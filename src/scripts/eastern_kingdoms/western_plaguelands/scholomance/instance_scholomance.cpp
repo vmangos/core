@@ -45,6 +45,7 @@ struct instance_scholomance : public ScriptedInstance
     uint64 m_uiGateRavenianGUID;
     uint64 m_uiGateBarovGUID;
     uint64 m_uiGateIlluciaGUID;
+    uint64 m_uiBrazierKirtonosGUID;
 
     uint32 m_uiBoneMinionCount0;
     uint32 m_uiBoneMinionCount1;
@@ -65,6 +66,7 @@ struct instance_scholomance : public ScriptedInstance
         m_uiGateRavenianGUID = 0;
         m_uiGateBarovGUID = 0;
         m_uiGateIlluciaGUID = 0;
+        m_uiBrazierKirtonosGUID = 0;
 
         m_uiBoneMinionCount0 = 0;
         m_uiBoneMinionCount1 = 0;
@@ -113,6 +115,9 @@ struct instance_scholomance : public ScriptedInstance
                 break;
             case GO_GATE_ILLUCIA:
                 m_uiGateIlluciaGUID = pGo->GetGUID();
+                break;
+            case GO_BRAZIER_KIRTONOS:
+                m_uiBrazierKirtonosGUID = pGo->GetGUID();
                 break;
             case GO_VIEWING_ROOM_DOOR:
                 if (GetData(TYPE_VIEWING_ROOM_DOOR) == DONE)
@@ -188,12 +193,18 @@ struct instance_scholomance : public ScriptedInstance
             case TYPE_KIRTONOS:
                 m_auiEncounter[TYPE_KIRTONOS] = uiData;
                 if (uiData == IN_PROGRESS)
-                    DoUseDoorOrButton(m_uiGateKirtonosGUID);
+                {
+                    if (GameObject* pGo = instance->GetGameObject(m_uiGateKirtonosGUID))
+                        if (pGo->GetGoState() == GO_STATE_ACTIVE)
+                            DoUseDoorOrButton(m_uiGateKirtonosGUID);
+                }
                 else if (uiData == FAIL)
                 {
                     if (GameObject* pGo = instance->GetGameObject(m_uiGateKirtonosGUID))
-                        if (pGo->GetGoState() != GO_STATE_ACTIVE) // fermée
+                        if (pGo->GetGoState() != GO_STATE_ACTIVE)
                             DoUseDoorOrButton(m_uiGateKirtonosGUID);
+                    if (GameObject* pGo = instance->GetGameObject(m_uiBrazierKirtonosGUID))
+                            pGo->ResetDoorOrButton();
                 }
                 break;
             case TYPE_ALEXEIBAROV:
@@ -369,13 +380,17 @@ bool GOOpen_brazier_herald(Player* pUser, GameObject *pGo)
 {
     if (InstanceData* pInst = pGo->GetInstanceData())
     {
-        // Verif pour voir si le boss est deja SPAWN
-        if (pInst->GetData(TYPE_KIRTONOS) != NOT_STARTED)
-            return false;
+        switch (pInst->GetData(TYPE_KIRTONOS))
+        {
+            case IN_PROGRESS:
+            case DONE:
+                return false;
+        }
+
         pInst->SetData(TYPE_KIRTONOS, IN_PROGRESS);
-        Creature* kirtonos = pUser->SummonCreature(NPC_KIRTONOS, 309.65f, 93.47f, 101.66f, 0.03f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
-        if (kirtonos && kirtonos->AI())
-            kirtonos->AI()->AttackStart(pUser);
+        pGo->PlayDirectSound(SOUND_SCREECH, 0);
+
+        Creature* kirtonos = pUser->SummonCreature(NPC_KIRTONOS, 315.028f, 70.53845f, 102.1496f, 0.3859715f, TEMPSUMMON_DEAD_DESPAWN, 900000);
     }
 
     return true;

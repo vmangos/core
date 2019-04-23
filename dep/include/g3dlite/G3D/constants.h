@@ -3,13 +3,14 @@
 
   @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   @created 2009-05-20
-  @edited  2009-05-20
+  @edited  2010-05-20
 */
 #ifndef G3D_constants_h
 #define G3D_constants_h
 
 #include "G3D/platform.h"
 #include "G3D/enumclass.h"
+#include "G3D/Any.h"
 
 namespace G3D {
 
@@ -25,10 +26,13 @@ public:
         TRIANGLE_STRIP = 0x0005,
         TRIANGLE_FAN   = 0x0006,
         QUADS          = 0x0007, 
-        QUAD_STRIP     = 0x0008
+        QUAD_STRIP     = 0x0008,
+        PATCHES        = 0x000E
     };
 
 private:
+    
+    static const char* toString(int i, Value& v);
 
     Value value;
 
@@ -38,7 +42,7 @@ public:
 };
 
 
-/** Values for SuperSurface::GPUGeom::refractionHint. */
+/** Values for UniversalSurface::GPUGeom::refractionHint. */
 class RefractionQuality {
 public:
     enum Value {
@@ -66,22 +70,17 @@ public:
 
 private:
 
-    /** Used for to/from string conversion.  Last is the emtpy string as a sentinel */
-    static const std::string    str[7];
-    static const Value          enm[6];
+    static const char* toString(int i, Value& v);
+
     Value value;
 
 public:
     G3D_DECLARE_ENUM_CLASS_METHODS(RefractionQuality);
 
-    RefractionQuality(const class Any&);
-    RefractionQuality& operator=(const Any&);
-    operator Any() const;
-    const std::string& toString() const;
 };
 
 
-/** Values for SuperSurface::GPUGeom::mirrorHint. */
+/** Values for UniversalSurface::GPUGeom::mirrorHint. */
 class MirrorQuality {
 public:
 
@@ -105,18 +104,12 @@ public:
 
 private:
 
-    /** Used for to/from string conversion.  Last is the emtpy string as a sentinel */
-    static const std::string    str[6];
-    static const Value          enm[5];
+    static const char* toString(int i, Value& v);
 
     Value value;
 
 public:
     G3D_DECLARE_ENUM_CLASS_METHODS(MirrorQuality);
-    MirrorQuality(const class Any&);
-    MirrorQuality& operator=(const Any&);
-    operator Any() const;
-    const std::string& toString() const;
 };
 
 } // namespace G3D

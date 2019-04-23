@@ -284,7 +284,7 @@ WarEffortGameEvents GetActiveTransportEvent()
 ## npc_AQwar_collector
 ###*/
 
-// UPDATE `creature_template` SET `ScriptName` = 'npc_AQwar_collector' WHERE `subname` like '%collector%' and subname not like '%ancestry%';
+// UPDATE `creature_template` SET `script_name` = 'npc_AQwar_collector' WHERE `subname` like '%collector%' and subname not like '%ancestry%';
 
 struct npc_AQwar_collectorAI : CreatureAI
 {
@@ -728,7 +728,7 @@ CreatureAI *GetAI_npc_AQwar_collector(Creature *pCreature)
 ## npc_resonating_Crystal
 ######*/
 
-// UPDATE `creature_template` SET `ScriptName` = 'npc_resonating_Crystal' WHERE `entry` = 15769;
+// UPDATE `creature_template` SET `script_name` = 'npc_resonating_Crystal' WHERE `entry` = 15769;
 
 enum
 {

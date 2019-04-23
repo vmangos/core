@@ -134,7 +134,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectPull,                                     // 70 SPELL_EFFECT_PULL                     one spell: Distract Move
     &Spell::EffectPickPocket,                               // 71 SPELL_EFFECT_PICKPOCKET
     &Spell::EffectAddFarsight,                              // 72 SPELL_EFFECT_ADD_FARSIGHT
-    &Spell::EffectSummonGuardian,                           // 73 SPELL_EFFECT_SUMMON_POSSESSED
+    &Spell::EffectSummonPossessed,                          // 73 SPELL_EFFECT_SUMMON_POSSESSED
     &Spell::EffectSummonTotem,                              // 74 SPELL_EFFECT_SUMMON_TOTEM
     &Spell::EffectHealMechanical,                           // 75 SPELL_EFFECT_HEAL_MECHANICAL          one spell: Mechanical Patch Kit
     &Spell::EffectSummonObjectWild,                         // 76 SPELL_EFFECT_SUMMON_OBJECT_WILD
@@ -306,10 +306,12 @@ void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
 
     WorldObject* caster = GetCastingObject();               // we need the original casting object
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_SPELLINSTAKILLLOG, (8 + 4));
     data << unitTarget->GetObjectGuid();                    // Victim GUID
     data << uint32(m_spellInfo->Id);
     m_caster->SendMessageToSet(&data, true);
+#endif
 
     m_caster->DealDamage(unitTarget, unitTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 }
@@ -317,7 +319,7 @@ void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
 void Spell::EffectEnvironmentalDMG(SpellEffectIndex eff_idx)
 {
     uint32 absorb = 0;
-    uint32 resist = 0;
+    int32 resist = 0;
 
     // Note: this hack with damage replace required until GO casting not implemented
     // environment damage spells already have around enemies targeting but this not help in case nonexistent GO casting support
@@ -341,6 +343,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
             {
                 switch (m_spellInfo->Id)                    // better way to check unknown
                 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                     // Meteor like spells (divided damage to targets)
                     case 24340:
                     case 26558:
@@ -355,6 +358,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage /= count;                    // divide to all targets
                         break;
                     }
+#endif
                     // percent from health with min
                     case 25599:                             // Thundercrash
                     {
@@ -1105,6 +1109,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 20494, true);
                     return;
                 }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 case 19593:                                // Egg Explosion (Buru)
                 {
                     if (!unitTarget)
@@ -1137,12 +1142,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+#endif
                 case 20572:                                 // Blood Fury
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                     m_caster->CastSpell(m_caster, 23230, true);
+#endif
 
                     damage = damage * (m_caster->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100;
                     if (damage > 0)
@@ -1204,7 +1212,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     DEBUG_LOG("AddObject at SpellEfects.cpp EffectDummy");
                     map->Add(pGameObj);
 
-                    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
+                    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
                     data << ObjectGuid(pGameObj->GetObjectGuid());
                     m_caster->SendMessageToSet(&data, true);
 
@@ -1839,6 +1847,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         }
         case SPELLFAMILY_PALADIN:
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             switch (m_spellInfo->SpellIconID)
             {
                 case 156:                                   // Holy Shock
@@ -1889,6 +1898,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     return;
                 }
             }
+#endif
             break;
         }
         case SPELLFAMILY_SHAMAN:
@@ -2391,7 +2401,7 @@ void Spell::EffectPowerBurn(SpellEffectIndex eff_idx)
     m_damage += new_damage;
 }
 
-void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
+void Spell::EffectHeal(SpellEffectIndex eff_idx)
 {
     if (unitTarget && unitTarget->isAlive() && damage >= 0)
     {
@@ -2453,6 +2463,13 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
 
         addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, 1, this);
         addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL, 1, this);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        ExecuteLogInfo info(unitTarget->GetObjectGuid());
+        info.heal.amount = addhealth;
+        info.heal.critical = 0;
+        AddExecuteLogInfo(eff_idx, info);
+#endif
 
         m_healing += addhealth;
     }
@@ -2586,7 +2603,7 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
         }
 
         // set the "Crafted by ..." property of the item
-        if (pItem->GetProto()->Class != ITEM_CLASS_CONSUMABLE && pItem->GetProto()->Class != ITEM_CLASS_QUEST)
+        if (pItem->GetProto()->HasSignature())
             pItem->SetGuidValue(ITEM_FIELD_CREATOR, player->GetObjectGuid());
 
         // send info to the client
@@ -2659,6 +2676,13 @@ void Spell::EffectEnergize(SpellEffectIndex eff_idx)
 
     if (m_spellInfo->Id == 2687)
         unitTarget->SetInCombatState(false, nullptr);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    ExecuteLogInfo info(unitTarget->GetObjectGuid());
+    info.energize.amount = damage;
+    info.energize.powerType = power;
+    AddExecuteLogInfo(eff_idx, info);
+#endif
 
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, damage, power);
 }
@@ -2790,7 +2814,7 @@ void Spell::EffectOpenLock(SpellEffectIndex eff_idx)
     if (!m_CastItem && skillId != SKILL_NONE)
     {
         // update skill if really known
-        if (uint32 pureSkillValue = player->GetPureSkillValue(skillId))
+        if (uint32 pureSkillValue = player->GetSkillValuePure(skillId))
         {
             if (gameObjTarget)
             {
@@ -2972,7 +2996,7 @@ void Spell::EffectSummon(SpellEffectIndex eff_idx)
     uint32 pet_number = sObjectMgr.GeneratePetNumber();
     if (!spawnCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_PET), pos, cInfo, pet_number))
     {
-        sLog.outErrorDb("Spell::EffectSummon: can't create creature with entry %u for spell %u", cInfo->Entry, m_spellInfo->Id);
+        sLog.outErrorDb("Spell::EffectSummon: can't create creature with entry %u for spell %u", cInfo->entry, m_spellInfo->Id);
         delete spawnCreature;
         return;
     }
@@ -3161,8 +3185,13 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         {
             int32 count = success_list.size();
             WorldPacket data(SMSG_SPELLDISPELLOG, 8 + 8 + 4 + count * 4);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             data << unitTarget->GetPackGUID();              // Victim GUID
             data << m_caster->GetPackGUID();                // Caster GUID
+#else
+            data << unitTarget->GetGUID();              // Victim GUID
+            data << m_caster->GetGUID();                // Caster GUID
+#endif
             data << uint32(count);
             for (std::list<std::pair<SpellAuraHolder* , uint32> >::iterator j = success_list.begin(); j != success_list.end(); ++j)
             {
@@ -3366,6 +3395,7 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                 case 4071:
                 case 4072:
                 case 19805:
+                    summon->SetFactionTemporary(m_caster->getFaction(), TEMPFACTION_NONE);
                     summon->lootForCreator = true;
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
                     summon->SetLootRecipient(m_caster);
@@ -3459,7 +3489,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
     // Summoned by unit: use creature level but cap at owner level
     if (m_caster->GetTypeId() == TYPEID_UNIT)
     {
-        uint32 creaturelevel = cInfo->minlevel == cInfo->maxlevel ? cInfo->minlevel : urand(cInfo->minlevel, cInfo->maxlevel);
+        uint32 creaturelevel = cInfo->level_min == cInfo->level_max ? cInfo->level_min : urand(cInfo->level_min, cInfo->level_max);
         if (creaturelevel < level) level = creaturelevel;
     }
     // Summoned by player
@@ -3471,9 +3501,9 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
             level = m_spellInfo->spellLevel;
         }
         // Else match with owner level but cap at creature max
-        else if (cInfo->maxlevel < level)
+        else if (cInfo->level_max < level)
         {
-            level = cInfo->maxlevel;
+            level = cInfo->level_max;
         }
         // Engineering summons always scale with skill points
         if (m_CastItem)
@@ -3541,7 +3571,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         //spawnCreature->SetName("");                       // generated by client
         spawnCreature->SetOwnerGuid(m_caster->GetObjectGuid());
         spawnCreature->SetInitCreaturePowerType();
-        spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, spawnCreature->GetCreatureInfo()->npcflag);
+        spawnCreature->SetUInt32Value(UNIT_NPC_FLAGS, spawnCreature->GetCreatureInfo()->npc_flags);
         spawnCreature->setFaction(m_caster->getFaction());
         spawnCreature->SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
         spawnCreature->SetCreatorGuid(m_caster->GetObjectGuid());
@@ -3562,27 +3592,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
 
         switch (m_spellInfo->Id)
         {
-            case 126: // Eye of Kilrogg
-            {
-                spawnCreature->SetWalk(false);
-                if (Player* p = m_caster->ToPlayer())
-                {
-                    // Stealth
-                    spawnCreature->CastSpell(spawnCreature, 2585, true);
-                    p->ModPossessPet(spawnCreature, true, AURA_REMOVE_BY_DEFAULT);
-                }
-                break;
-            }
-            case 11403: // Elixir of Dream Vision
-            {
-                spawnCreature->SetWalk(false);
-                if (Player* p = m_caster->ToPlayer())
-                {
-                    spawnCreature->CastSpell(spawnCreature, 27986, true); // Levitate
-                    p->ModPossessPet(spawnCreature, true, AURA_REMOVE_BY_DEFAULT);
-                }
-                break;
-            }
             case 17166: // Release Umi's Yeti - Quest Are We There, Yeti? Part 3
             {
                 spawnCreature->MonsterTextEmote(-1900169);
@@ -3636,6 +3645,26 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
     }
 }
 
+void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
+{
+    Player* pCaster = m_caster->ToPlayer();
+    if (!pCaster)
+        return;
+
+    uint32 creatureEntry = m_spellInfo->EffectMiscValue[eff_idx];
+
+    Creature* pMinion = pCaster->SummonPossessedMinion(creatureEntry, m_spellInfo->Id, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster->GetOrientation());
+    if (!pMinion)
+    {
+        sLog.outError("Spell::EffectSummonPossessed: creature entry %u for spell %u could not be summoned.", creatureEntry, m_spellInfo->Id);
+        return;
+    }
+
+    // Notify Summoner
+    if (m_originalCaster && m_originalCaster != m_caster && m_originalCaster->AI())
+        m_originalCaster->AI()->JustSummoned(pMinion);
+}
+
 void Spell::EffectTeleUnitsFaceCaster(SpellEffectIndex eff_idx)
 {
     if (!unitTarget)
@@ -3664,9 +3693,16 @@ void Spell::EffectLearnSkill(SpellEffectIndex eff_idx)
     if (damage < 0)
         return;
 
-    uint32 skillid =  m_spellInfo->EffectMiscValue[eff_idx];
-    uint16 skillval = ((Player*)unitTarget)->GetPureSkillValue(skillid);
-    ((Player*)unitTarget)->SetSkill(skillid, skillval ? skillval : 1, damage * 75, damage);
+    Player* target = static_cast<Player*>(unitTarget);
+
+    uint16 skillid = uint16(m_spellInfo->EffectMiscValue[eff_idx]);
+    uint16 step = uint16(damage);
+    uint16 current = std::max(uint16(1), target->GetSkillValuePure(skillid));
+    uint16 max = (step * 75);
+    target->SetSkill(skillid, current, max, step);
+
+    if (WorldObject const* caster = GetCastingObject())
+        DEBUG_LOG("Spell: %s has learned skill %u (to maxlevel %u) from %s", target->GetGuidStr().c_str(), skillid, max, caster->GetGuidStr().c_str());
 }
 
 void Spell::EffectAddHonor(SpellEffectIndex /*eff_idx*/)
@@ -3872,28 +3908,8 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
 
 ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLevel)
 {
-    Pet *OldSummon = GetPet();
-
-    // if pet requested type already exist
-    if (OldSummon)
-    {
-        if (petEntry == 0 || OldSummon->GetEntry() == petEntry)
-        {
-            if (OldSummon->isDead())
-            {
-                if (petEntry) // Warlock pet
-                    OldSummon->Unsummon(PET_SAVE_NOT_IN_SLOT);
-                else
-                    return ObjectGuid(); // pet in corpse state can't be summoned
-            }
-            else
-                OldSummon->GetMap()->Remove((Creature*)OldSummon, false);
-        }
-        else if (GetTypeId() == TYPEID_PLAYER)
-            OldSummon->Unsummon(OldSummon->getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT, this);
-        else
-            return ObjectGuid();
-    }
+    if (!UnsummonOldPetBeforeNewSummon(petEntry))
+        return ObjectGuid();
 
     CreatureInfo const* cInfo = petEntry ? sCreatureStorage.LookupEntry<CreatureInfo>(petEntry) : NULL;
 
@@ -4234,7 +4250,7 @@ void Spell::EffectThreat(SpellEffectIndex eff_idx)
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
 }
 
-void Spell::EffectHealMaxHealth(SpellEffectIndex /*eff_idx*/)
+void Spell::EffectHealMaxHealth(SpellEffectIndex eff_idx)
 {
     if (!unitTarget)
         return;
@@ -4263,6 +4279,13 @@ void Spell::EffectHealMaxHealth(SpellEffectIndex /*eff_idx*/)
         TakenTotalMod *= (100.0f + maxval) / 100.0f;
 
     heal *= TakenTotalMod;
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    ExecuteLogInfo info(unitTarget->GetObjectGuid());
+    info.heal.amount = heal;
+    info.heal.critical = 0;
+    AddExecuteLogInfo(eff_idx, info);
+#endif
 
     m_healing += heal;
 }
@@ -5049,6 +5072,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 m_caster->CastSpell(unitTarget, spellId2, true);
                 return;
             }
+            // Seal of Fury proc
+            else if (m_spellInfo->SpellFamilyFlags == 4096)
+            {
+                if (!unitTarget || !unitTarget->CanHaveThreatList())
+                    return;
+                
+                if (unitTarget->getThreatManager().getThreat(m_caster))
+                    unitTarget->getThreatManager().addThreat(m_caster, damage * m_caster->GetAttackTime(BASE_ATTACK) / 1000);
+            }
             break;
         }
         case SPELLFAMILY_SHAMAN:
@@ -5486,7 +5518,7 @@ void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)
     pTotem->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        pTotem->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        pTotem->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
     if (m_caster->IsPvP())
         pTotem->SetPvP(true);
@@ -5723,7 +5755,7 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
     m_caster->AddGameObject(pGameObj);
 
     map->Add(pGameObj);
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
+    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
     data << ObjectGuid(pGameObj->GetObjectGuid());
     m_caster->SendMessageToSet(&data, true);
 
@@ -5921,7 +5953,7 @@ void Spell::EffectSkinning(SpellEffectIndex /*eff_idx*/)
 
     int32 reqValue = targetLevel < 10 ? 0 : targetLevel < 20 ? (targetLevel - 10) * 10 : targetLevel * 5;
 
-    int32 skillValue = ((Player*)m_caster)->GetPureSkillValue(skill);
+    int32 skillValue = ((Player*)m_caster)->GetSkillValuePure(skill);
 
     // Double chances for elites
     ((Player*)m_caster)->UpdateGatherSkill(skill, skillValue, reqValue, creature->IsElite() ? 2 : 1);
@@ -5992,7 +6024,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     critter->AIM_Initialize();
     critter->InitPetCreateSpells();                         // e.g. disgusting oozeling has a create spell as critter...
     critter->SelectLevel(critter->GetCreatureInfo());       // some summoned creaters have different from 1 DB data for level/hp
-    critter->SetUInt32Value(UNIT_NPC_FLAGS, critter->GetCreatureInfo()->npcflag);
+    critter->SetUInt32Value(UNIT_NPC_FLAGS, critter->GetCreatureInfo()->npc_flags);
     // some mini-pets have quests
 
     // set timer for unsummon

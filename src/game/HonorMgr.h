@@ -164,6 +164,7 @@ class HonorMgr
         static float HonorableKillPoints(Player* killer, Player* victim, uint32 groupsize);
 
         HonorRankInfo GetRank() const { return m_rank; }
+        uint8 GetCurrentHonorRank() const { return m_rank.rank; }
         void SetRank(HonorRankInfo rank) { m_rank = rank; }
         HonorRankInfo GetHighestRank() const { return m_highestRank; }
         void SetHighestRank(HonorRankInfo hignestRank) { m_highestRank = hignestRank; }

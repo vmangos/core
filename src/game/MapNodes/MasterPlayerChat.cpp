@@ -43,15 +43,15 @@ void MasterPlayer::Whisper(const std::string& text, uint32 language, MasterPlaye
     if (language != LANG_ADDON)                             // if not addon data
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
-    WorldPacket data(SMSG_MESSAGECHAT, 100);
-    Player::BuildPlayerChat(GetObjectGuid(), GetChatTag(), &data, CHAT_MSG_WHISPER, text, language);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
     receiver->GetSession()->SendPacket(&data);
 
     // not send confirmation for addon messages
     if (language != LANG_ADDON)
     {
-        data.Initialize(SMSG_MESSAGECHAT, 100);
-        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->GetChatTag(), &data, CHAT_MSG_WHISPER_INFORM, text, language);
+        data.clear();
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER_INFORM, text.c_str(), Language(language), receiver->GetChatTag(), receiver->GetObjectGuid());
         GetSession()->SendPacket(&data);
     }
 
@@ -59,14 +59,14 @@ void MasterPlayer::Whisper(const std::string& text, uint32 language, MasterPlaye
 
     if (receiver->IsDND())
     {
-        data.Initialize(SMSG_MESSAGECHAT, 100);
-        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->GetChatTag(), &data, CHAT_MSG_DND, receiver->dndMsg, language);
+        data.clear();
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_DND, receiver->dndMsg.c_str(), LANG_UNIVERSAL, CHAT_TAG_NONE, receiver->GetObjectGuid());
         GetSession()->SendPacket(&data);
     } 
     else if (receiver->IsAFK())
     {
-        data.Initialize(SMSG_MESSAGECHAT, 100);
-        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->GetChatTag(), &data, CHAT_MSG_AFK, receiver->afkMsg, language);
+        data.clear();
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_AFK, receiver->afkMsg.c_str(), LANG_UNIVERSAL, CHAT_TAG_NONE, receiver->GetObjectGuid());
         GetSession()->SendPacket(&data);
     }
 

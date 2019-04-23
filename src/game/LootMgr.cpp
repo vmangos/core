@@ -456,6 +456,10 @@ LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Play
 // Inserts the item into the loot (called by LootTemplate processors)
 void Loot::AddItem(LootStoreItem const & item)
 {
+    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item.itemid);
+    if (proto && !proto->m_bDiscovered)
+        proto->m_bDiscovered = true;
+
     if (item.needs_quest)                                   // Quest drop
     {
         if (m_questItems.size() < MAX_NR_QUEST_ITEMS)
@@ -470,7 +474,6 @@ void Loot::AddItem(LootStoreItem const & item)
         // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
         if (!item.conditionId)
         {
-            ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item.itemid);
             if (!proto || !(proto->Flags & ITEM_FLAG_PARTY_LOOT))
                 ++unlootedCount;
         }
@@ -1350,7 +1353,7 @@ void LoadLootTemplates_Creature()
     {
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
         {
-            if (uint32 lootid = cInfo->lootid)
+            if (uint32 lootid = cInfo->loot_id)
             {
                 if (ids_set.find(lootid) == ids_set.end())
                     LootTemplates_Creature.ReportNotExistedId(lootid);
@@ -1469,7 +1472,7 @@ void LoadLootTemplates_Pickpocketing()
     {
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
         {
-            if (uint32 lootid = cInfo->pickpocketLootId)
+            if (uint32 lootid = cInfo->pickpocket_loot_id)
             {
                 if (ids_set.find(lootid) == ids_set.end())
                     LootTemplates_Pickpocketing.ReportNotExistedId(lootid);
@@ -1511,7 +1514,7 @@ void LoadLootTemplates_Skinning()
     {
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
         {
-            if (uint32 lootid = cInfo->SkinLootId)
+            if (uint32 lootid = cInfo->skinning_loot_id)
             {
                 if (ids_set.find(lootid) == ids_set.end())
                     LootTemplates_Skinning.ReportNotExistedId(lootid);

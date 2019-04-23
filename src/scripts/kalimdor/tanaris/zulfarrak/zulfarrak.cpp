@@ -633,56 +633,6 @@ CreatureAI* GetAI_ward_zumrah(Creature* pCreature)
     return new ward_zumrahAI(pCreature);
 }
 
-/*
- *
- */
-
-struct earthGrab_totemAI : public ScriptedAI
-{
-    earthGrab_totemAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 m_uiRootTimer;
-
-    void JustDied(Unit *Killer)
-    {
-        m_creature->DeleteLater();
-    }
-
-    void Reset()
-    {
-        m_uiRootTimer = 0;
-
-        m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance : pas touch� par les AOE
-        //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED); // no attack a ajouter ?
-        m_creature->addUnitState(UNIT_STAT_ROOT);
-        SetCombatMovement(false);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
-
-        if (!m_creature->hasUnitState(UNIT_STAT_ROOT))
-            m_creature->addUnitState(UNIT_STAT_ROOT);
-
-        if (m_uiRootTimer < uiDiff)
-        {
-            DoCastSpellIfCan(m_creature, 8377, true);
-            m_uiRootTimer = 4000;
-        }
-        else
-            m_uiRootTimer -= uiDiff;
-    }
-};
-
-CreatureAI* GetAI_earth_grab_totem(Creature* pCreature)
-{
-    return new earthGrab_totemAI(pCreature);
-}
-
 void AddSC_at_zumrah()
 {
     Script* pNewScript;
@@ -701,11 +651,6 @@ void AddSC_zulfarrak()
     AddSC_go_troll_cage();
 
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "earth_grab_totem";
-    newscript->GetAI = &GetAI_earth_grab_totem;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "ward_zumrah";

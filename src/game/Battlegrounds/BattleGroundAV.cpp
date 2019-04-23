@@ -282,7 +282,7 @@ void BattleGroundAV::HandleKillUnit(Creature *creature, Player *killer)
         {
             // Stop landmines respawn
             uint8 eventIdx = creature->GetEntry() == NPC_LANDMINES_LAYER_A2 ? BG_AV_LANDMINES_ALLIANCE : BG_AV_LANDMINES_HORDE;
-            m_ActiveEvents[eventIdx] = 1; // Cf ScriptName "go_av_landmineAI"
+            m_ActiveEvents[eventIdx] = 1; // Cf script_name "go_av_landmineAI"
             return;
         }
         case NPC_LANDMINES_EXPERT_A2:

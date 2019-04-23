@@ -213,6 +213,9 @@ public:
             data << uint32(race);                               // player race
             data << uint32(pzoneid);                            // player zone id
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+            data << uint32(0);                                  // unknown
+#endif
             // 50 is maximum player count sent to client
             if ((++clientcount) == 49)
                 break;
@@ -299,6 +302,15 @@ void WorldSession::HandleWhoOpcode(WorldPacket & recv_data)
 
     SetReceivedWhoRequest(true);
     sWorld.AddAsyncTask(std::move(task));
+}
+
+void WorldSession::HandleLFGOpcode(WorldPacket & recv_data)
+{
+    DEBUG_LOG("WORLD: Recvd MSG_LOOKING_FOR_GROUP Message");
+    
+    WorldPacket data(MSG_LOOKING_FOR_GROUP, 4);
+    data << uint32(0);
+    SendPacket(&data);
 }
 
 void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)

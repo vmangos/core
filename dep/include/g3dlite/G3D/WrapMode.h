@@ -1,12 +1,12 @@
 /** 
-  @file WrapMode.h
+  \file G3D/WrapMode.h
  
-  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
+  \maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
-  @created 2007-04-17
-  @edited  2007-04-17
+  \created 2007-04-17
+  \edited  2010-04-17
 
-  Copyright 2000-2010, Morgan McGuire.
+  Copyright 2000-2012, Morgan McGuire.
   All rights reserved.
  */
 
@@ -61,30 +61,22 @@ public:
         ZERO,
         IGNORE, 
         ERROR
-    };
-
-private:
+    } value;
     
-    Value value;
+    static const char* toString(int i, Value& v) {
+        static const char* str[] = {"CLAMP", "TILE", "ZERO", "IGNORE", "ERROR", NULL}; 
+        static const Value val[] = {CLAMP, TILE, ZERO, IGNORE, ERROR};
+        const char* s = str[i];
+        if (s) {
+            v = val[i];
+        }
+        return s;
+    }
 
-public:
 
     G3D_DECLARE_ENUM_CLASS_METHODS(WrapMode);
-
-    inline const char* toString() const {
-        static const char* s[] = {"CLAMP", "TILE", "ZERO", "IGNORE", "ERROR"};
-        return s[value];
-    }
-
-    inline explicit WrapMode(const std::string& x) : value(ERROR) {
-        static const char* s[] = {"CLAMP", "TILE", "ZERO", "IGNORE", "ERROR"};
-        for (int i = 0; i < 5; ++i) {
-            if (x == s[i]) {
-                value = (Value)i;
-            }
-        }
-    }
 };
+
 
 } // namespace G3D
 

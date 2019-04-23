@@ -34,7 +34,7 @@ public:
                 Player* friendplayer = GetTestPlayer(2, TESTPLAYER_PVP_ON);
                 mage->CastSpell(mage, SPELL_FROST_NOVA, false);
                 TEST_ASSERT(!warlock->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_UNK_16));
-                TEST_ASSERT(warlock->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE));
+                TEST_ASSERT(warlock->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED));
                 TEST_ASSERT(warlock->IsHostileTo(mage));
                 TEST_ASSERT(friendplayer->IsFriendlyTo(mage));
                 TEST_ASSERT(!mage->IsValidAttackTarget(friendplayer));

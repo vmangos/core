@@ -17,87 +17,11 @@
 /* ScriptData
 SDName: Stonetalon_Mountains
 SD%Complete: 95
-SDComment: Quest support: 6523, 1090
+SDComment: Quest support: 1090
 SDCategory: Stonetalon Mountains
 EndScriptData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_kaya
-######*/
-
-enum
-{
-    NPC_GRIMTOTEM_RUFFIAN       = 11910,
-    NPC_GRIMTOTEM_BRUTE         = 11912,
-    NPC_GRIMTOTEM_SORCERER      = 11913,
-
-    SAY_START                   = -1000357,
-    SAY_AMBUSH                  = -1000358,
-    SAY_END                     = -1000359,
-
-    QUEST_PROTECT_KAYA          = 6523
-};
-
-struct npc_kayaAI : public npc_escortAI
-{
-    npc_kayaAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() { }
-
-    void JustSummoned(Creature* pSummoned)
-    {
-        pSummoned->AI()->AttackStart(m_creature);
-    }
-
-    void WaypointReached(uint32 uiPointId)
-    {
-        switch (uiPointId)
-        {
-            //Ambush
-            case 16:
-                //note about event here:
-                //apparently NPC say _after_ the ambush is over, and is most likely a bug at you-know-where.
-                //we simplify this, and make say when the ambush actually start.
-                DoScriptText(SAY_AMBUSH, m_creature);
-                m_creature->SummonCreature(NPC_GRIMTOTEM_RUFFIAN, -50.75f, -500.77f, -46.13f, 0.4f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-                m_creature->SummonCreature(NPC_GRIMTOTEM_BRUTE, -40.05f, -510.89f, -46.05f, 1.7f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-                m_creature->SummonCreature(NPC_GRIMTOTEM_SORCERER, -32.21f, -499.20f, -45.35f, 2.8f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
-                break;
-            // Award quest credit
-            case 18:
-                DoScriptText(SAY_END, m_creature);
-
-                if (Player* pPlayer = GetPlayerForEscort())
-                    pPlayer->GroupEventHappens(QUEST_PROTECT_KAYA, m_creature);
-                break;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_kaya(Creature* pCreature)
-{
-    return new npc_kayaAI(pCreature);
-}
-
-bool QuestAccept_npc_kaya(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    //Casting Spell and Starting the Escort quest is buggy, so this is a hack. Use the spell when it is possible.
-
-    if (pQuest->GetQuestId() == QUEST_PROTECT_KAYA)
-    {
-        pCreature->setFaction(FACTION_ESCORT_H_PASSIVE);
-        DoScriptText(SAY_START, pCreature);
-
-        if (npc_kayaAI* pEscortAI = dynamic_cast<npc_kayaAI*>(pCreature->AI()))
-            pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
-    }
-    return true;
-}
 
 /*######
 ## npc_piznik (quest 1090 by Rockette)
@@ -224,12 +148,6 @@ bool QuestAccept_npc_piznik(Player *pPlayer, Creature *pCreature, const Quest *p
 void AddSC_stonetalon_mountains()
 {
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_kaya";
-    newscript->GetAI = &GetAI_npc_kaya;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_kaya;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_piznik";

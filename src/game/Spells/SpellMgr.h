@@ -50,7 +50,7 @@ enum SpellAttributeCustom
     SPELL_CUSTOM_NEGATIVE                   = 0x002,
     SPELL_CUSTOM_POSITIVE                   = 0x004,
     SPELL_CUSTOM_CHAN_NO_DIST_LIMIT         = 0x008,
-    SPELL_CUSTOM_FIXED_DAMAGE               = 0x010,
+    SPELL_CUSTOM_FIXED_DAMAGE               = 0x010,     // Not affected by damage/healing done bonus
     SPELL_CUSTOM_IGNORE_ARMOR               = 0x020,
     SPELL_CUSTOM_FROM_BEHIND                = 0x040,     // For spells that require the caster to be behind the target
     SPELL_CUSTOM_FROM_FRONT                 = 0x080,     // For spells that require the target to be in front of the caster
@@ -609,7 +609,7 @@ enum ProcFlags
 {
     PROC_FLAG_NONE                           = 0x00000000,
 
-    PROC_FLAG_KILLED                         = 0x00000001,   // 00 Killed by aggressor
+    PROC_FLAG_HEARTBEAT                      = 0x00000001,   // 00 On Tick
     PROC_FLAG_KILL                           = 0x00000002,   // 01 Kill target (in most cases need XP/Honor reward, see Unit::IsTriggeredAtSpellProcEvent for additinoal check)
 
     PROC_FLAG_SUCCESSFUL_MELEE_HIT           = 0x00000004,   // 02 Successful melee auto attack
@@ -1230,10 +1230,18 @@ class SpellMgr
         bool IsRankSpellDueToSpell(SpellEntry const *spellInfo_1,uint32 spellId_2) const;
         bool IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) const;
         bool CanAurasStack(SpellEntry const *spellInfo_1, SpellEntry const *spellInfo_2, bool sameCaster) const;
-        bool canStackSpellRanksInSpellBook(SpellEntry const *spellInfo) const;
-        bool IsRankedSpellNonStackableInSpellBook(SpellEntry const *spellInfo) const
+        uint32 GetSpellBookSuccessorSpellId(uint32 spellId)
         {
-            return !canStackSpellRanksInSpellBook(spellInfo) && GetSpellRank(spellInfo->Id) != 0;
+            SkillLineAbilityMapBounds bounds = GetSkillLineAbilityMapBoundsBySpellId(spellId);
+            for (SkillLineAbilityMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
+            {
+                if (SkillLineAbilityEntry const* pAbility = itr->second)
+                {
+                    if (pAbility->forward_spellid)
+                        return pAbility->forward_spellid;
+                }
+            }
+            return 0;
         }
 
         SpellEntry const* SelectAuraRankForLevel(SpellEntry const* spellInfo, uint32 Level) const;
@@ -1284,10 +1292,15 @@ class SpellMgr
         // Spell correctness for client using
         static bool IsSpellValid(SpellEntry const * spellInfo, Player* pl = NULL, bool msg = true);
 
-        SkillLineAbilityMapBounds GetSkillLineAbilityMapBounds(uint32 spell_id) const
+        SkillLineAbilityMapBounds GetSkillLineAbilityMapBoundsBySpellId(uint32 spellId) const
         {
-            return mSkillLineAbilityMap.equal_range(spell_id);
+            return mSkillLineAbilityMapBySpellId.equal_range(spellId);
         }
+
+        SkillLineAbilityMapBounds GetSkillLineAbilityMapBoundsBySkillId(uint32 skillId) const
+        {
+            return mSkillLineAbilityMapBySkillId.equal_range(skillId);
+}
 
         SkillRaceClassInfoMapBounds GetSkillRaceClassInfoMapBounds(uint32 skill_id) const
         {
@@ -1354,7 +1367,7 @@ class SpellMgr
         void LoadSpellBonuses();
         void LoadSpellTargetPositions();
         void LoadSpellThreats();
-        void LoadSkillLineAbilityMap();
+        void LoadSkillLineAbilityMaps();
         void LoadSkillRaceClassInfoMap();
         void LoadSpellPetAuras();
         void LoadSpellAreas();
@@ -1401,7 +1414,8 @@ class SpellMgr
         SpellProcItemEnchantMap mSpellProcItemEnchantMap;
         SpellEnchantChargesMap mSpellEnchantChargesMap;
         SpellBonusMap      mSpellBonusMap;
-        SkillLineAbilityMap mSkillLineAbilityMap;
+        SkillLineAbilityMap mSkillLineAbilityMapBySpellId;
+        SkillLineAbilityMap mSkillLineAbilityMapBySkillId;
         SkillRaceClassInfoMap mSkillRaceClassInfoMap;
         SpellPetAuraMap     mSpellPetAuraMap;
         SpellAreaMap         mSpellAreaMap;

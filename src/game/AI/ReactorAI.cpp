@@ -21,6 +21,7 @@
 
 #include "ReactorAI.h"
 #include "Creature.h"
+#include "GuardMgr.h"
 
 int ReactorAI::Permissible(const Creature *creature)
 {
@@ -28,6 +29,26 @@ int ReactorAI::Permissible(const Creature *creature)
         return PERMIT_BASE_REACTIVE;
 
     return PERMIT_BASE_NO;
+}
+
+void ReactorAI::JustRespawned()
+{
+    m_bCanSummonGuards = m_creature->CanSummonGuards();
+}
+
+void ReactorAI::MoveInLineOfSight(Unit* pWho)
+{
+    if (!CanSummonGuards() || m_creature->isInCombat())
+        return;
+
+    if (!pWho->IsPlayer())
+        return;
+
+    if (!m_creature->IsWithinDistInMap(pWho, m_creature->GetDetectionRange()))
+        return;
+
+    if (m_creature->IsHostileTo(pWho) && pWho->isTargetableForAttack() && m_creature->IsWithinLOSInMap(pWho))
+        m_bCanSummonGuards = !sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho));
 }
 
 void ReactorAI::AttackStart(Unit *p)
@@ -55,7 +76,7 @@ void ReactorAI::UpdateAI(const uint32 uiDiff)
         return;
 
     if (!m_CreatureSpells.empty())
-        DoSpellTemplateCasts(uiDiff);
+        UpdateSpellsList(uiDiff);
 
     DoMeleeAttackIfReady();
 }

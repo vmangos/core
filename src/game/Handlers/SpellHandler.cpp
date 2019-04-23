@@ -314,10 +314,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         }
     }
 
-    // Remove invisibility except Gnomish Cloaking Device, since evidence suggests
-    // it remains until cast finish
-    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL, 4079);
-
     // client provided targets
     SpellCastTargets targets;
 
@@ -326,10 +322,32 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     // auto-selection buff level base at target level (in spellInfo)
     if (Unit* target = targets.getUnitTarget())
     {
+        // Cannot cast negative spells on yourself. Handle it here since casting negative
+        // spells on yourself is frequently used within the core itself for certain mechanics.
+        if (target == _player && IsExplicitlySelectedUnitTarget(spellInfo->EffectImplicitTargetA[0]) && !IsPositiveSpell(spellInfo, _player, target))
+        {
+            WorldPacket data(SMSG_CAST_RESULT, (4 + 1 + 1));
+            data << uint32(spellId);
+            data << uint8(2); // status = fail
+            data << uint8(SPELL_FAILED_BAD_TARGETS);
+            SendPacket(&data);
+            return;
+        }
+
         // if rank not found then function return NULL but in explicit cast case original spell can be casted and later failed with appropriate error message
         if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(spellInfo, target->getLevel()))
             spellInfo = actualSpellInfo;
     }
+
+    // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+    // - Stealth and Invisibility effects will now be canceled at the
+    //   beginning of an action(spellcast, ability use etc...), rather than
+    //   at the completion of the action.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    // Remove invisibility except Gnomish Cloaking Device, since evidence suggests
+    // it remains until cast finish
+    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL, 4079);
+#endif
 
     _player->m_castingSpell = spellId;
     if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)

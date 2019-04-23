@@ -446,7 +446,7 @@ void npc_doctorAI::PatientDied(Location* Point)
                     pPlayer->FailQuest(QUEST_TRIAGE_A);
                 else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
                     pPlayer->FailQuest(QUEST_TRIAGE_H);
-                pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);                
+                pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);                
                 Reset();
                 return;
             }
@@ -456,7 +456,7 @@ void npc_doctorAI::PatientDied(Location* Point)
         else
         {
             // If no player or player abandon quest in progress
-            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);        
+            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);        
             Reset();
         }
     }
@@ -555,7 +555,7 @@ bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, const Quest* p
 {
     if ((pQuest->GetQuestId() == QUEST_TRIAGE_A) || (pQuest->GetQuestId() == QUEST_TRIAGE_H))
     {
-        pPlayer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        pPlayer->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         if (npc_doctorAI* pDocAI = dynamic_cast<npc_doctorAI*>(pCreature->AI()))
             pDocAI->BeginEvent(pPlayer);
     }
@@ -566,7 +566,7 @@ bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, const Quest* p
 bool QuestRewarded_npc_doctor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if ((pQuest->GetQuestId() == QUEST_TRIAGE_A) || (pQuest->GetQuestId() == QUEST_TRIAGE_H))
-        pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
     return true;
 }
@@ -1888,12 +1888,6 @@ CreatureAI* GetAI_npc_firestarter_regular(Creature* pCreature)
  * Summon possessed mobs
  */
 
-enum
-{
-    SPELL_SUMMON_EYE_OF_KILROGG     = 126,
-    SPELL_SUMMON_DREAM_VISION       = 11403
-};
-
 struct npc_summon_possessedAI : ScriptedAI
 {
     explicit npc_summon_possessedAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -1908,12 +1902,12 @@ struct npc_summon_possessedAI : ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-        if (auto pOwner = m_creature->GetOwner())
+        if (auto pOwner = m_creature->GetCharmer())
         {
             if (auto pPlayer = pOwner->ToPlayer())
             {
-                pPlayer->RemoveAurasDueToSpell(SPELL_SUMMON_EYE_OF_KILROGG);
-                pPlayer->RemoveAurasDueToSpell(SPELL_SUMMON_DREAM_VISION);
+                if (uint32 spellId = m_creature->GetUInt32Value(UNIT_CREATED_BY_SPELL))
+                    pPlayer->RemoveAurasDueToSpell(spellId);
             } 
         }
 
@@ -2067,6 +2061,8 @@ struct npc_target_dummyAI : ScriptedAI
         m_bActive = true;
         m_uiStayTime = TARGET_DUMMY_DURATION;
         SetCombatMovement(false);
+        m_creature->GetMotionMaster()->Clear(false, true);
+        m_creature->GetMotionMaster()->MoveIdle();
 
         switch (m_creature->GetEntry())
         {
@@ -2092,17 +2088,27 @@ struct npc_target_dummyAI : ScriptedAI
         }
 
         m_creature->AddAura(m_passiveSpell, ADD_AURA_PERMANENT);
-        DoCastSpellIfCan(m_creature, m_spawnEffect, false);
+        m_creature->CastSpell(m_creature, m_spawnEffect, false);
     }
 
     void Reset() override
     {
-        
+        SetCombatMovement(false);
     }
 
     void Aggro(Unit* /*pWho*/) override
     {
 
+    }
+
+    void AttackStart(Unit* /*pWho*/) override
+    {
+
+    }
+
+    void EnterEvadeMode() override
+    {
+        
     }
 
     void UpdateAI(const uint32 diff) override
@@ -2120,9 +2126,6 @@ struct npc_target_dummyAI : ScriptedAI
         }
         else
             m_uiStayTime -= diff;
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
     }
 };
 

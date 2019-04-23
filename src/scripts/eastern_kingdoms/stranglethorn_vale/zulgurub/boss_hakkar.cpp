@@ -79,7 +79,6 @@ struct boss_hakkarAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    bool isEnteredBattle;
     uint32 BloodSiphon_Timer;
     uint32 CorruptedBlood_Timer;
     uint32 CauseInsanity_Timer;
@@ -98,8 +97,6 @@ struct boss_hakkarAI : public ScriptedAI
 
     void Reset()
     {
-        m_creature->SetRespawnTime(34560000);
-        isEnteredBattle = false;
         BloodSiphon_Timer = 90000;
         CorruptedBlood_Timer = 15000;
         CauseInsanity_Timer = 17000;
@@ -124,6 +121,8 @@ struct boss_hakkarAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_HAKKAR, IN_PROGRESS);
+        DoScriptText(SAY_AGGRO, m_creature);
+
         ScriptedAI::Aggro(who);
     }
 
@@ -142,17 +141,7 @@ struct boss_hakkarAI : public ScriptedAI
         if (m_creature->GetPositionZ() > 57.28f || m_creature->GetPositionZ() < 45.8f)
         {
             EnterEvadeMode();
-
-            m_creature->SetRespawnTime(300);
-            m_creature->ForcedDespawn();
-            m_creature->SetRespawnTime(300);
-        }
-
-
-        if (!isEnteredBattle)
-        {
-            DoScriptText(SAY_AGGRO, m_creature);
-            isEnteredBattle = true;
+            return;
         }
 
         if (CCDelayInsanity_Timer < diff)

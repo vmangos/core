@@ -392,7 +392,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleModPercentStat(bool Apply, bool Real);
         void HandleAurasVisible(bool Apply, bool Real);
         void HandleModResistancePercent(bool Apply, bool Real);
-        void HandleAuraModBaseResistancePCT(bool Apply, bool Real);
+        void HandleAuraModBaseResistancePercent(bool Apply, bool Real);
         void HandleModShieldBlockPCT(bool Apply, bool Real);
         void HandleAuraTrackStealthed(bool Apply, bool Real);
         void HandleModShieldBlock(bool Apply, bool Real);
@@ -536,6 +536,7 @@ class MANGOS_DLL_SPEC Aura
         void PeriodicTick(SpellEntry const* sProto = nullptr, AuraType auraType = SPELL_AURA_NONE, uint32 data = 0);
         void PeriodicDummyTick();
 
+        uint32 CalculateDotDamage() const;
         void ReapplyAffectedPassiveAuras();
 
         Modifier m_modifier;

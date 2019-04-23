@@ -589,6 +589,7 @@ void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket & recv_data)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (recv_data.empty())                                  // request
     {
         Group *group = GetPlayer()->GetGroup();
@@ -624,11 +625,16 @@ void WorldSession::HandleRaidReadyCheckOpcode(WorldPacket & recv_data)
             gleader->GetSession()->SendPacket(&data);
         }
     }
+#endif
 }
 
 void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data, uint32 mask, bool sendAllAuras)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     *data << player->GetPackGUID();
+#else
+    *data << player->GetGUID();
+#endif
     *data << uint32(mask);
 
     if (mask & GROUP_UPDATE_FLAG_STATUS)

@@ -82,12 +82,6 @@ enum BattleGroundMarks
     SPELL_AV_MARK_WINNER            = 24955,
 };
 
-enum BattleGroundMarksCount
-{
-    ITEM_WINNER_COUNT               = 3,
-    ITEM_LOSER_COUNT                = 1
-};
-
 enum BattleGroundTimeIntervals
 {
     RESURRECTION_INTERVAL           = 30000,                // ms
@@ -406,7 +400,7 @@ class BattleGround
         void CastSpellOnTeam(uint32 SpellID, Team team);
         void RewardHonorToTeam(uint32 Honor, Team team);
         void RewardReputationToTeam(uint32 faction_id, uint32 Reputation, Team team);
-        void RewardMark(Player *plr,uint32 count);
+        void RewardMark(Player *plr, bool winner);
         void SendRewardMarkByMail(Player *plr,uint32 mark, uint32 count);
         void RewardItem(Player *plr, uint32 item_id, uint32 count);
         void RewardQuestComplete(Player *plr);

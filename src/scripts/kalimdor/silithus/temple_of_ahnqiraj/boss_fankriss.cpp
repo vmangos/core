@@ -104,7 +104,10 @@ struct creature_spawn_fankrissAI : public ScriptedAI
 
         if (enrageTimer < diff)
         {
-            DoCastSpellIfCan(m_creature, SPELL_SPAWN_ENRAGE, CF_TRIGGERED);
+            //  World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            //  - Spawn of Fankriss will now enrage if not dealt with in a timely manner.
+            if (sWorld.GetWowPatch() >= WOW_PATCH_110)
+                m_creature->CastSpell(m_creature, SPELL_SPAWN_ENRAGE, true);
             enrageTimer = std::numeric_limits<uint32>::max();
         }
         else 

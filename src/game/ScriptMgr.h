@@ -145,7 +145,7 @@ enum eScriptCommand
     SCRIPT_COMMAND_SET_FACTION              = 22,           // source = Creature
                                                             // datalong = faction_Id,
                                                             // datalong2 = see enum TemporaryFactionFlags
-    SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL  = 23,           // source = Creature
+    SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL  = 23,           // source = Unit
                                                             // datalong = creature entry/modelid (depend on datalong2)
                                                             // datalong2 = (bool) is_display_id
     SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL  = 24,           // source = Creature
@@ -315,6 +315,8 @@ enum eScriptCommand
                                                             // datalong = gameobject_entry
                                                             // datalong2 = respawn_time
                                                             // x/y/z/o = coordinates
+    SCRIPT_COMMAND_SET_FLY                  = 77,           // source = Unit
+                                                            // datalong = (bool) 0 = off, 1 = on
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -818,7 +820,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_CREATURE_SPELLS (55)
         {
-            uint32 spellTemplate[4];                        // datalong to datalong4
+            uint32 spellListId[4];                          // datalong to datalong4
             uint32 unused;                                  // data_flags
             int32 chance[4];                                // dataint to dataint4
         } creatureSpells;
@@ -964,6 +966,11 @@ struct ScriptInfo
             uint32 gameobject_entry;                        // datalong
             uint32 respawn_time;                            // datalong2
         } summonObject;
+
+        struct                                              // SCRIPT_COMMAND_SET_FLY (77)
+        {
+            uint32 enabled;                                 // datalong
+        } setFly;
 
         struct
         {
@@ -1114,7 +1121,7 @@ enum ScriptTarget
 };
 
 //Generic scripting functions
-void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr, uint32 chatTypeOverride = 0);
+void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr, int32 chatTypeOverride = -1);
 void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
 
 // Returns a target based on the type specified.
@@ -1320,7 +1327,6 @@ class ScriptMgr
         void CollectPossibleEventIds(std::set<uint32>& eventIds);
         void LoadScripts(ScriptMapMap& scripts, const char* tablename);
         void CheckScriptTexts(ScriptMapMap const& scripts);
-        void DisableScriptAction(ScriptInfo& script);
 
         typedef std::vector<std::string> ScriptNameMap;
         typedef std::unordered_map<uint32, uint32> AreaTriggerScriptMap;

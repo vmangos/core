@@ -1,14 +1,14 @@
-/**
-  @file System.h
+/** 
+  \file System.h
+ 
+  \maintainer Morgan McGuire, http://graphics.cs.williams.edu
+ 
+  \cite Rob Wyatt http://www.gamasutra.com/features/wyatts_world/19990709/processor_detection_01.htm
+  \cite Benjamin Jurke http://www.flipcode.com/cgi-bin/msg.cgi?showThread=COTD-ProcessorDetectionClass&forum=cotd&id=-1
+  \cite Michael Herf http://www.stereopsis.com/memcpy.html
 
-  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
-
-  @cite Rob Wyatt http://www.gamasutra.com/features/wyatts_world/19990709/processor_detection_01.htm
-  @cite Benjamin Jurke http://www.flipcode.com/cgi-bin/msg.cgi?showThread=COTD-ProcessorDetectionClass&forum=cotd&id=-1
-  @cite Michael Herf http://www.stereopsis.com/memcpy.html
-
-  @created 2003-01-25
-  @edited  2008-10-14
+  \created 2003-01-25
+  \edited  2012-10-02
  */
 
 #ifndef G3D_System_h
@@ -18,28 +18,19 @@
 #include "G3D/g3dmath.h"
 #include "G3D/G3DGameUnits.h"
 #include "G3D/BinaryFormat.h"
+#include "G3D/FileNotFound.h"
 #include <string>
 
 #ifdef G3D_OSX
+#define Zone OSX_Zone
 #   include <CoreServices/CoreServices.h>
 #endif
 
 namespace G3D {
-
-/**
- Routine used by the demos to find the data.  Searches in
- ../data, ../../data, etc. up to 5 levels back.  Checks
- common locations like \verbatim c:\libraries\g3d-<version>\data \endverbatim
- and some hard-coded paths on the Brown University file
- system.
-
- @deprecated
- */
-std::string demoFindData(bool errorIfNotFound = true);
-
+    
 /** G3D, SDL, and IJG libraries require license documentation
     to be distributed with your program.  This generates the
-    string that must appear in your documentation.
+    string that must appear in your documentation. 
     <B>Your program can be commercial, closed-source</B> under
     any license you want.
     @deprecated Use System::license
@@ -48,19 +39,19 @@ std::string license();
 
 /**
 @brief The order in which the bytes of an integer are stored on a
-machine.
+machine. 
 
 Intel/AMD chips tend to be G3D_LITTLE_ENDIAN, Mac PPC's and Suns are
 G3D_BIG_ENDIAN. However, this is primarily used to specify the byte
 order of file formats, which are fixed.
 */
 enum G3DEndian {
-    G3D_BIG_ENDIAN,
+    G3D_BIG_ENDIAN, 
     G3D_LITTLE_ENDIAN
 };
 
 /**
- @brief OS and processor abstraction.
+ @brief OS and processor abstraction.  
 
  The first time any method is called the processor will be analyzed.
  Future calls are then fast.
@@ -83,7 +74,7 @@ public:
        @param size Size of memory that the system was trying to allocate
 
        @param recoverable If true, the system will attempt to allocate again
-       if the callback returns true.  If false, malloc is going to return
+       if the callback returns true.  If false, malloc is going to return 
        NULL and this invocation is just to notify the application.
 
        @return Return true to force malloc to attempt allocation again if the
@@ -115,7 +106,7 @@ private:
     std::string    m_cpuArch;
     std::string    m_operatingSystem;
 
-#   ifdef G3D_WIN32
+#   ifdef G3D_WINDOWS
     /** Used by getTick() for timing */
     LARGE_INTEGER  m_start;
     LARGE_INTEGER  m_counterFrequency;
@@ -140,7 +131,7 @@ private:
     /** @brief Used for the singleton instance only. */
     System();
 
-    /** @brief The singleton instance.
+    /** @brief The singleton instance. 
 
         Used instead of a global variable to ensure that the order of
         intialization is correct, which is critical because other
@@ -155,7 +146,7 @@ private:
         CPUID_GET_HIGHEST_FUNCTION   = 0x80000000,
         CPUID_EXTENDED_FEATURES      = 0x80000001};
 
-    /** Helper macro to call cpuid functions and return all values
+    /** Helper macro to call cpuid functions and return all values 
 
        See http://software.intel.com/en-us/articles/intel-64-architecture-processor-topology-enumeration/
        or  http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/25481.pdf
@@ -164,17 +155,21 @@ private:
     */
     static void cpuid(CPUIDFunction func, uint32& areg, uint32& breg, uint32& creg, uint32& dreg);
 
-    void init();
 
     /** Called from init() */
     void getStandardProcessorExtensions();
 
     /** Called from init() */
     void initTime();
+    
+    void init();
 
 public:
+    
+    /** atexit handling code invoked from G3DCleanupHook. */
+    static void cleanup();
 
-    /** Returns the speed of processor 0 in MHz.
+    /** Returns the speed of processor 0 in MHz. 
         Always returns 0 on linux.*/
     inline static int cpuSpeedMHz() {
         return instance().m_cpuSpeed;
@@ -229,7 +224,7 @@ public:
     inline static const std::string& operatingSystem() {
         return instance().m_operatingSystem;
     }
-
+    
     /** e.g., 80686 */
     inline static const std::string& cpuArchitecture() {
         return instance().m_cpuArch;
@@ -240,25 +235,22 @@ public:
     */
     static std::string currentDateString();
 
-    /**
-       Guarantees that the start of the array is aligned to the
-       specified number of bytes.
-    */
-    static void* alignedMalloc(size_t bytes, size_t alignment);
+    /** Returns the current 24-hour local time as a string in the form HH:MM:SS */
+    static std::string currentTimeString();
 
     /**
        Uses pooled storage to optimize small allocations (1 byte to 5
-       kilobytes).  Can be 10x to 100x faster than calling ::malloc or
-       new.
-
+       kilobytes).  Can be 10x to 100x faster than calling \c malloc or
+       \c new.
+       
        The result must be freed with free.
-
+       
        Threadsafe on Win32.
-
+       
        @sa calloc realloc OutOfMemoryCallback free
     */
     static void* malloc(size_t bytes);
-
+    
     static void* calloc(size_t n, size_t x);
 
     /**
@@ -272,7 +264,7 @@ public:
     static std::string mallocPerformance();
     static void resetMallocPerformanceCounters();
 
-    /**
+    /** 
        Returns a string describing the current usage of the buffer pools used for
        optimizing System::malloc.
      */
@@ -286,6 +278,12 @@ public:
     static void free(void* p);
 
     /**
+       Guarantees that the start of the array is aligned to the 
+       specified number of bytes.
+    */
+    static void* alignedMalloc(size_t bytes, size_t alignment);
+    
+    /**
      Frees memory allocated with alignedMalloc.
      */
     static void alignedFree(void* ptr);
@@ -294,12 +292,12 @@ public:
         one on some processors.  Guaranteed to have the same behavior as memcpy
         in all cases. */
     static void memcpy(void* dst, const void* src, size_t numBytes);
-
+    
     /** An implementation of memset that may be up to 2x as fast as the C library
         one on some processors.  Guaranteed to have the same behavior as memset
         in all cases. */
     static void memset(void* dst, uint8 value, size_t numBytes);
-
+    
     /**
      Returns the fully qualified filename for the currently running executable.
 
@@ -331,7 +329,7 @@ public:
     /**
      Causes the current thread to yield for the specified duration
      and consume almost no CPU.
-     The sleep will be extremely precise; it uses System::time()
+     The sleep will be extremely precise; it uses System::time() 
      to calibrate the exact yeild time.
      */
     static void sleep(RealTime t);
@@ -347,7 +345,7 @@ public:
      Console programs only.
      */
     static bool consoleKeyPressed();
-
+    
     /**
      Blocks until a key is read (use consoleKeyPressed to determine if
      a key is waiting to be read) then returns the character code for
@@ -358,7 +356,7 @@ public:
     /**
      The actual time (measured in seconds since
      Jan 1 1970 midnight).
-
+     
      Adjusted for local timezone and daylight savings
      time.   This is as accurate and fast as getCycleCount().
     */
@@ -367,6 +365,7 @@ public:
     /**
      To count the number of cycles a given operation takes:
 
+     \htmlonly
      <PRE>
      unsigned long count;
      System::beginCycleCount(count);
@@ -374,11 +373,12 @@ public:
      System::endCycleCount(count);
      // count now contains the cycle count for the intervening operation.
      </PRE>
+     \endhtmlonly
      */
-    /* static void beginCycleCount(uint64& cycleCount);
+    static void beginCycleCount(uint64& cycleCount);
     static void endCycleCount(uint64& cycleCount);
 
-    static uint64 getCycleCount(); */
+    static uint64 getCycleCount();
 
     inline static void setOutOfMemoryCallback(OutOfMemoryCallback c) {
         instance().m_outOfMemoryCallback = c;
@@ -392,7 +392,7 @@ public:
      true, System::malloc will attempt to allocate the memory again.
      If the callback returns false, then System::malloc will return NULL.
 
-     You can use outOfMemoryCallback to free data structures or to
+     You can use outOfMemoryCallback to free data structures or to 
      register the failure.
      */
     inline static OutOfMemoryCallback outOfMemoryCallback() {
@@ -401,7 +401,7 @@ public:
 
     /** Set an environment variable for the current process */
     static void setEnv(const std::string& name, const std::string& value);
-
+    
     /** Get an environment variable for the current process.  Returns NULL if the variable doesn't exist. */
     static const char* getEnv(const std::string& name);
 
@@ -409,25 +409,53 @@ public:
      Prints a human-readable description of this machine
      to the text output stream.  Either argument may be NULL.
      */
-    static void describeSystem(
-        class TextOutput& t);
+    static void describeSystem
+       (class TextOutput& t);
 
-    static void describeSystem(
-        std::string&        s);
-
-    /** On Win32, returns the clipboard text contents.  Does nothing on other
-       platforms (yet) */
-    static std::string getClipboardText();
-
-    /** Copies the text to the clipboard on Win32. */
-    static void setClipboardText(const std::string& s);
+    static void describeSystem
+       (std::string&        s);
 
     /**
      Tries to locate the resource by looking in related directories.
      If found, returns the full path to the resource, otherwise
      returns the empty string.
-     */
-    static std::string findDataFile(const std::string& full, bool errorIfNotFound = true);
+
+     Looks in:
+
+         - Literal interpretation of full (i.e., if it contains a fully-qualified name)
+         - Last directory in which a file was found
+         - Current directory
+         - System::appDataDir (which is usually GApp::Settings.dataDir, which defaults to the directory containing the program binary)
+         - $G3D9DATA directory
+         - System::appDataDir() + "data/"  (note that this may be a zipfile named "data" with no extension)
+         - System::appDataDir() + "data.zip/"
+         - ../data-files/  (windows)
+         - ../../data-files/ (windows)
+         - ../../../data-files/ (windows)
+
+       Plus the following subdirectories of those:
+
+         - cubemap
+         - gui
+         - font
+         - icon
+         - models
+         - image
+         - sky
+         - md2
+         - md3
+         - ifs
+         - 3ds
+
+        \param exceptionIfNotFound If true and the file is not found, throws G3D::FileNotFound.
+     */    
+    static std::string findDataFile(const std::string& full, bool exceptionIfNotFound = true, bool caseSensitive =
+#ifdef G3D_WINDOWS
+        false
+#else
+        true
+#endif
+        );
 
     /**
         Sets the path that the application is using as its data directory.
@@ -438,22 +466,33 @@ public:
 
 };
 
-/* don't need that for MaNGOS, not portable to Win64...
+
 #ifdef _MSC_VER
-    inline uint64 System::getCycleCount() {
-        uint32 timehi, timelo;
+#   ifdef _M_IX86
+        // 32-bit
+        inline uint64 System::getCycleCount() {
+            uint32 timehi, timelo;
 
-        // Use the assembly instruction rdtsc, which gets the current
-        // cycle count (since the process started) and puts it in edx:eax.
-        __asm
-            {
-                rdtsc;
-                mov timehi, edx;
-                mov timelo, eax;
-            }
+            // Use the assembly instruction rdtsc, which gets the current
+            // cycle count (since the process started) and puts it in edx:eax.
+            __asm
+                {
+                    rdtsc;
+                    mov timehi, edx;
+                    mov timelo, eax;
+                }
 
-        return ((uint64)timehi << 32) + (uint64)timelo;
-    }
+            return ((uint64)timehi << 32) + (uint64)timelo;
+        }
+#   else
+        // 64-bit
+        inline uint64 System::getCycleCount() {
+            LARGE_INTEGER now;
+            QueryPerformanceCounter(&now);
+            return now.QuadPart;
+        }
+
+#   endif
 
 #elif defined(G3D_LINUX)
 
@@ -472,13 +511,13 @@ public:
 #elif defined(G3D_OSX)
 
     inline uint64 System::getCycleCount() {
-		//Note:  To put off extra processing until the end, this does not
-		//return the actual clock cycle count.  It is a bus cycle count.
-		//When endCycleCount() is called, it converts the two into a difference
-		//of clock cycles
-
+        //Note:  To put off extra processing until the end, this does not 
+        //return the actual clock cycle count.  It is a bus cycle count.
+        //When endCycleCount() is called, it converts the two into a difference
+        //of clock cycles
+        
         return (uint64) UnsignedWideToUInt64(UpTime());
-		//return (uint64) mach_absolute_time();
+        //return (uint64) mach_absolute_time();
     }
 
 #endif
@@ -493,15 +532,20 @@ inline void System::endCycleCount(uint64& cycleCount) {
     cycleCount = getCycleCount() - cycleCount;
 #else
     AbsoluteTime end = UpTime();
-    Nanoseconds diffNS =
+    Nanoseconds diffNS = 
         AbsoluteDeltaToNanoseconds(end, UInt64ToUnsignedWide(cycleCount));
-    cycleCount =
-        (uint64) ((double) (instance().m_OSXCPUSpeed) *
+    cycleCount = 
+        (uint64) ((double) (instance().m_OSXCPUSpeed) * 
                   (double) UnsignedWideToUInt64(diffNS) * instance().m_secondsPerNS);
 #endif
 }
- */
+
 
 } // namespace
+
+
+#ifdef G3D_OSX
+#undef Zone
+#endif
 
 #endif

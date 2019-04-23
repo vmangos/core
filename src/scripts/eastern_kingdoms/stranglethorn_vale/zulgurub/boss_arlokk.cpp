@@ -334,8 +334,8 @@ struct boss_arlokkAI : public ScriptedAI
                 m_creature->CastSpell(m_creature, SPELL_PANTHER_TRANSFORM, false);
                 m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.7f);
                 const CreatureInfo *cinfo = m_creature->GetCreatureInfo();
-                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->mindmg + ((cinfo->mindmg / 100) * 35)));
-                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->maxdmg + ((cinfo->maxdmg / 100) * 35)));
+                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->dmg_min + ((cinfo->dmg_min / 100) * 35)));
+                m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->dmg_max + ((cinfo->dmg_max / 100) * 35)));
                 m_creature->UpdateDamagePhysical(BASE_ATTACK);
 
                 // Et embush

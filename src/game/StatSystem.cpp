@@ -119,8 +119,8 @@ void Player::UpdateResistances(uint32 school)
 {
     if (school > SPELL_SCHOOL_NORMAL)
     {
-        float value  = GetTotalAuraModValue(UnitMods(UNIT_MOD_RESISTANCE_START + school));
-        SetResistance(SpellSchools(school), int32(value));
+        int32 value = school == SPELL_SCHOOL_HOLY ? 0 : GetTotalResistanceValue(SpellSchools(school));
+        SetResistance(SpellSchools(school), value);
     }
     else
         UpdateArmor();
@@ -128,24 +128,20 @@ void Player::UpdateResistances(uint32 school)
 
 void Player::UpdateArmor()
 {
-    float value = 0.0f;
-    UnitMods unitMod = UNIT_MOD_ARMOR;
+    float dynamic = (GetStat(STAT_AGILITY) * 2.0f);
 
-    value  = GetModifierValue(unitMod, BASE_VALUE);         // base armor (from items)
-    value *= GetModifierValue(unitMod, BASE_PCT);           // armor percent from items
-    value += GetStat(STAT_AGILITY) * 2.0f;                  // armor bonus from stats
-    value += GetModifierValue(unitMod, TOTAL_VALUE);
-
-    //add dynamic flat mods
-    AuraList const& mResbyIntellect = GetAurasByType(SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT);
-    for (AuraList::const_iterator i = mResbyIntellect.begin(); i != mResbyIntellect.end(); ++i)
+    // Add dynamic flat mods
+    for (auto& i : GetAurasByType(SPELL_AURA_MOD_RESISTANCE_OF_STAT_PERCENT))
     {
-        Modifier* mod = (*i)->GetModifier();
-        if (mod->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL)
-            value += int32(GetStat(STAT_INTELLECT) * mod->m_amount / 100.0f);
+        if (Modifier* mod = i->GetModifier())
+        {
+            if (mod->m_miscvalue & SPELL_SCHOOL_MASK_NORMAL)
+                dynamic += (GetStat(STAT_INTELLECT) * (mod->m_amount * 0.01f));
+        }
     }
 
-    // add dummy effects from spells (check class and other conditions first for optimization)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    // Add dummy effects from spells (check class and other conditions first for optimization)
     if (getClass() == CLASS_DRUID)
     {
         ShapeshiftForm form = GetShapeshiftForm();
@@ -158,18 +154,21 @@ void Player::UpdateArmor()
                 if ((*itr)->GetId() == 5229)
                 {
                     float enrageModifier = 0.0f;
-                    enrageModifier = GetModifierValue(unitMod, BASE_VALUE);
+                    enrageModifier = GetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE);
                     enrageModifier *= (*itr)->GetModifier()->m_amount / 100.0f;
-                    value += enrageModifier;
+                    dynamic += enrageModifier;
                     break;
                 }
             }
         }
     }
+#endif
 
-    value *= GetModifierValue(unitMod, TOTAL_PCT);
+    m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] += dynamic;
+    int32 value = GetTotalResistanceValue(SPELL_SCHOOL_NORMAL);
 
-    SetArmor(int32(value));
+    SetArmor(value);
+    m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] -= dynamic;
 }
 
 float Player::GetHealthBonusFromStamina(float stamina)
@@ -226,7 +225,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 
     uint16 index = UNIT_FIELD_ATTACK_POWER;
     uint16 index_mod = UNIT_FIELD_ATTACK_POWER_MODS;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint16 index_mult = UNIT_FIELD_ATTACK_POWER_MULTIPLIER;
+#endif
 
     if (ranged)
     {
@@ -351,7 +352,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 
     SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
     SetInt32Value(index_mod, (uint32)attPowerMod);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(index_mult, attPowerMultiplier);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
+#endif
 
     //automatically update weapon damage after attack power modification
     if (ranged)
@@ -480,7 +483,7 @@ void Player::UpdateBlockPercentage()
         // Base value
         value = 5.0f;
         // Modify value from defense skill
-        value += (int32(GetDefenseSkillValue()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+        value += (int32(GetDefenseSkillValue()) - int32(GetSkillMaxForLevel())) * 0.04f;
         // Increase from SPELL_AURA_MOD_BLOCK_PERCENT aura
         value += GetTotalAuraModifier(SPELL_AURA_MOD_BLOCK_PERCENT);
         value = value < 0.0f ? 0.0f : value;
@@ -531,7 +534,7 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
             break;
     }
     // Modify crit from weapon skill and maximized defense skill of same level victim difference
-    value += (int32(GetWeaponSkillValue(attType)) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+    value += (int32(GetWeaponSkillValue(attType)) - int32(GetSkillMaxForLevel())) * 0.04f;
     value = value < 0.0f ? 0.0f : value;
     SetStatFloatValue(index, value);
 }
@@ -558,7 +561,7 @@ void Player::UpdateParryPercentage()
         // Base parry
         value  = 5.0f;
         // Modify value from defense skill
-        value += (int32(GetDefenseSkillValue()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+        value += (int32(GetDefenseSkillValue()) - int32(GetSkillMaxForLevel())) * 0.04f;
         // Parry from SPELL_AURA_MOD_PARRY_PERCENT aura
         value += GetTotalAuraModifier(SPELL_AURA_MOD_PARRY_PERCENT);
         value = value < 0.0f ? 0.0f : value;
@@ -594,7 +597,7 @@ void Player::UpdateDodgePercentage()
     // Dodge from agility
     value += GetDodgeFromAgility();
     // Modify value from defense skill
-    value += (int32(GetDefenseSkillValue()) - int32(GetMaxSkillValueForLevel())) * 0.04f;
+    value += (int32(GetDefenseSkillValue()) - int32(GetSkillMaxForLevel())) * 0.04f;
     // Dodge from SPELL_AURA_MOD_DODGE_PERCENT aura
     value += GetTotalAuraModifier(SPELL_AURA_MOD_DODGE_PERCENT);
     value = value < 0.0f ? 0.0f : value;
@@ -705,8 +708,8 @@ void Creature::UpdateResistances(uint32 school)
 {
     if (school > SPELL_SCHOOL_NORMAL)
     {
-        float value  = GetTotalAuraModValue(UnitMods(UNIT_MOD_RESISTANCE_START + school));
-        SetResistance(SpellSchools(school), int32(value));
+        int32 value = school == SPELL_SCHOOL_HOLY ? 0 : GetTotalResistanceValue(SpellSchools(school));
+        SetResistance(SpellSchools(school), value);
     }
     else
         UpdateArmor();
@@ -714,8 +717,8 @@ void Creature::UpdateResistances(uint32 school)
 
 void Creature::UpdateArmor()
 {
-    float value = GetTotalAuraModValue(UNIT_MOD_ARMOR);
-    SetArmor(int32(value));
+    int32 value = GetTotalResistanceValue(SPELL_SCHOOL_NORMAL);
+    SetArmor(value);
 }
 
 void Creature::UpdateMaxHealth()
@@ -750,7 +753,9 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
 
     uint16 index = UNIT_FIELD_ATTACK_POWER;
     uint16 index_mod = UNIT_FIELD_ATTACK_POWER_MODS;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint16 index_mult = UNIT_FIELD_ATTACK_POWER_MULTIPLIER;
+#endif
 
     if (ranged)
     {
@@ -767,7 +772,9 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
 
     SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
     SetInt32Value(index_mod, (uint32)attPowerMod);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(index_mult, attPowerMultiplier);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
+#endif
 
     if (ranged)
         return;
@@ -804,9 +811,9 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
      * ie if AP is reduced to 0, attack will be reduced of 30%
      * We have to ignore creatures that don't have AP set in database (we would divide by 0)
      */
-    if (GetCreatureInfo()->attackpower)
+    if (GetCreatureInfo()->attack_power)
     {
-        float databaseAttackPower = GetCreatureInfo()->attackpower;
+        float databaseAttackPower = GetCreatureInfo()->attack_power;
         float attackPowerNow = GetTotalAttackPowerValue(attType);
         weapon_mindamage = weapon_mindamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);
         weapon_maxdamage = weapon_maxdamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);
@@ -880,27 +887,18 @@ bool Pet::UpdateAllStats()
 void Pet::UpdateResistances(uint32 school)
 {
     if (school > SPELL_SCHOOL_NORMAL)
-    {
-        float value  = GetTotalAuraModValue(UnitMods(UNIT_MOD_RESISTANCE_START + school));
-        SetResistance(SpellSchools(school), int32(value));
-    }
+        return Creature::UpdateResistances(school);
     else
         UpdateArmor();
 }
 
 void Pet::UpdateArmor()
 {
-    float value = 0.0f;
-    float bonus_armor = 0.0f;
-    UnitMods unitMod = UNIT_MOD_ARMOR;
+    float amount = (GetStat(STAT_AGILITY) * 2.0f);
 
-    value  = GetModifierValue(unitMod, BASE_VALUE);
-    value *= GetModifierValue(unitMod, BASE_PCT);
-    value += GetStat(STAT_AGILITY) * 2.0f;
-    value += GetModifierValue(unitMod, TOTAL_VALUE) + bonus_armor;
-    value *= GetModifierValue(unitMod, TOTAL_PCT);
-
-    SetArmor(int32(value));
+    m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] += amount;
+    Creature::UpdateArmor();
+    m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] -= amount;
 }
 
 void Pet::UpdateMaxHealth()
@@ -955,7 +953,9 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
     //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
     SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS, (int32)attPowerMod);
     //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, attPowerMultiplier);
+#endif
 
     //automatically update weapon damage after attack power modification
     UpdateDamagePhysical(BASE_ATTACK);

@@ -270,7 +270,7 @@ struct celebrasSpiritAI : public npc_escortAI
                             if (player->GetQuestStatus(QUEST_SCEPTER) == QUEST_STATUS_INCOMPLETE)
                             {
                                 player->AreaExploredOrEventHappens(QUEST_SCEPTER);
-                                player->PrepareGossipMenu(m_creature, m_creature->GetCreatureInfo()->GossipMenuId);
+                                player->PrepareGossipMenu(m_creature, m_creature->GetCreatureInfo()->gossip_menu_id);
                                 player->SendPreparedGossip(m_creature);
                             }
                         }

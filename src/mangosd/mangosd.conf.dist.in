@@ -383,12 +383,6 @@ Anticrash.Rearm.Timer = 60000
 #        Whether to give dishonorable kills to players who kill civilians.
 #        Default: 1
 #
-#    Progression.AccurateMountSkillTraining
-#        Whether to use Blizzlike mount skill training.
-#        Before 1.12, players had to acquire individual skills per mount type and the training was the
-#        cheap part. After 1.12, it was homogenized to a single skill.
-#        Default: 1
-#
 #    Progression.AccuratePetStatistics
 #        Whether to allow Blizzlike pet statistic (damage, speed, resists) progression.
 #        Default: 1
@@ -408,12 +402,22 @@ Anticrash.Rearm.Timer = 60000
 #        spells which had effects added or removed which still exist in the game client.
 #        Default: 1
 #
+#    Progression.RestoreDeletedItems
+#        Whether to automatically restore items which were previously deleted because no item template with
+#        this entry existed on that content patch. Players will receive the item in the mail once it has been
+#        added to the game.
+#        Default: 1
+#
 #    Progression.NoRespecPriceDecay
 #        If set, the talent respec cost will not decay until patch 1.11 when the monthly reduction was added.
 #        Default: 1
 #
 #    Progression.NoQuestXpToGold
 #        If set, quest xp gained at max level will not be converted to gold until patch 1.10 when the feature was added.
+#        Default: 1
+#
+#    Progression.UnlinkedAuctionHouses
+#        If set, every auction house is separate until patch 1.9. Does not apply to goblin auction houses.
 #        Default: 1
 #
 #    DebuffLimit
@@ -432,13 +436,14 @@ PvP.AccurateTimeline = 1
 PvP.AccurateRewards = 1
 PvP.DishonorableKills = 1
 
-Progression.AccurateMountSkillTraining = 1
+Progression.RestoreDeletedItems = 1
 Progression.AccuratePetStatistics = 1
 Progression.AccurateLFGAvailability = 1
 Progression.AccuratePVEEvents = 1
 Progression.AccurateSpellEffects = 1
 Progression.NoRespecPriceDecay = 1
 Progression.NoQuestXpToGold = 1
+Progression.UnlinkedAuctionHouses = 1
 DebuffLimit = 0
 
 ###################################################################################################################
@@ -887,9 +892,14 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 1800000 (miliseconds, i.e 30 minutes)
 #                 0 (instance maps are kept in memory until they are reset)
 #
-#    Item.InstantSave.Quality
+#    Item.InstantSaveQuality
 #        Save character inventory instantly on receiving item of this quality or higher.
 #        Default: 6 - Artifact
+#
+#    Item.PreventDataMining
+#        Forbid querying information about items that have never been obtained.
+#        Default: 1 (true)
+#                 0 (false)
 #
 #    Quests.LowLevelHideDiff
 #        Quest level difference to hide for player low level quests:
@@ -1046,7 +1056,8 @@ Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0
 Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
-Item.InstantSave.Quality = 6
+Item.InstantSaveQuality = 6
+Item.PreventDataMining = 1
 Quests.LowLevelHideDiff = 4
 Quests.HighLevelHideDiff = 7
 Quests.IgnoreRaid = 0

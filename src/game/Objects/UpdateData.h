@@ -34,7 +34,9 @@ enum ObjectUpdateType
     UPDATETYPE_VALUES               = 0,
     UPDATETYPE_MOVEMENT             = 1,
     UPDATETYPE_CREATE_OBJECT        = 2,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     UPDATETYPE_CREATE_OBJECT2       = 3,
+#endif
     UPDATETYPE_OUT_OF_RANGE_OBJECTS = 4,
     UPDATETYPE_NEAR_OBJECTS         = 5
 };

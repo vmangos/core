@@ -94,23 +94,6 @@ class MANGOS_DLL_SPEC ChatHandler
         explicit ChatHandler(Player* player);
         virtual ~ChatHandler();
 
-        static void FillMessageData( WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char *channelName, ObjectGuid targetGuid, const char *message, Unit *speaker);
-
-        static void FillMessageData( WorldPacket *data, WorldSession* session, uint8 type, uint32 language, ObjectGuid targetGuid, const char* message)
-        {
-            FillMessageData( data, session, type, language, nullptr, targetGuid, message, nullptr);
-        }
-
-        static void FillMessageData( WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char* message)
-        {
-            FillMessageData( data, session, type, language, nullptr, ObjectGuid(), message, nullptr);
-        }
-
-        void FillSystemMessageData( WorldPacket *data, const char* message )
-        {
-            FillMessageData( data, m_session, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, ObjectGuid(), message );
-        }
-
         static char* LineFromMessage(char*& pos) { char* start = strtok(pos,"\n"); pos = nullptr; return start; }
 
         // function with different implementation for chat/console
@@ -138,6 +121,32 @@ class MANGOS_DLL_SPEC ChatHandler
         WorldSession* GetSession() { return m_session; }
 
         void SendBanResult(BanMode mode, BanReturn result, std::string& banTarget, uint32 duration_secs, std::string& reason);
+
+        /**
+        * \brief Prepare SMSG_GM_MESSAGECHAT/SMSG_MESSAGECHAT
+        *
+        * Method:    BuildChatPacket build message chat packet generic way
+        * FullName:  ChatHandler::BuildChatPacket
+        * Access:    public static
+        * Returns:   void
+        *
+        * \param WorldPacket& data             : Provided packet will be filled with requested info
+        * \param ChatMsg msgtype               : Message type from ChatMsg enum from SharedDefines.h
+        * \param uint32 chatTag                : Chat tag from PlayerChatTag in Chat.h
+        * \param char const* message           : Message to send
+        * \param Language language             : Language from Language enum in SharedDefines.h
+        * \param ObjectGuid const& senderGuid  : May be null in some case but often required for ignore list
+        * \param char const* senderName        : Required for type *MONSTER* or *BATTLENET, but also if GM is true
+        * \param ObjectGuid const& targetGuid  : Often null, but needed for type *MONSTER* or *BATTLENET or *BATTLEGROUND* or *ACHIEVEMENT
+        * \param char const* targetName        : Often null, but needed for type *MONSTER* or *BATTLENET or *BATTLEGROUND*
+        * \param char const* channelName       : Required only for CHAT_MSG_CHANNEL
+        * \param uint8 playerRank              : Used only for Defensive Channels (Value over 0 will show rank name before character name in channel)
+        **/
+        static void BuildChatPacket(
+            WorldPacket& data, ChatMsg msgtype, char const* message, Language language = LANG_UNIVERSAL, uint32 chatTag = CHAT_TAG_NONE,
+            ObjectGuid const& senderGuid = ObjectGuid(), char const* senderName = nullptr,
+            ObjectGuid const& targetGuid = ObjectGuid(), char const* targetName = nullptr,
+            char const* channelName = nullptr, uint8 playerRank = 0);
     protected:
         explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false), m_cluster_is_master(true), m_cluster_is_node(true) {}      // for CLI subclass
 
@@ -173,8 +182,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGodCommand(char *);
         bool HandleGMOptionsCommand(char *);
         bool HandleAnticheatCommand(char *);
-        bool HandleWardenCommand(char *);
-        bool HandleWardenReadCommand(char *);
         bool HandleClientInfosCommand(char* );
         bool HandleClientSearchCommand(char* );
         bool HandleReloadAnticheatCommand(char*);
@@ -296,8 +303,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugAssertFalseCommand(char* args);
         bool HandleDebugPvPCreditCommand(char* args);
         bool HandleDebugMonsterChatCommand(char *args);
-        // Need reimplement.
-        bool HandleDebugUpdateCommand(char *args) { return true; }
         // Formations
         bool HandleNpcGroupAddCommand(char *args);
         bool HandleNpcGroupAddRelCommand(char *args);
@@ -309,9 +314,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCharacterChangeRaceCommand(char *args);
         bool HandleCharacterCopySkinCommand(char *args);
         bool HandleCharacterFillFlysCommand(char *args);
-        bool HandleCharacterFlagsCommand(char *args);
         bool HandleFactionChangeItemsCommand(char *args);
-        bool HandleRecupCommand(char *args);
         // bg
         bool HandleBGStatusCommand(char *args);
         bool HandleBGStartCommand(char *args);
@@ -322,7 +325,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSpellInfosCommand(char *args);
         bool HandleSpellSearchCommand(char *args);
         // Other
-        bool HandleFreezCommand(char *args);
+        bool HandleFreezeCommand(char *args);
+        bool HandleUnfreezeCommand(char *args);
         bool HandleSpellIconFixCommand(char *args);
         bool HandleUnitStatCommand(char *args);
         bool HandleDebugControlCommand(char *args);
@@ -415,6 +419,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugSpellCoefsCommand(char* args);
         bool HandleDebugSpellModsCommand(char* args);
         bool HandleDebugUpdateWorldStateCommand(char* args);
+        bool HandleDebugOverflowCommand(char* args);
+        bool HandleDebugChatFreezeCommand(char* args);
 
         bool HandleDebugPlayCinematicCommand(char* args);
         bool HandleDebugPlaySoundCommand(char* args);
@@ -451,7 +457,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGameObjectDeleteCommand(char* args);
         bool HandleGameObjectMoveCommand(char* args);
         bool HandleGameObjectNearCommand(char* args);
-        bool HandleGameObjectPhaseCommand(char* args);
         bool HandleGameObjectTargetCommand(char* args);
         bool HandleGameObjectTurnCommand(char* args);
         bool HandleGameObjectDespawnCommand(char* args);
@@ -492,7 +497,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleHonorShow(char* args);
         bool HandleHonorAddCommand(char* args);
         bool HandleHonorAddKillCommand(char* args);
-        bool HandleHonorDebugScoresCommand(char*args);
         bool HandleHonorSetRPCommand(char*args);
         bool HandleHonorResetCommand(char*args);
 
@@ -600,14 +604,18 @@ class MANGOS_DLL_SPEC ChatHandler
 
         //-----------------------Npc Commands-----------------------
         bool HandleNpcAddCommand(char* args);
+        bool HandleNpcAddWeaponCommand(char* args);
         bool HandleNpcSummonCommand(char* args);
         bool HandleNpcAddVendorItemCommand(char* args);
         bool HandleNpcAIInfoCommand(char* args);
         bool HandleNpcAllowMovementCommand(char* args);
+        bool HandleNpcAllowAttackCommand(char* args);
         bool HandleNpcChangeEntryCommand(char* args);
         bool HandleNpcChangeLevelCommand(char* args);
+        bool HandleNpcDespawnCommand(char* args);
         bool HandleNpcDeleteCommand(char* args);
         bool HandleNpcDelVendorItemCommand(char* args);
+        bool HandleNpcEvadeCommand(char* args);
         bool HandleNpcFactionIdCommand(char* args);
         bool HandleNpcFlagCommand(char* args);
         bool HandleNpcFollowCommand(char* args);
@@ -626,10 +634,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcWhisperCommand(char* args);
         bool HandleNpcYellCommand(char* args);
 
-        //TODO: NpcCommands that needs to be fixed :
-        bool HandleNpcAddWeaponCommand(char* args);
-        bool HandleNpcNameCommand(char* args);
-        bool HandleNpcSubNameCommand(char* args);
         //----------------------------------------------------------
 
         bool HandlePDumpLoadCommand(char* args);
@@ -820,6 +824,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleFearCommand(char* args);
         bool HandleDamageCommand(char* args);
         bool HandleReviveCommand(char* args);
+        bool HandleReplenishCommand(char* args);
         bool HandleModifyMorphCommand(char* args);
         bool HandleAuraCommand(char* args);
         bool HandleUnAuraCommand(char* args);
@@ -882,9 +887,6 @@ class MANGOS_DLL_SPEC ChatHandler
         //! Development Commands
         bool HandleSaveAllCommand(char* args);
         bool HandleDebugMoveCommand(char* args);
-
-        //#INFO: Giperion was here
-        bool HandleDebugShowNearestGOInfo(char* args);
 
         Player*   GetSelectedPlayer();
         Creature* GetSelectedCreature();

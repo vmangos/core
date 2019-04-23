@@ -121,12 +121,20 @@ int32 MoveSplineInit::Launch()
     move_spline.Initialize(args);
     
     WorldPacket data(SMSG_MONSTER_MOVE, 64);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << unit.GetPackGUID();
+#else
+    data << unit.GetGUID();
+#endif
 
     if (newTransport)
     {
         data.SetOpcode(SMSG_MONSTER_MOVE_TRANSPORT);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << newTransport->GetPackGUID();
+#else
+        data << newTransport->GetGUID();
+#endif
     }
 
     if (unit.GetTransport() && unit.GetTransport() != newTransport)
@@ -143,8 +151,11 @@ int32 MoveSplineInit::Launch()
     }
     else
         move_spline.setLastPointSent(PacketBuilder::WriteMonsterMove(move_spline, data));
+
     // Compress data or not ?
     bool compress = false;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (!args.flags.done && args.velocity > 4 * realSpeedRun)
         compress = true;
     else if ((data.wpos() + 2) > 0x10)
@@ -154,11 +165,13 @@ int32 MoveSplineInit::Launch()
     // Since packet size is stored with an uint8, packet size is limited for compressed packets
     if ((data.wpos() + 2) > 0xFF)
         compress = false;
+#endif
 
     MovementData mvtData(compress ? NULL : &unit);
     // Nostalrius: client has a hardcoded limit to spline movement speed : 4*runSpeed.
     // We need to fix this, in case of charges for example (if character has movement slowing effects)
     if (args.velocity > 4 * realSpeedRun && !args.flags.done) // From client
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         mvtData.SetUnitSpeed(SMSG_SPLINE_SET_RUN_SPEED, unit.GetObjectGuid(), args.velocity);
     if (oldMoveFlags & MOVEFLAG_ROOT)
         mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_UNROOT, unit.GetObjectGuid());
@@ -166,6 +179,15 @@ int32 MoveSplineInit::Launch()
         mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
     if (moveFlags & MOVEFLAG_WALK_MODE && !(oldMoveFlags & MOVEFLAG_WALK_MODE)) // Switch to walk mode
         mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_SET_WALK_MODE, unit.GetObjectGuid());
+#else
+        mvtData.SetUnitSpeed(MSG_MOVE_SET_RUN_SPEED, unit.GetObjectGuid(), args.velocity);
+    if (oldMoveFlags & MOVEFLAG_ROOT)
+        mvtData.SetSplineOpcode(MSG_MOVE_UNROOT, unit.GetObjectGuid());
+    if (oldMoveFlags & MOVEFLAG_WALK_MODE && !(moveFlags & MOVEFLAG_WALK_MODE)) // Switch to run mode
+        mvtData.SetSplineOpcode(MSG_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
+    if (moveFlags & MOVEFLAG_WALK_MODE && !(oldMoveFlags & MOVEFLAG_WALK_MODE)) // Switch to walk mode
+        mvtData.SetSplineOpcode(MSG_MOVE_SET_WALK_MODE, unit.GetObjectGuid());
+#endif
 
     // Clear client root here, after we've added it to the packet - STATE SHOULD NOT BE USED
     unit.clearUnitState(UNIT_STAT_CLIENT_ROOT);
@@ -173,10 +195,18 @@ int32 MoveSplineInit::Launch()
     mvtData.AddPacket(data);
     // Do not forget to restore velocity after movement !
     if (args.velocity > 4 * realSpeedRun && !args.flags.done)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         mvtData.SetUnitSpeed(SMSG_SPLINE_SET_RUN_SPEED, unit.GetObjectGuid(), realSpeedRun);
+#else
+        mvtData.SetUnitSpeed(MSG_MOVE_SET_RUN_SPEED, unit.GetObjectGuid(), realSpeedRun);
+#endif
     // Restore correct walk mode for players
     if (unit.GetTypeId() == TYPEID_PLAYER && (moveFlags & MOVEFLAG_WALK_MODE) != (oldMoveFlags & MOVEFLAG_WALK_MODE))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
+#else
+        mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? MSG_MOVE_SET_WALK_MODE : MSG_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
+#endif
     if (compress)
     {
         WorldPacket data2;

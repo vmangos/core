@@ -185,13 +185,25 @@ void SpellCastTargets::read(ByteBuffer& data, Unit *caster)
 
     // TARGET_FLAG_UNK2 is used for non-combat pets, maybe other?
     if (m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_UNK2))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_unitTargetGUID.ReadAsPacked();
+#else
+        data >> m_unitTargetGUID;
+#endif
 
     if (m_targetMask & (TARGET_FLAG_OBJECT | TARGET_FLAG_OBJECT_UNK))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_GOTargetGUID.ReadAsPacked();
+#else
+        data >> m_GOTargetGUID;
+#endif
 
     if ((m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM)) && caster->GetTypeId() == TYPEID_PLAYER)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_itemTargetGUID.ReadAsPacked();
+#else
+        data >> m_itemTargetGUID;
+#endif
 
     if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
     {
@@ -211,7 +223,11 @@ void SpellCastTargets::read(ByteBuffer& data, Unit *caster)
         data >> m_strTarget;
 
     if (m_targetMask & (TARGET_FLAG_CORPSE | TARGET_FLAG_PVP_CORPSE))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_CorpseTargetGUID.ReadAsPacked();
+#else
+        data >> m_CorpseTargetGUID;
+#endif
 
     // find real units/GOs
     Update(caster);
@@ -226,14 +242,22 @@ void SpellCastTargets::write(ByteBuffer& data) const
         if (m_targetMask & TARGET_FLAG_UNIT)
         {
             if (m_unitTarget)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 data << m_unitTarget->GetPackGUID();
+#else
+                data << m_unitTarget->GetGUID();
+#endif
             else
                 data << uint8(0);
         }
         else if (m_targetMask & (TARGET_FLAG_OBJECT | TARGET_FLAG_OBJECT_UNK))
         {
             if (m_GOTarget)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 data << m_GOTarget->GetPackGUID();
+#else
+                data << m_GOTarget->GetGUID();
+#endif
             else
                 data << uint8(0);
         }
@@ -246,7 +270,11 @@ void SpellCastTargets::write(ByteBuffer& data) const
     if (m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM))
     {
         if (m_itemTarget)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             data << m_itemTarget->GetPackGUID();
+#else
+            data << m_itemTarget->GetGUID();
+#endif
         else
             data << uint8(0);
     }
@@ -692,15 +720,19 @@ void Spell::prepareDataForTriggerSystem()
                 // Seal of Command (example Vengeance proc) | SPELLFAMILY_PALADIN override in spell_mod
                 if (m_spellInfo->Id == 20424)
                     m_canTrigger = true;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
                 // Seal of Righteousness
                 else if (!m_spellInfo->SpellFamilyFlags && m_spellInfo->SpellIconID == 25)
                     m_canTrigger = true;
+#endif
                 // Holy Shock
                 else if (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_HOLY_SHOCK>())
                     m_canTrigger = true;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 // Eye for an Eye triggered spell
                 else if (m_spellInfo->Id == 25997)
                     m_canTrigger = true;
+#endif
                 break;
             case SPELLFAMILY_PRIEST:
                 // Touch of Weakness / Devouring Plague
@@ -870,7 +902,7 @@ void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
     if (m_spellInfo->Effect[effIndex] == 0)
         return;
 
-    if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_CANT_TARGET_SELF) && (m_spellInfo->EffectImplicitTargetA[effIndex] != TARGET_SELF) && (m_spellInfo->EffectImplicitTargetB[effIndex] != TARGET_SELF) && (pVictim->GetObjectGuid() == m_originalCaster->GetObjectGuid()))
+    if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_CANT_TARGET_SELF) && (m_spellInfo->EffectImplicitTargetA[effIndex] != TARGET_SELF) && (m_spellInfo->EffectImplicitTargetB[effIndex] != TARGET_SELF) && (pVictim->GetObjectGuid() == m_originalCasterGUID))
         return;
 
     // Check for effect immune skip if immuned
@@ -1232,6 +1264,29 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         {
             procEx |= PROC_EX_CRITICAL_HIT;
             addhealth = caster->SpellCriticalHealingBonus(m_spellInfo, addhealth, nullptr);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+            // If healing crits, we need to update the execute log data.
+            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                if (m_executeLogInfo[i].empty())
+                    continue;
+
+                for (uint32 j = 0; j < m_executeLogInfo[i].size(); ++j)
+                {
+                    switch (m_spellInfo->Effect[i])
+                    {
+                        case SPELL_EFFECT_HEAL:
+                        case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                        {
+                            m_executeLogInfo[i][j].heal.amount = addhealth;
+                            m_executeLogInfo[i][j].heal.critical = 1;
+                            break;
+                        }
+                    }
+                }
+            }
+#endif
         }
         else
             procEx |= PROC_EX_NORMAL_HIT;
@@ -2272,6 +2327,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             FillAreaTargets(targetUnitMap, radius, PUSH_DEST_CENTER, SPELL_TARGETS_AOE_DAMAGE);
             float minDist = -1;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             switch (m_spellInfo->Id)
             {
                 // Shadow Storm
@@ -2281,6 +2338,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     minDist = 20.0f;
                     break;
             }
+#endif
+
             if (minDist > 0)
             {
                 for (UnitList::iterator itr = targetUnitMap.begin(), next; itr != targetUnitMap.end(); itr = next)
@@ -3302,8 +3361,15 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
 
         // If timer = 0, it's an instant cast spell and will be casted on the next tick.
         // Cast completion will remove all any stealth/invis auras
-        if (m_timer) {
+        if (m_timer)
+        {
+            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            // - Stealth and Invisibility effects will now be canceled at the
+            //   beginning of an action(spellcast, ability use etc...), rather than
+            //   at the completion of the action.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             RemoveStealthAuras();
+#endif
             
             // If using a game object we need to remove any remaining invis auras. Should only
             // ever be Gnomish Cloaking Device, since it's a special case and not removed on
@@ -3475,7 +3541,7 @@ void Spell::cast(bool skipCheck)
     }
 
     // Ivina <Nostalrius> : Added the case when caster is charmed and not controlled.
-    if ((m_caster->GetTypeId() != TYPEID_PLAYER) || ((m_caster->GetCharmerGuid()) && (!m_caster->hasUnitState(UNIT_STAT_CONTROLLED))))
+    if ((m_caster->GetTypeId() != TYPEID_PLAYER) || ((m_caster->GetCharmerGuid()) && (!m_caster->hasUnitState(UNIT_STAT_POSSESSED))))
     {
         if (m_targets.getUnitTarget() && m_targets.getUnitTarget() != m_caster)
             m_caster->SetInFront(m_targets.getUnitTarget());
@@ -3622,7 +3688,7 @@ void Spell::cast(bool skipCheck)
 
     // CAST SPELL
     // Remove any remaining invis auras on cast completion, should only be gnomish cloaking device
-    if (!m_IsTriggeredSpell)
+    if (!m_IsTriggeredSpell  && !m_spellInfo->HasAttribute(SPELL_ATTR_EX_NOT_BREAK_STEALTH))
         m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL);
     
     SendSpellCooldown();
@@ -4339,11 +4405,19 @@ void Spell::SendSpellStart()
 
     WorldPacket data(SMSG_SPELL_START, (8 + 8 + 4 + 2 + 4));
     if (m_CastItem)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << m_CastItem->GetPackGUID();
     else
         data << m_caster->GetPackGUID();
 
     data << m_caster->GetPackGUID();
+#else
+        data << m_CastItem->GetGUID();
+    else
+        data << m_caster->GetGUID();
+
+    data << m_caster->GetGUID();
+#endif
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint16(castFlags);                              // cast flags
     data << uint32(m_timer);                                // delay?
@@ -4368,18 +4442,32 @@ void Spell::SendSpellGo(bool bSendToCaster)
 
     WorldPacket data(SMSG_SPELL_GO, 53);                    // guess size
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (m_CastItem)
         data << m_CastItem->GetPackGUID();
     else
         data << m_caster->GetPackGUID();
+#else
+    if (m_CastItem)
+        data << m_CastItem->GetGUID();
+    else
+        data << m_caster->GetGUID();
+#endif
 
     // (HACK) Don't display cast animation for Flametongue Weapon proc
     // TODO - figure out the rule for why some procs should or should not have cast animations
     // e.g. rogue poison proc should have animation
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (m_spellInfo->Id == 10444)
         data << PackedGuid();
      else
         data << m_caster->GetPackGUID();
+#else
+    if (m_spellInfo->Id == 10444)
+        data << uint64();
+    else
+        data << m_caster->GetGUID();
+#endif
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint16(castFlags);                              // cast flags
 
@@ -4515,7 +4603,12 @@ void Spell::SendLogExecute()
 {
     WorldPacket data(SMSG_SPELLLOGEXECUTE, (8 + 4 + 4 + 4 + 4 + 8));
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << m_caster->GetPackGUID();
+#else
+    data << m_caster->GetGUID();
+#endif
+
     data << uint32(m_spellInfo->Id);
 
     uint32 effectCount = 0;
@@ -4549,6 +4642,17 @@ void Spell::SendLogExecute()
                     data << info.powerDrain.amount;
                     data << info.powerDrain.power;
                     data << info.powerDrain.multiplier;
+                    break;
+                case SPELL_EFFECT_HEAL:
+                case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                    data << info.targetGuid;
+                    data << info.heal.amount;
+                    data << info.heal.critical;
+                    break;
+                case SPELL_EFFECT_ENERGIZE:
+                    data << info.targetGuid;
+                    data << info.energize.amount;
+                    data << info.energize.powerType;
                     break;
                 case SPELL_EFFECT_ADD_EXTRA_ATTACKS:
                     data << info.targetGuid;
@@ -4649,8 +4753,8 @@ void Spell::SendChannelUpdate(uint32 time)
 
             if (possessed)
             {
-                possessed->clearUnitState(UNIT_STAT_CONTROLLED);
-                possessed->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                possessed->clearUnitState(UNIT_STAT_POSSESSED);
+                possessed->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
                 possessed->SetCharmerGuid(ObjectGuid());
                 // TODO - Requires more specials for target?
 
@@ -5153,7 +5257,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     //   m_spellInfo->Id, strict ? "[strict]" : "", m_IsTriggeredSpell ? "[triggered]" : "", m_triggeredByAuraSpell ? "[triggeredByAura]" : "", m_targets.getUnitTargetGuid().GetString().c_str());
 
     // Quel sort peut-on faire lancer a un mob que l'on CM ?
-    if (m_caster->hasUnitState(UNIT_STAT_CONTROLLED))
+    if (m_caster->hasUnitState(UNIT_STAT_POSSESSED))
     {
         if (m_spellInfo->Category == 21) // Enrager
             return SPELL_FAILED_NOT_READY;
@@ -5172,7 +5276,7 @@ SpellCastResult Spell::CheckCast(bool strict)
      */
 
     uint32 spellCat = m_spellInfo->Category;
-    if (m_IsCastByItem)
+    if (m_CastItem)
     {
         // Find correct item category matching the current spell on item
         // used when item spells have custom categories due to wrong category
@@ -5283,14 +5387,14 @@ SpellCastResult Spell::CheckCast(bool strict)
             case 14269:
             case 14270:
             case 14271:
-                if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTraget(REACTIVE_DEFENSE))
+                if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTarget(REACTIVE_DEFENSE))
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
             // Contre-attaque
             case 19306:
             case 20909:
             case 20910:
-                if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTraget(REACTIVE_HUNTER_PARRY))
+                if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTarget(REACTIVE_HUNTER_PARRY))
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
             // Reindeer Transformation only castable while mounted
@@ -6225,18 +6329,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                 break;
             case SPELL_EFFECT_SUMMON_PET:
             {
-                if (m_caster->GetPetGuid())                 // let warlock do a replacement summon
-                {
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK)
-                    {
-                        Pet* pet = ((Player*)m_caster)->GetPet();
-                        // Nostalrius : Fix spellId (celui de MaNGOS est post-BC)
-                        if (strict && pet)                //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
-                            pet->CastSpell(pet, 29825, true, nullptr, nullptr, pet->GetObjectGuid());
-                    }
-                    else
-                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-                }
+                // In Vanilla old pets were unsummoned as soon as you began summoning a new one.
+                if (!m_caster->UnsummonOldPetBeforeNewSummon(m_spellInfo->EffectMiscValue[i]))
+                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
                 if (m_caster->GetCharmGuid())
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;
@@ -6458,13 +6553,21 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;
 
                 if (m_caster->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (!m_targets.getUnitTarget())
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
                 if (m_targets.getUnitTarget()->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (m_spellInfo->Id != 530) // Spell for ".possess" command.
                     if (int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i), m_targets.getUnitTarget()))
@@ -6484,13 +6587,21 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;
 
                 if (m_caster->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (!m_targets.getUnitTarget())
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
                 if (m_targets.getUnitTarget()->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i), m_targets.getUnitTarget()))
                     return SPELL_FAILED_HIGHLEVEL;
@@ -6512,14 +6623,22 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;
 
                 if (m_caster->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 Pet* pet = m_caster->GetPet();
                 if (!pet)
                     return SPELL_FAILED_NO_PET;
 
                 if (pet->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 break;
             }
@@ -7415,8 +7534,9 @@ SpellCastResult Spell::CheckItems()
                     return SPELL_FAILED_CANT_BE_DISENCHANTED;
 
                 // must have disenchant loot (other static req. checked at item prototype loading)
-                if (!itemProto->DisenchantID)
+                if (!itemProto->DisenchantID || (itemProto->Flags & ITEM_FLAG_NO_DISENCHANT))
                     return SPELL_FAILED_CANT_BE_DISENCHANTED;
+
                 break;
             }
             case SPELL_EFFECT_WEAPON_DAMAGE:

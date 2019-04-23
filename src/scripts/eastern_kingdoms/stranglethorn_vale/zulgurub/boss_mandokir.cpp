@@ -7,7 +7,7 @@ EndScriptData */
 
 /*
 [SQL]
-UPDATE creature_template SET ScriptName="mob_chained_spirit" WHERE entry=15117;
+UPDATE creature_template SET script_name="mob_chained_spirit" WHERE entry=15117;
 */
 #include "scriptPCH.h"
 #include "zulgurub.h"

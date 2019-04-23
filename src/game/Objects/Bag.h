@@ -26,8 +26,9 @@
 #include "ItemPrototype.h"
 #include "Item.h"
 
-// Maximum 36 Slots ( (CONTAINER_END - CONTAINER_FIELD_SLOT_1)/2
-#define MAX_BAG_SIZE 36
+// Maximum 36 Slots in 1.12
+// ((CONTAINER_END - CONTAINER_FIELD_SLOT_1)/2)
+#define MAX_BAG_SIZE ((CONTAINER_END - CONTAINER_FIELD_SLOT_1)/2)
 
 class Bag : public Item
 {

@@ -415,10 +415,10 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     if (getPetType() != MINI_PET)
     {
-        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         else
-            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
     }
 
     // Save pet for resurrection by spirit healer.
@@ -942,7 +942,7 @@ int32 Pet::GetTPForSpell(uint32 spellid)
 {
     uint32 basetrainp = 0;
 
-    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellid);
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellid);
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
         if (!_spell_idx->second->reqtrainpoints)
@@ -962,7 +962,7 @@ int32 Pet::GetTPForSpell(uint32 spellid)
 
         if (sSpellMgr.GetFirstSpellInChain(itr->first) == chainstart)
         {
-            SkillLineAbilityMapBounds _bounds = sSpellMgr.GetSkillLineAbilityMapBounds(itr->first);
+            SkillLineAbilityMapBounds _bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(itr->first);
 
             for (SkillLineAbilityMap::const_iterator _spell_idx2 = _bounds.first; _spell_idx2 != _bounds.second; ++_spell_idx2)
             {
@@ -1104,9 +1104,12 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= NULL*/)
         }
     }
 
-    // If we're being charmed, remove the charm
-    if (Unit* charmer = GetUnit(*this, GetCharmerGuid()))
-        charmer->RemoveCharmAuras();
+    // If we're being charmed, remove the charm. Note that we remove the
+    // charm on us, not the charmer. The charmer may in fact be under a
+    // charm themselves, and in cancelling this charm calling this method.
+    // Cancelling the parent charm = crash.
+    if (GetCharmerGuid())
+        RemoveCharmAuras();
 
     // If we're being possessed, remove the possesion. If we don't, and the caster
     // is a player, they are left with a dangling pointer for Player::m_mover
@@ -1230,7 +1233,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(creature->getLevel()));
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
-    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family))
+    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->beast_family))
         SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
     else
         SetName(creature->GetNameForLocaleIdx(sObjectMgr.GetDBCLocaleIndex()));
@@ -1266,12 +1269,12 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         owner = GetOwner();
         if (!owner)
         {
-            sLog.outError("attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->Entry);
+            sLog.outError("attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->entry);
             return false;
         }
     }
 
-    uint32 creature_ID = (getPetType() == HUNTER_PET) ? 1 : cinfo->Entry;
+    uint32 creature_ID = (getPetType() == HUNTER_PET) ? 1 : cinfo->entry;
 
     switch (getPetType())
     {
@@ -1297,22 +1300,22 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     // Before 1.9 pets retain their wild damage type
     if (sWorld.GetWowPatch() < WOW_PATCH_109 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS))
-        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+        SetMeleeDamageSchool(SpellSchools(cinfo->dmg_school));
     else
         SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
 
-    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
+    SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(petlevel * 50));
 
     // Nostalrius: pre-2.0: normalisation de la vitesse d'attaque des pets.
-    SetAttackTime(BASE_ATTACK, cinfo->baseattacktime); //BASE_ATTACK_TIME);
-    SetAttackTime(OFF_ATTACK, cinfo->baseattacktime); //BASE_ATTACK_TIME);
-    SetAttackTime(RANGED_ATTACK, cinfo->rangeattacktime); //BASE_ATTACK_TIME);
+    SetAttackTime(BASE_ATTACK, cinfo->base_attack_time); //BASE_ATTACK_TIME);
+    SetAttackTime(OFF_ATTACK, cinfo->base_attack_time); //BASE_ATTACK_TIME);
+    SetAttackTime(RANGED_ATTACK, cinfo->ranged_attack_time); //BASE_ATTACK_TIME);
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 #else
     SetInt32Value(UNIT_MOD_CAST_SPEED, 0);
 #endif
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->beast_family);
     if (cFamily && cFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
     {
         float scale;
@@ -1328,19 +1331,17 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     }
     m_bonusdamage = 0;
 
-    int32 createResistance[MAX_SPELL_SCHOOL] = {0, 0, 0, 0, 0, 0, 0};
-
     // http://wowwiki.wikia.com/wiki/Patch_1.3.0
     // Before 1.3 pets retain their wild resistances, however it is mentioned as a bug.
     // TODO: Do we keep it or remove it?
     if (getPetType() != HUNTER_PET || (sWorld.GetWowPatch() < WOW_PATCH_103 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS)))
     {
-        createResistance[SPELL_SCHOOL_HOLY]   = cinfo->resistance1;
-        createResistance[SPELL_SCHOOL_FIRE]   = cinfo->resistance2;
-        createResistance[SPELL_SCHOOL_NATURE] = cinfo->resistance3;
-        createResistance[SPELL_SCHOOL_FROST]  = cinfo->resistance4;
-        createResistance[SPELL_SCHOOL_SHADOW] = cinfo->resistance5;
-        createResistance[SPELL_SCHOOL_ARCANE] = cinfo->resistance6;
+        SetCreateResistance(SPELL_SCHOOL_HOLY, cinfo->holy_res);
+        SetCreateResistance(SPELL_SCHOOL_FIRE, cinfo->fire_res);
+        SetCreateResistance(SPELL_SCHOOL_NATURE, cinfo->nature_res);
+        SetCreateResistance(SPELL_SCHOOL_FROST, cinfo->frost_res);
+        SetCreateResistance(SPELL_SCHOOL_SHADOW, cinfo->shadow_res);
+        SetCreateResistance(SPELL_SCHOOL_ARCANE, cinfo->arcane_res);
     }
 
     switch (getPetType())
@@ -1351,7 +1352,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel * 1.15 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel * 1.45 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
 
-            //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
+            //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
 
             PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
             if (pInfo)                                      // exist in DB
@@ -1360,7 +1361,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 SetCreateMana(pInfo->mana);
 
                 if (pInfo->armor > 0)
-                    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
+                    SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(pInfo->armor));
 
                 for (int stat = 0; stat < MAX_STATS; ++stat)
                     SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
@@ -1369,11 +1370,11 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             {
                 // Erreur qui se declanche quand un mob invoque un add (squelette par exemple), et qui n'a
                 // donc pas de stats de pet.
-                DEBUG_LOG("Summoned pet (Entry: %u) not have pet stats data in DB", cinfo->Entry);
+                DEBUG_LOG("Summoned pet (Entry: %u) not have pet stats data in DB", cinfo->entry);
 
                 // remove elite bonuses included in DB values
-                SetCreateHealth(uint32(((float(cinfo->maxhealth) / cinfo->maxlevel) / (1 + 2 * cinfo->rank)) * petlevel));
-                SetCreateMana(uint32(((float(cinfo->maxmana)   / cinfo->maxlevel) / (1 + 2 * cinfo->rank)) * petlevel));
+                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
+                SetCreateMana(uint32(((float(cinfo->mana_max)   / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
 
                 SetCreateStat(STAT_STRENGTH, 22);
                 SetCreateStat(STAT_AGILITY, 22);
@@ -1395,8 +1396,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             if (pInfo)                                      // exist in DB
             {
                 SetCreateHealth(pInfo->health);
-                SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
-                //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
+                SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(pInfo->armor));
+                //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
 
                 for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
                     SetCreateStat(Stats(i),  float(pInfo->stats[i]));
@@ -1406,7 +1407,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 sLog.outErrorDb("Hunter pet levelstats missing in DB");
 
                 // remove elite bonuses included in DB values
-                SetCreateHealth(uint32(((float(cinfo->maxhealth) / cinfo->maxlevel) / (1 + 2 * cinfo->rank)) * petlevel));
+                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
 
                 SetCreateStat(STAT_STRENGTH, 22);
                 SetCreateStat(STAT_AGILITY, 22);
@@ -1423,15 +1424,15 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
             SetUInt32Value(UNIT_FIELD_FLAGS, cinfo->unit_flags);
 
-            SetCreateMana(cinfo->maxmana);
-            SetCreateHealth(cinfo->maxhealth);
+            SetCreateMana(cinfo->mana_max);
+            SetCreateHealth(cinfo->health_max);
 
-            SetAttackTime(BASE_ATTACK, cinfo->baseattacktime);
-            SetAttackTime(OFF_ATTACK, cinfo->baseattacktime);
-            SetAttackTime(RANGED_ATTACK, cinfo->rangeattacktime);
+            SetAttackTime(BASE_ATTACK, cinfo->base_attack_time);
+            SetAttackTime(OFF_ATTACK, cinfo->base_attack_time);
+            SetAttackTime(RANGED_ATTACK, cinfo->ranged_attack_time);
 
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->mindmg);
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->maxdmg);
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min);
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max);
             break;
         }
         default:
@@ -1441,23 +1442,10 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     if (getPetType() != MINI_PET)
     {
-        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
-            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        if (owner->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+            SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         else
-            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
-    }
-
-    for (int i = 0; i < 6; ++i)
-    {
-        if (createResistance[i] < 0)
-        {
-            SpellImmune immune;
-            immune.type = (1 << (i + 1));
-            immune.spellId = 642; // Any positive spell, for Unit::IsImmuneToSpell
-            m_spellImmune[IMMUNITY_SCHOOL].push_back(immune);
-        }
-        else
-            SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_HOLY + i), BASE_VALUE, createResistance[i]);
+            RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
     }
 
     UpdateAllStats();
@@ -1477,7 +1465,7 @@ bool Pet::HaveInDiet(ItemPrototype const* item) const
     if (!cInfo)
         return false;
 
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->beast_family);
     if (!cFamily)
         return false;
 
@@ -2098,7 +2086,7 @@ void Pet::InitPetCreateSpells()
 
             AddSpell(petspellid);
 
-            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(learn_spellproto->EffectTriggerSpell[0]);
+            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(learn_spellproto->EffectTriggerSpell[0]);
 
             for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
             {
@@ -2227,9 +2215,9 @@ bool Pet::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* ci
 
     Object::_Create(guidlow, pet_number, HIGHGUID_PET);
 
-    m_originalEntry = cinfo->Entry;
+    m_originalEntry = cinfo->entry;
 
-    if (!InitEntry(cinfo->Entry))
+    if (!InitEntry(cinfo->entry))
         return false;
 
     cPos.SelectFinalPoint(this);
@@ -2259,7 +2247,7 @@ void Pet::LearnPetPassives()
     if (!cInfo)
         return;
 
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->beast_family);
     if (!cFamily)
         return;
 

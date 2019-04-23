@@ -260,6 +260,7 @@ class Spell
         void EffectAddFarsight(SpellEffectIndex eff_idx);
         void EffectSummonWild(SpellEffectIndex eff_idx);
         void EffectSummonGuardian(SpellEffectIndex eff_idx);
+        void EffectSummonPossessed(SpellEffectIndex eff_idx);
         void EffectHealMechanical(SpellEffectIndex eff_idx);
         void EffectTeleUnitsFaceCaster(SpellEffectIndex eff_idx);
         void EffectLearnSkill(SpellEffectIndex eff_idx);
@@ -705,6 +706,18 @@ class Spell
                     int32 itemEntry;
                     int32 unk;
                 } durabilityDamage;
+
+                struct
+                {
+                    uint32 amount;
+                    uint8 critical;
+                } heal;
+
+                struct
+                {
+                    uint32 amount;
+                    uint32 powerType;
+                } energize;
             };
         };
 

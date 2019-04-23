@@ -322,7 +322,7 @@ class MANGOS_DLL_SPEC Group
         void BroadcastReadyCheck(WorldPacket *packet);
         void OfflineReadyCheck();
 
-        void RewardGroupAtKill(Unit* pVictim, Player* player_tap);
+        void RewardGroupAtKill(Unit* pVictim, Player* pPlayerTap);
 
         /*********************************************************/
         /***                   LFG SYSTEM                      ***/

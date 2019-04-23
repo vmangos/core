@@ -649,10 +649,8 @@ void Player::CleanupsBeforeDelete()
     Unit::CleanupsBeforeDelete();
 }
 
-bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 /*outfitId */)
+bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
 {
-    //FIXME: outfitId not used in player creating
-
     Object::_Create(guidlow, 0, HIGHGUID_PLAYER);
 
     m_name = name;
@@ -704,7 +702,7 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
         SetByteValue(UNIT_FIELD_BYTES_1, 1, 0xEE);
 
     SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_UNK5 | UNIT_BYTE2_FLAG_PVP);
-    SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+    SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
     // fix cast time showed in spell tooltip on client
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
@@ -762,59 +760,7 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     // original spells
     LearnDefaultSpells();
 
-    // original items
-    uint32 raceClassGender = GetUInt32Value(UNIT_FIELD_BYTES_0) & 0x00FFFFFF;
-
-    CharStartOutfitEntry const* oEntry = NULL;
-    for (uint32 i = 1; i < sCharStartOutfitStore.GetNumRows(); ++i)
-    {
-        if (CharStartOutfitEntry const* entry = sCharStartOutfitStore.LookupEntry(i))
-        {
-            if (entry->RaceClassGender == raceClassGender)
-            {
-                oEntry = entry;
-                break;
-            }
-        }
-    }
-
-    if (oEntry)
-    {
-        for (int j = 0; j < MAX_OUTFIT_ITEMS; ++j)
-        {
-            if (oEntry->ItemId[j] <= 0)
-                continue;
-
-            uint32 item_id = oEntry->ItemId[j];
-
-            // just skip, reported in ObjectMgr::LoadItemPrototypes
-            ItemPrototype const* iProto = ObjectMgr::GetItemPrototype(item_id);
-            if (!iProto)
-                continue;
-
-            // BuyCount by default
-            int32 count = iProto->BuyCount;
-
-            // special amount for foor/drink
-            if (iProto->Class == ITEM_CLASS_CONSUMABLE && iProto->SubClass == ITEM_SUBCLASS_FOOD)
-            {
-                switch (iProto->Spells[0].SpellCategory)
-                {
-                    case 11:                                // food
-                        if (iProto->Stackable > 4)
-                            count = 4;
-                        break;
-                    case 59:                                // drink
-                        if (iProto->Stackable > 2)
-                            count = 2;
-                        break;
-                }
-            }
-
-            StoreNewItemInBestSlots(item_id, count);
-        }
-    }
-
+    // Starting items.
     for (PlayerCreateInfoItems::const_iterator item_id_itr = info->item.begin(); item_id_itr != info->item.end(); ++item_id_itr)
         StoreNewItemInBestSlots(item_id_itr->item_id, item_id_itr->item_amount);
 
@@ -855,7 +801,6 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
 
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
-    SetCustomFlags(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_FROM_NOSTALRIUS_3);
 
     return true;
 }
@@ -944,24 +889,21 @@ uint32 Player::EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage)
 
     // Absorb, resist some environmental damage type
     uint32 absorb = 0;
-    uint32 resist = 0;
+    int32 resist = 0;
 
     if ((type == DAMAGE_LAVA) || (type == DAMAGE_FIRE))
         CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_FIRE, DIRECT_DAMAGE, damage, &absorb, &resist, NULL);
     else if (type == DAMAGE_SLIME)
         CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, damage, &absorb, &resist, NULL);
 
-    damage -= absorb + resist;
+    const uint32 bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
+    damage += bonus;
+    const uint32 malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
+    damage = (damage <= malus ? 0 : (damage - malus));
 
     DealDamageMods(this, damage, &absorb);
 
-    WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, (21));
-    data << GetObjectGuid();
-    data << uint8(type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
-    data << uint32(damage);
-    data << (uint32)absorb; // absorb
-    data << (uint32)resist; // resist
-    SendObjectMessageToSet(&data, true);
+    SendEnvironmentalDamageLog(type, damage, absorb, resist);
 
     uint32 final_damage = DealDamage(this, damage, NULL, SELF_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
 
@@ -1717,7 +1659,7 @@ bool Player::BuildEnumData(QueryResult * result, WorldPacket * p_data)
             {
                 petDisplayId = fields[17].GetUInt32();
                 petLevel     = fields[18].GetUInt32();
-                petFamily    = cInfo->family;
+                petFamily    = cInfo->beast_family;
             }
         }
 
@@ -2983,7 +2925,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
     SetInt32Value(UNIT_FIELD_ATTACK_POWER,            0);
     SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS,       0);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, 0.0f);
+#endif
     SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER,     0);
     SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 0);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
@@ -3043,7 +2987,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
                UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
                UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING      | UNIT_FLAG_NOT_SELECTABLE   |
                UNIT_FLAG_SKINNABLE      | UNIT_FLAG_AURAS_VISIBLE        | UNIT_FLAG_TAXI_FLIGHT);
-    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);    // must be set
+    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);    // must be set
 
     // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_FLAGS_FFA_PVP);
@@ -3151,8 +3095,6 @@ void Player::SendInitialSpells() const
 
 bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependent, bool disabled)
 {
-    bool superceded = false;
-
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spell_id);
     if (!spellInfo)
     {
@@ -3184,26 +3126,23 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
 
     PlayerSpellState state = learning ? PLAYERSPELL_NEW : PLAYERSPELL_UNCHANGED;
 
-    bool dependent_set = false;
     bool disabled_case = false;
+    bool superceded_old = false;
 
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr != m_spells.end())
     {
         uint32 next_active_spell_id = 0;
+        bool dependent_set = false;
+
         // fix activate state for non-stackable low rank (and find next spell for !active case)
-        if (sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
+        if (uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(spellInfo->Id))
         {
-            SpellChainMapNext const& nextMap = sSpellMgr.GetSpellChainNext();
-            for (SpellChainMapNext::const_iterator next_itr = nextMap.lower_bound(spell_id); next_itr != nextMap.upper_bound(spell_id); ++next_itr)
+            if (HasSpell(nextId))
             {
-                if (HasSpell(next_itr->second))
-                {
-                    // high rank already known so this must !active
-                    active = false;
-                    next_active_spell_id = next_itr->second;
-                    break;
-                }
+                // high rank already known so this must !active
+                active = false;
+                next_active_spell_id = nextId;
             }
         }
 
@@ -3252,11 +3191,7 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
                     GetSession()->SendPacket(&data);
                 }
                 else
-                {
-                    WorldPacket data(SMSG_REMOVED_SPELL, 4);
-                    data << uint16(spell_id);
-                    GetSession()->SendPacket(&data);
-                }
+                    SendSpellRemoved(spell_id);
             }
 
             return active;                                  // learn (show in spell book if active now)
@@ -3330,42 +3265,42 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
         newspell.disabled  = disabled;
 
         // replace spells in action bars and spellbook to bigger rank if only one spell rank must be accessible
-        if (newspell.active && !newspell.disabled && sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
+        if (newspell.active && !newspell.disabled)
         {
-            for (PlayerSpellMap::iterator itr2 = m_spells.begin(); itr2 != m_spells.end(); ++itr2)
+            for (auto& m_spell : m_spells)
             {
-                if (itr2->second.state == PLAYERSPELL_REMOVED) continue;
-                SpellEntry const *i_spellInfo = sSpellMgr.GetSpellEntry(itr2->first);
-                if (!i_spellInfo) continue;
-                if (itr2->first == 16857) continue; // Hack fix faerie fire bug.
+                PlayerSpell& playerSpell2 = m_spell.second;
 
-                if (sSpellMgr.IsRankSpellDueToSpell(spellInfo, itr2->first))
+                if (playerSpell2.state == PLAYERSPELL_REMOVED)
+                    continue;
+
+                if (uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(m_spell.first))
                 {
-                    if (itr2->second.active)
+                    if (playerSpell2.active)
                     {
-                        if (sSpellMgr.IsHighRankOfSpell(spell_id, itr2->first))
+                        if (nextId == spell_id)
                         {
                             if (IsInWorld())                // not send spell (re-/over-)learn packets at loading
                             {
                                 WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
-                                data << uint16(itr2->first);
+                                data << uint16(m_spell.first);
                                 data << uint16(spell_id);
                                 GetSession()->SendPacket(&data);
                             }
 
-                            superceded = true;
                             // mark old spell as disable (SMSG_SUPERCEDED_SPELL replace it in client by new)
-                            itr2->second.active = false;
-                            if (itr2->second.state != PLAYERSPELL_NEW)
-                                itr2->second.state = PLAYERSPELL_CHANGED;
+                            playerSpell2.active = false;
+                            if (playerSpell2.state != PLAYERSPELL_NEW)
+                                playerSpell2.state = PLAYERSPELL_CHANGED;
+                            superceded_old = true;          // new spell replace old in action bars and spell book.
                         }
-                        else if (sSpellMgr.IsHighRankOfSpell(itr2->first, spell_id))
+                        else if (m_spell.first == spell_id)
                         {
                             if (IsInWorld())                // not send spell (re-/over-)learn packets at loading
                             {
                                 WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
                                 data << uint16(spell_id);
-                                data << uint16(itr2->first);
+                                data << uint16(m_spell.first);
                                 GetSession()->SendPacket(&data);
                             }
 
@@ -3373,6 +3308,8 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
                             newspell.active = false;
                             if (newspell.state != PLAYERSPELL_NEW)
                                 newspell.state = PLAYERSPELL_CHANGED;
+                            playerSpell2.disabled = false;
+                            playerSpell2.state = PLAYERSPELL_CHANGED;
                         }
                     }
                 }
@@ -3417,62 +3354,7 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
     }
 
     // add dependent skills
-    uint16 maxskill = GetMaxSkillValueForLevel();
-
-    SpellLearnSkillNode const* spellLearnSkill = sSpellMgr.GetSpellLearnSkill(spell_id);
-
-    if (spellLearnSkill)
-    {
-        uint32 skill_value = GetPureSkillValue(spellLearnSkill->skill);
-        uint32 skill_max_value = GetPureMaxSkillValue(spellLearnSkill->skill);
-
-        if (skill_value < spellLearnSkill->value)
-            skill_value = spellLearnSkill->value;
-
-        uint32 new_skill_max_value = spellLearnSkill->maxvalue == 0 ? maxskill : spellLearnSkill->maxvalue;
-
-        if (skill_max_value < new_skill_max_value)
-            skill_max_value =  new_skill_max_value;
-
-        SetSkill(spellLearnSkill->skill, skill_value, skill_max_value, spellLearnSkill->step);
-    }
-    else
-    {
-        // not ranked skills
-        SkillLineAbilityMapBounds skill_bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spell_id);
-
-        for (SkillLineAbilityMap::const_iterator _spell_idx = skill_bounds.first; _spell_idx != skill_bounds.second; ++_spell_idx)
-        {
-            SkillLineEntry const *pSkill = sSkillLineStore.LookupEntry(_spell_idx->second->skillId);
-            if (!pSkill)
-                continue;
-
-            if (HasSkill(pSkill->id))
-                continue;
-
-            if (_spell_idx->second->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL ||
-                    // poison special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
-                    pSkill->id == SKILL_POISONS && _spell_idx->second->max_value == 0 ||
-                    // lockpicking special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
-                    pSkill->id == SKILL_LOCKPICKING && _spell_idx->second->max_value == 0)
-            {
-                switch (GetSkillRangeType(pSkill, _spell_idx->second->racemask != 0))
-                {
-                    case SKILL_RANGE_LANGUAGE:
-                        SetSkill(pSkill->id, 300, 300);
-                        break;
-                    case SKILL_RANGE_LEVEL:
-                        SetSkill(pSkill->id, 1, GetMaxSkillValueForLevel());
-                        break;
-                    case SKILL_RANGE_MONO:
-                        SetSkill(pSkill->id, 1, 1);
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-    }
+    UpdateSpellTrainedSkills(spell_id, true);
 
     // learn dependent spells
     SpellLearnSpellMapBounds spell_bounds = sSpellMgr.GetSpellLearnSpellMapBounds(spell_id);
@@ -3489,7 +3371,7 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
     }
 
     // return true (for send learn packet) only if spell active (in case ranked spells) and not replace old spell
-    return active && !disabled && !superceded;
+    return active && !disabled && !superceded_old;
 }
 
 bool Player::IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) const
@@ -3510,7 +3392,7 @@ bool Player::IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) cons
     return need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState)));
 }
 
-void Player::LearnSpell(uint32 spell_id, bool dependent)
+void Player::LearnSpell(uint32 spell_id, bool dependent, bool talent)
 {
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
 
@@ -3527,14 +3409,14 @@ void Player::LearnSpell(uint32 spell_id, bool dependent)
         GetSession()->SendPacket(&data);
     }
 
-    // learn all disabled higher ranks (recursive)
-    if (disabled)
+    // learn all disabled higher ranks (recursive) - skip for talent spells
+    if (disabled || talent)
     {
         SpellChainMapNext const& nextMap = sSpellMgr.GetSpellChainNext();
         for (SpellChainMapNext::const_iterator i = nextMap.lower_bound(spell_id); i != nextMap.upper_bound(spell_id); ++i)
         {
             PlayerSpellMap::iterator iter = m_spells.find(i->second);
-            if (disabled && iter != m_spells.end() && iter->second.disabled)
+            if (iter != m_spells.end() && iter->second.disabled)
                 LearnSpell(i->second, false);
         }
     }
@@ -3546,19 +3428,33 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     if (itr == m_spells.end())
         return;
 
-    if (itr->second.state == PLAYERSPELL_REMOVED || (disabled && itr->second.disabled))
+    // Always try to remove all dependent spells if present (needed to reset some talents properly)
+    SpellLearnSpellMapBounds spell_bounds = sSpellMgr.GetSpellLearnSpellMapBounds(spell_id);
+    for (SpellLearnSpellMap::const_iterator child_itr = spell_bounds.first; child_itr != spell_bounds.second; ++child_itr)
+        RemoveSpell(child_itr->second.spell, !IsPassiveSpell(child_itr->second.spell), !IsPassiveSpell(child_itr->second.spell));
+
+    // search again just in case
+    itr = m_spells.find(spell_id);
+    if (itr == m_spells.end())
         return;
 
-    // unlearn non talent higher ranks (recursive)
+    PlayerSpell& playerSpell = itr->second;
+    if (playerSpell.state == PLAYERSPELL_REMOVED || (disabled && playerSpell.disabled))
+        return;
+
+    if (disabled && GetTalentSpellPos(spell_id))
+        disabled = false; // talents should never be marked as disabled
+
+                          // unlearn non talent higher ranks (recursive)
     SpellChainMapNext const& nextMap = sSpellMgr.GetSpellChainNext();
     for (SpellChainMapNext::const_iterator itr2 = nextMap.lower_bound(spell_id); itr2 != nextMap.upper_bound(spell_id); ++itr2)
         if (HasSpell(itr2->second) && !GetTalentSpellPos(itr2->second))
-            RemoveSpell(itr2->second, disabled, false);
+            RemoveSpell(itr2->second, !IsPassiveSpell(itr2->second), false);
 
     // re-search, it can be corrupted in prev loop
     itr = m_spells.find(spell_id);
-    if (itr == m_spells.end() || itr->second.state == PLAYERSPELL_REMOVED)
-        return;                                             // already unleared
+    if (itr == m_spells.end() || playerSpell.state == PLAYERSPELL_REMOVED)
+        return;
 
     bool cur_active    = itr->second.active;
     bool cur_dependent = itr->second.dependent;
@@ -3605,91 +3501,15 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
             SetFreePrimaryProfessions(freeProfs);
     }
 
-    // remove dependent skill
-    SpellLearnSkillNode const* spellLearnSkill = sSpellMgr.GetSpellLearnSkill(spell_id);
-    if (spellLearnSkill)
-    {
-        uint32 prev_spell = sSpellMgr.GetPrevSpellInChain(spell_id);
-        if (!prev_spell)                                    // first rank, remove skill
-            SetSkill(spellLearnSkill->skill, 0, 0);
-        else
-        {
-            // search prev. skill setting by spell ranks chain
-            SpellLearnSkillNode const* prevSkill = sSpellMgr.GetSpellLearnSkill(prev_spell);
-            while (!prevSkill && prev_spell)
-            {
-                prev_spell = sSpellMgr.GetPrevSpellInChain(prev_spell);
-                prevSkill = sSpellMgr.GetSpellLearnSkill(sSpellMgr.GetFirstSpellInChain(prev_spell));
-            }
-
-            if (!prevSkill)                                 // not found prev skill setting, remove skill
-                SetSkill(spellLearnSkill->skill, 0, 0);
-            else                                            // set to prev. skill setting values
-            {
-                uint32 skill_value = GetPureSkillValue(prevSkill->skill);
-                uint32 skill_max_value = GetPureMaxSkillValue(prevSkill->skill);
-
-                if (skill_value >  prevSkill->value)
-                    skill_value = prevSkill->value;
-
-                uint32 new_skill_max_value = prevSkill->maxvalue == 0 ? GetMaxSkillValueForLevel() : prevSkill->maxvalue;
-
-                if (skill_max_value > new_skill_max_value)
-                    skill_max_value =  new_skill_max_value;
-
-                SetSkill(prevSkill->skill, skill_value, skill_max_value, prevSkill->step);
-            }
-        }
-
-    }
-    else
-    {
-        // not ranked skills
-        SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spell_id);
-
-        for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
-        {
-            SkillLineEntry const *pSkill = sSkillLineStore.LookupEntry(_spell_idx->second->skillId);
-            if (!pSkill)
-                continue;
-
-            if ((_spell_idx->second->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL &&
-                    pSkill->categoryId != SKILL_CATEGORY_CLASS) ||// not unlearn class skills (spellbook/talent pages)
-                    // poisons/lockpicking special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
-                    ((pSkill->id == SKILL_POISONS || pSkill->id == SKILL_LOCKPICKING) && _spell_idx->second->max_value == 0))
-            {
-                // not reset skills for professions and racial abilities
-                if ((pSkill->categoryId == SKILL_CATEGORY_SECONDARY || pSkill->categoryId == SKILL_CATEGORY_PROFESSION) &&
-                        (IsProfessionSkill(pSkill->id) || _spell_idx->second->racemask != 0))
-                    continue;
-                // Ustaag <Nostalrius> : Talent Chaman pas de reset du skill Haches et Masses a 2 mains quand respe
-                uint8 pClass = getClass();
-                if (pSkill->categoryId == SKILL_CATEGORY_WEAPON && pClass == CLASS_SHAMAN)
-                {
-                    if (IsTwoHandUsed())
-                        AutoUnequipMainHandIfNeed();
-                    WorldPacket data(SMSG_REMOVED_SPELL, 4);
-                    data << uint16(spell_id);
-                    GetSession()->SendPacket(&data);
-                }
-                else
-                    SetSkill(pSkill->id, 0, 0);
-            }
-        }
-    }
-
-    // remove dependent spells
-    SpellLearnSpellMapBounds spell_bounds = sSpellMgr.GetSpellLearnSpellMapBounds(spell_id);
-
-    for (SpellLearnSpellMap::const_iterator itr2 = spell_bounds.first; itr2 != spell_bounds.second; ++itr2)
-        RemoveSpell(itr2->second.spell, disabled);
+    // remove dependent skills
+    UpdateSpellTrainedSkills(spell_id, false);
 
     // activate lesser rank in spellbook/action bar, and cast it if need
     bool prev_activate = false;
 
     if (uint32 prev_id = sSpellMgr.GetPrevSpellInChain(spell_id))
     {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spell_id);
+        uint32 nextId = sSpellMgr.GetSpellBookSuccessorSpellId(prev_id);
 
         // if talent then lesser rank also talent and need learn
         if (talentPos)
@@ -3698,26 +3518,27 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
                 LearnSpell(prev_id, false);
         }
         // if ranked non-stackable spell: need activate lesser rank and update dependence state
-        else if (cur_active && sSpellMgr.IsRankedSpellNonStackableInSpellBook(spellInfo))
+        else if (cur_active && nextId == spell_id)
         {
             // need manually update dependence state (learn spell ignore like attempts)
             PlayerSpellMap::iterator prev_itr = m_spells.find(prev_id);
             if (prev_itr != m_spells.end())
             {
-                if (prev_itr->second.dependent != cur_dependent)
+                PlayerSpell& spell = prev_itr->second;
+                if (spell.dependent != cur_dependent)
                 {
-                    prev_itr->second.dependent = cur_dependent;
-                    if (prev_itr->second.state != PLAYERSPELL_NEW)
-                        prev_itr->second.state = PLAYERSPELL_CHANGED;
+                    spell.dependent = cur_dependent;
+                    if (spell.state != PLAYERSPELL_NEW)
+                        spell.state = PLAYERSPELL_CHANGED;
                 }
 
                 // now re-learn if need re-activate
-                if (cur_active && !prev_itr->second.active && learn_low_rank)
+                if (cur_active && !spell.active && learn_low_rank)
                 {
-                    if (AddSpell(prev_id, true, false, prev_itr->second.dependent, prev_itr->second.disabled))
+                    if (AddSpell(prev_id, true, false, spell.dependent, spell.disabled))
                     {
                         // downgrade spell ranks in spellbook and action bar
-                        WorldPacket data(SMSG_SUPERCEDED_SPELL, (4));
+                        WorldPacket data(SMSG_SUPERCEDED_SPELL, 4);
                         data << uint16(spell_id);
                         data << uint16(prev_id);
                         GetSession()->SendPacket(&data);
@@ -3725,16 +3546,12 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
                     }
                 }
             }
-        }
+}
     }
 
     // remove from spell book if not replaced by lesser rank
     if (!prev_activate)
-    {
-        WorldPacket data(SMSG_REMOVED_SPELL, 4);
-        data << uint16(spell_id);
-        GetSession()->SendPacket(&data);
-    }
+        SendSpellRemoved(spell_id);
 }
 
 void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
@@ -4213,7 +4030,7 @@ TrainerSpellState Player::GetTrainerSpellState(TrainerSpell const* trainer_spell
     }
 
     // check skill requirement
-    if (trainer_spell->reqSkill && GetBaseSkillValue(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
+    if (trainer_spell->reqSkill && GetSkillValueBase(trainer_spell->reqSkill) < trainer_spell->reqSkillValue)
         return TRAINER_SPELL_RED;
 
     // exist, already checked at loading
@@ -4421,6 +4238,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
             CharacterDatabase.PExecute("DELETE FROM character_queststatus WHERE guid = '%u'", lowguid);
             CharacterDatabase.PExecute("DELETE FROM character_reputation WHERE guid = '%u'", lowguid);
             CharacterDatabase.PExecute("DELETE FROM character_skills WHERE guid = '%u'", lowguid);
+            CharacterDatabase.PExecute("DELETE FROM character_forgotten_skills WHERE guid = '%u'", lowguid);
             CharacterDatabase.PExecute("DELETE FROM character_spell WHERE guid = '%u'", lowguid);
             CharacterDatabase.PExecute("DELETE FROM character_spell_cooldown WHERE guid = '%u'", lowguid);
             CharacterDatabase.PExecute("DELETE FROM character_ticket WHERE guid = '%u'", lowguid);
@@ -4495,9 +4313,13 @@ void Player::SetFly(bool enable)
 void Player::SetWaterWalk(bool enable)
 {
     Unit::SetWaterWalk(enable);
-
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4);
     data << GetPackGUID();
+#else
+    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 8 + 4);
+    data << GetGUID();
+#endif
     data << uint32(0);
     GetSession()->SendPacket(&data);
     GetCheatData()->OrderSent(&data);
@@ -4513,7 +4335,11 @@ void Player::SetFeatherFall(bool enable)
     else
         data.Initialize(SMSG_MOVE_NORMAL_FALL, 8 + 4);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
+#else
+    data << GetGUID();
+#endif
     data << uint32(0);
     SendMessageToSet(&data, true);
     GetCheatData()->OrderSent(&data);
@@ -4533,7 +4359,11 @@ void Player::SetHover(bool enable)
     else
         data.Initialize(SMSG_MOVE_UNSET_HOVER, 8 + 4);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
+#else
+    data << GetGUID();
+#endif
     data << uint32(0);
     SendMovementMessageToSet(std::move(data), true);
     GetCheatData()->OrderSent(&data);
@@ -5397,13 +5227,13 @@ bool Player::UpdateCraftSkill(uint32 spellid)
 {
     DEBUG_LOG("UpdateCraftSkill spellid %d", spellid);
 
-    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spellid);
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellid);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
         if (_spell_idx->second->skillId)
         {
-            uint32 SkillValue = GetPureSkillValue(_spell_idx->second->skillId);
+            uint32 SkillValue = GetSkillValuePure(_spell_idx->second->skillId);
 
             uint32 craft_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_CRAFTING);
 
@@ -5447,7 +5277,7 @@ bool Player::UpdateFishingSkill()
 {
     DEBUG_LOG("UpdateFishingSkill");
 
-    uint32 SkillValue = GetPureSkillValue(SKILL_FISHING);
+    uint32 SkillValue = GetSkillValuePure(SKILL_FISHING);
 
     int32 chance = SkillValue < 75 ? 100 : 2500 / (SkillValue - 50);
 
@@ -5585,28 +5415,10 @@ void Player::UpdateCombatSkills(Unit *pVictim, WeaponAttackType attType, bool de
         return;
 }
 
-void Player::ModifySkillBonus(uint32 skillid, int32 val, bool talent)
-{
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skillid);
-    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
-        return;
-
-    uint32 bonusIndex = PLAYER_SKILL_BONUS_INDEX(itr->second.pos);
-
-    uint32 bonus_val = GetUInt32Value(bonusIndex);
-    int16 temp_bonus = SKILL_TEMP_BONUS(bonus_val);
-    int16 perm_bonus = SKILL_PERM_BONUS(bonus_val);
-
-    if (talent)                                         // permanent bonus stored in high part
-        SetUInt32Value(bonusIndex, MAKE_SKILL_BONUS(temp_bonus, perm_bonus + val));
-    else                                                // temporary/item bonus stored in low part
-        SetUInt32Value(bonusIndex, MAKE_SKILL_BONUS(temp_bonus + val, perm_bonus));
-}
-
 void Player::UpdateSkillsForLevel()
 {
     uint16 maxconfskill = sWorld.GetConfigMaxSkillValue();
-    uint32 maxSkill = GetMaxSkillValueForLevel();
+    uint32 maxSkill = GetSkillMaxForLevel();
 
     bool alwaysMaxSkill = sWorld.getConfig(CONFIG_BOOL_ALWAYS_MAX_SKILL_FOR_LEVEL);
 
@@ -5696,7 +5508,9 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
             SetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos), MAKE_SKILL_VALUE(currVal, maxVal));
             if (itr->second.uState != SKILL_NEW)
                 itr->second.uState = SKILL_CHANGED;
-            //LearnSkillRewardedSpells(id, currVal);        // pre-3.x have only 1 skill level req (so at learning only)
+
+            // Learn all spells auto-trained by this skill on change
+            UpdateSkillTrainedSpells(id, currVal);
         }
         else                                                //remove
         {
@@ -5724,11 +5538,9 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
             else
                 mSkillStatus.erase(itr);
 
-            // remove all spells that related to this skill
-            for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
-                if (SkillLineAbilityEntry const *pAbility = sObjectMgr.GetSkillLineAbility(j))
-                    if (pAbility->skillId == id)
-                        RemoveSpell(sSpellMgr.GetFirstSpellInChain(pAbility->spellId));
+            // Remove all spells dependent on this skill unconditionally
+            UpdateSkillTrainedSpells(id, 0);
+
             // remove all quests related to this skill (else the spell will be automatically learned at next login, cf Player::LearnQuestRewardedSpells)
             for (QuestStatusMap::iterator itr = mQuestStatus.begin(); itr != mQuestStatus.end(); ++itr)
                 if (Quest const* quest = sObjectMgr.GetQuestTemplate(itr->first))
@@ -5791,117 +5603,255 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
                     if ((*j)->GetModifier()->m_miscvalue == int32(id))
                         (*j)->ApplyModifier(true);
 
-                // Learn all spells for skill
-                LearnSkillRewardedSpells(id, currVal);
+                // Learn all spells auto-trained by this skill
+                UpdateSkillTrainedSpells(id, currVal);
                 return;
             }
         }
     }
 }
 
-bool Player::HasSkill(uint32 skill) const
+bool Player::HasSkill(uint16 id) const
 {
-    if (!skill)
+    if (!id)
         return false;
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
     return (itr != mSkillStatus.end() && itr->second.uState != SKILL_DELETED);
 }
 
-uint16 Player::GetSkillValue(uint32 skill) const
+uint16 Player::GetSkill(uint16 id, bool bonusPerm, bool bonusTemp, bool max/* = false*/) const
 {
-    if (!skill)
+    if (!id)
         return 0;
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
     if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
         return 0;
 
-    uint32 bonus = GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(itr->second.pos));
+    SkillStatusData const& skillStatus = itr->second;
 
-    int32 result = int32(SKILL_VALUE(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos))));
-    result += SKILL_TEMP_BONUS(bonus);
-    result += SKILL_PERM_BONUS(bonus);
-    return result < 0 ? 0 : result;
+    uint32 field = GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(skillStatus.pos));
+
+    // Pure value
+    int32 value = (max ? SKILL_MAX(field) : SKILL_VALUE(field));
+
+    // Bonus values
+    if (bonusPerm || bonusTemp)
+    {
+        uint32 bonus = GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(skillStatus.pos));
+
+        if (bonusPerm)
+            value += SKILL_PERM_BONUS(bonus);
+
+        if (bonusTemp)
+            value += SKILL_TEMP_BONUS(bonus);
+    }
+
+    return uint16(std::max(0, value));
 }
 
-uint16 Player::GetMaxSkillValue(uint32 skill) const
+bool Player::ModifySkillBonus(uint16 id, int16 diff, bool permanent/* = false*/)
 {
-    if (!skill)
-        return 0;
+    if (!id || !diff)
+        return false;
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
     if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
-        return 0;
+        return false;
 
-    uint32 bonus = GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(itr->second.pos));
+    uint16 bonusIndex = PLAYER_SKILL_BONUS_INDEX(itr->second.pos);
+    uint32 bonus = GetUInt32Value(bonusIndex);
+    const int16 bonusTemporary = SKILL_TEMP_BONUS(bonus);
+    const int16 bonusPermanent = SKILL_PERM_BONUS(bonus);
 
-    int32 result = int32(SKILL_MAX(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos))));
-    result += SKILL_TEMP_BONUS(bonus);
-    result += SKILL_PERM_BONUS(bonus);
-    return result < 0 ? 0 : result;
+    if (permanent)
+        SetUInt32Value(bonusIndex, MAKE_SKILL_BONUS(bonusTemporary, (bonusPermanent + diff))); // permanent bonus stored in high part
+    else
+        SetUInt32Value(bonusIndex, MAKE_SKILL_BONUS((bonusTemporary + diff), bonusPermanent)); // temporary/item bonus stored in low part
+
+    return true;
 }
 
-uint16 Player::GetPureMaxSkillValue(uint32 skill) const
+int16 Player::GetSkillBonus(uint16 id, bool permanent/*= false*/) const
 {
-    if (!skill)
+    if (!id)
         return 0;
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
+    SkillStatusMap::const_iterator itr = mSkillStatus.find(id);
     if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
         return 0;
 
-    return SKILL_MAX(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos)));
+    SkillStatusData const& skillStatus = itr->second;
+
+    uint32 bonus = GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(skillStatus.pos));
+
+    return (permanent ? SKILL_PERM_BONUS(bonus) : SKILL_TEMP_BONUS(bonus));
 }
 
-uint16 Player::GetBaseSkillValue(uint32 skill) const
+void Player::UpdateSkillTrainedSpells(uint16 id, uint16 currVal)
 {
-    if (!skill)
-        return 0;
+    uint32 raceMask = getRaceMask();
+    uint32 classMask = getClassMask();
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
-    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
-        return 0;
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySkillId(id);
 
-    int32 result = int32(SKILL_VALUE(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos))));
-    result +=  SKILL_PERM_BONUS(GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(itr->second.pos)));
-    return result < 0 ? 0 : result;
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+    {
+        if (SkillLineAbilityEntry const* pAbility = itr->second)
+        {
+            // Update training: skill removal mode, wipe all dependent spells regardless of training method
+            if (!currVal)
+            {
+                RemoveSpell(pAbility->spellId);
+                continue;
+            }
+
+            // Check if auto-training method is set, skip if not
+            if (!pAbility->learnOnGetSkill)
+                continue;
+
+            // Check race if set
+            if (pAbility->racemask && !(pAbility->racemask & raceMask))
+                continue;
+
+            // Check class if set
+            if (pAbility->classmask && !(pAbility->classmask & classMask))
+                continue;
+
+            // Update training: needs unlearning spell if current value is too low
+            if (currVal < pAbility->req_skill_value)
+                RemoveSpell(pAbility->spellId);
+            // Update training: needs learning
+            else if (!IsInWorld())
+                AddSpell(pAbility->spellId, true, true, true, false);
+            else
+                LearnSpell(pAbility->spellId, true);
+        }
+    }
 }
 
-uint16 Player::GetPureSkillValue(uint32 skill) const
+void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
 {
-    if (!skill)
-        return 0;
+    if (SpellLearnSkillNode const* skillLearnInfo = sSpellMgr.GetSpellLearnSkill(spellId))
+    {
+        if (apply)
+        {
+            uint16 value = std::max(skillLearnInfo->value, GetSkillValuePure(skillLearnInfo->skill));
+            uint16 max = std::max((!skillLearnInfo->maxvalue ? GetSkillMaxForLevel() : skillLearnInfo->maxvalue), GetSkillMaxPure(skillLearnInfo->skill));
+            SetSkill(skillLearnInfo->skill, value, max, skillLearnInfo->step);
+        }
+        else
+        {
+            uint32 prev_spell = sSpellMgr.GetPrevSpellInChain(spellId);
+            if (!prev_spell)                                    // first rank, remove skill
+                SetSkill(skillLearnInfo->skill, 0, 0);
+            else
+            {
+                // search prev. skill setting by spell ranks chain
+                SpellLearnSkillNode const* prevSkill = sSpellMgr.GetSpellLearnSkill(prev_spell);
+                while (!prevSkill && prev_spell)
+                {
+                    prev_spell = sSpellMgr.GetPrevSpellInChain(prev_spell);
+                    prevSkill = sSpellMgr.GetSpellLearnSkill(sSpellMgr.GetFirstSpellInChain(prev_spell));
+                }
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
-    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
-        return 0;
+                if (!prevSkill)                                 // not found prev skill setting, remove skill
+                    SetSkill(skillLearnInfo->skill, 0, 0);
+                else                                            // set to prev. skill setting values
+                {
+                    uint16 value = std::min(prevSkill->value, GetSkillValuePure(prevSkill->skill));
+                    uint16 max = std::min((!prevSkill->maxvalue ? GetSkillMaxForLevel() : prevSkill->maxvalue), GetSkillMaxPure(prevSkill->skill));
+                    SetSkill(prevSkill->skill, value, max, prevSkill->step);
+                }
+            }
+        }
+    }
+    else
+    {
+        SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellId);
+        for (auto itr = bounds.first; itr != bounds.second; ++itr)
+        {
+            SkillLineAbilityEntry const* skillAbility = itr->second;
+            SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skillAbility->skillId);
+            if (!pSkill)
+                continue;
 
-    return SKILL_VALUE(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(itr->second.pos)));
-}
+            if (apply)
+            {
+                if (HasSkill(uint16(pSkill->id)))
+                    continue;
 
-int16 Player::GetSkillPermBonusValue(uint32 skill) const
-{
-    if (!skill)
-        return 0;
+                if (skillAbility->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL ||
+                    // poison special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
+                    ((pSkill->id == SKILL_POISONS) && (skillAbility->max_value == 0)) ||
+                    // lockpicking special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
+                    ((pSkill->id == SKILL_LOCKPICKING) && (skillAbility->max_value == 0)))
+                {
+                    switch (GetSkillRangeType(pSkill, skillAbility->racemask != 0))
+                    {
+                    case SKILL_RANGE_LANGUAGE:
+                        SetSkill(uint16(pSkill->id), 300, 300);
+                        break;
+                    case SKILL_RANGE_LEVEL:
+                    {
+                        uint16 newSkillValue = 1;
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
-    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
-        return 0;
+                        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+                        // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
+                        //   with these two weapons will now be retained if you decide to unspend
+                        //   this talent point and return to it later.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+                        if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
+                        {
+                            const auto savedValue = m_mForgottenSkills.find(pSkill->id);
 
-    return SKILL_PERM_BONUS(GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(itr->second.pos)));
-}
+                            if (savedValue != m_mForgottenSkills.end())
+                                if (savedValue->second <= GetSkillMaxForLevel())
+                                    newSkillValue = savedValue->second;
+                        }
+#endif
+                        SetSkill(uint16(pSkill->id), newSkillValue, GetSkillMaxForLevel());
+                        break;
+                    }
+                    case SKILL_RANGE_MONO:
+                        SetSkill(uint16(pSkill->id), 1, 1);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if ((skillAbility->learnOnGetSkill == ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL &&
+                    pSkill->categoryId != SKILL_CATEGORY_CLASS) ||// not unlearn class skills (spellbook/talent pages)
+                                                                  // poisons/lockpicking special case, not have ABILITY_LEARNED_ON_GET_RACE_OR_CLASS_SKILL
+                    ((pSkill->id == SKILL_POISONS || pSkill->id == SKILL_LOCKPICKING) && skillAbility->max_value == 0))
+                {
+                    // not reset skills for professions and racial abilities
+                    if ((pSkill->categoryId == SKILL_CATEGORY_SECONDARY || pSkill->categoryId == SKILL_CATEGORY_PROFESSION) &&
+                        (IsProfessionSkill(pSkill->id) || skillAbility->racemask != 0))
+                        continue;
 
-int16 Player::GetSkillTempBonusValue(uint32 skill) const
-{
-    if (!skill)
-        return 0;
+                    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+                    // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
+                    //   with these two weapons will now be retained if you decide to unspend
+                    //   this talent point and return to it later.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+                    if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
+                        if (GetSkillValuePure(pSkill->id) > m_mForgottenSkills[pSkill->id])
+                            m_mForgottenSkills[pSkill->id] = GetSkillValuePure(pSkill->id);
+#endif
 
-    SkillStatusMap::const_iterator itr = mSkillStatus.find(skill);
-    if (itr == mSkillStatus.end() || itr->second.uState == SKILL_DELETED)
-        return 0;
+                    SetSkill(uint16(pSkill->id), 0, 0);
 
-    return SKILL_TEMP_BONUS(GetUInt32Value(PLAYER_SKILL_BONUS_INDEX(itr->second.pos)));
+                    if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
+                        AutoUnequipWeaponsIfNeed();  
+                }
+            }
+        }
+    }
 }
 
 bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player* player)
@@ -6311,7 +6261,12 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
 //Calculates how many reputation points player gains in victim's enemy factions
 void Player::RewardReputation(Unit *pVictim, float rate)
 {
-    if (!pVictim || pVictim->GetTypeId() == TYPEID_PLAYER)
+    if (!pVictim || pVictim->IsPlayer())
+        return;
+
+    // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+    // - Pets no longer modify your reputation if you kill them.
+    if (pVictim->IsPet() && sWorld.GetWowPatch() >= WOW_PATCH_110)
         return;
 
     ReputationOnKillEntry const* Rep = sObjectMgr.GetReputationOnKillEntry(((Creature*)pVictim)->GetEntry());
@@ -7726,7 +7681,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
             if (loot_type == LOOT_PICKPOCKETING)
             {
 
-                uint32 lootid = creature->GetCreatureInfo()->pickpocketLootId;
+                uint32 lootid = creature->GetCreatureInfo()->pickpocket_loot_id;
 
                 if (!creature->lootForPickPocketed)
                 {
@@ -7810,7 +7765,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                     {
                         creature->lootForSkin = true;
                         loot->clear();
-                        loot->FillLoot(creature->GetCreatureInfo()->SkinLootId, LootTemplates_Skinning, this, false);
+                        loot->FillLoot(creature->GetCreatureInfo()->skinning_loot_id, LootTemplates_Skinning, this, false);
 
                         // let reopen skinning loot if will closed.
                         if (!loot->empty())
@@ -10265,13 +10220,21 @@ Item* Player::EquipItem(uint16 pos, Item *pItem, bool update)
 
             _ApplyItemMods(pItem, slot, true);
 
+            // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+            // - Switching weapons in combat triggers a 1 second global cooldown for
+            //   all abilities for rogues and a 1.5 second global cooldown for
+            //   everyone else.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             // Weapons and also Totem/Relic/Sigil/etc
             if (pProto && isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
             {
                 uint32 cooldownSpell = SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_5s;
 
+                // There doesn't appear to be a 1 sec combat swap cd spell before 1.9.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 if (getClass() == CLASS_ROGUE)
                     cooldownSpell = SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_0s;
+#endif
 
                 SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(cooldownSpell);
 
@@ -10279,10 +10242,15 @@ Item* Player::EquipItem(uint16 pos, Item *pItem, bool update)
                     sLog.outError("Weapon switch cooldown spell %u couldn't be found in Spell.dbc", cooldownSpell);
                 else
                 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                     m_weaponChangeTimer = spellProto->StartRecoveryTime;
+#else
+                    m_weaponChangeTimer = (getClass() == CLASS_ROGUE) ? 1000 : spellProto->StartRecoveryTime;
+#endif
                     SendSpellCooldown(cooldownSpell, 0, GetObjectGuid());
                 }
             }
+#endif
         }
 
         if (IsInWorld() && update)
@@ -11496,7 +11464,7 @@ void Player::UpdateItemDuration(uint32 time, bool realtimeonly)
         Item* item = *itr;
         ++itr;                                              // current element can be erased in UpdateDuration
 
-        if (!realtimeonly || (item->GetProto()->ExtraFlags & ITEM_EXTRA_REAL_TIME_DURATION))
+        if (!realtimeonly || (item->GetProto()->Flags & ITEM_FLAG_REAL_DURATION))
             item->UpdateDuration(this, time);
     }
 }
@@ -13767,12 +13735,8 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
 
 void Player::KilledMonster(CreatureInfo const* cInfo, ObjectGuid guid)
 {
-    if (cInfo->Entry)
-        KilledMonsterCredit(cInfo->Entry, guid);
-
-    for (int i = 0; i < MAX_KILL_CREDIT; ++i)
-        if (cInfo->KillCredit[i])
-            KilledMonsterCredit(cInfo->KillCredit[i], guid);
+    if (cInfo->entry)
+        KilledMonsterCredit(cInfo->entry, guid);
 }
 
 void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid)
@@ -14327,62 +14291,6 @@ void Player::_LoadIntoDataField(const char* data, uint32 startOffset, uint32 cou
         m_uint32Values[startOffset + index] = atol((*iter).c_str());
 }
 
-void Player::LoadCustomFlags()
-{
-    RemoveCustomFlag(CUSTOM_FLAG_FROM_NOSTALRIUS | CUSTOM_FLAG_FROM_BLACKROCK | CUSTOM_FLAG_FROM_NOSTALRIUS_2
-                     | CUSTOM_FLAG_FROM_PRISMATIA | CUSTOM_FLAG_FROM_NOSTALRIUS_3 | CUSTOM_FLAG_PRISMATIA_BETA);
-
-    uint32 guidLow = GetGUIDLow();
-    // Sur quel royaume / Quand le perso a-t-il été créé ?
-    if (guidLow < 10000)
-        AddCustomFlag(CUSTOM_FLAG_FROM_NOSTALRIUS);
-    else if (guidLow <= 13350)
-        AddCustomFlag(CUSTOM_FLAG_FROM_BLACKROCK);
-    else if (guidLow < 20000)
-        AddCustomFlag(CUSTOM_FLAG_FROM_NOSTALRIUS_2);
-    else if (guidLow <= 29375)
-        AddCustomFlag(CUSTOM_FLAG_FROM_PRISMATIA);
-    else
-        AddCustomFlag(CUSTOM_FLAG_FROM_NOSTALRIUS_3);
-    // Beta testeur ?
-    if (HasItemCount(50001, 1))
-        AddCustomFlag(CUSTOM_FLAG_PRISMATIA_BETA);
-    // Load des 'phases'
-    // -- Pex termine
-    if (HasItemCount(19160, 1))
-    {
-        AddCustomFlag(CUSTOM_FLAG_HL | CUSTOM_FLAG_PEX_FINISHED);
-        RemoveCustomFlag(CUSTOM_FLAG_IN_PEX);
-    }
-    // -- Pas eu de pex
-    //else if (getLevel() > 56 && !HasCustomFlag(CUSTOM_FLAG_FROM_BLACKROCK))
-    //{
-    //    AddCustomFlag(CUSTOM_FLAG_HL);
-    //    RemoveCustomFlag(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_PEX_FINISHED);
-    //}
-    // -- En cours de pex
-    if ((getLevel() < 55 && !HasCustomFlag(CUSTOM_FLAG_FROM_PRISMATIA)) ||
-            getLevel() < 40)
-    {
-        AddCustomFlag(CUSTOM_FLAG_IN_PEX);
-        RemoveCustomFlag(CUSTOM_FLAG_PEX_FINISHED | CUSTOM_FLAG_HL);
-    }
-    // Et finalement les autres
-    if (!HasCustomFlag(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_PEX_FINISHED | CUSTOM_FLAG_HL | CUSTOM_FLAG_INSTANT60))
-    {
-        sLog.outInfo("[CustomFlag] Joueur %u (guid %u) flags inconnu ...", GetName(), GetGUIDLow());
-        AddCustomFlag(CUSTOM_FLAG_HL);
-    }
-    // Derniere verification pour ceux qui auraient exploit bug :
-    // 3 jours de /played mini pour upper
-    if (m_Played_time[PLAYED_TIME_TOTAL] < (60 * 60 * 24 * 3) && HasCustomFlag(CUSTOM_FLAG_PEX_FINISHED))
-    {
-        sLog.outInfo("[CustomFlag] Joueur %s en pex finished mais avec %u totaltime", GetName(), m_Played_time[PLAYED_TIME_TOTAL]);
-        AddCustomFlag(CUSTOM_FLAG_HL);
-        RemoveCustomFlag(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_PEX_FINISHED);
-    }
-}
-
 bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
 {
     //       0     1        2     3     4      5       6      7   8      9            10            11
@@ -14396,7 +14304,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     // 45               46     47      48      49      50      51      52      53             54              55      56
     //"watchedFaction,  drunk, health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, actionBars,"
     // 57                58
-    //"world_phase_mask, customFlags FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
+    //"world_phase_mask FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
 
     QueryResult *result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
@@ -14671,10 +14579,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM))
         SetUInt32Value(PLAYER_FLAGS, 0 | old_safe_flags);
 
-
-    uint32 loadedCustomFlags = fields[58].GetUInt32();
-    SetCustomFlags(loadedCustomFlags);
-
     m_taxi.LoadTaxiMask(fields[17].GetString());
 
     uint32 extraflags = fields[31].GetUInt32();
@@ -14747,6 +14651,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
 
     // load skills after InitStatsForLevel because it triggering aura apply also
     _LoadSkills(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSKILLS));
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    _LoadForgottenSkills(holder->GetResult(PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS));
+#endif
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
 
@@ -14921,13 +14829,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     if (extraflags & PLAYER_EXTRA_WHISP_RESTRICTION)
         SetWhisperRestriction(true);
 
-    LoadCustomFlags();
     sBattleGroundMgr.PlayerLoggedIn(this); // Add to BG queue if needed
     CreatePacketBroadcaster();
 
-    // Note, if not using accurate mounts be sure to update all trainer spells in the
-    // database or players will be stuck with the old skill system
-    if (sWorld.GetWowPatch() >= WOW_PATCH_112 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_MOUNTS))
+    if (sWorld.GetWowPatch() >= WOW_PATCH_112)
         UpdateOldRidingSkillToNew(has_epic_mount);
 
     return true;
@@ -15765,6 +15670,7 @@ void Player::SendRaidInfo() const
 */
 void Player::SendSavedInstances() const
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     bool hasBeenSaved = false;
     WorldPacket data;
 
@@ -15794,6 +15700,7 @@ void Player::SendSavedInstances() const
             GetSession()->SendPacket(&data);
         }
     }
+#endif
 }
 
 /// convert the player's binds to the group
@@ -15963,7 +15870,7 @@ void Player::SaveToDB(bool online, bool force)
                               "honorRankPoints, honorHighestRank, honorStanding, honorLastWeekHK, honorLastWeekCP, honorStoredHK, honorStoredDK, "
                               "watchedFaction, drunk, health, power1, power2, power3, "
                               "power4, power5, exploredZones, equipmentCache, ammoId, actionBars, "
-                              "area, world_phase_mask, customFlags) "
+                              "area, world_phase_mask) "
                               "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"
                               "?, ?, ?, ?, ?, "
                               "?, ?, ?, "
@@ -15973,7 +15880,7 @@ void Player::SaveToDB(bool online, bool force)
                               "?, ?, ?, ?, ?, ?, ?, "
                               "?, ?, ?, ?, ?, ?, "
                               "?, ?, ?, ?, ?, ?, "
-                              "?, ?, ?) ");
+                              "?, ?) ");
 
     uberInsert.addUInt32(GetGUIDLow());
     uberInsert.addUInt32(GetSession()->GetAccountId());
@@ -16092,7 +15999,6 @@ void Player::SaveToDB(bool online, bool force)
     // Nostalrius
     uberInsert.addUInt32(GetAreaId());
     uberInsert.addUInt32(GetWorldMask());
-    uberInsert.addUInt32(customFlags);
     uberInsert.Execute();
 
     _SaveBGData();
@@ -16428,9 +16334,9 @@ void Player::_SaveQuestStatus()
 
 void Player::_SaveSkills()
 {
-    static SqlStatementID delSkills ;
-    static SqlStatementID insSkills ;
-    static SqlStatementID updSkills ;
+    static SqlStatementID delSkills;
+    static SqlStatementID insSkills;
+    static SqlStatementID updSkills;
 
     // we don't need transactions here.
     for (SkillStatusMap::iterator itr = mSkillStatus.begin(); itr != mSkillStatus.end();)
@@ -16476,6 +16382,21 @@ void Player::_SaveSkills()
 
         ++itr;
     }
+
+    
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    // Forgotten weapon skills.
+    static SqlStatementID forSkills;
+
+    for (const auto itr : m_mForgottenSkills)
+    {
+        if (itr.second > 1)
+        {
+            SqlStatement stmt = CharacterDatabase.CreateStatement(forSkills, "REPLACE INTO character_forgotten_skills (guid, skill, value) VALUES (?, ?, ?)");
+            stmt.PExecute(GetGUIDLow(), itr.first, itr.second);
+        }
+    }
+#endif
 }
 
 void Player::_SaveSpells()
@@ -16533,7 +16454,7 @@ void Player::_SaveStats()
         stmt.addFloat(GetStat(Stats(i)));
     // armor + school resistances
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
-        stmt.addUInt32(GetResistance(SpellSchools(i)));
+        stmt.addInt32(GetResistance(SpellSchools(i)));
     stmt.addFloat(GetFloatValue(PLAYER_BLOCK_PERCENTAGE));
     stmt.addFloat(GetFloatValue(PLAYER_DODGE_PERCENTAGE));
     stmt.addFloat(GetFloatValue(PLAYER_PARRY_PERCENTAGE));
@@ -16555,10 +16476,10 @@ void Player::outDebugStatsValues() const
     DEBUG_LOG("AGILITY is: \t\t%f\t\tSTRENGTH is: \t\t%f", GetStat(STAT_AGILITY), GetStat(STAT_STRENGTH));
     DEBUG_LOG("INTELLECT is: \t\t%f\t\tSPIRIT is: \t\t%f", GetStat(STAT_INTELLECT), GetStat(STAT_SPIRIT));
     DEBUG_LOG("STAMINA is: \t\t%f", GetStat(STAT_STAMINA));
-    DEBUG_LOG("Armor is: \t\t%u\t\tBlock is: \t\t%f", GetArmor(), GetFloatValue(PLAYER_BLOCK_PERCENTAGE));
-    DEBUG_LOG("HolyRes is: \t\t%u\t\tFireRes is: \t\t%u", GetResistance(SPELL_SCHOOL_HOLY), GetResistance(SPELL_SCHOOL_FIRE));
-    DEBUG_LOG("NatureRes is: \t\t%u\t\tFrostRes is: \t\t%u", GetResistance(SPELL_SCHOOL_NATURE), GetResistance(SPELL_SCHOOL_FROST));
-    DEBUG_LOG("ShadowRes is: \t\t%u\t\tArcaneRes is: \t\t%u", GetResistance(SPELL_SCHOOL_SHADOW), GetResistance(SPELL_SCHOOL_ARCANE));
+    DEBUG_LOG("Armor is: \t\t%i\t\tBlock is: \t\t%f", GetArmor(), GetFloatValue(PLAYER_BLOCK_PERCENTAGE));
+    DEBUG_LOG("HolyRes is: \t\t%i\t\tFireRes is: \t\t%i", GetResistance(SPELL_SCHOOL_HOLY), GetResistance(SPELL_SCHOOL_FIRE));
+    DEBUG_LOG("NatureRes is: \t\t%i\t\tFrostRes is: \t\t%i", GetResistance(SPELL_SCHOOL_NATURE), GetResistance(SPELL_SCHOOL_FROST));
+    DEBUG_LOG("ShadowRes is: \t\t%i\t\tArcaneRes is: \t\t%i", GetResistance(SPELL_SCHOOL_SHADOW), GetResistance(SPELL_SCHOOL_ARCANE));
     DEBUG_LOG("MIN_DAMAGE is: \t\t%f\tMAX_DAMAGE is: \t\t%f", GetFloatValue(UNIT_FIELD_MINDAMAGE), GetFloatValue(UNIT_FIELD_MAXDAMAGE));
     DEBUG_LOG("MIN_OFFHAND_DAMAGE is: \t%f\tMAX_OFFHAND_DAMAGE is: \t%f", GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE), GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE));
     DEBUG_LOG("MIN_RANGED_DAMAGE is: \t%f\tMAX_RANGED_DAMAGE is: \t%f", GetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE), GetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE));
@@ -16647,10 +16568,12 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience) const
 
 void Player::SendFactionAtWar(uint32 reputationId, bool apply) const
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_SET_FACTION_ATWAR, 4 + 1);
     data << uint32(reputationId);
     data << uint8(apply ? FACTION_FLAG_AT_WAR : 0);
     GetSession()->SendPacket(&data);
+#endif
 }
 
 void Player::SendResetFailedNotify()
@@ -16703,18 +16626,22 @@ void Player::ResetInstances(InstanceResetMethod method)
 
 void Player::SendResetInstanceSuccess(uint32 MapId) const
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_INSTANCE_RESET, 4);
     data << uint32(MapId);
     GetSession()->SendPacket(&data);
+#endif
 }
 
 void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId) const
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     // reason: see enum InstanceResetFailReason
     WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 8);
     data << uint32(reason);
     data << uint32(MapId);
     GetSession()->SendPacket(&data);
+#endif
 }
 
 /** Implementation of hourly maximum instances per account */
@@ -16813,29 +16740,10 @@ Pet* Player::GetMiniPet() const
     return GetMap()->GetPet(m_miniPetGuid);
 }
 
-void Player::BuildPlayerChat(ObjectGuid senderGuid, uint8 senderChatTag, WorldPacket *data, uint8 msgtype, const std::string& text, uint32 language)
-{
-    *data << uint8(msgtype);
-    *data << uint32(language);
-
-    if (msgtype == CHAT_MSG_SAY || msgtype == CHAT_MSG_YELL || msgtype == CHAT_MSG_PARTY)
-        *data << senderGuid;
-
-    *data << senderGuid;
-    *data << uint32(text.length() + 1);
-    *data << text;
-    *data << uint8(senderChatTag);
-}
-
-void Player::BuildPlayerChat(WorldPacket *data, uint8 msgtype, const std::string& text, uint32 language) const
-{
-    Player::BuildPlayerChat(GetObjectGuid(), GetChatTag(), data, msgtype, text, language);
-}
-
 void Player::Say(const std::string& text, const uint32 language) const
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 100);
-    BuildPlayerChat(&data, CHAT_MSG_SAY, text, language);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
     float range = std::min(sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY), GetYellRange());
     SendMessageToSetInRange(&data, range, true);
 }
@@ -16856,15 +16764,15 @@ float Player::GetYellRange() const
 
 void Player::Yell(const std::string& text, const uint32 language) const
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 100);
-    BuildPlayerChat(&data, CHAT_MSG_YELL, text, language);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
     SendMessageToSetInRange(&data, GetYellRange(), true);
 }
 
 void Player::TextEmote(const std::string& text) const
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 100);
-    BuildPlayerChat(&data, CHAT_MSG_EMOTE, text, LANG_UNIVERSAL);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, text.c_str(), LANG_UNIVERSAL, GetChatTag(), GetObjectGuid(), GetName());
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
@@ -17002,6 +16910,67 @@ void Player::RemovePetActionBar()
     WorldPacket data(SMSG_PET_SPELLS, 8);
     data << ObjectGuid();
     SendDirectMessage(&data);
+}
+
+// This will create a new creature and set the current unit as the controller of that new creature
+Creature* Player::SummonPossessedMinion(uint32 creatureId, uint32 spellId, float x, float y, float z, float ang)
+{
+    // Possess is a unique advertised charm, another advertised charm already exists: we should get rid of it first
+    if (!GetCharmGuid().IsEmpty())
+        return nullptr;
+
+    Creature* pCreature = SummonCreature(creatureId, x, y, z, ang, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+
+    if (!pCreature)
+        return nullptr;
+
+    pCreature->SetFactionTemporary(getFaction(), TEMPFACTION_NONE);     // set same faction than player
+    pCreature->SetCharmerGuid(GetObjectGuid());                         // save guid of the charmer
+    pCreature->SetPossesorGuid(GetObjectGuid());
+    pCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);          // set the spell id used to create this
+    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);          // set flag for client that mean this unit is controlled by a player
+    pCreature->addUnitState(UNIT_STAT_POSSESSED);                       // also set internal unit state flag
+    pCreature->SetLevel(getLevel());                                    // set level to same level than summoner TODO:: not sure its always the case...
+    pCreature->SetWalk(IsWalking(), true);                              // sync the walking state with the summoner
+    SetCharmGuid(pCreature->GetObjectGuid());                           // save guid of charmed creature
+
+    UnsummonPetTemporaryIfAny();
+
+    GetCamera().SetView(pCreature);                         // modify camera view to the creature view
+    pCreature->UpdateControl();                             // transfer client control to the creature after altering flags
+    SetMover(pCreature);                                    // set mover so now we know that creature is "moved" by this unit
+    SendForcedObjectUpdate();
+
+    // Initialize pet bar
+    if (CharmInfo* charmInfo = pCreature->InitCharmInfo(pCreature))
+        charmInfo->InitPossessCreateSpells();
+
+    PossessSpellInitialize();
+
+    return pCreature;
+}
+
+void Player::UnsummonPossessedMinion()
+{
+    Unit* pMinion = GetCharm();
+
+    SetCharm(nullptr);
+    SetMover(nullptr);
+    UpdateControl();
+    GetCamera().ResetView();
+    RemovePetActionBar();
+    SendForcedObjectUpdate();
+    ResummonPetTemporaryUnSummonedIfAny();
+
+    if (!pMinion)
+        return;
+
+    SetClientControl(pMinion, false);
+    pMinion->SetCharmerGuid(ObjectGuid());
+    pMinion->SetPossesorGuid(ObjectGuid());
+    pMinion->clearUnitState(UNIT_STAT_POSSESSED);
+    pMinion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
+    pMinion->DoKillUnit();
 }
 
 bool Player::HasInstantCastingSpellMod(SpellEntry const *spellInfo) const
@@ -18443,7 +18412,11 @@ void Player::SendInitialPacketsAfterAddToMap(bool login)
     if (HasAuraType(SPELL_AURA_MOD_ROOT))
     {
         WorldPacket data2(SMSG_FORCE_MOVE_ROOT, 10);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data2 << GetPackGUID();
+#else
+        data2 << GetGUID();
+#endif
         data2 << (uint32)2;
         SendObjectMessageToSet(&data2, true);
         GetCheatData()->OrderSent(&data2);
@@ -18475,6 +18448,7 @@ void Player::SendTransferAborted(uint8 reason) const
 
 void Player::SendInstanceResetWarning(uint32 mapid, uint32 _time) const
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     // type of warning, based on the time remaining until reset
     uint32 type;
     if (_time > 3600)
@@ -18490,6 +18464,7 @@ void Player::SendInstanceResetWarning(uint32 mapid, uint32 _time) const
     data << uint32(mapid);
     data << uint32(_time);
     GetSession()->SendPacket(&data);
+#endif
 }
 
 void Player::ApplyEquipCooldown(Item * pItem)
@@ -18646,36 +18621,6 @@ void Player::LearnQuestRewardedSpells()
     }
 }
 
-void Player::LearnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
-{
-    uint32 raceMask  = getRaceMask();
-    uint32 classMask = getClassMask();
-    for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
-    {
-        SkillLineAbilityEntry const *pAbility = sObjectMgr.GetSkillLineAbility(j);
-        if (!pAbility || pAbility->skillId != skill_id || pAbility->learnOnGetSkill != ABILITY_LEARNED_ON_GET_PROFESSION_SKILL)
-            continue;
-        // Check race if set
-        if (pAbility->racemask && !(pAbility->racemask & raceMask))
-            continue;
-        // Check class if set
-        if (pAbility->classmask && !(pAbility->classmask & classMask))
-            continue;
-
-        if (sSpellMgr.GetSpellEntry(pAbility->spellId))
-        {
-            // need unlearn spell
-            if (skill_value < pAbility->req_skill_value)
-                RemoveSpell(pAbility->spellId);
-            // need learn
-            else if (!IsInWorld())
-                AddSpell(pAbility->spellId, true, true, true, false);
-            else
-                LearnSpell(pAbility->spellId, true);
-        }
-    }
-}
-
 void Player::SetSemaphoreTeleportNear(bool semphsetting)
 {
     mSemaphoreTeleport_Near = semphsetting;
@@ -18810,7 +18755,7 @@ bool Player::IsSpellFitByClassAndRace(uint32 spell_id, uint32* pReqlevel /*= NUL
     uint32 racemask  = getRaceMask();
     uint32 classmask = getClassMask();
 
-    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(spell_id);
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spell_id);
     if (bounds.first == bounds.second)
         return true;
 
@@ -18969,60 +18914,53 @@ void Player::AddItemDurations(Item *item)
     }
 }
 
+void Player::AutoUnequipWeaponsIfNeed()
+{
+    if (Item* pMainHandWeapon = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND))
+        if (CanUseItem(pMainHandWeapon, false) != EQUIP_ERR_OK)
+            AutoUnequipItemFromSlot(EQUIPMENT_SLOT_MAINHAND);
+
+    if (Item* pOffHandWeapon = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+        if (CanUseItem(pOffHandWeapon, false) != EQUIP_ERR_OK)
+            AutoUnequipItemFromSlot(EQUIPMENT_SLOT_OFFHAND);
+
+    if (Item* pOffHandWeapon = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED))
+        if (CanUseItem(pOffHandWeapon, false) != EQUIP_ERR_OK)
+            AutoUnequipItemFromSlot(EQUIPMENT_SLOT_RANGED);
+}
+
 void Player::AutoUnequipOffhandIfNeed()
 {
-    Item *offItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
-    if (!offItem)
-        return;
-
-    // need unequip offhand for 2h-weapon
+    // need to unequip offhand for 2h-weapon
     if (!IsTwoHandUsed())
         return;
 
-    ItemPosCountVec off_dest;
-    uint8 off_msg = CanStoreItem(NULL_BAG, NULL_SLOT, off_dest, offItem, false);
-    if (off_msg == EQUIP_ERR_OK)
-    {
-        RemoveItem(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND, true);
-        StoreItem(off_dest, offItem, true);
-    }
-    else
-    {
-        MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND, true);
-        CharacterDatabase.BeginTransaction(GetGUIDLow());
-        offItem->DeleteFromInventoryDB();                   // deletes item from character's inventory
-        offItem->SaveToDB();                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
-        CharacterDatabase.CommitTransaction();
-
-        std::string subject = GetSession()->GetMangosString(LANG_NOT_EQUIPPED_ITEM);
-        MailDraft(subject).AddItem(offItem).SendMailTo(this, MailSender(this, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED);
-    }
+    AutoUnequipItemFromSlot(EQUIPMENT_SLOT_OFFHAND);
 }
 
-// Ustaag <Nostalrius> : ajout fonction
-void Player::AutoUnequipMainHandIfNeed()
+void Player::AutoUnequipItemFromSlot(uint32 slot)
 {
-    Item *mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-    if (!mainItem)
+    Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
+    if (!pItem)
         return;
 
-    ItemPosCountVec main_dest;
-    uint8 main_msg = CanStoreItem(NULL_BAG, NULL_SLOT, main_dest, mainItem, false);
+    ItemPosCountVec itemDestination;
+    uint8 main_msg = CanStoreItem(NULL_BAG, NULL_SLOT, itemDestination, pItem, false);
     if (main_msg == EQUIP_ERR_OK)
     {
-        RemoveItem(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND, true);
-        StoreItem(main_dest, mainItem, true);
+        RemoveItem(INVENTORY_SLOT_BAG_0, slot, true);
+        StoreItem(itemDestination, pItem, true);
     }
     else
     {
-        MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND, true);
+        MoveItemFromInventory(INVENTORY_SLOT_BAG_0, slot, true);
         CharacterDatabase.BeginTransaction(GetGUIDLow());
-        mainItem->DeleteFromInventoryDB();                   // deletes item from character's inventory
-        mainItem->SaveToDB();                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
+        pItem->DeleteFromInventoryDB();                   // deletes item from character's inventory
+        pItem->SaveToDB();                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
         CharacterDatabase.CommitTransaction();
 
         std::string subject = GetSession()->GetMangosString(LANG_NOT_EQUIPPED_ITEM);
-        MailDraft(subject).AddItem(mainItem).SendMailTo(this, MailSender(this, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED);
+        MailDraft(subject).AddItem(pItem).SendMailTo(this, MailSender(this, MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED);
     }
 }
 
@@ -19313,7 +19251,7 @@ uint32 Player::GetBaseWeaponSkillValue(WeaponAttackType attType) const
 
     // weapon skill or (unarmed for base attack)
     uint32  skill = item ? item->GetSkill() : uint32(SKILL_UNARMED);
-    return GetPureSkillValue(skill);
+    return GetSkillValuePure(skill);
 }
 
 void Player::ResurectUsingRequestData()
@@ -19351,16 +19289,45 @@ void Player::ResurectUsingRequestData()
 
 void Player::SetClientControl(Unit* target, uint8 allowMove)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_CLIENT_CONTROL_UPDATE, target->GetPackGUID().size() + 1);
     data << target->GetPackGUID();
     data << uint8(allowMove);
     GetSession()->SendPacket(&data);
+#endif
+}
+
+bool Player::IsMoverOf(Object const* pObject) const
+{
+    if (Player const* pPlayer = pObject->ToPlayer())
+    {
+        if (GetMover() == pPlayer)
+            return true;
+    }
+
+    return false;
+}
+
+bool Player::HasSelfMovementControl() const
+{
+    // Using Mind Vision
+    if (GetUInt64Value(PLAYER_FARSIGHT))
+        return false;
+
+    // Using Far Sight
+    if (m_longSightSpell)
+        return false;
+
+    if (hasUnitState(UNIT_STAT_LOST_CONTROL | UNIT_STAT_CONFUSED | UNIT_STAT_TAXI_FLIGHT))
+        return false;
+
+    return true;
 }
 
 bool Player::IsAllowedToMove(Unit* unit) const
 {
     if (unit == this)
-        return !hasUnitState(UNIT_STAT_CONTROLLED | UNIT_STAT_FLEEING | UNIT_FLAG_CONFUSED);
+        return !hasUnitState(UNIT_STAT_POSSESSED | UNIT_STAT_FLEEING | UNIT_FLAG_CONFUSED);
     return !unit->hasUnitState(UNIT_STAT_FLEEING | UNIT_FLAG_CONFUSED);
 }
 
@@ -19804,7 +19771,7 @@ void Player::_LoadSkills(QueryResult *result)
             SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(count), 0);
 
             mSkillStatus.insert(SkillStatusMap::value_type(skill, SkillStatusData(count, SKILL_UNCHANGED)));
-            LearnSkillRewardedSpells(skill, value);
+            UpdateSkillTrainedSpells(skill, value);
 
             ++count;
 
@@ -19825,6 +19792,40 @@ void Player::_LoadSkills(QueryResult *result)
     }
 }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+void Player::_LoadForgottenSkills(QueryResult *result)
+{
+    //                                                                 0      1
+    // SetPQuery(PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS,          "SELECT skill, value FROM character_forgotten_skills WHERE guid = '%u'", GUID_LOPART(m_guid));
+
+    if (result)
+    {
+        do
+        {
+            Field *fields = result->Fetch();
+
+            uint16 skill    = fields[0].GetUInt16();
+            uint16 value    = fields[1].GetUInt16();
+
+            SkillLineEntry const *pSkill = sSkillLineStore.LookupEntry(skill);
+            if (!pSkill)
+            {
+                sLog.outError("Character %u has saved value for forgotten skill %u that does not exist.", GetGUIDLow(), skill);
+                continue;
+            }
+
+            if (pSkill->categoryId != SKILL_CATEGORY_WEAPON)
+            {
+                sLog.outError("Character %u has saved value for forgotten skill %u that is not a weapon skill.", GetGUIDLow(), skill);
+                continue;
+            }
+
+            m_mForgottenSkills.insert(std::make_pair(skill, value));
+        }
+        while (result->NextRow());
+    }
+}
+#endif
 
 void Player::LoadSkillsFromFields()
 {
@@ -19833,7 +19834,7 @@ void Player::LoadSkillsFromFields()
         if (uint16 skill = PAIR32_LOPART(GetUInt32Value(PLAYER_SKILL_INDEX(i))))
         {
             mSkillStatus.insert(SkillStatusMap::value_type(skill, SkillStatusData(i, SKILL_UNCHANGED)));
-            LearnSkillRewardedSpells(skill, SKILL_VALUE(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i))));
+            UpdateSkillTrainedSpells(skill, SKILL_VALUE(GetUInt32Value(PLAYER_SKILL_VALUE_INDEX(i))));
         }
     }
 }
@@ -19950,7 +19951,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     // Check if it requires another talent
     if (talentInfo->DependsOn > 0)
     {
-        if (TalentEntry const *depTalentInfo = sTalentStore.LookupEntry(talentInfo->DependsOn))
+        if (TalentEntry const* depTalentInfo = sTalentStore.LookupEntry(talentInfo->DependsOn))
         {
             bool hasEnoughRank = false;
             for (int i = talentInfo->DependsOnRank; i < MAX_TALENT_RANK; ++i)
@@ -19979,7 +19980,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         for (unsigned int i = 0; i < numRows; ++i)          // Loop through all talents.
         {
             // Someday, someone needs to revamp
-            const TalentEntry *tmpTalent = sTalentStore.LookupEntry(i);
+            const TalentEntry* tmpTalent = sTalentStore.LookupEntry(i);
             if (tmpTalent)                                  // the way talents are tracked
             {
                 if (tmpTalent->TalentTab == tTab)
@@ -20014,7 +20015,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         return;
 
     // learn! (other talent ranks will unlearned at learning)
-    LearnSpell(spellid, false);
+    LearnSpell(spellid, false, true);
     DETAIL_LOG("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 }
 
@@ -20137,6 +20138,13 @@ void Player::SendClearCooldown(uint32 spell_id, Unit* target) const
     SendDirectMessage(&data);
 }
 
+void Player::SendClearAllCooldowns(Unit* target) const
+{
+    WorldPacket data(SMSG_COOLDOWN_CHEAT, 8);
+    data << target->GetObjectGuid();
+    SendDirectMessage(&data);
+}
+
 void Player::SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const
 {
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 4 + 4);
@@ -20146,13 +20154,24 @@ void Player::SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid targe
     GetSession()->SendPacket(&data);
 }
 
+void Player::SendSpellRemoved(uint32 spell_id) const
+{
+    WorldPacket data(SMSG_REMOVED_SPELL, 4);
+    data << uint16(spell_id);
+    GetSession()->SendPacket(&data);
+}
+
 void Player::BuildTeleportAckMsg(WorldPacket& data, float x, float y, float z, float ang) const
 {
     MovementInfo mi = m_movementInfo;
     mi.UpdateTime(WorldTimer::getMSTime());
     mi.ChangePosition(x, y, z, ang);
     data.Initialize(MSG_MOVE_TELEPORT_ACK, 41);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
+#else
+    data << GetGUID();
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     data << uint32(0);                                      // this value increments every time
 #endif
@@ -20837,7 +20856,11 @@ void Player::RefreshBitsForVisibleUnits(UpdateMask* mask, uint32 objectTypeMask)
             ByteBuffer buff(50);
 
             buff << uint8(UPDATETYPE_VALUES);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             buff << obj->GetPackGUID();
+#else
+            buff << obj->GetGUID();
+#endif
             obj->BuildValuesUpdate(UPDATETYPE_VALUES, &buff, mask, this);
             data.AddUpdateBlock(buff);
         }

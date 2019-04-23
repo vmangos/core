@@ -64,10 +64,9 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     uint8 hairStyle = urand(0, 5);
     uint8 hairColor = urand(0, 5);
     uint8 facialHair = urand(0, 5);
-    uint8 outfitId = urand(0, 10);
     Player *newChar = new Player(sess);
     uint32 guid = botEntry->playerGUID;
-    if (!newChar->Create(guid, name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair, outfitId))
+    if (!newChar->Create(guid, name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))
     {
         sLog.outError("PlayerBotAI::SpawnNewPlayer: Unable to create a player!");
         delete newChar;

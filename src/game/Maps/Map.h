@@ -538,8 +538,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         InstanceData const* GetInstanceData() const { return i_data; }
         uint32 GetScriptId() const { return i_script_id; }
 
-        void MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit const* target) const;
-        void MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit const* target, uint32 senderLowGuid = 0) const;
+        void MonsterYellToMap(ObjectGuid guid, int32 textId, Language language, Unit const* target) const;
+        void MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, Language language, Unit const* target, uint32 senderLowGuid = 0) const;
         void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0) const;
 
         // GameObjectCollision
@@ -588,6 +588,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, uint32 worldMask);
 
         bool ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit);
+        void RemoveBones(Corpse* corpse);
 
     private:
         void LoadMapAndVMap(int gx, int gy);
@@ -823,6 +824,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         bool ScriptCommand_AddAura(const ScriptInfo& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SummonObject(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetFly(const ScriptInfo& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         const ScriptCommandFunction m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -904,6 +906,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
             &Map::ScriptCommand_AddAura,                // 74
             &Map::ScriptCommand_AddThreat,              // 75
             &Map::ScriptCommand_SummonObject,           // 76
+            &Map::ScriptCommand_SetFly,                 // 77
         };
 
     public:

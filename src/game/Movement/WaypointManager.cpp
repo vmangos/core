@@ -229,7 +229,7 @@ void WaypointManager::Load()
 
                 sLog.outErrorDb("Table creature_movement has waypoint for creature guid %u (entry %u), but MovementType is not WAYPOINT_MOTION_TYPE(2). Creature will not use this path.", *itr, cData->id);
 
-                if (cInfo->MovementType == WAYPOINT_MOTION_TYPE)
+                if (cInfo->movement_type == WAYPOINT_MOTION_TYPE)
                     sLog.outErrorDb("    creature_template for this entry has MovementType WAYPOINT_MOTION_TYPE(2), did you intend to use creature_movement_template ?");
             }
         }

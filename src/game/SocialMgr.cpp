@@ -186,6 +186,20 @@ void SocialMgr::GetFriendInfo(MasterPlayer* player, uint32 friend_lowguid, Frien
     if (!player)
         return;
 
+    // Self status broadcast - on login or logout
+    if (player->GetObjectGuid().GetCounter() == friend_lowguid)
+    {
+        friendInfo.Status = FRIEND_STATUS_ONLINE;
+        if (player->IsAFK())
+            friendInfo.Status = FRIEND_STATUS_AFK;
+        if (player->IsDND())
+            friendInfo.Status = FRIEND_STATUS_DND;
+        friendInfo.Area = player->GetZoneId();
+        friendInfo.Level = player->getLevel();
+        friendInfo.Class = player->getClass();
+        return;
+    }
+
     MasterPlayer *pFriend = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, friend_lowguid));
 
     Team team = player->GetTeam();
@@ -242,7 +256,9 @@ void SocialMgr::SendFriendStatus(MasterPlayer *player, FriendsResult result, Obj
     {
         case FRIEND_ADDED_ONLINE:
         case FRIEND_ONLINE:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             data << uint8(fi.Status);
+#endif
             data << uint32(fi.Area);
             data << uint32(fi.Level);
             data << uint32(fi.Class);

@@ -202,7 +202,11 @@ void CinematicStuff::JumpPlayer(Player* player)
     MovementInfo mi;
     mi.moveFlags = MOVEFLAG_JUMPING;
     WorldPacket data(MSG_MOVE_JUMP, 50);
-    data << player->GetPackGUID();             // write guid
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    data << player->GetPackGUID();
+#else
+    data << player->GetGUID();
+#endif
     mi.Write(data);                               // write data
     player->SendObjectMessageToSet(&data, true, player);
 }

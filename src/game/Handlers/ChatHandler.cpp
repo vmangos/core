@@ -43,6 +43,9 @@
 
 bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
 {
+    if (!IsLanguageAllowedForChatType(lang, msgType))
+        return false;
+
     if (lang != LANG_ADDON)
     {
         // strip invisible characters for non-addon messages
@@ -59,10 +62,42 @@ bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32
             return false;
         }
     }
+
     ChatHandler handler(this);
 
     if (handler.ParseCommands(msg.c_str()))
         return false;
+
+    return true;
+}
+
+bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
+{
+    // Right now we'll just restrict addon language to the appropriate chat types
+    // Anything else is OK (default previous behaviour)
+    switch (lang)
+    {
+        case LANG_ADDON:
+        {
+            switch (msgType)
+            {
+                case CHAT_MSG_PARTY:
+                case CHAT_MSG_GUILD:
+                case CHAT_MSG_OFFICER:
+                case CHAT_MSG_RAID:
+                case CHAT_MSG_RAID_LEADER:
+                case CHAT_MSG_RAID_WARNING:
+                case CHAT_MSG_BATTLEGROUND:
+                case CHAT_MSG_BATTLEGROUND_LEADER:
+                case CHAT_MSG_CHANNEL:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        default:
+            return true;
+    }
 
     return true;
 }
@@ -326,6 +361,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 return;
             }
 
+            if (!GetPlayer()->isAlive())
+                return;
+
             GetPlayer()->Say(msg, lang);
 
             if (lang != LANG_ADDON)
@@ -344,6 +382,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 ChatHandler(this).SendSysMessage("You cannot use emotes yet (too low level).");
                 return;
             }
+
+            if (!GetPlayer()->isAlive())
+                return;
 
             GetPlayer()->TextEmote(msg);
 
@@ -364,6 +405,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 ChatHandler(this).SendSysMessage("You cannot yell yet (too low level).");
                 return;
             }
+
+            if (!GetPlayer()->isAlive())
+                return;
 
             GetPlayer()->Yell(msg, lang);
 
@@ -445,7 +489,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             }
 
             WorldPacket data;
-            ChatHandler::FillMessageData(&data, this, type, lang, msg.c_str());
+            ChatHandler::BuildChatPacket(data, ChatMsg(type), msg.c_str(), Language(lang), _player->GetChatTag(), _player->GetObjectGuid(), _player->GetName());
             group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetObjectGuid()));
             if (lang != LANG_ADDON)
                 sWorld.LogChat(this, "Group", msg, NULL, group->GetId());
@@ -485,7 +529,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             }
 
             WorldPacket data;
-            ChatHandler::FillMessageData(&data, this, CHAT_MSG_RAID, lang, msg.c_str());
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID, msg.c_str(), Language(lang), _player->GetChatTag(), _player->GetObjectGuid(), _player->GetName());
             group->BroadcastPacket(&data, false);
 
             if (lang != LANG_ADDON)
@@ -504,7 +548,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             }
 
             WorldPacket data;
-            ChatHandler::FillMessageData(&data, this, CHAT_MSG_RAID_LEADER, lang, msg.c_str());
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_LEADER, msg.c_str(), Language(lang), _player->GetChatTag(), _player->GetObjectGuid(), _player->GetName());
             group->BroadcastPacket(&data, false);
             if (lang != LANG_ADDON)
                 sWorld.LogChat(this, "Raid", msg, NULL, group->GetId());
@@ -520,7 +564,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
             WorldPacket data;
             //in battleground, raid warning is sent only to players in battleground - code is ok
-            ChatHandler::FillMessageData(&data, this, CHAT_MSG_RAID_WARNING, lang, msg.c_str());
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_RAID_WARNING, msg.c_str(), Language(lang), _player->GetChatTag(), _player->GetObjectGuid(), _player->GetName());
             group->BroadcastPacket(&data, false);
 
             if (lang != LANG_ADDON)
@@ -537,7 +581,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 return;
 
             WorldPacket data;
-            ChatHandler::FillMessageData(&data, this, CHAT_MSG_BATTLEGROUND, lang, msg.c_str());
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND, msg.c_str(), Language(lang), _player->GetChatTag(), _player->GetObjectGuid(), _player->GetName());
             group->BroadcastPacket(&data, false);
 
             if (lang != LANG_ADDON)
@@ -554,7 +598,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 return;
 
             WorldPacket data;
-            ChatHandler::FillMessageData(&data, this, CHAT_MSG_BATTLEGROUND_LEADER, lang, msg.c_str());
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_BATTLEGROUND_LEADER, msg.c_str(), Language(lang), _player->GetChatTag(), _player->GetObjectGuid(), _player->GetName());
             group->BroadcastPacket(&data, false);
 
             if (lang != LANG_ADDON)
@@ -721,7 +765,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
         return;
 
     WorldPacket data;
-    ChatHandler::FillMessageData(&data, this, CHAT_MSG_IGNORED, LANG_UNIVERSAL, NULL, GetPlayer()->GetObjectGuid(), GetPlayer()->GetName(), NULL);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_IGNORED, _player->GetName(), LANG_UNIVERSAL, CHAT_TAG_NONE, _player->GetObjectGuid());
     player->GetSession()->SendPacket(&data);
 }
 
@@ -740,6 +784,8 @@ void WorldSession::SendWrongFactionNotice()
 
 void WorldSession::SendChatRestrictedNotice()
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_CHAT_RESTRICTED, 0);
     SendPacket(&data);
+#endif
 }

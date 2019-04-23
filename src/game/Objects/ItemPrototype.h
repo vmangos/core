@@ -73,7 +73,7 @@ enum ItemPrototypeFlags
     ITEM_FLAG_CONJURED                        = 0x00000002,
     ITEM_FLAG_LOOTABLE                        = 0x00000004, // affect only non container items that can be "open" for loot. It or lockid set enable for client show "Right click to open". See also ITEM_DYNFLAG_UNLOCKED
     ITEM_FLAG_UNK3                            = 0x00000008, // not used in pre-3.x
-    ITEM_FLAG_UNK4                            = 0x00000010, // can't repeat old note: appears red icon (like when item durability==0)
+    ITEM_FLAG_DEPRECATED                      = 0x00000010, // can't repeat old note: appears red icon (like when item durability==0)
     ITEM_FLAG_INDESTRUCTIBLE                  = 0x00000020, // used for totem. Item can not be destroyed, except by using spell (item can be reagent for spell and then allowed)
     ITEM_FLAG_UNK6                            = 0x00000040, // ? old note: usable
     ITEM_FLAG_NO_EQUIP_COOLDOWN               = 0x00000080,
@@ -83,10 +83,10 @@ enum ItemPrototypeFlags
     ITEM_FLAG_PARTY_LOOT                      = 0x00000800, // determines if item is party loot or not
     ITEM_FLAG_UNK12                           = 0x00001000, // not used in pre-3.x
     ITEM_FLAG_CHARTER                         = 0x00002000, // guild charter
-    ITEM_FLAG_UNK14                           = 0x00004000,
-    ITEM_FLAG_UNK15                           = 0x00008000, // a lot of items have this
-    ITEM_FLAG_UNK16                           = 0x00010000, // a lot of items have this
-    ITEM_FLAG_UNK17                           = 0x00020000, // last used flag in 1.12.1
+    ITEM_FLAG_HAS_TEXT                        = 0x00004000, // Only readable items have this (but not all)
+    ITEM_FLAG_NO_DISENCHANT                   = 0x00008000,
+    ITEM_FLAG_REAL_DURATION                   = 0x00010000,
+    ITEM_FLAG_NO_CREATOR                      = 0x00020000, // last used flag in 1.12.1
 
     ITEM_FLAG_UNIQUE_EQUIPPED                 = 0x00080000, // custom server side check, in client added in 2.x
 };
@@ -393,9 +393,10 @@ inline uint8 ItemSubClassToDurabilityMultiplierId(uint32 ItemClass, uint32 ItemS
 
 enum ItemExtraFlags
 {
-    ITEM_EXTRA_REAL_TIME_DURATION  = 0x01,      // if set and have Duration time, then offline time included in counting, if not set then counted only in game time
+    ITEM_EXTRA_MAIL_STATIONERY     = 0x01,      // Used as icon or background for mails
     ITEM_EXTRA_IGNORE_QUEST_STATUS = 0x02,      // No quest status will be checked when this item drops
-    ITEM_EXTRA_ALL                 = 0x03       // all used flags, used for check DB data (mask all above flags)
+    ITEM_EXTRA_NOT_OBTAINABLE      = 0x04,      // Never obtainable by players in vanilla
+    ITEM_EXTRA_ALL                 = 0x07       // All used flags, used to check DB data (mask all above flags)
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
@@ -494,6 +495,9 @@ struct ItemPrototype
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
     uint32 ExtraFlags;                                      // see ItemExtraFlags
+    uint32 OtherTeamEntry;
+
+    mutable bool m_bDiscovered = false;                     // has item been discovered by players
 
     // helpers
     bool CanChangeEquipStateInCombat() const
@@ -522,6 +526,7 @@ struct ItemPrototype
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
     bool IsWeapon() const { return Class == ITEM_CLASS_WEAPON; }
     bool IsRangedWeapon() const { return IsWeapon() && (InventoryType == INVTYPE_RANGED || InventoryType == INVTYPE_THROWN || InventoryType == INVTYPE_RANGEDRIGHT); }
+    bool HasSignature() const { return GetMaxStackSize() == 1 && Class != ITEM_CLASS_CONSUMABLE && Class != ITEM_CLASS_QUEST && (Flags & ITEM_FLAG_NO_CREATOR) == 0 && ItemId != 6948; /*Hearthstone*/ }
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform

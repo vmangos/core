@@ -25,6 +25,7 @@ set (game_SRCS
     Conditions.cpp
     CreatureGroups.cpp
     GameEventMgr.cpp
+    GuardMgr.cpp
     GMTicketMgr.cpp
     GossipDef.cpp
     HardcodedEvents.cpp
@@ -94,13 +95,17 @@ set (game_SRCS
     Chat/AsyncCommandHandlers.cpp
     CinematicStuff/CinematicStuff.cpp
     CinematicStuff/CinematicStuff.h
-    Commands/debugcmds.cpp
-    Commands/GMTicketCommands.cpp
-    Commands/Level0.cpp
-    Commands/Level1.cpp
-    Commands/Level2.cpp
-    Commands/Level3.cpp
-    Commands/Nostalrius.cpp
+    Commands/AccountCommands.cpp
+    Commands/CharacterCommands.cpp
+    Commands/CreatureCommands.cpp
+    Commands/DebugCommands.cpp
+    Commands/LookupCommands.cpp
+    Commands/MiscCommands.cpp
+    Commands/ObjectCommands.cpp
+    Commands/ServerCommands.cpp
+    Commands/TeleportCommands.cpp
+    Commands/TicketCommands.cpp
+    Commands/UnitCommands.cpp
     Database/CharacterDatabaseCache.cpp
     Database/CharacterDatabaseCleaner.cpp
     Database/DBCStores.cpp
@@ -236,6 +241,7 @@ set (game_SRCS
     CreatureGroups.h
     Formulas.h
     GameEventMgr.h
+    GuardMgr.h
     GMTicketMgr.h
     GossipDef.h
     HardcodedEvents.h

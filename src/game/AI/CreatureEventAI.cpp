@@ -35,6 +35,7 @@
 #include "Language.h"
 #include "ScriptMgr.h"
 #include "CreatureAI.h"
+#include "GuardMgr.h"
 
 bool CreatureEventAIHolder::UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax)
 {
@@ -62,8 +63,6 @@ int CreatureEventAI::Permissible(const Creature *creature)
 void CreatureEventAI::GetAIInformation(ChatHandler& reader)
 {
     reader.PSendSysMessage(LANG_NPC_EVENTAI_PHASE, (uint32)m_Phase);
-    reader.PSendSysMessage(LANG_NPC_EVENTAI_MOVE, reader.GetOnOffStr(m_bCombatMovement));
-    reader.PSendSysMessage(LANG_NPC_EVENTAI_COMBAT, reader.GetOnOffStr(m_bMeleeAttack));
 }
 
 CreatureEventAI::CreatureEventAI(Creature *c) : CreatureAI(c)
@@ -110,7 +109,7 @@ CreatureEventAI::CreatureEventAI(Creature *c) : CreatureAI(c)
     m_Phase = 0;
     m_AttackDistance = 0.0f;
     m_AttackAngle = 0.0f;
-
+    m_bCanSummonGuards = c->CanSummonGuards();
     m_InvinceabilityHpLevel = 0;
 
     //Handle Spawned Events
@@ -450,6 +449,8 @@ void CreatureEventAI::JustRespawned()
 
     CreatureAI::JustRespawned();
 
+    m_bCanSummonGuards = m_creature->CanSummonGuards();
+
     if (m_bEmptyList)
         return;
 
@@ -648,8 +649,17 @@ void CreatureEventAI::MoveInLineOfSight(Unit *pWho)
         return;
 
     //Check for OOC LOS Event
-    if (!m_bEmptyList && !m_creature->getVictim())
-        UpdateEventsOn_MoveInLineOfSight(pWho);
+    if (!m_creature->getVictim())
+    {
+        if (!m_bEmptyList)
+            UpdateEventsOn_MoveInLineOfSight(pWho);
+
+        if (m_bCanSummonGuards && pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, m_creature->GetDetectionRange()) &&
+            m_creature->IsHostileTo(pWho) && pWho->isTargetableForAttack() && m_creature->IsWithinLOSInMap(pWho))
+        {
+            m_bCanSummonGuards = !sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho));
+        } 
+    }
 
     if (m_creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO || m_creature->IsNeutralToAll())
         return;
@@ -745,7 +755,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
     if (Combat)
     {
         if (!m_CreatureSpells.empty())
-            DoSpellTemplateCasts(diff);
+            UpdateSpellsList(diff);
 
         DoMeleeAttackIfReady();
     }

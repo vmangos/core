@@ -25,6 +25,7 @@
 #include "CreatureAI.h"
 #include "ObjectGuid.h"
 #include "Timer.h"
+#include "Totem.h"
 
 class Creature;
 class Totem;
@@ -40,15 +41,15 @@ class MANGOS_DLL_DECL TotemAI : public CreatureAI
 
         explicit TotemAI(Creature *c);
 
-        void MoveInLineOfSight(Unit *);
-        void AttackStart(Unit *);
+        void MoveInLineOfSight(Unit *) override { };
+        void AttackStart(Unit *) override { };
 
         void UpdateAI(const uint32);
         static int Permissible(const Creature *);
-    protected:
-        Totem& getTotem();
 
     private:
-        ObjectGuid i_victimGuid;
+        ObjectGuid m_victimGuid;
+        TotemType m_totemType;
+        uint32 m_spellId;
 };
 #endif

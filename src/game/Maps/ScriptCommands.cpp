@@ -60,7 +60,7 @@ bool Map::ScriptCommand_Talk(const ScriptInfo& script, WorldObject* source, Worl
         textId = script.talk.textId[rand() % i];
     }
 
-    DoScriptText(textId, pSource, unitTarget, script.talk.chatType);
+    DoScriptText(textId, pSource, unitTarget, script.talk.chatType > 0 ? script.talk.chatType : -1);
 
     return false;
 }
@@ -643,7 +643,10 @@ bool Map::ScriptCommand_DespawnCreature(const ScriptInfo& script, WorldObject* s
         return ShouldAbortScript(script);
     }
 
-    pSource->DespawnOrUnsummon(script.despawn.despawnDelay);
+    // Fix possible crash due to double aura deletion when creature is despawned on death.
+    uint32 const despawnDelay = !pSource->isAlive() && (script.despawn.despawnDelay == 0) ? 1 : script.despawn.despawnDelay;
+
+    pSource->DespawnOrUnsummon(despawnDelay);
 
     return false;
 }
@@ -661,7 +664,7 @@ bool Map::ScriptCommand_SetEquipment(const ScriptInfo& script, WorldObject* sour
 
     if (script.setEquipment.resetDefault)
     {
-        pSource->LoadEquipment(pSource->GetCreatureInfo()->equipmentId, true);
+        pSource->LoadEquipment(pSource->GetCreatureInfo()->equipment_id, true);
         return false;
     }
 
@@ -805,11 +808,11 @@ bool Map::ScriptCommand_SetFaction(const ScriptInfo& script, WorldObject* source
 // SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL (23)
 bool Map::ScriptCommand_Morph(const ScriptInfo& script, WorldObject* source, WorldObject* target)
 {
-    Creature* pSource;
+    Unit* pSource;
 
-    if (!((pSource = ToCreature(source)) || (pSource = ToCreature(target))))
+    if (!((pSource = ToUnit(source)) || (pSource = ToUnit(target))))
     {
-        sLog.outError("SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL (script id %u) call for a NULL or non-creature source and target (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", script.id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+        sLog.outError("SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL (script id %u) call for a NULL or non-unit source and target (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", script.id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
 
@@ -1558,7 +1561,7 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
 
     for (int i = 0; i < 4; i++)
     {
-        const uint32 currentId = script.creatureSpells.spellTemplate[i];
+        const uint32 currentId = script.creatureSpells.spellListId[i];
         const uint32 currentChance = script.creatureSpells.chance[i];
 
         if (!currentChance)
@@ -1574,7 +1577,7 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
     }
 
     if (pSource->AI())
-        pSource->AI()->SetSpellsTemplate(chosenId);
+        pSource->AI()->SetSpellsList(chosenId);
     else
         return ShouldAbortScript(script);
 
@@ -2119,6 +2122,22 @@ bool Map::ScriptCommand_SummonObject(const ScriptInfo& script, WorldObject* sour
     float o = script.o ? script.o : source->GetOrientation();
 
     source->SummonGameObject(script.summonObject.gameobject_entry, x, y, z, o, 0, 0, 0, 0, script.summonObject.respawn_time);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_SET_FLY (77)
+bool Map::ScriptCommand_SetFly(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Unit* pSource = ToUnit(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_FLY (script id %u) call for a NULL or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->SetFly(script.setFly.enabled);
 
     return false;
 }

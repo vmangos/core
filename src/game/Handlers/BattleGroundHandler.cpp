@@ -332,10 +332,14 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint32 mapId;
     recv_data >> mapId;
 
     BattleGroundTypeId bgTypeId = GetBattleGroundTypeIdByMapId(mapId);
+#else
+    BattleGroundTypeId bgTypeId = BattleGroundTypeId(_player->GetQueuedBattleground());
+#endif
 
     if (bgTypeId == BATTLEGROUND_TYPE_NONE)
     {
@@ -352,12 +356,18 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_BATTLEFIELD_PORT Message");
 
-    uint8 action;                                           // enter battle 0x1, leave queue 0x0
-    uint32 mapId;
+    uint8 action = 0; // enter battle 0x1, leave queue 0x0
+    uint32 mapId = 0;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     recv_data >> mapId >> action;
 
     BattleGroundTypeId bgTypeId = GetBattleGroundTypeIdByMapId(mapId);
+#else
+    recv_data >> action;
+
+    BattleGroundTypeId bgTypeId = BattleGroundTypeId(_player->GetQueuedBattleground());
+#endif
 
     if (bgTypeId == BATTLEGROUND_TYPE_NONE)
     {
@@ -492,12 +502,11 @@ void WorldSession::HandleLeaveBattlefieldOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_LEAVE_BATTLEFIELD Message");
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     recv_data.read_skip<uint8>();                           // unk1
     recv_data.read_skip<uint8>();                           // BattleGroundTypeId-1 ?
     recv_data.read_skip<uint16>();                          // unk2 0
-
-    //if(bgTypeId >= MAX_BATTLEGROUND_TYPES)                  // cheating? but not important in this case
-    //    return;
+#endif
 
     // not allow leave battleground in combat
     if (_player->isInCombat())
@@ -640,7 +649,7 @@ void WorldSession::SendBattleGroundJoinError(uint8 err)
             return;
             break;
     }
-    ChatHandler::FillMessageData(&data, NULL, CHAT_MSG_BG_SYSTEM_NEUTRAL, LANG_UNIVERSAL, GetMangosString(msg));
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_BG_SYSTEM_NEUTRAL, GetMangosString(msg), LANG_UNIVERSAL);
     SendPacket(&data);
     return;
 }

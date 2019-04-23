@@ -4,11 +4,11 @@
  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
  
  @author  2000-09-09
- @edited  2008-08-05
+ @edited  2010-03-05
  */
 
-#ifndef G3D_STRINGUTILS_H
-#define G3D_STRINGUTILS_H
+#ifndef G3D_stringutils_h
+#define G3D_stringutils_h
 
 #include "G3D/platform.h"
 #include "G3D/Array.h"
@@ -28,29 +28,75 @@ extern const char* NEWLINE;
 */
 void parseCommaSeparated(const std::string s, Array<std::string>& array, bool stripQuotes = true);
 
+/** Finds the index of the first '\\' or '/' character, starting at index \a start. 
+  \sa G3D::findLastSlash, G3D::isSlash
+*/
+inline size_t findSlash(const std::string& f, size_t start = 0) {
+    size_t i = f.find('/', start);
+    size_t j = f.find('\\', start);
+    if ((i != std::string::npos) && (i < j)) {
+        return i;
+    } else {
+        return j;
+    }
+}
+
+/** \brief Returns the larger string index, ignoring std::string::npos. */
+inline size_t maxNotNPOS(size_t i, size_t j) {
+    if (i == std::string::npos) {
+        return j;
+    } else if (j == std::string::npos) {
+        return i;
+    } else {
+        return max(i, j);
+    }
+}
+
+/** Finds the index of the first '\\' or '/' character, starting at index \a start (if \a start is -1, starts at the end of the string).
+  \sa G3D::findSlash, G3D::isSlash
+  */
+inline size_t findLastSlash(const std::string& f, size_t start = std::string::npos) {
+    if (start == std::string::npos) {
+        start = f.length() - 1;
+    }
+
+    size_t i = f.rfind('/', start);
+    size_t j = f.rfind('\\', start);
+    return maxNotNPOS(i, j);
+}
+
+
+/** Returns a string which is \a s, with all instances of \a pattern replaced */
+std::string replace(const std::string& s, const std::string& pattern, const std::string& replacement);
+
+/** Returns true if \a s is a valid C++ identifier */
+bool isValidIdentifier(const std::string& s);
+
 /**
- Returns true if the test string begins with the pattern string.
+ \brief Returns true if the test string begins with the pattern string.
  */
-bool beginsWith(
-    const std::string&          test,
+bool beginsWith
+   (const std::string&          test,
     const std::string&          pattern);
 
 /**
- Returns true if the test string ends with the pattern string.
+ \brief Returns true if the test string ends with the pattern string.
  */
-bool endsWith(
-    const std::string&          test,
+bool endsWith
+   (const std::string&          test,
     const std::string&          pattern);
 
 /**
- Produces a new string that is the input string
+ \brief Produces a new string that is the input string
  wrapped at a certain number of columns (where
  the line is broken at the latest space before the
  column limit.)  Platform specific NEWLINEs
  are inserted to wrap.
+
+ \sa G3D::GFont::wordWrapCut, G3D::TextOutput::Settings::WordWrapMode
  */
-std::string wordWrap(
-    const std::string&          input,
+std::string wordWrap
+   (const std::string&          input,
     int                         numCols);
 
 /**
@@ -132,6 +178,17 @@ inline bool isSlash(const unsigned char c) {
 
 inline bool isQuote(const unsigned char c) {
     return (c == '\'') || (c == '\"');
+}
+
+/** Number of new lines in the given string */
+inline int countNewlines(const std::string& s) {
+    int c = 0;
+    for (int i = 0; i < (int)s.size(); ++i) {
+        if (s[i] == '\n') {
+            ++c;
+        }
+    }
+    return c;
 }
 
 }; // namespace

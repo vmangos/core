@@ -165,7 +165,7 @@ bool DistancingMovementGenerator::Update(Creature &unit, const uint32 &diff)
 void DistancingMovementGenerator::MovementInform(Creature &unit)
 {
     if (unit.AI())
-        unit.AI()->DoSpellTemplateCasts(1);
+        unit.AI()->DoSpellsListCasts(1);
 }
 
 void AssistanceMovementGenerator::Initialize(Creature& unit)

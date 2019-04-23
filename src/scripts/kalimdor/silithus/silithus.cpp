@@ -956,7 +956,7 @@ CreatureAI* GetAI_npc_colossus(Creature* pCreature)
 /*UPDATE `gameobject_template` SET `size` = 1.5, `data2` = 39321600, `type` = 1 WHERE `entry` = 210342;
  UPDATE `gameobject_template` SET data2 = 39321600 WHERE `entry` = 180514;
  DELETE FROM `gameobject` WHERE `id` IN (180514, 210342);
- UPDATE `creature_template` SET `ScriptName` = 'npc_Geologist_Larksbane' WHERE `entry` = 15183;*/
+ UPDATE `creature_template` SET `script_name` = 'npc_Geologist_Larksbane' WHERE `entry` = 15183;*/
 
 enum
 {
@@ -1248,9 +1248,9 @@ bool QuestComplete_npc_Geologist_Larksbane(Player* pPlayer, Creature* pQuestGive
  ###*/
 
 /*
- UPDATE `creature_template` SET `minmana` = 432240, `maxmana` = 434240, `armor` = 3769, `speed_walk` = 1.24, `speed_run` = 1.24, `baseattacktime` = 1280,
+ UPDATE `creature_template` SET `minmana` = 432240, `maxmana` = 434240, `armor` = 3769, `speed_walk` = 1.24, `speed_run` = 1.24, `base_attack_time` = 1280,
  `resistance1` = 0, `mingold` = 4031, `maxgold` = 4031, `mechanic_immune_mask` = 650854367, `MovementType` = 1,
- `ScriptName` = 'npc_Emissary_Romankhan' WHERE `entry` = 14862;
+ `script_name` = 'npc_Emissary_Romankhan' WHERE `entry` = 14862;
  */
 
 enum
@@ -3250,51 +3250,6 @@ CreatureAI* GetAI_npc_Shai(Creature* pCreature)
     return new npc_ShaiAI(pCreature);
 }
 
-
-//=====================------------------------------------
-//Alita <Nostalrius>
-// PNJ tp AQ20, AQ40.
-//====================
-enum
-{
-    CHRIS = 56000 //notre pnj de tp.
-};
-bool GossipHello_npc_chris_starlightshadow(Player* pPlayer, Creature* pCreature)
-{
-
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Guide me to the Ruins of Ahn'Qiraj", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Guide me to the Temple of Ahn'Qiraj", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_chris_starlightshadow(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        if (pPlayer->TeleportTo(509, -8429.74f, 1512.14f, 31.9074f, 2.56f))
-            if (!pPlayer->isAlive())
-            {
-                pPlayer->ResurrectPlayer(0.5f, false);
-                pPlayer->SpawnCorpseBones();
-            }
-    }
-    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        if (pPlayer->TeleportTo(531, -8231.330078f, 2010.6f, 129.33051f, 0.95f))
-            if (!pPlayer->isAlive())
-            {
-                pPlayer->ResurrectPlayer(0.5f, false);
-                pPlayer->SpawnCorpseBones();
-            }
-    }
-
-    return true;
-}
-
 /** EVENT NOSTALRIUS VAM ,SAND PRINCE */
 
 enum
@@ -3447,14 +3402,6 @@ void AddSC_silithus()
     pNewScript->Name = "npc_Shai";
     pNewScript->GetAI = &GetAI_npc_Shai;
     pNewScript->RegisterSelf();
-
-    //--Alita------
-    pNewScript = new Script;
-    pNewScript->Name = "npc_chris_starlightshadow";
-    pNewScript->pGossipHello =  &GossipHello_npc_chris_starlightshadow;
-    pNewScript->pGossipSelect = &GossipSelect_npc_chris_starlightshadow;
-    pNewScript->RegisterSelf();
-    //------------
 
     /** Event Nostalrius */
     pNewScript = new Script;

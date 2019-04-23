@@ -49,6 +49,9 @@ public:
     {
         char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
 
+        ObjectGuid sourceGuid = i_source ? i_source->GetObjectGuid() : ObjectGuid();
+        std::string sourceName = i_source ? i_source->GetName() : "";
+
         if (i_args)
         {
             // we need copy va_list before use or original va_list will corrupted
@@ -59,24 +62,12 @@ public:
             vsnprintf(str, 2048, text, ap);
             va_end(ap);
 
-            do_helper(data, &str[0]);
+            ChatHandler::BuildChatPacket(data, i_msgtype, &str[0], LANG_UNIVERSAL, CHAT_TAG_NONE, sourceGuid, sourceName.c_str());
         }
         else
-            do_helper(data, text);
+            ChatHandler::BuildChatPacket(data, i_msgtype, text, LANG_UNIVERSAL, CHAT_TAG_NONE, sourceGuid, sourceName.c_str(), sourceGuid, sourceName.c_str());
     }
 private:
-    void do_helper(WorldPacket& data, char const* text)
-    {
-        ObjectGuid targetGuid = i_source ? i_source ->GetObjectGuid() : ObjectGuid();
-
-        data << uint8(i_msgtype);
-        data << uint32(LANG_UNIVERSAL);
-        data << ObjectGuid(targetGuid);             // there 0 for BG messages
-        data << uint32(strlen(text) + 1);
-        data << text;
-        data << uint8(i_source ? i_source->GetChatTag() : uint8(0));
-    }
-
     ChatMsg i_msgtype;
     int32 i_textId;
     Player const* i_source;
@@ -86,7 +77,7 @@ private:
 class BattleGroundYellBuilder
 {
 public:
-    BattleGroundYellBuilder(uint32 language, int32 textId, Creature const* source, va_list* args = nullptr)
+    BattleGroundYellBuilder(Language language, int32 textId, Creature const* source, va_list* args = nullptr)
         : i_language(language), i_textId(textId), i_source(source), i_args(args) {}
     void operator()(WorldPacket& data, int32 loc_idx)
     {
@@ -102,27 +93,13 @@ public:
             vsnprintf(str, 2048, text, ap);
             va_end(ap);
 
-            do_helper(data, &str[0]);
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, &str[0], i_language, CHAT_TAG_NONE, i_source->GetObjectGuid(), i_source->GetName());
         }
         else
-            do_helper(data, text);
+            ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, text, i_language, CHAT_TAG_NONE, i_source->GetObjectGuid(), i_source->GetName());
     }
 private:
-    void do_helper(WorldPacket& data, char const* text)
-    {
-        //copyied from BuildWorldObjectChat
-        data << uint8(CHAT_MSG_MONSTER_YELL);
-        data << uint32(i_language);
-        data << ObjectGuid(i_source->GetObjectGuid());
-        data << uint32(strlen(i_source->GetName()) + 1);
-        data << i_source->GetName();
-        data << ObjectGuid();                       // Unit Target - isn't important for bgs
-        data << uint32(strlen(text) + 1);
-        data << text;
-        data << uint8(0);                                      // ChatTag - for bgs allways 0?
-    }
-
-    uint32 i_language;
+    Language i_language;
     int32 i_textId;
     Creature const* i_source;
     va_list* i_args;
@@ -145,15 +122,9 @@ public:
 
         ObjectGuid targetGuid = i_source  ? i_source ->GetObjectGuid() : ObjectGuid();
 
-        data << uint8(i_msgtype);
-        data << uint32(LANG_UNIVERSAL);
-        data << ObjectGuid(targetGuid);             // there 0 for BG messages
-        data << uint32(strlen(str) + 1);
-        data << str;
-        data << uint8(i_source ? i_source->GetChatTag() : uint8(0));
+        ChatHandler::BuildChatPacket(data, i_msgtype, str, LANG_UNIVERSAL, CHAT_TAG_NONE, targetGuid);
     }
 private:
-
     ChatMsg i_msgtype;
     int32 i_textId;
     Player const* i_source;
@@ -164,7 +135,7 @@ private:
 class BattleGround2YellBuilder
 {
 public:
-    BattleGround2YellBuilder(uint32 language, int32 textId, Creature const* source, int32 arg1, int32 arg2)
+    BattleGround2YellBuilder(Language language, int32 textId, Creature const* source, int32 arg1, int32 arg2)
         : i_language(language), i_textId(textId), i_source(source), i_arg1(arg1), i_arg2(arg2) {}
     void operator()(WorldPacket& data, int32 loc_idx)
     {
@@ -174,20 +145,11 @@ public:
 
         char str [2048];
         snprintf(str, 2048, text, arg1str, arg2str);
-        //copyied from BuildWorldObjectChat
-        data << uint8(CHAT_MSG_MONSTER_YELL);
-        data << uint32(i_language);
-        data << ObjectGuid(i_source->GetObjectGuid());
-        data << uint32(strlen(i_source->GetName()) + 1);
-        data << i_source->GetName();
-        data << ObjectGuid();                       // Unit Target - isn't important for bgs
-        data << uint32(strlen(str) + 1);
-        data << str;
-        data << uint8(0);                           // ChatTag - for bgs allways 0?
+
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, str, i_language, CHAT_TAG_NONE, i_source ? i_source->GetObjectGuid() : ObjectGuid(), i_source ? i_source->GetName() : "");
     }
 private:
-
-    uint32 i_language;
+    Language i_language;
     int32 i_textId;
     Creature const* i_source;
     int32 i_arg1;
@@ -677,16 +639,13 @@ void BattleGround::EndBattleGround(Team winner)
             plr->getHostileRefManager().deleteReferences();
         }
 
-        //this line is obsolete - team is set ALWAYS
-        //if(!team) team = plr->GetTeam();
-
         if (team == winner)
-        {
-            RewardMark(plr, ITEM_WINNER_COUNT);
-            //RewardQuestComplete(plr);
-        }
-        else
-            RewardMark(plr, ITEM_LOSER_COUNT);
+            RewardMark(plr, true);
+        // World of Warcraft Client Patch 1.8.4 (2005-12-06)
+        // - Battles must now last at least ten minutes after the start of the 
+        //   battle in order for the losing team to receive a Mark of Honor.
+        else if (GetStartTime() > 10 * MINUTE * IN_MILLISECONDS)
+            RewardMark(plr, false);
 
         plr->CombatStopWithPets(true);
 
@@ -760,9 +719,9 @@ uint32 BattleGround::GetBattlemasterEntry() const
     }
 }
 
-void BattleGround::RewardMark(Player *plr, uint32 count)
+void BattleGround::RewardMark(Player *plr, bool winner)
 {
-    if (count == ITEM_WINNER_COUNT)
+    if (winner)
         RewardSpellCast(plr, plr->GetTeamId() ? GetHordeWinSpell() : GetAllianceWinSpell());
     else
         RewardSpellCast(plr, plr->GetTeamId() ? GetHordeLoseSpell() : GetAllianceLoseSpell());
@@ -776,7 +735,7 @@ void BattleGround::RewardSpellCast(Player *plr, uint32 spell_id)
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spell_id);
     if (!spellInfo)
     {
-        sLog.outError("Battleground reward casting spell %u not exist.", spell_id);
+        sLog.outError("Battleground reward spell %u does not exist.", spell_id);
         return;
     }
 
@@ -1539,7 +1498,7 @@ void BattleGround::SendYellToAll(int32 entry, uint32 language, ObjectGuid guid)
     Creature* source = GetBgMap()->GetCreature(guid);
     if (!source)
         return;
-    MaNGOS::BattleGroundYellBuilder bg_builder(language, entry, source);
+    MaNGOS::BattleGroundYellBuilder bg_builder(Language(language), entry, source);
     MaNGOS::LocalizedPacketDo<MaNGOS::BattleGroundYellBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }
@@ -1568,7 +1527,7 @@ void BattleGround::SendYell2ToAll(int32 entry, uint32 language, ObjectGuid guid,
     Creature* source = GetBgMap()->GetCreature(guid);
     if (!source)
         return;
-    MaNGOS::BattleGround2YellBuilder bg_builder(language, entry, source, arg1, arg2);
+    MaNGOS::BattleGround2YellBuilder bg_builder(Language(language), entry, source, arg1, arg2);
     MaNGOS::LocalizedPacketDo<MaNGOS::BattleGround2YellBuilder> bg_do(bg_builder);
     BroadcastWorker(bg_do);
 }

@@ -250,7 +250,7 @@ struct boss_razorgoreAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_creature->hasUnitState(UNIT_STAT_CONTROLLED))
+        if (m_creature->hasUnitState(UNIT_STAT_POSSESSED))
         {
             ScriptedAI::UpdateAI(uiDiff);
             return;

@@ -324,6 +324,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         float  m_AttackDistance;                            // Distance to attack from
         float  m_AttackAngle;                               // Angle of attack
         uint32 m_InvinceabilityHpLevel;                     // Minimal health level allowed at damage apply
+        bool m_bCanSummonGuards;
 
         void UpdateEventsOn_UpdateAI(const uint32 diff, bool Combat);
         void UpdateEventsOn_MoveInLineOfSight(Unit* pWho);

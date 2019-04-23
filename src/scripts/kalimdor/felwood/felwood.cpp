@@ -72,7 +72,7 @@ struct npc_kittenAI : public FollowerAI
 
     void MoveInLineOfSight(Unit* pWho)
     {
-        //should not have npcflag by default, so set when expected
+        //should not have npc_flags by default, so set when expected
         if (!m_creature->getVictim() && !m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && HasFollowState(STATE_FOLLOW_INPROGRESS) && pWho->GetEntry() == NPC_WINNA)
         {
             if (m_creature->IsWithinDistInMap(pWho, INTERACTION_DISTANCE))
@@ -115,9 +115,9 @@ bool EffectDummyCreature_npc_kitten(Unit* pCaster, uint32 uiSpellId, SpellEffect
         // Not nice way, however using UpdateEntry will not be correct.
         if (const CreatureInfo* pTemp = GetCreatureTemplateStore(NPC_CORRUPT_SABER))
         {
-            pCreatureTarget->SetEntry(pTemp->Entry);
+            pCreatureTarget->SetEntry(pTemp->entry);
             pCreatureTarget->SetDisplayId(Creature::ChooseDisplayId(pTemp));
-            pCreatureTarget->SetName(pTemp->Name);
+            pCreatureTarget->SetName(pTemp->name);
             pCreatureTarget->SetFloatValue(OBJECT_FIELD_SCALE_X, pTemp->scale);
         }
 

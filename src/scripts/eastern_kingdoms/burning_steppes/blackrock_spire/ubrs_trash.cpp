@@ -216,6 +216,6 @@ void AddSC_ubrs_trash()
     pNewScript->RegisterSelf();
 }
 /*
-UPDATE creature_template SET ScriptName="npc_blackhand_summoner", AIName="" WHERE entry=9818;
-UPDATE creature_template SET ScriptName="npc_blackhand_veteran", AIName="" WHERE entry=9819;
+UPDATE creature_template SET script_name="npc_blackhand_summoner", ai_name="" WHERE entry=9818;
+UPDATE creature_template SET script_name="npc_blackhand_veteran", ai_name="" WHERE entry=9819;
 */

@@ -34,7 +34,7 @@ enum
     SPELL_FULL_SPEED            =   1557,
     SPELL_THORNS                =   25640,
     SPELL_BURU_TRANSFORM        =   24721,
-    SPELL_SELF_FREEZE            =   29826,
+    SPELL_SELF_FREEZE           =   29826,
 
     NPC_BURU_EGG                =   15514,
     SPELL_SUMMON_HATCHLING      =   1881,

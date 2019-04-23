@@ -41,10 +41,10 @@ enum
 };
 
 /*
-DELETE FROM creature_template WHERE entry=20006 OR ScriptName="boss_magmadar_lavabomb";
+DELETE FROM creature_template WHERE entry=20006 OR script_name="boss_magmadar_lavabomb";
 INSERT INTO creature_template
 SET entry=20006, modelid_1=11686, modelid_2=11686, name="LavaBomb", subname="Script", minhealth=4000, maxhealth=5000, faction=14,
-speed_walk=0.01, speed_run=0.01, ScriptName="boss_magmadar_lavabomb";
+speed_walk=0.01, speed_run=0.01, script_name="boss_magmadar_lavabomb";
 */
 struct boss_magmadarAI : public ScriptedAI
 {

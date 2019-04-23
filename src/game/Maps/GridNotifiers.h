@@ -25,6 +25,7 @@
 #include "ObjectGridLoader.h"
 #include "UpdateData.h"
 #include <iostream>
+#include <memory>
 
 #include "Corpse.h"
 #include "Object.h"
@@ -1111,6 +1112,47 @@ namespace MaNGOS
             NearestAssistCreatureInCreatureRangeCheck(NearestAssistCreatureInCreatureRangeCheck const&);
     };
 
+    class NearestFriendlyGuardInRangeCheck
+    {
+    public:
+        NearestFriendlyGuardInRangeCheck(Creature const* obj, float range)
+            : i_obj(obj), i_range(range) {}
+        WorldObject const& GetFocusObject() const { return *i_obj; }
+        bool operator()(Creature const* u)
+        {
+            if (u == i_obj)
+                return false;
+
+            if (!u->isAlive())
+                return false;
+
+            if (u->isInCombat())
+                return false;
+
+            if (!u->IsGuard())
+                return false;
+
+            if (!u->IsFriendlyTo(i_obj))
+                return false;
+
+            if (!i_obj->IsWithinDistInMap(u, i_range))
+                return false;
+
+            if (!i_obj->IsWithinLOSInMap(u))
+                return false;
+
+            i_range = i_obj->GetDistance(u);            // use found unit range as new range limit for next check
+            return true;
+        }
+        float GetLastRange() const { return i_range; }
+    private:
+        Creature const* const i_obj;
+        float  i_range;
+
+        // prevent clone this object
+        NearestFriendlyGuardInRangeCheck(NearestFriendlyGuardInRangeCheck const&);
+    };
+
     // Success at unit in range, range update for next check (this can be use with CreatureLastSearcher to find nearest creature)
     class NearestCreatureEntryWithLiveStateInObjectRangeCheck
     {
@@ -1213,16 +1255,11 @@ namespace MaNGOS
         public:
             explicit LocalizedPacketDo(Builder& builder) : i_builder(builder) {}
 
-            ~LocalizedPacketDo()
-            {
-                for(size_t i = 0; i < i_data_cache.size(); ++i)
-                    delete i_data_cache[i];
-            }
             void operator()( Player* p );
 
         private:
             Builder& i_builder;
-            std::vector<WorldPacket*> i_data_cache;         // 0 = default, i => i-1 locale index
+            std::vector<std::unique_ptr<WorldPacket>> i_data_cache;         // 0 = default, i => i-1 locale index
     };
 
     // Prepare using Builder localized packets with caching and send to player

@@ -82,9 +82,9 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS] =
     &Unit::HandleProcTriggerDamageAuraProc,                 // 43 SPELL_AURA_PROC_TRIGGER_DAMAGE
     &Unit::HandleNULLProc,                                  // 44 SPELL_AURA_TRACK_CREATURES
     &Unit::HandleNULLProc,                                  // 45 SPELL_AURA_TRACK_RESOURCES
-    &Unit::HandleNULLProc,                                  // 46 SPELL_AURA_46
+    &Unit::HandleNULLProc,                                  // 46 SPELL_AURA_MOD_PARRY_SKILL
     &Unit::HandleNULLProc,                                  // 47 SPELL_AURA_MOD_PARRY_PERCENT
-    &Unit::HandleNULLProc,                                  // 48 SPELL_AURA_48
+    &Unit::HandleNULLProc,                                  // 48 SPELL_AURA_MOD_DODGE_SKILL
     &Unit::HandleNULLProc,                                  // 49 SPELL_AURA_MOD_DODGE_PERCENT
     &Unit::HandleNULLProc,                                  // 50 SPELL_AURA_MOD_BLOCK_SKILL    obsolete?
     &Unit::HandleNULLProc,                                  // 51 SPELL_AURA_MOD_BLOCK_PERCENT
@@ -259,13 +259,19 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     /// Delete all these spells, and manage it via the DB (spell_proc_event)
     if (procSpell)
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         // Eye for an Eye
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         if (spellProto->SpellIconID == 1820)
+#else
+        if (spellProto->SpellIconID == 1799)
+#endif
         {
             if (procFlag & PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT && procExtra & PROC_EX_CRITICAL_HIT)
                 return true;
             return false;
         }
+#endif
         // Improved Lay on Hands
         if (spellProto->SpellIconID == 79 && spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
         {
@@ -344,8 +350,22 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
             return false;
         }
     }
+
     // Get proc Event Entry
     spellProcEvent = sSpellMgr.GetSpellProcEvent(spellProto->Id);
+
+    // Custom hard-coded cases which depend on the proc event for firing...
+    if (procSpell)
+    {
+        // Fear Ward always procs on any Fear
+        if (spellProto->Id == 6346)
+        {
+            if (procSpell->Mechanic == MECHANIC_FEAR)
+                return true;
+
+            return false;
+        }
+    }
 
     // Get EventProcFlag
     uint32 EventProcFlag;
@@ -453,6 +473,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
         {
             switch (dummySpell->Id)
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 // Eye for an Eye
                 case 9799:
                 case 25988:
@@ -469,6 +490,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     triggered_spell_id = 25997;
                     break;
                 }
+#endif
                 // Sweeping Strikes
                 case 12292:
                 case 18765:
@@ -1594,6 +1616,31 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit *pVictim, uint32 
     SpellEntry const *spellInfo = triggeredByAura->GetSpellProto();
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "ProcDamageAndSpell: doing %u damage from spell id %u (triggered by auratype %u of spell %u)",
                      triggeredByAura->GetModifier()->m_amount, spellInfo->Id, triggeredByAura->GetModifier()->m_auraname, triggeredByAura->GetId());
+    
+    // World of Warcraft Client Patch 1.9.0 (2006-01-03)
+    // - Seal of Righteousness - Now does holy damage on every swing.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+    if (spellInfo->IsFitToFamilyMask<CF_PALADIN_SEALS>())
+    {
+        switch (spellInfo->Id)
+        {
+            case 21084: // Rank 1
+            case 20287: // Rank 2
+            case 20288: // Rank 3
+            case 20289: // Rank 4
+            case 20290: // Rank 5
+            case 20291: // Rank 6
+            case 20292: // Rank 7
+            case 20293: // Rank 8
+            {
+                if (!roll_chance_i(75)) // made up value
+                    return SPELL_AURA_PROC_FAILED;
+            }
+            break; 
+        }
+    }
+#endif
+
     SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
     damageInfo.damage = CalculateSpellDamage(pVictim, spellInfo, triggeredByAura->GetEffIndex());
     damageInfo.damage = SpellDamageBonusDone(pVictim, spellInfo, damageInfo.damage, SPELL_DIRECT_DAMAGE);
@@ -1825,6 +1872,6 @@ SpellAuraProcResult Unit::HandleModResistanceAuraProc(Unit* /*pVictim*/, uint32 
 SpellAuraProcResult Unit::HandleModDamageAuraProc(Unit* /*pVictim*/, uint32 /*damage*/, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 /*cooldown*/)
 {
     // the aura school mask must match the spell school
-    return !(procSpell == NULL || !(GetSchoolMask(procSpell->School) & triggeredByAura->GetModifier()->m_miscvalue))
+    return (procSpell == NULL || (GetSchoolMask(procSpell->School) & triggeredByAura->GetModifier()->m_miscvalue))
         ? SPELL_AURA_PROC_OK : SPELL_AURA_PROC_FAILED;
 }

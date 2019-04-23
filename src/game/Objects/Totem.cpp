@@ -94,7 +94,7 @@ void Totem::Summon(Unit* owner)
     AIM_Initialize();
     owner->GetMap()->Add((Creature*)this);
 
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
+    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
     data << GetObjectGuid();
     SendObjectMessageToSet(&data, true);
 

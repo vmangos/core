@@ -160,9 +160,9 @@ struct CreatureSpellsEntry
     CreatureSpellsEntry(uint16 Id, uint8 Probability, uint8 CastTarget, uint32 TargetParam1, uint32 TargetParam2, uint8 CastFlags, uint32 InitialMin, uint32 InitialMax, uint32 RepeatMin, uint32 RepeatMax, uint32 ScriptId) : spellId(Id), probability(Probability), castTarget(CastTarget), targetParam1(TargetParam1), targetParam2(TargetParam2), castFlags(CastFlags), delayInitialMin(InitialMin), delayInitialMax(InitialMax), delayRepeatMin(RepeatMin), delayRepeatMax(RepeatMax), scriptId(ScriptId) {}
 };
 
-typedef std::vector<CreatureSpellsEntry> CreatureSpellsTemplate;
+typedef std::vector<CreatureSpellsEntry> CreatureSpellsList;
 
-typedef std::unordered_map<uint32, CreatureSpellsTemplate> CreatureSpellsMap;
+typedef std::unordered_map<uint32, CreatureSpellsList> CreatureSpellsMap;
 
 typedef std::map<uint32/*player guid*/,uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
@@ -406,7 +406,7 @@ SkillRangeType GetSkillRangeType(SkillLineEntry const *pSkill, bool racial);
 #define MAX_PET_NAME             12                         // max allowed by client name length
 #define MAX_CHARTER_NAME         24                         // max allowed by client name length
 
-bool normalizePlayerName(std::string& name);
+bool normalizePlayerName(std::string& name, size_t max_len = MAX_INTERNAL_PLAYER_NAME);
 
 struct MANGOS_DLL_SPEC LanguageDesc
 {
@@ -488,7 +488,7 @@ enum PermVariables
     VAR_PERM_4      = 30007,
 
     DEF_ALIVE_COUNT = 4,        // default alive dragons count for VAR_ALIVE_COUNT
-    DEF_STOP_DELAY  = 5,        // default times event check will not stop the event
+    DEF_STOP_DELAY  = 20,       // default times event check will not stop the event
 
     NPC_YSONDRE     = 14887,
     NPC_LETHON      = 14888,
@@ -581,6 +581,7 @@ class ObjectMgr
         bool IsExistingGameObjectGuid(uint32 id) const { return (m_GameObjectGuidSet.find(id) != m_GameObjectGuidSet.end()); }
         bool IsExistingAreaTriggerId(uint32 id) const { return (m_AreaTriggerIdSet.find(id) != m_AreaTriggerIdSet.end()); }
         bool IsExistingCreatureSpellsId(uint32 id) const { return (m_CreatureSpellsIdSet.find(id) != m_CreatureSpellsIdSet.end()); }
+        bool IsExistingVendorTemplateId(uint32 id) const { return (m_VendorTemplateIdSet.find(id) != m_VendorTemplateIdSet.end()); }
 
         typedef std::unordered_map<uint32, Item*> ItemMap;
 
@@ -822,7 +823,9 @@ class ObjectMgr
         void LoadGameObjectLocales();
         void LoadGameobjects(bool reload = false);
         void LoadItemPrototypes();
+        void FillObtainedItemsList(std::set<uint32>&);
         void CorrectItemEffects(uint32, _ItemSpell&);
+        void CorrectItemModels(uint32, uint32&);
         void LoadItemRequiredTarget();
         void LoadItemLocales();
         void LoadQuestLocales();
@@ -961,7 +964,7 @@ class ObjectMgr
             return &itr->second;
         }
 
-        CreatureSpellsTemplate const* GetCreatureSpellsTemplate(uint32 entry) const
+        CreatureSpellsList const* GetCreatureSpellsList(uint32 entry) const
         {
             auto itr = m_CreatureSpellsMap.find(entry);
             if (itr == m_CreatureSpellsMap.end()) return nullptr;
@@ -1448,6 +1451,7 @@ class ObjectMgr
         std::set<uint32> m_GameObjectGuidSet;
         std::set<uint32> m_AreaTriggerIdSet;
         std::set<uint32> m_CreatureSpellsIdSet;
+        std::set<uint32> m_VendorTemplateIdSet;
 
         typedef std::map<uint32,PetLevelInfo*> PetLevelInfoMap;
         // PetLevelInfoMap[creature_id][level]

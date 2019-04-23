@@ -93,7 +93,7 @@ void GuardAI::UpdateAI(const uint32 uiDiff)
         return;
 
     if (!m_CreatureSpells.empty())
-        DoSpellTemplateCasts(uiDiff);
+        UpdateSpellsList(uiDiff);
 
     DoMeleeAttackIfReady();
 }

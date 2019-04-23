@@ -91,7 +91,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             switch (spellid)
             {
                 case COMMAND_STAY:                          // flat=1792  //STAY
-                    if (!pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+                    if (!pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
                     {
                         pCharmedUnit->StopMoving();
                         pCharmedUnit->GetMotionMaster()->Clear(false);
@@ -107,7 +107,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                     charmInfo->SaveStayPosition();
                     break;
                 case COMMAND_FOLLOW:                        // spellid=1792  //FOLLOW
-                    if (!pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+                    if (!pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
                     {
                         pCharmedUnit->AttackStop();
                         pCharmedUnit->InterruptNonMeleeSpells(false);
@@ -140,7 +140,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
 
                     pCharmedUnit->clearUnitState(UNIT_STAT_FOLLOW);
                     // This is true if pet has no target or has target but targets differs.
-                    if (pCharmedUnit->getVictim() != TargetUnit || (pCharmedUnit->getVictim() == TargetUnit && !pCharmedUnit->GetCharmInfo()->IsCommandAttack()) || pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+                    if (pCharmedUnit->getVictim() != TargetUnit || (pCharmedUnit->getVictim() == TargetUnit && !pCharmedUnit->GetCharmInfo()->IsCommandAttack()) || pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
                     {
                         if (pCharmedUnit->getVictim())
                             pCharmedUnit->AttackStop();

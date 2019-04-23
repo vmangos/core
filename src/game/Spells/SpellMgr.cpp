@@ -570,6 +570,10 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             if ((spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000020180400))) && spellInfo->baseLevel != 0)
                 return SPELL_JUDGEMENT;
 
+            // Old Judgement of Command
+            if (spellInfo->SpellIconID == 561 && spellInfo->SpellVisual == 5652)
+                return SPELL_JUDGEMENT;
+
             for (int i = 0; i < 3; ++i)
             {
                 // only paladin auras have this
@@ -1631,7 +1635,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellP
         return false;
 
     // Always trigger for this
-    if (EventProcFlag & (PROC_FLAG_KILLED | PROC_FLAG_KILL | PROC_FLAG_ON_TRAP_ACTIVATION))
+    if (EventProcFlag & (PROC_FLAG_HEARTBEAT | PROC_FLAG_KILL | PROC_FLAG_ON_TRAP_ACTIVATION))
         return true;
 
     if (spellProcEvent)     // Exist event data
@@ -2089,45 +2093,6 @@ bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const *spellInfo_1, uint32 spell
     return GetFirstSpellInChain(spellInfo_1->Id) == GetFirstSpellInChain(spellId_2);
 }
 
-bool SpellMgr::canStackSpellRanksInSpellBook(SpellEntry const *spellInfo) const
-{
-    if (IsPassiveSpell(spellInfo))                          // ranked passive spell
-        return false;
-    if (spellInfo->powerType != POWER_MANA && spellInfo->powerType != POWER_HEALTH)
-        return false;
-    if (IsProfessionOrRidingSpell(spellInfo->Id))
-        return false;
-
-    if (IsSkillBonusSpell(spellInfo->Id))
-        return false;
-
-    // All stance spells. if any better way, change it.
-    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-    {
-        switch (spellInfo->SpellFamilyName)
-        {
-            case SPELLFAMILY_PALADIN:
-                // Paladin aura Spell
-                if (spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
-                    return false;
-                break;
-            case SPELLFAMILY_DRUID:
-                // Druid form Spell
-                if (spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA &&
-                        spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_SHAPESHIFT)
-                    return false;
-                break;
-            case SPELLFAMILY_ROGUE:
-                // Rogue Stealth
-                if (spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA &&
-                        spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_SHAPESHIFT)
-                    return false;
-                break;
-        }
-    }
-    return true;
-}
-
 bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) const
 {
     SpellGroup unused;
@@ -2555,7 +2520,7 @@ bool SpellMgr::IsPrimaryProfessionFirstRankSpell(uint32 spellId) const
 
 bool SpellMgr::IsSkillBonusSpell(uint32 spellId) const
 {
-    SkillLineAbilityMapBounds bounds = GetSkillLineAbilityMapBounds(spellId);
+    SkillLineAbilityMapBounds bounds = GetSkillLineAbilityMapBoundsBySpellId(spellId);
 
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
@@ -2725,7 +2690,7 @@ void SpellMgr::LoadSpellChains()
     {
         // we can calculate ranks only after full data generation
         AbilitySpellPrevMap prevRanks;
-        for (SkillLineAbilityMap::const_iterator ab_itr = mSkillLineAbilityMap.begin(); ab_itr != mSkillLineAbilityMap.end(); ++ab_itr)
+        for (SkillLineAbilityMap::const_iterator ab_itr = mSkillLineAbilityMapBySpellId.begin(); ab_itr != mSkillLineAbilityMapBySpellId.end(); ++ab_itr)
         {
             uint32 spell_id = ab_itr->first;
 
@@ -2754,7 +2719,7 @@ void SpellMgr::LoadSpellChains()
                 continue;
 
             // some forward spells still exist but excluded from real use as ranks and not listed in skill abilities now
-            SkillLineAbilityMapBounds bounds = mSkillLineAbilityMap.equal_range(forward_id);
+            SkillLineAbilityMapBounds bounds = mSkillLineAbilityMapBySpellId.equal_range(forward_id);
             if (bounds.first == bounds.second)
                 continue;
 
@@ -3234,7 +3199,7 @@ void SpellMgr::LoadSpellScriptTarget()
     std::set<uint32> conditions;
 
     // Load existing condition Ids so we can check for wrong condition Id later.
-    QueryResult *result = WorldDatabase.Query("SELECT condition_entry FROM conditions");
+    QueryResult *result = WorldDatabase.Query("SELECT `condition_entry` FROM `conditions`");
 
     if (result)
     {
@@ -3254,7 +3219,7 @@ void SpellMgr::LoadSpellScriptTarget()
 
     uint32 count = 0;
 
-    result = WorldDatabase.Query("SELECT entry, type, targetEntry, conditionId FROM spell_script_target");
+    result = WorldDatabase.PQuery("SELECT `entry`, `type`, `targetEntry`, `conditionId` FROM `spell_script_target` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -3353,9 +3318,9 @@ void SpellMgr::LoadSpellScriptTarget()
                 }
                 if (const CreatureInfo* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(targetEntry))
                 {
-                    if (spellId == 30427 && !cInfo->SkinLootId)
+                    if (spellId == 30427 && !cInfo->skinning_loot_id)
                     {
-                        sLog.outErrorDb("Table `spell_script_target` has creature %u as a target of spellid 30427, but this creature has no skinlootid. Gas extraction will not work!", cInfo->Entry);
+                        sLog.outErrorDb("Table `spell_script_target` has creature %u as a target of spellid 30427, but this creature has no skinlootid. Gas extraction will not work!", cInfo->entry);
                         continue;
                     }
                 }
@@ -3882,26 +3847,28 @@ SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spell
     return GetSpellAllowedInLocationError(spellInfo, nullptr /* zone/area already checked */, player);
 }
 
-void SpellMgr::LoadSkillLineAbilityMap()
+void SpellMgr::LoadSkillLineAbilityMaps()
 {
-    mSkillLineAbilityMap.clear();
+    mSkillLineAbilityMapBySpellId.clear();
+    mSkillLineAbilityMapBySkillId.clear();
 
-    BarGoLink bar(sObjectMgr.GetMaxSkillLineAbilityId());
+    const uint32 rows = sObjectMgr.GetMaxSkillLineAbilityId();
     uint32 count = 0;
 
-    for (uint32 i = 0; i < sObjectMgr.GetMaxSkillLineAbilityId(); ++i)
+    BarGoLink bar(rows);
+    for (uint32 row = 0; row < rows; ++row)
     {
         bar.step();
-        SkillLineAbilityEntry const *SkillInfo = sObjectMgr.GetSkillLineAbility(i);
-        if (!SkillInfo)
-            continue;
-
-        mSkillLineAbilityMap.insert(SkillLineAbilityMap::value_type(SkillInfo->spellId, SkillInfo));
-        ++count;
+        if (SkillLineAbilityEntry const* entry = sObjectMgr.GetSkillLineAbility(row))
+        {
+            mSkillLineAbilityMapBySpellId.insert(SkillLineAbilityMap::value_type(entry->spellId, entry));
+            mSkillLineAbilityMapBySkillId.insert(SkillLineAbilityMap::value_type(entry->skillId, entry));
+            ++count;
+        }
     }
 
     sLog.outString();
-    sLog.outString(">> Loaded %u SkillLineAbility MultiMap Data", count);
+    sLog.outString(">> Loaded %u SkillLineAbility MultiMaps Data", count);
 }
 
 void SpellMgr::LoadSkillRaceClassInfoMap()
@@ -4347,7 +4314,7 @@ void SpellMgr::LoadExistingSpellIds()
     mExistingSpellsSet.clear();
 
     Field* fields;
-    QueryResult* result = WorldDatabase.Query("SELECT DISTINCT ID FROM spell_template");
+    QueryResult* result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `spell_template`");
 
     if (result)
     {
@@ -4566,12 +4533,170 @@ void SpellMgr::AssignInternalSpellFlags()
     }
 }
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+enum OldProcFlags
+{
+    OLD_PROC_FLAG_DONE_MELEE_HIT      = 0x00000001,   // New value - 20
+    OLD_PROC_FLAG_TAKEN_MELEE_HIT     = 0x00000002,   // New value - 40
+    OLD_PROC_FLAG_KILL                = 0x00000004,   // New value - 2
+    OLD_PROC_FLAG_HEARTBEAT           = 0x00000008,   // New value - 1
+    OLD_PROC_FLAG_DODGE               = 0x00000010,   // New value - 40
+    OLD_PROC_FLAG_PARRY               = 0x00000020,   // New value - 40
+    OLD_PROC_FLAG_BLOCK               = 0x00000040,   // New value - 40
+    OLD_PROC_FLAG_ON_SWING            = 0x00000080,   // New value - 4
+    OLD_PROC_FLAG_MAGIC_SPELL_CAST    = 0x00000100,   // New value - 81920
+    OLD_PROC_FLAG_TAKEN_NON_MELEE_HIT = 0x00000400,   // New value - 139904
+    OLD_PROC_FLAG_TAKEN_HIT           = 0x00000800,   // New value - 139936
+    OLD_PROC_FLAG_DONE_MELEE_CRIT     = 0x00001000,   // New value - 4
+    OLD_PROC_FLAG_TAKEN_MELEE_CRIT    = 0x00002000,   // New value - 8
+    OLD_PROC_FLAG_DONE_ANY_NOT_SWING  = 0x00004000,   // New value - 87376
+    OLD_PROC_FLAG_TAKEN_ANY_DAMAGE    = 0x00008000,   // New value - 1048576
+    OLD_PROC_FLAG_DONE_SPELL_CRIT     = 0x00010000,   // New value - 87376
+    OLD_PROC_FLAG_DONE_SPELL_HIT      = 0x00020000,   // New value - 87376
+    OLD_PROC_FLAG_TAKEN_RANGED_CRIT   = 0x00040000,   // New value - 139936
+    OLD_PROC_FLAG_DONE_RANGED_HIT     = 0x00080000,   // New value - 320
+    OLD_PROC_FLAG_TAKEN_RANGED_HIT    = 0x00100000,   // New value - 640
+};
+
+uint32 ReplaceOldSpellProcFlags(uint32 oldFlags)
+{
+    uint32 newFlags = 0;
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_MELEE_HIT)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_MELEE_HIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_KILL)
+        newFlags |= PROC_FLAG_KILL;
+
+    if (oldFlags & OLD_PROC_FLAG_HEARTBEAT)
+        newFlags |= PROC_FLAG_HEARTBEAT;
+
+    if (oldFlags & OLD_PROC_FLAG_DODGE)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_PARRY)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_BLOCK)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_ON_SWING)
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+
+    if (oldFlags & OLD_PROC_FLAG_MAGIC_SPELL_CAST)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_NON_MELEE_HIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_HIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_MELEE_CRIT)
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_MELEE_CRIT)
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_ANY_NOT_SWING)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_ANY_DAMAGE)
+        newFlags |= PROC_FLAG_TAKEN_ANY_DAMAGE;
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_SPELL_CRIT)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_SPELL_HIT)
+    {
+        //newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+        //newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_RANGED_CRIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_RANGED_HIT)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_RANGED_HIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+    }
+
+    return newFlags;
+}
+#endif
+
 void SpellMgr::LoadSpells()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
     // Getting the maximum ID.
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`ID`) FROM `spell_template`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`entry`) FROM `spell_template`"));
 
     if (!result)
     {
@@ -4586,7 +4711,7 @@ void SpellMgr::LoadSpells()
     uint32 maxEntry = fields[0].GetUInt32() + 1;
 
     // Actually loading the spells.
-    result.reset(WorldDatabase.PQuery("SELECT * FROM `spell_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+    result.reset(WorldDatabase.PQuery("SELECT * FROM `spell_template` t1 WHERE `build`=(SELECT max(`build`) FROM `spell_template` t2 WHERE t1.`entry`=t2.`entry` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -4803,13 +4928,76 @@ void SpellMgr::LoadSpells()
         //spell->RequiredAuraVision = fields[173].GetUInt32();
         spell->Custom = fields[174].GetUInt32();
 
-        // Before 1.11, the spell data specifies TO what percent the speed is reduced, not BY what percent.
+        
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
         for (int i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; ++i)
         {
-            if (IsEffectAppliesAura(spell->Effect[i]) && (spell->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED))
-                spell->EffectBasePoints[i] = -(100 - spell->EffectBasePoints[i]);
+            if (IsEffectAppliesAura(spell->Effect[i]))
+            {
+                switch (spell->EffectApplyAuraName[i])
+                {
+                    // Before 1.11, the spell data specifies TO what percent the speed is reduced, not BY what percent.
+                    case SPELL_AURA_MOD_DECREASE_SPEED:
+                    {
+                        spell->EffectBasePoints[i] = -(100 - spell->EffectBasePoints[i]);
+                        break;
+                    }
+                    
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+                    // Before 1.9, the creature family is not a mask.
+                    case SPELL_AURA_MOD_DAMAGE_DONE_CREATURE:
+                    {
+                        spell->EffectMiscValue[i] = 1 << (spell->EffectMiscValue[i] - 1);
+                        break;
+                    }
+                    // Before 1.9, value 0 means all schools.
+                    case SPELL_AURA_MOD_THREAT:
+                    {
+                        if (spell->EffectMiscValue[i] == 0)
+                            spell->EffectMiscValue[i] = 127;
+                        break;
+                    }
+                    // Before 1.9, the school is not a mask.
+                    case SPELL_AURA_MOD_DAMAGE_DONE:
+                    case SPELL_AURA_MOD_DAMAGE_TAKEN:
+                    case SPELL_AURA_MOD_RESISTANCE:
+                    case SPELL_AURA_SCHOOL_IMMUNITY:
+                    case SPELL_AURA_DAMAGE_IMMUNITY:
+                    case SPELL_AURA_SCHOOL_ABSORB:
+                    case SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL:
+                    case SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT:
+                    case SPELL_AURA_MOD_POWER_COST_SCHOOL:
+                    case SPELL_AURA_REFLECT_SPELLS_SCHOOL:
+                    case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
+                    case SPELL_AURA_SPLIT_DAMAGE_PCT:
+                    case SPELL_AURA_MOD_BASE_RESISTANCE:
+                    case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
+                    case SPELL_AURA_MOD_RESISTANCE_PCT:
+                    case SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN:
+                    case SPELL_AURA_MOD_HEALING:
+                    case SPELL_AURA_MOD_HEALING_PCT:
+                    case SPELL_AURA_MOD_HEALING_DONE:
+                    case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
+                    case SPELL_AURA_MOD_BASE_RESISTANCE_PCT:
+                    case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
+                    case SPELL_AURA_SPLIT_DAMAGE_FLAT:
+                    {
+                        if (spell->EffectMiscValue[i] == -2)
+                            spell->EffectMiscValue[i] = 127; // all schools
+                        else if (spell->EffectMiscValue[i] == -1)
+                            spell->EffectMiscValue[i] = 126; // all magic schools
+                        else
+                            spell->EffectMiscValue[i] = 1 << spell->EffectMiscValue[i];
+                        break;
+                    }
+#endif
+                }
+            }
         }
+#endif
+        // Before 1.10, the spell proc flags had completely different meanings.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        spell->procFlags = ReplaceOldSpellProcFlags(spell->procFlags);
 #endif
 
         spell->InitCachedValues();

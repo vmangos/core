@@ -1,0 +1,1 @@
+REPLACE INTO `variables` VALUES (30050, 12);

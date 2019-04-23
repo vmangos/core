@@ -1,33 +1,15 @@
-#ifndef G3D_NETADDRESS_H
-#define G3D_NETADDRESS_H
+/**
+ \file G3D/NetAddress.h
+
+ \created 2010-01-03
+ \edited  2013-03-17
+ */   
+#ifndef G3D_NetAddress_h
+#define G3D_NetAddress_h
 
 #include "G3D/platform.h"
 #include "G3D/Table.h"
-
-/** These control the version of Winsock used by G3D.
-    Version 2.0 is standard for G3D 6.09 and later.
-    Version 1.1 is standard for G3D 6.08 and earlier.
- */
-#define G3D_WINSOCK_MAJOR_VERSION 2
-#define G3D_WINSOCK_MINOR_VERSION 0
-
-#ifdef G3D_WIN32
-#   if (G3D_WINSOCK_MAJOR_VERSION == 2)
-#       include <winsock2.h>
-#   elif (G3D_WINSOCK_MAJOR_VERSION == 1)
-#       include <winsock.h>
-#   endif
-#else
-#   include <sys/types.h>
-#   include <sys/socket.h>
-#   include <netinet/in.h>
-#   ifndef SOCKADDR_IN
-#       define SOCKADDR_IN struct sockaddr_in
-#   endif
-#   ifndef SOCKET
-#       define SOCKET int
-#   endif
-#endif
+#include "G3D/netheaders.h"
 
 #include "G3D/g3dmath.h"
 
@@ -48,20 +30,31 @@ private:
     SOCKADDR_IN                 addr;
 
 public:
+
+    enum { 
+        /** 
+         Use the host portion of the IP address of the default adapter on this machine.
+        */
+        // Must match ENET_HOST_ANY
+        DEFAULT_ADAPTER_HOST = 0
+    };
+
     /**
-     In host byte order
+     In host byte order.
+
+     \sa DEFAULT_ADAPTER_HOST
      */
-    NetAddress(uint32 host, uint16 port = 0);
+    explicit NetAddress(uint32 host, uint16 port = 0);
 
     /**
      @param port Specified in host byte order (i.e., don't worry about endian issues)
-     */
+    */
     NetAddress(const std::string& hostname, uint16 port);
 
     /**
        @param hostnameAndPort in the form "hostname:port" or "ip:port"
      */
-    NetAddress(const std::string& hostnameAndPort);
+    explicit NetAddress(const std::string& hostnameAndPort);
 
     /**
        @deprecated Use G3D::NetworkDevice::broadcastAddressArray()
@@ -79,6 +72,8 @@ public:
     static NetAddress broadcastAddress(uint16 port);
 
     NetAddress();
+
+    static void localHostAddresses(Array<NetAddress>& array);
 
     void serialize(class BinaryOutput& b) const;
     void deserialize(class BinaryInput& b);
@@ -100,6 +95,13 @@ public:
     std::string ipString() const;
     std::string toString() const;
 
+    /** Name of this address, without the domain.  Performs reverse DNS lookup on this address.  This may make a network 
+    connection to a DNS server and block until that communication completes
+    if the address is one that has not been recently checked.*/
+    std::string hostname() const;
+
+    /** Name of the local machine machine, without the domain.  The value is cached after the first call.*/
+    static std::string localHostname();
 };
 
 std::ostream& operator<<(std::ostream& os, const NetAddress&);
@@ -119,7 +121,7 @@ namespace G3D {
  they have different IP's.
  */
 inline bool operator==(const NetAddress& a, const NetAddress& b) {
-	return (a.ip() == b.ip()) && (a.port() == b.port());
+    return (a.ip() == b.ip()) && (a.port() == b.port());
 }
 
 

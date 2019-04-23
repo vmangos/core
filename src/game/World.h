@@ -271,22 +271,6 @@ enum eConfigUInt32Values
     CONFIG_UINT32_VALUE_COUNT
 };
 
-// Content patches, used for loading DB data.
-enum WowPatch
-{
-    WOW_PATCH_102  = 0,
-    WOW_PATCH_103  = 1,
-    WOW_PATCH_104  = 2,
-    WOW_PATCH_105  = 3,
-    WOW_PATCH_106  = 4,
-    WOW_PATCH_107  = 5,
-    WOW_PATCH_108  = 6,
-    WOW_PATCH_109  = 7,
-    WOW_PATCH_110  = 8,
-    WOW_PATCH_111  = 9,
-    WOW_PATCH_112  = 10
-};
-
 enum
 {
     ANTICRASH_OPTION_ANNOUNCE_PLAYERS   = 0x01,
@@ -469,7 +453,6 @@ enum eConfigBoolValues
     CONFIG_BOOL_ACCURATE_PVP_REWARDS,
     CONFIG_BOOL_BATTLEGROUND_RANDOMIZE,
     CONFIG_BOOL_SEND_LOOT_ROLL_UPON_RECONNECT,
-    CONFIG_BOOL_ACCURATE_MOUNTS,
     CONFIG_BOOL_ACCURATE_PETS,
     CONFIG_BOOL_ACCURATE_SPELL_EFFECTS,
     CONFIG_BOOL_ACCURATE_PVE_EVENTS,
@@ -477,6 +460,9 @@ enum eConfigBoolValues
     CONFIG_BOOL_NO_RESPEC_PRICE_DECAY,
     CONFIG_BOOL_NO_QUEST_XP_TO_GOLD,
     CONFIG_BOOL_AUTO_HONOR_RESTART,
+    CONFIG_BOOL_RESTORE_DELETED_ITEMS,
+    CONFIG_BOOL_UNLINKED_AUCTION_HOUSES,
+    CONFIG_BOOL_PREVENT_ITEM_DATAMINING,
     CONFIG_BOOL_VALUE_COUNT
 };
 
@@ -621,12 +607,6 @@ class World
         void AddQueuedSession(WorldSession*);
         bool RemoveQueuedSession(WorldSession* session);
         int32 GetQueuedSessionPos(WorldSession*);
-
-        /// \todo Actions on m_allowMovement still to be implemented
-        /// Is movement allowed?
-        bool getAllowMovement() const { return m_allowMovement; }
-        /// Allow/Disallow object movements
-        void SetAllowMovement(bool allow) { m_allowMovement = allow; }
 
         /// Set a new Message of the Day
         void SetMotd(const std::string& motd) { m_motd = motd; }

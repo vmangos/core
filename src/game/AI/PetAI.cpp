@@ -92,7 +92,7 @@ void PetAI::UpdateAI(const uint32 diff)
         return;
 
     // part of it must run during eyes of the Beast to update melee hits
-    bool playerControlled = m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+    bool playerControlled = m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
 
     Unit* owner = m_creature->GetCharmerOrOwner();
 
@@ -524,7 +524,7 @@ void PetAI::HandleReturnMovement()
 
     // Prevent activating movement when under control of spells
     // such as "Eyes of the Beast"
-    if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+    if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
         return;
 
     if (m_creature->GetCharmInfo()->HasCommandState(COMMAND_STAY))
