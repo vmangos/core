@@ -133,10 +133,10 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleAuraModStalked,                            // 68 SPELL_AURA_MOD_STALKED
     &Aura::HandleSchoolAbsorb,                              // 69 SPELL_AURA_SCHOOL_ABSORB implemented in Unit::CalculateAbsorbAndResist
     &Aura::HandleUnused,                                    // 70 SPELL_AURA_EXTRA_ATTACKS      Useless, used by only one spell that has only visual effect
-    &Aura::HandleModSpellCritChanceShool,                   // 71 SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL
+    &Aura::HandleModSpellCritChanceSchool,                  // 71 SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL
     &Aura::HandleModPowerCostPCT,                           // 72 SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT
     &Aura::HandleModPowerCost,                              // 73 SPELL_AURA_MOD_POWER_COST_SCHOOL
-    &Aura::HandleNoImmediateEffect,                         // 74 SPELL_AURA_REFLECT_SPELLS_SCHOOL  implemented in Unit::SpellHitResult
+    &Aura::HandleReflectSpellsSchool,                       // 74 SPELL_AURA_REFLECT_SPELLS_SCHOOL  implemented in Unit::SpellHitResult
     &Aura::HandleNoImmediateEffect,                         // 75 SPELL_AURA_MOD_LANGUAGE
     &Aura::HandleFarSight,                                  // 76 SPELL_AURA_FAR_SIGHT
     &Aura::HandleModMechanicImmunity,                       // 77 SPELL_AURA_MECHANIC_IMMUNITY
@@ -1997,6 +1997,53 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         target->m_AuraFlags |= ~UNIT_AURAFLAG_ALIVE_INVISIBLE;
                     return;
             }
+            break;
+        }
+        case SPELLFAMILY_MAGE:
+        {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+            switch (GetId())
+            {
+                // Frost Warding
+                case 11189:
+                case 28332:
+                {
+                    if (Player* pPlayer = target->ToPlayer())
+                    {
+                        if (apply)
+                        {
+                            SpellModifier* mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, m_modifier.m_amount, GetId(), UI64LIT(0x0000000000000100));
+                            pPlayer->AddSpellMod(mod, true);
+                        }
+                        else
+                        {
+                            if (SpellModifier *mod = pPlayer->GetSpellMod(SPELLMOD_RESIST_MISS_CHANCE, GetId()))
+                                pPlayer->AddSpellMod(mod, false);
+                        }
+                    }
+                    return;
+                }
+                // Improved Fire Ward
+                case 11094:
+                case 13043:
+                {
+                    if (Player* pPlayer = target->ToPlayer())
+                    {
+                        if (apply)
+                        {
+                            SpellModifier *mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, m_modifier.m_amount, GetId(), UI64LIT(0x0000000000000008));
+                            pPlayer->AddSpellMod(mod, true);
+                        }
+                        else
+                        {
+                            if (SpellModifier *mod = pPlayer->GetSpellMod(SPELLMOD_RESIST_MISS_CHANCE, GetId()))
+                                pPlayer->AddSpellMod(mod, false);
+                        }
+                    }
+                    return;
+                }
+            }
+#endif
             break;
         }
         case SPELLFAMILY_DRUID:
@@ -4719,7 +4766,7 @@ void Aura::HandleModSpellCritChance(bool apply, bool Real)
         GetTarget()->m_baseSpellCritChance += apply ? m_modifier.m_amount : (-m_modifier.m_amount);
 }
 
-void Aura::HandleModSpellCritChanceShool(bool /*apply*/, bool Real)
+void Aura::HandleModSpellCritChanceSchool(bool /*apply*/, bool Real)
 {
     // spells required only Real aura add/remove
     if (!Real)
@@ -5066,6 +5113,17 @@ void Aura::HandleModPowerCost(bool apply, bool Real)
 /*********************************************************/
 /***                    OTHERS                         ***/
 /*********************************************************/
+
+void Aura::HandleReflectSpellsSchool(bool apply, bool Real)
+{
+    // all applied/removed only at real aura add/remove
+    if (!Real)
+        return;
+
+    if (Unit* pCaster = GetCaster())
+        if (Player *modOwner = pCaster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetId(), SPELLMOD_RESIST_MISS_CHANCE, m_modifier.m_amount);
+}
 
 void Aura::HandleShapeshiftBoosts(bool apply)
 {
@@ -6571,34 +6629,7 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
         }
         case SPELLFAMILY_MAGE:
         {
-            switch (GetId())
-            {
-                case 11189:                                 // Frost Warding
-                case 28332:
-                {
-                    if (m_target->GetTypeId() == TYPEID_PLAYER && !apply)
-                    {
-                        // reflection chance (effect 1) of Frost Ward, applied in dummy effect
-                        if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_RESIST_MISS_CHANCE, GetId()))
-                            ((Player*)m_target)->AddSpellMod(mod, false);
-                    }
-                    return;
-                }
-                case 11094:                                 // Improved Fire Ward
-                case 13043:
-                {
-                    if (m_target->GetTypeId() == TYPEID_PLAYER && !apply)
-                    {
-                        // reflection chance (effect 1) of Fire Ward, applied in dummy effect
-                        if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_RESIST_MISS_CHANCE, GetId()))
-                            ((Player*)m_target)->AddSpellMod(mod, false);
-                    }
-                    return;
-                }
-                default:
-                    return;
-            }
-            break;
+            return;
         }
         case SPELLFAMILY_HUNTER:
         {
