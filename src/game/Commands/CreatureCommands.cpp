@@ -1238,7 +1238,7 @@ inline Creature* Helper_CreateWaypointFor(Creature* wpOwner, WaypointPathOrigin 
 
     wpCreature->SetVisibility(VISIBILITY_OFF);
     wpCreature->SetSummonPoint(pos);
-
+    wpCreature->SetUInt32Value(UNIT_FIELD_LEVEL, wpId+1);
     wpCreature->SetActiveObjectState(true);
 
     wpCreature->Summon(TEMPSUMMON_TIMED_DESPAWN, 5 * MINUTE * IN_MILLISECONDS); // Also initializes the AI and MMGen
