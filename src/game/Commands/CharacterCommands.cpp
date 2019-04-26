@@ -38,6 +38,39 @@
 
 #include <regex>
 
+bool ChatHandler::HandleXpCommand(char* args)
+{
+    // Only a GM can modify another player's rates.
+    Player* pPlayer = (m_session->GetSecurity() < SEC_GAMEMASTER) ? m_session->GetPlayer() : GetSelectedPlayer();
+
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    float xp;
+    if (!ExtractFloat(&args, xp))
+        return false;
+
+    if (xp < sWorld.getConfig(CONFIG_FLOAT_RATE_XP_PERSONAL_MIN))
+    {
+        PSendSysMessage(LANG_XP_RATE_MIN, sWorld.getConfig(CONFIG_FLOAT_RATE_XP_PERSONAL_MIN));
+        return false;
+    }
+
+    if ((xp > sWorld.getConfig(CONFIG_FLOAT_RATE_XP_PERSONAL_MAX)) && (m_session->GetSecurity() < SEC_GAMEMASTER))
+    {
+        PSendSysMessage(LANG_XP_RATE_MAX, sWorld.getConfig(CONFIG_FLOAT_RATE_XP_PERSONAL_MAX));
+        return false;
+    }
+
+    pPlayer->SetPersonalXpRate(xp);
+    PSendSysMessage(LANG_XP_RATE_SET, (pPlayer != m_session->GetPlayer() ? (std::string(pPlayer->GetName()) + std::string("'s")).c_str() : "your" ), xp);
+    return true;
+}
+
 bool ChatHandler::HandleGodCommand(char* args)
 {
     Player *pPlayer = GetSelectedPlayer();

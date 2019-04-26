@@ -185,7 +185,10 @@ enum MangosStrings
     //                                    174               // used in master
     LANG_LIQUID_STATUS                  = 175,
     LANG_APPEARING_AT_OFFLINE           = 176,
-    // Room for more level 1              176-199 not used
+    LANG_XP_RATE_MIN                    = 177,
+    LANG_XP_RATE_MAX                    = 178,
+    LANG_XP_RATE_SET                    = 179,
+    // Room for more level 1              178-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
