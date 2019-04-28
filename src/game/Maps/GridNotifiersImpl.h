@@ -556,6 +556,16 @@ void MaNGOS::PlayerSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Check>
+void MaNGOS::PlayerLastSearcher<Check>::Visit(PlayerMapType &m)
+{
+    for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+    {
+        if (i_check(itr->getSource()))
+            i_object = itr->getSource();
+    }
+}
+
+template<class Check>
 void MaNGOS::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
 {
     for(PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)

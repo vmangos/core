@@ -2518,6 +2518,7 @@ bool WorldObject::CanSeeInWorld(WorldObject const* other) const
 
     return CanSeeInWorld(other->worldMask);
 }
+
 bool WorldObject::CanSeeInWorld(uint32 otherPhaseMask) const
 {
     // Les GMs voient tout
@@ -2598,6 +2599,16 @@ GameObject* WorldObject::FindNearestGameObject(uint32 uiEntry, float fMaxSearchR
     cell.Visit(pair, go_searcher, *(GetMap()), *this, fMaxSearchRange);
 
     return pGo;
+}
+
+Player* WorldObject::FindNearestPlayer(float range) const
+{
+    Player* target = nullptr;
+    MaNGOS::NearestUnitCheck check(this, range);
+    MaNGOS::PlayerLastSearcher<MaNGOS::NearestUnitCheck> searcher(target, check);
+    Cell::VisitWorldObjects(this, searcher, range);
+
+    return target;
 }
 
 void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange)
@@ -2730,39 +2741,6 @@ bool WorldObject::PrintCoordinatesError(float x, float y, float z, char const* d
 {
     sLog.outError("%s with invalid %s coordinates: mapid = %uu, x = %f, y = %f, z = %f", GetGuidStr().c_str(), descr, GetMapId(), x, y, z);
     return false;                                           // always false for continue assert fail
-}
-
-// Look for Db GUID
-Creature* WorldObject::FindNearCreature(uint32 guid, float range)
-{
-    Creature* creature = nullptr;
-    CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-    cell.SetNoCreate();
-
-    MaNGOS::CreatureWithDbGUIDCheck target_check(this, guid);
-    MaNGOS::CreatureSearcher<MaNGOS::CreatureWithDbGUIDCheck> checker(creature, target_check);
-
-    TypeContainerVisitor<MaNGOS::CreatureSearcher <MaNGOS::CreatureWithDbGUIDCheck>, GridTypeMapContainer > unit_checker(checker);
-    cell.Visit(p, unit_checker, *(GetMap()), *this, range);
-
-    return creature;
-}
-
-GameObject* WorldObject::FindNearGameObject(uint32 guid, float range)
-{
-    GameObject* gameObject = nullptr;
-
-    CellPair p(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
-    Cell cell(p);
-
-    MaNGOS::GameObjectWithDbGUIDCheck goCheck(*this, guid);
-    MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck> checker(gameObject, goCheck);
-
-    TypeContainerVisitor<MaNGOS::GameObjectSearcher<MaNGOS::GameObjectWithDbGUIDCheck>, GridTypeMapContainer > objectChecker(checker);
-    cell.Visit(p, objectChecker, *(GetMap()), *this, range);
-
-    return gameObject;
 }
 
 void WorldObject::SetActiveObjectState(bool on)

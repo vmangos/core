@@ -239,7 +239,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!m_creature->isInCombat())
                 return false;
 
-            Unit* pUnit = m_creature->DoSelectLowestHpFriendly((float)event.friendly_hp.radius, event.friendly_hp.hpDeficit);
+            Unit* pUnit = m_creature->FindLowestHpFriendlyUnit((float)event.friendly_hp.radius, event.friendly_hp.hpDeficit);
 
             if (!pUnit)
                 return false;
@@ -255,7 +255,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!m_creature->isInCombat())
                 return false;
 
-            Unit* pUnit = m_creature->DoFindFriendlyCC((float)event.friendly_is_cc.radius);
+            Unit* pUnit = m_creature->FindFriendlyUnitCC((float)event.friendly_is_cc.radius);
 
             if (!pUnit)
                 return false;
@@ -268,7 +268,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         }
         case EVENT_T_FRIENDLY_MISSING_BUFF:
         {
-            Unit* pUnit = m_creature->DoFindFriendlyMissingBuff((float)event.friendly_buff.radius, event.friendly_buff.spellId);
+            Unit* pUnit = m_creature->FindFriendlyUnitMissingBuff((float)event.friendly_buff.radius, event.friendly_buff.spellId);
 
             if (!pUnit)
                 return false;

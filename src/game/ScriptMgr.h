@@ -1117,6 +1117,13 @@ enum ScriptTarget
     TARGET_T_MAP_EVENT_EXTRA_TARGET         = 22,           //An additional WorldObject target from a scripted map event.
                                                             //Param1 = eventId
                                                             //Param2 = creature_entry or gameobject_entry
+    TARGET_T_NEAREST_PLAYER                 = 23,           //Nearest player within range.
+                                                            //Param1 = search-radius
+    TARGET_T_NEAREST_HOSTILE_PLAYER         = 24,           //Nearest hostile player within range.
+                                                            //Param1 = search-radius
+    TARGET_T_NEAREST_FRIENDLY_PLAYER        = 25,           //Nearest friendly player within range.
+                                                            //Param1 = search-radius
+
     TARGET_T_END
 };
 

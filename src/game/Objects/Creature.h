@@ -761,10 +761,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         // AI helpers
         Unit* SelectNearestHostileUnitInAggroRange(bool useLOS) const;
         Unit* SelectNearestTargetInAttackDistance(float dist) const;
-        Unit* DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff = 1, bool bPercent = false, Unit* except = nullptr) const;
-        Unit* DoFindFriendlyMissingBuff(float range, uint32 spellid, Unit* except = nullptr) const;
-        Unit* DoFindFriendlyCC(float range) const;
-        Creature* GetNearestGuard(float range) const;
+        Creature* FindNearestFriendlyGuard(float range) const;
         void CallNearestGuard(Unit* pEnemy) const;
 
         // Used by Creature Spells system to always know result of cast

@@ -226,7 +226,7 @@ struct boss_skeramAI : public ScriptedAI
         if (FullFillment_Timer < diff)
         {
             // Get closest target
-            if (Player* target = GetNearestPlayer(40.0f))
+            if (Player* target = m_creature->FindNearestHostilePlayer(40.0f))
             {
                 if (DoCastSpellIfCan(target, SPELL_TRUE_FULFILLMENT, CF_AURA_NOT_PRESENT) == CAST_OK)
                 {

@@ -2581,24 +2581,24 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
                 return pUnitSource->SelectRandomFriendlyTarget(Param2 ? ToUnit(pTarget) : nullptr, Param1 ? Param1 : 30.0f, true);
             break;
         case TARGET_T_FRIENDLY_INJURED:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true);
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindLowestHpFriendlyUnit(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true);
             break;
         case TARGET_T_FRIENDLY_INJURED_EXCEPT:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true, ToUnit(pTarget));
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindLowestHpFriendlyUnit(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true, ToUnit(pTarget));
             break;
         case TARGET_T_FRIENDLY_MISSING_BUFF:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyMissingBuff(Param1 ? Param1 : 30.0f, Param2);
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindFriendlyUnitMissingBuff(Param1 ? Param1 : 30.0f, Param2);
             break;
         case TARGET_T_FRIENDLY_MISSING_BUFF_EXCEPT:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyMissingBuff(Param1 ? Param1 : 30.0f, Param2, ToUnit(pTarget));
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindFriendlyUnitMissingBuff(Param1 ? Param1 : 30.0f, Param2, ToUnit(pTarget));
             break;
         case TARGET_T_FRIENDLY_CC:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyCC(Param1 ? Param1 : 30.0f);
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindFriendlyUnitCC(Param1 ? Param1 : 30.0f);
             break;
         case TARGET_T_MAP_EVENT_SOURCE:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
@@ -2617,6 +2617,18 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
                         if (WorldObject* pObject = pMap->GetWorldObject(target.target))
                             if (pObject && (pObject->GetEntry() == Param2))
                                 return pObject;
+            break;
+        case TARGET_T_NEAREST_PLAYER:
+            if (pSource)
+                return pSource->FindNearestPlayer(Param1);
+            break;
+        case TARGET_T_NEAREST_HOSTILE_PLAYER:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindNearestHostilePlayer(Param1);
+            break;
+        case TARGET_T_NEAREST_FRIENDLY_PLAYER:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindNearestFriendlyPlayer(Param1);
             break;
     }
     return nullptr;

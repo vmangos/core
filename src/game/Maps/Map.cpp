@@ -2453,12 +2453,7 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, con
                     return false;
                 }
 
-                Creature* pCreatureBuddy = nullptr;
-
-                MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSearcher, script.target_param1, true, script.target_param2);
-                MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreatureBuddy, u_check);
-
-                Cell::VisitGridObjects(pSearcher, searcher, script.target_param2);
+                Creature* pCreatureBuddy = pSearcher->FindNearestCreature(script.target_param1, script.target_param2, true);
 
                 if (pCreatureBuddy)
                     target = pCreatureBuddy;
@@ -2513,12 +2508,7 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, con
                     return false;
                 }
 
-                GameObject* pGameObjectBuddy = nullptr;
-
-                MaNGOS::NearestGameObjectEntryInObjectRangeCheck u_check(*pSearcher, script.target_param1, script.target_param2);
-                MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> searcher(pGameObjectBuddy, u_check);
-
-                Cell::VisitGridObjects(pSearcher, searcher, script.target_param2);
+                GameObject* pGameObjectBuddy = pSearcher->FindNearestGameObject(script.target_param1, script.target_param2);
 
                 if (pGameObjectBuddy)
                     target = pGameObjectBuddy;
