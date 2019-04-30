@@ -937,7 +937,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             if (missingItem)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED_AND_ITEM), at->requiredLevel, ObjectMgr::GetItemPrototype(missingItem)->Name1);
             else if (missingQuest)
-                SendAreaTriggerMessage("%s", at->requiredFailedText.c_str());
+                SendAreaTriggerMessage("You must complete %s to enter", sObjectMgr.GetQuestTemplate(missingQuest)->GetTitle().c_str());
             else if (missingLevel)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), missingLevel);
             else if (missingRank)

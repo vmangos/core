@@ -6590,11 +6590,11 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     std::unique_ptr<QueryResult> result(WorldDatabase.PQuery(
     //           0     1                 2                3                 4                      5
-        "SELECT `id`, `required_level`, `required_item`, `required_item2`, `required_quest_done`, `required_failed_text`, "
+        "SELECT `id`, `required_level`, `required_item`, `required_item2`, `required_quest_done`, `required_team`, "
     //    6             7                    8                    9                    10                    11
         "`target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `required_event`, "
-    //    12                   13
-        "`required_pvp_rank`, `required_team` "
+    //    12
+        "`required_pvp_rank` "
         "FROM `areatrigger_teleport` t1 WHERE `patch`=(SELECT max(`patch`) FROM `areatrigger_teleport` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
     
     if (!result)
@@ -6624,7 +6624,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.requiredItem       = fields[2].GetUInt32();
         at.requiredItem2      = fields[3].GetUInt32();
         at.requiredQuest      = fields[4].GetUInt32();
-        at.requiredFailedText = fields[5].GetCppString();
+        at.required_team      = fields[5].GetUInt16();
         at.target_mapId       = fields[6].GetUInt32();
         at.target_X           = fields[7].GetFloat();
         at.target_Y           = fields[8].GetFloat();
@@ -6632,7 +6632,6 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.target_Orientation = fields[10].GetFloat();
         at.required_event     = fields[11].GetInt32();
         at.required_pvp_rank  = fields[12].GetUInt8();
-        at.required_team      = fields[13].GetUInt16();
 
         AreaTriggerEntry const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
