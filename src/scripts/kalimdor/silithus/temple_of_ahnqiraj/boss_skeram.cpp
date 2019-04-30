@@ -301,8 +301,14 @@ struct boss_skeramAI : public ScriptedAI
         uint32 mask = 0x7;
 
         // Get Skeram ready for blink
+        // Prevent players being able to track the real skeram by things such as
+        // combo points, existing spells and pets
         m_creature->RemoveAllAuras();
         ClearTargetIcon();
+        m_creature->ClearComboPointHolders();
+        m_creature->InterruptSpellsCastedOnMe(true);
+        m_creature->RemoveAllAttackers();
+
         m_creature->SetVisibility(VISIBILITY_OFF);
 
         CastBlink(ImageA, mask);
