@@ -357,8 +357,8 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     // Custom hard-coded cases which depend on the proc event for firing...
     if (procSpell)
     {
-        // Fear Ward always procs on any Fear
-        if (spellProto->Id == 6346)
+        // Fear Ward always procs on any Fear (except ones cast by ourselves...)
+        if (spellProto->Id == 6346 && isVictim)
         {
             if (procSpell->Mechanic == MECHANIC_FEAR)
                 return true;
