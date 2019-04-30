@@ -4373,6 +4373,20 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
 
         uint32 i_spellId = i_spellProto->Id;
 
+        bool is_triggered_by_spell = false;
+        // prevent triggering aura of removing aura that triggered it
+        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+            if (i_spellProto->EffectTriggerSpell[j] == spellId)
+                is_triggered_by_spell = true;
+
+        // prevent triggered aura of removing aura that triggering it (triggered effect early some aura of parent spell
+        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+            if (spellProto->EffectTriggerSpell[j] == i_spellId)
+                is_triggered_by_spell = true;
+
+        if (is_triggered_by_spell)
+            continue;
+
         // early checks that spellId is passive non stackable spell
         if (i_spellProto->Attributes & (SPELL_ATTR_PASSIVE | 0x80))
         {
@@ -4427,20 +4441,6 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
             RemoveAurasDueToSpell(i_spellId);
             continue;
         }
-
-        bool is_triggered_by_spell = false;
-        // prevent triggering aura of removing aura that triggered it
-        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
-            if (i_spellProto->EffectTriggerSpell[j] == spellId)
-                is_triggered_by_spell = true;
-
-        // prevent triggered aura of removing aura that triggering it (triggered effect early some aura of parent spell
-        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
-            if (spellProto->EffectTriggerSpell[j] == i_spellId)
-                is_triggered_by_spell = true;
-
-        if (is_triggered_by_spell)
-            continue;
 
         if (IsSpellHaveAura(i_spellProto, SPELL_AURA_CHANNEL_DEATH_ITEM)) // Plusieurs demo par exemple peuvent mettre un siphon d'ame.
             continue;
