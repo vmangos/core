@@ -2479,7 +2479,29 @@ struct SetGameMasterOffHelper
     uint32 faction;
 };
 
-void Player::SetGameMaster(bool on)
+void Player::SetGMChat(bool on, bool notify)
+{
+    if (on)
+    {
+        m_ExtraFlags |= PLAYER_EXTRA_GM_CHAT;
+        if (notify)
+        {
+            ChatHandler(this).SendSysMessage(LANG_GM_CHAT_ON);
+            GetSession()->SendNotification(LANG_GM_CHAT_ON);
+        }
+    }
+    else
+    {
+        m_ExtraFlags &= ~PLAYER_EXTRA_GM_CHAT;
+        if (notify)
+        {
+            ChatHandler(this).SendSysMessage(LANG_GM_CHAT_OFF);
+            GetSession()->SendNotification(LANG_GM_CHAT_OFF);
+        }
+    }
+}
+
+void Player::SetGameMaster(bool on, bool notify)
 {
     if (on)
     {
@@ -2494,6 +2516,12 @@ void Player::SetGameMaster(bool on)
 
         getHostileRefManager().setOnlineOfflineState(false);
         CombatStopWithPets();
+
+        if (notify)
+        {
+            ChatHandler(this).SendSysMessage(LANG_GM_ON);
+            GetSession()->SendNotification(LANG_GM_ON);
+        }
     }
     else
     {
@@ -2511,6 +2539,12 @@ void Player::SetGameMaster(bool on)
         UpdateArea(m_areaUpdateId);
 
         getHostileRefManager().setOnlineOfflineState(true);
+
+        if (notify)
+        {
+            ChatHandler(this).SendSysMessage(LANG_GM_OFF);
+            GetSession()->SendNotification(LANG_GM_OFF);
+        }
     }
 
     m_camera.UpdateVisibilityForOwner();
@@ -2527,7 +2561,7 @@ void Player::SetGameMaster(bool on)
     RefreshBitsForVisibleUnits(&m, TYPEMASK_PLAYER);
 }
 
-void Player::SetGMVisible(bool on)
+void Player::SetGMVisible(bool on, bool notify)
 {
     // 'Invisibilite superieure'
     const uint32 VISUAL_AURA = 16380;
@@ -2543,6 +2577,12 @@ void Player::SetGMVisible(bool on)
             SetVisibility(VISIBILITY_GROUP_INVISIBILITY);
         else
             SetVisibility(VISIBILITY_ON);
+
+        if (notify)
+        {
+            ChatHandler(this).SendSysMessage(LANG_INVISIBLE_VISIBLE);
+            GetSession()->SendNotification(LANG_INVIS_OFF);
+        }
     }
     else
     {
@@ -2555,9 +2595,26 @@ void Player::SetGMVisible(bool on)
         SetGameMaster(true);
 
         SetVisibility(VISIBILITY_OFF);
+
+        if (notify)
+        {
+            ChatHandler(this).PSendSysMessage(LANG_INVISIBLE_INVISIBLE, GetGMInvisibilityLevel());
+            GetSession()->SendNotification(LANG_INVIS_ON);
+        }
     }
     // Sauvegarde directement pour que le site n'affiche plus le MJ parmis les joueurs co.
     CharacterDatabase.PExecute("UPDATE characters SET extra_flags = %u WHERE guid = %u", m_ExtraFlags, GetGUIDLow());
+}
+
+void Player::SetGodMode(bool on, bool notify)
+{
+    SetOption(PLAYER_CHEAT_GOD, on);
+
+    if (notify)
+    {
+        ChatHandler(this).SendSysMessage(on ? LANG_GOD_ON : LANG_GOD_OFF);
+        GetSession()->SendNotification(on ? LANG_GOD_ON : LANG_GOD_OFF);
+    }
 }
 
 bool Player::IsAllowedWhisperFrom(ObjectGuid guid) const
@@ -15062,6 +15119,16 @@ void Player::LoadAura(AuraSaveStruct& s, uint32 timediff)
             return;
 
         s.remaintime -= timediff * IN_MILLISECONDS;
+    }
+
+    // Special case for chat silenced indicator
+    if (spellproto->Id == SPELL_PLAYER_MUTED_VISUAL)
+    {
+        auto currTime = time(nullptr);
+        auto muteTime = GetSession()->m_muteTime;
+        if (muteTime <= currTime)
+            return;
+        s.remaintime = (muteTime - currTime) * IN_MILLISECONDS;
     }
 
     // prevent wrong values of remaincharges

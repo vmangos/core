@@ -46,6 +46,8 @@ class Unit;
 class GmTicket;
 struct ItemPrototype;
 
+#define SPELL_PLAYER_MUTED_VISUAL 1852
+
 enum CommandFlags
 {
     COMMAND_FLAGS_ONLY_ON_SELF      = 0x1,

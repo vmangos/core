@@ -86,12 +86,9 @@ bool ChatHandler::HandleGodCommand(char* args)
             SetSentErrorMessage(true);
             return false;
         }
-        pPlayer->SetGodMode(value);
+        pPlayer->SetGodMode(value, true);
     }
-    if (pPlayer->IsGod())
-        SendSysMessage("Mode GOD : [ON]");
-    else
-        SendSysMessage("Mode GOD : [OFF]");
+
     return true;
 }
 
@@ -2394,28 +2391,47 @@ bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
 
 bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
 {
-    static const char *gmSpellList[] =
+    static uint32 gmSpellList[] =
     {
-        "24347",                                            // Become A Fish, No Breath Bar
-        "35132",                                            // Visual Boom
-        "38488",                                            // Attack 4000-8000 AOE
-        "38795",                                            // Attack 2000 AOE + Slow Down 90%
-        "15712",                                            // Attack 200
-        "1852",                                             // GM Spell Silence
-        "31899",                                            // Kill
-        "31924",                                            // Kill
-        "29878",                                            // Kill My Self
-        "26644",                                            // More Kill
-
-        "28550",                                            //Invisible 24
-        "23452",                                            //Invisible + Target
-        "0"
+        5,      // Death Touch
+        265,    // Area Death (TEST)
+        30879,  // Permanent Area Damage 50k
+        7482,   // dmg
+        8295,   // dmg2
+        10073,  // dmg3
+        11821,  // dmg4
+        18389,  // dmg5
+        18390,  // dmg6
+        19901,  // dmg7
+        27254,  // dmg8
+        27255,  // dmg9
+        27258,  // dmg10
+        27261,  // dmg11
+        25059,  // Dmg Shield
+        26666,  // Dmg Shield2
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        456,    // SHOWLABEL Only OFF
+        2765,   // SHOWLABEL Only ON
+        1509,   // GM Only OFF
+        18139,  // GM Only ON
+        6147,   // INVIS Only OFF
+        2763,   // INVIS Only ON
+        20114,  // BM Only OFF
+        20115,  // BM Only ON
+#endif
+        24341,  // Revive
+        29313,  // CooldownAll
+        1302,   // Damage Immunity Test
+        9454,   // Freeze
+        31366,  // Root Anybody Forever
+        1908,   // Uber Heal Over Time
+        8358,   // Mana Spike
+        23965,  // Instant Heal
     };
 
-    uint16 gmSpellIter = 0;
-    while (strcmp(gmSpellList[gmSpellIter], "0"))
+    for (int i = 0; i < sizeof(gmSpellList) / sizeof(uint32); i++)
     {
-        uint32 spell = atol((char*)gmSpellList[gmSpellIter++]);
+        uint32 spell = gmSpellList[i];
 
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell);
         if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, m_session->GetPlayer()))

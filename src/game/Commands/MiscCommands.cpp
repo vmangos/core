@@ -119,16 +119,7 @@ bool ChatHandler::HandleGMCommand(char* args)
         return false;
     }
 
-    if (value)
-    {
-        m_session->GetPlayer()->SetGameMaster(true);
-        m_session->SendNotification(LANG_GM_ON);
-    }
-    else
-    {
-        m_session->GetPlayer()->SetGameMaster(false);
-        m_session->SendNotification(LANG_GM_OFF);
-    }
+    m_session->GetPlayer()->SetGameMaster(value, true);
 
     return true;
 }
@@ -153,16 +144,7 @@ bool ChatHandler::HandleGMChatCommand(char* args)
         return false;
     }
 
-    if (value)
-    {
-        m_session->GetPlayer()->SetGMChat(true);
-        m_session->SendNotification(LANG_GM_CHAT_ON);
-    }
-    else
-    {
-        m_session->GetPlayer()->SetGMChat(false);
-        m_session->SendNotification(LANG_GM_CHAT_OFF);
-    }
+    m_session->GetPlayer()->SetGMChat(value, true);
 
     return true;
 }
@@ -194,17 +176,10 @@ bool ChatHandler::HandleGMVisibleCommand(char* args)
         return false;
     }
 
-    if (value)
-    {
-        m_session->GetPlayer()->SetGMVisible(true);
-        m_session->SendNotification(LANG_INVISIBLE_VISIBLE);
-    }
-    else
-    {
+    if (!value)
         m_session->GetPlayer()->SetGMInvisibilityLevel(visibilityLevel);
-        m_session->SendNotification(LANG_INVISIBLE_INVISIBLE, visibilityLevel);
-        m_session->GetPlayer()->SetGMVisible(false);
-    }
+
+    m_session->GetPlayer()->SetGMVisible(value, true);
 
     return true;
 }

@@ -4393,6 +4393,62 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+                case 456: // SHOWLABEL Only OFF
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGMChat(false, true);
+                    return;
+                }
+                case 2765: // SHOWLABEL Only ON
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGMChat(true, true);;
+                    return;
+                }
+                case 1509: // GM Only OFF
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGameMaster(false, true);
+                    return;
+                }
+                case 18139: // GM Only ON
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGameMaster(true, true);
+                    return;
+                }
+                case 6147: // INVIS Only OFF
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGMVisible(true, true);
+                    return;
+                }
+                case 2763: // INVIS Only ON
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGMVisible(false, true);
+                    return;
+                }
+                case 20114: // BM Only OFF
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGodMode(false, true);
+                    return;
+                }
+                case 20115: // BM Only ON
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGodMode(true, true);
+                    return;
+                }
+                case 29313: // CooldownAll
+                {
+                    if (m_caster)
+                        m_caster->RemoveAllSpellCooldown();
+                    return;
+                }
+#endif
                 case 8856:                                  // Bending Shinbone
                 {
                     if (!itemTarget && m_caster->GetTypeId() != TYPEID_PLAYER)

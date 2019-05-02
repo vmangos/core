@@ -34,6 +34,23 @@ ALTER TABLE `auctionhousebot`
 	CHANGE COLUMN `bid` `bid` INT(11) UNSIGNED NOT NULL DEFAULT '1' COMMENT 'Bid Price' AFTER `stack`,
 	CHANGE COLUMN `buyout` `buyout` INT(11) UNSIGNED NOT NULL DEFAULT '1' COMMENT 'Buyout Price' AFTER `bid`;
 
+-- Change delay field to unsigned.
+ALTER TABLE `autobroadcast`
+	CHANGE COLUMN `delay` `delay` INT(11) UNSIGNED NULL DEFAULT NULL FIRST;
+
+-- Rename the comments filed to comment.
+ALTER TABLE `autobroadcast`
+	CHANGE COLUMN `comments` `comment` VARCHAR(255) NULL DEFAULT NULL AFTER `string_id`;
+    
+-- Change map field to unsigned.
+ALTER TABLE `battleground_events`
+	CHANGE COLUMN `map` `map` SMALLINT(5) UNSIGNED NOT NULL FIRST;
+
+-- Change cinematic and timer fields to unsigned.
+ALTER TABLE `cinematic_waypoints`
+	CHANGE COLUMN `cinematic` `cinematic` INT(11) UNSIGNED NULL DEFAULT '0' FIRST,
+	CHANGE COLUMN `timer` `timer` INT(11) UNSIGNED NULL DEFAULT '0' AFTER `cinematic`;
+
     
 -- End of migration.
 END IF;

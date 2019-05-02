@@ -19,6 +19,7 @@
 #include "Database/DatabaseImpl.h"
 #include "World.h"
 #include "Player.h"
+#include "SpellAuras.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
@@ -1182,7 +1183,7 @@ bool ChatHandler::HandleMuteCommand(char* args)
     if (HasLowerSecurity(target, target_guid, true))
         return false;
 
-    time_t mutetime = time(NULL) + notspeaktime * 60;
+    time_t mutetime = time(NULL) + notspeaktime * MINUTE;
 
     if (target)
         target->GetSession()->m_muteTime = mutetime;
@@ -1190,7 +1191,16 @@ bool ChatHandler::HandleMuteCommand(char* args)
     LoginDatabase.PExecute("UPDATE account SET mutetime = " UI64FMTD " WHERE id = '%u'", uint64(mutetime), account_id);
 
     if (target)
+    {
+        if (SpellAuraHolder* pAura = target->AddAura(SPELL_PLAYER_MUTED_VISUAL, 0, nullptr))
+        {
+            pAura->SetAuraDuration(notspeaktime * MINUTE * IN_MILLISECONDS);
+            pAura->SetAuraMaxDuration(notspeaktime * MINUTE * IN_MILLISECONDS);
+            pAura->RefreshHolder();
+        }
+            
         ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_DISABLED, notspeaktime);
+    }
 
     std::string nameLink = playerLink(target_name);
 
@@ -1245,7 +1255,10 @@ bool ChatHandler::HandleUnmuteCommand(char* args)
     LoginDatabase.PExecute("UPDATE account SET mutetime = '0' WHERE id = '%u'", account_id);
 
     if (target)
+    {
+        target->RemoveAurasDueToSpell(SPELL_PLAYER_MUTED_VISUAL);
         ChatHandler(target).PSendSysMessage(LANG_YOUR_CHAT_ENABLED);
+    } 
 
     std::string nameLink = playerLink(target_name);
 

@@ -639,6 +639,11 @@ void Spell::FillTargetMap()
                         break;
                 }
                 break;
+            case TARGET_ALL_ENEMY_IN_AREA:
+                if ((m_targets.m_targetMask & TARGET_FLAG_SOURCE_LOCATION) && !(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
+                    m_targets.setDestination(m_targets.m_srcX, m_targets.m_srcY, m_targets.m_srcZ);
+                SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                break;
             default:
                 switch (m_spellInfo->EffectImplicitTargetB[i])
                 {

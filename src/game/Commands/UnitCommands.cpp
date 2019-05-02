@@ -237,7 +237,7 @@ bool ChatHandler::HandleFreezeCommand(char* args)
     Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
         return false;
-    pTarget->CastSpell(pTarget, 29826, true);
+    pTarget->CastSpell(pTarget, 9454, true);
     return true;
 }
 
@@ -246,7 +246,7 @@ bool ChatHandler::HandleUnfreezeCommand(char* args)
     Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
         return false;
-    pTarget->RemoveAurasDueToSpell(29826);
+    pTarget->RemoveAurasDueToSpell(9454);
     return true;
 }
 
