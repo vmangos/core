@@ -542,6 +542,20 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
+                case 18282: // Learn Max Alchemy (Custom)
+                {
+                    Player* player = ToPlayer(unitTarget);
+                    if (!player)
+                        return;
+
+                    if (player->GetItemCount(77757, false) == 0)
+                        return;
+
+                    player->LearnSpell(11612, false);
+                    player->SetSkill(171, 300, 300);
+                    player->DestroyItemCount(77757, 1, true, false);
+                    return;
+                }
                 case 6700: // Dimensional Portal (Used by Arugal)
                 {
                     if (unitTarget->GetTypeId() == TYPEID_UNIT)
