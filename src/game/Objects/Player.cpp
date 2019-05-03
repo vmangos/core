@@ -594,7 +594,7 @@ Player::Player(WorldSession *session) : Unit(),
     // GM variables
     m_gmInvisibilityLevel = session->GetSecurity();
 
-    if(session->GetSecurity() != SEC_PLAYER)
+    if(session->GetSecurity() > SEC_MODERATOR)
         m_smartInstanceRebind = true;
 
     // TODO: remove it
@@ -14828,7 +14828,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     outDebugStatsValues();
 
     // GM state
-    if (GetSession()->GetSecurity() > SEC_PLAYER)
+    if (GetSession()->GetSecurity() > SEC_MODERATOR)
     {
         switch (sWorld.getConfig(CONFIG_UINT32_GM_LOGIN_STATE))
         {

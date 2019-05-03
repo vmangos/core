@@ -1317,7 +1317,7 @@ bool ChatHandler::HandleModifyMorphCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleModifyStandStateCommand(char* args)
+bool ChatHandler::HandleModifyEmoteStateCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();
 
