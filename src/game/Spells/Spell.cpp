@@ -3410,10 +3410,16 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
             //    cast(true);
         }
         // execute triggered without cast time explicitly in call point
-        else if (m_timer == 0)
+        else if ((m_timer == 0) &&
+            // Prevent scenario where pet has a periodic aura that
+            // triggers another spell to deal damage to owner,
+            // causing owner to die and pet gets despawned, leading to
+            // deletion of auras on pet and crash when stack unwinds.
+            // An example of this is spell 3584 Volatile Infection.
+            !(triggeredByAura && IsDamageSpell(m_spellInfo) && m_caster->IsCreature()))
             cast(true);
 
-        // else triggered with cast time will execute execute at next tick or later
+        // else triggered with cast time will execute at next tick or later
         // without adding to cast type slot
         // will not show cast bar but will show effects at casting time etc
     }

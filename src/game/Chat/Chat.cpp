@@ -1029,7 +1029,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "spell",          SEC_GAMEMASTER,     true, nullptr,                                         "", spellCommandTable},
         { NODE, "variable",       SEC_DEVELOPPER,     true,  &ChatHandler::HandleVariableCommand,            "", nullptr},
         { NODE, "god",            SEC_GAMEMASTER,     false, &ChatHandler::HandleGodCommand,                 "", nullptr },
-        { NODE, "aura",           SEC_GAMEMASTER,     false, &ChatHandler::HandleAuraCommand,                "", nullptr },
+        { NODE, "aura",           SEC_BASIC_ADMIN,    false, &ChatHandler::HandleAuraCommand,                "", nullptr },
         { NODE, "unaura",         SEC_GAMEMASTER,     false, &ChatHandler::HandleUnAuraCommand,              "", nullptr },
         { NODE, "announce",       SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleAnnounceCommand,            "", nullptr },
         { NODE, "notify",         SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleNotifyCommand,              "", nullptr },

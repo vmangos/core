@@ -65,12 +65,13 @@ enum SpellAttributeInternal
     SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x004,
     SPELL_INTERNAL_POSITIVE                 = 0x008,
     SPELL_INTERNAL_HEAL                     = 0x010,
-    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x020,
-    SPELL_INTERNAL_AOE                      = 0x040,
-    SPELL_INTERNAL_AOE_AURA                 = 0x080,
-    SPELL_INTERNAL_DISMOUNT                 = 0x100,
-    SPELL_INTERNAL_CHARM                    = 0x200,
-    SPELL_INTERNAL_REFLECTABLE              = 0x400,
+    SPELL_INTERNAL_DAMAGE                   = 0x020,
+    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x040,
+    SPELL_INTERNAL_AOE                      = 0x080,
+    SPELL_INTERNAL_AOE_AURA                 = 0x100,
+    SPELL_INTERNAL_DISMOUNT                 = 0x200,
+    SPELL_INTERNAL_CHARM                    = 0x400,
+    SPELL_INTERNAL_REFLECTABLE              = 0x800,
 };
 
 // only used in code
@@ -292,6 +293,11 @@ bool IsPositiveTarget(uint32 targetA, uint32 targetB);
 inline bool IsHealSpell(SpellEntry const *spellProto)
 {
     return spellProto->Internal & SPELL_INTERNAL_HEAL;
+}
+
+inline bool IsDamageSpell(SpellEntry const *spellProto)
+{
+    return spellProto->Internal & SPELL_INTERNAL_DAMAGE;
 }
 
 bool IsExplicitPositiveTarget(uint32 targetA);

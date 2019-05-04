@@ -676,9 +676,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsTappedBy(Player const* player) const;
         bool IsSkinnableBy(Player const* player) const { return !skinningForOthersTimer || IsTappedBy(player); }
 
-        SpellEntry const *ReachWithSpellAttack(Unit *pVictim);
-        SpellEntry const *ReachWithSpellCure(Unit *pVictim);
-
         uint32 m_spells[CREATURE_MAX_SPELLS];
 
         float GetAttackDistance(Unit const* pl) const;

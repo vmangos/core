@@ -4382,32 +4382,32 @@ namespace SpellInternal
         return periodic && !direct;
     }
 
-    bool IsPassiveSpellStackableWithRanks(SpellEntry const* spellProto)
+    bool IsPassiveSpellStackableWithRanks(SpellEntry const* spellInfo)
     {
-        if (!IsPassiveSpell(spellProto))
+        if (!IsPassiveSpell(spellInfo))
             return false;
 
         for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            if (SpellEffects(spellProto->Effect[i]) == SPELL_EFFECT_APPLY_AURA || SpellEffects(spellProto->Effect[i]) == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
+            if (SpellEffects(spellInfo->Effect[i]) == SPELL_EFFECT_APPLY_AURA || SpellEffects(spellInfo->Effect[i]) == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
                 return false;
         }
         return true;
     }
     
-    bool IsHealSpell(SpellEntry const *spellProto)
+    bool IsHealSpell(SpellEntry const *spellInfo)
     {
         // Holy Light/Flash of Light
-        if (spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
+        if (spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
         {
-            if (spellProto->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT2>() ||
-                spellProto->IsFitToFamilyMask<CF_PALADIN_HOLY_LIGHT2>())
+            if (spellInfo->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT2>() ||
+                spellInfo->IsFitToFamilyMask<CF_PALADIN_HOLY_LIGHT2>())
                 return true;
         }
 
         for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            switch (spellProto->Effect[i])
+            switch (spellInfo->Effect[i])
             {
                 case SPELL_EFFECT_HEAL:
                 case SPELL_EFFECT_HEAL_MAX_HEALTH:
@@ -4418,13 +4418,35 @@ namespace SpellInternal
                 case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
                 case SPELL_EFFECT_APPLY_AREA_AURA_PET:
                 {
-                    switch (spellProto->EffectApplyAuraName[i])
+                    switch (spellInfo->EffectApplyAuraName[i])
                     {
                         case SPELL_AURA_PERIODIC_HEAL:
                             return true;
                     }
                     break;
                 }
+            }
+        }
+
+        return false;
+    }
+
+    bool IsDamageSpell(SpellEntry const* spellInfo)
+    {
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            switch (spellInfo->Effect[i])
+            {
+                case SPELL_EFFECT_INSTAKILL:
+                case SPELL_EFFECT_SCHOOL_DAMAGE:
+                case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+                case SPELL_EFFECT_HEALTH_LEECH:
+                case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+                case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+                case SPELL_EFFECT_WEAPON_DAMAGE:
+                case SPELL_EFFECT_POWER_BURN:
+                case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                    return true;
             }
         }
 
@@ -4511,6 +4533,9 @@ void SpellMgr::AssignInternalSpellFlags()
 
             if (SpellInternal::IsHealSpell(pSpellEntry.get()))
                 pSpellEntry->Internal |= SPELL_INTERNAL_HEAL;
+
+            if (SpellInternal::IsDamageSpell(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_DAMAGE;
 
             if (SpellInternal::IsSpellWithCasterSourceTargetsOnly(pSpellEntry.get()))
                 pSpellEntry->Internal |= SPELL_INTERNAL_CASTER_SOURCE_TARGETS;
