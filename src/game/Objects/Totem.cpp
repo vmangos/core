@@ -179,7 +179,7 @@ void Totem::SetTypeBySummonSpell(SpellEntry const * spellProto)
     if (totemSpell)
     {
         // If spell have cast time -> so its active totem
-        if (GetSpellCastTime(totemSpell))
+        if (totemSpell->GetCastTime())
             m_type = TOTEM_ACTIVE;
     }
     if (spellProto->SpellIconID == 2056)
@@ -218,16 +218,16 @@ bool Totem::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex 
             break;
     }
 
-    if (!IsPositiveSpell(spellInfo))
+    if (!spellInfo->IsPositiveSpell())
     {
         // immune to all negative auras
-        if (IsSpellAppliesAura(spellInfo, 1 << index))
+        if (spellInfo->IsSpellAppliesAura(1 << index))
             return true;
     }
     else
     {
         // immune to any type of regeneration auras hp/mana etc.
-        if (IsPeriodicRegenerateEffect(spellInfo, index))
+        if (spellInfo->IsPeriodicRegenerateEffect(index))
             return true;
     }
     return Creature::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);

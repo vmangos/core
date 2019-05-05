@@ -66,7 +66,7 @@ void HostileRefManager::threatAssist(Unit *pVictim, float pThreat, SpellEntry co
     HostileReference* ref = getFirst();
     while (ref)
     {
-        ref->getSource()->addThreat(pVictim, threat, false, (pThreatSpell ? GetSpellSchoolMask(pThreatSpell) : SPELL_SCHOOL_MASK_NORMAL), pThreatSpell, true);
+        ref->getSource()->addThreat(pVictim, threat, false, (pThreatSpell ? pThreatSpell->GetSpellSchoolMask() : SPELL_SCHOOL_MASK_NORMAL), pThreatSpell, true);
 
         ref = ref->next();
     }

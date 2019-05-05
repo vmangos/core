@@ -3396,7 +3396,7 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
 
     // cast talents with SPELL_EFFECT_LEARN_SPELL (other dependent spells will learned later as not auto-learned)
     // note: all spells with SPELL_EFFECT_LEARN_SPELL isn't passive
-    if (talentPos && IsSpellHaveEffect(spellInfo, SPELL_EFFECT_LEARN_SPELL))
+    if (talentPos && spellInfo->HasEffect(SPELL_EFFECT_LEARN_SPELL))
     {
         // ignore stance requirement for talent learn spell (stance set for spell only for client spell description show)
         CastSpell(this, spell_id, true);
@@ -3404,7 +3404,7 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
     // also cast passive (and passive like) spells (including all talents without SPELL_EFFECT_LEARN_SPELL) with additional checks
     else if (IsNeedCastPassiveLikeSpellAtLearn(spellInfo))
         CastSpell(this, spell_id, true);
-    else if (IsSpellHaveEffect(spellInfo, SPELL_EFFECT_SKILL_STEP))
+    else if (spellInfo->HasEffect(SPELL_EFFECT_SKILL_STEP))
     {
         CastSpell(this, spell_id, true);
         return false;
@@ -3435,7 +3435,7 @@ bool Player::IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) cons
 {
     ShapeshiftForm form = GetShapeshiftForm();
 
-    if (IsNeedCastSpellAtFormApply(spellInfo, form))        // SPELL_ATTR_PASSIVE | SPELL_ATTR_UNK7 spells
+    if (spellInfo->IsNeedCastSpellAtFormApply(form))        // SPELL_ATTR_PASSIVE | SPELL_ATTR_UNK7 spells
         return true;                                        // all stance req. cases, not have auarastate cases
 
     if (!(spellInfo->Attributes & SPELL_ATTR_PASSIVE))
@@ -3488,7 +3488,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     // Always try to remove all dependent spells if present (needed to reset some talents properly)
     SpellLearnSpellMapBounds spell_bounds = sSpellMgr.GetSpellLearnSpellMapBounds(spell_id);
     for (SpellLearnSpellMap::const_iterator child_itr = spell_bounds.first; child_itr != spell_bounds.second; ++child_itr)
-        RemoveSpell(child_itr->second.spell, !IsPassiveSpell(child_itr->second.spell), !IsPassiveSpell(child_itr->second.spell));
+        RemoveSpell(child_itr->second.spell, !Spells::IsPassiveSpell(child_itr->second.spell), !Spells::IsPassiveSpell(child_itr->second.spell));
 
     // search again just in case
     itr = m_spells.find(spell_id);
@@ -3506,7 +3506,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
     SpellChainMapNext const& nextMap = sSpellMgr.GetSpellChainNext();
     for (SpellChainMapNext::const_iterator itr2 = nextMap.lower_bound(spell_id); itr2 != nextMap.upper_bound(spell_id); ++itr2)
         if (HasSpell(itr2->second) && !GetTalentSpellPos(itr2->second))
-            RemoveSpell(itr2->second, !IsPassiveSpell(itr2->second), false);
+            RemoveSpell(itr2->second, !Spells::IsPassiveSpell(itr2->second), false);
 
     // re-search, it can be corrupted in prev loop
     itr = m_spells.find(spell_id);
@@ -3633,7 +3633,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
         if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
             continue;
 
-        if ((idSchoolMask & GetSpellSchoolMask(spellInfo)) && GetSpellCooldownDelay(unSpellId) < unTimeMs)
+        if ((idSchoolMask & spellInfo->GetSpellSchoolMask()) && GetSpellCooldownDelay(unSpellId) < unTimeMs)
         {
             data << uint32(unSpellId);
             data << uint32(unTimeMs);                       // in m.secs
@@ -3824,7 +3824,7 @@ bool Player::ResetTalents(bool no_cost)
                         RemoveAurasDueToSpell(pInfos->EffectTriggerSpell[eff]);
 
             if (talentInfo->RankID[j])
-                RemoveSpell(talentInfo->RankID[j], !IsPassiveSpell(talentInfo->RankID[j]), false);
+                RemoveSpell(talentInfo->RankID[j], !Spells::IsPassiveSpell(talentInfo->RankID[j]), false);
         }
     }
 
@@ -5931,7 +5931,7 @@ bool Player::IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Pl
             {
                 if (!player->HasSpell(spellProto->Id))
                     return false;
-                else if (IsPassiveSpell(spellProto))
+                else if (spellProto->IsPassiveSpell())
                     return false;
             }
             break;
@@ -6093,7 +6093,7 @@ void Player::CheckAreaExploreAndOutdoor()
                     if (itr->second.state == PLAYERSPELL_REMOVED)
                         continue;
                     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(itr->first);
-                    if (!spellInfo || !IsNeedCastSpellAtFormApply(spellInfo, GetShapeshiftForm()) ||
+                    if (!spellInfo || !spellInfo->IsNeedCastSpellAtFormApply(GetShapeshiftForm()) ||
                             !(spellInfo->Attributes & SPELL_ATTR_OUTDOORS_ONLY) ||
                             HasAura(spellInfo->Id))
                         continue;
@@ -7067,7 +7067,7 @@ void Player::ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply
     if (apply)
     {
         // Cannot be used in this stance/form
-        if (GetErrorAtShapeshiftedCast(spellInfo, GetShapeshiftForm()) != SPELL_CAST_OK)
+        if (spellInfo->GetErrorAtShapeshiftedCast(GetShapeshiftForm()) != SPELL_CAST_OK)
             return;
 
         if (form_change)                                    // check aura active state from other form
@@ -7101,7 +7101,7 @@ void Player::ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply
         if (form_change)                                    // check aura compatibility
         {
             // Cannot be used in this stance/form
-            if (GetErrorAtShapeshiftedCast(spellInfo, GetShapeshiftForm()) == SPELL_CAST_OK)
+            if (spellInfo->GetErrorAtShapeshiftedCast(GetShapeshiftForm()) == SPELL_CAST_OK)
                 return;                                     // and remove only not compatible at form change
         }
 
@@ -7177,7 +7177,7 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
         }
 
         // not allow proc extra attack spell at extra attack
-        if (GetExtraAttacks() && IsSpellHaveEffect(spellInfo, SPELL_EFFECT_ADD_EXTRA_ATTACKS) )
+        if (GetExtraAttacks() && spellInfo->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS) )
             return;
 
         float chance = (float)spellInfo->procChance;
@@ -7229,7 +7229,7 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
                 uint32 charges = item->GetEnchantmentCharges(EnchantmentSlot(e_slot));
 
                 // PMonsterSay("Casted spell %u with %u charges.", proc_spell_id, charges);
-                if (IsPositiveSpell(spellInfo->Id))
+                if (spellInfo->IsPositiveSpell())
                     CastSpell(this, spellInfo->Id, true, item);
                 else
                     CastSpell(Target, spellInfo->Id, true, item);
@@ -15110,7 +15110,7 @@ void Player::LoadAura(AuraSaveStruct& s, uint32 timediff)
         return;
     }
 
-    if (s.remaintime != -1 && HasRealTimeDuration(spellproto))
+    if (s.remaintime != -1 && spellproto->HasRealTimeDuration())
     {
         if (timediff > (INT_MAX / IN_MILLISECONDS))
             return;
@@ -16199,7 +16199,7 @@ bool Player::SaveAura(SpellAuraHolder* holder, AuraSaveStruct& saveStruct)
 
     //skip all holders from spells that are passive or channeled
     //do not save single target holders (unless they were cast by the player)
-    if (!holder->IsPassive() && !IsChanneledSpell(holder->GetSpellProto()) && (holder->GetCasterGuid() == GetObjectGuid() || !holder->IsSingleTarget()))
+    if (!holder->IsPassive() && !holder->GetSpellProto()->IsChanneledSpell() && (holder->GetCasterGuid() == GetObjectGuid() || !holder->IsSingleTarget()))
     {
         saveStruct.effIndexMask = 0;
 

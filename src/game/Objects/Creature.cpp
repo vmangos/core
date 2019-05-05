@@ -2523,8 +2523,8 @@ bool Creature::MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* 
         }
 
         SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(pSpellInfo->rangeIndex);
-        float max_range = GetSpellMaxRange(srange);
-        float min_range = GetSpellMinRange(srange);
+        float max_range = Spells::GetSpellMaxRange(srange);
+        float min_range = Spells::GetSpellMinRange(srange);
         float dist = GetCombatDistance(pTarget);
 
         return dist < max_range && dist >= min_range;
@@ -3475,23 +3475,23 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         if (pSpellInfo->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, this))
             return SPELL_FAILED_UNIT_NOT_BEHIND;
 
-        if (!IsAreaOfEffectSpell(pSpellInfo))
+        if (!pSpellInfo->IsAreaOfEffectSpell())
         {
             // If the spell requires the target having a specific power type.
-            if (!IsTargetPowerTypeValid(pSpellInfo, pTarget->getPowerType()))
+            if (!pSpellInfo->IsTargetPowerTypeValid(pTarget->getPowerType()))
                 return SPELL_FAILED_UNKNOWN;
 
             // No point in casting if target is immune.
-            if (pTarget->IsImmuneToDamage(GetSpellSchoolMask(pSpellInfo), pSpellInfo))
+            if (pTarget->IsImmuneToDamage(pSpellInfo->GetSpellSchoolMask(), pSpellInfo))
                 return SPELL_FAILED_IMMUNE;
         }
 
         // Mind control abilities can't be used with just 1 attacker or mob will reset.
-        if ((getThreatManager().getThreatList().size() == 1) && IsCharmSpell(pSpellInfo))
+        if ((getThreatManager().getThreatList().size() == 1) && pSpellInfo->IsCharmSpell())
             return SPELL_FAILED_UNKNOWN;
 
         // Do not use dismounting spells when target is not mounted (there are 4 such spells).
-        if (!pTarget->IsMounted() && IsDismountSpell(pSpellInfo))
+        if (!pTarget->IsMounted() && pSpellInfo->IsDismountSpell())
             return SPELL_FAILED_ONLY_MOUNTED;
     }
 
@@ -3639,7 +3639,7 @@ void Creature::ApplyGameEventSpells(GameEventCreatureData const* eventData, bool
 
     if (remove_spell)
         if (SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(remove_spell))
-            if (IsSpellAppliesAura(spellEntry))
+            if (spellEntry->IsSpellAppliesAura())
                 RemoveAurasDueToSpell(remove_spell);
 
     if (cast_spell)

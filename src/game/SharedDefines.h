@@ -917,7 +917,7 @@ enum WeaponAttackType                                       // The different wea
 
 #define MAX_ATTACK  3
 
-enum Targets
+enum SpellTarget
 {
     TARGET_NONE                        = 0,
     TARGET_SELF                        = 1,

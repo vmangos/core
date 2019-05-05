@@ -72,11 +72,11 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
         return CAST_FAIL_OTHER;
 
     // If the spell requires the target having a specific power type
-    if (!IsAreaOfEffectSpell(pSpell) && !IsTargetPowerTypeValid(pSpell, pTarget->getPowerType()))
+    if (!pSpell->IsAreaOfEffectSpell() && !pSpell->IsTargetPowerTypeValid(pTarget->getPowerType()))
         return CAST_FAIL_OTHER;
 
     // Mind control abilities can't be used with just 1 attacker or mob will reset.
-    if ((m_creature->getThreatManager().getThreatList().size() == 1) && IsCharmSpell(pSpell))
+    if ((m_creature->getThreatManager().getThreatList().size() == 1) && pSpell->IsCharmSpell())
         return CAST_FAIL_OTHER;
 
     // If the unit is disarmed and the skill requires a weapon, it cannot be cast

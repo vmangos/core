@@ -1160,8 +1160,8 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             {
                 if (auto pSpellEntry = sSpellMgr.GetSpellEntry(tmp.addAura.spellId))
                 {
-                    if (!IsSpellAppliesAura(pSpellEntry, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
-                        !IsSpellHaveEffect(pSpellEntry, SPELL_EFFECT_PERSISTENT_AREA_AURA))
+                    if (!pSpellEntry->IsSpellAppliesAura((1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
+                        !pSpellEntry->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))
                     {
                         sLog.outErrorDb("Table `%s` has a spell that does not apply any auras (id: %u) in SCRIPT_COMMAND_ADD_AURA for script id %u",
                             tablename, tmp.addAura.spellId, tmp.id);

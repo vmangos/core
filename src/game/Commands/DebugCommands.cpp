@@ -140,7 +140,7 @@ bool ChatHandler::HandleSpellInfosCommand(char *args)
     PSendSysMessage("MaxTargetLevel%u:DmgClass%u:rangeIndex%u", pSpell->MaxTargetLevel, pSpell->DmgClass, pSpell->rangeIndex);
     PSendSysMessage("procChance%u:procFlags0x%x:procCharges%u", pSpell->procChance, pSpell->procFlags, pSpell->procCharges);
     PSendSysMessage("InterruptFlags0x%x:AuraInterruptFlags0x%x:PreventionType%x:spellLevel%u", pSpell->InterruptFlags, pSpell->AuraInterruptFlags, pSpell->PreventionType, pSpell->spellLevel);
-    PSendSysMessage("SpellSpecific%u:Binaire%s:spellPriority%u:Positive%u", GetSpellSpecific(pSpell->Id), pSpell->IsBinary() ? "OUI" : "NON", pSpell->spellPriority, IsPositiveSpell(pSpell->Id));
+    PSendSysMessage("SpellSpecific%u:Binaire%s:spellPriority%u:Positive%u", Spells::GetSpellSpecific(pSpell->Id), pSpell->IsBinary() ? "OUI" : "NON", pSpell->spellPriority, pSpell->IsPositiveSpell());
     PSendSysMessage("RecoveryTime%u:CategoryRecoveryTime%u:PvEHeartBeat%s", pSpell->RecoveryTime, pSpell->CategoryRecoveryTime, pSpell->IsPvEHeartBeat() ? "OUI" : "NON");
     return true;
 }
@@ -234,7 +234,7 @@ bool ChatHandler::HandleDebugSendNextChannelSpellVisualCommand(char *args)
     for (id = uiPlayId + 1; id <= sSpellMgr.GetMaxSpellId(); id++)
     {
         spellInfo = sSpellMgr.GetSpellEntry(id);
-        if (!spellInfo || uiPlayId >= spellInfo->Id || !spellInfo->SpellVisual || !IsChanneledSpell(spellInfo))
+        if (!spellInfo || uiPlayId >= spellInfo->Id || !spellInfo->SpellVisual || !spellInfo->IsChanneledSpell())
             continue;
         else
             break;
@@ -1348,8 +1348,8 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
 
     SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellid);
 
-    float direct_calc = CalculateDefaultCoefficient(spellEntry, SPELL_DIRECT_DAMAGE);
-    float dot_calc = CalculateDefaultCoefficient(spellEntry, DOT);
+    float direct_calc = spellEntry->CalculateDefaultCoefficient(SPELL_DIRECT_DAMAGE);
+    float dot_calc = spellEntry->CalculateDefaultCoefficient(DOT);
 
     bool isDirectHeal = false;
     for (int i = 0; i < 3; ++i)
@@ -1534,7 +1534,7 @@ bool ChatHandler::HandleSendSpellVisualCommand(char *args)
     m_session->GetPlayer()->SendSpellGo(pTarget, uiPlayId);
 
     // Channeled case
-    if (IsChanneledSpell(proto))
+    if (proto->IsChanneledSpell())
     {
         m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, uiPlayId);
         m_session->GetPlayer()->SetChannelObjectGuid(pTarget->GetObjectGuid());

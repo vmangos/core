@@ -135,7 +135,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : uiGlobal
             continue;
         if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE)
             continue;
-        if (IsPositiveSpell(itr->first) && !enablePositiveSpells)
+        if (Spells::IsPositiveSpell(itr->first) && !enablePositiveSpells)
             continue;
         switch (pPlayer->getClass())
         {
@@ -168,7 +168,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : uiGlobal
             SpellEntry const *pCurrSpell_2 = sSpellMgr.GetSpellEntry(*(it2));
             if (pCurrSpell_2->SpellFamilyName == pCurrSpell_1->SpellFamilyName && pCurrSpell_2->SpellIconID == pCurrSpell_1->SpellIconID && pCurrSpell_2->SpellVisual == pCurrSpell_1->SpellVisual) // Meme sort, rangs differents
             {
-                if (CompareAuraRanks(pCurrSpell_1->Id, pCurrSpell_2->Id) < 0) // pCurrSpell_1 < pCurrSpell_2
+                if (Spells::CompareAuraRanks(pCurrSpell_1->Id, pCurrSpell_2->Id) < 0) // pCurrSpell_1 < pCurrSpell_2
                 {
                     // Donc on supprime pCurrSpell_1
                     foundSupRank = true;
@@ -384,9 +384,9 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
                 // If its a positive spell we prioritize controller, if he's out of range,
                 // ourself, otherwise it will probably not be cast.
                 Unit* spellTarget = victim;
-                if (controller && IsPositiveSpell(spellInfo, me, controller))
+                if (controller && spellInfo->IsPositiveSpell(me, controller))
                     spellTarget = controller;
-                else if (IsPositiveSpell(spellInfo, me, me))
+                else if (spellInfo->IsPositiveSpell(me, me))
                     spellTarget = me;
 
                 if (spellInfo)

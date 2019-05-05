@@ -279,8 +279,8 @@ bool ChatHandler::HandleAuraCommand(char* args)
     if (!spellInfo)
         return false;
 
-    if (!IsSpellAppliesAura(spellInfo, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
-        !IsSpellHaveEffect(spellInfo, SPELL_EFFECT_PERSISTENT_AREA_AURA))
+    if (!spellInfo->IsSpellAppliesAura((1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
+        !spellInfo->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))
     {
         PSendSysMessage(LANG_SPELL_NO_HAVE_AURAS, spellID);
         SetSentErrorMessage(true);
@@ -300,7 +300,7 @@ bool ChatHandler::HandleAuraCommand(char* args)
         uint8 eff = spellInfo->Effect[i];
         if (eff >= TOTAL_SPELL_EFFECTS)
             continue;
-        if (IsAreaAuraEffect(eff) ||
+        if (Spells::IsAreaAuraEffect(eff) ||
             eff == SPELL_EFFECT_APPLY_AURA ||
             eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
         {
@@ -1845,8 +1845,8 @@ bool ChatHandler::HandleFearCommand(char* /*args*/)
     if (!spellInfo)
         return false;
 
-    if (!IsSpellAppliesAura(spellInfo, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
-        !IsSpellHaveEffect(spellInfo, SPELL_EFFECT_PERSISTENT_AREA_AURA))
+    if (!spellInfo->IsSpellAppliesAura((1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
+        !spellInfo->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))
     {
         PSendSysMessage(LANG_SPELL_NO_HAVE_AURAS, fearID);
         SetSentErrorMessage(true);
@@ -1860,7 +1860,7 @@ bool ChatHandler::HandleFearCommand(char* /*args*/)
         uint8 eff = spellInfo->Effect[i];
         if (eff >= TOTAL_SPELL_EFFECTS)
             continue;
-        if (IsAreaAuraEffect(eff) ||
+        if (Spells::IsAreaAuraEffect(eff) ||
             eff == SPELL_EFFECT_APPLY_AURA ||
             eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
         {

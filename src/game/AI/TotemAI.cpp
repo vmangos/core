@@ -50,13 +50,13 @@ TotemAI::TotemAI(Creature *pCreature) : CreatureAI(pCreature)
     {
         m_spellId = m_creature->GetCreatureInfo()->spells[0];
         SpellEntry const* totemSpell = sSpellMgr.GetSpellEntry(m_spellId);
-        if (totemSpell && GetSpellCastTime(totemSpell))
+        if (totemSpell && totemSpell->GetCastTime())
             m_totemType = TOTEM_ACTIVE;
         else
         {
             m_totemType = TOTEM_PASSIVE;
 
-            if (totemSpell && IsSpellAppliesAura(totemSpell))
+            if (totemSpell && totemSpell->IsSpellAppliesAura())
                 pCreature->CastSpell(pCreature, totemSpell, true);
         }
             
@@ -76,7 +76,7 @@ void TotemAI::UpdateAI(const uint32 /*diff*/)
         return;
 
     SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
-    float max_range = GetSpellMaxRange(srange);
+    float max_range = Spells::GetSpellMaxRange(srange);
 
     Unit* victim = m_creature->GetMap()->GetUnit(m_victimGuid);
     Unit* owner = m_creature->GetCharmerOrOwner();

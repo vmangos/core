@@ -411,7 +411,7 @@ void ChatHandler::ShowSpellListHelper(Player* target, SpellEntry const* spellInf
     uint32 talentCost = GetTalentSpellCost(id);
 
     bool talent = (talentCost > 0);
-    bool passive = IsPassiveSpell(spellInfo);
+    bool passive = spellInfo->IsPassiveSpell();
     bool active = target && target->HasAura(id);
 
     // unit32 used to prevent interpreting uint8 as char at output
