@@ -4155,7 +4155,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
 
                     MailDraft draft;
                     if (mailTemplateId)
-                        draft.SetMailTemplate(mailTemplateId, false);// items already included
+                        draft.SetMailTemplate(mailTemplateId, false); // items already included
                     else
                         draft.SetSubjectAndBodyId(subject, itemTextId);
 
@@ -12891,7 +12891,7 @@ void Player::RemoveQuestAtSlot(uint32 slot)
     }
 }
 
-void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questGiver, bool announce)
+void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questEnder, bool announce)
 {
     uint32 quest_id = pQuest->GetQuestId();
 
@@ -12904,8 +12904,8 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
     RemoveTimedQuest(quest_id);
 
     if (BattleGround* bg = GetBattleGround())
-        if ((bg->GetTypeID() == BATTLEGROUND_AV) && (questGiver->GetTypeId() == TYPEID_UNIT))
-            ((BattleGroundAV*)bg)->HandleQuestComplete(questGiver->ToUnit(), pQuest->GetQuestId(), this);
+        if ((bg->GetTypeID() == BATTLEGROUND_AV) && (questEnder->GetTypeId() == TYPEID_UNIT))
+            ((BattleGroundAV*)bg)->HandleQuestComplete(questEnder->ToUnit(), pQuest->GetQuestId(), this);
 
     if (pQuest->GetRewChoiceItemsCount() > 0)
     {
@@ -12951,15 +12951,33 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
     if (getLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         GiveXP(XP , NULL);
     else if (int32 money = pQuest->GetRewMoneyMaxLevelAtComplete())
-        LogModifyMoney(money, "QuestMaxLevel", questGiver->GetObjectGuid(), quest_id);
+        LogModifyMoney(money, "QuestMaxLevel", questEnder->GetObjectGuid(), quest_id);
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
-    LogModifyMoney(pQuest->GetRewOrReqMoney(), "Quest", questGiver->GetObjectGuid(), quest_id);
+    LogModifyMoney(pQuest->GetRewOrReqMoney(), "Quest", questEnder->GetObjectGuid(), quest_id);
 
     // Send reward mail
-    if (uint32 mail_template_id = pQuest->GetRewMailTemplateId())
-        MailDraft(mail_template_id).SendMailTo(this, questGiver, MAIL_CHECK_MASK_HAS_BODY, pQuest->GetRewMailDelaySecs());
+    if (int32 mail_template_id = pQuest->GetRewMailTemplateId())
+    {
+        // Send mail by quest giver not ender if id is negative
+        uint32 creatureId = 0;
+        if (mail_template_id < 0)
+        {
+            mail_template_id = -mail_template_id;
+            for (const auto& relation : sObjectMgr.GetCreatureQuestRelationsMap())
+            {
+                if (relation.second == quest_id)
+                {
+                    creatureId = relation.first;
+                    break;
+                }
+            }
+        }
+        
+        MailDraft(mail_template_id).SetMoney(pQuest->GetRewMailMoney()).SendMailTo(this, creatureId ? MailSender(MAIL_CREATURE, creatureId) : questEnder, MAIL_CHECK_MASK_HAS_BODY, pQuest->GetRewMailDelaySecs());
 
+    }
+        
     q_status.m_rewarded = true;
     if (!pQuest->IsRepeatable())
         SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
@@ -12970,22 +12988,22 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
         q_status.uState = QUEST_CHANGED;
 
     if (announce)
-        SendQuestReward(pQuest, XP, questGiver);
+        SendQuestReward(pQuest, XP, questEnder);
 
     bool handled = false;
 
-    switch (questGiver->GetTypeId())
+    switch (questEnder->GetTypeId())
     {
         case TYPEID_UNIT:
-            handled = sScriptMgr.OnQuestRewarded(this, (Creature*)questGiver, pQuest);
+            handled = sScriptMgr.OnQuestRewarded(this, (Creature*)questEnder, pQuest);
             break;
         case TYPEID_GAMEOBJECT:
-            handled = sScriptMgr.OnQuestRewarded(this, (GameObject*)questGiver, pQuest);
+            handled = sScriptMgr.OnQuestRewarded(this, (GameObject*)questEnder, pQuest);
             break;
     }
 
     if (!handled && pQuest->GetQuestCompleteScript() != 0)
-        GetMap()->ScriptsStart(sQuestEndScripts, pQuest->GetQuestCompleteScript(), questGiver, this);
+        GetMap()->ScriptsStart(sQuestEndScripts, pQuest->GetQuestCompleteScript(), questEnder, this);
 
     // Find spell cast on spell reward if any, then find the appropriate caster and cast it
     uint32 spellId = pQuest->GetRewSpellCast() ? pQuest->GetRewSpellCast() : pQuest->GetRewSpell();
@@ -12996,7 +13014,7 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
         {
             Unit* caster = this;
 
-            if (questGiver->GetTypeId() == TYPEID_UNIT)
+            if (questEnder->GetTypeId() == TYPEID_UNIT)
             {
                 for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
                 {
@@ -13005,7 +13023,7 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
                         spellProto->EffectImplicitTargetA[i] == TARGET_UNIT_TARGET_ANY ||
                         spellProto->EffectImplicitTargetA[i] == TARGET_SINGLE_FRIEND)
                     {
-                        caster = (Unit*)questGiver;
+                        caster = (Unit*)questEnder;
                         break;
                     }
                 }

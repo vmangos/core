@@ -4715,8 +4715,8 @@ void ObjectMgr::LoadQuests()
                           "`IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`,"
     //                      119                       120                       121                       122
                           "`OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`,"
-    //                      123            124               125
-                          "`StartScript`, `CompleteScript`, `MaxLevel`"
+    //                      123            124               125         126
+                          "`StartScript`, `CompleteScript`, `MaxLevel`, `RewMailMoney` "
                           " FROM `quest_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `quest_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
     if (!result)
     {
@@ -5229,23 +5229,24 @@ void ObjectMgr::LoadQuests()
         if (qinfo->RewMailTemplateId)
         {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            if (!sMailTemplateStore.LookupEntry(qinfo->RewMailTemplateId))
+            uint32 mailTemplateId = abs(qinfo->RewMailTemplateId);
+            if (!sMailTemplateStore.LookupEntry(mailTemplateId))
             {
                 sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u does not exist, quest will not have a mail reward.",
-                                qinfo->GetQuestId(), qinfo->RewMailTemplateId, qinfo->RewMailTemplateId);
+                                qinfo->GetQuestId(), mailTemplateId, mailTemplateId);
                 qinfo->RewMailTemplateId = 0;               // no mail will send to player
                 qinfo->RewMailDelaySecs = 0;                // no mail will send to player
             }
-            else if (usedMailTemplates.find(qinfo->RewMailTemplateId) != usedMailTemplates.end())
+            else if (usedMailTemplates.find(mailTemplateId) != usedMailTemplates.end())
             {
-                std::map<uint32, uint32>::const_iterator used_mt_itr = usedMailTemplates.find(qinfo->RewMailTemplateId);
+                std::map<uint32, uint32>::const_iterator used_mt_itr = usedMailTemplates.find(mailTemplateId);
                 sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u already used for quest %u, quest will not have a mail reward.",
-                                qinfo->GetQuestId(), qinfo->RewMailTemplateId, qinfo->RewMailTemplateId, used_mt_itr->second);
+                                qinfo->GetQuestId(), mailTemplateId, mailTemplateId, used_mt_itr->second);
                 qinfo->RewMailTemplateId = 0;               // no mail will send to player
                 qinfo->RewMailDelaySecs = 0;                // no mail will send to player
             }
             else
-                usedMailTemplates[qinfo->RewMailTemplateId] = qinfo->GetQuestId();
+                usedMailTemplates[mailTemplateId] = qinfo->GetQuestId();
 #else
             qinfo->RewMailTemplateId = 0;
 #endif
