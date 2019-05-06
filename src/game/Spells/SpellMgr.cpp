@@ -3400,7 +3400,7 @@ namespace SpellInternal
         return false;
     }
 
-    bool IsDamageSpell(SpellEntry const* spellInfo)
+    bool IsDirectDamageSpell(SpellEntry const* spellInfo)
     {
         for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
@@ -3503,8 +3503,8 @@ void SpellMgr::AssignInternalSpellFlags()
             if (SpellInternal::IsHealSpell(pSpellEntry.get()))
                 pSpellEntry->Internal |= SPELL_INTERNAL_HEAL;
 
-            if (SpellInternal::IsDamageSpell(pSpellEntry.get()))
-                pSpellEntry->Internal |= SPELL_INTERNAL_DAMAGE;
+            if (SpellInternal::IsDirectDamageSpell(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_DIRECT_DAMAGE;
 
             if (SpellInternal::IsSpellWithCasterSourceTargetsOnly(pSpellEntry.get()))
                 pSpellEntry->Internal |= SPELL_INTERNAL_CASTER_SOURCE_TARGETS;

@@ -54,7 +54,6 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             else
             {
                 // Well Fed buffs (must be exclusive with Food / Drink replenishment effects, or else Well Fed will cause them to be removed)
-                // SpellIcon 2560 is Spell 46687, does not have this flag
                 if (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_FOOD_BUFF)
                     return SPELL_WELL_FED;
             }

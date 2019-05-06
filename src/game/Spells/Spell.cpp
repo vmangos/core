@@ -3418,7 +3418,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
             // causing owner to die and pet gets despawned, leading to
             // deletion of auras on pet and crash when stack unwinds.
             // An example of this is spell 3584 Volatile Infection.
-            !(triggeredByAura && m_spellInfo->IsDamageSpell() && m_caster->IsCreature()))
+            !(triggeredByAura && m_spellInfo->IsDirectDamageSpell() && m_caster->IsCreature()))
             cast(true);
 
         // else triggered with cast time will execute at next tick or later

@@ -55,7 +55,7 @@ enum SpellAttributeInternal
     SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x004,
     SPELL_INTERNAL_POSITIVE                 = 0x008,
     SPELL_INTERNAL_HEAL                     = 0x010,
-    SPELL_INTERNAL_DAMAGE                   = 0x020,
+    SPELL_INTERNAL_DIRECT_DAMAGE            = 0x020,
     SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x040,
     SPELL_INTERNAL_AOE                      = 0x080,
     SPELL_INTERNAL_AOE_AURA                 = 0x100,
@@ -743,9 +743,9 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_HEAL;
         }
 
-        inline bool IsDamageSpell() const
+        inline bool IsDirectDamageSpell() const
         {
-            return Internal & SPELL_INTERNAL_DAMAGE;
+            return Internal & SPELL_INTERNAL_DIRECT_DAMAGE;
         }
 
         inline bool HasSingleTargetAura() const
