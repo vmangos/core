@@ -4246,11 +4246,6 @@ void Spell::finish(bool ok)
 
     if (!ok && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK)
     {
-        // Nostalrius: unstun du pet si cast de l'invocation interrompu.
-        if (m_caster->GetPetGuid())
-            if (Pet* pet = ((Player*)m_caster)->GetPet())
-                pet->RemoveAurasDueToSpell(29825);
-
         // Fix a client problem with ritual of doom, by itself it disables
         // the spell during cast and then the spell stays disabled
         // Ignore the spell when it's triggered (ritual helper)
