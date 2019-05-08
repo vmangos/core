@@ -109,7 +109,6 @@ public:
 void WorldSession::HandleSendMail(WorldPacket & recv_data)
 {
     ObjectGuid mailboxGuid;
-    
     uint32 unk1, unk2;
     
     recv_data >> mailboxGuid;

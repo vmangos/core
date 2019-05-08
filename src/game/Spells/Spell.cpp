@@ -3344,7 +3344,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         // Roll chance to cast from script (must be after cast checks, this is why its here)
         if (chance)
         {
-            if (roll_chance_u(chance))
+            if (!roll_chance_u(chance))
             {
                 finish(false);
                 return SPELL_FAILED_TRY_AGAIN;
