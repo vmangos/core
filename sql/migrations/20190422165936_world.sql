@@ -12,9 +12,6 @@ INSERT INTO `migrations` VALUES ('20190422165936');
 -- Add missing flags for Andonisus, Reaper of Souls.
 UPDATE `item_template` SET `flags`=229378 WHERE `entry`=22736;
 
--- Add missing flags for Zigris' Footlocker.
-UPDATE `item_template` SET `flags`=`flags`+4 WHERE `entry`=22233;
-
 -- Add missing depracated flag to several items.
 UPDATE `item_template` SET `flags`=`flags`+16 WHERE `entry` IN (2444, 2929, 2932, 3034, 5105, 7725);
 

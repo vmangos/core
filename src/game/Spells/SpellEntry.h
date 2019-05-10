@@ -68,7 +68,8 @@ enum SpellAttributeInternal
 enum SpellCategories
 {
     SPELLCATEGORY_HEALTH_MANA_POTIONS = 4,
-    SPELLCATEGORY_DEVOUR_MAGIC        = 12
+    SPELLCATEGORY_DEVOUR_MAGIC        = 12,
+    SPELLCATEGORY_ENRAGE              = 21,
 };
 
 // Spell clasification

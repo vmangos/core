@@ -5257,20 +5257,8 @@ void Spell::RemoveChanneledAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mo
 
 SpellCastResult Spell::CheckCast(bool strict)
 {
-    // Cheat du joueur ?
     if (m_caster->IsPlayer() && m_caster->ToPlayer()->HasOption(PLAYER_CHEAT_NO_CHECK_CAST))
         return SPELL_CAST_OK;
-
-    //sLog.outString("CheckCast de %u %s%s%s sur %s",
-    //   m_spellInfo->Id, strict ? "[strict]" : "", m_IsTriggeredSpell ? "[triggered]" : "", m_triggeredByAuraSpell ? "[triggeredByAura]" : "", m_targets.getUnitTargetGuid().GetString().c_str());
-
-    // Quel sort peut-on faire lancer a un mob que l'on CM ?
-    if (m_caster->hasUnitState(UNIT_STAT_POSSESSED))
-    {
-        if (m_spellInfo->Category == 21) // Enrager
-            return SPELL_FAILED_NOT_READY;
-    }
-    // Fin Nostalrius
 
     // Prevent casting while sitting unless the spell allows it
     if (!m_IsTriggeredSpell && m_caster->IsSitState() && !(m_spellInfo->Attributes & SPELL_ATTR_CASTABLE_WHILE_SITTING))
@@ -5928,6 +5916,12 @@ SpellCastResult Spell::CheckCast(bool strict)
         castResult = CheckCasterAuras();
         if (castResult != SPELL_CAST_OK)
             return castResult;
+
+        if (m_caster->hasUnitState(UNIT_STAT_POSSESSED))
+        {
+            if (m_spellInfo->Category == 21) // Enrage
+                return SPELL_FAILED_NOT_READY;
+        }
     }
 
     // All spells that require target to be below 20% have this.
