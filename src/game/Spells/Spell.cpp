@@ -7072,7 +7072,7 @@ SpellCastResult Spell::CheckRange(bool strict)
         if (min_range && dist < min_range)
             return SPELL_FAILED_TOO_CLOSE;
         if (m_caster->GetTypeId() == TYPEID_PLAYER &&
-                (m_spellInfo->Custom & SPELL_CUSTOM_FROM_FRONT) && !m_caster->HasInArc(M_PI_F, target))
+                (m_spellInfo->Custom & SPELL_CUSTOM_FACE_TARGET) && !m_caster->HasInArc(M_PI_F, target))
             return SPELL_FAILED_UNIT_NOT_INFRONT;
     }
 

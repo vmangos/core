@@ -3182,7 +3182,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
 
             // On success dispel
             // Devour Magic
-            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->Category == SPELLCATEGORY_DEVOUR_MAGIC)
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->Category == SPELLCATEGORY_HEALING_SPELL)
             {
                 uint32 heal_spell = 0;
                 switch (m_spellInfo->Id)

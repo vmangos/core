@@ -3472,7 +3472,7 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         }
 
         // If the spell requires to be behind the target.
-        if (pSpellInfo->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, this))
+        if (pSpellInfo->Custom & SPELL_CUSTOM_BEHIND_TARGET && pTarget->HasInArc(M_PI_F, this))
             return SPELL_FAILED_UNIT_NOT_BEHIND;
 
         if (!pSpellInfo->IsAreaOfEffectSpell())
