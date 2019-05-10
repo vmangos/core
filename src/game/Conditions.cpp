@@ -513,7 +513,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_IS_PLAYER:
         {
-            return m_value1 ? (target->IsUnit() ? static_cast<Unit const*>(target)->IsCharmerOrOwnerPlayerOrPlayerItself() : nullptr) : target->IsPlayer();
+            return m_value1 ? (target->IsUnit() ? static_cast<Unit const*>(target)->IsCharmerOrOwnerPlayerOrPlayerItself() : false) : target->IsPlayer();
         }
         case CONDITION_OBJECT_IS_SPAWNED:
         {
