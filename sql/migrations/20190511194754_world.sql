@@ -227,6 +227,10 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`
 DELETE FROM `creature` WHERE `id`=11554;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (39107, 11554, 1, 5851, 0, 6819.93, -2086, 623.713, 2.98, 300, 300, 0, 0, 100, 0, 0, 0, 0, 0, 0, 6);
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (39304, 11554, 1, 5851, 0, 3874.76, -1286.59, 220.49, 4.03171, 300, 300, 0, 0, 100, 0, 0, 0, 0, 0, 7, 10);
+-- Gossip menu for Grazle.
+UPDATE `creature_template` SET `gossip_menu_id`=3622 WHERE `entry`=11554;
+INSERT INTO `gossip_menu` VALUES (3622, 4393, 0);
+DELETE FROM `npc_gossip` WHERE `npc_guid`=39107;
 
 /*
  World of Warcraft Client Patch 1.7.0 (2005-09-13)
