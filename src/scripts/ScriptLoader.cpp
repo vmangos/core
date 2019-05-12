@@ -149,7 +149,6 @@ void AddSC_boss_baroness_anastari();
 void AddSC_boss_ramstein_the_gorger();
 void AddSC_boss_timmy_the_cruel();
 void AddSC_boss_postmaster_malown();
-void AddSC_boss_baron_rivendare();
 void AddSC_boss_dathrohan_balnazzar();
 void AddSC_boss_atiesh();
 void AddSC_instance_stratholme();
@@ -410,7 +409,6 @@ void AddScripts()
     AddSC_boss_ramstein_the_gorger();
     AddSC_boss_timmy_the_cruel();
     AddSC_boss_postmaster_malown();
-    AddSC_boss_baron_rivendare();
     AddSC_boss_dathrohan_balnazzar();
     AddSC_boss_atiesh();
     AddSC_instance_stratholme();

@@ -121,7 +121,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/eastern_plaguelands/naxxramas/boss_thaddius.cpp
     eastern_kingdoms/eastern_plaguelands/naxxramas/instance_naxxramas.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_baroness_anastari.cpp
-    eastern_kingdoms/eastern_plaguelands/stratholme/boss_baron_rivendare.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_cannon_master_willey.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_dathrohan_balnazzar.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_magistrate_barthilas.cpp
