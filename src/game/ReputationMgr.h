@@ -71,6 +71,7 @@ class ReputationMgr
         static const int32 Reputation_Bottom = -42000;
 
         static ReputationRank ReputationToRank(int32 standing);
+        static int32 GetRepPointsToRank(ReputationRank rank);
     public:                                                 // accessors
         FactionStateList const& GetStateList() const { return m_factions; }
 

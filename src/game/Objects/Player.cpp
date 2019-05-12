@@ -6338,7 +6338,18 @@ void Player::RewardReputation(Unit *pVictim, float rate)
         donerep1 = int32(donerep1 * rate);
         FactionEntry const *factionEntry1 = sObjectMgr.GetFactionEntry(Rep->repfaction1);
         uint32 current_reputation_rank1 = GetReputationMgr().GetRank(factionEntry1);
+
+        // World of Warcraft Client Patch 1.9.0 (2006-01-03)
+        // - Reputation caps for killing monsters now happen at the end of a 
+        //   level, rather than in the middle of it. For example : if reputation
+        //   gains for killing a monster were previously capped at the middle of
+        //   the range for Friendly on a monster, then they are now capped at the
+        //   end of Friendly.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         if (factionEntry1 && current_reputation_rank1 <= Rep->reputation_max_cap1)
+#else
+        if (factionEntry1 && (GetReputationMgr().GetReputation(factionEntry1) < (ReputationMgr::GetRepPointsToRank(ReputationRank(Rep->reputation_max_cap1)) + (ReputationMgr::PointsInRank[Rep->reputation_max_cap1] / 2))))
+#endif
             GetReputationMgr().ModifyReputation(factionEntry1, donerep1);
 
         // Wiki: Team factions value divided by 2
@@ -6356,7 +6367,12 @@ void Player::RewardReputation(Unit *pVictim, float rate)
         donerep2 = int32(donerep2 * rate);
         FactionEntry const *factionEntry2 = sObjectMgr.GetFactionEntry(Rep->repfaction2);
         uint32 current_reputation_rank2 = GetReputationMgr().GetRank(factionEntry2);
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         if (factionEntry2 && current_reputation_rank2 <= Rep->reputation_max_cap2)
+#else
+        if (factionEntry2 && (GetReputationMgr().GetReputation(factionEntry2) < (ReputationMgr::GetRepPointsToRank(ReputationRank(Rep->reputation_max_cap2)) + (ReputationMgr::PointsInRank[Rep->reputation_max_cap2] / 2))))
+#endif
             GetReputationMgr().ModifyReputation(factionEntry2, donerep2);
 
         // Wiki: Team factions value divided by 2
