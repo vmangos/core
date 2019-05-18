@@ -1740,9 +1740,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetWeaponDamageSchool(WeaponAttackType attType, SpellSchools school, uint8 index = 0) { m_weaponDamage[attType][index].school = school; }
         uint8 GetWeaponDamageCount(WeaponAttackType attType) const { return m_weaponDamageCount[attType]; }
 
-        void SetInFront(Unit const* target);
+        void SetInFront(Unit const* pTarget);
         void SetFacingTo(float ori);
         void SetFacingToObject(WorldObject* pObject);
+        bool IsBehindTarget(Unit const* pTarget) const;
 
         // Visibility system
         UnitVisibility GetVisibility() const { return m_Visibility; }

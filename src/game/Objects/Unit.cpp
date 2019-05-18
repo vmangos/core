@@ -3819,10 +3819,10 @@ Spell* Unit::FindCurrentSpellBySpellId(uint32 spell_id) const
     return nullptr;
 }
 
-void Unit::SetInFront(Unit const* target)
+void Unit::SetInFront(Unit const* pTarget)
 {
     if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE))
-        SetOrientation(GetAngle(target));
+        SetOrientation(GetAngle(pTarget));
 }
 
 void Unit::SetFacingTo(float ori)
@@ -3842,6 +3842,20 @@ void Unit::SetFacingToObject(WorldObject* pObject)
 
     // TODO: figure out under what conditions creature will move towards object instead of facing it where it currently is.
     SetFacingTo(GetAngle(pObject));
+}
+
+bool Unit::IsBehindTarget(Unit const* pTarget) const
+{
+    if (Creature const* pCreature = pTarget->ToCreature())
+    {
+        // Mobs always face their currect victim, unless incapacitated.
+        if (!pCreature->m_castingTargetGuid && (pCreature->getVictim() == this) &&
+            !pTarget->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE | UNIT_FLAG_STUNNED | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED) &&
+            !pTarget->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+            return false;
+    }
+
+    return !pTarget->HasInArc(M_PI_F, this);
 }
 
 bool Unit::isInAccessablePlaceFor(Creature const* c) const

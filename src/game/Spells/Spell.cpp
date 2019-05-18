@@ -5625,7 +5625,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_TARGET_AURASTATE;
 
         //Must be behind the target.
-        if (m_spellInfo->IsFromBehindOnlySpell() && target->HasInArc(M_PI_F, m_caster))
+        if (m_spellInfo->IsFromBehindOnlySpell() && !m_caster->IsBehindTarget(target))
         {
             SendInterrupted(2);
             return SPELL_FAILED_NOT_BEHIND;

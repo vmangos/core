@@ -35,7 +35,6 @@ class SpellEntry;
 enum SpellAttributeCustom
 {
     SPELL_CUSTOM_NONE                       = 0x000,
-
     SPELL_CUSTOM_ALLOW_STACK_BETWEEN_CASTER = 0x001,     // For example 'Siphon Soul' must be able to stack between the warlocks on a mob
     SPELL_CUSTOM_NEGATIVE                   = 0x002,
     SPELL_CUSTOM_POSITIVE                   = 0x004,
