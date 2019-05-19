@@ -4774,6 +4774,27 @@ bool ChatHandler::HandlePetDeleteCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandlePetLoyaltyCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Pet* pet = GetSelectedPet();
+    if (!pet)
+        return false;
+
+    if (pet->getPetType() != HUNTER_PET)
+        return false;
+
+    int32 loyaltyPoints;
+    if (!ExtractOptInt32(&args, loyaltyPoints, 1))
+        return false;
+
+    pet->ModifyLoyalty(loyaltyPoints);
+    
+    return true;
+}
+
 bool ChatHandler::HandleChannelJoinCommand(char* c)
 {
     WorldPacket pkt(CMSG_JOIN_CHANNEL, 4);

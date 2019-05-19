@@ -575,6 +575,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, "list",           SEC_GAMEMASTER,     true,  &ChatHandler::HandlePetListCommand,              "", nullptr },
         { MSTR, "rename",         SEC_GAMEMASTER,     true,  &ChatHandler::HandlePetRenameCommand,            "", nullptr },
         { MSTR, "delete",         SEC_GAMEMASTER,     true,  &ChatHandler::HandlePetDeleteCommand,            "", nullptr },
+        { MSTR, "loyalty",        SEC_GAMEMASTER,     false, &ChatHandler::HandlePetLoyaltyCommand,           "", nullptr },
         { MSTR, nullptr,          0,                  false, nullptr,                                         "", nullptr }
     };
 
@@ -2249,7 +2250,7 @@ void ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg msgtype, char const
     data << uint8(chatTag);
 }
 
-Player * ChatHandler::GetSelectedPlayer()
+Player * ChatHandler::GetSelectedPlayer() const
 {
     if (!m_session)
         return nullptr;
@@ -2262,7 +2263,7 @@ Player * ChatHandler::GetSelectedPlayer()
     return sObjectMgr.GetPlayer(guid);
 }
 
-Unit* ChatHandler::GetSelectedUnit()
+Unit* ChatHandler::GetSelectedUnit() const
 {
     if (!m_session)
         return nullptr;
@@ -2276,12 +2277,20 @@ Unit* ChatHandler::GetSelectedUnit()
     return ObjectAccessor::GetUnit(*m_session->GetPlayer(), guid);
 }
 
-Creature* ChatHandler::GetSelectedCreature()
+Creature* ChatHandler::GetSelectedCreature() const
 {
     if (!m_session)
         return nullptr;
 
     return m_session->GetPlayer()->GetMap()->GetAnyTypeCreature(m_session->GetPlayer()->GetSelectionGuid());
+}
+
+Pet* ChatHandler::GetSelectedPet() const
+{
+    if (!m_session)
+        return nullptr;
+
+    return m_session->GetPlayer()->GetMap()->GetPet(m_session->GetPlayer()->GetSelectionGuid());
 }
 
 /**

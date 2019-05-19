@@ -43,6 +43,7 @@ class GameObject;
 class Creature;
 class Player;
 class Unit;
+class Pet;
 class GmTicket;
 struct ItemPrototype;
 
@@ -654,6 +655,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandlePetListCommand(char* args);
         bool HandlePetRenameCommand(char* args);
         bool HandlePetDeleteCommand(char* args);
+        bool HandlePetLoyaltyCommand(char* args);
 
         bool HandleReloadAllCommand(char* args);
         bool HandleReloadAllAreaCommand(char* args);
@@ -891,9 +893,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSaveAllCommand(char* args);
         bool HandleDebugMoveCommand(char* args);
 
-        Player*   GetSelectedPlayer();
-        Creature* GetSelectedCreature();
-        Unit*     GetSelectedUnit();
+        Player*   GetSelectedPlayer() const;
+        Creature* GetSelectedCreature() const;
+        Unit*     GetSelectedUnit() const;
+        Pet*      GetSelectedPet() const;
 
         // extraction different type params from args string, all functions update (char** args) to first unparsed tail symbol at return
         void  SkipWhiteSpaces(char** args);
