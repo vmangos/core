@@ -45,7 +45,7 @@ enum EventAI_Type
     EVENT_T_KILL                    = 5,                    // RepeatMin, RepeatMax, PlayerOnly
     EVENT_T_DEATH                   = 6,                    // NONE
     EVENT_T_EVADE                   = 7,                    // NONE
-    EVENT_T_SPELLHIT                = 8,                    // SpellID, School, RepeatMin, RepeatMax
+    EVENT_T_HIT_BY_SPELL            = 8,                    // SpellID, School, RepeatMin, RepeatMax
     EVENT_T_RANGE                   = 9,                    // MinDist, MaxDist, RepeatMin, RepeatMax
     EVENT_T_OOC_LOS                 = 10,                   // NoHostile, MaxRnage, RepeatMin, RepeatMax
     EVENT_T_SPAWNED                 = 11,                   // NONE
@@ -71,6 +71,7 @@ enum EventAI_Type
     EVENT_T_MAP_SCRIPT_EVENT        = 31,                   // Param1 = EventID, Param2 = Data
     EVENT_T_GROUP_MEMBER_DIED       = 32,                   // Param1 = CreatureId, Param2 = IsLeader
     EVENT_T_VICTIM_ROOTED           = 33,                   // RepeatMin, RepeatMax
+    EVENT_T_HIT_BY_AURA             = 34,                   // AuraType, Unused, RepeatMin, RepeatMax
 
     EVENT_T_END,
 };
@@ -133,14 +134,14 @@ struct CreatureEventAI_Event
             uint32 repeatMax;
             uint32 playerOnly;
         } kill;
-        // EVENT_T_SPELLHIT                                 = 8
+        // EVENT_T_HIT_BY_SPELL                             = 8
         struct
         {
             uint32 spellId;
             uint32 schoolMask;                              // -1 (==0xffffffff) is ok value for full mask, or must be more limited mask like (0 < 1) = 1 for normal/physical school
             uint32 repeatMin;
             uint32 repeatMax;
-        } spell_hit;
+        } hit_by_spell;
         // EVENT_T_RANGE                                    = 9
         struct
         {
@@ -244,6 +245,14 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } victim_rooted;
+        // EVENT_T_HIT_BY_AURA                              = 33
+        struct
+        {
+            uint32 auraType;
+            uint32 unused;
+            uint32 repeatMin;
+            uint32 repeatMax;
+        } hit_by_aura;
         // RAW
         struct
         {

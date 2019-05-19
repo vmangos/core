@@ -745,14 +745,6 @@ class SpellEntry
             return !!(SpellFamilyFlags & BitMask<uint64, Args...>::value);
         }
 
-        bool IsAuraAddedBySpell(uint32 auraType) const
-        {
-            for (int i = 0; i < 3; i++)
-                if (EffectApplyAuraName[i] == auraType)
-                    return true;
-            return false;
-        }
-
         uint32 GetAllSpellMechanicMask() const
         {
             uint32 mask = 0;

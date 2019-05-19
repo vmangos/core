@@ -772,16 +772,16 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
                 // Before 1.11 the calculation whether to break fear used base spell damage.
                 // Calling it from spell class for direct spell damage in this case.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-                if (!spellProto || !spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR))
+                if (!spellProto || !spellProto->HasAura(SPELL_AURA_MOD_FEAR))
 #else
-                if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR)))
+                if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->HasAura(SPELL_AURA_MOD_FEAR)))
 #endif
                 {
                     if (!(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsWorldBoss()))
                         pVictim->RemoveFearEffectsByDamageTaken(cleanDamage->absorb, spellProto ? spellProto->Id : 0, damagetype);
                 }
 
-                if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_ROOT)))
+                if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || spellProto->HasAura(SPELL_AURA_MOD_ROOT)))
                     pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, cleanDamage->absorb);
 
                 pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0);
@@ -802,9 +802,9 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     // Before 1.11 the calculation whether to break fear used base spell damage.
     // Calling it from spell class for direct spell damage in this case.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    if (!spellProto || !spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR))
+    if (!spellProto || !spellProto->HasAura(SPELL_AURA_MOD_FEAR))
 #else
-    if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR)))
+    if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->HasAura(SPELL_AURA_MOD_FEAR)))
 #endif
     {
         if (!(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsWorldBoss()))
@@ -812,7 +812,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     }
 
     // root type spells do not dispel the root effect
-    if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_ROOT)))
+    if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || spellProto->HasAura(SPELL_AURA_MOD_ROOT)))
         pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, damage);
 
     // no xp,health if type 8 /critters/
@@ -870,7 +870,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     }
     //Get in CombatState
     if ((pVictim != this) && (damagetype != DOT || (spellProto && !spellProto->IsSpellAppliesPeriodicAura())) &&
-       (!spellProto || !spellProto->IsAuraAddedBySpell(SPELL_AURA_DAMAGE_SHIELD)))
+       (!spellProto || !spellProto->HasAura(SPELL_AURA_DAMAGE_SHIELD)))
     {
         SetInCombatWithVictim(pVictim);
         pVictim->SetInCombatWithAggressor(this);

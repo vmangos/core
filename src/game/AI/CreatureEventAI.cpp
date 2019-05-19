@@ -197,11 +197,11 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         case EVENT_T_EVADE:
         case EVENT_T_LEAVE_COMBAT:
             break;
-        case EVENT_T_SPELLHIT:
+        case EVENT_T_HIT_BY_SPELL:
             //Spell hit is special case, param1 and param2 handled within CreatureEventAI::SpellHit
 
             //Repeat Timers
-            pHolder.UpdateRepeatTimer(m_creature, event.spell_hit.repeatMin, event.spell_hit.repeatMax);
+            pHolder.UpdateRepeatTimer(m_creature, event.hit_by_spell.repeatMin, event.hit_by_spell.repeatMax);
             break;
         case EVENT_T_RANGE:
             //Repeat Timers
@@ -375,6 +375,10 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             pHolder.UpdateRepeatTimer(m_creature, event.victim_rooted.repeatMin, event.victim_rooted.repeatMax);
             break;
         }
+        case EVENT_T_HIT_BY_AURA:
+            //Repeat Timers
+            pHolder.UpdateRepeatTimer(m_creature, event.hit_by_aura.repeatMin, event.hit_by_aura.repeatMax);
+            break;
         default:
             sLog.outErrorDb("CreatureEventAI: Creature %u using Event %u has invalid Event Type(%u), missing from ProcessEvent() Switch.", m_creature->GetEntry(), pHolder.Event.event_id, pHolder.Event.event_type);
             break;
@@ -721,11 +725,25 @@ void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
         return;
 
     for (auto& i : m_CreatureEventAIList)
-        if (i.Event.event_type == EVENT_T_SPELLHIT)
-            //If spell id matches (or no spell id) & if spell school matches (or no spell school)
-            if (!i.Event.spell_hit.spellId || pSpell->Id == i.Event.spell_hit.spellId)
-                if (GetSchoolMask(pSpell->School) & i.Event.spell_hit.schoolMask)
+    {
+        switch (i.Event.event_type)
+        {
+            case EVENT_T_HIT_BY_SPELL:
+            {
+                //If spell id matches (or no spell id) & if spell school matches (or no spell school)
+                if (!i.Event.hit_by_spell.spellId || pSpell->Id == i.Event.hit_by_spell.spellId)
+                    if (GetSchoolMask(pSpell->School) & i.Event.hit_by_spell.schoolMask)
+                        ProcessEvent(i, pUnit);
+                break;
+            }
+            case EVENT_T_HIT_BY_AURA:
+            {
+                if (!i.Event.hit_by_aura.auraType || pSpell->HasAura(AuraType(i.Event.hit_by_aura.auraType)))
                     ProcessEvent(i, pUnit);
+                break;
+            }
+        }
+    }     
 }
 
 void CreatureEventAI::MovementInform(uint32 type, uint32 id)
