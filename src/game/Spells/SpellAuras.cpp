@@ -5360,7 +5360,7 @@ void Aura::HandleSpiritOfRedemption(bool apply, bool Real)
             ((Player*)target)->StopMirrorTimers();
 
             // set stand state (expected in this form)
-            if (!target->IsStandState())
+            if (!target->IsStandingUp())
                 target->SetStandState(UNIT_STAND_STATE_STAND);
         }
 
@@ -6321,7 +6321,7 @@ void SpellAuraHolder::_AddSpellAuraHolder()
     // TODO: Make it easer
     //*****************************************************
     // Sitdown on apply aura req seated
-    if (m_spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED && !m_target->IsSitState())
+    if (m_spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED && !m_target->IsSittingDown())
         m_target->SetStandState(UNIT_STAND_STATE_SIT);
 
     // register aura diminishing on apply

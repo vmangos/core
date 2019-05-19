@@ -34,7 +34,7 @@ void
 DistractMovementGenerator::Initialize(Unit& owner)
 {
     // Distracted creatures stand up if not standing
-    if (!owner.IsStandState())
+    if (!owner.IsStandingUp())
         owner.SetStandState(UNIT_STAND_STATE_STAND);
 
     owner.addUnitState(UNIT_STAT_DISTRACTED);

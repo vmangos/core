@@ -502,7 +502,10 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket & recv_data)
     uint32 animstate;
     recv_data >> animstate;
 
-    _player->SetStandState(animstate);
+    // Delay stand state changes to recreate the retail trick which let
+    // things like Reckoning proc while sitting if you spam the X button.
+    if (animstate < MAX_UNIT_STAND_STATE)
+        _player->ScheduleStandStateChange(animstate);
 }
 
 void WorldSession::HandleFriendListOpcode(WorldPacket & recv_data)

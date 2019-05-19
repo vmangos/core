@@ -749,7 +749,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         if (pVictim != this)
             RemoveNonPassiveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
 
-        if (pVictim->GetTypeId() == TYPEID_PLAYER && !pVictim->IsMounted() && !pVictim->IsStandState())
+        if (pVictim->GetTypeId() == TYPEID_PLAYER && !pVictim->IsMounted() && !pVictim->IsStandingUp())
             pVictim->SetStandState(UNIT_STAND_STATE_STAND);
     }
 
@@ -2606,7 +2606,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
     }
 
     // always crit against a sitting target (except 0 crit chance)
-    if (pVictim->GetTypeId() == TYPEID_PLAYER && crit_chance > 0 && !pVictim->IsStandState())
+    if (pVictim->GetTypeId() == TYPEID_PLAYER && crit_chance > 0 && !pVictim->IsStandingUp())
     {
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRIT (sitting victim)");
         return MELEE_HIT_CRIT;
@@ -2882,7 +2882,7 @@ bool Unit::IsSpellBlocked(Unit *pCaster, SpellEntry const *spellEntry, WeaponAtt
 // Crit or block - determined on damage calculation phase! (and can be both in some time)
 float Unit::MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const *spell, Spell* spellPtr)
 {
-    if (!pVictim || !pVictim->IsStandState())
+    if (!pVictim || !pVictim->IsStandingUp())
         return 0.0f;
 
     // Calculate hit chance (more correct for chance mod)
@@ -3300,7 +3300,7 @@ bool Unit::IsEffectResist(SpellEntry const* spell, int eff)
 
 float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) const
 {
-    if (!pVictim || !pVictim->IsStandState())
+    if (!pVictim || !pVictim->IsStandingUp())
         return 0.0f;
 
     // Base misschance 5%
@@ -5412,7 +5412,17 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
     if (pVictim && pVictim->isAlive() && procVictim)
+
+        // http://blue.cardplace.com/cache/wow-paladin/1069149.htm
+        // "Charges will not generate off auto attacks or npc attacks by trying"
+        // "to sit down and force a crit. However, ability crits from physical"
+        // "abilities such as Sinister Strike, Hamstring, Auto-shot, Aimed shot,"
+        // "etc will generate a charge if you're sitting."
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        pVictim->ProcDamageAndSpellFor(true, this, procVictim, !procSpell && !pVictim->IsStandingUp() ? procExtra & ~PROC_EX_CRITICAL_HIT : procExtra, attType, procSpell, amount, procTriggered, spell);
+#else
         pVictim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procTriggered, spell);
+#endif
 
     HandleTriggers(pVictim, procExtra, amount, procSpell, procTriggered);
 }
@@ -6852,8 +6862,7 @@ bool Unit::IsSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
             case SPELL_DAMAGE_CLASS_MELEE:
             case SPELL_DAMAGE_CLASS_RANGED:
             {
-                // Joueurs assis = critique obligatoire.
-                if (pVictim->GetTypeId() == TYPEID_PLAYER && pVictim->IsSitState())
+                if (pVictim->GetTypeId() == TYPEID_PLAYER && !pVictim->IsStandingUp())
                     return true;
                 crit_chance = GetUnitCriticalChance(attackType, pVictim);
                 crit_chance += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL, schoolMask);
@@ -10127,19 +10136,25 @@ void Unit::SetFeignDeath(bool apply, ObjectGuid casterGuid, bool success)
     }
 }
 
-bool Unit::IsSitState() const
+bool Unit::IsSittingDown() const
 {
-    uint8 s = getStandState();
-    return
-        s == UNIT_STAND_STATE_SIT_CHAIR        || s == UNIT_STAND_STATE_SIT_LOW_CHAIR  ||
-        s == UNIT_STAND_STATE_SIT_MEDIUM_CHAIR || s == UNIT_STAND_STATE_SIT_HIGH_CHAIR ||
-        s == UNIT_STAND_STATE_SIT;
+    switch (getStandState())
+    {
+        case UNIT_STAND_STATE_SIT:
+        case UNIT_STAND_STATE_SIT_CHAIR:
+        case UNIT_STAND_STATE_SIT_LOW_CHAIR:
+        case UNIT_STAND_STATE_SIT_MEDIUM_CHAIR:
+        case UNIT_STAND_STATE_SIT_HIGH_CHAIR:
+            return true;
+    }
+
+    return false;
 }
 
-bool Unit::IsStandState() const
+bool Unit::IsStandingUp() const
 {
     uint8 s = getStandState();
-    return !IsSitState() && s != UNIT_STAND_STATE_SLEEP && s != UNIT_STAND_STATE_KNEEL;
+    return (s == UNIT_STAND_STATE_STAND) || (s == UNIT_STAND_STATE_DEAD);
 }
 
 void Unit::SetStandState(uint8 state)
@@ -10149,7 +10164,7 @@ void Unit::SetStandState(uint8 state)
 
     SetByteValue(UNIT_FIELD_BYTES_1, 0, state);
 
-    if (IsStandState())
+    if (IsStandingUp())
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_NOT_SEATED);
 
     if (GetTypeId() == TYPEID_PLAYER)
@@ -10157,6 +10172,7 @@ void Unit::SetStandState(uint8 state)
         WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
         data << (uint8)state;
         ((Player*)this)->GetSession()->SendPacket(&data);
+        ((Player*)this)->ClearScheduledStandState();
     }
 }
 

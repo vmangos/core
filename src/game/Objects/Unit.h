@@ -1320,8 +1320,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         }
 
         uint8 getStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
-        bool IsSitState() const;
-        bool IsStandState() const;
+        bool IsSittingDown() const;
+        virtual bool IsStandingUp() const;
         void SetStandState(uint8 state);
 
         bool IsMounted() const { return (GetMountID() != 0); }

@@ -1483,7 +1483,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->RemoveAurasAtMechanicImmunity(1 << (MECHANIC_BANDAGE - 1), 0);
                     unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
 
-                    if (!unitTarget->IsStandState())
+                    if (!unitTarget->IsStandingUp())
                         unitTarget->SetStandState(UNIT_STAND_STATE_STAND);
 
                     return;
