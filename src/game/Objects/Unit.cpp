@@ -10217,8 +10217,15 @@ void Unit::UpdateModelData()
         SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / displayEntry->scale) * modelInfo->bounding_radius);
 
         // never actually update combat_reach for player, it's always the same. Below player case is for initialization
-        if (GetTypeId() == TYPEID_PLAYER)
-            SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
+        if (IsPlayer())
+        {
+            // Taurens have increased combat reach. Confirmed by Blizzard.
+            // https://us.forums.blizzard.com/en/wow/t/wow-classic-not-a-bug-list/175887
+            if (getRace() == RACE_TAUREN)
+                SetFloatValue(UNIT_FIELD_COMBATREACH, 4.05f);
+            else
+                SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
+        }
         else
             SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / displayEntry->scale) * modelInfo->combat_reach);
 
