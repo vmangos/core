@@ -2072,7 +2072,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
     public:
         void ScheduleStandStateChange(uint8 state);
         void ClearScheduledStandState() { m_newStandState = MAX_UNIT_STAND_STATE; m_standStateTimer = 0; }
-        bool IsStandingUp() const override;
+        bool IsStandingUpForProc() const override;
         void Mount(uint32 mount, uint32 spellId = 0) override;
         void Unmount(bool from_aura = false) override;
 

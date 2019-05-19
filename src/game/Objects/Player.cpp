@@ -17763,12 +17763,12 @@ void Player::SendDismountResult(PlayerDismountResult result) const
     GetSession()->SendPacket(&data);
 }
 
-bool Player::IsStandingUp() const
+bool Player::IsStandingUpForProc() const
 {
     if (m_newStandState < MAX_UNIT_STAND_STATE)
         return m_newStandState == UNIT_STAND_STATE_STAND;
 
-    return Unit::IsStandingUp();
+    return Unit::IsStandingUpForProc();
 }
 
 void Player::ScheduleStandStateChange(uint8 state)

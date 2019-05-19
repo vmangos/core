@@ -5419,7 +5419,7 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
         // "abilities such as Sinister Strike, Hamstring, Auto-shot, Aimed shot,"
         // "etc will generate a charge if you're sitting."
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-        pVictim->ProcDamageAndSpellFor(true, this, procVictim, !procSpell && !pVictim->IsStandingUp() ? procExtra & ~PROC_EX_CRITICAL_HIT : procExtra, attType, procSpell, amount, procTriggered, spell);
+        pVictim->ProcDamageAndSpellFor(true, this, procVictim, !procSpell && !pVictim->IsStandingUpForProc() ? procExtra & ~PROC_EX_CRITICAL_HIT : procExtra, attType, procSpell, amount, procTriggered, spell);
 #else
         pVictim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procTriggered, spell);
 #endif
@@ -10155,6 +10155,11 @@ bool Unit::IsStandingUp() const
 {
     uint8 s = getStandState();
     return (s == UNIT_STAND_STATE_STAND) || (s == UNIT_STAND_STATE_DEAD);
+}
+
+bool Unit::IsStandingUpForProc() const
+{
+    return IsStandingUp();
 }
 
 void Unit::SetStandState(uint8 state)
