@@ -5482,6 +5482,16 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_LOWLEVEL;
                 }
 
+                if (m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && m_spellInfo->IsFitToFamilyMask<CF_MAGE_POLYMORPH>())
+                {
+                    // Mob tapped by another player or group.
+                    if (Player* pCaster = m_caster->ToPlayer())
+                        if (Creature* pCreature = target->ToCreature())
+                            if (pCreature->GetLootGroupRecipientId() || pCreature->GetLootRecipientGuid())
+                                if (!pCreature->IsTappedBy(pCaster))
+                                    return SPELL_FAILED_CANT_CAST_ON_TAPPED;
+                }
+
                 if (strict && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER && !m_spellInfo->IsAreaOfEffectSpell())
                     return SPELL_FAILED_BAD_TARGETS;
             }
@@ -6608,11 +6618,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i), m_targets.getUnitTarget()))
                     return SPELL_FAILED_HIGHLEVEL;
 
-                // Mob tapped par un autre groupe.
-                if (Player* caster = m_caster->ToPlayer())
-                    if (Creature* crea = m_targets.getUnitTarget()->ToCreature())
-                        if (crea->GetLootGroupRecipientId() || crea->GetLootRecipientGuid())
-                            if (!crea->IsTappedBy(caster))
+                // Mob tapped by another player or group.
+                if (Player* pCaster = m_caster->ToPlayer())
+                    if (Creature* pCreature = m_targets.getUnitTarget()->ToCreature())
+                        if (pCreature->GetLootGroupRecipientId() || pCreature->GetLootRecipientGuid())
+                            if (!pCreature->IsTappedBy(pCaster))
                                 return SPELL_FAILED_CANT_CAST_ON_TAPPED;
                 break;
             }
