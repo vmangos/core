@@ -1126,7 +1126,7 @@ void WorldSession::ProcessAnticheatAction(const char* detector, const char* reas
         action = "Muted from pub chans.";
         if (GetSecurity() == SEC_PLAYER)
         {
-            LoginDatabase.PExecute("UPDATE account SET flags = flags | 0x%x WHERE id = %u", GetAccountId(), ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS);
+            LoginDatabase.PExecute("UPDATE account SET flags = flags | 0x%x WHERE id = %u", ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS, GetAccountId());
             SetAccountFlags(GetAccountFlags() | ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS);
         }
     }
