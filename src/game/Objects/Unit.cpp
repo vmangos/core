@@ -3844,15 +3844,18 @@ void Unit::SetFacingToObject(WorldObject* pObject)
     SetFacingTo(GetAngle(pObject));
 }
 
-bool Unit::IsBehindTarget(Unit const* pTarget) const
+bool Unit::IsBehindTarget(Unit const* pTarget, bool strict) const
 {
-    if (Creature const* pCreature = pTarget->ToCreature())
+    if (strict)
     {
-        // Mobs always face their currect victim, unless incapacitated.
-        if (!pCreature->m_castingTargetGuid && (pCreature->getVictim() == this) &&
-            !pTarget->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE | UNIT_FLAG_STUNNED | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED) &&
-            !pTarget->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-            return false;
+        if (Creature const* pCreature = pTarget->ToCreature())
+        {
+            // Mobs always face their currect victim, unless incapacitated.
+            if (!pCreature->m_castingTargetGuid && (pCreature->getVictim() == this) &&
+                !pTarget->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE | UNIT_FLAG_STUNNED | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED) &&
+                !pTarget->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+                return false;
+        }
     }
 
     return !pTarget->HasInArc(M_PI_F, this);
