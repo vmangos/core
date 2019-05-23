@@ -400,6 +400,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     ObjectGuid moverGuid = _player->GetMover()->GetObjectGuid();
     if (guid != moverGuid && guid != _clientMoverGuid)
         return;
+
     if (!VerifyMovementInfo(movementInfo))
         return;
 
@@ -444,33 +445,21 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     // Daemon TODO: enregistrement de cette position ?
     // Daemon: mise a jour de la vitesse pour les joueurs a cote.
     // Cf Unit::SetSpeedRate pour plus d'infos.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][3] =
+    const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE] =
     {
-        {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE,       SMSG_SPLINE_SET_WALK_SPEED},
-        {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE,        SMSG_SPLINE_SET_RUN_SPEED},
-        {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE,   SMSG_SPLINE_SET_RUN_BACK_SPEED},
-        {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE,       SMSG_SPLINE_SET_SWIM_SPEED},
-        {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,  SMSG_SPLINE_SET_SWIM_BACK_SPEED},
-        {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        SMSG_SPLINE_SET_TURN_RATE},
+        MSG_MOVE_SET_WALK_SPEED,
+        MSG_MOVE_SET_RUN_SPEED,
+        MSG_MOVE_SET_RUN_BACK_SPEED,
+        MSG_MOVE_SET_SWIM_SPEED,
+        MSG_MOVE_SET_SWIM_BACK_SPEED,
+        MSG_MOVE_SET_TURN_RATE
     };
-#else
-    const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][3] =
-    {
-        { MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE,       MSG_MOVE_SET_WALK_SPEED },
-        { MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE,        MSG_MOVE_SET_RUN_SPEED },
-        { MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE,   MSG_MOVE_SET_RUN_BACK_SPEED },
-        { MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE,       MSG_MOVE_SET_SWIM_SPEED },
-        { MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,  MSG_MOVE_SET_SWIM_BACK_SPEED },
-        { MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        MSG_MOVE_SET_TURN_RATE },
-    };
-#endif
 
-    if (!_player->IsTaxiFlying()) 
+    if (!_player->IsTaxiFlying() && !_player->GetTransport())
     {
         // Maybe update movespeed using the spline packet. works for move splines
         // and normal movement, but reverted due to issues in same changeset
-        WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
+        WorldPacket data(SetSpeed2Opc_table[move_type], 31);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << _player->GetMover()->GetPackGUID();
 #else
