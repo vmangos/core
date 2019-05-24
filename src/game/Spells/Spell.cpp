@@ -3395,7 +3395,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
                 m_caster->StopMoving();
 
         // This is used so that creatures face the target on which they are casting
-        if (m_setCreatureTarget = (m_caster->IsCreature() && (channeled || (!m_IsTriggeredSpell && m_timer)) && m_targets.getUnitTarget() && IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0])))
+        if (m_setCreatureTarget = (m_caster->IsCreature() && (channeled || (!m_IsTriggeredSpell && m_timer)) && m_targets.getUnitTarget() && IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]) && static_cast<Creature*>(m_caster)->CanHaveTarget()))
             static_cast<Creature*>(m_caster)->SetCastingTarget(m_targets.getUnitTarget());
 
         // add non-triggered (with cast time and without)

@@ -1511,22 +1511,19 @@ struct npc_cannonball_runnerAI : ScriptedPetAI
             m_creature->SetOrientation(m_creature->GetOwner()->GetOrientation());
 
         m_creature->addUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE);
 
         npc_cannonball_runnerAI::Reset();
     }
 
     void AttackStart(Unit* /*pWho*/) override {}
-
-    void Reset() override
-    {
-    }
+    void MoveInLineOfSight(Unit* /*pWho*/) override {}
+    void Reset() override {}
 
     void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->IsNonMeleeSpellCasted())
             if (Unit * pTarget = m_creature->SelectRandomUnfriendlyTarget((Unit *) nullptr, 40.0f, true))
-                DoCastSpellIfCan(pTarget, SPELL_CANNON_FIRE, false);
+                m_creature->CastSpell(pTarget, SPELL_CANNON_FIRE, false);
     }
 };
 
