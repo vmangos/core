@@ -494,7 +494,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // If the character had a logout request, then he is articifially stunned (cf CMSG_LOGOUT_REQUEST handler). Fix it here.
         if (pCurrChar->CanFreeMove())
         {
-            pCurrChar->SetMovement(MOVE_UNROOT);
+            pCurrChar->SetRooted(false);
             pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
             pCurrChar->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         }
@@ -678,7 +678,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
                 pCurrChar->CastSpell(pCurrChar, 20584, true);   // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
             pCurrChar->CastSpell(pCurrChar, 8326, true);        // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
 
-            pCurrChar->SetMovement(MOVE_WATER_WALK);
+            pCurrChar->SetWaterWalking(true);
         }
     }
 

@@ -570,11 +570,8 @@ class MANGOS_DLL_SPEC WorldSession
         // new party stats
         void HandleInspectHonorStatsOpcode(WorldPacket& recvPacket);
 
-        void HandleMoveWaterWalkAck(WorldPacket& recvPacket);
-        void HandleFeatherFallAck(WorldPacket &recv_data);
 
-        void HandleMoveHoverAck( WorldPacket & recv_data );
-
+        void HandleMovementFlagChangeToggleAck(WorldPacket& recvData);
         void HandleMountSpecialAnimOpcode(WorldPacket &recvdata);
 
         // character view

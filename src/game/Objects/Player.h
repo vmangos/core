@@ -1833,9 +1833,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool CanFly() const { return IsFlying(); }
 
         void SetFly(bool enable) override;
-        void SetFeatherFall(bool enable) override;
-        void SetHover(bool enable) override;
-        void SetWaterWalk(bool enable) override;
 
         // Anti undermap
         void SaveNoUndermapPosition(float x, float y, float z)

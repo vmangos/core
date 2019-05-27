@@ -2163,7 +2163,7 @@ void Aura::HandleAuraWaterWalk(bool apply, bool Real)
     if (!Real)
         return;
 
-    GetTarget()->SetWaterWalk(apply);
+    GetTarget()->SetWaterWalking(apply);
 }
 
 void Aura::HandleAuraFeatherFall(bool apply, bool Real)
@@ -2908,7 +2908,7 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         target->ScheduleAINotify(0);
         target->UpdateControl();
         if (target->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT))
-            target->SetMovement(MOVE_ROOT);
+            target->SetRooted(true);
         target->StopMoving();
         target->SetWalk(pPlayerCaster->IsWalking());
     }
@@ -2973,7 +2973,7 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
             target->CastSpell(target, 29051, true); 
         }
     }
-    target->SetUnitMovementFlags(MOVEFLAG_NONE);
+    //target->SetUnitMovementFlags(MOVEFLAG_NONE);
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
     if (pPlayerCaster && pPlayerTarget)
@@ -3230,7 +3230,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
             target->getHostileRefManager().deleteReferences();
         }
 
-        target->SetUnitMovementFlags(MOVEFLAG_NONE);
+        //target->SetUnitMovementFlags(MOVEFLAG_NONE);
         target->StopMoving();
         target->GetMotionMaster()->Clear(false);
         target->GetMotionMaster()->MoveIdle();
@@ -3398,7 +3398,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             if (!inCharge)
                 target->StopMoving();
 
-        target->SetMovement(MOVE_ROOT);
+        target->SetRooted(true);
     }
     else
     {
@@ -3437,7 +3437,7 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             target->SetTargetGuid(target->getVictim()->GetObjectGuid());
 
         if (!target->hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT))         // prevent allow move if have also root effect
-            target->SetMovement(MOVE_UNROOT);
+            target->SetRooted(false);
 
         // Wyvern Sting
         if (GetSpellProto()->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_MISC>())
@@ -3636,7 +3636,7 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
         if (!target->movespline->Finalized() && !inCharge)
             target->StopMoving();
 
-        target->SetMovement(MOVE_ROOT);
+        target->SetRooted(true);
     }
     else
     {
@@ -3671,8 +3671,8 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
 
         if (!target->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))      // prevent allow move if have also stun effect
         {
-            target->SetMovement(MOVE_UNROOT);
-            target->SetUnitMovementFlags(MOVEFLAG_NONE);
+            target->SetRooted(false);
+            //target->SetUnitMovementFlags(MOVEFLAG_NONE);
         }
     }
 }

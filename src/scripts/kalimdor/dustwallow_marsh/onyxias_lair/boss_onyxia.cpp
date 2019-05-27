@@ -198,7 +198,7 @@ struct boss_onyxiaAI : public ScriptedAI
             m_pInstance->SetData(DATA_ONYXIA_EVENT, NOT_STARTED);
         
         SetCombatMovement(true);
-        m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED, true);
+        m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED);
         m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 15.0f);
         m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 16.0f);
 
@@ -460,7 +460,7 @@ struct boss_onyxiaAI : public ScriptedAI
         {
             if (m_uiDeepBreathTimer <= uiDiff)
             {
-                m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_BREATH_SPEED, true);
+                m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_BREATH_SPEED);
                 m_creature->GetMotionMaster()->MovePoint(m_pPointData->uiLocId, m_pPointData->fX, m_pPointData->fY, m_pPointData->fZ, MOVE_PATHFINDING | MOVE_FLY_MODE);
                 // heat up egg pit during Deep Breath
                 m_creature->CastSpell(m_creature, SPELL_HEATED_GROUND_EAST, true);
@@ -550,7 +550,7 @@ struct boss_onyxiaAI : public ScriptedAI
         }
 
         m_pPointData = GetMoveData();
-        m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED, true);
+        m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED);
         m_creature->GetMotionMaster()->MovePoint(m_pPointData->uiLocId, m_pPointData->fX, m_pPointData->fY, m_pPointData->fZ, MOVE_PATHFINDING | MOVE_FLY_MODE);
         return false;
     }
@@ -628,7 +628,7 @@ struct boss_onyxiaAI : public ScriptedAI
                 m_creature->GetMotionMaster()->Clear(false);
                 m_creature->GetMotionMaster()->MoveIdle();
 
-                m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED, true);
+                m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED);
                 m_creature->GetMotionMaster()->MovePoint(DEPART_FLIGHT, -57.750641f, -215.610077f, -85.094727f, MOVE_PATHFINDING);
                 m_uiTransTimer = 60000; // handled by MovementInform
             }
@@ -666,7 +666,7 @@ struct boss_onyxiaAI : public ScriptedAI
             {
                 DoResetThreat();
                 DoScriptText(SAY_PHASE_3_TRANS, m_creature);
-                m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED, true);
+                m_creature->SetSpeedRate(MOVE_RUN, ONYXIA_NORMAL_SPEED);
                 m_creature->InterruptNonMeleeSpells(false);
 
                 if (m_creature->GetPositionX() < -40.0f)

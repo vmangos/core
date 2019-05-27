@@ -288,7 +288,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
 
             if (Creature* pMercutio = m_creature->FindNearestCreature(NPC_MERCUTIO, 10.0f))
             {
-                pMercutio->SetSpeedRate(MOVE_WALK, 2.5f, true);
+                pMercutio->SetSpeedRate(MOVE_WALK, 2.5f);
                 pMercutio->setFaction(m_creature->getFaction());
                 pMercutio->GetMotionMaster()->MovePoint(0, -9148.395508f, 371.322174f, 90.543655f);
                 pMercutio->ForcedDespawn(12000);
@@ -298,7 +298,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
             }
 
             m_creature->SetWalk(true);
-            m_creature->SetSpeedRate(MOVE_WALK, 1.0f, true);
+            m_creature->SetSpeedRate(MOVE_WALK, 1.0f);
             GreetPlayer = true;
         }
     }
@@ -867,7 +867,7 @@ void npc_squire_roweAI::UpdateAI(const uint32 uiDiff)
             switch (m_uiStep)
             {
             case 0:
-                m_creature->SetSpeedRate(MOVE_RUN, 1.1f, true);
+                m_creature->SetSpeedRate(MOVE_RUN, 1.1f);
                 m_creature->GetMotionMaster()->MovePoint(1, RoweDeplacement[0].x, RoweDeplacement[0].y, RoweDeplacement[0].z);
                 m_uiTimer = 1000;
                 ++m_uiStep;
@@ -897,7 +897,7 @@ void npc_squire_roweAI::UpdateAI(const uint32 uiDiff)
                     m_bWindsorUp = true;
                     pWindsor->Mount(MOUNT_WINDSOR);
                     pWindsor->SetWalk(false);
-                    pWindsor->SetSpeedRate(MOVE_RUN, 1.0f, true);
+                    pWindsor->SetSpeedRate(MOVE_RUN, 1.0f);
                     pWindsor->GetMotionMaster()->MovePoint(0, WindsorDeplacement[0].x, WindsorDeplacement[0].y, WindsorDeplacement[0].z, MOVE_PATHFINDING);
                     pWindsor->SetRespawnDelay(100000000);
                     pWindsor->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -1010,7 +1010,7 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
 
         pWindsor->Mount(MOUNT_WINDSOR);
         pWindsor->SetWalk(false);
-        pWindsor->SetSpeedRate(MOVE_RUN, 1.0f, true);
+        pWindsor->SetSpeedRate(MOVE_RUN, 1.0f);
         pWindsor->GetMotionMaster()->MovePoint(0, WindsorDeplacement[0].x, WindsorDeplacement[0].y, WindsorDeplacement[0].z, MOVE_PATHFINDING);
         pWindsor->SetRespawnDelay(100000000);
         pWindsor->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);

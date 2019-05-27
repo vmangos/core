@@ -363,7 +363,7 @@ struct cthunTentacle : public ScriptedAI
     {
         m_creature->addUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
-        m_creature->SetMovement(MOVE_ROOT);
+        m_creature->SetRooted(true);
         m_creature->SetInCombatWithZone();
     }
 
@@ -394,7 +394,7 @@ struct cthunTentacle : public ScriptedAI
         // retargetting another top-threat target if current leaves melee range
         m_creature->addUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
-        m_creature->SetMovement(MOVE_ROOT);
+        m_creature->SetRooted(true);
         return true;
     }
     

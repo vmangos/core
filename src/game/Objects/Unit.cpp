@@ -63,6 +63,7 @@
 #include "Anticheat.h"
 #include "CreatureLinkingMgr.h"
 #include "InstanceStatistics.h"
+#include "MovementPacketSender.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -8141,6 +8142,50 @@ bool Unit::canDetectStealthOf(Unit const* target, float distance, bool *alert) c
     return true;
 }
 
+PlayerMovementPendingChange Unit::PopPendingMovementChange()
+{
+    PlayerMovementPendingChange result = m_pendingMovementChanges.front();
+    m_pendingMovementChanges.pop_front();
+    return result;
+}
+
+void Unit::PushPendingMovementChange(PlayerMovementPendingChange newChange)
+{
+    m_pendingMovementChanges.emplace_back(std::move(newChange));
+}
+
+bool Unit::HasPendingMovementChange(MovementChangeType changeType) const
+{
+    return std::find_if(m_pendingMovementChanges.begin(), m_pendingMovementChanges.end(),
+        [changeType](PlayerMovementPendingChange const& pendingChange)
+    {
+        return pendingChange.movementChangeType == changeType;
+    }) != m_pendingMovementChanges.end();
+}
+
+Player* Unit::GetPlayerMovingMe()
+{
+    if (Player* pCharmer = ::ToPlayer(GetCharmer()))
+        if (pCharmer->GetCharmGuid() == GetObjectGuid())
+            return pCharmer;
+
+    return ToPlayer();
+}
+
+bool Unit::IsMovedByPlayer() const
+{
+    if (Player* pCharmer = ::ToPlayer(GetCharmer()))
+        if (pCharmer->GetCharmGuid() == GetObjectGuid())
+            return true;
+
+    return IsPlayer();
+}
+
+PlayerMovementPendingChange::PlayerMovementPendingChange()
+{
+    time = WorldTimer::getMSTime();
+}
+
 void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
 {
     // not in combat pet have same speed as owner
@@ -8153,7 +8198,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
                 case MOVE_RUN:
                 case MOVE_WALK:
                 case MOVE_SWIM:
-                    SetSpeedRate(mtype, owner->GetSpeedRate(mtype), forced);
+                    SetSpeedRate(mtype, owner->GetSpeedRate(mtype));
                     return;
                 default:
                     break;
@@ -8269,7 +8314,7 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
         }
     }
 
-    SetSpeedRate(mtype, speed * ratio, forced);
+    SetSpeedRate(mtype, speed * ratio);
 }
 
 float Unit::GetSpeed(UnitMoveType mtype) const
@@ -8322,63 +8367,159 @@ struct SetSpeedRateHelper
     bool forced;
 };
 
-void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
+void Unit::SetSpeedRate(UnitMoveType mtype, float rate)
 {
-    if (rate <= 0)
-        rate = 1.0f;
+    if (rate < 0)
+        rate = 0.0f;
 
     // Update speed only on change
-    if (m_speed_rate[mtype] != rate)
+    MovementChangeType changeType = MovementPacketSender::GetChangeTypeByMoveType(mtype);
+    if (m_speed_rate[mtype] == rate && !HasPendingMovementChange(changeType))
+        return;
+
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendSpeedChangeToMover(this, mtype, rate);
+    else if (IsMovedByPlayer() && !IsInWorld()) // (1)
+        SetSpeedRateReal(mtype, rate);
+    else // <=> if(!IsMovedByPlayer())
     {
-        m_speed_rate[mtype] = rate;
-
-        const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][2] =
-        {
-            {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE},
-            {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE},
-            {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE},
-            {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE},
-            {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE},
-            {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE},
-        };
-
-        if (forced)
-        {
-            if (Player* me = GetAffectingPlayer())
-            {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-                WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 18);
-                dataForMe << GetPackGUID();
-                dataForMe << uint32(0);
-#else
-                WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 14);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                dataForMe << GetPackGUID();
-#else
-                dataForMe << GetGUID();
-#endif
-#endif
-                dataForMe << float(GetSpeed(mtype));
-                me->GetSession()->SendPacket(&dataForMe);
-                me->GetCheatData()->OrderSent(&dataForMe);
-                //if (this == me)
-                    //if (WardenInterface* warden = me->GetSession()->GetWarden())
-                        //warden->SendSpeedChange(mtype, GetSpeed(mtype));
-            }
-        }
-
-
-        // TODO: Actually such opcodes should (always?) be packed with SMSG_COMPRESSED_MOVES
-        // Nostalrius: (google translated)
-        // Unable to send here the package 'MSG_MOVE_SET _ * _ SPEED', because we do not know the flags of movements, and the position dimension client
-        // (update every 0.5 sec). If one sends a packet, one leads to a desynchro (in the absence of interpolation of the position)
-        // This package will be sent after receiving a packet type 'CMSG_FORCE _ * _ SPEED_CHANGE_ACK' (MovementHandler.cpp)
-        //m_updateFlag |= UPDATEFLAG_LIVING; // Mise a jour des mouvements en cours, spline, vitesses, etc ... Inutile ?
-
-        propagateSpeedChange();
+        SetSpeedRateReal(mtype, rate);
+        MovementPacketSender::SendSpeedChangeToAll(this, mtype, rate);
     }
 
-    CallForAllControlledUnits(SetSpeedRateHelper(mtype, forced), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET);
+    // explaination of (1):
+    // If the player is not in the world yet, it won't reply to the packets requiring an ack. And once the player is in the world, next time a movement 
+    // packet which requires an ack is sent to the client (change of speed for example), the client is kicked from the 
+    // server on the ground that it should have replied to the first packet first. That line is a hacky fix 
+    // in the sense that it doesn't work like that in retail since buffs are applied only after the player has been 
+    // initialized in the world. cf description of PR #18771
+}
+
+void Unit::SetSpeedRateReal(UnitMoveType mtype, float rate)
+{
+    if (!isInCombat() && ToPlayer())
+        if (Pet* pet = ToPlayer()->GetPet())
+            pet->SetSpeedRate(mtype, rate);
+
+    m_speed_rate[mtype] = rate;
+    propagateSpeedChange();
+    CallForAllControlledUnits(SetSpeedRateHelper(mtype, true), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET);
+}
+
+void Unit::SetRooted(bool apply)
+{
+    // do nothing if the unit is already in the required state
+    if (apply == HasUnitMovementFlag(MOVEFLAG_ROOT) && !HasPendingMovementChange(ROOT))
+        return;
+
+    if (apply)
+        StopMoving(); // @todo: this method needs a rework to work well with players.
+    
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEFLAG_ROOT, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetRootedReal(apply);
+    else
+    {
+        SetRootedReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_ROOT, apply);
+    }
+}
+
+void Unit::SetRootedReal(bool apply)
+{
+    if (apply)
+        AddUnitMovementFlag(MOVEFLAG_ROOT);
+    else
+        RemoveUnitMovementFlag(MOVEFLAG_ROOT);
+}
+
+void Unit::SetWaterWalking(bool apply)
+{
+    if (apply == HasUnitMovementFlag(MOVEFLAG_WATERWALKING) && !HasPendingMovementChange(WATER_WALK))
+        return;
+
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEFLAG_WATERWALKING, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetWaterWalkingReal(apply);
+    else
+    {
+        SetWaterWalkingReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_WATERWALKING, apply);
+    }
+}
+
+void Unit::SetWaterWalkingReal(bool apply)
+{
+    if (apply)
+        AddUnitMovementFlag(MOVEFLAG_WATERWALKING);
+    else
+        RemoveUnitMovementFlag(MOVEFLAG_WATERWALKING);
+}
+
+void Unit::SetFeatherFall(bool apply)
+{
+    if (apply == HasUnitMovementFlag(MOVEFLAG_SAFE_FALL) && !HasPendingMovementChange(FEATHER_FALL))
+        return;
+
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEFLAG_SAFE_FALL, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetFeatherFallReal(apply);
+    else
+    {
+        SetFeatherFallReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_SAFE_FALL, apply);
+    }
+}
+
+void Unit::SetFeatherFallReal(bool apply)
+{
+    if (apply)
+        AddUnitMovementFlag(MOVEFLAG_SAFE_FALL);
+    else
+        RemoveUnitMovementFlag(MOVEFLAG_SAFE_FALL);
+}
+
+void Unit::SetHover(bool apply)
+{
+    if (apply == HasUnitMovementFlag(MOVEFLAG_HOVER) && !HasPendingMovementChange(SET_HOVER))
+        return;
+
+    if (IsMovedByPlayer() && IsInWorld())
+        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEFLAG_HOVER, apply);
+    else if (IsMovedByPlayer() && !IsInWorld())
+        SetHoverReal(apply);
+    else
+    {
+        SetHoverReal(apply);
+        MovementPacketSender::SendMovementFlagChangeToAll(this, MOVEFLAG_HOVER, apply);
+    }
+}
+
+void Unit::SetHoverReal(bool apply)
+{
+    if (apply)
+        AddUnitMovementFlag(MOVEFLAG_HOVER);
+    else
+        RemoveUnitMovementFlag(MOVEFLAG_HOVER);
+}
+
+void Unit::SetLevitate(bool enable)
+{
+    if (enable)
+        m_movementInfo.AddMovementFlag(MOVEFLAG_LEVITATING);
+    else
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_LEVITATING);
+}
+
+void Unit::SetFly(bool enable)
+{
+    if (enable)
+        m_movementInfo.AddMovementFlag(MOVEFLAG_FLYING | MOVEFLAG_CAN_FLY);
+    else
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_FLYING | MOVEFLAG_CAN_FLY);
 }
 
 void Unit::SetDeathState(DeathState s)
@@ -10798,6 +10939,9 @@ void Unit::SetPvP(bool state)
 
 void Unit::KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed)
 {
+    if (IsRooted())
+        return;
+
     float angle = this == target ? GetOrientation() + M_PI_F : target->GetAngle(this);
 
     // set immune anticheat and calculate speed
@@ -10812,26 +10956,17 @@ void Unit::KnockBackFrom(WorldObject* target, float horizontalSpeed, float verti
 
 void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
 {
+    if (IsRooted())
+        return;
+
     InterruptNonMeleeSpells(false);
 
     // Effect properly implemented only for players
-    if (GetTypeId() == TYPEID_PLAYER)
+    if (IsMovedByPlayer() && IsInWorld())
     {
         float vsin = sin(angle);
         float vcos = cos(angle);
-        WorldPacket data(SMSG_MOVE_KNOCK_BACK, 8 + 4 + 4 + 4 + 4 + 4);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        data << GetPackGUID();
-#else
-        data << GetGUID();
-#endif
-        data << uint32(0);                                  // Sequence
-        data << float(vcos);                                // x direction
-        data << float(vsin);                                // y direction
-        data << float(horizontalSpeed);                     // Horizontal speed
-        data << float(-verticalSpeed);                      // Z Movement speed (vertical)
-        SendMovementMessageToSet(std::move(data), true);
-
+        MovementPacketSender::SendKnockBackToMover(this, vcos, vsin, horizontalSpeed, -verticalSpeed); // !! notice the - sign in front of speedZ !!
         ToPlayer()->GetCheatData()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
     }
 }
@@ -11663,46 +11798,6 @@ void Unit::SetWalk(bool enable, bool asDefault)
         SendObjectMessageToSet(&data, false);
 }
 
-void Unit::SetLevitate(bool enable)
-{
-    if (enable)
-        m_movementInfo.AddMovementFlag(MOVEFLAG_LEVITATING);
-    else
-        m_movementInfo.RemoveMovementFlag(MOVEFLAG_LEVITATING);
-}
-
-void Unit::SetFly(bool enable)
-{
-    if (enable)
-        m_movementInfo.AddMovementFlag(MOVEFLAG_FLYING | MOVEFLAG_CAN_FLY);
-    else
-        m_movementInfo.RemoveMovementFlag(MOVEFLAG_FLYING | MOVEFLAG_CAN_FLY);
-}
-
-void Unit::SetFeatherFall(bool enable)
-{
-    if (enable)
-        m_movementInfo.AddMovementFlag(MOVEFLAG_SAFE_FALL);
-    else
-        m_movementInfo.RemoveMovementFlag(MOVEFLAG_SAFE_FALL);
-}
-
-void Unit::SetHover(bool enable)
-{
-    if (enable)
-        m_movementInfo.AddMovementFlag(MOVEFLAG_HOVER);
-    else
-        m_movementInfo.RemoveMovementFlag(MOVEFLAG_HOVER);
-}
-
-void Unit::SetWaterWalk(bool enable)
-{
-    if (enable)
-        m_movementInfo.AddMovementFlag(MOVEFLAG_WATERWALKING);
-    else
-        m_movementInfo.RemoveMovementFlag(MOVEFLAG_WATERWALKING);
-}
-
 void Unit::DisableSpline()
 {
     if (Player* me = ToPlayer())
@@ -11824,126 +11919,6 @@ void Unit::RemoveAttackersThreat(Unit* owner)
         if (owner)
             (*itr)->AddThreat(owner, 1.0f);
     }
-}
-
-void Unit::SetMovement(UnitMovementType pType)
-{
-    switch (pType)
-    {
-        case MOVE_ROOT:
-            m_movementInfo.ChangePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
-            m_movementInfo.UpdateTime(WorldTimer::getMSTime());
-            m_movementInfo.moveFlags = MOVEFLAG_ROOT | (m_movementInfo.moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN);
-            break;
-        case MOVE_UNROOT:
-            m_movementInfo.ChangePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
-            m_movementInfo.UpdateTime(WorldTimer::getMSTime());
-            m_movementInfo.moveFlags = (m_movementInfo.moveFlags & ~(MOVEFLAG_MASK_MOVING_OR_TURN | MOVEFLAG_ROOT));
-            break;
-    }
-    WorldPacket data;
-    if (!movespline->Finalized())
-    {
-        // Spline roots are sent here.
-        MovementData mvtData(this);
-        switch (pType)
-        {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-            case MOVE_ROOT:
-                mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_ROOT, GetObjectGuid());
-                return;
-            case MOVE_UNROOT:
-                mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_UNROOT, GetObjectGuid());
-                break;
-            case MOVE_WATER_WALK:
-                mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_WATER_WALK, GetObjectGuid());
-                break;
-            case MOVE_LAND_WALK:
-                mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_LAND_WALK, GetObjectGuid());
-                break;
-#else
-            case MOVE_ROOT:
-                mvtData.SetSplineOpcode(MSG_MOVE_ROOT, GetObjectGuid());
-                return;
-            case MOVE_UNROOT:
-                mvtData.SetSplineOpcode(MSG_MOVE_UNROOT, GetObjectGuid());
-                break;
-            case MOVE_WATER_WALK:
-                mvtData.SetSplineOpcode(SMSG_MOVE_WATER_WALK, GetObjectGuid());
-                break;
-            case MOVE_LAND_WALK:
-                mvtData.SetSplineOpcode(SMSG_MOVE_LAND_WALK, GetObjectGuid());
-                break;
-#endif
-        }
-        return;
-    }
-    // Inform controller
-    Player* mePlayer = ToPlayer();
-    Player* controller = nullptr;
-    if (Unit* charmer = GetCharmer())
-        if (Player* charmerPlayer = charmer->ToPlayer())
-            if (charmerPlayer->GetCharmGuid() == GetObjectGuid())
-                controller = charmerPlayer;
-    if (!mePlayer && !controller)
-        return;
-
-    switch (pType)
-    {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        case MOVE_ROOT:
-            data.Initialize(SMSG_FORCE_MOVE_ROOT,   GetPackGUID().size() + 4);
-            break;
-        case MOVE_UNROOT:
-            data.Initialize(SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
-            break;
-        case MOVE_WATER_WALK:
-            data.Initialize(SMSG_MOVE_WATER_WALK,   GetPackGUID().size() + 4);
-            break;
-        case MOVE_LAND_WALK:
-            data.Initialize(SMSG_MOVE_LAND_WALK,    GetPackGUID().size() + 4);
-            break;
-#else
-        case MOVE_ROOT:
-            data.Initialize(SMSG_FORCE_MOVE_ROOT,   8 + 4);
-            break;
-        case MOVE_UNROOT:
-            data.Initialize(SMSG_FORCE_MOVE_UNROOT, 8 + 4);
-            break;
-        case MOVE_WATER_WALK:
-            data.Initialize(SMSG_MOVE_WATER_WALK,   8 + 4);
-            break;
-        case MOVE_LAND_WALK:
-            data.Initialize(SMSG_MOVE_LAND_WALK,    8 + 4);
-            break;
-#endif
-        default:
-            sLog.outError("Player::SetMovement: Unsupported move type (%d), data not sent to client.", pType);
-            return;
-    }
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << GetPackGUID();
-#else
-    data << GetGUID();
-#endif
-    data << uint32(WorldTimer::getMSTime()); // Peut etre msTime : WorldTimer::getMSTime() ?
-    if (mePlayer)
-    {
-        mePlayer->GetCheatData()->OrderSent(&data);
-        mePlayer->GetSession()->SendPacket(&data);
-
-        // We can't send movement info here because it is out-of-date with the client
-        // and causes issues with unit speed updates on death/res
-        /*if (pType == MOVE_ROOT || pType == MOVE_UNROOT) {
-            WorldPacket rootData(pType == MOVE_ROOT ? MSG_MOVE_ROOT : MSG_MOVE_UNROOT, 31);
-            rootData << GetPackGUID();
-            rootData << m_movementInfo;
-
-            mePlayer->SendMovementMessageToSet(std::move(rootData), false);
-        }*/
-    }
-    if (controller)
-        controller->GetSession()->SendPacket(&data);
 }
 
 bool Unit::HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const

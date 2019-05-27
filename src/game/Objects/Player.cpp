@@ -4383,65 +4383,6 @@ void Player::SetFly(bool enable)
     SendHeartBeat(true);
 }
 
-void Player::SetWaterWalk(bool enable)
-{
-    Unit::SetWaterWalk(enable);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4);
-    data << GetPackGUID();
-#else
-    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 8 + 4);
-    data << GetGUID();
-#endif
-    data << uint32(0);
-    GetSession()->SendPacket(&data);
-    GetCheatData()->OrderSent(&data);
-}
-
-void Player::SetFeatherFall(bool enable)
-{
-    Unit::SetFeatherFall(enable);
-
-    WorldPacket data;
-    if (enable)
-        data.Initialize(SMSG_MOVE_FEATHER_FALL, 8 + 4);
-    else
-        data.Initialize(SMSG_MOVE_NORMAL_FALL, 8 + 4);
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << GetPackGUID();
-#else
-    data << GetGUID();
-#endif
-    data << uint32(0);
-    SendMessageToSet(&data, true);
-    GetCheatData()->OrderSent(&data);
-
-    // start fall from current height
-    if (!enable)
-        SetFallInformation(0, GetPositionZ());
-}
-
-void Player::SetHover(bool enable)
-{
-    Unit::SetHover(enable);
-
-    WorldPacket data;
-    if (enable)
-        data.Initialize(SMSG_MOVE_SET_HOVER, 8 + 4);
-    else
-        data.Initialize(SMSG_MOVE_UNSET_HOVER, 8 + 4);
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << GetPackGUID();
-#else
-    data << GetGUID();
-#endif
-    data << uint32(0);
-    SendMovementMessageToSet(std::move(data), true);
-    GetCheatData()->OrderSent(&data);
-}
-
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world
@@ -4482,9 +4423,9 @@ void Player::BuildPlayerRepop()
     // convert player body to ghost
     SetHealth(1);
 
-    SetWaterWalk(true);
+    SetWaterWalking(true);
     if (!GetSession()->isLogingOut())
-        SetMovement(MOVE_UNROOT);
+        SetRooted(false);
 
     // BG - remove insignia related
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
@@ -4514,8 +4455,8 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         RemoveAurasDueToSpell(20584);                       // speed bonuses
     RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
 
-    SetWaterWalk(false);
-    SetMovement(MOVE_UNROOT);
+    SetWaterWalking(false);
+    SetRooted(false);
 
     // set health/powers (0- will be set in caller)
     if (restore_percent > 0.0f)
@@ -18553,7 +18494,7 @@ void Player::SendInitialPacketsAfterAddToMap(bool login)
     }
 
     if (HasAuraType(SPELL_AURA_MOD_STUN))
-        SetMovement(MOVE_ROOT);
+        SetRooted(true);
 
     // manual send package (have code in ApplyModifier(true,true); that don't must be re-applied.
     if (HasAuraType(SPELL_AURA_MOD_ROOT))

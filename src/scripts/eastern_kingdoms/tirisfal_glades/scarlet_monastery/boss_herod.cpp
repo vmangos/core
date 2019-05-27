@@ -278,7 +278,7 @@ struct mob_scarlet_traineeAI : ScriptedAI
         {
             if (Start_Timer <= diff)
             {
-                m_creature->SetSpeedRate(MOVE_WALK, 2.20f, true);
+                m_creature->SetSpeedRate(MOVE_WALK, 2.20f);
 
                 if (group1)
                     m_creature->GetMotionMaster()->MovePoint(1, 1946.433594f, -435.955109f, 16.367277f);
