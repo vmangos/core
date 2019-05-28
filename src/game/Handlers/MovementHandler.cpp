@@ -617,7 +617,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recv_data)
     if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
-    if (!VerifyMovementInfo(movementInfo, guid))
+    if (!VerifyMovementInfo(movementInfo))
         return;
 
     if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
