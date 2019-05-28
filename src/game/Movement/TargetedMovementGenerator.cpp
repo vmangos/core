@@ -657,9 +657,9 @@ void FollowMovementGenerator<Creature>::_updateSpeed(Creature &u)
     if (!i_target.isValid() || i_target->GetObjectGuid() != u.GetOwnerGuid())
         return;
 
-    u.UpdateSpeed(MOVE_RUN, true);
-    u.UpdateSpeed(MOVE_WALK, true);
-    u.UpdateSpeed(MOVE_SWIM, true);
+    u.UpdateSpeed(MOVE_RUN, false);
+    u.UpdateSpeed(MOVE_WALK, false);
+    u.UpdateSpeed(MOVE_SWIM, false);
 }
 
 template<>

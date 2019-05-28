@@ -401,7 +401,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
     // now can skip not our packet
-    if (guid != _clientMoverGuid && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     if (!VerifyMovementInfo(movementInfo))
@@ -565,6 +565,10 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data)
     _clientMoverGuid = ObjectGuid();
 #endif
 
+    // Prevent client from removing root flag.
+    if (_player->HasUnitMovementFlag(MOVEFLAG_ROOT) && !mi.HasMovementFlag(MOVEFLAG_ROOT))
+        mi.AddMovementFlag(MOVEFLAG_ROOT);
+
     _player->m_movementInfo = mi;
 }
 
@@ -605,11 +609,12 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recv_data)
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (pPlayerMover && pPlayerMover->IsBeingTeleported())
     {
+        mover->PopPendingMovementChange();
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
 
-    if (guid != _clientMoverGuid && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     if (!VerifyMovementInfo(movementInfo, guid))
@@ -628,9 +633,11 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recv_data)
     }
 
     PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
+
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
     uint32 movementCounter = pendingChange.movementCounter;
 #endif
+
     if (pendingChange.movementCounter != movementCounter || pendingChange.movementChangeType != KNOCK_BACK
         || std::fabs(pendingChange.knockbackInfo.speedXY - movementInfo.jump.xyspeed) > 0.01f
         || std::fabs(pendingChange.knockbackInfo.speedZ - movementInfo.jump.velocity) > 0.01f
@@ -692,6 +699,10 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
 {
     Unit *mover = _player->GetMover();
     movementInfo.CorrectData(mover);
+
+    // Prevent client from removing root flag.
+    if (mover->HasUnitMovementFlag(MOVEFLAG_ROOT) && !movementInfo.HasMovementFlag(MOVEFLAG_ROOT))
+        movementInfo.AddMovementFlag(MOVEFLAG_ROOT);
 
     if (Player* plMover = mover->ToPlayer())
     {
@@ -876,7 +887,7 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
     applyReceived = applyInt == 0u ? false : true;
 
     // make sure this client is allowed to control the unit which guid is provided
-    if (guid != _clientMoverGuid && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     if (!VerifyMovementInfo(movementInfo))
@@ -963,7 +974,7 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
     // make sure this client is allowed to control the unit which guid is provided
-    if (guid != _clientMoverGuid && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     if (!VerifyMovementInfo(movementInfo))
@@ -1036,7 +1047,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
     // make sure this client is allowed to control the unit which guid is provided
-    if (guid != _clientMoverGuid && guid != _player->GetMover()->GetObjectGuid())
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
         return;
 
     if (!VerifyMovementInfo(movementInfo))

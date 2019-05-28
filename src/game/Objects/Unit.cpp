@@ -6093,7 +6093,7 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
                     case AURA_STATE_HEALTHLESS_15_PERCENT:
                     case AURA_STATE_HEALTHLESS_10_PERCENT:
                     case AURA_STATE_HEALTHLESS_5_PERCENT:
-                        UpdateSpeed(MOVE_RUN, true);
+                        UpdateSpeed(MOVE_RUN, false);
                         break;
                 }
             }
@@ -6128,7 +6128,7 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
                     case AURA_STATE_HEALTHLESS_15_PERCENT:
                     case AURA_STATE_HEALTHLESS_10_PERCENT:
                     case AURA_STATE_HEALTHLESS_5_PERCENT:
-                        UpdateSpeed(MOVE_RUN, true);
+                        UpdateSpeed(MOVE_RUN, false);
                         break;
                 }
             }
@@ -8314,7 +8314,10 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
         }
     }
 
-    SetSpeedRate(mtype, speed * ratio);
+    if (forced)
+        SetSpeedRateReal(mtype, speed * ratio);
+    else
+        SetSpeedRate(mtype, speed * ratio);
 }
 
 float Unit::GetSpeed(UnitMoveType mtype) const
@@ -8397,10 +8400,6 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate)
 
 void Unit::SetSpeedRateReal(UnitMoveType mtype, float rate)
 {
-    if (!isInCombat() && ToPlayer())
-        if (Pet* pet = ToPlayer()->GetPet())
-            pet->SetSpeedRate(mtype, rate);
-
     m_speed_rate[mtype] = rate;
     propagateSpeedChange();
     CallForAllControlledUnits(SetSpeedRateHelper(mtype, true), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET);
@@ -10967,7 +10966,7 @@ void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
         float vsin = sin(angle);
         float vcos = cos(angle);
         MovementPacketSender::SendKnockBackToMover(this, vcos, vsin, horizontalSpeed, -verticalSpeed); // !! notice the - sign in front of speedZ !!
-        ToPlayer()->GetCheatData()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
+        GetPlayerMovingMe()->GetCheatData()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
     }
 }
 

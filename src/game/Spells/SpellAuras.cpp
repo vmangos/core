@@ -49,7 +49,7 @@
 #include "CellImpl.h"
 #include "MapManager.h"
 #include "MoveSpline.h"
-
+#include "MovementPacketSender.h"
 #include "ZoneScript.h"
 #include "PlayerAI.h"
 #include "Anticheat.h"
@@ -2911,6 +2911,9 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
             target->SetRooted(true);
         target->StopMoving();
         target->SetWalk(pPlayerCaster->IsWalking());
+
+        if (target->IsCreature() && target->IsRooted())
+            MovementPacketSender::SendMovementFlagChangeToMover(target, MOVEFLAG_ROOT, true);
     }
     else
     {
@@ -3032,6 +3035,9 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
             charmInfo->SetIsReturning(false);
             charmInfo->SetIsFollowing(false);
         }
+
+        if (pet->IsRooted())
+            MovementPacketSender::SendMovementFlagChangeToMover(pet, MOVEFLAG_ROOT, true);
     }
     else
     {
@@ -3795,7 +3801,7 @@ void Aura::HandleAuraModIncreaseSpeed(bool apply, bool Real)
         if (Player* modOwner = caster->GetSpellModOwner())
             modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_SPEED, m_modifier.m_amount);
 
-    GetTarget()->UpdateSpeed(MOVE_RUN, true);
+    GetTarget()->UpdateSpeed(MOVE_RUN, false);
 }
 
 void Aura::HandleAuraModIncreaseMountedSpeed(bool /*apply*/, bool Real)
@@ -3804,7 +3810,7 @@ void Aura::HandleAuraModIncreaseMountedSpeed(bool /*apply*/, bool Real)
     if (!Real)
         return;
 
-    GetTarget()->UpdateSpeed(MOVE_RUN, true);
+    GetTarget()->UpdateSpeed(MOVE_RUN, false);
 }
 
 void Aura::HandleAuraModIncreaseSwimSpeed(bool /*apply*/, bool Real)
@@ -3813,7 +3819,7 @@ void Aura::HandleAuraModIncreaseSwimSpeed(bool /*apply*/, bool Real)
     if (!Real)
         return;
 
-    GetTarget()->UpdateSpeed(MOVE_SWIM, true);
+    GetTarget()->UpdateSpeed(MOVE_SWIM, false);
 }
 
 void Aura::HandleAuraModDecreaseSpeed(bool apply, bool Real)
@@ -3828,8 +3834,8 @@ void Aura::HandleAuraModDecreaseSpeed(bool apply, bool Real)
 
     Unit* target = GetTarget();
 
-    target->UpdateSpeed(MOVE_RUN, true);
-    target->UpdateSpeed(MOVE_SWIM, true);
+    target->UpdateSpeed(MOVE_RUN, false);
+    target->UpdateSpeed(MOVE_SWIM, false);
 }
 
 void Aura::HandleAuraModUseNormalSpeed(bool /*apply*/, bool Real)
@@ -3840,8 +3846,8 @@ void Aura::HandleAuraModUseNormalSpeed(bool /*apply*/, bool Real)
 
     Unit *target = GetTarget();
 
-    target->UpdateSpeed(MOVE_RUN, true);
-    target->UpdateSpeed(MOVE_SWIM, true);
+    target->UpdateSpeed(MOVE_RUN, false);
+    target->UpdateSpeed(MOVE_SWIM, false);
 }
 
 /*********************************************************/
