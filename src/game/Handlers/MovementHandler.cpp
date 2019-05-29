@@ -226,7 +226,6 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
     DEBUG_LOG("MSG_MOVE_TELEPORT_ACK");
 
     ObjectGuid guid;
-
     recv_data >> guid;
 
     uint32 counter = 0;
@@ -386,17 +385,14 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
 
     /* extract packet */
     ObjectGuid guid;
-    MovementInfo movementInfo;
-    float  speedReceived;
-
     recv_data >> guid;
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     uint32 movementCounter;
     recv_data >> movementCounter;
 #endif
-
+    MovementInfo movementInfo;
     recv_data >> movementInfo;
+    float  speedReceived;
     recv_data >> speedReceived;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
@@ -486,10 +482,8 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
         return;
     }
 
-    /* the client data has been verified. let's do the actual change now */
-    float newSpeedRate = speedSent / baseMoveSpeed[move_type]; // is it sure that IsControlledByPlayer() should be used?
-
-    // Process position-change
+    // the client data has been verified. let's do the actual change now
+    float newSpeedRate = speedSent / baseMoveSpeed[move_type];
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, opcode);
     mover->SetSpeedRateReal(move_type, newSpeedRate);
@@ -587,15 +581,12 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recv_data)
     DEBUG_LOG("CMSG_MOVE_KNOCK_BACK_ACK");
 
     ObjectGuid guid;
-    MovementInfo movementInfo;
-
     recv_data >> guid;
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     uint32 movementCounter;
     recv_data >> movementCounter;
 #endif
-
+    MovementInfo movementInfo;
     recv_data >> movementInfo;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
@@ -868,23 +859,17 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
 {
     /* extract packet */
     ObjectGuid guid;
-    
-    MovementInfo movementInfo;
-    uint32 applyInt;
-    bool applyReceived;
-
-    recvData >> guid; // guid
-
+    recvData >> guid;
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     uint32 movementCounter;
     recvData >> movementCounter;
 #endif
-
+    MovementInfo movementInfo;
     recvData >> movementInfo;
     movementInfo.UpdateTime(recvData.GetPacketTime());
-
+    uint32 applyInt;
     recvData >> applyInt;
-    applyReceived = applyInt == 0u ? false : true;
+    bool applyReceived = applyInt == 0u ? false : true;
 
     // make sure this client is allowed to control the unit which guid is provided
     if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
@@ -961,14 +946,13 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
 void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("CMSG_FORCE_MOVE_UNROOT_ACK");
+    
     ObjectGuid guid;
     recv_data >> guid;
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     uint32 movementCounter;
     recv_data >> movementCounter;
 #endif
-
     MovementInfo movementInfo;
     recv_data >> movementInfo;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
@@ -1022,7 +1006,6 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     // Update position if it has changed (possible on UNROOT ack?)
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
-
     mover->SetRootedReal(applyReceived);
 
     MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
@@ -1034,14 +1017,13 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
 void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_FORCE_MOVE_ROOT_ACK");
+    
     ObjectGuid guid;
     recv_data >> guid;
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     uint32 movementCounter;
     recv_data >> movementCounter;
 #endif
-
     MovementInfo movementInfo;
     recv_data >> movementInfo;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
@@ -1095,7 +1077,6 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     // Position change
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
-
     mover->SetRootedReal(applyReceived);
 
     MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
