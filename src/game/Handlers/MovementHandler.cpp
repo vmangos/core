@@ -1011,7 +1011,7 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
 
     // Clear unit client state for brevity, though it should not be used
-    _player->clearUnitState(UNIT_STAT_CLIENT_ROOT);
+    mover->clearUnitState(UNIT_STAT_CLIENT_ROOT);
 }
 
 void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
@@ -1082,7 +1082,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
 
     // Set unit client state for brevity, though it should not be used
-    _player->addUnitState(UNIT_STAT_CLIENT_ROOT);
+    mover->addUnitState(UNIT_STAT_CLIENT_ROOT);
 }
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
