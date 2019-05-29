@@ -103,9 +103,9 @@ void MovementPacketSender::SendSpeedChangeToObservers(Unit* unit, UnitMoveType m
     WorldPacket data;
     data.Initialize(moveTypeToOpcode[mtype][2], 8 + 30 + 4);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << mover->GetPackGUID();
+    data << unit->GetPackGUID();
 #else
-    data << mover->GetGUID();
+    data << unit->GetGUID();
 #endif
     data << unit->m_movementInfo;
     data << float(newRate);

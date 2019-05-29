@@ -1540,22 +1540,20 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
 
     public:
-        void SetRootedReal(bool apply);
-        void SetWaterWalkingReal(bool apply);
-        void SetHoverReal(bool apply);
-        void SetFeatherFallReal(bool apply);
-        void SetSpeedRateReal(UnitMoveType mtype, float rate);
-
         void SetRooted(bool apply);
+        void SetRootedReal(bool apply);
         bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
 
         void SetWaterWalking(bool apply);
+        void SetWaterWalkingReal(bool apply);
         bool IsWaterWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WATERWALKING); }
 
         void SetHover(bool apply);
+        void SetHoverReal(bool apply);
         bool IsHovering() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_HOVER); }
 
         void SetFeatherFall(bool apply);
+        void SetFeatherFallReal(bool apply);
         bool IsFallingSlow() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SAFE_FALL); }
 
         void SetLevitate(bool apply);
@@ -1576,12 +1574,13 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool HasPendingMovementChange() const { return !m_pendingMovementChanges.empty(); }
         bool HasPendingMovementChange(MovementChangeType changeType) const;
 
+        void SetSpeedRate(UnitMoveType mtype, float rate);
+        void SetSpeedRateReal(UnitMoveType mtype, float rate);
         void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
         float GetSpeed(UnitMoveType mtype) const;
         float GetXZFlagBasedSpeed() const;
         float GetXZFlagBasedSpeed(uint32 moveFlags) const;
         float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
-        void SetSpeedRate(UnitMoveType mtype, float rate);
 
         virtual bool CanWalk() const = 0;
         virtual bool CanFly() const = 0;
