@@ -491,6 +491,266 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     MovementPacketSender::SendSpeedChangeToObservers(mover, move_type, speedSent);
 }
 
+/*
+handles those packets:
+CMSG_MOVE_WATER_WALK_ACK
+CMSG_MOVE_HOVER_ACK
+CMSG_MOVE_FEATHER_FALL_ACK
+*/
+void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
+{
+    /* extract packet */
+    ObjectGuid guid;
+    recvData >> guid;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    uint32 movementCounter;
+    recvData >> movementCounter;
+#endif
+    MovementInfo movementInfo;
+    recvData >> movementInfo;
+    movementInfo.UpdateTime(recvData.GetPacketTime());
+    uint32 applyInt;
+    recvData >> applyInt;
+    bool applyReceived = applyInt == 0u ? false : true;
+
+    // make sure this client is allowed to control the unit which guid is provided
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+        return;
+
+    if (!VerifyMovementInfo(movementInfo))
+        return;
+
+    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recvData))
+        return;
+
+    Unit* mover = ObjectAccessor::GetUnit(*_player, guid);
+
+    if (!mover)
+        return;
+
+    // verify that indeed the client is replying with the changes that were send to him
+    if (!mover->HasPendingMovementChange())
+    {
+        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
+            _player->GetName(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+
+    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
+    bool applySent = pendingChange.apply;
+    MovementChangeType changeTypeSent = pendingChange.movementChangeType;
+
+    MovementFlags mFlag = MOVEFLAG_NONE;
+    MovementChangeType changeTypeReceived;
+    switch (recvData.GetOpcode())
+    {
+        case CMSG_MOVE_WATER_WALK_ACK:      changeTypeReceived = WATER_WALK; mFlag = MOVEFLAG_WATERWALKING; break;
+        case CMSG_MOVE_HOVER_ACK:           changeTypeReceived = SET_HOVER; mFlag = MOVEFLAG_HOVER; break;
+        case CMSG_MOVE_FEATHER_FALL_ACK:    changeTypeReceived = FEATHER_FALL; mFlag = MOVEFLAG_SAFE_FALL; break;
+        default:
+            sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Unknown move type opcode: %u", recvData.GetOpcode());
+            return;
+    }
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    uint32 movementCounter = pendingChange.movementCounter;
+#endif
+
+    if (pendingChange.movementCounter != movementCounter
+        || applySent != applyReceived
+        || changeTypeSent != changeTypeReceived)
+    {
+        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u kicked for incorrect data returned in an ack",
+            _player->GetName(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+
+    // Position change
+    HandleMoverRelocation(movementInfo);
+    _player->UpdateFallInformationIfNeed(movementInfo, recvData.GetOpcode());
+
+    switch (changeTypeReceived)
+    {
+        case WATER_WALK:            mover->SetWaterWalkingReal(applyReceived); break;
+        case SET_HOVER:             mover->SetHoverReal(applyReceived); break;
+        case FEATHER_FALL:          mover->SetFeatherFallReal(applyReceived); break;
+        default:
+            sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Unknown move type opcode: %u", recvData.GetOpcode());
+            return;
+    }
+
+    if(mFlag != MOVEFLAG_NONE)
+        MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
+}
+
+/*
+handles those packets:
+CMSG_FORCE_MOVE_ROOT_ACK
+CMSG_FORCE_MOVE_UNROOT_ACK
+*/
+void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
+{
+    DEBUG_LOG("HandleMoveRootAck");
+    
+    /* extract packet */
+    ObjectGuid guid;
+    recv_data >> guid;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    uint32 movementCounter;
+    recv_data >> movementCounter;
+#endif
+    MovementInfo movementInfo;
+    recv_data >> movementInfo;
+    movementInfo.UpdateTime(recv_data.GetPacketTime());
+
+    // make sure this client is allowed to control the unit which guid is provided
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+        return;
+
+    if (!VerifyMovementInfo(movementInfo))
+        return;
+
+    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
+        return;
+
+    Unit* mover = ObjectAccessor::GetUnit(*_player, guid);
+
+    if (!mover)
+        return;
+
+    // verify that indeed the client is replying with the changes that were send to him
+    if (!mover->HasPendingMovementChange())
+    {
+        sLog.outInfo("WorldSession::HandleMoveRootAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
+            _player->GetName(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+
+    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
+    bool applySent = pendingChange.apply;
+    MovementChangeType changeTypeSent = pendingChange.movementChangeType;
+
+    MovementFlags mFlag = MOVEFLAG_ROOT;
+    MovementChangeType changeTypeReceived = ROOT;
+    bool applyReceived = (recv_data.GetOpcode() == CMSG_FORCE_MOVE_ROOT_ACK);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    uint32 movementCounter = pendingChange.movementCounter;
+#endif
+
+    if (pendingChange.movementCounter != movementCounter 
+        || applySent != applyReceived
+        || changeTypeSent != changeTypeReceived)
+    {
+        sLog.outInfo("WorldSession::HandleMoveRootAck: Player %s from account id %u kicked for incorrect data returned in an ack",
+            _player->GetName(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+
+    // Update position if it has changed
+    HandleMoverRelocation(movementInfo);
+    _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
+    mover->SetRootedReal(applyReceived);
+
+    MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
+
+    // Set unit client state for brevity, though it should not be used
+    if (applyReceived)
+        mover->addUnitState(UNIT_STAT_CLIENT_ROOT);
+    else
+        mover->clearUnitState(UNIT_STAT_CLIENT_ROOT);
+}
+
+void WorldSession::HandleMoveKnockBackAck(WorldPacket & recv_data)
+{
+    DEBUG_LOG("CMSG_MOVE_KNOCK_BACK_ACK");
+
+    ObjectGuid guid;
+    recv_data >> guid;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    uint32 movementCounter;
+    recv_data >> movementCounter;
+#endif
+    MovementInfo movementInfo;
+    recv_data >> movementInfo;
+    movementInfo.UpdateTime(recv_data.GetPacketTime());
+
+    Unit* mover = ObjectAccessor::GetUnit(*_player, guid);
+
+    if (!mover)
+        return;
+
+    Player *pPlayerMover = mover->ToPlayer();
+
+    // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
+    if (pPlayerMover && pPlayerMover->IsBeingTeleported())
+    {
+        mover->PopPendingMovementChange();
+        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
+        return;
+    }
+
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+        return;
+
+    if (!VerifyMovementInfo(movementInfo))
+        return;
+
+    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
+        return;
+
+    // verify that indeed the client is replying with the changes that were send to him
+    if (!mover->HasPendingMovementChange())
+    {
+        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
+            _player->GetName(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+
+    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    uint32 movementCounter = pendingChange.movementCounter;
+#endif
+
+    if (pendingChange.movementCounter != movementCounter || pendingChange.movementChangeType != KNOCK_BACK
+        || std::fabs(pendingChange.knockbackInfo.speedXY - movementInfo.jump.xyspeed) > 0.01f
+        || std::fabs(pendingChange.knockbackInfo.speedZ - movementInfo.jump.velocity) > 0.01f
+        || std::fabs(pendingChange.knockbackInfo.vcos - movementInfo.jump.cosAngle) > 0.01f
+        || std::fabs(pendingChange.knockbackInfo.vsin - movementInfo.jump.sinAngle) > 0.01f)
+    {
+        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u kicked for incorrect data returned in an ack",
+            _player->GetName(), _player->GetSession()->GetAccountId());
+        _player->GetSession()->KickPlayer();
+        return;
+    }
+
+    HandleMoverRelocation(movementInfo);
+
+    MovementPacketSender::SendKnockBackToObservers(mover, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.velocity);
+}
+
+void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
+{
+    DEBUG_LOG("WORLD: Received CMSG_MOVE_SPLINE_DONE");
+
+    MovementInfo movementInfo;                              // used only for proper packet read
+
+    recv_data >> movementInfo;
+    recv_data >> Unused<uint32>();                          // unk
+    recv_data >> Unused<uint32>();                          // unk2
+
+    // Forward packet to near players
+    recv_data.SetOpcode(MSG_MOVE_STOP);
+    recv_data.rpos(0);
+    HandleMovementOpcodes(recv_data);
+}
+
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
@@ -576,76 +836,6 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
     GetPlayer()->SendMovementMessageToSet(std::move(data), false);
 }
 
-void WorldSession::HandleMoveKnockBackAck(WorldPacket & recv_data)
-{
-    DEBUG_LOG("CMSG_MOVE_KNOCK_BACK_ACK");
-
-    ObjectGuid guid;
-    recv_data >> guid;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    uint32 movementCounter;
-    recv_data >> movementCounter;
-#endif
-    MovementInfo movementInfo;
-    recv_data >> movementInfo;
-    movementInfo.UpdateTime(recv_data.GetPacketTime());
-
-    Unit* mover = ObjectAccessor::GetUnit(*_player, guid);
-
-    if (!mover)
-        return;
-
-    Player *pPlayerMover = mover->ToPlayer();
-
-    // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
-    if (pPlayerMover && pPlayerMover->IsBeingTeleported())
-    {
-        mover->PopPendingMovementChange();
-        recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
-        return;
-    }
-
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
-        return;
-
-    if (!VerifyMovementInfo(movementInfo))
-        return;
-
-    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
-        return;
-
-    // verify that indeed the client is replying with the changes that were send to him
-    if (!mover->HasPendingMovementChange())
-    {
-        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
-            _player->GetName(), _player->GetSession()->GetAccountId());
-        _player->GetSession()->KickPlayer();
-        return;
-    }
-
-    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
-
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
-    uint32 movementCounter = pendingChange.movementCounter;
-#endif
-
-    if (pendingChange.movementCounter != movementCounter || pendingChange.movementChangeType != KNOCK_BACK
-        || std::fabs(pendingChange.knockbackInfo.speedXY - movementInfo.jump.xyspeed) > 0.01f
-        || std::fabs(pendingChange.knockbackInfo.speedZ - movementInfo.jump.velocity) > 0.01f
-        || std::fabs(pendingChange.knockbackInfo.vcos - movementInfo.jump.cosAngle) > 0.01f
-        || std::fabs(pendingChange.knockbackInfo.vsin - movementInfo.jump.sinAngle) > 0.01f)
-    {
-        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u kicked for incorrect data returned in an ack",
-            _player->GetName(), _player->GetSession()->GetAccountId());
-        _player->GetSession()->KickPlayer();
-        return;
-    }
-
-    HandleMoverRelocation(movementInfo);
-
-    MovementPacketSender::SendKnockBackToObservers(mover, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.velocity);
-}
-
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)
 {
     if (!_player->isAlive() || _player->isInCombat())
@@ -655,6 +845,39 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recv_data)
     recv_data >> summonerGuid;
 
     _player->SummonIfPossible(true);
+}
+
+void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
+{
+    DEBUG_LOG("WORLD: Time Lag/Synchronization Resent/Update");
+
+    ObjectGuid g;
+    recv_data >> g;
+    uint32 lag;
+    recv_data >> lag;
+
+    Player* pl = GetPlayer();
+
+    pl->m_movementInfo.time += lag;
+    pl->m_movementInfo.ctime += lag;
+
+    // fix an 1.12 client problem with transports
+    Transport* tr = pl->GetTransport();
+    if (pl->HasJustBoarded() && tr)
+    {
+        pl->SetJustBoarded(false);
+        tr->SendOutOfRangeUpdateToPlayer(pl);
+        tr->SendCreateUpdateToPlayer(pl);
+    }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    else
+    {
+        WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
+        data << pl->GetPackGUID();
+        data << lag;
+        pl->SendMovementMessageToSet(std::move(data), false);
+    }
+#endif
 }
 
 bool WorldSession::VerifyMovementInfo(MovementInfo const& movementInfo, ObjectGuid const& guid) const
@@ -816,287 +1039,3 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
     }
 }
 
-void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
-{
-    DEBUG_LOG("WORLD: Time Lag/Synchronization Resent/Update");
-
-    ObjectGuid g;
-    recv_data >> g;
-    uint32 lag;
-    recv_data >> lag;
-
-    Player* pl = GetPlayer();
-
-    pl->m_movementInfo.time += lag;
-    pl->m_movementInfo.ctime += lag;
-
-    // fix an 1.12 client problem with transports
-    Transport* tr = pl->GetTransport();
-    if (pl->HasJustBoarded() && tr)
-    {
-        pl->SetJustBoarded(false);
-        tr->SendOutOfRangeUpdateToPlayer(pl);
-        tr->SendCreateUpdateToPlayer(pl);
-    }
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    else
-    {
-        WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
-        data << pl->GetPackGUID();
-        data << lag;
-        pl->SendMovementMessageToSet(std::move(data), false);
-    }
-#endif
-}
-
-/*
-handles those packets:
-CMSG_MOVE_WATER_WALK_ACK
-CMSG_MOVE_HOVER_ACK
-CMSG_MOVE_FEATHER_FALL_ACK
-*/
-void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
-{
-    /* extract packet */
-    ObjectGuid guid;
-    recvData >> guid;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    uint32 movementCounter;
-    recvData >> movementCounter;
-#endif
-    MovementInfo movementInfo;
-    recvData >> movementInfo;
-    movementInfo.UpdateTime(recvData.GetPacketTime());
-    uint32 applyInt;
-    recvData >> applyInt;
-    bool applyReceived = applyInt == 0u ? false : true;
-
-    // make sure this client is allowed to control the unit which guid is provided
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
-        return;
-
-    if (!VerifyMovementInfo(movementInfo))
-        return;
-
-    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recvData))
-        return;
-
-    Unit* mover = ObjectAccessor::GetUnit(*_player, guid);
-
-    if (!mover)
-        return;
-
-    // verify that indeed the client is replying with the changes that were send to him
-    if (!mover->HasPendingMovementChange())
-    {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
-            _player->GetName(), _player->GetSession()->GetAccountId());
-        _player->GetSession()->KickPlayer();
-        return;
-    }
-
-    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
-    bool applySent = pendingChange.apply;
-    MovementChangeType changeTypeSent = pendingChange.movementChangeType;
-
-    MovementFlags mFlag = MOVEFLAG_NONE;
-    MovementChangeType changeTypeReceived;
-    switch (recvData.GetOpcode())
-    {
-        case CMSG_MOVE_WATER_WALK_ACK:      changeTypeReceived = WATER_WALK; mFlag = MOVEFLAG_WATERWALKING; break;
-        case CMSG_MOVE_HOVER_ACK:           changeTypeReceived = SET_HOVER; mFlag = MOVEFLAG_HOVER; break;
-        case CMSG_MOVE_FEATHER_FALL_ACK:    changeTypeReceived = FEATHER_FALL; mFlag = MOVEFLAG_SAFE_FALL; break;
-        default:
-            sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Unknown move type opcode: %u", recvData.GetOpcode());
-            return;
-    }
-
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
-    uint32 movementCounter = pendingChange.movementCounter;
-#endif
-
-    if (pendingChange.movementCounter != movementCounter
-        || applySent != applyReceived
-        || changeTypeSent != changeTypeReceived)
-    {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u kicked for incorrect data returned in an ack",
-            _player->GetName(), _player->GetSession()->GetAccountId());
-        _player->GetSession()->KickPlayer();
-        return;
-    }
-
-    // Position change
-    HandleMoverRelocation(movementInfo);
-    _player->UpdateFallInformationIfNeed(movementInfo, recvData.GetOpcode());
-
-    switch (changeTypeReceived)
-    {
-        case WATER_WALK:            mover->SetWaterWalkingReal(applyReceived); break;
-        case SET_HOVER:             mover->SetHoverReal(applyReceived); break;
-        case FEATHER_FALL:          mover->SetFeatherFallReal(applyReceived); break;
-        default:
-            sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Unknown move type opcode: %u", recvData.GetOpcode());
-            return;
-    }
-
-    if(mFlag != MOVEFLAG_NONE)
-        MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
-}
-
-void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
-{
-    DEBUG_LOG("CMSG_FORCE_MOVE_UNROOT_ACK");
-    
-    ObjectGuid guid;
-    recv_data >> guid;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    uint32 movementCounter;
-    recv_data >> movementCounter;
-#endif
-    MovementInfo movementInfo;
-    recv_data >> movementInfo;
-    movementInfo.UpdateTime(recv_data.GetPacketTime());
-
-    // make sure this client is allowed to control the unit which guid is provided
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
-        return;
-
-    if (!VerifyMovementInfo(movementInfo))
-        return;
-
-    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
-        return;
-
-    Unit* mover = ObjectAccessor::GetUnit(*_player, guid);
-
-    if (!mover)
-        return;
-
-    // verify that indeed the client is replying with the changes that were send to him
-    if (!mover->HasPendingMovementChange())
-    {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
-            _player->GetName(), _player->GetSession()->GetAccountId());
-        _player->GetSession()->KickPlayer();
-        return;
-    }
-
-    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
-    bool applySent = pendingChange.apply;
-    MovementChangeType changeTypeSent = pendingChange.movementChangeType;
-
-    MovementFlags mFlag = MOVEFLAG_ROOT;
-    MovementChangeType changeTypeReceived = ROOT;
-    bool applyReceived = false;
-
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
-    uint32 movementCounter = pendingChange.movementCounter;
-#endif
-
-    if (pendingChange.movementCounter != movementCounter 
-        || applySent != applyReceived
-        || changeTypeSent != changeTypeReceived)
-    {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeAck: Player %s from account id %u kicked for incorrect data returned in an ack",
-            _player->GetName(), _player->GetSession()->GetAccountId());
-        _player->GetSession()->KickPlayer();
-        return;
-    }
-
-    // Update position if it has changed (possible on UNROOT ack?)
-    HandleMoverRelocation(movementInfo);
-    _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
-    mover->SetRootedReal(applyReceived);
-
-    MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
-
-    // Clear unit client state for brevity, though it should not be used
-    mover->clearUnitState(UNIT_STAT_CLIENT_ROOT);
-}
-
-void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
-{
-    DEBUG_LOG("WORLD: CMSG_FORCE_MOVE_ROOT_ACK");
-    
-    ObjectGuid guid;
-    recv_data >> guid;
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    uint32 movementCounter;
-    recv_data >> movementCounter;
-#endif
-    MovementInfo movementInfo;
-    recv_data >> movementInfo;
-    movementInfo.UpdateTime(recv_data.GetPacketTime());
-
-    // make sure this client is allowed to control the unit which guid is provided
-    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
-        return;
-
-    if (!VerifyMovementInfo(movementInfo))
-        return;
-
-    if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
-        return;
-
-    Unit* mover = ObjectAccessor::GetUnit(*_player, guid);
-
-    if (!mover)
-        return;
-
-    // verify that indeed the client is replying with the changes that were send to him
-    if (!mover->HasPendingMovementChange())
-    {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeAck: Player %s from account id %u kicked because no movement change ack was expected from this player",
-            _player->GetName(), _player->GetSession()->GetAccountId());
-        _player->GetSession()->KickPlayer();
-        return;
-    }
-
-    PlayerMovementPendingChange pendingChange = mover->PopPendingMovementChange();
-    bool applySent = pendingChange.apply;
-    MovementChangeType changeTypeSent = pendingChange.movementChangeType;
-
-    MovementFlags mFlag = MOVEFLAG_ROOT;
-    MovementChangeType changeTypeReceived = ROOT;
-    bool applyReceived = true;
-
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
-    uint32 movementCounter = pendingChange.movementCounter;
-#endif
-
-    if (pendingChange.movementCounter != movementCounter
-        || applySent != applyReceived
-        || changeTypeSent != changeTypeReceived)
-    {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeAck: Player %s from account id %u kicked for incorrect data returned in an ack",
-            _player->GetName(), _player->GetSession()->GetAccountId());
-        _player->GetSession()->KickPlayer();
-        return;
-    }
-
-    // Position change
-    HandleMoverRelocation(movementInfo);
-    _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
-    mover->SetRootedReal(applyReceived);
-
-    MovementPacketSender::SendMovementFlagChangeToObservers(mover, mFlag, applySent);
-
-    // Set unit client state for brevity, though it should not be used
-    mover->addUnitState(UNIT_STAT_CLIENT_ROOT);
-}
-
-void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)
-{
-    DEBUG_LOG("WORLD: Received CMSG_MOVE_SPLINE_DONE");
-
-    MovementInfo movementInfo;                              // used only for proper packet read
-
-    recv_data >> movementInfo;
-    recv_data >> Unused<uint32>();                          // unk
-    recv_data >> Unused<uint32>();                          // unk2
-
-    // Forward packet to near players
-    recv_data.SetOpcode(MSG_MOVE_STOP);
-    recv_data.rpos(0);
-    HandleMovementOpcodes(recv_data);
-}

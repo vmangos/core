@@ -32,20 +32,14 @@ class MovementInfo;
 //!       { SMSG_FORCE_MOVE_ROOT,                                 CMSG_FORCE_MOVE_ROOT_ACK,                                   MSG_MOVE_ROOT },
 //!       { SMSG_MOVE_WATER_WALK,                                 CMSG_MOVE_WATER_WALK_ACK,                                   MSG_MOVE_WATER_WALK },
 //!       { SMSG_MOVE_SET_HOVER,                                  CMSG_MOVE_HOVER_ACK,                                        MSG_MOVE_HOVER },
-//!       { SMSG_MOVE_SET_CAN_FLY,                                CMSG_MOVE_SET_CAN_FLY_ACK,                                  MSG_MOVE_UPDATE_CAN_FLY },
-//!       { SMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY,    CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK,      MSG_MOVE_UPDATE_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY },
 //!       { SMSG_MOVE_FEATHER_FALL,                               CMSG_MOVE_FEATHER_FALL_ACK,                                 MSG_MOVE_FEATHER_FALL },
-//!       { SMSG_MOVE_GRAVITY_DISABLE,                            CMSG_MOVE_GRAVITY_DISABLE_ACK,                              MSG_MOVE_GRAVITY_CHNG }
 //!   },
 //!   >>> UNAPPLY
 //!   {
 //!       { SMSG_FORCE_MOVE_UNROOT,                               CMSG_FORCE_MOVE_UNROOT_ACK,                                 MSG_MOVE_UNROOT },
 //!       { SMSG_MOVE_LAND_WALK,                                  CMSG_MOVE_WATER_WALK_ACK,                                   MSG_MOVE_WATER_WALK },
 //!       { SMSG_MOVE_UNSET_HOVER,                                CMSG_MOVE_HOVER_ACK,                                        MSG_MOVE_HOVER },
-//!       { SMSG_MOVE_UNSET_CAN_FLY,                              CMSG_MOVE_SET_CAN_FLY_ACK,                                  MSG_MOVE_UPDATE_CAN_FLY },
-//!       { SMSG_MOVE_UNSET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY,  CMSG_MOVE_SET_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY_ACK,      MSG_MOVE_UPDATE_CAN_TRANSITION_BETWEEN_SWIM_AND_FLY },
 //!       { SMSG_MOVE_NORMAL_FALL,                                CMSG_MOVE_FEATHER_FALL_ACK,                                 MSG_MOVE_FEATHER_FALL },
-//!       { SMSG_MOVE_GRAVITY_ENABLE,                             CMSG_MOVE_GRAVITY_ENABLE_ACK,                               MSG_MOVE_GRAVITY_CHNG }
 //!   }
 //!
 //!   ----------------------
@@ -57,14 +51,10 @@ class MovementInfo;
 //!       { SMSG_FORCE_SWIM_SPEED_CHANGE,                       CMSG_FORCE_SWIM_SPEED_CHANGE_ACK,                           MSG_MOVE_SET_SWIM_SPEED },
 //!       { SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,                  CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK,                      MSG_MOVE_SET_SWIM_BACK_SPEED },
 //!       { SMSG_FORCE_TURN_RATE_CHANGE,                        CMSG_FORCE_TURN_RATE_CHANGE_ACK,                            MSG_MOVE_SET_TURN_RATE },
-//!       { SMSG_FORCE_FLIGHT_SPEED_CHANGE,                     CMSG_FORCE_FLIGHT_SPEED_CHANGE_ACK,                         MSG_MOVE_SET_FLIGHT_SPEED },
-//!       { SMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE,                CMSG_FORCE_FLIGHT_BACK_SPEED_CHANGE_ACK,                    MSG_MOVE_SET_FLIGHT_BACK_SPEED },
-//!       { SMSG_FORCE_PITCH_RATE_CHANGE,                       CMSG_FORCE_PITCH_RATE_CHANGE_ACK,                           MSG_MOVE_SET_PITCH_RATE },
 //!
 //!   ----------------------
 //!   Other type of changes
 //!       // Step1 Sent by the server to the mover's client     // Step2 Sent back by the mover's client to the server      // Step3 Sent to observers
-//!       { SMSG_MOVE_SET_COLLISION_HGT,                        CMSG_MOVE_SET_COLLISION_HGT_ACK,                            MSG_MOVE_SET_COLLISION_HGT },
 //!       { MSG_MOVE_TELEPORT_ACK,                              MSG_MOVE_TELEPORT_ACK,                                      MSG_MOVE_TELEPORT },
 //!       { SMSG_MOVE_KNOCK_BACK,                               CMSG_MOVE_KNOCK_BACK_ACK,                                   MSG_MOVE_KNOCK_BACK },
 //!
@@ -88,7 +78,7 @@ class MovementInfo;
 //!   }
 
 /*
-xxxxxToMover() and xxxxxToObservers() methods should be only used on a unit controlled & moved by a player (as in direct client control: possess, vehicule,..).
+xxxxxToMover() and xxxxxToObservers() methods should be only used on a unit controlled & moved by a player (as in direct client control: possess).
 ToMover() to send a packet to the client (asking for confirmation before acting the change) and ToObservers once the change has been acted and should be broadcasted to the other players around (the observers).
 
 xxxxxToAll() method should be used on a unit controlled & moved by the server (@todo note to self: does a player moved unit under the control of a temporary disorient (Scatter Shot eg) or fear fall into this category? EDIT: by looking at the effects of Psychic Scream (10890), the answer is yes)

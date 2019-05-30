@@ -96,7 +96,7 @@ void MovementPacketSender::SendSpeedChangeToObservers(Unit* unit, UnitMoveType m
     Player* mover = unit->GetPlayerMovingMe();
     if (!mover)
     {
-        sLog.outError("entities.unit", "MovementPacketSender::SendSpeedChangeToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
+        sLog.outError("MovementPacketSender::SendSpeedChangeToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
         return;
     }
 
@@ -182,7 +182,7 @@ void MovementPacketSender::SendKnockBackToObservers(Unit* unit, float vcos, floa
     data << vsin;
     data << speedXY;
     data << speedZ;
-    unit->SendObjectMessageToSet(&data, false, mover);
+    unit->SendMovementMessageToSet(std::move(data), false, mover);
 }
 
 void MovementPacketSender::SendMovementFlagChangeToMover(Unit* unit, MovementFlags mFlag, bool apply)
