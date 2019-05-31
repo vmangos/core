@@ -17,6 +17,7 @@
 #include "GuardMgr.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "World.h"
 #include "DBCStores.h"
 #include "Log.h"
 #include "Policies/SingletonImp.h"
