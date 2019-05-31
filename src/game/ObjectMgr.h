@@ -813,6 +813,7 @@ class ObjectMgr
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
         void CheckCreatureTemplates();
+        void CorrectCreatureModels(uint32, uint32&);
 
         void LoadCreatures(bool reload = false);
         void LoadCreatureAddons();

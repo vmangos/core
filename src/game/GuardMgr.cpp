@@ -167,6 +167,7 @@ enum GuardIds
     NPC_MOONGLADE_WARDEN        = 11822,
     NPC_SHADOWGLEN_SENTINEL     = 12160,
     NPC_REVANTUSK_WATCHER       = 14730,
+    NPC_BOOTY_BAY_ELITE         = 15088,
     NPC_HAMERFALL_ELITE         = 15136,
     NPC_MENETHIL_ELITE          = 15137,
     NPC_SILVERPINE_ELITE        = 15138,
@@ -194,19 +195,16 @@ GuardMgr::GuardMgr()
     { AREA_SENTINEL_HILL,      AreaGuardInfo(NPC_PROTECTOR_OF_THE_PEOPLE, NPC_NONE) },
     { AREA_THELSAMAR,          AreaGuardInfo(NPC_THELSAMAR_MOUNTAINEER,   NPC_NONE) },
     { AREA_SILVERPINE,         AreaGuardInfo(NPC_NONE,                    NPC_SILVERPINE_DEATHGUARD) },
-    { AREA_SEPULCHER,          AreaGuardInfo(NPC_NONE,                    NPC_SILVERPINE_ELITE) },
     { AREA_UNDERCITY,          AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) },
     { AREA_KHARANOS,           AreaGuardInfo(NPC_IRONFORGE_MOUNTAINEER,   NPC_NONE) },
     { AREA_IRONFORGE,          AreaGuardInfo(NPC_IRONFORGE_GUARD,         NPC_NONE) },
     { AREA_DARNASSUS,          AreaGuardInfo(NPC_DARNASSUS_SENTINEL,      NPC_NONE) },
     { AREA_ORGRIMMAR,          AreaGuardInfo(NPC_NONE,                    NPC_ORGRIMMAR_GRUNT) },
     { AREA_WETLANDS,           AreaGuardInfo(NPC_MENETHIL_GUARD,          NPC_NONE) },
-    { AREA_MENETHIL,           AreaGuardInfo(NPC_MENETHIL_ELITE,          NPC_NONE) },
     { AREA_DUSTWALLOW_MARSH,   AreaGuardInfo(NPC_THERAMORE_GUARD,         NPC_BRACKENWALL_ENFORCER) },
     { AREA_BRACKENWALL_VILLAGE,AreaGuardInfo(NPC_NONE,                    NPC_BRACKENWALL_ENFORCER) },
     { AREA_ARATHI_HIGHLANDS,   AreaGuardInfo(NPC_REFUGE_POINTE_DEFENDER,  NPC_HAMERFALL_GUARDIAN) },
     { AREA_REFUGE_POINTE,      AreaGuardInfo(NPC_REFUGE_POINTE_DEFENDER,  NPC_NONE) },
-    { AREA_HAMERFALL,          AreaGuardInfo(NPC_NONE,                    NPC_HAMERFALL_ELITE) },
     { AREA_BRILL,              AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) },
     { AREA_TIRISFAL_GLADES,    AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) },
     { AREA_DEATHKNELL,         AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) },
@@ -230,11 +228,25 @@ GuardMgr::GuardMgr()
     { AREA_NORTHSHIRE,         AreaGuardInfo(NPC_NORTHSHIRE_GUARD,        NPC_NONE) },
     { AREA_COLDRIDGE_VALLEY,   AreaGuardInfo(NPC_COLDRIDGE_MOUNTAINEER,   NPC_NONE) },
     { AREA_VALLEY_OF_TRIALS,   AreaGuardInfo(NPC_NONE,                    NPC_DEN_GRUNT) },
-    { AREA_BOOTY_BAY,          AreaGuardInfo(NPC_BOOTY_BAY_BRUISER,       NPC_BOOTY_BAY_BRUISER) },
     { AREA_EVERLOOK,           AreaGuardInfo(NPC_EVERLOOK_BRUISER,        NPC_EVERLOOK_BRUISER) },
     { AREA_GADGETZAN,          AreaGuardInfo(NPC_GADGETZAN_BRUISER,       NPC_GADGETZAN_BRUISER) },
     { AREA_RATCHET,            AreaGuardInfo(NPC_RATCHET_BRUISER,         NPC_RATCHET_BRUISER) },
     };
+
+    if (sWorld.GetWowPatch() >= WOW_PATCH_107)
+    {
+        m_mAreaGuardInfo.insert({ AREA_SEPULCHER, AreaGuardInfo(NPC_NONE, NPC_SILVERPINE_ELITE) });
+        m_mAreaGuardInfo.insert({ AREA_MENETHIL,  AreaGuardInfo(NPC_MENETHIL_ELITE, NPC_NONE) });
+        m_mAreaGuardInfo.insert({ AREA_HAMERFALL, AreaGuardInfo(NPC_NONE, NPC_HAMERFALL_ELITE) });
+        m_mAreaGuardInfo.insert({ AREA_BOOTY_BAY, AreaGuardInfo(NPC_BOOTY_BAY_ELITE, NPC_BOOTY_BAY_ELITE) });
+    }
+    else
+    {
+        m_mAreaGuardInfo.insert({ AREA_SEPULCHER, AreaGuardInfo(NPC_NONE, NPC_SILVERPINE_DEATHGUARD) });
+        m_mAreaGuardInfo.insert({ AREA_MENETHIL,  AreaGuardInfo(NPC_MENETHIL_GUARD, NPC_NONE) });
+        m_mAreaGuardInfo.insert({ AREA_HAMERFALL, AreaGuardInfo(NPC_NONE, NPC_HAMERFALL_GUARDIAN) });
+        m_mAreaGuardInfo.insert({ AREA_BOOTY_BAY, AreaGuardInfo(NPC_BOOTY_BAY_BRUISER, NPC_BOOTY_BAY_BRUISER) });
+    }
 }
 
 void GuardMgr::Update(uint32 diff)

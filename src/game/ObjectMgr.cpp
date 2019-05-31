@@ -1141,6 +1141,24 @@ void ObjectMgr::LoadCreatureTemplates()
     CheckCreatureTemplates();
 }
 
+void ObjectMgr::CorrectCreatureModels(uint32 entry, uint32& displayId)
+{  
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    if (sWorld.GetWowPatch() == WOW_PATCH_106)
+    {
+        // Grizzle Halfmane
+        if (entry == 347 && displayId == 15092)
+            displayId = 15099;
+        // Elfarran
+        if (entry == 14981 && displayId == 15093)
+            displayId = 15098;
+        // Lylandris
+        if (entry == 14982 && displayId == 15094)
+            displayId = 15100;
+    }
+#endif
+}
+
 void ObjectMgr::CheckCreatureTemplates()
 {
     // check data correctness
@@ -1159,6 +1177,8 @@ void ObjectMgr::CheckCreatureTemplates()
 
         for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
         {
+            CorrectCreatureModels(cInfo->entry, const_cast<CreatureInfo*>(cInfo)->display_id[i]);
+
             if (cInfo->display_id[i])
             {
                 CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->display_id[i]);
