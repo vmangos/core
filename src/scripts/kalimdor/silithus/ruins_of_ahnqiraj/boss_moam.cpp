@@ -97,12 +97,8 @@ struct boss_moamAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        GameObject *pObsidian = m_creature->SummonGameObject(181069,
-                                m_creature->GetPositionX(),
-                                m_creature->GetPositionY(),
-                                m_creature->GetPositionZ(),
-                                0, 0, 0, 0, 0, -1, false);
-        pObsidian->SetRespawnTime(345600);
+        if (GameObject *pObsidian = m_creature->SummonGameObject(181069, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, 0, 0, 0, 0, -1, false))
+            pObsidian->SetRespawnTime(345600);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MOAM, DONE);
