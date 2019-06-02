@@ -30,7 +30,6 @@ go_barov_journal
 go_field_repair_bot_74A
 go_orb_of_command
 go_resonite_cask
-go_sacred_fire_of_life
 go_tablet_of_madness
 go_tablet_of_the_seven
 go_silithyste
@@ -233,23 +232,6 @@ bool GOHello_go_resonite_cask(Player* pPlayer, GameObject* pGO)
         pGO->SummonCreature(NPC_GOGGEROC, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 300000);
 
     return false;
-}
-
-/*######
-## go_sacred_fire_of_life
-######*/
-
-enum
-{
-    NPC_ARIKARA     = 10882,
-};
-
-bool GOHello_go_sacred_fire_of_life(Player* pPlayer, GameObject* pGO)
-{
-    if (pGO->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
-        pPlayer->SummonCreature(NPC_ARIKARA, -5008.338f, -2118.894f, 83.657f, 0.874f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-
-    return true;
 }
 
 /*######
@@ -579,11 +561,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_resonite_cask";
     newscript->pGOHello =           &GOHello_go_resonite_cask;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_sacred_fire_of_life";
-    newscript->pGOHello =           &GOHello_go_sacred_fire_of_life;
     newscript->RegisterSelf();
 
     newscript = new Script;
