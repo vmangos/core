@@ -10029,8 +10029,9 @@ InventoryResult Player::CanUseItem(Item *pItem, bool not_loading) const
             if (msg != EQUIP_ERR_OK)
                 return msg;
 
-            if (uint32 skill = pItem->GetSkill())
+            if (pItem->GetSkill() != 0)
             {
+                uint32 skill = pItem->GetSkill();
                 // Fist weapons use unarmed skill calculations, but we must query fist weapon skill presence to use this item
                 if (pProto->SubClass == ITEM_SUBCLASS_WEAPON_FIST)
                     skill = SKILL_FIST_WEAPONS;
