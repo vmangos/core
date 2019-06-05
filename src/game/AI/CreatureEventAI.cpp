@@ -148,7 +148,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             pHolder.UpdateRepeatTimer(m_creature, event.timer.repeatMin, event.timer.repeatMax);
             break;
         case EVENT_T_TIMER_OOC:
-            if (m_creature->isInCombat())
+            if (m_creature->isInCombat() || m_creature->IsInEvadeMode())
                 return false;
 
             //Repeat Timers
