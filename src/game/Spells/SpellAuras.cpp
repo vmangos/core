@@ -2838,8 +2838,28 @@ void Aura::HandleModPossess(bool apply, bool Real)
     if (!pCaster || !pTarget)
         return;
 
-    pCaster->ModPossess(pTarget, apply, m_removeMode);
-    pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    // Fix issue with control on old clients if player is afflicted by mind control,
+    // while he himself is possessing another unit. Client needs to first be told
+    // he no longer controls the other unit, have time to respond with set active mover,
+    // and only then to be told he is mind controlled in order to have control disabled.
+    if (pTarget->GetCharmGuid())
+    {
+        pTarget->CombatStop(true);
+        AuraRemoveMode removeMode = m_removeMode;
+        SpellSchoolMask schoolMask = GetSpellProto()->GetSpellSchoolMask();
+        pTarget->m_Events.AddLambdaEventAtOffset([pTarget, pCaster, apply, removeMode, schoolMask]
+        {
+            pCaster->ModPossess(pTarget, apply, removeMode);
+            pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, schoolMask);
+        }, 500);
+    }
+    else
+#endif
+    { 
+        pCaster->ModPossess(pTarget, apply, m_removeMode);
+        pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
+    }
 
     if (!apply && GetId() == 24937) // Controlling Steam Tonk
     {
@@ -2973,8 +2993,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
     }
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
-    if (Player* pPlayerTarget = pTarget->ToPlayer())
-        pPlayerTarget->SendCreateUpdateToPlayer(pCaster);
+    pTarget->SendCreateUpdateToPlayer(pCaster);
 #endif
 }
 
@@ -3046,6 +3065,10 @@ void Player::ModPossessPet(Pet* pPet, bool apply, AuraRemoveMode m_removeMode)
         // To avoid moving the wrong unit on server side between cancellation and mover swap
         // the pet has the controlled state removed in WorldSession::HandleSetActiveMoverOpcode
     }
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    pPet->SendCreateUpdateToPlayer(pCaster);
+#endif
 }
 
 void Aura::HandleModCharm(bool apply, bool Real)
