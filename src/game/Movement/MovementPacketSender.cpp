@@ -22,7 +22,7 @@
 #include "Anticheat.h"
 
 // Spline packets are for units controlled by the server. "Force speed change" (wrongly named opcodes) and "move set speed" packets are for units controlled by a player.
-OpcodesList const MovementPacketSender::moveTypeToOpcode[MAX_MOVE_TYPE][3] =
+OpcodesList const moveTypeToOpcode[MAX_MOVE_TYPE][3] =
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     { SMSG_SPLINE_SET_WALK_SPEED,        SMSG_FORCE_WALK_SPEED_CHANGE,           MSG_MOVE_SET_WALK_SPEED },
