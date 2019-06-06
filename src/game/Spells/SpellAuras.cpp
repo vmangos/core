@@ -2833,60 +2833,58 @@ void Aura::HandleModPossess(bool apply, bool Real)
     if (!Real)
         return;
 
-    Unit* target = GetTarget();
-    Unit* caster = GetCaster();
-    if (!caster || !target)
+    Unit* pTarget = GetTarget();
+    Unit* pCaster = GetCaster();
+    if (!pCaster || !pTarget)
         return;
 
-    caster->ModPossess(target, apply, m_removeMode);
-    target->AddThreat(caster,target->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
+    pCaster->ModPossess(pTarget, apply, m_removeMode);
+    pTarget->AddThreat(pCaster, pTarget->GetHealth(), false, GetSpellProto()->GetSpellSchoolMask());
 
     if (!apply && GetId() == 24937) // Controlling Steam Tonk
     {
-        target->CastSpell(target, 27771, true); // Cast Damaged Tonk
-        caster->CastSpell(caster, 9179, true); // Cast 3 sec Stun on self
-        caster->RemoveAurasDueToSpell(24935); // Unroot player
+        pTarget->CastSpell(pTarget, 27771, true); // Cast Damaged Tonk
+        pCaster->CastSpell(pCaster, 9179, true); // Cast 3 sec Stun on self
+        pCaster->RemoveAurasDueToSpell(24935); // Unroot player
     }
 }
 
-void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
+void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
 {
-    // not possess yourself
-    if (target == this)
+    // Cannot possess yourself.
+    if (pTarget == this)
         return;
 
-    Unit* caster = this;
-
-    Player* pPlayerCaster = caster->ToPlayer();
-    Player* pPlayerTarget = target->ToPlayer();
-
-    if (!pPlayerCaster && !pPlayerTarget)
+    // Only a player can possess units, mobs can charm.
+    Player* pCaster = ToPlayer();
+    if (!pCaster)
         return;
 
     if (apply)
     {
-        // Remove dummy auras from spells with EffectSummonPossessed
-        target->RemoveAurasDueToSpell(126);
-        target->RemoveAurasDueToSpell(6272);
-        target->RemoveAurasDueToSpell(11403);
+        // Remove dummy auras from spells with EffectSummonPossessed.
+        pTarget->RemoveAurasDueToSpell(126);
+        pTarget->RemoveAurasDueToSpell(6272);
+        pTarget->RemoveAurasDueToSpell(11403);
 
-        FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
-        target->addUnitState(UNIT_STAT_POSSESSED);
+        FactionTemplateEntry const* origFactionTemplate = pTarget->getFactionTemplateEntry();
+        pTarget->addUnitState(UNIT_STAT_POSSESSED);
 
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
-        target->SetCharmerGuid(caster->GetObjectGuid());
-        target->setFaction(caster->getFaction());
+        pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
+        pTarget->SetCharmerGuid(pCaster->GetObjectGuid());
+        pTarget->SetPossessorGuid(pCaster->GetObjectGuid());
+        pTarget->setFaction(pCaster->getFaction());
 
-        // target should became visible at SetView call(if not visible before):
-        // otherwise client\pPlayerCaster will ignore packets from the target(SetClientControl for example)
-        pPlayerCaster->GetCamera().SetView(target);
+        // Target should became visible at SetView call (if not visible before),
+        // otherwise client will ignore packets from the target (SetClientControl for example).
+        pCaster->GetCamera().SetView(pTarget);
 
-        caster->SetCharm(target);
-        pPlayerCaster->SetMover(target);
+        pCaster->SetCharm(pTarget);
+        pCaster->SetMover(pTarget);
 
-        target->CombatStop(true);
+        pTarget->CombatStop(true);
 
-        if (CharmInfo *charmInfo = target->InitCharmInfo(target))
+        if (CharmInfo *charmInfo = pTarget->InitCharmInfo(pTarget))
         {
             charmInfo->InitPossessCreateSpells();
             charmInfo->SetReactState(REACT_PASSIVE);
@@ -2894,93 +2892,89 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
             charmInfo->SetOriginalFactionTemplate(origFactionTemplate);
         }
 
-        pPlayerCaster->PossessSpellInitialize();
+        pCaster->PossessSpellInitialize();
 
-        if (Creature* pTargetCrea = target->ToCreature())
-            if (!pTargetCrea->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
-                if (pTargetCrea->AI()->SwitchAiAtControl())
-                    pTargetCrea->AIM_Initialize();
+        if (Creature* pCreature = pTarget->ToCreature())
+            if (!pCreature->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
+                if (pCreature->AI()->SwitchAiAtControl())
+                    pCreature->AIM_Initialize();
 
-        if (pPlayerTarget && !pPlayerCaster)
-            pPlayerTarget->SetControlledBy(caster);
-        // Les mobs doivent attaquer celui qui est CM.
-        // On appelle donc 'MoveInLineOfSight' pour les mobs a cote.
-        target->ScheduleAINotify(0);
-        target->UpdateControl();
-        if (target->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT))
-            target->SetRooted(true);
-        target->StopMoving();
-        target->SetWalk(pPlayerCaster->IsWalking());
+        // Mobs should attack the target being mind controlled.
+        // So we call 'MoveInLineOfSight' for nearby mobs.
+        pTarget->ScheduleAINotify(0);
 
-        if (target->IsCreature() && target->IsRooted())
-            MovementPacketSender::SendMovementFlagChangeToMover(target, MOVEFLAG_ROOT, true);
+        pTarget->UpdateControl();
+        if (pTarget->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT))
+            pTarget->SetRooted(true);
+        pTarget->StopMoving();
+        pTarget->SetWalk(pCaster->IsWalking());
+
+        if (pTarget->IsCreature() && pTarget->IsRooted())
+            MovementPacketSender::SendMovementFlagChangeToMover(pTarget, MOVEFLAG_ROOT, true);
     }
     else
     {
-        // Clear threat generated when MC ends
-        target->RemoveAttackersThreat(caster);
+        // Clear threat generated when MC ends.
+        pTarget->RemoveAttackersThreat(pCaster);
 
-        // spell is interrupted on channeled aura removal, don't need to interrupt here
-        //caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+        pCaster->SetMover(nullptr);
+        pCaster->SetCharm(nullptr);
+        pCaster->UpdateControl();
 
-        pPlayerCaster->SetMover(nullptr);
-        caster->SetCharm(nullptr);
-        caster->UpdateControl();
+        // There is a possibility that target became invisible for client at ResetView call.
+        // It must be called after movement control unapplying, not before! The reason is same as at aura applying.
+        pCaster->GetCamera().ResetView();
+        pCaster->RemovePetActionBar();
 
-        // there is a possibility that target became invisible for client\pPlayerCaster at ResetView call:
-        // it must be called after movement control unapplying, not before! the reason is same as at aura applying
-        pPlayerCaster->GetCamera().ResetView();
-        pPlayerCaster->RemovePetActionBar();
-
-        // on delete only do caster related effects
+        // On delete only do caster related effects.
         if (m_removeMode == AURA_REMOVE_BY_DELETE)
             return;
 
-        target->clearUnitState(UNIT_STAT_POSSESSED);
+        pTarget->clearUnitState(UNIT_STAT_POSSESSED);
+        pTarget->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
+        pTarget->SetCharmerGuid(ObjectGuid());
+        pTarget->SetPossessorGuid(ObjectGuid());
 
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
-
-        target->SetCharmerGuid(ObjectGuid());
-
-        if (target->GetTypeId() == TYPEID_PLAYER)
+        if (Player* pPlayerTarget = pTarget->ToPlayer())
         {
-            Player* p_target = ((Player*)target);
-            p_target->RemoveAI();
-            p_target->RelocateToLastClientPosition(); // Movement interpolation - prevent undermap.
+            pPlayerTarget->RemoveAI();
+            pPlayerTarget->RelocateToLastClientPosition(); // Movement interpolation - prevent undermap.
         }
 
-        target->RestoreFaction();
-        target->CombatStop(true);
-        target->UpdateControl();
-        target->SetWalk(false);
+        pTarget->RestoreFaction();
+        pTarget->CombatStop(true);
+        pTarget->UpdateControl();
+        pTarget->SetWalk(false);
 
-        if (Creature* pCreature = target->ToCreature())
+        if (Creature* pCreature = pTarget->ToCreature())
         {
             if (!pCreature->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
             {
-                target->StopMoving(true);
+                pTarget->StopMoving(true);
                 if (pCreature->AI() && pCreature->AI()->SwitchAiAtControl())
                     pCreature->AIM_Initialize();
 
-                pCreature->AttackedBy(caster);
+                pCreature->AttackedBy(pCaster);
             }
         }
         else
-            target->StopMoving(true);
+            pTarget->StopMoving(true);
 
         // cast mind exhaustion on self when the posess possess ends if the creature
         // is death knight understudy (razuvious). 
         // todo: if there is a way to know a possess has ended through scriptAI, fix this.
-        if (target->GetEntry() == 16803)
+        if (pTarget->GetEntry() == 16803)
         {
-            target->CastSpell(target, 29051, true); 
+            pTarget->CastSpell(pTarget, 29051, true); 
         }
+
+        if (pTarget->IsPlayer() && pTarget->IsRooted())
+            MovementPacketSender::SendMovementFlagChangeToMover(pTarget, MOVEFLAG_ROOT, true);
     }
-    //target->SetUnitMovementFlags(MOVEFLAG_NONE);
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
-    if (pPlayerCaster && pPlayerTarget)
-        pPlayerTarget->SendCreateUpdateToPlayer(pPlayerCaster);
+    if (Player* pPlayerTarget = pTarget->ToPlayer())
+        pPlayerTarget->SendCreateUpdateToPlayer(pCaster);
 #endif
 }
 
@@ -2989,67 +2983,65 @@ void Aura::HandleModPossessPet(bool apply, bool Real)
     if (!Real)
         return;
 
-    Unit* caster = GetCaster();
-    if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
+    Player* pCaster = ToPlayer(GetCaster());
+    if (!pCaster)
         return;
 
-    Unit* target = GetTarget();
-    if (target->GetTypeId() != TYPEID_UNIT || !((Creature*)target)->IsPet())
+    Unit* pTarget = GetTarget();
+    if (!pTarget->IsPet())
         return;
 
-    Pet* pet = (Pet*)target;
-
-    Player* p_caster = (Player*)caster;
-    p_caster->ModPossessPet(pet, apply, m_removeMode);
+    Pet* pPet = (Pet*)pTarget;
+    pCaster->ModPossessPet(pPet, apply, m_removeMode);
 }
 
-void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
+void Player::ModPossessPet(Pet* pPet, bool apply, AuraRemoveMode m_removeMode)
 {
-    Player* p_caster = this;
-    Camera& camera = p_caster->GetCamera();
+    Player* pCaster = this;
+    Camera& camera = pCaster->GetCamera();
 
     if (apply)
     {
-        pet->addUnitState(UNIT_STAT_POSSESSED);
+        pPet->addUnitState(UNIT_STAT_POSSESSED);
 
-        // target should became visible at SetView call(if not visible before):
-        // otherwise client\p_caster will ignore packets from the target(SetClientControl for example)
-        camera.SetView(pet);
+        // Target should became visible at SetView call(if not visible before),
+        // otherwise client will ignore packets from the target(SetClientControl for example).
+        camera.SetView(pPet);
 
-        p_caster->SetCharm(pet);
-        p_caster->SetMover(pet);
+        pCaster->SetCharm(pPet);
+        pCaster->SetMover(pPet);
 
-        pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
-        pet->SetCharmerGuid(p_caster->GetObjectGuid());
-        pet->SetPossesorGuid(p_caster->GetObjectGuid());
+        pPet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
+        pPet->SetCharmerGuid(pCaster->GetObjectGuid());
+        pPet->SetPossessorGuid(pCaster->GetObjectGuid());
 
-        pet->StopMoving();
-        pet->GetMotionMaster()->Clear(false);
-        pet->GetMotionMaster()->MoveIdle();
-        pet->UpdateControl();
-        pet->SetWalk(p_caster->IsWalking());
+        pPet->StopMoving();
+        pPet->GetMotionMaster()->Clear(false);
+        pPet->GetMotionMaster()->MoveIdle();
+        pPet->UpdateControl();
+        pPet->SetWalk(pCaster->IsWalking());
 
-        if (CharmInfo* charmInfo = pet->GetCharmInfo())
+        if (CharmInfo* charmInfo = pPet->GetCharmInfo())
         {
             charmInfo->SetIsAtStay(false);
             charmInfo->SetIsReturning(false);
             charmInfo->SetIsFollowing(false);
         }
 
-        if (pet->IsRooted())
-            MovementPacketSender::SendMovementFlagChangeToMover(pet, MOVEFLAG_ROOT, true);
+        if (pPet->IsRooted())
+            MovementPacketSender::SendMovementFlagChangeToMover(pPet, MOVEFLAG_ROOT, true);
     }
     else
     {
-        p_caster->SetCharm(nullptr);
-        p_caster->SetMover(nullptr);
+        pCaster->SetCharm(nullptr);
+        pCaster->SetMover(nullptr);
 
-        // there is a possibility that target became invisible for client\p_caster at ResetView call:
-        // it must be called after movement control unapplying, not before! the reason is same as at aura applying
+        // There is a possibility that target became invisible for client at ResetView call.
+        // It must be called after movement control unapplying, not before! the reason is same as at aura applying.
         camera.ResetView();
-        pet->UpdateControl();
-        pet->SetCharmerGuid(ObjectGuid());
-        pet->SetPossesorGuid(ObjectGuid());
+        pPet->UpdateControl();
+        pPet->SetCharmerGuid(ObjectGuid());
+        pPet->SetPossessorGuid(ObjectGuid());
 
         // To avoid moving the wrong unit on server side between cancellation and mover swap
         // the pet has the controlled state removed in WorldSession::HandleSetActiveMoverOpcode

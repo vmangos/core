@@ -6150,6 +6150,15 @@ Unit *Unit::GetCharmer() const
     return nullptr;
 }
 
+Player* Unit::GetPossessor() const
+{
+    if (ObjectGuid possessor = GetPossessorGuid())
+        if (possessor.IsPlayer())
+            return ObjectAccessor::FindPlayer(possessor);
+
+    return nullptr;
+}
+
 bool Unit::IsCharmerOrOwnerPlayerOrPlayerItself() const
 {
     if (GetTypeId() == TYPEID_PLAYER)
@@ -8165,17 +8174,17 @@ bool Unit::HasPendingMovementChange(MovementChangeType changeType) const
 
 Player* Unit::GetPlayerMovingMe()
 {
-    if (Player* pCharmer = ::ToPlayer(GetCharmer()))
-        if (pCharmer->GetCharmGuid() == GetObjectGuid())
-            return pCharmer;
+    if (Player* pPossessor = GetPossessor())
+        if (pPossessor->GetCharmGuid() == GetObjectGuid())
+            return pPossessor;
 
     return ToPlayer();
 }
 
 bool Unit::IsMovedByPlayer() const
 {
-    if (Player* pCharmer = ::ToPlayer(GetCharmer()))
-        if (pCharmer->GetCharmGuid() == GetObjectGuid())
+    if (Player* pPossessor = GetPossessor())
+        if (pPossessor->GetCharmGuid() == GetObjectGuid())
             return true;
 
     return IsPlayer();

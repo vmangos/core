@@ -1608,8 +1608,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
-        ObjectGuid const& GetPossessorGuid() { return m_possessorGuid; }
-        void SetPossesorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
+        ObjectGuid const& GetPossessorGuid() const { return m_possessorGuid; }
+        void SetPossessorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
 
         virtual Pet* GetMiniPet() const { return nullptr; }    // overwrited in Player
 
@@ -1626,6 +1626,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Unit* GetOwner() const;
         Pet* GetPet() const;
         Unit* GetCharmer() const;
+        Player* GetPossessor() const;
         Unit* GetCharm() const;
         void Uncharm();
         void RemoveCharmAuras();

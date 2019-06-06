@@ -16998,7 +16998,7 @@ Creature* Player::SummonPossessedMinion(uint32 creatureId, uint32 spellId, float
 
     pCreature->SetFactionTemporary(getFaction(), TEMPFACTION_NONE);     // set same faction than player
     pCreature->SetCharmerGuid(GetObjectGuid());                         // save guid of the charmer
-    pCreature->SetPossesorGuid(GetObjectGuid());
+    pCreature->SetPossessorGuid(GetObjectGuid());
     pCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);          // set the spell id used to create this
     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);          // set flag for client that mean this unit is controlled by a player
     pCreature->addUnitState(UNIT_STAT_POSSESSED);                       // also set internal unit state flag
@@ -17039,7 +17039,7 @@ void Player::UnsummonPossessedMinion()
 
     SetClientControl(pMinion, false);
     pMinion->SetCharmerGuid(ObjectGuid());
-    pMinion->SetPossesorGuid(ObjectGuid());
+    pMinion->SetPossessorGuid(ObjectGuid());
     pMinion->clearUnitState(UNIT_STAT_POSSESSED);
     pMinion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
     pMinion->DoKillUnit();
@@ -19383,17 +19383,6 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
     data << uint8(allowMove);
     GetSession()->SendPacket(&data);
 #endif
-}
-
-bool Player::IsMoverOf(Object const* pObject) const
-{
-    if (Player const* pPlayer = pObject->ToPlayer())
-    {
-        if (GetMover() == pPlayer)
-            return true;
-    }
-
-    return false;
 }
 
 bool Player::HasSelfMovementControl() const
