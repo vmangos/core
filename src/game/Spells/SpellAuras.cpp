@@ -2888,8 +2888,8 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         pTarget->RemoveAurasDueToSpell(11403);
 
         FactionTemplateEntry const* origFactionTemplate = pTarget->getFactionTemplateEntry();
-        pTarget->addUnitState(UNIT_STAT_POSSESSED);
 
+        pTarget->addUnitState(UNIT_STAT_POSSESSED);
         pTarget->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
         pTarget->SetCharmerGuid(pCaster->GetObjectGuid());
         pTarget->SetPossessorGuid(pCaster->GetObjectGuid());
@@ -2940,6 +2940,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         pCaster->SetMover(nullptr);
         pCaster->SetCharm(nullptr);
         pCaster->UpdateControl();
+        pCaster->SetClientControl(pTarget, false);
 
         // There is a possibility that target became invisible for client at ResetView call.
         // It must be called after movement control unapplying, not before! The reason is same as at aura applying.
@@ -3061,6 +3062,9 @@ void Player::ModPossessPet(Pet* pPet, bool apply, AuraRemoveMode m_removeMode)
         pPet->UpdateControl();
         pPet->SetCharmerGuid(ObjectGuid());
         pPet->SetPossessorGuid(ObjectGuid());
+
+        if (!pPet->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
+            pPet->StopMoving(true);
 
         // To avoid moving the wrong unit on server side between cancellation and mover swap
         // the pet has the controlled state removed in WorldSession::HandleSetActiveMoverOpcode
