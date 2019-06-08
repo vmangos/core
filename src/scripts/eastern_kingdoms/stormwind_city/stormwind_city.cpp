@@ -1224,102 +1224,6 @@ bool QuestAccept_npc_tyrion(Player* pPlayer, Creature* pCreature, const Quest* p
     return true;
 }
 
-/*######
-## npc_bolvar_fordragon
-######*/
-
-enum
-{
-    SPELL_HIGHLORDS_JUSTICE = 20683,
-    SPELL_CLEAVE            = 20684,
-    SPELL_SHIELD_WALL       = 29061,
-    SPELL_LAY_ON_HANDS      = 17233,
-};
-
-struct npc_bolvar_fordragonAI : ScriptedAI
-{
-    explicit npc_bolvar_fordragonAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        npc_bolvar_fordragonAI::Reset();
-    }
-
-    uint32 m_uiCleaveTimer;
-    uint32 m_uiHighlordsJusticeTimer;
-    uint32 m_uiShieldwallTimer;
-    bool m_bHasUsedLOH;
-
-    void Reset() override
-    {
-        m_bHasUsedLOH = false;
-        m_uiCleaveTimer = 5000;
-        m_uiHighlordsJusticeTimer = 10000;
-        m_uiShieldwallTimer = 18000;
-    }
-
-    void DamageTaken(Unit* /*pDealer*/, uint32& /*uiDamage*/) override
-    {
-        if (!m_bHasUsedLOH && m_creature->GetHealthPercent() < 20.0f)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_LAY_ON_HANDS) == CAST_OK)
-                m_bHasUsedLOH = true;
-        }
-    }
-
-    void UpdateAI(const uint32 uiDiff) override
-    { 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiCleaveTimer < uiDiff)
-        {
-           if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
-			   m_uiCleaveTimer = urand(5000, 8000);
-        }
-        else
-            m_uiCleaveTimer -= uiDiff;
-
-        if (m_uiHighlordsJusticeTimer < uiDiff)
-        {
-            if (m_creature->IsWithinDistInMap(m_creature->getVictim(), 5.0f))
-            {
-                if (DoCastSpellIfCan(m_creature, SPELL_HIGHLORDS_JUSTICE) == CAST_OK)
-                    m_uiHighlordsJusticeTimer = urand(20000, 22000);
-            }
-        }
-        else
-            m_uiHighlordsJusticeTimer -= uiDiff;
-
-        if (m_uiShieldwallTimer < uiDiff)
-        {
-            if (m_creature->GetHealthPercent() < 90.0f)
-            {
-                if (DoCastSpellIfCan(m_creature, SPELL_SHIELD_WALL) == CAST_OK)
-                    m_uiShieldwallTimer = urand (40000, 60000);
-            }
-            else
-                m_uiShieldwallTimer += 5000;
-        }
-        else m_uiShieldwallTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_bolvar_fordragon(Creature* pCreature)
-{
-    return new npc_bolvar_fordragonAI(pCreature);
-}
-
-bool GossipHello_npc_bolvar_fordragon(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    pPlayer->SEND_GOSSIP_MENU(865, pCreature->GetGUID());
-
-    return true;
-}
-
 struct SpawnLocation
 {
     float m_fX, m_fY, m_fZ;
@@ -1678,12 +1582,6 @@ void AddSC_stormwind_city()
     newscript->GetAI = &GetAI_npc_tyrion;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_tyrion;
     newscript->pGossipHello = &GossipHello_npc_tyrion;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_bolvar_fordragon";
-    newscript->GetAI = &GetAI_npc_bolvar_fordragon;
-    newscript->pGossipHello   = &GossipHello_npc_bolvar_fordragon;
     newscript->RegisterSelf();
 
     newscript = new Script;
