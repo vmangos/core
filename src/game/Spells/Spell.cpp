@@ -4062,16 +4062,10 @@ void Spell::update(uint32 difftime)
                     // check for incapacitating player states
                     if (m_caster->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
                     {
-                        if (m_caster->hasUnitState(UNIT_STAT_DIED))
-                            cancel();
-
-                        if (m_caster->hasUnitState(UNIT_STAT_STUNNED) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_STUN)))
-                            cancel();
-
-                        if (m_caster->hasUnitState(UNIT_STAT_CONFUSED) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_CONFUSE)))
-                            cancel();
-
-                        if (m_caster->hasUnitState(UNIT_STAT_FLEEING) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_FEAR)))
+                        if (m_caster->hasUnitState(UNIT_STAT_DIED) ||
+                           (m_caster->hasUnitState(UNIT_STAT_STUNNED) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_STUN))) ||
+                           (m_caster->hasUnitState(UNIT_STAT_CONFUSED) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_CONFUSE))) ||
+                           (m_caster->hasUnitState(UNIT_STAT_FLEEING) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_FEAR))))
                             cancel();
                     }
                 }

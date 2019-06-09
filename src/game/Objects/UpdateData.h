@@ -98,7 +98,9 @@ class MovementData
         void AddPacket(WorldPacket& data);
         void SetUnitSpeed(uint32 opcode, ObjectGuid const& unit, float value);
         void SetSplineOpcode(uint32 opcode, ObjectGuid const& unit);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         bool BuildPacket(WorldPacket& data);
+#endif
     protected:
         ByteBuffer _buffer;
         WorldObject* _owner; // If not null, we dont compress data
