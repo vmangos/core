@@ -10226,7 +10226,7 @@ void Unit::UpdateModelData()
         {
             // Taurens have increased combat reach. Confirmed by Blizzard.
             // https://us.forums.blizzard.com/en/wow/t/wow-classic-not-a-bug-list/175887
-            if (getRace() == RACE_TAUREN)
+            if (getRace() == RACE_TAUREN && GetDisplayId() == GetNativeDisplayId())
                 SetFloatValue(UNIT_FIELD_COMBATREACH, 4.05f);
             else
                 SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
@@ -12276,14 +12276,14 @@ void Unit::InitPlayerDisplayIds()
     switch (gender)
     {
         case GENDER_FEMALE:
-            SetDisplayId(info->displayId_f);
             SetNativeDisplayId(info->displayId_f);
+            SetDisplayId(info->displayId_f);
             if (getRace() == RACE_TAUREN)
                 setNativeScale(DEFAULT_TAUREN_FEMALE_SCALE);
             break;
         case GENDER_MALE:
-            SetDisplayId(info->displayId_m);
             SetNativeDisplayId(info->displayId_m);
+            SetDisplayId(info->displayId_m);
             if (getRace() == RACE_TAUREN)
                 setNativeScale(DEFAULT_TAUREN_MALE_SCALE);
             break;
