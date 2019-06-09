@@ -4057,24 +4057,33 @@ void Spell::update(uint32 difftime)
         {
             if (m_timer > 0)
             {
-                if (m_caster->GetTypeId() == TYPEID_PLAYER && (m_spellInfo->Id != 24322) && (m_spellInfo->Id != 24323))
+                if (m_caster->IsPlayer() || m_caster->IsPet())
+                {
+                    // check for incapacitating player states
+                    if (m_caster->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
+                    {
+                        if (m_caster->hasUnitState(UNIT_STAT_DIED))
+                            cancel();
+
+                        if (m_caster->hasUnitState(UNIT_STAT_STUNNED) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_STUN)))
+                            cancel();
+
+                        if (m_caster->hasUnitState(UNIT_STAT_CONFUSED) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_CONFUSE)))
+                            cancel();
+
+                        if (m_caster->hasUnitState(UNIT_STAT_FLEEING) && !(m_channeled && m_spellInfo->HasAura(SPELL_AURA_MOD_FEAR)))
+                            cancel();
+                    }
+                }
+
+                if (m_caster->IsPlayer() && (m_spellInfo->Id != 24322) && (m_spellInfo->Id != 24323))
                 {
                     // check if player has jumped before the channeling finished
                     if (((Player*)m_caster)->m_movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))
                         cancel();
 
-                    // check for incapacitating player states
-                    if (m_caster->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
-                        cancel();
-
                     // check if player has turned if flag is set
                     if (m_spellInfo->ChannelInterruptFlags & CHANNEL_FLAG_TURNING && m_castOrientation != nowO)
-                        cancel();
-                }
-                else if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->IsPet())
-                {
-                    // for succubus case
-                    if (m_caster->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
                         cancel();
                 }
 
