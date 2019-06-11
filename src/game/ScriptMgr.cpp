@@ -2055,7 +2055,8 @@ void ScriptMgr::LoadScriptWaypoints()
 
             if (!pCInfo)
             {
-                sLog.outErrorDb("DB table script_waypoint has waypoint for nonexistant creature entry %u", pTemp.uiCreatureEntry);
+                if (!sObjectMgr.IsExistingCreatureId(pTemp.uiCreatureEntry))
+                    sLog.outErrorDb("DB table script_waypoint has waypoint for nonexistant creature entry %u", pTemp.uiCreatureEntry);
                 continue;
             }
 

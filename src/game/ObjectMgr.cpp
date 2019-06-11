@@ -1142,7 +1142,24 @@ void ObjectMgr::LoadCreatureTemplates()
 }
 
 void ObjectMgr::CorrectCreatureModels(uint32 entry, uint32& displayId)
-{  
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_2_4
+    if (sWorld.GetWowPatch() == WOW_PATCH_102)
+    {
+        // Rhahk'Zor
+        if (entry == 644 && displayId == 1124)
+            displayId = 14403;
+        // Mo'grosh Brute
+        if (entry == 1180 && displayId == 1124)
+            displayId = 14403;
+        // Dreadmaul Ogre
+        if (entry == 5974 && displayId == 11541)
+            displayId = 14402;
+        // Dreadmaul Mauler
+        if (entry == 5977 && displayId == 11540)
+            displayId = 14401;
+    }
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (sWorld.GetWowPatch() == WOW_PATCH_106)
     {
@@ -3753,7 +3770,8 @@ void ObjectMgr::LoadItemRequiredTarget()
 
         if (!sCreatureStorage.LookupEntry<CreatureInfo>(uiTargetEntry))
         {
-            sLog.outErrorDb("Table `item_required_target`: creature template entry %u does not exist.", uiTargetEntry);
+            if (!sObjectMgr.IsExistingCreatureId(uiTargetEntry))
+                sLog.outErrorDb("Table `item_required_target`: creature template entry %u does not exist.", uiTargetEntry);
             continue;
         }
 
