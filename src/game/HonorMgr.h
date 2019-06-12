@@ -23,13 +23,13 @@ struct HonorStanding
     float  cp;
 
     // create the standing order
-    bool operator < (const HonorStanding& hs)
+    bool operator < (const HonorStanding& hs) const
     {
         return cp > hs.cp;
     }
 };
 
-typedef std::list<HonorStanding> HonorStandingList;
+typedef std::vector<HonorStanding> HonorStandingList;
 
 struct WeeklyScore
 {

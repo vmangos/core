@@ -320,7 +320,7 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
         return NULL;
 
-    uint32 tid = ACE_Based::Thread::currentId();
+    uint32 tid = (uintptr_t) ACE_Based::Thread::currentId();
     MMapData* mmap = loadedMMaps[mapId];
     mmap->navMeshQueries_lock.acquire_read();
 
@@ -424,7 +424,7 @@ dtNavMeshQuery const* MMapManager::GetModelNavMeshQuery(uint32 displayId)
     if (loadedModels.find(displayId) == loadedModels.end())
         return NULL;
 
-    uint32 tid = ACE_Based::Thread::currentId();
+    uint32 tid = (uintptr_t) ACE_Based::Thread::currentId();
     MMapData* mmap = loadedModels[displayId];
     if (mmap->navMeshQueries.find(tid) == mmap->navMeshQueries.end())
     {
