@@ -795,7 +795,7 @@ m_obj->m_updateTracker.Reset();
 
         void AddUnitMovementFlag(uint32 f) { m_movementInfo.moveFlags |= f; }
         void RemoveUnitMovementFlag(uint32 f) { m_movementInfo.moveFlags &= ~f; }
-        uint32 HasUnitMovementFlag(uint32 f) const { return m_movementInfo.moveFlags & f; }
+        bool HasUnitMovementFlag(uint32 f) const { return (m_movementInfo.moveFlags & f) == f; }
         uint32 GetUnitMovementFlags() const { return m_movementInfo.moveFlags; }
         void SetUnitMovementFlags(uint32 f) { m_movementInfo.moveFlags = f; }
 

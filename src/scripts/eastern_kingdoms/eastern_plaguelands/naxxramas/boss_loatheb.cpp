@@ -155,7 +155,7 @@ struct mob_eyeStalkAI : public ScriptedAI
     {
         m_creature->addUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
-        m_creature->SetMovement(MOVE_ROOT);
+        m_creature->SetRooted(true);
         m_creature->SetNoCallAssistance(true);
     }
 

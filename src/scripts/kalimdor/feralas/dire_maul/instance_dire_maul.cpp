@@ -776,7 +776,7 @@ struct npc_residual_montruosityAI : public ScriptedAI
             else if ((closestbefore < 32.0f) && (closestbehind > 36.0f))
                 newspeed = 1.00f;
         }
-        m_creature->SetSpeedRate(MOVE_WALK, newspeed, true);
+        m_creature->SetSpeedRate(MOVE_WALK, newspeed);
     }
 
     void UpdateAI(const uint32 uiDiff)

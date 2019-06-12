@@ -1438,9 +1438,9 @@ bool ChatHandler::HandleModifyASpeedCommand(char* args)
     }
     PSendSysMessage(LANG_YOU_CHANGE_ASPEED, modSpeed, chrNameLink.c_str());
 
-    chr->UpdateSpeed(MOVE_WALK, true, modSpeed);
-    chr->UpdateSpeed(MOVE_RUN, true, modSpeed);
-    chr->UpdateSpeed(MOVE_SWIM, true, modSpeed);
+    chr->UpdateSpeed(MOVE_WALK, false, modSpeed);
+    chr->UpdateSpeed(MOVE_RUN, false, modSpeed);
+    chr->UpdateSpeed(MOVE_SWIM, false, modSpeed);
 
     return true;
 }

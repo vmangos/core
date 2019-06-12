@@ -40,12 +40,59 @@
 #include "Timer.h"
 #include <list>
 
-enum UnitMovementType
+enum UnitMoveType
 {
-    MOVE_ROOT       = 1,
-    MOVE_UNROOT     = 2,
-    MOVE_WATER_WALK = 3,
-    MOVE_LAND_WALK  = 4
+    MOVE_WALK           = 0,
+    MOVE_RUN            = 1,
+    MOVE_RUN_BACK       = 2,
+    MOVE_SWIM           = 3,
+    MOVE_SWIM_BACK      = 4,
+    MOVE_TURN_RATE      = 5,
+};
+
+#define MAX_MOVE_TYPE 6
+
+extern float baseMoveSpeed[MAX_MOVE_TYPE];
+
+#define MOVEMENT_PACKET_TIME_DELAY 0
+
+enum MovementChangeType
+{
+    INVALID,
+
+    ROOT,
+    WATER_WALK,
+    SET_HOVER,
+    FEATHER_FALL,
+
+    SPEED_CHANGE_WALK,
+    SPEED_CHANGE_RUN,
+    SPEED_CHANGE_RUN_BACK,
+    SPEED_CHANGE_SWIM,
+    SPEED_CHANGE_SWIM_BACK,
+    RATE_CHANGE_TURN,
+
+    TELEPORT,
+    KNOCK_BACK
+};
+
+struct PlayerMovementPendingChange
+{
+    uint32 movementCounter = 0;
+    MovementChangeType movementChangeType = INVALID;
+    uint32 time = 0;
+
+    float newValue = 0.0f; // used if speed or height change
+    bool apply = false; // used if movement flag change
+    struct KnockbackInfo
+    {
+        float vcos = 0.0f;
+        float vsin = 0.0f;
+        float speedXY = 0.0f;
+        float speedZ = 0.0f;
+    } knockbackInfo; // used if knockback
+
+    PlayerMovementPendingChange();
 };
 
 enum SpellInterruptFlags
@@ -455,18 +502,6 @@ enum UnitState
     UNIT_STAT_ALL_STATE       = 0xFFFFFFFF,
     UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_NO_COMBAT_MOVEMENT | UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING),
 };
-
-enum UnitMoveType
-{
-    MOVE_WALK           = 0,
-    MOVE_RUN            = 1,
-    MOVE_RUN_BACK       = 2,
-    MOVE_SWIM           = 3,
-    MOVE_SWIM_BACK      = 4,
-    MOVE_TURN_RATE      = 5,
-};
-
-#define MAX_MOVE_TYPE 6
 
 /// internal used flags for marking special auras - for example some dummy-auras
 enum UnitAuraFlags
@@ -1498,10 +1533,54 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendHeartBeat(bool includingSelf = true);
         virtual void SetFly(bool enable);
         void SetWalk(bool enable, bool asDefault = true);
-        void SetLevitate(bool enable);
-        virtual void SetFeatherFall(bool /*enabled*/);
-        virtual void SetHover(bool /*enabled*/);
-        virtual void SetWaterWalk(bool /*enabled*/);
+
+    private:
+        // when a player controls this unit, and when change is made to this unit which requires an ack from the client to be acted (change of speed for example), this movementCounter is incremented
+        uint32 m_movementCounter = 0;
+        std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
+
+    public:
+        void SetRooted(bool apply);
+        void SetRootedReal(bool apply);
+        bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
+
+        void SetWaterWalking(bool apply);
+        void SetWaterWalkingReal(bool apply);
+        bool IsWaterWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WATERWALKING); }
+
+        void SetHover(bool apply);
+        void SetHoverReal(bool apply);
+        bool IsHovering() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_HOVER); }
+
+        void SetFeatherFall(bool apply);
+        void SetFeatherFallReal(bool apply);
+        bool IsFallingSlow() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SAFE_FALL); }
+
+        void SetLevitate(bool apply);
+        bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_LEVITATING); }
+
+        void KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed);
+        void KnockBack(float angle, float horizontalSpeed, float verticalSpeed);
+
+        // reflects direct client control (examples: a player MC another player or a creature (possess effects). etc...)
+        bool IsMovedByPlayer() const;
+        Player* GetPlayerMovingMe();
+
+        uint32 GetMovementCounterAndInc() { return m_movementCounter++; }
+        uint32 GetMovementCounter() const { return m_movementCounter; }
+
+        PlayerMovementPendingChange PopPendingMovementChange();
+        void PushPendingMovementChange(PlayerMovementPendingChange newChange);
+        bool HasPendingMovementChange() const { return !m_pendingMovementChanges.empty(); }
+        bool HasPendingMovementChange(MovementChangeType changeType) const;
+
+        void SetSpeedRate(UnitMoveType mtype, float rate);
+        void SetSpeedRateReal(UnitMoveType mtype, float rate);
+        void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
+        float GetSpeed(UnitMoveType mtype) const;
+        float GetXZFlagBasedSpeed() const;
+        float GetXZFlagBasedSpeed(uint32 moveFlags) const;
+        float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
 
         virtual bool CanWalk() const = 0;
         virtual bool CanFly() const = 0;
@@ -1529,8 +1608,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
-        ObjectGuid const& GetPossessorGuid() { return m_possessorGuid; }
-        void SetPossesorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
+        ObjectGuid const& GetPossessorGuid() const { return m_possessorGuid; }
+        void SetPossessorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
 
         virtual Pet* GetMiniPet() const { return nullptr; }    // overwrited in Player
 
@@ -1547,6 +1626,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Unit* GetOwner() const;
         Pet* GetPet() const;
         Unit* GetCharmer() const;
+        Player* GetPossessor() const;
         Unit* GetCharm() const;
         void Uncharm();
         void RemoveCharmAuras();
@@ -1901,18 +1981,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
         float RollMagicResistanceMultiplierOutcomeAgainst(const Unit* pCaster, SpellSchoolMask schoolMask, DamageEffectType dmgType, SpellEntry const* spellProto) const;
 
-        void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
-        float GetSpeed(UnitMoveType mtype) const;
-        float GetXZFlagBasedSpeed() const;
-        float GetXZFlagBasedSpeed(uint32 moveFlags) const;
-        float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
-        void SetSpeedRate(UnitMoveType mtype, float rate, bool forced = false);
-
-        bool isHover() const { return HasAuraType(SPELL_AURA_HOVER); }
-
-        void KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed);
-        void KnockBack(float angle, float horizontalSpeed, float verticalSpeed);
-
         void _RemoveAllAuraMods();
         void _ApplyAllAuraMods();
 
@@ -2058,7 +2126,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;
-        void SetMovement(UnitMovementType pType);
         bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel= nullptr) const;
         bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const;
 

@@ -1785,8 +1785,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SetClientControl(Unit* target, uint8 allowMove);
         void SetMover(Unit* target) { m_mover = target ? target : this; }
         Unit* GetMover() const { return m_mover; }
-        bool IsSelfMover() const { return m_mover == this; }// normal case for player not controlling other unit
-        bool IsMoverOf(Object const* pObject) const;
+        bool IsSelfMover() const { return m_mover == this; } // normal case for player not controlling other unit
         bool HasSelfMovementControl() const;
         bool IsNextRelocationIgnored() const { return m_bNextRelocationsIgnored ? true : false; }
         void SetNextRelocationsIgnoredCount(uint32 count) { m_bNextRelocationsIgnored = count; }
@@ -1833,9 +1832,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool CanFly() const { return IsFlying(); }
 
         void SetFly(bool enable) override;
-        void SetFeatherFall(bool enable) override;
-        void SetHover(bool enable) override;
-        void SetWaterWalk(bool enable) override;
 
         // Anti undermap
         void SaveNoUndermapPosition(float x, float y, float z)

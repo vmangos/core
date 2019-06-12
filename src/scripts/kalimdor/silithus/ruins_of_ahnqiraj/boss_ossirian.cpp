@@ -100,8 +100,8 @@ struct boss_ossirianAI : public ScriptedAI
         DoCast(m_creature, SPELL_STRENGTH_OF_OSSIRIAN);
 
         m_uiSpeed_Timer = 10000;
-        m_creature->SetSpeedRate(MOVE_RUN,  1.0f, true);
-        m_creature->SetSpeedRate(MOVE_WALK, 1.0f, true);
+        m_creature->SetSpeedRate(MOVE_RUN,  1.0f);
+        m_creature->SetSpeedRate(MOVE_WALK, 1.0f);
 
         m_uiCurseOfTongues_Timer     = 30000;
         m_uiStrengthOfOssirian_Timer = 25000;
@@ -237,7 +237,7 @@ struct boss_ossirianAI : public ScriptedAI
         if (m_uiSpeed_Timer >= uiDiff)
         {
             m_uiSpeed_Timer -= uiDiff;
-            m_creature->SetSpeedRate(MOVE_RUN, (2.0f - m_uiSpeed_Timer*1.0f/10000), true);
+            m_creature->SetSpeedRate(MOVE_RUN, (2.0f - m_uiSpeed_Timer*1.0f/10000));
         }
 
         if (!m_bIsEnraged && m_uiStrengthOfOssirian_Timer < uiDiff)

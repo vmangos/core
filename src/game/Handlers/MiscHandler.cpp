@@ -358,7 +358,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
         if ((GetPlayer()->GetPositionZ() < height + 0.1f) && !(GetPlayer()->IsInWater()) && GetPlayer()->getStandState() == UNIT_STAND_STATE_STAND)
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
 
-        GetPlayer()->SetMovement(MOVE_ROOT);
+        GetPlayer()->SetRooted(true);
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
@@ -387,7 +387,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket & /*recv_data*/)
     if (GetPlayer()->CanFreeMove())
     {
         //!we can move again
-        GetPlayer()->SetMovement(MOVE_UNROOT);
+        GetPlayer()->SetRooted(false);
 
         //! Stand Up
         GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);

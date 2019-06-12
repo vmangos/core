@@ -236,7 +236,7 @@ void ChargeMovementGenerator<T>::Finalize(T &unit)
     if (unit.hasUnitState(UNIT_STAT_PENDING_STUNNED))
         unit.addUnitState(UNIT_STAT_STUNNED);
     if (unit.hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
-        unit.SetMovement(MOVE_ROOT);
+        unit.SetRooted(true);
     if (_triggerAttack)
         if (!unit.IsPlayer() || victimGuid == unit.ToPlayer()->GetSelectionGuid())
             if (Unit* victim = unit.GetMap()->GetUnit(victimGuid))
@@ -323,7 +323,7 @@ void ChargeMovementGenerator<T>::Interrupt(T &unit)
     if (unit.hasUnitState(UNIT_STAT_PENDING_STUNNED))
         unit.addUnitState(UNIT_STAT_STUNNED);
     if (unit.hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
-        unit.SetMovement(MOVE_ROOT);
+        unit.SetRooted(true);
 }
 
 template<class T>
@@ -335,7 +335,7 @@ void ChargeMovementGenerator<T>::Reset(T &unit)
     if (unit.hasUnitState(UNIT_STAT_PENDING_STUNNED))
         unit.addUnitState(UNIT_STAT_STUNNED);
     if (unit.hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
-        unit.SetMovement(MOVE_ROOT);
+        unit.SetRooted(true);
 }
 
 template<class T>
