@@ -1874,6 +1874,24 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     target->CastSpell(target, 25040, true, nullptr, this);
                 return;
             }
+            case 25185:                                     // Itch
+            {
+                if (m_removeMode != AURA_REMOVE_BY_EXPIRE)
+                    return;
+
+                if (Unit* caster = GetCaster())
+                    caster->CastSpell(target, 25187, true);
+                return;
+            }
+            case 26077:                                     // Itch
+            {
+                if (m_removeMode != AURA_REMOVE_BY_EXPIRE)
+                    return;
+
+                if (Unit* caster = GetCaster())
+                    caster->CastSpell(target, 26078, true);
+                return;
+            }
             case 23183:                                     // Mark of Frost
             {
                 if (m_removeMode == AURA_REMOVE_BY_DEATH)
