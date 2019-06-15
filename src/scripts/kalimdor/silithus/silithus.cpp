@@ -3184,7 +3184,7 @@ struct npc_MerokAI : public ScriptedAI
         // HEALING WAVE
         if (m_uiHealingWave <= uiDiff)
         {
-            Unit* pUnit = m_creature->DoSelectLowestHpFriendly(60.0f, 1);
+            Unit* pUnit = m_creature->FindLowestHpFriendlyUnit(60.0f, 1);
             if (!pUnit)
                 return;
 
@@ -3230,7 +3230,7 @@ struct npc_ShaiAI : public ScriptedAI
         // FLASH HEAL
         if (m_uiFlashHeal <= uiDiff)
         {
-            Unit* pUnit = m_creature->DoSelectLowestHpFriendly(60.0f, 1);
+            Unit* pUnit = m_creature->FindLowestHpFriendlyUnit(60.0f, 1);
             if (!pUnit)
                 return;
 

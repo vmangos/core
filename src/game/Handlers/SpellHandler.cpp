@@ -32,6 +32,8 @@
 #include "Totem.h"
 #include "SpellAuras.h"
 
+using namespace Spells;
+
 void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 {
     uint8 bagIndex, slot;
@@ -97,7 +99,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         {
             if (SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(proto->Spells[i].SpellId))
             {
-                if (IsNonCombatSpell(spellInfo))
+                if (spellInfo->IsNonCombatSpell())
                 {
                     recvPacket.rpos(recvPacket.wpos());     // prevent spam at not read packet tail
                     pUser->SendEquipError(EQUIP_ERR_NOT_IN_COMBAT, pItem, NULL);
@@ -295,7 +297,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     if (_player->GetTypeId() == TYPEID_PLAYER)
     {
         // not have spell in spellbook or spell passive and not casted by client
-        if (!_player->HasActiveSpell(spellId) || IsPassiveSpell(spellInfo))
+        if (!_player->HasActiveSpell(spellId) || spellInfo->IsPassiveSpell())
         {
             sLog.outError("World: Player %u casts spell %u which he shouldn't have", _player->GetGUIDLow(), spellId);
             //cheater? kick? ban?
@@ -306,7 +308,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     else if (_player->GetTypeId() == TYPEID_UNIT)
     {
         // not have spell in spellbook or spell passive and not casted by client
-        if (!_player->HasSpell(spellId) || IsPassiveSpell(spellInfo))
+        if (!_player->HasSpell(spellId) || spellInfo->IsPassiveSpell())
         {
             //cheater? kick? ban?
             recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
@@ -324,7 +326,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     {
         // Cannot cast negative spells on yourself. Handle it here since casting negative
         // spells on yourself is frequently used within the core itself for certain mechanics.
-        if (target == _player && IsExplicitlySelectedUnitTarget(spellInfo->EffectImplicitTargetA[0]) && !IsPositiveSpell(spellInfo, _player, target))
+        if (target == _player && IsExplicitlySelectedUnitTarget(spellInfo->EffectImplicitTargetA[0]) && !spellInfo->IsPositiveSpell(_player, target))
         {
             WorldPacket data(SMSG_CAST_RESULT, (4 + 1 + 1));
             data << uint32(spellId);
@@ -394,7 +396,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     if (spellInfo->Attributes & SPELL_ATTR_CANT_CANCEL)
         return;
 
-    if (IsPassiveSpell(spellInfo))
+    if (spellInfo->IsPassiveSpell())
         return;
 
     if (!IsPositiveSpell(spellId))
@@ -435,7 +437,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     }
 
     // channeled spell case (it currently casted then)
-    if (IsChanneledSpell(spellInfo))
+    if (spellInfo->IsChanneledSpell())
     {
         if (Spell* curSpell = _player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             if (curSpell->m_spellInfo->Id == spellId)
@@ -446,7 +448,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     SpellAuraHolder *holder = _player->GetSpellAuraHolder(spellId);
 
     // not own area auras can't be cancelled (note: maybe need to check for aura on holder and not general on spell)
-    if (holder && holder->GetCasterGuid() != _player->GetObjectGuid() && HasAreaAuraEffect(holder->GetSpellProto()))
+    if (holder && holder->GetCasterGuid() != _player->GetObjectGuid() && holder->GetSpellProto()->HasAreaAuraEffect())
         return;
 
     // non channeled case

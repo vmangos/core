@@ -43,8 +43,11 @@ class GameObject;
 class Creature;
 class Player;
 class Unit;
+class Pet;
 class GmTicket;
 struct ItemPrototype;
+
+#define SPELL_PLAYER_MUTED_VISUAL 1852
 
 enum CommandFlags
 {
@@ -182,8 +185,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGodCommand(char *);
         bool HandleGMOptionsCommand(char *);
         bool HandleAnticheatCommand(char *);
-        bool HandleWardenCommand(char *);
-        bool HandleWardenReadCommand(char *);
         bool HandleClientInfosCommand(char* );
         bool HandleClientSearchCommand(char* );
         bool HandleReloadAnticheatCommand(char*);
@@ -316,9 +317,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCharacterChangeRaceCommand(char *args);
         bool HandleCharacterCopySkinCommand(char *args);
         bool HandleCharacterFillFlysCommand(char *args);
-        bool HandleCharacterFlagsCommand(char *args);
         bool HandleFactionChangeItemsCommand(char *args);
-        bool HandleRecupCommand(char *args);
         // bg
         bool HandleBGStatusCommand(char *args);
         bool HandleBGStartCommand(char *args);
@@ -424,6 +423,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugSpellModsCommand(char* args);
         bool HandleDebugUpdateWorldStateCommand(char* args);
         bool HandleDebugOverflowCommand(char* args);
+        bool HandleDebugChatFreezeCommand(char* args);
 
         bool HandleDebugPlayCinematicCommand(char* args);
         bool HandleDebugPlaySoundCommand(char* args);
@@ -460,7 +460,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGameObjectDeleteCommand(char* args);
         bool HandleGameObjectMoveCommand(char* args);
         bool HandleGameObjectNearCommand(char* args);
-        bool HandleGameObjectPhaseCommand(char* args);
         bool HandleGameObjectTargetCommand(char* args);
         bool HandleGameObjectTurnCommand(char* args);
         bool HandleGameObjectDespawnCommand(char* args);
@@ -501,7 +500,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleHonorShow(char* args);
         bool HandleHonorAddCommand(char* args);
         bool HandleHonorAddKillCommand(char* args);
-        bool HandleHonorDebugScoresCommand(char*args);
         bool HandleHonorSetRPCommand(char*args);
         bool HandleHonorResetCommand(char*args);
 
@@ -614,8 +612,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcAddVendorItemCommand(char* args);
         bool HandleNpcAIInfoCommand(char* args);
         bool HandleNpcAllowMovementCommand(char* args);
+        bool HandleNpcAllowAttackCommand(char* args);
         bool HandleNpcChangeEntryCommand(char* args);
         bool HandleNpcChangeLevelCommand(char* args);
+        bool HandleNpcDespawnCommand(char* args);
         bool HandleNpcDeleteCommand(char* args);
         bool HandleNpcDelVendorItemCommand(char* args);
         bool HandleNpcEvadeCommand(char* args);
@@ -637,9 +637,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcWhisperCommand(char* args);
         bool HandleNpcYellCommand(char* args);
 
-        //TODO: NpcCommands that needs to be fixed :
-        bool HandleNpcNameCommand(char* args);
-        bool HandleNpcSubNameCommand(char* args);
         //----------------------------------------------------------
 
         bool HandlePDumpLoadCommand(char* args);
@@ -658,6 +655,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandlePetListCommand(char* args);
         bool HandlePetRenameCommand(char* args);
         bool HandlePetDeleteCommand(char* args);
+        bool HandlePetLoyaltyCommand(char* args);
 
         bool HandleReloadAllCommand(char* args);
         bool HandleReloadAllAreaCommand(char* args);
@@ -825,7 +823,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleRemoveRidingCommand(char* args);
         bool HandleGetDistanceCommand(char* args);
         bool HandleGetAngleCommand(char* args);
-        bool HandleModifyStandStateCommand(char* args);
+        bool HandleModifyEmoteStateCommand(char* args);
         bool HandleDieCommand(char* args);
         bool HandleFearCommand(char* args);
         bool HandleDamageCommand(char* args);
@@ -838,6 +836,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNearGraveCommand(char* args);
         bool HandleExploreCheatCommand(char* args);
         bool HandleHoverCommand(char* args);
+        bool HandleXpCommand(char* args);
         bool HandleLevelUpCommand(char* args);
         bool HandleShowAreaCommand(char* args);
         bool HandleHideAreaCommand(char* args);
@@ -894,12 +893,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSaveAllCommand(char* args);
         bool HandleDebugMoveCommand(char* args);
 
-        //#INFO: Giperion was here
-        bool HandleDebugShowNearestGOInfo(char* args);
-
-        Player*   GetSelectedPlayer();
-        Creature* GetSelectedCreature();
-        Unit*     GetSelectedUnit();
+        Player*   GetSelectedPlayer() const;
+        Creature* GetSelectedCreature() const;
+        Unit*     GetSelectedUnit() const;
+        Pet*      GetSelectedPet() const;
 
         // extraction different type params from args string, all functions update (char** args) to first unparsed tail symbol at return
         void  SkipWhiteSpaces(char** args);

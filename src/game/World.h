@@ -373,6 +373,8 @@ enum eConfigFloatValues
     CONFIG_FLOAT_GHOST_RUN_SPEED_WORLD,
     CONFIG_FLOAT_GHOST_RUN_SPEED_BG,
     CONFIG_FLOAT_RATE_WAR_EFFORT_RESOURCE,
+    CONFIG_FLOAT_RATE_XP_PERSONAL_MIN,
+    CONFIG_FLOAT_RATE_XP_PERSONAL_MAX,
     CONFIG_FLOAT_VALUE_COUNT
 };
 
@@ -620,12 +622,6 @@ class World
         void AddQueuedSession(WorldSession*);
         bool RemoveQueuedSession(WorldSession* session);
         int32 GetQueuedSessionPos(WorldSession*);
-
-        /// \todo Actions on m_allowMovement still to be implemented
-        /// Is movement allowed?
-        bool getAllowMovement() const { return m_allowMovement; }
-        /// Allow/Disallow object movements
-        void SetAllowMovement(bool allow) { m_allowMovement = allow; }
 
         /// Set a new Message of the Day
         void SetMotd(const std::string& motd) { m_motd = motd; }

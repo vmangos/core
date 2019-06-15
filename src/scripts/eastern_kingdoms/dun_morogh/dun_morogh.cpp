@@ -33,7 +33,7 @@ struct npc_narm_faulkAI : ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (m_creature->IsStandState())
+        if (m_creature->IsStandingUp())
         {
             if (lifeTimer < diff)
                 m_creature->AI()->EnterEvadeMode();

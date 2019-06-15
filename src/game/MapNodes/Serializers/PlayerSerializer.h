@@ -135,7 +135,6 @@ void Player::Serialize(OP& buf)
 
     // Nostalrius
     buf(worldMask);
-    buf(customFlags);
 
     uint32 lastWeekHK = m_honorMgr.GetLastWeekHK();
     float lastWeekCP = m_honorMgr.GetLastWeekCP();

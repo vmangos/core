@@ -461,6 +461,19 @@ namespace MaNGOS
     };
 
     template<class Check>
+    struct MANGOS_DLL_DECL PlayerLastSearcher
+    {
+        Player* &i_object;
+        Check & i_check;
+
+        PlayerLastSearcher(Player* & result, Check & check) : i_object(result), i_check(check) {}
+
+        void Visit(PlayerMapType &m);
+
+        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED> &) {}
+    };
+
+    template<class Check>
     struct MANGOS_DLL_DECL PlayerListSearcher
     {
         std::list<Player*> &i_objects;
@@ -1375,16 +1388,72 @@ namespace MaNGOS
             float fRange;
     };
 
-    // TrinityCore (Creature::SelectNearestTargetInAttackDistance et Creature::SelectNearestTarget)
-    class NearestHostileUnitCheck
+    class NearestUnitCheck
     {
         public:
-            explicit NearestHostileUnitCheck(Unit const* creature, float dist = 0) : me(creature)
+            explicit NearestUnitCheck(WorldObject const* source, float dist = 0) : me(source)
             {
                 m_range = (dist == 0 ? 9999 : dist);
             }
             bool operator()(Unit* u)
             {
+                if (me == u)
+                    return false;
+
+                if (!me->IsWithinDistInMap(u, m_range))
+                    return false;
+
+                m_range = me->GetDistance(u);   // use found unit range as new range limit for next check
+                return true;
+            }
+
+        private:
+            WorldObject const *me;
+            float m_range;
+            NearestUnitCheck(NearestUnitCheck const&);
+    };
+
+    class NearestFriendlyUnitCheck
+    {
+        public:
+            explicit NearestFriendlyUnitCheck(Unit const* source, float dist = 0) : me(source)
+            {
+                m_range = (dist == 0 ? 9999 : dist);
+            }
+            bool operator()(Unit* u)
+            {
+                if (me == u)
+                    return false;
+
+                if (!me->IsWithinDistInMap(u, m_range))
+                    return false;
+
+                if (!me->IsFriendlyTo(u))
+                    return false;
+
+                m_range = me->GetDistance(u);   // use found unit range as new range limit for next check
+                return true;
+            }
+
+        private:
+            Unit const *me;
+            float m_range;
+            NearestFriendlyUnitCheck(NearestFriendlyUnitCheck const&);
+    };
+
+    // TrinityCore (Creature::SelectNearestTargetInAttackDistance et Creature::SelectNearestTarget)
+    class NearestHostileUnitCheck
+    {
+        public:
+            explicit NearestHostileUnitCheck(Unit const* source, float dist = 0) : me(source)
+            {
+                m_range = (dist == 0 ? 9999 : dist);
+            }
+            bool operator()(Unit* u)
+            {
+                if (me == u)
+                    return false;
+
                 if (!me->IsWithinDistInMap(u, m_range))
                     return false;
 

@@ -211,14 +211,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
         if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
         {
-            auto currTime = time(NULL);
-
-            if (m_muteTime > currTime) // Muted
+            if (type != CHAT_MSG_WHISPER) // whisper checked later
             {
-                std::string timeStr = secsToTimeString(m_muteTime - currTime);
-                SendNotification(GetMangosString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
-                return;
+                auto currTime = time(nullptr);
+
+                if (m_muteTime > currTime) // Muted
+                {
+                    std::string timeStr = secsToTimeString(m_muteTime - currTime);
+                    SendNotification(GetMangosString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+                    return;
+                }
             }
+            
             if (lang != LANG_ADDON && GetMasterPlayer())
                 GetMasterPlayer()->UpdateSpeakTime(); // Anti chat flood
         }
@@ -361,6 +365,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 return;
             }
 
+            if (!GetPlayer()->isAlive())
+                return;
+
             GetPlayer()->Say(msg, lang);
 
             if (lang != LANG_ADDON)
@@ -379,6 +386,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 ChatHandler(this).SendSysMessage("You cannot use emotes yet (too low level).");
                 return;
             }
+
+            if (!GetPlayer()->isAlive())
+                return;
 
             GetPlayer()->TextEmote(msg);
 
@@ -399,6 +409,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 ChatHandler(this).SendSysMessage("You cannot yell yet (too low level).");
                 return;
             }
+
+            if (!GetPlayer()->isAlive())
+                return;
 
             GetPlayer()->Yell(msg, lang);
 
@@ -430,6 +443,19 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             {
                 SendPlayerNotFoundNotice(to);
                 return;
+            }
+
+            // Can only whisper GMs while muted.
+            if (pSecurity == SEC_PLAYER)
+            {
+                auto currTime = time(nullptr);
+
+                if (m_muteTime > currTime) // Muted
+                {
+                    std::string timeStr = secsToTimeString(m_muteTime - currTime);
+                    SendNotification(GetMangosString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
+                    return;
+                }
             }
 
             if (tSecurity == SEC_PLAYER && pSecurity == SEC_PLAYER)

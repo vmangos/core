@@ -383,6 +383,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraModIncreaseSwimSpeed(bool Apply, bool Real);
         void HandleModPowerCostPCT(bool Apply, bool Real);
         void HandleModPowerCost(bool Apply, bool Real);
+        void HandleReflectSpellsSchool(bool Apply, bool Real);
         void HandleFarSight(bool Apply, bool Real);
         void HandleModPossessPet(bool Apply, bool Real);
         void HandleModMechanicImmunity(bool Apply, bool Real);
@@ -392,7 +393,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleModPercentStat(bool Apply, bool Real);
         void HandleAurasVisible(bool Apply, bool Real);
         void HandleModResistancePercent(bool Apply, bool Real);
-        void HandleAuraModBaseResistancePCT(bool Apply, bool Real);
+        void HandleAuraModBaseResistancePercent(bool Apply, bool Real);
         void HandleModShieldBlockPCT(bool Apply, bool Real);
         void HandleAuraTrackStealthed(bool Apply, bool Real);
         void HandleModShieldBlock(bool Apply, bool Real);
@@ -410,7 +411,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleSpiritOfRedemption(bool apply, bool Real);
         void HandleAuraAoeCharm(bool apply, bool real);
         void HandleShieldBlockValue(bool apply, bool Real);
-        void HandleModSpellCritChanceShool(bool apply, bool Real);
+        void HandleModSpellCritChanceSchool(bool apply, bool Real);
         void HandleAuraRetainComboPoints(bool apply, bool Real);
         void HandleModSpellDamagePercentFromStat(bool apply, bool Real);
         void HandleModSpellHealingPercentFromStat(bool apply, bool Real);

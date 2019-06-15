@@ -917,15 +917,15 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SetAcceptTicket(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_GM_ACCEPT_TICKETS; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_ACCEPT_TICKETS; }
 
         bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
-        void SetGameMaster(bool on);
+        void SetGameMaster(bool on, bool notify = false);
         bool IsGMChat() const { return GetSession()->GetSecurity() >= SEC_MODERATOR && (m_ExtraFlags & PLAYER_EXTRA_GM_CHAT); }
-        void SetGMChat(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_GM_CHAT; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_CHAT; }
+        void SetGMChat(bool on, bool notify = false);
         bool IsTaxiCheater() const { return m_ExtraFlags & PLAYER_EXTRA_TAXICHEAT; }
         void SetTaxiCheater(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_TAXICHEAT; else m_ExtraFlags &= ~PLAYER_EXTRA_TAXICHEAT; }
         bool IsGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
-        void SetGMVisible(bool on);
+        void SetGMVisible(bool on, bool notify = false);
         void SetPvPDeath(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_PVP_DEATH; else m_ExtraFlags &= ~PLAYER_EXTRA_PVP_DEATH; }
-        void SetGodMode(bool on) { SetOption(PLAYER_CHEAT_GOD, on); }
+        void SetGodMode(bool on, bool notify = false);
         bool IsGod() const { return HasOption(PLAYER_CHEAT_GOD); }
 
         bool HasOption(uint32 o) const { return (_playerOptions & o); }
@@ -1411,6 +1411,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
         virtual void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
         void SendClearCooldown(uint32 spell_id, Unit* target) const;
+        void SendClearAllCooldowns(Unit* target) const;
         void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
         void SendSpellRemoved(uint32 spell_id) const;
 
@@ -1481,6 +1482,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool m_canBlock;
         bool m_canDualWield;
         float m_ammoDPS;
+        float m_personalXpRate;
 
         void RegenerateAll();
         void Regenerate(Powers power);
@@ -1506,6 +1508,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void _ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool apply);
         void _ApplyAmmoBonuses();
     public:
+        void SetPersonalXpRate(float rate) { if (rate >= 0) m_personalXpRate = rate; }
+        float GetPersonalXpRate() const { return m_personalXpRate; }
         void GiveXP(uint32 xp, Unit* victim);
         void GiveLevel(uint32 level);
         void InitStatsForLevel(bool reapplyMods = false);
@@ -1781,7 +1785,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SetClientControl(Unit* target, uint8 allowMove);
         void SetMover(Unit* target) { m_mover = target ? target : this; }
         Unit* GetMover() const { return m_mover; }
-        bool IsSelfMover() const { return m_mover == this; }// normal case for player not controlling other unit
+        bool IsSelfMover() const { return m_mover == this; } // normal case for player not controlling other unit
+        bool HasSelfMovementControl() const;
         bool IsNextRelocationIgnored() const { return m_bNextRelocationsIgnored ? true : false; }
         void SetNextRelocationsIgnoredCount(uint32 count) { m_bNextRelocationsIgnored = count; }
         void DoIgnoreRelocation() { if (m_bNextRelocationsIgnored) --m_bNextRelocationsIgnored; }
@@ -1827,9 +1832,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool CanFly() const { return IsFlying(); }
 
         void SetFly(bool enable) override;
-        void SetFeatherFall(bool enable) override;
-        void SetHover(bool enable) override;
-        void SetWaterWalk(bool enable) override;
 
         // Anti undermap
         void SaveNoUndermapPosition(float x, float y, float z)
@@ -2043,6 +2045,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         /*********************************************************/
 
     private:
+        uint8 m_newStandState;
+        uint32 m_standStateTimer;
         uint32 m_DetectInvTimer;
         uint32 m_ExtraFlags;
         ObjectGuid m_curSelectionGuid;
@@ -2057,12 +2061,14 @@ class MANGOS_DLL_SPEC Player final: public Unit
         time_t m_deathExpireTime;
         ObjectGuid     m_selectedGobj; // For GM commands
         ObjectGuid m_escortingGuid;
-        uint32 customFlags;
 
         void SendMountResult(PlayerMountResult result) const;
         void SendDismountResult(PlayerDismountResult result) const;
         void UpdateCorpseReclaimDelay();
     public:
+        void ScheduleStandStateChange(uint8 state);
+        void ClearScheduledStandState() { m_newStandState = MAX_UNIT_STAND_STATE; m_standStateTimer = 0; }
+        bool IsStandingUpForProc() const override;
         void Mount(uint32 mount, uint32 spellId = 0) override;
         void Unmount(bool from_aura = false) override;
 
@@ -2107,14 +2113,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         // Nostalrius : Phasing
         virtual void SetWorldMask(uint32 newMask);
-
-        // Custom Flags
-        void LoadCustomFlags();
-        uint32 GetCustomFlags() { return customFlags; }
-        inline void SetCustomFlags(uint32 newFlags) { customFlags = newFlags; }
-        inline bool HasCustomFlag(uint32 flag) { return (customFlags & flag); }
-        inline void AddCustomFlag(uint32 flag) { customFlags |= flag; }
-        inline void RemoveCustomFlag(uint32 flag) { customFlags &= ~flag; }
 
         void RemoveDelayedOperation(uint32 operation)
         {

@@ -507,21 +507,14 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     // preserve all current dynamic flags if exist
     uint32 dynFlags = GetUInt32Value(UNIT_DYNAMIC_FLAGS);
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynFlags ? dynFlags : GetCreatureInfo()->dynamic_flags);
-    SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, float(GetCreatureInfo()->armor));
 
-    float resistances[] = {
-        float(GetCreatureInfo()->holy_res),
-        float(GetCreatureInfo()->fire_res),
-        float(GetCreatureInfo()->nature_res),
-        float(GetCreatureInfo()->frost_res),
-        float(GetCreatureInfo()->shadow_res),
-        float(GetCreatureInfo()->arcane_res)
-    };
-
-    for (int i = 0; i < 6; ++i)
-    {
-        SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_HOLY + i), BASE_VALUE, resistances[i]);
-    }
+    SetCreateResistance(SPELL_SCHOOL_NORMAL, GetCreatureInfo()->armor);
+    SetCreateResistance(SPELL_SCHOOL_HOLY, GetCreatureInfo()->holy_res);
+    SetCreateResistance(SPELL_SCHOOL_FIRE, GetCreatureInfo()->fire_res);
+    SetCreateResistance(SPELL_SCHOOL_NATURE, GetCreatureInfo()->nature_res);
+    SetCreateResistance(SPELL_SCHOOL_FROST, GetCreatureInfo()->frost_res);
+    SetCreateResistance(SPELL_SCHOOL_SHADOW, GetCreatureInfo()->shadow_res);
+    SetCreateResistance(SPELL_SCHOOL_ARCANE, GetCreatureInfo()->arcane_res);
 
     SetFly(CanFly());
     SetMeleeDamageSchool(SpellSchools(GetCreatureInfo()->dmg_school));
@@ -2049,107 +2042,6 @@ bool Creature::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectInd
     return Unit::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);
 }
 
-SpellEntry const *Creature::ReachWithSpellAttack(Unit *pVictim)
-{
-    if (!pVictim)
-        return nullptr;
-
-    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
-    {
-        if (!m_spells[i])
-            continue;
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(m_spells[i]);
-        if (!spellInfo)
-        {
-            sLog.outError("WORLD: unknown spell id %i", m_spells[i]);
-            continue;
-        }
-
-        bool bcontinue = true;
-        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
-        {
-            if ((spellInfo->Effect[j] == SPELL_EFFECT_SCHOOL_DAMAGE)       ||
-                    (spellInfo->Effect[j] == SPELL_EFFECT_INSTAKILL)            ||
-                    (spellInfo->Effect[j] == SPELL_EFFECT_ENVIRONMENTAL_DAMAGE) ||
-                    (spellInfo->Effect[j] == SPELL_EFFECT_HEALTH_LEECH)
-               )
-            {
-                bcontinue = false;
-                break;
-            }
-        }
-        if (bcontinue) continue;
-
-        if (spellInfo->manaCost > GetPower(POWER_MANA))
-            continue;
-        SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
-        float range = GetSpellMaxRange(srange);
-        float minrange = GetSpellMinRange(srange);
-
-        float dist = GetCombatDistance(pVictim);
-
-        //if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
-        //    continue;
-        if (dist > range || dist < minrange)
-            continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
-            continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
-            continue;
-        return spellInfo;
-    }
-    return nullptr;
-}
-
-SpellEntry const *Creature::ReachWithSpellCure(Unit *pVictim)
-{
-    if (!pVictim)
-        return nullptr;
-
-    for (uint32 i = 0; i < CREATURE_MAX_SPELLS; ++i)
-    {
-        if (!m_spells[i])
-            continue;
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(m_spells[i]);
-        if (!spellInfo)
-        {
-            sLog.outError("WORLD: unknown spell id %i", m_spells[i]);
-            continue;
-        }
-
-        bool bcontinue = true;
-        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
-        {
-            if ((spellInfo->Effect[j] == SPELL_EFFECT_HEAL))
-            {
-                bcontinue = false;
-                break;
-            }
-        }
-        if (bcontinue)
-            continue;
-
-        if (spellInfo->manaCost > GetPower(POWER_MANA))
-            continue;
-        SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
-        float range = GetSpellMaxRange(srange);
-        float minrange = GetSpellMinRange(srange);
-
-        float dist = GetCombatDistance(pVictim);
-
-        //if(!isInFront( pVictim, range ) && spellInfo->AttributesEx )
-        //    continue;
-        if (dist > range || dist < minrange)
-            continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
-            continue;
-        if (spellInfo->PreventionType == SPELL_PREVENTION_TYPE_PACIFY && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
-            continue;
-        return spellInfo;
-    }
-    return nullptr;
-}
-
 bool Creature::IsVisibleInGridForPlayer(Player* pl) const
 {
     // gamemaster in GM mode see all, including ghosts
@@ -2631,8 +2523,8 @@ bool Creature::MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* 
         }
 
         SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(pSpellInfo->rangeIndex);
-        float max_range = GetSpellMaxRange(srange);
-        float min_range = GetSpellMinRange(srange);
+        float max_range = Spells::GetSpellMaxRange(srange);
+        float min_range = Spells::GetSpellMinRange(srange);
         float dist = GetCombatDistance(pTarget);
 
         return dist < max_range && dist >= min_range;
@@ -3505,82 +3397,7 @@ Unit* Creature::SelectNearestHostileUnitInAggroRange(bool useLOS) const
     return target;
 }
 
-// Returns friendly unit with the most amount of hp missing from max hp
-Unit* Creature::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool bPercent, Unit* except) const
-{
-    std::list<Unit *> targets;
-
-    if (Unit* pVictim = getVictim())
-    {
-        HostileReference* pReference = pVictim->getHostileRefManager().getFirst();
-
-        while (pReference)
-        {
-            if (Unit* pTarget = pReference->getSourceUnit())
-            {
-                if (pTarget->isAlive() && IsFriendlyTo(pTarget) && IsWithinDistInMap(pTarget, fRange) &&
-                    ((bPercent && (100 - pTarget->GetHealthPercent() > uiMinHPDiff)) || (!bPercent && (pTarget->GetMaxHealth() - pTarget->GetHealth() > uiMinHPDiff))))
-                {
-                    targets.push_back(pTarget);
-                }
-            }
-            pReference = pReference->next();
-        }
-    }
-    else
-    {
-        MaNGOS::MostHPMissingInRangeCheck u_check(this, fRange, uiMinHPDiff, bPercent);
-        MaNGOS::UnitListSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(targets, u_check);
-
-        Cell::VisitAllObjects(this, searcher, fRange);
-    }
-
-    // remove current target
-    if (except)
-        targets.remove(except);
-
-    // no appropriate targets
-    if (targets.empty())
-        return nullptr;
-
-    return *targets.begin();
-}
-
-// Returns friendly unit that does not have an aura from the provided spellid
-Unit* Creature::DoFindFriendlyMissingBuff(float range, uint32 spellid, Unit* except) const
-{
-    std::list<Unit *> targets;
-
-    MaNGOS::FriendlyMissingBuffInRangeCheck u_check(this, range, spellid);
-    MaNGOS::UnitListSearcher<MaNGOS::FriendlyMissingBuffInRangeCheck> searcher(targets, u_check);
-
-    Cell::VisitGridObjects(this, searcher, range);
-
-    // remove current target
-    if (except)
-        targets.remove(except);
-
-    // no appropriate targets
-    if (targets.empty())
-        return nullptr;
-
-    return *targets.begin();
-}
-
-// Returns friendly unit that is under a crowd control effect
-Unit* Creature::DoFindFriendlyCC(float range) const
-{
-    Unit* pUnit = nullptr;
-
-    MaNGOS::FriendlyCCedInRangeCheck u_check(this, range);
-    MaNGOS::UnitSearcher<MaNGOS::FriendlyCCedInRangeCheck> searcher(pUnit, u_check);
-
-    Cell::VisitGridObjects(this, searcher, range);
-
-    return pUnit;
-}
-
-Creature* Creature::GetNearestGuard(float range) const
+Creature* Creature::FindNearestFriendlyGuard(float range) const
 {
     Creature* pGuard = nullptr;
 
@@ -3594,7 +3411,7 @@ Creature* Creature::GetNearestGuard(float range) const
 
 void Creature::CallNearestGuard(Unit* pEnemy) const
 {
-    if (Creature* pGuard = GetNearestGuard(50.0f))
+    if (Creature* pGuard = FindNearestFriendlyGuard(50.0f))
         if (pGuard->AI() && pGuard->IsValidAttackTarget(pEnemy))
             pGuard->AI()->AttackStart(pEnemy);
 }
@@ -3655,26 +3472,26 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         }
 
         // If the spell requires to be behind the target.
-        if (pSpellInfo->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, this))
+        if (pSpellInfo->Custom & SPELL_CUSTOM_BEHIND_TARGET && pTarget->HasInArc(M_PI_F, this))
             return SPELL_FAILED_UNIT_NOT_BEHIND;
 
-        if (!IsAreaOfEffectSpell(pSpellInfo))
+        if (!pSpellInfo->IsAreaOfEffectSpell())
         {
             // If the spell requires the target having a specific power type.
-            if (!IsTargetPowerTypeValid(pSpellInfo, pTarget->getPowerType()))
+            if (!pSpellInfo->IsTargetPowerTypeValid(pTarget->getPowerType()))
                 return SPELL_FAILED_UNKNOWN;
 
             // No point in casting if target is immune.
-            if (pTarget->IsImmuneToDamage(GetSpellSchoolMask(pSpellInfo), pSpellInfo))
+            if (pTarget->IsImmuneToDamage(pSpellInfo->GetSpellSchoolMask(), pSpellInfo))
                 return SPELL_FAILED_IMMUNE;
         }
 
         // Mind control abilities can't be used with just 1 attacker or mob will reset.
-        if ((getThreatManager().getThreatList().size() == 1) && IsCharmSpell(pSpellInfo))
+        if ((getThreatManager().getThreatList().size() == 1) && pSpellInfo->IsCharmSpell())
             return SPELL_FAILED_UNKNOWN;
 
         // Do not use dismounting spells when target is not mounted (there are 4 such spells).
-        if (!pTarget->IsMounted() && IsDismountSpell(pSpellInfo))
+        if (!pTarget->IsMounted() && pSpellInfo->IsDismountSpell())
             return SPELL_FAILED_ONLY_MOUNTED;
     }
 
@@ -3822,7 +3639,7 @@ void Creature::ApplyGameEventSpells(GameEventCreatureData const* eventData, bool
 
     if (remove_spell)
         if (SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(remove_spell))
-            if (IsSpellAppliesAura(spellEntry))
+            if (spellEntry->IsSpellAppliesAura())
                 RemoveAurasDueToSpell(remove_spell);
 
     if (cast_spell)
@@ -3963,47 +3780,4 @@ void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
         static_cast<Pet*>(this)->DelayedUnsummon(msTimeToDespawn, PET_SAVE_AS_DELETED);
     else
         ForcedDespawn(msTimeToDespawn);
-}
-
-void Creature::SetFeatherFall(bool enable)
-{
-    Unit::SetFeatherFall(enable);
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL);
-#else
-    WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL);
-#endif
-    data << GetPackGUID();
-    SendMessageToSet(&data, true);
-}
-
-void Creature::SetHover(bool enable)
-{
-    Unit::SetHover(enable);
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
-    data << GetPackGUID();
-#else
-    WorldPacket data(enable ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 9);
-    data << GetGUID();
-#endif
-
-    SendMessageToSet(&data, false);
-}
-
-void Creature::SetWaterWalk(bool enable)
-{
-    Unit::SetWaterWalk(enable);
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
-    data << GetPackGUID();
-#else
-    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 9);
-    data << GetGUID();
-#endif
-
-    SendMessageToSet(&data, true);
 }

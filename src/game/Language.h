@@ -185,7 +185,10 @@ enum MangosStrings
     //                                    174               // used in master
     LANG_LIQUID_STATUS                  = 175,
     LANG_APPEARING_AT_OFFLINE           = 176,
-    // Room for more level 1              176-199 not used
+    LANG_XP_RATE_MIN                    = 177,
+    LANG_XP_RATE_MAX                    = 178,
+    LANG_XP_RATE_SET                    = 179,
+    // Room for more level 1              180-199 not used
 
     // level 2 chat
     LANG_NO_SELECTION                   = 200,
@@ -334,12 +337,12 @@ enum MangosStrings
     LANG_CREATURE_NOT_FOLLOW_YOU_NOW    = 342,
     LANG_CREATURE_NON_TAMEABLE          = 343,
     LANG_YOU_ALREADY_HAVE_PET           = 344,
-    //                                    345 used in master branch
-    //                                    346 used in master branch
+    LANG_INVIS_ON                       = 345,
+    LANG_INVIS_OFF                      = 346,
     LANG_COMMAND_GOTAXINODENOTFOUND     = 347,
     LANG_GAMEOBJECT_HAVE_INVALID_DATA   = 348,
-    //                                    349 used in master branch
-    //                                    350 used in master branch
+    LANG_GOD_ON                         = 349,
+    LANG_GOD_OFF                        = 350,
     //                                    351 used in master branch
     //                                    352 used in master branch
     //                                    353 used in master branch

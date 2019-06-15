@@ -82,9 +82,9 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS] =
     &Unit::HandleProcTriggerDamageAuraProc,                 // 43 SPELL_AURA_PROC_TRIGGER_DAMAGE
     &Unit::HandleNULLProc,                                  // 44 SPELL_AURA_TRACK_CREATURES
     &Unit::HandleNULLProc,                                  // 45 SPELL_AURA_TRACK_RESOURCES
-    &Unit::HandleNULLProc,                                  // 46 SPELL_AURA_46
+    &Unit::HandleNULLProc,                                  // 46 SPELL_AURA_MOD_PARRY_SKILL
     &Unit::HandleNULLProc,                                  // 47 SPELL_AURA_MOD_PARRY_PERCENT
-    &Unit::HandleNULLProc,                                  // 48 SPELL_AURA_48
+    &Unit::HandleNULLProc,                                  // 48 SPELL_AURA_MOD_DODGE_SKILL
     &Unit::HandleNULLProc,                                  // 49 SPELL_AURA_MOD_DODGE_PERCENT
     &Unit::HandleNULLProc,                                  // 50 SPELL_AURA_MOD_BLOCK_SKILL    obsolete?
     &Unit::HandleNULLProc,                                  // 51 SPELL_AURA_MOD_BLOCK_PERCENT
@@ -284,7 +284,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
         if (spellProto->Id == 25906)
         {
             // Should be able to proc when negative magical effect lands on a target.
-            if (!isVictim && (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC) && !IsPositiveSpell(procSpell) && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(IsSpellAppliesAura(procSpell) && (procFlag & PROC_FLAG_ON_DO_PERIODIC)))
+            if (!isVictim && (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC) && !procSpell->IsPositiveSpell() && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(procSpell->IsSpellAppliesAura() && (procFlag & PROC_FLAG_ON_DO_PERIODIC)))
                 return roll_chance_f((float)spellProto->procChance);
         }
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
@@ -349,6 +349,31 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
 
             return false;
         }
+
+        // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+        // - Execute - This ability will now work with Sweeping Strikes again. If
+        //   the second victim is below 20 % health, they will be hit with the full
+        //   Execute amount.If the second victim is not below 20 % health, they
+        //   will be hit with normal melee swing damage.
+        // - Whirlwind - When this ability is used with Sweeping Strikes, it will
+        //   burn only one charge of Sweeping Strikes and will generate only one
+        //   additional attack.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        // Sweeping Strikes
+        if (spellProto->Id == 12292 || spellProto->Id == 18765)
+        {
+            // Never proc for Execute.
+            if (procSpell->SpellIconID == 1648)
+                return false;
+
+            // Proc for every Whirlwind hit.
+            if (procSpell->SpellIconID == 83)
+                return true;
+
+            if (procSpell->IsDirectDamageSpell() && (procFlag & (PROC_FLAG_SUCCESSFUL_MELEE_HIT | PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT)))
+                return true;
+        }
+#endif
     }
 
     // Get proc Event Entry
@@ -357,8 +382,8 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     // Custom hard-coded cases which depend on the proc event for firing...
     if (procSpell)
     {
-        // Fear Ward always procs on any Fear
-        if (spellProto->Id == 6346)
+        // Fear Ward always procs on any Fear (except ones cast by ourselves...)
+        if (spellProto->Id == 6346 && isVictim)
         {
             if (procSpell->Mechanic == MECHANIC_FEAR)
                 return true;
@@ -509,29 +534,37 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (!target)
                         return SPELL_AURA_PROC_FAILED;
 
+                    // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+                    // - Execute - This ability will now work with Sweeping Strikes again. If
+                    //   the second victim is below 20 % health, they will be hit with the full
+                    //   Execute amount.If the second victim is not below 20 % health, they
+                    //   will be hit with normal melee swing damage.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
                     // Case for Execute. This will only run when procced by Execute
                     if (procSpell && procSpell->Id == 20647)
                     {
                         if (pVictim->GetHealthPercent() <= 20.0f && target->GetHealthPercent() <= 20.0f)  // If Both Target A and target B is less or equal than 20% do full damage
                         {
                             basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
-                            triggered_spell_id = 12723; //Note this SS id deals 1 damage by itself (Cannot crit)
+                            triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                         else if (pVictim->GetHealthPercent() <= 20.0f)    // If only Target A is less or equal than 20% and target B is over 20% do Basic attack damage
                         {
-                            triggered_spell_id = 26654;    // This SS deals damage equal to AA also this spell ID can crit ?? Maybe this explains the rumor of SS criting since it only scales with spell crit ? = 5% crit.
+                            triggered_spell_id = 26654; // This SS deals damage equal to AA also this spell ID can crit ?? Maybe this explains the rumor of SS criting since it only scales with spell crit ? = 5% crit.
                         }
                         else // Full damage on anything else (Shouldn't really ever be used) since execute can only be used less or equal than 20% anyway.
                         {
                             basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
-                            triggered_spell_id = 12723;    //Note this SS id deals 1 damage by itself (Cannot crit)
+                            triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                     }
                     else // Full damage on anything else
+#endif
                     {
                         basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
-                        triggered_spell_id = 12723;    //Note this SS id deals 1 damage by itself (Cannot crit)
+                        triggered_spell_id = 12723; // Note this SS id deals 1 damage by itself (Cannot crit)
                     }
+
                     break;
                 }
                 // Retaliation
@@ -636,7 +669,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (!found)
                         return SPELL_AURA_PROC_FAILED;
 
-                    switch (GetFirstSchoolInMask(GetSpellSchoolMask(procSpell)))
+                    switch (GetFirstSchoolInMask(procSpell->GetSpellSchoolMask()))
                     {
                         case SPELL_SCHOOL_NORMAL:
                         case SPELL_SCHOOL_HOLY:
@@ -669,7 +702,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (!procSpell)
                         return SPELL_AURA_PROC_FAILED;
 
-                    switch (GetFirstSchoolInMask(GetSpellSchoolMask(procSpell)))
+                    switch (GetFirstSchoolInMask(procSpell->GetSpellSchoolMask()))
                     {
                         case SPELL_SCHOOL_NORMAL:
                             return SPELL_AURA_PROC_FAILED;                   // ignore
@@ -1549,7 +1582,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
     }
 
     // not allow proc extra attack spell at extra attack
-    if (m_extraAttacks && IsSpellHaveEffect(triggerEntry, SPELL_EFFECT_ADD_EXTRA_ATTACKS) && triggerEntry->Id != 20178)
+    if (m_extraAttacks && triggerEntry->HasEffect(SPELL_EFFECT_ADD_EXTRA_ATTACKS) && triggerEntry->Id != 20178)
         return SPELL_AURA_PROC_FAILED;
 
     // Custom basepoints/target for exist spell
@@ -1590,7 +1623,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
 
     // try detect target manually if not set
     if (target == NULL)
-        target = !(procFlags & PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL) && IsPositiveSpell(trigger_spell_id) ? this : pVictim;
+        target = !(procFlags & PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL) && Spells::IsPositiveSpell(trigger_spell_id) ? this : pVictim;
 
     // default case
     if (!target || target != this && !target->isAlive())
@@ -1616,6 +1649,31 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit *pVictim, uint32 
     SpellEntry const *spellInfo = triggeredByAura->GetSpellProto();
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "ProcDamageAndSpell: doing %u damage from spell id %u (triggered by auratype %u of spell %u)",
                      triggeredByAura->GetModifier()->m_amount, spellInfo->Id, triggeredByAura->GetModifier()->m_auraname, triggeredByAura->GetId());
+    
+    // World of Warcraft Client Patch 1.9.0 (2006-01-03)
+    // - Seal of Righteousness - Now does holy damage on every swing.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+    if (spellInfo->IsFitToFamilyMask<CF_PALADIN_SEALS>())
+    {
+        switch (spellInfo->Id)
+        {
+            case 21084: // Rank 1
+            case 20287: // Rank 2
+            case 20288: // Rank 3
+            case 20289: // Rank 4
+            case 20290: // Rank 5
+            case 20291: // Rank 6
+            case 20292: // Rank 7
+            case 20293: // Rank 8
+            {
+                if (!roll_chance_i(75)) // made up value
+                    return SPELL_AURA_PROC_FAILED;
+            }
+            break; 
+        }
+    }
+#endif
+
     SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
     damageInfo.damage = CalculateSpellDamage(pVictim, spellInfo, triggeredByAura->GetEffIndex());
     damageInfo.damage = SpellDamageBonusDone(pVictim, spellInfo, damageInfo.damage, SPELL_DIRECT_DAMAGE);
@@ -1682,7 +1740,7 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint3
         case 3656: // Corrupted Healing
         {
             // only proc on direct healing
-            if (IsSpellHaveEffect(procSpell, SPELL_EFFECT_HEAL))
+            if (procSpell->HasEffect(SPELL_EFFECT_HEAL))
                 triggered_spell_id = 23402;
             break;
         }
@@ -1741,7 +1799,7 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint3
 SpellAuraProcResult Unit::HandleModCastingSpeedNotStackAuraProc(Unit* /*pVictim*/, uint32 /*damage*/, Aura* /*triggeredByAura*/, SpellEntry const* procSpell, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 /*cooldown*/)
 {
     // Skip melee hits or instant cast spells
-    return !(procSpell == NULL || GetSpellCastTime(procSpell) == 0) ? SPELL_AURA_PROC_OK : SPELL_AURA_PROC_FAILED;
+    return !(procSpell == NULL || procSpell->GetCastTime() == 0) ? SPELL_AURA_PROC_OK : SPELL_AURA_PROC_FAILED;
 }
 
 SpellAuraProcResult Unit::HandleReflectSpellsSchoolAuraProc(Unit* /*pVictim*/, uint32 /*damage*/, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 /*cooldown*/)

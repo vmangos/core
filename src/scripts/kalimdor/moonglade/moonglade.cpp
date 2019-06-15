@@ -504,7 +504,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                 case 0:
                     if (Player* pPlayer = GetPlayerForEscort())
                         DoScriptText(SAY_REMULOS_INTRO_1, m_creature, pPlayer);
-                    m_creature->SetSpeedRate(MOVE_WALK, 2.2f, true); //du cout faudrait ptetre aussi revoir la vitesse de course.
+                    m_creature->SetSpeedRate(MOVE_WALK, 2.2f); //du cout faudrait ptetre aussi revoir la vitesse de course.
                     m_creature->SetWalk(true);
                     break;
                 case 1:
@@ -735,7 +735,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
 
             if (m_uiHealTimer < uiDiff)
             {
-                if (Unit* pTarget = m_creature->DoSelectLowestHpFriendly(DEFAULT_VISIBILITY_DISTANCE))
+                if (Unit* pTarget = m_creature->FindLowestHpFriendlyUnit(DEFAULT_VISIBILITY_DISTANCE))
                 {
                     switch (urand(0, 2))
                     {

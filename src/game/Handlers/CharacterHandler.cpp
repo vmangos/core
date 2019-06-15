@@ -91,7 +91,7 @@ bool LoginQueryHolder::Initialize()
                      "resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path, "
                      "honorRankPoints, honorHighestRank, honorStanding, honorLastWeekHK, honorLastWeekCP, honorStoredHK, honorStoredDK, "
                      "watchedFaction, drunk, health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, actionBars, "
-                     "world_phase_mask, customFlags FROM characters WHERE guid = '%u'", m_guid.GetCounter());
+                     "world_phase_mask FROM characters WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADGROUP,           "SELECT groupId FROM group_member WHERE memberGuid ='%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADBOUNDINSTANCES,  "SELECT id, permanent, map, resettime FROM character_instance LEFT JOIN instance ON instance = id WHERE guid = '%u'", m_guid.GetCounter());
     res &= SetPQuery(PLAYER_LOGIN_QUERY_LOADAURAS,           "SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM character_aura WHERE guid = '%u'", m_guid.GetCounter());
@@ -494,7 +494,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // If the character had a logout request, then he is articifially stunned (cf CMSG_LOGOUT_REQUEST handler). Fix it here.
         if (pCurrChar->CanFreeMove())
         {
-            pCurrChar->SetMovement(MOVE_UNROOT);
+            pCurrChar->SetRooted(false);
             pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
             pCurrChar->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
         }
@@ -659,7 +659,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     // friend status
     // TODO: Call it when node finished loading also
     if (GetMasterPlayer())
+    {
+        GetMasterPlayer()->areaId = pCurrChar->GetCachedAreaId();
+        GetMasterPlayer()->zoneId = pCurrChar->GetCachedZoneId();
         sSocialMgr.SendFriendStatus(GetMasterPlayer(), FRIEND_ONLINE, GetMasterPlayer()->GetObjectGuid(), true);
+    }
 
     if (!alreadyOnline)
     {
@@ -674,7 +678,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
                 pCurrChar->CastSpell(pCurrChar, 20584, true);   // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
             pCurrChar->CastSpell(pCurrChar, 8326, true);        // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
 
-            pCurrChar->SetMovement(MOVE_WATER_WALK);
+            pCurrChar->SetWaterWalking(true);
         }
     }
 
@@ -728,7 +732,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     sLog.out(LOG_CHAR, "Account: %d (IP: %s) Login Character:[%s] (guid: %u)%s",
              GetAccountId(), IP_str.c_str(), pCurrChar->GetName(), pCurrChar->GetGUIDLow(), alreadyOnline ? " Player was already online" : "");
     sWorld.LogCharacter(pCurrChar, "Login");
-    if (!alreadyOnline && !pCurrChar->IsStandState() && !pCurrChar->hasUnitState(UNIT_STAT_STUNNED))
+    if (!alreadyOnline && !pCurrChar->IsStandingUp() && !pCurrChar->hasUnitState(UNIT_STAT_STUNNED))
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
 
     m_playerLoading = false;

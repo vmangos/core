@@ -40,12 +40,59 @@
 #include "Timer.h"
 #include <list>
 
-enum UnitMovementType
+enum UnitMoveType
 {
-    MOVE_ROOT       = 1,
-    MOVE_UNROOT     = 2,
-    MOVE_WATER_WALK = 3,
-    MOVE_LAND_WALK  = 4
+    MOVE_WALK           = 0,
+    MOVE_RUN            = 1,
+    MOVE_RUN_BACK       = 2,
+    MOVE_SWIM           = 3,
+    MOVE_SWIM_BACK      = 4,
+    MOVE_TURN_RATE      = 5,
+};
+
+#define MAX_MOVE_TYPE 6
+
+extern float baseMoveSpeed[MAX_MOVE_TYPE];
+
+#define MOVEMENT_PACKET_TIME_DELAY 0
+
+enum MovementChangeType
+{
+    INVALID,
+
+    ROOT,
+    WATER_WALK,
+    SET_HOVER,
+    FEATHER_FALL,
+
+    SPEED_CHANGE_WALK,
+    SPEED_CHANGE_RUN,
+    SPEED_CHANGE_RUN_BACK,
+    SPEED_CHANGE_SWIM,
+    SPEED_CHANGE_SWIM_BACK,
+    RATE_CHANGE_TURN,
+
+    TELEPORT,
+    KNOCK_BACK
+};
+
+struct PlayerMovementPendingChange
+{
+    uint32 movementCounter = 0;
+    MovementChangeType movementChangeType = INVALID;
+    uint32 time = 0;
+
+    float newValue = 0.0f; // used if speed or height change
+    bool apply = false; // used if movement flag change
+    struct KnockbackInfo
+    {
+        float vcos = 0.0f;
+        float vsin = 0.0f;
+        float speedXY = 0.0f;
+        float speedZ = 0.0f;
+    } knockbackInfo; // used if knockback
+
+    PlayerMovementPendingChange();
 };
 
 enum SpellInterruptFlags
@@ -456,18 +503,6 @@ enum UnitState
     UNIT_STAT_ALL_DYN_STATES  = UNIT_STAT_ALL_STATE & ~(UNIT_STAT_NO_COMBAT_MOVEMENT | UNIT_STAT_RUNNING | UNIT_STAT_IGNORE_PATHFINDING),
 };
 
-enum UnitMoveType
-{
-    MOVE_WALK           = 0,
-    MOVE_RUN            = 1,
-    MOVE_RUN_BACK       = 2,
-    MOVE_SWIM           = 3,
-    MOVE_SWIM_BACK      = 4,
-    MOVE_TURN_RATE      = 5,
-};
-
-#define MAX_MOVE_TYPE 6
-
 /// internal used flags for marking special auras - for example some dummy-auras
 enum UnitAuraFlags
 {
@@ -489,7 +524,7 @@ enum UnitVisibility
 enum UnitFlags
 {
     UNIT_FLAG_NONE                  = 0x00000000,
-    UNIT_FLAG_UNK_0                 = 0x00000001,
+    UNIT_FLAG_UNK_0                 = 0x00000001,           // Movement checks disabled, likely paired with loss of client control packet.
     UNIT_FLAG_NON_ATTACKABLE        = 0x00000002,           // not attackable
     UNIT_FLAG_DISABLE_MOVE          = 0x00000004,
     UNIT_FLAG_PLAYER_CONTROLLED     = 0x00000008,           // players, pets, totems, guardians, companions, charms, any units associated with players
@@ -502,10 +537,14 @@ enum UnitFlags
     UNIT_FLAG_SILENCED              = 0x00002000,           // silenced, 2.1.1
     UNIT_FLAG_UNK_14                = 0x00004000,
     UNIT_FLAG_USE_SWIM_ANIMATION    = 0x00008000,
-    UNIT_FLAG_UNK_16                = 0x00010000,           // removes attackable icon
+    UNIT_FLAG_NON_ATTACKABLE_2      = 0x00010000,           // removes attackable icon, if on yourself, cannot assist self but can cast TARGET_UNIT_CASTER spells - added by SPELL_AURA_MOD_UNATTACKABLE
     UNIT_FLAG_PACIFIED              = 0x00020000,
-    UNIT_FLAG_DISABLE_ROTATE        = 0x00040000,
+    UNIT_FLAG_STUNNED               = 0x00040000,           // Unit is a subject to stun, turn and strafe movement disabled
     UNIT_FLAG_IN_COMBAT             = 0x00080000,
+    UNIT_FLAG_TAXI_FLIGHT           = 0x00100000,           // Unit is on taxi, paired with a duplicate loss of client control packet (likely a legacy serverside hack). Disables any spellcasts not allowed in taxi flight client-side.
+    UNIT_FLAG_CONFUSED              = 0x00400000,           // Unit is a subject to confused movement, movement checks disabled, paired with loss of client control packet.
+    UNIT_FLAG_FLEEING               = 0x00800000,           // Unit is a subject to fleeing movement, movement checks disabled, paired with loss of client control packet.
+    UNIT_FLAG_POSSESSED             = 0x01000000,           // Unit is under remote control by another unit, movement checks disabled, paired with loss of client control packet. New master is allowed to use melee attack and can't select this unit via mouse in the world (as if it was own character).
     UNIT_FLAG_NOT_SELECTABLE        = 0x02000000,
     UNIT_FLAG_SKINNABLE             = 0x04000000,
     UNIT_FLAG_AURAS_VISIBLE         = 0x08000000,           // magic detect
@@ -517,12 +556,7 @@ enum UnitFlags
     UNIT_FLAG_NOT_ATTACKABLE_1      = 0x00000080,           // ?? (UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_NOT_ATTACKABLE_1) is NON_PVP_ATTACKABLE
     UNIT_FLAG_LOOTING               = 0x00000400,           // loot animation
     UNIT_FLAG_PET_IN_COMBAT         = 0x00000800,           // in combat?, 2.0.8
-    UNIT_FLAG_STUNNED               = 0x00040000,           // stunned, 2.1.1
-    UNIT_FLAG_TAXI_FLIGHT           = 0x00100000,           // disable casting at client side spell not allowed by taxi flight (mounted?), probably used with 0x4 flag
     UNIT_FLAG_DISARMED              = 0x00200000,           // disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
-    UNIT_FLAG_CONFUSED              = 0x00400000,
-    UNIT_FLAG_FLEEING               = 0x00800000,
-    UNIT_FLAG_POSSESSED             = 0x01000000,           // Unit is under remote control by another unit, movement checks disabled, paired with loss of client control packet. New master is allowed to use melee attack and can't select this unit via mouse in the world (as if it was own character).
 
     UNIT_FLAG_UNK_28                = 0x10000000,
     UNIT_FLAG_UNK_29                = 0x20000000,           // used in Feing Death spell
@@ -911,7 +945,7 @@ enum ReactiveType
 {
     REACTIVE_DEFENSE      = 1,
     REACTIVE_HUNTER_PARRY = 2,
-    //REACTIVE_CRIT         = 3,
+    REACTIVE_CRIT         = 3,
     //REACTIVE_HUNTER_CRIT  = 4,
     REACTIVE_OVERPOWER    = 5
 };
@@ -1204,6 +1238,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Unit* SelectNearestTarget(float dist) const;
         Unit* SelectRandomUnfriendlyTarget(Unit* except = nullptr, float radius = ATTACK_DISTANCE, bool inFront = false, bool isValidAttackTarget = false) const;
         Unit* SelectRandomFriendlyTarget(Unit* except = nullptr, float radius = ATTACK_DISTANCE, bool inCombat = false) const;
+        Player* FindNearestHostilePlayer(float range) const;
+        Player* FindNearestFriendlyPlayer(float range) const;
+        Unit* FindLowestHpFriendlyUnit(float fRange, uint32 uiMinHPDiff = 1, bool bPercent = false, Unit* except = nullptr) const;
+        Unit* FindFriendlyUnitMissingBuff(float range, uint32 spellid, Unit* except = nullptr) const;
+        Unit* FindFriendlyUnitCC(float range) const;
         Unit* SummonCreatureAndAttack(uint32 creatureEntry, Unit* pVictim= nullptr);
         bool IsSecondaryThreatTarget();
         bool hasNegativeAuraWithInterruptFlag(uint32 flag);
@@ -1315,8 +1354,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         }
 
         uint8 getStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
-        bool IsSitState() const;
-        bool IsStandState() const;
+        bool IsSittingDown() const;
+        bool IsStandingUp() const;
+        virtual bool IsStandingUpForProc() const; // takes not yet applied stand state change into account (for players)
         void SetStandState(uint8 state);
 
         bool IsMounted() const { return (GetMountID() != 0); }
@@ -1493,10 +1533,54 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendHeartBeat(bool includingSelf = true);
         virtual void SetFly(bool enable);
         void SetWalk(bool enable, bool asDefault = true);
-        void SetLevitate(bool enable);
-        virtual void SetFeatherFall(bool /*enabled*/);
-        virtual void SetHover(bool /*enabled*/);
-        virtual void SetWaterWalk(bool /*enabled*/);
+
+    private:
+        // when a player controls this unit, and when change is made to this unit which requires an ack from the client to be acted (change of speed for example), this movementCounter is incremented
+        uint32 m_movementCounter = 0;
+        std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
+
+    public:
+        void SetRooted(bool apply);
+        void SetRootedReal(bool apply);
+        bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
+
+        void SetWaterWalking(bool apply);
+        void SetWaterWalkingReal(bool apply);
+        bool IsWaterWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WATERWALKING); }
+
+        void SetHover(bool apply);
+        void SetHoverReal(bool apply);
+        bool IsHovering() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_HOVER); }
+
+        void SetFeatherFall(bool apply);
+        void SetFeatherFallReal(bool apply);
+        bool IsFallingSlow() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SAFE_FALL); }
+
+        void SetLevitate(bool apply);
+        bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_LEVITATING); }
+
+        void KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed);
+        void KnockBack(float angle, float horizontalSpeed, float verticalSpeed);
+
+        // reflects direct client control (examples: a player MC another player or a creature (possess effects). etc...)
+        bool IsMovedByPlayer() const;
+        Player* GetPlayerMovingMe();
+
+        uint32 GetMovementCounterAndInc() { return m_movementCounter++; }
+        uint32 GetMovementCounter() const { return m_movementCounter; }
+
+        PlayerMovementPendingChange PopPendingMovementChange();
+        void PushPendingMovementChange(PlayerMovementPendingChange newChange);
+        bool HasPendingMovementChange() const { return !m_pendingMovementChanges.empty(); }
+        bool HasPendingMovementChange(MovementChangeType changeType) const;
+
+        void SetSpeedRate(UnitMoveType mtype, float rate);
+        void SetSpeedRateReal(UnitMoveType mtype, float rate);
+        void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
+        float GetSpeed(UnitMoveType mtype) const;
+        float GetXZFlagBasedSpeed() const;
+        float GetXZFlagBasedSpeed(uint32 moveFlags) const;
+        float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
 
         virtual bool CanWalk() const = 0;
         virtual bool CanFly() const = 0;
@@ -1524,8 +1608,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
-        ObjectGuid const& GetPossessorGuid() { return m_possessorGuid; }
-        void SetPossesorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
+        ObjectGuid const& GetPossessorGuid() const { return m_possessorGuid; }
+        void SetPossessorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
 
         virtual Pet* GetMiniPet() const { return nullptr; }    // overwrited in Player
 
@@ -1542,6 +1626,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Unit* GetOwner() const;
         Pet* GetPet() const;
         Unit* GetCharmer() const;
+        Player* GetPossessor() const;
         Unit* GetCharm() const;
         void Uncharm();
         void RemoveCharmAuras();
@@ -1649,6 +1734,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 GetCreateMana() const { return GetUInt32Value(UNIT_FIELD_BASE_MANA); }
         uint32 GetCreatePowers(Powers power) const;
         float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
+        void SetCreateResistance(SpellSchools school, int32 val) { m_createResistances[school] = val; }
+        int32 GetCreateResistance(SpellSchools school) const { return m_createResistances[school]; }
 
         void SetCurrentCastedSpell(Spell * pSpell);
         bool IsSpellProhibited(SpellEntry const* pSpell);
@@ -1710,6 +1797,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
         float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
         float GetTotalStatValue(Stats stat) const;
+        int32 GetTotalResistanceValue(SpellSchools school) const;
         float GetTotalAuraModValue(UnitMods unitMod) const;
         SpellSchools GetSpellSchoolByAuraGroup(UnitMods unitMod) const;
         Stats GetStatByAuraGroup(UnitMods unitMod) const;
@@ -1732,9 +1820,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetWeaponDamageSchool(WeaponAttackType attType, SpellSchools school, uint8 index = 0) { m_weaponDamage[attType][index].school = school; }
         uint8 GetWeaponDamageCount(WeaponAttackType attType) const { return m_weaponDamageCount[attType]; }
 
-        void SetInFront(Unit const* target);
+        void SetInFront(Unit const* pTarget);
         void SetFacingTo(float ori);
         void SetFacingToObject(WorldObject* pObject);
+        bool IsBehindTarget(Unit const* pTarget, bool strict = true) const;
 
         // Visibility system
         UnitVisibility GetVisibility() const { return m_Visibility; }
@@ -1892,18 +1981,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
         float RollMagicResistanceMultiplierOutcomeAgainst(const Unit* pCaster, SpellSchoolMask schoolMask, DamageEffectType dmgType, SpellEntry const* spellProto) const;
 
-        void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
-        float GetSpeed(UnitMoveType mtype) const;
-        float GetXZFlagBasedSpeed() const;
-        float GetXZFlagBasedSpeed(uint32 moveFlags) const;
-        float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
-        void SetSpeedRate(UnitMoveType mtype, float rate, bool forced = false);
-
-        bool isHover() const { return HasAuraType(SPELL_AURA_HOVER); }
-
-        void KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed);
-        void KnockBack(float angle, float horizontalSpeed, float verticalSpeed);
-
         void _RemoveAllAuraMods();
         void _ApplyAllAuraMods();
 
@@ -1948,7 +2025,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // reactive attacks
         void ClearAllReactives();
         void StartReactiveTimer(ReactiveType reactive, ObjectGuid target) { m_reactiveTimer[reactive] = REACTIVE_TIMER_START; m_reactiveTarget[reactive] = target; }
-        ObjectGuid const& GetReactiveTraget(ReactiveType reactive) const { return m_reactiveTarget[reactive]; }
+        ObjectGuid const& GetReactiveTarget(ReactiveType reactive) const { return m_reactiveTarget[reactive]; }
         void UpdateReactives(uint32 p_time);
 
         // group updates
@@ -2049,7 +2126,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;
-        void SetMovement(UnitMovementType pType);
         bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel= nullptr) const;
         bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const;
 
@@ -2098,6 +2174,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_attackTimer[MAX_ATTACK];
 
         float m_createStats[MAX_STATS];
+        int32 m_createResistances[MAX_SPELL_SCHOOL];
 
         AttackerSet m_attackers;
         Unit* m_attacking;

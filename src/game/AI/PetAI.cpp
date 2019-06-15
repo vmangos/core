@@ -207,9 +207,9 @@ void PetAI::UpdateAI(const uint32 diff)
             if (m_creature->HasSpellCooldown(spellInfo->Id))
                 continue;
 
-            if (IsPositiveSpell(spellInfo->Id))
+            if (spellInfo->IsPositiveSpell())
             {
-                if (!IsNonCombatSpell(spellInfo)) // Can be used in combat.
+                if (!spellInfo->IsNonCombatSpell()) // Can be used in combat.
                 {
                     /*
                     Spells handled here:
@@ -219,12 +219,12 @@ void PetAI::UpdateAI(const uint32 diff)
                     */
 
                     // Warlock Sacrifice: do not auto cast if not in combat
-                    bool castOnlyInCombat = IsSpellHaveEffect(spellInfo, SPELL_EFFECT_INSTAKILL);
+                    bool castOnlyInCombat = spellInfo->HasEffect(SPELL_EFFECT_INSTAKILL);
 
                     if (!castOnlyInCombat)
                     {
-                        int32 duration = GetSpellDuration(spellInfo);
-                        int32 cooldown = GetSpellRecoveryTime(spellInfo);
+                        int32 duration = spellInfo->GetDuration();
+                        int32 cooldown = spellInfo->GetRecoveryTime();
                         // Keep this spell for when we will be in combat.
                         if (cooldown >= 0 && duration >= 0 && cooldown > duration)
                             castOnlyInCombat = true;
@@ -237,7 +237,7 @@ void PetAI::UpdateAI(const uint32 diff)
                     if (spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMP_BUFFS>() && spellInfo->SpellVisual == 289)
                         castOnlyInCombat = false;
                     // Furious Howl: in combat only
-                    if (IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_DAMAGE_DONE))
+                    if (spellInfo->HasAura(SPELL_AURA_MOD_DAMAGE_DONE))
                         castOnlyInCombat = true;
                     if (castOnlyInCombat && !m_creature->getVictim())
                         continue;
@@ -285,7 +285,7 @@ void PetAI::UpdateAI(const uint32 diff)
                 if (!spellUsed)
                     spell->Delete();
             }
-            else if (m_creature->getVictim() && CanAttack(m_creature->getVictim()) && !IsNonCombatSpell(spellInfo))
+            else if (m_creature->getVictim() && CanAttack(m_creature->getVictim()) && !spellInfo->IsNonCombatSpell())
             {
                 Spell *spell = new Spell(m_creature, spellInfo, false);
                 if (spell->CanAutoCast(m_creature->getVictim()))
@@ -337,8 +337,8 @@ void PetAI::UpdateAI(const uint32 diff)
     }
 
     // Update speed as needed to prevent dropping too far behind and despawning
-    m_creature->UpdateSpeed(MOVE_RUN, true);
-    m_creature->UpdateSpeed(MOVE_WALK, true);
+    m_creature->UpdateSpeed(MOVE_RUN, false);
+    m_creature->UpdateSpeed(MOVE_WALK, false);
 }
 
 void PetAI::UpdateAllies()

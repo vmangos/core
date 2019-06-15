@@ -219,7 +219,7 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
                     }
                     case GENERIC_TARGET_FRIEND_NEED_HEAL:
                     {
-                        target = m_creature->DoSelectLowestHpFriendly(it->maxRange, it->healValue / 4);
+                        target = m_creature->FindLowestHpFriendlyUnit(it->maxRange, it->healValue / 4);
                         break;
                     }
                     case GENERIC_TARGET_FRIEND_DISPELL_CC:
@@ -444,7 +444,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
         if (spellToModify->healValue != 0)
             spellToModify->target = GENERIC_TARGET_FRIEND_NEED_HEAL;
         // Autres sorts positifs
-        else if (IsPositiveSpell(spellToModify->spellId))
+        else if (Spells::IsPositiveSpell(spellToModify->spellId))
             spellToModify->target = GENERIC_TARGET_SELF;
         /* 2 : Sorts negatifs*/
         // Attaque a distance
@@ -503,7 +503,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
                 }
                 case SPELL_EFFECT_SUMMON_GUARDIAN:
                 {
-                    int32 duration = GetSpellDuration(spellInfos);
+                    int32 duration = spellInfos->GetDuration();
                     if (duration > 0) 
                     {
                         spellToModify->minCD = duration;

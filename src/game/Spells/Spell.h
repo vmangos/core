@@ -706,6 +706,18 @@ class Spell
                     int32 itemEntry;
                     int32 unk;
                 } durabilityDamage;
+
+                struct
+                {
+                    uint32 amount;
+                    uint8 critical;
+                } heal;
+
+                struct
+                {
+                    uint32 amount;
+                    uint32 powerType;
+                } energize;
             };
         };
 

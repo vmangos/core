@@ -66,7 +66,7 @@ struct CreatureAISpellsEntry : CreatureSpellsEntry
 class MANGOS_DLL_SPEC CreatureAI
 {
     public:
-        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_uLastAlertTime(0), m_bMeleeAttack(true), m_bCombatMovement(true)
+        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_uLastAlertTime(0), m_uiCastingDelay(0), m_bMeleeAttack(true), m_bCombatMovement(true)
         {
             SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
         }
@@ -221,6 +221,7 @@ class MANGOS_DLL_SPEC CreatureAI
         void SetSpellsList(const CreatureSpellsList* pSpellsList);
 
         // Goes through the creature's spells list to update timers and cast spells.
+        void UpdateSpellsList(const uint32 uiDiff);
         void DoSpellsListCasts(const uint32 uiDiff);
 
         // Enables or disables melee attacks.
@@ -238,6 +239,7 @@ class MANGOS_DLL_SPEC CreatureAI
         bool   m_bUseAiAtControl;
         bool   m_bMeleeAttack;                                  // If we allow melee auto attack
         bool   m_bCombatMovement;                               // If we allow targeted movement gen (chasing target)
+        uint32 m_uiCastingDelay;                                // Cooldown before updating spell list again
         uint32 m_uLastAlertTime;
         std::vector<CreatureAISpellsEntry> m_CreatureSpells;    // Contains the currently used creature_spells template
 };

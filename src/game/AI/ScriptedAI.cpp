@@ -80,7 +80,7 @@ void ScriptedAI::UpdateAI(const uint32 uiDiff)
     m_creature->SelectHostileTarget();
 
     if (!m_CreatureSpells.empty() && m_creature->isInCombat())
-        DoSpellsListCasts(uiDiff);
+        UpdateSpellsList(uiDiff);
 
     DoMeleeAttackIfReady();
 }
@@ -240,16 +240,6 @@ void ScriptedAI::GetPlayersWithinRange(std::list<Player*>& players, float range)
     MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, check);
 
     Cell::VisitWorldObjects(m_creature, searcher, range);
-}
-
-Player* ScriptedAI::GetNearestPlayer(float range)
-{
-    Player* target = nullptr;
-    MaNGOS::NearestHostileUnitCheck check(m_creature, range);
-    MaNGOS::PlayerSearcher<MaNGOS::NearestHostileUnitCheck> searcher(target, check);
-    Cell::VisitWorldObjects(m_creature, searcher, range);
-
-    return target;
 }
 
 void ScriptedAI::SetEquipmentSlots(bool bLoadDefault, int32 uiMainHand, int32 uiOffHand, int32 uiRanged)

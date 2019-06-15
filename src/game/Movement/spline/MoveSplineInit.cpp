@@ -200,13 +200,12 @@ int32 MoveSplineInit::Launch()
 #else
         mvtData.SetUnitSpeed(MSG_MOVE_SET_RUN_SPEED, unit.GetObjectGuid(), realSpeedRun);
 #endif
+
     // Restore correct walk mode for players
     if (unit.GetTypeId() == TYPEID_PLAYER && (moveFlags & MOVEFLAG_WALK_MODE) != (oldMoveFlags & MOVEFLAG_WALK_MODE))
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
-#else
-        mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? MSG_MOVE_SET_WALK_MODE : MSG_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
-#endif
+
     if (compress)
     {
         WorldPacket data2;
@@ -217,6 +216,10 @@ int32 MoveSplineInit::Launch()
             sLog.outError("[MoveSplineInit] Unable to compress move packet, move spline not sent");
         }
     }
+#else
+        mvtData.SetSplineOpcode(oldMoveFlags & MOVEFLAG_WALK_MODE ? MSG_MOVE_SET_WALK_MODE : MSG_MOVE_SET_RUN_MODE, unit.GetObjectGuid());
+#endif
+    
     return move_spline.Duration();
 }
 

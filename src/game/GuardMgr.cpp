@@ -17,6 +17,8 @@
 #include "GuardMgr.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "World.h"
+#include "DBCStores.h"
 #include "Log.h"
 #include "Policies/SingletonImp.h"
 
@@ -24,6 +26,26 @@ INSTANTIATE_SINGLETON_1(GuardMgr);
 
 #define GUARD_POST_USE_COOLDOWN  10000
 #define GUARD_POST_RECHARGE_TIME 60000
+
+enum ModelIds
+{
+    MODEL_HUMAN_MALE    = 49,
+    MODEL_HUMAN_FEMALE  = 50,
+    MODEL_ORC_MALE      = 51,
+    MODEL_ORC_FEMALE    = 52,
+    MODEL_DWARF_MALE    = 53,
+    MODEL_DWARF_FEMALE  = 54,
+    MODEL_NELF_MALE     = 55,
+    MODEL_NELF_FEMALE   = 56,
+    MODEL_UNDEAD_MALE   = 57,
+    MODEL_UNDEAD_FEMALE = 58,
+    MODEL_TAUREN_MALE   = 59,
+    MODEL_TAUREN_FEMALE = 60,
+    MODEL_GNOME_MALE    = 182,
+    MODEL_GNOME_FEMALE  = 183,
+    MODEL_TROLL_MALE    = 185,
+    MODEL_TROLL_FEMALE  = 186,
+};
 
 enum GuardAreas
 {
@@ -146,6 +168,7 @@ enum GuardIds
     NPC_MOONGLADE_WARDEN        = 11822,
     NPC_SHADOWGLEN_SENTINEL     = 12160,
     NPC_REVANTUSK_WATCHER       = 14730,
+    NPC_BOOTY_BAY_ELITE         = 15088,
     NPC_HAMERFALL_ELITE         = 15136,
     NPC_MENETHIL_ELITE          = 15137,
     NPC_SILVERPINE_ELITE        = 15138,
@@ -154,66 +177,75 @@ enum GuardIds
 
 GuardMgr::GuardMgr()
 {
-    m_mAreaGuardInfo = {
     // Area Id                               Alliance NPC                 Horde NPC
-    { AREA_STORMWIND,          AreaGuardInfo(NPC_STORMWIND_CITY_GUARD,    NPC_NONE) },
-    { AREA_ASTRANAAR,          AreaGuardInfo(NPC_ASTRANAAR_SENTINEL,      NPC_NONE) },
-    { AREA_AUBERDINE,          AreaGuardInfo(NPC_AUBERDINE_SENTINEL,      NPC_NONE) },
-    { AREA_CROSSROADS,         AreaGuardInfo(NPC_NONE,                    NPC_HORDE_GUARD) },
-    { AREA_RAZOR_HILL,         AreaGuardInfo(NPC_NONE,                    NPC_RAZOR_HILL_GRUNT) },
-    { AREA_THERAMORE,          AreaGuardInfo(NPC_THERAMORE_GUARD,         NPC_NONE) },
-    { AREA_FEATHERMOON,        AreaGuardInfo(NPC_FEATHERMOON_SENTINEL,    NPC_NONE) },
-    { AREA_THUNDERBLUFF,       AreaGuardInfo(NPC_NONE,                    NPC_BLUFFWATCHER) },
-    { AREA_CAMP_NARACHE,       AreaGuardInfo(NPC_NONE,                    NPC_MULGORE_PROTECTOR) },
-    { AREA_BLOODHOOF_VILLAGE,  AreaGuardInfo(NPC_NONE,                    NPC_MULGORE_PROTECTOR) },
-    { AREA_MULGORE,            AreaGuardInfo(NPC_NONE,                    NPC_MULGORE_PROTECTOR) },
-    { AREA_CAMP_MOJACHE,       AreaGuardInfo(NPC_NONE,                    NPC_CAMP_MOJACHE_BRAVE) },
-    { AREA_FREEWIND_POST,      AreaGuardInfo(NPC_NONE,                    NPC_FREEWIND_BRAVE) },
-    { AREA_SENJIN_VILLAGE,     AreaGuardInfo(NPC_NONE,                    NPC_SENJIN_GUARDIAN) },
-    { AREA_SENTINEL_HILL,      AreaGuardInfo(NPC_PROTECTOR_OF_THE_PEOPLE, NPC_NONE) },
-    { AREA_THELSAMAR,          AreaGuardInfo(NPC_THELSAMAR_MOUNTAINEER,   NPC_NONE) },
-    { AREA_SILVERPINE,         AreaGuardInfo(NPC_NONE,                    NPC_SILVERPINE_DEATHGUARD) },
-    { AREA_SEPULCHER,          AreaGuardInfo(NPC_NONE,                    NPC_SILVERPINE_ELITE) },
-    { AREA_UNDERCITY,          AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) },
-    { AREA_KHARANOS,           AreaGuardInfo(NPC_IRONFORGE_MOUNTAINEER,   NPC_NONE) },
-    { AREA_IRONFORGE,          AreaGuardInfo(NPC_IRONFORGE_GUARD,         NPC_NONE) },
-    { AREA_DARNASSUS,          AreaGuardInfo(NPC_DARNASSUS_SENTINEL,      NPC_NONE) },
-    { AREA_ORGRIMMAR,          AreaGuardInfo(NPC_NONE,                    NPC_ORGRIMMAR_GRUNT) },
-    { AREA_WETLANDS,           AreaGuardInfo(NPC_MENETHIL_GUARD,          NPC_NONE) },
-    { AREA_MENETHIL,           AreaGuardInfo(NPC_MENETHIL_ELITE,          NPC_NONE) },
-    { AREA_DUSTWALLOW_MARSH,   AreaGuardInfo(NPC_THERAMORE_GUARD,         NPC_BRACKENWALL_ENFORCER) },
-    { AREA_BRACKENWALL_VILLAGE,AreaGuardInfo(NPC_NONE,                    NPC_BRACKENWALL_ENFORCER) },
-    { AREA_ARATHI_HIGHLANDS,   AreaGuardInfo(NPC_REFUGE_POINTE_DEFENDER,  NPC_HAMERFALL_GUARDIAN) },
-    { AREA_REFUGE_POINTE,      AreaGuardInfo(NPC_REFUGE_POINTE_DEFENDER,  NPC_NONE) },
-    { AREA_HAMERFALL,          AreaGuardInfo(NPC_NONE,                    NPC_HAMERFALL_ELITE) },
-    { AREA_BRILL,              AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) },
-    { AREA_TIRISFAL_GLADES,    AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) },
-    { AREA_DEATHKNELL,         AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) },
-    { AREA_HILLSBRAD_FOOTHILLS,AreaGuardInfo(NPC_SOUTHSHORE_GUARD,        NPC_TARREN_MILL_DEATHGUARD) },
-    { AREA_SOUTHSHORE,         AreaGuardInfo(NPC_SOUTHSHORE_GUARD,        NPC_NONE) },
-    { AREA_TARREN_MILL,        AreaGuardInfo(NPC_NONE,                    NPC_TARREN_MILL_DEATHGUARD) },
-    { AREA_STONETALON,         AreaGuardInfo(NPC_NONE,                    NPC_STONETALON_GRUNT) },
-    { AREA_GROMGOL,            AreaGuardInfo(NPC_NONE,                    NPC_GROMGOL_GRUNT) },
-    { AREA_GOLDSHIRE,          AreaGuardInfo(NPC_STORMWIND_CITY_GUARD,    NPC_NONE) },
-    { AREA_STONARD,            AreaGuardInfo(NPC_NONE,                    NPC_STONARD_GRUNT) },
-    { AREA_KARGATH,            AreaGuardInfo(NPC_NONE,                    NPC_KARGATH_GRUNT) },
-    { AREA_LAKESHIRE,          AreaGuardInfo(NPC_LAKESHIRE_GUARD,         NPC_NONE) },
-    { AREA_DARKSHIRE,          AreaGuardInfo(NPC_NIGHT_WATCH_GUARD,       NPC_NONE) },
-    { AREA_DOLANAAR,           AreaGuardInfo(NPC_TELDRASSIL_SENTINEL,     NPC_NONE) },
-    { AREA_TELDRASSIL,         AreaGuardInfo(NPC_TELDRASSIL_SENTINEL,     NPC_NONE) },
-    { AREA_RUTHERAN_VILLAGE,   AreaGuardInfo(NPC_DARNASSUS_SENTINEL,      NPC_NONE) },
-    { AREA_NIGHTHAVEN,         AreaGuardInfo(NPC_MOONGLADE_WARDEN,        NPC_MOONGLADE_WARDEN) },
-    { AREA_REVANTUSK_VILLAGE,  AreaGuardInfo(NPC_NONE,                    NPC_REVANTUSK_WATCHER) },
-    { AREA_LIGHTS_HOPE_CHAPEL, AreaGuardInfo(NPC_ARGENT_SENTRY,           NPC_ARGENT_SENTRY) },
-    { AREA_SHADOWGLEN,         AreaGuardInfo(NPC_SHADOWGLEN_SENTINEL,     NPC_NONE) },
-    { AREA_NORTHSHIRE,         AreaGuardInfo(NPC_NORTHSHIRE_GUARD,        NPC_NONE) },
-    { AREA_COLDRIDGE_VALLEY,   AreaGuardInfo(NPC_COLDRIDGE_MOUNTAINEER,   NPC_NONE) },
-    { AREA_VALLEY_OF_TRIALS,   AreaGuardInfo(NPC_NONE,                    NPC_DEN_GRUNT) },
-    { AREA_BOOTY_BAY,          AreaGuardInfo(NPC_BOOTY_BAY_BRUISER,       NPC_BOOTY_BAY_BRUISER) },
-    { AREA_EVERLOOK,           AreaGuardInfo(NPC_EVERLOOK_BRUISER,        NPC_EVERLOOK_BRUISER) },
-    { AREA_GADGETZAN,          AreaGuardInfo(NPC_GADGETZAN_BRUISER,       NPC_GADGETZAN_BRUISER) },
-    { AREA_RATCHET,            AreaGuardInfo(NPC_RATCHET_BRUISER,         NPC_RATCHET_BRUISER) },
-    };
+    m_mAreaGuardInfo.insert({ AREA_STORMWIND,          AreaGuardInfo(NPC_STORMWIND_CITY_GUARD,    NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_ASTRANAAR,          AreaGuardInfo(NPC_ASTRANAAR_SENTINEL,      NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_AUBERDINE,          AreaGuardInfo(NPC_AUBERDINE_SENTINEL,      NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_CROSSROADS,         AreaGuardInfo(NPC_NONE,                    NPC_HORDE_GUARD) });
+    m_mAreaGuardInfo.insert({ AREA_RAZOR_HILL,         AreaGuardInfo(NPC_NONE,                    NPC_RAZOR_HILL_GRUNT) });
+    m_mAreaGuardInfo.insert({ AREA_THERAMORE,          AreaGuardInfo(NPC_THERAMORE_GUARD,         NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_FEATHERMOON,        AreaGuardInfo(NPC_FEATHERMOON_SENTINEL,    NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_THUNDERBLUFF,       AreaGuardInfo(NPC_NONE,                    NPC_BLUFFWATCHER) });
+    m_mAreaGuardInfo.insert({ AREA_CAMP_NARACHE,       AreaGuardInfo(NPC_NONE,                    NPC_MULGORE_PROTECTOR) });
+    m_mAreaGuardInfo.insert({ AREA_BLOODHOOF_VILLAGE,  AreaGuardInfo(NPC_NONE,                    NPC_MULGORE_PROTECTOR) });
+    m_mAreaGuardInfo.insert({ AREA_MULGORE,            AreaGuardInfo(NPC_NONE,                    NPC_MULGORE_PROTECTOR) });
+    m_mAreaGuardInfo.insert({ AREA_CAMP_MOJACHE,       AreaGuardInfo(NPC_NONE,                    NPC_CAMP_MOJACHE_BRAVE) });
+    m_mAreaGuardInfo.insert({ AREA_FREEWIND_POST,      AreaGuardInfo(NPC_NONE,                    NPC_FREEWIND_BRAVE) });
+    m_mAreaGuardInfo.insert({ AREA_SENJIN_VILLAGE,     AreaGuardInfo(NPC_NONE,                    NPC_SENJIN_GUARDIAN) });
+    m_mAreaGuardInfo.insert({ AREA_SENTINEL_HILL,      AreaGuardInfo(NPC_PROTECTOR_OF_THE_PEOPLE, NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_THELSAMAR,          AreaGuardInfo(NPC_THELSAMAR_MOUNTAINEER,   NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_SILVERPINE,         AreaGuardInfo(NPC_NONE,                    NPC_SILVERPINE_DEATHGUARD) });
+    m_mAreaGuardInfo.insert({ AREA_UNDERCITY,          AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) });
+    m_mAreaGuardInfo.insert({ AREA_KHARANOS,           AreaGuardInfo(NPC_IRONFORGE_MOUNTAINEER,   NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_IRONFORGE,          AreaGuardInfo(NPC_IRONFORGE_GUARD,         NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_DARNASSUS,          AreaGuardInfo(NPC_DARNASSUS_SENTINEL,      NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_ORGRIMMAR,          AreaGuardInfo(NPC_NONE,                    NPC_ORGRIMMAR_GRUNT) });
+    m_mAreaGuardInfo.insert({ AREA_WETLANDS,           AreaGuardInfo(NPC_MENETHIL_GUARD,          NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_DUSTWALLOW_MARSH,   AreaGuardInfo(NPC_THERAMORE_GUARD,         NPC_BRACKENWALL_ENFORCER) });
+    m_mAreaGuardInfo.insert({ AREA_BRACKENWALL_VILLAGE,AreaGuardInfo(NPC_NONE,                    NPC_BRACKENWALL_ENFORCER) });
+    m_mAreaGuardInfo.insert({ AREA_ARATHI_HIGHLANDS,   AreaGuardInfo(NPC_REFUGE_POINTE_DEFENDER,  NPC_HAMERFALL_GUARDIAN) });
+    m_mAreaGuardInfo.insert({ AREA_REFUGE_POINTE,      AreaGuardInfo(NPC_REFUGE_POINTE_DEFENDER,  NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_BRILL,              AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) });
+    m_mAreaGuardInfo.insert({ AREA_TIRISFAL_GLADES,    AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) });
+    m_mAreaGuardInfo.insert({ AREA_DEATHKNELL,         AreaGuardInfo(NPC_NONE,                    NPC_DEATHGUARD_ELITE) });
+    m_mAreaGuardInfo.insert({ AREA_HILLSBRAD_FOOTHILLS,AreaGuardInfo(NPC_SOUTHSHORE_GUARD,        NPC_TARREN_MILL_DEATHGUARD) });
+    m_mAreaGuardInfo.insert({ AREA_SOUTHSHORE,         AreaGuardInfo(NPC_SOUTHSHORE_GUARD,        NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_TARREN_MILL,        AreaGuardInfo(NPC_NONE,                    NPC_TARREN_MILL_DEATHGUARD) });
+    m_mAreaGuardInfo.insert({ AREA_STONETALON,         AreaGuardInfo(NPC_NONE,                    NPC_STONETALON_GRUNT) });
+    m_mAreaGuardInfo.insert({ AREA_GROMGOL,            AreaGuardInfo(NPC_NONE,                    NPC_GROMGOL_GRUNT) });
+    m_mAreaGuardInfo.insert({ AREA_GOLDSHIRE,          AreaGuardInfo(NPC_STORMWIND_CITY_GUARD,    NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_STONARD,            AreaGuardInfo(NPC_NONE,                    NPC_STONARD_GRUNT) });
+    m_mAreaGuardInfo.insert({ AREA_KARGATH,            AreaGuardInfo(NPC_NONE,                    NPC_KARGATH_GRUNT) });
+    m_mAreaGuardInfo.insert({ AREA_LAKESHIRE,          AreaGuardInfo(NPC_LAKESHIRE_GUARD,         NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_DARKSHIRE,          AreaGuardInfo(NPC_NIGHT_WATCH_GUARD,       NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_DOLANAAR,           AreaGuardInfo(NPC_TELDRASSIL_SENTINEL,     NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_TELDRASSIL,         AreaGuardInfo(NPC_TELDRASSIL_SENTINEL,     NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_RUTHERAN_VILLAGE,   AreaGuardInfo(NPC_DARNASSUS_SENTINEL,      NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_NIGHTHAVEN,         AreaGuardInfo(NPC_MOONGLADE_WARDEN,        NPC_MOONGLADE_WARDEN) });
+    m_mAreaGuardInfo.insert({ AREA_REVANTUSK_VILLAGE,  AreaGuardInfo(NPC_NONE,                    NPC_REVANTUSK_WATCHER) });
+    m_mAreaGuardInfo.insert({ AREA_LIGHTS_HOPE_CHAPEL, AreaGuardInfo(NPC_ARGENT_SENTRY,           NPC_ARGENT_SENTRY) });
+    m_mAreaGuardInfo.insert({ AREA_SHADOWGLEN,         AreaGuardInfo(NPC_SHADOWGLEN_SENTINEL,     NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_NORTHSHIRE,         AreaGuardInfo(NPC_NORTHSHIRE_GUARD,        NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_COLDRIDGE_VALLEY,   AreaGuardInfo(NPC_COLDRIDGE_MOUNTAINEER,   NPC_NONE) });
+    m_mAreaGuardInfo.insert({ AREA_VALLEY_OF_TRIALS,   AreaGuardInfo(NPC_NONE,                    NPC_DEN_GRUNT) });
+    m_mAreaGuardInfo.insert({ AREA_EVERLOOK,           AreaGuardInfo(NPC_EVERLOOK_BRUISER,        NPC_EVERLOOK_BRUISER) });
+    m_mAreaGuardInfo.insert({ AREA_GADGETZAN,          AreaGuardInfo(NPC_GADGETZAN_BRUISER,       NPC_GADGETZAN_BRUISER) });
+    m_mAreaGuardInfo.insert({ AREA_RATCHET,            AreaGuardInfo(NPC_RATCHET_BRUISER,         NPC_RATCHET_BRUISER) });
+
+    if (sWorld.GetWowPatch() >= WOW_PATCH_107)
+    {
+        m_mAreaGuardInfo.insert({ AREA_SEPULCHER, AreaGuardInfo(NPC_NONE, NPC_SILVERPINE_ELITE) });
+        m_mAreaGuardInfo.insert({ AREA_MENETHIL,  AreaGuardInfo(NPC_MENETHIL_ELITE, NPC_NONE) });
+        m_mAreaGuardInfo.insert({ AREA_HAMERFALL, AreaGuardInfo(NPC_NONE, NPC_HAMERFALL_ELITE) });
+        m_mAreaGuardInfo.insert({ AREA_BOOTY_BAY, AreaGuardInfo(NPC_BOOTY_BAY_ELITE, NPC_BOOTY_BAY_ELITE) });
+    }
+    else
+    {
+        m_mAreaGuardInfo.insert({ AREA_SEPULCHER, AreaGuardInfo(NPC_NONE, NPC_SILVERPINE_DEATHGUARD) });
+        m_mAreaGuardInfo.insert({ AREA_MENETHIL,  AreaGuardInfo(NPC_MENETHIL_GUARD, NPC_NONE) });
+        m_mAreaGuardInfo.insert({ AREA_HAMERFALL, AreaGuardInfo(NPC_NONE, NPC_HAMERFALL_GUARDIAN) });
+        m_mAreaGuardInfo.insert({ AREA_BOOTY_BAY, AreaGuardInfo(NPC_BOOTY_BAY_BRUISER, NPC_BOOTY_BAY_BRUISER) });
+    }
 }
 
 void GuardMgr::Update(uint32 diff)
@@ -242,13 +274,47 @@ void GuardMgr::Update(uint32 diff)
     }
 }
 
-uint32 GuardMgr::GetTextId(uint32 factionTemplateId, uint32 areaId) const
+uint32 GuardMgr::GetTextId(uint32 factionTemplateId, uint32 areaId, uint32 displayId) const
 {
     // Do only Razor Hill npcs use this text?
     // https://youtu.be/jkBYnb0EBXU?t=63
     // https://www.youtube.com/watch?v=r7aveH_fyTw
     if (areaId == AREA_RAZOR_HILL)
         return TEXT_GUARD_ORC_2;
+
+    // It appears the text used depends on the model, not faction?
+    // Night Elf and Human NPC with same faction say different texts.
+    // https://youtu.be/LEmiZsv78Bo?t=107
+    if (CreatureDisplayInfoEntry const* pDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(displayId))
+    {
+        switch (pDisplayInfo->ModelId)
+        {
+            case MODEL_HUMAN_MALE:
+            case MODEL_HUMAN_FEMALE:
+                return TEXT_GUARD_HUMAN;
+            case MODEL_ORC_MALE:
+            case MODEL_ORC_FEMALE:
+                return TEXT_GUARD_ORC;
+            case MODEL_DWARF_MALE:
+            case MODEL_DWARF_FEMALE:
+                return TEXT_GUARD_DWARF;
+            case MODEL_NELF_MALE:
+            case MODEL_NELF_FEMALE:
+                return TEXT_GUARD_NIGHT_ELF;
+            case MODEL_UNDEAD_MALE:
+            case MODEL_UNDEAD_FEMALE:
+                return TEXT_GUARD_UNDEAD;
+            case MODEL_TAUREN_MALE:
+            case MODEL_TAUREN_FEMALE:
+                return TEXT_GUARD_TAUREN;
+            case MODEL_GNOME_MALE:
+            case MODEL_GNOME_FEMALE:
+                return TEXT_GUARD_GNOME;
+            case MODEL_TROLL_MALE:
+            case MODEL_TROLL_FEMALE:
+                return TEXT_GUARD_TROLL;
+        }
+    }
 
     switch (factionTemplateId)
     {
@@ -378,7 +444,7 @@ bool GuardMgr::SummonGuard(Creature* pCivilian, Player* pEnemy)
     guardInfo.charges--;
     guardInfo.cooldown = GUARD_POST_USE_COOLDOWN;
 
-    if (uint32 textId = GetTextId(pCivilian->getFaction(), areaId))
+    if (uint32 textId = GetTextId(pCivilian->getFaction(), areaId, pCivilian->GetDisplayId()))
         DoScriptText(textId, pCivilian, pEnemy, CHAT_TYPE_SAY);
 
     if (uint32 creatureId = pEnemy->GetTeamId() == TEAM_ALLIANCE ? guardInfo.creatureIdHorde : guardInfo.creatureIdAlliance)

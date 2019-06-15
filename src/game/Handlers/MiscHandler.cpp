@@ -213,6 +213,9 @@ public:
             data << uint32(race);                               // player race
             data << uint32(pzoneid);                            // player zone id
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+            data << uint32(0);                                  // unknown
+#endif
             // 50 is maximum player count sent to client
             if ((++clientcount) == 49)
                 break;
@@ -355,7 +358,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
         if ((GetPlayer()->GetPositionZ() < height + 0.1f) && !(GetPlayer()->IsInWater()) && GetPlayer()->getStandState() == UNIT_STAND_STATE_STAND)
             GetPlayer()->SetStandState(UNIT_STAND_STATE_SIT);
 
-        GetPlayer()->SetMovement(MOVE_ROOT);
+        GetPlayer()->SetRooted(true);
         GetPlayer()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
     }
 
@@ -384,7 +387,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket & /*recv_data*/)
     if (GetPlayer()->CanFreeMove())
     {
         //!we can move again
-        GetPlayer()->SetMovement(MOVE_UNROOT);
+        GetPlayer()->SetRooted(false);
 
         //! Stand Up
         GetPlayer()->SetStandState(UNIT_STAND_STATE_STAND);
@@ -499,7 +502,10 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket & recv_data)
     uint32 animstate;
     recv_data >> animstate;
 
-    _player->SetStandState(animstate);
+    // Delay stand state changes to recreate the retail trick which let
+    // things like Reckoning proc while sitting if you spam the X button.
+    if (animstate < MAX_UNIT_STAND_STATE)
+        _player->ScheduleStandStateChange(animstate);
 }
 
 void WorldSession::HandleFriendListOpcode(WorldPacket & recv_data)
@@ -934,7 +940,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             if (missingItem)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED_AND_ITEM), at->requiredLevel, ObjectMgr::GetItemPrototype(missingItem)->Name1);
             else if (missingQuest)
-                SendAreaTriggerMessage("%s", at->requiredFailedText.c_str());
+                SendAreaTriggerMessage("You must complete %s to enter", sObjectMgr.GetQuestTemplate(missingQuest)->GetTitle().c_str());
             else if (missingLevel)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), missingLevel);
             else if (missingRank)

@@ -35,6 +35,7 @@
 #include "Language.h"
 #include "ScriptMgr.h"
 #include "CreatureAI.h"
+#include "GuardMgr.h"
 
 bool CreatureEventAIHolder::UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax)
 {
@@ -108,7 +109,7 @@ CreatureEventAI::CreatureEventAI(Creature *c) : CreatureAI(c)
     m_Phase = 0;
     m_AttackDistance = 0.0f;
     m_AttackAngle = 0.0f;
-
+    m_bCanSummonGuards = c->CanSummonGuards();
     m_InvinceabilityHpLevel = 0;
 
     //Handle Spawned Events
@@ -147,7 +148,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             pHolder.UpdateRepeatTimer(m_creature, event.timer.repeatMin, event.timer.repeatMax);
             break;
         case EVENT_T_TIMER_OOC:
-            if (m_creature->isInCombat())
+            if (m_creature->isInCombat() || m_creature->IsInEvadeMode())
                 return false;
 
             //Repeat Timers
@@ -196,11 +197,11 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         case EVENT_T_EVADE:
         case EVENT_T_LEAVE_COMBAT:
             break;
-        case EVENT_T_SPELLHIT:
+        case EVENT_T_HIT_BY_SPELL:
             //Spell hit is special case, param1 and param2 handled within CreatureEventAI::SpellHit
 
             //Repeat Timers
-            pHolder.UpdateRepeatTimer(m_creature, event.spell_hit.repeatMin, event.spell_hit.repeatMax);
+            pHolder.UpdateRepeatTimer(m_creature, event.hit_by_spell.repeatMin, event.hit_by_spell.repeatMax);
             break;
         case EVENT_T_RANGE:
             //Repeat Timers
@@ -238,7 +239,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!m_creature->isInCombat())
                 return false;
 
-            Unit* pUnit = m_creature->DoSelectLowestHpFriendly((float)event.friendly_hp.radius, event.friendly_hp.hpDeficit);
+            Unit* pUnit = m_creature->FindLowestHpFriendlyUnit((float)event.friendly_hp.radius, event.friendly_hp.hpDeficit);
 
             if (!pUnit)
                 return false;
@@ -254,7 +255,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!m_creature->isInCombat())
                 return false;
 
-            Unit* pUnit = m_creature->DoFindFriendlyCC((float)event.friendly_is_cc.radius);
+            Unit* pUnit = m_creature->FindFriendlyUnitCC((float)event.friendly_is_cc.radius);
 
             if (!pUnit)
                 return false;
@@ -267,7 +268,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         }
         case EVENT_T_FRIENDLY_MISSING_BUFF:
         {
-            Unit* pUnit = m_creature->DoFindFriendlyMissingBuff((float)event.friendly_buff.radius, event.friendly_buff.spellId);
+            Unit* pUnit = m_creature->FindFriendlyUnitMissingBuff((float)event.friendly_buff.radius, event.friendly_buff.spellId);
 
             if (!pUnit)
                 return false;
@@ -374,6 +375,10 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             pHolder.UpdateRepeatTimer(m_creature, event.victim_rooted.repeatMin, event.victim_rooted.repeatMax);
             break;
         }
+        case EVENT_T_HIT_BY_AURA:
+            //Repeat Timers
+            pHolder.UpdateRepeatTimer(m_creature, event.hit_by_aura.repeatMin, event.hit_by_aura.repeatMax);
+            break;
         default:
             sLog.outErrorDb("CreatureEventAI: Creature %u using Event %u has invalid Event Type(%u), missing from ProcessEvent() Switch.", m_creature->GetEntry(), pHolder.Event.event_id, pHolder.Event.event_type);
             break;
@@ -447,6 +452,8 @@ void CreatureEventAI::JustRespawned()
     Reset();
 
     CreatureAI::JustRespawned();
+
+    m_bCanSummonGuards = m_creature->CanSummonGuards();
 
     if (m_bEmptyList)
         return;
@@ -646,8 +653,17 @@ void CreatureEventAI::MoveInLineOfSight(Unit *pWho)
         return;
 
     //Check for OOC LOS Event
-    if (!m_bEmptyList && !m_creature->getVictim())
-        UpdateEventsOn_MoveInLineOfSight(pWho);
+    if (!m_creature->getVictim())
+    {
+        if (!m_bEmptyList)
+            UpdateEventsOn_MoveInLineOfSight(pWho);
+
+        if (m_bCanSummonGuards && pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, m_creature->GetDetectionRange()) &&
+            m_creature->IsHostileTo(pWho) && pWho->isTargetableForAttack() && m_creature->IsWithinLOSInMap(pWho))
+        {
+            m_bCanSummonGuards = !sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho));
+        } 
+    }
 
     if (m_creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO || m_creature->IsNeutralToAll())
         return;
@@ -709,11 +725,25 @@ void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
         return;
 
     for (auto& i : m_CreatureEventAIList)
-        if (i.Event.event_type == EVENT_T_SPELLHIT)
-            //If spell id matches (or no spell id) & if spell school matches (or no spell school)
-            if (!i.Event.spell_hit.spellId || pSpell->Id == i.Event.spell_hit.spellId)
-                if (GetSchoolMask(pSpell->School) & i.Event.spell_hit.schoolMask)
+    {
+        switch (i.Event.event_type)
+        {
+            case EVENT_T_HIT_BY_SPELL:
+            {
+                //If spell id matches (or no spell id) & if spell school matches (or no spell school)
+                if (!i.Event.hit_by_spell.spellId || pSpell->Id == i.Event.hit_by_spell.spellId)
+                    if (GetSchoolMask(pSpell->School) & i.Event.hit_by_spell.schoolMask)
+                        ProcessEvent(i, pUnit);
+                break;
+            }
+            case EVENT_T_HIT_BY_AURA:
+            {
+                if (!i.Event.hit_by_aura.auraType || pSpell->HasAura(AuraType(i.Event.hit_by_aura.auraType)))
                     ProcessEvent(i, pUnit);
+                break;
+            }
+        }
+    }     
 }
 
 void CreatureEventAI::MovementInform(uint32 type, uint32 id)
@@ -743,7 +773,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
     if (Combat)
     {
         if (!m_CreatureSpells.empty())
-            DoSpellsListCasts(diff);
+            UpdateSpellsList(diff);
 
         DoMeleeAttackIfReady();
     }

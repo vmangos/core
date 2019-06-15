@@ -109,9 +109,8 @@ public:
 void WorldSession::HandleSendMail(WorldPacket & recv_data)
 {
     ObjectGuid mailboxGuid;
-    uint64 unk3;
     uint32 unk1, unk2;
-    uint8 unk4;
+    
     recv_data >> mailboxGuid;
     if (!CheckMailBox(mailboxGuid))
         return;
@@ -132,9 +131,14 @@ void WorldSession::HandleSendMail(WorldPacket & recv_data)
 
     recv_data >> req->itemGuid;
 
-    recv_data >> req->money >> req->COD;                              // money and cod
+    recv_data >> req->money >> req->COD;                    // money and cod
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    uint64 unk3;
+    uint8 unk4;
     recv_data >> unk3;                                      // const 0
     recv_data >> unk4;                                      // const 0
+#endif
 
     // packet read complete, now do check
     if (req->subject.size() > 64)
@@ -795,7 +799,10 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data)
         data << uint32((*itr)->COD);                        // Cash on delivery
         data << uint32((*itr)->checked);                    // flags
         data << float(float((*itr)->expire_time - time(NULL)) / float(DAY));// Time
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         data << uint32((*itr)->mailTemplateId);             // mail template (MailTemplate.dbc)
+#endif
 
         mailsCount += 1;
     }
@@ -845,7 +852,10 @@ void WorldSession::HandleMailCreateTextItem(WorldPacket & recv_data)
 
     recv_data >> mailboxGuid;
     recv_data >> mailId;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data.read_skip<uint32>();                          // mailTemplateId, non need, Mail store own 100% correct value anyway
+#endif
 
     if (!CheckMailBox(mailboxGuid))
         return;

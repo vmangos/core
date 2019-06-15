@@ -200,7 +200,7 @@ void AccountMgr::Load()
         case SEC_PLAYER:
             break;
         case SEC_MODERATOR:
-        case SEC_MODERATOR_CONF:
+        case SEC_TICKETMASTER:
         case SEC_GAMEMASTER:
         case SEC_BASIC_ADMIN:
         case SEC_DEVELOPPER:

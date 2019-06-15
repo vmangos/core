@@ -1160,8 +1160,8 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             {
                 if (auto pSpellEntry = sSpellMgr.GetSpellEntry(tmp.addAura.spellId))
                 {
-                    if (!IsSpellAppliesAura(pSpellEntry, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
-                        !IsSpellHaveEffect(pSpellEntry, SPELL_EFFECT_PERSISTENT_AREA_AURA))
+                    if (!pSpellEntry->IsSpellAppliesAura((1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
+                        !pSpellEntry->HasEffect(SPELL_EFFECT_PERSISTENT_AREA_AURA))
                     {
                         sLog.outErrorDb("Table `%s` has a spell that does not apply any auras (id: %u) in SCRIPT_COMMAND_ADD_AURA for script id %u",
                             tablename, tmp.addAura.spellId, tmp.id);
@@ -2055,7 +2055,8 @@ void ScriptMgr::LoadScriptWaypoints()
 
             if (!pCInfo)
             {
-                sLog.outErrorDb("DB table script_waypoint has waypoint for nonexistant creature entry %u", pTemp.uiCreatureEntry);
+                if (!sObjectMgr.IsExistingCreatureId(pTemp.uiCreatureEntry))
+                    sLog.outErrorDb("DB table script_waypoint has waypoint for nonexistant creature entry %u", pTemp.uiCreatureEntry);
                 continue;
             }
 
@@ -2581,24 +2582,24 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
                 return pUnitSource->SelectRandomFriendlyTarget(Param2 ? ToUnit(pTarget) : nullptr, Param1 ? Param1 : 30.0f, true);
             break;
         case TARGET_T_FRIENDLY_INJURED:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true);
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindLowestHpFriendlyUnit(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true);
             break;
         case TARGET_T_FRIENDLY_INJURED_EXCEPT:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true, ToUnit(pTarget));
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindLowestHpFriendlyUnit(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true, ToUnit(pTarget));
             break;
         case TARGET_T_FRIENDLY_MISSING_BUFF:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyMissingBuff(Param1 ? Param1 : 30.0f, Param2);
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindFriendlyUnitMissingBuff(Param1 ? Param1 : 30.0f, Param2);
             break;
         case TARGET_T_FRIENDLY_MISSING_BUFF_EXCEPT:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyMissingBuff(Param1 ? Param1 : 30.0f, Param2, ToUnit(pTarget));
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindFriendlyUnitMissingBuff(Param1 ? Param1 : 30.0f, Param2, ToUnit(pTarget));
             break;
         case TARGET_T_FRIENDLY_CC:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyCC(Param1 ? Param1 : 30.0f);
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindFriendlyUnitCC(Param1 ? Param1 : 30.0f);
             break;
         case TARGET_T_MAP_EVENT_SOURCE:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
@@ -2617,6 +2618,18 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
                         if (WorldObject* pObject = pMap->GetWorldObject(target.target))
                             if (pObject && (pObject->GetEntry() == Param2))
                                 return pObject;
+            break;
+        case TARGET_T_NEAREST_PLAYER:
+            if (pSource)
+                return pSource->FindNearestPlayer(Param1);
+            break;
+        case TARGET_T_NEAREST_HOSTILE_PLAYER:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindNearestHostilePlayer(Param1);
+            break;
+        case TARGET_T_NEAREST_FRIENDLY_PLAYER:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->FindNearestFriendlyPlayer(Param1);
             break;
     }
     return nullptr;

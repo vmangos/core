@@ -66,6 +66,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_IMMUNE_AOE                   = 0x00004000,       // creature is immune to AoE
     CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING         = 0x00008000,       // creature does not move back when target is within bounding radius
     CREATURE_FLAG_EXTRA_NO_ASSIST                    = 0x00010000,       // creature does not aggro when nearby creatures aggro
+    CREATURE_FLAG_EXTRA_NO_TARGET                    = 0x00020000,       // creature does not acquire targets
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
@@ -597,10 +598,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         CreatureAI const* AI() const { return i_AI; }
         void SetAInitializeOnRespawn(bool initialize) { m_AI_InitializeOnRespawn = initialize; }
 
-        void SetFeatherFall(bool enable) override;
-        void SetHover(bool enable) override;
-        void SetWaterWalk(bool enable) override;
-
         uint32 GetShieldBlockValue() const override
         {
             return getLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20); // dunno mob block value
@@ -676,9 +673,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsTappedBy(Player const* player) const;
         bool IsSkinnableBy(Player const* player) const { return !skinningForOthersTimer || IsTappedBy(player); }
 
-        SpellEntry const *ReachWithSpellAttack(Unit *pVictim);
-        SpellEntry const *ReachWithSpellCure(Unit *pVictim);
-
         uint32 m_spells[CREATURE_MAX_SPELLS];
 
         float GetAttackDistance(Unit const* pl) const;
@@ -697,6 +691,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool HasSearchedAssistance() const { return m_AlreadySearchedAssistance; }
         bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
         bool CanInitiateAttack();
+        bool CanHaveTarget() const { return !(GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_TARGET); }
 
         uint32 GetDefaultMount() { return m_mountId; }
         void SetDefaultMount(uint32 id) { m_mountId = id; }
@@ -761,10 +756,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         // AI helpers
         Unit* SelectNearestHostileUnitInAggroRange(bool useLOS) const;
         Unit* SelectNearestTargetInAttackDistance(float dist) const;
-        Unit* DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff = 1, bool bPercent = false, Unit* except = nullptr) const;
-        Unit* DoFindFriendlyMissingBuff(float range, uint32 spellid, Unit* except = nullptr) const;
-        Unit* DoFindFriendlyCC(float range) const;
-        Creature* GetNearestGuard(float range) const;
+        Creature* FindNearestFriendlyGuard(float range) const;
         void CallNearestGuard(Unit* pEnemy) const;
 
         // Used by Creature Spells system to always know result of cast

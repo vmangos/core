@@ -55,9 +55,10 @@
 #include "TemporarySummon.h"
 #include "MoveMapSharedDefines.h"
 #include "GameEventMgr.h"
-
 #include "InstanceData.h"
 #include "ScriptMgr.h"
+
+using namespace Spells;
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
 {
@@ -326,9 +327,9 @@ void Spell::EffectEnvironmentalDMG(SpellEffectIndex eff_idx)
     // currently each enemy selected explicitly and self cast damage, we prevent apply self casted spell bonuses/etc
     damage = m_spellInfo->CalculateSimpleValue(eff_idx);
 
-    m_caster->CalculateDamageAbsorbAndResist(m_caster, GetSpellSchoolMask(m_spellInfo), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, m_spellInfo);
+    m_caster->CalculateDamageAbsorbAndResist(m_caster, m_spellInfo->GetSpellSchoolMask(), SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, m_spellInfo);
 
-    m_caster->SendSpellNonMeleeDamageLog(m_caster, m_spellInfo->Id, damage, GetSpellSchoolMask(m_spellInfo), absorb, resist, false, 0, false);
+    m_caster->SendSpellNonMeleeDamageLog(m_caster, m_spellInfo->Id, damage, m_spellInfo->GetSpellSchoolMask(), absorb, resist, false, 0, false);
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
         ((Player*)m_caster)->EnvironmentalDamage(DAMAGE_FIRE, damage);
 }
@@ -618,7 +619,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(itr->first);
 
                         if (spellInfo->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_ARCANE_SHOT, CF_HUNTER_MULTI_SHOT, CF_HUNTER_VOLLEY, CF_HUNTER_AIMED_SHOT>() &&
-                            spellInfo->Id != m_spellInfo->Id && GetSpellRecoveryTime(spellInfo) > 0)
+                            spellInfo->Id != m_spellInfo->Id && spellInfo->GetRecoveryTime() > 0)
                             ((Player*)m_caster)->RemoveSpellCooldown((itr++)->first, true);
                         else
                             ++itr;
@@ -1004,7 +1005,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(itr->first);
 
                         if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE &&
-                                spellInfo->Id != m_spellInfo->Id && GetSpellRecoveryTime(spellInfo) > 0)
+                                spellInfo->Id != m_spellInfo->Id && spellInfo->GetRecoveryTime() > 0)
                             ((Player*)m_caster)->RemoveSpellCooldown(itr->first, true);
                     }
                     return;
@@ -1148,7 +1149,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                     m_caster->CastSpell(m_caster, 23230, true);
+#endif
 
                     damage = damage * (m_caster->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100;
                     if (damage > 0)
@@ -1480,7 +1483,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->RemoveAurasAtMechanicImmunity(1 << (MECHANIC_BANDAGE - 1), 0);
                     unitTarget->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
 
-                    if (!unitTarget->IsStandState())
+                    if (!unitTarget->IsStandingUp())
                         unitTarget->SetStandState(UNIT_STAND_STATE_STAND);
 
                     return;
@@ -1618,28 +1621,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
-                case 11189:                                 // Frost Warding
-                case 28332:
-                {
-                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    // increase reflection chance (effect 1) of Frost Ward, removed in aura boosts
-                    SpellModifier* mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, damage, m_spellInfo->Id, UI64LIT(0x0000000000000100));
-                    ((Player*)unitTarget)->AddSpellMod(mod, true);
-                    break;
-                }
-                case 11094:                                 // Improved Fire Ward
-                case 13043:
-                {
-                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    // increase reflection chance (effect 1) of Fire Ward, removed in aura boosts
-                    SpellModifier *mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, damage, m_spellInfo->Id, UI64LIT(0x0000000000000008));
-                    ((Player*)unitTarget)->AddSpellMod(mod, true);
-                    break;
-                }
                 case 12472:                                 // Cold Snap
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -1652,8 +1633,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(itr->first);
 
                         if (spellInfo->SpellFamilyName == SPELLFAMILY_MAGE &&
-                                (GetSpellSchoolMask(spellInfo) & SPELL_SCHOOL_MASK_FROST) &&
-                                spellInfo->Id != m_spellInfo->Id && GetSpellRecoveryTime(spellInfo) > 0)
+                                (spellInfo->GetSpellSchoolMask() & SPELL_SCHOOL_MASK_FROST) &&
+                                spellInfo->Id != m_spellInfo->Id && spellInfo->GetRecoveryTime() > 0)
                             ((Player*)m_caster)->RemoveSpellCooldown((itr++)->first, true);
                         else
                             ++itr;
@@ -1833,7 +1814,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     {
                         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(itr->first);
 
-                        if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && spellInfo->Id != 23989 && GetSpellRecoveryTime(spellInfo) > 0)
+                        if (spellInfo->SpellFamilyName == SPELLFAMILY_HUNTER && spellInfo->Id != 23989 && spellInfo->GetRecoveryTime() > 0)
                             ((Player*)m_caster)->RemoveSpellCooldown((itr++)->first, true);
                         else
                             ++itr;
@@ -1977,7 +1958,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 // found spelldamage coefficients of 0.381% per 0.1 speed and 15.244 per 4.0 speed
                 // but own calculation say 0.385 gives at most one point difference to published values
-                int32 spellDamage = m_caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellInfo));
+                int32 spellDamage = m_caster->SpellBaseDamageBonusDone(m_spellInfo->GetSpellSchoolMask());
                 float weaponSpeed = (1.0f / IN_MILLISECONDS) * m_CastItem->GetProto()->Delay;
                 int32 totalDamage = int32((damage + 3.85f * spellDamage) * 0.01 * weaponSpeed);
 
@@ -2149,7 +2130,7 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
     {
         // Note: not exist spells with weapon req. and IsSpellHaveCasterSourceTargets == true
         // so this just for speedup places in else
-        caster = IsSpellWithCasterSourceTargetsOnly(spellInfo) ? unitTarget : m_caster;
+        caster = spellInfo->IsSpellWithCasterSourceTargetsOnly() ? unitTarget : m_caster;
     }
 
     caster->CastSpell(unitTarget, spellInfo, true, nullptr, nullptr, m_originalCasterGUID);
@@ -2262,7 +2243,7 @@ void Spell::EffectApplyAura(SpellEffectIndex eff_idx)
         return;
 
     // ghost spell check, allow apply any auras at player loading in ghost mode (will be cleanup after load)
-    if ((!unitTarget->isAlive() && !(IsDeathOnlySpell(m_spellInfo) || IsDeathPersistentSpell(m_spellInfo))) &&
+    if ((!unitTarget->isAlive() && !(m_spellInfo->IsDeathOnlySpell() || m_spellInfo->IsDeathPersistentSpell())) &&
             (unitTarget->GetTypeId() != TYPEID_PLAYER || !((Player*)unitTarget)->GetSession()->PlayerLoading()))
         return;
 
@@ -2399,7 +2380,7 @@ void Spell::EffectPowerBurn(SpellEffectIndex eff_idx)
     m_damage += new_damage;
 }
 
-void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
+void Spell::EffectHeal(SpellEffectIndex eff_idx)
 {
     if (unitTarget && unitTarget->isAlive() && damage >= 0)
     {
@@ -2461,6 +2442,13 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
 
         addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, 1, this);
         addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL, 1, this);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        ExecuteLogInfo info(unitTarget->GetObjectGuid());
+        info.heal.amount = addhealth;
+        info.heal.critical = 0;
+        AddExecuteLogInfo(eff_idx, info);
+#endif
 
         m_healing += addhealth;
     }
@@ -2594,7 +2582,7 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
         }
 
         // set the "Crafted by ..." property of the item
-        if (pItem->GetProto()->Class != ITEM_CLASS_CONSUMABLE && pItem->GetProto()->Class != ITEM_CLASS_QUEST)
+        if (pItem->GetProto()->HasSignature())
             pItem->SetGuidValue(ITEM_FIELD_CREATOR, player->GetObjectGuid());
 
         // send info to the client
@@ -2667,6 +2655,13 @@ void Spell::EffectEnergize(SpellEffectIndex eff_idx)
 
     if (m_spellInfo->Id == 2687)
         unitTarget->SetInCombatState(false, nullptr);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    ExecuteLogInfo info(unitTarget->GetObjectGuid());
+    info.energize.amount = damage;
+    info.energize.powerType = power;
+    AddExecuteLogInfo(eff_idx, info);
+#endif
 
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, damage, power);
 }
@@ -3088,7 +3083,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
                     // do not remove positive auras if friendly target
                     // do not remove negative auras if non-friendly target
                     // when removing charm auras ignore hostile reaction from the charm
-                    if (!friendly && IsCharmSpell(holder->GetSpellProto()))
+                    if (!friendly && holder->GetSpellProto()->IsCharmSpell())
                     {
                         if (CharmInfo *charm = unitTarget->GetCharmInfo())
                             if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
@@ -3187,7 +3182,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
 
             // On success dispel
             // Devour Magic
-            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->Category == SPELLCATEGORY_DEVOUR_MAGIC)
+            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_WARLOCK && m_spellInfo->Category == SPELLCATEGORY_HEALING_SPELL)
             {
                 uint32 heal_spell = 0;
                 switch (m_spellInfo->Id)
@@ -3278,7 +3273,7 @@ void Spell::EffectAddFarsight(SpellEffectIndex eff_idx)
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    int32 duration = GetSpellDuration(m_spellInfo);
+    int32 duration = m_spellInfo->GetDuration();
     DynamicObject* dynObj = new DynamicObject;
 
     // set radius to 0: spell not expected to work as persistent aura
@@ -3321,7 +3316,7 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
     float center_z = m_targets.m_destZ;
 
     float radius = GetSpellRadius(sSpellRadiusStore.LookupEntry(m_spellInfo->EffectRadiusIndex[eff_idx]));
-    int32 duration = GetSpellDuration(m_spellInfo);
+    int32 duration = m_spellInfo->GetDuration();
     TempSummonType summonType = (duration == 0) ? TEMPSUMMON_DEAD_DESPAWN : TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN;
 
     int32 amount = damage > 0 ? damage : 1;
@@ -3446,7 +3441,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
     }
 
     // set timer for unsummon
-    int32 duration = CalculateSpellDuration(m_spellInfo, m_caster);
+    int32 duration = m_spellInfo->CalculateDuration(m_caster);
 
     // second direct cast unsummon guardian(s) (guardians without like functionality have cooldown > spawn time)
     if (!m_IsTriggeredSpell && m_caster->GetTypeId() == TYPEID_PLAYER)
@@ -4229,12 +4224,12 @@ void Spell::EffectThreat(SpellEffectIndex eff_idx)
     if (!unitTarget->CanHaveThreatList())
         return;
 
-    unitTarget->AddThreat(m_caster, float(damage), false, GetSpellSchoolMask(m_spellInfo), m_spellInfo);
+    unitTarget->AddThreat(m_caster, float(damage), false, m_spellInfo->GetSpellSchoolMask(), m_spellInfo);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
 }
 
-void Spell::EffectHealMaxHealth(SpellEffectIndex /*eff_idx*/)
+void Spell::EffectHealMaxHealth(SpellEffectIndex eff_idx)
 {
     if (!unitTarget)
         return;
@@ -4264,6 +4259,13 @@ void Spell::EffectHealMaxHealth(SpellEffectIndex /*eff_idx*/)
 
     heal *= TakenTotalMod;
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    ExecuteLogInfo info(unitTarget->GetObjectGuid());
+    info.heal.amount = heal;
+    info.heal.critical = 0;
+    AddExecuteLogInfo(eff_idx, info);
+#endif
+
     m_healing += heal;
 }
 
@@ -4292,7 +4294,7 @@ void Spell::EffectInterruptCast(SpellEffectIndex eff_idx)
                 && ((i == CURRENT_GENERIC_SPELL && curSpellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE)
                 || (i == CURRENT_CHANNELED_SPELL && curSpellInfo->ChannelInterruptFlags & CHANNEL_FLAG_INTERRUPT)))
             {
-                unitTarget->ProhibitSpellSchool(GetSpellSchoolMask(curSpellInfo), GetSpellDuration(m_spellInfo));
+                unitTarget->ProhibitSpellSchool(curSpellInfo->GetSpellSchoolMask(), m_spellInfo->GetDuration());
                 unitTarget->InterruptSpell(CurrentSpellTypes(i), false);
 
                 ExecuteLogInfo info(unitTarget->GetObjectGuid());
@@ -4338,7 +4340,7 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
         return;
     }
 
-    int32 duration = GetSpellDuration(m_spellInfo);
+    int32 duration = m_spellInfo->GetDuration();
 
     // Sapphirons summoned iceblocks have a duration *just* long enough to dissapear before the ice bomb.
     // Since they are despawned by another spell anyway, I make the gobj add slightly longer to avoid any lag
@@ -4392,6 +4394,62 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+                case 456: // SHOWLABEL Only OFF
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGMChat(false, true);
+                    return;
+                }
+                case 2765: // SHOWLABEL Only ON
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGMChat(true, true);;
+                    return;
+                }
+                case 1509: // GM Only OFF
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGameMaster(false, true);
+                    return;
+                }
+                case 18139: // GM Only ON
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGameMaster(true, true);
+                    return;
+                }
+                case 6147: // INVIS Only OFF
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGMVisible(true, true);
+                    return;
+                }
+                case 2763: // INVIS Only ON
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGMVisible(false, true);
+                    return;
+                }
+                case 20114: // BM Only OFF
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGodMode(false, true);
+                    return;
+                }
+                case 20115: // BM Only ON
+                {
+                    if (Player* pPlayer = ToPlayer(m_caster))
+                        pPlayer->SetGodMode(true, true);
+                    return;
+                }
+                case 29313: // CooldownAll
+                {
+                    if (m_caster)
+                        m_caster->RemoveAllSpellCooldown();
+                    return;
+                }
+#endif
                 case 8856:                                  // Bending Shinbone
                 {
                     if (!itemTarget && m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -5032,7 +5090,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     SpellEntry const *spellInfo = (*itr)->GetSpellProto();
 
                     // search seal (all seals have judgement's aura dummy spell id in 2 effect
-                    if (!spellInfo || !IsSealSpell((*itr)->GetSpellProto()) || (*itr)->GetEffIndex() != 2)
+                    if (!spellInfo || !(*itr)->GetSpellProto()->IsSealSpell() || (*itr)->GetEffIndex() != 2)
                         continue;
 
                     // must be calculated base at raw base points in spell proto, GetModifier()->m_value for S.Righteousness modified by SPELLMOD_DAMAGE
@@ -5048,6 +5106,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                 m_caster->CastSpell(unitTarget, spellId2, true);
                 return;
+            }
+            // Seal of Fury proc
+            else if (m_spellInfo->SpellFamilyFlags == 4096)
+            {
+                if (!unitTarget || !unitTarget->CanHaveThreatList())
+                    return;
+                
+                if (unitTarget->getThreatManager().getThreat(m_caster))
+                    unitTarget->getThreatManager().addThreat(m_caster, damage * m_caster->GetAttackTime(BASE_ATTACK) / 1000);
             }
             break;
         }
@@ -5216,7 +5283,7 @@ void Spell::EffectDuel(SpellEffectIndex eff_idx)
 
     pGameObj->SetUInt32Value(GAMEOBJECT_FACTION, m_caster->getFaction());
     pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel() + 1);
-    int32 duration = GetSpellDuration(m_spellInfo);
+    int32 duration = m_spellInfo->GetDuration();
     pGameObj->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
     pGameObj->SetSpellId(m_spellInfo->Id);
 
@@ -5548,7 +5615,7 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
 
         // Try duration index next
         if (!duration)
-            duration = GetSpellDuration(m_spellInfo);
+            duration = m_spellInfo->GetDuration();
 
         // 10 seconds for enchants which don't have listed duration
         if (!duration)
@@ -5717,7 +5784,7 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
     }
 
     pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_caster->getLevel());
-    int32 duration = GetSpellDuration(m_spellInfo);
+    int32 duration = m_spellInfo->GetDuration();
     pGameObj->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
     pGameObj->SetSpellId(m_spellInfo->Id);
     m_caster->AddGameObject(pGameObj);
@@ -5996,7 +6063,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     // some mini-pets have quests
 
     // set timer for unsummon
-    int32 duration = GetSpellDuration(m_spellInfo);
+    int32 duration = m_spellInfo->GetDuration();
     if (duration > 0)
         critter->SetDuration(duration);
 
@@ -6284,7 +6351,7 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
         return;
     }
 
-    int32 duration = GetSpellDuration(m_spellInfo);
+    int32 duration = m_spellInfo->GetDuration();
 
     switch (goinfo->type)
     {

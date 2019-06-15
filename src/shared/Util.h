@@ -110,11 +110,13 @@ inline bool roll_chance_f(float chance)
 {
     return chance > rand_chance();
 }
-
-/* Return true if a random roll fits in the specified chance (range 0-100). */
 inline bool roll_chance_i(int chance)
 {
     return chance > irand(0, 99);
+}
+inline bool roll_chance_u(uint32 chance)
+{
+    return chance > urand(0, 99);
 }
 
 inline void ApplyModUInt32Var(uint32& var, int32 val, bool apply)

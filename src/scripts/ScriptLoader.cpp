@@ -35,7 +35,6 @@ void AddSC_npc_king_gordok();
 //world
 void AddSC_areatrigger_scripts();
 void AddSC_dragons_of_nightmare();
-void AddSC_boss_lord_kazzak();
 void AddSC_go_scripts();
 void AddSC_npcs_special();
 void AddSC_Totems();
@@ -150,9 +149,7 @@ void AddSC_boss_baroness_anastari();
 void AddSC_boss_ramstein_the_gorger();
 void AddSC_boss_timmy_the_cruel();
 void AddSC_boss_postmaster_malown();
-void AddSC_boss_baron_rivendare();
 void AddSC_boss_dathrohan_balnazzar();
-void AddSC_boss_atiesh();
 void AddSC_instance_stratholme();
 void AddSC_stratholme();
 void AddSC_instance_sunken_temple();                 //sunken_temple
@@ -242,7 +239,6 @@ void AddSC_instance_zulfarrak();
 
 void AddSC_ashenvale();
 void AddSC_azshara();
-void AddSC_boss_anachronos();
 void AddSC_darkshore();
 void AddSC_desolace();
 void AddSC_durotar();
@@ -298,7 +294,6 @@ void AddScripts()
     //world
     AddSC_areatrigger_scripts();
     AddSC_dragons_of_nightmare();
-    AddSC_boss_lord_kazzak();
     AddSC_go_scripts();
     AddSC_npcs_special();
     AddSC_Totems();
@@ -413,9 +408,7 @@ void AddScripts()
     AddSC_boss_ramstein_the_gorger();
     AddSC_boss_timmy_the_cruel();
     AddSC_boss_postmaster_malown();
-    AddSC_boss_baron_rivendare();
     AddSC_boss_dathrohan_balnazzar();
-    AddSC_boss_atiesh();
     AddSC_instance_stratholme();
     AddSC_stratholme();
     AddSC_instance_sunken_temple();                         //sunken_temple
@@ -505,7 +498,6 @@ void AddScripts()
 
     AddSC_ashenvale();
     AddSC_azshara();
-    AddSC_boss_anachronos();
     AddSC_darkshore();
     AddSC_desolace();
     AddSC_durotar();

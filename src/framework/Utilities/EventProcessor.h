@@ -70,6 +70,23 @@ class BasicEvent
         uint64 m_execTime;                                  // planned time of next execution, filled by event handler
 };
 
+template<typename T>
+class LambdaBasicEvent : public BasicEvent
+{
+public:
+    LambdaBasicEvent(T&& callback) : BasicEvent(), _callback(std::move(callback)) { }
+
+    bool Execute(uint64, uint32) override
+    {
+        _callback();
+        return true;
+    }
+
+private:
+
+    T _callback;
+};
+
 typedef std::multimap<uint64, BasicEvent*> EventList;
 
 class EventProcessor
@@ -80,8 +97,15 @@ class EventProcessor
 
         void Update(uint32 p_time);
         void KillAllEvents(bool force);
-        void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
         uint64 CalculateTime(uint64 t_offset) const;
+
+        void AddEvent(BasicEvent* Event, uint64 e_time, bool set_addtime = true);
+        template<typename T>
+        void AddLambdaEvent(T&& event, uint64 e_time, bool set_addtime = true) { AddEvent(new LambdaBasicEvent<T>(std::move(event)), e_time, set_addtime); }
+        
+        void AddEventAtOffset(BasicEvent* event, uint32 offset) { AddEvent(event, CalculateTime(offset)); }
+        template<typename T>
+        void AddLambdaEventAtOffset(T&& event, uint32 offset) { AddEventAtOffset(new LambdaBasicEvent<T>(std::move(event)), offset); }
 
         // Zerix: Nostalrius compatibility. Figure a better way to handle this.
         bool HasScheduledEvent() const { return m_events.empty() ? false : true; }

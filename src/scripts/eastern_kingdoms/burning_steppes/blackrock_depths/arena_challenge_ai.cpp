@@ -132,7 +132,7 @@ struct npc_va_jashniAI : public ScriptedAI
     {
         if (m_uiFlashHealTimer < diff)
         {
-            Unit *target = m_creature->DoSelectLowestHpFriendly(40.0f, 1);
+            Unit *target = m_creature->FindLowestHpFriendlyUnit(40.0f, 1);
 
             if (target && DoCastSpellIfCan(target, SPELL_VA_JASHNI_FLASH_HEAL) == CAST_OK)
                 m_uiFlashHealTimer = urand(8000, 14000);
@@ -142,7 +142,7 @@ struct npc_va_jashniAI : public ScriptedAI
 
         if (m_uiShieldTimer < diff)
         {
-            Unit *target = m_creature->DoSelectLowestHpFriendly(40.0f, 1);
+            Unit *target = m_creature->FindLowestHpFriendlyUnit(40.0f, 1);
 
             if (target && DoCastSpellIfCan(target, SPELL_VA_JASHNI_SHIELD) == CAST_OK)
                 m_uiShieldTimer = urand(40000, 50000);
@@ -152,7 +152,7 @@ struct npc_va_jashniAI : public ScriptedAI
 
         if (m_uiRenewTimer < diff)
         {
-            Unit *target = m_creature->DoSelectLowestHpFriendly(40.0f, 1);
+            Unit *target = m_creature->FindLowestHpFriendlyUnit(40.0f, 1);
 
             if (target && DoCastSpellIfCan(target, SPELL_VA_JASHNI_RENEW) == CAST_OK)
                 m_uiRenewTimer = urand(55000, 65000);

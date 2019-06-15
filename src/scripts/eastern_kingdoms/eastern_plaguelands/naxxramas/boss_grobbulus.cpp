@@ -242,7 +242,7 @@ struct grob_poison_cloud : public ScriptedAI
     {
         m_creature->addUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
-        m_creature->SetMovement(MOVE_ROOT);
+        m_creature->SetRooted(true);
         untilDespawn = 70000;
     }
 

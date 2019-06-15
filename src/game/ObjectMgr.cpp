@@ -1141,6 +1141,41 @@ void ObjectMgr::LoadCreatureTemplates()
     CheckCreatureTemplates();
 }
 
+void ObjectMgr::CorrectCreatureModels(uint32 entry, uint32& displayId)
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_2_4
+    if (sWorld.GetWowPatch() == WOW_PATCH_102)
+    {
+        // Rhahk'Zor
+        if (entry == 644 && displayId == 1124)
+            displayId = 14403;
+        // Mo'grosh Brute
+        if (entry == 1180 && displayId == 1124)
+            displayId = 14403;
+        // Dreadmaul Ogre
+        if (entry == 5974 && displayId == 11541)
+            displayId = 14402;
+        // Dreadmaul Mauler
+        if (entry == 5977 && displayId == 11540)
+            displayId = 14401;
+    }
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    if (sWorld.GetWowPatch() == WOW_PATCH_106)
+    {
+        // Grizzle Halfmane
+        if (entry == 347 && displayId == 15092)
+            displayId = 15099;
+        // Elfarran
+        if (entry == 14981 && displayId == 15093)
+            displayId = 15098;
+        // Lylandris
+        if (entry == 14982 && displayId == 15094)
+            displayId = 15100;
+    }
+#endif
+}
+
 void ObjectMgr::CheckCreatureTemplates()
 {
     // check data correctness
@@ -1159,6 +1194,8 @@ void ObjectMgr::CheckCreatureTemplates()
 
         for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
         {
+            CorrectCreatureModels(cInfo->entry, const_cast<CreatureInfo*>(cInfo)->display_id[i]);
+
             if (cInfo->display_id[i])
             {
                 CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->display_id[i]);
@@ -3563,15 +3600,6 @@ void ObjectMgr::LoadItemPrototypes()
         {
             if (proto->ExtraFlags & ~ITEM_EXTRA_ALL)
                 sLog.outErrorDb("Item (Entry: %u) has wrong ExtraFlags (%u) with unused bits set", i, proto->ExtraFlags);
-
-            if (proto->ExtraFlags & ITEM_EXTRA_REAL_TIME_DURATION)
-            {
-                if (proto->Duration == 0)
-                {
-                    sLog.outErrorDb("Item (Entry: %u) has redundant real-time duration flag in ExtraFlags, item not have duration", i);
-                    const_cast<ItemPrototype*>(proto)->ExtraFlags &= ~ITEM_EXTRA_REAL_TIME_DURATION;
-                }
-            }
         }
 
 
@@ -3742,7 +3770,8 @@ void ObjectMgr::LoadItemRequiredTarget()
 
         if (!sCreatureStorage.LookupEntry<CreatureInfo>(uiTargetEntry))
         {
-            sLog.outErrorDb("Table `item_required_target`: creature template entry %u does not exist.", uiTargetEntry);
+            if (!sObjectMgr.IsExistingCreatureId(uiTargetEntry))
+                sLog.outErrorDb("Table `item_required_target`: creature template entry %u does not exist.", uiTargetEntry);
             continue;
         }
 
@@ -4724,8 +4753,8 @@ void ObjectMgr::LoadQuests()
                           "`IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`,"
     //                      119                       120                       121                       122
                           "`OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`,"
-    //                      123            124               125
-                          "`StartScript`, `CompleteScript`, `MaxLevel`"
+    //                      123            124               125         126
+                          "`StartScript`, `CompleteScript`, `MaxLevel`, `RewMailMoney` "
                           " FROM `quest_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `quest_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
     if (!result)
     {
@@ -5238,23 +5267,24 @@ void ObjectMgr::LoadQuests()
         if (qinfo->RewMailTemplateId)
         {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            if (!sMailTemplateStore.LookupEntry(qinfo->RewMailTemplateId))
+            uint32 mailTemplateId = abs(qinfo->RewMailTemplateId);
+            if (!sMailTemplateStore.LookupEntry(mailTemplateId))
             {
                 sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u does not exist, quest will not have a mail reward.",
-                                qinfo->GetQuestId(), qinfo->RewMailTemplateId, qinfo->RewMailTemplateId);
+                                qinfo->GetQuestId(), mailTemplateId, mailTemplateId);
                 qinfo->RewMailTemplateId = 0;               // no mail will send to player
                 qinfo->RewMailDelaySecs = 0;                // no mail will send to player
             }
-            else if (usedMailTemplates.find(qinfo->RewMailTemplateId) != usedMailTemplates.end())
+            else if (usedMailTemplates.find(mailTemplateId) != usedMailTemplates.end())
             {
-                std::map<uint32, uint32>::const_iterator used_mt_itr = usedMailTemplates.find(qinfo->RewMailTemplateId);
+                std::map<uint32, uint32>::const_iterator used_mt_itr = usedMailTemplates.find(mailTemplateId);
                 sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u already used for quest %u, quest will not have a mail reward.",
-                                qinfo->GetQuestId(), qinfo->RewMailTemplateId, qinfo->RewMailTemplateId, used_mt_itr->second);
+                                qinfo->GetQuestId(), mailTemplateId, mailTemplateId, used_mt_itr->second);
                 qinfo->RewMailTemplateId = 0;               // no mail will send to player
                 qinfo->RewMailDelaySecs = 0;                // no mail will send to player
             }
             else
-                usedMailTemplates[qinfo->RewMailTemplateId] = qinfo->GetQuestId();
+                usedMailTemplates[mailTemplateId] = qinfo->GetQuestId();
 #else
             qinfo->RewMailTemplateId = 0;
 #endif
@@ -6598,11 +6628,11 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     std::unique_ptr<QueryResult> result(WorldDatabase.PQuery(
     //           0     1                 2                3                 4                      5
-        "SELECT `id`, `required_level`, `required_item`, `required_item2`, `required_quest_done`, `required_failed_text`, "
+        "SELECT `id`, `required_level`, `required_item`, `required_item2`, `required_quest_done`, `required_team`, "
     //    6             7                    8                    9                    10                    11
         "`target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `required_event`, "
-    //    12                   13
-        "`required_pvp_rank`, `required_team` "
+    //    12
+        "`required_pvp_rank` "
         "FROM `areatrigger_teleport` t1 WHERE `patch`=(SELECT max(`patch`) FROM `areatrigger_teleport` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
     
     if (!result)
@@ -6632,7 +6662,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.requiredItem       = fields[2].GetUInt32();
         at.requiredItem2      = fields[3].GetUInt32();
         at.requiredQuest      = fields[4].GetUInt32();
-        at.requiredFailedText = fields[5].GetCppString();
+        at.required_team      = fields[5].GetUInt16();
         at.target_mapId       = fields[6].GetUInt32();
         at.target_X           = fields[7].GetFloat();
         at.target_Y           = fields[8].GetFloat();
@@ -6640,7 +6670,6 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.target_Orientation = fields[10].GetFloat();
         at.required_event     = fields[11].GetInt32();
         at.required_pvp_rank  = fields[12].GetUInt8();
-        at.required_team      = fields[13].GetUInt16();
 
         AreaTriggerEntry const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
@@ -7610,10 +7639,10 @@ void ObjectMgr::LoadReputationOnKill()
     uint32 count = 0;
 
     //                                                               0              1                       2
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`,"
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`,"
     //                      3               4               5                     6               7               8                     9
                           "`IsTeamAward1`, `MaxStanding1`, `RewOnKillRepValue1`, `IsTeamAward2`, `MaxStanding2`, `RewOnKillRepValue2`, `TeamDependent` "
-                          "FROM `creature_onkill_reputation`"));
+                          "FROM `creature_onkill_reputation` t1 WHERE `patch`=(SELECT max(`patch`) FROM `creature_onkill_reputation` t2 WHERE t1.`creature_id`=t2.`creature_id` && `patch` <= %u)", sWorld.GetWowPatch()));
 
     if (!result)
     {

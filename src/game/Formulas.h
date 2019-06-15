@@ -97,9 +97,9 @@ namespace MaNGOS
             return (pl_level * 5 + nBaseExp) * BaseGainLevelFactor(pl_level, mob_level);
         }
 
-        inline uint32 Gain(Player *pl, Unit *u)
+        inline uint32 Gain(Player *pPlayer, Unit *pUnit)
         {
-            if (Creature* pCreature = ToCreature(u))
+            if (Creature* pCreature = ToCreature(pUnit))
             {
                 // Some objects and totems are marked as pets, need some aditional checks
                 bool isPet = pCreature->IsPet() &&
@@ -117,7 +117,7 @@ namespace MaNGOS
                 if (pCreature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD))
                     return 0;
 
-                uint32 xp_gain = BaseGain(pl->getLevel(), u->getLevel());
+                uint32 xp_gain = BaseGain(pPlayer->getLevel(), pUnit->getLevel());
                 if (!xp_gain)
                     return 0;
 
@@ -130,37 +130,54 @@ namespace MaNGOS
                 xp_gain *= pCreature->GetCreatureInfo()->xp_multiplier;
                 xp_gain *= pCreature->GetXPModifierDueToDamageOrigin();
 
-                return (uint32)(xp_gain*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL));
+                float personalRate = pPlayer->GetPersonalXpRate();
+
+                if (personalRate >= 0.0f)
+                    xp_gain *= personalRate;
+                else
+                    xp_gain *= sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL);
+
+                return (uint32)xp_gain;
             }
             
             return 0;
         }
 
-        inline uint32 PetGain(Pet *pet, Unit *u)
+        inline uint32 PetGain(Pet *pPet, Unit *pUnit)
         {
-            bool isPet = u->GetTypeId() == TYPEID_UNIT && u->IsPet() &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_NOT_SPECIFIED &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
-                ((Creature*)u)->GetCreatureInfo()->health_min > 50;
+            bool isPet = pUnit->GetTypeId() == TYPEID_UNIT && pUnit->IsPet() &&
+                ((Creature*)pUnit)->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
+                ((Creature*)pUnit)->GetCreatureInfo()->type != CREATURE_TYPE_NOT_SPECIFIED &&
+                ((Creature*)pUnit)->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
+                ((Creature*)pUnit)->GetCreatureInfo()->health_min > 50;
 
-            if(u->GetTypeId()==TYPEID_UNIT && (
-                (u->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||
-                (((Creature*)u)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
-                u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD)))
+            if(pUnit->GetTypeId()==TYPEID_UNIT && (
+                (pUnit->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||
+                (((Creature*)pUnit)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
+                pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD)))
                 return 0;
 
-            uint32 xp_gain= BaseGain(pet->getLevel(), u->getLevel());
+            uint32 xp_gain= BaseGain(pPet->getLevel(), pUnit->getLevel());
             if( xp_gain == 0 )
                 return 0;
 
-            if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsElite())
+            if(pUnit->GetTypeId()==TYPEID_UNIT && ((Creature*)pUnit)->IsElite())
                 xp_gain *= 2;
 
             if(isPet)
                 xp_gain *= 0.75f;
 
-            return (uint32)(xp_gain*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL));
+            float personalRate = -1.0f;
+
+            if (Player* pOwner = ToPlayer(pPet->GetOwner()))
+                personalRate = pOwner->GetPersonalXpRate();
+
+            if (personalRate >= 0.0f)
+                xp_gain *= personalRate;
+            else
+                xp_gain *= sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL);
+
+            return (uint32)xp_gain;
         }
 
         inline float xp_in_group_rate(uint32 count, bool isRaid)

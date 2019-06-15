@@ -126,8 +126,8 @@ void HonorMaintenancer::LoadStandingLists()
     }
 
     // Make sure all things are sorted
-    m_allianceStandingList.sort();
-    m_hordeStandingList.sort();
+    std::sort(m_allianceStandingList.begin(), m_allianceStandingList.end());
+    std::sort(m_hordeStandingList.begin(), m_hordeStandingList.end());
 
     sLog.outHonor("[MAINTENANCE] Alliance: %u, Horde: %u, Inactive: %u",
         m_allianceStandingList.size(), m_hordeStandingList.size(), m_inactiveStandingList.size());

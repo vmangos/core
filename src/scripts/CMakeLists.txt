@@ -121,7 +121,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/eastern_plaguelands/naxxramas/boss_thaddius.cpp
     eastern_kingdoms/eastern_plaguelands/naxxramas/instance_naxxramas.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_baroness_anastari.cpp
-    eastern_kingdoms/eastern_plaguelands/stratholme/boss_baron_rivendare.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_cannon_master_willey.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_dathrohan_balnazzar.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_magistrate_barthilas.cpp
@@ -131,7 +130,6 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_postmaster_malown.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_ramstein_the_gorger.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/boss_timmy_the_cruel.cpp
-    eastern_kingdoms/eastern_plaguelands/stratholme/boss_atiesh.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/instance_stratholme.cpp
     eastern_kingdoms/eastern_plaguelands/stratholme/stratholme.cpp
     eastern_kingdoms/elwynn_forest/elwynn_forest.cpp
@@ -269,8 +267,6 @@ set (SCRIPTS_SRCS
     kalimdor/winterspring/winterspring.cpp
     PrecompiledHeaders/scriptPCH.cpp
     world/areatrigger_scripts.cpp
-    world/boss_anachronos.cpp
-    world/boss_lord_kazzak.cpp
     world/elemental_invasions.cpp
     world/event_scourge_invasion.cpp
     world/go_scripts.cpp

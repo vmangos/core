@@ -77,7 +77,7 @@ void ScriptedPetAI::ResetPetCombat()
 void ScriptedPetAI::UpdatePetAI(const uint32 uiDiff)
 {
     if (!m_CreatureSpells.empty())
-        DoSpellsListCasts(uiDiff);
+        UpdateSpellsList(uiDiff);
 
     DoMeleeAttackIfReady();
 }

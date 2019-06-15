@@ -71,7 +71,6 @@ struct AreaTriggerTeleport
     int required_event;
     uint8 required_pvp_rank;
     uint16 required_team;
-    std::string requiredFailedText;
     uint32 target_mapId;
     float  target_X;
     float  target_Y;
@@ -814,6 +813,7 @@ class ObjectMgr
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
         void CheckCreatureTemplates();
+        void CorrectCreatureModels(uint32, uint32&);
 
         void LoadCreatures(bool reload = false);
         void LoadCreatureAddons();

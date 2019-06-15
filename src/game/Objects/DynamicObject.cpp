@@ -117,8 +117,8 @@ bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEf
     m_radius = radius;
     m_effIndex = effIndex;
     m_spellId = spellId;
-    m_positive = IsPositiveEffect(spellProto, m_effIndex);
-    m_channeled = IsChanneledSpell(spellProto);
+    m_positive = spellProto->IsPositiveEffect(m_effIndex);
+    m_channeled = spellProto->IsChanneledSpell();
 
     return true;
 }
