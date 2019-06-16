@@ -2592,6 +2592,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
 
     // bonus from skills is 0.04%
     int32    skillBonus  = 4 * (attackerWeaponSkill - victimMaxSkillValueForLevel);
+    int32    levelSkillDelta = attackerMaxSkillValueForLevel - victimMaxSkillValueForLevel;
     int32    sum = 0, tmp = 0;
     int32    roll = urand(0, 10000);
 
@@ -2623,10 +2624,11 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
     // only players can't dodge if attacker is behind
     if (pVictim->GetTypeId() != TYPEID_PLAYER || !from_behind)
     {
+        // See https://us.forums.blizzard.com/en/wow/t/bug-hit-tables/185675/12
         tmp = dodge_chance;
-        if ((tmp > 0)                                           // check if unit _can_ dodge
-                && ((tmp -= skillBonus) > 0)
-                && roll < (sum += tmp))
+        tmp -= 10 * levelSkillDelta;
+        tmp -= skillBonus;
+        if (tmp > 0 && roll < (sum += tmp))
         {
             DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: DODGE <%d, %d)", sum - tmp, sum);
             return MELEE_HIT_DODGE;
@@ -2637,6 +2639,11 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
     // check if attack comes from behind, nobody can parry or block if attacker is behind
     if (!from_behind)
     {
+        // Based on https://us.forums.blizzard.com/en/wow/t/bug-hit-tables/185675/12,
+        // and Beta test data https://github.com/magey/classic-warrior/issues/5
+        if (levelSkillDelta < -10)
+            parry_chance += 900;
+
         if (parry_chance > 0 && (pVictim->GetTypeId() == TYPEID_PLAYER || !(((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY)))
         {
             parry_chance -= skillBonus;
@@ -2712,6 +2719,11 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
     // Critical chance
     tmp = crit_chance;
 
+    // Critical Strike chance is reduced by 1% per each additional level the target has over the player.
+    // See https://us.forums.blizzard.com/en/wow/t/bug-hit-tables/185675/12
+    if (levelSkillDelta < 0)
+        tmp += levelSkillDelta * 20;
+    
     if (tmp > 0 && roll < (sum += tmp))
     {
         DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRIT <%d, %d)", sum - tmp, sum);
@@ -2900,8 +2912,14 @@ float Unit::MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 
     // Hit chance depends from victim auras
     if (attType == RANGED_ATTACK)
         hitChance += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE);
-    else
-        hitChance += pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE);
+    else {
+        // The first hit from gear (and likely talents) was ignored by mobs with > 10 skill difference
+        int32 hitFromAuras = pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE);
+        if (skillDiff < -10 && hitFromAuras >= 1)
+            hitFromAuras -= 1;
+
+        hitChance += hitFromAuras;
+    }
 
     // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
     if (Player *modOwner = GetSpellModOwner())
@@ -3344,6 +3362,7 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
         missChance -= pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_RANGED_HIT_CHANCE);
     else
         missChance -= pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_ATTACKER_MELEE_HIT_CHANCE);
+
 
     // Limit miss chance from 0 to 60%
     if (missChance < 0.0f)
