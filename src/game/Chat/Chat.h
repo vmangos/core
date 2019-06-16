@@ -181,7 +181,6 @@ class MANGOS_DLL_SPEC ChatHandler
         void CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand);
         void FillFullCommandsName(ChatCommand* table, std::string prefix);
         ChatCommand* getCommandTable();
-
         bool HandleGodCommand(char *);
         bool HandleGMOptionsCommand(char *);
         bool HandleAnticheatCommand(char *);
@@ -824,12 +823,14 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGetDistanceCommand(char* args);
         bool HandleGetAngleCommand(char* args);
         bool HandleModifyEmoteStateCommand(char* args);
+        bool HandleNameDieCommand(char* args);
         bool HandleDieCommand(char* args);
         bool HandleFearCommand(char* args);
         bool HandleDamageCommand(char* args);
         bool HandleReviveCommand(char* args);
         bool HandleReplenishCommand(char* args);
         bool HandleModifyMorphCommand(char* args);
+        bool HandleNameAuraCommand(char* args);
         bool HandleAuraCommand(char* args);
         bool HandleUnAuraCommand(char* args);
         bool HandleLinkGraveCommand(char* args);
@@ -956,6 +957,9 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSendItemsHelper(MailDraft& draft, char* args);
         bool HandleSendMailHelper(MailDraft& draft, char* args);
         bool HandleSendMoneyHelper(MailDraft& draft, char* args);
+
+        bool HandleAuraHelper(uint32 spellID, int32 duration, Unit*);
+        bool HandleDieHelper(Unit* target);
 
         template<typename T>
         void ShowNpcOrGoSpawnInformation(uint32 guid);
