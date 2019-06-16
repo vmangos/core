@@ -29,6 +29,7 @@
 #include "Util.h"
 #include "WardenWin.h"
 #include "WardenMgr.h"
+#include "Anticheat.h"
 
 WardenWin::WardenWin() : Warden(), _serverTicks(0) {}
 
@@ -168,7 +169,7 @@ void WardenWin::RequestData()
     _currentChecks.clear();
 
     // Build check request
-    for (uint16 i = 0; i < sWorld.getConfig(CONFIG_UINT32_WARDEN_NUM_MEM_CHECKS); ++i)
+    for (uint16 i = 0; i < sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_NUM_MEM_CHECKS); ++i)
     {
         // If todo list is done break loop (will be filled on next Update() run)
         if (_memChecksTodo.empty())
@@ -185,7 +186,7 @@ void WardenWin::RequestData()
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
 
-    for (uint16 i = 0; i < sWorld.getConfig(CONFIG_UINT32_WARDEN_NUM_OTHER_CHECKS); ++i)
+    for (uint16 i = 0; i < sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_NUM_OTHER_CHECKS); ++i)
     {
         // If todo list is done break loop (will be filled on next Update() run)
         if (_otherChecksTodo.empty())

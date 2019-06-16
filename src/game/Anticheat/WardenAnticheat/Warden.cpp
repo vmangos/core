@@ -27,6 +27,7 @@
 #include "Warden.h"
 #include "AccountMgr.h"
 #include "Language.h"
+#include "Anticheat.h"
 
 Warden::Warden() : m_session(nullptr), m_inputCrypto(16), m_outputCrypto(16), m_checkTimer(10000/*10 sec*/), m_clientResponseTimer(0),
                    m_state(WardenState::STATE_INITIAL), m_module(nullptr)
@@ -133,7 +134,7 @@ void Warden::Update()
         case WardenState::STATE_REQUESTED_HASH:
         case WardenState::STATE_REQUESTED_DATA:
         {
-            uint32 maxClientResponseDelay = sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_RESPONSE_DELAY);
+            uint32 maxClientResponseDelay = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_RESPONSE_DELAY);
 
             if (maxClientResponseDelay > 0)
             {
@@ -197,7 +198,7 @@ void Warden::SetNewState(WardenState::Value state)
 
     // Reset timers
     // Set hold off timer, minimum timer should at least be 1 second
-    uint32 holdOff = sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_CHECK_HOLDOFF);
+    uint32 holdOff = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_CHECK_HOLDOFF);
     m_checkTimer = (holdOff < 1 ? 1 : holdOff) * IN_MILLISECONDS;
 
     m_clientResponseTimer = 0;
@@ -252,7 +253,7 @@ void Warden::ApplyPenalty(std::string message, WardenCheck* check)
     if (check)
         action = check->Action;
     else
-        action = WardenActions(sWorld.getConfig(CONFIG_UINT32_WARDEN_DEFAULT_PENALTY));
+        action = WardenActions(sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY));
 
     std::string playerName = m_session->GetPlayerName();
     std::string accountName = std::to_string(m_session->GetAccountId());
@@ -272,7 +273,7 @@ void Warden::ApplyPenalty(std::string message, WardenCheck* check)
                 if (check)
                     banReason << ": " << (check->Comment.empty() ? std::string("Undocumented Check") : check->Comment) << " (CheckId: " << check->CheckId << ")";
 
-                sWorld.BanAccount(BAN_ACCOUNT, accountName, sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_BAN_DURATION), banReason.str(), "Warden");
+                sWorld.BanAccount(BAN_ACCOUNT, accountName, sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_CLIENT_BAN_DURATION), banReason.str(), "Warden");
             }
         default:
             break;
@@ -282,15 +283,15 @@ void Warden::ApplyPenalty(std::string message, WardenCheck* check)
     message = "Player " + playerName + " (Account " + accountName + ") " + message;
 
     sLog.outWarden(message.c_str());
-    sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "WardenAlert", message.c_str());
+    sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "WardenAnticheat", message.c_str());
 }
 
-void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
+void Warden::HandleWardenDataOpcode(WorldPacket& recvData)
 {
-    if (!m_warden || recvData.empty())
+    if (recvData.empty())
         return;
 
-    m_warden->DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
+    DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
     uint8 opcode;
     recvData >> opcode;
     sLog.outWardenDebug("Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
@@ -299,23 +300,23 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
     switch (opcode)
     {
         case WARDEN_CMSG_MODULE_MISSING:
-            m_warden->SendModuleToClient();
+            SendModuleToClient();
             break;
         case WARDEN_CMSG_MODULE_OK:
-            m_warden->RequestHash();
+            RequestHash();
             break;
         case WARDEN_CMSG_CHEAT_CHECKS_RESULT:
-            m_warden->HandleData(recvData);
+            HandleData(recvData);
             break;
         case WARDEN_CMSG_MEM_CHECKS_RESULT:
             sLog.outWarden("NYI WARDEN_CMSG_MEM_CHECKS_RESULT received!");
             break;
         case WARDEN_CMSG_HASH_RESULT:
-            m_warden->HandleHashResult(recvData);
-            m_warden->InitializeModule();
+            HandleHashResult(recvData);
+            InitializeModule();
             break;
         case WARDEN_CMSG_MODULE_FAILED:
-            m_warden->ApplyPenalty("sent module failed opcode", nullptr);
+            ApplyPenalty("sent module failed opcode", nullptr);
             break;
         default:
             sLog.outWarden("Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
@@ -338,7 +339,7 @@ void Warden::LogPositiveToDB(WardenCheck* check)
     if (!check || !m_session)
         return;
 
-    if (uint32(check->Action) < sWorld.getConfig(CONFIG_UINT32_WARDEN_DB_LOGLEVEL))
+    if (uint32(check->Action) < sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DB_LOGLEVEL))
         return;
 
     static SqlStatementID insWardenPositive;

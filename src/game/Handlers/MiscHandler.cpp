@@ -714,7 +714,7 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 
     if (!guid) // Cheating attempt
     {
-        ProcessAnticheatAction("SAC", "Instant resurrect hack detected", CHEAT_ACTION_LOG);
+        ProcessAnticheatAction("PassiveAnticheat", "Instant resurrect hack detected", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
         return;
     }
 
@@ -1276,4 +1276,15 @@ void WorldSession::HandleRequestPetInfoOpcode(WorldPacket & /*recv_data */)
         _player->PetSpellInitialize();
     else if (_player->GetCharm())
         _player->CharmSpellInitialize();
+}
+
+void WorldSession::HandleWardenDataOpcode(WorldPacket & recv_data)
+{
+    if (!m_warden)
+    {
+        sLog.outWarden("HandleWardenDataOpcode: warden interface not found!");
+        return;
+    }
+
+    m_warden->HandleWardenDataOpcode(recv_data);
 }

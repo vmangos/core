@@ -56,6 +56,7 @@ void MovementPacketSender::SendSpeedChangeToMover(Unit* unit, UnitMoveType mtype
     pendingChange.movementCounter = mCounter;
     pendingChange.newValue = newSpeedFlat;
     pendingChange.movementChangeType = MovementPacketSender::GetChangeTypeByMoveType(mtype);
+    pendingChange.controller = mover->GetObjectGuid();
     unit->PushPendingMovementChange(pendingChange);
 
     WorldPacket data;
@@ -73,7 +74,6 @@ void MovementPacketSender::SendSpeedChangeToMover(Unit* unit, UnitMoveType mtype
     data << float(newSpeedFlat);
     
     mover->GetSession()->SendPacket(&data);
-    mover->GetCheatData()->OrderSent(&data);
 }
 
 MovementChangeType MovementPacketSender::GetChangeTypeByMoveType(UnitMoveType moveType)
@@ -138,7 +138,7 @@ void MovementPacketSender::SendKnockBackToMover(Unit* unit, float vcos, float vs
     pendingChange.knockbackInfo.vsin = vsin;
     pendingChange.knockbackInfo.speedXY = speedXY;
     pendingChange.knockbackInfo.speedZ = speedZ;
-
+    pendingChange.controller = mover->GetObjectGuid();
     unit->PushPendingMovementChange(pendingChange);
 
     WorldPacket data(SMSG_MOVE_KNOCK_BACK, (8 + 4 + 4 + 4 + 4 + 4));
@@ -212,7 +212,7 @@ void MovementPacketSender::SendMovementFlagChangeToMover(Unit* unit, MovementFla
     pendingChange.movementCounter = mCounter;
     pendingChange.movementChangeType = movementChangeType;
     pendingChange.apply = apply;
-
+    pendingChange.controller = mover->GetObjectGuid();
     unit->PushPendingMovementChange(pendingChange);
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -227,7 +227,6 @@ void MovementPacketSender::SendMovementFlagChangeToMover(Unit* unit, MovementFla
     data << mCounter;
 #endif
 
-    mover->GetCheatData()->OrderSent(&data);
     mover->GetSession()->SendPacket(&data);
 }
 

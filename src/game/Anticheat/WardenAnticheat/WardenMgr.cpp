@@ -27,6 +27,7 @@
 #include <mutex>
 #include <ace/OS_NS_dirent.h>
 #include <openssl/md5.h>
+#include "Anticheat.h"
 
 WardenMgr::WardenMgr() : CheckStore(), CheckResultStore() { }
 
@@ -45,7 +46,7 @@ WardenMgr::~WardenMgr()
 void WardenMgr::LoadWardenChecks()
 {
     // Check if Warden is enabled by config before loading anything
-    if (!sWorld.getConfig(CONFIG_BOOL_WARDEN_WIN_ENABLED) && !sWorld.getConfig(CONFIG_BOOL_WARDEN_OSX_ENABLED))
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED) && !sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED))
     {
         BarGoLink bar(1);
         bar.step();
@@ -91,7 +92,7 @@ void WardenMgr::LoadWardenChecks()
         wardenCheck->CheckId = id;
 
         if (penalty < WARDEN_ACTION_LOG || penalty >= WARDEN_ACTION_MAX)
-            penalty = sWorld.getConfig(CONFIG_UINT32_WARDEN_DEFAULT_PENALTY);
+            penalty = sWorld.getConfig(CONFIG_UINT32_AC_WARDEN_DEFAULT_PENALTY);
 
         // Initialize action with default action from config
         wardenCheck->Action = WardenActions(penalty);
@@ -156,7 +157,7 @@ void WardenMgr::LoadWardenChecks()
 void WardenMgr::LoadWardenModules()
 {
     // Check if Warden is enabled by config before loading anything
-    if (!sWorld.getConfig(CONFIG_BOOL_WARDEN_WIN_ENABLED) && !sWorld.getConfig(CONFIG_BOOL_WARDEN_OSX_ENABLED))
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED) && !sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED))
     {
         BarGoLink bar(1);
         bar.step();
@@ -181,8 +182,8 @@ void WardenMgr::LoadWardenModules()
     }
     bar.step();
 
-    MANGOS_ASSERT(!(m_vWindowsModules.empty() && sWorld.getConfig(CONFIG_BOOL_WARDEN_WIN_ENABLED)));
-    MANGOS_ASSERT(!(m_vMacModules.empty() && sWorld.getConfig(CONFIG_BOOL_WARDEN_OSX_ENABLED)));
+    MANGOS_ASSERT(!(m_vWindowsModules.empty() && sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_WIN_ENABLED)));
+    MANGOS_ASSERT(!(m_vMacModules.empty() && sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_OSX_ENABLED)));
 
     sLog.outString();
     sLog.outString(">> Loaded %u windows and %u mac modules.", m_vWindowsModules.size(), m_vMacModules.size());

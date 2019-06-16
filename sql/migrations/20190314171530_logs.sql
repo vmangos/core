@@ -24,6 +24,18 @@ CREATE TABLE `logs_warden` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Warden log of failed checks';
 
+CREATE TABLE IF NOT EXISTS `logs_movement` (
+  `account` int(10) unsigned NOT NULL,
+  `guid` int(10) unsigned NOT NULL,
+  `posx` float NOT NULL,
+  `posy` float NOT NULL,
+  `posz` float NOT NULL,
+  `map` int(10) unsigned NOT NULL,
+  `desyncMs` int(11) NOT NULL,
+  `desyncDist` float NOT NULL,
+  `cheats` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
 
 -- End of migration.
 END IF;

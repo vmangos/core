@@ -20,14 +20,7 @@
 #include <map>
 #include <mutex>
 #include "Auth/BigNumber.h"
-
-enum WardenActions
-{
-    WARDEN_ACTION_LOG,
-    WARDEN_ACTION_KICK,
-    WARDEN_ACTION_BAN,
-    WARDEN_ACTION_MAX
-};
+#include "SharedDefines.h"
 
 enum
 {

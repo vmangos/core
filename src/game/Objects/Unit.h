@@ -81,9 +81,10 @@ struct PlayerMovementPendingChange
     uint32 movementCounter = 0;
     MovementChangeType movementChangeType = INVALID;
     uint32 time = 0;
-
     float newValue = 0.0f; // used if speed or height change
     bool apply = false; // used if movement flag change
+    ObjectGuid controller;
+
     struct KnockbackInfo
     {
         float vcos = 0.0f;
@@ -1540,6 +1541,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
 
     public:
+        const std::deque<PlayerMovementPendingChange>& GetPendingMovementChangesQueue() const { return m_pendingMovementChanges; }
+
         void SetRooted(bool apply);
         void SetRootedReal(bool apply);
         bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }

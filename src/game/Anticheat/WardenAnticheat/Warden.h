@@ -23,6 +23,7 @@
 #include "ByteBuffer.h"
 #include "WardenMgr.h"
 #include "Database/DatabaseEnv.h"
+#include "Anticheat.h"
 
 class Object;
 class Player;
@@ -142,7 +143,7 @@ struct ClientWardenModule
 
 class WorldSession;
 
-class Warden
+class Warden : public WardenInterface
 {
     public:
         Warden();
@@ -155,14 +156,16 @@ class Warden
         virtual void HandleHashResult(ByteBuffer &buff) = 0;
         virtual void RequestData();
         virtual void HandleData(ByteBuffer &buff);
+        virtual void HandleWardenDataOpcode(WorldPacket & recv_data) override;
 
         void SendModuleToClient();
         void RequestModule();
-        void Update();
+        void Update() override;
         void DecryptData(uint8* buffer, uint32 length);
         void EncryptData(uint8* buffer, uint32 length);
 
         void SetNewState(WardenState::Value state);
+        WorldSession* GetSession() override { return m_session; }
 
         static bool IsValidCheckSum(uint32 checksum, const uint8 *data, const uint16 length);
         static uint32 BuildChecksum(const uint8 *data, uint32 length);

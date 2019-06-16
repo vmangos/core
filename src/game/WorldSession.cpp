@@ -40,8 +40,6 @@
 #include "BattleGroundMgr.h"
 #include "MapManager.h"
 #include "SocialMgr.h"
-#include "WardenWin.h"
-#include "WardenMac.h"
 #include "PlayerBotMgr.h"
 #include "Anticheat.h"
 #include "Language.h"
@@ -82,7 +80,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_
     m_ah_list_recvd(false), _scheduleBanLevel(0),
     _accountFlags(0), m_idleTime(WorldTimer::getMSTime()), _player(nullptr), m_Socket(sock), _security(sec), _accountId(id), _logoutTime(0), m_inQueue(false),
     m_playerLoading(false), m_playerLogout(false), m_playerRecentlyLogout(false), m_playerSave(false), m_sessionDbcLocale(sWorld.GetAvailableDbcLocale(locale)),
-    m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr),
+    m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
     m_bot(nullptr), m_lastReceivedPacketTime(0), _clientOS(CLIENT_OS_UNKNOWN), _gameBuild(0),
     _charactersCount(10), _characterMaxLevel(0), _clientHashComputeStep(HASH_NOT_COMPUTED), m_masterSession(nullptr), m_nodeSession(nullptr),
     m_masterPlayer(nullptr), m_lastPubChannelMsgTime(NULL)
@@ -122,6 +120,8 @@ WorldSession::~WorldSession()
 
     if (m_warden)
         delete m_warden;
+    if (m_cheatData)
+        delete m_cheatData;
 }
 
 void WorldSession::SizeError(WorldPacket const& packet, uint32 size) const
@@ -1116,16 +1116,20 @@ void WorldSession::SetDumpRecvPackets(const char* file)
 
 void WorldSession::InitWarden(BigNumber* k)
 {
-    ClientOSType os = GetOS();
+    m_warden = sAnticheatLib->CreateWardenFor(this, k);
+}
 
-    if (os == CLIENT_OS_WIN && sWorld.getConfig(CONFIG_BOOL_WARDEN_WIN_ENABLED)) {
-        m_warden = new WardenWin();
-        m_warden->Init(this, k);
-    }
-    else if (os == CLIENT_OS_MAC && sWorld.getConfig(CONFIG_BOOL_WARDEN_OSX_ENABLED)) {
-        m_warden = new WardenMac();
-        m_warden->Init(this, k);
-    }
+void WorldSession::InitCheatData(Player* pPlayer)
+{
+    if (m_cheatData)
+        m_cheatData->InitNewPlayer(pPlayer);
+    else
+        m_cheatData = sAnticheatLib->CreateAnticheatFor(pPlayer);
+}
+
+MovementAnticheatInterface* WorldSession::GetCheatData()
+{
+    return m_cheatData ? m_cheatData : (m_cheatData = sAnticheatLib->CreateAnticheatFor(GetPlayer()));
 }
 
 void WorldSession::ProcessAnticheatAction(const char* detector, const char* reason, uint32 cheatAction, uint32 banSeconds)
@@ -1170,21 +1174,6 @@ void WorldSession::ProcessAnticheatAction(const char* detector, const char* reas
     else if (!(cheatAction & CHEAT_ACTION_LOG))
         return;
 
-    if (cheatAction & CHEAT_ACTION_REPORT_GMS)
-    {
-        std::stringstream oss;
-        ObjectGuid pguid;
-        if (Player* p = GetPlayer())
-            pguid = p->GetObjectGuid();
-        else
-            oss << "[Account " << GetUsername() << "]";
-        oss << reason;
-        if (cheatAction >= CHEAT_ACTION_KICK)
-            oss << " " << action;
-
-        if (GetSecurity() == SEC_PLAYER)
-            ChannelMgr::AnnounceBothFactionsChannel(detector, pguid, oss.str().c_str());
-    }
     std::string playerDesc;
     if (_player)
         playerDesc = _player->GetShortDescription();
@@ -1194,7 +1183,19 @@ void WorldSession::ProcessAnticheatAction(const char* detector, const char* reas
         oss << "<None> [" << GetUsername() << ":" << GetAccountId() << "@" << GetRemoteAddress().c_str() << "]";
         playerDesc = oss.str();
     }
-    sLog.out(LOG_ANTICHEAT, "%s %s: %s %s", playerDesc.c_str(), detector, reason, action);
+
+    if (cheatAction & CHEAT_ACTION_REPORT_GMS)
+    {
+        std::stringstream oss;
+        oss << "Player " << playerDesc << ", Cheat: " << reason;
+
+        if (cheatAction >= CHEAT_ACTION_KICK)
+            oss << ", Penalty: " << action;
+
+        sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, detector, oss.str().c_str());
+    }
+    
+    sLog.outAnticheat(detector, playerDesc.c_str(), reason, action);
 }
 
 bool WorldSession::AllowPacket(uint16 opcode)

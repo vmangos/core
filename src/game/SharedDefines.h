@@ -2585,6 +2585,14 @@ enum TicketType
     GMTICKET_MAX
 };
 
+enum WardenActions
+{
+    WARDEN_ACTION_LOG,
+    WARDEN_ACTION_KICK,
+    WARDEN_ACTION_BAN,
+    WARDEN_ACTION_MAX
+};
+
 // Used for some dynamic scaling systems, depending on total population
 #define BLIZZLIKE_REALM_POPULATION 2500
 
