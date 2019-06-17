@@ -633,6 +633,7 @@ void MovementCheatData::KnockBack(float speedxy, float speedz, float cos, float 
 void MovementCheatData::OnUnreachable(Unit* attacker)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_UNREACHABLE_ENABLED) || 
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
         return;
 
@@ -656,8 +657,11 @@ void MovementCheatData::OnExplore(AreaEntry const* pArea)
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
         return;
 
-    AddCheats(1 << CHEAT_TYPE_EXPLORE);
-    if (static_cast<int32>(me->getLevel() + 10) < pArea->AreaLevel)
+    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_ENABLED))
+        AddCheats(1 << CHEAT_TYPE_EXPLORE);
+
+    if (CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED &&
+       (static_cast<int32>(me->getLevel() + 10) < pArea->AreaLevel))
         AddCheats(1 << CHEAT_TYPE_EXPLORE_HIGH_LEVEL);
 }
 
@@ -667,6 +671,7 @@ void MovementCheatData::OnExplore(AreaEntry const* pArea)
 void MovementCheatData::OnTransport(Player* plMover, ObjectGuid transportGuid)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
         return;
 
