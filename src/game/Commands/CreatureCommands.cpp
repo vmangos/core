@@ -831,6 +831,7 @@ bool ChatHandler::HandleNpcMoveCommand(char* args)
         }
         pCreature->GetMap()->CreatureRelocation(pCreature, x, y, z, o);
         pCreature->GetMotionMaster()->Initialize();
+        pCreature->SetHomePosition(x, y, z, o);
         if (pCreature->isAlive())                           // dead creature will reset movement generator at respawn
         {
             pCreature->SetDeathState(JUST_DIED);
