@@ -20,7 +20,7 @@
 #include <map>
 #include <mutex>
 #include "Auth/BigNumber.h"
-#include "SharedDefines.h"
+#include "Anticheat.h"
 
 enum
 {

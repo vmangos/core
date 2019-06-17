@@ -8,6 +8,14 @@
 #include "Common.h"
 #include "Unit.h"
 
+enum WardenActions
+{
+    WARDEN_ACTION_LOG,
+    WARDEN_ACTION_KICK,
+    WARDEN_ACTION_BAN,
+    WARDEN_ACTION_MAX
+};
+
 enum CheatAction
 {
     CHEAT_ACTION_NONE           = 0x00,
