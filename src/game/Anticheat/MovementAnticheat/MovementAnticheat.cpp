@@ -59,6 +59,8 @@ const char* GetMovementCheatName(CheatType flagId)
             return "SlowFall";
         case CHEAT_TYPE_FIXED_Z:
             return "FixedZ";
+        case CHEAT_TYPE_WRONG_ACK_DATA:
+            return "WrongAckData";
         case CHEAT_TYPE_PENDING_ACK_DELAY:
             return "PendingAckDelay";
         default:

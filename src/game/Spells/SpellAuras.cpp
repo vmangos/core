@@ -2946,9 +2946,6 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
             pTarget->SetRooted(true);
         pTarget->StopMoving();
         pTarget->SetWalk(pCaster->IsWalking());
-
-        if (pTarget->IsCreature() && pTarget->IsRooted())
-            MovementPacketSender::SendMovementFlagChangeToMover(pTarget, MOVEFLAG_ROOT, true);
     }
     else
     {

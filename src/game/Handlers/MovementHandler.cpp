@@ -745,6 +745,14 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
         return;
     }
 
+    if (!guid.IsEmpty())
+    {
+        Unit* pMover = ObjectAccessor::GetUnit(*_player, guid);
+
+        if (pMover && pMover->IsCreature() && pMover->IsRooted())
+            MovementPacketSender::SendMovementFlagChangeToMover(pMover, MOVEFLAG_ROOT, true);
+    }
+
     // pMover swap after Eyes of the Beast, PetAI::UpdateAI handle the pet's return
     // Check if we actually have a pet before looking up
     if (_player->GetPetGuid() && _player->GetPetGuid() == _clientMoverGuid)
