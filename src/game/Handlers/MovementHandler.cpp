@@ -623,12 +623,12 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         return;
     }
 
+    PlayerMovementPendingChange pendingChange = pMover->PopPendingMovementChange();
+    bool applyReceived = (recvData.GetOpcode() == CMSG_FORCE_MOVE_ROOT_ACK);
+
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
     uint32 movementCounter = pendingChange.movementCounter;
 #endif
-
-    PlayerMovementPendingChange pendingChange = pMover->PopPendingMovementChange();
-    bool applyReceived = (recvData.GetOpcode() == CMSG_FORCE_MOVE_ROOT_ACK);
 
     if (!_player->GetCheatData()->HandleRootUnrootAck(pMover, movementInfo, movementCounter, applyReceived, pendingChange))
         return;
