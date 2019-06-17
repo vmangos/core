@@ -1817,6 +1817,19 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
+#    Anticheat.WrongAckData.Enable
+#        Description: Check for players sending wrong data in an ACK packet.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.WrongAckData.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.WrongAckData.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
 #    Anticheat.PendingAckDelay.Enable
 #        Description: Check for players failing to acknowledge a forced movement change.
 #        Default:     1 - (Enabled)
@@ -1905,6 +1918,9 @@ Anticheat.SlowFall.Penalty = 7
 Anticheat.FixedZ.Enable = 1
 Anticheat.FixedZ.Threshold = 1
 Anticheat.FixedZ.Penalty = 7
+Anticheat.WrongAckData.Enable = 1
+Anticheat.WrongAckData.Threshold = 1
+Anticheat.WrongAckData.Penalty = 7
 Anticheat.PendingAckDelay.Enable = 1
 Anticheat.PendingAckDelay.Time = 5000
 Anticheat.PendingAckDelay.Threshold = 1

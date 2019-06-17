@@ -1063,6 +1063,9 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FIXED_Z_ENABLED, "Anticheat.FixedZ.Enable", true);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_THRESHOLD, "Anticheat.FixedZ.Threshold", 1);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_PENALTY, "Anticheat.FixedZ.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
+    setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED, "Anticheat.WrongAckData.Enable", true);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_THRESHOLD, "Anticheat.WrongAckData.Threshold", 1);
+    setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_PENALTY, "Anticheat.WrongAckData.Penalty", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS | CHEAT_ACTION_KICK);
     setConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_ENABLED, "Anticheat.PendingAckDelay.Enable", true);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_TIME, "Anticheat.PendingAckDelay.Time", 5000);
     setConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_THRESHOLD, "Anticheat.PendingAckDelay.Threshold", 1);

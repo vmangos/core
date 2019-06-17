@@ -1576,6 +1576,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void PushPendingMovementChange(PlayerMovementPendingChange newChange);
         bool HasPendingMovementChange() const { return !m_pendingMovementChanges.empty(); }
         bool HasPendingMovementChange(MovementChangeType changeType) const;
+        void ResolvePendingMovementChanges();
 
         void SetSpeedRate(UnitMoveType mtype, float rate);
         void SetSpeedRateReal(UnitMoveType mtype, float rate);

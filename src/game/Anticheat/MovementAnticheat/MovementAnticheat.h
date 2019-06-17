@@ -30,6 +30,7 @@ enum CheatType
     CHEAT_TYPE_TELE_TO_TRANSPORT,
     CHEAT_TYPE_SLOW_FALL,
     CHEAT_TYPE_FIXED_Z,
+    CHEAT_TYPE_WRONG_ACK_DATA,
     CHEAT_TYPE_PENDING_ACK_DELAY,
     CHEATS_COUNT
 };
@@ -61,8 +62,11 @@ class MovementCheatData: public MovementAnticheatInterface
         void HandleCommand(ChatHandler* handler) const override;
         uint32 Update(uint32 diff, std::stringstream& reason) override;
         uint32 Finalize(std::stringstream& reason) override;
-        bool HandleAnticheatTests(Player* pPlayer, MovementInfo& movementInfo, WorldPacket* packet) override;
-        bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, WorldPacket* packet, float newSpeed) override;
+        bool HandleAnticheatTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) override;
+        bool HandleSpeedChangeAck(Unit* pMover, MovementInfo& movementInfo, float speedReceived, uint32 movementCounter, UnitMoveType moveType, PlayerMovementPendingChange const& pendingChange, uint16 opcode) override;
+        bool HandleMovementFlagChangeAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived, PlayerMovementPendingChange const& pendingChange) override;
+        bool HandleKnockbackAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, PlayerMovementPendingChange const& pendingChange) override;
+        bool HandleRootUnrootAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, bool applyReceived, PlayerMovementPendingChange const& pendingChange) override;
         bool IsTeleportAllowed(MovementInfo const& movementInfo, float& distance);
         bool CheckTeleport(Player* pPlayer, MovementInfo& movementInfo, uint32 opcode) override;
         void CheckMovementFlags(Player* pPlayer, MovementInfo& movementInfo) override;

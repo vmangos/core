@@ -8172,6 +8172,48 @@ bool Unit::HasPendingMovementChange(MovementChangeType changeType) const
     }) != m_pendingMovementChanges.end();
 }
 
+void Unit::ResolvePendingMovementChanges()
+{
+    while (!m_pendingMovementChanges.empty())
+    {
+        auto change = m_pendingMovementChanges.begin();
+        switch (change->movementChangeType)
+        {
+            case ROOT:
+                SetRootedReal(change->apply);
+                break;
+            case WATER_WALK:
+                SetWaterWalkingReal(change->apply);
+                break;
+            case SET_HOVER:
+                SetHoverReal(change->apply);
+                break;
+            case FEATHER_FALL:
+                SetFeatherFallReal(change->apply);
+                break;
+            case SPEED_CHANGE_WALK:
+                SetSpeedRateReal(MOVE_WALK, change->newValue / baseMoveSpeed[MOVE_WALK]);
+                break;
+            case SPEED_CHANGE_RUN:
+                SetSpeedRateReal(MOVE_RUN, change->newValue / baseMoveSpeed[MOVE_RUN]);
+                break;
+            case SPEED_CHANGE_RUN_BACK:
+                SetSpeedRateReal(MOVE_RUN_BACK, change->newValue / baseMoveSpeed[MOVE_RUN_BACK]);
+                break;
+            case SPEED_CHANGE_SWIM:
+                SetSpeedRateReal(MOVE_SWIM, change->newValue / baseMoveSpeed[MOVE_SWIM]);
+                break;
+            case SPEED_CHANGE_SWIM_BACK:
+                SetSpeedRateReal(MOVE_SWIM_BACK, change->newValue / baseMoveSpeed[MOVE_SWIM_BACK]);
+                break;
+            case RATE_CHANGE_TURN:
+                SetSpeedRateReal(MOVE_TURN_RATE, change->newValue / baseMoveSpeed[MOVE_TURN_RATE]);
+                break;
+        }
+        m_pendingMovementChanges.erase(change);
+    }
+}
+
 Player* Unit::GetPlayerMovingMe()
 {
     if (Player* pPossessor = GetPossessor())
