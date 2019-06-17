@@ -248,6 +248,11 @@ bool MovementCheatData::HandleSpeedChangeAck(Unit* pMover, MovementInfo& movemen
         m_clientSpeeds[moveType] = speedReceived;
     }
 
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
+        return true;
+
     Player* pOwnPlayer = m_session->GetPlayer();
 
     float speedSent = pendingChange.newValue;
@@ -286,6 +291,11 @@ bool MovementCheatData::HandleSpeedChangeAck(Unit* pMover, MovementInfo& movemen
 
 bool MovementCheatData::HandleKnockbackAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, PlayerMovementPendingChange const& pendingChange)
 {
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
+        return true;
+
     Player* pOwnPlayer = m_session->GetPlayer();
 
     if ((pendingChange.movementCounter != movementCounter || pendingChange.movementChangeType != KNOCK_BACK
@@ -312,6 +322,11 @@ bool MovementCheatData::HandleKnockbackAck(Unit* pMover, MovementInfo& movementI
 
 bool MovementCheatData::HandleRootUnrootAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, bool applyReceived, PlayerMovementPendingChange const& pendingChange)
 {
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
+        return true;
+
     Player* pOwnPlayer = m_session->GetPlayer();
     bool applySent = pendingChange.apply;
     MovementChangeType changeTypeSent = pendingChange.movementChangeType;
@@ -336,6 +351,11 @@ bool MovementCheatData::HandleRootUnrootAck(Unit* pMover, MovementInfo& movement
 
 bool MovementCheatData::HandleMovementFlagChangeAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived, PlayerMovementPendingChange const& pendingChange)
 {
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
+        return true;
+
     Player* pOwnPlayer = m_session->GetPlayer();
     bool applySent = pendingChange.apply;
     MovementChangeType changeTypeSent = pendingChange.movementChangeType;
@@ -612,6 +632,10 @@ void MovementCheatData::KnockBack(float speedxy, float speedz, float cos, float 
 
 void MovementCheatData::OnUnreachable(Unit* attacker)
 {
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
+        return;
+
     if (IsInKnockBack() || 
        (attacker->GetCharmerOrOwnerGuid() == me->GetObjectGuid()) ||
        (me->GetTransport()))
@@ -628,6 +652,10 @@ void MovementCheatData::OnUnreachable(Unit* attacker)
 
 void MovementCheatData::OnExplore(AreaEntry const* pArea)
 {
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
+        return;
+
     AddCheats(1 << CHEAT_TYPE_EXPLORE);
     if (static_cast<int32>(me->getLevel() + 10) < pArea->AreaLevel)
         AddCheats(1 << CHEAT_TYPE_EXPLORE_HIGH_LEVEL);
@@ -638,6 +666,10 @@ void MovementCheatData::OnExplore(AreaEntry const* pArea)
 
 void MovementCheatData::OnTransport(Player* plMover, ObjectGuid transportGuid)
 {
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
+        return;
+
     // Do not allow bypassing anticheat by pretending to be on a transport.
     GameObject* transportGobj = plMover->GetMap()->GetGameObject(transportGuid);
     float const maxDist2d = (plMover->GetMapId() == MAP_DEEPRUN_TRAM) ? 3000.0f : 70.0f;
@@ -939,7 +971,8 @@ void MovementCheatData::CheckMovementFlags(Player* pPlayer, MovementInfo& moveme
 void MovementCheatData::CheckPendingMovementAcks()
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
-        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_ENABLED))
+        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
         return;
 
     std::set<Unit*> clientControlSet;
