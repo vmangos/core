@@ -64,9 +64,9 @@ const char* GetMovementCheatName(CheatType flagId)
             return "WrongAckData";
         case CHEAT_TYPE_PENDING_ACK_DELAY:
             return "PendingAckDelay";
-        default:
-            return "UnknownCheat";
     }
+
+    return "UnknownCheat";
 }
 
 uint32 MovementCheatData::Update(uint32 diff, std::stringstream& reason)

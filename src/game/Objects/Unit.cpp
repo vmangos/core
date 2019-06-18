@@ -8181,7 +8181,7 @@ void Unit::CheckPendingMovementChanges()
             return;
         }
 
-        if (oldestChangeToAck.resent)
+        if (oldestChangeToAck.resent || oldestChangeToAck.movementChangeType == INVALID || oldestChangeToAck.movementChangeType == KNOCK_BACK)
         {
             pController->GetCheatData()->OnFailedToAckChange();
             ResolvePendingMovementChange(oldestChangeToAck);
@@ -8191,8 +8191,10 @@ void Unit::CheckPendingMovementChanges()
         {
             oldestChangeToAck.resent = true;
             oldestChangeToAck.time = WorldTimer::getMSTime();
+
             if (oldestChangeToAck.movementCounter < GetMovementCounter())
                 oldestChangeToAck.movementCounter = GetMovementCounterAndInc();
+
             switch (oldestChangeToAck.movementChangeType)
             {
                 case ROOT:
@@ -8208,9 +8210,6 @@ void Unit::CheckPendingMovementChanges()
                 case SPEED_CHANGE_SWIM_BACK:
                 case RATE_CHANGE_TURN:
                     MovementPacketSender::SendSpeedChangeToController(this, pController, oldestChangeToAck);
-                    return;
-                default: // don't resend knock back
-                    PopPendingMovementChange();
                     return;
             }
         }

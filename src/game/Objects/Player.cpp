@@ -1387,15 +1387,19 @@ void Player::OnDisconnected()
     uint32 cheatAction = GetCheatData()->Finalize(reason);
     GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction);
 
-    if (IsInWorld() && FindMap() && CanFreeMove())
+    if (IsInWorld() && FindMap())
     {
         float height = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ());
         if ((GetPositionZ() < height + 0.1f) && !IsInWater())
             SetStandState(UNIT_STAND_STATE_SIT);
+
         // Update position after bot takes over
         // And remove movement flags, so he doesn't run into the void
-        GetMover()->RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
-        GetMover()->SendHeartBeat(false);
+        if (!GetMover()->hasUnitState(UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED))
+        {
+            GetMover()->RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
+            GetMover()->SendHeartBeat(false);
+        }
     }
 
     // Player should be leave from channels
