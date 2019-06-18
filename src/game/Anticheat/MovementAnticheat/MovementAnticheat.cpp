@@ -7,6 +7,7 @@
 #include "GameObject.h"
 #include "WorldSession.h"
 #include "MoveSpline.h"
+#include "World.h"
 
 #include <set>
 
@@ -97,8 +98,6 @@ uint32 MovementCheatData::Finalize(std::stringstream& reason)
 
     DEBUG_UNIT(me, DEBUG_CHEAT, "Desync %ims / %fyards", m_clientDesync, m_overspeedDistance);
     updateCheckTimer = CHEATS_UPDATE_INTERVAL;
-
-    CheckPendingMovementAcks();
 
     /// Check detected cheats with DB rules
     uint32 result = ComputeCheatAction(reason);
@@ -238,144 +237,35 @@ void MovementCheatData::InitSpeeds(Unit* unit)
         m_clientSpeeds[i] = unit->GetSpeed(UnitMoveType(i));
 }
 
-bool MovementCheatData::HandleSpeedChangeAck(Unit* pMover, MovementInfo& movementInfo, float speedReceived, uint32 movementCounter, UnitMoveType moveType, PlayerMovementPendingChange const& pendingChange, uint16 opcode)
+bool MovementCheatData::HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode)
 {
-    if (Player* pMoverPlayer = pMover->ToPlayer())
-    {
-        if (me != pMoverPlayer)
-            InitNewPlayer(pMoverPlayer);
+    if (me != pPlayer)
+        InitNewPlayer(pPlayer);
 
-        // Compute anticheat generic checks - with old speed.
-        HandleAnticheatTests(pMoverPlayer, movementInfo, opcode);
-        m_clientSpeeds[moveType] = speedReceived;
-    }
-
-    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
-        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
-        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
-        return true;
-
-    Player* pOwnPlayer = m_session->GetPlayer();
-
-    float speedSent = pendingChange.newValue;
-    MovementChangeType changeType = pendingChange.movementChangeType;
-    UnitMoveType moveTypeSent;
-    switch (changeType)
-    {
-        case SPEED_CHANGE_WALK:                 moveTypeSent = MOVE_WALK; break;
-        case SPEED_CHANGE_RUN:                  moveTypeSent = MOVE_RUN; break;
-        case SPEED_CHANGE_RUN_BACK:             moveTypeSent = MOVE_RUN_BACK; break;
-        case SPEED_CHANGE_SWIM:                 moveTypeSent = MOVE_SWIM; break;
-        case SPEED_CHANGE_SWIM_BACK:            moveTypeSent = MOVE_SWIM_BACK; break;
-        case RATE_CHANGE_TURN:                  moveTypeSent = MOVE_TURN_RATE; break;
-        default:
-            sLog.outInfo("WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u sent incorrect data returned in an ack",
-                pOwnPlayer->GetName(), m_session->GetAccountId());
-            AddCheats(1 << CHEAT_TYPE_WRONG_ACK_DATA);
-            return false;
-    }
-
-    if ((pendingChange.movementCounter != movementCounter || std::fabs(speedSent - speedReceived) > 0.01f || moveTypeSent != moveType) &&
-        pendingChange.controller == pOwnPlayer->GetObjectGuid())
-    {
-        sLog.outInfo("WorldSession::HandleForceSpeedChangeAck: Player %s from account id %u sent incorrect data returned in an ack",
-            pOwnPlayer->GetName(), pOwnPlayer->GetSession()->GetAccountId());
-        sLog.outInfo("WorldSession::HandleForceSpeedChangeAck: Expected: counter %u speed %g move_type %u",
-            pendingChange.movementCounter, speedSent, moveTypeSent);
-        sLog.outInfo("WorldSession::HandleForceSpeedChangeAck: Received: counter %u speed %g move_type %u",
-            movementCounter, speedReceived, moveType);
-        AddCheats(1 << CHEAT_TYPE_WRONG_ACK_DATA);
-        return false;
-    }
-    
+    // Compute anticheat generic checks - with old speed.
+    HandleAnticheatTests(pPlayer, movementInfo, opcode);
+    m_clientSpeeds[moveType] = speedReceived;
     return true;
 }
 
-bool MovementCheatData::HandleKnockbackAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, PlayerMovementPendingChange const& pendingChange)
+void MovementCheatData::OnWrongAckData()
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
-        return true;
+        return;
 
-    Player* pOwnPlayer = m_session->GetPlayer();
-
-    if ((pendingChange.movementCounter != movementCounter || pendingChange.movementChangeType != KNOCK_BACK
-        || std::fabs(pendingChange.knockbackInfo.speedXY - movementInfo.jump.xyspeed) > 0.01f
-        || std::fabs(pendingChange.knockbackInfo.speedZ - movementInfo.jump.velocity) > 0.01f
-        || std::fabs(pendingChange.knockbackInfo.vcos - movementInfo.jump.cosAngle) > 0.01f
-        || std::fabs(pendingChange.knockbackInfo.vsin - movementInfo.jump.sinAngle) > 0.01f) &&
-        pendingChange.controller == pOwnPlayer->GetObjectGuid())
-    {
-        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Player %s from account id %u sent incorrect data returned in an ack",
-            pOwnPlayer->GetName(), m_session->GetAccountId());
-        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Expected: counter %u change_type %u xyspeed %g velocity %g vcos %g vsin %g",
-            pendingChange.movementCounter, pendingChange.movementChangeType, pendingChange.knockbackInfo.speedXY,
-            pendingChange.knockbackInfo.speedZ, pendingChange.knockbackInfo.vcos, pendingChange.knockbackInfo.vsin);
-        sLog.outInfo("WorldSession::HandleMoveKnockBackAck: Received: counter %u change_type %u xyspeed %g velocity %g vcos %g vsin %g",
-            movementCounter, KNOCK_BACK, movementInfo.jump.xyspeed, movementInfo.jump.velocity,
-            movementInfo.jump.cosAngle, movementInfo.jump.sinAngle);
-        AddCheats(1 << CHEAT_TYPE_WRONG_ACK_DATA);
-        return false;
-    }
-
-    return true;
+    AddCheats(1 << CHEAT_TYPE_WRONG_ACK_DATA);
 }
 
-bool MovementCheatData::HandleRootUnrootAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, bool applyReceived, PlayerMovementPendingChange const& pendingChange)
+void MovementCheatData::OnFailedToAckChange()
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
-        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
+        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
-        return true;
+        return;
 
-    Player* pOwnPlayer = m_session->GetPlayer();
-    bool applySent = pendingChange.apply;
-    MovementChangeType changeTypeSent = pendingChange.movementChangeType;
-    MovementChangeType changeTypeReceived = ROOT;
-
-    if ((pendingChange.movementCounter != movementCounter
-        || applySent != applyReceived
-        || changeTypeSent != changeTypeReceived) && pendingChange.controller == pOwnPlayer->GetObjectGuid())
-    {
-        sLog.outInfo("WorldSession::HandleMoveRootAck: Player %s from account id %u sent incorrect data returned in an ack",
-            pOwnPlayer->GetName(), m_session->GetAccountId());
-        sLog.outInfo("WorldSession::HandleMoveRootAck: Expected: counter %u apply %u change_type %u",
-            pendingChange.movementCounter, applySent, changeTypeSent);
-        sLog.outInfo("WorldSession::HandleMoveRootAck: Received: counter %u apply %u change_type %u",
-            movementCounter, applyReceived, changeTypeReceived);
-        AddCheats(1 << CHEAT_TYPE_WRONG_ACK_DATA);
-        return false;
-    }
-
-    return true;
-}
-
-bool MovementCheatData::HandleMovementFlagChangeAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived, PlayerMovementPendingChange const& pendingChange)
-{
-    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
-        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
-        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
-        return true;
-
-    Player* pOwnPlayer = m_session->GetPlayer();
-    bool applySent = pendingChange.apply;
-    MovementChangeType changeTypeSent = pendingChange.movementChangeType;
-
-    if ((pendingChange.controller == pOwnPlayer->GetObjectGuid()) && 
-        (pendingChange.movementCounter != movementCounter || applySent != applyReceived || changeTypeSent != changeTypeReceived))
-    {
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Player %s from account id %u kicked for incorrect data returned in an ack",
-            pOwnPlayer->GetName(), m_session->GetAccountId());
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Expected: counter %u apply %u change_type %u",
-            pendingChange.movementCounter, applySent, changeTypeSent);
-        sLog.outInfo("WorldSession::HandleMovementFlagChangeToggleAck: Received: counter %u apply %u change_type %u",
-            movementCounter, applyReceived, changeTypeReceived);
-        AddCheats(1 << CHEAT_TYPE_WRONG_ACK_DATA);
-        return false;
-    }
-
-    return true;
+    AddCheats(1 << CHEAT_TYPE_PENDING_ACK_DELAY);
 }
 
 bool IsAckOpcode(uint16 opcode)
@@ -939,13 +829,6 @@ void MovementCheatData::CheckMovementFlags(Player* pPlayer, MovementInfo& moveme
             removeMoveFlags |= MOVEFLAG_LEVITATING;
         }
 
-        // This flag is only for creatures.
-        if (currentMoveFlags & MOVEFLAG_CAN_FLY)
-        {
-            AddCheats(1 << CHEAT_TYPE_FLY_HACK_SWIM);
-            removeMoveFlags |= MOVEFLAG_CAN_FLY;
-        }
-
         if ((currentMoveFlags & MOVEFLAG_SWIMMING) && (currentMoveFlags & MOVEFLAG_FLYING))
         {
             AddCheats(1 << CHEAT_TYPE_FLY_HACK_SWIM);
@@ -975,42 +858,3 @@ void MovementCheatData::CheckMovementFlags(Player* pPlayer, MovementInfo& moveme
     }
 }
 
-void MovementCheatData::CheckPendingMovementAcks()
-{
-    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
-        !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_ENABLED) ||
-        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
-        return;
-
-    std::set<Unit*> clientControlSet;
-
-    // Own player if not possessed
-    if (m_session->GetPlayer() == m_session->GetPlayer()->GetPlayerMovingMe())
-        clientControlSet.emplace(m_session->GetPlayer());
-
-    // Another unit possessed by this player
-    if (m_session->GetPlayer() == m_session->GetPlayer()->GetMover()->GetPlayerMovingMe())
-        clientControlSet.emplace(m_session->GetPlayer()->GetMover());
-
-    for (auto pUnit : clientControlSet)
-    {
-        if (!pUnit->HasPendingMovementChange())
-            continue;
-
-        PlayerMovementPendingChange const& oldestChangeToAck = pUnit->GetPendingMovementChangesQueue().front();
-        if (WorldTimer::getMSTime() > oldestChangeToAck.time + sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_TIME))
-        {
-            if (oldestChangeToAck.movementChangeType == TELEPORT)
-                continue;
-
-            // Previous controlled didn't ack a movement change. Not our fault.
-            if (oldestChangeToAck.controller != m_session->GetPlayer()->GetObjectGuid())
-            {
-                pUnit->PopPendingMovementChange();
-                continue;
-            }
-                
-            AddCheats(1 << CHEAT_TYPE_PENDING_ACK_DELAY);
-        }
-    }
-}

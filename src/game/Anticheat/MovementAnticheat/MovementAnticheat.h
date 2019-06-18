@@ -58,20 +58,19 @@ class MovementCheatData: public MovementAnticheatInterface
         void OnUnreachable(Unit* attacker) override;
         void OnExplore(AreaEntry const* pArea) override;
         void OnTransport(Player* plMover, ObjectGuid transportGuid) override;
+        void OnWrongAckData() override;
+        void OnFailedToAckChange() override;
 
         void HandleCommand(ChatHandler* handler) const override;
         uint32 Update(uint32 diff, std::stringstream& reason) override;
         uint32 Finalize(std::stringstream& reason) override;
         bool HandleAnticheatTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) override;
-        bool HandleSpeedChangeAck(Unit* pMover, MovementInfo& movementInfo, float speedReceived, uint32 movementCounter, UnitMoveType moveType, PlayerMovementPendingChange const& pendingChange, uint16 opcode) override;
-        bool HandleMovementFlagChangeAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived, PlayerMovementPendingChange const& pendingChange) override;
-        bool HandleKnockbackAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, PlayerMovementPendingChange const& pendingChange) override;
-        bool HandleRootUnrootAck(Unit* pMover, MovementInfo& movementInfo, uint32 movementCounter, bool applyReceived, PlayerMovementPendingChange const& pendingChange) override;
+        bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode) override;
+
         bool IsTeleportAllowed(MovementInfo const& movementInfo, float& distance);
         bool CheckTeleport(Player* pPlayer, MovementInfo& movementInfo, uint32 opcode) override;
         void CheckMovementFlags(Player* pPlayer, MovementInfo& movementInfo) override;
         bool CheckForbiddenArea(MovementInfo& movementInfo) const;
-        void CheckPendingMovementAcks();
         bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) override;
         bool GetMaxAllowedDist(MovementInfo const& mi, uint32 diffMs, float &dxy, float &dz);
 

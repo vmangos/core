@@ -86,21 +86,24 @@ xxxxxToAll() method should be used on a unit controlled & moved by the server (@
 namespace MovementPacketSender
 {
         /* speed change */
-        void SendSpeedChangeToMover(Unit* unit, UnitMoveType mtype, float newRate);
+        void AddSpeedChangeToController(Unit* unit, UnitMoveType mtype, float newRate);
+        void SendSpeedChangeToController(Unit* unit, Player* mover, PlayerMovementPendingChange& pendingChange);
         void SendSpeedChangeToObservers(Unit* unit, UnitMoveType mtype, float newRate);
         void SendSpeedChangeToAll(Unit* unit, UnitMoveType mtype, float newRate);
 
         /* knocback */
-        void SendKnockBackToMover(Unit* unit, float vcos, float vsin, float speedXY, float speedZ);
+        void SendKnockBackToController(Unit* unit, float vcos, float vsin, float speedXY, float speedZ);
         void SendKnockBackToObservers(Unit* unit, float vcos, float vsin, float speedXY, float speedZ);
 
         /* movement flag change */
-        void SendMovementFlagChangeToMover(Unit* unit, MovementFlags mFlag, bool apply);
+        void AddMovementFlagChangeToController(Unit* unit, MovementFlags mFlag, bool apply);
+        void SendMovementFlagChangeToController(Unit* unit, Player* mover, PlayerMovementPendingChange& pendingChange);
         void SendMovementFlagChangeToObservers(Unit* unit, MovementFlags mFlag, bool apply);
         void SendMovementFlagChangeToAll(Unit* unit, MovementFlags mFlag, bool apply);
 
         // utility method
         MovementChangeType GetChangeTypeByMoveType(UnitMoveType moveType);
+        UnitMoveType GetMoveTypeByChangeType(MovementChangeType moveType);
 };
 
 #endif

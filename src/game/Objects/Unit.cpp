@@ -355,6 +355,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
     if (isAlive())
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, GetHealth() < GetMaxHealth() * 0.20f);
 
+    CheckPendingMovementChanges();
     UpdateSplineMovement(p_time);
     GetMotionMaster()->UpdateMotion(p_time);
     if (GetMotionMaster()->NeedsAsyncUpdate() && IsInWorld())
@@ -8151,6 +8152,71 @@ bool Unit::canDetectStealthOf(Unit const* target, float distance, bool *alert) c
     return true;
 }
 
+void Unit::CheckPendingMovementChanges()
+{
+    if (!HasPendingMovementChange())
+        return;
+
+    Player* pController = GetPlayerMovingMe();
+    if (!pController || !pController->IsInWorld() || pController->IsBeingTeleported())
+    {
+        ResolvePendingMovementChanges();
+        return;
+    }
+
+    PlayerMovementPendingChange& oldestChangeToAck = GetPendingMovementChangesQueue().front();
+    if (WorldTimer::getMSTime() > oldestChangeToAck.time + sWorld.getConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME))
+    {
+        // Previous controller didn't ack a movement change. Not our fault.
+        if (oldestChangeToAck.controller != pController->GetObjectGuid())
+        {
+            PopPendingMovementChange();
+            return;
+        }
+
+        // There is a new change for the same thing, don't resend old state.
+        if (oldestChangeToAck.movementCounter < GetLastCounterForMovementChangeType(oldestChangeToAck.movementChangeType))
+        {
+            PopPendingMovementChange();
+            return;
+        }
+
+        if (oldestChangeToAck.resent)
+        {
+            pController->GetCheatData()->OnFailedToAckChange();
+            ResolvePendingMovementChange(oldestChangeToAck);
+            PopPendingMovementChange();
+        }
+        else
+        {
+            oldestChangeToAck.resent = true;
+            oldestChangeToAck.time = WorldTimer::getMSTime();
+            if (oldestChangeToAck.movementCounter < GetMovementCounter())
+                oldestChangeToAck.movementCounter = GetMovementCounterAndInc();
+            switch (oldestChangeToAck.movementChangeType)
+            {
+                case ROOT:
+                case WATER_WALK:
+                case SET_HOVER:
+                case FEATHER_FALL:
+                    MovementPacketSender::SendMovementFlagChangeToController(this, pController, oldestChangeToAck);
+                    return;
+                case SPEED_CHANGE_WALK:
+                case SPEED_CHANGE_RUN:
+                case SPEED_CHANGE_RUN_BACK:
+                case SPEED_CHANGE_SWIM:
+                case SPEED_CHANGE_SWIM_BACK:
+                case RATE_CHANGE_TURN:
+                    MovementPacketSender::SendSpeedChangeToController(this, pController, oldestChangeToAck);
+                    return;
+                default: // don't resend knock back
+                    PopPendingMovementChange();
+                    return;
+            }
+        }
+    }
+}
+
 PlayerMovementPendingChange Unit::PopPendingMovementChange()
 {
     PlayerMovementPendingChange result = m_pendingMovementChanges.front();
@@ -8160,6 +8226,7 @@ PlayerMovementPendingChange Unit::PopPendingMovementChange()
 
 void Unit::PushPendingMovementChange(PlayerMovementPendingChange newChange)
 {
+    m_lastMovementChangeCounterPerType[newChange.movementChangeType] = newChange.movementCounter;
     m_pendingMovementChanges.emplace_back(std::move(newChange));
 }
 
@@ -8177,41 +8244,139 @@ void Unit::ResolvePendingMovementChanges()
     while (!m_pendingMovementChanges.empty())
     {
         auto change = m_pendingMovementChanges.begin();
-        switch (change->movementChangeType)
-        {
-            case ROOT:
-                SetRootedReal(change->apply);
-                break;
-            case WATER_WALK:
-                SetWaterWalkingReal(change->apply);
-                break;
-            case SET_HOVER:
-                SetHoverReal(change->apply);
-                break;
-            case FEATHER_FALL:
-                SetFeatherFallReal(change->apply);
-                break;
-            case SPEED_CHANGE_WALK:
-                SetSpeedRateReal(MOVE_WALK, change->newValue / baseMoveSpeed[MOVE_WALK]);
-                break;
-            case SPEED_CHANGE_RUN:
-                SetSpeedRateReal(MOVE_RUN, change->newValue / baseMoveSpeed[MOVE_RUN]);
-                break;
-            case SPEED_CHANGE_RUN_BACK:
-                SetSpeedRateReal(MOVE_RUN_BACK, change->newValue / baseMoveSpeed[MOVE_RUN_BACK]);
-                break;
-            case SPEED_CHANGE_SWIM:
-                SetSpeedRateReal(MOVE_SWIM, change->newValue / baseMoveSpeed[MOVE_SWIM]);
-                break;
-            case SPEED_CHANGE_SWIM_BACK:
-                SetSpeedRateReal(MOVE_SWIM_BACK, change->newValue / baseMoveSpeed[MOVE_SWIM_BACK]);
-                break;
-            case RATE_CHANGE_TURN:
-                SetSpeedRateReal(MOVE_TURN_RATE, change->newValue / baseMoveSpeed[MOVE_TURN_RATE]);
-                break;
-        }
+        ResolvePendingMovementChange(*change);
         m_pendingMovementChanges.erase(change);
     }
+}
+
+void Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change)
+{
+    switch (change.movementChangeType)
+    {
+        case ROOT:
+            SetRootedReal(change.apply);
+            break;
+        case WATER_WALK:
+            SetWaterWalkingReal(change.apply);
+            break;
+        case SET_HOVER:
+            SetHoverReal(change.apply);
+            break;
+        case FEATHER_FALL:
+            SetFeatherFallReal(change.apply);
+            break;
+        case SPEED_CHANGE_WALK:
+            SetSpeedRateReal(MOVE_WALK, change.newValue / baseMoveSpeed[MOVE_WALK]);
+            break;
+        case SPEED_CHANGE_RUN:
+            SetSpeedRateReal(MOVE_RUN, change.newValue / baseMoveSpeed[MOVE_RUN]);
+            break;
+        case SPEED_CHANGE_RUN_BACK:
+            SetSpeedRateReal(MOVE_RUN_BACK, change.newValue / baseMoveSpeed[MOVE_RUN_BACK]);
+            break;
+        case SPEED_CHANGE_SWIM:
+            SetSpeedRateReal(MOVE_SWIM, change.newValue / baseMoveSpeed[MOVE_SWIM]);
+            break;
+        case SPEED_CHANGE_SWIM_BACK:
+            SetSpeedRateReal(MOVE_SWIM_BACK, change.newValue / baseMoveSpeed[MOVE_SWIM_BACK]);
+            break;
+        case RATE_CHANGE_TURN:
+            SetSpeedRateReal(MOVE_TURN_RATE, change.newValue / baseMoveSpeed[MOVE_TURN_RATE]);
+            break;
+    }
+}
+
+bool Unit::FindPendingMovementFlagChange(uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived)
+{
+    for (auto pendingChange = m_pendingMovementChanges.begin(); pendingChange != m_pendingMovementChanges.end(); pendingChange++)
+    {
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        movementCounter = pendingChange->movementCounter;
+#endif
+
+        if (pendingChange->movementCounter != movementCounter || pendingChange->apply != applyReceived || pendingChange->movementChangeType != changeTypeReceived)
+            continue;
+
+        m_pendingMovementChanges.erase(pendingChange);
+        return true;
+    }
+
+    return false;
+}
+
+bool Unit::FindPendingMovementRootChange(uint32 movementCounter, bool applyReceived)
+{
+    for (auto pendingChange = m_pendingMovementChanges.begin(); pendingChange != m_pendingMovementChanges.end(); pendingChange++)
+    {
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        movementCounter = pendingChange->movementCounter;
+#endif
+
+        if (pendingChange->movementCounter != movementCounter || pendingChange->apply != applyReceived || pendingChange->movementChangeType != ROOT)
+            continue;
+
+        m_pendingMovementChanges.erase(pendingChange);
+        return true;
+    }
+
+    return false;
+}
+
+bool Unit::FindPendingMovementKnockbackChange(MovementInfo& movementInfo, uint32 movementCounter)
+{
+    for (auto pendingChange = m_pendingMovementChanges.begin(); pendingChange != m_pendingMovementChanges.end(); pendingChange++)
+    {
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        movementCounter = pendingChange->movementCounter;
+#endif
+
+        if (pendingChange->movementCounter != movementCounter || pendingChange->movementChangeType != KNOCK_BACK
+            || std::fabs(pendingChange->knockbackInfo.speedXY - movementInfo.jump.xyspeed) > 0.01f
+            || std::fabs(pendingChange->knockbackInfo.speedZ - movementInfo.jump.velocity) > 0.01f
+            || std::fabs(pendingChange->knockbackInfo.vcos - movementInfo.jump.cosAngle) > 0.01f
+            || std::fabs(pendingChange->knockbackInfo.vsin - movementInfo.jump.sinAngle) > 0.01f)
+            continue;
+
+        m_pendingMovementChanges.erase(pendingChange);
+        return true;
+    }
+
+    return false;
+}
+
+bool Unit::FindPendingMovementSpeedChange(float speedReceived, uint32 movementCounter, UnitMoveType moveType)
+{
+    for (auto pendingChange = m_pendingMovementChanges.begin(); pendingChange != m_pendingMovementChanges.end(); pendingChange++)
+    {
+        float speedSent = pendingChange->newValue;
+        UnitMoveType moveTypeSent;
+        switch (pendingChange->movementChangeType)
+        {
+            case SPEED_CHANGE_WALK:                 moveTypeSent = MOVE_WALK; break;
+            case SPEED_CHANGE_RUN:                  moveTypeSent = MOVE_RUN; break;
+            case SPEED_CHANGE_RUN_BACK:             moveTypeSent = MOVE_RUN_BACK; break;
+            case SPEED_CHANGE_SWIM:                 moveTypeSent = MOVE_SWIM; break;
+            case SPEED_CHANGE_SWIM_BACK:            moveTypeSent = MOVE_SWIM_BACK; break;
+            case RATE_CHANGE_TURN:                  moveTypeSent = MOVE_TURN_RATE; break;
+            default:
+                continue;
+        }
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        movementCounter = pendingChange->movementCounter;
+#endif
+
+        if (pendingChange->movementCounter != movementCounter || std::fabs(speedSent - speedReceived) > 0.01f || moveTypeSent != moveType)
+            continue;
+
+        m_pendingMovementChanges.erase(pendingChange);
+        return true;
+    }
+
+    return false;
 }
 
 Player* Unit::GetPlayerMovingMe()
@@ -8432,7 +8597,7 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate)
         return;
 
     if (IsMovedByPlayer() && IsInWorld())
-        MovementPacketSender::SendSpeedChangeToMover(this, mtype, rate);
+        MovementPacketSender::AddSpeedChangeToController(this, mtype, rate);
     else if (IsMovedByPlayer() && !IsInWorld()) // (1)
         SetSpeedRateReal(mtype, rate);
     else // <=> if(!IsMovedByPlayer())
@@ -8466,7 +8631,7 @@ void Unit::SetRooted(bool apply)
         StopMoving(); // @todo: this method needs a rework to work well with players.
     
     if (IsMovedByPlayer() && IsInWorld())
-        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEFLAG_ROOT, apply);
+        MovementPacketSender::AddMovementFlagChangeToController(this, MOVEFLAG_ROOT, apply);
     else if (IsMovedByPlayer() && !IsInWorld())
         SetRootedReal(apply);
     else
@@ -8490,7 +8655,7 @@ void Unit::SetWaterWalking(bool apply)
         return;
 
     if (IsMovedByPlayer() && IsInWorld())
-        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEFLAG_WATERWALKING, apply);
+        MovementPacketSender::AddMovementFlagChangeToController(this, MOVEFLAG_WATERWALKING, apply);
     else if (IsMovedByPlayer() && !IsInWorld())
         SetWaterWalkingReal(apply);
     else
@@ -8514,7 +8679,7 @@ void Unit::SetFeatherFall(bool apply)
         return;
 
     if (IsMovedByPlayer() && IsInWorld())
-        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEFLAG_SAFE_FALL, apply);
+        MovementPacketSender::AddMovementFlagChangeToController(this, MOVEFLAG_SAFE_FALL, apply);
     else if (IsMovedByPlayer() && !IsInWorld())
         SetFeatherFallReal(apply);
     else
@@ -8538,7 +8703,7 @@ void Unit::SetHover(bool apply)
         return;
 
     if (IsMovedByPlayer() && IsInWorld())
-        MovementPacketSender::SendMovementFlagChangeToMover(this, MOVEFLAG_HOVER, apply);
+        MovementPacketSender::AddMovementFlagChangeToController(this, MOVEFLAG_HOVER, apply);
     else if (IsMovedByPlayer() && !IsInWorld())
         SetHoverReal(apply);
     else
@@ -11016,7 +11181,7 @@ void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
     {
         float vsin = sin(angle);
         float vcos = cos(angle);
-        MovementPacketSender::SendKnockBackToMover(this, vcos, vsin, horizontalSpeed, -verticalSpeed); // !! notice the - sign in front of speedZ !!
+        MovementPacketSender::SendKnockBackToController(this, vcos, vsin, horizontalSpeed, -verticalSpeed); // !! notice the - sign in front of speedZ !!
         GetPlayerMovingMe()->GetCheatData()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
     }
 }

@@ -1835,10 +1835,6 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.PendingAckDelay.Time
-#        Description: Time in milliseconds players have to acknowledge a change.
-#        Default:     5000
-#
 #    Anticheat.PendingAckDelay.Threshold
 #        Description: Detections needed to trigger a penalty.
 #        Default:     1
@@ -1922,9 +1918,11 @@ Anticheat.WrongAckData.Enable = 1
 Anticheat.WrongAckData.Threshold = 1
 Anticheat.WrongAckData.Penalty = 7
 Anticheat.PendingAckDelay.Enable = 1
-Anticheat.PendingAckDelay.Time = 5000
 Anticheat.PendingAckDelay.Threshold = 1
 Anticheat.PendingAckDelay.Penalty = 7
+
+# Time to wait for movement change ack
+Movement.PendingAckResponseTime = 2000
 
 ###################################################################################################################
 # GAME MASTER SETTINGS
