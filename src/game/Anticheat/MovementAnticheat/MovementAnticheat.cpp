@@ -9,8 +9,6 @@
 #include "MoveSpline.h"
 #include "World.h"
 
-#include <set>
-
 namespace Movement
 {
 extern float computeFallElevation(float time, bool safeFall, float initialSpeed);
