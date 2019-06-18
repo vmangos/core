@@ -243,9 +243,9 @@ bool MovementCheatData::HandleSpeedChangeAck(Player* pPlayer, MovementInfo& move
         InitNewPlayer(pPlayer);
 
     // Compute anticheat generic checks - with old speed.
-    HandleAnticheatTests(pPlayer, movementInfo, opcode);
+    bool result = HandleAnticheatTests(pPlayer, movementInfo, opcode);
     m_clientSpeeds[moveType] = speedReceived;
-    return true;
+    return result;
 }
 
 void MovementCheatData::OnWrongAckData()
