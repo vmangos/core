@@ -8181,8 +8181,17 @@ void Unit::CheckPendingMovementChanges()
             return;
         }
 
-        if (oldestChangeToAck.resent || oldestChangeToAck.movementChangeType == INVALID || oldestChangeToAck.movementChangeType == KNOCK_BACK)
+        // Not resendable change.
+        if (oldestChangeToAck.movementChangeType == INVALID || oldestChangeToAck.movementChangeType == KNOCK_BACK)
         {
+            pController->GetCheatData()->OnFailedToAckChange();
+            PopPendingMovementChange();
+            return;
+        }
+
+        if (oldestChangeToAck.resent)
+        {
+            // Change was resent but still no reply. Enforce the flags.
             pController->GetCheatData()->OnFailedToAckChange();
             ResolvePendingMovementChange(oldestChangeToAck);
             PopPendingMovementChange();
