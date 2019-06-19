@@ -319,7 +319,7 @@ bool MovementCheatData::HandleAnticheatTests(Player* pPlayer, MovementInfo& move
         m_jumpInitialSpeed = std::max(m_jumpInitialSpeed, 7.0f);
     }
 
-    if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > GetClientSpeed(GetMoveTypeFromLastFlags()) + 0.0001f)
+    if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (GetClientSpeed(GetMoveTypeFromLastFlags()) + 0.0001f))
         APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP);
 
     // Not allowed to change jump speed while jumping
