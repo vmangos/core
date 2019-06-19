@@ -1365,18 +1365,13 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             m_position.y = y;
             m_position.z = z;
             m_position.o = o;
-            /*
-            if (Unit* c = SummonCreature(1, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 5000))
-            {
-                c->SetFly(true);
-                c->SendHeartBeat();
-            }*/
         }
 
         // Anticheat sanction
         std::stringstream reason;
         uint32 cheatAction = GetCheatData()->Update(p_time, reason);
-        GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction);
+        if (cheatAction)
+            GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
     }
 }
 
@@ -1385,7 +1380,8 @@ void Player::OnDisconnected()
     // Anticheat sanction
     std::stringstream reason;
     uint32 cheatAction = GetCheatData()->Finalize(reason);
-    GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction);
+    if (cheatAction)
+        GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
 
     if (IsInWorld() && FindMap())
     {

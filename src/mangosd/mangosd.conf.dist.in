@@ -1529,6 +1529,12 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #
+#    Anticheat.BanDuration
+#        Description: Time (in seconds) an account will be banned if Penalty is set
+#                     to ban.
+#        Default:     86400 - (24 hours)
+#                     0     - (Permanent ban)
+#
 #    Anticheat.LogData
 #        Description: Save the result of every anticheat tick in the database.
 #        Default:     0 - (Disabled)
@@ -1659,7 +1665,7 @@ Warden.ModuleDir             = "warden_modules"
 #
 #    Anticheat.MovingWhileRooted.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     3
+#        Default:     5
 #
 #    Anticheat.MovingWhileRooted.Penalty
 #        Description: Action to take upon failing this check.
@@ -1824,7 +1830,7 @@ Warden.ModuleDir             = "warden_modules"
 #
 #    Anticheat.WrongAckData.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     1
+#        Default:     3
 #
 #    Anticheat.WrongAckData.Penalty
 #        Description: Action to take upon failing this check.
@@ -1837,7 +1843,7 @@ Warden.ModuleDir             = "warden_modules"
 #
 #    Anticheat.PendingAckDelay.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     1
+#        Default:     3
 #
 #    Anticheat.PendingAckDelay.Penalty
 #        Description: Action to take upon failing this check.
@@ -1848,6 +1854,7 @@ Warden.ModuleDir             = "warden_modules"
 Anticheat.Enable = 1
 Anticheat.PlayersOnly = 1
 Anticheat.NotifyCheaters = 0
+Anticheat.BanDuration = 86400
 Anticheat.LogData = 0
 Anticheat.MaxAllowedDesync = 0
 Anticheat.MultiJump.Enable = 1
@@ -1877,7 +1884,7 @@ Anticheat.FlyHack.Enable = 1
 Anticheat.FlyHack.Threshold = 3
 Anticheat.FlyHack.Penalty = 7
 Anticheat.MovingWhileRooted.Enable = 1
-Anticheat.MovingWhileRooted.Threshold = 3
+Anticheat.MovingWhileRooted.Threshold = 5
 Anticheat.MovingWhileRooted.Penalty = 7
 Anticheat.OverpspeedDistance.Enable = 1
 Anticheat.OverpspeedDistance.Threshold = 30
@@ -1915,10 +1922,10 @@ Anticheat.FixedZ.Enable = 1
 Anticheat.FixedZ.Threshold = 1
 Anticheat.FixedZ.Penalty = 7
 Anticheat.WrongAckData.Enable = 1
-Anticheat.WrongAckData.Threshold = 1
+Anticheat.WrongAckData.Threshold = 3
 Anticheat.WrongAckData.Penalty = 7
 Anticheat.PendingAckDelay.Enable = 1
-Anticheat.PendingAckDelay.Threshold = 1
+Anticheat.PendingAckDelay.Threshold = 3
 Anticheat.PendingAckDelay.Penalty = 7
 
 # Time to wait for movement change ack

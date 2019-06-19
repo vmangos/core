@@ -8186,6 +8186,7 @@ void Unit::CheckPendingMovementChanges()
             pController->GetCheatData()->OnFailedToAckChange();
             ResolvePendingMovementChange(oldestChangeToAck);
             PopPendingMovementChange();
+            SendHeartBeat(true);
         }
         else
         {
@@ -8253,6 +8254,8 @@ void Unit::ResolvePendingMovementChange(PlayerMovementPendingChange& change)
     switch (change.movementChangeType)
     {
         case ROOT:
+            if (change.apply)
+                RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING);
             SetRootedReal(change.apply);
             break;
         case WATER_WALK:

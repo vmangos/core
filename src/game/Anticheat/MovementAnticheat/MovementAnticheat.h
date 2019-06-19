@@ -73,15 +73,16 @@ class MovementCheatData: public MovementAnticheatInterface
         bool CheckForbiddenArea(MovementInfo& movementInfo) const;
         bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) override;
         bool GetMaxAllowedDist(MovementInfo const& mi, uint32 diffMs, float &dxy, float &dz);
+        UnitMoveType GetMoveTypeFromLastFlags();
 
         MovementInfo& GetLastMovementInfo();
         bool IsInKnockBack() const override { return m_knockBack; }
         void KnockBack(float speedxy, float speedz, float cos, float sin) override;
         float GetClientSpeed(UnitMoveType m) const { return m_clientSpeeds[m]; }
 
-        uint32 updateCheckTimer = 0;
-        uint32 cheatOccuranceTick[CHEATS_COUNT];    // per anticheat tick (not world/map tick)
-        uint32 cheatOccuranceTotal[CHEATS_COUNT];
+        uint32 m_updateCheckTimer = 0;
+        uint32 m_cheatOccuranceTick[CHEATS_COUNT];    // per anticheat tick (not world/map tick)
+        uint32 m_cheatOccuranceTotal[CHEATS_COUNT];
 
         bool m_knockBack = false;
         uint32 m_jumpCount = 0;
