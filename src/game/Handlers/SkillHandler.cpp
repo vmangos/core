@@ -75,7 +75,7 @@ void WorldSession::HandleUnlearnSkillOpcode(WorldPacket & recv_data)
     {
         std::stringstream reason;
         reason << "Attempt to unlearn not unlearnable skill #" << skill_id;
-        ProcessAnticheatAction("SAC", reason.str().c_str(), CHEAT_ACTION_LOG);
+        ProcessAnticheatAction("PassiveAnticheat", reason.str().c_str(), CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
         return;
     }
     GetPlayer()->SetSkill(skill_id, 0, 0);

@@ -99,7 +99,6 @@ enum LogFile
     LOG_LEVELUP,
     LOG_PERFORMANCE,
     LOG_MONEY_TRADES,
-    LOG_ANTICHEAT,
     LOG_GM_CRITICAL,
     LOG_CHAT_SPAM,
     LOG_EXPLOITS,
@@ -179,6 +178,8 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
                                                             // log level >= 3
         void outDebug( const char * str, ... )       ATTR_PRINTF(2,3);
         void outWarden(const char * wrd, ...)        ATTR_PRINTF(2,3);
+        void outWardenDebug(const char * wrd, ...)   ATTR_PRINTF(2,3);
+        void outAnticheat(const char* detector, const char* player, const char* reason, const char* penalty);
 
         void outErrorDb();                                  // any log level
                                                             // any log level
@@ -214,6 +215,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         FILE* gmLogfile;
         FILE* dberLogfile;
         FILE* wardenLogfile;
+        FILE* anticheatLogfile;
         FILE* worldLogfile;
         FILE* nostalriusLogFile;
         FILE* honorLogfile;
@@ -227,6 +229,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         LogLevel m_logFileLevel;
         bool m_colored;
         bool m_includeTime;
+        bool m_wardenDebug;
         Color m_colors[LOG_TYPE_MAX];
         uint32 m_logFilter;
 

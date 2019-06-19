@@ -2946,9 +2946,6 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
             pTarget->SetRooted(true);
         pTarget->StopMoving();
         pTarget->SetWalk(pCaster->IsWalking());
-
-        if (pTarget->IsCreature() && pTarget->IsRooted())
-            MovementPacketSender::SendMovementFlagChangeToMover(pTarget, MOVEFLAG_ROOT, true);
     }
     else
     {
@@ -3008,7 +3005,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
         }
 
         if (pTarget->IsPlayer() && pTarget->IsRooted())
-            MovementPacketSender::SendMovementFlagChangeToMover(pTarget, MOVEFLAG_ROOT, true);
+            MovementPacketSender::AddMovementFlagChangeToController(pTarget, MOVEFLAG_ROOT, true);
     }
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
@@ -3067,7 +3064,7 @@ void Player::ModPossessPet(Pet* pPet, bool apply, AuraRemoveMode m_removeMode)
         }
 
         if (pPet->IsRooted())
-            MovementPacketSender::SendMovementFlagChangeToMover(pPet, MOVEFLAG_ROOT, true);
+            MovementPacketSender::AddMovementFlagChangeToController(pPet, MOVEFLAG_ROOT, true);
     }
     else
     {

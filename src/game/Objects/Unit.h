@@ -72,7 +72,7 @@ enum MovementChangeType
     SPEED_CHANGE_SWIM_BACK,
     RATE_CHANGE_TURN,
 
-    TELEPORT,
+    //TELEPORT, - not used
     KNOCK_BACK
 };
 
@@ -81,9 +81,11 @@ struct PlayerMovementPendingChange
     uint32 movementCounter = 0;
     MovementChangeType movementChangeType = INVALID;
     uint32 time = 0;
-
     float newValue = 0.0f; // used if speed or height change
     bool apply = false; // used if movement flag change
+    bool resent = false; // sending change again because client didn't reply
+    ObjectGuid controller;
+
     struct KnockbackInfo
     {
         float vcos = 0.0f;
@@ -1538,8 +1540,13 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // when a player controls this unit, and when change is made to this unit which requires an ack from the client to be acted (change of speed for example), this movementCounter is incremented
         uint32 m_movementCounter = 0;
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
+        std::map<MovementChangeType, uint32> m_lastMovementChangeCounterPerType;
+
+        
 
     public:
+        std::deque<PlayerMovementPendingChange>& GetPendingMovementChangesQueue()  { return m_pendingMovementChanges; }
+
         void SetRooted(bool apply);
         void SetRootedReal(bool apply);
         bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
@@ -1568,11 +1575,22 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         uint32 GetMovementCounterAndInc() { return m_movementCounter++; }
         uint32 GetMovementCounter() const { return m_movementCounter; }
+        uint32 GetLastCounterForMovementChangeType(MovementChangeType changeType)
+        {
+            return m_lastMovementChangeCounterPerType[changeType];
+        }
 
         PlayerMovementPendingChange PopPendingMovementChange();
         void PushPendingMovementChange(PlayerMovementPendingChange newChange);
         bool HasPendingMovementChange() const { return !m_pendingMovementChanges.empty(); }
         bool HasPendingMovementChange(MovementChangeType changeType) const;
+        void ResolvePendingMovementChanges();
+        void ResolvePendingMovementChange(PlayerMovementPendingChange& change);
+        bool FindPendingMovementFlagChange(uint32 movementCounter, bool applyReceived, MovementChangeType changeTypeReceived);
+        bool FindPendingMovementRootChange(uint32 movementCounter, bool applyReceived);
+        bool FindPendingMovementKnockbackChange(MovementInfo& movementInfo, uint32 movementCounter);
+        bool FindPendingMovementSpeedChange(float speedReceived, uint32 movementCounter, UnitMoveType moveType);
+        void CheckPendingMovementChanges();
 
         void SetSpeedRate(UnitMoveType mtype, float rate);
         void SetSpeedRateReal(UnitMoveType mtype, float rate);

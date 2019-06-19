@@ -272,7 +272,7 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
     // Improved path to victim future estimated position
     if (Player* victimPlayer = victim.ToPlayer())
     {
-        PlayerAnticheatInterface* data = victimPlayer->GetCheatData();
+        MovementAnticheatInterface* data = victimPlayer->GetCheatData();
         if ((data->InterpolateMovement(victimPlayer->m_movementInfo, 1000, victimSpd.x, victimSpd.y, victimSpd.z, o)) &&
                 (data->InterpolateMovement(victimPlayer->m_movementInfo, 0, victimPos.x, victimPos.y, victimPos.z, o)))
         {
