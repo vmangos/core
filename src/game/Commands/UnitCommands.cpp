@@ -262,20 +262,30 @@ bool ChatHandler::HandlePossessCommand(char *args)
     return true;
 }
 
-bool ChatHandler::HandleAuraCommand(char* args)
+//.auraname spell player duration
+bool ChatHandler::HandleNameAuraCommand(char* args)
 {
-    Unit *target = GetSelectedUnit();
-    if (!target)
-    {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
     // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
     uint32 spellID = ExtractSpellIdFromLink(&args);
+    if (!spellID)
+        return false;
 
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellID);
+    char* nameStr = ExtractArg(&args);
+    Player* target;
+    ObjectGuid target_guid;
+    std::string target_name;
+    if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
+        return false;
+
+    // Aura duration in seconds
+    int32 duration = 0;
+    ExtractInt32(&args, duration);
+    return HandleAuraHelper(spellID, duration, target);
+}
+
+bool ChatHandler::HandleAuraHelper(uint32 spellID, int32 duration, Unit* unit)
+{
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellID);
     if (!spellInfo)
         return false;
 
@@ -287,11 +297,10 @@ bool ChatHandler::HandleAuraCommand(char* args)
         return false;
     }
 
-    SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer());
 
-    // Aura duration in seconds
-    int32 duration = 0;
-    ExtractInt32(&args, duration);
+    SpellAuraHolder* holder = CreateSpellAuraHolder(spellInfo, unit, m_session->GetPlayer());
+
+
     if (duration > 0)
         holder->SetAuraDuration(duration * IN_MILLISECONDS);
 
@@ -304,14 +313,32 @@ bool ChatHandler::HandleAuraCommand(char* args)
             eff == SPELL_EFFECT_APPLY_AURA ||
             eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
         {
-            Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, target);
+            Aura* aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, unit);
             holder->AddAura(aur, SpellEffectIndex(i));
         }
     }
-    if (!target->AddSpellAuraHolder(holder))
+    if (!unit->AddSpellAuraHolder(holder))
         holder = nullptr;
-
     return true;
+}
+
+bool ChatHandler::HandleAuraCommand(char* args)
+{
+    Unit* target = GetSelectedUnit();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+    uint32 spellID = ExtractSpellIdFromLink(&args);
+    // Aura duration in seconds
+    int32 duration = 0;
+    ExtractInt32(&args, duration);
+
+    return HandleAuraHelper(spellID, duration, target);
 }
 
 bool ChatHandler::HandleUnAuraCommand(char* args)
@@ -1758,9 +1785,16 @@ bool ChatHandler::HandleMovegensCommand(char* /*args*/)
     return true;
 }
 
+// .cooldown <spell_id_or_0> <name>
 bool ChatHandler::HandleCooldownCommand(char* args)
 {
+    uint32 spell_id = ExtractSpellIdFromLink(&args);   
+    std::string name = ExtractPlayerNameFromLink(&args);
     Unit* target = GetSelectedUnit();
+
+    if (!name.empty())
+        target = sObjectMgr.GetPlayer(name.c_str());
+
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -1770,36 +1804,46 @@ bool ChatHandler::HandleCooldownCommand(char* args)
 
     std::string tNameLink = target->ToPlayer() ? GetNameLink(target->ToPlayer()) : target->GetName();
 
-    if (!*args)
-    {
+    if (!spell_id) {
         target->RemoveAllSpellCooldown();
         PSendSysMessage(LANG_REMOVEALL_COOLDOWN, tNameLink.c_str());
+        return true;
     }
-    else
+
+    if (!sSpellMgr.GetSpellEntry(spell_id))
     {
-        // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-        uint32 spell_id = ExtractSpellIdFromLink(&args);
-        if (!spell_id)
-            return false;
-
-        if (!sSpellMgr.GetSpellEntry(spell_id))
-        {
-            PSendSysMessage(LANG_UNKNOWN_SPELL, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        target->RemoveSpellCooldown(spell_id, true);
-        PSendSysMessage(LANG_REMOVE_COOLDOWN, spell_id, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
+        PSendSysMessage(LANG_UNKNOWN_SPELL, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
+        SetSentErrorMessage(true);
+        return false;
     }
+
+    target->RemoveSpellCooldown(spell_id, true);
+    PSendSysMessage(LANG_REMOVE_COOLDOWN, spell_id, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
     return true;
+}
+
+
+bool ChatHandler::HandleNameDieCommand(char* args)
+{
+    char* nameStr = ExtractArg(&args);
+    Player* target;
+    ObjectGuid target_guid;
+    std::string target_name;
+    if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
+        return false;
+
+    return HandleDieHelper(target);
 }
 
 bool ChatHandler::HandleDieCommand(char* /*args*/)
 {
     Unit* target = GetSelectedUnit();
+    return HandleDieHelper(target);
+}
 
-    if (!target || !m_session->GetPlayer()->GetSelectionGuid())
+bool ChatHandler::HandleDieHelper(Unit* target)
+{
+    if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         SetSentErrorMessage(true);
