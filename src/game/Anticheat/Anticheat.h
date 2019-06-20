@@ -24,7 +24,6 @@ enum CheatAction
     CHEAT_ACTION_KICK           = 0x04,
     CHEAT_ACTION_BAN_ACCOUNT    = 0x08,
     CHEAT_ACTION_BAN_IP_ACCOUNT = 0x10,
-    CHEAT_ACTION_TELEPORT_BACK  = 0x20,
     CHEAT_ACTION_MUTE_PUB_CHANS = 0x40, // Mutes the account from public channels
     CHEAT_MAX_ACTIONS,
 };
@@ -75,8 +74,8 @@ class MovementAnticheatInterface
         virtual bool HandleAnticheatTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
         virtual bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode) { return true; }
         
-        virtual bool CheckTeleport(Player* pPlayer, MovementInfo& movementInfo, uint32 opcode) { return true; }
-        virtual void CheckMovementFlags(Player* pPlayer, MovementInfo& movementInfo) { }
+        virtual bool CheckTeleport(Player* pPlayer, MovementInfo const& movementInfo, uint32 opcode) { return true; }
+        virtual bool HandleMovementFlags(Player* pPlayer, MovementInfo& movementInfo) { return true; }
 
         virtual void InitSpeeds(Unit* unit) {}
         virtual bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) { return true; }  

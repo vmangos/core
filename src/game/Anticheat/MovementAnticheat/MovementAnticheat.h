@@ -9,29 +9,31 @@
 
 enum CheatType
 {
-    CHEAT_TYPE_WATER_WALK,
-    CHEAT_TYPE_FORBIDDEN,
-    CHEAT_TYPE_MULTIJUMP,
-    CHEAT_TYPE_PVE_FLYHACK,
     CHEAT_TYPE_TIME_BACK,
+    CHEAT_TYPE_NULL_CLIENT_TIME,
+    CHEAT_TYPE_SKIPPED_HEARTBEATS,
+    CHEAT_TYPE_DESYNC,
+    CHEAT_TYPE_NUM_DESYNC,
+    CHEAT_TYPE_OVERSPEED_DIST,
+    CHEAT_TYPE_OVERSPEED_Z,
     CHEAT_TYPE_OVERSPEED_JUMP,
     CHEAT_TYPE_JUMP_SPEED_CHANGE,
+    CHEAT_TYPE_MULTIJUMP,
+    CHEAT_TYPE_PVE_FLYHACK,
     CHEAT_TYPE_FLY_HACK_SWIM,
-    CHEAT_TYPE_NULL_CLIENT_TIME,
-    CHEAT_TYPE_ROOT_MOVE,
-    CHEAT_TYPE_OVERSPEED_DIST,
-    CHEAT_TYPE_DESYNC,
-    CHEAT_TYPE_EXPLORE,
-    CHEAT_TYPE_EXPLORE_HIGH_LEVEL,
-    CHEAT_TYPE_OVERSPEED_Z,
-    CHEAT_TYPE_SKIPPED_HEARTBEATS,
-    CHEAT_TYPE_NUM_DESYNC,
+    CHEAT_TYPE_TELEPORT,
+    CHEAT_TYPE_TELEPORT_TRANSPORT,
     CHEAT_TYPE_FAKE_TRANSPORT,
-    CHEAT_TYPE_TELE_TO_TRANSPORT,
+    CHEAT_TYPE_WATER_WALK,
     CHEAT_TYPE_SLOW_FALL,
+    CHEAT_TYPE_HOVER,
     CHEAT_TYPE_FIXED_Z,
+    CHEAT_TYPE_ROOT_MOVE,
     CHEAT_TYPE_WRONG_ACK_DATA,
     CHEAT_TYPE_PENDING_ACK_DELAY,
+    CHEAT_TYPE_EXPLORE,
+    CHEAT_TYPE_EXPLORE_HIGH_LEVEL,
+    CHEAT_TYPE_FORBIDDEN_AREA,
     CHEATS_COUNT
 };
 
@@ -53,7 +55,7 @@ class MovementCheatData: public MovementAnticheatInterface
 
         void AddCheats(uint32 cheats, uint32 count = 1) override;
         void StoreCheat(uint32 type, uint32 count = 1);
-        uint32 ComputeCheatAction(std::stringstream& reason) const;
+        uint32 ComputeCheatAction(std::stringstream& reason);
 
         void OnUnreachable(Unit* attacker) override;
         void OnExplore(AreaEntry const* pArea) override;
@@ -68,9 +70,9 @@ class MovementCheatData: public MovementAnticheatInterface
         bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode) override;
 
         bool IsTeleportAllowed(MovementInfo const& movementInfo, float& distance);
-        bool CheckTeleport(Player* pPlayer, MovementInfo& movementInfo, uint32 opcode) override;
-        void CheckMovementFlags(Player* pPlayer, MovementInfo& movementInfo) override;
-        bool CheckForbiddenArea(MovementInfo& movementInfo) const;
+        bool CheckTeleport(Player* pPlayer, MovementInfo const& movementInfo, uint32 opcode) override;
+        bool HandleMovementFlags(Player* pPlayer, MovementInfo& movementInfo) override;
+        bool CheckForbiddenArea(MovementInfo const& movementInfo) const;
         bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) override;
         bool GetMaxAllowedDist(MovementInfo const& mi, uint32 diffMs, float &dxy, float &dz);
         UnitMoveType GetMoveTypeFromLastFlags();

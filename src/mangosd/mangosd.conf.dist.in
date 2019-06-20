@@ -1544,68 +1544,6 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Client time desynchronization allowed when doing movement interpolation.
 #        Default:     0
 #
-#    Anticheat.MultiJump.Enable
-#        Description: Check for players jumping while still in the air.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.MultiJump.Threshold
-#        Description: Detections needed to trigger a penalty.
-#        Default:     2
-#
-#    Anticheat.MultiJump.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     7 - Log, Report to GM, Kick
-#
-#    Anticheat.SpeedHack.Enable
-#        Description: Check for players moving too fast.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.SpeedHack.UseInterpolation
-#        Description: Use movement interpolation when doing speed checks.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.WaterWalk.Enable
-#        Description: Check for players walking on water without a water walking buff.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.WaterWalk.Threshold
-#        Description: Detections needed to trigger a penalty.
-#        Default:     10
-#
-#    Anticheat.WaterWalk.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     7 - Log, Report to GM, Kick
-#
-#    Anticheat.ForbiddenArea.Enable
-#        Description: Check for players entering a forbidden area.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.ForbiddenArea.Threshold
-#        Description: Detections needed to trigger a penalty.
-#        Default:     1
-#
-#    Anticheat.ForbiddenArea.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     3 - Log, Report to GM
-#
-#    Anticheat.Unreachable.Enable
-#        Description: Check for players that are in combat with a creature which can't reach them.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.Unreachable.Threshold
-#        Description: Detections needed to trigger a penalty.
-#        Default:     40
-#
-#    Anticheat.Unreachable.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     3 - Log, Report to GM
-#
 #    Anticheat.ReverseTime.Enable
 #        Description: Check for players whose clock went back in time.
 #        Default:     1 - (Enabled)
@@ -1619,68 +1557,29 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
-#    Anticheat.OverspeedJump.Enable
-#        Description: Check for players that are moving too fast while jumping.
+#    Anticheat.NullTime.Enable
+#        Description: Check for players sending a null timestamp.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.OverspeedJump.Threshold
+#    Anticheat.NullTime.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     1
+#        Default:     2
 #
-#    Anticheat.OverspeedJump.Penalty
+#    Anticheat.NullTime.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
-#    Anticheat.JumpSpeedChange.Enable
-#        Description: Check for players that change speed while in the middle of a jump.
+#    Anticheat.SkippedHeartbeats.Enable
+#        Description: Check for players missing a heartbeat packet.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.JumpSpeedChange.Threshold
+#    Anticheat.SkippedHeartbeats.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     1
+#        Default:     2
 #
-#    Anticheat.JumpSpeedChange.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     7 - Log, Report to GM, Kick
-#
-#    Anticheat.FlyHack.Enable
-#        Description: Check for players that are flying.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.FlyHack.Threshold
-#        Description: Detections needed to trigger a penalty.
-#        Default:     3
-#
-#    Anticheat.FlyHack.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     7 - Log, Report to GM, Kick
-#
-#    Anticheat.MovingWhileRooted.Enable
-#        Description: Check for players that are moving while rooted.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.MovingWhileRooted.Threshold
-#        Description: Detections needed to trigger a penalty.
-#        Default:     5
-#
-#    Anticheat.MovingWhileRooted.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     7 - Log, Report to GM, Kick
-#
-#    Anticheat.OverpspeedDistance.Enable
-#        Description: Check for players that claim to have traveled further than possible.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.OverpspeedDistance.Threshold
-#        Description: Yards traveled beyond what we think is possible.
-#        Default:     30
-#
-#    Anticheat.OverpspeedDistance.Penalty
+#    Anticheat.SkippedHeartbeats.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
@@ -1710,29 +1609,26 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
-#    Anticheat.ExploreArea.Enable
-#        Description: Check for players that are exploring low level zones too quickly.
+#    Anticheat.SpeedHack.Enable
+#        Description: Check for players moving too fast.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.ExploreArea.Threshold
-#        Description: Count of areas explored this session.
-#        Default:     100
-#
-#    Anticheat.ExploreArea.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     7 - Log, Report to GM, Kick
-#
-#    Anticheat.ExploreHighLevelArea.Enable
-#        Description: Check for players that are exploring high level zones too quickly.
+#    Anticheat.SpeedHack.UseInterpolation
+#        Description: Use movement interpolation when doing speed checks.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.ExploreHighLevelArea.Threshold
-#        Description: Count of areas explored this session.
-#        Default:     50
+#    Anticheat.OverpspeedDistance.Enable
+#        Description: Check for players that claim to have traveled further than possible.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
 #
-#    Anticheat.ExploreHighLevelArea.Penalty
+#    Anticheat.OverpspeedDistance.Threshold
+#        Description: Yards traveled beyond what we think is possible.
+#        Default:     30
+#
+#    Anticheat.OverpspeedDistance.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
@@ -1749,16 +1645,128 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
-#    Anticheat.SkippedHeartbeats.Enable
-#        Description: Check for players missing a heartbeat packet.
+#    Anticheat.OverspeedJump.Enable
+#        Description: Check for players that are moving too fast while jumping.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.SkippedHeartbeats.Threshold
+#    Anticheat.OverspeedJump.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.OverspeedJump.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     3
+#
+#    Anticheat.OverspeedJump.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
+#    Anticheat.JumpSpeedChange.Enable
+#        Description: Check for players that change speed while in the middle of a jump.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.JumpSpeedChange.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.JumpSpeedChange.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     3
+#
+#    Anticheat.JumpSpeedChange.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
+#    Anticheat.MultiJump.Enable
+#        Description: Check for players jumping while still in the air.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.MultiJump.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.MultiJump.Threshold.Tick
+#        Description: Detections needed to trigger a penalty in one tick.
+#        Default:     2
+#
+#    Anticheat.MultiJump.Threshold.Tick
+#        Description: Detections needed to trigger a penalty total.
+#        Default:     10
+#
+#    Anticheat.MultiJump.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
+#    Anticheat.Unreachable.Enable
+#        Description: Check for players that are in combat with a creature which can't reach them.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.Unreachable.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     40
+#
+#    Anticheat.Unreachable.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     3 - Log, Report to GM
+#
+#    Anticheat.FlyHack.Enable
+#        Description: Check for players that are flying.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.FlyHack.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.FlyHack.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     3
+#
+#    Anticheat.FlyHack.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
+#    Anticheat.Teleport.Enable
+#        Description: Check for players teleporting far away from their current position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.Teleport.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.Teleport.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     3
+#
+#    Anticheat.Teleport.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     11 - Log, Report to GM, Ban
+#
+#    Anticheat.TeleportToTransport.Enable
+#        Description: Check for players teleporting on a transport.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.TeleportToTransport.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.TeleportToTransport.Threshold
 #        Description: Detections needed to trigger a penalty.
 #        Default:     2
 #
-#    Anticheat.SkippedHeartbeats.Penalty
+#    Anticheat.TeleportToTransport.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
@@ -1775,38 +1783,58 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
-#    Anticheat.Teleport.Enable
-#        Description: Check for players teleporting far away from their current position.
+#    Anticheat.WaterWalk.Enable
+#        Description: Check for players walking on water without a water walking buff.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.Teleport.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     35 - Log, Report to GM, Teleport Back
-#
-#    Anticheat.TeleportToTransport.Enable
-#        Description: Check for players teleporting on a transport.
+#    Anticheat.WaterWalk.Reject
+#        Description: Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
-#    Anticheat.TeleportToTransport.Threshold
+#    Anticheat.WaterWalk.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     1
+#        Default:     5
 #
-#    Anticheat.TeleportToTransport.Penalty
+#    Anticheat.WaterWalk.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
+#
 #
 #    Anticheat.SlowFall.Enable
 #        Description: Check for players slow falling without a slow fall buff.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
+#    Anticheat.SlowFall.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
 #    Anticheat.SlowFall.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     10
+#        Default:     5
 #
 #    Anticheat.SlowFall.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
+#    Anticheat.Hover.Enable
+#        Description: Check for players hovering without a hover buff.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.Hover.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.Hover.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     5
+#
+#    Anticheat.Hover.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
@@ -1815,11 +1843,38 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
+#    Anticheat.FixedZ.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
 #    Anticheat.FixedZ.Threshold
 #        Description: Detections needed to trigger a penalty.
-#        Default:     1
+#        Default:     5
 #
 #    Anticheat.FixedZ.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
+#    Anticheat.RootMove.Enable
+#        Description: Check for players that are moving while rooted.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.RootMove.Reject
+#        Description: Do not accept movement info and teleport to old position.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.RootMove.Threshold.Tick
+#        Description: Detections needed to trigger a penalty in one tick.
+#        Default:     5
+#
+#    Anticheat.RootMove.Threshold.Total
+#        Description: Detections needed to trigger a penalty in one tick.
+#        Default:     30
+#
+#    Anticheat.RootMove.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
@@ -1849,6 +1904,45 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Action to take upon failing this check.
 #        Default:     7 - Log, Report to GM, Kick
 #
+#    Anticheat.ExploreArea.Enable
+#        Description: Check for players that are exploring low level zones too quickly.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.ExploreArea.Threshold
+#        Description: Count of areas explored this session.
+#        Default:     100
+#
+#    Anticheat.ExploreArea.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
+#    Anticheat.ExploreHighLevelArea.Enable
+#        Description: Check for players that are exploring high level zones too quickly.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.ExploreHighLevelArea.Threshold
+#        Description: Count of areas explored this session.
+#        Default:     50
+#
+#    Anticheat.ExploreHighLevelArea.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     7 - Log, Report to GM, Kick
+#
+#    Anticheat.ForbiddenArea.Enable
+#        Description: Check for players entering a forbidden area.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Anticheat.ForbiddenArea.Threshold
+#        Description: Detections needed to trigger a penalty.
+#        Default:     1
+#
+#    Anticheat.ForbiddenArea.Penalty
+#        Description: Action to take upon failing this check.
+#        Default:     3 - Log, Report to GM
+#
 ###################################################################################################
 
 Anticheat.Enable = 1
@@ -1857,76 +1951,96 @@ Anticheat.NotifyCheaters = 0
 Anticheat.BanDuration = 86400
 Anticheat.LogData = 0
 Anticheat.MaxAllowedDesync = 0
-Anticheat.MultiJump.Enable = 1
-Anticheat.MultiJump.Threshold = 2
-Anticheat.MultiJump.Penalty = 7
-Anticheat.SpeedHack.Enable = 1
-Anticheat.SpeedHack.UseInterpolation = 1
-Anticheat.WaterWalk.Enable = 1
-Anticheat.WaterWalk.Threshold = 10
-Anticheat.WaterWalk.Penalty = 7
-Anticheat.ForbiddenArea.Enable = 1
-Anticheat.ForbiddenArea.Threshold = 1
-Anticheat.ForbiddenArea.Penalty = 3
-Anticheat.Unreachable.Enable = 1
-Anticheat.Unreachable.Threshold = 40
-Anticheat.Unreachable.Penalty = 3
 Anticheat.ReverseTime.Enable = 1
 Anticheat.ReverseTime.Threshold = 1
 Anticheat.ReverseTime.Penalty = 7
-Anticheat.OverspeedJump.Enable = 1
-Anticheat.OverspeedJump.Threshold = 1
-Anticheat.OverspeedJump.Penalty = 7
-Anticheat.JumpSpeedChange.Enable = 1
-Anticheat.JumpSpeedChange.Threshold = 1
-Anticheat.JumpSpeedChange.Penalty = 7
-Anticheat.FlyHack.Enable = 1
-Anticheat.FlyHack.Threshold = 3
-Anticheat.FlyHack.Penalty = 7
-Anticheat.MovingWhileRooted.Enable = 1
-Anticheat.MovingWhileRooted.Threshold = 5
-Anticheat.MovingWhileRooted.Penalty = 7
-Anticheat.OverpspeedDistance.Enable = 1
-Anticheat.OverpspeedDistance.Threshold = 30
-Anticheat.OverpspeedDistance.Penalty = 7
+Anticheat.NullTime.Enable = 1
+Anticheat.NullTime.Threshold = 2
+Anticheat.NullTime.Penalty = 7
+Anticheat.SkippedHeartbeats.Enable = 1
+Anticheat.SkippedHeartbeats.Threshold = 2
+Anticheat.SkippedHeartbeats.Penalty = 7
 Anticheat.TimeDesync.Enable = 1
 Anticheat.TimeDesync.Threshold = 10000
 Anticheat.TimeDesync.Penalty = 7
 Anticheat.NumDesyncs.Enable = 1
 Anticheat.NumDesyncs.Threshold = 5
 Anticheat.NumDesyncs.Penalty = 7
-Anticheat.ExploreArea.Enable = 1
-Anticheat.ExploreArea.Threshold = 100
-Anticheat.ExploreArea.Penalty = 7
-Anticheat.ExploreHighLevelArea.Enable = 1
-Anticheat.ExploreHighLevelArea.Threshold = 50
-Anticheat.ExploreHighLevelArea.Penalty = 7
+Anticheat.SpeedHack.Enable = 1
+Anticheat.SpeedHack.UseInterpolation = 1
+Anticheat.OverpspeedDistance.Enable = 1
+Anticheat.OverpspeedDistance.Threshold = 30
+Anticheat.OverpspeedDistance.Penalty = 7
 Anticheat.OverspeedZ.Enable = 1
 Anticheat.OverspeedZ.Threshold = 3
 Anticheat.OverspeedZ.Penalty = 7
-Anticheat.SkippedHeartbeats.Enable = 1
-Anticheat.SkippedHeartbeats.Threshold = 2
-Anticheat.SkippedHeartbeats.Penalty = 7
+Anticheat.OverspeedJump.Enable = 1
+Anticheat.OverspeedJump.Reject = 1
+Anticheat.OverspeedJump.Threshold = 3
+Anticheat.OverspeedJump.Penalty = 7
+Anticheat.JumpSpeedChange.Enable = 1
+Anticheat.JumpSpeedChange.Reject = 1
+Anticheat.JumpSpeedChange.Threshold = 3
+Anticheat.JumpSpeedChange.Penalty = 7
+Anticheat.MultiJump.Enable = 1
+Anticheat.MultiJump.Reject = 1
+Anticheat.MultiJump.Threshold.Tick = 2
+Anticheat.MultiJump.Threshold.Total = 10
+Anticheat.MultiJump.Penalty = 7
+Anticheat.Unreachable.Enable = 1
+Anticheat.Unreachable.Threshold = 40
+Anticheat.Unreachable.Penalty = 3
+Anticheat.FlyHack.Enable = 1
+Anticheat.FlyHack.Reject = 1
+Anticheat.FlyHack.Threshold = 3
+Anticheat.FlyHack.Penalty = 7
+Anticheat.Teleport.Enable = 1
+Anticheat.Teleport.Reject = 1
+Anticheat.Teleport.Threshold = 3
+Anticheat.Teleport.Penalty = 11
+Anticheat.TeleportToTransport.Enable = 1
+Anticheat.TeleportToTransport.Reject = 1
+Anticheat.TeleportToTransport.Threshold = 2
+Anticheat.TeleportToTransport.Penalty = 7
 Anticheat.FakeTransport.Enable = 1
 Anticheat.FakeTransport.Threshold = 1
 Anticheat.FakeTransport.Penalty = 7
-Anticheat.Teleport.Enable = 1
-Anticheat.Teleport.Penalty = 35
-Anticheat.TeleportToTransport.Enable = 1
-Anticheat.TeleportToTransport.Threshold = 1
-Anticheat.TeleportToTransport.Penalty = 7
+Anticheat.WaterWalk.Enable = 1
+Anticheat.WaterWalk.Reject = 1
+Anticheat.WaterWalk.Threshold = 5
+Anticheat.WaterWalk.Penalty = 7
 Anticheat.SlowFall.Enable = 1
-Anticheat.SlowFall.Threshold = 10
+Anticheat.SlowFall.Reject = 1
+Anticheat.SlowFall.Threshold = 5
 Anticheat.SlowFall.Penalty = 7
+Anticheat.Hover.Enable = 1
+Anticheat.Hover.Reject = 1
+Anticheat.Hover.Threshold = 5
+Anticheat.Hover.Penalty = 7
 Anticheat.FixedZ.Enable = 1
-Anticheat.FixedZ.Threshold = 1
+Anticheat.FixedZ.Reject = 1
+Anticheat.FixedZ.Threshold = 5
 Anticheat.FixedZ.Penalty = 7
+Anticheat.RootMove.Enable = 1
+Anticheat.RootMove.Reject = 1
+Anticheat.RootMove.Threshold.Tick = 5
+Anticheat.RootMove.Threshold.Total = 30
+Anticheat.RootMove.Penalty = 7
 Anticheat.WrongAckData.Enable = 1
 Anticheat.WrongAckData.Threshold = 3
 Anticheat.WrongAckData.Penalty = 7
 Anticheat.PendingAckDelay.Enable = 1
 Anticheat.PendingAckDelay.Threshold = 3
 Anticheat.PendingAckDelay.Penalty = 7
+Anticheat.ExploreArea.Enable = 1
+Anticheat.ExploreArea.Threshold = 100
+Anticheat.ExploreArea.Penalty = 7
+Anticheat.ExploreHighLevelArea.Enable = 1
+Anticheat.ExploreHighLevelArea.Threshold = 50
+Anticheat.ExploreHighLevelArea.Penalty = 7
+Anticheat.ForbiddenArea.Enable = 1
+Anticheat.ForbiddenArea.Threshold = 1
+Anticheat.ForbiddenArea.Penalty = 3
 
 # Time to wait for movement change ack
 Movement.PendingAckResponseTime = 2000

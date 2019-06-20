@@ -18,50 +18,56 @@ const char* GetMovementCheatName(CheatType flagId)
 {
     switch (flagId)
     {
-        case CHEAT_TYPE_WATER_WALK:
-            return "WaterWalk";
-        case CHEAT_TYPE_FORBIDDEN:
-            return "ForbiddenArea";
-        case CHEAT_TYPE_MULTIJUMP:
-            return "MultiJump";
-        case CHEAT_TYPE_PVE_FLYHACK:
-            return "PvEUnreachable";
         case CHEAT_TYPE_TIME_BACK:
             return "ReverseTime";
+        case CHEAT_TYPE_NULL_CLIENT_TIME:
+            return "NullClientTime";
+        case CHEAT_TYPE_SKIPPED_HEARTBEATS:
+            return "SkippedHeartbeats";
+        case CHEAT_TYPE_DESYNC:
+            return "TimeDesync";
+        case CHEAT_TYPE_NUM_DESYNC:
+            return "NumDesyncs";
+        case CHEAT_TYPE_OVERSPEED_DIST:
+            return "OverspeedDist";
+        case CHEAT_TYPE_OVERSPEED_Z:
+            return "OverspeedZ";
         case CHEAT_TYPE_OVERSPEED_JUMP:
             return "OverspeedJump";
         case CHEAT_TYPE_JUMP_SPEED_CHANGE:
             return "JumpSpeedChange";
+        case CHEAT_TYPE_MULTIJUMP:
+            return "MultiJump";
+        case CHEAT_TYPE_PVE_FLYHACK:
+            return "PvEUnreachable";
         case CHEAT_TYPE_FLY_HACK_SWIM:
             return "FlyHackSwim";
-        case CHEAT_TYPE_ROOT_MOVE:
-            return "MovementRooted";
-        case CHEAT_TYPE_OVERSPEED_DIST:
-            return "OverspeedDist";
-        case CHEAT_TYPE_DESYNC:
-            return "TimeDesync";
-        case CHEAT_TYPE_EXPLORE:
-            return "Exploration";
-        case CHEAT_TYPE_EXPLORE_HIGH_LEVEL:
-            return "ExploreHighLevelArea";
-        case CHEAT_TYPE_OVERSPEED_Z:
-            return "OverspeedZ";
-        case CHEAT_TYPE_SKIPPED_HEARTBEATS:
-            return "SkippedHeartbeats";
-        case CHEAT_TYPE_NUM_DESYNC:
-            return "NumDesyncs";
+        case CHEAT_TYPE_TELEPORT:
+            return "TeleportHack";
+        case CHEAT_TYPE_TELEPORT_TRANSPORT:
+            return "TeleToTransport";
         case CHEAT_TYPE_FAKE_TRANSPORT:
             return "FakeTransport";
-        case CHEAT_TYPE_TELE_TO_TRANSPORT:
-            return "TeleToTransport";
+        case CHEAT_TYPE_WATER_WALK:
+            return "WaterWalk";
         case CHEAT_TYPE_SLOW_FALL:
             return "SlowFall";
+        case CHEAT_TYPE_HOVER:
+            return "Hover";
         case CHEAT_TYPE_FIXED_Z:
             return "FixedZ";
+        case CHEAT_TYPE_ROOT_MOVE:
+            return "MovementRooted";
         case CHEAT_TYPE_WRONG_ACK_DATA:
             return "WrongAckData";
         case CHEAT_TYPE_PENDING_ACK_DELAY:
             return "PendingAckDelay";
+        case CHEAT_TYPE_EXPLORE:
+            return "Exploration";
+        case CHEAT_TYPE_EXPLORE_HIGH_LEVEL:
+            return "ExploreHighLevelArea";
+        case CHEAT_TYPE_FORBIDDEN_AREA:
+            return "ForbiddenArea";
     }
 
     return "UnknownCheat";
@@ -143,7 +149,7 @@ void MovementCheatData::StoreCheat(uint32 type, uint32 count)
     m_cheatOccuranceTick[type] += count;
 }
 
-uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason) const
+uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason)
 {
     uint32 action = CHEAT_ACTION_NONE;
 
@@ -162,32 +168,40 @@ uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason) const
                     reason << "/";
                 reason << GetMovementCheatName(cheatType) << "(Tick:" << count << ")";
                 action |= penalty;
+
+                if (total)
+                    m_cheatOccuranceTotal[cheatType] = 0;
             }
         }
     };
 
-    AddPenaltyForCheat(true, CHEAT_TYPE_WATER_WALK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_WATER_WALK_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WATER_WALK_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WATER_WALK_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_FORBIDDEN, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_MULTIJUMP, CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_PENALTY);
-    AddPenaltyForCheat(true, CHEAT_TYPE_PVE_FLYHACK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_UNREACHABLE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_TIME_BACK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_REVERSE_TIME_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_REVERSE_TIME_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_REVERSE_TIME_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_OVERSPEED_JUMP, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_JUMP_SPEED_CHANGE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_FLY_HACK_SWIM, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_ROOT_MOVE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_ROOT_MOVE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_OVERSPEED_DIST, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_DESYNC, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TIME_DESYNC_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TIME_DESYNC_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TIME_DESYNC_PENALTY);
-    AddPenaltyForCheat(true, CHEAT_TYPE_EXPLORE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_PENALTY);
-    AddPenaltyForCheat(true, CHEAT_TYPE_EXPLORE_HIGH_LEVEL, CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_OVERSPEED_Z, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_Z_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_Z_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_Z_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_NULL_CLIENT_TIME, CONFIG_BOOL_AC_MOVEMENT_CHEAT_NULL_TIME_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NULL_TIME_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NULL_TIME_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_SKIPPED_HEARTBEATS, CONFIG_BOOL_AC_MOVEMENT_CHEAT_SKIPPED_HEARTBEATS_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SKIPPED_HEARTBEATS_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SKIPPED_HEARTBEATS_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_DESYNC, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TIME_DESYNC_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TIME_DESYNC_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TIME_DESYNC_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_NUM_DESYNC, CONFIG_BOOL_AC_MOVEMENT_CHEAT_NUM_DESYNCS_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NUM_DESYNCS_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NUM_DESYNCS_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_OVERSPEED_DIST, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_OVERSPEED_Z, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_Z_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_Z_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_Z_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_OVERSPEED_JUMP, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_JUMP_SPEED_CHANGE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_MULTIJUMP, CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_THRESHOLD_TICK, CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_MULTIJUMP, CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_THRESHOLD_TOTAL, CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_PVE_FLYHACK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_UNREACHABLE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_FLY_HACK_SWIM, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FAKE_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_TELE_TO_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_PENALTY);
-    AddPenaltyForCheat(true, CHEAT_TYPE_SLOW_FALL, CONFIG_BOOL_AC_MOVEMENT_CHEAT_SLOW_FALL_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SLOW_FALL_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SLOW_FALL_PENALTY);
-    AddPenaltyForCheat(true, CHEAT_TYPE_FIXED_Z, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FIXED_Z_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_WATER_WALK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_WATER_WALK_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WATER_WALK_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WATER_WALK_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_SLOW_FALL, CONFIG_BOOL_AC_MOVEMENT_CHEAT_SLOW_FALL_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SLOW_FALL_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_SLOW_FALL_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_HOVER, CONFIG_BOOL_AC_MOVEMENT_CHEAT_HOVER_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_HOVER_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_HOVER_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_FIXED_Z, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FIXED_Z_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FIXED_Z_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_ROOT_MOVE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_ROOT_MOVE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_THRESHOLD_TICK, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_ROOT_MOVE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_ROOT_MOVE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_THRESHOLD_TOTAL, CONFIG_UINT32_AC_MOVEMENT_CHEAT_ROOT_MOVE_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_WRONG_ACK_DATA, CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_PENDING_ACK_DELAY, CONFIG_BOOL_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_EXPLORE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_EXPLORE_HIGH_LEVEL, CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_PENALTY);
+    AddPenaltyForCheat(false, CHEAT_TYPE_FORBIDDEN_AREA, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_PENALTY);
 
     return action;
 }
@@ -301,6 +315,55 @@ UnitMoveType MovementCheatData::GetMoveTypeFromLastFlags()
     return GetLastMovementInfo().HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN;
 }
 
+bool ShouldRejectMovement(uint32 cheatFlags)
+{
+    if ((cheatFlags & (1 << CHEAT_TYPE_OVERSPEED_JUMP)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_JUMP_SPEED_CHANGE)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_MULTIJUMP)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_FLY_HACK_SWIM)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_TELEPORT)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_TELEPORT_TRANSPORT)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_WATER_WALK)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WATER_WALK_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_SLOW_FALL)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_SLOW_FALL_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_HOVER)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_HOVER_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_FIXED_Z)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FIXED_Z_REJECT))
+        return true;
+
+    if ((cheatFlags & (1 << CHEAT_TYPE_ROOT_MOVE)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_ROOT_MOVE_REJECT))
+        return true;
+
+    return false;
+}
+
 bool MovementCheatData::HandleAnticheatTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
@@ -310,8 +373,8 @@ bool MovementCheatData::HandleAnticheatTests(Player* pPlayer, MovementInfo& move
     if (pPlayer != me)
         InitNewPlayer(pPlayer);
 
-    uint32 cheatType = 0x0;
-#define APPEND_CHEAT(t) cheatType |= (1 << t)
+    uint32 cheatFlags = 0x0;
+#define APPEND_CHEAT(t) cheatFlags |= (1 << t)
 
     if (opcode == CMSG_MOVE_FEATHER_FALL_ACK)
     {
@@ -329,7 +392,10 @@ bool MovementCheatData::HandleAnticheatTests(Player* pPlayer, MovementInfo& move
                 if (GetLastMovementInfo().jump.xyspeed > 0.0001f)
                     APPEND_CHEAT(CHEAT_TYPE_JUMP_SPEED_CHANGE);
 
-    if ((movementInfo.moveFlags & MOVEFLAG_MASK_MOVING) && ((movementInfo.moveFlags & MOVEFLAG_ROOT) || (GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT)) && !me->HasPendingMovementChange(ROOT))
+    if ((movementInfo.moveFlags & MOVEFLAG_MASK_MOVING) &&
+        ((movementInfo.moveFlags & MOVEFLAG_ROOT) || (GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT)) &&
+        !me->HasPendingMovementChange(ROOT) &&
+        (opcode != CMSG_FORCE_MOVE_UNROOT_ACK))
         APPEND_CHEAT(CHEAT_TYPE_ROOT_MOVE);
 
     if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_ENABLED))
@@ -369,7 +435,7 @@ bool MovementCheatData::HandleAnticheatTests(Player* pPlayer, MovementInfo& move
     }
 
     if (CheckForbiddenArea(movementInfo))
-        APPEND_CHEAT(CHEAT_TYPE_FORBIDDEN);
+        APPEND_CHEAT(CHEAT_TYPE_FORBIDDEN_AREA);
 
     // Minimal checks on transports
     if (movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT)
@@ -380,7 +446,7 @@ bool MovementCheatData::HandleAnticheatTests(Player* pPlayer, MovementInfo& move
             float dist2d = (movementInfo.pos.x - GetLastMovementInfo().pos.x) * (movementInfo.pos.x - GetLastMovementInfo().pos.x);
             dist2d += (movementInfo.pos.y - GetLastMovementInfo().pos.y) * (movementInfo.pos.y - GetLastMovementInfo().pos.y);
             if (dist2d > 100*100)
-                APPEND_CHEAT(CHEAT_TYPE_TELE_TO_TRANSPORT);
+                APPEND_CHEAT(CHEAT_TYPE_TELEPORT_TRANSPORT);
         }
     }
 
@@ -453,13 +519,19 @@ bool MovementCheatData::HandleAnticheatTests(Player* pPlayer, MovementInfo& move
         m_knockBack = false;
     }
 
-    AddCheats(cheatType);
+    AddCheats(cheatFlags);
+
+    if (ShouldRejectMovement(cheatFlags))
+    {
+        me->SendHeartBeat(true);
+        return false;
+    }
 
     return true;
 #undef APPEND_CHEAT
 }
 
-bool MovementCheatData::CheckForbiddenArea(MovementInfo& movementInfo) const
+bool MovementCheatData::CheckForbiddenArea(MovementInfo const& movementInfo) const
 {
     switch(me->GetMapId())
     {
@@ -736,7 +808,7 @@ bool MovementCheatData::GetMaxAllowedDist(MovementInfo const& mi, uint32 diffMs,
     return true;
 }
 
-bool MovementCheatData::CheckTeleport(Player* pPlayer, MovementInfo& movementInfo, uint32 opcode)
+bool MovementCheatData::CheckTeleport(Player* pPlayer, MovementInfo const& movementInfo, uint32 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) || 
         !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED) ||
@@ -752,17 +824,15 @@ bool MovementCheatData::CheckTeleport(Player* pPlayer, MovementInfo& movementInf
 
         if (!IsTeleportAllowed(movementInfo, distance))
         {
-            uint32 penalty = sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY);
+            AddCheats(1 << CHEAT_TYPE_TELEPORT);
 
-            if (penalty & CHEAT_ACTION_TELEPORT_BACK)
+            if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_REJECT))
             {
                 // save prevoius point
                 Player::SavePositionInDB(me->GetObjectGuid(), me->GetMapId(), me->m_movementInfo.pos.x, me->m_movementInfo.pos.y, me->m_movementInfo.pos.z, me->m_movementInfo.pos.o, me->GetZoneId());
                 me->NearLandTo(me->m_movementInfo.pos.x, me->m_movementInfo.pos.y, me->m_movementInfo.pos.z, me->GetOrientation());
+                return false;
             }
-            
-            m_session->ProcessAnticheatAction("MovementAnticheat", "TeleportHack", penalty);
-            return false;
         }
     }
 
@@ -808,11 +878,11 @@ bool MovementCheatData::IsTeleportAllowed(MovementInfo const& movementInfo, floa
     return false;
 }
 
-void MovementCheatData::CheckMovementFlags(Player* pPlayer, MovementInfo& movementInfo)
+bool MovementCheatData::HandleMovementFlags(Player* pPlayer, MovementInfo& movementInfo)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
        (m_session->GetSecurity() != SEC_PLAYER))
-        return;
+        return true;
 
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
@@ -822,46 +892,60 @@ void MovementCheatData::CheckMovementFlags(Player* pPlayer, MovementInfo& moveme
         auto const currentMoveFlags = movementInfo.GetMovementFlags();
         uint32 removeMoveFlags = 0;
 
+        uint32 cheatFlags = 0x0;
+#define APPEND_CHEAT(t) cheatFlags |= (1 << t)
+
         // This flag is only for creatures.
         if (currentMoveFlags & MOVEFLAG_FIXED_Z)
         {
-            AddCheats(1 << CHEAT_TYPE_FIXED_Z);
+            APPEND_CHEAT(CHEAT_TYPE_FIXED_Z);
             removeMoveFlags |= MOVEFLAG_FIXED_Z;
         }
 
         // This flag is only for creatures.
         if (currentMoveFlags & MOVEFLAG_LEVITATING)
         {
-            AddCheats(1 << CHEAT_TYPE_FLY_HACK_SWIM);
+            APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
             removeMoveFlags |= MOVEFLAG_LEVITATING;
         }
 
         if ((currentMoveFlags & MOVEFLAG_SWIMMING) && (currentMoveFlags & MOVEFLAG_FLYING))
         {
-            AddCheats(1 << CHEAT_TYPE_FLY_HACK_SWIM);
+            APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
             removeMoveFlags |= MOVEFLAG_SWIMMING | MOVEFLAG_FLYING;
         }
 
-        if ((currentMoveFlags & MOVEFLAG_WATERWALKING) && !me->HasAuraType(SPELL_AURA_WATER_WALK) && !me->HasAuraType(SPELL_AURA_GHOST))
+        if ((currentMoveFlags & MOVEFLAG_WATERWALKING) && !me->HasAuraType(SPELL_AURA_WATER_WALK) && !me->HasAuraType(SPELL_AURA_GHOST) && !me->HasPendingMovementChange(WATER_WALK))
         {
-            if (!me->GetMover()->HasPendingMovementChange(WATER_WALK))
-            {
-                AddCheats(1 << CHEAT_TYPE_WATER_WALK);
-                removeMoveFlags |= MOVEFLAG_WATERWALKING;
-            }
+            APPEND_CHEAT(CHEAT_TYPE_WATER_WALK);
+            removeMoveFlags |= MOVEFLAG_WATERWALKING;
         }
 
-        if ((currentMoveFlags & MOVEFLAG_SAFE_FALL) && !me->HasAuraType(SPELL_AURA_FEATHER_FALL))
+        if ((currentMoveFlags & MOVEFLAG_SAFE_FALL) && !me->HasAuraType(SPELL_AURA_FEATHER_FALL) && !me->HasPendingMovementChange(FEATHER_FALL))
         {
-            if (!me->GetMover()->HasPendingMovementChange(FEATHER_FALL))
-            {
-                AddCheats(1 << CHEAT_TYPE_SLOW_FALL);
-                removeMoveFlags |= MOVEFLAG_SAFE_FALL;
-            }
+            APPEND_CHEAT(CHEAT_TYPE_SLOW_FALL);
+            removeMoveFlags |= MOVEFLAG_SAFE_FALL;
         }
 
-        if (removeMoveFlags)
-            movementInfo.RemoveMovementFlag(MovementFlags(removeMoveFlags));
+        if ((currentMoveFlags & MOVEFLAG_HOVER) && !me->HasAuraType(SPELL_AURA_HOVER) && !me->HasPendingMovementChange(SET_HOVER))
+        {
+            APPEND_CHEAT(CHEAT_TYPE_HOVER);
+            removeMoveFlags |= MOVEFLAG_HOVER;
+        }
+#undef APPEND_CHEAT
+
+        AddCheats(cheatFlags);
+
+        if (ShouldRejectMovement(cheatFlags))
+        {
+            printf("reject flags\n");
+            me->SendHeartBeat(true);
+            return false;
+        }
+        else if (removeMoveFlags)
+            movementInfo.RemoveMovementFlag(removeMoveFlags);
     }
+
+    return true;
 }
 
