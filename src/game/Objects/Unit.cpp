@@ -11193,7 +11193,9 @@ void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
         float vsin = sin(angle);
         float vcos = cos(angle);
         MovementPacketSender::SendKnockBackToController(this, vcos, vsin, horizontalSpeed, -verticalSpeed); // !! notice the - sign in front of speedZ !!
-        GetPlayerMovingMe()->GetCheatData()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
+
+        if (IsPlayer())
+            GetPlayerMovingMe()->GetCheatData()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
     }
 }
 
