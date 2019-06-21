@@ -92,8 +92,11 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket & recv_data)
     HandleBattlemasterJoinOpcode(data);
     return;
 }
+
 void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
 {
+    DEBUG_LOG("WORLD: Recvd CMSG_BATTLEMASTER_JOIN");
+
     ObjectGuid guid;
     uint32 instanceId;
     uint32 mapId;
@@ -114,16 +117,32 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
 
     if (bgTypeId == BATTLEGROUND_TYPE_NONE)
     {
-        sLog.outError("Battleground: invalid bgtype (%u) received. possible cheater? player guid %u", bgTypeId, _player->GetGUIDLow());
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for invalid BG type", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
         return;
     }
     if (bgTypeId == BATTLEGROUND_AV && joinAsGroup)
     {
-        ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue AV as group.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for AV as group", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
         return;
     }
 
-    DEBUG_LOG("WORLD: Recvd CMSG_BATTLEMASTER_JOIN Message from %s", guid.GetString().c_str());
+    if (queuedAtBGPortal)
+    {
+        auto const& bgQueuePos = _player->GetBattleGroundEntryPoint();
+        if (_player->GetMapId() != bgQueuePos.mapid || !_player->IsWithinDist3d(bgQueuePos.coord_x, bgQueuePos.coord_y, bgQueuePos.coord_z, 50.0f))
+        {
+            ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for BG through out of range portal", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+            return;
+        }
+    }
+    else
+    {
+        if (!_player->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_BATTLEMASTER))
+        {
+            ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for BG through invalid creature", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+            return;
+        }
+    }
 
     // can do this, since it's battleground, not arena
     BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bgTypeId);

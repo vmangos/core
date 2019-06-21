@@ -343,29 +343,28 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
     return true;
 }
 
-
-bool registerPlayerToBg(WorldSession * sess, BattleGroundTypeId bgid)
+bool RegisterPlayerToBG(WorldSession * sess, BattleGroundTypeId bgid)
 {
-    Player* pl = sess->GetPlayer();
-    if (!pl->GetBGAccessByLevel(bgid))
+    Player* pPlayer = sess->GetPlayer();
+    if (!pPlayer->GetBGAccessByLevel(bgid))
         return false;
-    sess->SendBattlegGroundList(uint64(0), bgid);
+    pPlayer->SetBattleGroundEntryPoint(pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation());
+    sess->SendBattlegGroundList(pPlayer->GetObjectGuid(), bgid);
     return true;
 }
 
 bool ChatHandler::HandleGoWarsongCommand(char * args)
 {
-    return registerPlayerToBg(m_session, BattleGroundTypeId(BATTLEGROUND_WS));
+    return RegisterPlayerToBG(m_session, BattleGroundTypeId(BATTLEGROUND_WS));
 }
 bool ChatHandler::HandleGoArathiCommand(char *args)
 {
-    return registerPlayerToBg(m_session, BattleGroundTypeId(BATTLEGROUND_AB));
+    return RegisterPlayerToBG(m_session, BattleGroundTypeId(BATTLEGROUND_AB));
 }
 bool ChatHandler::HandleGoAlteracCommand(char *args)
 {
-    return registerPlayerToBg(m_session, BattleGroundTypeId(BATTLEGROUND_AV));
+    return RegisterPlayerToBG(m_session, BattleGroundTypeId(BATTLEGROUND_AV));
 }
-
 
 /** \brief GM command level 3 - Create a guild.
  *
