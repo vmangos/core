@@ -56,7 +56,7 @@ class MovementAnticheatInterface
         virtual uint32 Update(uint32 diff, std::stringstream& reason) { return CHEAT_ACTION_NONE; }
         virtual uint32 Finalize(std::stringstream& reason) { return CHEAT_ACTION_NONE; }
         virtual bool IsInKnockBack() const { return false; }
-        virtual void KnockBack(float speedxy, float speedz, float cos, float sin) {}
+        virtual void KnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) {}
 
         virtual void AddCheats(uint32 cheats, uint32 count = 1) {}
         virtual void HandleCommand(ChatHandler* handler) const {}

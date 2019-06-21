@@ -79,7 +79,7 @@ class MovementCheatData: public MovementAnticheatInterface
 
         MovementInfo& GetLastMovementInfo();
         bool IsInKnockBack() const override { return m_knockBack; }
-        void KnockBack(float speedxy, float speedz, float cos, float sin) override;
+        void KnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) override;
         float GetClientSpeed(UnitMoveType m) const { return m_clientSpeeds[m]; }
 
         uint32 m_updateCheckTimer = 0;

@@ -589,8 +589,11 @@ bool MovementCheatData::CheckForbiddenArea(MovementInfo const& movementInfo) con
     return false;
 }
 
-void MovementCheatData::KnockBack(float speedxy, float speedz, float cos, float sin)
+void MovementCheatData::KnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin)
 {
+    if (me != pPlayer)
+        InitNewPlayer(pPlayer);
+
     GetLastMovementInfo().jump.startClientTime = WorldTimer::getMSTime() - GetLastMovementInfo().time + GetLastMovementInfo().ctime;
     GetLastMovementInfo().jump.start.x = me->GetPositionX();
     GetLastMovementInfo().jump.start.y = me->GetPositionY();
@@ -938,7 +941,6 @@ bool MovementCheatData::HandleMovementFlags(Player* pPlayer, MovementInfo& movem
 
         if (ShouldRejectMovement(cheatFlags))
         {
-            printf("reject flags\n");
             me->SendHeartBeat(true);
             return false;
         }
