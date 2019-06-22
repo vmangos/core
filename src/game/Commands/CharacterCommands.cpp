@@ -73,10 +73,6 @@ bool ChatHandler::HandleXpCommand(char* args)
 
 bool ChatHandler::HandleGodCommand(char* args)
 {
-    Player *pPlayer = GetSelectedPlayer();
-    if (!pPlayer)
-        pPlayer = m_session->GetPlayer();
-
     if (*args)
     {
         bool value;
@@ -86,7 +82,12 @@ bool ChatHandler::HandleGodCommand(char* args)
             SetSentErrorMessage(true);
             return false;
         }
-        pPlayer->SetGodMode(value, true);
+        
+        Player* target;
+        if (!ExtractPlayerTarget(&args, &target))
+            return false;
+
+        target->SetGodMode(value, true);
     }
 
     return true;
