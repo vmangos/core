@@ -8158,22 +8158,17 @@ void Unit::CheckPendingMovementChanges()
         return;
 
     Player* pController = GetPlayerMovingMe();
-    if (!pController || !pController->IsInWorld() || pController->IsBeingTeleported())
+    if (!pController || !pController->IsInWorld() || pController->IsBeingTeleportedFar())
     {
         ResolvePendingMovementChanges();
+        if (pController != this)
+            SendHeartBeat(true);
         return;
     }
 
     PlayerMovementPendingChange& oldestChangeToAck = GetPendingMovementChangesQueue().front();
     if (WorldTimer::getMSTime() > oldestChangeToAck.time + sWorld.getConfig(CONFIG_UINT32_MOVEMENT_CHANGE_ACK_TIME))
     {
-        // Previous controller didn't ack a movement change. Not our fault.
-        if (oldestChangeToAck.controller != pController->GetObjectGuid())
-        {
-            PopPendingMovementChange();
-            return;
-        }
-
         // There is a new change for the same thing, don't resend old state.
         if (oldestChangeToAck.movementCounter < GetLastCounterForMovementChangeType(oldestChangeToAck.movementChangeType))
         {
@@ -8189,6 +8184,15 @@ void Unit::CheckPendingMovementChanges()
             return;
         }
 
+        // Previous controller didn't ack a movement change. Not our fault.
+        if (oldestChangeToAck.controller != pController->GetObjectGuid())
+        {
+            ResolvePendingMovementChange(oldestChangeToAck);
+            PopPendingMovementChange();
+            SendHeartBeat(true);
+            return;
+        }
+
         if (oldestChangeToAck.resent)
         {
             // Change was resent but still no reply. Enforce the flags.
@@ -8199,6 +8203,7 @@ void Unit::CheckPendingMovementChanges()
         }
         else
         {
+            // Send the change a second time and wait for reply.
             oldestChangeToAck.resent = true;
             oldestChangeToAck.time = WorldTimer::getMSTime();
 
