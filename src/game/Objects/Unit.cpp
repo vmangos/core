@@ -1614,37 +1614,37 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
     switch (spellInfo->DmgClass)
     {
         // Melee and Ranged Spells
-    case SPELL_DAMAGE_CLASS_RANGED:
-    case SPELL_DAMAGE_CLASS_MELEE:
-    {
-        //Calculate damage bonus
-        damage = MeleeDamageBonusDone(pVictim, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
-        damage = pVictim->MeleeDamageBonusTaken(this, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
-
-        // if crit add critical bonus
-        if (crit)
+        case SPELL_DAMAGE_CLASS_RANGED:
+        case SPELL_DAMAGE_CLASS_MELEE:
         {
-            damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
-            damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
-        }
-    }
-    break;
-    // Magical Attacks
-    case SPELL_DAMAGE_CLASS_NONE:
-    case SPELL_DAMAGE_CLASS_MAGIC:
-    {
-        // Calculate damage bonus
-        damage = SpellDamageBonusDone(pVictim, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
-        damage = pVictim->SpellDamageBonusTaken(this, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
+            //Calculate damage bonus
+            damage = MeleeDamageBonusDone(pVictim, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
+            damage = pVictim->MeleeDamageBonusTaken(this, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
 
-        // If crit add critical bonus
-        if (crit)
-        {
-            damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
-            damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
+            // if crit add critical bonus
+            if (crit)
+            {
+                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+                damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
+            }
+            break;
         }
-    }
-    break;
+        // Magical Attacks
+        case SPELL_DAMAGE_CLASS_NONE:
+        case SPELL_DAMAGE_CLASS_MAGIC:
+        {
+            // Calculate damage bonus
+            damage = SpellDamageBonusDone(pVictim, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
+            damage = pVictim->SpellDamageBonusTaken(this, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
+
+            // If crit add critical bonus
+            if (crit)
+            {
+                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+                damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
+            }
+            break;
+        }
     }
 
     // damage mitigation
@@ -3292,13 +3292,13 @@ SpellMissInfo Unit::SpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell
 
     switch (spell->DmgClass)
     {
-    case SPELL_DAMAGE_CLASS_NONE:
-        return SPELL_MISS_NONE;
-    case SPELL_DAMAGE_CLASS_MAGIC:
-        return MagicSpellHitResult(pVictim, spell, spellPtr);
-    case SPELL_DAMAGE_CLASS_MELEE:
-    case SPELL_DAMAGE_CLASS_RANGED:
-        return MeleeSpellHitResult(pVictim, spell, spellPtr);
+        case SPELL_DAMAGE_CLASS_NONE:
+            return SPELL_MISS_NONE;
+        case SPELL_DAMAGE_CLASS_MAGIC:
+            return MagicSpellHitResult(pVictim, spell, spellPtr);
+        case SPELL_DAMAGE_CLASS_MELEE:
+        case SPELL_DAMAGE_CLASS_RANGED:
+            return MeleeSpellHitResult(pVictim, spell, spellPtr);
     }
     return SPELL_MISS_NONE;
 }
@@ -3490,17 +3490,17 @@ float Unit::GetUnitCriticalChance(WeaponAttackType attackType, const Unit* pVict
     {
         switch (attackType)
         {
-        case OFF_ATTACK:
-        case BASE_ATTACK:
-            crit = GetFloatValue(PLAYER_CRIT_PERCENTAGE);
-            break;
-        case RANGED_ATTACK:
-            crit = GetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE);
-            break;
-            // Just for good manner
-        default:
-            crit = 0.0f;
-            break;
+            case OFF_ATTACK:
+            case BASE_ATTACK:
+                crit = GetFloatValue(PLAYER_CRIT_PERCENTAGE);
+                break;
+            case RANGED_ATTACK:
+                crit = GetFloatValue(PLAYER_RANGED_CRIT_PERCENTAGE);
+                break;
+                // Just for good manner
+            default:
+                crit = 0.0f;
+                break;
         }
     }
     else
