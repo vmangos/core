@@ -5804,35 +5804,35 @@ void Player::UpdateSpellTrainedSkills(uint32 spellId, bool apply)
                 {
                     switch (GetSkillRangeType(pSkill, skillAbility->racemask != 0))
                     {
-                    case SKILL_RANGE_LANGUAGE:
-                        SetSkill(uint16(pSkill->id), 300, 300);
-                        break;
-                    case SKILL_RANGE_LEVEL:
-                    {
-                        uint16 newSkillValue = 1;
-
-                        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
-                        // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
-                        //   with these two weapons will now be retained if you decide to unspend
-                        //   this talent point and return to it later.
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-                        if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
+                        case SKILL_RANGE_LANGUAGE:
+                            SetSkill(uint16(pSkill->id), 300, 300);
+                            break;
+                        case SKILL_RANGE_LEVEL:
                         {
-                            const auto savedValue = m_mForgottenSkills.find(pSkill->id);
+                            uint16 newSkillValue = sWorld.getConfig(CONFIG_BOOL_ALWAYS_MAX_SKILL_FOR_LEVEL) ? GetSkillMaxForLevel() : 1;
 
-                            if (savedValue != m_mForgottenSkills.end())
-                                if (savedValue->second <= GetSkillMaxForLevel())
-                                    newSkillValue = savedValue->second;
-                        }
+                            // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+                            // - Two-Handed Axes/Maces (Enhancement Talent) - Skill levels gained 
+                            //   with these two weapons will now be retained if you decide to unspend
+                            //   this talent point and return to it later.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+                            if (pSkill->categoryId == SKILL_CATEGORY_WEAPON)
+                            {
+                                const auto savedValue = m_mForgottenSkills.find(pSkill->id);
+
+                                if (savedValue != m_mForgottenSkills.end())
+                                    if (savedValue->second <= GetSkillMaxForLevel())
+                                        newSkillValue = savedValue->second;
+                            }
 #endif
-                        SetSkill(uint16(pSkill->id), newSkillValue, GetSkillMaxForLevel());
-                        break;
-                    }
-                    case SKILL_RANGE_MONO:
-                        SetSkill(uint16(pSkill->id), 1, 1);
-                        break;
-                    default:
-                        break;
+                            SetSkill(uint16(pSkill->id), newSkillValue, GetSkillMaxForLevel());
+                            break;
+                        }
+                        case SKILL_RANGE_MONO:
+                            SetSkill(uint16(pSkill->id), 1, 1);
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
