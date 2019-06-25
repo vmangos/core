@@ -2863,7 +2863,8 @@ bool Unit::IsSpellBlocked(Unit *pCaster, Unit *pVictim, SpellEntry const *spellE
     blockChance -= pVictim->IsPlayer() ? skillDiff * 0.04f : skillDiff * 0.1f;
 
     // Cannot be more than 5%
-    if (blockChance > 5) blockChance = 5.0f;
+    if (IsCreature() && (blockChance > 5))
+        blockChance = 5.0f;
 
     // Low level reduction
     if (!pVictim->IsPlayer() && pVictim->getLevel() < 10)
