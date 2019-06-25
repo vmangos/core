@@ -2668,7 +2668,8 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
             block_chance -= blockSkillBonus;
 
             // Cannot be more than 5%
-            if (block_chance > 500) block_chance = 500;
+            if (IsCreature() && (block_chance > 500))
+                block_chance = 500;
 
             // Low level reduction
             if (!pVictim->IsPlayer() && pVictim->getLevel() < 10)
