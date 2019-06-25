@@ -18,7 +18,8 @@ enum CheatType
     CHEAT_TYPE_OVERSPEED_Z,
     CHEAT_TYPE_OVERSPEED_JUMP,
     CHEAT_TYPE_JUMP_SPEED_CHANGE,
-    CHEAT_TYPE_MULTIJUMP,
+    CHEAT_TYPE_MULTI_JUMP,
+    CHEAT_TYPE_WALL_CLIMB,
     CHEAT_TYPE_PVE_FLYHACK,
     CHEAT_TYPE_FLY_HACK_SWIM,
     CHEAT_TYPE_TELEPORT,
@@ -29,6 +30,7 @@ enum CheatType
     CHEAT_TYPE_HOVER,
     CHEAT_TYPE_FIXED_Z,
     CHEAT_TYPE_ROOT_MOVE,
+    CHEAT_TYPE_SELF_ROOT,
     CHEAT_TYPE_WRONG_ACK_DATA,
     CHEAT_TYPE_PENDING_ACK_DELAY,
     CHEAT_TYPE_EXPLORE,
@@ -57,34 +59,44 @@ class MovementCheatData: public MovementAnticheatInterface
         void StoreCheat(uint32 type, uint32 count = 1);
         uint32 ComputeCheatAction(std::stringstream& reason);
 
+        void HandleCommand(ChatHandler* handler) const override;
+        uint32 Update(uint32 diff, std::stringstream& reason) override;
+        uint32 Finalize(std::stringstream& reason) override;
+
+        // Public methods called from the movement handler upon received a packet.
+        bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) override;
+        bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode) override;
+        bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) override;
+
+        void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) override;
         void OnUnreachable(Unit* attacker) override;
         void OnExplore(AreaEntry const* pArea) override;
         void OnTransport(Player* plMover, ObjectGuid transportGuid) override;
         void OnWrongAckData() override;
         void OnFailedToAckChange() override;
 
-        void HandleCommand(ChatHandler* handler) const override;
-        uint32 Update(uint32 diff, std::stringstream& reason) override;
-        uint32 Finalize(std::stringstream& reason) override;
-        bool HandleAnticheatTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) override;
-        bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode) override;
-
-        bool IsTeleportAllowed(MovementInfo const& movementInfo, float& distance);
-        bool CheckTeleport(Player* pPlayer, MovementInfo const& movementInfo, uint32 opcode) override;
-        bool HandleMovementFlags(Player* pPlayer, MovementInfo& movementInfo) override;
+private:
+        bool CheckTeleport(MovementInfo const& movementInfo) const;
+        bool IsTeleportAllowed(MovementInfo const& movementInfo) const;
         bool CheckForbiddenArea(MovementInfo const& movementInfo) const;
-        bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) override;
-        bool GetMaxAllowedDist(MovementInfo const& mi, uint32 diffMs, float &dxy, float &dz);
-        UnitMoveType GetMoveTypeFromLastFlags();
+        bool CheckMultiJump(uint16 opcode);
+        bool CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const;
+        bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
+        uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
+        bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const override;
+        bool GetMaxAllowedDist(MovementInfo const& mi, uint32 diffMs, float &dxy, float &dz) const;
+        uint32 CheckTimeDesync(MovementInfo const& movementInfo);
 
-        MovementInfo& GetLastMovementInfo();
+        MovementInfo& GetLastMovementInfo() { return me->m_movementInfo; }
+        MovementInfo const& GetLastMovementInfo() const { return me->m_movementInfo; }
         bool IsInKnockBack() const override { return m_knockBack; }
-        void KnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) override;
+        
         float GetClientSpeed(UnitMoveType m) const { return m_clientSpeeds[m]; }
+        float GetSpeedForMovementInfo(MovementInfo const& movementInfo) const;
 
         uint32 m_updateCheckTimer = 0;
-        uint32 m_cheatOccuranceTick[CHEATS_COUNT];    // per anticheat tick (not world/map tick)
-        uint32 m_cheatOccuranceTotal[CHEATS_COUNT];
+        std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTick = {};    // per anticheat tick (not world/map tick)
+        std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTotal = {};
 
         bool m_knockBack = false;
         uint32 m_jumpCount = 0;
@@ -94,8 +106,9 @@ class MovementCheatData: public MovementAnticheatInterface
         float m_overspeedDistance = 0.0f;
         float m_maxOverspeedDistance = 0.0f;
         std::array<float, MAX_MOVE_TYPE> m_clientSpeeds = {};
-        Player* me;      
-        WorldSession* m_session;
+
+        Player* me = nullptr; // current player object that checks run on, changes on mind control
+        WorldSession* const m_session = nullptr; // session to which the cheat data belongs, does not change
 };
 
 #endif

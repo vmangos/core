@@ -53,13 +53,15 @@ class MovementAnticheatInterface
 
         virtual void Init() {}
         virtual void InitNewPlayer(Player* pPlayer) {}
+        
+        virtual bool IsInKnockBack() const { return false; }
+        
         virtual uint32 Update(uint32 diff, std::stringstream& reason) { return CHEAT_ACTION_NONE; }
         virtual uint32 Finalize(std::stringstream& reason) { return CHEAT_ACTION_NONE; }
-        virtual bool IsInKnockBack() const { return false; }
-        virtual void KnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) {}
-
         virtual void AddCheats(uint32 cheats, uint32 count = 1) {}
         virtual void HandleCommand(ChatHandler* handler) const {}
+        virtual void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) {}
+
         virtual void OnUnreachable(Unit* attacker) {}
         virtual void OnExplore(AreaEntry const* pArea) {}
         virtual void OnTransport(Player* plMover, ObjectGuid transportGuid) {}
@@ -71,14 +73,12 @@ class MovementAnticheatInterface
             movementInfo - new movement info that was just received
             packet - the packet we are checking
         */
-        virtual bool HandleAnticheatTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
+        virtual bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
         virtual bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode) { return true; }
-        
-        virtual bool CheckTeleport(Player* pPlayer, MovementInfo const& movementInfo, uint32 opcode) { return true; }
-        virtual bool HandleMovementFlags(Player* pPlayer, MovementInfo& movementInfo) { return true; }
+        virtual bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) { return true; }
 
         virtual void InitSpeeds(Unit* unit) {}
-        virtual bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) { return true; }  
+        virtual bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const { return true; }  
 };
 
 class AntispamInterface

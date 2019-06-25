@@ -310,9 +310,8 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
 
     if (pPlayerMover)
     {
-        if (!_player->GetCheatData()->CheckTeleport(pPlayerMover, movementInfo, opcode) ||
-            !_player->GetCheatData()->HandleAnticheatTests(pPlayerMover, movementInfo, opcode) ||
-            !_player->GetCheatData()->HandleMovementFlags(pPlayerMover, movementInfo))
+        if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) || 
+            !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
         {
             m_moveRejectTime = WorldTimer::getMSTime();
             return;
@@ -323,7 +322,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
         pMover->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
 
-    HandleMoverRelocation(movementInfo);
+    HandleMoverRelocation(pMover, movementInfo);
 
     // fall damage generation (ignore in flight case that can be triggered also at lags in moment teleportation to another map).
     if (opcode == MSG_MOVE_FALL_LAND && pPlayerMover && !pPlayerMover->IsTaxiFlying())
@@ -482,18 +481,27 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recvData)
 
         if (pPlayerMover)
         {
-            if (!_player->GetCheatData()->CheckTeleport(pPlayerMover, movementInfo, opcode) ||
-                !_player->GetCheatData()->HandleSpeedChangeAck(pPlayerMover, movementInfo, speedReceived, move_type, opcode) || 
-                !_player->GetCheatData()->HandleMovementFlags(pPlayerMover, movementInfo))
+            if (!_player->GetCheatData()->HandleSpeedChangeAck(pPlayerMover, movementInfo, speedReceived, move_type, opcode) || 
+                !_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
                 return;
             }
         }
-
-        HandleMoverRelocation(movementInfo);
-        if (pPlayerMover)
-            pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+        
+        if (pMover == _player->GetMover())
+        {
+            // Update position if it has changed.
+            HandleMoverRelocation(pMover, movementInfo);
+            if (pPlayerMover)
+                pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+        }
+        else
+        {
+            // Can only change flags and speed for not current active mover.
+            pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
+            pMover->m_movementInfo.CorrectData(pMover);
+        }
     };
 
     HandleMovementPositionChange();
@@ -579,18 +587,27 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
 
         if (pPlayerMover)
         {
-            if (!_player->GetCheatData()->CheckTeleport(pPlayerMover, movementInfo, opcode) ||
-                !_player->GetCheatData()->HandleAnticheatTests(pPlayerMover, movementInfo, opcode))
+            if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) || 
+                !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
                 return;
             }
         }
 
-        // Position change
-        HandleMoverRelocation(movementInfo);
-        if (pPlayerMover)
-            pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+        if (pMover == _player->GetMover())
+        {
+            // Update position if it has changed.
+            HandleMoverRelocation(pMover, movementInfo);
+            if (pPlayerMover)
+                pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+        }
+        else
+        {
+            // Can only change flags and speed for not current active mover.
+            pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
+            pMover->m_movementInfo.CorrectData(pMover);
+        }
     };
     
     HandleMovementPositionChange();
@@ -673,18 +690,27 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
 
         if (pPlayerMover)
         {
-            if (!_player->GetCheatData()->CheckTeleport(pPlayerMover, movementInfo, opcode) ||
-                !_player->GetCheatData()->HandleAnticheatTests(pPlayerMover, movementInfo, opcode))
+            if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) ||
+                !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
                 return;
             }
         }
 
-        // Update position if it has changed
-        HandleMoverRelocation(movementInfo);
-        if (pPlayerMover)
-            pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+        if (pMover == _player->GetMover())
+        {
+            // Update position if it has changed.
+            HandleMoverRelocation(pMover, movementInfo);
+            if (pPlayerMover)
+                pPlayerMover->UpdateFallInformationIfNeed(movementInfo, opcode);
+        }
+        else
+        {
+            // Can only change flags and speed for not current active mover.
+            pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
+            pMover->m_movementInfo.CorrectData(pMover);
+        }
     };
     
     HandleMovementPositionChange();
@@ -746,7 +772,7 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
     if (pMover->IsPlayer() && static_cast<Player*>(pMover)->IsBeingTeleported())
         return;
 
-    HandleMoverRelocation(movementInfo);
+    HandleMoverRelocation(pMover, movementInfo);
 
     MovementPacketSender::SendKnockBackToObservers(pMover, movementInfo.jump.cosAngle, movementInfo.jump.sinAngle, movementInfo.jump.xyspeed, movementInfo.jump.velocity);
 }
@@ -842,10 +868,9 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recvData)
     recvData >> movementInfo;
     _clientMoverGuid = ObjectGuid();
 #endif
-
-    if (!_player->GetCheatData()->CheckTeleport(_player, movementInfo, recvData.GetOpcode()) ||
-        !_player->GetCheatData()->HandleAnticheatTests(_player, movementInfo, recvData.GetOpcode()) ||
-        !_player->GetCheatData()->HandleMovementFlags(_player, movementInfo))
+    
+    if (!_player->GetCheatData()->HandleFlagTests(_player, movementInfo, recvData.GetOpcode()) ||
+        !_player->GetCheatData()->HandlePositionTests(_player, movementInfo, recvData.GetOpcode()))
     {
         return;
     }
@@ -940,9 +965,8 @@ bool WorldSession::VerifyMovementInfo(MovementInfo const& movementInfo) const
     return true;
 }
 
-void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
+void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInfo)
 {
-    Unit *pMover = _player->GetMover();
     movementInfo.CorrectData(pMover);
 
     // Prevent client from removing root flag.
