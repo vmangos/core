@@ -438,7 +438,9 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     if (pPlayer != me)
         InitNewPlayer(pPlayer);
 
-    if (!me->movespline->Finalized())
+    // Do not accept position changes during server side movement,
+    // or while player is dead and has not released his spirit yet.
+    if (!me->movespline->Finalized() || (me->getDeathState() == CORPSE))
         return false;
 
     uint32 cheatFlags = 0x0;
