@@ -237,6 +237,8 @@ void MovementCheatData::Init()
 
     m_jumpInitialSpeed   = 0.f;
     m_jumpCount = 0;
+    m_jumpFlagCount = 0;
+    m_jumpFlagTime = 0;
 
     m_updateCheckTimer = CHEATS_UPDATE_INTERVAL;
     m_knockBack = false;
@@ -247,6 +249,8 @@ void MovementCheatData::InitNewPlayer(Player* pPlayer)
     me = pPlayer;
     m_jumpCount = 0;
     m_jumpInitialSpeed = 0.f;
+    m_jumpFlagCount = 0;
+    m_jumpFlagTime = 0;
     m_knockBack = false;
     InitSpeeds(pPlayer);
 }
