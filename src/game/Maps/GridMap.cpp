@@ -1082,6 +1082,10 @@ bool TerrainInfo::IsUnderWater(float x, float y, float z) const
  *
  * @return           calculated z coordinate
  */
+float TerrainInfo::GetWaterOrGroundLevel(Position const& position, float* pGround, bool swim) const
+{
+    return GetWaterOrGroundLevel(position.x, position.y, position.z, pGround, swim);
+}
 float TerrainInfo::GetWaterOrGroundLevel(float x, float y, float z, float* pGround /*= NULL*/, bool swim /*= false*/) const
 {
     if (const_cast<TerrainInfo*>(this)->GetGrid(x, y))

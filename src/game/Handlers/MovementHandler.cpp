@@ -481,8 +481,8 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recvData)
 
         if (pPlayerMover)
         {
-            if (!_player->GetCheatData()->HandleSpeedChangeAck(pPlayerMover, movementInfo, speedReceived, move_type, opcode) || 
-                !_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode))
+            if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, opcode) || 
+                !_player->GetCheatData()->HandleSpeedChangeAck(pPlayerMover, movementInfo, speedReceived, move_type, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
                 return;
@@ -771,6 +771,16 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (pMover->IsPlayer() && static_cast<Player*>(pMover)->IsBeingTeleported())
         return;
+
+    if (Player* pPlayerMover = pMover->ToPlayer())
+    {
+        if (!_player->GetCheatData()->HandleFlagTests(pPlayerMover, movementInfo, recvData.GetOpcode()) ||
+            !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, recvData.GetOpcode()))
+        {
+            m_moveRejectTime = WorldTimer::getMSTime();
+            return;
+        }
+    }
 
     HandleMoverRelocation(pMover, movementInfo);
 

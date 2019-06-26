@@ -44,6 +44,8 @@ const char* GetMovementCheatName(CheatType flagId)
             return "PvEUnreachable";
         case CHEAT_TYPE_FLY_HACK_SWIM:
             return "FlyHackSwim";
+        case CHEAT_TYPE_NO_FALL_TIME:
+            return "NoFallTime";
         case CHEAT_TYPE_TELEPORT:
             return "TeleportHack";
         case CHEAT_TYPE_TELEPORT_TRANSPORT:
@@ -192,6 +194,7 @@ uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason)
     AddPenaltyForCheat(true, CHEAT_TYPE_WALL_CLIMB, CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WALL_CLIMB_THRESHOLD_TOTAL, CONFIG_UINT32_AC_MOVEMENT_CHEAT_WALL_CLIMB_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_PVE_FLYHACK, CONFIG_BOOL_AC_MOVEMENT_CHEAT_UNREACHABLE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_UNREACHABLE_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FLY_HACK_SWIM, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FLY_PENALTY);
+    AddPenaltyForCheat(true, CHEAT_TYPE_NO_FALL_TIME, CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NO_FALL_TIME_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELEPORT_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_TELEPORT_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_FAKE_TRANSPORT, CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_PENALTY);
@@ -394,6 +397,10 @@ bool ShouldRejectMovement(uint32 cheatFlags)
         sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FLY_REJECT))
         return true;
 
+    if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
+        return true;
+
     if ((cheatFlags & (1 << CHEAT_TYPE_TELEPORT)) &&
         sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_REJECT))
         return true;
@@ -429,18 +436,27 @@ bool ShouldRejectMovement(uint32 cheatFlags)
     return false;
 }
 
+template<class T>
+float GetDistance3D(T const& from, T const& to)
+{
+    float dx = from.x - to.x;
+    float dy = from.y - to.y;
+    float dz = from.z - to.z;
+    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+    return (dist > 0 ? dist : 0);
+}
+
 bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
         return true;
-
+    
     if (pPlayer != me)
         InitNewPlayer(pPlayer);
 
-    // Do not accept position changes during server side movement,
-    // or while player is dead and has not released his spirit yet.
-    if (!me->movespline->Finalized() || (me->getDeathState() == CORPSE))
+    // Do not accept position changes if player is dead and has not released spirit.
+    if (me->getDeathState() == CORPSE)
         return false;
 
     uint32 cheatFlags = 0x0;
@@ -474,21 +490,42 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     if (uint32 flags = CheckTimeDesync(movementInfo))
         cheatFlags |= flags;
 
-    if (CheckTeleport(movementInfo))
-        APPEND_CHEAT(CHEAT_TYPE_TELEPORT);
+    bool failedSplineCheck = false;
+    
+    if (!me->movespline->Finalized())
+    {
+        // Server side movement checks.
+        auto const previousPoint = me->movespline->PreviousDestination();
+        auto const nextPoint = me->movespline->CurrentDestination();
+        float const distanceServer = GetDistance3D(previousPoint, nextPoint);
+        float const distanceClient = GetDistance3D(*GetLastMovementInfo().GetPos(), *movementInfo.GetPos());
 
-    if (CheckForbiddenArea(movementInfo))
-        APPEND_CHEAT(CHEAT_TYPE_FORBIDDEN_AREA);
+        // Player is moving a greater distance than it takes to reach next point?
+        if (distanceClient > distanceServer)
+            failedSplineCheck = true;
+    }
+    else
+    {
+        // Client controlled movement checks.
+        if (CheckTeleport(movementInfo))
+            APPEND_CHEAT(CHEAT_TYPE_TELEPORT);
 
-    if (CheckTeleportToTransport(movementInfo))
-        APPEND_CHEAT(CHEAT_TYPE_TELEPORT_TRANSPORT);
+        if (CheckForbiddenArea(movementInfo))
+            APPEND_CHEAT(CHEAT_TYPE_FORBIDDEN_AREA);
 
-    if (CheckWallClimb(movementInfo, opcode))
-        APPEND_CHEAT(CHEAT_TYPE_WALL_CLIMB);
+        if (CheckTeleportToTransport(movementInfo))
+            APPEND_CHEAT(CHEAT_TYPE_TELEPORT_TRANSPORT);
 
-    // Distance computation related
-    if (uint32 flags = CheckSpeedHack(movementInfo, opcode))
-        cheatFlags |= flags;
+        if (CheckWallClimb(movementInfo, opcode))
+            APPEND_CHEAT(CHEAT_TYPE_WALL_CLIMB);
+
+        if (CheckNoFallTime(movementInfo, opcode))
+            APPEND_CHEAT(CHEAT_TYPE_NO_FALL_TIME);
+
+        // Distance computation related
+        if (uint32 flags = CheckSpeedHack(movementInfo, opcode))
+            cheatFlags |= flags;
+    }
 
     // This is required for proper movement interpolation
     if (opcode == MSG_MOVE_JUMP)
@@ -501,7 +538,9 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
 
     AddCheats(cheatFlags);
 
-    if (ShouldRejectMovement(cheatFlags))
+    bool const sendHeartbeat = ShouldRejectMovement(cheatFlags);
+
+    if (sendHeartbeat || failedSplineCheck)
     {
         // Movement flags get verified first. Don't undo them if they passed.
         if (IsFlagAckOpcode(opcode))
@@ -510,7 +549,22 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
             me->m_movementInfo.CorrectData(me);
         }     
         
-        me->SendHeartBeat(true);
+        if (sendHeartbeat)
+        {
+            if ((cheatFlags & (1 << CHEAT_TYPE_NO_FALL_TIME)) &&
+                sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_REJECT))
+            {
+                // Teleport to ground height in this case.
+                float const x = GetLastMovementInfo().pos.x;
+                float const y = GetLastMovementInfo().pos.y;
+                float const z = me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + 5;
+                GetLastMovementInfo().RemoveMovementFlag(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR);
+                GetLastMovementInfo().ctime = 0; // Not a client packet. Pauses interpolation.
+                me->TeleportPositionRelocation(x, y, z, 0);
+            }
+            me->SendHeartBeat(true);
+        } 
+
         return false;
     }
 
@@ -537,100 +591,152 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
 
-    if (!me->IsLaunched() && !me->IsFalling() && (!me->movespline || me->movespline->Finalized()))
-    {
-        auto const currentMoveFlags = movementInfo.moveFlags;
-        uint32 removeMoveFlags = 0;
+    auto const currentMoveFlags = movementInfo.moveFlags;
+    uint32 removeMoveFlags = 0;
 
-        uint32 cheatFlags = 0x0;
+    uint32 cheatFlags = 0x0;
 #define APPEND_CHEAT(t) cheatFlags |= (1 << t)
 
-        // Client is rooted, but there is no root server side.
-        if ((currentMoveFlags & MOVEFLAG_ROOT) &&
-            !(GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT) &&
-            !me->HasPendingMovementChange(ROOT) &&
-            !me->hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) &&
-            (opcode != CMSG_FORCE_MOVE_ROOT_ACK))
-        {
-            APPEND_CHEAT(CHEAT_TYPE_SELF_ROOT);
-            removeMoveFlags |= MOVEFLAG_ROOT;
-        }
-
-        // Moving while rooted. We do not apply root flag until ack, so should be no false positives.
-        if ((currentMoveFlags & MOVEFLAG_MASK_MOVING) &&
-            ((currentMoveFlags & MOVEFLAG_ROOT) || (GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT)) &&
-            !me->HasPendingMovementChange(ROOT) &&
-            (opcode != CMSG_FORCE_MOVE_UNROOT_ACK))
-        {
-            APPEND_CHEAT(CHEAT_TYPE_ROOT_MOVE);
-            removeMoveFlags |= MOVEFLAG_MASK_MOVING;
-            movementInfo.moveFlags |= MOVEFLAG_ROOT;
-        }
-
-        // This flag is only for creatures.
-        if (currentMoveFlags & MOVEFLAG_FIXED_Z)
-        {
-            APPEND_CHEAT(CHEAT_TYPE_FIXED_Z);
-            removeMoveFlags |= MOVEFLAG_FIXED_Z;
-        }
-
-        // This flag is only for creatures.
-        if ((currentMoveFlags & MOVEFLAG_LEVITATING) &&
-            (m_session->GetSecurity() != SEC_PLAYER))
-        {
-            APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
-            removeMoveFlags |= MOVEFLAG_LEVITATING;
-        }
-
-        if ((currentMoveFlags & MOVEFLAG_SWIMMING) &&
-            (currentMoveFlags & MOVEFLAG_FLYING) &&
-            (m_session->GetSecurity() != SEC_PLAYER))
-        {
-            APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
-            removeMoveFlags |= MOVEFLAG_SWIMMING | MOVEFLAG_FLYING;
-        }
-
-        if ((currentMoveFlags & MOVEFLAG_WATERWALKING) &&
-            !me->HasAuraType(SPELL_AURA_WATER_WALK) &&
-            !me->HasAuraType(SPELL_AURA_GHOST) &&
-            !me->HasPendingMovementChange(WATER_WALK) &&
-            (opcode != CMSG_MOVE_WATER_WALK_ACK))
-        {
-            APPEND_CHEAT(CHEAT_TYPE_WATER_WALK);
-            removeMoveFlags |= MOVEFLAG_WATERWALKING;
-        }
-
-        if ((currentMoveFlags & MOVEFLAG_SAFE_FALL) &&
-            !me->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
-            !me->HasPendingMovementChange(FEATHER_FALL) &&
-            (opcode != CMSG_MOVE_FEATHER_FALL_ACK))
-        {
-            APPEND_CHEAT(CHEAT_TYPE_SLOW_FALL);
-            removeMoveFlags |= MOVEFLAG_SAFE_FALL;
-        }
-
-        if ((currentMoveFlags & MOVEFLAG_HOVER) &&
-            !me->HasAuraType(SPELL_AURA_HOVER) &&
-            !me->HasPendingMovementChange(SET_HOVER) &&
-            (opcode != CMSG_MOVE_HOVER_ACK))
-        {
-            APPEND_CHEAT(CHEAT_TYPE_HOVER);
-            removeMoveFlags |= MOVEFLAG_HOVER;
-        }
-#undef APPEND_CHEAT
-
-        AddCheats(cheatFlags);
-
-        if (ShouldRejectMovement(cheatFlags))
-        {
-            me->SendHeartBeat(true);
-            return false;
-        }
-        else if (removeMoveFlags)
-            movementInfo.RemoveMovementFlag(removeMoveFlags);
+    // Client is rooted, but there is no root server side.
+    if ((currentMoveFlags & MOVEFLAG_ROOT) &&
+        !(GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT) &&
+        !me->HasPendingMovementChange(ROOT) &&
+        !me->hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) &&
+        (opcode != CMSG_FORCE_MOVE_ROOT_ACK))
+    {
+        APPEND_CHEAT(CHEAT_TYPE_SELF_ROOT);
+        removeMoveFlags |= MOVEFLAG_ROOT;
     }
 
+    // Moving while rooted. We do not apply root flag until ack, so should be no false positives.
+    if ((currentMoveFlags & MOVEFLAG_MASK_MOVING) &&
+        ((currentMoveFlags & MOVEFLAG_ROOT) || (GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT)) &&
+        !me->HasPendingMovementChange(ROOT) &&
+        (opcode != CMSG_FORCE_MOVE_UNROOT_ACK))
+    {
+        APPEND_CHEAT(CHEAT_TYPE_ROOT_MOVE);
+        removeMoveFlags |= MOVEFLAG_MASK_MOVING;
+        movementInfo.moveFlags |= MOVEFLAG_ROOT;
+    }
+
+    // This flag is only for creatures.
+    if (currentMoveFlags & MOVEFLAG_FIXED_Z)
+    {
+        APPEND_CHEAT(CHEAT_TYPE_FIXED_Z);
+        removeMoveFlags |= MOVEFLAG_FIXED_Z;
+    }
+
+    // This flag is only for creatures.
+    if ((currentMoveFlags & MOVEFLAG_LEVITATING) &&
+        (m_session->GetSecurity() == SEC_PLAYER))
+    {
+        APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
+        removeMoveFlags |= MOVEFLAG_LEVITATING;
+    }
+
+    if ((currentMoveFlags & MOVEFLAG_SWIMMING) &&
+        (currentMoveFlags & MOVEFLAG_FLYING) &&
+        (m_session->GetSecurity() == SEC_PLAYER))
+    {
+        APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
+        removeMoveFlags |= MOVEFLAG_SWIMMING | MOVEFLAG_FLYING;
+    }
+
+    if ((currentMoveFlags & MOVEFLAG_WATERWALKING) &&
+        !me->HasAuraType(SPELL_AURA_WATER_WALK) &&
+        !me->HasAuraType(SPELL_AURA_GHOST) &&
+        !me->HasPendingMovementChange(WATER_WALK) &&
+        (opcode != CMSG_MOVE_WATER_WALK_ACK))
+    {
+        APPEND_CHEAT(CHEAT_TYPE_WATER_WALK);
+        removeMoveFlags |= MOVEFLAG_WATERWALKING;
+    }
+
+    if ((currentMoveFlags & MOVEFLAG_SAFE_FALL) &&
+        !me->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
+        !me->HasPendingMovementChange(FEATHER_FALL) &&
+        (opcode != CMSG_MOVE_FEATHER_FALL_ACK))
+    {
+        APPEND_CHEAT(CHEAT_TYPE_SLOW_FALL);
+        removeMoveFlags |= MOVEFLAG_SAFE_FALL;
+    }
+
+    if ((currentMoveFlags & MOVEFLAG_HOVER) &&
+        !me->HasAuraType(SPELL_AURA_HOVER) &&
+        !me->HasPendingMovementChange(SET_HOVER) &&
+        (opcode != CMSG_MOVE_HOVER_ACK))
+    {
+        APPEND_CHEAT(CHEAT_TYPE_HOVER);
+        removeMoveFlags |= MOVEFLAG_HOVER;
+    }
+#undef APPEND_CHEAT
+
+    AddCheats(cheatFlags);
+
+    if (ShouldRejectMovement(cheatFlags))
+    {
+        me->SendHeartBeat(true);
+        return false;
+    }
+    else if (removeMoveFlags)
+        movementInfo.RemoveMovementFlag(removeMoveFlags);
+
     return true;
+}
+
+#define JUMP_FLAG_TRESHOLD 5
+#define FAR_FALL_FLAG_TIME 3000
+#define FAR_FALL_FLAG_TIME 3000
+#define HEIGHT_LEEWAY 5.0f
+
+bool ShouldResetNoFallTimeCheck(MovementInfo const& movementInfo, uint16 opcode)
+{
+    if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR | MOVEFLAG_ROOT))
+        return true;
+
+    switch (opcode)
+    {
+        case MSG_MOVE_JUMP:
+        case MSG_MOVE_FALL_LAND:
+        case MSG_MOVE_START_SWIM:
+        case CMSG_MOVE_KNOCK_BACK_ACK:
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool MovementCheatData::CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode)
+{
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED) ||
+       (movementInfo.moveFlags & (MOVEFLAG_FLYING | MOVEFLAG_SWIMMING | MOVEFLAG_SAFE_FALL | MOVEFLAG_ONTRANSPORT)))
+        return false;
+
+    if (ShouldResetNoFallTimeCheck(movementInfo, opcode))
+    {
+        m_jumpFlagCount = 0;
+        m_jumpFlagTime = 0;
+        return false;
+    }
+    
+    if (movementInfo.HasMovementFlag(MOVEFLAG_JUMPING))
+    {
+        m_jumpFlagCount++;
+
+        if (!m_jumpFlagTime)
+            m_jumpFlagTime = movementInfo.time;
+    }
+        
+    if (m_jumpFlagTime &&
+       (m_jumpFlagCount > JUMP_FLAG_TRESHOLD) &&
+       (movementInfo.time - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
+       (GetLastMovementInfo().pos.z + 1.0f > movementInfo.pos.z) &&
+       (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY))
+        return true;
+
+    return false;
 }
 
 uint32 MovementCheatData::CheckTimeDesync(MovementInfo const& movementInfo)
@@ -681,7 +787,8 @@ bool MovementCheatData::CheckMultiJump(uint16 opcode)
     return false;
 }
 
-#define MAX_CLIMB_ANGLE 57.0f
+#define MAX_CLIMB_ANGLE_RADIANS 1.0f
+#define MAX_CLIMB_ANGLE_DEGREES 57.295776f
 #define NO_WALL_CLIMB_CHECK_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)
 
 bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const
@@ -705,9 +812,9 @@ bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 
         return false;
 
     float const angleRad = atan(deltaZ / deltaXY);
-    float const angleDeg = angleRad * (360 / (M_PI_F * 2));
+    //float const angleDeg = angleRad * (360 / (M_PI_F * 2));
 
-    if (angleDeg > MAX_CLIMB_ANGLE)
+    if (angleRad > MAX_CLIMB_ANGLE_RADIANS)
         return true;
 
     return false;
@@ -778,6 +885,7 @@ uint32 MovementCheatData::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_SPEED_HACK_ENABLED) ||
        (movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT) ||
+       (opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
         me->IsTaxiFlying())
         return 0;
 

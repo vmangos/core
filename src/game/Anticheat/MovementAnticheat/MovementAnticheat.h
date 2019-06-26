@@ -22,6 +22,7 @@ enum CheatType
     CHEAT_TYPE_WALL_CLIMB,
     CHEAT_TYPE_PVE_FLYHACK,
     CHEAT_TYPE_FLY_HACK_SWIM,
+    CHEAT_TYPE_NO_FALL_TIME,
     CHEAT_TYPE_TELEPORT,
     CHEAT_TYPE_TELEPORT_TRANSPORT,
     CHEAT_TYPE_FAKE_TRANSPORT,
@@ -81,6 +82,7 @@ private:
         bool CheckForbiddenArea(MovementInfo const& movementInfo) const;
         bool CheckMultiJump(uint16 opcode);
         bool CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const;
+        bool CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode);
         bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
         bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const override;
@@ -89,17 +91,19 @@ private:
 
         MovementInfo& GetLastMovementInfo() { return me->m_movementInfo; }
         MovementInfo const& GetLastMovementInfo() const { return me->m_movementInfo; }
-        bool IsInKnockBack() const override { return m_knockBack; }
-        
         float GetClientSpeed(UnitMoveType m) const { return m_clientSpeeds[m]; }
         float GetSpeedForMovementInfo(MovementInfo const& movementInfo) const;
-
-        uint32 m_updateCheckTimer = 0;
-        std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTick = {};    // per anticheat tick (not world/map tick)
-        std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTotal = {};
-
+        bool IsInKnockBack() const override { return m_knockBack; }
         bool m_knockBack = false;
+
+        // Multi jump
         uint32 m_jumpCount = 0;
+
+        // No fall time
+        uint32 m_jumpFlagCount = 0;
+        uint32 m_jumpFlagTime = 0;
+
+        // Speed hack
         int32 m_clientDesync = 0;
         uint32 m_maxClientDesync = 0;
         float m_jumpInitialSpeed = 0.0f;
@@ -109,6 +113,10 @@ private:
 
         Player* me = nullptr; // current player object that checks run on, changes on mind control
         WorldSession* const m_session = nullptr; // session to which the cheat data belongs, does not change
+
+        uint32 m_updateCheckTimer = 0;
+        std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTick = {};    // gets reset every anticheat update tick
+        std::array<uint32, CHEATS_COUNT> m_cheatOccuranceTotal = {};   // gets reset when total treshold is reached
 };
 
 #endif
