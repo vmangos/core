@@ -690,7 +690,6 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
 
 #define JUMP_FLAG_TRESHOLD 5
 #define FAR_FALL_FLAG_TIME 3000
-#define FAR_FALL_FLAG_TIME 3000
 #define HEIGHT_LEEWAY 5.0f
 
 bool ShouldResetNoFallTimeCheck(MovementInfo const& movementInfo, uint16 opcode)

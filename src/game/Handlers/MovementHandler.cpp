@@ -917,31 +917,34 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recvData)
 {
     DEBUG_LOG("WORLD: Time Lag/Synchronization Resent/Update");
 
-    ObjectGuid g;
-    recvData >> g;
+    ObjectGuid guid;
+    recvData >> guid;
     uint32 lag;
     recvData >> lag;
 
-    Player* pl = GetPlayer();
+    Unit* pMover = _player->GetMap()->GetUnit(guid);
 
-    pl->m_movementInfo.time += lag;
-    pl->m_movementInfo.ctime += lag;
+    if (!pMover)
+        return;
+
+    pMover->m_movementInfo.time += lag;
+    pMover->m_movementInfo.ctime += lag;
 
     // fix an 1.12 client problem with transports
-    Transport* tr = pl->GetTransport();
-    if (pl->HasJustBoarded() && tr)
+    Transport* tr = pMover->GetTransport();
+    if (_player->HasJustBoarded() && tr)
     {
-        pl->SetJustBoarded(false);
-        tr->SendOutOfRangeUpdateToPlayer(pl);
-        tr->SendCreateUpdateToPlayer(pl);
+        _player->SetJustBoarded(false);
+        tr->SendOutOfRangeUpdateToPlayer(_player);
+        tr->SendCreateUpdateToPlayer(_player);
     }
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     else
     {
         WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
-        data << pl->GetPackGUID();
+        data << pMover->GetPackGUID();
         data << lag;
-        pl->SendMovementMessageToSet(std::move(data), false);
+        pMover->SendMovementMessageToSet(std::move(data), true, _player);
     }
 #endif
 }
