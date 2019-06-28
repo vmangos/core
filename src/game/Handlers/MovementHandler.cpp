@@ -922,6 +922,9 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recvData)
     uint32 lag;
     recvData >> lag;
 
+    if (guid != _clientMoverGuid && guid != _player->GetObjectGuid() && guid != _player->GetMover()->GetObjectGuid())
+        return;
+
     Unit* pMover = _player->GetMap()->GetUnit(guid);
 
     if (!pMover)
