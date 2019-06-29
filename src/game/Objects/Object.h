@@ -678,6 +678,7 @@ m_obj->m_updateTracker.Reset();
 
         void SetOrientation(float orientation);
 
+        Position const& GetPosition() const { return m_position; }
         float GetPositionX( ) const { return m_position.x; }
         float GetPositionY( ) const { return m_position.y; }
         float GetPositionZ( ) const { return m_position.z; }

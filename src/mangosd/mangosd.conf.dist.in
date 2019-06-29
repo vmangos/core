@@ -1713,6 +1713,10 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
+#    Anticheat.WallClimb.Angle
+#        Description: Vertical angle in radians between two points that players are able to climb.
+#        Default:     1.0
+#
 #    Anticheat.WallClimb.Threshold.Tick
 #        Description: Detections needed to trigger a penalty in one tick.
 #        Default:     3
@@ -1783,6 +1787,11 @@ Warden.ModuleDir             = "warden_modules"
 #        Description: Do not accept movement info and teleport to old position.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
+#
+#    Anticheat.Teleport.Distance
+#        Description: Yards that we allow players to travel in one packet.
+#                     Setting this too low can cause false positives at high speeds.
+#        Default:     40.0
 #
 #    Anticheat.Teleport.Threshold
 #        Description: Detections needed to trigger a penalty.
@@ -2047,6 +2056,7 @@ Anticheat.MultiJump.Threshold.Total = 10
 Anticheat.MultiJump.Penalty = 7
 Anticheat.WallClimb.Enable = 1
 Anticheat.WallClimb.Reject = 1
+Anticheat.WallClimb.Angle = 1.0
 Anticheat.WallClimb.Threshold.Tick = 3
 Anticheat.WallClimb.Threshold.Total = 30
 Anticheat.WallClimb.Penalty = 7
@@ -2063,6 +2073,7 @@ Anticheat.NoFallTime.Threshold = 10
 Anticheat.NoFallTime.Penalty = 7
 Anticheat.Teleport.Enable = 1
 Anticheat.Teleport.Reject = 1
+Anticheat.Teleport.Distance = 40.0
 Anticheat.Teleport.Threshold = 3
 Anticheat.Teleport.Penalty = 11
 Anticheat.TeleportToTransport.Enable = 1

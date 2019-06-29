@@ -498,11 +498,11 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     
     if (!me->movespline->Finalized())
     {
-        // Server side movement checks.
+        // Server side movement.
         auto const previousPoint = me->movespline->PreviousDestination();
         auto const nextPoint = me->movespline->CurrentDestination();
         float const distanceServer = GetDistance3D(previousPoint, nextPoint);
-        float const distanceClient = GetDistance3D(*GetLastMovementInfo().GetPos(), *movementInfo.GetPos());
+        float const distanceClient = GetDistance3D(GetLastMovementInfo().pos, movementInfo.pos);
 
         // Player is moving a greater distance than it takes to reach next point?
         if (distanceClient > distanceServer)
@@ -510,8 +510,9 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     }
     else
     {
-        // Client controlled movement checks.
-        if (CheckTeleport(movementInfo))
+        // Client controlled movement.
+        bool teleportDetected;
+        if (teleportDetected = CheckTeleport(movementInfo))
             APPEND_CHEAT(CHEAT_TYPE_TELEPORT);
 
         if (CheckForbiddenArea(movementInfo))
@@ -525,10 +526,13 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
 
         if (CheckNoFallTime(movementInfo, opcode))
             APPEND_CHEAT(CHEAT_TYPE_NO_FALL_TIME);
-
-        // Distance computation related
-        if (uint32 flags = CheckSpeedHack(movementInfo, opcode))
-            cheatFlags |= flags;
+        
+        // Distance computation related. No need to do it if teleport detected.
+        if (!teleportDetected)
+        {
+            if (uint32 flags = CheckSpeedHack(movementInfo, opcode))
+                cheatFlags |= flags;
+        }
     }
 
     // This is required for proper movement interpolation
@@ -589,7 +593,8 @@ bool MovementCheatData::HandleSpeedChangeAck(Player* pPlayer, MovementInfo& move
 
 bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
-    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED))
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
+        (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
         return true;
     
     if (me != pPlayer)
@@ -632,7 +637,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
 
     // This flag is only for creatures.
     if ((currentMoveFlags & MOVEFLAG_LEVITATING) &&
-        (m_session->GetSecurity() == SEC_PLAYER))
+        !me->hasUnitState(UNIT_STAT_FLYING_ALLOWED))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
         removeMoveFlags |= MOVEFLAG_LEVITATING;
@@ -640,7 +645,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
 
     if ((currentMoveFlags & MOVEFLAG_SWIMMING) &&
         (currentMoveFlags & MOVEFLAG_FLYING) &&
-        (m_session->GetSecurity() == SEC_PLAYER))
+        !me->hasUnitState(UNIT_STAT_FLYING_ALLOWED))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
         removeMoveFlags |= MOVEFLAG_SWIMMING | MOVEFLAG_FLYING;
@@ -790,8 +795,6 @@ bool MovementCheatData::CheckMultiJump(uint16 opcode)
     return false;
 }
 
-#define MAX_CLIMB_ANGLE_RADIANS 1.0f
-#define MAX_CLIMB_ANGLE_DEGREES 57.295776f
 #define NO_WALL_CLIMB_CHECK_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)
 
 bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const
@@ -817,7 +820,7 @@ bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 
     float const angleRad = atan(deltaZ / deltaXY);
     //float const angleDeg = angleRad * (360 / (M_PI_F * 2));
 
-    if (angleRad > MAX_CLIMB_ANGLE_RADIANS)
+    if (angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE))
         return true;
 
     return false;
@@ -1124,9 +1127,6 @@ bool MovementCheatData::CheckTeleport(MovementInfo const& movementInfo) const
     return false;
 }
 
-// Max distance that we allow players to travel in one packet.
-// Setting this too low can cause false positives.
-#define ALLOWED_TELEPORT_DISTANCE 40.0f
 #define ALLOWED_TRANSPORT_DISTANCE 100.0f
 
 bool MovementCheatData::IsTeleportAllowed(MovementInfo const& movementInfo) const
@@ -1137,12 +1137,8 @@ bool MovementCheatData::IsTeleportAllowed(MovementInfo const& movementInfo) cons
        (me->IsBeingTeleported()))
         return true;
 
-    float const deltaX = me->GetPositionX() - movementInfo.pos.x;
-    float const deltaY = me->GetPositionY() - movementInfo.pos.y;
-    float const deltaZ = me->GetPositionZ() - movementInfo.pos.z;
-    float const distance = sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
-
-    float maxDistance = ALLOWED_TELEPORT_DISTANCE;
+    float const distance = GetDistance3D(me->GetPosition(), movementInfo.pos);
+    float maxDistance = sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_TELEPORT_DISTANCE);
 
     // Exclude elevators
     uint32 destZoneId = 0;
@@ -1154,7 +1150,7 @@ bool MovementCheatData::IsTeleportAllowed(MovementInfo const& movementInfo) cons
         if ((me->GetZoneId() == 1497 && me->GetAreaId() == 1497) ||
         // Thousand Needles Lift
            (me->GetZoneId() == 2257 || (me->GetZoneId() == 400 && me->GetAreaId() == 485)))
-            maxDistance = ALLOWED_TRANSPORT_DISTANCE;
+            maxDistance = std::max(maxDistance, ALLOWED_TRANSPORT_DISTANCE);
     }
 
     if (distance < maxDistance)

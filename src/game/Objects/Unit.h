@@ -463,7 +463,7 @@ enum UnitState
 
     UNIT_STAT_PENDING_ROOT          = 0x00100000,
     UNIT_STAT_PENDING_STUNNED       = 0x00200000,
-    UNIT_STAT_CLIENT_ROOT           = 0x00400000,
+    UNIT_STAT_FLYING_ALLOWED        = 0x00400000,               // has gm fly mode enabled
 
     // High-level states
     UNIT_STAT_NO_COMBAT_MOVEMENT = 0x01000000,

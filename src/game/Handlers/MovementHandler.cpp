@@ -716,12 +716,6 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     HandleMovementPositionChange();
     pMover->SetRootedReal(applyReceived);
     MovementPacketSender::SendMovementFlagChangeToObservers(pMover, MOVEFLAG_ROOT, applyReceived);
-
-    // Set unit client state for brevity, though it should not be used
-    if (applyReceived)
-        pMover->addUnitState(UNIT_STAT_CLIENT_ROOT);
-    else
-        pMover->clearUnitState(UNIT_STAT_CLIENT_ROOT);
 }
 
 void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)

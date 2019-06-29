@@ -188,9 +188,6 @@ int32 MoveSplineInit::Launch()
     if (moveFlags & MOVEFLAG_WALK_MODE && !(oldMoveFlags & MOVEFLAG_WALK_MODE)) // Switch to walk mode
         mvtData.SetSplineOpcode(MSG_MOVE_SET_WALK_MODE, unit.GetObjectGuid());
 #endif
-
-    // Clear client root here, after we've added it to the packet - STATE SHOULD NOT BE USED
-    unit.clearUnitState(UNIT_STAT_CLIENT_ROOT);
         
     mvtData.AddPacket(data);
     // Do not forget to restore velocity after movement !
