@@ -351,6 +351,19 @@ void MovementCheatData::OnFailedToAckChange()
     AddCheats(1 << CHEAT_TYPE_PENDING_ACK_DELAY);
 }
 
+float MovementCheatData::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
+{
+    float speed = 0.0f;
+    if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
+        speed = GetClientSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_SWIM_BACK : MOVE_SWIM);
+    else if (movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE))
+        speed = GetClientSpeed(MOVE_WALK);
+    else if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+        speed = GetClientSpeed(movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? MOVE_RUN_BACK : MOVE_RUN);
+
+    return speed;
+}
+
 bool IsFlagAckOpcode(uint16 opcode)
 {
     switch (opcode)
@@ -364,19 +377,6 @@ bool IsFlagAckOpcode(uint16 opcode)
     }
 
     return false;
-}
-
-float MovementCheatData::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
-{
-    float speed = 0.0f;
-    if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
-        speed = movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? GetClientSpeed(MOVE_SWIM_BACK) : GetClientSpeed(MOVE_SWIM);
-    else if (movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE))
-        speed = GetClientSpeed(MOVE_WALK);
-    else if (movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
-        speed = movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD) ? GetClientSpeed(MOVE_RUN_BACK) : GetClientSpeed(MOVE_RUN);
-
-    return speed;
 }
 
 bool ShouldRejectMovement(uint32 cheatFlags)
@@ -498,7 +498,7 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     
     if (!me->movespline->Finalized())
     {
-        // Server side movement.
+        // Server controlled movement.
         auto const previousPoint = me->movespline->PreviousDestination();
         auto const nextPoint = me->movespline->CurrentDestination();
         float const distanceServer = GetDistance3D(previousPoint, nextPoint);
@@ -693,7 +693,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     return true;
 }
 
-#define JUMP_FLAG_TRESHOLD 5
+#define JUMP_FLAG_THRESHOLD 5
 #define FAR_FALL_FLAG_TIME 3000
 #define HEIGHT_LEEWAY 5.0f
 
@@ -738,9 +738,9 @@ bool MovementCheatData::CheckNoFallTime(MovementInfo const& movementInfo, uint16
     }
     
     if (m_jumpFlagTime &&
-       (m_jumpFlagCount > JUMP_FLAG_TRESHOLD) &&
+       (m_jumpFlagCount > JUMP_FLAG_THRESHOLD) &&
        (movementInfo.time - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
-       (movementInfo.pos.z + 1.0 > GetLastMovementInfo().pos.z) &&
+       (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
        (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY))
         return true;
 
