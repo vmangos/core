@@ -3193,7 +3193,7 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
             if (!ExtractUInt32(&idS, id))
                 return false;
 
-            TaxiNodesEntry const* node = sObjectMgr.GeTaxiNodeEntry(id);
+            TaxiNodesEntry const* node = sObjectMgr.GetTaxiNodeEntry(id);
             if (!node)
                 return false;
             mapid = node->map_id;

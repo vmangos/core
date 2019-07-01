@@ -308,7 +308,7 @@ void MovementCheatData::OnExplore(AreaEntry const* pArea)
     if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_ENABLED))
         AddCheats(1 << CHEAT_TYPE_EXPLORE);
 
-    if (CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED &&
+    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED) &&
         (static_cast<int32>(me->getLevel() + 10) < pArea->AreaLevel))
         AddCheats(1 << CHEAT_TYPE_EXPLORE_HIGH_LEVEL);
 }
@@ -736,11 +736,11 @@ bool MovementCheatData::CheckNoFallTime(MovementInfo const& movementInfo, uint16
         if (!m_jumpFlagTime)
             m_jumpFlagTime = movementInfo.time;
     }
-        
+    
     if (m_jumpFlagTime &&
        (m_jumpFlagCount > JUMP_FLAG_TRESHOLD) &&
        (movementInfo.time - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
-       (GetLastMovementInfo().pos.z + 1.0f > movementInfo.pos.z) &&
+       (movementInfo.pos.z + 1.0 > GetLastMovementInfo().pos.z) &&
        (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY))
         return true;
 

@@ -867,7 +867,7 @@ bool ChatHandler::HandleLookupTaxiNodeCommand(char * args)
     // Search in taxi nodes table
     for (uint32 id = 0; id < sObjectMgr.GetMaxTaxiNodeId(); id++)
     {
-        TaxiNodesEntry const *nodeEntry = sObjectMgr.GeTaxiNodeEntry(id);
+        TaxiNodesEntry const *nodeEntry = sObjectMgr.GetTaxiNodeEntry(id);
         if (nodeEntry)
         {
             int loc = GetSessionDbcLocale();

@@ -396,7 +396,7 @@ void LoadDBCStores(const std::string& dataPath)
         memset(sTaxiNodesMask, 0, sizeof(sTaxiNodesMask));
         for (uint32 i = 1; i < sObjectMgr.GetMaxTaxiNodeId(); ++i)
         {
-            TaxiNodesEntry const* node = sObjectMgr.GeTaxiNodeEntry(i);
+            TaxiNodesEntry const* node = sObjectMgr.GetTaxiNodeEntry(i);
             if (!node)
                 continue;
 

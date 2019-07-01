@@ -6317,7 +6317,7 @@ uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, Te
 
     for (uint32 i = 1; i < GetMaxTaxiNodeId(); ++i)
     {
-        TaxiNodesEntry const* node = GeTaxiNodeEntry(i);
+        TaxiNodesEntry const* node = GetTaxiNodeEntry(i);
         if (!node || node->map_id != mapid || !node->MountCreatureID[team == ALLIANCE ? 1 : 0])
             continue;
 
@@ -6377,7 +6377,7 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
     uint16 mount_entry = 0;
 
     // select mount creature id
-    TaxiNodesEntry const* node = GeTaxiNodeEntry(id);
+    TaxiNodesEntry const* node = GetTaxiNodeEntry(id);
     if (node)
     {
         if (team == ALLIANCE)
