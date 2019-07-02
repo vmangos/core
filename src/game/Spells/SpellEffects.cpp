@@ -1781,16 +1781,16 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 29201: // Loatheb Corrupted Mind triggered sub spells
                 {
-                    uint32 spellid;
+                    uint32 spellid = 0;
                     switch (unitTarget->getClass())
                     {
                         // priests should be getting 29185, but it triggers on dmg effects as well, don't know why.
                         // stealing druid version for priests until anyone has a reason priests cant smite.s
-                    case CLASS_PRIEST:  spellid = 29194; break;//29185; break;
-                    case CLASS_DRUID:   spellid = 29194; break;
-                    case CLASS_PALADIN: spellid = 29196; break;
-                    case CLASS_SHAMAN:  spellid = 29198; break;
-                    default: break;
+                        case CLASS_PRIEST:  spellid = 29194; break;//29185; break;
+                        case CLASS_DRUID:   spellid = 29194; break;
+                        case CLASS_PALADIN: spellid = 29196; break;
+                        case CLASS_SHAMAN:  spellid = 29198; break;
+                        default: break;
                     }
                     if (spellid != 0)
                         m_caster->CastSpell(unitTarget, spellid, true);
