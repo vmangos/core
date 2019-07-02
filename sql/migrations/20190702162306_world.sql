@@ -15,7 +15,6 @@ INSERT INTO pool_gameobject (guid, pool_entry, chance, description) VALUES
 (45520, 39934, 0, 'Western Plaguelands - Large Mithril Bound Chest (153468)');
 REPLACE INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (45486, 153468, 0, 2989.21, -1601.67, 184.449, 2.49582, 0, 0, 0.948324, 0.317305, 7200, 7200, 100, 1, 0, 0, 0, 10);
 REPLACE INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (45520, 153468, 0, 2939.02, -1376.05, 167.237, -1.18682, 0, 0, 0, 0, 7200, 7200, 100, 1, 0, 0, 0, 10);
-UPDATE `gameobject` SET `spawntimesecsmin`=7200, `spawntimesecsmax`=7200 WHERE `id`=153468;
 
 
 -- End of migration.
