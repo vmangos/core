@@ -4387,7 +4387,6 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
 
 void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 {
-    // TODO: we must implement hunter pet summon at login there (spell 6962)
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_GENERIC:
