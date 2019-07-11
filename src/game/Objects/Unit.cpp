@@ -2262,10 +2262,11 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
         canResist = false;
 
     DEBUG_UNIT_IF(spellProto, this, DEBUG_SPELL_COMPUTE_RESISTS, "%s : Binary [%s]. Partial resists %s", spellProto->SpellName[2].c_str(), spellProto->IsBinary() ? "YES" : "NO", canResist ? "possible" : "impossible");
+    float const resistanceChance = pCaster->GetSpellResistChance(this, schoolMask, true);
 
-    if (canResist)
+    if (canResist || (resistanceChance < 0))
     {
-        const float multiplier = RollMagicResistanceMultiplierOutcomeAgainst(pCaster, schoolMask, damagetype, spellProto);
+        const float multiplier = RollMagicResistanceMultiplierOutcomeAgainst(pCaster, resistanceChance, schoolMask, damagetype, spellProto);
         *resist = int32(int64(damage) * multiplier);
         RemainingDamage -= *resist;
     }
@@ -3069,10 +3070,8 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit* pVictim, SpellEntry const* spell, 
     return SPELL_MISS_NONE;
 }
 
-float Unit::RollMagicResistanceMultiplierOutcomeAgainst(const Unit* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, SpellEntry const* spellProto) const
+float Unit::RollMagicResistanceMultiplierOutcomeAgainst(const Unit* pCaster, float resistanceChance, SpellSchoolMask schoolMask, DamageEffectType damagetype, SpellEntry const* spellProto) const
 {
-    float resistanceChance = pCaster->GetSpellResistChance(this, schoolMask, true);
-
     // Magic vulnerability instead of magic resistance:
     if (resistanceChance < 0)
         return resistanceChance;

@@ -833,13 +833,6 @@ bool ChatHandler::HandleModifyHolyCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    if (amount < 0)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
     pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_01, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_HOLY, pTarget->GetName(), amount);
@@ -867,13 +860,6 @@ bool ChatHandler::HandleModifyFireCommand(char *args)
     int32 amount;
     if (!ExtractInt32(&args, amount))
         return false;
-
-    if (amount < 0)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
-        return false;
-    }
 
     pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_02, amount);
 
@@ -903,13 +889,6 @@ bool ChatHandler::HandleModifyNatureCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    if (amount < 0)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
     pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_03, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_NATURE, pTarget->GetName(), amount);
@@ -937,13 +916,6 @@ bool ChatHandler::HandleModifyFrostCommand(char *args)
     int32 amount;
     if (!ExtractInt32(&args, amount))
         return false;
-
-    if (amount < 0)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
-        return false;
-    }
 
     pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_04, amount);
 
@@ -973,13 +945,6 @@ bool ChatHandler::HandleModifyShadowCommand(char *args)
     if (!ExtractInt32(&args, amount))
         return false;
 
-    if (amount < 0)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
     pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_05, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_SHADOW, pTarget->GetName(), amount);
@@ -1007,13 +972,6 @@ bool ChatHandler::HandleModifyArcaneCommand(char *args)
     int32 amount;
     if (!ExtractInt32(&args, amount))
         return false;
-
-    if (amount < 0)
-    {
-        SendSysMessage(LANG_BAD_VALUE);
-        SetSentErrorMessage(true);
-        return false;
-    }
 
     pTarget->SetInt32Value(UNIT_FIELD_RESISTANCES_06, amount);
 
