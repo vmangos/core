@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20190711170206');
 -- Add your query below.
 
 
--- Un'Goro Dirt Pile should containt 1 to 4 Un'Goro Soil.
+-- Un'Goro Dirt Pile should contain 1 to 4 Un'Goro Soil.
 UPDATE `gameobject_loot_template` SET `maxcount` = 4 WHERE `item` = 11018;
 
 
