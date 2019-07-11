@@ -5080,9 +5080,43 @@ bool ChatHandler::HandleWaterwalkCommand(char* args)
     else
         player->SetWaterWalking(false);
 
-    PSendSysMessage(LANG_YOU_SET_WATERWALK, args, GetNameLink(player).c_str());
+    PSendSysMessage(LANG_YOU_SET_WATERWALK, value ? "on" : "off", GetNameLink(player).c_str());
     if (needReportToTarget(player))
-        ChatHandler(player).PSendSysMessage(LANG_YOUR_WATERWALK_SET, args, GetNameLink().c_str());
+        ChatHandler(player).PSendSysMessage(LANG_YOUR_WATERWALK_SET, value ? "on" : "off", GetNameLink().c_str());
+    return true;
+}
+
+bool ChatHandler::HandleWallclimbCommand(char* args)
+{
+    bool value;
+    if (!ExtractOnOff(&args, value))
+    {
+        SendSysMessage(LANG_USE_BOL);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player *player = GetSelectedPlayer();
+
+    if (!player)
+    {
+        PSendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // check online security
+    if (HasLowerSecurity(player))
+        return false;
+
+    if (value)
+        player->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0);
+    else
+        player->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0);
+
+    PSendSysMessage(LANG_YOU_SET_WALLCLIMB, value ? "on" : "off", GetNameLink(player).c_str());
+    if (needReportToTarget(player))
+        ChatHandler(player).PSendSysMessage(LANG_YOUR_WALLCLIMB_SET, value ? "on" : "off", GetNameLink().c_str());
     return true;
 }
 

@@ -652,6 +652,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     }
 
     if ((currentMoveFlags & MOVEFLAG_WATERWALKING) &&
+        !(GetLastMovementInfo().moveFlags & MOVEFLAG_WATERWALKING) &&
         !me->HasAuraType(SPELL_AURA_WATER_WALK) &&
         !me->HasAuraType(SPELL_AURA_GHOST) &&
         !me->HasPendingMovementChange(WATER_WALK) &&
@@ -662,6 +663,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     }
 
     if ((currentMoveFlags & MOVEFLAG_SAFE_FALL) &&
+        !(GetLastMovementInfo().moveFlags & MOVEFLAG_SAFE_FALL) &&
         !me->HasAuraType(SPELL_AURA_FEATHER_FALL) &&
         !me->HasPendingMovementChange(FEATHER_FALL) &&
         (opcode != CMSG_MOVE_FEATHER_FALL_ACK))
@@ -671,6 +673,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     }
 
     if ((currentMoveFlags & MOVEFLAG_HOVER) &&
+        !(GetLastMovementInfo().moveFlags & MOVEFLAG_HOVER) &&
         !me->HasAuraType(SPELL_AURA_HOVER) &&
         !me->HasPendingMovementChange(SET_HOVER) &&
         (opcode != CMSG_MOVE_HOVER_ACK))
@@ -699,7 +702,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
 
 bool ShouldResetNoFallTimeCheck(MovementInfo const& movementInfo, uint16 opcode)
 {
-    if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR | MOVEFLAG_ROOT))
+    if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR | MOVEFLAG_ROOT | MOVEFLAG_FLYING | MOVEFLAG_SWIMMING | MOVEFLAG_SAFE_FALL | MOVEFLAG_ONTRANSPORT))
         return true;
 
     switch (opcode)
@@ -718,8 +721,7 @@ bool ShouldResetNoFallTimeCheck(MovementInfo const& movementInfo, uint16 opcode)
 
 bool MovementCheatData::CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode)
 {
-    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED) ||
-       (movementInfo.moveFlags & (MOVEFLAG_FLYING | MOVEFLAG_SWIMMING | MOVEFLAG_SAFE_FALL | MOVEFLAG_ONTRANSPORT)))
+    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED))
         return false;
 
     if (ShouldResetNoFallTimeCheck(movementInfo, opcode))
@@ -795,26 +797,28 @@ bool MovementCheatData::CheckMultiJump(uint16 opcode)
     return false;
 }
 
-#define NO_WALL_CLIMB_CHECK_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)
+#define NO_WALL_CLIMB_CHECK_MOVE_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)
+#define NO_WALL_CLIMB_CHECK_UNIT_FLAGS (UNIT_FLAG_UNK_0 | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED)
 
 bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const
 {
     // Not currently handled cases.
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_ENABLED) ||
-       (GetLastMovementInfo().moveFlags & NO_WALL_CLIMB_CHECK_FLAGS) ||
-       (movementInfo.moveFlags & NO_WALL_CLIMB_CHECK_FLAGS) ||
        (opcode != MSG_MOVE_HEARTBEAT) ||
+       (GetLastMovementInfo().moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
+       (movementInfo.moveFlags & NO_WALL_CLIMB_CHECK_MOVE_FLAGS) ||
+       (me->HasFlag(UNIT_FIELD_FLAGS, NO_WALL_CLIMB_CHECK_UNIT_FLAGS)) ||
         IsInKnockBack() || me->IsTaxiFlying())
         return false;
     
     float const dx = GetLastMovementInfo().pos.x - movementInfo.pos.x;
     float const dy = GetLastMovementInfo().pos.y - movementInfo.pos.y;
     float const deltaXY = sqrt((dx * dx) + (dy * dy));
-    if (deltaXY < 0.1f)
+    if (deltaXY < 0.5f)
         return false;
 
     float const deltaZ = movementInfo.pos.z - GetLastMovementInfo().pos.z;
-    if (deltaZ < 0.1f)
+    if (deltaZ < 0.5f)
         return false;
 
     float const angleRad = atan(deltaZ / deltaXY);

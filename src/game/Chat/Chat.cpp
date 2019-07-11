@@ -1102,6 +1102,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "repairitems",    SEC_GAMEMASTER,     true,  &ChatHandler::HandleRepairitemsCommand,         "", nullptr },
         { NODE, "stable",         SEC_TICKETMASTER,   false, &ChatHandler::HandleStableCommand,              "", nullptr },
         { NODE, "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", nullptr },
+        { NODE, "wallclimb",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWallclimbCommand,           "", nullptr },
         { NODE, "quit",           SEC_CONSOLE,        true,  &ChatHandler::HandleQuitCommand,                "", nullptr },
         { NODE, "mmap",           SEC_GAMEMASTER,     false, nullptr,                                        "", mmapCommandTable },
         { NODE, "video",          SEC_GAMEMASTER,     false, nullptr,                                        "", videosCommandTable },

@@ -343,12 +343,12 @@ enum MangosStrings
     LANG_GAMEOBJECT_HAVE_INVALID_DATA   = 348,
     LANG_GOD_ON                         = 349,
     LANG_GOD_OFF                        = 350,
-    //                                    351 used in master branch
-    //                                    352 used in master branch
-    //                                    353 used in master branch
-    //                                    354 used in master branch
-    //                                    355 used in master branch
-    //                                    356 used in master branch
+    LANG_YOU_SET_WALLCLIMB              = 351,
+    LANG_YOUR_WALLCLIMB_SET             = 352,
+    //                                    353 not used
+    //                                    354 not used
+    //                                    355 not used
+    //                                    356 not used
     LANG_AREATRIGER_NOT_HAS_TARGET      = 357,
     LANG_COMMAND_NOTRIGGERFOUND         = 358,
     LANG_TRIGGER_TARGET_LIST_CHAT       = 359,
