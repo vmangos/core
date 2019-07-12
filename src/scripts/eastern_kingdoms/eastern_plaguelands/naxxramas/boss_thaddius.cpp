@@ -925,7 +925,7 @@ struct boss_thaddiusAI : public ScriptedAI
         // This will prevent the boss from starting to spam balls of lightning if the boss is being moved with lag or something
         if (!DoMeleeAttackIfReady())
         {
-            if (!m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+            if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->getVictim()))
             {
                 m_uiBallLightningTimer -= std::min(diff, m_uiBallLightningTimer);
             }

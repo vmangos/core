@@ -440,7 +440,7 @@ struct cthunTentacle : public ScriptedAI
             Unit* caster = (*it)->GetCaster();
             if (!caster) continue;
 
-            if (caster->IsInMap(m_creature) && caster->isTargetableForAttack() && m_creature->CanReachWithMeleeAttack(caster))
+            if (caster->IsInMap(m_creature) && caster->isTargetableForAttack() && m_creature->CanReachWithMeleeAutoAttack(caster))
             {
                 target = caster;
                 break;
@@ -462,12 +462,12 @@ struct cthunTentacle : public ScriptedAI
                 ThreatList::const_reverse_iterator ritr = threatlist.rbegin();
                 
                 // Implementing this loop manually instead of using Creature::SelectAttackingTarget
-                // to use target->CanReachWithMeleeAttack(creature) instead of creature->isWithinMeleeRange(target),
+                // to use target->CanReachWithMeleeAutoAttack(creature) instead of creature->isWithinMeleeRange(target),
                 // because melee ranges are fucked up. todo: fix melee ranges....
                 for (; itr != threatlist.end(); ++itr) {
                     if (Unit* pTarget = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid())) {
                         if (pTarget->isTargetableForAttack() 
-                            && pTarget->CanReachWithMeleeAttack(m_creature)
+                            && pTarget->CanReachWithMeleeAutoAttack(m_creature)
                             && pTarget->IsWithinLOSInMap(m_creature)) {
                             tmpTarget = pTarget;
                             break;
@@ -477,7 +477,7 @@ struct cthunTentacle : public ScriptedAI
             }
 
             // Resetting threat of old target if it has left melee range
-            if (oldTarget && tmpTarget != oldTarget && !oldTarget->CanReachWithMeleeAttack(m_creature)) {
+            if (oldTarget && tmpTarget != oldTarget && !oldTarget->CanReachWithMeleeAutoAttack(m_creature)) {
             //if (oldTarget && tmpTarget != oldTarget && !m_creature->IsWithinMeleeRange(oldTarget)) {
                 m_creature->getThreatManager().modifyThreatPercent(oldTarget, -100);
             }

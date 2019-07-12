@@ -348,7 +348,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             }
 
             // If we are within range melee the target
-            if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->getVictim()))
             {
                 DoMeleeAttackIfReady();
             }

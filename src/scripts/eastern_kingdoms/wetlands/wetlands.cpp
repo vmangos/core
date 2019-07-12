@@ -93,7 +93,7 @@ public:
         if (!pAttacker || m_creature->getVictim())
             return;
 
-        if (m_creature->GetCharmInfo() && m_creature->CanReachWithMeleeAttack(pAttacker))
+        if (m_creature->GetCharmInfo() && m_creature->CanReachWithMeleeAutoAttack(pAttacker))
             AttackStart(pAttacker);
     }
 

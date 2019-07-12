@@ -880,7 +880,7 @@ struct mob_soldierAI : public kt_p1AddAI
         // to avoid melees being able to dps while casters hold aggro, this is most likely a logic that's supposed to exist
         if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
         {
-            if (m_creature->getVictim() != pNearest && m_creature->CanReachWithMeleeAttack(pNearest))
+            if (m_creature->getVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
             {
                 ScriptedAI::AttackStart(pNearest);
             }
@@ -908,7 +908,7 @@ struct mob_soulweaverAI : public kt_p1AddAI
         // to avoid melees being able to dps while casters hold aggro, this is most likely a logic that's supposed to exist
         if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
         {
-            if (m_creature->getVictim() != pNearest && m_creature->CanReachWithMeleeAttack(pNearest))
+            if (m_creature->getVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
             {
                 ScriptedAI::AttackStart(pNearest);
             }

@@ -168,7 +168,7 @@ struct boss_grobbulusAI : public ScriptedAI
 
     void UpdateSlimeStream(uint32 uiDiff)
     {
-        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+        if (m_creature->CanReachWithMeleeAutoAttack(m_creature->getVictim()))
             m_uiSlimeStreamTimer = SLIMESTREAM_REPEAT_CD;
         else
         {

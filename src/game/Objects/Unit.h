@@ -1665,7 +1665,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
         Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
         Player* GetAffectingPlayer() const;
-        float GetLeewayBonusRange(const Unit* target) const;
+        float GetLeewayBonusRange(const Unit* target, bool ability) const;
         float GetLeewayBonusRadius() const;
 
         void SetPet(Pet* pet);
@@ -2080,11 +2080,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsWithinMeleeRange(const Unit *obj, float dist = 0.0f) const;
         float GetMeleeReach() const;
         float GetCombatReach(bool forMeleeRange /*=true*/) const;
-        float GetCombatReach(Unit const* pVictim, bool forMeleeRange = true, float flatMod = 0.0f) const;
+        float GetCombatReach(Unit const* pVictim, bool ability, float flat_mod) const;
         void GetRandomAttackPoint(const Unit* target, float &x, float &y, float &z) const;
 
-        bool CanReachWithMeleeAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
-        bool CanReachWithMeleeAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
+        bool CanReachWithMeleeAutoAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
+        bool CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
         bool CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
 
         // Caster movement

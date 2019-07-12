@@ -117,7 +117,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     {
         // Check dest coords to ensure reachability
         G3D::Vector3 dest = path.getActualEndPosition();
-        if (!owner.CanReachWithMeleeAttackAtPosition(i_target.getTarget(), dest[0], dest[1], dest[2]))
+        if (!owner.CanReachWithMeleeAutoAttackAtPosition(i_target.getTarget(), dest[0], dest[1], dest[2]))
             m_bReachable = false;
     }
 
@@ -279,7 +279,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
         m_checkDistanceTimer.Reset(100);
         if (m_bIsSpreading)
         {
-            if (!owner.movespline->Finalized() && !owner.CanReachWithMeleeAttack(i_target.getTarget()))
+            if (!owner.movespline->Finalized() && !owner.CanReachWithMeleeAutoAttack(i_target.getTarget()))
             {
                 owner.movespline->_Interrupt();
                 interrupted = true;
@@ -400,7 +400,7 @@ void ChaseMovementGenerator<T>::DoBackMovement(T &owner, Unit* target)
     target->GetClosePoint(x, y, z, target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius(), 1.0f, m_fAngle, &owner);
 
     // Don't move beyond attack range.
-    if (!owner.CanReachWithMeleeAttackAtPosition(target, x, y, z, 0.0f))
+    if (!owner.CanReachWithMeleeAutoAttackAtPosition(target, x, y, z, 0.0f))
         return;
 
     m_bIsSpreading = true;
@@ -446,7 +446,7 @@ void ChaseMovementGenerator<T>::DoSpreadIfNeeded(T &owner, Unit* target)
     target->GetNearPoint(&owner, x, y, z, owner.GetObjectBoundingRadius(), frand(0.8f, (target->getAttackers().size() > 5 ? 4.0f : 2.0f)), new_angle);
 
     // Don't move beyond attack range.
-    if (!owner.CanReachWithMeleeAttackAtPosition(target, x, y, z, 0.0f))
+    if (!owner.CanReachWithMeleeAutoAttackAtPosition(target, x, y, z, 0.0f))
         return;
 
     m_bIsSpreading = true;
@@ -466,7 +466,7 @@ void ChaseMovementGenerator<T>::DoSpreadIfNeeded(T &owner, Unit* target)
 template<class T>
 void ChaseMovementGenerator<T>::_reachTarget(T &owner)
 {
-    if (owner.CanReachWithMeleeAttack(this->i_target.getTarget()))
+    if (owner.CanReachWithMeleeAutoAttack(this->i_target.getTarget()))
         owner.Attack(this->i_target.getTarget(), true);
 }
 

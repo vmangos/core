@@ -79,7 +79,7 @@ void boss_dragon_of_nightmareAI::UpdateAI(const uint32 uiDiff)
 
     auto pTarget = m_creature->getVictim();
 
-    if (!m_creature->CanReachWithMeleeAttack(pTarget) || !m_creature->IsWithinLOSInMap(pTarget))
+    if (!m_creature->CanReachWithMeleeAutoAttack(pTarget) || !m_creature->IsWithinLOSInMap(pTarget))
     {
         m_uiSummonPlayerTimer += uiDiff;
 
