@@ -493,11 +493,15 @@ enum BankBagSlots                                           // 6 slots
     BANK_SLOT_BAG_END           = 69
 };
 
-enum BuyBackSlots                                           // 12 slots
+enum BuyBackSlots                                           // 12 slots after 1.8, only one prior
 {
     // stored in m_buybackitems
     BUYBACK_SLOT_START          = 69,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     BUYBACK_SLOT_END            = 81
+#else
+    BUYBACK_SLOT_END            = 70
+#endif
 };
 
 enum KeyRingSlots                                           // 32 slots
@@ -1073,9 +1077,14 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void DestroyZoneLimitedItem(bool update, uint32 new_zone);
         void SplitItem(uint16 src, uint16 dst, uint32 count);
         void SwapItem(uint16 src, uint16 dst);
-        void AddItemToBuyBackSlot(Item* pItem, uint32 money);
+        void AddItemToBuyBackSlot(Item* pItem, uint32 money, ObjectGuid vendorGuid);
         Item* GetItemFromBuyBackSlot(uint32 slot);
         void RemoveItemFromBuyBackSlot(uint32 slot, bool del);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        uint32 GetBuyBackItemPrice(uint32 slot) const { return GetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + slot - BUYBACK_SLOT_START); }
+#else
+        uint32 GetBuyBackItemPrice(uint32 /*slot*/) const { return GetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE); }
+#endif
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         uint32 GetMaxKeyringSize() const { return getLevel() < 40 ? 4 : (getLevel() < 50 ? 8 : 12); }

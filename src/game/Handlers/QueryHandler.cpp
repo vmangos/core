@@ -201,7 +201,9 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
         data << uint32(ci->beast_family);                   // CreatureFamily.dbc
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
         data << uint32(0);                                  // unknown        wdbFeild11
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         data << uint32(ci->pet_spell_list_id);              // Id from CreatureSpellData.dbc    wdbField12
+#endif
         if (unit)
             data << unit->GetUInt32Value(UNIT_FIELD_DISPLAYID); //DisplayID      wdbFeild13
         else
