@@ -18,13 +18,14 @@ enum WardenActions
 
 enum CheatAction
 {
-    CHEAT_ACTION_NONE           = 0x00,
-    CHEAT_ACTION_LOG            = 0x01,
-    CHEAT_ACTION_REPORT_GMS     = 0x02,
-    CHEAT_ACTION_KICK           = 0x04,
-    CHEAT_ACTION_BAN_ACCOUNT    = 0x08,
-    CHEAT_ACTION_BAN_IP_ACCOUNT = 0x10,
-    CHEAT_ACTION_MUTE_PUB_CHANS = 0x40, // Mutes the account from public channels
+    CHEAT_ACTION_NONE             = 0x00,
+    CHEAT_ACTION_LOG              = 0x01,
+    CHEAT_ACTION_REPORT_GMS       = 0x02,
+    CHEAT_ACTION_GLOBAL_ANNOUNNCE = 0x04,
+    CHEAT_ACTION_KICK             = 0x08,
+    CHEAT_ACTION_BAN_ACCOUNT      = 0x10,
+    CHEAT_ACTION_BAN_IP_ACCOUNT   = 0x20,
+    CHEAT_ACTION_MUTE_PUB_CHANS   = 0x40, // Mutes the account from public channels
     CHEAT_MAX_ACTIONS,
 };
 
@@ -53,6 +54,7 @@ class MovementAnticheatInterface
 
         virtual void Init() {}
         virtual void InitNewPlayer(Player* pPlayer) {}
+        virtual void ResetJumpCounters() {}
         
         virtual bool IsInKnockBack() const { return false; }
         

@@ -12,7 +12,7 @@ enum CheatType
     CHEAT_TYPE_TIME_BACK,
     CHEAT_TYPE_NULL_CLIENT_TIME,
     CHEAT_TYPE_SKIPPED_HEARTBEATS,
-    CHEAT_TYPE_DESYNC,
+    CHEAT_TYPE_TIME_DESYNC,
     CHEAT_TYPE_NUM_DESYNC,
     CHEAT_TYPE_OVERSPEED_DIST,
     CHEAT_TYPE_OVERSPEED_Z,
@@ -55,6 +55,7 @@ class MovementCheatData: public MovementAnticheatInterface
         void Init() override;
         void InitNewPlayer(Player* pPlayer) override;
         void InitSpeeds(Unit* unit) override;
+        void ResetJumpCounters() override;
 
         void AddCheats(uint32 cheats, uint32 count = 1) override;
         void StoreCheat(uint32 type, uint32 count = 1);

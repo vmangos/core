@@ -64,6 +64,7 @@ class PlayerBroadcaster;
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_EXPLORED_ZONES_SIZE  64
+#define CORPSE_REPOP_TIME (6 * MINUTE * IN_MILLISECONDS)
 
 // Note: SPELLMOD_* values is aura types in fact
 enum SpellModType

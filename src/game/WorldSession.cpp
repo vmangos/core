@@ -1137,7 +1137,7 @@ void WorldSession::ProcessAnticheatAction(const char* detector, const char* reas
     const char* action = "";
     if (cheatAction & CHEAT_ACTION_MUTE_PUB_CHANS)
     {
-        action = "Muted from pub chans.";
+        action = "Muted from public channels.";
         if (GetSecurity() == SEC_PLAYER)
         {
             LoginDatabase.PExecute("UPDATE account SET flags = flags | 0x%x WHERE id = %u", ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS, GetAccountId());
@@ -1182,6 +1182,14 @@ void WorldSession::ProcessAnticheatAction(const char* detector, const char* reas
         std::stringstream oss;
         oss << "<None> [" << GetUsername() << ":" << GetAccountId() << "@" << GetRemoteAddress().c_str() << "]";
         playerDesc = oss.str();
+    }
+
+    if ((cheatAction & CHEAT_ACTION_GLOBAL_ANNOUNNCE) &&
+        (cheatAction >= CHEAT_ACTION_KICK))
+    {
+        std::stringstream oss;
+        oss << "|r[|c1f40af20Announce by |cffff0000" << detector << "|r]: Player " << _player->GetName() << ", Cheat: " << reason << ", Penalty: " << action;
+        sWorld.SendGlobalText(oss.str().c_str(), this);
     }
 
     if (cheatAction & CHEAT_ACTION_REPORT_GMS)
