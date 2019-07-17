@@ -3569,6 +3569,17 @@ void Aura::HandleModStealth(bool apply, bool Real)
         if (Real && target->GetTypeId() == TYPEID_PLAYER && GetId() == 20580)
             target->RemoveAurasDueToSpell(21009);
 
+        if (Real && (m_removeMode == AURA_REMOVE_BY_CANCEL) &&
+            GetSpellProto()->IsFitToFamilyMask<CF_ROGUE_STEALTH>())
+        {
+            // https://us.forums.blizzard.com/en/wow/t/wow-classic-not-a-bug-list/175887/45?blzcmp=app
+            // "Manually cancelling Stealth after using Vanish will
+            //  remove the Vanish buff as well as the Stealth buff."
+            target->RemoveAurasDueToSpellByCancel(11327);
+            target->RemoveAurasDueToSpellByCancel(11329);
+        }
+            
+
         // only at real aura remove of _last_ SPELL_AURA_MOD_STEALTH
         if (Real && !target->HasAuraType(SPELL_AURA_MOD_STEALTH))
         {
