@@ -39,6 +39,10 @@ MovementAnticheatInterface* MangosAnticheatLib::CreateAnticheatFor(Player* playe
 
 WardenInterface* MangosAnticheatLib::CreateWardenFor(WorldSession* client, BigNumber* K)
 {
+    if ((client->GetSecurity() != SEC_PLAYER) &&
+        sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY))
+        return nullptr;
+
     Warden* warden;
     ClientOSType os = client->GetOS();
 
