@@ -1996,7 +1996,11 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
 
     // Hmmmm dont like this emotes client must by self do all animations
     if (damageInfo->HitInfo & HITINFO_CRITICALHIT)
-        pVictim->HandleEmoteCommand(EMOTE_ONESHOT_WOUNDCRITICAL);
+    {
+        if (!(pVictim->IsCreature() && 
+           (static_cast<Creature*>(pVictim)->GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_NO_WOUND_ANIM)))
+            pVictim->HandleEmoteCommand(EMOTE_ONESHOT_WOUNDCRITICAL);
+    }
 
     if (damageInfo->TargetState == VICTIMSTATE_PARRY)
     {
