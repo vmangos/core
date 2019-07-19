@@ -122,7 +122,14 @@ namespace MaNGOS
                     return 0;
 
                 if (pCreature->IsElite())
-                    xp_gain *= (2 * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE));
+                {
+                    if (pCreature->GetMap()->IsNonRaidDungeon())
+                        xp_gain *= 2.5;
+                    else
+                        xp_gain *= 2;
+
+                    xp_gain *= sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL_ELITE);
+                }
 
                 if (isPet)
                     xp_gain *= 0.75f;
