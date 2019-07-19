@@ -7984,6 +7984,13 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
     //if (!u->CanSeeInWorld(this))
     //    return false;
 
+    if (Creature const* pCreature = ToCreature())
+    {
+        if ((pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY) &&
+            !pCreature->IsFriendlyTo(u))
+            return false;
+    } 
+
     // Visible units are always visible for all units
     if (m_Visibility == VISIBILITY_ON)
         return true;
