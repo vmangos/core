@@ -1174,6 +1174,14 @@ void ObjectMgr::CorrectCreatureModels(uint32 entry, uint32& displayId)
             displayId = 15100;
     }
 #endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    if (sWorld.GetWowPatch() == WOW_PATCH_107)
+    {
+        // Stormpike Emissary
+        if (entry == 15103 && displayId == 15261)
+            displayId = 15388;
+    }
+#endif
 }
 
 void ObjectMgr::CheckCreatureTemplates()
@@ -6152,7 +6160,8 @@ void ObjectMgr::LoadQuestAreaTriggers()
         AreaTriggerEntry const* atEntry = GetAreaTrigger(trigger_ID);
         if (!atEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_involvedrelation` has area trigger (ID: %u) not listed in `AreaTrigger.dbc`.", trigger_ID);
+            if (!IsExistingAreaTriggerId(trigger_ID))
+                sLog.outErrorDb("Table `areatrigger_involvedrelation` has area trigger (ID: %u) not listed in `AreaTrigger.dbc`.", trigger_ID);
             continue;
         }
 

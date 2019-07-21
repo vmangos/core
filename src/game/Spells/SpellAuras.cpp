@@ -1965,13 +1965,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 {
                     if (apply)
                     {
-                        target->SetStandState(UNIT_STAND_STATE_SLEEP);
-                        target->addUnitState(UNIT_STAT_ROOT);
-                    }
-                    else
-                    {
-                        target->clearUnitState(UNIT_STAT_ROOT);
-                        target->SetStandState(UNIT_STAND_STATE_STAND);
+                        target->m_Events.AddLambdaEventAtOffset([target]
+                        {
+                            target->HandleEmoteState(EMOTE_STATE_SLEEP);
+                            target->SetStandState(UNIT_STAND_STATE_SLEEP);
+                        }, 500);
                     }
 
                     return;
