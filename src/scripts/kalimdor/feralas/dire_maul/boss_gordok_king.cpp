@@ -158,9 +158,6 @@ enum
     SET_MAGE                = 1,
     SET_SHAMAN              = 2,
     SET_PRIST               = 3,
-
-    SAY_OGRE_AGGRO_1        = -359,
-    SAY_OGRE_AGGRO_2        = -360,
 };
 
 struct boss_chorushAI : public ScriptedAI
@@ -181,11 +178,6 @@ struct boss_chorushAI : public ScriptedAI
     // - King Gordok can no longer be seperated from Cho'Rush the Observer in Dire Maul.
     bool const m_bLinkCheckEnabled = sWorld.GetWowPatch() >= WOW_PATCH_109;
     uint32 m_uiLinkCheckTimer;
-
-    void EnterCombat(Unit* pWho)
-    {
-        m_creature->MonsterSay(urand(0, 1) ? SAY_OGRE_AGGRO_1 : SAY_OGRE_AGGRO_2, 0);
-    }
 
     void Reset()
     {
