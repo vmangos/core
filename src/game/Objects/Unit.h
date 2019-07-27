@@ -1984,7 +1984,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             return SPELL_AURA_PROC_CANT_TRIGGER;
         }
 
-        void SetLastManaUse() { m_lastManaUseTimer = 5000; }
+        void SetLastManaUse(uint32 spellId) { m_lastManaUseTimer = 5000; m_lastManaUseSpellId = spellId; }
         bool IsUnderLastManaUseEffect() const { return m_lastManaUseTimer; }
 
         void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply);
@@ -2234,6 +2234,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_reactiveTimer[MAX_REACTIVE];
         ObjectGuid m_reactiveTarget[MAX_REACTIVE];
         int32 m_regenTimer;
+        uint32 m_lastManaUseSpellId;
         uint32 m_lastManaUseTimer;
         uint32 m_spellUpdateTimeBuffer;
 
