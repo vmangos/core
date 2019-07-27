@@ -17,6 +17,9 @@
 
 INSTANTIATE_SINGLETON_1(HonorMaintenancer);
 
+char const* AlliancePvPRankNames[] = { "None", "Private", "Corporal", "Sergeant", "Master Sergeant", "Sergeant Major", "Knight", "Knight-Lieutenant", "Knight-Captain", "Knight-Champion", "Lieutenant Commander", "Commander", "Marshal", "Field Marshal", "Grand Marshal" };
+char const* HordePvPRankNames[] = { "None", "Scout", "Grunt", "Sergeant", "Senior Sergeant", "First Sergeant", "Stone Guard", "Blood Guard", "Legionnare", "Centurion", "Champion", "Lieutenant General", "General", "Warlord", "High Warlord" };
+
 HonorStandingList& HonorMaintenancer::GetStandingListByTeam(Team team)
 {
     switch (team)

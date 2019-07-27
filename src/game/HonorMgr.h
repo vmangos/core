@@ -139,6 +139,9 @@ typedef std::list<HonorCP> HonorCPMap;
 #define POSITIVE_HONOR_RANK_COUNT 15
 #define HONOR_RANK_COUNT 19
 
+extern char const* AlliancePvPRankNames[];
+extern char const* HordePvPRankNames[];
+
 class HonorMgr
 {
     public:

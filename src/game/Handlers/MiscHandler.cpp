@@ -944,7 +944,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             else if (missingLevel)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), missingLevel);
             else if (missingRank)
-                SendAreaTriggerMessage("You must be at least rank %u to enter", at->required_pvp_rank);
+                SendAreaTriggerMessage("You must be a %s or higher rank in order to enter the %s.", pl->GetTeam() == HORDE ? HordePvPRankNames[at->required_pvp_rank] : AlliancePvPRankNames[at->required_pvp_rank], targetMapEntry->name);
             else if (missingTeam)
                 SendAreaTriggerMessage("Only %s may enter here", at->required_team == HORDE ? "Horde" : "Alliance");
 
