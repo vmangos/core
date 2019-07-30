@@ -142,11 +142,7 @@ void MovementInfo::CorrectData(Unit* mover)
 
 void MovementInfo::Write(ByteBuffer &data) const
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     data << moveFlags;
-#else
-    data << (moveFlags & ~MOVEFLAG_SPLINE_ENABLED);
-#endif
     data << time;
     data << pos.x;
     data << pos.y;
@@ -567,11 +563,9 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
         *data << float(unit->GetSpeed(MOVE_SWIM));
         *data << float(unit->GetSpeed(MOVE_SWIM_BACK));
         *data << float(unit->GetSpeed(MOVE_TURN_RATE));
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         // Send current movement informations
         if (unit->m_movementInfo.moveFlags & MOVEFLAG_SPLINE_ENABLED)
             Movement::PacketBuilder::WriteCreate(*(unit->movespline), *data);
-#endif
     }
     else
         for (int i = 0; i < MAX_MOVE_TYPE; ++i)

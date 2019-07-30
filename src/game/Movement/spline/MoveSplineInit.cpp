@@ -96,11 +96,7 @@ int32 MoveSplineInit::Launch()
     }
     else
     {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         moveFlags |= (MOVEFLAG_SPLINE_ENABLED | MOVEFLAG_FORWARD);
-#else
-        moveFlags |= MOVEFLAG_FORWARD;
-#endif
 
         if (args.flags.runmode)
             moveFlags &= ~MOVEFLAG_WALK_MODE;

@@ -170,7 +170,9 @@ void PacketBuilder::WriteCreate(const MoveSpline& move_spline, ByteBuffer& data)
 
         data << move_spline.timePassed();
         data << move_spline.Duration();
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         data << move_spline.GetId();
+#endif
 
         uint32 nodes = move_spline.getPath().size();
         data << nodes;
