@@ -257,6 +257,11 @@ class MANGOS_DLL_SPEC Item : public Object
         virtual void DeleteFromDB();
         void DeleteFromInventoryDB();
         void LoadLootFromDB(Field* fields);
+		Bag* ToBag() { if (IsBag()) return reinterpret_cast<Bag*>(this); else return NULL; }
+		const Bag* ToBag() const { if (IsBag()) return reinterpret_cast<const Bag*>(this); else return NULL; }
+
+		bool IsLocked() const { return !HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNLOCKED); }
+		bool IsNotEmptyBag() const;
 
         static void DeleteAllFromDB(uint32 guidLow);
 
@@ -343,6 +348,9 @@ class MANGOS_DLL_SPEC Item : public Object
         bool HasQuest(uint32 quest_id) const { return GetProto()->StartQuest == quest_id; }
         bool HasInvolvedQuest(uint32 /*quest_id*/) const { return false; }
         bool IsConjuredConsumable() const { return GetProto()->IsConjuredConsumable(); }
+
+		bool IsWeaponVellum() const { return GetProto()->IsWeaponVellum(); }
+		bool IsArmorVellum() const { return GetProto()->IsArmorVellum(); }
 
         void AddToClientUpdateList();
         void RemoveFromClientUpdateList();

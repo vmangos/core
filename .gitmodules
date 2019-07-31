@@ -1,0 +1,6 @@
+[submodule "src/game/LuaEngine"]
+	path = src/game/LuaEngine
+	url = https://github.com/MaNGOS-Eluna/Eluna.git
+[submodule "dep/lualib"]
+	path = dep/lualib
+	url = https://github.com/MaNGOS-Eluna/lualib.git

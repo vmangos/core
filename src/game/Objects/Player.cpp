@@ -83,7 +83,7 @@
 #include "GameEventMgr.h"
 #include "world/world_event_naxxramas.h"
 #include "world/world_event_wareffort.h"
-
+#include "LuaEngine.h"
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
@@ -2730,7 +2730,8 @@ void Player::GiveXP(uint32 xp, Unit* victim)
         return;
 
     uint32 level = getLevel();
-
+	// used by eluna
+	sEluna->OnGiveXP(this, xp, victim);
     // XP to money conversion processed in Player::RewardQuest
     if (level >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         return;
@@ -2762,6 +2763,7 @@ void Player::GiveXP(uint32 xp, Unit* victim)
 // Current player experience not update (must be update by caller)
 void Player::GiveLevel(uint32 level)
 {
+	uint8 oldLevel = getLevel();
     if (level == getLevel())
         return;
 
@@ -2896,8 +2898,15 @@ void Player::GiveLevel(uint32 level)
     if (m_session->ShouldBeBanned(getLevel()))
         sWorld.BanAccount(BAN_ACCOUNT, m_session->GetUsername(), 0, m_session->GetScheduleBanReason(), "");
     sAnticheatLib->OnPlayerLevelUp(this);
+	// used by eluna
+	sEluna->OnLevelChanged(this, oldLevel);
 }
-
+void Player::SetFreeTalentPoints(uint32 points)
+{
+	// used by eluna
+	sEluna->OnFreeTalentPointsChanged(this, points);
+	SetUInt32Value(PLAYER_CHARACTER_POINTS1, points);
+}
 void Player::UpdateFreeTalentPoints(bool resetIfNeed)
 {
     uint32 level = getLevel();
@@ -3791,6 +3800,8 @@ uint32 Player::GetResetTalentsCost() const
 
 bool Player::ResetTalents(bool no_cost)
 {
+	// used by eluna
+	sEluna->OnTalentsReset(this, no_cost);
     // not need after this call
     if (HasAtLoginFlag(AT_LOGIN_RESET_TALENTS))
         RemoveAtLoginFlag(AT_LOGIN_RESET_TALENTS, true);
@@ -4389,6 +4400,14 @@ void Player::SetFly(bool enable)
     SendHeartBeat(true);
 }
 
+void Player::SetRoot(bool enable)
+{
+	WorldPacket data(enable ? SMSG_FORCE_MOVE_ROOT : SMSG_FORCE_MOVE_UNROOT, GetPackGUID().size() + 4);
+	data << GetPackGUID();
+	data << uint32(0);
+	SendMessageToSet(&data, true);
+}
+
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world
@@ -4484,7 +4503,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     m_camera.UpdateVisibilityForOwner();
     // update visibility of player for nearby cameras
     UpdateObjectVisibility();
-
+	sEluna->OnResurrect(this);
     if (!applySickness)
         return;
 
@@ -6289,7 +6308,8 @@ void Player::RewardReputation(Unit *pVictim, float rate)
     // - Pets no longer modify your reputation if you kill them.
     if (pVictim->IsPet() && sWorld.GetWowPatch() >= WOW_PATCH_110)
         return;
-
+	if (((Creature*)pVictim)->IsReputationGainDisabled())
+		return;
     ReputationOnKillEntry const* Rep = sObjectMgr.GetReputationOnKillEntry(((Creature*)pVictim)->GetEntry());
 
     if (!Rep)
@@ -6535,6 +6555,8 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
             wth->SendWeatherUpdateToPlayer(this);
         }
     }
+	// used by eluna
+	sEluna->OnUpdateZone(this, newZone, newArea);
 
     m_zoneUpdateId    = newZone;
     m_zoneUpdateTimer = ZONE_UPDATE_INTERVAL;
@@ -6665,7 +6687,8 @@ void Player::DuelComplete(DuelCompleteType type)
         data << GetName();
         SendObjectMessageToSet(&data, true);
     }
-
+	// used by eluna
+	sEluna->OnDuelEnd(duel->opponent, this, type);
     //Remove Duel Flag object
     if (GameObject* obj = GetMap()->GetGameObject(GetGuidValue(PLAYER_DUEL_ARBITER)))
         duel->initiator->RemoveGameObject(obj, true);
@@ -8457,7 +8480,20 @@ uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
 
     return count;
 }
+Item* Player::GetItemByEntry(uint32 item) const
+{
+     for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
+        if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (pItem->GetEntry() == item)
+                return pItem;
 
+    for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
+        if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            if (Item* itemPtr = pBag->GetItemByEntry(item))
+                return itemPtr;
+
+    return NULL;
+}
 Item* Player::GetItemByGuid(ObjectGuid guid) const
 {
     for (int i = EQUIPMENT_SLOT_START; i < INVENTORY_SLOT_ITEM_END; ++i)
@@ -10022,6 +10058,10 @@ InventoryResult Player::CanUseItem(ItemPrototype const *pProto, bool not_loading
         if (getLevel() < pProto->RequiredLevel)
             return EQUIP_ERR_CANT_EQUIP_LEVEL_I;
 
+		InventoryResult eres = sEluna->OnCanUseItem(this, pProto->ItemId);
+		if (eres != EQUIP_ERR_OK)
+			return eres;
+
         return EQUIP_ERR_OK;
     }
     return EQUIP_ERR_ITEM_NOT_FOUND;
@@ -10334,9 +10374,13 @@ Item* Player::EquipItem(uint16 pos, Item *pItem, bool update)
         pItem2->SetState(ITEM_CHANGED, this);
 
         ApplyEquipCooldown(pItem2);
+		// used by eluna
+		sEluna->OnEquip(this, pItem2, bag, slot);
 
         return pItem2;
     }
+	// used by eluna
+	sEluna->OnEquip(this, pItem, bag, slot);
 
     return pItem;
 }
@@ -10548,6 +10592,8 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
         RemoveItemDurations(pItem);
 
         ItemRemovedQuestCheck(pItem->GetEntry(), pItem->GetCount());
+
+		sEluna->OnRemove(this, pItem);
 
         if (bag == INVENTORY_SLOT_BAG_0)
         {
@@ -13069,9 +13115,19 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questE
     switch (questEnder->GetTypeId())
     {
         case TYPEID_UNIT:
+			if (sEluna->OnQuestReward(this, (Creature*)questEnder, pQuest, reward))
+			{
+				handled = true;
+				break;
+			}
             handled = sScriptMgr.OnQuestRewarded(this, (Creature*)questEnder, pQuest);
             break;
         case TYPEID_GAMEOBJECT:
+			if (sEluna->OnQuestReward(this, (GameObject*)questEnder, pQuest, reward))
+			{
+				handled = true;
+				break;
+			}
             handled = sScriptMgr.OnQuestRewarded(this, (GameObject*)questEnder, pQuest);
             break;
     }
@@ -15708,7 +15764,10 @@ InstancePlayerBind* Player::BindToInstance(DungeonPersistentState *state, bool p
         if (!load)
             DEBUG_LOG("Player::BindToInstance: %s(%d) is now bound to map %d, instance %d",
                       GetName(), GetGUIDLow(), state->GetMapId(), state->GetInstanceId());
-        return &bind;
+		// used by eluna
+		sEluna->OnBindToInstance(this, (Difficulty)0, state->GetMapId(), permanent);
+
+		return &bind;
     }
     else
         return NULL;
@@ -15961,6 +16020,10 @@ void Player::SaveToDB(bool online, bool force)
     CharacterDatabase.BeginTransaction(GetGUIDLow());
 
     m_honorMgr.Update();
+
+	// Hack to check that this is not on create save
+	if (!HasAtLoginFlag(AT_LOGIN_FIRST))
+		sEluna->OnSave(this);
 
     static SqlStatementID insChar;
 
@@ -16810,6 +16873,8 @@ void Player::UpdateDuelFlag(time_t currTime)
 {
     if (!duel || duel->finished || duel->startTimer == 0 || currTime < duel->startTimer + 3)
         return;
+	// used by eluna
+	sEluna->OnDuelStart(this, duel->opponent);
 
     SetUInt32Value(PLAYER_DUEL_TEAM, 1);
     duel->opponent->SetUInt32Value(PLAYER_DUEL_TEAM, 2);
@@ -20111,6 +20176,8 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     // learn! (other talent ranks will unlearned at learning)
     LearnSpell(spellid, false, true);
     DETAIL_LOG("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
+
+	sEluna->OnLearnTalents(this, talentId, talentRank, spellid);
 }
 
 void Player::UpdateFallInformationIfNeed(MovementInfo const& minfo, uint16 opcode)
@@ -20214,6 +20281,18 @@ void Player::_SaveBGData()
     }
 
     m_bgData.m_needSave = false;
+}
+
+void Player::ModifyMoney(int32 d)
+{
+	// used by eluna
+	sEluna->OnMoneyChanged(this, d);
+
+	if (d < 0)
+		SetMoney(GetMoney() > uint32(-d) ? GetMoney() + d : 0);
+	else
+		SetMoney(GetMoney() < uint32(MAX_MONEY_AMOUNT - d) ? GetMoney() + d : MAX_MONEY_AMOUNT);
+
 }
 
 void Player::RemoveAtLoginFlag(AtLoginFlags f, bool in_db_also /*= false*/)

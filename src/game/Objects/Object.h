@@ -78,6 +78,7 @@ class WorldPacket;
 class UpdateData;
 class WorldSession;
 class Creature;
+class GameObject;
 class Player;
 class Unit;
 class Map;
@@ -86,6 +87,7 @@ class InstanceData;
 class TerrainInfo;
 class ZoneScript;
 class Transport;
+class ElunaEventProcessor;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 
@@ -411,8 +413,28 @@ class MANGOS_DLL_SPEC Object
 
         ObjectGuid const& GetGuidValue( uint16 index ) const { return *reinterpret_cast<ObjectGuid const*>(&GetUInt64Value(index)); }
 
+		//used by eluna
+		//Player* ToPlayer() { if (GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Player*>(this); else return NULL; }
+		//Player const* ToPlayer() const { if (GetTypeId() == TYPEID_PLAYER) return reinterpret_cast<Player const*>(this); else return NULL; }
+
+		//Creature* ToCreature() { if (GetTypeId() == TYPEID_UNIT) return reinterpret_cast<Creature*>(this); else return NULL; }
+		//Creature const* ToCreature() const { if (GetTypeId() == TYPEID_UNIT) return reinterpret_cast<Creature const*>(this); else return NULL; }
+
+		//Unit* ToUnit() { if (isType(TYPEMASK_UNIT)) return reinterpret_cast<Unit*>(this); else return NULL; }
+		//Unit const* ToUnit() const { if (isType(TYPEMASK_UNIT)) return reinterpret_cast<Unit const*>(this); else return NULL; }
+
+		//GameObject* ToGameObject() { if (GetTypeId() == TYPEID_GAMEOBJECT) return reinterpret_cast<GameObject*>(this); else return NULL; }
+		//GameObject const* ToGameObject() const { if (GetTypeId() == TYPEID_GAMEOBJECT) return reinterpret_cast<GameObject const*>(this); else return NULL; }
+
+		//Corpse* ToCorpse() { if (GetTypeId() == TYPEID_CORPSE) return reinterpret_cast<Corpse*>(this); else return NULL; }
+		//Corpse const* ToCorpse() const { if (GetTypeId() == TYPEID_CORPSE) return reinterpret_cast<Corpse const*>(this); else return NULL; }
+
+		//DynamicObject* ToDynObject() { if (GetTypeId() == TYPEID_DYNAMICOBJECT) return reinterpret_cast<DynamicObject*>(this); else return NULL; }
+	
+
         void SetInt32Value(  uint16 index,        int32  value );
         void SetUInt32Value( uint16 index,       uint32  value );
+		void UpdateUInt32Value(uint16 index, uint32  value);
         void SetUInt64Value( uint16 index, const uint64 &value );
         void SetFloatValue(  uint16 index,       float   value );
         void SetByteValue(   uint16 index, uint8 offset, uint8 value );
@@ -612,7 +634,7 @@ class MANGOS_DLL_SPEC Object
             uint32 *m_uint32Values;
             float  *m_floatValues;
         };
-
+		//std::vector<bool> m_changedValues;
         uint32 *m_uint32Values_mirror;
 
         uint16 m_valuesCount;
@@ -667,10 +689,10 @@ m_obj->m_updateTracker.Reset();
                 WorldObject * const m_obj;
         };
 
-        virtual ~WorldObject ( ) {}
-
-        virtual void Update(uint32 /*update_diff*/, uint32 /*time_diff*/);
-
+        //virtual ~WorldObject ( ) {}
+		virtual ~WorldObject();
+        //virtual void Update(uint32 /*update_diff*/, uint32 /*time_diff*/);
+		virtual void Update(uint32 update_diff, uint32 /*time_diff*/);
         void _Create( uint32 guidlow, HighGuid guidhigh );
 
         void Relocate(float x, float y, float z, float orientation);
@@ -724,7 +746,7 @@ m_obj->m_updateTracker.Reset();
         void LoadMapCellsAround(float dist) const;
 
         InstanceData* GetInstanceData() const;
-
+		
         const char* GetName() const { return m_name.c_str(); }
         void SetName(const std::string& newname) { m_name=newname; }
 
@@ -807,6 +829,7 @@ m_obj->m_updateTracker.Reset();
         bool IsMoving() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING); }
         bool IsSwimming() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING); }
         bool IsMovingButNotWalking() const { return IsMoving() && !(IsWalking() || IsWalkingBackward()); }
+        bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
 
         MovementInfo m_movementInfo;
         Transport * m_transport;
@@ -883,6 +906,8 @@ m_obj->m_updateTracker.Reset();
 
         Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype = TEMPSUMMON_DEAD_DESPAWN,uint32 despwtime = 25000, bool asActiveObject = false, uint32 pacifiedTimer = 0);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 25000, bool attach = true);
+		//eluna
+		GameObject* SummonGameObject(uint32 id, float x, float y, float z, float angle, uint32 despwtime);
 
         Creature* FindNearestCreature(uint32 entry, float range, bool alive = true) const;
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
@@ -905,7 +930,7 @@ m_obj->m_updateTracker.Reset();
 
         // ASSERT print helper
         bool PrintCoordinatesError(float x, float y, float z, char const* descr) const;
-
+		ElunaEventProcessor* elunaEvents;
         //these functions are used mostly for Relocate() and Corpse/Player specific stuff...
         //use them ONLY in LoadFromDB()/Create() funcs and nowhere else!
         //mapId/instanceId should be set in SetMap() function!

@@ -29,7 +29,7 @@
 #include "Database/DatabaseEnv.h"
 #include <mutex>
 #include "Util.h"
-
+#include "Utilities/EventProcessor.h"
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
 #if defined( __GNUC__ )
 #pragma pack(1)
@@ -554,8 +554,9 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         void AddToWorld();
         void RemoveFromWorld();
-
-        bool Create(uint32 guidlow, uint32 name_id, Map *map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
+		void CleanupsBeforeDelete() override;
+        bool Create(uint32 guidlow, uint32 name_id, Map *map, float x, float y, float z, float ang, 
+			float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 animprogress = GO_ANIMPROGRESS_DEFAULT, GOState go_state = GO_STATE_READY);
         void Update(uint32 update_diff, uint32 p_time) override;
         GameObjectInfo const* GetGOInfo() const;
 
@@ -704,8 +705,11 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
 
         GameObject* LookupFishingHoleAround(float range);
-
+		Group* GameObject::GetGroupLootRecipient() const;
+		Player* GetLootRecipient() const;
         GridReference<GameObject> &GetGridRef() { return m_gridRef; }
+		void SetLootRecipient(Unit* pUnit);
+		Player* GetOriginalLootRecipient() const;           // ignore group changes/etc, not for looting
 
         // Nostalrius
         bool IsUseRequirementMet() const;
@@ -759,6 +763,11 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         GameObjectAI *i_AI;
 
         uint32 m_playerGroupId;
+
+		// Loot System
+		ObjectGuid m_lootRecipientGuid;                     // player who will have rights for looting if m_lootGroupRecipient==0 or group disbanded
+		uint32 m_lootGroupRecipientId;                      // group who will have rights for looting if set and exist
+
     private:
         void SwitchDoorOrButton(bool activate, bool alternative = false);
 

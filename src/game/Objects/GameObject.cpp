@@ -46,6 +46,8 @@
 #include "ZoneScript.h"
 #include "DynamicTree.h"
 #include "vmap/GameObjectModel.h"
+#include "LuaEngine.h"
+
 
 GameObject::GameObject() : WorldObject(),
     loot(this),
@@ -93,7 +95,8 @@ void GameObject::AddToWorld()
 
     // After Object::AddToWorld so that for initial state the GO is added to the world (and hence handled correctly)
     UpdateCollisionState();
-
+	if (!IsInWorld())
+		sEluna->OnAddToWorld(this);
     if (!i_AI)
         AIM_Initialize();
 }
@@ -110,6 +113,7 @@ void GameObject::RemoveFromWorld()
     ///- Remove the gameobject from the accessor
     if (IsInWorld())
     {
+		sEluna->OnRemoveFromWorld(this);
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
 
@@ -132,6 +136,10 @@ void GameObject::RemoveFromWorld()
     }
 
     Object::RemoveFromWorld();
+}
+void GameObject::CleanupsBeforeDelete()
+{
+	WorldObject::CleanupsBeforeDelete();
 }
 
 bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state)
@@ -196,6 +204,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, float x, float
     SetGoAnimProgress(animprogress);
     SetName(goinfo->name);
 
+	sEluna->OnSpawn(this);
     //Notify the map's instance data.
     //Only works if you create the object in it, not if it is moves to that map.
     //Normally non-players do not teleport to other maps.
@@ -244,7 +253,8 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         //((Transport*)this)->Update(p_time);
         return;
     }
-
+	// used by eluna
+	sEluna->UpdateAI(this, update_diff);
     ///- UpdateAI
     if (i_AI)
         i_AI->UpdateAI(update_diff);
@@ -2147,6 +2157,7 @@ bool GameObject::PlayerCanUse(Player* pl)
 void GameObject::SetLootState(LootState state)
 {
     m_lootState = state;
+	sEluna->OnLootStateChanged(this, state);
     UpdateCollisionState();
 }
 
@@ -2154,6 +2165,7 @@ void GameObject::SetGoState(GOState state)
 {
     //SetByteValue(GAMEOBJECT_BYTES_1, 0, state); // 3.3.5
     SetUInt32Value(GAMEOBJECT_STATE, state);
+	sEluna->OnGameObjectStateChanged(this, state);
     UpdateCollisionState();
 }
 
@@ -2321,4 +2333,65 @@ void GameObject::Despawn()
     }
     else
         AddObjectToRemoveList();
+}
+
+Player* GameObject::GetOriginalLootRecipient() const
+{
+	return m_lootRecipientGuid ? ObjectAccessor::FindPlayer(m_lootRecipientGuid) : nullptr;
+}
+Group* GameObject::GetGroupLootRecipient() const
+{
+	// original recipient group if set and not disbanded
+	return m_lootGroupRecipientId ? sObjectMgr.GetGroupById(m_lootGroupRecipientId) : nullptr;
+}
+
+Player* GameObject::GetLootRecipient() const
+{
+	// original recipient group if set and not disbanded
+	Group* group = GetGroupLootRecipient();
+
+	// original recipient player if online
+	Player* player = GetOriginalLootRecipient();
+
+	// if group not set or disbanded return original recipient player if any
+	if (!group)
+		return player;
+
+	// group case
+
+	// return player if it still be in original recipient group
+	if (player && player->GetGroup() == group)
+		return player;
+
+	// find any in group
+	for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+		if (Player* newPlayer = itr->getSource())
+			return newPlayer;
+
+	return nullptr;
+}
+
+void GameObject::SetLootRecipient(Unit* pUnit)
+{
+	// set the player whose group should receive the right
+	// to loot the gameobject after its used
+	// should be set to nullptr after the loot disappears
+
+	if (!pUnit)
+	{
+		m_lootRecipientGuid.Clear();
+		m_lootGroupRecipientId = 0;
+		return;
+	}
+
+	Player* player = pUnit->GetCharmerOrOwnerPlayerOrPlayerItself();
+	if (!player)                                            // normal creature, no player involved
+		return;
+
+	// set player for non group case or if group will disbanded
+	m_lootRecipientGuid = player->GetObjectGuid();
+
+	// set group for group existed case including if player will leave group at loot time
+	if (Group* group = player->GetGroup())
+		m_lootGroupRecipientId = group->GetId();
 }

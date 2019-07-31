@@ -51,6 +51,7 @@
 #include "NodeSession.h"
 #include "NodesOpcodes.h"
 #include "MasterPlayer.h"
+#include "LuaEngine.h"
 
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
@@ -764,6 +765,10 @@ void WorldSession::LogoutPlayer(bool Save)
         ///- Update cached data at logout
         sObjectMgr.UpdatePlayerCache(_player);
 
+
+		///- used by eluna
+		sEluna->OnLogout(_player);
+
         ///- Remove the player from the world
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map
@@ -1000,6 +1005,9 @@ void WorldSession::SaveTutorialsData()
 
 void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* packet)
 {
+    //if (!sEluna->OnPacketReceive(this, packet))
+    //	return;
+
     // need prevent do internal far teleports in handlers because some handlers do lot steps
     // or call code that can do far teleports in some conditions unexpectedly for generic way work code
     if (_player)

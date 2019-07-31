@@ -32,7 +32,7 @@
 
 #include "Opcodes.h"
 #include "MangosSocketImpl.h"
-
+#include "LuaEngine.h"
 template class MangosSocket<WorldSession, WorldSocket, AuthCrypt>;
 
 int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
@@ -72,7 +72,8 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                     sLog.outError("WorldSocket::ProcessIncoming: Player send CMSG_AUTH_SESSION again");
                     return -1;
                 }
-
+				//if (!sEluna->OnPacketReceive(m_session, *pct))
+				//	return false;
                 return HandleAuthSession(*new_pct);
             default:
             {
@@ -82,6 +83,10 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
                 {
                     // OK ,give the packet to WorldSession
                     aptr.release();
+
+					//if (!sEluna->OnPacketReceive(m_session, *pct))
+					//	return false;
+
                     // WARNINIG here we call it with locks held.
                     // Its possible to cause deadlock if QueuePacket calls back
                     m_Session->QueuePacket(new_pct);

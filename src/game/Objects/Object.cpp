@@ -54,7 +54,8 @@
 #include "packet_builder.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
-
+#include "LuaEngine.h"
+#include "ElunaEventMgr.h"
 ////////////////////////////////////////////////////////////
 // Methods of class MovementInfo
 
@@ -983,6 +984,17 @@ void Object::SetUInt32Value(uint16 index, uint32 value)
     }
 }
 
+void Object::UpdateUInt32Value(uint16 index, uint32 value)
+{
+    MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index, true));
+
+    if (m_uint32Values[ index ] != value)
+    {
+        m_uint32Values[ index ] = value;
+        MarkForClientUpdate();
+    }
+}
+
 void Object::SetUInt64Value(uint16 index, const uint64 &value)
 {
     MANGOS_ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
@@ -1298,7 +1310,7 @@ void WorldObject::SetVisibilityModifier(float f)
 }
 
 WorldObject::WorldObject()
-    :   m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0),
+    : elunaEvents(NULL), m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0),
         m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_creatureSummonCount(0), m_summonLimitAlert(0)
 {
     // Phasing
@@ -1308,7 +1320,11 @@ WorldObject::WorldObject()
     m_movementInfo.time = WorldTimer::getMSTime();
     m_creatureSummonLimit = sWorld.GetCreatureSummonCountLimit();
 }
-
+WorldObject::~WorldObject()
+{
+	delete elunaEvents;
+	elunaEvents = NULL;
+}
 void WorldObject::CleanupsBeforeDelete()
 {
     RemoveFromWorld();
@@ -1316,6 +1332,7 @@ void WorldObject::CleanupsBeforeDelete()
     if (Transport* transport = GetTransport())
         transport->RemovePassenger(this);
 }
+
 
 void WorldObject::_Create(uint32 guidlow, HighGuid guidhigh)
 {
@@ -1985,7 +2002,9 @@ void WorldObject::SetMap(Map * map)
     //lets save current map's Id/instanceId
     m_mapId = map->GetId();
     m_InstanceId = map->GetInstanceId();
-
+	delete elunaEvents;
+	// On multithread replace this with a pointer to map's Eluna pointer stored in a map
+	elunaEvents = new ElunaEventProcessor(&Eluna::GEluna, this);
     // Order is important, must be done after m_currMap is set
     SetZoneScript();
 }
@@ -1998,6 +2017,7 @@ Map* WorldObject::GetMap() const
 
 void WorldObject::ResetMap()
 {
+	elunaEvents = nullptr;
     m_currMap = nullptr;
     m_zoneScript = nullptr;
 }
@@ -2097,7 +2117,8 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
 
     if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
         ((Creature*)this)->AI()->JustSummoned(pCreature);
-
+	if (Unit* summoner = ToUnit())
+		sEluna->OnSummoned(pCreature, summoner);
     // Creature Linking, Initial load is handled like respawn
     if (pCreature->IsLinkingEventTrigger())
         GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, pCreature);
@@ -2108,7 +2129,35 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     ++m_creatureSummonCount;
     return pCreature;
 }
+GameObject* WorldObject::SummonGameObject(uint32 id, float x, float y, float z, float angle, uint32 despwtime)
+{
+	if (!IsInWorld())
+		return NULL;
 
+	if (!sObjectMgr.GetGameObjectInfo(id))
+	{
+		sLog.outErrorDb("WorldObject::SummonGameObject: GameObject (Entry: %u) not existed for summoner: %s. ", id, GetGuidStr().c_str());
+		return NULL;
+	}
+
+	Map *map = GetMap();
+	GameObject* pGameObj = new GameObject;
+	if (!pGameObj->Create(map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), id, map, x, y, z, angle))
+	{
+		delete pGameObj;
+		return NULL;
+	}
+
+	pGameObj->SetRespawnTime(despwtime / IN_MILLISECONDS);
+	if (GetTypeId() == TYPEID_PLAYER || GetTypeId() == TYPEID_UNIT)
+		ToUnit()->AddGameObject(pGameObj);
+	else
+		pGameObj->SetSpawnedByDefault(false);
+
+	map->Add(pGameObj);
+
+	return pGameObj;
+}
 void WorldObject::SetCreatureSummonLimit(uint32 limit)
 {
     //sLog.outInfo("[WorldObject]: Object %s is changing summon limit to %u", GetGuidStr().c_str(), limit);
@@ -3016,6 +3065,7 @@ void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
     }
 
     ExecuteDelayedActions();
+	elunaEvents->Update(update_diff);
 }
 
 class MANGOS_DLL_DECL NULLNotifier

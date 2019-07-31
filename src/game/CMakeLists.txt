@@ -15,7 +15,17 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+file(GLOB SRC_FILES_LUAENGINE LuaEngine/*.cpp LuaEngine/*.h)
+set(SRC_GRP_LUAENGINE
+    ${SRC_FILES_LUAENGINE}
+)
+source_group("LuaEngine"
+  FILES
+    ${SRC_GRP_LUAENGINE}
+)
+
 set (game_SRCS 
+    ${SRC_GRP_LUAENGINE}
     AdvancedPlayerBotAI.h
     AdvancedPlayerBotAI.cpp
     AccountMgr.cpp
@@ -440,7 +450,7 @@ if(WIN32)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:implicitNoexcept-")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 endif()
-
+# add_subdirectory(LuaEngine)
 # Used in game ScriptMgr
 if(SCRIPTS)
   list(APPEND game_SRCS
@@ -478,6 +488,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/AuctionHouse
   ${CMAKE_CURRENT_SOURCE_DIR}/AutoTesting
   ${CMAKE_CURRENT_SOURCE_DIR}/Battlegrounds
+  ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine
   ${CMAKE_CURRENT_SOURCE_DIR}/Chat
   ${CMAKE_CURRENT_SOURCE_DIR}/CinematicStuff
   ${CMAKE_CURRENT_SOURCE_DIR}/Commands
@@ -496,6 +507,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Movement/spline
   ${CMAKE_CURRENT_SOURCE_DIR}/Objects
   ${CMAKE_CURRENT_SOURCE_DIR}/OutdoorPvP
+  ${CMAKE_SOURCE_DIR}/dep/lualib
   ${CMAKE_CURRENT_SOURCE_DIR}/PacketBroadcast
   ${CMAKE_CURRENT_SOURCE_DIR}/PlayerBots
   ${CMAKE_CURRENT_SOURCE_DIR}/Protocol
@@ -526,6 +538,7 @@ if(WIN32)
     ${CMAKE_SOURCE_DIR}/dep/include-windows
   )
 endif()
+
 
 source_group("Object"
   REGULAR_EXPRESSION .*
@@ -576,10 +589,12 @@ SET_TARGET_PROPERTIES (game PROPERTIES FOLDER "Game Libs")
 target_link_libraries(game
   shared
   detour
+  lualib
 )
 
 #add_dependencies(game revision.h)
-
+#add_dependencies(${LIBRARY_NAME} lualib)
+add_dependencies(game lualib)
 # Generate precompiled header
 if(PCH)
   if(MSVC OR XCODE)
@@ -591,3 +606,5 @@ if(PCH)
     add_precompiled_header(game ${CMAKE_CURRENT_SOURCE_DIR}/pchdef.h)
   endif()
 endif()
+
+install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/LuaEngine/extensions DESTINATION ${BIN_DIR}/lua_scripts/)

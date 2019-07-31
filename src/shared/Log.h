@@ -136,6 +136,10 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
             fclose(dberLogfile);
         dberLogfile = nullptr;
 
+		if (elunaErrLogfile != nullptr)
+			fclose(elunaErrLogfile);
+		elunaErrLogfile = NULL;
+
         if (worldLogfile != nullptr)
             fclose(worldLogfile);
         worldLogfile = nullptr;
@@ -181,6 +185,10 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         void outWardenDebug(const char * wrd, ...)   ATTR_PRINTF(2,3);
         void outAnticheat(const char* detector, const char* player, const char* reason, const char* penalty);
 
+		void outErrorEluna();                               // any log level
+		// any log level
+		void outErrorEluna(const char* str, ...)        ATTR_PRINTF(2, 3);
+
         void outErrorDb();                                  // any log level
                                                             // any log level
         void outErrorDb( const char * str, ... )     ATTR_PRINTF(2,3);
@@ -214,6 +222,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         FILE* logfile;
         FILE* gmLogfile;
         FILE* dberLogfile;
+		FILE* elunaErrLogfile;
         FILE* wardenLogfile;
         FILE* anticheatLogfile;
         FILE* worldLogfile;

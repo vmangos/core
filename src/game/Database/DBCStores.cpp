@@ -120,7 +120,7 @@ DBCStorage <TaxiPathEntry> sTaxiPathStore(TaxiPathEntryfmt);
 // DBC store data but sTaxiPathNodesByPath used for fast access to entries (it's not owner pointed data).
 TaxiPathNodesByPath sTaxiPathNodesByPath;
 static DBCStorage <TaxiPathNodeEntry> sTaxiPathNodeStore(TaxiPathNodeEntryfmt);
-
+DBCStorage <AreaTableEntry> sAreaStore(AreaTableEntryfmt);
 DBCStorage <WMOAreaTableEntry>  sWMOAreaTableStore(WMOAreaTableEntryfmt);
 DBCStorage <WorldMapAreaEntry>  sWorldMapAreaStore(WorldMapAreaEntryfmt);
 //DBCStorage <WorldMapOverlayEntry> sWorldMapOverlayStore(WorldMapOverlayEntryfmt);
@@ -502,7 +502,10 @@ WMOAreaTableEntry const* GetWMOAreaTableEntryByTripple(int32 rootid, int32 adtid
     return i->second;
 
 }
-
+AreaTableEntry const* GetAreaEntryByAreaID(uint32 area_id)
+{
+	return sAreaStore.LookupEntry(area_id);
+}
 ChatChannelsEntry const* GetChannelEntryFor(uint32 channel_id)
 {
     // not sorted, numbering index from 0

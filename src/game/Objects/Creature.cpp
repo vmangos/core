@@ -59,6 +59,7 @@
 #include "TemporarySummon.h"
 #include "ScriptedEscortAI.h"
 #include "GuardMgr.h"
+#include "LuaEngine.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -187,6 +188,7 @@ Creature::Creature(CreatureSubtype subtype) :
 
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
         m_spells[i] = 0;
+    DisableReputationGain = false;
 }
 
 Creature::~Creature()
@@ -216,10 +218,14 @@ void Creature::AddToWorld()
         AIM_Initialize();
     if (!bWasInWorld && m_zoneScript)
         m_zoneScript->OnCreatureCreate(this);
+	if (!bWasInWorld)
+		sEluna->OnAddToWorld(this);
 }
 
 void Creature::RemoveFromWorld()
 {
+	if (IsInWorld())
+		sEluna->OnRemoveFromWorld(this);
     ///- Remove the creature from the accessor
     if (IsInWorld())
     {
@@ -262,7 +268,12 @@ void Creature::RemoveCorpse()
     GetRespawnCoord(x, y, z, &o);
     GetMap()->CreatureRelocation(this, x, y, z, o);
 }
-
+//uint32 Creature::GetCreatureSpellCooldownDelay(uint32 spellId) const
+//{
+//	CreatureSpellCooldowns::const_iterator itr = m_CreatureSpellCooldowns.find(spellId);
+//	time_t t = time(NULL);
+//	return uint32(itr != m_CreatureSpellCooldowns.end() && itr->second > t ? itr->second - t : 0);
+//}
 /**
  * change the entry of creature until respawn
  */

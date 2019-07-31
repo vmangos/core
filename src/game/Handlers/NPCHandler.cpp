@@ -39,7 +39,8 @@
 #include "GuildMgr.h"
 #include "Chat.h"
 #include "CharacterDatabaseCache.h"
-
+#include "Item.h"
+#include "LuaEngine.h"
 enum StableResultCode
 {
     STABLE_ERR_MONEY        = 0x01,                         // "you don't have enough money"
@@ -442,6 +443,30 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket & recv_data)
         if (!sScriptMgr.OnGossipSelect(_player, pGo, sender, action, code.empty() ? NULL : code.c_str()))
             _player->OnGossipSelect(pGo, gossipListId);
     }
+	//eluna
+	else if (guid.IsItem())
+	{
+		Item* item = GetPlayer()->GetItemByGuid(guid);
+		if (!item)
+		{
+			DEBUG_LOG("WORLD: HandleGossipSelectOptionOpcode - %s not found or you can't interact with it.", guid.GetString().c_str());
+			return;
+		}
+
+		// used by eluna
+		sEluna->HandleGossipSelectOption(GetPlayer(), item, GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
+	}
+	else if (guid.IsPlayer())
+	{
+		if (GetPlayer()->GetGUIDLow() != guid)
+		{
+			DEBUG_LOG("WORLD: HandleGossipSelectOptionOpcode - %s not found or you can't interact with it.", guid.GetString().c_str());
+			return;
+		}
+
+		// used by eluna
+		sEluna->HandleGossipSelectOption(GetPlayer(), GetPlayer()->PlayerTalkClass->GetGossipMenu().GetMenuId(), GetPlayer()->PlayerTalkClass->GossipOptionSender(gossipListId), GetPlayer()->PlayerTalkClass->GossipOptionAction(gossipListId), code);
+	}
 }
 
 void WorldSession::HandleSpiritHealerActivateOpcode(WorldPacket & recv_data)

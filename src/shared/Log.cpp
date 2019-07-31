@@ -56,7 +56,7 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
 };
 
 Log::Log() :
-    logfile(nullptr), gmLogfile(nullptr), dberLogfile(nullptr),
+    logfile(nullptr), gmLogfile(nullptr), dberLogfile(nullptr), elunaErrLogfile(nullptr),
     wardenLogfile(nullptr), anticheatLogfile(nullptr), honorLogfile(nullptr), m_colored(false), m_wardenDebug(false), m_includeTime(false), m_gmlog_per_account(false)
 {
     for (int i = 0; i < LOG_MAX_FILES; ++i)
@@ -294,6 +294,7 @@ void Log::Initialize()
 
     dberLogfile             = openLogFile("DBErrorLogFile", nullptr, "a");
     worldLogfile            = openLogFile("WorldLogFile", "WorldLogTimestamp", "a");
+	elunaErrLogfile			= openLogFile("ElunaErrorLogFile", nullptr, "a");
     nostalriusLogFile       = openLogFile("NostalriusLogFile", "NostalriusLogTimestamp", "a");
     honorLogfile            = openLogFile("HonorLogFile", "HonorLogTimestamp", "a");
     wardenLogfile           = openLogFile("WardenLogFile", "WardenLogTimestamp", "a");
@@ -656,6 +657,80 @@ void Log::outErrorDb( const char * err, ... )
     }
 
     fflush(stderr);
+}
+void Log::outErrorEluna()
+{
+	if (m_includeTime)
+		outTime(stderr);
+
+	fprintf(stderr, "\n");
+
+	if (logfile)
+	{
+		outTimestamp(logfile);
+		fprintf(logfile, "ERROR Eluna\n");
+		fflush(logfile);
+	}
+
+	if (elunaErrLogfile)
+	{
+		outTimestamp(elunaErrLogfile);
+		fprintf(elunaErrLogfile, "\n");
+		fflush(elunaErrLogfile);
+	}
+
+	fflush(stderr);
+}
+
+void Log::outErrorEluna(const char* err, ...)
+{
+	if (!err)
+		return;
+
+	if (m_colored)
+		SetColor(false, m_colors[LogError]);
+
+	if (m_includeTime)
+		outTime(stderr);
+
+	va_list ap;
+
+	va_start(ap, err);
+	vutf8printf(stderr, err, &ap);
+	va_end(ap);
+
+	if (m_colored)
+		ResetColor(false);
+
+	fprintf(stderr, "\n");
+
+	if (logfile)
+	{
+		outTimestamp(logfile);
+		fprintf(logfile, "ERROR Eluna: ");
+
+		va_start(ap, err);
+		vfprintf(logfile, err, ap);
+		va_end(ap);
+
+		fprintf(logfile, "\n");
+		fflush(logfile);
+	}
+
+	if (elunaErrLogfile)
+	{
+		outTimestamp(elunaErrLogfile);
+
+		va_list ap;
+		va_start(ap, err);
+		vfprintf(elunaErrLogfile, err, ap);
+		va_end(ap);
+
+		fprintf(elunaErrLogfile, "\n");
+		fflush(elunaErrLogfile);
+	}
+
+	fflush(stderr);
 }
 
 void Log::outBasic( const char * str, ... )

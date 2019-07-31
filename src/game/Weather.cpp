@@ -32,7 +32,7 @@
 #include "Log.h"
 #include "Util.h"
 #include "ProgressBar.h"
-
+#include "LuaEngine.h"
 INSTANTIATE_SINGLETON_1(WeatherMgr);
 
 /// Weather sound defines ( only for 1.12 )
@@ -239,6 +239,7 @@ bool Weather::SendWeatherForPlayersInZone(Map const* _map)
     ///- Log the event
     LogWeatherState(GetWeatherState());
 
+	sEluna->OnChange(this, m_zone, GetWeatherState(), m_grade);
     return true;
 }
 

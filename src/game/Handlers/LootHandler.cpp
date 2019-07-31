@@ -35,7 +35,7 @@
 #include "World.h"
 #include "Util.h"
 #include "Anticheat.h"
-
+#include "LuaEngine.h"
 void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_AUTOSTORE_LOOT_ITEM");
@@ -182,6 +182,8 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
         sLog.out(LOG_LOOTS, "%s loots %ux%u [loot from %s]", _player->GetShortDescription().c_str(), item->count, item->itemid, lguid.GetString().c_str());
         player->SendNewItem(newitem, uint32(item->count), false, false, true);
         player->OnReceivedItem(newitem);
+		//eluna loot item test
+		sEluna->OnLootItem(player, newitem, item->count, lguid);
     }
     else
         player->SendEquipError(msg, NULL, NULL, item->itemid);
@@ -278,11 +280,14 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recv_data*/)
                 WorldPacket data(SMSG_LOOT_MONEY_NOTIFY, 4);
                 data << uint32(money_per_player);
                 (*i)->GetSession()->SendPacket(&data);
+				//eluna loot money test
+				sEluna->OnLootMoney(player, money_per_player);
             }
         }
         else
             player->LootMoney(pLoot->gold, pLoot);
-
+			//eluna loot money test
+			sEluna->OnLootMoney(player, pLoot->gold);
         pLoot->gold = 0;
 
         if (pItem)

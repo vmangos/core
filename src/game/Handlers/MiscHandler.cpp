@@ -49,7 +49,7 @@
 #include "MasterPlayer.h"
 #include "GossipDef.h"
 #include "GameEventMgr.h"
-
+#include "LuaEngine.h"
 void WorldSession::HandleRepopRequestOpcode(WorldPacket & /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_REPOP_REQUEST Message");
@@ -71,6 +71,8 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket & /*recv_data*/)
         DEBUG_LOG("HandleRepopRequestOpcode: got request after player %s(%d) was killed and before he was updated", player->GetName(), player->GetGUIDLow());
         player->KillPlayer();
     }
+	// used by eluna
+	sEluna->OnRepop(GetPlayer());
 
     player->BuildPlayerRepop();
     player->RepopAtGraveyard();

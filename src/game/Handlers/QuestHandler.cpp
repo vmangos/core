@@ -32,6 +32,7 @@
 #include "ObjectAccessor.h"
 #include "ScriptMgr.h"
 #include "Group.h"
+#include "LuaEngine.h"
 
 void WorldSession::HandleQuestgiverStatusQueryOpcode(WorldPacket & recv_data)
 {
@@ -345,8 +346,14 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recv_data)
     recv_data >> slot;
 
     DEBUG_LOG("WORLD: Received CMSG_QUESTLOG_REMOVE_QUEST slot = %u", slot);
+	if (uint32 quest = _player->GetQuestSlotQuestId(slot))
+    {
+		// used by eluna
+		sEluna->OnQuestAbandon(_player, quest);
+    }
 
     _player->RemoveQuestAtSlot(slot);
+
 }
 
 void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)

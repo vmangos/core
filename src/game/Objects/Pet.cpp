@@ -2279,7 +2279,15 @@ void Pet::CastPetAuras(bool current)
             CastPetAura(pa);
     }
 }
+void Pet::CastOwnerTalentAuras()
+{
+	if (!GetOwner() || GetOwner()->GetTypeId() != TYPEID_PLAYER)
+		return;
 
+	Player* pOwner = static_cast<Player*>(GetOwner());
+
+	// Add below code handling spells cast by pet when owner/player has aura from talent
+}
 void Pet::CastPetAura(PetAura const* aura)
 {
     uint32 auraId = aura->GetAura(GetEntry());

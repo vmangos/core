@@ -22,7 +22,7 @@
 #include "WorldSession.h"
 #include "Log.h"
 #include "DBCStores.h"
-
+#include "LuaEngine.h"
 
 template <typename SessionType, typename SocketName, typename Crypt>
 MangosSocket<SessionType, SocketName, Crypt>::MangosSocket() :

@@ -235,8 +235,10 @@ enum DBLocaleConstant : int
 #define MAX_DBC_LOCALE 8
 #define MAX_LOCALE 9
 
+#define DEFAULT_LOCALE LOCALE_enUS
 LocaleConstant GetLocaleByName(const std::string& name);
 LocaleConstant GetDbcLocaleFromDbLocale(DBLocaleConstant localeIndex);
+typedef std::vector<std::string> StringVector;
 
 extern char const* localeNames[MAX_LOCALE];
 

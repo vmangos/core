@@ -57,7 +57,7 @@
 #include "GameEventMgr.h"
 #include "InstanceData.h"
 #include "ScriptMgr.h"
-
+#include "LuaEngine.h"
 using namespace Spells;
 
 pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
@@ -3023,6 +3023,14 @@ void Spell::EffectSummon(SpellEffectIndex eff_idx)
     if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned((Creature*)spawnCreature);
 
+	if (m_originalCaster && (m_originalCaster != m_caster))
+	{
+		if (Unit* summoner = m_originalCaster->ToUnit())
+			sEluna->OnSummoned(spawnCreature, summoner);
+	}
+	else if (Unit* summoner = m_caster->ToUnit())
+		sEluna->OnSummoned(spawnCreature, summoner);
+
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
 }
 
@@ -3419,6 +3427,14 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
             // UNIT_FIELD_CREATEDBY are not set for these kind of spells.
             // Does exceptions exist? If so, what are they?
             // summon->SetCreatorGuid(m_caster->GetObjectGuid());
+			if (m_originalCaster && (m_originalCaster != m_caster))
+			{
+				if (Unit* summoner = m_originalCaster->ToUnit())
+					sEluna->OnSummoned(summon, summoner);
+			}
+			else if (Unit* summoner = m_caster->ToUnit())
+				sEluna->OnSummoned(summon, summoner);
+
 
             if (count == 0)
                 AddExecuteLogInfo(eff_idx, ExecuteLogInfo(summon->GetObjectGuid()));
@@ -3618,6 +3634,16 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
                 break;
             }
         }
+
+		if (m_originalCaster && (m_originalCaster != m_caster))
+		{
+			if (Unit* summoner = m_originalCaster->ToUnit())
+				sEluna->OnSummoned(spawnCreature, summoner);
+				
+		}
+		else if (Unit* summoner = m_caster->ToUnit())
+			sEluna->OnSummoned(spawnCreature, summoner);
+
 
         if (count == 0)
             AddExecuteLogInfo(eff_idx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
@@ -5320,6 +5346,9 @@ void Spell::EffectDuel(SpellEffectIndex eff_idx)
 
     caster->SetGuidValue(PLAYER_DUEL_ARBITER, pGameObj->GetObjectGuid());
     target->SetGuidValue(PLAYER_DUEL_ARBITER, pGameObj->GetObjectGuid());
+
+	// used by eluna
+	sEluna->OnDuelRequest(target, caster);
 }
 
 void Spell::EffectStuck(SpellEffectIndex /*eff_idx*/)
@@ -5637,6 +5666,8 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
         item->SetEnchantment(slot, enchant_id, duration, charges);
         item_owner->ApplyEnchantment(item, slot, true);
     }
+
+
 }
 
 void Spell::EffectDisEnchant(SpellEffectIndex /*eff_idx*/)
@@ -6073,6 +6104,14 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     // Notify Summoner
     if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(critter);
+
+	if (m_originalCaster && (m_originalCaster != m_caster))
+	{
+		if (Unit* summoner = m_originalCaster->ToUnit())
+			sEluna->OnSummoned(critter, summoner);
+	}
+	else if (Unit* summoner = m_caster->ToUnit())
+		sEluna->OnSummoned(critter, summoner);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(critter->GetObjectGuid()));
 }

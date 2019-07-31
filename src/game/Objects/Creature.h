@@ -531,6 +531,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsCorpse() const { return getDeathState() ==  CORPSE; }
         bool IsDespawned() const { return getDeathState() ==  DEAD; }
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
+        uint32 GetCorpseDelay() const { return m_corpseDelay; }
         bool IsRacialLeader() const { return GetCreatureInfo()->racial_leader; }
         bool IsCivilian() const { return GetCreatureInfo()->civilian; }
         bool IsTrigger() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INVISIBLE; }
@@ -607,6 +608,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         SpellSchoolMask GetMeleeDamageSchoolMask() const override { return m_meleeDamageSchoolMask; }
         void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = GetSchoolMask(school); }
 
+		/*uint32 GetCreatureSpellCooldownDelay(uint32 spellId) const;*/
         bool HasSpell(uint32 spellID) const override;
 
         bool UpdateEntry(uint32 entry, Team team = ALLIANCE, const CreatureData* data = nullptr, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
@@ -864,6 +866,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetVirtualItem(VirtualItemSlot slot, uint32 item_id);
 
+        void SetDisableReputationGain(bool disable) { DisableReputationGain = disable; }
+		bool IsReputationGainDisabled() { return DisableReputationGain; }
         void ResetDamageTakenOrigin()
         {
             _playerDamageTaken      = 0;
@@ -925,7 +929,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         uint32 m_groupLootId;                               // used to find group which is looting corpse
         void StopGroupLoot();
-
+		bool DisableReputationGain;
         // vendor items
         VendorItemCounts m_vendorItemCounts;
 

@@ -1003,6 +1003,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         uint8 FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) const;
         uint32 GetItemCount(uint32 item, bool inBankAlso = false, Item* skipItem = nullptr) const;
         Item* GetItemByGuid(ObjectGuid guid) const;
+		Item* GetItemByEntry(uint32 item) const;            // only for special cases
         Item* GetItemByPos(uint16 pos) const;
         Item* GetItemByPos(uint8 bag, uint8 slot) const;
         Item* GetWeaponForAttack(WeaponAttackType attackType) const { return GetWeaponForAttack(attackType,false,false); }
@@ -1117,13 +1118,14 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         uint32 GetMoney() const { return GetUInt32Value(PLAYER_FIELD_COINAGE); }
         void LogModifyMoney(int32 d, const char* type, ObjectGuid fromGuid = ObjectGuid(), uint32 data = 0);
-        void ModifyMoney(int32 d)
-        {
-            if (d < 0)
-                SetMoney(GetMoney() > uint32(-d) ? GetMoney() + d : 0);
-            else
-                SetMoney(GetMoney() < uint32(MAX_MONEY_AMOUNT - d) ? GetMoney() + d : MAX_MONEY_AMOUNT);
-        }
+        // void ModifyMoney(int32 d)
+        // {
+            // if (d < 0)
+                // SetMoney(GetMoney() > uint32(-d) ? GetMoney() + d : 0);
+            // else
+                // SetMoney(GetMoney() < uint32(MAX_MONEY_AMOUNT - d) ? GetMoney() + d : MAX_MONEY_AMOUNT);
+        // }
+		void ModifyMoney(int32 d);
         void LootMoney(int32 g, Loot* loot);
         std::string GetShortDescription() const; // "player:guid [username:accountId@IP]"
 
@@ -1183,13 +1185,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void GiveQuestSourceItemIfNeed(Quest const* pQuest);
 
         uint16 FindQuestSlot(uint32 quest_id) const;
-        uint32 GetQuestSlotQuestId(uint16 slot) const { return GetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot * MAX_QUEST_OFFSET + QUEST_ID_OFFSET); }
-        void SetQuestSlot(uint16 slot, uint32 quest_id, uint32 timer = 0)
-        {
-            SetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot*MAX_QUEST_OFFSET + QUEST_ID_OFFSET, quest_id);
-            SetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot*MAX_QUEST_OFFSET + QUEST_COUNT_STATE_OFFSET, 0);
-            SetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot*MAX_QUEST_OFFSET + QUEST_TIME_OFFSET, timer);
-        }
+        
         void SetQuestSlotCounter(uint16 slot, uint8 counter, uint8 count)
         {
             uint32 val = GetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot*MAX_QUEST_OFFSET + QUEST_COUNT_STATE_OFFSET);
@@ -1201,6 +1197,13 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void RemoveQuestSlotState(uint16 slot, uint8 state) { RemoveByteFlag(PLAYER_QUEST_LOG_1_1 + slot*MAX_QUEST_OFFSET + QUEST_COUNT_STATE_OFFSET, 3, state); }
         void SetQuestSlotTimer(uint16 slot, uint32 timer) { SetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot*MAX_QUEST_OFFSET + QUEST_TIME_OFFSET, timer); }
     public:
+		uint32 GetQuestSlotQuestId(uint16 slot) const { return GetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot * MAX_QUEST_OFFSET + QUEST_ID_OFFSET); }
+		void SetQuestSlot(uint16 slot, uint32 quest_id, uint32 timer = 0)
+		{
+			SetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot * MAX_QUEST_OFFSET + QUEST_ID_OFFSET, quest_id);
+			SetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot * MAX_QUEST_OFFSET + QUEST_COUNT_STATE_OFFSET, 0);
+			SetUInt32Value(PLAYER_QUEST_LOG_1_1 + slot * MAX_QUEST_OFFSET + QUEST_TIME_OFFSET, timer);
+		}
         uint32 GetQuestLevelForPlayer(Quest const* pQuest) const { return pQuest && (pQuest->GetQuestLevel() > 0) ? pQuest->GetQuestLevel() : getLevel(); }
         void PrepareQuestMenu(ObjectGuid guid, uint32 exceptQuestId = 0);
         void SendPreparedQuest(ObjectGuid guid);
@@ -1465,13 +1468,15 @@ class MANGOS_DLL_SPEC Player final: public Unit
         uint32 m_usedTalentCount;
 
         void UpdateFreeTalentPoints(bool resetIfNeed = true);
-        uint32 GetResetTalentsCost() const;
+        
         void UpdateResetTalentsMultiplier() const;
         uint32 CalculateTalentsPoints() const;
         void SendTalentWipeConfirm(ObjectGuid guid) const;
     public:
+		uint32 GetResetTalentsCost() const;
         uint32 GetFreeTalentPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS1); }
-        void SetFreeTalentPoints(uint32 points) { SetUInt32Value(PLAYER_CHARACTER_POINTS1, points); }
+        //void SetFreeTalentPoints(uint32 points) { SetUInt32Value(PLAYER_CHARACTER_POINTS1, points); }
+		void SetFreeTalentPoints(uint32 points);
         bool ResetTalents(bool no_cost = false);
         void InitTalentForLevel();
         void LearnTalent(uint32 talentId, uint32 talentRank);
@@ -1531,7 +1536,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void AddComboPoints(Unit* target, int8 count);
         void ClearComboPoints();
         void SetComboPoints();
-
+        float GetManaBonusFromIntellect() const;
+        float GetHealthBonusFromStamina() const;
         bool UpdateStats(Stats stat);
         bool UpdateAllStats();
         void UpdateResistances(uint32 school);
@@ -1893,7 +1899,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SetInWater(bool apply);
         bool IsInWater() const { return m_isInWater; }
         bool IsUnderWater() const;
-
+		bool IsFalling() { return GetPositionZ() < m_lastFallZ; }
         void SendInitialPacketsBeforeAddToMap();
         void SendInitialPacketsAfterAddToMap(bool login = true);
 
@@ -1946,8 +1952,9 @@ class MANGOS_DLL_SPEC Player final: public Unit
         /*********************************************************/
         
     private:
-        PlayerTaxi m_taxi;
+        
     public:
+		PlayerTaxi m_taxi;
         PlayerTaxi& GetTaxi() { return m_taxi; }
         PlayerTaxi const& GetTaxi() const { return m_taxi; }
         void InitTaxiNodes() { m_taxi.InitTaxiNodes(getRace(), getLevel()); }
@@ -1971,6 +1978,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void CinematicEnd();
         void CinematicStart(uint32 id);
 
+        void SetRoot(bool enable) ;
         uint32 watching_cinematic_entry;
         Position cinematic_start;
         Position const* cinematic_current_waypoint;
@@ -2017,6 +2025,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode = AURA_REMOVE_BY_DEFAULT);
 
         void SetDeathState(DeathState s);                   // overwrite Unit::SetDeathState
+
 
         /*********************************************************/
         /***                  SESSION SYSTEM                   ***/
@@ -2208,7 +2217,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         /*********************************************************/
 
     private:
-        HonorMgr  m_honorMgr;
+        
         void UpdatePvPFlagTimer(uint32 diff);
         void UpdatePvPContestedFlagTimer(uint32 diff);
     public:
@@ -2231,6 +2240,14 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void RewardHonor(Unit* uVictim, uint32 groupSize);
         void RewardHonorOnDeath();
         bool IsHonorOrXPTarget(Unit* pVictim) const;
+        //add for eluna
+		bool AddHonorCP(float honor, uint8 type, Unit* victim = nullptr) { return m_honorMgr.Add(honor, type, victim); };
+		void ResetHonor() { m_honorMgr.Reset(); };
+		void ClearHonorInfo() { m_honorMgr.ClearHonorData(); };
+		void UpdateHonor() { m_honorMgr.Update(); };
+		float GetRankPoints(void) const { return m_honorMgr.GetRankPoints(); }
+		int32 GetHonorLastWeekStandingPos() const { return m_honorMgr.GetStanding(); }
+		//float GetHonorStoredKills(bool honorable) const { return honorable ? m_honorMgr.HonorableKillPoints: m_honorMgr.DishonorableKillPoints; }
 
         HonorMgr&       GetHonorMgr() { return m_honorMgr; }
         HonorMgr const& GetHonorMgr() const { return m_honorMgr; }
@@ -2510,6 +2527,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
          * @return false iif the player is corrupt.
          */
         bool WakeUp();
+		
+		HonorMgr  m_honorMgr;
     protected:
         template <typename OP>
         void SerializeAuras(OP& buf);

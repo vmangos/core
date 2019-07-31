@@ -25,6 +25,9 @@
 #include "Platform/Define.h"
 #include <cassert>
 
+#define VMANGOS
+#define CLASSIC
+
 #define MAX_SPELL_EFFECTS 3
 #define EFFECT_0          0
 #define EFFECT_1          1
@@ -487,6 +490,14 @@ enum Team
     HORDE               = 67,
     ALLIANCE            = 469,
 };
+
+enum PvpTeamIndex
+{
+	TEAM_INDEX_ALLIANCE = 0,
+	TEAM_INDEX_HORDE = 1,
+	TEAM_INDEX_NEUTRAL = 2,
+};
+#define PVP_TEAM_COUNT    2
 
 enum SpellEffects
 {

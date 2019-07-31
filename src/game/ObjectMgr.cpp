@@ -898,6 +898,17 @@ Group* ObjectMgr::GetGroupById(uint32 id) const
     return nullptr;
 }
 
+void ObjectMgr::AddLocaleString(std::string const& s, LocaleConstant locale, StringVector& data)
+{
+	if (!s.empty())
+	{
+		if (data.size() <= size_t(locale))
+			data.resize(locale + 1);
+
+		data[locale] = s;
+	}
+}
+
 Group* ObjectMgr::GetGroupByMember(ObjectGuid memberGuid)
 {
     for (GroupMap::const_iterator itr = m_GroupMap.begin(); itr != m_GroupMap.end(); ++itr)
@@ -4558,6 +4569,9 @@ void ObjectMgr::BuildPlayerLevelInfo(uint8 race, uint8 _class, uint8 level, Play
         }
     }
 }
+
+//InstanceTemplate const* ObjectMgr::GetInstanceTemplate(uint32 map) { return sInstanceTemplate.LookupEntry<InstanceTemplate>(map); }
+//WorldTemplate const* ObjectMgr::GetWorldTemplate(uint32 map) { return sWorldTemplate.LookupEntry<WorldTemplate>(map); }
 
 void ObjectMgr::LoadGroups()
 {

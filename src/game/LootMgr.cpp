@@ -26,7 +26,7 @@
 #include "World.h"
 #include "Util.h"
 #include "Conditions.h"
-
+#include "LuaEngine.h"
 static eConfigFloatValues const qualityToRate[MAX_ITEM_QUALITY] =
 {
     CONFIG_FLOAT_RATE_DROP_ITEM_POOR,                                    // ITEM_QUALITY_POOR

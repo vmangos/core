@@ -29,7 +29,7 @@
 
 class Item;
 class Petition;
-
+#define GUILD_RANK_NONE         0xFF
 #define GUILD_RANKS_MIN_COUNT   5
 #define GUILD_RANKS_MAX_COUNT   10
 
@@ -242,6 +242,7 @@ class Guild
         void SetLeader(ObjectGuid guid);
         GuildAddStatus AddMember(ObjectGuid plGuid, uint32 plRank);
         bool DelMember(ObjectGuid guid, bool isDisbanding = false);
+		bool ChangeMemberRank(ObjectGuid guid, uint8 newRank);
         //lowest rank is the count of ranks - 1 (the highest rank_id in table)
         uint32 GetLowestRank() const { return m_Ranks.size() - 1; }
 

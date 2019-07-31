@@ -531,6 +531,9 @@ struct ItemPrototype
     uint32 GetMaxStackSize() const { return Stackable; }
 
     bool IsConjuredConsumable() const { return Class == ITEM_CLASS_CONSUMABLE && (Flags & ITEM_FLAG_CONJURED); }
+	bool IsWeaponVellum() const { return Class == ITEM_CLASS_TRADE_GOODS; }
+	bool IsArmorVellum() const { return Class == ITEM_CLASS_TRADE_GOODS; }
+
     bool IsWeapon() const { return Class == ITEM_CLASS_WEAPON; }
     bool IsRangedWeapon() const { return IsWeapon() && (InventoryType == INVTYPE_RANGED || InventoryType == INVTYPE_THROWN || InventoryType == INVTYPE_RANGEDRIGHT); }
     bool HasSignature() const { return GetMaxStackSize() == 1 && Class != ITEM_CLASS_CONSUMABLE && Class != ITEM_CLASS_QUEST && (Flags & ITEM_FLAG_NO_CREATOR) == 0 && ItemId != 6948; /*Hearthstone*/ }

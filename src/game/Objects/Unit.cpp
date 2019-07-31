@@ -67,7 +67,8 @@
 
 #include <math.h>
 #include <stdarg.h>
-
+#include "LuaEngine.h"
+#include "ElunaEventMgr.h"
 //#define DEBUG_DEBUFF_LIMIT
 
 float baseMoveSpeed[MAX_MOVE_TYPE] =
@@ -274,6 +275,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
     m_spellUpdateTimeBuffer += update_diff;
     if (m_spellUpdateTimeBuffer >= UNIT_SPELL_UPDATE_TIME_BUFFER)
     {
+		elunaEvents->Update(update_diff);
         // WARNING! Order of execution here is important, do not change.
         // Spells must be processed with event system BEFORE they go to _UpdateSpells.
         // Or else we may have some SPELL_STATE_FINISHED spells stalled in pointers, that is bad.
@@ -1295,6 +1297,13 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
     if (pPlayerVictim && !damageFromSpiritOfRedemtionTalent)
         pPlayerVictim->SetPvPDeath(pPlayerTap != nullptr);
 
+	if (Creature* killer = ToCreature())
+	{
+		// used by eluna
+		if (Player* killed = pVictim->ToPlayer())
+			sEluna->OnPlayerKilledByCreature(killer, killed);
+	}
+
     // Call KilledUnit for creatures
     if (Creature* pThisCreature = ToCreature())
         if (pThisCreature->AI())
@@ -1316,6 +1325,8 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
             WorldPacket data(SMSG_DURABILITY_DAMAGE_DEATH, 0);
             pPlayerVictim->GetSession()->SendPacket(&data);
         }
+		// used by eluna
+		sEluna->OnPVPKill(pPlayerTap, pPlayerVictim);
     }
     else                                                // creature died
     {
@@ -1379,14 +1390,21 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
     {
         if (BattleGround *bg = pPlayerVictim->GetBattleGround())
             bg->HandleKillPlayer(pPlayerVictim, pPlayerTap);
+		// used by eluna
+		sEluna->OnPVPKill(pPlayerTap, pPlayerVictim);
     }
     else if (pCreatureVictim)
     {
         if (pPlayerTap)
             if (BattleGround *bg = pPlayerTap->GetBattleGround())
                 bg->HandleKillUnit(pCreatureVictim, pPlayerTap);
+			// used by eluna
+			sEluna->OnCreatureKill(pPlayerTap, pCreatureVictim);
+
     }
     // Nostalrius: interrupt non melee spell casted
+	pVictim->CombatStop();
+	pVictim->getHostileRefManager().deleteReferences();
     pVictim->InterruptSpellsCastedOnMe(false, true);
     if (pPlayerTap)
         ALL_SESSION_SCRIPTS(pPlayerTap->GetSession(), OnUnitKilled(pVictim->GetObjectGuid()));
@@ -7755,7 +7773,9 @@ void Unit::ClearInCombat()
     m_CombatTimer = 0;
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
-
+	// used by eluna
+	if (GetTypeId() == TYPEID_PLAYER)
+		sEluna->OnPlayerLeaveCombat(ToPlayer());
     if (GetTypeId() == TYPEID_PLAYER)
         static_cast<Player*>(this)->pvpInfo.inPvPCombat = false;
 }

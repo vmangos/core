@@ -187,6 +187,26 @@ float Player::GetManaBonusFromIntellect(float intellect)
     return baseInt + (moreInt * 15.0f);
 }
 
+float Player::GetHealthBonusFromStamina() const
+{
+	float stamina = GetStat(STAT_STAMINA);
+
+	float baseStam = stamina < 20 ? stamina : 20;
+	float moreStam = stamina - baseStam;
+
+	return baseStam + (moreStam * 10.0f);
+}
+
+float Player::GetManaBonusFromIntellect() const
+{
+	float intellect = GetStat(STAT_INTELLECT);
+
+	float baseInt = intellect < 20 ? intellect : 20;
+	float moreInt = intellect - baseInt;
+
+	return baseInt + (moreInt * 15.0f);
+}
+
 void Player::UpdateMaxHealth()
 {
     UnitMods unitMod = UNIT_MOD_HEALTH;
