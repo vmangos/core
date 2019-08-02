@@ -1007,6 +1007,79 @@ int32 Pet::GetDispTP() const
     return -(m_TrainingPoints + 1);
 }
 
+uint32 Pet::GetSkillIdForPetTraining() const
+{
+    switch (GetCreatureInfo()->beast_family)
+    {
+        case CREATURE_FAMILY_WOLF:
+            return SKILL_PET_WOLF;
+        case CREATURE_FAMILY_CAT:
+            return SKILL_PET_CAT;
+        case CREATURE_FAMILY_SPIDER:
+            return SKILL_PET_SPIDER;
+        case CREATURE_FAMILY_BEAR:
+            return SKILL_PET_BEAR;
+        case CREATURE_FAMILY_BOAR:
+            return SKILL_PET_BOAR;
+        case CREATURE_FAMILY_CROCOLISK:
+            return SKILL_PET_CROCILISK;
+        case CREATURE_FAMILY_CARRION_BIRD:
+            return SKILL_PET_CARRION_BIRD;
+        case CREATURE_FAMILY_CRAB:
+            return SKILL_PET_CRAB;
+        case CREATURE_FAMILY_GORILLA:
+            return SKILL_PET_GORILLA;
+        case CREATURE_FAMILY_RAPTOR:
+            return SKILL_PET_RAPTOR;
+        case CREATURE_FAMILY_TALLSTRIDER:
+            return SKILL_PET_TALLSTRIDER;
+        case CREATURE_FAMILY_FELHUNTER:
+            return SKILL_PET_FELHUNTER;
+        case CREATURE_FAMILY_VOIDWALKER:
+            return SKILL_PET_VOIDWALKER;
+        case CREATURE_FAMILY_SUCCUBUS:
+            return SKILL_PET_SUCCUBUS;
+        case CREATURE_FAMILY_DOOMGUARD:
+            return SKILL_PET_DOOMGUARD;
+        case CREATURE_FAMILY_SCORPID:
+            return SKILL_PET_SCORPID;
+        case CREATURE_FAMILY_TURTLE:
+            return SKILL_PET_TURTLE;
+        case CREATURE_FAMILY_IMP:
+            return SKILL_PET_IMP;
+        case CREATURE_FAMILY_BAT:
+            return SKILL_PET_BAT;
+        case CREATURE_FAMILY_HYENA:
+            return SKILL_PET_HYENA;
+        case CREATURE_FAMILY_OWL:
+            return SKILL_PET_OWL;
+        case CREATURE_FAMILY_WIND_SERPENT:
+            return SKILL_PET_WIND_SERPENT;
+    }
+
+    return 0;
+}
+
+bool Pet::CanLearnPetSpell(uint32 spellId)
+{
+    uint32 requiredSkillId = 0;
+    SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellId);
+    for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
+    {
+        requiredSkillId = _spell_idx->second->skillId;
+        break;
+    }
+
+    if (requiredSkillId == GetSkillIdForPetTraining())
+        return true;
+
+    if ((requiredSkillId == SKILL_PET_TALENTS) &&
+        (getPetType() == HUNTER_PET))
+        return true;
+
+    return false;
+}
+
 void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= NULL*/)
 {
     if (m_removed || m_unSummoned)

@@ -4029,6 +4029,9 @@ void Spell::EffectLearnPetSpell(SpellEffectIndex eff_idx)
     if (!learn_spellproto)
         return;
 
+    if (!pet->CanLearnPetSpell(learn_spellproto->Id))
+        return;
+
     pet->SetTP(pet->m_TrainingPoints - pet->GetTPForSpell(learn_spellproto->Id));
     pet->LearnSpell(learn_spellproto->Id);
 
