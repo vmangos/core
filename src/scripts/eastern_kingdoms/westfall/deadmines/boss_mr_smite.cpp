@@ -26,12 +26,12 @@ EndScriptData */
 
 enum
 {
-    SAY_PHASE_2                     = -1036002,//Alita :  NON TROUVE.
-    SAY_PHASE_3                     = -1036003,
+    SAY_PHASE_2                     = 1344,
+    SAY_PHASE_3                     = 1345,
 
-    EQUIP_ID_SWORD                  = 7311,                      //2179,                 // default equipment, not used in code
-    EQUIP_ID_AXE                    = 13913,                     //2183,
-    EQUIP_ID_HAMMER                 = 19610,                   //10756,
+    EQUIP_ID_SWORD                  = 2179,
+    EQUIP_ID_AXE                    = 2183,
+    EQUIP_ID_HAMMER                 = 10756,
 
     SPELL_NIBLE_REFLEXES            = 6433,                 // removed after phase 1
     SPELL_SMITE_SLAM                = 6435,                 // only casted in phase 3
@@ -62,23 +62,17 @@ struct boss_mr_smiteAI : public ScriptedAI
     uint32 m_uiSlamTimer;
     uint32 m_uiThrashTimer;
     bool equiping; //Alita : Basicaly when he is not chasing the player.
-    uint32 estimatedSplineTime;
     bool inSpline; //bool true while running to chest.
-
 
     void Reset() override
     {
-        equiping = 0;
-        inSpline = 0;
+        equiping = false;
+        inSpline = false;
         m_uiPhase = PHASE_1;
         m_uiEquipTimer = 0;
         m_uiSlamTimer = 9000;
         m_uiThrashTimer = 4000;
-
-        //DoCastSpellIfCan(m_creature, SPELL_NIBLE_REFLEXES, CF_TRIGGERED);//in creature_addon now
-
-
-        m_creature->LoadEquipment(31000, 0);
+        m_creature->LoadEquipment(m_creature->GetCreatureInfo()->equipment_id, true);
     }
 
     void AttackedBy(Unit* pAttacker) override
@@ -99,7 +93,7 @@ struct boss_mr_smiteAI : public ScriptedAI
 
         if (m_creature->Attack(pWho, true))
         {
-            equiping = 0;
+            equiping = false;
             m_creature->AddThreat(pWho);
             m_creature->SetInCombatWith(pWho);
             pWho->SetInCombatWith(m_creature);
@@ -110,11 +104,12 @@ struct boss_mr_smiteAI : public ScriptedAI
 
     void MovementInform(uint32 uiMotionType, uint32 uiPointId) override
     {
-        if (inSpline == 1)
+        if (inSpline)
         {
             SplineFinished();
-            inSpline = 0;
+            inSpline = false;
         }
+
         if (!equiping)
         {
             if (uiMotionType == POINT_MOTION_TYPE)
@@ -125,13 +120,13 @@ struct boss_mr_smiteAI : public ScriptedAI
             return;
         }
 
-
         m_creature->SetSheath(SHEATH_STATE_UNARMED);
         m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
 
         m_uiEquipTimer = 3000;
         m_uiPhase = PHASE_EQUIP_PROCESS;
     }
+
     void SplineFinished()
     {
         //m_creature->MonsterSay("splineFinished.");
@@ -163,7 +158,7 @@ struct boss_mr_smiteAI : public ScriptedAI
         m_creature->GetMotionMaster()->Clear();
         m_creature->SetFacingToObject(pChest);
 
-        inSpline = 1;
+        inSpline = true;
         m_creature->GetMotionMaster()->MovePoint(0, fX, fY, fZ, MOVE_PATHFINDING);
     }
 
@@ -172,13 +167,17 @@ struct boss_mr_smiteAI : public ScriptedAI
         if (m_creature->GetHealthPercent() < 33.0f)
         {
             // It's Hammer, go Hammer!
-            m_creature->LoadEquipment(12, 0);
+            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, EQUIP_ID_HAMMER);
+            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, 0);
+            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
             DoCastSpellIfCan(m_creature, SPELL_SMITE_HAMMER);
         }
         else
         {
             // It's double Axe.
-            m_creature->LoadEquipment(31001, 0);
+            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, EQUIP_ID_AXE);
+            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_1, EQUIP_ID_AXE);
+            m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_2, 0);
         }
 
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
@@ -201,7 +200,7 @@ struct boss_mr_smiteAI : public ScriptedAI
 
         m_uiPhase = m_creature->GetHealthPercent() < 33.0f ? PHASE_3 : PHASE_2;
 
-        equiping = 0;
+        equiping = false;
         AttackStart(pVictim);
     }
 
@@ -252,7 +251,7 @@ struct boss_mr_smiteAI : public ScriptedAI
 
                         // will clear getVictim (m_attacking)
                         m_creature->GetMotionMaster()->Clear();
-                        equiping = 1;
+                        equiping = true;
                         m_creature->AttackStop(true);
                         m_creature->RemoveAurasDueToSpell(SPELL_NIBLE_REFLEXES);
                     }
@@ -280,7 +279,7 @@ struct boss_mr_smiteAI : public ScriptedAI
 
                         // will clear getVictim (m_attacking)
                         m_creature->GetMotionMaster()->Clear();
-                        equiping = 1;
+                        equiping = true;
                         m_creature->AttackStop(true);
                         //m_creature->RemoveAurasDueToSpell(SPELL_THRASH);
                     }
