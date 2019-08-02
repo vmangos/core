@@ -247,7 +247,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
         void  SetTP(int32 TP);
         int32 GetDispTP() const;
         uint32 GetSkillIdForPetTraining() const;
-        bool CanLearnPetSpell(uint32 spellId);
+        bool CanLearnPetSpell(uint32 spellId) const;
 
         int32   m_TrainingPoints;
         uint32  m_resetTalentsCost;
