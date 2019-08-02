@@ -489,7 +489,8 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recvData)
             }
         }
         
-        if (pMover == _player->GetMover())
+        if ((pMover == _player->GetMover()) &&
+            (!pPlayerMover || !pPlayerMover->IsBeingTeleported()))
         {
             // Update position if it has changed.
             HandleMoverRelocation(pMover, movementInfo);
@@ -595,7 +596,8 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
             }
         }
 
-        if (pMover == _player->GetMover())
+        if ((pMover == _player->GetMover()) &&
+            (!pPlayerMover || !pPlayerMover->IsBeingTeleported()))
         {
             // Update position if it has changed.
             HandleMoverRelocation(pMover, movementInfo);
@@ -698,7 +700,8 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
             }
         }
 
-        if (pMover == _player->GetMover())
+        if ((pMover == _player->GetMover()) &&
+            (!pPlayerMover || !pPlayerMover->IsBeingTeleported()))
         {
             // Update position if it has changed.
             HandleMoverRelocation(pMover, movementInfo);

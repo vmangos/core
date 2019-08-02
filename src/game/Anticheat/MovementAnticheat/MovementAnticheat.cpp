@@ -983,7 +983,8 @@ uint32 MovementCheatData::CheckSpeedHack(MovementInfo const& movementInfo, uint1
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_SPEED_HACK_ENABLED) ||
        (movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT) ||
        (opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
-        me->IsTaxiFlying())
+        me->IsTaxiFlying() || 
+        me->IsBeingTeleported())
         return 0;
 
     uint32 cheatFlags = 0x0;
