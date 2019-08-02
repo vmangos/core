@@ -1385,16 +1385,19 @@ void Player::OnDisconnected()
 
     if (IsInWorld() && FindMap())
     {
-        float height = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ());
-        if ((GetPositionZ() < height + 0.1f) && !IsInWater())
-            SetStandState(UNIT_STAND_STATE_SIT);
+        if (!hasUnitState(UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED | UNIT_STAT_TAXI_FLIGHT))
+        {
+            float const height = GetMap()->GetHeight(GetPositionX(), GetPositionY(), GetPositionZ());
+            if ((GetPositionZ() < height + 0.1f) && !IsInWater())
+                SetStandState(UNIT_STAND_STATE_SIT);
+        }
 
         // Update position after bot takes over
         // And remove movement flags, so he doesn't run into the void
-        if (!GetMover()->hasUnitState(UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED))
+        if (!GetMover()->hasUnitState(UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED | UNIT_STAT_TAXI_FLIGHT))
         {
             GetMover()->RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
-            GetMover()->SendHeartBeat(false);
+            GetMover()->SendHeartBeat(GetMover() != this);
         }
     }
 
