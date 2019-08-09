@@ -1656,6 +1656,9 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
                 return;
             }
 
+            // World of Warcraft Client Patch (2004-11-07)
+            // - Healing and buffing NPCs will not flag you for PvP unless those 
+            //   NPCs are in combat.
             if (unit->isInCombat())
             {
                 if (!(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO))
@@ -1664,7 +1667,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
                     unit->getHostileRefManager().threatAssist(realCaster, 0.0f, m_spellInfo);
                 }
             }
-            else if (unit->IsPvP())
+            else if (unit->IsPvP() && unit->IsPlayer())
             {
                 if (Player* pPlayer = realCaster->GetCharmerOrOwnerPlayerOrPlayerItself())
                     pPlayer->UpdatePvP(true);

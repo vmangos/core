@@ -68,6 +68,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_NO_ASSIST                    = 0x00010000,       // creature does not aggro when nearby creatures aggro
     CREATURE_FLAG_EXTRA_NO_TARGET                    = 0x00020000,       // creature does not acquire targets
     CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY     = 0x00040000,       // creature can only be seen by friendly units
+    CREATURE_FLAG_EXTRA_PVP                          = 0x00080000,       // creature has pvp unit flag set by default
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
