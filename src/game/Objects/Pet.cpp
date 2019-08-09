@@ -1352,7 +1352,6 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     switch (getPetType())
     {
         case SUMMON_PET:
-            SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_MAGE);
             SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NONE);
             break;
         case HUNTER_PET:

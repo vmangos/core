@@ -916,16 +916,18 @@ void Creature::RegenerateHealth()
         else
         {
             float HealthIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_HEALTH);
-            float Spirit = GetStat(STAT_SPIRIT);
 
-            addvalue = uint32(Spirit * 0.25 * HealthIncreaseRate);
-            addvalue *= 4; // Le timer tick toutes les 4 secondes.
+            addvalue = uint32(GetRegenHPPerSpirit() * HealthIncreaseRate);
+            addvalue *= 4; // The timer ticks every 4 seconds.
         }
     }
     else
     {
         addvalue = maxValue / 3;
     }
+
+    if (addvalue < 0)
+        addvalue = 0;
 
     ModifyHealth(addvalue);
 }

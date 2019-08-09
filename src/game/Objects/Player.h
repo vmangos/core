@@ -1503,8 +1503,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
         float GetMeleeCritFromAgility() const;
         float GetDodgeFromAgility() const;
         float GetSpellCritFromIntellect() const;
-        float GetRegenHPPerSpirit() const;
-        float GetRegenMPPerSpirit() const;
         void InitStatBuffMods()
         {
             for (int i = STAT_STRENGTH; i < MAX_STATS; ++i) SetFloatValue(PLAYER_FIELD_POSSTAT0 + i, 0);

@@ -634,8 +634,8 @@ void Player::UpdateAllSpellCritChances()
 void Player::UpdateManaRegen()
 {
     // Mana regen from spirit
-    // Nostalrius - Fix mana regen (diviser par 2)
-    float power_regen = GetRegenMPPerSpirit() / 2.0f;
+    float power_regen = GetRegenMPPerSpirit();
+
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
     power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
 
@@ -738,13 +738,13 @@ void Creature::UpdateMaxPower(Powers power)
 void Creature::UpdateManaRegen()
 {
     float ManaIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_MANA);
-    float Spirit = GetStat(STAT_SPIRIT);
+    float intellect = std::max(1.0f, GetStat(STAT_INTELLECT));
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
     float power_regen = GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
     // Mana regen from SPELL_AURA_MOD_POWER_REGEN aura
     float power_regen_mp5 = GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) / 5.0f;
     
-    m_manaRegen = uint32(((Spirit / 5.0f + 17.0f) * power_regen + power_regen_mp5) * ManaIncreaseRate);
+    m_manaRegen = uint32((sqrt(intellect) * GetRegenMPPerSpirit() * power_regen + power_regen_mp5) * ManaIncreaseRate);
 }
 
 void Creature::UpdateAttackPowerAndDamage(bool ranged)
