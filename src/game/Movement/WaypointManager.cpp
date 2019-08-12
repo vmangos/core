@@ -69,7 +69,7 @@ void WaypointManager::Load()
     // creature_movement
     // /////////////////////////////////////////////////////
 
-    QueryResult *result = WorldDatabase.Query("SELECT id, COUNT(point) FROM creature_movement GROUP BY id");
+    QueryResult *result = WorldDatabase.Query("SELECT `id`, COUNT(`point`) FROM `creature_movement` GROUP BY `id`");
 
     if (!result)
     {
@@ -100,10 +100,10 @@ void WaypointManager::Load()
 
         delete result;
 
-        //                                   0   1      2           3           4           5         6
-        result = WorldDatabase.Query("SELECT id, point, position_x, position_y, position_z, waittime, script_id,"
-                                     //   7        8        9        10       11       12     13     14           15      16
-                                     "textid1, textid2, textid3, textid4, textid5, emote, spell, orientation, model1, model2 FROM creature_movement");
+        //                                    0     1        2             3             4             5           6                  7
+        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`,"
+        //                             8          9          10         11         12         13       14       15             16        17
+                                     "`textid1`, `textid2`, `textid3`, `textid4`, `textid5`, `emote`, `spell`, `orientation`, `model1`, `model2` FROM `creature_movement`");
 
         BarGoLink barRow((int)result->GetRowCount());
 
@@ -116,7 +116,7 @@ void WaypointManager::Load()
             Field *fields = result->Fetch();
             uint32 id           = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
-            uint32 script_id    = fields[6].GetUInt32();
+            uint32 script_id    = fields[7].GetUInt32();
 
             if (script_id)
             {
@@ -151,14 +151,15 @@ void WaypointManager::Load()
             node.x              = fields[2].GetFloat();
             node.y              = fields[3].GetFloat();
             node.z              = fields[4].GetFloat();
-            node.orientation    = fields[14].GetFloat();
+            node.orientation    = fields[15].GetFloat();
             node.delay          = fields[5].GetUInt32();
-            node.script_id      = fields[6].GetUInt32();
+            node.wander_distance = fields[6].GetFloat();
+            node.script_id      = fields[7].GetUInt32();
 
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
             {
-                QueryResult *result1 = WorldDatabase.PQuery("SELECT id, map FROM creature WHERE guid = '%u'", id);
+                QueryResult *result1 = WorldDatabase.PQuery("SELECT `id`, `map` FROM `creature` WHERE `guid` = '%u'", id);
                 if (result1)
                     sLog.outErrorDb("Creature (guidlow %d, entry %d) have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
                                     id, result1->Fetch()[0].GetUInt32(), point, node.x, node.y);
@@ -175,20 +176,20 @@ void WaypointManager::Load()
                     delete result1;
                 }
 
-                WorldDatabase.PExecute("UPDATE creature_movement SET position_x = '%f', position_y = '%f', position_z = '%f' WHERE id = '%u' AND point = '%u'", node.x, node.y, node.z, id, point);
+                WorldDatabase.PExecute("UPDATE `creature_movement` SET `position_x` = '%f', `position_y` = '%f', `position_z` = '%f' WHERE `id` = '%u' AND `point` = '%u'", node.x, node.y, node.z, id, point);
             }
 
             // WaypointBehavior can be dropped in time. Script_id added may 2010 and can handle all the below behavior.
 
             WaypointBehavior be;
-            be.model1           = fields[15].GetUInt32();
-            be.model2           = fields[16].GetUInt32();
-            be.emote            = fields[12].GetUInt32();
-            be.spell            = fields[13].GetUInt32();
+            be.model1           = fields[16].GetUInt32();
+            be.model2           = fields[17].GetUInt32();
+            be.emote            = fields[13].GetUInt32();
+            be.spell            = fields[14].GetUInt32();
 
             for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
             {
-                be.textid[i]    = fields[7 + i].GetUInt32();
+                be.textid[i]    = fields[8 + i].GetUInt32();
 
                 if (be.textid[i] < 0)
                 {
@@ -246,7 +247,7 @@ void WaypointManager::Load()
     // creature_movement_template
     // /////////////////////////////////////////////////////
 
-    result = WorldDatabase.Query("SELECT entry, COUNT(point) FROM creature_movement_template GROUP BY entry");
+    result = WorldDatabase.Query("SELECT `entry`, COUNT(`point`) FROM `creature_movement_template` GROUP BY `entry`");
 
     if (!result)
     {
@@ -279,10 +280,10 @@ void WaypointManager::Load()
         sLog.outString();
         sLog.outString(">> Path templates loaded");
 
-        //                                   0      1      2           3           4           5         6
-        result = WorldDatabase.Query("SELECT entry, point, position_x, position_y, position_z, waittime, script_id,"
-                                     //   7        8        9        10       11       12     13     14           15      16
-                                     "textid1, textid2, textid3, textid4, textid5, emote, spell, orientation, model1, model2 FROM creature_movement_template");
+        //                                    0        1        2             3             4             5           6                  7
+        result = WorldDatabase.Query("SELECT `entry`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`,"
+        //                             8          9          10         11         12         13       14       15             16        17
+                                     "`textid1`, `textid2`, `textid3`, `textid4`, `textid5`, `emote`, `spell`, `orientation`, `model1`, `model2` FROM `creature_movement_template`");
 
         BarGoLink bar(result->GetRowCount());
 
@@ -293,7 +294,7 @@ void WaypointManager::Load()
 
             uint32 entry        = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
-            uint32 script_id    = fields[6].GetUInt32();
+            uint32 script_id    = fields[7].GetUInt32();
 
             if (script_id)
             {
@@ -325,9 +326,10 @@ void WaypointManager::Load()
             node.x              = fields[2].GetFloat();
             node.y              = fields[3].GetFloat();
             node.z              = fields[4].GetFloat();
-            node.orientation    = fields[14].GetFloat();
+            node.orientation    = fields[15].GetFloat();
             node.delay          = fields[5].GetUInt32();
-            node.script_id      = fields[6].GetUInt32();
+            node.wander_distance = fields[6].GetFloat();
+            node.script_id      = fields[7].GetUInt32();
 
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
@@ -341,18 +343,18 @@ void WaypointManager::Load()
                 sLog.outErrorDb("Table creature_movement_template for entry %u (point %u) are auto corrected to normalized position_x=%f, position_y=%f",
                                 entry, point, node.x, node.y);
 
-                WorldDatabase.PExecute("UPDATE creature_movement_template SET position_x = '%f', position_y = '%f' WHERE entry = %u AND point = %u", node.x, node.y, entry, point);
+                WorldDatabase.PExecute("UPDATE `creature_movement_template` SET `position_x` = '%f', `position_y` = '%f' WHERE `entry` = %u AND `point` = %u", node.x, node.y, entry, point);
             }
 
             WaypointBehavior be;
-            be.model1           = fields[15].GetUInt32();
-            be.model2           = fields[16].GetUInt32();
-            be.emote            = fields[12].GetUInt32();
-            be.spell            = fields[13].GetUInt32();
+            be.model1           = fields[16].GetUInt32();
+            be.model2           = fields[17].GetUInt32();
+            be.emote            = fields[13].GetUInt32();
+            be.spell            = fields[14].GetUInt32();
 
             for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
             {
-                be.textid[i]    = fields[7 + i].GetUInt32();
+                be.textid[i]    = fields[8 + i].GetUInt32();
 
                 if (be.textid[i] < 0)
                 {
@@ -396,7 +398,7 @@ void WaypointManager::Load()
     // creature_movement_special
     // /////////////////////////////////////////////////////
 
-    result = WorldDatabase.Query("SELECT id, COUNT(point) FROM creature_movement_special GROUP BY id");
+    result = WorldDatabase.Query("SELECT `id`, COUNT(`point`) FROM `creature_movement_special` GROUP BY `id`");
 
     if (!result)
     {
@@ -429,10 +431,10 @@ void WaypointManager::Load()
 
         delete result;
 
-        //                                   0   1      2           3           4           5         6
-        result = WorldDatabase.Query("SELECT id, point, position_x, position_y, position_z, waittime, script_id,"
-                                     //   7        8        9        10       11       12     13     14           15      16
-                                     "textid1, textid2, textid3, textid4, textid5, emote, spell, orientation, model1, model2 FROM creature_movement_special");
+        //                                    0     1        2             3             4             5           6                  7
+        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`,"
+        //                             8          9          10         11         12         13       14       15             16        17
+                                     "`textid1`, `textid2`, `textid3`, `textid4`, `textid5`, `emote`, `spell`, `orientation`, `model1`, `model2` FROM `creature_movement_special`");
 
         BarGoLink barRow((int)result->GetRowCount());
 
@@ -442,7 +444,7 @@ void WaypointManager::Load()
             Field *fields = result->Fetch();
             uint32 id           = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
-            uint32 script_id    = fields[6].GetUInt32();
+            uint32 script_id    = fields[7].GetUInt32();
 
             if (script_id)
             {
@@ -465,9 +467,10 @@ void WaypointManager::Load()
             node.x              = fields[2].GetFloat();
             node.y              = fields[3].GetFloat();
             node.z              = fields[4].GetFloat();
-            node.orientation    = fields[14].GetFloat();
+            node.orientation    = fields[15].GetFloat();
             node.delay          = fields[5].GetUInt32();
-            node.script_id      = fields[6].GetUInt32();
+            node.wander_distance = fields[6].GetFloat();
+            node.script_id      = fields[7].GetUInt32();
 
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
@@ -481,20 +484,20 @@ void WaypointManager::Load()
                 sLog.outErrorDb("Table creature_movement_special for Id %u (point %u) are auto corrected to normalized position_x=%f, position_y=%f",
                     id, point, node.x, node.y);
 
-                WorldDatabase.PExecute("UPDATE creature_movement_special SET position_x = '%f', position_y = '%f' WHERE id = %u AND point = %u", node.x, node.y, id, point);
+                WorldDatabase.PExecute("UPDATE `creature_movement_special` SET `position_x` = '%f', `position_y` = '%f' WHERE `id` = %u AND `point` = %u", node.x, node.y, id, point);
             }
 
             // WaypointBehavior can be dropped in time. Script_id added may 2010 and can handle all the below behavior.
 
             WaypointBehavior be;
-            be.model1           = fields[15].GetUInt32();
-            be.model2           = fields[16].GetUInt32();
-            be.emote            = fields[12].GetUInt32();
-            be.spell            = fields[13].GetUInt32();
+            be.model1           = fields[16].GetUInt32();
+            be.model2           = fields[17].GetUInt32();
+            be.emote            = fields[13].GetUInt32();
+            be.spell            = fields[14].GetUInt32();
 
             for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
             {
-                be.textid[i]    = fields[7 + i].GetUInt32();
+                be.textid[i]    = fields[8 + i].GetUInt32();
 
                 if (be.textid[i] < 0)
                 {
@@ -635,7 +638,7 @@ WaypointNode const* WaypointManager::AddNode(uint32 entry, uint32 dbGuid, uint32
         pointId = 1;
 
     uint32 nextPoint = pointId;
-    WaypointNode temp = WaypointNode(x, y, z, 100, 0, 0, nullptr);
+    WaypointNode temp = WaypointNode(x, y, z, 100, 0, 0, 0, nullptr);
     WaypointPath::iterator find = path.find(nextPoint);
     if (find != path.end())                                 // Point already exists
     {

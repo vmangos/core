@@ -346,14 +346,14 @@ void MotionMaster::MoveIdle()
         push(&si_idleMovement);
 }
 
-void MotionMaster::MoveRandom(bool use_current_position, float wander_distance)
+void MotionMaster::MoveRandom(bool use_current_position, float wander_distance, uint32 expire_time)
 {
     if (!m_owner->IsCreature())
         sLog.outError("%s attempts to move random.", m_owner->GetGuidStr().c_str());
     else
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s move random.", m_owner->GetGuidStr().c_str());
-        Mutate(new RandomMovementGenerator(*static_cast<Creature*>(m_owner), use_current_position, wander_distance));
+        Mutate(new RandomMovementGenerator(*static_cast<Creature*>(m_owner), use_current_position, wander_distance, expire_time));
     }
 }
 

@@ -92,6 +92,14 @@ void RandomMovementGenerator::Finalize(Creature &creature)
 
 bool RandomMovementGenerator::Update(Creature &creature, const uint32 &diff)
 {
+    if (i_expireTime)
+    {
+        if (i_expireTime <= diff)
+            return false;
+        else
+            i_expireTime -= diff;
+    }
+
     creature.GetMotionMaster()->SetNeedAsyncUpdate();
     return true;
 }

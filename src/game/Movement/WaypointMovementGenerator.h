@@ -70,7 +70,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
   public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
-        WaypointMovementGenerator(Creature &, bool repeating = true) : i_nextMoveTime(0), m_isArrivalDone(false), m_repeating(repeating), m_lastReachedWaypoint(0) {}
+        WaypointMovementGenerator(Creature &, bool repeating = true) : i_nextMoveTime(0), m_isArrivalDone(false), m_repeating(repeating), m_lastReachedWaypoint(0), m_isWandering(false) {}
         ~WaypointMovementGenerator() { i_path = NULL; }
         void Initialize(Creature &u);
         void Interrupt(Creature &);
@@ -101,7 +101,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
             return i_nextMoveTime.Passed();
         }
 
-        void OnArrived(Creature&);
+        bool OnArrived(Creature&);
         void StartMove(Creature&);
 
         void StartMoveNow(Creature& creature)
@@ -113,6 +113,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
         ShortTimeTracker i_nextMoveTime;
         bool m_isArrivalDone;
         bool m_repeating;
+        bool m_isWandering;
         uint32 m_lastReachedWaypoint;
 
         int32 m_pathId;
