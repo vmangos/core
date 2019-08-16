@@ -577,6 +577,7 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     // Client controlled movement.
     else
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         // Not allowed to change jump speed while jumping
         if ((movementInfo.moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)) &&
            (GetLastMovementInfo().moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)) &&
@@ -584,6 +585,7 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
            (GetLastMovementInfo().jump.xyspeed > 0.0001f) &&
            (!IsInKnockBack()))
             APPEND_CHEAT(CHEAT_TYPE_JUMP_SPEED_CHANGE);
+#endif
 
         if (opcode == MSG_MOVE_JUMP && movementInfo.jump.xyspeed > (GetSpeedForMovementInfo(GetLastMovementInfo()) + 0.0001f))
             APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_JUMP);
