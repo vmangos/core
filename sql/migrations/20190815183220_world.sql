@@ -12,26 +12,30 @@ INSERT INTO `migrations` VALUES ('20190815183220');
 -- Waypoints for Sergeant Houser
 DELETE FROM `creature_movement` WHERE `id`=38435;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `textid1`, `textid2`, `textid3`, `textid4`, `textid5`, `emote`, `spell`, `orientation`, `model1`, `model2`) VALUES 
-(38435, 1, 1682.45, 416.902, -62.298, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0),
+(38435, 1, 1682.45, 416.902, -62.298, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0),
 (38435, 2, 1705.67, 422.108, -62.361, 8400, 0, 3843502, 0, 0, 0, 0, 0, 0, 0, 1.8, 0, 0),
 (38435, 3, 1689.15, 417.493, -62.298, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (38435, 4, 1706.23, 422.453, -62.364, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0),
-(38435, 5, 1682.45, 416.902, -62.298, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0),
+(38435, 5, 1682.45, 416.902, -62.298, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0),
 (38435, 6, 1690.97, 418.036, -62.298, 8400, 0, 3843506, 0, 0, 0, 0, 0, 0, 0, 1.73, 0, 0),
 (38435, 7, 1689.85, 417.388, -62.298, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (38435, 8, 1706.23, 422.453, -62.364, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0);
 
 -- Waypoint scripts for Sergeant Houser
 DELETE FROM `creature_movement_scripts` WHERE `id`=3843502;
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1969, 1965, 1968, 1966, 0, 0, 0, 0, 0, 'Sergeant Houser - Say Text 1');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843502, 0, 39, 3843501, 3843502, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Say Text 1');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843502, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Emote Point');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843502, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1963, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Say Text 2');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843502, 5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Emote Talk');
 DELETE FROM `creature_movement_scripts` WHERE `id`=3843506;
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843506, 0, 39, 3843501, 3843502, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Say Text 1');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843506, 0, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Emote Point');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843506, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1965, 1970, 1966, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Say Text 1');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843506, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1963, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Say Text 2');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843506, 5, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Houser - Emote Talk');
+DELETE FROM `event_scripts` WHERE `id`=3843501;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1964, 1965, 1966, 1967, 0, 0, 0, 0, 0, 'Sergeant Houser - Say Text');
+DELETE FROM `event_scripts` WHERE `id`=3843502;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3843502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1968, 1969, 1970, 1971, 0, 0, 0, 0, 0, 'Sergeant Houser - Say Text');
 
 -- Events list for Practice Dummy
 DELETE FROM `creature_ai_events` WHERE `creature_id`=5652;
