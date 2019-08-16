@@ -36,6 +36,8 @@ enum OptionFlags
     OPTION_INFORM_MEMBERS_ON_ANY_DIED   = 0x080,
 };
 
+#define ALL_CREATURE_GROUP_OPTIONS (OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER | OPTION_RESPAWN_TOGETHER | OPTION_RESPAWN_ALL_ON_MASTER_EVADE | OPTION_RESPAWN_ALL_ON_ANY_EVADE | OPTION_INFORM_LEADER_ON_MEMBER_DIED | OPTION_INFORM_MEMBERS_ON_ANY_DIED)
+
 struct CreatureGroupMember
 {
     bool ComputeRelativePosition(float leaderAngle, float &x, float &y) const;
@@ -52,6 +54,7 @@ class CreatureGroup
         }
         CreatureGroupMember* AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags = (OPTION_FORMATION_MOVE|OPTION_AGGRO_TOGETHER));
         void RemoveMember(ObjectGuid guid);
+        void DisbandGroup(Creature* pMember);
         void DeleteFromDb();
         void SaveToDb();
 

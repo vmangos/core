@@ -317,6 +317,12 @@ enum eScriptCommand
                                                             // x/y/z/o = coordinates
     SCRIPT_COMMAND_SET_FLY                  = 77,           // source = Unit
                                                             // datalong = (bool) 0 = off, 1 = on
+    SCRIPT_COMMAND_JOIN_CREATURE_GROUP      = 78,           // source = Creature
+                                                            // target = Creature
+                                                            // datalong = OptionFlags
+                                                            // x = distance
+                                                            // o = angle
+    SCRIPT_COMMAND_LEAVE_CREATURE_GROUP     = 79,           // source = Creature
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -971,6 +977,13 @@ struct ScriptInfo
         {
             uint32 enabled;                                 // datalong
         } setFly;
+
+        struct                                              // SCRIPT_COMMAND_JOIN_CREATURE_GROUP (78)
+        {
+            uint32 options;                                 // datalong
+        } joinCreatureGroup;
+
+                                                            // SCRIPT_COMMAND_LEAVE_CREATURE_GROUP (79)
 
         struct
         {

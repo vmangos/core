@@ -3767,6 +3767,23 @@ void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint
         GetMotionMaster()->Initialize();
 }
 
+void Creature::LeaveCreatureGroup()
+{
+    if (CreatureGroup* pGroup = GetCreatureGroup())
+    {
+        if (pGroup->GetLeaderGuid() == GetObjectGuid())
+        {
+            pGroup->DisbandGroup(this);
+            delete pGroup;
+        }
+        else
+        {
+            pGroup->RemoveMember(GetObjectGuid());
+            SetCreatureGroup(nullptr);
+        }
+    }
+}
+
 bool Creature::HasWeapon() const
 {
     uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (0 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);

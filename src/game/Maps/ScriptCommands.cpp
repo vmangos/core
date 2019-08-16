@@ -2141,3 +2141,43 @@ bool Map::ScriptCommand_SetFly(const ScriptInfo& script, WorldObject* source, Wo
 
     return false;
 }
+
+// SCRIPT_COMMAND_JOIN_CREATURE_GROUP (78)
+bool Map::ScriptCommand_JoinCreatureGroup(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_JOIN_CREATURE_GROUP (script id %u) call for a NULL or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    Creature* pTarget = ToCreature(target);
+
+    if (!pTarget)
+    {
+        sLog.outError("SCRIPT_COMMAND_JOIN_CREATURE_GROUP (script id %u) call for a NULL or non-creature target (TypeId: %u), skipping.", script.id, target ? target->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->JoinCreatureGroup(pTarget, script.x, script.o, script.joinCreatureGroup.options);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_LEAVE_CREATURE_GROUP (79)
+bool Map::ScriptCommand_LeaveCreatureGroup(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_LEAVE_CREATURE_GROUP (script id %u) call for a NULL or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->LeaveCreatureGroup();
+
+    return false;
+}

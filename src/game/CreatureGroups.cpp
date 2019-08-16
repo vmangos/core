@@ -170,6 +170,26 @@ void CreatureGroup::RemoveMember(ObjectGuid guid)
     }
 }
 
+void CreatureGroup::DisbandGroup(Creature* pMember)
+{
+    if (Creature* pLeader = pMember->GetMap()->GetCreature(GetLeaderGuid()))
+        pLeader->SetCreatureGroup(nullptr);
+
+    for (auto& it : _members)
+    {
+        if (Creature* pOtherMember = pMember->GetMap()->GetCreature(it.first))
+        {
+            pOtherMember->SetCreatureGroup(nullptr);
+            if (IsFormation() && pOtherMember->isAlive())
+                pOtherMember->GetMotionMaster()->Initialize();
+        }
+            
+        delete it.second;
+    }
+
+    _members.clear();
+}
+
 void CreatureGroup::DeleteFromDb()
 {
     WorldDatabase.PExecute("DELETE FROM creature_groups WHERE leader_guid=%u", _leaderGuid.GetCounter());
