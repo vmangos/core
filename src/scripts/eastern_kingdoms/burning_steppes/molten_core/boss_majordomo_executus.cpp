@@ -281,13 +281,18 @@ struct boss_majordomoAI : public ScriptedAI
                 DoScriptText(SAY_SUMMON_MAJ, m_creature);
                 break;
             case 28:
-                if (Creature* Ragnaros = m_creature->SummonCreature(NPC_RAGNAROS, 842.237488f, -833.683105f, -231.916498f, M_PI + m_creature->GetAngle(842.237488f, -833.683105f), TEMPSUMMON_MANUAL_DESPAWN, 2 * HOUR * IN_MILLISECONDS))   // Ragnaros reste spawn 2heures
+            {
+                // World of Warcraft Client Patch 1.4.0 (2005-04-19)
+                // - Ragnaros now stays up 2 hours rather than 1 after being summoned. 
+                uint32 const despawnTime = (sWorld.GetWowPatch() >= WOW_PATCH_104) ? (2 * HOUR * IN_MILLISECONDS) : (1 * HOUR * IN_MILLISECONDS);
+                if (Creature* Ragnaros = m_creature->SummonCreature(NPC_RAGNAROS, 842.237488f, -833.683105f, -231.916498f, M_PI + m_creature->GetAngle(842.237488f, -833.683105f), TEMPSUMMON_MANUAL_DESPAWN, despawnTime))
                 {
                     Ragnaros->SetUInt64Value(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_creature->SetFacingToObject(Ragnaros);
                     Ragnaros->CastSpell(Ragnaros, SPELL_RAGNAROS_EMERGE, false);
                 }
                 break;
+            }
             case 34:
                 if (Creature* Ragnaros = m_creature->FindNearestCreature(NPC_RAGNAROS, 100.0f, true))
                 {

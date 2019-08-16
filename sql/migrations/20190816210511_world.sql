@@ -118,7 +118,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 DELETE FROM `creature_movement_scripts` WHERE `id`=7981530;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (7981530, 0, 79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Justin - Disband Creature Group');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (7981530, 1, 3, 0, 0, 66, 2, 79816, 0, 9, 2, 0, 0, 0, 0, -8673.38, 911.824, 96.3384, 2.25631, 0, 'Roman - Move to point');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (7981530, 1, 3, 0, 0, 66, 2, 79817, 0, 9, 2, 0, 0, 0, 0, -8674.68, 910.761, 96.3384, 2.25631, 0, 'Brandon - Move to poin');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (7981530, 1, 3, 0, 0, 66, 2, 79817, 0, 9, 2, 0, 0, 0, 0, -8674.68, 910.761, 96.3384, 2.25631, 0, 'Brandon - Move to point');
 
 
 -- End of migration.
