@@ -97,6 +97,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  47
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  48
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  49
+    CONDITION_REQ_MAP_OR_WORLDOBJECT, //  50
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -522,6 +523,14 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_OBJECT_LOOT_STATE:
         {
             return target->ToGameObject()->getLootState() == m_value1;
+        }
+        case CONDITION_OBJECT_FIT_CONDITION:
+        {
+            Map* pMap = const_cast<Map*>(map ? map : (source ? source->GetMap() : target->GetMap()));
+            if (GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(m_value1))
+                if (GameObject* pGameObject = pMap->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, m_value1)))
+                    return sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(pGameObject, map, source, conditionSourceType);
+            return false;
         }
     }
     return false;
@@ -1029,6 +1038,21 @@ bool ConditionEntry::IsValid()
             if (m_value1 > GO_JUST_DEACTIVATED)
             {
                 sLog.outErrorDb("CONDITION_OBJECT_LOOT_STATE (entry %u, type %d) has value1 %u for an invalid loot state, skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_OBJECT_FIT_CONDITION:
+        {
+            if (!sObjectMgr.IsExistingGameObjectGuid(m_value1))
+            {
+                sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %u) has invalid nonexistent GameObject guid %u", m_entry, m_condition, m_value1);
+                return false;
+            }
+            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
+            if (!condition1)
+            {
+                sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
                 return false;
             }
             break;

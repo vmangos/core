@@ -83,6 +83,7 @@ enum ConditionType
     CONDITION_MAP_EVENT_TARGETS     = 47,                   // event_id     cond_id
     CONDITION_OBJECT_IS_SPAWNED     = 48,                   // 0            0
     CONDITION_OBJECT_LOOT_STATE     = 49,                   // state        0
+    CONDITION_OBJECT_FIT_CONDITION  = 50,                   // guid         cond_id
 };
 
 enum ConditionFlags
