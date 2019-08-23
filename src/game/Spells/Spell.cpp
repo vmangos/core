@@ -6267,9 +6267,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!go->IsUseRequirementMet())
                         return SPELL_FAILED_TRY_AGAIN;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
                     // Prevent looting chests while totally immune
                     if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && m_caster->ToPlayer()->IsTotalImmune())
                         return SPELL_FAILED_DAMAGE_IMMUNE;
+#endif
                 }
                 else if (Item* item = m_targets.getItemTarget())
                 {

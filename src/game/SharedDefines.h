@@ -783,11 +783,13 @@ enum SpellCastResult
     SPELL_FAILED_ONLY_BATTLEGROUNDS                   , // Can only use in battlegrounds
     SPELL_FAILED_TARGET_NOT_GHOST                     , // Target is not a ghost
     SPELL_FAILED_TOO_MANY_SKILLS                      , // Your pet can't learn any more skills
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     SPELL_FAILED_TRANSFORM_UNUSABLE                   , // You can't use the new item
     SPELL_FAILED_WRONG_WEATHER                        , // The weather isn't right for that
     SPELL_FAILED_DAMAGE_IMMUNE                        , // You can't do that while you are immune
     SPELL_FAILED_PREVENTED_BY_MECHANIC                , // Can't do that while %s
     SPELL_FAILED_PLAY_TIME                            , // Maximum play time exceeded
+#endif
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     SPELL_FAILED_REPUTATION                           , // Your reputation isn't high enough
 #endif
