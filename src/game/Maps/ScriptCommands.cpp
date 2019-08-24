@@ -2181,3 +2181,18 @@ bool Map::ScriptCommand_LeaveCreatureGroup(const ScriptInfo& script, WorldObject
 
     return false;
 }
+
+// SCRIPT_COMMAND_SET_GO_STATE (80)
+bool Map::ScriptCommand_SetGoState(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    GameObject *pGo = nullptr;
+
+    if (!((pGo = ToGameObject(target)) || (pGo = ToGameObject(source))))
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_GO_STATE (script id %u) call for a NULL gameobject, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    pGo->SetGoState(GOState(script.setGoState.state));
+    return false;
+}

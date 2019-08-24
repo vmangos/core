@@ -1206,6 +1206,16 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_SET_GO_STATE:
+            {
+                if (tmp.setGoState.state > GO_STATE_ACTIVE_ALTERNATIVE)
+                {
+                    sLog.outErrorDb("Table `%s` using invalid go state in datalong (%u) in SCRIPT_COMMAND_SET_GO_STATE for script id %u",
+                        tablename, tmp.setGoState.state, tmp.id);
+                    continue;
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())

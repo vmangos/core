@@ -623,3 +623,75 @@ bool ChatHandler::HandleGameObjectResetCommand(char*)
     go->ResetDoorOrButton();
     return true;
 }
+
+bool ChatHandler::HandleGameObjectSetGoStateCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 uiGoState;
+    if (!ExtractUInt32(&args, uiGoState))
+        return false;
+
+    if (uiGoState > GO_STATE_ACTIVE_ALTERNATIVE)
+        return false;
+
+    pGameObject->SetGoState(GOState(uiGoState));
+    PSendSysMessage("You changed GO State of %s (GUID %u) to %u.", pGameObject->GetName(), pGameObject->GetGUIDLow(), uiGoState);
+
+    return true;
+}
+
+bool ChatHandler::HandleGameObjectSetLootStateCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 uiLootState;
+    if (!ExtractUInt32(&args, uiLootState))
+        return false;
+
+    if (uiLootState > GO_JUST_DEACTIVATED)
+        return false;
+
+    pGameObject->SetLootState(LootState(uiLootState));
+    PSendSysMessage("You changed Loot State of %s (GUID %u) to %u.", pGameObject->GetName(), pGameObject->GetGUIDLow(), uiLootState);
+
+    return true;
+}
