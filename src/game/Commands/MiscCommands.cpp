@@ -1177,7 +1177,7 @@ bool ChatHandler::HandlePoolSpawnsCommand(char* args)
     uint32 pool_id = 0;
     if (!ExtractUint32KeyFromLink(&args, "Hpool", pool_id) && !mapState->GetMapEntry()->Instanceable())
     {
-        PSendSysMessage(LANG_POOL_SPAWNS_NON_INSTANCE, mapState->GetMapEntry()->name[GetSessionDbcLocale()], mapState->GetMapId());
+        PSendSysMessage(LANG_POOL_SPAWNS_NON_INSTANCE, mapState->GetMapEntry()->name, mapState->GetMapId());
         SetSentErrorMessage(false);
         return false;
     }
