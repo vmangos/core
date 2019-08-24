@@ -27,6 +27,7 @@
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "CellImpl.h"
+#include "GridNotifiers.h"
 
 bool ChatHandler::HandleGUIDCommand(char* /*args*/)
 {
@@ -1648,6 +1649,38 @@ bool ChatHandler::HandleDamageCommand(char* args)
         return false;
 
     m_session->GetPlayer()->SpellNonMeleeDamageLog(target, spellid, damage);
+    return true;
+}
+
+bool ChatHandler::HandleAoEDamageCommand(char* args)
+{
+    int32 damage_int = 1000;
+    ExtractInt32(&args, damage_int);
+
+    if (damage_int <= 0)
+        return false;
+
+    uint32 damage = uint32(damage_int);
+
+    int32 max_range = 10;
+    ExtractInt32(&args, max_range);
+
+    if (max_range <= 0)
+        return false;
+
+    Player* pPlayer = m_session->GetPlayer();
+
+    std::list<Unit*> targetsList;
+    MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(pPlayer, pPlayer, max_range);
+    MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(targetsList, u_check);
+    Cell::VisitAllObjects(pPlayer, searcher, max_range);
+
+    for (Unit* pTarget : targetsList)
+    {
+        pPlayer->DealDamage(pTarget, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+        pPlayer->SendAttackStateUpdate(HITINFO_NORMALSWING2, pTarget, 1, SPELL_SCHOOL_MASK_NORMAL, damage, 0, 0, VICTIMSTATE_NORMAL, 0);
+    }
+
     return true;
 }
 
