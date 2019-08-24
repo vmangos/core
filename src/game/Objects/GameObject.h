@@ -246,7 +246,7 @@ struct GameObjectInfo
         //20 GAMEOBJECT_TYPE_AUCTIONHOUSE
         struct
         {
-            uint32 actionHouseID;                           //0
+            uint32 auctionHouseID;                          //0
         } auctionhouse;
         //21 GAMEOBJECT_TYPE_GUARDPOST
         struct
