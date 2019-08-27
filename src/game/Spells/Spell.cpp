@@ -303,6 +303,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_triggeredBySpellInfo = triggeredBy;
     m_triggeredByParentSpellInfo = triggeredByParent;
     m_caster = caster;
+    m_unitCaster = caster;
     m_selfContainer = nullptr;
     m_referencedFromCurrentSpell = false;
     m_executeStack = 0;
@@ -320,8 +321,90 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
 
     // wand case
     if (m_attackType == RANGED_ATTACK)
-        if (!!(m_caster->getClassMask() & CLASSMASK_WAND_USERS) && m_caster->GetTypeId() == TYPEID_PLAYER)
-            m_spellSchoolMask = GetSchoolMask(m_caster->GetWeaponDamageSchool(RANGED_ATTACK));
+        if (!!(caster->getClassMask() & CLASSMASK_WAND_USERS) && caster->GetTypeId() == TYPEID_PLAYER)
+            m_spellSchoolMask = GetSchoolMask(caster->GetWeaponDamageSchool(RANGED_ATTACK));
+
+    // Set health leech amount to zero
+    m_healthLeech = 0;
+
+    m_originalCasterGUID = originalCasterGUID ? originalCasterGUID : m_caster->GetObjectGuid();
+
+    UpdateOriginalCasterPointer();
+
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        m_currentBasePoints[i] = m_spellInfo->CalculateSimpleValue(SpellEffectIndex(i));
+
+    m_spellState = SPELL_STATE_NULL;
+
+    m_castPositionX = m_castPositionY = m_castPositionZ = m_castOrientation = 0;
+    m_TriggerSpells.clear();
+    m_preCastSpells.clear();
+    m_IsTriggeredSpell = triggered;
+    //m_AreaAura = false;
+    m_CastItem = nullptr;
+    m_IsCastByItem = false;
+
+    unitTarget = nullptr;
+    itemTarget = nullptr;
+    corpseTarget = nullptr;
+    gameObjTarget = nullptr;
+    focusObject = nullptr;
+    m_triggeredByAuraSpell  = nullptr;
+    m_triggeredByAuraBasePoints = 0;
+
+    //Auto Shot & Shoot
+    m_autoRepeat = m_spellInfo->IsAutoRepeatRangedSpell();
+
+    m_powerCost = 0;                                        // setup to correct value in Spell::prepare, don't must be used before.
+    m_casttime = 0;                                         // setup to correct value in Spell::prepare, don't must be used before.
+    m_timer = 0;                                            // will set to cast time in prepare
+    m_duration = 0;
+
+    m_channeled = info->IsChanneledSpell();
+
+    m_needAliveTargetMask = 0;
+
+    // determine reflection
+    m_canReflect = victim ? m_spellInfo->IsReflectableSpell(caster, victim) : m_spellInfo->IsReflectableSpell();
+
+    m_isClientStarted = false;
+
+    m_spellAuraHolder = nullptr;
+    m_delayed = false;
+    // Must initialize to an element in the list or bad things happen,
+    // begin changes so use end
+    m_channeledUpdateIterator = m_channeledHolders.end();
+
+    CleanupTargetList();
+}
+
+Spell::Spell(GameObject* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
+    m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false), m_setCreatureTarget(false)
+{
+    MANGOS_ASSERT(caster != NULL && info != NULL);
+    MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to a sSpellMgr element");
+
+    m_successCast = false;
+    m_destroyed = false;
+    m_spellInfo = info;
+    m_triggeredBySpellInfo = triggeredBy;
+    m_triggeredByParentSpellInfo = triggeredByParent;
+    m_caster = caster;
+    m_gobjectCaster = caster;
+    m_selfContainer = nullptr;
+    m_referencedFromCurrentSpell = false;
+    m_executeStack = 0;
+    m_delayStart = 0;
+    m_delayAtDamageCount = 0;
+    m_isChannelingVisual = false;
+
+    m_applyMultiplierMask = 0;
+    m_absorbed = 0;
+
+    // Get data for type of attack
+    m_attackType = m_spellInfo->GetWeaponAttackType();
+
+    m_spellSchoolMask = info->GetSpellSchoolMask();           // Can be override for some spell (wand shoot for example)
 
     // Set health leech amount to zero
     m_healthLeech = 0;
@@ -424,8 +507,8 @@ void Spell::FillTargetMap()
 
         // TODO: find a way so this is not needed?
         // for area auras always add caster as target (needed for totems for example)
-        if (IsAreaAuraEffect(m_spellInfo->Effect[i]))
-            AddUnitTarget(m_caster, SpellEffectIndex(i));
+        if (IsAreaAuraEffect(m_spellInfo->Effect[i]) && m_unitCaster)
+            AddUnitTarget(m_unitCaster, SpellEffectIndex(i));
         // If same target already filled, use it
         // Example: AoE fear has effects speedup and modfear, with maxtargets = 1
         // We dont want to apply speedup to the first, fear to the second.
@@ -600,7 +683,8 @@ void Spell::FillTargetMap()
                         break;
                     case 0:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                        tmpUnitMap.push_back(m_caster);
+                        if (m_unitCaster)
+                            tmpUnitMap.push_back(m_unitCaster);
                         break;
                     default:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);

@@ -857,7 +857,7 @@ uint16 SpellEntry::GetAuraMaxTicks() const
     return 6;
 }
 
-bool SpellEntry::IsPositiveSpell(Unit* caster, Unit* victim) const
+bool SpellEntry::IsPositiveSpell(WorldObject* caster, Unit* victim) const
 {
     if (Attributes & SPELL_ATTR_NEGATIVE)
         return false;
@@ -869,7 +869,7 @@ bool SpellEntry::IsPositiveSpell(Unit* caster, Unit* victim) const
     return true;
 }
 
-bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, Unit* caster, Unit* victim) const
+bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster, Unit* victim) const
 {
     // Nostalrius (SpellMod)
     if (Custom & SPELL_CUSTOM_POSITIVE)

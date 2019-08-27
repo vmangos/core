@@ -891,8 +891,8 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_POSITIVE;
         }
 
-        bool IsPositiveSpell(Unit* caster, Unit* victim) const;
-        bool IsPositiveEffect(SpellEffectIndex effIndex, Unit* caster = nullptr, Unit* victim = nullptr) const;
+        bool IsPositiveSpell(WorldObject* caster, Unit* victim) const;
+        bool IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster = nullptr, Unit* victim = nullptr) const;
 
         inline bool IsHealSpell() const
         {
@@ -939,7 +939,7 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_REFLECTABLE;
         }
 
-        inline bool IsReflectableSpell(Unit* caster, Unit* victim) const
+        inline bool IsReflectableSpell(WorldObject* caster, Unit* victim) const
         {
             return DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !HasAttribute(SPELL_ATTR_IS_ABILITY)
                 && !HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)

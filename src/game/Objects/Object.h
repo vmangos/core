@@ -927,6 +927,15 @@ m_obj->m_updateTracker.Reset();
         uint32 GetCreatureSummonLimit() const { return m_creatureSummonLimit; }
         void SetCreatureSummonLimit(uint32 limit);
 
+        virtual uint32 getFaction() const { return 0; }
+        FactionTemplateEntry const* getFactionTemplateEntry() const;
+
+        Unit* SelectMagnetTarget(Unit *victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
+        virtual bool IsValidAttackTarget(Unit const* target) const { return false; }
+        ReputationRank GetReactionTo(WorldObject const* target) const;
+        ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
+        virtual Player* GetAffectingPlayer() const { return nullptr; }
+
     protected:
         explicit WorldObject();
 

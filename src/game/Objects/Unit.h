@@ -1325,12 +1325,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual void SetSheath( SheathState sheathed ) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
 
         // faction template id
-        uint32 getFaction() const { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
+        uint32 getFaction() const final override { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
         void setFaction(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction ); }
-        FactionTemplateEntry const* getFactionTemplateEntry() const;
-
-        ReputationRank GetReactionTo(Unit const* target) const;
-        ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, Unit const* target);
 
         bool IsHostileTo(Unit const* unit) const override;
         bool IsHostileToPlayers() const;
@@ -1492,7 +1488,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
         void RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype);
 
-        bool IsValidAttackTarget(Unit const* target) const;
+        bool IsValidAttackTarget(Unit const* target) const final override;
         bool isTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
         bool isAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
         bool isPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }
@@ -1664,7 +1660,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
         Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
-        Player* GetAffectingPlayer() const;
+        Player* GetAffectingPlayer() const final override;
         float GetLeewayBonusRange(const Unit* target, bool ability) const;
         float GetLeewayBonusRadius() const;
 
@@ -1940,7 +1936,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool HasAuraState(AuraState flag) const { return HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)); }
         void UnsummonAllTotems();
         bool UnsummonOldPetBeforeNewSummon(uint32 newPetEntry);
-        Unit* SelectMagnetTarget(Unit *victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
 
         int32 SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, Unit *pCaster, Spell* spell = nullptr);
         int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
