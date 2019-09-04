@@ -11,13 +11,13 @@ INSERT INTO `migrations` VALUES ('20190905004807');
 
 -- Ironaya texts
 DELETE FROM `script_texts` WHERE `entry` = -1070000;
-UPDATE `broadcast_text` SET `sound` = 5851 WHERE `ID` = 3261;
+UPDATE `broadcast_text` SET `Sound` = 5851, `Type` = 1 WHERE `ID` = 3261;
 
 -- Archaedas texts
-UPDATE `broadcast_text` SET `sound` = 5855 WHERE `ID` = 3400;
-UPDATE `broadcast_text` SET `sound` = 5856 WHERE `ID` = 6536;
-UPDATE `broadcast_text` SET `sound` = 5857 WHERE `ID` = 6537;
-UPDATE `broadcast_text` SET `sound` = 5858 WHERE `ID` = 6215;
+UPDATE `broadcast_text` SET `Sound` = 5855, `Type` = 1 WHERE `ID` = 3400;
+UPDATE `broadcast_text` SET `Sound` = 5856, `Type` = 1 WHERE `ID` = 6536;
+UPDATE `broadcast_text` SET `Sound` = 5857, `Type` = 1 WHERE `ID` = 6537;
+UPDATE `broadcast_text` SET `Sound` = 5858, `Type` = 1 WHERE `ID` = 6215;
 
 
 -- End of migration.
