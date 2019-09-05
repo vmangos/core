@@ -24,7 +24,10 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "uldaman.h"
 
-#define SAY_AGGRO -1070000
+enum Texts
+{
+    SAY_AGGRO           = 3261
+};
 
 struct boss_ironayaAI : public ScriptedAI
 {
