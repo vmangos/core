@@ -2196,7 +2196,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit* pVictim, const uint32 damage)
     if (tmpvalue > 0.75f)
         tmpvalue = 0.75f;
 
-    newdamage = uint32(damage - (damage * tmpvalue));
+    newdamage = uint32(roundf(damage - (damage * tmpvalue)));
 
     return (newdamage > 1) ? newdamage : 1;
 }
