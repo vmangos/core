@@ -2046,7 +2046,7 @@ bool Creature::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectInd
     return Unit::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);
 }
 
-bool Creature::IsVisibleInGridForPlayer(Player* pl) const
+bool Creature::IsVisibleInGridForPlayer(Player const* pl) const
 {
     // gamemaster in GM mode see all, including ghosts
     if (pl->IsGameMaster())
@@ -2888,19 +2888,6 @@ void Creature::AllLootRemovedFromCorpse()
             // be spawned already, while this corpse will not appear in respawned form.
         }
     }
-}
-
-uint32 Creature::GetLevelForTarget(Unit const* target) const
-{
-    if (!IsWorldBoss())
-        return Unit::GetLevelForTarget(target);
-
-    uint32 level = target->getLevel() + sWorld.getConfig(CONFIG_UINT32_WORLD_BOSS_LEVEL_DIFF);
-    if (level < 1)
-        return 1;
-    if (level > 255)
-        return 255;
-    return level;
 }
 
 std::string Creature::GetAIName() const

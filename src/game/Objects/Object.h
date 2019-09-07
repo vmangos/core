@@ -634,6 +634,39 @@ class MANGOS_DLL_SPEC Object
 
 struct WorldObjectChangeAccumulator;
 
+// Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
+struct SpellNonMeleeDamage {
+    SpellNonMeleeDamage(WorldObject *_attacker, Unit *_target, uint32 _SpellID, SpellSchools _school)
+        : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
+        absorb(0), resist(0), periodicLog(false), unused(false), blocked(0), HitInfo(0), spell(nullptr)
+    {}
+
+    Unit   *target;
+    WorldObject   *attacker;
+    uint32 SpellID;
+    uint32 damage;
+    SpellSchools school;
+    uint32 absorb;
+    int32 resist;
+    bool   periodicLog;
+    bool   unused;
+    uint32 blocked;
+    uint32 HitInfo;
+    Spell *spell;
+};
+
+struct CleanDamage
+{
+    CleanDamage(uint32 _damage, WeaponAttackType _attackType, MeleeHitOutcome _hitOutCome, uint32 _Absorb, int32 _Resist) :
+    damage(_damage), attackType(_attackType), hitOutCome(_hitOutCome), absorb(_Absorb), resist(_Resist) {}
+
+    uint32 damage;
+    WeaponAttackType attackType;
+    MeleeHitOutcome hitOutCome;
+    uint32 absorb;
+    int32 resist;
+};
+
 class MANGOS_DLL_SPEC WorldObject : public Object
 {
     friend struct WorldObjectChangeAccumulator;
@@ -845,8 +878,8 @@ m_obj->m_updateTracker.Reset();
 
         void SendObjectDeSpawnAnim(ObjectGuid guid) const;
 
-        virtual bool IsHostileTo(Unit const* unit) const =0;
-        virtual bool IsFriendlyTo(Unit const* unit) const =0;
+        virtual bool IsHostileTo(WorldObject const* target) const =0;
+        virtual bool IsFriendlyTo(WorldObject const* target) const =0;
         bool IsControlledByPlayer() const;
 
         virtual void SaveRespawnTime() {}
@@ -862,7 +895,7 @@ m_obj->m_updateTracker.Reset();
         bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const { return isVisibleForInState(u,viewPoint,false); }
 
         // low level function for visibility change code, must be define in all main world object subclasses
-        virtual bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const = 0;
+        virtual bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
 
         void SetMap(Map * map);
         Map * GetMap() const;
@@ -927,7 +960,7 @@ m_obj->m_updateTracker.Reset();
         uint32 GetCreatureSummonLimit() const { return m_creatureSummonLimit; }
         void SetCreatureSummonLimit(uint32 limit);
 
-        virtual uint32 getFaction() const { return 0; }
+        virtual uint32 getFaction() const = 0;
         FactionTemplateEntry const* getFactionTemplateEntry() const;
 
         Unit* SelectMagnetTarget(Unit *victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
@@ -936,6 +969,46 @@ m_obj->m_updateTracker.Reset();
         ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
         virtual Player* GetAffectingPlayer() const { return nullptr; }
 
+        virtual bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const { return false; }
+        SpellMissInfo SpellHitResult(Unit *pVictim, SpellEntry const *spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
+        void ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const *procSpell = nullptr, Spell* spell = nullptr);
+        uint32 SpellCriticalHealingBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim) const;
+        uint32 SpellCriticalDamageBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim, Spell* spell = nullptr);
+        uint32 SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
+        uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage) const;
+        void DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb);
+        virtual uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell = nullptr);
+        void DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss);
+
+        void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log);
+        void SendSpellNonMeleeDamageLog(Unit *target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
+
+        float  MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        int32 MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
+        void CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, SpellEntry const *spellInfo, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
+        uint32 MeleeDamageBonusDone(Unit *pVictim, uint32 damage, WeaponAttackType attType,
+            SpellEntry const *spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
+        virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
+        int32 SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject *pCaster, Spell* spell = nullptr);
+        static float CalculateLevelPenalty(SpellEntry const* spellProto);
+        float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
+        
+        uint32 GetLevelForTarget(WorldObject const* target = nullptr) const;
+        uint16 GetSkillMaxForLevel(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; };
+        uint32 GetWeaponSkillValue(WeaponAttackType attType, WorldObject const* target = nullptr) const;
+        uint32 GetUnitMeleeSkill(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; }
+        uint32 GetDefenseSkillValue(WorldObject const* target = nullptr) const;
+
+        void SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo);
+        virtual bool isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return isVisibleForInState(pDetector, viewPoint, inVisibleList); }
+
+        int32 DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical = false);
+        void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
+        void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
     protected:
         explicit WorldObject();
 

@@ -727,7 +727,7 @@ float SpellEntry::CalculateDefaultCoefficient(DamageEffectType const damagetype)
     return coeff * DotFactor;
 }
 
-float SpellEntry::CalculateCustomCoefficient(Unit const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const
+float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const
 {
     if (!caster)
         return coeff;
@@ -773,10 +773,13 @@ float SpellEntry::CalculateCustomCoefficient(Unit const* caster, DamageEffectTyp
 
                 if (spell->GetTargetNum() > 1)
                 {
-                    if (Player* modOwner = caster->GetSpellModOwner())
+                    if (Unit const* pUnit = caster->ToUnit())
                     {
-                        // Improved Chain Heal (T2 3/8 bonus) / Gift of the Gathering Storm Chain Lightning Bonus
-                        modOwner->ApplySpellMod(spell->m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, spell);
+                        if (Player* modOwner = pUnit->GetSpellModOwner())
+                        {
+                            // Improved Chain Heal (T2 3/8 bonus) / Gift of the Gathering Storm Chain Lightning Bonus
+                            modOwner->ApplySpellMod(spell->m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, spell);
+                        }
                     }
                 }
 

@@ -503,9 +503,9 @@ class Spell
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
 
-        WorldObject* m_caster;
-        Unit* m_unitCaster;
-        GameObject* m_gobjectCaster;
+        WorldObject* m_caster = nullptr;
+        Unit* m_unitCaster = nullptr;
+        GameObject* m_gobjectCaster = nullptr;
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
                                                             // e.g. damage around area spell trigered by victim aura and da,age emeies of aura caster

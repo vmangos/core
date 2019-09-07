@@ -694,15 +694,14 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
                                                             // 0 = use `gameobject`.`spawntimesecs`
         void ResetDoorOrButton();
 
-        bool IsHostileTo(Unit const* unit) const;
-        bool IsFriendlyTo(Unit const* unit) const;
+        bool IsHostileTo(WorldObject const* target) const override;
+        bool IsFriendlyTo(WorldObject const* target) const override;
 
         void SummonLinkedTrapIfAny();
         void TriggerLinkedGameObject(Unit* target);
         void RespawnLinkedGameObject();
 
-        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
-
+        
         GameObject* LookupFishingHoleAround(float range);
 
         GridReference<GameObject> &GetGridRef() { return m_gridRef; }
@@ -730,6 +729,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         bool IsVisible() const { return m_visible; }
         void SetVisible(bool b);
+        bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
         uint32 getFaction() const final override { return GetGOInfo()->faction; }
         bool IsValidAttackTarget(Unit const* target) const final override;

@@ -60,15 +60,16 @@ class DynamicObject : public WorldObject
         void RemoveAffected(Unit *unit) { m_affected.erase(unit->GetObjectGuid()); }
         void Delay(int32 delaytime);
 
-        bool IsHostileTo(Unit const* unit) const;
-        bool IsFriendlyTo(Unit const* unit) const;
+        bool IsHostileTo(WorldObject const* target) const;
+        bool IsFriendlyTo(WorldObject const* target) const;
+        uint32 getFaction() const final override;
 
         float GetObjectBoundingRadius() const               // overwrite WorldObject version
         {
             return 0.0f;                                    // dynamic object not have real interact size
         }
 
-        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
+        bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
         GridReference<DynamicObject> &GetGridRef() { return m_gridRef; }
 

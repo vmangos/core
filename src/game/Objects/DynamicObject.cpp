@@ -129,6 +129,11 @@ Unit* DynamicObject::GetCaster() const
     return ObjectAccessor::GetUnit(*this, GetCasterGuid());
 }
 
+uint32 DynamicObject::getFaction() const
+{
+    return GetCaster()->getFaction();
+}
+
 void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 {
     WorldObject::Update(update_diff, p_time);
@@ -229,31 +234,31 @@ void DynamicObject::Delay(int32 delaytime)
     }
 }
 
-bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
+bool DynamicObject::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    if (!IsInWorld() || !u->IsInWorld())
+    if (!IsInWorld() || !pDetector->IsInWorld())
         return false;
 
     // always seen by owner
-    if (GetCasterGuid() == u->GetObjectGuid())
+    if (GetCasterGuid() == pDetector->GetObjectGuid())
         return true;
 
     // normal case
     return IsWithinDistInMap(viewPoint, GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
 }
 
-bool DynamicObject::IsHostileTo(Unit const* unit) const
+bool DynamicObject::IsHostileTo(WorldObject const* target) const
 {
     if (Unit* owner = GetCaster())
-        return owner->IsHostileTo(unit);
+        return owner->IsHostileTo(target);
     else
         return false;
 }
 
-bool DynamicObject::IsFriendlyTo(Unit const* unit) const
+bool DynamicObject::IsFriendlyTo(WorldObject const* target) const
 {
     if (Unit* owner = GetCaster())
-        return owner->IsFriendlyTo(unit);
+        return owner->IsFriendlyTo(target);
     else
         return true;
 }

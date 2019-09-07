@@ -1073,7 +1073,7 @@ class SpellEntry
         uint16 GetAuraMaxTicks() const;
         WeaponAttackType GetWeaponAttackType() const;
         float CalculateDefaultCoefficient(DamageEffectType const damagetype) const;
-        float CalculateCustomCoefficient(Unit const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const;
+        float CalculateCustomCoefficient(WorldObject const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const;
         SpellCastResult GetErrorAtShapeshiftedCast(uint32 form) const;
         uint32 GetMechanic() const { return Mechanic; }
         uint32 GetManaCost() const { return manaCost; }

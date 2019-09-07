@@ -987,18 +987,18 @@ void GameObject::SetVisible(bool b)
     UpdateObjectVisibility();
 }
 
-bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
+bool GameObject::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
     // Not in world
-    if (!IsInWorld() || !u->IsInWorld())
+    if (!IsInWorld() || !pDetector->IsInWorld())
         return false;
 
     // Transport always visible at this step implementation
-    if (IsTransport() && IsInMap(u))
+    if (IsTransport() && IsInMap(pDetector))
         return true;
 
     // quick check visibility false cases for non-GM-mode
-    if (!u->IsGameMaster())
+    if (!pDetector->IsPlayer() || !static_cast<Player const*>(pDetector)->IsGameMaster())
     {
         if (!IsVisible())
             return false;
@@ -1014,14 +1014,18 @@ bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoi
             if(check stuff here)
                 return false;
         }*/
-        if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && IsHostileTo(u))
+        if (Unit const* pDetectorUnit = pDetector->ToUnit())
         {
-            if (!(u->m_detectInvisibilityMask & (1 << 3))) // Detection des pieges
+            if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && IsHostileTo(pDetectorUnit))
+            {
+                if (!(pDetectorUnit->m_detectInvisibilityMask & (1 << 3))) // Detection des pieges
+                    return false;
+            }
+            // Smuggled Mana Cell required 10 invisibility type detection/state
+            if (GetEntry() == 187039 && ((pDetectorUnit->m_detectInvisibilityMask | pDetectorUnit->m_invisibilityMask) & (1 << 10)) == 0)
                 return false;
         }
-        // Smuggled Mana Cell required 10 invisibility type detection/state
-        if (GetEntry() == 187039 && ((u->m_detectInvisibilityMask | u->m_invisibilityMask) & (1 << 10)) == 0)
-            return false;
+        
     }
 
     // check distance
@@ -1989,18 +1993,21 @@ void GameObject::UpdateRotationFields(float rotation2 /*=0.0f*/, float rotation3
     SetFloatValue(GAMEOBJECT_ROTATION + 3, rotation3);
 }
 
-bool GameObject::IsHostileTo(Unit const* unit) const
+bool GameObject::IsHostileTo(WorldObject const* target) const
 {
     // always non-hostile to GM in GM mode
-    if (unit->GetTypeId() == TYPEID_PLAYER && ((Player const*)unit)->IsGameMaster())
+    if (target->GetTypeId() == TYPEID_PLAYER && ((Player const*)target)->IsGameMaster())
         return false;
 
     // test owner instead if have
     if (Unit const* owner = GetOwner())
-        return owner->IsHostileTo(unit);
+        return owner->IsHostileTo(target);
 
-    if (Unit const* targetOwner = unit->GetCharmerOrOwner())
-        return IsHostileTo(targetOwner);
+    if (Unit const* pUnitTarget = target->ToUnit())
+    {
+        if (Unit const* targetOwner = pUnitTarget->GetCharmerOrOwner())
+            return IsHostileTo(targetOwner);
+    }
 
     // for not set faction case (wild object) use hostile case
     if (!GetGOInfo()->faction)
@@ -2008,23 +2015,23 @@ bool GameObject::IsHostileTo(Unit const* unit) const
 
     // faction base cases
     FactionTemplateEntry const*tester_faction = sObjectMgr.GetFactionTemplateEntry(GetGOInfo()->faction);
-    FactionTemplateEntry const*target_faction = unit->getFactionTemplateEntry();
+    FactionTemplateEntry const*target_faction = target->getFactionTemplateEntry();
     if (!tester_faction || !target_faction)
         return false;
 
     // GvP forced reaction and reputation case
-    if (unit->GetTypeId() == TYPEID_PLAYER)
+    if (target->GetTypeId() == TYPEID_PLAYER)
     {
         // forced reaction
         if (tester_faction->faction)
         {
-            if (ReputationRank const* force = ((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+            if (ReputationRank const* force = ((Player*)target)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
                 return *force <= REP_HOSTILE;
 
             // apply reputation state
             FactionEntry const* raw_tester_faction = sObjectMgr.GetFactionEntry(tester_faction->faction);
             if (raw_tester_faction && raw_tester_faction->reputationListID >= 0)
-                return ((Player const*)unit)->GetReputationMgr().GetRank(raw_tester_faction) <= REP_HOSTILE;
+                return ((Player const*)target)->GetReputationMgr().GetRank(raw_tester_faction) <= REP_HOSTILE;
         }
     }
 
@@ -2032,18 +2039,21 @@ bool GameObject::IsHostileTo(Unit const* unit) const
     return tester_faction->IsHostileTo(*target_faction);
 }
 
-bool GameObject::IsFriendlyTo(Unit const* unit) const
+bool GameObject::IsFriendlyTo(WorldObject const* target) const
 {
     // always friendly to GM in GM mode
-    if (unit->GetTypeId() == TYPEID_PLAYER && ((Player const*)unit)->IsGameMaster())
+    if (target->GetTypeId() == TYPEID_PLAYER && ((Player const*)target)->IsGameMaster())
         return true;
 
     // test owner instead if have
     if (Unit const* owner = GetOwner())
-        return owner->IsFriendlyTo(unit);
+        return owner->IsFriendlyTo(target);
 
-    if (Unit const* targetOwner = unit->GetCharmerOrOwner())
-        return IsFriendlyTo(targetOwner);
+    if (Unit const* pUnitTarget = target->ToUnit())
+    {
+        if (Unit const* targetOwner = pUnitTarget->GetCharmerOrOwner())
+            return IsFriendlyTo(targetOwner);
+    }
 
     // for not set faction case (wild object) use hostile case
     if (!GetGOInfo()->faction)
@@ -2051,23 +2061,23 @@ bool GameObject::IsFriendlyTo(Unit const* unit) const
 
     // faction base cases
     FactionTemplateEntry const*tester_faction = sObjectMgr.GetFactionTemplateEntry(GetGOInfo()->faction);
-    FactionTemplateEntry const*target_faction = unit->getFactionTemplateEntry();
+    FactionTemplateEntry const*target_faction = target->getFactionTemplateEntry();
     if (!tester_faction || !target_faction)
         return false;
 
     // GvP forced reaction and reputation case
-    if (unit->GetTypeId() == TYPEID_PLAYER)
+    if (target->GetTypeId() == TYPEID_PLAYER)
     {
         // forced reaction
         if (tester_faction->faction)
         {
-            if (ReputationRank const* force = ((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+            if (ReputationRank const* force = ((Player*)target)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
                 return *force >= REP_FRIENDLY;
 
             // apply reputation state
             if (FactionEntry const* raw_tester_faction = sObjectMgr.GetFactionEntry(tester_faction->faction))
                 if (raw_tester_faction->reputationListID >= 0)
-                    return ((Player const*)unit)->GetReputationMgr().GetRank(raw_tester_faction) >= REP_FRIENDLY;
+                    return ((Player const*)target)->GetReputationMgr().GetRank(raw_tester_faction) >= REP_FRIENDLY;
         }
     }
 

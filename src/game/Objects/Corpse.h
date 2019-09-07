@@ -74,14 +74,14 @@ class Corpse : public WorldObject
         void ResetGhostTime() { m_time = time(NULL); }
         CorpseType GetType() const { return m_type; }
 
-        ReputationRank GetReactionTo(Unit const* unit) const;
-        bool IsHostileTo(Unit const* unit) const;
-        bool IsFriendlyTo(Unit const* unit) const;
+        ReputationRank GetReactionTo(WorldObject const* target) const;
+        bool IsHostileTo(WorldObject const* target) const;
+        bool IsFriendlyTo(WorldObject const* target) const;
 
         GridPair const& GetGrid() const { return m_grid; }
         void SetGrid(GridPair const& grid) { m_grid = grid; }
 
-        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
+        bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
         Loot loot;                                          // remove insignia ONLY at BG
         Player* lootRecipient;
