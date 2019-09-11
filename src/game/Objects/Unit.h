@@ -1043,7 +1043,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
          * @param Level The current level of diminishing returns for the group, decides the new duration
          * @param isReflected Whether the spell was reflected or not, used to determine if we should do any calculations at all.
          */
-        void ApplyDiminishingToDuration(DiminishingGroup  group, int32 &duration,Unit* caster, DiminishingLevels Level, bool isReflected = false);
+        void ApplyDiminishingToDuration(DiminishingGroup  group, int32 &duration, WorldObject const* caster, DiminishingLevels Level, bool isReflected = false);
         /**
          * Applies a diminishing return to the given group if apply is true,
          * otherwise lowers the level by one (?)
@@ -2080,8 +2080,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_lastAttackType;
         uint32 GetLastAttackType();
         void SetLastAttackType(uint32 attackType);
-        // Nostalrius - suis-je considere comme un joueur ? (joueur ou un pet de joueur)
-        bool IsLikePlayer() const;
 
         // Nostalrius - en fin de CM par exemple
         void TransferAttackersThreatTo(Unit* unit);

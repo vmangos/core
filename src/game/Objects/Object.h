@@ -1009,6 +1009,9 @@ m_obj->m_updateTracker.Reset();
         int32 DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical = false);
         void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
         void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
+
+        // Nostalrius - suis-je considere comme un joueur ? (joueur ou un pet de joueur)
+        bool IsLikePlayer() const;
     protected:
         explicit WorldObject();
 

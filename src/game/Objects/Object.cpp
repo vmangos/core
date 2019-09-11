@@ -2738,6 +2738,17 @@ Pet* Object::ToPet()
     return IsPet() ? static_cast<Pet*>(this) : nullptr;
 }
 
+bool WorldObject::IsLikePlayer() const
+{
+    if (IsPlayer())
+        return true;
+
+    if (Pet const* pPet = ToPet())
+        return pPet->isControlled() && pPet->GetOwnerGuid().IsPlayer();
+
+    return false;
+}
+
 bool WorldObject::PrintCoordinatesError(float x, float y, float z, char const* descr) const
 {
     sLog.outError("%s with invalid %s coordinates: mapid = %uu, x = %f, y = %f, z = %f", GetGuidStr().c_str(), descr, GetMapId(), x, y, z);

@@ -7937,20 +7937,7 @@ void Unit::IncrDiminishing(DiminishingGroup group)
     m_Diminishing.push_back(DiminishingReturn(group, WorldTimer::getMSTime(), DIMINISHING_LEVEL_2));
 }
 
-bool Unit::IsLikePlayer() const
-{
-    if (IsPlayer())
-        return true;
-    if (!IsPet())
-        return false;
-    // Pet creature. Reste a savoir si ce machin appartient a un joueur.
-    Pet* pet = ((Pet*)this);
-    if (!pet->isControlled())
-        return false;
-    return pet->GetOwnerGuid().IsPlayer();
-}
-
-void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32 &duration, Unit* caster, DiminishingLevels Level, bool isReflected)
+void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32 &duration, WorldObject const* caster, DiminishingLevels Level, bool isReflected)
 {
     if (duration == -1 || group == DIMINISHING_NONE || (!isReflected && caster->IsFriendlyTo(this)))
         return;
