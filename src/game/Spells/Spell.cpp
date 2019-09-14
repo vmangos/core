@@ -2198,12 +2198,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
     switch (targetMode)
     {
-    case TARGET_SELF:
-        if (m_casterUnit)
-            targetUnitMap.push_back(m_casterUnit);
-        else if (m_casterGo)
-            AddGOTarget(m_casterGo, effIndex);
-        break;
+        case TARGET_SELF:
+            if (m_casterUnit)
+                targetUnitMap.push_back(m_casterUnit);
+            else if (m_casterGo)
+                AddGOTarget(m_casterGo, effIndex);
+            break;
         case TARGET_TOTEM_EARTH:
         case TARGET_TOTEM_WATER:
         case TARGET_TOTEM_AIR:
