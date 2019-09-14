@@ -1857,7 +1857,7 @@ struct npc_holiday_firestarterAI : ScriptedAI
                 0, 0, 0, 0,
                 1))
             {
-                pGo->UseDoorOrButton();
+                pGo->SendObjectDeSpawnAnim(pGo->GetObjectGuid());
             }
         }
     }
