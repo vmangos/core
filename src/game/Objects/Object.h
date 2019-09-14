@@ -637,6 +637,21 @@ class MANGOS_DLL_SPEC Object
 
 struct WorldObjectChangeAccumulator;
 
+// At least some values expected fixed and used in auras field, other custom
+enum MeleeHitOutcome
+{
+    MELEE_HIT_EVADE = 0,
+    MELEE_HIT_MISS = 1,
+    MELEE_HIT_DODGE = 2,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_BLOCK = 3,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_PARRY = 4,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_GLANCING = 5,
+    MELEE_HIT_CRIT = 6,
+    MELEE_HIT_CRUSHING = 7,
+    MELEE_HIT_NORMAL = 8,
+    MELEE_HIT_BLOCK_CRIT = 9,
+};
+
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
 struct SpellNonMeleeDamage {
     SpellNonMeleeDamage(WorldObject *_attacker, Unit *_target, uint32 _SpellID, SpellSchools _school)
@@ -906,7 +921,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         // main visibility check function in normal case (ignore grey zone distance check)
         bool isWithinVisibilityDistanceOf(Unit const* viewer, WorldObject const* viewpoint, bool inVisibleList = false) const;
-        bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const { return isVisibleForInState(u,viewPoint,false); }
+        bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const;
 
         // low level function for visibility change code, must be define in all main world object subclasses
         virtual bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
@@ -1020,6 +1035,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         static float CalculateLevelPenalty(SpellEntry const* spellProto);
         float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
         
+        virtual uint32 getLevel() const = 0;
         uint32 GetLevelForTarget(WorldObject const* target = nullptr) const;
         uint16 GetSkillMaxForLevel(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; };
         uint32 GetWeaponSkillValue(WeaponAttackType attType, WorldObject const* target = nullptr) const;
@@ -1031,6 +1047,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         int32 DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical = false);
         void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
+        void EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
         void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
 
         void SetCurrentCastedSpell(Spell * pSpell);

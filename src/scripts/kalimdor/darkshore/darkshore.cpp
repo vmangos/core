@@ -847,20 +847,24 @@ CreatureAI* GetAI_npc_rabid_thistle_bear(Creature* pCreature)
     return new npc_rabid_thistle_bearAI(pCreature);
 }
 
-bool EffectDummyCreature_npc_rabid_thistle_bear(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex effIndex, Creature* pCreatureTarget)
+bool EffectDummyCreature_npc_rabid_thistle_bear(WorldObject* pCaster, uint32 uiSpellId, SpellEffectIndex effIndex, Creature* pCreatureTarget)
 {
     //always check spellid and effectindex
-    if (uiSpellId == SPELL_TRAPPED_BEAR && effIndex == EFFECT_INDEX_0 && pCaster->GetTypeId() == TYPEID_PLAYER)
+    if (uiSpellId == SPELL_TRAPPED_BEAR && effIndex == EFFECT_INDEX_0)
     {
-        pCreatureTarget->UpdateEntry(NPC_CAPTURED_RABID_THISTLE_BEAR);
-        pCaster->ToPlayer()->KilledMonsterCredit(pCreatureTarget->GetEntry(), pCreatureTarget->GetObjectGuid());
-        if (npc_rabid_thistle_bearAI* pBearAI = dynamic_cast<npc_rabid_thistle_bearAI*>(pCreatureTarget->AI()))
+        if (Player* pPlayer = pCaster->ToPlayer())
         {
-            pBearAI->EnterEvadeMode();
-            pBearAI->StartFollowing(pCaster->ToPlayer());
+            pCreatureTarget->UpdateEntry(NPC_CAPTURED_RABID_THISTLE_BEAR);
+            pPlayer->KilledMonsterCredit(pCreatureTarget->GetEntry(), pCreatureTarget->GetObjectGuid());
+            if (npc_rabid_thistle_bearAI* pBearAI = dynamic_cast<npc_rabid_thistle_bearAI*>(pCreatureTarget->AI()))
+            {
+                pBearAI->EnterEvadeMode();
+                pBearAI->StartFollowing(pPlayer);
+            }
+
+            //always return true when we are handling this spell and effect
+            return true;
         }
-        //always return true when we are handling this spell and effect
-        return true;
     }
     return false;
 }

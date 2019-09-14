@@ -3753,7 +3753,7 @@ void Unit::RemoveSingleAuraFromSpellAuraHolder(uint32 spellId, SpellEffectIndex 
     }
 }
 
-void Unit::RemoveAuraHolderDueToSpellByDispel(uint32 spellId, uint32 stackAmount, ObjectGuid casterGuid, Unit *dispeller)
+void Unit::RemoveAuraHolderDueToSpellByDispel(uint32 spellId, uint32 stackAmount, ObjectGuid casterGuid)
 {
     RemoveAuraHolderFromStack(spellId, stackAmount, casterGuid, AURA_REMOVE_BY_DISPEL);
 }
@@ -5218,13 +5218,6 @@ bool Unit::UnsummonOldPetBeforeNewSummon(uint32 newPetEntry)
     }
 
     return true;
-}
-
-void Unit::EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
-{
-    SendEnergizeSpellLog(pVictim, SpellID, Damage, powertype);
-    // needs to be called after sending spell log
-    pVictim->ModifyPower(powertype, Damage);
 }
 
 void Unit::SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const

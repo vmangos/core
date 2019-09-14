@@ -462,19 +462,22 @@ Spell::~Spell()
 template<typename T>
 WorldObject* Spell::FindCorpseUsing()
 {
+    if (!m_casterUnit)
+        return nullptr;
+
     // non-standard target selection
     SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex);
     float max_range = GetSpellMaxRange(srange);
 
     WorldObject* result = nullptr;
 
-    T u_check(m_caster, max_range);
+    T u_check(m_casterUnit, max_range);
     MaNGOS::WorldObjectSearcher<T> searcher(result, u_check);
 
-    Cell::VisitGridObjects(m_caster, searcher, max_range);
+    Cell::VisitGridObjects(m_casterUnit, searcher, max_range);
 
     if (!result)
-        Cell::VisitWorldObjects(m_caster, searcher, max_range);
+        Cell::VisitWorldObjects(m_casterUnit, searcher, max_range);
 
     return result;
 }
@@ -627,20 +630,10 @@ void Spell::FillTargetMap()
                 switch (m_spellInfo->EffectImplicitTargetB[i])
                 {
                     case TARGET_ALL_ENEMY_IN_AREA:
-                        // Note: this hack with search required until GO casting not implemented
-                        // environment damage spells already have around enemies targeting but this not help in case nonexistent GO casting support
-                        // currently each enemy selected explicitly and self cast damage
-                        if (m_spellInfo->Effect[i] == SPELL_EFFECT_ENVIRONMENTAL_DAMAGE)
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        switch (m_spellInfo->Id)
                         {
-                            if (m_targets.getUnitTarget())
-                                tmpUnitMap.push_back(m_targets.getUnitTarget());
-                        }
-                        else
-                        {
-                            SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
-                            SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
-                            switch (m_spellInfo->Id)
-                            {
                             case 5246:
                                 // Exception: Intimidating Shout
                                 // The AoE fear does not apply to spell main target (that is stunned by another aura)
@@ -672,7 +665,6 @@ void Spell::FillTargetMap()
                                         ++itr;
                                 }
                                 break;
-                            }
                         }
                         break;
                     case 0:
@@ -2206,11 +2198,16 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
     switch (targetMode)
     {
+    case TARGET_SELF:
+        if (m_casterUnit)
+            targetUnitMap.push_back(m_casterUnit);
+        else if (m_casterGo)
+            AddGOTarget(m_casterGo, effIndex);
+        break;
         case TARGET_TOTEM_EARTH:
         case TARGET_TOTEM_WATER:
         case TARGET_TOTEM_AIR:
         case TARGET_TOTEM_FIRE:
-        case TARGET_SELF:
             if (m_casterUnit)
                 targetUnitMap.push_back(m_casterUnit);
             break;
@@ -3208,14 +3205,26 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         if (GameObject* pSummoner = m_caster->GetMap()->GetGameObject(m_originalCasterGUID))
                             m_targets.setDestination(pSummoner->GetPositionX(), pSummoner->GetPositionY(), pSummoner->GetPositionZ());
                     }
-                    // no break
+
+                    if (m_casterUnit)
+                        targetUnitMap.push_back(m_casterUnit);
+                    else if (m_casterGo)
+                        AddGOTarget(m_casterGo, effIndex);
+                    break;
+                }
+                case SPELL_EFFECT_SUMMON_DEMON:
+                {
+                    if (m_casterUnit)
+                        targetUnitMap.push_back(m_casterUnit);
+                    else if (m_casterGo)
+                        AddGOTarget(m_casterGo, effIndex);
+                    break;
                 }
                 case SPELL_EFFECT_SUMMON_CHANGE_ITEM:
                 case SPELL_EFFECT_SUMMON_GUARDIAN:
                 case SPELL_EFFECT_ADD_FARSIGHT:
                 case SPELL_EFFECT_STUCK:
                 case SPELL_EFFECT_DESTROY_ALL_TOTEMS:
-                case SPELL_EFFECT_SUMMON_DEMON:
                 case SPELL_EFFECT_SKILL:
                     if (m_casterUnit)
                         targetUnitMap.push_back(m_casterUnit);

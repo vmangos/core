@@ -1382,7 +1382,7 @@ void GameObject::Use(Unit* user)
             // directly (except from spell effect). Code here will be called by TriggerLinkedGameObject.
 
             if (uint32 spellId = GetGOInfo()->trap.spellId)
-                CastSpell(user, spellId, true, NULL, NULL, GetObjectGuid());
+                CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
 
             if (uint32 max_charges = GetGOInfo()->GetCharges())
             {
@@ -2367,6 +2367,22 @@ void GameObject::Despawn()
     }
     else
         AddObjectToRemoveList();
+}
+
+uint32 GameObject::getLevel() const
+{
+    switch (GetGOInfo()->type)
+    {
+        case GAMEOBJECT_TYPE_CHEST:
+            return GetGOInfo()->chest.level;
+        case GAMEOBJECT_TYPE_TRAP:
+            return GetGOInfo()->trap.level;
+    }
+
+    if (GetUInt32Value(GAMEOBJECT_LEVEL))
+        return GetUInt32Value(GAMEOBJECT_LEVEL);
+
+    return DEFAULT_MAX_LEVEL;
 }
 
 // function based on function Unit::CanAttack from 13850 client

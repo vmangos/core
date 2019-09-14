@@ -93,6 +93,7 @@ class Corpse : public WorldObject
         void SetFactionTemplate(FactionTemplateEntry const* entry) { m_faction = entry; }
         FactionTemplateEntry const* GetFactionTemplate() { return m_faction; }
         uint32 getFaction() const final override { return m_faction->ID; }
+        uint32 getLevel() const final override;
     private:
         GridReference<Corpse> m_gridRef;
         FactionTemplateEntry const* m_faction;

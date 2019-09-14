@@ -44,7 +44,7 @@ class DynamicObject : public WorldObject
         void AddToWorld();
         void RemoveFromWorld();
 
-        bool Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type);
+        bool Create(uint32 guidlow, WorldObject* caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type);
         void Update(uint32 update_diff, uint32 p_time) override;
         void Delete();
         uint32 GetSpellId() const { return m_spellId; }
@@ -63,6 +63,7 @@ class DynamicObject : public WorldObject
         bool IsHostileTo(WorldObject const* target) const;
         bool IsFriendlyTo(WorldObject const* target) const;
         uint32 getFaction() const final override;
+        uint32 getLevel() const final override;
 
         float GetObjectBoundingRadius() const               // overwrite WorldObject version
         {

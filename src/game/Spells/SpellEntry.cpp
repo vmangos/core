@@ -582,21 +582,25 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
 
     if (spell)
     {
-        // Nostalrius: ne pas consommer les SpellModifier si 'castTime' = 0 (Eclat lunaire / Grace de la nature 16886)
-        if (castTime)
-            if (Player* modOwner = spell->GetCaster()->GetSpellModOwner())
-                modOwner->ApplySpellMod(Id, SPELLMOD_CASTING_TIME, castTime, spell);
-
-        if (!(Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_TRADESPELL)))
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-            castTime = int32(castTime * spell->GetCaster()->GetFloatValue(UNIT_MOD_CAST_SPEED));
-#else
-            castTime = int32(castTime * (1.0f + spell->GetCaster()->GetInt32Value(UNIT_MOD_CAST_SPEED)/100.0f));
-#endif
-        else
+        if (Unit* pUnit = spell->GetCaster()->ToUnit())
         {
-            if (spell->IsRangedSpell() && !spell->IsAutoRepeat())
-                castTime = int32(castTime * spell->GetCaster()->m_modAttackSpeedPct[RANGED_ATTACK]);
+            // Nostalrius: do not consume the Spell Mod if 'castTime' = 0 (Nature's Grace 16886)
+            if (castTime)
+                if (Player* modOwner = pUnit->GetSpellModOwner())
+                    modOwner->ApplySpellMod(Id, SPELLMOD_CASTING_TIME, castTime, spell);
+
+            if (!(Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_TRADESPELL)))
+            {
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+                castTime = int32(castTime * pUnit->GetFloatValue(UNIT_MOD_CAST_SPEED));
+#else
+                castTime = int32(castTime * (1.0f + pUnit->GetInt32Value(UNIT_MOD_CAST_SPEED) / 100.0f));
+#endif
+            }
+            else if (spell->IsRangedSpell() && !spell->IsAutoRepeat())
+            {
+                castTime = int32(castTime * pUnit->m_modAttackSpeedPct[RANGED_ATTACK]);
+            }
         }
     }
 

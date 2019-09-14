@@ -289,3 +289,10 @@ bool Corpse::IsExpired(time_t t) const
     else
         return m_time < t - 3 * DAY;
 }
+
+uint32 Corpse::getLevel() const
+{
+    if (Unit* pOwner = ObjectAccessor::GetUnit(*this, GetOwnerGuid()))
+        return pOwner->getLevel();
+    return DEFAULT_MAX_LEVEL;
+}

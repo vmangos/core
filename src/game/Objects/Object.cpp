@@ -3168,9 +3168,9 @@ ReputationRank WorldObject::GetReactionTo(WorldObject const* target) const
                 return *repRank;
     }
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+    if (IsUnit() && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
     {
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+        if (target->IsUnit() && target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
         {
             if (selfPlayerOwner && targetPlayerOwner)
             {
@@ -3306,6 +3306,9 @@ uint32 WorldObject::GetLevelForTarget(WorldObject const* target) const
             case GAMEOBJECT_TYPE_TRAP:
                 return pGo->GetGOInfo()->trap.level;
         }
+
+        if (pGo->GetUInt32Value(GAMEOBJECT_LEVEL))
+            return pGo->GetUInt32Value(GAMEOBJECT_LEVEL);
     }
 
     if (Unit const* pUnit = ::ToUnit(target))
@@ -3740,20 +3743,7 @@ float WorldObject::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
         return (resistModHitChance * 0.01f);
     }
 
-    uint32 uiLevel = pUnit ? pUnit->getLevel() : victim->getLevel();
-
-    if (GameObject const* pGo = ToGameObject())
-    {
-        switch (pGo->GetGOInfo()->type)
-        {
-        case GAMEOBJECT_TYPE_CHEST:
-            uiLevel = pGo->GetGOInfo()->chest.level;
-            break;
-        case GAMEOBJECT_TYPE_TRAP:
-            uiLevel = pGo->GetGOInfo()->trap.level;
-            break;
-        }
-    }
+    uint32 const uiLevel = getLevel();
 
     // Computing innate resists, resistance bonus when attacking a creature higher level. Not affected by modifiers.
     if (innateResists && victim->GetTypeId() == TYPEID_UNIT)
@@ -3890,6 +3880,13 @@ void WorldObject::SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 D
 #endif
 }
 
+void WorldObject::EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
+{
+    SendEnergizeSpellLog(pVictim, SpellID, Damage, powertype);
+    // needs to be called after sending spell log
+    pVictim->ModifyPower(powertype, Damage);
+}
+
 void WorldObject::SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
@@ -3962,22 +3959,7 @@ uint32 WorldObject::CalcArmorReducedDamage(Unit* pVictim, const uint32 damage) c
     if (armor < 0.0f)
         armor = 0.0f;
 
-    float uiLevel = pUnit ? pUnit->getLevel() : pVictim->getLevel();
-
-    if (GameObject const* pGo = ToGameObject())
-    {
-        switch (pGo->GetGOInfo()->type)
-        {
-            case GAMEOBJECT_TYPE_CHEST:
-                uiLevel = pGo->GetGOInfo()->chest.level;
-                break;
-            case GAMEOBJECT_TYPE_TRAP:
-                uiLevel = pGo->GetGOInfo()->trap.level;
-                break;
-        }
-    }
-
-    float tmpvalue = 0.1f * armor / (8.5f * uiLevel + 40.0f);
+    float tmpvalue = 0.1f * armor / (8.5f * float(getLevel()) + 40.0f);
     tmpvalue = tmpvalue / (1.0f + tmpvalue);
 
     if (tmpvalue < 0.0f)
@@ -3997,22 +3979,7 @@ int32 WorldObject::CalculateSpellDamage(Unit const* target, SpellEntry const* sp
 
     uint8 comboPoints = pPlayer ? pPlayer->GetComboPoints() : 0;
 
-    uint32 uiLevel = pUnit ? pUnit->getLevel() : target->getLevel();
-
-    if (GameObject const* pGo = ToGameObject())
-    {
-        switch (pGo->GetGOInfo()->type)
-        {
-            case GAMEOBJECT_TYPE_CHEST:
-                uiLevel = pGo->GetGOInfo()->chest.level;
-                break;
-            case GAMEOBJECT_TYPE_TRAP:
-                uiLevel = pGo->GetGOInfo()->trap.level;
-                break;
-        }
-    }
-
-    int32 level = int32(uiLevel);
+    int32 level = getLevel();
 
     if (level > (int32)spellProto->maxLevel && spellProto->maxLevel > 0)
         level = (int32)spellProto->maxLevel;
@@ -4065,7 +4032,7 @@ int32 WorldObject::CalculateSpellDamage(Unit const* target, SpellEntry const* sp
             spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
             spellProto->Effect[effect_index] != SPELL_EFFECT_KNOCK_BACK &&
             (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
-        value = int32(value * 0.25f * exp(uiLevel * (70 - spellProto->spellLevel) / 1000.0f));
+        value = int32(value * 0.25f * exp(getLevel() * (70 - spellProto->spellLevel) / 1000.0f));
 
     return value;
 }
@@ -4637,13 +4604,13 @@ void WorldObject::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabili
     DealDamage(pVictim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, GetSchoolMask(damageInfo->school), spellProto, durabilityLoss, damageInfo->spell);
 }
 
-uint32 WorldObject::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell = nullptr)
+uint32 WorldObject::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell)
 {
     // Should never happen since DealDamage is overriden in Unit class.
     if (pVictim == this)
         return 0;
 
-    pVictim->DealDamage(pVictim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto, durabilityLoss, spell);
+    return pVictim->DealDamage(pVictim, damage, cleanDamage, damagetype, damageSchoolMask, spellProto, durabilityLoss, spell);
 }
 
 bool WorldObject::CheckAndIncreaseCastCounter()
@@ -5117,4 +5084,9 @@ void WorldObject::CastSpell(float x, float y, float z, SpellEntry const *spellIn
     targets.setDestination(x, y, z);
     spell->SetCastItem(castItem);
     spell->prepare(std::move(targets), triggeredByAura);
+}
+
+bool WorldObject::isVisibleFor(Player const* u, WorldObject const* viewPoint) const
+{
+    return isVisibleForInState(u, viewPoint, false);
 }

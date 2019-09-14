@@ -29,6 +29,7 @@
 
 class Spell;
 class Unit;
+class WorldObject;
 class SpellEntry;
 
 // Custom flags assigned in the db

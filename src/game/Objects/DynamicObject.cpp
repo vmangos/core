@@ -60,7 +60,7 @@ void DynamicObject::RemoveFromWorld()
     Object::RemoveFromWorld();
 }
 
-bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type)
+bool DynamicObject::Create(uint32 guidlow, WorldObject* caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type)
 {
     WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT);
     SetMap(caster->GetMap());
@@ -144,6 +144,11 @@ WorldObject* DynamicObject::GetCaster() const
 uint32 DynamicObject::getFaction() const
 {
     return GetCaster()->getFaction();
+}
+
+uint32 DynamicObject::getLevel() const
+{
+    return GetCaster()->getLevel();
 }
 
 void DynamicObject::Update(uint32 update_diff, uint32 p_time)

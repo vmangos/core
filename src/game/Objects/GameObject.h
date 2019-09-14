@@ -733,6 +733,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
         uint32 getFaction() const final override { return GetGOInfo()->faction; }
+        uint32 getLevel() const final override;
         bool IsValidAttackTarget(Unit const* target) const final override;
     protected:
         bool        m_visible;

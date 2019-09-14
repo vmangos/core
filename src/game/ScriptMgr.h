@@ -1212,7 +1212,7 @@ struct Script
         pGossipSelectWithCode(nullptr), pGOGossipSelectWithCode(nullptr), pQuestComplete(nullptr),
         pNPCDialogStatus(nullptr), pGODialogStatus(nullptr), pQuestRewardedNPC(nullptr), pQuestRewardedGO(nullptr), pItemHello(nullptr), pGOHello(nullptr), pAreaTrigger(nullptr),
         pProcessEventId(nullptr), pItemQuestAccept(nullptr), pGOQuestAccept(nullptr),
-        pItemUse(nullptr), pEffectDummyCreature(nullptr), pEffectDummyGameObj(nullptr), pEffectDummyItem(nullptr),
+        pItemUse(nullptr), pEffectDummyCreature(nullptr), pEffectDummyGameObj(nullptr),
         pEffectAuraDummy(nullptr), GOOpen(nullptr),
         GOGetAI(nullptr), GetAI(nullptr), GetInstanceData(nullptr)
     {}
@@ -1241,9 +1241,8 @@ struct Script
     bool (*pGOQuestAccept           )(Player*, GameObject*, const Quest*);
 //    bool (*pGOChooseReward          )(Player*, GameObject*, const Quest*, uint32);
     bool (*pItemUse                 )(Player*, Item*, SpellCastTargets const&);
-    bool (*pEffectDummyCreature     )(Unit*, uint32, SpellEffectIndex, Creature*);
-    bool (*pEffectDummyGameObj      )(Unit*, uint32, SpellEffectIndex, GameObject*);
-    bool (*pEffectDummyItem         )(Unit*, uint32, SpellEffectIndex, Item*);
+    bool (*pEffectDummyCreature     )(WorldObject*, uint32, SpellEffectIndex, Creature*);
+    bool (*pEffectDummyGameObj      )(WorldObject*, uint32, SpellEffectIndex, GameObject*);
     bool (*pEffectAuraDummy         )(const Aura*, bool);
     bool (*GOOpen                   )(Player* pUser, GameObject* gobj);
     GameObjectAI* (*GOGetAI         )(GameObject* pGo);
@@ -1346,8 +1345,8 @@ class ScriptMgr
         bool OnGameObjectOpen(Player* pPlayer, GameObject* pGameObject);
         bool OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry);
         bool OnProcessEvent(uint32 eventId, Object* pSource, Object* pTarget, bool isStart);
-        bool OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, Creature* pTarget);
-        bool OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, GameObject* pTarget);
+        bool OnEffectDummy(WorldObject* pCaster, uint32 spellId, SpellEffectIndex effIndex, Creature* pTarget);
+        bool OnEffectDummy(WorldObject* pCaster, uint32 spellId, SpellEffectIndex effIndex, GameObject* pTarget);
         bool OnAuraDummy(Aura const* pAura, bool apply);
 
     private:
