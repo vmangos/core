@@ -85,6 +85,9 @@ GameObject::~GameObject()
 
     delete i_AI;
     delete m_model;
+
+    MANGOS_ASSERT(m_gameObj.size() == 0);
+    MANGOS_ASSERT(m_dynObjGUIDs.size() == 0);
 }
 
 void GameObject::AddToWorld()
@@ -122,6 +125,8 @@ void GameObject::RemoveFromWorld()
     {
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
+
+        RemoveAllDynObjects();
 
         // Remove GO from owner
         if (ObjectGuid owner_guid = GetOwnerGuid())
@@ -2362,63 +2367,6 @@ void GameObject::Despawn()
     }
     else
         AddObjectToRemoveList();
-}
-
-void GameObject::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
-{
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
-
-    if (!spellInfo)
-    {
-        if (triggeredByAura)
-            sLog.outError("CastSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
-        else
-            sLog.outError("CastSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
-        return;
-    }
-
-    CastSpell(Victim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
-}
-
-void GameObject::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
-{
-    if (!spellInfo)
-    {
-        if (triggeredByAura)
-            sLog.outError("CastSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
-        else
-            sLog.outError("CastSpell: unknown spell by caster: %s", GetGuidStr().c_str());
-        return;
-    }
-
-    if (castItem)
-        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
-
-    if (triggeredByAura)
-    {
-        if (!originalCaster)
-            originalCaster = triggeredByAura->GetCasterGuid();
-
-        triggeredBy = triggeredByAura->GetSpellProto();
-    }
-
-    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster, triggeredBy, NULL, triggeredByParent);
-
-    SpellCastTargets targets;
-
-    // Don't set unit target on destination target based spells, otherwise the spell will cancel
-    // as soon as the target dies or leaves the area of the effect
-    if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
-        targets.setDestination(Victim->GetPositionX(), Victim->GetPositionY(), Victim->GetPositionZ());
-    else
-        targets.setUnitTarget(Victim);
-
-    if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
-        if (WorldObject* caster = spell->GetCastingObject())
-            targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
-
-    spell->SetCastItem(castItem);
-    spell->prepare(std::move(targets), triggeredByAura);
 }
 
 // function based on function Unit::CanAttack from 13850 client

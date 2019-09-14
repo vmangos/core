@@ -20803,30 +20803,6 @@ bool Player::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex
     return Unit::IsImmuneToSpellEffect(spellInfo, index, castOnSelf);
 }
 
-/* Appeler cette fonction pour memoriser le dernier sort lance par une unite.
-byclient = true si le sort est lance depuis le client du jeu. */
-void Player::SetLastCastedSpell(uint32 spell_id, bool byclient)
-{
-    if (spell_id != 23303 && spell_id != 836)
-    {
-        m_lastCastedSpellID = spell_id;
-        if (byclient)
-            m_lastFromClientCastedSpellID = spell_id;
-    }
-}
-
-/* Appeler cette fonction pour obtenir le dernier sort lance par une unite.
-byclientonly = true si on veut le dernier sort lance depuis le client,
-sinon inclut tous les sorts. */
-uint32 Player::GetLastCastedSpell(bool byclientonly)
-{
-    if (byclientonly)
-        return m_lastFromClientCastedSpellID;
-    else
-        return m_lastCastedSpellID;
-};
-
-
 Item* Player::AddItem(uint32 itemId, uint32 count)
 {
     uint32 noSpaceForCount = 0;

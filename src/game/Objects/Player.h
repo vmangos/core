@@ -1452,9 +1452,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         std::vector<ItemSetEffect*> m_ItemSetEff;
 
-        void SetLastCastedSpell(uint32 spell_id, bool byclient);
-        uint32 GetLastCastedSpell(bool byclientonly);
-
         /*********************************************************/
         /***                   TALENT SYSTEM                   ***/
         /*********************************************************/

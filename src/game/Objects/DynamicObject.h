@@ -51,7 +51,7 @@ class DynamicObject : public WorldObject
         SpellEffectIndex GetEffIndex() const { return m_effIndex; }
         uint32 GetDuration() const { return m_aliveDuration; }
         ObjectGuid const& GetCasterGuid() const { return GetGuidValue(DYNAMICOBJECT_CASTER); }
-        Unit* GetCaster() const;
+        WorldObject* GetCaster() const;
         float GetRadius() const { return m_radius; }
         DynamicObjectType GetType() const { return (DynamicObjectType)GetByteValue(DYNAMICOBJECT_BYTES,0); }
         bool NeedsRefresh(Unit *unit) const;

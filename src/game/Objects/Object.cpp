@@ -1633,6 +1633,21 @@ bool WorldObject::IsInRange3d(float x, float y, float z, float minRange, float m
     return distsq < maxdist * maxdist;
 }
 
+bool WorldObject::CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod /*= 0.0f*/) const
+{
+    if (!pVictim || !pVictim->IsInWorld())
+        return false;
+
+    float reach = IsUnit() ? static_cast<Unit const*>(this)->GetCombatReach(pVictim, true, flat_mod) : ATTACK_DISTANCE;
+
+    // This check is not related to bounding radius
+    float dx = GetPositionX() - pVictim->GetPositionX();
+    float dy = GetPositionY() - pVictim->GetPositionY();
+
+    // melee spells ignore Z-axis checks
+    return dx * dx + dy * dy < reach * reach;
+}
+
 float WorldObject::GetLeewayBonusRange(const Unit* target, bool ability) const
 {
     if (Player const* pPlayer = ToPlayer())
@@ -4833,4 +4848,273 @@ void WorldObject::FinishSpell(CurrentSpellTypes spellType, bool ok /*= true*/)
         spell->SendChannelUpdate(0);
 
     spell->finish(ok);
+}
+
+void WorldObject::GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut)
+{
+    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
+    {
+        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
+        if (!dynObj)
+        {
+            i = m_dynObjGUIDs.erase(i);
+            continue;
+        }
+
+        if (dynObj->GetSpellId() == spellId && dynObj->GetEffIndex() == effectIndex)
+            dynObjsOut.push_back(dynObj);
+        ++i;
+    }
+}
+
+DynamicObject * WorldObject::GetDynObject(uint32 spellId, SpellEffectIndex effIndex)
+{
+    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
+    {
+        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
+        if (!dynObj)
+        {
+            i = m_dynObjGUIDs.erase(i);
+            continue;
+        }
+
+        if (dynObj->GetSpellId() == spellId && dynObj->GetEffIndex() == effIndex)
+            return dynObj;
+        ++i;
+    }
+    return nullptr;
+}
+
+DynamicObject * WorldObject::GetDynObject(uint32 spellId)
+{
+    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
+    {
+        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
+        if (!dynObj)
+        {
+            i = m_dynObjGUIDs.erase(i);
+            continue;
+        }
+
+        if (dynObj->GetSpellId() == spellId)
+            return dynObj;
+        ++i;
+    }
+    return nullptr;
+}
+
+void WorldObject::AddDynObject(DynamicObject* dynObj)
+{
+    m_dynObjGUIDs.push_back(dynObj->GetObjectGuid());
+    dynObj->SetWorldMask(GetWorldMask()); // Nostalrius : phasing
+}
+
+void WorldObject::RemoveDynObject(uint32 spellid)
+{
+    if (m_dynObjGUIDs.empty())
+        return;
+    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
+    {
+        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
+        if (!dynObj)
+            i = m_dynObjGUIDs.erase(i);
+        else if (spellid == 0 || dynObj->GetSpellId() == spellid)
+        {
+            dynObj->Delete();
+            i = m_dynObjGUIDs.erase(i);
+        }
+        else
+            ++i;
+    }
+}
+
+void WorldObject::RemoveAllDynObjects()
+{
+    while (!m_dynObjGUIDs.empty())
+    {
+        if (DynamicObject* dynObj = GetMap()->GetDynamicObject(*m_dynObjGUIDs.begin()))
+            dynObj->Delete();
+        m_dynObjGUIDs.erase(m_dynObjGUIDs.begin());
+    }
+}
+
+void WorldObject::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
+{
+    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+
+    if (!spellInfo)
+    {
+        if (triggeredByAura)
+            sLog.outError("CastSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
+        return;
+    }
+
+    CastSpell(Victim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
+}
+
+void WorldObject::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
+{
+    if (!spellInfo)
+    {
+        if (triggeredByAura)
+            sLog.outError("CastSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastSpell: unknown spell by caster: %s", GetGuidStr().c_str());
+        return;
+    }
+
+    if (castItem)
+        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
+
+    if (triggeredByAura)
+    {
+        if (!originalCaster)
+            originalCaster = triggeredByAura->GetCasterGuid();
+
+        triggeredBy = triggeredByAura->GetSpellProto();
+    }
+
+    Spell *spell;
+
+    if (Unit* pUnit = ToUnit())
+        spell = new Spell(pUnit, spellInfo, triggered, originalCaster, triggeredBy, NULL, triggeredByParent);
+    else if (GameObject* pGameObject = ToGameObject())
+        spell = new Spell(pGameObject, spellInfo, triggered, originalCaster, triggeredBy, NULL, triggeredByParent);
+    else
+        return;
+
+    SpellCastTargets targets;
+
+    // Don't set unit target on destination target based spells, otherwise the spell will cancel
+    // as soon as the target dies or leaves the area of the effect
+    if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+        targets.setDestination(Victim->GetPositionX(), Victim->GetPositionY(), Victim->GetPositionZ());
+    else
+        targets.setUnitTarget(Victim);
+
+    if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
+        if (WorldObject* caster = spell->GetCastingObject())
+            targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+
+    spell->SetCastItem(castItem);
+    spell->prepare(std::move(targets), triggeredByAura);
+}
+
+void WorldObject::CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+{
+    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+
+    if (!spellInfo)
+    {
+        if (triggeredByAura)
+            sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
+        return;
+    }
+
+    CastCustomSpell(Victim, spellInfo, bp0, bp1, bp2, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
+}
+
+void WorldObject::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+{
+    if (!spellInfo)
+    {
+        if (triggeredByAura)
+            sLog.outError("CastCustomSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastCustomSpell: unknown spell by caster: %s", GetGuidStr().c_str());
+        return;
+    }
+
+    if (castItem)
+        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
+
+    if (triggeredByAura)
+    {
+        if (!originalCaster)
+            originalCaster = triggeredByAura->GetCasterGuid();
+
+        triggeredBy = triggeredByAura->GetSpellProto();
+    }
+
+    Spell *spell;
+
+    if (Unit* pUnit = ToUnit())
+        spell = new Spell(pUnit, spellInfo, triggered, originalCaster, triggeredBy);
+    else if (GameObject* pGameObject = ToGameObject())
+        spell = new Spell(pGameObject, spellInfo, triggered, originalCaster, triggeredBy);
+    else
+        return;
+
+    if (bp0)
+        spell->m_currentBasePoints[EFFECT_INDEX_0] = *bp0;
+
+    if (bp1)
+        spell->m_currentBasePoints[EFFECT_INDEX_1] = *bp1;
+
+    if (bp2)
+        spell->m_currentBasePoints[EFFECT_INDEX_2] = *bp2;
+
+    SpellCastTargets targets;
+    targets.setUnitTarget(Victim);
+    spell->SetCastItem(castItem);
+    spell->prepare(std::move(targets), triggeredByAura);
+}
+
+// used for scripting
+void WorldObject::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+{
+    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+
+    if (!spellInfo)
+    {
+        if (triggeredByAura)
+            sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
+        return;
+    }
+
+    CastSpell(x, y, z, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
+}
+
+// used for scripting
+void WorldObject::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+{
+    if (!spellInfo)
+    {
+        if (triggeredByAura)
+            sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
+        else
+            sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s", GetGuidStr().c_str());
+        return;
+    }
+
+    if (castItem)
+        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
+
+    if (triggeredByAura)
+    {
+        if (!originalCaster)
+            originalCaster = triggeredByAura->GetCasterGuid();
+
+        triggeredBy = triggeredByAura->GetSpellProto();
+    }
+
+    Spell *spell;
+
+    if (Unit* pUnit = ToUnit())
+        spell = new Spell(pUnit, spellInfo, triggered, originalCaster, triggeredBy);
+    else if (GameObject* pGameObject = ToGameObject())
+        spell = new Spell(pGameObject, spellInfo, triggered, originalCaster, triggeredBy);
+    else
+        return;
+
+    SpellCastTargets targets;
+    targets.setDestination(x, y, z);
+    spell->SetCastItem(castItem);
+    spell->prepare(std::move(targets), triggeredByAura);
 }

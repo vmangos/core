@@ -188,7 +188,7 @@ Unit::Unit()
     //m_victimThreat = 0.0f;
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
         m_threatModifier[i] = 1.0f;
-    m_isSorted = true;
+    
     for (int i = 0; i < MAX_MOVE_TYPE; ++i)
         m_speed_rate[i] = 1.0f;
 
@@ -203,9 +203,6 @@ Unit::Unit()
     // Phasing
     worldMask = WORLD_DEFAULT_UNIT;
 
-    // Nostalrius : Ivina
-    m_lastCastedSpellID = 0;
-    m_lastAttackType = MAX_ATTACK;
     _casterChaseDistance = 0.0f;
 
     m_doExtraAttacks = false;
@@ -1399,165 +1396,15 @@ void Unit::CastStop(uint32 except_spellid)
                 InterruptSpell(CurrentSpellTypes(i), false);
 }
 
-void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
-{
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
-    if (!spellInfo)
-    {
-        if (triggeredByAura)
-            sLog.outError("CastSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
-        else
-            sLog.outError("CastSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
-        return;
-    }
 
-    CastSpell(Victim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
-}
 
-void Unit::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
-{
-    if (!spellInfo)
-    {
-        if (triggeredByAura)
-            sLog.outError("CastSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
-        else
-            sLog.outError("CastSpell: unknown spell by caster: %s", GetGuidStr().c_str());
-        return;
-    }
 
-    if (castItem)
-        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
 
-    if (triggeredByAura)
-    {
-        if (!originalCaster)
-            originalCaster = triggeredByAura->GetCasterGuid();
 
-        triggeredBy = triggeredByAura->GetSpellProto();
-    }
 
-    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster, triggeredBy, NULL, triggeredByParent);
 
-    SpellCastTargets targets;
 
-    // Don't set unit target on destination target based spells, otherwise the spell will cancel
-    // as soon as the target dies or leaves the area of the effect
-    if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
-        targets.setDestination(Victim->GetPositionX(), Victim->GetPositionY(), Victim->GetPositionZ());
-    else
-        targets.setUnitTarget(Victim);
-
-    if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
-        if (WorldObject* caster = spell->GetCastingObject())
-            targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
-
-    spell->SetCastItem(castItem);
-    spell->prepare(std::move(targets), triggeredByAura);
-}
-
-void Unit::CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
-{
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
-
-    if (!spellInfo)
-    {
-        if (triggeredByAura)
-            sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
-        else
-            sLog.outError("CastCustomSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
-        return;
-    }
-
-    CastCustomSpell(Victim, spellInfo, bp0, bp1, bp2, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
-}
-
-void Unit::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
-{
-    if (!spellInfo)
-    {
-        if (triggeredByAura)
-            sLog.outError("CastCustomSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
-        else
-            sLog.outError("CastCustomSpell: unknown spell by caster: %s", GetGuidStr().c_str());
-        return;
-    }
-
-    if (castItem)
-        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
-
-    if (triggeredByAura)
-    {
-        if (!originalCaster)
-            originalCaster = triggeredByAura->GetCasterGuid();
-
-        triggeredBy = triggeredByAura->GetSpellProto();
-    }
-
-    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster, triggeredBy);
-
-    if (bp0)
-        spell->m_currentBasePoints[EFFECT_INDEX_0] = *bp0;
-
-    if (bp1)
-        spell->m_currentBasePoints[EFFECT_INDEX_1] = *bp1;
-
-    if (bp2)
-        spell->m_currentBasePoints[EFFECT_INDEX_2] = *bp2;
-
-    SpellCastTargets targets;
-    targets.setUnitTarget(Victim);
-    spell->SetCastItem(castItem);
-    spell->prepare(std::move(targets), triggeredByAura);
-}
-
-// used for scripting
-void Unit::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
-{
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
-
-    if (!spellInfo)
-    {
-        if (triggeredByAura)
-            sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
-        else
-            sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
-        return;
-    }
-
-    CastSpell(x, y, z, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
-}
-
-// used for scripting
-void Unit::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
-{
-    if (!spellInfo)
-    {
-        if (triggeredByAura)
-            sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
-        else
-            sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s", GetGuidStr().c_str());
-        return;
-    }
-
-    if (castItem)
-        DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: cast Item spellId - %i", spellInfo->Id);
-
-    if (triggeredByAura)
-    {
-        if (!originalCaster)
-            originalCaster = triggeredByAura->GetCasterGuid();
-
-        triggeredBy = triggeredByAura->GetSpellProto();
-    }
-
-    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster, triggeredBy);
-
-    SpellCastTargets targets;
-    targets.setDestination(x, y, z);
-    spell->SetCastItem(castItem);
-    spell->prepare(std::move(targets), triggeredByAura);
-}
 
 // Obsolete func need remove, here only for comotability vs another patches
 uint32 Unit::SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage)
@@ -1591,19 +1438,16 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
             damageInfo->procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_HIT;
             damageInfo->procVictim   = PROC_FLAG_TAKEN_MELEE_HIT;
             damageInfo->HitInfo      = HITINFO_NORMALSWING2;
-            SetLastAttackType(0); // Nostalrius : Ivina (lastAttackType)
             break;
         case OFF_ATTACK:
             damageInfo->procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_HIT | PROC_FLAG_SUCCESSFUL_OFFHAND_HIT;
             damageInfo->procVictim   = PROC_FLAG_TAKEN_MELEE_HIT;//|PROC_FLAG_TAKEN_OFFHAND_HIT // not used
             damageInfo->HitInfo = HITINFO_LEFTSWING;
-            SetLastAttackType(1);
             break;
         case RANGED_ATTACK:
             damageInfo->procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_HIT;
             damageInfo->procVictim   = PROC_FLAG_TAKEN_RANGED_HIT;
             damageInfo->HitInfo = HITINFO_UNK3;             // test (dev note: test what? HitInfo flag possibly not confirmed.)
-            SetLastAttackType(2);
             break;
         default:
             break;
@@ -4400,94 +4244,6 @@ bool Unit::HasAura(uint32 spellId, SpellEffectIndex effIndex) const
             return true;
 
     return false;
-}
-
-void Unit::AddDynObject(DynamicObject* dynObj)
-{
-    m_dynObjGUIDs.push_back(dynObj->GetObjectGuid());
-    dynObj->SetWorldMask(GetWorldMask()); // Nostalrius : phasing
-}
-
-void Unit::RemoveDynObject(uint32 spellid)
-{
-    if (m_dynObjGUIDs.empty())
-        return;
-    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
-    {
-        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
-        if (!dynObj)
-            i = m_dynObjGUIDs.erase(i);
-        else if (spellid == 0 || dynObj->GetSpellId() == spellid)
-        {
-            dynObj->Delete();
-            i = m_dynObjGUIDs.erase(i);
-        }
-        else
-            ++i;
-    }
-}
-
-void Unit::RemoveAllDynObjects()
-{
-    while (!m_dynObjGUIDs.empty())
-    {
-        if (DynamicObject* dynObj = GetMap()->GetDynamicObject(*m_dynObjGUIDs.begin()))
-            dynObj->Delete();
-        m_dynObjGUIDs.erase(m_dynObjGUIDs.begin());
-    }
-}
-
-void Unit::GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut)
-{
-    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
-    {
-        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
-        if (!dynObj)
-        {
-            i = m_dynObjGUIDs.erase(i);
-            continue;
-        }
-
-        if (dynObj->GetSpellId() == spellId && dynObj->GetEffIndex() == effectIndex)
-            dynObjsOut.push_back(dynObj);
-        ++i;
-    }
-}
-
-DynamicObject * Unit::GetDynObject(uint32 spellId, SpellEffectIndex effIndex)
-{
-    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
-    {
-        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
-        if (!dynObj)
-        {
-            i = m_dynObjGUIDs.erase(i);
-            continue;
-        }
-
-        if (dynObj->GetSpellId() == spellId && dynObj->GetEffIndex() == effIndex)
-            return dynObj;
-        ++i;
-    }
-    return nullptr;
-}
-
-DynamicObject * Unit::GetDynObject(uint32 spellId)
-{
-    for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
-    {
-        DynamicObject* dynObj = GetMap()->GetDynamicObject(*i);
-        if (!dynObj)
-        {
-            i = m_dynObjGUIDs.erase(i);
-            continue;
-        }
-
-        if (dynObj->GetSpellId() == spellId)
-            return dynObj;
-        ++i;
-    }
-    return nullptr;
 }
 
 GameObject* Unit::GetGameObject(uint32 spellId) const
@@ -10147,21 +9903,6 @@ bool Unit::CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, f
     return (dx * dx + dy * dy < reach * reach) && ((dz * dz) < zReach);
 }
 
-bool Unit::CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod /*= 0.0f*/) const
-{
-    if (!pVictim || !pVictim->IsInWorld())
-        return false;
-
-    float reach = GetCombatReach(pVictim, true, flat_mod);
-
-    // This check is not related to bounding radius
-    float dx = GetPositionX() - pVictim->GetPositionX();
-    float dy = GetPositionY() - pVictim->GetPositionY();
-
-    // melee spells ignore Z-axis checks
-    return dx * dx + dy * dy < reach * reach;
-}
-
 Unit* Unit::GetUnit(WorldObject &obj, uint64 const &Guid)
 {
     if (obj.IsInWorld())
@@ -10402,31 +10143,6 @@ Aura* Unit::GetMostImportantAuraAfter(Aura const* like, Aura const* except)
         ASSERT(currMostImportant->CheckExclusiveWith(like) > 0);
     }
     return currMostImportant;
-}
-
-// Nostalrius : Ivina
-void Unit::SetLastCastedSpell(uint32 spell_id, bool byclient)
-{
-    if (spell_id != 23303 && spell_id != 836)
-        m_lastCastedSpellID = spell_id;
-}
-
-uint32 Unit::GetLastCastedSpell(bool byclientonly)
-{
-    if (byclientonly)
-        return 0;
-    else
-        return m_lastCastedSpellID;
-}
-
-uint32 Unit::GetLastAttackType()
-{
-    return m_lastAttackType;
-}
-
-void Unit::SetLastAttackType(uint32 attackType)
-{
-    m_lastAttackType = attackType;
 }
 
 void Unit::UpdateSplineMovement(uint32 t_diff)

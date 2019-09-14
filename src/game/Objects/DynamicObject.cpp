@@ -123,10 +123,22 @@ bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEf
     return true;
 }
 
-Unit* DynamicObject::GetCaster() const
+WorldObject* DynamicObject::GetCaster() const
 {
+    if (ObjectGuid guid = GetCasterGuid())
+    {
+        if (!guid.IsEmpty())
+        {
+            if (guid.IsUnit())
+                return ObjectAccessor::GetUnit(*this, guid);
+            else if (guid.IsGameObject())
+            {
+                return GetMap()->GetGameObject(guid);
+            }
+        }
+    }
     // can be not found in some cases
-    return ObjectAccessor::GetUnit(*this, GetCasterGuid());
+    return nullptr;
 }
 
 uint32 DynamicObject::getFaction() const
@@ -138,7 +150,7 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 {
     WorldObject::Update(update_diff, p_time);
     // caster can be not in world at time dynamic object update, but dynamic object not yet deleted in Unit destructor
-    Unit* caster = GetCaster();
+    WorldObject* caster = GetCaster();
     if (!caster)
     {
         Delete();
@@ -157,7 +169,7 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
     if (m_aliveDuration <= 0)
         m_aliveDuration = 0;
 
-    if (m_aliveDuration == 0 && (!m_channeled || caster->GetChannelObjectGuid() != GetObjectGuid()))
+    if (m_aliveDuration == 0 && (!m_channeled || (caster->IsUnit() && static_cast<Unit*>(caster)->GetChannelObjectGuid() != GetObjectGuid())))
         deleteThis = true;
 
     for (AffectedMap::iterator iter = m_affected.begin(); iter != m_affected.end(); ++iter)
@@ -249,7 +261,7 @@ bool DynamicObject::isVisibleForInState(WorldObject const* pDetector, WorldObjec
 
 bool DynamicObject::IsHostileTo(WorldObject const* target) const
 {
-    if (Unit* owner = GetCaster())
+    if (WorldObject* owner = GetCaster())
         return owner->IsHostileTo(target);
     else
         return false;
@@ -257,7 +269,7 @@ bool DynamicObject::IsHostileTo(WorldObject const* target) const
 
 bool DynamicObject::IsFriendlyTo(WorldObject const* target) const
 {
-    if (Unit* owner = GetCaster())
+    if (WorldObject* owner = GetCaster())
         return owner->IsFriendlyTo(target);
     else
         return true;

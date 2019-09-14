@@ -146,8 +146,8 @@ struct boss_mandokirAI : public ScriptedAI
     uint64 m_uiTargetToKill;
     bool m_bTargetMoved;
     float m_fWatchedTargetAllowedMoveRange;
-    bool m_bTargetCasted;
-    bool m_bTargetAttacked;
+    bool m_bTargetActed;
+    float m_fTargetThreat;
     bool m_bFearAfterCharge;
 
     bool m_bChargeCasted;
@@ -178,8 +178,8 @@ struct boss_mandokirAI : public ScriptedAI
         m_uiTargetToKill = 0;
         m_bTargetMoved = false;
         m_fWatchedTargetAllowedMoveRange = 2.0;
-        m_bTargetCasted = false;
-        m_bTargetAttacked = false;
+        m_bTargetActed = false;
+        m_fTargetThreat = 0.0f;
 
         m_uiPlayerToRez = 0;
 
@@ -301,17 +301,14 @@ struct boss_mandokirAI : public ScriptedAI
                         m_fWatchedTargetAllowedMoveRange = 2.0;
                     }
 
-                    // Ni attaquer, soigner, ou participer au combat
-                    if ((!m_bTargetCasted) && (pWatchTarget->GetLastCastedSpell(true)))
-                        m_bTargetCasted = true;
                     // Ni attaquer.
-                    if ((!m_bTargetAttacked) && (pWatchTarget->GetLastAttackType() < MAX_ATTACK))
-                        m_bTargetAttacked = true;
+                    if ((!m_bTargetActed) && (m_creature->getThreatManager().getThreat(pWatchTarget) > m_fTargetThreat))
+                        m_bTargetActed = true;
                 }
                 // Le debuff est termine
                 else
                 {
-                    if (m_bTargetMoved || m_bTargetCasted || m_bTargetAttacked)
+                    if (m_bTargetMoved || m_bTargetActed)
                         m_uiTargetToKill = m_uiWatchTarget;
                     else
                         m_uiTargetToKill = 0;
@@ -399,11 +396,9 @@ struct boss_mandokirAI : public ScriptedAI
             m_uiWatchTarget = pTarget->GetGUID();
             m_fTargetX      = pTarget->GetPositionX();
             m_fTargetY      = pTarget->GetPositionY();
-            pTarget->SetLastCastedSpell(0, true);
-            pTarget->SetLastAttackType(MAX_ATTACK);
             m_bTargetMoved = false;
-            m_bTargetCasted = false;
-            m_bTargetAttacked = false;
+            m_bTargetActed = false;
+            m_fTargetThreat = m_creature->getThreatManager().getThreat(pTarget);
         }
     }
 

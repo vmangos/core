@@ -1427,7 +1427,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool isInRoots() const { return HasAuraType(SPELL_AURA_MOD_ROOT); }
         bool IsPolymorphed() const;
         bool IsImmuneToSchoolMask(uint32 schoolMask) const;
-
         bool isFrozen() const;
 
         void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
@@ -1442,16 +1441,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual bool IsUnderWater() const;
         bool isInAccessablePlaceFor(Creature const* c) const;
 
-
         void EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
         void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
         uint32 SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
-        void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
-        void CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem= nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
-        void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem= nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastCustomSpell(Unit* Victim,SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem= nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+
         // Affiche le visuel d'un sort
         void SendSpellGo(Unit* target, uint32 spellId);
 
@@ -1690,21 +1683,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetCreateResistance(SpellSchools school, int32 val) { m_createResistances[school] = val; }
         int32 GetCreateResistance(SpellSchools school) const { return m_createResistances[school]; }
 
-        
         bool IsSpellProhibited(SpellEntry const* pSpell);
         bool HasProhibitedSpell(); /* use this to check if creature is silenced */
         typedef std::list<ProhibitSpellInfo> ProhibitSpellList;
         ProhibitSpellList m_prohibitSpell;
-
-
-
-        
-        
-        
-
-        
-
-        
 
         ObjectGuid m_ObjectSlotGuid[4];
         uint32 m_detectInvisibilityMask;
@@ -1837,16 +1819,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void setTransForm(uint32 spellid) { m_transform = spellid;}
         uint32 getTransForm() const { return m_transform;}
         float GetCollisionHeight() const { return m_modelCollisionHeight * m_nativeScaleOverride; }
+        void UpdateModelData(); // at any changes to scale and/or displayId
 
-        // at any changes to scale and/or displayId
-        void UpdateModelData();
-        void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut);
-        DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex);
-        DynamicObject* GetDynObject(uint32 spellId);
-        void AddDynObject(DynamicObject* dynObj);
-        void RemoveDynObject(uint32 spellid);
-        void RemoveDynObjectWithGUID(ObjectGuid guid) { m_dynObjGUIDs.remove(guid); }
-        void RemoveAllDynObjects();
 
         GameObject* GetGameObject(uint32 spellId) const;
         void AddGameObject(GameObject* gameObj);
@@ -1998,7 +1972,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool CanReachWithMeleeAutoAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
         bool CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
-        bool CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
 
         // Caster movement
         float GetMinChaseDistance(Unit* target) const;
@@ -2041,13 +2014,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void OnRelocated();
         void ProcessRelocationVisibilityUpdates();
         bool m_needUpdateVisibility;
-
-        uint32 m_lastCastedSpellID;
-        virtual void SetLastCastedSpell(uint32 spell_id, bool byclient);
-        virtual uint32 GetLastCastedSpell(bool byclientonly);
-        uint32 m_lastAttackType;
-        uint32 GetLastAttackType();
-        void SetLastAttackType(uint32 attackType);
 
         // Nostalrius - en fin de CM par exemple
         void TransferAttackersThreatTo(Unit* unit);
@@ -2116,13 +2082,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         SpellAuraHolderList m_deletedHolders;
 
         SingleCastSpellTargetMap m_singleCastSpellTargets;  // casted by unit single per-caster auras
-
-        typedef std::list<ObjectGuid> DynObjectGUIDs;
-        DynObjectGUIDs m_dynObjGUIDs;
-
-        typedef std::list<GameObject*> GameObjectList;
-        GameObjectList m_gameObj;
-        bool m_isSorted;
+        
         uint32 m_transform;
         float m_modelCollisionHeight;
 
@@ -2205,22 +2165,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         float m_meleeZLimit;
         float m_meleeZReach;
-
-        // Error traps for some wrong args using
-        // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type
-        // no bodies expected for this declarations
-        template <typename TR>
-        void CastSpell(Unit* Victim, uint32 spell, TR triggered);
-        template <typename TR>
-        void CastSpell(Unit* Victim, SpellEntry const* spell, TR triggered);
-        template <typename TR>
-        void CastCustomSpell(Unit* Victim, uint32 spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
-        template <typename SP, typename TR>
-        void CastCustomSpell(Unit* Victim, SpellEntry const* spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
-        template <typename TR>
-        void CastSpell(float x, float y, float z, uint32 spell, TR triggered);
-        template <typename TR>
-        void CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
 };
 
 template<typename Func>

@@ -162,7 +162,7 @@ class SpellCastTargets
 
         bool IsEmpty() const { return !m_GOTargetGUID && !m_unitTargetGUID && !m_itemTarget && !m_CorpseTargetGUID; }
 
-        void Update(Unit* caster);
+        void Update(WorldObject* caster);
 
         float m_srcX, m_srcY, m_srcZ;
         float m_destX, m_destY, m_destZ;
@@ -503,12 +503,12 @@ class Spell
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
 
-        WorldObject* m_caster = nullptr;
-        Unit* m_casterUnit = nullptr;
-        GameObject* m_casterGo = nullptr;
+        WorldObject* const m_caster = nullptr;
+        Unit* const m_casterUnit = nullptr;
+        GameObject* const m_casterGo = nullptr;
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
-                                                            // e.g. damage around area spell trigered by victim aura and da,age emeies of aura caster
+                                                            // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
         Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
 
         Spell** m_selfContainer;                            // pointer to our spell container (if applicable)
