@@ -624,6 +624,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         uint32 ComputeRespawnDelay() const; // Applies dynamic / random respawn timers if needed.
         void Refresh();
         void Delete();
+        void CleanupsBeforeDelete() override;
 
         // Functions spawn/remove gameobject with DB guid in all loaded map copies (if point grid loaded in map)
         static void AddToRemoveListInMaps(uint32 db_guid, GameObjectData const* data);

@@ -29,6 +29,7 @@
 #include "ObjectGuid.h"
 #include "Camera.h"
 #include "SpellEntry.h"
+#include "Utilities/EventProcessor.h"
 
 #include <set>
 #include <string>
@@ -667,6 +668,17 @@ struct CleanDamage
     int32 resist;
 };
 
+enum CurrentSpellTypes
+{
+    CURRENT_MELEE_SPELL             = 0,
+    CURRENT_GENERIC_SPELL           = 1,
+    CURRENT_AUTOREPEAT_SPELL        = 2,
+    CURRENT_CHANNELED_SPELL         = 3
+};
+
+#define CURRENT_FIRST_NON_MELEE_SPELL 1
+#define CURRENT_MAX_SPELL             4
+
 class MANGOS_DLL_SPEC WorldObject : public Object
 {
     friend struct WorldObjectChangeAccumulator;
@@ -683,8 +695,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
                 void Update(uint32 time_diff)
                 {
-m_obj->Update(m_obj->m_updateTracker.timeElapsed(), time_diff);
-m_obj->m_updateTracker.Reset();
+                    m_obj->Update(m_obj->m_updateTracker.timeElapsed(), time_diff);
+                    m_obj->m_updateTracker.Reset();
                 }
 
                 void UpdateRealTime(uint32 now, uint32 time_diff)
@@ -990,6 +1002,8 @@ m_obj->m_updateTracker.Reset();
         int32 MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
         float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
         void CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, SpellEntry const *spellInfo, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
+        int32 CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr);
+
         uint32 MeleeDamageBonusDone(Unit *pVictim, uint32 damage, WeaponAttackType attType,
             SpellEntry const *spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
         virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
@@ -1010,8 +1024,35 @@ m_obj->m_updateTracker.Reset();
         void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
         void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
 
-        // Nostalrius - suis-je considere comme un joueur ? (joueur ou un pet de joueur)
+        void SetCurrentCastedSpell(Spell * pSpell);
+        Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
+        Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
+        bool CheckAndIncreaseCastCounter();
+        void DecreaseCastCounter() { if (m_castCounter) --m_castCounter; }
+
+        // set withDelayed to true to account delayed spells as casted
+        // delayed+channeled spells are always accounted as casted
+        // we can skip channeled or delayed checks using flags
+        bool IsNonMeleeSpellCasted(bool withDelayed = false, bool skipChanneled = false, bool skipAutorepeat = false) const;
+        bool IsNextSwingSpellCasted() const;
+        // for movement generators, check if current casted spell has movement interrupt flags
+        bool IsNoMovementSpellCasted() const;
+
+        // set withDelayed to true to interrupt delayed spells too
+        // delayed+channeled spells are always interrupted
+        void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0);
+        void InterruptSpellsWithInterruptFlags(uint32 flags, uint32 except = 0);
+        void InterruptSpell(CurrentSpellTypes spellType, bool withDelayed = true);
+        void FinishSpell(CurrentSpellTypes spellType, bool ok = true);
+
+        float GetLeewayBonusRange(const Unit* target, bool ability) const;
+        float GetLeewayBonusRadius() const;
+        
+
         bool IsLikePlayer() const;
+
+        // Event handler
+        EventProcessor m_Events;
     protected:
         explicit WorldObject();
 
@@ -1036,9 +1077,12 @@ m_obj->m_updateTracker.Reset();
         
         float m_lootAndXPRangeModifier;
 
-        uint32 m_creatureSummonCount;   // Current summon count
-        uint32 m_creatureSummonLimit;   // Hard limit on creature summons
-        uint32 m_summonLimitAlert;      // Timer to alert GMs if a creature is at the summon limit
+        uint32 m_creatureSummonCount;                       // Current summon count
+        uint32 m_creatureSummonLimit;                       // Hard limit on creature summons
+        uint32 m_summonLimitAlert;                          // Timer to alert GMs if a creature is at the summon limit
+
+        std::array<Spell*, CURRENT_MAX_SPELL> m_currentSpells{};
+        uint32 m_castCounter = 0;                           // count casts chain of triggered spells for prevent infinity cast crashes
 };
 
 // Helper functions to cast between different Object pointers. Useful when unsure that your object* is valid at all.

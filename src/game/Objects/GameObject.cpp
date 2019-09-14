@@ -73,6 +73,16 @@ GameObject::GameObject() : WorldObject(),
 
 GameObject::~GameObject()
 {
+    // set current spells as deletable
+    for (uint32 i = 0; i < CURRENT_MAX_SPELL; ++i)
+    {
+        if (m_currentSpells[i])
+        {
+            m_currentSpells[i]->SetReferencedFromCurrent(false);
+            m_currentSpells[i] = nullptr;
+        }
+    }
+
     delete i_AI;
     delete m_model;
 }
@@ -245,6 +255,18 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         return;
     }
 
+    m_Events.Update(update_diff);
+
+    // remove finished spells from current pointers
+    for (uint32 i = 0; i < CURRENT_MAX_SPELL; ++i)
+    {
+        if (m_currentSpells[i] && m_currentSpells[i]->getState() == SPELL_STATE_FINISHED)
+        {
+            m_currentSpells[i]->SetReferencedFromCurrent(false);
+            m_currentSpells[i] = nullptr;                      // remove pointer
+        }
+    }
+
     ///- UpdateAI
     if (i_AI)
         i_AI->UpdateAI(update_diff);
@@ -278,12 +300,10 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             SetGoState(GO_STATE_ACTIVE);
                             // SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_NODESPAWN);
 
-                
-                
                             SendForcedObjectUpdate();
 
-                // Play splash sound
-                PlayDistanceSound(3355);
+                            // Play splash sound
+                            PlayDistanceSound(3355);
                             SendGameObjectCustomAnim();
                         }
 
@@ -429,9 +449,11 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
 
                     if (ok && (!AI() || !AI()->OnUse(ok)))
                     {
-                        Unit *caster =  owner ? owner : ok;
+                        if (owner)
+                            owner->CastSpell(ok, goInfo->trap.spellId, true, nullptr, nullptr, GetObjectGuid());
+                        else
+                            CastSpell(ok, goInfo->trap.spellId, true, nullptr, nullptr, GetObjectGuid());
 
-                        caster->CastSpell(ok, goInfo->trap.spellId, true, NULL, NULL, GetObjectGuid());
                         // use template cooldown if provided
                         m_cooldownTime = time(NULL) + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4));
 
@@ -724,6 +746,16 @@ uint32 GameObject::GetUniqueUseCount()
 {
     std::lock_guard<std::mutex> guard(m_UniqueUsers_lock);
     return m_UniqueUsers.size();
+}
+
+void GameObject::CleanupsBeforeDelete()
+{
+    if (m_uint32Values)                                     // only for fully created object
+    {
+        InterruptNonMeleeSpells(true);
+        m_Events.KillAllEvents(false);                      // non-delatable (currently casted spells) will not deleted now but it will deleted at call in Map::RemoveAllObjectsInRemoveList
+    }
+    WorldObject::CleanupsBeforeDelete();
 }
 
 void GameObject::Delete()
@@ -1344,9 +1376,8 @@ void GameObject::Use(Unit* user)
             // Currently we do not expect trap code below to be Use()
             // directly (except from spell effect). Code here will be called by TriggerLinkedGameObject.
 
-            // FIXME: when GO casting will be implemented trap must cast spell to target
             if (uint32 spellId = GetGOInfo()->trap.spellId)
-                user->CastSpell(user, spellId, true, NULL, NULL, GetObjectGuid());
+                CastSpell(user, spellId, true, NULL, NULL, GetObjectGuid());
 
             if (uint32 max_charges = GetGOInfo()->GetCharges())
             {

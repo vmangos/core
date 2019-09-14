@@ -32,7 +32,6 @@
 #include "HostileRefManager.h"
 #include "FollowerReference.h"
 #include "FollowerRefManager.h"
-#include "Utilities/EventProcessor.h"
 #include "MotionMaster.h"
 #include "DBCStructure.h"
 #include "Path.h"
@@ -708,16 +707,6 @@ enum SpellAuraProcResult
 typedef SpellAuraProcResult(Unit::*pAuraProcHandler)(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
 extern pAuraProcHandler AuraProcHandler[TOTAL_AURAS];
 
-enum CurrentSpellTypes
-{
-    CURRENT_MELEE_SPELL             = 0,
-    CURRENT_GENERIC_SPELL           = 1,
-    CURRENT_AUTOREPEAT_SPELL        = 2,
-    CURRENT_CHANNELED_SPELL         = 3
-};
-
-#define CURRENT_FIRST_NON_MELEE_SPELL 1
-#define CURRENT_MAX_SPELL             4
 #define UNIT_SPELL_UPDATE_TIME_BUFFER 60
 
 struct GlobalCooldown
@@ -1613,8 +1602,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
         Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
         Player* GetAffectingPlayer() const final override;
-        float GetLeewayBonusRange(const Unit* target, bool ability) const;
-        float GetLeewayBonusRadius() const;
 
         void SetPet(Pet* pet);
         void SetCharm(Unit* pet);
@@ -1703,33 +1690,21 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetCreateResistance(SpellSchools school, int32 val) { m_createResistances[school] = val; }
         int32 GetCreateResistance(SpellSchools school) const { return m_createResistances[school]; }
 
-        void SetCurrentCastedSpell(Spell * pSpell);
+        
         bool IsSpellProhibited(SpellEntry const* pSpell);
         bool HasProhibitedSpell(); /* use this to check if creature is silenced */
         typedef std::list<ProhibitSpellInfo> ProhibitSpellList;
         ProhibitSpellList m_prohibitSpell;
 
-        void InterruptSpell(CurrentSpellTypes spellType, bool withDelayed = true);
-        void FinishSpell(CurrentSpellTypes spellType, bool ok = true);
 
-        // set withDelayed to true to account delayed spells as casted
-        // delayed+channeled spells are always accounted as casted
-        // we can skip channeled or delayed checks using flags
-        bool IsNonMeleeSpellCasted(bool withDelayed = false, bool skipChanneled = false, bool skipAutorepeat = false) const;
-        bool IsNextSwingSpellCasted() const;
-        // for movement generators, check if current casted spell has movement interrupt flags
-        bool IsNoMovementSpellCasted() const;
+
         
-        // set withDelayed to true to interrupt delayed spells too
-        // delayed+channeled spells are always interrupted
-        void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0);
-        void InterruptSpellsWithInterruptFlags(uint32 flags, uint32 except = 0);
+        
+        
 
-        Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
-        Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
+        
 
-        bool CheckAndIncreaseCastCounter();
-        void DecreaseCastCounter() { if (m_castCounter) --m_castCounter; }
+        
 
         ObjectGuid m_ObjectSlotGuid[4];
         uint32 m_detectInvisibilityMask;
@@ -1754,9 +1729,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float m_threatModifier[MAX_SPELL_SCHOOL];
         float m_modAttackSpeedPct[3];
         float m_modRecalcDamagePct[3];
-
-        // Event handler
-        EventProcessor m_Events;
 
         // stat system
         bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
@@ -1947,10 +1919,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void _RemoveAllAuraMods();
         void _ApplyAllAuraMods();
 
-        int32 CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr);
-
-
-
         void addFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }
         void removeFollower(FollowerReference* /*pRef*/ ) { /* nothing to do yet */ }
 
@@ -2130,7 +2098,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void _UpdateSpells(uint32 time);
 
         void _UpdateAutoRepeatSpell();
-        bool m_AutoRepeatFirstCast;
+        
 
         uint32 m_attackTimer[MAX_ATTACK];
 
@@ -2186,6 +2154,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool m_isSpawningLinked;
 
     public:
+        bool m_AutoRepeatFirstCast;
         void DisableSpline();
         void UnitDamaged(ObjectGuid from, uint32 damage) { _damageTakenHistory[from] += damage; _lastDamageTaken = 0; }
         void SetMeleeZLimit(float newZLimit) { m_meleeZLimit = newZLimit; }
@@ -2215,9 +2184,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_extraAttacks;
         bool m_extraMute;
         bool m_doExtraAttacks;
-
-        Spell* m_currentSpells[CURRENT_MAX_SPELL];
-        uint32 m_castCounter;                               // count casts chain of triggered spells for prevent infinity cast crashes
 
         UnitVisibility m_Visibility;
         Position m_last_notified_position;

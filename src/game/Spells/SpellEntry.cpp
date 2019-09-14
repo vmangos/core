@@ -811,7 +811,7 @@ int32 SpellEntry::GetMaxDuration() const
     return (du->Duration[2] == -1) ? -1 : abs(du->Duration[2]);
 }
 
-int32 SpellEntry::CalculateDuration(Unit const* caster) const
+int32 SpellEntry::CalculateDuration(WorldObject const* caster) const
 {
     int32 duration = GetDuration();
 
@@ -819,15 +819,19 @@ int32 SpellEntry::CalculateDuration(Unit const* caster) const
     {
         int32 maxduration = GetMaxDuration();
 
-        if (duration != maxduration && caster->GetTypeId() == TYPEID_PLAYER)
-            duration += int32((maxduration - duration) * ((Player*)caster)->GetComboPoints() / 5);
+        if (duration != maxduration)
+            if (Player const* pPlayer = caster->ToPlayer())
+                duration += int32((maxduration - duration) * pPlayer->GetComboPoints() / 5);
 
-        if (Player* modOwner = caster->GetSpellModOwner())
+        if (Unit const* pUnit = caster->ToUnit())
         {
-            modOwner->ApplySpellMod(Id, SPELLMOD_DURATION, duration);
+            if (Player* modOwner = pUnit->GetSpellModOwner())
+            {
+                modOwner->ApplySpellMod(Id, SPELLMOD_DURATION, duration);
 
-            if (duration < 0)
-                duration = 0;
+                if (duration < 0)
+                    duration = 0;
+            }
         }
     }
 
