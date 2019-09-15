@@ -2371,18 +2371,22 @@ void GameObject::Despawn()
 
 uint32 GameObject::getLevel() const
 {
+    uint32 level = 0;
+
     switch (GetGOInfo()->type)
     {
         case GAMEOBJECT_TYPE_CHEST:
-            return GetGOInfo()->chest.level;
+            level = GetGOInfo()->chest.level;
+            break;
         case GAMEOBJECT_TYPE_TRAP:
-            return GetGOInfo()->trap.level;
+            level = GetGOInfo()->trap.level;
+            break;
     }
 
-    if (GetUInt32Value(GAMEOBJECT_LEVEL))
-        return GetUInt32Value(GAMEOBJECT_LEVEL);
+    if (!level)
+        level = GetUInt32Value(GAMEOBJECT_LEVEL);
 
-    return DEFAULT_MAX_LEVEL;
+    return level > 0 ? level : DEFAULT_MAX_LEVEL;
 }
 
 // function based on function Unit::CanAttack from 13850 client

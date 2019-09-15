@@ -3299,16 +3299,23 @@ uint32 WorldObject::GetLevelForTarget(WorldObject const* target) const
 
     if (GameObject const* pGo = ToGameObject())
     {
+        uint32 level = 0;
+
         switch (pGo->GetGOInfo()->type)
         {
             case GAMEOBJECT_TYPE_CHEST:
-                return pGo->GetGOInfo()->chest.level;
+                level = pGo->GetGOInfo()->chest.level;
+                break;
             case GAMEOBJECT_TYPE_TRAP:
-                return pGo->GetGOInfo()->trap.level;
+                level = pGo->GetGOInfo()->trap.level;
+                break;
         }
 
-        if (pGo->GetUInt32Value(GAMEOBJECT_LEVEL))
-            return pGo->GetUInt32Value(GAMEOBJECT_LEVEL);
+        if (!level)
+            level = pGo->GetUInt32Value(GAMEOBJECT_LEVEL);
+
+        if (level)
+            return level;
     }
 
     if (Unit const* pUnit = ::ToUnit(target))
@@ -4258,6 +4265,111 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
 
     // bonus result can be negative
     return tmpDamage > 0 ? uint32(tmpDamage) : 0;
+}
+
+/**
+ * Calculates caster part of healing spell bonuses,
+ * also includes different bonuses dependent from target auras
+ */
+uint32 WorldObject::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack, Spell* spell)
+{
+    Unit* pUnit = ToUnit();
+
+    // For totems get healing bonus from owner (statue isn't totem in fact)
+    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsTotem() && ((Totem*)this)->GetTotemType() != TOTEM_STATUE)
+        if (Unit* owner = pUnit->GetOwner())
+            return owner->SpellHealingBonusDone(pVictim, spellProto, healamount, damagetype, stack, spell);
+
+    // No heal amount for this class spells
+    if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellProto->Custom & SPELL_CUSTOM_FIXED_DAMAGE)
+    {
+        //DEBUG_UNIT(this, DEBUG_SPELLS_DAMAGE, "SpellHealingBonusDone[spell=%u]: has fixed damage (SPELL_DAMAGE_CLASS_NONE)", spellProto->Id);
+        return healamount < 0 ? 0 : healamount;
+    }
+    // Healing Done
+    // Done total percent damage auras
+    float  DoneTotalMod = 1.0f;
+    int32  DoneTotal = 0;
+
+    if (pUnit)
+    {
+        // Healing done percent
+        Unit::AuraList const& mHealingDonePct = pUnit->GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+        for (Unit::AuraList::const_iterator i = mHealingDonePct.begin(); i != mHealingDonePct.end(); ++i)
+            DoneTotalMod *= (100.0f + (*i)->GetModifier()->m_amount) / 100.0f;
+
+        // done scripted mod (take it from owner)
+        Unit *owner = pUnit->GetOwner();
+        if (!owner)
+            owner = pUnit;
+
+        Unit::AuraList const& mOverrideClassScript = owner->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+        for (Unit::AuraList::const_iterator i = mOverrideClassScript.begin(); i != mOverrideClassScript.end(); ++i)
+        {
+            if (!(*i)->isAffectedOnSpell(spellProto))
+                continue;
+            switch ((*i)->GetModifier()->m_miscvalue)
+            {
+                case 4415: // Increased Rejuvenation Healing
+                    DoneTotal += (*i)->GetModifier()->m_amount / 4; // 4 ticks
+                    break;
+                case 3736: // Hateful Totem of the Third Wind / Increased Lesser Healing Wave / Savage Totem of the Third Wind
+                    DoneTotal += (*i)->GetModifier()->m_amount;
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+    
+    
+
+    // Done fixed damage bonus auras
+    int32 DoneAdvertisedBenefit  = SpellBaseHealingBonusDone(spellProto->GetSpellSchoolMask());
+
+    // apply ap bonus and benefit affected by spell power implicit coeffs and spell level penalties
+    DoneTotal = SpellBonusWithCoeffs(spellProto, DoneTotal, DoneAdvertisedBenefit, 0, damagetype, true, this, spell);
+
+    // use float as more appropriate for negative values and percent applying
+    float heal = (healamount + DoneTotal * int32(stack)) * DoneTotalMod;
+
+    if (pUnit)
+    {
+        // apply spellmod to Done amount
+        if (Player* modOwner = pUnit->GetSpellModOwner())
+            modOwner->ApplySpellMod(spellProto->Id, damagetype == DOT ? SPELLMOD_DOT : SPELLMOD_DAMAGE, heal, spell);
+    }
+    
+    //DEBUG_UNIT(this, DEBUG_SPELLS_DAMAGE, "SpellHealingBonusDone[spell=%u]: (base=%u + %i) * %f. HealingPwr=%i", spellProto->Id, healamount, DoneTotal, DoneTotalMod, DoneAdvertisedBenefit);
+    return heal < 0 ? 0 : uint32(heal);
+}
+
+int32 WorldObject::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
+{
+    int32 AdvertisedBenefit = 0;
+
+    if (Unit* pUnit = ToUnit())
+    {
+        Unit::AuraList const& mHealingDone = pUnit->GetAurasByType(SPELL_AURA_MOD_HEALING_DONE);
+        for (Unit::AuraList::const_iterator i = mHealingDone.begin(); i != mHealingDone.end(); ++i)
+            if (((*i)->GetModifier()->m_miscvalue & schoolMask) != 0)
+                AdvertisedBenefit += (*i)->GetModifier()->m_amount;
+
+        // Healing bonus of spirit, intellect and strength
+        if (GetTypeId() == TYPEID_PLAYER)
+        {
+            // Healing bonus from stats
+            Unit::AuraList const& mHealingDoneOfStatPercent = pUnit->GetAurasByType(SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT);
+            for (Unit::AuraList::const_iterator i = mHealingDoneOfStatPercent.begin(); i != mHealingDoneOfStatPercent.end(); ++i)
+            {
+                // 1.12.* have only 1 stat type support
+                Stats usedStat = STAT_SPIRIT;
+                AdvertisedBenefit += int32(pUnit->GetStat(usedStat) * (*i)->GetModifier()->m_amount / 100.0f);
+            }
+        }
+    }
+    
+    return AdvertisedBenefit;
 }
 
 /**

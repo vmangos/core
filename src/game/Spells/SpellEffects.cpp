@@ -2444,7 +2444,7 @@ void Spell::EffectHeal(SpellEffectIndex eff_idx)
     if (unitTarget && unitTarget->isAlive() && damage >= 0)
     {
         // Try to get original caster
-        Unit *caster = GetAffectiveCaster();
+        WorldObject *caster = GetAffectiveCasterObject();
         if (!caster)
             return;
 
@@ -2519,7 +2519,7 @@ void Spell::EffectHealMechanical(SpellEffectIndex /*eff_idx*/)
     if (unitTarget && unitTarget->isAlive() && damage >= 0)
     {
         // Try to get original caster
-        Unit *caster = GetAffectiveCaster();
+        WorldObject *caster = GetAffectiveCasterObject();
         if (!caster)
             return;
 
