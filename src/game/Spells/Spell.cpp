@@ -5537,14 +5537,14 @@ SpellCastResult Spell::CheckCast(bool strict)
                 return SPELL_FAILED_MOVING;
         }
 
-        if (!m_IsTriggeredSpell && m_spellInfo->NeedsComboPoints() &&
-                (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetObjectGuid() != ((Player*)m_caster)->GetComboTargetGuid()))
+        if (!m_IsTriggeredSpell && m_spellInfo->NeedsComboPoints() && Spells::IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0]) &&
+           (!m_targets.getUnitTarget() || m_targets.getUnitTarget()->GetObjectGuid() != ((Player*)m_caster)->GetComboTargetGuid()))
             // warrior not have real combo-points at client side but use this way for mark allow Overpower use
             return m_casterUnit->getClass() == CLASS_WARRIOR ? SPELL_FAILED_BAD_TARGETS : SPELL_FAILED_NO_COMBO_POINTS;
 
         switch (m_spellInfo->Id)
         {
-            // Morsure de mangouste
+            // Mongoose Bite
             case 1495:
             case 14269:
             case 14270:
@@ -5552,7 +5552,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_targets.getUnitTargetGuid() != m_casterUnit->GetReactiveTarget(REACTIVE_DEFENSE))
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
-            // Contre-attaque
+            // Counterattack
             case 19306:
             case 20909:
             case 20910:
@@ -5592,7 +5592,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
     if (Unit *target = m_targets.getUnitTarget())
     {
-        // Nostalrius - Un sort plus puissant est deja actif
+        // A more powerful spell is already active
         if (m_spellInfo->IsSpellAppliesAura() && !m_spellInfo->IsAreaOfEffectSpell() && m_spellInfo->IsPositiveSpell() && target->HasMorePowerfullSpellActive(m_spellInfo))
             return SPELL_FAILED_AURA_BOUNCED;
 
@@ -5731,8 +5731,8 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
         }
 
-        //check creature type
-        //ignore self casts (including area casts when caster selected as target)
+        // check creature type
+        // ignore self casts (including area casts when caster selected as target)
         if (non_caster_target)
         {
             if (!CheckTargetCreatureType(target))
