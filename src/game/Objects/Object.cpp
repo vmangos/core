@@ -4321,8 +4321,6 @@ uint32 WorldObject::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spell
             }
         }
     }
-    
-    
 
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit  = SpellBaseHealingBonusDone(spellProto->GetSpellSchoolMask());
