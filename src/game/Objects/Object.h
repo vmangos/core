@@ -1113,9 +1113,6 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         typedef std::list<ObjectGuid> DynObjectGUIDs;
         DynObjectGUIDs m_dynObjGUIDs;
 
-        typedef std::list<GameObject*> GameObjectList;
-        GameObjectList m_gameObj;
-
         std::array<Spell*, CURRENT_MAX_SPELL> m_currentSpells{};
         uint32 m_castCounter = 0;                           // count casts chain of triggered spells for prevent infinity cast crashes
     private:

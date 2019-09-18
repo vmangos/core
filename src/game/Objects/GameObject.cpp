@@ -86,7 +86,6 @@ GameObject::~GameObject()
     delete i_AI;
     delete m_model;
 
-    MANGOS_ASSERT(m_gameObj.size() == 0);
     MANGOS_ASSERT(m_dynObjGUIDs.size() == 0);
 }
 

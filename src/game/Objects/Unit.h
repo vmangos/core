@@ -2034,6 +2034,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         SingleCastSpellTargetMap m_singleCastSpellTargets;  // casted by unit single per-caster auras
         
+        typedef std::list<GameObject*> GameObjectList;
+        GameObjectList m_gameObj;
+
         uint32 m_transform;
         float m_modelCollisionHeight;
 
