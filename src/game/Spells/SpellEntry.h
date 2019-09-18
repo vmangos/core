@@ -29,6 +29,7 @@
 
 class Spell;
 class Unit;
+class WorldObject;
 class SpellEntry;
 
 // Custom flags assigned in the db
@@ -891,8 +892,8 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_POSITIVE;
         }
 
-        bool IsPositiveSpell(Unit* caster, Unit* victim) const;
-        bool IsPositiveEffect(SpellEffectIndex effIndex, Unit* caster = nullptr, Unit* victim = nullptr) const;
+        bool IsPositiveSpell(WorldObject* caster, Unit* victim) const;
+        bool IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster = nullptr, Unit* victim = nullptr) const;
 
         inline bool IsHealSpell() const
         {
@@ -939,7 +940,7 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_REFLECTABLE;
         }
 
-        inline bool IsReflectableSpell(Unit* caster, Unit* victim) const
+        inline bool IsReflectableSpell(WorldObject* caster, Unit* victim) const
         {
             return DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !HasAttribute(SPELL_ATTR_IS_ABILITY)
                 && !HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
@@ -1067,13 +1068,13 @@ class SpellEntry
 
         int32 GetDuration() const;
         int32 GetMaxDuration() const;
-        int32 CalculateDuration(Unit const* caster = nullptr) const;
+        int32 CalculateDuration(WorldObject const* caster = nullptr) const;
         uint32 GetCastTime(Spell* spell = nullptr) const;
         uint32 GetCastTimeForBonus(DamageEffectType damagetype) const;
         uint16 GetAuraMaxTicks() const;
         WeaponAttackType GetWeaponAttackType() const;
         float CalculateDefaultCoefficient(DamageEffectType const damagetype) const;
-        float CalculateCustomCoefficient(Unit const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const;
+        float CalculateCustomCoefficient(WorldObject const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const;
         SpellCastResult GetErrorAtShapeshiftedCast(uint32 form) const;
         uint32 GetMechanic() const { return Mechanic; }
         uint32 GetManaCost() const { return manaCost; }

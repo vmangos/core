@@ -150,12 +150,12 @@ namespace MaNGOS
     struct MANGOS_DLL_DECL DynamicObjectUpdater
     {
         DynamicObject &i_dynobject;
-        Unit* i_check;
+        WorldObject* i_check;
         bool i_positive;
-        DynamicObjectUpdater(DynamicObject &dynobject, Unit* caster, bool positive) : i_dynobject(dynobject), i_positive(positive)
+        DynamicObjectUpdater(DynamicObject &dynobject, WorldObject* caster, bool positive) : i_dynobject(dynobject), i_positive(positive)
         {
             i_check = caster;
-            Unit* owner = i_check->GetOwner();
+            Unit* owner = i_check->IsUnit() ? static_cast<Unit*>(i_check)->GetOwner() : nullptr;
             if(owner)
                 i_check = owner;
         }
@@ -585,8 +585,8 @@ namespace MaNGOS
     class GameObjectFocusCheck
     {
         public:
-            GameObjectFocusCheck(Unit const* unit,uint32 focusId) : i_unit(unit), i_focusId(focusId) {}
-            WorldObject const& GetFocusObject() const { return *i_unit; }
+            GameObjectFocusCheck(WorldObject const* caster, uint32 focusId) : i_caster(caster), i_focusId(focusId) {}
+            WorldObject const& GetFocusObject() const { return *i_caster; }
             bool operator()(GameObject* go) const
             {
                 if(go->GetGOInfo()->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
@@ -597,10 +597,10 @@ namespace MaNGOS
 
                 float dist = (float)go->GetGOInfo()->spellFocus.dist;
 
-                return go->IsWithinDistInMap(i_unit, dist);
+                return go->IsWithinDistInMap(i_caster, dist);
             }
         private:
-            Unit const* i_unit;
+            WorldObject const* i_caster;
             uint32 i_focusId;
     };
 

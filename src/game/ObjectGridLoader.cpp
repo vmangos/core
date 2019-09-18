@@ -339,5 +339,14 @@ ObjectGridStoper::Visit(CreatureMapType &m)
     }
 }
 
-template void ObjectGridUnloader::Visit(GameObjectMapType &);
+void
+ObjectGridStoper::Visit(GameObjectMapType &m)
+{
+    // remove dynobjects created at cast at grid de-activation
+    for (GameObjectMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    {
+        iter->getSource()->RemoveAllDynObjects();
+    }
+}
+
 template void ObjectGridUnloader::Visit(DynamicObjectMapType &);

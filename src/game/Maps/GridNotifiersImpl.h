@@ -164,9 +164,11 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (!i_dynobject.NeedsRefresh(target))
         return;
 
+    Unit* pUnit = i_check->ToUnit();
+
     // Negative AoE from non flagged players cannot target other players
     if (Player *attackedPlayer = target->GetCharmerOrOwnerPlayerOrPlayerItself())
-        if (!i_positive && i_check->IsPlayer() && !i_check->IsPvP() && !((Player*)i_check)->IsInDuelWith(attackedPlayer))
+        if (pUnit && !i_positive && i_check->IsPlayer() && !pUnit->IsPvP() && !((Player*)i_check)->IsInDuelWith(attackedPlayer))
             return;
 
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(i_dynobject.GetSpellId());
@@ -174,13 +176,13 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 
     // Mise en combat
     // Exception : fusee eclairante, piege de givre
-    if (!i_positive && i_dynobject.GetSpellId() != 1543 && i_dynobject.GetSpellId() != 13810)
+    if (pUnit && !i_positive && i_dynobject.GetSpellId() != 1543 && i_dynobject.GetSpellId() != 13810)
     {
         if (CreatureAI* pAi = target->AI())
-            pAi->AttackedBy(i_check);
+            pAi->AttackedBy(pUnit);
 
-        target->SetInCombatWithAggressor(i_check);
-        i_check->SetInCombatWithVictim(target);
+        target->SetInCombatWithAggressor(pUnit);
+        pUnit->SetInCombatWithVictim(target);
     }
     // Check target immune to spell or aura
     if (target->IsImmuneToSpell(spellInfo, false) || target->IsImmuneToSpellEffect(spellInfo, eff_index, false))
@@ -196,7 +198,11 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         holder->SetInUse(true);
         if (!holder->GetAuraByEffectIndex(eff_index))
         {
-            PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, NULL, holder, target, i_dynobject.GetCaster());
+            Unit* pCaster = i_dynobject.GetCaster()->ToUnit();
+            if (!pCaster)
+                pCaster = target;
+
+            PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, NULL, holder, target, pCaster);
             holder->AddAura(Aur, eff_index);
             
             target->AddAuraToModList(Aur);
@@ -214,8 +220,12 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     }
     else
     {
+        Unit* pCaster = i_dynobject.GetCaster()->ToUnit();
+        if (!pCaster)
+            pCaster = target;
+
         holder = CreateSpellAuraHolder(spellInfo, target, i_dynobject.GetCaster());
-        PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, NULL, holder, target, i_dynobject.GetCaster());
+        PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, NULL, holder, target, pCaster);
         holder->AddAura(Aur, eff_index);
 
         // Debuff slots may be full, in which case holder is deleted or holder is not able to
@@ -226,7 +236,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 
     if (holder && holder->IsChanneled())
     {
-        if (Unit *caster = i_dynobject.GetCaster())
+        if (WorldObject *caster = i_dynobject.GetCaster())
         {
             // Caster is channeling this spell, update current channel spell holders with
             // the new holder. Don't check channel object, as it might be a spell with

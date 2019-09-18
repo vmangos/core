@@ -74,14 +74,14 @@ class Corpse : public WorldObject
         void ResetGhostTime() { m_time = time(NULL); }
         CorpseType GetType() const { return m_type; }
 
-        ReputationRank GetReactionTo(Unit const* unit) const;
-        bool IsHostileTo(Unit const* unit) const;
-        bool IsFriendlyTo(Unit const* unit) const;
+        ReputationRank GetReactionTo(WorldObject const* target) const final override;
+        bool IsHostileTo(WorldObject const* target) const override;
+        bool IsFriendlyTo(WorldObject const* target) const override;
 
         GridPair const& GetGrid() const { return m_grid; }
         void SetGrid(GridPair const& grid) { m_grid = grid; }
 
-        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
+        bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
         Loot loot;                                          // remove insignia ONLY at BG
         Player* lootRecipient;
@@ -92,6 +92,8 @@ class Corpse : public WorldObject
         bool IsExpired(time_t t) const;
         void SetFactionTemplate(FactionTemplateEntry const* entry) { m_faction = entry; }
         FactionTemplateEntry const* GetFactionTemplate() { return m_faction; }
+        uint32 getFaction() const final override { return m_faction->ID; }
+        uint32 getLevel() const final override;
     private:
         GridReference<Corpse> m_gridRef;
         FactionTemplateEntry const* m_faction;

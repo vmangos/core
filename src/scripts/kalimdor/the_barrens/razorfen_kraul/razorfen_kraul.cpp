@@ -304,22 +304,26 @@ CreatureAI* GetAI_npc_snufflenose_gopher(Creature* pCreature)
     return new npc_snufflenose_gopherAI(pCreature);
 }
 
-bool EffectDummyCreature_npc_snufflenose_gopher(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
+bool EffectDummyCreature_npc_snufflenose_gopher(WorldObject* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
 {
+    Unit* pUnit = pCaster->ToUnit();
+    if (!pUnit)
+        return false;
+
     // always check spellid and effectindex
     if (uiSpellId == SPELL_SNUFFLENOSE_COMMAND && uiEffIndex == EFFECT_INDEX_0)
     {
         if (pCreatureTarget->GetEntry() == NPC_SNUFFLENOSE_GOPHER)
         {
             // Do nothing if player has not targeted gopher
-            if (pCaster->GetTargetGuid() != pCreatureTarget->GetObjectGuid())
+            if (pUnit->GetTargetGuid() != pCreatureTarget->GetObjectGuid())
             {
                 // Send Spell_FAILED_BAD_TARGETS
                 pCreatureTarget->SendPetCastFail(uiSpellId, (SpellCastResult)0x0A);
                 return false;
             }
 
-            DoScriptText(SAY_GOPHER_COMMAND, pCreatureTarget, pCaster);
+            DoScriptText(SAY_GOPHER_COMMAND, pCreatureTarget, pUnit);
 
             if (npc_snufflenose_gopherAI* pGopherAI = dynamic_cast<npc_snufflenose_gopherAI*>(pCreatureTarget->AI()))
             {

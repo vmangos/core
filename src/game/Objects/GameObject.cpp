@@ -73,8 +73,20 @@ GameObject::GameObject() : WorldObject(),
 
 GameObject::~GameObject()
 {
+    // set current spells as deletable
+    for (uint32 i = 0; i < CURRENT_MAX_SPELL; ++i)
+    {
+        if (m_currentSpells[i])
+        {
+            m_currentSpells[i]->SetReferencedFromCurrent(false);
+            m_currentSpells[i] = nullptr;
+        }
+    }
+
     delete i_AI;
     delete m_model;
+
+    MANGOS_ASSERT(m_dynObjGUIDs.size() == 0);
 }
 
 void GameObject::AddToWorld()
@@ -112,6 +124,8 @@ void GameObject::RemoveFromWorld()
     {
         if (m_zoneScript)
             m_zoneScript->OnGameObjectRemove(this);
+
+        RemoveAllDynObjects();
 
         // Remove GO from owner
         if (ObjectGuid owner_guid = GetOwnerGuid())
@@ -245,6 +259,18 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
         return;
     }
 
+    m_Events.Update(update_diff);
+
+    // remove finished spells from current pointers
+    for (uint32 i = 0; i < CURRENT_MAX_SPELL; ++i)
+    {
+        if (m_currentSpells[i] && m_currentSpells[i]->getState() == SPELL_STATE_FINISHED)
+        {
+            m_currentSpells[i]->SetReferencedFromCurrent(false);
+            m_currentSpells[i] = nullptr;                      // remove pointer
+        }
+    }
+
     ///- UpdateAI
     if (i_AI)
         i_AI->UpdateAI(update_diff);
@@ -278,12 +304,10 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             SetGoState(GO_STATE_ACTIVE);
                             // SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_NODESPAWN);
 
-                
-                
                             SendForcedObjectUpdate();
 
-                // Play splash sound
-                PlayDistanceSound(3355);
+                            // Play splash sound
+                            PlayDistanceSound(3355);
                             SendGameObjectCustomAnim();
                         }
 
@@ -429,9 +453,11 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
 
                     if (ok && (!AI() || !AI()->OnUse(ok)))
                     {
-                        Unit *caster =  owner ? owner : ok;
+                        if (owner)
+                            owner->CastSpell(ok, goInfo->trap.spellId, true, nullptr, nullptr, GetObjectGuid());
+                        else
+                            CastSpell(ok, goInfo->trap.spellId, true, nullptr, nullptr, GetObjectGuid());
 
-                        caster->CastSpell(ok, goInfo->trap.spellId, true, NULL, NULL, GetObjectGuid());
                         // use template cooldown if provided
                         m_cooldownTime = time(NULL) + (goInfo->trap.cooldown ? goInfo->trap.cooldown : uint32(4));
 
@@ -726,6 +752,16 @@ uint32 GameObject::GetUniqueUseCount()
     return m_UniqueUsers.size();
 }
 
+void GameObject::CleanupsBeforeDelete()
+{
+    if (m_uint32Values)                                     // only for fully created object
+    {
+        InterruptNonMeleeSpells(true);
+        m_Events.KillAllEvents(false);                      // non-delatable (currently casted spells) will not deleted now but it will deleted at call in Map::RemoveAllObjectsInRemoveList
+    }
+    WorldObject::CleanupsBeforeDelete();
+}
+
 void GameObject::Delete()
 {
     if (!IsDeleted())
@@ -987,18 +1023,18 @@ void GameObject::SetVisible(bool b)
     UpdateObjectVisibility();
 }
 
-bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
+bool GameObject::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
     // Not in world
-    if (!IsInWorld() || !u->IsInWorld())
+    if (!IsInWorld() || !pDetector->IsInWorld())
         return false;
 
     // Transport always visible at this step implementation
-    if (IsTransport() && IsInMap(u))
+    if (IsTransport() && IsInMap(pDetector))
         return true;
 
     // quick check visibility false cases for non-GM-mode
-    if (!u->IsGameMaster())
+    if (!pDetector->IsPlayer() || !static_cast<Player const*>(pDetector)->IsGameMaster())
     {
         if (!IsVisible())
             return false;
@@ -1014,14 +1050,18 @@ bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoi
             if(check stuff here)
                 return false;
         }*/
-        if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && IsHostileTo(u))
+        if (Unit const* pDetectorUnit = pDetector->ToUnit())
         {
-            if (!(u->m_detectInvisibilityMask & (1 << 3))) // Detection des pieges
+            if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && IsHostileTo(pDetectorUnit))
+            {
+                if (!(pDetectorUnit->m_detectInvisibilityMask & (1 << 3))) // Detection des pieges
+                    return false;
+            }
+            // Smuggled Mana Cell required 10 invisibility type detection/state
+            if (GetEntry() == 187039 && ((pDetectorUnit->m_detectInvisibilityMask | pDetectorUnit->m_invisibilityMask) & (1 << 10)) == 0)
                 return false;
         }
-        // Smuggled Mana Cell required 10 invisibility type detection/state
-        if (GetEntry() == 187039 && ((u->m_detectInvisibilityMask | u->m_invisibilityMask) & (1 << 10)) == 0)
-            return false;
+        
     }
 
     // check distance
@@ -1340,9 +1380,8 @@ void GameObject::Use(Unit* user)
             // Currently we do not expect trap code below to be Use()
             // directly (except from spell effect). Code here will be called by TriggerLinkedGameObject.
 
-            // FIXME: when GO casting will be implemented trap must cast spell to target
             if (uint32 spellId = GetGOInfo()->trap.spellId)
-                user->CastSpell(user, spellId, true, NULL, NULL, GetObjectGuid());
+                CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
 
             if (uint32 max_charges = GetGOInfo()->GetCharges())
             {
@@ -1989,18 +2028,21 @@ void GameObject::UpdateRotationFields(float rotation2 /*=0.0f*/, float rotation3
     SetFloatValue(GAMEOBJECT_ROTATION + 3, rotation3);
 }
 
-bool GameObject::IsHostileTo(Unit const* unit) const
+bool GameObject::IsHostileTo(WorldObject const* target) const
 {
     // always non-hostile to GM in GM mode
-    if (unit->GetTypeId() == TYPEID_PLAYER && ((Player const*)unit)->IsGameMaster())
+    if (target->GetTypeId() == TYPEID_PLAYER && ((Player const*)target)->IsGameMaster())
         return false;
 
     // test owner instead if have
     if (Unit const* owner = GetOwner())
-        return owner->IsHostileTo(unit);
+        return owner->IsHostileTo(target);
 
-    if (Unit const* targetOwner = unit->GetCharmerOrOwner())
-        return IsHostileTo(targetOwner);
+    if (Unit const* pUnitTarget = target->ToUnit())
+    {
+        if (Unit const* targetOwner = pUnitTarget->GetCharmerOrOwner())
+            return IsHostileTo(targetOwner);
+    }
 
     // for not set faction case (wild object) use hostile case
     if (!GetGOInfo()->faction)
@@ -2008,23 +2050,23 @@ bool GameObject::IsHostileTo(Unit const* unit) const
 
     // faction base cases
     FactionTemplateEntry const*tester_faction = sObjectMgr.GetFactionTemplateEntry(GetGOInfo()->faction);
-    FactionTemplateEntry const*target_faction = unit->getFactionTemplateEntry();
+    FactionTemplateEntry const*target_faction = target->getFactionTemplateEntry();
     if (!tester_faction || !target_faction)
         return false;
 
     // GvP forced reaction and reputation case
-    if (unit->GetTypeId() == TYPEID_PLAYER)
+    if (target->GetTypeId() == TYPEID_PLAYER)
     {
         // forced reaction
         if (tester_faction->faction)
         {
-            if (ReputationRank const* force = ((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+            if (ReputationRank const* force = ((Player*)target)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
                 return *force <= REP_HOSTILE;
 
             // apply reputation state
             FactionEntry const* raw_tester_faction = sObjectMgr.GetFactionEntry(tester_faction->faction);
             if (raw_tester_faction && raw_tester_faction->reputationListID >= 0)
-                return ((Player const*)unit)->GetReputationMgr().GetRank(raw_tester_faction) <= REP_HOSTILE;
+                return ((Player const*)target)->GetReputationMgr().GetRank(raw_tester_faction) <= REP_HOSTILE;
         }
     }
 
@@ -2032,18 +2074,21 @@ bool GameObject::IsHostileTo(Unit const* unit) const
     return tester_faction->IsHostileTo(*target_faction);
 }
 
-bool GameObject::IsFriendlyTo(Unit const* unit) const
+bool GameObject::IsFriendlyTo(WorldObject const* target) const
 {
     // always friendly to GM in GM mode
-    if (unit->GetTypeId() == TYPEID_PLAYER && ((Player const*)unit)->IsGameMaster())
+    if (target->GetTypeId() == TYPEID_PLAYER && ((Player const*)target)->IsGameMaster())
         return true;
 
     // test owner instead if have
     if (Unit const* owner = GetOwner())
-        return owner->IsFriendlyTo(unit);
+        return owner->IsFriendlyTo(target);
 
-    if (Unit const* targetOwner = unit->GetCharmerOrOwner())
-        return IsFriendlyTo(targetOwner);
+    if (Unit const* pUnitTarget = target->ToUnit())
+    {
+        if (Unit const* targetOwner = pUnitTarget->GetCharmerOrOwner())
+            return IsFriendlyTo(targetOwner);
+    }
 
     // for not set faction case (wild object) use hostile case
     if (!GetGOInfo()->faction)
@@ -2051,23 +2096,23 @@ bool GameObject::IsFriendlyTo(Unit const* unit) const
 
     // faction base cases
     FactionTemplateEntry const*tester_faction = sObjectMgr.GetFactionTemplateEntry(GetGOInfo()->faction);
-    FactionTemplateEntry const*target_faction = unit->getFactionTemplateEntry();
+    FactionTemplateEntry const*target_faction = target->getFactionTemplateEntry();
     if (!tester_faction || !target_faction)
         return false;
 
     // GvP forced reaction and reputation case
-    if (unit->GetTypeId() == TYPEID_PLAYER)
+    if (target->GetTypeId() == TYPEID_PLAYER)
     {
         // forced reaction
         if (tester_faction->faction)
         {
-            if (ReputationRank const* force = ((Player*)unit)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
+            if (ReputationRank const* force = ((Player*)target)->GetReputationMgr().GetForcedRankIfAny(tester_faction))
                 return *force >= REP_FRIENDLY;
 
             // apply reputation state
             if (FactionEntry const* raw_tester_faction = sObjectMgr.GetFactionEntry(tester_faction->faction))
                 if (raw_tester_faction->reputationListID >= 0)
-                    return ((Player const*)unit)->GetReputationMgr().GetRank(raw_tester_faction) >= REP_FRIENDLY;
+                    return ((Player const*)target)->GetReputationMgr().GetRank(raw_tester_faction) >= REP_FRIENDLY;
         }
     }
 
@@ -2321,4 +2366,76 @@ void GameObject::Despawn()
     }
     else
         AddObjectToRemoveList();
+}
+
+uint32 GameObject::getLevel() const
+{
+    uint32 level = 0;
+
+    switch (GetGOInfo()->type)
+    {
+        case GAMEOBJECT_TYPE_CHEST:
+            level = GetGOInfo()->chest.level;
+            break;
+        case GAMEOBJECT_TYPE_TRAP:
+            level = GetGOInfo()->trap.level;
+            break;
+    }
+
+    if (!level)
+        level = GetUInt32Value(GAMEOBJECT_LEVEL);
+
+    return level > 0 ? level : DEFAULT_MAX_LEVEL;
+}
+
+// function based on function Unit::CanAttack from 13850 client
+bool GameObject::IsValidAttackTarget(Unit const* target) const
+{
+    ASSERT(target);
+
+    if (FindMap() != target->FindMap())
+        return false;
+
+    // can't attack unattackable units or GMs
+    if (target->GetTypeId() == TYPEID_PLAYER && target->ToPlayer()->IsGameMaster())
+        return false;
+
+    // check flags
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_TAXI_FLIGHT | UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_NON_ATTACKABLE_2))
+        return false;
+
+    // CvC case - can attack each other only when one of them is hostile
+    if (!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+        return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
+
+    // PvP, PvC, CvP case
+    // can't attack friendly targets
+    if (GetReactionTo(target) > REP_NEUTRAL
+        || target->GetReactionTo(this) > REP_NEUTRAL)
+        return false;
+
+    Player const* playerAffectingTarget = target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) ? target->GetAffectingPlayer() : nullptr;
+
+    // Not all neutral creatures can be attacked
+    if (GetReactionTo(target) == REP_NEUTRAL &&
+        target->GetReactionTo(this) == REP_NEUTRAL)
+    {
+        if (playerAffectingTarget)
+        {
+            Player const* player = playerAffectingTarget;
+            WorldObject const* non_player = this;
+
+            if (FactionTemplateEntry const* factionTemplate = non_player->getFactionTemplateEntry())
+            {
+                if (!(player->GetReputationMgr().GetForcedRankIfAny(factionTemplate)))
+                    if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(factionTemplate->faction))
+                        if (FactionState const* repState = player->GetReputationMgr().GetState(factionEntry))
+                            if (!(repState->Flags & FACTION_FLAG_AT_WAR))
+                                return false;
+
+            }
+        }
+    }
+
+    return true;
 }

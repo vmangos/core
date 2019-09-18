@@ -590,8 +590,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
             return GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS;
         }
 
-        uint32 GetLevelForTarget(Unit const* target) const override; // overwrite Unit::GetLevelForTarget for boss level support
-
         bool IsInEvadeMode() const;
 
         bool AIM_Initialize();
@@ -708,7 +706,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         Cell const& GetCurrentCell() const { return m_currentCell; }
         void SetCurrentCell(Cell const& cell) { m_currentCell = cell; }
 
-        bool IsVisibleInGridForPlayer(Player* pl) const override;
+        bool IsVisibleInGridForPlayer(Player const* pl) const override;
 
         void RemoveCorpse();
         bool IsDeadByDefault() const { return m_isDeadByDefault; };

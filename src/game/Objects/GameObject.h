@@ -624,6 +624,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         uint32 ComputeRespawnDelay() const; // Applies dynamic / random respawn timers if needed.
         void Refresh();
         void Delete();
+        void CleanupsBeforeDelete() override;
 
         // Functions spawn/remove gameobject with DB guid in all loaded map copies (if point grid loaded in map)
         static void AddToRemoveListInMaps(uint32 db_guid, GameObjectData const* data);
@@ -694,15 +695,13 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
                                                             // 0 = use `gameobject`.`spawntimesecs`
         void ResetDoorOrButton();
 
-        bool IsHostileTo(Unit const* unit) const;
-        bool IsFriendlyTo(Unit const* unit) const;
+        bool IsHostileTo(WorldObject const* target) const override;
+        bool IsFriendlyTo(WorldObject const* target) const override;
 
         void SummonLinkedTrapIfAny();
         void TriggerLinkedGameObject(Unit* target);
         void RespawnLinkedGameObject();
-
-        bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
-
+        
         GameObject* LookupFishingHoleAround(float range);
 
         GridReference<GameObject> &GetGridRef() { return m_gridRef; }
@@ -730,7 +729,11 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         bool IsVisible() const { return m_visible; }
         void SetVisible(bool b);
+        bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
+        uint32 getFaction() const final override { return GetGOInfo()->faction; }
+        uint32 getLevel() const final override;
+        bool IsValidAttackTarget(Unit const* target) const final override;
     protected:
         bool        m_visible;
         uint32      m_spellId;

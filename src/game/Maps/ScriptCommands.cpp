@@ -566,24 +566,24 @@ bool Map::ScriptCommand_CastSpell(const ScriptInfo& script, WorldObject* source,
     Unit* pUnitSource = ToUnit(source);
     Unit* pUnitTarget = ToUnit(target);
     
-    if (!pUnitSource)
+    if (!source)
     {
-        sLog.outError("SCRIPT_COMMAND_CAST_SPELL (script id %u) call for a NULL or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        sLog.outError("SCRIPT_COMMAND_CAST_SPELL (script id %u) call for a NULL source, skipping.", script.id);
         return ShouldAbortScript(script);
     }
 
     if (!pUnitTarget)
         return ShouldAbortScript(script);
 
-    if ((script.castSpell.flags & CF_INTERRUPT_PREVIOUS) && pUnitSource->IsNonMeleeSpellCasted(false))
+    if ((script.castSpell.flags & CF_INTERRUPT_PREVIOUS) && pUnitSource && pUnitSource->IsNonMeleeSpellCasted(false))
         pUnitSource->InterruptNonMeleeSpells(false);
 
-    Creature* pCreatureSource = pUnitSource->ToCreature();
+    Creature* pCreatureSource = source->ToCreature();
 
     if (pCreatureSource)
         pCreatureSource->TryToCast(pUnitTarget, script.castSpell.spellId, script.castSpell.flags, 0u);
     else
-        pUnitSource->CastSpell(pUnitTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
+        source->CastSpell(pUnitTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
 
     return false;
 }

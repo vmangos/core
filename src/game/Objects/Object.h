@@ -29,6 +29,7 @@
 #include "ObjectGuid.h"
 #include "Camera.h"
 #include "SpellEntry.h"
+#include "Utilities/EventProcessor.h"
 
 #include <set>
 #include <string>
@@ -81,6 +82,8 @@ class Creature;
 class Player;
 class Unit;
 class Map;
+class Item;
+class Aura;
 class UpdateMask;
 class InstanceData;
 class TerrainInfo;
@@ -634,6 +637,65 @@ class MANGOS_DLL_SPEC Object
 
 struct WorldObjectChangeAccumulator;
 
+// At least some values expected fixed and used in auras field, other custom
+enum MeleeHitOutcome
+{
+    MELEE_HIT_EVADE = 0,
+    MELEE_HIT_MISS = 1,
+    MELEE_HIT_DODGE = 2,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_BLOCK = 3,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_PARRY = 4,                                // used as misc in SPELL_AURA_IGNORE_COMBAT_RESULT
+    MELEE_HIT_GLANCING = 5,
+    MELEE_HIT_CRIT = 6,
+    MELEE_HIT_CRUSHING = 7,
+    MELEE_HIT_NORMAL = 8,
+    MELEE_HIT_BLOCK_CRIT = 9,
+};
+
+// Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
+struct SpellNonMeleeDamage {
+    SpellNonMeleeDamage(WorldObject *_attacker, Unit *_target, uint32 _SpellID, SpellSchools _school)
+        : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
+        absorb(0), resist(0), periodicLog(false), unused(false), blocked(0), HitInfo(0), spell(nullptr)
+    {}
+
+    Unit   *target;
+    WorldObject   *attacker;
+    uint32 SpellID;
+    uint32 damage;
+    SpellSchools school;
+    uint32 absorb;
+    int32 resist;
+    bool   periodicLog;
+    bool   unused;
+    uint32 blocked;
+    uint32 HitInfo;
+    Spell *spell;
+};
+
+struct CleanDamage
+{
+    CleanDamage(uint32 _damage, WeaponAttackType _attackType, MeleeHitOutcome _hitOutCome, uint32 _Absorb, int32 _Resist) :
+    damage(_damage), attackType(_attackType), hitOutCome(_hitOutCome), absorb(_Absorb), resist(_Resist) {}
+
+    uint32 damage;
+    WeaponAttackType attackType;
+    MeleeHitOutcome hitOutCome;
+    uint32 absorb;
+    int32 resist;
+};
+
+enum CurrentSpellTypes
+{
+    CURRENT_MELEE_SPELL             = 0,
+    CURRENT_GENERIC_SPELL           = 1,
+    CURRENT_AUTOREPEAT_SPELL        = 2,
+    CURRENT_CHANNELED_SPELL         = 3
+};
+
+#define CURRENT_FIRST_NON_MELEE_SPELL 1
+#define CURRENT_MAX_SPELL             4
+
 class MANGOS_DLL_SPEC WorldObject : public Object
 {
     friend struct WorldObjectChangeAccumulator;
@@ -650,8 +712,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
                 void Update(uint32 time_diff)
                 {
-m_obj->Update(m_obj->m_updateTracker.timeElapsed(), time_diff);
-m_obj->m_updateTracker.Reset();
+                    m_obj->Update(m_obj->m_updateTracker.timeElapsed(), time_diff);
+                    m_obj->m_updateTracker.Reset();
                 }
 
                 void UpdateRealTime(uint32 now, uint32 time_diff)
@@ -778,6 +840,10 @@ m_obj->m_updateTracker.Reset();
         bool isInFront(WorldObject const* target,float distance, float arc = M_PI) const;
         bool isInBack(WorldObject const* target, float distance, float arc = M_PI) const;
 
+        bool CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
+        float GetLeewayBonusRange(const Unit* target, bool ability) const;
+        float GetLeewayBonusRadius() const;
+
         // Gestion des positions
         void GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z);
         void GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o);
@@ -845,9 +911,17 @@ m_obj->m_updateTracker.Reset();
 
         void SendObjectDeSpawnAnim(ObjectGuid guid) const;
 
-        virtual bool IsHostileTo(Unit const* unit) const =0;
-        virtual bool IsFriendlyTo(Unit const* unit) const =0;
+        virtual bool IsHostileTo(WorldObject const* target) const =0;
+        virtual bool IsFriendlyTo(WorldObject const* target) const =0;
+        virtual uint32 getFaction() const = 0;
+        FactionTemplateEntry const* getFactionTemplateEntry() const;
+        virtual ReputationRank GetReactionTo(WorldObject const* target) const;
+        ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
+        virtual bool IsValidAttackTarget(Unit const* target) const { return false; }
+        virtual bool isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return isVisibleForInState(pDetector, viewPoint, inVisibleList); }
+
         bool IsControlledByPlayer() const;
+        bool IsLikePlayer() const;
 
         virtual void SaveRespawnTime() {}
         void AddObjectToRemoveList();
@@ -859,10 +933,10 @@ m_obj->m_updateTracker.Reset();
 
         // main visibility check function in normal case (ignore grey zone distance check)
         bool isWithinVisibilityDistanceOf(Unit const* viewer, WorldObject const* viewpoint, bool inVisibleList = false) const;
-        bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const { return isVisibleForInState(u,viewPoint,false); }
+        bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const;
 
         // low level function for visibility change code, must be define in all main world object subclasses
-        virtual bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const = 0;
+        virtual bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
 
         void SetMap(Map * map);
         Map * GetMap() const;
@@ -927,6 +1001,87 @@ m_obj->m_updateTracker.Reset();
         uint32 GetCreatureSummonLimit() const { return m_creatureSummonLimit; }
         void SetCreatureSummonLimit(uint32 limit);
 
+        virtual uint32 getLevel() const = 0;
+        uint32 GetLevelForTarget(WorldObject const* target = nullptr) const;
+        uint16 GetSkillMaxForLevel(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; };
+        uint32 GetWeaponSkillValue(WeaponAttackType attType, WorldObject const* target = nullptr) const;
+        uint32 GetUnitMeleeSkill(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; }
+        uint32 GetDefenseSkillValue(WorldObject const* target = nullptr) const;
+
+        virtual Player* GetAffectingPlayer() const { return nullptr; }
+        Unit* SelectMagnetTarget(Unit *victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
+
+        void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        void CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        
+        void SetCurrentCastedSpell(Spell * pSpell);
+        Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
+        Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
+        bool CheckAndIncreaseCastCounter();
+        void DecreaseCastCounter() { if (m_castCounter) --m_castCounter; }
+
+        // set withDelayed to true to account delayed spells as casted
+        // delayed+channeled spells are always accounted as casted
+        // we can skip channeled or delayed checks using flags
+        bool IsNonMeleeSpellCasted(bool withDelayed = false, bool skipChanneled = false, bool skipAutorepeat = false) const;
+        bool IsNextSwingSpellCasted() const;
+        // for movement generators, check if current casted spell has movement interrupt flags
+        bool IsNoMovementSpellCasted() const;
+
+        // set withDelayed to true to interrupt delayed spells too
+        // delayed+channeled spells are always interrupted
+        void InterruptNonMeleeSpells(bool withDelayed, uint32 spellid = 0);
+        void InterruptSpellsWithInterruptFlags(uint32 flags, uint32 except = 0);
+        void InterruptSpell(CurrentSpellTypes spellType, bool withDelayed = true);
+        void FinishSpell(CurrentSpellTypes spellType, bool ok = true);
+        
+        virtual bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const { return false; }
+        uint32 SpellCriticalHealingBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim) const;
+        uint32 SpellCriticalDamageBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim, Spell* spell = nullptr);
+        float  MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        int32 MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
+        SpellMissInfo SpellHitResult(Unit *pVictim, SpellEntry const *spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
+        void ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const *procSpell = nullptr, Spell* spell = nullptr);
+        void CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, SpellEntry const *spellInfo, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
+        int32 CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr);
+        int32 SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject *pCaster, Spell* spell = nullptr);
+        static float CalculateLevelPenalty(SpellEntry const* spellProto);
+        uint32 SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
+        uint32 SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        int32 SpellBaseHealingBonusDone(SpellSchoolMask schoolMask);
+        uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage) const;
+        uint32 MeleeDamageBonusDone(Unit *pVictim, uint32 damage, WeaponAttackType attType, SpellEntry const *spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
+        virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
+        float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
+        virtual uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell = nullptr);
+        void DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb);
+        void DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss);
+        void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log);
+        void SendSpellNonMeleeDamageLog(Unit *target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
+        void SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo);
+        int32 DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical = false);
+        void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
+        void EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
+        void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
+
+        void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut);
+        DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex);
+        DynamicObject* GetDynObject(uint32 spellId);
+        void AddDynObject(DynamicObject* dynObj);
+        void RemoveDynObject(uint32 spellid);
+        void RemoveDynObjectWithGUID(ObjectGuid guid) { m_dynObjGUIDs.remove(guid); }
+        void RemoveAllDynObjects();
+
+        // Event handler
+        EventProcessor m_Events;
     protected:
         explicit WorldObject();
 
@@ -951,9 +1106,31 @@ m_obj->m_updateTracker.Reset();
         
         float m_lootAndXPRangeModifier;
 
-        uint32 m_creatureSummonCount;   // Current summon count
-        uint32 m_creatureSummonLimit;   // Hard limit on creature summons
-        uint32 m_summonLimitAlert;      // Timer to alert GMs if a creature is at the summon limit
+        uint32 m_creatureSummonCount;                       // Current summon count
+        uint32 m_creatureSummonLimit;                       // Hard limit on creature summons
+        uint32 m_summonLimitAlert;                          // Timer to alert GMs if a creature is at the summon limit
+
+        typedef std::list<ObjectGuid> DynObjectGUIDs;
+        DynObjectGUIDs m_dynObjGUIDs;
+
+        std::array<Spell*, CURRENT_MAX_SPELL> m_currentSpells{};
+        uint32 m_castCounter = 0;                           // count casts chain of triggered spells for prevent infinity cast crashes
+    private:
+        // Error traps for some wrong args using
+        // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type
+        // no bodies expected for this declarations
+        template <typename TR>
+        void CastSpell(Unit* Victim, uint32 spell, TR triggered);
+        template <typename TR>
+        void CastSpell(Unit* Victim, SpellEntry const* spell, TR triggered);
+        template <typename TR>
+        void CastCustomSpell(Unit* Victim, uint32 spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
+        template <typename SP, typename TR>
+        void CastCustomSpell(Unit* Victim, SpellEntry const* spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
+        template <typename TR>
+        void CastSpell(float x, float y, float z, uint32 spell, TR triggered);
+        template <typename TR>
+        void CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
 };
 
 // Helper functions to cast between different Object pointers. Useful when unsure that your object* is valid at all.

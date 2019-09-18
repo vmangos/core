@@ -162,7 +162,7 @@ class SpellCastTargets
 
         bool IsEmpty() const { return !m_GOTargetGUID && !m_unitTargetGUID && !m_itemTarget && !m_CorpseTargetGUID; }
 
-        void Update(Unit* caster);
+        void Update(WorldObject* caster);
 
         float m_srcX, m_srcY, m_srcZ;
         float m_destX, m_destY, m_destZ;
@@ -224,7 +224,7 @@ class Spell
 {
     friend struct MaNGOS::SpellNotifierPlayer;
     friend struct MaNGOS::SpellNotifierCreatureAndPlayer;
-    friend void Unit::SetCurrentCastedSpell( Spell * pSpell );
+    friend void WorldObject::SetCurrentCastedSpell(Spell* pSpell);
     public:
 
         void EffectEmpty(SpellEffectIndex eff_idx);
@@ -325,6 +325,7 @@ class Spell
         void HandleAddTargetTriggerAuras();
 
         Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL, Unit* victim = NULL, SpellEntry const* triggeredByParent = NULL);
+        Spell(GameObject* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL, Unit* victim = NULL, SpellEntry const* triggeredByParent = NULL);
         ~Spell();
 
         SpellCastResult prepare(SpellCastTargets targets, Aura* triggeredByAura = nullptr, uint32 chance = 0);
@@ -421,7 +422,7 @@ class Spell
         {
             return  m_spellInfo->Attributes & SPELL_ATTR_RANGED;
         }
-        bool IsChannelActive() const { return m_caster->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0; }
+        bool IsChannelActive() const { return m_casterUnit ? m_casterUnit->GetUInt32Value(UNIT_CHANNEL_SPELL) != 0 : false; }
         bool IsMeleeAttackResetSpell() const { return !m_IsTriggeredSpell && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK);  }
         bool IsRangedAttackResetSpell() const { return !m_IsTriggeredSpell && IsRangedSpell() && (m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_AUTOATTACK); }
 
@@ -439,11 +440,11 @@ class Spell
 
         // caster types:
         // formal spell caster, in game source of spell affects cast
-        Unit* GetCaster() const { return m_caster; }
+        WorldObject* GetCaster() const { return m_caster; }
         // real source of cast affects, explicit caster, or DoT/HoT applier, or GO owner, or wild GO itself. Can be NULL
         WorldObject* GetAffectiveCasterObject() const;
         // limited version returning NULL in cases wild gameobject caster object, need for Aura (auras currently not support non-Unit caster)
-        Unit* GetAffectiveCaster() const { return m_originalCasterGUID ? m_originalCaster : m_caster; }
+        Unit* GetAffectiveCaster() const { return m_originalCasterGUID ? m_originalCaster : m_casterUnit; }
         // m_originalCasterGUID can store GO guid, and in this case this is visual caster
         WorldObject* GetCastingObject() const;
 
@@ -502,10 +503,12 @@ class Spell
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
 
-        Unit* m_caster;
+        WorldObject* const m_caster = nullptr;
+        Unit* const m_casterUnit = nullptr;
+        GameObject* const m_casterGo = nullptr;
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
-                                                            // e.g. damage around area spell trigered by victim aura and da,age emeies of aura caster
+                                                            // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
         Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
 
         Spell** m_selfContainer;                            // pointer to our spell container (if applicable)

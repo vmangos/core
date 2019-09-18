@@ -582,21 +582,25 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
 
     if (spell)
     {
-        // Nostalrius: ne pas consommer les SpellModifier si 'castTime' = 0 (Eclat lunaire / Grace de la nature 16886)
-        if (castTime)
-            if (Player* modOwner = spell->GetCaster()->GetSpellModOwner())
-                modOwner->ApplySpellMod(Id, SPELLMOD_CASTING_TIME, castTime, spell);
-
-        if (!(Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_TRADESPELL)))
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-            castTime = int32(castTime * spell->GetCaster()->GetFloatValue(UNIT_MOD_CAST_SPEED));
-#else
-            castTime = int32(castTime * (1.0f + spell->GetCaster()->GetInt32Value(UNIT_MOD_CAST_SPEED)/100.0f));
-#endif
-        else
+        if (Unit* pUnit = spell->GetCaster()->ToUnit())
         {
-            if (spell->IsRangedSpell() && !spell->IsAutoRepeat())
-                castTime = int32(castTime * spell->GetCaster()->m_modAttackSpeedPct[RANGED_ATTACK]);
+            // Nostalrius: do not consume the Spell Mod if 'castTime' = 0 (Nature's Grace 16886)
+            if (castTime)
+                if (Player* modOwner = pUnit->GetSpellModOwner())
+                    modOwner->ApplySpellMod(Id, SPELLMOD_CASTING_TIME, castTime, spell);
+
+            if (!(Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_TRADESPELL)))
+            {
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+                castTime = int32(castTime * pUnit->GetFloatValue(UNIT_MOD_CAST_SPEED));
+#else
+                castTime = int32(castTime * (1.0f + pUnit->GetInt32Value(UNIT_MOD_CAST_SPEED) / 100.0f));
+#endif
+            }
+            else if (spell->IsRangedSpell() && !spell->IsAutoRepeat())
+            {
+                castTime = int32(castTime * pUnit->m_modAttackSpeedPct[RANGED_ATTACK]);
+            }
         }
     }
 
@@ -727,7 +731,7 @@ float SpellEntry::CalculateDefaultCoefficient(DamageEffectType const damagetype)
     return coeff * DotFactor;
 }
 
-float SpellEntry::CalculateCustomCoefficient(Unit const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const
+float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart) const
 {
     if (!caster)
         return coeff;
@@ -773,10 +777,13 @@ float SpellEntry::CalculateCustomCoefficient(Unit const* caster, DamageEffectTyp
 
                 if (spell->GetTargetNum() > 1)
                 {
-                    if (Player* modOwner = caster->GetSpellModOwner())
+                    if (Unit const* pUnit = caster->ToUnit())
                     {
-                        // Improved Chain Heal (T2 3/8 bonus) / Gift of the Gathering Storm Chain Lightning Bonus
-                        modOwner->ApplySpellMod(spell->m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, spell);
+                        if (Player* modOwner = pUnit->GetSpellModOwner())
+                        {
+                            // Improved Chain Heal (T2 3/8 bonus) / Gift of the Gathering Storm Chain Lightning Bonus
+                            modOwner->ApplySpellMod(spell->m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, spell);
+                        }
                     }
                 }
 
@@ -808,7 +815,7 @@ int32 SpellEntry::GetMaxDuration() const
     return (du->Duration[2] == -1) ? -1 : abs(du->Duration[2]);
 }
 
-int32 SpellEntry::CalculateDuration(Unit const* caster) const
+int32 SpellEntry::CalculateDuration(WorldObject const* caster) const
 {
     int32 duration = GetDuration();
 
@@ -816,15 +823,19 @@ int32 SpellEntry::CalculateDuration(Unit const* caster) const
     {
         int32 maxduration = GetMaxDuration();
 
-        if (duration != maxduration && caster->GetTypeId() == TYPEID_PLAYER)
-            duration += int32((maxduration - duration) * ((Player*)caster)->GetComboPoints() / 5);
+        if (duration != maxduration)
+            if (Player const* pPlayer = caster->ToPlayer())
+                duration += int32((maxduration - duration) * pPlayer->GetComboPoints() / 5);
 
-        if (Player* modOwner = caster->GetSpellModOwner())
+        if (Unit const* pUnit = caster->ToUnit())
         {
-            modOwner->ApplySpellMod(Id, SPELLMOD_DURATION, duration);
+            if (Player* modOwner = pUnit->GetSpellModOwner())
+            {
+                modOwner->ApplySpellMod(Id, SPELLMOD_DURATION, duration);
 
-            if (duration < 0)
-                duration = 0;
+                if (duration < 0)
+                    duration = 0;
+            }
         }
     }
 
@@ -857,7 +868,7 @@ uint16 SpellEntry::GetAuraMaxTicks() const
     return 6;
 }
 
-bool SpellEntry::IsPositiveSpell(Unit* caster, Unit* victim) const
+bool SpellEntry::IsPositiveSpell(WorldObject* caster, Unit* victim) const
 {
     if (Attributes & SPELL_ATTR_NEGATIVE)
         return false;
@@ -869,7 +880,7 @@ bool SpellEntry::IsPositiveSpell(Unit* caster, Unit* victim) const
     return true;
 }
 
-bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, Unit* caster, Unit* victim) const
+bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster, Unit* victim) const
 {
     // Nostalrius (SpellMod)
     if (Custom & SPELL_CUSTOM_POSITIVE)

@@ -60,7 +60,7 @@ void DynamicObject::RemoveFromWorld()
     Object::RemoveFromWorld();
 }
 
-bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type)
+bool DynamicObject::Create(uint32 guidlow, WorldObject* caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type)
 {
     WorldObject::_Create(guidlow, HIGHGUID_DYNAMICOBJECT);
     SetMap(caster->GetMap());
@@ -123,17 +123,39 @@ bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEf
     return true;
 }
 
-Unit* DynamicObject::GetCaster() const
+WorldObject* DynamicObject::GetCaster() const
 {
+    if (ObjectGuid guid = GetCasterGuid())
+    {
+        if (!guid.IsEmpty())
+        {
+            if (guid.IsUnit())
+                return ObjectAccessor::GetUnit(*this, guid);
+            else if (guid.IsGameObject())
+            {
+                return GetMap()->GetGameObject(guid);
+            }
+        }
+    }
     // can be not found in some cases
-    return ObjectAccessor::GetUnit(*this, GetCasterGuid());
+    return nullptr;
+}
+
+uint32 DynamicObject::getFaction() const
+{
+    return GetCaster()->getFaction();
+}
+
+uint32 DynamicObject::getLevel() const
+{
+    return GetCaster()->getLevel();
 }
 
 void DynamicObject::Update(uint32 update_diff, uint32 p_time)
 {
     WorldObject::Update(update_diff, p_time);
     // caster can be not in world at time dynamic object update, but dynamic object not yet deleted in Unit destructor
-    Unit* caster = GetCaster();
+    WorldObject* caster = GetCaster();
     if (!caster)
     {
         Delete();
@@ -152,7 +174,7 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
     if (m_aliveDuration <= 0)
         m_aliveDuration = 0;
 
-    if (m_aliveDuration == 0 && (!m_channeled || caster->GetChannelObjectGuid() != GetObjectGuid()))
+    if (m_aliveDuration == 0 && (!m_channeled || (caster->IsUnit() && static_cast<Unit*>(caster)->GetChannelObjectGuid() != GetObjectGuid())))
         deleteThis = true;
 
     for (AffectedMap::iterator iter = m_affected.begin(); iter != m_affected.end(); ++iter)
@@ -229,31 +251,31 @@ void DynamicObject::Delay(int32 delaytime)
     }
 }
 
-bool DynamicObject::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
+bool DynamicObject::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    if (!IsInWorld() || !u->IsInWorld())
+    if (!IsInWorld() || !pDetector->IsInWorld())
         return false;
 
     // always seen by owner
-    if (GetCasterGuid() == u->GetObjectGuid())
+    if (GetCasterGuid() == pDetector->GetObjectGuid())
         return true;
 
     // normal case
     return IsWithinDistInMap(viewPoint, GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
 }
 
-bool DynamicObject::IsHostileTo(Unit const* unit) const
+bool DynamicObject::IsHostileTo(WorldObject const* target) const
 {
-    if (Unit* owner = GetCaster())
-        return owner->IsHostileTo(unit);
+    if (WorldObject* owner = GetCaster())
+        return owner->IsHostileTo(target);
     else
         return false;
 }
 
-bool DynamicObject::IsFriendlyTo(Unit const* unit) const
+bool DynamicObject::IsFriendlyTo(WorldObject const* target) const
 {
-    if (Unit* owner = GetCaster())
-        return owner->IsFriendlyTo(unit);
+    if (WorldObject* owner = GetCaster())
+        return owner->IsFriendlyTo(target);
     else
         return true;
 }

@@ -230,7 +230,7 @@ CreatureAI* GetAI_boss_thermaplugg(Creature* pCreature)
     return new boss_thermapluggAI(pCreature);
 }
 
-bool EffectDummyCreature_spell_boss_thermaplugg(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
+bool EffectDummyCreature_spell_boss_thermaplugg(WorldObject* /*pCaster*/, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
 {
     if ((uiSpellId != SPELL_ACTIVATE_BOMB_A && uiSpellId != SPELL_ACTIVATE_BOMB_B) || uiEffIndex != EFFECT_INDEX_0)
         return false;

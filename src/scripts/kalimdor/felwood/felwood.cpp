@@ -107,7 +107,7 @@ CreatureAI* GetAI_npc_kitten(Creature* pCreature)
     return new npc_kittenAI(pCreature);
 }
 
-bool EffectDummyCreature_npc_kitten(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex effIndex, Creature* pCreatureTarget)
+bool EffectDummyCreature_npc_kitten(WorldObject* /*pCaster*/, uint32 uiSpellId, SpellEffectIndex effIndex, Creature* pCreatureTarget)
 {
     //always check spellid and effectindex
     if (uiSpellId == SPELL_CORRUPT_SABER_VISUAL && effIndex == EFFECT_INDEX_0)

@@ -52,7 +52,7 @@ enum
     SPELL_BLAZERUNNER_AURA              = 13913
 };
 
-bool EffectDummyCreature_spell_dummy_npc(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
+bool EffectDummyCreature_spell_dummy_npc(WorldObject* /*pCaster*/, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
 {
     switch (uiSpellId)
     {

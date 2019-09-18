@@ -1112,7 +1112,7 @@ bool QuestAccept_npc_keeper_remulos(Player* pPlayer, Creature* pCreature, const 
     return true;
 }
 
-bool EffectDummyCreature_conjure_rift(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
+bool EffectDummyCreature_conjure_rift(WorldObject* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
 {
     //always check spellid and effectindex
     if (uiSpellId == SPELL_CONJURE_RIFT && uiEffIndex == EFFECT_INDEX_0)

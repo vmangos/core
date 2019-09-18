@@ -102,6 +102,7 @@ class MANGOS_DLL_DECL ObjectGridStoper
 
         void Stop(GridType &grid);
         void Visit(CreatureMapType &m);
+        void Visit(GameObjectMapType &m);
 
         template<class NONACTIVE> void Visit(GridRefManager<NONACTIVE> &) {}
     private:

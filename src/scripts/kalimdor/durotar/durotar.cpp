@@ -177,14 +177,13 @@ struct LazyPeonAI : public ScriptedAI
     }
 };
 
-bool peon_wake_up(Unit *caster, uint32 spellId, SpellEffectIndex effIndex, Creature *crTarget)
+bool peon_wake_up(WorldObject* pCaster, uint32 spellId, SpellEffectIndex effIndex, Creature *crTarget)
 {
     if (spellId == SPELL_AWAKEN_PEON && crTarget->GetEntry() == LAZY_PEON_ENTRY && crTarget->HasAura(SPELL_BUFF_SLEEP))
     {
         /** Display updated quest status */
-        Player* player;
-        if (player = caster->ToPlayer())
-            player->KilledMonsterCredit(crTarget->GetEntry(), crTarget->GetObjectGuid());
+        if (Player* pPlayer = pCaster->ToPlayer())
+            pPlayer->KilledMonsterCredit(crTarget->GetEntry(), crTarget->GetObjectGuid());
     }
 
     return true;

@@ -255,31 +255,31 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
     return true;
 }
 
-bool Corpse::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
+bool Corpse::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    return IsInWorld() && u->IsInWorld() && IsWithinDist(viewPoint, u->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
+    return IsInWorld() && pDetector->IsInWorld() && IsWithinDist(viewPoint, pDetector->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
 }
 
-ReputationRank Corpse::GetReactionTo(Unit const* unit) const
+ReputationRank Corpse::GetReactionTo(WorldObject const* target) const
 {
     if (Player* owner = sObjectMgr.GetPlayer(GetOwnerGuid()))
-        return owner->GetReactionTo(unit);
-    else if (unit->IsPlayer() && unit->ToPlayer()->GetGroup() && unit->ToPlayer()->GetGroup()->IsMember(GetOwnerGuid()))
+        return owner->GetReactionTo(target);
+    else if (target->IsPlayer() && target->ToPlayer()->GetGroup() && target->ToPlayer()->GetGroup()->IsMember(GetOwnerGuid()))
         return REP_FRIENDLY;
     else if (m_faction)
-        return Unit::GetFactionReactionTo(m_faction, unit);
+        return WorldObject::GetFactionReactionTo(m_faction, target);
     else
         return REP_NEUTRAL;
 }
 
-bool Corpse::IsHostileTo(Unit const* unit) const
+bool Corpse::IsHostileTo(WorldObject const* target) const
 {
-    return GetReactionTo(unit) <= REP_HOSTILE;
+    return GetReactionTo(target) <= REP_HOSTILE;
 }
 
-bool Corpse::IsFriendlyTo(Unit const* unit) const
+bool Corpse::IsFriendlyTo(WorldObject const* target) const
 {
-    return GetReactionTo(unit) >= REP_FRIENDLY;
+    return GetReactionTo(target) >= REP_FRIENDLY;
 }
 
 bool Corpse::IsExpired(time_t t) const
@@ -288,4 +288,11 @@ bool Corpse::IsExpired(time_t t) const
         return m_time < t - sWorld.getConfig(CONFIG_UINT32_BONES_EXPIRE_MINUTES) * MINUTE;
     else
         return m_time < t - 3 * DAY;
+}
+
+uint32 Corpse::getLevel() const
+{
+    if (Unit* pOwner = ObjectAccessor::GetUnit(*this, GetOwnerGuid()))
+        return pOwner->getLevel();
+    return DEFAULT_MAX_LEVEL;
 }
