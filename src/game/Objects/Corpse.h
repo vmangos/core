@@ -74,9 +74,9 @@ class Corpse : public WorldObject
         void ResetGhostTime() { m_time = time(NULL); }
         CorpseType GetType() const { return m_type; }
 
-        ReputationRank GetReactionTo(WorldObject const* target) const;
-        bool IsHostileTo(WorldObject const* target) const;
-        bool IsFriendlyTo(WorldObject const* target) const;
+        ReputationRank GetReactionTo(WorldObject const* target) const final override;
+        bool IsHostileTo(WorldObject const* target) const override;
+        bool IsFriendlyTo(WorldObject const* target) const override;
 
         GridPair const& GetGrid() const { return m_grid; }
         void SetGrid(GridPair const& grid) { m_grid = grid; }

@@ -60,8 +60,8 @@ class DynamicObject : public WorldObject
         void RemoveAffected(Unit *unit) { m_affected.erase(unit->GetObjectGuid()); }
         void Delay(int32 delaytime);
 
-        bool IsHostileTo(WorldObject const* target) const;
-        bool IsFriendlyTo(WorldObject const* target) const;
+        bool IsHostileTo(WorldObject const* target) const override;
+        bool IsFriendlyTo(WorldObject const* target) const override;
         uint32 getFaction() const final override;
         uint32 getLevel() const final override;
 

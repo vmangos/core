@@ -915,7 +915,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         virtual bool IsFriendlyTo(WorldObject const* target) const =0;
         virtual uint32 getFaction() const = 0;
         FactionTemplateEntry const* getFactionTemplateEntry() const;
-        ReputationRank GetReactionTo(WorldObject const* target) const;
+        virtual ReputationRank GetReactionTo(WorldObject const* target) const;
         ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
         virtual bool IsValidAttackTarget(Unit const* target) const { return false; }
         virtual bool isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return isVisibleForInState(pDetector, viewPoint, inVisibleList); }

@@ -701,7 +701,6 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void SummonLinkedTrapIfAny();
         void TriggerLinkedGameObject(Unit* target);
         void RespawnLinkedGameObject();
-
         
         GameObject* LookupFishingHoleAround(float range);
 

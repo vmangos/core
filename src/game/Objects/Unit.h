@@ -306,7 +306,6 @@ class Aura;
 class SpellAuraHolder;
 class Creature;
 class Spell;
-class DynamicObject;
 class GameObject;
 class Item;
 class Pet;
@@ -1302,34 +1301,24 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual void Mount(uint32 mount, uint32 spellId = 0);
         virtual void Unmount(bool from_aura = false);
 
+        void HandleEmote(uint32 emote_id);                  // auto-select command/state
+        void HandleEmoteCommand(uint32 emote_id);
+        void HandleEmoteState(uint32 emote_id);
+
         // Kills the victim.
         void DoKillUnit(Unit *victim = nullptr);
         uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell = nullptr) final override;
         // Called after this unit kills someone.
         void Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss = true);
-
         void PetOwnerKilledUnit(Unit* pVictim);
 
-        
         void ProcDamageAndSpellFor(bool isVictim, Unit * pTarget, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, SpellEntry const* procSpell, uint32 damage, ProcTriggeredList& triggeredList, Spell* spell = nullptr);
         void HandleTriggers(Unit *pVictim, uint32 procExtra, uint32 amount, SpellEntry const *procSpell, ProcTriggeredList const& procTriggered);
-
-        void HandleEmote(uint32 emote_id);                  // auto-select command/state
-        void HandleEmoteCommand(uint32 emote_id);
-        void HandleEmoteState(uint32 emote_id);
         void AttackerStateUpdate (Unit *pVictim, WeaponAttackType attType = BASE_ATTACK, bool checkLoS = true, bool extra = false );
-
         float MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) const;
         void CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *damageInfo, WeaponAttackType attackType = BASE_ATTACK);
         void DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss);
-
-        
-        
-
-        
-        
-        // Nostalrius : SPELL_AURA_MOD_MECHANIC_RESISTANCE
-        bool IsEffectResist(SpellEntry const* spell, int eff);
+        bool IsEffectResist(SpellEntry const* spell, int eff); // SPELL_AURA_MOD_MECHANIC_RESISTANCE
 
         float GetUnitDodgeChance()    const;
         float GetUnitParryChance()    const;
@@ -1365,7 +1354,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
                 UNIT_NPC_FLAG_SPIRITGUIDE | UNIT_NPC_FLAG_TABARDDESIGNER | UNIT_NPC_FLAG_AUCTIONEER );
         }
         bool isSpiritService() const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITHEALER | UNIT_NPC_FLAG_SPIRITGUIDE ); }
-
         bool IsTaxiFlying() const { return hasUnitState(UNIT_STAT_TAXI_FLIGHT); }
 
         bool isInCombat() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT); }
@@ -1383,7 +1371,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool HasAuraTypeByCaster(AuraType auraType, ObjectGuid casterGuid) const;
         uint32 GetFirstAuraBySpellIconAndVisual(uint32 spellIconId, uint32 spellVisual) const;
-
         uint64 GetAuraApplicationMask() const;
         uint64 GetNegativeAuraApplicationMask() const;
 
@@ -1403,9 +1390,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         {
             return m_spellAuraHolders.find(spellId) != m_spellAuraHolders.end();
         }
-
         bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
-
         bool HasStealthAura()      const { return HasAuraType(SPELL_AURA_MOD_STEALTH); }
         bool HasInvisibilityAura() const { return HasAuraType(SPELL_AURA_MOD_INVISIBILITY); }
         bool isFeared()  const { return HasAuraType(SPELL_AURA_MOD_FEAR); }
@@ -1442,10 +1427,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void NearLandTo(float x, float y, float z, float orientation);
         void TeleportPositionRelocation(float x, float y, float z, float o);
         void MonsterMoveWithSpeed(float x, float y, float z, float o, float speed, uint32 options);
-        void MonsterMove(float x, float y, float z); // Utilise vitesse de course
+        void MonsterMove(float x, float y, float z);
 
-        // recommend use MonsterMove/MonsterMoveWithSpeed for most case that correctly work with movegens
-        // if used additional args in ... part then floats must explicitly casted to double
         void SendHeartBeat(bool includingSelf = true);
         virtual void SetFly(bool enable);
         void SetWalk(bool enable, bool asDefault = true);
@@ -1455,8 +1438,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_movementCounter = 0;
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
         std::map<MovementChangeType, uint32> m_lastMovementChangeCounterPerType;
-
-        
 
     public:
         std::deque<PlayerMovementPendingChange>& GetPendingMovementChangesQueue()  { return m_pendingMovementChanges; }
@@ -1604,6 +1585,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void _AddTotem(TotemSlot slot, Totem* totem);       // only for call from Totem summon code
         void _RemoveTotem(Totem* totem);                    // only for call from Totem class
+
+        void UnsummonAllTotems();
+        bool UnsummonOldPetBeforeNewSummon(uint32 newPetEntry);
 
         template<typename Func>
         void CallForAllControlledUnits(Func const& func, uint32 controlledMask);
@@ -1805,21 +1789,16 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float GetCollisionHeight() const { return m_modelCollisionHeight * m_nativeScaleOverride; }
         void UpdateModelData(); // at any changes to scale and/or displayId
 
-
         GameObject* GetGameObject(uint32 spellId) const;
         void AddGameObject(GameObject* gameObj);
         void RemoveGameObject(GameObject* gameObj, bool del);
         void RemoveGameObject(uint32 spellid, bool del);
         void RemoveAllGameObjects();
 
-        uint32 CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index = 0);
-        
         void ModifyAuraState(AuraState flag, bool apply);
         bool HasAuraState(AuraState flag) const { return HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)); }
-        void UnsummonAllTotems();
-        bool UnsummonOldPetBeforeNewSummon(uint32 newPetEntry);
 
-        
+        uint32 CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index = 0);
         int32 SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask);
         uint32 SpellDamageBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
         int32 SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask);
@@ -1863,8 +1842,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr);
         virtual bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
 
-        
-        
         void CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, int32 *resist, SpellEntry const* spellProto = nullptr, Spell* spell = nullptr);
         void CalculateAbsorbResistBlock(WorldObject* pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
         float RollMagicResistanceMultiplierOutcomeAgainst(float resistanceChance, SpellSchoolMask schoolMask, DamageEffectType dmgType, SpellEntry const* spellProto) const;
@@ -2027,9 +2004,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveSpellCooldown(uint32 spell_id, bool update = false);
         void RemoveSpellCategoryCooldown(uint32 cat, bool update = false);
         void WritePetSpellsCooldown(WorldPacket& data);
-
         GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
-
         void RemoveAllSpellCooldown();
 
         void setTransformScale(float scale);
@@ -2041,12 +2016,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         explicit Unit ();
 
         void _UpdateSpells(uint32 time);
-
         void _UpdateAutoRepeatSpell();
         
-
         uint32 m_attackTimer[MAX_ATTACK];
-
         float m_createStats[MAX_STATS];
         int32 m_createResistances[MAX_SPELL_SCHOOL];
 

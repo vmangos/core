@@ -3080,22 +3080,6 @@ void WorldObject::LoadMapCellsAround(float dist) const
     Cell::VisitAllObjects(this, notifier, dist, false);
 }
 
-FactionTemplateEntry const* WorldObject::getFactionTemplateEntry() const
-{
-    FactionTemplateEntry const* entry = sObjectMgr.GetFactionTemplateEntry(getFaction());
-    if (!entry)
-    {
-        static ObjectGuid guid;                             // prevent repeating spam same faction problem
-
-        if (GetObjectGuid() != guid)
-        {
-            sLog.outError("%s have invalid faction (faction template id) #%u", GetGuidStr().c_str(), getFaction());
-            guid = GetObjectGuid();
-        }
-    }
-    return entry;
-}
-
 Unit* WorldObject::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectIndex eff)
 {
     if (!victim)
@@ -3133,6 +3117,22 @@ Unit* WorldObject::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectInd
     }
 
     return victim;
+}
+
+FactionTemplateEntry const* WorldObject::getFactionTemplateEntry() const
+{
+    FactionTemplateEntry const* entry = sObjectMgr.GetFactionTemplateEntry(getFaction());
+    if (!entry)
+    {
+        static ObjectGuid guid;                             // prevent repeating spam same faction problem
+
+        if (GetObjectGuid() != guid)
+        {
+            sLog.outError("%s have invalid faction (faction template id) #%u", GetGuidStr().c_str(), getFaction());
+            guid = GetObjectGuid();
+        }
+    }
+    return entry;
 }
 
 // function based on function Unit::UnitReaction from 13850 client
