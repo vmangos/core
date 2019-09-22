@@ -290,29 +290,13 @@ void SpellCastTargets::write(ByteBuffer& data) const
 }
 
 Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
-    m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false), m_setCreatureTarget(false), m_caster(caster), m_casterUnit(caster)
+     m_caster(caster), m_casterUnit(caster), m_spellInfo(info), m_triggeredBySpellInfo(triggeredBy), m_triggeredByParentSpellInfo(triggeredByParent), m_IsTriggeredSpell(triggered)
 {
     MANGOS_ASSERT(caster != nullptr && info != nullptr);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to a sSpellMgr element");
 
-    m_successCast = false;
-    m_destroyed = false;
-    m_spellInfo = info;
-    m_triggeredBySpellInfo = triggeredBy;
-    m_triggeredByParentSpellInfo = triggeredByParent;
-    m_selfContainer = nullptr;
-    m_referencedFromCurrentSpell = false;
-    m_executeStack = 0;
-    m_delayStart = 0;
-    m_delayAtDamageCount = 0;
-    m_isChannelingVisual = false;
-
-    m_applyMultiplierMask = 0;
-    m_absorbed = 0;
-
     // Get data for type of attack
     m_attackType = m_spellInfo->GetWeaponAttackType();
-
     m_spellSchoolMask = info->GetSpellSchoolMask();           // Can be override for some spell (wand shoot for example)
 
     // wand case
@@ -320,53 +304,22 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
         if (!!(caster->getClassMask() & CLASSMASK_WAND_USERS) && caster->IsPlayer())
             m_spellSchoolMask = GetSchoolMask(caster->GetWeaponDamageSchool(RANGED_ATTACK));
 
-    // Set health leech amount to zero
-    m_healthLeech = 0;
-
     m_originalCasterGUID = originalCasterGUID ? originalCasterGUID : caster->GetObjectGuid();
-
     UpdateOriginalCasterPointer();
 
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
         m_currentBasePoints[i] = m_spellInfo->CalculateSimpleValue(SpellEffectIndex(i));
 
-    m_spellState = SPELL_STATE_NULL;
-
-    m_castPositionX = m_castPositionY = m_castPositionZ = m_castOrientation = 0;
     m_TriggerSpells.clear();
     m_preCastSpells.clear();
-    m_IsTriggeredSpell = triggered;
-    //m_AreaAura = false;
-    m_CastItem = nullptr;
-    m_IsCastByItem = false;
-
-    unitTarget = nullptr;
-    itemTarget = nullptr;
-    corpseTarget = nullptr;
-    gameObjTarget = nullptr;
-    focusObject = nullptr;
-    m_triggeredByAuraSpell  = nullptr;
-    m_triggeredByAuraBasePoints = 0;
 
     //Auto Shot & Shoot
     m_autoRepeat = m_spellInfo->IsAutoRepeatRangedSpell();
-
-    m_powerCost = 0;                                        // setup to correct value in Spell::prepare, don't must be used before.
-    m_casttime = 0;                                         // setup to correct value in Spell::prepare, don't must be used before.
-    m_timer = 0;                                            // will set to cast time in prepare
-    m_duration = 0;
-
     m_channeled = info->IsChanneledSpell();
-
-    m_needAliveTargetMask = 0;
 
     // determine reflection
     m_canReflect = victim ? m_spellInfo->IsReflectableSpell(caster, victim) : m_spellInfo->IsReflectableSpell();
 
-    m_isClientStarted = false;
-
-    m_spellAuraHolder = nullptr;
-    m_delayed = false;
     // Must initialize to an element in the list or bad things happen,
     // begin changes so use end
     m_channeledUpdateIterator = m_channeledHolders.end();
@@ -375,78 +328,31 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
 }
 
 Spell::Spell(GameObject* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
-    m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false), m_setCreatureTarget(false), m_caster(caster), m_casterGo(caster)
+    m_caster(caster), m_casterGo(caster), m_spellInfo(info), m_triggeredBySpellInfo(triggeredBy), m_triggeredByParentSpellInfo(triggeredByParent), m_IsTriggeredSpell(triggered)
 {
     MANGOS_ASSERT(caster != nullptr && info != nullptr);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to a sSpellMgr element");
 
-    m_successCast = false;
-    m_destroyed = false;
-    m_spellInfo = info;
-    m_triggeredBySpellInfo = triggeredBy;
-    m_triggeredByParentSpellInfo = triggeredByParent;
-    m_selfContainer = nullptr;
-    m_referencedFromCurrentSpell = false;
-    m_executeStack = 0;
-    m_delayStart = 0;
-    m_delayAtDamageCount = 0;
-    m_isChannelingVisual = false;
-
-    m_applyMultiplierMask = 0;
-    m_absorbed = 0;
-
     // Get data for type of attack
     m_attackType = m_spellInfo->GetWeaponAttackType();
-
     m_spellSchoolMask = info->GetSpellSchoolMask();           // Can be override for some spell (wand shoot for example)
 
-    // Set health leech amount to zero
-    m_healthLeech = 0;
-
     m_originalCasterGUID = originalCasterGUID ? originalCasterGUID : caster->GetObjectGuid();
-
     UpdateOriginalCasterPointer();
 
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
         m_currentBasePoints[i] = m_spellInfo->CalculateSimpleValue(SpellEffectIndex(i));
 
-    m_spellState = SPELL_STATE_NULL;
-
-    m_castPositionX = m_castPositionY = m_castPositionZ = m_castOrientation = 0;
     m_TriggerSpells.clear();
     m_preCastSpells.clear();
-    m_IsTriggeredSpell = triggered;
-    //m_AreaAura = false;
-    m_CastItem = nullptr;
-    m_IsCastByItem = false;
-
-    unitTarget = nullptr;
-    itemTarget = nullptr;
-    corpseTarget = nullptr;
-    gameObjTarget = nullptr;
-    focusObject = nullptr;
-    m_triggeredByAuraSpell  = nullptr;
-    m_triggeredByAuraBasePoints = 0;
 
     //Auto Shot & Shoot
     m_autoRepeat = m_spellInfo->IsAutoRepeatRangedSpell();
-
-    m_powerCost = 0;                                        // setup to correct value in Spell::prepare, don't must be used before.
-    m_casttime = 0;                                         // setup to correct value in Spell::prepare, don't must be used before.
-    m_timer = 0;                                            // will set to cast time in prepare
-    m_duration = 0;
-
     m_channeled = info->IsChanneledSpell();
-
-    m_needAliveTargetMask = 0;
 
     // determine reflection
     m_canReflect = victim ? m_spellInfo->IsReflectableSpell(caster, victim) : m_spellInfo->IsReflectableSpell();
 
-    m_isClientStarted = false;
-
-    m_spellAuraHolder = nullptr;
-    m_delayed = false;
     // Must initialize to an element in the list or bad things happen,
     // begin changes so use end
     m_channeledUpdateIterator = m_channeledHolders.end();

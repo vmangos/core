@@ -324,8 +324,8 @@ class Spell
         void EffectNostalrius(SpellEffectIndex eff_idx);
         void HandleAddTargetTriggerAuras();
 
-        Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL, Unit* victim = NULL, SpellEntry const* triggeredByParent = NULL);
-        Spell(GameObject* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL, Unit* victim = NULL, SpellEntry const* triggeredByParent = NULL);
+        Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, Unit* victim = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        Spell(GameObject* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, Unit* victim = nullptr, SpellEntry const* triggeredByParent = nullptr);
         ~Spell();
 
         SpellCastResult prepare(SpellCastTargets targets, Aura* triggeredByAura = nullptr, uint32 chance = 0);
@@ -406,7 +406,7 @@ class Spell
         SpellEntry const* m_triggeredBySpellInfo;
         SpellEntry const* m_triggeredByParentSpellInfo;     // Spell that triggered the spell that triggered this
         int32 m_currentBasePoints[MAX_EFFECT_INDEX];        // cache SpellEntry::CalculateSimpleValue and use for set custom base points
-        Item* m_CastItem;
+        Item* m_CastItem = nullptr;
         SpellCastTargets m_targets;
 
         int32 GetCastTime() const { return m_casttime; }
@@ -464,8 +464,8 @@ class Spell
         void CleanupTargetList();
         void ClearCastItem();
 
-        bool   m_isClientStarted;
-        void   SetClientStarted(bool isClientStarted);
+        bool m_isClientStarted = false;
+        void SetClientStarted(bool isClientStarted);
         bool IsTriggered() const       { return m_IsTriggeredSpell; }
         bool IsTriggeredByAura() const { return m_triggeredByAuraSpell; }
         bool IsCastByItem() const      { return m_IsCastByItem; }
@@ -509,32 +509,32 @@ class Spell
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection
                                                             // e.g. damage around area spell trigered by victim aura and damage enemies of aura caster
-        Unit* m_originalCaster;                             // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
+        Unit* m_originalCaster = nullptr;                   // cached pointer for m_originalCaster, updated at Spell::UpdatePointers()
 
-        Spell** m_selfContainer;                            // pointer to our spell container (if applicable)
+        Spell** m_selfContainer = nullptr;                  // pointer to our spell container (if applicable)
 
         //Spell data
         WeaponAttackType m_attackType;                      // For weapon based attack
-        uint32 m_powerCost;                                 // Calculated spell cost     initialized only in Spell::prepare
-        int32 m_casttime;                                   // Calculated spell cast time initialized only in Spell::prepare
-        int32 m_duration;
-        bool m_canReflect;                                  // can reflect this spell?
-        bool m_autoRepeat;
-        bool m_delayed;
-        bool m_successCast;
-        bool m_channeled;
-        bool m_isChannelingVisual;                          // For summoning ritual helpers visual spell
+        uint32 m_powerCost = 0;                             // Calculated spell cost     initialized only in Spell::prepare
+        int32 m_casttime = 0;                               // Calculated spell cast time initialized only in Spell::prepare
+        int32 m_duration = 0;
+        bool m_canReflect = false;                          // can reflect this spell?
+        bool m_autoRepeat = false;
+        bool m_delayed = false;
+        bool m_successCast = false;
+        bool m_channeled = false;
+        bool m_isChannelingVisual = false;                  // For summoning ritual helpers visual spell
                                                             // no effect handled, only channel start/update is sent
 
-        bool m_setCreatureTarget;                           // Set for spell casts that need to make the creature face the target
+        bool m_setCreatureTarget = false;                   // Set for spell casts that need to make the creature face the target
 
-        uint8 m_delayAtDamageCount;
+        uint8 m_delayAtDamageCount = 0;
         int32 GetNextDelayAtDamageMsTime() { return m_delayAtDamageCount < 5 ? 1000 - (m_delayAtDamageCount++)* 200 : 200; }
 
         // Delayed spells system
-        uint64 m_delayStart;                                // time of spell delay start, filled by event handler, zero = just started
-        uint64 m_delayMoment;                               // moment of next delay call, used internally
-        bool m_immediateHandled;                            // were immediate actions handled? (used by delayed spells only)
+        uint64 m_delayStart = 0;                            // time of spell delay start, filled by event handler, zero = just started
+        uint64 m_delayMoment = 0;                           // moment of next delay call, used internally
+        bool m_immediateHandled = false;                    // were immediate actions handled? (used by delayed spells only)
 
         // Channeled spells system
         typedef std::list<SpellAuraHolder *> SpellAuraHolderList;
@@ -542,21 +542,21 @@ class Spell
         SpellAuraHolderList::iterator m_channeledUpdateIterator; // maintain an iterator to the current update element so we can handle removal of multiple auras
 
         // These vars are used in both delayed spell system and modified immediate spell system
-        bool m_referencedFromCurrentSpell;                  // mark as references to prevent deleted and access by dead pointers
-        uint32 m_executeStack;                                // mark as executed to prevent deleted and access by dead pointers
-        bool m_needSpellLog;                                // need to send spell log?
-        uint8 m_applyMultiplierMask;                        // by effect: damage multiplier needed?
+        bool m_referencedFromCurrentSpell = false;          // mark as references to prevent deleted and access by dead pointers
+        uint32 m_executeStack = 0;                          // mark as executed to prevent deleted and access by dead pointers
+        bool m_needSpellLog = false;                        // need to send spell log?
+        uint8 m_applyMultiplierMask = 0;                    // by effect: damage multiplier needed?
         float m_damageMultipliers[3];                       // by effect: damage multiplier
 
-        uint8 m_targetNum;                                  // the target number for each bounce in a spell
+        uint8 m_targetNum = 0;                              // the target number for each bounce in a spell
 
         // Current targets, to be used in SpellEffects (MUST BE USED ONLY IN SPELL EFFECTS)
-        Unit* unitTarget;
-        Item* itemTarget;
-        Corpse* corpseTarget; // Nostalrius
-        GameObject* gameObjTarget;
-        SpellAuraHolder* m_spellAuraHolder;                 // spell aura holder for current target, created only if spell has aura applying effect
-        int32 damage;
+        Unit* unitTarget = nullptr;
+        Item* itemTarget = nullptr;
+        Corpse* corpseTarget = nullptr;
+        GameObject* gameObjTarget = nullptr;
+        SpellAuraHolder* m_spellAuraHolder = nullptr;       // spell aura holder for current target, created only if spell has aura applying effect
+        int32 damage = 0;
         bool isReflected = false;
 
         // this is set in Spell Hit, but used in Apply Aura handler
@@ -564,21 +564,21 @@ class Spell
         DiminishingGroup m_diminishGroup;
 
         // -------------------------------------------
-        GameObject* focusObject;
+        GameObject* focusObject = nullptr;
 
         // Damage and healing in effects need just calculate
-        int32 m_damage;                                     // Damage   in effects count here
-        int32 m_healing;                                    // Healing in effects count here
-        int32 m_healthLeech;                                // Health leech in effects for all targets count here
-        int32 m_absorbed;
+        int32 m_damage = 0;                                 // Damage   in effects count here
+        int32 m_healing = 0;                                // Healing in effects count here
+        int32 m_healthLeech = 0;                            // Health leech in effects for all targets count here
+        int32 m_absorbed = 0;
 
         //******************************************
         // Spell trigger system
         //******************************************
-        bool   m_canTrigger;                                // Can start trigger (m_IsTriggeredSpell can`t use for this)
-        uint8  m_negativeEffectMask;                        // Use for avoid sent negative spell procs for additional positive effects only targets
-        uint32 m_procAttacker;                              // Attacker trigger flags
-        uint32 m_procVictim;                                // Victim   trigger flags
+        bool   m_canTrigger = false;                        // Can start trigger (m_IsTriggeredSpell can`t use for this)
+        uint8  m_negativeEffectMask = 0;                    // Use for avoid sent negative spell procs for additional positive effects only targets
+        uint32 m_procAttacker = 0;                          // Attacker trigger flags
+        uint32 m_procVictim = 0;                            // Victim   trigger flags
         void   prepareDataForTriggerSystem();
 
         //*****************************************
@@ -597,7 +597,7 @@ class Spell
             bool   processed:1;
             bool   deleted:1;
         };
-        uint8 m_needAliveTargetMask;                        // Mask req. alive targets
+        uint8 m_needAliveTargetMask = 0;                    // Mask req. alive targets
 
         struct GOTargetInfo
         {
@@ -614,7 +614,7 @@ class Spell
             uint8 effectMask;
             bool   deleted:1;
         };
-        bool m_destroyed;
+        bool m_destroyed = false;
 
 #ifndef USE_STANDARD_MALLOC
         typedef tbb::concurrent_vector<TargetInfo>     TargetList;
@@ -652,21 +652,21 @@ class Spell
         SpellInfoList m_TriggerSpells;                      // casted by caster to same targets settings in m_targets at success finish of current spell
         SpellInfoList m_preCastSpells;                      // casted by caster to each target at spell hit before spell effects apply
 
-        uint32 m_spellState;
-        uint32 m_timer;
-        uint32 m_triggeredByAuraBasePoints;
+        uint32 m_spellState = SPELL_STATE_NULL;
+        uint32 m_timer = 0;
+        uint32 m_triggeredByAuraBasePoints = 0;
 
-        float m_castPositionX;
-        float m_castPositionY;
-        float m_castPositionZ;
-        float m_castOrientation;
-        bool m_IsTriggeredSpell;
-        bool m_IsCastByItem;
+        float m_castPositionX = 0;
+        float m_castPositionY = 0;
+        float m_castPositionZ = 0;
+        float m_castOrientation = 0;
+        bool m_IsTriggeredSpell = false;
+        bool m_IsCastByItem = false;
 
         // if need this can be replaced by Aura copy
         // we can't store original aura link to prevent access to deleted auras
         // and in same time need aura data and after aura deleting.
-        SpellEntry const* m_triggeredByAuraSpell;
+        SpellEntry const* m_triggeredByAuraSpell = nullptr;
 
         struct ExecuteLogInfo
         {
