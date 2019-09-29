@@ -10990,7 +10990,7 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
     DEBUG_LOG("STORAGE: SwapItem bag = %u, slot = %u, item = %u", dstbag, dstslot, pSrcItem->GetEntry());
 
-    if (!isAlive())
+    if (!isAlive() && !(IsInventoryPos(src) && IsInventoryPos(dst)))
     {
         SendEquipError(EQUIP_ERR_YOU_ARE_DEAD, pSrcItem, pDstItem);
         return;
