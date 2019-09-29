@@ -1416,6 +1416,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // Affiche le visuel d'un sort
         void SendSpellGo(Unit* target, uint32 spellId);
+        void SendPlaySpellVisual(uint32 id) const;
 
         void DeMorph();
 

@@ -10160,6 +10160,14 @@ void Unit::SendSpellGo(Unit* target, uint32 spellId)
     SendMessageToSet(&data, true);
 }
 
+void Unit::SendPlaySpellVisual(uint32 id) const
+{
+    WorldPacket data(SMSG_PLAY_SPELL_VISUAL, 8 + 4);
+    data << uint64(GetGUID());
+    data << uint32(id); // SpellVisualKit.dbc index
+    SendMessageToSet(&data, true);
+}
+
 #define PRELOAD if (this == unit) return true; \
 const Unit* u1 = GetCharmerOrOwnerOrSelf(); \
 const Unit* u2 = unit->GetCharmerOrOwnerOrSelf(); \
