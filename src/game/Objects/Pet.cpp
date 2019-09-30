@@ -1062,20 +1062,16 @@ uint32 Pet::GetSkillIdForPetTraining() const
 
 bool Pet::CanLearnPetSpell(uint32 spellId) const
 {
-    uint32 requiredSkillId = 0;
     SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(spellId);
     for (SkillLineAbilityMap::const_iterator _spell_idx = bounds.first; _spell_idx != bounds.second; ++_spell_idx)
     {
-        requiredSkillId = _spell_idx->second->skillId;
-        break;
+        if (_spell_idx->second->skillId == GetSkillIdForPetTraining())
+            return true;
+
+        if ((_spell_idx->second->skillId == SKILL_PET_TALENTS) &&
+            (getPetType() == HUNTER_PET))
+            return true;
     }
-
-    if (requiredSkillId == GetSkillIdForPetTraining())
-        return true;
-
-    if ((requiredSkillId == SKILL_PET_TALENTS) &&
-        (getPetType() == HUNTER_PET))
-        return true;
 
     return false;
 }
