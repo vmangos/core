@@ -119,6 +119,19 @@ inline bool roll_chance_u(uint32 chance)
     return chance > urand(0, 99);
 }
 
+inline float round_float(float value)
+{
+    float const remainder = value - floor(value);
+
+    if (remainder == 0.5f)
+        return urand(0, 1) ? floor(value) : ceil(value);
+
+    if (remainder > 0.5f)
+        return ceil(value);
+
+    return floor(value);
+}
+
 inline void ApplyModUInt32Var(uint32& var, int32 val, bool apply)
 {
     int32 cur = var;
