@@ -2234,28 +2234,27 @@ void Player::HandleFoodEmotes(uint32 diff)
     // 5 seconds over and over again which confirms my theory that we have a independed timer.
     if (m_foodEmoteTimer <= diff)
     {
-        std::vector<Aura*> auraList;
         AuraList const& ModRegenAuras = GetAurasByType(SPELL_AURA_MOD_REGEN);
         AuraList const& ModPowerRegenAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
 
-        auraList.reserve(ModRegenAuras.size() + ModPowerRegenAuras.size());
-        auraList.insert(auraList.end(), ModRegenAuras.begin(), ModRegenAuras.end());
-        auraList.insert(auraList.end(), ModPowerRegenAuras.begin(), ModPowerRegenAuras.end());
-
-        for (auto itr = auraList.begin(); itr != auraList.end(); ++itr)
+        for (auto itr = ModRegenAuras.begin(); itr != ModRegenAuras.end(); ++itr)
         {
-            // Food emote comes above drinking emote if we have to decide (mage regen food for example)
-            if ((*itr)->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && (*itr)->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if ((*itr)->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && (*itr)->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_FOOD);
                 break;
             }
-            else if ((*itr)->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && (*itr)->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+        }
+
+        for (auto itr = ModPowerRegenAuras.begin(); itr != ModPowerRegenAuras.end(); ++itr)
+        {
+            if ((*itr)->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && (*itr)->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_DRINK);
                 break;
             }
         }
+
         m_foodEmoteTimer = 5000;
     }
     else
