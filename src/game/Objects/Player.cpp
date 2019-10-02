@@ -2239,7 +2239,7 @@ void Player::HandleFoodEmotes(uint32 diff)
 
         for (auto itr = ModRegenAuras.begin(); itr != ModRegenAuras.end(); ++itr)
         {
-            if ((*itr)->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && (*itr)->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if ((*itr)->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && (*itr)->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_FOOD);
                 break;
