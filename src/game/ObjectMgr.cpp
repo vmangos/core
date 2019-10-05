@@ -1277,7 +1277,7 @@ void ObjectMgr::CheckCreatureTemplates()
 
         if (cInfo->pet_spell_list_id)
         {
-            CreatureSpellDataEntry const* spellDataId = sCreatureSpellDataStore.LookupEntry(cInfo->pet_spell_list_id);
+            CreatureSpellDataEntry const* spellDataId = sCreatureSpellDataStorage.LookupEntry<CreatureSpellDataEntry>(cInfo->pet_spell_list_id);
             if (!spellDataId)
                 sLog.outErrorDb("Creature (Entry: %u) has nonexistent pet_spell_list_id (%u)", cInfo->entry, cInfo->pet_spell_list_id);
         }
@@ -5274,9 +5274,8 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->RewMailTemplateId)
         {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             uint32 mailTemplateId = abs(qinfo->RewMailTemplateId);
-            if (!sMailTemplateStore.LookupEntry(mailTemplateId))
+            if (!sMailTemplateStorage.LookupEntry<MailTemplateEntry>(mailTemplateId))
             {
                 sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u does not exist, quest will not have a mail reward.",
                                 qinfo->GetQuestId(), mailTemplateId, mailTemplateId);
@@ -5293,9 +5292,6 @@ void ObjectMgr::LoadQuests()
             }
             else
                 usedMailTemplates[mailTemplateId] = qinfo->GetQuestId();
-#else
-            qinfo->RewMailTemplateId = 0;
-#endif
         }
 
         if (qinfo->NextQuestInChain)
@@ -5557,7 +5553,7 @@ void ObjectMgr::LoadPetCreateSpells()
             continue;
         }
 
-        if (CreatureSpellDataEntry const* petSpellEntry = cInfo->pet_spell_list_id ? sCreatureSpellDataStore.LookupEntry(cInfo->pet_spell_list_id) : nullptr)
+        if (CreatureSpellDataEntry const* petSpellEntry = cInfo->pet_spell_list_id ? sCreatureSpellDataStorage.LookupEntry<CreatureSpellDataEntry>(cInfo->pet_spell_list_id) : nullptr)
         {
             sLog.outErrorDb("Creature id %u listed in `petcreateinfo_spell` have set `pet_spell_list_id` field and will use its instead, skip.", creature_id);
             continue;
@@ -5626,7 +5622,7 @@ void ObjectMgr::LoadPetCreateSpells()
         if (!cInfo)
             continue;
 
-        CreatureSpellDataEntry const* petSpellEntry = cInfo->pet_spell_list_id ? sCreatureSpellDataStore.LookupEntry(cInfo->pet_spell_list_id) : nullptr;
+        CreatureSpellDataEntry const* petSpellEntry = cInfo->pet_spell_list_id ? sCreatureSpellDataStorage.LookupEntry<CreatureSpellDataEntry>(cInfo->pet_spell_list_id) : nullptr;
         if (!petSpellEntry)
             continue;
 
@@ -5651,6 +5647,13 @@ void ObjectMgr::LoadPetCreateSpells()
 
     sLog.outString();
     sLog.outString(">> Loaded %u pet create spells from table and %u from DBC", count, dcount);
+}
+
+void ObjectMgr::LoadPetSpellData()
+{
+    sCreatureSpellDataStorage.LoadProgressive(SUPPORTED_CLIENT_BUILD, "build");
+    sLog.outString(">> Loaded %u pet spell lists", sCreatureSpellDataStorage.GetRecordCount());
+    sLog.outString();
 }
 
 void ObjectMgr::LoadItemTexts()
@@ -10576,7 +10579,7 @@ void ObjectMgr::RestoreDeletedItems()
                 std::string subject = itemProto->Name1;
 
                 // text
-                std::string textFormat = GetMangosString(LANG_RESTORED_ITEM, LOCALE_enUS);
+                std::string textFormat = GetMangosString(LANG_RESTORED_ITEM, DB_LOCALE_enUS);
                 
                 MailDraft(subject, textFormat)
                     .AddItem(restoredItem)
@@ -10757,6 +10760,21 @@ void ObjectMgr::GeneratePetNumberRange(uint32& first, uint32& last)
         prev = nextGuid;
     }
     last = first + 1000;
+}
+
+void ObjectMgr::LoadMailTemplate()
+{
+    sMailTemplateStorage.Load();
+    sLog.outString(">> Loaded %u mail text templates", sMailTemplateStorage.GetRecordCount());
+    sLog.outString();
+}
+
+char const* ObjectMgr::GetMailTextTemplate(uint32 id, LocaleConstant locale_idx)
+{
+    if (MailTemplateEntry const* pTemplate = sMailTemplateStorage.LookupEntry<MailTemplateEntry>(id))
+        return pTemplate->subject[locale_idx];
+
+    return "Missing mail text template!";
 }
 
 void ObjectMgr::LoadAreaTemplate()

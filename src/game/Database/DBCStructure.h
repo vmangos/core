@@ -417,7 +417,7 @@ struct LockEntry
 struct MailTemplateEntry
 {
     uint32      ID;                                         // 0        m_ID
-    //char*       subject[8];                               // 1-8      m_subject_lang
+    char*       subject[8];                                 // 1-8      m_subject_lang
                                                             // 9 string flags
 };
 

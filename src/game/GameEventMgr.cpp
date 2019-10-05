@@ -593,7 +593,6 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventMails.resize(mGameEvent.size() * 2 - 1);
 
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     result = WorldDatabase.Query("SELECT event, raceMask, quest, mailTemplateId, senderEntry FROM game_event_mail");
 
     count = 0;
@@ -648,7 +647,7 @@ void GameEventMgr::LoadFromDB()
                 continue;
             }
 
-            if (!sMailTemplateStore.LookupEntry(mail.mailTemplateId))
+            if (!sMailTemplateStorage.LookupEntry<MailTemplateEntry>(mail.mailTemplateId))
             {
                 sLog.outErrorDb("Table `game_event_mail` have invalid mailTemplateId (%u) for game event %i that invalid not include any player races, ignoring.", mail.mailTemplateId, event_id);
                 continue;
@@ -672,7 +671,6 @@ void GameEventMgr::LoadFromDB()
         sLog.outString();
         sLog.outString(">> Loaded %u start/end game event mails", count);
     }
-#endif
 }
 
 uint32 GameEventMgr::Initialize()                           // return the next event delay in ms
