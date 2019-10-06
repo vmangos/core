@@ -1264,6 +1264,12 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading skill line abilities ...");
     sObjectMgr.LoadSkillLineAbility();
 
+    sLog.outString("Loading mail text templates ...");
+    sObjectMgr.LoadMailTemplate();
+
+    sLog.outString("Loading pet spell data ...");
+    sObjectMgr.LoadPetSpellData();
+
     ///- Load the DBC files
     sLog.outString("Initialize data stores...");
 

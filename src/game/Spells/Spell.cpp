@@ -5132,6 +5132,10 @@ void Spell::TakeAmmo()
     {
         Item *pItem = pCaster->GetWeaponForAttack(RANGED_ATTACK, true, false);
 
+        // wands don't have ammo
+        if (!pItem || pItem->GetProto()->SubClass == ITEM_SUBCLASS_WEAPON_WAND)
+            return;
+
         if (pItem->GetProto()->InventoryType == INVTYPE_THROWN)
         {
             if (pItem->GetMaxStackCount() == 1)

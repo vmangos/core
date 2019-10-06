@@ -314,7 +314,7 @@ void MasterPlayer::LoadMails(QueryResult *result)
         m->mailTemplateId = fields[12].GetInt16();
         m->has_items = fields[13].GetBool();                // true, if mail have items or mail have template and items generated (maybe none)
 
-        if (m->mailTemplateId && !sMailTemplateStore.LookupEntry(m->mailTemplateId))
+        if (m->mailTemplateId && !sMailTemplateStorage.LookupEntry<MailTemplateEntry>(m->mailTemplateId))
         {
             sLog.outError("Player::_LoadMail - Mail (%u) have nonexistent MailTemplateId (%u), remove at load", m->messageID, m->mailTemplateId);
             m->mailTemplateId = 0;

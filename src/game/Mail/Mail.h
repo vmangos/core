@@ -200,9 +200,7 @@ class MailDraft
         * @param a boolean specifying whether the mail needs items or not.
         *
         */
-        explicit MailDraft(uint16 mailTemplateId, bool need_items = true)
-            : m_mailTemplateId(mailTemplateId), m_mailTemplateItemsNeed(need_items), m_bodyId(0), m_money(0), m_COD(0)
-        {}
+        explicit MailDraft(uint16 mailTemplateId, bool need_items = true, LocaleConstant locale_idx = LOCALE_enUS);
         /**
          * Creates a new MailDraft object using subject text and content text id.
          *
