@@ -1299,7 +1299,7 @@ void GameObject::SwitchDoorOrButton(bool activate, bool alternative /* = false *
 void GameObject::Use(Unit* user)
 {
     // by default spell caster is user
-    Unit* spellCaster = user;
+    WorldObject* spellCaster = this;
     uint32 spellId = 0;
     bool triggered = false;
 
@@ -1327,7 +1327,7 @@ void GameObject::Use(Unit* user)
             UseDoorOrButton();
 
             // activate script
-            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), spellCaster, this);
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
             return;
         }
         case GAMEOBJECT_TYPE_BUTTON:                        // 1
@@ -1341,7 +1341,7 @@ void GameObject::Use(Unit* user)
             UseDoorOrButton();
 
             // activate script
-            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), spellCaster, this);
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
 
             TriggerLinkedGameObject(user);
             return;
@@ -1381,7 +1381,13 @@ void GameObject::Use(Unit* user)
             // directly (except from spell effect). Code here will be called by TriggerLinkedGameObject.
 
             if (uint32 spellId = GetGOInfo()->trap.spellId)
-                CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
+            {
+                Unit* pOwner = GetOwner();
+                if (pOwner)
+                    pOwner->CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
+                else
+                    CastSpell(user, spellId, true, nullptr, nullptr, GetObjectGuid());
+            }
 
             if (uint32 max_charges = GetGOInfo()->GetCharges())
             {
@@ -1763,31 +1769,9 @@ void GameObject::Use(Unit* user)
         }
         case GAMEOBJECT_TYPE_MEETINGSTONE:                  //23
         {
-            GameObjectInfo const* info = GetGOInfo();
-
-            if (user->GetTypeId() != TYPEID_PLAYER)
-                return;
-
-            Player* player = (Player*)user;
-
-            Player* targetPlayer = ObjectAccessor::FindPlayer(player->GetSelectionGuid());
-
-            // accept only use by player from same group for caster except caster itself
-            if (!targetPlayer || targetPlayer == player || !targetPlayer->IsInSameGroupWith(player))
-                return;
-
-            //required lvl checks!
-            uint8 level = player->getLevel();
-            if (level < info->meetingstone.minLevel || level > info->meetingstone.maxLevel)
-                return;
-
-            level = targetPlayer->getLevel();
-            if (level < info->meetingstone.minLevel || level > info->meetingstone.maxLevel)
-                return;
-
-            spellId = 23598;
-
-            break;
+            // Should never be called for this type of object.
+            // See WorldSession::HandleMeetingStoneJoinOpcode
+            return;
         }
         case GAMEOBJECT_TYPE_FLAGSTAND:                     // 24
         {
@@ -1959,7 +1943,13 @@ void GameObject::Use(Unit* user)
     // Ensure that the spell you are using, and any event it may trigger, is checking
     // pointer validity (i.e. instance, GO, etc) since the caster may have moved maps
     // or the GO might be gone by the time the spell is executed.
-    Spell *spell = new Spell(spellCaster, spellInfo, triggered, GetObjectGuid());
+    Spell *spell = nullptr;
+    if (Unit* pUnit = spellCaster->ToUnit())
+        spell = new Spell(pUnit, spellInfo, triggered, GetObjectGuid());
+    else if (GameObject* pGo = spellCaster->ToGameObject())
+        spell = new Spell(pGo, spellInfo, triggered, GetObjectGuid());
+    else
+        return;
 
     SpellCastTargets targets;
 

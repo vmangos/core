@@ -1098,7 +1098,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     WorldObject *pRealCaster = GetAffectiveCasterObject();
     WorldObject *pCaster = pRealCaster ? pRealCaster : m_caster;
     Unit* pUnitCaster = pCaster->ToUnit();
-    Unit* pRealUnitCaster = pRealCaster->ToUnit();
+    Unit* pRealUnitCaster = ToUnit(pRealCaster);
 
     SpellMissInfo missInfo = target->missCondition;
     // Need init unitTarget by default unit (can changed in code on reflect)
@@ -1685,7 +1685,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
 
     if (m_spellInfo->IsSpellAppliesAura(effectMask))
     {
-        m_spellAuraHolder = CreateSpellAuraHolder(m_spellInfo, unit, pRealUnitCaster ? pRealUnitCaster : unit, m_CastItem);
+        m_spellAuraHolder = CreateSpellAuraHolder(m_spellInfo, unit, pRealUnitCaster ? pRealUnitCaster : unit, m_caster, m_CastItem);
         m_spellAuraHolder->SetTriggered(IsTriggered());
         m_spellAuraHolder->setDiminishGroup(m_diminishGroup);
         m_spellAuraHolder->setDiminishLevel(m_diminishLevel);

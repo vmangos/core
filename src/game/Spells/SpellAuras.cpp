@@ -486,9 +486,9 @@ Aura* CreateAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *curr
     return new Aura(spellproto, eff, currentBasePoints, holder, target, caster, castItem);
 }
 
-SpellAuraHolder* CreateSpellAuraHolder(SpellEntry const* spellproto, Unit* target, Unit* caster, Item* castItem)
+SpellAuraHolder* CreateSpellAuraHolder(SpellEntry const* spellproto, Unit* target, Unit* caster, WorldObject* realCaster, Item* castItem)
 {
-    return new SpellAuraHolder(spellproto, target, caster, castItem);
+    return new SpellAuraHolder(spellproto, target, caster, castItem, realCaster);
 }
 
 void Aura::SetModifier(AuraType t, int32 a, uint32 pt, int32 miscValue)
@@ -714,7 +714,7 @@ void AreaAura::Update(uint32 diff)
                     bool addedToExisting = true;
                     if (!holder)
                     {
-                        holder = CreateSpellAuraHolder(actualSpellInfo, target, caster);
+                        holder = CreateSpellAuraHolder(actualSpellInfo, target, caster, caster);
                         addedToExisting = false;
                     }
 
@@ -814,7 +814,7 @@ void PersistentAreaAura::Update(uint32 diff)
     if (spellId != 13812 && spellId != 14314 && spellId != 14315)
     {
         remove = true;
-        if (Unit *caster = GetCaster())
+        if (WorldObject* caster = GetRealCaster())
         {
             std::vector<DynamicObject*> dynObjs;
             caster->GetDynObjects(spellId, GetEffIndex(), dynObjs);
@@ -6234,7 +6234,7 @@ bool Aura::IsLastAuraOnHolder()
     return true;
 }
 
-SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit *target, Unit *caster, Item *castItem) :
+SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit *target, Unit *caster, Item *castItem, WorldObject* pRealCaster) :
     m_spellProto(spellproto), m_target(target), m_castItemGuid(castItem ? castItem->GetObjectGuid() : ObjectGuid()),
     m_auraSlot(MAX_AURAS), m_auraLevel(1), m_procCharges(0),
     m_stackAmount(1), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE), m_timeCla(1000),
@@ -6253,6 +6253,11 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit *target, Uni
         MANGOS_ASSERT(caster->isType(TYPEMASK_UNIT))
         m_casterGuid = caster->GetObjectGuid();
     }
+
+    if (pRealCaster)
+        m_realCasterGuid = pRealCaster->GetObjectGuid();
+    else
+        m_realCasterGuid = m_casterGuid;
 
     m_applyTime      = time(nullptr);
     m_isPassive      = IsPassiveSpell(GetId()) || spellproto->Attributes == 0x80;
@@ -6421,10 +6426,11 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
         CleanupTriggeredSpells();
 
     Unit* caster = GetCaster();
+    WorldObject* realCaster = GetRealCaster();
 
-    if (caster && IsPersistent())
+    if (realCaster && IsPersistent())
     {
-        DynamicObject *dynObj = caster->GetDynObject(GetId());
+        DynamicObject *dynObj = realCaster->GetDynObject(GetId());
         if (dynObj)
             dynObj->RemoveAffected(m_target);
     }
@@ -6592,6 +6598,14 @@ Unit* SpellAuraHolder::GetCaster() const
         return m_target;
 
     return ObjectAccessor::GetUnit(*m_target, m_casterGuid);// player will search at any maps
+}
+
+WorldObject* SpellAuraHolder::GetRealCaster() const
+{
+    if (GetRealCasterGuid() == GetCasterGuid())
+        return GetCaster();
+
+    return m_target->GetMap()->GetWorldObject(GetRealCasterGuid());
 }
 
 bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) const

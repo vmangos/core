@@ -2677,6 +2677,10 @@ void Spell::EffectCreateItem(SpellEffectIndex eff_idx)
 void Spell::EffectPersistentAA(SpellEffectIndex eff_idx)
 {
     WorldObject* pCaster = GetAffectiveCasterObject();
+
+    if (GameObject* pGo = ToGameObject(pCaster))
+        if (Unit* pOwner = pGo->GetOwner())
+            pCaster = pOwner;
     
     if (!pCaster)
         pCaster = m_caster;

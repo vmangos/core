@@ -87,7 +87,7 @@ struct ReapplyAffectedPassiveAurasHelper;
 class MANGOS_DLL_SPEC SpellAuraHolder
 {
     public:
-        SpellAuraHolder (SpellEntry const* spellproto, Unit* target, Unit* caster, Item* castItem);
+        SpellAuraHolder (SpellEntry const* spellproto, Unit* target, Unit* caster, Item* castItem, WorldObject* realCaster);
         Aura* m_auras[MAX_EFFECT_INDEX];
 
         void AddAura(Aura* aura, SpellEffectIndex index);
@@ -115,8 +115,11 @@ class MANGOS_DLL_SPEC SpellAuraHolder
 
         ObjectGuid const& GetCasterGuid() const { return m_casterGuid; }
         void SetCasterGuid(ObjectGuid guid) { m_casterGuid = guid; }
+        ObjectGuid const& GetRealCasterGuid() const { return m_realCasterGuid; }
+        void SetRealCasterGuid(ObjectGuid guid) { m_realCasterGuid = guid; }
         ObjectGuid const& GetCastItemGuid() const { return m_castItemGuid; }
         Unit* GetCaster() const;
+        WorldObject* GetRealCaster() const;
         Unit* GetTarget() const { return m_target; }
         void SetTarget(Unit* target) { m_target = target; }
 
@@ -238,6 +241,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
 
         Unit* m_target;
         ObjectGuid m_casterGuid;
+        ObjectGuid m_realCasterGuid;
         ObjectGuid m_castItemGuid;                          // it is NOT safe to keep a pointer to the item because it may get deleted
         time_t m_applyTime;
 
@@ -436,7 +440,9 @@ class MANGOS_DLL_SPEC Aura
         uint32 GetId() const{ return GetHolder()->GetSpellProto()->Id; }
         ObjectGuid const& GetCastItemGuid() const { return GetHolder()->GetCastItemGuid(); }
         ObjectGuid const& GetCasterGuid() const { return GetHolder()->GetCasterGuid(); }
+        ObjectGuid const& GetRealCasterGuid() const { return GetHolder()->GetRealCasterGuid(); }
         Unit* GetCaster() const { return GetHolder()->GetCaster(); }
+        WorldObject* GetRealCaster() const { return GetHolder()->GetRealCaster(); }
         Unit* GetTarget() const { return GetHolder()->GetTarget(); }
 
         SpellEffectIndex GetEffIndex() const{ return m_effIndex; }
@@ -601,5 +607,5 @@ class MANGOS_DLL_SPEC SingleEnemyTargetAura : public Aura
 };
 
 Aura* CreateAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32* currentBasePoints, SpellAuraHolder* holder, Unit* target, Unit* caster = nullptr, Item* castItem = nullptr);
-SpellAuraHolder* CreateSpellAuraHolder(SpellEntry const* spellproto, Unit* target, Unit* caster, Item* castItem = nullptr);
+SpellAuraHolder* CreateSpellAuraHolder(SpellEntry const* spellproto, Unit* target, Unit* caster, WorldObject* realCaster, Item* castItem = nullptr);
 #endif

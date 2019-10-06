@@ -300,8 +300,7 @@ bool ChatHandler::HandleAuraHelper(uint32 spellID, int32 duration, Unit* unit)
     }
 
 
-    SpellAuraHolder* holder = CreateSpellAuraHolder(spellInfo, unit, m_session->GetPlayer());
-
+    SpellAuraHolder* holder = CreateSpellAuraHolder(spellInfo, unit, m_session->GetPlayer(), m_session->GetPlayer());
 
     if (duration > 0)
         holder->SetAuraDuration(duration * IN_MILLISECONDS);
@@ -1889,7 +1888,7 @@ bool ChatHandler::HandleFearCommand(char* /*args*/)
         return false;
     }
 
-    SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer());
+    SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer(), m_session->GetPlayer());
 
     for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {

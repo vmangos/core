@@ -141,6 +141,22 @@ WorldObject* DynamicObject::GetCaster() const
     return nullptr;
 }
 
+Unit* DynamicObject::GetUnitCaster() const
+{
+    WorldObject* pCaster = GetCaster();
+    if (!pCaster)
+        return nullptr;
+
+    if (pCaster->IsUnit())
+        return static_cast<Unit*>(pCaster);
+    
+    if (GameObject* pGo = pCaster->ToGameObject())
+        return pGo->GetOwner();
+
+    // can be not found in some cases
+    return nullptr;
+}
+
 uint32 DynamicObject::getFaction() const
 {
     return GetCaster()->getFaction();
