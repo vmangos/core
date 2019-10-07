@@ -45,7 +45,11 @@ enum
     NPC_TENDRIS            = 11489,
     NPC_TENDRIS_PROTECTOR  = 11459,
 
-    SAY_FREE_IMMOLTHAR     = -1900008,
+    SAY_FREE_IMMOLTHAR     = 9364,
+    SAY_KING_DEAD          = 9472,
+    SAY_IMMOL_THAR_DEAD    = 9407,
+
+    FACTION_FRIENDLY       = 35,
 
     GO_FORCE_FIELD         = 179503,
     GO_MAGIC_VORTEX        = 179506,
@@ -67,9 +71,6 @@ enum
     GO_BROKEN_TRAP         = 179485,
     GO_FIXED_TRAP          = 179512,
 
-    NPC_TRIBUTE            = 11500,
-    SPELL_TRIBUTE_EVENT    = 23318,
-    SPELL_CHORUSH_EVENT    = 23320,
     SPELL_KING_OF_GORDOK   = 22799,
 
     GO_GORDOK_TRIBUTE_0    = 179564,
@@ -154,7 +155,6 @@ class instance_dire_maul : public ScriptedInstance
 
         // North
         uint32 m_uiGuardAliveCount;
-        uint64 m_uiTributeGUID;
         uint64 m_uiTendrisGUID;
         uint64 m_uiOldIronbarkGUID;
         uint64 m_uiSlipKikGUID;

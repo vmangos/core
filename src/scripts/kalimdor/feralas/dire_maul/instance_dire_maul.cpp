@@ -27,7 +27,6 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     m_uiTendrisGUID(0),
     m_uiMagicVortexGUID(0),
     // North
-    m_uiTributeGUID(0),
     m_uiGuardAliveCount(6),
     m_uiGordokTribute0GUID(0),
     m_uiGordokTribute1GUID(0),
@@ -172,7 +171,7 @@ void instance_dire_maul::OnCreatureDeath(Creature* pCreature)
             break;
         case NPC_IMMOL_THAR:
             if (Creature* pTortheldrin = instance->GetCreature(m_uiTortheldrinGUID))
-                pTortheldrin->MonsterYell("Who dares disrupt the sanctity of Eldre'Thalas? Face me, cowards!");
+                pTortheldrin->MonsterYell(SAY_IMMOL_THAR_DEAD);
             break;
         case NPC_GUARD_MOLDAR:
             SetData(TYPE_MOLDAR, DONE); 
@@ -187,12 +186,17 @@ void instance_dire_maul::OnCreatureDeath(Creature* pCreature)
                 SetData(TYPE_GORDOK_TRIBUTE, SPECIAL);
             break;
         case NPC_KING_GORDOK:
-            if (Creature* pTribute = instance->GetCreature(m_uiTributeGUID))
-                pTribute->CastSpell(pTribute, SPELL_TRIBUTE_EVENT, true);
+            GetMap()->SummonCreature(NPC_MIZZLE_THE_CRAFTY, 693.44f, 480.806f, 28.175f, 0.02757f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3000000);
 
             if (Creature* pChorush = instance->GetCreature(m_uiChoRushTheObserverGUID))
+            {
                 if (pChorush->isAlive())
-                    pChorush->CastSpell(pChorush, SPELL_CHORUSH_EVENT, true);
+                {
+                    pChorush->SetFactionTemporary(FACTION_FRIENDLY, 0);
+                    pChorush->m_Events.AddLambdaEventAtOffset([pChorush]() { DoScriptText(SAY_KING_DEAD, pChorush); }, 5000);
+                }
+            }
+                    
             break;
     }
 }
@@ -201,9 +205,6 @@ void instance_dire_maul::OnCreatureCreate(Creature* pCreature)
 {
     switch (pCreature->GetEntry())
     {
-        case NPC_TRIBUTE:
-            m_uiTributeGUID = pCreature->GetGUID();
-            break;
         case NPC_IMMOL_THAR:
             m_uiImmolTharGUID   = pCreature->GetGUID();
             if (GetData(TYPE_CRISTAL_EVENT) != DONE)
