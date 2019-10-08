@@ -6426,13 +6426,15 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
         CleanupTriggeredSpells();
 
     Unit* caster = GetCaster();
-    WorldObject* realCaster = GetRealCaster();
 
-    if (realCaster && IsPersistent())
+    if (IsPersistent())
     {
-        DynamicObject *dynObj = realCaster->GetDynObject(GetId());
-        if (dynObj)
-            dynObj->RemoveAffected(m_target);
+        if (WorldObject* realCaster = GetRealCaster())
+        {
+            DynamicObject *dynObj = realCaster->GetDynObject(GetId());
+            if (dynObj)
+                dynObj->RemoveAffected(m_target);
+        }
     }
 
     //passive auras do not get put in slots
@@ -6597,7 +6599,7 @@ Unit* SpellAuraHolder::GetCaster() const
     if (GetCasterGuid() == m_target->GetObjectGuid())
         return m_target;
 
-    return ObjectAccessor::GetUnit(*m_target, m_casterGuid);// player will search at any maps
+    return ObjectAccessor::GetUnit(*m_target, GetCasterGuid());// player will search at any maps
 }
 
 WorldObject* SpellAuraHolder::GetRealCaster() const
@@ -6605,7 +6607,13 @@ WorldObject* SpellAuraHolder::GetRealCaster() const
     if (GetRealCasterGuid() == GetCasterGuid())
         return GetCaster();
 
-    return m_target->GetMap()->GetWorldObject(GetRealCasterGuid());
+    if (GetRealCasterGuid().IsUnit())
+        return ObjectAccessor::GetUnit(*m_target, GetRealCasterGuid());
+
+    if (m_target->FindMap())
+        return m_target->FindMap()->GetWorldObject(GetRealCasterGuid());
+
+    return nullptr;
 }
 
 bool SpellAuraHolder::IsWeaponBuffCoexistableWith(SpellAuraHolder const* ref) const
