@@ -6251,9 +6251,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!creature->IsWithinDistInMap(m_caster, INTERACTION_DISTANCE))
                     return SPELL_FAILED_OUT_OF_RANGE;
 
-                uint32 skill = creature->GetCreatureInfo()->GetRequiredLootSkill();
-
-                int32 skillValue = ((Player*)m_caster)->GetSkillValue(skill);
+                int32 skillValue = ((Player*)m_caster)->GetSkillValue(SKILL_SKINNING);
                 int32 TargetLevel = m_targets.getUnitTarget()->getLevel();
                 int32 ReqValue = (skillValue < 100 ? (TargetLevel - 10) * 10 : TargetLevel * 5);
                 if (ReqValue > skillValue)

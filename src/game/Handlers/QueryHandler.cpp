@@ -195,7 +195,11 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
         data << Name;
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data << SubName;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         data << uint32(ci->type_flags);                     // flags
+#else
+        data << uint32(ci->type_flags << 20);               // flags
+#endif
         data << uint32(ci->type);
 
         data << uint32(ci->beast_family);                   // CreatureFamily.dbc
