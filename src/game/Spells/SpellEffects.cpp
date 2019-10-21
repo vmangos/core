@@ -6093,17 +6093,15 @@ void Spell::EffectSkinning(SpellEffectIndex /*eff_idx*/)
     Creature* creature = (Creature*) unitTarget;
     int32 targetLevel = creature->getLevel();
 
-    uint32 skill = creature->GetCreatureInfo()->GetRequiredLootSkill();
-
     ((Player*)m_caster)->SendLoot(creature->GetObjectGuid(), LOOT_SKINNING);
     creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 
     int32 reqValue = targetLevel < 10 ? 0 : targetLevel < 20 ? (targetLevel - 10) * 10 : targetLevel * 5;
 
-    int32 skillValue = ((Player*)m_caster)->GetSkillValuePure(skill);
+    int32 skillValue = ((Player*)m_caster)->GetSkillValuePure(SKILL_SKINNING);
 
     // Double chances for elites
-    ((Player*)m_caster)->UpdateGatherSkill(skill, skillValue, reqValue, creature->IsElite() ? 2 : 1);
+    ((Player*)m_caster)->UpdateGatherSkill(SKILL_SKINNING, skillValue, reqValue, creature->IsElite() ? 2 : 1);
 }
 
 void Spell::EffectCharge(SpellEffectIndex /*eff_idx*/)
