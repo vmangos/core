@@ -180,10 +180,12 @@ struct EquipmentInfo
     uint32  equipentry[3];
 };
 
+#define MAX_SPAWN_ID 4
+
 // from `creature` table
 struct CreatureData
 {
-    uint32 id;                                              // entry in creature_template
+    uint32 creature_id[MAX_SPAWN_ID];                       // entry in creature_template
     uint16 mapid;
     uint32 modelid_override;                                // overrides any model defined in creature_template
     int32 equipmentId;
@@ -195,17 +197,38 @@ struct CreatureData
     uint32 spawntimesecsmax;
     float spawndist;
     uint32 currentwaypoint;
-    uint32 curhealth;
-    uint32 curmana;
+    float curhealth;
+    float curmana;
     bool  is_dead;
     uint8 movementType;
     uint32 spawnFlags;
     float visibilityModifier;
 
     uint32 instanciatedContinentInstanceId;
+
     // helper function
-    ObjectGuid GetObjectGuid(uint32 lowguid) const { return ObjectGuid(CreatureInfo::GetHighGuid(), id, lowguid); }
+    ObjectGuid GetObjectGuid(uint32 lowguid) const { return ObjectGuid(CreatureInfo::GetHighGuid(), creature_id[0], lowguid); }
     uint32 GetRandomRespawnTime() const { return urand(spawntimesecsmin, spawntimesecsmax); }
+    uint32 ChooseCreatureId() const
+    {
+        uint32 creatureId = 0;
+        uint32 creatureIdCount = 0;
+        for (; creatureIdCount < MAX_SPAWN_ID && creature_id[creatureIdCount]; ++creatureIdCount);
+
+        if (creatureIdCount)
+            creatureId = creature_id[urand(0, creatureIdCount - 1)];
+
+        if (!creatureId)
+            creatureId = 1;
+
+        return creatureId;
+    }
+    uint32 GetCreatureIdCount() const
+    {
+        uint32 creatureIdCount = 0;
+        for (; creatureIdCount < MAX_SPAWN_ID && creature_id[creatureIdCount]; ++creatureIdCount);
+        return creatureIdCount;
+    }
 };
 
 // from `creature_addon` and `creature_template_addon`tables
@@ -477,7 +500,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, Team team = TEAM_NONE, const CreatureData *data = nullptr, GameEventCreatureData const* eventData = nullptr);
+        bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, Team team, uint32 firstCreatureId, const CreatureData *data = nullptr, GameEventCreatureData const* eventData = nullptr);
         bool LoadCreatureAddon(bool reload = false);
         void UnloadCreatureAddon(const CreatureDataAddon* data);
 
@@ -499,7 +522,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool HasStaticDBSpawnData() const;                  // listed in `creature` table and have fixed in DB guid
         uint32 GetDBTableGUIDLow() const;
-        uint32 GetDBTableEntry() const;
 
         char const* GetSubName() const { return GetCreatureInfo()->subname; }
 
@@ -907,11 +929,12 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool CanAssistPlayers() { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_CAN_ASSIST; }
 
         bool CanSummonGuards() { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_SUMMON_GUARD; }
+        uint32 GetOriginalEntry() const { return m_originalEntry; }
 
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
 
-        bool CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, Team team, const CreatureData *data = nullptr, GameEventCreatureData const* eventData = nullptr);
+        bool CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, Team team, uint32 firstCreatureId, const CreatureData *data = nullptr, GameEventCreatureData const* eventData = nullptr);
         bool InitEntry(uint32 entry, Team team=ALLIANCE, const CreatureData* data = nullptr, GameEventCreatureData const* eventData = nullptr);
 
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot

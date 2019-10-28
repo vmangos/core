@@ -2469,7 +2469,7 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, con
                 const CreatureData* pCreatureData = sObjectMgr.GetCreatureData(script.target_param1);
                 if (pCreatureData)
                 {
-                    Creature* pCreatureBuddy = this->GetCreature(ObjectGuid(HIGHGUID_UNIT, pCreatureData->id, script.target_param1));
+                    Creature* pCreatureBuddy = this->GetCreature(ObjectGuid(HIGHGUID_UNIT, pCreatureData->creature_id[0], script.target_param1));
 
                     if (pCreatureBuddy)
                         target = pCreatureBuddy;

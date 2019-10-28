@@ -1818,13 +1818,13 @@ void ObjectMgr::LoadCreatureSpells()
 void ObjectMgr::LoadCreatures(bool reload)
 {
     uint32 count = 0;
-    //                                                                          0                  1     2      3
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `map`, `modelid`,"
-    //                      4               5             6             7             8              9                   10                  11           12
+    //                                                                          0                  1                2                 3                 4      5      6
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `creature`.`id2`, `creature`.`id3`, `creature`.`id4`, `map`, `modelid`,"
+    //                      7               8             9             10            11             12                  13                  14           15
                           "`equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`,"
-    //                      13           14         15            16              17
+    //                      16           17         18            19              20
                           "`curhealth`, `curmana`, `DeathState`, `MovementType`, `event`,"
-    //                                      18                                     19            20            21                          22                      23
+    //                                      21                                     22            23            24                          25                      26
                           "`pool_creature`.`pool_entry`, `pool_creature_template`.`pool_entry`, `spawnFlags`, `visibilitymod`, `creature`.`patch_min`, `creature`.`patch_max`  "
                           "FROM `creature` "
                           "LEFT OUTER JOIN `game_event_creature` ON `creature`.`guid` = `game_event_creature`.`guid` "
@@ -1849,15 +1849,24 @@ void ObjectMgr::LoadCreatures(bool reload)
         Field *fields = result->Fetch();
 
         uint32 guid         = fields[ 0].GetUInt32();
-        uint32 entry        = fields[ 1].GetUInt32();
-        uint8 patch_min     = fields[22].GetUInt8();
-        uint8 patch_max     = fields[23].GetUInt8();
+        uint32 first_entry  = fields[ 1].GetUInt32();
+        float curhealth     = fields[16].GetFloat();
+        float curmana       = fields[17].GetFloat();
+        bool is_dead        = fields[18].GetBool();
+        uint8 patch_min     = fields[25].GetUInt8();
+        uint8 patch_max     = fields[26].GetUInt8();
         bool existsInPatch  = true;
+
+        if (!first_entry)
+        {
+            sLog.outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, first_entry);
+            continue;
+        }
 
         if ((patch_min > patch_max) || (patch_max > 10))
         {
-            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has invalid values min_patch=%u, max_patch=%u.", guid, entry, patch_min, patch_max);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET min_patch=0, max_patch=10 WHERE guid=%u AND id=%u;", guid, entry);
+            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has invalid values min_patch=%u, max_patch=%u.", guid, first_entry, patch_min, patch_max);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature SET min_patch=0, max_patch=10 WHERE guid=%u AND id=%u;", guid, first_entry);
             patch_min = 0;
             patch_max = 10;
         }
@@ -1865,80 +1874,90 @@ void ObjectMgr::LoadCreatures(bool reload)
         if (!((sWorld.GetWowPatch() >= patch_min) && (sWorld.GetWowPatch() <= patch_max)))
             existsInPatch = false;
 
-        CreatureInfo const* cInfo = GetCreatureTemplate(entry);
-        if (!cInfo)
+        bool skip = false;
+        for (int i = 0; i < MAX_SPAWN_ID; i++)
         {
-            if (existsInPatch) // don't print error when it is not loaded for the current patch
+            if (uint32 entry = fields[1 + i].GetUInt32())
             {
-                sLog.outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, entry);
-                sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u;", guid);
+                CreatureInfo const* cInfo = GetCreatureTemplate(entry);
+                if (!cInfo)
+                {
+                    if (existsInPatch) // don't print error when it is not loaded for the current patch
+                    {
+                        sLog.outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, entry);
+                        sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u;", guid);
+                    }
+                    skip = true;
+                    break;
+                }
+
+                if ((cInfo->regeneration & REGEN_FLAG_HEALTH) && (cInfo->health_min > 0) && (curhealth < 100.0f) && !is_dead)
+                {
+                    sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with REGEN_FLAG_HEALTH and low current health percent (%g%%).", guid, first_entry, curhealth);
+                    sLog.out(LOG_DBERRFIX, "UPDATE creature SET curhealth=100 WHERE guid=%u AND id=%u;", guid, first_entry);
+                    curhealth = 100.0f;
+                }
+
+                if ((cInfo->regeneration & REGEN_FLAG_POWER) && (cInfo->mana_min > 0) && (curmana < 100.0f))
+                {
+                    sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with REGEN_FLAG_POWER and low current mana percent (%g%%).", guid, first_entry, curmana);
+                    sLog.out(LOG_DBERRFIX, "UPDATE creature SET curmana=100 WHERE guid=%u AND id=%u;", guid, first_entry);
+                    curmana = 100.0f;
+                }
+
+                if (curhealth > 100.0f)
+                {
+                    sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with more than 100%% health.", guid, first_entry);
+                    sLog.out(LOG_DBERRFIX, "UPDATE creature SET curhealth=100 WHERE guid=%u AND id=%u;", guid, first_entry);
+                    curhealth = 100.0f;
+                }
+
+                if (curmana > 100.0f)
+                {
+                    sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with more than 100%% mana.", guid, first_entry);
+                    sLog.out(LOG_DBERRFIX, "UPDATE creature SET curmana=100 WHERE guid=%u AND id=%u;", guid, first_entry);
+                    curmana = 100.0f;
+                }
             }
-            continue;
         }
+
+        if (skip)
+            continue;
 
         bool alreadyPresent = reload && m_CreatureDataMap.find(guid) != m_CreatureDataMap.end();
         CreatureData& data = m_CreatureDataMap[guid];
 
-        data.id                 = entry;
-        data.mapid              = fields[ 2].GetUInt32();
-        data.modelid_override   = fields[ 3].GetUInt32();
-        data.equipmentId        = fields[ 4].GetUInt32();
-        data.posX               = fields[ 5].GetFloat();
-        data.posY               = fields[ 6].GetFloat();
-        data.posZ               = fields[ 7].GetFloat();
-        data.orientation        = fields[ 8].GetFloat();
-        data.spawntimesecsmin   = fields[ 9].GetUInt32();
-        data.spawntimesecsmax   = fields[10].GetUInt32();
-        data.spawndist          = fields[11].GetFloat();
-        data.currentwaypoint    = fields[12].GetUInt32();
-        float curhealth         = fields[13].GetFloat();
-        float curmana           = fields[14].GetFloat();
-        data.is_dead            = fields[15].GetBool();
-        data.movementType       = fields[16].GetUInt8();
-        data.spawnFlags         = fields[20].GetUInt32();
-        data.visibilityModifier = fields[21].GetFloat();
+        data.creature_id[0]     = fields[ 1].GetUInt32();
+        data.creature_id[1]     = fields[ 2].GetUInt32();
+        data.creature_id[2]     = fields[ 3].GetUInt32();
+        data.creature_id[3]     = fields[ 4].GetUInt32();
+        data.mapid              = fields[ 5].GetUInt32();
+        data.modelid_override   = fields[ 6].GetUInt32();
+        data.equipmentId        = fields[ 7].GetUInt32();
+        data.posX               = fields[ 8].GetFloat();
+        data.posY               = fields[ 9].GetFloat();
+        data.posZ               = fields[10].GetFloat();
+        data.orientation        = fields[11].GetFloat();
+        data.spawntimesecsmin   = fields[12].GetUInt32();
+        data.spawntimesecsmax   = fields[13].GetUInt32();
+        data.spawndist          = fields[14].GetFloat();
+        data.currentwaypoint    = fields[15].GetUInt32();
+        data.curhealth          = curhealth;
+        data.curmana            = curmana;
+        data.is_dead            = is_dead;
+        data.movementType       = fields[19].GetUInt8();
+        data.spawnFlags         = fields[23].GetUInt32();
+        data.visibilityModifier = fields[24].GetFloat();
         data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.mapid, data.posX, data.posY);
-        int16 gameEvent         = fields[17].GetInt16();
-        int16 GuidPoolId        = fields[18].GetInt16();
-        int16 EntryPoolId       = fields[19].GetInt16();
-
-        if ((cInfo->regeneration & REGEN_FLAG_HEALTH) && (cInfo->health_min > 0) && (curhealth < 100.0f) && !data.is_dead)
-        {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with REGEN_FLAG_HEALTH and low current health percent (%g%%).", guid, data.id, curhealth);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET curhealth=100 WHERE guid=%u AND id=%u;", guid, data.id);
-            curhealth = 100.0f;
-        }
-
-        if ((cInfo->regeneration & REGEN_FLAG_POWER) && (cInfo->mana_min > 0) && (curmana < 100.0f))
-        {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with REGEN_FLAG_POWER and low current mana percent (%g%%).", guid, data.id, curmana);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET curmana=100 WHERE guid=%u AND id=%u;", guid, data.id);
-            curmana = 100.0f;
-        }
-
-        if (curhealth > 100.0f)
-        {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with more than 100%% health.", guid, data.id);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET curhealth=100 WHERE guid=%u AND id=%u;", guid, data.id);
-            curhealth = 100.0f;
-        }
-
-        if (curmana > 100.0f)
-        {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with more than 100%% mana.", guid, data.id);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET curmana=100 WHERE guid=%u AND id=%u;", guid, data.id);
-            curmana = 100.0f;
-        }
-
-        // Calculate exact health and mana for spawn.
-        data.curhealth = cInfo->health_max * curhealth / 100.0f;
-        data.curmana = cInfo->mana_max * curmana / 100.0f;
+        int16 gameEvent         = fields[20].GetInt16();
+        int16 GuidPoolId        = fields[21].GetInt16();
+        int16 EntryPoolId       = fields[22].GetInt16();
 
         MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.mapid);
         if (!mapEntry)
         {
             sLog.outErrorDb("Table `creature` have creature (GUID: %u) that spawned at nonexistent map (Id: %u), skipped.", guid, data.mapid);
-            sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u AND id=%u;", guid, data.id);
+            sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
             continue;
         }
 
@@ -1948,14 +1967,14 @@ void ObjectMgr::LoadCreatures(bool reload)
         if (data.spawntimesecsmax < data.spawntimesecsmin)
         {
             sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `spawntimesecsmax` (%u) value lower than `spawntimesecsmin` (%u), it will be adjusted to %u.",
-                guid, data.id, uint32(data.spawntimesecsmax), uint32(data.spawntimesecsmin), uint32(data.spawntimesecsmin));
+                guid, data.creature_id[0], uint32(data.spawntimesecsmax), uint32(data.spawntimesecsmin), uint32(data.spawntimesecsmin));
             data.spawntimesecsmax = data.spawntimesecsmin;
         }
 
         if (data.modelid_override > 0 && !sCreatureDisplayInfoStore.LookupEntry(data.modelid_override))
         {
-            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has model for nonexistent model id (%u), set to 0.", guid, data.id, data.modelid_override);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET modelid=0 WHERE guid=%u AND id=%u;", guid, data.id);
+            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has model for nonexistent model id (%u), set to 0.", guid, data.creature_id[0], data.modelid_override);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature SET modelid=0 WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
             data.modelid_override = 0;
         }
 
@@ -1963,37 +1982,23 @@ void ObjectMgr::LoadCreatures(bool reload)
         {
             if (!GetEquipmentInfo(data.equipmentId))
             {
-                sLog.outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", data.id, data.equipmentId);
+                sLog.outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", data.creature_id[0], data.equipmentId);
                 data.equipmentId = -1;
             }
         }
 
-        if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
-        {
-            if (!mapEntry || !mapEntry->IsDungeon())
-                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_INSTANCE_BIND (%u) but creature are not in instance.",
-                                guid, data.id, CREATURE_FLAG_EXTRA_INSTANCE_BIND);
-        }
-
-        if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_AGGRO_ZONE)
-        {
-            if (!mapEntry || !mapEntry->IsDungeon())
-                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`flags_extra` including CREATURE_FLAG_EXTRA_AGGRO_ZONE (%u) but creature are not in instance.",
-                                guid, data.id, CREATURE_FLAG_EXTRA_AGGRO_ZONE);
-        }
-
         if (data.spawndist < 0.0f)
         {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `spawndist`< 0, set to 0.", guid, data.id);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET spawndist=0 WHERE guid=%u AND id=%u;", guid, data.id);
+            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `spawndist`< 0, set to 0.", guid, data.creature_id[0]);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature SET spawndist=0 WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
             data.spawndist = 0.0f;
         }
         else if (data.movementType == RANDOM_MOTION_TYPE)
         {
             if (data.spawndist == 0.0f)
             {
-                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `spawndist`=0, replace by idle movement type (0).", guid, data.id);
-                sLog.out(LOG_DBERRFIX, "UPDATE creature SET MovementType=%u WHERE guid=%u AND id=%u;", IDLE_MOTION_TYPE, guid, data.id);
+                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `spawndist`=0, replace by idle movement type (0).", guid, data.creature_id[0]);
+                sLog.out(LOG_DBERRFIX, "UPDATE creature SET MovementType=%u WHERE guid=%u AND id=%u;", IDLE_MOTION_TYPE, guid, data.creature_id[0]);
                 data.movementType = IDLE_MOTION_TYPE;
             }
         }
@@ -2001,8 +2006,8 @@ void ObjectMgr::LoadCreatures(bool reload)
         {
             if (data.spawndist != 0.0f)
             {
-                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `spawndist`<>0, set to 0.", guid, data.id);
-                sLog.out(LOG_DBERRFIX, "UPDATE creature SET spawndist=0 WHERE guid=%u AND id=%u;", guid, data.id);
+                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `spawndist`<>0, set to 0.", guid, data.creature_id[0]);
+                sLog.out(LOG_DBERRFIX, "UPDATE creature SET spawndist=0 WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
                 data.spawndist = 0.0f;
             }
         }
@@ -7264,7 +7269,7 @@ void ObjectMgr::LoadGameobjectsRequirements()
         {
             case GameObjectUseRequirement::GOBJ_REQUIRE_DEAD_CREATURE:
                 if (CreatureData const* data = GetCreatureData(reqGuidLow))
-                    entry.guid = ObjectGuid(HIGHGUID_UNIT, data->id, reqGuidLow);
+                    entry.guid = ObjectGuid(HIGHGUID_UNIT, data->creature_id[0], reqGuidLow);
                 else
                 {
                     sLog.outErrorDb("Table `gameobject_requirement` has not found creature guid (%u)", reqGuidLow);
@@ -10051,7 +10056,7 @@ Quest const* GetQuestTemplateStore(uint32 entry)
 bool FindCreatureData::operator()(CreatureDataPair const& dataPair)
 {
     // skip wrong entry ids
-    if (i_id && dataPair.second.id != i_id)
+    if (i_id && dataPair.second.creature_id[0] != i_id)
         return false;
 
     if (!i_anyData)
@@ -10200,7 +10205,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
 bool ObjectMgr::MoveCreData(uint32 guid, uint32 mapId, const Position& pos)
 {
     CreatureData& data = NewOrExistCreatureData(guid);
-    if (!data.id)
+    if (!data.creature_id[0])
         return false;
 
     RemoveCreatureFromGrid(guid, &data);
@@ -10242,7 +10247,7 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float 
 
     uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_UNIT);
     CreatureData& data = NewOrExistCreatureData(guid);
-    data.id = entry;
+    data.creature_id[0] = entry;
     data.mapid = mapId;
     data.equipmentId = cInfo->equipment_id;
     data.posX = x;
@@ -10253,8 +10258,8 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float 
     data.spawntimesecsmax = spawntimedelay;
     data.spawndist = 0;
     data.currentwaypoint = 0;
-    data.curhealth = cInfo->health_max;
-    data.curmana = cInfo->mana_max;
+    data.curhealth = 100.0f;
+    data.curmana = 100.0f;
     data.is_dead = false;
     data.movementType = cInfo->movement_type;
 
