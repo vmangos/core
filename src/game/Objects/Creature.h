@@ -185,25 +185,26 @@ struct EquipmentInfo
 // from `creature` table
 struct CreatureData
 {
-    uint32 creature_id[MAX_SPAWN_ID];                       // entry in creature_template
-    uint16 mapid;
-    uint32 modelid_override;                                // overrides any model defined in creature_template
-    int32 equipmentId;
-    float posX;
-    float posY;
-    float posZ;
-    float orientation;
-    uint32 spawntimesecsmin;
-    uint32 spawntimesecsmax;
-    float spawndist;
-    uint32 currentwaypoint;
-    float curhealth;
-    float curmana;
-    bool  is_dead;
-    uint8 movementType;
-    uint32 spawnFlags;
-    float visibilityModifier;
+    uint32 creature_id[MAX_SPAWN_ID] = {};
+    uint16 mapid = 0;
+    uint32 modelid_override = 0;
+    int32 equipmentId = 0;
+    float posX = 0.0f;
+    float posY = 0.0f;
+    float posZ = 0.0f;
+    float orientation = 0.0f;
+    uint32 spawntimesecsmin = 0;
+    uint32 spawntimesecsmax = 0;
+    float spawndist = 0.0f;
+    uint32 currentwaypoint = 0;
+    float curhealth = 100.0f;
+    float curmana = 100.0f;
+    bool  is_dead = false;
+    uint8 movementType = 0;
+    uint32 spawnFlags = 0;
+    float visibilityModifier = 0.0f;
 
+    // non db field
     uint32 instanciatedContinentInstanceId;
 
     // helper function

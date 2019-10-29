@@ -359,7 +359,6 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=NU
     if (data)
         m_startwaypoint = data->currentwaypoint;
 
-    // checked at loading
     if (!data)
         m_defaultMovementType = MovementGeneratorType(cinfo->movement_type);
 
@@ -1406,8 +1405,6 @@ void Creature::SaveToDB(uint32 mapid)
     // prevent add data integrity problems
     data.spawndist = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0 : m_respawnradius;
     data.currentwaypoint = 0;
-    data.curhealth = 100;
-    data.curmana = 100;
     data.is_dead = m_isDeadByDefault;
     // prevent add data integrity problems
     data.movementType = !m_respawnradius && GetDefaultMovementType() == RANDOM_MOTION_TYPE
@@ -1425,7 +1422,10 @@ void Creature::SaveToDB(uint32 mapid)
     std::ostringstream ss;
     ss << "INSERT INTO creature VALUES ("
        << GetGUIDLow() << ","
-       << GetEntry() << ","
+       << data.creature_id[0] << ","
+       << data.creature_id[1] << ","
+       << data.creature_id[2] << ","
+       << data.creature_id[3] << ","
        << mapid << ","
        << displayId << ","
        << GetEquipmentId() << ","
@@ -1435,9 +1435,9 @@ void Creature::SaveToDB(uint32 mapid)
        << GetOrientation() << ","
        << data.spawntimesecsmin << ","                     // respawn time minimum
        << data.spawntimesecsmax << ","                     // respawn time maximum
-       << spawndist << ","                                 // spawn distance
+       << spawndist << ","                                 // wander distance
        << (uint32)(0) << ","                               // currentwaypoint
-       << GetHealthPercent() << ","                        // curhealth
+       << data.curhealth << ","                            // curhealth
        << curmana << ","                                   // curmana
        << (m_isDeadByDefault ? 1 : 0) << ","               // is_dead
        << GetDefaultMovementType() << ","                  // default movement generator type
