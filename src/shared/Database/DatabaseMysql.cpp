@@ -161,7 +161,9 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
     {
         case CR_SERVER_GONE_ERROR:
         case CR_SERVER_LOST:
+            #if !(MARIADB_VERSION_ID >= 100200)
         case CR_INVALID_CONN_HANDLE:
+            #endif
         case CR_SERVER_LOST_EXTENDED:
         {
             mysql_close(mMysql);
