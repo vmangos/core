@@ -8986,7 +8986,8 @@ bool ObjectMgr::LoadQuestGreetings()
             {
                 if (!ObjectMgr::GetCreatureTemplate(entry))
                 {
-                    sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
+                    if (!IsExistingCreatureId(entry))
+                        sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
                     continue;
                 }
                 break;
@@ -9394,7 +9395,8 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 
             if (!cInfo)
             {
-                sLog.outErrorDb("Table `%s` have entry for nonexistent creature template (Entry: %u), ignore", tableName, entry);
+                if (!IsExistingCreatureId(entry))
+                    sLog.outErrorDb("Table `%s` have entry for nonexistent creature template (Entry: %u), ignore", tableName, entry);
                 continue;
             }
 
