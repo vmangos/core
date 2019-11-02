@@ -846,7 +846,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
 
-        void SetNoXP() { SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD); }
+        void SetNoXP() { addUnitState(UNIT_STAT_NO_KILL_REWARD); }
 
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
         void ClearTemporaryFaction();

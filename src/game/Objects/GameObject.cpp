@@ -1307,8 +1307,17 @@ void GameObject::Use(Unit* user)
     if (AI() && AI()->OnUse(user))
         return;
 
-    if (user->GetTypeId() == TYPEID_PLAYER && sScriptMgr.OnGameObjectUse((Player*)user, this))
-        return;
+    if (user->IsPlayer())
+    {
+        if (m_goInfo->CannotBeUsedUnderImmunity() && user->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE))
+            return;
+
+        if (!m_goInfo->IsUsableMounted())
+            user->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+
+        if (sScriptMgr.OnGameObjectUse((Player*)user, this))
+            return;
+    }
 
     // test only for exist cooldown data (cooldown timer used for door/buttons reset that not have use cooldown)
     if (uint32 cooldown = GetGOInfo()->GetCooldown())

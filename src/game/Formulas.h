@@ -114,7 +114,7 @@ namespace MaNGOS
                 if (pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)
                     return 0;
 
-                if (pCreature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD))
+                if (pCreature->hasUnitState(UNIT_STAT_NO_KILL_REWARD))
                     return 0;
 
                 uint32 xp_gain = BaseGain(pPlayer->getLevel(), pUnit->getLevel());
@@ -161,7 +161,7 @@ namespace MaNGOS
             if(pUnit->GetTypeId()==TYPEID_UNIT && (
                 (pUnit->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||
                 (((Creature*)pUnit)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
-                pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD)))
+                pUnit->hasUnitState(UNIT_STAT_NO_KILL_REWARD)))
                 return 0;
 
             uint32 xp_gain= BaseGain(pPet->getLevel(), pUnit->getLevel());

@@ -3095,10 +3095,10 @@ void Player::InitStatsForLevel(bool reapplyMods)
     RemoveFlag(UNIT_FIELD_FLAGS,
                UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_NOT_ATTACKABLE_1 |
                UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_PASSIVE  | UNIT_FLAG_LOOTING          |
-               UNIT_FLAG_PET_IN_COMBAT  | UNIT_FLAG_SILENCED     | UNIT_FLAG_PACIFIED         |
-               UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
-               UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING      | UNIT_FLAG_NOT_SELECTABLE   |
-               UNIT_FLAG_SKINNABLE      | UNIT_FLAG_AURAS_VISIBLE        | UNIT_FLAG_TAXI_FLIGHT);
+               UNIT_FLAG_PET_IN_COMBAT  | UNIT_FLAG_SILENCED   | UNIT_FLAG_PACIFIED         |
+               UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT  | UNIT_FLAG_DISARMED         |
+               UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING    | UNIT_FLAG_NOT_SELECTABLE   |
+               UNIT_FLAG_SKINNABLE      | UNIT_FLAG_IMMUNE     | UNIT_FLAG_AURAS_VISIBLE    | UNIT_FLAG_TAXI_FLIGHT);
     SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);    // must be set
 
     // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
@@ -19209,7 +19209,7 @@ bool Player::IsHonorOrXPTarget(Unit* pVictim) const
         if (((Creature*)pVictim)->IsTotem() ||
                 ((Creature*)pVictim)->IsPet() ||
                 ((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL ||
-                pVictim->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD))
+                pVictim->hasUnitState(UNIT_STAT_NO_KILL_REWARD))
             return false;
     }
     return true;

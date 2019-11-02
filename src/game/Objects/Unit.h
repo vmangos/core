@@ -432,7 +432,7 @@ enum UnitState
 {
     // persistent state (applied by aura/etc until expire)
     UNIT_STAT_MELEE_ATTACKING = 0x00000001,                     // unit is melee attacking someone Unit::Attack
-    //UNIT_STAT_ATTACK_PLAYER = 0x00000002,                     // (Deprecated) unit attack player or player's controlled unit and have contested pvpv timer setup, until timer expire, combat end and etc
+    UNIT_STAT_NO_KILL_REWARD  = 0x00000002,                     // Unit should yield no reward (Honor/XP/Rep) on kill
     UNIT_STAT_DIED            = 0x00000004,                     // Unit::SetFeignDeath
     UNIT_STAT_STUNNED         = 0x00000008,                     // Aura::HandleAuraModStun
     UNIT_STAT_ROOT            = 0x00000010,                     // Aura::HandleAuraModRoot
@@ -549,8 +549,7 @@ enum UnitFlags
     UNIT_FLAG_SKINNABLE             = 0x04000000,
     UNIT_FLAG_AURAS_VISIBLE         = 0x08000000,           // magic detect
     UNIT_FLAG_SHEATHE               = 0x40000000,
-    //UNIT_FLAG_UNK_31              = 0x80000000            // no effect in 1.12.1
-    UNIT_FLAG_NO_KILL_REWARD        = 0x80000000,           // Unit should yield no reward (Honor/XP/Rep) on kill
+    UNIT_FLAG_IMMUNE                = 0x80000000,           // Immune to damage
 
     // [-ZERO] TBC enumerations [?]
     UNIT_FLAG_NOT_ATTACKABLE_1      = 0x00000080,           // ?? (UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_NOT_ATTACKABLE_1) is NON_PVP_ATTACKABLE

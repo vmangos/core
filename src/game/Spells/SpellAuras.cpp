@@ -3979,30 +3979,41 @@ void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
 
     // TODO: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else
-    if (Real && apply
-            && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY
-            && IsPositiveSpell(GetId()))                        //Only positive immunity removes auras
+    if (Real && GetSpellProto()->HasAttribute(SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
+             && IsPositiveSpell(GetId()))                        // Only positive immunity removes auras
     {
-        uint32 school_mask = m_modifier.m_miscvalue;
-        Unit::SpellAuraHolderMap& Auras = target->GetSpellAuraHolderMap();
-        for (Unit::SpellAuraHolderMap::iterator iter = Auras.begin(), next; iter != Auras.end(); iter = next)
+        if (apply)
         {
-            next = iter;
-            ++next;
-            SpellEntry const *spell = iter->second->GetSpellProto();
-            if ((spell->GetSpellSchoolMask() & school_mask) //Check for school mask
-                    && !(spell->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)    //Spells unaffected by invulnerability
-                    && !iter->second->IsPositive()          //Don't remove positive spells
-                    && spell->Id != GetId())                //Don't remove self
+            uint32 school_mask = m_modifier.m_miscvalue;
+            Unit::SpellAuraHolderMap& Auras = target->GetSpellAuraHolderMap();
+            for (Unit::SpellAuraHolderMap::iterator iter = Auras.begin(), next; iter != Auras.end(); iter = next)
             {
-                target->RemoveAurasDueToSpell(spell->Id);
-                if (Auras.empty())
-                    break;
-                else
-                    next = Auras.begin();
+                next = iter;
+                ++next;
+                SpellEntry const *spell = iter->second->GetSpellProto();
+                if ((spell->GetSpellSchoolMask() & school_mask) // Check for school mask
+                    && !(spell->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)    // Spells unaffected by invulnerability
+                    && !iter->second->IsPositive()          // Don't remove positive spells
+                    && spell->Id != GetId())                // Don't remove self
+                {
+                    target->RemoveAurasDueToSpell(spell->Id);
+                    if (Auras.empty())
+                        break;
+                    else
+                        next = Auras.begin();
+                }
             }
+            target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE);
         }
+        else
+        {
+            // Do not remove unit flag if there are more than this auraEffect of that kind on unit
+            if (!target->HasAuraType(SPELL_AURA_SCHOOL_IMMUNITY))
+                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE);
+        }
+        
     }
+
     if (Real && GetSpellProto()->Mechanic == MECHANIC_BANISH)
     {
         if (apply)
