@@ -714,16 +714,18 @@ bool ChatHandler::HandleNpcAddEntryCommand(char* args)
         return false;
     }
 
+    int count = 0;
     std::array<uint32, MAX_SPAWN_ID> creatureIds = pData->creature_id;
     for (int i = 0; i < MAX_SPAWN_ID; i++)
     {
         if (!creatureIds[i])
         {
+            count = i+1;
             creatureIds[i] = uiCreatureId;
             break;
         }
     }
-    std::sort(creatureIds.begin(), creatureIds.end());
+    std::sort(creatureIds.begin(), creatureIds.begin()+count);
     pData->creature_id = creatureIds;
 
     WorldDatabase.PExecute("UPDATE `creature` SET `id`=%u, `id2`=%u, `id3`=%u, `id4`=%u WHERE `guid`=%u", creatureIds[0], creatureIds[1], creatureIds[2], creatureIds[3], pCreature->GetGUIDLow());
