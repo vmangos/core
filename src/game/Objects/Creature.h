@@ -185,7 +185,7 @@ struct EquipmentInfo
 // from `creature` table
 struct CreatureData
 {
-    uint32 creature_id[MAX_SPAWN_ID] = {};
+    std::array<uint32, MAX_SPAWN_ID> creature_id = {};
     uint16 mapid = 0;
     uint32 modelid_override = 0;
     int32 equipmentId = 0;

@@ -667,6 +667,70 @@ bool ChatHandler::HandleNpcDeleteCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleNpcAddEntryCommand(char* args)
+{
+    Creature* pCreature = GetSelectedCreature();
+
+    if (!pCreature)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        return true;
+    }
+
+    uint32 uiCreatureId = 0;
+
+    if (!ExtractUInt32(&args, uiCreatureId))
+        return false;
+
+    if (!ObjectMgr::GetCreatureTemplate(uiCreatureId))
+    {
+        PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, uiCreatureId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("Creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (int i = 0; i < MAX_SPAWN_ID; i++)
+    {
+        if (pData->creature_id[i] == uiCreatureId)
+        {
+            SendSysMessage("Creature spawn already includes this entry.");
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
+    if (pData->GetCreatureIdCount() >= MAX_SPAWN_ID)
+    {
+        SendSysMessage("Creature spawn has the maximum amount of entries already.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::array<uint32, MAX_SPAWN_ID> creatureIds = pData->creature_id;
+    for (int i = 0; i < MAX_SPAWN_ID; i++)
+    {
+        if (!creatureIds[i])
+        {
+            creatureIds[i] = uiCreatureId;
+            break;
+        }
+    }
+    std::sort(creatureIds.begin(), creatureIds.end());
+    pData->creature_id = creatureIds;
+
+    WorldDatabase.PExecute("UPDATE `creature` SET `id`=%u, `id2`=%u, `id3`=%u, `id4`=%u WHERE `guid`=%u", creatureIds[0], creatureIds[1], creatureIds[2], creatureIds[3], pCreature->GetGUIDLow());
+    PSendSysMessage("Creature entry %u added to guid %u.", uiCreatureId, pCreature->GetGUIDLow());
+    return true;
+}
+
 bool ChatHandler::HandleNpcAddWeaponCommand(char* args)
 {
     Creature* pCreature = GetSelectedCreature();
