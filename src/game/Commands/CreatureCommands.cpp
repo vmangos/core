@@ -568,7 +568,7 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
         return false;
     }
 
-    if (!pCreature->Create(lowguid, pos, cinfo))
+    if (!pCreature->Create(lowguid, pos, cinfo, TEAM_NONE, id))
     {
         delete pCreature;
         return false;
@@ -664,6 +664,72 @@ bool ChatHandler::HandleNpcDeleteCommand(char* args)
 
     SendSysMessage(LANG_COMMAND_DELCREATMESSAGE);
 
+    return true;
+}
+
+bool ChatHandler::HandleNpcAddEntryCommand(char* args)
+{
+    Creature* pCreature = GetSelectedCreature();
+
+    if (!pCreature)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        return true;
+    }
+
+    uint32 uiCreatureId = 0;
+
+    if (!ExtractUInt32(&args, uiCreatureId))
+        return false;
+
+    if (!ObjectMgr::GetCreatureTemplate(uiCreatureId))
+    {
+        PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, uiCreatureId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    CreatureData* pData = const_cast<CreatureData*>(pCreature->GetCreatureData());
+    if (!pData)
+    {
+        SendSysMessage("Creature is not a permanent spawn.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (int i = 0; i < MAX_SPAWN_ID; i++)
+    {
+        if (pData->creature_id[i] == uiCreatureId)
+        {
+            SendSysMessage("Creature spawn already includes this entry.");
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
+    if (pData->GetCreatureIdCount() >= MAX_SPAWN_ID)
+    {
+        SendSysMessage("Creature spawn has the maximum amount of entries already.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    int count = 0;
+    std::array<uint32, MAX_SPAWN_ID> creatureIds = pData->creature_id;
+    for (int i = 0; i < MAX_SPAWN_ID; i++)
+    {
+        if (!creatureIds[i])
+        {
+            count = i+1;
+            creatureIds[i] = uiCreatureId;
+            break;
+        }
+    }
+    std::sort(creatureIds.begin(), creatureIds.begin()+count);
+    pData->creature_id = creatureIds;
+
+    WorldDatabase.PExecute("UPDATE `creature` SET `id`=%u, `id2`=%u, `id3`=%u, `id4`=%u WHERE `guid`=%u", creatureIds[0], creatureIds[1], creatureIds[2], creatureIds[3], pCreature->GetGUIDLow());
+    PSendSysMessage("Creature entry %u added to guid %u.", uiCreatureId, pCreature->GetGUIDLow());
     return true;
 }
 
@@ -1222,7 +1288,7 @@ inline Creature* Helper_CreateWaypointFor(Creature* wpOwner, WaypointPathOrigin 
 
     CreatureCreatePos pos(wpOwner->GetMap(), wpNode->x, wpNode->y, wpNode->z, wpNode->orientation != 100.0f ? wpNode->orientation : 0.0f);
 
-    if (!wpCreature->Create(wpOwner->GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo))
+    if (!wpCreature->Create(wpOwner->GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, TEAM_NONE, waypointInfo->entry))
     {
         delete wpCreature;
         return NULL;
@@ -2081,7 +2147,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
         CreatureCreatePos pos{map, wp.fX, wp.fY, wp.fZ, pPlayer->GetOrientation()};
         Creature* wpCreature = new Creature;
 
-        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo))
+        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, TEAM_NONE, waypointInfo->entry))
         {
             PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
             delete wpCreature;

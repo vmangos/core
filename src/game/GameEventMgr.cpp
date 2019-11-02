@@ -995,7 +995,7 @@ struct GameEventUpdateCreatureDataInMapsWorker
     {
         if (Creature* pCreature = map->GetCreature(i_guid))
         {
-            pCreature->UpdateEntry(i_data->id, TEAM_NONE, i_data, i_activate ? i_event_data : NULL);
+            pCreature->UpdateEntry(pCreature->GetOriginalEntry(), TEAM_NONE, i_data, i_activate ? i_event_data : NULL);
 
             // spells not casted for event remove case (sent NULL into update), do it
             if (!i_activate)

@@ -943,8 +943,8 @@ class ObjectMgr
         {
             auto itr = m_CreatureDataMap.begin();
             for (; itr != m_CreatureDataMap.end(); ++itr)
-                if (itr->second.id == entry)
-                    return ObjectGuid(HIGHGUID_UNIT, itr->second.id, itr->first);
+                if (itr->second.creature_id[0] == entry)
+                    return ObjectGuid(HIGHGUID_UNIT, itr->second.creature_id[0], itr->first);
             return ObjectGuid();
         }
 

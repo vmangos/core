@@ -456,7 +456,7 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
             else                                            // guid case
             {
                 CreatureData const* masterData = sObjectMgr.GetCreatureData(pInfo->masterDBGuid);
-                CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->id);
+                CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->creature_id[0]);
                 pMaster = pSource->GetMap()->GetCreature(ObjectGuid(cInfo->GetHighGuid(), cInfo->entry, pInfo->masterDBGuid));
             }
 
@@ -664,7 +664,7 @@ bool CreatureLinkingHolder::CanSpawn(uint32 lowGuid, Map* _map, CreatureLinkingI
         CreatureData const* data = sObjectMgr.GetCreatureData(lowGuid);
         if (!data)
             return true;
-        pInfo = sCreatureLinkingMgr.GetLinkedTriggerInformation(data->id, lowGuid, data->mapid);
+        pInfo = sCreatureLinkingMgr.GetLinkedTriggerInformation(data->creature_id[0], lowGuid, data->mapid);
         if (!pInfo)
             return true;
         // Has lowGuid npc actually spawning linked?
@@ -728,7 +728,7 @@ bool CreatureLinkingHolder::TryFollowMaster(Creature* pCreature)
     else                                                    // guid case
     {
         CreatureData const* masterData = sObjectMgr.GetCreatureData(pInfo->masterDBGuid);
-        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->id);
+        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->creature_id[0]);
         pMaster = pCreature->GetMap()->GetCreature(ObjectGuid(cInfo->GetHighGuid(), cInfo->entry, pInfo->masterDBGuid));
     }
 

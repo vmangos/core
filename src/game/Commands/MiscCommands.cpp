@@ -1188,7 +1188,7 @@ bool ChatHandler::HandlePoolSpawnsCommand(char* args)
     for (SpawnedPoolObjects::const_iterator itr = crSpawns.begin(); itr != crSpawns.end(); ++itr)
         if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<Creature>(*itr))
             if (CreatureData const* data = sObjectMgr.GetCreatureData(*itr))
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->id))
+                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
                     PSendSysMessage(LANG_CREATURE_LIST_CHAT, *itr, PrepareStringNpcOrGoSpawnInformation<Creature>(*itr).c_str(),
                                     *itr, info->name, data->posX, data->posY, data->posZ, data->mapid);
 
@@ -1243,7 +1243,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
         {
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr->guid))
             {
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->id))
+                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
                 {
                     char const* active = crSpawns && crSpawns->find(itr->guid) != crSpawns->end() ? active_str.c_str() : "";
                     if (m_session)
@@ -1265,7 +1265,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
         {
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr->guid))
             {
-                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->id))
+                if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
                 {
                     char const* active = crSpawns && crSpawns->find(itr->guid) != crSpawns->end() ? active_str.c_str() : "";
                     if (m_session)
