@@ -398,6 +398,7 @@ UPDATE `locales_points_of_interest` SET `entry`=460 WHERE `entry`=10338;
 UPDATE `points_of_interest` SET `entry`=649, `x`=-9386.55, `y`=-118.731, `icon`=6, `flags`=99, `icon_name`='Lee Brown' WHERE `entry`=10012;
 UPDATE `locales_points_of_interest` SET `entry`=649 WHERE `entry`=10012;
 UPDATE `gossip_menu_option` SET `action_poi_id`=649 WHERE `action_poi_id`=10012;
+UPDATE `gossip_menu_option` SET `action_poi_id`=420 WHERE `menu_id`=2168 && `id`=4;
 
 -- Remove tbc and wotlk poi entries.
 DELETE FROM `points_of_interest` WHERE `entry` > 10000;
