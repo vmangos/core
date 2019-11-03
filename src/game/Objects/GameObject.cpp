@@ -1312,7 +1312,7 @@ void GameObject::Use(Unit* user)
         if (m_goInfo->CannotBeUsedUnderImmunity() && user->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE))
             return;
 
-        if (!m_goInfo->IsUsableMounted())
+        if (!m_goInfo->IsUsableMounted() && user->IsMounted())
             user->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
         if (sScriptMgr.OnGameObjectUse((Player*)user, this))
