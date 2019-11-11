@@ -2083,7 +2083,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         Creature* GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask) const;
         bool CanInteractWithNPC(Creature* pCreature, uint32 npcflagmask) const;
         GameObject* GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameobject_type = MAX_GAMEOBJECT_TYPE) const;
-        bool CanInteractWithGameObject(GameObject* pGameObejct, uint32 gameobject_type = MAX_GAMEOBJECT_TYPE) const;
+        bool CanInteractWithGameObject(GameObject* pGo, uint32 gameobject_type = MAX_GAMEOBJECT_TYPE) const;
 
         ObjectGuid const& GetSelectedGobj() const { return m_selectedGobj; }
         void SetSelectedGobj(ObjectGuid guid) { m_selectedGobj = guid; }
