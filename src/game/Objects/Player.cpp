@@ -2429,11 +2429,11 @@ bool Player::CanInteractWithNPC(Creature* pCreature, uint32 npcflagmask) const
 
     // some basic checks
     if (!IsInWorld() || IsTaxiFlying())
-        return nullptr;
+        return false;
 
     // not in interactive state
     if (hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-        return nullptr;
+        return false;
 
     // appropriate npc type
     if (npcflagmask && !pCreature->HasFlag(UNIT_NPC_FLAGS, npcflagmask))
