@@ -319,6 +319,12 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
     ///- Get the list of accounts ID logged to the realm
     //                                                 0   1         2        3        4
     QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE current_realm = %u LIMIT %u", realmID, limit);
+    if (!result)
+    {
+        SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     uint32 count = 0;
     AccountSearchHandler::ShowAccountListHelper(result, *this, count, limit, true);
