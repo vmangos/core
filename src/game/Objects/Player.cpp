@@ -2525,7 +2525,7 @@ bool Player::CanInteractWithGameObject(GameObject* pGo, uint32 gameobject_type) 
         }
 
         if (pGo->IsWithinDistInMap(this, maxdist) && pGo->isSpawned())
-            return pGo;
+            return true;
 
         sLog.outError("GetGameObjectIfCanInteractWith: GameObject '%s' [GUID: %u] is too far away from player %s [GUID: %u] to be used by him (distance=%f, maximal %f is allowed)",
             pGo->GetGOInfo()->name, pGo->GetGUIDLow(), GetName(), GetGUIDLow(), pGo->GetDistance(this), maxdist);
