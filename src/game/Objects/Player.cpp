@@ -2392,102 +2392,146 @@ void Player::RegenerateHealth()
     ModifyHealth(int32(addvalue));
 }
 
+bool Player::CanInteractWithQuestGiver(Object* questGiver) const
+{
+    switch (questGiver->GetTypeId())
+    {
+        case TYPEID_UNIT:
+            return CanInteractWithNPC(static_cast<Creature*>(questGiver), UNIT_NPC_FLAG_QUESTGIVER);
+        case TYPEID_GAMEOBJECT:
+            return CanInteractWithGameObject(static_cast<GameObject*>(questGiver), GAMEOBJECT_TYPE_QUESTGIVER);
+        case TYPEID_PLAYER:
+            return isAlive() && static_cast<Player*>(questGiver)->isAlive();
+        case TYPEID_ITEM:
+            return isAlive();
+        default:
+            break;
+    }
+    return false;
+}
+
 Creature* Player::GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask) const
 {
     // some basic checks
     if (!guid || !IsInWorld() || IsTaxiFlying())
-        return NULL;
+        return nullptr;
+
+    // exist (we need look pets also for some interaction (quest/etc)
+    Creature *pCreature = GetMap()->GetAnyTypeCreature(guid);
+    
+    return CanInteractWithNPC(pCreature, npcflagmask) ? pCreature : nullptr;
+}
+
+bool Player::CanInteractWithNPC(Creature* pCreature, uint32 npcflagmask) const
+{
+    if (!pCreature)
+        return false;
+
+    // some basic checks
+    if (!IsInWorld() || IsTaxiFlying())
+        return nullptr;
 
     // not in interactive state
     if (hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-        return NULL;
-
-    // exist (we need look pets also for some interaction (quest/etc)
-    Creature *unit = GetMap()->GetAnyTypeCreature(guid);
-    if (!unit)
-        return NULL;
+        return nullptr;
 
     // appropriate npc type
-    if (npcflagmask && !unit->HasFlag(UNIT_NPC_FLAGS, npcflagmask))
-        return NULL;
+    if (npcflagmask && !pCreature->HasFlag(UNIT_NPC_FLAGS, npcflagmask))
+        return false;
 
     if (npcflagmask == UNIT_NPC_FLAG_STABLEMASTER)
     {
         if (getClass() != CLASS_HUNTER)
-            return NULL;
+            return false;
     }
 
-    // if a dead unit should be able to talk - the creature must be alive and have special flags
-    if (!unit->isAlive())
-        return NULL;
+    if (!pCreature->isAlive())
+        return false;
 
-    if (isAlive() && unit->isInvisibleForAlive())
-        return NULL;
+    if (isAlive() && pCreature->isInvisibleForAlive())
+        return false;
+
+    if (!isAlive() && !pCreature->HasTypeFlag(CREATURE_TYPEFLAGS_GHOST_VISIBLE))
+        return false;
 
     // not allow interaction under control, but allow with own pets
-    if (unit->GetCharmerGuid())
-        return NULL;
+    if (pCreature->GetCharmerGuid())
+        return false;
 
     // not enemy
-    if (unit->IsHostileTo(this))
-        return NULL;
+    if (pCreature->IsHostileTo(this))
+        return false;
 
     // combat check
-    if (unit->isInCombat())
-        return NULL;
+    if (pCreature->isInCombat())
+        return false;
 
     // not unfriendly
-    if (FactionTemplateEntry const* factionTemplate = sObjectMgr.GetFactionTemplateEntry(unit->getFaction()))
+    if (FactionTemplateEntry const* factionTemplate = sObjectMgr.GetFactionTemplateEntry(pCreature->getFaction()))
         if (factionTemplate->faction)
             if (FactionEntry const* faction = sObjectMgr.GetFactionEntry(factionTemplate->faction))
                 if (faction->reputationListID >= 0 && GetReputationMgr().GetRank(faction) <= REP_UNFRIENDLY)
-                    return NULL;
+                    return false;
 
     // not too far
-    if (!unit->IsWithinDistInMap(this, INTERACTION_DISTANCE))
-        return NULL;
+    if (!pCreature->IsWithinDistInMap(this, INTERACTION_DISTANCE))
+        return false;
 
-    return unit;
+    return true;
 }
 
 GameObject* Player::GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameobject_type) const
 {
     // some basic checks
     if (!guid || !IsInWorld() || IsTaxiFlying())
-        return NULL;
+        return nullptr;
+
+    GameObject *pGo = GetMap()->GetGameObject(guid);
+    return CanInteractWithGameObject(pGo, gameobject_type) ? pGo : nullptr;
+}
+
+bool Player::CanInteractWithGameObject(GameObject* pGo, uint32 gameobject_type) const
+{
+    if (!pGo)
+        return false;
+
+    // some basic checks
+    if (!IsInWorld() || IsTaxiFlying())
+        return false;
 
     // not in interactive state
     if (hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-        return NULL;
+        return false;
 
-    if (GameObject *go = GetMap()->GetGameObject(guid))
+    if (!isAlive())
+        return false;
+
+    if (uint32(pGo->GetGoType()) == gameobject_type || gameobject_type == MAX_GAMEOBJECT_TYPE)
     {
-        if (uint32(go->GetGoType()) == gameobject_type || gameobject_type == MAX_GAMEOBJECT_TYPE)
+        float maxdist;
+        switch (pGo->GetGoType())
         {
-            float maxdist;
-            switch (go->GetGoType())
-            {
-                // TODO: find out how the client calculates the maximal usage distance to spellless working
-                // gameobjects like mailboxes - 10.0 is a just an abitrary choosen number
-                case GAMEOBJECT_TYPE_MAILBOX:
-                    maxdist = 10.0f;
-                    break;
-                case GAMEOBJECT_TYPE_FISHINGHOLE:
-                    maxdist = 20.0f + CONTACT_DISTANCE;     // max spell range
-                    break;
-                default:
-                    maxdist = INTERACTION_DISTANCE;
-                    break;
-            }
-
-            if (go->IsWithinDistInMap(this, maxdist) && go->isSpawned())
-                return go;
-
-            sLog.outError("GetGameObjectIfCanInteractWith: GameObject '%s' [GUID: %u] is too far away from player %s [GUID: %u] to be used by him (distance=%f, maximal %f is allowed)",
-                          go->GetGOInfo()->name,  go->GetGUIDLow(), GetName(), GetGUIDLow(), go->GetDistance(this), maxdist);
+            // TODO: find out how the client calculates the maximal usage distance to spellless working
+            // gameobjects like mailboxes - 10.0 is a just an abitrary choosen number
+            case GAMEOBJECT_TYPE_MAILBOX:
+                maxdist = 10.0f;
+                break;
+            case GAMEOBJECT_TYPE_FISHINGHOLE:
+                maxdist = 20.0f + CONTACT_DISTANCE;     // max spell range
+                break;
+            default:
+                maxdist = INTERACTION_DISTANCE;
+                break;
         }
+
+        if (pGo->IsWithinDistInMap(this, maxdist) && pGo->isSpawned())
+            return pGo;
+
+        sLog.outError("GetGameObjectIfCanInteractWith: GameObject '%s' [GUID: %u] is too far away from player %s [GUID: %u] to be used by him (distance=%f, maximal %f is allowed)",
+            pGo->GetGOInfo()->name, pGo->GetGUIDLow(), GetName(), GetGUIDLow(), pGo->GetDistance(this), maxdist);
     }
-    return NULL;
+
+    return false;
 }
 
 bool Player::IsUnderWater() const

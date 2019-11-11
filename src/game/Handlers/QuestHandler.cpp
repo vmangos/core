@@ -116,7 +116,7 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket & recv_data)
     uint32 quest;
     recv_data >> guid >> quest;
 
-    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_ACCEPT_QUEST npc = %s, quest = %u", guid.GetString().c_str(), quest);
+    DEBUG_LOG("WORLD: Received CMSG_QUESTGIVER_ACCEPT_QUEST giver = %s, quest = %u", guid.GetString().c_str(), quest);
 
     Object* pObject = _player->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_GAMEOBJECT_PLAYER_OR_ITEM);
 
@@ -131,16 +131,11 @@ void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket & recv_data)
         return;
     }
 
-    if (!GetPlayer()->isAlive())
+    if (!_player->CanInteractWithQuestGiver(pObject))
     {
-        // Some quest can be rewarded while dead (cf q3912 [Meet at the Grave])
-        if (Creature* crea = pObject->ToCreature())
-        {
-            if (!crea->isInvisibleForAlive())
-                return;
-        }
-        else
-            return;
+        _player->PlayerTalkClass->CloseGossip();
+        _player->ClearDividerGuid();
+        return;
     }
 
     Quest const* qInfo = sObjectMgr.GetQuestTemplate(quest);
