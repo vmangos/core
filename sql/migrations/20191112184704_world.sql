@@ -18,17 +18,17 @@ DELETE FROM `creature` WHERE `id` = 20111;
 
 -- Make triggers invisible
 -- Trigger Vipore
-UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14031 AND `patch`=0;
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14031;
 -- Trigger Ichman
-UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14029 AND `patch`=0;
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14029;
 -- Trigger Mulverick
-UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14027 AND `patch`=0;
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14027;
 -- Trigger Jeztor
-UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14028 AND `patch`=0;
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14028;
 -- Trigger Slidore
-UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14030 AND `patch`=0;
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14030;
 -- Trigger Guse
-UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14026 AND `patch`=0;
+UPDATE `creature_template` SET `flags_extra`=`flags_extra`|128 WHERE  `entry`=14026;
 
 -- Delete Cornish Rex Cat from dwarf start
 DELETE FROM `creature` WHERE `guid` = 1528;
