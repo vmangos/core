@@ -502,7 +502,7 @@ bool ChatHandler::HandleBotAddCommand(char* args)
         SendSysMessage("[PlayerBotMgr] Unable to load bot.");
         return true;
     }
-    PSendSysMessage("[PlayerBotMgr] Bot added : '%s', GUID=%u", charname ? charname : "nullptr", guid);
+    PSendSysMessage("[PlayerBotMgr] Bot added : '%s', GUID=%u", charname ? charname : "NULL", guid);
     return true;
 }
 

@@ -177,7 +177,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
                 packet2 >> guid2;
             packet2 >> textLen >> message >> chatTag;
             if (guid1.IsEmpty() || sObjectMgr.GetPlayerNameByGUID(guid1, name1))
-                _chatBotHistory << uint32(msgtype) << " " << name1 << " nullptr " << message << std::endl;
+                _chatBotHistory << uint32(msgtype) << " " << name1 << " NULL " << message << std::endl;
         }
         return;
     }

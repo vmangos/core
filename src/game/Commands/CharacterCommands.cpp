@@ -1026,7 +1026,7 @@ void ChatHandler::HandleCharacterDeletedRestoreHelper(DeletedInfo const& delInfo
         return;
     }
 
-    CharacterDatabase.PExecute("UPDATE characters SET name='%s', account='%u', deleteDate=nullptr, deleteInfos_Name=nullptr, deleteInfos_Account=nullptr WHERE deleteDate IS NOT NULL AND guid = %u",
+    CharacterDatabase.PExecute("UPDATE characters SET name='%s', account='%u', deleteDate=NULL, deleteInfos_Name=NULL, deleteInfos_Account=NULL WHERE deleteDate IS NOT NULL AND guid = %u",
         delInfo.name.c_str(), delInfo.accountId, delInfo.lowguid);
 }
 

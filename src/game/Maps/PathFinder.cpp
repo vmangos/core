@@ -393,8 +393,8 @@ void PathInfo::BuildPointPath(const float *startPoint, const float *endPoint, fl
                        m_pathPolyRefs,     // current path
                        m_polyLength,       // lenth of current path
                        pathPoints,         // [out] path corner points
-                       nullptr,               // [out] flags
-                       nullptr,               // [out] shortened path
+                       nullptr,            // [out] flags
+                       nullptr,            // [out] shortened path
                        (int*)&pointCount,
                        m_pointPathLimit);   // maximum number of points/polygons to use
     }

@@ -64,7 +64,7 @@ static DumpTable dumpTables[] =
     { "item_instance",                    DTT_ITEM       }, //                  <- item guids
     { "item_loot",                        DTT_ITEM_LOOT  }, //                  <- item guids
     { "item_text",                        DTT_ITEM_TEXT  },
-    { nullptr,                               DTT_CHAR_TABLE }, // end marker
+    { NULL,                               DTT_CHAR_TABLE }, // end marker
 };
 
 // Low level functions
@@ -220,7 +220,7 @@ std::string CreateDumpString(char const* tableName, QueryResult *result)
             ss << ", ";
 
         if (fields[i].IsNULL())
-            ss << "nullptr";
+            ss << "NULL";
         else
         {
             std::string s =  fields[i].GetCppString();

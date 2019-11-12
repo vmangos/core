@@ -118,7 +118,7 @@ enum GroupUpdateFlags
     GROUP_UPDATE_FLAG_AURAS             = 0x00000200,       // 9 : uint32 mask, for each bit set uint16 spellid
     GROUP_UPDATE_FLAG_AURAS_NEGATIVE    = 0x00000400,       // 10: uint16 mask, for each bit set uint16 spellid
     GROUP_UPDATE_FLAG_PET_GUID          = 0x00000800,       // 11: uint64 pet guid
-    GROUP_UPDATE_FLAG_PET_NAME          = 0x00001000,       // 12: pet name, nullptr terminated string
+    GROUP_UPDATE_FLAG_PET_NAME          = 0x00001000,       // 12: pet name, NULL terminated string
     GROUP_UPDATE_FLAG_PET_MODEL_ID      = 0x00002000,       // 13: uint16, model id
     GROUP_UPDATE_FLAG_PET_CUR_HP        = 0x00004000,       // 14: uint16 pet cur health
     GROUP_UPDATE_FLAG_PET_MAX_HP        = 0x00008000,       // 15: uint16 pet max health

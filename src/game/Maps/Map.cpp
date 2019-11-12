@@ -3248,10 +3248,10 @@ bool Map::GetWalkHitPosition(Transport* transport, float srcX, float srcY, float
     int pointCount = 0;
     result = m_navMeshQuery->findStraightPath(
         closestPoint,         // start position
-        endPosition,           // end position
-        visited,                 // current path
-        visitedCount,       // length of current path
-        pathPoints,         // [out] path corner points
+        endPosition,          // end position
+        visited,              // current path
+        visitedCount,         // length of current path
+        pathPoints,           // [out] path corner points
         nullptr,
         nullptr,
         (int*)&pointCount,
