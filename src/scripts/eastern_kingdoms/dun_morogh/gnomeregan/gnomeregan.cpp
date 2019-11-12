@@ -366,7 +366,7 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
                         m_uiPhaseTimer = 3500;              // 6s delay, but 2500ms for escortstarting
                         break;
                     case 3:
-                        Start(false, m_playerGuid, NULL, false, false);
+                        Start(false, m_playerGuid, nullptr, false, false);
                         m_uiPhaseTimer = 0;
                         break;
 
@@ -795,8 +795,8 @@ struct npc_kernobeeAI : public FollowerAI
                 if (Creature* crea = m_creature->GetMap()->GetCreature(bombGuid))
                 {
                     crea->CastSpell(crea, SPELL_EXPLOSION, true);
-                    crea->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                    crea->DealDamage(crea, crea->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    crea->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                    crea->DealDamage(crea, crea->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                     nextStep = 4;
                     m_nextStepTimer = 200;
                 }
@@ -810,9 +810,9 @@ struct npc_kernobeeAI : public FollowerAI
             {
                 if (Creature* crea = m_creature->GetMap()->GetCreature(bombGuid))
                 {
-                    crea->DealDamage(crea, crea->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    crea->DealDamage(crea, crea->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                     nextStep = 0;
-                    crea->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    crea->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 }
             }
             else

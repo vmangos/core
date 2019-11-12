@@ -128,7 +128,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
     {
         m_creature->SetInCombatWithZone();
 
-        //m_creature->MonsterYell(SAY_AGGRO, LANG_UNIVERSAL, NULL);
+        //m_creature->MonsterYell(SAY_AGGRO, LANG_UNIVERSAL, nullptr);
         DoPlaySoundToSet(m_creature, 8272);
     }
 
@@ -160,7 +160,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
         if (Razor_Remove_Auras < diff)
         {
 
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             m_creature->AI()->AttackStart(target);
 
@@ -214,7 +214,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
             // Aura Check. If the gamer is affected by confliguration we attack a random gamer.
             if (m_creature->getVictim()->HasAura(SPELL_CONFLAGRATION, EFFECT_INDEX_0))
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
                 if (target)
                     m_creature->TauntApply(target);
@@ -314,8 +314,8 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                         break;
                 }
 
-                Creature* Spawned = NULL;
-                Unit* target = NULL;
+                Creature* Spawned = nullptr;
+                Unit* target = nullptr;
 
                 ++SpawnedAdds;
 
@@ -333,8 +333,8 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                 ++SpawnedAdds;
 
                 //Spawn creature and force it to start attacking a random target
-                target = NULL;
-                Spawned = NULL;
+                target = nullptr;
+                Spawned = nullptr;
                 Spawned = m_creature->SummonCreature(SpawnType2, SPAWN_X2, SPAWN_Y2, SPAWN_Z2, 5.000, TEMPSUMMON_TIMED_DESPAWN, Despawn_Timer);
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
@@ -348,8 +348,8 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                 ++SpawnedAdds;
 
                 //Spawn creature and force it to start attacking a random target
-                target = NULL;
-                Spawned = NULL;
+                target = nullptr;
+                Spawned = nullptr;
                 Spawned = m_creature->SummonCreature(SpawnType3, SPAWN_X3, SPAWN_Y3, SPAWN_Z3, 5.000, TEMPSUMMON_TIMED_DESPAWN, Despawn_Timer);
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
@@ -363,8 +363,8 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                 ++SpawnedAdds;
 
                 //Spawn creature and force it to start attacking a random target
-                target = NULL;
-                Spawned = NULL;
+                target = nullptr;
+                Spawned = nullptr;
                 Spawned = m_creature->SummonCreature(SpawnType4, SPAWN_X4, SPAWN_Y4, SPAWN_Z4, 5.000, TEMPSUMMON_TIMED_DESPAWN, Despawn_Timer);
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 

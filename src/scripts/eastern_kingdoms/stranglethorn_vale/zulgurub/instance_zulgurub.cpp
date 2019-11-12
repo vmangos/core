@@ -352,7 +352,7 @@ Unit* instance_zulgurub::Thekal_GetUnitThatCanRez()
     if (Unit *pThekal = instance->GetUnit(GetData64(DATA_THEKAL)))
         if (pThekal->isAlive())
             return pThekal;
-    return NULL;
+    return nullptr;
 }
 
 InstanceData* GetInstanceData_instance_zulgurub(Map* pMap)

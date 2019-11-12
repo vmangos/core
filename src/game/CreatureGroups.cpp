@@ -27,7 +27,7 @@
 CreatureGroupMember* CreatureGroup::AddMember(ObjectGuid guid, float followDist, float followAngle, uint32 memberFlags)
 {
     if (guid == _leaderGuid)
-        return NULL;
+        return nullptr;
     CreatureGroupMember*& member = _members[guid];
     if (!member)
         member = new CreatureGroupMember();
@@ -114,7 +114,7 @@ void CreatureGroup::RespawnAll(Creature* except)
             Respawn(otherMember, nullptr);
 }
 
-void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberEntry /* = NULL for leader */)
+void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberEntry /* = nullptr for leader */)
 {
     // Prevent stack overflow (member->Respawn() can call CreatureGroup::Respawn, etc ...)
     if (_respawnGuard)

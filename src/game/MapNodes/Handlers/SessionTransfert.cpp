@@ -54,7 +54,7 @@ void NodeSession::HandleLoadSession(WorldPacket& pkt)
     PacketLoadSession_Header loadInfos;
     pkt.read((uint8*)&loadInfos, sizeof(loadInfos));
 
-    WorldSession* wsess = new WorldSession(loadInfos.accountId, NULL, loadInfos.sec, loadInfos.muteTime, loadInfos.locale);
+    WorldSession* wsess = new WorldSession(loadInfos.accountId, nullptr, loadInfos.sec, loadInfos.muteTime, loadInfos.locale);
     wsess->SetAccountFlags(loadInfos.accountFlags);
     wsess->SetAccountMaxLevel(loadInfos.accountMaxLevel);
     wsess->SetMasterSession(this);
@@ -167,7 +167,7 @@ void NodeSession::HandleSessionSocketClosed(WorldPacket& pkt)
     WorldSession* sess = sWorld.FindSession(accountId);
     if (!sess)
         return;
-    sess->SetMasterSession(NULL); // Will be disconnected after 120 seconds
+    sess->SetMasterSession(nullptr); // Will be disconnected after 120 seconds
     sess->ForcePlayerLogoutDelay();
 }
 
@@ -179,7 +179,7 @@ void NodeSession::HandleSessionLogoutComplete(WorldPacket& pkt)
     WorldSession* sess = sWorld.FindSession(accountId);
     if (!sess)
         return;
-    sess->SetNodeSession(NULL);
+    sess->SetNodeSession(nullptr);
     sess->LogoutPlayer(false); // Do not save the player, he was already saved on the Node
 }
 

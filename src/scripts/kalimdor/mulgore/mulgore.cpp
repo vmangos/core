@@ -75,7 +75,7 @@ struct plainVisionAI : public npc_escortAI
         if (!isEngaged)
         {
             isEngaged = true;
-            Start(false, NULL, NULL, false);
+            Start(false, 0, nullptr, false);
         }
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

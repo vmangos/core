@@ -140,7 +140,7 @@ struct boss_gmislandAI : public ScriptedAI
                         if (mort->isAlive())
                         {
                             // "Presque" mort :p
-                            mort->DealDamage(mort, mort->GetHealth() - 50, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                            mort->DealDamage(mort, mort->GetHealth() - 50, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                             m_creature->MonsterSay("Tiens, toi t'es mort !", LANG_UNIVERSAL, 0);
                         }
                     }

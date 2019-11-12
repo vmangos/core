@@ -38,16 +38,16 @@ template <typename T>
 void PlayerWrapper<T>::LeftChannel(Channel* c) { player.LeftChannel(c); }
 
 template <typename T>
-bool PlayerWrapper<T>::ok() const { return (&player) != NULL; }
+bool PlayerWrapper<T>::ok() const { return (&player) != nullptr; }
 
 // Specializations
 template <>
 Player* PlayerWrapper<Player>::ToPlayer() const { return &player; }
 template <>
-MasterPlayer* PlayerWrapper<Player>::ToMasterPlayer() const { return NULL; }
+MasterPlayer* PlayerWrapper<Player>::ToMasterPlayer() const { return nullptr; }
 
 template <>
-Player* PlayerWrapper<MasterPlayer>::ToPlayer() const { return NULL; }
+Player* PlayerWrapper<MasterPlayer>::ToPlayer() const { return nullptr; }
 template <>
 MasterPlayer* PlayerWrapper<MasterPlayer>::ToMasterPlayer() const { return &player; }
 

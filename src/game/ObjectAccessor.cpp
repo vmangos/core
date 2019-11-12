@@ -56,13 +56,13 @@ Unit*
 ObjectAccessor::GetUnit(WorldObject const &u, ObjectGuid guid)
 {
     if (!guid)
-        return NULL;
+        return nullptr;
 
     if (guid.IsPlayer())
         return FindPlayer(guid);
 
     if (!u.IsInWorld())
-        return NULL;
+        return nullptr;
 
     return u.GetMap()->GetAnyTypeCreature(guid);
 }
@@ -71,9 +71,9 @@ Corpse* ObjectAccessor::GetCorpseInMap(ObjectGuid guid, uint32 mapid)
 {
     Corpse * ret = HashMapHolder<Corpse>::Find(guid);
     if (!ret)
-        return NULL;
+        return nullptr;
     if (ret->GetMapId() != mapid)
-        return NULL;
+        return nullptr;
 
     return ret;
 }
@@ -104,7 +104,7 @@ Player* ObjectAccessor::FindPlayerByNameNotInWorld(const char *name)
     if (it != playerNameToPlayerPointer.end())
         return it->second;
 
-    return NULL;
+    return nullptr;
 }
 
 Player* ObjectAccessor::FindPlayerByName(const char *name)
@@ -125,13 +125,13 @@ MasterPlayer* ObjectAccessor::FindMasterPlayer(const char *name)
     if (it != playerNameToMasterPlayerPointer.end())
         return it->second;
 
-    return NULL;
+    return nullptr;
 }
 
 MasterPlayer* ObjectAccessor::FindMasterPlayer(ObjectGuid guid)
 {
     if (!guid)
-        return NULL;
+        return nullptr;
 
     return HashMapHolder<MasterPlayer>::Find(guid);;
 }
@@ -145,7 +145,7 @@ PlayerPointer ObjectAccessor::FindPlayerPointer(ObjectGuid guid)
     MasterPlayer* mplr = FindMasterPlayer(guid);
     if (mplr)
         return PlayerPointer(new PlayerWrapper<MasterPlayer>(mplr));
-    return PlayerPointer(NULL);
+    return PlayerPointer(nullptr);
 }
 
 PlayerPointer ObjectAccessor::FindPlayerPointer(const char* name)
@@ -156,7 +156,7 @@ PlayerPointer ObjectAccessor::FindPlayerPointer(const char* name)
     MasterPlayer* mplr = FindMasterPlayer(name);
     if (mplr)
         return PlayerPointer(new PlayerWrapper<MasterPlayer>(mplr));
-    return PlayerPointer(NULL);
+    return PlayerPointer(nullptr);
 }
 
 void
@@ -187,7 +187,7 @@ ObjectAccessor::GetCorpseForPlayerGUID(ObjectGuid guid)
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
     if (iter == i_player2corpse.end())
-        return NULL;
+        return nullptr;
 
     MANGOS_ASSERT(iter->second->GetType() != CORPSE_BONES);
 
@@ -290,7 +290,7 @@ void ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid player_guid, Player* loot
 
 void ObjectAccessor::RemoveOldCorpses()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     Player2CorpsesMapType::iterator next;
     for (Player2CorpsesMapType::iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); itr = next)
     {

@@ -151,8 +151,8 @@ bool VMapManager2::isInLineOfSight(unsigned int pMapId, float x1, float y1, floa
 }
 ModelInstance* VMapManager2::FindCollisionModel(unsigned int mapId, float x0, float y0, float z0, float x1, float y1, float z1)
 {
-    if (!isLineOfSightCalcEnabled()) return NULL;
-    ModelInstance* result = NULL;
+    if (!isLineOfSightCalcEnabled()) return nullptr;
+    ModelInstance* result = nullptr;
     InstanceTreeMap::iterator instanceTree = iInstanceMapTrees.find(mapId);
     if (instanceTree != iInstanceMapTrees.end())
     {
@@ -288,7 +288,7 @@ WorldModel* VMapManager2::acquireModelInstance(const std::string& basepath, cons
             ERROR_LOG("VMapManager2: could not load '%s%s.vmo'!", basepath.c_str(), filename.c_str());
             delete worldmodel;
             m_modelsLock.release();
-            return NULL;
+            return nullptr;
         }
         //DEBUG_FILTER_LOG(LOG_FILTER_MAP_LOADING, "VMapManager2: loading file '%s%s'.", basepath.c_str(), filename.c_str());
         model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(filename, ManagedModel())).first;

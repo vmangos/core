@@ -79,7 +79,7 @@ void VMapFactory::preventSpellsFromBeingTestedForLoS(const char* pSpellIdString)
 {
     if (!iIgnoreSpellIds)
         iIgnoreSpellIds = new Table<unsigned int , bool>();
-    if (pSpellIdString != NULL)
+    if (pSpellIdString != nullptr)
     {
         unsigned int pos = 0;
         unsigned int id;
@@ -113,7 +113,7 @@ void VMapFactory::clear()
     delete iIgnoreSpellIds;
     delete gVMapManager;
 
-    iIgnoreSpellIds = NULL;
-    gVMapManager = NULL;
+    iIgnoreSpellIds = nullptr;
+    gVMapManager = nullptr;
 }
 }

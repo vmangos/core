@@ -72,7 +72,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //Frostbolt_Timer
         if (Frostbolt_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_FROSTBOLT);
 

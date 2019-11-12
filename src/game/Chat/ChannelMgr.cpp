@@ -38,7 +38,7 @@ ChannelMgr* channelMgr(Team team)
     if (team == HORDE)
         return &MaNGOS::Singleton<HordeChannelMgr>::Instance();
 
-    return NULL;
+    return nullptr;
 }
 
 ChannelMgr::~ChannelMgr()
@@ -59,7 +59,7 @@ Channel *ChannelMgr::GetJoinChannel(std::string name, bool allowAreaDependantCha
     {
         ChatChannelsEntry const* ch = GetChannelEntryFor(name);
         if (!allowAreaDependantChans && ch && ch->flags & Channel::CHANNEL_DBC_FLAG_ZONE_DEP)
-            return NULL;
+            return nullptr;
         Channel *nchan = new Channel(name);
         channels[wname] = nchan;
         return nchan;
@@ -85,7 +85,7 @@ Channel *ChannelMgr::GetChannel(std::string name, PlayerPointer p, bool pkt)
             p->GetSession()->SendPacket(&data);
         }
 
-        return NULL;
+        return nullptr;
     }
     else
         return i->second;

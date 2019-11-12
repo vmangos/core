@@ -92,7 +92,7 @@ struct boss_bug_trioAI : public ScriptedAI
         m_pInstance->SetData(TYPE_BUG_TRIO, SPECIAL);
         if (m_pInstance->GetData(TYPE_BUG_TRIO) != DONE)
         {
-            m_creature->SetLootRecipient(NULL);
+            m_creature->SetLootRecipient(nullptr);
             m_creature->ForcedDespawn(4000);
 
             if (Creature* pKri = m_pInstance->GetSingleCreatureFromStorage(NPC_KRI))

@@ -73,7 +73,7 @@ struct mob_aquementasAI : public ScriptedAI
                 !((Player*)receiver)->HasItemCount(11522, 1, true))
         {
             ItemPosCountVec dest;
-            uint8 msg = ((Player*)receiver)->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 11522, 1, NULL);
+            uint8 msg = ((Player*)receiver)->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 11522, 1, nullptr);
             if (msg == EQUIP_ERR_OK)
                 ((Player*)receiver)->StoreNewItem(dest, 11522, 1, true);
         }
@@ -312,7 +312,7 @@ CreatureAI* GetAI_npc_stone_watcher_of_norgannon(Creature* creature)
     creature->GetCreatureListWithEntryInGrid(creatures, creature->GetEntry(), 20.0f);
     if (creatures.size())
         creature->DeleteLater();
-    return NULL;
+    return nullptr;
 }
 
 /*####
@@ -549,12 +549,12 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
             {
                 if (pPlayer->GetQuestStatus(2882) == QUEST_STATUS_INCOMPLETE)
                 {
-                    Creature* pirate1 = NULL;
-                    Creature* pirate2 = NULL;
-                    Creature* pirate3 = NULL;
-                    Creature* pirate4 = NULL;
-                    Creature* pirate5 = NULL;
-                    GameObject* pTreasure = NULL;
+                    Creature* pirate1 = nullptr;
+                    Creature* pirate2 = nullptr;
+                    Creature* pirate3 = nullptr;
+                    Creature* pirate4 = nullptr;
+                    Creature* pirate5 = nullptr;
+                    GameObject* pTreasure = nullptr;
                     int extraPirateType[2];
                     extraPirateType[0] = NPC_PIRATES_1;
                     extraPirateType[1] = NPC_PIRATES_2;
@@ -606,7 +606,7 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                     {
                         if(pTreasure = pGo->SummonGameObject(GO_PIRATES_TREASURE, -10115.037109, -4050.484863, 5.521664, 0, 0, 0, 0, 0, 13));
                     }
-                    if(pTreasure != NULL)
+                    if(pTreasure != nullptr)
                     {
                         //pTreasure->SetGoState(GO_STATE_READY);
                         //pTreasure->SetLootState(GO_READY);
@@ -706,7 +706,7 @@ bool QuestRewarded_npc_yehkinya(Player* pPlayer, Creature* pCreature, Quest cons
 
         if (npc_yehkinyaAI* pEscortAI = dynamic_cast<npc_yehkinyaAI*>(pCreature->AI()))
                 {
-            pEscortAI->Start(true, NULL, NULL, true);
+            pEscortAI->Start(true, 0, nullptr, true);
                         pCreature->SetWalk(false);
                 }
     }

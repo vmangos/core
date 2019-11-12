@@ -30,7 +30,7 @@
 #include "World.h"
 #include "ObjectMgr.h"
 
-Corpse::Corpse(CorpseType type) : WorldObject(), loot(NULL), lootRecipient(NULL), m_faction(NULL)
+Corpse::Corpse(CorpseType type) : WorldObject(), loot(nullptr), lootRecipient(nullptr), m_faction(nullptr)
 {
     m_objectType |= TYPEMASK_CORPSE;
     m_objectTypeId = TYPEID_CORPSE;
@@ -40,7 +40,7 @@ Corpse::Corpse(CorpseType type) : WorldObject(), loot(NULL), lootRecipient(NULL)
 
     m_type = type;
 
-    m_time = time(NULL);
+    m_time = time(nullptr);
 
     lootForBody = false;
 }

@@ -42,7 +42,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket & recv_data)
     if (!pEnemy)
     {
         // stop attack state at client
-        SendAttackStop(NULL);
+        SendAttackStop(nullptr);
         return;
     }
 

@@ -58,7 +58,7 @@ class MANGOS_DLL_SPEC PlayerAI
 class MANGOS_DLL_SPEC PlayerControlledAI: public PlayerAI
 {
     public:
-        explicit PlayerControlledAI(Player* pPlayer, Unit* caster = NULL);
+        explicit PlayerControlledAI(Player* pPlayer, Unit* caster = nullptr);
 
         virtual ~PlayerControlledAI();
 

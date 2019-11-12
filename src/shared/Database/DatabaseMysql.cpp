@@ -48,7 +48,7 @@ DatabaseMysql::DatabaseMysql()
     if (db_count++ == 0 )
     {
         // Mysql Library Init
-        mysql_library_init(-1, NULL, NULL);
+        mysql_library_init(-1, nullptr, nullptr);
 
         if (!mysql_thread_safe())
         {
@@ -81,7 +81,7 @@ MySQLConnection::~MySQLConnection()
 
 bool MySQLConnection::OpenConnection(bool reconnect)
 {
-    MYSQL * mysqlInit = mysql_init(NULL);
+    MYSQL * mysqlInit = mysql_init(nullptr);
     if (!mysqlInit)
     {
         sLog.outError( "Could not initialize Mysql connection" );
@@ -97,7 +97,7 @@ bool MySQLConnection::OpenConnection(bool reconnect)
     }
 
     mMysql = mysql_real_connect(mysqlInit, m_host.c_str(), m_user.c_str(),
-        m_password.c_str(), m_database.c_str(), m_port, NULL, 0);
+        m_password.c_str(), m_database.c_str(), m_port, nullptr, 0);
 
     if (mMysql)
     {
@@ -239,13 +239,13 @@ bool MySQLConnection::_Query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD *
 
 QueryResult* MySQLConnection::Query(const char *sql)
 {
-    MYSQL_RES *result = NULL;
-    MYSQL_FIELD *fields = NULL;
+    MYSQL_RES *result = nullptr;
+    MYSQL_FIELD *fields = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
     if(!_Query(sql,&result,&fields,&rowCount,&fieldCount))
-        return NULL;
+        return nullptr;
 
     QueryResultMysql *queryResult = new QueryResultMysql(result, fields, rowCount, fieldCount);
 
@@ -255,13 +255,13 @@ QueryResult* MySQLConnection::Query(const char *sql)
 
 QueryNamedResult* MySQLConnection::QueryNamed(const char *sql)
 {
-    MYSQL_RES *result = NULL;
-    MYSQL_FIELD *fields = NULL;
+    MYSQL_RES *result = nullptr;
+    MYSQL_FIELD *fields = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
     if(!_Query(sql,&result,&fields,&rowCount,&fieldCount))
-        return NULL;
+        return nullptr;
 
     QueryFieldNames names(fieldCount);
     for (uint32 i = 0; i < fieldCount; i++)
@@ -346,7 +346,7 @@ SqlPreparedStatement * MySQLConnection::CreateStatement( const std::string& fmt 
 
 //////////////////////////////////////////////////////////////////////////
 MySqlPreparedStatement::MySqlPreparedStatement( const std::string& fmt, SqlConnection& conn, MYSQL * mysql ) : SqlPreparedStatement(fmt, conn),
-    m_pMySQLConn(mysql), m_stmt(NULL), m_pInputArgs(NULL), m_pResult(NULL), m_pResultMetadata(NULL)
+    m_pMySQLConn(mysql), m_stmt(nullptr), m_pInputArgs(nullptr), m_pResult(nullptr), m_pResultMetadata(nullptr)
 {
 }
 
@@ -480,10 +480,10 @@ void MySqlPreparedStatement::RemoveBinds()
     mysql_free_result(m_pResultMetadata);
     mysql_stmt_close(m_stmt);
 
-    m_stmt = NULL;
-    m_pResultMetadata = NULL;
-    m_pResult = NULL;
-    m_pInputArgs = NULL;
+    m_stmt = nullptr;
+    m_pResultMetadata = nullptr;
+    m_pResult = nullptr;
+    m_pInputArgs = nullptr;
 
     m_bPrepared = false;
 }

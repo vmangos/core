@@ -61,7 +61,7 @@ int32 MoveSplineInit::Launch()
     float realSpeedRun = 0.0f;
     MoveSpline& move_spline = *unit.movespline;
 
-    Transport* newTransport = NULL;
+    Transport* newTransport = nullptr;
     if (args.transportGuid)
         newTransport = HashMapHolder<Transport>::Find(ObjectGuid(HIGHGUID_MO_TRANSPORT, args.transportGuid));
     Vector3 real_position(unit.GetPositionX(), unit.GetPositionY(), unit.GetPositionZ());
@@ -70,7 +70,7 @@ int32 MoveSplineInit::Launch()
     if (!move_spline.Finalized())
     {
         real_position = move_spline.ComputePosition();
-        Transport* oldTransport = NULL;
+        Transport* oldTransport = nullptr;
         if (move_spline.GetTransportGuid())
             oldTransport = HashMapHolder<Transport>::Find(ObjectGuid(HIGHGUID_MO_TRANSPORT, move_spline.GetTransportGuid()));
         if (oldTransport)
@@ -171,7 +171,7 @@ int32 MoveSplineInit::Launch()
         compress = false;
 #endif
 
-    MovementData mvtData(compress ? NULL : &unit);
+    MovementData mvtData(compress ? nullptr : &unit);
     // Nostalrius: client has a hardcoded limit to spline movement speed : 4*runSpeed.
     // We need to fix this, in case of charges for example (if character has movement slowing effects)
     if (args.velocity > 4 * realSpeedRun && !args.flags.done) // From client

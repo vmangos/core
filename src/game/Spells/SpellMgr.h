@@ -543,7 +543,7 @@ class SpellMgr
             if (itr != mSpellThreatMap.end())
                 return &itr->second;
 
-            return NULL;
+            return nullptr;
         }
 
         float GetSpellThreatMultiplier(SpellEntry const *spellInfo) const
@@ -563,7 +563,7 @@ class SpellMgr
             SpellProcEventMap::const_iterator itr = mSpellProcEventMap.find(spellId);
             if( itr != mSpellProcEventMap.end( ) )
                 return &itr->second;
-            return NULL;
+            return nullptr;
         }
 
         // Spell procs from item enchants
@@ -586,7 +586,7 @@ class SpellMgr
             if( itr != mSpellBonusMap.end( ) )
                 return &itr->second;
 
-            return NULL;
+            return nullptr;
         }
 
         // Spell target coordinates
@@ -595,7 +595,7 @@ class SpellMgr
             SpellTargetPositionMap::const_iterator itr = mSpellTargetPositions.find( spell_id );
             if( itr != mSpellTargetPositions.end( ) )
                 return &itr->second;
-            return NULL;
+            return nullptr;
         }
 
         // Spell ranks chains
@@ -603,7 +603,7 @@ class SpellMgr
         {
             SpellChainMap::const_iterator itr = mSpellChains.find(spell_id);
             if(itr == mSpellChains.end())
-                return NULL;
+                return nullptr;
 
             return &itr->second;
         }
@@ -691,7 +691,7 @@ class SpellMgr
             if(itr != mSpellLearnSkills.end())
                 return &itr->second;
             else
-                return NULL;
+                return nullptr;
         }
 
         bool IsSpellLearnSpell(uint32 spell_id) const
@@ -728,7 +728,7 @@ class SpellMgr
         }
 
         // Spell correctness for client using
-        static bool IsSpellValid(SpellEntry const * spellInfo, Player* pl = NULL, bool msg = true);
+        static bool IsSpellValid(SpellEntry const * spellInfo, Player* pl = nullptr, bool msg = true);
 
         SkillLineAbilityMapBounds GetSkillLineAbilityMapBoundsBySpellId(uint32 spellId) const
         {

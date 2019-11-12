@@ -186,7 +186,7 @@ struct boss_baron_geddonAI : public ScriptedAI
                         m_creature->clearUnitState(UNIT_STAT_ROOT);
                         break;
                 }
-                m_creature->CastCustomSpell(m_creature, 19698, &Damage, NULL, NULL, true);
+                m_creature->CastCustomSpell(m_creature, 19698, &Damage, nullptr, nullptr, true);
                 InfCount++;
                 Tick = 0;
             }

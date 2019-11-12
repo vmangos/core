@@ -139,8 +139,8 @@ void WorldSession::moveItems(Item* myItems[], Item* hisItems[])
     {
         ItemPosCountVec traderDst;
         ItemPosCountVec playerDst;
-        bool traderCanTrade = (myItems[i] == NULL || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == EQUIP_ERR_OK);
-        bool playerCanTrade = (hisItems[i] == NULL || _player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == EQUIP_ERR_OK);
+        bool traderCanTrade = (myItems[i] == nullptr || trader->CanStoreItem(NULL_BAG, NULL_SLOT, traderDst, myItems[i], false) == EQUIP_ERR_OK);
+        bool playerCanTrade = (hisItems[i] == nullptr || _player->CanStoreItem(NULL_BAG, NULL_SLOT, playerDst, hisItems[i], false) == EQUIP_ERR_OK);
         if (traderCanTrade && playerCanTrade)
         {
             // Ok, if trade item exists and can be stored
@@ -217,7 +217,7 @@ static void setAcceptTradeMode(TradeData* myTrade, TradeData* hisTrade, Item **m
         if (Item* item = myTrade->GetItem(TradeSlots(i)))
         {
             DEBUG_LOG("player trade %s bag: %u slot: %u", item->GetGuidStr().c_str(), item->GetBagSlot(), item->GetSlot());
-            //Can return NULL
+            //Can return nullptr
             myItems[i] = item;
             myItems[i]->SetInTrade();
         }
@@ -256,14 +256,14 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
     TradeData* my_trade = _player->m_trade;
     if (!my_trade)
         return;
-    double lastModificationTimeInMS = difftime(time(NULL), my_trade->GetLastModificationTime()) * 1000;
+    double lastModificationTimeInMS = difftime(time(nullptr), my_trade->GetLastModificationTime()) * 1000;
     if (lastModificationTimeInMS < my_trade->GetScamPreventionDelay()) // if we are not outside the delay period since last modification
     {
         SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
         return;
     }
 
-    my_trade->SetLastModificationTime(time(NULL)); // Update it
+    my_trade->SetLastModificationTime(time(nullptr)); // Update it
 
     Player* trader = my_trade->GetTrader();
 
@@ -271,8 +271,8 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
     if (!his_trade)
         return;
 
-    Item *myItems[TRADE_SLOT_TRADED_COUNT]  = { NULL, NULL, NULL, NULL, NULL, NULL };
-    Item *hisItems[TRADE_SLOT_TRADED_COUNT] = { NULL, NULL, NULL, NULL, NULL, NULL };
+    Item *myItems[TRADE_SLOT_TRADED_COUNT]  = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+    Item *hisItems[TRADE_SLOT_TRADED_COUNT] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
     bool myCanCompleteTrade = true, hisCanCompleteTrade = true;
 
     // set before checks to properly undo at problems (it already set in to client)
@@ -333,10 +333,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
 
         setAcceptTradeMode(my_trade, his_trade, myItems, hisItems);
 
-        Spell* my_spell = NULL;
+        Spell* my_spell = nullptr;
         SpellCastTargets my_targets;
 
-        Spell* his_spell = NULL;
+        Spell* his_spell = nullptr;
         SpellCastTargets his_targets;
 
         // not accept if spell can't be casted now (cheating)
@@ -432,7 +432,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
             trader->GetSession()->SendNotification(LANG_NOT_PARTNER_FREE_TRADE_SLOTS);
             my_trade->SetAccepted(false);
             his_trade->SetAccepted(false);
-            his_trade->SetLastModificationTime(time(NULL));
+            his_trade->SetLastModificationTime(time(nullptr));
             return;
         }
         else if (!hisCanCompleteTrade)
@@ -443,7 +443,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
             trader->GetSession()->SendNotification(LANG_NOT_FREE_TRADE_SLOTS);
             my_trade->SetAccepted(false);
             his_trade->SetAccepted(false);
-            his_trade->SetLastModificationTime(time(NULL));
+            his_trade->SetLastModificationTime(time(nullptr));
             return;
         }
 
@@ -499,9 +499,9 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         // cleanup
         clearAcceptTradeMode(my_trade, his_trade);
         delete _player->m_trade;
-        _player->m_trade = NULL;
+        _player->m_trade = nullptr;
         delete trader->m_trade;
-        trader->m_trade = NULL;
+        trader->m_trade = nullptr;
 
         // desynchronized with the other saves here, let players save gold per their own serialized transaction
         _player->SaveInventoryAndGoldToDB();
@@ -667,8 +667,8 @@ void WorldSession::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)
 
     // gold can be incorrect, but this is checked at trade finished.
     his_trade->SetAccepted(false);
-    his_trade->SetLastModificationTime(time(NULL));
-    my_trade->SetLastModificationTime(time(NULL));
+    his_trade->SetLastModificationTime(time(nullptr));
+    my_trade->SetLastModificationTime(time(nullptr));
     my_trade->SetMoney(gold);
 }
 
@@ -721,8 +721,8 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
     }
 
     his_trade->SetAccepted(false);
-    his_trade->SetLastModificationTime(time(NULL));
-    my_trade->SetLastModificationTime(time(NULL));
+    his_trade->SetLastModificationTime(time(nullptr));
+    my_trade->SetLastModificationTime(time(nullptr));
     my_trade->SetItem(TradeSlots(tradeSlot), item);
 }
 
@@ -743,7 +743,7 @@ void WorldSession::HandleClearTradeItemOpcode(WorldPacket& recvPacket)
         return;
 
     his_trade->SetAccepted(false);
-    his_trade->SetLastModificationTime(time(NULL));
-    my_trade->SetLastModificationTime(time(NULL));
-    my_trade->SetItem(TradeSlots(tradeSlot), NULL);
+    his_trade->SetLastModificationTime(time(nullptr));
+    my_trade->SetLastModificationTime(time(nullptr));
+    my_trade->SetItem(TradeSlots(tradeSlot), nullptr);
 }

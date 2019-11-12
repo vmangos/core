@@ -156,7 +156,7 @@ struct boss_marliAI : public ScriptedAI
                     return (*iter);
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     void JustSummoned(Creature* pSummoned)
@@ -266,7 +266,7 @@ struct boss_marliAI : public ScriptedAI
                     m_bHasWebbed = false;
                     /*
                         DoResetThreat();
-                        Unit* pTarget = NULL;
+                        Unit* pTarget = nullptr;
                         uint8 i = 0 ;
                         while (i < 5)                               // max 3 tries to get a random target with power_mana
                         {

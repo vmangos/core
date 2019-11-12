@@ -234,7 +234,7 @@ struct npc_snufflenose_gopherAI : public FollowerAI
             return;
 
         lTubersInRange.sort(ObjectDistanceOrder(m_creature));
-        GameObject* pNearestTuber = NULL;
+        GameObject* pNearestTuber = nullptr;
 
         // Always need to find new ones
         for (std::list<GameObject*>::const_iterator itr = lTubersInRange.begin(); itr != lTubersInRange.end(); ++itr)

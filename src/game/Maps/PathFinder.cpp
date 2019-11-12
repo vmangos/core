@@ -35,7 +35,7 @@
 PathInfo::PathInfo(const Unit* owner) :
     m_polyLength(0), m_type(PATHFIND_BLANK),
     m_useStraightPath(false), m_forceDestination(false), m_pointPathLimit(MAX_POINT_PATH_LENGTH),
-    m_sourceUnit(owner), m_navMesh(NULL), m_navMeshQuery(NULL), m_transport(NULL), m_targetAllowedFlags(0)
+    m_sourceUnit(owner), m_navMesh(nullptr), m_navMeshQuery(nullptr), m_transport(nullptr), m_targetAllowedFlags(0)
 {
     //DEBUG_FILTER_LOG(LOG_FILTER_PATHFINDING, "++ PathFinder::PathInfo for %u \n", m_sourceUnit->GetGUIDLow());
     createFilter();
@@ -393,8 +393,8 @@ void PathInfo::BuildPointPath(const float *startPoint, const float *endPoint, fl
                        m_pathPolyRefs,     // current path
                        m_polyLength,       // lenth of current path
                        pathPoints,         // [out] path corner points
-                       NULL,               // [out] flags
-                       NULL,               // [out] shortened path
+                       nullptr,               // [out] flags
+                       nullptr,               // [out] shortened path
                        (int*)&pointCount,
                        m_pointPathLimit);   // maximum number of points/polygons to use
     }
@@ -561,7 +561,7 @@ bool PathInfo::HaveTiles(const Vector3& p) const
 
     // check if the start and end point have a .mmtile loaded
     m_navMesh->calcTileLoc(point, &tx, &ty);
-    return (m_navMesh->getTileAt(tx, ty, 0) != NULL);
+    return (m_navMesh->getTileAt(tx, ty, 0) != nullptr);
 }
 
 uint32 PathInfo::fixupCorridor(dtPolyRef* path, const uint32 npath, const uint32 maxPath,

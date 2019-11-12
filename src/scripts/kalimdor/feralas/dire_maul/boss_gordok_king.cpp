@@ -261,7 +261,7 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
     // Bloodlust
     if (m_uiSpellTimers[3] < uiDiff)
     {
-        Unit* pTarget = NULL;
+        Unit* pTarget = nullptr;
 
         if (!m_creature->HasAura(SPELL_BLOODLUST))
             pTarget = m_creature;
@@ -365,7 +365,7 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
     // Healing Wave
     if (m_uiSpellTimers[3] < uiDiff) 
     {
-        Unit* pTarget = NULL;
+        Unit* pTarget = nullptr;
         if (pTarget = m_creature->FindLowestHpFriendlyUnit(40.0f, 15000));
         else if (m_creature->GetHealthPercent() < 50.0f)
             pTarget = m_creature;
@@ -425,7 +425,7 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
     // Heal
     if (m_uiSpellTimers[3] < uiDiff) 
     {
-        Unit* pTarget = NULL;
+        Unit* pTarget = nullptr;
         if (pTarget = m_creature->FindLowestHpFriendlyUnit(40.0f, 15000));
         else if (m_creature->GetHealthPercent() < 50.0f)
             pTarget = m_creature;

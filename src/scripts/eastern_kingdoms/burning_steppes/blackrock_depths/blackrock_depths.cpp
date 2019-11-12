@@ -523,7 +523,7 @@ struct npc_grimstoneAI : public npc_escortAI
 CreatureAI* GetAI_npc_grimstone(Creature* pCreature)
 {
     if (!pCreature->GetInstanceData())
-        return NULL;
+        return nullptr;
     return new npc_grimstoneAI(pCreature);
 }
 

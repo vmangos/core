@@ -195,7 +195,7 @@ struct mob_restless_soulAI : public ScriptedAI
             {
                 if (Player* temp = m_creature->GetMap()->GetPlayer(Tagger))
                     temp->KilledMonsterCredit(m_creature->GetEntry(), m_creature->GetGUID());
-                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
             else Die_Timer -= diff;
         }
@@ -265,7 +265,7 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
         if (Tagged)
         {
             if (Die_Timer < diff)
-                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             else Die_Timer -= diff;
         }
 
@@ -380,7 +380,7 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
                 if (pCreature && pCreature->isAlive())
                     return;
 
-        m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+        m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
     }
 };
 

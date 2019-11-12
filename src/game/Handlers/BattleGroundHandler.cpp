@@ -236,7 +236,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
         DEBUG_LOG("Battleground: the following players are joining as group:");
         GroupQueueInfo * ginfo = bgQueue.AddGroup(_player, grp, bgTypeId, bgBracketId, isPremade, &excludedMembers);
         uint32 avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bgBracketId);
-        for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference *itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player *member = itr->getSource();
             if (!member) continue;  // this should never happen
@@ -543,7 +543,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket & /*recv_data*/)
 
     WorldPacket data;
     // we must update all queues here
-    BattleGround *bg = NULL;
+    BattleGround *bg = nullptr;
     for (uint8 i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
     {
         BattleGroundQueueTypeId bgQueueTypeId = _player->GetBattleGroundQueueTypeId(i);

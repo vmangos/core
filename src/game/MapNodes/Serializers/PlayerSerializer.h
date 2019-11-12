@@ -145,7 +145,7 @@ void Player::Serialize(OP& buf)
     {
         InitPlayerDisplayIds();
         SetFactionForRace(getRace());
-        SetCharm(NULL);
+        SetCharm(nullptr);
     }
 
     if (buf.IsRead())
@@ -304,7 +304,7 @@ void Player::SerializeInventory(MaNGOS::Serializer::ReadSerializer& buf)
             // From Player::_LoadInventory:
             if (!bag_guid)
             {
-                item->SetContainer(NULL);
+                item->SetContainer(nullptr);
                 item->SetSlot(item_slot);
 
                 if (IsInventoryPos(INVENTORY_SLOT_BAG_0, item_slot))
@@ -407,7 +407,7 @@ template <>
 void Player::SerializeSpellCooldowns(MaNGOS::Serializer::WriteSerializer& buf)
 {
     static uint32 last_spell_id = 0;
-    time_t currTime = time(NULL);
+    time_t currTime = time(nullptr);
     for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
     {
         if (itr->second.end > currTime && itr->second.end <= currTime + infinityCooldownDelayCheck)

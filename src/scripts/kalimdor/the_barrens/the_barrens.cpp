@@ -932,19 +932,19 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         Creature* pDefender;
         for (int i = 0; i < 9; i++)
         {
-            pDefender = NULL;
+            pDefender = nullptr;
             if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseOneGuards[i]))
                 static_cast<TemporarySummon*>(pDefender)->UnSummon();
         }
         for (int i = 0; i < 8; i++)
         {
-            pDefender = NULL;
+            pDefender = nullptr;
             if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseTwoGuards[i]))
                 static_cast<TemporarySummon*>(pDefender)->UnSummon();
         }
         while (!AllKolkars.empty())
         {
-            pDefender = NULL;
+            pDefender = nullptr;
             if (pDefender = m_creature->GetMap()->GetCreature(AllKolkars.front()))
                 static_cast<TemporarySummon*>(pDefender)->UnSummon();
             AllKolkars.pop_front();

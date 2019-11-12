@@ -72,7 +72,7 @@ bool ChatHandler::HandleSpellEffectsCommand(char *args)
         return false;
     }
     LocaleConstant loc = GetSessionDbcLocale();
-    ShowSpellListHelper(NULL, pSpell, loc);
+    ShowSpellListHelper(nullptr, pSpell, loc);
     for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         if (pSpell->Effect[i] == 0)
@@ -110,7 +110,7 @@ bool ChatHandler::HandleSpellEffectsCommand(char *args)
         }
 
         if (SpellEntry const* pTriggered = sSpellMgr.GetSpellEntry(pSpell->EffectTriggerSpell[i]))
-            ShowSpellListHelper(NULL, pTriggered, loc);
+            ShowSpellListHelper(nullptr, pTriggered, loc);
         else
             PSendSysMessage("(existe pas)");
     }
@@ -130,7 +130,7 @@ bool ChatHandler::HandleSpellInfosCommand(char *args)
         return false;
     }
     LocaleConstant loc = GetSessionDbcLocale();
-    ShowSpellListHelper(NULL, pSpell, loc);
+    ShowSpellListHelper(nullptr, pSpell, loc);
 
     PSendSysMessage("School%u:Category%u:Dispel%u:Mechanic%u", pSpell->School, pSpell->Category, pSpell->Dispel, pSpell->Mechanic);
     PSendSysMessage("Attributes0x%x:Ex[0x%x:0x%x:0x%x:0x%x]", pSpell->Attributes, pSpell->AttributesEx, pSpell->AttributesEx2, pSpell->AttributesEx3, pSpell->AttributesEx4);
@@ -158,7 +158,7 @@ bool ChatHandler::HandleSpellSearchCommand(char *args)
         return false;
     PSendSysMessage("* Results for SpellFamilyName %u and SpellFamilyFlags & 0x%x", familyName, familyFlags);
     LocaleConstant loc = GetSessionDbcLocale();
-    SpellEntry const* pSpell = NULL;
+    SpellEntry const* pSpell = nullptr;
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); ++id)
     {
         pSpell = sSpellMgr.GetSpellEntry(id);
@@ -166,7 +166,7 @@ bool ChatHandler::HandleSpellSearchCommand(char *args)
             continue;
         if (pSpell->SpellFamilyName == familyName && pSpell->SpellFamilyFlags & familyFlags)
         {
-            ShowSpellListHelper(NULL, pSpell, loc);
+            ShowSpellListHelper(nullptr, pSpell, loc);
             ++results;
         }
     }
@@ -196,7 +196,7 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
     if (!ExtractOptUInt32(&args, failarg2, 0))
         return false;
 
-    char* unk = strtok(NULL, " ");
+    char* unk = strtok(nullptr, " ");
     uint8 unkI = unk ? (uint8)atoi(unk) : 2;
 
     WorldPacket data(SMSG_CAST_RESULT, 4 + 1 + 1);
@@ -230,7 +230,7 @@ bool ChatHandler::HandleDebugSendNextChannelSpellVisualCommand(char *args)
         return true;
     }
     uint32 id = 0;
-    SpellEntry const *spellInfo = NULL;
+    SpellEntry const *spellInfo = nullptr;
     for (id = uiPlayId + 1; id <= sSpellMgr.GetMaxSpellId(); id++)
     {
         spellInfo = sSpellMgr.GetSpellEntry(id);
@@ -313,7 +313,7 @@ bool ChatHandler::HandleDebugSendEquipErrorCommand(char* args)
         return false;
 
     uint8 msg = atoi(args);
-    m_session->GetPlayer()->SendEquipError(InventoryResult(msg), NULL, NULL);
+    m_session->GetPlayer()->SendEquipError(InventoryResult(msg), nullptr, nullptr);
     return true;
 }
 
@@ -799,9 +799,9 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
                     continue;
                 }
 
-                if (updateQueue[qp] == NULL)
+                if (updateQueue[qp] == nullptr)
                 {
-                    PSendSysMessage("%s at slot %u has a queuepos (%d) that points to NULL in the queue!",
+                    PSendSysMessage("%s at slot %u has a queuepos (%d) that points to nullptr in the queue!",
                                     item->GetGuidStr().c_str(), item->GetSlot(), qp);
                     error = true;
                     continue;
@@ -878,9 +878,9 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
                             continue;
                         }
 
-                        if (updateQueue[qp] == NULL)
+                        if (updateQueue[qp] == nullptr)
                         {
-                            PSendSysMessage("%s in bag %u at slot %u has a queuepos (%d) that points to NULL in the queue!",
+                            PSendSysMessage("%s in bag %u at slot %u has a queuepos (%d) that points to nullptr in the queue!",
                                             item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), qp);
                             error = true;
                             continue;
@@ -931,7 +931,7 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
             if (item->GetState() == ITEM_REMOVED) continue;
             Item *test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
-            if (test == NULL)
+            if (test == nullptr)
             {
                 PSendSysMessage("queue(" SIZEFMTD "): %s has incorrect (bag %u slot %u) values, the player doesn't have an item at that position!",
                                 i, item->GetGuidStr().c_str(), item->GetBagSlot(), item->GetSlot());
@@ -1414,7 +1414,7 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
         return false;
 
     Player *chr = GetSelectedPlayer();
-    if (chr == NULL)
+    if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
         SetSentErrorMessage(true);
@@ -1618,7 +1618,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     simCount = simCount ? simCount : 10000;
     SetSentErrorMessage(true);
 
-    LootStore const* store = NULL;
+    LootStore const* store = nullptr;
     if (tableName == "creature")
         store = &LootTemplates_Creature;
     else if (tableName == "reference")
@@ -1663,7 +1663,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
 
     for (unsigned int i = 0; i < simCount; ++i)
     {
-        Loot l(NULL);
+        Loot l(nullptr);
         if (lootOwner)
             l.SetTeam(lootOwner->GetTeam());
         tab->Process(l, *store, store->IsRatesAllowed());
@@ -1825,7 +1825,7 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 
         if (!canEquip)
         {
-            ItemPrototype const* similar = NULL;
+            ItemPrototype const* similar = nullptr;
             for (uint32 id2 = 0; id2 < sItemStorage.GetMaxEntry(); id2++)
                 if (ItemPrototype const * proto2 = sItemStorage.LookupEntry<ItemPrototype>(id2))
                     if (proto1 != proto2 && IsSimilarItem(proto1, proto2))
@@ -2354,7 +2354,7 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
 
     // this entry visible only to GM's with "gm on"
     static const uint32 WAYPOINT_NPC_ENTRY = 1;
-    Creature* wp = NULL;
+    Creature* wp = nullptr;
     for (uint32 i = 0; i < pointPath.size(); ++i)
     {
         if (transport)
@@ -2502,7 +2502,7 @@ bool ChatHandler::HandleMmapStatsCommand(char* /*args*/)
     if (Transport* transport = m_session->GetPlayer()->GetTransport())
     {
         const dtNavMeshQuery* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetModelNavMeshQuery(transport->GetDisplayId());
-        navmesh = navmeshquery ? navmeshquery->getAttachedNavMesh() : NULL;
+        navmesh = navmeshquery ? navmeshquery->getAttachedNavMesh() : nullptr;
     }
 
     if (!navmesh)

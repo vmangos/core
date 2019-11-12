@@ -88,7 +88,7 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called when an unit moves within visibility distance
         virtual void MoveInLineOfSight(Unit*) {}
 
-        // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
+        // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
         virtual void EnterCombat(Unit* /*enemy*/) {}
 
         // Called for reaction at stopping attack at no attackers or targets

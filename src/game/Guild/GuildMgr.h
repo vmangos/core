@@ -61,7 +61,7 @@ class GuildMgr
             std::map<uint32, uint32>::iterator it = m_guid2guild.find(lowguid);
             if (it != m_guid2guild.end())
                 return GetGuildById(it->second);
-            return NULL;
+            return nullptr;
         }
 
         void CreatePetition(uint32 id, Player* player, const ObjectGuid& charterGuid, std::string& name);

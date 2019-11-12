@@ -82,7 +82,7 @@ public:
     Item* GetMItem(uint32 id)
     {
         ItemMap::const_iterator itr = mMitems.find(id);
-        return itr != mMitems.end() ? itr->second : NULL;
+        return itr != mMitems.end() ? itr->second : nullptr;
     }
 
     void AddMItem(Item* it);

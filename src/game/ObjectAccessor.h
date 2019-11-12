@@ -72,7 +72,7 @@ class HashMapHolder
         {
             ReadGuard guard(i_lock);
             typename MapType::iterator itr = m_objectMap.find(guid);
-            return (itr != m_objectMap.end()) ? itr->second : NULL;
+            return (itr != m_objectMap.end()) ? itr->second : nullptr;
         }
 
         static MapType& GetContainer() { return m_objectMap; }
@@ -116,7 +116,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         /**
          * @brief These functions will attempt to return a Player* if available.
          * Else they will try to return a MasterPlayer*.
-         * Otherwise, they return NULL
+         * Otherwise, they return nullptr
          * @param guid
          * @return IPlayerPointer
          */

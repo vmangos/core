@@ -40,7 +40,7 @@ static std::vector<uint32> hunterSkipSpells =
 
 void PlayerAI::Remove()
 {
-    me->setAI(NULL);
+    me->setAI(nullptr);
     delete this;
 }
 
@@ -284,7 +284,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         return;
     }
 
-    Unit* victim = NULL;
+    Unit* victim = nullptr;
     CharmInfo* charmInfo = me->GetCharmInfo();
     Unit* controller = FindController();
 

@@ -340,7 +340,7 @@ struct mob_zara_larvaAI : public ScriptedAI
 
     void Reset()
     {
-        m_victim = NULL;
+        m_victim = nullptr;
         m_waypoint = 0;
         Active = 2000;
         SetCombatMovement(false);

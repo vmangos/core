@@ -35,7 +35,7 @@
 #include "ObjectAccessor.h"
 
 Transport::Transport() : GameObject(),
-    _transportInfo(NULL), _isMoving(true), _pendingStop(false),
+    _transportInfo(nullptr), _isMoving(true), _pendingStop(false),
     _passengerTeleportItr(_passengers.begin()), _pathProgress(0)
 {
     // the path progress is the only value that seem to matter
@@ -84,7 +84,7 @@ bool Transport::Create(uint32 guidlow, uint32 entry, uint32 mapid, float x, floa
     _nextFrame = tInfo->keyFrames.begin();
     _currentFrame = _nextFrame++;
 
-    _pathProgress = time(NULL) % (tInfo->pathTime / 1000);
+    _pathProgress = time(nullptr) % (tInfo->pathTime / 1000);
     _pathProgress *= 1000;
     SetObjectScale(goinfo->size);
     SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
@@ -221,7 +221,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
 
     if (erased)
     {
-        passenger->SetTransport(NULL);
+        passenger->SetTransport(nullptr);
         passenger->m_movementInfo.ClearTransportData();
         DEBUG_LOG("Object %s removed from transport %s.", passenger->GetName(), GetName());
     }

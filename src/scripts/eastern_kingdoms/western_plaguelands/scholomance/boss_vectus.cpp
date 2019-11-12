@@ -51,7 +51,7 @@ struct boss_vectusAI : public ScriptedAI
         eventGambitStart        = false;
         findGambit              = false;
         m_uiGambitEvent_Timer   = 0;
-        pGambit     = NULL;
+        pGambit     = nullptr;
         Reset();
     }
 
@@ -132,7 +132,7 @@ struct boss_vectusAI : public ScriptedAI
                         if (CreatureGroup* myGroup = (*it)->GetCreatureGroup())
                         {
                             myGroup->RemoveMember((*it)->GetGUID());
-                            (*it)->SetCreatureGroup(NULL);
+                            (*it)->SetCreatureGroup(nullptr);
                         }
 
                         (*it)->setFaction(14);
@@ -271,8 +271,8 @@ struct npc_scholomance_studentAI : public ScriptedAI
                         {
                             myGroup->RemoveMember(Vectus->GetGUID());
                             myGroup->RemoveMember(Marduke->GetGUID());
-                            Vectus->SetCreatureGroup(NULL);
-                            Marduke->SetCreatureGroup(NULL);
+                            Vectus->SetCreatureGroup(nullptr);
+                            Marduke->SetCreatureGroup(nullptr);
                         }
                     }
                 }
@@ -304,7 +304,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         if (m_creature->isAlive())
             m_creature->GetMotionMaster()->MoveTargetedHome();
 
-        m_creature->SetLootRecipient(NULL);
+        m_creature->SetLootRecipient(nullptr);
 
         Reset();
     }

@@ -67,7 +67,7 @@ class LifeTimePolicy
 void MaNGOS::Singleton<T, ThreadingModel, CreatePolicy, LifeTimePolicy>::DestroySingleton()
 {
     CreatePolicy::Destroy(si_instance);
-    si_instance = NULL;
+    si_instance = nullptr;
     si_destroyed = true;
 }
 

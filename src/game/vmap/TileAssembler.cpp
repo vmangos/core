@@ -59,7 +59,7 @@ Vector3 ModelPosition::transform(const Vector3& pIn) const
 TileAssembler::TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName) : iSrcDir(pSrcDirName), iDestDir(pDestDirName)
 {
     iCurrentUniqueNameId = 0;
-    iFilterMethod = NULL;
+    iFilterMethod = nullptr;
 }
 
 TileAssembler::~TileAssembler()

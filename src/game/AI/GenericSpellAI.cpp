@@ -186,7 +186,7 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
 #endif
             if (it->timer  < uiDiff)
             {
-                Unit* target = NULL;
+                Unit* target = nullptr;
                 switch (it->target)
                 {
                     case GENERIC_TARGET_SELF:

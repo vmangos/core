@@ -15,7 +15,7 @@ struct npc_escort_genericAI : public npc_escortAI
             sLog.outError("npc_escort : La creature %u n'a pas de donnees dans la table `script_escort_data` ! Le PNJ sera inactif.");
     }
 
-    // ATTENTION : Peut etre NULL
+    // ATTENTION : Peut etre nullptr
     CreatureEscortData const* m_pEscortData;
 
     void Reset()
@@ -42,7 +42,7 @@ struct npc_escort_genericAI : public npc_escortAI
         //m_creature->RemoveAllAuras();
         m_creature->DeleteThreatList();
         m_creature->CombatStop(true);
-        m_creature->SetLootRecipient(NULL);
+        m_creature->SetLootRecipient(nullptr);
 
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -106,7 +106,7 @@ struct npc_escort_genericAI : public npc_escortAI
         if (pQuest->GetQuestId() == m_pEscortData->uiQuestEntry)
         {
             Start(false, pPlayer->GetGUID(), pQuest);
-            m_creature->MonsterTextEmote("quest accepted", NULL);
+            m_creature->MonsterTextEmote("quest accepted", nullptr);
         }
     }
 
@@ -131,7 +131,7 @@ struct npc_escort_genericAI : public npc_escortAI
 CreatureAI* GetAI_npc_escort_genericAI(Creature* pCreature)
 {
     CreatureEscortData const* data = sScriptMgr.GetEscortData(pCreature->GetEntry());
-    npc_escort_genericAI* pTempAI = NULL;
+    npc_escort_genericAI* pTempAI = nullptr;
     pTempAI = new npc_escort_genericAI(pCreature, data);
     return (CreatureAI*)pTempAI;
 }

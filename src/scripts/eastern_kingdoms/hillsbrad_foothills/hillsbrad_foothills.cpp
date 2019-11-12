@@ -71,7 +71,7 @@ struct go_dusty_rugAI: public GameObjectAI
         {
             if (timer < uiDiff)
             {
-                Creature* curr = NULL;
+                Creature* curr = nullptr;
                 switch (step)
                 {
                     case 1:
@@ -108,13 +108,13 @@ struct go_dusty_rugAI: public GameObjectAI
                         }
                         if (curr = me->GetMap()->GetCreature(Farmers.front()))
                             curr->SetStandState(UNIT_STAND_STATE_STAND);
-                        curr = NULL;
+                        curr = nullptr;
                         while (!Farmers.empty())
                         {
                             if (curr = me->GetMap()->GetCreature(Farmers.front()))
-                                curr->DealDamage(curr, curr->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                                curr->DealDamage(curr, curr->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                             Farmers.pop_front();
-                            curr = NULL;
+                            curr = nullptr;
                         }
 
                         timer = 20000;

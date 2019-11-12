@@ -368,7 +368,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
             if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
             {
                 if (pMograine->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
-                    pKiller->DealDamage(pMograine, 1, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    pKiller->DealDamage(pMograine, 1, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
         }
     }
@@ -433,7 +433,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
         //If we are <75% hp cast healing spells at self or Mograine
         if (m_uiHeal_Timer < uiDiff)
         {
-            Creature* pTarget = NULL;
+            Creature* pTarget = nullptr;
 
             if (m_creature->GetHealthPercent() <= 75.0f)
                 pTarget = m_creature;

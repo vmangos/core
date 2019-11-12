@@ -62,9 +62,9 @@ PostgreSQLConnection::~PostgreSQLConnection()
 bool PostgreSQLConnection::OpenConnection(bool reconnect)
 {
     if (m_socket)
-        mPGconn = PQsetdbLogin(NULL, m_port_or_socket == "localhost" ? NULL : m_port_or_socket.c_str(), NULL, NULL, m_database.c_str(), m_user.c_str(), m_password.c_str());
+        mPGconn = PQsetdbLogin(nullptr, m_port_or_socket == "localhost" ? nullptr : m_port_or_socket.c_str(), nullptr, nullptr, m_database.c_str(), m_user.c_str(), m_password.c_str());
     else
-        mPGconn = PQsetdbLogin(m_host.c_str(), m_port_or_socket.c_str(), NULL, NULL, m_database.c_str(), m_user.c_str(), m_password.c_str());
+        mPGconn = PQsetdbLogin(m_host.c_str(), m_port_or_socket.c_str(), nullptr, nullptr, m_database.c_str(), m_user.c_str(), m_password.c_str());
 
     /* check to see that the backend connection was successfully made */
     if (PQstatus(mPGconn) != CONNECTION_OK)
@@ -72,7 +72,7 @@ bool PostgreSQLConnection::OpenConnection(bool reconnect)
         sLog.outError( "Could not connect to Postgre database at %s: %s",
             m_host.c_str(), PQerrorMessage(mPGconn));
         PQfinish(mPGconn);
-        mPGconn = NULL;
+        mPGconn = nullptr;
         return false;
     }
 
@@ -120,14 +120,14 @@ bool PostgreSQLConnection::_Query(const char *sql, PGresult** pResult, uint64* p
 QueryResult* PostgreSQLConnection::Query(const char *sql)
 {
     if (!mPGconn)
-        return NULL;
+        return nullptr;
 
-    PGresult* result = NULL;
+    PGresult* result = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
     if(!_Query(sql,&result,&rowCount,&fieldCount))
-        return NULL;
+        return nullptr;
 
     QueryResultPostgre * queryResult = new QueryResultPostgre(result, rowCount, fieldCount);
 
@@ -138,14 +138,14 @@ QueryResult* PostgreSQLConnection::Query(const char *sql)
 QueryNamedResult* PostgreSQLConnection::QueryNamed(const char *sql)
 {
     if (!mPGconn)
-        return NULL;
+        return nullptr;
 
-    PGresult* result = NULL;
+    PGresult* result = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
     if(!_Query(sql,&result,&rowCount,&fieldCount))
-        return NULL;
+        return nullptr;
 
     QueryFieldNames names(fieldCount);
     for (uint32 i = 0; i < fieldCount; i++)

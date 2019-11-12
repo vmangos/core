@@ -171,7 +171,7 @@ struct npc_ringoAI : public FollowerAI
         m_uiFaintTimer = urand(30000, 60000);
         m_uiEndEventProgress = 0;
         m_uiEndEventTimer = 1000;
-        pSpraggle = NULL;
+        pSpraggle = nullptr;
     }
 
     void MoveInLineOfSight(Unit *pWho)
@@ -384,7 +384,7 @@ struct ungoro_eggs_triggerAI : public ScriptedAI
                 if (currPlayer->isAlive())
                     return currPlayer;
         }
-        return NULL;
+        return nullptr;
     }
     void UpdateAI(const uint32 diff)
     {
@@ -864,7 +864,7 @@ struct npc_simone_the_inconspicuousAI : public ScriptedAI
     {
         if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
         {
-            Creature* pPreciousDevourer = NULL;
+            Creature* pPreciousDevourer = nullptr;
             Creature* pDemon    = m_creature->SummonCreature(NPC_SIMONE_THE_SEDUCTRESS,
                                   m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(m_creature), TEMPSUMMON_DEAD_DESPAWN, 0);
             Creature* pPrecious = GetClosestCreatureWithEntry(m_creature, NPC_PRECIOUS, 100.0f);

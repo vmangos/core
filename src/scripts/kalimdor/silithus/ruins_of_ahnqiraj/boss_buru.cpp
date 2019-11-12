@@ -104,7 +104,7 @@ struct boss_buruAI : public ScriptedAI
         for (int i = 0; i < 6; i++)
         {
             egg = m_pInstance->GetCreature(m_eggsGUID[i]);
-            if (egg != NULL)
+            if (egg != nullptr)
                 egg->AddObjectToRemoveList();
             if (Creature* egg = m_creature->SummonCreature(NPC_BURU_EGG, Eggs[i].x, Eggs[i].y, Eggs[i].z, 0))
                 m_eggsGUID[i] = egg->GetGUID();
@@ -141,7 +141,7 @@ struct boss_buruAI : public ScriptedAI
         for (int i = 0; i < 6 && !m_bIsEnraged; i++)
         {
             egg = m_pInstance->GetCreature(m_eggsGUID[i]);
-            if (egg == NULL)
+            if (egg == nullptr)
             {
                 if (Creature* egg = m_creature->SummonCreature(NPC_BURU_EGG, Eggs[i].x, Eggs[i].y, Eggs[i].z, 0))
                     m_eggsGUID[i] = egg->GetGUID();

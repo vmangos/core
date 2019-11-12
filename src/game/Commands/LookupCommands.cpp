@@ -173,7 +173,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
     return true;
 }
 
-void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target /*=NULL*/)
+void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target /*=nullptr*/)
 {
     ItemPrototype const *itemProto = sItemStorage.LookupEntry<ItemPrototype >(itemId);
     if (!itemProto)
@@ -181,7 +181,7 @@ void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target 
 
     std::string name;
 
-    if (ItemLocale const *il = loc_idx >= 0 ? sObjectMgr.GetItemLocale(itemProto->ItemId) : NULL)
+    if (ItemLocale const *il = loc_idx >= 0 ? sObjectMgr.GetItemLocale(itemProto->ItemId) : nullptr)
         name = il->Name[loc_idx];
 
     if (name.empty())
@@ -215,7 +215,7 @@ bool ChatHandler::HandleLookupItemCommand(char* args)
 
     wstrToLower(wnamepart);
 
-    Player* pl = m_session ? m_session->GetPlayer() : NULL;
+    Player* pl = m_session ? m_session->GetPlayer() : nullptr;
 
     uint32 counter = 0;
 
@@ -328,7 +328,7 @@ bool ChatHandler::HandleLookupSkillCommand(char* args)
     if (!*args)
         return false;
 
-    // can be NULL in console call
+    // can be nullptr in console call
     Player* target = GetSelectedPlayer();
 
     std::string namepart = args;
@@ -453,7 +453,7 @@ bool ChatHandler::HandleLookupSpellCommand(char* args)
     if (!*args)
         return false;
 
-    // can be NULL at console call
+    // can be nullptr at console call
     Player* target = GetSelectedPlayer();
 
     std::string namepart = args;
@@ -507,7 +507,7 @@ bool ChatHandler::HandleLookupSpellCommand(char* args)
     return true;
 }
 
-void ChatHandler::ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target /*= NULL*/)
+void ChatHandler::ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target /*= nullptr*/)
 {
     Quest const* qinfo = sObjectMgr.GetQuestTemplate(questId);
     if (!qinfo)
@@ -515,7 +515,7 @@ void ChatHandler::ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* tar
 
     std::string title;
 
-    if (QuestLocale const *il = loc_idx >= 0 ? sObjectMgr.GetQuestLocale(qinfo->GetQuestId()) : NULL)
+    if (QuestLocale const *il = loc_idx >= 0 ? sObjectMgr.GetQuestLocale(qinfo->GetQuestId()) : nullptr)
         title = il->Title[loc_idx];
 
     if (title.empty())
@@ -549,7 +549,7 @@ bool ChatHandler::HandleLookupQuestCommand(char* args)
     if (!*args)
         return false;
 
-    // can be NULL at console call
+    // can be nullptr at console call
     Player* target = GetSelectedPlayer();
 
     std::string namepart = args;
@@ -999,7 +999,7 @@ bool ChatHandler::HandleLookupPlayerIpCommand(char* args)
     if (!ExtractOptUInt32(&args, limit, 100))
         return false;
 
-    QueryResult* result = NULL;
+    QueryResult* result = nullptr;
     std::string ip = ipStr;
     LoginDatabase.escape_string(ip);
     result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), ip.c_str());
@@ -1078,7 +1078,7 @@ bool ChatHandler::HandleLookupPlayerCharacterCommand(char* args)
     if (!ExtractOptUInt32(&args, limit, 100))
         return false;
 
-    QueryResult* result = NULL;
+    QueryResult* result = nullptr;
     std::string normalizedName = nameStr;
     if (normalizePlayerName(normalizedName))
         if (PlayerCacheData const* data = sObjectMgr.GetPlayerDataByName(normalizedName))
@@ -1091,7 +1091,7 @@ bool ChatHandler::HandleLookupPlayerCharacterCommand(char* args)
 
                 AccountTypes security = sAccountMgr.GetSecurity(id);
                 if (GetAccessLevel() < security || (GetAccessLevel() < SEC_ADMINISTRATOR && security > SEC_PLAYER))
-                    return LookupPlayerSearchCommand(NULL, &limit);
+                    return LookupPlayerSearchCommand(nullptr, &limit);
 
                 LoginDatabase.escape_string(ip);
                 result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip = '%s'", ip.c_str());
@@ -1160,8 +1160,8 @@ bool ChatHandler::HandleLookupPoolCommand(char * args)
 
     std::string namepart = args;
 
-    Player* player = m_session ? m_session->GetPlayer() : NULL;
-    MapPersistentState* mapState = player ? player->GetMap()->GetPersistentState() : NULL;
+    Player* player = m_session ? m_session->GetPlayer() : nullptr;
+    MapPersistentState* mapState = player ? player->GetMap()->GetPersistentState() : nullptr;
 
     strToLower(namepart);
 
@@ -1386,7 +1386,7 @@ static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
     LANG_REP_FRIENDLY, LANG_REP_HONORED, LANG_REP_REVERED,    LANG_REP_EXALTED
 };
 
-void ChatHandler::ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState /*= NULL*/, Player * target /*= NULL */)
+void ChatHandler::ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState /*= nullptr*/, Player * target /*= nullptr */)
 {
     std::string name = factionEntry->name[loc];
     // send faction in "id - [faction] rank reputation [visible] [at war] [own team] [unknown] [invisible] [inactive]" format
@@ -1397,7 +1397,7 @@ void ChatHandler::ShowFactionListHelper(FactionEntry const * factionEntry, Local
     else
         ss << factionEntry->ID << " - " << name << " " << localeNames[loc];
 
-    if (repState)                               // and then target!=NULL also
+    if (repState)                               // and then target!=nullptr also
     {
         ReputationRank rank = target->GetReputationMgr().GetRank(factionEntry);
         std::string rankName = GetMangosString(ReputationRankStrIndex[rank]);
@@ -1428,7 +1428,7 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
     if (!*args)
         return false;
 
-    // Can be NULL at console call
+    // Can be nullptr at console call
     Player *target = GetSelectedPlayer();
 
     std::string namepart = args;
@@ -1471,7 +1471,7 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
 
             if (loc < MAX_DBC_LOCALE)
             {
-                FactionState const* repState = target ? target->GetReputationMgr().GetState(factionEntry) : NULL;
+                FactionState const* repState = target ? target->GetReputationMgr().GetState(factionEntry) : nullptr;
                 ShowFactionListHelper(factionEntry, LocaleConstant(loc), repState, target);
                 counter++;
             }

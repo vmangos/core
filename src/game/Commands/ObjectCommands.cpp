@@ -135,7 +135,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 
     if (target)
     {
-        time_t curRespawnDelay = target->GetRespawnTimeEx() - time(NULL);
+        time_t curRespawnDelay = target->GetRespawnTimeEx() - time(nullptr);
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
 
@@ -188,7 +188,7 @@ bool ChatHandler::HandleGameObjectTurnCommand(char* args)
     if (!lowguid)
         return false;
 
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
 
     // by DB guid
     if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
@@ -231,7 +231,7 @@ bool ChatHandler::HandleGameObjectMoveCommand(char* args)
     if (!lowguid)
         return false;
 
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
 
     // by DB guid
     if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
@@ -308,7 +308,7 @@ bool ChatHandler::HandleGameObjectDeleteCommand(char* args)
     if (!lowguid)
         return false;
 
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
 
     // by DB guid
     if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
@@ -433,7 +433,7 @@ bool ChatHandler::HandleGameObjectTempAddCommand(char *args)
 
     Player *chr = m_session->GetPlayer();
 
-    char* spawntime = strtok(NULL, " ");
+    char* spawntime = strtok(nullptr, " ");
     uint32 spawntm = 300;
 
     if (spawntime)
@@ -523,7 +523,7 @@ bool ChatHandler::HandleGameObjectSelectCommand(char*)
     const float dist = 10.0f;
     Player* player = m_session->GetPlayer();
 
-    GameObject* go = NULL;
+    GameObject* go = nullptr;
     CellPair pair(MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY()));
     Cell cell(pair);
     cell.SetNoCreate();
@@ -577,7 +577,7 @@ bool ChatHandler::HandleGameObjectRespawnCommand(char*)
 bool ChatHandler::HandleGameObjectToggleCommand(char* args)
 {
     uint32 lowguid;
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
 
     if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
     {

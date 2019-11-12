@@ -325,7 +325,7 @@ struct boss_majordomoAI : public ScriptedAI
         {
             Creature* DomoAdd[8];
             for (int i = 0; i < 8; i++)
-                DomoAdd[i] = NULL;
+                DomoAdd[i] = nullptr;
 
             for (int i = 0; i < 8; i++)
                 DomoAdd[i] = m_creature->SummonCreature(m_aBosspawnLocs[i].m_uiEntry, m_aBosspawnLocs[i].m_fX, m_aBosspawnLocs[i].m_fY, m_aBosspawnLocs[i].m_fZ, m_aBosspawnLocs[i].m_fO, TEMPSUMMON_DEAD_DESPAWN, 0);

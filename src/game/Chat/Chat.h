@@ -991,7 +991,7 @@ class MANGOS_DLL_SPEC ChatHandler
 
         void SetSentErrorMessage(bool val){ sentErrorMessage = val;};
     private:
-        WorldSession * m_session;                           // != NULL for chat command call and NULL for CLI command
+        WorldSession * m_session;                           // != nullptr for chat command call and nullptr for CLI command
 
         // common global flag
         static bool load_command_table;

@@ -226,7 +226,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
 
     Creature* SelectWaypoint()
     {
-        Creature* creatureFound = NULL;
+        Creature* creatureFound = nullptr;
 
         CellPair pair(MaNGOS::ComputeCellPair(m_creature->GetPositionX(), m_creature->GetPositionY()));
         Cell cell(pair);

@@ -270,7 +270,7 @@ CreatureAI* GetAI_npc_j_eevee(Creature* pCreature)
     else if (pCreature->GetMapId() == 289) // Map 289, Zone 2057. Scholomance
         return new npc_j_eevee_scholomanceAI(pCreature);
 
-    return NULL;
+    return nullptr;
 }
 
 void AddSC_npc_j_eevee()

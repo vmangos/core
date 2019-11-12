@@ -47,13 +47,13 @@ class Transport : public GameObject
         PassengerSet const& GetPassengers() const { return _passengers; }
 
         /// This method transforms supplied transport offsets into global coordinates
-        void CalculatePassengerPosition(float& x, float& y, float& z, float* o = NULL) const
+        void CalculatePassengerPosition(float& x, float& y, float& z, float* o = nullptr) const
         {
             CalculatePassengerPosition(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
         }
 
         /// This method transforms supplied global coordinates into local offsets
-        void CalculatePassengerOffset(float& x, float& y, float& z, float* o = NULL) const
+        void CalculatePassengerOffset(float& x, float& y, float& z, float* o = nullptr) const
         {
             CalculatePassengerOffset(x, y, z, o, GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
         }

@@ -27,7 +27,7 @@ void SingleTest::Reset()
         // only maps created for the testing are deleted
         if (_map->GetInstanceId() > RESERVED_INSTANCES_LAST)
             sMapMgr.DeleteTestMap(_map);
-        _map = NULL;
+        _map = nullptr;
     }
 }
 
@@ -86,17 +86,17 @@ WorldObject* SingleTest::GetTestObject(uint32 num, uint32 options)
 {
     Map* map = GetMap();
     if (!map)
-        return NULL;
+        return nullptr;
     TestObjectGuids::const_iterator it = _testObjects.find(num);
     if (it == _testObjects.end())
-        return NULL;
+        return nullptr;
     _initializedObjects.insert(num);
     return map->GetWorldObject(it->second);
 }
 
 Unit* SingleTest::GetTestUnit(uint32 num, uint32 options)
 {
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
     bool initialized = _initializedObjects.find(num) != _initializedObjects.end();
     if (WorldObject* obj = GetTestObject(num, options))
         unit = obj->ToUnit();
@@ -114,7 +114,7 @@ Unit* SingleTest::GetTestUnit(uint32 num, uint32 options)
 
 Player* SingleTest::GetTestPlayer(uint32 num, uint32 options)
 {
-    Player* p = NULL;
+    Player* p = nullptr;
     bool initialized = _initializedObjects.find(num) != _initializedObjects.end();
     if (WorldObject* obj = GetTestUnit(num, options))
         p = obj->ToPlayer();
@@ -138,7 +138,7 @@ Player* SingleTest::GetTestPlayer(uint32 num, uint32 options)
 
 Creature* SingleTest::GetTestCreature(uint32 num, uint32 options)
 {
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     if (WorldObject* obj = GetTestUnit(num, options))
         creature = obj->ToCreature();
     if (!creature)
@@ -150,7 +150,7 @@ class TestPlayerBotAI : public PlayerCreatorAI
 {
 public:
     TestPlayerBotAI(SingleTest* test, uint32 num, uint8 _race_, uint8 _class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o) :
-        PlayerCreatorAI(NULL, _race_, _class_, mapId, instanceId, x, y, z, o), _test(test), _num(num)
+        PlayerCreatorAI(nullptr, _race_, _class_, mapId, instanceId, x, y, z, o), _test(test), _num(num)
     {
     }
     void OnPlayerLogin()
@@ -172,7 +172,7 @@ void SingleTest::SpawnPlayer(uint32 id, uint8 _class, uint32 _race, float x, flo
 Creature* SingleTest::SpawnCreature(uint32 num, uint32 entry, float x, float y, float z, float o)
 {
     ComputeCoords(x, y, z);
-    Creature* c = NULL;
+    Creature* c = nullptr;
     if (c = GetMap()->SummonCreature(entry, x, y, z, o, TEMPSUMMON_MANUAL_DESPAWN, 0))
     {
         c->SetActiveObjectState(true);

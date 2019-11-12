@@ -354,7 +354,7 @@ struct boss_onyxiaAI : public ScriptedAI
                 return &aMoveData[i];
         }
 
-        return NULL;
+        return nullptr;
     } 
 
     void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)

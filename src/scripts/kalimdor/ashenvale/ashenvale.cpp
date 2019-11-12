@@ -735,7 +735,7 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
         if (eventPhase != 0)
             return false;
         eventPhase = 1;
-        Creature* foulweald = NULL;
+        Creature* foulweald = nullptr;
         for (int i = 0; i < 2; i++)
         {
             if (foulweald = me->SummonCreature(NPC_ENRAGED_FOULWEALD, foulwealdSpawnCoords[i][0], foulwealdSpawnCoords[i][1], foulwealdSpawnCoords[i][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 420000))
@@ -748,7 +748,7 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
                 foulweald->SetRespawnDelay(425000);
                 DefineFoulwealdMound(foulweald, me->GetGUID());
             }
-            foulweald = NULL;
+            foulweald = nullptr;
         }
         return true;
     }

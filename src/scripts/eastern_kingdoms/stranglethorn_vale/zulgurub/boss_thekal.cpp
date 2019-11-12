@@ -68,7 +68,7 @@ INSERT INTO creature_template SET entry=15109, modelid_1=15214, modelid_2=15214,
 class ChargeUnitSelector : public ThreatListProcesser
 {
 public:
-    ChargeUnitSelector(Unit* thekal) : _victim(NULL), _charger(thekal)
+    ChargeUnitSelector(Unit* thekal) : _victim(nullptr), _charger(thekal)
     {
         ASSERT(_charger);
     }
@@ -131,7 +131,7 @@ struct zg_rez_add : public ScriptedAI
     void JustDied(Unit* Killer)
     {
         DoScriptText(EMOTE_DIES, m_creature);
-        Unit* pRezzer = NULL;
+        Unit* pRezzer = nullptr;
         // Mort et non selectionnable (= pas de loots)
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         if (m_pInstance)
@@ -353,7 +353,7 @@ struct boss_thekalAI : public zg_rez_add
         {
             // Apres les 10 sec sans rez :
             // Rez
-            DoRessurectUnit(m_creature, NULL);
+            DoRessurectUnit(m_creature, nullptr);
             m_creature->SetEntry(14509);
             // Phase 2
             DoSetInPhaseTwo();
@@ -434,7 +434,7 @@ struct boss_thekalAI : public zg_rez_add
                     // On tente tout de même de trouver une cible.
                     Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
                     float nearestDist = 200.0f;
-                    Player* target = NULL;
+                    Player* target = nullptr;
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                         if (m_creature->canAttack(itr->getSource()))
                             if (itr->getSource()->GetDistance(m_creature) < nearestDist)

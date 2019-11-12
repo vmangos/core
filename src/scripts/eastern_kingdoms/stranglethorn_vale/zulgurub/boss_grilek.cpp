@@ -54,7 +54,7 @@ struct boss_grilekAI : public ScriptedAI
         {
 
             DoCastSpellIfCan(m_creature, SPELL_AVARTAR);
-            Unit* target = NULL;
+            Unit* target = nullptr;
 
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
 

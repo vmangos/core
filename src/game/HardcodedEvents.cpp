@@ -578,7 +578,7 @@ void SilithusWarEffortBattle::Enable()
         float FinalZ = KalimdorMap->GetHeight(FinalX, FinalY, 0.0f, true, 100.0f);
         float FinalO = frand(0, M_PI_F * 2);
 
-        Creature* c = NULL;
+        Creature* c = nullptr;
         if (c = KalimdorMap->SummonCreature(14471, FinalX, FinalY, FinalZ, FinalO, TEMPSUMMON_CORPSE_DESPAWN, 0))
         {
             SummonedMobs.push_back(c);
@@ -665,8 +665,8 @@ ScourgeInvasionEvent::ScourgeInvasionEvent()
     memset(&previousRemainingCounts[0], -1, sizeof(int) * 6);
 
     // At start up
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL));
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL));
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(nullptr));
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(nullptr));
 
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_BLASTED_LANDS);
@@ -829,7 +829,7 @@ void ScourgeInvasionEvent::Update()
     if (!invasion1Loaded || !invasion2Loaded)
         return;
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
 
     bool attackStateChange = false;
     for (auto it = invasionPoints.begin(); it != invasionPoints.end(); ++it)
@@ -918,8 +918,8 @@ void ScourgeInvasionEvent::Disable()
         }
     }
     
-    sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL), true);
-    sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL), true);
+    sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(nullptr), true);
+    sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(nullptr), true);
 
     sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0, true);
     sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0, true);
@@ -998,7 +998,7 @@ bool ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
 // chosen zone is unavailable the invasion will simply not be started, and a new attempt will be made next update
 void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable)
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     // Not yet time
     if (now < sObjectMgr.GetSavedVariable(timeVariable))
         return;

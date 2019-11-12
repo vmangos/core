@@ -621,7 +621,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                             float z = 0.0f;
                             float o = 0.0f;
                             m_creature->GetHomePosition(x, y, z, o);
-                            //m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(),NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                            //m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(),nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                             m_creature->NearTeleportTo(x, y, z, o);
                             m_creature->ForcedDespawn();
                             m_uiOutroTimer = 0;
@@ -1194,7 +1194,7 @@ struct boss_eranikusAI : public ScriptedAI
             m_creature->CombatStop(true);
             m_creature->LoadCreatureAddon(true);
 
-            m_creature->SetLootRecipient(NULL);
+            m_creature->SetLootRecipient(nullptr);
 
             // Get Remulos guid and make him stop summoning shades
             if (Creature* pRemulos = GetClosestCreatureWithEntry(m_creature, NPC_REMULOS, 50.0f))

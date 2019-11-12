@@ -350,7 +350,7 @@ bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, c
                 pObsidionAI->m_playerList.push_back(pPlayer->GetObjectGuid());
 
                 if (Group* pGroup = pPlayer->GetGroup())
-                    for (GroupReference* pRef = pGroup->GetFirstMember(); pRef != NULL; pRef = pRef->next())
+                    for (GroupReference* pRef = pGroup->GetFirstMember(); pRef != nullptr; pRef = pRef->next())
                         if (Player* pMember = pRef->getSource())
                             pObsidionAI->m_playerList.push_back(pMember->GetObjectGuid());
 

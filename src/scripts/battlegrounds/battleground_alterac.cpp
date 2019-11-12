@@ -1270,7 +1270,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
     void GetAIInformation(ChatHandler& reader)
     {
         reader.PSendSysMessage("npc_AlteracBowmanAI::GetAIInformation");
-        reader.PSendSysMessage("victim: %s", m_creature->getVictim() ? m_creature->getVictim()->GetName() : "NULL");
+        reader.PSendSysMessage("victim: %s", m_creature->getVictim() ? m_creature->getVictim()->GetName() : "nullptr");
         reader.PSendSysMessage("evade_mode: %u", m_creature->IsInEvadeMode());
         ScriptedAI::GetAIInformation(reader);
     }
@@ -1706,7 +1706,7 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
             {
                 if (!pEscortAI->HasEscortState(STATE_ESCORT_ESCORTING))
                 {
-                    pEscortAI->Start(true, NULL, NULL, false);
+                    pEscortAI->Start(true, 0, nullptr, false);
                     pEscortAI->setCurrentWP(getCurrentWP());
                     isOnHisOwn = true;
                 }
@@ -2553,7 +2553,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     pEscortAI->Reset();
                     (*it)->SetRespawnDelay(432000);
-                    pEscortAI->Start(true, NULL, NULL, false);
+                    pEscortAI->Start(true, 0, nullptr, false);
                     pEscortAI->setCurrentWP(getCurrentWP());
                 }
             }
@@ -2908,7 +2908,7 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
                 /** Start NPC movement for World Boss event */
                 if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pQuestGiver->AI()))
                 {
-                    pEscortAI->Start(true, NULL, NULL, false);
+                    pEscortAI->Start(true, 0, nullptr, false);
                     pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pQuestGiver->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
@@ -3122,7 +3122,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pCreature->AI()))
             {
                 pCreature->setFaction(1194);
-                pEscortAI->Start(true, NULL, NULL, false);
+                pEscortAI->Start(true, 0, nullptr, false);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
@@ -3149,7 +3149,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                     pCreature->CastSpell(pCreature, 5759, false);
 
                 pCreature->setFaction(1194);
-                pEscortAI->Start(true, NULL, NULL, false);
+                pEscortAI->Start(true, 0, nullptr, false);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
@@ -3579,7 +3579,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
             {
                 /** Start escort for troops since leader is dead */
                 if (AV_npc_troops_chief_EventAI* pEscortAI = dynamic_cast<AV_npc_troops_chief_EventAI*>((*it)->AI()))
-                    pEscortAI->Start(true, NULL, NULL, false);
+                    pEscortAI->Start(true, 0, nullptr, false);
             }
             m_RamRiderList.clear();
         }
@@ -3691,7 +3691,7 @@ bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Q
 
                 if (AV_npc_troops_chief_EventAI* pEscortAI = dynamic_cast<AV_npc_troops_chief_EventAI*>(pQuestGiver->AI()))
                 {
-                    pEscortAI->Start(true, NULL, NULL, false);
+                    pEscortAI->Start(true, 0, nullptr, false);
                     pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pQuestGiver->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
@@ -3916,7 +3916,7 @@ bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, ui
 
                         if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pCreature->AI()))
                         {
-                            pEscortAI->Start(true, NULL, NULL, false);
+                            pEscortAI->Start(true, 0, nullptr, false);
                             //pCreature->setFaction(pPlayer->getFaction());
                             pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
@@ -4322,7 +4322,7 @@ class av_world_boss_baseai: public npc_escortAI
             }
             m_creature->DeleteThreatList();
             m_creature->CombatStop(true);
-            m_creature->SetLootRecipient(NULL);
+            m_creature->SetLootRecipient(nullptr);
 
             // Back on escart_ai path.
             ReturnToCombatStartPosition();
@@ -4478,7 +4478,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         if (m_uiEngageTimer < uiDiff && isEngageModeStarted == false)
         {
             /** Start waypoint path system */
-            Start(false, NULL, NULL, false);
+            Start(false, 0, nullptr, false);
             isEngageModeStarted = true;
         }
         else
@@ -4659,7 +4659,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
         if (m_uiEngageTimer < uiDiff && isEngageModeStarted == false)
         {
             /** Start waypoint path system */
-            Start(false, NULL, NULL, false);
+            Start(false, 0, nullptr, false);
             isEngageModeStarted = true;
         }
         else
@@ -5258,14 +5258,14 @@ class npc_av_battle_npc_summoner: public ScriptedAI
                     {
                         float x, y, z;
                         m_creature->GetPosition(x, y, z);
-                        m_creature->GetMap()->GetWalkRandomPosition(NULL, x, y, z, 5.0f);
+                        m_creature->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, 5.0f);
                         if (Creature* c = m_creature->SummonCreature(SelectCreatureEntry(), x, y, z, 0.0f, TEMPSUMMON_CORPSE_DESPAWN))
                         {
                             m_summoned[i] = c->GetObjectGuid();
                             x = m_destX;
                             y = m_destY;
                             z = m_destZ;
-                            m_creature->GetMap()->GetWalkRandomPosition(NULL, x, y, z, 20.0f);
+                            m_creature->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, 20.0f);
                             c->SetHomePosition(x, y, z, frand(0, 2 * M_PI_F));
                             c->SetRespawnRadius(10.0f);
                             c->SetDefaultMovementType(RANDOM_MOTION_TYPE);

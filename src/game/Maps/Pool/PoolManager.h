@@ -44,7 +44,7 @@ struct PoolTemplateData
 
     MapEntry const* mapEntry;                               // Map id used for pool creature/gameobject spams. In case non-instanceable map
                                                             // it can be not unique but base at sharing same pool system dynamic data in this case this is not important.
-                                                            // NULL is no spawns by some reason
+                                                            // nullptr is no spawns by some reason
     uint32  MaxLimit;
     uint32  PoolFlags;
     uint32  InstanceId;

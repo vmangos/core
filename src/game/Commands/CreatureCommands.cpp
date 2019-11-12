@@ -56,7 +56,7 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
     uint32 Entry = target->GetEntry();
     CreatureInfo const* cInfo = target->GetCreatureInfo();
 
-    time_t curRespawnDelay = target->GetRespawnTimeEx() - time(NULL);
+    time_t curRespawnDelay = target->GetRespawnTimeEx() - time(nullptr);
     if (curRespawnDelay < 0)
         curRespawnDelay = 0;
     std::string curRespawnDelayStr = secsToTimeString(curRespawnDelay, true);
@@ -610,7 +610,7 @@ bool ChatHandler::HandleNpcSummonCommand(char* args)
 
 bool ChatHandler::HandleNpcDeleteCommand(char* args)
 {
-    Creature* unit = NULL;
+    Creature* unit = nullptr;
 
     if (*args)
     {
@@ -968,12 +968,12 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
     else
         return false;
 
-    bool doNotDelete = ExtractLiteralArg(&args, "NODEL") != NULL;
+    bool doNotDelete = ExtractLiteralArg(&args, "NODEL") != nullptr;
     if (!doNotDelete && *args)                              // need fail if false in result wrong literal
         return false;
 
     // now lowguid is low guid really existing creature
-    // and pCreature point (maybe) to this creature or NULL
+    // and pCreature point (maybe) to this creature or nullptr
 
     // update movement type
     if (!doNotDelete)
@@ -1240,7 +1240,7 @@ bool ChatHandler::HandleNpcGroupDelCommand(char *args)
 
     g->RemoveMember(target->GetObjectGuid());
     g->SaveToDb();
-    target->SetCreatureGroup(NULL);
+    target->SetCreatureGroup(nullptr);
     target->GetMotionMaster()->Initialize();
     return true;
 }
@@ -1291,7 +1291,7 @@ inline Creature* Helper_CreateWaypointFor(Creature* wpOwner, WaypointPathOrigin 
     if (!wpCreature->Create(wpOwner->GetMap()->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo, TEAM_NONE, waypointInfo->entry))
     {
         delete wpCreature;
-        return NULL;
+        return nullptr;
     }
 
     wpCreature->SetVisibility(VISIBILITY_OFF);
@@ -1802,7 +1802,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
     }
 
     Creature* wpOwner;                                      // Npc that is moving
-    TemporarySummonWaypoint* wpTarget = NULL;               // Define here for wp-info command
+    TemporarySummonWaypoint* wpTarget = nullptr;               // Define here for wp-info command
 
     // Show info for the selected waypoint (Step one: get moving npc)
     if (subCmd == "info")
@@ -1839,7 +1839,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
         wpOwner = targetCreature;
 
     // Get the path
-    WaypointPath* wpPath = NULL;
+    WaypointPath* wpPath = nullptr;
     if (wpOrigin != PATH_NO_PATH)                           // Might have been provided by param
         wpPath = sWaypointMgr.GetPathFromOrigin(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), wpPathId, wpOrigin);
     else
@@ -2227,8 +2227,8 @@ bool ChatHandler::HandleEscortAddWpCommand(char *args)
         SetSentErrorMessage(true);
         return false;
     }
-    QueryResult* pResult = NULL;
-    Field* pFields       = NULL;
+    QueryResult* pResult = nullptr;
+    Field* pFields       = nullptr;
     if (waypointId == 0)
     {
         pResult = WorldDatabase.PQuery("SELECT MAX(pointid) FROM script_waypoint WHERE entry=%u", creatureEntry);

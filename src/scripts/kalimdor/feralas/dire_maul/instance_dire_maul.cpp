@@ -1168,7 +1168,7 @@ struct GordokBruteAI : public ScriptedAI
             char eMessage[100];
             sprintf(eMessage, "Gordok Brute puts his club away and begins swinging wildly!");
             m_creature->LoadEquipment(0, true);
-            m_creature->MonsterTextEmote(eMessage, NULL, false);
+            m_creature->MonsterTextEmote(eMessage, nullptr, false);
 
             m_creature->CastSpell(m_creature, SPELL_ENRAGE, false);
             m_bEnrage = true;
@@ -1264,7 +1264,7 @@ struct boss_guardsAI : public ScriptedAI
         if (pInstance->GetData(TYPE_GORDOK_TRIBUTE) == DONE)
         {
             m_creature->MonsterSay("Why... Boss.. betray.. us...?", 0, 0);
-            m_creature->SetLootRecipient(NULL);
+            m_creature->SetLootRecipient(nullptr);
         }
     }
 
@@ -1444,7 +1444,7 @@ struct go_fixed_trap : public GameObjectAI
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-                pSlipkik->CastSpell(pSlipkik, SPELL_ICE_LOCK, true, NULL);
+                pSlipkik->CastSpell(pSlipkik, SPELL_ICE_LOCK, true, nullptr);
                 me->SendGameObjectCustomAnim();
                 me->Delete();
             }
@@ -1546,7 +1546,7 @@ struct boss_kromcrushAI : public ScriptedAI
         if (pInstance->GetData(TYPE_GORDOK_TRIBUTE) == DONE)
         {
             m_creature->MonsterSay("Why... Boss.. betray.. us...?", 0, 0);
-            m_creature->SetLootRecipient(NULL);
+            m_creature->SetLootRecipient(nullptr);
         }
     }
 

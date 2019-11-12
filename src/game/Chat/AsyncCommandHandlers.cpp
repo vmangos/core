@@ -451,7 +451,7 @@ void AccountSearchHandler::ShowAccountListHelper(QueryResult* result, ChatHandle
         uint32 account = fields[0].GetUInt32();
 
         WorldSession* session = sWorld.FindSession(account);
-        Player* player = session ? session->GetPlayer() : NULL;
+        Player* player = session ? session->GetPlayer() : nullptr;
         char const* char_name = player ? player->GetName() : " - ";
 
         std::string lastIp = chatHandler.GetMangosString(LANG_ERROR);

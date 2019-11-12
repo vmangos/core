@@ -125,7 +125,7 @@ void PacketCompressor::Compress(void* dst, uint32 *dst_size, void* src, int src_
 bool UpdateData::BuildPacket(WorldPacket *packet, bool hasTransport)
 {
     if (!m_datas.size())
-        return BuildPacket(packet, NULL, hasTransport);
+        return BuildPacket(packet, nullptr, hasTransport);
     return BuildPacket(packet, &(m_datas.front()), hasTransport);
 }
 
@@ -188,7 +188,7 @@ void UpdateData::Send(WorldSession* session, bool hasTransport)
     WorldPacket data;
     if (!m_datas.size() && !m_outOfRangeGUIDs.empty())
     {
-        BuildPacket(&data, NULL, hasTransport);
+        BuildPacket(&data, nullptr, hasTransport);
         session->SendPacket(&data);
         m_outOfRangeGUIDs.clear();
         return;

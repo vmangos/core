@@ -1234,7 +1234,7 @@ enum
 
 struct npc_blackwing_technicianAI : public ScriptedAI
 {
-    npc_blackwing_technicianAI(Creature* pCreature) : ScriptedAI(pCreature), m_pTechnicianHelper(NULL)
+    npc_blackwing_technicianAI(Creature* pCreature) : ScriptedAI(pCreature), m_pTechnicianHelper(nullptr)
     {
         m_bAdded = false;
         m_bVaelGob = (pCreature->GetPositionZ() < 420.0f);

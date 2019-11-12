@@ -84,10 +84,10 @@ namespace VMAP
 
             //! pass mesh data to object and create BIH. Passed vectors get get swapped with old geometry!
             void setMeshData(std::vector<Vector3>& vert, std::vector<MeshTriangle>& tri);
-            void setLiquidData(WmoLiquid*& liquid) { iLiquid = liquid; liquid = NULL; }
+            void setLiquidData(WmoLiquid*& liquid) { iLiquid = liquid; liquid = nullptr; }
             uint32 IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit) const;
             bool IsInsideObject(const Vector3& pos, const Vector3& up, float& z_dist) const;
-            bool IsUnderObject(const Vector3& pos, const Vector3& up, bool isM2, float* outDist = NULL, float* inDist = NULL) const; // Use client triangles orientation. You can see bot->top through the floor.
+            bool IsUnderObject(const Vector3& pos, const Vector3& up, bool isM2, float* outDist = nullptr, float* inDist = nullptr) const; // Use client triangles orientation. You can see bot->top through the floor.
             bool GetLiquidLevel(const Vector3& pos, float& liqHeight) const;
             uint32 GetLiquidType() const;
             bool writeToFile(FILE* wf);
@@ -120,7 +120,7 @@ namespace VMAP
             void setRootWmoID(uint32 id) { RootWMOID = id; }
             bool IntersectRay(const G3D::Ray& ray, float& distance, bool stopAtFirstHit) const;
             bool IntersectPoint(const G3D::Vector3& p, const G3D::Vector3& down, float& dist, AreaInfo& info) const;
-            bool IsUnderObject(const G3D::Vector3& p, const G3D::Vector3& up, bool m2, float* outDist = NULL, float* inDist = NULL) const;
+            bool IsUnderObject(const G3D::Vector3& p, const G3D::Vector3& up, bool m2, float* outDist = nullptr, float* inDist = nullptr) const;
             bool GetLocationInfo(const G3D::Vector3& p, const G3D::Vector3& down, float& dist, LocationInfo& info) const;
             bool writeFile(const std::string& filename);
             bool readFile(const std::string& filename);

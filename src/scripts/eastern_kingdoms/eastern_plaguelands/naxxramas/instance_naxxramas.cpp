@@ -1163,7 +1163,7 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
         return lList.front();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide)
@@ -1720,7 +1720,7 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
         if (!m_creature->getVictim() || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
             return;
 
-        Creature* pNearest = NULL;
+        Creature* pNearest = nullptr;
         MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_creature, 16067, true, 100.0f);
         MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pNearest, u_check);
 

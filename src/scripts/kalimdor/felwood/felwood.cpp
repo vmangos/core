@@ -763,7 +763,7 @@ struct npc_areiAI : public npc_escortAI
         if (uiEntry == NPC_AREI)
             return m_creature;
 
-        return NULL;
+        return nullptr;
     }
 
     void UpdateAI(const uint32 uiDiff) override

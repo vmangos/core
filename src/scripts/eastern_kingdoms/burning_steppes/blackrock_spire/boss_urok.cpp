@@ -125,7 +125,7 @@ struct go_urok_challengeAI: public GameObjectAI
     {
         Unit* massacrer = me->FindNearestCreature(NPC_UROK_MASSACRER, 20.0f);
         Unit* mage      = me->FindNearestCreature(NPC_UROK_MAGE, 20.0f);
-        Unit* target    = NULL;
+        Unit* target    = nullptr;
         if (!mage)
             target = massacrer;
         else if (massacrer)
@@ -137,7 +137,7 @@ struct go_urok_challengeAI: public GameObjectAI
         }
         else
             target = mage;
-        // Sinon, massacre=mage=NULL, aucune cible.
+        // Sinon, massacre=mage=nullptr, aucune cible.
         return target;
     }
 

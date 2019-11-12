@@ -113,7 +113,7 @@ WmoLiquid::WmoLiquid(uint32 width, uint32 height, const Vector3& corner, uint32 
     iFlags = new uint8[width * height];
 }
 
-WmoLiquid::WmoLiquid(const WmoLiquid& other): iHeight(NULL), iFlags(NULL)
+WmoLiquid::WmoLiquid(const WmoLiquid& other): iHeight(nullptr), iFlags(nullptr)
 {
     *this = other;                                      // use assignment operator defined below
 }
@@ -142,14 +142,14 @@ WmoLiquid& WmoLiquid::operator=(const WmoLiquid& other)
         memcpy(iHeight, other.iHeight, (iTilesX + 1) * (iTilesY + 1) * sizeof(float));
     }
     else
-        iHeight = NULL;
+        iHeight = nullptr;
     if (other.iFlags)
     {
         iFlags = new uint8[iTilesX * iTilesY];
         memcpy(iFlags, other.iFlags, iTilesX * iTilesY * sizeof(uint8));
     }
     else
-        iFlags = NULL;
+        iFlags = nullptr;
 
     return *this;
 }

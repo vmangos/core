@@ -327,7 +327,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
             {
                 if (Unit *pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1)) //ATTACKING_TARGET_RANDOM=>ATTACKING_TARGET_TOPAGGRO ,0 => 1 Alita
                 {
-                    if (pTarget != NULL && !pTarget->HasAura(SPELL_SLEEP))
+                    if (pTarget != nullptr && !pTarget->HasAura(SPELL_SLEEP))
                     {
                         MCPlayerGuid = pTarget->GetGUID();
                         MCPlayerAggro = m_creature->getThreatManager().getThreat(pTarget);

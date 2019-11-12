@@ -74,7 +74,7 @@ struct npc_galen_goodwardAI : public npc_escortAI
         {
             case 0:
             {
-                GameObject* pCage = NULL;
+                GameObject* pCage = nullptr;
                 if (m_uiGalensCageGUID)
                     pCage = m_creature->GetMap()->GetGameObject(m_uiGalensCageGUID);
                 else

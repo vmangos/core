@@ -59,7 +59,7 @@ struct boss_wushoolayAI : public ScriptedAI
         //LightningWave_Timer
         if (LightningWave_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_LIGHTNINGWAVE);
 

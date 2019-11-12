@@ -274,8 +274,8 @@ class MANGOS_DLL_SPEC Database
         // Frees data, cancels scheduled queries, closes connection
         void StopServer();
     protected:
-        Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadsBodies(NULL), m_delayThreads(NULL), m_numAsyncWorkers(0),
-            m_serialDelayQueue(NULL), m_delayQueue(new SqlQueue()), m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1),
+        Database() : m_pAsyncConn(nullptr), m_pResultQueue(nullptr), m_threadsBodies(nullptr), m_delayThreads(nullptr), m_numAsyncWorkers(0),
+            m_serialDelayQueue(nullptr), m_delayQueue(new SqlQueue()), m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1),
             m_bAllowAsyncTransactions(false), m_iStmtIndex(-1)
         {
             m_nQueryCounter = -1;
@@ -287,15 +287,15 @@ class MANGOS_DLL_SPEC Database
         class MANGOS_DLL_SPEC TransHelper
         {
             public:
-                TransHelper() : m_pTrans(NULL) {}
+                TransHelper() : m_pTrans(nullptr) {}
                 ~TransHelper();
 
                 //initializes new SqlTransaction object
                 SqlTransaction * init(uint32 serialId);
-                //gets pointer on current transaction object. Returns NULL if transaction was not initiated
+                //gets pointer on current transaction object. Returns nullptr if transaction was not initiated
                 SqlTransaction * get() const { return m_pTrans; }
                 //detaches SqlTransaction object allocated by init() function
-                //next call to get() function will return NULL!
+                //next call to get() function will return nullptr!
                 //do not forget to destroy obtained SqlTransaction object!
                 SqlTransaction * detach();
                 //destroyes SqlTransaction allocated by init() function

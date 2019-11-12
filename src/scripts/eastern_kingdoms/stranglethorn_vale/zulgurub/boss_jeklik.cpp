@@ -518,9 +518,9 @@ struct npc_guru_bat_riderAI : public ScriptedAI
         {
             GoingToExplose = true;
             if (urand(0, 1))
-                m_creature->MonsterTextEmote("Gurubashi Bat Rider becomes fully engulfed in flames.", NULL, false);
+                m_creature->MonsterTextEmote("Gurubashi Bat Rider becomes fully engulfed in flames.", nullptr, false);
             else
-                m_creature->MonsterTextEmote("Gurubashi Bat Rider gets a crazed look in his eye.", NULL, false);
+                m_creature->MonsterTextEmote("Gurubashi Bat Rider gets a crazed look in his eye.", nullptr, false);
             m_creature->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true); // fear immunity
             m_creature->CastSpell(m_creature, SPELL_EXPLOSION, false);
         }

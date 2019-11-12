@@ -7,7 +7,7 @@
 #include "ObjectAccessor.h"
 
 MasterPlayer::MasterPlayer(WorldSession* s):
-    m_session(s), m_social(NULL), m_mailsUpdated(false),
+    m_session(s), m_social(nullptr), m_mailsUpdated(false),
     m_speakTime(0), m_speakCount(0)
 {
 }
@@ -64,7 +64,7 @@ void MasterPlayer::SaveToDB()
 void MasterPlayer::Update()
 {
     // undelivered mail
-    if (m_nextMailDelivereTime && m_nextMailDelivereTime <= time(NULL))
+    if (m_nextMailDelivereTime && m_nextMailDelivereTime <= time(nullptr))
     {
         SendNewMail();
         ++unReadMails;
@@ -201,7 +201,7 @@ void MasterPlayer::UpdateNextMailTimeAndUnreads()
 {
     // calculate next delivery time (min. from non-delivered mails
     // and recalculate unReadMail
-    time_t cTime = time(NULL);
+    time_t cTime = time(nullptr);
     m_nextMailDelivereTime = 0;
     unReadMails = 0;
     for (PlayerMails::iterator itr = m_mail.begin(); itr != m_mail.end(); ++itr)
@@ -218,7 +218,7 @@ void MasterPlayer::UpdateNextMailTimeAndUnreads()
 
 void MasterPlayer::AddNewMailDeliverTime(time_t deliver_time)
 {
-    if (deliver_time <= time(NULL))                         // ready now
+    if (deliver_time <= time(nullptr))                         // ready now
     {
         ++unReadMails;
         SendNewMail();
@@ -338,7 +338,7 @@ Mail* MasterPlayer::GetMail(uint32 id)
         if ((*itr)->messageID == id)
             return (*itr);
     }
-    return NULL;
+    return nullptr;
 }
 
 
@@ -360,8 +360,8 @@ void MasterPlayer::SendInitialActionButtons() const
 
 ActionButton* MasterPlayer::addActionButton(uint8 button, uint32 action, uint8 type)
 {
-    if (!Player::IsActionButtonDataValid(button, action, type, NULL))
-        return NULL;
+    if (!Player::IsActionButtonDataValid(button, action, type, nullptr))
+        return nullptr;
 
     // it create new button (NEW state) if need or return existing
     ActionButton& ab = m_actionButtons[button];

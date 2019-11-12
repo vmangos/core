@@ -20,8 +20,8 @@ public:
     }
     void Test() override
     {
-        Player* warlock = GetTestStep() ? GetTestPlayer(0, TESTPLAYER_MAXLEVEL) : NULL;
-        Creature* necromancer = GetTestStep() > 1 ? GetTestCreature(1) : NULL;
+        Player* warlock = GetTestStep() ? GetTestPlayer(0, TESTPLAYER_MAXLEVEL) : nullptr;
+        Creature* necromancer = GetTestStep() > 1 ? GetTestCreature(1) : nullptr;
         switch (GetTestStep())
         {
             case 0:
@@ -63,9 +63,9 @@ public:
     }
     void Test() override
     {
-        Player* warlock = GetTestStep() ? GetTestPlayer(0, TESTPLAYER_MAXLEVEL) : NULL;
-        Player* hunt = GetTestStep() ? GetTestPlayer(1, TESTPLAYER_MAXLEVEL) : NULL;
-        Creature* necromancer = GetTestStep() > 1 ? GetTestCreature(2) : NULL;
+        Player* warlock = GetTestStep() ? GetTestPlayer(0, TESTPLAYER_MAXLEVEL) : nullptr;
+        Player* hunt = GetTestStep() ? GetTestPlayer(1, TESTPLAYER_MAXLEVEL) : nullptr;
+        Creature* necromancer = GetTestStep() > 1 ? GetTestCreature(2) : nullptr;
         switch (GetTestStep())
         {
             case 0:

@@ -239,7 +239,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
     DEBUG_LOG("Counter %u, time %u", counter, time / IN_MILLISECONDS);
 
     Unit *pMover = _player->GetMover();
-    Player *pPlayerMover = pMover->GetTypeId() == TYPEID_PLAYER ? (Player*)pMover : NULL;
+    Player *pPlayerMover = pMover->GetTypeId() == TYPEID_PLAYER ? (Player*)pMover : nullptr;
 
     if (!pPlayerMover || !pPlayerMover->IsBeingTeleportedNear())
         return;

@@ -131,19 +131,19 @@ GameObjectModel* GameObjectModel::construct(const GameObject* const object)
     {
         // TODO: What kind of gobj should block LoS or not ?
         if (gobjInfo->type == GAMEOBJECT_TYPE_BUTTON && gobjInfo->button.losOK)
-            return NULL;
+            return nullptr;
         if (gobjInfo->type == GAMEOBJECT_TYPE_GOOBER && gobjInfo->goober.losOK)
-            return NULL;
+            return nullptr;
     }
     const GameObjectDisplayInfoEntry* info = sGameObjectDisplayInfoStore.LookupEntry(object->GetDisplayId());
     if (!info)
-        return NULL;
+        return nullptr;
 
     GameObjectModel* mdl = new GameObjectModel();
     if (!mdl->initialize(object, info))
     {
         delete mdl;
-        return NULL;
+        return nullptr;
     }
 
     return mdl;

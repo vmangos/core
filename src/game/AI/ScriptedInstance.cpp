@@ -139,7 +139,7 @@ Player* ScriptedInstance::GetPlayerInMap(bool bOnlyAlive /*=false*/, bool bCanBe
     return nullptr;
 }
 
-/// Returns a pointer to a loaded GameObject that was stored in m_mGoEntryGuidStore. Can return NULL
+/// Returns a pointer to a loaded GameObject that was stored in m_mGoEntryGuidStore. Can return nullptr
 GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
 {
     EntryGuidMap::iterator find = m_mGoEntryGuidStore.find(uiEntry);
@@ -152,7 +152,7 @@ GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
     return nullptr;
 }
 
-/// Returns a pointer to a loaded Creature that was stored in m_mGoEntryGuidStore. Can return NULL
+/// Returns a pointer to a loaded Creature that was stored in m_mGoEntryGuidStore. Can return nullptr
 Creature* ScriptedInstance::GetSingleCreatureFromStorage(uint32 uiEntry, bool bSkipDebugLog /*=false*/)
 {
     EntryGuidMap::iterator find = m_mNpcEntryGuidStore.find(uiEntry);

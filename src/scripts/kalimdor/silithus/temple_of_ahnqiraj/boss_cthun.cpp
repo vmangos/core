@@ -243,7 +243,7 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
     }
 
     if (temp.empty())
-        return NULL;
+        return nullptr;
 
     j = temp.begin();
 
@@ -1718,7 +1718,7 @@ struct cthunAI : public ScriptedAI
         if (nextStomachEnterGrabTimer < diff) {
             if (Player* target = SelectRandomAliveNotStomach(m_pInstance)) {
                 target->InterruptNonMeleeSpells(false);
-                target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, NULL, NULL, m_creature->GetObjectGuid());
+                target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, nullptr, nullptr, m_creature->GetObjectGuid());
                 stomachEnterPortTimer = STOMACH_GRAB_DURATION;
                 StomachEnterTargetGUID = target->GetObjectGuid();
             }

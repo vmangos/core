@@ -345,7 +345,7 @@ int MangosSocketMgr<SocketType>::Connect(int port, std::string const& address, S
     if (connector.connect(handler,addr) == -1)
     {
         // Handler is already deleted.
-        handler = NULL;
+        handler = nullptr;
         return -1;
     }
     // Now add a reactor so our connnection gets updated

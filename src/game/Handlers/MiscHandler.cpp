@@ -366,7 +366,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
     data << uint32(0);
     data << uint8(0);
     SendPacket(&data);
-    LogoutRequest(time(NULL));
+    LogoutRequest(time(nullptr));
 }
 
 void WorldSession::HandlePlayerLogoutOpcode(WorldPacket & /*recv_data*/)
@@ -481,7 +481,7 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
     {
         if (!unit || unit == _player)
         {
-            pSpell->m_targets.setUnitTarget(NULL);
+            pSpell->m_targets.setUnitTarget(nullptr);
             pSpell->cancel();
             return;
         }
@@ -696,7 +696,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
         return;
 
     // prevent resurrect before 30-sec delay after body release not finished
-    if (corpse->GetGhostTime() + GetPlayer()->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP) > time(NULL))
+    if (corpse->GetGhostTime() + GetPlayer()->GetCorpseReclaimDelay(corpse->GetType() == CORPSE_RESURRECTABLE_PVP) > time(nullptr))
         return;
 
     if (!corpse->IsWithinDistInMap(GetPlayer(), CORPSE_RECLAIM_RADIUS, true))
@@ -829,7 +829,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             return;
     }
 
-    // NULL if all values default (non teleport trigger)
+    // nullptr if all values default (non teleport trigger)
     AreaTriggerTeleport const* at = sObjectMgr.GetAreaTriggerTeleport(Trigger_ID);
     if (!at)
         return;

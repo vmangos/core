@@ -74,7 +74,7 @@ public:
         NodeOpcodeMap::const_iterator itr = mOpcodeMap.find(id);
         if (itr != mOpcodeMap.end())
             return &itr->second;
-        return NULL;
+        return nullptr;
     }
     static NodesOpcodes* instance()
     {

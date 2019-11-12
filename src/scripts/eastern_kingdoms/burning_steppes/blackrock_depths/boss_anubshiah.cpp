@@ -68,7 +68,7 @@ struct boss_anubshiahAI : public ScriptedAI
         //CurseOfTongues_Timer
         if (CurseOfTongues_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_CURSEOFTONGUES);
             CurseOfTongues_Timer = 18000;
@@ -94,7 +94,7 @@ struct boss_anubshiahAI : public ScriptedAI
         //EnvelopingWeb_Timer
         if (EnvelopingWeb_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_ENVELOPINGWEB);
             EnvelopingWeb_Timer = 12000;

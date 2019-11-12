@@ -13,7 +13,7 @@ PlayerBotAI* CreatePlayerBotAI(std::string ainame);
 class PlayerBotAI: public PlayerAI
 {
     public:
-        explicit PlayerBotAI(Player* pPlayer = NULL) : PlayerAI(pPlayer), botEntry(NULL) {}
+        explicit PlayerBotAI(Player* pPlayer = nullptr) : PlayerAI(pPlayer), botEntry(nullptr) {}
         virtual ~PlayerBotAI() {}
         virtual void Remove();
 
@@ -21,7 +21,7 @@ class PlayerBotAI: public PlayerAI
         virtual void OnBotEntryLoad(PlayerBotEntry* entry) {}
         virtual void UpdateAI(const uint32 /*diff*/); // Handle delayed teleports
         virtual void OnPlayerLogin() {}
-        virtual void BeforeAddToMap(Player* player) {} // me=NULL at call
+        virtual void BeforeAddToMap(Player* player) {} // me=nullptr at call
         // Helpers
         bool SpawnNewPlayer(WorldSession* sess, uint8 _class, uint32 _race, uint32 mapId, uint32 instanceId, float dx, float dy, float dz, float o);
         PlayerBotEntry* botEntry;
@@ -60,7 +60,7 @@ class PlayerBotFleeingAI : public PlayerBotAI
 class MageOrgrimmarAttackerAI: public PlayerBotAI
 {
     public:
-        explicit MageOrgrimmarAttackerAI(Player* pPlayer = NULL) : PlayerBotAI(pPlayer) {}
+        explicit MageOrgrimmarAttackerAI(Player* pPlayer = nullptr) : PlayerBotAI(pPlayer) {}
         virtual ~MageOrgrimmarAttackerAI() {}
         virtual bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess);
         virtual void UpdateAI(const uint32 /*diff*/);
@@ -69,9 +69,9 @@ class MageOrgrimmarAttackerAI: public PlayerBotAI
 class PopulateAreaBotAI: public PlayerBotAI
 {
     public:
-        explicit PopulateAreaBotAI(uint32 map, float x, float y, float z, uint32 team, float radius, Player* pPlayer = NULL) : PlayerBotAI(pPlayer), _map(map), _x(x), _y(y), _z(z), _team(team), _radius(radius) {}
+        explicit PopulateAreaBotAI(uint32 map, float x, float y, float z, uint32 team, float radius, Player* pPlayer = nullptr) : PlayerBotAI(pPlayer), _map(map), _x(x), _y(y), _z(z), _team(team), _radius(radius) {}
         virtual ~PopulateAreaBotAI() {}
-        virtual void BeforeAddToMap(Player* player); // me=NULL at call
+        virtual void BeforeAddToMap(Player* player); // me=nullptr at call
         virtual void OnPlayerLogin();
     protected:
         uint32 _map;

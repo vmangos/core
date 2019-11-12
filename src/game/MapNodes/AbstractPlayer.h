@@ -63,7 +63,7 @@ class PlayerWrapper final: public AbstractPlayer
 public:
     PlayerWrapper(T& pl) : player(pl) {}
     PlayerWrapper(T* pl) : player(*pl) {}
-    PlayerWrapper() : player(*((T*)NULL)) {}
+    PlayerWrapper() : player(*((T*)nullptr)) {}
     PlayerWrapper(PlayerWrapper<T> const& other) : player(other.player) {}
 
     virtual ObjectGuid GetObjectGuid() const;

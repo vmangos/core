@@ -30,9 +30,9 @@ struct PlayerBotEntry
     bool customBot; // Enabled even if PlayerBot system disabled (AutoTesting system for example)
     PlayerBotAI* ai;
 
-    PlayerBotEntry(uint64 guid, uint32 account, uint32 _chance): playerGUID(guid), accountId(account), chance(_chance), state(PB_STATE_OFFLINE), isChatBot(false), ai(NULL), customBot(false)
+    PlayerBotEntry(uint64 guid, uint32 account, uint32 _chance): playerGUID(guid), accountId(account), chance(_chance), state(PB_STATE_OFFLINE), isChatBot(false), ai(nullptr), customBot(false)
     {}
-    PlayerBotEntry(): state(PB_STATE_OFFLINE), isChatBot(false), ai(NULL), accountId(0), playerGUID(0), chance(100.0f), customBot(false)
+    PlayerBotEntry(): state(PB_STATE_OFFLINE), isChatBot(false), ai(nullptr), accountId(0), playerGUID(0), chance(100.0f), customBot(false)
     {}
 };
 

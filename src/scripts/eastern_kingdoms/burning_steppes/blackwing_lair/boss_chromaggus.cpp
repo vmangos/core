@@ -136,7 +136,7 @@ struct boss_chromaggusAI : public ScriptedAI
             {
                 pTarget->RemoveAurasDueToSpell(23175);
                 pTarget->RemoveAurasDueToSpell(23177);
-                pTarget->DealDamage(pTarget, pTarget->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                pTarget->DealDamage(pTarget, pTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
         }
         m_lChromaticPlayerGUID.clear();

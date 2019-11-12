@@ -60,7 +60,7 @@ bool NodeSession::SafeUpdate(uint32 diff)
     if (m_socket && m_socket->IsClosed())
     {
         m_socket->RemoveReference();
-        m_socket = NULL;
+        m_socket = nullptr;
         return false;
     }
 
@@ -134,7 +134,7 @@ void NodeSession::UnsafeUpdate(uint32 diff)
 
 void NodeSession::ProcessPacketsByType(uint32 type)
 {
-    WorldPacket* packet = NULL;
+    WorldPacket* packet = nullptr;
     while (m_socket && !m_socket->IsClosed() && m_recvQueue[type].next(packet))
         ProcessPacket(packet);
 }

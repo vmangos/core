@@ -103,11 +103,11 @@ void PetAI::UpdateAI(const uint32 diff)
         m_updateAlliesTimer -= diff;
 
     // First checking if we have some taunt on us
-    Unit* tauntTarget = NULL;
+    Unit* tauntTarget = nullptr;
     const Unit::AuraList& tauntAuras = m_creature->GetAurasByType(SPELL_AURA_MOD_TAUNT);
     if (!tauntAuras.empty() && !playerControlled)
     {
-        Unit* caster = NULL;
+        Unit* caster = nullptr;
 
         // Auras are pushed_back, last caster will be on the end
         Unit::AuraList::const_iterator aura = tauntAuras.end();
@@ -344,7 +344,7 @@ void PetAI::UpdateAI(const uint32 diff)
 void PetAI::UpdateAllies()
 {
     Unit* owner = m_creature->GetCharmerOrOwner();
-    Group *group = NULL;
+    Group *group = nullptr;
 
     m_updateAlliesTimer = 10 * IN_MILLISECONDS;              //update friendly targets every 10 seconds, lesser checks increase performance
 
@@ -365,7 +365,7 @@ void PetAI::UpdateAllies()
     m_AllySet.insert(m_creature->GetObjectGuid());
     if (group)                                             //add group
     {
-        for (GroupReference *itr = group->GetFirstMember(); itr != NULL; itr = itr->next())
+        for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* target = itr->getSource();
             if (!target || !group->SameSubGroup((Player*)owner, target))
@@ -451,7 +451,7 @@ void PetAI::OwnerAttacked(Unit* target)
     // Called when owner attacks something. Allows defensive pets to know
     //  that they need to assist
 
-    // Target might be NULL if called from spell with invalid cast targets
+    // Target might be nullptr if called from spell with invalid cast targets
     if (!target)
         return;
 
@@ -483,16 +483,16 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Pet desactive (monture)
     if (m_creature->IsPet() && !((Pet*)m_creature)->IsEnabled())
-        return NULL;
+        return nullptr;
 
     // Passive pets don't do next target selection
     if (m_creature->HasReactState(REACT_PASSIVE))
-        return NULL;
+        return nullptr;
 
     // Not sure why we wouldn't have an owner but just in case...
     Unit* owner = m_creature->GetCharmerOrOwner();
     if (!owner)
-        return NULL;
+        return nullptr;
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->getAttackerForHelper())
@@ -515,7 +515,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     }
 
     // Default - no valid targets
-    return NULL;
+    return nullptr;
 }
 
 void PetAI::HandleReturnMovement()
@@ -670,7 +670,7 @@ bool PetAI::CanAttack(Unit* target)
     {
         // Check if our owner selected this target and clicked "attack"
         Unit* owner = m_creature->GetCharmerOrOwner();
-        Unit* ownerTarget = NULL;
+        Unit* ownerTarget = nullptr;
         if (owner)
         {
             if (Player* playerOwner = owner->ToPlayer())

@@ -306,7 +306,7 @@ struct mob_mawsAI : public ScriptedAI
         m_creature->RemoveAllAuras();
         m_creature->DeleteThreatList();
         m_creature->CombatStop(true);
-        m_creature->SetLootRecipient(NULL);
+        m_creature->SetLootRecipient(nullptr);
         LeaveCombatTimer = 30000;
         SaccagerTimer = urand(20, 120) * 1000;
         SaccagerTimerMax = 120000;

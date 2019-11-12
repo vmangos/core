@@ -420,7 +420,7 @@ struct boss_mandokirAI : public ScriptedAI
                 if (killedPlayer->getDeathState() == CORPSE && !killedPlayer->IsRessurectRequested())
                 {
                     // Find nearest spirit ready to resurrect
-                    Creature* spirit = NULL;
+                    Creature* spirit = nullptr;
                     float spiritDist = 0.0f;
                     for (std::vector<uint64>::iterator it = m_lSpirits.begin(); it != m_lSpirits.end(); ++it)
                     {
@@ -441,7 +441,7 @@ struct boss_mandokirAI : public ScriptedAI
                     if (spirit)
                     {
                         spirit->MonsterWhisper("I am released through you! Avenge me!", killedPlayer);
-                        spirit->AI()->SpellHitTarget(killedPlayer, NULL);
+                        spirit->AI()->SpellHitTarget(killedPlayer, nullptr);
                     }
                 }
             }

@@ -414,7 +414,7 @@ void AccountMgr::LoadAccountBanList(bool silent)
 bool AccountMgr::IsIPBanned(std::string const& ip) const
 {
     std::map<std::string, uint32>::const_iterator it = _ipBanned.find(ip);
-    if (it == _ipBanned.end() || it->second < time(NULL))
+    if (it == _ipBanned.end() || it->second < time(nullptr))
         return false;
     return true;
 }
@@ -422,7 +422,7 @@ bool AccountMgr::IsIPBanned(std::string const& ip) const
 bool AccountMgr::IsAccountBanned(uint32 acc) const
 {
     std::map<uint32, uint32>::const_iterator it = _accountBanned.find(acc);
-    if (it == _accountBanned.end() || it->second < time(NULL))
+    if (it == _accountBanned.end() || it->second < time(nullptr))
         return false;
     return true;
 }
@@ -438,7 +438,7 @@ bool AccountMgr::CheckInstanceCount(uint32 accountId, uint32 instanceId, uint32 
         return true;
     if (enterTimes.size() < maxCount)
         return true;
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     for (it2 = enterTimes.begin(); it2 != enterTimes.end(); ++it2)
         if (it2->second + 3600 < now)
         {
@@ -500,7 +500,7 @@ uint32 AccountPersistentData::GetWhisperScore(MasterPlayer* from, MasterPlayer* 
 
 void AccountPersistentData::JustMailed(uint32 toAccount)
 {
-    _mailsSent[toAccount] = time(NULL);
+    _mailsSent[toAccount] = time(nullptr);
 }
 
 bool AccountPersistentData::CanMail(uint32 targetAccount)
@@ -510,7 +510,7 @@ bool AccountPersistentData::CanMail(uint32 targetAccount)
         return true;
 
     uint32 totalScore = 0;
-    time_t lastNonExpired = time(NULL) - sWorld.getConfig(CONFIG_UINT32_MAILSPAM_EXPIRE_SECS);
+    time_t lastNonExpired = time(nullptr) - sWorld.getConfig(CONFIG_UINT32_MAILSPAM_EXPIRE_SECS);
     for (auto it = _mailsSent.begin(); it != _mailsSent.end(); ++it)
         if (it->second >= lastNonExpired)
             totalScore++;

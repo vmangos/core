@@ -304,7 +304,7 @@ void AdvancedPlayerBotAI::MageAI(const uint32 delta)
     float range = me->isInCombat() ? 30.0f : frand(15, 30);
     Unit* target = me->SelectNearestTarget(range);
     if (target && !me->IsWithinLOSInMap(target))
-        target = NULL;
+        target = nullptr;
     // OOM ?
     if (me->GetPower(POWER_MANA) < 40 && target && me->isInCombat())
     {

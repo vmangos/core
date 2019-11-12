@@ -55,7 +55,7 @@ void ZoneScriptMgr::InitMapZoneScripts(uint32 mapId, Map* pMap)
         pScript = (*it)->GetZoneScript();
         if (!pScript)
         {
-            sLog.outError("Could not initialize ZoneScript object. Got NULL pointer from script.");
+            sLog.outError("Could not initialize ZoneScript object. Got nullptr pointer from script.");
             continue;
         }
         pScript->SetMap(pMap);

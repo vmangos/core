@@ -34,8 +34,8 @@ void PlayerBotAI::UpdateAI(const uint32 diff)
 
 void PlayerBotAI::Remove()
 {
-    me->setAI(NULL);
-    me = NULL;
+    me->setAI(nullptr);
+    me = nullptr;
 }
 
 void PlayerBotFleeingAI::OnPlayerLogin()
@@ -98,7 +98,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     newChar->CreatePacketBroadcaster();
     MasterPlayer* mPlayer = new MasterPlayer(sess);
     mPlayer->LoadPlayer(newChar);
-    mPlayer->SetSocial(sSocialMgr.LoadFromDB(NULL, newChar->GetObjectGuid()));
+    mPlayer->SetSocial(sSocialMgr.LoadFromDB(nullptr, newChar->GetObjectGuid()));
     if (!newChar->GetMap()->Add(newChar))
     {
         sLog.outError("PlayerBotAI::SpawnNewPlayer: Unable to add player to map!");
@@ -146,7 +146,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
     float range = me->isInCombat() ? 30.0f : frand(15, 30);
     Unit* target = me->SelectNearestTarget(range);
     if (target && !me->IsWithinLOSInMap(target))
-        target = NULL;
+        target = nullptr;
     // OOM ?
     if (me->GetPower(POWER_MANA) < 40 && target && me->isInCombat())
     {
@@ -274,7 +274,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
             me->UpdateGroundPositionZ(x, y, z);
         }
         r = 20;
-        if (!me->GetMap()->GetWalkRandomPosition(NULL, x, y, z, r))
+        if (!me->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, r))
             return;
     }
     else
@@ -287,7 +287,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
             float angle = me->GetOrientation() + frand(-M_PI_F / 2, M_PI_F / 2);
             x += r * cos(angle);
             y += r * sin(angle);
-            if (!me->GetMap()->GetWalkHitPosition(NULL, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), x, y, z))
+            if (!me->GetMap()->GetWalkHitPosition(nullptr, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), x, y, z))
                 return;
         }
         else
@@ -306,7 +306,7 @@ void PopulateAreaBotAI::BeforeAddToMap(Player* player)
         float y = _y;
         float z = _z;
         Map* map = sMapMgr.CreateMap(_map, player);
-        while (!map->GetWalkRandomPosition(NULL, x, y, z, _radius));
+        while (!map->GetWalkRandomPosition(nullptr, x, y, z, _radius));
         player->Relocate(x, y, z);
         player->SetLocationMapId(_map);
     }

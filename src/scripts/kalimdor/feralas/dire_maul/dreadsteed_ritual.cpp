@@ -610,7 +610,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                 }
             }
         }
-        GameObject* gobj = NULL;
+        GameObject* gobj = nullptr;
         switch (nodeNb)
         {
             case 0:

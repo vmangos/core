@@ -87,7 +87,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
     public:
         typedef std::map<MapID, Map* > MapMapType;
 
-        uint32 GetContinentInstanceId(uint32 mapId, float x, float y, bool* transitionArea = NULL);
+        uint32 GetContinentInstanceId(uint32 mapId, float x, float y, bool* transitionArea = nullptr);
         Map* CreateMap(uint32, const WorldObject* obj);
         Map* CreateBgMap(uint32 mapid, BattleGround* bg);
         Map* CreateTestMap(uint32 mapid, bool instanced, float posX, float posY);
@@ -196,7 +196,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         {
             // Check pointer rather than deref. Deleted after
             // continent and instance updates are finished
-            if (i_continentUpdateFinished == NULL)
+            if (i_continentUpdateFinished == nullptr)
                 return true;
 
             for (int i = 0; i < i_maxContinentThread; ++i)
@@ -222,7 +222,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         void DeleteStateMachine();
 
         Map* CreateInstance(uint32 id, Player * player);
-        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState *save = NULL);
+        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState *save = nullptr);
         BattleGroundMap* CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg);
 
         uint32 i_gridCleanUpDelay;

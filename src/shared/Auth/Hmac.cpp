@@ -26,7 +26,7 @@ HmacHash::HmacHash(const uint8* data, int length)
     HMAC_Init_ex(m_ctx, data, length, EVP_sha1(), nullptr);
 #else
     HMAC_CTX_init(&m_ctx);
-    HMAC_Init_ex(&m_ctx, data, length, EVP_sha1(), NULL);
+    HMAC_Init_ex(&m_ctx, data, length, EVP_sha1(), nullptr);
 #endif
 }
 

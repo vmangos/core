@@ -32,7 +32,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     // Called at each attack of m_creature by any victim
     void AttackStart(Unit*) override;
 
-    // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
+    // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
     void EnterCombat(Unit*) override;
 
     // Called at stoping attack by any attacker

@@ -244,7 +244,7 @@ struct go_pierre_ventsAI: public GameObjectAI
         if (user->isAlive())
         {
             user->CastSpell(user, SPELL_RED_LIGHTNING, true);
-            user->DealDamage(user, user->GetHealth() > 1000 ? 1000 : user->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+            user->DealDamage(user, user->GetHealth() > 1000 ? 1000 : user->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
         }
     }
     bool CanUse(Player* user)
@@ -885,7 +885,7 @@ struct npc_colossusAI : public ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_COLOSSAL_SMASH) == CAST_OK) // Maxi KB
             {
-                m_creature->MonsterTextEmote("Colossus begins to cast Colossus Smash", NULL);
+                m_creature->MonsterTextEmote("Colossus begins to cast Colossus Smash", nullptr);
                 m_uiColossalSmashTimer = firstSmash ? 10000 : 60000;
                 m_uiColossalSmashEmoteTimer = 5000;
 
@@ -900,7 +900,7 @@ struct npc_colossusAI : public ScriptedAI
 
         if (m_uiColossalSmashEmoteTimer && m_uiColossalSmashEmoteTimer < uiDiff)
         {
-            m_creature->MonsterTextEmote("Colossus lets loose a massive attack", NULL);
+            m_creature->MonsterTextEmote("Colossus lets loose a massive attack", nullptr);
             m_uiColossalSmashEmoteTimer = 0;
         }
         else
@@ -1065,7 +1065,7 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             }
             case 9:
             {
-                m_creature->MonsterTextEmote(10837, NULL, false);
+                m_creature->MonsterTextEmote(10837, nullptr, false);
                 uiNextActionTimer = 3000;
                 break;
             }
@@ -1177,7 +1177,7 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             case 25:
             {
                 if (Creature* Crea = m_creature->FindNearestCreature(15180, 50.0f))    // Baristolth of the Shifting Sands
-                    Crea->MonsterTextEmote(10853, NULL, false);
+                    Crea->MonsterTextEmote(10853, nullptr, false);
                 uiNextActionTimer = 4000;
                 break;
             }
@@ -2729,7 +2729,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         m_uiChargeTimer = urand(15000, 20000);
         m_uiCleaveTimer = urand(4000, 8000);
         m_uiFearTimer = urand(5000, 10000);
-        // m_creature->MonsterTextEmote("Reset", NULL); // pour debug
+        // m_creature->MonsterTextEmote("Reset", nullptr); // pour debug
     }
 
     Unit* GetVictimInRangePlayerOnly(float min, float max)
@@ -2746,7 +2746,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
                 }
             }
         }
-        return NULL;
+        return nullptr;
     }
 
     void UpdateAI(const uint32 uiDiff) override

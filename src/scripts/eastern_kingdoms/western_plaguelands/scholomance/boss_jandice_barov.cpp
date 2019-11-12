@@ -162,7 +162,7 @@ struct boss_jandicebarovAI : public ScriptedAI
             Illusion_Timer = 25000;
 
             //Summon 10 Illusions attacking random gamers
-            Unit* target = NULL;
+            Unit* target = nullptr;
             for (int i = 0; i < 10; ++i)
             {
                 target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);

@@ -79,7 +79,7 @@ enum
 #define SPAWN_Z4_BIS 407.206f
 
 #define DEBUG_RAZOR(...) //sLog.outString("[MC/Razor] "__VA_ARGS__)
-#define DEBUG_EMOTE(s)  //m_creature->MonsterTextEmote(s, NULL);
+#define DEBUG_EMOTE(s)  //m_creature->MonsterTextEmote(s, nullptr);
 
 struct boss_razorgoreAI : public ScriptedAI
 {

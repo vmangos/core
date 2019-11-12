@@ -334,7 +334,7 @@ class MANGOS_DLL_SPEC WorldSession
         // Session can be safely deleted if returns false
         bool ForcePlayerLogoutDelay();
 
-        void QueuePacket(WorldPacket* new_packet, NodeSession* from_node = NULL);
+        void QueuePacket(WorldPacket* new_packet, NodeSession* from_node = nullptr);
 
         bool Update(PacketFilter& updater);
         /**
@@ -513,7 +513,7 @@ class MANGOS_DLL_SPEC WorldSession
         {
             SessionScriptsMap::iterator it = scripts.find(name);
             if (it == scripts.end())
-                return NULL;
+                return nullptr;
             return it->second;
         }
         SessionScriptsMap scripts;

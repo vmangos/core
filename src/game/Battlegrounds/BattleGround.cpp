@@ -1601,7 +1601,7 @@ void BattleGround::HandleKillPlayer(Player *player, Player *killer)
     // Nostalrius:
     // 2 appels pour un pretre avec l'esprit de redemption.
     // - Avant le declenchement du talent (Aura 27827)
-    // - Apres la fin du buff - a ce moment la killer=NULL
+    // - Apres la fin du buff - a ce moment la killer=nullptr
 
     // add +1 kills to group and +1 killing_blows to killer
     if (killer && player->getFaction() != killer->getFaction())

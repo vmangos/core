@@ -45,7 +45,7 @@ int MapSocket::ProcessIncoming(WorldPacket* new_pct)
         {
             ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
 
-            if (m_Session != NULL)
+            if (m_Session != nullptr)
             {
                 // OK, give the packet to WorldSession
                 aptr.release();

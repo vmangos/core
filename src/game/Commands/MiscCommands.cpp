@@ -415,7 +415,7 @@ bool ChatHandler::HandleGuildInviteCommand(char *args)
 
     // if not guild name only (in "") then player name
     ObjectGuid target_guid;
-    if (!ExtractPlayerTarget(&nameStr, NULL, &target_guid))
+    if (!ExtractPlayerTarget(&nameStr, nullptr, &target_guid))
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
         SetSentErrorMessage(true);
@@ -778,7 +778,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(char* args)
         if (itr->first != player->GetMapId())
         {
             DungeonPersistentState *save = itr->second.state;
-            std::string timeleft = secsToTimeString(save->GetResetTime() - time(NULL), true);
+            std::string timeleft = secsToTimeString(save->GetResetTime() - time(nullptr), true);
 
             if (const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
             {
@@ -851,7 +851,7 @@ bool ChatHandler::HandleSendMassMailCommand(char* args)
 {
     // format: raceMask "subject text" "mail text"
     uint32 raceMask = 0;
-    char const* name = NULL;
+    char const* name = nullptr;
 
     if (!ExtractRaceMask(&args, raceMask, &name))
         return false;
@@ -984,7 +984,7 @@ bool ChatHandler::HandleSendMassItemsCommand(char* args)
     // format: racemask "subject text" "mail text" item1[:count1] item2[:count2] ... item12[:count12]
 
     uint32 raceMask = 0;
-    char const* name = NULL;
+    char const* name = nullptr;
 
     if (!ExtractRaceMask(&args, raceMask, &name))
         return false;
@@ -1065,7 +1065,7 @@ bool ChatHandler::HandleSendMassMoneyCommand(char* args)
     /// format: raceMask "subject text" "mail text" money
 
     uint32 raceMask = 0;
-    char const* name = NULL;
+    char const* name = nullptr;
 
     if (!ExtractRaceMask(&args, raceMask, &name))
         return false;
@@ -1210,10 +1210,10 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     if (!ExtractUint32KeyFromLink(&args, "Hpool", pool_id))
         return false;
 
-    Player* player = m_session ? m_session->GetPlayer() : NULL;
+    Player* player = m_session ? m_session->GetPlayer() : nullptr;
 
-    MapPersistentState* mapState = player ? player->GetMap()->GetPersistentState() : NULL;
-    SpawnedPoolData const* spawns = mapState ? &mapState->GetSpawnedPoolData() : NULL;
+    MapPersistentState* mapState = player ? player->GetMap()->GetPersistentState() : nullptr;
+    SpawnedPoolData const* spawns = mapState ? &mapState->GetSpawnedPoolData() : nullptr;
 
     std::string active_str = GetMangosString(LANG_ACTIVE);
 
@@ -1233,7 +1233,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     }
 
     PoolGroup<Creature> const& poolCreatures = sPoolMgr.GetPoolCreatures(pool_id);
-    SpawnedPoolObjects const* crSpawns = spawns ? &spawns->GetSpawnedCreatures() : NULL;
+    SpawnedPoolObjects const* crSpawns = spawns ? &spawns->GetSpawnedCreatures() : nullptr;
 
     PoolObjectList const& poolCreaturesEx = poolCreatures.GetExplicitlyChanced();
     if (!poolCreaturesEx.empty())
@@ -1280,7 +1280,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     }
 
     PoolGroup<GameObject> const& poolGameObjects = sPoolMgr.GetPoolGameObjects(pool_id);
-    SpawnedPoolObjects const* goSpawns = spawns ? &spawns->GetSpawnedGameobjects() : NULL;
+    SpawnedPoolObjects const* goSpawns = spawns ? &spawns->GetSpawnedGameobjects() : nullptr;
 
     PoolObjectList const& poolGameObjectsEx = poolGameObjects.GetExplicitlyChanced();
     if (!poolGameObjectsEx.empty())
@@ -1327,7 +1327,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     }
 
     PoolGroup<Pool> const& poolPools = sPoolMgr.GetPoolPools(pool_id);
-    SpawnedPoolPools const* poolSpawns = spawns ? &spawns->GetSpawnedPools() : NULL;
+    SpawnedPoolPools const* poolSpawns = spawns ? &spawns->GetSpawnedPools() : nullptr;
 
     PoolObjectList const& poolPoolsEx = poolPools.GetExplicitlyChanced();
     if (!poolPoolsEx.empty())
@@ -1419,9 +1419,9 @@ void ChatHandler::ShowTriggerListHelper(AreaTriggerEntry const * atEntry)
 
 bool ChatHandler::HandleTriggerCommand(char* args)
 {
-    AreaTriggerEntry const* atEntry = NULL;
+    AreaTriggerEntry const* atEntry = nullptr;
 
-    Player* pl = m_session ? m_session->GetPlayer() : NULL;
+    Player* pl = m_session ? m_session->GetPlayer() : nullptr;
 
     // select by args
     if (*args)
@@ -1666,7 +1666,7 @@ bool ChatHandler::HandleCinematicListWpCommand(char *args)
 
 bool ChatHandler::HandleReplayPlayCommand(char* c)
 {
-    if (!c || !*c || strchr(c, '/') != NULL || strchr(c, '.') != NULL)
+    if (!c || !*c || strchr(c, '/') != nullptr || strchr(c, '.') != nullptr)
         return false;
     WorldSession* sess = m_session;
     if (Player* player = GetSelectedPlayer())
@@ -1719,7 +1719,7 @@ bool ChatHandler::HandleReplayStopCommand(char* c)
         SetSentErrorMessage(true);
         return false;
     }
-    m_session->SetReadPacket(NULL);
+    m_session->SetReadPacket(nullptr);
     SendSysMessage("Replay stopped");
     return true;
 }

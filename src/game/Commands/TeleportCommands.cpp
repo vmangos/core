@@ -139,7 +139,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
         return false;
     }
 
-    for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+    for (GroupReference *itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player *pl = itr->getSource();
 
@@ -214,7 +214,7 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
         return false;
     }
 
-    for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+    for (GroupReference *itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player *pl = itr->getSource();
 
@@ -274,7 +274,7 @@ static char const* const areatriggerKeys[] =
 {
     "Hareatrigger",
     "Hareatrigger_target",
-    NULL
+    nullptr
 };
 
 bool ChatHandler::HandleGoTriggerCommand(char* args)
@@ -353,7 +353,7 @@ static char const* const creatureKeys[] =
 {
     "Hcreature",
     "Hcreature_entry",
-    NULL
+    nullptr
 };
 
 /** \brief Teleport the GM to the specified creature
@@ -391,7 +391,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
         crType = CREATURE_LINK_ENTRY;
     }
 
-    CreatureData const* data = NULL;
+    CreatureData const* data = nullptr;
 
     uint32 lowguid = 0;
     switch (crType)
@@ -412,7 +412,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
             return false;
         }
 
-        FindCreatureData worker(tEntry, m_session ? m_session->GetPlayer() : NULL);
+        FindCreatureData worker(tEntry, m_session ? m_session->GetPlayer() : nullptr);
 
         sObjectMgr.DoCreatureData(worker);
 
@@ -467,7 +467,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
                 return false;
             }
 
-            FindCreatureData worker(0, m_session ? m_session->GetPlayer() : NULL);
+            FindCreatureData worker(0, m_session ? m_session->GetPlayer() : nullptr);
 
             do
             {
@@ -519,7 +519,7 @@ static char const* const gameobjectKeys[] =
 {
     "Hgameobject",
     "Hgameobject_entry",
-    NULL
+    nullptr
 };
 
 //teleport to gameobject
@@ -544,7 +544,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
         goType = GAMEOBJECT_LINK_ENTRY;
     }
 
-    GameObjectData const* data = NULL;
+    GameObjectData const* data = nullptr;
 
     switch (goType)
     {
@@ -564,7 +564,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
             return false;
         }
 
-        FindGOData worker(tEntry, m_session ? m_session->GetPlayer() : NULL);
+        FindGOData worker(tEntry, m_session ? m_session->GetPlayer() : nullptr);
 
         sObjectMgr.DoGOData(worker);
 
@@ -622,7 +622,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
                 return false;
             }
 
-            FindGOData worker(0, m_session ? m_session->GetPlayer() : NULL);
+            FindGOData worker(0, m_session ? m_session->GetPlayer() : nullptr);
 
             do
             {
@@ -701,7 +701,7 @@ bool ChatHandler::HandleTeleNameCommand(char* args)
     else
     {
         // check offline security
-        if (HasLowerSecurity(NULL, target_guid))
+        if (HasLowerSecurity(nullptr, target_guid))
             return false;
 
         std::string nameLink = playerLink(target_name);
@@ -1185,7 +1185,7 @@ bool ChatHandler::HandleNamegoCommand(char* args)
     else
     {
         // check offline security
-        if (HasLowerSecurity(NULL, target_guid))
+        if (HasLowerSecurity(nullptr, target_guid))
             return false;
 
         std::string nameLink = playerLink(target_name);
@@ -1279,7 +1279,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
             {
                 Group *group = _player->GetGroup();
                 // if no bind exists, create a solo bind
-                InstanceGroupBind *gBind = group ? group->GetBoundInstance(target->GetMapId()) : NULL;
+                InstanceGroupBind *gBind = group ? group->GetBoundInstance(target->GetMapId()) : nullptr;
                 // if no bind exists, create a solo bind
                 if (!gBind)
                 {
@@ -1343,7 +1343,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
 bool ChatHandler::HandleGocorpseCommand(char* args)
 {
     ObjectGuid target_guid;
-    if (!ExtractPlayerTarget(&args, NULL, &target_guid, NULL))
+    if (!ExtractPlayerTarget(&args, nullptr, &target_guid, nullptr))
         return false;
 
     Corpse* corpse = sObjectAccessor.GetCorpseForPlayerGUID(target_guid);
@@ -1358,5 +1358,5 @@ bool ChatHandler::HandleGocorpseCommand(char* args)
     float y = corpse->GetPositionY();
     float z = corpse->GetPositionZ();
 
-    return HandleGoHelper(m_session->GetPlayer(), corpse->GetMapId(), x, y, &z, NULL);
+    return HandleGoHelper(m_session->GetPlayer(), corpse->GetMapId(), x, y, &z, nullptr);
 }

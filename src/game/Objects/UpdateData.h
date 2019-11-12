@@ -93,7 +93,7 @@ class UpdateData
 class MovementData
 {
     public:
-        MovementData(WorldObject* owner = NULL) : _buffer(100), _owner(owner) {}
+        MovementData(WorldObject* owner = nullptr) : _buffer(100), _owner(owner) {}
         ~MovementData() {}
         void AddPacket(WorldPacket& data);
         void SetUnitSpeed(uint32 opcode, ObjectGuid const& unit, float value);

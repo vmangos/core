@@ -129,7 +129,7 @@ uint64 instance_ruins_of_ahnqiraj::GetData64(uint32 uiData)
             return m_uiGUIDvalue;
 
         default:
-            return NULL;
+            return 0;
     }
 }
 

@@ -47,13 +47,13 @@ CreatureAI* selectAI(Creature *creature)
 
     CreatureAIRegistry &ai_registry(CreatureAIRepository::Instance());
 
-    const CreatureAICreator *ai_factory = NULL;
+    const CreatureAICreator *ai_factory = nullptr;
 
     std::string ainame = creature->GetAIName();
 
     // select by NPC flags _first_ - otherwise EventAI might be choosen for pets/totems
     // excplicit check for isControlled() and owner type to allow guardian, mini-pets and pets controlled by NPCs to be scripted by EventAI
-    Unit *owner = NULL;
+    Unit *owner = nullptr;
     if ((creature->IsPet() && ((Pet*)creature)->isControlled() &&
             ((owner = creature->GetOwner()) && owner->GetTypeId() == TYPEID_PLAYER)) || creature->isCharmed())
         ai_factory = ai_registry.GetRegistryItem("PetAI");
@@ -85,7 +85,7 @@ CreatureAI* selectAI(Creature *creature)
         {
             const CreatureAICreator *factory = iter->second;
             const SelectableAI *p = dynamic_cast<const SelectableAI *>(factory);
-            MANGOS_ASSERT(p != NULL);
+            MANGOS_ASSERT(p != nullptr);
             int val = p->Permit(creature);
             if (val > best_val)
             {
@@ -96,21 +96,21 @@ CreatureAI* selectAI(Creature *creature)
     }
 
     // select NullCreatureAI if not another cases
-    ainame = (ai_factory == NULL) ? "NullCreatureAI" : ai_factory->key();
+    ainame = (ai_factory == nullptr) ? "NullCreatureAI" : ai_factory->key();
 
     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature %u used AI is %s.", creature->GetGUIDLow(), ainame.c_str());
-    return (ai_factory == NULL ? new NullCreatureAI(creature) : ai_factory->Create(creature));
+    return (ai_factory == nullptr ? new NullCreatureAI(creature) : ai_factory->Create(creature));
 }
 
 MovementGenerator* selectMovementGenerator(Creature *creature)
 {
     MovementGeneratorRegistry &mv_registry(MovementGeneratorRepository::Instance());
-    MANGOS_ASSERT(creature->GetCreatureInfo() != NULL);
+    MANGOS_ASSERT(creature->GetCreatureInfo() != nullptr);
     MovementGeneratorType type = creature->GetOwnerGuid().IsPlayer() ? FOLLOW_MOTION_TYPE : creature->GetDefaultMovementType();
     if (CreatureGroup* group = creature->GetCreatureGroup())
         if (group->IsFormation() && group->GetLeaderGuid() != creature->GetObjectGuid())
             type = PATROL_MOTION_TYPE;
     MovementGeneratorCreator const * mv_factory = mv_registry.GetRegistryItem(type);
-    return (mv_factory == NULL ? NULL : mv_factory->Create(creature));
+    return (mv_factory == nullptr ? nullptr : mv_factory->Create(creature));
 }
 }

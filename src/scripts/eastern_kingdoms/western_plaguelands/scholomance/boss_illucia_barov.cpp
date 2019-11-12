@@ -71,7 +71,7 @@ struct boss_illuciabarovAI : public ScriptedAI
         //ShadowShock_Timer
         if (ShadowShock_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_SHADOWSHOCK);
 

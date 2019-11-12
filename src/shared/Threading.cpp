@@ -173,7 +173,7 @@ void Thread::destroy()
 
     // reference set at ACE_Thread::spawn
     Runnable* task = m_task;
-    m_task = NULL;
+    m_task = nullptr;
     task->decReference(); // Prevent race conditions, because at this point, m_task may be deleted!
 }
 

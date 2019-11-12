@@ -78,7 +78,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
             {
                 ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
 
-                if (m_Session != NULL)
+                if (m_Session != nullptr)
                 {
                     // OK ,give the packet to WorldSession
                     aptr.release();
@@ -270,7 +270,7 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     sha.UpdateData((uint8 *) & t, 4);
     sha.UpdateData((uint8 *) & clientSeed, 4);
     sha.UpdateData((uint8 *) & seed, 4);
-    sha.UpdateBigNumbers(&K, NULL);
+    sha.UpdateBigNumbers(&K, nullptr);
     sha.Finalize();
 
     if (memcmp(sha.GetDigest(), digest, 20))

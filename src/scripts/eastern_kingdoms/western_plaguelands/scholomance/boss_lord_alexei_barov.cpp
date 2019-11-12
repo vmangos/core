@@ -59,7 +59,7 @@ struct boss_lordalexeibarovAI : public ScriptedAI
         //Immolate_Timer
         if (Immolate_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_IMMOLATE);
 

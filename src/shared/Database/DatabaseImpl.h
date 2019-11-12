@@ -53,7 +53,7 @@ bool
 Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*), const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class>(object, method, (QueryResult*)NULL), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class>(object, method, (QueryResult*)nullptr), m_pResultQueue));
     return true;
 }
 
@@ -62,7 +62,7 @@ bool
 Database::AsyncQueryUnsafe(Class *object, void (Class::*method)(QueryResult*), const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    MaNGOS::QueryCallback<Class>* cb = new MaNGOS::QueryCallback<Class>(object, method, (QueryResult*)NULL);
+    MaNGOS::QueryCallback<Class>* cb = new MaNGOS::QueryCallback<Class>(object, method, (QueryResult*)nullptr);
     cb->threadSafe = false;
     AddToDelayQueue(new SqlQuery(sql, cb, m_pResultQueue));
     return true;
@@ -73,7 +73,7 @@ bool
 Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1>(object, method, (QueryResult*)NULL, param1), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1>(object, method, (QueryResult*)nullptr, param1), m_pResultQueue));
     return true;
 }
 template<class Class, typename ParamType1>
@@ -81,7 +81,7 @@ bool
 Database::AsyncQueryUnsafe(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    MaNGOS::QueryCallback<Class, ParamType1>* cb = new MaNGOS::QueryCallback<Class, ParamType1>(object, method, (QueryResult*)NULL, param1);
+    MaNGOS::QueryCallback<Class, ParamType1>* cb = new MaNGOS::QueryCallback<Class, ParamType1>(object, method, (QueryResult*)nullptr, param1);
     cb->threadSafe = false;
     AddToDelayQueue(new SqlQuery(sql, cb, m_pResultQueue));
     return true;
@@ -92,7 +92,7 @@ bool
 Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2>(object, method, (QueryResult*)NULL, param1, param2), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2>(object, method, (QueryResult*)nullptr, param1, param2), m_pResultQueue));
     return true;
 }
 
@@ -101,7 +101,7 @@ bool
 Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2, ParamType3>(object, method, (QueryResult*)NULL, param1, param2, param3), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2, ParamType3>(object, method, (QueryResult*)nullptr, param1, param2, param3), m_pResultQueue));
     return true;
 }
 
@@ -112,7 +112,7 @@ bool
 Database::AsyncQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1>(method, (QueryResult*)NULL, param1), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1>(method, (QueryResult*)nullptr, param1), m_pResultQueue));
     return true;
 }
 
@@ -121,7 +121,7 @@ bool
 Database::AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1, ParamType2>(method, (QueryResult*)NULL, param1, param2), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1, ParamType2>(method, (QueryResult*)nullptr, param1, param2), m_pResultQueue));
     return true;
 }
 
@@ -130,7 +130,7 @@ bool
 Database::AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1, ParamType2, ParamType3>(method, (QueryResult*)NULL, param1, param2, param3), m_pResultQueue));
+    AddToDelayQueue(new SqlQuery(sql, new MaNGOS::SQueryCallback<ParamType1, ParamType2, ParamType3>(method, (QueryResult*)nullptr, param1, param2, param3), m_pResultQueue));
     return true;
 }
 
@@ -139,7 +139,7 @@ bool
 Database::AsyncQueryUnsafe(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    MaNGOS::SQueryCallback<ParamType1>* cb = new MaNGOS::SQueryCallback<ParamType1>(method, (QueryResult*)NULL, param1);
+    MaNGOS::SQueryCallback<ParamType1>* cb = new MaNGOS::SQueryCallback<ParamType1>(method, (QueryResult*)nullptr, param1);
     cb->threadSafe = false;
     AddToDelayQueue(new SqlQuery(sql, cb, m_pResultQueue));
     return true;
@@ -150,7 +150,7 @@ bool
 Database::AsyncQueryUnsafe(void(*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *sql)
 {
     ASYNC_QUERY_BODY(sql)
-    MaNGOS::SQueryCallback<ParamType1, ParamType2>* cb = new MaNGOS::SQueryCallback<ParamType1, ParamType2>(method, (QueryResult*)NULL, param1, param2);
+    MaNGOS::SQueryCallback<ParamType1, ParamType2>* cb = new MaNGOS::SQueryCallback<ParamType1, ParamType2>(method, (QueryResult*)nullptr, param1, param2);
     cb->threadSafe = false;
     AddToDelayQueue(new SqlQuery(sql, cb, m_pResultQueue));
     return true;
@@ -253,14 +253,14 @@ bool
 Database::DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, (QueryResult*)NULL, holder), this, m_pResultQueue);
+    return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, (QueryResult*)nullptr, holder), this, m_pResultQueue);
 }
 template<class Class>
 bool
 Database::DelayQueryHolderUnsafe(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    MaNGOS::QueryCallback<Class, SqlQueryHolder*> *cb = new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, (QueryResult*)NULL, holder);
+    MaNGOS::QueryCallback<Class, SqlQueryHolder*> *cb = new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, (QueryResult*)nullptr, holder);
     cb->threadSafe = false;
     return holder->Execute(cb, this, m_pResultQueue);
 }
@@ -269,7 +269,7 @@ bool
 Database::DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*, ParamType1>(object, method, (QueryResult*)NULL, holder, param1), this, m_pResultQueue);
+    return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*, ParamType1>(object, method, (QueryResult*)nullptr, holder, param1), this, m_pResultQueue);
 }
 
 // -- QueryHolder static --
@@ -278,7 +278,7 @@ bool
 Database::DelayQueryHolder(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    return holder->Execute(new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, (QueryResult*)NULL, holder, param1), this, m_pResultQueue);
+    return holder->Execute(new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, (QueryResult*)nullptr, holder, param1), this, m_pResultQueue);
 }
 
 template<typename ParamType1>
@@ -286,7 +286,7 @@ bool
 Database::DelayQueryHolderUnsafe(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1> *cb = new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, (QueryResult*)NULL, holder, param1);
+    MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1> *cb = new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, (QueryResult*)nullptr, holder, param1);
     cb->threadSafe = false;
     return holder->Execute(cb, this, m_pResultQueue);
 }

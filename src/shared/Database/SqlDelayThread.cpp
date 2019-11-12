@@ -75,7 +75,7 @@ void SqlDelayThread::Stop()
 
 void SqlDelayThread::ProcessRequests()
 {
-    SqlOperation* s = NULL;
+    SqlOperation* s = nullptr;
     while (m_dbEngine->NextDelayedOperation(s))
     {
         s->Execute(m_dbConnection);

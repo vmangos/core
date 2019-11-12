@@ -172,7 +172,7 @@ struct boss_doomrelAI : public ScriptedAI
             case 6:
                 return m_creature;
         }
-        return NULL;
+        return nullptr;
     }
 
     void CallToFight(bool bStartFight)

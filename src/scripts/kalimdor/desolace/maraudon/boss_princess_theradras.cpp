@@ -87,7 +87,7 @@ struct boss_ptheradrasAI : public ScriptedAI
         //Boulder_Timer
         if (Boulder_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target)
                 if (DoCastSpellIfCan(target, SPELL_BOULDER) == CAST_OK)

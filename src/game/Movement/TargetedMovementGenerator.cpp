@@ -46,7 +46,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     bool losChecked = false;
     bool losResult = false;
 
-    Transport* transport = NULL;
+    Transport* transport = nullptr;
     bool isPet = (owner.GetTypeId() == TYPEID_UNIT && ((Creature*)&owner)->IsPet());
     if (isPet)
         transport = i_target.getTarget()->GetTransport();

@@ -298,7 +298,7 @@ struct boss_rajaxxAI : public ScriptedAI
 
         if (Player* pLootRecepient = m_creature->GetLootRecipient()) {
             if (Group* pGroup = pLootRecepient->GetGroup()) {
-                for (GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                for (GroupReference *itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                 {
                     Player* pGroupGuy = itr->getSource();
                     if (!pGroupGuy || !pGroupGuy->IsInWorld())

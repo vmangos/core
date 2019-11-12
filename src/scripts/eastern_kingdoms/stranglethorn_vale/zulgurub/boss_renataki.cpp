@@ -121,7 +121,7 @@ struct boss_renatakiAI : public ScriptedAI
         //Resetting some aggro so he attacks other gamers
         if (Aggro_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
 
             if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))

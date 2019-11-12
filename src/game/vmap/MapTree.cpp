@@ -58,7 +58,7 @@ protected:
 class MapIntersectionFinderCallback
 {
 public:
-    MapIntersectionFinderCallback(ModelInstance* val): prims(val), result(NULL) {}
+    MapIntersectionFinderCallback(ModelInstance* val): prims(val), result(nullptr) {}
     bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
         bool hit = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
@@ -178,7 +178,7 @@ bool StaticMapTree::GetLocationInfo(const Vector3& pos, LocationInfo& info) cons
 }
 
 StaticMapTree::StaticMapTree(uint32 mapID, const std::string& basePath):
-    iMapID(mapID), iIsTiled(false), iTreeValues(NULL), iNTreeValues(0), iBasePath(basePath)
+    iMapID(mapID), iIsTiled(false), iTreeValues(nullptr), iNTreeValues(0), iBasePath(basePath)
 {
     if (iBasePath.length() > 0 && (iBasePath[iBasePath.length() - 1] != '/' && iBasePath[iBasePath.length() - 1] != '\\'))
         iBasePath.append("/");
@@ -270,14 +270,14 @@ ModelInstance* StaticMapTree::FindCollisionModel(const G3D::Vector3& pos1, const
 {
     float maxDist = (pos2 - pos1).magnitude();
     if (maxDist < 1e-10f)
-        return NULL;
+        return nullptr;
     G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
 
     MapIntersectionFinderCallback intersectionCallBack(iTreeValues);
     iTree.intersectRay(ray, intersectionCallBack, maxDist, true);
     if (intersectionCallBack.result)
         return intersectionCallBack.result;
-    return NULL;
+    return nullptr;
 }
 
 //=========================================================

@@ -78,7 +78,7 @@ struct boss_instructormaliciaAI : public ScriptedAI
         //Corruption_Timer
         if (Corruption_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target) DoCastSpellIfCan(target, SPELL_CORRUPTION);
 

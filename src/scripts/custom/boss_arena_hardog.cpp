@@ -394,7 +394,7 @@ struct npc_karlekAI : public ScriptedAI
     {
         if (pSummoned->GetObjectGuid() == m_uiSzerelmesGUID)
         {
-            m_creature->MonsterTextEmote("Vous me faites perdre mon temps !", NULL);
+            m_creature->MonsterTextEmote("Vous me faites perdre mon temps !", nullptr);
             ResetEvent();
         }
     }

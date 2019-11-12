@@ -83,7 +83,7 @@ struct celebras_the_cursedAI : public ScriptedAI
         //Wrath
         if (Wrath_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target)
                 DoCastSpellIfCan(target, SPELL_WRATH);

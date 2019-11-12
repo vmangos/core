@@ -728,7 +728,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
         MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(ME, ME, 120.0f);
         MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
         Cell::VisitAllObjects(ME, searcher, 120.0f);
-        Unit* nearest = NULL;
+        Unit* nearest = nullptr;
         uint32 quality = 0;
         for (std::list<Unit*>::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
@@ -763,7 +763,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
         }
         // Il faut quand meme s'arreter a un moment, sinon toute la foret d'Elwynn va y passer.
         if (quality <= 7)
-            return NULL;
+            return nullptr;
         return nearest;
     }
     void UpdateAI(const uint32 uiDiff)

@@ -49,7 +49,7 @@ class AccountPersistentData
 public:
     struct WhisperData
     {
-        WhisperData() : first_whisp(time(NULL)), score(0), whispers_count(0) {}
+        WhisperData() : first_whisp(time(nullptr)), score(0), whispers_count(0) {}
         time_t first_whisp;
         uint32 score;
         uint32 whispers_count;

@@ -62,7 +62,7 @@ bool NodesMgr::OnServerStartup()
 
 bool NodesMgr::TryConnectToMaster()
 {
-    MapSocket* s = NULL;
+    MapSocket* s = nullptr;
     if (sMapSocketMgr->Connect(m_masterListenPort, m_masterListenAddress, s) == -1)
         return false;
 
@@ -105,6 +105,6 @@ NodeSession* NodesMgr::GetNodeById(uint32 id)
 {
     NodesMap::iterator it = m_nodes.find(id);
     if (it == m_nodes.end())
-        return NULL;
+        return nullptr;
     return it->second;
 }

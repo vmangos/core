@@ -153,7 +153,7 @@ struct boss_moamAI : public ScriptedAI
             {
                 //Check if a victim was memorize, in case of error, take a random one.
                 Unit * victim = m_creature->GetMap()->GetUnit(m_OGvictim);
-                if (victim != NULL)
+                if (victim != nullptr)
                     m_creature->AI()->AttackStart(victim);
                 else
                     m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);

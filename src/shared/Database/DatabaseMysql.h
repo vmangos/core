@@ -72,7 +72,7 @@ private:
 class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
 {
     public:
-        MySQLConnection(Database& db) : SqlConnection(db), mMysql(NULL) {}
+        MySQLConnection(Database& db) : SqlConnection(db), mMysql(nullptr) {}
         ~MySQLConnection();
 
         bool OpenConnection(bool reconnect);

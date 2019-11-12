@@ -294,7 +294,7 @@ public:
             {
                 int nbCreaWithDebuff = 0;
                 int nbCreaWithMovement = 0;
-                Creature* murloc = NULL;
+                Creature* murloc = nullptr;
                 for (int i = 1; i < 13; i++)
                 {
                     murloc = GetTestCreature(i);

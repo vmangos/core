@@ -59,7 +59,7 @@ struct WaypointNode
     float wander_distance;
     uint32 script_id;                                       // Added may 2010. WaypointBehavior w/DB data should in time be removed.
     WaypointBehavior * behavior;
-    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), wander_distance(0.0f), script_id(0), behavior(NULL) {}
+    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), wander_distance(0.0f), script_id(0), behavior(nullptr) {}
     WaypointNode(float _x, float _y, float _z, float _o, uint32 _delay, float _wander_distance, uint32 _script_id, WaypointBehavior * _behavior)
       : x(_x), y(_y), z(_z), orientation(_o), delay(_delay), script_id(_script_id), behavior(_behavior), wander_distance(_wander_distance) {}
 };
@@ -88,9 +88,9 @@ class WaypointManager
         //        Creators need to be sure that creature_movement_template is always valid for summons.
         //        Mob that can be summoned anywhere should not have creature_movement_template for example.
 
-        WaypointPath* GetDefaultPath(uint32 entry, uint32 lowGuid, WaypointPathOrigin* wpOrigin = NULL)
+        WaypointPath* GetDefaultPath(uint32 entry, uint32 lowGuid, WaypointPathOrigin* wpOrigin = nullptr)
         {
-            WaypointPath* path = NULL;
+            WaypointPath* path = nullptr;
             path = GetPath(lowGuid);
             if (path && wpOrigin)
                 *wpOrigin = PATH_FROM_GUID;

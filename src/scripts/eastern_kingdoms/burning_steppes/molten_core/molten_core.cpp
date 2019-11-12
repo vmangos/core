@@ -309,7 +309,7 @@ struct mob_core_houndAI : public ScriptedAI
     
     void Kill_Self()
     {
-        m_creature->DealDamage(m_creature, 1, NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+        m_creature->DealDamage(m_creature, 1, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
         m_creature->ForcedDespawn();
     }
 

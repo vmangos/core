@@ -75,7 +75,7 @@ struct boss_golemaggAI : public ScriptedAI
             for (std::list<Creature*>::iterator itr = ChiensListe.begin(); itr != ChiensListe.end(); ++itr)
             {
                 if ((*itr)->getDeathState() == ALIVE)
-                    (*itr)->DealDamage((*itr), (*itr)->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    (*itr)->DealDamage((*itr), (*itr)->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 (*itr)->Respawn();
             }
         }
