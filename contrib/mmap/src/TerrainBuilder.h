@@ -66,7 +66,7 @@ namespace MMAP
     // see following files:
     // contrib/extractor/system.cpp
     // src/game/GridMap.cpp
-    static char const* MAP_VERSION_MAGIC = "z1.3";
+    static char const* MAP_VERSION_MAGIC = "z1.4";
 
     struct MeshData
     {
@@ -138,7 +138,7 @@ namespace MMAP
             void getLiquidCoord(int index, int index2, float xOffset, float yOffset, float* coord, float* v);
 
             /// Get the liquid type for a specific position
-            uint16 getLiquidType(int square, const uint16* liquid_type);
+            uint8 TerrainBuilder::getLiquidType(int square, const uint8 liquid_type[16][16]);
 
 
             // hide parameterless and copy constructor

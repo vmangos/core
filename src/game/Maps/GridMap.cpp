@@ -32,7 +32,7 @@
 #include "SQLStorages.h"
 
 char const* MAP_MAGIC         = "MAPS";
-char const* MAP_VERSION_MAGIC = "z1.3";
+char const* MAP_VERSION_MAGIC = "z1.4";
 char const* MAP_AREA_MAGIC    = "AREA";
 char const* MAP_HEIGHT_MAGIC  = "MHGT";
 char const* MAP_LIQUID_MAGIC  = "MLIQ";
@@ -53,7 +53,8 @@ GridMap::GridMap()
     m_V8 = nullptr;
 
     // Liquid data
-    m_liquidType    = 0;
+    m_liquidGlobalEntry = 0;
+    m_liquidGlobalFlags = 0;
     m_liquid_offX   = 0;
     m_liquid_offY   = 0;
     m_liquid_width  = 0;
@@ -205,7 +206,8 @@ bool GridMap::loadGridMapLiquidData(FILE* in, uint32 offset, uint32 /*size*/)
     if (header.fourcc != *((uint32 const*)(MAP_LIQUID_MAGIC)))
         return false;
 
-    m_liquidType    = header.liquidType;
+    m_liquidGlobalEntry = header.liquidType;
+    m_liquidGlobalFlags = header.liquidFlags;
     m_liquid_offX   = header.offsetX;
     m_liquid_offY   = header.offsetY;
     m_liquid_width  = header.width;
@@ -488,7 +490,7 @@ float GridMap::getLiquidLevel(float x, float y)
 uint8 GridMap::getTerrainType(float x, float y)
 {
     if (!m_liquidFlags)
-        return (uint8)m_liquidType;
+        return (uint8)m_liquidGlobalFlags;
 
     x = 16 * (32 - x / SIZE_OF_GRIDS);
     y = 16 * (32 - y / SIZE_OF_GRIDS);
@@ -501,7 +503,7 @@ uint8 GridMap::getTerrainType(float x, float y)
 GridMapLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData* data)
 {
     // Check water type (if no water return)
-    if (!m_liquidFlags && !m_liquidType)
+    if (!m_liquidFlags && !m_liquidGlobalFlags)
         return LIQUID_MAP_NO_WATER;
 
     // Get cell
@@ -513,41 +515,34 @@ GridMapLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 Re
 
     // Check water type in cell
     int idx = (x_int >> 3) * 16 + (y_int >> 3);
-    uint8 type = m_liquidFlags ? m_liquidFlags[idx] : 1 << m_liquidType;
-    uint32 entry = 0;
-
-    // ToDo: check if this part requires update for 1.12.1
-    if (m_liquidEntry)
+    uint8 type = m_liquidFlags ? m_liquidFlags[idx] : m_liquidGlobalFlags;
+    uint32 entry = m_liquidEntry ? m_liquidEntry[idx] : m_liquidGlobalEntry;
+    if (LiquidTypeEntry const* liquidEntry = sTerrainMgr.GetLiquidType(entry))
     {
-        if (LiquidTypeEntry const* liquidEntry = sTerrainMgr.GetLiquidType(m_liquidEntry[idx]))
+        entry = liquidEntry->Id;
+        type &= MAP_LIQUID_TYPE_DARK_WATER;
+        uint32 liqTypeIdx = liquidEntry->Type;
+        if (entry < 21)
         {
-            entry = liquidEntry->Id;
-            type &= MAP_LIQUID_TYPE_DARK_WATER;
-            uint32 liqTypeIdx = liquidEntry->Type;
-            if ((entry < 21) && (type & MAP_LIQUID_TYPE_WATER))
+            if (const auto *areaEntry = AreaEntry::GetById(getArea(x, y)))
             {
-                // only basic liquid stored in maps actualy so in some case we need to override type depend on area
-                // actualy only Naxxramas raid be overrided here
-                if (const auto *areaEntry = AreaEntry::GetById(getArea(x, y)))
+                uint32 overrideLiquid = areaEntry->LiquidTypeId;
+                if (!overrideLiquid && !areaEntry->IsZone())
                 {
-                    uint32 overrideLiquid = areaEntry->LiquidTypeId;
-                    if (!overrideLiquid && !areaEntry->IsZone())
-                    {
-                        areaEntry = AreaEntry::GetById(areaEntry->ZoneId);
-                        if (areaEntry)
-                            overrideLiquid = areaEntry->LiquidTypeId;
-                    }
+                    areaEntry = AreaEntry::GetById(areaEntry->ZoneId);
+                    if (areaEntry)
+                        overrideLiquid = areaEntry->LiquidTypeId;
+                }
 
-                    if (LiquidTypeEntry const* liq = sTerrainMgr.GetLiquidType(overrideLiquid))
-                    {
-                        entry = overrideLiquid;
-                        liqTypeIdx = liq->Type;
-                    }
+                if (LiquidTypeEntry const* liq = sTerrainMgr.GetLiquidType(overrideLiquid))
+                {
+                    entry = overrideLiquid;
+                    liqTypeIdx = liq->Type;
                 }
             }
-
-            type |= (1 << liqTypeIdx) | (type & MAP_LIQUID_TYPE_DARK_WATER);
         }
+
+        type |= (1 << liqTypeIdx) | (type & MAP_LIQUID_TYPE_DARK_WATER);
     }
 
     if (type == 0)
