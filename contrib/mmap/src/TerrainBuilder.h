@@ -22,7 +22,6 @@
 #include <set>
 
 #include "MMapCommon.h"
-#include "MangosMap.h"
 #include "../../../src/game/Maps/MoveMapSharedDefines.h"
 
 #include "WorldModel.h"
@@ -32,7 +31,6 @@
 #include "G3D/Vector3.h"
 #include "G3D/Matrix3.h"
 
-using namespace MaNGOS;
 
 namespace MMAP
 {

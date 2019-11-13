@@ -19,10 +19,9 @@
 #include <list>
 #include "MMapCommon.h"
 #include "MapBuilder.h"
-
 #include "MapTree.h"
 #include "ModelInstance.h"
-
+#include "Maps/GridMapDefines.h"
 #include "DetourNavMeshBuilder.h"
 #include "DetourCommon.h"
 

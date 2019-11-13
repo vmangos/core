@@ -339,6 +339,7 @@ set (game_SRCS
     Maps/CellImpl.h
     Maps/GridDefines.h
     Maps/GridMap.h
+    Maps/GridMapDefines.h
     Maps/GridNotifiers.h
     Maps/GridNotifiersImpl.h
     Maps/GridSearchers.h

@@ -19,6 +19,9 @@ project (MANGOS_MAP_EXTRACTOR)
 
 include_directories (${CMAKE_SOURCE_DIR}/dep/libmpq)
 include_directories (loadlib)
+include_directories (
+     ../../src/game/Maps
+)
 
 add_executable (mapextractor
     dbcfile.cpp
