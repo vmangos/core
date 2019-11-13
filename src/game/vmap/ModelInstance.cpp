@@ -195,7 +195,7 @@ bool ModelSpawn::readFromFile(FILE* rf, ModelSpawn& spawn)
     check += fread(&spawn.iPos, sizeof(float), 3, rf);
     check += fread(&spawn.iRot, sizeof(float), 3, rf);
     check += fread(&spawn.iScale, sizeof(float), 1, rf);
-    bool has_bound = (spawn.flags & MOD_HAS_BOUND);
+    bool const has_bound = (spawn.flags & MOD_HAS_BOUND) != 0;
     if (has_bound) // only WMOs have bound in MPQ, only available after computation
     {
         Vector3 bLow, bHigh;
@@ -234,7 +234,7 @@ bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn& spawn)
     check += fwrite(&spawn.iPos, sizeof(float), 3, wf);
     check += fwrite(&spawn.iRot, sizeof(float), 3, wf);
     check += fwrite(&spawn.iScale, sizeof(float), 1, wf);
-    bool has_bound = (spawn.flags & MOD_HAS_BOUND);
+    bool const has_bound = (spawn.flags & MOD_HAS_BOUND) != 0;
     if (has_bound) // only WMOs have bound in MPQ, only available after computation
     {
         check += fwrite(&spawn.iBound.low(), sizeof(float), 3, wf);
