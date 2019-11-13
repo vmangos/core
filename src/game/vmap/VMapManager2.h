@@ -53,7 +53,7 @@ namespace VMAP
         public:
             ManagedModel() : iModel(nullptr), iRefCount(0) {}
             void setModel(WorldModel* model) { iModel = model; }
-            WorldModel* getModel() { return iModel; }
+            WorldModel* getModel() const { return iModel; }
             void incRefCount() { ++iRefCount; }
             int decRefCount() { return --iRefCount; }
             int getRefCount() const { return iRefCount.value(); }
