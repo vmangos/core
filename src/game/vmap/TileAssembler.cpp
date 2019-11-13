@@ -208,7 +208,6 @@ bool TileAssembler::readMapSpawns()
     }
     printf("Read coordinate mapping...\n");
     uint32 mapID = 0, tileX = 0, tileY = 0;
-    G3D::Vector3 v1, v2;
     ModelSpawn spawn;
     while (!feof(dirf))
     {
