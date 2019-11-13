@@ -853,21 +853,7 @@ namespace MMAP
 
         // merge per tile poly and detail meshes
         rcPolyMesh** pmmerge = new rcPolyMesh*[TILES_PER_MAP * TILES_PER_MAP];
-        if (!pmmerge)
-        {
-            printf("%s alloc pmmerge FAILED!                              \r", tileString);
-            delete [] tiles;
-            return;
-        }
-
         rcPolyMeshDetail** dmmerge = new rcPolyMeshDetail*[TILES_PER_MAP * TILES_PER_MAP];
-        if (!dmmerge)
-        {
-            printf("%s alloc dmmerge FAILED!                              \r", tileString);
-            delete [] tiles;
-            delete [] pmmerge;
-            return;
-        }
 
         int nmerge = 0;
         for (int y = 0; y < TILES_PER_MAP; ++y)
