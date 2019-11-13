@@ -1059,7 +1059,7 @@ namespace MMAP
             // write header
             MmapTileHeader header;
             header.size = uint32(navDataSize);
-            header.usesLiquids = m_terrainBuilder->usesLiquids();
+            header.usesLiquids = m_terrainBuilder->usesLiquids() ? 1 : 0;
             fwrite(&header, sizeof(MmapTileHeader), 1, file);
 
             // write data
