@@ -231,7 +231,6 @@ Return the hit pos or the original dest pos
 
 bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, Vector3& pResultHitPos, float pModifyDist) const
 {
-    bool result = false;
     float maxDist = (pPos2 - pPos1).magnitude();
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
     MANGOS_ASSERT(maxDist < std::numeric_limits<float>::max());
@@ -256,14 +255,10 @@ bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, 
         }
         else
             pResultHitPos = pResultHitPos + dir * pModifyDist;
-        result = true;
+        return true;
     }
-    else
-    {
-        pResultHitPos = pPos2;
-        result = false;
-    }
-    return result;
+    pResultHitPos = pPos2;
+    return false;
 }
 
 ModelInstance* StaticMapTree::FindCollisionModel(const G3D::Vector3& pos1, const G3D::Vector3& pos2)

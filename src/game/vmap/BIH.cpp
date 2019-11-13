@@ -43,7 +43,9 @@ void BIH::subdivide(int left, int right, std::vector<uint32>& tempTree, buildDat
     }
     // calculate extents
     int axis = -1, rightOrig;
-    float clipL = G3D::fnan(), clipR = G3D::fnan(), prevClip = G3D::fnan();
+    float clipL = G3D::fnan();
+    float clipR = G3D::fnan();
+    float prevClip = G3D::fnan();
     float split = G3D::fnan();
     bool wasLeft = true;
     while (true)

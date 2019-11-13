@@ -207,14 +207,13 @@ bool TileAssembler::readMapSpawns()
         return false;
     }
     printf("Read coordinate mapping...\n");
-    uint32 mapID, tileX, tileY, check = 0;
+    uint32 mapID = 0, tileX = 0, tileY = 0;
     G3D::Vector3 v1, v2;
     ModelSpawn spawn;
     while (!feof(dirf))
     {
-        check = 0;
         // read mapID, tileX, tileY, Flags, adtID, ID, Pos, Rot, Scale, Bound_lo, Bound_hi, name
-        check += fread(&mapID, sizeof(uint32), 1, dirf);
+        uint32 check = fread(&mapID, sizeof(uint32), 1, dirf);
         if (check == 0) // EoF...
             break;
         check += fread(&tileX, sizeof(uint32), 1, dirf);
