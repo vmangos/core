@@ -40,10 +40,10 @@ VMapManager2::VMapManager2()
 
 VMapManager2::~VMapManager2(void)
 {
-    for (InstanceTreeMap::iterator i = iInstanceMapTrees.begin(); i != iInstanceMapTrees.end(); ++i)
-        delete i->second;
-    for (ModelFileMap::iterator i = iLoadedModelFiles.begin(); i != iLoadedModelFiles.end(); ++i)
-        delete i->second.getModel();
+    for (auto& iInstanceMapTree : iInstanceMapTrees)
+        delete iInstanceMapTree.second;
+    for (auto& iLoadedModelFile : iLoadedModelFiles)
+        delete iLoadedModelFile.second.getModel();
 }
 
 //=========================================================
