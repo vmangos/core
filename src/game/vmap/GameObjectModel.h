@@ -46,7 +46,7 @@ class GameObjectModel
         VMAP::WorldModel* iModel;
 
         GameObjectModel() : collision_enabled(false), iModel(nullptr), iInvScale(0), iScale(0) {}
-        bool initialize(const GameObject* const pGo, const GameObjectDisplayInfoEntry* info);
+        bool initialize(const GameObject* const pGo, const GameObjectDisplayInfoEntry* pDisplayInfo);
 
     public:
         std::string name;
@@ -61,7 +61,7 @@ class GameObjectModel
         void disable() { collision_enabled = false;}
         void enable(bool enabled) { collision_enabled = enabled;}
 
-        bool intersectRay(const G3D::Ray& Ray, float& MaxDist, bool StopAtFirstHit) const;
+        bool intersectRay(const G3D::Ray& ray, float& MaxDist, bool StopAtFirstHit) const;
 
         static GameObjectModel* construct(const GameObject* const pGo);
 

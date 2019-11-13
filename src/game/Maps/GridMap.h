@@ -94,7 +94,7 @@ class GridMap
         GridMap();
         ~GridMap();
 
-        bool loadData(char* filaname);
+        bool loadData(char const* filaname);
         void unloadData();
 
         static bool ExistMap(uint32 mapid, int gx, int gy);

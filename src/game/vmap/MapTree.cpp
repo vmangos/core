@@ -218,10 +218,7 @@ bool StaticMapTree::isInLineOfSight(const Vector3& pos1, const Vector3& pos2) co
         return true;
     // direction with length of 1
     G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
-    if (getIntersectionTime(ray, maxDist, true, true))
-        return false;
-
-    return true;
+    return !getIntersectionTime(ray, maxDist, true, true);
 }
 //=========================================================
 /**

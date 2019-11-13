@@ -244,7 +244,6 @@ bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn& spawn)
     check += fwrite(&nameLen, sizeof(uint32), 1, wf);
     if (check != uint32(has_bound ? 17 : 11)) return false;
     check = fwrite(spawn.name.c_str(), sizeof(char), nameLen, wf);
-    if (check != nameLen) return false;
-    return true;
+    return check == nameLen;
 }
 }
