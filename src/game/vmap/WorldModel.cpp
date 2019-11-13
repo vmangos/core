@@ -266,7 +266,8 @@ void GroupModel::setMeshData(std::vector<Vector3>& vert, std::vector<MeshTriangl
 bool GroupModel::writeToFile(FILE* wf)
 {
     bool result = true;
-    uint32 chunkSize, count;
+    uint32 chunkSize = 0;
+    uint32 count = 0;
 
     if (result && fwrite(&iBound, sizeof(G3D::AABox), 1, wf) != 1) result = false;
     if (result && fwrite(&iMogpFlags, sizeof(uint32), 1, wf) != 1) result = false;
@@ -309,7 +310,8 @@ bool GroupModel::readFromFile(FILE* rf)
 {
     char chunk[8];
     bool result = true;
-    uint32 chunkSize, count;
+    uint32 chunkSize = 0;
+    uint32 count = 0;
     triangles.clear();
     vertices.clear();
     delete iLiquid;
@@ -552,7 +554,8 @@ bool WorldModel::writeFile(const std::string& filename)
     if (!wf)
         return false;
 
-    uint32 chunkSize, count;
+    uint32 chunkSize = 0;
+    uint32 count = 0;
     bool result = fwrite(VMAP_MAGIC, 1, 8, wf) == 8;
     if (result && fwrite("WMOD", 1, 4, wf) != 4) result = false;
     chunkSize = sizeof(uint32) + sizeof(uint32);

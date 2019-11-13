@@ -76,10 +76,10 @@ enum GridMapLiquidStatus
 
 struct GridMapLiquidData
 {
-    uint32 type_flags;
-    uint32 entry;
-    float level;
-    float depth_level;
+    uint32 type_flags = 0;
+    uint32 entry = 0;
+    float level = 0.0f;
+    float depth_level = 0.0f;
 };
 
 enum NavMeshAreas

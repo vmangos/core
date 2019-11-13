@@ -235,7 +235,8 @@ void PathInfo::BuildPolyPath(const Vector3 &startPos, const Vector3 &endPos)
     // TODO: we can merge it with getPathPolyByPosition() loop
     bool startPolyFound = false;
     bool endPolyFound = false;
-    uint32 pathStartIndex, pathEndIndex;
+    uint32 pathStartIndex = 0;
+    uint32 pathEndIndex = 0;
 
     if (m_polyLength)
     {
