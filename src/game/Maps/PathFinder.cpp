@@ -663,7 +663,7 @@ int fixupShortcuts(dtPolyRef* path, int npath, dtNavMeshQuery const* navQuery)
 
 bool PathInfo::getSteerTarget(const float* startPos, const float* endPos,
                               const float minTargetDist, const dtPolyRef* path, const uint32 pathSize,
-                              float* steerPos, unsigned char& steerPosFlag, dtPolyRef& steerPosRef)
+                              float* steerPos, unsigned char& steerPosFlag, dtPolyRef& steerPosRef) const
 {
     // Find steer target.
     static const uint32 MAX_STEER_POINTS = 3;

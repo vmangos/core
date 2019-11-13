@@ -45,7 +45,7 @@ public:
             hit = true;
         return result;
     }
-    bool didHit()
+    bool didHit() const
     {
         return hit;
     }
