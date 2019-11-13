@@ -291,7 +291,6 @@ struct WMOLiquidHeader
 //=================================================================
 bool TileAssembler::convertRawFile(const std::string& pModelFilename)
 {
-    bool success = true;
     std::string filename = iSrcDir;
     if (filename.length() > 0)
         filename.append("/");
@@ -320,10 +319,8 @@ bool TileAssembler::convertRawFile(const std::string& pModelFilename)
         model.setGroupModels(groupsArray);
     }
 
-    success = model.writeFile(iDestDir + "/" + pModelFilename + ".vmo");
-
     //std::cout << "readRawFile2: '" << pModelFilename << "' tris: " << nElements << " nodes: " << nNodes << std::endl;
-    return success;
+    return model.writeFile(iDestDir + "/" + pModelFilename + ".vmo");
 }
 
 void TileAssembler::exportGameobjectModels()
