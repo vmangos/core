@@ -524,7 +524,7 @@ namespace MMAP
         else
             switch (triangle)
             {
-                    //           0-----1 .... 128
+                                                                        //           0-----1 .... 128
                 case TOP:                                               //           |\    |
                     indices[0] = square + rowOffset;                    //           | \ T |
                     indices[1] = square + 1 + rowOffset;                //           |  \  |

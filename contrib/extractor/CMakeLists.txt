@@ -27,7 +27,7 @@ add_executable (mapextractor
     loadlib/loadlib.cpp 
     loadlib/adt.cpp
     loadlib/wdt.cpp
-	)
+    )
 
 SET_TARGET_PROPERTIES (mapextractor PROPERTIES FOLDER Extractors)
 

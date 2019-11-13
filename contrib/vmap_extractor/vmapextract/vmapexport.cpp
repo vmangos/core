@@ -327,7 +327,7 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
         }
     }
 
-    return(true);
+    return true;
 }
 
 bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
@@ -358,7 +358,7 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
     printf("Scanning patch levels from data directory.\n");
     sprintf(path, "%spatch", input_path);
     if (!scan_patches(path, pArchiveNames))
-        return(false);
+        return false;
 
     printf("\n");
 
