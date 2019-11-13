@@ -28,8 +28,6 @@
 #include <stdexcept>
 #include <vector>
 #include <algorithm>
-#include <limits>
-#include <cmath>
 
 #define MAX_STACK_SIZE 64
 
