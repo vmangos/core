@@ -248,7 +248,7 @@ bool WmoLiquid::readFromFile(FILE* rf, WmoLiquid*& out)
 
 GroupModel::GroupModel(const GroupModel& other):
     iBound(other.iBound), iMogpFlags(other.iMogpFlags), iGroupWMOID(other.iGroupWMOID),
-    vertices(other.vertices), triangles(other.triangles), meshTree(other.meshTree), iLiquid(0)
+    vertices(other.vertices), triangles(other.triangles), meshTree(other.meshTree), iLiquid(nullptr)
 {
     if (other.iLiquid)
         iLiquid = new WmoLiquid(*other.iLiquid);
@@ -312,7 +312,7 @@ bool GroupModel::readFromFile(FILE* rf)
     triangles.clear();
     vertices.clear();
     delete iLiquid;
-    iLiquid = 0;
+    iLiquid = nullptr;
 
     if (result && fread(&iBound, sizeof(G3D::AABox), 1, rf) != 1) result = false;
     if (result && fread(&iMogpFlags, sizeof(uint32), 1, rf) != 1) result = false;

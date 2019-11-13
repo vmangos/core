@@ -471,7 +471,7 @@ bool GroupModel_Raw::Read(FILE* rf)
     }
 
     // ----- liquid
-    liquid = 0;
+    liquid = nullptr;
     if (liquidflags & 1)
     {
         WMOLiquidHeader hlq;
