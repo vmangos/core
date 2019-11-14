@@ -1408,6 +1408,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         virtual bool IsInWater() const;
         virtual bool IsUnderWater() const;
+        bool IsReachableBySwmming() const;
         bool isInAccessablePlaceFor(Creature const* c) const;
 
         void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;

@@ -1038,15 +1038,33 @@ GridMapLiquidStatus TerrainInfo::getLiquidStatus(float x, float y, float z, uint
     return result;
 }
 
-bool TerrainInfo::IsInWater(float x, float y, float pZ, GridMapLiquidData* data) const
+// check if creature is in water and have enough space to swim
+bool TerrainInfo::IsSwimmable(float x, float y, float z, float radius /*= 1.5f*/, GridMapLiquidData* data /*= 0*/) const
 {
     // Check surface in x, y point for liquid
-    ASSERT(MaNGOS::IsValidMapCoord(x, y, pZ));
     if (const_cast<TerrainInfo*>(this)->GetGrid(x, y))
     {
         GridMapLiquidData liquid_status;
         GridMapLiquidData* liquid_ptr = data ? data : &liquid_status;
-        if (getLiquidStatus(x, y, pZ, MAP_ALL_LIQUIDS, liquid_ptr) & LIQUID_MAP_UNDER_WATER)
+        if (getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr))
+        {
+            if (liquid_ptr->level - liquid_ptr->depth_level > radius) // is unit have enough space to swim
+                return true;
+        }
+    }
+    return false;
+}
+
+bool TerrainInfo::IsInWater(float x, float y, float z, GridMapLiquidData* data) const
+{
+    // Check surface in x, y point for liquid
+    ASSERT(MaNGOS::IsValidMapCoord(x, y, z));
+    if (const_cast<TerrainInfo*>(this)->GetGrid(x, y))
+    {
+        GridMapLiquidData liquid_status;
+        GridMapLiquidData* liquid_ptr = data ? data : &liquid_status;
+        auto status = getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr);
+        if (status == LIQUID_MAP_IN_WATER || status == LIQUID_MAP_UNDER_WATER)
             return true;
     }
     return false;

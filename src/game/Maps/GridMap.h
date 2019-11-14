@@ -148,6 +148,7 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         float GetWaterLevel(float x, float y, float z, float* pGround = nullptr) const;
         float GetWaterOrGroundLevel(Position const& position, float* pGround = nullptr, bool swim = false) const;
         float GetWaterOrGroundLevel(float x, float y, float z, float* pGround = nullptr, bool swim = false) const;
+        bool IsSwimmable(float x, float y, float z, float radius = 1.5f, GridMapLiquidData* data = 0) const;
         bool IsInWater(float x, float y, float z, GridMapLiquidData* data = 0) const;
         bool IsUnderWater(float x, float y, float z) const;
 
