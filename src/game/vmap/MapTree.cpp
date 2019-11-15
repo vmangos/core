@@ -45,7 +45,7 @@ public:
             hit = true;
         return result;
     }
-    bool didHit()
+    bool didHit() const
     {
         return hit;
     }
@@ -218,10 +218,7 @@ bool StaticMapTree::isInLineOfSight(const Vector3& pos1, const Vector3& pos2) co
         return true;
     // direction with length of 1
     G3D::Ray ray = G3D::Ray::fromOriginAndDirection(pos1, (pos2 - pos1) / maxDist);
-    if (getIntersectionTime(ray, maxDist, true, true))
-        return false;
-
-    return true;
+    return !getIntersectionTime(ray, maxDist, true, true);
 }
 //=========================================================
 /**
@@ -231,7 +228,6 @@ Return the hit pos or the original dest pos
 
 bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, Vector3& pResultHitPos, float pModifyDist) const
 {
-    bool result = false;
     float maxDist = (pPos2 - pPos1).magnitude();
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
     MANGOS_ASSERT(maxDist < std::numeric_limits<float>::max());
@@ -256,14 +252,10 @@ bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, 
         }
         else
             pResultHitPos = pResultHitPos + dir * pModifyDist;
-        result = true;
+        return true;
     }
-    else
-    {
-        pResultHitPos = pPos2;
-        result = false;
-    }
-    return result;
+    pResultHitPos = pPos2;
+    return false;
 }
 
 ModelInstance* StaticMapTree::FindCollisionModel(const G3D::Vector3& pos1, const G3D::Vector3& pos2)
@@ -390,11 +382,11 @@ bool StaticMapTree::InitMap(const std::string& fname, VMapManager2* vm)
 
 void StaticMapTree::UnloadMap(VMapManager2* vm)
 {
-    for (loadedSpawnMap::iterator i = iLoadedSpawns.begin(); i != iLoadedSpawns.end(); ++i)
+    for (auto& iLoadedSpawn : iLoadedSpawns)
     {
-        iTreeValues[i->first].setUnloaded();
-        for (uint32 refCount = 0; refCount < i->second; ++refCount)
-            vm->releaseModelInstance(iTreeValues[i->first].name);
+        iTreeValues[iLoadedSpawn.first].setUnloaded();
+        for (uint32 refCount = 0; refCount < iLoadedSpawn.second; ++refCount)
+            vm->releaseModelInstance(iTreeValues[iLoadedSpawn.first].name);
     }
     iLoadedSpawns.clear();
     iLoadedTiles.clear();
@@ -446,13 +438,11 @@ bool StaticMapTree::LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
                 fread(&referencedVal, sizeof(uint32), 1, tf);
                 if (!iLoadedSpawns.count(referencedVal))
                 {
-#ifdef VMAP_DEBUG
                     if (referencedVal > iNTreeValues)
                     {
-                        DEBUG_LOG("invalid tree element! (%u/%u)", referencedVal, iNTreeValues);
+                        ERROR_LOG("invalid tree element! (%u/%u)", referencedVal, iNTreeValues);
                         continue;
                     }
-#endif
                     iTreeValues[referencedVal] = ModelInstance(spawn, model);
                     iLoadedSpawns[referencedVal] = 1;
                 }

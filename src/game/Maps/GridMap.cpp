@@ -32,7 +32,7 @@
 #include "SQLStorages.h"
 
 char const* MAP_MAGIC         = "MAPS";
-char const* MAP_VERSION_MAGIC = "z1.3";
+char const* MAP_VERSION_MAGIC = "z1.4";
 char const* MAP_AREA_MAGIC    = "AREA";
 char const* MAP_HEIGHT_MAGIC  = "MHGT";
 char const* MAP_LIQUID_MAGIC  = "MLIQ";
@@ -53,7 +53,8 @@ GridMap::GridMap()
     m_V8 = nullptr;
 
     // Liquid data
-    m_liquidType    = 0;
+    m_liquidGlobalEntry = 0;
+    m_liquidGlobalFlags = 0;
     m_liquid_offX   = 0;
     m_liquid_offY   = 0;
     m_liquid_width  = 0;
@@ -69,7 +70,7 @@ GridMap::~GridMap()
     unloadData();
 }
 
-bool GridMap::loadData(char* filename)
+bool GridMap::loadData(char const* filename)
 {
     // Unload old data if exist
     unloadData();
@@ -205,7 +206,8 @@ bool GridMap::loadGridMapLiquidData(FILE* in, uint32 offset, uint32 /*size*/)
     if (header.fourcc != *((uint32 const*)(MAP_LIQUID_MAGIC)))
         return false;
 
-    m_liquidType    = header.liquidType;
+    m_liquidGlobalEntry = header.liquidType;
+    m_liquidGlobalFlags = header.liquidFlags;
     m_liquid_offX   = header.offsetX;
     m_liquid_offY   = header.offsetY;
     m_liquid_width  = header.width;
@@ -230,7 +232,7 @@ bool GridMap::loadGridMapLiquidData(FILE* in, uint32 offset, uint32 /*size*/)
     return true;
 }
 
-uint16 GridMap::getArea(float x, float y)
+uint16 GridMap::getArea(float x, float y) const
 {
     if (!m_area_map)
         return m_gridArea;
@@ -465,7 +467,7 @@ float GridMap::getHeightFromUint16(float x, float y) const
     return (float)((a * x) + (b * y) + c) * m_gridIntHeightMultiplier + m_gridHeight;
 }
 
-float GridMap::getLiquidLevel(float x, float y)
+float GridMap::getLiquidLevel(float x, float y) const
 {
     if (!m_liquid_map)
         return m_liquidLevel;
@@ -485,10 +487,10 @@ float GridMap::getLiquidLevel(float x, float y)
     return m_liquid_map[cx_int * m_liquid_width + cy_int];
 }
 
-uint8 GridMap::getTerrainType(float x, float y)
+uint8 GridMap::getTerrainType(float x, float y) const
 {
     if (!m_liquidFlags)
-        return (uint8)m_liquidType;
+        return (uint8)m_liquidGlobalFlags;
 
     x = 16 * (32 - x / SIZE_OF_GRIDS);
     y = 16 * (32 - y / SIZE_OF_GRIDS);
@@ -501,7 +503,7 @@ uint8 GridMap::getTerrainType(float x, float y)
 GridMapLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData* data)
 {
     // Check water type (if no water return)
-    if (!m_liquidFlags && !m_liquidType)
+    if (!m_liquidFlags && !m_liquidGlobalFlags)
         return LIQUID_MAP_NO_WATER;
 
     // Get cell
@@ -513,41 +515,34 @@ GridMapLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 Re
 
     // Check water type in cell
     int idx = (x_int >> 3) * 16 + (y_int >> 3);
-    uint8 type = m_liquidFlags ? m_liquidFlags[idx] : 1 << m_liquidType;
-    uint32 entry = 0;
-
-    // ToDo: check if this part requires update for 1.12.1
-    if (m_liquidEntry)
+    uint8 type = m_liquidFlags ? m_liquidFlags[idx] : m_liquidGlobalFlags;
+    uint32 entry = m_liquidEntry ? m_liquidEntry[idx] : m_liquidGlobalEntry;
+    if (LiquidTypeEntry const* liquidEntry = sTerrainMgr.GetLiquidType(entry))
     {
-        if (LiquidTypeEntry const* liquidEntry = sTerrainMgr.GetLiquidType(m_liquidEntry[idx]))
+        entry = liquidEntry->Id;
+        type &= MAP_LIQUID_TYPE_DARK_WATER;
+        uint32 liqTypeIdx = liquidEntry->Type;
+        if (entry < 21)
         {
-            entry = liquidEntry->Id;
-            type &= MAP_LIQUID_TYPE_DARK_WATER;
-            uint32 liqTypeIdx = liquidEntry->Type;
-            if ((entry < 21) && (type & MAP_LIQUID_TYPE_WATER))
+            if (const auto *areaEntry = AreaEntry::GetById(getArea(x, y)))
             {
-                // only basic liquid stored in maps actualy so in some case we need to override type depend on area
-                // actualy only Naxxramas raid be overrided here
-                if (const auto *areaEntry = AreaEntry::GetById(getArea(x, y)))
+                uint32 overrideLiquid = areaEntry->LiquidTypeId;
+                if (!overrideLiquid && !areaEntry->IsZone())
                 {
-                    uint32 overrideLiquid = areaEntry->LiquidTypeId;
-                    if (!overrideLiquid && !areaEntry->IsZone())
-                    {
-                        areaEntry = AreaEntry::GetById(areaEntry->ZoneId);
-                        if (areaEntry)
-                            overrideLiquid = areaEntry->LiquidTypeId;
-                    }
+                    areaEntry = AreaEntry::GetById(areaEntry->ZoneId);
+                    if (areaEntry)
+                        overrideLiquid = areaEntry->LiquidTypeId;
+                }
 
-                    if (LiquidTypeEntry const* liq = sTerrainMgr.GetLiquidType(overrideLiquid))
-                    {
-                        entry = overrideLiquid;
-                        liqTypeIdx = liq->Type;
-                    }
+                if (LiquidTypeEntry const* liq = sTerrainMgr.GetLiquidType(overrideLiquid))
+                {
+                    entry = overrideLiquid;
+                    liqTypeIdx = liq->Type;
                 }
             }
-
-            type |= (1 << liqTypeIdx) | (type & MAP_LIQUID_TYPE_DARK_WATER);
         }
+
+        type |= (1 << liqTypeIdx) | (type & MAP_LIQUID_TYPE_DARK_WATER);
     }
 
     if (type == 0)
@@ -826,8 +821,7 @@ float TerrainInfo::GetHeightStatic(float x, float y, float z, bool useVmaps/*=tr
             // we are already under the surface or vmap height above map heigt
             if (z < mapHeight || vmapHeight > mapHeight)
                 return vmapHeight;
-            else
-                return mapHeight;                           // better use .map surface height
+            return mapHeight;                               // better use .map surface height
         }
         else
             return vmapHeight;                              // we have only vmapHeight (if have)
@@ -967,8 +961,7 @@ uint8 TerrainInfo::GetTerrainType(float x, float y) const
 {
     if (GridMap* gmap = const_cast<TerrainInfo*>(this)->GetGrid(x, y))
         return gmap->getTerrainType(x, y);
-    else
-        return 0;
+    return 0;
 }
 
 uint32 TerrainInfo::GetAreaId(float x, float y, float z) const
@@ -1045,15 +1038,33 @@ GridMapLiquidStatus TerrainInfo::getLiquidStatus(float x, float y, float z, uint
     return result;
 }
 
-bool TerrainInfo::IsInWater(float x, float y, float pZ, GridMapLiquidData* data) const
+// check if creature is in water and have enough space to swim
+bool TerrainInfo::IsSwimmable(float x, float y, float z, float radius /*= 1.5f*/, GridMapLiquidData* data /*= 0*/) const
 {
     // Check surface in x, y point for liquid
-    ASSERT(MaNGOS::IsValidMapCoord(x, y, pZ));
     if (const_cast<TerrainInfo*>(this)->GetGrid(x, y))
     {
         GridMapLiquidData liquid_status;
         GridMapLiquidData* liquid_ptr = data ? data : &liquid_status;
-        if (getLiquidStatus(x, y, pZ, MAP_ALL_LIQUIDS, liquid_ptr) & LIQUID_MAP_UNDER_WATER)
+        if (getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr))
+        {
+            if (liquid_ptr->level - liquid_ptr->depth_level > radius) // is unit have enough space to swim
+                return true;
+        }
+    }
+    return false;
+}
+
+bool TerrainInfo::IsInWater(float x, float y, float z, GridMapLiquidData* data) const
+{
+    // Check surface in x, y point for liquid
+    ASSERT(MaNGOS::IsValidMapCoord(x, y, z));
+    if (const_cast<TerrainInfo*>(this)->GetGrid(x, y))
+    {
+        GridMapLiquidData liquid_status;
+        GridMapLiquidData* liquid_ptr = data ? data : &liquid_status;
+        auto status = getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr);
+        if (status == LIQUID_MAP_IN_WATER || status == LIQUID_MAP_UNDER_WATER)
             return true;
     }
     return false;
@@ -1206,8 +1217,8 @@ TerrainManager::TerrainManager()
 
 TerrainManager::~TerrainManager()
 {
-    for (TerrainDataMap::iterator it = i_TerrainMap.begin(); it != i_TerrainMap.end(); ++it)
-        delete it->second;
+    for (auto& it : i_TerrainMap)
+        delete it.second;
 }
 
 TerrainInfo* TerrainManager::LoadTerrain(const uint32 mapId)
@@ -1239,7 +1250,7 @@ void TerrainManager::UnloadTerrain(const uint32 mapId)
     {
         TerrainInfo* ptr = (*iter).second;
         // lets check if this object can be actually freed
-        if (ptr->IsReferenced() == false)
+        if (!ptr->IsReferenced())
         {
             i_TerrainMap.erase(iter);
             delete ptr;
@@ -1250,14 +1261,14 @@ void TerrainManager::UnloadTerrain(const uint32 mapId)
 void TerrainManager::Update(const uint32 diff)
 {
     // global garbage collection for GridMap objects and VMaps
-    for (TerrainDataMap::iterator iter = i_TerrainMap.begin(); iter != i_TerrainMap.end(); ++iter)
-        iter->second->CleanUpGrids(diff);
+    for (auto& iter : i_TerrainMap)
+        iter.second->CleanUpGrids(diff);
 }
 
 void TerrainManager::UnloadAll()
 {
-    for (TerrainDataMap::iterator it = i_TerrainMap.begin(); it != i_TerrainMap.end(); ++it)
-        delete it->second;
+    for (auto& it : i_TerrainMap)
+        delete it.second;
 
     i_TerrainMap.clear();
 }
@@ -1268,8 +1279,7 @@ uint32 TerrainManager::GetAreaIdByAreaFlag(uint16 areaflag, uint32 map_id)
 
     if (entry)
         return entry->Id;
-    else
-        return 0;
+    return 0;
 }
 
 uint32 TerrainManager::GetZoneIdByAreaFlag(uint16 areaflag, uint32 map_id)
@@ -1278,8 +1288,7 @@ uint32 TerrainManager::GetZoneIdByAreaFlag(uint16 areaflag, uint32 map_id)
 
     if (entry)
         return !entry->IsZone() ? entry->ZoneId : entry->Id;
-    else
-        return 0;
+    return 0;
 }
 
 void TerrainManager::GetZoneAndAreaIdByAreaFlag(uint32& zoneid, uint32& areaid, uint16 areaflag, uint32 map_id)

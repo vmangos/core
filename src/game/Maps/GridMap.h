@@ -23,6 +23,7 @@
 #include "Policies/Singleton.h"
 #include "DBCStructure.h"
 #include "GridDefines.h"
+#include "Maps/GridMapDefines.h"
 #include "Object.h"
 #include "SharedDefines.h"
 #include <memory>
@@ -37,85 +38,6 @@ class Group;
 class BattleGround;
 class Map;
 struct LiquidTypeEntry;
-
-struct GridMapFileHeader
-{
-    uint32 mapMagic;
-    uint32 versionMagic;
-    uint32 areaMapOffset;
-    uint32 areaMapSize;
-    uint32 heightMapOffset;
-    uint32 heightMapSize;
-    uint32 liquidMapOffset;
-    uint32 liquidMapSize;
-    uint32 holesOffset;
-    uint32 holesSize;
-};
-
-#define MAP_AREA_NO_AREA      0x0001
-
-struct GridMapAreaHeader
-{
-    uint32 fourcc;
-    uint16 flags;
-    uint16 gridArea;
-};
-
-#define MAP_HEIGHT_NO_HEIGHT  0x0001
-#define MAP_HEIGHT_AS_INT16   0x0002
-#define MAP_HEIGHT_AS_INT8    0x0004
-
-struct GridMapHeightHeader
-{
-    uint32 fourcc;
-    uint32 flags;
-    float gridHeight;
-    float gridMaxHeight;
-};
-
-#define MAP_LIQUID_NO_TYPE    0x0001
-#define MAP_LIQUID_NO_HEIGHT  0x0002
-
-struct GridMapLiquidHeader
-{
-    uint32 fourcc;
-    uint16 flags;
-    uint16 liquidType;
-    uint8 offsetX;
-    uint8 offsetY;
-    uint8 width;
-    uint8 height;
-    float liquidLevel;
-};
-
-enum GridMapLiquidStatus
-{
-    LIQUID_MAP_NO_WATER     = 0x00000000,
-    LIQUID_MAP_ABOVE_WATER  = 0x00000001,
-    LIQUID_MAP_WATER_WALK   = 0x00000002,
-    LIQUID_MAP_IN_WATER     = 0x00000004,
-    LIQUID_MAP_UNDER_WATER  = 0x00000008
-};
-
-// defined in DBC and left shifted for flag usage
-#define MAP_LIQUID_TYPE_NO_WATER    0x00
-#define MAP_LIQUID_TYPE_MAGMA       0x01
-#define MAP_LIQUID_TYPE_OCEAN       0x02
-#define MAP_LIQUID_TYPE_SLIME       0x04
-#define MAP_LIQUID_TYPE_WATER       0x08
-
-#define MAP_ALL_LIQUIDS   (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_SLIME)
-
-#define MAP_LIQUID_TYPE_DARK_WATER  0x10
-#define MAP_LIQUID_TYPE_WMO_WATER   0x20
-
-struct GridMapLiquidData
-{
-    uint32 type_flags;
-    uint32 entry;
-    float level;
-    float depth_level;
-};
 
 class GridMap
 {
@@ -144,7 +66,8 @@ class GridMap
         };
 
         // Liquid data
-        uint16 m_liquidType;
+        uint16 m_liquidGlobalEntry;
+        uint8 m_liquidGlobalFlags;
         uint8 m_liquid_offX;
         uint8 m_liquid_offY;
         uint8 m_liquid_width;
@@ -171,16 +94,16 @@ class GridMap
         GridMap();
         ~GridMap();
 
-        bool loadData(char* filaname);
+        bool loadData(char const* filaname);
         void unloadData();
 
         static bool ExistMap(uint32 mapid, int gx, int gy);
         static bool ExistVMap(uint32 mapid, int gx, int gy);
 
-        uint16 getArea(float x, float y);
-        float getHeight(float x, float y) { return (this->*m_gridGetHeight)(x, y); }
-        float getLiquidLevel(float x, float y);
-        uint8 getTerrainType(float x, float y);
+        uint16 getArea(float x, float y) const;
+        inline float getHeight(float x, float y) const { return (this->*m_gridGetHeight)(x, y); }
+        float getLiquidLevel(float x, float y) const;
+        uint8 getTerrainType(float x, float y) const;
         GridMapLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData* data = 0);
 };
 
@@ -225,6 +148,7 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         float GetWaterLevel(float x, float y, float z, float* pGround = nullptr) const;
         float GetWaterOrGroundLevel(Position const& position, float* pGround = nullptr, bool swim = false) const;
         float GetWaterOrGroundLevel(float x, float y, float z, float* pGround = nullptr, bool swim = false) const;
+        bool IsSwimmable(float x, float y, float z, float radius = 1.5f, GridMapLiquidData* data = 0) const;
         bool IsInWater(float x, float y, float z, GridMapLiquidData* data = 0) const;
         bool IsUnderWater(float x, float y, float z) const;
 

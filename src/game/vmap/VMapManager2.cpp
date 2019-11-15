@@ -16,7 +16,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <iostream>
 #include <iomanip>
 #include <string>
 #include <sstream>
@@ -41,10 +40,10 @@ VMapManager2::VMapManager2()
 
 VMapManager2::~VMapManager2(void)
 {
-    for (InstanceTreeMap::iterator i = iInstanceMapTrees.begin(); i != iInstanceMapTrees.end(); ++i)
-        delete i->second;
-    for (ModelFileMap::iterator i = iLoadedModelFiles.begin(); i != iLoadedModelFiles.end(); ++i)
-        delete i->second.getModel();
+    for (auto& iInstanceMapTree : iInstanceMapTrees)
+        delete iInstanceMapTree.second;
+    for (auto& iLoadedModelFile : iLoadedModelFiles)
+        delete iLoadedModelFile.second.getModel();
 }
 
 //=========================================================
@@ -95,7 +94,10 @@ bool VMapManager2::_loadMap(unsigned int pMapId, const std::string& basePath, ui
         std::string mapFileName = getMapFileName(pMapId);
         StaticMapTree* newTree = new StaticMapTree(pMapId, basePath);
         if (!newTree->InitMap(mapFileName, this))
+        {
+            delete newTree;
             return false;
+        }
         instanceTree = iInstanceMapTrees.insert(InstanceTreeMap::value_type(pMapId, newTree)).first;
     }
     return instanceTree->second->LoadMapTile(tileX, tileY, this);

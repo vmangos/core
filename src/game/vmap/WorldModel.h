@@ -19,7 +19,6 @@
 #ifndef _WORLDMODEL_H
 #define _WORLDMODEL_H
 
-#include <G3D/HashTrait.h>
 #include <G3D/Vector3.h>
 #include <G3D/AABox.h>
 #include <G3D/Ray.h>
@@ -36,7 +35,7 @@ namespace VMAP
     class MeshTriangle
     {
         public:
-            MeshTriangle() {};
+            MeshTriangle() : idx0(0), idx1(0), idx2(0) {};
             MeshTriangle(uint32 na, uint32 nb, uint32 nc): idx0(na), idx1(nb), idx2(nc) {};
 
             uint32 idx0;
@@ -53,13 +52,13 @@ namespace VMAP
             WmoLiquid& operator=(const WmoLiquid& other);
             bool GetLiquidHeight(const Vector3& pos, float& liqHeight) const;
             uint32 GetType() const { return iType; }
-            float* GetHeightStorage() { return iHeight; }
-            uint8* GetFlagsStorage() { return iFlags; }
-            uint32 GetFileSize();
+            float* GetHeightStorage() const { return iHeight; }
+            uint8* GetFlagsStorage() const { return iFlags; }
+            uint32 GetFileSize() const;
             bool writeToFile(FILE* wf);
-            static bool readFromFile(FILE* rf, WmoLiquid*& liquid);
+            static bool readFromFile(FILE* rf, WmoLiquid*& out);
         private:
-            WmoLiquid(): iHeight(0), iFlags(0) {};
+            WmoLiquid() : iTilesX(0), iTilesY(0), iType(0), iHeight(nullptr), iFlags(nullptr) {};
             uint32 iTilesX;  //!< number of tiles in x direction, each
             uint32 iTilesY;
             Vector3 iCorner; //!< the lower corner
@@ -76,10 +75,10 @@ namespace VMAP
     class GroupModel
     {
         public:
-            GroupModel(): iLiquid(0) {}
+            GroupModel() : iMogpFlags(0), iGroupWMOID(0), iLiquid(nullptr) {}
             GroupModel(const GroupModel& other);
             GroupModel(uint32 mogpFlags, uint32 groupWMOID, const AABox& bound):
-                iBound(bound), iMogpFlags(mogpFlags), iGroupWMOID(groupWMOID), iLiquid(0) {}
+                iBound(bound), iMogpFlags(mogpFlags), iGroupWMOID(groupWMOID), iLiquid(nullptr) {}
             ~GroupModel() { delete iLiquid; }
 
             //! pass mesh data to object and create BIH. Passed vectors get get swapped with old geometry!

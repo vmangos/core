@@ -50,7 +50,7 @@ SET_TARGET_PROPERTIES (MoveMapGen PROPERTIES FOLDER Extractors)
 
 target_link_libraries(MoveMapGen 
                         vmap 
-                        detour
+                        Detour
                         Recast
                         ${ACE_LIBRARIES}
                         shared

@@ -24,7 +24,6 @@
 #include <set>
 #include <iomanip>
 #include <sstream>
-#include <iomanip>
 
 using G3D::Vector3;
 using G3D::AABox;
@@ -180,20 +179,20 @@ bool TileAssembler::convertWorld2()
 
     // export objects
     std::cout << "\nConverting Model Files" << std::endl;
-    for (std::set<std::string>::iterator mfile = spawnedModelFiles.begin(); mfile != spawnedModelFiles.end(); ++mfile)
+    for (const auto& spawnedModelFile : spawnedModelFiles)
     {
-        std::cout << "Converting " << *mfile << std::endl;
-        if (!convertRawFile(*mfile))
+        std::cout << "Converting " << spawnedModelFile << std::endl;
+        if (!convertRawFile(spawnedModelFile))
         {
-            std::cout << "error converting " << *mfile << std::endl;
+            std::cout << "error converting " << spawnedModelFile << std::endl;
             success = false;
             break;
         }
     }
 
     // cleanup:
-    for (MapData::iterator map_iter = mapData.begin(); map_iter != mapData.end(); ++map_iter)
-        delete map_iter->second;
+    for (auto& map_iter : mapData)
+        delete map_iter.second;
     return success;
 }
 
@@ -207,14 +206,12 @@ bool TileAssembler::readMapSpawns()
         return false;
     }
     printf("Read coordinate mapping...\n");
-    uint32 mapID, tileX, tileY, check = 0;
-    G3D::Vector3 v1, v2;
+    uint32 mapID = 0, tileX = 0, tileY = 0;
     ModelSpawn spawn;
     while (!feof(dirf))
     {
-        check = 0;
         // read mapID, tileX, tileY, Flags, adtID, ID, Pos, Rot, Scale, Bound_lo, Bound_hi, name
-        check += fread(&mapID, sizeof(uint32), 1, dirf);
+        uint32 check = fread(&mapID, sizeof(uint32), 1, dirf);
         if (check == 0) // EoF...
             break;
         check += fread(&tileX, sizeof(uint32), 1, dirf);
@@ -226,7 +223,7 @@ bool TileAssembler::readMapSpawns()
         MapData::iterator map_iter = mapData.find(mapID);
         if (map_iter == mapData.end())
         {
-            printf("spawning Map %d\n", mapID);
+            printf("spawning Map %u\n", mapID);
             mapData[mapID] = current = new MapSpawns();
         }
         else current = (*map_iter).second;
@@ -292,7 +289,6 @@ struct WMOLiquidHeader
 //=================================================================
 bool TileAssembler::convertRawFile(const std::string& pModelFilename)
 {
-    bool success = true;
     std::string filename = iSrcDir;
     if (filename.length() > 0)
         filename.append("/");
@@ -305,7 +301,7 @@ bool TileAssembler::convertRawFile(const std::string& pModelFilename)
     // write WorldModel
     WorldModel model;
     model.setRootWmoID(raw_model.RootWMOID);
-    if (raw_model.groupsArray.size())
+    if (!raw_model.groupsArray.empty())
     {
         std::vector<GroupModel> groupsArray;
 
@@ -321,10 +317,8 @@ bool TileAssembler::convertRawFile(const std::string& pModelFilename)
         model.setGroupModels(groupsArray);
     }
 
-    success = model.writeFile(iDestDir + "/" + pModelFilename + ".vmo");
-
     //std::cout << "readRawFile2: '" << pModelFilename << "' tris: " << nElements << " nodes: " << nNodes << std::endl;
-    return success;
+    return model.writeFile(iDestDir + "/" + pModelFilename + ".vmo");
 }
 
 void TileAssembler::exportGameobjectModels()
@@ -364,9 +358,9 @@ void TileAssembler::exportGameobjectModels()
 
         AABox bounds;
         bool boundEmpty = true;
-        for (uint32 g = 0; g < raw_model.groupsArray.size(); ++g)
+        for (auto& g : raw_model.groupsArray)
         {
-            std::vector<Vector3>& vertices = raw_model.groupsArray[g].vertexArray;
+            std::vector<Vector3>& vertices = g.vertexArray;
 
             uint32 nvectors = vertices.size();
             for (uint32 i = 0; i < nvectors; ++i)
@@ -471,7 +465,7 @@ bool GroupModel_Raw::Read(FILE* rf)
     }
 
     // ----- liquid
-    liquid = 0;
+    liquid = nullptr;
     if (liquidflags & 1)
     {
         WMOLiquidHeader hlq;

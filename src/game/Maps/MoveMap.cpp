@@ -16,11 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "GridMap.h"
 #include "Log.h"
 #include "World.h"
 #include "VMapFactory.h"
-
 #include "MoveMap.h"
 #include "MoveMapSharedDefines.h"
 
@@ -90,11 +88,11 @@ bool MMapManager::loadMapData(uint32 mapId)
 
     dtNavMesh* mesh = dtAllocNavMesh();
     MANGOS_ASSERT(mesh);
-    dtStatus r = mesh->init(&params);
-    if (r != DT_SUCCESS)
+    dtStatus dtResult = mesh->init(&params);
+    if (dtStatusFailed(dtResult))
     {
         dtFreeNavMesh(mesh);
-        sLog.outError("MMAP:loadMapData: Failed to initialize dtNavMesh for mmap %03u from file %s with %u tiles. Result 0x%x.", mapId, fileName, params.maxTiles, r);
+        sLog.outError("MMAP:loadMapData: Failed to initialize dtNavMesh for mmap %03u from file %s with %u tiles. Result 0x%x.", mapId, fileName, params.maxTiles, dtResult);
         delete [] fileName;
         return false;
     }
@@ -117,7 +115,7 @@ bool MMapManager::loadMapData(uint32 mapId)
     return true;
 }
 
-uint32 MMapManager::packTileID(int32 x, int32 y)
+uint32 MMapManager::packTileID(int32 x, int32 y) const
 {
     return uint32(x << 16 | y);
 }
@@ -235,7 +233,8 @@ bool MMapManager::unloadMap(uint32 mapId, int32 x, int32 y)
     dtTileRef tileRef = mmap->mmapLoadedTiles[packedGridPos];
 
     // unload, and mark as non loaded
-    if (DT_SUCCESS != mmap->navMesh->removeTile(tileRef, nullptr, nullptr))
+    dtStatus dtResult = mmap->navMesh->removeTile(tileRef, nullptr, nullptr);
+    if (dtStatusFailed(dtResult))
     {
         // this is technically a memory leak
         // if the grid is later reloaded, dtNavMesh::addTile will return error but no extra memory is used
@@ -268,7 +267,8 @@ bool MMapManager::unloadMap(uint32 mapId)
     {
         uint32 x = (i->first >> 16);
         uint32 y = (i->first & 0x0000FFFF);
-        if (DT_SUCCESS != mmap->navMesh->removeTile(i->second, nullptr, nullptr))
+        dtStatus dtResult = mmap->navMesh->removeTile(i->second, nullptr, nullptr);
+        if (dtStatusFailed(dtResult))
             sLog.outError("MMAP:unloadMap: Could not unload %03u%02i%02i.mmtile from navmesh", mapId, x, y);
         else
             --loadedTiles;
@@ -334,7 +334,8 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
         // allocate mesh query
         navMeshQuery = dtAllocNavMeshQuery();
         MANGOS_ASSERT(navMeshQuery);
-        if (DT_SUCCESS != navMeshQuery->init(mmap->navMesh, 2048))
+        dtStatus dtResult = navMeshQuery->init(mmap->navMesh, 2048);
+        if (dtStatusFailed(dtResult))
         {
             mmap->navMeshQueries_lock.release();
             dtFreeNavMeshQuery(navMeshQuery);

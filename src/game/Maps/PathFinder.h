@@ -112,9 +112,9 @@ class PathInfo
 
         dtQueryFilter m_filter;                     // use single filter for all movements, update it when needed
 
-        inline void setStartPosition(Vector3 point) { m_startPosition = point; }
-        inline void setEndPosition(Vector3 point) { m_actualEndPosition = point; m_endPosition = point; }
-        inline void setActualEndPosition(Vector3 point) { m_actualEndPosition = point; }
+        inline void setStartPosition(const Vector3& point) { m_startPosition = point; }
+        inline void setEndPosition(const Vector3& point) { m_actualEndPosition = point; m_endPosition = point; }
+        inline void setActualEndPosition(const Vector3& point) { m_actualEndPosition = point; }
 
         inline void clear()
         {
@@ -141,10 +141,10 @@ class PathInfo
                              const dtPolyRef* visited, const uint32 nvisited);
         bool getSteerTarget(const float* startPos, const float* endPos, const float minTargetDist,
                             const dtPolyRef* path, const uint32 pathSize, float* steerPos,
-                            unsigned char& steerPosFlag, dtPolyRef& steerPosRef);
+                            unsigned char& steerPosFlag, dtPolyRef& steerPosRef) const;
         dtStatus findSmoothPath(const float* startPos, const float* endPos,
                               const dtPolyRef* polyPath, uint32 polyPathSize,
-                              float* smoothPath, int* smoothPathSize, uint32 smoothPathMaxSize);
+                              float* smoothPath, int* smoothPathSize, uint32 maxSmoothPathSize);
 };
 
 typedef PathInfo PathFinder;

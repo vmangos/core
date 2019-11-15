@@ -31,7 +31,19 @@
 // TODO: figure out a multiplatform version of uint64_t
 // - maybe: https://code.google.com/p/msinttypes/
 // - or: http://www.azillionmonkeys.com/qed/pstdint.h
+#if defined(WIN32) && !defined(__MINGW32__)
+/// Do not rename back to uint64. Otherwise mac complains about typedef redefinition
+typedef unsigned __int64    uint64_d;
+#else
 #include <stdint.h>
+#ifndef uint64_t
+#ifdef __linux__
+#include <linux/types.h>
+#endif
+#endif
+/// Do not rename back to uint64. Otherwise mac complains about typedef redefinition
+typedef uint64_t            uint64_d;
+#endif 
 #endif
 
 // Note: If you want to use 64-bit refs, change the types of both dtPolyRef & dtTileRef.
@@ -40,10 +52,10 @@
 /// A handle to a polygon within a navigation mesh tile.
 /// @ingroup detour
 #ifdef DT_POLYREF64
-static const unsigned int DT_SALT_BITS = 16;
-static const unsigned int DT_TILE_BITS = 28;
-static const unsigned int DT_POLY_BITS = 20;
-typedef uint64_t dtPolyRef;
+static const unsigned int DT_SALT_BITS = 12;
+static const unsigned int DT_TILE_BITS = 21;
+static const unsigned int DT_POLY_BITS = 31;
+typedef uint64_d dtPolyRef;
 #else
 typedef unsigned int dtPolyRef;
 #endif
@@ -51,7 +63,7 @@ typedef unsigned int dtPolyRef;
 /// A handle to a tile within a navigation mesh.
 /// @ingroup detour
 #ifdef DT_POLYREF64
-typedef uint64_t dtTileRef;
+typedef uint64_d dtTileRef;
 #else
 typedef unsigned int dtTileRef;
 #endif
@@ -128,6 +140,11 @@ enum dtFindPathOptions
 enum dtRaycastOptions
 {
 	DT_RAYCAST_USE_COSTS = 0x01,		///< Raycast should calculate movement cost along the ray and fill RaycastHit::cost
+};
+
+enum dtDetailTriEdgeFlags
+{
+	DT_DETAIL_EDGE_BOUNDARY = 0x01,		///< Detail triangle edge is part of the poly boundary
 };
 
 
@@ -287,7 +304,8 @@ struct dtMeshTile
 	/// The detail mesh's unique vertices. [(x, y, z) * dtMeshHeader::detailVertCount]
 	float* detailVerts;	
 
-	/// The detail mesh's triangles. [(vertA, vertB, vertC) * dtMeshHeader::detailTriCount]
+	/// The detail mesh's triangles. [(vertA, vertB, vertC, triFlags) * dtMeshHeader::detailTriCount].
+	/// See dtDetailTriEdgeFlags and dtGetDetailTriEdgeFlags.
 	unsigned char* detailTris;	
 
 	/// The tile bounding volume nodes. [Size: dtMeshHeader::bvNodeCount]
@@ -304,6 +322,15 @@ private:
 	dtMeshTile(const dtMeshTile&);
 	dtMeshTile& operator=(const dtMeshTile&);
 };
+
+/// Get flags for edge in detail triangle.
+/// @param	triFlags[in]		The flags for the triangle (last component of detail vertices above).
+/// @param	edgeIndex[in]		The index of the first vertex of the edge. For instance, if 0,
+///								returns flags for edge AB.
+inline int dtGetDetailTriEdgeFlags(unsigned char triFlags, int edgeIndex)
+{
+	return (triFlags >> (edgeIndex * 2)) & 0x3;
+}
 
 /// Configuration parameters used to define multi-tile navigation meshes.
 /// The values are used to allocate space during the initialization of a navigation mesh.
@@ -635,7 +662,9 @@ private:
 							dtPolyRef* polys, const int maxPolys) const;
 	/// Find nearest polygon within a tile.
 	dtPolyRef findNearestPolyInTile(const dtMeshTile* tile, const float* center,
-									const float* extents, float* nearestPt) const;
+									const float* halfExtents, float* nearestPt) const;
+	/// Returns whether position is over the poly and the height at the position if so.
+	bool getPolyHeight(const dtMeshTile* tile, const dtPoly* poly, const float* pos, float* height) const;
 	/// Returns closest point on polygon.
 	void closestPointOnPoly(dtPolyRef ref, const float* pos, float* closest, bool* posOverPoly) const;
 	
@@ -655,6 +684,8 @@ private:
 	unsigned int m_tileBits;			///< Number of tile bits in the tile ID.
 	unsigned int m_polyBits;			///< Number of poly bits in the tile ID.
 #endif
+
+	friend class dtNavMeshQuery;
 };
 
 /// Allocates a navigation mesh object using the Detour allocator.
