@@ -4461,15 +4461,43 @@ void Aura::HandleAuraModStat(bool apply, bool /*Real*/)
         return;
     }
 
+    Unit* target = GetTarget();
+
+    // Improved Scorpid Sting
+    if (GetSpellProto()->IsFitToFamilyMask<CF_HUNTER_SCORPID_STING>() && (m_modifier.m_miscvalue == STAT_STRENGTH))
+    {
+        if (apply)
+        {
+            int32 staminaToRemove = 0;
+            Unit::AuraList const& auraClassScripts = GetCaster()->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+            for (const auto& aura : auraClassScripts)
+            {
+                bool exitLoop = false;
+                switch (aura->GetModifier()->m_miscvalue)
+                {
+                    case 2388: staminaToRemove = m_modifier.m_amount * 10 / 100; exitLoop = true; break; // Rank 1
+                    case 2389: staminaToRemove = m_modifier.m_amount * 20 / 100; exitLoop = true; break; // Rank 2
+                    case 2390: staminaToRemove = m_modifier.m_amount * 30 / 100; exitLoop = true; break; // Rank 3
+                }
+                if (exitLoop)
+                    break;
+            }
+            if (staminaToRemove)
+                GetCaster()->CastCustomSpell(target, 19486, &staminaToRemove, nullptr, nullptr, true);
+        }
+        else
+            target->RemoveAurasDueToSpell(19486, this->GetHolder());
+    }
+
     for (int32 i = STAT_STRENGTH; i < MAX_STATS; i++)
     {
         // -1 or -2 is all stats ( misc < -2 checked in function beginning )
         if (m_modifier.m_miscvalue < 0 || m_modifier.m_miscvalue == i)
         {
             //m_target->ApplyStatMod(Stats(i), m_modifier.m_amount,apply);
-            GetTarget()->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(m_modifier.m_amount), apply);
-            if (GetTarget()->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)GetTarget())->ApplyStatBuffMod(Stats(i), float(m_modifier.m_amount), apply);
+            target->HandleStatModifier(UnitMods(UNIT_MOD_STAT_START + i), TOTAL_VALUE, float(m_modifier.m_amount), apply);
+            if (target->GetTypeId() == TYPEID_PLAYER)
+                ((Player*)target)->ApplyStatBuffMod(Stats(i), float(m_modifier.m_amount), apply);
         }
     }
 }
