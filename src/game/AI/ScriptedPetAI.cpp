@@ -106,7 +106,7 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
             ResetPetCombat();
             return;
         }
-        else if (pTarget->HasBreakableByDamageCrowdControlAura() && m_creature->GetCharmInfo() && (m_creature->GetCharmInfo()->GetReactState() != REACT_AGGRESSIVE))
+        else if (pTarget->HasAuraPetShouldAvoidBreaking() && m_creature->GetCharmInfo() && (m_creature->GetCharmInfo()->GetReactState() != REACT_AGGRESSIVE))
         {
             m_creature->CastStop();
             m_creature->AttackStop(true);
@@ -130,7 +130,7 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
             if (Unit * const pTarget = pOwner->getAttackerForHelper())
             {
                 // Prevent scripted pets from breaking CC effects
-                if (!pTarget->HasBreakableByDamageCrowdControlAura())
+                if (!pTarget->HasAuraPetShouldAvoidBreaking())
                     AttackStart(pTarget);
                 else
                 {
@@ -138,7 +138,7 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
                     Unit::AttackerSet attackers = pOwner->getAttackers();
                     for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
                     {
-                        if ((*itr)->IsInMap(m_creature) && (*itr)->isTargetableForAttack() && !(*itr)->HasBreakableByDamageCrowdControlAura())
+                        if ((*itr)->IsInMap(m_creature) && (*itr)->isTargetableForAttack() && !(*itr)->HasAuraPetShouldAvoidBreaking())
                         { 
                             AttackStart((*itr));
                             return;

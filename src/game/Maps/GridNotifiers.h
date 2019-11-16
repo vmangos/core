@@ -1473,34 +1473,38 @@ namespace MaNGOS
     class NearestHostileUnitInAggroRangeCheck
     {
         public:
-            explicit NearestHostileUnitInAggroRangeCheck(Creature const* creature, bool useLOS = false) : _me(creature), _useLOS(useLOS)
+            explicit NearestHostileUnitInAggroRangeCheck(Creature const* creature, bool useLOS = false, bool ignoreCivilians = false) : m_me(creature), m_useLOS(useLOS), m_ignoreCivilians(ignoreCivilians)
             {
                 m_dist = 9999;
             }
             bool operator()(Unit* u)
             {
-                if (!_me->IsHostileTo(u))
+                if (!m_me->IsHostileTo(u))
                     return false;
 
-                if (!u->isVisibleForOrDetect(_me, _me, false))
+                if (!u->isVisibleForOrDetect(m_me, m_me, false))
                     return false;
 
-                if (!u->IsWithinDistInMap(_me, std::min(_me->GetAttackDistance(u), m_dist)))
+                if (!u->IsWithinDistInMap(m_me, std::min(m_me->GetAttackDistance(u), m_dist)))
                     return false;
 
                 if (!u->isTargetableForAttack())
                     return false;
 
-                if (_useLOS && !u->IsWithinLOSInMap(_me))
+                if (m_ignoreCivilians && u->IsCreature() && static_cast<Creature*>(u)->IsCivilian())
                     return false;
 
-                m_dist = _me->GetDistance(u);
+                if (m_useLOS && !u->IsWithinLOSInMap(m_me))
+                    return false;
+
+                m_dist = m_me->GetDistance(u);
                 return true;
             }
 
     private:
-            Creature const* _me;
-            bool _useLOS;
+            Creature const* m_me;
+            bool m_useLOS;
+            bool m_ignoreCivilians;
             float m_dist;
             NearestHostileUnitInAggroRangeCheck(NearestHostileUnitInAggroRangeCheck const&);
     };

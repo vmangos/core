@@ -1378,13 +1378,17 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
 
     // more generic checks
     if (spellInfo_1->SpellIconID == spellInfo_2->SpellIconID &&
-            spellInfo_1->SpellIconID != 0 && spellInfo_1->SpellIconID != 1 && // SpellIconID 1 se stack avec tout ...
+            spellInfo_1->SpellIconID != 0 && spellInfo_1->SpellIconID != 1 && // SpellIconID 1 stacks with everything ...
             spellInfo_1->SpellFamilyName == spellInfo_2->SpellFamilyName &&
             spellInfo_1->SpellVisual == spellInfo_2->SpellVisual &&
-            // Generic peut etre, mais un peu debile .. :O
             // Exception :
-            spellInfo_1->SpellIconID != 516 && // Sprint ameliore
-            spellInfo_1->IsPositiveSpell() == spellInfo_2->IsPositiveSpell() // Jugement n'ecrase pas le sceau en dudu pala-pala
+            spellInfo_1->SpellIconID != 516 && // Improved Sprint
+            // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+            // - Sayge?s buffs at the Darkmoon Faire are now exclusive to one another.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+            !(spellInfo_1->SpellIconID == 1595 && spellInfo_1->SpellVisual == 7042 && spellInfo_2->SpellIconID == 1595 && spellInfo_2->SpellVisual == 7042) &&
+#endif
+            spellInfo_1->IsPositiveSpell() == spellInfo_2->IsPositiveSpell() // judgement does not remove the enemy seal in a pala-pala duel
        )
     {
         bool isModifier = false;
@@ -1416,7 +1420,7 @@ bool SpellMgr::IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) cons
     if (spellInfo_1->SpellFamilyName != spellInfo_2->SpellFamilyName)
         return false;
 
-    // Nostalrius: potions fonctionnent autrement.
+    // potions work differently
     if (spellInfo_1->SpellFamilyName == SPELLFAMILY_POTION)
         return false;
 

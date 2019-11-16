@@ -770,7 +770,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         Unit* SelectAttackingTarget(AttackingTarget target, uint32 position, SpellEntry const* pSpellInfo = nullptr, uint32 selectFlags = SELECT_FLAG_NO_TOTEM) const;
 
         // AI helpers
-        Unit* SelectNearestHostileUnitInAggroRange(bool useLOS) const;
+        Unit* SelectNearestHostileUnitInAggroRange(bool useLOS, bool ignoreCivilians = false) const;
         Unit* SelectNearestTargetInAttackDistance(float dist) const;
         Creature* FindNearestFriendlyGuard(float range) const;
         void CallNearestGuard(Unit* pEnemy) const;

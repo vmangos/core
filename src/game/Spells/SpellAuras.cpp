@@ -7517,6 +7517,14 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
             if (spellproto->IsFitToFamilyMask<CF_HUNTER_ASPECT_OF_THE_HAWK>())
                 return false;
             break;
+        case SPELLFAMILY_DRUID:
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+            // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+            // - Multiple Druids casting Hurricane will no longer stack the slowdown effect
+            if (spellproto->IsFitToFamilyMask<CF_DRUID_HURRICANE>())
+                return false;
+#endif
+            break;
     }
 
     // La bouffe

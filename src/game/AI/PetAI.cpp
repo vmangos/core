@@ -103,32 +103,12 @@ void PetAI::UpdateAI(const uint32 diff)
         m_updateAlliesTimer -= diff;
 
     // First checking if we have some taunt on us
-    Unit* tauntTarget = nullptr;
-    const Unit::AuraList& tauntAuras = m_creature->GetAurasByType(SPELL_AURA_MOD_TAUNT);
-    if (!tauntAuras.empty() && !playerControlled)
-    {
-        Unit* caster = nullptr;
-
-        // Auras are pushed_back, last caster will be on the end
-        Unit::AuraList::const_iterator aura = tauntAuras.end();
-        while (aura != tauntAuras.begin())
-        {
-            --aura;
-            caster = (*aura)->GetCaster();
-            if (caster && caster->isTargetableForAttack())
-            {
-                tauntTarget = caster;
-                break;
-            }
-        }
-
-        if (tauntTarget)
-            DoAttack(tauntTarget, true);
-    }
+    Unit* tauntTarget = !playerControlled ? m_creature->GetTauntTarget() : nullptr;
+    if (tauntTarget)
+        DoAttack(tauntTarget, true);
 
     if (m_creature->getVictim() && m_creature->getVictim()->isAlive())
     {
-
         if (_needToStop())
         {
             _stopAttack();
@@ -496,7 +476,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->getAttackerForHelper())
-        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura() && owner->isInCombat())
+        if (!ownerAttacker->HasAuraPetShouldAvoidBreaking() && owner->isInCombat())
             return ownerAttacker;
 
     // Check owner victim
@@ -510,7 +490,13 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     if (m_creature->HasReactState(REACT_AGGRESSIVE) && allowAutoSelect)
     {
         if (!m_creature->GetCharmInfo()->IsReturning() || m_creature->GetCharmInfo()->IsFollowing() || m_creature->GetCharmInfo()->IsAtStay())
-            if (Unit* nearTarget = m_creature->ToCreature()->SelectNearestHostileUnitInAggroRange(true))
+            // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+            // - Guardians and pets in aggressive mode no longer attack civilians.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+            if (Unit* nearTarget = m_creature->ToCreature()->SelectNearestHostileUnitInAggroRange(true, true))
+#else
+            if (Unit* nearTarget = m_creature->ToCreature()->SelectNearestHostileUnitInAggroRange(true, false))
+#endif
                 return nearTarget;
     }
 
@@ -654,7 +640,7 @@ bool PetAI::CanAttack(Unit* target)
         return m_creature->GetCharmInfo()->IsCommandAttack();
 
     // CC - mobs under crowd control can be attacked if owner commanded
-    if (target->HasBreakableByDamageCrowdControlAura())
+    if (target->HasAuraPetShouldAvoidBreaking())
         return m_creature->GetCharmInfo()->IsCommandAttack();
         
     // Returning - pets ignore attacks only if owner clicked follow

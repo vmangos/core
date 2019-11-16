@@ -37,6 +37,7 @@ enum
     SPELL_WARSTOMP             = 24375,
     SPELL_FIREBALL_VOLLEY      = 22425,
     SPELL_CONFLAGRATION        = 23023,
+    SPELL_SUMMON_PLAYER        = 24776,
     MODEL_INVISIBLE            = 11686,
 
     SPELL_EXPLOSION            = 20038,             // TODO : better use?
@@ -98,6 +99,7 @@ struct boss_razorgoreAI : public ScriptedAI
     uint32 m_uiFireballVolleyTimer;
     uint32 m_uiConflagrationTimer;
     uint32 m_uiInitTimer;
+    uint32 m_uiOutOfReachTimer;
     bool m_uiInit;
 
     uint32 m_uiEvadeTroopsTimer;
@@ -109,7 +111,8 @@ struct boss_razorgoreAI : public ScriptedAI
         m_uiWarStompTimer       = 22000;
         m_uiConflagrationTimer  = 12000;
         m_uiFireballVolleyTimer = 7000;
-        m_uiInitTimer = 5000;
+        m_uiOutOfReachTimer     = 10000;
+        m_uiInitTimer           = 5000;
 
         m_uiEvadeTroopsTimer = 5000;
     }
@@ -282,6 +285,21 @@ struct boss_razorgoreAI : public ScriptedAI
                 else
                     m_uiEvadeTroopsTimer -= uiDiff;
             }
+        }
+
+        // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+        // - Razorgore now has the ability to summon players to him if he cannot 
+        //   reach them for a time.
+        if ((sWorld.GetWowPatch() >= WOW_PATCH_108) && m_creature->CantPathToVictim())
+        {
+            if (m_uiOutOfReachTimer < uiDiff)
+            {
+                DEBUG_EMOTE("summon");
+                if (m_creature->TryToCast(m_creature->getVictim(), SPELL_SUMMON_PLAYER, CF_TRIGGERED, 100) == SPELL_CAST_OK)
+                    m_uiOutOfReachTimer = 10000;
+            }
+            else
+                m_uiOutOfReachTimer -= uiDiff;
         }
 
         if (m_uiCleaveTimer < uiDiff)

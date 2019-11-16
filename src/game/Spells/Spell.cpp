@@ -1507,9 +1507,17 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         }
     }
 
-    // Tell any pets to stop attacking the target on application of breakable crowd control spells
-    if (m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE && m_casterUnit && unit->HasBreakableByDamageCrowdControlAura(m_casterUnit))
+    
+    // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+    // - Pets no longer break off attacks when their target is affected by Warlock Fear.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+    if (((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE) || m_spellInfo->HasAura(SPELL_AURA_MOD_FEAR)) &&
+#else
+    if ((m_spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE) &&
+#endif
+        m_casterUnit && unit->HasAuraPetShouldAvoidBreaking(m_casterUnit))
     {
+        // Tell any pets to stop attacking the target on application of breakable crowd control spells
         Unit::AttackerSet attackers = unit->getAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
         {
