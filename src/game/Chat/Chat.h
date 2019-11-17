@@ -66,12 +66,12 @@ class ChatCommand
 public:
         CommandServer      server;
         const char *       Name;
-        uint32             SecurityLevel;                   // function pointer required correct align (use uint32)
+        uint8              SecurityLevel;                   // function pointer required correct align (use uint32)
         bool               AllowConsole;
         bool (ChatHandler::*Handler)(char* args);
         std::string        Help;
         ChatCommand *      ChildCommands;
-        uint32             Flags;
+        uint8              Flags;
         std::string        FullName;
 };
 
@@ -172,7 +172,7 @@ class MANGOS_DLL_SPEC ChatHandler
         void ForwardCommandToNode();
         void ForwardCommandToMaster();
 
-        bool SetDataForCommandInTable(ChatCommand *table, const char* text, uint32 security, std::string const& help, uint32 flags);
+        bool SetDataForCommandInTable(ChatCommand *table, const char* text, uint8 security, std::string const& help, uint8 flags);
         void ExecuteCommand(const char* text);
         bool ShowHelpForCommand(ChatCommand *table, const char* cmd);
         bool ShowHelpForSubCommands(ChatCommand *table, char const* cmd);

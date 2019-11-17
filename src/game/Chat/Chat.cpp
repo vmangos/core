@@ -1133,7 +1133,7 @@ ChatCommand * ChatHandler::getCommandTable()
         //CheckIntegrity(commandTable, nullptr);
         FillFullCommandsName(commandTable, "");
 
-        QueryResult *result = WorldDatabase.Query("SELECT name,security,help,flags FROM command");
+        QueryResult *result = WorldDatabase.Query("SELECT `name`, `security`, `help`, `flags` FROM `command`");
         if (result)
         {
             do
@@ -1141,7 +1141,7 @@ ChatCommand * ChatHandler::getCommandTable()
                 Field *fields = result->Fetch();
                 std::string name = fields[0].GetCppString();
 
-                SetDataForCommandInTable(commandTable, name.c_str(), fields[1].GetUInt16(), fields[2].GetCppString(), fields[3].GetUInt32());
+                SetDataForCommandInTable(commandTable, name.c_str(), fields[1].GetUInt8(), fields[2].GetCppString(), fields[3].GetUInt8());
 
             }
             while (result->NextRow());
@@ -1365,7 +1365,7 @@ void ChatHandler::CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand)
         ChatCommand* command = &table[i];
 
         if (parentCommand && command->SecurityLevel < parentCommand->SecurityLevel)
-            sLog.outError("Subcommand '%s' of command '%s' have less access level (%u) that parent (%u)",
+            sLog.outError("Subcommand '%s' of command '%s' have less access level (%hhu) that parent (%hhu)",
                           command->Name, parentCommand->Name, command->SecurityLevel, parentCommand->SecurityLevel);
 
         if (!parentCommand && strlen(command->Name) == 0)
@@ -1664,7 +1664,7 @@ void ChatHandler::ExecuteCommand(const char* text)
  *
  * All problems found while command search and updated output as to DB errors log
  */
-bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char* text, uint32 security, std::string const& help, uint32 flags)
+bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char* text, uint8 security, std::string const& help, uint8 flags)
 {
     std::string fullcommand = text;                         // original `text` can't be used. It content destroyed in command code processing.
 
@@ -1678,7 +1678,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char
         case CHAT_COMMAND_OK:
         {
             if (command->SecurityLevel != security)
-                DETAIL_LOG("Table `command` overwrite for command '%s' default security (%u) by %u",
+                DETAIL_LOG("Table `command` overwrite for command '%s' default security (%hhu) by %hhu",
                            fullcommand.c_str(), command->SecurityLevel, security);
 
             command->SecurityLevel = security;
