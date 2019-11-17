@@ -8401,11 +8401,10 @@ InventoryResult Player::CanUnequipItems(uint32 item, uint32 count) const
                 return EQUIP_ERR_OK;
         }
     }
-    Bag *pBag;
+    
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
     {
-        pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i);
-        if (pBag)
+        if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
         {
             for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
             {
@@ -14743,8 +14742,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
         //speed collect rest bonus in offline, in logout, in tavern, city (section/in hour)
         float bubble1 = 0.125f;
         float bubble = fields[23].GetUInt32() > 0
-                       ? bubble1 * sWorld.getConfig(CONFIG_FLOAT_RATE_REST_OFFLINE_IN_TAVERN_OR_CITY)
-                       : bubble0 * sWorld.getConfig(CONFIG_FLOAT_RATE_REST_OFFLINE_IN_WILDERNESS);
+                       ? (bubble1 * sWorld.getConfig(CONFIG_FLOAT_RATE_REST_OFFLINE_IN_TAVERN_OR_CITY))
+                       : (bubble0 * sWorld.getConfig(CONFIG_FLOAT_RATE_REST_OFFLINE_IN_WILDERNESS));
 
         SetRestBonus(GetRestBonus() + time_diff * ((float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) / 72000)*bubble);
     }

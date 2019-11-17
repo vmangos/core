@@ -778,7 +778,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "corpses",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerCorpsesCommand,       "", nullptr },
         { NODE, "exit",           SEC_CONSOLE,        true,  &ChatHandler::HandleServerExitCommand,          "", nullptr },
         { NODE, "idlerestart",    SEC_ADMINISTRATOR,  true, nullptr,                                         "", serverIdleRestartCommandTable },
-        { NODE, "idleshutdown",   SEC_ADMINISTRATOR,  true, nullptr,                                         "", serverShutdownCommandTable },
+        { NODE, "idleshutdown",   SEC_ADMINISTRATOR,  true, nullptr,                                         "", serverIdleShutdownCommandTable },
         { NODE, "info",           SEC_PLAYER,         true,  &ChatHandler::HandleServerInfoCommand,          "", nullptr },
         { NODE, "log",            SEC_CONSOLE,        true, nullptr,                                         "", serverLogCommandTable },
         { NODE, "motd",           SEC_PLAYER,         true,  &ChatHandler::HandleServerMotdCommand,          "", nullptr },

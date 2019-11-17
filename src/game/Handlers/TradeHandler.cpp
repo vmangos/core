@@ -273,7 +273,6 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
 
     Item *myItems[TRADE_SLOT_TRADED_COUNT]  = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
     Item *hisItems[TRADE_SLOT_TRADED_COUNT] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-    bool myCanCompleteTrade = true, hisCanCompleteTrade = true;
 
     // set before checks to properly undo at problems (it already set in to client)
     my_trade->SetAccepted(true);
@@ -418,8 +417,8 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         trader->GetSession()->SendTradeStatus(TRADE_STATUS_TRADE_ACCEPT);
 
         // test if item will fit in each inventory
-        hisCanCompleteTrade = (trader->CanStoreItems(myItems, TRADE_SLOT_TRADED_COUNT) == EQUIP_ERR_OK);
-        myCanCompleteTrade = (_player->CanStoreItems(hisItems, TRADE_SLOT_TRADED_COUNT) == EQUIP_ERR_OK);
+        bool hisCanCompleteTrade = (trader->CanStoreItems(myItems, TRADE_SLOT_TRADED_COUNT) == EQUIP_ERR_OK);
+        bool myCanCompleteTrade = (_player->CanStoreItems(hisItems, TRADE_SLOT_TRADED_COUNT) == EQUIP_ERR_OK);
 
         clearAcceptTradeMode(myItems, hisItems);
 
