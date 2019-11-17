@@ -548,7 +548,7 @@ bool WorldModel::IsUnderObject(const G3D::Vector3& p, const G3D::Vector3& up, bo
     return callback.UnderModel();
 }
 
-bool WorldModel::writeFile(const std::string& filename)
+bool WorldModel::writeFile(std::string const& filename)
 {
     FILE* wf = fopen(filename.c_str(), "wb");
     if (!wf)
@@ -582,7 +582,7 @@ bool WorldModel::writeFile(const std::string& filename)
     return result;
 }
 
-bool WorldModel::readFile(const std::string& filename)
+bool WorldModel::readFile(std::string const& filename)
 {
     FILE* rf = fopen(filename.c_str(), "rb");
     if (!rf)

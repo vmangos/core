@@ -63,9 +63,9 @@ namespace VMAP
             static std::string getTileFileName(uint32 mapID, uint32 tileX, uint32 tileY);
             static uint32 packTileID(uint32 tileX, uint32 tileY) { return tileX << 16 | tileY; }
             static void unpackTileID(uint32 ID, uint32& tileX, uint32& tileY) { tileX = ID >> 16; tileY = ID & 0xFF; }
-            static bool CanLoadMap(const std::string& vmapPath, uint32 mapID, uint32 tileX, uint32 tileY);
+            static bool CanLoadMap(std::string const& vmapPath, uint32 mapID, uint32 tileX, uint32 tileY);
 
-            StaticMapTree(uint32 mapID, const std::string& basePath);
+            StaticMapTree(uint32 mapID, std::string const& basePath);
             ~StaticMapTree();
 
             bool isInLineOfSight(const G3D::Vector3& pos1, const G3D::Vector3& pos2) const;
@@ -76,7 +76,7 @@ namespace VMAP
             bool isUnderModel(G3D::Vector3& pos, float* outDist = nullptr, float* inDist = nullptr) const;
             bool GetLocationInfo(const Vector3& pos, LocationInfo& info) const;
 
-            bool InitMap(const std::string& fname, VMapManager2* vm);
+            bool InitMap(std::string const& fname, VMapManager2* vm);
             void UnloadMap(VMapManager2* vm);
             bool LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);
             void UnloadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm);

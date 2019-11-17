@@ -424,7 +424,7 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
     return dump;
 }
 
-DumpReturn PlayerDumpWriter::WriteDump(const std::string& file, uint32 guid)
+DumpReturn PlayerDumpWriter::WriteDump(std::string const& file, uint32 guid)
 {
     FILE *fout = fopen(file.c_str(), "w");
     if (!fout)
@@ -440,7 +440,7 @@ DumpReturn PlayerDumpWriter::WriteDump(const std::string& file, uint32 guid)
 // Reading - High-level functions
 #define ROLLBACK(DR) {CharacterDatabase.RollbackTransaction(); fclose(fin); return (DR);}
 
-DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, std::string name, uint32 guid)
+DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, std::string name, uint32 guid)
 {
     // check character count
     uint32 charcount = sAccountMgr.GetCharactersCount(account);
@@ -471,7 +471,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
     // normalize the name if specified and check if it exists
     if (!normalizePlayerName(name))
-        name = "";
+        name.clear();
 
     if (ObjectMgr::CheckPlayerName(name, true) == CHAR_NAME_SUCCESS)
     {
@@ -479,12 +479,12 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
         result = CharacterDatabase.PQuery("SELECT * FROM characters WHERE name = '%s'", name.c_str());
         if (result)
         {
-            name = "";                                      // use the one from the dump
+            name.clear();                                      // use the one from the dump
             delete result;
         }
     }
     else
-        name = "";
+        name.clear();
 
     // name encoded or empty
 

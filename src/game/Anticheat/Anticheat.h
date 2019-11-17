@@ -94,7 +94,7 @@ public:
     virtual std::string normalizeMessage(const std::string &msg, uint32 mask = 0) { return msg; }
     virtual bool filterMessage(const std::string &msg) { return 0; }
 
-    virtual void addMessage(const std::string& msg, uint32 type, PlayerPointer from, PlayerPointer to) {}
+    virtual void addMessage(std::string const& msg, uint32 type, PlayerPointer from, PlayerPointer to) {}
 
     virtual bool isMuted(uint32 accountId, bool checkChatType = false, uint32 chatType = 0) const { return false; }
     virtual void mute(uint32 accountId) {}

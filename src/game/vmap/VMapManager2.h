@@ -72,7 +72,7 @@ namespace VMAP
             ModelFileMap iLoadedModelFiles;
             InstanceTreeMap iInstanceMapTrees;
 
-            bool _loadMap(uint32 pMapId, const std::string& basePath, uint32 tileX, uint32 tileY);
+            bool _loadMap(uint32 pMapId, std::string const& basePath, uint32 tileX, uint32 tileY);
             /* void _unloadMap(uint32 pMapId, uint32 x, uint32 y); */
 
             ACE_RW_Mutex    m_modelsLock;
@@ -103,8 +103,8 @@ namespace VMAP
             bool isUnderModel(unsigned int pMapId, float x, float y, float z, float* outDist = nullptr, float* inDist = nullptr) const override;
             bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 ReqLiquidType, float& level, float& floor, uint32& type) const override;
 
-            WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
-            void releaseModelInstance(const std::string& filename);
+            WorldModel* acquireModelInstance(std::string const& basepath, std::string const& filename);
+            void releaseModelInstance(std::string const& filename);
 
             // what's the use of this? o.O
             std::string getDirFileName(unsigned int pMapId, int /*x*/, int /*y*/) const override

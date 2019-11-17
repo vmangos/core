@@ -38,7 +38,7 @@ public:
 
     // CHAT SYSTEM
     void UpdateSpeakTime();
-    void Whisper(const std::string& text, uint32 language, MasterPlayer* receiver);
+    void Whisper(std::string const& text, uint32 language, MasterPlayer* receiver);
     void ToggleDND();
     void ToggleAFK();
     void JoinedChannel(Channel *c);

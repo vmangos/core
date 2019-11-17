@@ -692,7 +692,7 @@ class MANGOS_DLL_SPEC PlayerTaxi
         void AppendTaximaskTo(ByteBuffer& data, bool all);
 
         // Destinations
-        bool LoadTaxiDestinationsFromString(const std::string& values, Team team);
+        bool LoadTaxiDestinationsFromString(std::string const& values, Team team);
         std::string SaveTaxiDestinationsToString() const;
 
         void ClearTaxiDestinations()
@@ -882,7 +882,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         static UpdateMask updateVisualBits;
         static void InitVisibleBits();
 
-        bool Create(uint32 guidlow, const std::string& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
+        bool Create(uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair);
         void Update(uint32 update_diff, uint32 time) override;
         static bool BuildEnumData(QueryResult* result,  WorldPacket* p_data);
 
@@ -2170,9 +2170,9 @@ class MANGOS_DLL_SPEC Player final: public Unit
         uint8 GetChatTag() const;
 
         float GetYellRange() const;
-        void Say(const std::string& text, const uint32 language) const;
-        void Yell(const std::string& text, const uint32 language) const;
-        void TextEmote(const std::string& text) const;
+        void Say(std::string const& text, const uint32 language) const;
+        void Yell(std::string const& text, const uint32 language) const;
+        void TextEmote(std::string const& text) const;
 
         /*********************************************************/
         /***                   FACTION SYSTEM                  ***/

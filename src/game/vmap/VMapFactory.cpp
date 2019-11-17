@@ -49,7 +49,7 @@ Table<unsigned int, bool>* iIgnoreSpellIds = nullptr;
 //===============================================
 // result false, if no more id are found
 
-bool getNextId(const std::string& pString, unsigned int& pStartPos, unsigned int& pId)
+bool getNextId(std::string const& pString, unsigned int& pStartPos, unsigned int& pId)
 {
     bool result = false;
     unsigned int i;

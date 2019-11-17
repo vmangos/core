@@ -55,7 +55,7 @@ Vector3 ModelPosition::transform(const Vector3& pIn) const
 
 //=================================================================
 
-TileAssembler::TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName) : iSrcDir(pSrcDirName), iDestDir(pDestDirName)
+TileAssembler::TileAssembler(std::string const& pSrcDirName, std::string const& pDestDirName) : iSrcDir(pSrcDirName), iDestDir(pDestDirName)
 {
     iCurrentUniqueNameId = 0;
     iFilterMethod = nullptr;
@@ -287,7 +287,7 @@ struct WMOLiquidHeader
     short type;
 };
 //=================================================================
-bool TileAssembler::convertRawFile(const std::string& pModelFilename)
+bool TileAssembler::convertRawFile(std::string const& pModelFilename)
 {
     std::string filename = iSrcDir;
     if (filename.length() > 0)

@@ -691,14 +691,14 @@ PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow) const
     return nullptr;
 }
 
-PlayerCacheData* ObjectMgr::GetPlayerDataByName(const std::string& name) const
+PlayerCacheData* ObjectMgr::GetPlayerDataByName(std::string const& name) const
 {
     if (ObjectGuid guid = GetPlayerGuidByName(name))
         return GetPlayerDataByGUID(guid.GetCounter());
     return nullptr;
 }
 
-ObjectGuid ObjectMgr::GetPlayerGuidByName(const std::string& name) const
+ObjectGuid ObjectMgr::GetPlayerGuidByName(std::string const& name) const
 {
     auto itr = m_playerNameToGuid.find(name);
     if (itr != m_playerNameToGuid.end())
@@ -765,7 +765,7 @@ uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
     return 0;
 }
 
-uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
+uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(std::string const& name) const
 {
     if (auto pData = sObjectMgr.GetPlayerDataByName(name))
         return pData->uiAccount;
@@ -834,7 +834,7 @@ void ObjectMgr::UpdatePlayerCache(Player* pPlayer)
     UpdatePlayerCachedPosition(data, pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), pPlayer->IsTaxiFlying());
 }
 
-void ObjectMgr::UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, const std::string& name, uint32 level, uint32 zoneId)
+void ObjectMgr::UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, std::string const& name, uint32 level, uint32 zoneId)
 {
     data->uiAccount = accountId;
     data->uiRace = race;
@@ -845,7 +845,7 @@ void ObjectMgr::UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _cl
     data->uiZoneId = zoneId;
 }
 
-PlayerCacheData* ObjectMgr::InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 gender, uint32 accountId, const std::string& name, uint32 level, uint32 zoneId)
+PlayerCacheData* ObjectMgr::InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 gender, uint32 accountId, std::string const& name, uint32 level, uint32 zoneId)
 {
     auto data = new PlayerCacheData;
     data->uiGuid = lowGuid;
@@ -869,7 +869,7 @@ void ObjectMgr::DeletePlayerFromCache(uint32 lowGuid)
     }
 }
 
-void ObjectMgr::ChangePlayerNameInCache(uint32 guidLow, const std::string& oldName, const std::string& newName)
+void ObjectMgr::ChangePlayerNameInCache(uint32 guidLow, std::string const& oldName, std::string const& newName)
 {
     auto itr = m_playerCacheData.find(guidLow);
     if (itr != m_playerCacheData.end())
@@ -8214,7 +8214,7 @@ void ObjectMgr::LoadReservedPlayersNames()
     sLog.outString(">> Loaded %u reserved player names", count);
 }
 
-bool ObjectMgr::IsReservedName(const std::string& name) const
+bool ObjectMgr::IsReservedName(std::string const& name) const
 {
     std::wstring wstr;
     if (!Utf8toWStr(name, wstr))
@@ -8262,7 +8262,7 @@ static LanguageType GetRealmLanguageType(bool create)
     }
 }
 
-bool isValidString(const std::wstring& wstr, uint32 strictMask, bool numericOrSpace, bool create = false)
+bool isValidString(std::wstring const& wstr, uint32 strictMask, bool numericOrSpace, bool create = false)
 {
     if (strictMask == 0)                                    // any language, ignore realm
     {
@@ -8298,7 +8298,7 @@ bool isValidString(const std::wstring& wstr, uint32 strictMask, bool numericOrSp
     return false;
 }
 
-uint8 ObjectMgr::CheckPlayerName(const std::string& name, bool create)
+uint8 ObjectMgr::CheckPlayerName(std::string const& name, bool create)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -8318,7 +8318,7 @@ uint8 ObjectMgr::CheckPlayerName(const std::string& name, bool create)
     return CHAR_NAME_SUCCESS;
 }
 
-bool ObjectMgr::IsValidCharterName(const std::string& name)
+bool ObjectMgr::IsValidCharterName(std::string const& name)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -8336,7 +8336,7 @@ bool ObjectMgr::IsValidCharterName(const std::string& name)
     return isValidString(wname, strictMask, true);
 }
 
-PetNameInvalidReason ObjectMgr::CheckPetName(const std::string& name)
+PetNameInvalidReason ObjectMgr::CheckPetName(std::string const& name)
 {
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
@@ -9248,7 +9248,7 @@ void ObjectMgr::LoadGameTele()
     sLog.outString(">> Loaded %u GameTeleports", count);
 }
 
-GameTele const* ObjectMgr::GetGameTele(const std::string& name) const
+GameTele const* ObjectMgr::GetGameTele(std::string const& name) const
 {
     // explicit name case
     std::wstring wname;
@@ -9291,7 +9291,7 @@ bool ObjectMgr::AddGameTele(GameTele& tele)
                                      new_id, tele.position_x, tele.position_y, tele.position_z, tele.orientation, tele.mapId, tele.name.c_str());
 }
 
-bool ObjectMgr::DeleteGameTele(const std::string& name)
+bool ObjectMgr::DeleteGameTele(std::string const& name)
 {
     // explicit name case
     std::wstring wname;

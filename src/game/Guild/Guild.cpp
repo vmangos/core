@@ -141,7 +141,7 @@ bool Guild::Create(Player* leader, std::string gname)
 
     m_LeaderGuid = leader->GetObjectGuid();
     m_Name = gname;
-    GINFO = "";
+    GINFO.clear();
     MOTD = "No message set.";
     m_Id = sObjectMgr.GenerateGuildId();
 
@@ -584,7 +584,7 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
     return members.empty();
 }
 
-void Guild::BroadcastToGuild(WorldSession *session, const std::string& msg, uint32 language)
+void Guild::BroadcastToGuild(WorldSession *session, std::string const& msg, uint32 language)
 {
     if (!session)
         return;
@@ -608,7 +608,7 @@ void Guild::BroadcastToGuild(WorldSession *session, const std::string& msg, uint
     }
 }
 
-void Guild::BroadcastToOfficers(WorldSession *session, const std::string& msg, uint32 language)
+void Guild::BroadcastToOfficers(WorldSession *session, std::string const& msg, uint32 language)
 {
     if (!session)
         return;
@@ -670,7 +670,7 @@ void Guild::CreateRank(std::string name_, uint32 rights)
     CharacterDatabase.PExecute("INSERT INTO guild_rank (guildid,rid,rname,rights) VALUES ('%u', '%u', '%s', '%u')", m_Id, new_rank_id, name_.c_str(), rights);
 }
 
-void Guild::AddRank(const std::string& name_, uint32 rights)
+void Guild::AddRank(std::string const& name_, uint32 rights)
 {
     m_Ranks.push_back(RankInfo(name_, rights));
 }

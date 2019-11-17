@@ -657,12 +657,12 @@ class ObjectMgr
         }
         void GetPlayerLevelInfo(uint32 race, uint32 class_,uint32 level, PlayerLevelInfo* info) const;
 
-        ObjectGuid GetPlayerGuidByName(const std::string& name) const;
+        ObjectGuid GetPlayerGuidByName(std::string const& name) const;
         bool GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const;
         Team GetPlayerTeamByGUID(ObjectGuid guid) const;
         uint8 GetPlayerClassByGUID(ObjectGuid guid) const;
         uint32 GetPlayerAccountIdByGUID(ObjectGuid guid) const;
-        uint32 GetPlayerAccountIdByPlayerName(const std::string& name) const;
+        uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
 
         uint32 GetNearestTaxiNode( float x, float y, float z, uint32 mapid, Team team );
         void GetTaxiPath( uint32 source, uint32 destination, uint32 &path, uint32 &cost);
@@ -1116,12 +1116,12 @@ class ObjectMgr
 
         // reserved names
         void LoadReservedPlayersNames();
-        bool IsReservedName(const std::string& name) const;
+        bool IsReservedName(std::string const& name) const;
 
         // name with valid structure and symbols
-        static uint8 CheckPlayerName( const std::string& name, bool create = false );
-        static PetNameInvalidReason CheckPetName( const std::string& name );
-        static bool IsValidCharterName( const std::string& name );
+        static uint8 CheckPlayerName(std::string const& name, bool create = false);
+        static PetNameInvalidReason CheckPetName(std::string const& name);
+        static bool IsValidCharterName(std::string const& name);
 
         int GetIndexForLocale(LocaleConstant loc);
         LocaleConstant GetLocaleForIndex(int i);
@@ -1135,10 +1135,10 @@ class ObjectMgr
             return &itr->second;
         }
 
-        GameTele const* GetGameTele(const std::string& name) const;
+        GameTele const* GetGameTele(std::string const& name) const;
         GameTeleMap const& GetGameTeleMap() const { return m_GameTeleMap; }
         bool AddGameTele(GameTele& data);
-        bool DeleteGameTele(const std::string& name);
+        bool DeleteGameTele(std::string const& name);
 
         uint32 GetNpcGossip(uint32 entry) const
         {
@@ -1246,17 +1246,17 @@ class ObjectMgr
         // Caching Player Data
         void LoadPlayerCacheData();
         PlayerCacheData* GetPlayerDataByGUID(uint32 lowGuid) const;
-        PlayerCacheData* GetPlayerDataByName(const std::string& name) const;
+        PlayerCacheData* GetPlayerDataByName(std::string const& name) const;
         void GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData*>& data) const;
         PlayerCacheData* InsertPlayerInCache(Player *pPlayer);
-        PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, const std::string& name, uint32 level, uint32 zoneId);
+        PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, std::string const& name, uint32 level, uint32 zoneId);
         void DeletePlayerFromCache(uint32 lowGuid);
-        void ChangePlayerNameInCache(uint32 lowGuid, const std::string& oldName, const std::string& newName);
+        void ChangePlayerNameInCache(uint32 lowGuid, std::string const& oldName, std::string const& newName);
         void UpdatePlayerCachedPosition(Player *pPlayer);
         void UpdatePlayerCachedPosition(uint32 lowGuid, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight);
         void UpdatePlayerCachedPosition(PlayerCacheData* data, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight);
         void UpdatePlayerCache(Player* pPlayer);
-        void UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, const std::string& name, uint32 level, uint32 zoneId);
+        void UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, std::string const& name, uint32 level, uint32 zoneId);
 
         PlayerCacheDataMap m_playerCacheData;
         std::map<std::string, uint32> m_playerNameToGuid;

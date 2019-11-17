@@ -301,7 +301,7 @@ Player* Group::GetInvited(ObjectGuid guid) const
     return nullptr;
 }
 
-Player* Group::GetInvited(const std::string& name) const
+Player* Group::GetInvited(std::string const& name) const
 {
     for (InvitesList::const_iterator itr = m_invitees.begin(); itr != m_invitees.end(); ++itr)
     {
@@ -531,7 +531,7 @@ void Group::Disband(bool hideDestroy)
 
     _updateLeaderFlag(true);
     m_leaderGuid.Clear();
-    m_leaderName = "";
+    m_leaderName.clear();
 }
 
 /*********************************************************/

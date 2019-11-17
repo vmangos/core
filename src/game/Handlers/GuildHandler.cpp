@@ -490,7 +490,7 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPacket& recvPacket)
     if (!recvPacket.empty())
         recvPacket >> MOTD;
     else
-        MOTD = "";
+        MOTD.clear();
 
     if (MOTD.size() > GUILD_MOTD_MAX_LENGTH)
         return;
@@ -681,7 +681,7 @@ void WorldSession::HandleGuildDelRankOpcode(WorldPacket& /*recvPacket*/)
     guild->Roster();                                        // broadcast for tab rights update
 }
 
-void WorldSession::SendGuildCommandResult(uint32 typecmd, const std::string& str, uint32 cmdresult)
+void WorldSession::SendGuildCommandResult(uint32 typecmd, std::string const& str, uint32 cmdresult)
 {
     WorldPacket data(SMSG_GUILD_COMMAND_RESULT, (8 + str.size() + 1));
     data << typecmd;

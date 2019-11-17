@@ -31,7 +31,7 @@ bool ChatHandler::HandleTeleCommand(char* args)
     if (!*args)
         return false;
 
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
     GameTele const* tele = ExtractGameTeleFromLink(&args);
@@ -43,7 +43,7 @@ bool ChatHandler::HandleTeleCommand(char* args)
         return false;
     }
 
-    return HandleGoHelper(_player, tele->mapId, tele->position_x, tele->position_y, &tele->position_z, &tele->orientation);
+    return HandleGoHelper(pPlayer, tele->mapId, tele->position_x, tele->position_y, &tele->position_z, &tele->orientation);
 }
 
 bool ChatHandler::HandleTeleAddCommand(char* args)
@@ -200,13 +200,14 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
         return false;
     }
 
-    Map* gmMap = m_session->GetPlayer()->GetMap();
+    Player* pPlayer = m_session->GetPlayer();
+    Map* gmMap = pPlayer->GetMap();
     bool to_instance =  gmMap->Instanceable();
 
     // we are in instance, and can summon only player in our group with us as lead
     if (to_instance && (
-                !m_session->GetPlayer()->GetGroup() || (grp->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()) ||
-                (m_session->GetPlayer()->GetGroup()->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid())))
+                !pPlayer->GetGroup() || (grp->GetLeaderGuid() != pPlayer->GetObjectGuid()) ||
+                (pPlayer->GetGroup()->GetLeaderGuid() != pPlayer->GetObjectGuid())))
         // the last check is a bit excessive, but let it be, just in case
     {
         SendSysMessage(LANG_CANNOT_SUMMON_TO_INST);
@@ -218,7 +219,7 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
     {
         Player *pl = itr->getSource();
 
-        if (!pl || pl == m_session->GetPlayer() || !pl->GetSession())
+        if (!pl || pl == pPlayer || !pl->GetSession())
             continue;
 
         // check online security
@@ -263,8 +264,8 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
 
         // before GM
         float x, y, z;
-        m_session->GetPlayer()->GetClosePoint(x, y, z, pl->GetObjectBoundingRadius());
-        pl->TeleportTo(m_session->GetPlayer()->GetMapId(), x, y, z, pl->GetOrientation());
+        pPlayer->GetClosePoint(x, y, z, pl->GetObjectBoundingRadius());
+        pl->TeleportTo(pPlayer->GetMapId(), x, y, z, pl->GetOrientation());
     }
 
     return true;
@@ -279,7 +280,7 @@ static char const* const areatriggerKeys[] =
 
 bool ChatHandler::HandleGoTriggerCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     if (!*args)
         return false;
@@ -317,15 +318,15 @@ bool ChatHandler::HandleGoTriggerCommand(char* args)
             return false;
         }
 
-        return HandleGoHelper(_player, at->target_mapId, at->target_X, at->target_Y, &at->target_Z);
+        return HandleGoHelper(pPlayer, at->target_mapId, at->target_X, at->target_Y, &at->target_Z);
     }
     else
-        return HandleGoHelper(_player, atEntry->mapid, atEntry->x, atEntry->y, &atEntry->z);
+        return HandleGoHelper(pPlayer, atEntry->mapid, atEntry->x, atEntry->y, &atEntry->z);
 }
 
 bool ChatHandler::HandleGoGraveyardCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     uint32 gyId;
     if (!ExtractUInt32(&args, gyId))
@@ -339,7 +340,7 @@ bool ChatHandler::HandleGoGraveyardCommand(char* args)
         return false;
     }
 
-    return HandleGoHelper(_player, gy->map_id, gy->x, gy->y, &gy->z);
+    return HandleGoHelper(pPlayer, gy->map_id, gy->x, gy->y, &gy->z);
 }
 
 enum CreatureLinkType
@@ -372,7 +373,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
     if (!*args)
         return false;
 
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     // "id" or number or [name] Shift-click form |color|Hcreature:creature_id|h[name]|h|r
     int crType;
@@ -412,7 +413,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
             return false;
         }
 
-        FindCreatureData worker(tEntry, m_session ? m_session->GetPlayer() : nullptr);
+        FindCreatureData worker(tEntry, m_session ? pPlayer : nullptr);
 
         sObjectMgr.DoCreatureData(worker);
 
@@ -467,7 +468,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
                 return false;
             }
 
-            FindCreatureData worker(0, m_session ? m_session->GetPlayer() : nullptr);
+            FindCreatureData worker(0, m_session ? pPlayer : nullptr);
 
             do
             {
@@ -503,9 +504,9 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
     x = data->posX;
     y = data->posY;
     z = data->posZ;
-    if (Creature* creature = _player->GetMap()->GetCreature(data->GetObjectGuid(lowguid)))
+    if (Creature* creature = pPlayer->GetMap()->GetCreature(data->GetObjectGuid(lowguid)))
         creature->GetPosition(x, y, z);
-    return HandleGoHelper(_player, data->mapid, x, y, &z);
+    return HandleGoHelper(pPlayer, data->mapid, x, y, &z);
 }
 
 enum GameobjectLinkType
@@ -525,7 +526,7 @@ static char const* const gameobjectKeys[] =
 //teleport to gameobject
 bool ChatHandler::HandleGoObjectCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     // number or [name] Shift-click form |color|Hgameobject:go_guid|h[name]|h|r
     int goType;
@@ -564,7 +565,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
             return false;
         }
 
-        FindGOData worker(tEntry, m_session ? m_session->GetPlayer() : nullptr);
+        FindGOData worker(tEntry, m_session ? pPlayer : nullptr);
 
         sObjectMgr.DoGOData(worker);
 
@@ -622,7 +623,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
                 return false;
             }
 
-            FindGOData worker(0, m_session ? m_session->GetPlayer() : nullptr);
+            FindGOData worker(0, m_session ? pPlayer : nullptr);
 
             do
             {
@@ -653,7 +654,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
     }
     }
 
-    return HandleGoHelper(_player, data->mapid, data->posX, data->posY, &data->posZ);
+    return HandleGoHelper(pPlayer, data->mapid, data->posX, data->posY, &data->posZ);
 }
 
 
@@ -781,7 +782,7 @@ bool ChatHandler::HandleGoTargetCommand(char* /*args*/)
 
 bool ChatHandler::HandleGoTaxinodeCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     uint32 nodeId;
     if (!ExtractUint32KeyFromLink(&args, "Htaxinode", nodeId))
@@ -802,7 +803,7 @@ bool ChatHandler::HandleGoTaxinodeCommand(char* args)
         return false;
     }
 
-    return HandleGoHelper(_player, node->map_id, node->x, node->y, &node->z);
+    return HandleGoHelper(pPlayer, node->map_id, node->x, node->y, &node->z);
 }
 
 bool ChatHandler::HandleGoCommand(char* args)
@@ -810,7 +811,7 @@ bool ChatHandler::HandleGoCommand(char* args)
     if (!*args)
         return false;
 
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     uint32 mapid;
     float x, y, z;
@@ -824,20 +825,20 @@ bool ChatHandler::HandleGoCommand(char* args)
         if (!ExtractFloat(&args, z))
             return false;
 
-        if (!ExtractOptUInt32(&args, mapid, _player->GetMapId()))
+        if (!ExtractOptUInt32(&args, mapid, pPlayer->GetMapId()))
             return false;
     }
     // link case
     else if (!ExtractLocationFromLink(&args, mapid, x, y, z))
         return false;
 
-    return HandleGoHelper(_player, mapid, x, y, &z);
+    return HandleGoHelper(pPlayer, mapid, x, y, &z);
 }
 
 //teleport at coordinates
 bool ChatHandler::HandleGoXYCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     float x;
     if (!ExtractFloat(&args, x))
@@ -848,16 +849,16 @@ bool ChatHandler::HandleGoXYCommand(char* args)
         return false;
 
     uint32 mapid;
-    if (!ExtractOptUInt32(&args, mapid, _player->GetMapId()))
+    if (!ExtractOptUInt32(&args, mapid, pPlayer->GetMapId()))
         return false;
 
-    return HandleGoHelper(_player, mapid, x, y);
+    return HandleGoHelper(pPlayer, mapid, x, y);
 }
 
 //teleport at coordinates, including Z
 bool ChatHandler::HandleGoXYZCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     float x;
     if (!ExtractFloat(&args, x))
@@ -872,16 +873,16 @@ bool ChatHandler::HandleGoXYZCommand(char* args)
         return false;
 
     uint32 mapid;
-    if (!ExtractOptUInt32(&args, mapid, _player->GetMapId()))
+    if (!ExtractOptUInt32(&args, mapid, pPlayer->GetMapId()))
         return false;
 
-    return HandleGoHelper(_player, mapid, x, y, &z);
+    return HandleGoHelper(pPlayer, mapid, x, y, &z);
 }
 
 //teleport at coordinates, including Z and orientation
 bool ChatHandler::HandleGoXYZOCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     float x;
     if (!ExtractFloat(&args, x))
@@ -900,16 +901,16 @@ bool ChatHandler::HandleGoXYZOCommand(char* args)
         return false;
 
     uint32 mapid;
-    if (!ExtractOptUInt32(&args, mapid, _player->GetMapId()))
+    if (!ExtractOptUInt32(&args, mapid, pPlayer->GetMapId()))
         return false;
 
-    return HandleGoHelper(_player, mapid, x, y, &z, &ort);
+    return HandleGoHelper(pPlayer, mapid, x, y, &z, &ort);
 }
 
 //teleport at coordinates
 bool ChatHandler::HandleGoZoneXYCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     float x;
     if (!ExtractFloat(&args, x))
@@ -926,7 +927,7 @@ bool ChatHandler::HandleGoZoneXYCommand(char* args)
             return false;
     }
     else
-        areaid = _player->GetZoneId();
+        areaid = pPlayer->GetZoneId();
 
     const auto *areaEntry = AreaEntry::GetById(areaid);
 
@@ -960,13 +961,13 @@ bool ChatHandler::HandleGoZoneXYCommand(char* args)
         return false;
     }
 
-    return HandleGoHelper(_player, mapEntry->id, x, y);
+    return HandleGoHelper(pPlayer, mapEntry->id, x, y);
 }
 
 //teleport to grid
 bool ChatHandler::HandleGoGridCommand(char* args)
 {
-    Player* _player = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     float grid_x;
     if (!ExtractFloat(&args, grid_x))
@@ -977,14 +978,14 @@ bool ChatHandler::HandleGoGridCommand(char* args)
         return false;
 
     uint32 mapid;
-    if (!ExtractOptUInt32(&args, mapid, _player->GetMapId()))
+    if (!ExtractOptUInt32(&args, mapid, pPlayer->GetMapId()))
         return false;
 
     // center of grid
     float x = (grid_x - CENTER_GRID_ID + 0.5f) * SIZE_OF_GRIDS;
     float y = (grid_y - CENTER_GRID_ID + 0.5f) * SIZE_OF_GRIDS;
 
-    return HandleGoHelper(_player, mapid, x, y);
+    return HandleGoHelper(pPlayer, mapid, x, y);
 }
 
 
@@ -1126,61 +1127,61 @@ bool ChatHandler::HandleRecallCommand(char* args)
 //Summon Player
 bool ChatHandler::HandleNamegoCommand(char* args)
 {
-    Player* target;
+    Player* pTarget;
     ObjectGuid target_guid;
     std::string target_name;
-    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+    if (!ExtractPlayerTarget(&args, &pTarget, &target_guid, &target_name))
         return false;
 
-    Player* _player = m_session->GetPlayer();
-    if (target == _player || target_guid == _player->GetObjectGuid())
+    Player* pPlayer = m_session->GetPlayer();
+    if (pTarget == pPlayer || target_guid == pPlayer->GetObjectGuid())
     {
         PSendSysMessage(LANG_CANT_TELEPORT_SELF);
         SetSentErrorMessage(true);
         return false;
     }
 
-    if (target)
+    if (pTarget)
     {
         std::string nameLink = playerLink(target_name);
         // check online security
-        if (HasLowerSecurity(target))
+        if (HasLowerSecurity(pTarget))
             return false;
 
-        if (target->IsBeingTeleported())
+        if (pTarget->IsBeingTeleported())
         {
             PSendSysMessage(LANG_IS_TELEPORTED, nameLink.c_str());
             SetSentErrorMessage(true);
             return false;
         }
 
-        Map* pMap = m_session->GetPlayer()->GetMap();
+        Map* pMap = pPlayer->GetMap();
 
         if (pMap->IsBattleGround())
         {
-            target->SetBattleGroundId(m_session->GetPlayer()->GetBattleGroundId(), m_session->GetPlayer()->GetBattleGroundTypeId());
+            pTarget->SetBattleGroundId(pPlayer->GetBattleGroundId(), pPlayer->GetBattleGroundTypeId());
             // remember current position as entry point for return at bg end teleportation
-            if (!target->GetMap()->IsBattleGround())
-                target->SetBattleGroundEntryPoint();
+            if (!pTarget->GetMap()->IsBattleGround())
+                pTarget->SetBattleGroundEntryPoint();
         }
         PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), "");
-        if (needReportToTarget(target))
-            ChatHandler(target).PSendSysMessage(LANG_SUMMONED_BY, playerLink(_player->GetName()).c_str());
+        if (needReportToTarget(pTarget))
+            ChatHandler(pTarget).PSendSysMessage(LANG_SUMMONED_BY, playerLink(pPlayer->GetName()).c_str());
 
         // stop flight if need
-        if (target->IsTaxiFlying())
+        if (pTarget->IsTaxiFlying())
         {
-            target->GetMotionMaster()->MovementExpired();
-            target->GetTaxi().ClearTaxiDestinations();
+            pTarget->GetMotionMaster()->MovementExpired();
+            pTarget->GetTaxi().ClearTaxiDestinations();
         }
         // save only in non-flight case
         else
-            target->SaveRecallPosition();
+            pTarget->SaveRecallPosition();
 
         // before GM
         float x, y, z;
-        m_session->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectBoundingRadius());
-        target->TeleportTo(m_session->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT);
+        pPlayer->GetClosePoint(x, y, z, pTarget->GetObjectBoundingRadius());
+        pTarget->TeleportTo(pPlayer->GetMapId(), x, y, z, pTarget->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT);
     }
     else
     {
@@ -1193,12 +1194,12 @@ bool ChatHandler::HandleNamegoCommand(char* args)
         PSendSysMessage(LANG_SUMMONING, nameLink.c_str(), GetMangosString(LANG_OFFLINE));
 
         // in point where GM stay
-        Player::SavePositionInDB(target_guid, m_session->GetPlayer()->GetMapId(),
-                                 m_session->GetPlayer()->GetPositionX(),
-                                 m_session->GetPlayer()->GetPositionY(),
-                                 m_session->GetPlayer()->GetPositionZ(),
-                                 m_session->GetPlayer()->GetOrientation(),
-                                 m_session->GetPlayer()->GetZoneId());
+        Player::SavePositionInDB(target_guid, pPlayer->GetMapId(),
+                                              pPlayer->GetPositionX(),
+                                              pPlayer->GetPositionY(),
+                                              pPlayer->GetPositionZ(),
+                                              pPlayer->GetOrientation(),
+                                              pPlayer->GetZoneId());
     }
 
     return true;
@@ -1207,37 +1208,37 @@ bool ChatHandler::HandleNamegoCommand(char* args)
 //Teleport to Player
 bool ChatHandler::HandleGonameCommand(char* args)
 {
-    Player* target;
+    Player* pTarget;
     ObjectGuid target_guid;
     std::string target_name;
-    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+    if (!ExtractPlayerTarget(&args, &pTarget, &target_guid, &target_name))
         return false;
 
-    Player* _player = m_session->GetPlayer();
-    if (target == _player || target_guid == _player->GetObjectGuid())
+    Player* pPlayer = m_session->GetPlayer();
+    if (pTarget == pPlayer || target_guid == pPlayer->GetObjectGuid())
     {
         SendSysMessage(LANG_CANT_TELEPORT_SELF);
         SetSentErrorMessage(true);
         return false;
     }
 
-    if (target)
+    if (pTarget)
     {
         std::string chrNameLink = playerLink(target_name);
-        Map* cMap = target->GetMap();
+        Map* cMap = pTarget->GetMap();
         uint32 instanceId = 0;
         uint32 teleFlags = TELE_TO_GM_MODE;
-        InstancePlayerBind *bind = _player->GetBoundInstance(target->GetMapId());
+        InstancePlayerBind *bind = pPlayer->GetBoundInstance(pTarget->GetMapId());
 
-        if (_player->GetSmartInstanceBindingMode() && bind)
+        if (pPlayer->GetSmartInstanceBindingMode() && bind)
         {
             instanceId = bind->state->GetInstanceId();
-            _player->UnbindInstance(target->GetMapId());
+            pPlayer->UnbindInstance(pTarget->GetMapId());
         }
 
         if (cMap->IsBattleGround())
         {
-            if (_player->GetBattleGroundId() && _player->GetBattleGroundId() != target->GetBattleGroundId())
+            if (pPlayer->GetBattleGroundId() && pPlayer->GetBattleGroundId() != pTarget->GetBattleGroundId())
             {
                 PSendSysMessage(LANG_CANNOT_GO_TO_BG_FROM_BG, chrNameLink.c_str());
                 SetSentErrorMessage(true);
@@ -1245,25 +1246,25 @@ bool ChatHandler::HandleGonameCommand(char* args)
             }
             // all's well, set bg id
             // when porting out from the bg, it will be reset to 0
-            if(_player->GetBattleGroundId() != target->GetBattleGroundId())
+            if(pPlayer->GetBattleGroundId() != pTarget->GetBattleGroundId())
             {
-                _player->SetBattleGroundId(target->GetBattleGroundId(), target->GetBattleGroundTypeId());
+                pPlayer->SetBattleGroundId(pTarget->GetBattleGroundId(), pTarget->GetBattleGroundTypeId());
                 teleFlags |= TELE_TO_FORCE_MAP_CHANGE;
             }
 
             // remember current position as entry point for return at bg end teleportation
-            if (!_player->GetMap()->IsBattleGround())
-                _player->SetBattleGroundEntryPoint();
+            if (!pPlayer->GetMap()->IsBattleGround())
+                pPlayer->SetBattleGroundEntryPoint();
         }
         else if (cMap->IsDungeon())
         {
             // we have to go to instance, and can go to player only if:
             //   1) we are in his group (either as leader or as member)
             //   2) we are not bound to any group and have GM mode on
-            if (_player->GetGroup())
+            if (pPlayer->GetGroup())
             {
                 // we are in group, we can go only if we are in the player group
-                if (_player->GetGroup() != target->GetGroup())
+                if (pPlayer->GetGroup() != pTarget->GetGroup())
                 {
                     PSendSysMessage(LANG_CANNOT_GO_TO_INST_PARTY, chrNameLink.c_str());
                     SetSentErrorMessage(true);
@@ -1273,23 +1274,23 @@ bool ChatHandler::HandleGonameCommand(char* args)
 
             // if the player or the player's group is bound to another instance
             // the player will not be bound to another one
-            InstancePlayerBind *pBind = _player->GetBoundInstance(target->GetMapId());
+            InstancePlayerBind *pBind = pPlayer->GetBoundInstance(pTarget->GetMapId());
 
             if (!pBind)
             {
-                Group *group = _player->GetGroup();
+                Group *group = pPlayer->GetGroup();
                 // if no bind exists, create a solo bind
-                InstanceGroupBind *gBind = group ? group->GetBoundInstance(target->GetMapId()) : nullptr;
+                InstanceGroupBind *gBind = group ? group->GetBoundInstance(pTarget->GetMapId()) : nullptr;
                 // if no bind exists, create a solo bind
                 if (!gBind)
                 {
-                    DungeonPersistentState *save = ((DungeonMap*)target->GetMap())->GetPersistanceState();
+                    DungeonPersistentState *save = ((DungeonMap*)pTarget->GetMap())->GetPersistanceState();
 
                     // if player is group leader then we need add group bind
-                    if (group && group->IsLeader(_player->GetObjectGuid()))
+                    if (group && group->IsLeader(pPlayer->GetObjectGuid()))
                         group->BindToInstance(save, !save->CanReset());
                     else
-                        _player->BindToInstance(save, !save->CanReset());
+                        pPlayer->BindToInstance(save, !save->CanReset());
 
                     if (instanceId && instanceId != save->GetInstanceId()) {
                         teleFlags |= TELE_TO_FORCE_MAP_CHANGE;
@@ -1299,24 +1300,24 @@ bool ChatHandler::HandleGonameCommand(char* args)
         }
 
         PSendSysMessage(LANG_APPEARING_AT_ONLINE, chrNameLink.c_str());
-        if (needReportToTarget(target))
-            ChatHandler(target).PSendSysMessage(LANG_APPEARING_TO, GetNameLink().c_str());
+        if (needReportToTarget(pTarget))
+            ChatHandler(pTarget).PSendSysMessage(LANG_APPEARING_TO, GetNameLink().c_str());
 
         // stop flight if need
-        if (_player->IsTaxiFlying())
+        if (pPlayer->IsTaxiFlying())
         {
-            _player->GetMotionMaster()->MovementExpired();
-            _player->GetTaxi().ClearTaxiDestinations();
+            pPlayer->GetMotionMaster()->MovementExpired();
+            pPlayer->GetTaxi().ClearTaxiDestinations();
         }
         // save only in non-flight case
         else
-            _player->SaveRecallPosition();
+            pPlayer->SaveRecallPosition();
 
-        // to point to see at target with same orientation
+        // to point to see at pTarget with same orientation
         float x, y, z;
-        target->GetPosition(x, y, z);
+        pTarget->GetPosition(x, y, z);
 
-        _player->TeleportTo(target->GetMapId(), x, y, z + 5.0f, _player->GetAngle(target), teleFlags);
+        pPlayer->TeleportTo(pTarget->GetMapId(), x, y, z + 5.0f, pPlayer->GetAngle(pTarget), teleFlags);
     }
     else
     {
@@ -1331,7 +1332,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
         if (!Player::LoadPositionFromDB(target_guid, map, x, y, z, o, in_flight))
             return false;
 
-        return HandleGoHelper(_player, map, x, y, &z);
+        return HandleGoHelper(pPlayer, map, x, y, &z);
     }
 
     return true;

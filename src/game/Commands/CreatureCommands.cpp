@@ -850,7 +850,7 @@ bool ChatHandler::HandleNpcDelVendorItemCommand(char* args)
 bool ChatHandler::HandleNpcMoveCommand(char* args)
 {
     uint32 lowguid = 0;
-
+    Player* pPlayer = m_session->GetPlayer();
     Creature* pCreature = GetSelectedCreature();
 
     if (!pCreature)
@@ -866,25 +866,24 @@ bool ChatHandler::HandleNpcMoveCommand(char* args)
             SetSentErrorMessage(true);
             return false;
         }
+        
 
-        Player* player = m_session->GetPlayer();
-
-        if (player->GetMapId() != data->mapid)
+        if (pPlayer->GetMapId() != data->mapid)
         {
             PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
             SetSentErrorMessage(true);
             return false;
         }
 
-        pCreature = player->GetMap()->GetCreature(data->GetObjectGuid(lowguid));
+        pCreature = pPlayer->GetMap()->GetCreature(data->GetObjectGuid(lowguid));
     }
     else
         lowguid = pCreature->GetGUIDLow();
 
-    float x = m_session->GetPlayer()->GetPositionX();
-    float y = m_session->GetPlayer()->GetPositionY();
-    float z = m_session->GetPlayer()->GetPositionZ();
-    float o = m_session->GetPlayer()->GetOrientation();
+    float x = pPlayer->GetPositionX();
+    float y = pPlayer->GetPositionY();
+    float z = pPlayer->GetPositionZ();
+    float o = pPlayer->GetOrientation();
 
     if (pCreature)
     {

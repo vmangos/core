@@ -728,7 +728,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::SendPetNameInvalid(uint32 error, const std::string& name)
+void WorldSession::SendPetNameInvalid(uint32 error, std::string const& name)
 {
     WorldPacket data(SMSG_PET_NAME_INVALID, 0);
     SendPacket(&data);

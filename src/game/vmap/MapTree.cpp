@@ -177,7 +177,7 @@ bool StaticMapTree::GetLocationInfo(const Vector3& pos, LocationInfo& info) cons
     return intersectionCallBack.result;
 }
 
-StaticMapTree::StaticMapTree(uint32 mapID, const std::string& basePath):
+StaticMapTree::StaticMapTree(uint32 mapID, std::string const& basePath):
     iMapID(mapID), iIsTiled(false), iTreeValues(nullptr), iNTreeValues(0), iBasePath(basePath)
 {
     if (iBasePath.length() > 0 && (iBasePath[iBasePath.length() - 1] != '/' && iBasePath[iBasePath.length() - 1] != '\\'))
@@ -287,7 +287,7 @@ float StaticMapTree::getHeight(const Vector3& pPos, float maxSearchDist) const
 
 //=========================================================
 
-bool StaticMapTree::CanLoadMap(const std::string& vmapPath, uint32 mapID, uint32 tileX, uint32 tileY)
+bool StaticMapTree::CanLoadMap(std::string const& vmapPath, uint32 mapID, uint32 tileX, uint32 tileY)
 {
     std::string basePath = vmapPath;
     if (basePath.length() > 0 && (basePath[basePath.length() - 1] != '/' && basePath[basePath.length() - 1] != '\\'))
@@ -324,7 +324,7 @@ bool StaticMapTree::CanLoadMap(const std::string& vmapPath, uint32 mapID, uint32
 
 //=========================================================
 
-bool StaticMapTree::InitMap(const std::string& fname, VMapManager2* vm)
+bool StaticMapTree::InitMap(std::string const& fname, VMapManager2* vm)
 {
     //DEBUG_FILTER_LOG(LOG_FILTER_MAP_LOADING, "Initializing StaticMapTree '%s'", fname.c_str());
     bool success = true;

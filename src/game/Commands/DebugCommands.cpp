@@ -371,7 +371,7 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
         std::string type;
         ifs >> type;
 
-        if (type == "")
+        if (type.empty())
             break;
 
         if (type == "uint8")

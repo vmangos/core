@@ -2005,15 +2005,17 @@ void World::Update(uint32 diff)
 /// Send a packet to all players (except self if mentioned)
 void World::SendGlobalMessage(WorldPacket *packet, WorldSession *self, uint32 team)
 {
-    SessionMap::const_iterator itr;
-    for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    for (const auto& itr : m_sessions)
     {
-        if (itr->second &&
-                itr->second->GetPlayer() &&
-                itr->second->GetPlayer()->IsInWorld() &&
-                itr->second != self &&
-                (team == 0 || itr->second->GetPlayer()->GetTeam() == team))
-            itr->second->SendPacket(packet);
+        if (WorldSession* session = itr.second)
+        {
+            if (session != self)
+            {
+                Player* player = session->GetPlayer();
+                if (player && player->IsInWorld() && (team == TEAM_NONE || player->GetTeam() == team))
+                    session->SendPacket(packet);
+            }
+        }
     }
 }
 
@@ -2075,12 +2077,14 @@ void World::SendWorldText(int32 string_id, ...)
 
     MaNGOS::WorldWorldTextBuilder wt_builder(string_id, &ap);
     MaNGOS::LocalizedPacketListDo<MaNGOS::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    for (const auto& itr : m_sessions)
     {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld())
-            continue;
-
-        wt_do(itr->second->GetPlayer());
+        if (WorldSession* session = itr.second)
+        {
+            Player* player = session->GetPlayer();
+            if (player && player->IsInWorld())
+                wt_do(player);
+        }
     }
 
     va_end(ap);
@@ -2088,16 +2092,17 @@ void World::SendWorldText(int32 string_id, ...)
 
 void World::SendGMTicketText(const char* text)
 {
-    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    for (const auto& itr : m_sessions)
     {
-        if (!itr->second ||
-            !itr->second->GetPlayer() ||
-            !itr->second->GetPlayer()->IsInWorld() ||
-            itr->second->GetSecurity() == SEC_PLAYER ||
-            !itr->second->GetPlayer()->IsAcceptTickets())
-            continue;
-
-        ChatHandler(itr->second->GetPlayer()).SendSysMessage(text);
+        if (WorldSession* session = itr.second)
+        {
+            if (session->GetSecurity() > SEC_PLAYER)
+            {
+                Player* player = session->GetPlayer();
+                if (player && player->IsInWorld() && player->IsAcceptTickets())
+                    ChatHandler(player).SendSysMessage(text);
+            }
+        }
     }
 }
 
@@ -2108,16 +2113,19 @@ void World::SendGMTicketText(int32 string_id, ...)
 
     MaNGOS::WorldWorldTextBuilder wt_builder(string_id, &ap);
     MaNGOS::LocalizedPacketListDo<MaNGOS::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    for (const auto& itr : m_sessions)
     {
-        if (!itr->second ||
-            !itr->second->GetPlayer() ||
-            !itr->second->GetPlayer()->IsInWorld() ||
-            itr->second->GetSecurity() == SEC_PLAYER ||
-            !itr->second->GetPlayer()->IsAcceptTickets())
-            continue;
-
-        wt_do(itr->second->GetPlayer());
+        if (WorldSession* session = itr.second)
+        {
+            if (session->GetSecurity() > SEC_PLAYER)
+            {
+                Player* player = session->GetPlayer();
+                if (player && player->IsInWorld() && player->IsAcceptTickets())
+                {
+                    wt_do(player);
+                }
+            }
+        }
     }
 
     va_end(ap);
@@ -2130,12 +2138,19 @@ void World::SendGMText(int32 string_id, ...)
 
     MaNGOS::WorldWorldTextBuilder wt_builder(string_id, &ap);
     MaNGOS::LocalizedPacketListDo<MaNGOS::WorldWorldTextBuilder> wt_do(wt_builder);
-    for (SessionMap::iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    for (const auto& itr : m_sessions)
     {
-        if (!itr->second || !itr->second->GetPlayer() || !itr->second->GetPlayer()->IsInWorld() || itr->second->GetSecurity() == SEC_PLAYER)
-            continue;
-
-        wt_do(itr->second->GetPlayer());
+        if (WorldSession* session = itr.second)
+        {
+            if (session->GetSecurity() > SEC_PLAYER)
+            {
+                Player* player = session->GetPlayer();
+                if (player && player->IsInWorld())
+                {
+                    wt_do(player);
+                }
+            }
+        }
     }
 
     va_end(ap);
@@ -2162,16 +2177,21 @@ void World::SendGlobalText(const char* text, WorldSession *self)
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
 void World::SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self, uint32 team)
 {
-    SessionMap::const_iterator itr;
-    for (itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
+    for (const auto& itr : m_sessions)
     {
-        if (itr->second &&
-                itr->second->GetPlayer() &&
-                itr->second->GetPlayer()->IsInWorld() &&
-                itr->second->GetPlayer()->GetZoneId() == zone &&
-                itr->second != self &&
-                (team == 0 || itr->second->GetPlayer()->GetTeam() == team))
-            itr->second->SendPacket(packet);
+        if (WorldSession* session = itr.second)
+        {
+            if (session != self)
+            {
+                Player* player = session->GetPlayer();
+                if (player && player->IsInWorld() &&
+                   (player->GetZoneId() == zone) &&
+                   (team == TEAM_NONE || player->GetTeam() == team))
+                {
+                    session->SendPacket(packet);
+                }
+            }
+        }
     }
 }
 
@@ -2189,19 +2209,20 @@ void World::KickAll()
     m_QueuedSessions.clear();                               // prevent send queue update packet and login queued sessions
 
     // session not removed at kick and will removed in next update tick
-    for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        itr->second->KickPlayer();
-    for (SessionSet::const_iterator itr = m_disconnectedSessions.begin(); itr != m_disconnectedSessions.end(); ++itr)
-        (*itr)->KickPlayer();
+    for (const auto& itr : m_sessions)
+        itr.second->KickPlayer();
+    for (const auto& itr : m_disconnectedSessions)
+        (*itr).KickPlayer();
 }
 
 /// Kick (and save) all players with security level less `sec`
 void World::KickAllLess(AccountTypes sec)
 {
     // session not removed at kick and will removed in next update tick
-    for (SessionMap::const_iterator itr = m_sessions.begin(); itr != m_sessions.end(); ++itr)
-        if (itr->second->GetSecurity() < sec)
-            itr->second->KickPlayer();
+    for (const auto& itr : m_sessions)
+        if (WorldSession* session = itr.second)
+            if (session->GetSecurity() < sec)
+                session->KickPlayer();
 }
 
 void World::WarnAccount(uint32 accountId, std::string from, std::string reason, const char* type)
@@ -2382,7 +2403,7 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
 }
 
 /// Remove a ban from an account or IP address
-bool World::RemoveBanAccount(BanMode mode, const std::string& source, const std::string& message, std::string nameOrIP)
+bool World::RemoveBanAccount(BanMode mode, std::string const& source, std::string const& message, std::string nameOrIP)
 {
     if (mode == BAN_IP)
     {

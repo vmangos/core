@@ -100,7 +100,7 @@ namespace VMAP
             std::set<std::string> spawnedModelFiles;
 
         public:
-            TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName);
+            TileAssembler(std::string const& pSrcDirName, std::string const& pDestDirName);
             virtual ~TileAssembler();
 
             bool convertWorld2();
@@ -108,7 +108,7 @@ namespace VMAP
             bool calculateTransformedBound(ModelSpawn& spawn);
 
             void exportGameobjectModels();
-            bool convertRawFile(const std::string& pModelFilename);
+            bool convertRawFile(std::string const& pModelFilename);
             void setModelNameFilterMethod(bool (*pFilterMethod)(char* pName)) { iFilterMethod = pFilterMethod; }
     };
 }                                                           // VMAP

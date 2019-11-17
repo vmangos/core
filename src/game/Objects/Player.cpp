@@ -189,7 +189,7 @@ void PlayerTaxi::AppendTaximaskTo(ByteBuffer& data, bool all)
     }
 }
 
-bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, Team team)
+bool PlayerTaxi::LoadTaxiDestinationsFromString(std::string const& values, Team team)
 {
     ClearTaxiDestinations();
 
@@ -648,7 +648,7 @@ void Player::CleanupsBeforeDelete()
     Unit::CleanupsBeforeDelete();
 }
 
-bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
+bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair)
 {
     Object::_Create(guidlow, 0, HIGHGUID_PLAYER);
 
@@ -3722,11 +3722,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
             continue;
         uint32 unSpellId = itr->first;
         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(unSpellId);
-        if (!spellInfo)
-        {
-            MANGOS_ASSERT(spellInfo);
-            continue;
-        }
+        MANGOS_ASSERT(spellInfo);
 
         // Not send cooldown for this spells
         if (spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
@@ -16849,7 +16845,7 @@ Pet* Player::GetMiniPet() const
     return GetMap()->GetPet(m_miniPetGuid);
 }
 
-void Player::Say(const std::string& text, const uint32 language) const
+void Player::Say(std::string const& text, const uint32 language) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
@@ -16871,14 +16867,14 @@ float Player::GetYellRange() const
     return range;
 }
 
-void Player::Yell(const std::string& text, const uint32 language) const
+void Player::Yell(std::string const& text, const uint32 language) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
     SendMessageToSetInRange(&data, GetYellRange(), true);
 }
 
-void Player::TextEmote(const std::string& text) const
+void Player::TextEmote(std::string const& text) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, text.c_str(), LANG_UNIVERSAL, GetChatTag(), GetObjectGuid(), GetName());

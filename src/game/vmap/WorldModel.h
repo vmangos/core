@@ -121,8 +121,8 @@ namespace VMAP
             bool IntersectPoint(const G3D::Vector3& p, const G3D::Vector3& down, float& dist, AreaInfo& info) const;
             bool IsUnderObject(const G3D::Vector3& p, const G3D::Vector3& up, bool m2, float* outDist = nullptr, float* inDist = nullptr) const;
             bool GetLocationInfo(const G3D::Vector3& p, const G3D::Vector3& down, float& dist, LocationInfo& info) const;
-            bool writeFile(const std::string& filename);
-            bool readFile(const std::string& filename);
+            bool writeFile(std::string const& filename);
+            bool readFile(std::string const& filename);
         protected:
             uint32 RootWMOID;
             std::vector<GroupModel> groupModels;

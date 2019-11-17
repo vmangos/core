@@ -86,7 +86,7 @@ VMAPLoadResult VMapManager2::loadMap(const char* pBasePath, unsigned int pMapId,
 //=========================================================
 // load one tile (internal use only)
 
-bool VMapManager2::_loadMap(unsigned int pMapId, const std::string& basePath, uint32 tileX, uint32 tileY)
+bool VMapManager2::_loadMap(unsigned int pMapId, std::string const& basePath, uint32 tileX, uint32 tileY)
 {
     InstanceTreeMap::iterator instanceTree = iInstanceMapTrees.find(pMapId);
     if (instanceTree == iInstanceMapTrees.end())
@@ -268,7 +268,7 @@ bool VMapManager2::GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint
 
 //=========================================================
 
-WorldModel* VMapManager2::acquireModelInstance(const std::string& basepath, const std::string& filename)
+WorldModel* VMapManager2::acquireModelInstance(std::string const& basepath, std::string const& filename)
 {
     m_modelsLock.acquire_read();
     ModelFileMap::iterator model = iLoadedModelFiles.find(filename);
@@ -301,7 +301,7 @@ WorldModel* VMapManager2::acquireModelInstance(const std::string& basepath, cons
     return model->second.getModel();
 }
 
-void VMapManager2::releaseModelInstance(const std::string& filename)
+void VMapManager2::releaseModelInstance(std::string const& filename)
 {
     m_modelsLock.acquire_read();
     ModelFileMap::iterator model = iLoadedModelFiles.find(filename);

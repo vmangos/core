@@ -199,7 +199,7 @@ struct MemberSlot
 
 struct RankInfo
 {
-    RankInfo(const std::string& _name, uint32 _rights) : Name(_name), Rights(_rights)
+    RankInfo(std::string const& _name, uint32 _rights) : Name(_name), Rights(_rights)
     {
     }
 
@@ -257,8 +257,8 @@ class Guild
         bool LoadRanksFromDB(QueryResult *guildRanksResult);
         bool LoadMembersFromDB(QueryResult *guildMembersResult);
 
-        void BroadcastToGuild(WorldSession *session, const std::string& msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastToOfficers(WorldSession *session, const std::string& msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToGuild(WorldSession *session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToOfficers(WorldSession *session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
         void BroadcastPacketToRank(WorldPacket *packet, uint32 rankId);
         void BroadcastPacket(WorldPacket *packet);
 
@@ -302,7 +302,7 @@ class Guild
             return itr != members.end() ? &itr->second : nullptr;
         }
 
-        MemberSlot* GetMemberSlot(const std::string& name)
+        MemberSlot* GetMemberSlot(std::string const& name)
         {
             for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
                 if(itr->second.Name == name)
@@ -320,7 +320,7 @@ class Guild
         void   LogGuildEvent(uint8 EventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
 
     protected:
-        void AddRank(const std::string& name,uint32 rights);
+        void AddRank(std::string const& name,uint32 rights);
 
         uint32 m_Id;
         std::string m_Name;

@@ -292,8 +292,8 @@ class MANGOS_DLL_SPEC WorldSession
         void SendPacket(WorldPacket const* packet);
         void SendNotification(const char *format,...) ATTR_PRINTF(2,3);
         void SendNotification(int32 string_id,...);
-        void SendPetNameInvalid(uint32 error, const std::string& name);
-        void SendPartyResult(PartyOperation operation, const std::string& member, PartyResult res);
+        void SendPetNameInvalid(uint32 error, std::string const& name);
+        void SendPartyResult(PartyOperation operation, std::string const& member, PartyResult res);
         void SendAreaTriggerMessage(const char* Text, ...) ATTR_PRINTF(2,3);
         void SendQueryTimeResponse();
 
@@ -351,7 +351,7 @@ class MANGOS_DLL_SPEC WorldSession
         static void SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32 accountId);
 
         void SendTrainerList(ObjectGuid guid);
-        void SendTrainerList(ObjectGuid guid, const std::string& strTitle );
+        void SendTrainerList(ObjectGuid guid, std::string const& strTitle );
         void SendTrainingSuccess(ObjectGuid guid, uint32 spellId);
         void SendTrainingFailure(ObjectGuid guid, uint32 serviceId, uint32 errorCode);
 
@@ -421,7 +421,7 @@ class MANGOS_DLL_SPEC WorldSession
         bool SendLearnNewTaxiNode( Creature* unit );
 
         // Guild Team
-        void SendGuildCommandResult(uint32 typecmd, const std::string& str, uint32 cmdresult);
+        void SendGuildCommandResult(uint32 typecmd, std::string const& str, uint32 cmdresult);
         void SendPetitionShowList(ObjectGuid& guid);
         void SendSaveGuildEmblem( uint32 msg );
         void SendBattleGroundJoinError(uint8 err);
@@ -614,10 +614,8 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleEmoteOpcode(WorldPacket& recvPacket);
         void HandleFriendListOpcode(WorldPacket& recvPacket);
         void HandleAddFriendOpcode(WorldPacket& recvPacket);
-        static void HandleAddFriendOpcodeCallBack(QueryResult *result, uint32 accountId);
         void HandleDelFriendOpcode(WorldPacket& recvPacket);
         void HandleAddIgnoreOpcode(WorldPacket& recvPacket);
-        static void HandleAddIgnoreOpcodeCallBack(QueryResult *result, uint32 accountId);
         void HandleDelIgnoreOpcode(WorldPacket& recvPacket);
         void HandleBugOpcode(WorldPacket& recvPacket);
         void HandleSetAmmoOpcode(WorldPacket& recvPacket);

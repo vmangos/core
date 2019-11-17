@@ -28,7 +28,7 @@
 
 struct GameobjectModelData
 {
-    GameobjectModelData(const std::string& name_, const G3D::AABox& box) :
+    GameobjectModelData(std::string const& name_, const G3D::AABox& box) :
         name(name_), bound(box) {}
 
     std::string name;

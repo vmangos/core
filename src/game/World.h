@@ -739,7 +739,7 @@ class World
         int32 GetQueuedSessionPos(WorldSession*);
 
         /// Set a new Message of the Day
-        void SetMotd(const std::string& motd) { m_motd = motd; }
+        void SetMotd(std::string const& motd) { m_motd = motd; }
         /// Get the current Message of the Day
         const char* GetMotd() const { return m_motd.c_str(); }
 
@@ -834,7 +834,7 @@ class World
         void WarnAccount(uint32 accountId, std::string from, std::string reason, const char* type = "WARNING");
         void BanAccount(uint32 accountId, uint32 duration, std::string reason, std::string author);
         BanReturn BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_secs, std::string reason, std::string author);
-        bool RemoveBanAccount(BanMode mode, const std::string& source, const std::string& message, std::string nameOrIP);
+        bool RemoveBanAccount(BanMode mode, std::string const& source, std::string const& message, std::string nameOrIP);
 
         // for max speed access
         static float GetMaxVisibleDistanceOnContinents()    { return m_MaxVisibleDistanceOnContinents; }

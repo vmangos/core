@@ -169,8 +169,8 @@ class MANGOS_DLL_SPEC GossipMenu
         explicit GossipMenu(WorldSession* session);
         ~GossipMenu();
 
-        void AddMenuItem(uint8 Icon, const std::string& Message, bool Coded = false);
-        void AddMenuItem(uint8 Icon, const std::string& Message, uint32 dtSender, uint32 dtAction, const std::string& BoxMessage, bool Coded = false);
+        void AddMenuItem(uint8 Icon, std::string const& Message, bool Coded = false);
+        void AddMenuItem(uint8 Icon, std::string const& Message, uint32 dtSender, uint32 dtAction, std::string const& BoxMessage, bool Coded = false);
 
         // for using from scripts, don't must be inlined
         void AddMenuItem(uint8 Icon, char const* Message, bool Coded = false);
@@ -289,7 +289,7 @@ class MANGOS_DLL_SPEC PlayerMenu
         /*********************************************************/
         void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID);
 
-        void SendQuestGiverQuestList(QEmote eEmote, const std::string& Title, ObjectGuid guid);
+        void SendQuestGiverQuestList(QEmote eEmote, std::string const& Title, ObjectGuid guid);
 
         void SendQuestQueryResponse(Quest const *pQuest);
         void SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcGUID, bool ActivateAccept);
