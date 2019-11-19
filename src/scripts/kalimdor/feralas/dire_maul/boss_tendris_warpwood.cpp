@@ -47,7 +47,7 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
         return false;
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         m_creature->SummonCreature(NPC_ANCIENT_EQUINE_SPIRIT, 
                                    pKiller->GetPositionX(), 
@@ -57,7 +57,7 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
                                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (!m_uiAggroProtector)
         {
@@ -78,7 +78,7 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiInvocation_Timer       = 0;
         m_uiTrampleTimer           = urand(5000, 9000);
@@ -87,14 +87,14 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
         m_uiAggroProtector         = false;
     }
 
-    void AttackStart(Unit* Who)
+    void AttackStart(Unit* Who) override
     {
         ScriptedAI::AttackStart(Who);
         if (m_pInstance)
             m_pInstance->SetData(DATA_TENDRIS_AGGRO, IN_PROGRESS);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->IsNonMeleeSpellCasted(false))
             return;

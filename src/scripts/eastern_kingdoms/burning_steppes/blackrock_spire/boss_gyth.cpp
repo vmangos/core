@@ -113,7 +113,7 @@ struct boss_gythAI : public ScriptedAI
     std::list<uint64> m_lSummonedGuids;
     bool bChromaticChaosCasted;
 
-    void Reset()
+    void Reset() override
     {
         uiDragonsTimer = 3000;
         uiOrcTimer = WAVE_TIMER;
@@ -182,7 +182,7 @@ struct boss_gythAI : public ScriptedAI
         sLog.outString("[Rend]     : %s", what);
 #endif
     }
-    void SummonedCreatureJustDied(Creature* summ)
+    void SummonedCreatureJustDied(Creature* summ) override
     {
         // Rend - invoque par Gyth - peut mourir apres Gyth.
         if (m_creature->isAlive())
@@ -238,7 +238,7 @@ struct boss_gythAI : public ScriptedAI
     }
 
     // NOSTALRIUS END
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
         {
@@ -246,7 +246,7 @@ struct boss_gythAI : public ScriptedAI
             m_uiCombatDoorGUID = m_pInstance->GetData64(GO_GYTH_COMBAT_DOOR);
         }
     }
-    void AttackStart(Unit *target)
+    void AttackStart(Unit *target) override
     {
         // $target commence a nous attaquer.
         if (!m_bAggro)
@@ -267,7 +267,7 @@ struct boss_gythAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
 #ifdef DEBUG_ON
         sLog.outString("Boss GYTH JustDied");
@@ -276,7 +276,7 @@ struct boss_gythAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GYTH, DONE);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
 #ifdef DEBUG_ON
         sLog.outString("Boss GYTH EnterEvadeMode");
@@ -292,7 +292,7 @@ struct boss_gythAI : public ScriptedAI
         }
         Reset();
     }
-    void JustReachedHome()
+    void JustReachedHome() override
     {
 #ifdef DEBUG_ON
         sLog.outString("Boss GYTH JustReachedHome");
@@ -323,7 +323,7 @@ struct boss_gythAI : public ScriptedAI
         ++waveRemainingCount;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_bInitialized)
         {

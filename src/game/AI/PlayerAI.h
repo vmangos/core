@@ -60,10 +60,10 @@ class MANGOS_DLL_SPEC PlayerControlledAI: public PlayerAI
     public:
         explicit PlayerControlledAI(Player* pPlayer, Unit* caster = nullptr);
 
-        virtual ~PlayerControlledAI();
+        ~PlayerControlledAI() override;
 
         // Called at World update tick
-        virtual void UpdateAI(const uint32 /*diff*/);
+        void UpdateAI(const uint32 /*diff*/) override;
         Unit* FindController();
         void UpdateTarget(Unit* victim);
 

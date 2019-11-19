@@ -38,9 +38,9 @@ struct npc_ragged_johnAI : public ScriptedAI
         Reset();
     }
 
-    void Reset() {}
+    void Reset() override {}
 
-    void MoveInLineOfSight(Unit *who)
+    void MoveInLineOfSight(Unit *who) override
     {
         if (who->HasAura(16468, EFFECT_INDEX_0))
         {
@@ -556,7 +556,7 @@ struct npc_klinfranAI : public ScriptedAI
     uint32 m_uiDemonic_Frenzy_Timer;
     uint32 m_uiDespawn_Timer;
 
-    void Reset() 
+    void Reset()  override
     {
         switch (m_creature->GetEntry())
         {
@@ -608,7 +608,7 @@ struct npc_klinfranAI : public ScriptedAI
     }
 
     /** Klinfran the Crazed */
-    void Aggro(Unit* pWho) 
+    void Aggro(Unit* pWho) override
     {
         if (pWho->getClass() == CLASS_HUNTER && (m_hunterGuid.IsEmpty() || m_hunterGuid == pWho->GetObjectGuid())/*&& pWho->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE*/)
         {
@@ -618,7 +618,7 @@ struct npc_klinfranAI : public ScriptedAI
             DemonDespawn();
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         m_creature->SetHomePosition(-8318.19f, -993.662f, 176.956f, 5.65024f);
 
@@ -673,7 +673,7 @@ struct npc_klinfranAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         /** Franklin the Friendly */
         if (m_bTransform)

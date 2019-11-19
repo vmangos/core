@@ -39,7 +39,7 @@ struct boss_kormokAI : public ScriptedAI
     uint32 Mage_Timer;
     bool Mages;
 
-    void Reset()
+    void Reset() override
     {
         ShadowVolley_Timer = 10000;
         BoneShield_Timer = 2000;
@@ -62,7 +62,7 @@ struct boss_kormokAI : public ScriptedAI
                 summonedMage->AI()->AttackStart(victim);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

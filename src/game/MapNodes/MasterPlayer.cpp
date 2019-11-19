@@ -7,8 +7,8 @@
 #include "ObjectAccessor.h"
 
 MasterPlayer::MasterPlayer(WorldSession* s):
-    m_session(s), m_social(nullptr), m_mailsUpdated(false),
-    m_speakTime(0), m_speakCount(0)
+    m_speakTime(0), m_speakCount(0), m_social(nullptr), 
+    m_session(s), m_mailsUpdated(false)
 {
 }
 

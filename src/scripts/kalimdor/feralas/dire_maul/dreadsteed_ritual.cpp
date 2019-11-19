@@ -653,7 +653,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         }
         nodeNb++;
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (eventPhase == 1 || eventPhase == 2 || eventPhase == 4) //and phase < ended
         {
@@ -725,16 +725,16 @@ struct npc_ritual_triggerAI : public ScriptedAI
     {
         Reset();
     }
-    void Reset()
+    void Reset() override
     {
         timer = 0;
     }
-    void EnterCombat(Unit* enemy) {}
-    void AttackedBy(Unit* attacker) {}
-    void AttackStart(Unit * unit) {}
-    void EnterEvadeMode() {}
+    void EnterCombat(Unit* enemy) override {}
+    void AttackedBy(Unit* attacker) override {}
+    void AttackStart(Unit * unit) override {}
+    void EnterEvadeMode() override {}
     uint32 timer;
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         /*if (timer < uiDiff)
         {
@@ -765,7 +765,7 @@ struct go_ritual_nodeAI: public GameObjectAI
     uint32 spell;
     /*bool OnUse(Unit* pUser){ }*/
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (me->GetGoState() == GO_STATE_ACTIVE && me->isSpawned())
         {
@@ -829,14 +829,14 @@ struct boss_lordHelNurathAI : public ScriptedAI
     uint32 m_uiSleep_Timer;
     uint32 m_uiKnockAway_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiShadowWord_Timer = 28000;
         m_uiVielOfShadow_Timer = 16000;
         m_uiSleep_Timer = 21000;
         m_uiKnockAway_Timer = 20000; //less than 20s
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -887,12 +887,12 @@ struct boss_xorothianDreadsteedAI : public ScriptedAI
     uint32 m_uiCharge_Timer;
     uint32 m_uiFlameBuffet_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCharge_Timer = 8000;
         m_uiFlameBuffet_Timer = 10000;
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -914,7 +914,7 @@ struct boss_xorothianDreadsteedAI : public ScriptedAI
             m_uiFlameBuffet_Timer -= uiDiff;
         DoMeleeAttackIfReady();
     }
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         m_creature->CastSpell(m_creature, SPELL_SUMMON_DREADSTEED_SPIRIT, true);
     }

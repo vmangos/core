@@ -21,7 +21,7 @@ class instance_razorfen_kraul : public ScriptedInstance
 {
     public:
         instance_razorfen_kraul(Map* pMap);
-        ~instance_razorfen_kraul() {}
+        ~instance_razorfen_kraul() override {}
 
         void Initialize() override;
 

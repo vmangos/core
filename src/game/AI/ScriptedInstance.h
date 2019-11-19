@@ -30,7 +30,7 @@ class MANGOS_DLL_DECL ScriptedInstance : public InstanceData
     public:
 
         explicit ScriptedInstance(Map* pMap) : InstanceData(pMap) {}
-        ~ScriptedInstance() {}
+        ~ScriptedInstance() override {}
 
         // Default accessor functions
         GameObject* GetSingleGameObjectFromStorage(uint32 uiEntry);

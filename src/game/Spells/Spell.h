@@ -783,11 +783,11 @@ class SpellEvent : public BasicEvent
 {
     public:
         SpellEvent(Spell* spell);
-        virtual ~SpellEvent();
+        ~SpellEvent() override;
 
-        virtual bool Execute(uint64 e_time, uint32 p_time);
-        virtual void Abort(uint64 e_time);
-        virtual bool IsDeletable() const;
+        bool Execute(uint64 e_time, uint32 p_time) override;
+        void Abort(uint64 e_time) override;
+        bool IsDeletable() const override;
         Spell* GetSpell() { return m_Spell; }
     protected:
         Spell* m_Spell;
@@ -797,10 +797,10 @@ class ChannelResetEvent : public BasicEvent
 {
     public:
         ChannelResetEvent(Unit* _caster) : caster(_caster) {}
-        virtual ~ChannelResetEvent() {}
+        ~ChannelResetEvent() override {}
 
-        virtual bool Execute(uint64 e_time, uint32 p_time);
-        virtual void Abort(uint64 e_time);
+        bool Execute(uint64 e_time, uint32 p_time) override;
+        void Abort(uint64 e_time) override;
     protected:
         Unit* caster;
 };

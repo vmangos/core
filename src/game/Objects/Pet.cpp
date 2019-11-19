@@ -62,9 +62,8 @@ bool UnsummonPetDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
 Pet::Pet(PetType type) :
     Creature(CREATURE_SUBTYPE_PET),
     m_TrainingPoints(0), m_resetTalentsCost(0), m_resetTalentsTime(0),
-    m_removed(false), m_happinessTimer(7500), m_loyaltyTimer(12000), m_petType(type), m_duration(0),
-    m_loyaltyPoints(0), m_bonusdamage(0), m_auraUpdateMask(0), m_loading(false),
-    m_enabled(true), m_unSummoned(false), m_focusTimer(4000)
+    m_removed(false), m_focusTimer(4000), m_happinessTimer(7500), m_loyaltyTimer(12000), m_petType(type), m_duration(0),
+    m_loyaltyPoints(0), m_bonusdamage(0), m_auraUpdateMask(0), m_loading(false), m_pTmpCache(nullptr), m_unSummoned(false), m_enabled(true)
 {
     m_name = "Pet";
     m_regenTimer = REGEN_TIME_FULL;
@@ -76,8 +75,6 @@ Pet::Pet(PetType type) :
         SetReactState(REACT_PASSIVE);
     else if (type == GUARDIAN_PET)                          // always aggressive
         SetReactState(REACT_AGGRESSIVE);
-
-    m_pTmpCache = nullptr;
 }
 
 Pet::~Pet()
@@ -1625,7 +1622,6 @@ void Pet::_LoadSpellCooldowns()
                 continue;
 
             data << uint32(spell_id);
-            uint32 timer = uint32(db_time - curTime) * IN_MILLISECONDS;
             data << uint32(uint32(db_time - curTime)*IN_MILLISECONDS);
 
             AddSpellCooldown(spell_id, 0, db_time, db_cat_time, spell->Category);

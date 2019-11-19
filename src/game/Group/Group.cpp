@@ -79,9 +79,9 @@ void Roll::targetObjectBuildLink()
 //============== Group ==============================
 //===================================================
 
-Group::Group() : m_Id(0), m_groupType(GROUPTYPE_NORMAL),
-    m_bgGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON),
-    m_subGroupsCounts(nullptr), m_groupTeam(TEAM_NONE), m_leaderLastOnline(0), m_LFGAreaId(0)
+Group::Group() : m_Id(0), m_leaderLastOnline(0), m_groupType(GROUPTYPE_NORMAL), 
+                 m_bgGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON),
+                 m_subGroupsCounts(nullptr), m_groupTeam(TEAM_NONE), m_LFGAreaId(0)
 {
 }
 
@@ -215,8 +215,8 @@ bool Group::LoadMemberFromDB(uint32 guidLow, uint8 subgroup, bool assistant)
     SubGroupCounterIncrease(subgroup);
 
     Team playerTeam = Player::TeamForRace(data->uiRace);
-    if (m_groupTeam == ALLIANCE && playerTeam == HORDE ||
-        m_groupTeam == HORDE && playerTeam == ALLIANCE)
+    if ((m_groupTeam == ALLIANCE && playerTeam == HORDE) ||
+        (m_groupTeam == HORDE && playerTeam == ALLIANCE))
         m_groupTeam = TEAM_CROSSFACTION;
     if (m_groupTeam == TEAM_NONE)
         m_groupTeam = playerTeam;
@@ -320,8 +320,8 @@ bool Group::AddMember(ObjectGuid guid, const char* name, uint8 joinMethod)
 
     if (Player *player = sObjectMgr.GetPlayer(guid))
     {
-        if (m_groupTeam == ALLIANCE && player->GetTeam() == HORDE ||
-            m_groupTeam == HORDE && player->GetTeam() == ALLIANCE)
+        if ((m_groupTeam == ALLIANCE && player->GetTeam() == HORDE) ||
+            (m_groupTeam == HORDE && player->GetTeam() == ALLIANCE))
             m_groupTeam = TEAM_CROSSFACTION;
         if (m_groupTeam == TEAM_NONE)
             m_groupTeam = player->GetTeam();
@@ -580,8 +580,6 @@ bool Group::FillPremadeLFG(const ObjectGuid& plrGuid, Classes playerClass, Class
     uint32& DpsCount, std::list<ObjectGuid>& processed)
 {
     // We grant the role unless someone else in the group has higher priority for it
-    bool grantRole = true;
-
     RolesPriority priority = LFGQueue::getPriority(playerClass, requiredRole);
 
     for (member_citerator citr = GetMemberSlots().begin(); citr != GetMemberSlots().end(); ++citr)

@@ -66,7 +66,7 @@ struct CreatureAISpellsEntry : CreatureSpellsEntry
 class MANGOS_DLL_SPEC CreatureAI
 {
     public:
-        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_uLastAlertTime(0), m_uiCastingDelay(0), m_bMeleeAttack(true), m_bCombatMovement(true)
+        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_bMeleeAttack(true), m_bCombatMovement(true), m_uiCastingDelay(0), m_uLastAlertTime(0)
         {
             SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
         }

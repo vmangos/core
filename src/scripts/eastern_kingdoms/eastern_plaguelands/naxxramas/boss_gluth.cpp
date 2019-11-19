@@ -90,7 +90,7 @@ struct boss_gluthAI : public ScriptedAI
 
     uint32 five_percent;
     
-    void Reset()
+    void Reset() override
     {
         m_events.Reset();
 

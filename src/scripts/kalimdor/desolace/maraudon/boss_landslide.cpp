@@ -38,14 +38,14 @@ struct boss_landslideAI : public ScriptedAI
     uint32 Trample_Timer;
     uint32 Landslide_Timer;
 
-    void Reset()
+    void Reset() override
     {
         KnockAway_Timer = 8000;
         Trample_Timer = 2000;
         Landslide_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

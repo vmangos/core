@@ -37,13 +37,13 @@ struct boss_grilekAI : public ScriptedAI
     uint32 Avartar_Timer;
     uint32 GroundTremor_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Avartar_Timer = urand(15000, 25000);
         GroundTremor_Timer = urand(8000, 16000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

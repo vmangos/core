@@ -67,18 +67,18 @@ struct boss_general_angerforgeAI : public ScriptedAI
     uint32 m_uiSunderArmorTimer;
     uint32 m_uiAlarmTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiSunderArmorTimer = urand(5 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
         m_uiAlarmTimer = 0;
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->GetMotionMaster()->MoveFollow(m_creature, 0.0f, 0.0f);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

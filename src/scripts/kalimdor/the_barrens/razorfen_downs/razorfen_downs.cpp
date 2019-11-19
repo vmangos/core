@@ -90,7 +90,7 @@ struct boss_ladyFaltheressAI : public ScriptedAI
 
     uint32 MindBlast_Timer;
 
-    void Reset()
+    void Reset() override
     {
         MindBlast_Timer = 8000;
     }
@@ -102,7 +102,7 @@ struct boss_ladyFaltheressAI : public ScriptedAI
         m_creature->SetDisplayId(MODEL_ID_UNDEAD);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -191,13 +191,13 @@ struct npc_belnistraszAI : public npc_escortAI
     uint32 m_uiFireballTimer;
     uint32 m_uiFrostNovaTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFireballTimer = 1000;
         m_uiFrostNovaTimer = 6000;
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
         if (HasEscortState(STATE_ESCORT_PAUSED))
         {
@@ -254,7 +254,7 @@ struct npc_belnistraszAI : public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         SpawnerSummon(pSummoned);
     }
@@ -266,7 +266,7 @@ struct npc_belnistraszAI : public npc_escortAI
             crea->SetRespawnDelay(600000);
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         if (uiPointId == 24)
         {
@@ -275,7 +275,7 @@ struct npc_belnistraszAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (HasEscortState(STATE_ESCORT_PAUSED))
         {
@@ -432,12 +432,12 @@ struct npc_tomb_creatureAI : public ScriptedAI
 
     uint32 uiWebTimer;
 
-    void Reset()
+    void Reset() override
     {
         uiWebTimer = urand(5000, 8000);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!UpdateVictim())
             return;
@@ -456,7 +456,7 @@ struct npc_tomb_creatureAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (pInstance)
             pInstance->SetData(DATA_GONG_WAVES, pInstance->GetData(DATA_GONG_WAVES) + 1);

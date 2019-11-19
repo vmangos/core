@@ -48,7 +48,7 @@ class npc_alterac_bossHelper
         {
             public:
                 ThreatListCopier(Unit* destination) : _dest(destination) {}
-                bool Process(Unit* unit)
+                bool Process(Unit* unit) override
                 {
                     _dest->AI()->AttackStart(unit);
                     return false;
@@ -101,7 +101,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     bool m_bCombat5;
     bool m_bLeashed;
 
-    void Reset()
+    void Reset() override
     {
         m_uiGlobalCooldown = 0;
 
@@ -118,7 +118,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         m_bCombat5 = true;
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (m_bLeashed)
             DoScriptText(SAY_VANNDAR_RESET, m_creature);
@@ -129,7 +129,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         ScriptedAI::EnterEvadeMode();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_bAggro)
         {
@@ -138,7 +138,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         }
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (m_creature->getVictim())
             return;
@@ -147,7 +147,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
             AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_creature->GetMapId() == 30)
             if (m_creature->GetDistance2d(POSITION_VANNDAR_CENTER_X, POSITION_VANNDAR_CENTER_Y) > 35.0f)
@@ -342,7 +342,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     bool m_bCombat5;
     bool m_bLeashed;
 
-    void Reset()
+    void Reset() override
     {
         m_uiGlobalCooldown = 0;
 
@@ -375,7 +375,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (m_bLeashed)
             DoScriptText(SAY_DREKTHAR_RESET, m_creature);
@@ -386,7 +386,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         ScriptedAI::EnterEvadeMode();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_bAggro)
         {
@@ -395,7 +395,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         }
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (m_creature->getVictim())
             return;
@@ -404,7 +404,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
             AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_creature->GetMapId() == 30)
         {
@@ -579,7 +579,7 @@ struct npc_BalindaAI : public ScriptedAI
     bool   m_bSayAggro;
     bool   m_bReset;
 
-    void Reset()
+    void Reset() override
     {
         m_uiGlobalCooldown = 0;
 
@@ -596,7 +596,7 @@ struct npc_BalindaAI : public ScriptedAI
         m_bSayAggro = true;
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (m_creature->getVictim())
             return;
@@ -605,7 +605,7 @@ struct npc_BalindaAI : public ScriptedAI
             AttackStart(pWho);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_bSayAggro)
         {
@@ -614,7 +614,7 @@ struct npc_BalindaAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -819,7 +819,7 @@ struct npc_GalvangarAI : public ScriptedAI
     bool   m_bSayAggro;
     bool   m_bReset;
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_bSayAggro)
         {
@@ -828,7 +828,7 @@ struct npc_GalvangarAI : public ScriptedAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiGlobalCooldown = 0;
 
@@ -845,7 +845,7 @@ struct npc_GalvangarAI : public ScriptedAI
         m_bSayAggro     = true;
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (m_creature->getVictim())
             return;
@@ -854,7 +854,7 @@ struct npc_GalvangarAI : public ScriptedAI
             AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -1030,7 +1030,7 @@ struct npc_WarMasterAI : public ScriptedAI
     uint32 m_uiEnrage_Timer;
     bool   m_isKilled;
 
-    void Reset()
+    void Reset() override
     {
         m_uiGlobalCooldown  = 0;
         m_uiCharge_Timer    = 0;
@@ -1042,7 +1042,7 @@ struct npc_WarMasterAI : public ScriptedAI
         m_creature->clearUnitState(UNIT_STAT_ROOT);
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (m_creature->getVictim())
             return;
@@ -1055,12 +1055,12 @@ struct npc_WarMasterAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* killer)
+    void JustDied(Unit* killer) override
     {
         m_isKilled = true;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         /* Prevents the following bug:
          *  The war master is killed
@@ -1216,11 +1216,11 @@ struct npc_AlteracBowmanAI : public ScriptedAI
     uint32 m_uiShoot_Timer;
     uint32 m_uiReset_Timer;
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         m_creature->AddAura(SPELL_ROOT_SELF, ADD_AURA_PERMANENT);
     }
-    void Reset()
+    void Reset() override
     {
         m_uiShoot_Timer = 100;
         m_uiReset_Timer = 3000;
@@ -1231,13 +1231,13 @@ struct npc_AlteracBowmanAI : public ScriptedAI
         return m_creature->GetDistance(pTarget) < 80.0f && m_creature->IsWithinLOSInMap(pTarget);
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (pWho && !m_creature->getVictim() && m_creature->IsValidAttackTarget(pWho) && TargetWithinShootRange(pWho))
             AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->IsInEvadeMode() && (!m_creature->getVictim() || !TargetWithinShootRange(m_creature->getVictim())))
         {
@@ -1267,7 +1267,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-    void GetAIInformation(ChatHandler& reader)
+    void GetAIInformation(ChatHandler& reader) override
     {
         reader.PSendSysMessage("npc_AlteracBowmanAI::GetAIInformation");
         reader.PSendSysMessage("victim: %s", m_creature->getVictim() ? m_creature->getVictim()->GetName() : "nullptr");
@@ -1296,12 +1296,12 @@ struct npc_AlteracDardoshAI : public ScriptedAI
     // ScriptedInstance* m_pInstance; // remplacer par BG?
     uint32 m_uiCleave_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCleave_Timer = 1000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -1422,12 +1422,12 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
 
     ObjectGuid playerGuid;
 
-    uint32 GetData(uint32)
+    uint32 GetData(uint32) override
     {
         return playerGuid.GetCounter();
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
@@ -1437,7 +1437,7 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
         m_creature->DisappearAndDie();
     }
 
-    void SpellHit(Unit* caster, SpellEntry const* spell)
+    void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COLLAR_USING_ALLIANCE || spell->Id == SPELL_COLLAR_USING_HORDE)
             AttackStart(caster);
@@ -1472,7 +1472,7 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         /** The tamed beast musn't attack */
         if (m_creature->GetEntry() == NPC_RAM_TAMED || m_creature->GetEntry() == NPC_WOLF_TAMED)
@@ -1528,12 +1528,12 @@ struct RamWolfMasterAI : public ScriptedAI
     uint32 m_uiEntryQuest;
     uint32 m_uiCheckTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCheckTimer = 200;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         /** Check if Tamed beast are in 10 meters radius */
         if (m_uiCheckTimer < uiDiff)
@@ -1692,7 +1692,7 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
     uint32 Point;
     uint32 leaderDie_Timer;
 
-    void Reset()
+    void Reset() override
     {
         /** Use the corresponding mount depending on the NPC */
         if (m_creature->GetEntry() == AV_NPC_RAMRIDER)
@@ -1717,7 +1717,7 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
 
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         /** Cavalry dismount in case of aggro situation */
         if (m_creature->GetEntry() == AV_NPC_RAMRIDER ||
@@ -1729,11 +1729,11 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
         SetEscortPaused(true);
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         uint32 commander_id = 0;
 
@@ -1782,10 +1782,10 @@ class npc_korrak_the_bloodragerAI: public ScriptedAI
             Reset();
             m_yell = false;
         }
-        void Reset()
+        void Reset() override
         {
         }
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 diff) override
         {
             if (!m_appeared)
             {
@@ -2149,7 +2149,7 @@ struct AV_NpcEventAI : public npc_escortAI
         }
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         b_isSpeechDone = false;
         isGobSummoned = false;
@@ -2220,7 +2220,7 @@ struct AV_NpcEventAI : public npc_escortAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         if ((m_creature->GetEntry() == AV_NPC_ENTRY_VIPORE && m_creature->GetDistance(-1221.27f, -354.51f, 57.7f) < 5.0f) ||
             (m_creature->GetEntry() == AV_NPC_ENTRY_ICHMAN && m_creature->GetDistance(-1291.28f, -266.65f, 91.66f) < 5.0f))
@@ -2270,7 +2270,7 @@ struct AV_NpcEventAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         /** Cavalry dismount in case of aggro situation */
         if (m_creature->GetEntry() == AV_NPC_RAMRIDER_CMD ||
@@ -2289,7 +2289,7 @@ struct AV_NpcEventAI : public npc_escortAI
         SetEscortPaused(true);
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         switch (i)
         {
@@ -2475,7 +2475,7 @@ struct AV_NpcEventAI : public npc_escortAI
         }
     }
 
-    void JustDied(Unit* pWho)
+    void JustDied(Unit* pWho) override
     {
         /** Unlock speech for Cavalry again */
         b_isSpeechDone = false;
@@ -2639,7 +2639,7 @@ struct AV_NpcEventAI : public npc_escortAI
     }
 
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         switch (m_creature->GetEntry())
         {
@@ -2974,11 +2974,11 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
     bool   b_objectiveGlobalAirAssaultLieutenant = false;
     bool   b_objectiveGlobalAirAssaultCommander  = false;
     uint32 m_faction_id = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
-    uint32 m_actual_ressources;
-    uint32 m_actual_ressources2;
-    uint32 m_objective_ressources;
-    uint32 m_challenge;
-    uint32 m_minRepAssault;
+    uint32 m_actual_ressources = 0;
+    uint32 m_actual_ressources2 = 0;
+    uint32 m_objective_ressources = 0;
+    uint32 m_challenge = 0;
+    uint32 m_minRepAssault = 0;
 
     uint16 uiMessage = 0;
     uint16 uiMessageGlobalAirAssault = 0;
@@ -3498,7 +3498,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         if (isAggro)
         {
@@ -3510,13 +3510,13 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         isAggro = true;
         SetEscortPaused(true);
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         switch (i)
         {
@@ -3555,7 +3555,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
         }
     }
 
-    void JustDied(Unit* pWho)
+    void JustDied(Unit* pWho) override
     {
         isAggro = false;
         // Unlock speech for Cavalry again
@@ -3587,7 +3587,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
 
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         uint32 m_uiTroopsType = 0;
         uint16 m_uiWarcryBC;
@@ -3666,7 +3666,6 @@ bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Q
         return false;
 
     uint32 m_faction_id           = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
-    uint32 m_ressources_delivered = pQuest->ReqItemCount[0];
 
     if (pQuestGiver->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
     {
@@ -4073,7 +4072,7 @@ struct AV_WarRiderAI : public ScriptedAI
     bool isAttacking;
     bool isMovingToPoint;
 
-    void Reset()
+    void Reset() override
     {
         isAttacking = false;
         m_creature->SetFly(true);
@@ -4084,12 +4083,12 @@ struct AV_WarRiderAI : public ScriptedAI
         m_uiStunBombAttack_Timer = 13000;
         m_uiTimerGoDown = 2000;
     }
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         m_creature->GetMotionMaster()->MoveRandom();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!isMovingToPoint)
         {
@@ -4208,7 +4207,7 @@ struct AV_BeaconInvocationObjectAI : public GameObjectAI
         m_invocationTimer = 60000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_invocationTimer < uiDiff)
         {
@@ -4227,7 +4226,7 @@ struct AV_BeaconInvocationObjectAI : public GameObjectAI
             m_invocationTimer -= uiDiff;
     }
     /** Triggered when a player successfully finishes the channelling. Disable the beacon. */
-    bool OnUse(Unit* /*user*/)
+    bool OnUse(Unit* /*user*/) override
     {
         me->AddObjectToRemoveList();
         return true;
@@ -4251,7 +4250,7 @@ class go_av_landmineAI: public GameObjectAI
             if (GameObjectData const* info = me->GetGOData())
                 m_respawnTimer = info->GetRandomRespawnTime();
         }
-        void UpdateAI(uint32 const diff)
+        void UpdateAI(uint32 const diff) override
         {
             if (me->isSpawned())
                 return;
@@ -4264,7 +4263,7 @@ class go_av_landmineAI: public GameObjectAI
             if (!bg->IsActiveEvent(m_eventIdx, 0))
                 me->SetRespawnTime(urand(m_respawnTimer / 2, m_respawnTimer));
         }
-        bool OnUse(Unit* user)
+        bool OnUse(Unit* user) override
         {
             if (!me->IsHostileTo(user))
                 return true; // Do not attack friends !
@@ -4306,7 +4305,7 @@ class av_world_boss_baseai: public npc_escortAI
             }
             bg->SpawnEvent(bgEvent, 0, true, true);
         }
-        void EnterEvadeMode()
+        void EnterEvadeMode() override
         {
             // Modified version of npc_escortAI::EnterEvadeMode
             Unit::SpellAuraHolderMap& creatureAuras = m_creature->GetSpellAuraHolderMap();
@@ -4328,7 +4327,7 @@ class av_world_boss_baseai: public npc_escortAI
             ReturnToCombatStartPosition();
             Reset();
         }
-        void JustDied(Unit* killer)
+        void JustDied(Unit* killer) override
         {
             Map* m = m_creature->GetMap();
             if (!m || !m->IsBattleGround())
@@ -4401,7 +4400,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
     bool   isInvocated;
     bool   isYelling;
 
-    void Reset()
+    void Reset() override
     {
         m_uiBlizzardTimer   = 10000;
         m_uiFrostBoltTimer  = 1000;
@@ -4421,13 +4420,13 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         isAggro = true;
         SetEscortPaused(true);
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         /** If last waypoint reached, then say "Your base is forfeit, puny mortals!" */
         switch (i)
@@ -4442,7 +4441,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         }
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
         {
@@ -4453,7 +4452,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (!isYelling)
         {
@@ -4608,7 +4607,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
     uint32 m_uiEngageTimer;
     bool   isInvocated;
 
-    void Reset()
+    void Reset() override
     {
         m_uiRootsTimer      = 8500;
         m_uiFaerieFireTimer = 5500;
@@ -4627,13 +4626,13 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         isAggro = true;
         SetEscortPaused(true);
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         if (i == 1)
             DoScriptText(SAY_IVUS_PAST_FIELD, m_creature);
@@ -4644,7 +4643,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (isInvocated == false)
         {
@@ -4758,11 +4757,11 @@ struct AV_CommanderAI : public ScriptedAI
 
     uint32 m_uiGripOfCommand_Timer;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         switch (m_creature->GetEntry())
         {
@@ -4801,7 +4800,7 @@ struct AV_DismountAI : public ScriptedAI
     uint32 m_uiMount;
     uint32 m_uiGripOfCommand_Timer;
 
-    void Reset()
+    void Reset() override
     {
         switch (m_creature->GetEntry())
         {
@@ -4840,12 +4839,12 @@ struct AV_DismountAI : public ScriptedAI
         m_creature->Mount(m_uiMount);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->Unmount();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         switch (m_creature->GetEntry())
         {
@@ -4892,7 +4891,7 @@ struct FrostwolfShamanAI : public ScriptedAI
     bool   b_isFirstAggro;
     bool   b_isChanneling;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->CastSpell(m_creature, SPELL_LIGHTNING_SHIELD, false);
         m_uiFrostShock_Timer = 5000;
@@ -4904,7 +4903,7 @@ struct FrostwolfShamanAI : public ScriptedAI
             m_creature->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (b_isFirstAggro)
         {
@@ -4921,7 +4920,7 @@ struct FrostwolfShamanAI : public ScriptedAI
         m_creature->Unmount();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -4973,7 +4972,7 @@ struct DruidOfTheGroveAI : public ScriptedAI
     bool   b_isFirstAggro;
     bool   b_isChanneling;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->CastSpell(m_creature, SPELL_THORNS, false);
         m_uiEntanglingRoots_Timer = 3000;
@@ -4985,7 +4984,7 @@ struct DruidOfTheGroveAI : public ScriptedAI
             m_creature->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (b_isFirstAggro)
         {
@@ -5002,7 +5001,7 @@ struct DruidOfTheGroveAI : public ScriptedAI
         m_creature->Unmount();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -5110,16 +5109,17 @@ class npc_av_battle_npc_summoner: public ScriptedAI
     public:
         npc_av_battle_npc_summoner(Creature* c, uint32 factionId, float targetX, float targetY, float targetZ):
             ScriptedAI(c),
+            m_timer(0),
+            m_totalElapsedTime(0),
+            m_despawnAfterTime(0),
             m_factionId(factionId),
             m_destX(targetX),
             m_destY(targetY),
-            m_destZ(targetZ),
-            m_despawnAfterTime(0),
-            m_totalElapsedTime(0)
+            m_destZ(targetZ)
         {
             Reset();
         }
-        void Reset()
+        void Reset() override
         {
             m_timer = 0;
         }
@@ -5211,14 +5211,14 @@ class npc_av_battle_npc_summoner: public ScriptedAI
             }
         }
 
-        void OnRemoveFromWorld()
+        void OnRemoveFromWorld() override
         {
             for (int i = 0; i < TOTAL_NPC_PER_SPAWN; ++i)
                 if (Creature* c = m_creature->GetMap()->GetCreature(m_summoned[i]))
                     c->DeleteLater();
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 diff) override
         {
             /* Despawn when the capitain is killed */
             bool despawn = false;
@@ -5334,7 +5334,7 @@ struct MineNPC_AI : public ScriptedAI
     uint32 m_uiFlashBomb_Timer;
     uint32 m_uiLandMine_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_bIsBombLaunched         = false;
         m_uiBomb_Timer            = 2700;
@@ -5342,7 +5342,7 @@ struct MineNPC_AI : public ScriptedAI
         m_uiLandMine_Timer        = 9000;
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         Map* map = me->GetMap();
         if (!map->IsBattleGround())
@@ -5360,11 +5360,11 @@ struct MineNPC_AI : public ScriptedAI
                 break;
         }
     }
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -5453,11 +5453,11 @@ struct AV_mineNpcAI : public ScriptedAI
     float  m_destZ;
     uint32 m_originalEntry;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         uint32 m_newEntry = SelectCreatureEntry();
         if (m_newEntry != 0 && m_creature->GetEntry() != m_newEntry)
@@ -5593,7 +5593,7 @@ struct AV_mineNpcAI : public ScriptedAI
         return 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         uint32 m_newEntry = SelectCreatureEntry();
         if (m_newEntry != 0 && m_creature->GetEntry() != m_newEntry)
@@ -5618,10 +5618,10 @@ class npc_av_trigger_for_questAI: public ScriptedAI
         {
             Reset();
         }
-        void Reset()
+        void Reset() override
         {
         }
-        void MoveInLineOfSight(Unit* who)
+        void MoveInLineOfSight(Unit* who) override
         {
             if (!who || !who->IsPlayer() || !who->IsWithinDist(m_creature, 10.0f, false))
                 return;

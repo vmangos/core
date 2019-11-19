@@ -39,18 +39,18 @@ struct boss_houndmaster_lokseyAI : public ScriptedAI
 
     uint32 BloodLust_Timer;
 
-    void Reset()
+    void Reset() override
     {
         BloodLust_Timer = 20000;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         DoCastSpellIfCan(m_creature, SPELL_SUMMONSCARLETHOUND);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -256,8 +256,6 @@ void AdvancedPlayerBotAI::WarlockBattleAI(Unit* NearestAttacker)
     if (!me->movespline->Finalized())
         me->StopMoving();
 
-    uint32 mana = me->GetPower(POWER_MANA);
-
     float RandFactor = frand(0.0f, 1.0f);
 
     if (RandFactor < 0.1f)

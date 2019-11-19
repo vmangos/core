@@ -2210,7 +2210,7 @@ bool Creature::CanInitiateAttack()
 class DynamicRespawnRatesChecker
 {
 public:
-    DynamicRespawnRatesChecker(Creature* crea) : _count(0), _me(crea), _hasNearbyEscort(false)
+    DynamicRespawnRatesChecker(Creature* crea) : _count(0), _hasNearbyEscort(false)
     {
         _myLevel = crea->getLevel();
         _maxLevelDiff = sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_LEVELDIFF);
@@ -2232,7 +2232,6 @@ public:
     bool HasNearbyEscort() const { return _hasNearbyEscort; }
 private:
     uint32 _count;
-    Creature* _me;
     uint32 _myLevel;
     uint32 _maxLevelDiff;
     bool _hasNearbyEscort;
@@ -2248,7 +2247,7 @@ void Creature::ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data)
 
     // Only affects rares and above with the forced flag
     if (GetCreatureInfo()->rank > CREATURE_ELITE_ELITE)
-        if (data && !(data->spawnFlags & SPAWN_FLAG_FORCE_DYNAMIC_ELITE) || !data)
+        if (!data || !(data->spawnFlags & SPAWN_FLAG_FORCE_DYNAMIC_ELITE))
             return;
 
     if (getLevel() > sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_LEVEL_BELOW))

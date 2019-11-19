@@ -127,9 +127,9 @@ public:
         cooldown(initialCD),
         resetCD(resetCD),
         triggered(triggeredSpell),
-        targetSelectFunc(targetSelectFunc),
+        retryOnFail(retryOnFail),
         timeSinceLast(std::numeric_limits<uint32>::max()),
-        retryOnFail(retryOnFail)
+        targetSelectFunc(targetSelectFunc)
     {}
 
     virtual void Reset(int custom = -1) {
@@ -255,13 +255,6 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
 }
 
 // Helper functions for SpellTimer users
-static Unit* selectRandNotStomachFunc(Creature* c) {
-    instance_temple_of_ahnqiraj* inst = dynamic_cast<instance_temple_of_ahnqiraj*>(c->GetInstanceData());
-    if (inst) {
-        return SelectRandomAliveNotStomach(inst);
-    }
-    return nullptr;
-}
 static Unit* selectSelfFunc(Creature* c) {
     return c;
 }
@@ -359,7 +352,7 @@ struct cthunTentacle : public ScriptedAI
         defaultOrientation = m_creature->GetOrientation();
     }
 
-    virtual void Reset() override
+    void Reset() override
     {
         m_creature->addUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
@@ -459,7 +452,6 @@ struct cthunTentacle : public ScriptedAI
             if (m_creature->CanHaveThreatList()) {
                 ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
                 ThreatList::const_iterator itr = threatlist.begin();
-                ThreatList::const_reverse_iterator ritr = threatlist.rbegin();
                 
                 // Implementing this loop manually instead of using Creature::SelectAttackingTarget
                 // to use target->CanReachWithMeleeAutoAttack(creature) instead of creature->isWithinMeleeRange(target),
@@ -539,7 +531,7 @@ public:
         }
     }
 
-    virtual void Reset() override
+    void Reset() override
     {
         cthunTentacle::Reset();
         groundRuptureTimer.Reset();
@@ -644,7 +636,7 @@ struct clawTentacle : public cthunPortalTentacle
     {
     }
 
-    virtual void Reset() override
+    void Reset() override
     {
         cthunPortalTentacle::Reset();
         hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
@@ -792,7 +784,7 @@ struct eye_tentacleAI : public cthunPortalTentacle
         eye_tentacleAI::Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         cthunPortalTentacle::Reset();
         nextMFAttempt = MIND_FLAY_INITIAL_WAIT_DURATION;
@@ -807,7 +799,7 @@ struct eye_tentacleAI : public cthunPortalTentacle
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!cthunPortalTentacle::UpdatePortalTentacle(diff))
             return;
@@ -871,7 +863,7 @@ struct claw_tentacleAI : public clawTentacle
         clawTentacle::Reset();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         clawTentacle::UpdateClawTentacle(diff);
     }
@@ -897,7 +889,7 @@ struct giant_claw_tentacleAI : public clawTentacle
         trashTimer.Reset();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!clawTentacle::UpdateClawTentacle(diff))
             return;
@@ -917,14 +909,14 @@ struct giant_eye_tentacleAI : public cthunPortalTentacle
     {
         giant_eye_tentacleAI::Reset();
     }
-    void Reset()
+    void Reset() override
     {
         cthunPortalTentacle::Reset();
         BeamTimer = GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN;
         isCasting = false;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!isCasting)
         {
@@ -1055,7 +1047,7 @@ struct eye_of_cthunAI : public ScriptedAI
         IsAlreadyPulled = true;
     }
 
-    void Aggro(Unit* puller)
+    void Aggro(Unit* puller) override
     {
         // Just in case someone manages to get through the AggroRadius logic in C'thuns AI
         // we make sure the proper pull-sequence is initiated by calling C'thuns attackstart.
@@ -1066,7 +1058,7 @@ struct eye_of_cthunAI : public ScriptedAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         currentPhase = GREEN_BEAM;
         initialPullerGuid = 0;
@@ -1087,7 +1079,7 @@ struct eye_of_cthunAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_pInstance)
             return;

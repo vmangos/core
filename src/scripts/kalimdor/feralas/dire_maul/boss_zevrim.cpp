@@ -25,19 +25,19 @@ struct boss_zevrimAI : public ScriptedAI
     uint32 m_uiIntensePainTimer;
     uint32 m_uiSacrificeTimer;
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_BOSS_ZEVRIM, DONE);
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiIntensePainTimer    = urand(5000, 9000);
         m_uiSacrificeTimer      = urand(9000, 12000);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->IsNonMeleeSpellCasted(false))
             return;

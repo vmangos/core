@@ -55,9 +55,9 @@ struct npc_morokkAI : public npc_escortAI
 
     bool m_bIsSuccess;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -76,7 +76,7 @@ struct npc_morokkAI : public npc_escortAI
         }
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
         if (m_creature->getVictim())
             return;
@@ -87,7 +87,7 @@ struct npc_morokkAI : public npc_escortAI
         AttackStart(pAttacker);
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -106,7 +106,7 @@ struct npc_morokkAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
@@ -280,7 +280,7 @@ struct npc_private_hendelAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         // if Hendel returns spawn point in MDQP_FIGHT phase, players have failed a quest.
         if (m_mdQuestPhase == MDQP_FIGHT)
@@ -316,7 +316,7 @@ struct npc_private_hendelAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
         if (m_creature->getVictim())
             return;
@@ -460,7 +460,7 @@ struct npc_private_hendelAI : public ScriptedAI
         }
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         ScriptedAI::JustRespawned(); // calls Reset()
 
@@ -482,7 +482,7 @@ struct npc_private_hendelAI : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         // This is required to handle other fight cases For example if NPC is getting attacked by opposite faction, hostile creatures, etc.
         if (m_mdQuestPhase == MDQP_NONE)
@@ -511,7 +511,7 @@ struct npc_private_hendelAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
 #ifdef ELYSIUM_CORE_JUST_RESPAWNED
         if (m_justCreated)
@@ -821,7 +821,7 @@ struct npc_archmage_tervoshAI : public ScriptedAI
     // returns the current phase in the event
     const uint32 getCurrentPhase() const { return m_eventPhase; }
 
-    void Reset()
+    void Reset() override
     {
         m_eventStarted = false;
         m_eventPhase = MDQP_ARRIVE;
@@ -829,7 +829,7 @@ struct npc_archmage_tervoshAI : public ScriptedAI
         m_despawnDelayTimer = TERVOSH_SPAWN_DURATION;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_eventStarted)
         {
@@ -1038,13 +1038,13 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
     uint32 m_uiSpellTimer;
     uint32 m_uiSpecialTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiSpellTimer = 3000;
         m_uiSpecialTimer = 15000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->IsNonMeleeSpellCasted())
             return;
@@ -1204,9 +1204,9 @@ struct npc_stinky_ignatzAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() {}
+    void Reset() override {}
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         currWaypoint = 0;
         timer = 21000;
@@ -1216,7 +1216,7 @@ struct npc_stinky_ignatzAI : public npc_escortAI
     uint32 currWaypoint;
     uint32 timer;
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         currWaypoint = uiPointId;
 
@@ -1250,7 +1250,7 @@ struct npc_stinky_ignatzAI : public npc_escortAI
                 break;
         }
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {

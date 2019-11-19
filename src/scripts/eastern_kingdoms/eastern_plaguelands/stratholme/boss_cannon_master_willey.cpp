@@ -107,7 +107,7 @@ struct boss_cannon_master_willeyAI : public ScriptedAI
     uint32 m_uiShootTimer;
     uint32 m_uiSummonRiflemanTimer;
 
-    void Reset()
+    void Reset() override
     {
         ToggleGate(OPEN);
 
@@ -125,7 +125,7 @@ struct boss_cannon_master_willeyAI : public ScriptedAI
         ToggleGate(CLOSED);
     }
 
-    void JustDied(Unit* Victim)
+    void JustDied(Unit* Victim) override
     {
         ToggleGate(OPEN);
     }

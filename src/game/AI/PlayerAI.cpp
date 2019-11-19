@@ -95,7 +95,7 @@ void PlayerAI::UpdateAI(const uint32 /*diff*/)
 {
 }
 
-PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : uiGlobalCD(0), PlayerAI(pPlayer), controllerGuid(caster ? caster->GetObjectGuid() : ObjectGuid())
+PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : controllerGuid(caster ? caster->GetObjectGuid() : ObjectGuid()), uiGlobalCD(0), PlayerAI(pPlayer)
 {
     ASSERT(pPlayer);
     switch (pPlayer->getClass())

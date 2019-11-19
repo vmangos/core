@@ -129,7 +129,7 @@ struct instance_stratholme : public ScriptedInstance
     uint32 m_uiYsidaReward_Timer;
     uint32 m_uiPostboxesUsed;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -184,7 +184,7 @@ struct instance_stratholme : public ScriptedInstance
         m_uiPostboxesUsed = 0;
     }
 
-    bool IsEncounterInProgress() const
+    bool IsEncounterInProgress() const override
     {
         for (uint8 i = 0; i < STRAT_MAX_ENCOUNTER; i++)
             if (m_auiEncounter[i] == IN_PROGRESS)
@@ -236,7 +236,7 @@ struct instance_stratholme : public ScriptedInstance
         }
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -280,7 +280,7 @@ struct instance_stratholme : public ScriptedInstance
         npc_placeEcarlateGUID.insert(pCreature->GetGUID());
     }
 
-    void OnGameObjectCreate(GameObject* pGo)
+    void OnGameObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -348,7 +348,7 @@ struct instance_stratholme : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature *who)
+    void OnCreatureDeath(Creature *who) override
     {
         switch (who->GetEntry())
         {
@@ -363,7 +363,7 @@ struct instance_stratholme : public ScriptedInstance
         }
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -377,7 +377,7 @@ struct instance_stratholme : public ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -395,7 +395,7 @@ struct instance_stratholme : public ScriptedInstance
         return 0;
     }
 
-    void SetData64(uint32 uiType, uint64 uiData)
+    void SetData64(uint32 uiType, uint64 uiData) override
     {
         switch (uiType)
         {
@@ -404,7 +404,7 @@ struct instance_stratholme : public ScriptedInstance
                 break;
         }
     }
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -660,12 +660,12 @@ struct instance_stratholme : public ScriptedInstance
 
     /** Load / save system */
     std::string strInstData;
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
             return;
@@ -683,14 +683,14 @@ struct instance_stratholme : public ScriptedInstance
 
     bool JoueurDansPiegeRat1()
     {
-        float x1 = 3907.45f;
-        float y1 = -3550.41f;
+        //float x1 = 3907.45f;
+        //float y1 = -3550.41f;
         float x2 = 3909.34f;
         float y2 = -3540.14f;
         float x3 = 3930.1f;
         float y3 = -3554.4f;
-        float x4 = 3931.9f;
-        float y4 = -3544.6f;
+        //float x4 = 3931.9f;
+        //float y4 = -3544.6f;
 
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
         for (Map::PlayerList::const_iterator itr = listeJoueur.begin(); itr != listeJoueur.end(); ++itr)
@@ -758,7 +758,7 @@ struct instance_stratholme : public ScriptedInstance
         }
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         if (m_uiBaronRun_Timer)
         {

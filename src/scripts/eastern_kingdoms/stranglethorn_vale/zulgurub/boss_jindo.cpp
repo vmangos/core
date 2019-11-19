@@ -90,12 +90,12 @@ struct boss_jindoAI : public ScriptedAI
         while (Creature* Crea = m_creature->FindNearestCreature(NPC_BRAINWASH_TOTEM, 150.0f))
             Crea->DisappearAndDie();
     }
-    void JustSummoned(Creature* c)
+    void JustSummoned(Creature* c) override
     {
         summonedCreatures.push_back(c->GetObjectGuid());
         ScriptedAI::JustSummoned(c);
     }
-    void Reset()
+    void Reset() override
     {
         BrainWashTotem_Timer    = 22000;
         HealingWard_Timer       = 12000;
@@ -116,7 +116,7 @@ struct boss_jindoAI : public ScriptedAI
             m_pInstance->SetData(TYPE_JINDO, NOT_STARTED);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_HEX)
         {
@@ -130,14 +130,14 @@ struct boss_jindoAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DespawnAllSummons();
         if (m_pInstance)
             m_pInstance->SetData(TYPE_JINDO, DONE);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         if (m_pInstance)
@@ -151,7 +151,7 @@ struct boss_jindoAI : public ScriptedAI
             Skeleton->AI()->AttackStart(initialTarget);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -299,19 +299,19 @@ struct mob_shade_of_jindoAI : public ScriptedAI
 
     uint32 ShadowShock_Timer;
 
-    void Reset()
+    void Reset() override
     {
         ShadowShock_Timer = 1000;
         m_creature->AddAura(SPELL_INVISIBLE, ADD_AURA_PERMANENT);
     }
 
-    void DamageTaken(Unit *done_by, uint32 &damage)
+    void DamageTaken(Unit *done_by, uint32 &damage) override
     {
         if (done_by && !done_by->HasAura(SPELL_DELUSIONS_OF_JINDO))
             damage = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -345,7 +345,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
     uint64 PlayerMCGuid;
     uint32 CheckTimer;
 
-    void Reset()
+    void Reset() override
     {
         PlayerMCGuid = 0;
         CheckTimer = 0;
@@ -355,7 +355,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
         SetCombatMovement(false);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
         {

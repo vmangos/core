@@ -151,7 +151,7 @@ class MANGOS_DLL_SPEC ChatHandler
             ObjectGuid const& targetGuid = ObjectGuid(), char const* targetName = nullptr,
             char const* channelName = nullptr, uint8 playerRank = 0);
     protected:
-        explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false), m_cluster_is_master(true), m_cluster_is_node(true) {}      // for CLI subclass
+        explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false), m_cluster_is_node(true), m_cluster_is_master(true) {}      // for CLI subclass
 
         bool hasStringAbbr(const char* name, const char* part);
 
@@ -1009,15 +1009,15 @@ class CliHandler : public ChatHandler
             : m_accountId(accountId), m_loginAccessLevel(accessLevel), m_callbackArg(callbackArg), m_print(zprint) {}
 
         // overwrite functions
-        const char *GetMangosString(int32 entry) const;
-        uint32 GetAccountId() const;
-        AccountTypes GetAccessLevel() const;
-        bool isAvailable(ChatCommand const& cmd) const;
-        void SendSysMessage(const char *str);
-        std::string GetNameLink() const;
-        bool needReportToTarget(Player* chr) const;
-        LocaleConstant GetSessionDbcLocale() const;
-        int GetSessionDbLocaleIndex() const;
+        const char *GetMangosString(int32 entry) const override;
+        uint32 GetAccountId() const override;
+        AccountTypes GetAccessLevel() const override;
+        bool isAvailable(ChatCommand const& cmd) const override;
+        void SendSysMessage(const char *str) override;
+        std::string GetNameLink() const override;
+        bool needReportToTarget(Player* chr) const override;
+        LocaleConstant GetSessionDbcLocale() const override;
+        int GetSessionDbLocaleIndex() const override;
 
     private:
         uint32 m_accountId;
@@ -1032,14 +1032,14 @@ class NullChatHandler : public ChatHandler
         explicit NullChatHandler() {}
 
         // overwrite functions
-        const char *GetMangosString(int32 entry) const;
-        uint32 GetAccountId() const { return 0; }
-        AccountTypes GetAccessLevel() const { return SEC_PLAYER; }
-        bool isAvailable(ChatCommand const& cmd) const { return false; }
-        void SendSysMessage(const char *str) {}
-        std::string GetNameLink() const { return ""; }
-        LocaleConstant GetSessionDbcLocale() const;
-        int GetSessionDbLocaleIndex() const;
+        const char *GetMangosString(int32 entry) const override;
+        uint32 GetAccountId() const override { return 0; }
+        AccountTypes GetAccessLevel() const override { return SEC_PLAYER; }
+        bool isAvailable(ChatCommand const& cmd) const override { return false; }
+        void SendSysMessage(const char *str) override {}
+        std::string GetNameLink() const override { return ""; }
+        LocaleConstant GetSessionDbcLocale() const override;
+        int GetSessionDbLocaleIndex() const override;
 };
 
 

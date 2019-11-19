@@ -49,7 +49,7 @@ struct boss_sulfuronAI : public ScriptedAI
     uint32 Flamespear_Timer;
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         Darkstrike_Timer        = 10000;                     //These times are probably wrong
         DemoralizingShout_Timer = 15000;
@@ -61,20 +61,20 @@ struct boss_sulfuronAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SULFURON, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SULFURON, IN_PROGRESS);
         m_creature->SetInCombatWithZone();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SULFURON, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

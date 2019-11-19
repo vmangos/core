@@ -497,7 +497,6 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
 void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Player *player)
 {
     char sMessageRemaining[200]        = "";
-    uint32 faction_spell = 0;
 
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;

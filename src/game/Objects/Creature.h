@@ -496,7 +496,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
     public:
 
         explicit Creature(CreatureSubtype subtype = CREATURE_SUBTYPE_GENERIC);
-        virtual ~Creature();
+        ~Creature() override;
 
         void AddToWorld() override;
         void RemoveFromWorld() override;

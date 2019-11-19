@@ -57,7 +57,7 @@ struct boss_golemaggAI : public ScriptedAI
     uint32 TickTimer;
     bool m_bEnraged;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPyroblastTimer = 7 * IN_MILLISECONDS;            // These timers are probably wrong
         m_uiEarthquakeTimer = 3 * IN_MILLISECONDS;
@@ -83,19 +83,19 @@ struct boss_golemaggAI : public ScriptedAI
         //    m_creature->CastSpell(m_creature, SPELL_MAGMASPLASH, true);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GOLEMAGG, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GOLEMAGG, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -155,13 +155,13 @@ struct mob_core_ragerAI : public ScriptedAI
     uint32 m_uiMangleTimer;
     uint32 TickTimer;
 
-    void Reset()
+    void Reset() override
     {
         TickTimer = 1000;
         m_uiMangleTimer = 7 * IN_MILLISECONDS;               // These times are probably wrong
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
     {
         if (m_pInstance)
         {
@@ -181,7 +181,7 @@ struct mob_core_ragerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

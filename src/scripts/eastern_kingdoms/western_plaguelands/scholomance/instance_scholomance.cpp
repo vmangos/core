@@ -54,7 +54,7 @@ struct instance_scholomance : public ScriptedInstance
     uint32 m_uiBoneMinionCount4;
     uint32 m_uiBoneMinionCount5;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -76,7 +76,7 @@ struct instance_scholomance : public ScriptedInstance
         m_uiBoneMinionCount5 = 0;
 
     }
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -88,7 +88,7 @@ struct instance_scholomance : public ScriptedInstance
                 break;
         }
     }
-    void OnGameObjectCreate(GameObject* pGo)
+    void OnGameObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -126,7 +126,7 @@ struct instance_scholomance : public ScriptedInstance
         }
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         if (uiType == TYPE_GANDLING)
         {
@@ -139,7 +139,7 @@ struct instance_scholomance : public ScriptedInstance
             return m_auiEncounter[uiType];
         return 0;
     }
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -150,7 +150,7 @@ struct instance_scholomance : public ScriptedInstance
         }
         return 0;
     }
-    void OnCreatureDeath(Creature *who)
+    void OnCreatureDeath(Creature *who) override
     {
         switch (who->GetEntry())
         {
@@ -162,7 +162,7 @@ struct instance_scholomance : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -341,12 +341,12 @@ struct instance_scholomance : public ScriptedInstance
         SummonGandlingIfPossible();
     }
     /** Load / save system */
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
             return;
@@ -390,7 +390,7 @@ bool GOOpen_brazier_herald(Player* pUser, GameObject *pGo)
         pInst->SetData(TYPE_KIRTONOS, IN_PROGRESS);
         pGo->PlayDirectSound(SOUND_SCREECH, 0);
 
-        Creature* kirtonos = pUser->SummonCreature(NPC_KIRTONOS, 315.028f, 70.53845f, 102.1496f, 0.3859715f, TEMPSUMMON_DEAD_DESPAWN, 900000);
+        pUser->SummonCreature(NPC_KIRTONOS, 315.028f, 70.53845f, 102.1496f, 0.3859715f, TEMPSUMMON_DEAD_DESPAWN, 900000);
     }
 
     return true;
@@ -426,14 +426,14 @@ struct boss_lordblackwoodAI : public ScriptedAI
     uint32 MultiShot_Timer;
     uint32 LastWayPoint;
 
-    void Reset()
+    void Reset() override
     {
         ShieldBash_Timer = 8000;
         MultiShot_Timer = 1000;
         m_creature->GetMotionMaster()->MovePoint(LastWayPoint, ronde[LastWayPoint].x, ronde[LastWayPoint].y, ronde[LastWayPoint].z);
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (!m_creature->getVictim())
         {
@@ -447,7 +447,7 @@ struct boss_lordblackwoodAI : public ScriptedAI
             LastWayPoint = uiPointId;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -482,7 +482,7 @@ struct go_viewing_room_door : public GameObjectAI
 {
     go_viewing_room_door(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         // Save door state to database
         if (user && user->GetInstanceData())

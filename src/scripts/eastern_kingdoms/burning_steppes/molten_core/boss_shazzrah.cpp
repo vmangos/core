@@ -49,7 +49,7 @@ struct boss_shazzrahAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         ArcaneExplosion_Timer = 2000;
         ShazzrahCurse_Timer = 10000;
@@ -61,19 +61,19 @@ struct boss_shazzrahAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SHAZZRAH, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SHAZZRAH, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SHAZZRAH, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

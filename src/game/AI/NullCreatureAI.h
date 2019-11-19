@@ -32,7 +32,7 @@ class MANGOS_DLL_DECL NullCreatureAI : public CreatureAI
         {
             c->addUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
         }
-        ~NullCreatureAI();
+        ~NullCreatureAI() override;
 
         void MoveInLineOfSight(Unit *) override {}
         void AttackStart(Unit *) override {}

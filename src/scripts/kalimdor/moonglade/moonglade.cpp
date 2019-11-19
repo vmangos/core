@@ -371,7 +371,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
 
     bool m_bIsFirstWave;
 
-    void Reset()
+    void Reset() override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -409,7 +409,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
     }
 
     // Remulos follows player
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         npc_escortAI::EnterEvadeMode();
         if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_bIsFirstWave)
@@ -422,7 +422,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         switch (pSummoned->GetEntry())
         {
@@ -449,7 +449,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -473,7 +473,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -495,7 +495,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -596,7 +596,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         m_uiOutroTimer = 3000;
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -771,7 +771,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
     }
 
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         npc_escortAI::UpdateAI(uiDiff);
 
@@ -1167,7 +1167,7 @@ struct boss_eranikusAI : public ScriptedAI
     ObjectGuid m_uiTyrandeGUID;
     std::list<uint64> m_lPriestessList;
 
-    void Reset()
+    void Reset() override
     {
         m_uiAcidBreathTimer = 10000;
         m_uiNoxiousBreathTimer = 3000;
@@ -1185,7 +1185,7 @@ struct boss_eranikusAI : public ScriptedAI
         SetCombatMovement(false);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (m_creature->GetHealthPercent() < 20.0f)
         {
@@ -1226,7 +1226,7 @@ struct boss_eranikusAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -1244,7 +1244,7 @@ struct boss_eranikusAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         switch (pSummoned->GetEntry())
         {
@@ -1275,7 +1275,7 @@ struct boss_eranikusAI : public ScriptedAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -1329,7 +1329,7 @@ struct boss_eranikusAI : public ScriptedAI
         }
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE || uiPointId != POINT_ID_ERANIKUS_REDEEMED)
             return;
@@ -1338,7 +1338,7 @@ struct boss_eranikusAI : public ScriptedAI
         m_uiEventTimer = 11000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiEventTimer)
         {

@@ -77,7 +77,7 @@ struct go_defias_gunpowderAI: public GameObjectAI
 {
     go_defias_gunpowderAI(GameObject* go) : GameObjectAI(go) {}
 
-    void SummonedMovementInform(Creature* summoned, uint32 motion_type, uint32 point_id)
+    void SummonedMovementInform(Creature* summoned, uint32 motion_type, uint32 point_id) override
     {
         if (motion_type == POINT_MOTION_TYPE)
         {

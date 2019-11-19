@@ -219,11 +219,11 @@ public:
     {
     }
 
-    virtual ~BattlePlayerAI ()
+    ~BattlePlayerAI () override
     {
     }
 
-    virtual void OnPlayerLogin();
+    void OnPlayerLogin() override;
 
 };
 

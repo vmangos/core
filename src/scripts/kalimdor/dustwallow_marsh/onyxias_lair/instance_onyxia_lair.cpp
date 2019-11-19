@@ -11,7 +11,7 @@ struct instance_onyxia_lair : public ScriptedInstance
     };
     uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-    void Initialize() { }
+    void Initialize() override { }
 
     bool IsEncounterInProgress() const override
     {
@@ -21,7 +21,7 @@ struct instance_onyxia_lair : public ScriptedInstance
         return false;
     }
 
-    uint32 GetData(uint32 identifier)
+    uint32 GetData(uint32 identifier) override
     {
         switch (identifier)
         {

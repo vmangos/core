@@ -27,8 +27,8 @@
 #include "Chat.h"
 
 Channel::Channel(std::string const& name)
-    : m_announce(true), m_moderate(false), m_name(name), m_flags(0), m_channelId(0),
-        m_securityLevel(0), m_area_dependant(true), m_levelRestricted(true)
+    : m_area_dependant(true), m_announce(true), m_moderate(false), m_levelRestricted(true),
+      m_name(name), m_flags(0), m_securityLevel(0), m_channelId(0)
 {
     // set special flags if built-in channel
     ChatChannelsEntry const* ch = GetChannelEntryFor(name);

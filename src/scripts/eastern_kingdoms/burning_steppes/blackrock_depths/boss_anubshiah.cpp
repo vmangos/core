@@ -42,7 +42,7 @@ struct boss_anubshiahAI : public ScriptedAI
     uint32 DemonArmor_Timer;
     uint32 EnvelopingWeb_Timer;
 
-    void Reset()
+    void Reset() override
     {
         ShadowBolt_Timer = 7000;
         CurseOfTongues_Timer = 24000;
@@ -51,7 +51,7 @@ struct boss_anubshiahAI : public ScriptedAI
         EnvelopingWeb_Timer = 16000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

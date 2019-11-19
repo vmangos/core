@@ -106,12 +106,12 @@ struct mob_viscidus_globAI : public ScriptedAI
     { }
 
     // dummy methods
-    void Reset() { }
-    void AttackStart(Unit* /*pWho*/) { }
-    void MoveInLineOfSight(Unit* /*pWho*/) { }
+    void Reset() override { }
+    void AttackStart(Unit* /*pWho*/) override { }
+    void MoveInLineOfSight(Unit* /*pWho*/) override { }
 
     // Implements acceleration on timer, prevents combat.
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiGlobStartAccelerationTimer <= uiDiff)
         {
@@ -148,11 +148,11 @@ struct mob_viscidus_triggerAI : public ScriptedAI
     { }
 
     // dummy methods
-    void Reset() { }
-    void AttackStart(Unit* /*pWho*/) { }
-    void MoveInLineOfSight(Unit* /*pWho*/) { }
+    void Reset() override { }
+    void AttackStart(Unit* /*pWho*/) override { }
+    void MoveInLineOfSight(Unit* /*pWho*/) override { }
     // Implements toxin cloud on timer, prevents combat.
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiToxinDelayTimer <= uiDiff)
         {
@@ -213,7 +213,7 @@ struct boss_viscidusAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiGrowTimer = 0;
         m_uiPhase                 = PHASE_NORMAL;
@@ -246,13 +246,13 @@ struct boss_viscidusAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VISCIDUS, IN_PROGRESS);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VISCIDUS, FAIL);
@@ -260,13 +260,13 @@ struct boss_viscidusAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_DESPAWN_GLOBS, CF_TRIGGERED);
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VISCIDUS, DONE);
     }
 
-    void DamageTaken(Unit* pDealer, uint32 &damage)
+    void DamageTaken(Unit* pDealer, uint32 &damage) override
     {
         if (pDealer->IsCreature() && ((Creature*)pDealer)->GetEntry() == NPC_VISCIDUS)
             return;
@@ -279,7 +279,7 @@ struct boss_viscidusAI : public ScriptedAI
             m_creature->SetHealthPercent(1.0f);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_GLOB_OF_VISCIDUS)
         {
@@ -311,7 +311,7 @@ struct boss_viscidusAI : public ScriptedAI
         SetCombatMovement(true);
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_GLOB_OF_VISCIDUS)
         {
@@ -339,7 +339,7 @@ struct boss_viscidusAI : public ScriptedAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId) override
     {
         if (pSummoned->GetEntry() != NPC_GLOB_OF_VISCIDUS || uiType != POINT_MOTION_TYPE || !uiPointId)
             return;
@@ -355,7 +355,7 @@ struct boss_viscidusAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_VISCIDUS_EXPLODE)
         {
@@ -460,7 +460,7 @@ struct boss_viscidusAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

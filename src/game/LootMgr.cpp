@@ -496,7 +496,7 @@ bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
         return false;
     }
 
-    _personal = true;
+    m_personal = true;
     items.reserve(MAX_NR_LOOT_ITEMS);
     m_questItems.reserve(MAX_NR_QUEST_ITEMS);
 
@@ -507,13 +507,13 @@ bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
     if (!personal && group)
     {
         roundRobinPlayer = loot_owner->GetGUID();
-        _personal        = false;
+        m_personal        = false;
         for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
             if (Player* pl = itr->getSource())
             {
                 if (!looted || (pl->IsInWorld() && pl->IsAtGroupRewardDistance(looted)))
                 {
-                    _allowedLooters.push_back(pl->GetObjectGuid());
+                    m_allowedLooters.push_back(pl->GetObjectGuid());
                     FillNotNormalLootFor(pl);
                 }
             }
@@ -531,10 +531,10 @@ bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
 
 bool Loot::IsAllowedLooter(ObjectGuid guid, bool doPersonalCheck) const
 {
-    if (doPersonalCheck && _personal)
+    if (doPersonalCheck && m_personal)
         return true;
 
-    for (std::vector<ObjectGuid>::const_iterator it = _allowedLooters.begin(); it != _allowedLooters.end(); ++it)
+    for (std::vector<ObjectGuid>::const_iterator it = m_allowedLooters.begin(); it != m_allowedLooters.end(); ++it)
         if ((*it) == guid)
             return true;
     return false;
@@ -543,7 +543,7 @@ bool Loot::IsAllowedLooter(ObjectGuid guid, bool doPersonalCheck) const
 void Loot::FillNotNormalLootFor(Player* pl)
 {
     if (pl->IsInWorld())
-        _allowedLooters.push_back(pl->GetObjectGuid());
+        m_allowedLooters.push_back(pl->GetObjectGuid());
     
     uint32 plguid = pl->GetGUIDLow();
 

@@ -479,7 +479,6 @@ class SpellMgr
         bool IsMorePowerfullSpell(uint32 powerfullSpell, uint32 otherSpell, SpellGroup group) const
         {
             // The most powerfull spell appears after less powerfull spells in the list.
-            bool spellPassed = false;
             for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
             {
                 if (itr->first != group)

@@ -34,7 +34,7 @@ struct boss_king_gordokAI : public ScriptedAI
     uint32 m_uiLinkCheckTimer;
     
     
-    void Reset()
+    void Reset() override
     {
         m_uiWarStomp_Timer        = urand(7000, 8000);
         m_uiMortalStrike_Timer    = urand(15000, 25000);
@@ -45,12 +45,12 @@ struct boss_king_gordokAI : public ScriptedAI
         m_uiLinkCheckTimer = 2500;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -179,7 +179,7 @@ struct boss_chorushAI : public ScriptedAI
     bool const m_bLinkCheckEnabled = sWorld.GetWowPatch() >= WOW_PATCH_109;
     uint32 m_uiLinkCheckTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiLinkCheckTimer = 2500;
         m_uiEquipment = 0;
@@ -208,7 +208,7 @@ struct boss_chorushAI : public ScriptedAI
     void UpdateAIShaman(const uint32 uiDiff);
     void UpdateAIPrist(const uint32 uiDiff);
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

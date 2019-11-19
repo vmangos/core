@@ -45,7 +45,7 @@ struct boss_instructormaliciaAI : public ScriptedAI
     uint32 FlashCounter;
     uint32 TouchCounter;
 
-    void Reset()
+    void Reset() override
     {
         CallOfGraves_Timer = 4000;
         Corruption_Timer = 8000;
@@ -56,13 +56,13 @@ struct boss_instructormaliciaAI : public ScriptedAI
         TouchCounter = 0;
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_MALICIA, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

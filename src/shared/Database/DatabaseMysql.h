@@ -42,16 +42,16 @@ class MANGOS_DLL_SPEC MySqlPreparedStatement : public SqlPreparedStatement
 {
 public:
     MySqlPreparedStatement(const std::string& fmt, SqlConnection& conn, MYSQL * mysql);
-    ~MySqlPreparedStatement();
+    ~MySqlPreparedStatement() override;
 
     //prepare statement
-    virtual bool prepare();
+    bool prepare() override;
 
     //bind input parameters
-    virtual void bind(const SqlStmtParameters& holder);
+    void bind(const SqlStmtParameters& holder) override;
 
     //execute DML statement
-    virtual bool execute();
+    bool execute() override;
 
 protected:
     //bind parameters
@@ -73,24 +73,24 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
 {
     public:
         MySQLConnection(Database& db) : SqlConnection(db), mMysql(nullptr) {}
-        ~MySQLConnection();
+        ~MySQLConnection() override;
 
-        bool OpenConnection(bool reconnect);
+        bool OpenConnection(bool reconnect) override;
         bool Reconnect();
         bool HandleMySQLError(uint32 errNo);
 
-        QueryResult* Query(const char *sql);
-        QueryNamedResult* QueryNamed(const char *sql);
-        bool Execute(const char *sql);
+        QueryResult* Query(const char *sql) override;
+        QueryNamedResult* QueryNamed(const char *sql) override;
+        bool Execute(const char *sql) override;
 
-        unsigned long escape_string(char *to, const char *from, unsigned long length);
+        unsigned long escape_string(char *to, const char *from, unsigned long length) override;
 
-        bool BeginTransaction();
-        bool CommitTransaction();
-        bool RollbackTransaction();
+        bool BeginTransaction() override;
+        bool CommitTransaction() override;
+        bool RollbackTransaction() override;
 
     protected:
-        SqlPreparedStatement * CreateStatement(const std::string& fmt);
+        SqlPreparedStatement * CreateStatement(const std::string& fmt) override;
 
     private:
         bool _TransactionCmd(const char *sql);
@@ -105,18 +105,18 @@ class MANGOS_DLL_SPEC DatabaseMysql : public Database
 
     public:
         DatabaseMysql();
-        ~DatabaseMysql();
+        ~DatabaseMysql() override;
 
         //! Initializes Mysql and connects to a server.
         /*! infoString should be formated like hostname;username;password;database. */
 
         // must be call before first query in thread
-        void ThreadStart();
+        void ThreadStart() override;
         // must be call before finish thread run
-        void ThreadEnd();
+        void ThreadEnd() override;
 
     protected:
-        virtual SqlConnection * CreateConnection();
+        SqlConnection * CreateConnection() override;
 
     private:
         static size_t db_count;

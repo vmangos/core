@@ -39,12 +39,12 @@ struct boss_timmy_the_cruelAI : public ScriptedAI
 
     uint32 m_uiRavenousClawTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiRavenousClawTimer = 7000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -65,7 +65,7 @@ struct boss_timmy_the_cruelAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void CorpseRemoved(uint32 &respawnDelay)
+    void CorpseRemoved(uint32 &respawnDelay) override
     {
         m_creature->DeleteLater();
     }
@@ -92,14 +92,14 @@ struct npc_crimson_guardsmanAI : public ScriptedAI
     uint32 m_uiShieldBashTimer;
     uint32 m_uiShieldChargeTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiDisarmTimer = 6000;
         m_uiShieldBashTimer = 4000;
         m_uiShieldChargeTimer = 1000;
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_bIsTimmySpawner)
         {
@@ -119,7 +119,7 @@ struct npc_crimson_guardsmanAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

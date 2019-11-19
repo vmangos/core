@@ -88,7 +88,6 @@ int32 WriteLinearPath(const Spline<int32>& spline, ByteBuffer& data, uint32 star
     const Vector3* real_path = &spline.getPoint(1);
     Vector3 destination = real_path[last_idx];
 
-    size_t lastIndexPos = data.wpos();
     data << (last_idx - start + 1);
     data << destination;
     if (last_idx > 1)

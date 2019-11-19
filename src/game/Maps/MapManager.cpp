@@ -37,11 +37,12 @@ INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
 INSTANTIATE_CLASS_MUTEX(MapManager, ACE_Recursive_Thread_Mutex);
 
 MapManager::MapManager()
-    : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN)),
-    i_MaxInstanceId(RESERVED_INSTANCES_LAST),
+    : 
     i_GridStateErrorCount(0),
-    i_continentUpdateFinished(nullptr),
+    i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN)),
+    i_MaxInstanceId(RESERVED_INSTANCES_LAST),
     i_maxContinentThread(0),
+    i_continentUpdateFinished(nullptr),
     asyncMapUpdating(false)
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
@@ -266,7 +267,7 @@ public:
 class ContinentAsyncUpdater : public ACE_Based::Runnable
 {
 public:
-    ContinentAsyncUpdater(uint32 updateDiff, Map* m) : diff(updateDiff), map(m)
+    ContinentAsyncUpdater(uint32 updateDiff, Map* m) : map(m), diff(updateDiff)
     {
     }
 

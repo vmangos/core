@@ -40,7 +40,7 @@ class ChatHandler;
 struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
 {
         explicit npc_escortAI(Creature* pCreature);
-        ~npc_escortAI() {}
+        ~npc_escortAI() override {}
 
         void Aggro(Unit*) override;
 

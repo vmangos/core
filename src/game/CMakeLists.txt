@@ -287,7 +287,6 @@ set (game_SRCS
     AI/ScriptedEscortAI.h
     AI/ScriptedFollowerAI.h
     AI/ScriptedGameObject.h
-    AI/ScriptedGossip.h
     AI/ScriptedInstance.h
     AI/ScriptedPetAI.h
     AI/TotemAI.h

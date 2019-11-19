@@ -114,7 +114,7 @@ struct boss_rajaxxAI : public ScriptedAI
     uint32 m_uiNextWaveIndex;
     bool m_bHasEnraged;
 
-    void Reset()
+    void Reset() override
     {
         // Rajaxx's spells
         m_uiResetAggro_Timer = 20000;
@@ -225,7 +225,7 @@ struct boss_rajaxxAI : public ScriptedAI
         return m_pInstance->GetData64(data);
     }
 
-    void Aggro(Unit* pPuller)
+    void Aggro(Unit* pPuller) override
     {
         m_creature->SetInCombatWithZone();
 
@@ -233,7 +233,7 @@ struct boss_rajaxxAI : public ScriptedAI
             m_pInstance->SetData(TYPE_RAJAXX, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (!m_pInstance)
             return;
@@ -249,13 +249,13 @@ struct boss_rajaxxAI : public ScriptedAI
         OnKillReputationReward();
     }
 
-    void KilledUnit(Unit *pKilled)
+    void KilledUnit(Unit *pKilled) override
     {
 //        if (!m_creature->isInCombat())
 //            DoScriptText(SAY_DEAGGRO, m_creature, pKilled);
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         // Frenzy
         if (!m_bHasEnraged && ((m_creature->GetHealth() * 100) / m_creature->GetMaxHealth()) < 30)
@@ -315,7 +315,7 @@ struct boss_rajaxxAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Waves launcher
         if (m_pInstance && (m_pInstance->GetData(TYPE_RAJAXX) == IN_PROGRESS))
@@ -410,7 +410,7 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
         return;
     }
 
-    bool FillLoot(Loot* loot, Player* looter) const
+    bool FillLoot(Loot* loot, Player* looter) const override
     {
         return true; // Do nothing. No loot drop out here.
     }
@@ -430,7 +430,7 @@ struct npc_andorovAI : public ScriptedAI
     uint32 m_uiBash_Timer;
     uint32 m_uiStrike_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCommandAura_Timer = 10000;
         m_uiBash_Timer = 5000;
@@ -441,7 +441,7 @@ struct npc_andorovAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GENERAL_ANDOROV, NOT_STARTED);
     }
 
-    void JustDied(Unit *pKiller)
+    void JustDied(Unit *pKiller) override
     {
         if (!m_pInstance)
             return;
@@ -455,7 +455,7 @@ struct npc_andorovAI : public ScriptedAI
         m_pInstance->SetData(TYPE_GENERAL_ANDOROV, FAIL);
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         DEBUG_EMOTE_YELL(m_creature, "DEBUG : Move inform");
         if (uiType != WAYPOINT_MOTION_TYPE)
@@ -506,7 +506,7 @@ struct npc_andorovAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_pInstance)
             return;

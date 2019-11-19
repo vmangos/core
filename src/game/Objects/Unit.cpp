@@ -3997,7 +3997,6 @@ void Unit::DeleteAuraHolder(SpellAuraHolder *holder)
 void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
 {
     // Statue unsummoned at holder remove
-    SpellEntry const* AurSpellInfo = holder->GetSpellProto();
     Totem* statue = nullptr;
     WorldObject* caster = holder->GetRealCaster();
     bool isChanneled = holder->IsChanneled(); // cache for after the holder is deleted
@@ -6167,7 +6166,6 @@ bool Unit::isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
     if (m_Visibility == VISIBILITY_RESPAWN)
         return false;
 
-    Map& _map = *pDetector->GetMap();
     Unit const* pDetectorUnit = pDetector->ToUnit();
     Player const* pDetectorPlayer = pDetector->ToPlayer();
 
@@ -7977,9 +7975,9 @@ CharmInfo* Unit::InitCharmInfo(Unit *charm)
 }
 
 CharmInfo::CharmInfo(Unit* unit)
-    : m_unit(unit), m_CommandState(COMMAND_FOLLOW), m_reactState(REACT_PASSIVE), m_petnumber(0),
-      _isCommandAttack(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
-      _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f), _isCommandFollow(false), m_originalFactionTemplate(nullptr)
+    : m_unit(unit), m_originalFactionTemplate(nullptr), m_CommandState(COMMAND_FOLLOW), m_reactState(REACT_PASSIVE), m_petnumber(0),
+      _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
+      _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
 {
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
         m_charmspells[i].SetActionAndType(0, ACT_DISABLED);
@@ -8803,10 +8801,12 @@ void Unit::UpdateModelData()
             SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / displayEntry->scale) * modelInfo->combat_reach);
 
         if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
+        {
             if (modelData->collisionHeight > 0.f && modelData->modelScale > 0.f)
                 m_modelCollisionHeight = modelData->collisionHeight / modelData->modelScale;
             else
                 m_modelCollisionHeight = 2.f;
+        }
     }
     else
     {

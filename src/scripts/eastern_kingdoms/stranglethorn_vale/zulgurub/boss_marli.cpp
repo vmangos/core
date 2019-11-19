@@ -79,7 +79,7 @@ struct boss_marliAI : public ScriptedAI
 
     uint32 m_uiDefaultModel;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPoisonVolley_Timer = 15000;
         m_uiSpawnSpider_Timer = 20000;
@@ -130,7 +130,7 @@ struct boss_marliAI : public ScriptedAI
         m_creature->ResetStats();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
@@ -174,7 +174,7 @@ struct boss_marliAI : public ScriptedAI
         return nullptr;
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_SPAWN_OF_MARLI)
         {
@@ -183,7 +183,7 @@ struct boss_marliAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -191,7 +191,7 @@ struct boss_marliAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MARLI, DONE);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (!pCaster)
             return;
@@ -205,7 +205,7 @@ struct boss_marliAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -371,12 +371,12 @@ struct mob_spawn_of_marliAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     uint32 m_uiLevelUp_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiLevelUp_Timer = 3000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

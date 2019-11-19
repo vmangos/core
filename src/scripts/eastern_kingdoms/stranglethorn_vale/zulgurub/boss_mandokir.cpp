@@ -157,7 +157,7 @@ struct boss_mandokirAI : public ScriptedAI
 
     std::vector<uint64> m_lSpirits;
 
-    void Reset()
+    void Reset() override
     {
         m_uiGlobalCooldown = 0;
 
@@ -196,7 +196,7 @@ struct boss_mandokirAI : public ScriptedAI
         CheckVilebranchState(true);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
         {
@@ -222,7 +222,7 @@ struct boss_mandokirAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
 
@@ -368,7 +368,7 @@ struct boss_mandokirAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (!m_creature->getVictim())
             return;
@@ -377,7 +377,7 @@ struct boss_mandokirAI : public ScriptedAI
             pSummoned->AI()->AttackStart(m_creature->getVictim());
     }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
         if (m_creature->getVictim())
             return;
@@ -389,7 +389,7 @@ struct boss_mandokirAI : public ScriptedAI
                         AttackStart(pWho);
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_WATCH)
         {
@@ -402,7 +402,7 @@ struct boss_mandokirAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_VilebranchDead)
             CheckVilebranchState();
@@ -649,20 +649,20 @@ struct mob_ohganAI : public ScriptedAI
     uint32 Thrash_Timer;
     uint32 Execute_Timer;
 
-    void Reset()
+    void Reset() override
     {
         SunderArmor_Timer = 5000;
         Thrash_Timer = urand(5000, 9000);
         Execute_Timer = 1000;
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_OHGAN, DONE);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
             if (m_creature->isInCombat())
@@ -670,7 +670,7 @@ struct mob_ohganAI : public ScriptedAI
                     pMandokir->AI()->KilledUnit(pVictim);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -738,20 +738,20 @@ struct mob_chainedSpiritsAI : public ScriptedAI
     uint64 m_uiTargetRezGUID;
     uint32 m_uiRezTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiRezTimer = 0;
     }
 
     // Ready to revive someone ?
-    uint32 GetData(uint32)
+    uint32 GetData(uint32) override
     {
         if (m_uiTargetRezGUID)
             return 0;
         return 1;
     }
 
-    void SpellHitTarget(Unit* pDead, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pDead, const SpellEntry* pSpell) override
     {
         if (!pSpell)
         {
@@ -764,13 +764,13 @@ struct mob_chainedSpiritsAI : public ScriptedAI
             m_creature->DeleteLater();
     }
 
-    void MovementInform(uint32 mvtType, uint32 moveId)
+    void MovementInform(uint32 mvtType, uint32 moveId) override
     {
         if (mvtType == POINT_MOTION_TYPE && moveId == 1)
             if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiTargetRezGUID))
                 m_uiRezTimer = 2500;
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_uiRezTimer)
         {
@@ -802,16 +802,16 @@ struct mob_vilebrancheAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         //
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

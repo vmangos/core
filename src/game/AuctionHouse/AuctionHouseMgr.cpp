@@ -759,7 +759,6 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
         return;
     }
 
-    time_t currTime = sWorld.GetGameTime();
     int loc_idx = player->GetSession()->GetSessionDbLocaleIndex();
     LocaleConstant dbc_loc = player->GetSession()->GetSessionDbcLocale();
 
@@ -784,7 +783,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 continue;
 
             if (query.auctionSlotID != 0xffffffff && proto->InventoryType != query.auctionSlotID &&
-                    (query.auctionSlotID != INVTYPE_CHEST ||  query.auctionSlotID == INVTYPE_CHEST && proto->InventoryType != INVTYPE_ROBE))
+                    (query.auctionSlotID != INVTYPE_CHEST || (query.auctionSlotID == INVTYPE_CHEST && proto->InventoryType != INVTYPE_ROBE)))
                 continue;
 
             if (query.quality != 0xffffffff && proto->Quality < query.quality)

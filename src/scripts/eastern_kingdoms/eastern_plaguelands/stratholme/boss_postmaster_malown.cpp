@@ -49,7 +49,7 @@ struct boss_postmaster_malownAI : public ScriptedAI
     uint32 CallOfTheGrave_Timer;
     bool HasYelled;
 
-    void Reset()
+    void Reset() override
     {
         WailingDead_Timer = 19000; //lasts 6 sec
         Backhand_Timer = 8000; //2 sec stun
@@ -59,19 +59,19 @@ struct boss_postmaster_malownAI : public ScriptedAI
         HasYelled = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         ScriptedAI::Aggro(pWho);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         DoScriptText(SAY_KILLED, m_creature);
         ScriptedAI::KilledUnit(pVictim);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

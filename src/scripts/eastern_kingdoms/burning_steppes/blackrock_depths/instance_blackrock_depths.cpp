@@ -217,7 +217,7 @@ struct instance_blackrock_depths : ScriptedInstance
         }
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -319,7 +319,7 @@ struct instance_blackrock_depths : ScriptedInstance
         }
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -432,7 +432,7 @@ struct instance_blackrock_depths : ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature* pCreature)
+    void OnCreatureDeath(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -626,7 +626,7 @@ struct instance_blackrock_depths : ScriptedInstance
         }
     }
 
-    void CustomSpellCasted(uint32 spellId, Unit* caster, Unit* target)
+    void CustomSpellCasted(uint32 spellId, Unit* caster, Unit* target) override
     {
         sLog.outString("Spell %u caste par '%s' sur '%s'", spellId, caster->GetName(), (target) ? target->GetName() : "<Personne>");
         switch (spellId)
@@ -714,7 +714,7 @@ struct instance_blackrock_depths : ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         sLog.outDebug("Instance Blackrock Depths: SetData update (Type: %u Data %u)", uiType, uiData);
 
@@ -944,7 +944,7 @@ struct instance_blackrock_depths : ScriptedInstance
         return false;
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -1001,7 +1001,7 @@ struct instance_blackrock_depths : ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -1089,7 +1089,7 @@ struct instance_blackrock_depths : ScriptedInstance
         return 0;
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         if (m_uiDagranTimer)
         {
@@ -1132,12 +1132,12 @@ struct instance_blackrock_depths : ScriptedInstance
         }
     }
 
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* in)
+    void Load(const char* in) override
     {
         if (!in)
         {

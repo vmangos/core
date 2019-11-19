@@ -456,7 +456,6 @@ struct instance_molten_core : ScriptedInstance
                 if (GOUseGuidList[i])
                 {
                     GameObject* Rune = instance->GetGameObject(GOUseGuidList[i]);
-                    bool End = true;
                     switch (Rune->GetEntry())
                     {
                         case 176951:                                    //Sulfuron
@@ -546,6 +545,7 @@ struct instance_molten_core : ScriptedInstance
         for (int i = 0; i < INSTANCE_MC_MAX_ENCOUNTER; i++)
             SetData(i, m_auiEncounter[i]);
 
+        /*
         uint64 GuidRunes[7] =
         {
             m_uiRuneKoroGUID,
@@ -556,7 +556,7 @@ struct instance_molten_core : ScriptedInstance
             m_uiRuneKressGUID,
             m_uiRuneMohnGUID
         };
-
+        */
 
         for (int i = 0; i < 7; i++)
             SetData((TypeRuneActive0 + 16), RuneActive[i]);

@@ -109,7 +109,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
     uint32 m_auiEncounter[INSTANCE_BFD_MAX_ENCOUNTER];
     std::string strInstData;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -129,13 +129,13 @@ struct instance_blackfathom_deeps : public ScriptedInstance
             m_uiSpawnMobsTimer[i] = 0;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         if (pCreature->GetEntry() == 4832)
             m_uiTwilightLordKelrisGUID = pCreature->GetGUID();
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -165,7 +165,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -209,12 +209,12 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         }
     }
 
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -229,7 +229,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -252,7 +252,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         return 0;
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
         {
@@ -271,7 +271,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
 
         OUT_LOAD_INST_DATA_COMPLETE;
     }
-    void OnCreatureDeath(Creature* pCreature)
+    void OnCreatureDeath(Creature* pCreature) override
     {
         if (pCreature->GetEntry() == NPC_BARON_AQUANIS)
             SetData(TYPE_AQUANIS, DONE);
@@ -338,7 +338,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         return true;
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         // Only use this function if shrine event is in progress
         if (m_auiEncounter[BFD_ENCOUNTER_SHRINE] != IN_PROGRESS)
@@ -379,7 +379,7 @@ struct go_fire_of_akumaiAI: public GameObjectAI
 {
     go_fire_of_akumaiAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData();
 

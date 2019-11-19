@@ -182,7 +182,7 @@ struct boss_maexxnaAI : public ScriptedAI
         {3493.35f, -3834.06f, 318.71f}
     };
 
-    void Reset()
+    void Reset() override
     {
         m_uiWebWrapTimer            = WebWrapCooldown(true);
         m_uiWebSprayTimer           = WebSprayCooldown(true);
@@ -194,13 +194,13 @@ struct boss_maexxnaAI : public ScriptedAI
         wraps2.clear();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MAEXXNA, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MAEXXNA, DONE);
@@ -280,7 +280,6 @@ struct boss_maexxnaAI : public ScriptedAI
             float dx = pTarget->GetPositionX() - wepWrapLoc[i][0];
             float dy = pTarget->GetPositionY() - wepWrapLoc[i][1];
             float dist = sqrt((dx * dx) + (dy * dy));
-            const float  distXY = (dist > 0 ? dist : 0);
             float yDist = wepWrapLoc[i][2] - pTarget->GetPositionZ();
 
             // todo: to avoid ever hitting the overhanging ceiling we would need to adjust the horizontal
@@ -364,7 +363,7 @@ struct boss_maexxnaAI : public ScriptedAI
             wraps.clear();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

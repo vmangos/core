@@ -28,13 +28,13 @@
 class MANGOS_DLL_SPEC MapReference : public Reference<Map, Player>
 {
     protected:
-        inline void targetObjectBuildLink();
-        inline void targetObjectDestroyLink();
-        inline void sourceObjectDestroyLink();
+        inline void targetObjectBuildLink() override;
+        inline void targetObjectDestroyLink() override;
+        inline void sourceObjectDestroyLink() override;
 
     public:
         MapReference() : Reference<Map, Player>() {}
-        ~MapReference() { unlink(); }
+        ~MapReference() override { unlink(); }
         MapReference *next() { return (MapReference*)Reference<Map, Player>::next(); }
         MapReference const *next() const { return (MapReference const*)Reference<Map, Player>::next(); }
 };

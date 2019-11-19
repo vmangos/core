@@ -188,7 +188,7 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
 
     fclose(file);
 
-    dtMeshHeader* header = (dtMeshHeader*)data;
+    //dtMeshHeader* header = (dtMeshHeader*)data;
     dtTileRef tileRef = 0;
 
     // memory allocated for data is now managed by detour, and will be deallocated when the tile is removed

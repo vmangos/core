@@ -144,9 +144,9 @@ void TwinsIntroDialogue::JustDidDialogueStep(int32 iEntry)
 instance_temple_of_ahnqiraj::instance_temple_of_ahnqiraj(Map* pMap) :
     ScriptedInstance(pMap),
     m_uiBugTrioDeathCount(0),
+    m_twinsDeadDialogue(twinsDeathDialogue),
     m_uiCthunWhisperTimer(CTHUN_FIRST_WHISPER),
-    m_uiCthunPrevWhisperTimer(CTHUN_FIRST_WHISPER),
-    m_twinsDeadDialogue(twinsDeathDialogue)
+    m_uiCthunPrevWhisperTimer(CTHUN_FIRST_WHISPER)
 {
     Initialize();
 };

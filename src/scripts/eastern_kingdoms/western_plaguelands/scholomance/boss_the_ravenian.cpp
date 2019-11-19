@@ -42,7 +42,7 @@ struct boss_theravenianAI : public ScriptedAI
     uint32 KnockAway_Timer;
     bool HasYelled;
 
-    void Reset()
+    void Reset() override
     {
         Trample_Timer = 24000;
         Cleave_Timer = 15000;
@@ -51,13 +51,13 @@ struct boss_theravenianAI : public ScriptedAI
         HasYelled = false;
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_RAVENIAN, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

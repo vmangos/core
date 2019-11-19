@@ -153,9 +153,9 @@ class WorldPersistentState : public MapPersistentState
         */
         explicit WorldPersistentState(uint16 MapId, uint16 instanceId) : MapPersistentState(MapId, instanceId) {}
 
-        ~WorldPersistentState() {}
+        ~WorldPersistentState() override {}
     protected:
-        bool CanBeUnload() const;                           // overwrite MapPersistentState::CanBeUnload
+        bool CanBeUnload() const override;                           // overwrite MapPersistentState::CanBeUnload
 };
 
 /*
@@ -176,7 +176,7 @@ class DungeonPersistentState : public MapPersistentState
            - when a group bound to the instance is loaded */
         DungeonPersistentState(uint16 MapId, uint32 InstanceId, time_t resetTime, bool canReset);
 
-        ~DungeonPersistentState();
+        ~DungeonPersistentState() override;
         void UnbindThisState();
 
         uint8 GetPlayerCount() const { return m_playerList.size(); }
@@ -210,7 +210,7 @@ class DungeonPersistentState : public MapPersistentState
         void DeleteRespawnTimesAndData();
 
     protected:
-        bool CanBeUnload() const;                           // overwrite MapPersistentState::CanBeUnload
+        bool CanBeUnload() const override;                           // overwrite MapPersistentState::CanBeUnload
         bool HasBounds() const { return !m_playerList.empty() || !m_groupList.empty(); }
 
     private:
@@ -236,9 +236,9 @@ class BattleGroundPersistentState : public MapPersistentState
         BattleGroundPersistentState(uint16 MapId, uint32 InstanceId)
             : MapPersistentState(MapId, InstanceId) {}
 
-        ~BattleGroundPersistentState() {}
+        ~BattleGroundPersistentState() override {}
     protected:
-        bool CanBeUnload() const;                           // overwrite MapPersistentState::CanBeUnload
+        bool CanBeUnload() const override;                           // overwrite MapPersistentState::CanBeUnload
 };
 
 enum ResetEventType

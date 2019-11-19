@@ -43,7 +43,7 @@ struct npc_darrowshire_spiritAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         DoCastSpellIfCan(m_creature, SPELL_SPIRIT_SPAWNIN);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -214,7 +214,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         return me->GetMap()->GetPlayer(JoueurGUID);
     }
 
-    void Reset()
+    void Reset() override
     {
         Vague = 0;
         VillageoisMorts = 0;
@@ -234,12 +234,12 @@ struct npc_eris_havenfireAI : public ScriptedAI
             VillageoisGUIDs[i] = 0;
     }
 
-    void AttackedBy(Unit* Attacker)
+    void AttackedBy(Unit* Attacker) override
     {
         return;
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && CleanerSpawn == false && BeginQuete == true)
         {
@@ -324,17 +324,9 @@ struct npc_eris_havenfireAI : public ScriptedAI
         mobsEntries.clear();
     }
 
-    void JustSummoned(Creature* summoned)
+    void JustSummoned(Creature* summoned) override
     {
-        float X = 0.0f;
-        float Y = 0.0f;
-        float Z = 0.0f;
         int Var = 0;
-        int var = 0;
-        uint64 GUIDs[50];
-
-        for (int i = 0; i < 50; i++)
-            GUIDs[i] = 0;
 
         switch (summoned->GetEntry())
         {
@@ -368,7 +360,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId) override
     {
         if (uiMotionType != POINT_MOTION_TYPE || !pSummoned)
             return;
@@ -407,7 +399,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (!pSummoned)
             return;
@@ -621,7 +613,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (BeginQuete == false || CleanerSpawn == true)
             return;
@@ -744,7 +736,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
     uint32 m_uiSayPeasantTimer;
 
-    void Reset()
+    void Reset() override
     {
         if (X == 0.0f && Y == 0.0f && Z == 0.0f)
             m_creature->GetRandomPoint(ErisHavenfireEvent[PaysantsDest].X, ErisHavenfireEvent[PaysantsDest].Y, ErisHavenfireEvent[PaysantsDest].Z, 5.0f, X, Y, Z);
@@ -760,18 +752,18 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         m_uiSayPeasantTimer = urand(10000, 30000);
     }
 
-    void KilledUnit(Unit* victim)
+    void KilledUnit(Unit* victim) override
     {
     }
 
 
-    void DamageTaken(Unit *done_by, uint32 &damage)
+    void DamageTaken(Unit *done_by, uint32 &damage) override
     {
         if (done_by->GetEntry() == NPC_ARCHER)
             damage = urand(80, 105);
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_TIR_FLECHE)
         {
@@ -800,11 +792,11 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -820,7 +812,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (DeplacementRequis == true)
         {
@@ -879,7 +871,7 @@ struct npc_demetriaAI : public ScriptedAI
         Reset();
     }
     uint64 guidScarletTrooper[9];
-    void MovementInform(uint32 movementType, uint32 moveId)
+    void MovementInform(uint32 movementType, uint32 moveId) override
     {
         if (movementType != WAYPOINT_MOTION_TYPE)
             return;
@@ -912,7 +904,7 @@ struct npc_demetriaAI : public ScriptedAI
             m_creature->ForcedDespawn();
         }
     }
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         DespawnTroopers();
     }
@@ -933,7 +925,7 @@ struct npc_demetriaAI : public ScriptedAI
     uint32 Resurrect_Timer;
     uint8  PsychicScream_HealthCheck;
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (Resurrect_Timer < diff)
         {
@@ -1010,7 +1002,7 @@ struct npc_demetriaAI : public ScriptedAI
         }
         DoMeleeAttackIfReady();
     }
-    void Reset()
+    void Reset() override
     {
         MindBlast_Timer = 3000;
         ShadowWordPain_Timer = 9000;
@@ -1141,7 +1133,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
     ObjectGuid davilGuid;
     ObjectGuid horgusGuid;
 
-    void Reset()
+    void Reset() override
     {
         // Changement de faction nécessaire pour permettre l'aggro à vue
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
@@ -1175,7 +1167,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
 
     bool _cleanupDone;
     bool _initialized;
-    void OnRemoveFromWorld()
+    void OnRemoveFromWorld() override
     {
         if (_cleanupDone || !_initialized)
             return;
@@ -1209,7 +1201,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         m_creature->DeleteLater();
     }
 
-    void JustSummoned(Creature* summoned)
+    void JustSummoned(Creature* summoned) override
     {
         if (!summoned)
             return;
@@ -1249,7 +1241,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId) override
     {
         if (uiMotionType != POINT_MOTION_TYPE || !pSummoned)
             return;
@@ -1294,7 +1286,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (!pSummoned)
             return;
@@ -1345,7 +1337,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!_initialized)
         {
@@ -1689,7 +1681,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
     uint32 EventStep;
     uint32 EventTimer;
 
-    void Reset()
+    void Reset() override
     {
     }
 
@@ -1703,7 +1695,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
         }
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -1750,7 +1742,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (EventTimer && EventTimer <= uiDiff)
         {

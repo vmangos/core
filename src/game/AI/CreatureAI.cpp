@@ -355,7 +355,7 @@ bool CreatureAI::UpdateVictim()
 
 void CreatureAI::DoCast(Unit* victim, uint32 spellId, bool triggered)
 {
-    if (!victim || m_creature->IsNonMeleeSpellCasted(false) && !triggered)
+    if (!victim || (m_creature->IsNonMeleeSpellCasted(false) && !triggered))
         return;
 
     m_creature->CastSpell(victim, spellId, triggered);

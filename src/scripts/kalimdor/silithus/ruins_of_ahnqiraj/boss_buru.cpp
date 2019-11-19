@@ -86,7 +86,7 @@ struct boss_buruAI : public ScriptedAI
 
     uint64 m_eggsGUID[6];
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetDisplayId(15654);
         m_creature->RemoveAllAuras();
@@ -114,7 +114,7 @@ struct boss_buruAI : public ScriptedAI
             m_pInstance->SetData(TYPE_BURU, NOT_STARTED);
     }
 
-    void Aggro(Unit *pWho)
+    void Aggro(Unit *pWho) override
     {
         m_creature->SetInCombatWithZone();
         DoCast(m_creature, SPELL_THORNS);
@@ -123,7 +123,7 @@ struct boss_buruAI : public ScriptedAI
             m_pInstance->SetData(TYPE_BURU, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         // Le debuff fade quand il est mort, sinon le raid se fait decimer
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
@@ -134,7 +134,7 @@ struct boss_buruAI : public ScriptedAI
             m_pInstance->SetData(TYPE_BURU, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
 
         Creature* egg;
@@ -314,14 +314,14 @@ struct mob_buru_eggAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     Creature* pBuru;
 
-    void Reset()
+    void Reset() override
     {
         // Empêche les oeufs d'aggro et de tourner
         SetCombatMovement(false);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         // Aggro de Buru quand on tape un oeuf
         if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))
@@ -331,7 +331,7 @@ struct mob_buru_eggAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (!m_pInstance)
             return;
@@ -357,7 +357,7 @@ struct mob_buru_eggAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         return;
     }

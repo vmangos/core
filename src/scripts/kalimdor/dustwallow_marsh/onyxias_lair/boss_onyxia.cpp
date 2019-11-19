@@ -161,7 +161,7 @@ struct boss_onyxiaAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     std::list<GameObject*> GOListe;
     
-    void Reset()
+    void Reset() override
     {
         m_uiPhase              = PHASE_ONE;
         m_bTransition          = false;
@@ -294,7 +294,7 @@ struct boss_onyxiaAI : public ScriptedAI
        } 
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         // Daemon: Fix orientation.
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
@@ -311,7 +311,7 @@ struct boss_onyxiaAI : public ScriptedAI
                 (*itr)->Respawn();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(DATA_ONYXIA_EVENT, DONE);
@@ -327,7 +327,7 @@ struct boss_onyxiaAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
     
-    void JustSummoned(Creature *pSummoned)
+    void JustSummoned(Creature *pSummoned) override
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             pSummoned->AI()->AttackStart(pTarget);
@@ -335,7 +335,7 @@ struct boss_onyxiaAI : public ScriptedAI
         ++m_uiSummonCount;
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         DoScriptText(SAY_KILL, m_creature);
     }
@@ -357,7 +357,7 @@ struct boss_onyxiaAI : public ScriptedAI
         return nullptr;
     } 
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_BELLOWINGROAR)
         {
@@ -648,8 +648,7 @@ struct boss_onyxiaAI : public ScriptedAI
                 m_creature->CastSpell(m_creature, 17131, true); /** Start flying */
                 m_bTransition = false;
                 m_uiTransTimer = 0;
-                float X = m_creature->GetPositionX() - m_pPointData->fX;
-                float Y = m_creature->GetPositionY() - m_pPointData->fY;
+
                 // increase Onyxia's hitbox while in the air to make it slightly easier for melee to use specials on her
                 m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 21.0f);
                 m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 22.0f);
@@ -710,7 +709,7 @@ struct boss_onyxiaAI : public ScriptedAI
             m_uiTransTimer -= uiDiff;
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -745,7 +744,7 @@ struct boss_onyxiaAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         CheckForTargetsInAggroRadius(uiDiff);
 
@@ -822,16 +821,16 @@ struct OnyxianWhelpAI: public ScriptedAI
     }
 
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

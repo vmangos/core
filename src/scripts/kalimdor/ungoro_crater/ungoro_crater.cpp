@@ -50,9 +50,9 @@ struct npc_ame01AI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -70,7 +70,7 @@ struct npc_ame01AI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (pWho->GetTypeId() == TYPEID_PLAYER)
             return;
@@ -166,7 +166,7 @@ struct npc_ringoAI : public FollowerAI
 
     Unit* pSpraggle;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFaintTimer = urand(30000, 60000);
         m_uiEndEventProgress = 0;
@@ -174,7 +174,7 @@ struct npc_ringoAI : public FollowerAI
         pSpraggle = nullptr;
     }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
 
@@ -194,7 +194,7 @@ struct npc_ringoAI : public FollowerAI
         }
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_REVIVE_RINGO)
             ClearFaint();
@@ -253,7 +253,7 @@ struct npc_ringoAI : public FollowerAI
         SetFollowPaused(false);
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff)
+    void UpdateFollowerAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
@@ -361,7 +361,7 @@ struct ungoro_eggs_triggerAI : public ScriptedAI
     {
         Reset();
     }
-    void Reset()
+    void Reset() override
     {
         checkTimer = 10000;
         summon_x = m_creature->GetPositionX();
@@ -386,7 +386,7 @@ struct ungoro_eggs_triggerAI : public ScriptedAI
         }
         return nullptr;
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (checkTimer < diff)
         {
@@ -430,13 +430,13 @@ struct mob_captured_felwood_oozeAI : public ScriptedAI
     uint32 initialTimer;
     bool mergeDone;
 
-    void Reset()
+    void Reset() override
     {
         initialTimer = 1000;
         mergeDone = false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (initialTimer < uiDiff)
         {
@@ -452,7 +452,7 @@ struct mob_captured_felwood_oozeAI : public ScriptedAI
             initialTimer -= uiDiff;
     }
 
-    void MovementInform(uint32 type, uint32 id)
+    void MovementInform(uint32 type, uint32 id) override
     {
         if (type == FOLLOW_MOTION_TYPE && !mergeDone)
         {
@@ -499,13 +499,13 @@ struct npc_precious_the_devourerAI : public ScriptedAI
     ObjectGuid m_simoneGuid;
     uint32 m_uiSplitCheck_Timer;
     
-    void Reset()
+    void Reset() override
     {
         m_creature->SetVisibility(VISIBILITY_ON);
         m_uiSplitCheck_Timer    = 7500;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (Creature* pSimone = m_creature->GetMap()->GetCreature(m_simoneGuid))
         {
@@ -529,7 +529,7 @@ struct npc_precious_the_devourerAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
     
-    void DamageTaken(Unit* pDealer, uint32& /*uiDamage*/)
+    void DamageTaken(Unit* pDealer, uint32& /*uiDamage*/) override
     {
         if (Creature* pSimone = m_creature->GetMap()->GetCreature(m_simoneGuid))
         {
@@ -538,7 +538,7 @@ struct npc_precious_the_devourerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
@@ -589,7 +589,7 @@ struct npc_simone_seductressAI : public ScriptedAI
     
     uint32 m_uiDespawn_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetVisibility(VISIBILITY_ON);
         
@@ -637,7 +637,7 @@ struct npc_simone_seductressAI : public ScriptedAI
         Reset();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (Creature* pPrecious = m_creature->GetMap()->GetCreature(m_preciousGuid))
         {
@@ -656,7 +656,7 @@ struct npc_simone_seductressAI : public ScriptedAI
             DemonDespawn();
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (Creature* pSimone = m_creature->GetMap()->GetCreature(m_simoneGuid))
         {
@@ -732,7 +732,7 @@ struct npc_simone_seductressAI : public ScriptedAI
         m_creature->RemoveFromWorld();
     }
     
-    void DamageTaken(Unit* /*pDealer*/, uint32& /*uiDamage*/)
+    void DamageTaken(Unit* /*pDealer*/, uint32& /*uiDamage*/) override
     {
         if (Creature* pPrecious = m_creature->GetMap()->GetCreature(m_preciousGuid))
         {
@@ -741,7 +741,7 @@ struct npc_simone_seductressAI : public ScriptedAI
         }
     }
     
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell)
+    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell) override
     {
         if (pSpell && pSpell->Id == 14280)   // Viper Sting (Rank 3)
         {
@@ -750,7 +750,7 @@ struct npc_simone_seductressAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiDespawn_Timer < uiDiff)
         {
@@ -834,7 +834,7 @@ struct npc_simone_the_inconspicuousAI : public ScriptedAI
     ObjectGuid m_playerGuid;
     Creature* pPrecious;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetRespawnDelay(35*MINUTE);
         m_creature->SetRespawnTime(35*MINUTE);
@@ -906,7 +906,7 @@ struct npc_simone_the_inconspicuousAI : public ScriptedAI
         m_bTransform = true;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_bTransform) 
         {

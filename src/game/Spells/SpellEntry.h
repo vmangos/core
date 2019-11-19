@@ -997,8 +997,8 @@ class SpellEntry
 
             // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!
             // Feline Swiftness Passive 2a not have 0x1 mask in Stance field in spell data as expected
-            return ((Stances & (1 << (form - 1)) || Id == 24864 && form == FORM_CAT) &&
-                !(AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
+            return ((Stances & (1 << (form - 1)) || (Id == 24864 && form == FORM_CAT)) &&
+                !HasAttribute(SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
         }
 
         // Spell effects require a specific power type on the target

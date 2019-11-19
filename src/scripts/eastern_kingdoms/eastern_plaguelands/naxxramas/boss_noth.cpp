@@ -88,14 +88,6 @@ static const uint8 g1_start = 0, g1_size = 4;
 static const uint8 g2_start = 4, g2_size = 4;
 static const uint8 g3_start = 8, g3_size = 2;
 
-static const uint32 GuardianSpells[4] =
-{
-    SPELL_SUM_GUARD_NE,
-    SPELL_SUM_GUARD_NW,
-    SPELL_SUM_GUARD_SW1,
-    SPELL_SUM_GUARD_SW2,
-};
-
 enum eScriptText
 {
     SAY_AGGRO1                          = -1533075,
@@ -146,7 +138,7 @@ struct boss_nothAI : public ScriptedAI
     uint32 killSayCooldown;
     EventMap m_events;
     bool isOnBalc;
-    void Reset()
+    void Reset() override
     {
         isOnBalc = false;
         phaseCounter = 0;
@@ -167,7 +159,7 @@ struct boss_nothAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
 
@@ -362,17 +354,17 @@ struct boss_nothAI : public ScriptedAI
         }
     }
 
-    virtual void SummonedCreatureJustDied(Creature* unit) 
+    void SummonedCreatureJustDied(Creature* unit) override 
     {
         unit->ForcedDespawn(3000);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->SetInCombatWithZone();
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (!killSayCooldown)
         {
@@ -381,7 +373,7 @@ struct boss_nothAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -389,7 +381,7 @@ struct boss_nothAI : public ScriptedAI
             m_pInstance->SetData(TYPE_NOTH, DONE);
     }
 
-    void AttackStart(Unit* pWho)
+    void AttackStart(Unit* pWho) override
     {
         if (!isOnBalc)
             ScriptedAI::AttackStart(pWho);
@@ -399,7 +391,7 @@ struct boss_nothAI : public ScriptedAI
         if (isOnBalc && uiDamage > 0)
             uiDamage = 0;
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!isOnBalc)
         {

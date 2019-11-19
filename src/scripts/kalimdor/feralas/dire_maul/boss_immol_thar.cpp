@@ -43,13 +43,13 @@ struct boss_immol_tharAI : public ScriptedAI
         return false;
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_IMMOL_THAR, DONE);
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiEnrageTimer            = 50000;
         m_uiTrampleTimer           = urand(5000, 9000);
@@ -67,13 +67,13 @@ struct boss_immol_tharAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if(!m_bEngage)
             m_bEngage = true;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {

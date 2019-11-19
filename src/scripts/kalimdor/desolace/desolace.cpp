@@ -451,7 +451,7 @@ struct go_serpent_statueAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (state)
         {
@@ -553,7 +553,7 @@ struct go_ghost_magnetAI: public GameObjectAI
     uint16 nbToSpawn;
     bool state;//0 = already are functioning magnets, do not spawn spectre. //1 = spawning.
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (state)
         {
@@ -608,7 +608,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
         corpseTimer = 20000;
         Reset();
     }
-    void Reset()
+    void Reset() override
     {
         timer=0;
         curseTimer = urand(5000, 9000);
@@ -623,7 +623,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
     uint64 guidMagnet;
     bool isGreen;
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if(isGreen)
             return;
@@ -631,7 +631,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
             return;
         turnGreen();
     }
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if(!isGreen)
             turnGreen();
@@ -644,7 +644,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
         isGreen=true;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -663,7 +663,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
             curseTimer -= uiDiff;
         DoMeleeAttackIfReady();
     }
-    void UpdateAI_corpse(const uint32 uiDiff)
+    void UpdateAI_corpse(const uint32 uiDiff) override
     {
         if ( corpseTimer < uiDiff)//purpose is to delay the new spawn.
         {
@@ -716,7 +716,7 @@ struct go_demon_portalAI: public GameObjectAI
     {
     }
     ObjectGuid _demonGuid;
-    bool OnUse(Unit* caster)
+    bool OnUse(Unit* caster) override
     {
         Unit* demon;
         if (_demonGuid)
@@ -831,9 +831,9 @@ const Coords Ambusher[] =
 
 const CaravanMember Caravan[] =
 {
-    { NPC_CARAVAN_KODO,     -1887.26f, 2465.12f, 59.8224f, 4.48f, { 26.0f, 3.14f } },
-    { NPC_RIGGER_GIZELTON,  -1883.63f, 2471.68f, 59.8224f, 4.48f, { 18.0f, 3.14f } },
-    { NPC_CARAVAN_KODO,     -1882.11f, 2476.80f, 59.8224f, 4.48f, { 8.0f,  3.14f } }
+    { {NPC_CARAVAN_KODO,     -1887.26f, 2465.12f, 59.8224f, 4.48f}, { 26.0f, 3.14f } },
+    { {NPC_RIGGER_GIZELTON,  -1883.63f, 2471.68f, 59.8224f, 4.48f}, { 18.0f, 3.14f } },
+    { {NPC_CARAVAN_KODO,     -1882.11f, 2476.80f, 59.8224f, 4.48f}, { 8.0f,  3.14f } }
 };
 
 struct npc_cork_gizeltonAI : npc_escortAI
@@ -942,11 +942,13 @@ struct npc_cork_gizeltonAI : npc_escortAI
         {
             if (*itr != m_creature->GetObjectGuid())
             {
-                if (auto pCreature = m_creature->GetMap()->GetCreature(*itr))
+                if (Creature* pCreature = m_creature->GetMap()->GetCreature(*itr))
+                {
                     if (apply)
                         pCreature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_NONE);
                     else
                         pCreature->ClearTemporaryFaction();
+                }
             }
         }
 

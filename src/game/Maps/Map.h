@@ -219,7 +219,7 @@ struct ScriptedEventTarget
 struct ScriptedEvent
 {
     ScriptedEvent(uint32 eventId, ObjectGuid source, ObjectGuid target, Map& map, time_t expireTime, uint32 failureCondition, uint32 failureScript, uint32 successCondition, uint32 successScript) :
-        m_uiEventId(eventId), m_Source(source), m_Target(target), m_Map(map), m_tExpireTime(expireTime), m_uiFailureCondition(failureCondition), m_uiFailureScript(failureScript), m_uiSuccessCondition(successCondition), m_uiSuccessScript(successScript), m_bEnded(false) {}
+        m_Source(source), m_Target(target), m_Map(map), m_uiEventId(eventId), m_tExpireTime(expireTime), m_bEnded(false), m_uiFailureCondition(failureCondition), m_uiFailureScript(failureScript), m_uiSuccessCondition(successCondition), m_uiSuccessScript(successScript) {}
     
     ObjectGuid m_Source;
     ObjectGuid m_Target;
@@ -328,7 +328,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         Map(uint32 id, time_t, uint32 InstanceId);
 
     public:
-        virtual ~Map();
+        ~Map() override;
         void PrintInfos(ChatHandler& handler);
         void SpawnActiveObjects();
         // currently unused for normal maps
@@ -995,7 +995,7 @@ class MANGOS_DLL_SPEC WorldMap : public Map
 
     public:
         WorldMap(uint32 id, time_t expiry, uint32 instance = 0) : Map(id, expiry, instance) {}
-        ~WorldMap() {}
+        ~WorldMap() override {}
 
         // can't be nullptr for loaded map
         WorldPersistentState* GetPersistanceState() const;
@@ -1007,7 +1007,7 @@ class MANGOS_DLL_SPEC DungeonMap : public Map
 
     public:
         DungeonMap(uint32 id, time_t, uint32 InstanceId);
-        ~DungeonMap();
+        ~DungeonMap() override;
         bool Add(Player*) override;
         void Remove(Player*, bool) override;
         void Update(uint32) override;
@@ -1036,7 +1036,7 @@ class MANGOS_DLL_SPEC BattleGroundMap : public Map
 
     public:
         BattleGroundMap(uint32 id, time_t, uint32 InstanceId);
-        ~BattleGroundMap();
+        ~BattleGroundMap() override;
 
         void Update(uint32) override;
         bool Add(Player*) override;

@@ -49,7 +49,7 @@ struct boss_rend_blackhandAI : public ScriptedAI
     uint32 m_uiCloseCombatCount;
     uint32 m_uiWhirlWindTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiMortalStrikeTimer       = 1000;
         m_uiCleaveTimer             = 4000;
@@ -59,7 +59,7 @@ struct boss_rend_blackhandAI : public ScriptedAI
         m_uiWhirlWindTimer          = 0;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

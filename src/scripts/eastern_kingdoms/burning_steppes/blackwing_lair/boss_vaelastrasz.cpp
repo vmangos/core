@@ -131,7 +131,7 @@ struct boss_vaelAI : public ScriptedAI
     ObjectGuid m_playerGuid;
     ObjectGuid m_nefariusGuid;
 
-    void Reset()
+    void Reset() override
     {
         m_uiSpeechTimer                  = 0;
         m_uiSpeechNum                    = 0;
@@ -181,7 +181,7 @@ struct boss_vaelAI : public ScriptedAI
 
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (!pVictim || pVictim->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -192,7 +192,7 @@ struct boss_vaelAI : public ScriptedAI
         DoScriptText(SAY_KILLTARGET, m_creature, pVictim);
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         if (!m_bCastedEssenceOfTheRed)
         {
@@ -211,14 +211,14 @@ struct boss_vaelAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         m_creature->SetRespawnDelay(604800); // 7 j. 604800
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VAELASTRASZ, DONE);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VAELASTRASZ, FAIL);
@@ -228,7 +228,7 @@ struct boss_vaelAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_pInstance)
             return;
@@ -545,7 +545,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
     uint32 m_uiCommandingShoutTimer;
     uint32 m_uiCleaveTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiMarkDetonationTimer     = 10000;
         m_uiMarkFlamesTimer         = 6000;
@@ -555,7 +555,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         SetAuraFlames(false);
     }
 
-    void MoveInLineOfSight(Unit *pUnit)
+    void MoveInLineOfSight(Unit *pUnit) override
     {
         if (!pUnit || m_creature->getVictim())
             return;
@@ -565,7 +565,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
             AttackStart(pUnit);
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         if (!m_creature->HasAura(SPELL_AURA_FLAMES))
             m_creature->AddAura(SPELL_AURA_FLAMES, ADD_AURA_PERMANENT);
@@ -573,7 +573,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_COMMANDING_SHOUT, CF_TRIGGERED);
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         SetAuraFlames(false);
     }
@@ -605,7 +605,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -685,14 +685,14 @@ struct npc_death_talon_SeetherAI : public ScriptedAI
     uint32 m_uiFrenzyTimer;
     bool m_bEngaged;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFlameBuffetTimer = urand(5000, 10000);
         m_uiFrenzyTimer     = 15000;
         m_bEngaged          = false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

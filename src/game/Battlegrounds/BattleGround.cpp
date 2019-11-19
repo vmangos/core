@@ -578,14 +578,11 @@ void BattleGround::EndBattleGround(Team winner)
 {
     uint32 bgTypeID = BATTLEGROUND_TYPE_NONE;
 
-    if (this->m_MaxPlayers == 40)
+    if (m_MaxPlayers == 40)
         bgTypeID = BATTLEGROUND_AV;
 
+    RemoveFromBGFreeSlotQueue();
 
-    this->RemoveFromBGFreeSlotQueue();
-
-    uint32 loser_rating = 0;
-    uint32 winner_rating = 0;
     WorldPacket data;
     int32 winmsg_id = 0;
 

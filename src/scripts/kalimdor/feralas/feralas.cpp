@@ -153,7 +153,7 @@ struct npc_shay_leafrunnerAI : public FollowerAI
             }
         }
     }
-    void JustDied(Unit* killer)
+    void JustDied(Unit* killer) override
     {
         m_uiWanderTimer = 0;
         m_uiDespawnTimer = 0;
@@ -174,7 +174,7 @@ struct npc_shay_leafrunnerAI : public FollowerAI
         SetFollowPaused(false);
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff)
+    void UpdateFollowerAI(const uint32 uiDiff) override
     {
         if (m_uiDespawnTimer)
         {
@@ -287,7 +287,7 @@ struct MushgogAI : public ScriptedAI
     bool m_bEnrage;
     bool m_bAggro;
 
-    void Reset()
+    void Reset() override
     {
     	m_uiInvocation_Timer  = 1000;
         m_uiSporeCloud_Timer  = 6000;
@@ -297,7 +297,7 @@ struct MushgogAI : public ScriptedAI
         m_bAggro              = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
         if (!m_bAggro)
@@ -313,7 +313,7 @@ struct MushgogAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
     	uint32 chanceToSpawn = urand(0,5);
     	if (chanceToSpawn==0)
@@ -328,7 +328,7 @@ struct MushgogAI : public ScriptedAI
     	}
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -407,7 +407,7 @@ struct TheRazzaAI : public ScriptedAI
     uint32 m_uiInvocation_Timer;
     bool m_bAggro;
 
-    void Reset()
+    void Reset() override
     {
     	m_uiInvocation_Timer     = 1000;
         m_uiPoisonBolt_Timer     = 5000;
@@ -415,7 +415,7 @@ struct TheRazzaAI : public ScriptedAI
         m_bAggro                 = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
         if (!m_bAggro)
@@ -431,7 +431,7 @@ struct TheRazzaAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -498,7 +498,7 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
     uint32 m_uiInvocation_Timer;
     bool m_bAggro;
 
-    void Reset()
+    void Reset() override
     {
     	m_uiInvocation_Timer    = 1000;
         m_uiCleave_Timer        = urand(7000,10000);
@@ -507,7 +507,7 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
         m_bAggro                = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
         if (!m_bAggro)
@@ -523,7 +523,7 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

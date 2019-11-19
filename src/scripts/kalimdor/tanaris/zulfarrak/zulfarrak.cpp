@@ -77,7 +77,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
     uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless m_creature->getVictim() dodge, parry or block attack. Trinity support required.
     uint64 PlayerGUID;
 
-    void Reset()
+    void Reset() override
     {
         ShieldBash_Timer = 5000;
         Revenge_Timer = 8000;
@@ -85,7 +85,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
 //        m_creature->setFaction(FACTION_FRIENDLY);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!pInstance)
             return;
@@ -147,7 +147,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void DoAction(const uint32 param)
+    void DoAction(const uint32 param) override
     {
         postGossipStep = 1;
         Text_Timer = 0;
@@ -297,25 +297,25 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
     bool regen;
     ScriptedInstance* pInstance;
 
-    void Reset()
+    void Reset() override
     {
         /*if (pInstance)
             pInstance->SetData(0, NOT_STARTED);*/
     }
 
-    void AttackStart(Unit *victim)
+    void AttackStart(Unit *victim) override
     {
         ScriptedAI::AttackStart(victim);
         //AttackStartCaster(victim,10);//keep back & toss bombs/shoot
     }
 
-    void JustDied(Unit * /*victim*/)
+    void JustDied(Unit * /*victim*/) override
     {
         /*if (pInstance)
             pInstance->SetData(0, DONE);*/
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (regen == false && pInstance->GetData(EVENT_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
         {
@@ -381,7 +381,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
         }
     }
 
-    void MovementInform(uint32 type, uint32 id)
+    void MovementInform(uint32 type, uint32 id) override
     {
         if (pInstance)
         {
@@ -433,7 +433,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
         }
     }
 
-    void DoAction(const uint32 param)
+    void DoAction(const uint32 param) override
     {
         sLog.outString("DoAction de npc_weegli_blastfuse : Destruction porte");
         DestroyDoor();
@@ -608,13 +608,13 @@ struct ward_zumrahAI : public ScriptedAI
 
     uint32 m_uiSkeletonTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiSkeletonTimer = 5000;
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
 

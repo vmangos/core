@@ -225,7 +225,7 @@ struct arena_szerelmesAI : public ScriptedAI
     uint32 Shoot_Timer;
     uint32 add_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Shoot_Timer = 15000;
         Pummel_Timer = 7000;
@@ -233,19 +233,19 @@ struct arena_szerelmesAI : public ScriptedAI
         add_Timer = 60000;
     }
 
-    void Aggro(Unit* pPlayer)
+    void Aggro(Unit* pPlayer) override
     {
         add_Timer = 1000;
         DoCastSpellIfCan(m_creature->getVictim(), SPELL_FAIL);
     }
 
-    void JustDied(Unit* Victim)
+    void JustDied(Unit* Victim) override
     {
         while (Creature* Add = m_creature->FindNearestCreature(NPC_ADD, 100.0f))
             Add->DisappearAndDie();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -340,7 +340,7 @@ struct npc_karlekAI : public ScriptedAI
     ArenaBossSzerelmesStatus eEventStatus;
     uint32 m_uiEventResetTimer;
 
-    void Reset()
+    void Reset() override
     {
     }
 
@@ -390,7 +390,7 @@ struct npc_karlekAI : public ScriptedAI
     }
 
     // L'event se reset si le boss despawn.
-    void SummonedCreatureDespawn(Creature* pSummoned)
+    void SummonedCreatureDespawn(Creature* pSummoned) override
     {
         if (pSummoned->GetObjectGuid() == m_uiSzerelmesGUID)
         {
@@ -400,14 +400,14 @@ struct npc_karlekAI : public ScriptedAI
     }
 
     // L'event se complete si le boss meurt.
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (pSummoned->GetObjectGuid() == m_uiSzerelmesGUID)
             CompleteEvent();
     }
 
 
-    void UpdateAI(const uint32 diff, Player *pPlayer)
+    void UpdateAI(uint32 const diff) override
     {
         if (Creature* pSzerelmes = m_creature->GetMap()->GetCreature(m_uiSzerelmesGUID))
         {
@@ -424,7 +424,6 @@ struct npc_karlekAI : public ScriptedAI
             return;
 
         DoMeleeAttackIfReady();
-
     }
 };
 

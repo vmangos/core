@@ -57,7 +57,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
     uint32 m_uiWPHolder;
     uint32 m_uiShootTimer;
 
-    void Reset()
+    void Reset() override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -80,7 +80,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         m_uiShootTimer = 0;
     }
 
-    void WaypointReached(uint32 uiPoint)
+    void WaypointReached(uint32 uiPoint) override
     {
         m_uiWPHolder = uiPoint;
 
@@ -129,7 +129,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         }
     }
 
-    void AttackStart(Unit* pWho)
+    void AttackStart(Unit* pWho) override
     {
         if (!pWho)
             return;
@@ -144,12 +144,12 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -206,7 +206,7 @@ struct npc_defias_traitorAI : public npc_escortAI
         Reset();
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         switch (i)
         {
@@ -227,12 +227,12 @@ struct npc_defias_traitorAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* who)
+    void Aggro(Unit* who) override
     {
         DoScriptText(urand(0, 1) ? SAY_AGGRO_1 : SAY_AGGRO_2, m_creature, who);
     }
 
-    void Reset() { }
+    void Reset() override { }
 };
 
 bool QuestAccept_npc_defias_traitor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)

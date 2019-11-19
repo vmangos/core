@@ -52,7 +52,7 @@ struct boss_jandicebarovAI : public ScriptedAI
     bool Invisible;
     bool checkForDamage;
 
-    void Reset()
+    void Reset() override
     {
         CurseOfBlood_Timer = 10000;
         Illusion_Timer = 15000;
@@ -86,7 +86,7 @@ struct boss_jandicebarovAI : public ScriptedAI
         IllusionGUIDS.clear(); 
     }
 
-    void JustDied(Unit *pKiller)
+    void JustDied(Unit *pKiller) override
     {
         UnsummonIllusions();
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -98,7 +98,7 @@ struct boss_jandicebarovAI : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit* /*pDealer*/, uint32& uiDamage)
+    void DamageTaken(Unit* /*pDealer*/, uint32& uiDamage) override
     {
         if (checkForDamage)
         {
@@ -112,7 +112,7 @@ struct boss_jandicebarovAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (Invisible && Invisible_Timer < diff)
         {
@@ -187,13 +187,13 @@ struct mob_illusionofjandicebarovAI : public ScriptedAI
 
     uint32 Cleave_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Cleave_Timer = urand(2000, 8000);
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

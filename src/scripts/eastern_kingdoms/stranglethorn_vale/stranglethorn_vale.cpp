@@ -42,13 +42,13 @@ struct mob_yennikuAI : public ScriptedAI
     uint32 Reset_Timer;
     bool bReset;
 
-    void Reset()
+    void Reset() override
     {
         Reset_Timer = 0;
         m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, const SpellEntry *spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -67,18 +67,21 @@ struct mob_yennikuAI : public ScriptedAI
         return;
     }
 
-    void Aggro(Unit *who) {}
+    void Aggro(Unit *who) override {}
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (bReset)
+        {
             if (Reset_Timer < diff)
             {
                 EnterEvadeMode();
                 bReset = false;
                 m_creature->setFaction(28);                     //troll, bloodscalp
             }
-            else Reset_Timer -= diff;
+            else
+                Reset_Timer -= diff;
+        }
 
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -101,13 +104,13 @@ struct mob_assistant_kryll : public ScriptedAI
 
     uint32 Speach_Timer;    
 
-    void Reset()
+    void Reset() override
     {
         Speach_Timer = 360000;
     }
 
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (Speach_Timer < diff)
         {
@@ -141,7 +144,7 @@ struct go_transpolyporterAI: public GameObjectAI
     go_transpolyporterAI(GameObject* pGo) : GameObjectAI(pGo)
     {}
 
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         if (user && user->IsPlayer())
         {
@@ -200,7 +203,7 @@ struct npc_molthorAI : public npc_escortAI
         m_uiPhase = 0;
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         if (uiPointId == 7)
         {

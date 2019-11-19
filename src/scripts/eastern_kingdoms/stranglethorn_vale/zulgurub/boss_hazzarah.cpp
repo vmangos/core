@@ -38,14 +38,14 @@ struct boss_hazzarahAI : public ScriptedAI
     uint32 Sleep_Timer;
     uint32 Illusions_Timer;
 
-    void Reset()
+    void Reset() override
     {
         ManaBurn_Timer = urand(4000, 10000);
         Sleep_Timer = urand(10000, 18000);
         Illusions_Timer = urand(10000, 18000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -40,12 +40,12 @@ struct npc_astor_hadrenAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_creature->setFaction(68);
     }
 
-    void JustDied(Unit *who)
+    void JustDied(Unit *who) override
     {
         m_creature->setFaction(68);
     }
@@ -120,7 +120,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
     uint64 uiRaneGUID;
     uint64 uiQuinnGUID;
 
-    void MoveInLineOfSight(Unit* pUnit)
+    void MoveInLineOfSight(Unit* pUnit) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -139,7 +139,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
         npc_escortAI::MoveInLineOfSight(pUnit);
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         Player* pPlayer = GetPlayerForEscort();
 
@@ -178,7 +178,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -187,7 +187,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* who)
+    void Aggro(Unit* who) override
     {
         switch (urand(0, 2))
         {
@@ -552,7 +552,7 @@ struct npc_human_worgenAI : public ScriptedAI
     {
         return m_creature->GetEntry() == m_uiWorgenEntry;
     }
-    void Reset()
+    void Reset() override
     {
         m_bIsInDefenseStance     = false;
         m_uiShieldBlock_Timer    = 3000;
@@ -567,7 +567,7 @@ struct npc_human_worgenAI : public ScriptedAI
 #endif
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         time_t rawtime;
         time(&rawtime);

@@ -85,7 +85,7 @@ class ObjectWorldLoader
 {
 public:
     explicit ObjectWorldLoader(ObjectGridLoader& gloader)
-        : i_cell(gloader.i_cell), i_grid(gloader.i_grid), i_map(gloader.i_map), i_corpses(0)
+        : i_cell(gloader.i_cell), i_map(gloader.i_map), i_corpses(0)
     {}
 
     void Visit(CorpseMapType &m);
@@ -94,7 +94,6 @@ public:
 
 private:
     Cell i_cell;
-    NGridType &i_grid;
     Map* i_map;
 public:
     uint32 i_corpses;

@@ -1159,12 +1159,7 @@ bool ChatHandler::HandleLookupPoolCommand(char * args)
         return false;
 
     std::string namepart = args;
-
-    Player* player = m_session ? m_session->GetPlayer() : nullptr;
-    MapPersistentState* mapState = player ? player->GetMap()->GetPersistentState() : nullptr;
-
     strToLower(namepart);
-
     uint32 counter = 0;
 
     // spawn pools for expected map or for not initialized shared pools state for non-instanceable maps
@@ -1355,7 +1350,6 @@ bool ChatHandler::HandleLookupSoundCommand(char* args)
     {
         uint32 id = itr.first;
         SoundEntriesEntry const& soundEntry = itr.second;
-        int loc = GetSessionDbcLocale();
         std::string name = soundEntry.Name;
 
         if (name.empty())

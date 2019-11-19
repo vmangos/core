@@ -378,7 +378,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
 
-            if (InstanceData const* data = map->GetInstanceData())
+            if (InstanceData const* data = pMap->GetInstanceData())
             {
                 switch (m_value3)
                 {

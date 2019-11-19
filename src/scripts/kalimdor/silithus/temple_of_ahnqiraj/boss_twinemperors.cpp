@@ -98,11 +98,11 @@ static constexpr uint32 TELEPORTTIME_MAX_CD         = 40000;    // Longest possi
 
 static constexpr uint32 TRY_HEAL_FREQUENCY          = 0;        // How ofthen will the emperors TRY to heal eachother, 0 for every update
 static constexpr uint32 SUCCESS_HEAL_FREQUENCY      = 1500;     // How ofthen will the emperors actually heal, when in range of each other
-static constexpr float  HEAL_BROTHER_AMOUNT         = 30000.0f; // How much do they heal when in heal-range
+//static constexpr float  HEAL_BROTHER_AMOUNT         = 30000.0f; // How much do they heal when in heal-range
 static constexpr float  HEAL_BROTHER_RANGE          = 60.0f;
 
 static constexpr uint32 RESPAWN_BUG_FREQUENCY       = 10000;    // How often do we try to respawn a dead bug
-static constexpr float  RESPAWN_BUG_DISTANCE        = 50.0f;    // How far away do we look for dead bugs for respawning
+//static constexpr float  RESPAWN_BUG_DISTANCE        = 50.0f;    // How far away do we look for dead bugs for respawning
 static constexpr float  BUG_SPELL_MAX_DIST          = 20.0f;    // Max distance a bug can be for the twin to choose it
 
 // Vek'nilash constants
@@ -154,7 +154,7 @@ struct mob_TwinsBug : public ScriptedAI {
         m_creature->RemoveAllAuras();
     }
 
-    virtual void Reset() override
+    void Reset() override
     {
         m_creature->setFaction(7);
         m_creature->RemoveAllAuras();
@@ -163,7 +163,7 @@ struct mob_TwinsBug : public ScriptedAI {
 
     }
 
-    virtual void UpdateAI(const uint32 diff) override
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -634,12 +634,12 @@ struct boss_veklorAI : public boss_twinemperorsAI
         return urand(EXPLODE_BUG_MIN_CD, EXPLODE_BUG_MAX_CD);
     }
 
-    uint32 GetBugSpell()
+    uint32 GetBugSpell() override
     {
         return SPELL_EXPLODEBUG;
     }
 
-    virtual void UpdateTeleportToMyBrother(uint32 diff) override
+    void UpdateTeleportToMyBrother(uint32 diff) override
     {
         // Updating time and returning if it's not yet time to teleport
         if (teleportTimer >= diff) {
@@ -835,7 +835,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_SPELL, true);
     }
 
-    void OnEndTeleportVirtual()
+    void OnEndTeleportVirtual() override
     {
         //todo: anything that needs doing?
     }
@@ -845,7 +845,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         return urand(MUTATE_BUG_MIN_CD, MUTATE_BUG_MAX_CD);
     }
 
-    uint32 GetBugSpell()
+    uint32 GetBugSpell() override
     {
         return SPELL_MUTATE_BUG;
     }
@@ -875,7 +875,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         return m_creature->GetMap()->GetUnit((*it)->getUnitGuid());
     }
     
-    void UpdateEmperor(uint32 diff)
+    void UpdateEmperor(uint32 diff) override
     {       
         // Vek'nilash goes first, instantly does his yell when we are in combat. 
         if (!didPullDialogue) {
@@ -918,7 +918,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         }
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
         ScriptedAI::AttackStart(who);
     }

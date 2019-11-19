@@ -54,7 +54,7 @@ struct FirewalkerAI : public ScriptedAI
     uint32 m_uiInciteFlames_Timer;
     uint32 m_uiNbBlossom;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFireBlossomCasting_Timer   =  6000;
         m_uiFireBlossom_Timer          =     0;
@@ -63,12 +63,12 @@ struct FirewalkerAI : public ScriptedAI
         m_uiNbBlossom                  =     0;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -150,7 +150,7 @@ struct mob_ancient_core_houndAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         switch (urand(0, 5))
         {
@@ -180,7 +180,7 @@ struct mob_ancient_core_houndAI : public ScriptedAI
         m_creature->SetNoCallAssistance(true);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance && m_pInstance->GetData(TYPE_MAGMADAR) == DONE)
         {
@@ -207,7 +207,7 @@ struct mob_ancient_core_houndAI : public ScriptedAI
     }
     */
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -492,12 +492,12 @@ struct mob_lava_surgerAI : public ScriptedAI
     uint32 m_uiSurgeTimer;
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         m_uiSurgeTimer = urand(1000, 2000);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance && m_pInstance->GetData(TYPE_GARR) == DONE)
         {
@@ -506,7 +506,7 @@ struct mob_lava_surgerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -44,7 +44,7 @@ struct boss_rasfrostAI : public ScriptedAI
     uint32 ChillNova_Timer;
     uint32 FrostVolley_Timer;
 
-    void Reset()
+    void Reset() override
     {
         IceArmor_Timer = 2000;
         Frostbolt_Timer = 8000;
@@ -56,7 +56,7 @@ struct boss_rasfrostAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_ICEARMOR, true);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -362,19 +362,19 @@ struct RazorfenDefenderAI : public ScriptedAI
     uint32 m_uiImprovedBlocking_Timer;
     uint32 m_uiShieldBash_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiImprovedBlocking_Timer = 1000;
         m_uiShieldBash_Timer      = 6600;
         DoCastSpellIfCan(m_creature, SPELL_DEFENSIVE_STANCE, true);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

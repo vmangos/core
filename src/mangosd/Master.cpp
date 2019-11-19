@@ -513,7 +513,7 @@ int Master::Run()
         b[3].Event.KeyEvent.wVirtualScanCode = 0x1c;
         b[3].Event.KeyEvent.wRepeatCount = 1;
         DWORD numb;
-        BOOL ret = WriteConsoleInput(hStdIn, b, 4, &numb);
+        WriteConsoleInput(hStdIn, b, 4, &numb);
 
         cliThread->wait();
 
@@ -693,7 +693,7 @@ void Master::_OnSignal(int s)
                 sObjectAccessor.SaveAllPlayers();
                 ACE_Based::Thread::Sleep(25000); // Wait enough time to execute the SQL queries.
             }
-            *((int*)nullptr) = 42; // Crash for real now.
+            *((volatile int*)nullptr) = 42; // Crash for real now.
             return;
     }
 

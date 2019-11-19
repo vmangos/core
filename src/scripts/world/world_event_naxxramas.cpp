@@ -50,33 +50,33 @@ struct NecropolisProxyAI : public ScriptedAI
 
     ObjectGuid _necropolisGuid;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
     }
 
-    void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
+    void InformGuid(const ObjectGuid necropolis, uint32 type = 0) override
     {
         _necropolisGuid = necropolis;
     }
 
-    void SpellHit(Unit* caster, const SpellEntry* spell)
+    void SpellHit(Unit* caster, const SpellEntry* spell) override
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && caster != m_creature)
             DoCastSpellIfCan(m_creature, SPELL_COMMUNICATION_TRIGGER);
     }
 
-    void SpellHitTarget(Unit* target, const SpellEntry* spell)
+    void SpellHitTarget(Unit* target, const SpellEntry* spell) override
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
             if (Creature* crea = target->ToCreature())
                 crea->AI()->InformGuid(_necropolisGuid);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
     }
 };
@@ -106,7 +106,7 @@ struct NecropolisRelayAI : public ScriptedAI
     ObjectGuid _necropolisGuid;
     std::vector<ObjectGuid> SpawnedShards;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
     }
@@ -120,7 +120,7 @@ struct NecropolisRelayAI : public ScriptedAI
     {
         SpawnedShards.push_back(pCreature->GetObjectGuid());
     }
-    void SpellHitTarget(Unit* target, const SpellEntry* spell)
+    void SpellHitTarget(Unit* target, const SpellEntry* spell) override
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
         {
@@ -151,7 +151,7 @@ struct NecropolisRelayAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (despawnTimer)
         {
@@ -186,7 +186,7 @@ public:
         me->SetActiveObjectState(true);
         me->SetVisibilityModifier(3000.0f);
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
     }
 };
@@ -239,7 +239,7 @@ struct npc_necrotic_shard : public ScriptedAI
     uint32 eliteSpawnTimer;
     std::set<ObjectGuid> _adds;
 
-    void OnRemoveFromWorld()
+    void OnRemoveFromWorld() override
     {
         DespawnAdds();
     }
@@ -278,15 +278,15 @@ struct npc_necrotic_shard : public ScriptedAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* who)
+    void Aggro(Unit* who) override
     {
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
     }
 
@@ -300,12 +300,12 @@ struct npc_necrotic_shard : public ScriptedAI
         //    break;
         //}
     }
-    void JustRespawned()
+    void JustRespawned() override
     {
         m_creature->UpdateEntry(NPC_NECROTIC_SHARD);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
             necropolis->SendGameObjectCustomAnim();
@@ -317,13 +317,13 @@ struct npc_necrotic_shard : public ScriptedAI
         DespawnAdds();
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_COMMUNICATION_TRIGGER || pSpell->Id == SPELL_ZAP_CRYSTAL)
             DoCastSpellIfCan(m_creature, SPELL_CAMP_RECEIVES_COMMUNIQUE);
     }
 
-    void DamageTaken(Unit* doneBy, uint32& damage)
+    void DamageTaken(Unit* doneBy, uint32& damage) override
     {
         if (m_creature->GetHealth() < damage + 1)
         {
@@ -356,7 +356,7 @@ struct npc_necrotic_shard : public ScriptedAI
             uiAmountHealed = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (eliteSpawnTimer < diff)
         {
@@ -422,23 +422,23 @@ struct npc_cultist_engineer : public ScriptedAI
     uint32 _healTimer;
     ObjectGuid _shardGuid;
 
-    void Reset()
+    void Reset() override
     {
         _healTimer = 1000;
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         m_creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_ENGINEER_REPAIR);
         m_creature->SetChannelObjectGuid(_shardGuid);
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
 
     }
 
-    void DoAction(Unit* unit, uint32 action)
+    void DoAction(Unit* unit, uint32 action) override
     {
         if (action == ENGINEER_AI_ACTION_SET_PYLON)
         {
@@ -461,7 +461,7 @@ struct npc_cultist_engineer : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (_healTimer < diff)
         {
@@ -522,18 +522,18 @@ struct ShadowOfDoomAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiFear_Timer = 10000;
         m_uiMindFlay_Timer = 6000;
         m_uiScourgeStrike_Timer = 120000;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         uint32 rnd;
         rnd = urand(0, 1);
@@ -543,7 +543,7 @@ struct ShadowOfDoomAI : public ScriptedAI
             creature->MonsterSay(LANG_SHADOW_OF_DOOM_TEST_1, LANG_UNIVERSAL, 0);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -597,33 +597,33 @@ struct GhoulBerserker : public ScriptedAI
     }
     uint32 _plagueTimer;
     uint32 _enrageTimer;
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _plagueTimer = 10000;
         _enrageTimer = 0;
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPAWN_SMOKE_1);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
     {
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -669,25 +669,25 @@ struct SpectralSoldierAI : public ScriptedAI
     uint32 _shoutTimer;
     uint32 _sunderArmorTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _shoutTimer = 15000;
         _sunderArmorTimer = 10000;
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -731,25 +731,25 @@ struct SkeletalShocktrooperAI : public ScriptedAI
     uint32 _boneShardsTimer;
     uint32 _cleaveTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _boneShardsTimer = 10000;
         _cleaveTimer = 8000;
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -792,25 +792,25 @@ struct SkeletalTrooperAI : public ScriptedAI
     uint32 _ShadowWordPainTimer;
     uint32 _ScourgeStrikeTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _ScourgeStrikeTimer = 120000; // 2 min
         _ShadowWordPainTimer = 15000; // 15 sec
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPAWN_SMOKE_1);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -851,23 +851,23 @@ struct SpectralSpiritAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -894,24 +894,24 @@ struct SpectralApparitionAI : public ScriptedAI
 
     uint32 _ScourgeStrikeTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _ScourgeStrikeTimer = 120000; // 2 min
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -947,11 +947,11 @@ struct naxx_event_rewards_giverAI : public ScriptedAI
 
     bool _alliance;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         uint32 newEntry = 0;
         uint32 victories = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);

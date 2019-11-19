@@ -123,7 +123,7 @@ struct instance_ruins_of_ahnqiraj : public ScriptedInstance
 {
 public:
     instance_ruins_of_ahnqiraj(Map* pMap);
-    void Initialize();
+    void Initialize() override;
 
     void SetData(uint32 uiType, uint32 uiData) override;
     uint32 GetData(uint32 uiType) override;

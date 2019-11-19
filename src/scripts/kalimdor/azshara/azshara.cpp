@@ -44,13 +44,13 @@ struct mobs_spitelashesAI : public ScriptedAI
     uint32 morphtimer;
     bool spellhit;
 
-    void Reset()
+    void Reset() override
     {
         morphtimer = 0;
         spellhit = false;
     }
 
-    void SpellHit(Unit *Hitter, const SpellEntry *Spellkind)
+    void SpellHit(Unit *Hitter, const SpellEntry *Spellkind) override
     {
         if (!spellhit && Hitter->GetTypeId() == TYPEID_PLAYER)
         {
@@ -63,7 +63,7 @@ struct mobs_spitelashesAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         // we mustn't remove the creature in the same round in which we cast the summon spell, otherwise there will be no summons
         if (spellhit && morphtimer >= 5000)
@@ -218,7 +218,7 @@ struct mob_mawsAI : public ScriptedAI
     bool InCombat;
     bool PhaseTwo;
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (!InCombat)
         {
@@ -231,7 +231,7 @@ struct mob_mawsAI : public ScriptedAI
             LastWayPoint = uiPointId;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (InCombat)
         {
@@ -289,17 +289,17 @@ struct mob_mawsAI : public ScriptedAI
         else if (m_creature->getVictim())
             InCombat = 1;
     }
-    void DamageTaken(Unit *done_by, uint32 &damage)// l'empecher d'etre kittable infini. s'applique pas aux dégats de la charge.
+    void DamageTaken(Unit *done_by, uint32 &damage) override// l'empecher d'etre kittable infini. s'applique pas aux dégats de la charge.
     {
         LeaveCombatTimer = 30000;
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         sWorld.SendWorldText(EMOTE_THE_BEAST_RETURNS);
     }
 
-    void Reset()
+    void Reset() override
     {
         PhaseTwo = 0;
         InCombat = 0;

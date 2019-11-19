@@ -73,7 +73,7 @@ struct boss_patchwerkAI : public ScriptedAI
     bool   m_bBerserk;
     ObjectGuid previousTarget;
 
-    void Reset()
+    void Reset() override
     {
         m_events.Reset();
         m_bEnraged = false;
@@ -81,7 +81,7 @@ struct boss_patchwerkAI : public ScriptedAI
         previousTarget = 0;
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (urand(0, 4))
             return;
@@ -89,7 +89,7 @@ struct boss_patchwerkAI : public ScriptedAI
         DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -103,7 +103,7 @@ struct boss_patchwerkAI : public ScriptedAI
             m_pInstance->SetData(TYPE_PATCHWERK, FAIL);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(urand(0, 1) ? SAY_AGGRO1 : SAY_AGGRO2, m_creature);
 
@@ -224,7 +224,7 @@ struct boss_patchwerkAI : public ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!CustomGetTarget() || !m_creature->getVictim())
             return;

@@ -105,7 +105,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
     uint32 Razor_Phase_2;
     uint32 Razor_Remove_Auras;
 
-    void Reset()
+    void Reset() override
     {
         Cleave_Timer = 15000;                               //These times are probably wrong
         WarStomp_Timer = 35000;
@@ -124,7 +124,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
 
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
 
@@ -132,13 +132,13 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
         DoPlaySoundToSet(m_creature, 8272);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         m_pInstance->SetData(TYPE_RAZORGORE, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -399,7 +399,7 @@ struct Mob_Grethok_The_ControllerAI : public ScriptedAI
     uint32 Slow_Timer;
     uint32 Razorgore_Spawn;
 
-    void Reset()
+    void Reset() override
     {
         Greater_Polymorph_Timer = 3000;
         Dominate_Mind_Timer = 1000;
@@ -408,12 +408,12 @@ struct Mob_Grethok_The_ControllerAI : public ScriptedAI
         Razorgore_Spawn = 1;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
 
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

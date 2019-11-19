@@ -114,7 +114,7 @@ public:
     uint32 addGroupSize;
     uint32 waypoint;
 
-    void Initialize()
+    void Initialize() override
     {
         EndDoorEncounter = NOT_STARTED;
         GahzRillaEncounter = NOT_STARTED;
@@ -135,7 +135,7 @@ public:
         EndDoorGUID = 0;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -174,7 +174,7 @@ public:
         }
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -186,7 +186,7 @@ public:
         }
     }
 
-    uint32 GetData(uint32 type)
+    uint32 GetData(uint32 type) override
     {
         switch (type)
         {
@@ -196,7 +196,7 @@ public:
         return 0;
     }
 
-    uint64 GetData64(uint32 data)
+    uint64 GetData64(uint32 data) override
     {
         switch (data)
         {
@@ -220,7 +220,7 @@ public:
         return 0;
     }
 
-    void SetData(uint32 type, uint32 data)
+    void SetData(uint32 type, uint32 data) override
     {
         switch (type)
         {
@@ -243,7 +243,7 @@ public:
         }
     }
 
-    virtual void Update(uint32 diff)
+    void Update(uint32 diff) override
     {
         switch (PyramidPhase)
         {

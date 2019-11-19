@@ -55,7 +55,7 @@ bool WorldSession::CheckMailBox(ObjectGuid guid)
 class WorldSession::AsyncMailSendRequest
 {
 public:
-    AsyncMailSendRequest(): rcTeam(TEAM_NONE), mailsCount(0xFF), receiverPtr(nullptr), accountId(0), money(0), COD(0) {}
+    AsyncMailSendRequest(): accountId(0), money(0), COD(0), receiverPtr(nullptr), rcTeam(TEAM_NONE), mailsCount(0xFF) {}
     uint32 accountId;
     ObjectGuid senderGuid;
     ObjectGuid receiver;
@@ -729,7 +729,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data)
     ASSERT(pl);
 
     // client can't work with packets > max int16 value
-    const uint32 maxPacketSize = 32767;
+    // const uint32 maxPacketSize = 32767;
 
     uint32 mailsCount = 0;                                  // real send to client mails amount
 

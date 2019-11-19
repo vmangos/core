@@ -61,7 +61,7 @@ struct boss_scornAI : public ScriptedAI
     uint32 FrostNova_Timer;
     uint32 LastWayPoint;
 
-    void Reset()
+    void Reset() override
     {
         LichSlap_Timer = 45000;
         FrostboltVolley_Timer = 30000;
@@ -69,7 +69,7 @@ struct boss_scornAI : public ScriptedAI
         FrostNova_Timer = 30000;
         m_creature->GetMotionMaster()->MovePoint(LastWayPoint, ronde[LastWayPoint].x, ronde[LastWayPoint].y, ronde[LastWayPoint].z);
     }
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (!m_creature->getVictim())
         {
@@ -82,7 +82,7 @@ struct boss_scornAI : public ScriptedAI
         if (uiPointId >= 0 && uiPointId < 10)
             LastWayPoint = uiPointId;
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

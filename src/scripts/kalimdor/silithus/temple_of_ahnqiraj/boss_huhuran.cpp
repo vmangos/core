@@ -88,7 +88,7 @@ struct boss_huhuranAI : public ScriptedAI
             m_pInstance->SetData(TYPE_HUHURAN, DONE);
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiFrenzyTimer        = urand(25000, 35000);
         m_uiWyvernTimer        = urand(18000, 28000);
@@ -99,7 +99,7 @@ struct boss_huhuranAI : public ScriptedAI
         m_bBerserk             = false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

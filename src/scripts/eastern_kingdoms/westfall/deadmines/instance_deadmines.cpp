@@ -53,7 +53,7 @@ struct instance_deadmines : public ScriptedInstance
     uint32 m_uiIronDoor_Timer;
     uint32 m_uiDoor_Step;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -72,7 +72,7 @@ struct instance_deadmines : public ScriptedInstance
         m_uiDoor_Step = 0;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         if (pCreature->GetEntry() == NPC_RHAHKZOR)
             m_uiRhahkGUID = pCreature->GetGUID();
@@ -98,7 +98,7 @@ struct instance_deadmines : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature *who)
+    void OnCreatureDeath(Creature *who) override
     {
         switch (who->GetEntry())
         {
@@ -127,7 +127,7 @@ struct instance_deadmines : public ScriptedInstance
         }
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         if (pGo->GetEntry() == GO_IRON_CLAD)
             m_uiIronCladGUID = pGo->GetGUID();
@@ -149,7 +149,7 @@ struct instance_deadmines : public ScriptedInstance
         }
     }
 
-    void OnPlayerEnter(Player* pPlayer)
+    void OnPlayerEnter(Player* pPlayer) override
     {
         if (!pPlayer)
             return;
@@ -162,7 +162,7 @@ struct instance_deadmines : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         if (uiType == TYPE_DEFIAS_ENDDOOR)
         {
@@ -182,7 +182,7 @@ struct instance_deadmines : public ScriptedInstance
             isGunPowderEventDone = uiData;
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         if (uiType == TYPE_DEFIAS_ENDDOOR)
             return m_auiEncounter[0];
@@ -191,7 +191,7 @@ struct instance_deadmines : public ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         if (uiData == DATA_DEFIAS_DOOR)
             return m_uiIronCladGUID;
@@ -199,7 +199,7 @@ struct instance_deadmines : public ScriptedInstance
         return 0;
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         if (isRhahkDead)
         {

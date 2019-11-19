@@ -38,13 +38,13 @@ struct boss_grizzleAI : public ScriptedAI
     uint32 GroundTremor_Timer;
     uint32 Frenzy_Timer;
 
-    void Reset()
+    void Reset() override
     {
         GroundTremor_Timer = 12000;
         Frenzy_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

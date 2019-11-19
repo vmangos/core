@@ -62,20 +62,20 @@ struct celebras_the_cursedAI : public ScriptedAI
     uint32 EntanglingRoots_Timer;
     uint32 CorruptForces_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Wrath_Timer = 8000;
         EntanglingRoots_Timer = 2000;
         CorruptForces_Timer = 30000;
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CELEBRAS, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -134,7 +134,7 @@ struct celebrasSpiritAI : public npc_escortAI
     uint64 auraGUID;
     bool m_bBookRead;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPhase = 0;
         Event_Timer = 0;
@@ -142,7 +142,7 @@ struct celebrasSpiritAI : public npc_escortAI
         m_bBookRead = false;
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         std::list<GameObject*> scepterList;
         switch (i)
@@ -221,7 +221,7 @@ struct celebrasSpiritAI : public npc_escortAI
             Event_Timer = 1000;
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (Event_Timer && !m_creature->getVictim())
         {

@@ -104,7 +104,7 @@ struct boss_razorgoreAI : public ScriptedAI
 
     uint32 m_uiEvadeTroopsTimer;
 
-    void Reset()
+    void Reset() override
     {
         SetCombatMovement(true);
         m_uiCleaveTimer         = 9000;                       // These times are probably wrong
@@ -117,7 +117,7 @@ struct boss_razorgoreAI : public ScriptedAI
         m_uiEvadeTroopsTimer = 5000;
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
         if (!pTarget)
             return;
@@ -126,7 +126,7 @@ struct boss_razorgoreAI : public ScriptedAI
             m_creature->getThreatManager().modifyThreatPercent(pTarget, -30);
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         if (!m_pInstance)
             return;
@@ -157,7 +157,7 @@ struct boss_razorgoreAI : public ScriptedAI
         SituationInitiale();
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         DEBUG_RAZOR("Razor JustDied");
         if (m_pInstance)
@@ -171,7 +171,7 @@ struct boss_razorgoreAI : public ScriptedAI
         MortPhaseUn();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAZORGORE, FAIL);
@@ -251,7 +251,7 @@ struct boss_razorgoreAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_creature->hasUnitState(UNIT_STAT_POSSESSED))
         {
@@ -344,7 +344,7 @@ struct boss_razorgoreAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void GetAIInformation(ChatHandler& handler)
+    void GetAIInformation(ChatHandler& handler) override
     {
         handler.PSendSysMessage("* CombatMovement : %s", IsCombatMovementEnabled() ? "OUI" : "NON");
     }
@@ -371,7 +371,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
     bool m_uiCombatStarted;
     ObjectGuid m_uiPossesseurGuid;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPopTimer = 45000; // Timer confirmed by BigWigs
         m_uiCheckTimer = 5000;
@@ -559,7 +559,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_pInstance)
             return;

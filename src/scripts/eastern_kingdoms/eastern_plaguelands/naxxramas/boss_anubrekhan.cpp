@@ -229,7 +229,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         deadCryptGuards.push_back(pSummoned->GetObjectGuid());
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiImpaleTimer = IMPALE_CD();
         m_uiLocustSwarmTimer = LOCUST_SWARM_CD(true);
@@ -239,7 +239,6 @@ struct boss_anubrekhanAI : public ScriptedAI
 
         std::list<Creature*> scarabs;
         GetCreatureListWithEntryInGrid(scarabs, m_creature, MOB_CORPSE_SCARAB, 300.0f);
-        int count = 0;
         for (auto it = scarabs.begin(); it != scarabs.end();)
         {
             if (scarabs.size() < 31)
@@ -284,7 +283,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         CheckSpawnInitialCryptGuards();
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         // Scarabs are summoned by instance script when a player dies.
         // See instance_naxxramas::OnPlayerDeath(Player*)
@@ -304,7 +303,7 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (!m_pInstance)
             return;
@@ -322,13 +321,13 @@ struct boss_anubrekhanAI : public ScriptedAI
         DoScriptText(SAY_AGGRO3 + urand(0, 2), m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_ANUB_REKHAN, DONE);
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (pWho->GetTypeId() == TYPEID_PLAYER 
             && !m_creature->isInCombat() 
@@ -384,7 +383,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -501,7 +500,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         cleaveTimer     = CRYPTGUARD_CLEAVE_CD;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         // Make sure anub is pulled too. Anub will take care of pulling the other crypt-guard
         
@@ -570,7 +569,7 @@ struct anub_doorAI : public GameObjectAI
             sLog.outError("anub_doorAI could not find instanceData");
     }
 
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         if (haveDoneIntro)
             return false;

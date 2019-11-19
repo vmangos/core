@@ -7,8 +7,8 @@
 
 NodeSession::NodeSession(MapSocket* sock):
     m_socket(sock), m_lastReceivedPacketTime(0),
-    itemGuidsGenerator(1000), petGuidsGenerator(1000),
-    m_isConnectedToMaster(!sock->IsServerSide()), m_isReady(false)
+    m_isConnectedToMaster(!sock->IsServerSide()), m_isReady(false),
+    itemGuidsGenerator(1000), petGuidsGenerator(1000)
 {
     ASSERT(sock);
     sock->AddReference();

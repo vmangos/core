@@ -26,7 +26,7 @@
 
 namespace MMAP
 {
-    TerrainBuilder::TerrainBuilder(bool skipLiquid, bool quick) : m_skipLiquid(skipLiquid), m_V9(NULL), m_V8(NULL), m_mapId(0), m_quick(quick) { }
+    TerrainBuilder::TerrainBuilder(bool skipLiquid, bool quick) : m_skipLiquid(skipLiquid), m_V9(nullptr), m_V8(nullptr), m_quick(quick), m_mapId(0) { }
     TerrainBuilder::~TerrainBuilder() { }
 
     /**************************************************************************/
@@ -277,7 +277,7 @@ namespace MMAP
                     j++;
                 }
                 delete [] liquid_map;
-                liquid_map = NULL;
+                liquid_map = nullptr;
             }
             else
             {
@@ -584,7 +584,7 @@ namespace MMAP
         VMAPLoadResult result = vmapManager.loadMap("vmaps", mapID, tileX, tileY);
         InstanceTreeMap instanceTrees;
         vmapManager.getInstanceMapTree(instanceTrees);
-        ModelInstance* models = NULL;
+        ModelInstance* models = nullptr;
         uint32 count = 0;
         if (instanceTrees[mapID])
             instanceTrees[mapID]->getModelInstances(models, count);
@@ -625,7 +625,7 @@ namespace MMAP
                 vector<Vector3> tempVertices;
                 vector<Vector3> transformedVertices;
                 vector<MeshTriangle> tempTriangles;
-                WmoLiquid* liquid = NULL;
+                WmoLiquid* liquid = nullptr;
 
                 (*it).getMeshData(tempVertices, tempTriangles, liquid);
 
@@ -995,7 +995,7 @@ namespace MMAP
     void TerrainBuilder::loadOffMeshConnections(uint32 mapID, uint32 tileX, uint32 tileY, MeshData& meshData, const char* offMeshFilePath)
     {
         // no meshfile input given?
-        if (offMeshFilePath == NULL)
+        if (offMeshFilePath == nullptr)
             return;
 
         FILE* fp = fopen(offMeshFilePath, "rb");

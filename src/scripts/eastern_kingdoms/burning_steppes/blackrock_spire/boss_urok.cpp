@@ -40,7 +40,7 @@ struct go_urok_challengeAI: public GameObjectAI
 
     // Fonction appellees toutes les 100ms en moyenne.
     // Permet de gerer les timer de pop des adds par exemple.
-    void UpdateAI(uint32 const diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (_spellTimer < diff)
             _spellTimer = 0;
@@ -142,7 +142,7 @@ struct go_urok_challengeAI: public GameObjectAI
     }
 
     // Clic-droit sur le gameobject.
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         if (_actived)
         {
@@ -203,7 +203,7 @@ struct urokUnderlingAI : public ScriptedAI
     {
         timer=0;
     }
-    void Reset()
+    void Reset() override
     {
         timer=0;
         abilityReset();
@@ -211,7 +211,7 @@ struct urokUnderlingAI : public ScriptedAI
     virtual void abilityReset(){}
     uint32 timer;
     uint64 guidMound;
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if(GameObject* gobj=m_creature->GetMap()->GetGameObject(guidMound))
         {
@@ -221,7 +221,7 @@ struct urokUnderlingAI : public ScriptedAI
             }
         }
     }
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -229,7 +229,7 @@ struct urokUnderlingAI : public ScriptedAI
             return;
         HitBanner();
     }
-    void AttackStart(Unit * unit)
+    void AttackStart(Unit * unit) override
     {
       if( m_creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             return;
@@ -256,7 +256,7 @@ struct urokUnderlingAI : public ScriptedAI
           }
           return false;
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
@@ -292,12 +292,12 @@ struct urokEnforcerAI : public urokUnderlingAI
     {
         abilityReset();
     }
-    void abilityReset()
+    void abilityReset() override
     {
         m_uiStrike_Timer = 1000;
     }
     uint32 m_uiStrike_Timer;
-    void abilityCombatUpdate(uint32 uiDiff)
+    void abilityCombatUpdate(uint32 uiDiff) override
     {
         if (m_uiStrike_Timer < uiDiff)
         {
@@ -319,7 +319,7 @@ struct urokOgreMagusAI : public urokUnderlingAI
     {
     }
 
-    void abilityCombatUpdate(uint32 uiDiff)
+    void abilityCombatUpdate(uint32 uiDiff) override
     {
         if (!m_CreatureSpells.empty())
             UpdateSpellsList(uiDiff);

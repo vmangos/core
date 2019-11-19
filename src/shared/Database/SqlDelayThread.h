@@ -48,12 +48,12 @@ class SqlDelayThread : public ACE_Based::Runnable
 
     public:
         SqlDelayThread(Database* db, SqlConnection* conn, int workerId);
-        ~SqlDelayThread();
+        ~SqlDelayThread() override;
 
         ///< Put sql statement to delay queue
         bool Delay(SqlOperation* sql) { m_sqlQueue.add(sql); return true; }
 
         virtual void Stop();                                ///< Stop event
-        virtual void run();                                 ///< Main Thread loop
+        void run() override;                                 ///< Main Thread loop
 };
 #endif                                                      //__SQLDELAYTHREAD_H

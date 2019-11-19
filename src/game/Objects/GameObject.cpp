@@ -49,8 +49,8 @@
 
 GameObject::GameObject() : WorldObject(),
     loot(this),
-    m_goInfo(nullptr),
-    m_visible(true)
+    m_visible(true),
+    m_goInfo(nullptr)
 {
     m_objectType |= TYPEMASK_GAMEOBJECT;
     m_objectTypeId = TYPEID_GAMEOBJECT;

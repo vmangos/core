@@ -118,10 +118,10 @@ bool ModelInstance::isUnderModel(const G3D::Vector3& p, float* outDist, float* i
     Vector3 up(0, 0, 1);
     Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
     up = iInvRot * up * iInvScale;
-    Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
 
     if (iModel->IsUnderObject(pModel, up, flags & MOD_M2, outDist, inDist))
         return true;
+
     return false;
 }
 

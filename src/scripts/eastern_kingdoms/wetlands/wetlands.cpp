@@ -75,20 +75,20 @@ public:
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_slowingPoisonTimer = urand(5000, 8900);
         m_backstabTimer = 500;
         m_creature->CastSpell(m_creature, SPELL_POISON_PROC, false);
     }
 
-    void AttackStart(Unit* pWho)
+    void AttackStart(Unit* pWho) override
     {
         if (pWho && m_creature->Attack(pWho, true))
             m_creature->GetMotionMaster()->MoveChase(pWho);
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
         if (!pAttacker || m_creature->getVictim())
             return;
@@ -199,7 +199,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_nextPhaseDelay = 0;
         m_mdDialogPhase = 0;
@@ -208,14 +208,14 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
     }
 
     // This function is also called when NPC runs away from player/group range.
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DespawnFriendIfExists();
         // Let escort ai do all checks for players and quests.
         npc_escortAI::JustDied(pKiller);
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         npc_escortAI::JustRespawned(); // calls Reset()
 
@@ -231,7 +231,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             DoScriptText(SAY_PROGRESS_5_MIC, npcMikhail);
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -253,7 +253,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         // This function is also called when Tapoke Slim Jahn has been defeated!
         if (Pet *slimsFriend = m_creature->FindGuardianWithEntry(NPC_SLIMS_FRIEND))
@@ -266,7 +266,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             DoScriptText(SAY_PROGRESS_1_TAP, m_creature);
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
         if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
@@ -274,7 +274,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         AttackStart(pAttacker);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (m_justCreated)
         {
@@ -365,13 +365,13 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         }
     }
 
-    void JustStartedEscort()
+    void JustStartedEscort() override
     {
         // Once event starts, NPC will use his Stealth spell.
         m_creature->CastSpell(m_creature, SPELL_STEALTH, false);
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
             return;

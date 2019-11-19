@@ -581,10 +581,10 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 {
     public:
         explicit GameObject();
-        ~GameObject();
+        ~GameObject() override;
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
         bool Create(uint32 guidlow, uint32 name_id, Map *map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
         void Update(uint32 update_diff, uint32 p_time) override;
@@ -598,7 +598,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
 
         // overwrite WorldObject function for proper name localization
-        const char* GetNameForLocaleIdx(int32 locale_idx) const;
+        const char* GetNameForLocaleIdx(int32 locale_idx) const override;
 
         void SaveToDB();
         void SaveToDB(uint32 mapid);
@@ -684,7 +684,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void SendGameObjectCustomAnim(uint32 animId = 0);
         void SendGameObjectReset();
 
-        float GetObjectBoundingRadius() const;              // overwrite WorldObject version
+        float GetObjectBoundingRadius() const override;              // overwrite WorldObject version
 
         void Use(Unit* user);
 
@@ -714,12 +714,12 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void AddUse() { ++m_useTimes; }
         uint32 GetUseCount() const { return m_useTimes; }
 
-        void SaveRespawnTime();
+        void SaveRespawnTime() override;
 
         Loot        loot;
 
-        bool HasQuest(uint32 quest_id) const;
-        bool HasInvolvedQuest(uint32 quest_id) const;
+        bool HasQuest(uint32 quest_id) const override;
+        bool HasInvolvedQuest(uint32 quest_id) const override;
         bool ActivateToQuest(Player *pTarget) const;
         uint32 GetDefaultGossipMenuId() const override { return GetGOInfo()->GetGossipMenuId(); }
         void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false);
@@ -762,9 +762,9 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void SetVisible(bool b);
         bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
-        uint32 getFaction() const final override { return GetGOInfo()->faction; }
-        uint32 getLevel() const final override;
-        bool IsValidAttackTarget(Unit const* target) const final override;
+        uint32 getFaction() const final { return GetGOInfo()->faction; }
+        uint32 getLevel() const final ;
+        bool IsValidAttackTarget(Unit const* target) const final ;
     protected:
         bool        m_visible;
         uint32      m_spellId;

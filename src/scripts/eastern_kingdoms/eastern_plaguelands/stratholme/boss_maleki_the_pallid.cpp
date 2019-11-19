@@ -48,7 +48,7 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
 
     bool NeedMoveCloser;
 
-    void Reset()
+    void Reset() override
     {
         Frostbolt_Timer = 1000;
         IceTomb_Timer = 12000;
@@ -60,7 +60,7 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
         NeedMoveCloser = false;
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_PALLID, DONE);
@@ -71,7 +71,7 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
         return (((float)m_creature->GetPower(POWER_MANA) / (float)m_creature->GetMaxPower(POWER_MANA)) * 100);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -50,7 +50,7 @@ struct boss_renatakiAI : public ScriptedAI
     bool Invisible;
     bool Light;
 
-    void Reset()
+    void Reset() override
     {
         TickTimer = 1000;
         Invisible_Timer = urand(28000, 32000);
@@ -65,12 +65,12 @@ struct boss_renatakiAI : public ScriptedAI
         m_creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_INFO  + 1, 3);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         LeaveVanish();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!Light)
         {

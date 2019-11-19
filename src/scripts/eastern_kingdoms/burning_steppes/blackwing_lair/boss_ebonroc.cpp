@@ -49,14 +49,14 @@ struct boss_ebonrocAI : public ScriptedAI
     uint32 m_uiWingBuffetTimer;
     uint32 m_uiShadowOfEbonrocTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiShadowFlameTimer        = 16000;                // These times are probably wrong
         m_uiWingBuffetTimer         = 30000;
         m_uiShadowOfEbonrocTimer    = 8000;
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EBONROC, IN_PROGRESS);
@@ -64,19 +64,19 @@ struct boss_ebonrocAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EBONROC, DONE);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EBONROC, FAIL);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_WING_BUFFET)
         {
@@ -87,7 +87,7 @@ struct boss_ebonrocAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -224,19 +224,18 @@ void filterLedgeSpans(const int walkableHeight, const int walkableClimbTransitio
 
 namespace MMAP
 {
-    MapBuilder::MapBuilder(float maxWalkableAngle, bool skipLiquid,
+    MapBuilder::MapBuilder(bool skipLiquid,
                            bool skipContinents, bool skipJunkMaps, bool skipBattlegrounds,
                            bool debugOutput, bool bigBaseUnit, bool quick, const char* offMeshFilePath) :
-        m_terrainBuilder(NULL),
+        m_terrainBuilder(nullptr),
         m_debugOutput(debugOutput),
+        m_offMeshFilePath(offMeshFilePath),
         m_skipContinents(skipContinents),
         m_skipJunkMaps(skipJunkMaps),
         m_skipBattlegrounds(skipBattlegrounds),
-        m_maxWalkableAngle(maxWalkableAngle),
-        m_bigBaseUnit(bigBaseUnit),
         m_quick(quick),
-        m_rcContext(NULL),
-        m_offMeshFilePath(offMeshFilePath)
+        m_bigBaseUnit(bigBaseUnit),
+        m_rcContext(nullptr)
     {
         m_terrainBuilder = new TerrainBuilder(skipLiquid, quick);
 
@@ -408,7 +407,7 @@ namespace MMAP
         }
         if (!tiles->size())
             return;
-        dtNavMesh* navMesh = NULL;
+        dtNavMesh* navMesh = nullptr;
         buildNavMesh(mapID, navMesh);
         if (!navMesh)
         {
@@ -444,7 +443,7 @@ namespace MMAP
             return;
 
         // build navMesh
-        dtNavMesh* navMesh = NULL;
+        dtNavMesh* navMesh = nullptr;
         buildNavMesh(mapID, navMesh);
         if (!navMesh)
         {
@@ -535,7 +534,7 @@ namespace MMAP
 
         // use Max because '32 - tileX' is negative for values over 32
         float bmin[3], bmax[3];
-        getTileBounds(tileXMax, tileYMax, NULL, 0, bmin, bmax);
+        getTileBounds(tileXMax, tileYMax, nullptr, 0, bmin, bmax);
         int maxTiles = tiles->size();
 
         /***       now create the navmesh       ***/
@@ -848,11 +847,11 @@ namespace MMAP
                 // we may want to keep them in the future for debug
                 // but right now, we don't have the code to merge them
                 rcFreeHeightField(tile.solid);
-                tile.solid = NULL;
+                tile.solid = nullptr;
                 rcFreeCompactHeightfield(tile.chf);
-                tile.chf = NULL;
+                tile.chf = nullptr;
                 rcFreeContourSet(tile.cset);
-                tile.cset = NULL;
+                tile.cset = nullptr;
             }
         }
 
@@ -972,7 +971,7 @@ namespace MMAP
         params.ch = config.ch;
 
         // will hold final navmesh
-        unsigned char* navData = NULL;
+        unsigned char* navData = nullptr;
         int navDataSize = 0;
 
         do
@@ -1041,7 +1040,7 @@ namespace MMAP
                 char message[1024];
                 sprintf(message, "[Map %03i] Failed to open %s for writing!             \n", mapID, fileName);
                 perror(message);
-                navMesh->removeTile(tileRef, NULL, NULL);
+                navMesh->removeTile(tileRef, nullptr, nullptr);
                 continue;
             }
 
@@ -1073,7 +1072,7 @@ namespace MMAP
                 }
             }
             // now that tile is written to disk, we can unload it
-            navMesh->removeTile(tileRef, NULL, NULL);
+            navMesh->removeTile(tileRef, nullptr, nullptr);
         }
         while (0);
     }
@@ -1203,7 +1202,7 @@ namespace MMAP
             // transform data
             vector<Vector3> tempVertices;
             vector<MeshTriangle> tempTriangles;
-            WmoLiquid* liquid = NULL;
+            WmoLiquid* liquid = nullptr;
 
             (*it).getMeshData(tempVertices, tempTriangles, liquid);
 
@@ -1320,11 +1319,11 @@ namespace MMAP
             return;
         }
         rcFreeHeightField(tile.solid);
-        tile.solid = NULL;
+        tile.solid = nullptr;
         rcFreeCompactHeightfield(tile.chf);
-        tile.chf = NULL;
+        tile.chf = nullptr;
         rcFreeContourSet(tile.cset);
-        tile.cset = NULL;
+        tile.cset = nullptr;
 
         IntermediateValues iv;
         iv.polyMesh = tile.pmesh;
@@ -1344,8 +1343,8 @@ namespace MMAP
         }
 
         // Will be deleted by IntermediateValues
-        tile.pmesh = NULL;
-        tile.dmesh = NULL;
+        tile.pmesh = nullptr;
+        tile.dmesh = nullptr;
         // setup mesh parameters
         dtNavMeshCreateParams params;
         memset(&params, 0, sizeof(params));
@@ -1371,7 +1370,7 @@ namespace MMAP
         params.ch = config.ch;
         params.buildBvTree = true;
 
-        unsigned char* navData = NULL;
+        unsigned char* navData = nullptr;
         int navDataSize = 0;
         printf("* Building navmesh tile [%f %f %f to %f %f %f]\n",
                 params.bmin[0], params.bmin[1], params.bmin[2],

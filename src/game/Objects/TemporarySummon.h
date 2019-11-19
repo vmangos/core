@@ -29,7 +29,7 @@ class TemporarySummon : public Creature
 {
     public:
         explicit TemporarySummon(ObjectGuid summoner = ObjectGuid());
-        virtual ~TemporarySummon();
+        ~TemporarySummon() override;
 
         void Update(uint32 update_diff, uint32 time) override;
         void Summon(TempSummonType type, uint32 lifetime);
@@ -44,7 +44,6 @@ class TemporarySummon : public Creature
         uint32 m_lifetime;
         ObjectGuid m_summoner;
         bool m_justDied = false;
-        uint32 m_forceTargetUpdateTimer;
         bool m_unSummonInformed;
         void InformSummonerOfDespawn();
 };

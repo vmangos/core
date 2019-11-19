@@ -70,7 +70,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
   public PathMovementBase<Creature, WaypointPath const*>
 {
     public:
-        WaypointMovementGenerator(Creature &, bool repeating = true) : i_nextMoveTime(0), m_isArrivalDone(false), m_repeating(repeating), m_lastReachedWaypoint(0), m_isWandering(false) {}
+        WaypointMovementGenerator(Creature &, bool repeating = true) : i_nextMoveTime(0), m_isArrivalDone(false), m_repeating(repeating), m_isWandering(false), m_lastReachedWaypoint(0) {}
         ~WaypointMovementGenerator() { i_path = nullptr; }
         void Initialize(Creature &u);
         void Interrupt(Creature &);

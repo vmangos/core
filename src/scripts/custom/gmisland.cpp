@@ -47,14 +47,14 @@ struct boss_gmislandAI : public ScriptedAI
     std::vector<uint32> spells;
     std::vector<uint32> gmSpells;
 
-    void Reset()
+    void Reset() override
     {
         uiGlobalCD       = 0;
         uiGmRefreshTimer = 0;
         m_creature->SetObjectScale(1.0f);
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER)
         {
@@ -89,7 +89,7 @@ struct boss_gmislandAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         uiGeneralTimer += uiDiff;
         uiGmRefreshTimer += uiDiff;

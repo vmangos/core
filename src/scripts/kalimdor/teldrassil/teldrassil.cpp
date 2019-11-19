@@ -47,9 +47,9 @@ struct npc_mistAI : public FollowerAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
 
@@ -99,11 +99,11 @@ struct npc_sethirAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* pUnit)
+    void Aggro(Unit* pUnit) override
     {
         m_creature->MonsterSay("Filfh! Filfh everywhere! The forests must be cleansed!");
         for (uint32 counter = 0; counter < 6; counter++)
@@ -114,7 +114,7 @@ struct npc_sethirAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

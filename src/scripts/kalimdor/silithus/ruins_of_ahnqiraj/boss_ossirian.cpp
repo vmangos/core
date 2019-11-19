@@ -93,7 +93,7 @@ struct boss_ossirianAI : public ScriptedAI
     bool m_bIsEnraged;
     bool m_bAggro;
 
-    void Reset()
+    void Reset() override
     {
         m_bAggro = false;
 
@@ -133,7 +133,7 @@ struct boss_ossirianAI : public ScriptedAI
         m_pInstance->SetData(TYPE_OSSIRIAN, FAIL);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_ENVELOPING_WINDS)
         {
@@ -143,7 +143,7 @@ struct boss_ossirianAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pUnit, const SpellEntry* pSpell)
+    void SpellHit(Unit* pUnit, const SpellEntry* pSpell) override
     {
         for (int i = 0; i < SpellWeakness.size(); ++i)
         {
@@ -162,7 +162,7 @@ struct boss_ossirianAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
@@ -198,7 +198,7 @@ struct boss_ossirianAI : public ScriptedAI
         m_pInstance->SetData(TYPE_OSSIRIAN, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         if (!TornadoGUIDs.empty())
@@ -215,13 +215,13 @@ struct boss_ossirianAI : public ScriptedAI
         m_pInstance->SetData(TYPE_OSSIRIAN, DONE);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
             DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -303,13 +303,13 @@ struct generic_random_moveAI : public ScriptedAI
 
     uint32 m_uiTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiTimer = 5000;
         SetCombatMovement(false);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiTimer < uiDiff)
         {
@@ -349,7 +349,7 @@ struct ossirian_crystalAI : public GameObjectAI
 {
     ossirian_crystalAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         instance_ruins_of_ahnqiraj* pInstance = dynamic_cast<instance_ruins_of_ahnqiraj*>(me->GetInstanceData());
 

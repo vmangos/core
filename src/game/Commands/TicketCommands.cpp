@@ -113,7 +113,7 @@ bool ChatHandler::HandleGMTicketCommentCommand(char* args)
     char* ticketIdStr = strtok((char*)args, " ");
     uint32 ticketId = atoi(ticketIdStr);
 
-    char* comment = strtok(nullptr, "\n");
+    char const* comment = strtok(nullptr, "\n");
     if (!comment)
         comment = "";
 

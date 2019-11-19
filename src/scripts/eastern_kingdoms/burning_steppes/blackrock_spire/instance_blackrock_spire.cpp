@@ -600,7 +600,7 @@ struct go_father_flameAI: public GameObjectAI
 {
     go_father_flameAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         if (ScriptedInstance* pInstance = (instance_blackrock_spire*)me->GetInstanceData())
             if (pInstance->GetData(TYPE_SOLAKAR) != IN_PROGRESS && pInstance->GetData(TYPE_SOLAKAR) != DONE)
@@ -626,11 +626,11 @@ struct npc_solakar_triggerAI : public ScriptedAI
 
     ScriptedInstance* instance;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (!instance)
             return;
@@ -689,14 +689,14 @@ struct npc_rookery_hatcherAI : public ScriptedAI
     uint32 Strike_Timer;
     uint32 HatchRookeryEgg_Timer;
 
-    void Reset()
+    void Reset() override
     {
         SunderArmor_Timer = urand(8000, 12000);
         Strike_Timer = urand(5000, 7000);
         HatchRookeryEgg_Timer = urand(5000, 10000);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance->GetData(TYPE_SOLAKAR) == SPECIAL)
             HatchRookeryEgg();
@@ -737,7 +737,7 @@ struct npc_rookery_hatcherAI : public ScriptedAI
         listRookeryEgg.clear();
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == 10161)
         {
@@ -746,7 +746,7 @@ struct npc_rookery_hatcherAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

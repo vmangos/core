@@ -59,15 +59,14 @@ namespace MMAP
     class MapBuilder
     {
         public:
-            MapBuilder(float maxWalkableAngle   = 60.0f,
-                       bool skipLiquid          = false,
+            MapBuilder(bool skipLiquid          = false,
                        bool skipContinents      = false,
                        bool skipJunkMaps        = true,
                        bool skipBattlegrounds   = false,
                        bool debugOutput         = false,
                        bool bigBaseUnit         = false,
                        bool quick               = false,
-                       const char* offMeshFilePath = NULL);
+                       const char* offMeshFilePath = nullptr);
 
             ~MapBuilder();
 
@@ -120,13 +119,10 @@ namespace MMAP
             bool m_skipJunkMaps;
             bool m_skipBattlegrounds;
             bool m_quick;
-
-            float m_maxWalkableAngle;
             bool m_bigBaseUnit;
 
             // build performance - not really used for now
             rcContext* m_rcContext;
-            uint32 m_lastMapTriangle;
     };
 }
 

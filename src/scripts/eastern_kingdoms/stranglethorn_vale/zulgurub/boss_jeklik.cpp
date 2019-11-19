@@ -81,7 +81,7 @@ struct boss_jeklikAI : public ScriptedAI
 
     bool PhaseTwo;
 
-    void Reset()
+    void Reset() override
     {
         SpawnBats_Timer = 40000;
 
@@ -108,13 +108,13 @@ struct boss_jeklikAI : public ScriptedAI
         m_creature->SetObjectScale(1.5f);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         m_creature->CastSpell(m_creature, SPELL_GREENCHANNELING, false);
         m_creature->SetObjectScale(1.0f);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         m_creature->addUnitState(UNIT_STAT_IGNORE_PATHFINDING);
         DoScriptText(SAY_AGGRO, m_creature);
@@ -127,7 +127,7 @@ struct boss_jeklikAI : public ScriptedAI
         ScriptedAI::Aggro(who);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -144,7 +144,7 @@ struct boss_jeklikAI : public ScriptedAI
         m_creature->NearTeleportTo(x, y, z, o);
     }
 
-    void UpdateAI(const uint32 lastDiff)
+    void UpdateAI(const uint32 lastDiff) override
     {
         if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -400,16 +400,16 @@ struct mob_batriderAI : public ScriptedAI
 
     uint32 Bomb_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Bomb_Timer = 2000;
     }
 
-    void AttackStart(Unit *pWho)
+    void AttackStart(Unit *pWho) override
     {
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
     }
 
@@ -432,14 +432,14 @@ struct mob_batriderAI : public ScriptedAI
     }
 
     // Called when spell hits creature's target
-    virtual void SpellHitTarget(Unit* target, const SpellEntry* spell)
+    void SpellHitTarget(Unit* target, const SpellEntry* spell) override
     {
         // Trigger bomb AoE on the ground
         if (target && spell && spell->Id == SPELL_THROW_LIQUID_FIRE)
             m_creature->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_BOMB, false);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_pInstance)
             return;
@@ -494,7 +494,7 @@ struct npc_guru_bat_riderAI : public ScriptedAI
     uint32 InfectedBite_Timer;
     uint32 Thrash_Timer;
 
-    void Reset()
+    void Reset() override
     {
         GoingToExplose     = false;
         Despawn_Timer      = 0;
@@ -503,13 +503,13 @@ struct npc_guru_bat_riderAI : public ScriptedAI
         Thrash_Timer       = 6000;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->CastSpell(m_creature, SPELL_DEMORALIZING_SHOUT, false);
         ScriptedAI::Aggro(pWho);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

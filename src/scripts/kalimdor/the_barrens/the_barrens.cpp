@@ -119,12 +119,12 @@ struct npc_pollyAI : public ScriptedAI
 
     bool b_text;
 
-    void Reset()
+    void Reset() override
     {
         b_text = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (b_text == false)
         {
@@ -170,9 +170,9 @@ struct npc_giltharesAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         Player* pPlayer = GetPlayerForEscort();
 
@@ -203,7 +203,7 @@ struct npc_giltharesAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         //not always use
         if (urand(0, 3))
@@ -276,7 +276,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
     uint32 Reset_Timer;
     uint8 FlareCount;
 
-    void Reset()
+    void Reset() override
     {
         IsFriend = false;
         Reset_Timer = 120000;
@@ -297,7 +297,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
         m_creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, const SpellEntry *spell) override
     {
         if (spell->Id == SPELL_FLARE || spell->Id == SPELL_FOLLY)
         {
@@ -308,7 +308,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (IsFriend)
         {
@@ -323,7 +323,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 emote)
+    void ReceiveEmote(Player* pPlayer, uint32 emote) override
     {
         if (emote == TEXTEMOTE_SALUTE)
         {
@@ -388,7 +388,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
     uint64 BigWillGUID;
     uint64 AffrayChallenger[6];
 
-    void Reset()
+    void Reset() override
     {
         EventInProgress = false;
 
@@ -445,7 +445,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         pUnit->setFaction(14);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!EventInProgress)
             return;
@@ -615,7 +615,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
     uint32 m_uiPostEventTimer;
     uint32 m_uiPostEventCount;
 
-    void Reset()
+    void Reset() override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -628,7 +628,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
         }
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -652,7 +652,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
         }
     }
 
-    void WaypointStart(uint32 uiPointId)
+    void WaypointStart(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -668,7 +668,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_PILOT_WIZZ)
             m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
@@ -677,7 +677,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
             pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
@@ -810,7 +810,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
 
         ResetVars();
     }
-    void Reset()
+    void Reset() override
     {
 
     }
@@ -952,7 +952,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
 
         ResetVars();
     }
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (!pSummoned)
             return;
@@ -1042,7 +1042,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
             }
         }
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (eventPhase > 0)
         {
@@ -1148,7 +1148,7 @@ struct npc_kolkar_invaderAI : public ScriptedAI
     {
         Reset();
     }
-    void Reset()
+    void Reset() override
     {
         // torchTimer=30000;
         chargeTimer = 0;
@@ -1159,13 +1159,13 @@ struct npc_kolkar_invaderAI : public ScriptedAI
     uint32 chargeTimer;
     uint32 strikeTimer;
     uint32 tetanosTimer;
-    void MovementInform(uint32 movementType, uint32 moveId)
+    void MovementInform(uint32 movementType, uint32 moveId) override
     {
         if (movementType != POINT_MOTION_TYPE || moveId != 2)
             return;
         //m_creature->CastSpell( m_creature->GetPositionX() + 10*cos( m_creature->GetOrientation()),  m_creature->GetPositionY() + 10*sin( m_creature->GetOrientation()),  m_creature->GetPositionZ(), SPELL_TORCH, false);
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -1224,17 +1224,17 @@ struct npc_axe_throwerAI : public ScriptedAI
     {
         Reset();
     }
-    void Reset()
+    void Reset() override
     {
         throwTimer = 0;
     }
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (urand(0, 1))
             DoScriptText(urand(0, 1) ? SAY_HORDE : SAY_FOES, m_creature);
     }
     uint32 throwTimer;
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -1261,17 +1261,17 @@ struct npc_warlord_kromzarAI : public ScriptedAI
     {
         Reset();
     }
-    void Reset()
+    void Reset() override
     {
         strikeTimer = urand(4000, 7000);
     }
     uint32 strikeTimer;
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         m_creature->CastSpell(m_creature, 13965, true); //SPELL_BANNER
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
