@@ -4237,7 +4237,6 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
         charDelete_method = 0;
     else
     {
-        uint32 level = 0;
         PlayerCacheData const* data = sObjectMgr.GetPlayerDataByGUID(playerguid);
         if (data && data->uiLevel < charDelete_minLvl)
             charDelete_method = 0;

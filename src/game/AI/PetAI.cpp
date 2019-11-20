@@ -41,7 +41,7 @@ int PetAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-PetAI::PetAI(Creature *c) : CreatureAI(c), inCombat(false)
+PetAI::PetAI(Creature *c) : CreatureAI(c)
 {
     UpdateAllies();
     // Warlock imp has no melee attack
