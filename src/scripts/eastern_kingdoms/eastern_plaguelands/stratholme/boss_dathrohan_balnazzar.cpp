@@ -119,7 +119,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
     uint64 SleepPlayerGuid;
     float SleepPlayerAggro;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCrusadersHammer_Timer = 8000;
         m_uiCrusaderStrike_Timer = 12000;
@@ -142,7 +142,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
 
     }
 
-    void JustDied(Unit* Victim)
+    void JustDied(Unit* Victim) override
     {
         m_creature->MonsterSay("Damn you mortals! All my plans of revenge, all my hate... all burned to ash...");
         
@@ -166,12 +166,12 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         m_creature->MonsterYell("Today you have unmade what took me years to create! For this you shall all die by my hand!");
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

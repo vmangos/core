@@ -370,7 +370,7 @@ struct npc_brazierAI: public ScriptedAI
     uint32 Timer;
     uint32 Var;
 
-    void Reset()
+    void Reset() override
     {
         Timer = 0;
         Var = 0;
@@ -397,7 +397,7 @@ struct npc_brazierAI: public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (Var > 24)
             m_creature->ForcedDespawn();

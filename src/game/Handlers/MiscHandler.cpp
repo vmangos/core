@@ -552,7 +552,6 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket & recv_data)
     FriendsResult friendResult = FRIEND_NOT_FOUND;
     if (friendGuid)
     {
-        uint32 otherWorldMask = sObjectMgr.GetPlayerWorldMaskByGUID(friendLowGuid);
         if (friendGuid == GetMasterPlayer()->GetObjectGuid())
             friendResult = FRIEND_SELF;
         else if (GetMasterPlayer()->GetTeam() != team && !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_ADD_FRIEND) && GetSecurity() < SEC_MODERATOR)

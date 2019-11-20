@@ -290,7 +290,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
 }
 
 Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
-     m_caster(caster), m_casterUnit(caster), m_spellInfo(info), m_triggeredBySpellInfo(triggeredBy), m_triggeredByParentSpellInfo(triggeredByParent), m_IsTriggeredSpell(triggered)
+    m_spellInfo(info), m_triggeredBySpellInfo(triggeredBy), m_triggeredByParentSpellInfo(triggeredByParent), m_caster(caster), m_casterUnit(caster), m_IsTriggeredSpell(triggered)
 {
     MANGOS_ASSERT(caster != nullptr && info != nullptr);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to a sSpellMgr element");
@@ -328,7 +328,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
 }
 
 Spell::Spell(GameObject* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
-    m_caster(caster), m_casterGo(caster), m_spellInfo(info), m_triggeredBySpellInfo(triggeredBy), m_triggeredByParentSpellInfo(triggeredByParent), m_IsTriggeredSpell(triggered)
+    m_spellInfo(info), m_triggeredBySpellInfo(triggeredBy), m_triggeredByParentSpellInfo(triggeredByParent), m_caster(caster), m_casterGo(caster), m_IsTriggeredSpell(triggered)
 {
     MANGOS_ASSERT(caster != nullptr && info != nullptr);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to a sSpellMgr element");
@@ -4079,9 +4079,9 @@ void Spell::update(uint32 difftime)
             if (pGo->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
                 m_spellInfo->Id == pInfo->summoningRitual.spellId &&
                 // too many helpers cancelled
-                (pGo->GetUniqueUseCount() < pInfo->summoningRitual.reqParticipants||
+                (pGo->GetUniqueUseCount() < pInfo->summoningRitual.reqParticipants ||
                 // the warlock cancelled
-                !pInfo->summoningRitual.ritualPersistent && !pGo->GetOwner()))
+                (!pInfo->summoningRitual.ritualPersistent && !pGo->GetOwner())))
             {
                 cancel();
                 pGo->SetGoState(GO_STATE_READY);
@@ -8006,7 +8006,7 @@ bool Spell::IsTriggeredSpellWithRedundentData() const
 {
     return m_triggeredByAuraSpell || m_triggeredBySpellInfo ||
            // possible not need after above check?
-           m_IsTriggeredSpell && (m_spellInfo->manaCost || m_spellInfo->ManaCostPercentage);
+           (m_IsTriggeredSpell && (m_spellInfo->manaCost || m_spellInfo->ManaCostPercentage));
 }
 
 bool Spell::HaveTargetsForEffect(SpellEffectIndex effect) const
@@ -8442,14 +8442,14 @@ void Spell::FillRaidOrPartyTargets(UnitList &TagUnitMap, Unit* target, float rad
                     && target->getLevel() + 10 >= m_spellInfo->spellLevel
                     && !m_caster->IsHostileTo(target))
             {
-                if (target == m_caster && withcaster ||
-                        target != m_caster && m_caster->IsWithinDistInMap(target, radius))
+                if ((target == m_caster && withcaster) ||
+                        (target != m_caster && m_caster->IsWithinDistInMap(target, radius)))
                     TagUnitMap.push_back(target);
 
                 if (withPets)
                     if (Pet* pet = target->GetPet())
-                        if (pet == m_caster && withcaster ||
-                                pet != m_caster && m_caster->IsWithinDistInMap(pet, radius))
+                        if ((pet == m_caster && withcaster) ||
+                                (pet != m_caster && m_caster->IsWithinDistInMap(pet, radius)))
                             TagUnitMap.push_back(pet);
             }
         }
@@ -8457,14 +8457,14 @@ void Spell::FillRaidOrPartyTargets(UnitList &TagUnitMap, Unit* target, float rad
     else
     {
         Unit* ownerOrSelf = pTarget ? pTarget : target->GetCharmerOrOwnerOrSelf();
-        if (ownerOrSelf == m_caster && withcaster ||
-                ownerOrSelf != m_caster && m_caster->IsWithinDistInMap(ownerOrSelf, radius))
+        if ((ownerOrSelf == m_caster && withcaster) ||
+                (ownerOrSelf != m_caster && m_caster->IsWithinDistInMap(ownerOrSelf, radius)))
             TagUnitMap.push_back(ownerOrSelf);
 
         if (withPets)
             if (Pet* pet = ownerOrSelf->GetPet())
-                if (pet == m_caster && withcaster ||
-                        pet != m_caster && m_caster->IsWithinDistInMap(pet, radius))
+                if ((pet == m_caster && withcaster) ||
+                        (pet != m_caster && m_caster->IsWithinDistInMap(pet, radius)))
                     TagUnitMap.push_back(pet);
     }
 }

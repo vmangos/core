@@ -48,7 +48,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
     bool bCanDetonate;
     bool bShielded;
 
-    void Reset()
+    void Reset() override
     {
         Polymorph_Timer = 20000;
         AoESilence_Timer = 15000;
@@ -57,12 +57,12 @@ struct boss_arcanist_doanAI : public ScriptedAI
         bShielded = false;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

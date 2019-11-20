@@ -239,7 +239,7 @@ class MANGOS_DLL_SPEC Item : public Object
         Item();
 
         virtual bool Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid = ObjectGuid());
-        virtual void RemoveFromWorld();
+        void RemoveFromWorld() override;
 
         ItemPrototype const* GetProto() const;
         bool ChangeEntry(ItemPrototype const* pNewProto);
@@ -340,13 +340,13 @@ class MANGOS_DLL_SPEC Item : public Object
             uState = state;
         }
 
-        bool HasQuest(uint32 quest_id) const { return GetProto()->StartQuest == quest_id; }
-        bool HasInvolvedQuest(uint32 /*quest_id*/) const { return false; }
+        bool HasQuest(uint32 quest_id) const override { return GetProto()->StartQuest == quest_id; }
+        bool HasInvolvedQuest(uint32 /*quest_id*/) const override { return false; }
         bool IsConjuredConsumable() const { return GetProto()->IsConjuredConsumable(); }
 
-        void AddToClientUpdateList();
-        void RemoveFromClientUpdateList();
-        void BuildUpdateData(UpdateDataMapType& update_players);
+        void AddToClientUpdateList() override;
+        void RemoveFromClientUpdateList() override;
+        void BuildUpdateData(UpdateDataMapType& update_players) override;
         void SetGeneratedLoot(bool value) { generatedLoot = value; }
         bool HasGeneratedLootSecondary() {  return generatedLoot; } // todo, remove and add condition to HasGeneratedLoot
 

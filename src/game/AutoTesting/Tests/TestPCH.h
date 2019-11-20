@@ -8,7 +8,7 @@
 #ifndef GAME_AUTOTESTING_TESTS_TESTPCH_H_
 #define GAME_AUTOTESTING_TESTS_TESTPCH_H_
 
-#include "AutoTesting/AutoTestingMgr.h"
+#include "AutoTestingMgr.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "MoveMap.h"

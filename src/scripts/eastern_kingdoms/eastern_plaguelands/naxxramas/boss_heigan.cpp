@@ -82,14 +82,14 @@ enum Phases
 };
 
 
-static const uint32 firstEruptionDBGUID = 533048;
+//static const uint32 firstEruptionDBGUID = 533048;
 static const uint8 numSections = 4;
-static const uint8 numEruptions[numSections] = { // count of sequential GO DBGUIDs in the respective section of the room
+/*static const uint8 numEruptions[numSections] = { // count of sequential GO DBGUIDs in the respective section of the room
     15,
     25,
     23,
     13
-};
+};*/
 
 // in tunnel
 static constexpr float safespotFissures[3][3] = 
@@ -130,7 +130,7 @@ struct boss_heiganAI : public ScriptedAI
     uint32 killCooldown;
     std::vector<ObjectGuid> portedPlayersThisPhase;
 
-    void Reset()
+    void Reset() override
     {
         portedPlayersThisPhase.clear();
         
@@ -139,7 +139,7 @@ struct boss_heiganAI : public ScriptedAI
         currentPhase = PHASE_FIGHT;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
         
@@ -191,13 +191,13 @@ struct boss_heiganAI : public ScriptedAI
             ScriptedAI::AttackStart(pWho);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if(!killCooldown)
             DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -209,7 +209,7 @@ struct boss_heiganAI : public ScriptedAI
 
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
         {
@@ -438,7 +438,7 @@ struct boss_heiganAI : public ScriptedAI
             m_events.Repeat(Seconds(1));
     }
    
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // This will avoid him running off the platform during dance phase.
         if (currentPhase == PHASE_FIGHT)
@@ -512,8 +512,8 @@ struct mob_plague_cloudAI : public ScriptedAI
         m_creature->SetRooted(true);
     }
 
-    void AttackStart(Unit*) { }
-    void MoveInLineOfSight(Unit*) { }
+    void AttackStart(Unit*) override { }
+    void MoveInLineOfSight(Unit*) override { }
 
     void UpdateAI(const uint32) override { }
 };

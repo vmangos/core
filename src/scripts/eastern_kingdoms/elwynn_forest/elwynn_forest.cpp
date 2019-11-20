@@ -43,7 +43,7 @@ struct npc_henze_faulkAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         lifeTimer = 120000;
         m_creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
@@ -51,9 +51,9 @@ struct npc_henze_faulkAI : public ScriptedAI
         spellHit = false;
     }
 
-    void MoveInLineOfSight(Unit *who) { }
+    void MoveInLineOfSight(Unit *who) override { }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_creature->IsStandingUp())
         {
@@ -64,7 +64,7 @@ struct npc_henze_faulkAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit *Hitter, const SpellEntry *Spellkind)
+    void SpellHit(Unit *Hitter, const SpellEntry *Spellkind) override
     {
         if (Spellkind->Id == 8593 && !spellHit)
         {
@@ -101,7 +101,7 @@ struct go_marshal_haggards_chestAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (state)
         {

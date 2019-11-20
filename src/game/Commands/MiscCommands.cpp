@@ -1158,7 +1158,6 @@ bool ChatHandler::HandlePoolUpdateCommand(char* args)
     if (!ExtractUint32KeyFromLink(&args, "Hpool", pool_id))
         return false;
 
-    PoolGroup<GameObject>& gobjGroup = sPoolMgr.GetPoolGameObjects(pool_id);
     PoolTemplateData const& pool_template = sPoolMgr.GetPoolTemplate(pool_id);
 
     PSendSysMessage("Pool #%u: %u objects spawned [limit = %u]", pool_id, spawns.GetSpawnedObjects(pool_id), pool_template.MaxLimit);
@@ -1776,7 +1775,6 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
             }
 
             std::string statusName;
-            bool bFull                = it->second->HasFreeSlots();
             BattleGroundStatus status = it->second->GetStatus();
             switch (status)
             {

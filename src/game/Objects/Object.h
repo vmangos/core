@@ -729,7 +729,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
                 WorldObject * const m_obj;
         };
 
-        virtual ~WorldObject ( ) {}
+        ~WorldObject ( ) override {}
 
         virtual void Update(uint32 /*update_diff*/, uint32 /*time_diff*/);
 

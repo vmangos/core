@@ -149,7 +149,7 @@ struct npc_attack_masterAI : public ScriptedAI
 
     // Fonctions generiques
 #if 1
-    void Reset()
+    void Reset() override
     {
     }
     void SetAttackableInList(MobsGUIDList mobsList, bool bAttackable)
@@ -525,7 +525,7 @@ struct npc_attack_masterAI : public ScriptedAI
         }
     }
 #endif
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (uiCD < uiDiff)
         {
@@ -624,7 +624,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
     std::vector<uint32> m_lSpells;
     std::vector<uint32> m_lGobj;
 
-    void Reset()
+    void Reset() override
     {
         uiCD        = urand(5, 10) * 1000;
     }
@@ -766,7 +766,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
             return nullptr;
         return nearest;
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (ME->IsStopped() && !ME->getVictim())
         {
@@ -788,7 +788,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-    void JustDied(Unit* killer)
+    void JustDied(Unit* killer) override
     {
         if (bIsBad)
             DoSpawnDestruction();
@@ -848,7 +848,7 @@ struct npc_guard_masterAI : public ScriptedAI
     uint64 uiTarget;
     // Fonctions generiques
 #if 1
-    void Reset()
+    void Reset() override
     {
         uiTarget = 0;
     }
@@ -860,7 +860,7 @@ struct npc_guard_masterAI : public ScriptedAI
     {
         ME->MonsterYell(what, 0, 0);
     }
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (!uiTarget && pWho->GetTypeId() != TYPEID_PLAYER)
             DoAllAttack(pWho);
@@ -995,7 +995,7 @@ struct npc_guard_masterAI : public ScriptedAI
         }
     }
 #endif
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (uiCD < uiDiff)
         {

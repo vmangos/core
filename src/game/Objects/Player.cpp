@@ -1095,8 +1095,6 @@ DrunkenState Player::GetDrunkenstateByValue(uint16 value)
 
 void Player::SetDrunkValue(uint16 newDrunkenValue, uint32 itemId)
 {
-    uint32 oldDrunkenState = Player::GetDrunkenstateByValue(m_drunk);
-
     m_drunk = newDrunkenValue;
     SetUInt16Value(PLAYER_BYTES_3, 0, uint16(getGender()) | (m_drunk & 0xFFFE));
 
@@ -1930,9 +1928,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
     {
-        Map* oldmap = IsInWorld() ? GetMap() : nullptr;
         // check if we can enter before stopping combat / removing pet / totems / interrupting spells
-
         // Check enter rights before map getting to avoid creating instance copy for player
         // this check not dependent from map instance copy and same for all instance copies of selected map
         if (!sMapMgr.CanPlayerEnter(mapid, this))
@@ -3542,7 +3538,7 @@ bool Player::IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) cons
 
     // note: form passives activated with shapeshift spells be implemented by HandleShapeshiftBoosts instead of spell_learn_spell
     // talent dependent passives activated at form apply have proper stance data
-    bool need_cast = (!spellInfo->Stances || !form && (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
+    bool need_cast = (!spellInfo->Stances || (!form && (spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT)));
 
     // Check CasterAuraStates
     return need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState)));
@@ -4241,7 +4237,6 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
         charDelete_method = 0;
     else
     {
-        uint32 level = 0;
         PlayerCacheData const* data = sObjectMgr.GetPlayerDataByGUID(playerguid);
         if (data && data->uiLevel < charDelete_minLvl)
             charDelete_method = 0;
@@ -5147,7 +5142,6 @@ float Player::GetSpellCritFromIntellect() const
     // increases his intelligence by other means (enchants, buffs, talents, ...)
 
     //[TZERO] from mangos 3462 for 1.12 MUST BE CHECKED
-    float val = 0.0f;
 
     static const struct
     {
@@ -7605,7 +7599,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                 {
                     uint32 level = pVictim->getLevel();
                     bones->loot.gold = (uint32)(urand(50, 150) * 0.016f * pow(((float)level) / 5.76f, 2.5f) * sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_MONEY));
-                    bones->loot._personal = true; // Everyone can loot the corpse
+                    bones->loot.m_personal = true; // Everyone can loot the corpse
                     if (BattleGround* bg = GetBattleGround())
                     {
                         if (bg->GetTypeID() == BATTLEGROUND_AV)
@@ -8051,8 +8045,8 @@ void Player::SendInitWorldStates(uint32 zoneid) const
     // Scourge Invasion - Patch 1.11
     if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
     {
-        int ATTACK_ZONE1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
-        int ATTACK_ZONE2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
+        //int ATTACK_ZONE1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
+        //int ATTACK_ZONE2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
         int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
         int REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
         int REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
@@ -8503,7 +8497,7 @@ Item* Player::GetItemByPos(uint16 pos) const
 
 Item* Player::GetItemByPos(uint8 bag, uint8 slot) const
 {
-    if (bag == INVENTORY_SLOT_BAG_0 && (slot < BANK_SLOT_BAG_END || slot >= KEYRING_SLOT_START && slot < KEYRING_SLOT_END))
+    if (bag == INVENTORY_SLOT_BAG_0 && (slot < BANK_SLOT_BAG_END || (slot >= KEYRING_SLOT_START && slot < KEYRING_SLOT_END)))
         return m_items[slot];
     else if ((bag >= INVENTORY_SLOT_BAG_START && bag < INVENTORY_SLOT_BAG_END)
              || (bag >= BANK_SLOT_BAG_START && bag < BANK_SLOT_BAG_END))
@@ -10047,7 +10041,6 @@ InventoryResult Player::CanUseAmmo(uint32 item) const
             return msg;
 
         /*if( GetReputationMgr().GetReputation() < pProto->RequiredReputation )
-        /*if ( GetReputationMgr().GetReputation() < pProto->RequiredReputation )
         return EQUIP_ERR_CANT_EQUIP_REPUTATION;
         */
 
@@ -15729,9 +15722,8 @@ DungeonPersistentState* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapid)
     // then the player's group bind and finally the solo bind.
     if (!pBind || !pBind->perm)
     {
-        InstanceGroupBind *groupBind = nullptr;
         if (Group *group = GetGroup())
-            if (groupBind = group->GetBoundInstance(mapid))
+            if (InstanceGroupBind* groupBind = group->GetBoundInstance(mapid))
                 state = groupBind->state;
     }
 
@@ -15746,8 +15738,6 @@ void Player::SendRaidInfo() const
 
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
-
-    time_t now = time(nullptr);
 
     for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
     {
@@ -16512,7 +16502,7 @@ void Player::_SaveSpells()
     SqlStatement stmtDel = CharacterDatabase.CreateStatement(delSpells, "DELETE FROM character_spell WHERE guid = ? and spell = ?");
     SqlStatement stmtIns = CharacterDatabase.CreateStatement(insSpells, "INSERT INTO character_spell (guid,spell,active,disabled) VALUES (?, ?, ?, ?)");
 
-    for (PlayerSpellMap::iterator itr = m_spells.begin(), next = m_spells.begin(); itr != m_spells.end();)
+    for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end();)
     {
         if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.state == PLAYERSPELL_CHANGED)
             stmtDel.PExecute(GetGUIDLow(), itr->first);
@@ -19139,7 +19129,6 @@ void Player::RemoveItemDependentAurasAndCasts(Item * pItem)
         SpellAuraHolder* holder = itr->second;
 
         // skip passive (passive item dependent spells work in another way) and not self applied auras
-        SpellEntry const* spellInfo = holder->GetSpellProto();
         if (holder->IsPassive() ||  holder->GetCasterGuid() != GetObjectGuid())
         {
             ++itr;
@@ -20722,11 +20711,9 @@ bool Player::ChangeReputationsForRace(uint8 oldRace, uint8 newRace)
         // Calcul des reputations/flags de base
         int newIdx = pFactionEntry->GetIndexFitTo(newRaceMask, getClassMask());
         int32 newBaseRep = newIdx >= 0 ? pFactionEntry->BaseRepValue[newIdx] : 0;
-        uint32 newInitFlags = newIdx >= 0 ? pFactionEntry->ReputationFlags[newIdx] : 0;
-
         int oldIdx = pFactionEntry->GetIndexFitTo(oldRaceMask, getClassMask());
         int32 oldBaseRep = oldIdx >= 0 ? pFactionEntry->BaseRepValue[oldIdx] : 0;
-        uint32 oldInitFlags = oldIdx >= 0 ? pFactionEntry->ReputationFlags[oldIdx] : 0;
+
         // De signe different et non nulles.
         if (newBaseRep * oldBaseRep < 0)
         {

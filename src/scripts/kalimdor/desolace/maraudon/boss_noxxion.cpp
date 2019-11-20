@@ -39,7 +39,7 @@ struct boss_noxxionAI : public ScriptedAI
     uint32 Invisible_Timer;
     bool Invisible;
 
-    void Reset()
+    void Reset() override
     {
         ToxicVolley_Timer = 7000;
         Uppercut_Timer = 16000;
@@ -55,7 +55,7 @@ struct boss_noxxionAI : public ScriptedAI
                 summoned->AI()->AttackStart(victim);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (Invisible && Invisible_Timer < diff)
         {

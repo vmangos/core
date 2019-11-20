@@ -374,7 +374,6 @@ bool PlayerBotMgr::deleteBot(uint32 playerGUID)
     std::map<uint32, PlayerBotEntry*>::iterator iter = m_bots.find(playerGUID);
     if (iter == m_bots.end())
         return false;
-    uint32 accountId = iter->second->accountId;
 
     if (iter->second->state == PB_STATE_LOADING)
         m_stats.loadingCount--;

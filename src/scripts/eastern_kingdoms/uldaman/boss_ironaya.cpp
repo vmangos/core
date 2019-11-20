@@ -45,19 +45,19 @@ struct boss_ironayaAI : public ScriptedAI
     bool hasCastedKnockaway;
     bool hasMoved;
 
-    void Reset()
+    void Reset() override
     {
         hasCastedKnockaway = false;
         hasCastedWstomp = false;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_creature->getFaction() == FACTION_AWAKE && !hasMoved)
         {

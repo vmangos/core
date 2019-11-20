@@ -209,7 +209,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
         }
     }
 
-    void AttackStart(Unit* pWho)
+    void AttackStart(Unit* pWho) override
     {
         if (!m_bIsSpirit)
             ScriptedAI::AttackStart(pWho);
@@ -394,7 +394,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
@@ -406,7 +406,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         }
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_bIsSpirit)
             return;
@@ -417,7 +417,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(12));
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         // Not sure about that
         if (m_bIsSpirit)
@@ -430,7 +430,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_bIsSpirit)
             return;
@@ -439,12 +439,12 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         DoScriptText(SAY_BLAU_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         AggroRadius(uiDiff);
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
@@ -502,7 +502,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
@@ -517,7 +517,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         specialSayCooldown = 12000;
     }
     uint32 specialSayCooldown;
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_bIsSpirit)
             return;
@@ -528,7 +528,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         m_creature->CastSpell(m_creature, SPELL_RIGHTEOUS_FIRE, true);
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         // He is used for SM event too, sooo 
         if (m_creature->GetMapId() != 533)
@@ -545,7 +545,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_bIsSpirit)
             return;
@@ -554,7 +554,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         DoScriptText(SAY_MOG_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
         if (pSpell->Id == 28882 && specialSayCooldown == 0) // Righteous Fire
@@ -564,7 +564,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         AggroRadius(uiDiff);
 
@@ -601,7 +601,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
@@ -613,7 +613,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         }
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_bIsSpirit)
             return;
@@ -625,7 +625,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(30));
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         // Not sure about it
         if (m_bIsSpirit)
@@ -638,7 +638,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_bIsSpirit)
             return;
@@ -647,12 +647,12 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         DoScriptText(SAY_KORT_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         AggroRadius(uiDiff);
 
@@ -702,7 +702,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
@@ -714,7 +714,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         }
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_bIsSpirit)
             return;
@@ -723,7 +723,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(12));
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         // Not sure about it
         if (m_bIsSpirit)
@@ -745,12 +745,12 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         DoScriptText(SAY_ZELI_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         AggroRadius(uiDiff);
 

@@ -103,7 +103,7 @@ struct boss_arlokkAI : public ScriptedAI
     bool m_bIsVanished;
     ObjectGuid m_doorGuid;
 
-    void Reset()
+    void Reset() override
     {
         m_uiShadowWordPain_Timer = 8000;
         m_uiGouge_Timer = 14000;
@@ -130,7 +130,7 @@ struct boss_arlokkAI : public ScriptedAI
         m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
@@ -138,7 +138,7 @@ struct boss_arlokkAI : public ScriptedAI
             door->UseDoorOrButton();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             if (m_pInstance->GetData(TYPE_ARLOKK) != DONE)
@@ -152,7 +152,7 @@ struct boss_arlokkAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -179,7 +179,7 @@ struct boss_arlokkAI : public ScriptedAI
         DoSummonSinglePhanter(-11532.9970f, -1606.4840f, 41.2979f, pUnit);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (Unit* pUnit = m_creature->GetMap()->GetUnit(m_uiMarkedGUID))
         {
@@ -201,7 +201,7 @@ struct boss_arlokkAI : public ScriptedAI
         EnterEvadeMode();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -394,20 +394,20 @@ struct mob_prowlerAI : public ScriptedAI
                 return CAST_AI(boss_arlokkAI, pArlokk->AI());
         return nullptr;
     }
-    void Reset()
+    void Reset() override
     {
         DoCast(m_creature, 22766);
         m_uiThrash_Timer = urand(5000, 9000);
         m_uiUpdateTarget_Timer = 2000;
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (boss_arlokkAI* pArlokkAI = GetArlokkAI())
             pArlokkAI->m_uiSummonCount--;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiUpdateTarget_Timer <= uiDiff)
         {

@@ -179,7 +179,7 @@ struct npc_artoriusAI : public ScriptedAI
     uint32 m_uiDemonic_Frenzy_Timer;
     uint32 m_uiDespawn_Timer;
 
-    void Reset() 
+    void Reset() override 
     {
         switch (m_creature->GetEntry())
         {
@@ -232,7 +232,7 @@ struct npc_artoriusAI : public ScriptedAI
     }
 
     /** Artorius the Doombringer */
-    void Aggro(Unit* pWho) 
+    void Aggro(Unit* pWho) override 
     {
         if (pWho->getClass() == CLASS_HUNTER && (m_hunterGuid.IsEmpty() || m_hunterGuid == pWho->GetObjectGuid())/*&& pWho->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE*/)
         {
@@ -242,7 +242,7 @@ struct npc_artoriusAI : public ScriptedAI
             DemonDespawn();
     }    
     
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         m_creature->SetHomePosition(7909.71f, -4598.67f, 710.008f, 0.606013f);
 
@@ -297,7 +297,7 @@ struct npc_artoriusAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         /** Artorius the Amiable */
         if (m_bTransform)
@@ -574,15 +574,10 @@ struct npc_ranshallaAI : public npc_escortAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId) override
     {
         if (!(uiType != POINT_MOTION_TYPE || pSummoned->GetEntry() != 12116))
         {
-
-            int id = 1;
-            int maxid = 3;
-            //m_creature->MonsterSay("Dans SummonedMovementInform");//test
-
             if (pretressesRepartent == 1)
             {
                 if (uiPointId > 0 && uiPointId < 4)
@@ -606,7 +601,7 @@ struct npc_ranshallaAI : public npc_escortAI
         }
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         //altar = 49182;
         /*
@@ -689,7 +684,7 @@ struct npc_ranshallaAI : public npc_escortAI
     }
 
 // pretresses sont pop pile 2MIN
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -797,7 +792,7 @@ struct npc_ranshallaAI : public npc_escortAI
         npc_escortAI::UpdateAI(uiDiff);
     }
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
@@ -899,7 +894,7 @@ struct npc_umi_yetiAI : public ScriptedAI
     {
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_UNSUMMON_YETI)
         {

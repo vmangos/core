@@ -116,7 +116,7 @@ Thread::Thread(Runnable* instance) : m_iThreadId(0), m_hThreadHandle(0), m_task(
     if (m_task)
         m_task->incReference();
 
-    bool _start = start();
+    /*bool _start = */ start();
     //MANGOS_ASSERT (_start);
 }
 
@@ -237,7 +237,7 @@ void Thread::setPriority(Priority type)
 {
 #ifndef __sun__
     int _priority = m_TpEnum.getPriority(type);
-    int _ok = ACE_Thread::setprio(m_hThreadHandle, _priority);
+    /*int _ok =*/ ACE_Thread::setprio(m_hThreadHandle, _priority);
     //remove this ASSERT in case you don't want to know is thread priority change was successful or not
     //MANGOS_ASSERT (_ok == 0);
 #endif

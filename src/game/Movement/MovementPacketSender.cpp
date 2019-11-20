@@ -247,7 +247,9 @@ void MovementPacketSender::SendMovementFlagChangeToController(Unit* unit, Player
         case WATER_WALK: opcode = pendingChange.apply ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK; break;
         case SET_HOVER: opcode = pendingChange.apply ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER; break;
         case FEATHER_FALL: opcode = pendingChange.apply ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL; break;
-        default: sLog.outError("MovementPacketSender::SendMovementFlagChangeToController: Unsupported movement change (%u), data not sent to client.", pendingChange.movementChangeType);
+        default:
+            sLog.outError("MovementPacketSender::SendMovementFlagChangeToController: Unsupported movement change (%u), data not sent to client.", pendingChange.movementChangeType);
+            return;
     }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

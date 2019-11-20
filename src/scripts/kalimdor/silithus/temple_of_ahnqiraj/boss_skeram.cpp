@@ -80,7 +80,7 @@ struct boss_skeramAI : public ScriptedAI
 
     bool IsImage;
 
-    void Reset()
+    void Reset() override
     {
         ArcaneExplosion_Timer = urand(6000, 8000);
         EarthShock_Timer = 1000;
@@ -125,7 +125,7 @@ struct boss_skeramAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void KilledUnit(Unit* victim)
+    void KilledUnit(Unit* victim) override
     {
         switch (urand(0,8))
         {
@@ -135,7 +135,7 @@ struct boss_skeramAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (IsImage)
         {
@@ -154,7 +154,7 @@ struct boss_skeramAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SKERAM, DONE);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (IsImage)
             return;
@@ -173,7 +173,7 @@ struct boss_skeramAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SKERAM, IN_PROGRESS);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         CancelFulfillment();
 
@@ -184,7 +184,7 @@ struct boss_skeramAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SKERAM, FAIL);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         // Despawn Images instantly if the True Prophet died
         if (IsImage && m_pInstance && m_pInstance->GetData(TYPE_SKERAM) == DONE)
@@ -264,7 +264,7 @@ struct boss_skeramAI : public ScriptedAI
 
     }
 
-    void JustSummoned(Creature* skeramImage)
+    void JustSummoned(Creature* skeramImage) override
     {
         if (m_creature->GetEntry() != skeramImage->GetEntry())
             return;

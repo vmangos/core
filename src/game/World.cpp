@@ -2265,8 +2265,8 @@ class BanQueryHolder : public SqlQueryHolder
 public:
     BanQueryHolder(BanMode mode, std::string banTarget, uint32 duration, std::string reason, uint32 realmId, std::string author,
         uint32 authorAccountId)
-        : m_mode(mode), m_banTarget(banTarget), m_duration(duration), m_reason(reason), m_realmId(realmId), m_author(author),
-          m_accountId(authorAccountId)
+        : m_mode(mode), m_duration(duration), m_reason(reason), m_realmId(realmId), 
+          m_author(author), m_banTarget(banTarget), m_accountId(authorAccountId)
     {
     }
 

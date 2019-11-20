@@ -50,13 +50,13 @@ struct npc_bartlebyAI : public ScriptedAI
 
     uint32 m_uiNormalFaction;
 
-    void Reset()
+    void Reset() override
     {
         if (m_creature->getFaction() != m_uiNormalFaction)
             m_creature->setFaction(m_uiNormalFaction);
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
         if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
@@ -64,7 +64,7 @@ struct npc_bartlebyAI : public ScriptedAI
         AttackStart(pAttacker);
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         if (!pDoneBy)
             return;
@@ -168,7 +168,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
     }
 
     // Prevent Reset() call after Dashel has been defeated.
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
         if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
@@ -176,7 +176,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         AttackStart(pAttacker);
     }
 
-    void Reset()
+    void Reset() override
     {
         if (m_questFightStarted)
         {
@@ -212,7 +212,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         m_playerGuid.Clear();
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         if (m_questFightStarted)
         {
@@ -256,7 +256,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         switch (m_eventPhase)
         {
@@ -377,7 +377,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pUnit)
+    void JustDied(Unit* pUnit) override
     {
         // case: something weird happened, killed by GM command, etc.
         if (m_dialogStarted || m_questFightStarted)
@@ -568,7 +568,7 @@ struct npc_tyrionAI : public ScriptedAI
 
     bool m_IsEventRunning;
 
-    void GetAIInformation(ChatHandler& reader)
+    void GetAIInformation(ChatHandler& reader) override
     {
         ScriptedAI::GetAIInformation(reader);
         reader.PSendSysMessage("TYRION: Event running: [%s]", m_IsEventRunning ? "YES" : "NO");
@@ -614,7 +614,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
     ObjectGuid m_guidTyrion;
     ObjectGuid m_guidPriestress;
 
-    void Reset()
+    void Reset() override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
             return;
@@ -623,7 +623,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
         m_uiEventPhase = 0;
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (m_creature->getFaction() == FACTION_ENEMYY)
             m_creature->setFaction(FACTION_NORMAL_LESCOVAR);
@@ -653,7 +653,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
             }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() != NPC_MARZON_THE_SILENT_BLADE)
             return;
@@ -682,7 +682,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pAttacker)
+    void Aggro(Unit* pAttacker) override
     {
         if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
         {
@@ -693,7 +693,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
         m_uiEventPhase = 13;
     }
 
-    void SummonedCreatureDespawn(Creature* pSummoned)
+    void SummonedCreatureDespawn(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() != NPC_MARZON_THE_SILENT_BLADE)
             return;
@@ -722,7 +722,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
 
     }
 
-    void WaypointReached(uint32 uiPoint)
+    void WaypointReached(uint32 uiPoint) override
     {
         Player* pPlayer = GetPlayerForEscort();
         if (!pPlayer)
@@ -783,7 +783,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiEventTimer)
         {
@@ -942,7 +942,7 @@ struct npc_tyrion_spybotAI : public npc_escortAI
     uint8 m_uiEventPhase;
     float m_fDefaultScaleSize;
 
-    void Reset()
+    void Reset() override
     {
 
         if (HasEscortState(STATE_ESCORT_ESCORTING))
@@ -964,7 +964,7 @@ struct npc_tyrion_spybotAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pAttacker) {}
+    void Aggro(Unit* pAttacker) override {}
 
 
     bool AreCreaturesRequiredForQuestPresent(float fMaxSearchRange = 40.0f)
@@ -1039,7 +1039,7 @@ struct npc_tyrion_spybotAI : public npc_escortAI
         return true;
     }
 
-    void WaypointReached(uint32 uiPoint)
+    void WaypointReached(uint32 uiPoint) override
     {
         if (!AreCreaturesRequiredForQuestPresent())
             return;
@@ -1095,7 +1095,7 @@ struct npc_tyrion_spybotAI : public npc_escortAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
 
         if (m_uiEventTimer)
@@ -1244,12 +1244,12 @@ struct npc_master_woodAI : public ScriptedAI
 
     uint32 m_uiRudeCount;
 
-    void Reset()
+    void Reset() override
     {
         m_uiRudeCount = 0;
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 emote)
+    void ReceiveEmote(Player* pPlayer, uint32 emote) override
     {
         if (pPlayer && (pPlayer->GetTeam() == ALLIANCE) && !m_creature->isInCombat() && m_creature->IsWithinLOSInMap(pPlayer))
         {

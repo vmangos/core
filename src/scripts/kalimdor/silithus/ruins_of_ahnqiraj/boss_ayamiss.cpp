@@ -96,7 +96,7 @@ struct boss_ayamissAI : public ScriptedAI
     ObjectGuid m_uiSacrificeGuid;
     float m_fSacrificeAggro;
 
-    void Reset()
+    void Reset() override
     {
         m_uiStingerSpray_Timer = 10000;
         m_uiPoisonStinger_Timer = 5000;
@@ -141,19 +141,19 @@ struct boss_ayamissAI : public ScriptedAI
             m_pInstance->SetData(TYPE_AYAMISS, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_AYAMISS, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_AYAMISS, DONE);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_PARALYZE)
         {
@@ -169,12 +169,12 @@ struct boss_ayamissAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -338,7 +338,7 @@ struct mob_zara_larvaAI : public ScriptedAI
     uint8 m_waypoint;
     Unit * m_victim;
 
-    void Reset()
+    void Reset() override
     {
         m_victim = nullptr;
         m_waypoint = 0;
@@ -346,7 +346,7 @@ struct mob_zara_larvaAI : public ScriptedAI
         SetCombatMovement(false);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (Active > uiDiff)
         {

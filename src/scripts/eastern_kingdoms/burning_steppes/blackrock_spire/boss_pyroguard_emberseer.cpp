@@ -194,7 +194,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
     }
     // END NOSTALRIUS
 
-    void Reset()
+    void Reset() override
     {
         m_uiFireNovaTimer = 6000;
         m_uiFlameBuffetTimer = 3000;
@@ -207,7 +207,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
     }
 
-    void AttackStart(Unit *target)
+    void AttackStart(Unit *target) override
     {
         // $target commence a nous attaquer.
         // Pas de combat autorise avec le boss.
@@ -225,19 +225,19 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EMBERSEER, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EMBERSEER, DONE);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EMBERSEER, FAIL);
@@ -247,7 +247,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_SELF_CAGE, false);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_pInstance)
             return;
@@ -344,14 +344,14 @@ struct npc_geolier_main_noireAI : public ScriptedAI
     bool fled;
     // END NOSTALRIUS
 
-    void Reset()
+    void Reset() override
     {
         MiseEnCage_Timer = urand(5000, 40000);
         Frappe_Timer     = urand(2000, 12100);
         fled = false;
     }
 
-    void AttackStart(Unit *target)
+    void AttackStart(Unit *target) override
     {
         if (!m_pInstance)
             return;
@@ -370,7 +370,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_pInstance)
             return;

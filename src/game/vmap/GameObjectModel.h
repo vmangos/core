@@ -45,7 +45,7 @@ class GameObjectModel
         float iScale;
         VMAP::WorldModel* iModel;
 
-        GameObjectModel() : collision_enabled(false), iModel(nullptr), iInvScale(0), iScale(0) {}
+        GameObjectModel() : collision_enabled(false), iInvScale(0), iScale(0), iModel(nullptr) {}
         bool initialize(const GameObject* const pGo, const GameObjectDisplayInfoEntry* pDisplayInfo);
 
     public:

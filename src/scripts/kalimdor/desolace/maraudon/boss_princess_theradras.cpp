@@ -41,7 +41,7 @@ struct boss_ptheradrasAI : public ScriptedAI
     uint32 RepulsiveGaze_Timer;
     uint32 RestoreTargetTimer;
 
-    void Reset()
+    void Reset() override
     {
         Dustfield_Timer = 8000;
         Boulder_Timer = 2000;
@@ -50,12 +50,12 @@ struct boss_ptheradrasAI : public ScriptedAI
         RestoreTargetTimer = 0;
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         m_creature->SummonCreature(12238, 28.067f, 61.875f, -123.405f, 4.67f, TEMPSUMMON_TIMED_DESPAWN, 600000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

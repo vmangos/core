@@ -30,7 +30,7 @@ class MANGOS_DLL_SPEC QueryResult
 {
     public:
         QueryResult(uint64 rowCount, uint32 fieldCount)
-            : mFieldCount(fieldCount), mRowCount(rowCount), mCurrentRow(nullptr){}
+            : mCurrentRow(nullptr), mFieldCount(fieldCount), mRowCount(rowCount) {}
 
         virtual ~QueryResult() {}
 
@@ -44,7 +44,7 @@ class MANGOS_DLL_SPEC QueryResult
         uint64 GetRowCount() const { return mRowCount; }
 
     protected:
-        Field *mCurrentRow;
+        Field* mCurrentRow;
         uint32 mFieldCount;
         uint64 mRowCount;
 };

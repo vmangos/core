@@ -21,14 +21,14 @@ struct npc_ecorceferAI : public ScriptedAI
     bool m_bHasBrokenDoor;
     bool m_bIsZevrimDead;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCheckDoorTimer = 0;
         m_bHasBrokenDoor   = false;
         m_bIsZevrimDead    = false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_bIsZevrimDead)
         {

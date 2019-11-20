@@ -88,7 +88,7 @@ struct boss_venoxisAI : public ScriptedAI
 
     float m_fDefaultSize;
 
-    void Reset()
+    void Reset() override
     {
         m_uiHolyFire_Timer = 10000;
         m_uiHolyWrath_Timer = 30000;
@@ -117,13 +117,13 @@ struct boss_venoxisAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VENOXIS, IN_PROGRESS);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         // Despawn snakes immediately when we're running home.
         std::list<Creature*> cobras;
@@ -134,7 +134,7 @@ struct boss_venoxisAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         // Respawn snakes
         std::list<Creature*> cobras;
@@ -154,7 +154,7 @@ struct boss_venoxisAI : public ScriptedAI
             m_pInstance->SetData(TYPE_VENOXIS, NOT_STARTED);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         m_creature->CastSpell(m_creature, SPELL_POISON_CLOUD, true);
@@ -165,7 +165,7 @@ struct boss_venoxisAI : public ScriptedAI
             m_pInstance->SetData(TYPE_VENOXIS, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

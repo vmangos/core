@@ -68,9 +68,9 @@ struct npc_kittenAI : public FollowerAI
 
     uint32 m_uiMoonwellCooldown;
 
-    void Reset() { }
+    void Reset() override { }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         //should not have npc_flags by default, so set when expected
         if (!m_creature->getVictim() && !m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && HasFollowState(STATE_FOLLOW_INPROGRESS) && pWho->GetEntry() == NPC_WINNA)
@@ -80,7 +80,7 @@ struct npc_kittenAI : public FollowerAI
         }
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff)
+    void UpdateFollowerAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
@@ -248,7 +248,7 @@ struct npc_niby_the_almightyAI : public ScriptedAI
 
     bool m_bEventStarted;
 
-    void Reset()
+    void Reset() override
     {
         m_uiSummonTimer = 500;
         m_uiSpeech = 0;
@@ -263,7 +263,7 @@ struct npc_niby_the_almightyAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_bEventStarted)
         {
@@ -348,12 +348,12 @@ struct npc_cursed_oozeAI : public ScriptedAI
         Reset();
     }
     uint32 SpellTimer;
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, const SpellEntry *spell) override
     {
         if (spell && spell->Id == SPELL_QUEST_CURSED_JAR)
             m_creature->ForcedDespawn();
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -366,7 +366,7 @@ struct npc_cursed_oozeAI : public ScriptedAI
             SpellTimer -= diff;
         DoMeleeAttackIfReady();
     }
-    void Reset()
+    void Reset() override
     {
         SpellTimer = 3000;
     }
@@ -385,12 +385,12 @@ struct npc_tainted_oozeAI : public ScriptedAI
         Reset();
     }
     uint32 SpellTimer;
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, const SpellEntry *spell) override
     {
         if (spell && spell->Id == SPELL_QUEST_TAINTED_JAR)
             m_creature->ForcedDespawn();
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -403,7 +403,7 @@ struct npc_tainted_oozeAI : public ScriptedAI
             SpellTimer -= diff;
         DoMeleeAttackIfReady();
     }
-    void Reset()
+    void Reset() override
     {
         SpellTimer = 3000;
     }
@@ -857,7 +857,7 @@ public:
     uint32 cleansedEntry;
     ObjectGuid cleansedGuid;
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (me->isSpawned() && cleansedGuid)
         {

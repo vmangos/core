@@ -23,19 +23,19 @@ struct GurubashiAxeThrowerAI : public ScriptedAI
     uint32 m_uiAxeFlurry_Timer;
     bool   m_bEnrage;
 
-    void Reset()
+    void Reset() override
     {
         m_uiAxeFlurry_Timer   = 10000;
         m_uiThrow_Timer       = 5000;
         m_bEnrage             = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -97,7 +97,7 @@ struct GurubashiBerserkerAI : public ScriptedAI
     uint32 m_uiFear_Timer;
     bool   m_bEnrage;
 
-    void Reset()
+    void Reset() override
     {
         m_uiKnockBack_Timer   = 10000;
         m_uiThunderClap_Timer = 5000;
@@ -105,12 +105,12 @@ struct GurubashiBerserkerAI : public ScriptedAI
         m_bEnrage             = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -189,7 +189,7 @@ struct npc_hakkari_doctor : public ScriptedAI
     uint32 m_uiCrapaudsLiberationTimer;
     uint32 m_uiOrionOmbreTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiMaleficeTimer = 5000;
         m_uiCrapaudsTimer = 15000;
@@ -197,7 +197,7 @@ struct npc_hakkari_doctor : public ScriptedAI
         m_uiOrionOmbreTimer = 4000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -251,7 +251,7 @@ struct npc_hakkari_doctor : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         m_creature->SummonCreatureAndAttack(15009, pKiller);
     }
@@ -272,11 +272,11 @@ struct npc_esprit_vaudou : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (Unit* pVictim = m_creature->getVictim())
         {
@@ -306,13 +306,13 @@ struct npc_fils_hakkar : public ScriptedAI
     uint32 m_uiKnockDownTimer;
     uint32 m_uiTrashTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiKnockDownTimer = 10000;
         m_uiTrashTimer = 5000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -336,7 +336,7 @@ struct npc_fils_hakkar : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         m_creature->CastSpell(m_creature, 24320, true);//24840
     }
@@ -354,7 +354,7 @@ struct go_pile_dechetsAI: public GameObjectAI
     bool Actif;
     GameObject * const m_pGo;
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         if (pUser->IsWithinDistInMap(m_pGo, 5.0f) && !Actif && (urand(0, 2)))
         {

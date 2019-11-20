@@ -41,7 +41,7 @@ struct boss_shadowvoshAI : public ScriptedAI
     uint32 m_uiHexTimer;
     uint32 m_uiCleaveTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCurseOfBloodTimer = 2000;
         m_uiHexTimer          = 8000;
@@ -50,7 +50,7 @@ struct boss_shadowvoshAI : public ScriptedAI
         //m_creature->CastSpell(m_creature,SPELL_ICEARMOR,true);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

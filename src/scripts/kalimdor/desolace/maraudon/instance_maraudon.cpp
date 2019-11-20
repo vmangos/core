@@ -22,7 +22,7 @@ struct instance_maraudon : public ScriptedInstance
     bool bRespawnSpewedLarva;
     uint32 uiSpewedLarvaTimer;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -35,7 +35,7 @@ struct instance_maraudon : public ScriptedInstance
 
     }
 
-    void OnCreatureCreate(Creature *pCreature)
+    void OnCreatureCreate(Creature *pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -54,7 +54,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    void OnGameObjectCreate(GameObject* pGo)
+    void OnGameObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -71,7 +71,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    void OnCreatureRespawn(Creature *pCreature)
+    void OnCreatureRespawn(Creature *pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -83,12 +83,12 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
             return;
@@ -101,7 +101,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -116,7 +116,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -155,7 +155,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -178,7 +178,7 @@ struct instance_maraudon : public ScriptedInstance
             }
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         // Remove a corrupted vine when a healed one was summoned over
         if (vineGuid)

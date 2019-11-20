@@ -38,13 +38,13 @@ struct boss_halyconAI : public ScriptedAI
     uint32 MightyBlow_Timer;
     bool Summoned;
 
-    void Reset()
+    void Reset() override
     {
         CrowdPummel_Timer = 8000;
         MightyBlow_Timer = 14000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -68,7 +68,7 @@ struct boss_halyconAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         //Summon Gizrul
         if (!Summoned)

@@ -226,9 +226,7 @@ namespace MMAP
         allVerts.append(meshData.solidVerts);
 
         float* verts = allVerts.getCArray();
-        int vertCount = allVerts.size() / 3;
         int* tris = allTris.getCArray();
-        int triCount = allTris.size() / 3;
 
         for (int i = 0; i < allVerts.size() / 3; i++)
             fprintf(objFile, "v %f %f %f\n", verts[i * 3], verts[i * 3 + 1], verts[i * 3 + 2]);
@@ -266,9 +264,13 @@ namespace MMAP
             return;
         }
 
+        int vertCount = allVerts.size() / 3;
+
         fwrite(&vertCount, sizeof(int), 1, objFile);
         fwrite(verts, sizeof(float), vertCount * 3, objFile);
         fflush(objFile);
+
+        int triCount = allTris.size() / 3;
 
         fwrite(&triCount, sizeof(int), 1, objFile);
         fwrite(tris, sizeof(int), triCount * 3, objFile);

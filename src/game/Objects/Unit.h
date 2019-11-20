@@ -981,7 +981,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         typedef std::set<uint32> ComboPointHolderSet;
         typedef std::map<SpellEntry const*, ObjectGuid> SingleCastSpellTargetMap;
 
-        virtual ~Unit ( );
+        ~Unit ( ) override;
 
         void AddToWorld() override;
         void RemoveFromWorld() override;
@@ -1199,7 +1199,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             return !hasUnitState(UNIT_STAT_NO_FREE_MOVE) && !GetOwnerGuid();
         }
 
-        uint32 getLevel() const final override { return GetUInt32Value(UNIT_FIELD_LEVEL); }
+        uint32 getLevel() const final { return GetUInt32Value(UNIT_FIELD_LEVEL); }
         void SetLevel(uint32 lvl);
         uint8 getRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, 0); }
         uint32 getRaceMask() const { return getRace() ? 1 << (getRace()-1) : 0x0; }
@@ -1263,7 +1263,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual void SetSheath( SheathState sheathed ) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
 
         // faction template id
-        uint32 getFaction() const final override { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
+        uint32 getFaction() const final { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
         void setFaction(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction ); }
 
         bool IsHostileTo(WorldObject const* target) const override;
@@ -1306,7 +1306,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // Kills the victim.
         void DoKillUnit(Unit *victim = nullptr);
-        uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell = nullptr) final override;
+        uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell = nullptr) final ;
         // Called after this unit kills someone.
         void Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss = true);
         void PetOwnerKilledUnit(Unit* pVictim);
@@ -1401,7 +1401,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
         void RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype);
 
-        bool IsValidAttackTarget(Unit const* target) const final override;
+        bool IsValidAttackTarget(Unit const* target) const final ;
         bool isTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
         bool isAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
         bool isPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }
@@ -1560,7 +1560,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
         Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
-        Player* GetAffectingPlayer() const final override;
+        Player* GetAffectingPlayer() const final ;
 
         void SetPet(Pet* pet);
         void SetCharm(Unit* pet);
@@ -1722,7 +1722,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void UpdateVisibilityAndView() override;                // overwrite WorldObject::UpdateVisibilityAndView()
 
         // common function for visibility checks for player/creatures with detection code
-        bool isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const final override;
+        bool isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const final ;
         bool canDetectInvisibilityOf(Unit const* u) const;
         bool canDetectStealthOf(Unit const* u, float distance, bool* alert = nullptr) const;
 
@@ -1808,7 +1808,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 MeleeDamageBonusTaken(WorldObject* pCaster, uint32 pdamage, WeaponAttackType attType, SpellEntry const *spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
 
         bool   IsSpellBlocked(WorldObject* pCaster, Unit *pVictim, SpellEntry const *spellProto, WeaponAttackType attackType = BASE_ATTACK);
-        bool   IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const final override;
+        bool   IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const final ;
 
         bool IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent );
         // Aura proc handlers

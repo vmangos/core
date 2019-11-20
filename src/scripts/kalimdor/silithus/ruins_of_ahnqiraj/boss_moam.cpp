@@ -62,7 +62,7 @@ struct boss_moamAI : public ScriptedAI
     ObjectGuid m_OGvictim;          // Memorize last target before turning into stone, then take it back.
     bool m_bIsInCombat;
 
-    void Reset()
+    void Reset() override
     {
         m_uiTrample_Timer = 6000;
         m_uiSummonManaFiend_Timer = 90000;
@@ -81,7 +81,7 @@ struct boss_moamAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MOAM, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
         DoScriptText(EMOTE_AGGRO, m_creature);
@@ -95,7 +95,7 @@ struct boss_moamAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MOAM, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (GameObject *pObsidian = m_creature->SummonGameObject(181069, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, 0, 0, 0, 0, -1, false))
             pObsidian->SetRespawnTime(345600);
@@ -105,7 +105,7 @@ struct boss_moamAI : public ScriptedAI
     }
 
     /** This function seems to be unused, kept as it is in case of...*/
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
         {
@@ -138,7 +138,7 @@ struct boss_moamAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if ((!m_creature->SelectHostileTarget() || !m_creature->getVictim()) && !m_creature->HasAura(SPELL_ENERGIZE))
             return;

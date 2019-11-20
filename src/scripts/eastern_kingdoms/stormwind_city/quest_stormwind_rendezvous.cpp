@@ -746,7 +746,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
                     if (!CombatJustEnded)
                     {
                         Bolvar->SetWalk(true);
-                        Bolvar->GetMotionMaster()->MovePoint(0, -8447.39f, 335.35f, 121.747f, 1.29f);
+                        Bolvar->GetMotionMaster()->MovePoint(0, -8447.39f, 335.35f, 121.747f, 0, 0, 1.29f);
                         CombatJustEnded = true;
                         Timer = 5000;
                         Tick = 68;

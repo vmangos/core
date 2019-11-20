@@ -29,7 +29,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
     uint32 m_mvt_timer;
     char m_mvt_id;
 
-    void Reset()
+    void Reset() override
     {
         DrainingBlow_Timer = 16000;
         CrowdPummel_Timer = 12000;
@@ -45,7 +45,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
             m_creature->SetDisplayId(MODEL_HUMAN);
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 emote)
+    void ReceiveEmote(Player* pPlayer, uint32 emote) override
     {
         if (emote == 1000 && m_mvt_id == 0)
         {
@@ -67,7 +67,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit *who)
+    void MoveInLineOfSight(Unit *who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && m_creature->IsWithinDistInMap(who, 10.0f))
         {
@@ -76,12 +76,12 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(who);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         m_creature->SetDisplayId(MODEL_HUMAN);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_mvt_id > 0)
         {

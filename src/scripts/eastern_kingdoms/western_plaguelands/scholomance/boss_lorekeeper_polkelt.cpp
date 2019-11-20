@@ -41,25 +41,25 @@ struct boss_lorekeeperpolkeltAI : public ScriptedAI
     uint32 CorrosiveAcid_Timer;
     uint32 NoxiousCatalyst_Timer;
 
-    void Reset()
+    void Reset() override
     {
         VolatileInfection_Timer = 38000;
         CorrosiveAcid_Timer = 45000;
         NoxiousCatalyst_Timer = 35000;
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         DoCastSpellIfCan(m_creature, SPELL_DARKPLAGUE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);        
     }
     
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_POLKELT, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

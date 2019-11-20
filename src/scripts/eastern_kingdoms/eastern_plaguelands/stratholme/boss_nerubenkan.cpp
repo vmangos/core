@@ -47,7 +47,7 @@ struct boss_nerubenkanAI : public ScriptedAI
     float WebbedPlayerAggro;
 
 
-    void Reset()
+    void Reset() override
     {
         EncasingWebs_Timer = 7000;
         PierceArmor_Timer = 15000;
@@ -89,13 +89,13 @@ struct boss_nerubenkanAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_NERUB, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

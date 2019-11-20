@@ -54,10 +54,10 @@ class Corpse : public WorldObject
 {
     public:
         explicit Corpse( CorpseType type = CORPSE_BONES );
-        ~Corpse( );
+        ~Corpse( ) override;
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
         bool Create( uint32 guidlow );
         bool Create( uint32 guidlow, Player *owner );
@@ -74,7 +74,7 @@ class Corpse : public WorldObject
         void ResetGhostTime() { m_time = time(nullptr); }
         CorpseType GetType() const { return m_type; }
 
-        ReputationRank GetReactionTo(WorldObject const* target) const final override;
+        ReputationRank GetReactionTo(WorldObject const* target) const final ;
         bool IsHostileTo(WorldObject const* target) const override;
         bool IsFriendlyTo(WorldObject const* target) const override;
 
@@ -92,8 +92,8 @@ class Corpse : public WorldObject
         bool IsExpired(time_t t) const;
         void SetFactionTemplate(FactionTemplateEntry const* entry) { m_faction = entry; }
         FactionTemplateEntry const* GetFactionTemplate() { return m_faction; }
-        uint32 getFaction() const final override { return m_faction->ID; }
-        uint32 getLevel() const final override;
+        uint32 getFaction() const final { return m_faction->ID; }
+        uint32 getLevel() const final ;
     private:
         GridReference<Corpse> m_gridRef;
         FactionTemplateEntry const* m_faction;

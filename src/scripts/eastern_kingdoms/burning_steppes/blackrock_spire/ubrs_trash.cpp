@@ -32,7 +32,7 @@ struct npc_blackhand_summonerAI : public ScriptedAI
     uint32 m_uiNovaGivreTimer;
     uint32 m_uiSummonTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiBouleFeuTimer = 7000;
         m_uiNovaGivreTimer = 10000;
@@ -49,13 +49,13 @@ struct npc_blackhand_summonerAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData64(TYPE_ROOM_EVENT, m_creature->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->IsNonMeleeSpellCasted(false))
             return;
@@ -126,7 +126,7 @@ struct npc_blackhand_veteranAI : public ScriptedAI
     uint32 m_uiFrappeTimer;
     bool m_bFirstChargeDone;
 
-    void Reset()
+    void Reset() override
     {
         m_uiChargeBouclierTimer = 0;
         m_uiCoupBouclierTimer = 2000;
@@ -144,13 +144,13 @@ struct npc_blackhand_veteranAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData64(TYPE_ROOM_EVENT, m_creature->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

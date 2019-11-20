@@ -47,7 +47,7 @@ struct boss_gehennasAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         m_uiGehennasCurseTimer = urand(5 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
         m_uiRainOfFireTimer = urand(6 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
@@ -58,20 +58,20 @@ struct boss_gehennasAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GEHENNAS, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GEHENNAS, IN_PROGRESS);
         m_creature->SetInCombatWithZone();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GEHENNAS, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

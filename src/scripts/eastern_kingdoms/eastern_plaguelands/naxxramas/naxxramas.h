@@ -298,9 +298,9 @@ class instance_naxxramas : public ScriptedInstance
 {
 public:
     instance_naxxramas(Map* pMap);
-    ~instance_naxxramas() {}
+    ~instance_naxxramas() override {}
 
-    void Initialize();
+    void Initialize() override;
 
     bool IsEncounterInProgress() const override;
 
@@ -308,14 +308,14 @@ public:
     void OnObjectCreate(GameObject* pGo) override;
     void OnCreatureRespawn(Creature * pCreature) override;
 
-    void SetData(uint32 uiType, uint32 uiData);
-    uint32 GetData(uint32 uiType);
-    uint64 GetData64(uint32 uiData);
+    void SetData(uint32 uiType, uint32 uiData) override;
+    uint32 GetData(uint32 uiType) override;
+    uint64 GetData64(uint32 uiData) override;
 
     uint64 GetGOUuid(NaxxGOs which);
 
-    const char* Save() { return strInstData.c_str(); }
-    void Load(const char* chrIn);
+    const char* Save() override { return strInstData.c_str(); }
+    void Load (const char* chrIn) override;
 
     // goth
     void SetGothTriggers();

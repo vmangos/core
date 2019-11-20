@@ -95,7 +95,7 @@ struct boss_hakkarAI : public ScriptedAI
 
     bool Enraged;
 
-    void Reset()
+    void Reset() override
     {
         BloodSiphon_Timer = 90000;
         CorruptedBlood_Timer = 15000;
@@ -117,7 +117,7 @@ struct boss_hakkarAI : public ScriptedAI
             m_pInstance->SetData(TYPE_HAKKAR, NOT_STARTED);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_HAKKAR, IN_PROGRESS);
@@ -126,13 +126,13 @@ struct boss_hakkarAI : public ScriptedAI
         ScriptedAI::Aggro(who);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_HAKKAR, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

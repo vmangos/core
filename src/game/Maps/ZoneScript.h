@@ -269,7 +269,7 @@ class OutdoorPvP : public ZoneScript
         OutdoorPvP();
 
         // dtor
-        virtual ~OutdoorPvP();
+        ~OutdoorPvP() override;
 
         // deletes all gos/creatures spawned by the pvp
         void DeleteSpawns();

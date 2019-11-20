@@ -121,7 +121,7 @@ struct boss_doomrelAI : public ScriptedAI
     uint8 m_uiDwarfRound;
     bool m_bHasSummoned;
 
-    void Reset()
+    void Reset() override
     {
         m_uiShadowVolley_Timer = 10000;
         m_uiImmolate_Timer = 18000;
@@ -133,13 +133,13 @@ struct boss_doomrelAI : public ScriptedAI
         m_bHasSummoned = false;
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_TOMB_OF_SEVEN, FAIL);
     }
 
-    void JustDied(Unit *victim)
+    void JustDied(Unit *victim) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_TOMB_OF_SEVEN, DONE);
@@ -147,7 +147,7 @@ struct boss_doomrelAI : public ScriptedAI
         //m_creature->SummonGameObject ( 169243, 1274.655640f, -283.507874f, -78.219254f, 2.365980, 0, 0, 0, 0, 0);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             pSummoned->AI()->AttackStart(pTarget);
@@ -195,7 +195,7 @@ struct boss_doomrelAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_pInstance)
         {

@@ -1157,7 +1157,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
     }
 
     // default case
-    if (!target || target != this && !target->isAlive())
+    if (!target || (target != this && !target->isAlive()))
         return SPELL_AURA_PROC_FAILED;
 
     if (cooldown && HasSpellCooldown(triggered_spell_id))
@@ -1626,7 +1626,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
         target = !(procFlags & PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL) && Spells::IsPositiveSpell(trigger_spell_id) ? this : pVictim;
 
     // default case
-    if (!target || target != this && !target->isAlive())
+    if (!target || (target != this && !target->isAlive()))
         return SPELL_AURA_PROC_FAILED;
 
     if (basepoints[EFFECT_INDEX_0] || basepoints[EFFECT_INDEX_1] || basepoints[EFFECT_INDEX_2])

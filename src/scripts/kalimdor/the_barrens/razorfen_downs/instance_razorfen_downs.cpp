@@ -39,7 +39,7 @@ struct instance_razorfen_downs : public ScriptedInstance
     std::string str_data;
     std::string strInstData;
 
-    void Initialize()
+    void Initialize() override
     {
         uiGongGUID = 0;
 
@@ -52,7 +52,7 @@ struct instance_razorfen_downs : public ScriptedInstance
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
         {
@@ -73,7 +73,7 @@ struct instance_razorfen_downs : public ScriptedInstance
         OUT_LOAD_INST_DATA_COMPLETE;
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -93,7 +93,7 @@ struct instance_razorfen_downs : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         if (uiType == DATA_GONG_WAVES)
         {
@@ -203,7 +203,7 @@ struct instance_razorfen_downs : public ScriptedInstance
 
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -214,7 +214,7 @@ struct instance_razorfen_downs : public ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiType)
+    uint64 GetData64(uint32 uiType) override
     {
         switch (uiType)
         {

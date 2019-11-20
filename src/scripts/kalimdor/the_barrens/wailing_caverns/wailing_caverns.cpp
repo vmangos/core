@@ -108,7 +108,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
     bool Yelled;
     bool isAggro;
 
-    void Reset()
+    void Reset() override
     {
         Event_Timer = 0;
         Sleep_Timer = 5000;
@@ -122,7 +122,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         isAggro = false;
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         m_creature->DeleteThreatList();
         m_creature->CombatStop(true);
@@ -137,7 +137,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         SetEscortPaused(false);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         isAggro = true;
         if (OnCastWaypoint() || OnFightWaypoint())
@@ -326,7 +326,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 diff)
+    void UpdateEscortAI(const uint32 diff) override
     {
         if (!m_pInstance)
             return;
@@ -653,14 +653,14 @@ struct EvolvingEctoplasmAI : public ScriptedAI
     uint32 m_uiImmuneTimer;
     bool   isImmune;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->RemoveAllAuras();
         m_uiImmuneTimer = 0;
         isImmune = false;
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (!isImmune)
         {
@@ -695,7 +695,7 @@ struct EvolvingEctoplasmAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiImmuneTimer < uiDiff)
         {

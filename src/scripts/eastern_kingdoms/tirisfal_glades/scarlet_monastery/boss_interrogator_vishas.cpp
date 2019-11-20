@@ -49,24 +49,24 @@ struct boss_interrogator_vishasAI : public ScriptedAI
     bool Yell60;
     uint32 ShadowWordPain_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Yell30 = false;
         Yell60 = false;
         ShadowWordPain_Timer = 5000;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         DoScriptText(SAY_KILL, m_creature);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (!m_pInstance)
             return;
@@ -76,7 +76,7 @@ struct boss_interrogator_vishasAI : public ScriptedAI
             DoScriptText(SAY_TRIGGER_VORREL, vorrel);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

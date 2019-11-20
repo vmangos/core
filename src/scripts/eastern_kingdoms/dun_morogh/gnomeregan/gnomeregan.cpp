@@ -678,7 +678,7 @@ struct npc_kernobeeAI : public FollowerAI
 
     void Reset() override {}
 
-    void UpdateFollowerAI(const uint32 uiDiff)
+    void UpdateFollowerAI(const uint32 uiDiff) override
     {
         FollowerAI::UpdateFollowerAI(uiDiff);               // Do combat handling
         if (nextStep == 5) //HasFollowState(STATE_FOLLOW_COMPLETE)
@@ -820,7 +820,7 @@ struct npc_kernobeeAI : public FollowerAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         FollowerAI::JustDied(pKiller);
         QuestReset();

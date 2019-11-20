@@ -107,7 +107,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     WorldLocation m_StartingLoc;
 
-    void Reset()
+    void Reset() override
     {
         m_uiSweepTimer        = urand(30000, 40000);
         m_uiSandBlastTimer    = urand(SANDBLAST_TIMER_INITIAL_MIN, SANDBLAST_TIMER_INITIAL_MAX);
@@ -128,7 +128,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_ouroTriggerGuid.Clear();
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_OURO, IN_PROGRESS);
@@ -146,7 +146,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             (*itr)->ForcedDespawn();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_OURO, FAIL);
@@ -158,7 +158,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_creature->ForcedDespawn(2000);
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_OURO, DONE);
@@ -166,7 +166,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         switch (pSummoned->GetEntry())
         {
@@ -269,7 +269,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no pTarget
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -449,7 +449,7 @@ struct npc_ouro_spawnerAI : public Scripted_NoMovementAI
 
     bool m_bHasSummoned;
 
-    void Reset()
+    void Reset() override
     {
         m_bHasSummoned = false;
 
@@ -470,7 +470,7 @@ struct npc_ouro_spawnerAI : public Scripted_NoMovementAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         // Despawn when Ouro is spawned
         if (pSummoned->GetEntry() == NPC_OURO)
@@ -481,7 +481,7 @@ struct npc_ouro_spawnerAI : public Scripted_NoMovementAI
         }
     }
 
-    void UpdateAI(const uint32 /*uiDiff*/) { }
+    void UpdateAI(const uint32 /*uiDiff*/) override { }
 };
 
 CreatureAI* GetAI_npc_ouro_spawner(Creature* pCreature)
@@ -504,7 +504,7 @@ struct npc_dirt_moundAI : public ScriptedAI
         ScriptedAI::JustRespawned();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiDespawnTimer = 30000;
 	    m_TargetGUID.Clear();
@@ -513,7 +513,7 @@ struct npc_dirt_moundAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
     }
 
-    void MoveInLineOfSight(Unit *who)
+    void MoveInLineOfSight(Unit *who) override
     {
         if (!m_TargetGUID && who->GetTypeId() == TYPEID_PLAYER)
         {
@@ -521,7 +521,7 @@ struct npc_dirt_moundAI : public ScriptedAI
 	    }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         Unit *pTarget = m_creature->GetMap()->GetUnit(m_CurrentTargetGUID);
         const bool bForceChangeTarget = !pTarget || pTarget->isDead()
@@ -569,12 +569,12 @@ struct npc_ouro_scarabAI : public ScriptedAI
 
     uint32 m_uiDespawnTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiDespawnTimer = 45000;
     }
 
-    void MoveInLineOfSight(Unit *who)
+    void MoveInLineOfSight(Unit *who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim() && !urand(0, 5))
 	    {
@@ -582,7 +582,7 @@ struct npc_ouro_scarabAI : public ScriptedAI
 	    }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_creature->getVictim())
             DoMeleeAttackIfReady();
@@ -605,7 +605,7 @@ struct go_sandworm_baseAI: public GameObjectAI
 
     bool m_bActive;
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         WorldLocation loc;
         pUser->GetObjectScale();

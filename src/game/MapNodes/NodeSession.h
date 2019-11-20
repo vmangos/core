@@ -131,7 +131,7 @@ protected:
 
     struct GuidsGenerator
     {
-        GuidsGenerator(uint32 minFreeGuids) : m_newGuidsRequestSent(false), m_minFreeGuids(minFreeGuids), m_freeGuidsCount(0) {}
+        GuidsGenerator(uint32 minFreeGuids) : m_newGuidsRequestSent(false), m_freeGuidsCount(0), m_minFreeGuids(minFreeGuids) {}
 
         void ReadFreeGuids(WorldPacket& pkt);
         uint32 Generate();

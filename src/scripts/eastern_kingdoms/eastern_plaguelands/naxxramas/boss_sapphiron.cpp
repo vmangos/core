@@ -146,7 +146,7 @@ struct boss_sapphironAI : public ScriptedAI
     uint32 m_forceTargetUpdateTimer;
     uint32 m_TargetNotReachableTimer;
 
-    void Reset()
+    void Reset() override
     {
         pullCheckTimer = 0;
         phase = PHASE_GROUND;
@@ -216,7 +216,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
         if (phase != PHASE_GROUND)
             return;
@@ -309,7 +309,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (phase != PHASE_GROUND)
             return;
@@ -323,7 +323,7 @@ struct boss_sapphironAI : public ScriptedAI
         events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         m_creature->CastSpell(m_creature, SPELL_SAPPHIRON_DIES, true);
         UnSummonWingBuffet();
@@ -695,7 +695,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
     {
     }
 
-    void AttackStart(Unit*)
+    void AttackStart(Unit*) override
     {
         return;
     }
@@ -705,7 +705,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         return;
     }
 
-    void Aggro(Unit*)
+    void Aggro(Unit*) override
     {
         return;
     }

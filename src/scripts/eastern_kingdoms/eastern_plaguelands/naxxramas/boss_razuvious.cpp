@@ -82,7 +82,7 @@ struct mob_deathknightUnderstudyAI : public ScriptedAI
 
     uint32 attackTimer;
     bool runAttack;
-    void Reset()
+    void Reset() override
     {
         m_creature->HandleEmote(EMOTE_STATE_READY1H);
         attackTimer = urand(5000, 10000);
@@ -131,7 +131,7 @@ struct boss_razuviousAI : public ScriptedAI
     EventMap rpEvents;
     ObjectGuid rpBuddy;
     
-    void Reset()
+    void Reset() override
     {
         events.Reset();
     }
@@ -194,14 +194,14 @@ struct boss_razuviousAI : public ScriptedAI
         RespawnAdds();
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         if (urand(0, 3))
             return;
         DoScriptText(urand(SAY_SLAY2, SAY_SLAY1), m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         DoCastSpellIfCan(m_creature, SPELL_HOPELESS, CF_TRIGGERED);
@@ -209,7 +209,7 @@ struct boss_razuviousAI : public ScriptedAI
             m_pInstance->SetData(TYPE_RAZUVIOUS, DONE);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
 
         DoScriptText(urand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
@@ -306,7 +306,7 @@ struct boss_razuviousAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->isInCombat())
             UpdateRP(uiDiff);

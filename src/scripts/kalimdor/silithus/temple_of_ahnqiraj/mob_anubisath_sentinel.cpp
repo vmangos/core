@@ -233,7 +233,7 @@ struct aqsentinelAI : public ScriptedAI
         CallBuddiesToAttack(who);
     }
 
-    void Reset()
+    void Reset() override
     {
         if (!m_creature->isDead())
         {
@@ -268,7 +268,7 @@ struct aqsentinelAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (gatherOthersWhenAggro)
             GetOtherSentinels(pWho);
@@ -279,7 +279,7 @@ struct aqsentinelAI : public ScriptedAI
     }
 
     // Transfer powers on death
-    void JustDied(Unit* killer)
+    void JustDied(Unit* killer) override
     {
         m_bAlone = true;
         for (auto iter = nearby.cbegin(); iter != nearby.cend(); ++iter)
@@ -305,7 +305,7 @@ struct aqsentinelAI : public ScriptedAI
             DoScriptText(EMOTE_TRANSFER, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

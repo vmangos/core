@@ -143,7 +143,6 @@ public:
     blackwing_technicians_helper(ScriptedInstance *pInstance) :
         m_bUpdated(false),
         m_uiTechniciansUpdate(0),
-        m_uiTechniciansInFight(0),
         m_pInstance(pInstance)
     {
     }
@@ -240,7 +239,6 @@ public:
 private:
     bool m_bUpdated;
     uint32 m_uiTechniciansUpdate;
-    uint32 m_uiTechniciansInFight;
     std::vector<ObjectGuid> m_vTechniciansGuid;
     std::map<ObjectGuid, float> m_mThreatGuid;
     ScriptedInstance* const m_pInstance;
@@ -260,7 +258,7 @@ struct instance_blackwing_lair : public ScriptedInstance
     std::list<ObjectGuid> m_lVaelGobs;
     blackwing_technicians_helper m_hBlackwingTechnicians;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
         memset(&m_auiData, 0, sizeof(m_auiData));
@@ -283,7 +281,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         return false;
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -334,7 +332,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
     }
 
-    void OnCreatureEnterCombat(Creature* pCreature)
+    void OnCreatureEnterCombat(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -358,7 +356,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
     }
 
-    void OnCreatureEvade(Creature* pCreature)
+    void OnCreatureEvade(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -377,7 +375,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
     }
 
-    void OnCreatureRespawn(Creature* pCreature)
+    void OnCreatureRespawn(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -464,7 +462,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature *who)
+    void OnCreatureDeath(Creature *who) override
     {
         switch (who->GetEntry())
         {
@@ -478,7 +476,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -606,14 +604,14 @@ struct instance_blackwing_lair : public ScriptedInstance
         m_hBlackwingTechnicians.RemovePotentialVictim(player->GetObjectGuid());
     }
 
-    uint64 GetData64(uint32 data)
+    uint64 GetData64(uint32 data) override
     {
         if (data < MAX_DATAS)
             return m_auiData[data];
         return 0;
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -806,7 +804,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         }
     }
 
-    bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const
+    bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const override
     {
         ObjectGuid scepterChampion = m_auiData[DATA_SCEPTER_CHAMPION];
 
@@ -832,19 +830,19 @@ struct instance_blackwing_lair : public ScriptedInstance
 
     }
 
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         if (uiType < MAX_ENCOUNTER)
             return (m_auiEncounter[uiType]);
         return 0;
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
         {
@@ -926,7 +924,7 @@ struct go_oeuf_razAI: public GameObjectAI
 {
     go_oeuf_razAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         if (!pUser)
             return true;
@@ -982,7 +980,7 @@ struct go_engin_suppressionAI: public GameObjectAI
     uint32 m_uiCheckTimer;
     bool m_bActive;
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         if (pUser->IsWithinDistInMap(me, 5.0f))
         {
@@ -1016,7 +1014,7 @@ struct go_engin_suppressionAI: public GameObjectAI
         m_bActive = true;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_uiCheckTimer <= uiDiff)
         {
@@ -1118,20 +1116,20 @@ struct npc_death_talonAI : public ScriptedAI
     uint32 m_uiSchoolSensibility;
     bool m_bIsOverSeer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCleaveTimer     = urand(5000, 9000);
         m_uiWarStompTimer   = 8000;
         m_uiFireBlastTimer  = 8000;
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         m_uiBroodPower = RandomPower();
         m_uiSchoolSensibility = RandomSensibility();
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         // aggro Master Elementalist with the pull
         if (!m_bIsOverSeer)
@@ -1174,7 +1172,7 @@ struct npc_death_talonAI : public ScriptedAI
         return (0);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_bIsOverSeer && !m_creature->HasAura(m_uiBroodPower))
             m_creature->AddAura(m_uiBroodPower);
@@ -1253,7 +1251,7 @@ struct npc_blackwing_technicianAI : public ScriptedAI
     bool m_bAdded;
     blackwing_technicians_helper *m_pTechnicianHelper;
 
-    void Reset()
+    void Reset() override
     {
         if (m_pTechnicianHelper && m_bAdded)
         {
@@ -1266,13 +1264,13 @@ struct npc_blackwing_technicianAI : public ScriptedAI
             m_uiEmoteTimer = urand(0, 1) ? 1000 : 3000;
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (!m_bVaelGob)
             ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void Aggro(Unit* who)
+    void Aggro(Unit* who) override
     {
         if (m_pTechnicianHelper && !m_bAdded)
         {
@@ -1282,7 +1280,7 @@ struct npc_blackwing_technicianAI : public ScriptedAI
         ScriptedAI::Aggro(who);
     }
 
-    void JustDied(Unit* killer)
+    void JustDied(Unit* killer) override
     {
         if (m_pTechnicianHelper && m_bAdded)
         {
@@ -1292,7 +1290,7 @@ struct npc_blackwing_technicianAI : public ScriptedAI
         ScriptedAI::JustDied(killer);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_bVaelGob && m_creature->GetPositionZ() >= 430.0f)
             m_creature->DeleteLater();
@@ -1367,7 +1365,7 @@ struct CorruptedWhelpAI : public ScriptedAI
     }
 
 
-    void Reset()
+    void Reset() override
     {
     }
 
@@ -1378,7 +1376,7 @@ struct CorruptedWhelpAI : public ScriptedAI
     }
     */
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

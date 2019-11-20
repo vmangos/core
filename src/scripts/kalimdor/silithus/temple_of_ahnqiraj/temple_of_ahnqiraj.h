@@ -125,25 +125,25 @@ class instance_temple_of_ahnqiraj : public ScriptedInstance
 public:
     instance_temple_of_ahnqiraj(Map* pMap);
 
-    void Initialize();
+    void Initialize() override;
 
     bool IsEncounterInProgress() const override;
 
-    void OnCreatureRespawn(Creature* pCreature);
-    void OnCreatureCreate(Creature* pCreature);
-    void OnObjectCreate(GameObject* pGo);
+    void OnCreatureRespawn(Creature* pCreature) override;
+    void OnCreatureCreate(Creature* pCreature) override;
+    void OnObjectCreate(GameObject* pGo) override;
 
     void SetData(uint32 uiType, uint32 uiData) override;
     uint32 GetData(uint32 uiType) override;
 
-    bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const;
+    bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const override;
 
     void GetRoyalGuardGUIDList(GuidList& lList) { lList = m_lRoyalGuardGUIDList; }
 
-    const char* Save() { return m_strInstData.c_str(); }
-    void Load(const char* chrIn);
+    const char* Save() override { return m_strInstData.c_str(); }
+    void Load(const char* chrIn) override;
 
-    void Update(uint32 uiDiff);
+    void Update(uint32 uiDiff) override;
 
     bool TwinsDialogueStartedOrDone();
 
@@ -152,8 +152,6 @@ private:
     std::string m_strInstData;
 
     uint32 m_uiBugTrioDeathCount;
-    uint32 m_uiCthunPhase;
-
     GuidList m_lRoyalGuardGUIDList;
 
     TwinsIntroDialogue m_twinsIntroDialogue;

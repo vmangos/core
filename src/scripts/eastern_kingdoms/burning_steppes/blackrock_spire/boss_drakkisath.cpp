@@ -48,7 +48,7 @@ struct boss_drakkisathAI : public ScriptedAI
     uint32 m_uiRageTimer;
     uint32 m_uiPierceArmorTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFlameStrikeTimer    = 16000;
         m_uiCleaveTimer         = 12000;
@@ -58,7 +58,7 @@ struct boss_drakkisathAI : public ScriptedAI
         m_uiPierceArmorTimer    = 5000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

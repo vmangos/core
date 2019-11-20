@@ -894,7 +894,6 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                     {
                         if (Player* pPlayer = i->getSource())
                         {
-                            uint32 current_reputation_rank1 = pPlayer->GetReputationMgr().GetRank(factionEntry);
                             pPlayer->GetReputationMgr().ModifyReputation(factionEntry, 100);
                         }
                     }
@@ -1543,7 +1542,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         goStoneform();
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE))
         {
@@ -1562,7 +1561,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit*)
+    void Aggro(Unit*) override
     {
         if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE))
         {
@@ -1570,7 +1569,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -1629,12 +1628,12 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
         ChangeColor();
     }
 
-    void Aggro(Unit*)
+    void Aggro(Unit*) override
     {
         m_creature->CallForHelp(10.0f);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -1665,8 +1664,8 @@ struct mob_toxic_tunnelAI : public ScriptedAI
         _evadeTimer = 0;
     }
 
-    void AttackStart(Unit*) { }
-    void MoveInLineOfSight(Unit*) { }
+    void AttackStart(Unit*) override { }
+    void MoveInLineOfSight(Unit*) override { }
 
     void EnterCombat(Unit*) override
     {
@@ -1735,7 +1734,7 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -1783,15 +1782,15 @@ bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
     return false;
 }
 
-static constexpr char* tailorText = "I am a master tailor, Omarion";
-static constexpr char* blacksmithText = "I am a master blacksmith, Omarion";
-static constexpr char* leatherworkerText = "I am a master leatherworker, Omarion";
-static constexpr char* nocraftText = "Omarion, I am not a craftsman. Can you still help me?";
-static constexpr char* close_nocrafter = "Thank you, Omarion. You have taken a fatal blow for the team on this day.";
-static constexpr char* close_crafter = "I need to go. Evil stirs. Die well, Omarion.";
-
 enum OmarionMisc {
     QUEST_OMARIONS_HANDBOOK = 9233,
+
+    BC_TAILOR_TEXT        = 12251, // I am a master tailor, Omarion.
+    BC_BLACKSMITH_TEXT    = 12269, // I am a master blacksmith, Omarion.
+    BC_LEATHERWORKER_TEXT = 12257, // I am a master leatherworker, Omarion.
+    BC_NO_CRAFT_TEXT      = 12279, // Omarion, I am not a craftsman. Can you still help me?
+    BC_CLOSE_NO_CRAFTER   = 12281, // Thank you, Omarion. You have taken a fatal blow for the team on this day.
+    BC_CLOSE_CRAFTER      = 12270, // I need to go. Evil stirs. Die well, Omarion.
 
     GOSSIP_MENU_INTRO   = 8507,
     GOSSIP_MENU_CRAFTER = 8508,
@@ -1878,7 +1877,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Vest" , GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_CHEST);
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Cloak", GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_GLACIAL_CLOAK);
         }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_TAILOR, GOSSIP_CLOSE);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_CRAFTER, GOSSIP_SELECT_TAILOR, GOSSIP_CLOSE);
         pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
         return true;
     case GOSSIP_SELECT_BS:
@@ -1891,7 +1890,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
         {
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Breastplate", GOSSIP_SELECT_BS, GOSSIP_SELECT_ICEBANE_CHEST);
         }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_BS, GOSSIP_CLOSE);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_CRAFTER, GOSSIP_SELECT_BS, GOSSIP_CLOSE);
         pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
         return true;
     case GOSSIP_SELECT_LW:
@@ -1908,14 +1907,14 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Tunic", GOSSIP_SELECT_LW, GOSSIP_SELECT_POLAR_CHEST);
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Breastplate", GOSSIP_SELECT_LW, GOSSIP_SELECT_ICYSCALE_CHEST);
         }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_LW, GOSSIP_CLOSE);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_CRAFTER, GOSSIP_SELECT_LW, GOSSIP_CLOSE);
         pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
         return true;
     case GOSSIP_SELECT_NOCRAFT:
     {
         if (argentDawnRep >= BOOK_REQ_RANK)
         {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_nocrafter, GOSSIP_SENDER_MAIN, GOSSIP_CLOSE);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_NO_CRAFTER, GOSSIP_SENDER_MAIN, GOSSIP_CLOSE);
             pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_NOCRAFT, pCreature->GetGUID());
             if (!pPlayer->HasItemCount(22719, 1, true))
             {
@@ -1998,7 +1997,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
     }
     }
 
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, uiSender, GOSSIP_CLOSE);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_CLOSE_CRAFTER, uiSender, GOSSIP_CLOSE);
     pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
     return true;
 }
@@ -2010,13 +2009,13 @@ bool GossipHello_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreature
     uint32 leatherworkSkill = pPlayer->GetSkillValue(SKILL_LEATHERWORKING);
 
     if(tailorSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, tailorText, GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_TAILOR);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_TAILOR_TEXT, GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_TAILOR);
     if(blacksmithSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, blacksmithText, GOSSIP_SELECT_BS, GOSSIP_SELECT_BS);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_BLACKSMITH_TEXT, GOSSIP_SELECT_BS, GOSSIP_SELECT_BS);
     if(leatherworkSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, leatherworkerText, GOSSIP_SELECT_LW, GOSSIP_SELECT_LW);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_LEATHERWORKER_TEXT, GOSSIP_SELECT_LW, GOSSIP_SELECT_LW);
 
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, nocraftText, GOSSIP_SENDER_MAIN, GOSSIP_SELECT_NOCRAFT);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BC_NO_CRAFT_TEXT, GOSSIP_SENDER_MAIN, GOSSIP_SELECT_NOCRAFT);
 
     pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_INTRO, pCreature->GetGUID());
     pCreature->HandleEmote(EMOTE_ONESHOT_LAUGH);

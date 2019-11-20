@@ -57,7 +57,7 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
 
 Log::Log() :
     logfile(nullptr), gmLogfile(nullptr), dberLogfile(nullptr),
-    wardenLogfile(nullptr), anticheatLogfile(nullptr), honorLogfile(nullptr), m_colored(false), m_wardenDebug(false), m_includeTime(false), m_gmlog_per_account(false)
+    wardenLogfile(nullptr), anticheatLogfile(nullptr), honorLogfile(nullptr), m_colored(false), m_includeTime(false), m_wardenDebug(false), m_gmlog_per_account(false)
 {
     for (int i = 0; i < LOG_MAX_FILES; ++i)
     {

@@ -100,7 +100,7 @@ struct boss_majordomoAI : public ScriptedAI
     uint32 DialogRagnarosTimer;
     bool RagnarosEventStart;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
         Reflection_Timer =  30000;
@@ -130,7 +130,7 @@ struct boss_majordomoAI : public ScriptedAI
         RagnarosEventStart = false;
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (AddVivant > 0)
             AddVivant--;
@@ -198,13 +198,13 @@ struct boss_majordomoAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit* victim)
+    void KilledUnit(Unit* victim) override
     {
         if (m_creature->getFaction() != 35)
             DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_creature->getFaction() != 35)
             DoScriptText(SAY_AGGRO, m_creature);
@@ -216,7 +216,7 @@ struct boss_majordomoAI : public ScriptedAI
         }
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -319,7 +319,7 @@ struct boss_majordomoAI : public ScriptedAI
             }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_creature->getFaction() != 35 && AddSpawn == false)
         {

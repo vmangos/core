@@ -64,7 +64,7 @@ struct boss_magmadarAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFrenzyTimer          = 15000;
         m_uiPanicTimer           = 10000;
@@ -81,19 +81,19 @@ struct boss_magmadarAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MAGMADAR, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MAGMADAR, IN_PROGRESS);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MAGMADAR, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -197,7 +197,7 @@ struct boss_magmadarAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void UpdateAI_corpse(const uint32 diff)
+    void UpdateAI_corpse(const uint32 diff) override
     {
         // continue activating Lava Bomb triggers while dead until they've all despawned
         if (m_uiLavaBombTriggerTimer)

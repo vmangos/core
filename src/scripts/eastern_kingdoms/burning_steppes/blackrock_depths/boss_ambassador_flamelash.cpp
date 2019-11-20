@@ -52,7 +52,7 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
 
     GuidList lBurningSpirits;
 
-    void Reset()
+    void Reset() override
     {
         for (uint8 i = 0; i < DWARF_RUNES_MAX; i++)
             m_uiSpiritTimer[i] = 5 * IN_MILLISECONDS;
@@ -113,7 +113,7 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
             pWho->CastSpell(m_creature, SPELL_BURNING_SPIRIT, true);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

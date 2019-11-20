@@ -66,29 +66,29 @@ public:
     PlayerWrapper() : player(*((T*)nullptr)) {}
     PlayerWrapper(PlayerWrapper<T> const& other) : player(other.player) {}
 
-    virtual ObjectGuid GetObjectGuid() const;
-    virtual Team GetTeam() const;
-    virtual const char* GetName() const;
-    virtual uint32 GetZoneId() const;
-    virtual uint32 GetAreaId() const;
-    virtual uint8 getClass() const;
-    virtual uint8 getRace() const;
-    virtual uint32 getLevel() const;
-    virtual uint32 GetGuildId() const;
-    virtual bool IsAFK() const;
-    virtual bool IsDND() const;
-    virtual bool IsGameMaster() const;
-    virtual uint8 GetChatTag() const;
-    virtual WorldSession* GetSession() const;
-    virtual PlayerSocial* GetSocial() const;
+    ObjectGuid GetObjectGuid() const override;
+    Team GetTeam() const override;
+    const char* GetName() const override;
+    uint32 GetZoneId() const override;
+    uint32 GetAreaId() const override;
+    uint8 getClass() const override;
+    uint8 getRace() const override;
+    uint32 getLevel() const override;
+    uint32 GetGuildId() const override;
+    bool IsAFK() const override;
+    bool IsDND() const override;
+    bool IsGameMaster() const override;
+    uint8 GetChatTag() const override;
+    WorldSession* GetSession() const override;
+    PlayerSocial* GetSocial() const override;
 
-    virtual void JoinedChannel(Channel *c);
-    virtual void LeftChannel(Channel *c);
+    void JoinedChannel(Channel *c) override;
+    void LeftChannel(Channel *c) override;
 
-    virtual Player* ToPlayer() const;
-    virtual MasterPlayer* ToMasterPlayer() const;
+    Player* ToPlayer() const override;
+    MasterPlayer* ToMasterPlayer() const override;
 
-    virtual bool ok() const;
+    bool ok() const override;
 protected:
     T& player;
 };

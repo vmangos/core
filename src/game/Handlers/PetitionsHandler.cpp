@@ -214,8 +214,6 @@ void WorldSession::HandlePetitionQueryOpcode(WorldPacket & recv_data)
     if (!petition)
         return;
 
-    uint8 signs = petition->GetSignatureCount();
-
     WorldPacket data(SMSG_PETITION_QUERY_RESPONSE, (4 + 8 + petition->GetName().size() + 1 + 2 + 4 * 11));
     data << uint32(petitionguid);                           // petition guid
     data << ObjectGuid(petition->GetOwnerGuid());           // charter owner guid
@@ -516,9 +514,6 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
     }
 
     // OK!
-
-    // signs
-    uint8 signs = petition->GetSignatureCount();
 
     Guild* guild = new Guild;
     if (!guild->Create(petition, _player))

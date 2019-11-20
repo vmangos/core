@@ -140,11 +140,26 @@ struct boss_bug_trioAI : public ScriptedAI
     {
         // Force evade all 3 bugs and respawn any that are already dead. We have to do this manually or linked bugs don't evade/respawn on region triggered EnterEvadeMode.
         if (Creature* pKri = m_pInstance->GetSingleCreatureFromStorage(NPC_KRI))
-            if (pKri->isDead()) pKri->Respawn(); else pKri->AI()->EnterEvadeMode();
+        {
+            if (pKri->isDead())
+                pKri->Respawn();
+            else
+                pKri->AI()->EnterEvadeMode();
+        }
         if (Creature* pYauj = m_pInstance->GetSingleCreatureFromStorage(NPC_PRINCESS_YAUJ))
-            if (pYauj->isDead()) pYauj->Respawn(); else pYauj->AI()->EnterEvadeMode();
+        {
+            if (pYauj->isDead())
+                pYauj->Respawn();
+            else
+                pYauj->AI()->EnterEvadeMode();
+        }
         if (Creature* pVem = m_pInstance->GetSingleCreatureFromStorage(NPC_VEM))
-            if (pVem->isDead()) pVem->Respawn(); else pVem->AI()->EnterEvadeMode();
+        {
+            if (pVem->isDead())
+                pVem->Respawn();
+            else
+                pVem->AI()->EnterEvadeMode();
+        }
     }
 
     virtual bool UpdateBugAI(const uint32 /*uiDiff*/) { return true; }
@@ -217,7 +232,7 @@ struct boss_kriAI : public boss_bug_trioAI
         boss_bug_trioAI::JustDied(pKiller);
     }
 
-    bool UpdateBugAI(const uint32 uiDiff)
+    bool UpdateBugAI(const uint32 uiDiff) override
     {
         // Cleave
         if (m_uiCleaveTimer < uiDiff)
@@ -302,7 +317,7 @@ struct boss_yaujAI : public boss_bug_trioAI
         pSummoned->SetInCombatWithZone();
     }
 
-    bool UpdateBugAI(const uint32 uiDiff)
+    bool UpdateBugAI(const uint32 uiDiff) override
     {
         // Fear
         if (m_uiFearTimer < uiDiff)
@@ -382,7 +397,7 @@ struct boss_vemAI : public boss_bug_trioAI
         }
     }
 
-    bool UpdateBugAI(const uint32 uiDiff)
+    bool UpdateBugAI(const uint32 uiDiff) override
     {
         // Charge
         if (m_uiChargeTimer < uiDiff)

@@ -38,14 +38,14 @@ struct boss_azshir_the_sleeplessAI : public ScriptedAI
     uint32 CallOftheGrave_Timer;
     uint32 Terrify_Timer;
 
-    void Reset()
+    void Reset() override
     {
         SoulSiphon_Timer = 1;
         CallOftheGrave_Timer = 30000;
         Terrify_Timer = 20000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

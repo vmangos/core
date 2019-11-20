@@ -67,7 +67,7 @@ struct boss_vectusAI : public ScriptedAI
 
     bool m_bStartedDialogue;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFlameStrike_Timer   = 2000;
         m_uiBlastWave_Timer     = 14000;
@@ -90,7 +90,7 @@ struct boss_vectusAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Chakor@Nostalrius : Event Du Gambit
         if (!eventGambitDone)
@@ -223,9 +223,9 @@ struct npc_scholomance_studentAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     bool isTransformed;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void SpellHit(Unit *pCaster, const SpellEntry *pSpell)
+    void SpellHit(Unit *pCaster, const SpellEntry *pSpell) override
     {
         if (pSpell->Id == SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT)
         {
@@ -239,7 +239,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         // set the viewing room and Marduk and Vectus to hostile on aggro
         std::list<Creature*> creatures;
@@ -254,7 +254,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
 			pVectus->setFaction(14);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (isTransformed)
         {
@@ -283,7 +283,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         }
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         if (isTransformed)
             m_creature->AddAura(SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, ADD_AURA_NO_OPTION, m_creature);
@@ -291,7 +291,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         Reset();
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         m_creature->RemoveAllAuras();
         m_creature->DeleteThreatList();

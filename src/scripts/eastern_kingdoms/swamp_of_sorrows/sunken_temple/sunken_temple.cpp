@@ -80,9 +80,9 @@ struct npc_malfurionAI : public ScriptedAI
     uint32 m_uiSpeech;
     bool m_inDungeon;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // We are in Sunken Temple
         if (m_inDungeon)
@@ -178,7 +178,7 @@ struct go_eternal_flameAI: public GameObjectAI
 {
     go_eternal_flameAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         if (me->GetGoState() == GO_STATE_ACTIVE)    // already used - script handler calls twice
             return true;
@@ -589,7 +589,7 @@ struct go_atalai_lightAI: public GameObjectAI
 {
     go_atalai_lightAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData();
 

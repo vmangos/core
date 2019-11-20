@@ -441,7 +441,7 @@ bool ChatHandler::HandleAddCharacterNoteCommand(char* args)
         return false;
     }
     std::string authorName = m_session ? m_session->GetPlayerName() : "Console";
-    char* reason = ExtractQuotedOrLiteralArg(&args);
+    char const* reason = ExtractQuotedOrLiteralArg(&args);
     if (!reason)
         reason = "<no reason given>";
 
@@ -468,7 +468,7 @@ bool ChatHandler::HandleWarnCharacterCommand(char* args)
         return false;
     }
     std::string authorName = m_session ? m_session->GetPlayerName() : "Console";
-    char* reason = ExtractQuotedOrLiteralArg(&args);
+    char const* reason = ExtractQuotedOrLiteralArg(&args);
     if (!reason)
         reason = "<no reason given>";
 
@@ -526,7 +526,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
     if (!ipStr)
         return false;
 
-    char* reason = ExtractQuotedOrLiteralArg(&args);
+    char const* reason = ExtractQuotedOrLiteralArg(&args);
     if (!reason)
         reason = "<no reason given>";
 
@@ -646,15 +646,15 @@ void ChatHandler::SendBanResult(BanMode mode, BanReturn result, std::string& ban
         case BAN_NOTFOUND:
             switch (mode)
             {
-            default:
-                PSendSysMessage(LANG_BAN_NOTFOUND, "account", banTarget.c_str());
-                break;
-            case BAN_CHARACTER:
-                PSendSysMessage(LANG_BAN_NOTFOUND, "character", banTarget.c_str());
-                break;
-            case BAN_IP:
-                PSendSysMessage(LANG_BAN_NOTFOUND, "ip", banTarget.c_str());
-                break;
+                default:
+                    PSendSysMessage(LANG_BAN_NOTFOUND, "account", banTarget.c_str());
+                    break;
+                case BAN_CHARACTER:
+                    PSendSysMessage(LANG_BAN_NOTFOUND, "character", banTarget.c_str());
+                    break;
+                case BAN_IP:
+                    PSendSysMessage(LANG_BAN_NOTFOUND, "ip", banTarget.c_str());
+                    break;
             }
             SetSentErrorMessage(true);
             return;

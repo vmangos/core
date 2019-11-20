@@ -1142,8 +1142,6 @@ void GameEventMgr::UpdateSilithusPVP()
     struct tm *timeinfo;
     timeinfo = localtime(&rawtime);
 
-    uint32 TodayOfMonth = timeinfo->tm_mday;
-
     /** Event start every 6hours for 2hours */
     uint32 occurency = 6;
     if (timeinfo->tm_hour % occurency == 0 && timeinfo->tm_min == 0)

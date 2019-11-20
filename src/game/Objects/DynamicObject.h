@@ -41,8 +41,8 @@ class DynamicObject : public WorldObject
         typedef std::map<ObjectGuid, uint32> AffectedMap;
         explicit DynamicObject();
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
         bool Create(uint32 guidlow, WorldObject* caster, uint32 spellId, SpellEffectIndex effIndex, float x, float y, float z, int32 duration, float radius, DynamicObjectType type);
         void Update(uint32 update_diff, uint32 p_time) override;
@@ -63,10 +63,10 @@ class DynamicObject : public WorldObject
 
         bool IsHostileTo(WorldObject const* target) const override;
         bool IsFriendlyTo(WorldObject const* target) const override;
-        uint32 getFaction() const final override;
-        uint32 getLevel() const final override;
+        uint32 getFaction() const final ;
+        uint32 getLevel() const final ;
 
-        float GetObjectBoundingRadius() const               // overwrite WorldObject version
+        float GetObjectBoundingRadius() const override      // overwrite WorldObject version
         {
             return 0.0f;                                    // dynamic object not have real interact size
         }

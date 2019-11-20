@@ -765,7 +765,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
     uint32 m_uiWisperingsTimer;
     uint32 SPELL_WHISPERINGS;
 
-    void Reset()
+    void Reset() override
     {
         SetCombatMovement(false);
         playerDetected = false;
@@ -797,7 +797,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() != TYPEID_PLAYER || who->ToPlayer()->IsGameMaster())
             return;
@@ -838,7 +838,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (playerDetected)
         {
@@ -910,7 +910,7 @@ struct npc_infantrymanAI : ScriptedAI
         m_saurfangFollowDist = 0.0f;
     }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
         if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
@@ -1386,7 +1386,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
         m_movementPaused = true;
     }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
         if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
@@ -1417,7 +1417,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->isAlive())
             return;
@@ -1546,7 +1546,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         // Respawned back at CH. Keep running to the gate
         if (m_movingToGate)

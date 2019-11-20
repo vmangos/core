@@ -48,7 +48,7 @@ struct boss_bloodmage_thalnosAI : public ScriptedAI
     uint32 FlameSpike_Timer;
     uint32 FireNova_Timer;
 
-    void Reset()
+    void Reset() override
     {
         HpYell = false;
         FlameShock_Timer = 10000;
@@ -57,17 +57,17 @@ struct boss_bloodmage_thalnosAI : public ScriptedAI
         FireNova_Timer = 40000;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         DoScriptText(SAY_KILL, m_creature);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -1293,8 +1293,8 @@ void WorldObject::SetVisibilityModifier(float f)
 }
 
 WorldObject::WorldObject()
-    :   m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0),
-        m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_creatureSummonCount(0), m_summonLimitAlert(0)
+    :   m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
+        m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0), m_creatureSummonCount(0), m_summonLimitAlert(0)
 {
     // Phasing
     worldMask = WORLD_DEFAULT_OBJECT;
@@ -1805,8 +1805,8 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         if (map->GetWalkRandomPosition(GetTransport(), rand_x, rand_y, rand_z, distance, moveAllowed))
         {
             // Giant type creatures walk underwater
-            if (isType(TYPEMASK_UNIT) && !ToUnit()->CanSwim() ||
-                IsCreature() && ToCreature()->GetCreatureInfo()->type == CREATURE_TYPE_GIANT)
+            if ((isType(TYPEMASK_UNIT) && !ToUnit()->CanSwim()) ||
+                (IsCreature() && ToCreature()->GetCreatureInfo()->type == CREATURE_TYPE_GIANT))
                 return true;
             // La position renvoyee par le pathfinding est tout au fond de l'eau. On randomise ca un peu ...
             float ground = 0.0f;

@@ -1544,30 +1544,6 @@ namespace MaNGOS
             NearestHostileUnitInAttackDistanceCheck(NearestHostileUnitInAttackDistanceCheck const&);
     };
 
-    class GameObjectWithDbGUIDCheck
-    {
-        public:
-            GameObjectWithDbGUIDCheck(WorldObject const& obj, uint32 db_guid) : i_obj(obj), i_db_guid(db_guid) {}
-            bool operator()(GameObject const* go) const
-            {
-                return go->GetDBTableGUIDLow() == i_db_guid;
-            }
-        private:
-            WorldObject const& i_obj;
-            uint32 i_db_guid;
-    };
-    class CreatureWithDbGUIDCheck
-    {
-        public:
-            CreatureWithDbGUIDCheck(WorldObject const* obj, uint32 lowguid) : i_obj(obj), i_lowguid(lowguid) {}
-            bool operator()(Creature* u)
-            {
-                return u->GetDBTableGUIDLow() == i_lowguid;
-            }
-        private:
-            WorldObject const* i_obj;
-            uint32 i_lowguid;
-    };
     class AllWorldObjectsInRange
     {
     public:

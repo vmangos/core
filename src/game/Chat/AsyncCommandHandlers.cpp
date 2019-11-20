@@ -219,7 +219,7 @@ void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
     uint32 gold_out = mail_gold_outbox / GOLD;
     uint32 silv_out = (mail_gold_outbox % GOLD) / SILVER;
     uint32 copp_out = (mail_gold_outbox % GOLD) % SILVER;
-    cHandler.PSendSysMessage(LANG_PINFO_LEVEL, timeStr.c_str(), data->level, gold, silv, copp, gold_in, silv_in, silv_out, gold_out, silv_out, copp_out);
+    cHandler.PSendSysMessage(LANG_PINFO_LEVEL, timeStr.c_str(), data->level, gold, silv, copp, gold_in, silv_in, copp_in, gold_out, silv_out, copp_out);
     if (Guild* guild = sGuildMgr.GetPlayerGuild(data->target_guid))
         cHandler.PSendSysMessage("Guild: %s", cHandler.playerLink(guild->GetName()).c_str());
 

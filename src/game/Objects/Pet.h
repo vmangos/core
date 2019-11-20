@@ -146,7 +146,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
 {
     public:
         explicit Pet(PetType type = MAX_PET_TYPE);
-        virtual ~Pet();
+        ~Pet() override;
 
         void AddToWorld() override;
         void RemoveFromWorld() override;

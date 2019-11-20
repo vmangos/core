@@ -54,7 +54,7 @@ struct boss_silver_hand_bossesAI : public ScriptedAI
     uint32 HolyLight_Timer;
     uint32 DivineShield_Timer;
 
-    void Reset()
+    void Reset() override
     {
         HolyLight_Timer = 20000;
         DivineShield_Timer = 20000;
@@ -82,7 +82,7 @@ struct boss_silver_hand_bossesAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
         {
@@ -109,7 +109,7 @@ struct boss_silver_hand_bossesAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

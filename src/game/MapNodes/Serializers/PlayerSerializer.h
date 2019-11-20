@@ -367,7 +367,7 @@ void Player::SerializeSpells(MaNGOS::Serializer::WriteSerializer& buf)
     uint32 spell_id;
     bool is_spell_active;
     bool is_spell_disabled;
-    for (PlayerSpellMap::iterator itr = m_spells.begin(), next = m_spells.begin(); itr != m_spells.end(); ++itr)
+    for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
     {
         // add only changed/new not dependent spells
         if (!itr->second.dependent)

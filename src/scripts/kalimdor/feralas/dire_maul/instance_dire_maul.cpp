@@ -16,18 +16,26 @@ void EnableCreature(Creature* pCreature)
 
 instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     // East
-    m_uiCorruptVineGUID(0),
-    m_uiCrumbleWallGUID(0),
-    m_uiOldIronbarkGUID(0),
     m_uiDoorAlzzinInGUID(0),
+    m_uiCrumbleWallGUID(0),
+    m_uiCorruptVineGUID(0),
+    
     // West
-    m_uiForceFieldGUID(0),
-    m_uiTortheldrinGUID(0),
-    m_uiImmolTharGUID(0),
-    m_uiTendrisGUID(0),
     m_uiMagicVortexGUID(0),
+    m_uiForceFieldGUID(0),
+    m_uiImmolTharGUID(0),
+    m_uiTortheldrinGUID(0),
+    
     // North
     m_uiGuardAliveCount(6),
+    m_uiTendrisGUID(0),
+    m_uiOldIronbarkGUID(0),
+    m_uiSlipKikGUID(0),
+    m_uiCaptainKromcrushGUID(0),
+    m_uiKingGordokGUID(0),
+    m_uiChoRushTheObserverGUID(0),
+    m_uiChoRushEquipment(0),
+
     m_uiGordokTribute0GUID(0),
     m_uiGordokTribute1GUID(0),
     m_uiGordokTribute2GUID(0),
@@ -35,14 +43,10 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     m_uiGordokTribute4GUID(0),
     m_uiGordokTribute5GUID(0),
     m_uiGordokTribute6GUID(0),
+
+    m_uiBrokenTrapGUID(0),
     m_bIsGordokTributeRespawned(false),
-    m_bIsTanninLooted(false),
-    m_uiSlipKikGUID(0),
-    m_uiCaptainKromcrushGUID(0),
-    m_uiKingGordokGUID(0),
-    m_uiChoRushTheObserverGUID(0),
-    m_uiChoRushEquipment(0),
-    m_uiBrokenTrapGUID(0)
+    m_bIsTanninLooted(false)
 {
     Initialize();
 }
@@ -592,20 +596,20 @@ struct npc_reste_manaAI : public ScriptedAI
     uint32 m_uiChainLighting_Timer;
     uint32 m_uiBlink_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiBlink_Timer = urand(12000, 23000);
         m_uiChainLighting_Timer = urand(2000, 6000);
         m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData64(TYPE_CRISTAL_EVENT, m_creature->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -658,20 +662,20 @@ struct npc_arcane_aberrationAI : public ScriptedAI
     uint32 m_uiArcaneBoltTimer;
     bool m_bManaBurnDone;
 
-    void Reset()
+    void Reset() override
     {
         m_uiArcaneBoltTimer = urand(0, 400);
         m_bManaBurnDone = false;
         m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData64(TYPE_CRISTAL_EVENT, m_creature->GetGUID());
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
     {
         if (m_creature->GetHealthPercent() > 5.0f)
             return;
@@ -683,7 +687,7 @@ struct npc_arcane_aberrationAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -728,14 +732,14 @@ struct npc_residual_montruosityAI : public ScriptedAI
     uint32 m_uiArcaneBoltTimer;
     uint32 m_uiArcaneBlastTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiArcaneBlastTimer = urand(1000, 2500);
         m_uiArcaneBoltTimer = urand(0, 400);
         m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoCastSpellIfCan(m_creature, SPELL_SUMMON_MANABURSTS);
     }
@@ -780,7 +784,7 @@ struct npc_residual_montruosityAI : public ScriptedAI
         m_creature->SetSpeedRate(MOVE_WALK, newspeed);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -869,9 +873,9 @@ struct npc_mizzle_the_craftyAI : public ScriptedAI
     bool m_bJustReachedHome;
     instance_dire_maul* m_pInstance;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (!m_bJustReachedHome)
         {
@@ -881,7 +885,7 @@ struct npc_mizzle_the_craftyAI : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
         m_creature->SetOrientation(3.170f);
     }
@@ -967,9 +971,9 @@ struct npc_knot_thimblejackAI : public ScriptedAI
 
     instance_dire_maul* m_pInstance;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void MovementInform(uint32 type, uint32 id)
+    void MovementInform(uint32 type, uint32 id) override
     {
         if (type != POINT_MOTION_TYPE)
             return;
@@ -1107,7 +1111,7 @@ struct GordokBruteAI : public ScriptedAI
     uint32 m_uiUppercut_Timer;
     bool m_bEnrage;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->LoadEquipment(m_uiEquipment_id, true);
         m_uiBackhand_Timer     = 2000;
@@ -1117,7 +1121,7 @@ struct GordokBruteAI : public ScriptedAI
         m_bEnrage = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         uint32 yellChance = urand(0, 4);
         switch (yellChance)
@@ -1138,7 +1142,7 @@ struct GordokBruteAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -1247,7 +1251,7 @@ struct boss_guardsAI : public ScriptedAI
 
     uint32 m_uiCombatBugTimer;
     
-    void Reset()
+    void Reset() override
     {
         m_uiShieldCharge_Timer = 500;
         m_uiStrike_Timer       = urand(10000, 20000);
@@ -1258,7 +1262,7 @@ struct boss_guardsAI : public ScriptedAI
         m_uiCombatBugTimer = 0;
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         // Guards no longer drop loot after contributing to the Tribute
         if (pInstance->GetData(TYPE_GORDOK_TRIBUTE) == DONE)
@@ -1268,13 +1272,13 @@ struct boss_guardsAI : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_KNOCK_AWAY)
             m_creature->getThreatManager().modifyThreatPercent(pCaster, -50);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Workaround fix for bug where Slip'kik doesnt leave combat properly if he charges through the trap
         if (m_uiCombatBugTimer)
@@ -1433,7 +1437,7 @@ struct go_fixed_trap : public GameObjectAI
 
     instance_dire_maul* pInstance;
 
-    void UpdateAI(uint32 const diff)
+    void UpdateAI(uint32 const diff) override
     {
        if (Creature* pSlipkik = me->GetMap()->GetCreature(pInstance->GetData64(NPC_GUARD_SLIPKIK)))
         {
@@ -1493,7 +1497,7 @@ struct boss_kromcrushAI : public ScriptedAI
     bool m_bRetaliationUsed;
     bool m_bCallReavers;
 
-    void Reset()
+    void Reset() override
     {
         m_uiMortalCleave_Timer      = urand(7000, 13000);
         m_uiIntimidatingShout_Timer = 10000;
@@ -1512,12 +1516,12 @@ struct boss_kromcrushAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature, pWho);
     }
 
-    void MovementInform(uint32 uiMovementType, uint32 uiData) 
+    void MovementInform(uint32 uiMovementType, uint32 uiData) override 
     {
         if (uiMovementType == POINT_MOTION_TYPE)
         {
@@ -1540,7 +1544,7 @@ struct boss_kromcrushAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         // Kromcrush no longer drops loot after contributing to the Tribute
         if (pInstance->GetData(TYPE_GORDOK_TRIBUTE) == DONE)
@@ -1550,7 +1554,7 @@ struct boss_kromcrushAI : public ScriptedAI
         }
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         ScriptedAI::EnterEvadeMode();
 
@@ -1561,7 +1565,7 @@ struct boss_kromcrushAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature *pSummoned)
+    void JustSummoned(Creature *pSummoned) override
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             pSummoned->AI()->AttackStart(pTarget);
@@ -1584,7 +1588,7 @@ struct boss_kromcrushAI : public ScriptedAI
         //m_creature->CastSpell(m_creature, SPELL_CALL_REAVERS, false);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -1709,7 +1713,7 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
     uint32 summonTimer;    
     uint32 whirlwindTimer;    
 
-    void Reset()
+    void Reset() override
     {
         arcaneBlastTimer     = urand(15000, 20000);
         counterspellTimer    = urand(10000, 20000);
@@ -1720,7 +1724,7 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_THRASH, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {       
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -2239,7 +2243,7 @@ struct boss_ferraAI : public ScriptedAI
     uint32 m_uiCharge_Timer;
     uint32 m_uiMaul_Timer;
 
-    void Reset() 
+    void Reset() override 
     {    
         m_uiCharge_Timer        = 0;
         m_uiMaul_Timer          = urand(5000, 10000);
@@ -2247,7 +2251,7 @@ struct boss_ferraAI : public ScriptedAI
 		m_creature->SetNoCallAssistance(true);
     }   
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {        
         if (!m_creature->isInCombat()) 
         {
@@ -2261,7 +2265,7 @@ struct boss_ferraAI : public ScriptedAI
         }              
     }   
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())            
             return;
@@ -2326,7 +2330,7 @@ struct boss_magister_kalendrisAI:public ScriptedAI
     bool m_bShadowformUsed;
     bool m_bInMeele;
 
-    void Reset()
+    void Reset() override
     {
         m_bShadowformUsed = false;
         m_uiShadowWordPainTimer     = urand(5000, 10000);
@@ -2335,7 +2339,7 @@ struct boss_magister_kalendrisAI:public ScriptedAI
         m_uiDominateMindTimer       = urand(20000, 30000);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {       
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

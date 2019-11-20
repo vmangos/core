@@ -49,7 +49,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
     bool PowerWordShield;
     bool bAshbringer;
 
-    void Reset()
+    void Reset() override
     {
         CurseOfBlood_Timer = 10000;
         DispelMagic_Timer = 30000;
@@ -73,7 +73,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

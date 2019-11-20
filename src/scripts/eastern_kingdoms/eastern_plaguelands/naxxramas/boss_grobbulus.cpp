@@ -246,8 +246,8 @@ struct grob_poison_cloud : public ScriptedAI
         untilDespawn = 70000;
     }
 
-    void AttackStart(Unit* /*pWho*/) { }
-    void MoveInLineOfSight(Unit* /*pWho*/) { }
+    void AttackStart(Unit* /*pWho*/) override { }
+    void MoveInLineOfSight(Unit* /*pWho*/) override { }
 
     void UpdateAI(const uint32 uiDiff) override
     {

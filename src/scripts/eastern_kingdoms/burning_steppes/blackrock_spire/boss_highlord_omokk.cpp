@@ -47,7 +47,7 @@ struct boss_highlordomokkAI : public ScriptedAI
     uint32 m_uiKnockAwayTimer;
     uint32 m_uiSlowTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiWarStompTimer    = 15000;
         m_uiStrikeTimer      = 10000;
@@ -57,7 +57,7 @@ struct boss_highlordomokkAI : public ScriptedAI
         m_uiSlowTimer        = 24000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

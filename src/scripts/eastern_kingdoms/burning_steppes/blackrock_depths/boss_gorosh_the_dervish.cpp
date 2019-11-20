@@ -39,14 +39,14 @@ struct boss_gorosh_the_dervishAI : public ScriptedAI
     uint32 MortalStrike_Timer;
     uint32 Bloodlust_Timer;
 
-    void Reset()
+    void Reset() override
     {
         WhirlWind_Timer = 12000;
         MortalStrike_Timer = 22000;
         Bloodlust_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

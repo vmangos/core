@@ -58,7 +58,7 @@ protected:
 class MapIntersectionFinderCallback
 {
 public:
-    MapIntersectionFinderCallback(ModelInstance* val): prims(val), result(nullptr) {}
+    MapIntersectionFinderCallback(ModelInstance* val): result(nullptr), prims(val) {}
     bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
         bool hit = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
@@ -337,7 +337,7 @@ bool StaticMapTree::InitMap(std::string const& fname, VMapManager2* vm)
         char chunk[8];
         // general info
         if (!readChunk(rf, chunk, VMAP_MAGIC, 8)) success = false;
-        char tiled;
+        char tiled = 0;
         if (success && fread(&tiled, sizeof(char), 1, rf) != 1) success = false;
         iIsTiled = bool(tiled);
         // Nodes
@@ -417,7 +417,7 @@ bool StaticMapTree::LoadMapTile(uint32 tileX, uint32 tileY, VMapManager2* vm)
         char chunk[8];
         if (!readChunk(tf, chunk, VMAP_MAGIC, 8))
             result = false;
-        uint32 numSpawns;
+        uint32 numSpawns = 0;
         if (result && fread(&numSpawns, sizeof(uint32), 1, tf) != 1)
             result = false;
         for (uint32 i = 0; i < numSpawns && result; ++i)

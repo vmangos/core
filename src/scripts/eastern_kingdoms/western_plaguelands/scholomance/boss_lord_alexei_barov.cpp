@@ -37,7 +37,7 @@ struct boss_lordalexeibarovAI : public ScriptedAI
     uint32 Immolate_Timer;
     uint32 VeilofShadow_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Immolate_Timer = 7000;
         VeilofShadow_Timer = 15000;
@@ -45,13 +45,13 @@ struct boss_lordalexeibarovAI : public ScriptedAI
         m_creature->LoadCreatureAddon(true);
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_ALEXEIBAROV, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -95,7 +95,7 @@ bool handleArgs(int argc, char** argv,
                 bool &quick,
                 char*& offMeshInputPath)
 {
-    char* param = NULL;
+    char* param = nullptr;
     for (int i = 1; i < argc; ++i)
     {
         if (strcmp(argv[i], "--maxAngle") == 0)
@@ -117,7 +117,7 @@ bool handleArgs(int argc, char** argv,
                 return false;
 
             char* stileX = strtok(param, ",");
-            char* stileY = strtok(NULL, ",");
+            char* stileY = strtok(nullptr, ",");
             int tilex = atoi(stileX);
             int tiley = atoi(stileY);
 
@@ -267,7 +267,7 @@ int main(int argc, char** argv)
          silent = false,
          bigBaseUnit = false,
          quick = false;
-    char* offMeshInputPath = NULL;
+    char* offMeshInputPath = nullptr;
 
     bool validParam = handleArgs(argc, argv, mapnum,
                                  tileX, tileY, maxAngle,
@@ -292,7 +292,7 @@ int main(int argc, char** argv)
     if (!checkDirectories(debugOutput))
         return silent ? -3 : finish("Press any key to close...", -3);
 
-    MapBuilder builder(maxAngle, skipLiquid, skipContinents, skipJunkMaps,
+    MapBuilder builder(skipLiquid, skipContinents, skipJunkMaps,
                        skipBattlegrounds, debugOutput, bigBaseUnit, quick, offMeshInputPath);
 
     if (tileX > -1 && tileY > -1 && mapnum >= 0)

@@ -47,7 +47,7 @@ struct instance_wailing_caverns : public ScriptedInstance
     // to be despawn when the nightmare is over
     std::vector<uint64> vNightmareMonsters;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -59,7 +59,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         Assaulted = false;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -89,7 +89,7 @@ struct instance_wailing_caverns : public ScriptedInstance
             vNightmareMonsters.push_back(pCreature->GetGUID());
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         if (pGo->GetEntry() == GO_DMF_CHEST)
         {
@@ -98,7 +98,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         }
     }
 
-    void OnPlayerEnter(Player* pPlayer)
+    void OnPlayerEnter(Player* pPlayer) override
     {
         if (!pPlayer)
             return;
@@ -111,7 +111,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -200,12 +200,12 @@ struct instance_wailing_caverns : public ScriptedInstance
         }
     }
 
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -220,7 +220,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -230,7 +230,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         return 0;
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
         {

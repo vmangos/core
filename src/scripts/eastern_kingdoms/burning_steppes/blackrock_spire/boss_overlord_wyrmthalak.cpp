@@ -56,7 +56,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
     bool m_bPulledByPet;
     uint32 m_uiLeashCheckTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiBlastWaveTimer = 20000;
         m_uiShoutTimer     = 2000;
@@ -68,7 +68,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
         m_uiLeashCheckTimer = 5000;
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() != NPC_SPIRESTONE_WARLORD && pSummoned->GetEntry() != NPC_SMOLDERTHORN_BERSERKER)
             return;
@@ -104,7 +104,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
             EnterEvadeMode();
     } 
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

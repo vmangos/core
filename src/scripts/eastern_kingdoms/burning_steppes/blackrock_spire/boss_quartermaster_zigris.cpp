@@ -42,14 +42,14 @@ struct boss_quatermasterzigrisAI : public ScriptedAI
     uint32 m_uiStunBombTimer;
     //uint32 HelingPotion_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiShootTimer    = 1000;
         m_uiStunBombTimer = 16000;
         //HelingPotion_Timer = 25000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

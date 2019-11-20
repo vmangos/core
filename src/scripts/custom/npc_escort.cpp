@@ -18,7 +18,7 @@ struct npc_escort_genericAI : public npc_escortAI
     // ATTENTION : Peut etre nullptr
     CreatureEscortData const* m_pEscortData;
 
-    void Reset()
+    void Reset() override
     {
         if (Player* pPlayer = GetPlayerForEscort())
         {
@@ -37,7 +37,7 @@ struct npc_escort_genericAI : public npc_escortAI
         }
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         //m_creature->RemoveAllAuras();
         m_creature->DeleteThreatList();
@@ -64,7 +64,7 @@ struct npc_escort_genericAI : public npc_escortAI
         Reset();
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         if (!m_pEscortData)
             return;
@@ -76,7 +76,7 @@ struct npc_escort_genericAI : public npc_escortAI
                 pPlayer->GroupEventHappens(m_pEscortData->uiQuestEntry, m_creature);
         }
     }
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (!m_pEscortData)
             return;
@@ -87,7 +87,7 @@ struct npc_escort_genericAI : public npc_escortAI
                 pPlayer->FailQuest(m_pEscortData->uiQuestEntry);
         }
     }
-    void JustStartedEscort()
+    void JustStartedEscort() override
     {
         if (!m_pEscortData)
             return;
@@ -110,7 +110,7 @@ struct npc_escort_genericAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (!m_pEscortData)
             return;

@@ -54,10 +54,10 @@ public:
         SeenCreature = nullptr;
     }
 
-    virtual ~AdvancedPlayerBotAI()
+    ~AdvancedPlayerBotAI() override
     {}
 
-    virtual void UpdateAI(const uint32 delta) override;
+    void UpdateAI(const uint32 delta) override;
 
 protected:
 

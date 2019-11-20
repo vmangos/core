@@ -119,7 +119,7 @@ struct npc_grimstoneAI : public npc_escortAI
 
     bool GroupIsWiped;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
@@ -265,7 +265,7 @@ struct npc_grimstoneAI : public npc_escortAI
         MobDeath_Timer = 2500;
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         switch (i)
         {
@@ -303,7 +303,7 @@ struct npc_grimstoneAI : public npc_escortAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_pInstance)
             return;
@@ -583,7 +583,7 @@ struct mob_phalanxAI : public ScriptedAI
     float m_fKeepDoorOrientation;
     bool m_bActivated;
 
-    void Reset()
+    void Reset() override
     {
         m_fKeepDoorOrientation = 2.06059f;
         m_uiCallPatrolTimer    = 0;
@@ -610,7 +610,7 @@ struct mob_phalanxAI : public ScriptedAI
         m_bActivated = true;
     } 
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -619,7 +619,7 @@ struct mob_phalanxAI : public ScriptedAI
             m_creature->GetMotionMaster()->MovePoint(1, 868.122f, -223.884f, -43.695f, MOVE_PATHFINDING, 0, 2.06059f); 
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_pInstance)
             return;
@@ -1017,7 +1017,7 @@ struct npc_rocknotAI : public npc_escortAI
 
     float m_fInitialOrientation;
 
-    void Reset()
+    void Reset() override
     {
         if (!m_pInstance)
             return;
@@ -1383,7 +1383,7 @@ struct npc_hurley_blackbreathAI : public ScriptedAI
     }
 
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -1407,7 +1407,7 @@ struct npc_hurley_blackbreathAI : public ScriptedAI
         DoScriptText(SAY_HURLEY_AGGRO, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return; 
@@ -1493,19 +1493,19 @@ struct npc_watchman_doomgripAI : public ScriptedAI
     uint32 BoireLaPotionDeSoins_Timer;
     uint32 FracasserArmure_Timer;
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_DOOMGRIP, DONE);
     }
 
-    void Reset()
+    void Reset() override
     {
         BoireLaPotionDeSoins_Timer = 0;
         FracasserArmure_Timer = 1000;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         std::list<Creature*> m_lGolems;
         GetCreatureListWithEntryInGrid(m_lGolems, m_creature, NPC_WARBRINGER_CONSTRUCT, 20.0f);
@@ -1524,7 +1524,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -1583,13 +1583,13 @@ struct npc_ribbly_fermevanneAI : public ScriptedAI
     uint32 BiseGenou_Timer;
     uint32 Suriner_Timer;
 
-    void Reset()
+    void Reset() override
     {
         BiseGenou_Timer = urand(3000, 9000);
         Suriner_Timer = urand(2000, 10000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -1667,7 +1667,7 @@ struct npc_golem_lord_argelmachAI : public ScriptedAI
     uint32 ChaineDEclaires_Timer;
     uint32 Horion_Timer;
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->GetMotionMaster()->MovePoint(0, 846.801025f, 16.280600f, -53.639500f);
         //m_creature->MonsterYell("Golems, votre Seigneur a besoin de vous!", 0, pWho);
@@ -1677,20 +1677,20 @@ struct npc_golem_lord_argelmachAI : public ScriptedAI
             m_pInstance->SetData(DATA_ARGELMACH_AGGRO, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(DATA_ARGELMACH_AGGRO, DONE);
     }
 
-    void Reset()
+    void Reset() override
     {
         BouclierDeFoudre_Timer = 0;
         ChaineDEclaires_Timer = 5000;
         Horion_Timer = 2000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

@@ -256,6 +256,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
     // because the client will request the name for the old pet guid and receive no answer
     // result would be a pet named "unknown"
     if (pPlayerMover->GetTemporaryUnsummonedPetNumber())
+    {
         if (sWorld.getConfig(CONFIG_BOOL_CONTINENTS_INSTANCIATE) && pPlayerMover->GetMap()->IsContinent())
         {
             bool transition = false;
@@ -264,6 +265,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
         }
         else
             pPlayerMover->ResummonPetTemporaryUnSummonedIfAny();
+    }
 
     //lets process all delayed operations on successful teleport
     pPlayerMover->ProcessDelayedOperations();
@@ -1052,8 +1054,9 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
         pPlayerMover->m_movementInfo = movementInfo;
 
         // super smart decision; rework required
-        if (ObjectGuid lootGuid = pPlayerMover->GetLootGuid() && !lootGuid.IsItem())
-            pPlayerMover->SendLootRelease(lootGuid);
+        if (ObjectGuid lootGuid = pPlayerMover->GetLootGuid())
+            if (!lootGuid.IsItem())
+                pPlayerMover->SendLootRelease(lootGuid);
 
         // Nostalrius - antiundermap1
         if (movementInfo.HasMovementFlag(MOVEFLAG_FALLINGFAR))

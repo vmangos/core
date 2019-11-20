@@ -63,10 +63,6 @@ enum
     SPELL_DISPELL_SHACKLES              = 28471,            // not used, doing it "manually"
 };
 
-static float M_F_ANGLE = 0.2f;                              // to adjust for map rotation
-static float M_F_HEIGHT = 2.0f;                             // adjust for height difference
-static float M_F_RANGE = 55.0f;                             // ~ range from center of chamber to center of alcove
-static float centerCoord[3] = { 3716.379883f, -5106.779785f, 141.289993f };
 enum AddSpells
 {
     // guardian of icecrown
@@ -234,7 +230,7 @@ struct kt_p1AddAI : public ScriptedAI
         hasAggroed = false;
     }
     bool hasAggroed;
-    virtual void Reset() = 0;
+    void Reset() override = 0;
     void ActualAttack(Unit* target)
     {
         m_creature->AddThreat(target, 300.0f);
@@ -301,7 +297,7 @@ struct boss_kelthuzadAI : public ScriptedAI
     uint32 timeSinceLastAEFrostBolt;
     uint32 killSayTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetHealth(m_creature->GetMaxHealth());
         events.Reset();
@@ -341,7 +337,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (!killSayTimer)
         {
@@ -350,7 +346,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         if (m_pInstance)
@@ -379,7 +375,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
         {
@@ -528,9 +524,6 @@ struct boss_kelthuzadAI : public ScriptedAI
             {
                 if (numSkeletons < 120)
                 {
-
-                    float t = 3.0f / 150.0f * (p1Timer / 1000.0f - 150.0f);
-                    uint32 repeat_next = std::max(uint32(t * 1000 + 2000), uint32(2000));
                     if (SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN))
                     {
                         uint32 repeat_next = std::max(uint32(3750 - 25 * numSkeletons), uint32(2000));
@@ -786,7 +779,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_pInstance)
             return;

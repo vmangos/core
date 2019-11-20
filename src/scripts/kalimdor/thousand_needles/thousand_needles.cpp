@@ -52,9 +52,9 @@ struct npc_kanatiAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -77,12 +77,12 @@ struct npc_kanatiAI : public npc_escortAI
                                        TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         // set quest to failed
         if (Player* pPlayer = GetPlayerForEscort())
@@ -142,9 +142,9 @@ struct npc_lakota_windsongAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -222,9 +222,9 @@ struct npc_paoka_swiftmountainAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -294,7 +294,7 @@ struct npc_plucky_johnsonAI : public ScriptedAI
     uint32 m_uiNormFaction;
     uint32 m_uiResetTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiResetTimer = 120000;
 
@@ -307,7 +307,7 @@ struct npc_plucky_johnsonAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_PLUCKY_CHICKEN, false);
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 uiTextEmote)
+    void ReceiveEmote(Player* pPlayer, uint32 uiTextEmote) override
     {
         if (pPlayer->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
         {
@@ -333,7 +333,7 @@ struct npc_plucky_johnsonAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
         {

@@ -274,9 +274,9 @@ class MANGOS_DLL_SPEC Database
         // Frees data, cancels scheduled queries, closes connection
         void StopServer();
     protected:
-        Database() : m_pAsyncConn(nullptr), m_pResultQueue(nullptr), m_threadsBodies(nullptr), m_delayThreads(nullptr), m_numAsyncWorkers(0),
-            m_serialDelayQueue(nullptr), m_delayQueue(new SqlQueue()), m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1),
-            m_bAllowAsyncTransactions(false), m_iStmtIndex(-1)
+        Database() : m_nQueryConnPoolSize(1), m_delayQueue(new SqlQueue()), m_serialDelayQueue(nullptr), m_pAsyncConn(nullptr), 
+                     m_pResultQueue(nullptr), m_numAsyncWorkers(0), m_threadsBodies(nullptr), m_delayThreads(nullptr),
+                     m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_logSQL(false), m_pingIntervallms(0)
         {
             m_nQueryCounter = -1;
         }

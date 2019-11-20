@@ -893,7 +893,7 @@ struct npc_tharnariun_treetenderAI : public ScriptedAI
     Player* pPlaguedLandsPlayer = nullptr;
     Creature* pPlaguedLandsBear = nullptr;
 
-    void Reset()
+    void Reset() override
     {
         m_bPlaguedLandsEvent = false;
         PlaguedLandsCount = 0;
@@ -909,7 +909,7 @@ struct npc_tharnariun_treetenderAI : public ScriptedAI
         m_uiPlaguedLandsTimer = 1100;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (m_bPlaguedLandsEvent)
         { 

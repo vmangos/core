@@ -72,7 +72,7 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
     bool bShadowPortalCasted;
     uint64 ShadowPortalTargetGUID;
 
-    void Reset()
+    void Reset() override
     {
         ArcaneMissiles_Timer = 4500;
         ShadowShield_Timer = 12000;
@@ -82,7 +82,7 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
         ShadowPortalTargetGUID = 0;
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GANDLING, DONE);
@@ -90,13 +90,13 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
         DoScriptText(SAY_GANDLING_DEATH, m_creature);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GANDLING, FAIL);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

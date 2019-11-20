@@ -7,7 +7,7 @@ uint32 PlayerBroadcaster::num_bcaster_created = 0;
 uint32 PlayerBroadcaster::num_bcaster_deleted = 0;
 
 PlayerBroadcaster::PlayerBroadcaster(WorldSocket* w_socket, const ObjectGuid& self, std::size_t max_queue)
-    : m_socket(w_socket), m_self(self), MAX_QUEUE_SIZE(max_queue), instanceId(0), lastUpdatePackets(0)
+    : MAX_QUEUE_SIZE(max_queue), m_socket(w_socket), m_self(self), instanceId(0), lastUpdatePackets(0)
 {
     if (m_socket)
         m_socket->AddReference();

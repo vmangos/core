@@ -62,15 +62,15 @@ struct plainVisionAI : public npc_escortAI
 
     bool isEngaged;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(const uint32 uiDiff) override
     {
         if (!isEngaged)
         {

@@ -33,7 +33,7 @@ class Transport : public GameObject
     public:
         typedef std::set<WorldObject*> PassengerSet;
 
-        ~Transport();
+        ~Transport() override;
 
         bool Create(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
         void CleanupsBeforeDelete() override;

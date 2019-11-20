@@ -79,12 +79,12 @@ struct mob_stone_keeperAI : public ScriptedAI
     
     uint32 m_uiTrample_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiTrample_Timer = urand(4000, 9000);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (Unit* target = me->SelectNearestHostileUnitInAggroRange(true))
         {
@@ -96,13 +96,13 @@ struct mob_stone_keeperAI : public ScriptedAI
             instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, FAIL);
     }
 
-    void JustDied(Unit* pWho)
+    void JustDied(Unit* pWho) override
     {
         if (instance)
             instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, IN_PROGRESS);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
@@ -140,12 +140,12 @@ struct mob_jadespine_basiliskAI : public ScriptedAI
 
     uint32 Cslumber_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Cslumber_Timer = 2000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -290,15 +290,15 @@ struct AnnoraAI : public ScriptedAI
     uint32 m_uiNbScorpion;
     bool isSpawned;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!isSpawned)
         {

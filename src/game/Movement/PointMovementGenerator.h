@@ -30,7 +30,7 @@ class MANGOS_DLL_SPEC PointMovementGenerator
 {
     public:
         PointMovementGenerator(uint32 _id, float _x, float _y, float _z, uint32 options, float _speed = 0.0f, float finalOrientation = -10.0f) :
-          id(_id), i_x(_x), i_y(_y), i_z(_z), _options(options), speed(_speed), _recalculateSpeed(false), _finalO(finalOrientation) {}
+          id(_id), i_x(_x), i_y(_y), i_z(_z), _finalO(finalOrientation), _options(options), speed(_speed), _recalculateSpeed(false) {}
         virtual ~PointMovementGenerator() {}
 
         virtual void Initialize(T &);
@@ -43,7 +43,7 @@ class MANGOS_DLL_SPEC PointMovementGenerator
 
         void unitSpeedChanged() { _recalculateSpeed = true; }
 
-        MovementGeneratorType GetMovementGeneratorType() const { return POINT_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return POINT_MOTION_TYPE; }
 
         bool GetDestination(float& x, float& y, float& z) const { x=i_x; y=i_y; z=i_z; return true; }
     protected:
@@ -62,7 +62,7 @@ class MANGOS_DLL_SPEC DistancingMovementGenerator
         DistancingMovementGenerator(float _x, float _y, float _z) :
             PointMovementGenerator<Creature>(0, _x, _y, _z, MOVE_PATHFINDING | MOVE_RUN_MODE) {}
 
-        MovementGeneratorType GetMovementGeneratorType() const { return DISTANCING_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return DISTANCING_MOTION_TYPE; }
         bool Update(Creature&, const uint32 &diff);
         void MovementInform(Creature &) override;
 };
@@ -74,7 +74,7 @@ class MANGOS_DLL_SPEC AssistanceMovementGenerator
         AssistanceMovementGenerator(float _x, float _y, float _z) :
             PointMovementGenerator<Creature>(0, _x, _y, _z, true) {}
 
-        MovementGeneratorType GetMovementGeneratorType() const { return ASSISTANCE_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return ASSISTANCE_MOTION_TYPE; }
         void Initialize(Creature& unit) override;
         void Finalize(Creature &) override;
 };
@@ -89,7 +89,7 @@ class EffectMovementGenerator : public MovementGenerator
         void Interrupt(Unit &) {}
         void Reset(Unit &) {}
         bool Update(Unit &u, const uint32 &);
-        MovementGeneratorType GetMovementGeneratorType() const { return EFFECT_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return EFFECT_MOTION_TYPE; }
     private:
         uint32 m_Id;
 };
@@ -100,7 +100,7 @@ class MANGOS_DLL_SPEC ChargeMovementGenerator
 {
     public:
         ChargeMovementGenerator(T& attacker, Unit& victim, uint32 interpolationDelay = 0, bool triggerAttack = false, float speed = 0.0f) :
-            path(&attacker), victimGuid(victim.GetObjectGuid()), _recalculateSpeed(false), _interpolateDelay(interpolationDelay), _triggerAttack(triggerAttack), _scheduleStopMoving(false), _speed(speed)
+            path(&attacker), victimGuid(victim.GetObjectGuid()), _recalculateSpeed(false), _triggerAttack(triggerAttack), _interpolateDelay(interpolationDelay), _scheduleStopMoving(false), _speed(speed)
         {
             ComputePath(attacker, victim);
         }
@@ -112,7 +112,7 @@ class MANGOS_DLL_SPEC ChargeMovementGenerator
         void Reset(T &unit);
         bool Update(T &, const uint32 &diff);
 
-        MovementGeneratorType GetMovementGeneratorType() const { return CHARGE_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return CHARGE_MOTION_TYPE; }
         void unitSpeedChanged() { _recalculateSpeed = true; }
     protected:
         PathFinder path;

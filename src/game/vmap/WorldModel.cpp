@@ -512,7 +512,7 @@ class UnderObjectCheckerCallback
 {
 public:
     UnderObjectCheckerCallback(const std::vector<GroupModel>& vals, const Vector3& up, bool _ism2):
-        prims(vals.begin()), hit(vals.end()), zVec(up), m2(_ism2), outDist(-1), inDist(-1) {}
+        prims(vals.begin()), hit(vals.end()), m2(_ism2), zVec(up), outDist(-1), inDist(-1) {}
     std::vector<GroupModel>::const_iterator prims;
     std::vector<GroupModel>::const_iterator hit;
     bool m2;

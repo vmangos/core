@@ -130,7 +130,6 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
     void Reset()
     {
         std::vector<GenericAISpell>::iterator it;
-        uint32 casterCD = 0;
         for (it = m_uiSpells.begin(); it != m_uiSpells.end(); ++it)
         {
 #ifdef DEBUG_ON
@@ -225,7 +224,6 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
                     case GENERIC_TARGET_FRIEND_DISPELL_CC:
                     {
                         std::list<Creature*> creaList = DoFindFriendlyCC(it->maxRange);
-                        uint32 size = creaList.size();
 
                         while (!creaList.empty())
                         {

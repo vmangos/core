@@ -41,7 +41,7 @@ struct boss_illuciabarovAI : public ScriptedAI
     uint32 Silence_Timer;
     uint32 Fear_Timer;
 
-    void Reset()
+    void Reset() override
     {
         CurseOfAgony_Timer = 18000;
         ShadowShock_Timer = 9000;
@@ -49,13 +49,13 @@ struct boss_illuciabarovAI : public ScriptedAI
         Fear_Timer = 30000;
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_ILLUCIABAROV, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

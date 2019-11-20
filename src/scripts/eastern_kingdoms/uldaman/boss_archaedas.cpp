@@ -86,7 +86,7 @@ struct boss_archaedasAI : public ScriptedAI
         return !unit->IsWithinDist2d(spawnX, spawnY, 38.0f);
     }
 
-    void Reset()
+    void Reset() override
     {
         uiTremorTimer = 60000;
         iAwakenTimer = 0;
@@ -99,7 +99,7 @@ struct boss_archaedasAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
-    void SpellHit(Unit* /*caster*/, const SpellEntry* spell)
+    void SpellHit(Unit* /*caster*/, const SpellEntry* spell) override
     {
         // Being woken up from the altar, start the awaken sequence
         if (spell->Id == SPELL_ARCHAEDAS_AWAKEN && !bWakingUp)
@@ -110,19 +110,19 @@ struct boss_archaedasAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit* /*victim*/)
+    void KilledUnit(Unit* /*victim*/) override
     {
         DoScriptText(SAY_SLAY, m_creature);
     }
 
     // He goes back to his spawn point after reset, stone him after.
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         Reset();
         instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, NOT_STARTED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (bJustCreated)
         {
@@ -221,7 +221,7 @@ struct boss_archaedasAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (Unit* target = me->SelectNearestHostileUnitInAggroRange(true))
         {
@@ -236,7 +236,7 @@ struct boss_archaedasAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
 
-    void JustDied(Unit* /*killer*/)
+    void JustDied(Unit* /*killer*/) override
     {
         if (instance)
         {
@@ -275,7 +275,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
     bool bAwake;
     ScriptedInstance* instance;
 
-    void Reset()
+    void Reset() override
     {
         uiArcing_Timer = 3000;
         uiTrample_Timer = urand(4000, 10000);
@@ -287,7 +287,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         bAwake = false;
     }
     
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         Unit* target = me->SelectNearestHostileUnitInAggroRange(true);
         if (!target)
@@ -303,7 +303,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         }
     }
 
-    void EnterCombat()
+    void JoinCombat()
     {
         instance->SetData64(1, me->GetGUID()); // unfreeze
         bAwake = true;
@@ -313,7 +313,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, const SpellEntry* spell)
+    void SpellHit(Unit* /*caster*/, const SpellEntry* spell) override
     {
         // time to wake up, start animation
         if (spell->Id == SPELL_AWAKEN_EARTHEN_DWARF
@@ -326,11 +326,11 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         else if (spell->Id == SPELL_AWAKEN_VAULT_WARDER)
         {
             bWakeSpellHit = true;
-            EnterCombat();
+            JoinCombat();
         }
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (bAwake)
         {
@@ -338,7 +338,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) != IN_PROGRESS)
         {
@@ -361,7 +361,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
             bWakingUp = false;
             // Wake him only if Archaedas is in combat
             if (instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) == IN_PROGRESS)
-                EnterCombat();
+                JoinCombat();
             uiAwakenTimer = 4000;
             return; // dont want to continue until we finish the AttackStart method
         }

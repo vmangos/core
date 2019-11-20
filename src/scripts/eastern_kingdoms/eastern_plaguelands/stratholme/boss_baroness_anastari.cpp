@@ -61,7 +61,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
     SpawnLocations old_Position;
     float PlayerHealth;
 
-    void Reset()
+    void Reset() override
     {
         BansheeWail_Timer       = 1000;
         BansheeCurse_Timer      = 11000;
@@ -90,7 +90,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
         old_Position.z = m_creature->GetPositionZ();
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_BARONESS, DONE);
@@ -102,13 +102,13 @@ struct boss_baroness_anastariAI : public ScriptedAI
             if (Unit* pTarget = m_creature->GetMap()->GetUnit(PlayerGuids[i]))
                 pTarget->RestoreFaction();
     }
-    void DamageTaken(Unit *done_by, uint32 &damage)
+    void DamageTaken(Unit *done_by, uint32 &damage) override
     {
         if (Possessed)
             damage = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

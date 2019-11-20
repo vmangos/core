@@ -25,9 +25,9 @@ enum
 
 npc_escortAI::npc_escortAI(Creature* pCreature) : ScriptedAI(pCreature),
     m_uiPlayerGUID(0),
-    m_uiDelayBeforeTheFirstWaypoint(2500),
     m_uiPlayerCheckTimer(1000),
     m_uiEscortState(STATE_ESCORT_NONE),
+    m_uiDelayBeforeTheFirstWaypoint(2500),
     m_pQuestForEscort(nullptr),
     m_currentWaypointIdx(0),
     m_bIsRunning(false),

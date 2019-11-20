@@ -13,7 +13,7 @@ class ScriptedPetAI : public CreatureAI
 {
 public:
     explicit ScriptedPetAI(Creature* pCreature);
-    ~ScriptedPetAI() {}
+    ~ScriptedPetAI() override {}
 
     void MoveInLineOfSight(Unit* /*pWho*/) override;
 

@@ -115,7 +115,7 @@ struct boss_chromaggusAI : public ScriptedAI
     AfflictionGuids m_lRedAfflictionPlayerGUID;
     AfflictionGuids m_lChromaticPlayerGUID;
 
-    void Reset()
+    void Reset() override
     {
         m_uiMovetoLeverTimer = 2000;
 
@@ -154,7 +154,7 @@ struct boss_chromaggusAI : public ScriptedAI
         m_vTimeLapseInfo.clear();
     }
 
-    void MoveInLineOfSight(Unit *pUnit)
+    void MoveInLineOfSight(Unit *pUnit) override
     {
         if (!pUnit || m_creature->getVictim())
             return;
@@ -164,7 +164,7 @@ struct boss_chromaggusAI : public ScriptedAI
             AttackStart(pUnit);
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CHROMAGGUS, IN_PROGRESS);
@@ -173,7 +173,7 @@ struct boss_chromaggusAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CHROMAGGUS, DONE);
@@ -182,13 +182,13 @@ struct boss_chromaggusAI : public ScriptedAI
         m_vTimeLapseInfo.clear();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CHROMAGGUS, FAIL);
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
         if (!pTarget)
             return;
@@ -203,7 +203,7 @@ struct boss_chromaggusAI : public ScriptedAI
         }
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -212,11 +212,11 @@ struct boss_chromaggusAI : public ScriptedAI
         {
             case 0:
                 // walk to Flamegor's room on first pull of lever
-                m_creature->GetMotionMaster()->MovePoint(1, -7379.223f, -1002.1122f, 477.0402f, 3.7662f);
+                m_creature->GetMotionMaster()->MovePoint(1, -7379.223f, -1002.1122f, 477.0402f, 0, 0.0f, 3.7662f);
                 break;
             case 1:
                 // didn't find anyone! walk back to home position
-                m_creature->GetMotionMaster()->MovePoint(2, -7484.609385f, -1075.678101f, 477.144623f, 0.616172f);
+                m_creature->GetMotionMaster()->MovePoint(2, -7484.609385f, -1075.678101f, 477.144623f, 0, 0.0f, 0.616172f);
                 break;
             case 2:
                 m_creature->GetMotionMaster()->MoveTargetedHome();
@@ -224,7 +224,7 @@ struct boss_chromaggusAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->isInCombat() && !m_bEngagedOnce)
         {

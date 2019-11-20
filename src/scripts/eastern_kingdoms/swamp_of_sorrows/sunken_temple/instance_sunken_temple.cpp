@@ -73,7 +73,7 @@ struct instance_sunken_temple : public ScriptedInstance
     uint64 m_luiBigLightGUIDs[6];
     uint64 m_luiCircleGUIDs[8];
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
         memset(&m_luiProtectorGUIDs, 0, sizeof(m_luiProtectorGUIDs));
@@ -185,11 +185,10 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
-        int var = 0;
-        int Var = 0;
-        int varr = 0;
+        int countCircle = 0;
+        int countLight = 0;
         switch (pGo->GetEntry())
         {
             case GO_JAMMALAN_BARRIER:
@@ -228,17 +227,17 @@ struct instance_sunken_temple : public ScriptedInstance
                 for (int i = 0; i < 6; i++)
                 {
                     if (m_luiBigLightGUIDs[i] != 0 && m_luiBigLightGUIDs[i] != pGo->GetGUID())
-                        ++Var;
+                        ++countLight;
                 }
-                m_luiBigLightGUIDs[Var] = pGo->GetGUID();
+                m_luiBigLightGUIDs[countLight] = pGo->GetGUID();
                 break;
             case GO_EVIL_CIRCLE:
                 for (int i = 0; i < 8; i++)
                 {
                     if (m_luiCircleGUIDs[i] != 0 && m_luiCircleGUIDs[i] != pGo->GetGUID())
-                        ++var;
+                        ++countCircle;
                 }
-                m_luiCircleGUIDs[var] = pGo->GetGUID();
+                m_luiCircleGUIDs[countCircle] = pGo->GetGUID();
                 break;
 
             case GO_ETERNAL_FLAME_1:
@@ -258,7 +257,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -328,7 +327,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnCreatureEnterCombat(Creature* pCreature)
+    void OnCreatureEnterCombat(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -355,7 +354,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature *pCreature)
+    void OnCreatureDeath(Creature *pCreature) override
     {
         if (m_uiShadeHakkarGUID && (pCreature->GetEntry() == NPC_HAKKARI_MINION || pCreature->GetEntry() == NPC_BLOODKEEPER))
         {
@@ -370,7 +369,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -629,7 +628,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void SetData64(uint32 uiType, uint64 uiData)
+    void SetData64(uint32 uiType, uint64 uiData) override
     {
         switch (uiType)
         {
@@ -663,12 +662,12 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -689,7 +688,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    uint64 GetData64(uint32 uiType)
+    uint64 GetData64(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -711,7 +710,7 @@ struct instance_sunken_temple : public ScriptedInstance
         return 0;
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         if (RemoveTimer < uiDiff)
         {
@@ -722,7 +721,7 @@ struct instance_sunken_temple : public ScriptedInstance
             RemoveTimer -= uiDiff;
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
         {

@@ -49,8 +49,8 @@
 
 GameObject::GameObject() : WorldObject(),
     loot(this),
-    m_goInfo(nullptr),
-    m_visible(true)
+    m_visible(true),
+    m_goInfo(nullptr)
 {
     m_objectType |= TYPEMASK_GAMEOBJECT;
     m_objectTypeId = TYPEID_GAMEOBJECT;
@@ -574,7 +574,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                 {
                     // In Instances GO_FLAG_LOCKED or GO_FLAG_NO_INTERACT are not changed
                     uint32 currentLockOrInteractFlags = GetUInt32Value(GAMEOBJECT_FLAGS) & (GO_FLAG_LOCKED | GO_FLAG_NO_INTERACT);
-                    SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags & ~(GO_FLAG_LOCKED | GO_FLAG_NO_INTERACT) | currentLockOrInteractFlags);
+                    SetUInt32Value(GAMEOBJECT_FLAGS, (GetGOInfo()->flags & ~(GO_FLAG_LOCKED | GO_FLAG_NO_INTERACT)) | currentLockOrInteractFlags);
                 }
                 else
                     SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);

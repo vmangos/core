@@ -223,8 +223,8 @@ class LootValidatorRef :  public Reference<Loot, LootValidatorRef>
 {
     public:
         LootValidatorRef() {}
-        void targetObjectDestroyLink() {}
-        void sourceObjectDestroyLink() {}
+        void targetObjectDestroyLink() override {}
+        void sourceObjectDestroyLink() override {}
 };
 
 //=====================================================
@@ -257,7 +257,7 @@ struct Loot
     QuestItemMap const& GetPlayerFFAItems() const { return m_playerFFAItems; }
     QuestItemMap const& GetPlayerNonQuestNonFFAConditionalItems() const { return m_playerNonQuestNonFFAConditionalItems; }
 
-    bool _personal;
+    bool m_personal;
     LootItemList items;
     uint32 gold;
     uint8 unlootedCount;
@@ -265,13 +265,13 @@ struct Loot
     LootType loot_type;                                     // required for for proper item loot finish (store internal loot types in different from 3.x version, in fact this meaning that it send same loot types for interesting cases like 3.x version code, skip pre-3.x client loot type limitaitons)
 
     Loot(WorldObject const* lootTarget, uint32 _gold = 0) :
-        _personal(false),
+        m_personal(false),
         gold(_gold),
         unlootedCount(0),
-        m_lootTarget(lootTarget),
-        loot_type(LOOT_CORPSE),
         roundRobinPlayer(0),
-        _groupTeam(TEAM_CROSSFACTION)
+        loot_type(LOOT_CORPSE),
+        m_lootTarget(lootTarget),
+        m_groupTeam(TEAM_CROSSFACTION)
     {
     }
     ~Loot() { clear(); }
@@ -307,9 +307,9 @@ struct Loot
         unlootedCount = 0;
         m_LootValidatorRefManager.clearReferences();
         roundRobinPlayer = 0;
-        _allowedLooters.clear();
-        _personal = true;
-        _groupTeam = TEAM_CROSSFACTION;
+        m_allowedLooters.clear();
+        m_personal = true;
+        m_groupTeam = TEAM_CROSSFACTION;
     }
 
     void leaveOnlyQuestItems()
@@ -345,8 +345,8 @@ struct Loot
 
     void FillNotNormalLootFor(Player* player);
 
-    uint32 GetTeam() const { return _groupTeam; }
-    void SetTeam(Team team) { _groupTeam = team; }
+    uint32 GetTeam() const { return m_groupTeam; }
+    void SetTeam(Team team) { m_groupTeam = team; }
 
     LootItemList m_questItems;
     QuestItemMap m_playerQuestItems;
@@ -362,11 +362,11 @@ struct Loot
 
         // All rolls are registered here. They need to know, when the loot is not valid anymore
         LootValidatorRefManager m_LootValidatorRefManager;
-        std::vector<ObjectGuid> _allowedLooters;
+        std::vector<ObjectGuid> m_allowedLooters;
 
         // What is looted
         WorldObject const* m_lootTarget;
-        Team _groupTeam;
+        Team m_groupTeam;
 };
 
 struct LootView

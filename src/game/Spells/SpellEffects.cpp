@@ -305,8 +305,6 @@ void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
     if (m_caster == unitTarget)                             // prevent interrupt message
         finish();
 
-    WorldObject* caster = GetCastingObject();               // we need the original casting object
-
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_SPELLINSTAKILLLOG, (8 + 4));
     data << unitTarget->GetObjectGuid();                    // Victim GUID
@@ -3531,9 +3529,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         return;
     }
 
-    // set timer for unsummon
-    int32 duration = m_spellInfo->CalculateDuration(m_casterUnit);
-
     // second direct cast unsummon guardian(s) (guardians without like functionality have cooldown > spawn time)
     if (!m_IsTriggeredSpell && m_casterUnit->GetTypeId() == TYPEID_PLAYER)
     {
@@ -5052,7 +5047,6 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     {
                         if (Group* pGroup = pPlayerTarget->GetGroup())
                         {
-                            uint32 zone_id = pPlayerTarget->GetCachedZoneId();
                             for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
                             {
                                 Player* pGroupMember = itr->getSource();
@@ -6233,7 +6227,6 @@ void Spell::EffectPlayerPull(SpellEffectIndex eff_idx)
         float dx = unitTarget->GetPositionX() - m_caster->GetPositionX();
         float dy = unitTarget->GetPositionY() - m_caster->GetPositionY();
         float dist = sqrt((dx * dx) + (dy * dy));
-        const float  distXY = (dist > 0 ? dist : 0);
         float yDist = m_caster->GetPositionZ() - unitTarget->GetPositionZ();
         float horizontalSpeed = dist / 1.5f;
         float verticalSpeed = 12.0f + (yDist*0.5f);

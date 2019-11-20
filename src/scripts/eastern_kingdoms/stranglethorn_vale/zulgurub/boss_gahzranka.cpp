@@ -56,7 +56,7 @@ struct boss_gahzrankaAI : public ScriptedAI
     uint32 MassiveGeyser_Timer;
     uint32 Slam_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Frostbreath_Timer = 8000;
         MassiveGeyser_Timer = 25000;
@@ -65,18 +65,18 @@ struct boss_gahzrankaAI : public ScriptedAI
         if (m_pInstance && m_pInstance->GetData(TYPE_GAHZRANKA) != DONE)
             m_pInstance->SetData(TYPE_GAHZRANKA, NOT_STARTED);
     }
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GAHZRANKA, IN_PROGRESS);
     }
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GAHZRANKA, DONE);
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         CheckSpawnStatus();
     }
@@ -93,21 +93,21 @@ struct boss_gahzrankaAI : public ScriptedAI
         }
         else
         {
-            m_creature->GetMotionMaster()->MovePoint(0, -11709.3476f, -1749.965f, 8.733f, 5.3478f);
+            m_creature->GetMotionMaster()->MovePoint(0, -11709.3476f, -1749.965f, 8.733f, 0, 0, 5.3478f);
             m_creature->SetHomePosition(-11688.95f, -1777.21f, 12.593f, 5.81f);
         }
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
 
         if (uiPointId == 0) // move to the Beach
-            m_creature->GetMotionMaster()->MovePoint(1, -11688.95f, -1777.21f, 12.593f, 5.81f);
+            m_creature->GetMotionMaster()->MovePoint(1, -11688.95f, -1777.21f, 12.593f, 0, 0, 5.81f);
     } 
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

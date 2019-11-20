@@ -868,7 +868,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket & recv_data)
     }
 
     // cheating: check if source bag / item or destination bag is in bank and player can't use bank
-    if (_player->IsBankPos(srcbag, srcslot) || dstbag >= BANK_SLOT_BAG_START && dstbag < BANK_SLOT_BAG_END)
+    if (_player->IsBankPos(srcbag, srcslot) || (dstbag >= BANK_SLOT_BAG_START && dstbag < BANK_SLOT_BAG_END))
     {
         if (!CanUseBank())
             return;

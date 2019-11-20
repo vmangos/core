@@ -63,13 +63,13 @@ struct npc_miranAI: public npc_escortAI
 
     uint8 m_uiDwarves;
 
-    void Reset()
+    void Reset() override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
             m_uiDwarves = 0;
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -86,7 +86,7 @@ struct npc_miranAI: public npc_escortAI
         }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_DARK_IRON_DWARF)
         {
@@ -96,7 +96,7 @@ struct npc_miranAI: public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_DARK_IRON_DWARF)
         {
@@ -166,17 +166,17 @@ struct npc_saeanAI : public ScriptedAI
         m_eventStarted = false;
     }
 
-    void Reset() { }
+    void Reset() override { }
 
     // called when Saean summons his guards
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         // optimization: safely assume, that m_numSummonedAmbushers don't go outside range
         m_darkIronAmbusher[m_numSummonedAmbushers] = pSummoned;
         ++m_numSummonedAmbushers;
     }
 
-    void JustDied(Unit* pVictim)
+    void JustDied(Unit* pVictim) override
     {
         // It is safe to forget about ambushers, they will despawn automatically.
         for (ptrdiff_t i = 0; i < 2; ++i)

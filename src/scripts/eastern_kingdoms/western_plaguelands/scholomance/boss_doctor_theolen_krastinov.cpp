@@ -44,20 +44,20 @@ struct boss_theolenkrastinovAI : public ScriptedAI
     uint32 m_uiBackhand_Timer;
     uint32 m_uiFrenzy_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiRend_Timer = 8000;
         m_uiBackhand_Timer = 9000;
         m_uiFrenzy_Timer = 1000;
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_THEOLEN, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

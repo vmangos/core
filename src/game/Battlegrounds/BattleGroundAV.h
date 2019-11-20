@@ -405,7 +405,7 @@ class BattleGroundAVScore : public BattleGroundScore
 {
     public:
         BattleGroundAVScore() : GraveyardsAssaulted(0), GraveyardsDefended(0), TowersAssaulted(0), TowersDefended(0), SecondaryObjectives(0), LieutnantCount(0), SecondaryNPC(0) {};
-        virtual ~BattleGroundAVScore() {};
+        ~BattleGroundAVScore() override {};
         uint32 GraveyardsAssaulted;
         uint32 GraveyardsDefended;
         uint32 TowersAssaulted;
@@ -421,33 +421,33 @@ class BattleGroundAV : public BattleGround
 
     public:
         BattleGroundAV();
-        ~BattleGroundAV();
-        void Update(uint32 diff);
+        ~BattleGroundAV() override;
+        void Update(uint32 diff) override;
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player *plr);
+        void AddPlayer(Player *plr) override;
 
-        virtual void StartingEventCloseDoors();
-        virtual void StartingEventOpenDoors();
+        void StartingEventCloseDoors() override;
+        void StartingEventOpenDoors() override;
         // world states
-        virtual void FillInitialWorldStates(WorldPacket& data, uint32& count);
+        void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
 
-        void RemovePlayer(Player *plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player *Source, uint32 Trigger);
-        virtual void Reset();
+        void RemovePlayer(Player *plr, ObjectGuid guid) override;
+        void HandleAreaTrigger(Player *Source, uint32 Trigger) override;
+        void Reset() override;
 
         void ResetTamedEvent(uint32 teamIdx);
-        SpellCastResult CheckSpellCast(Player* caster, SpellEntry const* spell);
+        SpellCastResult CheckSpellCast(Player* caster, SpellEntry const* spell) override;
 
         /*general stuff*/
         void UpdateScore(BattleGroundTeamIndex teamIdx, int32 points);
-        void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
+        void UpdatePlayerScore(Player *Source, uint32 type, uint32 value) override;
         void UpgradeArmor(Object* questGiver, Player *player);
         uint32 GetActualArmorRessources(uint32 m_faction_id);
         /*handle stuff*/ // these are functions which get called from extern scripts
-        virtual void EventPlayerClickedOnFlag(Player *source, GameObject* target_obj);
-        void HandleKillPlayer(Player* player, Player *killer);
-        void HandleKillUnit(Creature *creature, Player *killer);
+        void EventPlayerClickedOnFlag(Player *source, GameObject* target_obj) override;
+        void HandleKillPlayer(Player* player, Player *killer) override;
+        void HandleKillUnit(Creature *creature, Player *killer) override;
 
         /** Challenge handler : air or ground assault, world boss assault */
         bool   isSnivvle;
@@ -484,12 +484,12 @@ class BattleGroundAV : public BattleGround
         void HandleQuestComplete(Unit* questGiver, uint32 questid, Player *player);
         bool PlayerCanDoMineQuest(int32 GOId, Team team);
 
-        void EndBattleGround(Team winner);
+        void EndBattleGround(Team winner) override;
 
-        virtual WorldSafeLocsEntry const* GetClosestGraveYard(Player *plr);
+        WorldSafeLocsEntry const* GetClosestGraveYard(Player *plr) override;
 
         static BattleGroundAVTeamIndex GetAVTeamIndexByTeamId(Team team) { return BattleGroundAVTeamIndex(GetTeamIndexByTeamId(team)); }
-        void HandleCommand(Player* player, ChatHandler* handler, char* args);
+        void HandleCommand(Player* player, ChatHandler* handler, char* args) override;
     private:
         /* Nodes occupying */
         void EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node);

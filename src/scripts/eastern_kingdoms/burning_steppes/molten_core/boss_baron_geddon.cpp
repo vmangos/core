@@ -51,7 +51,7 @@ struct boss_baron_geddonAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         m_uiIgniteManaTimer    = urand(10000, 15000);
         m_uiLivingBombTimer    = urand(15000, 20000);
@@ -66,20 +66,20 @@ struct boss_baron_geddonAI : public ScriptedAI
         m_creature->clearUnitState(UNIT_STAT_ROOT);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GEDDON, IN_PROGRESS);
         m_creature->SetInCombatWithZone();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GEDDON, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;

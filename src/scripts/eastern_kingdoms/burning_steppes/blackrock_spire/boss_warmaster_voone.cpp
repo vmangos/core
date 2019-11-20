@@ -44,7 +44,7 @@ struct boss_warmastervooneAI : public ScriptedAI
     uint32 Pummel_Timer;
     uint32 ThrowAxe_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Snapkick_Timer = 8000;
         Cleave_Timer = 14000;
@@ -54,7 +54,7 @@ struct boss_warmastervooneAI : public ScriptedAI
         ThrowAxe_Timer = 1000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

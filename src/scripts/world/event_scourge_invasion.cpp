@@ -53,12 +53,12 @@ struct npc_flameshocker_spawn_pointAI : public ScriptedAI
     ObjectGuid _myMonster;
     uint32 _checkTimer;
 
-    void Reset()
+    void Reset() override
     {
         _checkTimer = urand(2000, 5000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (_checkTimer < diff)
         {
@@ -71,7 +71,7 @@ struct npc_flameshocker_spawn_pointAI : public ScriptedAI
         else
             _checkTimer -= diff;
     }
-    void OnRemoveFromWorld()
+    void OnRemoveFromWorld() override
     {
         if (Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster))
             myMonster->AddObjectToRemoveList();
@@ -94,12 +94,12 @@ struct npc_horror_pallid_spawn_pointAI : public ScriptedAI
     ObjectGuid _myMonster;
     uint32 _checkTimer;
 
-    void Reset()
+    void Reset() override
     {
         _checkTimer = urand(12000, 30000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (_checkTimer < diff)
         {
@@ -113,7 +113,7 @@ struct npc_horror_pallid_spawn_pointAI : public ScriptedAI
         else
             _checkTimer -= diff;
     }
-    void OnRemoveFromWorld()
+    void OnRemoveFromWorld() override
     {
         if (Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster))
             myMonster->AddObjectToRemoveList();
@@ -130,7 +130,7 @@ class WaypointForFlameshocker
 {
 public:
     WaypointForFlameshocker(Creature const& obj, std::set<ObjectGuid> const& visited)
-        : i_obj(obj), i_range(300.f), i_visited(visited) {}
+        : i_obj(obj), i_visited(visited), i_range(300.f) {}
     Creature const& GetFocusObject() const
     {
         return i_obj;
@@ -205,11 +205,11 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
     bool _alliance;
     bool _enableAutoMove;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         // On n'attaque pas les joueurs spontannement.
         if (who->GetTypeId() == TYPEID_PLAYER)
@@ -247,7 +247,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
         MaNGOS::CreatureWorker<TriggerGuardsReactions> worker(m_creature, u_do);
         Cell::VisitGridObjects(m_creature, worker, 30.0f);
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         if (_checksTimer < diff)
         {
@@ -292,11 +292,11 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
             c->ResetLastDamageTakenTime();
         DoMeleeAttackIfReady();
     }
-    void CorpseRemoved(uint32&)
+    void CorpseRemoved(uint32&) override
     {
         m_creature->DeleteLater();
     }
-    void EnterCombat(Unit* who)
+    void EnterCombat(Unit* who) override
     {
         // Riposte !
         if (!m_creature->getVictim())
@@ -347,7 +347,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
         }
         _guards.insert(who->GetObjectGuid());
     }
-    void OnRemoveFromWorld()
+    void OnRemoveFromWorld() override
     {
         for (std::set<ObjectGuid>::iterator it = _guards.begin(); it != _guards.end(); ++it)
             if (Creature* c = m_creature->GetMap()->GetCreature(*it))
@@ -371,17 +371,17 @@ struct FlameshockerAI : public ScourgeInvasion_RandomAttackerAI
     uint32 _revengeTimer;
 
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_FLAMESHOCKERS_VISUAL);
     }
 
-    void InformGuid(const ObjectGuid guid, uint32 type = 0)
+    void InformGuid(const ObjectGuid guid, uint32 type = 0) override
     {
         _enableAutoMove = false;
         _pallidHorror = guid;
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff) override
     {
         ScourgeInvasion_RandomAttackerAI::UpdateAI(diff);
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -454,13 +454,13 @@ struct PallidHorrorAI : public ScourgeInvasion_RandomAttackerAI
 
     std::set<ObjectGuid> _flameshockers;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         m_creature->AddAura(SPELL_AURA_OF_FEAR);
     }
 
-    void OnRemoveFromWorld()
+    void OnRemoveFromWorld() override
     {
         for (std::set<ObjectGuid>::iterator it = _flameshockers.begin(); it != _flameshockers.end(); ++it)
             if (Creature* c = m_creature->GetMap()->GetCreature(*it))
@@ -468,7 +468,7 @@ struct PallidHorrorAI : public ScourgeInvasion_RandomAttackerAI
         ScourgeInvasion_RandomAttackerAI::OnRemoveFromWorld();
     }
 
-    void JustDied(Unit* killer)
+    void JustDied(Unit* killer) override
     {
         // Stormwind
         if (m_creature->GetZoneId() == 1519)
@@ -492,8 +492,8 @@ struct QuestGiverCrystalAI : public ScriptedAI
     }
 
     uint32 _dieTimer;
-    void Reset() {}
-    void UpdateAI(const uint32 diff)
+    void Reset() override {}
+    void UpdateAI(const uint32 diff) override
     {
         if (_dieTimer < diff)
             m_creature->DoKillUnit();

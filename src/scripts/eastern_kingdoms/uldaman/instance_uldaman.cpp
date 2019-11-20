@@ -55,7 +55,7 @@ struct instance_uldaman : public ScriptedInstance
     std::vector<uint64> vEarthenGuardian;
     std::vector<uint64> vArchaedasWallMinions; //Minions lined up around the wall
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
         uiArchaedasGUID = 0;
@@ -75,7 +75,7 @@ struct instance_uldaman : public ScriptedInstance
         vEarthenGuardian.reserve(6);
     }
 
-    bool IsEncounterInProgress() const
+    bool IsEncounterInProgress() const override
     {
         for (uint8 i = 0; i < ULDAMAN_MAX_ENCOUNTER; ++i)
         {
@@ -89,7 +89,7 @@ struct instance_uldaman : public ScriptedInstance
     }
 
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -137,7 +137,7 @@ struct instance_uldaman : public ScriptedInstance
         }
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         //sLog.outError("%s %u",pGo->GetNameForLocaleIdx(0),pGo->GetEntry());
         switch (pGo->GetEntry())
@@ -225,7 +225,7 @@ struct instance_uldaman : public ScriptedInstance
         target->RemoveCorpse();
     }
 
-    void SetData64(uint32 type, uint64 data)
+    void SetData64(uint32 type, uint64 data) override
     {
         // Ironaya's waker
         if (type == 0)
@@ -250,7 +250,7 @@ struct instance_uldaman : public ScriptedInstance
         }
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         if (uiData == 0) return uiWhoWokeIronayaGUID;
         if (uiData == 1) return vVaultWarder[0]; // VaultWarder1
@@ -268,7 +268,7 @@ struct instance_uldaman : public ScriptedInstance
         return 0;
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -525,7 +525,7 @@ struct instance_uldaman : public ScriptedInstance
         OUT_LOAD_INST_DATA_COMPLETE;
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         if (uiType == ULDAMAN_ENCOUNTER_IRONAYA_DOOR) return m_auiEncounter[ULDAMAN_ENCOUNTER_IRONAYA_DOOR];
         if (uiType == ULDAMAN_ENCOUNTER_STONE_KEEPERS) return m_auiEncounter[ULDAMAN_ENCOUNTER_STONE_KEEPERS];
@@ -534,7 +534,7 @@ struct instance_uldaman : public ScriptedInstance
         return 0;
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         if (!bKeystoneCheck)
         {

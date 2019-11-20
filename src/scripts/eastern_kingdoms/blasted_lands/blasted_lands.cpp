@@ -57,7 +57,7 @@ struct ThadiusGrimshadeAI : public ScriptedAI
     uint64 grimshadeGUID;
     uint64 playerGUID;
 
-    void Reset()
+    void Reset() override
     {
     }
 
@@ -70,7 +70,7 @@ struct ThadiusGrimshadeAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (underEvent)
         {

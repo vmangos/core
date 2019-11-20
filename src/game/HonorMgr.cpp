@@ -955,8 +955,6 @@ float HonorMgr::HonorableKillPoints(Player* killer, Player* victim, uint32 group
     if (!killer || !victim || !groupSize)
         return 0.0;
 
-    uint32 today = sWorld.GetGameDay();
-
     uint32 totalKills = killer->GetHonorMgr().CalculateTotalKills(victim);
     uint32 victimRank = victim->GetHonorMgr().GetRank().visualRank;
     uint8 killerLevel = killer->getLevel();

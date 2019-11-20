@@ -43,11 +43,11 @@ struct npc_pusillinAI : public ScriptedAI
     float fNextPositions[3];
     uint32 uiGlobalCD;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         std::list<Creature*> m_impList;
         GetCreatureListWithEntryInGrid(m_impList, ME, 13276, 100.0f);
@@ -55,7 +55,7 @@ struct npc_pusillinAI : public ScriptedAI
             (*it)->Attack(pWho,true);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!ME->SelectHostileTarget() || !ME->getVictim())
             return;

@@ -194,10 +194,10 @@ MangosSocketMgr<SocketType>::MangosSocketMgr():
     m_NetThreadsCount(0),
     m_SockOutKBuff(-1),
     m_SockOutUBuff(65536),
-    m_Interval(10000),
     m_UseNoDelay(true),
-    m_Acceptor(0),
-    m_port(0)
+    m_Interval(10000),
+    m_port(0),
+    m_Acceptor(0)
 {
 }
 
