@@ -21,9 +21,9 @@ enum
 
 FollowerAI::FollowerAI(Creature* pCreature) : ScriptedAI(pCreature),
     m_uiLeaderGUID(0),
-    m_pQuestForFollow(nullptr),
     m_uiUpdateFollowTimer(2500),
     m_uiFollowState(STATE_FOLLOW_NONE),
+    m_pQuestForFollow(nullptr),
     m_uiFollowDistance(0.0f)
 {}
 

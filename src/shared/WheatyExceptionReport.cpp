@@ -271,13 +271,13 @@ BOOL WheatyExceptionReport::_GetWindowsVersion(TCHAR* szVersion, DWORD cntMax)
             lRet = ::RegOpenKeyEx(HKEY_LOCAL_MACHINE, _T("SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Hotfix\\Q246009"), 0, KEY_QUERY_VALUE, &hKey);
             if (lRet == ERROR_SUCCESS)
             {
-                _stprintf(wszTmp, _T("Service Pack 6a (Version %u.%u, Build %u)"),
+                _stprintf(wszTmp, _T("Service Pack 6a (Version %lu.%lu, Build %lu)"),
                     osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber & 0xFFFF);
                 _tcsncat(szVersion, wszTmp, cntMax);
             }
             else                                            // Windows NT 4.0 prior to SP6a
             {
-                _stprintf(wszTmp, _T("%s (Version %u.%u, Build %u)"),
+                _stprintf(wszTmp, _T("%s (Version %lu.%lu, Build %lu)"),
                     osvi.szCSDVersion, osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber & 0xFFFF);
                 _tcsncat(szVersion, wszTmp, cntMax);
             }
@@ -286,16 +286,16 @@ BOOL WheatyExceptionReport::_GetWindowsVersion(TCHAR* szVersion, DWORD cntMax)
         else                                                // Windows NT 3.51 and earlier or Windows 2000 and later
         {
             if (!_tcslen(osvi.szCSDVersion))
-                _stprintf(wszTmp, _T("(Version %u.%u, Build %u)"),
+                _stprintf(wszTmp, _T("(Version %lu.%lu, Build %lu)"),
                     osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber & 0xFFFF);
             else
-                _stprintf(wszTmp, _T("%s (Version %u.%u, Build %u)"),
+                _stprintf(wszTmp, _T("%s (Version %lu.%lu, Build %lu)"),
                     osvi.szCSDVersion, osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber & 0xFFFF);
             _tcsncat(szVersion, wszTmp, cntMax);
         }
         break;
         default:
-            _stprintf(wszTmp, _T("%s (Version %u.%u, Build %u)"),
+            _stprintf(wszTmp, _T("%s (Version %lu.%lu, Build %lu)"),
                 osvi.szCSDVersion, osvi.dwMajorVersion, osvi.dwMinorVersion, osvi.dwBuildNumber & 0xFFFF);
             _tcsncat(szVersion, wszTmp, cntMax);
             break;

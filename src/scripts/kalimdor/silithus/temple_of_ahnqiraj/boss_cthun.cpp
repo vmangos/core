@@ -268,7 +268,7 @@ static constexpr uint32 SPELL_ROTATE_TRIGGER_CASTTIME   = 3000;
 static constexpr uint32 GREEN_BEAM_PHASE_DURATION       = 45000;
 static constexpr uint32 DARK_GLARE_PHASE_DURATION       = 38000; 
 static constexpr uint32 DARK_GLARE_COOLING_DOWN         = 1000;
-static constexpr int32  MAX_INITIAL_PULLER_HITS         = 3;     // How many times will c'thun target the initial 
+//static constexpr int32  MAX_INITIAL_PULLER_HITS       = 3;     // How many times will c'thun target the initial 
                                                                  // puller with green beam before random target.
 static constexpr int32  P1_GREEN_BEAM_COOLDOWN          = 3000;  // Green beam has a 2 sec cast time. If this number is > 2000, 
                                                                  // the cooldown will be P1_GREEN_BEAM_COOLDOWN - 2000
@@ -299,7 +299,7 @@ static constexpr uint32 HAMSTRING_INITIAL_COOLDOWN             = 2000;          
 static const uint32 hamstringResetCooldownFunc()               { return 5000; } // Claw tentacle hamstring cooldown after use
 static const uint32 trashResetCooldownFunc()                   { return urand(6000, 12000); }
 static const uint32 groundTremorResetCooldownFunc()            { return urand(6000, 12000); }
-static constexpr uint32 CLAW_TENTACLE_FIRST_MELEE_DELAY        = 1000; // Earliest possible point for a claw tentacle to melee after spawn/tp
+//static constexpr uint32 CLAW_TENTACLE_FIRST_MELEE_DELAY      = 1000; // Earliest possible point for a claw tentacle to melee after spawn/tp
 static constexpr uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN      = 5000; // How long does a claw tentacle evade before TPing to new target
 
 static constexpr uint32 TENTACLE_BIRTH_DURATION                = 3000; // Duration of birth animation and /afk before tentacles start doing stuff

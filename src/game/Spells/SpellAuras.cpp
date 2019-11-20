@@ -4232,7 +4232,6 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
     //   equipment after the cast.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     Unit *target = GetTarget();
-    SpellEntry const* spellProto = GetSpellProto();
 
     // For prevent double apply bonuses
     bool loading = (target->GetTypeId() == TYPEID_PLAYER && ((Player*)target)->GetSession()->PlayerLoading());

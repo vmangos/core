@@ -92,10 +92,12 @@ void WorldSession::HandleChannelListOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->List(player);
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelPasswordOpcode(WorldPacket& recvPacket)
@@ -109,10 +111,12 @@ void WorldSession::HandleChannelPasswordOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->Password(player->GetObjectGuid(), pass.c_str());
         else
             ForwardPacketToNode();
+    } 
 }
 
 void WorldSession::HandleChannelSetOwnerOpcode(WorldPacket& recvPacket)
@@ -130,10 +134,12 @@ void WorldSession::HandleChannelSetOwnerOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->SetOwner(player->GetObjectGuid(), newp.c_str());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelOwnerOpcode(WorldPacket& recvPacket)
@@ -145,10 +151,12 @@ void WorldSession::HandleChannelOwnerOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->SendWhoOwner(player->GetObjectGuid());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelModeratorOpcode(WorldPacket& recvPacket)
@@ -165,10 +173,12 @@ void WorldSession::HandleChannelModeratorOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->SetModerator(player->GetObjectGuid(), otp.c_str());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelUnmoderatorOpcode(WorldPacket& recvPacket)
@@ -185,10 +195,12 @@ void WorldSession::HandleChannelUnmoderatorOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->UnsetModerator(player->GetObjectGuid(), otp.c_str());
         else
             ForwardPacketToNode();
+    } 
 }
 
 void WorldSession::HandleChannelMuteOpcode(WorldPacket& recvPacket)
@@ -205,10 +217,12 @@ void WorldSession::HandleChannelMuteOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->SetMute(player->GetObjectGuid(), otp.c_str());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelUnmuteOpcode(WorldPacket& recvPacket)
@@ -225,10 +239,12 @@ void WorldSession::HandleChannelUnmuteOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->UnsetMute(player->GetObjectGuid(), otp.c_str());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelInviteOpcode(WorldPacket& recvPacket)
@@ -248,10 +264,12 @@ void WorldSession::HandleChannelInviteOpcode(WorldPacket& recvPacket)
         return;
 
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->Invite(player->GetObjectGuid(), otp.c_str());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelKickOpcode(WorldPacket& recvPacket)
@@ -267,10 +285,12 @@ void WorldSession::HandleChannelKickOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->Kick(player->GetObjectGuid(), otp.c_str());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelBanOpcode(WorldPacket& recvPacket)
@@ -287,10 +307,12 @@ void WorldSession::HandleChannelBanOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->Ban(player->GetObjectGuid(), otp.c_str());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelUnbanOpcode(WorldPacket& recvPacket)
@@ -307,10 +329,12 @@ void WorldSession::HandleChannelUnbanOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->UnBan(player->GetObjectGuid(), otp.c_str());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelAnnouncementsOpcode(WorldPacket& recvPacket)
@@ -322,10 +346,12 @@ void WorldSession::HandleChannelAnnouncementsOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->Announce(player->GetObjectGuid());
         else
             ForwardPacketToNode();
+    }
 }
 
 void WorldSession::HandleChannelModerateOpcode(WorldPacket& recvPacket)
@@ -337,9 +363,11 @@ void WorldSession::HandleChannelModerateOpcode(WorldPacket& recvPacket)
 
     PlayerPointer player = GetPlayerPointer();
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))
+    {
         if (Channel *chn = cMgr->GetChannel(channelname, player, IsNode()))
             chn->Moderate(player->GetObjectGuid());
         else
             ForwardPacketToNode();
+    }
 }
 

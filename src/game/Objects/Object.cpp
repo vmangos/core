@@ -1293,9 +1293,8 @@ void WorldObject::SetVisibilityModifier(float f)
 }
 
 WorldObject::WorldObject()
-    :   m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0),
-        m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_lootAndXPRangeModifier(0), 
-        m_creatureSummonCount(0), m_summonLimitAlert(0)
+    :   m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
+        m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0), m_creatureSummonCount(0), m_summonLimitAlert(0)
 {
     // Phasing
     worldMask = WORLD_DEFAULT_OBJECT;

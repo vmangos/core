@@ -82,14 +82,14 @@ enum Phases
 };
 
 
-static const uint32 firstEruptionDBGUID = 533048;
+//static const uint32 firstEruptionDBGUID = 533048;
 static const uint8 numSections = 4;
-static const uint8 numEruptions[numSections] = { // count of sequential GO DBGUIDs in the respective section of the room
+/*static const uint8 numEruptions[numSections] = { // count of sequential GO DBGUIDs in the respective section of the room
     15,
     25,
     23,
     13
-};
+};*/
 
 // in tunnel
 static constexpr float safespotFissures[3][3] = 
