@@ -394,6 +394,7 @@ set (game_SRCS
     Objects/TemporarySummon.h
     Objects/Totem.h
     Objects/Unit.h
+    Objects/UnitDefines.h
     Objects/UpdateData.h
     Objects/UpdateFields.h
     Objects/UpdateMask.h
@@ -410,6 +411,7 @@ set (game_SRCS
     Spells/SpellAuraDefines.h
     Spells/SpellAuras.h
     Spells/SpellClassMask.h
+    Spells/SpellDefines.h
     Spells/SpellEntry.h
     Spells/SpellMgr.h
     Spells/SpellModMgr.h

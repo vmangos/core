@@ -425,7 +425,7 @@ struct boss_sapphironAI : public ScriptedAI
 
             //m_creature->SetFly(false);
             //m_creature->SetLevitate(false);
-            m_creature->SetMeleeZLimit(MELEE_Z_LIMIT);
+            m_creature->SetMeleeZLimit(UNIT_DEFAULT_MELEE_Z_LIMIT);
         }
     }
 
