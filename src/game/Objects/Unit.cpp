@@ -9067,7 +9067,7 @@ Player* Unit::FindNearestFriendlyPlayer(float range) const
     return target;
 }
 
-bool Unit::IsSecondaryThreatTarget()
+bool Unit::IsSecondaryThreatTarget() const
 {
     // Targets with Fear / Confuse / breakable CC
     for (SpellAuraHolderMap::const_iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end(); ++iter)
@@ -9096,16 +9096,6 @@ bool Unit::IsSecondaryThreatTarget()
                     return true;
             }
         }
-    }
-    return false;
-}
-
-bool Unit::hasNegativeAuraWithInterruptFlag(uint32 flag)
-{
-    for (SpellAuraHolderMap::const_iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end(); ++iter)
-    {
-        if (!iter->second->IsPositive() && iter->second->GetSpellProto()->AuraInterruptFlags & flag)
-            return true;
     }
     return false;
 }
