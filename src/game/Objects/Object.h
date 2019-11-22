@@ -791,7 +791,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void SetName(std::string const& newname) { m_name=newname; }
 
         virtual const char* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
-        virtual uint8 getGender() const { return 0; } // used in chat builder
+        virtual uint8 GetGender() const { return 0; } // used in chat builder
 
         virtual uint32 GetDefaultGossipMenuId() const { return 0; }
 
@@ -913,12 +913,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         virtual bool IsHostileTo(WorldObject const* target) const =0;
         virtual bool IsFriendlyTo(WorldObject const* target) const =0;
-        virtual uint32 getFaction() const = 0;
+        virtual uint32 GetFactionTemplateId() const = 0;
         FactionTemplateEntry const* getFactionTemplateEntry() const;
         virtual ReputationRank GetReactionTo(WorldObject const* target) const;
         ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
         virtual bool IsValidAttackTarget(Unit const* target) const { return false; }
-        virtual bool isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return isVisibleForInState(pDetector, viewPoint, inVisibleList); }
+        virtual bool IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return IsVisibleForInState(pDetector, viewPoint, inVisibleList); }
 
         bool IsControlledByPlayer() const;
         bool IsLikePlayer() const;
@@ -936,7 +936,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const;
 
         // low level function for visibility change code, must be define in all main world object subclasses
-        virtual bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
+        virtual bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
 
         void SetMap(Map * map);
         Map * GetMap() const;
@@ -1001,7 +1001,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         uint32 GetCreatureSummonLimit() const { return m_creatureSummonLimit; }
         void SetCreatureSummonLimit(uint32 limit);
 
-        virtual uint32 getLevel() const = 0;
+        virtual uint32 GetLevel() const = 0;
         uint32 GetLevelForTarget(WorldObject const* target = nullptr) const;
         uint16 GetSkillMaxForLevel(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; };
         uint32 GetWeaponSkillValue(WeaponAttackType attType, WorldObject const* target = nullptr) const;

@@ -51,7 +51,7 @@ struct boss_garrAI : ScriptedAI
         m_uiCheckAddsTimer      = 2000;
         m_uiExplodeTimer        = urand(3000, 6000);
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_GARR, NOT_STARTED);
     }
 
@@ -205,7 +205,7 @@ struct mob_fireswornAI : ScriptedAI
 
         if (Creature* pGarr = m_pInstance->GetSingleCreatureFromStorage(NPC_GARR))
         {
-            if (pGarr->isAlive())
+            if (pGarr->IsAlive())
             {
                 if (auto pGarrAI = static_cast<boss_garrAI*>(pGarr->AI()))
                     pGarrAI->FireswornJustDied(m_creature->GetObjectGuid());                

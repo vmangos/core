@@ -41,7 +41,7 @@ struct boss_lucifronAI : public ScriptedAI
         m_Events.ScheduleEvent(eEvents::EventCurse, Seconds(20));               // Zerix: 20s Initial Cast, Repeats every 15s.
         m_Events.ScheduleEvent(eEvents::EventShadowShock, Seconds(6));          // Zerix: 6s Initial Cast, Repeats every 6s.
 
-        if (m_Instance && m_creature->isAlive())
+        if (m_Instance && m_creature->IsAlive())
             m_Instance->SetData(TYPE_LUCIFRON, NOT_STARTED);
     }
 

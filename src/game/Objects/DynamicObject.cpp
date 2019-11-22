@@ -157,14 +157,14 @@ Unit* DynamicObject::GetUnitCaster() const
     return nullptr;
 }
 
-uint32 DynamicObject::getFaction() const
+uint32 DynamicObject::GetFactionTemplateId() const
 {
-    return GetCaster()->getFaction();
+    return GetCaster()->GetFactionTemplateId();
 }
 
-uint32 DynamicObject::getLevel() const
+uint32 DynamicObject::GetLevel() const
 {
-    return GetCaster()->getLevel();
+    return GetCaster()->GetLevel();
 }
 
 void DynamicObject::Update(uint32 update_diff, uint32 p_time)
@@ -267,7 +267,7 @@ void DynamicObject::Delay(int32 delaytime)
     }
 }
 
-bool DynamicObject::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
+bool DynamicObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
     if (!IsInWorld() || !pDetector->IsInWorld())
         return false;

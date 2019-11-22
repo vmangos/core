@@ -146,7 +146,7 @@ struct boss_buruAI : public ScriptedAI
                 if (Creature* egg = m_creature->SummonCreature(NPC_BURU_EGG, Eggs[i].x, Eggs[i].y, Eggs[i].z, 0))
                     m_eggsGUID[i] = egg->GetGUID();
             }
-            else if (!egg->isAlive())
+            else if (!egg->IsAlive())
             {
                 if (m_uiRespawnEgg_Timer[i] < uiDiff)
                 {
@@ -232,7 +232,7 @@ struct boss_buruAI : public ScriptedAI
                 for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
                 {
                     Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
-                    if (pPlayer && pPlayer->isAlive())
+                    if (pPlayer && pPlayer->IsAlive())
                     {
                         GUIDs[var] = (*itr)->getUnitGuid();
                         ++var;
@@ -348,7 +348,7 @@ struct mob_buru_eggAI : public ScriptedAI
         // Si Buru est a portee, il inflige des degats a celui-ci et changement de cible
         if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))
         {
-            if (pBuru->isAlive() && pBuru->GetDistance2d(m_creature) < 5.0f && pBuru->GetHealthPercent() >= 20)
+            if (pBuru->IsAlive() && pBuru->GetDistance2d(m_creature) < 5.0f && pBuru->GetHealthPercent() >= 20)
             {
                 pBuru->getThreatManager().modifyThreatPercent(pBuru->getVictim(), -100);
 

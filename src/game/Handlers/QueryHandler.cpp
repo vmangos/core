@@ -52,9 +52,9 @@ void WorldSession::SendNameQueryOpcode(Player *p)
     data << ObjectGuid(p->GetObjectGuid());
     data << p->GetName();                                   // CString(48): played name
 #endif
-    data << uint32(p->getRace());
-    data << uint32(p->getGender());
-    data << uint32(p->getClass());
+    data << uint32(p->GetRace());
+    data << uint32(p->GetGender());
+    data << uint32(p->GetClass());
 
     SendPacket(&data);
 }

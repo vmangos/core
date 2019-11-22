@@ -52,7 +52,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
     if (!creature.GetRandomPoint(i_positionX, i_positionY, i_positionZ, i_wanderDistance, destX, destY, destZ))
         return;
 
-    creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
+    creature.AddUnitState(UNIT_STAT_ROAMING_MOVE);
     Movement::MoveSplineInit init(creature, "RandomMovementGenerator");
     init.MoveTo(destX, destY, destZ, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
     init.SetWalk(true);
@@ -66,10 +66,10 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
 
 void RandomMovementGenerator::Initialize(Creature &creature)
 {
-    if (!creature.isAlive())
+    if (!creature.IsAlive())
         return;
 
-    creature.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    creature.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     i_nextMoveTime.Reset(50);
 }
 
@@ -80,14 +80,14 @@ void RandomMovementGenerator::Reset(Creature &creature)
 
 void RandomMovementGenerator::Interrupt(Creature &creature)
 {
-    creature.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    creature.SetWalk(!creature.hasUnitState(UNIT_STAT_RUNNING), false);
+    creature.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    creature.SetWalk(!creature.HasUnitState(UNIT_STAT_RUNNING), false);
 }
 
 void RandomMovementGenerator::Finalize(Creature &creature)
 {
-    creature.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    creature.SetWalk(!creature.hasUnitState(UNIT_STAT_RUNNING), false);
+    creature.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    creature.SetWalk(!creature.HasUnitState(UNIT_STAT_RUNNING), false);
 }
 
 bool RandomMovementGenerator::Update(Creature &creature, const uint32 &diff)
@@ -108,10 +108,10 @@ void RandomMovementGenerator::UpdateAsync(Creature &creature, uint32 diff)
 {
     // Lock async updates for safety, see Unit::asyncMovesplineLock doc
     ACE_Guard<ACE_Thread_Mutex> guard(creature.asyncMovesplineLock);
-    if (creature.hasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_DISTRACTED))
+    if (creature.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_DISTRACTED))
     {
         i_nextMoveTime.Reset(0);  // Expire the timer
-        creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
+        creature.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
     }
     else if (creature.IsNoMovementSpellCasted())
     {

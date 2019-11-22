@@ -28,7 +28,7 @@ MasterPlayer::~MasterPlayer()
 void MasterPlayer::Create(Player* player)
 {
     guid = player->GetObjectGuid();
-    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(player->getRace(), player->getClass());
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(player->GetRace(), player->GetClass());
     ASSERT(info);
 
     // original action bar
@@ -42,9 +42,9 @@ void MasterPlayer::LoadPlayer(Player* player)
     name = player->GetName();
     zoneId = player->GetCachedZoneId();
     areaId = player->GetCachedAreaId();
-    raceId = player->getRace();
-    classId = player->getClass();
-    level = player->getLevel();
+    raceId = player->GetRace();
+    classId = player->GetClass();
+    level = player->GetLevel();
     guildId = player->GetGuildId();
     m_team = player->GetTeam();
     m_chatTag = player->GetChatTag();

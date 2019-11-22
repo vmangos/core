@@ -110,9 +110,9 @@ struct boss_herodAI : ScriptedAI
         {
             if (auto pMyrmidon = m_creature->GetMap()->GetCreature(*itr))
             {
-                if (!pMyrmidon->isAlive() || pMyrmidon->getVictim())
+                if (!pMyrmidon->IsAlive() || pMyrmidon->getVictim())
                     continue;
-                if (victim->isAlive())
+                if (victim->IsAlive())
                     pMyrmidon->SetInCombatWith(victim);
             }
         }
@@ -137,7 +137,7 @@ struct boss_herodAI : ScriptedAI
         {
             if (auto pMyrmidon = m_creature->GetMap()->GetCreature(*itr))
             {
-                if (pMyrmidon->isAlive() && !pMyrmidon->getVictim())
+                if (pMyrmidon->IsAlive() && !pMyrmidon->getVictim())
                     pMyrmidon->ForcedDespawn();
             }
         }
@@ -148,7 +148,7 @@ struct boss_herodAI : ScriptedAI
 
     void EnterEvadeMode() override
     {
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STAT_ROOT);
         DespawnMyrmidons();
         ScriptedAI::EnterEvadeMode();
     }
@@ -188,7 +188,7 @@ struct boss_herodAI : ScriptedAI
         {
             if (m_uiRootTimer < diff)
             {
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
                 m_bWhirlwind = false;
             }
             else
@@ -237,7 +237,7 @@ struct boss_herodAI : ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WHIRLWIND) == CAST_OK)
             {
-                m_creature->addUnitState(UNIT_STAT_ROOT);
+                m_creature->AddUnitState(UNIT_STAT_ROOT);
                 m_bWhirlwind = true;
                 m_uiRootTimer = 11000;
                 DoScriptText(SAY_WHIRLWIND, m_creature);

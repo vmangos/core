@@ -158,7 +158,7 @@ struct boss_gluthAI : public ScriptedAI
             {
                 Player* pPlayer = (*it).getSource();
                 if (!pPlayer) continue;
-                if (pPlayer->isDead()) continue;
+                if (pPlayer->IsDead()) continue;
                 DoCastSpellIfCan(pPlayer, SPELL_DECIMATE_OTHER, CF_TRIGGERED);
             }
         }
@@ -271,7 +271,7 @@ struct boss_gluthAI : public ScriptedAI
             return;
         for (auto it = chowableZombies.begin(); it != chowableZombies.end(); ++it)
         {
-            if (!(*it)->isAlive())
+            if (!(*it)->IsAlive())
                 continue;
 
             // Using 2d distance, should do fine

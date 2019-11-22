@@ -131,7 +131,7 @@ CreatureAI* GetAI_boss_cairne_bloodhoof(Creature* pCreature)
 
 bool GossipHello_npc_cairne_bloodhoof(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
     if (pPlayer->GetQuestStatus(925) == QUEST_STATUS_INCOMPLETE)
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I know this is rather silly but a young ward who is a bit shy would like your hoofprint.", GOSSIP_SENDER_MAIN, GOSSIP_SENDER_INFO);

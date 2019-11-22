@@ -194,13 +194,13 @@ struct boss_archaedasAI : public ScriptedAI
             // fix factions now or they'll look green for a brief moment
             if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(1)))
             {
-                target->setFaction(FACTION_AWAKE);
+                target->SetFactionTemplateId(FACTION_AWAKE);
                 target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 target->CastSpell(target, SPELL_STONE_DWARF_AWAKEN, false);
             }
             if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(2)))
             {
-                target->setFaction(FACTION_AWAKE);
+                target->SetFactionTemplateId(FACTION_AWAKE);
                 target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 target->CastSpell(target, SPELL_STONE_DWARF_AWAKEN, false);
             }

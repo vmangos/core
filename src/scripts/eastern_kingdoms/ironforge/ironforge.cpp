@@ -39,7 +39,7 @@ EndContentData */
 
 bool GossipHello_npc_royal_historian_archesonus(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(3702) == QUEST_STATUS_INCOMPLETE)
@@ -88,7 +88,7 @@ bool GossipSelect_npc_royal_historian_archesonus(Player* pPlayer, Creature* pCre
 
 bool GossipHello_npc_magni_bronzebeard(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
 
@@ -101,7 +101,7 @@ bool GossipHello_npc_magni_bronzebeard(Player* pPlayer, Creature* pCreature)
 
 bool GossipHello_npc_tinker_mekkatorque(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
 

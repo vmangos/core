@@ -96,7 +96,7 @@ struct go_urok_challengeAI: public GameObjectAI
                 Map::PlayerList const& list = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
                     if (Player* player = it->getSource())
-                        if (player->isAlive() && !invoc->IsFriendlyTo(player))
+                        if (player->IsAlive() && !invoc->IsFriendlyTo(player))
                             invoc->AI()->AttackStart(player);
             }
         }

@@ -194,7 +194,7 @@ bool ChatHandler::HandleLevelUpCommand(char* args)
 
     if (Creature* pCreature = GetSelectedCreature())
     {
-        int32 newlevel = pCreature->getLevel() + addlevel;
+        int32 newlevel = pCreature->GetLevel() + addlevel;
 
         if (newlevel < 1)
             newlevel = 1;
@@ -217,7 +217,7 @@ bool ChatHandler::HandleLevelUpCommand(char* args)
         if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
             return false;
 
-        int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromDB(target_guid);
+        int32 oldlevel = target ? target->GetLevel() : Player::GetLevelFromDB(target_guid);
         int32 newlevel = oldlevel + addlevel;
 
         if (newlevel < 1)
@@ -1354,7 +1354,7 @@ bool ChatHandler::HandleCharacterLevelCommand(char* args)
     if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
         return false;
 
-    int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromDB(target_guid);
+    int32 oldlevel = target ? target->GetLevel() : Player::GetLevelFromDB(target_guid);
     if (nolevel)
         newlevel = oldlevel;
 
@@ -2460,7 +2460,7 @@ bool ChatHandler::HandleLearnAllMyClassCommand(char* /*args*/)
 bool ChatHandler::HandleLearnAllMySpellsCommand(char* /*args*/)
 {
     Player* pPlayer = m_session->GetPlayer();
-    ChrClassesEntry const* clsEntry = sChrClassesStore.LookupEntry(pPlayer->getClass());
+    ChrClassesEntry const* clsEntry = sChrClassesStore.LookupEntry(pPlayer->GetClass());
     if (!clsEntry)
         return true;
     uint32 family = clsEntry->spellfamily;
@@ -2506,7 +2506,7 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(char* /*args*/)
 bool ChatHandler::HandleLearnAllMyTalentsCommand(char* /*args*/)
 {
     Player* pPlayer = m_session->GetPlayer();
-    uint32 classMask = pPlayer->getClassMask();
+    uint32 classMask = pPlayer->GetClassMask();
 
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
@@ -2600,7 +2600,7 @@ bool ChatHandler::HandleLearnAllDefaultCommand(char* args)
 
 void ChatHandler::HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id)
 {
-    uint32 classmask = player->getClassMask();
+    uint32 classmask = player->GetClassMask();
 
     for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {
@@ -3344,10 +3344,10 @@ bool ChatHandler::HandleResetHonorCommand(char* args)
 
 static bool HandleResetStatsOrLevelHelper(Player* player)
 {
-    ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(player->getClass());
+    ChrClassesEntry const* cEntry = sChrClassesStore.LookupEntry(player->GetClass());
     if (!cEntry)
     {
-        sLog.outError("Class %u not found in DBC (Wrong DBC files?)", player->getClass());
+        sLog.outError("Class %u not found in DBC (Wrong DBC files?)", player->GetClass());
         return false;
     }
 
@@ -3360,7 +3360,7 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
     player->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
     player->SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
 
-    player->SetFactionForRace(player->getRace());
+    player->SetFactionForRace(player->GetRace());
 
     player->SetByteValue(UNIT_FIELD_BYTES_0, 3, powertype);
 
@@ -3745,7 +3745,7 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
         return false;
     }
 
-    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(player->getRace(), player->getClass());
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(player->GetRace(), player->GetClass());
     if (!info)
         return false;
 
@@ -3756,14 +3756,14 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
 
     if (!strncmp(gender_str, "male", gender_len))            // MALE
     {
-        if (player->getGender() == GENDER_MALE)
+        if (player->GetGender() == GENDER_MALE)
             return true;
 
         gender = GENDER_MALE;
     }
     else if (!strncmp(gender_str, "female", gender_len))    // FEMALE
     {
-        if (player->getGender() == GENDER_FEMALE)
+        if (player->GetGender() == GENDER_FEMALE)
             return true;
 
         gender = GENDER_FEMALE;

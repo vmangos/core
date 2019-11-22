@@ -803,7 +803,7 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
 
 void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
 {
-    uint32 classmask = player->getClassMask();
+    uint32 classmask = player->GetClassMask();
 
     for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {

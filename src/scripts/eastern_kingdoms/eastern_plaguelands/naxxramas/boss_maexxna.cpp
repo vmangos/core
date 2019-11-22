@@ -119,7 +119,7 @@ struct mob_webwrapAI : public ScriptedAI
         {
             if (Player* pVictim = m_creature->GetMap()->GetPlayer(m_victimGuid))
             {
-                if (pVictim->isAlive()) {
+                if (pVictim->IsAlive()) {
                     pVictim->RemoveAurasDueToSpell(SPELL_WEBWRAP);
                     pVictim->RemoveAurasDueToSpell(SPELL_SUMMON_WEB_WRAP);
                 }
@@ -134,7 +134,7 @@ struct mob_webwrapAI : public ScriptedAI
             return;
 
         Player* pVictim = m_creature->GetMap()->GetPlayer(m_victimGuid);
-        if (!pVictim || pVictim->isDead()) {
+        if (!pVictim || pVictim->IsDead()) {
             m_creature->Kill(m_creature, nullptr);
             // ((TemporarySummon*)m_creature)->UnSummon();
             return;
@@ -251,7 +251,7 @@ struct boss_maexxnaAI : public ScriptedAI
 
             // todo: verify that IsWithinLOSInMap does not screw anyting up. Afaik there should be nowhere
             // to los in maexxnas room, so would only stop us from selecting players outside the room, which is good.
-            if (pPlayer->isAlive() && !pPlayer->IsGameMaster()
+            if (pPlayer->IsAlive() && !pPlayer->IsGameMaster()
                 && m_creature->IsWithinLOSInMap(pPlayer)        // Only players in the room
                 && !pPlayer->HasAura(SPELL_WEBWRAP))            // Don't retarget players who are still wrapped
             {

@@ -124,7 +124,7 @@ struct boss_bug_trioAI : public ScriptedAI
 
     void TriggerDevour(Unit* pWho)
     {
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             m_uiDevourTimer = 4000;
             m_bIsEating = true;
@@ -141,21 +141,21 @@ struct boss_bug_trioAI : public ScriptedAI
         // Force evade all 3 bugs and respawn any that are already dead. We have to do this manually or linked bugs don't evade/respawn on region triggered EnterEvadeMode.
         if (Creature* pKri = m_pInstance->GetSingleCreatureFromStorage(NPC_KRI))
         {
-            if (pKri->isDead())
+            if (pKri->IsDead())
                 pKri->Respawn();
             else
                 pKri->AI()->EnterEvadeMode();
         }
         if (Creature* pYauj = m_pInstance->GetSingleCreatureFromStorage(NPC_PRINCESS_YAUJ))
         {
-            if (pYauj->isDead())
+            if (pYauj->IsDead())
                 pYauj->Respawn();
             else
                 pYauj->AI()->EnterEvadeMode();
         }
         if (Creature* pVem = m_pInstance->GetSingleCreatureFromStorage(NPC_VEM))
         {
-            if (pVem->isDead())
+            if (pVem->IsDead())
                 pVem->Respawn();
             else
                 pVem->AI()->EnterEvadeMode();
@@ -415,7 +415,7 @@ struct boss_vemAI : public boss_bug_trioAI
         // Knock Away
         if (m_uiKnockBackTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()) && !m_creature->getVictim()->hasUnitState(UNIT_STAT_STUNNED))
+            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()) && !m_creature->getVictim()->HasUnitState(UNIT_STAT_STUNNED))
             {
                 if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKBACK) == CAST_OK)
                     m_uiKnockBackTimer = urand(10000, 14000);

@@ -149,7 +149,7 @@ public:
             else // not in combat
             {
                 // if not following, start follow
-                if (!m_creature->hasUnitState(UNIT_STAT_FOLLOW))
+                if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
                     m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             }
         }
@@ -222,7 +222,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         // restore original respawn delay.
         m_creature->SetRespawnDelay(m_respawnDelay);
         // restore faction, which usually getting restored automatically, but in rare cases it still can fail.
-        m_creature->setFaction(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
         // "announce" that Tapoke Slim Jahn is back and event is ready to start.
         // distance between Mikhail and Tapoke "Slim" Jahn is about 16 yards, 20 used for "safety".
         Creature* npcMikhail = GetClosestCreatureWithEntry(m_creature, NPC_MIKHAIL, 20.0f);
@@ -239,7 +239,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         {
             SetRun();
             // change faction, which makes him attackable.
-            m_creature->setFaction(FACTION_NEUTRAL);
+            m_creature->SetFactionTemplateId(FACTION_NEUTRAL);
         }break;
         case WAYPOINT_GATE:
         {
@@ -300,7 +300,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
 
                         if (Pet *slimsFriend = m_creature->FindGuardianWithEntry(NPC_SLIMS_FRIEND))
                         {
-                            if (slimsFriend->isAlive())
+                            if (slimsFriend->IsAlive())
                                 slimsFriend->SetFacingToObject(player);
                         }
                     }
@@ -394,7 +394,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
 
             SetEscortPaused(true);
 
-            m_creature->setFaction(FACTION_FRIENDLY_TO_ALL);
+            m_creature->SetFactionTemplateId(FACTION_FRIENDLY_TO_ALL);
             m_creature->RemoveAllAuras();
             m_creature->DeleteThreatList();
             m_creature->CombatStop(true);

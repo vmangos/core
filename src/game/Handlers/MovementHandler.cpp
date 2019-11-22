@@ -271,7 +271,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
     pPlayerMover->ProcessDelayedOperations();
 
     // Si le joueur est stun, il ne pourra pas envoyer sa position -> Fix desynchro ici.
-    if (pPlayerMover->hasUnitState(UNIT_STAT_NO_FREE_MOVE))
+    if (pPlayerMover->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
     {
         pPlayerMover->m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN;
         pPlayerMover->SendHeartBeat(false);
@@ -839,7 +839,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
     {
         if (Pet* pet = _player->GetPet())
         {
-            pet->clearUnitState(UNIT_STAT_POSSESSED);
+            pet->ClearUnitState(UNIT_STAT_POSSESSED);
             pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
             // out of range pet dismissed
             if (!pet->IsWithinDistInMap(_player, pet->GetMap()->GetGridActivationDistance()))
@@ -903,7 +903,7 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 {
-    if (!_player->isAlive() || _player->isInCombat())
+    if (!_player->IsAlive() || _player->isInCombat())
         return;
 
     ObjectGuid summonerGuid;
@@ -1081,7 +1081,7 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
             // NOTE: this is actually called many times while falling
             // even after the player has been teleported away
             // TODO: discard movement packets after the player is rooted
-            if (pPlayerMover->isAlive())
+            if (pPlayerMover->IsAlive())
             {
                 if (pPlayerMover->InBattleGround())
                     pPlayerMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, pPlayerMover->GetHealth());
@@ -1089,7 +1089,7 @@ void WorldSession::HandleMoverRelocation(Unit* pMover, MovementInfo& movementInf
                     pPlayerMover->EnvironmentalDamage(DAMAGE_FALL_TO_VOID, pPlayerMover->GetHealth() / 2);
 
                 // player can be alive if GM and God
-                if (!pPlayerMover->isAlive())
+                if (!pPlayerMover->IsAlive())
                 {
                     // change the death state to CORPSE to prevent the death timer from
                     // starting in the next player update

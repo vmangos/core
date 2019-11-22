@@ -150,7 +150,7 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
                     ShadowPortalTargetGUID = 0;
                     bShadowPortalCasted = false;
 
-                    if (target->isAlive())
+                    if (target->IsAlive())
                     {
                         switch (urand(0, 5))
                         {

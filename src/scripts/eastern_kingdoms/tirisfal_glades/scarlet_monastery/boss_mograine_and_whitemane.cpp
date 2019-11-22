@@ -100,7 +100,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
 //        {
 //            if (Creature* pWhitemane = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_WHITEMANE)))
 //            {
-//                if (m_creature->isAlive() && !pWhitemane->isAlive())
+//                if (m_creature->IsAlive() && !pWhitemane->IsAlive())
 //                    pWhitemane->Respawn();
 //            }
 //        }
@@ -123,7 +123,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         {
             for (std::list<Creature*>::iterator itr = mograinesAssist.begin(); itr != mograinesAssist.end(); ++itr)
             {
-                if ((*itr)->isAlive() && (*itr)->AI())
+                if ((*itr)->IsAlive() && (*itr)->AI())
                     (*itr)->AI()->AttackStart(pWho);
             }
         }
@@ -172,7 +172,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         {
             if (Creature* pWhitemane = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_WHITEMANE)))
             {
-                if (pWhitemane->isAlive())
+                if (pWhitemane->IsAlive())
                     FakeDeath();
             }
 
@@ -185,7 +185,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         //On first death, fake death and open door, as well as initiate whitemane if exist
         if (Creature* pWhitemane = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_WHITEMANE)))
         {
-            if (pWhitemane->isAlive())
+            if (pWhitemane->IsAlive())
             {
                 m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
 
@@ -306,7 +306,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
 
         if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
         {
-            if (m_creature->isAlive() && !pMograine->isAlive())
+            if (m_creature->IsAlive() && !pMograine->IsAlive())
                 pMograine->Respawn();
         }
     }
@@ -442,7 +442,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
             {
                 if (Creature* pMograine = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_MOGRAINE)))
                 {
-                    if (pMograine->isAlive() && pMograine->GetHealthPercent() <= 75.0f)
+                    if (pMograine->IsAlive() && pMograine->GetHealthPercent() <= 75.0f)
                         pTarget = pMograine;
                 }
             }

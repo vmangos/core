@@ -194,10 +194,10 @@ struct boss_jindoAI : public ScriptedAI
                 {
                     if (Player* pTarget = m_creature->GetMap()->GetPlayer((*itr)))
                     {
-                        if ((pTarget->isAlive() && !pTarget->HasAura(24261, EFFECT_INDEX_0)) || pTarget->isDead()) // SPELL_BRAINWASH 24261
+                        if ((pTarget->IsAlive() && !pTarget->HasAura(24261, EFFECT_INDEX_0)) || pTarget->IsDead()) // SPELL_BRAINWASH 24261
                         {
                             PlayerBrainWashedGuid = *itr;
-                            if (pTarget->isDead())
+                            if (pTarget->IsDead())
                                 PlayerDead = true;
                             else
                                 AuraRemoved = true;
@@ -351,7 +351,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
         CheckTimer = 0;
 
         m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance : pas touché par les AOE
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         SetCombatMovement(false);
     }
 
@@ -363,7 +363,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
             return;
         }
 
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
 
         if (!m_creature->isInCombat())
             m_creature->SetInCombatWithZone();
@@ -371,7 +371,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
         // Deja en train de CM le joueur
         if (PlayerMCGuid)
             if (Player* pPlayer = m_creature->GetMap()->GetPlayer(PlayerMCGuid))
-                if (pPlayer->isAlive() && pPlayer->HasAura(24261, EFFECT_INDEX_0))
+                if (pPlayer->IsAlive() && pPlayer->HasAura(24261, EFFECT_INDEX_0))
                     return;
 
 
@@ -381,7 +381,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
             if (pJindo->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1))
             {
                 Unit* pTarget = pJindo ? pJindo->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : nullptr;
-                if (pTarget && pTarget->isAlive() && pTarget->IsPlayer() && !pTarget->HasAura(SPELL_HEX) && !pTarget->HasAura(SPELL_BRAINWASH))
+                if (pTarget && pTarget->IsAlive() && pTarget->IsPlayer() && !pTarget->HasAura(SPELL_HEX) && !pTarget->HasAura(SPELL_BRAINWASH))
                 {
                     if (boss_jindoAI* pJindoAI = dynamic_cast<boss_jindoAI*>(pJindo->AI()))
                     {

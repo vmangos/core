@@ -186,7 +186,7 @@ struct boss_gothikAI : public ScriptedAI
 
     void SummonAdd(uint32 entry, float x, float y, float z, float o)
     {
-        if (!m_creature->isInCombat() && !m_creature->isDead())
+        if (!m_creature->isInCombat() && !m_creature->IsDead())
             return;
 
         if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000))
@@ -346,7 +346,7 @@ struct boss_gothikAI : public ScriptedAI
             if (const Player* p = playerRef.getSource())
             {
                 // Don't count dead players, except those feigned
-                if (p->isDead() && !p->HasAura(SPELL_AURA_FEIGN_DEATH))
+                if (p->IsDead() && !p->HasAura(SPELL_AURA_FEIGN_DEATH))
                     continue;
 
                 if(m_pInstance->IsInRightSideGothArea(p))

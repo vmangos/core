@@ -1071,13 +1071,13 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
     if (!pPlayer)
         return false;
 
-    if (pPlayer->isInCombat() || pPlayer->InBattleGround() || pPlayer->IsTaxiFlying() || pPlayer->HasSpellCooldown(20939) || (pPlayer->getDeathState() == CORPSE) || (pPlayer->getLevel() < 10))
+    if (pPlayer->isInCombat() || pPlayer->InBattleGround() || pPlayer->IsTaxiFlying() || pPlayer->HasSpellCooldown(20939) || (pPlayer->GetDeathState() == CORPSE) || (pPlayer->GetLevel() < 10))
     {
         SendSysMessage(LANG_UNSTUCK_UNAVAILABLE);
         return false;
     }
 
-    if (pPlayer->isAlive())
+    if (pPlayer->IsAlive())
     {
         pPlayer->CastSpell(pPlayer, 20939, false);
         SendSysMessage(LANG_UNSTUCK_ALIVE);

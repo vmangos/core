@@ -13,7 +13,7 @@ EndScriptData */
 //18651
 //20735
 //coup de bouclier 11972
-//summoned->addUnitState(UNIT_STAT_ROOT);
+//summoned->AddUnitState(UNIT_STAT_ROOT);
 /*
 enum
 {

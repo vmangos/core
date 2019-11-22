@@ -624,7 +624,7 @@ void BattleGround::EndBattleGround(Team winner)
         if (plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
             plr->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
 
-        if (!plr->isAlive())
+        if (!plr->IsAlive())
         {
             plr->ResurrectPlayer(1.0f);
             plr->SpawnCorpseBones();
@@ -850,7 +850,7 @@ void BattleGround::RemovePlayerAtLeave(ObjectGuid guid, bool Transport, bool Sen
     if (plr && plr->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         plr->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
 
-    if (plr && !plr->isAlive())                             // resurrect on exit
+    if (plr && !plr->IsAlive())                             // resurrect on exit
     {
         plr->ResurrectPlayer(1.0f);
         plr->SpawnCorpseBones();
@@ -1601,7 +1601,7 @@ void BattleGround::HandleKillPlayer(Player *player, Player *killer)
     // - Apres la fin du buff - a ce moment la killer=nullptr
 
     // add +1 kills to group and +1 killing_blows to killer
-    if (killer && player->getFaction() != killer->getFaction())
+    if (killer && player->GetFactionTemplateId() != killer->GetFactionTemplateId())
     {
         UpdatePlayerScore(killer, SCORE_HONORABLE_KILLS, 1);
         UpdatePlayerScore(killer, SCORE_KILLING_BLOWS, 1);
@@ -1669,7 +1669,7 @@ uint32 BattleGround::GetAlivePlayersCountByTeam(Team team) const
         if (itr->second.PlayerTeam == team)
         {
             Player * pl = sObjectMgr.GetPlayer(itr->first);
-            if (pl && pl->isAlive())
+            if (pl && pl->IsAlive())
                 ++count;
         }
     }

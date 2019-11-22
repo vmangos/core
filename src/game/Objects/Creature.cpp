@@ -235,7 +235,7 @@ void Creature::RemoveFromWorld()
 
 void Creature::RemoveCorpse()
 {
-    if ((getDeathState() != CORPSE && !m_isDeadByDefault) || (getDeathState() != ALIVE && m_isDeadByDefault))
+    if ((GetDeathState() != CORPSE && !m_isDeadByDefault) || (GetDeathState() != ALIVE && m_isDeadByDefault))
         return;
 
     m_corpseDecayTimer = 0;
@@ -484,7 +484,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
 
     SelectLevel(GetCreatureInfo(), preserveHPAndPower ? GetHealthPercent() : 100.0f, preserveHPAndPower ? GetPowerPercent(POWER_MANA) : 100.0f);
 
-    setFaction(GetCreatureInfo()->faction);
+    SetFactionTemplateId(GetCreatureInfo()->faction);
 
     SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npc_flags);
 
@@ -636,7 +636,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                     SetDeathState(JUST_DIED);
                     SetHealth(0);
                     i_motionMaster.Clear();
-                    clearUnitState(UNIT_STAT_ALL_DYN_STATES);
+                    ClearUnitState(UNIT_STAT_ALL_DYN_STATES);
                     LoadCreatureAddon(true);
                 }
                 else
@@ -756,7 +756,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
             // creature can be dead after Unit::Update call
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
-            if (!isAlive())
+            if (!IsAlive())
                 break;
 
             float hpPercent = GetHealthPercent();
@@ -829,7 +829,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
             // creature can be dead after UpdateAI call
             // CORPSE/DEAD state will processed at next tick (in other case death timer will be updated unexpectedly)
-            if (!isAlive())
+            if (!IsAlive())
                 break;
 
             RegenerateAll(update_diff, IsEvadeBecauseTargetNotReachable());
@@ -943,7 +943,7 @@ void Creature::RegenerateHealth()
 
 void Creature::DoFlee()
 {
-    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     float hpPercent = GetHealthPercent();
@@ -961,7 +961,7 @@ void Creature::DoFlee()
 
 void Creature::DoFleeToGetAssistance()
 {
-    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
@@ -998,7 +998,7 @@ float Creature::GetFleeingSpeed() const
 
 void Creature::MoveAwayFromTarget(Unit* pTarget, float distance)
 {
-    if (hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+    if (HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     GetMotionMaster()->MoveDistance(pTarget, distance);
@@ -1080,7 +1080,7 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
 
 bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
 {
-    if (!isTrainer())
+    if (!IsTrainer())
         return false;
 
     TrainerSpellData const* cSpells = GetTrainerSpells();
@@ -1097,7 +1097,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
     switch (GetCreatureInfo()->trainer_type)
     {
         case TRAINER_TYPE_CLASS:
-            if (pPlayer->getClass() != GetCreatureInfo()->trainer_class)
+            if (pPlayer->GetClass() != GetCreatureInfo()->trainer_class)
             {
                 if (msg)
                 {
@@ -1137,7 +1137,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
             }
             break;
         case TRAINER_TYPE_PETS:
-            if (pPlayer->getClass() != CLASS_HUNTER)
+            if (pPlayer->GetClass() != CLASS_HUNTER)
             {
                 if (msg)
                 {
@@ -1148,7 +1148,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
             }
             break;
         case TRAINER_TYPE_MOUNTS:
-            if (GetCreatureInfo()->trainer_race && pPlayer->getRace() != GetCreatureInfo()->trainer_race)
+            if (GetCreatureInfo()->trainer_race && pPlayer->GetRace() != GetCreatureInfo()->trainer_race)
             {
                 // Allowed to train if exalted
                 if (FactionTemplateEntry const* faction_template = getFactionTemplateEntry())
@@ -1210,7 +1210,7 @@ bool Creature::IsTrainerOf(Player* pPlayer, bool msg) const
 
 bool Creature::CanInteractWithBattleMaster(Player* pPlayer, bool msg) const
 {
-    if (!isBattleMaster())
+    if (!IsBattleMaster())
         return false;
 
     BattleGroundTypeId bgTypeId = sBattleGroundMgr.GetBattleMasterBG(GetEntry());
@@ -1244,9 +1244,9 @@ bool Creature::CanInteractWithBattleMaster(Player* pPlayer, bool msg) const
 
 bool Creature::CanTrainAndResetTalentsOf(Player* pPlayer) const
 {
-    return pPlayer->getLevel() >= 10
+    return pPlayer->GetLevel() >= 10
            && GetCreatureInfo()->trainer_type == TRAINER_TYPE_CLASS
-           && pPlayer->getClass() == GetCreatureInfo()->trainer_class;
+           && pPlayer->GetClass() == GetCreatureInfo()->trainer_class;
 }
 
 /**
@@ -1673,7 +1673,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     m_defaultMovementType = MovementGeneratorType(data->movementType);
 
     // Creature Linking, Initial load is handled like respawn
-    if (m_isCreatureLinkingTrigger && isAlive())
+    if (m_isCreatureLinkingTrigger && IsAlive())
         GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
 
     if (data->spawnFlags & SPAWN_FLAG_NOT_VISIBLE)
@@ -1801,7 +1801,7 @@ float Creature::GetAttackDistance(Unit const* pl) const
     // SPELL_AURA_MOD_DETECT_RANGE: Par exemple [2908 - Apaiser les animaux]. Affecte uniquement si niveau < 70 par exemple (rang 3).
     AuraList const& nModDetectRange = GetAurasByType(SPELL_AURA_MOD_DETECT_RANGE);
     for (AuraList::const_iterator i = nModDetectRange.begin(); i != nModDetectRange.end(); ++i)
-        if ((*i)->GetSpellProto()->MaxTargetLevel >= getLevel())
+        if ((*i)->GetSpellProto()->MaxTargetLevel >= GetLevel())
             finalDistance += (*i)->GetModifier()->m_amount;
 
     // detected range auras
@@ -1866,7 +1866,7 @@ void Creature::SetDeathState(DeathState s)
 
     if (s == JUST_ALIVED)
     {
-        clearUnitState(UNIT_STAT_ALL_STATE);
+        ClearUnitState(UNIT_STAT_ALL_STATE);
 
         CreatureInfo const *cinfo = GetCreatureInfo();
 
@@ -1898,7 +1898,7 @@ void Creature::SetDeathState(DeathState s)
 bool Creature::FallGround()
 {
     // Only if state is JUST_DIED. CORPSE_FALLING is set below and promoted to CORPSE later
-    if (getDeathState() != JUST_DIED)
+    if (GetDeathState() != JUST_DIED)
         return false;
 
     // use larger distance for vmap height search than in most other cases
@@ -1963,7 +1963,7 @@ void Creature::ForcedDespawn(uint32 timeMSToDespawn)
         return;
     }
 
-    if (isAlive())
+    if (IsAlive())
         SetDeathState(JUST_DIED);
 
     RemoveCorpse();
@@ -2070,11 +2070,11 @@ bool Creature::IsVisibleInGridForPlayer(Player const* pl) const
         return false;
 
     // Live player (or with not release body see live creatures or death creatures with corpse disappearing time > 0
-    if (pl->isAlive() || pl->GetDeathTimer() > 0)
-        return (isAlive() || m_corpseDecayTimer > 0 || (m_isDeadByDefault && m_deathState == CORPSE));
+    if (pl->IsAlive() || pl->GetDeathTimer() > 0)
+        return (IsAlive() || m_corpseDecayTimer > 0 || (m_isDeadByDefault && m_deathState == CORPSE));
 
     // Dead player see live creatures near own corpse
-    if (isAlive())
+    if (IsAlive())
     {
         Corpse *corpse = pl->GetCorpse();
         if (corpse)
@@ -2144,7 +2144,7 @@ void Creature::CallForHelp(float fRadius)
 
 bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const
 {
-    if (!isAlive())
+    if (!IsAlive())
         return false;
 
     if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_ASSIST)
@@ -2174,7 +2174,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
     // only from same creature faction
     if (checkfaction)
     {
-        if (getFaction() != u->getFaction())
+        if (GetFactionTemplateId() != u->GetFactionTemplateId())
             return false;
     }
     else
@@ -2192,7 +2192,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
 
 bool Creature::CanInitiateAttack()
 {
-    if (hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED))
+    if (HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED))
         return false;
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
@@ -2212,7 +2212,7 @@ class DynamicRespawnRatesChecker
 public:
     DynamicRespawnRatesChecker(Creature* crea) : _count(0), _hasNearbyEscort(false)
     {
-        _myLevel = crea->getLevel();
+        _myLevel = crea->GetLevel();
         _maxLevelDiff = sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_LEVELDIFF);
     }
     void operator()(Player* player)
@@ -2223,7 +2223,7 @@ public:
             return;
         }
 
-        if (uint32(abs(int32(player->getLevel()) - (int32)_myLevel)) > _maxLevelDiff)
+        if (uint32(abs(int32(player->GetLevel()) - (int32)_myLevel)) > _maxLevelDiff)
             return;
 
         ++_count;
@@ -2250,7 +2250,7 @@ void Creature::ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data)
         if (!data || !(data->spawnFlags & SPAWN_FLAG_FORCE_DYNAMIC_ELITE))
             return;
 
-    if (getLevel() > sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_LEVEL_BELOW))
+    if (GetLevel() > sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_LEVEL_BELOW))
         return;
     float checkRange = sWorld.getConfig(CONFIG_FLOAT_DYN_RESPAWN_CHECK_RANGE);
     if (checkRange <= 0)
@@ -2475,7 +2475,7 @@ void Creature::SetInCombatWithZone(bool initialPulse)
             if (!initialPulse && pPlayer->isInCombat())
                 continue;
 
-            if (pPlayer->isAlive() && !IsFriendlyTo(pPlayer))
+            if (pPlayer->IsAlive() && !IsFriendlyTo(pPlayer))
             {
                 pPlayer->SetInCombatWith(this);
                 AddThreat(pPlayer);
@@ -2493,13 +2493,13 @@ bool Creature::MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* 
     if (selectFlags & SELECT_FLAG_NO_TOTEM && pTarget->ToCreature() && pTarget->ToCreature()->IsTotem())
         return false;
 
-    if (selectFlags & SELECT_FLAG_POWER_MANA && pTarget->getPowerType() != POWER_MANA)
+    if (selectFlags & SELECT_FLAG_POWER_MANA && pTarget->GetPowerType() != POWER_MANA)
         return false;
 
-    if (selectFlags & SELECT_FLAG_POWER_RAGE && pTarget->getPowerType() != POWER_RAGE)
+    if (selectFlags & SELECT_FLAG_POWER_RAGE && pTarget->GetPowerType() != POWER_RAGE)
         return false;
 
-    if (selectFlags & SELECT_FLAG_POWER_ENERGY && pTarget->getPowerType() != POWER_ENERGY)
+    if (selectFlags & SELECT_FLAG_POWER_ENERGY && pTarget->GetPowerType() != POWER_ENERGY)
         return false;
 
     if (selectFlags & SELECT_FLAG_IN_MELEE_RANGE && !IsWithinMeleeRange(pTarget))
@@ -3031,7 +3031,7 @@ const char* Creature::GetNameForLocaleIdx(int32 loc_idx) const
 void Creature::SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags)
 {
     m_temporaryFactionFlags = tempFactionFlags;
-    setFaction(factionId);
+    SetFactionTemplateId(factionId);
 }
 
 void Creature::ClearTemporaryFaction()
@@ -3043,7 +3043,7 @@ void Creature::ClearTemporaryFaction()
         return;
 
     m_temporaryFactionFlags = TEMPFACTION_NONE;
-    setFaction(GetCreatureInfo()->faction);
+    SetFactionTemplateId(GetCreatureInfo()->faction);
 }
 
 void Creature::SendAreaSpiritHealerQueryOpcode(Player *pl)
@@ -3068,7 +3068,7 @@ void Creature::DisappearAndDie()
     if (IsCreature() && ToCreature()->IsPet())
         ((Pet*)this)->Unsummon(PET_SAVE_AS_DELETED);
     DestroyForNearbyPlayers();
-    if (isAlive())
+    if (IsAlive())
         SetDeathState(JUST_DIED);
     RemoveCorpse();
 }
@@ -3123,7 +3123,7 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
     if (!pWho)
         return;
 
-    if (i_AI && !hasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
+    if (i_AI && !HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
         i_AI->AttackedBy(pWho);
 
     if (_creatureGroup)
@@ -3304,16 +3304,6 @@ bool Creature::CastSpellOnNearestVictim(uint32 spellId, float min, float max, bo
     return false;
 }
 
-bool Creature::CastSpellOnHostileCaster(uint32 spellId, bool triggered)
-{
-    if (Unit* pTarget = GetHostileCaster())
-    {
-        CastSpell(pTarget, spellId, triggered);
-        return true;
-    }
-    return false;
-}
-
 bool Creature::CastSpellOnHostileCasterInRange(uint32 spellId, float min, float max, bool triggered)
 {
     if (Unit* pTarget = GetHostileCasterInRange(min, max))
@@ -3324,15 +3314,6 @@ bool Creature::CastSpellOnHostileCasterInRange(uint32 spellId, float min, float 
     return false;
 }
 
-bool Creature::CastSpellOnAllInRange(uint32 spellId, float min, float max, bool triggered)
-{
-    if (Unit* pTarget = GetHostileCasterInRange(min, max))
-    {
-        CastSpell(pTarget, spellId, triggered);
-        return true;
-    }
-    return false;
-}
 void Creature::AddThreatsOf(Creature const* pOther)
 {
     ThreatList const& tList = pOther->getThreatManager().getThreatList();
@@ -3340,7 +3321,7 @@ void Creature::AddThreatsOf(Creature const* pOther)
     {
         Unit* pTarget = GetMap()->GetUnit((*i)->getUnitGuid());
 
-        if (pTarget && pTarget->isAlive() && !IsFriendlyTo(pTarget))
+        if (pTarget && pTarget->IsAlive() && !IsFriendlyTo(pTarget))
         {
             pTarget->SetInCombatWith(this);
             AddThreat(pTarget);
@@ -3450,14 +3431,14 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         return SPELL_FAILED_TOO_CLOSE;
 
     // This spell should only be cast when we cannot get into melee range.
-    if ((uiCastFlags & CF_TARGET_UNREACHABLE) && (CanReachWithMeleeAutoAttack(pTarget) || (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE) || !(hasUnitState(UNIT_STAT_ROOT) || !GetMotionMaster()->GetCurrent()->IsReachable())))
+    if ((uiCastFlags & CF_TARGET_UNREACHABLE) && (CanReachWithMeleeAutoAttack(pTarget) || (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE) || !(HasUnitState(UNIT_STAT_ROOT) || !GetMotionMaster()->GetCurrent()->IsReachable())))
         return SPELL_FAILED_MOVING;
 
     // Custom checks
     if (!(uiCastFlags & CF_FORCE_CAST))
     {
         // Motion Master is not updated when this state is active.
-        if (!hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+        if (!HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
         {
             // Can't cast while fleeing.
             switch (GetMotionMaster()->GetCurrentMovementGeneratorType())
@@ -3475,7 +3456,7 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         if (!pSpellInfo->IsAreaOfEffectSpell())
         {
             // If the spell requires the target having a specific power type.
-            if (!pSpellInfo->IsTargetPowerTypeValid(pTarget->getPowerType()))
+            if (!pSpellInfo->IsTargetPowerTypeValid(pTarget->GetPowerType()))
                 return SPELL_FAILED_UNKNOWN;
 
             // No point in casting if target is immune.
@@ -3535,7 +3516,7 @@ bool Creature::_IsTargetAcceptable(Unit const *target) const
     // if the target cannot be attacked, the target is not acceptable
     if (IsFriendlyTo(target)
             || !target->isAttackableByAOE()
-            || target->hasUnitState(UNIT_STAT_DIED))
+            || target->HasUnitState(UNIT_STAT_DIED))
         return false;
 
     Unit *myVictim = getAttackerForHelper();

@@ -118,7 +118,7 @@ VisibleNotifier::Notify()
     // for every new visible unit send attack stance if needed
     for (Object const* obj : i_visibleNow)
         if (Unit const* unit = obj->ToUnit())
-            if (unit->hasUnitState(UNIT_STAT_MELEE_ATTACKING))
+            if (unit->HasUnitState(UNIT_STAT_MELEE_ATTACKING))
                 if (Unit const* victim = unit->getVictim())
                 {
                     WorldPacket data(SMSG_ATTACKSTART, 8 + 8);

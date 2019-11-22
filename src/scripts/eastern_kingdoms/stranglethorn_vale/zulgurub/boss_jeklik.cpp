@@ -102,7 +102,7 @@ struct boss_jeklikAI : public ScriptedAI
         PhaseTwo       = false;
         skillStarted   = false;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_JEKLIK, FAIL);
 
         m_creature->SetObjectScale(1.5f);
@@ -116,7 +116,7 @@ struct boss_jeklikAI : public ScriptedAI
 
     void Aggro(Unit *who) override
     {
-        m_creature->addUnitState(UNIT_STAT_IGNORE_PATHFINDING);
+        m_creature->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING);
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->AddAura(SPELL_BAT_FORM);
         m_creature->SetFly(true);

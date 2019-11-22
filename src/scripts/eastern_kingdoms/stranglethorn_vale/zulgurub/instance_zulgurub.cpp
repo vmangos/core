@@ -51,7 +51,7 @@ void instance_zulgurub::LowerHakkarHitPoints()
 {
     if (Creature* pHakkar = instance->GetCreature(m_uiHakkarGUID))
     {
-        if (pHakkar->isAlive())
+        if (pHakkar->IsAlive())
         {
             pHakkar->SetMaxHealth(pHakkar->GetMaxHealth() - 50000);
             pHakkar->SetHealth(pHakkar->GetHealth() - 50000);
@@ -155,7 +155,7 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
                 for (std::list<uint64>::const_iterator itr = m_lMarliTrashGUIDList.begin(); itr != m_lMarliTrashGUIDList.end(); itr++)
                 {
                     if (Creature* MarliTrash = instance->GetCreature(*itr))
-                        if (MarliTrash->isAlive() && !MarliTrash->isInCombat())
+                        if (MarliTrash->IsAlive() && !MarliTrash->isInCombat())
                             if (MarliTrash->GetMapId() == 309 && MarliTrash->GetZoneId() == 1977 && MarliTrash->GetAreaId() == 3379)
                                 MarliTrash->AI()->AttackStart(pVictim);
                 }
@@ -344,13 +344,13 @@ void instance_zulgurub::SpawnRandomBoss()
 Unit* instance_zulgurub::Thekal_GetUnitThatCanRez()
 {
     if (Unit *pLorKhan = instance->GetUnit(GetData64(DATA_LORKHAN)))
-        if (pLorKhan->isAlive())
+        if (pLorKhan->IsAlive())
             return pLorKhan;
     if (Unit *pZath = instance->GetUnit(GetData64(DATA_ZATH)))
-        if (pZath->isAlive())
+        if (pZath->IsAlive())
             return pZath;
     if (Unit *pThekal = instance->GetUnit(GetData64(DATA_THEKAL)))
-        if (pThekal->isAlive())
+        if (pThekal->IsAlive())
             return pThekal;
     return nullptr;
 }

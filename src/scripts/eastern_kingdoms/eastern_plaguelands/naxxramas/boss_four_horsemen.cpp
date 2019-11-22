@@ -163,7 +163,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
             if (m_creature->GetDistanceToCenter(pPlayer) > 74.0f)
                 continue;
             bool alert;
-            if (!pPlayer->isVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
+            if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
                 return;
             if (m_creature->CanInitiateAttack() && pPlayer->isTargetableForAttack() && m_creature->IsHostileTo(pPlayer))
             {
@@ -231,7 +231,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
         if (m_bIsSpirit)
         {
-            m_creature->addUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STAT_ROOT);
             m_creature->SetInCombatWithZone();
         }
         else

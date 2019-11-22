@@ -317,7 +317,7 @@ void AdvancedPlayerBotAI::MageAI(const uint32 delta)
     if (!me->HasSpellCooldown(SPELL_FROST_NOVA) && me->GetPower(POWER_MANA) > 50)
         if (nearTarget)
             me->CastSpell(me, SPELL_FROST_NOVA, false);
-    if (nearTarget && target->hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (nearTarget && target->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
     {
         // already runing
         if (!me->movespline->Finalized())
@@ -365,7 +365,7 @@ void AdvancedPlayerBotAI::GatherConditions()
 {
     SeenCreature = nullptr;
 
-    Conditions.IsDead = me->isDead();
+    Conditions.IsDead = me->IsDead();
     if (Conditions.IsDead) 
     {
         Conditions.IsResurrectRequested = me->IsRessurectRequested();

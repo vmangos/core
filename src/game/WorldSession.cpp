@@ -697,7 +697,7 @@ void WorldSession::LogoutPlayer(bool Save)
             Save = false;
             sLog.outInfo("[CRASH] Joueur %s pas dans le monde a la deco.", _player->GetName());
         }
-        else if (ShouldBeBanned(_player->getLevel()))
+        else if (ShouldBeBanned(_player->GetLevel()))
             doBanPlayer = true;
 
         sBattleGroundMgr.PlayerLoggedOut(_player);

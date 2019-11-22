@@ -25,7 +25,7 @@ void CinematicStuff::AddStuff(Player* player, uint32 itemID)
 void CinematicStuff::AddSpells(Player* player)
 {
     uint32 familyName = 0;
-    switch (player->getClass())
+    switch (player->GetClass())
     {
         case CLASS_MAGE:
             familyName = SPELLFAMILY_MAGE;
@@ -58,7 +58,7 @@ void CinematicStuff::AddSpells(Player* player)
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
     {
         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
-        if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->getLevel())
+        if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->GetLevel())
             player->LearnSpell(id, false);
     }
 }
@@ -83,7 +83,7 @@ void CinematicStuff::Mount(Player* p, uint32 mountItem)
 
 void CinematicStuff::StuffLevel60(Player* player)
 {
-    switch (player->getClass())
+    switch (player->GetClass())
     {
         case CLASS_WARLOCK:
             AddStuff(player, 16931);
@@ -149,7 +149,7 @@ void CinematicStuff::StuffLevel60(Player* player)
 void CinematicStuff::AutoMountPlayer(Player* player, bool mount60 /*= false*/)
 {
     uint32 mount = 0;
-    switch (player->getRace())
+    switch (player->GetRace())
     {
         case RACE_HUMAN:
             mount = 18776;
@@ -213,7 +213,7 @@ void CinematicStuff::JumpPlayer(Player* player)
 
 void CinematicStuff::SearchAndDestroy(Player* player)
 {
-    if (!player->isAlive()) return;
+    if (!player->IsAlive()) return;
 
     Unit* target = player->getVictim();
     if (target == nullptr)
@@ -232,7 +232,7 @@ void CinematicStuff::SearchAndDestroy(Player* player)
         }
     }
 
-    if (target != nullptr && target->isAlive())
+    if (target != nullptr && target->IsAlive())
     {
         player->GetMotionMaster()->MoveChase(target);
         player->SetFacingToObject(target);

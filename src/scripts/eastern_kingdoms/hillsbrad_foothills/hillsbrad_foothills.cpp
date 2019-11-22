@@ -82,7 +82,7 @@ struct go_dusty_rugAI: public GameObjectAI
                             me->GetCreatureListWithEntryInGrid(lCrea, NPC_CAPTURED_FARMER, 30.0f);
                             for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
                             {
-                                if ((*it)->isAlive())
+                                if ((*it)->IsAlive())
                                 {
                                     Farmers.push_back((*it)->GetGUID());
                                     pKeg->GetContactPoint((*it), fX, fY, fZ, CONTACT_DISTANCE);

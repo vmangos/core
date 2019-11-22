@@ -48,11 +48,11 @@ void PInfoHandler::HandlePInfoCommand(WorldSession *session, Player *target, Obj
         data->accId = target->GetSession()->GetAccountId();
         data->money = target->GetMoney();
         data->total_player_time = target->GetTotalPlayedTime();
-        data->level = target->getLevel();
+        data->level = target->GetLevel();
         data->latency = target->GetSession()->GetLatency();
         data->loc = target->GetSession()->GetSessionDbcLocale();
-        data->race = target->getRace();
-        data->class_ = target->getClass();
+        data->race = target->GetRace();
+        data->class_ = target->GetClass();
 
         data->target_guid = target->GetObjectGuid();
         data->online = true;

@@ -84,7 +84,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                     break;*/
         }
         if ((pCreature->GetCreatureType() != CREATURE_TYPE_CRITTER) &&
-            pCreature->getFaction() != 35 && // the 2 druids
+            pCreature->GetFactionTemplateId() != 35 && // the 2 druids
             pCreature->GetEntry() != 3653) // Kresh is cool
             vNightmareMonsters.push_back(pCreature->GetGUID());
     }
@@ -120,16 +120,16 @@ struct instance_wailing_caverns : public ScriptedInstance
                 if (uiData == DONE && !Assaulted)
                 {
                     if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->isAlive())
+                        if (pSerpentis->IsAlive())
                             DoScriptText(SERPENTIS_YELL, pSerpentis);
                     Assaulted = true;
                 }
                 if (uiData == SPECIAL)
                 {
                     if (Creature* pAna = instance->GetCreature(m_uiAnacondraGUID))
-                        if (pAna->isAlive())
+                        if (pAna->IsAlive())
                             if (Creature* pDruid = GetClosestCreatureWithEntry(pAna, 3840, INTERACTION_DISTANCE))
-                                if (pDruid->isAlive())
+                                if (pDruid->IsAlive())
                                     pDruid->DisappearAndDie();
                 }
                 break;
@@ -138,7 +138,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                 if (uiData == DONE && !Assaulted)
                 {
                     if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->isAlive())
+                        if (pSerpentis->IsAlive())
                             DoScriptText(SERPENTIS_YELL, pSerpentis);
                     Assaulted = true;
                 }
@@ -148,7 +148,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                 if (uiData == DONE && !Assaulted)
                 {
                     if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->isAlive())
+                        if (pSerpentis->IsAlive())
                             DoScriptText(SERPENTIS_YELL, pSerpentis);
                     Assaulted = true;
                 }
@@ -162,7 +162,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                     {
                         if (Creature* pCreature = instance->GetCreature(*it))
                         {
-                            if (pCreature->isAlive() || pCreature->loot.empty())
+                            if (pCreature->IsAlive() || pCreature->loot.empty())
                                 pCreature->ForcedDespawn();
                         }
                         it = vNightmareMonsters.erase(it);

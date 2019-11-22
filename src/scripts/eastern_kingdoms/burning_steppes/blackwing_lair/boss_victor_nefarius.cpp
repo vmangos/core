@@ -191,7 +191,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         scepterRun = false;
         watchScepterRun = false;
 
-        m_creature->setFaction(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
 
         // set gossip flag to begin the event
         m_creature->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR);
@@ -259,7 +259,7 @@ struct boss_victor_nefariusAI : ScriptedAI
 
     void JustReachedHome() override
     {
-        m_creature->setFaction(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
         if (m_pInstance)
@@ -336,11 +336,11 @@ struct boss_victor_nefariusAI : ScriptedAI
                         break;
                     case 3:
                         DoCastSpellIfCan(m_creature, SPELL_NEFARIUS_BARRIER);
-                        m_creature->setFaction(FACTION_BLACK_DRAGON);
+                        m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
 
                         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-                            if (i->getSource() && i->getSource()->isAlive())
+                            if (i->getSource() && i->getSource()->IsAlive())
                                 m_creature->AddThreat(i->getSource(), 10000.0f);
 
                         DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED); // root

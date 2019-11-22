@@ -179,13 +179,13 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         if (entry == NPC_BLAUMEUX || entry == NPC_MOGRAINE || entry == NPC_ZELIEK || entry == NPC_THANE)
         {
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_BLAUMEUX))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_MOGRAINE))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_ZELIEK))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_THANE))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
         }
         else
         {
@@ -413,7 +413,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
     // 4hm
     if (pCreature->GetEntry() >= 16062 && pCreature->GetEntry() <= 16065)
     {
-        if (m_auiEncounter[TYPE_FOUR_HORSEMEN] != DONE && pCreature->isDead())
+        if (m_auiEncounter[TYPE_FOUR_HORSEMEN] != DONE && pCreature->IsDead())
         {
             pCreature->Respawn();
         }
@@ -871,7 +871,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 for (uint32 i = NPC_MOGRAINE; i <= NPC_BLAUMEUX; i++)
                 {
                     if (Creature* p = GetSingleCreatureFromStorage(i))
-                        if (p->isDead())
+                        if (p->IsDead())
                             p->Respawn();
                 }
 
@@ -1393,7 +1393,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
             m_faerlinaHaveGreeted = true;
             if (Creature* pFaerlina = GetSingleCreatureFromStorage(NPC_FAERLINA))
             {
-                if(pFaerlina->isAlive())
+                if(pFaerlina->IsAlive())
                     DoScriptText(SAY_FAERLINA_GREET, pFaerlina);
             }
         }
@@ -1404,7 +1404,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
             m_thaddiusHaveGreeted = true;
             if (Creature* pThaddius = GetSingleCreatureFromStorage(NPC_THADDIUS))
             {
-                if (pThaddius->isAlive())
+                if (pThaddius->IsAlive())
                     DoScriptText(SAY_THADDIUS_GREET, pThaddius);
             }
         }
@@ -1425,7 +1425,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
 
 bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-    if (pPlayer->IsGameMaster() || !pPlayer->isAlive())
+    if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
         return false;
 
     if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
@@ -1777,7 +1777,7 @@ CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
 
 bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->getStandState() != UNIT_STAND_STATE_SIT)
+    if (pCreature->GetStandState() != UNIT_STAND_STATE_SIT)
         pCreature->SetStandState(UNIT_STAND_STATE_SIT);
     return false;
 }

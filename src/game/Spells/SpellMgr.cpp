@@ -3131,14 +3131,14 @@ bool SpellArea::IsFitToRequirements(Player const* player, uint32 newZone, uint32
     if (gender != GENDER_NONE)
     {
         // not in expected gender
-        if (!player || gender != player->getGender())
+        if (!player || gender != player->GetGender())
             return false;
     }
 
     if (raceMask)
     {
         // not in expected race
-        if (!player || !(raceMask & player->getRaceMask()))
+        if (!player || !(raceMask & player->GetRaceMask()))
             return false;
     }
 

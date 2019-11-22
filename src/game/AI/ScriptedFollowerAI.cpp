@@ -55,7 +55,7 @@ bool FollowerAI::AssistPlayerInCombat(Unit* pWho)
     if (m_creature->CanAssistPlayers())
         return false;
 
-    if (m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED))
+    if (m_creature->HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_DIED))
         return false;
 
     //not a player
@@ -154,8 +154,8 @@ void FollowerAI::JustRespawned()
     if (!IsCombatMovementEnabled())
         SetCombatMovement(true);
 
-    if (m_creature->getFaction() != m_creature->GetCreatureInfo()->faction)
-        m_creature->setFaction(m_creature->GetCreatureInfo()->faction);
+    if (m_creature->GetFactionTemplateId() != m_creature->GetCreatureInfo()->faction)
+        m_creature->SetFactionTemplateId(m_creature->GetCreatureInfo()->faction);
 
     Reset();
 }
@@ -337,7 +337,7 @@ void FollowerAI::StartFollow(Player* pLeader, uint32 uiFactionForFollower, const
     m_uiFollowDistance = followDist;
 
     if (uiFactionForFollower)
-        m_creature->setFaction(uiFactionForFollower);
+        m_creature->SetFactionTemplateId(uiFactionForFollower);
 
     m_pQuestForFollow = pQuest;
 
@@ -361,7 +361,7 @@ Player* FollowerAI::GetLeaderForFollower()
 {
     if (Player* pLeader = m_creature->GetMap()->GetPlayer(m_uiLeaderGUID))
     {
-        if (pLeader->isAlive())
+        if (pLeader->IsAlive())
             return pLeader;
 
         if (Group* pGroup = pLeader->GetGroup())
@@ -370,7 +370,7 @@ Player* FollowerAI::GetLeaderForFollower()
             {
                 Player* pMember = pRef->getSource();
 
-                if (pMember && pMember->isAlive() && m_creature->IsWithinDistInMap(pMember, MAX_PLAYER_DISTANCE))
+                if (pMember && pMember->IsAlive() && m_creature->IsWithinDistInMap(pMember, MAX_PLAYER_DISTANCE))
                 {
                     sLog.outDebug("FollowerAI GetLeader changed and returned new leader.");
                     m_uiLeaderGUID = pMember->GetGUID();

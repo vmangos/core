@@ -127,13 +127,13 @@ struct boss_ayamissAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(GardiensListe, m_creature, NPC_HIVEZARA_HORNET, 300.0f);
         for (std::list<Creature*>::iterator itr = GardiensListe.begin(); itr != GardiensListe.end(); ++itr)
         {
-            if ((*itr)->isAlive())
+            if ((*itr)->IsAlive())
                 (*itr)->AddObjectToRemoveList();
         }
         GetCreatureListWithEntryInGrid(GardiensListe, m_creature, NPC_HIVEZARA_SWARMER, 300.0f);
         for (std::list<Creature*>::iterator itr = GardiensListe.begin(); itr != GardiensListe.end(); ++itr)
         {
-            if ((*itr)->isAlive())
+            if ((*itr)->IsAlive())
                 (*itr)->AddObjectToRemoveList();
         }
 
@@ -200,7 +200,7 @@ struct boss_ayamissAI : public ScriptedAI
             SetCombatMovement(true);
             m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
             m_creature->AttackerStateUpdate(m_creature->getVictim(), BASE_ATTACK, true);
-            m_creature->addUnitState(UNIT_STAT_IGNORE_PATHFINDING); //pathfinding desactivation
+            m_creature->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING); //pathfinding desactivation
             m_bIsInPhaseTwo = true;
 
             /** Aggro list reset */
@@ -235,7 +235,7 @@ struct boss_ayamissAI : public ScriptedAI
             std::list<Creature*> SwarmerList;
             GetCreatureListWithEntryInGrid(SwarmerList, m_creature, NPC_HIVEZARA_SWARMER, 300.0f);
             for (std::list<Creature*>::iterator itr = SwarmerList.begin(); itr != SwarmerList.end(); ++itr)
-                (*itr)->addUnitState(UNIT_STAT_IGNORE_PATHFINDING);
+                (*itr)->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING);
 
             m_uiSummonSwarmer_Timer = 60000;
         }
@@ -268,7 +268,7 @@ struct boss_ayamissAI : public ScriptedAI
         {
             if (!m_bPhaseTwoBeforeTeleport)
                 if (Player* player = m_creature->GetMap()->GetPlayer(m_uiSacrificeGuid))
-                    if (player->isAlive())
+                    if (player->IsAlive())
                         m_creature->getThreatManager().addThreatDirectly(player, m_fSacrificeAggro);
             m_uiSacrificeGuid.Clear();
             m_fSacrificeAggro = 0;

@@ -645,7 +645,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
 
                         if (appendValue & UNIT_NPC_FLAG_STABLEMASTER)
                         {
-                            if (target->getClass() != CLASS_HUNTER)
+                            if (target->GetClass() != CLASS_HUNTER)
                                 appendValue &= ~UNIT_NPC_FLAG_STABLEMASTER;
                         }
 
@@ -751,7 +751,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     }
                     uint32 faction = m_uint32Values[index];
                     if (forceFriendly)
-                        faction = target->getFaction();
+                        faction = target->GetFactionTemplateId();
 
                     *data << uint32(faction);
                 }
@@ -2225,7 +2225,7 @@ public:
 
         float x, y, z;
 
-        if (!c->isAlive() || c->hasUnitState(UNIT_STAT_NOT_MOVE) ||
+        if (!c->IsAlive() || c->HasUnitState(UNIT_STAT_NOT_MOVE) ||
                 !c->GetMotionMaster()->GetDestination(x, y, z))
         {
             x = c->GetPositionX();
@@ -2836,7 +2836,7 @@ namespace MaNGOS
             : i_source(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target), i_vaList(vaList) {}
         void operator()(WorldPacket& data, int32 loc_idx)
         {
-            char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_source.getGender()) : sObjectMgr.GetMangosString(i_textId, loc_idx);
+            char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_source.GetGender()) : sObjectMgr.GetMangosString(i_textId, loc_idx);
             char textFinal[2048];
             va_list argsCpy;
             va_copy(argsCpy, *i_vaList);
@@ -2865,7 +2865,7 @@ namespace MaNGOS
             : i_source(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target) {}
         void operator()(WorldPacket& data, int32 loc_idx) const
         {
-            char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_source.getGender()) : sObjectMgr.GetMangosString(i_textId, loc_idx);
+            char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx, i_source.GetGender()) : sObjectMgr.GetMangosString(i_textId, loc_idx);
 
             ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_source.GetObjectGuid(), i_source.GetNameForLocaleIdx(loc_idx),
                 i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
@@ -3019,7 +3019,7 @@ void WorldObject::MonsterWhisper(int32 textId, Unit const* target, bool IsBossWh
         return;
 
     uint32 loc_idx = ((Player*)target)->GetSession()->GetSessionDbLocaleIndex();
-    char const* text = textId > 0 ? sObjectMgr.GetBroadcastText(textId, loc_idx, getGender()) : sObjectMgr.GetMangosString(textId, loc_idx);
+    char const* text = textId > 0 ? sObjectMgr.GetBroadcastText(textId, loc_idx, GetGender()) : sObjectMgr.GetMangosString(textId, loc_idx);
 
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL, CHAT_TAG_NONE, GetObjectGuid(), GetName(),
@@ -3102,7 +3102,7 @@ Unit* WorldObject::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectInd
         {
             if (Unit* magnet = (*itr)->GetCaster())
             {
-                if (magnet->isAlive() && magnet->IsWithinLOSInMap(this) && spell->CheckTarget(magnet, eff))
+                if (magnet->IsAlive() && magnet->IsWithinLOSInMap(this) && spell->CheckTarget(magnet, eff))
                 {
                     if (SpellAuraHolder *holder = (*itr)->GetHolder())
                         if (holder->DropAuraCharge())
@@ -3121,14 +3121,14 @@ Unit* WorldObject::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectInd
 
 FactionTemplateEntry const* WorldObject::getFactionTemplateEntry() const
 {
-    FactionTemplateEntry const* entry = sObjectMgr.GetFactionTemplateEntry(getFaction());
+    FactionTemplateEntry const* entry = sObjectMgr.GetFactionTemplateEntry(GetFactionTemplateId());
     if (!entry)
     {
         static ObjectGuid guid;                             // prevent repeating spam same faction problem
 
         if (GetObjectGuid() != guid)
         {
-            sLog.outError("%s have invalid faction (faction template id) #%u", GetGuidStr().c_str(), getFaction());
+            sLog.outError("%s have invalid faction (faction template id) #%u", GetGuidStr().c_str(), GetFactionTemplateId());
             guid = GetObjectGuid();
         }
     }
@@ -3284,9 +3284,9 @@ uint32 WorldObject::GetLevelForTarget(WorldObject const* target) const
     if (Creature const* pCreature = ToCreature())
     {
         if (!pCreature->IsWorldBoss() || !target || !target->IsUnit())
-            return pCreature->getLevel();
+            return pCreature->GetLevel();
 
-        uint32 level = static_cast<Unit const*>(target)->getLevel() + sWorld.getConfig(CONFIG_UINT32_WORLD_BOSS_LEVEL_DIFF);
+        uint32 level = static_cast<Unit const*>(target)->GetLevel() + sWorld.getConfig(CONFIG_UINT32_WORLD_BOSS_LEVEL_DIFF);
         if (level < 1)
             return 1;
         if (level > 255)
@@ -3295,7 +3295,7 @@ uint32 WorldObject::GetLevelForTarget(WorldObject const* target) const
     }
 
     if (Unit const* pUnit = ToUnit())
-        return pUnit->getLevel();
+        return pUnit->GetLevel();
 
     if (GameObject const* pGo = ToGameObject())
     {
@@ -3319,7 +3319,7 @@ uint32 WorldObject::GetLevelForTarget(WorldObject const* target) const
     }
 
     if (Unit const* pUnit = ::ToUnit(target))
-        return pUnit->getLevel();
+        return pUnit->GetLevel();
 
     return DEFAULT_MAX_LEVEL;
 }
@@ -3441,7 +3441,7 @@ void WorldObject::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
-    if (pVictim && pVictim->isAlive() && procVictim)
+    if (pVictim && pVictim->IsAlive() && procVictim)
 
         // http://blue.cardplace.com/cache/wow-paladin/1069149.htm
         // "Charges will not generate off auto attacks or npc attacks by trying"
@@ -3478,8 +3478,8 @@ float WorldObject::MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType,
         missChance = 5.0f - skillDiff * 0.1f;
 
     // Low level reduction
-    if (!pVictim->IsPlayer() && pVictim->getLevel() < 10)
-        missChance *= pVictim->getLevel() / 10.0f;
+    if (!pVictim->IsPlayer() && pVictim->GetLevel() < 10)
+        missChance *= pVictim->GetLevel() / 10.0f;
 
     if (Unit* pUnit = ToUnit())
     {
@@ -3599,8 +3599,8 @@ SpellMissInfo WorldObject::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* 
             dodgeChance = 0;
 
         // Low level reduction
-        if (!pVictim->IsPlayer() && pVictim->getLevel() < 10)
-            dodgeChance *= pVictim->getLevel() / 10.0f;
+        if (!pVictim->IsPlayer() && pVictim->GetLevel() < 10)
+            dodgeChance *= pVictim->GetLevel() / 10.0f;
 
         tmp += dodgeChance;
         if (roll < tmp)
@@ -3618,8 +3618,8 @@ SpellMissInfo WorldObject::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* 
             parryChance = 0;
 
         // Low level reduction
-        if (!pVictim->IsPlayer() && pVictim->getLevel() < 10)
-            parryChance *= pVictim->getLevel() / 10.0f;
+        if (!pVictim->IsPlayer() && pVictim->GetLevel() < 10)
+            parryChance *= pVictim->GetLevel() / 10.0f;
 
         tmp += parryChance;
         if (roll < tmp)
@@ -3632,7 +3632,7 @@ SpellMissInfo WorldObject::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* 
 SpellMissInfo WorldObject::MagicSpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr)
 {
     // Can`t miss on dead target (on skinning for example)
-    if (!pVictim->isAlive())
+    if (!pVictim->IsAlive())
         return SPELL_MISS_NONE;
 
     // Spell cannot be resisted (not exist on dbc, custom flag)
@@ -3750,7 +3750,7 @@ float WorldObject::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
         return (resistModHitChance * 0.01f);
     }
 
-    uint32 const uiLevel = getLevel();
+    uint32 const uiLevel = GetLevel();
 
     // Computing innate resists, resistance bonus when attacking a creature higher level. Not affected by modifiers.
     if (innateResists && victim->GetTypeId() == TYPEID_UNIT)
@@ -3966,7 +3966,7 @@ uint32 WorldObject::CalcArmorReducedDamage(Unit* pVictim, const uint32 damage) c
     if (armor < 0.0f)
         armor = 0.0f;
 
-    float tmpvalue = 0.1f * armor / (8.5f * float(getLevel()) + 40.0f);
+    float tmpvalue = 0.1f * armor / (8.5f * float(GetLevel()) + 40.0f);
     tmpvalue = tmpvalue / (1.0f + tmpvalue);
 
     if (tmpvalue < 0.0f)
@@ -3986,7 +3986,7 @@ int32 WorldObject::CalculateSpellDamage(Unit const* target, SpellEntry const* sp
 
     uint8 comboPoints = pPlayer ? pPlayer->GetComboPoints() : 0;
 
-    int32 level = getLevel();
+    int32 level = GetLevel();
 
     if (level > (int32)spellProto->maxLevel && spellProto->maxLevel > 0)
         level = (int32)spellProto->maxLevel;
@@ -4039,7 +4039,7 @@ int32 WorldObject::CalculateSpellDamage(Unit const* target, SpellEntry const* sp
             spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
             spellProto->Effect[effect_index] != SPELL_EFFECT_KNOCK_BACK &&
             (spellProto->Effect[effect_index] != SPELL_EFFECT_APPLY_AURA || spellProto->EffectApplyAuraName[effect_index] != SPELL_AURA_MOD_DECREASE_SPEED))
-        value = int32(value * 0.25f * exp(getLevel() * (70 - spellProto->spellLevel) / 1000.0f));
+        value = int32(value * 0.25f * exp(GetLevel() * (70 - spellProto->spellLevel) / 1000.0f));
 
     return value;
 }
@@ -4054,7 +4054,7 @@ void WorldObject::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 da
     if (damage < 0)
         return;
 
-    if (!pVictim->isAlive())
+    if (!pVictim->IsAlive())
         return;
 
     // Check spell crit chance
@@ -4612,10 +4612,10 @@ void WorldObject::DealDamageMods(Unit *victim, uint32 &damage, uint32* absorb)
 {
     Unit* pUnit = ToUnit();
     // [Nostalrius] Pas de degats sous esprit de redemption
-    if (!victim->isAlive() ||
+    if (!victim->IsAlive() ||
         victim->IsTaxiFlying() ||
         (victim->IsCreature() && static_cast<Creature*>(victim)->IsInEvadeMode()) ||
-        (pUnit && pUnit->getClass() == CLASS_PRIEST && pUnit->HasAura(27827)))
+        (pUnit && pUnit->GetClass() == CLASS_PRIEST && pUnit->HasAura(27827)))
     {
         if (absorb)
             *absorb += damage;
@@ -4652,7 +4652,7 @@ float WorldObject::CalculateLevelPenalty(SpellEntry const* spellProto)
 
         if(spellLevel < 20)
             LvlPenalty = 20.0f - spellLevel * 3.75f;
-        float LvlFactor = (float(spellLevel) + 6.0f) / float(getLevel());
+        float LvlFactor = (float(spellLevel) + 6.0f) / float(GetLevel());
         if(LvlFactor > 1.0f)
             LvlFactor = 1.0f;
 
@@ -4699,7 +4699,7 @@ void WorldObject::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabili
     if (!pVictim)
         return;
 
-    if (!pVictim->isAlive() || pVictim->IsTaxiFlying() || (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode()))
+    if (!pVictim->IsAlive() || pVictim->IsTaxiFlying() || (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode()))
         return;
 
     SpellEntry const *spellProto = sSpellMgr.GetSpellEntry(damageInfo->SpellID);
@@ -5198,5 +5198,5 @@ void WorldObject::CastSpell(float x, float y, float z, SpellEntry const *spellIn
 
 bool WorldObject::isVisibleFor(Player const* u, WorldObject const* viewPoint) const
 {
-    return isVisibleForInState(u, viewPoint, false);
+    return IsVisibleForInState(u, viewPoint, false);
 }

@@ -240,7 +240,7 @@ struct grob_poison_cloud : public ScriptedAI
     uint32 untilDespawn;
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
         untilDespawn = 70000;

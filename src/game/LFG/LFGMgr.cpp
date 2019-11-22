@@ -109,7 +109,7 @@ void LFGQueue::AddToQueue(Player* leader, uint32 queueAreaID)
         i_Player.team = leader->GetTeam();
         i_Player.areaId = queueAreaID;
         i_Player.hasQueuePriority = false;
-        i_Player.CalculateRoles(static_cast<Classes>(leader->getClass()));
+        i_Player.CalculateRoles(static_cast<Classes>(leader->GetClass()));
         i_Player.name = leader->GetName();
 
         leader->GetSession()->SendMeetingstoneSetqueue(queueAreaID, MEETINGSTONE_STATUS_JOINED_QUEUE);

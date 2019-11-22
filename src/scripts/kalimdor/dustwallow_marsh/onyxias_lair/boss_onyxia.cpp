@@ -307,7 +307,7 @@ struct boss_onyxiaAI : public ScriptedAI
         std::list<Creature*> WarderList;
         GetCreatureListWithEntryInGrid(WarderList, m_creature, NPC_ONYXIAN_WARDER, 200.0f);
         for (std::list<Creature*>::iterator itr = WarderList.begin(); itr != WarderList.end(); ++itr)
-            if (!(*itr)->isAlive())
+            if (!(*itr)->IsAlive())
                 (*itr)->Respawn();
     }
 
@@ -613,7 +613,7 @@ struct boss_onyxiaAI : public ScriptedAI
     void PhaseTransition(uint32 uiDiff, bool bDebut)
     {
 //        m_creature->CombatStop(true);
-        m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
+        m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
 
         /** P2 Event to take off */
         if (m_uiPhase == PHASE_TWO)

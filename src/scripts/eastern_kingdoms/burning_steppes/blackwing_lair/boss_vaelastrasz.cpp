@@ -222,7 +222,7 @@ struct boss_vaelAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VAELASTRASZ, FAIL);
-        m_creature->setFaction(FACTION_BLACK_DRAGON);
+        m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
@@ -288,12 +288,12 @@ struct boss_vaelAI : public ScriptedAI
             {
                 if (m_pInstance->GetData(TYPE_VAEL_EVENT) != DONE)
                 {
-                    m_creature->setFaction(FACTION_FRIENDLY);
+                    m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
                     m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
                 }
                 else
                 {
-                    m_creature->setFaction(FACTION_BLACK_DRAGON);
+                    m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
                     m_creature->SetStandState(UNIT_STAND_STATE_STAND);
                 }
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
@@ -337,7 +337,7 @@ struct boss_vaelAI : public ScriptedAI
                         ++m_uiSpeechNum;
                         break;
                     case 2:
-                        m_creature->setFaction(FACTION_BLACK_DRAGON);
+                        m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
                         if (m_playerGuid)
                         {
                             if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
@@ -368,7 +368,7 @@ struct boss_vaelAI : public ScriptedAI
             for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
             {
                 Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
-                if (pPlayer && pPlayer->isAlive() && pPlayer->getPowerType() == POWER_MANA && !pPlayer->HasAura(SPELL_BURNING_ADRENALINE, EFFECT_INDEX_0))
+                if (pPlayer && pPlayer->IsAlive() && pPlayer->GetPowerType() == POWER_MANA && !pPlayer->HasAura(SPELL_BURNING_ADRENALINE, EFFECT_INDEX_0))
                     vPossibleVictim.push_back(pPlayer->GetObjectGuid());
             }
             if (!vPossibleVictim.empty())
@@ -386,7 +386,7 @@ struct boss_vaelAI : public ScriptedAI
         {
             // have the victim cast the spell on himself otherwise the third effect aura will be applied
             // to Vael instead of the player
-            if (m_creature->getVictim() && !m_creature->getVictim()->HasAura(SPELL_BURNING_ADRENALINE) && m_creature->getVictim()->isAlive())
+            if (m_creature->getVictim() && !m_creature->getVictim()->HasAura(SPELL_BURNING_ADRENALINE) && m_creature->getVictim()->IsAlive())
             {
                 m_creature->getVictim()->CastSpell(m_creature->getVictim(), SPELL_BURNING_ADRENALINE, true);
                 m_uiBurningAdrenalineTankTimer = 45000;
@@ -470,7 +470,7 @@ bool GossipHello_boss_vael(Player* pPlayer, Creature* pCreature)
     if (m_pInstance->GetData(TYPE_RAZORGORE) != DONE && !pPlayer->IsGameMaster())
         return false;
 
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         if (m_pInstance->GetData(TYPE_SCEPTER_RUN) == NOT_STARTED)
             pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
@@ -587,10 +587,10 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
 
         for (std::list<Creature *>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
         {
-            if (!(*itr)->isAlive())
+            if (!(*itr)->IsAlive())
                 continue;
 
-            if (on && m_creature->isAlive())
+            if (on && m_creature->IsAlive())
             {
                 if (m_creature->IsWithinDistInMap((*itr), 15.0f))
                 {
@@ -643,7 +643,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         {
             if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
-                if (pUnit->isAlive())
+                if (pUnit->IsAlive())
                 {
                     pUnit->CastSpell(pUnit, SPELL_MARK_DETONATION, true);
                     m_uiMarkDetonationTimer = 20000;

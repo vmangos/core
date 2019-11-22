@@ -35,7 +35,7 @@ EndContentData */
 
 bool GossipHello_npc_lorax(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(5126) == QUEST_STATUS_INCOMPLETE)
@@ -84,10 +84,10 @@ bool GossipSelect_npc_lorax(Player* pPlayer, Creature* pCreature, uint32 uiSende
 
 bool GossipHello_npc_rivern_frostwind(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
-    if (pCreature->isVendor() && pPlayer->GetReputationRank(589) >= REP_FRIENDLY)
+    if (pCreature->IsVendor() && pPlayer->GetReputationRank(589) >= REP_FRIENDLY)
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
@@ -109,7 +109,7 @@ bool GossipSelect_npc_rivern_frostwind(Player* pPlayer, Creature* pCreature, uin
 
 bool GossipHello_npc_witch_doctor_mauari(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestRewardStatus(975))
@@ -234,7 +234,7 @@ struct npc_artoriusAI : public ScriptedAI
     /** Artorius the Doombringer */
     void Aggro(Unit* pWho) override 
     {
-        if (pWho->getClass() == CLASS_HUNTER && (m_hunterGuid.IsEmpty() || m_hunterGuid == pWho->GetObjectGuid())/*&& pWho->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE*/)
+        if (pWho->GetClass() == CLASS_HUNTER && (m_hunterGuid.IsEmpty() || m_hunterGuid == pWho->GetObjectGuid())/*&& pWho->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE*/)
         {
             m_hunterGuid = pWho->GetObjectGuid();
         }
@@ -274,7 +274,7 @@ struct npc_artoriusAI : public ScriptedAI
                 {
                     if (Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
                     {
-                        if (pUnit->isAlive())
+                        if (pUnit->IsAlive())
                         {
                             pCleaner->SetInCombatWith(pUnit);
                             pCleaner->AddThreat(pUnit);
@@ -327,7 +327,7 @@ struct npc_artoriusAI : public ScriptedAI
         {
             if (m_uiDespawn_Timer <= uiDiff)
             {
-                if (m_creature->isAlive() && !m_creature->isInCombat())
+                if (m_creature->IsAlive() && !m_creature->isInCombat())
                     DemonDespawn(false);
             }
             else
@@ -337,7 +337,7 @@ struct npc_artoriusAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_creature->getThreatManager().getThreatList().size() > 1 /*|| pHunter->isDead()*/)
+        if (m_creature->getThreatManager().getThreatList().size() > 1 /*|| pHunter->IsDead()*/)
             DemonDespawn();
 
         if (m_uiDemonic_Frenzy_Timer < uiDiff)
@@ -800,7 +800,7 @@ struct npc_ranshallaAI : public npc_escortAI
         {
             wpInvoqueAtteint = 0;
             pretressesInvoque = 0;
-            //m_creature->setFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+            //m_creature->SetFactionTemplateId(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
             guidPriestess1 = 0;
             guidPriestess2 = 0;
             guidMoonkin = 0;

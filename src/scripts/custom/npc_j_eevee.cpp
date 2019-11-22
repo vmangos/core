@@ -39,7 +39,7 @@ npc_j_eevee_dreadsteedAI::npc_j_eevee_dreadsteedAI(Creature* pCreature) : Script
 {
     //m_pInstance = (instance_dire_maul*) pCreature->GetInstanceData();
     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
-    m_creature->setFaction(35); //friendly to everyone
+    m_creature->SetFactionTemplateId(35); //friendly to everyone
     m_creature->SetWalk(true);
     Reset();
 }
@@ -148,7 +148,7 @@ npc_j_eevee_scholomanceAI::npc_j_eevee_scholomanceAI(Creature* pCreature) : Scri
 
         if (Player *player = m_creature->GetMap()->GetPlayer(guidPlayer)) {
             player->HandleEmote(EMOTE_ONESHOT_KNEEL);
-            m_creature->setFaction(player->getFaction()); // player faction, friendly to player but hostile to other mobs
+            m_creature->SetFactionTemplateId(player->GetFactionTemplateId()); // player faction, friendly to player but hostile to other mobs
         }
     }
 

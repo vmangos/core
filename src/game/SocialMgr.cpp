@@ -195,8 +195,8 @@ void SocialMgr::GetFriendInfo(MasterPlayer* player, uint32 friend_lowguid, Frien
         if (player->IsDND())
             friendInfo.Status = FRIEND_STATUS_DND;
         friendInfo.Area = player->GetZoneId();
-        friendInfo.Level = player->getLevel();
-        friendInfo.Class = player->getClass();
+        friendInfo.Level = player->GetLevel();
+        friendInfo.Class = player->GetClass();
         return;
     }
 
@@ -223,8 +223,8 @@ void SocialMgr::GetFriendInfo(MasterPlayer* player, uint32 friend_lowguid, Frien
             if (pFriend->IsDND())
                 friendInfo.Status = FRIEND_STATUS_DND;
             friendInfo.Area = pFriend->GetZoneId();
-            friendInfo.Level = pFriend->getLevel();
-            friendInfo.Class = pFriend->getClass();
+            friendInfo.Level = pFriend->GetLevel();
+            friendInfo.Class = pFriend->GetClass();
         }
         else
         {

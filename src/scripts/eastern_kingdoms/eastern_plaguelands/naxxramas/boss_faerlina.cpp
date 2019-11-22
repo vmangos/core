@@ -355,7 +355,7 @@ struct mob_faerlina_rp : public ScriptedAI
 
             for (auto it = creatures.begin(); it != creatures.end();)
             {
-                if ((*it)->isDead())
+                if ((*it)->IsDead())
                     it = creatures.erase(it);
                 else
                     ++it;

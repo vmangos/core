@@ -79,7 +79,7 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
         case TEMPSUMMON_CORPSE_DESPAWN:
         {
             // if m_deathState is DEAD, CORPSE was skipped
-            if (isDead())
+            if (IsDead())
             {
                 UnSummon();
                 return;
@@ -99,7 +99,7 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
         case TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN:
         {
             // if m_deathState is DEAD, CORPSE was skipped
-            if (isDead())
+            if (IsDead())
             {
                 UnSummon();
                 return;
@@ -128,7 +128,7 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
                 return;
             }
 
-            if (!isInCombat() && isAlive())
+            if (!isInCombat() && IsAlive())
             {
                 if (m_timer <= update_diff)
                 {
@@ -144,7 +144,7 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
         }
         case TEMPSUMMON_TIMED_COMBAT_OR_CORPSE_DESPAWN:
         {
-            if (isDead())
+            if (IsDead())
             {
                 UnSummon();
                 return;
@@ -172,7 +172,7 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
             }
 
             // Reset timer when the mob dies
-            if (!isAlive() && !m_justDied)
+            if (!IsAlive() && !m_justDied)
             {
                 m_justDied = true;
                 m_timer = m_lifetime;

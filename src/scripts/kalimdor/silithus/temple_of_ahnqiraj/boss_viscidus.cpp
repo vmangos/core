@@ -159,7 +159,7 @@ struct mob_viscidus_triggerAI : public ScriptedAI
             if (!m_spellCasted)
             {
                 // set faction and flags before toxin cloud, so it won't damage a boss.
-                m_creature->setFaction(14); // 14 is a hostile faction
+                m_creature->SetFactionTemplateId(14); // 14 is a hostile faction
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1);
 
                 m_spellCasted = true;
@@ -302,7 +302,7 @@ struct boss_viscidusAI : public ScriptedAI
 
         DoResetThreat();
         m_creature->SetVisibility(VISIBILITY_ON);
-        m_creature->clearUnitState(UNIT_STAT_DIED);
+        m_creature->ClearUnitState(UNIT_STAT_DIED);
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_uiPhase = PHASE_NORMAL;

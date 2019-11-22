@@ -97,7 +97,7 @@ struct boss_ladyFaltheressAI : public ScriptedAI
 
     void TransformIntoHostile()
     {
-        m_creature->setFaction(FACTION_SCOURGE);
+        m_creature->SetFactionTemplateId(FACTION_SCOURGE);
         //TODO : find the humain appearance she transforms out of.
         m_creature->SetDisplayId(MODEL_ID_UNDEAD);
     }
@@ -388,7 +388,7 @@ bool QuestAccept_npc_belnistrasz(Player* pPlayer, Creature* pCreature, const Que
         {
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
             DoScriptText(SAY_BELNISTRASZ_READY, pCreature, pPlayer);
-            pCreature->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+            pCreature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
         }
     }
     return true;

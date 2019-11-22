@@ -322,7 +322,7 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
                     break;
                 }
 
-                if (!player->isAlive())
+                if (!player->IsAlive())
                     player->ResurrectPlayer(1.0f);
 
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_CONFUSE);

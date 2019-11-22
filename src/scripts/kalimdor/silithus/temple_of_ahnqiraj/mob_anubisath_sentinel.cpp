@@ -235,13 +235,13 @@ struct aqsentinelAI : public ScriptedAI
 
     void Reset() override
     {
-        if (!m_creature->isDead())
+        if (!m_creature->IsDead())
         {
             for (auto iter = nearby.cbegin(); iter != nearby.cend(); ++iter)
             {
                 if (Creature* buddy = m_creature->GetMap()->GetCreature(*iter))
                 {
-                    if (buddy->isDead())
+                    if (buddy->IsDead())
                         buddy->Respawn();
                 }
             }
@@ -286,7 +286,7 @@ struct aqsentinelAI : public ScriptedAI
         {
             if (Creature* buddy = m_creature->GetMap()->GetCreature(*iter))
             {
-                if (buddy->isDead())
+                if (buddy->IsDead())
                     continue;
 
                 m_bAlone = false;

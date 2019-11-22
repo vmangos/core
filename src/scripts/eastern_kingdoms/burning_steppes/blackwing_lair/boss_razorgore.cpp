@@ -146,7 +146,7 @@ struct boss_razorgoreAI : public ScriptedAI
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
-            if (i->getSource() && i->getSource()->isAlive())
+            if (i->getSource() && i->getSource()->IsAlive())
                 i->getSource()->CastSpell(i->getSource(), SPELL_EXPLOSION, true);
         }
 
@@ -220,7 +220,7 @@ struct boss_razorgoreAI : public ScriptedAI
 
             for (std::list<Creature*>::iterator itr = GardesListe.begin(); itr != GardesListe.end(); ++itr)
             {
-                if (!(*itr)->isAlive())
+                if (!(*itr)->IsAlive())
                     (*itr)->Respawn();
                 if ((*itr)->GetEntry() == MOB_GRETHOK)
                     (*itr)->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS_ORB);
@@ -246,14 +246,14 @@ struct boss_razorgoreAI : public ScriptedAI
 
         for (std::list<Creature*>::iterator it = lCreatureNear.begin(); it != lCreatureNear.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 (*it)->AI()->EnterEvadeMode();
         }
     }
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (m_creature->hasUnitState(UNIT_STAT_POSSESSED))
+        if (m_creature->HasUnitState(UNIT_STAT_POSSESSED))
         {
             ScriptedAI::UpdateAI(uiDiff);
             return;
@@ -394,7 +394,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
         for (std::list<Creature*>::iterator it = lCreatureNear.begin(); it != lCreatureNear.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
             {
                 (*it)->SetHomePosition(-7555.55f, -1025.16f, 408.4914f, 0.65f);
                 (*it)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_SILENCED);
@@ -614,7 +614,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
                     if (Unit* pChanneler = m_creature->GetMap()->GetUnit(m_uiPossesseurGuid))
                     {
-                        if (pChanneler->isDead())
+                        if (pChanneler->IsDead())
                         {
                             pRazorgore->RemoveAurasDueToSpell(SPELL_POSSESS_ORB);
                             if (pRazorgore->getThreatManager().isThreatListEmpty())

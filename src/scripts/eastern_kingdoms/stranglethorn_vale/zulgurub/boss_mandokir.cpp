@@ -201,7 +201,7 @@ struct boss_mandokirAI : public ScriptedAI
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
         {
             DoCastSpellIfCan(m_creature, SPELL_LEVEL_UP, true);
-            m_creature->SetLevel(m_creature->getLevel() + 1);
+            m_creature->SetLevel(m_creature->GetLevel() + 1);
             m_uiPlayerToRez = pVictim->GetGUID();
 
             DoScriptText(SAY_DING_KILL, m_creature);
@@ -213,7 +213,7 @@ struct boss_mandokirAI : public ScriptedAI
             {
                 if (Creature* jTemp = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_JINDO)))
                 {
-                    if (jTemp->isAlive())
+                    if (jTemp->IsAlive())
                         DoScriptText(SAY_GRATS_JINDO, jTemp);
                 }
                 else
@@ -257,7 +257,7 @@ struct boss_mandokirAI : public ScriptedAI
         // If Vilebranch dies and group wipes, boss should start at the bottom of the stairs
         // Video: https://www.youtube.com/watch?v=joaWY0wjOXI
         Creature* vileBranch = m_creature->FindNearestCreature(11391, 100.0f, true);
-        bool isVilebranchDead = !vileBranch || !vileBranch->isAlive();
+        bool isVilebranchDead = !vileBranch || !vileBranch->IsAlive();
         if (reset || m_VilebranchDead != isVilebranchDead)
         {
             if (isVilebranchDead)
@@ -282,7 +282,7 @@ struct boss_mandokirAI : public ScriptedAI
         {
             Unit* pWatchTarget = m_creature->GetMap()->GetUnit(m_uiWatchTarget);
 
-            if (pWatchTarget && pWatchTarget->isAlive())
+            if (pWatchTarget && pWatchTarget->IsAlive())
             {
                 // Pendant le debuff
                 if (pWatchTarget->HasAura(SPELL_WATCH))
@@ -325,7 +325,7 @@ struct boss_mandokirAI : public ScriptedAI
             for (std::vector<uint64>::iterator it = m_lSpirits.begin(); it != m_lSpirits.end(); ++it)
             {
                 if (Creature* pSpirit = m_creature->GetMap()->GetCreature(*it))
-                    if (pSpirit->isAlive())
+                    if (pSpirit->IsAlive())
                         pSpirit->AddObjectToRemoveList();
             }
         }
@@ -351,7 +351,7 @@ struct boss_mandokirAI : public ScriptedAI
         if (!m_uiRaptorGUID.IsEmpty())
         {
             if (Creature* pRaptor = m_creature->GetMap()->GetCreature(m_uiRaptorGUID))
-                if (pRaptor->isAlive())
+                if (pRaptor->IsAlive())
                     pRaptor->AddObjectToRemoveList();
         }
         m_uiRaptorGUID.Clear();
@@ -417,7 +417,7 @@ struct boss_mandokirAI : public ScriptedAI
         {
             if (Player* killedPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerToRez))
             {
-                if (killedPlayer->getDeathState() == CORPSE && !killedPlayer->IsRessurectRequested())
+                if (killedPlayer->GetDeathState() == CORPSE && !killedPlayer->IsRessurectRequested())
                 {
                     // Find nearest spirit ready to resurrect
                     Creature* spirit = nullptr;
@@ -492,7 +492,7 @@ struct boss_mandokirAI : public ScriptedAI
             {
                 if (Unit* pTargetToKill = m_creature->GetMap()->GetUnit(m_uiTargetToKill))
                 {
-                    if (pTargetToKill->isAlive())
+                    if (pTargetToKill->IsAlive())
                     {
                         bool bTargetKilled = false;
                         float addAggro = 0;
@@ -513,7 +513,7 @@ struct boss_mandokirAI : public ScriptedAI
                         }
                         if (!bTargetKilled)
                             m_creature->DoKillUnit(pTargetToKill);
-                        if(pTargetToKill->isAlive())
+                        if(pTargetToKill->IsAlive())
                             m_creature->DoKillUnit(pTargetToKill);
                         m_uiGlobalCooldown = 1000;
                         m_uiTargetToKill = 0;
@@ -572,7 +572,7 @@ struct boss_mandokirAI : public ScriptedAI
                 {
                     if (Player* player = m_creature->GetMap()->GetPlayer(m_uiChargedPlayerGUID))
                     {
-                        if (player->isAlive())
+                        if (player->IsAlive())
                         {
                             if(m_creature->GetDistance(player) < 4.0f)
                             {
@@ -778,7 +778,7 @@ struct mob_chainedSpiritsAI : public ScriptedAI
             {
                 // Attempt to rez player
                 Player* target = m_creature->GetMap()->GetPlayer(m_uiTargetRezGUID);
-                if (target && target->getDeathState() == CORPSE && !target->IsRessurectRequested())
+                if (target && target->GetDeathState() == CORPSE && !target->IsRessurectRequested())
                     m_creature->CastSpell(target, SPELL_REVIVE, true); // Will despawn at SpellHit
                 else
                     m_creature->AddObjectToRemoveList();

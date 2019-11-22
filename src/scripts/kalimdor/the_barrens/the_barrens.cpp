@@ -241,7 +241,7 @@ bool QuestAccept_npc_gilthares(Player* pPlayer, Creature* pCreature, const Quest
 {
     if (pQuest->GetQuestId() == QUEST_FREE_FROM_HOLD)
     {
-        pCreature->setFaction(FACTION_ESCORT_H_NEUTRAL_ACTIVE);
+        pCreature->SetFactionTemplateId(FACTION_ESCORT_H_NEUTRAL_ACTIVE);
         pCreature->SetStandState(UNIT_STAND_STATE_STAND);
 
         DoScriptText(SAY_GIL_START, pCreature, pPlayer);
@@ -267,7 +267,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
 {
     npc_taskmaster_fizzuleAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        factionNorm = pCreature->getFaction();
+        factionNorm = pCreature->GetFactionTemplateId();
         Reset();
     }
 
@@ -281,7 +281,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
         IsFriend = false;
         Reset_Timer = 120000;
         FlareCount = 0;
-        m_creature->setFaction(factionNorm);
+        m_creature->SetFactionTemplateId(factionNorm);
     }
 
     void DoFriend()
@@ -293,7 +293,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
         m_creature->StopMoving();
         m_creature->GetMotionMaster()->MoveIdle();
 
-        m_creature->setFaction(FACTION_FRIENDLY_F);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY_F);
         m_creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
     }
 
@@ -329,7 +329,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
         {
             if (FlareCount >= 2)
             {
-                if (m_creature->getFaction() == FACTION_FRIENDLY_F)
+                if (m_creature->GetFactionTemplateId() == FACTION_FRIENDLY_F)
                     return;
 
                 DoFriend();
@@ -430,7 +430,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                 continue;
             }
 
-            pCreature->setFaction(35);
+            pCreature->SetFactionTemplateId(35);
             pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             pCreature->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
             AffrayChallenger[i] = pCreature->GetGUID();
@@ -442,7 +442,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         pUnit->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         pUnit->HandleEmoteCommand(EMOTE_ONESHOT_ROAR);
-        pUnit->setFaction(14);
+        pUnit->SetFactionTemplateId(14);
     }
 
     void UpdateAI(const uint32 diff) override
@@ -457,7 +457,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                 for (uint8 i = 0; i < 6; ++i)
                 {
                     Creature *challenger = m_creature->GetMap()->GetCreature(AffrayChallenger[i]);
-                    if (challenger && !challenger->isAlive() && challenger->isDead())
+                    if (challenger && !challenger->IsAlive() && challenger->IsDead())
                     {
                         DoScriptText(SAY_TWIGGY_DOWN, m_creature);
                         challenger->RemoveCorpse();
@@ -473,7 +473,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         {
             Player* pPlayer = m_creature->GetMap()->GetPlayer(PlayerGUID);
 
-            if (!pPlayer || pPlayer->isDead())
+            if (!pPlayer || pPlayer->IsDead())
                 Reset();
 
             switch (Step)
@@ -498,7 +498,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                     if (Unit *temp = m_creature->SummonCreature(NPC_BIG_WILL, -1713.79f, -4342.09f, 6.05f, 6.15f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000))
                     {
                         BigWillGUID = temp->GetGUID();
-                        temp->setFaction(35);
+                        temp->SetFactionTemplateId(35);
                         temp->GetMotionMaster()->MovePoint(0, -1682.31f, -4329.68f, 2.78f);
                     }
                     Event_Timer = 15000;
@@ -507,7 +507,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                 case 3:
                     if (Unit *will = m_creature->GetMap()->GetUnit(BigWillGUID))
                     {
-                        will->setFaction(32);
+                        will->SetFactionTemplateId(32);
                         DoScriptText(SAY_BIG_WILL_READY, will, pPlayer);
                     }
                     Event_Timer = 5000;
@@ -515,7 +515,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
                     break;
                 case 4:
                     Unit *will = m_creature->GetMap()->GetUnit(BigWillGUID);
-                    if (will && will->isDead())
+                    if (will && will->IsDead())
                     {
                         DoScriptText(SAY_TWIGGY_OVER, m_creature);
                         Reset();
@@ -565,7 +565,7 @@ CreatureAI* GetAI_npc_twiggy_flathead(Creature* pCreature)
 
 bool AreaTrigger_at_twiggy_flathead(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-    if (!pPlayer->isDead() && pPlayer->GetQuestStatus(QUEST_AFFRAY) == QUEST_STATUS_INCOMPLETE)
+    if (!pPlayer->IsDead() && pPlayer->GetQuestStatus(QUEST_AFFRAY) == QUEST_STATUS_INCOMPLETE)
     {
         Creature* pCreature = GetClosestCreatureWithEntry(pPlayer, NPC_TWIGGY, 30.0f);
 
@@ -619,7 +619,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
-            if (m_creature->getStandState() == UNIT_STAND_STATE_DEAD)
+            if (m_creature->GetStandState() == UNIT_STAND_STATE_DEAD)
                 m_creature->SetStandState(UNIT_STAND_STATE_STAND);
 
             m_bIsPostEvent = false;
@@ -724,7 +724,7 @@ bool QuestAccept_npc_wizzlecranks_shredder(Player* pPlayer, Creature* pCreature,
     if (pQuest->GetQuestId() == QUEST_ESCAPE)
     {
         DoScriptText(SAY_START, pCreature);
-        pCreature->setFaction(FACTION_RATCHET);
+        pCreature->SetFactionTemplateId(FACTION_RATCHET);
 
         if (npc_wizzlecranks_shredderAI* pEscortAI = dynamic_cast<npc_wizzlecranks_shredderAI*>(pCreature->AI()))
             pEscortAI->Start(true, pPlayer->GetGUID(), pQuest);

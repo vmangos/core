@@ -111,7 +111,7 @@ uint32_t WorldSession::ChatCooldown()
     const auto cooldownMaxLvl = sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_CD_MAX_LEVEL);
     const auto cooldownScaling = sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_CD_SCALING);
     const auto cooldownUseAcctLvl = sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_CD_USE_ACCOUNT_MAX_LEVEL);
-    const auto playerLevel = cooldownUseAcctLvl? GetAccountMaxLevel() : GetPlayer()->getLevel();
+    const auto playerLevel = cooldownUseAcctLvl? GetAccountMaxLevel() : GetPlayer()->GetLevel();
 
     if (cooldown && cooldownMaxLvl > playerLevel)
     {
@@ -293,7 +293,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                 if (Channel *chn = cMgr->GetChannel(channel, playerPointer, IsMaster()))
                 {
                     // Level channels restrictions
-                    if (chn->IsLevelRestricted() && playerPointer->getLevel() < sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_MIN_LEVEL)
+                    if (chn->IsLevelRestricted() && playerPointer->GetLevel() < sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_MIN_LEVEL)
                         && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
                     {
                         ChatHandler(this).SendSysMessage("You cannot use this channel yet.");
@@ -358,14 +358,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         break;
 
         case CHAT_MSG_SAY:
-            if (GetPlayer()->getLevel() < sWorld.getConfig(CONFIG_UINT32_SAY_MIN_LEVEL)
+            if (GetPlayer()->GetLevel() < sWorld.getConfig(CONFIG_UINT32_SAY_MIN_LEVEL)
                 && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
             {
                 ChatHandler(this).SendSysMessage("You cannot speak yet (too low level).");
                 return;
             }
 
-            if (!GetPlayer()->isAlive())
+            if (!GetPlayer()->IsAlive())
                 return;
 
             GetPlayer()->Say(msg, lang);
@@ -380,14 +380,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
             break;
         case CHAT_MSG_EMOTE:
-            if (GetPlayer()->getLevel() < sWorld.getConfig(CONFIG_UINT32_SAY_EMOTE_MIN_LEVEL)
+            if (GetPlayer()->GetLevel() < sWorld.getConfig(CONFIG_UINT32_SAY_EMOTE_MIN_LEVEL)
                 && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
             {
                 ChatHandler(this).SendSysMessage("You cannot use emotes yet (too low level).");
                 return;
             }
 
-            if (!GetPlayer()->isAlive())
+            if (!GetPlayer()->IsAlive())
                 return;
 
             GetPlayer()->TextEmote(msg);
@@ -403,14 +403,14 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             break;
         case CHAT_MSG_YELL:
         {
-            if (GetPlayer()->getLevel() < sWorld.getConfig(CONFIG_UINT32_YELL_MIN_LEVEL)
+            if (GetPlayer()->GetLevel() < sWorld.getConfig(CONFIG_UINT32_YELL_MIN_LEVEL)
                 && GetAccountMaxLevel() < sWorld.getConfig(CONFIG_UINT32_PUB_CHANS_MUTE_VANISH_LEVEL))
             {
                 ChatHandler(this).SendSysMessage("You cannot yell yet (too low level).");
                 return;
             }
 
-            if (!GetPlayer()->isAlive())
+            if (!GetPlayer()->IsAlive())
                 return;
 
             GetPlayer()->Yell(msg, lang);
@@ -465,7 +465,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                     SendWrongFactionNotice();
                     return;
                 }
-                if (/*player->GetZoneId() != masterPlr->GetZoneId() && */masterPlr->getLevel() < sWorld.getConfig(CONFIG_UINT32_WHISP_DIFF_ZONE_MIN_LEVEL))
+                if (/*player->GetZoneId() != masterPlr->GetZoneId() && */masterPlr->GetLevel() < sWorld.getConfig(CONFIG_UINT32_WHISP_DIFF_ZONE_MIN_LEVEL))
                 {
                     ChatHandler(this).SendSysMessage("You cannot whisper yet.");
                     return;
@@ -670,7 +670,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleEmoteOpcode(WorldPacket & recv_data)
 {
-    if (!GetPlayer()->isAlive() || GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (!GetPlayer()->IsAlive() || GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         return;
 
     if (!GetPlayer()->CanSpeak())
@@ -724,7 +724,7 @@ private:
 
 void WorldSession::HandleTextEmoteOpcode(WorldPacket & recv_data)
 {
-    if (!GetPlayer()->isAlive())
+    if (!GetPlayer()->IsAlive())
         return;
 
     if (!GetPlayer()->CanSpeak())
@@ -757,7 +757,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recv_data)
         default:
         {
             // in feign death state allowed only text emotes.
-            if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+            if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
                 break;
 
             GetPlayer()->HandleEmoteCommand(emote_id);

@@ -166,7 +166,7 @@ struct boss_ragnarosAI : ScriptedAI
 
         HasAura = true;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
         {
             m_pInstance->SetData(TYPE_RAGNAROS, NOT_STARTED);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
@@ -342,7 +342,7 @@ struct boss_ragnarosAI : ScriptedAI
         {
             m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_FADE);
             m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_EFFECT);
-            m_creature->setFaction(14);
+            m_creature->SetFactionTemplateId(14);
             m_creature->SetVisibility(VISIBILITY_ON);
 
             if (DoCastSpellIfCan(m_creature, SPELL_EMERGE_VISUAL) == CAST_OK)
@@ -373,9 +373,9 @@ struct boss_ragnarosAI : ScriptedAI
 
                 for (std::list<Creature*>::iterator itr = FilsListe.begin(); itr != FilsListe.end(); ++itr)
                 {
-                    if ((*itr)->isAlive())
+                    if ((*itr)->IsAlive())
                     {
-                        if (!(*itr)->hasUnitState(UNIT_STAT_ISOLATED)) // banished
+                        if (!(*itr)->HasUnitState(UNIT_STAT_ISOLATED)) // banished
                         {
                             Allbanished = false;
                             break;
@@ -401,7 +401,7 @@ struct boss_ragnarosAI : ScriptedAI
                     }
 
                     m_creature->SetVisibility(VISIBILITY_OFF);
-                    m_creature->setFaction(35);
+                    m_creature->SetFactionTemplateId(35);
                     m_uiSubmergeStateTimer = 0;
                 }
                 else
@@ -489,7 +489,7 @@ struct boss_ragnarosAI : ScriptedAI
             for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
             {
                 Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
-                if (pPlayer && pPlayer->isAlive() && pPlayer->getPowerType() == POWER_MANA && !pPlayer->IsGameMaster())
+                if (pPlayer && pPlayer->IsAlive() && pPlayer->GetPowerType() == POWER_MANA && !pPlayer->IsGameMaster())
                     manaPlayers.push_back(pPlayer);
             }
             if (!manaPlayers.empty())
@@ -661,11 +661,11 @@ struct boss_flame_of_ragnarosAI : ScriptedAI
 
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->SetLevel(63);
-        m_creature->setFaction(14);
+        m_creature->SetFactionTemplateId(14);
         m_creature->CastSpell(m_creature, SPELL_INTENSE_HEAT, false);
         Explode = false;
     }

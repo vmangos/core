@@ -544,8 +544,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         Totem const* ToTotem() const { return IsTotem() ? reinterpret_cast<Totem const*>(this) : nullptr; }
         Totem* ToTotem() { return IsTotem() ? reinterpret_cast<Totem*>(this) : nullptr; }
         bool IsTemporarySummon() const { return m_subtype == CREATURE_SUBTYPE_TEMPORARY_SUMMON; }
-        bool IsCorpse() const { return getDeathState() ==  CORPSE; }
-        bool IsDespawned() const { return getDeathState() ==  DEAD; }
+        bool IsCorpse() const { return GetDeathState() ==  CORPSE; }
+        bool IsDespawned() const { return GetDeathState() ==  DEAD; }
         void SetCorpseDelay(uint32 delay) { m_corpseDelay = delay; }
         bool IsRacialLeader() const { return GetCreatureInfo()->racial_leader; }
         bool IsCivilian() const { return GetCreatureInfo()->civilian; }
@@ -616,7 +616,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         uint32 GetShieldBlockValue() const override
         {
-            return getLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20); // dunno mob block value
+            return GetLevel() / 2 + uint32(GetStat(STAT_STRENGTH) / 20); // dunno mob block value
         }
 
         SpellSchoolMask GetMeleeDamageSchoolMask() const override { return m_meleeDamageSchoolMask; }
@@ -816,9 +816,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         // Return true if target found. 
         bool CastSpellOnFarthestVictim (uint32 spellId, float min = 0.0f, float max = 100.0f, bool triggered = false);
         bool CastSpellOnNearestVictim(uint32 spellId, float min = 0.0f, float max = 100.0f, bool triggered = false);
-        bool CastSpellOnHostileCaster(uint32 spellId, bool triggered = false);
         bool CastSpellOnHostileCasterInRange(uint32 spellId, float min = 0.0f, float max = 100.0f, bool triggered = false);
-        bool CastSpellOnAllInRange(uint32 spellId, float min = 0.0f, float max = 100.0f, bool triggered = false);
         // Set in combat with units on the threatlist of 'pOther'
         void AddThreatsOf(Creature const* pOther);
 
@@ -847,7 +845,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
 
-        void SetNoXP() { addUnitState(UNIT_STAT_NO_KILL_REWARD); }
+        void SetNoXP() { AddUnitState(UNIT_STAT_NO_KILL_REWARD); }
 
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
         void ClearTemporaryFaction();

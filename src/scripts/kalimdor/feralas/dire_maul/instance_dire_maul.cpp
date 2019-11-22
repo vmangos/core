@@ -194,7 +194,7 @@ void instance_dire_maul::OnCreatureDeath(Creature* pCreature)
 
             if (Creature* pChorush = instance->GetCreature(m_uiChoRushTheObserverGUID))
             {
-                if (pChorush->isAlive())
+                if (pChorush->IsAlive())
                 {
                     pChorush->SetFactionTemporary(FACTION_FRIENDLY, 0);
                     pChorush->m_Events.AddLambdaEventAtOffset([pChorush]() { DoScriptText(SAY_KING_DEAD, pChorush); }, 5000);
@@ -247,7 +247,7 @@ void instance_dire_maul::OnCreatureCreate(Creature* pCreature)
 
             if (GetData(TYPE_GORDOK_TRIBUTE) == DONE)
             {
-                pCreature->setFaction(35);
+                pCreature->SetFactionTemplateId(35);
                 pCreature->SetStandState(UNIT_STAND_STATE_SIT);
             }
             break; 
@@ -279,14 +279,14 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                         if (Creature* pCreature = instance->GetCreature(*itr))
                         {
                             // Ne pas non plus aggro toute l'instance.
-                            if (pCreature->isAlive())
+                            if (pCreature->IsAlive())
                             {
                                 EnableCreature(pCreature);
 
                                 if (pCreature->GetDistance(pImmolThar) > 100.0f)
                                     continue;
 
-                                pCreature->setFaction(100);
+                                pCreature->SetFactionTemplateId(100);
 
                                 if (!bHasYelled)
                                 {
@@ -559,7 +559,7 @@ void instance_dire_maul::DoSortCristalsEventMobs()
             {
                 if (Creature* pCreature = instance->GetCreature(*itr))
                 {
-                    if (pCreature->isAlive() && pCreature->GetDistance(pRune) < 20.0f)
+                    if (pCreature->IsAlive() && pCreature->GetDistance(pRune) < 20.0f)
                         m_alCristalsEventtMobGUIDSorted[i].push_back(*itr);
                 }
             }
@@ -1030,7 +1030,7 @@ CreatureAI* GetAI_npc_knot_thimblejack(Creature* pCreature)
 
 bool GossipHello_npc_knot_thimblejack(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Why should I bother fixing the trap? Why not just eliminate the guard the old fashioned way?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
@@ -1633,7 +1633,7 @@ struct boss_kromcrushAI : public ScriptedAI
 
 bool GossipHello_boss_kromcrush(Player* pPlayer, Creature * pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
     if (instance_dire_maul* pInstance = (instance_dire_maul*)pCreature->GetInstanceData())
@@ -1934,7 +1934,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         {
             for (auto iter = m_lHelpers.begin(); iter != m_lHelpers.end(); ++iter)
             {
-                if (*iter && !(*iter)->isAlive())
+                if (*iter && !(*iter)->IsAlive())
                     static_cast<TemporarySummon*>(*iter)->UnSummon();
             }
             m_lHelpers.clear();
@@ -2190,7 +2190,7 @@ struct npc_alzzins_minionAI : ScriptedAI
     {
         if (Unit* pSummoner = m_creature->GetMap()->GetUnit(((TemporarySummon*)m_creature)->GetSummonerGuid()))
         {
-            if (pSummoner->isAlive())
+            if (pSummoner->IsAlive())
                 m_creature->GetMotionMaster()->MoveFollow(pSummoner, PET_FOLLOW_DIST, frand(0.0f, 6.2832f));
         }
     }
@@ -2208,7 +2208,7 @@ struct npc_alzzins_minionAI : ScriptedAI
     {
         if (Unit* pSummoner = m_creature->GetMap()->GetUnit(((TemporarySummon*)m_creature)->GetSummonerGuid()))
         {
-            if (!pSummoner->isAlive() || !pSummoner->isInCombat())
+            if (!pSummoner->IsAlive() || !pSummoner->isInCombat())
                 ((TemporarySummon*)m_creature)->UnSummon();
         }
     }

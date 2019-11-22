@@ -297,7 +297,7 @@ struct npc_AQwar_collectorAI : CreatureAI
     {
         resourceType = WAREFFORT_BAR;
 
-        switch (creature->getFaction())
+        switch (creature->GetFactionTemplateId())
         {
             case 57:
             case 11:
@@ -564,7 +564,7 @@ bool GossipHello_npc_AQwar_collector(Player* pPlayer, Creature* pCreature)
 
         pCreature->HandleEmote(EMOTE_ONESHOT_BOW);
     }
-    else if (pCreature->isQuestGiver())
+    else if (pCreature->IsQuestGiver())
     {
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
         pPlayer->SEND_GOSSIP_MENU(gossipTextId, pCreature->GetObjectGuid());
@@ -802,7 +802,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         if (who->GetTypeId() != TYPEID_PLAYER || who->ToPlayer()->IsGameMaster())
             return;
 
-        if (!who->isAlive())
+        if (!who->IsAlive())
             return;
 
         playerDetected = m_creature->IsWithinDistInMap(who, MAX_SIGHT_DISTANCE) ? true : false;
@@ -815,7 +815,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
+            if (pPlayer && pPlayer->IsAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
                 ++var;
 
             if (var > 1)
@@ -830,7 +830,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
+            if (pPlayer && pPlayer->IsAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
             {
                 m_creature->AddThreat(pPlayer);
                 m_creature->SetInCombatWith(pPlayer);
@@ -945,7 +945,7 @@ struct npc_infantrymanAI : ScriptedAI
         m_creature->CombatStop(true);
         m_creature->LoadCreatureAddon(true);
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             if (m_followingSaurfang)
                 FollowSaurfang();
@@ -1018,7 +1018,7 @@ struct npc_infantrymanAI : ScriptedAI
         double orientation = m_creature->GetHomePositionO() + (m_clockwiseRotation ? -1 : 1) * M_PI / 2;
 
         m_creature->SetHomePosition(newPos.x, newPos.y, newPos.z, orientation);
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
             m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
@@ -1195,7 +1195,7 @@ struct npc_priestessAI : npc_infantrymanAI
         position.z = height;
 
         m_creature->SetHomePosition(position.x, position.y, position.z, 2.62f);
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
             m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
@@ -1419,7 +1419,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->isAlive())
+        if (!m_creature->IsAlive())
             return;
 
         if (!m_CenarionHoldAttackWarn && sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT_CH_ATTACK))

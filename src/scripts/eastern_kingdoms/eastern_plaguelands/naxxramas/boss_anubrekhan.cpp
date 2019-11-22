@@ -587,7 +587,7 @@ struct anub_doorAI : public GameObjectAI
         // on door open, while the rest are said at random points during the fight?
         if (Creature* anubRekhan = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
-            if (anubRekhan->isAlive()) {
+            if (anubRekhan->IsAlive()) {
                 switch (urand(0, 4))
                 {
                 case 0:

@@ -183,7 +183,7 @@ struct boss_arlokkAI : public ScriptedAI
     {
         if (Unit* pUnit = m_creature->GetMap()->GetUnit(m_uiMarkedGUID))
         {
-            if (pUnit->isAlive())
+            if (pUnit->IsAlive())
             {
                 pSummoned->AI()->AttackStart(pUnit);
                 ++m_uiSummonCount;
@@ -390,7 +390,7 @@ struct mob_prowlerAI : public ScriptedAI
                 m_uiArlokkGuid = pArlokk->GetGUID();
 
         if (Creature* pArlokk = m_creature->GetMap()->GetCreature(m_uiArlokkGuid))
-            if (pArlokk->isAlive())
+            if (pArlokk->IsAlive())
                 return CAST_AI(boss_arlokkAI, pArlokk->AI());
         return nullptr;
     }

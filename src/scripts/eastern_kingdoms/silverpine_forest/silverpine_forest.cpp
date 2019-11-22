@@ -42,12 +42,12 @@ struct npc_astor_hadrenAI : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->setFaction(68);
+        m_creature->SetFactionTemplateId(68);
     }
 
     void JustDied(Unit *who) override
     {
-        m_creature->setFaction(68);
+        m_creature->SetFactionTemplateId(68);
     }
 };
 
@@ -76,7 +76,7 @@ bool GossipSelect_npc_astor_hadren(Player* pPlayer, Creature* pCreature, uint32 
             break;
         case GOSSIP_ACTION_INFO_DEF + 2:
             pPlayer->CLOSE_GOSSIP_MENU();
-            pCreature->setFaction(21);
+            pCreature->SetFactionTemplateId(21);
             ((npc_astor_hadrenAI*)pCreature->AI())->AttackStart(pPlayer);
             break;
     }

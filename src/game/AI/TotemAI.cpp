@@ -39,7 +39,7 @@ int TotemAI::Permissible(const Creature *creature)
 
 TotemAI::TotemAI(Creature *pCreature) : CreatureAI(pCreature)
 {
-    pCreature->addUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
+    pCreature->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
 
     if (Totem const* pTotem = pCreature->ToTotem())
     {
@@ -68,7 +68,7 @@ void TotemAI::UpdateAI(const uint32 /*diff*/)
     if (m_totemType != TOTEM_ACTIVE)
         return;
 
-    if (!m_creature->isAlive() || m_creature->IsNonMeleeSpellCasted(false))
+    if (!m_creature->IsAlive() || m_creature->IsNonMeleeSpellCasted(false))
         return;
 
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(m_spellId);
@@ -87,7 +87,7 @@ void TotemAI::UpdateAI(const uint32 /*diff*/)
 
     // Search for another target if current is invalid.
     if (!victim || !m_creature->IsWithinDistInMap(victim, max_range) ||
-            !m_creature->IsValidAttackTarget(victim) || !victim->isVisibleForOrDetect(m_creature, m_creature, false))
+            !m_creature->IsValidAttackTarget(victim) || !victim->IsVisibleForOrDetect(m_creature, m_creature, false))
     {
         victim = nullptr;
 

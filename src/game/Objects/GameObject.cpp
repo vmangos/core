@@ -236,7 +236,7 @@ public:
             return false;
 
         bool _isTotem = u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem();
-        if (u->isAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u) &&
+        if (u->IsAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u) &&
             (u->isInCombat() || i_trapOwner->IsHostileTo(u)))
         {
             i_range = i_trap->GetDistance(u);
@@ -1023,7 +1023,7 @@ void GameObject::SetVisible(bool b)
     UpdateObjectVisibility();
 }
 
-bool GameObject::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
+bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
     // Not in world
     if (!IsInWorld() || !pDetector->IsInWorld())
@@ -2127,7 +2127,7 @@ bool GameObject::IsUseRequirementMet() const
         {
             case GameObjectUseRequirement::GOBJ_REQUIRE_DEAD_CREATURE:
                 if (Creature* crea = GetMap()->GetCreature(req->guid))
-                    if (crea->isAlive())
+                    if (crea->IsAlive())
                         return false;
                 break;
             case GameObjectUseRequirement::GOBJ_REQUIRE_ACTIVE_OBJECT:
@@ -2367,7 +2367,7 @@ void GameObject::Despawn()
         AddObjectToRemoveList();
 }
 
-uint32 GameObject::getLevel() const
+uint32 GameObject::GetLevel() const
 {
     uint32 level = 0;
 

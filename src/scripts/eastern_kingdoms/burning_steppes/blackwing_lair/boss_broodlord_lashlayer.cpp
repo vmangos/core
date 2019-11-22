@@ -67,7 +67,7 @@ struct boss_broodlordAI : public ScriptedAI
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LASHLAYER, IN_PROGRESS);
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             SetMobsDesactivated(true);
             DoScriptText(SAY_AGGRO, m_creature);

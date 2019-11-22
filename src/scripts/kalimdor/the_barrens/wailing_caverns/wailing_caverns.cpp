@@ -273,7 +273,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         while (it != vSummoned.end())
         {
             if (Creature* pSummon = m_pInstance->GetCreature(*it))
-                if (pSummon->isAlive())
+                if (pSummon->IsAlive())
                     pSummon->ForcedDespawn();
             it = vSummoned.erase(it);
         }
@@ -339,7 +339,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         {
             if (Creature* pSummon = m_pInstance->GetCreature(it))
             {
-                if (!pSummon->getVictim() && m_creature->isAlive())
+                if (!pSummon->getVictim() && m_creature->IsAlive())
                 {
                     //the summon has reached the disciple, attack him
                     if (pSummon->GetDistance2d(m_creature) < ATTACK_DISTANCE)
@@ -370,7 +370,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         {
                             for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
                             {
-                                if (i->getSource()->isAlive() && (i->getSource()->GetDistance(m_creature) < 30))
+                                if (i->getSource()->IsAlive() && (i->getSource()->GetDistance(m_creature) < 30))
                                     m_creature->CastSpell(i->getSource(), SPELL_MARK, false);
                             }
                         }
@@ -416,7 +416,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             break;
                         case 1:
                             m_creature->CastSpell(m_creature, SPELL_CLEANSING, false);
-                            m_creature->addUnitState(UNIT_STAT_ROOT);
+                            m_creature->AddUnitState(UNIT_STAT_ROOT);
                             Subevent_Phase = 2;
                             Event_Timer = 15000;
                             break;
@@ -429,7 +429,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 3:
                             if (!m_creature->GetCurrentSpell(CURRENT_GENERIC_SPELL))
                             {
-                                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                                m_creature->ClearUnitState(UNIT_STAT_ROOT);
                                 Subevent_Phase = 4;
                             }
                             Event_Timer = 1000;
@@ -522,7 +522,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             else Event_Timer = 2000;
                             break;
                         case 8:
-                            if (m_creature->isAlive() &&
+                            if (m_creature->IsAlive() &&
                                 !m_creature->getVictim())
                             {
                                 m_creature->DeleteThreatList();
@@ -597,7 +597,7 @@ bool GossipHello_npc_disciple_of_naralex(Player* pPlayer, Creature* pCreature)
 
     pCreature->CastSpell(pPlayer, SPELL_MARK, false);
 
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
     if (m_pInstance && m_pInstance->GetData(TYPE_DISCIPLE) == SPECIAL)
     {
@@ -623,7 +623,7 @@ bool GossipSelect_npc_disciple_of_naralex(Player* pPlayer, Creature* pCreature, 
         {
             pEscortAI->Start(false, /*pPlayer->GetGUID()*/ 0);//we don't want the out of range check.
             pEscortAI->m_playerGuid = pPlayer->GetObjectGuid();
-            pCreature->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+            pCreature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
         }
         pPlayer->CLOSE_GOSSIP_MENU();
     }

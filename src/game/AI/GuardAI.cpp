@@ -43,7 +43,7 @@ bool GuardAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
 
     if (Unit* pVictim = pWho->getVictim())
     {
-        if (m_creature->IsFriendlyTo(pVictim) || pVictim->isTaxi())
+        if (m_creature->IsFriendlyTo(pVictim) || pVictim->IsTaxi())
             return true;
     }
 

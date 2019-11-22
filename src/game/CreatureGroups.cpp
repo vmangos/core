@@ -57,7 +57,7 @@ void CreatureGroup::OnMemberDied(Creature* member)
     {
         if (member->GetObjectGuid() != GetLeaderGuid())
             if (Creature* groupLeader = member->GetMap()->GetCreature(GetLeaderGuid()))
-                if (groupLeader->IsInWorld() && groupLeader->isAlive() && groupLeader->AI())
+                if (groupLeader->IsInWorld() && groupLeader->IsAlive() && groupLeader->AI())
                     groupLeader->AI()->GroupMemberJustDied(member, false);
     }
     if (_options & OPTION_INFORM_MEMBERS_ON_ANY_DIED)
@@ -65,7 +65,7 @@ void CreatureGroup::OnMemberDied(Creature* member)
         for (const auto& itr : _members)
             if (itr.first != member->GetObjectGuid())
                 if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
-                    if (otherMember->IsInWorld() && otherMember->isAlive() && otherMember->AI())
+                    if (otherMember->IsInWorld() && otherMember->IsAlive() && otherMember->AI())
                         otherMember->AI()->GroupMemberJustDied(member, member->GetObjectGuid() == GetLeaderGuid());
     }
 }
@@ -78,12 +78,12 @@ void CreatureGroup::OnLeaveCombat(Creature* member)
         for (const auto& itr : _members)
             if (itr.first != member->GetObjectGuid())
                 if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
-                    if (otherMember->IsInWorld() && otherMember->isAlive() && otherMember->AI())
+                    if (otherMember->IsInWorld() && otherMember->IsAlive() && otherMember->AI())
                         otherMember->AI()->EnterEvadeMode();
 
         if (member->GetObjectGuid() != GetLeaderGuid())
             if (Creature* otherMember = member->GetMap()->GetCreature(GetLeaderGuid()))
-                if (otherMember->IsInWorld() && otherMember->isAlive() && otherMember->AI())
+                if (otherMember->IsInWorld() && otherMember->IsAlive() && otherMember->AI())
                 {
                     masterEvade = true;
                     otherMember->AI()->EnterEvadeMode();
@@ -128,7 +128,7 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
             if (Unit* leader = member->GetMap()->GetUnit(GetLeaderGuid()))
             {
                 float x, y, z;
-                if (leader->isAlive() || leader->GetTypeId() != TYPEID_UNIT)
+                if (leader->IsAlive() || leader->GetTypeId() != TYPEID_UNIT)
                     leader->GetPosition(x, y, z);
                 else
                     leader->ToCreature()->GetRespawnCoord(x, y, z);
@@ -147,7 +147,7 @@ void CreatureGroup::MemberAssist(Creature* member, Unit *target)
     if (!member || !member->IsInWorld())
         return;
 
-    if (!member->isAlive())
+    if (!member->IsAlive())
         return;
 
     if (member->getVictim())
@@ -180,7 +180,7 @@ void CreatureGroup::DisbandGroup(Creature* pMember)
         if (Creature* pOtherMember = pMember->GetMap()->GetCreature(it.first))
         {
             pOtherMember->SetCreatureGroup(nullptr);
-            if (IsFormation() && pOtherMember->isAlive())
+            if (IsFormation() && pOtherMember->IsAlive())
                 pOtherMember->GetMotionMaster()->Initialize();
         }
             

@@ -360,14 +360,14 @@ struct go_pile_dechetsAI: public GameObjectAI
         {
             if (Creature* Guru = pUser->SummonCreature(15047, pUser->GetPositionX(), pUser->GetPositionY(), pUser->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000))
             {
-                Guru->addUnitState(UNIT_STAT_ROOT);
+                Guru->AddUnitState(UNIT_STAT_ROOT);
 
                 Map::PlayerList const& players = Guru->GetMap()->GetPlayers();
                 bool OtherPlayerFound = false;
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
                     Player* pPlayer = itr->getSource();
-                    if (pPlayer && pPlayer->isAlive() && pUser->IsWithinDistInMap(pPlayer, 60.0f) && pUser->IsWithinLOSInMap(pPlayer) &&
+                    if (pPlayer && pPlayer->IsAlive() && pUser->IsWithinDistInMap(pPlayer, 60.0f) && pUser->IsWithinLOSInMap(pPlayer) &&
                             pPlayer != pUser->ToPlayer() && !pPlayer->IsGameMaster())
                     {
                         Guru->AddThreat(pPlayer);
@@ -412,22 +412,22 @@ struct go_pile_dechetsAI: public GameObjectAI
 
                     for (std::list<Creature*>::iterator itr = MobList.begin(); itr != MobList.end(); ++itr)
                     {
-                        if (pUser->IsWithinLOSInMap(*itr) && pUser->IsWithinDistInMap((*itr), 45.0f) && (*itr)->isAlive())
+                        if (pUser->IsWithinLOSInMap(*itr) && pUser->IsWithinDistInMap((*itr), 45.0f) && (*itr)->IsAlive())
                         {
                             if (Player* pPlay = pUser->ToPlayer())
                             {
                                 if (pPlay->GetTeam() == HORDE)
-                                    Guru->setFaction(1);    // Human
+                                    Guru->SetFactionTemplateId(1);    // Human
                                 else if (pPlay->GetTeam() == ALLIANCE)
-                                    Guru->setFaction(2);    // Orc
+                                    Guru->SetFactionTemplateId(2);    // Orc
 
                                 Guru->AddThreat(*itr);
                                 Guru->SetInCombatWith(*itr);
                                 Guru->CastSpell(pUser, 24178, true);
-                                Guru->addUnitState(UNIT_STAT_ROOT);
+                                Guru->AddUnitState(UNIT_STAT_ROOT);
                                 Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                Guru->setFaction(14); // Troll Bloodscalp
+                                Guru->SetFactionTemplateId(14); // Troll Bloodscalp
                                 break;
                             }
                         }

@@ -348,7 +348,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
                 else
                     m_uiConsumeDamage_Timer -= uiDiff;
 
-                if (!pConsumeTarget->isAlive())
+                if (!pConsumeTarget->IsAlive())
                 {
                     if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                         m_creature->GetMotionMaster()->MoveChase(pTarget);
@@ -357,7 +357,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
             }
             else
             {
-                if (pConsumeTarget->isAlive() && m_bPlayerConsumedCharged)
+                if (pConsumeTarget->IsAlive() && m_bPlayerConsumedCharged)
                 {
                     if (DoCastSpellIfCan(pConsumeTarget, SPELL_SPLIT) == CAST_OK)
                     {
@@ -428,7 +428,7 @@ struct ObsidianDestroyerAI : public ScriptedAI
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
-            if (i->getSource()->isAlive() && i->getSource()->getPowerType() == POWER_MANA)
+            if (i->getSource()->IsAlive() && i->getSource()->GetPowerType() == POWER_MANA)
                 PlayerList.push_back(i->getSource()->GetObjectGuid());
         }
     }
@@ -449,7 +449,7 @@ struct ObsidianDestroyerAI : public ScriptedAI
                 Player *Plr = m_creature->GetMap()->GetPlayer(PlayerList[Rand]);
                 if (Plr)
                 {
-                    if (Plr->isAlive())
+                    if (Plr->IsAlive())
                     {
                         m_uiDrainCount++;
                         uint32 Mana = Plr->GetPower(POWER_MANA);
@@ -563,7 +563,7 @@ struct SilicateFeederAI : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->setFaction(7);
+        m_creature->SetFactionTemplateId(7);
         m_bIsAttacked = false;
     }
 
@@ -579,7 +579,7 @@ struct SilicateFeederAI : public ScriptedAI
 
         if (m_bIsAttacked == false)
         {
-            m_creature->setFaction(14);
+            m_creature->SetFactionTemplateId(14);
             m_creature->SetInCombatWithZone();
             m_bIsAttacked = true;
         }
@@ -877,7 +877,7 @@ struct QirajiWarriorAI : public ScriptedAI
                 m_uiTuubidGuid = pTuubid->GetGUID();
 
         if (Creature* pTuubid = m_creature->GetMap()->GetCreature(m_uiTuubidGuid))
-            if (pTuubid->isAlive())
+            if (pTuubid->IsAlive())
                 return CAST_AI(TuubidAI, pTuubid->AI());
         return nullptr;
     }
@@ -985,7 +985,7 @@ struct SwarmguardNeedlerAI : public ScriptedAI
                 m_uiTuubidGuid = pTuubid->GetGUID();
 
         if (Creature* pTuubid = m_creature->GetMap()->GetCreature(m_uiTuubidGuid))
-            if (pTuubid->isAlive())
+            if (pTuubid->IsAlive())
                 return CAST_AI(TuubidAI, pTuubid->AI());
         return nullptr;
     }

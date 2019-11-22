@@ -849,7 +849,7 @@ struct boss_thaddiusAI : public ScriptedAI
         for (auto& p : lPlayers)
         {
             Player* pPlayer = p.getSource();
-            if (pPlayer->isDead())
+            if (pPlayer->IsDead())
                 continue;
 
             playerVec.push_back(p.getSource());

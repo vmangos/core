@@ -327,7 +327,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                 if (target && Spawned)
                 {
                     Spawned->AI()->AttackStart(target);
-                    Spawned->setFaction(103);
+                    Spawned->SetFactionTemplateId(103);
                 }
 
                 ++SpawnedAdds;
@@ -341,7 +341,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                 if (target && Spawned)
                 {
                     Spawned->AI()->AttackStart(target);
-                    Spawned->setFaction(103);
+                    Spawned->SetFactionTemplateId(103);
                 }
 
 
@@ -356,7 +356,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                 if (target && Spawned)
                 {
                     Spawned->AI()->AttackStart(target);
-                    Spawned->setFaction(103);
+                    Spawned->SetFactionTemplateId(103);
 
                 }
 
@@ -371,7 +371,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
                 if (target && Spawned)
                 {
                     Spawned->AI()->AttackStart(target);
-                    Spawned->setFaction(103);
+                    Spawned->SetFactionTemplateId(103);
                 }
                 Despawn_Timer = Despawn_Timer - 15000;
                 AddSpawnTimer = 15000;

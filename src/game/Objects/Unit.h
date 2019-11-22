@@ -376,48 +376,42 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         /***                   STAT SYSTEM                     ***/
         /*********************************************************/
 
+    protected:
         void SetCreateStat(Stats stat, float val) { m_createStats[stat] = val; }
         void SetCreateHealth(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_HEALTH, val); }
-        uint32 GetCreateHealth() const { return GetUInt32Value(UNIT_FIELD_BASE_HEALTH); }
         void SetCreateMana(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_MANA, val); }
+        void SetCreateResistance(SpellSchools school, int32 val) { m_createResistances[school] = val; }
+        void SetStat(Stats stat, int32 val) { SetStatInt32Value(UNIT_FIELD_STAT0 + stat, val); }
+        void SetResistance(SpellSchools school, int32 val) { SetInt32Value(UNIT_FIELD_RESISTANCES + school, val); }
+        float GetRegenHPPerSpirit() const;
+        float GetRegenMPPerSpirit() const;
+    public:
+        // Data
+        float m_modMeleeHitChance;
+        float m_modRangedHitChance;
+        float m_modSpellHitChance;
+        int32 m_baseSpellCritChance;
+        float m_threatModifier[MAX_SPELL_SCHOOL];
+        float m_modAttackSpeedPct[3];
+        float m_modRecalcDamagePct[3];
+
+        float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
+        uint32 GetCreateHealth() const { return GetUInt32Value(UNIT_FIELD_BASE_HEALTH); }
         uint32 GetCreateMana() const { return GetUInt32Value(UNIT_FIELD_BASE_MANA); }
         uint32 GetCreatePowers(Powers power) const;
-        float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
-        void SetCreateResistance(SpellSchools school, int32 val) { m_createResistances[school] = val; }
         int32 GetCreateResistance(SpellSchools school) const { return m_createResistances[school]; }
-
-        
-
-        uint32 getLevel() const final { return GetUInt32Value(UNIT_FIELD_LEVEL); }
-        void SetLevel(uint32 lvl);
-        uint8 getRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, 0); }
-        uint32 getRaceMask() const { return getRace() ? 1 << (getRace()-1) : 0x0; }
-        uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
-        uint32 getClassMask() const { return getClass() ? 1 << (getClass()-1) : 0x0; }
-        uint8 getGender() const override { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
-
-        /**
-         * @brief Inits display id to player display ID, depending on race, class, gender
-         */
-        void InitPlayerDisplayIds();
-
         float GetStat(Stats stat) const { return float(GetUInt32Value(UNIT_FIELD_STAT0+stat)); }
-        void SetStat(Stats stat, int32 val) { SetStatInt32Value(UNIT_FIELD_STAT0+stat, val); }
+        int32 GetArmor() const { return GetResistance(SPELL_SCHOOL_NORMAL); }
+        void SetArmor(int32 val) { SetStatInt32Value(UNIT_FIELD_RESISTANCES, val); }
+        int32 GetResistance(SpellSchools school) const { return GetInt32Value(UNIT_FIELD_RESISTANCES + school); }
 
-        inline int32 GetArmor() const { return GetResistance(SPELL_SCHOOL_NORMAL); }
-        inline void SetArmor(int32 val) { SetStatInt32Value(UNIT_FIELD_RESISTANCES, val); }
-
-        inline int32 GetResistance(SpellSchools school) const { return GetInt32Value(UNIT_FIELD_RESISTANCES + school); }
-        inline void SetResistance(SpellSchools school, int32 val) { SetInt32Value(UNIT_FIELD_RESISTANCES + school, val); }
-
-        uint32 GetHealth()    const { return GetUInt32Value(UNIT_FIELD_HEALTH); }
+        uint32 GetHealth() const { return GetUInt32Value(UNIT_FIELD_HEALTH); }
         uint32 GetMaxHealth() const { return GetUInt32Value(UNIT_FIELD_MAXHEALTH); }
         float GetHealthPercent() const { return (GetHealth()*100.0f) / GetMaxHealth(); }
-        void SetHealth(   uint32 val);
+        void SetHealth(uint32 val);
         void SetMaxHealth(uint32 val);
         void SetHealthPercent(float percent);
         int32 ModifyHealth(int32 val);
-
         bool IsFullHealth() const { return GetHealth() == GetMaxHealth(); }
         bool HealthBelowPct(int32 pct) const { return GetHealth() * 100 < GetMaxHealth() * pct; }
         bool HealthBelowPctDamaged(int32 pct, uint32 damage) const { return (int32(GetHealth()) - damage) * 100 < GetMaxHealth() * pct; }
@@ -425,8 +419,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 CountPctFromMaxHealth(int32 pct) const { return uint32(float(pct) * GetMaxHealth() / 100.0f); }
         void SetFullHealth() { SetHealth(GetMaxHealth()); }
 
-        Powers getPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, 3)); }
-        void setPowerType(Powers power);
+        Powers GetPowerType() const { return Powers(GetByteValue(UNIT_FIELD_BYTES_0, 3)); }
+        void SetPowerType(Powers power);
         void SetInitCreaturePowerType();
         uint32 GetPower(   Powers power) const { return GetUInt32Value(UNIT_FIELD_POWER1   +power); }
         uint32 GetMaxPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_MAXPOWER1+power); }
@@ -448,13 +442,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void ApplyAttackTimePercentMod(WeaponAttackType att,float val, bool apply, bool recalcDamage = false);
         void ApplyCastTimePercentMod(float val, bool apply);
 
-        SheathState GetSheath() const { return SheathState(GetByteValue(UNIT_FIELD_BYTES_2, 0)); }
-        virtual void SetSheath( SheathState sheathed ) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
-
-        // faction template id
-        uint32 getFaction() const final { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
-        void setFaction(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction ); }
-
         float GetObjectBoundingRadius() const final { return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; }
         float GetCombatReach() const final { return m_floatValues[UNIT_FIELD_COMBATREACH]; }
 
@@ -466,27 +453,19 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual uint32 GetShieldBlockValue() const = 0;
         float GetPPMProcChance(uint32 WeaponSpeed, float PPM) const;
 
-        float m_modMeleeHitChance;
-        float m_modRangedHitChance;
-        float m_modSpellHitChance;
-        int32 m_baseSpellCritChance;
-
-        float m_threatModifier[MAX_SPELL_SCHOOL];
-        float m_modAttackSpeedPct[3];
-        float m_modRecalcDamagePct[3];
-
-        // stat system
         bool HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, float amount, bool apply);
         void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
         float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
         float GetTotalStatValue(Stats stat) const;
         int32 GetTotalResistanceValue(SpellSchools school) const;
         float GetTotalAuraModValue(UnitMods unitMod) const;
+
         SpellSchools GetSpellSchoolByAuraGroup(UnitMods unitMod) const;
         Stats GetStatByAuraGroup(UnitMods unitMod) const;
         Powers GetPowerTypeByAuraGroup(UnitMods unitMod) const;
         bool CanModifyStats() const { return m_canModifyStats; }
         void SetCanModifyStats(bool modifyStats) { m_canModifyStats = modifyStats; }
+
         virtual bool UpdateStats(Stats stat) = 0;
         virtual bool UpdateAllStats() = 0;
         virtual void UpdateResistances(uint32 school) = 0;
@@ -494,8 +473,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual void UpdateMaxHealth() = 0;
         virtual void UpdateMaxPower(Powers power) = 0;
         virtual void UpdateManaRegen() = 0;
-        float GetRegenHPPerSpirit() const;
-        float GetRegenMPPerSpirit() const;
+
         virtual void UpdateAttackPowerAndDamage(bool ranged = false) = 0;
         virtual void UpdateDamagePhysical(WeaponAttackType attType) = 0;
         float GetTotalAttackPowerValue(WeaponAttackType attType) const;
@@ -510,10 +488,149 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void ClearComboPointHolders();
 
         /*********************************************************/
+        /***                   STATE SYSTEM                    ***/
+        /*********************************************************/
+
+        void AddUnitState(uint32 f) { m_state |= f; }
+        bool HasUnitState(uint32 f) const { return m_state & f; }
+        void ClearUnitState(uint32 f) { m_state &= ~f; }
+        uint32 GetUnitState() const { return m_state; }
+        void UpdateControl();
+        bool CanFreeMove() const { return !HasUnitState(UNIT_STAT_NO_FREE_MOVE) && !GetOwnerGuid(); }
+        uint32 GetCreatureType() const;
+        uint32 GetCreatureTypeMask() const
+        {
+            uint32 creatureType = GetCreatureType();
+            return creatureType ? (1 << (creatureType - 1)) : 0;
+        }
+        bool IsAlive() const { return m_deathState == ALIVE; }
+        bool IsDead() const { return m_deathState == DEAD || m_deathState == CORPSE; }
+        DeathState GetDeathState() const { return m_deathState; }
+        virtual void SetDeathState(DeathState s);           // overwritten in Creature/Player/Pet
+        uint32 GetLevel() const final { return GetUInt32Value(UNIT_FIELD_LEVEL); }
+        void SetLevel(uint32 lvl);
+        uint8 GetRace() const { return GetByteValue(UNIT_FIELD_BYTES_0, 0); }
+        uint32 GetRaceMask() const { return GetRace() ? 1 << (GetRace()-1) : 0x0; }
+        uint8 GetClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
+        uint32 GetClassMask() const { return GetClass() ? 1 << (GetClass()-1) : 0x0; }
+        uint8 GetGender() const final { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
+        SheathState GetSheath() const { return SheathState(GetByteValue(UNIT_FIELD_BYTES_2, 0)); }
+        virtual void SetSheath(SheathState sheathed) { SetByteValue(UNIT_FIELD_BYTES_2, 0, sheathed); }
+        void SetStandState(uint8 state);
+        uint8 GetStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
+        bool IsSittingDown() const;
+        bool IsStandingUp() const;
+        virtual bool IsStandingUpForProc() const; // takes not yet applied stand state change into account (for players to simulate batching)
+        bool IsMounted() const { return (GetMountID() != 0); }
+        uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
+        virtual void Mount(uint32 mount, uint32 spellId = 0);
+        virtual void Unmount(bool from_aura = false);
+        ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, 2)); }
+        void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, 2, form); }
+        bool IsInFeralForm() const
+        {
+            ShapeshiftForm form = GetShapeshiftForm();
+            return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR;
+        }
+        bool IsInDisallowedMountForm() const;
+        uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
+        void SetDisplayId(uint32 modelId);
+        uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
+        void SetNativeDisplayId(uint32 modelId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, modelId); }
+        void SetTransForm(uint32 spellid) { m_transform = spellid; }
+        uint32 GetTransForm() const { return m_transform; }
+        void SetTransformScale(float scale);
+        void ResetTransformScale();
+        float GetNativeScale() const;
+        void SetNativeScale(float scale);
+        float GetCollisionHeight() const { return m_modelCollisionHeight * m_nativeScaleOverride; }
+        void UpdateModelData(); // at any changes to scale and/or displayId
+        void InitPlayerDisplayIds();
+        void DeMorph();
+        uint32 GetFactionTemplateId() const final { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
+        void SetFactionTemplateId(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction); }
+
+        bool IsVendor()       const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR ); }
+        bool IsTrainer()      const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER ); }
+        bool IsQuestGiver()   const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER ); }
+        bool IsGossip()       const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP ); }
+        bool IsTaxi()         const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_FLIGHTMASTER ); }
+        bool IsGuildMaster()  const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PETITIONER ); }
+        bool IsBattleMaster() const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BATTLEMASTER ); }
+        bool IsBanker()       const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BANKER ); }
+        bool IsInnkeeper()    const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_INNKEEPER ); }
+        bool IsSpiritHealer() const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITHEALER ); }
+        bool IsSpiritGuide()  const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITGUIDE ); }
+        bool IsTabardDesigner()const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TABARDDESIGNER ); }
+        bool IsAuctioner()    const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_AUCTIONEER ); }
+        bool IsArmorer()      const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_REPAIR ); }
+        bool IsServiceProvider() const
+        {
+            return HasFlag( UNIT_NPC_FLAGS,
+                UNIT_NPC_FLAG_VENDOR | UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_FLIGHTMASTER |
+                UNIT_NPC_FLAG_PETITIONER | UNIT_NPC_FLAG_BATTLEMASTER | UNIT_NPC_FLAG_BANKER |
+                UNIT_NPC_FLAG_INNKEEPER | UNIT_NPC_FLAG_SPIRITHEALER |
+                UNIT_NPC_FLAG_SPIRITGUIDE | UNIT_NPC_FLAG_TABARDDESIGNER | UNIT_NPC_FLAG_AUCTIONEER );
+        }
+        bool IsSpiritService() const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITHEALER | UNIT_NPC_FLAG_SPIRITGUIDE ); }
+        bool IsTaxiFlying() const { return HasUnitState(UNIT_STAT_TAXI_FLIGHT); }
+
+        bool IsCaster() const;
+        CreatureAI* AI() const;
+        void ScheduleAINotify(uint32 delay);
+        bool IsAINotifyScheduled() const { return m_AINotifyScheduled; }
+        void SetAINotifyScheduled(bool on) { m_AINotifyScheduled = on; }       // only for call from RelocationNotifyEvent code
+        bool IsLinkingEventTrigger() const { return m_isCreatureLinkingTrigger; }
+
+        void HandleEmote(uint32 emote_id);                  // auto-select command/state
+        void HandleEmoteCommand(uint32 emote_id);
+        void HandleEmoteState(uint32 emote_id);
+                                                                               // debug.
+        void Debug(uint32 debugType, const char* str, ...) const ATTR_PRINTF(3, 4);
+        void SetDebugger(ObjectGuid playerGuid, uint32 flags)
+        {
+            m_debuggerGuid = playerGuid;
+            m_debugFlags = flags;
+        }
+        uint32 GetDebugFlags() const { return m_debugFlags; }
+        ObjectGuid GetDebuggerGuid() const { return m_debuggerGuid; }
+    protected:
+        mutable ObjectGuid m_debuggerGuid;
+        mutable uint32 m_debugFlags;
+
+        /*********************************************************/
+        /***                VISIBILITY SYSTEM                  ***/
+        /*********************************************************/
+
+    public:
+        uint32 m_detectInvisibilityMask;
+        uint32 m_invisibilityMask;
+        virtual bool CanBeDetected() const { return true; }
+        UnitVisibility GetVisibility() const { return m_Visibility; }
+        void SetVisibility(UnitVisibility x);
+        void UpdateVisibilityAndView() override;
+
+        // common function for visibility checks for player/creatures with detection code
+        bool IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const final;
+        bool CanDetectInvisibilityOf(Unit const* u) const;
+        bool CanDetectStealthOf(Unit const* u, float distance, bool* alert = nullptr) const;
+
+        // virtual functions for all world objects types
+        bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
+        // function for low level grid visibility checks in player/creature cases
+        virtual bool IsVisibleInGridForPlayer(Player const* pl) const = 0;
+        bool IsInvisibleForAlive() const;
+        bool IsVisibleForDead() const;
+
+        /*********************************************************/
         /***                   SPELL SYSTEM                    ***/
         /*********************************************************/
 
+    protected:
+        void _UpdateSpells(uint32 time);
+        void _UpdateAutoRepeatSpell();
 
+    public:
         /**
          * Stop all spells from casting except the one give by except_spellid
          * @param except_spellid This spell id will not be stopped from casting, defaults to 0
@@ -557,50 +674,23 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
          */
         void ClearDiminishings() { m_Diminishing.clear(); }
 
-        bool IsEffectResist(SpellEntry const* spell, int eff); // SPELL_AURA_MOD_MECHANIC_RESISTANCE
-
-        bool HasAuraTypeByCaster(AuraType auraType, ObjectGuid casterGuid) const;
-        uint32 GetFirstAuraBySpellIconAndVisual(uint32 spellIconId, uint32 spellVisual) const;
-        uint64 GetAuraApplicationMask() const;
-        uint64 GetNegativeAuraApplicationMask() const;
-
-        SpellAuraHolderBounds GetSpellAuraHolderBounds(uint32 spell_id)
-        {
-            return m_spellAuraHolders.equal_range(spell_id);
-        }
-        SpellAuraHolderConstBounds GetSpellAuraHolderBounds(uint32 spell_id) const
-        {
-            return m_spellAuraHolders.equal_range(spell_id);
-        }
-
-        bool HasAuraType(AuraType auraType) const;
-        bool HasAffectedAura(AuraType auraType, SpellEntry const* spellProto) const;
-        bool HasAura(uint32 spellId, SpellEffectIndex effIndex) const;
-        bool HasAura(uint32 spellId) const
-        {
-            return m_spellAuraHolders.find(spellId) != m_spellAuraHolders.end();
-        }
-        bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
-        bool HasStealthAura()      const { return HasAuraType(SPELL_AURA_MOD_STEALTH); }
-        bool HasInvisibilityAura() const { return HasAuraType(SPELL_AURA_MOD_INVISIBILITY); }
-        bool isFeared()  const { return HasAuraType(SPELL_AURA_MOD_FEAR); }
-        bool isInRoots() const { return HasAuraType(SPELL_AURA_MOD_ROOT); }
-        bool IsPolymorphed() const;
-        bool IsImmuneToSchoolMask(uint32 schoolMask) const;
-        bool isFrozen() const;
-
-        void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
-        void RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype);
-
-        void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
-        uint32 SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
-
         void SendSpellGo(Unit* target, uint32 spellId);
         void SendPlaySpellVisual(uint32 id) const;
         void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo *pInfo, AuraType auraTypeOverride = SPELL_AURA_NONE);
+        void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
+        uint32 SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
 
+        SpellAuraHolder* AddAura(uint32 spellId, uint32 addAuraFlags = 0, Unit* pCaster = nullptr);
+        SpellAuraHolder* RefreshAura(uint32 spellId, int32 duration);
         bool AddSpellAuraHolder(SpellAuraHolder *holder);
         void AddAuraToModList(Aura *aura);
+        void ApplyAuraProcTriggerDamage(Aura* aura, bool apply);
+
+        // pet auras
+        typedef std::set<PetAura const*> PetAuraSet;
+        PetAuraSet m_petAuras;
+        void AddPetAura(PetAura const* petSpell);
+        void RemovePetAura(PetAura const* petSpell);
 
         // removing specific aura stack
         void RemoveAura(Aura* aura, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
@@ -610,11 +700,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveSingleAuraFromSpellAuraHolder(uint32 id, SpellEffectIndex index, ObjectGuid casterGuid, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveSingleAuraDueToItemSet(uint32 spellId, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void DeleteAuraHolder(SpellAuraHolder *holder);
-
-        // Limit debuffs a 16
-        uint32 GetNegativeAurasCount();
-        // Returns true if we remove 'currentAura'
-        bool RemoveAuraDueToDebuffLimit(SpellAuraHolder* currentAura);
 
         // removing specific aura stacks by diff reasons and selections
         void RemoveAurasDueToSpell(uint32 spellId, SpellAuraHolder* except = nullptr, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
@@ -639,19 +724,28 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveAllNegativeAuras(AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAuraTypeOnDeath(AuraType auraType);
         void RemoveAllAurasOnDeath();
+        bool RemoveAuraDueToDebuffLimit(SpellAuraHolder* currentAura); // Returns true if we remove 'currentAura'
+        void RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage);
+        void RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype);
+        uint32 GetNegativeAurasCount(); // Limit debuffs to 16
 
         // removing specific aura FROM stack by diff reasons and selections
         void RemoveAuraHolderFromStack(uint32 spellId, uint32 stackAmount = 1, ObjectGuid casterGuid = ObjectGuid(), AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAuraHolderDueToSpellByDispel(uint32 spellId, uint32 stackAmount, ObjectGuid casterGuid);
 
-        void DelaySpellAuraHolder(uint32 spellId, int32 delaytime, ObjectGuid casterGuid);
+        void _RemoveAllAuraMods();
+        void _ApplyAllAuraMods();
 
-        bool IsSpellProhibited(SpellEntry const* pSpell);
-        bool HasProhibitedSpell(); /* use this to check if creature is silenced */
-        typedef std::list<ProhibitSpellInfo> ProhibitSpellList;
-        ProhibitSpellList m_prohibitSpell;
+        // group updates
+        void UpdateAuraForGroup(uint8 slot);
 
+        GameObject* GetGameObject(uint32 spellId) const;
+        void AddGameObject(GameObject* gameObj);
+        void RemoveGameObject(GameObject* gameObj, bool del);
+        void RemoveGameObject(uint32 spellid, bool del);
+        void RemoveAllGameObjects();
         ObjectGuid m_ObjectSlotGuid[4];
+        uint32 m_lastSanctuaryTime;
 
         SingleCastSpellTargetMap      & GetSingleCastSpellTargets() { return m_singleCastSpellTargets; }
         SingleCastSpellTargetMap const& GetSingleCastSpellTargets() const { return m_singleCastSpellTargets; }
@@ -664,8 +758,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         SpellAuraHolderMap      & GetSpellAuraHolderMap() { return m_spellAuraHolders; }
         SpellAuraHolderMap const& GetSpellAuraHolderMap() const { return m_spellAuraHolders; }
+        void DelaySpellAuraHolder(uint32 spellId, int32 delaytime, ObjectGuid casterGuid);
         AuraList const& GetAurasByType(AuraType type) const { return m_modAuras[type]; }
-        void ApplyAuraProcTriggerDamage(Aura* aura, bool apply);
 
         int32 GetTotalAuraModifier(AuraType auratype) const;
         float GetTotalAuraMultiplier(AuraType auratype) const;
@@ -682,15 +776,38 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         int32 GetMaxPositiveAuraModifierByMiscValue(AuraType auratype, int32 misc_value) const;
         int32 GetMaxNegativeAuraModifierByMiscValue(AuraType auratype, int32 misc_value) const;
 
+        uint64 GetAuraApplicationMask() const;
+        uint64 GetNegativeAuraApplicationMask() const;
+
+        SpellAuraHolderBounds GetSpellAuraHolderBounds(uint32 spell_id)
+        {
+            return m_spellAuraHolders.equal_range(spell_id);
+        }
+        SpellAuraHolderConstBounds GetSpellAuraHolderBounds(uint32 spell_id) const
+        {
+            return m_spellAuraHolders.equal_range(spell_id);
+        }
+
         Aura* GetDummyAura(uint32 spell_id) const;
+        bool HasAuraType(AuraType auraType) const;
+        bool HasAuraTypeByCaster(AuraType auraType, ObjectGuid casterGuid) const;
+        bool HasAffectedAura(AuraType auraType, SpellEntry const* spellProto) const;
+        bool HasAura(uint32 spellId, SpellEffectIndex effIndex) const;
+        bool HasAura(uint32 spellId) const { return m_spellAuraHolders.find(spellId) != m_spellAuraHolders.end(); }
+        bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
+        bool HasStealthAura()      const { return HasAuraType(SPELL_AURA_MOD_STEALTH); }
+        bool HasInvisibilityAura() const { return HasAuraType(SPELL_AURA_MOD_INVISIBILITY); }
+        bool IsFeared()  const { return HasAuraType(SPELL_AURA_MOD_FEAR); }
+        bool IsInRoots() const { return HasAuraType(SPELL_AURA_MOD_ROOT); }
+        bool IsPolymorphed() const;
+        bool IsImmuneToSchoolMask(uint32 schoolMask) const;
+        bool IsFrozen() const;
 
-        uint32 m_AuraFlags;
-
-        GameObject* GetGameObject(uint32 spellId) const;
-        void AddGameObject(GameObject* gameObj);
-        void RemoveGameObject(GameObject* gameObj, bool del);
-        void RemoveGameObject(uint32 spellid, bool del);
-        void RemoveAllGameObjects();
+        bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel = nullptr) const;
+        bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const;
+        bool HasAuraPetShouldAvoidBreaking(Unit* excludeCasterChannel = nullptr) const;
+        bool HasMorePowerfulSpellActive(SpellEntry const* spellInfos);
+        Aura* GetMostImportantAuraAfter(Aura const* like, Aura const* except = nullptr); // Returns the most important aura of the same type as 'like' except 'except'
 
         void ModifyAuraState(AuraState flag, bool apply);
         bool HasAuraState(AuraState flag) const { return HasFlag(UNIT_FIELD_AURASTATE, 1 << (flag - 1)); }
@@ -699,12 +816,13 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 SpellDamageBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
         int32 SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask);
         uint32 SpellHealingBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
-
-
-        bool   IsSpellBlocked(WorldObject* pCaster, Unit *pVictim, SpellEntry const *spellProto, WeaponAttackType attackType = BASE_ATTACK);
-        bool   IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const final;
-
-        bool IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent);
+        void CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, int32 *resist, SpellEntry const* spellProto = nullptr, Spell* spell = nullptr);
+        void CalculateAbsorbResistBlock(WorldObject* pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
+        float RollMagicResistanceMultiplierOutcomeAgainst(float resistanceChance, SpellSchoolMask schoolMask, DamageEffectType dmgType, SpellEntry const* spellProto) const;
+        bool IsSpellBlocked(WorldObject* pCaster, Unit *pVictim, SpellEntry const *spellProto, WeaponAttackType attackType = BASE_ATTACK) const;
+        bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const final;
+        bool IsEffectResist(SpellEntry const* spell, int eff); // SPELL_AURA_MOD_MECHANIC_RESISTANCE
+        bool IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent) const;
 
         // Aura proc handlers
         SpellAuraProcResult HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown);
@@ -739,43 +857,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr);
         virtual bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
 
-        void CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, int32 *resist, SpellEntry const* spellProto = nullptr, Spell* spell = nullptr);
-        void CalculateAbsorbResistBlock(WorldObject* pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
-        float RollMagicResistanceMultiplierOutcomeAgainst(float resistanceChance, SpellSchoolMask schoolMask, DamageEffectType dmgType, SpellEntry const* spellProto) const;
-
-        void _RemoveAllAuraMods();
-        void _ApplyAllAuraMods();
-
-        // group updates
-        void UpdateAuraForGroup(uint8 slot);
-
-        // pet auras
-        typedef std::set<PetAura const*> PetAuraSet;
-        PetAuraSet m_petAuras;
-        void AddPetAura(PetAura const* petSpell);
-        void RemovePetAura(PetAura const* petSpell);
-
         uint32 m_castingSpell;
         void ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellID, MovementModType modType, uint32 time = 0);
-        // "Un sort plus puissant est actif"
-        bool HasMorePowerfullSpellActive(SpellEntry const* spellInfos);
-
-        // Renvoit l'aura le plus important de la meme sorte que 'like', sauf except.
-        Aura* GetMostImportantAuraAfter(Aura const* like, Aura const* except = nullptr);
-
-        // Appele dans SpellEffects::EffectSummonPet et apres un rez en BG.
-        ObjectGuid EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLevel);
-        void ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode = AURA_REMOVE_BY_DEFAULT);
-
-        // Auras
-        SpellAuraHolder* AddAura(uint32 spellId, uint32 addAuraFlags = 0, Unit* pCaster = nullptr);
-
-        // Refresh seulement si l'aura existe.
-        SpellAuraHolder* RefreshAura(uint32 spellId, int32 duration);
-
-        bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel = nullptr) const;
-        bool HasBreakableByDamageAuraType(AuraType type, uint32 excludeAura) const;
-        bool HasAuraPetShouldAvoidBreaking(Unit* excludeCasterChannel = nullptr) const;
 
         // Cooldown management
         SpellCooldowns const& GetSpellCooldownMap() const { return m_spellCooldowns; }
@@ -796,13 +879,18 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         }
         void CooldownEvent(SpellEntry const *spellInfo, uint32 itemId = 0, Spell* spell = nullptr);
         void AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 itemId, Spell* spell = nullptr, bool infinityCooldown = false);
-        void AddSpellCooldown(uint32 spell_id, uint32 itemid, time_t endTime, time_t categoryEndTime = 0, uint32 cat = 0);
-        virtual void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
         void RemoveSpellCooldown(uint32 spell_id, bool update = false);
         void RemoveSpellCategoryCooldown(uint32 cat, bool update = false);
+        void RemoveAllSpellCooldown();
         void WritePetSpellsCooldown(WorldPacket& data);
         GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
-        void RemoveAllSpellCooldown();
+        void AddSpellCooldown(uint32 spell_id, uint32 itemid, time_t endTime, time_t categoryEndTime = 0, uint32 cat = 0);
+
+        virtual void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
+        bool IsSpellProhibited(SpellEntry const* pSpell);
+        bool HasProhibitedSpell(); /* use this to check if creature is silenced */
+        typedef std::list<ProhibitSpellInfo> ProhibitSpellList;
+        ProhibitSpellList m_prohibitSpell;
 
         /*********************************************************/
         /***                  COMBAT SYSTEM                    ***/
@@ -1051,6 +1139,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void TransferAttackersThreatTo(Unit* unit);
         void RemoveAttackersThreat(Unit* owner);
 
+        void ClearAllReactives();
+        void StartReactiveTimer(ReactiveType reactive, ObjectGuid target) { m_reactiveTimer[reactive] = REACTIVE_TIMER_START; m_reactiveTarget[reactive] = target; }
+        ObjectGuid const& GetReactiveTarget(ReactiveType reactive) const { return m_reactiveTarget[reactive]; }
+        void UpdateReactives(uint32 p_time);
+
         /*********************************************************/
         /***                 RELATIONS SYSTEM                  ***/
         /*********************************************************/
@@ -1174,149 +1267,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendPetAIReaction();
         ///----------End of Pet responses methods----------
 
-        /*********************************************************/
-        /***                   STATE SYSTEM                    ***/
-        /*********************************************************/
+        // Apply SpellEffects::EffectSummonPet after ressurecting in BG.
+        ObjectGuid EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLevel);
+        void ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode = AURA_REMOVE_BY_DEFAULT);
 
-        void addUnitState(uint32 f) { m_state |= f; }
-        bool hasUnitState(uint32 f) const { return m_state & f; }
-        void clearUnitState(uint32 f) { m_state &= ~f; }
-        uint32 getUnitState() const { return m_state; }
-        bool CanFreeMove() const
-        {
-            return !hasUnitState(UNIT_STAT_NO_FREE_MOVE) && !GetOwnerGuid();
-        }
-
-        virtual bool CanBeDetected() const { return true; }
-
-        uint32 GetCreatureType() const;
-        uint32 GetCreatureTypeMask() const
-        {
-            uint32 creatureType = GetCreatureType();
-            return creatureType ? (1 << (creatureType - 1)) : 0;
-        }
-
-        uint8 getStandState() const { return GetByteValue(UNIT_FIELD_BYTES_1, 0); }
-        bool IsSittingDown() const;
-        bool IsStandingUp() const;
-        virtual bool IsStandingUpForProc() const; // takes not yet applied stand state change into account (for players)
-        void SetStandState(uint8 state);
-
-        void DeMorph();
-
-        bool IsMounted() const { return (GetMountID() != 0); }
-        uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
-        virtual void Mount(uint32 mount, uint32 spellId = 0);
-        virtual void Unmount(bool from_aura = false);
-
-        void HandleEmote(uint32 emote_id);                  // auto-select command/state
-        void HandleEmoteCommand(uint32 emote_id);
-        void HandleEmoteState(uint32 emote_id);
-
-        bool isVendor()       const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR ); }
-        bool isTrainer()      const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER ); }
-        bool isQuestGiver()   const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER ); }
-        bool isGossip()       const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP ); }
-        bool isTaxi()         const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_FLIGHTMASTER ); }
-        bool isGuildMaster()  const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_PETITIONER ); }
-        bool isBattleMaster() const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BATTLEMASTER ); }
-        bool isBanker()       const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_BANKER ); }
-        bool isInnkeeper()    const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_INNKEEPER ); }
-        bool isSpiritHealer() const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITHEALER ); }
-        bool isSpiritGuide()  const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITGUIDE ); }
-        bool isTabardDesigner()const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TABARDDESIGNER ); }
-        bool isAuctioner()    const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_AUCTIONEER ); }
-        bool isArmorer()      const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_REPAIR ); }
-        bool isServiceProvider() const
-        {
-            return HasFlag( UNIT_NPC_FLAGS,
-                UNIT_NPC_FLAG_VENDOR | UNIT_NPC_FLAG_TRAINER | UNIT_NPC_FLAG_FLIGHTMASTER |
-                UNIT_NPC_FLAG_PETITIONER | UNIT_NPC_FLAG_BATTLEMASTER | UNIT_NPC_FLAG_BANKER |
-                UNIT_NPC_FLAG_INNKEEPER | UNIT_NPC_FLAG_SPIRITHEALER |
-                UNIT_NPC_FLAG_SPIRITGUIDE | UNIT_NPC_FLAG_TABARDDESIGNER | UNIT_NPC_FLAG_AUCTIONEER );
-        }
-        bool isSpiritService() const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_SPIRITHEALER | UNIT_NPC_FLAG_SPIRITGUIDE ); }
-        bool IsTaxiFlying() const { return hasUnitState(UNIT_STAT_TAXI_FLIGHT); }
-        
-        bool isAlive() const { return m_deathState == ALIVE; }
-        bool isDead() const { return m_deathState == DEAD || m_deathState == CORPSE; }
-        DeathState getDeathState() const { return m_deathState; }
-        virtual void SetDeathState(DeathState s);           // overwritten in Creature/Player/Pet
-
-        uint32 m_detectInvisibilityMask;
-        uint32 m_invisibilityMask;
-
-        ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, 2)); }
-        void  SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, 2, form); }
-
-        bool IsInFeralForm() const
-        {
-            ShapeshiftForm form = GetShapeshiftForm();
-            return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR;
-        }
-
-        bool IsInDisallowedMountForm() const;
-
-        // Visibility system
-        UnitVisibility GetVisibility() const { return m_Visibility; }
-        void SetVisibility(UnitVisibility x);
-        void UpdateVisibilityAndView() override;
-
-        // common function for visibility checks for player/creatures with detection code
-        bool isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const final;
-        bool canDetectInvisibilityOf(Unit const* u) const;
-        bool canDetectStealthOf(Unit const* u, float distance, bool* alert = nullptr) const;
-
-        // virtual functions for all world objects types
-        bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
-        // function for low level grid visibility checks in player/creature cases
-        virtual bool IsVisibleInGridForPlayer(Player const* pl) const = 0;
-        bool isInvisibleForAlive() const;
-        bool isVisibleForDead() const;
-
-        uint32 m_lastSanctuaryTime;
-
-        uint32 GetDisplayId() const { return GetUInt32Value(UNIT_FIELD_DISPLAYID); }
-        void SetDisplayId(uint32 modelId);
-        uint32 GetNativeDisplayId() const { return GetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID); }
-        void SetNativeDisplayId(uint32 modelId) { SetUInt32Value(UNIT_FIELD_NATIVEDISPLAYID, modelId); }
-        void setTransForm(uint32 spellid) { m_transform = spellid; }
-        uint32 getTransForm() const { return m_transform; }
-        float GetCollisionHeight() const { return m_modelCollisionHeight * m_nativeScaleOverride; }
-        void UpdateModelData(); // at any changes to scale and/or displayId
-
-        void ClearAllReactives();
-        void StartReactiveTimer(ReactiveType reactive, ObjectGuid target) { m_reactiveTimer[reactive] = REACTIVE_TIMER_START; m_reactiveTarget[reactive] = target; }
-        ObjectGuid const& GetReactiveTarget(ReactiveType reactive) const { return m_reactiveTarget[reactive]; }
-        void UpdateReactives(uint32 p_time);
-
-        bool IsLinkingEventTrigger() const { return m_isCreatureLinkingTrigger; }
-        void UpdateControl();
-
-        void setTransformScale(float scale);
-        void resetTransformScale();
-        float getNativeScale() const;
-        void setNativeScale(float scale);
-
-        // Caster ?
-        bool IsCaster();
-        CreatureAI* AI() const;
-
-        void ScheduleAINotify(uint32 delay);
-        bool IsAINotifyScheduled() const { return m_AINotifyScheduled; }
-        void _SetAINotifyScheduled(bool on) { m_AINotifyScheduled = on; }       // only for call from RelocationNotifyEvent code
-
-        // debug.
-        void Debug(uint32 debugType, const char* str, ...) const ATTR_PRINTF(3, 4);
-        void SetDebugger(ObjectGuid playerGuid, uint32 flags)
-        {
-            _debuggerGuid = playerGuid;
-            _debugFlags = flags;
-        }
-        uint32 GetDebugFlags() const { return _debugFlags; }
-        ObjectGuid GetDebuggerGuid() const { return _debuggerGuid; }
-        ObjectGuid _debuggerGuid;
-        uint32     _debugFlags;
 
         /*********************************************************/
         /***                 MOVEMENT SYSTEM                   ***/
@@ -1411,7 +1365,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
         MotionMaster const* GetMotionMaster() const { return &i_motionMaster; }
 
-        bool IsStopped() const { return !(hasUnitState(UNIT_STAT_MOVING)); }
+        bool IsStopped() const { return !(HasUnitState(UNIT_STAT_MOVING)); }
         void StopMoving(bool force = false);
         
         void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
@@ -1439,9 +1393,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
     protected:
         explicit Unit ();
-
-        void _UpdateSpells(uint32 time);
-        void _UpdateAutoRepeatSpell();
         
         uint32 m_attackTimer[MAX_ATTACK];
         float m_createStats[MAX_STATS];

@@ -359,7 +359,7 @@ struct boss_heiganAI : public ScriptedAI
             if (Unit* pUnit = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
             {
                 // Candidates are only alive players who have not yet been ported during this phase rotation
-                if (pUnit->IsPlayer() && pUnit->isAlive()
+                if (pUnit->IsPlayer() && pUnit->IsAlive()
                     && std::find(portedPlayersThisPhase.begin(), portedPlayersThisPhase.end(), pUnit->GetObjectGuid()) == portedPlayersThisPhase.end())
                 {
                     candidates.push_back(pUnit);
@@ -421,7 +421,7 @@ struct boss_heiganAI : public ScriptedAI
         {
             if (Unit* pTarget = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
             {
-                if (pTarget->getPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->isAlive())
+                if (pTarget->GetPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
                 {
                     if (m_creature->GetDistanceToCenter((*it)->getTarget()) < 28.0f)
                     {
@@ -507,7 +507,7 @@ struct mob_plague_cloudAI : public ScriptedAI
     }
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
     }

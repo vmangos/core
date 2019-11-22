@@ -214,9 +214,9 @@ struct boss_nefarianAI : ScriptedAI
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive())
+            if (pPlayer && pPlayer->IsAlive())
             {
-                if (pPlayer->getClass() == ClassCalled)
+                if (pPlayer->GetClass() == ClassCalled)
                 {
                     bClassFound = true;
                     switch (ClassCalled)
@@ -507,7 +507,7 @@ struct npc_corrupted_totemAI : ScriptedAI
 
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
 
         if (!m_creature->HasAura(SPELL_ROOT_SELF))
             m_creature->AddAura(SPELL_ROOT_SELF);
@@ -575,10 +575,10 @@ struct npc_corrupted_totemAI : ScriptedAI
                 Creature* curr = tmpMobsList.front();
                 tmpMobsList.pop_front();
 
-                if (!curr->isAlive())
+                if (!curr->IsAlive())
                     continue;
 
-                if (on && m_creature->isAlive())
+                if (on && m_creature->IsAlive())
                 {
                     if (m_creature->IsWithinDistInMap(curr, 40.0f))
                     {

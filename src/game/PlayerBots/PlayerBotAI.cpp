@@ -118,21 +118,21 @@ bool MageOrgrimmarAttackerAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSessio
 void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
 {
     PlayerBotAI::UpdateAI(diff);
-    if (me->getLevel() != 60)
+    if (me->GetLevel() != 60)
         me->GiveLevel(60);
     /// DEATH
-    if (!me->isAlive())
+    if (!me->IsAlive())
     {
         sPlayerBotMgr.deleteBot(me->GetGUIDLow());
         /*
-        if (me->getDeathState() < CORPSE)
+        if (me->GetDeathState() < CORPSE)
             return;
-        if (me->getDeathState() == CORPSE && me->GetDeathTimer() && me->GetDeathTimer() < (6 * MINUTE * IN_MILLISECONDS - 30000))
+        if (me->GetDeathState() == CORPSE && me->GetDeathTimer() && me->GetDeathTimer() < (6 * MINUTE * IN_MILLISECONDS - 30000))
         {
             me->SetHealth(1);
             me->RepopAtGraveyard();
         }
-        else if (me->getDeathState() == CORPSE && !me->GetDeathTimer())
+        else if (me->GetDeathState() == CORPSE && !me->GetDeathTimer())
         {
             me->ResurrectPlayer(0.5f);
             me->SpawnCorpseBones();
@@ -161,7 +161,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
     if (!me->HasSpellCooldown(SPELL_FROST_NOVA) && me->GetPower(POWER_MANA) > 50)
         if (nearTarget)
             me->CastSpell(me, SPELL_FROST_NOVA, false);
-    if (nearTarget && target->hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (nearTarget && target->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
     {
         // already runing
         if (!me->movespline->Finalized())

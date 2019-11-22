@@ -112,9 +112,9 @@ public:
     const char* GetName() const { return name.c_str(); }
     uint32 GetZoneId() const { return zoneId; }
     uint32 GetAreaId() const { return areaId; }
-    uint8 getClass() const { return classId; }
-    uint8 getRace() const { return raceId; }
-    uint32 getLevel() const { return level; }
+    uint8 GetClass() const { return classId; }
+    uint8 GetRace() const { return raceId; }
+    uint32 GetLevel() const { return level; }
     bool IsAFK() const { return GetChatTag() == 1; }
     bool IsDND() const { return GetChatTag() == 2; }
     uint8 GetChatTag() const { return m_chatTag; }

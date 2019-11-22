@@ -360,7 +360,7 @@ struct instance_sunken_temple : public ScriptedInstance
         {
             if (Creature *shade = GetMap()->GetCreature(m_uiShadeHakkarGUID))
             {
-                if (!shade->isAlive() || !shade->AI())
+                if (!shade->IsAlive() || !shade->AI())
                     return;
 
                 if (npc_shade_hakkarAI *ai = dynamic_cast<npc_shade_hakkarAI*>(shade->AI()))
@@ -436,7 +436,7 @@ struct instance_sunken_temple : public ScriptedInstance
                     {
                         if (Creature* pProt = instance->GetCreature(m_luiProtectorGUIDs[i]))
                         {
-                            if (pProt->isAlive())
+                            if (pProt->IsAlive())
                             {
                                 bAllDead = false;
                                 break;
@@ -508,7 +508,7 @@ struct instance_sunken_temple : public ScriptedInstance
                             if (!curr->GetDBTableGUIDLow())
                                 continue;
 
-                            if (curr->isAlive())
+                            if (curr->IsAlive())
                                 curr->SetInCombatWithZone();
                         }
                     }
@@ -604,7 +604,7 @@ struct instance_sunken_temple : public ScriptedInstance
                             if (!curr->GetDBTableGUIDLow())
                                 continue;
 
-                            if (curr->isAlive())
+                            if (curr->IsAlive())
                                 curr->SetInCombatWithZone();
                         }
                     }

@@ -88,7 +88,7 @@ struct RespawnAndEvadeHelper
     explicit RespawnAndEvadeHelper(Creature* _pCreature) : pCreature(_pCreature) {}
     void operator()() const
     {
-        if (!pCreature->isAlive())
+        if (!pCreature->IsAlive())
             pCreature->Respawn();
         pCreature->AI()->EnterEvadeMode();
     }
@@ -128,7 +128,7 @@ struct boss_rajaxxAI : public ScriptedAI
         m_uiNextWave_Timer = 0;
         m_uiNextWaveIndex = 0;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
         {
             for (uint8 waveIndex = 0; waveIndex < WAVE_MAX; ++waveIndex)
                 ResetWave(waveIndex);
@@ -138,7 +138,7 @@ struct boss_rajaxxAI : public ScriptedAI
 
     void ResetWave(uint8 waveIndex)
     {
-        if (!m_pInstance || !m_creature->isAlive())
+        if (!m_pInstance || !m_creature->IsAlive())
             return;
         if (waveIndex >= WAVE_MAX)
             return;
@@ -163,7 +163,7 @@ struct boss_rajaxxAI : public ScriptedAI
                 uint64 leaderGUID = GetLeaderGuidFromWaveIndex(waveInd);
                 if (Creature* pLeader = m_pInstance->GetCreature(leaderGUID))
                 {
-                    if (pLeader->isAlive())
+                    if (pLeader->IsAlive())
                         pLeader->SetInCombatWithZone();
                 }
             }
@@ -294,7 +294,7 @@ struct boss_rajaxxAI : public ScriptedAI
             return;
         int alive = 0;
         for (auto it : helpers)
-            if (it->isAlive()) ++alive;
+            if (it->IsAlive()) ++alive;
 
         if (Player* pLootRecepient = m_creature->GetLootRecipient()) {
             if (Group* pGroup = pLootRecepient->GetGroup()) {
@@ -448,7 +448,7 @@ struct npc_andorovAI : public ScriptedAI
 
         if (Creature* pRajaxx = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_RAJAXX)))
         {
-            if (pRajaxx->isAlive())
+            if (pRajaxx->IsAlive())
                 DoScriptText(SAY_KILLS_ANDOROV, pRajaxx);
         }
 

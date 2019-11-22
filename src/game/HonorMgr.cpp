@@ -957,8 +957,8 @@ float HonorMgr::HonorableKillPoints(Player* killer, Player* victim, uint32 group
 
     uint32 totalKills = killer->GetHonorMgr().CalculateTotalKills(victim);
     uint32 victimRank = victim->GetHonorMgr().GetRank().visualRank;
-    uint8 killerLevel = killer->getLevel();
-    uint8 victimLevel = victim->getLevel();
+    uint8 killerLevel = killer->GetLevel();
+    uint8 victimLevel = victim->GetLevel();
         
     return MaNGOS::Honor::GetHonorGain(killerLevel, victimLevel, victimRank, totalKills, groupSize);
 }

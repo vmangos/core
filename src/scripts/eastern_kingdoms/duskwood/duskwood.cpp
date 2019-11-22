@@ -28,7 +28,7 @@ enum
 
 void Handle_NightmareCorruption(/*const*/ Player* player)
 {
-    if (player->isDead() || player->GetQuestStatus(QUEST_NIGHTMARE_CORRUPTION) != QUEST_STATUS_INCOMPLETE)
+    if (player->IsDead() || player->GetQuestStatus(QUEST_NIGHTMARE_CORRUPTION) != QUEST_STATUS_INCOMPLETE)
     {
         return;
     }
@@ -167,7 +167,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
             {
                 if (Player* player = m_creature->GetMap()->GetPlayer(GUIDs[i]))
                 {
-                    if (player->isDead())
+                    if (player->IsDead())
                     {
                         char eMessage[200];
                         sprintf(eMessage, "Twilight Corrupter squeezes the last bit of life out of %s and swallows their soul.", player->GetName());
@@ -467,7 +467,7 @@ struct npc_stitchesAI : npc_escortAI
     void JustDied(Unit* /*pKiller*/) override
     {
         auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-        if (pTownCrier && pTownCrier->isAlive())
+        if (pTownCrier && pTownCrier->IsAlive())
             pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_5);
 
         DespawnWatcher();
@@ -490,7 +490,7 @@ struct npc_stitchesAI : npc_escortAI
         if (pUnit && (pUnit->GetEntry() == NPC_WATCHER_SELKIN))
         {
             auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-            if (pTownCrier && pTownCrier->isAlive())
+            if (pTownCrier && pTownCrier->IsAlive())
                 pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_3);
         }
     }
@@ -501,7 +501,7 @@ struct npc_stitchesAI : npc_escortAI
         {
             if (auto pWatchman = m_creature->GetMap()->GetCreature(*itr))
             {
-                if (pWatchman->isAlive())
+                if (pWatchman->IsAlive())
                     pWatchman->DisappearAndDie();
             }
         }
@@ -583,7 +583,7 @@ struct npc_stitchesAI : npc_escortAI
         case 30:
             {
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
+                if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_1);
             }
             break;
@@ -597,7 +597,7 @@ struct npc_stitchesAI : npc_escortAI
         case 35:
             {
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
+                if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_2);
             }
             break;
@@ -616,7 +616,7 @@ struct npc_stitchesAI : npc_escortAI
                 SummonWatchman(7);
                 SummonWatchman(8);
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
+                if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_4);
             }
             break;

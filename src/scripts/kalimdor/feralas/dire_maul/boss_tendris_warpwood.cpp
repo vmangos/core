@@ -69,7 +69,7 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
                 GetCreatureListWithEntryInGrid(m_AggroList, m_creature, NPC_IRONBARK_PROTECTOR, 1800.0f);
                 for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
                 {
-                    if ((*it)->isAlive())
+                    if ((*it)->IsAlive())
                         (*it)->SetInCombatWithZone();
                 }
             }

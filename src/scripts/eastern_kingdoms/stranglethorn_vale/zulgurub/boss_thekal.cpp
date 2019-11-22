@@ -156,7 +156,7 @@ struct zg_rez_add : public ScriptedAI
         {
             if (Unit* pRezzeur = m_pInstance->instance->GetUnit(m_uiRezzeurGUID))
             {
-                if (pRezzeur->isAlive())
+                if (pRezzeur->IsAlive())
                 {
                     pRezzeur->InterruptNonMeleeSpells(true);
                     pRezzeur->CastSpell(m_creature, SPELL_RESURRECT, false);
@@ -169,7 +169,7 @@ struct zg_rez_add : public ScriptedAI
             {
                 if (Unit* pRezzeur = m_pInstance->instance->GetUnit(m_uiRezzeurGUID))
                 {
-                    if (!pRezzeur->isAlive())
+                    if (!pRezzeur->IsAlive())
                     {
                         m_uiRessurectTimer = 8000;
                         m_uiRezzeurGUID = 0;
@@ -403,7 +403,7 @@ struct boss_thekalAI : public zg_rez_add
     void CheckTiger(uint64& guid)
     {
         Creature* pTiger = m_creature->GetMap()->GetCreature(guid);
-        if (!pTiger || !pTiger->isAlive())
+        if (!pTiger || !pTiger->IsAlive())
         {
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
@@ -415,7 +415,7 @@ struct boss_thekalAI : public zg_rez_add
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->isAlive())
+        if (!m_creature->IsAlive())
             return;
         zg_rez_add::UpdateAI(diff);
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())

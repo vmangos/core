@@ -31,7 +31,7 @@ struct npc_pusillinAI : public ScriptedAI
     {
         m_pInstance = (instance_dire_maul*) pCreature->GetInstanceData();
         ME->SetObjectScale(0.5f);
-        ME->setFaction(35);
+        ME->SetFactionTemplateId(35);
         uiStep = 0;
         bInCombat = false;
         Reset();
@@ -135,7 +135,7 @@ struct npc_pusillinAI : public ScriptedAI
             case 4:
                 ME->SetHomePosition(18.19f, -701.15f, -12.64f, 0);
                 ME->MonsterSay(TEXT_5, 0, 0);
-                ME->setFaction(14);
+                ME->SetFactionTemplateId(14);
                 ME->SetObjectScale(0.7f);
                 ME->CastSpell(ME, 22735, false); // Spirit of Runn Tum
                 bInCombat = true;

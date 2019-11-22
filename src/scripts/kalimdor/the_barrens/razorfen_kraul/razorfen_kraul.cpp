@@ -197,7 +197,7 @@ struct npc_snufflenose_gopherAI : public FollowerAI
 
     void Reset() override
     {
-        m_creature->setFaction(35);
+        m_creature->SetFactionTemplateId(35);
         m_bIsMovementActive  = false;
         m_followPausedTimer = 3000;
     }

@@ -141,7 +141,7 @@ struct mob_TwinsBug : public ScriptedAI {
     void GoBeBadBug(uint32 whatKindOfbad)
     {
         m_creature->AddAura(whatKindOfbad);
-        m_creature->setFaction(14);
+        m_creature->SetFactionTemplateId(14);
         m_creature->SetInCombatWithZone();
         if (whatKindOfbad == SPELL_MUTATE_BUG) {
             m_creature->SetFullHealth();
@@ -150,13 +150,13 @@ struct mob_TwinsBug : public ScriptedAI {
 
     void JustDied(Unit* Killer) override
     {
-        m_creature->setFaction(7);
+        m_creature->SetFactionTemplateId(7);
         m_creature->RemoveAllAuras();
     }
 
     void Reset() override
     {
-        m_creature->setFaction(7);
+        m_creature->SetFactionTemplateId(7);
         m_creature->RemoveAllAuras();
         pierceArmorTimer = 5000;
         acidSpitTimer = 6000;
@@ -238,7 +238,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         justTeleported  = false;
         didPullDialogue = false;
         killSayCooldown = 0;
-        m_creature->clearUnitState(UNIT_STAT_STUNNED);
+        m_creature->ClearUnitState(UNIT_STAT_STUNNED);
     }
 
     void MoveInLineOfSight(Unit *who) override
@@ -321,7 +321,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         for (auto it = lst.begin(); it != lst.end(); it++)
         {
             Creature* pC = *it;
-            if (pC->isDead()) continue;
+            if (pC->IsDead()) continue;
             pC->SetActiveObjectState(true);
             pC->SetInCombatWithZone();
             pC->AI()->AttackStart(pWho);
@@ -479,7 +479,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
             std::list<Creature*>::iterator iter;
             for (iter = lUnitList.begin(); iter != lUnitList.end();) {
-                if ((*iter)->isDead()) {
+                if ((*iter)->IsDead()) {
                     iter = lUnitList.erase(iter);
                 }
                 // Ignoring bugs that has already been affected by a spell
@@ -777,7 +777,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         }
         else if (!m_creature->IsMoving())
         {
-            if(m_creature->getStandState() != UNIT_STAND_STATE_STAND)
+            if(m_creature->GetStandState() != UNIT_STAND_STATE_STAND)
                 m_creature->SetStandState(UNIT_STAND_STATE_STAND);
             if (shadowBoltTimer < diff) 
             {

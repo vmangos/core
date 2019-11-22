@@ -156,7 +156,7 @@ struct boss_sarturaAI : public ScriptedAI
         {
             if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(*itr))
             {
-                if (pRoyalGuard->isDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
+                if (pRoyalGuard->IsDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
             }
         }
     }
@@ -318,7 +318,7 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
     {
         if (Creature* pSartura = m_pInstance->GetSingleCreatureFromStorage(NPC_BATTLEGUARD_SARTURA))
         {
-            if (pSartura->isAlive())
+            if (pSartura->IsAlive())
             {
                 pSartura->AI()->EnterEvadeMode();
 
@@ -328,7 +328,7 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
                 {
                     if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(*itr))
                     {
-                        if (pRoyalGuard->isDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
+                        if (pRoyalGuard->IsDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
                     }
                 }
             }
@@ -515,7 +515,7 @@ struct mob_vekniss_guardianAI : public ScriptedAI
                 if ((*itr)->GetObjectGuid() == m_creature->GetObjectGuid())
                     continue;
 
-                if ((*itr)->isAlive() && m_creature->IsWithinLOSInMap((*itr)))
+                if ((*itr)->IsAlive() && m_creature->IsWithinLOSInMap((*itr)))
                 {
                     if (m_bIsAlone)
                         m_bIsAlone = false;

@@ -179,18 +179,18 @@ struct boss_doomrelAI : public ScriptedAI
     {
         if (Creature* pDwarf = GetDwarfForPhase(m_uiDwarfRound))
         {
-            if (bStartFight && pDwarf->isAlive())
+            if (bStartFight && pDwarf->IsAlive())
             {
                 pDwarf->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-                pDwarf->setFaction(FACTION_HOSTILE);
+                pDwarf->SetFactionTemplateId(FACTION_HOSTILE);
                 pDwarf->SetInCombatWithZone();              // attackstart
             }
             else
             {
-                if (!pDwarf->isAlive() || pDwarf->isDead())
+                if (!pDwarf->IsAlive() || pDwarf->IsDead())
                     pDwarf->Respawn();
 
-                pDwarf->setFaction(FACTION_NEUTRAL);
+                pDwarf->SetFactionTemplateId(FACTION_NEUTRAL);
             }
         }
     }
@@ -217,7 +217,7 @@ struct boss_doomrelAI : public ScriptedAI
                     {
                         if (Creature* pDwarf = GetDwarfForPhase(m_uiDwarfRound - 1))
                         {
-                            if (pDwarf->isAlive())
+                            if (pDwarf->IsAlive())
                             {
                                 if (!pDwarf->SelectHostileTarget() || !pDwarf->getVictim())
                                 {

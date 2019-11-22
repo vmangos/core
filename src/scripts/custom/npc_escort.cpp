@@ -96,7 +96,7 @@ struct npc_escort_genericAI : public npc_escortAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
 
-        m_creature->setFaction(m_pEscortData->uiEscortFaction);
+        m_creature->SetFactionTemplateId(m_pEscortData->uiEscortFaction);
     }
     void OnQuestAccept(Player* pPlayer, const Quest* pQuest)
     {

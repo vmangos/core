@@ -91,7 +91,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
         {
             Creature* pCreature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-            bool ok_loot = pCreature && pCreature->isAlive() == (player->getClass() == CLASS_ROGUE && pCreature->lootForPickPocketed);
+            bool ok_loot = pCreature && pCreature->IsAlive() == (player->GetClass() == CLASS_ROGUE && pCreature->lootForPickPocketed);
 
             if (!ok_loot || !pCreature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
             {
@@ -237,9 +237,9 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recv_data*/)
         {
             Creature* pCreature = GetPlayer()->GetMap()->GetCreature(guid);
 
-            if (player->getClass() == CLASS_ROGUE && pCreature && pCreature->lootForPickPocketed)
+            if (player->GetClass() == CLASS_ROGUE && pCreature && pCreature->lootForPickPocketed)
                 shareMoneyWithGroup = false;
-            bool ok_loot = pCreature && pCreature->isAlive() == (player->getClass() == CLASS_ROGUE && pCreature->lootForPickPocketed);
+            bool ok_loot = pCreature && pCreature->IsAlive() == (player->GetClass() == CLASS_ROGUE && pCreature->lootForPickPocketed);
 
             if (ok_loot && pCreature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
                 pLoot = &pCreature->loot ;
@@ -304,7 +304,7 @@ void WorldSession::HandleLootOpcode(WorldPacket & recv_data)
     }
 
     // Check possible cheat
-    if (!_player->isAlive())
+    if (!_player->IsAlive())
         return;
 
     if (!_player->IsInWorld())
@@ -482,7 +482,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
         {
             Creature* creature = GetPlayer()->GetMap()->GetCreature(lguid);
 
-            bool ok_loot = creature && creature->isAlive() == (player->getClass() == CLASS_ROGUE && creature->lootForPickPocketed);
+            bool ok_loot = creature && creature->IsAlive() == (player->GetClass() == CLASS_ROGUE && creature->lootForPickPocketed);
             if (!ok_loot || !creature->IsWithinDistInMap(_player, INTERACTION_DISTANCE))
                 return;
 
@@ -491,7 +491,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
             if (loot->isLooted())
             {
                 // skip pickpocketing loot for speed, skinning timer reduction is no-op in fact
-                if (!creature->isAlive())
+                if (!creature->IsAlive())
                     creature->AllLootRemovedFromCorpse();
 
                 creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);

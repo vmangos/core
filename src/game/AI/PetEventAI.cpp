@@ -81,7 +81,7 @@ void PetEventAI::AttackStart(Unit* pWho)
     if (m_creature->HasReactState(REACT_PASSIVE) && m_creature->GetCharmInfo() && !m_creature->GetCharmInfo()->IsCommandAttack())
         return;
 
-    if (pWho->HasAuraPetShouldAvoidBreaking() && m_creature->GetCharmerOrOwner() && m_creature->GetCharmerOrOwner()->isAlive())
+    if (pWho->HasAuraPetShouldAvoidBreaking() && m_creature->GetCharmerOrOwner() && m_creature->GetCharmerOrOwner()->IsAlive())
         return;
 
     if (m_creature->Attack(pWho, m_bMeleeAttack))
@@ -181,11 +181,11 @@ void PetEventAI::UpdateAI(const uint32 uiDiff)
     bool bHasVictim = m_creature->getVictim();
 
     //Must return if creature isn't alive. Normally select hostile target and get victim prevent this
-    if (!m_creature->isAlive())
+    if (!m_creature->IsAlive())
         return;
 
     Unit* pOwner = m_creature->GetCharmerOrOwner();
-    bool hasAliveOwner = pOwner && pOwner->isAlive() && m_creature->GetCharmInfo();
+    bool hasAliveOwner = pOwner && pOwner->IsAlive() && m_creature->GetCharmInfo();
 
     if (!bHasVictim && (m_creature->isInCombat() || (hasAliveOwner && pOwner->isInCombat())))
     {
@@ -208,7 +208,7 @@ void PetEventAI::UpdateAI(const uint32 uiDiff)
         if (m_creature->isInCombat() && !(hasAliveOwner && pOwner->isInCombat()))
             m_creature->OnLeaveCombat();
 
-        if (hasAliveOwner && m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW) && !m_creature->hasUnitState(UNIT_STAT_FOLLOW))
+        if (hasAliveOwner && m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW) && !m_creature->HasUnitState(UNIT_STAT_FOLLOW))
         {
             m_creature->GetMotionMaster()->MoveFollow(m_creature->GetCharmerOrOwner(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
             if (m_creature->GetCharmInfo())
@@ -225,7 +225,7 @@ void PetEventAI::OwnerAttackedBy(Unit* pAttacker)
         return;
 
     // Prevent pet from disengaging from current target
-    if (m_creature->getVictim() && m_creature->getVictim()->isAlive())
+    if (m_creature->getVictim() && m_creature->getVictim()->IsAlive())
         return;
 
     // If owner attacked by fire, attacker=owner. Don't attack our owner !
@@ -246,7 +246,7 @@ void PetEventAI::OwnerAttacked(Unit* pTarget)
         return;
 
     // Prevent pet from disengaging from current target
-    if (m_creature->getVictim() && m_creature->getVictim()->isAlive())
+    if (m_creature->getVictim() && m_creature->getVictim()->IsAlive())
         return;
 
     if (!m_creature->IsValidAttackTarget(pTarget))

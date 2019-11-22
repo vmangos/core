@@ -332,7 +332,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         for (std::list<uint64>::const_iterator itr = m_lWaveMobsGUIDList.begin(); itr != m_lWaveMobsGUIDList.end(); itr++)
         {
             if (Creature* WaveMob = instance->GetCreature(*itr))
-                if (WaveMob->isAlive())
+                if (WaveMob->IsAlive())
                     return false;
         }
         return true;

@@ -273,7 +273,7 @@ struct boss_ossirianAI : public ScriptedAI
             {
                 if (Unit* unit = m_creature->GetMap()->GetUnit(TmpThreatList[i]))
                 {
-                    if (unit->isAlive())
+                    if (unit->IsAlive())
                     {
                         if (unit->HasAura(SPELL_ENVELOPING_WINDS))
                             continue;

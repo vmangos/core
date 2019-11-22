@@ -311,7 +311,7 @@ bool QuestAccept_npc_prospector_remtravel(Player* pPlayer, Creature* pCreature, 
 {
     if (pQuest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
     {
-        pCreature->setFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+        pCreature->SetFactionTemplateId(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
         if (npc_prospector_remtravelAI* pEscortAI = dynamic_cast<npc_prospector_remtravelAI*>(pCreature->AI()))
         {
@@ -364,7 +364,7 @@ struct npc_threshwackonatorAI : public FollowerAI
 
     void DoAtEnd()
     {
-        m_creature->setFaction(FACTION_HOSTILE);
+        m_creature->SetFactionTemplateId(FACTION_HOSTILE);
 
         if (Player* pHolder = GetLeaderForFollower())
             m_creature->AI()->AttackStart(pHolder);
@@ -1351,7 +1351,7 @@ struct npc_murkdeepAI : public ScriptedAI
         if (!bonfire)
             return nullptr;
 
-        if (player->IsInRange(bonfire, 0.0f, 50.0f) && player->isAlive())
+        if (player->IsInRange(bonfire, 0.0f, 50.0f) && player->IsAlive())
             return player;
 
         return nullptr;
@@ -1489,13 +1489,13 @@ bool at_murloc_camp(Player* pPlayer, AreaTriggerEntry const *pAt)
 {
     if (pAt->id == AREATRIGGER_MURKDEEP)
     {
-        if (pPlayer->IsGameMaster() || pPlayer->isDead())
+        if (pPlayer->IsGameMaster() || pPlayer->IsDead())
             return false;
 
         if (pPlayer && pPlayer->GetQuestStatus(QUEST_WANTED_MURKDEEP) == QUEST_STATUS_INCOMPLETE)
         {
             Creature *pCreature = GetClosestCreatureWithEntry(pPlayer, NPC_MURKDEEP, DEFAULT_VISIBILITY_DISTANCE);
-            if (pCreature && pCreature->isAlive())
+            if (pCreature && pCreature->IsAlive())
                 return false;
 
             pCreature = pPlayer->SummonCreature(NPC_MURKDEEP, 

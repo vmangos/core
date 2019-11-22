@@ -46,7 +46,7 @@ enum
 
 bool GossipHello_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature)
 {
-    if (pPlayer->getClass() != CLASS_DRUID)
+    if (pPlayer->GetClass() != CLASS_DRUID)
         pPlayer->SEND_GOSSIP_MENU(4916, pCreature->GetGUID());
     else if (pPlayer->GetTeam() != HORDE)
     {
@@ -55,7 +55,7 @@ bool GossipHello_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature)
 
         pPlayer->SEND_GOSSIP_MENU(4917, pCreature->GetGUID());
     }
-    else if (pPlayer->getClass() == CLASS_DRUID && pPlayer->GetTeam() == HORDE)
+    else if (pPlayer->GetClass() == CLASS_DRUID && pPlayer->GetTeam() == HORDE)
     {
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_THUNDER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
@@ -74,7 +74,7 @@ bool GossipSelect_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature, u
         case GOSSIP_ACTION_INFO_DEF + 1:
             pPlayer->CLOSE_GOSSIP_MENU();
 
-            if (pPlayer->getClass() == CLASS_DRUID && pPlayer->GetTeam() == HORDE)
+            if (pPlayer->GetClass() == CLASS_DRUID && pPlayer->GetTeam() == HORDE)
                 pPlayer->ActivateTaxiPathTo(TAXI_PATH_ID_HORDE, 0, true);
 
             break;
@@ -147,7 +147,7 @@ bool GossipSelect_npc_great_bear_spirit(Player* pPlayer, Creature* pCreature, ui
 
 bool GossipHello_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature)
 {
-    if (pPlayer->getClass() != CLASS_DRUID)
+    if (pPlayer->GetClass() != CLASS_DRUID)
         pPlayer->SEND_GOSSIP_MENU(4913, pCreature->GetGUID());
     else if (pPlayer->GetTeam() != ALLIANCE)
     {
@@ -156,7 +156,7 @@ bool GossipHello_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature)
 
         pPlayer->SEND_GOSSIP_MENU(4915, pCreature->GetGUID());
     }
-    else if (pPlayer->getClass() == CLASS_DRUID && pPlayer->GetTeam() == ALLIANCE)
+    else if (pPlayer->GetClass() == CLASS_DRUID && pPlayer->GetTeam() == ALLIANCE)
     {
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_RUTHERAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
@@ -175,7 +175,7 @@ bool GossipSelect_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature, uint
         case GOSSIP_ACTION_INFO_DEF + 1:
             pPlayer->CLOSE_GOSSIP_MENU();
 
-            if (pPlayer->getClass() == CLASS_DRUID && pPlayer->GetTeam() == ALLIANCE)
+            if (pPlayer->GetClass() == CLASS_DRUID && pPlayer->GetTeam() == ALLIANCE)
                 pPlayer->ActivateTaxiPathTo(TAXI_PATH_ID_ALLY, 0, true);
 
             break;
@@ -508,7 +508,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                     m_creature->SetWalk(true);
                     break;
                 case 1:
-                    m_creature->setFaction(1254); //Alita stop Remulos from healing shades.
+                    m_creature->SetFactionTemplateId(1254); //Alita stop Remulos from healing shades.
                     //1254 is a cenarian circle faction(609), belonging to group 1, has group 8 as ennemies, and is friendly with other cenarian circle guys
                     DoScriptText(SAY_REMULOS_INTRO_2, m_creature);
                     break;
@@ -1211,7 +1211,7 @@ struct boss_eranikusAI : public ScriptedAI
 
             // redeem eranikus
             m_uiEventTimer = 5000;
-            m_creature->setFaction(FACTION_FRIENDLY);
+            m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
         }
         else
@@ -1259,7 +1259,7 @@ struct boss_eranikusAI : public ScriptedAI
                 m_creature->GetRandomPoint(aTyrandeLocations[1].m_fX, aTyrandeLocations[1].m_fY, aTyrandeLocations[1].m_fZ, 10.0f, fX, fY, fZ);
                 //pSummoned->GetMotionMaster()->MovePoint(POINT_ID_TYRANDE_HEAL, fX, fY, fZ);
                 pSummoned->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_PATHFINDING | MOVE_RUN_MODE);
-                pSummoned->setFaction(495);//Alita : works out ^^'. 495 is an escort faction
+                pSummoned->SetFactionTemplateId(495);//Alita : works out ^^'. 495 is an escort faction
                 break;
         }
     }

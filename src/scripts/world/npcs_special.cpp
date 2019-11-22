@@ -66,7 +66,7 @@ struct npc_chicken_cluckAI : public ScriptedAI
     {
         m_uiResetFlagTimer = 120000;
 
-        m_creature->setFaction(FACTION_CHICKEN);
+        m_creature->SetFactionTemplateId(FACTION_CHICKEN);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
     }
 
@@ -79,7 +79,7 @@ struct npc_chicken_cluckAI : public ScriptedAI
                 if (pPlayer->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_NONE)
                 {
                     m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                    m_creature->setFaction(FACTION_FRIENDLY);
+                    m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
 
                     DoScriptText(EMOTE_A_HELLO, m_creature);
 
@@ -98,7 +98,7 @@ struct npc_chicken_cluckAI : public ScriptedAI
             if (pPlayer->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_COMPLETE)
             {
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                m_creature->setFaction(FACTION_FRIENDLY);
+                m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
                 DoScriptText(EMOTE_CLUCK_TEXT2, m_creature);
             }
         }
@@ -317,7 +317,7 @@ struct npc_injured_patientAI : public ScriptedAI
 
     void SpellHit(Unit *caster, const SpellEntry *spell) override
     {
-        if (caster->GetTypeId() == TYPEID_PLAYER && m_creature->isAlive() && spell->Id == 20804)
+        if (caster->GetTypeId() == TYPEID_PLAYER && m_creature->IsAlive() && spell->Id == 20804)
         {
             if ((((Player*)caster)->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (((Player*)caster)->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE))
             {
@@ -377,7 +377,7 @@ struct npc_injured_patientAI : public ScriptedAI
             return;
         }
         _healthModTimer = 2000; // TODO: Timer ?
-        if (!m_creature->isAlive() || !Pvloss)
+        if (!m_creature->IsAlive() || !Pvloss)
             return;
 
         if (m_creature->GetHealth() <= 100)
@@ -1028,7 +1028,7 @@ bool GossipSelect_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature, uint
 
 bool GossipHello_npc_sayge(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->HasSpellCooldown(SPELL_INT) ||
@@ -1285,7 +1285,7 @@ struct npc_felhound_minionAI : public ScriptedPetAI
         {
             if (m_uiManaBurnTimer < uiDiff)
             {
-                if (m_creature->getVictim()->getPowerType() == POWER_MANA)
+                if (m_creature->getVictim()->GetPowerType() == POWER_MANA)
                     DoCastSpellIfCan(m_creature->getVictim(), 15980);
                 m_uiManaBurnTimer = urand(9800, 15200);
                 return;
@@ -1512,7 +1512,7 @@ struct npc_cannonball_runnerAI : ScriptedPetAI
         if (m_creature->GetOwner())
             m_creature->SetOrientation(m_creature->GetOwner()->GetOrientation());
 
-        m_creature->addUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT);
+        m_creature->AddUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT);
 
         npc_cannonball_runnerAI::Reset();
     }
@@ -1956,7 +1956,7 @@ struct npc_riggle_bassbaitAI : ScriptedAI
         // yells should not be repeatable, quest credit should go to a single person per week
         if (sGameEventMgr.IsActiveEvent(EVENT_TOURNAMENT))
         {
-            if (!m_creature->isQuestGiver())
+            if (!m_creature->IsQuestGiver())
             {
                 auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_TOURNAMENT);
 
@@ -1976,7 +1976,7 @@ struct npc_riggle_bassbaitAI : ScriptedAI
         }
         else
         {
-            if (m_creature->isQuestGiver())
+            if (m_creature->IsQuestGiver())
             {
                 m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 0, true);
@@ -3495,7 +3495,7 @@ struct npc_oozeling_jubjubAI : public ScriptedPetAI
         if (type == POINT_MOTION_TYPE && id == 1)
         {
             m_creature->MonsterTextEmote(EMOTE_GUZZLE_ALE);
-            m_creature->addUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STAT_ROOT);
             m_uiReturnTimer = 3000;
         }
     }
@@ -3507,7 +3507,7 @@ struct npc_oozeling_jubjubAI : public ScriptedPetAI
             if (m_uiReturnTimer <= uiDiff)
             {
                 m_uiReturnTimer = 0;
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
 
                 if (GameObject* pMug = m_creature->FindNearestGameObject(OBJECT_DARK_IRON_MUG, 1.0f))
                 {

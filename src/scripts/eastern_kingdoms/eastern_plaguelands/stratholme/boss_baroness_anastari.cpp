@@ -128,7 +128,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
                         m_creature->NearTeleportTo(old_Position.x, old_Position.y, old_Position.z, 0.0f);
 
                         /** Set the player health back to its old state unless their party members killed them, whoops! */
-                        if (pTarget->isAlive())
+                        if (pTarget->IsAlive())
                             pTarget->SetHealthPercent(PlayerHealth);
 
                         m_creature->SetVisibility(VISIBILITY_ON);
@@ -140,7 +140,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
                             if (Unit* pTarg = m_creature->GetMap()->GetUnit(PlayerGuids[i]))
                             {
                                 m_creature->getThreatManager().addThreatDirectly(pTarg, PlayerAggro[i]);
-                                if (pTarg->isAlive())
+                                if (pTarg->IsAlive())
                                     m_creature->SetInCombatWith(pTarg);
                             }
                         }

@@ -278,7 +278,7 @@ struct boss_sapphironAI : public ScriptedAI
             
 
             bool alert;
-            if (!pPlayer->isVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
+            if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
                 continue;
 
             if (!pPlayer->isTargetableForAttack() || !m_creature->IsHostileTo(pPlayer))
@@ -353,7 +353,7 @@ struct boss_sapphironAI : public ScriptedAI
         for (auto itr = threatlist.begin(); itr != threatlist.end(); ++itr)
             if (Unit* pTarget = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid()))
             {
-                if (pTarget->isDead())
+                if (pTarget->IsDead())
                     continue;
                 
                 if (std::find(iceboltTargets.begin(), iceboltTargets.end(), pTarget->GetObjectGuid()) != iceboltTargets.end())
@@ -513,7 +513,7 @@ struct boss_sapphironAI : public ScriptedAI
                 if (m_creature->GetHealthPercent() > 10.0f)
                 {
                     events.Reset();
-                    m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                    m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
                     m_creature->InterruptNonMeleeSpells(false);
                     m_creature->GetMotionMaster()->Clear(false);
                     m_creature->GetMotionMaster()->MoveIdle();

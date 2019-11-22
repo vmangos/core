@@ -180,7 +180,7 @@ struct instance_uldaman : public ScriptedInstance
 
     void SetFrozenState(Creature* creature)
     {
-        creature->setFaction(FACTION_STONED);
+        creature->SetFactionTemplateId(FACTION_STONED);
         creature->RemoveAllAuras();
         creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         if (!creature->HasAura(SPELL_STONED))
@@ -191,13 +191,13 @@ struct instance_uldaman : public ScriptedInstance
 
     void SetUnFrozenState(Creature* creature)
     {
-        creature->setFaction(FACTION_AWAKE);
+        creature->SetFactionTemplateId(FACTION_AWAKE);
         if (creature->HasAura(SPELL_STONED))
         {
             creature->RemoveAurasDueToSpell(SPELL_STONED);
         }
         creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        //creature->clearUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT);
+        //creature->ClearUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT);
         //creature->RemoveFlag(UNIT_FIELD_FLAGS,
     //                    UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
     }
@@ -205,21 +205,21 @@ struct instance_uldaman : public ScriptedInstance
     void RespawnMinion(uint64 guid)
     {
         Creature* target = instance->GetCreature(guid);
-        if (!target || (target->isAlive() && target->getFaction() == FACTION_STONED))
+        if (!target || (target->IsAlive() && target->GetFactionTemplateId() == FACTION_STONED))
             return;
-        if (target->isAlive())
+        if (target->IsAlive())
         {
             target->SetDeathState(JUST_DIED);
             target->RemoveCorpse();
         }
         target->Respawn();
-        target->setFaction(FACTION_STONED);
+        target->SetFactionTemplateId(FACTION_STONED);
     }
 
     void DespawnMinion(uint64 guid)
     {
         Creature* target = instance->GetCreature(guid);
-        if (!target || target->isDead())
+        if (!target || target->IsDead())
             return;
         target->SetDeathState(JUST_DIED);
         target->RemoveCorpse();
@@ -309,14 +309,14 @@ struct instance_uldaman : public ScriptedInstance
                             Creature* current = instance->GetCreature(it);
 
                             /* Do nothing if one is already alive and awaken */
-                            if (current && current->isAlive() && current->getFaction() == FACTION_AWAKE)
+                            if (current && current->IsAlive() && current->GetFactionTemplateId() == FACTION_AWAKE)
                             {
                                 target = nullptr;
                                 encounterDone = false;
                                 break;
                             }
                             /* Save a creature that can be awaken for later */
-                            if (!target && current && current->isAlive() && current->getFaction() != FACTION_AWAKE)
+                            if (!target && current && current->IsAlive() && current->GetFactionTemplateId() != FACTION_AWAKE)
                             {
                                 target = current;
                             }
@@ -348,12 +348,12 @@ struct instance_uldaman : public ScriptedInstance
                             {
                                 continue;
                             }
-                            if (target->isDead())
+                            if (target->IsDead())
                             {
                                 target->Respawn();
                                 SetFrozenState(target);
                             }
-                            else if (target->getFaction() == FACTION_AWAKE)
+                            else if (target->GetFactionTemplateId() == FACTION_AWAKE)
                             {
                                 target->SetDeathState(JUST_DIED);
                                 target->RemoveCorpse();
@@ -415,7 +415,7 @@ struct instance_uldaman : public ScriptedInstance
                                 SetData(DATA_ANCIENT_DOOR, IN_PROGRESS);
                             if (archaedas)
                             {
-                                if (archaedas->isAlive() && archaedas->getFaction() != FACTION_AWAKE)
+                                if (archaedas->IsAlive() && archaedas->GetFactionTemplateId() != FACTION_AWAKE)
                                 {
                                     archaedas->CastSpell(archaedas, SPELL_ARCHAEDAS_AWAKEN, false);
                                     SetUnFrozenState(archaedas);
@@ -427,12 +427,12 @@ struct instance_uldaman : public ScriptedInstance
                             for (const auto& i : vArchaedasWallMinions)
                             {
                                 Creature* target = instance->GetCreature(i);
-                                if (!target || !target->isAlive() || target->getFaction() == FACTION_AWAKE)
+                                if (!target || !target->IsAlive() || target->GetFactionTemplateId() == FACTION_AWAKE)
                                 {
                                     continue;
                                 }
                                 archaedas->CastSpell(target, SPELL_AWAKEN_EARTHEN_DWARF, false);
-                                target->setFaction(FACTION_AWAKE);
+                                target->SetFactionTemplateId(FACTION_AWAKE);
                                 break; // only want the first one we find
                             }
                         }

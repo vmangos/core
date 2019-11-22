@@ -137,7 +137,7 @@ struct boss_gmislandAI : public ScriptedAI
                 case 4:
                     if (Unit* mort = m_creature->getVictim())
                     {
-                        if (mort->isAlive())
+                        if (mort->IsAlive())
                         {
                             // "Presque" mort :p
                             mort->DealDamage(mort, mort->GetHealth() - 50, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
@@ -150,7 +150,7 @@ struct boss_gmislandAI : public ScriptedAI
                 case 9:
                     if(Unit* pauvreVictime = m_creature->getVictim())
                     {
-                        if(pauvreVictime->GetTypeId() == TYPEID_PLAYER && pauvreVictime->isAlive())
+                        if(pauvreVictime->GetTypeId() == TYPEID_PLAYER && pauvreVictime->IsAlive())
                         {
                             // Mais qui retirera ce "setConfused" ... ? :P
                             pauvreVictime->SetConfused(true, m_creature->GetGUID(), 5);

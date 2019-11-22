@@ -58,7 +58,7 @@ struct mob_aquementasAI : public ScriptedAI
     {
         SendItem_Timer = 0;
         SwitchFaction_Timer = 10000;
-        m_creature->setFaction(35);
+        m_creature->SetFactionTemplateId(35);
         isFriendly = true;
 
         AquaJet_Timer = 5000;
@@ -90,7 +90,7 @@ struct mob_aquementasAI : public ScriptedAI
         {
             if (SwitchFaction_Timer < diff)
             {
-                m_creature->setFaction(91);
+                m_creature->SetFactionTemplateId(91);
                 isFriendly = false;
             }
             else SwitchFaction_Timer -= diff;
@@ -262,7 +262,7 @@ CreatureAI* GetAI_npc_custodian_of_time(Creature* pCreature)
 
 bool GossipHello_npc_stone_watcher_of_norgannon(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(2954) == QUEST_STATUS_INCOMPLETE)
@@ -403,7 +403,7 @@ struct npc_toogaAI : public FollowerAI
                     m_uiPostEventTimer = 5000;
                     Unit* pTorta = m_creature->GetMap()->GetCreature(m_tortaGuid);
 
-                    if (!pTorta || !pTorta->isAlive())
+                    if (!pTorta || !pTorta->IsAlive())
                     {
                         //something happened, so just complete
                         SetFollowComplete();

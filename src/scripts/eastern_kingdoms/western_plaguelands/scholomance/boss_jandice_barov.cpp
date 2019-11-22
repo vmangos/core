@@ -117,7 +117,7 @@ struct boss_jandicebarovAI : public ScriptedAI
         if (Invisible && Invisible_Timer < diff)
         {
             //Become visible again
-            m_creature->setFaction(14);
+            m_creature->SetFactionTemplateId(14);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->SetVisibility(VISIBILITY_ON);
             Invisible = false;
@@ -149,7 +149,7 @@ struct boss_jandicebarovAI : public ScriptedAI
         {
             //Inturrupt any spell casting
             m_creature->InterruptNonMeleeSpells(false);
-            m_creature->setFaction(35);
+            m_creature->SetFactionTemplateId(35);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -99);
             m_creature->SetVisibility(VISIBILITY_OFF);

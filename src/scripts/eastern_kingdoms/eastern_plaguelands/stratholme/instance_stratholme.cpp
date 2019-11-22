@@ -200,7 +200,7 @@ struct instance_stratholme : public ScriptedInstance
         {
             if (Creature* pCristal = instance->GetCreature(*i))
             {
-                if (!pCristal->isAlive())
+                if (!pCristal->IsAlive())
                     --uiCount;
             }
             else
@@ -491,7 +491,7 @@ struct instance_stratholme : public ScriptedInstance
                     {
                         if (Creature* pAbom = instance->GetCreature(*i))
                         {
-                            if (!pAbom->isAlive())
+                            if (!pAbom->IsAlive())
                                 --uiCount;
                         }
                     }
@@ -704,7 +704,7 @@ struct instance_stratholme : public ScriptedInstance
              |->x    /------------/
                     ^x1             ^x3
             */
-            if (itr->getSource()->isAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible())
+            if (itr->getSource()->IsAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible())
             {
                 //hauteur corect ?
                 if (itr->getSource()->GetPositionZ() < 135 && itr->getSource()->GetPositionZ() > 130)
@@ -726,7 +726,7 @@ struct instance_stratholme : public ScriptedInstance
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
         for (Map::PlayerList::const_iterator itr = listeJoueur.begin(); itr != listeJoueur.end(); ++itr)
         {
-            if (itr->getSource()->isAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible() &&
+            if (itr->getSource()->IsAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible() &&
                     itr->getSource()->GetPositionX() < 3621.32 && itr->getSource()->GetPositionX() > 3603.18 &&
                     itr->getSource()->GetPositionY() < -3335 && itr->getSource()->GetPositionY() > -3340.46 &&
                     itr->getSource()->GetPositionZ() < 130 && itr->getSource()->GetPositionZ() > 123)
@@ -746,7 +746,7 @@ struct instance_stratholme : public ScriptedInstance
 
             if (Creature* pAbom = instance->GetCreature(*Iter))
             {
-                if (pAbom->isAlive() && !pAbom->isInCombat())
+                if (pAbom->IsAlive() && !pAbom->isInCombat())
                 {
                     pAbom->GetMotionMaster()->MovePoint(0, 4037.194f, -3473.741943f, 121.738808f);
                     //pAbom->GetMotionMaster()->MovePoint(1, 4038.45288f, -3487.635498f, 121.742157f);

@@ -287,7 +287,7 @@ struct boss_marliAI : public ScriptedAI
                         {
                             ++i;                                    //not aggro leader
                             pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM,0);
-                            if (pTarget && pTarget->getPowerType() == POWER_MANA)
+                            if (pTarget && pTarget->GetPowerType() == POWER_MANA)
                                 i=5;
                         }
                     */
@@ -384,7 +384,7 @@ struct mob_spawn_of_marliAI : public ScriptedAI
         if (m_uiLevelUp_Timer < uiDiff)
         {
             DoCastSpellIfCan(m_creature, SPELL_LEVELUP);
-            m_creature->SetLevel(m_creature->getLevel() + 1);
+            m_creature->SetLevel(m_creature->GetLevel() + 1);
             m_uiLevelUp_Timer = 3000;
         }
         else

@@ -443,7 +443,7 @@ struct instance_blackrock_depths : ScriptedInstance
                 {
                     uint32 uiTextId;
 
-                    if (!pDagran->isAlive())
+                    if (!pDagran->IsAlive())
                         return;
 
                     if (m_uiDagranTimer > 0)
@@ -678,7 +678,7 @@ struct instance_blackrock_depths : ScriptedInstance
         {
             crea->SetInCombatWithZone();
             crea->AI()->AttackStart(who);
-            crea->setFaction(16);
+            crea->SetFactionTemplateId(16);
         }
     }
 
@@ -727,8 +727,8 @@ struct instance_blackrock_depths : ScriptedInstance
                     {
                         if (Creature* pCreature = instance->GetCreature(*itr))
                         {
-                            if (pCreature->isAlive())
-                                pCreature->setFaction(674);
+                            if (pCreature->IsAlive())
+                                pCreature->SetFactionTemplateId(674);
                         }
                     }
                 }
@@ -832,9 +832,9 @@ struct instance_blackrock_depths : ScriptedInstance
                     {
                         if (Creature* pCreature = instance->GetCreature(*itr))
                         {
-                            if (pCreature->isAlive())
+                            if (pCreature->IsAlive())
                             {
-                                pCreature->setFaction(14);
+                                pCreature->SetFactionTemplateId(14);
                                 Unit* pVictim = pCreature->getVictim();
                                 if (pCreature->AI())
                                     pCreature->AI()->AttackStart(pVictim);
@@ -851,7 +851,7 @@ struct instance_blackrock_depths : ScriptedInstance
                         if (Unit* pVictim = argelmach->getVictim())
                             for (std::list<uint64>::const_iterator itr = m_lArgelmachProtectorsMobGUIDList.begin(); itr != m_lArgelmachProtectorsMobGUIDList.end(); itr++)
                                 if (Creature* protector = instance->GetCreature(*itr))
-                                    if (protector->isAlive() && protector->AI() && protector->IsWithinDist(argelmach, 80.0f))
+                                    if (protector->IsAlive() && protector->AI() && protector->IsWithinDist(argelmach, 80.0f))
                                         protector->AI()->AttackStart(pVictim);
                 }
                 m_auiEncounter[DATA_ARGELMACH_AGGRO] = uiData;

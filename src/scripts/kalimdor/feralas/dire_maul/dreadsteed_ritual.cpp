@@ -174,14 +174,14 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_XOROTHIAN_IMP, 30.0f);
         for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 DoScriptText(SAY_IMP_DESPAWN, (*it));
             (*it)->DisappearAndDie();
         }
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_DREAD_GUARD, 30.0f);
         for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 DoScriptText(SAY_DREAD_GUARD_DESPAWN, (*it));
             (*it)->DisappearAndDie();
         }
@@ -220,14 +220,14 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_XOROTHIAN_IMP, 30.0f);
         for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 DoScriptText(SAY_IMP_DESPAWN, (*it));
             (*it)->DisappearAndDie();
         }
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_DREAD_GUARD, 30.0f);
         for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 DoScriptText(SAY_DREAD_GUARD_DESPAWN, (*it));
             (*it)->DisappearAndDie();
         }

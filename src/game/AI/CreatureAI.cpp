@@ -54,7 +54,7 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
     if (!isTriggered)
     {
         // State does not allow
-        if (m_creature->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+        if (m_creature->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
             return CAST_FAIL_STATE;
 
         if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || m_creature->IsSpellProhibited(pSpell)))
@@ -72,7 +72,7 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
         return CAST_FAIL_OTHER;
 
     // If the spell requires the target having a specific power type
-    if (!pSpell->IsAreaOfEffectSpell() && !pSpell->IsTargetPowerTypeValid(pTarget->getPowerType()))
+    if (!pSpell->IsAreaOfEffectSpell() && !pSpell->IsTargetPowerTypeValid(pTarget->GetPowerType()))
         return CAST_FAIL_OTHER;
 
     // Mind control abilities can't be used with just 1 attacker or mob will reset.
@@ -437,7 +437,7 @@ void CreatureAI::OnCombatStop()
 
 void CreatureAI::EnterEvadeMode()
 {
-    if (!m_creature->isAlive())
+    if (!m_creature->IsAlive())
     {
         m_creature->CombatStop(true);
         m_creature->DeleteThreatList();
@@ -467,7 +467,7 @@ void CreatureAI::TriggerAlert(Unit const* who)
         return;
 
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
-    if (m_creature->GetTypeId() != TYPEID_UNIT || m_creature->isInCombat() || m_creature->hasUnitState(UNIT_STAT_NO_FREE_MOVE))
+    if (m_creature->GetTypeId() != TYPEID_UNIT || m_creature->isInCombat() || m_creature->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
         return;
 
     // Only alert for hostiles!

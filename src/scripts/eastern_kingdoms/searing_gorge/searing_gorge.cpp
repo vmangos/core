@@ -34,7 +34,7 @@ EndContentData */
 
 bool GossipHello_npc_lothos_riftwaker(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestRewardStatus(7487) || pPlayer->GetQuestRewardStatus(7848))
@@ -51,7 +51,7 @@ bool GossipSelect_npc_lothos_riftwaker(Player* pPlayer, Creature* pCreature, uin
     {
         pPlayer->CLOSE_GOSSIP_MENU();
         if (pPlayer->TeleportTo(409, 1096.0f, -467.0f, -104.6f, 3.64f))
-            if (!pPlayer->isAlive())
+            if (!pPlayer->IsAlive())
             {
                 pPlayer->ResurrectPlayer(0.5f, false);
                 pPlayer->SpawnCorpseBones();
@@ -239,7 +239,7 @@ struct npc_obsidionAI : public ScriptedAI
 
     void SummonedCreatureDespawn(Creature* creature) override
     {
-        if (creature->GetEntry() == NPC_LATHORIC_THE_BLACK && (!m_creature->isAlive() || !m_creature->isInCombat()))
+        if (creature->GetEntry() == NPC_LATHORIC_THE_BLACK && (!m_creature->IsAlive() || !m_creature->isInCombat()))
             Reset();
     }
 
@@ -344,7 +344,7 @@ bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, c
         {
             if (npc_obsidionAI* pObsidionAI = dynamic_cast<npc_obsidionAI*>(Obsidion->AI()))
             {
-                if (pObsidionAI->m_IsEventRunning || !Obsidion->isAlive())
+                if (pObsidionAI->m_IsEventRunning || !Obsidion->IsAlive())
                     return false;
                 pObsidionAI->StartEvent();
                 pObsidionAI->m_playerList.push_back(pPlayer->GetObjectGuid());

@@ -38,9 +38,9 @@ public:
     virtual const char* GetName() const = 0;
     virtual uint32 GetZoneId() const = 0;
     virtual uint32 GetAreaId() const = 0;
-    virtual uint8 getClass() const = 0;
-    virtual uint8 getRace() const = 0;
-    virtual uint32 getLevel() const = 0;
+    virtual uint8 GetClass() const = 0;
+    virtual uint8 GetRace() const = 0;
+    virtual uint32 GetLevel() const = 0;
     virtual uint32 GetGuildId() const = 0;
     virtual bool IsAFK() const = 0;
     virtual bool IsDND() const = 0;
@@ -71,9 +71,9 @@ public:
     const char* GetName() const override;
     uint32 GetZoneId() const override;
     uint32 GetAreaId() const override;
-    uint8 getClass() const override;
-    uint8 getRace() const override;
-    uint32 getLevel() const override;
+    uint8 GetClass() const override;
+    uint8 GetRace() const override;
+    uint32 GetLevel() const override;
     uint32 GetGuildId() const override;
     bool IsAFK() const override;
     bool IsDND() const override;

@@ -29,10 +29,10 @@ EndScriptData */
 
 bool GossipHello_npc_gregan_brewspewer(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
-    if (pCreature->isVendor() && pPlayer->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
+    if (pCreature->IsVendor() && pPlayer->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Buy somethin', will ya?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
     pPlayer->SEND_GOSSIP_MENU(2433, pCreature->GetGUID());
@@ -242,7 +242,7 @@ bool QuestAccept_npc_shay_leafrunner(Player* pPlayer, Creature* pCreature, const
     {
         DoScriptText(SAY_ESCORT_START, pCreature);
         if (npc_shay_leafrunnerAI* leafrunnerAI = dynamic_cast<npc_shay_leafrunnerAI*>(pCreature->AI()))
-            leafrunnerAI->BeforeStartFollow(pPlayer, pPlayer->getFaction(), pQuest);
+            leafrunnerAI->BeforeStartFollow(pPlayer, pPlayer->GetFactionTemplateId(), pQuest);
     }
     return true;
 }
@@ -306,7 +306,7 @@ struct MushgogAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
             for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
             {
-                if ((*it)->isAlive())
+                if ((*it)->IsAlive())
                      (*it)->MonsterYell("Leaf him alone Mushgog!");
             }
             m_bAggro = true;
@@ -424,7 +424,7 @@ struct TheRazzaAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
             for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
             {
-                if ((*it)->isAlive())
+                if ((*it)->IsAlive())
                      (*it)->MonsterYell("Woohoo! They are into it now!");
             }
             m_bAggro = true;
@@ -516,7 +516,7 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
             for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
             {
-                if ((*it)->isAlive())
+                if ((*it)->IsAlive())
                      (*it)->MonsterYell("Looks like Skarr has found his next challenger! Wouldn't want to be in that poor fool's shoes!");
             }
             m_bAggro = true;
@@ -720,7 +720,7 @@ struct npc_captured_sprite_darterAI : public ScriptedAI
 
     void JustDied(Unit* /*pWho*/) override
     {
-        if (m_creature->isDead())
+        if (m_creature->IsDead())
         {
             if (Creature * pKindal = m_creature->GetMap()->GetCreature(m_uiKindalGUID))
             {
@@ -793,7 +793,7 @@ struct npc_captured_sprite_darterAI : public ScriptedAI
             return;
         }
 
-        if (m_creature->getVictim()->getPowerType() == POWER_MANA)
+        if (m_creature->getVictim()->GetPowerType() == POWER_MANA)
         {
             if (m_uiManaBurnTimer < uiDiff)
             {

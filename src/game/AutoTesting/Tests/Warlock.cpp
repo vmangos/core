@@ -251,7 +251,7 @@ public:
                 Player* p = GetTestPlayer(0);
                 TEST_ASSERT(p->IsNonMeleeSpellCasted());
                 TEST_ASSERT(p->GetPet());
-                TEST_ASSERT(p->GetPet()->hasUnitState(UNIT_STAT_STUNNED));
+                TEST_ASSERT(p->GetPet()->HasUnitState(UNIT_STAT_STUNNED));
                 Finish();
                 break;
             }
@@ -344,7 +344,7 @@ public:
             {
                 Player* warlock = GetTestPlayer(0);
                 Player* victim = GetTestPlayer(1);
-                TEST_ASSERT(!victim->isAlive());
+                TEST_ASSERT(!victim->IsAlive());
                 TEST_ASSERT(warlock->HasItemCount(ITEM_SOULSHARD, 1));
                 Finish();
                 break;

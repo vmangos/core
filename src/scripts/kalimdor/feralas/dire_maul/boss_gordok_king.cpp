@@ -112,7 +112,7 @@ struct boss_king_gordokAI : public ScriptedAI
             {
                 if (Creature* pChorush = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_CHORUSH)))
                 {
-                    if (pChorush->isAlive() && !pChorush->isInCombat())
+                    if (pChorush->IsAlive() && !pChorush->isInCombat())
                         pChorush->AI()->AttackStart(m_creature->getVictim());
                 }
                 m_uiLinkCheckTimer = 2500;

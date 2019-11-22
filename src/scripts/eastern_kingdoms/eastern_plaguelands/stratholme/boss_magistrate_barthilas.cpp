@@ -39,7 +39,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
         m_mvt_timer = 0;
         m_mvt_id = 0;
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
             m_creature->SetDisplayId(MODEL_NORMAL);
         else
             m_creature->SetDisplayId(MODEL_HUMAN);

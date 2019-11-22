@@ -281,7 +281,7 @@ struct AnnoraAI : public ScriptedAI
     AnnoraAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_creature->SetVisibility(VISIBILITY_OFF);
-        m_creature->setFaction(FACTION_STONED);
+        m_creature->SetFactionTemplateId(FACTION_STONED);
         m_uiNbScorpion = 0;
         isSpawned = false;
         Reset();
@@ -308,7 +308,7 @@ struct AnnoraAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(m_EscortList, m_creature, 7078, 30.0f);
             for (const auto& it : m_EscortList)
             {
-                if (it->isAlive())
+                if (it->IsAlive())
                 {
                     m_uiNbScorpion++;
                 }

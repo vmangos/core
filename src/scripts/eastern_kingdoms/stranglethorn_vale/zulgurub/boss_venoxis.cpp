@@ -145,7 +145,7 @@ struct boss_venoxisAI : public ScriptedAI
             for (auto iter = cobras.cbegin(); iter != cobras.cend(); ++iter)
             {
                 auto cobra = *iter;
-                if (cobra && !cobra->isAlive())
+                if (cobra && !cobra->IsAlive())
                     cobra->Respawn();
             }
         }

@@ -472,7 +472,7 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     {
         if (Player* player = itr->getSource())
         {
-            if (!player->isDead()) {
+            if (!player->IsDead()) {
                 auto find_it = std::find_if(cthunWhisperMutes.begin(), cthunWhisperMutes.end(), 
                     [player](const std::pair<ObjectGuid, uint32>& e) {return e.first == player->GetObjectGuid(); });
                 if (find_it == cthunWhisperMutes.end()) {
@@ -529,7 +529,7 @@ bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, const AreaTriggerEntry* pAt
 {
     if (pAt->id == AREATRIGGER_TWIN_EMPERORS || pAt->id == AREATRIGGER_SARTURA)
     {
-        if (pPlayer->IsGameMaster() || !pPlayer->isAlive())
+        if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
             return false;
 
         if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
@@ -607,7 +607,7 @@ bool instance_temple_of_ahnqiraj::PlayerInStomach(Unit * unit)
 void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const AreaTriggerEntry * pAt)
 {
     if (!pPlayer) return;
-    if (pPlayer->IsGameMaster() || !pPlayer->isAlive())
+    if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
         return;
 
     if (pAt->id == AREATRIGGER_STOMACH_GROUND) {
@@ -651,7 +651,7 @@ bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
                 continue;
             }
 
-            if (p->isAlive()) {
+            if (p->IsAlive()) {
                 p->DealDamage(p, p->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
             if (p->HasAura(SPELL_DIGESTIVE_ACID)) {
@@ -792,14 +792,14 @@ struct AI_QirajiMindslayer : public ScriptedAI {
             return;
 
         // finding closest player and casting manaburn on that target.
-        // todo: should we add a player->getPowerType() == POWER_MANA check too when choosing valid target?
+        // todo: should we add a player->GetPowerType() == POWER_MANA check too when choosing valid target?
         Player* closestPlayer = nullptr;
         float closestDist = std::numeric_limits<float>::max();
         MapRefManager const &list = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = list.begin(); i != list.end(); ++i)
         {
             if (Player* player = i->getSource()) {
-                if (player->isAlive()) { 
+                if (player->IsAlive()) { 
                     float dist = m_creature->GetDistance(player);
                     if (dist < closestDist) {
                         closestPlayer = player;

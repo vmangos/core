@@ -524,7 +524,7 @@ struct npc_dirt_moundAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         Unit *pTarget = m_creature->GetMap()->GetUnit(m_CurrentTargetGUID);
-        const bool bForceChangeTarget = !pTarget || pTarget->isDead()
+        const bool bForceChangeTarget = !pTarget || pTarget->IsDead()
             || pTarget->IsImmuneToDamage(SPELL_SCHOOL_MASK_NATURE);
 
         if (bForceChangeTarget || m_uiChangeTargetTimer < uiDiff)

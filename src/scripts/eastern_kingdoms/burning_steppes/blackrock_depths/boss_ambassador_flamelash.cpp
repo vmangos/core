@@ -109,7 +109,7 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
     {
         ScriptedAI::MoveInLineOfSight(pWho);
 
-        if (pWho->GetEntry() == NPC_BURNING_SPIRIT && pWho->isAlive() && !pWho->isInCombat() && pWho->IsWithinDistInMap(m_creature, 4 * CONTACT_DISTANCE))
+        if (pWho->GetEntry() == NPC_BURNING_SPIRIT && pWho->IsAlive() && !pWho->isInCombat() && pWho->IsWithinDistInMap(m_creature, 4 * CONTACT_DISTANCE))
             pWho->CastSpell(m_creature, SPELL_BURNING_SPIRIT, true);
     }
 

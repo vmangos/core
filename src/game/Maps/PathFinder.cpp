@@ -87,7 +87,7 @@ bool PathInfo::calculate(float destX, float destY, float destZ, bool forceDest, 
 
     // make sure navMesh works - we can run on map w/o mmap
     // check if the start and end point have a .mmtile loaded (can we pass via not loaded tile on the way?)
-    if (!m_navMesh || !m_navMeshQuery || m_sourceUnit->hasUnitState(UNIT_STAT_IGNORE_PATHFINDING) ||
+    if (!m_navMesh || !m_navMeshQuery || m_sourceUnit->HasUnitState(UNIT_STAT_IGNORE_PATHFINDING) ||
             !HaveTiles(start) || !HaveTiles(dest))
     {
         BuildShortcut();

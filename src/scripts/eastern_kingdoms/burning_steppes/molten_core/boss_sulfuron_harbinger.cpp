@@ -57,7 +57,7 @@ struct boss_sulfuronAI : public ScriptedAI
         Knockdown_Timer         = 6000;
         Flamespear_Timer        = 2000;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_SULFURON, NOT_STARTED);
     }
 

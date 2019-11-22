@@ -185,7 +185,7 @@ struct boss_gythAI : public ScriptedAI
     void SummonedCreatureJustDied(Creature* summ) override
     {
         // Rend - invoque par Gyth - peut mourir apres Gyth.
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
             m_creature->SetInCombatWithZone();
 
         // Ne doit pas etre negatif
@@ -285,7 +285,7 @@ struct boss_gythAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GYTH, FAIL);
         DespawnAdds();
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             m_creature->SetDeathState(JUST_DIED);
             m_creature->Respawn();
@@ -301,7 +301,7 @@ struct boss_gythAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GYTH, FAIL);
         DespawnAdds();
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             m_creature->SetDeathState(JUST_DIED);
             m_creature->Respawn();
@@ -337,7 +337,7 @@ struct boss_gythAI : public ScriptedAI
         if (!m_bRootSelf)
         {
             //DoCastSpellIfCan(m_creature, SPELL_ROOT_SELF);
-            m_creature->addUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STAT_ROOT);
             m_bRootSelf = true;
         }
 
@@ -354,10 +354,10 @@ struct boss_gythAI : public ScriptedAI
                 //m_creature->GetMotionMaster()->Initialize();
 
                 m_creature->SetDisplayId(MODEL_ID_GYTH_MOUNTED);
-                m_creature->setFaction(14);
+                m_creature->SetFactionTemplateId(14);
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 //m_creature->RemoveAurasDueToSpell(SPELL_ROOT_SELF);
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
 
                 DoResetThreat();
                 

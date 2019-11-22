@@ -59,7 +59,7 @@ struct boss_ironayaAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (m_creature->getFaction() == FACTION_AWAKE && !hasMoved)
+        if (m_creature->GetFactionTemplateId() == FACTION_AWAKE && !hasMoved)
         {
             if (Unit* target = Unit::GetUnit(*me, instance->GetData64(0)))
             {

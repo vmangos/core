@@ -109,7 +109,7 @@ struct boss_moamAI : public ScriptedAI
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
         {
-            if (pTarget->isAlive())
+            if (pTarget->IsAlive())
             {
                 pSummoned->AI()->AttackStart(pTarget);
                 if (pSummoned->GetEntry() == NPC_MANA_FIEND)
@@ -133,7 +133,7 @@ struct boss_moamAI : public ScriptedAI
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
-            if (i->getSource()->isAlive() && i->getSource()->getPowerType() == POWER_MANA)
+            if (i->getSource()->IsAlive() && i->getSource()->GetPowerType() == POWER_MANA)
                 PlayerList.push_back(i->getSource());
         }
     }
@@ -228,7 +228,7 @@ struct boss_moamAI : public ScriptedAI
                 Player *Plr = 0;
                 if ((Plr = PlayerList[Rand]))
                 {
-                    if (Plr->isAlive())
+                    if (Plr->IsAlive())
                     {
                         m_uiDrainCount++;
                         uint32 Mana = Plr->GetPower(POWER_MANA);

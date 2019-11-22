@@ -48,7 +48,7 @@ void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
     if (!pCreature)
         return;
 
-    if (!pCreature->isBattleMaster())                       // it's not battlemaster
+    if (!pCreature->IsBattleMaster())                       // it's not battlemaster
         return;
 
     // Stop the npc if moving
@@ -441,10 +441,10 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recv_data)
             DEBUG_LOG("Battleground: player %s (%u) has a deserter debuff, do not port him to battleground!", _player->GetName(), _player->GetGUIDLow());
         }
         //if player don't match battleground max level, then do not allow him to enter! (this might happen when player leveled up during his waiting in queue
-        if (_player->getLevel() > bg->GetMaxLevel())
+        if (_player->GetLevel() > bg->GetMaxLevel())
         {
             sLog.outError("Battleground: Player %s (%u) has level (%u) higher than maxlevel (%u) of battleground (%u)! Do not port him to battleground!",
-                          _player->GetName(), _player->GetGUIDLow(), _player->getLevel(), bg->GetMaxLevel(), bg->GetTypeID());
+                          _player->GetName(), _player->GetGUIDLow(), _player->GetLevel(), bg->GetMaxLevel(), bg->GetTypeID());
             action = 0;
         }
     }
@@ -460,7 +460,7 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recv_data)
             }
 
             // resurrect the player
-            if (!_player->isAlive())
+            if (!_player->IsAlive())
             {
                 _player->ResurrectPlayer(1.0f);
                 _player->SpawnCorpseBones();
@@ -608,7 +608,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket & recv_data)
     if (!unit)
         return;
 
-    if (!unit->isSpiritService())                           // it's not spirit service
+    if (!unit->IsSpiritService())                           // it's not spirit service
         return;
 
     unit->SendAreaSpiritHealerQueryOpcode(GetPlayer());
@@ -629,7 +629,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket & recv_data)
     if (!unit)
         return;
 
-    if (!unit->isSpiritService())                           // it's not spirit service
+    if (!unit->IsSpiritService())                           // it's not spirit service
         return;
 
     sScriptMgr.OnGossipHello(GetPlayer(), unit);

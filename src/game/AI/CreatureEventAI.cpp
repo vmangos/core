@@ -369,7 +369,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             break;
         case EVENT_T_VICTIM_ROOTED:
         {
-            if (!m_creature->getVictim() || !m_creature->getVictim()->hasUnitState(UNIT_STAT_ROOT))
+            if (!m_creature->getVictim() || !m_creature->getVictim()->HasUnitState(UNIT_STAT_ROOT))
                 return false;
 
             pHolder.UpdateRepeatTimer(m_creature, event.victim_rooted.repeatMin, event.victim_rooted.repeatMax);
@@ -764,7 +764,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
     bool Combat =  m_creature->getVictim();
 
     //Must return if creature isn't alive. Normally select hostil target and get victim prevent this
-    if (!m_creature->isAlive())
+    if (!m_creature->IsAlive())
         return;
 
     if (!m_bEmptyList)

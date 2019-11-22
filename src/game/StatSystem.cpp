@@ -142,7 +142,7 @@ void Player::UpdateArmor()
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     // Add dummy effects from spells (check class and other conditions first for optimization)
-    if (getClass() == CLASS_DRUID)
+    if (GetClass() == CLASS_DRUID)
     {
         ShapeshiftForm form = GetShapeshiftForm();
         if ((form == FORM_DIREBEAR) || (form == FORM_BEAR))
@@ -219,7 +219,7 @@ void Player::UpdateMaxPower(Powers power)
 void Player::UpdateAttackPowerAndDamage(bool ranged)
 {
     float val2 = 0.0f;
-    float level = float(getLevel());
+    float level = float(GetLevel());
 
     UnitMods unitMod = ranged ? UNIT_MOD_ATTACK_POWER_RANGED : UNIT_MOD_ATTACK_POWER;
 
@@ -237,7 +237,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
         index_mult = UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER;
 #endif
 
-        switch (getClass())
+        switch (GetClass())
         {
             case CLASS_HUNTER:
                 val2 = level * 2.0f + GetStat(STAT_AGILITY) * 2.0f - 10.0f;
@@ -268,7 +268,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     }
     else
     {
-        switch (getClass())
+        switch (GetClass())
         {
             case CLASS_WARRIOR:
                 val2 = level * 3.0f + GetStat(STAT_STRENGTH) * 2.0f                    - 20.0f;
@@ -316,14 +316,14 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                 switch (form)
                 {
                     case FORM_CAT:
-                        val2 = getLevel() * mLevelMult + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) - 20.0f;
+                        val2 = GetLevel() * mLevelMult + GetStat(STAT_STRENGTH) * 2.0f + GetStat(STAT_AGILITY) - 20.0f;
                         break;
                     case FORM_BEAR:
                     case FORM_DIREBEAR:
-                        val2 = getLevel() * mLevelMult + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+                        val2 = GetLevel() * mLevelMult + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
                         break;
                     case FORM_MOONKIN:
-                        val2 = getLevel() * mLevelMult + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
+                        val2 = GetLevel() * mLevelMult + GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
                         break;
                     default:
                         val2 = GetStat(STAT_STRENGTH) * 2.0f - 20.0f;
@@ -410,7 +410,7 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
         }
         else 
         {
-            uint32 lvl = getLevel();
+            uint32 lvl = GetLevel();
             if (lvl > 60)
                 lvl = 60;
 
@@ -512,7 +512,7 @@ void Player::UpdateCritPercentage(WeaponAttackType attType)
     }
 
     float value = GetTotalPercentageModValue(modGroup);
-    switch (getClass())
+    switch (GetClass())
     {
         case CLASS_DRUID:
             value += 0.9f;
@@ -573,7 +573,7 @@ void Player::UpdateDodgePercentage()
 {
     // Nostalrius : base dodge per class
     float value = 0.0f;
-    switch (getClass())
+    switch (GetClass())
     {
         case CLASS_DRUID:
             value += 0.9f;

@@ -67,7 +67,7 @@ class npc_alterac_bossHelper
             for (int i = 0; i < m_linkedEntries.size(); ++i)
                 GetCreatureListWithEntryInGrid(creaturesLinked, me, m_linkedEntries[i], 100.0f);
             for (std::list<Creature*>::iterator it = creaturesLinked.begin(); it != creaturesLinked.end(); ++it)
-                if ((*it)->isAlive() && !(*it)->isInCombat())
+                if ((*it)->IsAlive() && !(*it)->isInCombat())
                 {
                     ThreatListCopier* c = new ThreatListCopier(*it);
                     me->ProcessThreatList(c);
@@ -108,7 +108,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         m_uiAvatar_Timer = urand(12000, 20000);
         m_uiStormbolt_Timer = 8000;
         m_uiThunderclap_Timer = 5000;
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STAT_ROOT);
         m_bAggro = true;
         m_bLeashed = false;
         m_bCombat1 = true;
@@ -154,7 +154,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
                 m_bLeashed = true;
                 EnterEvadeMode();
                 return;
@@ -350,7 +350,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         m_uiIsInWhirlwind_Timer = 0;
         m_uiKnockDown_Timer = 18000;
         m_uiFrenzy_Timer = 1000;
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STAT_ROOT);
         m_bAggro = true;
         m_bLeashed = false;
         m_bCombat1 = true;
@@ -363,13 +363,13 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         std::list<Creature*> m_Wolf;
         GetCreatureListWithEntryInGrid(m_Wolf, m_creature, 12121, 100.0f);
         for (std::list<Creature*>::iterator it = m_Wolf.begin(); it != m_Wolf.end(); ++it)
-            if (!(*it)->isAlive())
+            if (!(*it)->IsAlive())
                 (*it)->Respawn();
         m_Wolf.clear();
 
         GetCreatureListWithEntryInGrid(m_Wolf, m_creature, 12122, 100.0f);
         for (std::list<Creature*>::iterator it = m_Wolf.begin(); it != m_Wolf.end(); ++it)
-            if (!(*it)->isAlive())
+            if (!(*it)->IsAlive())
                 (*it)->Respawn();
         m_Wolf.clear();
 
@@ -412,7 +412,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
                 m_bLeashed = true;
                 EnterEvadeMode();
                 return;
@@ -440,13 +440,13 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_uiIsInWhirlwind_Timer == 0)
         {
-            if (m_creature->hasUnitState(UNIT_STAT_ROOT))
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
         }
         else
         {
-            if (!m_creature->hasUnitState(UNIT_STAT_ROOT))
-                m_creature->addUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
+                m_creature->AddUnitState(UNIT_STAT_ROOT);
         }
 
         // SPELL_WHIRLWIND
@@ -588,7 +588,7 @@ struct npc_BalindaAI : public ScriptedAI
         m_uiConeOfCold_Timer = 1500;
         m_uiArcaneExplo_Timer = 2000;
         m_uiPolymorph_Timer = 1750;
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STAT_ROOT);
         if (m_bReset)
             DoScriptText(SAY_BALINDA_RESET, m_creature);
         m_bReset = true;
@@ -624,7 +624,7 @@ struct npc_BalindaAI : public ScriptedAI
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
                 EnterEvadeMode();
                 return;
             }
@@ -652,13 +652,13 @@ struct npc_BalindaAI : public ScriptedAI
         if (((m_creature->GetDistance(m_creature->getVictim()) > 25.0f) || (m_creature->GetDistance(m_creature->getVictim()) < 5.0f))
             || (!m_creature->IsWithinLOSInMap(m_creature->getVictim())))
         {
-            if (m_creature->hasUnitState(UNIT_STAT_ROOT))
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
         }
         else
         {
-            if (!m_creature->hasUnitState(UNIT_STAT_ROOT))
-                m_creature->addUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
+                m_creature->AddUnitState(UNIT_STAT_ROOT);
         }
 
         // ARCANE EXPLOSION
@@ -837,7 +837,7 @@ struct npc_GalvangarAI : public ScriptedAI
         m_uiMortalStrike_Timer = 7000;
         m_uiCleave_Timer = 4000;
         m_uiFrighteningShout_Timer = m_uiWhirlwind_Timer + urand(1000, 5000);
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STAT_ROOT);
         if (m_bReset)
             DoScriptText(SAY_GALVANGAR_RESET, m_creature);
         m_bReset = true;
@@ -866,7 +866,7 @@ struct npc_GalvangarAI : public ScriptedAI
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
                 EnterEvadeMode();
                 return;
             }
@@ -900,13 +900,13 @@ struct npc_GalvangarAI : public ScriptedAI
 
         if (m_uiIsInWhirlwind_Timer == 0)
         {
-            if (m_creature->hasUnitState(UNIT_STAT_ROOT))
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+            if (m_creature->HasUnitState(UNIT_STAT_ROOT))
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
         }
         else
         {
-            if (!m_creature->hasUnitState(UNIT_STAT_ROOT))
-                m_creature->addUnitState(UNIT_STAT_ROOT);
+            if (!m_creature->HasUnitState(UNIT_STAT_ROOT))
+                m_creature->AddUnitState(UNIT_STAT_ROOT);
         }
 
         // SPELL_WHIRLWIND_GAL
@@ -1039,7 +1039,7 @@ struct npc_WarMasterAI : public ScriptedAI
         m_uiWhirlwind_Timer = 12000;
         m_uiEnrage_Timer    = 0;
         m_uiIsInWhirlwind_Timer = 0;
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        m_creature->ClearUnitState(UNIT_STAT_ROOT);
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -1092,9 +1092,9 @@ struct npc_WarMasterAI : public ScriptedAI
         }
 
         if (!m_uiIsInWhirlwind_Timer)
-            m_creature->clearUnitState(UNIT_STAT_ROOT);
+            m_creature->ClearUnitState(UNIT_STAT_ROOT);
         else
-            m_creature->addUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STAT_ROOT);
 
         // SPELL_WHIRLWIND_WM
         if (m_uiWhirlwind_Timer < diff)
@@ -1445,7 +1445,7 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
         {
 
             EnterEvadeMode();
-            m_creature->setFaction(35);
+            m_creature->SetFactionTemplateId(35);
 
             /** Link the tamed creature to the player it shall follow */
             m_creature->CastSpell(m_creature, SPELL_TAME_OWNED_BY_PLAYER, true);
@@ -1481,7 +1481,7 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
             ObjectGuid playerOwner(HIGHGUID_PLAYER, m_creature->AI()->GetData(0));
             if (Player* player = m_creature->GetMap()->GetPlayer(playerOwner))
             {
-                if (player->isDead())
+                if (player->IsDead())
                 {
                     /** Make the tamed beast disappears, respawn in 2min30 */
                     m_creature->SetRespawnDelay(180);
@@ -1747,7 +1747,7 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, commander_id, 200.0f);
             for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-                if ((*it)->isDead())
+                if ((*it)->IsDead())
                     isLeaderDead = true;
             m_RamRiderList.clear();
         }
@@ -3015,7 +3015,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_GROUND_ASSAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
 
-        //        if (pCreature->isVendor())
+        //        if (pCreature->IsVendor())
         //            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
         //       pPlayer->SEND_GOSSIP_MENU(6255, pCreature->GetGUID());
@@ -3121,13 +3121,13 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
         {
             if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pCreature->AI()))
             {
-                pCreature->setFaction(1194);
+                pCreature->SetFactionTemplateId(1194);
                 pEscortAI->Start(true, 0, nullptr, false);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 pCreature->SetWalk(false);
-                pCreature->setFaction(pPlayer->getFaction());
+                pCreature->SetFactionTemplateId(pPlayer->GetFactionTemplateId());
                 if (pCreature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
                     pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             }
@@ -3148,13 +3148,13 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                 if (pCreature->GetEntry() == AV_NPC_ENTRY_VIPORE)
                     pCreature->CastSpell(pCreature, 5759, false);
 
-                pCreature->setFaction(1194);
+                pCreature->SetFactionTemplateId(1194);
                 pEscortAI->Start(true, 0, nullptr, false);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 pCreature->SetWalk(false);
-                pCreature->setFaction(pPlayer->getFaction());
+                pCreature->SetFactionTemplateId(pPlayer->GetFactionTemplateId());
                 if (pCreature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
                     pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             }
@@ -3421,7 +3421,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
             if (pCreature->GetEntry() == AV_NPC_QUARTERMASTER_A || pCreature->GetEntry() == AV_NPC_QUARTERMASTER)
             {
-                if (pCreature->isVendor())
+                if (pCreature->IsVendor())
                     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
                 pPlayer->SEND_GOSSIP_MENU(6255, pCreature->GetGUID());
@@ -3438,11 +3438,11 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
         pCreature->HandleEmote(EMOTE_ONESHOT_BOW);
         return true;
     }
-    else if (pCreature->isQuestGiver())
+    else if (pCreature->IsQuestGiver())
     {
         if (pCreature->GetEntry() == AV_NPC_QUARTERMASTER_A || pCreature->GetEntry() == AV_NPC_QUARTERMASTER)
         {
-            if (pCreature->isVendor())
+            if (pCreature->IsVendor())
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
             pPlayer->SEND_GOSSIP_MENU(6255, pCreature->GetGUID());
@@ -3916,7 +3916,7 @@ bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, ui
                         if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pCreature->AI()))
                         {
                             pEscortAI->Start(true, 0, nullptr, false);
-                            //pCreature->setFaction(pPlayer->getFaction());
+                            //pCreature->SetFactionTemplateId(pPlayer->GetFactionTemplateId());
                             pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                             pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                             pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
@@ -4358,7 +4358,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
-            if (i->getSource()->isAlive())
+            if (i->getSource()->IsAlive())
                 i->getSource()->RemoveAurasDueToSpell(11206);
         }
 
@@ -4568,7 +4568,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
-            if (i->getSource()->isAlive())
+            if (i->getSource()->IsAlive())
                 i->getSource()->RemoveAurasDueToSpell(11206);
         }
 
@@ -5471,7 +5471,7 @@ struct AV_mineNpcAI : public ScriptedAI
             return 0;
         BattleGroundAV* bgAv = dynamic_cast<BattleGroundAV*>(((BattleGroundMap*)m)->GetBG());
         uint32 m_factionId;
-        if (m_creature->getFaction() == 85)
+        if (m_creature->GetFactionTemplateId() == 85)
             m_factionId = 1;
         else
             m_factionId = 0;

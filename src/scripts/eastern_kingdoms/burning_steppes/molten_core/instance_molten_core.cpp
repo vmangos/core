@@ -220,7 +220,7 @@ struct instance_molten_core : ScriptedInstance
                 {
                     for (std::list<Creature*>::iterator itr = DomoListe.begin(); itr != DomoListe.end(); ++itr)
                     {
-                        if ((*itr)->isAlive() && !(*itr)->isInCombat())
+                        if ((*itr)->IsAlive() && !(*itr)->isInCombat())
                             (*itr)->SetInCombatWith(victim);
                     }
                 }

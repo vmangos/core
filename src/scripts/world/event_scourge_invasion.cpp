@@ -63,7 +63,7 @@ struct npc_flameshocker_spawn_pointAI : public ScriptedAI
         if (_checkTimer < diff)
         {
             Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster);
-            if (!myMonster || !myMonster->isAlive())
+            if (!myMonster || !myMonster->IsAlive())
                 if (Creature* spawn = m_creature->SummonCreature(NPC_FLAMESHOCKER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0, true))
                     _myMonster = spawn->GetObjectGuid();
             _checkTimer = urand(2 * 60, 3 * 60) * 1000;
@@ -105,7 +105,7 @@ struct npc_horror_pallid_spawn_pointAI : public ScriptedAI
         {
             uint32 entry = urand(0, 1) ? NPC_PATCHWORK_TERROR : NPC_PALLID_HORROR;
             Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster);
-            if (!myMonster || !myMonster->isAlive())
+            if (!myMonster || !myMonster->IsAlive())
                 if (Creature* spawn = m_creature->SummonCreature(entry, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0, true))
                     _myMonster = spawn->GetObjectGuid();
             _checkTimer = urand(15 * 60, 17 * 60) * 1000;
@@ -172,9 +172,9 @@ public:
     {
         if (!u->IsGuard())
             return false;
-        if (!u->isAlive())
+        if (!u->IsAlive())
             return false;
-        if (u->getLevel() < 40)
+        if (u->GetLevel() < 40)
             return false;
         if (!u->IsWithinDistInMap(&i_obj, 30.0f))
             return false;
@@ -390,7 +390,7 @@ struct FlameshockerAI : public ScourgeInvasion_RandomAttackerAI
             {
                 if (Creature* pallid = m_creature->GetMap()->GetCreature(_pallidHorror))
                 {
-                    if (!pallid->isAlive())
+                    if (!pallid->IsAlive())
                         _enableAutoMove = true;
 
                     else if (pallid->getVictim())

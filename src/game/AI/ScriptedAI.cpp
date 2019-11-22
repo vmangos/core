@@ -92,11 +92,11 @@ void ScriptedAI::EnterEvadeMode()
     m_creature->CombatStop(true);
     m_creature->LoadCreatureAddon(true);
 
-    if (m_creature->isAlive())
+    if (m_creature->IsAlive())
         m_creature->GetMotionMaster()->MoveTargetedHome();
 
     // Prevent raid loot loss on grid unload
-    if (!m_creature->IsWorldBoss() || !m_creature->isDead())
+    if (!m_creature->IsWorldBoss() || !m_creature->IsDead())
         m_creature->SetLootRecipient(nullptr);
 
     // Reset back to default spells template. This also resets timers.
@@ -343,7 +343,7 @@ void Scripted_NoMovementAI::AttackStart(Unit* pWho)
 
 void ScriptedAI::DoGoHome()
 {
-    if (!m_creature->getVictim() && m_creature->isAlive())
+    if (!m_creature->getVictim() && m_creature->IsAlive())
         m_creature->GetMotionMaster()->MoveTargetedHome();
 }
 
@@ -380,7 +380,7 @@ void ScriptedAI::DoTeleportAll(float fX, float fY, float fZ, float fO)
     Map::PlayerList const &PlayerList = map->GetPlayers();
     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
         if (Player* i_pl = i->getSource())
-            if (i_pl->isAlive())
+            if (i_pl->IsAlive())
                 i_pl->TeleportTo(me->GetMapId(), fX, fY, fZ, fO, TELE_TO_NOT_LEAVE_COMBAT);
 }
 

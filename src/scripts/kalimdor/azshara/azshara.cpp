@@ -113,7 +113,7 @@ CreatureAI* GetAI_mobs_spitelashes(Creature* pCreature)
 
 bool GossipHello_npc_loramus_thalipedes(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(2744) == QUEST_STATUS_INCOMPLETE)

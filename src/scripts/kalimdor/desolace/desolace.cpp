@@ -640,7 +640,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
     {
         m_creature->RemoveAurasDueToSpell(SPELL_BLUE_AURA);
         m_creature->AddAura(SPELL_GREEN_AURA);
-        m_creature->setFaction(FACTION_ENNEMY);
+        m_creature->SetFactionTemplateId(FACTION_ENNEMY);
         isGreen=true;
     }
 
@@ -722,7 +722,7 @@ struct go_demon_portalAI: public GameObjectAI
         if (_demonGuid)
         {
             demon = me->GetMap()->GetCreature(_demonGuid);
-            if (demon && demon->isAlive())
+            if (demon && demon->IsAlive())
                 return true;
         }
         demon = me->SummonCreature(NPC_PORTAL_DEMON_DEMON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), caster ? me->GetAngle(caster) : 0.0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);

@@ -63,8 +63,8 @@ int32 ReputationMgr::GetBaseReputation(FactionEntry const* factionEntry) const
     if (!factionEntry)
         return 0;
 
-    uint32 raceMask = m_player->getRaceMask();
-    uint32 classMask = m_player->getClassMask();
+    uint32 raceMask = m_player->GetRaceMask();
+    uint32 classMask = m_player->GetClassMask();
 
     int idx = factionEntry->GetIndexFitTo(raceMask, classMask);
 
@@ -108,8 +108,8 @@ uint32 ReputationMgr::GetDefaultStateFlags(FactionEntry const* factionEntry) con
     if (!factionEntry)
         return 0;
 
-    uint32 raceMask = m_player->getRaceMask();
-    uint32 classMask = m_player->getClassMask();
+    uint32 raceMask = m_player->GetRaceMask();
+    uint32 classMask = m_player->GetClassMask();
 
     int idx = factionEntry->GetIndexFitTo(raceMask, classMask);
 

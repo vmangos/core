@@ -123,7 +123,7 @@ bool Map::ScriptCommand_MoveTo(const ScriptInfo& script, WorldObject* source, Wo
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     float x = script.x;
@@ -162,7 +162,7 @@ bool Map::ScriptCommand_MoveTo(const ScriptInfo& script, WorldObject* source, Wo
     }
 
     // Only move if we can move.
-    if (pSource->hasUnitState(UNIT_STAT_NOT_MOVE) && !(script.moveTo.flags & SF_MOVETO_FORCED))
+    if (pSource->HasUnitState(UNIT_STAT_NOT_MOVE) && !(script.moveTo.flags & SF_MOVETO_FORCED))
         return ShouldAbortScript(script);
 
     float speed = script.moveTo.travelTime != 0 ? pSource->GetDistance(x, y, z) / ((float)script.moveTo.travelTime * 0.001f) : 0.0f;
@@ -644,7 +644,7 @@ bool Map::ScriptCommand_DespawnCreature(const ScriptInfo& script, WorldObject* s
     }
 
     // Fix possible crash due to double aura deletion when creature is despawned on death.
-    uint32 const despawnDelay = !pSource->isAlive() && (script.despawn.despawnDelay == 0) ? 1 : script.despawn.despawnDelay;
+    uint32 const despawnDelay = !pSource->IsAlive() && (script.despawn.despawnDelay == 0) ? 1 : script.despawn.despawnDelay;
 
     pSource->DespawnOrUnsummon(despawnDelay);
 
@@ -699,7 +699,7 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     switch (script.movement.movementType)
@@ -816,7 +816,7 @@ bool Map::ScriptCommand_Morph(const ScriptInfo& script, WorldObject* source, Wor
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     if (!script.morph.creatureOrModelEntry)
@@ -847,7 +847,7 @@ bool Map::ScriptCommand_Mount(const ScriptInfo& script, WorldObject* source, Wor
 
     uint32 displayId = script.mount.isDisplayId || !script.mount.creatureOrModelEntry ? script.mount.creatureOrModelEntry : Creature::ChooseDisplayId(ObjectMgr::GetCreatureTemplate(script.mount.creatureOrModelEntry));
 
-    if (pSource->isAlive())
+    if (pSource->IsAlive())
     {
         if (displayId)
             pSource->Mount(displayId);
@@ -889,7 +889,7 @@ bool Map::ScriptCommand_AttackStart(const ScriptInfo& script, WorldObject* sourc
         return ShouldAbortScript(script);
     }
 
-    if (!pAttacker->isAlive())
+    if (!pAttacker->IsAlive())
         return ShouldAbortScript(script);
 
     if (pAttacker->IsFriendlyTo(pTarget) || !pTarget->isTargetableForAttack() || !pAttacker->IsInMap(pTarget))
@@ -932,7 +932,7 @@ bool Map::ScriptCommand_SetStandState(const ScriptInfo& script, WorldObject* sou
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     pSource->SetStandState(script.standState.standState);
@@ -978,7 +978,7 @@ bool Map::ScriptCommand_SendTaxiPath(const ScriptInfo& script, WorldObject* sour
         return ShouldAbortScript(script);
     }
 
-    if (!pPlayer->isAlive())
+    if (!pPlayer->IsAlive())
         return ShouldAbortScript(script);
 
     pPlayer->ActivateTaxiPathTo(script.sendTaxiPath.taxiPathId, 0, true);
@@ -1047,7 +1047,7 @@ bool Map::ScriptCommand_Evade(const ScriptInfo& script, WorldObject* source, Wor
         return ShouldAbortScript(script);
     }
 
-    if (pSource->AI() && pSource->isAlive())
+    if (pSource->AI() && pSource->IsAlive())
         pSource->AI()->EnterEvadeMode();
 
     return false;
@@ -1097,7 +1097,7 @@ bool Map::ScriptCommand_TurnTo(const ScriptInfo& script, WorldObject* source, Wo
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     switch (script.turnTo.facingLogic)
@@ -1411,7 +1411,7 @@ bool Map::ScriptCommand_Flee(const ScriptInfo& script, WorldObject* source, Worl
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     if (script.flee.seekAssistance)
@@ -1441,7 +1441,7 @@ bool Map::ScriptCommand_DealDamage(const ScriptInfo& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    if (!pTarget->isAlive())
+    if (!pTarget->IsAlive())
         return ShouldAbortScript(script);
 
     uint32 damage = script.dealDamage.isPercent ? pTarget->GetMaxHealth()*(script.dealDamage.damage / 100.0f) : script.dealDamage.damage;
@@ -1461,7 +1461,7 @@ bool Map::ScriptCommand_ZoneCombatPulse(const ScriptInfo& script, WorldObject* s
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     pSource->SetInCombatWithZone(script.combatPulse.initialPulse);
@@ -1480,7 +1480,7 @@ bool Map::ScriptCommand_CallForHelp(const ScriptInfo& script, WorldObject* sourc
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     pSource->CallForHelp(script.x);
@@ -1669,7 +1669,7 @@ bool Map::ScriptCommand_StartWaypoints(const ScriptInfo& script, WorldObject* so
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
+    if (!pSource->IsAlive())
         return ShouldAbortScript(script);
 
     pSource->GetMotionMaster()->Clear(false, true);
@@ -1870,7 +1870,7 @@ bool Map::ScriptCommand_SetDefaultMovement(const ScriptInfo& script, WorldObject
     else if (script.setDefaultMovement.movementType == WAYPOINT_MOTION_TYPE)
         pSource->m_startwaypoint = script.setDefaultMovement.param1;
 
-    if (pSource->isAlive())
+    if (pSource->IsAlive())
         pSource->GetMotionMaster()->InitializeNewDefault(script.setDefaultMovement.alwaysReplace);
 
     return false;
@@ -1986,7 +1986,7 @@ bool Map::ScriptCommand_RespawnCreature(const ScriptInfo& script, WorldObject* s
         return ShouldAbortScript(script);
     }
 
-    if (pSource->isAlive())
+    if (pSource->IsAlive())
     {
         if (script.respawnCreature.evenAlive)
             pSource->SetDeathState(JUST_DIED);
@@ -2090,7 +2090,7 @@ bool Map::ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source,
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isInCombat() || !pSource->isAlive())
+    if (!pSource->isInCombat() || !pSource->IsAlive())
         return false;
 
     Unit* pTarget = ToUnit(target);

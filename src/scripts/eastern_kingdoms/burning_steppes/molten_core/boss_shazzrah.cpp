@@ -57,7 +57,7 @@ struct boss_shazzrahAI : public ScriptedAI
         Countspell_Timer = 15000;
         Blink_Timer = urand(25000, 30000);
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_SHAZZRAH, NOT_STARTED);
     }
 

@@ -258,7 +258,7 @@ struct boss_chromaggusAI : public ScriptedAI
         for (std::vector<TimeLapseInfo*>::iterator itr = m_vTimeLapseInfo.begin(); itr != m_vTimeLapseInfo.end(); ++itr)
             if (Player* pTarget = m_creature->GetMap()->GetPlayer((*itr)->m_targetGuid))
             {
-                if (!pTarget->HasAura(SPELL_TIME_LAPSE) && pTarget->isAlive())
+                if (!pTarget->HasAura(SPELL_TIME_LAPSE) && pTarget->IsAlive())
                 {
                     if ((*itr)->m_targetHealth >= (pTarget->GetMaxHealth() / 2))
                         pTarget->SetHealth(pTarget->GetMaxHealth());
@@ -404,13 +404,13 @@ struct boss_chromaggusAI : public ScriptedAI
         for (AfflictionGuids::iterator itr = m_lRedAfflictionPlayerGUID.begin(); itr != m_lRedAfflictionPlayerGUID.end();)
         {
             Player* pTarget = m_creature->GetMap()->GetPlayer(*itr);
-            if (pTarget && pTarget->isAlive() && !pTarget->HasAura(SPELL_BROODAF_RED, EFFECT_INDEX_0))
+            if (pTarget && pTarget->IsAlive() && !pTarget->HasAura(SPELL_BROODAF_RED, EFFECT_INDEX_0))
             {
                 itr = m_lRedAfflictionPlayerGUID.erase(itr);
                 continue;
             }
 
-            if (!pTarget || pTarget->isDead())
+            if (!pTarget || pTarget->IsDead())
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_CHROMA_HEAL) == CAST_OK) //Heal 150000 HP
                     m_lRedAfflictionPlayerGUID.erase(itr);
@@ -424,7 +424,7 @@ struct boss_chromaggusAI : public ScriptedAI
         {
             if (Player* pTarget = m_creature->GetMap()->GetPlayer(*itr))
             {
-                if (pTarget->isDead())
+                if (pTarget->IsDead())
                 {
                     pTarget->RemoveAurasDueToSpell(23175);
                     pTarget->RemoveAurasDueToSpell(23177);

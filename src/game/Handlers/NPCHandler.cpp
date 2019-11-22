@@ -85,7 +85,7 @@ void WorldSession::HandleBankerActivateOpcode(WorldPacket & recv_data)
         return;
 
     // remove fake death
-    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     SendShowBank(guid);
@@ -378,7 +378,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket & recv_data)
     if (!pCreature->IsStopped())
         pCreature->StopMoving();
 
-    if (pCreature->isSpiritGuide())
+    if (pCreature->IsSpiritGuide())
         pCreature->SendAreaSpiritHealerQueryOpcode(_player);
 
     if (!sScriptMgr.OnGossipHello(_player, pCreature))
@@ -508,7 +508,7 @@ void WorldSession::HandleBinderActivateOpcode(WorldPacket & recv_data)
     ObjectGuid npcGuid;
     recv_data >> npcGuid;
 
-    if (!GetPlayer()->IsInWorld() || !GetPlayer()->isAlive())
+    if (!GetPlayer()->IsInWorld() || !GetPlayer()->IsAlive())
         return;
 
     Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(npcGuid, UNIT_NPC_FLAG_INNKEEPER);
@@ -570,11 +570,11 @@ void WorldSession::SendStablePet(ObjectGuid guid)
     uint8 num = 0;                                          // counter for place holder
 
     // not let move dead pet in slot
-    if (pet && pet->isAlive() && pet->getPetType() == HUNTER_PET)
+    if (pet && pet->IsAlive() && pet->getPetType() == HUNTER_PET)
     {
         data << uint32(pet->GetCharmInfo()->GetPetNumber());
         data << uint32(pet->GetEntry());
-        data << uint32(pet->getLevel());
+        data << uint32(pet->GetLevel());
         data << pet->GetName();                             // petname
         data << uint32(pet->GetLoyaltyLevel());             // loyalty
         data << uint8(0x01);                                // client slot 1 == current pet (0)
@@ -649,7 +649,7 @@ void WorldSession::HandleStablePet(WorldPacket & recv_data)
 
     recv_data >> npcGUID;
 
-    if (!GetPlayer()->isAlive())
+    if (!GetPlayer()->IsAlive())
     {
         SendStableResult(STABLE_ERR_STABLE);
         return;
@@ -667,7 +667,7 @@ void WorldSession::HandleStablePet(WorldPacket & recv_data)
     Pet *pet = _player->GetPet();
 
     // can't place in stable dead pet
-    if (!pet || !pet->isAlive() || pet->getPetType() != HUNTER_PET)
+    if (!pet || !pet->IsAlive() || pet->getPetType() != HUNTER_PET)
     {
         SendStableResult(STABLE_ERR_STABLE);
         return;
@@ -804,7 +804,7 @@ void WorldSession::HandleStableSwapPet(WorldPacket & recv_data)
 
     Pet* pet = _player->GetPet();
 
-    if (!pet || !pet->isAlive() || pet->getPetType() != HUNTER_PET)
+    if (!pet || !pet->IsAlive() || pet->getPetType() != HUNTER_PET)
     {
         SendStableResult(STABLE_ERR_STABLE);
         return;

@@ -87,14 +87,14 @@ struct instance_deadmines : public ScriptedInstance
         if (pCreature->GetRespawnDelay() == 43199)
         {
             pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->setFaction(35);
+            pCreature->SetFactionTemplateId(35);
         }
 
         /** Initialize Gilnid Patrol */
         if (pCreature->GetRespawnDelay() == 43201)
         {
             pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->setFaction(35);
+            pCreature->SetFactionTemplateId(35);
         }
     }
 
@@ -215,7 +215,7 @@ struct instance_deadmines : public ScriptedInstance
                         if ((*it)->GetRespawnDelay() == 43199)
                         {
                             (*it)->SetVisibility(VISIBILITY_ON);
-                            (*it)->setFaction(17);
+                            (*it)->SetFactionTemplateId(17);
                         }
                     m_EscortList.clear();
 
@@ -224,7 +224,7 @@ struct instance_deadmines : public ScriptedInstance
                         if ((*it)->GetRespawnDelay() == 43199)
                         {
                             (*it)->SetVisibility(VISIBILITY_ON);
-                            (*it)->setFaction(17);
+                            (*it)->SetFactionTemplateId(17);
                         }
                     m_EscortList.clear();
                 }
@@ -246,7 +246,7 @@ struct instance_deadmines : public ScriptedInstance
                         if ((*it)->GetRespawnDelay() == 43201)
                         {
                             (*it)->SetVisibility(VISIBILITY_ON);
-                            (*it)->setFaction(17);
+                            (*it)->SetFactionTemplateId(17);
                         }
                     m_EscortList.clear();
 
@@ -255,7 +255,7 @@ struct instance_deadmines : public ScriptedInstance
                         if ((*it)->GetRespawnDelay() == 43201)
                         {
                             (*it)->SetVisibility(VISIBILITY_ON);
-                            (*it)->setFaction(17);
+                            (*it)->SetFactionTemplateId(17);
                         }
                     m_EscortList.clear();
                 }

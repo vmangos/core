@@ -444,7 +444,7 @@ bool GuardMgr::SummonGuard(Creature* pCivilian, Player* pEnemy)
     guardInfo.charges--;
     guardInfo.cooldown = GUARD_POST_USE_COOLDOWN;
 
-    if (uint32 textId = GetTextId(pCivilian->getFaction(), areaId, pCivilian->GetDisplayId()))
+    if (uint32 textId = GetTextId(pCivilian->GetFactionTemplateId(), areaId, pCivilian->GetDisplayId()))
         DoScriptText(textId, pCivilian, pEnemy, CHAT_TYPE_SAY);
 
     if (uint32 creatureId = pEnemy->GetTeamId() == TEAM_ALLIANCE ? guardInfo.creatureIdHorde : guardInfo.creatureIdAlliance)

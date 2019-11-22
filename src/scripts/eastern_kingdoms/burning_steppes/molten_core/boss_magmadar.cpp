@@ -77,7 +77,7 @@ struct boss_magmadarAI : public ScriptedAI
         if (!m_creature->HasAura(SPELL_MAGMASPIT))
             m_creature->CastSpell(m_creature, SPELL_MAGMASPIT, true);
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_MAGMADAR, NOT_STARTED);
     }
 
@@ -138,7 +138,7 @@ struct boss_magmadarAI : public ScriptedAI
                     {
                         //scale at 0 is necessary for spell animation
                         Cre->SetObjectScale(0.0f);
-                        Cre->setFaction(m_creature->getFaction());
+                        Cre->SetFactionTemplateId(m_creature->GetFactionTemplateId());
                     }
                     m_uiLavaBombTimer = urand(10000, 13000);
                     m_uiLavaBombTriggerTimer = 500;

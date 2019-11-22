@@ -60,7 +60,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
         return;
     }
 
-    if (!pCharmedUnit->isAlive())
+    if (!pCharmedUnit->IsAlive())
         return;
 
     Creature* pCharmedCreature = pCharmedUnit->ToCreature();
@@ -138,7 +138,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                     if (!GetPlayer()->IsValidAttackTarget(TargetUnit))
                         return;
 
-                    pCharmedUnit->clearUnitState(UNIT_STAT_FOLLOW);
+                    pCharmedUnit->ClearUnitState(UNIT_STAT_FOLLOW);
                     // This is true if pet has no target or has target but targets differs.
                     if (pCharmedUnit->getVictim() != TargetUnit || (pCharmedUnit->getVictim() == TargetUnit && !pCharmedUnit->GetCharmInfo()->IsCommandAttack()) || pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
                     {
@@ -241,7 +241,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             if (!pCharmedUnit->HasSpell(spellid) || spellInfo->IsPassiveSpell())
                 return;
 
-            pCharmedUnit->clearUnitState(UNIT_STAT_MOVING);
+            pCharmedUnit->ClearUnitState(UNIT_STAT_MOVING);
 
             Spell* spell = new Spell(pCharmedUnit, spellInfo, false);
 
@@ -337,7 +337,7 @@ void WorldSession::HandlePetStopAttack(WorldPacket& recv_data)
         return;
     }
 
-    if (!pet->isAlive())
+    if (!pet->IsAlive())
         return;
 
     pet->AttackStop();
@@ -605,7 +605,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
         pet->unlearnSpell(spell_id, false);
     }
 
-    pet->SetTP(pet->getLevel() * (pet->GetLoyaltyLevel() - 1));
+    pet->SetTP(pet->GetLevel() * (pet->GetLoyaltyLevel() - 1));
 
     for (int i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
         if (UnitActionBarEntry const* ab = charmInfo->GetActionBarEntry(i))
@@ -695,7 +695,7 @@ void WorldSession::HandlePetCastSpellOpcode(WorldPacket& recvPacket)
 
     recvPacket >> targets.ReadForCaster(pet);
 
-    pet->clearUnitState(UNIT_STAT_MOVING);
+    pet->ClearUnitState(UNIT_STAT_MOVING);
 
     Spell *spell = new Spell(pet, spellInfo, false);
     spell->m_targets = targets;

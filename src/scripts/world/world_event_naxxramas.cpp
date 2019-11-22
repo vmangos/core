@@ -229,7 +229,7 @@ struct npc_necrotic_shard : public ScriptedAI
         Reset();
         
         eliteSpawnTimer = urand(ELITE_SPAWN_MINIMUM, ELITE_SPAWN_MAXIMUM);
-        if(m_creature->isAlive())
+        if(m_creature->IsAlive())
             me->SetVisibility(VISIBILITY_ON);
     }
 

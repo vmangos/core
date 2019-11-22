@@ -69,7 +69,7 @@ bool PetAI::_needToStop() const
 
 void PetAI::_stopAttack()
 {
-    if (!m_creature->isAlive())
+    if (!m_creature->IsAlive())
     {
         m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MoveIdle();
@@ -88,7 +88,7 @@ void PetAI::_stopAttack()
 
 void PetAI::UpdateAI(const uint32 diff)
 {
-    if (!m_creature->isAlive() || !m_creature->GetCharmInfo())
+    if (!m_creature->IsAlive() || !m_creature->GetCharmInfo())
         return;
 
     // part of it must run during eyes of the Beast to update melee hits
@@ -107,7 +107,7 @@ void PetAI::UpdateAI(const uint32 diff)
     if (tauntTarget)
         DoAttack(tauntTarget, true);
 
-    if (m_creature->getVictim() && m_creature->getVictim()->isAlive())
+    if (m_creature->getVictim() && m_creature->getVictim()->IsAlive())
     {
         if (_needToStop())
         {
@@ -419,7 +419,7 @@ void PetAI::OwnerAttackedBy(Unit* attacker)
         return;
 
     // Prevent pet from disengaging from current target
-    if (m_creature->getVictim() && m_creature->getVictim()->isAlive())
+    if (m_creature->getVictim() && m_creature->getVictim()->IsAlive())
         return;
 
     // Continue to evaluate and attack if necessary
@@ -447,7 +447,7 @@ void PetAI::OwnerAttacked(Unit* target)
         return;
 
     // Prevent pet from disengaging from current target
-    if (m_creature->getVictim() && m_creature->getVictim()->isAlive())
+    if (m_creature->getVictim() && m_creature->getVictim()->IsAlive())
         return;
 
     // Continue to evaluate and attack if necessary
@@ -622,7 +622,7 @@ bool PetAI::CanAttack(Unit* target)
     if (!m_creature->IsValidAttackTarget(target))
         return false;
 
-    if (!target->isAlive())
+    if (!target->IsAlive())
     {
         // Clear target to prevent getting stuck on dead targets
         m_creature->AttackStop();
@@ -713,7 +713,7 @@ void PetAI::AttackedBy(Unit* attacker)
         return;
 
     // Prevent pet from disengaging from current target
-    if (m_creature->getVictim() && m_creature->getVictim()->isAlive())
+    if (m_creature->getVictim() && m_creature->getVictim()->IsAlive())
         return;
 
     // Continue to evaluate and attack if necessary

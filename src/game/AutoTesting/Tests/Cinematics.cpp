@@ -23,7 +23,7 @@ public:
     static void AddSpells(Player* player)
     {
         uint32 familyName = 0;
-        switch (player->getClass())
+        switch (player->GetClass())
         {
             case CLASS_MAGE:
                 familyName = SPELLFAMILY_MAGE;
@@ -56,7 +56,7 @@ public:
         for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
         {
             SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
-            if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->getLevel())
+            if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->GetLevel())
                 player->LearnSpell(id, false);
         }
     }
@@ -96,7 +96,7 @@ public:
 
     static void StuffLevel60(Player* p)
     {
-        switch (p->getClass())
+        switch (p->GetClass())
         {
             case CLASS_WARLOCK:
                 AddStuff(p, 16931);
@@ -169,7 +169,7 @@ public:
     static void AutoMountPlayer(Player* p, bool mount60 = false)
     {
         uint32 mount = 0;
-        switch (p->getRace())
+        switch (p->GetRace())
         {
             case RACE_HUMAN:
                 mount = 18776;
@@ -398,7 +398,7 @@ public:
         for (int i = step % 6; i < TARREN_CHARGE_NUM_PLAYERS; i += 6)
         {
             Player* p = GetTestPlayer(i);
-            if (p->getLevel() >= 40)
+            if (p->GetLevel() >= 40)
                 AutoMountPlayer(p, true);
         }
         TEST_DELAY(40000)*/
@@ -656,7 +656,7 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
         Unit* target = p->getVictim();
         if (target == nullptr)
@@ -675,7 +675,7 @@ public:
             }            
         }
 
-        if (target != nullptr && target->isAlive())
+        if (target != nullptr && target->IsAlive())
         {
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
@@ -825,7 +825,7 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
         Unit* target = p->getVictim();
         if (target == nullptr)
@@ -844,7 +844,7 @@ public:
             }
         }
 
-        if (target != nullptr && target->isAlive())
+        if (target != nullptr && target->IsAlive())
         {
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
@@ -1042,7 +1042,7 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
         float x = p->GetPositionX();
         float y = p->GetPositionY();
@@ -1058,7 +1058,7 @@ public:
 
     static void AddSkillsPlayer(Player* player)
     {
-        switch (player->getClass())
+        switch (player->GetClass())
         {
         case CLASS_WARRIOR:
             player->LearnSpell(12294, false);
@@ -1104,7 +1104,7 @@ public:
     {
         if (p->GetTeamId() == TEAM_ALLIANCE)
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1159,7 +1159,7 @@ public:
         }
         else
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1299,7 +1299,7 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
         float x = p->GetPositionX();
         float y = p->GetPositionY();
@@ -1315,7 +1315,7 @@ public:
 
     static void AddSkillsPlayer(Player* player)
     {
-        switch (player->getClass())
+        switch (player->GetClass())
         {
         case CLASS_WARRIOR:
             player->LearnSpell(12294, false);
@@ -1361,7 +1361,7 @@ public:
     {
         if (p->GetTeamId() == TEAM_ALLIANCE)
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1416,7 +1416,7 @@ public:
         }
         else
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1556,7 +1556,7 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
         Unit* target = p->getVictim();
         if (target == nullptr)
@@ -1575,7 +1575,7 @@ public:
             }
         }
 
-        if (target != nullptr && target->isAlive())
+        if (target != nullptr && target->IsAlive())
         {
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
@@ -1600,7 +1600,7 @@ public:
 
     static void AddSkillsPlayer(Player* player)
     {
-        switch (player->getClass())
+        switch (player->GetClass())
         {
         case CLASS_WARRIOR:
             player->LearnSpell(12294, false);
@@ -1646,7 +1646,7 @@ public:
     {
         if (p->GetTeamId() == TEAM_ALLIANCE)
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1701,7 +1701,7 @@ public:
         }
         else
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);

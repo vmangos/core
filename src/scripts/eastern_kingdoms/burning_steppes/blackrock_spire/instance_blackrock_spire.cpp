@@ -551,7 +551,7 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
             {
                 if (Creature* pCreature = instance->GetCreature(*itr))
                 {
-                    if (pCreature->isAlive() && pCreature->GetDistance(pRune) < 10.0f)
+                    if (pCreature->IsAlive() && pCreature->GetDistance(pRune) < 10.0f)
                         m_alRoomEventMobGUIDSorted[i].push_back(*itr);
                 }
 #ifdef DEBUG_ON
@@ -571,7 +571,7 @@ InstanceData* GetInstanceData_instance_blackrock_spire(Map* pMap)
 
 bool AreaTrigger_at_blackrock_spire(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-    if (pPlayer->isDead())
+    if (pPlayer->IsDead())
         return false;
 
     switch (pAt->id)
@@ -588,7 +588,7 @@ bool AreaTrigger_at_blackrock_spire(Player* pPlayer, const AreaTriggerEntry* pAt
         case AREATRIGGER_STADIUM:
             if (instance_blackrock_spire* pInstance = (instance_blackrock_spire*) pPlayer->GetInstanceData())
                 if (Creature* pGyth = pInstance->instance->GetCreature(pInstance->GetData64(NPC_GYTH)))
-                    if (pGyth->isAlive() && !pGyth->isInCombat())
+                    if (pGyth->IsAlive() && !pGyth->isInCombat())
                         pGyth->AI()->AttackStart(pPlayer);
             break;
     }
@@ -605,7 +605,7 @@ struct go_father_flameAI: public GameObjectAI
         if (ScriptedInstance* pInstance = (instance_blackrock_spire*)me->GetInstanceData())
             if (pInstance->GetData(TYPE_SOLAKAR) != IN_PROGRESS && pInstance->GetData(TYPE_SOLAKAR) != DONE)
                 if (Creature* pDrakki = pInstance->instance->GetCreature(pInstance->GetData64(NPC_DRAKKISATH)))
-                    if (pDrakki->isAlive())
+                    if (pDrakki->IsAlive())
                         pInstance->SetData(TYPE_SOLAKAR, IN_PROGRESS);
         return true;
     }
@@ -649,7 +649,7 @@ struct npc_solakar_triggerAI : public ScriptedAI
                 {
                     if (listHatcher.empty())
                         break;
-                    if (!(*itr)->isAlive())
+                    if (!(*itr)->IsAlive())
                         continue;
 
                     (*itr)->AI()->EnterEvadeMode();
@@ -843,12 +843,12 @@ GameObjectAI* GetAIgo_rookey_egg(GameObject *pGo)
 
 bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-    if (pPlayer->isDead())
+    if (pPlayer->IsDead())
         return false;
 
     if (instance_blackrock_spire* pInstance = (instance_blackrock_spire*)pPlayer->GetInstanceData())
         if (Creature* pBeast = pInstance->instance->GetCreature(pInstance->GetData64(NPC_THE_BEAST)))
-            if (pBeast->isAlive() && !pBeast->isInCombat())
+            if (pBeast->IsAlive() && !pBeast->isInCombat())
                 pBeast->AI()->AttackStart(pPlayer);
 
     return false;

@@ -24,7 +24,7 @@ void ScriptedPetAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->GetCharmInfo() || !m_creature->GetCharmInfo()->HasReactState(REACT_AGGRESSIVE))
         return;
 
-    if (!pWho || !m_creature->IsValidAttackTarget(pWho) || !pWho->isVisibleForOrDetect(m_creature, m_creature, true) ||
+    if (!pWho || !m_creature->IsValidAttackTarget(pWho) || !pWho->IsVisibleForOrDetect(m_creature, m_creature, true) ||
         !m_creature->CanInitiateAttack() || !pWho->isInAccessablePlaceFor(m_creature) || !m_creature->canAttack(pWho, true))
         return;
 
@@ -90,7 +90,7 @@ void ScriptedPetAI::JustRespawned()
 
 void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
 {
-    if (!m_creature->isAlive())                             // should not be needed, isAlive is checked in mangos before calling UpdateAI
+    if (!m_creature->IsAlive())                             // should not be needed, isAlive is checked in mangos before calling UpdateAI
         return;
 
     // UpdateAllies() is done in the generic PetAI in Mangos, but we can't do this from script side.
@@ -145,7 +145,7 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
                         }
                     }
                     // If we are out of the FOR it means no valid targets, so follow master.
-                    if (!m_creature->hasUnitState(UNIT_STAT_FOLLOW))
+                    if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
                         m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
                 }
             }
@@ -153,7 +153,7 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
         else if (m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW))
         {
             // not following, so start follow
-            if (!m_creature->hasUnitState(UNIT_STAT_FOLLOW))
+            if (!m_creature->HasUnitState(UNIT_STAT_FOLLOW))
                 m_creature->GetMotionMaster()->MoveFollow(pOwner, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
             // update when not in combat

@@ -58,7 +58,7 @@ struct mob_yennikuAI : public ScriptedAI
                 m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STUN);
                 m_creature->CombatStop();                   //stop combat
                 m_creature->DeleteThreatList();             //unsure of this
-                m_creature->setFaction(83);                 //horde generic
+                m_creature->SetFactionTemplateId(83);                 //horde generic
 
                 bReset = true;
                 Reset_Timer = 60000;
@@ -77,7 +77,7 @@ struct mob_yennikuAI : public ScriptedAI
             {
                 EnterEvadeMode();
                 bReset = false;
-                m_creature->setFaction(28);                     //troll, bloodscalp
+                m_creature->SetFactionTemplateId(28);                     //troll, bloodscalp
             }
             else
                 Reset_Timer -= diff;
@@ -550,7 +550,7 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
 
     void SummonedCreatureDespawn(Creature* pCreature) override
     {
-        if (!m_bStartEvent || !pCreature->isAlive())
+        if (!m_bStartEvent || !pCreature->IsAlive())
             return;
 
         m_bResetEvent = true;
