@@ -18128,7 +18128,7 @@ void Player::LeaveBattleground(bool teleportToEntryPoint)
 bool Player::CanJoinToBattleground() const
 {
     // check Deserter debuff
-    if (GetDummyAura(26013))
+    if (HasAura(26013))
         return false;
     return true;
 }

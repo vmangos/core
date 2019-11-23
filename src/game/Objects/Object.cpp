@@ -4536,7 +4536,7 @@ int32 WorldObject::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
     return DoneAdvertisedBenefit;
 }
 
-int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit,  DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell)
+int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit,  DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell) const
 {
     // Distribute Damage over multiple effects, reduce by AoE
     float coeff = 0.0f;
@@ -4554,7 +4554,7 @@ int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 tota
         if (donePart && (bonus->ap_bonus || bonus->ap_dot_bonus))
         {
             float const ap_bonus = damagetype == DOT ? bonus->ap_dot_bonus : bonus->ap_bonus;
-            float const total_ap = IsUnit() ? static_cast<Unit*>(this)->GetTotalAttackPowerValue(spellProto->IsSpellRequiresRangedAP() ? RANGED_ATTACK : BASE_ATTACK) : 0;
+            float const total_ap = IsUnit() ? static_cast<Unit const*>(this)->GetTotalAttackPowerValue(spellProto->IsSpellRequiresRangedAP() ? RANGED_ATTACK : BASE_ATTACK) : 0;
             total += int32(ap_bonus * (total_ap + ap_benefit));
         }
     }
@@ -4571,7 +4571,7 @@ int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 tota
         coeff = spellProto->CalculateCustomCoefficient(pCaster, damagetype, coeff, spell, donePart);
 
         // Spellmod SpellDamage
-        if (Unit* pUnit = ToUnit())
+        if (Unit const* pUnit = ToUnit())
         {
             if (Player* modOwner = pUnit->GetSpellModOwner())
             {
@@ -4587,7 +4587,7 @@ int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 tota
         if (spellProto->Id == 19993)
         {
             bUsePenalty = false;
-            if (Unit* pUnit = ToUnit())
+            if (Unit const* pUnit = ToUnit())
             {
                 if (pUnit->HasAura(28853)) total += 53.0f;  // Libram of Divinity
                 if (pUnit->HasAura(28851)) total += 83.0f;  // Libram of Light

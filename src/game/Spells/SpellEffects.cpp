@@ -4604,7 +4604,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         return;
 
                     // Onyxia Scale Cloak
-                    if (unitTarget->GetDummyAura(22683))
+                    if (unitTarget->HasAura(22683))
                         return;
 
                     // Shadow Flame
@@ -5450,7 +5450,7 @@ void Spell::EffectSummonPlayer(SpellEffectIndex /*eff_idx*/)
         return;
 
     // Evil Twin (ignore player summon, but hide this for summoner)
-    if (unitTarget->GetDummyAura(23445))
+    if (unitTarget->HasAura(23445))
         return;
 
     float x, y, z;
