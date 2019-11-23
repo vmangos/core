@@ -150,20 +150,20 @@ public:
     void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_KNOCK_AWAY)
-            if (m_creature->getThreatManager().getThreat(pTarget))
-                m_creature->getThreatManager().modifyThreatPercent(pTarget, -25);
+            if (m_creature->GetThreatManager().getThreat(pTarget))
+                m_creature->GetThreatManager().modifyThreatPercent(pTarget, -25);
     }
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiStormBoltTimer <= uiDiff)
         {
             if (m_bHasStormBolted)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STORM_BOLT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STORM_BOLT) == CAST_OK)
                 {
                     m_bHasStormBolted = false;
                     m_uiStormBoltTimer = 10000;
@@ -207,7 +207,7 @@ public:
 
         if (m_uiChargeTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHARGE) == CAST_OK)
                 m_uiChargeTimer = 5000;
         }
         else

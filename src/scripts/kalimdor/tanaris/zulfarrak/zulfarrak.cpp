@@ -74,7 +74,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
     uint32 postGossipStep;
     uint32 Text_Timer;
     uint32 ShieldBash_Timer;
-    uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless m_creature->getVictim() dodge, parry or block attack. Trinity support required.
+    uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless m_creature->GetVictim() dodge, parry or block attack. Trinity support required.
     uint64 PlayerGUID;
 
     void Reset() override
@@ -125,12 +125,12 @@ struct npc_sergeant_blyAI : public ScriptedAI
                 Text_Timer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (ShieldBash_Timer <= diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH);
             ShieldBash_Timer = 15000;
         }
         else
@@ -138,7 +138,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
 
         if (Revenge_Timer <= diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_REVENGE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_REVENGE);
             Revenge_Timer = 10000;
         }
         else
@@ -342,36 +342,36 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
         }
 
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
 
         if (pInstance->GetData(EVENT_PYRAMID) != PYRAMID_KILLED_ALL_TROLLS)
         {
             Creature* pOro = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_ORO));
-            if (!pOro->SelectHostileTarget() || !pOro->getVictim())
-                ((CreatureAI*)pOro->AI())->AttackStart(m_creature->getVictim());
+            if (!pOro->SelectHostileTarget() || !pOro->GetVictim())
+                ((CreatureAI*)pOro->AI())->AttackStart(m_creature->GetVictim());
 
             Creature* pMurta = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_MURTA));
-            if (!pMurta->SelectHostileTarget() || !pMurta->getVictim())
-                ((CreatureAI*)pMurta->AI())->AttackStart(m_creature->getVictim());
+            if (!pMurta->SelectHostileTarget() || !pMurta->GetVictim())
+                ((CreatureAI*)pMurta->AI())->AttackStart(m_creature->GetVictim());
 
             Creature* pBly = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_BLY));
-            if (!pBly->SelectHostileTarget() || !pBly->getVictim())
-                ((CreatureAI*)pBly->AI())->AttackStart(m_creature->getVictim());
+            if (!pBly->SelectHostileTarget() || !pBly->GetVictim())
+                ((CreatureAI*)pBly->AI())->AttackStart(m_creature->GetVictim());
         }
 
         if (Bomb_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BOMB);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BOMB);
             Bomb_Timer = 10000;
         }
         else
             Bomb_Timer -= diff;
 
-        if (m_creature->isAttackReady() && !m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if (m_creature->IsAttackReady() && !m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT);
             m_creature->SetSheath(SHEATH_STATE_RANGED);
         }
         else

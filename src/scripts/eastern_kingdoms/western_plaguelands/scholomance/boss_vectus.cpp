@@ -152,7 +152,7 @@ struct boss_vectusAI : public ScriptedAI
                 m_uiGambitEvent_Timer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // NOSTALRIUS: Aggro toute la salle lorsqu'il est pull.
@@ -163,7 +163,7 @@ struct boss_vectusAI : public ScriptedAI
             for (std::list<Creature*>::iterator it = creatures.begin(); it != creatures.end(); ++it)
             {
                 (*it)->SetFactionTemplateId(14);
-                (*it)->AI()->AttackStart(m_creature->getVictim());
+                (*it)->AI()->AttackStart(m_creature->GetVictim());
             }
             _fullAggroDone = true;
         }
@@ -180,7 +180,7 @@ struct boss_vectusAI : public ScriptedAI
         //BlastWave_Timer
         if (m_uiBlastWave_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLAST_WAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BLAST_WAVE);
             m_uiBlastWave_Timer = 12000;
         }
         else

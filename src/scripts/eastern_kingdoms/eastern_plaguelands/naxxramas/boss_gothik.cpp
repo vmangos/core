@@ -186,7 +186,7 @@ struct boss_gothikAI : public ScriptedAI
 
     void SummonAdd(uint32 entry, float x, float y, float z, float o)
     {
-        if (!m_creature->isInCombat() && !m_creature->IsDead())
+        if (!m_creature->IsInCombat() && !m_creature->IsDead())
             return;
 
         if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000))
@@ -366,14 +366,14 @@ struct boss_gothikAI : public ScriptedAI
     {
         if(!m_creature->HasAura(SPELL_IMMUNE_ALL))
         {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
             if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
                 return;
         }
         else
         {
-            if (m_creature->getThreatManager().isThreatListEmpty())
+            if (m_creature->GetThreatManager().isThreatListEmpty())
             {
                 EnterEvadeMode();
             }
@@ -484,12 +484,12 @@ struct boss_gothikAI : public ScriptedAI
                 // Prevent units in the other side of the room getting aggro from dots
                 if (!gatesOpened)
                 {
-                    if (Unit* victim = m_creature->getVictim())
+                    if (Unit* victim = m_creature->GetVictim())
                     {
                         bool unitIsRight = m_pInstance->IsInRightSideGothArea(victim);
                         if ((m_bRightSide && !unitIsRight) || (!m_bRightSide && unitIsRight))
                         {
-                            m_creature->getThreatManager().modifyThreatPercent(victim, -100);
+                            m_creature->GetThreatManager().modifyThreatPercent(victim, -100);
                             m_creature->SelectHostileTarget();
                         }
                     }

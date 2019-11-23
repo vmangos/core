@@ -903,7 +903,7 @@ void WorldSession::HandleMountSpecialAnimOpcode(WorldPacket& /*recvdata*/)
 
 void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
 {
-    if (!_player->IsAlive() || _player->isInCombat())
+    if (!_player->IsAlive() || _player->IsInCombat())
         return;
 
     ObjectGuid summonerGuid;

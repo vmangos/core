@@ -63,12 +63,12 @@ public:
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiCleaveTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = 10000;
         }
         else
@@ -76,7 +76,7 @@ public:
 
         if (m_uiMortalStrikeTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
                 m_uiMortalStrikeTimer = 15000;
         }
         else
@@ -84,7 +84,7 @@ public:
 
         if (m_uiUppercutTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_UPPERCUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UPPERCUT) == CAST_OK)
                 m_uiUppercutTimer = 20000;
         }
         else

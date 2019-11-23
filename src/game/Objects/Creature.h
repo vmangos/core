@@ -784,7 +784,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         // We send this guid instead when its set, to avoid overwriting the unit field.
         void SetCastingTarget(Unit const* pTarget)
         {
-            if (pTarget != getVictim())
+            if (pTarget != GetVictim())
             {
                 m_castingTargetGuid = pTarget->GetGUID();
                 ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);

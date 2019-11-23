@@ -118,7 +118,7 @@ struct boss_skeramAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // The bug trio have a larger than normal aggro radius
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 28.0f, true) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->IsInCombat() && m_creature->IsWithinDistInMap(pWho, 28.0f, true) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
         }
@@ -191,7 +191,7 @@ struct boss_skeramAI : public ScriptedAI
             m_creature->DoKillUnit();
 
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (ArcaneExplosion_Timer < diff)
@@ -202,21 +202,21 @@ struct boss_skeramAI : public ScriptedAI
 
             if (players.size() > 4)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_EXPLOSION) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANE_EXPLOSION) == CAST_OK)
                     ArcaneExplosion_Timer = urand(6000, 14000);
             }
         }
         else ArcaneExplosion_Timer -= diff;
 
         //If we are within range, melee the target
-        if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
             DoMeleeAttackIfReady();
         else
         // Target not in melee range. Spam Earthshock
         {
             if (EarthShock_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_EARTH_SHOCK) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_EARTH_SHOCK) == CAST_OK)
                     EarthShock_Timer = 1000;
             }
             else

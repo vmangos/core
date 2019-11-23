@@ -54,7 +54,7 @@ struct boss_high_interrogator_gerstahnAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ShadowWordPain_Timer
@@ -82,7 +82,7 @@ struct boss_high_interrogator_gerstahnAI : public ScriptedAI
         //PsychicScream_Timer
         if (m_uiPsychicScream_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_PSYCHICSCREAM);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PSYCHICSCREAM);
             m_uiPsychicScream_Timer = 30000;
         }
         else

@@ -467,7 +467,7 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 m_uiSomethingWentWrongTimer -=  uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -644,7 +644,7 @@ struct npc_klinfranAI : public ScriptedAI
             Creature* pCleaner = m_creature->SummonCreature(NPC_THE_CLEANER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(m_creature), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20*MINUTE*IN_MILLISECONDS);
             if (pCleaner)
             {
-                ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+                ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 
                 for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
                 {
@@ -703,17 +703,17 @@ struct npc_klinfranAI : public ScriptedAI
         {
             if (m_uiDespawn_Timer <= uiDiff)
             {
-                if (m_creature->IsAlive() && !m_creature->isInCombat())
+                if (m_creature->IsAlive() && !m_creature->IsInCombat())
                     DemonDespawn(false);
             }
             else
                 m_uiDespawn_Timer -= uiDiff;
         }
             
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->getThreatManager().getThreatList().size() > 1 /*|| pHunter->IsDead()*/)
+        if (m_creature->GetThreatManager().getThreatList().size() > 1 /*|| pHunter->IsDead()*/)
             DemonDespawn();
 
         if (m_uiDemonic_Frenzy_Timer < uiDiff)

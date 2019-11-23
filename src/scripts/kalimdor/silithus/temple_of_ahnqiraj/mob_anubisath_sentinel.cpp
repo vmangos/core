@@ -112,7 +112,7 @@ struct aqsentinelAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // Increase aggro radius
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 45.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->IsInCombat() && m_creature->IsWithinDistInMap(pWho, 45.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
         }
@@ -169,7 +169,7 @@ struct aqsentinelAI : public ScriptedAI
         {
             if (Creature* creature = m_creature->GetMap()->GetCreature(*iter))
             {
-                if (creature->isInCombat())
+                if (creature->IsInCombat())
                     continue;
 
                 creature->SetNoCallAssistance(true);
@@ -263,8 +263,8 @@ struct aqsentinelAI : public ScriptedAI
     {
         if ((pSpell->Id == SPELL_KNOCK) && pTarget->GetTypeId() == TYPEID_PLAYER)
         {
-            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -20);
+            if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -20);
         }
     }
 
@@ -308,14 +308,14 @@ struct aqsentinelAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_abilitySpellId == SPELL_KNOCK_BUFF)
         {
             if (m_uiKnock_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK);
                 m_uiKnock_Timer = 13000;
             }
             else

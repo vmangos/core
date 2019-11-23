@@ -61,7 +61,7 @@ public:
             {
                 Player* paladin = GetTestPlayer(0);
                 Creature* necromancer = GetTestCreature(1);
-                TEST_ASSERT(paladin->isInCombat() && necromancer->isInCombat());
+                TEST_ASSERT(paladin->IsInCombat() && necromancer->IsInCombat());
                 TEST_ASSERT(necromancer->HasAura(_spellId));
                 TEST_ASSERT(!paladin->HasAura(SPELL_SOUL_TAP));
                 Finish();

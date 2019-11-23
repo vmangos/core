@@ -110,13 +110,13 @@ struct boss_gahzrankaAI : public ScriptedAI
     void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Frostbreath_Timer
         if (Frostbreath_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROSTBREATH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROSTBREATH) == CAST_OK)
                 Frostbreath_Timer = urand(8000, 20000);
         }
         else Frostbreath_Timer -= diff;
@@ -138,7 +138,7 @@ struct boss_gahzrankaAI : public ScriptedAI
         //Slam_Timer
         if (Slam_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLAM) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLAM) == CAST_OK)
                 Slam_Timer = urand(12000, 20000);
         }
         else Slam_Timer -= diff;

@@ -59,13 +59,13 @@ struct boss_theolenkrastinovAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Rend_Timer
         if (m_uiRend_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_REND);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_REND);
             m_uiRend_Timer = 10000;
         }
         else
@@ -74,8 +74,8 @@ struct boss_theolenkrastinovAI : public ScriptedAI
         //m_uiBackhand_Timer
         if (m_uiBackhand_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKHAND);
-            DoModifyThreatPercent(m_creature->getVictim(), -100);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKHAND);
+            DoModifyThreatPercent(m_creature->GetVictim(), -100);
             m_uiBackhand_Timer = 10000;
         }
         else

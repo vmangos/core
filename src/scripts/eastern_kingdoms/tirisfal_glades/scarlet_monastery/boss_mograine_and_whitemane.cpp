@@ -217,7 +217,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_bHasDied && !m_bHeal && m_pInstance && m_pInstance->GetData(TYPE_MOGRAINE_AND_WHITE_EVENT) == SPECIAL)
@@ -230,8 +230,8 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
                 m_uiCrusaderStrike_Timer = 10000;
                 m_uiHammerOfJustice_Timer = 15000;
 
-                if (m_creature->getVictim())
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                if (m_creature->GetVictim())
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
 
                 m_bHeal = true;
             }
@@ -244,7 +244,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         //m_uiCrusaderStrike_Timer
         if (m_uiCrusaderStrike_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CRUSADERSTRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRUSADERSTRIKE);
             m_uiCrusaderStrike_Timer = 10000;
         }
         else
@@ -253,7 +253,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         //m_uiHammerOfJustice_Timer
         if (m_uiHammerOfJustice_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_HAMMEROFJUSTICE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HAMMEROFJUSTICE);
             m_uiHammerOfJustice_Timer = 45000;
         }
         else
@@ -375,7 +375,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if ((!m_creature->SelectHostileTarget() || !m_creature->getVictim()) && !m_bStopAttack)
+        if ((!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) && !m_bStopAttack)
             return;
 
         if (m_bCanResurrect)
@@ -400,7 +400,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
             if (m_creature->IsNonMeleeSpellCasted(false))
                 m_creature->InterruptNonMeleeSpells(false);
 
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_DEEPSLEEP);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DEEPSLEEP);
             m_bCanResurrectCheck = true;
             m_bCanResurrect = true;
             m_bStopAttack = true;
@@ -467,7 +467,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
         //m_uiHolySmite_Timer
         if (m_uiHolySmite_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOLYSMITE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HOLYSMITE);
             m_uiHolySmite_Timer = 6000;
         }
         else

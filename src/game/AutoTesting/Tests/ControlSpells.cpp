@@ -81,7 +81,7 @@ public:
                 break;
             case 2:
                 TEST_ASSERT(necromancer->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE);
-                TEST_ASSERT(necromancer->getVictim() == hunt);
+                TEST_ASSERT(necromancer->GetVictim() == hunt);
                 DoPlayerCast(0, 2, spellId);
                 Wait(4000);
                 break;
@@ -147,7 +147,7 @@ public:
                 Player* warlock = GetTestPlayer(0);
                 Player* mage = GetTestPlayer(1);
                 Creature* necromancer = GetTestCreature(2);
-                TEST_ASSERT(mage->isInCombat() && warlock->isInCombat() && necromancer->isInCombat());
+                TEST_ASSERT(mage->IsInCombat() && warlock->IsInCombat() && necromancer->IsInCombat());
                 TEST_ASSERT(necromancer->HasAura(SHEEP_R4));
                 TEST_ASSERT(necromancer->HasAura(FEAR_R1));
                 necromancer->RemoveAllAuras();

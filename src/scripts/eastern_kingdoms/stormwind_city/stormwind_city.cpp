@@ -58,7 +58,7 @@ struct npc_bartlebyAI : public ScriptedAI
 
     void AttackedBy(Unit* pAttacker) override
     {
-        if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
+        if (!pAttacker || m_creature->GetVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
 
         AttackStart(pAttacker);
@@ -170,7 +170,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
     // Prevent Reset() call after Dashel has been defeated.
     void AttackedBy(Unit* pAttacker) override
     {
-        if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
+        if (!pAttacker || m_creature->GetVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
 
         AttackStart(pAttacker);
@@ -778,7 +778,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
             }
 
             if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                if (!pMarzon->isInCombat())
+                if (!pMarzon->IsInCombat())
                     pMarzon->ForcedDespawn(0);
         }
     }
@@ -793,13 +793,13 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
                 {
                 case 1:
                     if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
-                        if (pGuard1->IsAlive() && !pGuard1->getVictim())
+                        if (pGuard1->IsAlive() && !pGuard1->GetVictim())
                         {
                             DoScriptText(SAY_ROYAL_GUARD_2, pGuard1);
                             pGuard1->GetMotionMaster()->MovePoint(0, -8364.07f, 406.775f, 122.274f, MOVE_PATHFINDING);
                         }
                     if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
-                        if (pGuard2->IsAlive() && !pGuard2->getVictim())
+                        if (pGuard2->IsAlive() && !pGuard2->GetVictim())
                         {
                             DoScriptText(SAY_ROYAL_GUARD_2, pGuard2);
                             pGuard2->GetMotionMaster()->MovePoint(0, -8353.91f, 415.318f, 122.274f, MOVE_PATHFINDING);
@@ -869,18 +869,18 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
                 case 11:
                     if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
                     {
-                        if (!m_creature->isInCombat())
+                        if (!m_creature->IsInCombat())
                             pMarzon->GetMotionMaster()->MovePoint(0, -8419.00f, 486.26f, 123.75f, MOVE_PATHFINDING);
-                        else if (m_creature->getVictim())
-                            pMarzon->AI()->AttackStart(m_creature->getVictim());
+                        else if (m_creature->GetVictim())
+                            pMarzon->AI()->AttackStart(m_creature->GetVictim());
                     }
                     ++m_uiEventPhase;
                     SetEscortPaused(false);
                     break;
                 case 12:
                     if (Creature* pMarzon = m_creature->GetMap()->GetCreature(m_guidMarzon))
-                      if (pMarzon->isInCombat() && pMarzon->getVictim() && !m_creature->isInCombat())
-                          m_creature->AI()->AttackStart(pMarzon->getVictim());
+                      if (pMarzon->IsInCombat() && pMarzon->GetVictim() && !m_creature->IsInCombat())
+                          m_creature->AI()->AttackStart(pMarzon->GetVictim());
                     break;
                 case 13:
                     if (Player* pPlayer = GetPlayerForEscort())
@@ -892,7 +892,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
                                 if (!pMarzon->IsDead() && pMarzon->GetFactionTemplateId() == FACTION_ENEMYY)
                                     pMarzon->SetFactionTemplateId(FACTION_NORMAL_MARZON);
                         }
-                    if (!m_creature->isInCombat())
+                    if (!m_creature->IsInCombat())
                         SetEscortPaused(false);
                     break;
                 }
@@ -907,7 +907,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
 
         npc_escortAI::UpdateAI(uiDiff);
 
-        if (m_creature->SelectHostileTarget() || m_creature->getVictim())
+        if (m_creature->SelectHostileTarget() || m_creature->GetVictim())
             DoMeleeAttackIfReady();
     }
 };
@@ -1070,13 +1070,13 @@ struct npc_tyrion_spybotAI : public npc_escortAI
             DoScriptText(SAY_TYRIONA_1, m_creature);
             if (Creature* pGuard1 = m_creature->GetMap()->GetCreature(m_guidGuard1))
             {
-                if (pGuard1 && pGuard1->IsAlive() && !pGuard1->getVictim())
+                if (pGuard1 && pGuard1->IsAlive() && !pGuard1->GetVictim())
                     pGuard1->SetFacingToObject(m_creature);
             }
 
             if (Creature* pGuard2 = m_creature->GetMap()->GetCreature(m_guidGuard2))
             {
-                if (pGuard2 && pGuard2->IsAlive() && !pGuard2->getVictim())
+                if (pGuard2 && pGuard2->IsAlive() && !pGuard2->GetVictim())
                     pGuard2->SetFacingToObject(m_creature);
             }
 
@@ -1251,7 +1251,7 @@ struct npc_master_woodAI : public ScriptedAI
 
     void ReceiveEmote(Player* pPlayer, uint32 emote) override
     {
-        if (pPlayer && (pPlayer->GetTeam() == ALLIANCE) && !m_creature->isInCombat() && m_creature->IsWithinLOSInMap(pPlayer))
+        if (pPlayer && (pPlayer->GetTeam() == ALLIANCE) && !m_creature->IsInCombat() && m_creature->IsWithinLOSInMap(pPlayer))
         {
             switch (emote)
             {

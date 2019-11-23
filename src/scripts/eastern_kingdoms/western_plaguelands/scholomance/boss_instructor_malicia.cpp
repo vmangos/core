@@ -64,13 +64,13 @@ struct boss_instructormaliciaAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //CallOfGraves_Timer
         if (CallOfGraves_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CALLOFGRAVES);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CALLOFGRAVES);
             CallOfGraves_Timer = 65000;
         }
         else CallOfGraves_Timer -= diff;

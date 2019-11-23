@@ -1401,7 +1401,7 @@ void Aura::TriggerSpell()
             case 9347:                                      // Mortal Strike
             {
                 // expected selection current fight target
-                triggerTarget = GetTarget()->getVictim();
+                triggerTarget = GetTarget()->GetVictim();
                 if (!triggerTarget)
                     return;
 
@@ -1648,7 +1648,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     {
                         if (Player* pPlayer = ToPlayer(target))
                         {
-                            if (!pPlayer->isInCombat())
+                            if (!pPlayer->IsInCombat())
                                 pPlayer->HandleEmoteCommand(EMOTE_STATE_DANCE);
                         }
                         return;
@@ -1847,7 +1847,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     if (Unit* caster = GetCaster())
                         if (Player* casterPlayer = caster->ToPlayer())
                         {
-                            if (casterPlayer->IsAlive() && !casterPlayer->isInCombat() && !casterPlayer->IsTaxiFlying())
+                            if (casterPlayer->IsAlive() && !casterPlayer->IsInCombat() && !casterPlayer->IsTaxiFlying())
                             {
                                 casterPlayer->AddAura(15007); // Add Resurrection Sickness
                                 if (sObjectMgr.GetClosestGraveYard(casterPlayer->GetPositionX(), casterPlayer->GetPositionY(), casterPlayer->GetPositionZ(), casterPlayer->GetMapId(), casterPlayer->GetTeam()))
@@ -3131,7 +3131,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->CombatStop(true);
         target->DeleteThreatList();
-        target->getHostileRefManager().deleteReferences();
+        target->GetHostileRefManager().deleteReferences();
 
         CharmInfo *charmInfo = target->InitCharmInfo(target);
         charmInfo->InitCharmCreateSpells();
@@ -3247,7 +3247,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (pPlayerTarget)
             pPlayerTarget->SetFactionForRace(target->GetRace());
 
-        if (pPlayerTarget && pPlayerTarget->IsAlive() && caster && caster->IsAlive() && caster->isInCombat())
+        if (pPlayerTarget && pPlayerTarget->IsAlive() && caster && caster->IsAlive() && caster->IsInCombat())
         {
             pPlayerTarget->SendAttackSwingCancelAttack();
 
@@ -3257,7 +3257,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
             target->AttackStop();
             target->RemoveAllAttackers();
             target->DeleteThreatList();
-            target->getHostileRefManager().deleteReferences();
+            target->GetHostileRefManager().deleteReferences();
 
             caster->SetInCombatWith(target);
             target->SetInCombatWith(caster);
@@ -3268,7 +3268,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         {
             target->CombatStop(true);
             target->DeleteThreatList();
-            target->getHostileRefManager().deleteReferences();
+            target->GetHostileRefManager().deleteReferences();
         }
 
         //target->SetUnitMovementFlags(MOVEFLAG_NONE);
@@ -3322,7 +3322,7 @@ void Aura::HandleFeignDeath(bool apply, bool Real)
     
     if (apply)
     {
-        HostileReference* pReference = pTarget->getHostileRefManager().getFirst();
+        HostileReference* pReference = pTarget->GetHostileRefManager().getFirst();
         while (pReference)
         {
             if (Creature* refTarget = ToCreature(pReference->getSourceUnit()))
@@ -3474,8 +3474,8 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
         target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
 
 
-        if (target->getVictim() && target->IsAlive())
-            target->SetTargetGuid(target->getVictim()->GetObjectGuid());
+        if (target->GetVictim() && target->IsAlive())
+            target->SetTargetGuid(target->GetVictim()->GetObjectGuid());
 
         if (!target->HasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT))         // prevent allow move if have also root effect
             target->SetRooted(false);
@@ -3681,8 +3681,8 @@ void Aura::HandleAuraModRoot(bool apply, bool Real)
         target->AddUnitState(inCharge ? UNIT_STAT_PENDING_ROOT : UNIT_STAT_ROOT);
 
         //Save last orientation
-        if (target->getVictim())
-            target->SetOrientation(target->GetAngle(target->getVictim()));
+        if (target->GetVictim())
+            target->SetOrientation(target->GetAngle(target->GetVictim()));
 
         if (!target->movespline->Finalized() && !inCharge)
             target->StopMoving();
@@ -3805,7 +3805,7 @@ void Aura::HandleAuraModTotalThreat(bool apply, bool Real)
     if (!caster || !caster->IsAlive())
         return;
 
-    target->getHostileRefManager().addTempThreat(m_modifier.m_amount, apply);
+    target->GetHostileRefManager().addTempThreat(m_modifier.m_amount, apply);
 }
 
 void Aura::HandleModTaunt(bool apply, bool Real)
@@ -5527,7 +5527,7 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
 
             // Power Word: Shield generates half the threat as healing for the same amount
             if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_POWER_WORD_SHIELD>() && spellProto->Id != 27779)
-                caster->getHostileRefManager().threatAssist(caster, float(m_modifier.m_amount) * 0.25, spellProto);
+                caster->GetHostileRefManager().threatAssist(caster, float(m_modifier.m_amount) * 0.25, spellProto);
         }
     }
 }
@@ -5744,7 +5744,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             uint32 heal = int32(new_damage * multiplier);
 
             int32 gain = pCaster->DealHeal(pCaster, heal, spellProto);
-            pCaster->getHostileRefManager().threatAssist(pCaster, gain * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
+            pCaster->GetHostileRefManager().threatAssist(pCaster, gain * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
             break;
         }
         case SPELL_AURA_PERIODIC_HEAL:
@@ -5811,7 +5811,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
             pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, procEx, gain, BASE_ATTACK, spellProto);
 
-            target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
+            target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
 
             // heal for caster damage, warlock's health funnel already cost hps
             if (target != pCaster && spellProto->SpellVisual == 163 &&
@@ -5951,7 +5951,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             if (power != POWER_MANA)     // 1.9 - Mana regeneration over time will no longer generate threat.
                 if (Unit* pCaster = GetCaster())
-                    target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
+                    target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
             break;
         }
         case SPELL_AURA_OBS_MOD_MANA:
@@ -5977,7 +5977,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             int32 gain = target->ModifyPower(POWER_MANA, pdamage);
 
             if (Unit* pCaster = GetCaster())
-                target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
+                target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
             break;
         }
         case SPELL_AURA_POWER_BURN_MANA:
@@ -6037,7 +6037,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             int32 gain = target->ModifyHealth(m_modifier.m_amount);
             if (Unit *caster = GetCaster())
-                target->getHostileRefManager().threatAssist(caster, float(gain) * 0.5f  * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
+                target->GetHostileRefManager().threatAssist(caster, float(gain) * 0.5f  * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
             // Eating anim
             if (spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
                 target->HandleEmoteCommand(EMOTE_ONESHOT_EAT);
@@ -6157,7 +6157,7 @@ void Aura::PeriodicDummyTick()
                     return;
                 }
                 case 24596:                                 // Intoxicating Venom
-                    if (target->isInCombat())
+                    if (target->IsInCombat())
                     {
                         uint32 rand = urand(0, 99);
                         if (rand < 7)

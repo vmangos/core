@@ -358,7 +358,7 @@ struct boss_majordomoAI : public ScriptedAI
                 DomoEvent();
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->GetFactionTemplateId() == 35)
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->GetFactionTemplateId() == 35)
         {
             if (m_creature->GetDistance2d(758.089f, -1176.71f) < 2.0f && m_creature->GetFactionTemplateId() == 35)
             {
@@ -378,7 +378,7 @@ struct boss_majordomoAI : public ScriptedAI
         {
             uint32 Reflect = rand() % 2 ? SPELL_MAGIC_REFLECTION : SPELL_DAMAGE_REFLECTION;
 
-            if (m_creature->getVictim())
+            if (m_creature->GetVictim())
                 m_creature->CastSpell(m_creature, Reflect, true);
             Reflection_Timer = 30000;
         }
@@ -397,7 +397,7 @@ struct boss_majordomoAI : public ScriptedAI
         {
             if (TPDomo_Timer[i] < diff)
             {
-                Unit* uTarget = m_creature->getVictim();
+                Unit* uTarget = m_creature->GetVictim();
                 if (i == 1)
                     uTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
                 if (uTarget && uTarget->IsPlayer() && DoCastSpellIfCan(uTarget, SPELL_TELEPORT) == CAST_OK)

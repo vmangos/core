@@ -110,7 +110,7 @@ struct boss_herodAI : ScriptedAI
         {
             if (auto pMyrmidon = m_creature->GetMap()->GetCreature(*itr))
             {
-                if (!pMyrmidon->IsAlive() || pMyrmidon->getVictim())
+                if (!pMyrmidon->IsAlive() || pMyrmidon->GetVictim())
                     continue;
                 if (victim->IsAlive())
                     pMyrmidon->SetInCombatWith(victim);
@@ -137,7 +137,7 @@ struct boss_herodAI : ScriptedAI
         {
             if (auto pMyrmidon = m_creature->GetMap()->GetCreature(*itr))
             {
-                if (pMyrmidon->IsAlive() && !pMyrmidon->getVictim())
+                if (pMyrmidon->IsAlive() && !pMyrmidon->GetVictim())
                     pMyrmidon->ForcedDespawn();
             }
         }
@@ -170,7 +170,7 @@ struct boss_herodAI : ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // check if the target is still inside the room
@@ -178,7 +178,7 @@ struct boss_herodAI : ScriptedAI
         {
             if (!m_creature->IsWithinDist2d(RoomCenter.x, RoomCenter.y, 32.0f))
             {
-                EngageMyrmidons(me->getVictim());
+                EngageMyrmidons(me->GetVictim());
             }
             uiRoomCheck = 500;
         }
@@ -212,7 +212,7 @@ struct boss_herodAI : ScriptedAI
         // Rushing Charge
         if (RushingCharge_Timer < diff)
         {
-            auto pVictim = m_creature->getVictim();
+            auto pVictim = m_creature->GetVictim();
 
             if (pVictim && !pVictim->IsInRange(m_creature, 0.0f, MELEE_RANGE + 10.0f))
             {
@@ -226,7 +226,7 @@ struct boss_herodAI : ScriptedAI
         // Cleave
         if (Cleave_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 Cleave_Timer = 12000;
         }
         else
@@ -235,7 +235,7 @@ struct boss_herodAI : ScriptedAI
         // Whirlwind
         if (Whirlwind_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WHIRLWIND) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WHIRLWIND) == CAST_OK)
             {
                 m_creature->AddUnitState(UNIT_STAT_ROOT);
                 m_bWhirlwind = true;
@@ -291,7 +291,7 @@ struct mob_scarlet_traineeAI : ScriptedAI
                 Start_Timer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

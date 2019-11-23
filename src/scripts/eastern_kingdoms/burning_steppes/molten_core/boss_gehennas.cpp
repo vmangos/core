@@ -73,7 +73,7 @@ struct boss_gehennasAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Rain of Fire
@@ -106,7 +106,7 @@ struct boss_gehennasAI : public ScriptedAI
         // Shadow Bolt (target)
         if (m_uiShadowBoltTargetTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_BOLT_TARGET) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOW_BOLT_TARGET) == CAST_OK)
                 m_uiShadowBoltTargetTimer = urand(3 * IN_MILLISECONDS, 6 * IN_MILLISECONDS);
         }
         else

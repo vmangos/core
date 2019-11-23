@@ -588,7 +588,7 @@ bool AreaTrigger_at_blackrock_spire(Player* pPlayer, const AreaTriggerEntry* pAt
         case AREATRIGGER_STADIUM:
             if (instance_blackrock_spire* pInstance = (instance_blackrock_spire*) pPlayer->GetInstanceData())
                 if (Creature* pGyth = pInstance->instance->GetCreature(pInstance->GetData64(NPC_GYTH)))
-                    if (pGyth->IsAlive() && !pGyth->isInCombat())
+                    if (pGyth->IsAlive() && !pGyth->IsInCombat())
                         pGyth->AI()->AttackStart(pPlayer);
             break;
     }
@@ -748,13 +748,13 @@ struct npc_rookery_hatcherAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //  Sunder Armor
         if (SunderArmor_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
                 SunderArmor_Timer = urand(10000, 15000);
         }
         else
@@ -763,7 +763,7 @@ struct npc_rookery_hatcherAI : public ScriptedAI
         //  Strike
         if (Strike_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE) == CAST_OK)
                 Strike_Timer = urand(4000, 6000);
         }
         else
@@ -848,7 +848,7 @@ bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, const AreaTriggerEntry* pAt)
 
     if (instance_blackrock_spire* pInstance = (instance_blackrock_spire*)pPlayer->GetInstanceData())
         if (Creature* pBeast = pInstance->instance->GetCreature(pInstance->GetData64(NPC_THE_BEAST)))
-            if (pBeast->IsAlive() && !pBeast->isInCombat())
+            if (pBeast->IsAlive() && !pBeast->IsInCombat())
                 pBeast->AI()->AttackStart(pPlayer);
 
     return false;

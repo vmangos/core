@@ -77,7 +77,7 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Trample
@@ -91,9 +91,9 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
         //Knockout
         if (Knockout_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKOUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKOUT) == CAST_OK)
             {
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
                 Knockout_Timer = 10000;
             }
         }

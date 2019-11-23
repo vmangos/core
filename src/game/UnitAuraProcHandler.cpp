@@ -1178,7 +1178,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
     return SPELL_AURA_PROC_OK;
 }
 
-SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown)
+SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown)
 {
     // Get triggered aura spell info
     SpellEntry const* auraSpellInfo = triggeredByAura->GetSpellProto();
@@ -1494,20 +1494,21 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 if (!procSpell)
                     return SPELL_AURA_PROC_FAILED;
 
+                Player* pPlayer = ToPlayer();
+                if (!pPlayer)
+                    return SPELL_AURA_PROC_FAILED;
+
                 // procspell is triggered spell but we need mana cost of original casted spell
+                // The casted spell is in a variable: Player::m_castingSpell. Otherwise we can not find the spell that caused the proc.
 
-                //[Nostalrius] : Stocke autremenent
-                //Le sort caste est dans une varible : Unit::m_castingSpell. Sinon, impossible de trouver le sort qui a provoque le proc
-
-                SpellEntry const *originalSpell = sSpellMgr.GetSpellEntry(m_castingSpell);
-                //SpellEntry const *originalSpell = sSpellMgr.GetSpellEntry(originalSpellId);
+                SpellEntry const *originalSpell = sSpellMgr.GetSpellEntry(pPlayer->m_castingSpell);
                 if (!originalSpell)
                 {
-                    sLog.outError("Unit::HandleProcTriggerSpell: Spell %u unknown but selected as original in Illu", m_castingSpell);
+                    sLog.outError("Unit::HandleProcTriggerSpell: Spell %u unknown but selected as original in Illu", pPlayer->m_castingSpell);
                     return SPELL_AURA_PROC_FAILED;
                 }
                 // Histoire de pas reproc une autre fois ... :S
-                m_castingSpell = 0;
+                pPlayer->m_castingSpell = 0;
                 basepoints[0] = originalSpell->manaCost;
                 trigger_spell_id = 20272;
                 target = this;
@@ -1600,7 +1601,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
         // Combo points add triggers (need add combopoint only for main target, and after possible combopoints reset)
         case 15250: // Rogue Setup
         {
-            if (!pVictim || pVictim != getVictim())  // applied only for main target
+            if (!pVictim || pVictim != GetVictim())  // applied only for main target
                 return SPELL_AURA_PROC_FAILED;
             break;                                   // continue normal case
         }
@@ -1836,13 +1837,13 @@ SpellAuraProcResult Unit::HandleAddTargetTriggerAuraProc(Unit *pVictim, uint32 /
     {
         switch (aurEntry->Id)
         {
-            // Frappes implacables
-            case 14179: // Rang 1 : 4%
+            // Relentless Strikes
+            case 14179: // Rank 1 : 4%
             {
-                if (GetTypeId() == TYPEID_PLAYER)
+                if (Player* pPlayer = ToPlayer())
                 {
-                    chance = 20.0f * m_castingSpell;
-                    m_castingSpell = 0;
+                    chance = 20.0f * pPlayer->m_castingSpell;
+                    pPlayer->m_castingSpell = 0;
                 }
                 break;
             }

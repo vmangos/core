@@ -658,17 +658,17 @@ public:
     {
         if (!p->IsAlive()) return;
 
-        Unit* target = p->getVictim();
+        Unit* target = p->GetVictim();
         if (target == nullptr)
         {
-            if (!p->isInCombat())
+            if (!p->IsInCombat())
                 target = p->SelectRandomUnfriendlyTarget(nullptr, DEFAULT_VISIBILITY_DISTANCE);
             else
             {
-                target = p->getVictim();
+                target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->getAttackers();
+                    const std::set<Unit*> attackers = p->GetAttackers();
                     if (attackers.size() > 0)
                         target = *attackers.begin();
                 }
@@ -827,17 +827,17 @@ public:
     {
         if (!p->IsAlive()) return;
 
-        Unit* target = p->getVictim();
+        Unit* target = p->GetVictim();
         if (target == nullptr)
         {
-            if (!p->isInCombat())
+            if (!p->IsInCombat())
                 target = p->SelectRandomUnfriendlyTarget(nullptr, DEFAULT_VISIBILITY_DISTANCE);
             else
             {
-                target = p->getVictim();
+                target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->getAttackers();
+                    const std::set<Unit*> attackers = p->GetAttackers();
                     if (attackers.size() > 0)
                         target = *attackers.begin();
                 }
@@ -1558,17 +1558,17 @@ public:
     {
         if (!p->IsAlive()) return;
 
-        Unit* target = p->getVictim();
+        Unit* target = p->GetVictim();
         if (target == nullptr)
         {
-            if (!p->isInCombat())
+            if (!p->IsInCombat())
                 target = p->SelectRandomUnfriendlyTarget(nullptr, DEFAULT_VISIBILITY_DISTANCE);
             else
             {
-                target = p->getVictim();
+                target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->getAttackers();
+                    const std::set<Unit*> attackers = p->GetAttackers();
                     if (attackers.size() > 0)
                         target = *attackers.begin();
                 }

@@ -238,7 +238,7 @@ struct boss_viscidusAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim() && m_creature->IsWithinDistInMap(who, 95.0f, true))
+        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->GetVictim() && m_creature->IsWithinDistInMap(who, 95.0f, true))
         {
             AttackStart(who);
         }
@@ -462,7 +462,7 @@ struct boss_viscidusAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         HackyScaleUpdate();
@@ -503,7 +503,7 @@ struct boss_viscidusAI : public ScriptedAI
         {
             if (m_uiRestoreTargetTimer <= uiDiff)
             {
-                if (Unit* pTarget = m_creature->getVictim())
+                if (Unit* pTarget = m_creature->GetVictim())
                 {
                     m_creature->SetInFront(pTarget);
                     m_creature->SetTargetGuid(pTarget->GetObjectGuid());

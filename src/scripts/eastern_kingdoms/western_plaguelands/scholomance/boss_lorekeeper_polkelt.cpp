@@ -61,13 +61,13 @@ struct boss_lorekeeperpolkeltAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //VolatileInfection_Timer
         if (VolatileInfection_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_VOLATILEINFECTION);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VOLATILEINFECTION);
             VolatileInfection_Timer = 32000;
         }
         else VolatileInfection_Timer -= diff;
@@ -75,7 +75,7 @@ struct boss_lorekeeperpolkeltAI : public ScriptedAI
         //CorrosiveAcid_Timer
         if (CorrosiveAcid_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CORROSIVEACID);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CORROSIVEACID);
             CorrosiveAcid_Timer = 25000;
         }
         else CorrosiveAcid_Timer -= diff;
@@ -83,7 +83,7 @@ struct boss_lorekeeperpolkeltAI : public ScriptedAI
         //NoxiousCatalyst_Timer
         if (NoxiousCatalyst_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_NOXIOUSCATALYST);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_NOXIOUSCATALYST);
             NoxiousCatalyst_Timer = 38000;
         }
         else NoxiousCatalyst_Timer -= diff;

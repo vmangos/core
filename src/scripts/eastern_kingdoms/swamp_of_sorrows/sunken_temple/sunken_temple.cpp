@@ -484,7 +484,7 @@ void npc_shade_hakkarAI::UpdateAI(const uint32 uiDiff)
     else
         CheckTimer -= uiDiff;
 
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_pInstance)
         return;
 
     if (m_creature->HasAura(SPELL_SUPPRESSION))

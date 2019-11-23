@@ -83,14 +83,14 @@ struct boss_flamegorAI : public ScriptedAI
         {
             if (!pCaster || pCaster->GetTypeId() != TYPEID_PLAYER)
                 return;
-            if (m_creature->getThreatManager().getThreat(pCaster))
-                m_creature->getThreatManager().modifyThreatPercent(pCaster, -50);
+            if (m_creature->GetThreatManager().getThreat(pCaster))
+                m_creature->GetThreatManager().modifyThreatPercent(pCaster, -50);
         }
     }
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Shadow Flame Timer
@@ -108,7 +108,7 @@ struct boss_flamegorAI : public ScriptedAI
         // Wing Buffet Timer
         if (m_uiWingBuffetTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WING_BUFFET) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WING_BUFFET) == CAST_OK)
             {
                 DoScriptText(EMOTE_GENERIC_WING_BUFFET, m_creature);
                 m_uiWingBuffetTimer = 30000;
@@ -129,7 +129,7 @@ struct boss_flamegorAI : public ScriptedAI
         else
             m_uiFrenzyTimer -= uiDiff;
 
-        if (m_creature->isAttackReady() && !urand(0, 2))
+        if (m_creature->IsAttackReady() && !urand(0, 2))
             DoCastSpellIfCan(m_creature, SPELL_THRASH);
 
         DoMeleeAttackIfReady();

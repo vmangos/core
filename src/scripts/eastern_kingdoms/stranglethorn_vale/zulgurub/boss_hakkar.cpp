@@ -134,7 +134,7 @@ struct boss_hakkarAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         /** Prevent exploit */
@@ -152,8 +152,8 @@ struct boss_hakkarAI : public ScriptedAI
                 {
                     if (!pTarget->HasAura(SPELL_CAUSEINSANITY))
                     {
-                        m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
-                        m_creature->getThreatManager().addThreatDirectly(pTarget, InsanePlayerAggro);
+                        m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
+                        m_creature->GetThreatManager().addThreatDirectly(pTarget, InsanePlayerAggro);
 
                         InsanePlayerGuid = 0;
                         InsanePlayerAggro = 0;
@@ -198,12 +198,12 @@ struct boss_hakkarAI : public ScriptedAI
         // CAUSEINSANITY
         if (CauseInsanity_Timer < diff)
         {
-            if (Unit* pTarget = m_creature->getVictim())
+            if (Unit* pTarget = m_creature->GetVictim())
             {
                 InsanePlayerGuid = pTarget->GetGUID();
-                InsanePlayerAggro = m_creature->getThreatManager().getThreat(pTarget);
+                InsanePlayerAggro = m_creature->GetThreatManager().getThreat(pTarget);
 
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CAUSEINSANITY) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CAUSEINSANITY) == CAST_OK)
                 {
                     CCDelayInsanity_Timer = 4000;
                     //DoScriptText(SAY_FLEEING, m_creature);
@@ -229,7 +229,7 @@ struct boss_hakkarAI : public ScriptedAI
         {
             if (AspectOfJeklik_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ASPECT_OF_JEKLIK) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ASPECT_OF_JEKLIK) == CAST_OK)
                     AspectOfJeklik_Timer = urand(10000, 14000);
             }
             else
@@ -241,7 +241,7 @@ struct boss_hakkarAI : public ScriptedAI
         {
             if (AspectOfVenoxis_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ASPECT_OF_VENOXIS) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ASPECT_OF_VENOXIS) == CAST_OK)
                     AspectOfVenoxis_Timer = 8000;
             }
             else
@@ -253,7 +253,7 @@ struct boss_hakkarAI : public ScriptedAI
         {
             if (AspectOfMarli_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ASPECT_OF_MARLI) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ASPECT_OF_MARLI) == CAST_OK)
                     AspectOfMarli_Timer = 10000;
             }
             else

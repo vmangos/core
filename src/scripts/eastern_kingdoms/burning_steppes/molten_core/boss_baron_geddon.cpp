@@ -81,7 +81,7 @@ struct boss_baron_geddonAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_bArmageddon)
@@ -123,7 +123,7 @@ struct boss_baron_geddonAI : public ScriptedAI
         {
             if (m_uiRestoreTargetTimer <= diff)
             {
-                if (Unit* pTarget = m_creature->getVictim())
+                if (Unit* pTarget = m_creature->GetVictim())
                 {
                     m_creature->SetInFront(pTarget);
                     m_creature->SetTargetGuid(pTarget->GetObjectGuid());

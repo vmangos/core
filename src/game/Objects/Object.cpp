@@ -494,7 +494,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
     {
         if (Unit const* me = ToUnit())
         {
-            if (Unit const* victim = me->getVictim())
+            if (Unit const* victim = me->GetVictim())
                 * data << victim->GetPackGUID();
             else
                 *data << uint8(0); // Empty pack guid

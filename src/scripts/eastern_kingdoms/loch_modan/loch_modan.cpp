@@ -241,7 +241,7 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
 
     
     // minor optimization: Quest NPCs are already in combat with someone, so skip further checks.
-    if (miran->isInCombat() || huldar->isInCombat())
+    if (miran->IsInCombat() || huldar->IsInCombat())
         return true;
     
     // Check if Saean is available.

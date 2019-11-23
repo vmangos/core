@@ -339,7 +339,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         {
             if (Creature* pSummon = m_pInstance->GetCreature(it))
             {
-                if (!pSummon->getVictim() && m_creature->IsAlive())
+                if (!pSummon->GetVictim() && m_creature->IsAlive())
                 {
                     //the summon has reached the disciple, attack him
                     if (pSummon->GetDistance2d(m_creature) < ATTACK_DISTANCE)
@@ -437,7 +437,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 4:
                         {
                             Player* eventStarter = m_creature->GetMap()->GetPlayer(m_playerGuid);
-                            if (!m_creature->isInCombat() && eventStarter && !eventStarter->isInCombat())
+                            if (!m_creature->IsInCombat() && eventStarter && !eventStarter->IsInCombat())
                             {
                                 DoScriptText(SAY_AFTER_CIRCLE, m_creature);
                                 m_creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
@@ -523,7 +523,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                             break;
                         case 8:
                             if (m_creature->IsAlive() &&
-                                !m_creature->getVictim())
+                                !m_creature->GetVictim())
                             {
                                 m_creature->DeleteThreatList();
                                 m_creature->CombatStop(true);
@@ -576,7 +576,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         if (OnCastWaypoint())
             return;
 
-        if (m_creature->SelectHostileTarget() && m_creature->getVictim())
+        if (m_creature->SelectHostileTarget() && m_creature->GetVictim())
         {
             if (Sleep_Timer < diff)
             {
@@ -709,7 +709,7 @@ struct EvolvingEctoplasmAI : public ScriptedAI
         else
             m_uiImmuneTimer -= uiDiff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

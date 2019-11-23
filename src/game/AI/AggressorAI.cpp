@@ -34,15 +34,15 @@ int AggressorAI::Permissible(const Creature *creature)
 void AggressorAI::MoveInLineOfSight(Unit *u)
 {
     // Check this now to prevent calling expensive functions (isInAccessablePlaceFor / IsWithinLOSInMap)
-    if (m_creature->getVictim() && !m_creature->GetMap()->IsDungeon())
+    if (m_creature->GetVictim() && !m_creature->GetMap()->IsDungeon())
         return;
     if (!m_creature->IsWithinDistInMap(u, m_creature->GetAttackDistance(u)))
         return;
 
-    if (m_creature->CanInitiateAttack() && u->isTargetableForAttack() && m_creature->IsHostileTo(u) &&
+    if (m_creature->CanInitiateAttack() && u->IsTargetableForAttack() && m_creature->IsHostileTo(u) &&
             m_creature->IsWithinLOSInMap(u) && u->isInAccessablePlaceFor(m_creature))
     {
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             AttackStart(u);
         else if (m_creature->GetMap()->IsDungeon())
         {
@@ -55,7 +55,7 @@ void AggressorAI::MoveInLineOfSight(Unit *u)
 
 void AggressorAI::UpdateAI(const uint32 uiDiff)
 {
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
 
     if (!m_CreatureSpells.empty())

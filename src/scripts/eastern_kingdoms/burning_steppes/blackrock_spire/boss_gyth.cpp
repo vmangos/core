@@ -331,7 +331,7 @@ struct boss_gythAI : public ScriptedAI
             m_bInitialized = true;
         }
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!m_bRootSelf)

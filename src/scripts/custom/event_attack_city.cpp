@@ -651,7 +651,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
     void DoCastRandomSpell()
     {
         uint32 randEntry = m_lSpells[ urand(0, m_lSpells.size() - 1) ];
-        ME->CastSpell(ME->getVictim(), randEntry, false);
+        ME->CastSpell(ME->GetVictim(), randEntry, false);
     }
     void DoSpawnRandomGobj()
     {
@@ -768,7 +768,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
     }
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (ME->IsStopped() && !ME->getVictim())
+        if (ME->IsStopped() && !ME->GetVictim())
         {
             if (Unit* newTarget = GetRandomNearUnitToAttack())
                 AttackStart(newTarget);

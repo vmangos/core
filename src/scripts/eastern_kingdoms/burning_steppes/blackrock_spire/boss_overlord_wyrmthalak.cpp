@@ -73,10 +73,10 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
         if (pSummoned->GetEntry() != NPC_SPIRESTONE_WARLORD && pSummoned->GetEntry() != NPC_SMOLDERTHORN_BERSERKER)
             return;
 
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
         {
             Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            pSummoned->AI()->AttackStart(pTarget ? pTarget : m_creature->getVictim());
+            pSummoned->AI()->AttackStart(pTarget ? pTarget : m_creature->GetVictim());
         }
     }
 
@@ -107,7 +107,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Prevent players from pulling Wyrmthalak into UBRS
@@ -134,7 +134,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
         // Cleave
         if (m_uiCleaveTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
             m_uiCleaveTimer = 7000;
         }
         else

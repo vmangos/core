@@ -131,7 +131,7 @@ struct boss_grobbulusAI : public ScriptedAI
             return false;
 
         std::vector<Unit*> suitableTargets;
-        ThreatList const& threatList = m_creature->getThreatManager().getThreatList();
+        ThreatList const& threatList = m_creature->GetThreatManager().getThreatList();
 
         for (ThreatList::const_iterator itr = threatList.begin(); itr != threatList.end(); ++itr)
         {
@@ -168,7 +168,7 @@ struct boss_grobbulusAI : public ScriptedAI
 
     void UpdateSlimeStream(uint32 uiDiff)
     {
-        if (m_creature->CanReachWithMeleeAutoAttack(m_creature->getVictim()))
+        if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             m_uiSlimeStreamTimer = SLIMESTREAM_REPEAT_CD;
         else
         {
@@ -184,7 +184,7 @@ struct boss_grobbulusAI : public ScriptedAI
     
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -212,7 +212,7 @@ struct boss_grobbulusAI : public ScriptedAI
                         m_events.Repeat(100);
                     break;
                 case EVENT_SLIME_SPRAY:
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_SPRAY) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLIME_SPRAY) == CAST_OK)
                     {
                         m_events.Repeat(SLIMESPRAY_CD(false));
                         //DoScriptText(EMOTE_SPRAY_SLIME, m_creature);

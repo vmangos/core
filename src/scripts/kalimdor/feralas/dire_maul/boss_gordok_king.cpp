@@ -52,13 +52,13 @@ struct boss_king_gordokAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Sunder Armor
         if (m_uiSunderArmor_Timer < uiDiff) 
         {
-            Unit* pTarget = m_creature->getVictim();
+            Unit* pTarget = m_creature->GetVictim();
             if (pTarget) 
             {
                 DoCastSpellIfCan(pTarget, SPELL_SUNDER_ARMOR);
@@ -79,7 +79,7 @@ struct boss_king_gordokAI : public ScriptedAI
         // Mortal Strike
         if (m_uiMortalStrike_Timer < uiDiff) 
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
                 m_uiMortalStrike_Timer = urand(12000, 20000);
         } 
         else 
@@ -112,8 +112,8 @@ struct boss_king_gordokAI : public ScriptedAI
             {
                 if (Creature* pChorush = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_CHORUSH)))
                 {
-                    if (pChorush->IsAlive() && !pChorush->isInCombat())
-                        pChorush->AI()->AttackStart(m_creature->getVictim());
+                    if (pChorush->IsAlive() && !pChorush->IsInCombat())
+                        pChorush->AI()->AttackStart(m_creature->GetVictim());
                 }
                 m_uiLinkCheckTimer = 2500;
             }
@@ -210,7 +210,7 @@ struct boss_chorushAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         switch (m_uiEquipment)
@@ -235,8 +235,8 @@ struct boss_chorushAI : public ScriptedAI
             {
                 if (Creature* pKing = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_KING_GORDOK)))
                 {
-                    if (!pKing->isInCombat())
-                        pKing->AI()->AttackStart(m_creature->getVictim());
+                    if (!pKing->IsInCombat())
+                        pKing->AI()->AttackStart(m_creature->GetVictim());
                 }
                 m_uiLinkCheckTimer = 2500;
             }
@@ -252,7 +252,7 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
     // Fireball
     if (m_uiSpellTimers[0] < uiDiff) 
     {
-        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIREBALL) == CAST_OK)
+        if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FIREBALL) == CAST_OK)
             m_uiSpellTimers[0] = (m_bInMeele ? urand(7000, 10000) : urand(3000, 4000));
     } 
     else 
@@ -281,7 +281,7 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
     if (m_uiSpellTimers[1] < uiDiff) 
     {
         bool m_bMeleeAttackers = false;
-        Unit::AttackerSet attackers = m_creature->getAttackers();
+        Unit::AttackerSet attackers = m_creature->GetAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
             if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
@@ -301,7 +301,7 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
     if (m_uiSpellTimers[2] < uiDiff) 
     {
         bool m_bMeleeAttackers = false;
-        Unit::AttackerSet attackers = m_creature->getAttackers();
+        Unit::AttackerSet attackers = m_creature->GetAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
             if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
@@ -318,23 +318,23 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
 
     if (!IsCombatMovementEnabled())
     { //Melee
-        if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->getVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 30.0f
-          || !m_creature->IsWithinLOSInMap(m_creature->getVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
+        if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->GetVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->GetVictim()) > 30.0f
+          || !m_creature->IsWithinLOSInMap(m_creature->GetVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
         {
             SetCombatMovement(true);
-            DoStartMovement(m_creature->getVictim());
+            DoStartMovement(m_creature->GetVictim());
             m_bInMeele = true;
             return;
         }
     }
     else                
     { //Range
-        if (m_bInMeele && m_creature->GetDistance2d(m_creature->getVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->getVictim()) <= 30.0f
-          && m_creature->IsWithinLOSInMap(m_creature->getVictim()) && m_creature->GetPowerPercent(POWER_MANA) >= 5.0f)
+        if (m_bInMeele && m_creature->GetDistance2d(m_creature->GetVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->GetVictim()) <= 30.0f
+          && m_creature->IsWithinLOSInMap(m_creature->GetVictim()) && m_creature->GetPowerPercent(POWER_MANA) >= 5.0f)
         {
             SetCombatMovement(false);
             m_bInMeele = false;
-            DoStartNoMovement(m_creature->getVictim());
+            DoStartNoMovement(m_creature->GetVictim());
             return;
         }
     }
@@ -347,7 +347,7 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
     if (m_uiSpellTimers[2] < uiDiff) 
     {
         bool m_bMeleeAttackers = false;
-        Unit::AttackerSet attackers = m_creature->getAttackers();
+        Unit::AttackerSet attackers = m_creature->GetAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
             if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
                 if (m_creature->IsInRange(attacker, 0.0f, 6.0f, false)) 
@@ -380,7 +380,7 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
     // Lightning Bolt
     if (m_uiSpellTimers[0] < uiDiff) 
     {
-        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_LIGHTNING_BOLT) == CAST_OK)
+        if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_LIGHTNING_BOLT) == CAST_OK)
             m_uiSpellTimers[0] = (m_bInMeele ? urand(7000, 10000) : urand(3000, 4000));
     } 
     else 
@@ -389,7 +389,7 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
     // Chain Lightning
     if (m_uiSpellTimers[1] < uiDiff) 
     {
-        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHAIN_LIGHTNING) == CAST_OK)
+        if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHAIN_LIGHTNING) == CAST_OK)
             m_uiSpellTimers[1] = urand(15000, 25000);
     } 
     else 
@@ -397,23 +397,23 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
 
     if (!IsCombatMovementEnabled())
     { //Melee
-        if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->getVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 30.0f
-          || !m_creature->IsWithinLOSInMap(m_creature->getVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
+        if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->GetVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->GetVictim()) > 30.0f
+          || !m_creature->IsWithinLOSInMap(m_creature->GetVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
         {
             SetCombatMovement(true);
-            DoStartMovement(m_creature->getVictim());
+            DoStartMovement(m_creature->GetVictim());
             m_bInMeele = true;
             return;
         }
     }
     else
     { //Range
-        if (m_bInMeele && m_creature->GetDistance2d(m_creature->getVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->getVictim()) <= 30.0f
-          && m_creature->IsWithinLOSInMap(m_creature->getVictim()) && m_creature->GetPowerPercent(POWER_MANA) >= 5.0f)
+        if (m_bInMeele && m_creature->GetDistance2d(m_creature->GetVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->GetVictim()) <= 30.0f
+          && m_creature->IsWithinLOSInMap(m_creature->GetVictim()) && m_creature->GetPowerPercent(POWER_MANA) >= 5.0f)
         {
             SetCombatMovement(false);
             m_bInMeele = false;
-            DoStartNoMovement(m_creature->getVictim());
+            DoStartNoMovement(m_creature->GetVictim());
             return;
         }
     }
@@ -440,7 +440,7 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
     // Mind Blast
     if (m_uiSpellTimers[0] < uiDiff) 
     {
-        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_BLAST) == CAST_OK)
+        if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_BLAST) == CAST_OK)
             m_uiSpellTimers[0] = (m_bInMeele ? urand(7000, 10000) : urand(2000, 3000));
     } 
     else 
@@ -462,7 +462,7 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
     if (m_uiSpellTimers[2] < uiDiff) 
     {
         bool m_bMeleeAttackers = false;
-        Unit::AttackerSet attackers = m_creature->getAttackers();
+        Unit::AttackerSet attackers = m_creature->GetAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
             if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
@@ -479,23 +479,23 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
 
     if (!IsCombatMovementEnabled())
     { //Melee
-        if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->getVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 30.0f
-            || !m_creature->IsWithinLOSInMap(m_creature->getVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
+        if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->GetVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->GetVictim()) > 30.0f
+            || !m_creature->IsWithinLOSInMap(m_creature->GetVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
         {
             SetCombatMovement(true);
-            DoStartMovement(m_creature->getVictim());
+            DoStartMovement(m_creature->GetVictim());
             m_bInMeele = true;
             return;
         }
     }
     else
     { //Range
-        if (m_bInMeele && m_creature->GetDistance2d(m_creature->getVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->getVictim()) <= 30.0f
-            && m_creature->IsWithinLOSInMap(m_creature->getVictim()) && m_creature->GetPowerPercent(POWER_MANA) >= 5.0f)
+        if (m_bInMeele && m_creature->GetDistance2d(m_creature->GetVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->GetVictim()) <= 30.0f
+            && m_creature->IsWithinLOSInMap(m_creature->GetVictim()) && m_creature->GetPowerPercent(POWER_MANA) >= 5.0f)
         {
             SetCombatMovement(false);
             m_bInMeele = false;
-            DoStartNoMovement(m_creature->getVictim());
+            DoStartNoMovement(m_creature->GetVictim());
             return;
         }
     }

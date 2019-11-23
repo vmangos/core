@@ -165,11 +165,11 @@ struct boss_four_horsemen_shared : public ScriptedAI
             bool alert;
             if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
                 return;
-            if (m_creature->CanInitiateAttack() && pPlayer->isTargetableForAttack() && m_creature->IsHostileTo(pPlayer))
+            if (m_creature->CanInitiateAttack() && pPlayer->IsTargetableForAttack() && m_creature->IsHostileTo(pPlayer))
             {
                 if (pPlayer->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
                 {
-                    if (!m_creature->getVictim())
+                    if (!m_creature->GetVictim())
                     {
                         AttackStart(pPlayer);
                         return;
@@ -194,11 +194,11 @@ struct boss_four_horsemen_shared : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 75.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
             if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
                 else if (m_creature->GetMap()->IsDungeon())
                 {
@@ -351,13 +351,13 @@ struct boss_four_horsemen_shared : public ScriptedAI
             {
                 m_uiMarkTimer = 12000;
                 //todo: this behavior should get some more confirmation
-                ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+                ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
                 {
                     Unit* pUnit = m_creature->GetMap()->GetUnit( (*itr)->getUnitGuid());
 
-                    if (pUnit && m_creature->getThreatManager().getThreat(pUnit))
-                        m_creature->getThreatManager().modifyThreatPercent(pUnit, -50);
+                    if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
+                        m_creature->GetThreatManager().modifyThreatPercent(pUnit, -50);
                 }
             }
         }
@@ -447,7 +447,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
     void UpdateAI(const uint32 uiDiff) override
     {
         AggroRadius(uiDiff);
-        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
@@ -568,7 +568,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
     {
         AggroRadius(uiDiff);
 
-        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
@@ -656,7 +656,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
     {
         AggroRadius(uiDiff);
 
-        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
@@ -755,7 +755,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         AggroRadius(uiDiff);
 
         //Return since we have no target
-        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;

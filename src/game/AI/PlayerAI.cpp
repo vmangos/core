@@ -209,7 +209,7 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
 
     Unit* controller = FindController();
 
-    bool isNewVictim = me->getVictim() != victim;
+    bool isNewVictim = me->GetVictim() != victim;
 
     if (isNewVictim)
         me->Attack(victim, true);
@@ -305,19 +305,19 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         if (charmInfo)
         {
             if (charmInfo->HasReactState(REACT_PASSIVE))
-                victim = me->getVictim();
+                victim = me->GetVictim();
             else if (charmInfo->HasReactState(REACT_DEFENSIVE) || charmInfo->HasReactState(REACT_AGGRESSIVE))
             {
-                victim = me->getVictim();
+                victim = me->GetVictim();
                 if (!victim || (victim == Pcontroller))
-                    victim = Pcontroller->getVictim();
+                    victim = Pcontroller->GetVictim();
             }
         }
         else
         {
-            victim = me->getVictim();
+            victim = me->GetVictim();
             if (!victim || (victim == Pcontroller))
-                victim = Pcontroller->getVictim();
+                victim = Pcontroller->GetVictim();
         }
 
         if (!victim || (victim == me))
@@ -332,11 +332,11 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         // Unit * victim = controller-> getVictim ();
         // Ivina <Nostalrius>: chooses the target randomly and not always the target of the controller.
         victim = Ccontroller ? Ccontroller->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : me->SelectNearestTarget(50.0f);
-        if (Unit* v2 = me->getVictim())
+        if (Unit* v2 = me->GetVictim())
             if (me->canAttack(v2, false))
                 victim = v2;
 
-        if (Ccontroller && (!Ccontroller->IsAlive() || !Ccontroller->isInCombat()))
+        if (Ccontroller && (!Ccontroller->IsAlive() || !Ccontroller->IsInCombat()))
         {
             me->RemoveCharmAuras();
             // Note that we CANNOT continue after this point since this object has been deleted

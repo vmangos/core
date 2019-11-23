@@ -1201,7 +1201,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                     {
                         if (!m_spellInfo->HasAura(SPELL_AURA_MOD_POSSESS))
                         {
-                            if (!unit->isInCombat())
+                            if (!unit->IsInCombat())
                                 unit->AttackedBy(pRealUnitCaster);
 
                             unit->AddThreat(pRealUnitCaster);
@@ -1305,7 +1305,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         float classThreatModifier = pUnitCaster && pUnitCaster->GetClass() == CLASS_PALADIN ? 0.25f : 0.5f;
 
         if (pRealUnitCaster)
-            unitTarget->getHostileRefManager().threatAssist(pRealUnitCaster, float(gain) * classThreatModifier * sSpellMgr.GetSpellThreatMultiplier(m_spellInfo), m_spellInfo);
+            unitTarget->GetHostileRefManager().threatAssist(pRealUnitCaster, float(gain) * classThreatModifier * sSpellMgr.GetSpellThreatMultiplier(m_spellInfo), m_spellInfo);
     }
     // Do damage and triggers
     else if (m_damage)
@@ -1518,7 +1518,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         m_casterUnit && unit->HasAuraPetShouldAvoidBreaking(m_casterUnit))
     {
         // Tell any pets to stop attacking the target on application of breakable crowd control spells
-        Unit::AttackerSet attackers = unit->getAttackers();
+        Unit::AttackerSet attackers = unit->GetAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
         {
             if ((*itr)->IsPet())
@@ -1541,7 +1541,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
 
     if (!effectMask)
     {
-        if (pRealUnitCaster && !unit->isInCombat())
+        if (pRealUnitCaster && !unit->IsInCombat())
             unit->AttackedBy(pRealUnitCaster);
         return;
     }
@@ -1628,7 +1628,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
                     {
                         if (!m_spellInfo->HasAura(SPELL_AURA_MOD_POSSESS))
                         {
-                            if (!unit->isInCombat())
+                            if (!unit->IsInCombat())
                                 unit->AttackedBy(pRealUnitCaster);
 
                             unit->AddThreat(pRealUnitCaster);
@@ -1660,12 +1660,12 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
             //   NPCs are in combat.
             if (pRealUnitCaster)
             {
-                if (unit->isInCombat())
+                if (unit->IsInCombat())
                 {
                     if (!(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO))
                     {
                         pRealUnitCaster->SetInCombatWithAssisted(unit);
-                        unit->getHostileRefManager().threatAssist(pRealUnitCaster, 0.0f, m_spellInfo);
+                        unit->GetHostileRefManager().threatAssist(pRealUnitCaster, 0.0f, m_spellInfo);
                     }
                 }
                 else if (unit->IsPvP() && unit->IsPlayer())
@@ -2475,7 +2475,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 // remove not targetable units if spell has no script targets
                 for (UnitList::iterator itr = targetUnitMap.begin(); itr != targetUnitMap.end();)
                 {
-                    if (!(*itr)->isTargetableForAttack(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD, m_caster->IsPlayer()))
+                    if (!(*itr)->IsTargetableForAttack(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD, m_caster->IsPlayer()))
                         targetUnitMap.erase(itr++);
                     else
                         ++itr;
@@ -3817,9 +3817,9 @@ void Spell::cast(bool skipCheck)
 
     if (m_casterUnit && IsMeleeAttackResetSpell() && !(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_RESET_AUTO_ACTIONS))
     {
-        m_casterUnit->resetAttackTimer(BASE_ATTACK);
-        if (m_casterUnit->haveOffhandWeapon())
-            m_casterUnit->resetAttackTimer(OFF_ATTACK);
+        m_casterUnit->ResetAttackTimer(BASE_ATTACK);
+        if (m_casterUnit->HaveOffhandWeapon())
+            m_casterUnit->ResetAttackTimer(OFF_ATTACK);
     }
 
     m_caster->DecreaseCastCounter();
@@ -4353,7 +4353,7 @@ void Spell::finish(bool ok)
         m_casterUnit->DealHeal(m_casterUnit, uint32(m_healthLeech), m_spellInfo);
 
     /*if (IsRangedAttackResetSpell())
-        m_caster->resetAttackTimer(RANGED_ATTACK);*/
+        m_caster->ResetAttackTimer(RANGED_ATTACK);*/
 
     // Clear combo at finish state
     if (m_caster->IsPlayer() && m_spellInfo->NeedsComboPoints())
@@ -5213,7 +5213,7 @@ void Spell::HandleThreatSpells()
 
         // positive spells distribute threat among all units that are in combat with target, like healing
         if (positive)
-            target->getHostileRefManager().threatAssist(m_casterUnit /*pRealCaster ??*/, threat, m_spellInfo);
+            target->GetHostileRefManager().threatAssist(m_casterUnit /*pRealCaster ??*/, threat, m_spellInfo);
         // for negative spells threat gets distributed among affected targets
         else
         {
@@ -5403,7 +5403,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
         if (strict && m_casterUnit)
         {
-            if (m_casterUnit && m_casterUnit->isInCombat() && m_spellInfo->IsNonCombatSpell())
+            if (m_casterUnit && m_casterUnit->IsInCombat() && m_spellInfo->IsNonCombatSpell())
                 return SPELL_FAILED_AFFECTING_COMBAT;
 
             // only check at first call, Stealth auras are already removed at second call
@@ -5529,7 +5529,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
         // World of Warcraft Client Patch 1.12.0 (2006-08-22)
         // - Pickpocket can now be used on targets that are in combat, as long as the rogue remains stealthed.
-        if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_IS_PICKPOCKET) && target->isInCombat())
+        if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_IS_PICKPOCKET) && target->IsInCombat())
             return SPELL_FAILED_TARGET_IN_COMBAT;
 #endif
 
@@ -5547,7 +5547,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_LINE_OF_SIGHT;
 
                 // check if target is in combat
-                if (strict && non_caster_target && (m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET) && target->isInCombat())
+                if (strict && non_caster_target && (m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_IN_COMBAT_TARGET) && target->IsInCombat())
                     return SPELL_FAILED_TARGET_AFFECTING_COMBAT;
 
                 // auto selection spell rank implemented in WorldSession::HandleCastSpellOpcode
@@ -6197,7 +6197,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!pet->GetCurrentFoodBenefitLevel(foodItem->GetProto()->ItemLevel))
                     return SPELL_FAILED_FOOD_LOWLEVEL;
 
-                if (pet->isInCombat())
+                if (pet->IsInCombat())
                     return SPELL_FAILED_AFFECTING_COMBAT;
 
                 break;
@@ -6452,7 +6452,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!target || ((Player*)m_caster) == target || !target->IsInSameRaidWith((Player*)m_caster))
                         return SPELL_FAILED_BAD_TARGETS;
 
-                    if (target->isInCombat())
+                    if (target->IsInCombat())
                         return SPELL_FAILED_TARGET_IN_COMBAT;
 
                     // check if our map is dungeon
@@ -6885,7 +6885,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
     if (m_casterUnit->IsNonMeleeSpellCasted(false))
         return SPELL_FAILED_SPELL_IN_PROGRESS;
 
-    if (m_casterUnit->isInCombat() && m_spellInfo->IsNonCombatSpell())
+    if (m_casterUnit->IsInCombat() && m_spellInfo->IsNonCombatSpell())
         return SPELL_FAILED_AFFECTING_COMBAT;
 
     if (m_casterUnit->IsCreature() && (((Creature*)m_casterUnit)->IsPet() || m_casterUnit->isCharmed()))
@@ -6920,7 +6920,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
         if (_target)                                         //for target dead/target not valid
         {
-            if (!_target->isTargetableForAttack(false, m_casterUnit->IsPlayer()))
+            if (!_target->IsTargetableForAttack(false, m_casterUnit->IsPlayer()))
                 return SPELL_FAILED_BAD_TARGETS;            // guessed error
 
             // SPELL_EFFECT_DISPEL -> Positive or negative depending on the target
@@ -7073,13 +7073,13 @@ bool Spell::CanAutoCast(Unit* target)
 
     // Nostalrius - par exemple roder ne doit pas se declencher si on envoie le pet attaquer.
     // Sinon le pet revient a cause de cet attribut :
-    if (m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET && m_casterUnit->getVictim())
+    if (m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET && m_casterUnit->GetVictim())
         return false;
 
     // 2947 - Fire Shield, rank 1 enUS
     // When set to auto-cast, the Imp will cast this on any party members within 30 yds if they receive a melee attack.
     if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMP_BUFFS>() && m_spellInfo->SpellVisual == 289)
-        if (!target->getAttackerForHelper())
+        if (!target->GetAttackerForHelper())
             return false;
 
     if (!m_spellInfo->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE))
@@ -8299,7 +8299,7 @@ public:
 
             if (i_TargetType != SPELL_TARGETS_ALL)
             {
-                if (!unit->isAttackableByAOE(i_spell.m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD, i_playerControlled))
+                if (!unit->IsAttackableByAOE(i_spell.m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD, i_playerControlled))
                     continue;
             }
 
@@ -8602,8 +8602,8 @@ void Spell::OnSpellLaunch()
     // Delay attack, otherwise player makes instant attack after cast
     if (m_casterUnit->IsPlayer())
     {
-        m_casterUnit->setAttackTimer(BASE_ATTACK, m_casterUnit->getAttackTimer(BASE_ATTACK) + 200 + 40 * m_casterUnit->GetDistance(unitTarget));
-        m_casterUnit->setAttackTimer(OFF_ATTACK, m_casterUnit->getAttackTimer(OFF_ATTACK)  + 200 + 40 * m_casterUnit->GetDistance(unitTarget));
+        m_casterUnit->SetAttackTimer(BASE_ATTACK, m_casterUnit->GetAttackTimer(BASE_ATTACK) + 200 + 40 * m_casterUnit->GetDistance(unitTarget));
+        m_casterUnit->SetAttackTimer(OFF_ATTACK, m_casterUnit->GetAttackTimer(OFF_ATTACK)  + 200 + 40 * m_casterUnit->GetDistance(unitTarget));
     }
     
     bool triggerAutoAttack = unitTarget != m_casterUnit && !m_spellInfo->IsPositiveSpell() && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET);

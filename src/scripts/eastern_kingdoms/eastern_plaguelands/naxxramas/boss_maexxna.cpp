@@ -211,11 +211,11 @@ struct boss_maexxnaAI : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 40.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
             if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
                 else if (m_creature->GetMap()->IsDungeon())
                 {
@@ -238,7 +238,7 @@ struct boss_maexxnaAI : public ScriptedAI
     
     bool DoCastWebWrap()
     {
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         if (tList.size() < 2)
             return false;
 
@@ -365,7 +365,7 @@ struct boss_maexxnaAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         UpdateWraps(uiDiff);
@@ -382,7 +382,7 @@ struct boss_maexxnaAI : public ScriptedAI
         // Web Spray
         if (m_uiWebSprayTimer < uiDiff)
         {
-            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_WEBSPRAY) == CAST_OK)
+            if(DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WEBSPRAY) == CAST_OK)
                 m_uiWebSprayTimer = WebSprayCooldown();
         }
         else
@@ -391,7 +391,7 @@ struct boss_maexxnaAI : public ScriptedAI
         // Poison Shock
         if (m_uiPoisonShockTimer < uiDiff)
         {
-            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISONSHOCK) == CAST_OK)
+            if(DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POISONSHOCK) == CAST_OK)
                 m_uiPoisonShockTimer = PoisonShockCooldown();
         }
         else
@@ -400,7 +400,7 @@ struct boss_maexxnaAI : public ScriptedAI
         // Necrotic Poison
         if (m_uiNecroticPoisonTimer < uiDiff)
         {
-            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_NECROTICPOISON) == CAST_OK)
+            if(DoCastSpellIfCan(m_creature->GetVictim(), SPELL_NECROTICPOISON) == CAST_OK)
                 m_uiNecroticPoisonTimer = NecroticPoisonCooldown();
         }
         else

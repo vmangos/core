@@ -101,7 +101,7 @@ void AdvancedPlayerBotAI::WarriorAI(const uint32 delta)
     else
     {
         //Search
-        if (me->getVictim() == nullptr)
+        if (me->GetVictim() == nullptr)
         {
             if (Unit* NewTarget = me->SelectNearestTarget(50.0f))
             {
@@ -111,7 +111,7 @@ void AdvancedPlayerBotAI::WarriorAI(const uint32 delta)
         }
         else
         {
-            WarriorAttackTarget(me->getVictim());
+            WarriorAttackTarget(me->GetVictim());
         }
     }
 }
@@ -218,7 +218,7 @@ void AdvancedPlayerBotAI::WarlockAI(const uint32 delta)
     else
     {
         //Search
-        if (me->getVictim() == nullptr)
+        if (me->GetVictim() == nullptr)
         {
             if (Unit* NewTarget = me->SelectNearestTarget(50.0f))
             {
@@ -227,7 +227,7 @@ void AdvancedPlayerBotAI::WarlockAI(const uint32 delta)
         }
         else
         {
-            WarlockBattleAI(me->getVictim());
+            WarlockBattleAI(me->GetVictim());
         }
     }
 
@@ -299,12 +299,12 @@ void AdvancedPlayerBotAI::MageAI(const uint32 delta)
     //if we already cast something - no need to update
     if (me->IsNonMeleeSpellCasted(false)) return;
 
-    float range = me->isInCombat() ? 30.0f : frand(15, 30);
+    float range = me->IsInCombat() ? 30.0f : frand(15, 30);
     Unit* target = me->SelectNearestTarget(range);
     if (target && !me->IsWithinLOSInMap(target))
         target = nullptr;
     // OOM ?
-    if (me->GetPower(POWER_MANA) < 40 && target && me->isInCombat())
+    if (me->GetPower(POWER_MANA) < 40 && target && me->IsInCombat())
     {
         if (me->Attack(target, true))
             me->GetMotionMaster()->MoveChase(target);
@@ -352,7 +352,7 @@ void AdvancedPlayerBotAI::MageAI(const uint32 delta)
         return;
     }
     /// OUT OF COMBAT REGEN
-    if (!me->isInCombat() && me->GetPower(POWER_MANA) < 150)
+    if (!me->IsInCombat() && me->GetPower(POWER_MANA) < 150)
     {
         if (!me->movespline->Finalized())
             me->StopMoving();
@@ -393,11 +393,11 @@ void AdvancedPlayerBotAI::GatherConditions()
     }
 
     //Is attacked?
-    Conditions.IsAttacked = me->isInCombat();
+    Conditions.IsAttacked = me->IsInCombat();
 
     if (Conditions.IsAttacked)
     {
-        Unit::AttackerSet AttackerTable = me->getAttackers();
+        Unit::AttackerSet AttackerTable = me->GetAttackers();
         if (AttackerTable.size() == 0)
         {
             Conditions.IsAttacked = false;
@@ -409,7 +409,7 @@ void AdvancedPlayerBotAI::GatherConditions()
 
 Unit* AdvancedPlayerBotAI::PickNearestAttacker()
 {
-    Unit::AttackerSet AttackerTable = me->getAttackers();
+    Unit::AttackerSet AttackerTable = me->GetAttackers();
     if (AttackerTable.size() > 0)
     {
         //pick nearest

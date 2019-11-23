@@ -143,12 +143,12 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
     /// COMBAT AI
     if (me->IsNonMeleeSpellCasted(false) || (me->HasAura(AURA_REGEN_MANA) && me->GetPower(POWER_MANA) != me->GetMaxPower(POWER_MANA)))
         return;
-    float range = me->isInCombat() ? 30.0f : frand(15, 30);
+    float range = me->IsInCombat() ? 30.0f : frand(15, 30);
     Unit* target = me->SelectNearestTarget(range);
     if (target && !me->IsWithinLOSInMap(target))
         target = nullptr;
     // OOM ?
-    if (me->GetPower(POWER_MANA) < 40 && target && me->isInCombat())
+    if (me->GetPower(POWER_MANA) < 40 && target && me->IsInCombat())
     {
         if (me->Attack(target, true))
             me->GetMotionMaster()->MoveChase(target);
@@ -196,7 +196,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
         return;
     }
     /// OUT OF COMBAT REGEN
-    if (!me->isInCombat() && me->GetPower(POWER_MANA) < 150)
+    if (!me->IsInCombat() && me->GetPower(POWER_MANA) < 150)
     {
         if (!me->movespline->Finalized())
             me->StopMoving();

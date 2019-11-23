@@ -251,7 +251,7 @@ struct boss_rajaxxAI : public ScriptedAI
 
     void KilledUnit(Unit *pKilled) override
     {
-//        if (!m_creature->isInCombat())
+//        if (!m_creature->IsInCombat())
 //            DoScriptText(SAY_DEAGGRO, m_creature, pKilled);
     }
 
@@ -347,16 +347,16 @@ struct boss_rajaxxAI : public ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // ThunderCrash
         if (m_uiThunderCrash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THUNDERCRASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THUNDERCRASH) == CAST_OK)
             {
                 m_uiThunderCrash_Timer = urand(18000, 22000);
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
                 if (Unit* victim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                     m_creature->AI()->AttackStart(victim);
             }
@@ -368,8 +368,8 @@ struct boss_rajaxxAI : public ScriptedAI
         if (m_uiResetAggro_Timer < uiDiff)
         {
             m_uiResetAggro_Timer = urand(15000, 17000);
-            DoScriptText(SAY_DEAGGRO, m_creature, m_creature->getVictim());
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+            DoScriptText(SAY_DEAGGRO, m_creature, m_creature->GetVictim());
+            m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
         }
         else
             m_uiResetAggro_Timer -= uiDiff;
@@ -377,7 +377,7 @@ struct boss_rajaxxAI : public ScriptedAI
         /* Trash */
         if (m_uiTrash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRASH) == CAST_OK)
                 m_uiTrash_Timer = urand(19000, 23000);
         }
         else
@@ -386,7 +386,7 @@ struct boss_rajaxxAI : public ScriptedAI
         // Disarm
         if (m_uiDisarm_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISARM) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISARM) == CAST_OK)
                 m_uiDisarm_Timer = 15000;
         }
         else
@@ -516,13 +516,13 @@ struct npc_andorovAI : public ScriptedAI
                 m_pInstance->GetData(TYPE_GENERAL_ANDOROV) == NOT_STARTED)
             StartEvent();
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Bash
         if (m_uiBash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BASH) == CAST_OK)
                 m_uiBash_Timer = 30000;
         }
         else
@@ -531,7 +531,7 @@ struct npc_andorovAI : public ScriptedAI
         // Strike
         if (m_uiStrike_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE) == CAST_OK)
                 m_uiStrike_Timer = 15000;
         }
         else

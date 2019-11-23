@@ -727,7 +727,7 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
         case CHASE_MOTION_TYPE:
             if (script.movement.boolParam) // chase victim
             {
-                if (Unit* pVictim = pSource->getVictim())
+                if (Unit* pVictim = pSource->GetVictim())
                     pSource->GetMotionMaster()->MoveChase(pVictim, script.x, script.o);
                 break;
             }
@@ -740,7 +740,7 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
         case FLEEING_MOTION_TYPE:
             if (script.movement.boolParam) // flee from victim
             {
-                if (Unit* pVictim = pSource->getVictim())
+                if (Unit* pVictim = pSource->GetVictim())
                     pSource->GetMotionMaster()->MoveFleeing(pVictim, script.movement.intParam);
                 break;
             }
@@ -892,7 +892,7 @@ bool Map::ScriptCommand_AttackStart(const ScriptInfo& script, WorldObject* sourc
     if (!pAttacker->IsAlive())
         return ShouldAbortScript(script);
 
-    if (pAttacker->IsFriendlyTo(pTarget) || !pTarget->isTargetableForAttack() || !pAttacker->IsInMap(pTarget))
+    if (pAttacker->IsFriendlyTo(pTarget) || !pTarget->IsTargetableForAttack() || !pAttacker->IsInMap(pTarget))
     {
         sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) for an invalid attack target, skipping.", script.id);
         return ShouldAbortScript(script);
@@ -953,15 +953,15 @@ bool Map::ScriptCommand_ModifyThreat(const ScriptInfo& script, WorldObject* sour
 
     if (script.modThreat.target == SO_MODIFYTHREAT_ALL_ATTACKERS)
     {
-        ThreatList const& threatList = pSource->getThreatManager().getThreatList();
+        ThreatList const& threatList = pSource->GetThreatManager().getThreatList();
         for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
             if (Unit* Temp = pSource->GetMap()->GetUnit((*i)->getUnitGuid()))
-                pSource->getThreatManager().modifyThreatPercent(Temp, script.x);
+                pSource->GetThreatManager().modifyThreatPercent(Temp, script.x);
     }
     else
     {
         if (Unit* pTarget = ToUnit(GetTargetByType(pSource, target, script.modThreat.target)))
-            pSource->getThreatManager().modifyThreatPercent(pTarget, script.x);
+            pSource->GetThreatManager().modifyThreatPercent(pTarget, script.x);
     }
 
     return false;
@@ -2021,22 +2021,22 @@ bool Map::ScriptCommand_AssistUnit(const ScriptInfo& script, WorldObject* source
     if (!pSource->IsInMap(pTarget))
         return ShouldAbortScript(script);
 
-    Unit* pAttacker = pTarget->getAttackerForHelper();
+    Unit* pAttacker = pTarget->GetAttackerForHelper();
 
     if (!pAttacker)
         return false;
 
-    if (Unit* pVictim = pSource->getVictim())
+    if (Unit* pVictim = pSource->GetVictim())
     {
         if (pVictim == pAttacker)
             return false;
 
-        if (!pSource->IsFriendlyTo(pAttacker) && pAttacker->isTargetableForAttack() && pSource->IsWithinDistInMap(pAttacker, 40.0f))
+        if (!pSource->IsFriendlyTo(pAttacker) && pAttacker->IsTargetableForAttack() && pSource->IsWithinDistInMap(pAttacker, 40.0f))
             pSource->AddThreat(pAttacker);
     }
     else
     {
-        if (pSource->AI() && !pSource->IsFriendlyTo(pAttacker) && pAttacker->isTargetableForAttack() && pSource->IsWithinDistInMap(pAttacker, 40.0f))
+        if (pSource->AI() && !pSource->IsFriendlyTo(pAttacker) && pAttacker->IsTargetableForAttack() && pSource->IsWithinDistInMap(pAttacker, 40.0f))
             pSource->AI()->AttackStart(pAttacker);
     }
 
@@ -2054,7 +2054,7 @@ bool Map::ScriptCommand_CombatStop(const ScriptInfo& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    if (pSource->isInCombat())
+    if (pSource->IsInCombat())
     {
         pSource->CombatStop(true);
         pSource->DeleteThreatList();
@@ -2090,7 +2090,7 @@ bool Map::ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source,
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isInCombat() || !pSource->IsAlive())
+    if (!pSource->IsInCombat() || !pSource->IsAlive())
         return false;
 
     Unit* pTarget = ToUnit(target);
@@ -2101,7 +2101,7 @@ bool Map::ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source,
         return ShouldAbortScript(script);
     }
 
-    if (pTarget->isTargetableForAttack() && pSource->IsInMap(pTarget) && !pSource->IsFriendlyTo(pTarget))
+    if (pTarget->IsTargetableForAttack() && pSource->IsInMap(pTarget) && !pSource->IsFriendlyTo(pTarget))
         pSource->AddThreat(pTarget);
 
     return false;

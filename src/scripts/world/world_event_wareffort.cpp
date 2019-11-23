@@ -854,7 +854,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
                 m_uiCheckTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Whisperings of C'Thun (MC)
@@ -912,11 +912,11 @@ struct npc_infantrymanAI : ScriptedAI
 
     void MoveInLineOfSight(Unit *pWho) override
     {
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
             if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
             }
         }
@@ -1388,11 +1388,11 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
     void MoveInLineOfSight(Unit *pWho) override
     {
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
             if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
             }
         }
@@ -1479,14 +1479,14 @@ struct npc_aqwar_saurfangAI : ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->getVictim()->GetHealth() <= m_creature->getVictim()->GetMaxHealth() * 0.2f)
+        if (m_creature->GetVictim()->GetHealth() <= m_creature->GetVictim()->GetMaxHealth() * 0.2f)
         {
             if (m_uiExecute_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_EXECUTE);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_EXECUTE);
                 m_uiExecute_Timer = 2000;
             }
             else
@@ -1495,7 +1495,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (m_uiMortalStrike_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_MORTALSTRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_MORTALSTRIKE);
             m_uiMortalStrike_Timer = 13000;
         }
         else
@@ -1503,17 +1503,17 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (m_uiCleave_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_CLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_CLEAVE);
             m_uiCleave_Timer = 7000;
         }
         else
             m_uiCleave_Timer -= diff;
 
-        if (m_uiCharge_Timer < diff && m_creature->GetDistance(m_creature->getVictim()->GetPositionX(),
-            m_creature->getVictim()->GetPositionY(),
-            m_creature->getVictim()->GetPositionZ()) >= 8.0f)
+        if (m_uiCharge_Timer < diff && m_creature->GetDistance(m_creature->GetVictim()->GetPositionX(),
+            m_creature->GetVictim()->GetPositionY(),
+            m_creature->GetVictim()->GetPositionZ()) >= 8.0f)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_CHARGE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_CHARGE);
             m_uiCharge_Timer = 9000;
         }
         else
@@ -1521,7 +1521,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (m_uiThunderClap_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_THUNDERCLAP);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_THUNDERCLAP);
             m_uiThunderClap_Timer = 9000;
         }
         else
@@ -1529,7 +1529,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (m_uiSaurfangRage_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_SAURFANGRAGE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_SAURFANGRAGE);
             m_uiSaurfangRage_Timer = 8000;
         }
         else

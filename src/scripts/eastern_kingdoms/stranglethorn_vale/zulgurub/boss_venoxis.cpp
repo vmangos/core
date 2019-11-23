@@ -167,7 +167,7 @@ struct boss_venoxisAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (m_creature->IsNonMeleeSpellCasted(false))
             return;
@@ -213,7 +213,7 @@ struct boss_venoxisAI : public ScriptedAI
 
             if (m_uiHolyFire_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOLY_FIRE);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HOLY_FIRE);
                 m_uiHolyFire_Timer = urand(8000, 12000);
             }
             else
@@ -229,7 +229,7 @@ struct boss_venoxisAI : public ScriptedAI
 
             if (m_uiHolyWrath_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOLY_WRATH);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HOLY_WRATH);
                 m_uiHolyWrath_Timer = urand(15000, 25000);
             }
             else
@@ -241,7 +241,7 @@ struct boss_venoxisAI : public ScriptedAI
 
             if (m_uiPoisonCloud_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISON_CLOUD) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POISON_CLOUD) == CAST_OK)
                     m_uiPoisonCloud_Timer = urand(7000, 10000);
             }
             else
@@ -249,7 +249,7 @@ struct boss_venoxisAI : public ScriptedAI
 
             if (m_uiTrash_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRASH) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRASH) == CAST_OK)
                     m_uiTrash_Timer = urand(10000, 20000);
             }
             else

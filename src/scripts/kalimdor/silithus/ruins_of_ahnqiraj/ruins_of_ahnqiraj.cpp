@@ -105,7 +105,7 @@ struct mob_anubisath_guardianAI : public ScriptedAI
 
     void JustSummoned(Creature* pSummoned) override
     {
-        pSummoned->AI()->AttackStart(m_creature->getVictim());
+        pSummoned->AI()->AttackStart(m_creature->GetVictim());
         ++m_uiSummonCount;
     }
 
@@ -120,7 +120,7 @@ struct mob_anubisath_guardianAI : public ScriptedAI
         {
             if (m_uiSpell4 == SPELL_ENRAGE)
             {
-                DoCast(m_creature->getVictim(), m_uiSpell4);
+                DoCast(m_creature->GetVictim(), m_uiSpell4);
                 DoScriptText(EMOTE_FRENZY, m_creature);
                 m_bIsEnraged = true;
             }
@@ -135,7 +135,7 @@ struct mob_anubisath_guardianAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiExplode_Timer < uiDiff && m_bIsExploding == true)
@@ -167,7 +167,7 @@ struct mob_anubisath_guardianAI : public ScriptedAI
 
         if (m_uiSpell2_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), m_uiSpell2) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), m_uiSpell2) == CAST_OK)
                 m_uiSpell2_Timer = 15000;
         }
         else
@@ -220,7 +220,7 @@ struct OssirianTornadoAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -299,7 +299,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiPoisonBolt_Timer < uiDiff)
@@ -339,7 +339,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
 //m_creature->GetMotionMaster()->MoveCaster(pConsumeTarget, 320.0f);
                         m_creature->GetMotionMaster()->Initialize();
                         m_creature->StopMoving();
-                        m_creature->getThreatManager().modifyThreatPercent(pConsumeTarget, -100);
+                        m_creature->GetThreatManager().modifyThreatPercent(pConsumeTarget, -100);
                         m_uiConsumeDamage_Timer = 1000;
                         m_bPlayerConsumedCharged = true;
                         pConsumeTarget->SetHealth(pConsumeTarget->GetHealth() - pConsumeTarget->GetMaxHealth() / 10.0f);
@@ -362,7 +362,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
                     if (DoCastSpellIfCan(pConsumeTarget, SPELL_SPLIT) == CAST_OK)
                     {
                         m_bPlayerConsumedCharged = false;
-                        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                        m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
                     }
                 }
             }
@@ -370,7 +370,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
 
         if (m_uiTrash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRASH) == CAST_OK)
                 m_uiTrash_Timer = 5000 + rand() % 2000;
         }
         else
@@ -435,7 +435,7 @@ struct ObsidianDestroyerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //m_uiDrainMana_Timer
@@ -517,7 +517,7 @@ struct HiveZaraSoldierAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiVenomSpit_Timer < uiDiff)
@@ -574,7 +574,7 @@ struct SilicateFeederAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_bIsAttacked == false)
@@ -618,12 +618,12 @@ struct QirajiSwarmguardAI : public ScriptedAI
         if (m_creature->IsWalking())
             m_creature->SetWalk(false);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSunder_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SUNDERING_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDERING_CLEAVE) == CAST_OK)
                 m_uiSunder_Timer = urand(8000, 12000);
         }
         else
@@ -679,7 +679,7 @@ struct QirajiGladiatorAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_pInstance && m_pInstance->GetData(TYPE_QIRAJI_GLADIATOR) > 0 && !m_bIsEnraged)
@@ -690,7 +690,7 @@ struct QirajiGladiatorAI : public ScriptedAI
 
         if (m_uiTrample_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRAMPLE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRAMPLE) == CAST_OK)
                 m_uiTrample_Timer = urand(4000, 6000);
         }
         else
@@ -698,7 +698,7 @@ struct QirajiGladiatorAI : public ScriptedAI
 
         if (m_uiUppercut_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_UPPERCUT2) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UPPERCUT2) == CAST_OK)
                 m_uiUppercut_Timer = urand(10000, 15000);
         }
         else
@@ -734,7 +734,7 @@ struct HiveZaraStingerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiCharge_Timer < uiDiff)
@@ -757,12 +757,12 @@ struct HiveZaraStingerAI : public ScriptedAI
                 if (m_uiChargeCasted_Timer < uiDiff)
                 {
                     m_bChargeCasted = false;
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
                 }
             }
         }
 
-//        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+//        m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
         DoMeleeAttackIfReady();
     }
 };
@@ -798,7 +798,7 @@ struct TuubidAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiAttackOrder_Timer < uiDiff)
@@ -829,7 +829,7 @@ struct TuubidAI : public ScriptedAI
 
         if (m_uiCleave_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE_T) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE_T) == CAST_OK)
                 m_uiCleave_Timer = 10000;
         }
         else
@@ -901,7 +901,7 @@ struct QirajiWarriorAI : public ScriptedAI
     {
         if (!m_bHasEnraged && ((m_creature->GetHealth() * 100) / m_creature->GetMaxHealth()) <= 20 && !m_creature->IsNonMeleeSpellCasted(false))
         {
-            DoCast(m_creature->getVictim(), SPELL_ENRAGE_QW);
+            DoCast(m_creature->GetVictim(), SPELL_ENRAGE_QW);
             m_bHasEnraged = true;
         }
     }
@@ -917,7 +917,7 @@ struct QirajiWarriorAI : public ScriptedAI
             if (!m_creature->SelectHostileTarget())
                 return;
         }
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             return;
 
         if (m_uiUpdateTarget_Timer < uiDiff)
@@ -942,7 +942,7 @@ struct QirajiWarriorAI : public ScriptedAI
         {
             if (m_creature->GetDistance2d(m_creature) < 5.0f)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THUNDERCLAP) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THUNDERCLAP) == CAST_OK)
                     m_uiThunderclap_Timer = 6000;
             }
         }
@@ -951,7 +951,7 @@ struct QirajiWarriorAI : public ScriptedAI
 
         if (m_uiUppercut_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_UPPERCUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UPPERCUT) == CAST_OK)
                 m_uiUppercut_Timer = 10000;
         }
         else
@@ -1014,7 +1014,7 @@ struct SwarmguardNeedlerAI : public ScriptedAI
             if (!m_creature->SelectHostileTarget())
                 return;
         }
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             return;
 
         if (m_uiUpdateTarget_Timer < uiDiff)
@@ -1036,7 +1036,7 @@ struct SwarmguardNeedlerAI : public ScriptedAI
 
         if (m_uiCleave_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleave_Timer = 8000;
         }
         else

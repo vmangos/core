@@ -98,7 +98,7 @@ struct creature_spawn_fankrissAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
             return;
         }
 
@@ -177,7 +177,7 @@ struct creature_vekniss_hatchlingAI : public ScriptedAI
                     if (m_creature->GetDistance(pTarget) > 200) {
                         return; //avoid running after people far off in the instance somewhere
                     }
-                    m_creature->getThreatManager().addThreat(pTarget, 1);
+                    m_creature->GetThreatManager().addThreat(pTarget, 1);
                     AttackStart(pTarget);
 
                 }
@@ -188,7 +188,7 @@ struct creature_vekniss_hatchlingAI : public ScriptedAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
             return;
         }
         DoMeleeAttackIfReady();
@@ -267,7 +267,7 @@ struct boss_fankrissAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // Fankriss has an extremely large aggro radius
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 100.0f) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->IsInCombat() && m_creature->IsWithinDistInMap(pWho, 100.0f) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
         }
@@ -425,7 +425,7 @@ struct boss_fankrissAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->isInCombat()) {
+        if (!m_creature->IsInCombat()) {
             Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
             {
@@ -446,7 +446,7 @@ struct boss_fankrissAI : public ScriptedAI
             }
         }
         
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
             return;
         }
 
@@ -454,7 +454,7 @@ struct boss_fankrissAI : public ScriptedAI
         // Mortal Wound
         if (m_uiMortalWoundTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
                 m_uiMortalWoundTimer = urand(4000, 8000);
         }
         else

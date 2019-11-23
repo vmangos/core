@@ -155,7 +155,7 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
     void UpdateAI(const uint32 uiDiff)
     {
         m_creature->SelectHostileTarget();
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             return;
         /*if(isDistanceCaster)
         { // Check du CoolDown global
@@ -192,7 +192,7 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
                         target = m_creature;
                         break;
                     case GENERIC_TARGET_VICTIM:
-                        target = m_creature->getVictim();
+                        target = m_creature->GetVictim();
                         break;
                     case GENERIC_TARGET_HOSTILE_RAND:
                         target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
@@ -265,7 +265,7 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
                 // Test CM
                 if (cast && it->spellFlags & SPELL_FLAG_CM)
                 {
-                    uint32 targetCounts = m_creature->getThreatManager().getThreatList().size();
+                    uint32 targetCounts = m_creature->GetThreatManager().getThreatList().size();
                     // On ne CM pas si il n'y a personne d'autre.
                     if (targetCounts <= 1)
                         cast = false;
@@ -282,13 +282,13 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
                 {
                     DoCastSpellIfCan(target, it->spellId);
                     it->timer = urand(it->minCD, it->maxCD);
-                    if (it->spellFlags & SPELL_FLAG_STOP_ATTACK_TARGET && target != m_creature->getVictim()) // Change de cible
+                    if (it->spellFlags & SPELL_FLAG_STOP_ATTACK_TARGET && target != m_creature->GetVictim()) // Change de cible
                     {
                         if (Unit* pSecondAggro = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1))
                         {
                             if (pSecondAggro != target)
                             {
-                                m_creature->getThreatManager().modifyThreatPercent(target, -100);
+                                m_creature->GetThreatManager().modifyThreatPercent(target, -100);
                                 AttackStart(pSecondAggro);
                             }
                         }

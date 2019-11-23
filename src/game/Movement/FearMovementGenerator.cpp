@@ -212,7 +212,7 @@ void TimedFearMovementGenerator::Finalize(Unit &owner)
     owner.ClearUnitState(UNIT_STAT_FLEEING | UNIT_STAT_FLEEING_MOVE);
     owner.UpdateControl();
 
-    if (Unit* victim = owner.getVictim())
+    if (Unit* victim = owner.GetVictim())
     {
         if (owner.IsAlive())
         {

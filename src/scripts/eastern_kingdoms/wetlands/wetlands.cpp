@@ -90,7 +90,7 @@ public:
 
     void AttackedBy(Unit* pAttacker) override
     {
-        if (!pAttacker || m_creature->getVictim())
+        if (!pAttacker || m_creature->GetVictim())
             return;
 
         if (m_creature->GetCharmInfo() && m_creature->CanReachWithMeleeAutoAttack(pAttacker))
@@ -102,7 +102,7 @@ public:
         // slowing poison timer
         if (m_slowingPoisonTimer < uiDiff)
         {
-            CanCastResult castResult = DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLOWING_POISON, CF_AURA_NOT_PRESENT);
+            CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SLOWING_POISON, CF_AURA_NOT_PRESENT);
             if (castResult == CAST_OK)
                 m_slowingPoisonTimer = urand(8400, 15300);
         }
@@ -112,7 +112,7 @@ public:
         // backstab timer
         if (m_backstabTimer < uiDiff)
         {
-            CanCastResult castResult = DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKSTAB);
+            CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKSTAB);
             if (castResult == CAST_OK)
                 m_backstabTimer = urand(2100, 5600);
         }
@@ -125,7 +125,7 @@ public:
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        Unit* pTarget = m_creature->getVictim();
+        Unit* pTarget = m_creature->GetVictim();
         if (pTarget) // in combat
         {
             // update when in combat
@@ -138,9 +138,9 @@ public:
             if (!pOwner)
                 return;
 
-            if (pOwner->isInCombat())
+            if (pOwner->IsInCombat())
             {
-                Unit* pTarget = pOwner->getAttackerForHelper();
+                Unit* pTarget = pOwner->GetAttackerForHelper();
                 if (pTarget)
                 {
                     AttackStart(pTarget);
@@ -268,7 +268,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
 
     void AttackedBy(Unit* pAttacker) override
     {
-        if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
+        if (!pAttacker || m_creature->GetVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
 
         AttackStart(pAttacker);
@@ -348,13 +348,13 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         }
         else
         {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
 
             // Pummel timer
             if (m_pummelTimer < uiDiff)
             {
-                CanCastResult castResult = DoCastSpellIfCan(m_creature->getVictim(), SPELL_PUMMEL);
+                CanCastResult castResult = DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL);
                 if (castResult == CAST_OK)
                     m_pummelTimer = urand(7300, 15000);
             }

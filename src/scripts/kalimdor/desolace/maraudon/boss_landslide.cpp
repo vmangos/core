@@ -47,13 +47,13 @@ struct boss_landslideAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //KnockAway_Timer
         if (KnockAway_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKAWAY);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKAWAY);
             KnockAway_Timer = 15000;
         }
         else KnockAway_Timer -= diff;

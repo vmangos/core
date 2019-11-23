@@ -201,13 +201,13 @@ struct boss_marliAI : public ScriptedAI
             if (pCaster->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            m_creature->getThreatManager().modifyThreatPercent(pCaster, -100);
+            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -100);
         }
     }
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Troll
@@ -215,7 +215,7 @@ struct boss_marliAI : public ScriptedAI
         {
             if (m_uiPoisonVolley_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISONVOLLEY);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POISONVOLLEY);
                 m_uiPoisonVolley_Timer = urand(10000, 20000);
             }
             else
@@ -223,7 +223,7 @@ struct boss_marliAI : public ScriptedAI
 
             if (m_uiDrainLife_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_DRAIN_LIFE);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DRAIN_LIFE);
                 m_uiDrainLife_Timer = urand(20000, 50000);
             }
             else
@@ -262,7 +262,7 @@ struct boss_marliAI : public ScriptedAI
         {
             if (!m_bHasWebbed && m_uiWebs_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_ENVELOPINGWEBS);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ENVELOPINGWEBS);
                 m_uiWebs_Timer = urand(10000, 15000);
                 m_uiCharge_Timer = 1000;
                 m_bHasWebbed = true;
@@ -299,7 +299,7 @@ struct boss_marliAI : public ScriptedAI
 
             if (m_uiCorrosivePoison_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_CORROSIVE_POISON);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CORROSIVE_POISON);
                 m_uiCorrosivePoison_Timer = urand(25000, 35000);
             }
             else
@@ -349,7 +349,7 @@ struct boss_marliAI : public ScriptedAI
 
         if (m_uiTrash_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRASH);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRASH);
             m_uiTrash_Timer = urand(10000, 20000);
         }
         else
@@ -378,7 +378,7 @@ struct mob_spawn_of_marliAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiLevelUp_Timer < uiDiff)

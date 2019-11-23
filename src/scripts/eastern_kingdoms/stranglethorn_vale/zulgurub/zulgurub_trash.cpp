@@ -37,14 +37,14 @@ struct GurubashiAxeThrowerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiAxeFlurry_Timer < uiDiff)
         {
             if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_AXE_FLURRY) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AXE_FLURRY) == CAST_OK)
                     m_uiAxeFlurry_Timer = urand(14000, 19000);
             }
         }
@@ -53,7 +53,7 @@ struct GurubashiAxeThrowerAI : public ScriptedAI
 
         if (m_uiThrow_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THROW) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THROW) == CAST_OK)
                 m_uiThrow_Timer = urand(4000, 7000);
         }
         else
@@ -112,12 +112,12 @@ struct GurubashiBerserkerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiKnockBack_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKBACK) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKBACK) == CAST_OK)
             {
                 DoResetThreat();
                 m_uiKnockBack_Timer = 10000;
@@ -128,7 +128,7 @@ struct GurubashiBerserkerAI : public ScriptedAI
 
         if (m_uiThunderClap_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THUNDERCLAP) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THUNDERCLAP) == CAST_OK)
                 m_uiThunderClap_Timer = urand(14000, 16000);
         }
         else
@@ -136,7 +136,7 @@ struct GurubashiBerserkerAI : public ScriptedAI
 
         if (m_uiFear_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR) == CAST_OK)
             {
                 m_uiFear_Timer = urand(25000, 30000);
                 DoResetThreat();
@@ -199,7 +199,7 @@ struct npc_hakkari_doctor : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiMaleficeTimer < uiDiff)
@@ -278,7 +278,7 @@ struct npc_esprit_vaudou : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (Unit* pVictim = m_creature->getVictim())
+        if (Unit* pVictim = m_creature->GetVictim())
         {
             if (pVictim->GetDistance(m_creature) < 5.0f)
             {
@@ -314,7 +314,7 @@ struct npc_fils_hakkar : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiTrashTimer < uiDiff)
@@ -327,7 +327,7 @@ struct npc_fils_hakkar : public ScriptedAI
 
         if (m_uiKnockDownTimer < uiDiff)
         {
-            m_creature->CastSpell(m_creature->getVictim(), 16790, true);
+            m_creature->CastSpell(m_creature->GetVictim(), 16790, true);
             m_uiKnockDownTimer = urand(5000, 10000);
         }
         else

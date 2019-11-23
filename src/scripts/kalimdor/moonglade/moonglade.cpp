@@ -730,7 +730,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
             }
 
             // Combat spells
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
 
             if (m_uiHealTimer < uiDiff)
@@ -1409,19 +1409,19 @@ struct boss_eranikusAI : public ScriptedAI
         }
 
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         //Alita : make sure he prefers targets he can hit. TO REMOVE WHEN AGGRO MECANICS WILL DO THE JOB.
-        Unit* pTarget = m_creature->getVictim();
+        Unit* pTarget = m_creature->GetVictim();
 
         if (!m_creature->IsWithinMeleeRange(pTarget))
         {
-            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
             {
                 if (Unit* pAttacker = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
                     if (m_creature->IsWithinMeleeRange(pAttacker))
-                        m_creature->getThreatManager().modifyThreatPercent(pAttacker, 5);
+                        m_creature->GetThreatManager().modifyThreatPercent(pAttacker, 5);
             }
         }
         // Move Tyrande after she is summoned

@@ -215,17 +215,17 @@ void CinematicStuff::SearchAndDestroy(Player* player)
 {
     if (!player->IsAlive()) return;
 
-    Unit* target = player->getVictim();
+    Unit* target = player->GetVictim();
     if (target == nullptr)
     {
-        if (!player->isInCombat())
+        if (!player->IsInCombat())
             target = player->SelectRandomUnfriendlyTarget(nullptr, DEFAULT_VISIBILITY_DISTANCE);
         else
         {
-            target = player->getVictim();
+            target = player->GetVictim();
             if (target == nullptr)
             {
-                const std::set<Unit*> attackers = player->getAttackers();
+                const std::set<Unit*> attackers = player->GetAttackers();
                 if (attackers.size() > 0)
                     target = *attackers.begin();
             }

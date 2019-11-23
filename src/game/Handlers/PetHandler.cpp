@@ -140,9 +140,9 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
 
                     pCharmedUnit->ClearUnitState(UNIT_STAT_FOLLOW);
                     // This is true if pet has no target or has target but targets differs.
-                    if (pCharmedUnit->getVictim() != TargetUnit || (pCharmedUnit->getVictim() == TargetUnit && !pCharmedUnit->GetCharmInfo()->IsCommandAttack()) || pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
+                    if (pCharmedUnit->GetVictim() != TargetUnit || (pCharmedUnit->GetVictim() == TargetUnit && !pCharmedUnit->GetCharmInfo()->IsCommandAttack()) || pCharmedUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
                     {
-                        if (pCharmedUnit->getVictim())
+                        if (pCharmedUnit->GetVictim())
                             pCharmedUnit->AttackStop();
 
                         if (pCharmedCreature)
@@ -166,7 +166,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                         }
                         else                                // charmed player
                         {
-                            if (pCharmedUnit->getVictim() && pCharmedUnit->getVictim() != TargetUnit)
+                            if (pCharmedUnit->GetVictim() && pCharmedUnit->GetVictim() != TargetUnit)
                                 pCharmedUnit->AttackStop();
 
                             charmInfo->SetIsCommandAttack(true);
@@ -285,9 +285,9 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                 if (unit_target && !GetPlayer()->IsFriendlyTo(unit_target) && !pCharmedUnit->HasAuraType(SPELL_AURA_MOD_POSSESS))
                 {
                     // This is true if pet has no target or has target but targets differs.
-                    if (pCharmedUnit->getVictim() != unit_target)
+                    if (pCharmedUnit->GetVictim() != unit_target)
                     {
-                        if (pCharmedUnit->getVictim())
+                        if (pCharmedUnit->GetVictim())
                             pCharmedUnit->AttackStop();
                         pCharmedUnit->GetMotionMaster()->Clear();
                         if (((Creature*)pCharmedUnit)->AI())

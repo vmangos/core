@@ -70,7 +70,7 @@ struct boss_thebeastAI : public ScriptedAI
         if (!m_creature->HasAura(AURA_IMMOLATE))
             m_creature->CastSpell(m_creature, AURA_IMMOLATE, true);
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Flamebreak
@@ -107,7 +107,7 @@ struct boss_thebeastAI : public ScriptedAI
         if (m_uiBeserkerChargeTimer <= uiDiff)
         {
             Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
-            if (m_uiBeserkerChargeTimer == 0) pTarget = m_creature->getVictim();
+            if (m_uiBeserkerChargeTimer == 0) pTarget = m_creature->GetVictim();
 
             if (DoCastSpellIfCan(pTarget, SPELL_BERSERKER_CHARGE) == CAST_OK)
                 m_uiBeserkerChargeTimer = urand(15000, 20000);
@@ -129,7 +129,7 @@ struct boss_thebeastAI : public ScriptedAI
 
         if (m_uiFireBlastTimer < uiDiff)
         {
-            if (Unit* pTarget = m_creature->getVictim())
+            if (Unit* pTarget = m_creature->GetVictim())
             {
                 if (DoCastSpellIfCan(pTarget, SPELL_FIREBLAST) == CAST_OK)
                     m_uiFireBlastTimer = urand(14000, 20000);

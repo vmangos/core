@@ -61,7 +61,7 @@ struct boss_lucifronAI : public ScriptedAI
 
     void UpdateAI(const uint32 p_Diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         m_Events.Update(p_Diff);

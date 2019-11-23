@@ -158,7 +158,7 @@ void npc_shade_of_taerarAI::UpdatePetAI(const uint32 uiDiff)
 {
     if (m_uiAcidBreathTimer <= uiDiff)
     {
-        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_BREATH) == CAST_OK)
+        if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ACID_BREATH) == CAST_OK)
             m_uiAcidBreathTimer = urand(10000, 15000);
     }
     else

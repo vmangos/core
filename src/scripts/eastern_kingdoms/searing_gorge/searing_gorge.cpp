@@ -134,7 +134,7 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
 
     void UpdateEscortAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -239,7 +239,7 @@ struct npc_obsidionAI : public ScriptedAI
 
     void SummonedCreatureDespawn(Creature* creature) override
     {
-        if (creature->GetEntry() == NPC_LATHORIC_THE_BLACK && (!m_creature->IsAlive() || !m_creature->isInCombat()))
+        if (creature->GetEntry() == NPC_LATHORIC_THE_BLACK && (!m_creature->IsAlive() || !m_creature->IsInCombat()))
             Reset();
     }
 
@@ -254,7 +254,7 @@ struct npc_obsidionAI : public ScriptedAI
             return;
 
         // talking, only if not in combat
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
         {
             if (m_nextText == SAY_LATHORIC1)
             {
@@ -299,12 +299,12 @@ struct npc_obsidionAI : public ScriptedAI
        }
 
         // fighting
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiGroundSmashTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GROUND_SMASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_GROUND_SMASH) == CAST_OK)
                 m_uiGroundSmashTimer = 8000;
         }
         else
@@ -313,7 +313,7 @@ struct npc_obsidionAI : public ScriptedAI
 
         if (m_uiKnockAwayTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                 m_uiKnockAwayTimer = 12000;
         }
         else

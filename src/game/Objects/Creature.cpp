@@ -746,7 +746,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             _lastDamageTakenForEvade += update_diff;
             Unit::Update(update_diff, diff);
 
-            if (getVictim())
+            if (GetVictim())
             {
                 float x, y, z;
                 GetRespawnCoord(x, y, z, nullptr, nullptr);
@@ -765,24 +765,24 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             ModifyAuraState(AURA_STATE_HEALTHLESS_5_PERCENT, hpPercent < 6.0f);
 
             bool unreachableTarget = !i_motionMaster.empty() &&
-                                     getVictim() &&
+                                     GetVictim() &&
                                      GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
                                      !HasDistanceCasterMovement() &&
-                                     (!CanReachWithMeleeAutoAttack(getVictim()) || !IsWithinLOSInMap(getVictim())) &&
+                                     (!CanReachWithMeleeAutoAttack(GetVictim()) || !IsWithinLOSInMap(GetVictim())) &&
                                      !GetMotionMaster()->GetCurrent()->IsReachable();
             // No evade mode for pets.
             if (unreachableTarget && GetCharmerOrOwnerGuid().IsPlayer())
                 unreachableTarget = false;
             if (unreachableTarget)
-                if (getVictim())
-                    if (Player* victimPlayer = getVictim()->ToPlayer())
+                if (GetVictim())
+                    if (Player* victimPlayer = GetVictim()->ToPlayer())
                         if (victimPlayer->GetCheatData() && victimPlayer->GetCheatData()->IsInKnockBack())
                             unreachableTarget = false;
             if (unreachableTarget)
             {
                 m_TargetNotReachableTimer += update_diff;
                 if (GetMapId() == 30 && CanHaveThreatList() && m_TargetNotReachableTimer > 1000) // Alterac Valley exploit fix
-                    getThreatManager().modifyThreatPercent(getVictim(), -101);
+                    GetThreatManager().modifyThreatPercent(GetVictim(), -101);
             }
             else
                 m_TargetNotReachableTimer = 0;
@@ -869,7 +869,7 @@ void Creature::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
     if (m_regenTimer > 0)
         return;
 
-    if (!isInCombat() || IsPolymorphed() || skipCombatCheck)
+    if (!IsInCombat() || IsPolymorphed() || skipCombatCheck)
         RegenerateHealth();
 
     RegenerateMana();
@@ -891,7 +891,7 @@ void Creature::RegenerateMana()
     uint32 addvalue = 0;
 
     // Combat and any controlled creature
-    if (isInCombat() || GetCharmerOrOwnerGuid())
+    if (IsInCombat() || GetCharmerOrOwnerGuid())
     {
         if (!IsUnderLastManaUseEffect())
             addvalue = m_manaRegen;
@@ -943,7 +943,7 @@ void Creature::RegenerateHealth()
 
 void Creature::DoFlee()
 {
-    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     float hpPercent = GetHealthPercent();
@@ -953,15 +953,15 @@ void Creature::DoFlee()
 
     SetNoSearchAssistance(true);
 
-    SetFleeing(true, getVictim()->GetObjectGuid(), 0, sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
-    MonsterTextEmote(CREATURE_FLEE_TEXT, getVictim());
+    SetFleeing(true, GetVictim()->GetObjectGuid(), 0, sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
+    MonsterTextEmote(CREATURE_FLEE_TEXT, GetVictim());
     UpdateSpeed(MOVE_RUN, false);
     InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
 }
 
 void Creature::DoFleeToGetAssistance()
 {
-    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+    if (!GetVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || HasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
@@ -970,20 +970,20 @@ void Creature::DoFleeToGetAssistance()
     {
         Creature* pCreature = nullptr;
 
-        MaNGOS::NearestAssistCreatureInCreatureRangeCheck u_check(this, getVictim(), radius);
+        MaNGOS::NearestAssistCreatureInCreatureRangeCheck u_check(this, GetVictim(), radius);
         MaNGOS::CreatureLastSearcher<MaNGOS::NearestAssistCreatureInCreatureRangeCheck> searcher(pCreature, u_check);
         Cell::VisitGridObjects(this, searcher, radius);
 
         SetNoSearchAssistance(true);
 
         if (!pCreature)
-            SetFleeing(true, getVictim()->GetObjectGuid(), 0, sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
+            SetFleeing(true, GetVictim()->GetObjectGuid(), 0, sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
         else
         {
             GetMotionMaster()->MoveSeekAssistance(pCreature->GetPositionX(), pCreature->GetPositionY(), pCreature->GetPositionZ());
             SetTargetGuid(ObjectGuid());
         }
-        MonsterTextEmote(CREATURE_FLEE_TEXT, getVictim());
+        MonsterTextEmote(CREATURE_FLEE_TEXT, GetVictim());
         UpdateSpeed(MOVE_RUN, false);
         InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
     }
@@ -2107,7 +2107,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
 void Creature::CallAssistance()
 {
-    if (!m_AlreadyCallAssistance && getVictim() && !IsPet() && !isCharmed())
+    if (!m_AlreadyCallAssistance && GetVictim() && !IsPet() && !isCharmed())
     {
         SetNoCallAssistance(true);
 
@@ -2116,16 +2116,16 @@ void Creature::CallAssistance()
         {
             std::list<Creature*> assistList;
 
-            MaNGOS::AnyAssistCreatureInRangeCheck u_check(this, getVictim(), radius);
+            MaNGOS::AnyAssistCreatureInRangeCheck u_check(this, GetVictim(), radius);
             MaNGOS::CreatureListSearcher<MaNGOS::AnyAssistCreatureInRangeCheck> searcher(assistList, u_check);
             Cell::VisitGridObjects(this, searcher, radius);
 
-            if (!getVictim()) // May be invalidated by AI at grid activation ...
+            if (!GetVictim()) // May be invalidated by AI at grid activation ...
                 return;
 
             if (!assistList.empty())
             {
-                AssistDelayEvent *e = new AssistDelayEvent(getVictim()->GetObjectGuid(), *this, assistList);
+                AssistDelayEvent *e = new AssistDelayEvent(GetVictim()->GetObjectGuid(), *this, assistList);
                 m_Events.AddEvent(e, m_Events.CalculateTime(sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_ASSISTANCE_DELAY)));
             }
         }
@@ -2134,10 +2134,10 @@ void Creature::CallAssistance()
 
 void Creature::CallForHelp(float fRadius)
 {
-    if (fRadius <= 0.0f || !getVictim() || IsPet() || isCharmed())
+    if (fRadius <= 0.0f || !GetVictim() || IsPet() || isCharmed())
         return;
 
-    MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, getVictim(), fRadius);
+    MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), fRadius);
     MaNGOS::CreatureWorker<MaNGOS::CallOfHelpCreatureInRangeDo> worker(this, u_do);
     Cell::VisitGridObjects(this, worker, fRadius);
 }
@@ -2157,7 +2157,7 @@ bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /
         return false;
 
     // skip fighting creature
-    if (isInCombat())
+    if (IsInCombat())
         return false;
 
     // only free creature
@@ -2472,7 +2472,7 @@ void Creature::SetInCombatWithZone(bool initialPulse)
             if (pPlayer->IsGameMaster())
                 continue;
 
-            if (!initialPulse && pPlayer->isInCombat())
+            if (!initialPulse && pPlayer->IsInCombat())
                 continue;
 
             if (pPlayer->IsAlive() && !IsFriendlyTo(pPlayer))
@@ -2685,7 +2685,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
         return nullptr;
 
     // ThreatList m_threatlist;
-    ThreatList const& threatlist = getThreatManager().getThreatList();
+    ThreatList const& threatlist = GetThreatManager().getThreatList();
     ThreatList::const_iterator itr = threatlist.begin();
     ThreatList::const_reverse_iterator ritr = threatlist.rbegin();
 
@@ -3178,7 +3178,7 @@ Unit* Creature::GetNearestVictimInRange(float min, float max)
     float bestRange = max;
     Unit* pUnit = nullptr;
 
-    ThreatList const& tList = getThreatManager().getThreatList();
+    ThreatList const& tList = GetThreatManager().getThreatList();
     for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
     {
         Unit* pTarget = GetMap()->GetUnit((*i)->getUnitGuid());
@@ -3203,7 +3203,7 @@ Unit* Creature::GetFarthestVictimInRange(float min, float max)
     float bestRange = min;
     Unit* pUnit = nullptr;
 
-    ThreatList const& tList = getThreatManager().getThreatList();
+    ThreatList const& tList = GetThreatManager().getThreatList();
     for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
     {
         Unit* pTarget = GetMap()->GetUnit((*i)->getUnitGuid());
@@ -3225,7 +3225,7 @@ Unit* Creature::GetVictimInRange(float min, float max)
     if (!CanHaveThreatList())
         return nullptr;
 
-    ThreatList const& tList = getThreatManager().getThreatList();
+    ThreatList const& tList = GetThreatManager().getThreatList();
     for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
     {
         Unit* pTarget = GetMap()->GetUnit((*i)->getUnitGuid());
@@ -3241,7 +3241,7 @@ Unit* Creature::GetHostileCasterInRange(float min, float max)
     if (!CanHaveThreatList())
         return nullptr;
 
-    ThreatList const& tList = getThreatManager().getThreatList();
+    ThreatList const& tList = GetThreatManager().getThreatList();
     for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
     {
         Unit* pTarget = GetMap()->GetUnit((*i)->getUnitGuid());
@@ -3257,7 +3257,7 @@ Unit* Creature::GetHostileCaster()
     if (!CanHaveThreatList())
         return nullptr;
 
-    ThreatList const& tList = getThreatManager().getThreatList();
+    ThreatList const& tList = GetThreatManager().getThreatList();
     for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
     {
         Unit* pTarget = GetMap()->GetUnit((*i)->getUnitGuid());
@@ -3273,7 +3273,7 @@ void Creature::ProcessThreatList(ThreatListProcesser* f)
     if (!CanHaveThreatList())
         return;
 
-    ThreatList const& tList = getThreatManager().getThreatList();
+    ThreatList const& tList = GetThreatManager().getThreatList();
     for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
     {
         Unit* target = GetMap()->GetUnit((*i)->getUnitGuid());
@@ -3316,7 +3316,7 @@ bool Creature::CastSpellOnHostileCasterInRange(uint32 spellId, float min, float 
 
 void Creature::AddThreatsOf(Creature const* pOther)
 {
-    ThreatList const& tList = pOther->getThreatManager().getThreatList();
+    ThreatList const& tList = pOther->GetThreatManager().getThreatList();
     for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
     {
         Unit* pTarget = GetMap()->GetUnit((*i)->getUnitGuid());
@@ -3465,7 +3465,7 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         }
 
         // Mind control abilities can't be used with just 1 attacker or mob will reset.
-        if ((getThreatManager().getThreatList().size() == 1) && pSpellInfo->IsCharmSpell())
+        if ((GetThreatManager().getThreatList().size() == 1) && pSpellInfo->IsCharmSpell())
             return SPELL_FAILED_UNKNOWN;
 
         // Do not use dismounting spells when target is not mounted (there are 4 such spells).
@@ -3498,7 +3498,7 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
 
 bool Creature::CantPathToVictim() const
 {
-    if (!getVictim())
+    if (!GetVictim())
         return false;
 
     if (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
@@ -3515,12 +3515,12 @@ bool Creature::_IsTargetAcceptable(Unit const *target) const
 
     // if the target cannot be attacked, the target is not acceptable
     if (IsFriendlyTo(target)
-            || !target->isAttackableByAOE()
+            || !target->IsAttackableByAOE()
             || target->HasUnitState(UNIT_STAT_DIED))
         return false;
 
-    Unit *myVictim = getAttackerForHelper();
-    Unit *targetVictim = target->getAttackerForHelper();
+    Unit *myVictim = GetAttackerForHelper();
+    Unit *targetVictim = target->GetAttackerForHelper();
 
     // if I'm already fighting target, or I'm hostile towards the target, the target is acceptable
     if (myVictim == target || targetVictim == this || IsHostileTo(target))
@@ -3595,8 +3595,8 @@ bool Creature::canStartAttack(Unit const* who, bool force) const
         if (!_IsTargetAcceptable(who))
             return false;
 
-        if (who->isInCombat())
-            if (Unit *victim = who->getAttackerForHelper())
+        if (who->IsInCombat())
+            if (Unit *victim = who->GetAttackerForHelper())
                 if (IsWithinDistInMap(victim, 10.0f))
                     force = true;
 
@@ -3629,7 +3629,7 @@ void Creature::FillGuidsListFromThreatList(std::vector<ObjectGuid>& guids, uint3
     if (!CanHaveThreatList())
         return;
 
-    ThreatList const& threats = getThreatManager().getThreatList();
+    ThreatList const& threats = GetThreatManager().getThreatList();
 
     maxamount = maxamount > 0 ? std::min(maxamount, uint32(threats.size())) : threats.size();
 

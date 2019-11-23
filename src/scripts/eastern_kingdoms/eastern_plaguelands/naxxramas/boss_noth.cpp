@@ -204,7 +204,7 @@ struct boss_nothAI : public ScriptedAI
     {
         // From what I can understand, the plague should always target the current target,
         // and will then also target the next 19 closest players to the current target
-        if (Unit* pTarget = m_creature->getVictim())
+        if (Unit* pTarget = m_creature->GetVictim())
         {
             DoCastSpellIfCan(pTarget, SPELL_CURSE_PLAGUEBRINGER);
             m_events.Repeat(Seconds(urand(50,60))); //It's somewhere around 50seconds+
@@ -395,7 +395,7 @@ struct boss_nothAI : public ScriptedAI
     {
         if (!isOnBalc)
         {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
             if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
                 return;
@@ -403,7 +403,7 @@ struct boss_nothAI : public ScriptedAI
         else
         {
             // Will make him TP down rather thank walk through the air on a reset/wipe
-            if (m_creature->getThreatManager().isThreatListEmpty())
+            if (m_creature->GetThreatManager().isThreatListEmpty())
             {
                 if (m_events.GetTimeUntilEvent(EVENT_RMV_INVULN) > 2000)
                 {

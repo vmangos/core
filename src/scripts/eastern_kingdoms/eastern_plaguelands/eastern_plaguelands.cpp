@@ -286,12 +286,12 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 summoned->AddThreat(player, 50.0f);
                 if ((rand() % 4) > 0)
                 {
-                    if (Unit* victim = summoned->getVictim())
+                    if (Unit* victim = summoned->GetVictim())
                         summoned->SendMeleeAttackStop(victim);
                     summoned->AddThreat(player, 200.0f);
                     summoned->GetMotionMaster()->Clear(false);
                     summoned->GetMotionMaster()->MoveChase(player);
-                    if (Unit* victim = summoned->getVictim())
+                    if (Unit* victim = summoned->GetVictim())
                         summoned->SendMeleeAttackStart(victim);
                 }
             }
@@ -931,21 +931,21 @@ struct npc_demetriaAI : public ScriptedAI
         {
             if (Creature* deadTrooper = m_creature->FindNearestCreature(NPC_SCARLET_TROOPER, 40.0f, false))
             {
-                DoRessurectUnit(deadTrooper, m_creature->getVictim());
+                DoRessurectUnit(deadTrooper, m_creature->GetVictim());
                 Resurrect_Timer = 10000;
             }
         }
         else
             Resurrect_Timer -= diff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!(m_creature->GetSpellAuraHolder(SPELL_SHADOWFORM)))
             DoCastSpellIfCan(m_creature, SPELL_SHADOWFORM);
         if (MindBlast_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_BLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_BLAST) == CAST_OK)
                 MindBlast_Timer = urand(4000, 5000);
         }
         else
@@ -988,7 +988,7 @@ struct npc_demetriaAI : public ScriptedAI
             }
             else
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISPELL_MAGIC2) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISPELL_MAGIC2) == CAST_OK)
                     DispelMagic_Timer = 6000;
             }
         }
@@ -1494,7 +1494,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                                 if (Crea->GetEntry() != NPC_BLOODLETTER && Crea->GetEntry() != NPC_DAVIL_LIGHTFIRE && Crea->GetEntry() != NPC_CAPTAIN_REDPATH)
                                     continue;
 
-                                if (Crea->IsAlive() && !Crea->isInCombat() && Crea->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
+                                if (Crea->IsAlive() && !Crea->IsInCombat() && Crea->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
                                 {
                                     int point = 0;
                                     int Rand = 0;

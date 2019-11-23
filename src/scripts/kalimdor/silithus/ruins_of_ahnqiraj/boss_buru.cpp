@@ -178,7 +178,7 @@ struct boss_buruAI : public ScriptedAI
         }
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Si il n'est pas enrage et qu'il n'a plus de threat list, il choisi une personne a focus au hasard
@@ -206,8 +206,8 @@ struct boss_buruAI : public ScriptedAI
                 m_creature->RemoveAurasDueToSpell(SPELL_GAIN_SPEED);
                 m_creature->UpdateSpeed(MOVE_RUN, true, 1.0f);
 
-                if (m_creature->getVictim())
-                    m_creature->SetFacingToObject(m_creature->getVictim());
+                if (m_creature->GetVictim())
+                    m_creature->SetFacingToObject(m_creature->GetVictim());
 
                 // Despawn des oeufs lors de l'enrage
                 for (int i = 0 ; i < 6 ; i++)
@@ -221,14 +221,14 @@ struct boss_buruAI : public ScriptedAI
                     }
                 }
             }
-            else if (m_creature->getThreatManager().getThreat(m_creature->getVictim()) < (THREAT_LOCK / 1000))
+            else if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()) < (THREAT_LOCK / 1000))
             {
                 uint64 GUIDs[40];
                 for (int i = 0; i < 40; i++)
                     GUIDs[i] = 0;
 
                 int var = 0;
-                ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+                ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
                 {
                     Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
@@ -247,7 +247,7 @@ struct boss_buruAI : public ScriptedAI
                         DoScriptText(EMOTE_TARGET, m_creature, pTarget);
 
                         // Pour verouiller la cible, on applique une menace tres elevee
-                        m_creature->getThreatManager().addThreat(pTarget, THREAT_LOCK);
+                        m_creature->GetThreatManager().addThreat(pTarget, THREAT_LOCK);
 
                         m_creature->RemoveAurasDueToSpell(SPELL_GAIN_SPEED);
                         m_creature->UpdateSpeed(MOVE_RUN, true, 0.5f);
@@ -260,7 +260,7 @@ struct boss_buruAI : public ScriptedAI
         // Dismember - A stacking bleed effect that does 1248 damage every 2 second. Buru will use this if he catches up to whoever he is targeting.
         if (m_uiDismember_Timer < uiDiff && !m_bIsEnraged)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISMEMBER) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISMEMBER) == CAST_OK)
                 m_uiDismember_Timer = 6000;
         }
         else
@@ -326,7 +326,7 @@ struct mob_buru_eggAI : public ScriptedAI
         // Aggro de Buru quand on tape un oeuf
         if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))
         {
-            if (!pBuru->isInCombat())
+            if (!pBuru->IsInCombat())
                 pBuru->SetInCombatWithZone();
         }
     }
@@ -350,7 +350,7 @@ struct mob_buru_eggAI : public ScriptedAI
         {
             if (pBuru->IsAlive() && pBuru->GetDistance2d(m_creature) < 5.0f && pBuru->GetHealthPercent() >= 20)
             {
-                pBuru->getThreatManager().modifyThreatPercent(pBuru->getVictim(), -100);
+                pBuru->GetThreatManager().modifyThreatPercent(pBuru->GetVictim(), -100);
 
                 pBuru->SetHealth(pBuru->GetHealth() - 45000);
             }

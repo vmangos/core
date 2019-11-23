@@ -627,7 +627,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         {
             ForwardPacketToNode();
 
-            if(_player && _player->isInCombat())
+            if(_player && _player->IsInCombat())
                 break;
 
             if(!msg.empty() || !_player->IsAFK())

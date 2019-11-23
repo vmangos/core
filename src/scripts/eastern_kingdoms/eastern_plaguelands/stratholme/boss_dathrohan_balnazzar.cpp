@@ -173,7 +173,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //START NOT TRANSFORMED
@@ -182,7 +182,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
             //MindBlast
             if (m_uiMindBlast_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDBLAST) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MINDBLAST) == CAST_OK)
                     m_uiMindBlast_Timer = urand(15000, 20000);
             }
             else m_uiMindBlast_Timer -= uiDiff;
@@ -198,7 +198,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
             //CrusaderStrike
             if (m_uiCrusaderStrike_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CRUSADERSTRIKE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRUSADERSTRIKE) == CAST_OK)
                     m_uiCrusaderStrike_Timer = 15000;
             }
             else m_uiCrusaderStrike_Timer -= uiDiff;
@@ -206,7 +206,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
             //HolyStrike
             if (m_uiHolyStrike_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOLYSTRIKE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HOLYSTRIKE) == CAST_OK)
                     m_uiHolyStrike_Timer = 15000;
             }
             else m_uiHolyStrike_Timer -= uiDiff;
@@ -247,8 +247,8 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
                 {
                     if (!pTarget->HasAura(SPELL_MINDCONTROL))
                     {
-                        m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
-                        m_creature->getThreatManager().addThreatDirectly(pTarget, MCPlayerAggro);
+                        m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
+                        m_creature->GetThreatManager().addThreatDirectly(pTarget, MCPlayerAggro);
                         MCPlayerGuid = 0;
                         MCPlayerAggro = 0;
                     }
@@ -266,8 +266,8 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
                 {
                     if (!pTarget->HasAura(SPELL_SLEEP))
                     {
-                        m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
-                        m_creature->getThreatManager().addThreatDirectly(pTarget, SleepPlayerAggro);
+                        m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
+                        m_creature->GetThreatManager().addThreatDirectly(pTarget, SleepPlayerAggro);
                         SleepPlayerGuid = 0;
                         SleepPlayerAggro = 0;
                     }
@@ -282,7 +282,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
             //MindBlast
             if (m_uiMindBlast_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDBLAST) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MINDBLAST) == CAST_OK)
                     m_uiMindBlast_Timer = urand(15000, 20000);
             }
             else m_uiMindBlast_Timer -= uiDiff;
@@ -290,7 +290,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
             //ShadowShock
             if (m_uiShadowShock_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWSHOCK);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWSHOCK);
                 m_uiShadowShock_Timer = 11000;
             }
             else m_uiShadowShock_Timer -= uiDiff;
@@ -311,10 +311,10 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
                     if (!pTarget->HasAura(SPELL_SLEEP))
                     {
                         SleepPlayerGuid = pTarget->GetGUID();
-                        SleepPlayerAggro = m_creature->getThreatManager().getThreat(pTarget);
+                        SleepPlayerAggro = m_creature->GetThreatManager().getThreat(pTarget);
                         if (DoCastSpellIfCan(pTarget, SPELL_SLEEP) == CAST_OK)
                         {
-                            m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
+                            m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
                             m_uiDeepSleep_Timer = 15000;
                         }
                     }
@@ -330,7 +330,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
                     if (pTarget != nullptr && !pTarget->HasAura(SPELL_SLEEP))
                     {
                         MCPlayerGuid = pTarget->GetGUID();
-                        MCPlayerAggro = m_creature->getThreatManager().getThreat(pTarget);
+                        MCPlayerAggro = m_creature->GetThreatManager().getThreat(pTarget);
                         if (DoCastSpellIfCan(pTarget, SPELL_MINDCONTROL) == CAST_OK)
                             m_uiMindControl_Timer = urand(25000, 30000);
                     }

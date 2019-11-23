@@ -468,7 +468,7 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
                     if (pMaster->IsControlledByPlayer())
                         return;
 
-                    if (pMaster->isInCombat())
+                    if (pMaster->IsInCombat())
                         pMaster->SetInCombatWith(pEnemy);
                     else
                         pMaster->AI()->AttackStart(pEnemy);
@@ -529,7 +529,7 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
             if (pSlave->IsControlledByPlayer())
                 return;
 
-            if (pSlave->isInCombat())
+            if (pSlave->IsInCombat())
             {
                 if (pSource->GetMap()->IsDungeon() && (pSource->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_AGGRO_ZONE))
                     pSlave->SetInCombatWithZone();
@@ -567,7 +567,7 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
         else if (flag & FLAG_DESPAWN_ON_RESPAWN && pSlave->IsAlive())
             pSlave->ForcedDespawn();
 
-        if (flag & FLAG_FOLLOW && pSlave->IsAlive() && !pSlave->isInCombat())
+        if (flag & FLAG_FOLLOW && pSlave->IsAlive() && !pSlave->IsInCombat())
             SetFollowing(pSlave, pSource);
 
         break;

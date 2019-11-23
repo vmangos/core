@@ -96,14 +96,14 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->IsNonMeleeSpellCasted(false))
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->IsNonMeleeSpellCasted(false))
             return;
 
         if (ManageTimer(uiDiff, &m_uiTrampleTimer,              urand(9000, 14000)))
             DoCastSpellIfCan(m_creature, SPELL_TRAMPLE);
 
         if (ManageTimer(uiDiff, &m_uiUppercutTimer,             urand(12000, 15000)))
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_UPPERCUT);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UPPERCUT);
 
         if (ManageTimer(uiDiff, &m_uiGraspingVinesTimer,       urand(17000, 22000)))
             DoCastSpellIfCan(m_creature, SPELL_GRASPING_VINES);
@@ -114,7 +114,7 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
         /** Invoque player in front of him */
         if (m_uiInvocation_Timer < uiDiff)
         {
-            Unit* pUnit = m_creature->getVictim();
+            Unit* pUnit = m_creature->GetVictim();
             if (m_creature->GetDistance(pUnit) > 7.0f)
             {
                 float x = m_creature->GetPositionX();

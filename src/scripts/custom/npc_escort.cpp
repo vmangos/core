@@ -115,7 +115,7 @@ struct npc_escort_genericAI : public npc_escortAI
         if (!m_pEscortData)
             return;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (HasEscortState(STATE_ESCORT_PAUSED))
                 SetEscortPaused(false);

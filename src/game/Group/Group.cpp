@@ -1916,7 +1916,7 @@ bool Group::InCombatToInstance(uint32 instanceId)
     for (GroupReference *itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
         Player *pPlayer = itr->getSource();
-        if (pPlayer->isInCombat() && pPlayer->GetInstanceId() == instanceId)
+        if (pPlayer->IsInCombat() && pPlayer->GetInstanceId() == instanceId)
             return true;
     }
     return false;

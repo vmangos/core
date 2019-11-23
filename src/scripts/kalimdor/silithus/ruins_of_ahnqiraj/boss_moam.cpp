@@ -119,7 +119,7 @@ struct boss_moamAI : public ScriptedAI
                 }
             }
         }
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             pSummoned->AddObjectToRemoveList();
             return;
@@ -140,7 +140,7 @@ struct boss_moamAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if ((!m_creature->SelectHostileTarget() || !m_creature->getVictim()) && !m_creature->HasAura(SPELL_ENERGIZE))
+        if ((!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) && !m_creature->HasAura(SPELL_ENERGIZE))
             return;
 
         // Once Moam got 100% mana, take back last target and launch arcane eruption
@@ -159,7 +159,7 @@ struct boss_moamAI : public ScriptedAI
                     m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
                 m_creature->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                DoCast(m_creature->getVictim(), SPELL_ARCANEERUPTION);
+                DoCast(m_creature->GetVictim(), SPELL_ARCANEERUPTION);
                 DoScriptText(EMOTE_MANA_FULL, m_creature);
                 m_creature->SetArmor(m_uiArmorValue);
             }
@@ -171,7 +171,7 @@ struct boss_moamAI : public ScriptedAI
         // Cast arcane eruption spell if not in energize mode and if mana is at 100%
         if (m_creature->GetPower(POWER_MANA) == m_creature->GetMaxPower(POWER_MANA))
         {
-            DoCast(m_creature->getVictim(), SPELL_ARCANEERUPTION);
+            DoCast(m_creature->GetVictim(), SPELL_ARCANEERUPTION);
             DoScriptText(EMOTE_MANA_FULL, m_creature);
         }
 
@@ -198,7 +198,7 @@ struct boss_moamAI : public ScriptedAI
 
                 m_uiSummonManaFiend_Timer = 90000;
                 m_uiTurnBackFromStone_Timer = 90000;
-                m_OGvictim = m_creature->getVictim()->GetObjectGuid(); /** Memorize actual target to take it back,
+                m_OGvictim = m_creature->GetVictim()->GetObjectGuid(); /** Memorize actual target to take it back,
                                       once the end of SPELL_ENERGIZE */
                 m_creature->AttackStop();
                 DoScriptText(EMOTE_DRAIN, m_creature);
@@ -211,7 +211,7 @@ struct boss_moamAI : public ScriptedAI
         //m_uiTrample_Timer
         if (m_uiTrample_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRAMPLE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRAMPLE) == CAST_OK)
                 m_uiTrample_Timer = 10000;
         }
         else

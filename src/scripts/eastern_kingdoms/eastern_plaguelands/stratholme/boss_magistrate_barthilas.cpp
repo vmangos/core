@@ -115,7 +115,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
             else m_mvt_timer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (FuriousAnger_Timer < diff)
@@ -132,7 +132,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
         //DrainingBlow
         if (DrainingBlow_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_DRAININGBLOW);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DRAININGBLOW);
             DrainingBlow_Timer = 15000;
         }
         else DrainingBlow_Timer -= diff;
@@ -140,7 +140,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
         //CrowdPummel
         if (CrowdPummel_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CROWDPUMMEL);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CROWDPUMMEL);
             CrowdPummel_Timer = 15000;
         }
         else CrowdPummel_Timer -= diff;
@@ -148,7 +148,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
         //MightyBlow
         if (MightyBlow_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIGHTYBLOW);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIGHTYBLOW);
             MightyBlow_Timer = 20000;
         }
         else MightyBlow_Timer -= diff;

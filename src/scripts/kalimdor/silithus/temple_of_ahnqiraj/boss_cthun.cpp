@@ -235,7 +235,7 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
         {
             if (Player* player = itr->getSource())
             {
-                if (!player->IsDead() && !player->IsGameMaster() && player->isInCombat() && !instance->PlayerInStomach(player)) {
+                if (!player->IsDead() && !player->IsGameMaster() && player->IsInCombat() && !instance->PlayerInStomach(player)) {
                     temp.push_back(player);
                 }
             }
@@ -259,7 +259,7 @@ static Unit* selectSelfFunc(Creature* c) {
     return c;
 }
 static Unit* selectTargetFunc(Creature* c) {
-    return c->getVictim();
+    return c->GetVictim();
 }
 
 // ================== PHASE 1 CONSTANTS ==================
@@ -424,7 +424,7 @@ struct cthunTentacle : public ScriptedAI
             return true;
         }
 
-        Unit* oldTarget = m_creature->getVictim();
+        Unit* oldTarget = m_creature->GetVictim();
         Unit* target = nullptr;
 
         // First checking if we have some taunt on us
@@ -433,14 +433,14 @@ struct cthunTentacle : public ScriptedAI
             Unit* caster = (*it)->GetCaster();
             if (!caster) continue;
 
-            if (caster->IsInMap(m_creature) && caster->isTargetableForAttack() && m_creature->CanReachWithMeleeAutoAttack(caster))
+            if (caster->IsInMap(m_creature) && caster->IsTargetableForAttack() && m_creature->CanReachWithMeleeAutoAttack(caster))
             {
                 target = caster;
                 break;
             }
             else {
                 // Target is not in melee and reset his threat
-                m_creature->getThreatManager().modifyThreatPercent(caster, -100);
+                m_creature->GetThreatManager().modifyThreatPercent(caster, -100);
             }
         }
         // So far so good. If we have a target after this loop it means we have a valid target in melee range.
@@ -450,7 +450,7 @@ struct cthunTentacle : public ScriptedAI
         {
             Unit* tmpTarget = nullptr;
             if (m_creature->CanHaveThreatList()) {
-                ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
+                ThreatList const& threatlist = m_creature->GetThreatManager().getThreatList();
                 ThreatList::const_iterator itr = threatlist.begin();
                 
                 // Implementing this loop manually instead of using Creature::SelectAttackingTarget
@@ -458,7 +458,7 @@ struct cthunTentacle : public ScriptedAI
                 // because melee ranges are fucked up. todo: fix melee ranges....
                 for (; itr != threatlist.end(); ++itr) {
                     if (Unit* pTarget = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid())) {
-                        if (pTarget->isTargetableForAttack() 
+                        if (pTarget->IsTargetableForAttack() 
                             && pTarget->CanReachWithMeleeAutoAttack(m_creature)
                             && pTarget->IsWithinLOSInMap(m_creature)) {
                             tmpTarget = pTarget;
@@ -471,12 +471,12 @@ struct cthunTentacle : public ScriptedAI
             // Resetting threat of old target if it has left melee range
             if (oldTarget && tmpTarget != oldTarget && !oldTarget->CanReachWithMeleeAutoAttack(m_creature)) {
             //if (oldTarget && tmpTarget != oldTarget && !m_creature->IsWithinMeleeRange(oldTarget)) {
-                m_creature->getThreatManager().modifyThreatPercent(oldTarget, -100);
+                m_creature->GetThreatManager().modifyThreatPercent(oldTarget, -100);
             }
 
             if (tmpTarget) {
                 // Need to call getHostileTarget to force an update of the threatlist, bleh
-                target = m_creature->getThreatManager().getHostileTarget();
+                target = m_creature->GetThreatManager().getHostileTarget();
             }
         }
         
@@ -1051,7 +1051,7 @@ struct eye_of_cthunAI : public ScriptedAI
     {
         // Just in case someone manages to get through the AggroRadius logic in C'thuns AI
         // we make sure the proper pull-sequence is initiated by calling C'thuns attackstart.
-        if (!m_creature->isInCombat()) {
+        if (!m_creature->IsInCombat()) {
             if (Creature* pCthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN)) {
                 pCthun->AI()->AttackStart(puller);
             }
@@ -1276,7 +1276,7 @@ struct cthunAI : public ScriptedAI
 
     void AttackStart(Unit* who) override
     {
-        if (!m_creature->isInCombat()) {
+        if (!m_creature->IsInCombat()) {
             Creature* pEye = m_pInstance->GetCreature(eyeGuid);
             if (!pEye) {
                 sLog.outError("cthunAI::AggroRadius could not find pEye");

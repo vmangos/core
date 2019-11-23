@@ -476,7 +476,7 @@ struct npc_grimstoneAI : public npc_escortAI
         {
             Player *player = itr->getSource();
 
-            if (player && player->IsWithinDistInMap(m_creature, 80.0f) && player->isInCombat()) {
+            if (player && player->IsWithinDistInMap(m_creature, 80.0f) && player->IsInCombat()) {
                 wiped = false;
                 break;
             }
@@ -635,13 +635,13 @@ struct mob_phalanxAI : public ScriptedAI
                 m_uiCallPatrolTimer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ThunderClap_Timer
         if (ThunderClap_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_THUNDERCLAP);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THUNDERCLAP);
             ThunderClap_Timer = 10000;
         }
         else ThunderClap_Timer -= diff;
@@ -651,7 +651,7 @@ struct mob_phalanxAI : public ScriptedAI
         {
             if (FireballVolley_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIREBALLVOLLEY);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FIREBALLVOLLEY);
                 FireballVolley_Timer = 15000;
             }
             else FireballVolley_Timer -= diff;
@@ -660,7 +660,7 @@ struct mob_phalanxAI : public ScriptedAI
         //MightyBlow_Timer
         if (MightyBlow_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIGHTYBLOW);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIGHTYBLOW);
             MightyBlow_Timer = 10000;
         }
         else MightyBlow_Timer -= diff;
@@ -1409,12 +1409,12 @@ struct npc_hurley_blackbreathAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return; 
 
         if (uiFlameBreathTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BREATH) == CAST_OK)
                 uiFlameBreathTimer = urand(8000, 12000);
         }
         else
@@ -1526,7 +1526,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //BoireLaPotionDeSoins_Timer
@@ -1534,7 +1534,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
         {
             if (BoireLaPotionDeSoins_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_BOIRE_LA_POTION_DE_SOINS);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BOIRE_LA_POTION_DE_SOINS);
                 BoireLaPotionDeSoins_Timer = 15000;
             }
             else BoireLaPotionDeSoins_Timer -= diff;
@@ -1543,7 +1543,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
         //FracasserArmure_Timer
         if (FracasserArmure_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FRACASSER_ARMURE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FRACASSER_ARMURE);
             FracasserArmure_Timer = 10000;
         }
         else FracasserArmure_Timer -= diff;
@@ -1591,13 +1591,13 @@ struct npc_ribbly_fermevanneAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //BiseGenou_Timer
         if (BiseGenou_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BRISE_GENOU);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BRISE_GENOU);
             BiseGenou_Timer = urand(9000, 15000);
         }
         else BiseGenou_Timer -= diff;
@@ -1605,7 +1605,7 @@ struct npc_ribbly_fermevanneAI : public ScriptedAI
         //Suriner_Timer
         if (Suriner_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SURINER);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SURINER);
             Suriner_Timer = urand(9000, 12000);
         }
         else Suriner_Timer -= diff;
@@ -1692,7 +1692,7 @@ struct npc_golem_lord_argelmachAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //BouclierDeFoudre_Timer
@@ -1707,7 +1707,7 @@ struct npc_golem_lord_argelmachAI : public ScriptedAI
         //ChaineDEclaires_Timer
         if (ChaineDEclaires_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHAINE_D_ECLAIRES) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHAINE_D_ECLAIRES) == CAST_OK)
                 ChaineDEclaires_Timer = 14000;
         }
         else ChaineDEclaires_Timer -= diff;
@@ -1715,7 +1715,7 @@ struct npc_golem_lord_argelmachAI : public ScriptedAI
         //Horion_Timer
         if (Horion_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HORION) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HORION) == CAST_OK)
                 Horion_Timer = 6000;
         }
         else Horion_Timer -= diff;
@@ -1890,7 +1890,7 @@ struct boss_plugger_spazzringAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         // Combat check
-        if (m_creature->SelectHostileTarget() && m_creature->getVictim())
+        if (m_creature->SelectHostileTarget() && m_creature->GetVictim())
         {
             if (m_uiBanishTimer < uiDiff)
             {
@@ -1905,7 +1905,7 @@ struct boss_plugger_spazzringAI : public ScriptedAI
 
             if (m_uiImmolateTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_IMMOLATE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_IMMOLATE) == CAST_OK)
                     m_uiImmolateTimer = 25000;
             }
             else
@@ -1913,7 +1913,7 @@ struct boss_plugger_spazzringAI : public ScriptedAI
 
             if (m_uiShadowBoltTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_BOLT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOW_BOLT) == CAST_OK)
                     m_uiShadowBoltTimer = urand(36, 63) * 100;
             }
             else

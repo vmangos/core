@@ -475,7 +475,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_IS_IN_COMBAT:
         {
-            return target->ToUnit()->isInCombat();
+            return target->ToUnit()->IsInCombat();
         }
         case CONDITION_IS_HOSTILE_TO:
         {

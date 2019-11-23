@@ -86,14 +86,14 @@ struct boss_emperor_dagran_thaurissanAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiHandOfThaurissan_Timer < uiDiff)
         {
             if (m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, nullptr, SELECT_FLAG_PLAYER))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HANDOFTHAURISSAN) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HANDOFTHAURISSAN) == CAST_OK)
                     m_uiHandOfThaurissan_Timer = urand(10000, 15000);
             }
         }
@@ -119,7 +119,7 @@ struct boss_emperor_dagran_thaurissanAI : public ScriptedAI
         /*
         if (m_uiIronfoeTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
                 if (DoCastSpellIfCan(m_creature, SPELL_IRONFOE) == CAST_OK)
                     m_uiIronfoeTimer = urand(20000, 25000);
         }
@@ -191,13 +191,13 @@ struct boss_moira_bronzebeardAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //MindBlast_Timer
         if (m_uiMindBlast_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDBLAST);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MINDBLAST);
             m_uiMindBlast_Timer = 14000;
         }
         else
@@ -206,7 +206,7 @@ struct boss_moira_bronzebeardAI : public ScriptedAI
         //ShadowWordPain_Timer
         if (m_uiShadowWordPain_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWWORDPAIN);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWWORDPAIN);
             m_uiShadowWordPain_Timer = 18000;
         }
         else
@@ -215,7 +215,7 @@ struct boss_moira_bronzebeardAI : public ScriptedAI
         //Smite_Timer
         if (m_uiSmite_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SMITE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SMITE);
             m_uiSmite_Timer = 10000;
         }
         else

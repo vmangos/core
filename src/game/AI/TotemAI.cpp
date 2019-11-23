@@ -83,7 +83,7 @@ void TotemAI::UpdateAI(const uint32 /*diff*/)
 
     // Check owner's attackers for targets.
     if (!victim && owner)
-        victim = owner->getAttackerForHelper();
+        victim = owner->GetAttackerForHelper();
 
     // Search for another target if current is invalid.
     if (!victim || !m_creature->IsWithinDistInMap(victim, max_range) ||

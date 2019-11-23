@@ -659,7 +659,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
                     {
                         Creature* crea = me->GetMap()->GetCreature(DragsGUIDs[Var]);
                         crea->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        crea->getThreatManager().addThreatDirectly(Bolvar, 5000.0f);
+                        crea->GetThreatManager().addThreatDirectly(Bolvar, 5000.0f);
                         crea->SetTargetGuid(Bolvar->GetGUID());
                         Bolvar->AddThreat(crea);
                         Bolvar->SetInCombatWith(crea);
@@ -741,7 +741,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
         {
             if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
             {
-                if (!Bolvar->isInCombat())
+                if (!Bolvar->IsInCombat())
                 {
                     if (!CombatJustEnded)
                     {

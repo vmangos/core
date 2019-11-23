@@ -66,7 +66,7 @@ void boss_dragon_of_nightmareAI::UpdateAI(const uint32 uiDiff)
     else
         m_uiAuraOfNatureTimer -= uiDiff;
 
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
 
     EnterEvadeIfOutOfHomeArea();
@@ -77,7 +77,7 @@ void boss_dragon_of_nightmareAI::UpdateAI(const uint32 uiDiff)
     if (!UpdateDragonAI(uiDiff))
         return;
 
-    auto pTarget = m_creature->getVictim();
+    auto pTarget = m_creature->GetVictim();
 
     if (!m_creature->CanReachWithMeleeAutoAttack(pTarget) || !m_creature->IsWithinLOSInMap(pTarget))
     {
@@ -158,7 +158,7 @@ struct npc_dream_fogAI : ScriptedPetAI
             {
                 if (Unit* pTarget = ((Creature*)pOwner)->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER_NOT_GM))
                 {
-                    if (pTarget != m_creature->getVictim())
+                    if (pTarget != m_creature->GetVictim())
                         return pTarget;
                 }
             }
@@ -171,8 +171,8 @@ struct npc_dream_fogAI : ScriptedPetAI
     {
         if (Unit* pTarget = GetNextTarget())
         {
-            if (m_creature->getVictim() && m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+            if (m_creature->GetVictim() && m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
 
             AttackStart(pTarget);
             m_uiChangeTargetTimer = urand(6000, 10000);
@@ -186,7 +186,7 @@ struct npc_dream_fogAI : ScriptedPetAI
         else
             m_uiChangeTargetTimer -= uiDiff;
 
-        if (m_creature->IsWithinDistInMap(m_creature->getVictim(), CONTACT_DISTANCE))
+        if (m_creature->IsWithinDistInMap(m_creature->GetVictim(), CONTACT_DISTANCE))
             m_uiChangeTargetTimer = urand(4000, 8000);
     }
 };

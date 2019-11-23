@@ -57,10 +57,10 @@ struct npc_pusillinAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!ME->SelectHostileTarget() || !ME->getVictim())
+        if (!ME->SelectHostileTarget() || !ME->GetVictim())
             return;
 
-//        if (!ME->getVictim())
+//        if (!ME->GetVictim())
 //            return;
 
         if (uiGlobalCD < uiDiff)
@@ -68,15 +68,15 @@ struct npc_pusillinAI : public ScriptedAI
             switch (urand(1, 3))
             {
                 case 1: // Boule de feu
-                    ME->CastSpell(ME->getVictim(), 15228, false);
+                    ME->CastSpell(ME->GetVictim(), 15228, false);
                     uiGlobalCD = 6000;
                     break;
                 case 2: // Trait de feu
-                    ME->CastSpell(ME->getVictim(), 14145, false);
+                    ME->CastSpell(ME->GetVictim(), 14145, false);
                     uiGlobalCD = 4000;
                     break;
                 case 3: // Vague explosive
-                    ME->CastSpell(ME->getVictim(), 22424, false);
+                    ME->CastSpell(ME->GetVictim(), 22424, false);
                     uiGlobalCD = 9000;
                     break;
             }

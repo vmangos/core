@@ -156,11 +156,11 @@ struct boss_chromaggusAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *pUnit) override
     {
-        if (!pUnit || m_creature->getVictim())
+        if (!pUnit || m_creature->GetVictim())
             return;
 
         if (m_bEngagedOnce && pUnit->IsPlayer() && m_creature->GetDistance2d(pUnit) < 55.0f && m_creature->IsWithinLOSInMap(pUnit)
-          && pUnit->isTargetableForAttack() && pUnit->isInAccessablePlaceFor(m_creature))
+          && pUnit->IsTargetableForAttack() && pUnit->isInAccessablePlaceFor(m_creature))
             AttackStart(pUnit);
     }
 
@@ -199,7 +199,7 @@ struct boss_chromaggusAI : public ScriptedAI
                 holder->SetTargetSecondaryThreatFocus(true);
             if (pTarget->GetTypeId() != TYPEID_PLAYER)
                 return;
-            m_vTimeLapseInfo.push_back(new TimeLapseInfo(pTarget->GetObjectGuid(), m_creature->getThreatManager().getThreat(pTarget), pTarget->GetHealth()));
+            m_vTimeLapseInfo.push_back(new TimeLapseInfo(pTarget->GetObjectGuid(), m_creature->GetThreatManager().getThreat(pTarget), pTarget->GetHealth()));
         }
     }
 
@@ -226,7 +226,7 @@ struct boss_chromaggusAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->isInCombat() && !m_bEngagedOnce)
+        if (!m_creature->IsInCombat() && !m_bEngagedOnce)
         {
             if (GameObject* pGO = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(DATA_DOOR_CHROMAGGUS_SIDE)))
             {
@@ -252,7 +252,7 @@ struct boss_chromaggusAI : public ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         for (std::vector<TimeLapseInfo*>::iterator itr = m_vTimeLapseInfo.begin(); itr != m_vTimeLapseInfo.end(); ++itr)
@@ -352,7 +352,7 @@ struct boss_chromaggusAI : public ScriptedAI
             }
 
             std::vector<ObjectGuid> m_vPossibleVictim;
-            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
                 if (Player* target = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid()))
                     m_vPossibleVictim.push_back(target->GetObjectGuid());

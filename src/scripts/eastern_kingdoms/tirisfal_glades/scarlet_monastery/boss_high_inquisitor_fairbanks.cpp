@@ -75,7 +75,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //If we are <25% hp cast Heal
@@ -126,7 +126,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         //CurseOfBlood_Timer
         if (CurseOfBlood_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSEOFBLOOD);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSEOFBLOOD);
             CurseOfBlood_Timer = 25000;
         }
         else CurseOfBlood_Timer -= diff;

@@ -78,7 +78,7 @@ void
 AssistanceDistractMovementGenerator::Finalize(Unit &unit)
 {
     unit.ClearUnitState(UNIT_STAT_DISTRACTED);
-    if (Unit* victim = unit.getVictim())
+    if (Unit* victim = unit.GetVictim())
     {
         if (unit.IsAlive())
         {

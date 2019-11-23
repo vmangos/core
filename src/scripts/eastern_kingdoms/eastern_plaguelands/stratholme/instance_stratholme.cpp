@@ -746,7 +746,7 @@ struct instance_stratholme : public ScriptedInstance
 
             if (Creature* pAbom = instance->GetCreature(*Iter))
             {
-                if (pAbom->IsAlive() && !pAbom->isInCombat())
+                if (pAbom->IsAlive() && !pAbom->IsInCombat())
                 {
                     pAbom->GetMotionMaster()->MovePoint(0, 4037.194f, -3473.741943f, 121.738808f);
                     //pAbom->GetMotionMaster()->MovePoint(1, 4038.45288f, -3487.635498f, 121.742157f);

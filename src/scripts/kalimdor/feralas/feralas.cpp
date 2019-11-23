@@ -188,7 +188,7 @@ struct npc_shay_leafrunnerAI : public FollowerAI
                 m_uiDespawnTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (m_uiWanderTimer)
             {
@@ -330,7 +330,7 @@ struct MushgogAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSporeCloud_Timer < uiDiff)
@@ -344,7 +344,7 @@ struct MushgogAI : public ScriptedAI
 
         if (m_uiRoots_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ROOTS) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ROOTS) == CAST_OK)
             	m_uiRoots_Timer = urand(8000, 12000);
         }
         else
@@ -352,7 +352,7 @@ struct MushgogAI : public ScriptedAI
 
         if (m_uiThornVolley_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THORN_VOLLEY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THORN_VOLLEY) == CAST_OK)
             	m_uiThornVolley_Timer = urand(5000, 9000);
         }
         else
@@ -433,12 +433,12 @@ struct TheRazzaAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiPoisonBolt_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISON_BOLT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POISON_BOLT) == CAST_OK)
             	m_uiPoisonBolt_Timer = 6000;
         }
         else
@@ -446,7 +446,7 @@ struct TheRazzaAI : public ScriptedAI
 
         if (m_uiChainLightning_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHAIN_LIGHTNING) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHAIN_LIGHTNING) == CAST_OK)
             	m_uiChainLightning_Timer = urand(4000, 7000);
         }
         else
@@ -525,12 +525,12 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiCleave_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
             	m_uiCleave_Timer = urand(7000,10000);
         }
         else
@@ -538,7 +538,7 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
 
         if (m_uiMortalStrike_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
             	m_uiMortalStrike_Timer = urand(9000, 15000);
         }
         else
@@ -546,7 +546,7 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
 
         if (m_uiKnockdown_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKDOWN) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKDOWN) == CAST_OK)
             	m_uiKnockdown_Timer = urand(10000, 13000);
         }
         else
@@ -734,7 +734,7 @@ struct npc_captured_sprite_darterAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (!m_uiKindalGUID || !m_uiGateGUID)
                 return;
@@ -793,11 +793,11 @@ struct npc_captured_sprite_darterAI : public ScriptedAI
             return;
         }
 
-        if (m_creature->getVictim()->GetPowerType() == POWER_MANA)
+        if (m_creature->GetVictim()->GetPowerType() == POWER_MANA)
         {
             if (m_uiManaBurnTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MANA_BURN) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MANA_BURN) == CAST_OK)
                     m_uiManaBurnTimer = urand(7000, 10000);
             }
             else

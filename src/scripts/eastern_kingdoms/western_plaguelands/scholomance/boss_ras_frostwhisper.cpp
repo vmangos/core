@@ -58,7 +58,7 @@ struct boss_rasfrostAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //IceArmor_Timer
@@ -83,7 +83,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //Freeze_Timer
         if (Freeze_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FREEZE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FREEZE);
             Freeze_Timer = 24000;
         }
         else Freeze_Timer -= diff;
@@ -91,7 +91,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //Fear_Timer
         if (Fear_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR);
             Fear_Timer = 30000;
         }
         else Fear_Timer -= diff;
@@ -99,7 +99,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //ChillNova_Timer
         if (ChillNova_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHILLNOVA);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHILLNOVA);
             ChillNova_Timer = 14000;
         }
         else ChillNova_Timer -= diff;
@@ -107,7 +107,7 @@ struct boss_rasfrostAI : public ScriptedAI
         //FrostVolley_Timer
         if (FrostVolley_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROSTVOLLEY);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROSTVOLLEY);
             FrostVolley_Timer = 15000;
         }
         else FrostVolley_Timer -= diff;

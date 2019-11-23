@@ -41,7 +41,7 @@ bool GuardAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
     if (pWho->IsPvPContested())
         return true;
 
-    if (Unit* pVictim = pWho->getVictim())
+    if (Unit* pVictim = pWho->GetVictim())
     {
         if (m_creature->IsFriendlyTo(pVictim) || pVictim->IsTaxi())
             return true;
@@ -52,7 +52,7 @@ bool GuardAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
 
 void GuardAI::MoveInLineOfSight(Unit *pWho)
 {
-    if (m_creature->getVictim())
+    if (m_creature->GetVictim())
         return;
 
     // Ignore Z for flying creatures
@@ -74,7 +74,7 @@ void GuardAI::MoveInLineOfSight(Unit *pWho)
     if (!m_creature->IsWithinDistInMap(pWho, attackRadius))
         return;
 
-    if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() &&
+    if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() &&
        (pWho->IsHostileToPlayers() || m_creature->IsHostileTo(pWho) || isAttackingFriend) &&
         pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
     {
@@ -89,7 +89,7 @@ void GuardAI::EnterCombat(Unit *)
 
 void GuardAI::UpdateAI(const uint32 uiDiff)
 {
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
 
     if (!m_CreatureSpells.empty())

@@ -94,7 +94,7 @@ struct mobs_spitelashesAI : public ScriptedAI
 
             }
         }
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //TODO: add abilities for the different creatures
@@ -235,7 +235,7 @@ struct mob_mawsAI : public ScriptedAI
     {
         if (InCombat)
         {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || LeaveCombatTimer < uiDiff) // m_creature->getThreatManager().isThreatListEmpty() ?
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || LeaveCombatTimer < uiDiff) // m_creature->GetThreatManager().isThreatListEmpty() ?
             {
                 InCombat = 0;
                 Reset();
@@ -255,7 +255,7 @@ struct mob_mawsAI : public ScriptedAI
                 }
                 if (SaccagerTimer < uiDiff)
                 {
-                    DoCastSpellIfCan(m_creature->getVictim(), SACCAGER);
+                    DoCastSpellIfCan(m_creature->GetVictim(), SACCAGER);
                     if (!PhaseTwo)
                         SaccagerTimerMax = urand(20, 120) * 1000;
                     SaccagerTimer = SaccagerTimerMax;
@@ -281,12 +281,12 @@ struct mob_mawsAI : public ScriptedAI
                 }
 
                 if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE)
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
                 LeaveCombatTimer -= uiDiff;
                 DoMeleeAttackIfReady();
             }
         }
-        else if (m_creature->getVictim())
+        else if (m_creature->GetVictim())
             InCombat = 1;
     }
     void DamageTaken(Unit *done_by, uint32 &damage) override// l'empecher d'etre kittable infini. s'applique pas aux dégats de la charge.

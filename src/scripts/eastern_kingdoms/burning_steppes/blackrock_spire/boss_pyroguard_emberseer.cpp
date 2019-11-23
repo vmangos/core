@@ -273,7 +273,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         }
 
         // Sinon, on est "normalement" en combat.
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // FireNova Timer
@@ -385,7 +385,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
             return;
         }
         // Sinon go.
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (MiseEnCage_Timer < uiDiff)
         {
@@ -403,7 +403,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
 
         if (Frappe_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 15580) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), 15580) == CAST_OK)
                 Frappe_Timer = urand(7900, 14000);
         }
         else

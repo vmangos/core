@@ -212,7 +212,7 @@ void instance_ruins_of_ahnqiraj::OnCreatureEvade(Creature* pCreature)
         case NPC_KALDOREI_ELITE:
             if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
             {
-                if (pAndorov->isInCombat())
+                if (pAndorov->IsInCombat())
                 {
                     pCreature->AddThreatsOf(pAndorov);
                     break;

@@ -115,7 +115,7 @@ struct npc_chicken_cluckAI : public ScriptedAI
                 m_uiResetFlagTimer -= uiDiff;
         }
 
-        if (m_creature->SelectHostileTarget() && m_creature->getVictim())
+        if (m_creature->SelectHostileTarget() && m_creature->GetVictim())
             DoMeleeAttackIfReady();
     }
 };
@@ -645,7 +645,7 @@ struct npc_garments_of_questsAI : public npc_escortAI
         if (Spell->Id == SPELL_LESSER_HEAL_R2 || Spell->Id == SPELL_FORTITUDE_R1)
         {
             //not while in combat
-            if (m_creature->isInCombat())
+            if (m_creature->IsInCombat())
                 return;
 
             //nothing to be done now
@@ -756,7 +756,7 @@ struct npc_garments_of_questsAI : public npc_escortAI
 
     void UpdateEscortAI(const uint32 diff) override
     {
-        if (bCanRun && !m_creature->isInCombat())
+        if (bCanRun && !m_creature->IsInCombat())
         {
             if (RunAwayTimer <= diff)
             {
@@ -791,7 +791,7 @@ struct npc_garments_of_questsAI : public npc_escortAI
             else RunAwayTimer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -823,13 +823,13 @@ struct npc_guardianAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->isAttackReady())
+        if (m_creature->IsAttackReady())
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_DEATHTOUCH, true);
-            m_creature->resetAttackTimer();
+            m_creature->CastSpell(m_creature->GetVictim(), SPELL_DEATHTOUCH, true);
+            m_creature->ResetAttackTimer();
         }
     }
 };
@@ -1281,12 +1281,12 @@ struct npc_felhound_minionAI : public ScriptedPetAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
         {
             if (m_uiManaBurnTimer < uiDiff)
             {
-                if (m_creature->getVictim()->GetPowerType() == POWER_MANA)
-                    DoCastSpellIfCan(m_creature->getVictim(), 15980);
+                if (m_creature->GetVictim()->GetPowerType() == POWER_MANA)
+                    DoCastSpellIfCan(m_creature->GetVictim(), 15980);
                 m_uiManaBurnTimer = urand(9800, 15200);
                 return;
             }
@@ -1420,7 +1420,7 @@ struct npc_arcanite_dragonlingAI : ScriptedPetAI
     {
         if (m_firebuffetTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
                 m_firebuffetTimer = 22500;
         }
         else
@@ -1428,7 +1428,7 @@ struct npc_arcanite_dragonlingAI : ScriptedPetAI
 
         if (m_flamebreathTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BREATH) == CAST_OK)
                 m_flamebreathTimer = urand(10000, 60000);
         }
         else
@@ -1477,7 +1477,7 @@ struct npc_emerald_dragon_whelpAI : ScriptedPetAI
     {
         if (m_uiAcidSpitTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_SPIT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ACID_SPIT) == CAST_OK)
                 m_uiAcidSpitTimer = 2000;
         }
         else
@@ -1571,13 +1571,13 @@ struct npc_the_cleanerAI : public ScriptedAI
     {
         if (m_uiDespawnTimer < uiDiff)
         {
-            if (m_creature->getThreatManager().getThreatList().empty())
+            if (m_creature->GetThreatManager().getThreatList().empty())
                 m_creature->ForcedDespawn();
         }
         else
             m_uiDespawnTimer -= uiDiff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -2207,7 +2207,7 @@ struct npc_shahramAI : ScriptedPetAI
                     shahramSpell = SPELL_MIGHT_OF_SHAHRAM;
                 }
 
-                Unit* victim = m_creature->getVictim();
+                Unit* victim = m_creature->GetVictim();
 
                 if (!victim || !m_creature->IsInRange(victim, 0, 10.0f))
                     shahramSpell = 0;
@@ -2338,7 +2338,7 @@ struct npc_goblin_land_mineAI : ScriptedAI
 
         if (m_bDetonation && !m_bDespawn)
         {
-            DoStartNoMovement(m_creature->getVictim());
+            DoStartNoMovement(m_creature->GetVictim());
 
             if (m_uiDetonationTimer < uiDiff)
             {
@@ -2420,7 +2420,7 @@ struct npc_critterAI : ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (m_creature->isInCombat())
+        if (m_creature->IsInCombat())
         {
             if (m_uiCombatTimer <= diff)
             {

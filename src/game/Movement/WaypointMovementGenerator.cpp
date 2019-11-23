@@ -396,7 +396,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
 
     if (player.GetTaxi().empty())
     {
-        player.getHostileRefManager().setOnlineOfflineState(true);
+        player.GetHostileRefManager().setOnlineOfflineState(true);
         if (player.pvpInfo.inPvPEnforcedArea)
         {
             player.CastSpell(&player, 2479, true);
@@ -422,7 +422,7 @@ void FlightPathMovementGenerator::Interrupt(Player & player)
 
 void FlightPathMovementGenerator::Reset(Player & player, float modSpeed)
 {
-    player.getHostileRefManager().setOnlineOfflineState(false);
+    player.GetHostileRefManager().setOnlineOfflineState(false);
     player.AddUnitState(UNIT_STAT_TAXI_FLIGHT);
     player.SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
 

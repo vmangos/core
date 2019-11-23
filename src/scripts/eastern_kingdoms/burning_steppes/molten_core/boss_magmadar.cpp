@@ -95,7 +95,7 @@ struct boss_magmadarAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Frenzy
@@ -113,7 +113,7 @@ struct boss_magmadarAI : public ScriptedAI
         // Panic
         if (m_uiPanicTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PANIC) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PANIC) == CAST_OK)
                 m_uiPanicTimer = urand(30000, 35000);
         }
         else
@@ -170,8 +170,8 @@ struct boss_magmadarAI : public ScriptedAI
         {
             if (m_uiRestoreTargetTimer <= diff)
             {
-                m_creature->SetInFront(m_creature->getVictim());
-                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_creature->SetInFront(m_creature->GetVictim());
+                m_creature->SetTargetGuid(m_creature->GetVictim()->GetObjectGuid());
                 m_uiRestoreTargetTimer = 0;
             }
             else
@@ -180,7 +180,7 @@ struct boss_magmadarAI : public ScriptedAI
 
         if (m_uiMagmaSpitTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 19450) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), 19450) == CAST_OK)
                 m_uiMagmaSpitTimer = urand(10000, 20000);
         }
         else

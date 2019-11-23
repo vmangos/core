@@ -78,7 +78,7 @@ struct npc_morokkAI : public npc_escortAI
 
     void AttackedBy(Unit* pAttacker) override
     {
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
             return;
 
         if (m_creature->IsFriendlyTo(pAttacker))
@@ -108,7 +108,7 @@ struct npc_morokkAI : public npc_escortAI
 
     void UpdateEscortAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (HasEscortState(STATE_ESCORT_PAUSED))
             {
@@ -318,7 +318,7 @@ struct npc_private_hendelAI : public ScriptedAI
 
     void AttackedBy(Unit* pAttacker) override
     {
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
             return;
 
         if (m_creature->IsFriendlyTo(pAttacker))
@@ -756,7 +756,7 @@ bool QuestAccept_npc_private_hendel(Player* pPlayer, Creature* pCreature, const 
                     {
                         guard->SetFactionTemplateId(FACTION_HOSTILE);
                         // rare case: players from opposite faction and hostile creatures can be used to distract guards before event starts
-                        if (!guard->isInCombat())
+                        if (!guard->IsInCombat())
                             guard->AI()->AttackStart(pPlayer);
                     }
                 }
@@ -874,7 +874,7 @@ struct npc_archmage_tervoshAI : public ScriptedAI
                     // make guards face private hendel
                     for (auto const& g : guards)
                     {
-                        if (!g->isInCombat() && g->IsAlive())
+                        if (!g->IsInCombat() && g->IsAlive())
                         {
                             g->StopMoving(); // Movement will be restored automatically in the core
                             g->SetFacingToObject(m_creature);
@@ -1046,7 +1046,7 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->IsNonMeleeSpellCasted())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->IsNonMeleeSpellCasted())
             return;
 
         if (m_uiSpecialTimer < uiDiff)
@@ -1058,7 +1058,7 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
             }
             else
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_JAINA_TELEPORT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_JAINA_TELEPORT) == CAST_OK)
                 { 
                     m_uiSpecialTimer = urand(10, 30)*IN_MILLISECONDS;
 
@@ -1066,9 +1066,9 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
                     {
                         // If we don't remove target from threat list after teleporting,
                         // Jaina will try to chase him and evade despite having other targets.
-                        Unit* pOldVictim = m_creature->getVictim();
+                        Unit* pOldVictim = m_creature->GetVictim();
                         m_creature->_removeAttacker(pOldVictim);
-                        m_creature->getThreatManager().modifyThreatPercent(pOldVictim, -101.0f);
+                        m_creature->GetThreatManager().modifyThreatPercent(pOldVictim, -101.0f);
                     }
                 }
             }
@@ -1083,14 +1083,14 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
                 case 0:
                 case 1:
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_JAINA_FIREBALL) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_JAINA_FIREBALL) == CAST_OK)
                         m_uiSpellTimer = urand(3, 10)*IN_MILLISECONDS;
                     break;
                 }
                 case 2:
                 case 3:
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_JAINA_FIREBLAST) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_JAINA_FIREBLAST) == CAST_OK)
                         m_uiSpellTimer = urand(3, 10)*IN_MILLISECONDS;
                     break;
                 }
@@ -1252,7 +1252,7 @@ struct npc_stinky_ignatzAI : public npc_escortAI
     }
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (timer < 20000)
             {
@@ -1520,7 +1520,7 @@ struct npc_emberstrifeAI : ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!m_bWeakened && m_creature->GetHealthPercent() < 11)
@@ -1532,7 +1532,7 @@ struct npc_emberstrifeAI : ScriptedAI
         // Cleave
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(6000, 8000);
         }
         else
@@ -1541,7 +1541,7 @@ struct npc_emberstrifeAI : ScriptedAI
         // Flame Breath
         if (m_uiFlameBreathTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BREATH) == CAST_OK)
                 m_uiFlameBreathTimer = urand(8000, 12000);
         }
         else

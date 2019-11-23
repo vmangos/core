@@ -119,7 +119,7 @@ VisibleNotifier::Notify()
     for (Object const* obj : i_visibleNow)
         if (Unit const* unit = obj->ToUnit())
             if (unit->HasUnitState(UNIT_STAT_MELEE_ATTACKING))
-                if (Unit const* victim = unit->getVictim())
+                if (Unit const* victim = unit->GetVictim())
                 {
                     WorldPacket data(SMSG_ATTACKSTART, 8 + 8);
                     data << unit->GetObjectGuid();

@@ -38,15 +38,15 @@ struct boss_lordblackwoodAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if(!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if(!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
         {
             m_creature->MonsterSay("pas au cac!");
             if (MultiShot_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MULTI_SHOT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MULTI_SHOT) == CAST_OK)
                     MultiShot_Timer=2000;
             }
             MultiShot_Timer-=diff;
@@ -54,7 +54,7 @@ struct boss_lordblackwoodAI : public ScriptedAI
         if (ShieldBash_Timer < diff)
         {
         m_creature->MonsterSay("yo");
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH) == CAST_OK)
                 ShieldBash_Timer=8000;
         }
         ShieldBash_Timer -=diff;

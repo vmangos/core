@@ -69,7 +69,7 @@ struct boss_ironayaAI : public ScriptedAI
         }
 
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }
@@ -77,12 +77,12 @@ struct boss_ironayaAI : public ScriptedAI
         //If we are <50% hp do knockaway ONCE
         if (!hasCastedKnockaway && m_creature->GetHealthPercent() < 50.0f)
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_KNOCKAWAY, false);
+            m_creature->CastSpell(m_creature->GetVictim(), SPELL_KNOCKAWAY, false);
 
             // current aggro target is knocked away pick new target
             Unit* Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
 
-            if (!Target || Target == m_creature->getVictim())
+            if (!Target || Target == m_creature->GetVictim())
             {
                 Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
             }

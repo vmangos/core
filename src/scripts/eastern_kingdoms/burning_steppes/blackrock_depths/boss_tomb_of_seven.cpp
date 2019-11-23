@@ -219,7 +219,7 @@ struct boss_doomrelAI : public ScriptedAI
                         {
                             if (pDwarf->IsAlive())
                             {
-                                if (!pDwarf->SelectHostileTarget() || !pDwarf->getVictim())
+                                if (!pDwarf->SelectHostileTarget() || !pDwarf->GetVictim())
                                 {
                                     if (m_pInstance)
                                         m_pInstance->SetData(TYPE_TOMB_OF_SEVEN, FAIL);
@@ -245,13 +245,13 @@ struct boss_doomrelAI : public ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ShadowVolley_Timer
         if (m_uiShadowVolley_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLTVOLLEY);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLTVOLLEY);
             m_uiShadowVolley_Timer = 12000;
         }
         else
@@ -271,7 +271,7 @@ struct boss_doomrelAI : public ScriptedAI
         //CurseOfWeakness_Timer
         if (m_uiCurseOfWeakness_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSEOFWEAKNESS);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSEOFWEAKNESS);
             m_uiCurseOfWeakness_Timer = 45000;
         }
         else

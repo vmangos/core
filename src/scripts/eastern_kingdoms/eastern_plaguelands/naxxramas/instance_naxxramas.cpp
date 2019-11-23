@@ -204,7 +204,7 @@ void instance_naxxramas::OnCreatureEnterCombat(Creature * creature)
         GetCreatureListWithEntryInGrid(sewageSlimes, creature, NPC_SewageSlime, 100.0f);
         for (Creature* pC : sewageSlimes)
         {
-            if (!pC->isInCombat())
+            if (!pC->IsInCombat())
             {
                 pC->CastSpell(pC, 28033, true); // aggro all in los
             }
@@ -1473,7 +1473,7 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (portalTimer)
@@ -1547,7 +1547,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE))
         {
             if (pWho->GetTypeId() == TYPEID_PLAYER
-                && !m_creature->isInCombat()
+                && !m_creature->IsInCombat()
                 && m_creature->IsWithinDistInMap(pWho, 17.0f)
                 && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH)
                 && m_creature->IsWithinLOSInMap(pWho))
@@ -1571,7 +1571,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(28995))
@@ -1635,7 +1635,7 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (colorChangeTimer < diff)
@@ -1716,7 +1716,7 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
 
     void FleeToHorse()
     {
-        if (!m_creature->getVictim() || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+        if (!m_creature->GetVictim() || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
             return;
 
         Creature* pNearest = nullptr;
@@ -1736,7 +1736,7 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!hasFled && m_creature->GetHealthPercent() < 50.0f)

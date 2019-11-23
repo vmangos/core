@@ -151,15 +151,15 @@ struct npc_daphne_stilwellAI : public npc_escortAI
 
     void UpdateEscortAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiShootTimer < uiDiff)
         {
             m_uiShootTimer = 1000;
 
-            if (!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT);
+            if (!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT);
 
         }
         else

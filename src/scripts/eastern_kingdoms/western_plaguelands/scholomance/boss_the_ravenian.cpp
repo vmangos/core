@@ -59,13 +59,13 @@ struct boss_theravenianAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Trample_Timer
         if (Trample_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRAMPLE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRAMPLE);
             Trample_Timer = 10000;
         }
         else Trample_Timer -= diff;
@@ -73,7 +73,7 @@ struct boss_theravenianAI : public ScriptedAI
         //Cleave_Timer
         if (Cleave_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
             Cleave_Timer = 7000;
         }
         else Cleave_Timer -= diff;
@@ -81,7 +81,7 @@ struct boss_theravenianAI : public ScriptedAI
         //SunderingCleave_Timer
         if (SunderingCleave_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SUNDERINCLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDERINCLEAVE);
             SunderingCleave_Timer = 20000;
         }
         else SunderingCleave_Timer -= diff;
@@ -89,7 +89,7 @@ struct boss_theravenianAI : public ScriptedAI
         //KnockAway_Timer
         if (KnockAway_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKAWAY);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKAWAY);
             KnockAway_Timer = 12000;
         }
         else KnockAway_Timer -= diff;

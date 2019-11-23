@@ -29,11 +29,11 @@ void ScriptedAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho)))
         return;
 
-    if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+    if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
     {
         if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
         {
-            if (!m_creature->getVictim())
+            if (!m_creature->GetVictim())
                 AttackStart(pWho);
             else if (m_creature->GetMap()->IsDungeon())
             {
@@ -79,7 +79,7 @@ void ScriptedAI::UpdateAI(const uint32 uiDiff)
     //Check if we have a current target
     m_creature->SelectHostileTarget();
 
-    if (!m_CreatureSpells.empty() && m_creature->isInCombat())
+    if (!m_CreatureSpells.empty() && m_creature->IsInCombat())
         UpdateSpellsList(uiDiff);
 
     DoMeleeAttackIfReady();
@@ -128,7 +128,7 @@ void ScriptedAI::DoStartNoMovement(Unit* pVictim)
 
 void ScriptedAI::DoStopAttack()
 {
-    if (m_creature->getVictim())
+    if (m_creature->GetVictim())
         m_creature->AttackStop();
 }
 
@@ -169,19 +169,19 @@ Creature* ScriptedAI::DoSpawnCreature(uint32 id, float dist, uint32 type, uint32
 
 void ScriptedAI::DoResetThreat()
 {
-    if (!m_creature->CanHaveThreatList() || m_creature->getThreatManager().isThreatListEmpty())
+    if (!m_creature->CanHaveThreatList() || m_creature->GetThreatManager().isThreatListEmpty())
     {
         sLog.outError("DoResetThreat called for creature that either cannot have threat list or has empty threat list (m_creature entry = %d)", m_creature->GetEntry());
         return;
     }
 
-    ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+    ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
     for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
     {
         Unit* pUnit = m_creature->GetMap()->GetUnit( (*itr)->getUnitGuid());
 
-        if (pUnit && m_creature->getThreatManager().getThreat(pUnit))
-            m_creature->getThreatManager().modifyThreatPercent(pUnit, -100);
+        if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
+            m_creature->GetThreatManager().modifyThreatPercent(pUnit, -100);
     }
 }
 
@@ -280,7 +280,7 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(const uint32 uiDiff)
         return false;
     }
 
-    if (m_creature->IsInEvadeMode() || !m_creature->getVictim())
+    if (m_creature->IsInEvadeMode() || !m_creature->GetVictim())
         return false;
 
     float fX = m_creature->GetPositionX();
@@ -343,7 +343,7 @@ void Scripted_NoMovementAI::AttackStart(Unit* pWho)
 
 void ScriptedAI::DoGoHome()
 {
-    if (!m_creature->getVictim() && m_creature->IsAlive())
+    if (!m_creature->GetVictim() && m_creature->IsAlive())
         m_creature->GetMotionMaster()->MoveTargetedHome();
 }
 
@@ -352,13 +352,13 @@ void ScriptedAI::DoGoHome()
 float ScriptedAI::DoGetThreat(Unit* pUnit)
 {
     if (!pUnit) return 0.0f;
-    return me->getThreatManager().getThreat(pUnit);
+    return me->GetThreatManager().getThreat(pUnit);
 }
 
 void ScriptedAI::DoModifyThreatPercent(Unit* pUnit, int32 pct)
 {
     if (!pUnit) return;
-    me->getThreatManager().modifyThreatPercent(pUnit, pct);
+    me->GetThreatManager().modifyThreatPercent(pUnit, pct);
 }
 
 void ScriptedAI::DoTeleportTo(float fX, float fY, float fZ)
@@ -393,16 +393,16 @@ void ScriptedAI::EnterVanish()
     m_creature->AttackStop();
     m_creature->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
     // DoResetThreat :
-    if (!m_creature->CanHaveThreatList() || m_creature->getThreatManager().isThreatListEmpty())
+    if (!m_creature->CanHaveThreatList() || m_creature->GetThreatManager().isThreatListEmpty())
         return;
 
-    ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+    ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
     for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
     {
         Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid());
 
-        if (pUnit && m_creature->getThreatManager().getThreat(pUnit))
-            m_creature->getThreatManager().modifyThreatPercent(pUnit, -100);
+        if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
+            m_creature->GetThreatManager().modifyThreatPercent(pUnit, -100);
     }
 }
 

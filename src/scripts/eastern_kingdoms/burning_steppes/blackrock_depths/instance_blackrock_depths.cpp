@@ -835,7 +835,7 @@ struct instance_blackrock_depths : ScriptedInstance
                             if (pCreature->IsAlive())
                             {
                                 pCreature->SetFactionTemplateId(14);
-                                Unit* pVictim = pCreature->getVictim();
+                                Unit* pVictim = pCreature->GetVictim();
                                 if (pCreature->AI())
                                     pCreature->AI()->AttackStart(pVictim);
                             }
@@ -848,7 +848,7 @@ struct instance_blackrock_depths : ScriptedInstance
                 if (uiData == IN_PROGRESS)
                 {
                     if (Creature* argelmach = instance->GetCreature(m_uiGolemLordArgelmachGUID))
-                        if (Unit* pVictim = argelmach->getVictim())
+                        if (Unit* pVictim = argelmach->GetVictim())
                             for (std::list<uint64>::const_iterator itr = m_lArgelmachProtectorsMobGUIDList.begin(); itr != m_lArgelmachProtectorsMobGUIDList.end(); itr++)
                                 if (Creature* protector = instance->GetCreature(*itr))
                                     if (protector->IsAlive() && protector->AI() && protector->IsWithinDist(argelmach, 80.0f))

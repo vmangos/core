@@ -2605,7 +2605,7 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
             return pTarget;
         case TARGET_T_HOSTILE:
             if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->getVictim();
+                return pUnitSource->GetVictim();
             break;
         case TARGET_T_HOSTILE_SECOND_AGGRO:
             if (Creature* pCreatureSource = ToCreature(pSource))

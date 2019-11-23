@@ -18,7 +18,7 @@ ScriptedPetAI::ScriptedPetAI(Creature* pCreature) : CreatureAI(pCreature)
 
 void ScriptedPetAI::MoveInLineOfSight(Unit* pWho)
 {
-    if (m_creature->getVictim())
+    if (m_creature->GetVictim())
         return;
 
     if (!m_creature->GetCharmInfo() || !m_creature->GetCharmInfo()->HasReactState(REACT_AGGRESSIVE))
@@ -46,7 +46,7 @@ void ScriptedPetAI::AttackStart(Unit* pWho)
 
 void ScriptedPetAI::AttackedBy(Unit* pAttacker)
 {
-    if (m_creature->getVictim())
+    if (m_creature->GetVictim())
         return;
 
     if (m_creature->GetCharmInfo() && !m_creature->GetCharmInfo()->HasReactState(REACT_PASSIVE) &&
@@ -96,9 +96,9 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
     // UpdateAllies() is done in the generic PetAI in Mangos, but we can't do this from script side.
     // Unclear what side effects this has, but is something to be resolved from Mangos.
 
-    if (Unit * const pTarget = m_creature->getVictim())                            // in combat
+    if (Unit * const pTarget = m_creature->GetVictim())                            // in combat
     {
-        if (!pTarget->isTargetableForAttack())
+        if (!pTarget->IsTargetableForAttack())
         {
             // target no longer valid for pet, so either attack stops or new target are selected
             // doesn't normally reach this, because of how petAi is designed in Mangos. CombatStop
@@ -123,11 +123,11 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
         if (!pOwner)
             return;
 
-        if (pOwner->isInCombat() && !m_creature->GetCharmInfo()->HasReactState(REACT_PASSIVE))
+        if (pOwner->IsInCombat() && !m_creature->GetCharmInfo()->HasReactState(REACT_PASSIVE))
         {
             // Not correct in all cases.
             // When mob initiate attack by spell, pet should not start attack before spell landed.
-            if (Unit * const pTarget = pOwner->getAttackerForHelper())
+            if (Unit * const pTarget = pOwner->GetAttackerForHelper())
             {
                 // Prevent scripted pets from breaking CC effects
                 if (!pTarget->HasAuraPetShouldAvoidBreaking())
@@ -135,10 +135,10 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
                 else
                 {
                     // Main target is CC-ed, so pick another attacker.
-                    Unit::AttackerSet attackers = pOwner->getAttackers();
+                    Unit::AttackerSet attackers = pOwner->GetAttackers();
                     for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
                     {
-                        if ((*itr)->IsInMap(m_creature) && (*itr)->isTargetableForAttack() && !(*itr)->HasAuraPetShouldAvoidBreaking())
+                        if ((*itr)->IsInMap(m_creature) && (*itr)->IsTargetableForAttack() && !(*itr)->HasAuraPetShouldAvoidBreaking())
                         { 
                             AttackStart((*itr));
                             return;

@@ -269,12 +269,12 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
             else Die_Timer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (cast_Haunting < diff)
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_HAUNTING_PHANTOM, false);
+            m_creature->CastSpell(m_creature->GetVictim(), SPELL_HAUNTING_PHANTOM, false);
             cast_Haunting = 20000;
         }
         else cast_Haunting -= diff;
@@ -287,7 +287,7 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
         switch (emote)
         {
             case TEXTEMOTE_DANCE:
-                if (m_creature->isInCombat() && !hasEvadedOnce)
+                if (m_creature->IsInCombat() && !hasEvadedOnce)
                 {
                     EnterEvadeMode();
                     hasEvadedOnce = true;
@@ -701,7 +701,7 @@ struct npc_auriusAI : public ScriptedAI
             //m_creature->GetMotionMaster()->MoveIdle();
             m_creature->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
             m_creature->InterruptNonMeleeSpells(true);
-            m_creature->getHostileRefManager().deleteReferences();
+            m_creature->GetHostileRefManager().deleteReferences();
         }
     }
 
@@ -870,7 +870,7 @@ struct npc_couloir_trigger1AI : public ScriptedAI
 
                 if (Creature* Crea = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_DATHROHAN)))
                 {
-                    if (Crea->IsAlive() && !Crea->isInCombat())
+                    if (Crea->IsAlive() && !Crea->IsInCombat())
                     {
                         //"The scourge has broken into our bastion!"
                         Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
@@ -1016,7 +1016,7 @@ struct npc_Scourge_TriggerAI : public ScriptedAI
 
                 if (Creature* Crea = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_DATHROHAN)))
                 {
-                    if (Crea->IsAlive() && !Crea->isInCombat())
+                    if (Crea->IsAlive() && !Crea->IsInCombat())
                     {
                         //"The scourge has broken into our bastion!"
                         Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);

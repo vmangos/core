@@ -140,7 +140,7 @@ struct npc_aged_dying_ancient_kodoAI : ScriptedAI
         if (m_creature->GetEntry() == NPC_TAMED_KODO)
             return;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -358,7 +358,7 @@ struct npc_melizza_brimbuzzleAI : public npc_escortAI
     {
         Dialogue(uiDiff);
         npc_escortAI::UpdateAI(uiDiff);
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -646,16 +646,16 @@ struct npc_magrami_spetreAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if ( curseTimer < uiDiff)
         {
-            if(m_creature->getVictim()->HasAura(SPELL_CURSE_OF_THE_FALLEN_MAGRAM))
+            if(m_creature->GetVictim()->HasAura(SPELL_CURSE_OF_THE_FALLEN_MAGRAM))
                 curseTimer = 5000;
             else
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSE_OF_THE_FALLEN_MAGRAM) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSE_OF_THE_FALLEN_MAGRAM) == CAST_OK)
                     curseTimer = urand(15000, 21000);
             }
         }

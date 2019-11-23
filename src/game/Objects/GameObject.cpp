@@ -237,7 +237,7 @@ public:
 
         bool _isTotem = u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem();
         if (u->IsAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u) &&
-            (u->isInCombat() || i_trapOwner->IsHostileTo(u)))
+            (u->IsInCombat() || i_trapOwner->IsHostileTo(u)))
         {
             i_range = i_trap->GetDistance(u);
             return true;
@@ -286,7 +286,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                     // Arming Time for GAMEOBJECT_TYPE_TRAP (6)
                     /* Ivina < Nostalrius > : toujours appliquer le startDelay. Retirer le delai de la DB si jamais un piege n'en a pas. */
                     // Unit* owner = GetOwner();
-                    // if (owner && ((Player*)owner)->isInCombat())
+                    // if (owner && ((Player*)owner)->IsInCombat())
                     if (GetGOInfo()->trap.startDelay)
                         m_cooldownTime = time(nullptr) + GetGOInfo()->trap.startDelay;
                     m_lootState = GO_READY;

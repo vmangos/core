@@ -256,7 +256,7 @@ struct npc_highprotectorlorikAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_RETRIBUTIONAURA, true);
 
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // GlobalCD non ecoule.
@@ -290,7 +290,7 @@ struct npc_highprotectorlorikAI : public ScriptedAI
         {
             if (!m_uiGlobalCooldown)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEBLAST) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEBLAST) == CAST_OK)
                 {
                     m_uiArcaneBlastTimer = urand(10000, 12000);
                     m_uiGlobalCooldown = 1000;
@@ -318,9 +318,9 @@ struct npc_highprotectorlorikAI : public ScriptedAI
         // SHIELDSLAM
         if (m_uiShieldSlamTimer < uiDiff)
         {
-            if (!m_uiGlobalCooldown && m_creature->getVictim()->IsNonMeleeSpellCasted(false))
+            if (!m_uiGlobalCooldown && m_creature->GetVictim()->IsNonMeleeSpellCasted(false))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELDSLAM) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELDSLAM) == CAST_OK)
                 {
                     m_uiShieldSlamTimer = 9000;
                     m_uiGlobalCooldown = 1000;

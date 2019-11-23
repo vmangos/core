@@ -317,7 +317,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
             else Reset_Timer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -679,7 +679,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
 
     void UpdateEscortAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (m_bIsPostEvent)
             {
@@ -1072,7 +1072,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
             else
                 phaseTimer -= uiDiff;
         }
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -1168,7 +1168,7 @@ struct npc_kolkar_invaderAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             // if (torchTimer < uiDiff)
             // {
@@ -1185,9 +1185,9 @@ struct npc_kolkar_invaderAI : public ScriptedAI
 
         if (chargeTimer < uiDiff)
         {
-            if (m_creature->GetDistance(m_creature->getVictim()) > 12)
+            if (m_creature->GetDistance(m_creature->GetVictim()) > 12)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE, false) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHARGE, false) == CAST_OK)
                 {
                     chargeTimer = 15000;
                     DoScriptText(EMOTE_CHARGE, m_creature);
@@ -1198,14 +1198,14 @@ struct npc_kolkar_invaderAI : public ScriptedAI
             chargeTimer -= uiDiff;
         if (strikeTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STRIKE, false) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE, false) == CAST_OK)
                 strikeTimer = urand(4000, 9000);
         }
         else
             strikeTimer -= uiDiff;
         if (tetanosTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TETANOS, false) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TETANOS, false) == CAST_OK)
                 tetanosTimer = 30000;
         }
         else
@@ -1237,12 +1237,12 @@ struct npc_axe_throwerAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (throwTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_AXE_THROW, false) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AXE_THROW, false) == CAST_OK)
                 throwTimer = 1000;
         }
         else
@@ -1274,12 +1274,12 @@ struct npc_warlord_kromzarAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (strikeTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STRIKE, false) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE, false) == CAST_OK)
                 strikeTimer = urand(5000, 8000);
         }
         else
@@ -1319,12 +1319,12 @@ struct npc_razormane_stalkerAI : public ScriptedAI
     void UpdateAI(const uint32 diff) override
     {
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (SinisterStrike_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SINISTERSTRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SINISTERSTRIKE);
             SinisterStrike_Counter += 1;
             if (SinisterStrike_Counter == 1) SinisterStrike_Timer = 15000;
             else if (SinisterStrike_Counter == 2) SinisterStrike_Timer = 12000;
@@ -1445,7 +1445,7 @@ struct npc_sarilus_foulborneAI : ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiElementalsTimer < uiDiff)
@@ -1458,7 +1458,7 @@ struct npc_sarilus_foulborneAI : ScriptedAI
 
         if (m_uiFrostboltTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROSTBOLT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROSTBOLT) == CAST_OK)
                 m_uiFrostboltTimer = urand(3500, 4500);
         }
         else

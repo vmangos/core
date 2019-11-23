@@ -150,7 +150,7 @@ void CreatureGroup::MemberAssist(Creature* member, Unit *target)
     if (!member->IsAlive())
         return;
 
-    if (member->getVictim())
+    if (member->GetVictim())
         return;
 
     if (member->AI())

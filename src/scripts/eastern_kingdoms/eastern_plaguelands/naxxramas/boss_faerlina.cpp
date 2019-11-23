@@ -240,7 +240,7 @@ struct boss_faerlinaAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -263,7 +263,7 @@ struct boss_faerlinaAI : public ScriptedAI
             }
             else 
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_POSIONBOLT_VOLLEY) == CanCastResult::CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POSIONBOLT_VOLLEY) == CanCastResult::CAST_OK)
                 {
                     m_uiPoisonBoltVolleyTimer = POSIONBOLT_VOLLEY_CD();
                 }
@@ -347,7 +347,7 @@ struct mob_faerlina_rp : public ScriptedAI
                 Reset();
                 break;
             }
-            if ((*creatures.begin())->isInCombat())
+            if ((*creatures.begin())->IsInCombat())
             {
                 Reset();
                 break;

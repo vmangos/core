@@ -899,7 +899,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!unitTarget || !m_casterUnit)
                         return;
 
-                    m_casterUnit->getThreatManager().modifyThreatPercent(unitTarget, -100);
+                    m_casterUnit->GetThreatManager().modifyThreatPercent(unitTarget, -100);
                     return;
                 }
                 case 9976:                                  // Polly Eats the E.C.A.C.
@@ -923,7 +923,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     float damage;
                     // DW should benefit of attack power, damage percent mods etc.
                     // TODO: check if using offhand damage is correct and if it should be divided by 2
-                    if (m_casterUnit->haveOffhandWeapon() && m_casterUnit->getAttackTimer(BASE_ATTACK) > m_casterUnit->getAttackTimer(OFF_ATTACK))
+                    if (m_casterUnit->HaveOffhandWeapon() && m_casterUnit->GetAttackTimer(BASE_ATTACK) > m_casterUnit->GetAttackTimer(OFF_ATTACK))
                         damage = (m_casterUnit->GetFloatValue(UNIT_FIELD_MINOFFHANDDAMAGE) + m_casterUnit->GetFloatValue(UNIT_FIELD_MAXOFFHANDDAMAGE)) / 2;
                     else
                         damage = (m_casterUnit->GetFloatValue(UNIT_FIELD_MINDAMAGE) + m_casterUnit->GetFloatValue(UNIT_FIELD_MAXDAMAGE)) / 2;
@@ -1190,8 +1190,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     {
                         // Spell used by Azuregos to teleport all the players to him
                         // This also resets the target threat
-                        if (m_casterUnit->getThreatManager().getThreat(unitTarget))
-                            m_casterUnit->getThreatManager().modifyThreatPercent(unitTarget, -100);
+                        if (m_casterUnit->GetThreatManager().getThreat(unitTarget))
+                            m_casterUnit->GetThreatManager().modifyThreatPercent(unitTarget, -100);
 
                         // cast summon player
                         m_casterUnit->CastSpell(unitTarget, 21150, true);
@@ -1481,7 +1481,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (unitTarget->GetTypeId() != TYPEID_UNIT)
                         return;
 
-                    if (m_casterUnit->getVictim() && !m_casterUnit->IsWithinDistInMap(unitTarget, 60.0f))
+                    if (m_casterUnit->GetVictim() && !m_casterUnit->IsWithinDistInMap(unitTarget, 60.0f))
                     {
                         // Cast Shock on nearby targets
                         if (Unit* pTarget = ((Creature*)m_casterUnit)->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
@@ -3320,7 +3320,7 @@ void Spell::EffectPull(SpellEffectIndex /*eff_idx*/)
 void Spell::EffectDistract(SpellEffectIndex eff_idx)
 {
     // Check for possible target
-    if (!unitTarget || unitTarget->isInCombat())
+    if (!unitTarget || unitTarget->IsInCombat())
         return;
 
     // target must be OK to do this
@@ -3466,7 +3466,7 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                 case 16381:
                     if (m_casterUnit)
                     {
-                        if (Unit* pTarget = m_casterUnit->getAttackerForHelper())
+                        if (Unit* pTarget = m_casterUnit->GetAttackerForHelper())
                             summon->AI()->AttackStart(pTarget);
                     }
                     break;
@@ -4137,7 +4137,7 @@ void Spell::EffectTaunt(SpellEffectIndex eff_idx)
     // for spell as marked "non effective at already attacking target"
     if (unitTarget->GetTypeId() != TYPEID_PLAYER)
     {
-        if (unitTarget->getVictim() == m_caster)
+        if (unitTarget->GetVictim() == m_caster)
         {
             SendCastResult(SPELL_FAILED_DONT_REPORT);
             return;
@@ -4145,9 +4145,9 @@ void Spell::EffectTaunt(SpellEffectIndex eff_idx)
     }
 
     // Also use this effect to set the taunter's threat to the taunted creature's highest value
-    if (unitTarget->CanHaveThreatList() && unitTarget->getThreatManager().getCurrentVictim())
+    if (unitTarget->CanHaveThreatList() && unitTarget->GetThreatManager().getCurrentVictim())
     {
-        unitTarget->getThreatManager().addThreat(m_casterUnit, unitTarget->getThreatManager().getCurrentVictim()->getThreat());
+        unitTarget->GetThreatManager().addThreat(m_casterUnit, unitTarget->GetThreatManager().getCurrentVictim()->getThreat());
 
         // Patch 1.11 notes
         // https://web.archive.org/web/20061109034626/http://evilempireguild.org:80/guides/kenco2.php
@@ -4161,7 +4161,7 @@ void Spell::EffectTaunt(SpellEffectIndex eff_idx)
         // Of course if other people are generating significant threat on the mob, they could exceed your threat by more than 10 % before the taunt debuff wears off,
         // and will gain aggro as soon as it does.There is no limit to the amount of threat you can gain from Taunt.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        unitTarget->getThreatManager().setCurrentVictimIfCan(m_casterUnit);
+        unitTarget->GetThreatManager().setCurrentVictimIfCan(m_casterUnit);
 #endif
     }
 
@@ -4573,7 +4573,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget || !m_casterUnit)
                         return;
 
-                    m_casterUnit->getThreatManager().modifyThreatPercent(unitTarget, -100);
+                    m_casterUnit->GetThreatManager().modifyThreatPercent(unitTarget, -100);
 
                     return;
                 }
@@ -4928,7 +4928,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     // Select maintank + 4 random targets
                     std::vector<Unit*> viableTargets;
-                    const ThreatList& tl = m_casterUnit->getThreatManager().getThreatList();
+                    const ThreatList& tl = m_casterUnit->GetThreatManager().getThreatList();
                     for (auto it = tl.begin(); it != tl.end(); it++)
                     {
                         if ((*it)->getUnitGuid().IsPlayer())
@@ -4944,7 +4944,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     int num_targets = std::min(int(viableTargets.size()), 5)-1; // leaving 1 target not MCed to avoid reset due to all MCed
 
                     // always MC maintank
-                    if (Unit* maintank = m_casterUnit->getVictim())
+                    if (Unit* maintank = m_casterUnit->GetVictim())
                     {
                         auto it = std::find(viableTargets.begin(), viableTargets.end(), maintank);
                         if (it != viableTargets.end())
@@ -5213,8 +5213,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 if (!unitTarget || !unitTarget->CanHaveThreatList() || !m_casterUnit)
                     return;
                 
-                if (unitTarget->getThreatManager().getThreat(m_casterUnit))
-                    unitTarget->getThreatManager().addThreat(m_casterUnit, damage * m_casterUnit->GetAttackTime(BASE_ATTACK) / 1000);
+                if (unitTarget->GetThreatManager().getThreat(m_casterUnit))
+                    unitTarget->GetThreatManager().addThreat(m_casterUnit, damage * m_casterUnit->GetAttackTime(BASE_ATTACK) / 1000);
             }
             break;
         }
@@ -5232,8 +5232,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget || !unitTarget->CanHaveThreatList() || !m_casterUnit)
                         return;
 
-                    if (unitTarget->getThreatManager().getThreat(m_casterUnit))
-                        unitTarget->getThreatManager().addThreat(m_casterUnit, damage * m_casterUnit->GetAttackTime(BASE_ATTACK) / 1000);
+                    if (unitTarget->GetThreatManager().getThreat(m_casterUnit))
+                        unitTarget->GetThreatManager().addThreat(m_casterUnit, damage * m_casterUnit->GetAttackTime(BASE_ATTACK) / 1000);
                 }
             }
             break;
@@ -5261,7 +5261,7 @@ void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
     unitTarget->InterruptSpellsCastedOnMe(true);
     unitTarget->CombatStop();
 
-    HostileReference* pReference = unitTarget->getHostileRefManager().getFirst();
+    HostileReference* pReference = unitTarget->GetHostileRefManager().getFirst();
 
     while (pReference)
     {
@@ -6384,7 +6384,7 @@ void Spell::EffectModifyThreatPercent(SpellEffectIndex eff_idx)
     if (!unitTarget || !m_casterUnit)
         return;
 
-    unitTarget->getThreatManager().modifyThreatPercent(m_casterUnit, damage);
+    unitTarget->GetThreatManager().modifyThreatPercent(m_casterUnit, damage);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
 }

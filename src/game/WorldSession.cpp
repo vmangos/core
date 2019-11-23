@@ -651,14 +651,14 @@ void WorldSession::LogoutPlayer(bool Save)
         ///- If the player just died before logging out, make him appear as a ghost
         if (inWorld && _player->GetDeathTimer())
         {
-            _player->getHostileRefManager().deleteReferences();
+            _player->GetHostileRefManager().deleteReferences();
             _player->BuildPlayerRepop();
             _player->RepopAtGraveyard();
         }
-        else if (inWorld && _player->isInCombat())
+        else if (inWorld && _player->IsInCombat())
         {
             _player->CombatStop();
-            _player->getHostileRefManager().setOnlineOfflineState(false);
+            _player->GetHostileRefManager().setOnlineOfflineState(false);
         }
         else if (inWorld && _player->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
         {

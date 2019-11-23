@@ -102,7 +102,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
         for (int i = 0; i < 40; i++)
             GUIDs[i] = 0;
 
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
         {
             Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
@@ -116,7 +116,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSoulCorruptionTimer < uiDiff)
@@ -133,8 +133,8 @@ struct npc_twilight_corrupterAI : ScriptedAI
             {
                 if (!pTarget->HasAura(SPELL_CREATURE_OF_NIGHTMARE))
                 {
-                    m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
-                    m_creature->getThreatManager().addThreatDirectly(pTarget, CoNPlayerAggro);
+                    m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
+                    m_creature->GetThreatManager().addThreatDirectly(pTarget, CoNPlayerAggro);
                     CoNPlayerGuid = 0;
                     CoNPlayerAggro = 0;
                 }
@@ -152,7 +152,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
             if (pTarg && pTarg->IsPlayer())
             {
                 CoNPlayerGuid = pTarg->GetGUID();
-                CoNPlayerAggro = m_creature->getThreatManager().getThreat(pTarg);
+                CoNPlayerAggro = m_creature->GetThreatManager().getThreat(pTarg);
                 if (DoCastSpellIfCan(pTarg, SPELL_CREATURE_OF_NIGHTMARE) == CAST_OK)
                     m_uiCreatureOfNightmareTimer = urand(35000, 40000);
             }
@@ -313,7 +313,7 @@ struct npc_commander_felstromAI : ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSuicide_Timer < uiDiff)
@@ -652,12 +652,12 @@ struct npc_stitchesAI : npc_escortAI
                 m_uiLaunchTimer -= uiDiff;            
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiAuraOfRotTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_AURA_OF_ROT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AURA_OF_ROT) == CAST_OK)
                 m_uiAuraOfRotTimer = 3000;
         }
         else

@@ -302,7 +302,7 @@ struct boss_mandokirAI : public ScriptedAI
                     }
 
                     // Ni attaquer.
-                    if ((!m_bTargetActed) && (m_creature->getThreatManager().getThreat(pWatchTarget) > m_fTargetThreat))
+                    if ((!m_bTargetActed) && (m_creature->GetThreatManager().getThreat(pWatchTarget) > m_fTargetThreat))
                         m_bTargetActed = true;
                 }
                 // Le debuff est termine
@@ -370,16 +370,16 @@ struct boss_mandokirAI : public ScriptedAI
 
     void JustSummoned(Creature* pSummoned) override
     {
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             return;
 
         if (pSummoned->GetEntry() == NPC_OHGAN)
-            pSummoned->AI()->AttackStart(m_creature->getVictim());
+            pSummoned->AI()->AttackStart(m_creature->GetVictim());
     }
 
     void MoveInLineOfSight(Unit *pWho) override
     {
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
             return;
 
         if (Player* pPlayer = pWho->ToPlayer())
@@ -398,7 +398,7 @@ struct boss_mandokirAI : public ScriptedAI
             m_fTargetY      = pTarget->GetPositionY();
             m_bTargetMoved = false;
             m_bTargetActed = false;
-            m_fTargetThreat = m_creature->getThreatManager().getThreat(pTarget);
+            m_fTargetThreat = m_creature->GetThreatManager().getThreat(pTarget);
         }
     }
 
@@ -407,7 +407,7 @@ struct boss_mandokirAI : public ScriptedAI
         if (!m_VilebranchDead)
             CheckVilebranchState();
 
-        if (!m_VilebranchDead || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_VilebranchDead || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         CheckRaptor();
@@ -496,12 +496,12 @@ struct boss_mandokirAI : public ScriptedAI
                     {
                         bool bTargetKilled = false;
                         float addAggro = 0;
-                        if (float agro = m_creature->getThreatManager().getThreat(m_creature->getVictim()))
+                        if (float agro = m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
                         {
-                            m_creature->getThreatManager().modifyThreatPercent(pTargetToKill, -100);
+                            m_creature->GetThreatManager().modifyThreatPercent(pTargetToKill, -100);
                             addAggro = agro;
                         }
-                        m_creature->getThreatManager().addThreat(pTargetToKill, (addAggro + 2000));
+                        m_creature->GetThreatManager().addThreat(pTargetToKill, (addAggro + 2000));
                         m_creature->SelectHostileTarget();
 
 
@@ -557,7 +557,7 @@ struct boss_mandokirAI : public ScriptedAI
                 if (m_uiChargeCasted_Timer < diff)
                 {
                     m_bChargeCasted = false;
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
                 }
             }
         }
@@ -618,9 +618,9 @@ struct boss_mandokirAI : public ScriptedAI
         // MORTAL STRIKE
         if (m_uiMortalStrike_Timer < diff)
         {
-            if ((m_uiGlobalCooldown == 0) && (m_creature->getVictim()->GetHealthPercent() < 50.0f))
+            if ((m_uiGlobalCooldown == 0) && (m_creature->GetVictim()->GetHealthPercent() < 50.0f))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
                 {
                     m_uiMortalStrike_Timer = 15000;
                     m_uiGlobalCooldown = 500;
@@ -665,20 +665,20 @@ struct mob_ohganAI : public ScriptedAI
     void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
-            if (m_creature->isInCombat())
+            if (m_creature->IsInCombat())
                 if (Creature* pMandokir = pVictim->FindNearestCreature(NPC_MANDOKIR, 100.0f))
                     pMandokir->AI()->KilledUnit(pVictim);
     }
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // SunderArmor_Timer
         if (SunderArmor_Timer <= diff)
         {
-            DoCast(me->getVictim(), SPELL_SUNDERARMOR);
+            DoCast(me->GetVictim(), SPELL_SUNDERARMOR);
             SunderArmor_Timer = 10000 + rand() % 5000;
         }
         else
@@ -694,11 +694,11 @@ struct mob_ohganAI : public ScriptedAI
             Thrash_Timer -= diff;
 
         // Execute_Timer
-        if (me->getVictim()->GetHealth() <= me->getVictim()->GetMaxHealth() * 0.2f)  // check health first
+        if (me->GetVictim()->GetHealth() <= me->GetVictim()->GetMaxHealth() * 0.2f)  // check health first
         {
             if (Execute_Timer <= diff)
             {
-                DoCast(me->getVictim(), SPELL_EXECUTE);
+                DoCast(me->GetVictim(), SPELL_EXECUTE);
                 Execute_Timer = 10000;
             }
             else
@@ -813,7 +813,7 @@ struct mob_vilebrancheAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

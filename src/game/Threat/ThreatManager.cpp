@@ -74,14 +74,14 @@ HostileReference::HostileReference(Unit* pUnit, ThreatManager *pThreatManager, f
 // Tell our refTo (target) object that we have a link
 void HostileReference::targetObjectBuildLink()
 {
-    getTarget()->addHatedBy(this);
+    getTarget()->AddHatedBy(this);
 }
 
 //============================================================
 // Tell our refTo (taget) object, that the link is cut
 void HostileReference::targetObjectDestroyLink()
 {
-    getTarget()->removeHatedBy(this);
+    getTarget()->RemoveHatedBy(this);
 }
 
 //============================================================
@@ -309,7 +309,7 @@ HostileReference* ThreatContainer::selectNextVictim(Creature* pAttacker, Hostile
 
             bool outOfThreatArea = pAttacker->IsOutOfThreatArea(target);
             bool validAttackTarget = pAttacker->IsValidAttackTarget(target);
-            bool targetableForAttack = target->isTargetableForAttack();
+            bool targetableForAttack = target->IsTargetableForAttack();
 
             if (outOfThreatArea)
                 return nullptr;

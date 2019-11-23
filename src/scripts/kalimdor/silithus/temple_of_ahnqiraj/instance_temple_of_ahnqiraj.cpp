@@ -816,7 +816,7 @@ struct AI_QirajiMindslayer : public ScriptedAI {
     void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->IsNonMeleeSpellCasted()) { // prevents re-targetting of topaggro from happening while channeling mindflay
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
         }
             

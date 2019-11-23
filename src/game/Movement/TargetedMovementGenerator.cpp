@@ -159,7 +159,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         if (dist > 15.0f)
         {
             Unit* pOwner = owner.GetCharmerOrOwner();
-            if (pOwner && !pOwner->isInCombat() && !owner.isInCombat())
+            if (pOwner && !pOwner->IsInCombat() && !owner.IsInCombat())
             {
                 float distFactor = 1.0f;
                 if (pOwner->IsMounted())
@@ -420,7 +420,7 @@ void ChaseMovementGenerator<T>::DoSpreadIfNeeded(T &owner, Unit* target)
     // there's enough of them.
     Unit* pSpreadingTarget = nullptr;
 
-    for (auto& attacker : target->getAttackers())
+    for (auto& attacker : target->GetAttackers())
     {
         if (attacker->IsCreature() && (attacker != &owner) &&
             (owner.GetObjectBoundingRadius() - 2.0f < attacker->GetObjectBoundingRadius()) &&
@@ -443,7 +443,7 @@ void ChaseMovementGenerator<T>::DoSpreadIfNeeded(T &owner, Unit* target)
     float const new_angle = (his_angle > my_angle) ? my_angle - frand(0.4f, 1.0f) : my_angle + frand(0.4f, 1.0f);
     
     float x, y, z;
-    target->GetNearPoint(&owner, x, y, z, owner.GetObjectBoundingRadius(), frand(0.8f, (target->getAttackers().size() > 5 ? 4.0f : 2.0f)), new_angle);
+    target->GetNearPoint(&owner, x, y, z, owner.GetObjectBoundingRadius(), frand(0.8f, (target->GetAttackers().size() > 5 ? 4.0f : 2.0f)), new_angle);
 
     // Don't move beyond attack range.
     if (!owner.CanReachWithMeleeAutoAttackAtPosition(target, x, y, z, 0.0f))

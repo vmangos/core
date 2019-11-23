@@ -282,7 +282,7 @@ struct boss_vaelAI : public ScriptedAI
                 m_uiIntroTimer -= uiDiff;
         }
 
-        if (!m_creature->isInCombat() && !m_bFlagSet)
+        if (!m_creature->IsInCombat() && !m_bFlagSet)
         {
             if (m_uiInitTimer < uiDiff)
             {
@@ -356,7 +356,7 @@ struct boss_vaelAI : public ScriptedAI
         }
 
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Burning Adrenaline Caster Timer
@@ -364,7 +364,7 @@ struct boss_vaelAI : public ScriptedAI
         if (m_uiBurningAdrenalineCasterTimer < uiDiff)
         {
             std::vector<ObjectGuid> vPossibleVictim;
-            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
             {
                 Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
@@ -386,9 +386,9 @@ struct boss_vaelAI : public ScriptedAI
         {
             // have the victim cast the spell on himself otherwise the third effect aura will be applied
             // to Vael instead of the player
-            if (m_creature->getVictim() && !m_creature->getVictim()->HasAura(SPELL_BURNING_ADRENALINE) && m_creature->getVictim()->IsAlive())
+            if (m_creature->GetVictim() && !m_creature->GetVictim()->HasAura(SPELL_BURNING_ADRENALINE) && m_creature->GetVictim()->IsAlive())
             {
-                m_creature->getVictim()->CastSpell(m_creature->getVictim(), SPELL_BURNING_ADRENALINE, true);
+                m_creature->GetVictim()->CastSpell(m_creature->GetVictim(), SPELL_BURNING_ADRENALINE, true);
                 m_uiBurningAdrenalineTankTimer = 45000;
             }
         }
@@ -405,7 +405,7 @@ struct boss_vaelAI : public ScriptedAI
         // Cleave Timer
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(5000, 10000);
         }
         else
@@ -414,7 +414,7 @@ struct boss_vaelAI : public ScriptedAI
         // Flame Breath Timer
         if (m_uiFlameBreathTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BREATH) == CAST_OK)
                 m_uiFlameBreathTimer = urand(5000, 10000);
         }
         else
@@ -557,11 +557,11 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *pUnit) override
     {
-        if (!pUnit || m_creature->getVictim())
+        if (!pUnit || m_creature->GetVictim())
             return;
 
         if (pUnit->IsPlayer() && m_creature->GetDistance2d(pUnit) < 29.0f && m_creature->IsWithinLOSInMap(pUnit)
-          && pUnit->isTargetableForAttack() && pUnit->isInAccessablePlaceFor(m_creature))
+          && pUnit->IsTargetableForAttack() && pUnit->isInAccessablePlaceFor(m_creature))
             AttackStart(pUnit);
     }
 
@@ -607,14 +607,14 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         SetAuraFlames(true);
 
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE2) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE2) == CAST_OK)
                 m_uiCleaveTimer = urand(4000, 8000);
         }
         else
@@ -694,7 +694,7 @@ struct npc_death_talon_SeetherAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiFrenzyTimer < uiDiff)
@@ -709,14 +709,14 @@ struct npc_death_talon_SeetherAI : public ScriptedAI
 
         if (!m_bEngaged)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
                 m_bEngaged = true;
         }
         else
         {
             if (m_uiFlameBuffetTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
                     m_uiFlameBuffetTimer = urand(8000, 12000);
             }
             else m_uiFlameBuffetTimer -= uiDiff;

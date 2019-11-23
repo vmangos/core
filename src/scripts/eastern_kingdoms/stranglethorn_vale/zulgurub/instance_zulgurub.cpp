@@ -151,11 +151,11 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
             if (uiData == IN_PROGRESS)
             {
                 Creature *Marli = instance->GetCreature(m_uiMarliGUID);
-                Unit* pVictim = Marli->getVictim();
+                Unit* pVictim = Marli->GetVictim();
                 for (std::list<uint64>::const_iterator itr = m_lMarliTrashGUIDList.begin(); itr != m_lMarliTrashGUIDList.end(); itr++)
                 {
                     if (Creature* MarliTrash = instance->GetCreature(*itr))
-                        if (MarliTrash->IsAlive() && !MarliTrash->isInCombat())
+                        if (MarliTrash->IsAlive() && !MarliTrash->IsInCombat())
                             if (MarliTrash->GetMapId() == 309 && MarliTrash->GetZoneId() == 1977 && MarliTrash->GetAreaId() == 3379)
                                 MarliTrash->AI()->AttackStart(pVictim);
                 }

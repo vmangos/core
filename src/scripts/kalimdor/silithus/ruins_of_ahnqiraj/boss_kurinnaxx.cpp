@@ -91,7 +91,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
     {
         if (!m_bHasEnraged && ((m_creature->GetHealth() * 100) / m_creature->GetMaxHealth()) <= 30 && !m_creature->IsNonMeleeSpellCasted(false))
         {
-            DoCast(m_creature->getVictim(), SPELL_ENRAGE);
+            DoCast(m_creature->GetVictim(), SPELL_ENRAGE);
             m_bHasEnraged = true;
         }
     }
@@ -110,13 +110,13 @@ struct boss_kurinnaxxAI : public ScriptedAI
         else
             m_uiCleanSandTrap_Timer -= uiDiff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         /* Moral wound */
         if (m_uiMortalWound_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALWOUND) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALWOUND) == CAST_OK)
                 m_uiMortalWound_Timer = 9000;
         }
         else
@@ -139,7 +139,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         /* WideSlash */
         if (m_uiWideSlash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WIDE_SLASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WIDE_SLASH) == CAST_OK)
                 m_uiWideSlash_Timer = 10000 + (rand() % 10000);
         }
         else
@@ -166,7 +166,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         /* Trash */
         if (m_uiTrash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRASH) == CAST_OK)
                 m_uiTrash_Timer = 10000 + (rand() % 10000);
         }
         else

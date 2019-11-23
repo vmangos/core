@@ -203,14 +203,14 @@ struct boss_arlokkAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!m_bIsPhaseTwo && !m_bIsVanished) //P1
         {
             if (m_uiShadowWordPain_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWWORDPAIN) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWWORDPAIN) == CAST_OK)
                     m_uiShadowWordPain_Timer = 15000;
             }
             else
@@ -218,7 +218,7 @@ struct boss_arlokkAI : public ScriptedAI
 
             if (m_uiBackstab_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKSTAB) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKSTAB) == CAST_OK)
                     m_uiBackstab_Timer = urand(6000, 12000);
             }
             else
@@ -257,7 +257,7 @@ struct boss_arlokkAI : public ScriptedAI
         {
             if (m_uiThrash_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ROSSER) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ROSSER) == CAST_OK)
                     m_uiThrash_Timer = urand(5000, 9000);
             }
             else
@@ -266,7 +266,7 @@ struct boss_arlokkAI : public ScriptedAI
             // Ravage Timer
             if (m_uiRavage_Timer <= uiDiff)
             {
-                if (DoCastSpellIfCan(me->getVictim(), SPELL_RAVAGE) == CAST_OK)
+                if (DoCastSpellIfCan(me->GetVictim(), SPELL_RAVAGE) == CAST_OK)
                     m_uiRavage_Timer = 16000;
             }
             else
@@ -275,10 +275,10 @@ struct boss_arlokkAI : public ScriptedAI
             //Gouge_Timer
             if (m_uiGouge_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GOUGE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_GOUGE) == CAST_OK)
                 {
-                    if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -80);
+                    if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                        m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -80);
 
                     m_uiGouge_Timer = urand(17000, 27000);
                 }
@@ -288,7 +288,7 @@ struct boss_arlokkAI : public ScriptedAI
 
             if (m_uiTourbillon_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TOURBILLON) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TOURBILLON) == CAST_OK)
                     m_uiTourbillon_Timer = 16000;
             }
             else
@@ -419,8 +419,8 @@ struct mob_prowlerAI : public ScriptedAI
                 m_creature->AddObjectToRemoveList();
                 return;
             }
-            if (DoGetThreat(m_creature->getVictim()))
-                DoModifyThreatPercent(m_creature->getVictim(), -100);
+            if (DoGetThreat(m_creature->GetVictim()))
+                DoModifyThreatPercent(m_creature->GetVictim(), -100);
             if (pMarkedTarget)
             {
                 

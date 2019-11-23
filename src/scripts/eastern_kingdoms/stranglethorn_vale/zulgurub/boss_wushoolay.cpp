@@ -45,13 +45,13 @@ struct boss_wushoolayAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //LightningCloud_Timer
         if (LightningCloud_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_LIGHTNINGCLOUD);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_LIGHTNINGCLOUD);
             LightningCloud_Timer = urand(15000, 20000);
         }
         else LightningCloud_Timer -= diff;
