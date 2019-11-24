@@ -60,7 +60,7 @@ struct boss_huhuranAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         
-        if (m_creature->canAttack(pWho)
+        if (m_creature->CanAttack(pWho)
             && !m_creature->IsInCombat()
             && m_creature->IsWithinDistInMap(pWho, 80.0f) 
             && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))

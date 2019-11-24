@@ -19245,7 +19245,7 @@ bool Player::IsHonorOrXPTarget(Unit* pVictim) const
 
 void Player::RewardSinglePlayerAtKill(Unit* pVictim)
 {
-    bool PvP = pVictim->isCharmedOwnedByPlayerOrPlayer();
+    bool PvP = pVictim->IsCharmedOwnedByPlayerOrPlayer();
 
     uint32 xp = PvP ? 0 : MaNGOS::XP::Gain(this, pVictim);
 
@@ -21028,7 +21028,7 @@ void Player::RewardHonorOnDeath()
     uint32 totalDamage = 0;
     std::map<Group*, uint32> damagePerGroup;
     std::map<Player*, uint32> damagePerAlonePlayer;
-    for (auto itr : _damageTakenHistory)
+    for (auto itr : m_damageTakenHistory)
     {
         totalDamage += itr.second;
         if (Player* attacker = GetMap()->GetPlayer(itr.first))
@@ -21042,7 +21042,7 @@ void Player::RewardHonorOnDeath()
 
     if (!totalDamage)
     {
-        _damageTakenHistory.clear();
+        m_damageTakenHistory.clear();
         return;
     }
 
@@ -21084,7 +21084,7 @@ void Player::RewardHonorOnDeath()
             rewItr.first->GetHonorMgr().Add(rewPoints, HONORABLE, this);
     }
 
-    _damageTakenHistory.clear();
+    m_damageTakenHistory.clear();
 }
 
 void Player::OnReceivedItem(Item* item)

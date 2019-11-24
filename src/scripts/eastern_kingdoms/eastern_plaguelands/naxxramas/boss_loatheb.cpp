@@ -94,7 +94,7 @@ struct mob_rottingMaggotAI : public ScriptedAI
 
         if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
                 m_creature->SetNoCallAssistance(true);
 
@@ -169,7 +169,7 @@ struct mob_eyeStalkAI : public ScriptedAI
 
         if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
                 m_creature->SetNoCallAssistance(true);
                 if (!m_creature->GetVictim())

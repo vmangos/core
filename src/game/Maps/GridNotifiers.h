@@ -777,7 +777,7 @@ namespace MaNGOS
             bool operator()(Unit* u)
             {
                 if(u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    (u->isCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT)))
+                    (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT)))
                 {
                     return true;
                 }
@@ -1457,7 +1457,7 @@ namespace MaNGOS
                 if (!me->IsWithinDistInMap(u, m_range))
                     return false;
 
-                if (!me->canAttack(u))
+                if (!me->CanAttack(u))
                     return false;
 
                 m_range = me->GetDistance(u);   // use found unit range as new range limit for next check
@@ -1524,7 +1524,7 @@ namespace MaNGOS
 
                 if (m_force)
                 {
-                    if (!me->canAttack(u))
+                    if (!me->CanAttack(u))
                         return false;
                 }
                 else

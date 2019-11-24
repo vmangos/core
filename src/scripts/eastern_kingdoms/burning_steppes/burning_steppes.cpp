@@ -44,7 +44,7 @@ struct npc_ragged_johnAI : public ScriptedAI
     {
         if (who->HasAura(16468, EFFECT_INDEX_0))
         {
-            if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 15) && who->isInAccessablePlaceFor(m_creature))
+            if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 15) && who->IsInAccessablePlaceFor(m_creature))
             {
                 DoCastSpellIfCan(who, 16472);
                 ((Player*)who)->AreaExploredOrEventHappens(4866);

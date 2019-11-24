@@ -377,6 +377,14 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         /*********************************************************/
 
     protected:
+        float m_createStats[MAX_STATS];
+        int32 m_createResistances[MAX_SPELL_SCHOOL];
+        float m_auraModifiersGroup[UNIT_MOD_END][MODIFIER_TYPE_END];
+        WeaponDamageInfo m_weaponDamage[MAX_ATTACK][MAX_ITEM_PROTO_DAMAGES];
+        uint8 m_weaponDamageCount[MAX_ATTACK];
+        bool m_canModifyStats;
+        int32 m_regenTimer;
+
         void SetCreateStat(Stats stat, float val) { m_createStats[stat] = val; }
         void SetCreateHealth(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_HEALTH, val); }
         void SetCreateMana(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_MANA, val); }
@@ -483,6 +491,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetWeaponDamageSchool(WeaponAttackType attType, SpellSchools school, uint8 index = 0) { m_weaponDamage[attType][index].school = school; }
         uint8 GetWeaponDamageCount(WeaponAttackType attType) const { return m_weaponDamageCount[attType]; }
 
+    private:
+        ComboPointHolderSet m_ComboPointHolders;
+    public:
         void AddComboPointHolder(uint32 lowguid) { m_ComboPointHolders.insert(lowguid); }
         void RemoveComboPointHolder(uint32 lowguid) { m_ComboPointHolders.erase(lowguid); }
         void ClearComboPointHolders();
@@ -491,10 +502,22 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         /***                   STATE SYSTEM                    ***/
         /*********************************************************/
 
-        void AddUnitState(uint32 f) { m_state |= f; }
-        bool HasUnitState(uint32 f) const { return m_state & f; }
-        void ClearUnitState(uint32 f) { m_state &= ~f; }
-        uint32 GetUnitState() const { return m_state; }
+    private:
+        uint32 m_stateFlags; // Even derived shouldn't modify
+        bool m_AINotifyScheduled;
+    protected:
+        DeathState m_deathState;
+        uint32 m_transform;
+        float m_modelCollisionHeight;
+        bool m_isCreatureLinkingTrigger;
+        bool m_isSpawningLinked;
+        float m_nativeScale = 1.0f;
+        float m_nativeScaleOverride = 1.0f;
+    public:
+        void AddUnitState(uint32 f) { m_stateFlags |= f; }
+        bool HasUnitState(uint32 f) const { return m_stateFlags & f; }
+        void ClearUnitState(uint32 f) { m_stateFlags &= ~f; }
+        uint32 GetUnitState() const { return m_stateFlags; }
         void UpdateControl();
         bool CanFreeMove() const { return !HasUnitState(UNIT_STAT_NO_FREE_MOVE) && !GetOwnerGuid(); }
         uint32 GetCreatureType() const;
@@ -547,8 +570,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void UpdateModelData(); // at any changes to scale and/or displayId
         void InitPlayerDisplayIds();
         void DeMorph();
-        uint32 GetFactionTemplateId() const final { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
-        void SetFactionTemplateId(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction); }
 
         bool IsVendor()       const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR ); }
         bool IsTrainer()      const { return HasFlag( UNIT_NPC_FLAGS, UNIT_NPC_FLAG_TRAINER ); }
@@ -602,6 +623,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         /***                VISIBILITY SYSTEM                  ***/
         /*********************************************************/
 
+    private:
+        UnitVisibility m_Visibility;
+        Position m_last_notified_position;
     public:
         uint32 m_detectInvisibilityMask;
         uint32 m_invisibilityMask;
@@ -626,7 +650,23 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         /***                   SPELL SYSTEM                    ***/
         /*********************************************************/
 
+    private:
+        Diminishing m_Diminishing;
     protected:
+        SpellAuraHolderMap m_spellAuraHolders;
+        SpellAuraHolderMap::iterator m_spellAuraHoldersUpdateIterator; // != end() in Unit::m_spellAuraHolders update and point to next element
+        AuraList m_deletedAuras;                                       // auras removed while in ApplyModifier and waiting deleted
+        SpellAuraHolderList m_deletedHolders;
+        SingleCastSpellTargetMap m_singleCastSpellTargets;  // casted by unit single per-caster auras
+        typedef std::list<GameObject*> GameObjectList;
+        GameObjectList m_gameObj;
+        AuraList m_modAuras[TOTAL_AURAS];
+        uint32 m_lastManaUseSpellId;
+        uint32 m_lastManaUseTimer;
+        uint32 m_spellUpdateTimeBuffer;
+        SpellCooldowns m_spellCooldowns;
+        GlobalCooldownMgr m_GlobalCooldownMgr;
+
         void _UpdateSpells(uint32 time);
         void _UpdateAutoRepeatSpell();
 
@@ -691,6 +731,14 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void AddPetAura(PetAura const* petSpell);
         void RemovePetAura(PetAura const* petSpell);
 
+        // Apply SpellEffects::EffectSummonPet after ressurecting in BG.
+        ObjectGuid EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLevel);
+        void ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode = AURA_REMOVE_BY_DEFAULT);
+
+    private:
+        void CleanupDeletedAuras();
+
+    public:
         // removing specific aura stack
         void RemoveAura(Aura* aura, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveAura(uint32 spellId, SpellEffectIndex effindex, Aura* except = nullptr);
@@ -748,6 +796,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid m_ObjectSlotGuid[4];
 
         uint32 m_lastSanctuaryTime; // Used by SPELL_EFFECT_SANCTUARY.
+        bool m_AutoRepeatFirstCast; // auto shoot and wand
 
         SingleCastSpellTargetMap      & GetSingleCastSpellTargets() { return m_singleCastSpellTargets; }
         SingleCastSpellTargetMap const& GetSingleCastSpellTargets() const { return m_singleCastSpellTargets; }
@@ -893,6 +942,24 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         /***                  COMBAT SYSTEM                    ***/
         /*********************************************************/
 
+    private:
+        uint32 m_CombatTimer;
+        uint32 m_extraAttacks;
+        bool m_extraMute;
+        bool m_doExtraAttacks;
+        float m_meleeZLimit;
+        float m_meleeZReach;
+        ThreatManager m_ThreatManager; // Manage all Units threatening us
+        HostileRefManager m_HostileRefManager; // Manage all Units that are threatened by us
+    protected:
+        uint32 m_attackTimer[MAX_ATTACK];
+        AttackerSet m_attackers;
+        Unit* m_attacking;
+        uint32 m_reactiveTimer[MAX_REACTIVE];
+        ObjectGuid m_reactiveTarget[MAX_REACTIVE];
+        typedef std::map<ObjectGuid /*attackerGuid*/, uint32 /*damage*/ > DamageTakenHistoryMap;
+        DamageTakenHistoryMap   m_damageTakenHistory;
+        uint32                  m_lastDamageTaken;
     public:
         /**
          * Updates the attack time for the given WeaponAttackType
@@ -979,6 +1046,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         float MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) const;
         void CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo *damageInfo, WeaponAttackType attackType = BASE_ATTACK);
+        void UnitDamaged(ObjectGuid from, uint32 damage) { m_damageTakenHistory[from] += damage; m_lastDamageTaken = 0; }
         void DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss);
         uint32 CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index = 0) const;
         uint32 MeleeDamageBonusTaken(WorldObject* pCaster, uint32 pdamage, WeaponAttackType attType, SpellEntry const *spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
@@ -994,6 +1062,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void ExtraAttacksLocked(bool mute) { m_extraMute = mute; }
         void AddExtraAttackOnUpdate() { m_doExtraAttacks = true; };
 
+        bool CanAttack(Unit const* target, bool force = false) const;
         bool IsValidAttackTarget(Unit const* target) const final;
         bool IsTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
         bool IsAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
@@ -1004,6 +1073,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float GetMeleeReach() const;
         float GetCombatReach(bool forMeleeRange /*=true*/) const;
         float GetCombatReach(Unit const* pVictim, bool ability, float flat_mod) const;
+        void SetMeleeZLimit(float newZLimit) { m_meleeZLimit = newZLimit; }
+        float GetMeleeZLimit() const { return m_meleeZLimit; }
+        void SetMeleeZReach(float newZReach) { m_meleeZReach = newZReach; }
+        float GetMeleeZReach() const { return m_meleeZReach; }
         void GetRandomAttackPoint(Unit const* target, float &x, float &y, float &z) const;
 
         /**
@@ -1132,6 +1205,20 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         /***                 RELATIONS SYSTEM                  ***/
         /*********************************************************/
 
+    private:
+        Unit* _GetTotem(TotemSlot slot) const;              // for templated function without include need
+        Pet* _GetPet(ObjectGuid guid) const;                // for templated function without include need
+        FollowerRefManager m_FollowingRefManager;
+        GuardianPetList m_guardianPets;
+        ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
+    protected:
+        CharmInfo *m_charmInfo;
+        ObjectGuid m_possessorGuid; // Guid of unit possessing this one
+    public:
+        uint32 GetFactionTemplateId() const final { return GetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE); }
+        void SetFactionTemplateId(uint32 faction) { SetUInt32Value(UNIT_FIELD_FACTIONTEMPLATE, faction); }
+        void RestoreFaction();
+
         bool IsHostileTo(WorldObject const* target) const override;
         bool IsHostileToPlayers() const;
         bool IsFriendlyTo(WorldObject const* target) const override;
@@ -1143,33 +1230,63 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
             return false;
         }
+        bool IsInPartyWith(Unit const* unit) const;
+        bool IsInRaidWith(Unit const* unit) const;
+
         bool IsPvP() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); }
         void SetPvP(bool state);
         bool IsPvPContested() const;
         void SetPvPContested(bool state);
-        bool isPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }
+        bool IsPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }
 
-        ObjectGuid const& GetOwnerGuid() const { return  GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
-        void SetOwnerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_SUMMONEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
-        ObjectGuid const& GetCreatorGuid() const { return GetGuidValue(UNIT_FIELD_CREATEDBY); }
-        void SetCreatorGuid(ObjectGuid creator) { SetGuidValue(UNIT_FIELD_CREATEDBY, creator); }
-        ObjectGuid const& GetPetGuid() const { return GetGuidValue(UNIT_FIELD_SUMMON); }
-        void SetPetGuid(ObjectGuid pet) { SetGuidValue(UNIT_FIELD_SUMMON, pet); }
-        ObjectGuid const& GetCharmerGuid() const { return GetGuidValue(UNIT_FIELD_CHARMEDBY); }
-        void SetCharmerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
-        ObjectGuid const& GetCharmGuid() const { return GetGuidValue(UNIT_FIELD_CHARM); }
-        void SetCharmGuid(ObjectGuid charm) { SetGuidValue(UNIT_FIELD_CHARM, charm); }
-        ObjectGuid const& GetTargetGuid() const { return GetGuidValue(UNIT_FIELD_TARGET); }
         void SetTargetGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_TARGET, targetGuid); }
+        ObjectGuid const& GetTargetGuid() const { return GetGuidValue(UNIT_FIELD_TARGET); }
         void ClearTarget() { SetTargetGuid(ObjectGuid()); }
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
-        ObjectGuid const& GetPossessorGuid() const { return m_possessorGuid; }
-        void SetPossessorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
+        CharmInfo* GetCharmInfo() const { return m_charmInfo; }
+        CharmInfo* InitCharmInfo(Unit* charm);
 
-        virtual Pet* GetMiniPet() const { return nullptr; }    // overwrited in Player
+        Unit* GetOwner() const;
+        ObjectGuid const& GetOwnerGuid() const { return  GetGuidValue(UNIT_FIELD_SUMMONEDBY); }
+        void SetOwnerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_SUMMONEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
+        ObjectGuid const& GetCreatorGuid() const { return GetGuidValue(UNIT_FIELD_CREATEDBY); }
+        void SetCreatorGuid(ObjectGuid creator) { SetGuidValue(UNIT_FIELD_CREATEDBY, creator); }
+        
+        ObjectGuid const& GetPetGuid() const { return GetGuidValue(UNIT_FIELD_SUMMON); }
+        void SetPetGuid(ObjectGuid pet) { SetGuidValue(UNIT_FIELD_SUMMON, pet); }
+        Pet* GetPet() const;
+        void SetPet(Pet* pet);
+        virtual Pet* GetMiniPet() const { return nullptr; }    // overwritten in Player
+        bool UnsummonOldPetBeforeNewSummon(uint32 newPetEntry);
 
+        // Pet responses methods
+        void SendPetCastFail(uint32 spellid, SpellCastResult msg);
+        void SendPetActionFeedback(uint8 msg);
+        void SendPetTalk(uint32 pettalk);
+        void SendPetAIReaction();
+
+        void AddGuardian(Pet* pet);
+        void RemoveGuardian(Pet* pet);
+        void RemoveGuardians();
+        void RemoveGuardiansWithEntry(uint32 entry);
+        Pet* FindGuardianWithEntry(uint32 entry);
+        uint32 GetGuardianCountWithEntry(uint32 entry);
+
+        ObjectGuid const& GetTotemGuid(TotemSlot slot) const { return m_TotemSlot[slot]; }
+        Totem* GetTotem(TotemSlot slot) const;
+        bool IsAllTotemSlotsUsed() const;
+        void _AddTotem(TotemSlot slot, Totem* totem);       // only for call from Totem summon code
+        void _RemoveTotem(Totem* totem);                    // only for call from Totem class
+        void UnsummonAllTotems();
+
+        Unit* GetCharmer() const;
+        ObjectGuid const& GetCharmerGuid() const { return GetGuidValue(UNIT_FIELD_CHARMEDBY); }
+        void SetCharmerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
+        bool IsCharmed() const { return !GetCharmerGuid().IsEmpty(); }
+        bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
+        bool IsCharmedOwnedByPlayerOrPlayer() const { return GetCharmerOrOwnerOrOwnGuid().IsPlayer(); }
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return GetCharmerGuid() ? GetCharmerGuid() : GetOwnerGuid(); }
         ObjectGuid const& GetCharmerOrOwnerOrOwnGuid() const
         {
@@ -1177,16 +1294,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
                 return guid;
             return GetObjectGuid();
         }
-        bool isCharmedOwnedByPlayerOrPlayer() const { return GetCharmerOrOwnerOrOwnGuid().IsPlayer(); }
-
-        Player* GetSpellModOwner() const;
-        Unit* GetOwner() const;
-        Pet* GetPet() const;
-        Unit* GetCharmer() const;
-        Player* GetPossessor() const;
-        Unit* GetCharm() const;
-        void Uncharm();
-        void RemoveCharmAuras();
+        Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
         Unit* GetCharmerOrOwner() const { return GetCharmerGuid() ? GetCharmer() : GetOwner(); }
         Unit* GetCharmerOrOwnerOrSelf()
         {
@@ -1197,93 +1305,50 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         }
         Unit const* GetCharmerOrOwnerOrSelf() const
         {
-            Unit const*u = GetCharmerOrOwner();
+            Unit const* u = GetCharmerOrOwner();
             return u ? u : this;
         }
 
-        bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
-        Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
+        Unit* GetCharm() const;
+        void SetCharm(Unit* pet);
+        void Uncharm();
+        void RemoveCharmAuras();
+        ObjectGuid const& GetCharmGuid() const { return GetGuidValue(UNIT_FIELD_CHARM); }
+        void SetCharmGuid(ObjectGuid charm) { SetGuidValue(UNIT_FIELD_CHARM, charm); }
+
+        Player* GetSpellModOwner() const;
         Player* GetAffectingPlayer() const final;
 
-        void SetPet(Pet* pet);
-        void SetCharm(Unit* pet);
-
-        void RestoreFaction();
-        bool canAttack(Unit const* target, bool force = false) const;
-
-        void AddGuardian(Pet* pet);
-        void RemoveGuardian(Pet* pet);
-        void RemoveGuardians();
-        void RemoveGuardiansWithEntry(uint32 entry);
-        Pet* FindGuardianWithEntry(uint32 entry);
-        uint32 GetGuardianCountWithEntry(uint32 entry);
-
-        bool isCharmed() const { return !GetCharmerGuid().IsEmpty(); }
-
-        CharmInfo* GetCharmInfo() const { return m_charmInfo; }
-        CharmInfo* InitCharmInfo(Unit* charm);
-
-        ObjectGuid const& GetTotemGuid(TotemSlot slot) const { return m_TotemSlot[slot]; }
-        Totem* GetTotem(TotemSlot slot) const;
-        bool IsAllTotemSlotsUsed() const;
-
-        void _AddTotem(TotemSlot slot, Totem* totem);       // only for call from Totem summon code
-        void _RemoveTotem(Totem* totem);                    // only for call from Totem class
-
-        void UnsummonAllTotems();
-        bool UnsummonOldPetBeforeNewSummon(uint32 newPetEntry);
-
+        Player* GetPossessor() const;
+        ObjectGuid const& GetPossessorGuid() const { return m_possessorGuid; }
+        void SetPossessorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
+        
         template<typename Func>
         void CallForAllControlledUnits(Func const& func, uint32 controlledMask);
         template<typename Func>
         bool CheckAllControlledUnits(Func const& func, uint32 controlledMask) const;
 
-        void addFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }
-        void removeFollower(FollowerReference* /*pRef*/) { /* nothing to do yet */ }
-
-        bool IsInPartyWith(Unit const* unit) const;
-        bool IsInRaidWith(Unit const* unit) const;
-
-        ///----------Pet responses methods-----------------
-        void SendPetCastFail(uint32 spellid, SpellCastResult msg);
-        void SendPetActionFeedback(uint8 msg);
-        void SendPetTalk(uint32 pettalk);
-        void SendPetAIReaction();
-        ///----------End of Pet responses methods----------
-
-        // Apply SpellEffects::EffectSummonPet after ressurecting in BG.
-        ObjectGuid EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLevel);
-        void ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode = AURA_REMOVE_BY_DEFAULT);
-
+        void AddFollower(FollowerReference* pRef) { m_FollowingRefManager.insertFirst(pRef); }
+        void RemoveFollower(FollowerReference* /*pRef*/) { /* nothing to do yet */ }
 
         /*********************************************************/
         /***                 MOVEMENT SYSTEM                   ***/
         /*********************************************************/
-
-        virtual bool IsInWater() const;
-        virtual bool IsUnderWater() const;
-        bool IsReachableBySwmming() const;
-        bool isInAccessablePlaceFor(Creature const* c) const;
-        
-        void NearTeleportTo(float x, float y, float z, float orientation, uint32 teleportOptions = TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-        void NearLandTo(float x, float y, float z, float orientation);
-        void TeleportPositionRelocation(float x, float y, float z, float o);
-        void MonsterMoveWithSpeed(float x, float y, float z, float o, float speed, uint32 options);
-        void MonsterMove(float x, float y, float z);
-
-        void SendHeartBeat(bool includingSelf = true);
-        virtual void SetFly(bool enable);
-        void SetWalk(bool enable, bool asDefault = true);
 
     private:
         // when a player controls this unit, and when change is made to this unit which requires an ack from the client to be acted (change of speed for example), this movementCounter is incremented
         uint32 m_movementCounter = 0;
         std::deque<PlayerMovementPendingChange> m_pendingMovementChanges;
         std::map<MovementChangeType, uint32> m_lastMovementChangeCounterPerType;
-
+        float m_casterChaseDistance;
+        float m_speed_rate[MAX_MOVE_TYPE];
+        void UpdateSplineMovement(uint32 t_diff);
+    protected:
+        MotionMaster i_motionMaster;
     public:
-        std::deque<PlayerMovementPendingChange>& GetPendingMovementChangesQueue()  { return m_pendingMovementChanges; }
-
+        void SendHeartBeat(bool includingSelf = true);
+        virtual void SetFly(bool enable);
+        
         void SetRooted(bool apply);
         void SetRootedReal(bool apply);
         bool IsRooted() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_ROOT); }
@@ -1329,14 +1394,23 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool FindPendingMovementSpeedChange(float speedReceived, uint32 movementCounter, UnitMoveType moveType);
         void CheckPendingMovementChanges();
 
+        void SetWalk(bool enable, bool asDefault = true);
         void SetSpeedRate(UnitMoveType mtype, float rate);
         void SetSpeedRateReal(UnitMoveType mtype, float rate);
-        void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
+        void UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
         float GetSpeed(UnitMoveType mtype) const;
         float GetXZFlagBasedSpeed() const;
         float GetXZFlagBasedSpeed(uint32 moveFlags) const;
         float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
+        void PropagateSpeedChange() { GetMotionMaster()->PropagateSpeedChange(); }
 
+        // Terrain checks
+        virtual bool IsInWater() const;
+        virtual bool IsUnderWater() const;
+        bool IsReachableBySwmming() const;
+        bool IsInAccessablePlaceFor(Creature const* c) const;
+
+        // Inhabit type checks
         virtual bool CanWalk() const = 0;
         virtual bool CanFly() const = 0;
         virtual bool CanSwim() const = 0;
@@ -1348,20 +1422,21 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
         MotionMaster const* GetMotionMaster() const { return &i_motionMaster; }
-
+        void RestoreMovement();
+        void NearTeleportTo(float x, float y, float z, float orientation, uint32 teleportOptions = TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+        void NearLandTo(float x, float y, float z, float orientation);
+        void TeleportPositionRelocation(float x, float y, float z, float o);
+        void MonsterMoveWithSpeed(float x, float y, float z, float o, float speed, uint32 options);
+        void MonsterMove(float x, float y, float z);
         bool IsStopped() const { return !(HasUnitState(UNIT_STAT_MOVING)); }
         void StopMoving(bool force = false);
-        
-        void propagateSpeedChange() { GetMotionMaster()->propagateSpeedChange(); }
+        void DisableSpline();
 
         // Caster movement
         float GetMinChaseDistance(Unit* target) const;
         float GetMaxChaseDistance(Unit* target) const;
-        bool HasDistanceCasterMovement() const { return (_casterChaseDistance >= 1.0f); }
-        void SetCasterChaseDistance(float dist) { _casterChaseDistance = dist; }
-        float _casterChaseDistance;
-
-        void RestoreMovement();
+        bool HasDistanceCasterMovement() const { return (m_casterChaseDistance >= 1.0f); }
+        void SetCasterChaseDistance(float dist) { m_casterChaseDistance = dist; }
 
         Movement::MoveSpline* movespline;
         // Serialize access to the movespline to prevent thread race conditions in async
@@ -1369,116 +1444,12 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // spline for end point with targeted move gen)
         ACE_Thread_Mutex asyncMovesplineLock;
 
-        
         void OnRelocated();
         void ProcessRelocationVisibilityUpdates();
         bool m_needUpdateVisibility;
-        
 
     protected:
-        explicit Unit ();
-        
-        uint32 m_attackTimer[MAX_ATTACK];
-        float m_createStats[MAX_STATS];
-        int32 m_createResistances[MAX_SPELL_SCHOOL];
-
-        AttackerSet m_attackers;
-        Unit* m_attacking;
-
-        DeathState m_deathState;
-
-        SpellAuraHolderMap m_spellAuraHolders;
-        SpellAuraHolderMap::iterator m_spellAuraHoldersUpdateIterator; // != end() in Unit::m_spellAuraHolders update and point to next element
-        AuraList m_deletedAuras;                                       // auras removed while in ApplyModifier and waiting deleted
-        SpellAuraHolderList m_deletedHolders;
-
-        SingleCastSpellTargetMap m_singleCastSpellTargets;  // casted by unit single per-caster auras
-        
-        typedef std::list<GameObject*> GameObjectList;
-        GameObjectList m_gameObj;
-
-        uint32 m_transform;
-        float m_modelCollisionHeight;
-
-        AuraList m_modAuras[TOTAL_AURAS];
-        float m_auraModifiersGroup[UNIT_MOD_END][MODIFIER_TYPE_END];
-        WeaponDamageInfo m_weaponDamage[MAX_ATTACK][MAX_ITEM_PROTO_DAMAGES];
-        uint8 m_weaponDamageCount[MAX_ATTACK];
-        bool m_canModifyStats;
-        //std::list< spellEffectPair > AuraSpells[TOTAL_AURAS];  // TODO: use this if ok for mem
-
-        float m_speed_rate[MAX_MOVE_TYPE];
-
-        CharmInfo *m_charmInfo;
-        ObjectGuid m_possessorGuid; // Guid of unit possessing this one
-
-        MotionMaster i_motionMaster;
-
-        uint32 m_reactiveTimer[MAX_REACTIVE];
-        ObjectGuid m_reactiveTarget[MAX_REACTIVE];
-        int32 m_regenTimer;
-        uint32 m_lastManaUseSpellId;
-        uint32 m_lastManaUseTimer;
-        uint32 m_spellUpdateTimeBuffer;
-
-        SpellCooldowns m_spellCooldowns;
-        GlobalCooldownMgr m_GlobalCooldownMgr;
-
-        bool m_isCreatureLinkingTrigger;
-        bool m_isSpawningLinked;
-
-    public:
-        bool m_AutoRepeatFirstCast;
-        void DisableSpline();
-        void UnitDamaged(ObjectGuid from, uint32 damage) { _damageTakenHistory[from] += damage; _lastDamageTaken = 0; }
-        void SetMeleeZLimit(float newZLimit) { m_meleeZLimit = newZLimit; }
-        float GetMeleeZLimit() const { return m_meleeZLimit; }
-        void SetMeleeZReach(float newZReach) { m_meleeZReach = newZReach; }
-        float GetMeleeZReach() const { return m_meleeZReach; }
-
-    protected:
-        typedef std::map<ObjectGuid /*attackerGuid*/, uint32 /*damage*/ > DamageTakenHistoryMap;
-        DamageTakenHistoryMap   _damageTakenHistory;
-        uint32                  _lastDamageTaken;
-
-        float m_nativeScale = 1.0f;
-        float m_nativeScaleOverride = 1.0f;
-
-    private:
-        void CleanupDeletedAuras();
-        void UpdateSplineMovement(uint32 t_diff);
-
-        Unit* _GetTotem(TotemSlot slot) const;              // for templated function without include need
-        Pet* _GetPet(ObjectGuid guid) const;                // for templated function without include need
-
-        uint32 m_state;                                     // Even derived shouldn't modify
-        uint32 m_CombatTimer;
-
-        // extra attacks vars
-        uint32 m_extraAttacks;
-        bool m_extraMute;
-        bool m_doExtraAttacks;
-
-        UnitVisibility m_Visibility;
-        Position m_last_notified_position;
-        bool m_AINotifyScheduled;
-
-        Diminishing m_Diminishing;
-        // Manage all Units threatening us
-        ThreatManager m_ThreatManager;
-
-        // Manage all Units that are threatened by us
-        HostileRefManager m_HostileRefManager;
-        FollowerRefManager m_FollowingRefManager;
-
-        ComboPointHolderSet m_ComboPointHolders;
-
-        GuardianPetList m_guardianPets;
-
-        ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
-
-        float m_meleeZLimit;
-        float m_meleeZReach;
+        explicit Unit ();     
 };
 
 template<typename Func>

@@ -305,7 +305,7 @@ void CreatureAI::ClearTargetIcon()
 
 void CreatureAI::SetGazeOn(Unit *target)
 {
-    if (m_creature->canAttack(target))
+    if (m_creature->CanAttack(target))
     {
         AttackStart(target);
         m_creature->SetReactState(REACT_PASSIVE);
@@ -444,7 +444,7 @@ void CreatureAI::EnterEvadeMode()
         return;
     }
 
-    if (!m_creature->isCharmed())
+    if (!m_creature->IsCharmed())
     {
         m_creature->RemoveAurasAtReset();
 

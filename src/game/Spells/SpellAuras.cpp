@@ -3972,7 +3972,7 @@ void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
     // remove all flag auras (they are positive, but they must be removed when you are immune)
     if (apply && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY
               && GetSpellProto()->AttributesEx2 & SPELL_ATTR_EX2_DAMAGE_REDUCED_SHIELD
-              && target->IsPlayer() && !target->isCharmed())
+              && target->IsPlayer() && !target->IsCharmed())
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
 
     // TODO: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else

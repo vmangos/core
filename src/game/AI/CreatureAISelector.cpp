@@ -41,7 +41,7 @@ CreatureAI* selectAI(Creature *creature)
         return new NullCreatureAI(creature);
 
     // Allow scripting AI for normal creatures and not controlled pets (guardians and mini-pets)
-    if ((!creature->IsPet() || !((Pet*)creature)->isControlled()) && !creature->isCharmed())
+    if ((!creature->IsPet() || !((Pet*)creature)->isControlled()) && !creature->IsCharmed())
         if (CreatureAI* scriptedAI = sScriptMgr.GetCreatureAI(creature))
             return scriptedAI;
 
@@ -55,7 +55,7 @@ CreatureAI* selectAI(Creature *creature)
     // excplicit check for isControlled() and owner type to allow guardian, mini-pets and pets controlled by NPCs to be scripted by EventAI
     Unit *owner = nullptr;
     if ((creature->IsPet() && ((Pet*)creature)->isControlled() &&
-            ((owner = creature->GetOwner()) && owner->GetTypeId() == TYPEID_PLAYER)) || creature->isCharmed())
+            ((owner = creature->GetOwner()) && owner->GetTypeId() == TYPEID_PLAYER)) || creature->IsCharmed())
         ai_factory = ai_registry.GetRegistryItem("PetAI");
     else if (creature->IsTotem())
         ai_factory = ai_registry.GetRegistryItem("TotemAI");

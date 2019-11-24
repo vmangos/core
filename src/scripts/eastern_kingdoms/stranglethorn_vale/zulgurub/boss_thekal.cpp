@@ -434,7 +434,7 @@ struct boss_thekalAI : public zg_rez_add
                     float nearestDist = 200.0f;
                     Player* target = nullptr;
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (m_creature->canAttack(itr->getSource()))
+                        if (m_creature->CanAttack(itr->getSource()))
                             if (itr->getSource()->GetDistance(m_creature) < nearestDist)
                             {
                                 nearestDist = itr->getSource()->GetDistance(m_creature);

@@ -33,14 +33,14 @@ int AggressorAI::Permissible(const Creature *creature)
 
 void AggressorAI::MoveInLineOfSight(Unit *u)
 {
-    // Check this now to prevent calling expensive functions (isInAccessablePlaceFor / IsWithinLOSInMap)
+    // Check this now to prevent calling expensive functions (IsInAccessablePlaceFor / IsWithinLOSInMap)
     if (m_creature->GetVictim() && !m_creature->GetMap()->IsDungeon())
         return;
     if (!m_creature->IsWithinDistInMap(u, m_creature->GetAttackDistance(u)))
         return;
 
     if (m_creature->CanInitiateAttack() && u->IsTargetableForAttack() && m_creature->IsHostileTo(u) &&
-            m_creature->IsWithinLOSInMap(u) && u->isInAccessablePlaceFor(m_creature))
+            m_creature->IsWithinLOSInMap(u) && u->IsInAccessablePlaceFor(m_creature))
     {
         if (!m_creature->GetVictim())
             AttackStart(u);

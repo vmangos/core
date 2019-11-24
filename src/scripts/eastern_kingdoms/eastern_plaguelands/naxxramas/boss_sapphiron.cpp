@@ -291,7 +291,7 @@ struct boss_sapphironAI : public ScriptedAI
             }
             if (m_creature->CanInitiateAttack())
             {
-                if (pPlayer->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
+                if (pPlayer->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
                 {
                     if (!m_creature->GetVictim())
                     {

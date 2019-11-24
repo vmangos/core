@@ -668,7 +668,7 @@ void CreatureEventAI::MoveInLineOfSight(Unit *pWho)
     if (m_creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO || m_creature->IsNeutralToAll())
         return;
 
-    // Check this now to prevent calling expensive functions (isInAccessablePlaceFor / IsWithinLOSInMap)
+    // Check this now to prevent calling expensive functions (IsInAccessablePlaceFor / IsWithinLOSInMap)
     if (m_creature->GetVictim() && !m_creature->GetMap()->IsDungeon())
         return;
 
@@ -682,12 +682,12 @@ void CreatureEventAI::MoveInLineOfSight(Unit *pWho)
         {
             if (!m_creature->GetVictim())
             {
-                if (m_creature->IsWithinLOSInMap(pWho) && pWho->isInAccessablePlaceFor(m_creature))
+                if (m_creature->IsWithinLOSInMap(pWho) && pWho->IsInAccessablePlaceFor(m_creature))
                     AttackStart(pWho);
             }
             else if (m_creature->GetMap()->IsDungeon())
             {
-                if (m_creature->IsWithinLOSInMap(pWho) && pWho->isInAccessablePlaceFor(m_creature))
+                if (m_creature->IsWithinLOSInMap(pWho) && pWho->IsInAccessablePlaceFor(m_creature))
                 {
                     m_creature->AddThreat(pWho);
                     pWho->SetInCombatWith(m_creature);

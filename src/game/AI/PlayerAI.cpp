@@ -200,7 +200,7 @@ Unit* PlayerControlledAI::FindController()
 
 void PlayerControlledAI::UpdateTarget(Unit* victim)
 {
-    if ((victim->isCharmed() && victim->GetCharmerGuid() == me->GetCharmerGuid()) || me->IsFeared() || me->IsPolymorphed())
+    if ((victim->IsCharmed() && victim->GetCharmerGuid() == me->GetCharmerGuid()) || me->IsFeared() || me->IsPolymorphed())
     {
         me->AttackStop();
         me->CastStop();
@@ -333,7 +333,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         // Ivina <Nostalrius>: chooses the target randomly and not always the target of the controller.
         victim = Ccontroller ? Ccontroller->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : me->SelectNearestTarget(50.0f);
         if (Unit* v2 = me->GetVictim())
-            if (me->canAttack(v2, false))
+            if (me->CanAttack(v2, false))
                 victim = v2;
 
         if (Ccontroller && (!Ccontroller->IsAlive() || !Ccontroller->IsInCombat()))

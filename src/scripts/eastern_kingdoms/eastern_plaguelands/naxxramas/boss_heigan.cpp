@@ -169,7 +169,7 @@ struct boss_heiganAI : public ScriptedAI
                 return;
             if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
             {
-                if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+                if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
                 {
                     if (!m_creature->GetVictim())
                         AttackStart(pWho);

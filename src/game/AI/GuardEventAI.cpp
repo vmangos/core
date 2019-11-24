@@ -77,7 +77,7 @@ void GuardEventAI::MoveInLineOfSight(Unit *pWho)
 
     if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() &&
         (pWho->IsHostileToPlayers() || m_creature->IsHostileTo(pWho) || isAttackingFriend) &&
-        pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+        pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
     {
         AttackStart(pWho);
     }

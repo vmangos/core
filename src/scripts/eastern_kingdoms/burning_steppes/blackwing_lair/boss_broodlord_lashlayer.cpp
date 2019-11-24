@@ -94,7 +94,7 @@ struct boss_broodlordAI : public ScriptedAI
     void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 40.0f) && m_creature->IsWithinLOSInMap(who) && !m_creature->IsInCombat()
-                && who->isInAccessablePlaceFor(m_creature) && !who->HasStealthAura())
+                && who->IsInAccessablePlaceFor(m_creature) && !who->HasStealthAura())
             m_creature->SetInCombatWithZone();
     }
 

@@ -2107,7 +2107,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
 void Creature::CallAssistance()
 {
-    if (!m_AlreadyCallAssistance && GetVictim() && !IsPet() && !isCharmed())
+    if (!m_AlreadyCallAssistance && GetVictim() && !IsPet() && !IsCharmed())
     {
         SetNoCallAssistance(true);
 
@@ -2134,7 +2134,7 @@ void Creature::CallAssistance()
 
 void Creature::CallForHelp(float fRadius)
 {
-    if (fRadius <= 0.0f || !GetVictim() || IsPet() || isCharmed())
+    if (fRadius <= 0.0f || !GetVictim() || IsPet() || IsCharmed())
         return;
 
     MaNGOS::CallOfHelpCreatureInRangeDo u_do(this, GetVictim(), fRadius);
@@ -2198,7 +2198,7 @@ bool Creature::CanInitiateAttack()
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
         return false;
 
-    if (isPassiveToHostile())
+    if (IsPassiveToHostile())
         return false;
 
     if (IsTempPacified())
@@ -3039,7 +3039,7 @@ void Creature::ClearTemporaryFaction()
     // No restore if creature is charmed/possessed.
     // For later we may consider extend to restore to charmer faction where charmer is creature.
     // This can also be done by update any pet/charmed of creature at any faction change to charmer.
-    if (isCharmed())
+    if (IsCharmed())
         return;
 
     m_temporaryFactionFlags = TEMPFACTION_NONE;
@@ -3540,7 +3540,7 @@ bool Creature::canCreatureAttack(Unit const *pVictim, bool force) const
     if (!pVictim->IsInMap(this))
         return false;
 
-    if (!canAttack(pVictim, force))
+    if (!CanAttack(pVictim, force))
         return false;
 
     if (GetMap()->IsDungeon())
@@ -3557,7 +3557,7 @@ bool Creature::canCreatureAttack(Unit const *pVictim, bool force) const
     else if (!pVictim->IsWithinDist3d(m_HomeX, m_HomeY, m_HomeZ, dist))
         return false;
 
-    if (!pVictim->isInAccessablePlaceFor(this))
+    if (!pVictim->IsInAccessablePlaceFor(this))
         return false;
     return true;
 }

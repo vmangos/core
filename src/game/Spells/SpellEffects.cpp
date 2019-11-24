@@ -5967,7 +5967,7 @@ void Spell::EffectAddExtraAttacks(SpellEffectIndex eff_idx)
     if (!unitTarget)
         return;
 
-    if (!unitTarget->IsAlive()|| unitTarget->IsExtraAttacksLocked())
+    if (!unitTarget->IsAlive() || unitTarget->IsExtraAttacksLocked())
         return;
 
     if (m_spellInfo->Id == 20178) // Reckoning
