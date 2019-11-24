@@ -38,7 +38,6 @@
 #include "ObjectGuid.h"
 #include "Player.h"
 #include "UpdateMask.h"
-#include "Unit.h"
 #include "Language.h"
 #include "DBCStores.h"
 #include "BattleGroundMgr.h"

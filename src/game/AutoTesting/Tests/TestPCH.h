@@ -17,7 +17,6 @@
 #include "Player.h"
 #include "Spell.h"
 #include "SpellAuras.h"
-#include "Unit.h"
 #include "VMapFactory.h"
 #include "World.h"
 

@@ -20,7 +20,6 @@
  */
 
 #include "ThreatManager.h"
-#include "Unit.h"
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "Map.h"

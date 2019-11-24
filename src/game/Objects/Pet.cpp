@@ -28,7 +28,6 @@
 #include "Formulas.h"
 #include "SpellAuras.h"
 #include "CreatureAI.h"
-#include "Unit.h"
 #include "Util.h"
 #include "CharacterDatabaseCache.h"
 

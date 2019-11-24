@@ -28,7 +28,6 @@
 #include "Chat.h"
 #include "GameEventMgr.h"
 #include "ScriptMgr.h"
-#include "SpellMgr.h"
 #include "AccountMgr.h"
 #include "DBCStores.h"
 #include "Util.h"

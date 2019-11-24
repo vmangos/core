@@ -28,7 +28,6 @@
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
 #include "LootMgr.h"
-#include "Unit.h"
 #include "Player.h"
 
 #ifdef USE_STANDARD_MALLOC

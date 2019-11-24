@@ -24,7 +24,6 @@
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Player.h"
-#include "Unit.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Totem.h"

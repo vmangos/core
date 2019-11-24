@@ -35,8 +35,6 @@
 #include "FollowerRefManager.h"
 #include "MotionMaster.h"
 #include "DBCStructure.h"
-#include "Path.h"
-#include "WorldPacket.h"
 #include "Timer.h"
 #include <list>
 
@@ -44,6 +42,7 @@
 struct FactionTemplateEntry;
 struct Modifier;
 
+class WorldPacket;
 class SpellEntry;
 class Aura;
 class SpellAuraHolder;
@@ -117,6 +116,12 @@ struct DiminishingReturn
      * decides how how long the duration of the stun etc is.
      */
     uint32                  hitCount;
+};
+
+struct WeaponDamageInfo
+{
+    float damage[2];
+    SpellSchools school;
 };
 
 struct SubDamageInfo

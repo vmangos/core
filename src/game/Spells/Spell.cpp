@@ -33,7 +33,6 @@
 #include "SpellMgr.h"
 #include "Player.h"
 #include "Pet.h"
-#include "Unit.h"
 #include "DynamicObject.h"
 #include "Group.h"
 #include "UpdateData.h"

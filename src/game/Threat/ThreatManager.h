@@ -27,6 +27,7 @@
 #include "Utilities/LinkedReference/Reference.h"
 #include "UnitEvents.h"
 #include "ObjectGuid.h"
+#include "SpellDefines.h"
 #include <list>
 
 //==============================================================

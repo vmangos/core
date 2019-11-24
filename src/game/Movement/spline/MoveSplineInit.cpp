@@ -23,6 +23,7 @@
 #include "Transport.h"
 #include "ObjectAccessor.h"
 #include "Anticheat.h"
+#include "WorldPacket.h"
 
 namespace Movement
 {

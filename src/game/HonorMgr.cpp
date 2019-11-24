@@ -6,7 +6,6 @@
 #include "HonorMgr.h"
 #include "Language.h"
 #include "World.h"
-#include "Unit.h"
 #include "Creature.h"
 #include "Player.h"
 #include "Database/DatabaseEnv.h"

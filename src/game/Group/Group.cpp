@@ -35,7 +35,6 @@
 #include "MapPersistentStateMgr.h"
 #include "Util.h"
 #include "LootMgr.h"
-#include "SpellMgr.h"
 #include "LFGMgr.h"
 #include "LFGHandler.h"
 

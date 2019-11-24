@@ -24,7 +24,6 @@
 
 #include "Object.h"
 #include "DBCEnums.h"
-#include "Unit.h"
 
 enum DynamicObjectType
 {
@@ -57,8 +56,8 @@ class DynamicObject : public WorldObject
         DynamicObjectType GetType() const { return (DynamicObjectType)GetByteValue(DYNAMICOBJECT_BYTES,0); }
         bool NeedsRefresh(Unit *unit) const;
         bool IsChanneled() const { return m_channeled; }
-        void AddAffected(Unit *unit) { m_affected[unit->GetObjectGuid()] = 0; }
-        void RemoveAffected(Unit *unit) { m_affected.erase(unit->GetObjectGuid()); }
+        void AddAffected(Unit* unit);
+        void RemoveAffected(Unit* unit);
         void Delay(int32 delaytime);
 
         bool IsHostileTo(WorldObject const* target) const override;

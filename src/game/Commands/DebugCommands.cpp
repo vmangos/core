@@ -27,7 +27,6 @@
 #include "Opcodes.h"
 #include "Chat.h"
 #include "Log.h"
-#include "Unit.h"
 #include "GossipDef.h"
 #include "Language.h"
 #include "BattleGroundMgr.h"

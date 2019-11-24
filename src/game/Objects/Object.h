@@ -28,11 +28,14 @@
 #include "UpdateData.h"
 #include "ObjectGuid.h"
 #include "Camera.h"
-#include "SpellEntry.h"
+#include "SharedDefines.h"
+#include "SpellDefines.h"
+#include "DBCEnums.h"
 #include "Utilities/EventProcessor.h"
 
 #include <set>
 #include <string>
+#include <array>
 
 #define CONTACT_DISTANCE            0.5f
 #define INTERACTION_DISTANCE        5.0f
@@ -89,6 +92,10 @@ class InstanceData;
 class TerrainInfo;
 class ZoneScript;
 class Transport;
+class SpellEntry;
+class Spell;
+
+struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 

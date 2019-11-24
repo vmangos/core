@@ -7,7 +7,7 @@
 #include "ObjectMgr.h"
 #include "MoveSpline.h"
 #include "PlayerBotMgr.h"
-
+#include "WorldPacket.h"
 
 bool PlayerBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
 {

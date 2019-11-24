@@ -32,7 +32,6 @@
 #include "DynamicObject.h"
 #include "GameObject.h"
 #include "Player.h"
-#include "Unit.h"
 #include "CreatureAI.h"
 #include "Conditions.h"
 

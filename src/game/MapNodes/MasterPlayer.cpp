@@ -5,6 +5,7 @@
 #include "Item.h"
 #include "Mail.h"
 #include "ObjectAccessor.h"
+#include "WorldPacket.h"
 
 MasterPlayer::MasterPlayer(WorldSession* s):
     m_speakTime(0), m_speakCount(0), m_social(nullptr), 

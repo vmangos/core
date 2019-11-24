@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "ObjectMgr.h"
 #include "MoveMapSharedDefines.h"
-
+#include "WorldPacket.h"
 
 void CinematicStuff::AddStuff(Player* player, uint32 itemID)
 {

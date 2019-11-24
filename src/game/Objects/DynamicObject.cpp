@@ -228,6 +228,16 @@ void DynamicObject::Delete()
     AddObjectToRemoveList();
 }
 
+void DynamicObject::AddAffected(Unit* unit)
+{
+    m_affected[unit->GetObjectGuid()] = 0;
+}
+
+void DynamicObject::RemoveAffected(Unit* unit)
+{
+    m_affected.erase(unit->GetObjectGuid());
+}
+
 void DynamicObject::Delay(int32 delaytime)
 {
     m_aliveDuration -= delaytime;

@@ -30,7 +30,6 @@
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Player.h"
-#include "Unit.h"
 #include "Spell.h"
 #include "DynamicObject.h"
 #include "Group.h"

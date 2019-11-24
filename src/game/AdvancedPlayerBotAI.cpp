@@ -39,7 +39,7 @@ void AdvancedPlayerBotAI::CommonAI(const uint32 delta)
     {
         if (Conditions.IsResurrectRequested)
         {
-            WorldPacket ResurrectAnswer(CMSG_RESURRECT_RESPONSE);
+            //WorldPacket ResurrectAnswer(CMSG_RESURRECT_RESPONSE);
             me->ResurectUsingRequestData();
         }
         return;
