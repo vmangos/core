@@ -159,7 +159,7 @@ struct mob_viscidus_triggerAI : public ScriptedAI
             if (!m_spellCasted)
             {
                 // set faction and flags before toxin cloud, so it won't damage a boss.
-                m_creature->setFaction(14); // 14 is a hostile faction
+                m_creature->SetFactionTemplateId(14); // 14 is a hostile faction
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1);
 
                 m_spellCasted = true;
@@ -238,7 +238,7 @@ struct boss_viscidusAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim() && m_creature->IsWithinDistInMap(who, 95.0f, true))
+        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->GetVictim() && m_creature->IsWithinDistInMap(who, 95.0f, true))
         {
             AttackStart(who);
         }
@@ -302,7 +302,7 @@ struct boss_viscidusAI : public ScriptedAI
 
         DoResetThreat();
         m_creature->SetVisibility(VISIBILITY_ON);
-        m_creature->clearUnitState(UNIT_STAT_DIED);
+        m_creature->ClearUnitState(UNIT_STAT_DIED);
         m_creature->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_uiPhase = PHASE_NORMAL;
@@ -462,7 +462,7 @@ struct boss_viscidusAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         HackyScaleUpdate();
@@ -503,7 +503,7 @@ struct boss_viscidusAI : public ScriptedAI
         {
             if (m_uiRestoreTargetTimer <= uiDiff)
             {
-                if (Unit* pTarget = m_creature->getVictim())
+                if (Unit* pTarget = m_creature->GetVictim())
                 {
                     m_creature->SetInFront(pTarget);
                     m_creature->SetTargetGuid(pTarget->GetObjectGuid());

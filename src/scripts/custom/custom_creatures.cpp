@@ -803,7 +803,7 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
 
 void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
 {
-    uint32 classmask = player->getClassMask();
+    uint32 classmask = player->GetClassMask();
 
     for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {
@@ -1005,7 +1005,7 @@ struct npc_training_dummyAI : ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (m_creature->isInCombat())
+        if (m_creature->IsInCombat())
         {
             if (m_uiCombatTimer <= diff)
             {
@@ -1021,14 +1021,14 @@ struct npc_training_dummyAI : ScriptedAI
                     if (itr->second + 10 < std::time(nullptr))
                     {
                         m_creature->_removeAttacker(pAttacker);
-                        m_creature->getThreatManager().modifyThreatPercent(pAttacker, -101.0f);
+                        m_creature->GetThreatManager().modifyThreatPercent(pAttacker, -101.0f);
                         itr = attackers.erase(itr);
                         continue;
                     }
                     ++itr;
                 }
 
-                if (m_creature->getThreatManager().isThreatListEmpty())
+                if (m_creature->GetThreatManager().isThreatListEmpty())
                     EnterEvadeMode();
 
                 m_uiCombatTimer = 15000;
@@ -1079,7 +1079,7 @@ struct npc_summon_debugAI : ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             return;
 
         if (m_summonCount >= m_maxSummonCount)

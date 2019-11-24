@@ -72,13 +72,13 @@ struct boss_magmusAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //FieryBurst_Timer
         if (m_uiFieryBurst_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIERYBURST);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FIERYBURST);
             m_uiFieryBurst_Timer = 6000;
         }
         else
@@ -89,7 +89,7 @@ struct boss_magmusAI : public ScriptedAI
         {
             if (m_uiWarStomp_Timer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_WARSTOMP);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WARSTOMP);
                 m_uiWarStomp_Timer = 8000;
             }
             else

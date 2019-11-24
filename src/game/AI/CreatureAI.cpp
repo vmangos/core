@@ -20,9 +20,9 @@
  */
 
 #include "CreatureAI.h"
+#include "Spell.h"
 #include "Creature.h"
 #include "DBCStores.h"
-#include "Spell.h"
 #include "Totem.h"
 #include "GridSearchers.h"
 
@@ -42,7 +42,7 @@ void CreatureAI::JustRespawned()
 
 void CreatureAI::AttackedBy(Unit* attacker)
 {
-    if (!m_creature->getVictim())
+    if (!m_creature->GetVictim())
         AttackStart(attacker);
 }
 
@@ -54,7 +54,7 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
     if (!isTriggered)
     {
         // State does not allow
-        if (m_creature->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+        if (m_creature->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
             return CAST_FAIL_STATE;
 
         if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED) || m_creature->IsSpellProhibited(pSpell)))
@@ -72,11 +72,11 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
         return CAST_FAIL_OTHER;
 
     // If the spell requires the target having a specific power type
-    if (!pSpell->IsAreaOfEffectSpell() && !pSpell->IsTargetPowerTypeValid(pTarget->getPowerType()))
+    if (!pSpell->IsAreaOfEffectSpell() && !pSpell->IsTargetPowerTypeValid(pTarget->GetPowerType()))
         return CAST_FAIL_OTHER;
 
     // Mind control abilities can't be used with just 1 attacker or mob will reset.
-    if ((m_creature->getThreatManager().getThreatList().size() == 1) && pSpell->IsCharmSpell())
+    if ((m_creature->GetThreatManager().getThreatList().size() == 1) && pSpell->IsCharmSpell())
         return CAST_FAIL_OTHER;
 
     // If the unit is disarmed and the skill requires a weapon, it cannot be cast
@@ -305,7 +305,7 @@ void CreatureAI::ClearTargetIcon()
 
 void CreatureAI::SetGazeOn(Unit *target)
 {
-    if (m_creature->canAttack(target))
+    if (m_creature->CanAttack(target))
     {
         AttackStart(target);
         m_creature->SetReactState(REACT_PASSIVE);
@@ -314,36 +314,36 @@ void CreatureAI::SetGazeOn(Unit *target)
 
 bool CreatureAI::UpdateVictimWithGaze()
 {
-    if (!m_creature->isInCombat())
+    if (!m_creature->IsInCombat())
         return false;
 
     if (m_creature->HasReactState(REACT_PASSIVE))
     {
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
             return true;
         m_creature->SetReactState(REACT_AGGRESSIVE);
     }
 
     if (m_creature->SelectHostileTarget())
-        if (Unit *victim = m_creature->getVictim())
+        if (Unit *victim = m_creature->GetVictim())
             AttackStart(victim);
-    return m_creature->getVictim();
+    return m_creature->GetVictim();
 }
 
 bool CreatureAI::UpdateVictim()
 {
-    if (!m_creature->isInCombat())
+    if (!m_creature->IsInCombat())
         return false;
 
     if (!m_creature->HasReactState(REACT_PASSIVE))
     {
         if (m_creature->SelectHostileTarget())
-            if (Unit *victim = m_creature->getVictim())
+            if (Unit *victim = m_creature->GetVictim())
                 AttackStart(victim);
-        return m_creature->getVictim();
+        return m_creature->GetVictim();
     }
 
-    if (m_creature->getThreatManager().isThreatListEmpty())
+    if (m_creature->GetThreatManager().isThreatListEmpty())
     {
         EnterEvadeMode();
         return false;
@@ -400,7 +400,7 @@ void CreatureAI::SetMeleeAttack(bool enabled)
 
     m_bMeleeAttack = enabled;
 
-    if (Unit* pVictim = m_creature->getVictim())
+    if (Unit* pVictim = m_creature->GetVictim())
     { 
         if (enabled)
             m_creature->SendMeleeAttackStart(pVictim);
@@ -416,7 +416,7 @@ void CreatureAI::SetCombatMovement(bool enabled)
 
     m_bCombatMovement = enabled;
 
-    if (Unit* pVictim = m_creature->getVictim())
+    if (Unit* pVictim = m_creature->GetVictim())
     {
         if (!enabled && (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE))
             m_creature->GetMotionMaster()->MoveIdle();
@@ -437,14 +437,14 @@ void CreatureAI::OnCombatStop()
 
 void CreatureAI::EnterEvadeMode()
 {
-    if (!m_creature->isAlive())
+    if (!m_creature->IsAlive())
     {
         m_creature->CombatStop(true);
         m_creature->DeleteThreatList();
         return;
     }
 
-    if (!m_creature->isCharmed())
+    if (!m_creature->IsCharmed())
     {
         m_creature->RemoveAurasAtReset();
 
@@ -467,7 +467,7 @@ void CreatureAI::TriggerAlert(Unit const* who)
         return;
 
     // If this unit isn't an NPC, is already distracted, is in combat, is confused, stunned or fleeing, do nothing
-    if (m_creature->GetTypeId() != TYPEID_UNIT || m_creature->isInCombat() || m_creature->hasUnitState(UNIT_STAT_NO_FREE_MOVE))
+    if (m_creature->GetTypeId() != TYPEID_UNIT || m_creature->IsInCombat() || m_creature->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
         return;
 
     // Only alert for hostiles!

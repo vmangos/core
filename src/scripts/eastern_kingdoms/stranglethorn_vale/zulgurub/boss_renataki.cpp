@@ -78,7 +78,7 @@ struct boss_renatakiAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_RED_LIGHTNING, true);
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->GetHealthPercent() < 30)
@@ -124,8 +124,8 @@ struct boss_renatakiAI : public ScriptedAI
             Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
 
-            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -50);
+            if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -50);
 
             if (target)
                 AttackStart(target);
@@ -136,12 +136,12 @@ struct boss_renatakiAI : public ScriptedAI
 
         if (ThousandBlades_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_THOUSANDBLADES);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THOUSANDBLADES);
             ThousandBlades_Timer = urand(7000, 12000);
         }
         else ThousandBlades_Timer -= diff;
 
-        if (m_creature->isAttackReady() && !urand(0, 2))
+        if (m_creature->IsAttackReady() && !urand(0, 2))
             m_creature->CastSpell(m_creature, SPELL_TRASH, true);
 
         DoMeleeAttackIfReady();

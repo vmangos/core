@@ -70,7 +70,7 @@ struct FirewalkerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiFireBlossomCasting_Timer < uiDiff)
@@ -86,7 +86,7 @@ struct FirewalkerAI : public ScriptedAI
 
         if (m_uiInciteFlames_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_INCITE_FLAMES) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_INCITE_FLAMES) == CAST_OK)
                 m_uiInciteFlames_Timer = 20000;
         }
         else
@@ -192,9 +192,9 @@ struct mob_ancient_core_houndAI : public ScriptedAI
     /*
     void MoveInLineOfSight(Unit *pWho) override
     {        
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
         {
-            if (pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, 20.0f) && pWho->isTargetableForAttack())
+            if (pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, 20.0f) && pWho->IsTargetableForAttack())
             {
                 // allow Soothe Animal to lower aggro range
                 if (m_creature->HasAuraType(SPELL_AURA_MOD_DETECT_RANGE) && !m_creature->IsWithinDistInMap(pWho, 10.0f))
@@ -209,7 +209,7 @@ struct mob_ancient_core_houndAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiConeOfFireTimer < uiDiff)
@@ -228,21 +228,21 @@ struct mob_ancient_core_houndAI : public ScriptedAI
 
         if (m_uiBiteTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
             {
-                m_creature->CastSpell(m_creature->getVictim(), SPELL_BITE, false);
+                m_creature->CastSpell(m_creature->GetVictim(), SPELL_BITE, false);
                 m_uiBiteTimer = 6000;
             }
         }
         else m_uiBiteTimer -= uiDiff;
 
-        if (m_creature->isAttackReady())
+        if (m_creature->IsAttackReady())
         {
             //If we are within range melee the target
-            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
             {
-                m_creature->CastSpell(m_creature->getVictim(), SPELL_VICIOUS_BITE, true);
-                m_creature->resetAttackTimer();
+                m_creature->CastSpell(m_creature->GetVictim(), SPELL_VICIOUS_BITE, true);
+                m_creature->ResetAttackTimer();
             }
         }
     }
@@ -293,7 +293,7 @@ struct mob_core_houndAI : public ScriptedAI
 
     void FeignDeath()
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         m_creature->MonsterTextEmote("Core Hound collapses and begins to smolder.");
@@ -342,7 +342,7 @@ struct mob_core_houndAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_pInstance)
             return;
 
         // Resurrect pack if not died during 10 seconds
@@ -356,7 +356,7 @@ struct mob_core_houndAI : public ScriptedAI
                 GetCreatureListWithEntryInGrid(m_CoreHoundList, m_creature, NPC_CORE_HOUND, 100.0f);
                 for (std::list<Creature*>::const_iterator itr = m_CoreHoundList.begin(); itr != m_CoreHoundList.end(); ++itr)
                 {
-                    if ((*itr) && (*itr)->isInCombat())
+                    if ((*itr) && (*itr)->IsInCombat())
                     {
                         if ((*itr)->GetHealth() > 0)
                             m_bResurrectionOkay = true;
@@ -381,7 +381,7 @@ struct mob_core_houndAI : public ScriptedAI
         //Serrated Bite
         if (m_uiSerratedBiteTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(),SPELL_SERRATED_BITE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(),SPELL_SERRATED_BITE) == CAST_OK)
                 m_uiSerratedBiteTimer = urand(4000, 7000);
         }
         else
@@ -441,7 +441,7 @@ struct mob_firelordAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Summon Lava Spawn
@@ -508,7 +508,7 @@ struct mob_lava_surgerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->HasAuraType(SPELL_AURA_MOD_STUN))     // don't update CDs while Banished

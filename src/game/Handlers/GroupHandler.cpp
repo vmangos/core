@@ -646,7 +646,7 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
     if (mask & GROUP_UPDATE_FLAG_MAX_HP)
         *data << uint16(player->GetMaxHealth());
 
-    Powers powerType = player->getPowerType();
+    Powers powerType = player->GetPowerType();
     if (mask & GROUP_UPDATE_FLAG_POWER_TYPE)
         *data << uint8(powerType);
 
@@ -657,7 +657,7 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
         *data << uint16(player->GetMaxPower(powerType));
 
     if (mask & GROUP_UPDATE_FLAG_LEVEL)
-        *data << uint16(player->getLevel());
+        *data << uint16(player->GetLevel());
 
     if (mask & GROUP_UPDATE_FLAG_ZONE)
         *data << uint16(player->GetCachedZoneId());
@@ -723,7 +723,7 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
     if (mask & GROUP_UPDATE_FLAG_PET_POWER_TYPE)
     {
         if (pet)
-            *data << uint8(pet->getPowerType());
+            *data << uint8(pet->GetPowerType());
         else
             *data << uint8(0);
     }
@@ -731,7 +731,7 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
     if (mask & GROUP_UPDATE_FLAG_PET_CUR_POWER)
     {
         if (pet)
-            *data << uint16(pet->GetPower(pet->getPowerType()));
+            *data << uint16(pet->GetPower(pet->GetPowerType()));
         else
             *data << uint16(0);
     }
@@ -739,7 +739,7 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
     if (mask & GROUP_UPDATE_FLAG_PET_MAX_POWER)
     {
         if (pet)
-            *data << uint16(pet->GetMaxPower(pet->getPowerType()));
+            *data << uint16(pet->GetMaxPower(pet->GetPowerType()));
         else
             *data << uint16(0);
     }

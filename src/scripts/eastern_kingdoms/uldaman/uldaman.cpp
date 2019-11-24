@@ -104,13 +104,13 @@ struct mob_stone_keeperAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }
         if (m_uiTrample_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRAMPLE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRAMPLE) == CAST_OK)
             {
                 m_uiTrample_Timer = urand(4000, 10000);
             }
@@ -148,7 +148,7 @@ struct mob_jadespine_basiliskAI : public ScriptedAI
     void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }
@@ -157,15 +157,15 @@ struct mob_jadespine_basiliskAI : public ScriptedAI
         if (Cslumber_Timer < diff)
         {
             //Cast
-            // DoCastSpellIfCan(m_creature->getVictim(),SPELL_CRYSTALLINE_SLUMBER);
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_CRYSTALLINE_SLUMBER, false);
+            // DoCastSpellIfCan(m_creature->GetVictim(),SPELL_CRYSTALLINE_SLUMBER);
+            m_creature->CastSpell(m_creature->GetVictim(), SPELL_CRYSTALLINE_SLUMBER, false);
 
             //Stop attacking target thast asleep and pick new target
             Cslumber_Timer = 28000;
 
             Unit* Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
 
-            if (!Target || Target == m_creature->getVictim())
+            if (!Target || Target == m_creature->GetVictim())
             {
                 Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             }
@@ -281,7 +281,7 @@ struct AnnoraAI : public ScriptedAI
     AnnoraAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_creature->SetVisibility(VISIBILITY_OFF);
-        m_creature->setFaction(FACTION_STONED);
+        m_creature->SetFactionTemplateId(FACTION_STONED);
         m_uiNbScorpion = 0;
         isSpawned = false;
         Reset();
@@ -308,7 +308,7 @@ struct AnnoraAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(m_EscortList, m_creature, 7078, 30.0f);
             for (const auto& it : m_EscortList)
             {
-                if (it->isAlive())
+                if (it->IsAlive())
                 {
                     m_uiNbScorpion++;
                 }
@@ -323,7 +323,7 @@ struct AnnoraAI : public ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }

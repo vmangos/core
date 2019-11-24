@@ -60,7 +60,7 @@ struct boss_noxxionAI : public ScriptedAI
         if (Invisible && Invisible_Timer < diff)
         {
             //Become visible again
-            m_creature->setFaction(14);
+            m_creature->SetFactionTemplateId(14);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             //Noxxion model
             m_creature->SetDisplayId(11172);
@@ -75,13 +75,13 @@ struct boss_noxxionAI : public ScriptedAI
         }
 
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ToxicVolley_Timer
         if (ToxicVolley_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TOXICVOLLEY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TOXICVOLLEY) == CAST_OK)
                 ToxicVolley_Timer = 9000;
         }
         else
@@ -90,7 +90,7 @@ struct boss_noxxionAI : public ScriptedAI
         //Uppercut_Timer
         if (Uppercut_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_UPPERCUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UPPERCUT) == CAST_OK)
                 Uppercut_Timer = 12000;
         }
         else
@@ -101,12 +101,12 @@ struct boss_noxxionAI : public ScriptedAI
         {
             //Inturrupt any spell casting
             m_creature->InterruptNonMeleeSpells(false);
-            m_creature->setFaction(35);
+            m_creature->SetFactionTemplateId(35);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             // Invisible Model
             m_creature->SetDisplayId(11686);
             for (int i = 0; i < 5; ++i)
-                SummonAdds(m_creature->getVictim());
+                SummonAdds(m_creature->GetVictim());
             Invisible = true;
             Invisible_Timer = 15000;
 

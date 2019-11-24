@@ -255,7 +255,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
     return true;
 }
 
-bool Corpse::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
+bool Corpse::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
     return IsInWorld() && pDetector->IsInWorld() && IsWithinDist(viewPoint, pDetector->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
 }
@@ -290,9 +290,14 @@ bool Corpse::IsExpired(time_t t) const
         return m_time < t - 3 * DAY;
 }
 
-uint32 Corpse::getLevel() const
+uint32 Corpse::GetFactionTemplateId() const 
+{
+    return m_faction->ID;
+}
+
+uint32 Corpse::GetLevel() const
 {
     if (Unit* pOwner = ObjectAccessor::GetUnit(*this, GetOwnerGuid()))
-        return pOwner->getLevel();
+        return pOwner->GetLevel();
     return DEFAULT_MAX_LEVEL;
 }

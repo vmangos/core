@@ -96,7 +96,7 @@ struct go_urok_challengeAI: public GameObjectAI
                 Map::PlayerList const& list = me->GetMap()->GetPlayers();
                 for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
                     if (Player* player = it->getSource())
-                        if (player->isAlive() && !invoc->IsFriendlyTo(player))
+                        if (player->IsAlive() && !invoc->IsFriendlyTo(player))
                             invoc->AI()->AttackStart(player);
             }
         }
@@ -258,7 +258,7 @@ struct urokUnderlingAI : public ScriptedAI
     }
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if ( timer < uiDiff)
             {
@@ -301,7 +301,7 @@ struct urokEnforcerAI : public urokUnderlingAI
     {
         if (m_uiStrike_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STRIKE ) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE ) == CAST_OK)
                 m_uiStrike_Timer = urand(10000, 18000);
         }
         else

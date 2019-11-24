@@ -364,7 +364,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
             continue;
         }
 
-        if (pCreature->isDead())
+        if (pCreature->IsDead())
             map->GetPersistentState()->SaveCreatureRespawnTime(guid.GetCounter(), respawnTime);
         else
             ++alive;
@@ -618,7 +618,7 @@ void SilithusWarEffortBattle::Disable()
 
     for (Creature* cr : SummonedMobs)
     {
-        if (cr->isDead())
+        if (cr->IsDead())
         {
             DeadCreatures.push_back(cr);
         }

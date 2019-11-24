@@ -148,7 +148,7 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
 
         MovementGeneratorType GetCurrentMovementGeneratorType() const;
 
-        void propagateSpeedChange();
+        void PropagateSpeedChange();
         bool SetNextWaypoint(uint32 pointId);
 
         uint32 getLastReachedWaypoint() const;

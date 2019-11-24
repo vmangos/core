@@ -79,7 +79,7 @@ struct npc_kerlonianAI : public FollowerAI
     {
         FollowerAI::MoveInLineOfSight(pWho);
 
-        if (!m_creature->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_LILADRIS)
+        if (!m_creature->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_LILADRIS)
         {
             if (m_creature->IsWithinDistInMap(pWho, INTERACTION_DISTANCE * 5))
             {
@@ -151,7 +151,7 @@ struct npc_kerlonianAI : public FollowerAI
 
     void UpdateFollowerAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (!HasFollowState(STATE_FOLLOW_INPROGRESS))
                 return;
@@ -311,7 +311,7 @@ bool QuestAccept_npc_prospector_remtravel(Player* pPlayer, Creature* pCreature, 
 {
     if (pQuest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
     {
-        pCreature->setFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
+        pCreature->SetFactionTemplateId(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
         if (npc_prospector_remtravelAI* pEscortAI = dynamic_cast<npc_prospector_remtravelAI*>(pCreature->AI()))
         {
@@ -352,7 +352,7 @@ struct npc_threshwackonatorAI : public FollowerAI
     {
         FollowerAI::MoveInLineOfSight(pWho);
 
-        if (!m_creature->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_GELKAK)
+        if (!m_creature->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_GELKAK)
         {
             if (m_creature->IsWithinDistInMap(pWho, 10.0f))
             {
@@ -364,7 +364,7 @@ struct npc_threshwackonatorAI : public FollowerAI
 
     void DoAtEnd()
     {
-        m_creature->setFaction(FACTION_HOSTILE);
+        m_creature->SetFactionTemplateId(FACTION_HOSTILE);
 
         if (Player* pHolder = GetLeaderForFollower())
             m_creature->AI()->AttackStart(pHolder);
@@ -818,12 +818,12 @@ struct npc_rabid_thistle_bearAI : public FollowerAI
                 Captured_Timer -= SignedDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (Rage_Timer < SignedDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_RAGE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_RAGE) == CAST_OK)
                 Rage_Timer = 60000;
         }
         else
@@ -967,7 +967,7 @@ struct npc_tharnariun_treetenderAI : public ScriptedAI
         }
 
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -1175,14 +1175,14 @@ struct npc_sentinel_aynashaAI : public Scripted_NoMovementAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (WaveNB < 4)
         {
             if (m_uiSpell_AynashasBowTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_AYNASHAS_BOW) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AYNASHAS_BOW) == CAST_OK)
                     m_uiSpell_AynashasBowTimer = 2000;
             }
             else
@@ -1351,7 +1351,7 @@ struct npc_murkdeepAI : public ScriptedAI
         if (!bonfire)
             return nullptr;
 
-        if (player->IsInRange(bonfire, 0.0f, 50.0f) && player->isAlive())
+        if (player->IsInRange(bonfire, 0.0f, 50.0f) && player->IsAlive())
             return player;
 
         return nullptr;
@@ -1395,10 +1395,10 @@ struct npc_murkdeepAI : public ScriptedAI
 
         if (m_uiSunderArmorTimer < uiDiff)
         {
-            SpellAuraHolder* holder = m_creature->getVictim()->GetSpellAuraHolder(SPELL_SUNDER_ARMOR);
+            SpellAuraHolder* holder = m_creature->GetVictim()->GetSpellAuraHolder(SPELL_SUNDER_ARMOR);
             if (!holder || holder->GetStackAmount() < 5)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
                     m_uiSunderArmorTimer = urand(5000, 9000);
             }
             else
@@ -1409,7 +1409,7 @@ struct npc_murkdeepAI : public ScriptedAI
 
         if (m_uiNetTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_NET) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_NET) == CAST_OK)
                 m_uiNetTimer = urand(9000, 15000);
         }
         else
@@ -1420,7 +1420,7 @@ struct npc_murkdeepAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (!m_uiEventPhase && m_bEventState && m_creature->GetVisibility() == VISIBILITY_OFF)
             {
@@ -1489,13 +1489,13 @@ bool at_murloc_camp(Player* pPlayer, AreaTriggerEntry const *pAt)
 {
     if (pAt->id == AREATRIGGER_MURKDEEP)
     {
-        if (pPlayer->IsGameMaster() || pPlayer->isDead())
+        if (pPlayer->IsGameMaster() || pPlayer->IsDead())
             return false;
 
         if (pPlayer && pPlayer->GetQuestStatus(QUEST_WANTED_MURKDEEP) == QUEST_STATUS_INCOMPLETE)
         {
             Creature *pCreature = GetClosestCreatureWithEntry(pPlayer, NPC_MURKDEEP, DEFAULT_VISIBILITY_DISTANCE);
-            if (pCreature && pCreature->isAlive())
+            if (pCreature && pCreature->IsAlive())
                 return false;
 
             pCreature = pPlayer->SummonCreature(NPC_MURKDEEP, 

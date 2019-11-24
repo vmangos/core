@@ -132,7 +132,7 @@ Player* ScriptedInstance::GetPlayerInMap(bool bOnlyAlive /*=false*/, bool bCanBe
     for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
     {
         Player* pPlayer = itr->getSource();
-        if (pPlayer && (!bOnlyAlive || pPlayer->isAlive()) && (bCanBeGamemaster || !pPlayer->IsGameMaster()))
+        if (pPlayer && (!bOnlyAlive || pPlayer->IsAlive()) && (bCanBeGamemaster || !pPlayer->IsGameMaster()))
             return pPlayer;
     }
 
@@ -190,7 +190,7 @@ void ScriptedInstance_PTR::Update(uint32 diff)
             if (GetMap())
                 if (Creature* c = GetMap()->GetCreature(it->first))
                 {
-                    if (!c->isAlive())
+                    if (!c->IsAlive())
                         c->DoKillUnit();
                     c->SaveRespawnTime();
                     c->AddObjectToRemoveList();

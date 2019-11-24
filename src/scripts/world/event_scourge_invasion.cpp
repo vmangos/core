@@ -63,7 +63,7 @@ struct npc_flameshocker_spawn_pointAI : public ScriptedAI
         if (_checkTimer < diff)
         {
             Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster);
-            if (!myMonster || !myMonster->isAlive())
+            if (!myMonster || !myMonster->IsAlive())
                 if (Creature* spawn = m_creature->SummonCreature(NPC_FLAMESHOCKER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0, true))
                     _myMonster = spawn->GetObjectGuid();
             _checkTimer = urand(2 * 60, 3 * 60) * 1000;
@@ -105,7 +105,7 @@ struct npc_horror_pallid_spawn_pointAI : public ScriptedAI
         {
             uint32 entry = urand(0, 1) ? NPC_PATCHWORK_TERROR : NPC_PALLID_HORROR;
             Creature* myMonster = m_creature->GetMap()->GetCreature(_myMonster);
-            if (!myMonster || !myMonster->isAlive())
+            if (!myMonster || !myMonster->IsAlive())
                 if (Creature* spawn = m_creature->SummonCreature(entry, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f, TEMPSUMMON_MANUAL_DESPAWN, 0, true))
                     _myMonster = spawn->GetObjectGuid();
             _checkTimer = urand(15 * 60, 17 * 60) * 1000;
@@ -172,9 +172,9 @@ public:
     {
         if (!u->IsGuard())
             return false;
-        if (!u->isAlive())
+        if (!u->IsAlive())
             return false;
-        if (u->getLevel() < 40)
+        if (u->GetLevel() < 40)
             return false;
         if (!u->IsWithinDistInMap(&i_obj, 30.0f))
             return false;
@@ -215,10 +215,10 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
         if (who->GetTypeId() == TYPEID_PLAYER)
             return;
         // Mais on defend nos copains si on n'a que ca a faire !
-        if (!m_creature->getVictim() && m_creature->CanInitiateAttack())
-            if (Unit* victim = who->getVictim())
+        if (!m_creature->GetVictim() && m_creature->CanInitiateAttack())
+            if (Unit* victim = who->GetVictim())
                 if (victim->GetEntry() == m_creature->GetEntry())
-                    if (who->isTargetableForAttack())
+                    if (who->IsTargetableForAttack())
                         if (!who->IsWithinDistInMap(m_creature, 20.0f))
                             AttackStart(who);
         return;
@@ -262,7 +262,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
             _checksTimer -= diff;
 
         m_creature->SelectHostileTarget();
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
         {
             if (!_enableAutoMove)
                 return;
@@ -288,7 +288,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
             return;
         }
 
-        if (Creature* c = m_creature->getVictim()->ToCreature())
+        if (Creature* c = m_creature->GetVictim()->ToCreature())
             c->ResetLastDamageTakenTime();
         DoMeleeAttackIfReady();
     }
@@ -299,7 +299,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
     void EnterCombat(Unit* who) override
     {
         // Riposte !
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
             AttackStart(who);
         ScriptedAI::AttackedBy(who);
         if (!who)
@@ -351,7 +351,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
     {
         for (std::set<ObjectGuid>::iterator it = _guards.begin(); it != _guards.end(); ++it)
             if (Creature* c = m_creature->GetMap()->GetCreature(*it))
-                if (!c->isInCombat())
+                if (!c->IsInCombat())
                     c->AddObjectToRemoveList();
     }
 };
@@ -384,17 +384,17 @@ struct FlameshockerAI : public ScourgeInvasion_RandomAttackerAI
     void UpdateAI(const uint32 diff) override
     {
         ScourgeInvasion_RandomAttackerAI::UpdateAI(diff);
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (!_enableAutoMove)
             {
                 if (Creature* pallid = m_creature->GetMap()->GetCreature(_pallidHorror))
                 {
-                    if (!pallid->isAlive())
+                    if (!pallid->IsAlive())
                         _enableAutoMove = true;
 
-                    else if (pallid->getVictim())
-                        AttackStart(pallid->getVictim());
+                    else if (pallid->GetVictim())
+                        AttackStart(pallid->GetVictim());
                     else if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
                         m_creature->GetMotionMaster()->MoveFollow(pallid, rand_norm_f() * 5.0f, PET_FOLLOW_ANGLE);
                 }
@@ -405,7 +405,7 @@ struct FlameshockerAI : public ScourgeInvasion_RandomAttackerAI
         }
         if (_touchTimer < diff)
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_FLAMESHOCKERS_TOUCH, false);
+            m_creature->CastSpell(m_creature->GetVictim(), SPELL_FLAMESHOCKERS_TOUCH, false);
             _touchTimer = urand(5000, 10000);
         }
         else
@@ -416,7 +416,7 @@ struct FlameshockerAI : public ScourgeInvasion_RandomAttackerAI
         {
             if (_revengeTimer < diff)
             {
-                m_creature->CastSpell(m_creature->getVictim(), SPELL_FLAMESHOCKERS_REVENGE, false);
+                m_creature->CastSpell(m_creature->GetVictim(), SPELL_FLAMESHOCKERS_REVENGE, false);
                 _revengeTimer = urand(12000, 15000);
             }
             else

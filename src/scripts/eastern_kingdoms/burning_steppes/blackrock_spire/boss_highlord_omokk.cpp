@@ -60,7 +60,7 @@ struct boss_highlordomokkAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // WarStomp
@@ -75,7 +75,7 @@ struct boss_highlordomokkAI : public ScriptedAI
         // Strike
         if (m_uiStrikeTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_STRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE);
             m_uiStrikeTimer = 10000;
         }
         else
@@ -84,7 +84,7 @@ struct boss_highlordomokkAI : public ScriptedAI
         // Rend
         if (m_uiRendTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_REND);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_REND);
             m_uiRendTimer = 18000;
         }
         else
@@ -93,7 +93,7 @@ struct boss_highlordomokkAI : public ScriptedAI
         // Sunder Armor
         if (m_uiSunderArmorTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SUNDERARMOR);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDERARMOR);
             m_uiSunderArmorTimer = 25000;
         }
         else

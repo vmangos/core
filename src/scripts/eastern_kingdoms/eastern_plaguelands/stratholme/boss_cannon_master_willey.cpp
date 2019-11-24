@@ -159,13 +159,13 @@ struct boss_cannon_master_willeyAI : public ScriptedAI
     void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Pummel
         if (m_uiPummelTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PUMMEL) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL) == CAST_OK)
                 m_uiPummelTimer = 12000;
         }
         else 
@@ -174,7 +174,7 @@ struct boss_cannon_master_willeyAI : public ScriptedAI
         // Knock Away
         if (m_uiKnockAwayTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                 m_uiKnockAwayTimer = urand(15000, 20000);
         }
         else 
@@ -240,7 +240,7 @@ struct boss_cannon_master_willeyAI : public ScriptedAI
         // Shoot
         if (m_uiShootTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT) == CAST_OK)
                 m_uiShootTimer = urand(2500, 3500);
         }
         else 
@@ -248,21 +248,21 @@ struct boss_cannon_master_willeyAI : public ScriptedAI
 
         if (!IsCombatMovementEnabled())
         { //Melee
-            if (!m_bInMelee && (m_creature->GetDistance2d(m_creature->getVictim()) < 8.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 27.0f || !m_creature->IsWithinLOSInMap(m_creature->getVictim())))
+            if (!m_bInMelee && (m_creature->GetDistance2d(m_creature->GetVictim()) < 8.0f || m_creature->GetDistance2d(m_creature->GetVictim()) > 27.0f || !m_creature->IsWithinLOSInMap(m_creature->GetVictim())))
             {
                 SetCombatMovement(true);
-                DoStartMovement(m_creature->getVictim());
+                DoStartMovement(m_creature->GetVictim());
                 m_bInMelee = true;
                 return;
             }
         }
         else
         { //Range
-            if (m_bInMelee && m_creature->GetDistance2d(m_creature->getVictim()) >= 8.0f && m_creature->GetDistance2d(m_creature->getVictim()) <= 27.0f && m_creature->IsWithinLOSInMap(m_creature->getVictim()))
+            if (m_bInMelee && m_creature->GetDistance2d(m_creature->GetVictim()) >= 8.0f && m_creature->GetDistance2d(m_creature->GetVictim()) <= 27.0f && m_creature->IsWithinLOSInMap(m_creature->GetVictim()))
             {
                 SetCombatMovement(false);
                 m_bInMelee = false;
-                DoStartNoMovement(m_creature->getVictim());
+                DoStartNoMovement(m_creature->GetVictim());
                 return;
             }
         }

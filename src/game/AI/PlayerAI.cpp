@@ -56,7 +56,7 @@ CanCastResult PlayerAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bo
     if (!isTriggered)
     {
         // State does not allow
-        if (me->hasUnitState(checkControlled ? UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL : UNIT_STAT_CAN_NOT_REACT))
+        if (me->HasUnitState(checkControlled ? UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL : UNIT_STAT_CAN_NOT_REACT))
             return CAST_FAIL_STATE;
 
         if (pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE && me->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
@@ -98,7 +98,7 @@ void PlayerAI::UpdateAI(const uint32 /*diff*/)
 PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI(pPlayer), controllerGuid(caster ? caster->GetObjectGuid() : ObjectGuid()), uiGlobalCD(0)
 {
     ASSERT(pPlayer);
-    switch (pPlayer->getClass())
+    switch (pPlayer->GetClass())
     {
         case CLASS_WARRIOR:
         case CLASS_ROGUE:
@@ -137,7 +137,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
             continue;
         if (Spells::IsPositiveSpell(itr->first) && !enablePositiveSpells)
             continue;
-        switch (pPlayer->getClass())
+        switch (pPlayer->GetClass())
         {
         case CLASS_WARRIOR:
         case CLASS_ROGUE:
@@ -200,7 +200,7 @@ Unit* PlayerControlledAI::FindController()
 
 void PlayerControlledAI::UpdateTarget(Unit* victim)
 {
-    if ((victim->isCharmed() && victim->GetCharmerGuid() == me->GetCharmerGuid()) || me->isFeared() || me->IsPolymorphed())
+    if ((victim->IsCharmed() && victim->GetCharmerGuid() == me->GetCharmerGuid()) || me->IsFeared() || me->IsPolymorphed())
     {
         me->AttackStop();
         me->CastStop();
@@ -209,7 +209,7 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
 
     Unit* controller = FindController();
 
-    bool isNewVictim = me->getVictim() != victim;
+    bool isNewVictim = me->GetVictim() != victim;
 
     if (isNewVictim)
         me->Attack(victim, true);
@@ -262,7 +262,7 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
             else
             {
                 // melee not in melee range or nonmoving caster not in caster range
-                if (!me->isInRoots() && !me->IsMoving())
+                if (!me->IsInRoots() && !me->IsMoving())
                 {
                     me->GetMotionMaster()->Clear();
                     me->GetMotionMaster()->MoveChase(victim);
@@ -278,7 +278,7 @@ PlayerControlledAI::~PlayerControlledAI()
 
 void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
 {
-    if (me->IsDeleted() || !me->IsInWorld() || !me->isAlive())
+    if (me->IsDeleted() || !me->IsInWorld() || !me->IsAlive())
     {
         me->RemoveAI();
         return;
@@ -293,7 +293,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
     {
         Player* Pcontroller = ((Player*)controller);
 
-        if (!Pcontroller->isAlive())
+        if (!Pcontroller->IsAlive())
         {
             me->RemoveCharmAuras();
             // Note that we CANNOT continue after this point since this object has been deleted
@@ -305,19 +305,19 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         if (charmInfo)
         {
             if (charmInfo->HasReactState(REACT_PASSIVE))
-                victim = me->getVictim();
+                victim = me->GetVictim();
             else if (charmInfo->HasReactState(REACT_DEFENSIVE) || charmInfo->HasReactState(REACT_AGGRESSIVE))
             {
-                victim = me->getVictim();
+                victim = me->GetVictim();
                 if (!victim || (victim == Pcontroller))
-                    victim = Pcontroller->getVictim();
+                    victim = Pcontroller->GetVictim();
             }
         }
         else
         {
-            victim = me->getVictim();
+            victim = me->GetVictim();
             if (!victim || (victim == Pcontroller))
-                victim = Pcontroller->getVictim();
+                victim = Pcontroller->GetVictim();
         }
 
         if (!victim || (victim == me))
@@ -332,11 +332,11 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         // Unit * victim = controller-> getVictim ();
         // Ivina <Nostalrius>: chooses the target randomly and not always the target of the controller.
         victim = Ccontroller ? Ccontroller->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : me->SelectNearestTarget(50.0f);
-        if (Unit* v2 = me->getVictim())
-            if (me->canAttack(v2, false))
+        if (Unit* v2 = me->GetVictim())
+            if (me->CanAttack(v2, false))
                 victim = v2;
 
-        if (Ccontroller && (!Ccontroller->isAlive() || !Ccontroller->isInCombat()))
+        if (Ccontroller && (!Ccontroller->IsAlive() || !Ccontroller->IsInCombat()))
         {
             me->RemoveCharmAuras();
             // Note that we CANNOT continue after this point since this object has been deleted
@@ -357,7 +357,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
 
         if (uiGlobalCD < uiDiff)
         {
-            if (me->getClass() == CLASS_HUNTER)
+            if (me->GetClass() == CLASS_HUNTER)
             {
                 float dist = me->GetDistance(victim);
                 if (dist > 10.0f)

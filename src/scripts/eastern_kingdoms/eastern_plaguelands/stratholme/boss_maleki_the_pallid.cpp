@@ -73,7 +73,7 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (IcedPlayerGuid)
@@ -82,7 +82,7 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
             {
                 if (!pTarget->HasAura(SPELL_ICETOMB))
                 {
-                    m_creature->getThreatManager().addThreatDirectly(pTarget, IcedPlayerAggro);
+                    m_creature->GetThreatManager().addThreatDirectly(pTarget, IcedPlayerAggro);
                     IcedPlayerGuid = 0;
                     IcedPlayerAggro = 0;
                 }
@@ -97,7 +97,7 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
         //Frostbolt
         if (Frostbolt_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROSTBOLT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROSTBOLT) == CAST_OK)
                 Frostbolt_Timer = urand(3500, 4500);
         }
         else
@@ -106,13 +106,13 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
         //IceTomb
         if (IceTomb_Timer < diff)
         {
-            if (Unit* pTarget = m_creature->getVictim())
+            if (Unit* pTarget = m_creature->GetVictim())
             {
                 if (DoCastSpellIfCan(pTarget, SPELL_ICETOMB) == CAST_OK)
                 {
                     IcedPlayerGuid = pTarget->GetGUID();
-                    IcedPlayerAggro = m_creature->getThreatManager().getThreat(pTarget);
-                    m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
+                    IcedPlayerAggro = m_creature->GetThreatManager().getThreat(pTarget);
+                    m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
                     IceTomb_Timer = urand(20000, 25000);
                 }
             }
@@ -126,10 +126,10 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
             if (Drain_Timer < diff)
             {
                 bool ManaTarget = false;
-                if (Unit* pTarget = m_creature->getVictim())
+                if (Unit* pTarget = m_creature->GetVictim())
                     if (pTarget->GetPower(POWER_MANA))
                         ManaTarget = true;
-                if (DoCastSpellIfCan(m_creature->getVictim(), (ManaTarget ? SPELL_DRAIN_MANA : SPELL_DRAIN_LIFE)) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), (ManaTarget ? SPELL_DRAIN_MANA : SPELL_DRAIN_LIFE)) == CAST_OK)
                     Drain_Timer = urand(12000, 18000);
             }
             else
@@ -138,7 +138,7 @@ struct boss_maleki_the_pallidAI : public ScriptedAI
         else
             NeedMoveCloser = false;
 
-        if (Unit* pTarget = m_creature->getVictim())
+        if (Unit* pTarget = m_creature->GetVictim())
         {
             if ((pTarget->GetDistance2d(m_creature) > (NeedMoveCloser ? 20.0f : 40.0f)) || (GetManaPercent() < 10.0f))
             {

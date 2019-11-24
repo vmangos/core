@@ -212,7 +212,7 @@ uint32 GetRandomGuardText()
 
 void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
 {
-    if (Victim && Victim->isAlive())
+    if (Victim && Victim->IsAlive())
     {
         if (Victim->GetEntry() == NPC_STORMWIND_CITY_GUARD ||
             Victim->GetEntry() == NPC_STORMWIND_ROYAL_GUARD ||
@@ -289,7 +289,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
             if (Creature* pMercutio = m_creature->FindNearestCreature(NPC_MERCUTIO, 10.0f))
             {
                 pMercutio->SetSpeedRate(MOVE_WALK, 2.5f);
-                pMercutio->setFaction(m_creature->getFaction());
+                pMercutio->SetFactionTemplateId(m_creature->GetFactionTemplateId());
                 pMercutio->GetMotionMaster()->MovePoint(0, -9148.395508f, 371.322174f, 90.543655f);
                 pMercutio->ForcedDespawn(12000);
                 m_creature->SetFacingToObject(pMercutio);
@@ -659,7 +659,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
                     {
                         Creature* crea = me->GetMap()->GetCreature(DragsGUIDs[Var]);
                         crea->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        crea->getThreatManager().addThreatDirectly(Bolvar, 5000.0f);
+                        crea->GetThreatManager().addThreatDirectly(Bolvar, 5000.0f);
                         crea->SetTargetGuid(Bolvar->GetGUID());
                         Bolvar->AddThreat(crea);
                         Bolvar->SetInCombatWith(crea);
@@ -741,7 +741,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
         {
             if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
             {
-                if (!Bolvar->isInCombat())
+                if (!Bolvar->IsInCombat())
                 {
                     if (!CombatJustEnded)
                     {
@@ -786,7 +786,7 @@ bool GossipHello_npc_reginald_windsor(Player* pPlayer, Creature* pCreature)
     {
         if (pPlayer == pWindsorEventAI->GetPlayer() && pWindsorEventAI->QuestAccepted)
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, 8256, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        else if (pCreature->isQuestGiver())
+        else if (pCreature->IsQuestGiver())
             pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
         pPlayer->SEND_GOSSIP_MENU(5633, pCreature->GetGUID());
@@ -982,7 +982,7 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
         return false;
 
     // If player is dead, GM mode is ON, quest complete or no quest.
-    if (!pPlayer || !pPlayer->isAlive() || pPlayer->IsGameMaster() ||
+    if (!pPlayer || !pPlayer->IsAlive() || pPlayer->IsGameMaster() ||
         !(pPlayer->IsCurrentQuest(QUEST_STORMWIND_RENDEZVOUS) || (pPlayer->GetQuestRewardStatus(QUEST_STORMWIND_RENDEZVOUS) && !pPlayer->GetQuestRewardStatus(QUEST_THE_GREAT_MASQUERADE) && !pPlayer->IsCurrentQuest(QUEST_THE_GREAT_MASQUERADE))))
         return false;
 

@@ -19,9 +19,9 @@ EndContentData */
 
 bool GossipHello_npcs_dithers_and_arbington(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-    if (pCreature->isVendor())
+    if (pCreature->IsVendor())
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
     if (pPlayer->GetQuestRewardStatus(5237) || pPlayer->GetQuestRewardStatus(5238))
@@ -84,7 +84,7 @@ enum
 
 bool GossipHello_npc_myranda_the_hag(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(QUEST_SUBTERFUGE) == QUEST_STATUS_COMPLETE &&
@@ -256,7 +256,7 @@ struct npc_highprotectorlorikAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_RETRIBUTIONAURA, true);
 
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // GlobalCD non ecoule.
@@ -290,7 +290,7 @@ struct npc_highprotectorlorikAI : public ScriptedAI
         {
             if (!m_uiGlobalCooldown)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEBLAST) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEBLAST) == CAST_OK)
                 {
                     m_uiArcaneBlastTimer = urand(10000, 12000);
                     m_uiGlobalCooldown = 1000;
@@ -318,9 +318,9 @@ struct npc_highprotectorlorikAI : public ScriptedAI
         // SHIELDSLAM
         if (m_uiShieldSlamTimer < uiDiff)
         {
-            if (!m_uiGlobalCooldown && m_creature->getVictim()->IsNonMeleeSpellCasted(false))
+            if (!m_uiGlobalCooldown && m_creature->GetVictim()->IsNonMeleeSpellCasted(false))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELDSLAM) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELDSLAM) == CAST_OK)
                 {
                     m_uiShieldSlamTimer = 9000;
                     m_uiGlobalCooldown = 1000;

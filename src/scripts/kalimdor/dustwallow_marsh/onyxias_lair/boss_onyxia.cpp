@@ -235,14 +235,14 @@ struct boss_onyxiaAI : public ScriptedAI
             return;
         }
 
-        if (!m_creature->isInCombat() && !m_creature->IsInEvadeMode())
+        if (!m_creature->IsInCombat() && !m_creature->IsInEvadeMode())
         {
             Map::PlayerList const& lPlayers = m_creature->GetMap()->GetPlayers();
             for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
             {
                 if (Player* pPlayer = itr->getSource())
                 {
-                    if (m_creature->IsWithinDistInMap(pPlayer, ONYXIA_AGGRO_RANGE) && pPlayer->isTargetableForAttack())
+                    if (m_creature->IsWithinDistInMap(pPlayer, ONYXIA_AGGRO_RANGE) && pPlayer->IsTargetableForAttack())
                     {
                         pPlayer->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
                         m_creature->AI()->AttackStart(pPlayer);
@@ -279,7 +279,7 @@ struct boss_onyxiaAI : public ScriptedAI
         }
 
         /** Teleport victim to the center of the chamber if too far away from Onyxia */
-        if (Unit* pVictim = m_creature->getVictim())
+        if (Unit* pVictim = m_creature->GetVictim())
         {
             if (isOnyxiaFlying() && !m_creature->IsMoving()) 
             {
@@ -307,7 +307,7 @@ struct boss_onyxiaAI : public ScriptedAI
         std::list<Creature*> WarderList;
         GetCreatureListWithEntryInGrid(WarderList, m_creature, NPC_ONYXIAN_WARDER, 200.0f);
         for (std::list<Creature*>::iterator itr = WarderList.begin(); itr != WarderList.end(); ++itr)
-            if (!(*itr)->isAlive())
+            if (!(*itr)->IsAlive())
                 (*itr)->Respawn();
     }
 
@@ -381,7 +381,7 @@ struct boss_onyxiaAI : public ScriptedAI
         
         if (m_uiFlameBreathTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAMEBREATH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAMEBREATH) == CAST_OK)
             {
                 DelayCastEvents(2000); // 2sec de cast
                 m_uiFlameBreathTimer = urand(10000, 20000);
@@ -392,7 +392,7 @@ struct boss_onyxiaAI : public ScriptedAI
 
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(2000, 5000);
         }
         else
@@ -400,9 +400,9 @@ struct boss_onyxiaAI : public ScriptedAI
 
         if (m_uiWingBuffetTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WINGBUFFET) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WINGBUFFET) == CAST_OK)
                 {
                     DelayCastEvents(1500);
                     m_uiWingBuffetTimer = urand(15000, 30000);
@@ -414,12 +414,12 @@ struct boss_onyxiaAI : public ScriptedAI
 
         if (m_uiKnockAwayTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                 {
-                    if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -25);
+                    if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                        m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -25);
 
                     DelayCastEvents(1500);
                     m_uiKnockAwayTimer = urand(15000, 30000);
@@ -476,12 +476,12 @@ struct boss_onyxiaAI : public ScriptedAI
         {
             if (m_uiMovementTimer > 3500 && m_creature->IsStopped() && !m_bDeepBreathIsCasting)
             {
-                if (Unit* pTarget = m_creature->getVictim())
+                if (Unit* pTarget = m_creature->GetVictim())
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_FIREBALL) == CAST_OK)
                     {
-                        if (m_creature->getThreatManager().getThreat(pTarget))
-                            m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
+                        if (m_creature->GetThreatManager().getThreat(pTarget))
+                            m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
                         m_uiFireballTimer = 3000;
                     }
                 }
@@ -613,7 +613,7 @@ struct boss_onyxiaAI : public ScriptedAI
     void PhaseTransition(uint32 uiDiff, bool bDebut)
     {
 //        m_creature->CombatStop(true);
-        m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
+        m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
 
         /** P2 Event to take off */
         if (m_uiPhase == PHASE_TWO)
@@ -688,11 +688,11 @@ struct boss_onyxiaAI : public ScriptedAI
             /** Landed. Restore target and start combat movement.*/
             else if (m_uiTransTimer < uiDiff && m_uiTransCount == 4)
             {               
-                if (Unit* pVictim = m_creature->getVictim())
+                if (Unit* pVictim = m_creature->GetVictim())
                     m_creature->SetTargetGuid(pVictim->GetObjectGuid()); 
 
                 SetCombatMovement(true);
-                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
 
                 m_bTransition  = false;
                 m_uiTransTimer = 0;
@@ -717,7 +717,7 @@ struct boss_onyxiaAI : public ScriptedAI
         // restore Onyxia's target after movement in Phase 2
         if (uiPointId == m_pPointData->uiLocId)
         {
-            if (Unit* pVictim = m_creature->getVictim())
+            if (Unit* pVictim = m_creature->GetVictim())
                 m_creature->SetTargetGuid(pVictim->GetObjectGuid()); 
         }
 
@@ -748,7 +748,7 @@ struct boss_onyxiaAI : public ScriptedAI
     {
         CheckForTargetsInAggroRadius(uiDiff);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         /** whenever Onyxia is moving to a waypoint or casting Deep Breath, clear her target */
@@ -832,7 +832,7 @@ struct OnyxianWhelpAI: public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

@@ -74,7 +74,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
     uint32 postGossipStep;
     uint32 Text_Timer;
     uint32 ShieldBash_Timer;
-    uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless m_creature->getVictim() dodge, parry or block attack. Trinity support required.
+    uint32 Revenge_Timer;                                   //this is wrong, spell should never be used unless m_creature->GetVictim() dodge, parry or block attack. Trinity support required.
     uint64 PlayerGUID;
 
     void Reset() override
@@ -82,7 +82,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
         ShieldBash_Timer = 5000;
         Revenge_Timer = 8000;
 
-//        m_creature->setFaction(FACTION_FRIENDLY);
+//        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
     }
 
     void UpdateAI(const uint32 diff) override
@@ -105,7 +105,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
                         Text_Timer = 5000;
                         break;
                     case 3:
-                        m_creature->setFaction(FACTION_HOSTILE);
+                        m_creature->SetFactionTemplateId(FACTION_HOSTILE);
                         if (Player* pTarget = ((Player*)Unit::GetUnit(*m_creature, PlayerGUID)))
                             AttackStart(pTarget);
                         //weegli doesn't fight - he goes & blows up the door
@@ -125,12 +125,12 @@ struct npc_sergeant_blyAI : public ScriptedAI
                 Text_Timer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (ShieldBash_Timer <= diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH);
             ShieldBash_Timer = 15000;
         }
         else
@@ -138,7 +138,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
 
         if (Revenge_Timer <= diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_REVENGE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_REVENGE);
             Revenge_Timer = 10000;
         }
         else
@@ -156,8 +156,8 @@ struct npc_sergeant_blyAI : public ScriptedAI
     void switchFactionIfAlive(InstanceData* pInstance, uint32 entry)
     {
         if (Creature* crew = pInstance->instance->GetCreature(pInstance->GetData64(entry)))
-            if (crew->isAlive())
-                crew->setFaction(FACTION_HOSTILE);
+            if (crew->IsAlive())
+                crew->SetFactionTemplateId(FACTION_HOSTILE);
     }
 };
 
@@ -224,7 +224,7 @@ void initBlyCrewMember(InstanceData* pInstance, uint32 entry, float x, float y, 
         crew->SetCombatStartPosition(x, y, z);
         crew->SetHomePosition(x, y, z, 4.7f);
         crew->GetMotionMaster()->MovePoint(1, x, y, z, MOVE_PATHFINDING | MOVE_WALK_MODE);
-        crew->setFaction(FACTION_FREED);
+        crew->SetFactionTemplateId(FACTION_FREED);
     }
 }
 
@@ -322,56 +322,56 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
             regen = true;
 
             Creature* pOro = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_ORO));
-            if (pOro->isAlive())
+            if (pOro->IsAlive())
                 pOro->SetHealthPercent(100.0f);
 
             Creature* pMurta = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_MURTA));
-            if (pMurta->isAlive())
+            if (pMurta->IsAlive())
                 pMurta->SetHealthPercent(100.0f);
 
             Creature* pBly = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_BLY));
-            if (pBly->isAlive())
+            if (pBly->IsAlive())
                 pBly->SetHealthPercent(100.0f);
 
             Creature* pRaven = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_RAVEN));
-            if (pRaven->isAlive())
+            if (pRaven->IsAlive())
                 pRaven->SetHealthPercent(100.0f);
 
-            if (m_creature->isAlive())
+            if (m_creature->IsAlive())
                 m_creature->SetHealthPercent(100.0f);
         }
 
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
 
         if (pInstance->GetData(EVENT_PYRAMID) != PYRAMID_KILLED_ALL_TROLLS)
         {
             Creature* pOro = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_ORO));
-            if (!pOro->SelectHostileTarget() || !pOro->getVictim())
-                ((CreatureAI*)pOro->AI())->AttackStart(m_creature->getVictim());
+            if (!pOro->SelectHostileTarget() || !pOro->GetVictim())
+                ((CreatureAI*)pOro->AI())->AttackStart(m_creature->GetVictim());
 
             Creature* pMurta = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_MURTA));
-            if (!pMurta->SelectHostileTarget() || !pMurta->getVictim())
-                ((CreatureAI*)pMurta->AI())->AttackStart(m_creature->getVictim());
+            if (!pMurta->SelectHostileTarget() || !pMurta->GetVictim())
+                ((CreatureAI*)pMurta->AI())->AttackStart(m_creature->GetVictim());
 
             Creature* pBly = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_BLY));
-            if (!pBly->SelectHostileTarget() || !pBly->getVictim())
-                ((CreatureAI*)pBly->AI())->AttackStart(m_creature->getVictim());
+            if (!pBly->SelectHostileTarget() || !pBly->GetVictim())
+                ((CreatureAI*)pBly->AI())->AttackStart(m_creature->GetVictim());
         }
 
         if (Bomb_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BOMB);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BOMB);
             Bomb_Timer = 10000;
         }
         else
             Bomb_Timer -= diff;
 
-        if (m_creature->isAttackReady() && !m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if (m_creature->IsAttackReady() && !m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT);
             m_creature->SetSheath(SHEATH_STATE_RANGED);
         }
         else
@@ -441,9 +441,9 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
 
     void DestroyDoor()
     {
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
-            m_creature->setFaction(FACTION_FRIENDLY);
+            m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
             m_creature->SetWalk(false);
             m_creature->GetMotionMaster()->MovePoint(0, 1858.57f, 1146.35f, 14.745f);
             m_creature->SetCombatStartPosition(1858.57f, 1146.35f, 14.745f); // in case he gets interrupted
@@ -454,7 +454,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
 
     void RunAfterExplosion1()
     {
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             m_creature->GetMotionMaster()->MovePoint(1, 1863.77f, 1176.99f, 9.993f);
             m_creature->SetCombatStartPosition(1863.77f, 1176.99f, 9.993f); // in case he gets interrupted
@@ -465,7 +465,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
 
     void RunAfterExplosion2()
     {
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             m_creature->GetMotionMaster()->MovePoint(2, 1827.1f, 1184.0f, 8.993f);
             m_creature->SetCombatStartPosition(1827.1f, 1184.0f, 8.993f); // in case he gets interrupted
@@ -580,9 +580,9 @@ bool OnTrigger_at_zumrah(Player* pPlayer, const AreaTriggerEntry *at)
     if (!pZumrah)
         return false;
 
-    if (pZumrah->getFaction() != ZUMRAH_HOSTILE_FACTION)
+    if (pZumrah->GetFactionTemplateId() != ZUMRAH_HOSTILE_FACTION)
     {
-        pZumrah->setFaction(ZUMRAH_HOSTILE_FACTION);
+        pZumrah->SetFactionTemplateId(ZUMRAH_HOSTILE_FACTION);
         DoScriptText(SAY_ZUMRAH_TRIGGER, pZumrah);
     }
 

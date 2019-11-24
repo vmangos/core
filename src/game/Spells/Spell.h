@@ -28,7 +28,6 @@
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
 #include "LootMgr.h"
-#include "Unit.h"
 #include "Player.h"
 
 #ifdef USE_STANDARD_MALLOC
@@ -763,7 +762,7 @@ namespace MaNGOS
             for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
             {
                 Player * pPlayer = itr->getSource();
-                if( !pPlayer->isAlive() || pPlayer->IsTaxiFlying())
+                if( !pPlayer->IsAlive() || pPlayer->IsTaxiFlying())
                     continue;
 
                 if( i_originalCaster->IsFriendlyTo(pPlayer) )

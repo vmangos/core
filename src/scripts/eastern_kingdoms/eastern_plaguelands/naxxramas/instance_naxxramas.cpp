@@ -179,13 +179,13 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         if (entry == NPC_BLAUMEUX || entry == NPC_MOGRAINE || entry == NPC_ZELIEK || entry == NPC_THANE)
         {
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_BLAUMEUX))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_MOGRAINE))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_ZELIEK))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
             if (Creature* pC = GetSingleCreatureFromStorage(NPC_THANE))
-                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+                if (pC->IsAlive()) pC->AI()->EnterEvadeMode();
         }
         else
         {
@@ -204,7 +204,7 @@ void instance_naxxramas::OnCreatureEnterCombat(Creature * creature)
         GetCreatureListWithEntryInGrid(sewageSlimes, creature, NPC_SewageSlime, 100.0f);
         for (Creature* pC : sewageSlimes)
         {
-            if (!pC->isInCombat())
+            if (!pC->IsInCombat())
             {
                 pC->CastSpell(pC, 28033, true); // aggro all in los
             }
@@ -413,7 +413,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
     // 4hm
     if (pCreature->GetEntry() >= 16062 && pCreature->GetEntry() <= 16065)
     {
-        if (m_auiEncounter[TYPE_FOUR_HORSEMEN] != DONE && pCreature->isDead())
+        if (m_auiEncounter[TYPE_FOUR_HORSEMEN] != DONE && pCreature->IsDead())
         {
             pCreature->Respawn();
         }
@@ -871,7 +871,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 for (uint32 i = NPC_MOGRAINE; i <= NPC_BLAUMEUX; i++)
                 {
                     if (Creature* p = GetSingleCreatureFromStorage(i))
-                        if (p->isDead())
+                        if (p->IsDead())
                             p->Respawn();
                 }
 
@@ -1393,7 +1393,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
             m_faerlinaHaveGreeted = true;
             if (Creature* pFaerlina = GetSingleCreatureFromStorage(NPC_FAERLINA))
             {
-                if(pFaerlina->isAlive())
+                if(pFaerlina->IsAlive())
                     DoScriptText(SAY_FAERLINA_GREET, pFaerlina);
             }
         }
@@ -1404,7 +1404,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
             m_thaddiusHaveGreeted = true;
             if (Creature* pThaddius = GetSingleCreatureFromStorage(NPC_THADDIUS))
             {
-                if (pThaddius->isAlive())
+                if (pThaddius->IsAlive())
                     DoScriptText(SAY_THADDIUS_GREET, pThaddius);
             }
         }
@@ -1425,7 +1425,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
 
 bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-    if (pPlayer->IsGameMaster() || !pPlayer->isAlive())
+    if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
         return false;
 
     if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
@@ -1473,7 +1473,7 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (portalTimer)
@@ -1547,7 +1547,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE))
         {
             if (pWho->GetTypeId() == TYPEID_PLAYER
-                && !m_creature->isInCombat()
+                && !m_creature->IsInCombat()
                 && m_creature->IsWithinDistInMap(pWho, 17.0f)
                 && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH)
                 && m_creature->IsWithinLOSInMap(pWho))
@@ -1571,7 +1571,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(28995))
@@ -1635,7 +1635,7 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (colorChangeTimer < diff)
@@ -1716,7 +1716,7 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
 
     void FleeToHorse()
     {
-        if (!m_creature->getVictim() || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+        if (!m_creature->GetVictim() || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
             return;
 
         Creature* pNearest = nullptr;
@@ -1736,7 +1736,7 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!hasFled && m_creature->GetHealthPercent() < 50.0f)
@@ -1777,7 +1777,7 @@ CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
 
 bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->getStandState() != UNIT_STAND_STATE_SIT)
+    if (pCreature->GetStandState() != UNIT_STAND_STATE_SIT)
         pCreature->SetStandState(UNIT_STAND_STATE_SIT);
     return false;
 }

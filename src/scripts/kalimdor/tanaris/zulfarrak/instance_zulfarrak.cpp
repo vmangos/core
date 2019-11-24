@@ -332,7 +332,7 @@ public:
     {
         if (Creature* npc = instance->GetCreature(GetData64(entry)))
         {
-            if (npc->isAlive())
+            if (npc->IsAlive())
             {
                 npc->GetMotionMaster()->MovePoint(1, x, y, z, MOVE_PATHFINDING | MOVE_WALK_MODE);
                 npc->SetCombatStartPosition(x, y, z);
@@ -360,7 +360,7 @@ public:
         {
             if (Creature* add = instance->GetCreature((*itr)))
             {
-                if (add->isAlive())
+                if (add->IsAlive())
                     return false;
             }
         }
@@ -368,7 +368,7 @@ public:
         {
             if (Creature* add = instance->GetCreature(((*itr))))
             {
-                if (add->isAlive())
+                if (add->IsAlive())
                     return false;
             }
         }
@@ -382,7 +382,7 @@ public:
         {
             if (Creature* add = instance->GetCreature(*addsAtBase.begin()))
             {
-                if (add->isAlive())
+                if (add->IsAlive())
                 {
                     add->GetMotionMaster()->MovePoint(0, 1880 + urand(0, 10), 1274, 42, MOVE_PATHFINDING | MOVE_RUN_MODE);
                     add->SetWalk(false);

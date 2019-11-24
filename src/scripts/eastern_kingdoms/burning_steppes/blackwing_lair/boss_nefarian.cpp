@@ -214,9 +214,9 @@ struct boss_nefarianAI : ScriptedAI
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive())
+            if (pPlayer && pPlayer->IsAlive())
             {
-                if (pPlayer->getClass() == ClassCalled)
+                if (pPlayer->GetClass() == ClassCalled)
                 {
                     bClassFound = true;
                     switch (ClassCalled)
@@ -311,7 +311,7 @@ struct boss_nefarianAI : ScriptedAI
                     case 2:
                         m_creature->SetWalk(true);
                         m_creature->RemoveAurasDueToSpell(17131);
-                        if (Unit* pTarget = m_creature->getVictim())
+                        if (Unit* pTarget = m_creature->GetVictim())
                         {
                             //m_creature->AI()->AttackStart(pTarget);
                             //m_creature->GetMotionMaster()->Clear(false);
@@ -327,7 +327,7 @@ struct boss_nefarianAI : ScriptedAI
                 m_uiTransitionTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_bTransitionDone)
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_bTransitionDone)
             return;
 
         // ShadowFlame_Timer
@@ -357,7 +357,7 @@ struct boss_nefarianAI : ScriptedAI
         // VeilOfShadow_Timer
         if (m_uiVeilOfShadowTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_VEIL_OF_SHADOW) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VEIL_OF_SHADOW) == CAST_OK)
                 m_uiVeilOfShadowTimer = urand(10000, 15000);
         }
         else
@@ -366,7 +366,7 @@ struct boss_nefarianAI : ScriptedAI
         // Cleave_Timer
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(7000, 10000);
         }
         else
@@ -414,7 +414,7 @@ struct boss_nefarianAI : ScriptedAI
                         if (pMage->HasAura(SPELL_MAGE))
                         {
                             std::vector<ObjectGuid> m_vPossibleVictim;
-                            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+                            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                             for (ThreatList::const_iterator itr2 = tList.begin(); itr2 != tList.end(); ++itr2)
                             {
                                 Unit* pUnit = m_creature->GetMap()->GetUnit((*itr2)->getUnitGuid());
@@ -507,7 +507,7 @@ struct npc_corrupted_totemAI : ScriptedAI
 
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
 
         if (!m_creature->HasAura(SPELL_ROOT_SELF))
             m_creature->AddAura(SPELL_ROOT_SELF);
@@ -575,10 +575,10 @@ struct npc_corrupted_totemAI : ScriptedAI
                 Creature* curr = tmpMobsList.front();
                 tmpMobsList.pop_front();
 
-                if (!curr->isAlive())
+                if (!curr->IsAlive())
                     continue;
 
-                if (on && m_creature->isAlive())
+                if (on && m_creature->IsAlive())
                 {
                     if (m_creature->IsWithinDistInMap(curr, 40.0f))
                     {
@@ -607,7 +607,7 @@ struct npc_corrupted_totemAI : ScriptedAI
         if (!m_creature->HasAura(SPELL_ROOT_SELF))
             m_creature->AddAura(SPELL_ROOT_SELF);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         uint32 addAuraEntry = 0;

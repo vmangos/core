@@ -118,7 +118,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
         recvData >> ticketText;
         recvData >> reservedForFutureUse;
 
-        if (GetPlayer()->getLevel() < sWorld.getConfig(CONFIG_UINT32_GMTICKETS_MINLEVEL))
+        if (GetPlayer()->GetLevel() < sWorld.getConfig(CONFIG_UINT32_GMTICKETS_MINLEVEL))
         {
             ChatHandler(this).PSendSysMessage("You can't use the ticket system before level %u", sWorld.getConfig(CONFIG_UINT32_GMTICKETS_MINLEVEL));
             return;

@@ -102,7 +102,7 @@ struct boss_jeklikAI : public ScriptedAI
         PhaseTwo       = false;
         skillStarted   = false;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_JEKLIK, FAIL);
 
         m_creature->SetObjectScale(1.5f);
@@ -116,7 +116,7 @@ struct boss_jeklikAI : public ScriptedAI
 
     void Aggro(Unit *who) override
     {
-        m_creature->addUnitState(UNIT_STAT_IGNORE_PATHFINDING);
+        m_creature->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING);
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->AddAura(SPELL_BAT_FORM);
         m_creature->SetFly(true);
@@ -146,7 +146,7 @@ struct boss_jeklikAI : public ScriptedAI
 
     void UpdateAI(const uint32 lastDiff) override
     {
-        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!PhaseTwo && m_creature->GetHealthPercent() < 50.0f)
@@ -244,7 +244,7 @@ struct boss_jeklikAI : public ScriptedAI
             {
                 if (!skillStarted)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCREECH) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCREECH) == CAST_OK)
                     {
                         skillStarted   = true;
                         Screech_Timer  = 30000;
@@ -262,7 +262,7 @@ struct boss_jeklikAI : public ScriptedAI
             {
                 if (!skillStarted)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SONICBURST) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SONICBURST) == CAST_OK)
                     {
                         skillStarted     = true;
                         SonicBurst_Timer = urand(20000, 24000);
@@ -278,7 +278,7 @@ struct boss_jeklikAI : public ScriptedAI
             {
                 if (!skillStarted)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SWOOP) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SWOOP) == CAST_OK)
                     {
                         skillStarted   = true;
                         Swoop_Timer    = urand(12000, 15000);
@@ -294,7 +294,7 @@ struct boss_jeklikAI : public ScriptedAI
             {
                 if (!skillStarted)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PIERCEARMOR) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PIERCEARMOR) == CAST_OK)
                     {
                         skillStarted      = true;
                         PierceArmor_Timer = urand(16000, 18000);
@@ -511,7 +511,7 @@ struct npc_guru_bat_riderAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!GoingToExplose && m_creature->GetHealthPercent() < 40.0f)
@@ -535,7 +535,7 @@ struct npc_guru_bat_riderAI : public ScriptedAI
 
         if (InfectedBite_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_INFECTED_BITE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_INFECTED_BITE) == CAST_OK)
                 InfectedBite_Timer = 15000;
         }
         else
@@ -543,7 +543,7 @@ struct npc_guru_bat_riderAI : public ScriptedAI
 
         if (Thrash_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THRASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THRASH) == CAST_OK)
                 Thrash_Timer = 6000;
         }
         else

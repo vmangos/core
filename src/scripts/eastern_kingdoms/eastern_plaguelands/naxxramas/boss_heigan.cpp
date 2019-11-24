@@ -167,11 +167,11 @@ struct boss_heiganAI : public ScriptedAI
         {
             if (pWho->GetPositionX() > 2825.0f)
                 return;
-            if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+            if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
             {
-                if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+                if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
                 {
-                    if (!m_creature->getVictim())
+                    if (!m_creature->GetVictim())
                         AttackStart(pWho);
                     else if (m_creature->GetMap()->IsDungeon())
                     {
@@ -342,15 +342,15 @@ struct boss_heiganAI : public ScriptedAI
         eruptionPhase = 0;
 
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
-        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+        m_creature->GetMotionMaster()->MoveChase(m_creature->GetVictim());
 
     }
 
     void EventPortPlayer()
     {
-        const ThreatList& tl = m_creature->getThreatManager().getThreatList();
+        const ThreatList& tl = m_creature->GetThreatManager().getThreatList();
         std::vector<Unit*> candidates;
         auto it = tl.begin();
         ++it; // skip the tank
@@ -359,7 +359,7 @@ struct boss_heiganAI : public ScriptedAI
             if (Unit* pUnit = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
             {
                 // Candidates are only alive players who have not yet been ported during this phase rotation
-                if (pUnit->IsPlayer() && pUnit->isAlive()
+                if (pUnit->IsPlayer() && pUnit->IsAlive()
                     && std::find(portedPlayersThisPhase.begin(), portedPlayersThisPhase.end(), pUnit->GetObjectGuid()) == portedPlayersThisPhase.end())
                 {
                     candidates.push_back(pUnit);
@@ -415,13 +415,13 @@ struct boss_heiganAI : public ScriptedAI
     {
         // Looking for anyone with a manabar, currently excluded pets and totems
         // within 25yd range (radius of SPELL_MANABURN). If there is one we cast SPELL_MANABURN
-        const auto& tl = m_creature->getThreatManager().getThreatList();
+        const auto& tl = m_creature->GetThreatManager().getThreatList();
         bool found_mana_in_range = false;
         for (auto it = tl.begin(); it != tl.end(); ++it)
         {
             if (Unit* pTarget = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
             {
-                if (pTarget->getPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->isAlive())
+                if (pTarget->GetPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
                 {
                     if (m_creature->GetDistanceToCenter((*it)->getTarget()) < 28.0f)
                     {
@@ -443,14 +443,14 @@ struct boss_heiganAI : public ScriptedAI
         // This will avoid him running off the platform during dance phase.
         if (currentPhase == PHASE_FIGHT)
         {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
             if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
                 return;
         }
         else {
             // If wipe, we force the dance phase to end so above code runs and he evades.
-            if (m_creature->getThreatManager().isThreatListEmpty())
+            if (m_creature->GetThreatManager().isThreatListEmpty())
                 EventDanceEnd();
         }
         
@@ -507,7 +507,7 @@ struct mob_plague_cloudAI : public ScriptedAI
     }
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
     }

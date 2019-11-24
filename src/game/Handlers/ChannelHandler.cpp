@@ -260,7 +260,7 @@ void WorldSession::HandleChannelInviteOpcode(WorldPacket& recvPacket)
         return;
 
     PlayerPointer player = GetPlayerPointer();
-    if (player->getLevel() < sWorld.getConfig(CONFIG_UINT32_CHANNEL_INVITE_MIN_LEVEL))
+    if (player->GetLevel() < sWorld.getConfig(CONFIG_UINT32_CHANNEL_INVITE_MIN_LEVEL))
         return;
 
     if (ChannelMgr* cMgr = channelMgr(player->GetTeam()))

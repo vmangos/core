@@ -174,14 +174,14 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_XOROTHIAN_IMP, 30.0f);
         for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 DoScriptText(SAY_IMP_DESPAWN, (*it));
             (*it)->DisappearAndDie();
         }
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_DREAD_GUARD, 30.0f);
         for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 DoScriptText(SAY_DREAD_GUARD_DESPAWN, (*it));
             (*it)->DisappearAndDie();
         }
@@ -220,14 +220,14 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_XOROTHIAN_IMP, 30.0f);
         for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 DoScriptText(SAY_IMP_DESPAWN, (*it));
             (*it)->DisappearAndDie();
         }
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_DREAD_GUARD, 30.0f);
         for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 DoScriptText(SAY_DREAD_GUARD_DESPAWN, (*it));
             (*it)->DisappearAndDie();
         }
@@ -838,12 +838,12 @@ struct boss_lordHelNurathAI : public ScriptedAI
     }
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (m_uiShadowWord_Timer < uiDiff)
         {
             //penser à vérifier qu'il change de target si la cible est sleep
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_WORD) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOW_WORD) == CAST_OK)
                 m_uiShadowWord_Timer = urand(10000, 30000);
         }
         else
@@ -851,7 +851,7 @@ struct boss_lordHelNurathAI : public ScriptedAI
 
         if (m_uiVielOfShadow_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_VEIL_OF_SHADOW) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VEIL_OF_SHADOW) == CAST_OK)
                 m_uiVielOfShadow_Timer = urand(20000, 85000);
         }
         else
@@ -865,7 +865,7 @@ struct boss_lordHelNurathAI : public ScriptedAI
             m_uiSleep_Timer -= uiDiff;
         if (m_uiKnockAway_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                 m_uiKnockAway_Timer = urand(6000, 10000);
         }
         else
@@ -894,7 +894,7 @@ struct boss_xorothianDreadsteedAI : public ScriptedAI
     }
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (m_uiCharge_Timer < uiDiff)
         {
@@ -907,7 +907,7 @@ struct boss_xorothianDreadsteedAI : public ScriptedAI
 
         if (m_uiFlameBuffet_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
                 m_uiFlameBuffet_Timer = urand(7000, 12000);
         }
         else

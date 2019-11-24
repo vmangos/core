@@ -330,7 +330,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         if (pWho->GetTypeId() == TYPEID_PLAYER 
-            && !m_creature->isInCombat() 
+            && !m_creature->IsInCombat() 
             && m_creature->IsWithinDistInMap(pWho, 55.0f) 
             && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
@@ -385,7 +385,7 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -395,8 +395,8 @@ struct boss_anubrekhanAI : public ScriptedAI
         {
             if (m_uiRestoreTargetTimer <= uiDiff)
             {
-                m_creature->SetInFront(m_creature->getVictim());
-                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_creature->SetInFront(m_creature->GetVictim());
+                m_creature->SetTargetGuid(m_creature->GetVictim()->GetObjectGuid());
                 m_uiRestoreTargetTimer = 0;
             }
             else
@@ -447,8 +447,8 @@ struct boss_anubrekhanAI : public ScriptedAI
             // restore target at once if we have just done an impale
             if (m_uiRestoreTargetTimer)
             {
-                m_creature->SetInFront(m_creature->getVictim());
-                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_creature->SetInFront(m_creature->GetVictim());
+                m_creature->SetTargetGuid(m_creature->GetVictim()->GetObjectGuid());
                 m_uiRestoreTargetTimer = 0;
             }
 
@@ -512,7 +512,7 @@ struct mob_cryptguardsAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         // Crypt guards enrage at 50%
@@ -534,7 +534,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         }
 
         if (cleaveTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CRYPTGUARD_CLEAVE) == CanCastResult::CAST_OK) {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_CLEAVE) == CanCastResult::CAST_OK) {
                 cleaveTimer = CRYPTGUARD_CLEAVE_CD;
             }
         }
@@ -543,7 +543,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         }
 
         if (acidSpitTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CRYPTGUARD_ACID) == CanCastResult::CAST_OK) {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_ACID) == CanCastResult::CAST_OK) {
                 acidSpitTimer = CRYPTGUARD_ACID_CD;
             }
         }
@@ -587,7 +587,7 @@ struct anub_doorAI : public GameObjectAI
         // on door open, while the rest are said at random points during the fight?
         if (Creature* anubRekhan = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
-            if (anubRekhan->isAlive()) {
+            if (anubRekhan->IsAlive()) {
                 switch (urand(0, 4))
                 {
                 case 0:

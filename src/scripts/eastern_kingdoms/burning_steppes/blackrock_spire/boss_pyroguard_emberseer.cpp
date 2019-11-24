@@ -74,7 +74,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         for (it = canaliseurs.begin(); it != canaliseurs.end(); ++it)
             if (Creature* pCanaliser = m_creature->GetMap()->GetCreature(*it))
             {
-                if (!pCanaliser->isAlive())
+                if (!pCanaliser->IsAlive())
                     pCanaliser->Respawn();
                 pCanaliser->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
             }
@@ -106,7 +106,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         std::vector<ObjectGuid>::iterator it;
         for (it = canaliseurs.begin(); it != canaliseurs.end(); ++it)
             if (Creature* pCanaliser = m_creature->GetMap()->GetCreature(*it))
-                if (pCanaliser->isAlive())
+                if (pCanaliser->IsAlive())
                     return false;
         return true;
     }
@@ -171,7 +171,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         for (Map::PlayerList::const_iterator it2 = pl.begin(); it2 != pl.end(); ++it2)
         {
             Player* currPlayer = it2->getSource();
-            if (currPlayer && currPlayer->isAlive() && m_creature->IsInRange(currPlayer, 0.0f, 50.0f))
+            if (currPlayer && currPlayer->IsAlive() && m_creature->IsInRange(currPlayer, 0.0f, 50.0f))
                 AttackStart(currPlayer);
         }
         m_creature->SetInCombatWithZone();
@@ -273,7 +273,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         }
 
         // Sinon, on est "normalement" en combat.
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // FireNova Timer
@@ -385,7 +385,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
             return;
         }
         // Sinon go.
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (MiseEnCage_Timer < uiDiff)
         {
@@ -403,7 +403,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
 
         if (Frappe_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 15580) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), 15580) == CAST_OK)
                 Frappe_Timer = urand(7900, 14000);
         }
         else

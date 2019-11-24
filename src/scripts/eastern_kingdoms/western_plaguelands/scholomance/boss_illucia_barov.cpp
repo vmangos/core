@@ -57,13 +57,13 @@ struct boss_illuciabarovAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //CurseOfAgony_Timer
         if (CurseOfAgony_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSEOFAGONY);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSEOFAGONY);
             CurseOfAgony_Timer = 30000;
         }
         else CurseOfAgony_Timer -= diff;
@@ -82,7 +82,7 @@ struct boss_illuciabarovAI : public ScriptedAI
         //Silence_Timer
         if (Silence_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SILENCE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SILENCE);
             Silence_Timer = 14000;
         }
         else Silence_Timer -= diff;
@@ -90,7 +90,7 @@ struct boss_illuciabarovAI : public ScriptedAI
         //Fear_Timer
         if (Fear_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR);
             Fear_Timer = 30000;
         }
         else Fear_Timer -= diff;

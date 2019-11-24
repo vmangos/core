@@ -156,11 +156,11 @@ struct boss_chromaggusAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *pUnit) override
     {
-        if (!pUnit || m_creature->getVictim())
+        if (!pUnit || m_creature->GetVictim())
             return;
 
         if (m_bEngagedOnce && pUnit->IsPlayer() && m_creature->GetDistance2d(pUnit) < 55.0f && m_creature->IsWithinLOSInMap(pUnit)
-          && pUnit->isTargetableForAttack() && pUnit->isInAccessablePlaceFor(m_creature))
+          && pUnit->IsTargetableForAttack() && pUnit->IsInAccessablePlaceFor(m_creature))
             AttackStart(pUnit);
     }
 
@@ -199,7 +199,7 @@ struct boss_chromaggusAI : public ScriptedAI
                 holder->SetTargetSecondaryThreatFocus(true);
             if (pTarget->GetTypeId() != TYPEID_PLAYER)
                 return;
-            m_vTimeLapseInfo.push_back(new TimeLapseInfo(pTarget->GetObjectGuid(), m_creature->getThreatManager().getThreat(pTarget), pTarget->GetHealth()));
+            m_vTimeLapseInfo.push_back(new TimeLapseInfo(pTarget->GetObjectGuid(), m_creature->GetThreatManager().getThreat(pTarget), pTarget->GetHealth()));
         }
     }
 
@@ -226,7 +226,7 @@ struct boss_chromaggusAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->isInCombat() && !m_bEngagedOnce)
+        if (!m_creature->IsInCombat() && !m_bEngagedOnce)
         {
             if (GameObject* pGO = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(DATA_DOOR_CHROMAGGUS_SIDE)))
             {
@@ -252,13 +252,13 @@ struct boss_chromaggusAI : public ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         for (std::vector<TimeLapseInfo*>::iterator itr = m_vTimeLapseInfo.begin(); itr != m_vTimeLapseInfo.end(); ++itr)
             if (Player* pTarget = m_creature->GetMap()->GetPlayer((*itr)->m_targetGuid))
             {
-                if (!pTarget->HasAura(SPELL_TIME_LAPSE) && pTarget->isAlive())
+                if (!pTarget->HasAura(SPELL_TIME_LAPSE) && pTarget->IsAlive())
                 {
                     if ((*itr)->m_targetHealth >= (pTarget->GetMaxHealth() / 2))
                         pTarget->SetHealth(pTarget->GetMaxHealth());
@@ -352,7 +352,7 @@ struct boss_chromaggusAI : public ScriptedAI
             }
 
             std::vector<ObjectGuid> m_vPossibleVictim;
-            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
             for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
                 if (Player* target = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid()))
                     m_vPossibleVictim.push_back(target->GetObjectGuid());
@@ -404,13 +404,13 @@ struct boss_chromaggusAI : public ScriptedAI
         for (AfflictionGuids::iterator itr = m_lRedAfflictionPlayerGUID.begin(); itr != m_lRedAfflictionPlayerGUID.end();)
         {
             Player* pTarget = m_creature->GetMap()->GetPlayer(*itr);
-            if (pTarget && pTarget->isAlive() && !pTarget->HasAura(SPELL_BROODAF_RED, EFFECT_INDEX_0))
+            if (pTarget && pTarget->IsAlive() && !pTarget->HasAura(SPELL_BROODAF_RED, EFFECT_INDEX_0))
             {
                 itr = m_lRedAfflictionPlayerGUID.erase(itr);
                 continue;
             }
 
-            if (!pTarget || pTarget->isDead())
+            if (!pTarget || pTarget->IsDead())
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_CHROMA_HEAL) == CAST_OK) //Heal 150000 HP
                     m_lRedAfflictionPlayerGUID.erase(itr);
@@ -424,7 +424,7 @@ struct boss_chromaggusAI : public ScriptedAI
         {
             if (Player* pTarget = m_creature->GetMap()->GetPlayer(*itr))
             {
-                if (pTarget->isDead())
+                if (pTarget->IsDead())
                 {
                     pTarget->RemoveAurasDueToSpell(23175);
                     pTarget->RemoveAurasDueToSpell(23177);

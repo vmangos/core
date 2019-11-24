@@ -148,7 +148,7 @@ CreatureAI* GetAI_npc_malfurion(Creature* pCreature)
 // Summon Malfurion trigger (AQ scepter quest)
 bool AreaTrigger_at_shade_of_eranikus(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    if (!pPlayer || !pPlayer->isAlive() || !pAt)
+    if (!pPlayer || !pPlayer->IsAlive() || !pAt)
         return false;
 
     if (pAt->id != AREATRIGGER_MALFURION)
@@ -397,7 +397,7 @@ void npc_shade_hakkarAI::JustSummoned(Creature* summoned)
 
 void npc_shade_hakkarAI::SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
 {
-    if (uiMotionType != POINT_MOTION_TYPE || !pSummoned->isAlive())
+    if (uiMotionType != POINT_MOTION_TYPE || !pSummoned->IsAlive())
         return;
 
     if (pSummoned->GetEntry() == NPC_HAKKARI_MINION)
@@ -460,7 +460,7 @@ void npc_shade_hakkarAI::SummonedMovementInform(Creature* pSummoned, uint32 uiMo
         {
             case 0:
                 pSummoned->GetMotionMaster()->MoveIdle();
-                if (pSummoned->isAlive())
+                if (pSummoned->IsAlive())
                     if (Creature* Shade = pSummoned->FindNearestCreature(8440, 150.0f)) // NPC_SHADE_OF_HAKKAR
                         pSummoned->CastSpell(Shade, SPELL_SUPPRESSION, false);
                 break;
@@ -484,7 +484,7 @@ void npc_shade_hakkarAI::UpdateAI(const uint32 uiDiff)
     else
         CheckTimer -= uiDiff;
 
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_pInstance)
         return;
 
     if (m_creature->HasAura(SPELL_SUPPRESSION))

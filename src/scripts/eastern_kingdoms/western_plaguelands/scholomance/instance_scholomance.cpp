@@ -435,7 +435,7 @@ struct boss_lordblackwoodAI : public ScriptedAI
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
         {
             m_creature->SetWalk(true);
             if (uiPointId < 3)
@@ -449,14 +449,14 @@ struct boss_lordblackwoodAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if (!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
         {
             if (MultiShot_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MULTI_SHOT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MULTI_SHOT) == CAST_OK)
                     MultiShot_Timer = 2000;
             }
             else
@@ -464,7 +464,7 @@ struct boss_lordblackwoodAI : public ScriptedAI
         }
         if (ShieldBash_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH) == CAST_OK)
                 ShieldBash_Timer = 8000;
         }
         else

@@ -176,7 +176,7 @@ uint32 Quest::XPValue(Player *pPlayer) const
     {
         if (RewXP > 0)
         {
-            uint32 pLevel = pPlayer->getLevel();
+            uint32 pLevel = pPlayer->GetLevel();
             uint32 qLevel = QuestLevel;
             float fullxp = RewXP;
 

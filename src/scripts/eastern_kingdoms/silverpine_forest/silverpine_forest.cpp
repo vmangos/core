@@ -42,12 +42,12 @@ struct npc_astor_hadrenAI : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->setFaction(68);
+        m_creature->SetFactionTemplateId(68);
     }
 
     void JustDied(Unit *who) override
     {
-        m_creature->setFaction(68);
+        m_creature->SetFactionTemplateId(68);
     }
 };
 
@@ -76,7 +76,7 @@ bool GossipSelect_npc_astor_hadren(Player* pPlayer, Creature* pCreature, uint32 
             break;
         case GOSSIP_ACTION_INFO_DEF + 2:
             pPlayer->CLOSE_GOSSIP_MENU();
-            pCreature->setFaction(21);
+            pCreature->SetFactionTemplateId(21);
             ((npc_astor_hadrenAI*)pCreature->AI())->AttackStart(pPlayer);
             break;
     }
@@ -402,7 +402,7 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
                 m_uiWaveTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -621,7 +621,7 @@ struct npc_human_worgenAI : public ScriptedAI
                 m_uiWolfSound_Timer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         switch (m_creature->GetEntry())
@@ -666,7 +666,7 @@ struct npc_human_worgenAI : public ScriptedAI
             case PYREWOOD_TAILOR:
                 if (m_uiBackstab_Timer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKSTAB) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKSTAB) == CAST_OK)
                         m_uiBackstab_Timer = 8100;
                 }
                 else
@@ -674,7 +674,7 @@ struct npc_human_worgenAI : public ScriptedAI
 
                 if (m_uiDisarm_Timer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISARM) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISARM) == CAST_OK)
                         m_uiDisarm_Timer = 7100;
                 }
                 else
@@ -682,7 +682,7 @@ struct npc_human_worgenAI : public ScriptedAI
 
                 if (m_uiExposeWeakness_Timer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_EXPOSE_WEAKNESS) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_EXPOSE_WEAKNESS) == CAST_OK)
                         m_uiExposeWeakness_Timer = 9100;
                 }
                 else

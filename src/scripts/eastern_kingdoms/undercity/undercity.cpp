@@ -75,7 +75,7 @@ public:
             m_creature->GetMotionMaster()->Clear();
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSummSkelTimer <= uiDiff)
@@ -90,7 +90,7 @@ public:
         {
             if (DoCastSpellIfCan(m_creature, SPELL_FADE) == CAST_OK)
             {
-                m_creature->GetMotionMaster()->MoveFollow(m_creature->getVictim(), 30.0f, m_creature->GetAngle(m_creature->getVictim()));
+                m_creature->GetMotionMaster()->MoveFollow(m_creature->GetVictim(), 30.0f, m_creature->GetAngle(m_creature->GetVictim()));
                 m_uiFadeTimer = 50000;
                 m_uiBlackArrowTimer = 0;
                 m_uiMultiShotTimer = 0;
@@ -125,7 +125,7 @@ public:
 
         if (m_uiShootTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT) == CAST_OK)
                 m_uiShootTimer = 10000;
         }
         else

@@ -130,7 +130,7 @@ Player* SingleTest::GetTestPlayer(uint32 num, uint32 options)
     if (options & TESTPLAYER_MAXLEVEL)
     {
         p->GiveLevel(60);
-        p->SetPower(p->getPowerType(), p->GetMaxPower(p->getPowerType()));
+        p->SetPower(p->GetPowerType(), p->GetMaxPower(p->GetPowerType()));
         p->SetFullHealth();
     }
     return p;

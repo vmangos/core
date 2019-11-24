@@ -191,7 +191,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         scepterRun = false;
         watchScepterRun = false;
 
-        m_creature->setFaction(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
 
         // set gossip flag to begin the event
         m_creature->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR);
@@ -259,7 +259,7 @@ struct boss_victor_nefariusAI : ScriptedAI
 
     void JustReachedHome() override
     {
-        m_creature->setFaction(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
         if (m_pInstance)
@@ -336,11 +336,11 @@ struct boss_victor_nefariusAI : ScriptedAI
                         break;
                     case 3:
                         DoCastSpellIfCan(m_creature, SPELL_NEFARIUS_BARRIER);
-                        m_creature->setFaction(FACTION_BLACK_DRAGON);
+                        m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
 
                         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
                         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-                            if (i->getSource() && i->getSource()->isAlive())
+                            if (i->getSource() && i->getSource()->IsAlive())
                                 m_creature->AddThreat(i->getSource(), 10000.0f);
 
                         DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED); // root
@@ -373,7 +373,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         }
 
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (phase2bis)
@@ -461,7 +461,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         // Shadowbolt Timer
         if (m_uiShadowBoltTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT) == CAST_OK)
                 m_uiShadowBoltTimer = urand(3000, 10000);
         }
         else
@@ -470,7 +470,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         // Shadowbolt Volley Timer
         if (m_uiShadowBoltVolleyTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT_VOLLEY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT_VOLLEY) == CAST_OK)
                 m_uiShadowBoltVolleyTimer = 15000;
         }
         else
@@ -531,8 +531,8 @@ struct boss_victor_nefariusAI : ScriptedAI
             {
                 if (!pTarget->HasAura(SPELL_SHADOW_COMMAND))
                 {
-                    m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
-                    m_creature->getThreatManager().addThreatDirectly(pTarget, m_uiMindControledPlayerAggro);
+                    m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
+                    m_creature->GetThreatManager().addThreatDirectly(pTarget, m_uiMindControledPlayerAggro);
                     DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED);    // Root self
                     m_uiMindControledPlayerGuid.Clear();
                     m_uiMindControledPlayerAggro = 0;
@@ -551,7 +551,7 @@ struct boss_victor_nefariusAI : ScriptedAI
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
             {
                 m_uiMindControledPlayerGuid = pTarget->GetObjectGuid();
-                m_uiMindControledPlayerAggro = m_creature->getThreatManager().getThreat(pTarget);
+                m_uiMindControledPlayerAggro = m_creature->GetThreatManager().getThreat(pTarget);
                 if (DoCastSpellIfCan(pTarget, SPELL_SHADOW_COMMAND, CF_AURA_NOT_PRESENT) == CAST_OK)
                     m_uiMindControlTimer = urand(25000, 40000);
             }

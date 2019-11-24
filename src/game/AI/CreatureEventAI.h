@@ -23,11 +23,10 @@
 #define MANGOS_CREATURE_EAI_H
 
 #include "Common.h"
-#include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
-#include "ScriptMgr.h"
 
+class Unit;
+class Creature;
 class Player;
 class WorldObject;
 

@@ -79,7 +79,7 @@ struct boss_bug_trioAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // The bug trio have a larger than normal aggro radius
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 60.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->IsInCombat() && m_creature->IsWithinDistInMap(pWho, 60.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
         }
@@ -124,7 +124,7 @@ struct boss_bug_trioAI : public ScriptedAI
 
     void TriggerDevour(Unit* pWho)
     {
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             m_uiDevourTimer = 4000;
             m_bIsEating = true;
@@ -141,21 +141,21 @@ struct boss_bug_trioAI : public ScriptedAI
         // Force evade all 3 bugs and respawn any that are already dead. We have to do this manually or linked bugs don't evade/respawn on region triggered EnterEvadeMode.
         if (Creature* pKri = m_pInstance->GetSingleCreatureFromStorage(NPC_KRI))
         {
-            if (pKri->isDead())
+            if (pKri->IsDead())
                 pKri->Respawn();
             else
                 pKri->AI()->EnterEvadeMode();
         }
         if (Creature* pYauj = m_pInstance->GetSingleCreatureFromStorage(NPC_PRINCESS_YAUJ))
         {
-            if (pYauj->isDead())
+            if (pYauj->IsDead())
                 pYauj->Respawn();
             else
                 pYauj->AI()->EnterEvadeMode();
         }
         if (Creature* pVem = m_pInstance->GetSingleCreatureFromStorage(NPC_VEM))
         {
-            if (pVem->isDead())
+            if (pVem->IsDead())
                 pVem->Respawn();
             else
                 pVem->AI()->EnterEvadeMode();
@@ -166,7 +166,7 @@ struct boss_bug_trioAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_bIsEating)
@@ -177,9 +177,9 @@ struct boss_bug_trioAI : public ScriptedAI
                 DoResetThreat();
                 m_bIsEating = false;
                 m_creature->SetHealth(m_creature->GetMaxHealth());
-                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_creature->SetTargetGuid(m_creature->GetVictim()->GetObjectGuid());
                 m_creature->UpdateSpeed(MOVE_RUN, false);
-                DoStartMovement(m_creature->getVictim());
+                DoStartMovement(m_creature->GetVictim());
             }
             else
             {
@@ -237,7 +237,7 @@ struct boss_kriAI : public boss_bug_trioAI
         // Cleave
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(5000, 12000);
         }
         else
@@ -352,7 +352,7 @@ struct boss_yaujAI : public boss_bug_trioAI
         // Ravage
         if (m_uiRavageTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_RAVAGE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_RAVAGE) == CAST_OK)
                 m_uiRavageTimer = urand(12000, 20000);
         }
         else
@@ -392,8 +392,8 @@ struct boss_vemAI : public boss_bug_trioAI
     {
         if ((pSpell->Id == SPELL_KNOCKBACK) && pTarget->GetTypeId() == TYPEID_PLAYER)
         {
-            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -80);
+            if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -80);
         }
     }
 
@@ -415,9 +415,9 @@ struct boss_vemAI : public boss_bug_trioAI
         // Knock Away
         if (m_uiKnockBackTimer < uiDiff)
         {
-            if (m_creature->IsWithinMeleeRange(m_creature->getVictim()) && !m_creature->getVictim()->hasUnitState(UNIT_STAT_STUNNED))
+            if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()) && !m_creature->GetVictim()->HasUnitState(UNIT_STAT_STUNNED))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKBACK) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKBACK) == CAST_OK)
                     m_uiKnockBackTimer = urand(10000, 14000);
             }
         }
@@ -429,7 +429,7 @@ struct boss_vemAI : public boss_bug_trioAI
         {
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_KNOCKDOWN, SELECT_FLAG_IN_MELEE_RANGE))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKDOWN) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKDOWN) == CAST_OK)
                     m_uiKnockdownTimer = urand(15000, 20000);
             }
         }

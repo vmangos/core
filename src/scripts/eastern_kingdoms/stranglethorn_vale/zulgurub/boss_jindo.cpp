@@ -124,9 +124,9 @@ struct boss_jindoAI : public ScriptedAI
                 return;
 
             HexGuid = pCaster->GetGUID();
-            HexAggro = m_creature->getThreatManager().getThreat(pCaster);
+            HexAggro = m_creature->GetThreatManager().getThreat(pCaster);
 
-            m_creature->getThreatManager().modifyThreatPercent(pCaster, -100);
+            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -100);
         }
     }
 
@@ -153,7 +153,7 @@ struct boss_jindoAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (HexGuid)
@@ -161,7 +161,7 @@ struct boss_jindoAI : public ScriptedAI
             Player* hexPlayer = m_creature->GetMap()->GetPlayer(HexGuid);
             if (hexPlayer && !hexPlayer->HasAura(SPELL_HEX))
             {
-                m_creature->getThreatManager().addThreatDirectly(hexPlayer, HexAggro);
+                m_creature->GetThreatManager().addThreatDirectly(hexPlayer, HexAggro);
                 HexGuid = 0;
                 HexAggro = 0;
             }
@@ -194,10 +194,10 @@ struct boss_jindoAI : public ScriptedAI
                 {
                     if (Player* pTarget = m_creature->GetMap()->GetPlayer((*itr)))
                     {
-                        if ((pTarget->isAlive() && !pTarget->HasAura(24261, EFFECT_INDEX_0)) || pTarget->isDead()) // SPELL_BRAINWASH 24261
+                        if ((pTarget->IsAlive() && !pTarget->HasAura(24261, EFFECT_INDEX_0)) || pTarget->IsDead()) // SPELL_BRAINWASH 24261
                         {
                             PlayerBrainWashedGuid = *itr;
-                            if (pTarget->isDead())
+                            if (pTarget->IsDead())
                                 PlayerDead = true;
                             else
                                 AuraRemoved = true;
@@ -215,8 +215,8 @@ struct boss_jindoAI : public ScriptedAI
                     Player* playerBrainWashed = m_creature->GetMap()->GetPlayer(PlayerBrainWashedGuid);
                     if (AuraRemoved)
                     {
-                        m_creature->getThreatManager().modifyThreatPercent(playerBrainWashed, -100);
-                        m_creature->getThreatManager().addThreatDirectly(playerBrainWashed, (*Iter));
+                        m_creature->GetThreatManager().modifyThreatPercent(playerBrainWashed, -100);
+                        m_creature->GetThreatManager().addThreatDirectly(playerBrainWashed, (*Iter));
                     }
 
                     BrainWashedPlayerGuid.remove(PlayerBrainWashedGuid);
@@ -243,7 +243,7 @@ struct boss_jindoAI : public ScriptedAI
         //Hex_Timer
         if (Hex_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HEX) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_HEX) == CAST_OK)
                 Hex_Timer = urand(12000, 20000);
         }
         else
@@ -313,16 +313,16 @@ struct mob_shade_of_jindoAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->getVictim()->HasAura(SPELL_HEX))
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+        if (m_creature->GetVictim()->HasAura(SPELL_HEX))
+            m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
 
         //ShadowShock_Timer
         if (ShadowShock_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWSHOCK);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWSHOCK);
             ShadowShock_Timer = 2000;
         }
         else
@@ -351,27 +351,27 @@ struct mob_brain_wash_totemAI : public ScriptedAI
         CheckTimer = 0;
 
         m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance : pas touché par les AOE
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         SetCombatMovement(false);
     }
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_pInstance)
         {
             m_creature->DisappearAndDie();
             return;
         }
 
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
 
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
             m_creature->SetInCombatWithZone();
 
         // Deja en train de CM le joueur
         if (PlayerMCGuid)
             if (Player* pPlayer = m_creature->GetMap()->GetPlayer(PlayerMCGuid))
-                if (pPlayer->isAlive() && pPlayer->HasAura(24261, EFFECT_INDEX_0))
+                if (pPlayer->IsAlive() && pPlayer->HasAura(24261, EFFECT_INDEX_0))
                     return;
 
 
@@ -381,12 +381,12 @@ struct mob_brain_wash_totemAI : public ScriptedAI
             if (pJindo->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1))
             {
                 Unit* pTarget = pJindo ? pJindo->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : nullptr;
-                if (pTarget && pTarget->isAlive() && pTarget->IsPlayer() && !pTarget->HasAura(SPELL_HEX) && !pTarget->HasAura(SPELL_BRAINWASH))
+                if (pTarget && pTarget->IsAlive() && pTarget->IsPlayer() && !pTarget->HasAura(SPELL_HEX) && !pTarget->HasAura(SPELL_BRAINWASH))
                 {
                     if (boss_jindoAI* pJindoAI = dynamic_cast<boss_jindoAI*>(pJindo->AI()))
                     {
                         pJindoAI->BrainWashedPlayerGuid.push_back(pTarget->GetGUID());
-                        pJindoAI->BrainWashedPlayerAggro.push_back(pJindo->getThreatManager().getThreat(pTarget));
+                        pJindoAI->BrainWashedPlayerAggro.push_back(pJindo->GetThreatManager().getThreat(pTarget));
                         if (DoCastSpellIfCan(pTarget, SPELL_BRAINWASH) == CAST_OK)
                         {
                             PlayerMCGuid = pTarget->GetGUID();

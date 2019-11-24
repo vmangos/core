@@ -27,7 +27,6 @@
 #include "Opcodes.h"
 #include "Chat.h"
 #include "Log.h"
-#include "Unit.h"
 #include "GossipDef.h"
 #include "Language.h"
 #include "BattleGroundMgr.h"
@@ -2092,13 +2091,13 @@ bool ChatHandler::HandleUnitStatCommand(char *args)
         return false;
     uint32 unitStat = 0x0;
     for (int i = 1; i < UNIT_STAT_IGNORE_PATHFINDING; i *= 2)
-        if (pTarget->hasUnitState(i))
+        if (pTarget->HasUnitState(i))
             unitStat |= i;
     PSendSysMessage("UnitState = 0x%x (%u)", unitStat, unitStat);
     if (ExtractUInt32(&args, unitStat))
     {
-        pTarget->clearUnitState(UNIT_STAT_ALL_STATE);
-        pTarget->addUnitState(unitStat);
+        pTarget->ClearUnitState(UNIT_STAT_ALL_STATE);
+        pTarget->AddUnitState(unitStat);
         PSendSysMessage("UnitState changed to 0x%x (%u)", unitStat, unitStat);
     }
     return true;

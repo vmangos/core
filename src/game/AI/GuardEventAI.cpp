@@ -35,9 +35,9 @@ bool GuardEventAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
     if (pWho->IsPvPContested())
         return true;
 
-    if (Unit* pVictim = pWho->getVictim())
+    if (Unit* pVictim = pWho->GetVictim())
     {
-        if (m_creature->IsFriendlyTo(pVictim) || pVictim->isTaxi())
+        if (m_creature->IsFriendlyTo(pVictim) || pVictim->IsTaxi())
             return true;
     }
 
@@ -49,7 +49,7 @@ void GuardEventAI::MoveInLineOfSight(Unit *pWho)
     if (!pWho)
         return;
 
-    if (m_creature->getVictim())
+    if (m_creature->GetVictim())
         return;
 
     // Check for OOC LOS Event
@@ -75,9 +75,9 @@ void GuardEventAI::MoveInLineOfSight(Unit *pWho)
     if (!m_creature->IsWithinDistInMap(pWho, attackRadius))
         return;
 
-    if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() &&
+    if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() &&
         (pWho->IsHostileToPlayers() || m_creature->IsHostileTo(pWho) || isAttackingFriend) &&
-        pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+        pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
     {
         AttackStart(pWho);
     }

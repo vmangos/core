@@ -204,7 +204,7 @@ struct instance_molten_core : ScriptedInstance
 
     void OnCreatureEnterCombat(Creature* pCreature) override
     {
-        Unit* victim = pCreature->getVictim();
+        Unit* victim = pCreature->GetVictim();
         if (!victim)
             return;
         std::list<Creature*> DomoListe;
@@ -220,7 +220,7 @@ struct instance_molten_core : ScriptedInstance
                 {
                     for (std::list<Creature*>::iterator itr = DomoListe.begin(); itr != DomoListe.end(); ++itr)
                     {
-                        if ((*itr)->isAlive() && !(*itr)->isInCombat())
+                        if ((*itr)->IsAlive() && !(*itr)->IsInCombat())
                             (*itr)->SetInCombatWith(victim);
                     }
                 }

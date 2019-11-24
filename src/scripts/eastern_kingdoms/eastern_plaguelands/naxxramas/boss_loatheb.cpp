@@ -92,13 +92,13 @@ struct mob_rottingMaggotAI : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 1.5f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
                 m_creature->SetNoCallAssistance(true);
 
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
                 else if (m_creature->GetMap()->IsDungeon())
                 {
@@ -117,7 +117,7 @@ struct mob_rottingMaggotAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (isDiseased)
         {
@@ -153,7 +153,7 @@ struct mob_eyeStalkAI : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->AddUnitState(UNIT_STAT_ROOT);
         m_creature->StopMoving();
         m_creature->SetRooted(true);
         m_creature->SetNoCallAssistance(true);
@@ -167,12 +167,12 @@ struct mob_eyeStalkAI : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 19.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
                 m_creature->SetNoCallAssistance(true);
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
                 else if (m_creature->GetMap()->IsDungeon())
                 {
@@ -198,13 +198,13 @@ struct mob_eyeStalkAI : public ScriptedAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!m_creature->IsNonMeleeSpellCasted())
         {
-            if (m_creature->GetDistance(m_creature->getVictim()) < 35.0f)
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_FLAY);
+            if (m_creature->GetDistance(m_creature->GetVictim()) < 35.0f)
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_FLAY);
             else
                 DoStopAttack();
         }
@@ -408,7 +408,7 @@ struct boss_loathebAI : public ScriptedAI
 
         WhackAStalk(uiDiff);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))

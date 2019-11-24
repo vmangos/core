@@ -197,7 +197,7 @@ CreatureAI* GetAI_npc_saean(Creature* pCreature)
 bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
 {
     // If player is dead, GM mode is ON, quest complete or no quest
-    if (!pPlayer->isAlive() || pPlayer->IsGameMaster() ||
+    if (!pPlayer->IsAlive() || pPlayer->IsGameMaster() ||
         pPlayer->GetQuestStatus(QUEST_RESUPPLYING_THE_EXCAVATION) == QUEST_STATUS_COMPLETE ||
         pPlayer->GetQuestStatus(QUEST_RESUPPLYING_THE_EXCAVATION) == QUEST_STATUS_NONE)
     return false;
@@ -212,7 +212,7 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     Creature* huldar = GetClosestCreatureWithEntry(pPlayer, NPC_HULDAR, 60.0f);
     if (huldar)
     {
-        if (!huldar->isAlive())
+        if (!huldar->IsAlive())
             return false;
     }
     else
@@ -222,7 +222,7 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     Creature* miran = GetClosestCreatureWithEntry(pPlayer, NPC_MIRAN, 60.0f);
     if (miran)
     {
-        if (!miran->isAlive())
+        if (!miran->IsAlive())
             return false;
         else
         {
@@ -241,14 +241,14 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
 
     
     // minor optimization: Quest NPCs are already in combat with someone, so skip further checks.
-    if (miran->isInCombat() || huldar->isInCombat())
+    if (miran->IsInCombat() || huldar->IsInCombat())
         return true;
     
     // Check if Saean is available.
     Creature* saean = GetClosestCreatureWithEntry(pPlayer, NPC_SAEAN, 60.0f);
     if (saean)
     {
-        if (saean->isAlive())
+        if (saean->IsAlive())
         {
             npc_saeanAI* saeanAI = dynamic_cast<npc_saeanAI*>(saean->AI());
             if (saeanAI)

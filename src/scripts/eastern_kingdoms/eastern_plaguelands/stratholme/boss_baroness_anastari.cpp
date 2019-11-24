@@ -110,7 +110,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (Possessed)
@@ -128,7 +128,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
                         m_creature->NearTeleportTo(old_Position.x, old_Position.y, old_Position.z, 0.0f);
 
                         /** Set the player health back to its old state unless their party members killed them, whoops! */
-                        if (pTarget->isAlive())
+                        if (pTarget->IsAlive())
                             pTarget->SetHealthPercent(PlayerHealth);
 
                         m_creature->SetVisibility(VISIBILITY_ON);
@@ -139,8 +139,8 @@ struct boss_baroness_anastariAI : public ScriptedAI
                         {
                             if (Unit* pTarg = m_creature->GetMap()->GetUnit(PlayerGuids[i]))
                             {
-                                m_creature->getThreatManager().addThreatDirectly(pTarg, PlayerAggro[i]);
-                                if (pTarg->isAlive())
+                                m_creature->GetThreatManager().addThreatDirectly(pTarg, PlayerAggro[i]);
+                                if (pTarg->IsAlive())
                                     m_creature->SetInCombatWith(pTarg);
                             }
                         }
@@ -174,14 +174,14 @@ struct boss_baroness_anastariAI : public ScriptedAI
                     if (target->IsPlayer() && target->GetHealthPercent() > 30.0f)
                     {
                         PossessedPlayerGuid = target->GetGUID();
-                        /*PossessedPlayerAggro = m_creature->getThreatManager().getThreat(target);*/
+                        /*PossessedPlayerAggro = m_creature->GetThreatManager().getThreat(target);*/
 
                         for (int i = 0; i < 5; i++)
                         {
                             PlayerGuids[i] = 0;
                             PlayerAggro[i] = 0;
                         }
-                        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+                        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                         for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
                         {
                             Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
@@ -192,7 +192,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
                                     if (PlayerGuids[i] == 0)
                                     {
                                         PlayerGuids[i] = pUnit->GetGUID();
-                                        PlayerAggro[i] = m_creature->getThreatManager().getThreat(pUnit);
+                                        PlayerAggro[i] = m_creature->GetThreatManager().getThreat(pUnit);
                                     }
                                 }
                             }
@@ -221,7 +221,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
                             for (int i = 0; i < 5; i++)
                             {
                                 if (PlayerGuids[i] != PossessedPlayerGuid)
-                                    m_creature->getThreatManager().addThreatDirectly(m_creature->GetMap()->GetUnit(PlayerGuids[i]), PlayerAggro[i]);
+                                    m_creature->GetThreatManager().addThreatDirectly(m_creature->GetMap()->GetUnit(PlayerGuids[i]), PlayerAggro[i]);
                             }
 
                             Possessed = true;
@@ -238,7 +238,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
         //BansheeWail
         if (BansheeWail_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BANSHEEWAIL) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BANSHEEWAIL) == CAST_OK)
                 BansheeWail_Timer = 4000;
         }
         else BansheeWail_Timer -= diff;
@@ -246,7 +246,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
         //BansheeCurse
         if (BansheeCurse_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BANSHEECURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BANSHEECURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
                 BansheeCurse_Timer = 18000;
         }
         else BansheeCurse_Timer -= diff;

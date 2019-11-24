@@ -97,19 +97,19 @@ struct boss_ladyFaltheressAI : public ScriptedAI
 
     void TransformIntoHostile()
     {
-        m_creature->setFaction(FACTION_SCOURGE);
+        m_creature->SetFactionTemplateId(FACTION_SCOURGE);
         //TODO : find the humain appearance she transforms out of.
         m_creature->SetDisplayId(MODEL_ID_UNDEAD);
     }
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (MindBlast_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_BLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_BLAST) == CAST_OK)
                 MindBlast_Timer = 8000;
         }
         else
@@ -350,12 +350,12 @@ struct npc_belnistraszAI : public npc_escortAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiFireballTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIREBALL);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FIREBALL);
             m_uiFireballTimer = urand(2000, 3000);
         }
         else
@@ -363,7 +363,7 @@ struct npc_belnistraszAI : public npc_escortAI
 
         if (m_uiFrostNovaTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_NOVA);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROST_NOVA);
             m_uiFrostNovaTimer = urand(10000, 15000);
         }
         else
@@ -388,7 +388,7 @@ bool QuestAccept_npc_belnistrasz(Player* pPlayer, Creature* pCreature, const Que
         {
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
             DoScriptText(SAY_BELNISTRASZ_READY, pCreature, pPlayer);
-            pCreature->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+            pCreature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
         }
     }
     return true;
@@ -447,7 +447,7 @@ struct npc_tomb_creatureAI : public ScriptedAI
         {
             if (uiWebTimer <= uiDiff)
             {
-                DoCast(m_creature->getVictim(), SPELL_WEB);
+                DoCast(m_creature->GetVictim(), SPELL_WEB);
                 uiWebTimer = urand(7000, 16000);
             }
             else uiWebTimer -= uiDiff;

@@ -244,7 +244,7 @@ struct boss_sapphironAI : public ScriptedAI
 
     void AggroRadius(uint32 diff)
     {
-        if (m_creature->isInCombat() || m_creature->IsInEvadeMode())
+        if (m_creature->IsInCombat() || m_creature->IsInEvadeMode())
             return;
         if (phase != PHASE_GROUND && phase != PHASE_SKELETON)
             return;
@@ -278,10 +278,10 @@ struct boss_sapphironAI : public ScriptedAI
             
 
             bool alert;
-            if (!pPlayer->isVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
+            if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
                 continue;
 
-            if (!pPlayer->isTargetableForAttack() || !m_creature->IsHostileTo(pPlayer))
+            if (!pPlayer->IsTargetableForAttack() || !m_creature->IsHostileTo(pPlayer))
                 continue;
 
             if (phase == PHASE_SKELETON)
@@ -291,9 +291,9 @@ struct boss_sapphironAI : public ScriptedAI
             }
             if (m_creature->CanInitiateAttack())
             {
-                if (pPlayer->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
+                if (pPlayer->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
                 {
-                    if (!m_creature->getVictim())
+                    if (!m_creature->GetVictim())
                     {
                         AttackStart(pPlayer);
                         return;
@@ -342,7 +342,7 @@ struct boss_sapphironAI : public ScriptedAI
 
     void DoIceBolt()
     {
-        ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
+        ThreatList const& threatlist = m_creature->GetThreatManager().getThreatList();
         if (threatlist.size() <= iceboltTargets.size())
         {
             RescheduleIcebolt();
@@ -353,7 +353,7 @@ struct boss_sapphironAI : public ScriptedAI
         for (auto itr = threatlist.begin(); itr != threatlist.end(); ++itr)
             if (Unit* pTarget = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid()))
             {
-                if (pTarget->isDead())
+                if (pTarget->IsDead())
                     continue;
                 
                 if (std::find(iceboltTargets.begin(), iceboltTargets.end(), pTarget->GetObjectGuid()) != iceboltTargets.end())
@@ -425,7 +425,7 @@ struct boss_sapphironAI : public ScriptedAI
 
             //m_creature->SetFly(false);
             //m_creature->SetLevitate(false);
-            m_creature->SetMeleeZLimit(MELEE_Z_LIMIT);
+            m_creature->SetMeleeZLimit(UNIT_DEFAULT_MELEE_Z_LIMIT);
         }
     }
 
@@ -433,10 +433,10 @@ struct boss_sapphironAI : public ScriptedAI
     {
         bool unreachableTarget = 
             !m_creature->GetMotionMaster()->empty() &&
-             m_creature->getVictim() &&
+             m_creature->GetVictim() &&
              m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
             !m_creature->HasDistanceCasterMovement() &&
-           (!m_creature->IsWithinDistInMap(m_creature->getVictim(), m_creature->GetMaxChaseDistance(m_creature->getVictim())) || !m_creature->IsWithinLOSInMap(m_creature->getVictim())) &&
+           (!m_creature->IsWithinDistInMap(m_creature->GetVictim(), m_creature->GetMaxChaseDistance(m_creature->GetVictim())) || !m_creature->IsWithinLOSInMap(m_creature->GetVictim())) &&
             !m_creature->GetMotionMaster()->GetCurrent()->IsReachable();
         
         if (unreachableTarget)
@@ -470,7 +470,7 @@ struct boss_sapphironAI : public ScriptedAI
         if (phase == PHASE_GROUND)
         {
             AggroRadius(uiDiff);
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
          
             UpdateReachable(uiDiff);
@@ -493,7 +493,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
         else 
         {
-            if (m_creature->getThreatManager().isThreatListEmpty())
+            if (m_creature->GetThreatManager().isThreatListEmpty())
             {
                 EnterEvadeMode();
             }
@@ -513,7 +513,7 @@ struct boss_sapphironAI : public ScriptedAI
                 if (m_creature->GetHealthPercent() > 10.0f)
                 {
                     events.Reset();
-                    m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                    m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
                     m_creature->InterruptNonMeleeSpells(false);
                     m_creature->GetMotionMaster()->Clear(false);
                     m_creature->GetMotionMaster()->MoveIdle();
@@ -626,7 +626,7 @@ struct boss_sapphironAI : public ScriptedAI
             }
             case EVENT_CLEAVE:
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                     events.Repeat(Seconds(urand(5, 10)));
                 else
                     events.Repeat(100);
@@ -739,7 +739,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         }
 
         // if only "tank" alive, move random
-        ThreatList const& threatlist = pSapp->getThreatManager().getThreatList();
+        ThreatList const& threatlist = pSapp->GetThreatManager().getThreatList();
         if (threatlist.size() < 2)
         {
             SetRandomMove();

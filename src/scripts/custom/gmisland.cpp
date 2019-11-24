@@ -93,7 +93,7 @@ struct boss_gmislandAI : public ScriptedAI
     {
         uiGeneralTimer += uiDiff;
         uiGmRefreshTimer += uiDiff;
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
         {
             Reset();
             if ((uiGeneralTimer - uiLastFusee) > 4000)
@@ -135,9 +135,9 @@ struct boss_gmislandAI : public ScriptedAI
                     m_creature->MonsterSay("Vous ne derangerez pas les MJs : ils sont en reunion !", LANG_UNIVERSAL, 0);
                     break;
                 case 4:
-                    if (Unit* mort = m_creature->getVictim())
+                    if (Unit* mort = m_creature->GetVictim())
                     {
-                        if (mort->isAlive())
+                        if (mort->IsAlive())
                         {
                             // "Presque" mort :p
                             mort->DealDamage(mort, mort->GetHealth() - 50, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
@@ -148,9 +148,9 @@ struct boss_gmislandAI : public ScriptedAI
                 /*
                 // Trop mechant
                 case 9:
-                    if(Unit* pauvreVictime = m_creature->getVictim())
+                    if(Unit* pauvreVictime = m_creature->GetVictim())
                     {
-                        if(pauvreVictime->GetTypeId() == TYPEID_PLAYER && pauvreVictime->isAlive())
+                        if(pauvreVictime->GetTypeId() == TYPEID_PLAYER && pauvreVictime->IsAlive())
                         {
                             // Mais qui retirera ce "setConfused" ... ? :P
                             pauvreVictime->SetConfused(true, m_creature->GetGUID(), 5);

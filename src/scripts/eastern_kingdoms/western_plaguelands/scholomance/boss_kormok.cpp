@@ -64,13 +64,13 @@ struct boss_kormokAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ShadowVolley_Timer
         if (ShadowVolley_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLTVOLLEY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLTVOLLEY) == CAST_OK)
                 ShadowVolley_Timer = 15000;
         }
         else
@@ -79,7 +79,7 @@ struct boss_kormokAI : public ScriptedAI
         //BoneShield_Timer
         if (BoneShield_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BONESHIELD) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BONESHIELD) == CAST_OK)
                 BoneShield_Timer = 45000;
         }
         else
@@ -90,7 +90,7 @@ struct boss_kormokAI : public ScriptedAI
         {
             //Cast
             for (int i = 0; i < 4; ++i)
-                SummonMinion(m_creature->getVictim());
+                SummonMinion(m_creature->GetVictim());
 
             Minion_Timer = 12000;
         }
@@ -101,8 +101,8 @@ struct boss_kormokAI : public ScriptedAI
         if (!Mages && m_creature->GetHealthPercent() < 26.0f)
         {
             //Cast
-            SummonMages(m_creature->getVictim());
-            SummonMages(m_creature->getVictim());
+            SummonMages(m_creature->GetVictim());
+            SummonMages(m_creature->GetVictim());
             Mages = true;
         }
 

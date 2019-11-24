@@ -32,6 +32,7 @@ class Bag;
 class Field;
 class QueryResult;
 class Unit;
+struct ItemRandomPropertiesEntry;
 
 struct ItemSetEffect
 {

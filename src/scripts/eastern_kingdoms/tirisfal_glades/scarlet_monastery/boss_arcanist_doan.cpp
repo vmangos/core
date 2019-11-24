@@ -64,7 +64,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (bShielded && bCanDetonate)
@@ -102,7 +102,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
         //AoESilence_Timer
         if (AoESilence_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_AOESILENCE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AOESILENCE);
             AoESilence_Timer = urand(15000, 20000);
         }
         else AoESilence_Timer -= diff;
@@ -110,7 +110,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
         //ArcaneExplosion_Timer
         if (ArcaneExplosion_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEEXPLOSION);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEEXPLOSION);
             ArcaneExplosion_Timer = 8000;
         }
         else ArcaneExplosion_Timer -= diff;

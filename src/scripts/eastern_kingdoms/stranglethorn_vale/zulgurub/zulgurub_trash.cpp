@@ -37,14 +37,14 @@ struct GurubashiAxeThrowerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiAxeFlurry_Timer < uiDiff)
         {
             if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_AXE_FLURRY) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AXE_FLURRY) == CAST_OK)
                     m_uiAxeFlurry_Timer = urand(14000, 19000);
             }
         }
@@ -53,7 +53,7 @@ struct GurubashiAxeThrowerAI : public ScriptedAI
 
         if (m_uiThrow_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THROW) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THROW) == CAST_OK)
                 m_uiThrow_Timer = urand(4000, 7000);
         }
         else
@@ -112,12 +112,12 @@ struct GurubashiBerserkerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiKnockBack_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKBACK) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKBACK) == CAST_OK)
             {
                 DoResetThreat();
                 m_uiKnockBack_Timer = 10000;
@@ -128,7 +128,7 @@ struct GurubashiBerserkerAI : public ScriptedAI
 
         if (m_uiThunderClap_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THUNDERCLAP) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THUNDERCLAP) == CAST_OK)
                 m_uiThunderClap_Timer = urand(14000, 16000);
         }
         else
@@ -136,7 +136,7 @@ struct GurubashiBerserkerAI : public ScriptedAI
 
         if (m_uiFear_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR) == CAST_OK)
             {
                 m_uiFear_Timer = urand(25000, 30000);
                 DoResetThreat();
@@ -199,7 +199,7 @@ struct npc_hakkari_doctor : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiMaleficeTimer < uiDiff)
@@ -278,7 +278,7 @@ struct npc_esprit_vaudou : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (Unit* pVictim = m_creature->getVictim())
+        if (Unit* pVictim = m_creature->GetVictim())
         {
             if (pVictim->GetDistance(m_creature) < 5.0f)
             {
@@ -314,7 +314,7 @@ struct npc_fils_hakkar : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiTrashTimer < uiDiff)
@@ -327,7 +327,7 @@ struct npc_fils_hakkar : public ScriptedAI
 
         if (m_uiKnockDownTimer < uiDiff)
         {
-            m_creature->CastSpell(m_creature->getVictim(), 16790, true);
+            m_creature->CastSpell(m_creature->GetVictim(), 16790, true);
             m_uiKnockDownTimer = urand(5000, 10000);
         }
         else
@@ -360,14 +360,14 @@ struct go_pile_dechetsAI: public GameObjectAI
         {
             if (Creature* Guru = pUser->SummonCreature(15047, pUser->GetPositionX(), pUser->GetPositionY(), pUser->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN, 20000))
             {
-                Guru->addUnitState(UNIT_STAT_ROOT);
+                Guru->AddUnitState(UNIT_STAT_ROOT);
 
                 Map::PlayerList const& players = Guru->GetMap()->GetPlayers();
                 bool OtherPlayerFound = false;
                 for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
                 {
                     Player* pPlayer = itr->getSource();
-                    if (pPlayer && pPlayer->isAlive() && pUser->IsWithinDistInMap(pPlayer, 60.0f) && pUser->IsWithinLOSInMap(pPlayer) &&
+                    if (pPlayer && pPlayer->IsAlive() && pUser->IsWithinDistInMap(pPlayer, 60.0f) && pUser->IsWithinLOSInMap(pPlayer) &&
                             pPlayer != pUser->ToPlayer() && !pPlayer->IsGameMaster())
                     {
                         Guru->AddThreat(pPlayer);
@@ -412,22 +412,22 @@ struct go_pile_dechetsAI: public GameObjectAI
 
                     for (std::list<Creature*>::iterator itr = MobList.begin(); itr != MobList.end(); ++itr)
                     {
-                        if (pUser->IsWithinLOSInMap(*itr) && pUser->IsWithinDistInMap((*itr), 45.0f) && (*itr)->isAlive())
+                        if (pUser->IsWithinLOSInMap(*itr) && pUser->IsWithinDistInMap((*itr), 45.0f) && (*itr)->IsAlive())
                         {
                             if (Player* pPlay = pUser->ToPlayer())
                             {
                                 if (pPlay->GetTeam() == HORDE)
-                                    Guru->setFaction(1);    // Human
+                                    Guru->SetFactionTemplateId(1);    // Human
                                 else if (pPlay->GetTeam() == ALLIANCE)
-                                    Guru->setFaction(2);    // Orc
+                                    Guru->SetFactionTemplateId(2);    // Orc
 
                                 Guru->AddThreat(*itr);
                                 Guru->SetInCombatWith(*itr);
                                 Guru->CastSpell(pUser, 24178, true);
-                                Guru->addUnitState(UNIT_STAT_ROOT);
+                                Guru->AddUnitState(UNIT_STAT_ROOT);
                                 Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                Guru->setFaction(14); // Troll Bloodscalp
+                                Guru->SetFactionTemplateId(14); // Troll Bloodscalp
                                 break;
                             }
                         }

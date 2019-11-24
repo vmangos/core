@@ -158,7 +158,7 @@ struct boss_archaedasAI : public ScriptedAI
         // check if the target is still inside the room
         if (uiRoomCheck <= uiDiff)
         {
-            if (UnitIsOutside(me) || UnitIsOutside(me->getVictim()))
+            if (UnitIsOutside(me) || UnitIsOutside(me->GetVictim()))
             {
                 EnterEvadeMode();
                 return;
@@ -194,13 +194,13 @@ struct boss_archaedasAI : public ScriptedAI
             // fix factions now or they'll look green for a brief moment
             if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(1)))
             {
-                target->setFaction(FACTION_AWAKE);
+                target->SetFactionTemplateId(FACTION_AWAKE);
                 target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 target->CastSpell(target, SPELL_STONE_DWARF_AWAKEN, false);
             }
             if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(2)))
             {
-                target->setFaction(FACTION_AWAKE);
+                target->SetFactionTemplateId(FACTION_AWAKE);
                 target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 target->CastSpell(target, SPELL_STONE_DWARF_AWAKEN, false);
             }
@@ -212,7 +212,7 @@ struct boss_archaedasAI : public ScriptedAI
         if (uiTremorTimer <= uiDiff)
         {
             //Cast
-            DoCast(me->getVictim(), SPELL_GROUND_TREMOR);
+            DoCast(me->GetVictim(), SPELL_GROUND_TREMOR);
             //45 seconds until we should cast this agian
             uiTremorTimer = 45000;
         }
@@ -294,7 +294,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         {
             if (Unit* archaedas = Unit::GetUnit(*me, instance->GetData64(11)))
             {
-                target = archaedas->getVictim();
+                target = archaedas->GetVictim();
             }
         }
         if (target)
@@ -393,7 +393,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         
         if (m_creature->GetEntry() == NPC_VAULT_WARDER && uiTrample_Timer <= uiDiff)
         {
-            DoCast(me->getVictim(), SPELL_TRAMPLE);
+            DoCast(me->GetVictim(), SPELL_TRAMPLE);
             uiTrample_Timer = 10000;
         }
         else uiTrample_Timer -= uiDiff;

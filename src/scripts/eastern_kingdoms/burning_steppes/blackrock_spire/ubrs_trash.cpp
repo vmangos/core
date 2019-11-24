@@ -57,7 +57,7 @@ struct npc_blackhand_summonerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->IsNonMeleeSpellCasted(false))
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->IsNonMeleeSpellCasted(false))
             return;
 
         if (ManageTimer(uiDiff, &m_uiSummonTimer))
@@ -93,7 +93,7 @@ struct npc_blackhand_summonerAI : public ScriptedAI
         }
         if (ManageTimer(uiDiff, &m_uiNovaGivreTimer))
         {
-            if (Unit* pTarget = m_creature->getVictim())//m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            if (Unit* pTarget = m_creature->GetVictim())//m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
                 if (pTarget->GetDistance(m_creature) < 10.0f)
                 {
@@ -152,7 +152,7 @@ struct npc_blackhand_veteranAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (ManageTimer(uiDiff, &m_uiChargeBouclierTimer))
@@ -162,7 +162,7 @@ struct npc_blackhand_veteranAI : public ScriptedAI
                 pTarget1 = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             else
             {
-                pTarget1 = m_creature->getVictim();
+                pTarget1 = m_creature->GetVictim();
                 m_bFirstChargeDone = true;
             }
             if (pTarget1)

@@ -69,10 +69,10 @@ bool GossipHello_npc_darrowshire_spirit(Player* pPlayer, Creature* pCreature)
 
 bool GossipHello_npc_tirion_fordring(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
-    if (pPlayer->GetQuestStatus(5742) == QUEST_STATUS_INCOMPLETE && pPlayer->getStandState() == UNIT_STAND_STATE_SIT)
+    if (pPlayer->GetQuestStatus(5742) == QUEST_STATUS_INCOMPLETE && pPlayer->GetStandState() == UNIT_STAND_STATE_SIT)
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I am ready to hear your tale, Tirion.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
@@ -276,22 +276,22 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 Creature* curr = tmpMobsList.front();
                 tmpMobsList.pop_front();
 
-                if (curr->isAlive())
+                if (curr->IsAlive())
                     summoned->AddThreat(curr, float(urand(100, 200)));
             }
         }
         if (Player* player = GetPlayer())
-            if (player->isAlive())
+            if (player->IsAlive())
             {
                 summoned->AddThreat(player, 50.0f);
                 if ((rand() % 4) > 0)
                 {
-                    if (Unit* victim = summoned->getVictim())
+                    if (Unit* victim = summoned->GetVictim())
                         summoned->SendMeleeAttackStop(victim);
                     summoned->AddThreat(player, 200.0f);
                     summoned->GetMotionMaster()->Clear(false);
                     summoned->GetMotionMaster()->MoveChase(player);
-                    if (Unit* victim = summoned->getVictim())
+                    if (Unit* victim = summoned->GetVictim())
                         summoned->SendMeleeAttackStart(victim);
                 }
             }
@@ -317,7 +317,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 Creature* curr = tmpMobsList.front();
                 tmpMobsList.pop_front();
 
-                if (curr->isAlive())
+                if (curr->IsAlive())
                     curr->ForcedDespawn();
             }
         }
@@ -338,7 +338,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 ArchersGUIDs[Var] = summoned->GetGUID();
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->addUnitState(UNIT_STAT_ROOT);
+                summoned->AddUnitState(UNIT_STAT_ROOT);
                 break;
             case NPC_GUERRIER:
                 SetAttackOnPeasantOrPlayer(summoned);
@@ -354,7 +354,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                     VillageoisGUIDs[Var] = summoned->GetGUID();
 
                 if (Player* player = GetPlayer())
-                    summoned->setFaction(player->getFaction());
+                    summoned->SetFactionTemplateId(player->GetFactionTemplateId());
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 break;
         }
@@ -579,7 +579,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                     if (currPlayer->IsGameMaster())
                         continue;
 
-                    if (currPlayer->isAlive() && questPlayer != currPlayer)
+                    if (currPlayer->IsAlive() && questPlayer != currPlayer)
                         return true;
                 }
             }
@@ -606,7 +606,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 {
                     Player* currPlayer =  it->getSource();
                     if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
-                        if (player && player != currPlayer && currPlayer->isAlive() && !currPlayer->IsGameMaster())
+                        if (player && player != currPlayer && currPlayer->IsAlive() && !currPlayer->IsGameMaster())
                             Crea->AddThreat(currPlayer, 1000.0f);
                 }
             }
@@ -679,7 +679,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                             if (VillageoisGUIDs[Var])
                             {
                                 Unit* Villagois = m_creature->GetMap()->GetCreature(VillageoisGUIDs[Var]);
-                                if (Villagois && Villagois->isAlive())
+                                if (Villagois && Villagois->IsAlive())
                                 {
                                     GUIDs[var] = VillageoisGUIDs[Var];
                                     ++var;
@@ -931,21 +931,21 @@ struct npc_demetriaAI : public ScriptedAI
         {
             if (Creature* deadTrooper = m_creature->FindNearestCreature(NPC_SCARLET_TROOPER, 40.0f, false))
             {
-                DoRessurectUnit(deadTrooper, m_creature->getVictim());
+                DoRessurectUnit(deadTrooper, m_creature->GetVictim());
                 Resurrect_Timer = 10000;
             }
         }
         else
             Resurrect_Timer -= diff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!(m_creature->GetSpellAuraHolder(SPELL_SHADOWFORM)))
             DoCastSpellIfCan(m_creature, SPELL_SHADOWFORM);
         if (MindBlast_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_BLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_BLAST) == CAST_OK)
                 MindBlast_Timer = urand(4000, 5000);
         }
         else
@@ -988,7 +988,7 @@ struct npc_demetriaAI : public ScriptedAI
             }
             else
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISPELL_MAGIC2) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISPELL_MAGIC2) == CAST_OK)
                     DispelMagic_Timer = 6000;
             }
         }
@@ -1143,7 +1143,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
             for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
             {
                 Player* pPlayer =  it->getSource();
-                if (pPlayer && pPlayer->isAlive() && !pPlayer->IsGameMaster() && m_creature->IsWithinDist(pPlayer, 20.0f, false))
+                if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster() && m_creature->IsWithinDist(pPlayer, 20.0f, false))
                 {
                     if (pPlayer->GetQuestStatus(QUEST_BATTLE_DARROWSHIRE) == QUEST_STATUS_INCOMPLETE)
                     {
@@ -1188,7 +1188,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
 
         for (std::list<ObjectGuid>::const_iterator itr = summonedMobsList.begin(); itr != summonedMobsList.end(); ++itr)
             if (Creature* creature = m_creature->GetMap()->GetCreature(*itr))
-                if (creature->isAlive() && creature->GetEntry() != NPC_JOSEPH_REDPATH && creature->GetEntry() != NPC_DAVIL_CROKFORD)
+                if (creature->IsAlive() && creature->GetEntry() != NPC_JOSEPH_REDPATH && creature->GetEntry() != NPC_DAVIL_CROKFORD)
                     creature->ForcedDespawn(5000);
 
         summonedMobsList.clear();
@@ -1213,7 +1213,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
             case NPC_DARROWSHIRE_DEFENDER:
             case NPC_SILVERHAND_DISCIPLE:
             case NPC_REDPATH_MILITIA:
-                summoned->setFaction(DefenderFaction);
+                summoned->SetFactionTemplateId(DefenderFaction);
             // no break
             case NPC_MARAUDING_CORPSE:
             case NPC_MARAUDING_SKELETON:
@@ -1227,7 +1227,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                 break;
             case NPC_DAVIL_LIGHTFIRE:
             case NPC_CAPTAIN_REDPATH:
-                summoned->setFaction(DefenderFaction);
+                summoned->SetFactionTemplateId(DefenderFaction);
                 summoned->SetWalk(false);
                 summoned->SetHomePosition(DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, DarrowshireEvent[4].O);
                 summoned->GetMotionMaster()->MovePoint(2, DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, MOVE_PATHFINDING, 5.0f);
@@ -1494,7 +1494,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                                 if (Crea->GetEntry() != NPC_BLOODLETTER && Crea->GetEntry() != NPC_DAVIL_LIGHTFIRE && Crea->GetEntry() != NPC_CAPTAIN_REDPATH)
                                     continue;
 
-                                if (Crea->isAlive() && !Crea->isInCombat() && Crea->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
+                                if (Crea->IsAlive() && !Crea->IsInCombat() && Crea->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
                                 {
                                     int point = 0;
                                     int Rand = 0;

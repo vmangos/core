@@ -7,7 +7,7 @@
 #include "ObjectMgr.h"
 #include "MoveSpline.h"
 #include "PlayerBotMgr.h"
-
+#include "WorldPacket.h"
 
 bool PlayerBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
 {
@@ -118,21 +118,21 @@ bool MageOrgrimmarAttackerAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSessio
 void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
 {
     PlayerBotAI::UpdateAI(diff);
-    if (me->getLevel() != 60)
+    if (me->GetLevel() != 60)
         me->GiveLevel(60);
     /// DEATH
-    if (!me->isAlive())
+    if (!me->IsAlive())
     {
         sPlayerBotMgr.deleteBot(me->GetGUIDLow());
         /*
-        if (me->getDeathState() < CORPSE)
+        if (me->GetDeathState() < CORPSE)
             return;
-        if (me->getDeathState() == CORPSE && me->GetDeathTimer() && me->GetDeathTimer() < (6 * MINUTE * IN_MILLISECONDS - 30000))
+        if (me->GetDeathState() == CORPSE && me->GetDeathTimer() && me->GetDeathTimer() < (6 * MINUTE * IN_MILLISECONDS - 30000))
         {
             me->SetHealth(1);
             me->RepopAtGraveyard();
         }
-        else if (me->getDeathState() == CORPSE && !me->GetDeathTimer())
+        else if (me->GetDeathState() == CORPSE && !me->GetDeathTimer())
         {
             me->ResurrectPlayer(0.5f);
             me->SpawnCorpseBones();
@@ -143,12 +143,12 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
     /// COMBAT AI
     if (me->IsNonMeleeSpellCasted(false) || (me->HasAura(AURA_REGEN_MANA) && me->GetPower(POWER_MANA) != me->GetMaxPower(POWER_MANA)))
         return;
-    float range = me->isInCombat() ? 30.0f : frand(15, 30);
+    float range = me->IsInCombat() ? 30.0f : frand(15, 30);
     Unit* target = me->SelectNearestTarget(range);
     if (target && !me->IsWithinLOSInMap(target))
         target = nullptr;
     // OOM ?
-    if (me->GetPower(POWER_MANA) < 40 && target && me->isInCombat())
+    if (me->GetPower(POWER_MANA) < 40 && target && me->IsInCombat())
     {
         if (me->Attack(target, true))
             me->GetMotionMaster()->MoveChase(target);
@@ -161,7 +161,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
     if (!me->HasSpellCooldown(SPELL_FROST_NOVA) && me->GetPower(POWER_MANA) > 50)
         if (nearTarget)
             me->CastSpell(me, SPELL_FROST_NOVA, false);
-    if (nearTarget && target->hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (nearTarget && target->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
     {
         // already runing
         if (!me->movespline->Finalized())
@@ -196,7 +196,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
         return;
     }
     /// OUT OF COMBAT REGEN
-    if (!me->isInCombat() && me->GetPower(POWER_MANA) < 150)
+    if (!me->IsInCombat() && me->GetPower(POWER_MANA) < 150)
     {
         if (!me->movespline->Finalized())
             me->StopMoving();

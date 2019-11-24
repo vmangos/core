@@ -53,7 +53,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket & recv_data)
         return;
     }
 
-    if (!pEnemy->isAlive())
+    if (!pEnemy->IsAlive())
     {
         // client can generate swing to known dead target if autoswitch between autoshot and autohit is enabled in client options
         // stop attack state at client

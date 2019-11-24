@@ -83,8 +83,8 @@ public:
                 TEST_ASSERT(!player2->duel);
                 TEST_ASSERT(player1->GetPet());
                 TEST_ASSERT(player2->GetPet());
-                TEST_ASSERT(!player1->GetPet()->isInCombat());
-                TEST_ASSERT(!player2->GetPet()->isInCombat());
+                TEST_ASSERT(!player1->GetPet()->IsInCombat());
+                TEST_ASSERT(!player2->GetPet()->IsInCombat());
                 Finish();
                 break;
             }

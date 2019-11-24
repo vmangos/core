@@ -30,7 +30,7 @@ class MANGOS_DLL_DECL NullCreatureAI : public CreatureAI
     public:
         explicit NullCreatureAI(Creature* c) : CreatureAI(c)
         {
-            c->addUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
+            c->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
         }
         ~NullCreatureAI() override;
 

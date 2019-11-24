@@ -536,7 +536,7 @@ bool ChatHandler::HandleCastTargetCommand(char* args)
         return false;
     }
 
-    if (!caster->getVictim())
+    if (!caster->GetVictim())
     {
         SendSysMessage(LANG_SELECTED_TARGET_NOT_HAVE_VICTIM);
         SetSentErrorMessage(true);
@@ -554,7 +554,7 @@ bool ChatHandler::HandleCastTargetCommand(char* args)
 
     caster->SetFacingToObject(m_session->GetPlayer());
 
-    caster->CastSpell(caster->getVictim(), spell, triggered);
+    caster->CastSpell(caster->GetVictim(), spell, triggered);
 
     return true;
 }
@@ -698,7 +698,7 @@ bool ChatHandler::HandleModifyStaminaCommand(char *args)
     pTarget->SetModifierValue(UNIT_MOD_STAT_STAMINA, BASE_VALUE, (float)amount);
     pTarget->UpdateAllStats();
 
-    if (pTarget->isAlive())
+    if (pTarget->IsAlive())
         pTarget->SetHealth(pTarget->GetMaxHealth());
 
     PSendSysMessage(LANG_YOU_CHANGE_STA, pTarget->GetName(), amount);
@@ -1340,7 +1340,7 @@ bool ChatHandler::HandleModifyFactionCommand(char* args)
     {
         if (chr)
         {
-            uint32 factionid = chr->getFaction();
+            uint32 factionid = chr->GetFactionTemplateId();
             uint32 flag      = chr->GetUInt32Value(UNIT_FIELD_FLAGS);
             uint32 npcflag   = chr->GetUInt32Value(UNIT_NPC_FLAGS);
             uint32 dyflag    = chr->GetUInt32Value(UNIT_DYNAMIC_FLAGS);
@@ -1381,7 +1381,7 @@ bool ChatHandler::HandleModifyFactionCommand(char* args)
 
     PSendSysMessage(LANG_YOU_CHANGE_FACTION, chr->GetGUIDLow(), factionid, flag, npcflag, dyflag);
 
-    chr->setFaction(factionid);
+    chr->SetFactionTemplateId(factionid);
     chr->SetUInt32Value(UNIT_FIELD_FLAGS, flag);
     chr->SetUInt32Value(UNIT_NPC_FLAGS, npcflag);
     chr->SetUInt32Value(UNIT_DYNAMIC_FLAGS, dyflag);
@@ -1556,7 +1556,7 @@ bool ChatHandler::HandleModifyManaCommand(char* args)
 bool ChatHandler::HandleReplenishCommand(char* args)
 {
     Unit *pUnit = GetSelectedUnit();
-    if (!pUnit || !pUnit->isAlive())
+    if (!pUnit || !pUnit->IsAlive())
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
         SetSentErrorMessage(true);
@@ -1565,7 +1565,7 @@ bool ChatHandler::HandleReplenishCommand(char* args)
 
     pUnit->SetHealth(pUnit->GetMaxHealth());
 
-    if (pUnit->getPowerType() == POWER_MANA)
+    if (pUnit->GetPowerType() == POWER_MANA)
         pUnit->SetPower(POWER_MANA, pUnit->GetMaxPower(POWER_MANA));
 
     return true;
@@ -1585,7 +1585,7 @@ bool ChatHandler::HandleDamageCommand(char* args)
         return false;
     }
 
-    if (!target->isAlive())
+    if (!target->IsAlive())
         return true;
 
     int32 damage_int;
@@ -1847,7 +1847,7 @@ bool ChatHandler::HandleDieHelper(Unit* target)
             return false;
     }
 
-    if (target->isAlive())
+    if (target->IsAlive())
     {
         if (sWorld.getConfig(CONFIG_BOOL_DIE_COMMAND_CREDIT))
             m_session->GetPlayer()->DealDamage(target, target->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);

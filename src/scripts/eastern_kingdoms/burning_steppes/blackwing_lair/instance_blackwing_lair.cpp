@@ -150,13 +150,13 @@ public:
     {
         ASSERT(pTechnician);
         m_vTechniciansGuid.push_back(pTechnician->GetObjectGuid());
-        ThreatList threatList = pTechnician->getThreatManager().getThreatList();
+        ThreatList threatList = pTechnician->GetThreatManager().getThreatList();
         for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
         {
             if (Unit *pUnit = m_pInstance->instance->GetCreature((*i)->getUnitGuid()))
             {
                 m_mThreatGuid[pUnit->GetObjectGuid()] += (*i)->getThreat();
-                pTechnician->getThreatManager().modifyThreatPercent(pUnit, -100);
+                pTechnician->GetThreatManager().modifyThreatPercent(pUnit, -100);
             }
         }
     }
@@ -220,16 +220,16 @@ public:
             {
                 if (Creature *pCreature = m_pInstance->instance->GetCreature(*itr))
                 {
-                    if (!pCreature->isAlive())
+                    if (!pCreature->IsAlive())
                         continue;
                     // Copy the list, since it may get invalidated at 'modifyThreatPercent' call
-                    ThreatList threatList = pCreature->getThreatManager().getThreatList();
+                    ThreatList threatList = pCreature->GetThreatManager().getThreatList();
                     for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
                     {
                         if (Unit *pUnit = m_pInstance->instance->GetUnit((*i)->getUnitGuid()))
                         {
                             m_mThreatGuid[pUnit->GetObjectGuid()] += (*i)->getThreat();
-                            pCreature->getThreatManager().modifyThreatPercent(pUnit, -100);
+                            pCreature->GetThreatManager().modifyThreatPercent(pUnit, -100);
                         }
                     }
                 }
@@ -342,14 +342,14 @@ struct instance_blackwing_lair : public ScriptedInstance
                     m_auiEncounter[TYPE_RAZORGORE] = IN_PROGRESS;
                 if (Creature* pCreature = instance->GetCreature(m_auiData[DATA_RAZORGORE_GUID]))
                 {
-                    if (pCreature->isAlive() && !pCreature->isInCombat())
+                    if (pCreature->IsAlive() && !pCreature->IsInCombat())
                         pCreature->SetInCombatWithZone();
                 }
                 break;
             case NPC_RAZORGORE:
                 if (Creature* pCreature = instance->GetCreature(m_auiData[DATA_GRETOK_GUID]))
                 {
-                    if (pCreature->isAlive() && !pCreature->isInCombat())
+                    if (pCreature->IsAlive() && !pCreature->IsInCombat())
                         pCreature->SetInCombatWithZone();
                 }
                 break;
@@ -900,9 +900,9 @@ bool GOHello_go_orbe_domination(Player* pPlayer, GameObject* pGo)
             if (Creature* pCreature = pGo->GetMap()->GetCreature(pInstance->GetData64(DATA_RAZORGORE_GUID)))
             {
                 // Deja CM ?
-                if (pCreature->hasUnitState(UNIT_STAT_POSSESSED))
+                if (pCreature->HasUnitState(UNIT_STAT_POSSESSED))
                     return true;
-                if (pCreature->isInCombat() && pInstance->GetData64(DATA_EGG) != DONE)
+                if (pCreature->IsInCombat() && pInstance->GetData64(DATA_EGG) != DONE)
                 {
                     pPlayer->CastSpell(pPlayer, SPELL_MIND_EXHAUSTION, true);
                     pPlayer->CastSpell(pCreature, SPELL_POSSESS, true);
@@ -1000,7 +1000,7 @@ struct go_engin_suppressionAI: public GameObjectAI
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
             if (me->GetDistance(i->getSource()) <= 15.0f)
-                if (!i->getSource()->HasStealthAura() && i->getSource()->isAlive() && !i->getSource()->IsGameMaster())
+                if (!i->getSource()->HasStealthAura() && i->getSource()->IsAlive() && !i->getSource()->IsGameMaster())
                     i->getSource()->AddAura(SPELL_SUPPRESSION_AURA);
         }
     }
@@ -1046,7 +1046,7 @@ bool AreaTrigger_at_orb_of_command(Player* pPlayer, const AreaTriggerEntry* pAt)
     if (pAt->id == AT_ORB_OF_COMMAND)
     {
         Corpse *pCorpse = pPlayer->GetCorpse();
-        if (pPlayer && pPlayer->isDead() && pPlayer->GetQuestRewardStatus(7761) && pCorpse && (pCorpse->GetMapId() == 469))
+        if (pPlayer && pPlayer->IsDead() && pPlayer->GetQuestRewardStatus(7761) && pCorpse && (pCorpse->GetMapId() == 469))
         {
             pPlayer->ResurrectPlayer(0.5f);
             pPlayer->SpawnCorpseBones();
@@ -1180,12 +1180,12 @@ struct npc_death_talonAI : public ScriptedAI
         if (!m_creature->HasAura(m_uiSchoolSensibility))
             m_creature->AddAura(m_uiSchoolSensibility);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(5000, 9000);
         }
         else
@@ -1308,7 +1308,7 @@ struct npc_blackwing_technicianAI : public ScriptedAI
         // If we don't have a current victim and we're not added to the helper, stop AI.
         // Have to check the helper if possible in case the victim has died, otherwise
         // the technician will stand still doing nothing rather than re-targeting
-        if (!m_creature->getVictim() && !m_bAdded)
+        if (!m_creature->GetVictim() && !m_bAdded)
             return;
 
         if (m_pTechnicianHelper)
@@ -1322,7 +1322,7 @@ struct npc_blackwing_technicianAI : public ScriptedAI
                 m_uiAggroSyncTimer -= uiDiff;
         }
 
-        Unit* victim = m_creature->getVictim();
+        Unit* victim = m_creature->GetVictim();
         if (m_pTechnicianHelper)
             if (ObjectGuid victimGuid = m_pTechnicianHelper->GetVictimGuid())
                 victim = m_pTechnicianHelper->GetInstance()->instance->GetUnit(victimGuid);
@@ -1378,7 +1378,7 @@ struct CorruptedWhelpAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

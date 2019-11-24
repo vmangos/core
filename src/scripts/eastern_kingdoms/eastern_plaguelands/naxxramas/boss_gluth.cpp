@@ -116,7 +116,7 @@ struct boss_gluthAI : public ScriptedAI
     {
         // He should aggro just at the edge of the sewer pipe players jump from 
         if (pWho->GetTypeId() == TYPEID_PLAYER 
-            && !m_creature->isInCombat() 
+            && !m_creature->IsInCombat() 
             && m_creature->IsWithinDistInMap(pWho, 49.0f) 
             && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
@@ -158,7 +158,7 @@ struct boss_gluthAI : public ScriptedAI
             {
                 Player* pPlayer = (*it).getSource();
                 if (!pPlayer) continue;
-                if (pPlayer->isDead()) continue;
+                if (pPlayer->IsDead()) continue;
                 DoCastSpellIfCan(pPlayer, SPELL_DECIMATE_OTHER, CF_TRIGGERED);
             }
         }
@@ -166,7 +166,7 @@ struct boss_gluthAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)  override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         m_events.Update(uiDiff);
@@ -177,7 +177,7 @@ struct boss_gluthAI : public ScriptedAI
             case EVENT_MORTAL_WOUND:
             {
                 // mortal wound current target every 
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALWOUND) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALWOUND) == CAST_OK)
                     m_events.Repeat(MORTAL_WOUND_CD);
                 else
                     m_events.Repeat(100);
@@ -271,7 +271,7 @@ struct boss_gluthAI : public ScriptedAI
             return;
         for (auto it = chowableZombies.begin(); it != chowableZombies.end(); ++it)
         {
-            if (!(*it)->isAlive())
+            if (!(*it)->IsAlive())
                 continue;
 
             // Using 2d distance, should do fine
@@ -362,7 +362,7 @@ struct mob_zombieChow : public ScriptedAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

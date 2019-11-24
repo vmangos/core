@@ -13,11 +13,11 @@ uint32 PlayerWrapper<T>::GetZoneId() const { return player.GetZoneId(); }
 template <typename T>
 uint32 PlayerWrapper<T>::GetAreaId() const { return player.GetAreaId(); }
 template <typename T>
-uint8 PlayerWrapper<T>::getClass() const { return player.getClass(); }
+uint8 PlayerWrapper<T>::GetClass() const { return player.GetClass(); }
 template <typename T>
-uint8 PlayerWrapper<T>::getRace() const { return player.getRace(); }
+uint8 PlayerWrapper<T>::GetRace() const { return player.GetRace(); }
 template <typename T>
-uint32 PlayerWrapper<T>::getLevel() const { return player.getLevel(); }
+uint32 PlayerWrapper<T>::GetLevel() const { return player.GetLevel(); }
 template <typename T>
 bool PlayerWrapper<T>::IsAFK() const { return player.IsAFK(); }
 template <typename T>

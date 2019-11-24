@@ -6,7 +6,8 @@
 #define ANTICHEAT_H
 
 #include "Common.h"
-#include "Unit.h"
+#include "AbstractPlayer.h"
+#include "UnitDefines.h"
 
 enum WardenActions
 {
@@ -29,6 +30,11 @@ enum CheatAction
     CHEAT_MAX_ACTIONS,
 };
 
+class Unit;
+class Player;
+class MovementInfo;
+class BigNumber;
+class WorldPacket;
 class WorldSession;
 class ChatHandler;
 class WardenInterface;

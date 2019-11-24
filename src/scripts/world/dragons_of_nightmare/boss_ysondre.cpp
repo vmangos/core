@@ -56,13 +56,13 @@ void boss_ysondreAI::JustSummoned(Creature* pSummoned)
 
 bool boss_ysondreAI::DoSpecialAbility()
 {
-    auto const& attackers = m_creature->getThreatManager().getThreatList();
+    auto const& attackers = m_creature->GetThreatManager().getThreatList();
     uint8 attackersCount = 0;
 
     for (auto itr = attackers.begin(); itr != attackers.end(); ++itr)
     {
         Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
-        if (pPlayer && pPlayer->isAlive() && !pPlayer->IsGameMaster())
+        if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())
             ++attackersCount;
     }
 
@@ -113,7 +113,7 @@ void npc_demented_druidAI::Reset()
 
 void npc_demented_druidAI::UpdateAI(const uint32 uiDiff)
 {
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
         
     // Curse of Thorns
@@ -133,7 +133,7 @@ void npc_demented_druidAI::UpdateAI(const uint32 uiDiff)
     // MoonFire
     if (m_uiMoonFireTimer < uiDiff)
     {
-        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MOONFIRE) == CAST_OK)
+        if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MOONFIRE) == CAST_OK)
             m_uiMoonFireTimer = urand(3000, 6000);
     }
     else

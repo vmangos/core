@@ -25,7 +25,6 @@
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "Creature.h"
-#include "Unit.h"
 
 enum PetType
 {

@@ -141,7 +141,7 @@ struct mob_TwinsBug : public ScriptedAI {
     void GoBeBadBug(uint32 whatKindOfbad)
     {
         m_creature->AddAura(whatKindOfbad);
-        m_creature->setFaction(14);
+        m_creature->SetFactionTemplateId(14);
         m_creature->SetInCombatWithZone();
         if (whatKindOfbad == SPELL_MUTATE_BUG) {
             m_creature->SetFullHealth();
@@ -150,13 +150,13 @@ struct mob_TwinsBug : public ScriptedAI {
 
     void JustDied(Unit* Killer) override
     {
-        m_creature->setFaction(7);
+        m_creature->SetFactionTemplateId(7);
         m_creature->RemoveAllAuras();
     }
 
     void Reset() override
     {
-        m_creature->setFaction(7);
+        m_creature->SetFactionTemplateId(7);
         m_creature->RemoveAllAuras();
         pierceArmorTimer = 5000;
         acidSpitTimer = 6000;
@@ -165,18 +165,18 @@ struct mob_TwinsBug : public ScriptedAI {
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (pierceArmorTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PIERCE_ARMOR) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PIERCE_ARMOR) == CAST_OK)
                 pierceArmorTimer = urand(5000, 9000);
         }
         else
             pierceArmorTimer -= diff;
 
         if (acidSpitTimer < diff) {
-            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_SPIT) == CAST_OK)
+            if(DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ACID_SPIT) == CAST_OK)
                 acidSpitTimer = urand(6000, 12000);
         }
         else 
@@ -238,16 +238,16 @@ struct boss_twinemperorsAI : public ScriptedAI
         justTeleported  = false;
         didPullDialogue = false;
         killSayCooldown = 0;
-        m_creature->clearUnitState(UNIT_STAT_STUNNED);
+        m_creature->ClearUnitState(UNIT_STAT_STUNNED);
     }
 
     void MoveInLineOfSight(Unit *who) override
     {
         // Only want to run this if we are not in combat
-        if (!who || m_creature->getVictim() || m_creature->isInCombat())
+        if (!who || m_creature->GetVictim() || m_creature->IsInCombat())
             return;
 
-        if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
+        if (who->IsTargetableForAttack() && who->IsInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
         {
             float attackRadius = m_creature->GetAttackDistance(who);
             if (attackRadius < PULL_RANGE)
@@ -321,7 +321,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         for (auto it = lst.begin(); it != lst.end(); it++)
         {
             Creature* pC = *it;
-            if (pC->isDead()) continue;
+            if (pC->IsDead()) continue;
             pC->SetActiveObjectState(true);
             pC->SetInCombatWithZone();
             pC->AI()->AttackStart(pWho);
@@ -381,7 +381,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 //todo: any potential issues with using GetNearestVictimInRange and 300 maxrange?
                 if (Unit* closestPlayer = m_creature->GetNearestVictimInRange(0, 300.0f)) {
                     closestTargetAfterTP = closestPlayer->GetGUID();
-                    m_creature->getThreatManager().addThreat(closestPlayer, AFTER_TELEPORT_THREAT);
+                    m_creature->GetThreatManager().addThreat(closestPlayer, AFTER_TELEPORT_THREAT);
                 }
                 else {
                     sLog.outBasic("Twins unable to select closest target during TP stun");
@@ -397,7 +397,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
         else {
             // Not attempting to get a hostile target during teleport-idle
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
                 return;
             }
         }
@@ -479,7 +479,7 @@ struct boss_twinemperorsAI : public ScriptedAI
 
             std::list<Creature*>::iterator iter;
             for (iter = lUnitList.begin(); iter != lUnitList.end();) {
-                if ((*iter)->isDead()) {
+                if ((*iter)->IsDead()) {
                     iter = lUnitList.erase(iter);
                 }
                 // Ignoring bugs that has already been affected by a spell
@@ -531,7 +531,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     // simply center-to-center
     Player* GetPlayerInP2PRange(float min, float max, bool skipTopAggro)
     {
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
 
         if (tList.size() == 0)
             return nullptr;
@@ -753,7 +753,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         UpdateBlizzard(diff);
         updateArcaneBurst(diff);
    
-        Unit* victim = m_creature->getVictim();
+        Unit* victim = m_creature->GetVictim();
         if (!victim) 
             return;
 
@@ -777,11 +777,11 @@ struct boss_veklorAI : public boss_twinemperorsAI
         }
         else if (!m_creature->IsMoving())
         {
-            if(m_creature->getStandState() != UNIT_STAND_STATE_STAND)
+            if(m_creature->GetStandState() != UNIT_STAND_STATE_STAND)
                 m_creature->SetStandState(UNIT_STAND_STATE_STAND);
             if (shadowBoltTimer < diff) 
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK) 
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT) == CAST_OK) 
                 {
                     timeSinceLastSB = 0;
                     if (isMelee) 
@@ -854,7 +854,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
     {
         std::list<HostileReference*> candidates;
 
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         if (tList.size() < 1)
             return nullptr;
 
@@ -888,7 +888,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
 
         //UnbalancingStrike_Timer
         if (UnbalancingStrike_Timer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_UNBALANCING_STRIKE) == CAST_OK) {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UNBALANCING_STRIKE) == CAST_OK) {
                 UnbalancingStrike_Timer = urand(UNBALANCING_STRIKE_MIN_CD, UNBALANCING_STRIKE_MAX_CD);
             }
         }

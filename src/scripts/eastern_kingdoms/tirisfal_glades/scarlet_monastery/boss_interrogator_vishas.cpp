@@ -78,7 +78,7 @@ struct boss_interrogator_vishasAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //If we are low on hp Do sayings
@@ -97,7 +97,7 @@ struct boss_interrogator_vishasAI : public ScriptedAI
         //ShadowWordPain_Timer
         if (ShadowWordPain_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWWORDPAIN);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWWORDPAIN);
             ShadowWordPain_Timer = urand(5000, 15000);
         }
         else ShadowWordPain_Timer -= diff;

@@ -119,7 +119,7 @@ struct boss_vectusAI : public ScriptedAI
                     Creature* Marduck = m_creature->FindNearestCreature(NPC_MARDUK_BLACKPOOL, 100.0f);
                     if (Marduck)
                     {
-                        Marduck->setFaction(14);
+                        Marduck->SetFactionTemplateId(14);
                         Marduck->SetReactState(REACT_AGGRESSIVE);
                         Marduck->AIM_Initialize();
                     }
@@ -135,13 +135,13 @@ struct boss_vectusAI : public ScriptedAI
                             (*it)->SetCreatureGroup(nullptr);
                         }
 
-                        (*it)->setFaction(14);
+                        (*it)->SetFactionTemplateId(14);
                         (*it)->SetReactState(REACT_AGGRESSIVE);
                         (*it)->AIM_Initialize();
                     }
 
                     m_creature->MonsterYell(VECTUS_SPEECH_GAMBIT_EVENT_START, 0, 0);
-                    m_creature->setFaction(14);
+                    m_creature->SetFactionTemplateId(14);
                     m_creature->SetReactState(REACT_AGGRESSIVE);
                     m_creature->AIM_Initialize();
 
@@ -152,7 +152,7 @@ struct boss_vectusAI : public ScriptedAI
                 m_uiGambitEvent_Timer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // NOSTALRIUS: Aggro toute la salle lorsqu'il est pull.
@@ -162,8 +162,8 @@ struct boss_vectusAI : public ScriptedAI
             m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
             for (std::list<Creature*>::iterator it = creatures.begin(); it != creatures.end(); ++it)
             {
-                (*it)->setFaction(14);
-                (*it)->AI()->AttackStart(m_creature->getVictim());
+                (*it)->SetFactionTemplateId(14);
+                (*it)->AI()->AttackStart(m_creature->GetVictim());
             }
             _fullAggroDone = true;
         }
@@ -180,7 +180,7 @@ struct boss_vectusAI : public ScriptedAI
         //BlastWave_Timer
         if (m_uiBlastWave_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLAST_WAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BLAST_WAVE);
             m_uiBlastWave_Timer = 12000;
         }
         else
@@ -245,13 +245,13 @@ struct npc_scholomance_studentAI : public ScriptedAI
         std::list<Creature*> creatures;
         m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
         for (std::list<Creature*>::iterator it = creatures.begin(); it != creatures.end(); ++it)
-            (*it)->setFaction(14);
+            (*it)->SetFactionTemplateId(14);
 
         if (Creature* pMarduck = m_creature->FindNearestCreature(NPC_MARDUK_BLACKPOOL, 100.0f))
-            pMarduck->setFaction(14);
+            pMarduck->SetFactionTemplateId(14);
 
         if (Creature* pVectus = m_creature->FindNearestCreature(NPC_VECTUS, 100.0f))
-			pVectus->setFaction(14);
+			pVectus->SetFactionTemplateId(14);
     }
 
     void JustDied(Unit* Killer) override
@@ -301,7 +301,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         if (isTransformed)
             m_creature->AddAura(SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, ADD_AURA_NO_OPTION, m_creature);
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
             m_creature->GetMotionMaster()->MoveTargetedHome();
 
         m_creature->SetLootRecipient(nullptr);

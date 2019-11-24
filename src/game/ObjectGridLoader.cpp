@@ -99,11 +99,11 @@ public:
     uint32 i_corpses;
 };
 
-template<class T> void addUnitState(T* /*obj*/, CellPair const& /*cell_pair*/)
+template<class T> void AddUnitState(T* /*obj*/, CellPair const& /*cell_pair*/)
 {
 }
 
-template<> void addUnitState(Creature *obj, CellPair const& cell_pair)
+template<> void AddUnitState(Creature *obj, CellPair const& cell_pair)
 {
     Cell cell(cell_pair);
 
@@ -158,7 +158,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellPair &cell, GridRefManager<T> &
 
         grid.AddGridObject(obj);
 
-        addUnitState(obj, cell);
+        AddUnitState(obj, cell);
         obj->SetMap(map);
         obj->AddToWorld();
         if (obj->isActiveObject() && !map->IsUnloading())
@@ -191,7 +191,7 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellPair &cell, CorpseMapType
 
         grid.AddWorldObject(obj);
 
-        addUnitState(obj, cell);
+        AddUnitState(obj, cell);
         obj->SetMap(map);
         obj->AddToWorld();
         if (obj->isActiveObject() && !map->IsUnloading())

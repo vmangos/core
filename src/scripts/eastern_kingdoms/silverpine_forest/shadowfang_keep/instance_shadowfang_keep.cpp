@@ -143,14 +143,14 @@ struct instance_shadowfang_keep : public ScriptedInstance
         if (pCreature->GetRespawnDelay() == 7201)
         {
             pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->setFaction(35);
+            pCreature->SetFactionTemplateId(35);
         }
 
         /** Initialize 4278 Patrol */
         if (pCreature->GetRespawnDelay() == 7202)
         {
             pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->setFaction(35);
+            pCreature->SetFactionTemplateId(35);
         }
     }
 
@@ -208,7 +208,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
                         if ((*it)->GetRespawnDelay() == 7201)
                         {
                             (*it)->SetVisibility(VISIBILITY_ON);
-                            (*it)->setFaction(17);
+                            (*it)->SetFactionTemplateId(17);
                         }
                     m_EscortList.clear();
                 }
@@ -230,7 +230,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
                         if ((*it)->GetRespawnDelay() == 7202)
                         {
                             (*it)->SetVisibility(VISIBILITY_ON);
-                            (*it)->setFaction(17);
+                            (*it)->SetFactionTemplateId(17);
                         }
                     m_EscortList.clear();
                 }

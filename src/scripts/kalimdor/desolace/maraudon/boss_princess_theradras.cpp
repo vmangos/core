@@ -57,7 +57,7 @@ struct boss_ptheradrasAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Restore target after casting Boulder
@@ -65,7 +65,7 @@ struct boss_ptheradrasAI : public ScriptedAI
         {
             if (RestoreTargetTimer <= diff)
             {
-                if (Unit *pTarget = m_creature->getVictim())
+                if (Unit *pTarget = m_creature->GetVictim())
                 {
                     m_creature->SetInFront(pTarget);
                     m_creature->SetTargetGuid(pTarget->GetObjectGuid());
@@ -103,7 +103,7 @@ struct boss_ptheradrasAI : public ScriptedAI
         //RepulsiveGaze_Timer
         if (RepulsiveGaze_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_REPULSIVEGAZE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_REPULSIVEGAZE);
             RepulsiveGaze_Timer = 20000;
         }
         else RepulsiveGaze_Timer -= diff;

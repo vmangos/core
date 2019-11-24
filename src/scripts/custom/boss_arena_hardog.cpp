@@ -236,7 +236,7 @@ struct arena_szerelmesAI : public ScriptedAI
     void Aggro(Unit* pPlayer) override
     {
         add_Timer = 1000;
-        DoCastSpellIfCan(m_creature->getVictim(), SPELL_FAIL);
+        DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FAIL);
     }
 
     void JustDied(Unit* Victim) override
@@ -247,12 +247,12 @@ struct arena_szerelmesAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (Pummel_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PUMMEL) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL) == CAST_OK)
                 Pummel_Timer = 12000;
         }
         else
@@ -260,7 +260,7 @@ struct arena_szerelmesAI : public ScriptedAI
 
         if (KnockAway_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKAWAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKAWAY) == CAST_OK)
                 KnockAway_Timer = 14000;
         }
         else
@@ -269,7 +269,7 @@ struct arena_szerelmesAI : public ScriptedAI
         /* enlevé car trop dure!
                 if (Shoot_Timer < diff)
                 {
-                    DoCastSpellIfCan(m_creature->getVictim(),SPELL_SHOOT);
+                    DoCastSpellIfCan(m_creature->GetVictim(),SPELL_SHOOT);
                     Shoot_Timer = 2000;
                 }
                 else
@@ -420,7 +420,7 @@ struct npc_karlekAI : public ScriptedAI
                 ResetEvent();
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

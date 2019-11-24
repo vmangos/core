@@ -107,7 +107,7 @@ enum AuraType
      */
     SPELL_AURA_MOD_STEALTH = 16,
     /**
-     * Not handled by the Aura class, implemented in Unit::isVisibleForOrDetect
+     * Not handled by the Aura class, implemented in Unit::IsVisibleForOrDetect
      * which does a lot of checks to determine whether the person is visible or not,
      * the SPELL_AURA_MOD_STEALTH seems to determine how in/visible ie a rogue is.
      */

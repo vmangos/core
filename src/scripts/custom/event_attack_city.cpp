@@ -230,7 +230,7 @@ struct npc_attack_masterAI : public ScriptedAI
         {
             if (Unit* invoc = Unit::GetUnit(*ME, *itr))
             {
-                if (invoc->isAlive())
+                if (invoc->IsAlive())
                 {
                     ++num;
                     SetAttackable(invoc, false);
@@ -339,7 +339,7 @@ struct npc_attack_masterAI : public ScriptedAI
             {
                 if (Unit* waveMob = Unit::GetUnit(*ME, *it))
                 {
-                    if (waveMob->isAlive())
+                    if (waveMob->IsAlive())
                     {
                         if (!waveMob->HasAura(SPELL_AURA_RED))
                         {
@@ -651,7 +651,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
     void DoCastRandomSpell()
     {
         uint32 randEntry = m_lSpells[ urand(0, m_lSpells.size() - 1) ];
-        ME->CastSpell(ME->getVictim(), randEntry, false);
+        ME->CastSpell(ME->GetVictim(), randEntry, false);
     }
     void DoSpawnRandomGobj()
     {
@@ -733,9 +733,9 @@ struct npc_event_wave_mobAI : public ScriptedAI
         for (std::list<Unit*>::iterator iter = targets.begin(); iter != targets.end(); ++iter)
         {
             uint32 currVictimQuality = 0;
-            if ((*iter)->getFaction() == ME->getFaction())
+            if ((*iter)->GetFactionTemplateId() == ME->GetFactionTemplateId())
                 continue;
-            if (!(*iter)->isAlive())
+            if (!(*iter)->IsAlive())
                 continue;
             uint32 entry = (*iter)->GetEntry();
             if (entry == NPC_BOSS_CAPITAL_ADD1 || entry == NPC_BOSS_CAPITAL_ADD2
@@ -753,8 +753,8 @@ struct npc_event_wave_mobAI : public ScriptedAI
             if ((*iter)->GetDistance2d(ME) <= nearest->GetDistance2d(ME))
                 currVictimQuality += 0x2;
             // Autre priorite : le niveau
-            if ((*iter)->getLevel() > 50)
-                currVictimQuality += ((*iter)->getLevel() - 50);
+            if ((*iter)->GetLevel() > 50)
+                currVictimQuality += ((*iter)->GetLevel() - 50);
             if (currVictimQuality > quality)
             {
                 quality = currVictimQuality;
@@ -768,7 +768,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
     }
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (ME->IsStopped() && !ME->getVictim())
+        if (ME->IsStopped() && !ME->GetVictim())
         {
             if (Unit* newTarget = GetRandomNearUnitToAttack())
                 AttackStart(newTarget);
@@ -964,7 +964,7 @@ struct npc_guard_masterAI : public ScriptedAI
         {
             if (Unit* crea = Unit::GetUnit(*ME, *itr))
             {
-                if (crea->isAlive())
+                if (crea->IsAlive())
                     ((Creature*)crea)->AI()->AttackStart(crea);
             }
         }
@@ -975,7 +975,7 @@ struct npc_guard_masterAI : public ScriptedAI
         {
             if (Unit* crea = Unit::GetUnit(*ME, *itr))
             {
-                if (crea->isAlive())
+                if (crea->IsAlive())
                     ((Creature*)crea)->MonsterSay(what, 0, 0);
             }
         }

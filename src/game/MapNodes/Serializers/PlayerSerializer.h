@@ -144,7 +144,7 @@ void Player::Serialize(OP& buf)
     if (buf.IsRead())
     {
         InitPlayerDisplayIds();
-        SetFactionForRace(getRace());
+        SetFactionForRace(GetRace());
         SetCharm(nullptr);
     }
 
@@ -158,7 +158,7 @@ void Player::Serialize(OP& buf)
 
     SerializeSkills(buf);
     SerializeAuras(buf);
-    if (buf.IsRead() && !isAlive())
+    if (buf.IsRead() && !IsAlive())
         RemoveAllAurasOnDeath();
     SerializeSpells(buf);
     SerializeSpellCooldowns(buf);
@@ -296,7 +296,7 @@ void Player::SerializeInventory(MaNGOS::Serializer::ReadSerializer& buf)
         ASSERT(item->PrepareWakeUp(item_guid_low, proto, this));
         item->Serialize(buf);
         bool isValid = item->WakeUp();
-        if (isAlive() && item->IsLimitedToAnotherMapOrZone(GetMapId(), zone))
+        if (IsAlive() && item->IsLimitedToAnotherMapOrZone(GetMapId(), zone))
             isValid = false;
 
         if (isValid)

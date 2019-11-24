@@ -66,7 +66,7 @@ enum
 
 bool GossipHello_npc_highlord_demitrian(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(QUEST_EXAMINE_THE_VESSEL) == QUEST_STATUS_NONE &&
@@ -241,7 +241,7 @@ struct go_pierre_ventsAI: public GameObjectAI
 
     void UseFailed(Unit* user)
     {
-        if (user->isAlive())
+        if (user->IsAlive())
         {
             user->CastSpell(user, SPELL_RED_LIGHTNING, true);
             user->DealDamage(user, user->GetHealth() > 1000 ? 1000 : user->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
@@ -514,7 +514,7 @@ struct npc_solenorAI : public ScriptedAI
     /** Solenor the Slayer */
     void Aggro(Unit* pWho) override
     {
-        if (pWho->getClass() == CLASS_HUNTER && (m_hunterGuid.IsEmpty() || m_hunterGuid == pWho->GetObjectGuid())/*&& pWho->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE*/)
+        if (pWho->GetClass() == CLASS_HUNTER && (m_hunterGuid.IsEmpty() || m_hunterGuid == pWho->GetObjectGuid())/*&& pWho->GetQuestStatus(QUEST_STAVE_OF_THE_ANCIENTS) == QUEST_STATUS_INCOMPLETE*/)
         {
             m_hunterGuid = pWho->GetObjectGuid();
         }
@@ -531,8 +531,8 @@ struct npc_solenorAI : public ScriptedAI
 
     void JustSummoned(Creature* pSummoned) override
     {
-        if (m_creature->getVictim())
-            pSummoned->AI()->AttackStart(m_creature->getVictim());
+        if (m_creature->GetVictim())
+            pSummoned->AI()->AttackStart(m_creature->GetVictim());
     }
 
     void JustDied(Unit* /*pKiller*/) override
@@ -561,13 +561,13 @@ struct npc_solenorAI : public ScriptedAI
             Creature* pCleaner = m_creature->SummonCreature(NPC_THE_CLEANER, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(m_creature), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 20*MINUTE*IN_MILLISECONDS);
             if (pCleaner)
             {
-                ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+                ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
 
                 for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
                 {
                     if (Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
                     {
-                        if (pUnit->isAlive())
+                        if (pUnit->IsAlive())
                         {
                             pCleaner->SetInCombatWith(pUnit);
                             pCleaner->AddThreat(pUnit);
@@ -621,7 +621,7 @@ struct npc_solenorAI : public ScriptedAI
         {
             if (m_uiDespawn_Timer <= uiDiff)
             {
-                if (m_creature->isAlive() && !m_creature->isInCombat())
+                if (m_creature->IsAlive() && !m_creature->IsInCombat())
                     DemonDespawn(false);
             }
             else
@@ -640,13 +640,13 @@ struct npc_solenorAI : public ScriptedAI
                 m_uiCastSoulFlame_Timer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->HasAura(SPELL_SOUL_FLAME) && m_creature->HasAura(SPELL_FROST_TRAP))
                 m_creature->RemoveAurasDueToSpell(SPELL_SOUL_FLAME);
 
-        if (m_creature->getThreatManager().getThreatList().size() > 1 /*|| pHunter->isDead()*/)
+        if (m_creature->GetThreatManager().getThreatList().size() > 1 /*|| pHunter->IsDead()*/)
             DemonDespawn();
 
         if (m_uiCreepingDoom_Timer < uiDiff)
@@ -659,7 +659,7 @@ struct npc_solenorAI : public ScriptedAI
 
         if (m_uiDreadfulFright_Timer < uiDiff)
         {
-            if (Unit* pUnit = m_creature->getVictim())
+            if (Unit* pUnit = m_creature->GetVictim())
             {
                 if (m_creature->GetDistance2d(pUnit) > 5.0f)
                 {
@@ -759,7 +759,7 @@ struct npc_prince_thunderaanAI : public ScriptedAI
             return;
 
         if (pSpell->Id == SPELL_TENDRILS_OF_AIR)
-            m_creature->getThreatManager().modifyThreatPercent(pCaster, -100);
+            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -100);
     }
 
     void Aggro(Unit* pWho) override
@@ -779,7 +779,7 @@ struct npc_prince_thunderaanAI : public ScriptedAI
             emerged = true;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiTendrilsTimer < uiDiff)
@@ -878,7 +878,7 @@ struct npc_colossusAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiColossalSmashTimer < uiDiff)
@@ -1349,7 +1349,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSchockTimer < uiDiff)
@@ -1408,7 +1408,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
                 if (Unit* pTarget = m_creature->GetMap()->GetUnit(PlayerGuids[i]))
                 {
                     pTarget->SetInCombatWith(m_creature);
-                    if (pTarget->isDead())
+                    if (pTarget->IsDead())
                     {
                         // + 2% MP at each death
                         float currMana = m_creature->GetPower(POWER_MANA);
@@ -1816,7 +1816,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
             case NPC_QIRAJI_WASP:
             case NPC_QIRAJI_DRONE:
             case NPC_QIRAJI_TANK:
-                pSummoned->setFaction(14);
+                pSummoned->SetFactionTemplateId(14);
                 //pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 m_lQirajiWarriorsList.push_back(pSummoned->GetObjectGuid());
 
@@ -1838,7 +1838,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
                 break;
             case NPC_KALDOREI_INFANTRY:
-                pSummoned->setFaction(1608);
+                pSummoned->SetFactionTemplateId(1608);
                 m_lQirajiWarriorsList.push_back(pSummoned->GetObjectGuid());
                 break;
         }
@@ -2711,7 +2711,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         m_bReachedCamp = false;
         m_uiMoveTimer = 0;
         m_uiWaypoint = 0;
-        pCreature->setFaction(35);
+        pCreature->SetFactionTemplateId(35);
     }
 
     uint32 m_uiThunderClapTimer;
@@ -2734,7 +2734,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
 
     Unit* GetVictimInRangePlayerOnly(float min, float max)
     {
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
         {
             if (ObjectGuid uiTargetGuid = (*itr)->getUnitGuid())
@@ -2757,7 +2757,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
             {
                 if (m_uiWaypoint == HUNTERKILLER_WAYPOINTS_NUMBER)
                 {
-                    m_creature->setFaction(14);
+                    m_creature->SetFactionTemplateId(14);
                     if (Creature* krug = GetClosestCreatureWithEntry(m_creature, NPC_KRUG_SKULLSPLIT, 50.0f))
                         AttackStart(krug);
 
@@ -2782,7 +2782,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->IsNonMeleeSpellCasted(false))
@@ -2791,7 +2791,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         // THUNDERCLAP
         if (m_uiThunderClapTimer <= uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_THUNDERCLAP);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THUNDERCLAP);
             m_uiThunderClapTimer = 20000;
         }
         else
@@ -2812,7 +2812,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         // CLEAVE
         if (m_uiCleaveTimer <= uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
             m_uiCleaveTimer = urand(5000, 12000);
         }
         else
@@ -2821,7 +2821,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         // FEAR
         if (m_uiFearTimer <= uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR);
             m_uiFearTimer = urand(58000, 63000);
         }
         else
@@ -2926,7 +2926,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
                 m_bAlreadyMoved = false;
                 m_uiHunterKillerGUID = pHunterKiller->GetObjectGuid();
                 InitOtherNPCsGuids();
-                pHunterKiller->setFaction(35);
+                pHunterKiller->SetFactionTemplateId(35);
             }
 
             m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -3072,7 +3072,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
                 {
                     for (std::list<Creature*>::iterator itr = gruntList.begin(); itr != gruntList.end(); ++itr)
                     {
-                        if ((*itr)->isAlive())
+                        if ((*itr)->IsAlive())
                             DoScriptText(SAY_LINE_9, (*itr));
                     }
                 }
@@ -3100,7 +3100,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
         }
 
         /* Start of combat script */
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -3132,7 +3132,7 @@ bool GossipHello_npc_Krug_SkullSplit(Player* pPlayer, Creature* pCreature)
     else if ((pPlayer->GetQuestStatus(QUEST_FIELD_DUTY) == QUEST_STATUS_INCOMPLETE)
              && (eEventStatus == EVENT_COMPLETE))
     {
-        if (pCreature->isQuestGiver())
+        if (pCreature->IsQuestGiver())
             pPlayer->PrepareQuestMenu(pCreature->GetGUID());
         pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
     }
@@ -3175,7 +3175,7 @@ struct npc_MerokAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->IsNonMeleeSpellCasted(false))
@@ -3221,7 +3221,7 @@ struct npc_ShaiAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->IsNonMeleeSpellCasted(false))
@@ -3292,7 +3292,7 @@ struct boss_vamAI : public ScriptedAI
     void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Charge_Timer

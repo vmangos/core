@@ -137,9 +137,9 @@ struct boss_ossirianAI : public ScriptedAI
     {
         if (pSpell->Id == SPELL_ENVELOPING_WINDS)
         {
-            TmpThreatVal.push_back(m_creature->getThreatManager().getThreat(pCaster));
+            TmpThreatVal.push_back(m_creature->GetThreatManager().getThreat(pCaster));
             TmpThreatList.push_back(pCaster->GetObjectGuid());
-            m_creature->getThreatManager().modifyThreatPercent(pCaster, -100);
+            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -100);
         }
     }
 
@@ -180,7 +180,7 @@ struct boss_ossirianAI : public ScriptedAI
             {
                 pCreature->CastSpell(pCreature, SPELL_SANDSTORM, true);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                pCreature->AI()->AttackStart(m_creature->getVictim());
+                pCreature->AI()->AttackStart(m_creature->GetVictim());
                 TornadoGUIDs.push_back(pCreature->GetGUID());
             }
         }
@@ -223,12 +223,12 @@ struct boss_ossirianAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiCurseOfTongues_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSE_OF_TONGUES) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSE_OF_TONGUES) == CAST_OK)
                 m_uiCurseOfTongues_Timer = 10000 + rand() % 10000;
         }
         else
@@ -260,7 +260,7 @@ struct boss_ossirianAI : public ScriptedAI
 
         if (m_uiEnvelopingWinds_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ENVELOPING_WINDS) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ENVELOPING_WINDS) == CAST_OK)
                 m_uiEnvelopingWinds_Timer = 15000;
         }
         else
@@ -273,11 +273,11 @@ struct boss_ossirianAI : public ScriptedAI
             {
                 if (Unit* unit = m_creature->GetMap()->GetUnit(TmpThreatList[i]))
                 {
-                    if (unit->isAlive())
+                    if (unit->IsAlive())
                     {
                         if (unit->HasAura(SPELL_ENVELOPING_WINDS))
                             continue;
-                        m_creature->getThreatManager().addThreat(unit, TmpThreatVal[i]);
+                        m_creature->GetThreatManager().addThreat(unit, TmpThreatVal[i]);
                     }
                 }
                 TmpThreatList.erase(TmpThreatList.begin() + i);
@@ -375,7 +375,7 @@ struct ossirian_crystalAI : public GameObjectAI
         }
 
         // Encounter not started
-        if (!ossirian->SelectHostileTarget() || !ossirian->getVictim())
+        if (!ossirian->SelectHostileTarget() || !ossirian->GetVictim())
             return true;
 
         Creature* triggerCrystalPylons = me->SummonCreature(CRYSTAL_TRIGGER,

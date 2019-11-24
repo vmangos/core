@@ -123,7 +123,7 @@ struct boss_razorgoreAI : public ScriptedAI
             return;
 
         if (pSpell->Id == SPELL_WARSTOMP)
-            m_creature->getThreatManager().modifyThreatPercent(pTarget, -30);
+            m_creature->GetThreatManager().modifyThreatPercent(pTarget, -30);
     }
 
     void Aggro(Unit* /*pWho*/) override
@@ -146,7 +146,7 @@ struct boss_razorgoreAI : public ScriptedAI
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
-            if (i->getSource() && i->getSource()->isAlive())
+            if (i->getSource() && i->getSource()->IsAlive())
                 i->getSource()->CastSpell(i->getSource(), SPELL_EXPLOSION, true);
         }
 
@@ -220,7 +220,7 @@ struct boss_razorgoreAI : public ScriptedAI
 
             for (std::list<Creature*>::iterator itr = GardesListe.begin(); itr != GardesListe.end(); ++itr)
             {
-                if (!(*itr)->isAlive())
+                if (!(*itr)->IsAlive())
                     (*itr)->Respawn();
                 if ((*itr)->GetEntry() == MOB_GRETHOK)
                     (*itr)->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_POSSESS_ORB);
@@ -246,14 +246,14 @@ struct boss_razorgoreAI : public ScriptedAI
 
         for (std::list<Creature*>::iterator it = lCreatureNear.begin(); it != lCreatureNear.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
                 (*it)->AI()->EnterEvadeMode();
         }
     }
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (m_creature->hasUnitState(UNIT_STAT_POSSESSED))
+        if (m_creature->HasUnitState(UNIT_STAT_POSSESSED))
         {
             ScriptedAI::UpdateAI(uiDiff);
             return;
@@ -269,7 +269,7 @@ struct boss_razorgoreAI : public ScriptedAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_pInstance->GetData64(DATA_EGG) == DONE)
@@ -295,7 +295,7 @@ struct boss_razorgoreAI : public ScriptedAI
             if (m_uiOutOfReachTimer < uiDiff)
             {
                 DEBUG_EMOTE("summon");
-                if (m_creature->TryToCast(m_creature->getVictim(), SPELL_SUMMON_PLAYER, CF_TRIGGERED, 100) == SPELL_CAST_OK)
+                if (m_creature->TryToCast(m_creature->GetVictim(), SPELL_SUMMON_PLAYER, CF_TRIGGERED, 100) == SPELL_CAST_OK)
                     m_uiOutOfReachTimer = 10000;
             }
             else
@@ -305,7 +305,7 @@ struct boss_razorgoreAI : public ScriptedAI
         if (m_uiCleaveTimer < uiDiff)
         {
             DEBUG_EMOTE("cleave");
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(5000, 10000);
         }
         else
@@ -394,7 +394,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
         for (std::list<Creature*>::iterator it = lCreatureNear.begin(); it != lCreatureNear.end(); ++it)
         {
-            if ((*it)->isAlive())
+            if ((*it)->IsAlive())
             {
                 (*it)->SetHomePosition(-7555.55f, -1025.16f, 408.4914f, 0.65f);
                 (*it)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_SILENCED);
@@ -578,7 +578,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
                 for (std::list<Creature*>::iterator itr = lGuards.begin(); itr != lGuards.end(); ++itr)
                 {
-                    if (!(*itr)->isInCombat())
+                    if (!(*itr)->IsInCombat())
                     {
                         (*itr)->SetInCombatWithZone();
                         if ((*itr)->GetEntry() == MOB_GRETHOK)
@@ -614,10 +614,10 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
                     if (Unit* pChanneler = m_creature->GetMap()->GetUnit(m_uiPossesseurGuid))
                     {
-                        if (pChanneler->isDead())
+                        if (pChanneler->IsDead())
                         {
                             pRazorgore->RemoveAurasDueToSpell(SPELL_POSSESS_ORB);
-                            if (pRazorgore->getThreatManager().isThreatListEmpty())
+                            if (pRazorgore->GetThreatManager().isThreatListEmpty())
                                 pRazorgore->AI()->EnterEvadeMode();
                         }
 
@@ -628,10 +628,10 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
                         for (std::list<Creature*>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
                         {
-                            if ((*itr)->getThreatManager().getThreat(pRazorgore))
+                            if ((*itr)->GetThreatManager().getThreat(pRazorgore))
                             {
-                                (*itr)->getThreatManager().modifyThreatPercent(pChanneler, -100);
-                                (*itr)->AddThreat(pChanneler, (*itr)->getThreatManager().getThreat(pRazorgore));
+                                (*itr)->GetThreatManager().modifyThreatPercent(pChanneler, -100);
+                                (*itr)->AddThreat(pChanneler, (*itr)->GetThreatManager().getThreat(pRazorgore));
                             }
                         }
                     }
@@ -652,7 +652,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                         GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_MAGE, 150.0f);
 
                         for (std::list<Creature*>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
-                            (*itr)->getThreatManager().modifyThreatPercent(pRazorgore, -100);
+                            (*itr)->GetThreatManager().modifyThreatPercent(pRazorgore, -100);
 
                         // Razorgore must attack the possessor
                         ((ScriptedAI*)pRazorgore->AI())->DoResetThreat();

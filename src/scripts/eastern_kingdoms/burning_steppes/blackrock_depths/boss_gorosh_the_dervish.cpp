@@ -49,7 +49,7 @@ struct boss_gorosh_the_dervishAI : public ScriptedAI
     void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //WhirlWind_Timer
@@ -63,7 +63,7 @@ struct boss_gorosh_the_dervishAI : public ScriptedAI
         //MortalStrike_Timer
         if (MortalStrike_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALSTRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALSTRIKE);
             MortalStrike_Timer = 15000;
         }
         else MortalStrike_Timer -= diff;

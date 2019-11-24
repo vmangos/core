@@ -38,8 +38,8 @@
 void MemberSlot::SetMemberStats(Player* player)
 {
     Name   = player->GetName();
-    Level  = player->getLevel();
-    Class  = player->getClass();
+    Level  = player->GetLevel();
+    Class  = player->GetClass();
     ZoneId = player->GetCachedZoneId();
 }
 
@@ -227,8 +227,8 @@ GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
     {
         newmember.accountId = pl->GetSession()->GetAccountId();
         newmember.Name   = pl->GetName();
-        newmember.Level  = pl->getLevel();
-        newmember.Class  = pl->getClass();
+        newmember.Level  = pl->GetLevel();
+        newmember.Class  = pl->GetClass();
         newmember.ZoneId = pl->GetCachedZoneId();
     }
     else
@@ -773,8 +773,8 @@ void Guild::Roster(WorldSession *session /*= nullptr*/)
             data << uint8(1);
             data << pl->GetName();
             data << uint32(itr->second.RankId);
-            data << uint8(pl->getLevel());
-            data << uint8(pl->getClass());
+            data << uint8(pl->GetLevel());
+            data << uint8(pl->GetClass());
             data << uint32(pl->GetCachedZoneId());
             data << itr->second.Pnote;
             data << itr->second.OFFnote;

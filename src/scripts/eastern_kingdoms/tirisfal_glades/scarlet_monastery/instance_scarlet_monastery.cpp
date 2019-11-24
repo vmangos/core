@@ -195,7 +195,7 @@ struct instance_scarlet_monastery : ScriptedInstance
             return;
         if (!pCaster->IsPlayer() || spell->Id != 28441) // AB Effect 000
             return;
-        if (receiver->isDead())
+        if (receiver->IsDead())
             return;
 
         switch (receiver->GetEntry())
@@ -218,7 +218,7 @@ struct instance_scarlet_monastery : ScriptedInstance
             receiver->StopMoving(true);
             receiver->SetFacingToObject(pCaster);
             receiver->SetStandState(UNIT_STAND_STATE_KNEEL);
-            receiver->addUnitState(UNIT_STAT_ROOT);
+            receiver->AddUnitState(UNIT_STAT_ROOT);
             if (!m_ashbringerSayTimer && urand(0,1))
             {
                 m_ashbringerSayTimer = 2000;
@@ -376,7 +376,7 @@ struct instance_scarlet_monastery : ScriptedInstance
 
                     for (Creature* pCreature : ScarletList)
                     {
-                        pCreature->setFaction(35);
+                        pCreature->SetFactionTemplateId(35);
                         if (pCreature->GetEntry() == NPC_COMMANDER_MOGRAINE)
                             pCreature->SetCharmerGuid(pPlayer->GetObjectGuid());
                     }

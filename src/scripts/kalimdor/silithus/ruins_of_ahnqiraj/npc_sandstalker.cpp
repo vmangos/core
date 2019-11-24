@@ -42,7 +42,7 @@ struct npc_sandstalkerAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
             EnterVanish();
 
         if (m_uiBurrow_Timer < uiDiff)

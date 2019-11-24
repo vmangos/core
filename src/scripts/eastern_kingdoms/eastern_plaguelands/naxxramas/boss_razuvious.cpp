@@ -108,7 +108,7 @@ struct mob_deathknightUnderstudyAI : public ScriptedAI
                 attackTimer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -141,11 +141,11 @@ struct boss_razuviousAI : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 33.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
                 else if (m_creature->GetMap()->IsDungeon())
                 {
@@ -308,10 +308,10 @@ struct boss_razuviousAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
             UpdateRP(uiDiff);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -323,11 +323,11 @@ struct boss_razuviousAI : public ScriptedAI
             switch (eventId)
             {
             case EVENT_UNBALANCING_STRIKE:
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_UNBALANCING_STRIKE);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UNBALANCING_STRIKE);
                 events.Repeat(Seconds(30));
                 break;
             case EVENT_DISRUPTING_SHOUT:
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISRUPTING_SHOUT);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISRUPTING_SHOUT);
                 DoScriptText(EMOTE_SHOUT, m_creature);
                 events.Repeat(Seconds(25));
                 break;

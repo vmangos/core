@@ -53,7 +53,7 @@ struct boss_lordalexeibarovAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Immolate_Timer
@@ -70,7 +70,7 @@ struct boss_lordalexeibarovAI : public ScriptedAI
         //VeilofShadow_Timer
         if (VeilofShadow_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_VEILOFSHADOW);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VEILOFSHADOW);
             VeilofShadow_Timer = 20000;
         }
         else VeilofShadow_Timer -= diff;

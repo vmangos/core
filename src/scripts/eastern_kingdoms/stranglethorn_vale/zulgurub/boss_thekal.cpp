@@ -156,7 +156,7 @@ struct zg_rez_add : public ScriptedAI
         {
             if (Unit* pRezzeur = m_pInstance->instance->GetUnit(m_uiRezzeurGUID))
             {
-                if (pRezzeur->isAlive())
+                if (pRezzeur->IsAlive())
                 {
                     pRezzeur->InterruptNonMeleeSpells(true);
                     pRezzeur->CastSpell(m_creature, SPELL_RESURRECT, false);
@@ -169,7 +169,7 @@ struct zg_rez_add : public ScriptedAI
             {
                 if (Unit* pRezzeur = m_pInstance->instance->GetUnit(m_uiRezzeurGUID))
                 {
-                    if (!pRezzeur->isAlive())
+                    if (!pRezzeur->IsAlive())
                     {
                         m_uiRessurectTimer = 8000;
                         m_uiRezzeurGUID = 0;
@@ -179,7 +179,7 @@ struct zg_rez_add : public ScriptedAI
             }
 
             if (Unit* pFriend = m_pInstance->Thekal_GetUnitThatCanRez())
-                DoRessurectUnit(m_creature, pFriend->getVictim());
+                DoRessurectUnit(m_creature, pFriend->GetVictim());
             else
             {
                 // Apres les 10 sec sans rez :
@@ -403,7 +403,7 @@ struct boss_thekalAI : public zg_rez_add
     void CheckTiger(uint64& guid)
     {
         Creature* pTiger = m_creature->GetMap()->GetCreature(guid);
-        if (!pTiger || !pTiger->isAlive())
+        if (!pTiger || !pTiger->IsAlive())
         {
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
@@ -415,10 +415,10 @@ struct boss_thekalAI : public zg_rez_add
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->isAlive())
+        if (!m_creature->IsAlive())
             return;
         zg_rez_add::UpdateAI(diff);
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (PhaseTwo)
             {
@@ -434,7 +434,7 @@ struct boss_thekalAI : public zg_rez_add
                     float nearestDist = 200.0f;
                     Player* target = nullptr;
                     for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (m_creature->canAttack(itr->getSource()))
+                        if (m_creature->CanAttack(itr->getSource()))
                             if (itr->getSource()->GetDistance(m_creature) < nearestDist)
                             {
                                 nearestDist = itr->getSource()->GetDistance(m_creature);
@@ -452,7 +452,7 @@ struct boss_thekalAI : public zg_rez_add
         {
             if (MortalCleave_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALCLEAVE);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALCLEAVE);
                 MortalCleave_Timer = urand(15000, 20000);
             }
             else
@@ -477,7 +477,7 @@ struct boss_thekalAI : public zg_rez_add
                 if (Unit* target = selector->GetUnit())
                 {
                     DoResetThreat();
-                    m_creature->getThreatManager().modifyThreatPercent(target, 100);
+                    m_creature->GetThreatManager().modifyThreatPercent(target, 100);
                     DoCastSpellIfCan(target, SPELL_CHARGE);
                     Charge_Timer = urand(15000, 22000);
                 }
@@ -498,7 +498,7 @@ struct boss_thekalAI : public zg_rez_add
 
             if (ForcePunch_Timer < diff)
             {
-                m_creature->CastSpell(m_creature->getVictim(), SPELL_FORCEPUNCH, true);
+                m_creature->CastSpell(m_creature->GetVictim(), SPELL_FORCEPUNCH, true);
                 ForcePunch_Timer = urand(16000, 21000);
             }
             else
@@ -571,7 +571,7 @@ struct mob_zealot_lorkhanAI : public zg_rez_add
     void UpdateAI(const uint32 diff) override
     {
         zg_rez_add::UpdateAI(diff);
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Shield_Timer
@@ -611,7 +611,7 @@ struct mob_zealot_lorkhanAI : public zg_rez_add
         //Disarm_Timer
         if (Disarm_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISARM);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISARM);
             Disarm_Timer = urand(15000, 25000);
         }
         else Disarm_Timer -= diff;
@@ -669,13 +669,13 @@ struct mob_zealot_zathAI : public zg_rez_add
     void UpdateAI(const uint32 diff) override
     {
         zg_rez_add::UpdateAI(diff);
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //SweepingStrikes_Timer
         if (SweepingStrikes_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SWEEPINGSTRIKES);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SWEEPINGSTRIKES);
             SweepingStrikes_Timer = urand(22000, 26000);
         }
         else SweepingStrikes_Timer -= diff;
@@ -683,7 +683,7 @@ struct mob_zealot_zathAI : public zg_rez_add
         //SinisterStrike_Timer
         if (SinisterStrike_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SINISTERSTRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SINISTERSTRIKE);
             SinisterStrike_Timer = urand(8000, 16000);
         }
         else SinisterStrike_Timer -= diff;
@@ -691,10 +691,10 @@ struct mob_zealot_zathAI : public zg_rez_add
         //Gouge_Timer
         if (Gouge_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_GOUGE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_GOUGE);
 
-            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+            if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()))
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
 
             Gouge_Timer = urand(17000, 27000);
         }
@@ -703,9 +703,9 @@ struct mob_zealot_zathAI : public zg_rez_add
         //Kick_Timer
         if (Kick_Timer < diff)
         {
-            if(m_creature->getVictim()->IsNonMeleeSpellCasted(false))
+            if(m_creature->GetVictim()->IsNonMeleeSpellCasted(false))
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_KICK);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KICK);
                 Kick_Timer = urand(15000, 25000);
             }
         }
@@ -714,7 +714,7 @@ struct mob_zealot_zathAI : public zg_rez_add
         //Blind_Timer
         if (Blind_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLIND);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BLIND);
             Blind_Timer = urand(10000, 20000);
         }
         else Blind_Timer -= diff;

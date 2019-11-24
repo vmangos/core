@@ -182,8 +182,8 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     {
         if (pSpell->Id == SPELL_SANDBLAST && pTarget)
         {
-            if (m_creature->getThreatManager().getThreat(pTarget))
-                m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
+            if (m_creature->GetThreatManager().getThreat(pTarget))
+                m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
         }
     }
 
@@ -222,20 +222,20 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     void SetNewTarget(Unit &pNewTarget)
     {
-        const uint32 uiMaxThreat = m_creature->getThreatManager().getThreat(m_creature->getVictim());
+        const uint32 uiMaxThreat = m_creature->GetThreatManager().getThreat(m_creature->GetVictim());
 
         // erase current target's threat as soon as we switch the target now
-        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+        m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
 
         // give the new target aggro
-        m_creature->getThreatManager().addThreat(&pNewTarget, uiMaxThreat);
+        m_creature->GetThreatManager().addThreat(&pNewTarget, uiMaxThreat);
     }
 
 
     bool CheckForMelee()
     {
         // at first we check for the current player-type target
-        Unit* pMainTarget = m_creature->getVictim();
+        Unit* pMainTarget = m_creature->GetVictim();
         if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->IsGameMaster() &&
             m_creature->IsWithinMeleeRange(pMainTarget) && m_creature->IsWithinLOSInMap(pMainTarget))
         {
@@ -272,7 +272,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     void UpdateAI(const uint32 uiDiff) override
     {
         // Return since we have no pTarget
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!m_bSubmerged)
@@ -299,7 +299,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             // Sand Blast
             if (m_uiSandBlastTimer < uiDiff)
             {
-                auto target = m_creature->getThreatManager().getHostileTarget();
+                auto target = m_creature->GetThreatManager().getHostileTarget();
 
                 if (target && DoCastSpellIfCan(target, SPELL_SANDBLAST) == CAST_OK)
                 {
@@ -348,7 +348,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             }
 
             // If we are within range melee the target
-            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->getVictim()))
+            if (m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             {
                 DoMeleeAttackIfReady();
             }
@@ -391,7 +391,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
                     std::list<Unit*> lGroundRuptureTargets;
-                    ThreatList const& lThreat = m_creature->getThreatManager().getThreatList();
+                    ThreatList const& lThreat = m_creature->GetThreatManager().getThreatList();
                     for (ThreatList::const_iterator i = lThreat.begin(); i != lThreat.end(); ++i)
                     {
                         Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
@@ -524,7 +524,7 @@ struct npc_dirt_moundAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         Unit *pTarget = m_creature->GetMap()->GetUnit(m_CurrentTargetGUID);
-        const bool bForceChangeTarget = !pTarget || pTarget->isDead()
+        const bool bForceChangeTarget = !pTarget || pTarget->IsDead()
             || pTarget->IsImmuneToDamage(SPELL_SCHOOL_MASK_NATURE);
 
         if (bForceChangeTarget || m_uiChangeTargetTimer < uiDiff)
@@ -576,7 +576,7 @@ struct npc_ouro_scarabAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *who) override
     {
-        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim() && !urand(0, 5))
+        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->GetVictim() && !urand(0, 5))
 	    {
             AttackStart(who);
 	    }
@@ -584,7 +584,7 @@ struct npc_ouro_scarabAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
             DoMeleeAttackIfReady();
 
         if (m_uiDespawnTimer < uiDiff)

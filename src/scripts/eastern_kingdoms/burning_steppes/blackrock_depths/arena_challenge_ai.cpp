@@ -70,7 +70,7 @@ struct npc_theldrenAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiInterceptTimer < diff)
@@ -85,7 +85,7 @@ struct npc_theldrenAI : public ScriptedAI
 
         if (m_uiMortalStrikeTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THELDREN_MORTAL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THELDREN_MORTAL_STRIKE) == CAST_OK)
                 m_uiMortalStrikeTimer = urand(8000, 15000);
         }
         else
@@ -93,7 +93,7 @@ struct npc_theldrenAI : public ScriptedAI
 
         if (m_uiFearTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THELDREN_INTIMIDATING_SHOUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THELDREN_INTIMIDATING_SHOUT) == CAST_OK)
                 m_uiFearTimer = urand(30000, 40000);
         }
         else
@@ -160,7 +160,7 @@ struct npc_va_jashniAI : public ScriptedAI
         else
             m_uiRenewTimer -= diff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -192,7 +192,7 @@ struct npc_korvAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiFrostShockTimer < diff)
@@ -247,12 +247,12 @@ struct npc_leftyAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiFiveFingerTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_LEFTY_FIVE_FAT_FINGERS) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_LEFTY_FIVE_FAT_FINGERS) == CAST_OK)
                 m_uiFiveFingerTimer = urand(2000, 3000);
         }
         else
@@ -289,12 +289,12 @@ struct npc_snokh_blackspineAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiPyroblastTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SNOKH_BLACKSPINE_PYROBLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SNOKH_BLACKSPINE_PYROBLAST) == CAST_OK)
                 m_uiPyroblastTimer = urand(10000, 20000);
         }
         else
@@ -302,7 +302,7 @@ struct npc_snokh_blackspineAI : public ScriptedAI
 
         if (m_uiScorchTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SNOKH_BLACKSPINE_SCORCH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SNOKH_BLACKSPINE_SCORCH) == CAST_OK)
                 m_uiScorchTimer = urand(3000, 5000);
         }
         else
@@ -355,7 +355,7 @@ struct npc_volidaAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiBlizzardTimer < diff)
@@ -370,7 +370,7 @@ struct npc_volidaAI : public ScriptedAI
 
         if (m_uiConeOfColdTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_VOLIDA_CONEOFCOLD) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VOLIDA_CONEOFCOLD) == CAST_OK)
                 m_uiConeOfColdTimer = 20000;
         }
         else
@@ -435,7 +435,7 @@ struct npc_malgen_longspearAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_bIsFeigned && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsFeigned && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
 
         if (m_uiFeignDeathTimer < diff)

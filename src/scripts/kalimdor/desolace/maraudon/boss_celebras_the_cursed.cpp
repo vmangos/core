@@ -77,7 +77,7 @@ struct celebras_the_cursedAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Wrath
@@ -94,7 +94,7 @@ struct celebras_the_cursedAI : public ScriptedAI
         //EntanglingRoots
         if (EntanglingRoots_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_ENTANGLINGROOTS);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ENTANGLINGROOTS);
             EntanglingRoots_Timer = 20000;
         }
         else EntanglingRoots_Timer -= diff;
@@ -223,7 +223,7 @@ struct celebrasSpiritAI : public npc_escortAI
 
     void UpdateEscortAI(const uint32 uiDiff) override
     {
-        if (Event_Timer && !m_creature->getVictim())
+        if (Event_Timer && !m_creature->GetVictim())
         {
             if (Event_Timer <= uiDiff)
             {
@@ -282,7 +282,7 @@ struct celebrasSpiritAI : public npc_escortAI
                 Event_Timer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

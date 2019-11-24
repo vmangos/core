@@ -117,7 +117,7 @@ struct boss_jandicebarovAI : public ScriptedAI
         if (Invisible && Invisible_Timer < diff)
         {
             //Become visible again
-            m_creature->setFaction(14);
+            m_creature->SetFactionTemplateId(14);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->SetVisibility(VISIBILITY_ON);
             Invisible = false;
@@ -132,13 +132,13 @@ struct boss_jandicebarovAI : public ScriptedAI
         }
 
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //CurseOfBlood_Timer
         if (CurseOfBlood_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSEOFBLOOD);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSEOFBLOOD);
             CurseOfBlood_Timer = 30000;
         }
         else
@@ -149,9 +149,9 @@ struct boss_jandicebarovAI : public ScriptedAI
         {
             //Inturrupt any spell casting
             m_creature->InterruptNonMeleeSpells(false);
-            m_creature->setFaction(35);
+            m_creature->SetFactionTemplateId(35);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -99);
+            m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -99);
             m_creature->SetVisibility(VISIBILITY_OFF);
 
             damageTaken = 0;
@@ -196,13 +196,13 @@ struct mob_illusionofjandicebarovAI : public ScriptedAI
     void UpdateAI(const uint32 diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Cleave_Timer
         if (Cleave_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 Cleave_Timer = urand(5000, 15000);
         }
         else
