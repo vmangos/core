@@ -357,7 +357,7 @@ class MANGOS_DLL_SPEC Object
         uint8 GetTypeId() const { return m_objectTypeId; }
         bool isType(TypeMask mask) const { return (mask & m_objectType); }
 
-        virtual void BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
+        virtual void BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) const;
         void SendCreateUpdateToPlayer(Player* player);
 
         // must be overwrite in appropriate subclasses (WorldObject, Item currently), or will crash
@@ -369,86 +369,86 @@ class MANGOS_DLL_SPEC Object
         void AddDelayedAction(ObjectDelayedAction e) { _delayedActions |= e; }
         void ExecuteDelayedActions();
 
-        void BuildValuesUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
-        void BuildOutOfRangeUpdateBlock( UpdateData *data ) const;
-        void BuildMovementUpdateBlock( UpdateData * data, uint8 flags = 0 ) const;
+        void BuildValuesUpdateBlockForPlayer(UpdateData *data, Player *target) const;
+        void BuildOutOfRangeUpdateBlock(UpdateData *data) const;
+        void BuildMovementUpdateBlock(UpdateData * data, uint8 flags = 0) const;
 
         void BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const;
-        void BuildValuesUpdate(uint8 updatetype, ByteBuffer *data, UpdateMask *updateMask, Player *target ) const;
+        void BuildValuesUpdate(uint8 updatetype, ByteBuffer *data, UpdateMask *updateMask, Player *target) const;
         void BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_players);
 
         void SendOutOfRangeUpdateToPlayer(Player* player);
 
-        virtual void DestroyForPlayer( Player *target ) const;
+        virtual void DestroyForPlayer(Player *target) const;
 
-        const int32& GetInt32Value( uint16 index ) const
+        const int32& GetInt32Value(uint16 index) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_int32Values[ index ];
         }
 
-        const uint32& GetUInt32Value( uint16 index ) const
+        const uint32& GetUInt32Value(uint16 index) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_uint32Values[ index ];
         }
 
-        const uint64& GetUInt64Value( uint16 index ) const
+        const uint64& GetUInt64Value(uint16 index) const
         {
-            MANGOS_ASSERT( index + 1 < m_valuesCount || PrintIndexError( index , false) );
+            MANGOS_ASSERT(index + 1 < m_valuesCount || PrintIndexError(index , false));
             return *((uint64*)&(m_uint32Values[ index ]));
         }
 
-        const float& GetFloatValue( uint16 index ) const
+        const float& GetFloatValue(uint16 index) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_floatValues[ index ];
         }
 
-        uint8 GetByteValue( uint16 index, uint8 offset) const
+        uint8 GetByteValue(uint16 index, uint8 offset) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false) );
-            MANGOS_ASSERT( offset < 4 );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
+            MANGOS_ASSERT(offset < 4);
             return *(((uint8*)&m_uint32Values[ index ])+offset);
         }
 
-        uint16 GetUInt16Value( uint16 index, uint8 offset) const
+        uint16 GetUInt16Value(uint16 index, uint8 offset) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false) );
-            MANGOS_ASSERT( offset < 2 );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
+            MANGOS_ASSERT(offset < 2);
             return *(((uint16*)&m_uint32Values[ index ])+offset);
         }
 
-        ObjectGuid const& GetGuidValue( uint16 index ) const { return *reinterpret_cast<ObjectGuid const*>(&GetUInt64Value(index)); }
+        ObjectGuid const& GetGuidValue(uint16 index) const { return *reinterpret_cast<ObjectGuid const*>(&GetUInt64Value(index)); }
 
-        void SetInt32Value(  uint16 index,        int32  value );
-        void SetUInt32Value( uint16 index,       uint32  value );
-        void SetUInt64Value( uint16 index, const uint64 &value );
-        void SetFloatValue(  uint16 index,       float   value );
-        void SetByteValue(   uint16 index, uint8 offset, uint8 value );
-        void SetUInt16Value( uint16 index, uint8 offset, uint16 value );
-        void SetInt16Value(  uint16 index, uint8 offset, int16 value ) { SetUInt16Value(index,offset,(uint16)value); }
-        void SetGuidValue( uint16 index, ObjectGuid const& value ) { SetUInt64Value(index, value.GetRawValue()); }
-        void SetStatFloatValue( uint16 index, float value);
-        void SetStatInt32Value( uint16 index, int32 value);
+        void SetInt32Value(uint16 index, int32  value);
+        void SetUInt32Value(uint16 index, uint32  value);
+        void SetUInt64Value(uint16 index, const uint64 &value);
+        void SetFloatValue(uint16 index, float   value);
+        void SetByteValue(uint16 index, uint8 offset, uint8 value);
+        void SetUInt16Value(uint16 index, uint8 offset, uint16 value);
+        void SetInt16Value(uint16 index, uint8 offset, int16 value) { SetUInt16Value(index,offset,(uint16)value); }
+        void SetGuidValue(uint16 index, ObjectGuid const& value) { SetUInt64Value(index, value.GetRawValue()); }
+        void SetStatFloatValue(uint16 index, float value);
+        void SetStatInt32Value(uint16 index, int32 value);
 
         void ApplyModUInt32Value(uint16 index, int32 val, bool apply);
         void ApplyModInt32Value(uint16 index, int32 val, bool apply);
-        void ApplyModPositiveFloatValue( uint16 index, float val, bool apply);
-        void ApplyModSignedFloatValue( uint16 index, float val, bool apply);
+        void ApplyModPositiveFloatValue(uint16 index, float val, bool apply);
+        void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
 
         void ForceValuesUpdateAtIndex(uint16 index);
 
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply)
         {
             val = val != -100.0f ? val : -99.9f ;
-            SetFloatValue(index, GetFloatValue(index) * (apply?(100.0f+val)/100.0f : 100.0f / (100.0f+val)) );
+            SetFloatValue(index, GetFloatValue(index) * (apply?(100.0f+val)/100.0f : 100.0f / (100.0f+val)));
         }
 
-        void SetFlag( uint16 index, uint32 newFlag );
-        void RemoveFlag( uint16 index, uint32 oldFlag );
+        void SetFlag(uint16 index, uint32 newFlag);
+        void RemoveFlag(uint16 index, uint32 oldFlag);
 
-        void ToggleFlag( uint16 index, uint32 flag)
+        void ToggleFlag(uint16 index, uint32 flag)
         {
             if(HasFlag(index, flag))
                 RemoveFlag(index, flag);
@@ -456,13 +456,13 @@ class MANGOS_DLL_SPEC Object
                 SetFlag(index, flag);
         }
 
-        bool HasFlag( uint16 index, uint32 flag ) const
+        bool HasFlag(uint16 index, uint32 flag) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return (m_uint32Values[ index ] & flag) != 0;
         }
 
-        void ApplyModFlag( uint16 index, uint32 flag, bool apply)
+        void ApplyModFlag(uint16 index, uint32 flag, bool apply)
         {
             if (apply)
                 SetFlag(index, flag);
@@ -470,10 +470,10 @@ class MANGOS_DLL_SPEC Object
                 RemoveFlag(index, flag);
         }
 
-        void SetByteFlag( uint16 index, uint8 offset, uint8 newFlag );
-        void RemoveByteFlag( uint16 index, uint8 offset, uint8 newFlag );
+        void SetByteFlag(uint16 index, uint8 offset, uint8 newFlag);
+        void RemoveByteFlag(uint16 index, uint8 offset, uint8 newFlag);
 
-        void ToggleByteFlag( uint16 index, uint8 offset, uint8 flag )
+        void ToggleByteFlag(uint16 index, uint8 offset, uint8 flag)
         {
             if (HasByteFlag(index, offset, flag))
                 RemoveByteFlag(index, offset, flag);
@@ -481,14 +481,14 @@ class MANGOS_DLL_SPEC Object
                 SetByteFlag(index, offset, flag);
         }
 
-        bool HasByteFlag( uint16 index, uint8 offset, uint8 flag ) const
+        bool HasByteFlag(uint16 index, uint8 offset, uint8 flag) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
-            MANGOS_ASSERT( offset < 4 );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
+            MANGOS_ASSERT(offset < 4);
             return (((uint8*)&m_uint32Values[index])[offset] & flag) != 0;
         }
 
-        void ApplyModByteFlag( uint16 index, uint8 offset, uint32 flag, bool apply)
+        void ApplyModByteFlag(uint16 index, uint8 offset, uint32 flag, bool apply)
         {
             if (apply)
                 SetByteFlag(index, offset, flag);
@@ -499,7 +499,7 @@ class MANGOS_DLL_SPEC Object
         void SetShortFlag(uint16 index, bool highpart, uint16 newFlag);
         void RemoveShortFlag(uint16 index, bool highpart, uint16 oldFlag);
 
-        void ToggleShortFlag( uint16 index, bool highpart, uint8 flag )
+        void ToggleShortFlag(uint16 index, bool highpart, uint8 flag)
         {
             if (HasShortFlag(index, highpart, flag))
                 RemoveShortFlag(index, highpart, flag);
@@ -507,13 +507,13 @@ class MANGOS_DLL_SPEC Object
                 SetShortFlag(index, highpart, flag);
         }
 
-        bool HasShortFlag( uint16 index, bool highpart, uint8 flag ) const
+        bool HasShortFlag(uint16 index, bool highpart, uint8 flag) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return (((uint16*)&m_uint32Values[index])[highpart ? 1 : 0] & flag) != 0;
         }
 
-        void ApplyModShortFlag( uint16 index, bool highpart, uint32 flag, bool apply)
+        void ApplyModShortFlag(uint16 index, bool highpart, uint32 flag, bool apply)
         {
             if (apply)
                 SetShortFlag(index, highpart, flag);
@@ -521,21 +521,21 @@ class MANGOS_DLL_SPEC Object
                 RemoveShortFlag(index, highpart, flag);
         }
 
-        void SetFlag64( uint16 index, uint64 newFlag )
+        void SetFlag64(uint16 index, uint64 newFlag)
         {
             uint64 oldval = GetUInt64Value(index);
             uint64 newval = oldval | newFlag;
             SetUInt64Value(index,newval);
         }
 
-        void RemoveFlag64( uint16 index, uint64 oldFlag )
+        void RemoveFlag64(uint16 index, uint64 oldFlag)
         {
             uint64 oldval = GetUInt64Value(index);
             uint64 newval = oldval & ~oldFlag;
             SetUInt64Value(index,newval);
         }
 
-        void ToggleFlag64( uint16 index, uint64 flag)
+        void ToggleFlag64(uint16 index, uint64 flag)
         {
             if (HasFlag64(index, flag))
                 RemoveFlag64(index, flag);
@@ -543,13 +543,13 @@ class MANGOS_DLL_SPEC Object
                 SetFlag64(index, flag);
         }
 
-        bool HasFlag64( uint16 index, uint64 flag ) const
+        bool HasFlag64(uint16 index, uint64 flag) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
-            return (GetUInt64Value( index ) & flag) != 0;
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
+            return (GetUInt64Value(index) & flag) != 0;
         }
 
-        void ApplyModFlag64( uint16 index, uint64 flag, bool apply)
+        void ApplyModFlag64(uint16 index, uint64 flag, bool apply)
         {
             if (apply)
                 SetFlag64(index, flag);
@@ -601,7 +601,7 @@ class MANGOS_DLL_SPEC Object
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
     protected:
 
-        Object ( );
+        Object ();
 
         void _InitValues();
         void _Create (uint32 guidlow, uint32 entry, HighGuid guidhigh);
@@ -736,11 +736,11 @@ class MANGOS_DLL_SPEC WorldObject : public Object
                 WorldObject * const m_obj;
         };
 
-        ~WorldObject ( ) override {}
+        ~WorldObject () override {}
 
         virtual void Update(uint32 /*update_diff*/, uint32 /*time_diff*/);
 
-        void _Create( uint32 guidlow, HighGuid guidhigh );
+        void _Create(uint32 guidlow, HighGuid guidhigh);
 
         void Relocate(float x, float y, float z, float orientation);
         void Relocate(float x, float y, float z);
@@ -748,22 +748,22 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void SetOrientation(float orientation);
 
         Position const& GetPosition() const { return m_position; }
-        float GetPositionX( ) const { return m_position.x; }
-        float GetPositionY( ) const { return m_position.y; }
-        float GetPositionZ( ) const { return m_position.z; }
+        float GetPositionX() const { return m_position.x; }
+        float GetPositionY() const { return m_position.y; }
+        float GetPositionZ() const { return m_position.z; }
         virtual void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
-        void GetPosition( float &x, float &y, float &z, Transport* onTransport = nullptr) const;
-        void GetPosition( WorldLocation &loc ) const
+        void GetPosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const;
+        void GetPosition(WorldLocation &loc) const
             { loc.mapid = m_mapId; GetPosition(loc.coord_x, loc.coord_y, loc.coord_z); loc.orientation = GetOrientation(); }
-        float GetOrientation( ) const { return m_position.o; }
-        void GetNearPoint2D( float &x, float &y, float distance, float absAngle) const;
+        float GetOrientation() const { return m_position.o; }
+        void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const;
         void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const;
-        void GetClosePoint(float &x, float &y, float &z, float bounding_radius, float distance2d = 0, float angle = 0, const WorldObject* obj = nullptr ) const
+        void GetClosePoint(float &x, float &y, float &z, float bounding_radius, float distance2d = 0, float angle = 0, WorldObject const* obj = nullptr) const
         {
             // angle calculated from current orientation
             GetNearPoint(obj, x, y, z, bounding_radius, distance2d, GetOrientation() + angle);
         }
-        void GetContactPoint( const WorldObject* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const
+        void GetContactPoint(WorldObject const* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const
         {
             // Nostalrius: On est deja au contact !
             if (GetDistance2d(obj) < distance2d)
@@ -802,17 +802,16 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         virtual uint32 GetDefaultGossipMenuId() const { return 0; }
 
-        float GetCombatDistance(const WorldObject* target) const;
-        float GetDistanceToCenter(const WorldObject* target) const;
-        float GetExactDistance( const WorldObject* obj ) const;
-        float GetExactDistance(float x, float y, float z) const;
-        float GetDistance( const WorldObject* obj ) const;
+        float GetCombatDistance(WorldObject const* target) const;
+        float GetDistance2dToCenter(WorldObject const* target) const;
+        float GetDistance3dToCenter(WorldObject const* target) const;
+        float GetDistance(WorldObject const* obj) const;
         float GetDistance(float x, float y, float z) const;
-        float GetDistance2d(const WorldObject* obj) const;
+        float GetDistance2d(WorldObject const* obj) const;
         float GetDistance2d(float x, float y) const;
-        float GetDistanceZ(const WorldObject* obj) const;
+        float GetDistanceZ(WorldObject const* obj) const;
         float GetDistanceSqr(float x, float y, float z) const;
-        bool IsInMap(const WorldObject* obj) const;
+        bool IsInMap(WorldObject const* obj) const;
         bool IsWithinDist3d(float x, float y, float z, float dist2compare) const;
         bool IsWithinDist2d(float x, float y, float dist2compare) const;
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
@@ -832,15 +831,15 @@ class MANGOS_DLL_SPEC WorldObject : public Object
             return obj && IsInMap(obj) && (GetCombatDistance(obj) <= dist2compare);
         }
         bool IsWithinLOS(float x, float y, float z, bool checkDynLos = true, float targetHeight = 2.f) const;
-        bool IsWithinLOSInMap(const WorldObject* obj, bool checkDynLos = true) const;
+        bool IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos = true) const;
         bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
         bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
         bool IsInRange2d(float x, float y, float minRange, float maxRange) const;
         bool IsInRange3d(float x, float y, float z, float minRange, float maxRange) const;
 
-        float GetAngle( const WorldObject* obj ) const;
-        float GetAngle( const float x, const float y ) const;
-        bool HasInArc(const float arcangle, const WorldObject* obj, float offset = 0.0f) const;
+        float GetAngle(WorldObject const* obj) const;
+        float GetAngle(const float x, const float y) const;
+        bool HasInArc(const float arcangle, WorldObject const* obj, float offset = 0.0f) const;
         bool HasInArc(const float arcangle, const float x, const float y) const;
         bool isInFrontInMap(WorldObject const* target,float distance, float arc = M_PI) const;
         bool isInBackInMap(WorldObject const* target, float distance, float arc = M_PI) const;
@@ -1146,9 +1145,9 @@ inline WorldObject* ToWorldObject(Object* object)
     return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject*>(object) : nullptr;
 }
 
-inline const WorldObject* ToWorldObject(const Object* object)
+inline WorldObject const* ToWorldObject(const Object* object)
 {
-    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<const WorldObject*>(object) : nullptr;
+    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject const*>(object) : nullptr;
 }
 
 inline GameObject* ToGameObject(Object* object)

@@ -607,7 +607,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
     void AttackStart(Unit* who) override
     {
-        float dist = m_creature->GetDistanceToCenter(who);
+        float dist = m_creature->GetDistance3dToCenter(who);
         if (dist <= VEKLOR_DIST) {
             // if he is <= VEKLOR_DIST he should not start chasing again until
             // target is further away than shadowboltRange

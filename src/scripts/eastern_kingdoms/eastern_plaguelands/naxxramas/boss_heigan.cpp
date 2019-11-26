@@ -423,7 +423,7 @@ struct boss_heiganAI : public ScriptedAI
             {
                 if (pTarget->GetPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
                 {
-                    if (m_creature->GetDistanceToCenter((*it)->getTarget()) < 28.0f)
+                    if (m_creature->GetDistance3dToCenter((*it)->getTarget()) < 28.0f)
                     {
                         found_mana_in_range = true;
                         break;

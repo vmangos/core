@@ -1548,7 +1548,7 @@ struct cthunAI : public ScriptedAI
 
     bool UnitShouldPull(Unit* unit)
     {
-        float distToCthun = unit->GetDistanceToCenter(m_creature);
+        float distToCthun = unit->GetDistance3dToCenter(m_creature);
         //float distToCthun = pPlayer->GetDistance(m_creature);
         float zDist = abs(unit->GetPositionZ() - 100.0f);
         // If we're at the same Z axis of cthun, or within the maximum possible pull distance

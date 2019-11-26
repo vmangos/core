@@ -423,6 +423,9 @@ enum NPCFlags
     UNIT_NPC_FLAG_OUTDOORPVP            = 0x20000000,       // custom flag for outdoor pvp creatures || Custom flag
 };
 
+// No orientation check for auto attacks below this distance.
+#define AUTO_ATTACK_FACING_LEEWAY 1.4f
+
 enum AutoAttackCheckResult
 {
     ATTACK_RESULT_OK = 0,

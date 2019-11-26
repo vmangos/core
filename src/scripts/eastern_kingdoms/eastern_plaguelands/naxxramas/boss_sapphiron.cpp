@@ -758,7 +758,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
                 if (std::find(previousTargets.begin(), previousTargets.end(), pTarget->GetObjectGuid()) != previousTargets.end())
                     continue;
                 // want to encourage the blizzard to move towards a semi-far-away target to make it spread out
-                if (m_creature->GetDistanceToCenter(pTarget) < 15.0f)
+                if (m_creature->GetDistance3dToCenter(pTarget) < 15.0f)
                     continue;
                 suitableUnits.push_back(pTarget);
             }

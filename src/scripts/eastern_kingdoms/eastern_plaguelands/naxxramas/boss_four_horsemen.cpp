@@ -160,7 +160,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
         {
             Player* pPlayer = itr->getSource();
             
-            if (m_creature->GetDistanceToCenter(pPlayer) > 74.0f)
+            if (m_creature->GetDistance3dToCenter(pPlayer) > 74.0f)
                 continue;
             bool alert;
             if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
