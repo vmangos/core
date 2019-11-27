@@ -22,9 +22,7 @@ SDComment: The Heated Ground spell has 12 spell Id triggers in total, which trip
            MaxSpellCastsInChain in mangosd.conf or break the chain up into two spells by
            disabling the 6th spell's trigger index in the spell_effect_mod table. This
            script is using the second solution.
-
            TODO: Implement summon check for areas up on the wall where Onyxia can't reach.
-
 SDCategory: Onyxia's Lair
 EndScriptData
 */
@@ -34,12 +32,11 @@ EndScriptData
 
 enum
 {
-    SAY_AGGRO                   = -1249000,
-    SAY_KILL                    = -1249001,
-    SAY_PHASE_2_TRANS           = -1249002,
-    SAY_PHASE_3_TRANS           = -1249003,
-    EMOTE_BREATH                = -1249004,
-  //EMOTE_ROAR                  = -1249005,
+    SAY_AGGRO                   = 8286,
+    SAY_KILL                    = 8287,
+    SAY_PHASE_2_TRANS           = 8288,
+    SAY_PHASE_3_TRANS           = 8290,
+    EMOTE_BREATH                = 7213,
 
     SPELL_WINGBUFFET            = 18500,
     SPELL_FLAMEBREATH           = 18435,
@@ -337,7 +334,9 @@ struct boss_onyxiaAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim) override
     {
-        DoScriptText(SAY_KILL, m_creature);
+        if (pVictim->IsPlayer())
+            if (roll_chance_i(50))
+                DoScriptText(SAY_KILL, m_creature);
     }
 
     bool isOnyxiaFlying()
@@ -561,7 +560,6 @@ struct boss_onyxiaAI : public ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_BELLOWINGROAR, true) == CAST_OK)
             {
-                //DoScriptText(EMOTE_ROAR, m_creature);
                 m_uiBellowingRoarTimer = urand(15000, 30000);
                 // Do not be interrupted by other casts.
                 DelayCastEvents(2000);
@@ -968,7 +966,6 @@ INSERT INTO spell_target_position VALUES (21136, 249, -107.385597, -213.917145, 
 INSERT INTO spell_target_position VALUES (21137, 249, -114.281258, -213.866486, -73.851128, 3.142);
 INSERT INTO spell_target_position VALUES (21138, 249, -123.328560, -213.607910, -71.559921, 3.142);
 INSERT INTO spell_target_position VALUES (21139, 249, -130.788300, -213.424026, -70.751007, 3.142);
-
 -- SPELL_HEATED_GROUND
 DELETE FROM spell_target_position WHERE id BETWEEN 22191 AND 22202; 
 INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES ('22191', '249', '-52.5138', '-277.7293', '-92.7831', '0');
