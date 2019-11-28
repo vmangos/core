@@ -263,13 +263,15 @@ bool EffectDummyCreature_npc_shay_leafrunner(WorldObject* pCaster, uint32 uiSpel
     return false;
 }
 
-enum
+enum MushgogData
 {
-    SPELL_SPORE_CLOUD    =   22948,
-    SPELL_ROOTS          =   12747,
-    SPELL_THORN_VOLLEY   =   21748,
-    SPELL_ENRAGE         =   8599,
-    SPELL_INVOCATION     =   26446,
+    SPELL_SPORE_CLOUD                        = 22948,
+    SPELL_ROOTS                              = 12747,
+    SPELL_THORN_VOLLEY                       = 21748,
+    SPELL_ENRAGE                             = 8599,
+    SPELL_INVOCATION                         = 26446,
+
+    GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_01 = 9502
 };
 
 /******************/
@@ -289,12 +291,12 @@ struct MushgogAI : public ScriptedAI
 
     void Reset() override
     {
-    	m_uiInvocation_Timer  = 1000;
-        m_uiSporeCloud_Timer  = 6000;
-        m_uiRoots_Timer       = 2000;
+        m_uiInvocation_Timer = 1000;
+        m_uiSporeCloud_Timer = 6000;
+        m_uiRoots_Timer = 2000;
         m_uiThornVolley_Timer = 3500;
-        m_bEnrage             = false;
-        m_bAggro              = false;
+        m_bEnrage = false;
+        m_bAggro = false;
     }
 
     void Aggro(Unit* pWho) override
@@ -307,7 +309,7 @@ struct MushgogAI : public ScriptedAI
             for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
             {
                 if ((*it)->IsAlive())
-                     (*it)->MonsterYell("Leaf him alone Mushgog!");
+                    (*it)->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_01);
             }
             m_bAggro = true;
         }
@@ -315,17 +317,17 @@ struct MushgogAI : public ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-    	uint32 chanceToSpawn = urand(0,5);
-    	if (chanceToSpawn==0)
-    	{
-    		GameObject *pBlackLotus = m_creature->SummonGameObject(176589,
+        uint32 chanceToSpawn = urand(0,5);
+        if (chanceToSpawn==0)
+        {
+            GameObject *pBlackLotus = m_creature->SummonGameObject(176589,
                                 m_creature->GetPositionX(),
                                 m_creature->GetPositionY()-5.0f,
                                 m_creature->GetPositionZ()-0.5f,
                                 0, 0, 0, 0, 0, -1, false);
-    		pBlackLotus->SetSpawnedByDefault(false);
-    		pBlackLotus->SetRespawnTime(9999999);
-    	}
+            pBlackLotus->SetSpawnedByDefault(false);
+            pBlackLotus->SetRespawnTime(9999999);
+        }
     }
 
     void UpdateAI(const uint32 uiDiff) override
@@ -337,7 +339,7 @@ struct MushgogAI : public ScriptedAI
         {
             Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (DoCastSpellIfCan(pTarget, SPELL_SPORE_CLOUD) == CAST_OK)
-            	m_uiSporeCloud_Timer = urand(7500, 12000);
+                m_uiSporeCloud_Timer = urand(7500, 12000);
         }
         else
             m_uiSporeCloud_Timer -= uiDiff;
@@ -345,18 +347,18 @@ struct MushgogAI : public ScriptedAI
         if (m_uiRoots_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ROOTS) == CAST_OK)
-            	m_uiRoots_Timer = urand(8000, 12000);
+                m_uiRoots_Timer = urand(8000, 12000);
         }
         else
-        	m_uiRoots_Timer -= uiDiff;
+            m_uiRoots_Timer -= uiDiff;
 
         if (m_uiThornVolley_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THORN_VOLLEY) == CAST_OK)
-            	m_uiThornVolley_Timer = urand(5000, 9000);
+                m_uiThornVolley_Timer = urand(5000, 9000);
         }
         else
-        	m_uiThornVolley_Timer -= uiDiff;
+            m_uiThornVolley_Timer -= uiDiff;
 
         if (m_creature->GetHealthPercent() < 20.0f && !m_bEnrage)
         {
@@ -376,9 +378,9 @@ struct MushgogAI : public ScriptedAI
 
                 if ( pUnit->GetPositionZ() > 142.0f)
                 {
-                	m_creature->SendSpellGo(pUnit, 25681);
-                	pUnit->NearTeleportTo(x, y, z, orientation);
-                	m_uiInvocation_Timer = urand(5000, 10000);
+                    m_creature->SendSpellGo(pUnit, 25681);
+                    pUnit->NearTeleportTo(x, y, z, orientation);
+                    m_uiInvocation_Timer = urand(5000, 10000);
                 }
             }
         }
@@ -389,10 +391,13 @@ struct MushgogAI : public ScriptedAI
     }
 };
 
-enum
+enum TheRazzaData
 {
-    SPELL_POISON_BOLT     =   22937,
-    SPELL_CHAIN_LIGHTNING =   16033,
+    SPELL_POISON_BOLT                        = 22937,
+    SPELL_CHAIN_LIGHTNING                    = 16033,
+
+    GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02 = 9504,
+    GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03 = 9505
 };
 
 struct TheRazzaAI : public ScriptedAI
@@ -409,10 +414,10 @@ struct TheRazzaAI : public ScriptedAI
 
     void Reset() override
     {
-    	m_uiInvocation_Timer     = 1000;
-        m_uiPoisonBolt_Timer     = 5000;
+        m_uiInvocation_Timer = 1000;
+        m_uiPoisonBolt_Timer = 5000;
         m_uiChainLightning_Timer = 9000;
-        m_bAggro                 = false;
+        m_bAggro = false;
     }
 
     void Aggro(Unit* pWho) override
@@ -425,9 +430,20 @@ struct TheRazzaAI : public ScriptedAI
             for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
             {
                 if ((*it)->IsAlive())
-                     (*it)->MonsterYell("Woohoo! They are into it now!");
+                    (*it)->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02);
             }
             m_bAggro = true;
+        }
+    }
+
+    void JustDied(Unit* pWho) override
+    {
+        std::list<Creature*> m_AggroList;
+        GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
+        for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
+        {
+            if ((*it)->IsAlive())
+                (*it)->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03);
         }
     }
 
@@ -439,18 +455,18 @@ struct TheRazzaAI : public ScriptedAI
         if (m_uiPoisonBolt_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_POISON_BOLT) == CAST_OK)
-            	m_uiPoisonBolt_Timer = 6000;
+                m_uiPoisonBolt_Timer = 6000;
         }
         else
-        	m_uiPoisonBolt_Timer -= uiDiff;
+            m_uiPoisonBolt_Timer -= uiDiff;
 
         if (m_uiChainLightning_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHAIN_LIGHTNING) == CAST_OK)
-            	m_uiChainLightning_Timer = urand(4000, 7000);
+                m_uiChainLightning_Timer = urand(4000, 7000);
         }
         else
-        	m_uiChainLightning_Timer -= uiDiff;
+            m_uiChainLightning_Timer -= uiDiff;
 
         /** Invoque player in front of him */
         if (m_uiInvocation_Timer < uiDiff)
@@ -464,9 +480,9 @@ struct TheRazzaAI : public ScriptedAI
 
                 if ( pUnit->GetPositionZ() > 142.0f)
                 {
-                        m_creature->SendSpellGo(pUnit, 25681);
-                        pUnit->NearTeleportTo(x, y, z, orientation);
-                        m_uiInvocation_Timer = urand(5000, 10000);
+                    m_creature->SendSpellGo(pUnit, 25681);
+                    pUnit->NearTeleportTo(x, y, z, orientation);
+                    m_uiInvocation_Timer = urand(5000, 10000);
                 }
             }
         }
@@ -477,17 +493,19 @@ struct TheRazzaAI : public ScriptedAI
     }
 };
 
-enum
+enum SkarrTheUnbreakableData
 {
-    SPELL_CLEAVE        =   15496,
-    SPELL_MORTAL_STRIKE =   15708,
-    SPELL_KNOCKDOWN     =   16033,
+    SPELL_CLEAVE                             = 15496,
+    SPELL_MORTAL_STRIKE                      = 15708,
+    SPELL_KNOCKDOWN                          = 16033,
+
+    GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04 = 9507
 };
 
 /******************/
 struct SkarrTheUnbreakableAI : public ScriptedAI
 {
-	SkarrTheUnbreakableAI(Creature* pCreature) : ScriptedAI(pCreature)
+    SkarrTheUnbreakableAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
@@ -500,11 +518,11 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
 
     void Reset() override
     {
-    	m_uiInvocation_Timer    = 1000;
-        m_uiCleave_Timer        = urand(7000,10000);
-        m_uiMortalStrike_Timer  = urand(8000,12000);
-        m_uiKnockdown_Timer     = urand(5000, 7000);
-        m_bAggro                = false;
+        m_uiInvocation_Timer = 1000;
+        m_uiCleave_Timer = urand(7000,10000);
+        m_uiMortalStrike_Timer = urand(8000,12000);
+        m_uiKnockdown_Timer = urand(5000, 7000);
+        m_bAggro = false;
     }
 
     void Aggro(Unit* pWho) override
@@ -517,7 +535,7 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
             for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
             {
                 if ((*it)->IsAlive())
-                     (*it)->MonsterYell("Looks like Skarr has found his next challenger! Wouldn't want to be in that poor fool's shoes!");
+                     (*it)->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04);
             }
             m_bAggro = true;
         }
@@ -531,26 +549,26 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
         if (m_uiCleave_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
-            	m_uiCleave_Timer = urand(7000,10000);
+                m_uiCleave_Timer = urand(7000,10000);
         }
         else
-        	m_uiCleave_Timer -= uiDiff;
+            m_uiCleave_Timer -= uiDiff;
 
         if (m_uiMortalStrike_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
-            	m_uiMortalStrike_Timer = urand(9000, 15000);
+                m_uiMortalStrike_Timer = urand(9000, 15000);
         }
         else
-        	m_uiMortalStrike_Timer -= uiDiff;
+            m_uiMortalStrike_Timer -= uiDiff;
 
         if (m_uiKnockdown_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKDOWN) == CAST_OK)
-            	m_uiKnockdown_Timer = urand(10000, 13000);
+                m_uiKnockdown_Timer = urand(10000, 13000);
         }
         else
-        	m_uiKnockdown_Timer -= uiDiff;
+            m_uiKnockdown_Timer -= uiDiff;
 
         /** Invoque player in front of him */
         if (m_uiInvocation_Timer < uiDiff)
