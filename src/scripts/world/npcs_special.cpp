@@ -24,6 +24,7 @@ EndScriptData
 
 #include "scriptPCH.h"
 #include "../kalimdor/moonglade/boss_omen.h"
+#include "CritterAI.h"
 #include <array>
 
 /* ContentData
@@ -53,16 +54,28 @@ enum
     FACTION_CHICKEN         = 31
 };
 
-struct npc_chicken_cluckAI : public ScriptedAI
+struct npc_chicken_cluckAI : public CritterAI
 {
-    npc_chicken_cluckAI(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_chicken_cluckAI(Creature* pCreature) : CritterAI(pCreature)
     {
         Reset();
     }
 
     uint32 m_uiResetFlagTimer;
 
-    void Reset() override
+    void JustRespawned() override
+    {
+        Reset();
+        CritterAI::JustRespawned();
+    }
+
+    void OnCombatStop() override
+    {
+        Reset();
+        CritterAI::OnCombatStop();
+    }
+
+    void Reset()
     {
         m_uiResetFlagTimer = 120000;
 
@@ -115,8 +128,7 @@ struct npc_chicken_cluckAI : public ScriptedAI
                 m_uiResetFlagTimer -= uiDiff;
         }
 
-        if (m_creature->SelectHostileTarget() && m_creature->GetVictim())
-            DoMeleeAttackIfReady();
+        CritterAI::UpdateAI(uiDiff);
     }
 };
 
@@ -2373,72 +2385,6 @@ CreatureAI* GetAI_npc_goblin_land_mine(Creature * pCreature)
 }
 
 /*
- * Critter
- */
-
-enum
-{
-    ESCAPE_TIMER    = 12000
-};
-
-struct npc_critterAI : ScriptedAI
-{
-    explicit npc_critterAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        npc_critterAI::Reset();
-    }
-
-    uint32 m_uiCombatTimer;
-
-    void Reset() override
-    {
-        m_uiCombatTimer = ESCAPE_TIMER;
-    }
-
-    void AttackStart(Unit* /*pWho*/) override {}
-
-    void DamageTaken(Unit* pWho, uint32& uiDamage) override
-    {
-        if (uiDamage < m_creature->GetHealth())
-        {
-            m_creature->GetMotionMaster()->MoveFleeing(pWho, ESCAPE_TIMER);
-            m_uiCombatTimer = ESCAPE_TIMER;
-        }
-    }
-
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
-    {
-        if (SpellAuraHolder* holder = m_creature->GetSpellAuraHolder(pSpell->Id))
-        {
-            if (!holder->IsPositive())
-            {
-                m_creature->GetMotionMaster()->MoveFleeing(pWho, ESCAPE_TIMER);
-                m_uiCombatTimer = ESCAPE_TIMER;
-            }
-        }
-    }
-
-    void UpdateAI(const uint32 diff) override
-    {
-        if (m_creature->IsInCombat())
-        {
-            if (m_uiCombatTimer <= diff)
-            {
-                EnterEvadeMode();
-                m_uiCombatTimer = ESCAPE_TIMER;
-            }
-            else
-                m_uiCombatTimer -= diff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_critter(Creature* pCreature)
-{
-    return new npc_critterAI(pCreature);
-}
-
-/*
  * Curing the Sick
  */
 
@@ -2457,11 +2403,10 @@ enum
     MODEL_CURED_GAZELLE         = 1547,
 };
 
-struct npc_sickly_critterAI : npc_critterAI
+struct npc_sickly_critterAI : CritterAI
 {
-    explicit npc_sickly_critterAI(Creature* pCreature) : npc_critterAI(pCreature)
+    explicit npc_sickly_critterAI(Creature* pCreature) : CritterAI(pCreature)
     {
-        npc_sickly_critterAI::Reset();
         npc_sickly_critterAI::ResetCreature();
     }
 
@@ -2471,12 +2416,13 @@ struct npc_sickly_critterAI : npc_critterAI
     Team team;
     ObjectGuid m_PlayerGuid;
 
-    void Reset() override
+    void JustRespawned() override
     {
-
+        ResetCreature();
+        CritterAI::JustRespawned();
     }
 
-    void ResetCreature() override
+    void ResetCreature()
     {
         m_bIsHit = false;
         m_bModify = false;
@@ -2487,7 +2433,7 @@ struct npc_sickly_critterAI : npc_critterAI
     {
         if (pSpell->Id != SPELL_APPLY_SALVE)
         {
-            npc_critterAI::SpellHit(pCaster, pSpell);
+            CritterAI::SpellHit(pCaster, pSpell);
             return;
         }
 
@@ -2542,7 +2488,7 @@ struct npc_sickly_critterAI : npc_critterAI
                 m_uiTimer -= uiDiff;
         }
 
-        npc_critterAI::UpdateAI(uiDiff);
+        CritterAI::UpdateAI(uiDiff);
     }
 };
 
@@ -3664,11 +3610,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_goblin_land_mine";
     newscript->GetAI = &GetAI_npc_goblin_land_mine;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_critter";
-    newscript->GetAI = &GetAI_npc_critter;
     newscript->RegisterSelf();
 
     newscript = new Script;

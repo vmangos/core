@@ -55,6 +55,7 @@ set (game_SRCS
     AI/CreatureAISelector.cpp
     AI/CreatureEventAI.cpp
     AI/CreatureEventAIMgr.cpp
+    AI/CritterAI.cpp
     AI/GenericSpellAI.cpp
     AI/GuardAI.cpp
     AI/GuardEventAI.cpp
@@ -275,6 +276,7 @@ set (game_SRCS
     AI/CreatureAISelector.h
     AI/CreatureEventAI.h
     AI/CreatureEventAIMgr.h
+    AI/CritterAI.h
     AI/GameObjectAI.h
     AI/GuardAI.h
     AI/GuardEventAI.h

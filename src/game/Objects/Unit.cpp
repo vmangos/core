@@ -784,48 +784,6 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
     if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || spellProto->HasAura(SPELL_AURA_MOD_ROOT)))
         pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, damage);
 
-    // no xp,health if type 8 /critters/
-    uint32 victimEntry = pVictim->GetEntry();
-    if (pVictim->IsCreature() && pVictim->GetCreatureType() == CREATURE_TYPE_CRITTER && victimEntry != 10441 && victimEntry != 10461 && victimEntry != 10536)
-    {
-        // TODO: fix this part
-        // Critter may not die of damage taken, instead expect it to run away (no fighting back)
-        // If (this) is TYPEID_PLAYER, (this) will enter combat w/victim, but after some time, automatically leave combat.
-        // It is unclear how it should work for other cases.
-
-        Creature* creature = pVictim->ToCreature();
-        creature->SetLootRecipient(this);
-
-        pVictim->SetDeathState(JUST_DIED);
-        pVictim->SetHealth(0);
-
-        if (!creature->IsPet())
-        {
-            creature->DeleteThreatList();
-            if (CreatureInfo const *cinfo = creature->GetCreatureInfo())
-                if (cinfo->loot_id || cinfo->gold_max > 0)
-                    creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-        }
-        // some critters required for quests
-        if (IsPlayer())
-            if (CreatureInfo const* normalInfo = ObjectMgr::GetCreatureTemplate(pVictim->GetEntry()))
-                ((Player*)this)->KilledMonster(normalInfo, pVictim->GetObjectGuid());
-        // Nostalrius : ajout de 'JustDied' pour les CRITTER.
-        if (CreatureAI* pAi = pVictim->AI())
-            pAi->JustDied(this);
-
-        if (InstanceData* mapInstance = pVictim->GetInstanceData())
-            mapInstance->OnCreatureDeath(((Creature*)pVictim));
-
-        DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamage critter, critter dies");
-
-        // Rage from Damage made vs critters (only from direct weapon damage)
-        if (damage && damagetype == DIRECT_DAMAGE && this != pVictim && IsPlayer() && (GetPowerType() == POWER_RAGE))
-            ((Player*)this)->RewardRage(damage, true);
-
-        return damage;
-    }
-
     uint32 health = pVictim->GetHealth();
     // duel ends when player has 1 or less hp
     bool duel_hasEnded = false;

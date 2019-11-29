@@ -75,6 +75,9 @@ CreatureAI* selectAI(Creature *creature)
     if (!ai_factory && creature->IsGuard())
         ai_factory = ai_registry.GetRegistryItem("GuardAI");
 
+    if (!ai_factory && creature->GetCreatureInfo()->type == CREATURE_TYPE_CRITTER)
+        ai_factory = ai_registry.GetRegistryItem("CritterAI");
+
     // select by permit check
     if (!ai_factory)
     {
