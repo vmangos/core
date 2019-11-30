@@ -63,6 +63,12 @@ set(g3dlite_SRCS
   Vector4.cpp
 )
 
+if(MINGW)
+  set(g3dlite_SRCS
+    libseh/common/sehpp.cpp
+   )
+endif(MINGW)
+
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/dep/include
