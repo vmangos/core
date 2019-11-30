@@ -1291,7 +1291,7 @@ public:
         if (ptr == NULL) {
 #           ifdef G3D_WINDOWS
 
-#ifndef _CrtCheckMemory()
+#ifndef _CrtCheckMemory
 #define _CrtCheckMemory() ((int)1)
 #endif
                 // Check for memory corruption

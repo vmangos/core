@@ -17,7 +17,7 @@ project (MANGOS_VMAP_ASSEMB_IO)
 # uncomment next line to disable debug mode
 # ADD_DEFINITIONS("-DIOMAP_DEBUG")
 
-if (NOT WIN32)
+if (NOT MSVC)
     ADD_DEFINITIONS("-Wall")
     ADD_DEFINITIONS("-ggdb")
     ADD_DEFINITIONS("-O3")
@@ -48,7 +48,7 @@ if(UNIX)
     target_link_libraries(vmap g3dlite ${ZLIB_LIBRARIES})
   endif(ZLIB_FOUND)
 else()
-    target_link_libraries(vmap g3dlite zlib)
+  target_link_libraries(vmap g3dlite zlib)
 endif(UNIX)
 
 add_executable(vmap_assembler vmap_assembler.cpp)

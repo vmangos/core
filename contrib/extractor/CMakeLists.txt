@@ -41,7 +41,7 @@ if(UNIX)
     target_link_libraries(mapextractor ${ZLIB_LIBRARIES} libmpq bz2)
   endif(ZLIB_FOUND)
 else()
-    target_link_libraries (mapextractor zlib libmpq bz2)
+  target_link_libraries (mapextractor zlib libmpq bz2)
 endif(UNIX)
 
 install(TARGETS mapextractor DESTINATION ${BIN_DIR})
