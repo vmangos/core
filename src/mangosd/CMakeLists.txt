@@ -164,6 +164,10 @@ if(APPLE)
   set(EXECUTABLE_LINK_FLAGS "-framework Carbon ${EXECUTABLE_LINK_FLAGS}")
 endif()
 
+if(MINGW)
+  set(EXECUTABLE_LINK_FLAGS "-static-libgcc -static-libstdc++ ${EXECUTABLE_LINK_FLAGS}")
+endif()
+
 set_target_properties(${EXECUTABLE_NAME} PROPERTIES LINK_FLAGS
   "${EXECUTABLE_LINK_FLAGS}"
 )

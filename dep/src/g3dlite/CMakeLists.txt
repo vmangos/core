@@ -63,16 +63,11 @@ set(g3dlite_SRCS
   Vector4.cpp
 )
 
-if(MINGW)
-  set(g3dlite_SRCS
-    libseh/common/sehpp.cpp
-   )
-endif(MINGW)
-
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_SOURCE_DIR}/dep/include
   ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
+  ${CMAKE_SOURCE_DIR}/dep/src/libseh
 )
 
 add_library(g3dlite STATIC
@@ -83,9 +78,11 @@ SET_TARGET_PROPERTIES (g3dlite PROPERTIES FOLDER "3rd Party")
 
 if(WIN32)
   include_directories(${CMAKE_SOURCE_DIR}/dep/include/zlib)
-  target_link_libraries(g3dlite
-    zlib
-  )
+  if(MINGW)
+    target_link_libraries(g3dlite zlib libseh)
+  else()
+    target_link_libraries(g3dlite zlib)
+  endif()
 else()
   find_package(ZLIB REQUIRED)
   if(ZLIB_FOUND)

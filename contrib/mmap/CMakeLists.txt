@@ -46,7 +46,11 @@ set(SOURCES
 )
 
 add_executable(MoveMapGen ${SOURCES})
-SET_TARGET_PROPERTIES (MoveMapGen PROPERTIES FOLDER Extractors)
+set(EXECUTABLE_LINK_FLAGS "")
+if(MINGW)
+  set(EXECUTABLE_LINK_FLAGS "-static-libgcc -static-libstdc++ ${EXECUTABLE_LINK_FLAGS}")
+endif()
+SET_TARGET_PROPERTIES (MoveMapGen PROPERTIES FOLDER Extractors LINK_FLAGS "${EXECUTABLE_LINK_FLAGS}")
 
 target_link_libraries(MoveMapGen 
                         vmap 

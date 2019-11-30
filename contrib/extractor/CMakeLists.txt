@@ -32,7 +32,13 @@ add_executable (mapextractor
     loadlib/wdt.cpp
     )
 
-SET_TARGET_PROPERTIES (mapextractor PROPERTIES FOLDER Extractors)
+set(EXECUTABLE_LINK_FLAGS "")
+    
+if(MINGW)
+  set(EXECUTABLE_LINK_FLAGS "-static-libgcc -static-libstdc++ ${EXECUTABLE_LINK_FLAGS}")
+endif()
+
+SET_TARGET_PROPERTIES (mapextractor PROPERTIES FOLDER Extractors LINK_FLAGS "${EXECUTABLE_LINK_FLAGS}")
 
 if(UNIX)
   find_package(ZLIB REQUIRED)
@@ -41,7 +47,7 @@ if(UNIX)
     target_link_libraries(mapextractor ${ZLIB_LIBRARIES} libmpq bz2)
   endif(ZLIB_FOUND)
 else()
-  target_link_libraries (mapextractor zlib libmpq bz2)
+    target_link_libraries (mapextractor zlib libmpq bz2)
 endif(UNIX)
 
 install(TARGETS mapextractor DESTINATION ${BIN_DIR})

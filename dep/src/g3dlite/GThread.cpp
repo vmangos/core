@@ -91,8 +91,8 @@ typedef struct tagTHREADNAME_INFO {
 } THREADNAME_INFO;
 #pragma pack(pop)
 
-#ifndef _MSC_VER
-#include <libseh/seh.h>
+#ifdef __MINGW32__
+#include <seh.h>
 #endif
 
 static void SetThreadName(DWORD dwThreadID, const char* threadName) {
@@ -102,17 +102,17 @@ static void SetThreadName(DWORD dwThreadID, const char* threadName) {
     info.dwThreadID = dwThreadID;
     info.dwFlags = 0;
 
-#ifdef _MSC_VER
-    __try {
-        RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
-    }
-    __except(EXCEPTION_EXECUTE_HANDLER) {}
-#else
+#ifdef __MINGW32__
     __seh_try {
         RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
     }   
     __seh_except(EXCEPTION_EXECUTE_HANDLER) {}
     __seh_end_except
+#else
+    __try {
+        RaiseException( MS_VC_EXCEPTION, 0, sizeof(info)/sizeof(ULONG_PTR), (ULONG_PTR*)&info );
+    }
+    __except(EXCEPTION_EXECUTE_HANDLER) {}
 #endif
 }
 #endif

@@ -45,7 +45,11 @@
 #   include <sys/timeb.h>
 #   include "G3D/RegistryUtil.h"
 #include <Ole2.h>
+#ifdef _MSC_VER
 #include <intrin.h>
+#else
+#include <x86intrin.h>
+#endif
 
 #elif defined(G3D_LINUX) 
 

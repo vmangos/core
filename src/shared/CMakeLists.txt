@@ -180,4 +180,8 @@ if(UNIX)
   target_link_libraries(shared ${ACE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 endif(UNIX)
 
+if(MINGW)
+  target_link_libraries(shared ${ACE_LIBRARIES} -lws2_32)
+endif()
+
 SET_TARGET_PROPERTIES (shared PROPERTIES FOLDER "Game Libs")
