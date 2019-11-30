@@ -63,7 +63,6 @@
 #include "SocialMgr.h"
 #include "Mail.h"
 #include "WaypointMovementGenerator.h"
-#include "MapReferenceImpl.h"
 #include "GMTicketMgr.h"
 #include "MasterPlayer.h"
 

@@ -35,7 +35,6 @@
 #include "Bag.h"
 #include "WorldSession.h"
 #include "Pet.h"
-#include "MapReference.h"
 #include "Util.h"                                           // for Tokens typedef
 #include "ReputationMgr.h"
 #include "BattleGround.h"
@@ -61,6 +60,7 @@ class Item;
 class ZoneScript;
 class PlayerAI;
 class PlayerBroadcaster;
+class MapReference;
 
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_EXPLORED_ZONES_SIZE  64
