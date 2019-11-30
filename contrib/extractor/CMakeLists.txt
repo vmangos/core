@@ -32,13 +32,7 @@ add_executable (mapextractor
     loadlib/wdt.cpp
     )
 
-set(EXECUTABLE_LINK_FLAGS "")
-    
-if(MINGW)
-  set(EXECUTABLE_LINK_FLAGS "-static-libgcc -static-libstdc++ ${EXECUTABLE_LINK_FLAGS}")
-endif()
-
-SET_TARGET_PROPERTIES (mapextractor PROPERTIES FOLDER Extractors LINK_FLAGS "${EXECUTABLE_LINK_FLAGS}")
+SET_TARGET_PROPERTIES (mapextractor PROPERTIES FOLDER Extractors)
 
 if(UNIX)
   find_package(ZLIB REQUIRED)

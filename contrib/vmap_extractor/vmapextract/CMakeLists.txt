@@ -18,11 +18,7 @@ cmake_minimum_required (VERSION 2.6)
 project (MANGOS_IOMAP_EXTRACTOR)
 
 add_executable(vmapextractor adtfile.cpp  dbcfile.cpp gameobject_extract.cpp model.cpp  mpq_libmpq.cpp  vmapexport.cpp  wdtfile.cpp  wmo.cpp)
-set(EXECUTABLE_LINK_FLAGS "")
-if(MINGW)
-  set(EXECUTABLE_LINK_FLAGS "-static-libgcc -static-libstdc++ ${EXECUTABLE_LINK_FLAGS}")
-endif()
-SET_TARGET_PROPERTIES (vmapextractor PROPERTIES FOLDER Extractors LINK_FLAGS "${EXECUTABLE_LINK_FLAGS}")
+SET_TARGET_PROPERTIES (vmapextractor PROPERTIES FOLDER Extractors)
 
 if(UNIX)
   find_package(ZLIB REQUIRED)
