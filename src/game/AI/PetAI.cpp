@@ -145,15 +145,25 @@ void PetAI::UpdateAI(const uint32 diff)
             // Stay - Only pick from pet or owner targets / attackers so targets won't run by
             //   while chasing our owner. Don't do auto select.
             // All other cases (ie: defensive) - Targets are assigned by AttackedBy(), OwnerAttackedBy(), OwnerAttacked(), etc.
-            Unit* nextTarget = SelectNextTarget(m_creature->HasReactState(REACT_AGGRESSIVE));
+            Unit* nextTarget;
+            ePetSelectTargetReason reason;
+            std::tie(nextTarget, reason) = SelectNextTarget(m_creature->HasReactState(REACT_AGGRESSIVE));
 
             if (nextTarget)
                 AttackStart(nextTarget);
-            else if (!m_creature->HasReactState(REACT_PASSIVE))
+            else
             {
-                if (m_creature->IsInCombat())
-                    m_creature->CombatStop();
-                HandleReturnMovement();
+                switch (reason)
+                {
+                    case PSTR_FAIL_DEFAULT:
+                    case PSTR_FAIL_NOT_ENABLED:
+                    case PSTR_FAIL_NO_OWNER:
+                    {
+                        if (m_creature->IsInCombat())
+                            m_creature->CombatStop();
+                        HandleReturnMovement();
+                    }
+                }
             }
         }
         else
@@ -377,13 +387,24 @@ void PetAI::KilledUnit(Unit* victim)
     m_creature->SendMeleeAttackStop(victim);  // Stops the pet's 'Attack' button from flashing
 
     // Before returning to owner, see if there are more things to attack
-    if (Unit* nextTarget = SelectNextTarget(false))
+    Unit* nextTarget;
+    ePetSelectTargetReason reason;
+    std::tie(nextTarget, reason) = SelectNextTarget(false);
+    if (nextTarget)
         AttackStart(nextTarget);
     else
     {
-        if (m_creature->IsInCombat())
-            m_creature->CombatStop();
-        HandleReturnMovement(); // Return
+        switch (reason)
+        {
+            case PSTR_FAIL_DEFAULT:
+            case PSTR_FAIL_NOT_ENABLED:
+            case PSTR_FAIL_NO_OWNER:
+            {
+                if (m_creature->IsInCombat())
+                    m_creature->CombatStop();
+                HandleReturnMovement();
+            }
+        }
     }
 }
 
@@ -428,11 +449,17 @@ void PetAI::OwnerAttackedBy(Unit* attacker)
 
 void PetAI::OwnerAttacked(Unit* target)
 {
-    // Called when owner attacks something. Allows defensive pets to know
-    //  that they need to assist
+    // Called when owner attacks something.
 
     // Target might be nullptr if called from spell with invalid cast targets
     if (!target)
+        return;
+
+    // The owner attacking a mob while the pet is currently not in combat
+    // will not make the pet attack that target too. Tested on classic.
+    // Defensive pet should not engage until it or its owner is damaged by
+    // the enemy, and Aggressive pet aggroes based on proximity.
+    if (!m_creature->IsInCombat() && m_creature->GetOwnerGuid().IsPlayer())
         return;
 
     if (!m_creature->IsValidAttackTarget(target))
@@ -454,7 +481,7 @@ void PetAI::OwnerAttacked(Unit* target)
     AttackStart(target);
 }
 
-Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
+std::pair<Unit*, ePetSelectTargetReason> PetAI::SelectNextTarget(bool allowAutoSelect) const
 {
     // Provides next target selection after current target death.
     // This function should only be called internally by the AI
@@ -463,21 +490,21 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Pet desactive (monture)
     if (m_creature->IsPet() && !((Pet*)m_creature)->IsEnabled())
-        return nullptr;
+        return std::make_pair(nullptr, PSTR_FAIL_NOT_ENABLED);
 
     // Passive pets don't do next target selection
     if (m_creature->HasReactState(REACT_PASSIVE))
-        return nullptr;
+        return std::make_pair(nullptr, PSTR_FAIL_PASSIVE);
 
     // Not sure why we wouldn't have an owner but just in case...
     Unit* owner = m_creature->GetCharmerOrOwner();
     if (!owner)
-        return nullptr;
+        return std::make_pair(nullptr, PSTR_FAIL_NO_OWNER);
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->GetAttackerForHelper())
         if (!ownerAttacker->HasAuraPetShouldAvoidBreaking() && owner->IsInCombat())
-            return ownerAttacker;
+            return std::make_pair(ownerAttacker, PSTR_SUCCESS_OWNER_ATTACKER);
 
     // Check owner victim
     // 3.0.2 - Pets now start attacking their owners victim in defensive mode as soon as the hunter does
@@ -490,6 +517,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     if (m_creature->HasReactState(REACT_AGGRESSIVE) && allowAutoSelect)
     {
         if (!m_creature->GetCharmInfo()->IsReturning() || m_creature->GetCharmInfo()->IsFollowing() || m_creature->GetCharmInfo()->IsAtStay())
+        {
             // World of Warcraft Client Patch 1.8.0 (2005-10-11)
             // - Guardians and pets in aggressive mode no longer attack civilians.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
@@ -497,11 +525,18 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 #else
             if (Unit* nearTarget = m_creature->ToCreature()->SelectNearestHostileUnitInAggroRange(true, false))
 #endif
-                return nearTarget;
+            {
+                return std::make_pair(nearTarget, PSTR_SUCCESS_AGGRO_RANGE);
+            }
+        }
+        else
+        {
+            return std::make_pair(nullptr, PSTR_FAIL_RETURNING);
+        }
     }
 
     // Default - no valid targets
-    return nullptr;
+    return std::make_pair(nullptr, PSTR_FAIL_DEFAULT);
 }
 
 void PetAI::HandleReturnMovement()

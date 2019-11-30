@@ -136,11 +136,11 @@ bool PetEventAI::FindTargetForAttack()
 
     // Check if any of the Pet's attackers are valid targets.
     Unit::AttackerSet attackers = m_creature->GetAttackers();
-    for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+    for (const auto& itr : attackers)
     {
-        if ((*itr)->IsInMap(m_creature) && (*itr)->IsTargetableForAttack() && !(*itr)->HasAuraPetShouldAvoidBreaking())
+        if (itr->IsInMap(m_creature) && itr->IsTargetableForAttack() && !itr->HasAuraPetShouldAvoidBreaking())
         {
-            AttackStart((*itr));
+            AttackStart(itr);
             return true;
         }
     }
@@ -163,11 +163,11 @@ bool PetEventAI::FindTargetForAttack()
         {
             // Main target is CC-ed, so pick another attacker.
             Unit::AttackerSet owner_attackers = pOwner->GetAttackers();
-            for (Unit::AttackerSet::const_iterator itr = owner_attackers.begin(); itr != owner_attackers.end(); ++itr)
+            for (const auto& itr : owner_attackers)
             {
-                if ((*itr)->IsInMap(m_creature) && (*itr)->IsTargetableForAttack() && !(*itr)->HasAuraPetShouldAvoidBreaking())
+                if (itr->IsInMap(m_creature) && itr->IsTargetableForAttack() && !itr->HasAuraPetShouldAvoidBreaking())
                 {
-                    AttackStart((*itr));
+                    AttackStart(itr);
                     return true;
                 }
             }
