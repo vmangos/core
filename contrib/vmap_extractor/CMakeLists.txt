@@ -23,18 +23,18 @@ project (MANGOS_VMAP_EXTRACT_IO)
 # build setup currently only supports libmpq 0.4.x
 ADD_DEFINITIONS("-DUSE_LIBMPQ04")
 if (NOT MSVC)
-	ADD_DEFINITIONS("-Wall")
-	ADD_DEFINITIONS("-ggdb")
-	ADD_DEFINITIONS("-O3")
+    ADD_DEFINITIONS("-Wall")
+    #ADD_DEFINITIONS("-ggdb")
+    ADD_DEFINITIONS("-O3")
 endif()
 
 add_library(bz2
-	../../dep/src/bzip2/blocksort.c
-	../../dep/src/bzip2/bzlib.c
-	../../dep/src/bzip2/bzlib.h
-	../../dep/src/bzip2/bzlib_private.h
-	../../dep/src/bzip2/compress.c
-	../../dep/src/bzip2/crctable.c
+    ../../dep/src/bzip2/blocksort.c
+    ../../dep/src/bzip2/bzlib.c
+    ../../dep/src/bzip2/bzlib.h
+    ../../dep/src/bzip2/bzlib_private.h
+    ../../dep/src/bzip2/compress.c
+    ../../dep/src/bzip2/crctable.c
     ../../dep/src/bzip2/decompress.c
     ../../dep/src/bzip2/huffman.c
     ../../dep/src/bzip2/randtable
