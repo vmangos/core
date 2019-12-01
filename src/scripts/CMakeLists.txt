@@ -285,6 +285,11 @@ set (SCRIPTS_SRCS
 
 )
 
+if(WIN32)
+  if(MINGW)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+  endif()
+endif()
 
 # Used in game ScriptMgr, not need here
 list(REMOVE_ITEM SCRIPTS_SRCS ScriptLoader.cpp)

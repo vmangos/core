@@ -121,6 +121,14 @@ class ByteBuffer
             return *this;
         }
 
+#ifdef __MINGW32__
+        ByteBuffer &operator<<(time_t value)
+        {
+            append<time_t>(value);
+            return *this;
+        }
+#endif
+
         // signed as in 2e complement
         ByteBuffer &operator<<(int8 value)
         {
@@ -208,6 +216,14 @@ class ByteBuffer
             value = read<uint64>();
             return *this;
         }
+
+#ifdef __MINGW32__
+        ByteBuffer &operator >> (time_t &value)
+        {
+            value = read<time_t>();
+            return *this;
+        }
+#endif
 
         //signed as in 2e complement
         ByteBuffer &operator>>(int8 &value)

@@ -113,6 +113,13 @@ if(WIN32)
     migrations_list.h
   )
   
+  if (NOT MSVC)
+    list(REMOVE_ITEM shared_SRCS
+      WheatyExceptionReport.cpp
+      WheatyExceptionReport.h
+    )
+  endif()
+  
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
 else()
   list(REMOVE_ITEM shared_SRCS
@@ -172,5 +179,9 @@ if(UNIX)
   find_package(Threads)
   target_link_libraries(shared ${ACE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 endif(UNIX)
+
+if(MINGW)
+  target_link_libraries(shared ${ACE_LIBRARIES} -lws2_32)
+endif()
 
 SET_TARGET_PROPERTIES (shared PROPERTIES FOLDER "Game Libs")

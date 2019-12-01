@@ -27,7 +27,7 @@
 #include "Object.h"
 #include "LootMgr.h"
 #include "Database/DatabaseEnv.h"
-#include <mutex>
+#include <ace/Thread_Mutex.h>
 #include "Util.h"
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
@@ -784,7 +784,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         // collected only for GAMEOBJECT_TYPE_SUMMONING_RITUAL
         ObjectGuid m_firstUser;                             // first GO user, in most used cases owner, but in some cases no, for example non-summoned multi-use GAMEOBJECT_TYPE_SUMMONING_RITUAL
         GuidsSet m_UniqueUsers;                             // all players who use item, some items activated after specific amount unique uses
-        std::mutex m_UniqueUsers_lock;
+        ACE_Thread_Mutex m_UniqueUsers_lock;
         ObjectGuid m_summonTarget;                          // The player who is being summoned
 
         uint64 m_rotation;
