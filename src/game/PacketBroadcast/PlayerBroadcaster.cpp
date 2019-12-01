@@ -91,8 +91,6 @@ void PlayerBroadcaster::QueuePacket(WorldPacket packet, bool self, ObjectGuid ex
 
     ACE_Guard<ACE_Thread_Mutex> guard(m_queue_lock);
 
-    guard.acquire();
-
     // We need to drop a packet here - if possible
     if (m_queue.size() >= MAX_QUEUE_SIZE)
     {
