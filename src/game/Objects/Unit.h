@@ -215,6 +215,14 @@ struct SpellCooldown
 
 typedef std::map<uint32, SpellCooldown> SpellCooldowns;
 
+struct SpellImmune
+{
+    uint32 type;
+    uint32 spellId;
+};
+
+typedef std::list<SpellImmune> SpellImmuneList;
+
 #define UNIT_ACTION_BUTTON_ACTION(X) (uint32(X) & 0x00FFFFFF)
 #define UNIT_ACTION_BUTTON_TYPE(X)   ((uint32(X) & 0xFF000000) >> 24)
 #define MAX_UNIT_ACTION_BUTTON_ACTION_VALUE (0x00FFFFFF+1)
@@ -324,12 +332,6 @@ private:
 };
 
 typedef std::set<ObjectGuid> GuardianPetList;
-
-// delay time next attack to prevent client attack animation problems
-#define ATTACK_DISPLAY_DELAY 200
-
-// Regeneration defines
-#define REGEN_TIME_FULL     2000                            // For this time difference is computed regen value
 
 struct SpellProcEventEntry;                                 // used only privately
 

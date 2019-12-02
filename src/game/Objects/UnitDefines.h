@@ -55,6 +55,12 @@ enum MovementChangeType
     KNOCK_BACK
 };
 
+// Delay time next attack to prevent client attack animation problems
+#define ATTACK_DISPLAY_DELAY 200
+
+// For this time difference is computed regen value
+#define REGEN_TIME_FULL     2000
+
 #define BASE_MELEERANGE_OFFSET 1.33f
 #define BASE_MINDAMAGE 1.0f
 #define BASE_MAXDAMAGE 2.0f
@@ -163,15 +169,6 @@ enum InventorySlot
     NULL_BAG                   = 0,
     NULL_SLOT                  = 255
 };
-
-
-struct SpellImmune
-{
-    uint32 type;
-    uint32 spellId;
-};
-
-typedef std::list<SpellImmune> SpellImmuneList;
 
 enum UnitModifierType
 {
