@@ -49,8 +49,8 @@ void SpellMgr::LoadSpellTargetPositions()
 
     uint32 count = 0;
 
-    //                                                0   1           2                  3                  4                  5
-    QueryResult *result = WorldDatabase.PQuery("SELECT id, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM spell_target_position WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD);
+    //                                                               0   1           2                  3                  4                  5
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT id, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM spell_target_position WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -120,8 +120,6 @@ void SpellMgr::LoadSpellTargetPositions()
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u spell target destination coordinates", count);
@@ -320,8 +318,8 @@ void SpellMgr::LoadSpellProcEvents()
 {
     mSpellProcEventMap.clear();                             // need for reload case
 
-    //                                                0      1           2                3                 4                 5                 6          7       8        9             10
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD);
+    //                                                               0      1           2                3                 4                 5                 6          7       8        9             10
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, SchoolMask, SpellFamilyName, SpellFamilyMask0, SpellFamilyMask1, SpellFamilyMask2, procFlags, procEx, ppmRate, CustomChance, Cooldown FROM spell_proc_event WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -363,8 +361,6 @@ void SpellMgr::LoadSpellProcEvents()
 
     rankHelper.FillHigherRanks();
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u extra spell proc event conditions +%u custom proc (inc. +%u custom ranks)",  rankHelper.worker.count, rankHelper.worker.customProc, rankHelper.customRank);
 }
@@ -387,8 +383,8 @@ void SpellMgr::LoadSpellProcItemEnchant()
 
     uint32 count = 0;
 
-    //                                                0      1
-    QueryResult *result = WorldDatabase.Query("SELECT entry, ppmRate FROM spell_proc_item_enchant");
+    //                                                              0      1
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT entry, ppmRate FROM spell_proc_item_enchant"));
     if (!result)
     {
 
@@ -439,8 +435,6 @@ void SpellMgr::LoadSpellProcItemEnchant()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u proc item enchant definitions", count);
 }
@@ -461,8 +455,8 @@ void SpellMgr::LoadSpellBonuses()
 {
     mSpellBonusMap.clear();                             // need for reload case
     uint32 count = 0;
-    //                                                0      1             2          3
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, direct_bonus, dot_bonus, ap_bonus, ap_dot_bonus FROM spell_bonus_data WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD);
+    //                                                               0      1             2          3         4
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, direct_bonus, dot_bonus, ap_bonus, ap_dot_bonus FROM spell_bonus_data WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -588,8 +582,6 @@ void SpellMgr::LoadSpellBonuses()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u extra spell bonus data",  count);
 }
@@ -664,8 +656,8 @@ void SpellMgr::LoadSpellGroups()
 
     uint32 count = 0;
 
-    //                                                 0         1
-    QueryResult* result = WorldDatabase.PQuery("SELECT group_id, spell_id FROM spell_group WHERE %u BETWEEN build_min AND build_max ORDER BY group_id, group_spell_id, spell_id", SUPPORTED_CLIENT_BUILD);
+    //                                                               0         1
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT group_id, spell_id FROM spell_group WHERE %u BETWEEN build_min AND build_max ORDER BY group_id, group_spell_id, spell_id", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -735,7 +727,6 @@ void SpellMgr::LoadSpellGroups()
             mSpellSpellGroup.insert(SpellSpellGroupMap::value_type(*spellItr, SpellGroup(*groupItr)));
         }
     }
-    delete result;
     sLog.outString();
     sLog.outString(">> Loaded %u spell group definitions", count);
 }
@@ -746,8 +737,8 @@ void SpellMgr::LoadSpellGroupStackRules()
 
     uint32 count = 0;
 
-    //                                                       0         1
-    QueryResult* result = WorldDatabase.PQuery("SELECT group_id, stack_rule FROM spell_group_stack_rules t1 WHERE build=(SELECT max(build) FROM spell_group_stack_rules t2 WHERE t1.group_id=t2.group_id && build <= %u)", SUPPORTED_CLIENT_BUILD);
+    //                                                               0         1
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT group_id, stack_rule FROM spell_group_stack_rules t1 WHERE build=(SELECT max(build) FROM spell_group_stack_rules t2 WHERE t1.group_id=t2.group_id && build <= %u)", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -786,8 +777,6 @@ void SpellMgr::LoadSpellGroupStackRules()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u spell group stack rules", count);
@@ -879,8 +868,8 @@ void SpellMgr::LoadSpellElixirs()
 
     uint32 count = 0;
 
-    //                                                0      1
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, mask FROM spell_elixir WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD);
+    //                                                               0      1
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, mask FROM spell_elixir WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
 
@@ -917,8 +906,6 @@ void SpellMgr::LoadSpellElixirs()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u spell elixir definitions", count);
@@ -990,8 +977,8 @@ void SpellMgr::LoadSpellThreats()
 {
     mSpellThreatMap.clear();                                // need for reload case
 
-    //                                                0      1       2           3
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, Threat, multiplier, ap_bonus FROM spell_threat WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD);
+    //                                                               0      1       2           3
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, Threat, multiplier, ap_bonus FROM spell_threat WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -1024,8 +1011,6 @@ void SpellMgr::LoadSpellThreats()
     while (result->NextRow());
 
     rankHelper.FillHigherRanks();
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u spell threat entries", rankHelper.worker.count);
@@ -1741,7 +1726,7 @@ void SpellMgr::LoadSpellChains()
     }
 
     // load custom case
-    QueryResult *result = WorldDatabase.PQuery("SELECT spell_id, prev_spell, first_spell, rank, req_spell FROM spell_chain WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT spell_id, prev_spell, first_spell, rank, req_spell FROM spell_chain WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -1887,8 +1872,6 @@ void SpellMgr::LoadSpellChains()
     }
     while (result->NextRow());
 
-    delete result;
-
     // additional integrity checks
     for (SpellChainMap::const_iterator i = mSpellChains.begin(); i != mSpellChains.end(); ++i)
     {
@@ -2013,8 +1996,8 @@ void SpellMgr::LoadSpellEnchantCharges()
 
     uint32 count = 0;
 
-    //                                                0      1
-    QueryResult *result = WorldDatabase.Query("SELECT entry, charges FROM spell_enchant_charges");
+    //                                                              0      1
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT entry, charges FROM spell_enchant_charges"));
     if (!result)
     {
         BarGoLink bar(1);
@@ -2050,8 +2033,6 @@ void SpellMgr::LoadSpellEnchantCharges()
         ++count;
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u spell enchant charges", count);
 }
@@ -2060,8 +2041,8 @@ void SpellMgr::LoadSpellLearnSpells()
 {
     mSpellLearnSpells.clear();                              // need for reload case
 
-    //                                                0      1        2
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, SpellID, Active FROM spell_learn_spell WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD);
+    //                                                               0      1        2
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, SpellID, Active FROM spell_learn_spell WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
         BarGoLink bar(1);
@@ -2111,8 +2092,6 @@ void SpellMgr::LoadSpellLearnSpells()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     // search auto-learned spells and add its to map also for use in unlearn spells/talents
     uint32 dbc_count = 0;
@@ -2172,7 +2151,7 @@ void SpellMgr::LoadSpellScriptTarget()
     std::set<uint32> conditions;
 
     // Load existing condition Ids so we can check for wrong condition Id later.
-    QueryResult *result = WorldDatabase.Query("SELECT `condition_entry` FROM `conditions`");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `condition_entry` FROM `conditions`"));
 
     if (result)
     {
@@ -2184,15 +2163,13 @@ void SpellMgr::LoadSpellScriptTarget()
             conditions.insert(conditionId);
         }
         while (result->NextRow());
-
-        delete result;
     }
 
     mSpellScriptTarget.clear();                             // need for reload case
 
     uint32 count = 0;
 
-    result = WorldDatabase.PQuery("SELECT `entry`, `type`, `targetEntry`, `conditionId` FROM `spell_script_target` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD);
+    result.reset(WorldDatabase.PQuery("SELECT `entry`, `type`, `targetEntry`, `conditionId` FROM `spell_script_target` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -2312,8 +2289,6 @@ void SpellMgr::LoadSpellScriptTarget()
     }
     while (result->NextRow());
 
-    delete result;
-
     // Check all spells
     /* Disabled (lot errors at this moment)
     for(uint32 i = 1; i < sSpellMgr.GetMaxSpellId; ++i)
@@ -2349,8 +2324,8 @@ void SpellMgr::LoadSpellPetAuras()
 
     uint32 count = 0;
 
-    //                                                0      1    2
-    QueryResult *result = WorldDatabase.Query("SELECT spell, pet, aura FROM spell_pet_auras");
+    //                                                              0      1    2
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT spell, pet, aura FROM spell_pet_auras"));
     if (!result)
     {
 
@@ -2413,8 +2388,6 @@ void SpellMgr::LoadSpellPetAuras()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u spell pet auras", count);
@@ -2505,8 +2478,8 @@ void SpellMgr::LoadSpellAreas()
 
     uint32 count = 0;
 
-    //                                                0      1     2            3                   4          5           6         7       8
-    QueryResult *result = WorldDatabase.Query("SELECT spell, area, quest_start, quest_start_active, quest_end, aura_spell, racemask, gender, autocast FROM spell_area");
+    //                                                              0      1     2            3                   4          5           6         7       8
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT spell, area, quest_start, quest_start_active, quest_end, aura_spell, racemask, gender, autocast FROM spell_area"));
 
     if (!result)
     {
@@ -2706,8 +2679,6 @@ void SpellMgr::LoadSpellAreas()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u spell area requirements", count);
 }
@@ -2876,8 +2847,8 @@ void SpellMgr::CheckUsedSpells(char const* table)
     uint32 countSpells = 0;
     uint32 countMasks = 0;
 
-    //                                                 0       1               2               3         4           5             6          7          8         9    10
-    QueryResult *result = WorldDatabase.PQuery("SELECT spellid,SpellFamilyName,SpellFamilyMask,SpellIcon,SpellVisual,SpellCategory,EffectType,EffectAura,EffectIdx,Name,Code FROM %s", table);
+    //                                                               0       1               2               3         4           5             6          7          8         9    10
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT spellid,SpellFamilyName,SpellFamilyMask,SpellIcon,SpellVisual,SpellCategory,EffectType,EffectAura,EffectIdx,Name,Code FROM %s", table));
 
     if (!result)
     {
@@ -3120,8 +3091,6 @@ void SpellMgr::CheckUsedSpells(char const* table)
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Checked %u spells and %u spell masks", countSpells, countMasks);
 }
@@ -3185,8 +3154,8 @@ void SpellMgr::LoadSpellAffects()
 
     uint32 count = 0;
 
-    //                                                0      1         2
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, effectId, SpellFamilyMask FROM spell_affect WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD);
+    //                                                               0      1         2
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT entry, effectId, SpellFamilyMask FROM spell_affect WHERE (build_min <= %u) && (build_max >= %u)", SUPPORTED_CLIENT_BUILD, SUPPORTED_CLIENT_BUILD));
     if (!result)
     {
 
@@ -3252,8 +3221,6 @@ void SpellMgr::LoadSpellAffects()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u spell affect definitions", count);
 
@@ -3287,7 +3254,7 @@ void SpellMgr::LoadExistingSpellIds()
     mExistingSpellsSet.clear();
 
     Field* fields;
-    QueryResult* result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `spell_template`");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `spell_template`"));
 
     if (result)
     {
@@ -3297,7 +3264,6 @@ void SpellMgr::LoadExistingSpellIds()
             uint32 id = fields[0].GetUInt32();
             mExistingSpellsSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 }
 
@@ -3854,77 +3820,33 @@ void SpellMgr::LoadSpells()
         spell->activeIconID = fields[119].GetUInt32();
         spell->spellPriority = fields[120].GetUInt32();
         spell->SpellName[0] = fields[121].GetCppString();
-        spell->SpellName[1] = fields[122].GetCppString();
-        spell->SpellName[2] = fields[123].GetCppString();
-        spell->SpellName[3] = fields[124].GetCppString();
-        spell->SpellName[4] = fields[125].GetCppString();
-        spell->SpellName[5] = fields[126].GetCppString();
-        spell->SpellName[6] = fields[127].GetCppString();
-        spell->SpellName[7] = fields[128].GetCppString();
-        //spell->SpellNameFlag = fields[129].GetUInt32(); not used
-        spell->Rank[0] = fields[130].GetCppString();
-        spell->Rank[1] = fields[131].GetCppString();
-        spell->Rank[2] = fields[132].GetCppString();
-        spell->Rank[3] = fields[133].GetCppString();
-        spell->Rank[4] = fields[134].GetCppString();
-        spell->Rank[5] = fields[135].GetCppString();
-        spell->Rank[6] = fields[136].GetCppString();
-        spell->Rank[7] = fields[137].GetCppString();
+        //spell->SpellNameFlag = fields[122].GetUInt32(); not used
+        spell->Rank[0] = fields[123].GetCppString();
         /* not used
-        spell->RankFlags = fields[137].GetUInt32();
-        spell->Description[0] = new char[strlen(fields[138].GetString()) + 1];
-        strcpy(spell->Description[0], fields[138].GetString());
-        spell->Description[1] = new char[strlen(fields[139].GetString()) + 1];
-        strcpy(spell->Description[1], fields[139].GetString());
-        spell->Description[2] = new char[strlen(fields[140].GetString()) + 1];
-        strcpy(spell->Description[2], fields[140].GetString());
-        spell->Description[3] = new char[strlen(fields[141].GetString()) + 1];
-        strcpy(spell->Description[3], fields[141].GetString());
-        spell->Description[4] = new char[strlen(fields[142].GetString()) + 1];
-        strcpy(spell->Description[4], fields[142].GetString());
-        spell->Description[5] = new char[strlen(fields[143].GetString()) + 1];
-        strcpy(spell->Description[5], fields[143].GetString());
-        spell->Description[6] = new char[strlen(fields[144].GetString()) + 1];
-        strcpy(spell->Description[6], fields[144].GetString());
-        spell->Description[7] = new char[strlen(fields[145].GetString()) + 1];
-        strcpy(spell->Description[7], fields[145].GetString());
-        spell->DescriptionFlags = fields[146].GetUInt32();
-        spell->ToolTip[0] = new char[strlen(fields[147].GetString()) + 1];
-        strcpy(spell->ToolTip[0], fields[147].GetString());
-        spell->ToolTip[1] = new char[strlen(fields[148].GetString()) + 1];
-        strcpy(spell->ToolTip[1], fields[148].GetString());
-        spell->ToolTip[2] = new char[strlen(fields[149].GetString()) + 1];
-        strcpy(spell->ToolTip[2], fields[149].GetString());
-        spell->ToolTip[3] = new char[strlen(fields[150].GetString()) + 1];
-        strcpy(spell->ToolTip[3], fields[150].GetString());
-        spell->ToolTip[4] = new char[strlen(fields[151].GetString()) + 1];
-        strcpy(spell->ToolTip[4], fields[151].GetString());
-        spell->ToolTip[5] = new char[strlen(fields[152].GetString()) + 1];
-        strcpy(spell->ToolTip[5], fields[152].GetString());
-        spell->ToolTip[6] = new char[strlen(fields[153].GetString()) + 1];
-        strcpy(spell->ToolTip[6], fields[153].GetString());
-        spell->ToolTip[7] = new char[strlen(fields[154].GetString()) + 1];
-        strcpy(spell->ToolTip[7], fields[154].GetString());
-        spell->ToolTipFlags = fields[155].GetUInt32();
+        spell->RankFlags = fields[124].GetUInt32();
+        spell->Description[0] = fields[125].GetCppString();
+        spell->DescriptionFlags = fields[126].GetUInt32();
+        spell->ToolTip[0] = fields[127].GetCppString();
+        spell->ToolTipFlags = fields[128].GetUInt32();
         */
-        spell->ManaCostPercentage = fields[157].GetUInt32();
-        spell->StartRecoveryCategory = fields[158].GetUInt32();
-        spell->StartRecoveryTime = fields[159].GetUInt32();
-        spell->MinTargetLevel = fields[160].GetUInt32();
-        spell->MaxTargetLevel = fields[161].GetUInt32();
-        spell->SpellFamilyName = fields[162].GetUInt32();
-        spell->SpellFamilyFlags = fields[163].GetUInt64();
-        spell->MaxAffectedTargets = fields[164].GetUInt32();
-        spell->DmgClass = fields[165].GetUInt32();
-        spell->PreventionType = fields[166].GetUInt32();
-        //spell->StanceBarOrder = fields[167].GetInt32();
-        spell->DmgMultiplier[0] = fields[168].GetFloat();
-        spell->DmgMultiplier[1] = fields[169].GetFloat();
-        spell->DmgMultiplier[2] = fields[170].GetFloat();
-        //spell->MinFactionId = fields[171].GetUInt32();
-        //spell->MinReputation = fields[172].GetUInt32();
-        //spell->RequiredAuraVision = fields[173].GetUInt32();
-        spell->Custom = fields[174].GetUInt32();
+        spell->ManaCostPercentage = fields[129].GetUInt32();
+        spell->StartRecoveryCategory = fields[130].GetUInt32();
+        spell->StartRecoveryTime = fields[131].GetUInt32();
+        spell->MinTargetLevel = fields[132].GetUInt32();
+        spell->MaxTargetLevel = fields[133].GetUInt32();
+        spell->SpellFamilyName = fields[134].GetUInt32();
+        spell->SpellFamilyFlags = fields[135].GetUInt64();
+        spell->MaxAffectedTargets = fields[136].GetUInt32();
+        spell->DmgClass = fields[137].GetUInt32();
+        spell->PreventionType = fields[138].GetUInt32();
+        //spell->StanceBarOrder = fields[139].GetInt32();
+        spell->DmgMultiplier[0] = fields[140].GetFloat();
+        spell->DmgMultiplier[1] = fields[141].GetFloat();
+        spell->DmgMultiplier[2] = fields[142].GetFloat();
+        //spell->MinFactionId = fields[143].GetUInt32();
+        //spell->MinReputation = fields[144].GetUInt32();
+        //spell->RequiredAuraVision = fields[145].GetUInt32();
+        spell->Custom = fields[146].GetUInt32();
 
         
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
@@ -4002,6 +3924,50 @@ void SpellMgr::LoadSpells()
         mSpellEntryMap[spellId] = std::move(spell);
 
     } while (result->NextRow());
+
+    // Load localized texts.
+    //                                        0        1            2            3            4            5            6            7                   8                   9                   10                  11                  12                  13                  14                  15                  16                  17                  18                  19                      20                      21                      22                      23                      24
+    result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `nameSubtext_loc1`, `nameSubtext_loc2`, `nameSubtext_loc3`, `nameSubtext_loc4`, `nameSubtext_loc5`, `nameSubtext_loc6`, `description_loc1`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc5`, `description_loc6`, `auraDescription_loc1`, `auraDescription_loc2`, `auraDescription_loc3`, `auraDescription_loc4`, `auraDescription_loc5`, `auraDescription_loc6` FROM `locales_spell`"));
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 spellId = fields[0].GetUInt32();
+            if (spellId > maxEntry)
+                continue;
+
+            mSpellEntryMap[spellId]->SpellName[2] = fields[1].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[3] = fields[2].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[4] = fields[3].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[5] = fields[4].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[6] = fields[5].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[7] = fields[6].GetCppString();
+            mSpellEntryMap[spellId]->Rank[2] = fields[7].GetCppString();
+            mSpellEntryMap[spellId]->Rank[3] = fields[8].GetCppString();
+            mSpellEntryMap[spellId]->Rank[4] = fields[9].GetCppString();
+            mSpellEntryMap[spellId]->Rank[5] = fields[10].GetCppString();
+            mSpellEntryMap[spellId]->Rank[6] = fields[11].GetCppString();
+            mSpellEntryMap[spellId]->Rank[7] = fields[12].GetCppString();
+
+            /*
+            unused
+            mSpellEntryMap[spellId]->Description[2] = fields[13].GetCppString();
+            mSpellEntryMap[spellId]->Description[3] = fields[14].GetCppString();
+            mSpellEntryMap[spellId]->Description[4] = fields[15].GetCppString();
+            mSpellEntryMap[spellId]->Description[5] = fields[16].GetCppString();
+            mSpellEntryMap[spellId]->Description[6] = fields[17].GetCppString();
+            mSpellEntryMap[spellId]->Description[7] = fields[18].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[2] = fields[19].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[3] = fields[20].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[4] = fields[21].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[5] = fields[22].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[6] = fields[23].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[7] = fields[24].GetCppString();
+            */
+
+        } while (result->NextRow());
+    }
 
     sLog.outString();
     sLog.outString(">> Loaded %u spells in %ums.", mSpellEntryMap.size(), WorldTimer::getMSTimeDiffToNow(oldMSTime));
