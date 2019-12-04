@@ -3937,33 +3937,33 @@ void SpellMgr::LoadSpells()
             if (spellId > maxEntry)
                 continue;
 
-            mSpellEntryMap[spellId]->SpellName[2] = fields[1].GetCppString();
-            mSpellEntryMap[spellId]->SpellName[3] = fields[2].GetCppString();
-            mSpellEntryMap[spellId]->SpellName[4] = fields[3].GetCppString();
-            mSpellEntryMap[spellId]->SpellName[5] = fields[4].GetCppString();
-            mSpellEntryMap[spellId]->SpellName[6] = fields[5].GetCppString();
-            mSpellEntryMap[spellId]->SpellName[7] = fields[6].GetCppString();
-            mSpellEntryMap[spellId]->Rank[2] = fields[7].GetCppString();
-            mSpellEntryMap[spellId]->Rank[3] = fields[8].GetCppString();
-            mSpellEntryMap[spellId]->Rank[4] = fields[9].GetCppString();
-            mSpellEntryMap[spellId]->Rank[5] = fields[10].GetCppString();
-            mSpellEntryMap[spellId]->Rank[6] = fields[11].GetCppString();
-            mSpellEntryMap[spellId]->Rank[7] = fields[12].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[1] = fields[1].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[2] = fields[2].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[3] = fields[3].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[4] = fields[4].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[5] = fields[5].GetCppString();
+            mSpellEntryMap[spellId]->SpellName[6] = fields[6].GetCppString();
+            mSpellEntryMap[spellId]->Rank[1] = fields[7].GetCppString();
+            mSpellEntryMap[spellId]->Rank[2] = fields[8].GetCppString();
+            mSpellEntryMap[spellId]->Rank[3] = fields[9].GetCppString();
+            mSpellEntryMap[spellId]->Rank[4] = fields[10].GetCppString();
+            mSpellEntryMap[spellId]->Rank[5] = fields[11].GetCppString();
+            mSpellEntryMap[spellId]->Rank[6] = fields[12].GetCppString();
 
             /*
             unused
-            mSpellEntryMap[spellId]->Description[2] = fields[13].GetCppString();
-            mSpellEntryMap[spellId]->Description[3] = fields[14].GetCppString();
-            mSpellEntryMap[spellId]->Description[4] = fields[15].GetCppString();
-            mSpellEntryMap[spellId]->Description[5] = fields[16].GetCppString();
-            mSpellEntryMap[spellId]->Description[6] = fields[17].GetCppString();
-            mSpellEntryMap[spellId]->Description[7] = fields[18].GetCppString();
-            mSpellEntryMap[spellId]->ToolTip[2] = fields[19].GetCppString();
-            mSpellEntryMap[spellId]->ToolTip[3] = fields[20].GetCppString();
-            mSpellEntryMap[spellId]->ToolTip[4] = fields[21].GetCppString();
-            mSpellEntryMap[spellId]->ToolTip[5] = fields[22].GetCppString();
-            mSpellEntryMap[spellId]->ToolTip[6] = fields[23].GetCppString();
-            mSpellEntryMap[spellId]->ToolTip[7] = fields[24].GetCppString();
+            mSpellEntryMap[spellId]->Description[1] = fields[13].GetCppString();
+            mSpellEntryMap[spellId]->Description[2] = fields[14].GetCppString();
+            mSpellEntryMap[spellId]->Description[3] = fields[15].GetCppString();
+            mSpellEntryMap[spellId]->Description[4] = fields[16].GetCppString();
+            mSpellEntryMap[spellId]->Description[5] = fields[17].GetCppString();
+            mSpellEntryMap[spellId]->Description[6] = fields[18].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[1] = fields[19].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[2] = fields[20].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[3] = fields[21].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[4] = fields[22].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[5] = fields[23].GetCppString();
+            mSpellEntryMap[spellId]->ToolTip[6] = fields[24].GetCppString();
             */
 
         } while (result->NextRow());
