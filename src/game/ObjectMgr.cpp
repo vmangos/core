@@ -7512,26 +7512,52 @@ void ObjectMgr::LoadFactions()
             faction.ReputationFlags[2] = fields[17].GetUInt32();
             faction.ReputationFlags[3] = fields[18].GetUInt32();
             faction.team = fields[19].GetUInt32();
-            faction.name[0] = new char[strlen(fields[20].GetString()) + 1];
-            strcpy(faction.name[0], fields[20].GetString());
-            faction.name[1] = new char[strlen(fields[21].GetString()) + 1];
-            strcpy(faction.name[1], fields[21].GetString());
-            faction.name[2] = new char[strlen(fields[22].GetString()) + 1];
-            strcpy(faction.name[2], fields[22].GetString());
-            faction.name[3] = new char[strlen(fields[23].GetString()) + 1];
-            strcpy(faction.name[3], fields[23].GetString());
-            faction.name[4] = new char[strlen(fields[24].GetString()) + 1];
-            strcpy(faction.name[4], fields[24].GetString());
-            faction.name[5] = new char[strlen(fields[25].GetString()) + 1];
-            strcpy(faction.name[5], fields[25].GetString());
-            faction.name[6] = new char[strlen(fields[26].GetString()) + 1];
-            strcpy(faction.name[6], fields[26].GetString());
-            faction.name[7] = new char[strlen(fields[27].GetString()) + 1];
-            strcpy(faction.name[7], fields[27].GetString());
+            faction.name[0] = fields[20].GetCppString();
+            /*
+            unused
+            faction.description[0] = new char[strlen(fields[21].GetString()) + 1];
+            strcpy(faction.description[0], fields[21].GetString());
+            */
 
             m_FactionsMap[factionId] = faction;
 
         } while (result->NextRow());
+
+#if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
+        // Load localized texts (currently we only have 1.12 locales).
+        //                                        0        1            2            3            4            5            6            7                   8                   9                   10                  11                  12
+        result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `description_loc1`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc5`, `description_loc6` FROM `locales_faction`"));
+        if (result)
+        {
+            do
+            {
+                auto fields = result->Fetch();
+                uint32 factionId = fields[0].GetUInt32();
+                auto itr = m_FactionsMap.find(factionId);
+                if (itr == m_FactionsMap.end())
+                    continue;
+                FactionEntry& faction = itr->second;
+
+                faction.name[1] = fields[1].GetCppString();
+                faction.name[2] = fields[2].GetCppString();
+                faction.name[3] = fields[3].GetCppString();
+                faction.name[4] = fields[4].GetCppString();
+                faction.name[5] = fields[5].GetCppString();
+                faction.name[6] = fields[6].GetCppString();
+
+                /*
+                unused
+                faction.description[1] = fields[7].GetCppString();
+                faction.description[2] = fields[8].GetCppString();
+                faction.description[3] = fields[9].GetCppString();
+                faction.description[4] = fields[10].GetCppString();
+                faction.description[5] = fields[11].GetCppString();
+                faction.description[6] = fields[12].GetCppString();
+                */
+
+            } while (result->NextRow());
+        }
+#endif
     }
     sLog.outString(">> Loaded %u factions.", m_FactionsMap.size());
     sLog.outString();
@@ -8075,19 +8101,36 @@ void ObjectMgr::LoadTaxiNodes()
         taxiNode->y = fields[4].GetFloat();
         taxiNode->z = fields[5].GetFloat();
         taxiNode->name[0] = fields[6].GetCppString();
-        taxiNode->name[1] = fields[7].GetCppString();
-        taxiNode->name[2] = fields[8].GetCppString();
-        taxiNode->name[3] = fields[9].GetCppString();
-        taxiNode->name[4] = fields[10].GetCppString();
-        taxiNode->name[5] = fields[11].GetCppString();
-        taxiNode->name[6] = fields[12].GetCppString();
-        taxiNode->name[7] = fields[13].GetCppString();
-        taxiNode->MountCreatureID[0] = fields[14].GetUInt32();
-        taxiNode->MountCreatureID[1] = fields[15].GetUInt32();
+        taxiNode->MountCreatureID[0] = fields[7].GetUInt32();
+        taxiNode->MountCreatureID[1] = fields[8].GetUInt32();
 
         m_TaxiNodes[nodeId] = std::move(taxiNode);
 
     } while (result->NextRow());
+
+#if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
+    // Load localized texts (currently we only have 1.12 locales).
+    //                                        0        1            2            3            4            5            6
+    result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6` FROM `locales_taxi_node`"));
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 nodeId = fields[0].GetUInt32();
+            if ((nodeId > maxTaxiNodeEntry) || (!m_TaxiNodes[nodeId]))
+                continue;
+
+            m_TaxiNodes[nodeId]->name[1] = fields[1].GetCppString();
+            m_TaxiNodes[nodeId]->name[2] = fields[2].GetCppString();
+            m_TaxiNodes[nodeId]->name[3] = fields[3].GetCppString();
+            m_TaxiNodes[nodeId]->name[4] = fields[4].GetCppString();
+            m_TaxiNodes[nodeId]->name[5] = fields[5].GetCppString();
+            m_TaxiNodes[nodeId]->name[6] = fields[6].GetCppString();
+
+        } while (result->NextRow());
+    }
+#endif
 
     sLog.outString();
     sLog.outString(">> Loaded %u taxi nodes.", maxTaxiNodeEntry);

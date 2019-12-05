@@ -3925,7 +3925,8 @@ void SpellMgr::LoadSpells()
 
     } while (result->NextRow());
 
-    // Load localized texts.
+#if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_12_1
+    // Load localized texts (currently we only have 1.12 locales).
     //                                        0        1            2            3            4            5            6            7                   8                   9                   10                  11                  12                  13                  14                  15                  16                  17                  18                  19                      20                      21                      22                      23                      24
     result.reset(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `nameSubtext_loc1`, `nameSubtext_loc2`, `nameSubtext_loc3`, `nameSubtext_loc4`, `nameSubtext_loc5`, `nameSubtext_loc6`, `description_loc1`, `description_loc2`, `description_loc3`, `description_loc4`, `description_loc5`, `description_loc6`, `auraDescription_loc1`, `auraDescription_loc2`, `auraDescription_loc3`, `auraDescription_loc4`, `auraDescription_loc5`, `auraDescription_loc6` FROM `locales_spell`"));
     if (result)
@@ -3934,7 +3935,7 @@ void SpellMgr::LoadSpells()
         {
             fields = result->Fetch();
             uint32 spellId = fields[0].GetUInt32();
-            if (spellId > maxEntry)
+            if ((spellId > maxEntry) || (!mSpellEntryMap[spellId]))
                 continue;
 
             mSpellEntryMap[spellId]->SpellName[1] = fields[1].GetCppString();
@@ -3968,6 +3969,7 @@ void SpellMgr::LoadSpells()
 
         } while (result->NextRow());
     }
+#endif
 
     sLog.outString();
     sLog.outString(">> Loaded %u spells in %ums.", mSpellEntryMap.size(), WorldTimer::getMSTimeDiffToNow(oldMSTime));
