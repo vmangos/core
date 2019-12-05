@@ -7515,8 +7515,7 @@ void ObjectMgr::LoadFactions()
             faction.name[0] = fields[20].GetCppString();
             /*
             unused
-            faction.description[0] = new char[strlen(fields[21].GetString()) + 1];
-            strcpy(faction.description[0], fields[21].GetString());
+            faction.description[0] = fields[21].GetCppString();
             */
 
             m_FactionsMap[factionId] = faction;
