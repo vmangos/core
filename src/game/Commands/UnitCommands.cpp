@@ -1841,10 +1841,13 @@ bool ChatHandler::HandleDieHelper(Unit* target)
         return false;
     }
 
-    if (target->GetTypeId() == TYPEID_PLAYER)
+    if (Player* player = target->ToPlayer())
     {
         if (HasLowerSecurity((Player*)target, ObjectGuid(), false))
             return false;
+
+        if (player->IsGod())
+            player->SetGodMode(false);
     }
 
     if (target->IsAlive())
