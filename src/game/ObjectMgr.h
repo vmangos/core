@@ -370,6 +370,7 @@ struct GraveYardData
 };
 typedef std::multimap<uint32, GraveYardData> GraveYardMap;
 typedef std::pair<GraveYardMap::const_iterator, GraveYardMap::const_iterator> GraveYardMapBounds;
+typedef std::unordered_map<uint32, float> WorldSafeLocsFacingMap;
 
 struct TaxiPathTransition
 {
@@ -711,6 +712,8 @@ class ObjectMgr
         void RemoveGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = false);
         void LoadGraveyardZones();
         GraveYardData const* FindGraveYardData(uint32 id, uint32 zone) const;
+        void LoadWorldSafeLocsFacing();
+        float GetWorldSafeLocFacing(uint32 id) const;
 
         AreaTriggerTeleport const* GetAreaTriggerTeleport(uint32 trigger) const
         {
@@ -1417,6 +1420,7 @@ class ObjectMgr
         ReservedNamesMap    m_ReservedNames;
 
         GraveYardMap        m_GraveYardMap;
+        WorldSafeLocsFacingMap m_worldSafeLocsFacingMap;
 
         GameTeleMap         m_GameTeleMap;
 

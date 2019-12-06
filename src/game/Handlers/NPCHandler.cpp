@@ -486,8 +486,18 @@ void WorldSession::SendSpiritResurrect()
         WorldSafeLocsEntry const *ghostGrave = sObjectMgr.GetClosestGraveYard(
                 _player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), _player->GetMapId(), _player->GetTeam());
 
+        float orientation = _player->GetOrientation();
+
+        // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+        // - All graveyards that needed adjustment were changed so that a 
+        //   character's spirit comes into the world facing toward the Spirit Healer.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        if (float facing = sObjectMgr.GetWorldSafeLocFacing(corpseGrave->ID))
+            orientation = facing;
+#endif
+
         if (corpseGrave != ghostGrave)
-            _player->TeleportTo(corpseGrave->map_id, corpseGrave->x, corpseGrave->y, corpseGrave->z, _player->GetOrientation());
+            _player->TeleportTo(corpseGrave->map_id, corpseGrave->x, corpseGrave->y, corpseGrave->z, orientation);
         // or update at original position
         else
         {

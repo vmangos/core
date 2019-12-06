@@ -1270,6 +1270,9 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading pet spell data ...");
     sObjectMgr.LoadPetSpellData();
 
+    sLog.outString("Loading world safe locs facing values ...");
+    sObjectMgr.LoadWorldSafeLocsFacing();
+
     ///- Load the DBC files
     sLog.outString("Initialize data stores...");
 
