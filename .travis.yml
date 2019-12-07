@@ -1,19 +1,16 @@
 language: cpp
 compiler: gcc
-dist: trusty
+dist: xenial
 
 os:
   - linux
 
 before_script:
   # g++6
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
-  - sudo apt-get install -qq g++-6
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+  - sudo apt-get install -qq g++
 
   - g++   --version
-  - g++-6 --version
 
   # TBB
   - sudo apt-get install -y libtbb-dev
