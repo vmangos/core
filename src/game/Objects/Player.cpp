@@ -1911,10 +1911,10 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             const auto wps = [this](){
                 WorldPacket data;
                 BuildTeleportAckMsg(data,
-                                    m_teleport_dest.coord_x,
-                                    m_teleport_dest.coord_y,
-                                    m_teleport_dest.coord_z,
-                                    m_teleport_dest.orientation);
+                                    m_teleport_dest.x,
+                                    m_teleport_dest.y,
+                                    m_teleport_dest.z,
+                                    m_teleport_dest.o);
                 SendMovementMessageToSet(std::move(data), true);
             };
             if (recover)
@@ -2070,10 +2070,10 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData *data)
                 }
                 else
                 {
-                    data << m_teleport_dest.coord_x;
-                    data << m_teleport_dest.coord_y;
-                    data << m_teleport_dest.coord_z;
-                    data << m_teleport_dest.orientation;
+                    data << m_teleport_dest.x;
+                    data << m_teleport_dest.y;
+                    data << m_teleport_dest.z;
+                    data << m_teleport_dest.o;
                 }
                 GetSession()->SendPacket(&data);
                 SendMovementMessageToSet(std::move(data), true);
@@ -2100,7 +2100,7 @@ void Player::RestorePendingTeleport()
 
 bool Player::TeleportToBGEntryPoint()
 {
-    if (m_bgData.joinPos.coord_x == 0.0f && m_bgData.joinPos.coord_y == 0.0f && m_bgData.joinPos.coord_z == 0.0f)
+    if (m_bgData.joinPos.x == 0.0f && m_bgData.joinPos.y == 0.0f && m_bgData.joinPos.z == 0.0f)
         m_bgData.joinPos = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, 0.0f);
 
     return TeleportTo(m_bgData.joinPos);
@@ -14562,8 +14562,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     // player can have current coordinates in to BG map, fix this
     {
         const WorldLocation& _loc = GetBattleGroundEntryPoint();
-        SetLocationMapId(_loc.mapid);
-        Relocate(_loc.coord_x, _loc.coord_y, _loc.coord_z, _loc.orientation);
+        SetLocationMapId(_loc.mapId);
+        Relocate(_loc.x, _loc.y, _loc.z, _loc.o);
 
         // We are not in BG anymore
         SetBattleGroundId(0, BATTLEGROUND_TYPE_NONE);
@@ -14626,8 +14626,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
             AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(GetMapId());
             if (at)
             {
-                Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
-                SetLocationMapId(at->target_mapId);
+                Relocate(at->destination.x, at->destination.y, at->destination.z, at->destination.o);
+                SetLocationMapId(at->destination.mapId);
             }
             else if (GetMapId() == 533) // Naxxramas
             {
@@ -16013,11 +16013,11 @@ void Player::SaveToDB(bool online, bool force)
     }
     else
     {
-        uberInsert.addUInt32(GetTeleportDest().mapid);
-        uberInsert.addFloat(finiteAlways(GetTeleportDest().coord_x));
-        uberInsert.addFloat(finiteAlways(GetTeleportDest().coord_y));
-        uberInsert.addFloat(finiteAlways(GetTeleportDest().coord_z));
-        uberInsert.addFloat(MapManager::NormalizeOrientation(finiteAlways(GetTeleportDest().orientation)));
+        uberInsert.addUInt32(GetTeleportDest().mapId);
+        uberInsert.addFloat(finiteAlways(GetTeleportDest().x));
+        uberInsert.addFloat(finiteAlways(GetTeleportDest().y));
+        uberInsert.addFloat(finiteAlways(GetTeleportDest().z));
+        uberInsert.addFloat(MapManager::NormalizeOrientation(finiteAlways(GetTeleportDest().o)));
     }
 
     std::ostringstream ss;
@@ -20203,11 +20203,11 @@ void Player::_SaveBGData()
         stmt.addUInt32(GetGUIDLow());
         stmt.addUInt32(m_bgData.bgInstanceID);
         stmt.addUInt32(uint32(m_bgData.bgTeam));
-        stmt.addFloat(m_bgData.joinPos.coord_x);
-        stmt.addFloat(m_bgData.joinPos.coord_y);
-        stmt.addFloat(m_bgData.joinPos.coord_z);
-        stmt.addFloat(m_bgData.joinPos.orientation);
-        stmt.addUInt32(m_bgData.joinPos.mapid);
+        stmt.addFloat(m_bgData.joinPos.x);
+        stmt.addFloat(m_bgData.joinPos.y);
+        stmt.addFloat(m_bgData.joinPos.z);
+        stmt.addFloat(m_bgData.joinPos.o);
+        stmt.addUInt32(m_bgData.joinPos.mapId);
 
         stmt.Execute();
     }
@@ -20278,11 +20278,11 @@ bool Player::HasMovementFlag(MovementFlags f) const
 
 void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 area_id)
 {
-    m_homebindMapId = loc.mapid;
+    m_homebindMapId = loc.mapId;
     m_homebindAreaId = area_id;
-    m_homebindX = loc.coord_x;
-    m_homebindY = loc.coord_y;
-    m_homebindZ = loc.coord_z;
+    m_homebindX = loc.x;
+    m_homebindY = loc.y;
+    m_homebindZ = loc.z;
 
     // update sql homebind
     CharacterDatabase.PExecute("UPDATE character_homebind SET map = '%u', zone = '%u', position_x = '%f', position_y = '%f', position_z = '%f' WHERE guid = '%u'",

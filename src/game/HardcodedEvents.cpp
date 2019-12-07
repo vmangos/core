@@ -565,8 +565,8 @@ void SilithusWarEffortBattle::Enable()
     
     KalimdorMap = Maps[KalimdorID];
     
-    float CenterX = EventPos.coord_x;
-    float CenterY = EventPos.coord_y;
+    float CenterX = EventPos.x;
+    float CenterY = EventPos.y;
     
     const float Radius = 45.0f;
 
@@ -598,7 +598,7 @@ void SilithusWarEffortBattle::Enable()
 
         RaceClassCombo RaceClass = AvaliableCombos[ComboID];
 
-        BattlePlayerAI* PlayerAi = new BattlePlayerAI(nullptr, RaceClass.Race, RaceClass.Class, EventPos.mapid, 14, FinalX, FinalY, FinalZ, FinalO);
+        BattlePlayerAI* PlayerAi = new BattlePlayerAI(nullptr, RaceClass.Race, RaceClass.Class, EventPos.mapId, 14, FinalX, FinalY, FinalZ, FinalO);
         if (sPlayerBotMgr.addBot(PlayerAi))
         {
             BotEventInfo EventInfo(PlayerAi);

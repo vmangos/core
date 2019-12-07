@@ -111,15 +111,15 @@ struct Position
 
 struct WorldLocation
 {
-    uint32 mapid = 0;
-    float coord_x = 0.0f;
-    float coord_y = 0.0f;
-    float coord_z = 0.0f;
-    float orientation = 0.0f;
+    uint32 mapId = 0;
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float o = 0.0f;
     explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
-        : mapid(_mapid), coord_x(_x), coord_y(_y), coord_z(_z), orientation(_o) {}
+        : mapId(_mapid), x(_x), y(_y), z(_z), o(_o) {}
     WorldLocation(WorldLocation const &loc)
-        : mapid(loc.mapid), coord_x(loc.coord_x), coord_y(loc.coord_y), coord_z(loc.coord_z), orientation(loc.orientation) {}
+        : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
 };
 
 
@@ -753,8 +753,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetPositionZ() const { return m_position.z; }
         virtual void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
         void GetPosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const;
-        void GetPosition(WorldLocation &loc) const
-            { loc.mapid = m_mapId; GetPosition(loc.coord_x, loc.coord_y, loc.coord_z); loc.orientation = GetOrientation(); }
+        void GetPosition(WorldLocation &loc) const { loc.mapId = m_mapId; GetPosition(loc.x, loc.y, loc.z); loc.o = GetOrientation(); }
         float GetOrientation() const { return m_position.o; }
         void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const;
         void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const;
@@ -807,12 +806,16 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetDistance3dToCenter(WorldObject const* target) const;
         float GetDistance(WorldObject const* obj) const;
         float GetDistance(float x, float y, float z) const;
+        float GetDistance(WorldLocation const& position) const { return GetDistance(position.x, position.y, position.z); }
         float GetDistance2d(WorldObject const* obj) const;
         float GetDistance2d(float x, float y) const;
+        float GetDistance2d(WorldLocation const& position) const { return GetDistance2d(position.x, position.y); }
         float GetDistanceZ(WorldObject const* obj) const;
         float GetDistanceSqr(float x, float y, float z) const;
         bool IsInMap(WorldObject const* obj) const;
+        bool IsWithinDist3d(WorldLocation const& position, float dist2compare) const { return IsWithinDist3d(position.x, position.y, position.z, dist2compare); }
         bool IsWithinDist3d(float x, float y, float z, float dist2compare) const;
+        bool IsWithinDist2d(WorldLocation const& position, float dist2compare) const { return IsWithinDist2d(position.x, position.y, dist2compare); }
         bool IsWithinDist2d(float x, float y, float dist2compare) const;
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
 

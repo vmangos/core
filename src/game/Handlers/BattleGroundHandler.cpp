@@ -129,7 +129,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
     if (queuedAtBGPortal)
     {
         auto const& bgQueuePos = _player->GetBattleGroundEntryPoint();
-        if (_player->GetMapId() != bgQueuePos.mapid || !_player->IsWithinDist3d(bgQueuePos.coord_x, bgQueuePos.coord_y, bgQueuePos.coord_z, 50.0f))
+        if (_player->GetMapId() != bgQueuePos.mapId || !_player->IsWithinDist3d(bgQueuePos, 50.0f))
         {
             ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for BG through out of range portal", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
             return;

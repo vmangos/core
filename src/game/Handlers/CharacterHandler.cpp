@@ -619,9 +619,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // normal delayed teleport protection not applied (and this correct) for this case (Player object just created)
         AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(pCurrChar->GetMapId());
         if (at)
-            pCurrChar->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, pCurrChar->GetOrientation());
+            pCurrChar->TeleportTo(at->destination, pCurrChar->GetOrientation());
         else if (pCurrChar->GetMapId() == 533)
-            pCurrChar->TeleportTo(0, 3120.16f, -3724.93f, 137.66f, 5.83567f); // Naxxramas has no exit trigger
+            pCurrChar->TeleportTo(0, 3362.15f, -3379.35f, 144.782f, 6.28319f); // Naxxramas has no exit trigger
         else
             pCurrChar->TeleportToHomebind();
 

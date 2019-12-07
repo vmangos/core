@@ -61,11 +61,11 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     WorldLocation &loc = GetPlayer()->GetTeleportDest();
 
     // possible errors in the coordinate validity check (only cheating case possible)
-    if (!MapManager::IsValidMapCoord(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation))
+    if (!MapManager::IsValidMapCoord(loc))
     {
         sLog.outError("WorldSession::HandleMoveWorldportAckOpcode: %s was teleported far to a not valid location "
                       "(map:%u, x:%f, y:%f, z:%f) We port him to his homebind instead..",
-                      GetPlayer()->GetGuidStr().c_str(), loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
+                      GetPlayer()->GetGuidStr().c_str(), loc.mapId, loc.x, loc.y, loc.z);
         // stop teleportation else we would try this again and again in LogoutPlayer...
         GetPlayer()->SetSemaphoreTeleportFar(false);
         // and teleport the player to a valid place
@@ -74,7 +74,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
 
     // get the destination map entry, not the current one, this will fix homebind and reset greeting
-    MapEntry const* mEntry = sMapStorage.LookupEntry<MapEntry>(loc.mapid);
+    MapEntry const* mEntry = sMapStorage.LookupEntry<MapEntry>(loc.mapId);
 
     Map* map = nullptr;
 
@@ -82,13 +82,13 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     if (mEntry->IsBattleGround())
     {
         if (GetPlayer()->GetBattleGroundId())
-            map = sMapMgr.FindMap(loc.mapid, GetPlayer()->GetBattleGroundId());
+            map = sMapMgr.FindMap(loc.mapId, GetPlayer()->GetBattleGroundId());
 
         if (!map)
         {
             DETAIL_LOG("WorldSession::HandleMoveWorldportAckOpcode: %s was teleported far to nonexisten battleground instance "
                        " (map:%u, x:%f, y:%f, z:%f) Trying to port him to his previous place..",
-                       GetPlayer()->GetGuidStr().c_str(), loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
+                       GetPlayer()->GetGuidStr().c_str(), loc.mapId, loc.x, loc.y, loc.z);
 
             GetPlayer()->SetSemaphoreTeleportFar(false);
 
@@ -110,16 +110,16 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // relocate the player to the teleport destination
     if (!map)
     {
-        if (loc.mapid <= 1)
-            GetPlayer()->SetLocationInstanceId(sMapMgr.GetContinentInstanceId(loc.mapid, loc.coord_x, loc.coord_y));
-        map = sMapMgr.CreateMap(loc.mapid, GetPlayer());
+        if (loc.mapId <= 1)
+            GetPlayer()->SetLocationInstanceId(sMapMgr.GetContinentInstanceId(loc.mapId, loc.x, loc.y));
+        map = sMapMgr.CreateMap(loc.mapId, GetPlayer());
     }
 
     GetPlayer()->SetMap(map);
     if (Transport* t = GetPlayer()->GetTransport()) // Transport position may have changed while loading
         t->UpdatePassengerPosition(GetPlayer());
     else
-        GetPlayer()->Relocate(loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation);
+        GetPlayer()->Relocate(loc.x, loc.y, loc.z, loc.o);
 
     GetPlayer()->SendInitialPacketsBeforeAddToMap();
     // the CanEnter checks are done in TeleporTo but conditions may change
@@ -132,7 +132,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
 
         DETAIL_LOG("WorldSession::HandleMoveWorldportAckOpcode: %s was teleported far but couldn't be added to map "
                    " (map:%u, x:%f, y:%f, z:%f) Trying to port him to his previous place..",
-                   GetPlayer()->GetGuidStr().c_str(), loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
+                   GetPlayer()->GetGuidStr().c_str(), loc.mapId, loc.x, loc.y, loc.z);
 
         // Teleport to previous place, if cannot be ported back TP to homebind place
         if (!GetPlayer()->TeleportTo(old_loc))
@@ -250,7 +250,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
     pPlayerMover->SetSemaphoreTeleportNear(false);
 
     WorldLocation const& dest = pPlayerMover->GetTeleportDest();
-    pPlayerMover->TeleportPositionRelocation(dest.coord_x, dest.coord_y, dest.coord_z, dest.orientation);
+    pPlayerMover->TeleportPositionRelocation(dest);
 
     // resummon pet, if the destination is in another continent instance, let Player::SwitchInstance do it
     // because the client will request the name for the old pet guid and receive no answer
@@ -260,7 +260,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
         if (sWorld.getConfig(CONFIG_BOOL_CONTINENTS_INSTANCIATE) && pPlayerMover->GetMap()->IsContinent())
         {
             bool transition = false;
-            if (sMapMgr.GetContinentInstanceId(pPlayerMover->GetMap()->GetId(), dest.coord_x, dest.coord_y, &transition) == pPlayerMover->GetInstanceId())
+            if (sMapMgr.GetContinentInstanceId(pPlayerMover->GetMap()->GetId(), dest.x, dest.y, &transition) == pPlayerMover->GetInstanceId())
                 pPlayerMover->ResummonPetTemporaryUnSummonedIfAny();
         }
         else

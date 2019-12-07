@@ -1430,11 +1430,19 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
         MotionMaster const* GetMotionMaster() const { return &i_motionMaster; }
         void RestoreMovement();
+
+        template <class T>
+        void NearTeleportTo(T const& pos, uint32 teleportOptions = TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET) { NearTeleportTo(pos.x, pos.y, pos.z, pos.o, teleportOptions); }
         void NearTeleportTo(float x, float y, float z, float orientation, uint32 teleportOptions = TELE_TO_NOT_LEAVE_TRANSPORT | TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+        template <class T>
+        void NearLandTo(T const& pos) { NearLandTo(pos.x, pos.y, pos.z, pos.o); }
         void NearLandTo(float x, float y, float z, float orientation);
+        template <class T>
+        void TeleportPositionRelocation(T const& pos) { TeleportPositionRelocation(pos.x, pos.y, pos.z, pos.o); }
         void TeleportPositionRelocation(float x, float y, float z, float o);
-        void MonsterMoveWithSpeed(float x, float y, float z, float o, float speed, uint32 options);
+
         void MonsterMove(float x, float y, float z);
+        void MonsterMoveWithSpeed(float x, float y, float z, float o, float speed, uint32 options);
         bool IsStopped() const { return !(HasUnitState(UNIT_STAT_MOVING)); }
         void StopMoving(bool force = false);
         void DisableSpline();

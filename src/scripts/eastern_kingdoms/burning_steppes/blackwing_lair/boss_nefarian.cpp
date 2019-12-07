@@ -237,10 +237,10 @@ struct boss_nefarianAI : ScriptedAI
                         double dsin = sin(dang);
                         double dcos = cos(dang);
                         m_creature->GetPosition(loc);
-                        loc.coord_x += 5.0f * dcos;
-                        loc.coord_y += 5.0f * dsin;
-                        loc.coord_z += 0.5f;
-                        loc.orientation = dang - M_PI_F;
+                        loc.x += 5.0f * dcos;
+                        loc.y += 5.0f * dsin;
+                        loc.z += 0.5f;
+                        loc.o = dang - M_PI_F;
                         pPlayer->TeleportTo(loc);
                         pPlayer->AddAura(SPELL_ROGUE); // OK
                         break;

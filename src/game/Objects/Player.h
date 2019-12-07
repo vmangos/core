@@ -1749,7 +1749,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, std::function<void()> recover = std::function<void()>());
         bool TeleportTo(WorldLocation const &loc, uint32 options = 0, std::function<void()> recover = std::function<void()>())
         {
-            return TeleportTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation, options, recover);
+            return TeleportTo(loc.mapId, loc.x, loc.y, loc.z, loc.o, options, recover);
         }
 
         // _NOT_ thread-safe. Must be executed by the map manager after map updates, since we

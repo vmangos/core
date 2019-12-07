@@ -6685,8 +6685,8 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         "SELECT `id`, `required_level`, `required_item`, `required_item2`, `required_quest_done`, `required_team`, "
     //    6             7                    8                    9                    10                    11
         "`target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `required_event`, "
-    //    12
-        "`required_pvp_rank` "
+    //    12                   13
+        "`required_pvp_rank`, `message` "
         "FROM `areatrigger_teleport` t1 WHERE `patch`=(SELECT max(`patch`) FROM `areatrigger_teleport` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
     
     if (!result)
@@ -6717,13 +6717,14 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.requiredItem2      = fields[3].GetUInt32();
         at.requiredQuest      = fields[4].GetUInt32();
         at.required_team      = fields[5].GetUInt16();
-        at.target_mapId       = fields[6].GetUInt32();
-        at.target_X           = fields[7].GetFloat();
-        at.target_Y           = fields[8].GetFloat();
-        at.target_Z           = fields[9].GetFloat();
-        at.target_Orientation = fields[10].GetFloat();
+        at.destination.mapId  = fields[6].GetUInt32();
+        at.destination.x      = fields[7].GetFloat();
+        at.destination.y      = fields[8].GetFloat();
+        at.destination.z      = fields[9].GetFloat();
+        at.destination.o      = fields[10].GetFloat();
         at.required_event     = fields[11].GetInt32();
         at.required_pvp_rank  = fields[12].GetUInt8();
+        at.message            = fields[13].GetCppString();
 
         AreaTriggerEntry const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
@@ -6770,14 +6771,14 @@ void ObjectMgr::LoadAreaTriggerTeleports()
             }
         }
 
-        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(at.target_mapId);
+        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(at.destination.mapId);
         if (!mapEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent target map (ID: %u) for Area trigger (ID:%u).", at.target_mapId, Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent target map (ID: %u) for Area trigger (ID:%u).", at.destination.mapId, Trigger_ID);
             continue;
         }
 
-        if (at.target_X == 0 && at.target_Y == 0 && at.target_Z == 0)
+        if (!at.destination.x && !at.destination.y && !at.destination.z)
         {
             sLog.outErrorDb("Table `areatrigger_teleport` has area trigger (ID:%u) without target coordinates.", Trigger_ID);
             continue;
@@ -6803,7 +6804,7 @@ AreaTriggerTeleport const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
 
     for (AreaTriggerTeleportMap::const_iterator itr = m_AreaTriggerTeleportMap.begin(); itr != m_AreaTriggerTeleportMap.end(); ++itr)
     {
-        if (itr->second.target_mapId == uint32(mapEntry->ghostEntranceMap))
+        if (itr->second.destination.mapId == uint32(mapEntry->ghostEntranceMap))
         {
             AreaTriggerEntry const* atEntry = GetAreaTrigger(itr->first);
             if (atEntry && atEntry->mapid == map_id)
@@ -6820,7 +6821,7 @@ AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 {
     for (AreaTriggerTeleportMap::const_iterator itr = m_AreaTriggerTeleportMap.begin(); itr != m_AreaTriggerTeleportMap.end(); ++itr)
     {
-        if (itr->second.target_mapId == Map)
+        if (itr->second.destination.mapId == Map)
         {
             AreaTriggerEntry const* atEntry = GetAreaTrigger(itr->first);
             if (atEntry)

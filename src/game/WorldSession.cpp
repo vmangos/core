@@ -733,7 +733,7 @@ void WorldSession::LogoutPlayer(bool Save)
             {
                 AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(map->GetId());
                 if (at)
-                    removedFromMap = _player->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, _player->GetOrientation());
+                    removedFromMap = _player->TeleportTo(at->destination);
                 else
                     removedFromMap = _player->TeleportToHomebind();
 
@@ -1325,11 +1325,11 @@ void WorldSession::LoginPlayerToNode(NodeSession* session)
     SendPacket(&data);
 
     // Set position on Node
-    GetPlayer()->GetTeleportDest().mapid = GetPlayer()->GetMapId();
-    GetPlayer()->GetTeleportDest().coord_x = GetPlayer()->GetPositionX();
-    GetPlayer()->GetTeleportDest().coord_y = GetPlayer()->GetPositionY();
-    GetPlayer()->GetTeleportDest().coord_z = GetPlayer()->GetPositionZ();
-    GetPlayer()->GetTeleportDest().orientation = GetPlayer()->GetOrientation();
+    GetPlayer()->GetTeleportDest().mapId = GetPlayer()->GetMapId();
+    GetPlayer()->GetTeleportDest().x = GetPlayer()->GetPositionX();
+    GetPlayer()->GetTeleportDest().y = GetPlayer()->GetPositionY();
+    GetPlayer()->GetTeleportDest().z = GetPlayer()->GetPositionZ();
+    GetPlayer()->GetTeleportDest().o = GetPlayer()->GetOrientation();
     GetPlayer()->SetSemaphoreTeleportFar(true);
 
     m_nodeSession = session;

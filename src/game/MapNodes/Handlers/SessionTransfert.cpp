@@ -141,11 +141,11 @@ void NodeSession::HandleLoadPlayerSerialized(WorldPacket& pkt)
     sObjectAccessor.AddObject(player);
 
     WorldPacket data(SMSG_NEW_WORLD, 20);
-    data << uint32(player->GetTeleportDest().mapid);
-    data << float(player->GetTeleportDest().coord_x);
-    data << float(player->GetTeleportDest().coord_y);
-    data << float(player->GetTeleportDest().coord_z);
-    data << float(player->GetTeleportDest().orientation);
+    data << uint32(player->GetTeleportDest().mapId);
+    data << float(player->GetTeleportDest().x);
+    data << float(player->GetTeleportDest().y);
+    data << float(player->GetTeleportDest().z);
+    data << float(player->GetTeleportDest().o);
     wsess->SendPacket(&data);
 }
 

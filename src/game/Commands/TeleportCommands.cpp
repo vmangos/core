@@ -318,7 +318,7 @@ bool ChatHandler::HandleGoTriggerCommand(char* args)
             return false;
         }
 
-        return HandleGoHelper(pPlayer, at->target_mapId, at->target_X, at->target_Y, &at->target_Z);
+        return HandleGoHelper(pPlayer, at->destination.mapId, at->destination.x, at->destination.y, &at->destination.z);
     }
     else
         return HandleGoHelper(pPlayer, atEntry->mapid, atEntry->x, atEntry->y, &atEntry->z);

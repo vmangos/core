@@ -6650,17 +6650,17 @@ void Spell::EffectBind(SpellEffectIndex eff_idx)
 
     // binding
     WorldPacket data(SMSG_BINDPOINTUPDATE, (4 + 4 + 4 + 4 + 4));
-    data << float(loc.coord_x);
-    data << float(loc.coord_y);
-    data << float(loc.coord_z);
-    data << uint32(loc.mapid);
+    data << float(loc.x);
+    data << float(loc.y);
+    data << float(loc.z);
+    data << uint32(loc.mapId);
     data << uint32(area_id);
     player->SendDirectMessage(&data);
 
-    DEBUG_LOG("New Home Position X is %f", loc.coord_x);
-    DEBUG_LOG("New Home Position Y is %f", loc.coord_y);
-    DEBUG_LOG("New Home Position Z is %f", loc.coord_z);
-    DEBUG_LOG("New Home MapId is %u", loc.mapid);
+    DEBUG_LOG("New Home Position X is %f", loc.x);
+    DEBUG_LOG("New Home Position Y is %f", loc.y);
+    DEBUG_LOG("New Home Position Z is %f", loc.z);
+    DEBUG_LOG("New Home MapId is %u", loc.mapId);
     DEBUG_LOG("New Home AreaId is %u", area_id);
 
     // zone update

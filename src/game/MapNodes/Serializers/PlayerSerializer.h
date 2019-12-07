@@ -43,13 +43,13 @@ inline ByteBuffer& operator>>(ByteBuffer& buf, Position& p)
 
 inline ByteBuffer& operator<<(ByteBuffer& buf, WorldLocation const& p)
 {
-    buf << p.coord_x << p.coord_y << p.coord_z << p.orientation << p.mapid;
+    buf << p.x << p.y << p.z << p.o << p.mapId;
     return buf;
 }
 
 inline ByteBuffer& operator>>(ByteBuffer& buf, WorldLocation& p)
 {
-    buf >> p.coord_x >> p.coord_y >> p.coord_z >> p.orientation >> p.mapid;
+    buf >> p.x >> p.y >> p.z >> p.o >> p.mapId;
     return buf;
 }
 

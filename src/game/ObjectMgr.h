@@ -64,18 +64,15 @@ typedef std::unordered_map<uint32, GameTele > GameTeleMap;
 
 struct AreaTriggerTeleport
 {
-    uint8  requiredLevel;
-    uint32 requiredItem;
-    uint32 requiredItem2;
-    uint32 requiredQuest;
-    int required_event;
-    uint8 required_pvp_rank;
-    uint16 required_team;
-    uint32 target_mapId;
-    float  target_X;
-    float  target_Y;
-    float  target_Z;
-    float  target_Orientation;
+    std::string message;
+    uint8  requiredLevel = 0;
+    uint32 requiredItem = 0;
+    uint32 requiredItem2 = 0;
+    uint32 requiredQuest = 0;
+    int required_event = 0;
+    uint8 required_pvp_rank = 0;
+    uint16 required_team = 0;
+    WorldLocation destination;
 };
 
 struct BattlegroundEntranceTrigger
