@@ -27,8 +27,8 @@ enum ConditionType
 {
     //                                                      // value1       value2        value3        value4
     CONDITION_NOT                   = -3,                   // cond-id-1    0          returns !cond-id-1
-    CONDITION_OR                    = -2,                   // cond-id-1    cond-id-2  returns cond-id-1 OR cond-id-2
-    CONDITION_AND                   = -1,                   // cond-id-1    cond-id-2  returns cond-id-1 AND cond-id-2
+    CONDITION_OR                    = -2,                   // cond-id-1    cond-id-2     cond-id-3     cond-id-4 returns true if at least one of the conditions is satisfied
+    CONDITION_AND                   = -1,                   // cond-id-1    cond-id-2     cond-id-3     cond-id-4 returns true only if all conditions are satisfied
     CONDITION_NONE                  = 0,                    // 0            0
     CONDITION_AURA                  = 1,                    // spell_id     effindex
     CONDITION_ITEM                  = 2,                    // item_id      count   check present req. amount items in inventory

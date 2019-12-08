@@ -139,13 +139,24 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_OR:
         {
-            // Checked on load
+            // Third and fourth condition are optional
+            if (m_value3 && sConditionStorage.LookupEntry<ConditionEntry>(m_value3)->Meets(target, map, source, conditionSourceType))
+                return true;
+            if (m_value4 && sConditionStorage.LookupEntry<ConditionEntry>(m_value4)->Meets(target, map, source, conditionSourceType))
+                return true;
+            
             return sConditionStorage.LookupEntry<ConditionEntry>(m_value1)->Meets(target, map, source, conditionSourceType) || sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(target, map, source, conditionSourceType);
         }
         case CONDITION_AND:
         {
-            // Checked on load
-            return sConditionStorage.LookupEntry<ConditionEntry>(m_value1)->Meets(target, map, source, conditionSourceType) && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(target, map, source, conditionSourceType);
+            // Third and fourth condition are optional
+            bool extraConditionsSatisfied = true;
+            if (m_value3)
+                extraConditionsSatisfied = extraConditionsSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value3)->Meets(target, map, source, conditionSourceType);
+            if (m_value4)
+                extraConditionsSatisfied = extraConditionsSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value4)->Meets(target, map, source, conditionSourceType);
+
+            return extraConditionsSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value1)->Meets(target, map, source, conditionSourceType) && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(target, map, source, conditionSourceType);
         }
         case CONDITION_NONE:
         {
@@ -656,6 +667,34 @@ bool ConditionEntry::IsValid()
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
                 return false;
+            }
+            if (m_value3)
+            {
+                if (m_value3 >= m_entry)
+                {
+                    sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value3 %u, must be lower than entry, skipped", m_entry, m_condition, m_value3);
+                    return false;
+                }
+                const ConditionEntry* condition3 = sConditionStorage.LookupEntry<ConditionEntry>(m_value3);
+                if (!condition3)
+                {
+                    sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value3 %u without proper condition, skipped", m_entry, m_condition, m_value3);
+                    return false;
+                }
+            }
+            if (m_value4)
+            {
+                if (m_value4 >= m_entry)
+                {
+                    sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value4 %u, must be lower than entry, skipped", m_entry, m_condition, m_value4);
+                    return false;
+                }
+                const ConditionEntry* condition4 = sConditionStorage.LookupEntry<ConditionEntry>(m_value4);
+                if (!condition4)
+                {
+                    sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value4 %u without proper condition, skipped", m_entry, m_condition, m_value4);
+                    return false;
+                }
             }
             break;
         }
