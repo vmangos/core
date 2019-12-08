@@ -34,38 +34,38 @@ EndContentData */
 # npc_muglash
 ####*/
 
-enum
+enum MuglashData
 {
-    SAY_MUG_START1          = -1000501,
-    SAY_MUG_START2          = -1000502,
-    SAY_MUG_BRAZIER         = -1000503,
-    SAY_MUG_BRAZIER_WAIT    = -1000504,
-    SAY_MUG_ON_GUARD        = -1000505,
-    SAY_MUG_REST            = -1000506,
-    SAY_MUG_DONE            = -1000507,
-    SAY_MUG_GRATITUDE       = -1000508,
-    SAY_MUG_PATROL          = -1000509,
-    SAY_MUG_RETURN          = -1000510,
+    SAY_MUG_START1 = -1000501,
+    SAY_MUG_START2 = -1000502,
+    SAY_MUG_BRAZIER = -1000503,
+    SAY_MUG_BRAZIER_WAIT = -1000504,
+    SAY_MUG_ON_GUARD = -1000505,
+    SAY_MUG_REST = -1000506,
+    SAY_MUG_DONE = -1000507,
+    SAY_MUG_GRATITUDE = -1000508,
+    SAY_MUG_PATROL = -1000509,
+    SAY_MUG_RETURN = -1000510,
 
-    SAY_MUG_Q_COMPETENCE    = -1780221,
-    SAY_MUG_IMPATIENT       = -1780222,
+    SAY_MUG_Q_COMPETENCE = -1780221,
+    SAY_MUG_IMPATIENT = -1780222,
 
-    QUEST_VORSHA            = 6641,
+    QUEST_VORSHA = 6641,
 
-    GO_NAGA_BRAZIER         = 178247,
-    GO_BRAZIER_GUID         = 47873,
+    GO_NAGA_BRAZIER = 178247,
+    GO_BRAZIER_GUID = 47873,
 
-    NPC_MUGLASH             = 12717,
+    NPC_MUGLASH = 12717,
 
-    NPC_WRATH_RIDER         = 3713,
-    NPC_WRATH_SORCERESS     = 3717,
-    NPC_WRATH_RAZORTAIL     = 3712,
+    NPC_WRATH_RIDER = 3713,
+    NPC_WRATH_SORCERESS = 3717,
+    NPC_WRATH_RAZORTAIL = 3712,
 
-    NPC_WRATH_PRIESTESS     = 3944,
-    NPC_WRATH_MYRMIDON      = 3711,
-    NPC_WRATH_SEAWITCH      = 3715,
+    NPC_WRATH_PRIESTESS = 3944,
+    NPC_WRATH_MYRMIDON = 3711,
+    NPC_WRATH_SEAWITCH = 3715,
 
-    NPC_VORSHA              = 12940
+    NPC_VORSHA = 12940
 };
 
 static float m_afFirstNagaCoord[3][3] =
@@ -279,7 +279,6 @@ bool QuestAccept_npc_muglash(Player* pPlayer, Creature* pCreature, const Quest* 
             go_naga_brazier->ResetDoorOrButton();
             go_naga_brazier->SetGoState(GO_STATE_READY);
         }
-
     }
 
     return true;
@@ -310,14 +309,14 @@ bool GOHello_go_naga_brazier(Player* pPlayer, GameObject* pGo)
 # npc_ruul_snowhoof
 ####*/
 
-enum
+enum RuulSnowhoofData
 {
-    QUEST_FREEDOM_TO_RUUL   = 6482,
-    NPC_T_URSA              = 3921,
-    NPC_T_TOTEMIC           = 3922,
-    NPC_T_PATHFINDER        = 3926,
-    SAY_RUUL_END            = -1780189,
-    BEAR_AURA               = 20514
+    QUEST_FREEDOM_TO_RUUL = 6482,
+    NPC_T_URSA = 3921,
+    NPC_T_TOTEMIC = 3922,
+    NPC_T_PATHFINDER = 3926,
+    SAY_RUUL_END = 8265,
+    BEAR_AURA = 20514
 };
 
 struct npc_ruul_snowhoofAI : public npc_escortAI
@@ -385,23 +384,23 @@ CreatureAI* GetAI_npc_ruul_snowhoofAI(Creature* pCreature)
 # npc_torek
 ####*/
 
-enum
+enum TorekData
 {
-    SAY_READY                   = -1000106,
-    SAY_MOVE                    = -1000107,
-    SAY_PREPARE                 = -1000108,
-    SAY_WIN                     = -1000109,
-    SAY_END                     = -1000110,
+    SAY_READY = 8284,
+    SAY_MOVE = 8278,
+    SAY_PREPARE = 8282,
+    SAY_WIN = 8280,
+    SAY_END = 8281,
 
-    SPELL_REND                  = 11977,
-    SPELL_THUNDERCLAP           = 8078,
+    SPELL_REND = 11977,
+    SPELL_THUNDERCLAP = 8078,
 
-    QUEST_TOREK_ASSULT          = 6544,
+    QUEST_TOREK_ASSULT = 6544,
 
-    NPC_SPLINTERTREE_RAIDER     = 12859,
-    NPC_DURIEL                  = 12860,
-    NPC_SILVERWING_SENTINEL     = 12896,
-    NPC_SILVERWING_WARRIOR      = 12897
+    NPC_SPLINTERTREE_RAIDER = 12859,
+    NPC_DURIEL = 12860,
+    NPC_SILVERWING_SENTINEL = 12896,
+    NPC_SILVERWING_WARRIOR = 12897
 };
 
 struct npc_torekAI : public npc_escortAI
@@ -419,6 +418,7 @@ struct npc_torekAI : public npc_escortAI
         m_uiRend_Timer = 5000;
         m_uiThunderclap_Timer = 8000;
     }
+
     void JustDied(Unit* pKiller) override
     {
         std::list<Creature*> lCrea;
@@ -427,6 +427,7 @@ struct npc_torekAI : public npc_escortAI
             (*it)->DisappearAndDie();
         npc_escortAI::JustDied(pKiller);
     }
+
     void WaypointReached(uint32 uiPointId) override
     {
         Player* pPlayer = GetPlayerForEscort();
@@ -517,18 +518,18 @@ CreatureAI* GetAI_npc_torek(Creature* pCreature)
  # npc_feero_ironhand
  ####*/
 
-enum
+enum FeeroIronhandData
 {
-    SAY_QUEST_START = -1000817,
-    SAY_FIRST_AMBUSH_START = -1000818,
-    SAY_FIRST_AMBUSH_END = -1000819,
-    SAY_SECOND_AMBUSH_START = -1000820,
-    SAY_SCOUT_SECOND_AMBUSH = -1000821,
-    SAY_SECOND_AMBUSH_END = -1000822,
-    SAY_FINAL_AMBUSH_START = -1000823,
-    SAY_BALIZAR_FINAL_AMBUSH = -1000824,
-    SAY_FINAL_AMBUSH_ATTACK = -1000825,
-    SAY_QUEST_END = -1000826,
+    SAY_QUEST_START = 1292,
+    SAY_FIRST_AMBUSH_START = 1372,
+    SAY_FIRST_AMBUSH_END = 1294,
+    SAY_SECOND_AMBUSH_START = 1373,
+    SAY_SCOUT_SECOND_AMBUSH = 1309,
+    SAY_SECOND_AMBUSH_END = 1310,
+    SAY_FINAL_AMBUSH_START = 1374,
+    SAY_BALIZAR_FINAL_AMBUSH = 1313,
+    SAY_FINAL_AMBUSH_ATTACK = 1499,
+    SAY_QUEST_END = 1315,
 
     QUEST_SUPPLIES_TO_AUBERDINE = 976,
 
@@ -537,7 +538,7 @@ enum
 
     NPC_ALIGAR_THE_TORMENTOR = 3898,
     NPC_BALIZAR_THE_UMBRAGE = 3899,
-    NPC_CAEDAKAR_THE_VICIOUS = 3900,
+    NPC_CAEDAKAR_THE_VICIOUS = 3900
 };
 
 /*
@@ -690,20 +691,22 @@ bool QuestAccept_npc_feero_ironhand(Player* pPlayer, Creature* pCreature, const 
 
     return true;
 }
-//Alita King Of The Foulweed
-enum
-{
-    NPC_ENRAGED_FOULWEALD               = 12921,
-    NPC_CHIEF_MURGUT                    = 12918,
-    GO_KARANG_S_BANNER                  = 178205,
-    GO_KARANG_LIGHT                     = 178207,
-    GO_MOUND                            = 300131,
-    SPELL_CORRUPTED_STRENGTH            = 6821,
-    SPELL_DESTROY_KARANG_S_BANNER_1     = 20786,
-    SPELL_DESTROY_KARANG_S_BANNER_2     = 20783,
 
-    SAY_ATTACK_BANNER                   = -1780210
+//Alita King Of The Foulweed
+enum FoulwealdTotemMoundData
+{
+    NPC_ENRAGED_FOULWEALD = 12921,
+    NPC_CHIEF_MURGUT = 12918,
+    GO_KARANG_S_BANNER = 178205,
+    GO_KARANG_LIGHT = 178207,
+    GO_MOUND = 300131,
+    SPELL_CORRUPTED_STRENGTH = 6821,
+    SPELL_DESTROY_KARANG_S_BANNER_1 = 20786,
+    SPELL_DESTROY_KARANG_S_BANNER_2 = 20783,
+
+    SAY_ATTACK_BANNER = 8398
 };
+
 static float foulwealdSpawnCoords[4][3] =
 {
     {2237.48f, -1524.45f, 89.7827f},
@@ -720,6 +723,7 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
     {
         reset();
     }
+
     void reset()
     {
         eventPhase = 0;
@@ -734,6 +738,7 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
     {
         if (eventPhase != 0)
             return false;
+
         eventPhase = 1;
         Creature* foulweald = nullptr;
         for (int i = 0; i < 2; i++)
@@ -752,16 +757,19 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
         }
         return true;
     }
+
     void EventEnded()
     {
         if (GameObject* pGo = me->FindNearestGameObject(GO_KARANG_S_BANNER, 10))
             pGo->AddObjectToRemoveList();
         reset();
     }
+
     void EnragedFoulwealdJustDied(uint64 creatureGUID)
     {
         if (eventPhase != 1)
             return;
+
         Creature* foulweald;
         int pos = 0;
         for (int i = 0; i < 2; i++)
@@ -821,6 +829,7 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
             phaseTimer -= uiDiff;
     }
 };
+
 GameObjectAI* GetAIgo_foulweald_totem_mound(GameObject *pGo)
 {
     return new go_foulweald_totem_moundAI(pGo);
@@ -832,13 +841,16 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
     {
         Reset();
     }
+
     void Reset() override
     {
         m_creature->AddAura(SPELL_CORRUPTED_STRENGTH);
         timer = 0;
     }
+
     uint32 timer;
     uint64 guidMound;
+
     void JustDied(Unit* pKiller) override
     {
         if (GameObject* gobj = m_creature->GetMap()->GetGameObject(guidMound))
@@ -854,12 +866,14 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
             return;
         HitBanner();
     }
+
     void AttackStart(Unit * unit) override
     {
         if (m_creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             return;
         ScriptedAI::AttackStart(unit);
     }
+
     bool HitBanner()
     {
         if (GameObject* pGo = m_creature->FindNearestGameObject(GO_KARANG_S_BANNER, CONTACT_DISTANCE + 1))
@@ -873,11 +887,11 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
         }
         return false;
     }
+
     void UpdateAI(const uint32 uiDiff) override
     {
         if (m_creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             return;
-
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -900,6 +914,7 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
         }
         DoMeleeAttackIfReady();
     }
+
     void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_DESTROY_KARANG_S_BANNER_2)
@@ -911,6 +926,7 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
             }
         }
     }
+
     void SetMoundGuid(uint64 moundGuid)
     {
         guidMound = moundGuid;
@@ -921,6 +937,7 @@ CreatureAI* GetAI_npc_enraged_foulweald(Creature* pCreature)
 {
     return new npc_enraged_foulwealdAI(pCreature);
 }
+
 bool ProcessEventId_event_king_of_the_foulweald(uint32 eventId, Object* source, Object* target, bool isStart)
 {
     if (!target || !source)
@@ -936,6 +953,7 @@ void DefineFoulwealdMound(Creature * crea, uint64 gobjGUID)
     if (npc_enraged_foulwealdAI* foulwealdAI = dynamic_cast<npc_enraged_foulwealdAI*>(crea->AI()))
         foulwealdAI->SetMoundGuid(gobjGUID);
 }
+
 void AddSC_ashenvale()
 {
     Script *newscript;

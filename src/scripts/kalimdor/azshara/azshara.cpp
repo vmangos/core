@@ -135,7 +135,6 @@ bool GossipSelect_npc_loramus_thalipedes(Player* pPlayer, Creature* pCreature, u
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->AreaExploredOrEventHappens(2744);
             break;
-
         case GOSSIP_ACTION_INFO_DEF+2:
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Please continue", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 21);
             pPlayer->SEND_GOSSIP_MENU(1813, pCreature->GetGUID());
@@ -168,15 +167,17 @@ bool GossipSelect_npc_loramus_thalipedes(Player* pPlayer, Creature* pCreature, u
 enum
 {
     //sorts
-    EAU_SOMBRE  = 25743,
-    FRENESIE    = 19812,
-    SACCAGER    = 25744, //charge
-    EMOTE_THE_BEAST_RETURNS = -1000800
+    EAU_SOMBRE = 25743,
+    FRENESIE = 19812,
+    SACCAGER = 25744, //charge
+    EMOTE_THE_BEAST_RETURNS = 11160
 };
+
 struct Locations
 {
     float x, y, z;
 };
+
 //tourne dans l'eau avant aggro.
 static Locations ronde[] =
 {
@@ -289,6 +290,7 @@ struct mob_mawsAI : public ScriptedAI
         else if (m_creature->GetVictim())
             InCombat = 1;
     }
+
     void DamageTaken(Unit *done_by, uint32 &damage) override// l'empecher d'etre kittable infini. s'applique pas aux dégats de la charge.
     {
         LeaveCombatTimer = 30000;
