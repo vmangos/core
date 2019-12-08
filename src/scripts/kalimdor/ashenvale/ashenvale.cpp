@@ -36,19 +36,19 @@ EndContentData */
 
 enum MuglashData
 {
-    SAY_MUG_START1 = -1000501,
-    SAY_MUG_START2 = -1000502,
-    SAY_MUG_BRAZIER = -1000503,
-    SAY_MUG_BRAZIER_WAIT = -1000504,
-    SAY_MUG_ON_GUARD = -1000505,
-    SAY_MUG_REST = -1000506,
-    SAY_MUG_DONE = -1000507,
-    SAY_MUG_GRATITUDE = -1000508,
-    SAY_MUG_PATROL = -1000509,
-    SAY_MUG_RETURN = -1000510,
+    SAY_MUG_START1 = 8566,
+    SAY_MUG_START2 = 8555,
+    SAY_MUG_BRAZIER = 8556,
+    SAY_MUG_BRAZIER_WAIT = 8410,
+    SAY_MUG_ON_GUARD = 8412,
+    SAY_MUG_REST = 8413,
+    SAY_MUG_DONE = 8569,
+    SAY_MUG_GRATITUDE = 8558,
+    SAY_MUG_PATROL = 8564,
+    SAY_MUG_RETURN = 8565,
 
-    SAY_MUG_Q_COMPETENCE = -1780221,
-    SAY_MUG_IMPATIENT = -1780222,
+    SAY_MUG_Q_COMPETENCE = -1780221, // bct need
+    SAY_MUG_IMPATIENT = -1780222, // bct need
 
     QUEST_VORSHA = 6641,
 
@@ -146,10 +146,11 @@ struct npc_muglashAI : public npc_escortAI
                 }
                 break;
             case 25:
-                DoScriptText(SAY_MUG_GRATITUDE, m_creature);
-
                 if (Player* pPlayer = GetPlayerForEscort())
+                {
+                    DoScriptText(SAY_MUG_GRATITUDE, m_creature, pPlayer);
                     pPlayer->GroupEventHappens(QUEST_VORSHA, m_creature);
+                }
                 break;
             case 26:
                 DoScriptText(SAY_MUG_PATROL, m_creature);
@@ -178,7 +179,9 @@ struct npc_muglashAI : public npc_escortAI
                 m_creature->SummonCreature(NPC_VORSHA, m_fVorshaCoord[0], m_fVorshaCoord[1], m_fVorshaCoord[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000);
                 break;
             case 4:
-                DoScriptText(SAY_MUG_DONE, m_creature);
+                if (Player* pPlayer = GetPlayerForEscort())
+                    DoScriptText(SAY_MUG_DONE, m_creature, pPlayer);
+
                 m_creature->HandleEmote(EMOTE_ONESHOT_CHEER);
                 break;
             case 5:
@@ -295,7 +298,7 @@ bool GOHello_go_naga_brazier(Player* pPlayer, GameObject* pGo)
     {
         if (npc_muglashAI* pEscortAI = dynamic_cast<npc_muglashAI*>(pCreature->AI()))
         {
-            DoScriptText(SAY_MUG_BRAZIER_WAIT, pCreature);
+            DoScriptText(SAY_MUG_BRAZIER_WAIT, pCreature, pPlayer);
 
             pEscortAI->m_bIsBrazierExtinguished = true;
             return false;
