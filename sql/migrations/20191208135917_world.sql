@@ -25,10 +25,6 @@ UPDATE `broadcast_text` SET `Type` = 2 WHERE `ID` IN (11313, 11160, 3012);
 UPDATE `broadcast_text` SET `Type` = 3 WHERE `ID` IN (11277);
 UPDATE `broadcast_text` SET `Language` = 1 WHERE `ID` IN (8284, 8278, 8282, 8280, 8281);
 
-UPDATE `broadcast_text` SET `MaleText` = "A $c! Slaying him would please the master. Attack!" AND `FemaleText` = "A $c! Slaying him would please the master. Attack!" WHERE `ID` = 1309;
-UPDATE `broadcast_text` SET `MaleText` = "%s, has entered our world." AND `FemaleText` = "%s, has entered our world." WHERE `ID` = 11277;
-UPDATE `broadcast_text` SET `MaleText` = "%s, is wholly consumed by the Light of Elune. Tranquility sets in over the Moonglade." AND `FemaleText` = "%s, is wholly consumed by the Light of Elune. Tranquility sets in over the Moonglade." WHERE `ID` = 11313;
-
 
 -- End of migration.
 END IF;
