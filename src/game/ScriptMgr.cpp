@@ -70,48 +70,6 @@ void DisableScriptAction(ScriptInfo& script)
     script.condition = 0;
 }
 
-enum UpdateFields5875
-{
-    FIELD_GAMEOBJECT_FLAGS           = 9,
-    FIELD_GAMEOBJECT_DYN_FLAGS       = 19,
-    FIELD_ITEM_FIELD_FLAGS           = 21,
-    FIELD_CORPSE_FIELD_FLAGS         = 35,
-    FIELD_CORPSE_FIELD_DYNAMIC_FLAGS = 36,
-    FIELD_UNIT_FIELD_FLAGS           = 46,
-    FIELD_UNIT_DYNAMIC_FLAGS         = 143,
-    FIELD_UNIT_NPC_FLAGS             = 147,
-    FIELD_PLAYER_FLAGS               = 190,
-};
-
-// We use exact index of update fields in some script commands,
-// but they change based on supported build, so fix them here.
-uint32 GetIndexOfUpdateFieldForCurrentBuild(uint32 db_index)
-{
-    switch (db_index)
-    {
-        case FIELD_GAMEOBJECT_FLAGS:
-            return GAMEOBJECT_FLAGS;
-        case FIELD_GAMEOBJECT_DYN_FLAGS:
-            return GAMEOBJECT_DYN_FLAGS;
-        case FIELD_ITEM_FIELD_FLAGS:
-            return ITEM_FIELD_FLAGS;
-        case FIELD_CORPSE_FIELD_FLAGS:
-            return CORPSE_FIELD_FLAGS;
-        case FIELD_CORPSE_FIELD_DYNAMIC_FLAGS:
-            return CORPSE_FIELD_DYNAMIC_FLAGS;
-        case FIELD_UNIT_FIELD_FLAGS:
-            return UNIT_FIELD_FLAGS;
-        case FIELD_UNIT_DYNAMIC_FLAGS:
-            return UNIT_DYNAMIC_FLAGS;
-        case FIELD_UNIT_NPC_FLAGS:
-            return UNIT_NPC_FLAGS;
-        case FIELD_PLAYER_FLAGS:
-            return PLAYER_FLAGS;
-    }
-
-    return db_index;
-}
-
 void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
 {
     if (IsScriptScheduled())                                // function don't must be called in time scripts use.

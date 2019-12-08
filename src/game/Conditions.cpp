@@ -91,7 +91,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_UNIT,        //  41
     CONDITION_REQ_TARGET_UNIT,        //  42
     CONDITION_REQ_TARGET_UNIT,        //  43
-    CONDITION_REQ_BOTH_UNITS,         //  44
+    CONDITION_REQ_BOTH_WORLDOBJECTS,  //  44
     CONDITION_REQ_TARGET_PLAYER,      //  45
     CONDITION_REQ_TARGET_UNIT,        //  46
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  47
@@ -270,7 +270,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             Player const* pPlayer = target  ? target->ToPlayer() : nullptr;
             if (!map)
-                map = pPlayer ? pPlayer->GetMap() : source->GetMap();
+                map = target ? target->GetMap() : source->GetMap();
 
             if (InstanceData const* data = map->GetInstanceData())
                 return data->CheckConditionCriteriaMeet(pPlayer, m_value1, source, m_value2);
@@ -364,7 +364,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_LAST_WAYPOINT:
         {
-            uint32 lastReachedWp = ((Creature*)source)->GetMotionMaster()->getLastReachedWaypoint();
+            uint32 const lastReachedWp = ((Creature*)source)->GetMotionMaster()->getLastReachedWaypoint();
             switch (m_value2)
             {
                 case 0:
@@ -490,7 +490,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_IS_HOSTILE_TO:
         {
-            return target->ToUnit()->IsHostileTo(source->ToUnit());
+            return target->IsHostileTo(source);
         }
         case CONDITION_IS_IN_GROUP:
         {
@@ -1096,10 +1096,15 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
+        case CONDITION_HAS_FLAG:
+        {
+            // Fix field id for older client builds.
+            m_value1 = GetIndexOfUpdateFieldForCurrentBuild(m_value1);
+            break;
+        }
         case CONDITION_NONE:
         case CONDITION_INSTANCE_SCRIPT:
         case CONDITION_ACTIVE_HOLIDAY:
-        case CONDITION_HAS_FLAG:
         case CONDITION_INSTANCE_DATA:
         case CONDITION_MAP_EVENT_DATA:
         case CONDITION_MAP_EVENT_ACTIVE:
