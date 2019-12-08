@@ -1495,25 +1495,6 @@ bool ChatHandler::HandleTriggerCommand(char* args)
         ShowQuestListHelper(quest_id, loc_idx, pl);
     }
 
-    if (at)
-    {
-        if (at->requiredItem || at->requiredItem2)
-        {
-            SendSysMessage(LANG_TRIGGER_REQ_ITEMS);
-
-            if (at->requiredItem)
-                ShowItemListHelper(at->requiredItem, loc_idx, pl);
-            if (at->requiredItem2)
-                ShowItemListHelper(at->requiredItem2, loc_idx, pl);
-        }
-
-        if (at->requiredQuest)
-        {
-            SendSysMessage(LANG_TRIGGER_REQ_QUEST);
-            ShowQuestListHelper(at->requiredQuest, loc_idx, pl);
-        }
-    }
-
     return true;
 }
 

@@ -6226,16 +6226,16 @@ void ObjectMgr::LoadTavernAreaTriggers()
         bar.step();
         Field *fields = result->Fetch();
 
-        uint32 Trigger_ID      = fields[0].GetUInt32();
+        uint32 triggerId      = fields[0].GetUInt32();
 
-        AreaTriggerEntry const* atEntry = GetAreaTrigger(Trigger_ID);
+        AreaTriggerEntry const* atEntry = GetAreaTrigger(triggerId);
         if (!atEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_tavern` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_tavern` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", triggerId);
             continue;
         }
 
-        m_TavernAreaTriggerSet.insert(Trigger_ID);
+        m_TavernAreaTriggerSet.insert(triggerId);
     }
     while (result->NextRow());
 
@@ -6270,7 +6270,7 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
         bar.step();
         Field *fields = result->Fetch();
 
-        uint32 Trigger_ID = fields[0].GetUInt32();
+        uint32 triggerId = fields[0].GetUInt32();
 
         BattlegroundEntranceTrigger bget;
 
@@ -6284,23 +6284,23 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
         bget.exit_Z             = fields[6].GetFloat();
         bget.exit_Orientation   = fields[7].GetFloat();
 
-        AreaTriggerEntry const* bgetEntry = GetAreaTrigger(Trigger_ID);
+        AreaTriggerEntry const* bgetEntry = GetAreaTrigger(triggerId);
         if (!bgetEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_bg_entrance` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_bg_entrance` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", triggerId);
             continue;
         }
 
         if (team != ALLIANCE && team != HORDE)
         {
-            sLog.outError("Table `areatrigger_bg_entrance` has team (ID:%u) that is not Horde or Alliance for area trigger (ID:%u).", team, Trigger_ID);
+            sLog.outError("Table `areatrigger_bg_entrance` has team (ID:%u) that is not Horde or Alliance for area trigger (ID:%u).", team, triggerId);
             continue;
         }
         bget.team = Team(team);
 
         if (bgTypeId >= MAX_BATTLEGROUND_TYPE_ID)
         {
-            sLog.outErrorDb("Table `areatrigger_bg_entrance` has nonexistent battleground type (ID:%u) for area trigger (ID:%u), ignored.", bgTypeId, Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_bg_entrance` has nonexistent battleground type (ID:%u) for area trigger (ID:%u), ignored.", bgTypeId, triggerId);
             continue;
         }
         bget.bgTypeId = BattleGroundTypeId(bgTypeId);
@@ -6308,17 +6308,17 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
         MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(bget.exit_mapId);
         if (!mapEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_bg_entrance` has nonexistent exit map (ID: %u) for area trigger (ID:%u).", bget.exit_mapId, Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_bg_entrance` has nonexistent exit map (ID: %u) for area trigger (ID:%u).", bget.exit_mapId, triggerId);
             continue;
         }
 
         if (bget.exit_X == 0 && bget.exit_Y == 0 && bget.exit_Z == 0)
         {
-            sLog.outErrorDb("Table `areatrigger_bg_entrance` has area trigger (ID:%u) without battleground exit coordinates.", Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_bg_entrance` has area trigger (ID:%u) without battleground exit coordinates.", triggerId);
             continue;
         }
 
-        m_BGEntranceTriggersMap[Trigger_ID] = bget;
+        m_BGEntranceTriggersMap[triggerId] = bget;
     }
     while (result->NextRow());
 
@@ -6681,12 +6681,10 @@ void ObjectMgr::LoadAreaTriggerTeleports()
     uint32 count = 0;
 
     std::unique_ptr<QueryResult> result(WorldDatabase.PQuery(
-    //           0     1                 2                3                 4                      5
-        "SELECT `id`, `required_level`, `required_item`, `required_item2`, `required_quest_done`, `required_team`, "
-    //    6             7                    8                    9                    10                    11
-        "`target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `required_event`, "
-    //    12                   13
-        "`required_pvp_rank`, `message` "
+    //           0     1                 2                      3
+        "SELECT `id`, `required_level`, `required_condition`, `message`, "
+    //    4             5                    6                    7                    8 
+        "`target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation` "
         "FROM `areatrigger_teleport` t1 WHERE `patch`=(SELECT max(`patch`) FROM `areatrigger_teleport` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
     
     if (!result)
@@ -6708,83 +6706,46 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         bar.step();
         Field *fields = result->Fetch();
 
-        uint32 Trigger_ID = fields[0].GetUInt32();
+        uint32 triggerId = fields[0].GetUInt32();
 
         AreaTriggerTeleport at;
 
         at.requiredLevel      = fields[1].GetUInt8();
-        at.requiredItem       = fields[2].GetUInt32();
-        at.requiredItem2      = fields[3].GetUInt32();
-        at.requiredQuest      = fields[4].GetUInt32();
-        at.required_team      = fields[5].GetUInt16();
-        at.destination.mapId  = fields[6].GetUInt32();
-        at.destination.x      = fields[7].GetFloat();
-        at.destination.y      = fields[8].GetFloat();
-        at.destination.z      = fields[9].GetFloat();
-        at.destination.o      = fields[10].GetFloat();
-        at.required_event     = fields[11].GetInt32();
-        at.required_pvp_rank  = fields[12].GetUInt8();
-        at.message            = fields[13].GetCppString();
+        at.requiredCondition  = fields[2].GetUInt32();
+        at.message            = fields[3].GetCppString();
+        at.destination.mapId  = fields[4].GetUInt32();
+        at.destination.x      = fields[5].GetFloat();
+        at.destination.y      = fields[6].GetFloat();
+        at.destination.z      = fields[7].GetFloat();
+        at.destination.o      = fields[8].GetFloat();
 
-        AreaTriggerEntry const* atEntry = GetAreaTrigger(Trigger_ID);
+        AreaTriggerEntry const* atEntry = GetAreaTrigger(triggerId);
         if (!atEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_teleport` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_teleport` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", triggerId);
             continue;
         }
 
-
-        uint16 eventId = abs(at.required_event);
-        if (eventId && !sGameEventMgr.IsValidEvent(eventId))
+        if (at.requiredCondition && !sConditionStorage.LookupEntry<ConditionEntry>(at.requiredCondition))
         {
-            sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent event %u defined for trigger %u, ignoring", eventId, Trigger_ID);
-            at.required_event = 0;
-        }
-
-        if (at.requiredItem)
-        {
-            ItemPrototype const *pProto = GetItemPrototype(at.requiredItem);
-            if (!pProto)
-            {
-                sLog.outError("Table `areatrigger_teleport` has nonexistent key item %u for trigger %u, removing key requirement.", at.requiredItem, Trigger_ID);
-                at.requiredItem = 0;
-            }
-        }
-
-        if (at.requiredItem2)
-        {
-            ItemPrototype const *pProto = GetItemPrototype(at.requiredItem2);
-            if (!pProto)
-            {
-                sLog.outError("Table `areatrigger_teleport` has nonexistent second key item %u for trigger %u, remove key requirement.", at.requiredItem2, Trigger_ID);
-                at.requiredItem2 = 0;
-            }
-        }
-
-        if (at.requiredQuest)
-        {
-            QuestMap::iterator qReqItr = m_QuestTemplatesMap.find(at.requiredQuest);
-            if (qReqItr == m_QuestTemplatesMap.end())
-            {
-                sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent required quest %u for trigger %u, remove quest done requirement.", at.requiredQuest, Trigger_ID);
-                at.requiredQuest = 0;
-            }
+            sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent condition %u defined for trigger %u, ignoring", at.requiredCondition, triggerId);
+            at.requiredCondition = 0;
         }
 
         MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(at.destination.mapId);
         if (!mapEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent target map (ID: %u) for Area trigger (ID:%u).", at.destination.mapId, Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent target map (ID: %u) for Area trigger (ID:%u).", at.destination.mapId, triggerId);
             continue;
         }
 
         if (!at.destination.x && !at.destination.y && !at.destination.z)
         {
-            sLog.outErrorDb("Table `areatrigger_teleport` has area trigger (ID:%u) without target coordinates.", Trigger_ID);
+            sLog.outErrorDb("Table `areatrigger_teleport` has area trigger (ID:%u) without target coordinates.", triggerId);
             continue;
         }
 
-        m_AreaTriggerTeleportMap[Trigger_ID] = at;
+        m_AreaTriggerTeleportMap[triggerId] = at;
 
     }
     while (result->NextRow());

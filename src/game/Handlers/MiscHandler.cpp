@@ -110,43 +110,43 @@ public:
         HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
         for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
         {
-            Player* pl = itr->second;
+            Player* pPlayer = itr->second;
 
             if (security == SEC_PLAYER)
             {
                 // player can see member of other team only if CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST
-                if (pl->GetTeam() != team && !allowTwoSideWhoList)
+                if (pPlayer->GetTeam() != team && !allowTwoSideWhoList)
                     continue;
 
                 // player can see MODERATOR, GAME MASTER, ADMINISTRATOR only if CONFIG_GM_IN_WHO_LIST
-                if (pl->GetSession()->GetSecurity() > gmLevelInWhoList)
+                if (pPlayer->GetSession()->GetSecurity() > gmLevelInWhoList)
                     continue;
             }
 
             // do not process players which are not in world
-            if (!pl->IsInWorld())
+            if (!pPlayer->IsInWorld())
                 continue;
 
             // check if target's level is in level range
-            uint32 lvl = pl->GetLevel();
+            uint32 lvl = pPlayer->GetLevel();
             if (lvl < level_min || lvl > level_max)
                 continue;
 
             // check if target is globally visible for player
-            if (!pl->IsVisibleGloballyFor(sess->GetPlayer()))
+            if (!pPlayer->IsVisibleGloballyFor(sess->GetPlayer()))
                 continue;
 
             // check if class matches classmask
-            uint32 class_ = pl->GetClass();
+            uint32 class_ = pPlayer->GetClass();
             if (!(classmask & (1 << class_)))
                 continue;
 
             // check if race matches racemask
-            uint32 race = pl->GetRace();
+            uint32 race = pPlayer->GetRace();
             if (!(racemask & (1 << race)))
                 continue;
 
-            std::string pname = pl->GetName();
+            std::string pname = pPlayer->GetName();
             std::wstring wpname;
             if (!Utf8toWStr(pname, wpname))
                 continue;
@@ -155,7 +155,7 @@ public:
             if (!(wplayer_name.empty() || wpname.find(wplayer_name) != std::wstring::npos))
                 continue;
 
-            std::string gname = sGuildMgr.GetGuildNameById(pl->GetGuildId());
+            std::string gname = sGuildMgr.GetGuildNameById(pPlayer->GetGuildId());
             std::wstring wgname;
             if (!Utf8toWStr(gname, wgname))
                 continue;
@@ -164,7 +164,7 @@ public:
             if (!(wguild_name.empty() || wgname.find(wguild_name) != std::wstring::npos))
                 continue;
 
-            uint32 pzoneid = pl->GetCachedZoneId();
+            uint32 pzoneid = pPlayer->GetCachedZoneId();
 
             bool z_show = true;
             for (uint32 i = 0; i < zones_count; ++i)
@@ -173,7 +173,7 @@ public:
                 {
                     // World of Warcraft Client Patch 1.7.0 (2005-09-13)
                     // Using the / who command while in a Battleground instance will now only display players in your instance.
-                    z_show = (zone != pzoneid) || notInBattleground || (sess->GetPlayer()->GetInstanceId() == pl->GetInstanceId());
+                    z_show = (zone != pzoneid) || notInBattleground || (sess->GetPlayer()->GetInstanceId() == pPlayer->GetInstanceId());
                     break;
                 }
 
@@ -747,228 +747,165 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_AREATRIGGER");
 
-    uint32 Trigger_ID;
+    uint32 triggerId;
+    recv_data >> triggerId;
+    DEBUG_LOG("Trigger ID: %u", triggerId);
 
-    recv_data >> Trigger_ID;
-    DEBUG_LOG("Trigger ID: %u", Trigger_ID);
+    Player* const pPlayer = GetPlayer();
 
-    if (GetPlayer()->IsTaxiFlying())
+    if (pPlayer->IsTaxiFlying())
     {
-        DEBUG_LOG("Player '%s' (GUID: %u) in flight, ignore Area Trigger ID: %u", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), Trigger_ID);
+        DEBUG_LOG("Player '%s' (GUID: %u) in flight, ignore Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), triggerId);
         return;
     }
 
-    AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(Trigger_ID);
-    if (!atEntry)
+    AreaTriggerEntry const* pTrigger = sObjectMgr.GetAreaTrigger(triggerId);
+    if (!pTrigger)
     {
-        DEBUG_LOG("Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID: %u", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), Trigger_ID);
+        DEBUG_LOG("Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), triggerId);
         return;
     }
 
-    // delta is safe radius
-    const float delta = 5.0f;
     // check if player in the range of areatrigger
-    Player* pl = GetPlayer();
-
-    if (!IsPointInAreaTriggerZone(atEntry, pl->GetMapId(), pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), delta))
+    if (!IsPointInAreaTriggerZone(pTrigger, pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), 5.0f))
     {
-        DEBUG_LOG("Player '%s' (GUID: %u) too far, ignore Area Trigger ID: %u", pl->GetName(), pl->GetGUIDLow(), Trigger_ID);
+        DEBUG_LOG("Player '%s' (GUID: %u) too far, ignore Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), triggerId);
         return;
     }
 
-    if (sScriptMgr.OnAreaTrigger(pl, atEntry))
+    if (sScriptMgr.OnAreaTrigger(pPlayer, pTrigger))
         return;
 
-    uint32 quest_id = sObjectMgr.GetQuestForAreaTrigger(Trigger_ID);
-    if (quest_id && pl->IsAlive() && pl->IsActiveQuest(quest_id))
+    uint32 quest_id = sObjectMgr.GetQuestForAreaTrigger(triggerId);
+    if (quest_id && pPlayer->IsAlive() && pPlayer->IsActiveQuest(quest_id))
     {
         Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest_id);
         if (pQuest)
         {
-            if (pl->GetQuestStatus(quest_id) == QUEST_STATUS_INCOMPLETE)
-                pl->AreaExploredOrEventHappens(quest_id);
+            if (pPlayer->GetQuestStatus(quest_id) == QUEST_STATUS_INCOMPLETE)
+                pPlayer->AreaExploredOrEventHappens(quest_id);
         }
     }
 
     // enter to tavern, not overwrite city rest
-    if (sObjectMgr.IsTavernAreaTrigger(Trigger_ID))
+    if (sObjectMgr.IsTavernAreaTrigger(triggerId))
     {
         // set resting flag we are in the inn
-        if (pl->GetRestType() != REST_TYPE_IN_CITY)
-            pl->SetRestType(REST_TYPE_IN_TAVERN, Trigger_ID);
+        if (pPlayer->GetRestType() != REST_TYPE_IN_CITY)
+            pPlayer->SetRestType(REST_TYPE_IN_TAVERN, triggerId);
         return;
     }
 
-    if (BattlegroundEntranceTrigger const* bget = sObjectMgr.GetBattlegroundEntranceTrigger(Trigger_ID))
+    if (BattlegroundEntranceTrigger const* pBgEntrance = sObjectMgr.GetBattlegroundEntranceTrigger(triggerId))
     {
-        BattleGround *bg = sBattleGroundMgr.GetBattleGroundTemplate(bget->bgTypeId);
+        BattleGround *bg = sBattleGroundMgr.GetBattleGroundTemplate(pBgEntrance->bgTypeId);
         if (!bg)
             return;
 
-        if ((pl->GetLevel() < bg->GetMinLevel() || pl->GetLevel() > bg->GetMaxLevel()) ||
-            (pl->GetTeam() == bget->team))
+        if ((pPlayer->GetLevel() < bg->GetMinLevel() || pPlayer->GetLevel() > bg->GetMaxLevel()) ||
+            (pPlayer->GetTeam() == pBgEntrance->team))
         {
-            SendAreaTriggerMessage("You must be in the %s and at least %u%s level to enter.", pl->GetTeam() == ALLIANCE ? "Alliance" : "Horde", bg->GetMinLevel(), bg->GetMinLevel() % 2 ? "st" : "th");
+            SendAreaTriggerMessage("You must be in the %s and at least %u%s level to enter.", pPlayer->GetTeam() == ALLIANCE ? "Alliance" : "Horde", bg->GetMinLevel(), bg->GetMinLevel() % 2 ? "st" : "th");
             return;
         }
 
-        pl->SetBattleGroundEntryPoint(bget->exit_mapId, bget->exit_X, bget->exit_Y, bget->exit_Z, bget->exit_Orientation);
-        SendBattlegGroundList(pl->GetObjectGuid(), bget->bgTypeId);
+        pPlayer->SetBattleGroundEntryPoint(pBgEntrance->exit_mapId, pBgEntrance->exit_X, pBgEntrance->exit_Y, pBgEntrance->exit_Z, pBgEntrance->exit_Orientation);
+        SendBattlegGroundList(pPlayer->GetObjectGuid(), pBgEntrance->bgTypeId);
         return;
     }
 
-    if (pl->InBattleGround())
+    if (pPlayer->InBattleGround())
     {
-        if (BattleGround* bg = pl->GetBattleGround())
-            bg->HandleAreaTrigger(pl, Trigger_ID);
+        if (BattleGround* bg = pPlayer->GetBattleGround())
+            bg->HandleAreaTrigger(pPlayer, triggerId);
         return;
     }
-    if (ZoneScript * pZoneScript = GetPlayer()->GetZoneScript())
+    if (ZoneScript* pZoneScript = pPlayer->GetZoneScript())
     {
-        if (pZoneScript->HandleAreaTrigger(_player, Trigger_ID))
+        if (pZoneScript->HandleAreaTrigger(_player, triggerId))
             return;
     }
 
     // nullptr if all values default (non teleport trigger)
-    AreaTriggerTeleport const* at = sObjectMgr.GetAreaTriggerTeleport(Trigger_ID);
-    if (!at)
+    AreaTriggerTeleport const* pTeleTrigger = sObjectMgr.GetAreaTriggerTeleport(triggerId);
+    if (!pTeleTrigger)
         return;
 
-    MapEntry const* targetMapEntry = sMapStorage.LookupEntry<MapEntry>(at->destination.mapId);
-    if (!targetMapEntry)
+    MapEntry const* pTargetMap = sMapStorage.LookupEntry<MapEntry>(pTeleTrigger->destination.mapId);
+    if (!pTargetMap)
         return;
 
-    if (at->required_event)
+    // ghost resurrected at enter attempt to dungeon with corpse (including fail enter cases)
+    if (!pPlayer->IsAlive() && pTargetMap->IsDungeon())
     {
-        if (at->required_event > 0 && !sGameEventMgr.IsActiveEvent((uint16)(at->required_event)))
+        int32 corpseMapId = 0;
+        if (Corpse *corpse = pPlayer->GetCorpse())
+            corpseMapId = corpse->GetMapId();
+
+        // Special case prior Patch 1.3 to revive your corpse if dead in Molten Core
+        if (sWorld.GetWowPatch() <= WOW_PATCH_102)
+        {
+            if (corpseMapId == 409 && triggerId == 1466)
+            {
+                pPlayer->ResurrectPlayer(0.5f);
+                pPlayer->SpawnCorpseBones();
+                pPlayer->TeleportTo(230, 458.32f, 26.52f, -70.67f, 4.95f); // Blackrock Depths
+                // pPlayer->TeleportTo(409, 1082.04f, -474.596f, -107.762f, 5.02623f); // Molten Core
+                return;
+            }
+        }
+
+        // check back way from corpse to entrance
+        uint32 instance_map = corpseMapId;
+        do
+        {
+            // most often fast case
+            if (instance_map == pTargetMap->id)
+                break;
+
+            MapEntry const* instance = sMapStorage.LookupEntry<MapEntry>(instance_map);
+            instance_map = instance && instance->IsDungeon() ? instance->parent : 0;
+        }
+        while (instance_map);
+
+        // corpse not in dungeon or some linked deep dungeons
+        if (!instance_map)
+        {
+            pPlayer->GetSession()->SendAreaTriggerMessage("You cannot enter %s while in ghost form.", pTargetMap->name);
             return;
-        else if (at->required_event < 0 && sGameEventMgr.IsActiveEvent((uint16)(-at->required_event)))
-            return;
+        }
+
+        // need find areatrigger to inner dungeon for landing point
+        if (pTeleTrigger->destination.mapId != corpseMapId)
+            if (AreaTriggerTeleport const* corpseAt = sObjectMgr.GetMapEntranceTrigger(corpseMapId))
+                pTeleTrigger = corpseAt;
+
+        // now we can resurrect player, and then check teleport requirements
+        pPlayer->ResurrectPlayer(0.5f);
+        pPlayer->SpawnCorpseBones();
     }
 
-    auto playerRank = sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_ZONE_REQUIREMENTS) ?
-        GetPlayer()->GetHonorMgr().GetRank().visualRank
-        : GetPlayer()->GetHonorMgr().GetHighestRank().visualRank;
-
-    if (!pl->IsGameMaster())
+    if (!pPlayer->IsGameMaster())
     {
-        bool missingRank = false;
-        if (at->required_pvp_rank)
+        bool const bLevelCheck = pPlayer->GetLevel() < pTeleTrigger->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL);
+        bool const bConditionCheck = pTeleTrigger->requiredCondition && !IsConditionSatisfied(pTeleTrigger->requiredCondition, pPlayer, pPlayer->GetMap(), pPlayer, CONDITION_FROM_AREATRIGGER);
+        
+        if (bLevelCheck || bConditionCheck)
         {
-            if (playerRank < at->required_pvp_rank)
-                missingRank = true;
-        }
-
-        bool missingTeam = false;
-        if (at->required_team)
-        {
-            if (GetPlayer()->GetTeam() != at->required_team)
-                missingTeam = true;
-        }
-
-        // ghost resurrected at enter attempt to dungeon with corpse (including fail enter cases)
-        if (!pl->IsAlive() && targetMapEntry->IsDungeon())
-        {
-            int32 corpseMapId = 0;
-            if (Corpse *corpse = pl->GetCorpse())
-                corpseMapId = corpse->GetMapId();
-
-            // Special case prior Patch 1.3 to revive your corpse if dead in Molten Core
-            if (sWorld.GetWowPatch() <= WOW_PATCH_102)
+            if (pTeleTrigger->message.empty())
             {
-                if (corpseMapId == 409 && Trigger_ID == 1466)
-                {
-                    pl->ResurrectPlayer(0.5f);
-                    pl->SpawnCorpseBones();
-                    GetPlayer()->TeleportTo(230, 458.32f, 26.52f, -70.67f, 4.95f); // Blackrock Depths
-                    // GetPlayer()->TeleportTo(409, 1082.04f, -474.596f, -107.762f, 5.02623f); // Molten Core
-                    return;
-                }
-            }
-
-            // check back way from corpse to entrance
-            uint32 instance_map = corpseMapId;
-            do
-            {
-                // most often fast case
-                if (instance_map == targetMapEntry->id)
-                    break;
-
-                MapEntry const* instance = sMapStorage.LookupEntry<MapEntry>(instance_map);
-                instance_map = instance && instance->IsDungeon() ? instance->parent : 0;
-            }
-            while (instance_map);
-
-            // corpse not in dungeon or some linked deep dungeons
-            if (!instance_map)
-            {
-                pl->GetSession()->SendAreaTriggerMessage("You cannot enter %s while in ghost form.", targetMapEntry->name);
-                return;
-            }
-
-            // need find areatrigger to inner dungeon for landing point
-            if (at->destination.mapId != corpseMapId)
-                if (AreaTriggerTeleport const* corpseAt = sObjectMgr.GetMapEntranceTrigger(corpseMapId))
-                    at = corpseAt;
-            // now we can resurrect player, and then check teleport requirements
-            pl->ResurrectPlayer(0.5f);
-            pl->SpawnCorpseBones();
-        }
-
-        uint32 missingLevel = 0;
-        if (GetPlayer()->GetLevel() < at->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL))
-            missingLevel = at->requiredLevel;
-
-        // must have one or the other, report the first one that's missing
-        uint32 missingItem = 0;
-        if (at->requiredItem)
-        {
-            if (!pl->HasItemCount(at->requiredItem, 1) &&
-                    (!at->requiredItem2 || !GetPlayer()->HasItemCount(at->requiredItem2, 1)))
-                missingItem = at->requiredItem;
-        }
-        else if (at->requiredItem2 && !GetPlayer()->HasItemCount(at->requiredItem2, 1))
-            missingItem = at->requiredItem2;
-
-        // La verification de naxxramas.
-        if (Trigger_ID == 4055) // Naxxramas (Entrance)
-        {
-            if (!GetPlayer()->GetQuestRewardStatus(9121) && !GetPlayer()->GetQuestRewardStatus(9122) && !GetPlayer()->GetQuestRewardStatus(9123))
-            {
-                SendAreaTriggerMessage(at->message.c_str());
-                return;
-            }
-        }
-        // fin Verification Naxxramas
-
-        uint32 missingQuest = 0;
-        if (at->requiredQuest && !GetPlayer()->GetQuestRewardStatus(at->requiredQuest))
-            missingQuest = at->requiredQuest;
-
-        if (missingLevel || missingItem || missingQuest || missingRank || missingTeam)
-        {
-            if (at->message.empty())
-            { 
-                if (missingItem)
-                    SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED_AND_ITEM), at->requiredLevel, ObjectMgr::GetItemPrototype(missingItem)->Name1);
-                else if (missingQuest)
-                    SendAreaTriggerMessage("You must complete %s to enter", sObjectMgr.GetQuestTemplate(missingQuest)->GetTitle().c_str());
-                else if (missingLevel)
-                    SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), missingLevel);
-                else if (missingRank)
-                    SendAreaTriggerMessage("You must be a %s or higher rank in order to enter the %s.", pl->GetTeam() == HORDE ? HordePvPRankNames[at->required_pvp_rank] : AlliancePvPRankNames[at->required_pvp_rank], targetMapEntry->name);
-                else if (missingTeam)
-                    SendAreaTriggerMessage("Only %s may enter here", at->required_team == HORDE ? "Horde" : "Alliance");
+                if (bLevelCheck)
+                    SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), pTeleTrigger->requiredLevel);
             }
             else
             {
-                SendAreaTriggerMessage(at->message.c_str());
+                SendAreaTriggerMessage(pTeleTrigger->message.c_str());
             }
             return;
         }
     }
 
-    GetPlayer()->TeleportTo(at->destination);
+    pPlayer->TeleportTo(pTeleTrigger->destination);
 }
 
 void WorldSession::HandleUpdateAccountData(WorldPacket & recv_data)
@@ -1077,54 +1014,54 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data) {
     recv_data >> guid;
     // DEBUG_LOG("Party Stats guid is " I64FMTD,guid);
 
-    Player *pl = sObjectMgr.GetPlayer(guid);
-    if(pl)
+    Player *pPlayer = sObjectMgr.GetPlayer(guid);
+    if(pPlayer)
     {
         WorldPacket data(MSG_INSPECT_HONOR_STATS, (8 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
         data << guid;                                       // player guid
-        data << (uint8)pl->GetHonorMgr().GetHighestRank().rank;           // Highest Rank
+        data << (uint8)pPlayer->GetHonorMgr().GetHighestRank().rank;           // Highest Rank
 
                                                                           // Today Honorable and Dishonorable Kills
-        data << pl->GetUInt32Value(PLAYER_FIELD_SESSION_KILLS);
+        data << pPlayer->GetUInt32Value(PLAYER_FIELD_SESSION_KILLS);
 
         // Yesterday Honorable Kills
-        data << pl->GetUInt16Value(PLAYER_FIELD_YESTERDAY_KILLS, 0);
+        data << pPlayer->GetUInt16Value(PLAYER_FIELD_YESTERDAY_KILLS, 0);
 
         // Unknown (deprecated, yesterday dishonourable?)
         data << (uint16)0;
 
         // Last Week Honorable Kills
-        data << pl->GetUInt16Value(PLAYER_FIELD_LAST_WEEK_KILLS, 0);
+        data << pPlayer->GetUInt16Value(PLAYER_FIELD_LAST_WEEK_KILLS, 0);
 
         // Unknown (deprecated, last week dishonourable?)
         data << (uint16)0;
 
         // This Week Honorable kills
-        data << pl->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
+        data << pPlayer->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
 
         // Unknown (deprecated, this week dishonourable?)
         data << (uint16)0;
 
         // Lifetime Honorable Kills
-        data << pl->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
+        data << pPlayer->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
 
         // Lifetime Dishonorable Kills
-        data << pl->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
+        data << pPlayer->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
 
         // Yesterday Honor
-        data << pl->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
+        data << pPlayer->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
 
         // Last Week Honor
-        data << pl->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
+        data << pPlayer->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
 
         // This Week Honor
-        data << pl->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
+        data << pPlayer->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
 
         // Last Week Standing
-        data << pl->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
+        data << pPlayer->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
 
         // Rank progress bar
-        data << (uint8)pl->GetByteValue(PLAYER_FIELD_BYTES2, 0);
+        data << (uint8)pPlayer->GetByteValue(PLAYER_FIELD_BYTES2, 0);
 
         SendPacket(&data);
     } else

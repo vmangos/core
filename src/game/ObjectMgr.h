@@ -66,12 +66,7 @@ struct AreaTriggerTeleport
 {
     std::string message;
     uint8  requiredLevel = 0;
-    uint32 requiredItem = 0;
-    uint32 requiredItem2 = 0;
-    uint32 requiredQuest = 0;
-    int required_event = 0;
-    uint8 required_pvp_rank = 0;
-    uint16 required_team = 0;
+    uint32 requiredCondition = 0;
     WorldLocation destination;
 };
 
@@ -687,16 +682,16 @@ class ObjectMgr
         // Return 0 if no such item exists.
         uint32 GetQuestStartingItemID(uint32 quest_id) const;
 
-        uint32 GetQuestForAreaTrigger(uint32 Trigger_ID) const
+        uint32 GetQuestForAreaTrigger(uint32 triggerId) const
         {
-            auto itr = m_QuestAreaTriggerMap.find(Trigger_ID);
+            auto itr = m_QuestAreaTriggerMap.find(triggerId);
             if(itr != m_QuestAreaTriggerMap.end())
                 return itr->second;
             return 0;
         }
-        bool IsTavernAreaTrigger(uint32 Trigger_ID) const
+        bool IsTavernAreaTrigger(uint32 triggerId) const
         {
-            return m_TavernAreaTriggerSet.find(Trigger_ID) != m_TavernAreaTriggerSet.end();
+            return m_TavernAreaTriggerSet.find(triggerId) != m_TavernAreaTriggerSet.end();
         }
 
         bool IsGameObjectForQuests(uint32 entry) const

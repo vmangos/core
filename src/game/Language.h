@@ -76,7 +76,7 @@ enum MangosStrings
     LANG_NON_EXIST_CHARACTER            = 47,
     LANG_FRIEND_IGNORE_UNKNOWN          = 48,
     LANG_LEVEL_MINREQUIRED              = 49,
-    LANG_LEVEL_MINREQUIRED_AND_ITEM     = 50,
+    //                                  = 50, not used
     LANG_NPC_TAINER_HELLO               = 51,
     LANG_COMMAND_INVALID_ITEM_COUNT     = 52,
     LANG_COMMAND_MAIL_ITEMS_LIMIT       = 53,
@@ -360,8 +360,8 @@ enum MangosStrings
     LANG_TRIGGER_QUEST                  = 365,
     LANG_TRIGGER_EXPLORE_QUEST          = 366,
     LANG_TRIGGER_REQ_LEVEL              = 367,
-    LANG_TRIGGER_REQ_ITEMS              = 368,
-    LANG_TRIGGER_REQ_QUEST              = 369,
+    //                                  = 368, not used
+    //                                  = 369, not used
     //                                    370 used in master branch
     //                                    371 used in master branch
     //                                    372 used in master branch

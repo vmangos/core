@@ -37,7 +37,8 @@ char const* conditionSourceToStr[] =
     "vendor",
     "spell_area",
     "scripted map event",
-    "script action"
+    "script action",
+    "areatrigger"
 };
 
 // Stores what params need to be provided to each condition type.
@@ -98,6 +99,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  48
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  49
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  50
+    CONDITION_REQ_TARGET_PLAYER,      //  51
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -541,6 +543,20 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             if (GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(m_value1))
                 if (GameObject* pGameObject = pMap->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, m_value1)))
                     return sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(pGameObject, map, source, conditionSourceType);
+            return false;
+        }
+        case CONDITION_PVP_RANK:
+        {
+            int8 visualRank = target->ToPlayer()->GetHonorMgr().GetRank().visualRank;
+            switch (m_value2)
+            {
+                case 0:
+                    return visualRank == m_value1;
+                case 1:
+                    return visualRank >= m_value1;
+                case 2:
+                    return visualRank <= m_value1;
+            }
             return false;
         }
     }
@@ -1008,11 +1024,6 @@ bool ConditionEntry::IsValid()
                     return true;
                 }
             }
-            if (m_value2 < 0 || m_value2 > 1)
-            {
-                sLog.outErrorDb("NPC Entry condition (entry %u, type %u) has invalid criteria %u (must be 0 or 1)", m_entry, m_condition, m_value1);
-                return false;
-            }
             break;
         }
         case CONDITION_WAR_EFFORT_STAGE:
@@ -1085,13 +1096,27 @@ bool ConditionEntry::IsValid()
         {
             if (!sObjectMgr.IsExistingGameObjectGuid(m_value1))
             {
-                sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %u) has invalid nonexistent GameObject guid %u", m_entry, m_condition, m_value1);
+                sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %u) uses nonexistent GameObject guid %u", m_entry, m_condition, m_value1);
                 return false;
             }
             const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_PVP_RANK:
+        {
+            if (m_value1 > 14)
+            {
+                sLog.outErrorDb("CONDITION_PVP_RANK (entry %u, type %u) has invalid honor rank %u, skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+            if (m_value2 > 2)
+            {
+                sLog.outErrorDb("CONDITION_PVP_RANK (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
                 return false;
             }
             break;

@@ -212,6 +212,10 @@ enum ConditionType
                                                             // Requirement: Map
                                                             // Value1: guid
                                                             // Value2: condition_id
+    CONDITION_PVP_RANK              = 51,                   // Checks the player's honor rank.
+                                                            // Requirement: Player Target
+                                                            // Value1: rank
+                                                            // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
 };
 
 enum ConditionFlags
@@ -232,6 +236,7 @@ enum ConditionSource                                        // From where was th
     CONDITION_FROM_SPELL_AREA       = 7,                    // Used to check a condition from spell_area table
     CONDITION_FROM_MAP_EVENT        = 8,                    // Used to check conditions from scripted map events
     CONDITION_FROM_DBSCRIPTS        = 9,                    // Used to check a condition from DB Scripts Engine
+    CONDITION_FROM_AREATRIGGER      = 10,                   // Used to check a condition from areatrigger_teleport table
 };
 
 enum ConditionRequirement
