@@ -11,8 +11,8 @@ INSERT INTO `migrations` VALUES ('20191209173550');
 
 DELETE FROM `mangos_string` WHERE `entry` IN (636, 637, 638);
 UPDATE `mangos_string` SET `entry`=372 WHERE `entry`=640;
-INSERT INTO `mangos_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (353, 'NO COOLDWON cheat is ON', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
-INSERT INTO `mangos_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (354, 'NO COOLDWON cheat is OFF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `mangos_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (353, 'NO COOLDOWN cheat is ON', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+INSERT INTO `mangos_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (354, 'NO COOLDOWN cheat is OFF', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `mangos_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (355, 'You set no cooldown mode to %s for %s.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `mangos_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (356, 'Your no cooldown mode has been turned %s by %s.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `mangos_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (368, 'You set god mode to %s for %s.', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
