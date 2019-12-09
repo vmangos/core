@@ -198,59 +198,6 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleGMOptionsCommand(char* args)
-{
-    if (!args)
-        return false;
-
-    std::string sArgs(args);
-    bool enable = true;
-    uint32 flags = 0;
-    if (sArgs.find("off") != std::string::npos)
-        enable = false;
-    if (sArgs.find("OFF") != std::string::npos)
-        enable = false;
-    if (sArgs.find("GOD") != std::string::npos || sArgs.find("god") != std::string::npos)
-        flags |= PLAYER_CHEAT_GOD;
-    if (sArgs.find("CD") != std::string::npos || sArgs.find("cd") != std::string::npos || sArgs.find("cooldown") != std::string::npos || sArgs.find("COOLDOWN") != std::string::npos)
-        flags |= PLAYER_CHEAT_NO_COOLDOWN;
-    if (sArgs.find("CAST") != std::string::npos || sArgs.find("cast") != std::string::npos)
-        flags |= PLAYER_CHEAT_NO_CAST_TIME;
-    if (sArgs.find("SPEED") != std::string::npos || sArgs.find("speed") != std::string::npos)
-        flags |= PLAYER_CHEAT_NO_MOD_SPEED;
-    if (sArgs.find("power") != std::string::npos || sArgs.find("POWER") != std::string::npos || sArgs.find("mana") != std::string::npos || sArgs.find("MANA") != std::string::npos)
-        flags |= PLAYER_CHEAT_NO_POWER;
-    if (sArgs.find("crit") != std::string::npos || sArgs.find("CRIT") != std::string::npos)
-        flags |= PLAYER_CHEAT_ALWAYS_CRIT;
-    if (sArgs.find("checkcast") != std::string::npos || sArgs.find("CHECKCAST") != std::string::npos || sArgs.find("check") != std::string::npos || sArgs.find("CHECK") != std::string::npos)
-        flags |= PLAYER_CHEAT_NO_CHECK_CAST;
-    if (sArgs.find("proc") != std::string::npos || sArgs.find("PROC") != std::string::npos)
-        flags |= PLAYER_CHEAT_ALWAYS_PROC;
-    if (sArgs.find("video") != std::string::npos || sArgs.find("VIDEO") != std::string::npos)
-        flags |= PLAYER_VIDEO_MODE;
-
-    Player* pTarget = GetSelectedPlayer();
-    if (!pTarget)
-        pTarget = m_session->GetPlayer();
-    PSendSysMessage("%s flags 0x%x for `%s`.", enable ? "Adding" : "Removing", flags, pTarget->GetName());
-    if (enable)
-        pTarget->EnableOption(flags);
-    else
-        pTarget->RemoveOption(flags);
-
-    if (flags & PLAYER_VIDEO_MODE)
-    {
-        UpdateMask m;
-        m.SetCount(UNIT_END);
-        m.SetBit(UNIT_FIELD_FLAGS);
-        pTarget->RefreshBitsForVisibleUnits(&m, TYPEMASK_UNIT);
-        m.SetCount(PLAYER_END);
-        m.SetBit(UNIT_FIELD_FLAGS);
-        pTarget->RefreshBitsForVisibleUnits(&m, TYPEMASK_PLAYER);
-    }
-    return true;
-}
-
 /// Display the list of GMs
 bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 {

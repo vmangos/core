@@ -233,7 +233,7 @@ public:
             case 1:
             {
                 Player* p = GetTestPlayer(0, TESTPLAYER_MAXLEVEL);
-                p->EnableOption(PLAYER_CHEAT_NO_CAST_TIME);
+                p->EnableCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
                 p->CastSpell(p, SPELL_SUMMON_IMP, false);
                 Wait(2000); // GCD
                 break;
@@ -241,7 +241,7 @@ public:
             case 2:
             {
                 Player* p = GetTestPlayer(0, TESTPLAYER_MAXLEVEL);
-                p->RemoveOption(PLAYER_CHEAT_NO_CAST_TIME);
+                p->RemoveCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
                 p->CastSpell(p, SPELL_SUMMON_IMP, false);
                 Wait(500);
                 break;

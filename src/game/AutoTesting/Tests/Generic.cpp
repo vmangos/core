@@ -40,8 +40,8 @@ public:
             {
                 Player* player1 = GetTestPlayer(0);
                 Player* player2 = GetTestPlayer(1);
-                player1->EnableOption(PLAYER_CHEAT_NO_CAST_TIME);
-                player2->EnableOption(PLAYER_CHEAT_NO_CAST_TIME);
+                player1->EnableCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
+                player2->EnableCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
                 player1->AddItem(ITEM_SOUL_SHARD, 1);
                 player2->AddItem(ITEM_SOUL_SHARD, 1);
                 player1->CastSpell(player1, SPELL_SUMMON_SUCCUBUS, false);

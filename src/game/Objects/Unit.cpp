@@ -602,8 +602,6 @@ void Unit::RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage)
 {
     if (!HasAuraType(auraType))
         return;
-    if (IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE))
-        return;
 
     // The chance to dispel an aura depends on the damage taken with respect to the casters level.
     uint32 max_dmg = GetLevel() > 8 ? 25 * GetLevel() - 150 : 50;
@@ -627,8 +625,6 @@ void Unit::RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage)
 void Unit::RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype)
 {
     if (!HasAuraType(SPELL_AURA_MOD_FEAR))
-        return;
-    if (IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE))
         return;
 
     // Formula derived from Youfie's post here:
@@ -2209,7 +2205,7 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance, bool SpellCasted) const
 {
     // Nostalrius : cheat.
-    if (IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_ALWAYS_CRIT))
+    if (IsPlayer() && ToPlayer()->HasCheatOption(PLAYER_CHEAT_ALWAYS_CRIT))
         return MELEE_HIT_CRIT;
 
     if (pVictim->IsCreature() && ((Creature*)pVictim)->IsInEvadeMode())
@@ -2345,9 +2341,6 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
                 tmp = crit_chance;
                 if (IsPlayer() && SpellCasted && tmp > 0)
                 {
-                    if ((IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
-                        (pVictim->IsPlayer() && pVictim->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
-                        tmp = 0;
                     if (roll_chance_i(tmp / 100))
                     {
                         DEBUG_LOG("RollMeleeOutcomeAgainst: BLOCKED CRIT");
@@ -2510,8 +2503,7 @@ bool Unit::IsSpellBlocked(WorldObject* pCaster, Unit* pVictim, SpellEntry const*
     if (!pVictim->IsPlayer() && pVictim->GetLevel() < 10)
         blockChance *= pVictim->GetLevel() / 10.0f;
 
-    if ((IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) || (blockChance < 0) ||
-        (pCaster->IsPlayer() && pCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
+    if (blockChance < 0)
         blockChance = 0;
 
     return roll_chance_f(blockChance);
@@ -5102,7 +5094,7 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
     if (IsCreature() && !GetOwnerGuid().IsPlayer())
         return false;
 
-    if (IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_ALWAYS_CRIT))
+    if (IsPlayer() && ToPlayer()->HasCheatOption(PLAYER_CHEAT_ALWAYS_CRIT))
         return true;
 
     // not critting spell
@@ -5191,11 +5183,9 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
 
     DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "%s [ID:%u] Crit chance %f.", spellProto->SpellName[2].c_str(), spellProto->Id, crit_chance);
 
-    if ((IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
-        (pVictim->IsPlayer() && pVictim->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
-        crit_chance = 0;
     if (roll_chance_f(crit_chance))
         return true;
+
     return false;
 }
 

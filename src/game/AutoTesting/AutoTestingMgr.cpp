@@ -122,8 +122,8 @@ Player* SingleTest::GetTestPlayer(uint32 num, uint32 options)
         Fail("Unable to find player %u", num);
     if (!initialized)
     {
-        p->SetGodMode(!(options & TESTPLAYER_NO_GODMODE));
-        p->SetOption(PLAYER_CHEAT_UNRANDOMIZE, true);
+        p->SetCheatGod(!(options & TESTPLAYER_NO_GODMODE));
+        //p->SetCheatOption(PLAYER_CHEAT_UNRANDOMIZE, true);
     }
     if (options & TESTPLAYER_FFA_ON)
         p->SetFFAPvP(true);

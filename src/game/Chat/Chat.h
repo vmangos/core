@@ -181,14 +181,29 @@ class MANGOS_DLL_SPEC ChatHandler
         void CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand);
         void FillFullCommandsName(ChatCommand* table, std::string prefix);
         ChatCommand* getCommandTable();
-        bool HandleGodCommand(char *);
-        bool HandleGMOptionsCommand(char *);
+        
         bool HandleAnticheatCommand(char *);
         bool HandleClientInfosCommand(char* );
         bool HandleClientSearchCommand(char* );
         bool HandleReloadAnticheatCommand(char*);
         bool HandleRunTestCommand(char* );
         bool HandleViewLogCommand(char* );
+
+        //Cheats
+        bool HandleCheatStatusCommand(char *);
+        bool HandleCheatGodCommand(char *);
+        bool HandleCheatCooldownCommand(char *);
+        bool HandleCheatCastTimeCommand(char *);
+        bool HandleCheatPowerCommand(char *);
+        bool HandleCheatImmuneToAuraCommand(char *);
+        bool HandleCheatAlwaysCritCommand(char *);
+        bool HandleCheatNoCastCheckCommand(char *);
+        bool HandleCheatAlwaysProcCommand(char *);
+        bool HandleCheatTriggerPassCommand(char *);
+        bool HandleCheatIgnoreTriggersCommand(char *);
+        bool HandleCheatWaterwalkCommand(char* args);
+        bool HandleCheatWallclimbCommand(char* args);
+
         //Custom
         bool HandleListAddonsCommand(char *);
         bool HandleUpdateWorldStateCommand(char *);
@@ -891,8 +906,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCombatStopCommand(char* args);
         bool HandleRepairitemsCommand(char* args);
         bool HandleStableCommand(char* args);
-        bool HandleWaterwalkCommand(char* args);
-        bool HandleWallclimbCommand(char* args);
         bool HandleQuitCommand(char* args);
 
         //! Development Commands

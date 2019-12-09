@@ -575,7 +575,7 @@ Player::Player(WorldSession *session) : Unit(),
     // Phasing
     worldMask = WORLD_DEFAULT_CHAR;
     i_AI = nullptr;
-    _playerOptions = 0x0;
+    m_cheatOptions = 0x0;
     m_DbSaveDisabled = false;
 
     m_lastFromClientCastedSpellID = 0;
@@ -2700,14 +2700,103 @@ void Player::SetGMVisible(bool on, bool notify)
     CharacterDatabase.PExecute("UPDATE characters SET extra_flags = %u WHERE guid = %u", m_ExtraFlags, GetGUIDLow());
 }
 
-void Player::SetGodMode(bool on, bool notify)
+void Player::SetCheatGod(bool on, bool notify)
 {
-    SetOption(PLAYER_CHEAT_GOD, on);
+    SetCheatOption(PLAYER_CHEAT_GOD, on);
 
     if (notify)
     {
-        ChatHandler(this).SendSysMessage(on ? LANG_GOD_ON : LANG_GOD_OFF);
         GetSession()->SendNotification(on ? LANG_GOD_ON : LANG_GOD_OFF);
+    }
+}
+
+void Player::SetCheatNoCooldown(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_NO_COOLDOWN, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_NO_CD_ON : LANG_CHEAT_NO_CD_OFF);
+    }
+}
+
+void Player::SetCheatInstantCast(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_INSTANT_CAST_ON : LANG_CHEAT_INSTANT_CAST_OFF);
+    }
+}
+
+void Player::SetCheatNoPowerCost(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_NO_POWER, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_NO_POWER_COST_ON : LANG_CHEAT_NO_POWER_COST_OFF);
+    }
+}
+
+void Player::SetCheatImmuneToAura(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_IMMUNE_AURA, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_IMMUNE_TO_AURA_ON : LANG_CHEAT_IMMUNE_TO_AURA_OFF);
+    }
+}
+
+void Player::SetCheatAlwaysCrit(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_ALWAYS_CRIT, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_ALWAYS_CRIT_ON : LANG_CHEAT_ALWAYS_CRIT_OFF);
+    }
+}
+
+void Player::SetCheatNoCastCheck(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_NO_CHECK_CAST, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_NO_CAST_CHECK_ON : LANG_CHEAT_NO_CAST_CHECK_OFF);
+    }
+}
+
+void Player::SetCheatAlwaysProc(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_ALWAYS_PROC, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_ALWAYS_PROC_ON : LANG_CHEAT_ALWAYS_PROC_OFF);
+    }
+}
+
+void Player::SetCheatTriggerPass(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_TRIGGER_PASS, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_TRIGGER_PASS_ON : LANG_CHEAT_TRIGGER_PASS_OFF);
+    }
+}
+
+void Player::SetCheatIgnoreTriggers(bool on, bool notify)
+{
+    SetCheatOption(PLAYER_CHEAT_IGNORE_TRIGGERS, on);
+
+    if (notify)
+    {
+        GetSession()->SendNotification(on ? LANG_CHEAT_IGNORE_TRIGGERS_ON : LANG_CHEAT_IGNORE_TRIGGERS_OFF);
     }
 }
 
@@ -7210,7 +7299,7 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
 
             ApplySpellMod(spellInfo->Id, SPELLMOD_CHANCE_OF_SUCCESS, chance);
 
-            if (roll_chance_f(chance) || HasOption(PLAYER_CHEAT_ALWAYS_PROC))
+            if (roll_chance_f(chance) || HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC))
             {
                 uint32 charges = item->GetEnchantmentCharges(EnchantmentSlot(e_slot));
 
@@ -14919,7 +15008,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
                     SetAcceptWhispers(true);
                 break;
         }
-        SetGodMode(true);
+        SetCheatGod(true);
     }
 
     if (extraflags & PLAYER_EXTRA_WHISP_RESTRICTION)
@@ -20856,6 +20945,9 @@ bool Player::ChangeQuestsForRace(uint8 oldRace, uint8 newRace)
 
 bool Player::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex index, bool castOnSelf) const
 {
+    if (HasCheatOption(PLAYER_CHEAT_IMMUNE_AURA) && spellInfo->EffectApplyAuraName[index] && !spellInfo->IsPositiveEffect(index))
+        return true;
+
     switch (spellInfo->Effect[index])
     {
         case SPELL_EFFECT_ATTACK_ME:

@@ -1847,7 +1847,7 @@ bool ChatHandler::HandleDieHelper(Unit* target)
             return false;
 
         if (player->IsGod())
-            player->SetGodMode(false);
+            player->SetCheatGod(false);
     }
 
     if (target->IsAlive())

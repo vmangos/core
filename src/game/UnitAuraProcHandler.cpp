@@ -459,7 +459,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     if (Player* modOwner = GetSpellModOwner())
     {
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_CHANCE_OF_SUCCESS, chance);
-        if (modOwner->HasOption(PLAYER_CHEAT_ALWAYS_PROC))
+        if (modOwner->HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC))
             return true;
     }
 

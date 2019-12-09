@@ -753,6 +753,9 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
 
     Player* const pPlayer = GetPlayer();
 
+    if (pPlayer->HasCheatOption(PLAYER_CHEAT_IGNORE_TRIGGERS))
+        return;
+
     if (pPlayer->IsTaxiFlying())
     {
         DEBUG_LOG("Player '%s' (GUID: %u) in flight, ignore Area Trigger ID: %u", pPlayer->GetName(), pPlayer->GetGUIDLow(), triggerId);
@@ -885,7 +888,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         pPlayer->SpawnCorpseBones();
     }
 
-    if (!pPlayer->IsGameMaster())
+    if (!pPlayer->IsGameMaster() && !pPlayer->HasCheatOption(PLAYER_CHEAT_TRIGGER_PASS))
     {
         bool const bLevelCheck = pPlayer->GetLevel() < pTeleTrigger->requiredLevel && !sWorld.getConfig(CONFIG_BOOL_INSTANCE_IGNORE_LEVEL);
         bool const bConditionCheck = pTeleTrigger->requiredCondition && !IsConditionSatisfied(pTeleTrigger->requiredCondition, pPlayer, pPlayer->GetMap(), pPlayer, CONDITION_FROM_AREATRIGGER);

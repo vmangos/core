@@ -596,8 +596,6 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
         }
-        if (target->HasOption(PLAYER_VIDEO_MODE) && isType(TYPEMASK_UNIT))
-            updateMask->SetBit(UNIT_FIELD_FLAGS);
     }
     else                                                    // case UPDATETYPE_VALUES
     {
@@ -693,9 +691,6 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                          (index >= PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE  && index <= (PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE + 6)) ||
                          (index >= PLAYER_FIELD_POSSTAT0    && index <= PLAYER_FIELD_POSSTAT4))
                     *data << uint32(m_floatValues[index]);
-                // Video maker - hide unit name, etc ...
-                else if (index == UNIT_FIELD_FLAGS && target->HasOption(PLAYER_VIDEO_MODE) && target != this)
-                    *data << (m_uint32Values[index] | UNIT_FLAG_NOT_SELECTABLE);
                 // Gamemasters should be always able to select units and view auras
                 else if (index == UNIT_FIELD_FLAGS && target->IsGameMaster())
                     *data << ((m_uint32Values[index] | UNIT_FLAG_AURAS_VISIBLE) & ~UNIT_FLAG_NOT_SELECTABLE);
@@ -3628,10 +3623,6 @@ SpellMissInfo WorldObject::MagicSpellHitResult(Unit* pVictim, SpellEntry const* 
     int32 hitChance = MagicSpellHitChance(pVictim, spell, spellPtr);
     int32 missChance = 10000 - hitChance;
     int32 rand = irand(0, 10000);
-
-    if ((IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
-        (pVictim->IsPlayer() && pVictim->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
-        missChance = 0;
 
     if (rand < missChance)
         return SPELL_MISS_RESIST;

@@ -384,19 +384,18 @@ enum AtLoginFlags
     AT_LOGIN_FIRST             = 0x20,
 };
 
-// Nostalrius
-enum PlayerCheatOptions
+enum PlayerCheatOptions : uint16
 {
-    PLAYER_CHEAT_GOD           = 0x001,
-    PLAYER_CHEAT_NO_COOLDOWN   = 0x002,
-    PLAYER_CHEAT_NO_CAST_TIME  = 0x004,
-    PLAYER_CHEAT_NO_POWER      = 0x008,
-    PLAYER_CHEAT_NO_MOD_SPEED  = 0x010,
-    PLAYER_CHEAT_ALWAYS_CRIT   = 0x020,
-    PLAYER_CHEAT_NO_CHECK_CAST = 0x040,
-    PLAYER_CHEAT_ALWAYS_PROC   = 0x080,
-    PLAYER_VIDEO_MODE          = 0x100,
-    PLAYER_CHEAT_UNRANDOMIZE   = 0x200,
+    PLAYER_CHEAT_GOD             = 0x001,
+    PLAYER_CHEAT_NO_COOLDOWN     = 0x002,
+    PLAYER_CHEAT_NO_CAST_TIME    = 0x004,
+    PLAYER_CHEAT_NO_POWER        = 0x008,
+    PLAYER_CHEAT_IMMUNE_AURA     = 0x010,
+    PLAYER_CHEAT_ALWAYS_CRIT     = 0x020,
+    PLAYER_CHEAT_NO_CHECK_CAST   = 0x040,
+    PLAYER_CHEAT_ALWAYS_PROC     = 0x080,
+    PLAYER_CHEAT_TRIGGER_PASS    = 0x100,
+    PLAYER_CHEAT_IGNORE_TRIGGERS = 0x200,
 };
 
 typedef std::map<uint32, QuestStatusData> QuestStatusMap;
@@ -916,33 +915,43 @@ class MANGOS_DLL_SPEC Player final: public Unit
     private:
         uint32 m_gmInvisibilityLevel;
         uint32 m_currentTicketCounter;
-        uint32 _playerOptions;
+        uint16 m_cheatOptions;
     public:
         bool IsAcceptTickets() const { return GetSession()->GetSecurity() >= SEC_GAMEMASTER && (m_ExtraFlags & PLAYER_EXTRA_GM_ACCEPT_TICKETS); }
         void SetAcceptTicket(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_GM_ACCEPT_TICKETS; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_ACCEPT_TICKETS; }
-
         bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
         void SetGameMaster(bool on, bool notify = false);
         bool IsGMChat() const { return GetSession()->GetSecurity() >= SEC_MODERATOR && (m_ExtraFlags & PLAYER_EXTRA_GM_CHAT); }
         void SetGMChat(bool on, bool notify = false);
         bool IsTaxiCheater() const { return m_ExtraFlags & PLAYER_EXTRA_TAXICHEAT; }
         void SetTaxiCheater(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_TAXICHEAT; else m_ExtraFlags &= ~PLAYER_EXTRA_TAXICHEAT; }
+        void SetPvPDeath(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_PVP_DEATH; else m_ExtraFlags &= ~PLAYER_EXTRA_PVP_DEATH; }
         bool IsGMVisible() const { return !(m_ExtraFlags & PLAYER_EXTRA_GM_INVISIBLE); }
         void SetGMVisible(bool on, bool notify = false);
-        void SetPvPDeath(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_PVP_DEATH; else m_ExtraFlags &= ~PLAYER_EXTRA_PVP_DEATH; }
-        void SetGodMode(bool on, bool notify = false);
-        bool IsGod() const { return HasOption(PLAYER_CHEAT_GOD); }
-
-        bool HasOption(uint32 o) const { return (_playerOptions & o); }
-        void EnableOption(uint32 o)    { _playerOptions |= o; }
-        void RemoveOption(uint32 o)    { _playerOptions &= (~o); }
-        void SetOption(PlayerCheatOptions o, bool on)
+        
+        void SetCheatGod(bool on, bool notify = false);
+        bool IsGod() const { return HasCheatOption(PLAYER_CHEAT_GOD); }
+        void SetCheatNoCooldown(bool on, bool notify = false);
+        void SetCheatInstantCast(bool on, bool notify = false);
+        void SetCheatNoPowerCost(bool on, bool notify = false);
+        void SetCheatImmuneToAura(bool on, bool notify = false);
+        void SetCheatAlwaysCrit(bool on, bool notify = false);
+        void SetCheatNoCastCheck(bool on, bool notify = false);
+        void SetCheatAlwaysProc(bool on, bool notify = false);
+        void SetCheatTriggerPass(bool on, bool notify = false);
+        void SetCheatIgnoreTriggers(bool on, bool notify = false);
+        uint16 GetCheatOptions() const { return m_cheatOptions; }
+        bool HasCheatOption(PlayerCheatOptions o) const { return (m_cheatOptions & o); }
+        void EnableCheatOption(PlayerCheatOptions o)    { m_cheatOptions |= o; }
+        void RemoveCheatOption(PlayerCheatOptions o)    { m_cheatOptions &= (~o); }
+        void SetCheatOption(PlayerCheatOptions o, bool on)
         {
             if (on)
-                EnableOption(o);
+                EnableCheatOption(o);
             else
-                RemoveOption(o);
+                RemoveCheatOption(o);
         }
+
         uint32 GetGMInvisibilityLevel() const { return m_gmInvisibilityLevel; }
         void SetGMInvisibilityLevel(uint32 level) { m_gmInvisibilityLevel = level; }
         uint32 GetGMTicketCounter() const { return m_currentTicketCounter; }

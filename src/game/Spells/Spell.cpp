@@ -1549,9 +1549,6 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
     for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
         if (unit->IsEffectResist(m_spellInfo, eff))
         {
-            if ((pRealUnitCaster && pRealUnitCaster->IsPlayer() && pRealUnitCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
-                (unit->IsPlayer() && unit->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
-                break;
             effectMask &= ~(1 << eff);
             if (!effectMask)
                 return;
@@ -3354,8 +3351,8 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         // Fill cost data
         m_powerCost = CalculatePowerCost(m_spellInfo, m_casterUnit, this, m_CastItem);
 
-        if (Player* pPlayerCaster = m_caster->ToPlayer())
-            if (pPlayerCaster->HasOption(PLAYER_CHEAT_NO_POWER))
+        if (Player* pPlayer = m_caster->ToPlayer())
+            if (pPlayer->HasCheatOption(PLAYER_CHEAT_NO_POWER))
                 m_powerCost = 0;
 
         if (!IsChannelingVisual())
@@ -3398,7 +3395,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         m_casttime = m_spellInfo->GetCastTime(this);
 
         if (Player* pPlayerCaster = m_caster->ToPlayer())
-            if (pPlayerCaster->HasOption(PLAYER_CHEAT_NO_CAST_TIME))
+            if (pPlayerCaster->HasCheatOption(PLAYER_CHEAT_NO_CAST_TIME))
                 m_casttime = 0;
 
         m_duration = m_spellInfo->CalculateDuration(m_caster);
@@ -4004,8 +4001,14 @@ void Spell::SendSpellCooldown()
     if (m_spellInfo->Attributes & (SPELL_ATTR_DISABLED_WHILE_ACTIVE | SPELL_ATTR_PASSIVE))
         return;
 
-    if (m_caster->ToPlayer() && m_caster->ToPlayer()->HasOption(PLAYER_CHEAT_NO_COOLDOWN))
-        return;
+    if (Player* pPlayer = m_casterUnit->ToPlayer())
+    {
+        if (pPlayer->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
+        {
+            pPlayer->RemoveSpellCooldown(m_spellInfo->Id, true);
+            return;
+        }
+    }
 
     m_casterUnit->AddSpellAndCategoryCooldowns(m_spellInfo, m_CastItem ? m_CastItem->GetEntry() : 0, this);
 }
@@ -4290,7 +4293,7 @@ void Spell::HandleAddTargetTriggerAuras()
                 // Calculate chance at that moment (can be depend for example from combo points)
                 int32 auraBasePoints = (*i)->GetBasePoints();
                 int32 chance = m_casterUnit->CalculateSpellDamage(target, auraSpellInfo, auraSpellIdx, &auraBasePoints);
-                if ((m_casterUnit->IsPlayer() && m_casterUnit->ToPlayer()->HasOption(PLAYER_CHEAT_ALWAYS_PROC)) || roll_chance_i(chance))
+                if ((m_casterUnit->IsPlayer() && m_casterUnit->ToPlayer()->HasCheatOption(PLAYER_CHEAT_ALWAYS_PROC)) || roll_chance_i(chance))
                     m_casterUnit->CastSpell(target, auraSpellInfo->EffectTriggerSpell[auraSpellIdx], true, nullptr, (*i));
             }
         }
@@ -5054,6 +5057,10 @@ void Spell::TakePower()
     if (m_CastItem || m_triggeredByAuraSpell || IsChannelingVisual() || !m_casterUnit)
         return;
 
+    if (Player* pPlayer = m_casterUnit->ToPlayer())
+        if (pPlayer->HasCheatOption(PLAYER_CHEAT_NO_POWER))
+            return;
+
     // health as power used
     if (m_spellInfo->powerType == POWER_HEALTH)
     {
@@ -5333,7 +5340,7 @@ void Spell::RemoveChanneledAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mo
 
 SpellCastResult Spell::CheckCast(bool strict)
 {
-    if (m_caster->IsPlayer() && m_caster->ToPlayer()->HasOption(PLAYER_CHEAT_NO_CHECK_CAST))
+    if (m_caster->IsPlayer() && m_caster->ToPlayer()->HasCheatOption(PLAYER_CHEAT_NO_CHECK_CAST))
         return SPELL_CAST_OK;
 
     // Prevent casting while sitting unless the spell allows it
@@ -7763,9 +7770,6 @@ void Spell::Delayed()
     if (!(m_spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_DAMAGE))
         return;
 
-    if (m_caster->IsPlayer() && m_caster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE))
-        return;
-
     //check resist chance
     int32 resistChance = 100;                               //must be initialized to 100 for percent modifiers
     ((Player*)m_caster)->ApplySpellMod(m_spellInfo->Id, SPELLMOD_NOT_LOSE_CASTING_TIME, resistChance, this);
@@ -8510,7 +8514,7 @@ void Spell::TriggerGlobalCooldown()
         return;
 
     if (Player* pPlayer = m_casterUnit->ToPlayer())
-        if (pPlayer->HasOption(PLAYER_CHEAT_NO_COOLDOWN))
+        if (pPlayer->HasCheatOption(PLAYER_CHEAT_NO_COOLDOWN))
             return;
 
     int32 gcd = m_spellInfo->StartRecoveryTime;

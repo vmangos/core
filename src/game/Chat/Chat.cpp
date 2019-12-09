@@ -194,6 +194,24 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
+    static ChatCommand cheatCommandTable[] =
+    {
+        { NODE, "god",            SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatGodCommand,            "", nullptr },
+        { NODE, "cooldown",       SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatCooldownCommand,       "", nullptr },
+        { NODE, "casttime",       SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatCastTimeCommand,       "", nullptr },
+        { NODE, "powercost",      SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatPowerCommand,          "", nullptr },
+        { NODE, "immunetoauras",  SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatImmuneToAuraCommand,   "", nullptr },
+        { NODE, "crit",           SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatAlwaysCritCommand,     "", nullptr },
+        { NODE, "castchecks",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatNoCastCheckCommand,    "", nullptr },
+        { NODE, "proc",           SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatAlwaysProcCommand,     "", nullptr },
+        { NODE, "triggerpass",    SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatTriggerPassCommand,    "", nullptr },
+        { NODE, "ignoretriggers", SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatIgnoreTriggersCommand, "", nullptr },
+        { NODE, "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatWaterwalkCommand,      "", nullptr },
+        { NODE, "wallclimb",      SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatWallclimbCommand,      "", nullptr },
+        { NODE, "status",         SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatStatusCommand,         "", nullptr },
+        { MSTR, nullptr,          0,                  false, nullptr,                                        "", nullptr }
+    };
+
     static ChatCommand debugPlayCommandTable[] =
     {
         { NODE, "cinematic",      SEC_TICKETMASTER,   false, &ChatHandler::HandleDebugPlayCinematicCommand,       "", nullptr },
@@ -289,7 +307,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "ingame",         SEC_PLAYER,         true,  &ChatHandler::HandleGMListIngameCommand,        "", nullptr },
         { NODE, "list",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleGMListFullCommand,          "", nullptr },
         { NODE, "visible",        SEC_TICKETMASTER,   false, &ChatHandler::HandleGMVisibleCommand,           "", nullptr },
-        { NODE, "options",        SEC_GAMEMASTER,     false, &ChatHandler::HandleGMOptionsCommand,           "", nullptr },
         { NODE, "setview",        SEC_TICKETMASTER,   false, &ChatHandler::HandleSetViewCommand,             "", nullptr },
         { NODE, "",               SEC_TICKETMASTER,   false, &ChatHandler::HandleGMCommand,                  "", nullptr },
         { MSTR, nullptr,          0,                  false, nullptr,                                        "", nullptr }
@@ -997,8 +1014,9 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "auction",        SEC_TICKETMASTER,   false, nullptr,                                        "", auctionCommandTable  },
         { NODE, "cast",           SEC_DEVELOPPER,     false, nullptr,                                        "", castCommandTable     },
         { NODE, "character",      SEC_TICKETMASTER,   true, nullptr,                                         "", characterCommandTable},
+        { NODE, "cheat",          SEC_GAMEMASTER,     false, nullptr,                                        "", cheatCommandTable    },
         { NODE, "debug",          SEC_TICKETMASTER,   true, nullptr,                                         "", debugCommandTable    },
-        { NODE, "replenish",      SEC_GAMEMASTER,     false, &ChatHandler::HandleReplenishCommand,           "", nullptr },
+        { NODE, "replenish",      SEC_GAMEMASTER,     false, &ChatHandler::HandleReplenishCommand,           "", nullptr              },
         { NODE, "replay",         SEC_ADMINISTRATOR,  false, nullptr,                                        "", replayCommandTable   },
         { NODE, "event",          SEC_GAMEMASTER,     false, nullptr,                                        "", eventCommandTable    },
         { NODE, "gm",             SEC_PLAYER,         true, nullptr,                                         "", gmCommandTable       },
@@ -1033,7 +1051,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "bg",             SEC_GAMEMASTER,     false, nullptr,                                        "", bgCommandTable},
         { NODE, "spell",          SEC_GAMEMASTER,     true, nullptr,                                         "", spellCommandTable},
         { NODE, "variable",       SEC_DEVELOPPER,     true,  &ChatHandler::HandleVariableCommand,            "", nullptr},
-        { NODE, "god",            SEC_GAMEMASTER,     false, &ChatHandler::HandleGodCommand,                 "", nullptr },
         { NODE, "aura",           SEC_BASIC_ADMIN,    false, &ChatHandler::HandleAuraCommand,                "", nullptr },
         { NODE, "nameaura",       SEC_BASIC_ADMIN,    false, &ChatHandler::HandleNameAuraCommand,            "", nullptr },
         { NODE, "unaura",         SEC_GAMEMASTER,     false, &ChatHandler::HandleUnAuraCommand,              "", nullptr },
@@ -1105,8 +1122,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "combatstop",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCombatStopCommand,          "", nullptr },
         { NODE, "repairitems",    SEC_GAMEMASTER,     true,  &ChatHandler::HandleRepairitemsCommand,         "", nullptr },
         { NODE, "stable",         SEC_TICKETMASTER,   false, &ChatHandler::HandleStableCommand,              "", nullptr },
-        { NODE, "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWaterwalkCommand,           "", nullptr },
-        { NODE, "wallclimb",      SEC_GAMEMASTER,     false, &ChatHandler::HandleWallclimbCommand,           "", nullptr },
         { NODE, "quit",           SEC_CONSOLE,        true,  &ChatHandler::HandleQuitCommand,                "", nullptr },
         { NODE, "mmap",           SEC_GAMEMASTER,     false, nullptr,                                        "", mmapCommandTable },
         { NODE, "video",          SEC_GAMEMASTER,     false, nullptr,                                        "", videosCommandTable },

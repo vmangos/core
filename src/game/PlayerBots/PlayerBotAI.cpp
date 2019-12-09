@@ -41,7 +41,7 @@ void PlayerBotAI::Remove()
 void PlayerBotFleeingAI::OnPlayerLogin()
 {
     me->GetMotionMaster()->MoveFleeing(me);
-    me->SetGodMode(true);
+    me->SetCheatGod(true);
 }
 
 /// MageOrgrimmarAttackerAI event
