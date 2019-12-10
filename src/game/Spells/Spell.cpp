@@ -5480,7 +5480,14 @@ SpellCastResult Spell::CheckCast(bool strict)
             case 25860:
                 if (!m_casterUnit->HasAuraType(SPELL_AURA_MOUNTED))
                     return SPELL_FAILED_ONLY_MOUNTED;
-                break; 
+                break;
+            case 25720: // Place Loot / Quest 8606 Decoy!
+            {
+                if (Player* pPlayer = ToPlayer(GetAffectiveCaster()))
+                    if (!pPlayer->HasAura(25688)) // Narain's Turban
+                        return SPELL_FAILED_TARGET_AURASTATE;
+                break;
+            }
         }
 
         // Loatheb Corrupted Mind spell failed

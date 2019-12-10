@@ -794,25 +794,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(unitTarget, spell_id, true, nullptr, nullptr, m_originalCasterGUID, m_spellInfo);
                     return;
                 }
-
-                case 25720:     //spell Place Loot / Quest 8606 Decoy!
-                {
-                    if (!m_originalCaster)
-                        return;
-                    if (m_originalCaster->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    sLog.outString("Quest 8606 item Dummy Effect.");
-                    Player* pPlayer = (Player*)m_originalCaster;
-                    // Check for buff Narain!
-                    if (!pPlayer->HasAura(25688))
-                        return;
-                    // Start event 9527 using custom spell to avoid db error
-                    pPlayer->CastSpell(pPlayer, 33031, true);
-                    // Delete item Bag of Gold (21041)
-                    pPlayer->DestroyItemCount(21041, -1, true, false);
-                    return;
-                }
                 case 3360:                                  // Curse of the Eye
                 {
                     if (!unitTarget)
