@@ -1120,12 +1120,19 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     return;
                 }
                 case 19411:                                 // Lava Bomb
-                case 20474:                                 // Lava Bomb
                 {
                     if (!unitTarget)
                         return;
 
                     unitTarget->CastSpell(unitTarget, 20494, true);
+                    return;
+                }
+                case 20474:                                 // Lava Bomb
+                {
+                    if (!unitTarget)
+                        return;
+
+                    unitTarget->CastSpell(unitTarget, 20495, true);
                     return;
                 }
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4

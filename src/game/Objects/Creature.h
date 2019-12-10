@@ -322,6 +322,7 @@ enum SelectFlags
     SELECT_FLAG_PLAYER_NOT_GM       = 0x200,
     SELECT_FLAG_PET                 = 0x400,
     SELECT_FLAG_NOT_PLAYER          = 0x800,
+    SELECT_FLAG_POWER_NOT_MANA      = 0x1000,               // Used in some dungeon encounters
 };
 
 enum RegenStatsFlags

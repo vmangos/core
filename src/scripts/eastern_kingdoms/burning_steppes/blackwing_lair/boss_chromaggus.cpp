@@ -26,7 +26,7 @@ EndScriptData */
 
 enum
 {
-    EMOTE_GENERIC_FRENZY_KILL   = -1000001,
+    EMOTE_GENERIC_FRENZY_KILL   = 7797,
     EMOTE_SHIMMER               = -1469003,
 
     // These spells are actually called elemental shield

@@ -50,7 +50,7 @@ enum
     SAY_KILLS_ANDOROV   =   -1509016,
 
     SAY_AQ_WAR_START    =   -1509017, // Yell when realm complete quest 8743 for world event
-    EMOTE_FRENZY        =   -1000001,
+    EMOTE_FRENZY        =   7797,
 
     // General Rajaxx
     SPELL_DISARM            =   6713,

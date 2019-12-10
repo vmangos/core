@@ -1489,7 +1489,7 @@ bool QuestAccept_npc_tabetha(Player* pPlayer, Creature* pCreature, Quest const *
 
 enum
 {
-    EMOTE_GENERIC_FRENZY_KILL   = -1000001,
+    EMOTE_GENERIC_FRENZY_KILL   = 7797,
     EMOTE_GENERIC_IS_WEAKENED   = -1531011,
 
     SPELL_FRENZY                = 8269,

@@ -26,7 +26,7 @@ EndScriptData */
 
 enum
 {
-    //EMOTE_GENERIC_FRENZY_KILL   = -1000001,
+    //EMOTE_GENERIC_FRENZY_KILL   = 7797,
 
     NPC_STUDENT                                     = 10475,
     NPC_MARDUK_BLACKPOOL                            = 10433,

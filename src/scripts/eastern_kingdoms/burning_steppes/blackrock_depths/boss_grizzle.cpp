@@ -23,7 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 
-#define EMOTE_GENERIC_FRENZY_KILL   -1000001
+#define EMOTE_GENERIC_FRENZY_KILL   7797
 
 #define SPELL_GROUNDTREMOR          6524
 #define SPELL_FRENZY                8269

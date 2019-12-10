@@ -520,7 +520,7 @@ enum
     SPELL_DEMONIC_FRENZY            = 23257,
     SPELL_ENTROPIC_STING            = 23260,
 
-    EMOTE_FRENZY                    = -1000001,
+    EMOTE_FRENZY                    = 7797,
 
     NPC_NELSON_THE_NICE             = 14529,
     NPC_KLINFRAN_THE_CRAZED         = 14534,

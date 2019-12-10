@@ -671,7 +671,7 @@ enum
     SPELL_FRENZY         = 22428,
     SPELL_FLAME_BUFFET   = 22433,
 
-    EMOTE_FRENZY         = -1000001
+    EMOTE_FRENZY         = 7797
 };
 
 struct npc_death_talon_SeetherAI : public ScriptedAI
