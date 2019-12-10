@@ -22,6 +22,7 @@
 #include "InstanceData.h"
 #include "CreatureEventAI.h"
 #include "CreatureAIImpl.h"
+#include "NullCreatureAI.h"
 #include "GameEventMgr.h"
 
 // Script commands should return false by default.
@@ -393,7 +394,8 @@ bool Map::ScriptCommand_SummonCreature(const ScriptInfo& script, WorldObject* so
     }
 
     Creature* pCreature = pSummoner->SummonCreature(script.summonCreature.creatureEntry, x, y, z, o,
-        TempSummonType(script.summonCreature.despawnType), script.summonCreature.despawnDelay, script.summonCreature.flags & SF_SUMMONCREATURE_ACTIVE);
+        TempSummonType(script.summonCreature.despawnType), script.summonCreature.despawnDelay, script.summonCreature.flags & SF_SUMMONCREATURE_ACTIVE, 0,
+        (script.summonCreature.flags & SF_SUMMONCREATURE_NULL_AI) ? (CreatureAiSetter)([](Creature* pCreature) { pCreature->GetMotionMaster()->Initialize(); pCreature->SetAI(new NullCreatureAI(pCreature));}) : nullptr);
 
     if (!pCreature)
     {

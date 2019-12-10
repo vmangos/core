@@ -28,7 +28,7 @@ enum
 {
     // Last found data : HP : 3,331,000 (+20% = 3997200). Damage: 5,930 - 6,807. Armor: 4,691.
     NPC_VAELASTRAZ              = 13020,
-    NPC_LORD_NEFARIAN_VAEL      = 10163,
+    NPC_LORD_NEFARIAN_VAEL      = 10162,
 
     // Emotes
     // ------
@@ -246,7 +246,7 @@ struct boss_vaelAI : public ScriptedAI
                 switch (m_uiIntroPhase)
                 {
                 case 0:
-                    if (Creature *pNefarius = m_creature->SummonCreature(NPC_LORD_NEFARIAN_VAEL, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 25000))
+                    if (Creature *pNefarius = m_creature->SummonCreature(NPC_LORD_NEFARIAN_VAEL, aNefariusSpawnLoc[0], aNefariusSpawnLoc[1], aNefariusSpawnLoc[2], aNefariusSpawnLoc[3], TEMPSUMMON_TIMED_DESPAWN, 25000, false, 25000, [](Creature* pCreature) { pCreature->GetMotionMaster()->MoveIdle(); pCreature->SetAI(new NullCreatureAI(pCreature));}))
                     {
                         pNefarius->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         m_nefariusGuid = pNefarius->GetObjectGuid();

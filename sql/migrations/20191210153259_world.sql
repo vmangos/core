@@ -11,6 +11,7 @@ INSERT INTO `migrations` VALUES ('20191210153259');
 
 -- Remove custom versions of Doctor Weavil and his flying machine.
 DELETE FROM `creature_template` WHERE `entry` IN (155520, 155530);
+DELETE FROM `creature_template_addon` WHERE `entry` IN (155520, 155530);
 DELETE FROM `creature_ai_events` WHERE `creature_id` IN (155520, 155530);
 DELETE FROM `creature_ai_scripts` WHERE `id` iN (15552001, 15553001);
 
@@ -26,7 +27,7 @@ DELETE FROM `spell_effect_mod` WHERE `ID` IN (25720, 33008, 33009, 33031);
 DELETE FROM `event_scripts` WHERE `id`=9527;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9527, 0, 9, 181756, 31, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Decoy!: Respawn Stillpine Grain');
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9527, 5, 10, 15553, 61000, 0, 0, 0, 0, 0, 0, 0, 9529, 6, 1, 5166.07, -5196.86, 938.6, 2.125, 0, 'Decoy!: Summon Doctor Weavil\'s Flying Machine');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9527, 16, 10, 15552, 44000, 0, 0, 0, 0, 0, 0, 0, 9528, 6, 1, 5088.21, -5087.08, 922.385, 4.89885, 0, 'Decoy!: Summon Doctor Weavil');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9527, 16, 10, 15552, 44000, 0, 0, 0, 0, 0, 0, 16, 9528, 6, 1, 5088.21, -5087.08, 922.385, 4.89885, 0, 'Decoy!: Summon Doctor Weavil');
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9527, 33, 0, 0, 0, 0, 0, 15552, 50, 8, 3, 11106, 0, 0, 0, 0, 0, 0, 0, 0, 'Decoy!: Doctor Weavil - Say Text');
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9527, 33, 1, 1, 0, 0, 0, 15552, 50, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Decoy!: Doctor Weavil - Emote Talk');
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9527, 37, 1, 1, 0, 0, 0, 15552, 50, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Decoy!: Doctor Weavil - Emote Talk');

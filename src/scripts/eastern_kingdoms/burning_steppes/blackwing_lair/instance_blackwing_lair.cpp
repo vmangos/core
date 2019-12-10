@@ -92,7 +92,6 @@ enum
     NPC_CHROMAGGUS              = 14020,
     NPC_NEFARIAN                = 11583,
     NPC_LORD_NEFARIAN           = 10162,
-    NPC_LORD_NEFARIAN_VAEL      = 10163,
 
     GO_DOOR_RAZORGORE_ENTER     = 176964,
     GO_DOOR_RAZORGORE_EXIT      = 176965,
@@ -456,6 +455,8 @@ struct instance_blackwing_lair : public ScriptedInstance
                     pCreature->DeleteLater();
                 break;
             case NPC_LORD_NEFARIAN:
+                if (pCreature->IsTemporarySummon()) // second nefarion summoned temporarily for vael event
+                    break;
                 if (m_auiEncounter[TYPE_NEFARIAN] == DONE)
                     pCreature->DeleteLater();
                 break;
@@ -507,6 +508,8 @@ struct instance_blackwing_lair : public ScriptedInstance
                 m_auiData[DATA_NEFARIAN_GUID] = pCreature->GetObjectGuid();
                 break;
             case NPC_LORD_NEFARIAN:
+                if (pCreature->IsTemporarySummon()) // second nefarion summoned temporarily for vael event
+                    break;
                 m_auiData[DATA_NEFARIUS_GUID] = pCreature->GetObjectGuid();
                 if (m_auiEncounter[TYPE_NEFARIAN] == DONE)
                     pCreature->DeleteLater();

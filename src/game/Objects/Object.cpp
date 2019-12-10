@@ -2067,7 +2067,7 @@ Creature *Map::SummonCreature(uint32 entry, float x, float y, float z, float ang
     return pCreature;
 }
 
-Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject, uint32 pacifiedTimer)
+Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject, uint32 pacifiedTimer, CreatureAiSetter pFuncAiSetter)
 {
     CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(id);
     if (!cinfo)
@@ -2111,7 +2111,7 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     // Active state set before added to map
     pCreature->SetActiveObjectState(asActiveObject);
 
-    pCreature->Summon(spwtype, despwtime);
+    pCreature->Summon(spwtype, despwtime, pFuncAiSetter);
 
     if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
         ((Creature*)this)->AI()->JustSummoned(pCreature);
