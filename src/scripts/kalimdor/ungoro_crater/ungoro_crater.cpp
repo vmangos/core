@@ -353,66 +353,32 @@ bool QuestAccept_npc_ringo(Player* pPlayer, Creature* pCreature, const Quest* pQ
     return true;
 }
 
-// Nostalrius :
-// ungoro_eggs_trigger
-struct ungoro_eggs_triggerAI : public ScriptedAI
+/*######
+## at_scent_larkorwi
+######*/
+
+enum
 {
-    ungoro_eggs_triggerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-    void Reset() override
-    {
-        checkTimer = 10000;
-        summon_x = m_creature->GetPositionX();
-        summon_y = m_creature->GetPositionY();
-        summon_z = m_creature->GetPositionZ();
-        summon_o = m_creature->GetOrientation();
-    }
-
-    uint32 checkTimer;
-    float summon_x, summon_y, summon_z, summon_o;
-
-    Player* GetPlayerNear(float maxDist)
-    {
-        Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
-        uint32 myArea = m_creature->GetAreaId();
-        for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
-        {
-            Player* currPlayer =  it->getSource();
-            if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, maxDist, false))
-                if (currPlayer->IsAlive())
-                    return currPlayer;
-        }
-        return nullptr;
-    }
-    void UpdateAI(const uint32 diff) override
-    {
-        if (checkTimer < diff)
-        {
-            Player* target = GetPlayerNear(10.0f);
-            if (target)
-            {
-                m_creature->SummonCreature(9683, summon_x, summon_y, summon_z, summon_o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10000);
-                //sLog.outString("Spawn 9683 !");
-                // Histoire de pas respawn tout de suite un autre mob ...
-                checkTimer = 60000;
-            }
-            else
-            {
-                //sLog.outString("No target :(");
-                checkTimer = 10000;
-            }
-        }
-        else
-            checkTimer -= diff;
-    }
+    QUEST_SCENT_OF_LARKORWI     = 4291,
+    NPC_LARKORWI_MATE           = 9683
 };
 
-
-CreatureAI* GetAI_eggs_trigger(Creature* pCreature)
+bool AreaTrigger_at_scent_larkorwi(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    return new ungoro_eggs_triggerAI(pCreature);
+    if (pPlayer->IsAlive() && !pPlayer->IsGameMaster() && pPlayer->GetQuestStatus(QUEST_SCENT_OF_LARKORWI) == QUEST_STATUS_INCOMPLETE)
+    {
+        if (!GetClosestCreatureWithEntry(pPlayer, NPC_LARKORWI_MATE, 25.0f))
+        {
+            static std::unordered_map<uint32, time_t> cooldown;
+            if (cooldown[pAt->id] < time(nullptr))
+            {
+                pPlayer->SummonCreature(NPC_LARKORWI_MATE, pAt->x, pAt->y, pAt->z, 3.3f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 2 * MINUTE * IN_MILLISECONDS);
+                cooldown[pAt->id] = time(nullptr) + MINUTE;
+            }
+        }
+    }
+
+    return false;
 }
 
 enum
@@ -984,8 +950,8 @@ void AddSC_ungoro_crater()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "ungoro_eggs_trigger";
-    newscript->GetAI = &GetAI_eggs_trigger;
+    newscript->Name = "at_scent_larkorwi";
+    newscript->pAreaTrigger = &AreaTrigger_at_scent_larkorwi;
     newscript->RegisterSelf();
 
     newscript = new Script;
