@@ -36,28 +36,25 @@ EndContentData */
 
 enum KerlonianData
 {
-    SAY_KER_START = 6540,
-
+    SAY_KER_START     = 6540,
     EMOTE_KER_SLEEP_1 = 6811,
     EMOTE_KER_SLEEP_2 = 6542,
     EMOTE_KER_SLEEP_3 = 6541,
-
-    SAY_KER_SLEEP_1 = 6813,
-    SAY_KER_SLEEP_2 = 6543,
-    SAY_KER_SLEEP_3 = 6544,
-    SAY_KER_SLEEP_4 = 6545,
-
-    EMOTE_KER_AWAKEN = 6612,
-
-    SAY_KER_ALERT_1 = 6867,
-    SAY_KER_ALERT_2 = 6868,
-
-    SAY_KER_END = 6643,
+    SAY_KER_SLEEP_1   = 6813,
+    SAY_KER_SLEEP_2   = 6543,
+    SAY_KER_SLEEP_3   = 6544,
+    SAY_KER_SLEEP_4   = 6545,
+    EMOTE_KER_AWAKEN  = 6612,
+    SAY_KER_ALERT_1   = 6867,
+    SAY_KER_ALERT_2   = 6868,
+    SAY_KER_END       = 6643,
 
     SPELL_SLEEP_VISUAL = 25148,
-    SPELL_AWAKEN = 17536,
+    SPELL_AWAKEN       = 17536,
+
     QUEST_SLEEPER_AWAKENED = 5321,
-    NPC_LILADRIS = 11219                     //attackers entries unknown
+
+    NPC_LILADRIS = 11219 // attackers entries unknown
 };
 
 //TODO: make concept similar as "ringo" -escort. Find a way to run the scripted attacks, _if_ player are choosing road.
@@ -200,24 +197,25 @@ bool QuestAccept_npc_kerlonian(Player* pPlayer, Creature* pCreature, const Quest
 
 enum ProspectorRemtravelData
 {
-    SAY_REM_START = 925,
-    SAY_REM_AGGRO = 941,
-    SAY_REM_RAMP1_1 = 926,
-    SAY_REM_RAMP1_2 = 927,
-    SAY_REM_BOOK = 928,
-    SAY_REM_TENT1_1 = 929,
-    SAY_REM_TENT1_2 = 930,
-    SAY_REM_MOSS = 931,
-    EMOTE_REM_MOSS = 932,
+    SAY_REM_START         = 925,
+    SAY_REM_AGGRO         = 941,
+    SAY_REM_RAMP1_1       = 926,
+    SAY_REM_RAMP1_2       = 927,
+    SAY_REM_BOOK          = 928,
+    SAY_REM_TENT1_1       = 929,
+    SAY_REM_TENT1_2       = 930,
+    SAY_REM_MOSS          = 931,
+    EMOTE_REM_MOSS        = 932,
     SAY_REM_MOSS_PROGRESS = 933,
-    SAY_REM_PROGRESS = 935,
-    SAY_REM_REMEMBER = 936,
-    EMOTE_REM_END = 937,
+    SAY_REM_PROGRESS      = 935,
+    SAY_REM_REMEMBER      = 936,
+    EMOTE_REM_END         = 937,
 
     QUEST_ABSENT_MINDED_PT2 = 731,
+
     NPC_GRAVEL_SCOUT = 2158,
-    NPC_GRAVEL_BONE = 2159,
-    NPC_GRAVEL_GEO = 2160
+    NPC_GRAVEL_BONE  = 2159,
+    NPC_GRAVEL_GEO   = 2160
 };
 
 struct npc_prospector_remtravelAI : public npc_escortAI
@@ -330,11 +328,11 @@ bool QuestAccept_npc_prospector_remtravel(Player* pPlayer, Creature* pCreature, 
 
 enum ThreshwackonatorData
 {
-    EMOTE_START = 3012,
-    SAY_AT_CLOSE = 2704,
+    EMOTE_START        = 3012,
+    SAY_AT_CLOSE       = 2704,
     QUEST_GYROMAST_REV = 2078,
-    NPC_GELKAK = 6667,
-    FACTION_HOSTILE = 14
+    NPC_GELKAK         = 6667,
+    FACTION_HOSTILE    = 14
 };
 
 #define GOSSIP_ITEM_INSERT_KEY "[PH] Insert key"
@@ -409,7 +407,7 @@ bool GossipSelect_npc_threshwackonator(Player* pPlayer, Creature* pCreature, uin
 
 enum TheryluneData
 {
-    SAY_THERYLUNE_START = 1189,
+    SAY_THERYLUNE_START  = 1189,
     SAY_THERYLUNE_FINISH = 1188,
 
     NPC_THERYSIL = 3585,
@@ -469,27 +467,26 @@ bool QuestAccept_npc_therylune(Player* pPlayer, Creature* pCreature, const Quest
 
 enum VolcorData
 {
-    SAY_START = 1237,
-    SAY_END = 1243,
+    SAY_START        = 1237,
+    SAY_END          = 1243,
     SAY_FIRST_AMBUSH = 1250,
-    SAY_AGGRO_1 = 1251,
-    SAY_AGGRO_2 = 1252,
-    SAY_AGGRO_3 = 1253,
-    SAY_END_2 = 1241,
-    SAY_END_3 = 1244,
-
-    SAY_ESCAPE = 1236,
+    SAY_AGGRO_1      = 1251,
+    SAY_AGGRO_2      = 1252,
+    SAY_AGGRO_3      = 1253,
+    SAY_END_2        = 1241,
+    SAY_END_3        = 1244,
+    SAY_ESCAPE       = 1236,
 
     NPC_BLACKWOOD_SHAMAN = 2171,
-    NPC_BLACKWOOD_URSA = 2170,
-    NPC_GRIMCLAW = 3695,
+    NPC_BLACKWOOD_URSA   = 2170,
+    NPC_GRIMCLAW         = 3695,
 
     SPELL_MOONSTALKER_FORM = 10849,
 
     WAYPOINT_ID_QUEST_STEALTH = 16,
     FACTION_FRIENDLY = 35,
 
-    QUEST_ESCAPE_THROUGH_FORCE = 994,
+    QUEST_ESCAPE_THROUGH_FORCE   = 994,
     QUEST_ESCAPE_THROUGH_STEALTH = 995
 };
 
@@ -790,9 +787,9 @@ bool QuestAccept_npc_volcor(Player* pPlayer, Creature* pCreature, const Quest* p
 
 enum RabidThistleBearData
 {
+    SPELL_RAGE         = 3150,
     SPELL_TRAPPED_BEAR = 9439,
     NPC_CAPTURED_RABID_THISTLE_BEAR = 11836,
-    SPELL_RAGE = 3150
 };
 
 struct npc_rabid_thistle_bearAI : public FollowerAI
@@ -886,8 +883,8 @@ bool EffectDummyCreature_npc_rabid_thistle_bear(WorldObject* pCaster, uint32 uiS
 enum TharnariunTreetenderData
 {
     SAY_THARNARIUN_CLEANSED = 5937,
-    QUEST_PLAGUED_LANDS = 2118,
-    SPELL_THARNARIUN_HEAL = 9457
+    QUEST_PLAGUED_LANDS     = 2118,
+    SPELL_THARNARIUN_HEAL   = 9457
 };
 
 struct npc_tharnariun_treetenderAI : public ScriptedAI
@@ -1052,16 +1049,16 @@ bool QuestComplete_npc_terenthis(Player* pPlayer, Creature* pQuestGiver, Quest c
 
 enum SentinelAynashaData
 {
-    SAY_AYNASHA_START = 7200,
+    SAY_AYNASHA_START  = 7200,
     SAY_AYNASHA_ARROWS = 7199,
-    SAY_AYNASHA_END1 = 7201,
-    SAY_AYNASHA_END2 = 7202,
-    SAY_AYNASHA_END3 = 7328,
+    SAY_AYNASHA_END1   = 7201,
+    SAY_AYNASHA_END2   = 7202,
+    SAY_AYNASHA_END3   = 7328,
 
-    SPELL_AYNASHAS_BOW = 19767,
+    SPELL_AYNASHAS_BOW      = 19767,
     QUEST_ONE_SHOT_ONE_KILL = 5713,
-    NPC_BLACKWOOD_TRACKER = 11713,
-    NPC_MAROSH_THE_DEVIOUS = 11714
+    NPC_BLACKWOOD_TRACKER   = 11713,
+    NPC_MAROSH_THE_DEVIOUS  = 11714
 };
 
 struct npc_sentinel_aynashaAI : public Scripted_NoMovementAI
@@ -1272,9 +1269,9 @@ bool QuestAcceptGO_beached_sea(Player* player, GameObject* pGo, const Quest* pQu
 enum MurkdeepData
 {
     NPC_MURLOC_COATRUNNER = 2202,
-    NPC_MURLOC_WARRIOR = 2205,
-    NPC_MURLOC_HUNTER = 2206,
-    NPC_MURKDEEP = 10323,
+    NPC_MURLOC_WARRIOR    = 2205,
+    NPC_MURLOC_HUNTER     = 2206,
+    NPC_MURKDEEP          = 10323,
 
     GO_BONFIRE = 61927,
 
@@ -1283,7 +1280,7 @@ enum MurkdeepData
     QUEST_WANTED_MURKDEEP = 4740,
 
     SPELL_SUNDER_ARMOR = 11971,
-    SPELL_NET = 6533
+    SPELL_NET          = 6533
 };
 
 static const float m_fSummonPoints[3][3] =

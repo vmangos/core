@@ -33,10 +33,10 @@ EndContentData */
 
 enum MistData
 {
-    SAY_AT_HOME = 1330,
-    EMOTE_AT_HOME = 1340,
-    QUEST_MIST = 938,
-    NPC_ARYNIA = 3519,
+    SAY_AT_HOME       = 1330,
+    EMOTE_AT_HOME     = 1340,
+    QUEST_MIST        = 938,
+    NPC_ARYNIA        = 3519,
     FACTION_DARNASSUS = 79
 };
 
@@ -142,11 +142,11 @@ bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, const Quest* pQu
 
 enum FandralStaghelmData
 {
-    SPELL_WRATH = 20698,
-    SPELL_AE_ROOT = 20699,
+    SPELL_WRATH        = 20698,
+    SPELL_AE_ROOT      = 20699,
     SPELL_REJUVENATION = 20701,
-    SPELL_SUMM_TREANT = 20702,
-    SPELL_HURRICANE = 27530
+    SPELL_SUMM_TREANT  = 20702,
+    SPELL_HURRICANE    = 27530
 };
 
 struct boss_fandral_staghelmAI : public ScriptedAI

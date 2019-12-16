@@ -36,36 +36,33 @@ EndContentData */
 
 enum MuglashData
 {
-    SAY_MUG_START1 = 8566,
-    SAY_MUG_START2 = 8555,
-    SAY_MUG_BRAZIER = 8556,
+    SAY_MUG_START1       = 8566,
+    SAY_MUG_START2       = 8555,
+    SAY_MUG_BRAZIER      = 8556,
     SAY_MUG_BRAZIER_WAIT = 8410,
-    SAY_MUG_ON_GUARD = 8412,
-    SAY_MUG_REST = 8413,
-    SAY_MUG_DONE = 8569,
-    SAY_MUG_GRATITUDE = 8558,
-    SAY_MUG_PATROL = 8564,
-    SAY_MUG_RETURN = 8565,
+    SAY_MUG_ON_GUARD     = 8412,
+    SAY_MUG_REST         = 8413,
+    SAY_MUG_DONE         = 8569,
+    SAY_MUG_GRATITUDE    = 8558,
+    SAY_MUG_PATROL       = 8564,
+    SAY_MUG_RETURN       = 8565,
 
     SAY_MUG_Q_COMPETENCE = -1780221, // bct need
-    SAY_MUG_IMPATIENT = -1780222, // bct need
+    SAY_MUG_IMPATIENT    = -1780222, // bct need
 
     QUEST_VORSHA = 6641,
 
     GO_NAGA_BRAZIER = 178247,
     GO_BRAZIER_GUID = 47873,
 
-    NPC_MUGLASH = 12717,
-
-    NPC_WRATH_RIDER = 3713,
+    NPC_MUGLASH         = 12717,
+    NPC_WRATH_RIDER     = 3713,
     NPC_WRATH_SORCERESS = 3717,
     NPC_WRATH_RAZORTAIL = 3712,
-
     NPC_WRATH_PRIESTESS = 3944,
-    NPC_WRATH_MYRMIDON = 3711,
-    NPC_WRATH_SEAWITCH = 3715,
-
-    NPC_VORSHA = 12940
+    NPC_WRATH_MYRMIDON  = 3711,
+    NPC_WRATH_SEAWITCH  = 3715,
+    NPC_VORSHA          = 12940
 };
 
 static float m_afFirstNagaCoord[3][3] =
@@ -315,11 +312,11 @@ bool GOHello_go_naga_brazier(Player* pPlayer, GameObject* pGo)
 enum RuulSnowhoofData
 {
     QUEST_FREEDOM_TO_RUUL = 6482,
-    NPC_T_URSA = 3921,
-    NPC_T_TOTEMIC = 3922,
-    NPC_T_PATHFINDER = 3926,
-    SAY_RUUL_END = 8265,
-    BEAR_AURA = 20514
+    NPC_T_URSA            = 3921,
+    NPC_T_TOTEMIC         = 3922,
+    NPC_T_PATHFINDER      = 3926,
+    SAY_RUUL_END          = 8265,
+    BEAR_AURA             = 20514
 };
 
 struct npc_ruul_snowhoofAI : public npc_escortAI
@@ -389,21 +386,21 @@ CreatureAI* GetAI_npc_ruul_snowhoofAI(Creature* pCreature)
 
 enum TorekData
 {
-    SAY_READY = 8284,
-    SAY_MOVE = 8278,
+    SAY_READY   = 8284,
+    SAY_MOVE    = 8278,
     SAY_PREPARE = 8282,
-    SAY_WIN = 8280,
-    SAY_END = 8281,
+    SAY_WIN     = 8280,
+    SAY_END     = 8281,
 
-    SPELL_REND = 11977,
+    SPELL_REND        = 11977,
     SPELL_THUNDERCLAP = 8078,
 
     QUEST_TOREK_ASSULT = 6544,
 
     NPC_SPLINTERTREE_RAIDER = 12859,
-    NPC_DURIEL = 12860,
+    NPC_DURIEL              = 12860,
     NPC_SILVERWING_SENTINEL = 12896,
-    NPC_SILVERWING_WARRIOR = 12897
+    NPC_SILVERWING_WARRIOR  = 12897
 };
 
 struct npc_torekAI : public npc_escortAI
@@ -523,24 +520,23 @@ CreatureAI* GetAI_npc_torek(Creature* pCreature)
 
 enum FeeroIronhandData
 {
-    SAY_QUEST_START = 1292,
-    SAY_FIRST_AMBUSH_START = 1372,
-    SAY_FIRST_AMBUSH_END = 1294,
-    SAY_SECOND_AMBUSH_START = 1373,
-    SAY_SCOUT_SECOND_AMBUSH = 1309,
-    SAY_SECOND_AMBUSH_END = 1310,
-    SAY_FINAL_AMBUSH_START = 1374,
+    SAY_QUEST_START          = 1292,
+    SAY_FIRST_AMBUSH_START   = 1372,
+    SAY_FIRST_AMBUSH_END     = 1294,
+    SAY_SECOND_AMBUSH_START  = 1373,
+    SAY_SCOUT_SECOND_AMBUSH  = 1309,
+    SAY_SECOND_AMBUSH_END    = 1310,
+    SAY_FINAL_AMBUSH_START   = 1374,
     SAY_BALIZAR_FINAL_AMBUSH = 1313,
-    SAY_FINAL_AMBUSH_ATTACK = 1499,
-    SAY_QUEST_END = 1315,
+    SAY_FINAL_AMBUSH_ATTACK  = 1499,
+    SAY_QUEST_END            = 1315,
 
     QUEST_SUPPLIES_TO_AUBERDINE = 976,
 
     NPC_DARK_STRAND_ASSASSIN = 3879,
-    NPC_FORSAKEN_SCOUT = 3893,
-
+    NPC_FORSAKEN_SCOUT       = 3893,
     NPC_ALIGAR_THE_TORMENTOR = 3898,
-    NPC_BALIZAR_THE_UMBRAGE = 3899,
+    NPC_BALIZAR_THE_UMBRAGE  = 3899,
     NPC_CAEDAKAR_THE_VICIOUS = 3900
 };
 
@@ -699,11 +695,13 @@ bool QuestAccept_npc_feero_ironhand(Player* pPlayer, Creature* pCreature, const 
 enum FoulwealdTotemMoundData
 {
     NPC_ENRAGED_FOULWEALD = 12921,
-    NPC_CHIEF_MURGUT = 12918,
+    NPC_CHIEF_MURGUT      = 12918,
+
     GO_KARANG_S_BANNER = 178205,
-    GO_KARANG_LIGHT = 178207,
-    GO_MOUND = 300131,
-    SPELL_CORRUPTED_STRENGTH = 6821,
+    GO_KARANG_LIGHT    = 178207,
+    GO_MOUND           = 300131,
+
+    SPELL_CORRUPTED_STRENGTH        = 6821,
     SPELL_DESTROY_KARANG_S_BANNER_1 = 20786,
     SPELL_DESTROY_KARANG_S_BANNER_2 = 20783,
 

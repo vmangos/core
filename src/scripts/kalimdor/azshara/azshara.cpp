@@ -166,10 +166,9 @@ bool GossipSelect_npc_loramus_thalipedes(Player* pPlayer, Creature* pCreature, u
 //--Alita MAWS
 enum
 {
-    //sorts
-    EAU_SOMBRE = 25743,
-    FRENESIE = 19812,
-    SACCAGER = 25744, //charge
+    SPELL_DARK_WATER = 25743,
+    SPELL_FRENZY     = 19812,
+    SPELL_RAMPAGE    = 25744,
     EMOTE_THE_BEAST_RETURNS = 11160
 };
 
@@ -178,11 +177,11 @@ struct Locations
     float x, y, z;
 };
 
-//tourne dans l'eau avant aggro.
+// out of combat waypoints
 static Locations ronde[] =
 {
-    { 3525.413330f, -6673.905273f, -20.0f },//à cause de l'animation qui tombe je m'étais dit hop dans l'eau. non utilisé.
-    { 3561.725098f, -6647.203613f, -7.5f },//entre 57 et 58 metres du maelstom //spawn
+    { 3525.413330f, -6673.905273f, -20.0f }, // because of the animation that falls I said to myself hop in the water. Not used.
+    { 3561.725098f, -6647.203613f, -7.5f },  // between 57 and 58 meters from the maelstom // spawn
     { 3569.491211f, -6601.534668f, -7.5f },
     { 3567.581787f, -6601.534668f, -7.5f },
 
@@ -209,12 +208,12 @@ struct mob_mawsAI : public ScriptedAI
         Reset();
     }
     uint32 LastWayPoint;
-    uint32 SaccagerTimer;
-    uint32 SaccagerTimerMax;
+    uint32 RampageTimer;
+    uint32 RampageTimerMax;
     uint32 FrenzyTimer;
     uint32 FrenzyTimerMax;
     uint32 DarkWaterTimer;
-    uint32 LeaveCombatTimer; //juste pour éviter des abus.
+    uint32 LeaveCombatTimer; // just to avoid abuse
 
     bool InCombat;
     bool PhaseTwo;
@@ -247,25 +246,25 @@ struct mob_mawsAI : public ScriptedAI
                 if (!PhaseTwo && m_creature->GetHealthPercent() < 20.0f)
                 {
                     PhaseTwo = true;
-                    SaccagerTimerMax = 12000;
+                    RampageTimerMax = 12000;
                     FrenzyTimerMax = 15000;
-                    if (SaccagerTimerMax < SaccagerTimer)
-                        SaccagerTimer = SaccagerTimerMax;
+                    if (RampageTimerMax < RampageTimer)
+                        RampageTimer = RampageTimerMax;
                     if (FrenzyTimerMax < FrenzyTimer)
                         FrenzyTimer = FrenzyTimerMax;
                 }
-                if (SaccagerTimer < uiDiff)
+                if (RampageTimer < uiDiff)
                 {
-                    DoCastSpellIfCan(m_creature->GetVictim(), SACCAGER);
+                    DoCastSpellIfCan(m_creature->GetVictim(), SPELL_RAMPAGE);
                     if (!PhaseTwo)
-                        SaccagerTimerMax = urand(20, 120) * 1000;
-                    SaccagerTimer = SaccagerTimerMax;
+                        RampageTimerMax = urand(20, 120) * 1000;
+                    RampageTimer = RampageTimerMax;
                 }
                 else
-                    SaccagerTimer -= uiDiff;
+                    RampageTimer -= uiDiff;
                 if (FrenzyTimer < uiDiff)
                 {
-                    DoCastSpellIfCan(m_creature, FRENESIE);
+                    DoCastSpellIfCan(m_creature, SPELL_FRENZY);
                     FrenzyTimer = FrenzyTimerMax;
                 }
                 else
@@ -274,7 +273,7 @@ struct mob_mawsAI : public ScriptedAI
                 {
                     if (DarkWaterTimer < uiDiff)
                     {
-                        DoCastSpellIfCan(m_creature, EAU_SOMBRE);
+                        DoCastSpellIfCan(m_creature, SPELL_DARK_WATER);
                         DarkWaterTimer = 15000;
                     }
                     else
@@ -291,7 +290,7 @@ struct mob_mawsAI : public ScriptedAI
             InCombat = 1;
     }
 
-    void DamageTaken(Unit *done_by, uint32 &damage) override// l'empecher d'etre kittable infini. s'applique pas aux dégats de la charge.
+    void DamageTaken(Unit *done_by, uint32 &damage) override // Prevent infinite kiting. Does not apply to charge damage.
     {
         LeaveCombatTimer = 30000;
     }
@@ -310,8 +309,8 @@ struct mob_mawsAI : public ScriptedAI
         m_creature->CombatStop(true);
         m_creature->SetLootRecipient(nullptr);
         LeaveCombatTimer = 30000;
-        SaccagerTimer = urand(20, 120) * 1000;
-        SaccagerTimerMax = 120000;
+        RampageTimer = urand(20, 120) * 1000;
+        RampageTimerMax = 120000;
         FrenzyTimer = 25000;
         FrenzyTimerMax = 25000;
         DarkWaterTimer = 15000;

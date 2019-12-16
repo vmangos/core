@@ -36,13 +36,12 @@
 enum BunthenPlainswindData
 {
     QUEST_SEA_LION_HORDE = 30,
-    QUEST_SEA_LION_ALLY = 272,
-    TAXI_PATH_ID_ALLY = 315,
-    TAXI_PATH_ID_HORDE = 316
+    QUEST_SEA_LION_ALLY  = 272,
+    TAXI_PATH_ID_ALLY    = 315,
+    TAXI_PATH_ID_HORDE   = 316,
+    GOSSIP_ITEM_AQ_END   = 8036,
+    GOSSIP_ITEM_THUNDER  = 12804,
 };
-
-#define GOSSIP_ITEM_THUNDER "I'd like to fly to Thunder Bluff."
-#define GOSSIP_ITEM_AQ_END "Do you know where I can find Half Pendant of Aquatic Endurance?"
 
 bool GossipHello_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature)
 {
@@ -92,10 +91,13 @@ bool GossipSelect_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature, u
  ## npc_great_bear_spirit
  ######*/
 
-#define GOSSIP_BEAR1 "What do you represent, spirit?"
-#define GOSSIP_BEAR2 "I seek to understand the importance of strength of the body."
-#define GOSSIP_BEAR3 "I seek to understand the importance of strength of the heart."
-#define GOSSIP_BEAR4 "I have heard your words, Great Bear Spirit, and I understand. I now seek your blessings to fully learn the way of the Claw."
+enum
+{
+    GOSSIP_BEAR1 = 7439,
+    GOSSIP_BEAR2 = 7442,
+    GOSSIP_BEAR3 = 7444,
+    GOSSIP_BEAR4 = 7446,
+};
 
 bool GossipHello_npc_great_bear_spirit(Player* pPlayer, Creature* pCreature)
 {
@@ -142,8 +144,11 @@ bool GossipSelect_npc_great_bear_spirit(Player* pPlayer, Creature* pCreature, ui
  ## npc_silva_filnaveth
  ######*/
 
-#define GOSSIP_ITEM_RUTHERAN "I'd like to fly to Rut'theran Village."
-#define GOSSIP_ITEM_AQ_AGI "Do you know where I can find Half Pendant of Aquatic Agility?"
+enum
+{
+    GOSSIP_ITEM_RUTHERAN = 7573,
+    GOSSIP_ITEM_AQ_AGI   = 8035,
+};
 
 bool GossipHello_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature)
 {
@@ -195,94 +200,84 @@ bool GossipSelect_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature, uint
 
 enum KeeperRemulosData
 {
-    SPELL_CONJURE_RIFT = 25813, // summon Eranikus
-    SPELL_HEALING_TOUCH = 23381,
-    SPELL_REGROWTH = 20665,
-    SPELL_REJUVENATION = 20664,
-    SPELL_STARFIRE = 21668,
-    SPELL_ERANIKUS_REDEEMED = 25846, // transform Eranikus
-    //SPELL_MOONGLADE_TRANQUILITY = unk, // spell which acts as a spotlight over Eranikus after he is redeemed
+    SPELL_CONJURE_RIFT           = 25813, // summon Eranikus
+    SPELL_HEALING_TOUCH          = 23381,
+    SPELL_REGROWTH               = 20665,
+    SPELL_REJUVENATION           = 20664,
+    SPELL_STARFIRE               = 21668,
+    SPELL_ERANIKUS_REDEEMED      = 25846, // transform Eranikus
+  //SPELL_MOONGLADE_TRANQUILITY  = unk,   // spell which acts as a spotlight over Eranikus after he is redeemed
     SPELL_THROW_NIGHTMARE_OBJECT = 25004,
 
-    NPC_ERANIKUS_TYRANT = 15491,
-    NPC_NIGHTMARE_PHANTASM = 15629, // shadows summoned during the event - should cast 17228 and 21307
-    NPC_REMULOS = 11832,
+    NPC_ERANIKUS_TYRANT     = 15491,
+    NPC_NIGHTMARE_PHANTASM  = 15629, // shadows summoned during the event - should cast 17228 and 21307
+    NPC_REMULOS             = 11832,
     NPC_TYRANDE_WHISPERWIND = 15633, // appears with the priestess during the event to help the players - should cast healing spells
-    NPC_ELUNE_PRIESTESS = 15634,
-    NPC_MALFURION = 15362,
+    NPC_ELUNE_PRIESTESS     = 15634,
+    NPC_MALFURION           = 15362,
 
     QUEST_NIGHTMARE_MANIFESTS = 8736,
-    QUEST_WAKING_LEGENDS = 8447,
+    QUEST_WAKING_LEGENDS      = 8447,
 
     // yells -> in cronological order
-    SAY_REMULOS_INTRO_1 = 11282, // remulos intro
-    SAY_REMULOS_INTRO_2 = 11283,
-    SAY_REMULOS_INTRO_3 = 11290,
-    SAY_REMULOS_INTRO_4 = 11291,
-    SAY_REMULOS_INTRO_5 = 11292,
-
-    EMOTE_SUMMON_ERANIKUS = 11277, // eranikus spawn - world emote
-    SAY_ERANIKUS_SPAWN = 11030,
-
-    SAY_REMULOS_TAUNT_1 = 11293, // eranikus and remulos chat
-    EMOTE_ERANIKUS_LAUGH = 11296,
-    SAY_ERANIKUS_TAUNT_2 = 11294,
-    SAY_REMULOS_TAUNT_3 = 11295,
-    SAY_ERANIKUS_TAUNT_4 = 11297,
-
-    EMOTE_ERANIKUS_ATTACK = 11298, // start attack
-    SAY_REMULOS_DEFEND_1 = 11300,
-    SAY_REMULOS_DEFEND_2 = 11301,
-    SAY_ERANIKUS_SHADOWS = 11299,
-    SAY_REMULOS_DEFEND_3 = 11302,
-    SAY_ERANIKUS_ATTACK_1 = 11304,
-    SAY_ERANIKUS_ATTACK_2 = 11305,
-    SAY_ERANIKUS_ATTACK_3 = 11306,
-    SAY_ERANIKUS_KILL = 11027,
-
-    SAY_TYRANDE_APPEAR = 11309, // Tyrande appears
-    SAY_TYRANDE_HEAL = 11317, // yelled by tyrande when healing is needed
+    SAY_REMULOS_INTRO_1    = 11282, // remulos intro
+    SAY_REMULOS_INTRO_2    = 11283,
+    SAY_REMULOS_INTRO_3    = 11290,
+    SAY_REMULOS_INTRO_4    = 11291,
+    SAY_REMULOS_INTRO_5    = 11292,
+    EMOTE_SUMMON_ERANIKUS  = 11277, // eranikus spawn - world emote
+    SAY_ERANIKUS_SPAWN     = 11030,
+    SAY_REMULOS_TAUNT_1    = 11293, // eranikus and remulos chat
+    EMOTE_ERANIKUS_LAUGH   = 11296,
+    SAY_ERANIKUS_TAUNT_2   = 11294,
+    SAY_REMULOS_TAUNT_3    = 11295,
+    SAY_ERANIKUS_TAUNT_4   = 11297,
+    EMOTE_ERANIKUS_ATTACK  = 11298, // start attack
+    SAY_REMULOS_DEFEND_1   = 11300,
+    SAY_REMULOS_DEFEND_2   = 11301,
+    SAY_ERANIKUS_SHADOWS   = 11299,
+    SAY_REMULOS_DEFEND_3   = 11302,
+    SAY_ERANIKUS_ATTACK_1  = 11304,
+    SAY_ERANIKUS_ATTACK_2  = 11305,
+    SAY_ERANIKUS_ATTACK_3  = 11306,
+    SAY_ERANIKUS_KILL      = 11027,
+    SAY_TYRANDE_APPEAR     = 11309, // Tyrande appears
+    SAY_TYRANDE_HEAL       = 11317, // yelled by tyrande when healing is needed
     SAY_TYRANDE_FORGIVEN_1 = 11310,
     SAY_TYRANDE_FORGIVEN_2 = 11311,
     SAY_TYRANDE_FORGIVEN_3 = 11312,
-    SAY_ERANIKUS_DEFEAT_1 = 11314,
-    SAY_ERANIKUS_DEFEAT_2 = 11315,
-    SAY_ERANIKUS_DEFEAT_3 = 11316,
-    EMOTE_ERANIKUS_REDEEM = 11313, // world emote before WotLK //Eranikus, Tyrant of the Dream, is wholly consumed by the Light of Elune. Tranquility sets in over the Moonglade"
-
-    EMOTE_TYRANDE_KNEEL = 11319,
-    SAY_TYRANDE_REDEEMED = 11320,
-
-    SAY_REDEEMED_1 = 11323, // eranikus redeemed
-    SAY_REDEEMED_2 = 11324,
-    SAY_REDEEMED_3 = 11326,
-    SAY_REDEEMED_4 = 11327,
-
-    SAY_REMULOS_OUTRO_1 = 11303, // remulos outro
-    SAY_REMULOS_OUTRO_2 = 11329,
-
+    SAY_ERANIKUS_DEFEAT_1  = 11314,
+    SAY_ERANIKUS_DEFEAT_2  = 11315,
+    SAY_ERANIKUS_DEFEAT_3  = 11316,
+    EMOTE_ERANIKUS_REDEEM  = 11313, // world emote before WotLK //Eranikus, Tyrant of the Dream, is wholly consumed by the Light of Elune. Tranquility sets in over the Moonglade"
+    EMOTE_TYRANDE_KNEEL    = 11319,
+    SAY_TYRANDE_REDEEMED   = 11320,
+    SAY_REDEEMED_1         = 11323, // eranikus redeemed
+    SAY_REDEEMED_2         = 11324,
+    SAY_REDEEMED_3         = 11326,
+    SAY_REDEEMED_4         = 11327,
+    SAY_REMULOS_OUTRO_1    = 11303, // remulos outro
+    SAY_REMULOS_OUTRO_2    = 11329,
     // Texts Waking_Legends quest
+    SAY_REMULOS_1          = 10866,
+    SAY_REMULOS_2          = 10867,
+    SAY_REMULOS_3          = 10868,
+    SAY_REMULOS_4          = 10870,
+    SAY_REMULOS_5          = 10872,
+    SAY_REMULOS_6          = 10874,
+    SAY_REMULOS_7          = 10877,
+    SAY_REMULOS_8          = 10879,
+    SAY_MALFURION_1        = 10869,
+    SAY_MALFURION_2        = 10871,
+    SAY_MALFURION_3        = 10873,
+    SAY_MALFURION_4        = 10876,
+    SAY_MALFURION_5        = 10878,
 
-    SAY_REMULOS_1 = 10866,
-    SAY_REMULOS_2 = 10867,
-    SAY_REMULOS_3 = 10868,
-    SAY_REMULOS_4 = 10870,
-    SAY_REMULOS_5 = 10872,
-    SAY_REMULOS_6 = 10874,
-    SAY_REMULOS_7 = 10877,
-    SAY_REMULOS_8 = 10879,
-
-    SAY_MALFURION_1 = 10869,
-    SAY_MALFURION_2 = 10871,
-    SAY_MALFURION_3 = 10873,
-    SAY_MALFURION_4 = 10876,
-    SAY_MALFURION_5 = 10878,
-
-    POINT_ID_ERANIKUS_FLIGHT = 0,
-    POINT_ID_ERANIKUS_COMBAT = 1,
+    POINT_ID_ERANIKUS_FLIGHT   = 0,
+    POINT_ID_ERANIKUS_COMBAT   = 1,
     POINT_ID_ERANIKUS_REDEEMED = 2,
 
-    MAX_SHADOWS = 4, // the max shadows summoned per turn
+    MAX_SHADOWS      = 4, // the max shadows summoned per turn
     MAX_SUMMON_TURNS = 10 // There are about 10 summoned shade waves
 };
 
@@ -1131,16 +1126,16 @@ enum EranikusData
 {
     NPC_KEEPER_REMULOS = 11832,
 
-    SPELL_ACID_BREATH = 24839,
-    SPELL_NOXIOUS_BREATH = 24818,
+    SPELL_ACID_BREATH       = 24839,
+    SPELL_NOXIOUS_BREATH    = 24818,
     SPELL_SHADOWBOLT_VOLLEY = 25586,
     SPELL_ARCANE_CHANNELING = 23017, // used by Tyrande - not sure if it's the right id
 
     FACTION_FRIENDLY = 35,
-    MAX_PRIESTESS = 7,
+    MAX_PRIESTESS    = 7,
 
-    POINT_ID_TYRANDE_HEAL = 5, //0,
-    POINT_ID_TYRANDE_ABSOLUTION = 6 //1,
+    POINT_ID_TYRANDE_HEAL       = 5, // 0,
+    POINT_ID_TYRANDE_ABSOLUTION = 6, // 1,
 };
 
 struct boss_eranikusAI : public ScriptedAI
