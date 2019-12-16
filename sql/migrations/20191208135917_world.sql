@@ -24,7 +24,9 @@ UPDATE `broadcast_text` SET `EmoteId0` = 2 WHERE `ID` IN (8265);
 UPDATE `broadcast_text` SET `Type` = 1 WHERE `ID` IN (11030, 11293, 11294, 11295, 11297, 11299, 11304, 11305, 11306, 11309, 11310, 11311, 11314, 11315, 11316, 11320);
 UPDATE `broadcast_text` SET `Type` = 2 WHERE `ID` IN (11313, 11160, 3012);
 UPDATE `broadcast_text` SET `Type` = 3 WHERE `ID` IN (11277);
-UPDATE `broadcast_text` SET `Language` = 1 WHERE `ID` IN (8284, 8278, 8282, 8280, 8281, 8566, 8555, 8556, 8410, 8412, 8413, 8569, 8558, 8564, 8565);
+
+-- The language is also sniffed and should not be changed.
+-- UPDATE `broadcast_text` SET `Language` = 1 WHERE `ID` IN (8284, 8278, 8282, 8280, 8281, 8566, 8555, 8556, 8410, 8412, 8413, 8569, 8558, 8564, 8565);
 
 
 -- End of migration.
