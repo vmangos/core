@@ -5480,11 +5480,11 @@ void Unit::Mount(uint32 mount, uint32 spellId)
     if (!mount)
         return;
 
-    if (SpellAuraHolder *holder = GetSpellAuraHolder(29519))
+    if (IsPlayer() && HasAura(29519))
     {
-        if (((Player*)this)->GetZoneId() == 1377)
+        if (GetZoneId() == 1377)
         {
-            // OutdoorPVP Silithus : Perte du buff silithyste
+            // OutdoorPVP Silithus : Loss of silithyst buff
             if (ZoneScript* pScript = ((Player*)this)->GetZoneScript())
                 pScript->HandleDropFlag(((Player*)this), 29519);
         }
