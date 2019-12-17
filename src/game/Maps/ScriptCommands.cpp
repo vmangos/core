@@ -851,10 +851,14 @@ bool Map::ScriptCommand_Mount(const ScriptInfo& script, WorldObject* source, Wor
 
     if (pSource->IsAlive())
     {
+        bool ok;
         if (displayId)
-            pSource->Mount(displayId);
+            ok = pSource->Mount(displayId) == MOUNTRESULT_OK;
         else
-            pSource->Unmount();
+            ok = pSource->Unmount() == DISMOUNTRESULT_OK;
+
+        if (!ok && ShouldAbortScript(script))
+            return true;
     }
 
     if (script.mount.permanent)

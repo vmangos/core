@@ -553,8 +553,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual bool IsStandingUpForProc() const; // takes not yet applied stand state change into account (for players to simulate batching)
         bool IsMounted() const { return (GetMountID() != 0); }
         uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
-        virtual void Mount(uint32 mount, uint32 spellId = 0);
-        virtual void Unmount(bool from_aura = false);
+        virtual UnitMountResult Mount(uint32 mount, uint32 spellId = 0);
+        virtual UnitDismountResult Unmount(bool from_aura = false);
         ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, 2)); }
         void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, 2, form); }
         bool IsInFeralForm() const

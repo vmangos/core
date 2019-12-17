@@ -615,29 +615,6 @@ enum PlayerDelayedOperations
     DELAYED_END
 };
 
-enum PlayerMountResult
-{
-    MOUNTRESULT_INVALIDMOUNTEE  = 0,    // You can't mount that unit!
-    MOUNTRESULT_TOOFARAWAY      = 1,    // That mount is too far away!
-    MOUNTRESULT_ALREADYMOUNTED  = 2,    // You're already mounted!
-    MOUNTRESULT_NOTMOUNTABLE    = 3,    // That unit can't be mounted!
-    MOUNTRESULT_NOTYOURPET      = 4,    // That mount isn't your pet!
-    MOUNTRESULT_OTHER           = 5,    // internal
-    MOUNTRESULT_LOOTING         = 6,    // You can't mount while looting!
-    MOUNTRESULT_RACECANTMOUNT   = 7,    // You can't mount because of your race!
-    MOUNTRESULT_SHAPESHIFTED    = 8,    // You can't mount while shapeshifted!
-    MOUNTRESULT_FORCEDDISMOUNT  = 9,    // You dismount before continuing.
-    MOUNTRESULT_OK              = 10    // no error
-};
-
-enum PlayerDismountResult
-{
-    DISMOUNTRESULT_NOPET        = 0,    // internal
-    DISMOUNTRESULT_NOTMOUNTED   = 1,    // You're not mounted!
-    DISMOUNTRESULT_NOTYOURPET   = 2,    // internal
-    DISMOUNTRESULT_OK           = 3     // no error
-};
-
 enum ReputationSource
 {
     REPUTATION_SOURCE_KILL,
@@ -2079,15 +2056,15 @@ class MANGOS_DLL_SPEC Player final: public Unit
         ObjectGuid     m_selectedGobj; // For GM commands
         ObjectGuid m_escortingGuid;
 
-        void SendMountResult(PlayerMountResult result) const;
-        void SendDismountResult(PlayerDismountResult result) const;
+        void SendMountResult(UnitMountResult result) const;
+        void SendDismountResult(UnitDismountResult result) const;
         void UpdateCorpseReclaimDelay();
     public:
         void ScheduleStandStateChange(uint8 state);
         void ClearScheduledStandState() { m_newStandState = MAX_UNIT_STAND_STATE; m_standStateTimer = 0; }
         bool IsStandingUpForProc() const override;
-        void Mount(uint32 mount, uint32 spellId = 0) override;
-        void Unmount(bool from_aura = false) override;
+        UnitMountResult Mount(uint32 mount, uint32 spellId = 0) override;
+        UnitDismountResult Unmount(bool from_aura = false) override;
 
         bool CanInteractWithQuestGiver(Object* questGiver) const;
         Creature* GetNPCIfCanInteractWith(ObjectGuid guid, uint32 npcflagmask) const;
