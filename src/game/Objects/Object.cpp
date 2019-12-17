@@ -3302,7 +3302,7 @@ uint32 WorldObject::GetLevelForTarget(WorldObject const* target) const
     if (Unit const* pUnit = ::ToUnit(target))
         return pUnit->GetLevel();
 
-    return DEFAULT_MAX_LEVEL;
+    return PLAYER_MAX_LEVEL;
 }
 
 uint32 WorldObject::GetWeaponSkillValue(WeaponAttackType attType, WorldObject const* target) const

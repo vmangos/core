@@ -3535,44 +3535,32 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
     if (m_casterUnit->GetTypeId() != TYPEID_PLAYER && m_casterUnit->GetGuardianCountWithEntry(pet_entry) > 15)
         return;
 
-    // in another case summon new
-    uint32 level = m_casterUnit->GetLevel();
+    // Guardian pets use their creature template level by default
+    uint32 level = urand(cInfo->level_min, cInfo->level_max);
+    if (m_casterUnit->GetTypeId() != TYPEID_PLAYER)
+    {
+        // If EffectMultipleValue <= 0, guardian pets use their caster level modified by EffectMultipleValue for their own level
+        if (m_spellInfo->EffectMultipleValue[eff_idx] <= 0)
+        {
+            uint32 resultLevel = std::max(m_casterUnit->GetLevel() + m_spellInfo->EffectMultipleValue[eff_idx], 0.0f);
 
-    // Summoned by unit: use creature level but cap at owner level
-    if (m_casterUnit->GetTypeId() == TYPEID_UNIT)
-    {
-        uint32 creaturelevel = cInfo->level_min == cInfo->level_max ? cInfo->level_min : urand(cInfo->level_min, cInfo->level_max);
-        if (creaturelevel < level) level = creaturelevel;
+            // Result level should be a valid level for creatures
+            if (resultLevel > 0 && resultLevel <= CREATURE_MAX_LEVEL)
+                level = resultLevel;
+        }
     }
-    // Summoned by player
-    else
+    // level of pet summoned using engineering item based at engineering skill level
+    else if (m_CastItem)
     {
-        // Use spell level if possible
-        if (m_spellInfo->spellLevel > 1)
+        ItemPrototype const *proto = m_CastItem->GetProto();
+        if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
         {
-            level = m_spellInfo->spellLevel;
-        }
-        // Else match with owner level but cap at creature max
-        else if (cInfo->level_max < level)
-        {
-            level = cInfo->level_max;
-        }
-        // Engineering summons always scale with skill points
-        if (m_CastItem)
-        {
-            ItemPrototype const *proto = m_CastItem->GetProto();
-            if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
+            uint16 engiLevel = ((Player*)m_casterUnit)->GetSkillValue(SKILL_ENGINEERING);
+            if (engiLevel)
             {
-                uint16 engiLevel = ((Player*)m_casterUnit)->GetSkillValue(SKILL_ENGINEERING);
-                if (engiLevel)
-                {
-                    level = engiLevel / 5;
-                }
+                level = engiLevel / 5;
             }
         }
-        // Eye of Kilrog
-        if (m_spellInfo->Effect[eff_idx] == SPELL_EFFECT_SUMMON_POSSESSED)
-            level = m_casterUnit->GetLevel();
     }
 
     // select center of summon position

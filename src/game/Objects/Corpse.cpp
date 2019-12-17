@@ -299,5 +299,5 @@ uint32 Corpse::GetLevel() const
 {
     if (Unit* pOwner = ObjectAccessor::GetUnit(*this, GetOwnerGuid()))
         return pOwner->GetLevel();
-    return DEFAULT_MAX_LEVEL;
+    return PLAYER_MAX_LEVEL;
 }

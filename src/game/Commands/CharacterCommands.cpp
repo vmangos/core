@@ -542,8 +542,8 @@ bool ChatHandler::HandleLevelUpCommand(char* args)
         if (newlevel < 1)
             newlevel = 1;
 
-        if (newlevel > STRONG_MAX_LEVEL)
-            newlevel = STRONG_MAX_LEVEL;
+        if (newlevel > PLAYER_STRONG_MAX_LEVEL)
+            newlevel = PLAYER_STRONG_MAX_LEVEL;
 
         if (pCreature->IsPet())
             ((Pet*)pCreature)->GivePetLevel(newlevel);
@@ -566,8 +566,8 @@ bool ChatHandler::HandleLevelUpCommand(char* args)
         if (newlevel < 1)
             newlevel = 1;
 
-        if (newlevel > STRONG_MAX_LEVEL)                        // hardcoded maximum level
-            newlevel = STRONG_MAX_LEVEL;
+        if (newlevel > PLAYER_STRONG_MAX_LEVEL)                        // hardcoded maximum level
+            newlevel = PLAYER_STRONG_MAX_LEVEL;
 
         HandleCharacterLevel(target, target_guid, oldlevel, newlevel);
 
@@ -1704,8 +1704,8 @@ bool ChatHandler::HandleCharacterLevelCommand(char* args)
     if (newlevel < 1)
         return false;                                       // invalid level
 
-    if (newlevel > STRONG_MAX_LEVEL)                        // hardcoded maximum level
-        newlevel = STRONG_MAX_LEVEL;
+    if (newlevel > PLAYER_STRONG_MAX_LEVEL)                 // hardcoded maximum level
+        newlevel = PLAYER_STRONG_MAX_LEVEL;
 
     HandleCharacterLevel(target, target_guid, oldlevel, newlevel);
 

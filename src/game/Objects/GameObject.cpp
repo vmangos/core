@@ -2384,7 +2384,7 @@ uint32 GameObject::GetLevel() const
     if (!level)
         level = GetUInt32Value(GAMEOBJECT_LEVEL);
 
-    return level > 0 ? level : DEFAULT_MAX_LEVEL;
+    return level > 0 ? level : PLAYER_MAX_LEVEL;
 }
 
 // function based on function Unit::CanAttack from 13850 client
