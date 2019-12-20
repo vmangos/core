@@ -300,7 +300,7 @@ CreatureAI* GetAI_boss_venoxis(Creature* pCreature)
 
 void AddSC_boss_venoxis()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_venoxis";
     newscript->GetAI = &GetAI_boss_venoxis;

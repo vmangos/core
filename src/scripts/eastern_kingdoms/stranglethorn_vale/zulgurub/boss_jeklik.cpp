@@ -560,7 +560,7 @@ CreatureAI* GetAI_guru_bat_rider(Creature* pCreature)
 
 void AddSC_boss_jeklik()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_jeklik";
     newscript->GetAI = &GetAI_boss_jeklik;

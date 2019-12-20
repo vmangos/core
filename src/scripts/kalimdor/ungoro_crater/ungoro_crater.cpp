@@ -935,7 +935,7 @@ CreatureAI* GetAI_npc_simone_the_inconspicuous(Creature* pCreature)
 
 void AddSC_ungoro_crater()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_ame01";

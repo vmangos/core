@@ -1300,7 +1300,7 @@ CreatureAI* GetAI_npc_master_wood(Creature* pCreature)
 
 void AddSC_stormwind_city()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_bartleby";

@@ -77,7 +77,7 @@ bool GOHello_go_mausoleum_trigger(Player* pPlayer, GameObject* pGo)
 
 void AddSC_tirisfal_glades()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_mausoleum_door";

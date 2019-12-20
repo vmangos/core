@@ -347,7 +347,7 @@ CreatureAI* GetAI_npc_highprotectorlorik(Creature* pCreature)
 
 void AddSC_western_plaguelands()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npcs_dithers_and_arbington";

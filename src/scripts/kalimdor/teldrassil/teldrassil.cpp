@@ -247,7 +247,7 @@ bool QuestComplete_npc_treshala_fallowbrook(Player* pPlayer, Creature* pQuestGiv
 
 void AddSC_teldrassil()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_mist";

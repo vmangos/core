@@ -90,7 +90,7 @@ CreatureAI* GetAI_boss_halycon(Creature* pCreature)
 
 void AddSC_boss_halycon()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_halycon";
     newscript->GetAI = &GetAI_boss_halycon;

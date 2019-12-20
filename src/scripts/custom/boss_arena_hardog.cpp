@@ -541,7 +541,7 @@ bool GossipSelect_npc_laska(Player *player, Creature *pCreature, uint32 sender, 
 
 void AddSC_boss_arena_hardog()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "arena_szerelmes";
     newscript->GetAI = &GetAI_arena_szerelmes;

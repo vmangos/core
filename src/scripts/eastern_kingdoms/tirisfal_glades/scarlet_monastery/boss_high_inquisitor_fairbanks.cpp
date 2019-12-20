@@ -143,7 +143,7 @@ CreatureAI* GetAI_boss_high_inquisitor_fairbanks(Creature* pCreature)
 
 void AddSC_boss_high_inquisitor_fairbanks()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_high_inquisitor_fairbanks";
     newscript->GetAI = &GetAI_boss_high_inquisitor_fairbanks;

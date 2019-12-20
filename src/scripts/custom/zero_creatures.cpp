@@ -471,7 +471,7 @@ CreatureAI* GetZeroAI_Mob_Grethok_The_Controller(Creature* pCreature)
 
 void AddSC_zero_creatures()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "zero_boss_razorgore";
     newscript->GetAI = &GetZeroAI_boss_razorgore;

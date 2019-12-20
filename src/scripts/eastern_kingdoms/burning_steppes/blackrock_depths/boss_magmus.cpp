@@ -107,7 +107,7 @@ CreatureAI* GetAI_boss_magmus(Creature* pCreature)
 
 void AddSC_boss_magmus()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_magmus";
     newscript->GetAI = &GetAI_boss_magmus;

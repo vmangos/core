@@ -119,7 +119,7 @@ CreatureAI* GetAI_boss_warmastervoone(Creature* pCreature)
 
 void AddSC_boss_warmastervoone()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_warmaster_voone";
     newscript->GetAI = &GetAI_boss_warmastervoone;

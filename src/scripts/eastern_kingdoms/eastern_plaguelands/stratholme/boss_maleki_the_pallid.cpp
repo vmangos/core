@@ -164,7 +164,7 @@ CreatureAI* GetAI_boss_maleki_the_pallid(Creature* pCreature)
 
 void AddSC_boss_maleki_the_pallid()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_maleki_the_pallid";
     newscript->GetAI = &GetAI_boss_maleki_the_pallid;

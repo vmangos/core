@@ -121,7 +121,7 @@ CreatureAI* GetAI_boss_ironaya(Creature* pCreature)
 
 void AddSC_boss_ironaya()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_ironaya";
     newscript->GetAI = &GetAI_boss_ironaya;

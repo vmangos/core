@@ -1579,7 +1579,7 @@ CreatureAI* GetAI_npc_aqwar_saurfang(Creature *pCreature)
 
 void AddSC_war_effort()
 {
-    Script *pNewScript;
+    Script* pNewScript;
 
     pNewScript = new Script;
     pNewScript->Name = "npc_AQwar_collector";

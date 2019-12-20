@@ -82,7 +82,7 @@ CreatureAI* GetAI_boss_grizzle(Creature* pCreature)
 
 void AddSC_boss_grizzle()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_grizzle";
     newscript->GetAI = &GetAI_boss_grizzle;

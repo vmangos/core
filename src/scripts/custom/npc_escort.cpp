@@ -146,7 +146,7 @@ bool QuestAccept_npc_escort_genericAI(Player* pPlayer, Creature* pCreature, Ques
 
 void AddSC_npc_escort()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "npc_escort";
     newscript->GetAI = &GetAI_npc_escort_genericAI;

@@ -27,7 +27,7 @@ CreatureAI* GetAI_TotemGlebe(Creature* pCreature)
 
 void AddSC_Totems()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "TotemGlebe";

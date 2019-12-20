@@ -332,7 +332,7 @@ bool GossipSelect_boss_doomrel(Player* pPlayer, Creature* pCreature, uint32 uiSe
 
 void AddSC_boss_tomb_of_seven()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_gloomrel";

@@ -122,7 +122,7 @@ CreatureAI* GetAI_boss_rasfrost(Creature* pCreature)
 
 void AddSC_boss_rasfrost()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_boss_ras_frostwhisper";
     newscript->GetAI = &GetAI_boss_rasfrost;

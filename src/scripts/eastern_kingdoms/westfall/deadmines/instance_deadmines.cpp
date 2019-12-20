@@ -309,7 +309,7 @@ InstanceData* GetInstanceData_instance_deadmines(Map* pMap)
 
 void AddSC_instance_deadmines()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_deadmines";
     newscript->GetInstanceData = &GetInstanceData_instance_deadmines;

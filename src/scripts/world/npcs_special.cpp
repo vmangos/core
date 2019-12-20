@@ -3478,7 +3478,7 @@ CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
 
 void AddSC_npcs_special()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_chicken_cluck";

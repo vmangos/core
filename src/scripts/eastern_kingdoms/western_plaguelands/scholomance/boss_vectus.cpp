@@ -317,7 +317,7 @@ CreatureAI* GetAI_npc_scholomance_student(Creature* pCreature)
 
 void AddSC_boss_vectus()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_vectus";
     newscript->GetAI = &GetAI_boss_vectus;

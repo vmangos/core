@@ -69,7 +69,7 @@ CreatureAI* GetAI_boss_lordblackwood(Creature* pCreature)
 
 void AddSC_boss_lordblackwood()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_lord_blackwood";
     newscript->GetAI = &GetAI_boss_lordblackwood;

@@ -375,7 +375,7 @@ CreatureAI* GetAI_npc_dorius(Creature* pCreature)
 
 void AddSC_searing_gorge()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_lothos_riftwaker";

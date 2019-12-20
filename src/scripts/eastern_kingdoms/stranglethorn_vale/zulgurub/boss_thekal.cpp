@@ -741,7 +741,7 @@ CreatureAI* GetAI_mob_zealot_zath(Creature* pCreature)
 
 void AddSC_boss_thekal()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_thekal";

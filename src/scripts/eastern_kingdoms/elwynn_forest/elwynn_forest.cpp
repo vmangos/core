@@ -149,7 +149,7 @@ bool GOHello_go_marshal_haggards_chest(Player* pPlayer, GameObject* pGo)
 }
 void AddSC_elwynn_forest()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_henze_faulk";

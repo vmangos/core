@@ -234,7 +234,7 @@ CreatureAI* GetAI_boss_magni_bronzebeard(Creature* pCreature)
 
 void AddSC_ironforge()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_royal_historian_archesonus";

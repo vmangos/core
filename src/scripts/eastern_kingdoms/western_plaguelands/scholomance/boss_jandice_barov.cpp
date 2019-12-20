@@ -224,7 +224,7 @@ CreatureAI* GetAI_mob_illusionofjandicebarov(Creature* pCreature)
 
 void AddSC_boss_jandicebarov()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_jandice_barov";
     newscript->GetAI = &GetAI_boss_jandicebarov;

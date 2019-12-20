@@ -98,7 +98,7 @@ CreatureAI* GetAI_boss_lorekeeperpolkelt(Creature* pCreature)
 
 void AddSC_boss_lorekeeperpolkelt()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_lorekeeper_polkelt";
     newscript->GetAI = &GetAI_boss_lorekeeperpolkelt;

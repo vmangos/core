@@ -540,7 +540,7 @@ CreatureAI* GetAI_mob_lava_surger(Creature* pCreature)
 
 void AddSC_molten_core()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "mob_firewalker";

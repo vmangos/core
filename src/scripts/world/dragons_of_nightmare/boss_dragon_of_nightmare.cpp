@@ -258,7 +258,7 @@ CreatureAI* GetAI_boss_dragon_of_nightmare(Creature* pCreature)
 
 void AddSC_dragons_of_nightmare()
 {
-    Script *pNewScript;
+    Script* pNewScript;
 
     pNewScript = new Script;
     pNewScript->Name = "npc_dream_fog";

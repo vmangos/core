@@ -498,7 +498,7 @@ GameObjectAI* GOGetAI_go_viewing_room_door(GameObject *pGo)
 
 void AddSC_instance_scholomance()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_scholomance";
     newscript->GetInstanceData = &GetInstanceData_instance_scholomance;

@@ -88,7 +88,7 @@ CreatureAI* GetAI_plainVision(Creature* pCreature)
 
 void AddSC_mulgore()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_plains_vision";

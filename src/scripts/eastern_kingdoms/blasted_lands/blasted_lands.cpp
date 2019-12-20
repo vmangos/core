@@ -177,7 +177,7 @@ bool GOHello_go_stone_of_binding(Player* pPlayer, GameObject* pGo)
 }
 void AddSC_blasted_lands()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_thadius_grimshade";

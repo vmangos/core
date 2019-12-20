@@ -142,7 +142,7 @@ CreatureAI* GetAI_boss_postmaster_malown(Creature* pCreature)
 
 void AddSC_boss_postmaster_malown()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_postmaster_malown";
     newscript->GetAI = &GetAI_boss_postmaster_malown;

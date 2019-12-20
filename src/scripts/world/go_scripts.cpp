@@ -515,7 +515,7 @@ GameObjectAI* GetAI_go_darkmoon_faire_music(GameObject* gameobject)
 
 void AddSC_go_scripts()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_greater_moonlight";

@@ -148,7 +148,7 @@ CreatureAI* GetAI_boss_sulfuron(Creature* pCreature)
 
 void AddSC_boss_sulfuron()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_sulfuron";

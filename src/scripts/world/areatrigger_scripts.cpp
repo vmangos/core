@@ -75,7 +75,7 @@ bool AreaTrigger_at_ravenholdt(Player* pPlayer, AreaTriggerEntry const* pAt)
 
 void AddSC_areatrigger_scripts()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "at_ravenholdt";

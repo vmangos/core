@@ -297,7 +297,7 @@ bool GO_scarlet_cannon(Player* pPlayer, GameObject* pGo)
 
 void AddSC_boss_cannon_master_willey()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_cannon_master_willey";
     newscript->GetAI = &GetAI_boss_cannon_master_willey;

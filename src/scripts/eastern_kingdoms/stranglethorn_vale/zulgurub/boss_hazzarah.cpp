@@ -102,7 +102,7 @@ CreatureAI* GetAI_boss_hazzarah(Creature* pCreature)
 
 void AddSC_boss_hazzarah()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_hazzarah";
     newscript->GetAI = &GetAI_boss_hazzarah;

@@ -375,7 +375,7 @@ CreatureAI* GetAI_mob_buru_egg(Creature* pCreature)
 
 void AddSC_boss_buru()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_buru";
     newscript->GetAI = &GetAI_boss_buru;

@@ -1525,7 +1525,7 @@ bool at_murloc_camp(Player* pPlayer, AreaTriggerEntry const *pAt)
 
 void AddSC_darkshore()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_kerlonian";

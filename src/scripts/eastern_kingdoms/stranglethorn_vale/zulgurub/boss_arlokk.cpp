@@ -456,7 +456,7 @@ CreatureAI* GetAI_mob_prowler(Creature* pCreature)
 
 void AddSC_boss_arlokk()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_gong_of_bethekk";

@@ -134,7 +134,7 @@ bool GossipHello_npc_eitrigg(Player* pPlayer, Creature* pCreature)
 
 void AddSC_orgrimmar()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_shenthul";

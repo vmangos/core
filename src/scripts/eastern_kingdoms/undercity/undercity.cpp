@@ -155,7 +155,7 @@ CreatureAI* GetAI_boss_sylvanas(Creature* pCreature)
 
 void AddSC_undercity()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_lady_sylvanas_windrunner";

@@ -1219,7 +1219,7 @@ CreatureAI* GetAI_npc_piege_grille2(Creature* pCreature)
 
 void AddSC_stratholme()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_gauntlet_gate";

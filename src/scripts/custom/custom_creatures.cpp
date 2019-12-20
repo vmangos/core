@@ -1096,7 +1096,7 @@ CreatureAI* GetAI_custom_summon_debug(Creature *creature)
 
 void AddSC_custom_creatures()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "custom_teleport_npc";

@@ -407,7 +407,7 @@ CreatureAI* GetAI_generic_random_move(Creature* pCreature)
 
 void AddSC_boss_ossirian()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_ossirian";
     newscript->GetAI = &GetAI_boss_ossirian;

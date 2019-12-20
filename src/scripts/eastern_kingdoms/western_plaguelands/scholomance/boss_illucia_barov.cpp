@@ -105,7 +105,7 @@ CreatureAI* GetAI_boss_illuciabarov(Creature* pCreature)
 
 void AddSC_boss_illuciabarov()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_illucia_barov";
     newscript->GetAI = &GetAI_boss_illuciabarov;

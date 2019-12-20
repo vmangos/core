@@ -663,7 +663,7 @@ CreatureAI* GetAI_npc_witch_doctor_unbagwa(Creature* pCreature)
 
 void AddSC_stranglethorn_vale()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "mob_yenniku";

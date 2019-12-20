@@ -446,7 +446,7 @@ bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, Quest const*
 
 void AddSC_arathi_highlands()
 {
-    Script * newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_professor_phizzlethorpe";

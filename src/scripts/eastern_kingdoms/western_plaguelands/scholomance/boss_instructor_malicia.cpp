@@ -142,7 +142,7 @@ CreatureAI* GetAI_boss_instructormalicia(Creature* pCreature)
 
 void AddSC_boss_instructormalicia()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_instructor_malicia";
     newscript->GetAI = &GetAI_boss_instructormalicia;

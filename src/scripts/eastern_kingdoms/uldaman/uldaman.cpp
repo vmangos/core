@@ -346,7 +346,7 @@ enum
 
 void AddSC_uldaman()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "mob_annora";

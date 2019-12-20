@@ -77,7 +77,7 @@ CreatureAI* GetAI_boss_wushoolay(Creature* pCreature)
 
 void AddSC_boss_wushoolay()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_wushoolay";
     newscript->GetAI = &GetAI_boss_wushoolay;

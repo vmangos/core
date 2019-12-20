@@ -90,7 +90,7 @@ CreatureAI* GetAI_boss_gorosh_the_dervish(Creature* pCreature)
 
 void AddSC_boss_gorosh_the_dervish()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_gorosh_the_dervish";
     newscript->GetAI = &GetAI_boss_gorosh_the_dervish;

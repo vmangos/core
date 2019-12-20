@@ -1111,7 +1111,7 @@ CreatureAI* GetAI_QirajiSwarmguard(Creature* pCreature)
 
 void AddSC_ruins_of_ahnqiraj()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "mob_anubisath_guardian";
     newscript->GetAI = &GetAI_mob_anubisath_guardian;

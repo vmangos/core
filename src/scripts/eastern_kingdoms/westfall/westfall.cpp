@@ -258,7 +258,7 @@ CreatureAI* GetAI_npc_defias_traitor(Creature* pCreature)
 
 void AddSC_westfall()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_daphne_stilwell";

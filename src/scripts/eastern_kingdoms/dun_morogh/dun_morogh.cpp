@@ -1454,7 +1454,7 @@ CreatureAI* GetAI_npc_mortar_team_target_dummy(Creature* pCreature)
 
 void AddSC_dun_morogh()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_narm_faulk";

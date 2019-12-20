@@ -1313,7 +1313,7 @@ CreatureAI* GetAI_npc_caravan_vendor(Creature* pCreature)
 
 void AddSC_desolace()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_aged_dying_ancient_kodo";

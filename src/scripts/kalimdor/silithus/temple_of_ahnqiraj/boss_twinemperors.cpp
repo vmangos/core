@@ -984,7 +984,7 @@ CreatureAI* GetAI_twinsBug(Creature* pCreature)
 
 void AddSC_boss_twinemperors()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_veknilash";

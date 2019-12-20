@@ -3339,7 +3339,7 @@ CreatureAI* GetAI_boss_vamAI(Creature* pCreature)
 
 void AddSC_silithus()
 {
-    Script *pNewScript;
+    Script* pNewScript;
 
     pNewScript = new Script;
     pNewScript->Name = "npc_highlord_demitrian";

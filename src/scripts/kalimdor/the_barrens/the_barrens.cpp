@@ -1527,7 +1527,7 @@ bool ProcessEventId_event_the_principle_source(uint32 eventId, Object* pSource, 
 
 void AddSC_the_barrens()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_beaten_corpse";

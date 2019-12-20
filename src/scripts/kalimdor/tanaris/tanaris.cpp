@@ -693,7 +693,7 @@ bool QuestRewarded_npc_yehkinya(Player* pPlayer, Creature* pCreature, Quest cons
 
 void AddSC_tanaris()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_yehkinya";

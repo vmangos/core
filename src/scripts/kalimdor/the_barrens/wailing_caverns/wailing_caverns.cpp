@@ -723,7 +723,7 @@ CreatureAI* GetAI_EvolvingEctoplasmAI(Creature* pCreature)
 
 void AddSC_wailing_caverns()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_evolving_ectoplasm";

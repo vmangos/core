@@ -113,7 +113,7 @@ CreatureAI* GetAI_boss_interrogator_vishas(Creature* pCreature)
 
 void AddSC_boss_interrogator_vishas()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_interrogator_vishas";
     newscript->GetAI = &GetAI_boss_interrogator_vishas;

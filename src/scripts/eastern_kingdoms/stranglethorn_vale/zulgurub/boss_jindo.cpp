@@ -417,7 +417,7 @@ CreatureAI* GetAI_mob_brain_wash(Creature* pCreature)
 // UPDATE `creature_template` SET `ai_name` = '', `script_name` = 'mob_brain_wash' WHERE `entry` = 15112;
 void AddSC_boss_jindo()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_jindo";

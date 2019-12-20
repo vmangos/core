@@ -49,7 +49,7 @@ InstanceData* GetInstanceData_instance_onyxia_lair(Map* pMap)
 
 void AddSC_instance_onyxia_lair()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "instance_onyxia_lair";

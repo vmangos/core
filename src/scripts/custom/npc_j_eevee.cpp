@@ -275,7 +275,7 @@ CreatureAI* GetAI_npc_j_eevee(Creature* pCreature)
 
 void AddSC_npc_j_eevee()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_j_eevee";

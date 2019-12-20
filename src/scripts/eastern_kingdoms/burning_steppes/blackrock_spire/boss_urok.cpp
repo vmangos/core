@@ -364,7 +364,7 @@ void DefineGoChallenge(Creature * crea, uint64 gobjGUID)
 }
 void AddSC_boss_urok() // Permet l'intégration dans la DB.
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_urok_challenge";

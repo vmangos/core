@@ -1169,7 +1169,7 @@ InstanceData* GetInstanceData_instance_blackrock_depths(Map* pMap)
 
 void AddSC_instance_blackrock_depths()
 {
-	Script *newscript;
+	Script* newscript;
 	newscript = new Script;
 	newscript->Name = "instance_blackrock_depths";
 	newscript->GetInstanceData = &GetInstanceData_instance_blackrock_depths;

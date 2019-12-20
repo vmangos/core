@@ -197,7 +197,7 @@ CreatureAI* GetAI_LazyPeon(Creature* pCreature)
 
 void AddSC_durotar()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "LazyPeons";

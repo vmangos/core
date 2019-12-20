@@ -754,7 +754,7 @@ CreatureAI* GetAI_npc_klinfran(Creature* pCreature)
 
 void AddSC_burning_steppes()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_ragged_john";

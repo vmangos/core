@@ -96,7 +96,7 @@ GameObjectAI* GetAIgo_defias_gunpowder(GameObject *go)
 
 void AddSC_deadmines()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_door_lever_dm";

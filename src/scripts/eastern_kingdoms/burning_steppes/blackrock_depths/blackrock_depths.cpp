@@ -2633,7 +2633,7 @@ GameObjectAI* GetAI_go_cell_door(GameObject* pGo)
 
 void AddSC_blackrock_depths()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_shadowforge_brazier";

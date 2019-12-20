@@ -1025,7 +1025,7 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
 
 void AddSC_quest_stormwind_rendezvous()
 {
-    Script *pNewScript;
+    Script* pNewScript;
 
     pNewScript = new Script;
     pNewScript->Name = "npc_squire_rowe";

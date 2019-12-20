@@ -158,7 +158,7 @@ bool QuestRewarded_go_dusty_rug(Player* pPlayer, GameObject* pGo, Quest const* p
 
 void AddSC_hillsbrad_foothills()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_helcular_s_grave";

@@ -154,7 +154,7 @@ bool GossipSelect_npc_cairne_bloodhoof(Player* pPlayer, Creature* pCreature, uin
 
 void AddSC_thunder_bluff()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_cairne_bloodhoof";

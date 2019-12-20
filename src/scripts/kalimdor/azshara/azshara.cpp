@@ -328,7 +328,7 @@ CreatureAI* GetAI_mob_maws(Creature* pCreature)
 
 void AddSC_azshara()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "mobs_spitelashes";

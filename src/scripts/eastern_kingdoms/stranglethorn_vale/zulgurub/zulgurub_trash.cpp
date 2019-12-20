@@ -449,7 +449,7 @@ GameObjectAI* GetAIgo_pile_dechets(GameObject *pGo)
 
 void AddSC_zg_trash()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_gurubashi_berserker";

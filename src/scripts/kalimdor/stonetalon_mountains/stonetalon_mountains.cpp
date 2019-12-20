@@ -147,7 +147,7 @@ bool QuestAccept_npc_piznik(Player *pPlayer, Creature *pCreature, Quest const *p
 
 void AddSC_stonetalon_mountains()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_piznik";

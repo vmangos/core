@@ -650,7 +650,7 @@ void AddSC_zulfarrak()
     AddSC_at_zumrah();
     AddSC_go_troll_cage();
 
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "ward_zumrah";

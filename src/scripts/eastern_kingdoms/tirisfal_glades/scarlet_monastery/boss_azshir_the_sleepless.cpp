@@ -91,7 +91,7 @@ CreatureAI* GetAI_boss_azshir_the_sleepless(Creature* pCreature)
 
 void AddSC_boss_azshir_the_sleepless()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_azshir_the_sleepless";
     newscript->GetAI = &GetAI_boss_azshir_the_sleepless;

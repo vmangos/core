@@ -422,7 +422,7 @@ CreatureAI* GetAI_boss_ayamiss(Creature* pCreature)
 
 void AddSC_boss_ayamiss()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_ayamiss";
     newscript->GetAI = &GetAI_boss_ayamiss;

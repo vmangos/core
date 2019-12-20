@@ -116,7 +116,7 @@ CreatureAI* GetAI_boss_kormok(Creature* pCreature)
 
 void AddSC_boss_kormok()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_kormok";
     newscript->GetAI = &GetAI_boss_kormok;

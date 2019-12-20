@@ -1396,7 +1396,7 @@ CreatureAI* GetAI_npc_corrupted_whelp(Creature* pCreature)
 
 void AddSC_instance_blackwing_lair()
 {
-    Script *pNewscript;
+    Script* pNewscript;
     pNewscript = new Script;
     pNewscript->Name = "instance_blackwing_lair";
     pNewscript->GetInstanceData = &GetInstanceData_instance_blackwing_lair;

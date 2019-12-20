@@ -511,7 +511,7 @@ bool GossipHello_npc_mikhail(Player* pPlayer, Creature* pCreature)
 //-----------------------------------------------------------------------------
 void AddSC_wetlands()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_slims_friend";

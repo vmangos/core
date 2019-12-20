@@ -125,7 +125,7 @@ CreatureAI* GetAI_boss_noxxion(Creature* pCreature)
 
 void AddSC_boss_noxxion()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_noxxion";
     newscript->GetAI = &GetAI_boss_noxxion;

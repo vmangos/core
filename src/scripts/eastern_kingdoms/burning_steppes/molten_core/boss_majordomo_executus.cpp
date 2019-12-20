@@ -461,7 +461,7 @@ CreatureAI* GetAI_boss_majordomo(Creature* pCreature)
 
 void AddSC_boss_majordomo()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_majordomo";
     newscript->GetAI = &GetAI_boss_majordomo;

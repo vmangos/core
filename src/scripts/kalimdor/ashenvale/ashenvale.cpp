@@ -957,7 +957,7 @@ void DefineFoulwealdMound(Creature * crea, uint64 gobjGUID)
 
 void AddSC_ashenvale()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_muglash";

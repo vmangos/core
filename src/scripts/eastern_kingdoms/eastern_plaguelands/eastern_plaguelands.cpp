@@ -1859,7 +1859,7 @@ bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpe
 
 void AddSC_eastern_plaguelands()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_darrowshire_spirit";

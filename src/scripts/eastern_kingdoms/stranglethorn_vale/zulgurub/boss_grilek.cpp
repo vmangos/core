@@ -85,7 +85,7 @@ CreatureAI* GetAI_boss_grilek(Creature* pCreature)
 
 void AddSC_boss_grilek()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_grilek";
     newscript->GetAI = &GetAI_boss_grilek;

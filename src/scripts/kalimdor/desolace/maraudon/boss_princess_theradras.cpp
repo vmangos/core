@@ -126,7 +126,7 @@ CreatureAI* GetAI_boss_ptheradras(Creature* pCreature)
 
 void AddSC_boss_ptheradras()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_princess_theradras";
     newscript->GetAI = &GetAI_boss_ptheradras;

@@ -1638,7 +1638,7 @@ GameObjectAI* GetAI_go_forged_seal(GameObject* pGo)
 
 void AddSC_dustwallow_marsh()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_morokk";

@@ -73,7 +73,7 @@ CreatureAI* GetAI_boss_houndmaster_loksey(Creature* pCreature)
 
 void AddSC_boss_houndmaster_loksey()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_houndmaster_loksey";
     newscript->GetAI = &GetAI_boss_houndmaster_loksey;

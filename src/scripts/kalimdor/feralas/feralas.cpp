@@ -933,7 +933,7 @@ bool QuestAccept_npc_kindal_moonweaver(Player* pPlayer, Creature* pCreature, Que
 
 void AddSC_feralas()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_mushgog";

@@ -163,7 +163,7 @@ CreatureAI* GetAI_boss_magistrate_barthilas(Creature* pCreature)
 
 void AddSC_boss_magistrate_barthilas()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_magistrate_barthilas";
     newscript->GetAI = &GetAI_boss_magistrate_barthilas;

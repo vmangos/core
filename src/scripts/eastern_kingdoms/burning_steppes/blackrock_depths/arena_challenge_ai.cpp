@@ -508,7 +508,7 @@ CreatureAI* GetAI_npc_malgen_longspear(Creature* pCreature)
 
 void AddSC_blackrock_depths_arena_challenge()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_theldren";
