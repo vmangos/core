@@ -78,7 +78,7 @@ inline void C_Evaluate(const Vector3 *vertice, float t, const float (&matrix)[4]
     int i = 0;
     double c;
     double x = 0, y = 0, z = 0;
-    while ( i < 4 )
+    while (i < 4)
     {
         c = matrix[0][i]*tvec.x + matrix[1][i]*tvec.y + matrix[2][i]*tvec.z + matrix[3][i];
 

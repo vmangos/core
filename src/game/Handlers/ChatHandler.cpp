@@ -331,9 +331,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
                         if (auto cooldown = ChatCooldown())
                         {
-                            ChatHandler(this).PSendSysMessage(
-                                "Please wait %u seconds before sending another message.", cooldown
-                            );
+                            ChatHandler(this).PSendSysMessage("Please wait %u seconds before sending another message.", cooldown);
                             return;
                         }
                     }
@@ -627,20 +625,20 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         {
             ForwardPacketToNode();
 
-            if(_player && _player->IsInCombat())
+            if (_player && _player->IsInCombat())
                 break;
 
-            if(!msg.empty() || !_player->IsAFK())
+            if (!msg.empty() || !_player->IsAFK())
             {
                 if (MasterPlayer* masterPlr = GetMasterPlayer())
                     masterPlr->afkMsg = msg;
             }
 
-            if(msg.empty() || !_player->IsAFK())
+            if (msg.empty() || !_player->IsAFK())
             {
                 _player->ToggleAFK();
 
-                if(_player->IsAFK() && _player->IsDND())
+                if (_player->IsAFK() && _player->IsDND())
                     _player->ToggleDND();
             }
         }
@@ -649,17 +647,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
         case CHAT_MSG_DND:
         {
-            if(!msg.empty() || !_player->IsDND())
+            if (!msg.empty() || !_player->IsDND())
             {
                 if (MasterPlayer* masterPlr = GetMasterPlayer())
                     masterPlr->dndMsg = msg;
             }
 
-            if(msg.empty() || !_player->IsDND())
+            if (msg.empty() || !_player->IsDND())
             {
                 _player->ToggleDND();
 
-                if(_player->IsDND() && _player->IsAFK())
+                if (_player->IsDND() && _player->IsAFK())
                     _player->ToggleAFK();
             }
         }

@@ -632,7 +632,7 @@ void Guild::BroadcastToOfficers(WorldSession *session, std::string const& msg, u
     }
 }
 
-void Guild::BroadcastPacket(WorldPacket *packet)
+void Guild::BroadcastPacket(WorldPacket* packet)
 {
     for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
     {
@@ -642,7 +642,7 @@ void Guild::BroadcastPacket(WorldPacket *packet)
     }
 }
 
-void Guild::BroadcastPacketToRank(WorldPacket *packet, uint32 rankId)
+void Guild::BroadcastPacketToRank(WorldPacket* packet, uint32 rankId)
 {
     for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
     {

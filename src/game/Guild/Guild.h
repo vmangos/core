@@ -259,8 +259,8 @@ class Guild
 
         void BroadcastToGuild(WorldSession *session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
         void BroadcastToOfficers(WorldSession *session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastPacketToRank(WorldPacket *packet, uint32 rankId);
-        void BroadcastPacket(WorldPacket *packet);
+        void BroadcastPacketToRank(WorldPacket* packet, uint32 rankId);
+        void BroadcastPacket(WorldPacket* packet);
 
         void BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 = nullptr, char const* str2 = nullptr, char const* str3 = nullptr);
         void BroadcastEvent(GuildEvents event, char const* str1 = nullptr, char const* str2 = nullptr, char const* str3 = nullptr)
@@ -272,8 +272,8 @@ class Guild
         void BroadcastWorker(Do& _do, Player* except = nullptr)
         {
             for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
-                if(Player *player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
-                    if(player != except)
+                if (Player *player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
+                    if (player != except)
                         _do(player);
         }
 
@@ -305,7 +305,7 @@ class Guild
         MemberSlot* GetMemberSlot(std::string const& name)
         {
             for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
-                if(itr->second.Name == name)
+                if (itr->second.Name == name)
                     return &itr->second;
 
             return nullptr;

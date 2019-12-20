@@ -97,7 +97,7 @@ public:
     void SendDisconnectedFromMaster(uint32 accountId);
 
     // Handlers
-    void HandleNull(WorldPacket& ) {}
+    void HandleNull(WorldPacket&) {}
     void HandleMasterHello(WorldPacket& pkt);
     void HandleNodeHello(WorldPacket& pkt);
     void HandleRequestFreeGuidsItems(WorldPacket& pkt);

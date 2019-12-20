@@ -174,7 +174,7 @@ World::~World()
 void World::Shutdown()
 {
     sWorld.KickAll();                                       // save and kick all players
-    sWorld.UpdateSessions( 1 );                             // real players unload required UpdateSessions call
+    sWorld.UpdateSessions(1);                               // real players unload required UpdateSessions call
     if (m_charDbWorkerThread)
         m_charDbWorkerThread->wait();
 }
@@ -2005,7 +2005,7 @@ void World::Update(uint32 diff)
 }
 
 /// Send a packet to all players (except self if mentioned)
-void World::SendGlobalMessage(WorldPacket *packet, WorldSession *self, uint32 team)
+void World::SendGlobalMessage(WorldPacket* packet, WorldSession* self, uint32 team)
 {
     for (const auto& itr : m_sessions)
     {
@@ -2177,7 +2177,7 @@ void World::SendGlobalText(const char* text, WorldSession *self)
 }
 
 /// Send a packet to all players (or players selected team) in the zone (except self if mentioned)
-void World::SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self, uint32 team)
+void World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self, uint32 team)
 {
     for (const auto& itr : m_sessions)
     {

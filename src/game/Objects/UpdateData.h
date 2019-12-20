@@ -65,7 +65,7 @@ class UpdatePacket
 class PacketCompressor
 {
     public:
-        static void Compress(void* dst, uint32 *dst_size, void* src, int src_size);
+        static void Compress(void* dst, uint32* dst_size, void* src, int src_size);
 };
 
 class UpdateData
@@ -75,11 +75,11 @@ class UpdateData
         ~UpdateData();
 
         void AddOutOfRangeGUID(ObjectGuidSet& guids);
-        void AddOutOfRangeGUID(ObjectGuid const &guid);
-        void AddUpdateBlock(const ByteBuffer &block);
+        void AddOutOfRangeGUID(ObjectGuid const& guid);
+        void AddUpdateBlock(ByteBuffer const& block);
         void Send(WorldSession* session, bool hasTransport = false);
-        bool BuildPacket(WorldPacket *packet, bool hasTransport = false);
-        bool BuildPacket(WorldPacket *packet, UpdatePacket const* updPacket, bool hasTransport = false);
+        bool BuildPacket(WorldPacket* packet, bool hasTransport = false);
+        bool BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket, bool hasTransport = false);
         bool HasData() { return m_datas.size() || !m_outOfRangeGUIDs.empty(); }
         void Clear();
 

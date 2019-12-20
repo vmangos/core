@@ -132,7 +132,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         // current pet (slot 0)                   0   1      2      3        4      5    6           7              8        9           10    11    12       13         14       15            16      17              18        19                 20                 21              22
         /*result = CharacterDatabase.PQuery("SELECT id, entry, owner, modelid, level, exp, Reactstate, loyaltypoints, loyalty, trainpoint, slot, name, renamed, curhealth, curmana, curhappiness, abdata, TeachSpelldata, savetime, resettalents_cost, resettalents_time, CreatedBySpell, PetType "
             "FROM character_pet WHERE owner = '%u' AND slot = '%u'",
-            ownerid, PET_SAVE_AS_CURRENT );*/
+            ownerid, PET_SAVE_AS_CURRENT);*/
         m_pTmpCache = sCharacterDatabaseCache.GetCharacterCurrentPet(ownerid);
     }
     else if (petentry)
@@ -478,8 +478,8 @@ void Pet::SavePetToDB(PetSaveMode mode)
         uint32 curmana = GetPower(POWER_MANA);
 
         // stable and not in slot saves
-        if ( (mode != PET_SAVE_AS_CURRENT && getPetType() != HUNTER_PET) ||
-              mode == PET_SAVE_FIRST_STABLE_SLOT || mode == PET_SAVE_LAST_STABLE_SLOT )
+        if ((mode != PET_SAVE_AS_CURRENT && getPetType() != HUNTER_PET) ||
+             mode == PET_SAVE_FIRST_STABLE_SLOT || mode == PET_SAVE_LAST_STABLE_SLOT)
             RemoveAllAuras();
 
         //save pet's data as one single transaction
@@ -1628,7 +1628,7 @@ void Pet::_LoadSpellCooldowns()
 
             DEBUG_LOG("Pet (Number: %u) spell %u cooldown loaded (%u secs).", m_charmInfo->GetPetNumber(), spell_id, uint32(db_time - curTime));
         }
-        //while( result->NextRow() );
+        //while (result->NextRow());
 
         //delete result;
 
@@ -1687,7 +1687,7 @@ void Pet::_LoadSpells()
             //Field *fields = result->Fetch();
             AddSpell(it->spell, ActiveStates(it->active), PETSPELL_UNCHANGED);
         }
-        //while( result->NextRow() );
+        //while (result->NextRow());
         //delete result;
     }
 }
@@ -1832,7 +1832,7 @@ void Pet::_LoadAuras(uint32 timediff)
             else
                 delete holder;
         }
-        //while( result->NextRow() );
+        //while (result->NextRow());
 
         //delete result;
     }

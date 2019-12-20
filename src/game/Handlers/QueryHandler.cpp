@@ -166,7 +166,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
     Creature *unit = _player->GetMap()->GetAnyTypeCreature(guid);
 
     //if (unit == nullptr)
-    //    sLog.outDebug( "WORLD: HandleCreatureQueryOpcode - (%u) NO SUCH UNIT! (GUID: %u, ENTRY: %u)", uint32(GUID_LOPART(guid)), guid, entry );
+    //    sLog.outDebug("WORLD: HandleCreatureQueryOpcode - (%u) NO SUCH UNIT! (GUID: %u, ENTRY: %u)", uint32(GUID_LOPART(guid)), guid, entry);
 
     CreatureInfo const *ci = ObjectMgr::GetCreatureTemplate(entry);
     if (ci)

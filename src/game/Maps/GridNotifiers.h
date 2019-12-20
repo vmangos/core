@@ -65,9 +65,9 @@ namespace MaNGOS
     struct MANGOS_DLL_DECL MessageDeliverer
     {
         Player const& i_player;
-        WorldPacket *i_message;
+        WorldPacket* i_message;
         bool i_toSelf;
-        MessageDeliverer(Player const& pl, WorldPacket *msg, bool to_self) : i_player(pl), i_message(msg), i_toSelf(to_self) {}
+        MessageDeliverer(Player const& pl, WorldPacket* msg, bool to_self) : i_player(pl), i_message(msg), i_toSelf(to_self) {}
         void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
@@ -77,7 +77,7 @@ namespace MaNGOS
         WorldPacket*  i_message;
         Player const* i_skipped_receiver;
 
-        MessageDelivererExcept(WorldPacket *msg, Player const* skipped)
+        MessageDelivererExcept(WorldPacket* msg, Player const* skipped)
             : i_message(msg), i_skipped_receiver(skipped) {}
 
         void Visit(CameraMapType &m);
@@ -86,8 +86,8 @@ namespace MaNGOS
 
     struct MANGOS_DLL_DECL ObjectMessageDeliverer
     {
-        WorldPacket *i_message;
-        explicit ObjectMessageDeliverer(WorldPacket *msg) : i_message(msg) {}
+        WorldPacket* i_message;
+        explicit ObjectMessageDeliverer(WorldPacket* msg) : i_message(msg) {}
         void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
@@ -95,12 +95,12 @@ namespace MaNGOS
     struct MANGOS_DLL_DECL MessageDistDeliverer
     {
         Player const& i_player;
-        WorldPacket *i_message;
+        WorldPacket* i_message;
         bool i_toSelf;
         bool i_ownTeamOnly;
         float i_dist;
 
-        MessageDistDeliverer(Player const& pl, WorldPacket *msg, float dist, bool to_self, bool ownTeamOnly)
+        MessageDistDeliverer(Player const& pl, WorldPacket* msg, float dist, bool to_self, bool ownTeamOnly)
             : i_player(pl), i_message(msg), i_toSelf(to_self), i_ownTeamOnly(ownTeamOnly), i_dist(dist) {}
         void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
@@ -109,9 +109,9 @@ namespace MaNGOS
     struct MANGOS_DLL_DECL ObjectMessageDistDeliverer
     {
         WorldObject const& i_object;
-        WorldPacket *i_message;
+        WorldPacket* i_message;
         float i_dist;
-        ObjectMessageDistDeliverer(WorldObject const& obj, WorldPacket *msg, float dist) : i_object(obj), i_message(msg), i_dist(dist) {}
+        ObjectMessageDistDeliverer(WorldObject const& obj, WorldPacket* msg, float dist) : i_object(obj), i_message(msg), i_dist(dist) {}
         void Visit(CameraMapType &m);
         template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
     };
@@ -155,7 +155,7 @@ namespace MaNGOS
         {
             i_check = caster;
             Unit* owner = i_check->IsUnit() ? static_cast<Unit*>(i_check)->GetOwner() : nullptr;
-            if(owner)
+            if (owner)
                 i_check = owner;
         }
 
@@ -547,7 +547,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_fobj; }
             bool operator()(Player* u)
             {
-                if( i_fobj->IsFriendlyTo(u) || u->IsAlive() || u->IsTaxiFlying() || !i_fobj->CanSeeInWorld(u))
+                if (i_fobj->IsFriendlyTo(u) || u->IsAlive() || u->IsTaxiFlying() || !i_fobj->CanSeeInWorld(u))
                     return false;
 
                 return i_fobj->IsWithinDistInMap(u, i_range);
@@ -588,10 +588,10 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_caster; }
             bool operator()(GameObject* go) const
             {
-                if(go->GetGOInfo()->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
+                if (go->GetGOInfo()->type != GAMEOBJECT_TYPE_SPELL_FOCUS)
                     return false;
 
-                if(go->GetGOInfo()->spellFocus.focusId != i_focusId)
+                if (go->GetGOInfo()->spellFocus.focusId != i_focusId)
                     return false;
 
                 float dist = (float)go->GetGOInfo()->spellFocus.dist;
@@ -611,7 +611,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return i_obj; }
             bool operator()(GameObject* go)
             {
-                if(go->GetGOInfo()->type == GAMEOBJECT_TYPE_FISHINGHOLE && go->isSpawned() && i_obj.IsWithinDistInMap(go, i_range) && i_obj.IsWithinDistInMap(go, (float)go->GetGOInfo()->fishinghole.radius))
+                if (go->GetGOInfo()->type == GAMEOBJECT_TYPE_FISHINGHOLE && go->isSpawned() && i_obj.IsWithinDistInMap(go, i_range) && i_obj.IsWithinDistInMap(go, (float)go->GetGOInfo()->fishinghole.radius))
                 {
                     i_range = i_obj.GetDistance(go);
                     return true;
@@ -635,7 +635,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return i_obj; }
             bool operator()(GameObject* go)
             {
-                if(go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range))
+                if (go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range))
                 {
                     i_range = i_obj.GetDistance(go);        // use found GO range as new range limit for next check
                     return true;
@@ -659,7 +659,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return i_obj; }
             bool operator()(GameObject* go)
             {
-                if(go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range))
+                if (go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range))
                 {
                     if (i_conditionId && !IsConditionSatisfied(i_conditionId, go, go->GetMap(), &i_obj, CONDITION_FROM_SPELL_AREA))
                         return false;
@@ -775,7 +775,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if(u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
+                if (u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
                     (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT)))
                 {
                     return true;
@@ -794,8 +794,8 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if(u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    !(u->HasAura(i_spell, EFFECT_INDEX_0) || u->HasAura(i_spell, EFFECT_INDEX_1) || u->HasAura(i_spell, EFFECT_INDEX_2)) )
+                if (u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
+                    !(u->HasAura(i_spell, EFFECT_INDEX_0) || u->HasAura(i_spell, EFFECT_INDEX_1) || u->HasAura(i_spell, EFFECT_INDEX_2)))
                 {
                     return true;
                 }
@@ -814,9 +814,9 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if(!i_funit->CanSeeInWorld(u))
+                if (!i_funit->CanSeeInWorld(u))
                     return false;
-                if(u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u))
+                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u))
                     return true;
                 return false;
             }
@@ -852,7 +852,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if(u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_obj->IsFriendlyTo(u) && u->CanSeeInWorld(i_obj))
+                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_obj->IsFriendlyTo(u) && u->CanSeeInWorld(i_obj))
                     return true;
                 return false;
             }
@@ -868,7 +868,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if(u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && u->CanSeeInWorld(i_obj))
+                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && u->CanSeeInWorld(i_obj))
                     return true;
 
                 return false;
@@ -1048,10 +1048,10 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_funit; }
             bool operator()(Creature* u)
             {
-                if(!u->CanSeeInWorld(i_funit))
+                if (!u->CanSeeInWorld(i_funit))
                     return false;
 
-                if(u->IsAlive() && u->IsHostileTo(i_funit) && i_funit->IsWithinDistInMap(u, u->GetAttackDistance(i_funit)))
+                if (u->IsAlive() && u->IsHostileTo(i_funit) && i_funit->IsWithinDistInMap(u, u->GetAttackDistance(i_funit)))
                     return true;
 
                 return false;
@@ -1070,18 +1070,18 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_funit; }
             bool operator()(Creature* u)
             {
-                if(u == i_funit)
+                if (u == i_funit)
                     return false;
 
-                if ( !u->CanAssistTo(i_funit, i_enemy) )
+                if (!u->CanAssistTo(i_funit, i_enemy))
                     return false;
 
                 // too far
-                if( !i_funit->IsWithinDistInMap(u, i_range) )
+                if (!i_funit->IsWithinDistInMap(u, i_range))
                     return false;
 
                 // only if see assisted creature
-                if( !i_funit->IsWithinLOSInMap(u) )
+                if (!i_funit->IsWithinLOSInMap(u))
                     return false;
 
                 return true;
@@ -1100,15 +1100,15 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Creature* u)
             {
-                if(u == i_obj)
+                if (u == i_obj)
                     return false;
-                if(!u->CanAssistTo(i_obj,i_enemy))
-                    return false;
-
-                if(!i_obj->IsWithinDistInMap(u, i_range))
+                if (!u->CanAssistTo(i_obj,i_enemy))
                     return false;
 
-                if(!i_obj->IsWithinLOSInMap(u))
+                if (!i_obj->IsWithinDistInMap(u, i_range))
+                    return false;
+
+                if (!i_obj->IsWithinLOSInMap(u))
                     return false;
 
                 i_range = i_obj->GetDistance(u);            // use found unit range as new range limit for next check
@@ -1231,7 +1231,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Player* u)
             {
-                if(u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range, b_3dDist))
+                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range, b_3dDist))
                     return true;
 
                 return false;
@@ -1267,7 +1267,7 @@ namespace MaNGOS
         public:
             explicit LocalizedPacketDo(Builder& builder) : i_builder(builder) {}
 
-            void operator()( Player* p );
+            void operator()(Player* p);
 
         private:
             Builder& i_builder;
@@ -1288,7 +1288,7 @@ namespace MaNGOS
                     for(size_t j = 0; j < i_data_cache[i].size(); ++j)
                         delete i_data_cache[i][j];
             }
-            void operator()( Player* p );
+            void operator()(Player* p);
 
         private:
             Builder& i_builder;

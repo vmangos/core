@@ -566,7 +566,7 @@ void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
         Creature * c = HashMapHolder<Creature>::Find(m_Creatures[EP_PWT_FLIGHTMASTER]);
         //Spawn flight master as friendly to capturing team
         c->SetUInt32Value(GAMEOBJECT_FACTION,(team == ALLIANCE ? 55 : 68));
-        if(c)
+        if (c)
         {
             GossipOption gso;
             gso.Action = GOSSIP_OPTION_OUTDOORPVP;

@@ -104,7 +104,7 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator<<(const uint32 val)
     {
-        if( x_coord > val )
+        if (x_coord > val)
             x_coord -= val;
         else
             x_coord = 0;
@@ -112,7 +112,7 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator>>(const uint32 val)
     {
-        if( x_coord+val < LIMIT )
+        if (x_coord+val < LIMIT)
             x_coord += val;
         else
             x_coord = LIMIT - 1;
@@ -120,7 +120,7 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator-=(const uint32 val)
     {
-        if( y_coord > val )
+        if (y_coord > val)
             y_coord -= val;
         else
             y_coord = 0;
@@ -128,7 +128,7 @@ struct MANGOS_DLL_DECL CoordPair
 
     void operator+=(const uint32 val)
     {
-        if( y_coord+val < LIMIT )
+        if (y_coord+val < LIMIT)
             y_coord += val;
         else
             y_coord = LIMIT - 1;
@@ -174,9 +174,9 @@ namespace MaNGOS
 
     inline void NormalizeMapCoord(float &c)
     {
-        if(c > MAP_HALFSIZE - 0.5)
+        if (c > MAP_HALFSIZE - 0.5)
             c = MAP_HALFSIZE - 0.5;
-        else if(c < -(MAP_HALFSIZE - 0.5))
+        else if (c < -(MAP_HALFSIZE - 0.5))
             c = -(MAP_HALFSIZE - 0.5);
     }
     inline bool IsValidZCoord(float z)

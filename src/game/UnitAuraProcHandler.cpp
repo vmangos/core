@@ -828,7 +828,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                                 igniteHolder->SetStackAmount(5);
                             
                             // Refresh Ignite Stack
-                            igniteHolder->Refresh(igniteAura->GetCaster(), target, igniteHolder );
+                            igniteHolder->Refresh(igniteAura->GetCaster(), target, igniteHolder);
                             
                             return SPELL_AURA_PROC_OK;
                         }

@@ -200,7 +200,7 @@ void SocialMgr::GetFriendInfo(MasterPlayer* player, uint32 friend_lowguid, Frien
         return;
     }
 
-    MasterPlayer *pFriend = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, friend_lowguid));
+    MasterPlayer* pFriend = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, friend_lowguid));
 
     Team team = player->GetTeam();
     AccountTypes security = player->GetSession()->GetSecurity();
@@ -236,14 +236,14 @@ void SocialMgr::GetFriendInfo(MasterPlayer* player, uint32 friend_lowguid, Frien
     }
 }
 
-void SocialMgr::MakeFriendStatusPacket(FriendsResult result, uint32 guid, WorldPacket *data)
+void SocialMgr::MakeFriendStatusPacket(FriendsResult result, uint32 guid, WorldPacket* data)
 {
     data->Initialize(SMSG_FRIEND_STATUS, 5);
     *data << uint8(result);
     *data << ObjectGuid(HIGHGUID_PLAYER, guid);
 }
 
-void SocialMgr::SendFriendStatus(MasterPlayer *player, FriendsResult result, ObjectGuid friend_guid, bool broadcast)
+void SocialMgr::SendFriendStatus(MasterPlayer* player, FriendsResult result, ObjectGuid friend_guid, bool broadcast)
 {
     uint32 friend_lowguid = friend_guid.GetCounter();
 
@@ -274,7 +274,7 @@ void SocialMgr::SendFriendStatus(MasterPlayer *player, FriendsResult result, Obj
         player->GetSession()->SendPacket(&data);
 }
 
-void SocialMgr::BroadcastToFriendListers(MasterPlayer *player, WorldPacket *packet)
+void SocialMgr::BroadcastToFriendListers(MasterPlayer* player, WorldPacket* packet)
 {
     if (!player)
         return;
@@ -291,7 +291,7 @@ void SocialMgr::BroadcastToFriendListers(MasterPlayer *player, WorldPacket *pack
         PlayerSocialMap::const_iterator itr2 = itr->second.m_playerSocialMap.find(guid);
         if (itr2 != itr->second.m_playerSocialMap.end() && (itr2->second.Flags & SOCIAL_FLAG_FRIEND))
         {
-            MasterPlayer *pFriend = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+            MasterPlayer* pFriend = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
 
             // PLAYER see his team only and PLAYER can't see MODERATOR, GAME MASTER, ADMINISTRATOR characters
             // MODERATOR, GAME MASTER, ADMINISTRATOR can see all
@@ -304,10 +304,10 @@ void SocialMgr::BroadcastToFriendListers(MasterPlayer *player, WorldPacket *pack
     }
 }
 
-PlayerSocial *SocialMgr::LoadFromDB(QueryResult *result, ObjectGuid guid)
+PlayerSocial* SocialMgr::LoadFromDB(QueryResult* result, ObjectGuid guid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(_socialMapLock);
-    PlayerSocial *social = &m_socialMap[guid.GetCounter()];
+    PlayerSocial* social = &m_socialMap[guid.GetCounter()];
     social->SetPlayerGuid(guid);
 
     if (!result)
@@ -321,7 +321,7 @@ PlayerSocial *SocialMgr::LoadFromDB(QueryResult *result, ObjectGuid guid)
 
     do
     {
-        Field *fields  = result->Fetch();
+        Field* fields  = result->Fetch();
 
         friend_guid = fields[0].GetUInt32();
         flags = fields[1].GetUInt32();

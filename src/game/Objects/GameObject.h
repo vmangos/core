@@ -31,7 +31,7 @@
 #include "Util.h"
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -43,7 +43,7 @@ struct GameObjectInfo
     uint32  id;
     uint32  type;
     uint32  displayId;
-    char   *name;
+    char  * name;
     uint32  faction;
     uint32  flags;
     float   size;
@@ -507,7 +507,7 @@ struct GameObjectInfo
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack()
 #else
 #pragma pack(pop)
@@ -586,7 +586,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        bool Create(uint32 guidlow, uint32 name_id, Map *map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
+        bool Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
         void Update(uint32 update_diff, uint32 p_time) override;
         GameObjectInfo const* GetGOInfo() const;
 
@@ -602,7 +602,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         void SaveToDB();
         void SaveToDB(uint32 mapid);
-        bool LoadFromDB(uint32 guid, Map *map);
+        bool LoadFromDB(uint32 guid, Map* map);
         void DeleteFromDB() const;
 
         void SetOwnerGuid(ObjectGuid ownerGuid)
@@ -625,7 +625,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         time_t GetRespawnTimeEx() const
         {
             time_t now = time(nullptr);
-            if(m_respawnTime > now)
+            if (m_respawnTime > now)
                 return m_respawnTime;
             else
                 return now;
@@ -661,7 +661,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         static void AddToRemoveListInMaps(uint32 db_guid, GameObjectData const* data);
         static void SpawnInMaps(uint32 db_guid, GameObjectData const* data);
 
-        void getFishLoot(Loot *loot, Player* loot_owner);
+        void getFishLoot(Loot* loot, Player* loot_owner);
         GameobjectTypes GetGoType() const { return GameobjectTypes(GetUInt32Value(GAMEOBJECT_TYPE_ID)); }
         void SetGoType(GameobjectTypes type) { SetUInt32Value(GAMEOBJECT_TYPE_ID, type); }
         GOState GetGoState() const { return GOState(GetUInt32Value(GAMEOBJECT_STATE)); }
@@ -720,7 +720,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         bool HasQuest(uint32 quest_id) const override;
         bool HasInvolvedQuest(uint32 quest_id) const override;
-        bool ActivateToQuest(Player *pTarget) const;
+        bool ActivateToQuest(Player* pTarget) const;
         uint32 GetDefaultGossipMenuId() const override { return GetGOInfo()->GetGossipMenuId(); }
         void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false);
                                                             // 0 = use `gameobject`.`spawntimesecs`
@@ -751,7 +751,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void UpdateModel();                                 // updates model in case displayId were changed
         GameObjectModel* m_model;
         void UpdateModelPosition();
-        GameObjectData const * GetGOData() const;
+        GameObjectData const*  GetGOData() const;
 
         // Transports system
         uint64 GetRotation() const { return m_rotation; }
@@ -790,7 +790,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         uint64 m_rotation;
         GameObjectInfo const* m_goInfo;
 
-        GameObjectAI *i_AI;
+        GameObjectAI* i_AI;
 
         uint32 m_playerGroupId;
     private:

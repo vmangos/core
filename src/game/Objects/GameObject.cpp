@@ -148,7 +148,7 @@ void GameObject::RemoveFromWorld()
     Object::RemoveFromWorld();
 }
 
-bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state)
+bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state)
 {
     MANGOS_ASSERT(map);
     Relocate(x, y, z, ang);
@@ -365,7 +365,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                                 return;
                             }
 
-                            const LockEntry *lock = sLockStore.LookupEntry(GetGOInfo()->GetLockId());
+                            LockEntry const* lock = sLockStore.LookupEntry(GetGOInfo()->GetLockId());
                             //workarounds for PvP banners
                             if (lock && lock->Index[1] == LOCKTYPE_SLOW_OPEN)
                             {
@@ -469,7 +469,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                         {
                             //BattleGround gameobjects case
                             if (((Player*)ok)->InBattleGround())
-                                if (BattleGround *bg = ((Player*)ok)->GetBattleGround())
+                                if (BattleGround* bg = ((Player*)ok)->GetBattleGround())
                                     bg->HandleTriggerBuff(GetObjectGuid());
                         }
 
@@ -667,7 +667,7 @@ void GameObject::AddUniqueUse(Player* player)
             info->summoningRitual.animSpell &&
             GetOwnerGuid() != player->GetObjectGuid())
         {
-            SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(info->summoningRitual.animSpell);
+            SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(info->summoningRitual.animSpell);
             if (!spellInfo)
             {
                 sLog.outError("WORLD: unknown spell id %u at play anim for gameobject (Entry: %u GoType: %u )", info->summoningRitual.animSpell, GetEntry(), GetGoType());
@@ -779,7 +779,7 @@ void GameObject::Delete()
         sPoolMgr.GetPoolGameObjects(poolid).DespawnObject(*GetMap()->GetPersistentState(), GetGUIDLow());
 }
 
-void GameObject::getFishLoot(Loot *fishloot, Player* loot_owner)
+void GameObject::getFishLoot(Loot* fishloot, Player* loot_owner)
 {
     fishloot->clear();
 
@@ -800,7 +800,7 @@ void GameObject::SaveToDB()
 {
     // this should only be used when the gameobject has already been loaded
     // preferably after adding to map, because mapid may not be valid otherwise
-    GameObjectData const *data = sObjectMgr.GetGOData(GetGUIDLow());
+    GameObjectData const* data = sObjectMgr.GetGOData(GetGUIDLow());
     if (!data)
     {
         sLog.outError("GameObject::SaveToDB failed, cannot get gameobject data!");
@@ -812,7 +812,7 @@ void GameObject::SaveToDB()
 
 void GameObject::SaveToDB(uint32 mapid)
 {
-    const GameObjectInfo *goI = GetGOInfo();
+    GameObjectInfo const* goI = GetGOInfo();
 
     if (!goI)
         return;
@@ -866,7 +866,7 @@ void GameObject::SaveToDB(uint32 mapid)
     WorldDatabase.CommitTransaction();
 }
 
-bool GameObject::LoadFromDB(uint32 guid, Map *map)
+bool GameObject::LoadFromDB(uint32 guid, Map* map)
 {
     GameObjectData const* data = sObjectMgr.GetGOData(guid);
 
@@ -964,7 +964,7 @@ void GameObject::DeleteFromDB() const
     WorldDatabase.PExecuteLog("DELETE FROM gameobject_battleground WHERE guid = '%u'", GetGUIDLow());
 }
 
-GameObjectInfo const *GameObject::GetGOInfo() const
+GameObjectInfo const* GameObject::GetGOInfo() const
 {
     return m_goInfo;
 }
@@ -997,7 +997,7 @@ bool GameObject::HasInvolvedQuest(uint32 quest_id) const
 bool GameObject::IsTransport() const
 {
     // If something is marked as a transport, don't transmit an out of range packet for it.
-    GameObjectInfo const * gInfo = GetGOInfo();
+    GameObjectInfo const* gInfo = GetGOInfo();
     if (!gInfo) return false;
     return gInfo->type == GAMEOBJECT_TYPE_TRANSPORT || gInfo->type == GAMEOBJECT_TYPE_MO_TRANSPORT;
 }
@@ -1045,9 +1045,9 @@ bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject c
 
         // special invisibility cases
         /* TODO: implement trap stealth, take look at spell 2836
-        if(GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && u->IsHostileTo(GetOwner()))
+        if (GetGOInfo()->type == GAMEOBJECT_TYPE_TRAP && GetGOInfo()->trap.stealthed && u->IsHostileTo(GetOwner()))
         {
-            if(check stuff here)
+            if (check stuff here)
                 return false;
         }*/
         if (Unit const* pDetectorUnit = pDetector->ToUnit())
@@ -1078,7 +1078,7 @@ void GameObject::Respawn()
     }
 }
 
-bool GameObject::ActivateToQuest(Player *pTarget) const
+bool GameObject::ActivateToQuest(Player* pTarget) const
 {
     // if GO is ReqCreatureOrGoN for quest
     if (pTarget->HasQuestForGO(GetEntry()))
@@ -1124,7 +1124,7 @@ bool GameObject::ActivateToQuest(Player *pTarget) const
             {
                 //look for battlegroundAV for some objects which are only activated after mine gots captured by own team
 //                if (GetEntry() == BG_AV_OBJECTID_MINE_N || GetEntry() == BG_AV_OBJECTID_MINE_S)
-//                    if (BattleGround *bg = pTarget->GetBattleGround())
+//                    if (BattleGround* bg = pTarget->GetBattleGround())
 //                        if (bg->GetTypeID() == BATTLEGROUND_AV && !(((BattleGroundAV*)bg)->PlayerCanDoMineQuest(GetEntry(), pTarget->GetTeam())))
 //                            return false;
                 return true;
@@ -1751,19 +1751,19 @@ void GameObject::Use(Unit* user)
                 Unit* caster = GetOwner();
                 if (!caster)
                 {
-                    if( m_playerGroupId == 0)
+                    if (m_playerGroupId == 0)
                        return;
 
-                    Group *  group = ((Player*) user)->GetGroup();
-                    if(!group)
+                    Group* group = ((Player*) user)->GetGroup();
+                    if (!group)
                         return;
 
-                    if(group->GetId() != m_playerGroupId)
+                    if (group->GetId() != m_playerGroupId)
                         return;
                 }
                 else
                 {
-                    if(caster->GetTypeId() != TYPEID_PLAYER)
+                    if (caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
                     if (user->GetTypeId() != TYPEID_PLAYER || !((Player*)user)->IsInSameRaidWith((Player*)caster))
@@ -1792,7 +1792,7 @@ void GameObject::Use(Unit* user)
             if (player->CanUseBattleGroundObject())
             {
                 // in battleground check
-                BattleGround *bg = player->GetBattleGround();
+                BattleGround* bg = player->GetBattleGround();
                 if (!bg)
                     return;
                 // BG flag click
@@ -1829,7 +1829,7 @@ void GameObject::Use(Unit* user)
             if (player->CanUseBattleGroundObject())
             {
                 // in battleground check
-                BattleGround *bg = player->GetBattleGround();
+                BattleGround* bg = player->GetBattleGround();
                 if (!bg)
                     return;
                 // BG flag dropped
@@ -1941,7 +1941,7 @@ void GameObject::Use(Unit* user)
     if (!spellId)
         return;
 
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
     {
         sLog.outError("WORLD: unknown spell id %u at use action for gameobject (Entry: %u GoType: %u )", spellId, GetEntry(), GetGoType());
@@ -1952,7 +1952,7 @@ void GameObject::Use(Unit* user)
     // Ensure that the spell you are using, and any event it may trigger, is checking
     // pointer validity (i.e. instance, GO, etc) since the caster may have moved maps
     // or the GO might be gone by the time the spell is executed.
-    Spell *spell = nullptr;
+    Spell* spell = nullptr;
     if (Unit* pUnit = spellCaster->ToUnit())
         spell = new Spell(pUnit, spellInfo, triggered, GetObjectGuid());
     else if (GameObject* pGo = spellCaster->ToGameObject())
@@ -1986,7 +1986,7 @@ const char* GameObject::GetNameForLocaleIdx(int32 loc_idx) const
 {
     if (loc_idx >= 0)
     {
-        GameObjectLocale const *cl = sObjectMgr.GetGameObjectLocale(GetEntry());
+        GameObjectLocale const* cl = sObjectMgr.GetGameObjectLocale(GetEntry());
         if (cl)
         {
             if (cl->Name.size() > (size_t)loc_idx && !cl->Name[loc_idx].empty())
@@ -2159,7 +2159,7 @@ bool GameObject::PlayerCanUse(Player* pl)
             uint32 lockId = inf->GetLockId();
             if (lockId != 0)
             {
-                LockEntry const *lockInfo = sLockStore.LookupEntry(lockId);
+                LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
                 if (!lockInfo)
                     return false;
                 for (int j = 0; j < 8; ++j)
@@ -2322,7 +2322,7 @@ void GameObject::UpdateModelPosition()
     }
 }
 
-GameObjectData const * GameObject::GetGOData() const
+GameObjectData const* GameObject::GetGOData() const
 {
     return sObjectMgr.GetGOData(GetGUIDLow());
 }

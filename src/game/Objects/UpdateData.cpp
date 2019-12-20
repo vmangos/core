@@ -66,7 +66,7 @@ void UpdateData::AddUpdateBlock(const ByteBuffer &block)
     ++it->blockCount;
 }
 
-void PacketCompressor::Compress(void* dst, uint32 *dst_size, void* src, int src_size)
+void PacketCompressor::Compress(void* dst, uint32* dst_size, void* src, int src_size)
 {
     z_stream c_stream;
 
@@ -122,14 +122,14 @@ void PacketCompressor::Compress(void* dst, uint32 *dst_size, void* src, int src_
     *dst_size = c_stream.total_out;
 }
 
-bool UpdateData::BuildPacket(WorldPacket *packet, bool hasTransport)
+bool UpdateData::BuildPacket(WorldPacket* packet, bool hasTransport)
 {
     if (!m_datas.size())
         return BuildPacket(packet, nullptr, hasTransport);
     return BuildPacket(packet, &(m_datas.front()), hasTransport);
 }
 
-bool UpdateData::BuildPacket(WorldPacket *packet, UpdatePacket const* updPacket, bool hasTransport)
+bool UpdateData::BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket, bool hasTransport)
 {
     MANGOS_ASSERT(packet->empty());                         // shouldn't happen
 

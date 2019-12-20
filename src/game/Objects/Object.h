@@ -132,7 +132,7 @@ class WorldUpdateCounter
 
         uint32 timeElapsed()
         {
-            if(!m_tmStart)
+            if (!m_tmStart)
                 m_tmStart = WorldTimer::tickPrevTime();
 
             return WorldTimer::getMSTimeDiff(m_tmStart, WorldTimer::tickTime());
@@ -239,7 +239,7 @@ class MovementInfo
         void SetMovementFlags(MovementFlags f) { moveFlags = f; }
 
         // Position manipulations
-        Position const *GetPos() const { return &pos; }
+        Position const* GetPos() const { return &pos; }
         void SetTransportData(ObjectGuid guid, float x, float y, float z, float o, uint32 time)
         {
             t_guid = guid;
@@ -259,7 +259,7 @@ class MovementInfo
             t_time = 0;
         }
         ObjectGuid const& GetTransportGuid() const { return t_guid; }
-        Position const *GetTransportPos() const { return &t_pos; }
+        Position const* GetTransportPos() const { return &t_pos; }
         Position* GetTransportPos() { return &t_pos; }
         uint32 GetTransportTime() const { return t_time; }
         uint32 GetFallTime() const { return fallTime; }
@@ -325,7 +325,7 @@ class MANGOS_DLL_SPEC Object
         const bool& IsInWorld() const { return m_inWorld; }
         virtual void AddToWorld()
         {
-            if(m_inWorld)
+            if (m_inWorld)
                 return;
 
             m_inWorld = true;
@@ -359,7 +359,7 @@ class MANGOS_DLL_SPEC Object
         uint8 GetTypeId() const { return m_objectTypeId; }
         bool isType(TypeMask mask) const { return (mask & m_objectType); }
 
-        virtual void BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) const;
+        virtual void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
         void SendCreateUpdateToPlayer(Player* player);
 
         // must be overwrite in appropriate subclasses (WorldObject, Item currently), or will crash
@@ -371,17 +371,17 @@ class MANGOS_DLL_SPEC Object
         void AddDelayedAction(ObjectDelayedAction e) { _delayedActions |= e; }
         void ExecuteDelayedActions();
 
-        void BuildValuesUpdateBlockForPlayer(UpdateData *data, Player *target) const;
-        void BuildOutOfRangeUpdateBlock(UpdateData *data) const;
-        void BuildMovementUpdateBlock(UpdateData * data, uint8 flags = 0) const;
+        void BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const;
+        void BuildOutOfRangeUpdateBlock(UpdateData* data) const;
+        void BuildMovementUpdateBlock(UpdateData* data, uint8 flags = 0) const;
 
-        void BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const;
-        void BuildValuesUpdate(uint8 updatetype, ByteBuffer *data, UpdateMask *updateMask, Player *target) const;
+        void BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const;
+        void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const;
         void BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_players);
 
         void SendOutOfRangeUpdateToPlayer(Player* player);
 
-        virtual void DestroyForPlayer(Player *target) const;
+        virtual void DestroyForPlayer(Player* target) const;
 
         const int32& GetInt32Value(uint16 index) const
         {
@@ -452,7 +452,7 @@ class MANGOS_DLL_SPEC Object
 
         void ToggleFlag(uint16 index, uint32 flag)
         {
-            if(HasFlag(index, flag))
+            if (HasFlag(index, flag))
                 RemoveFlag(index, flag);
             else
                 SetFlag(index, flag);
@@ -608,10 +608,10 @@ class MANGOS_DLL_SPEC Object
         void _InitValues();
         void _Create (uint32 guidlow, uint32 entry, HighGuid guidhigh);
 
-        virtual void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;
+        virtual void _SetUpdateBits(UpdateMask* updateMask, Player* target) const;
         void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
-        virtual void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
+        virtual void _SetCreateBits(UpdateMask* updateMask, Player* target) const;
 
         uint16 m_objectType;
 
@@ -620,12 +620,12 @@ class MANGOS_DLL_SPEC Object
 
         union
         {
-            int32  *m_int32Values;
-            uint32 *m_uint32Values;
-            float  *m_floatValues;
+            int32* m_int32Values;
+            uint32* m_uint32Values;
+            float* m_floatValues;
         };
 
-        uint32 *m_uint32Values_mirror;
+        uint32* m_uint32Values_mirror;
 
         uint16 m_valuesCount;
 
@@ -663,13 +663,13 @@ enum MeleeHitOutcome
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
 struct SpellNonMeleeDamage {
-    SpellNonMeleeDamage(WorldObject *_attacker, Unit *_target, uint32 _SpellID, SpellSchools _school)
+    SpellNonMeleeDamage(WorldObject* _attacker, Unit* _target, uint32 _SpellID, SpellSchools _school)
         : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
         absorb(0), resist(0), periodicLog(false), unused(false), blocked(0), HitInfo(0), spell(nullptr)
     {}
 
-    Unit   *target;
-    WorldObject   *attacker;
+    Unit* target;
+    WorldObject* attacker;
     uint32 SpellID;
     uint32 damage;
     SpellSchools school;
@@ -679,7 +679,7 @@ struct SpellNonMeleeDamage {
     bool   unused;
     uint32 blocked;
     uint32 HitInfo;
-    Spell *spell;
+    Spell* spell;
 };
 
 struct CleanDamage
@@ -716,7 +716,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         class MANGOS_DLL_SPEC UpdateHelper
         {
             public:
-                explicit UpdateHelper(WorldObject * obj) : m_obj(obj) {}
+                explicit UpdateHelper(WorldObject* obj) : m_obj(obj) {}
                 ~UpdateHelper() { }
 
                 void Update(uint32 time_diff)
@@ -735,7 +735,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
                 UpdateHelper(const UpdateHelper&);
                 UpdateHelper& operator=(const UpdateHelper&) = delete;
 
-                WorldObject * const m_obj;
+                WorldObject* const m_obj;
         };
 
         ~WorldObject () override {}
@@ -863,7 +863,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         // Transports / Movement
         Transport* GetTransport() const { return m_transport; }
-        virtual void SetTransport(Transport * t) { m_transport = t; }
+        virtual void SetTransport(Transport* t) { m_transport = t; }
 
         float GetTransOffsetX() const { return m_movementInfo.GetTransportPos()->x; }
         float GetTransOffsetY() const { return m_movementInfo.GetTransportPos()->y; }
@@ -886,18 +886,18 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool IsMovingButNotWalking() const { return IsMoving() && !(IsWalking() || IsWalkingBackward()); }
 
         MovementInfo m_movementInfo;
-        Transport * m_transport;
+        Transport* m_transport;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
         // Send to players
-        virtual void SendMessageToSet(WorldPacket *data, bool self) const;
+        virtual void SendMessageToSet(WorldPacket* data, bool self) const;
         // Send to players who have object at client
-        void SendObjectMessageToSet(WorldPacket *data, bool self, WorldObject const* except = nullptr) const;
+        void SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except = nullptr) const;
         void SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except = nullptr);
 
-        virtual void SendMessageToSetInRange(WorldPacket *data, float dist, bool self) const;
-        void SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver) const;
+        virtual void SendMessageToSetInRange(WorldPacket* data, float dist, bool self) const;
+        void SendMessageToSetExcept(WorldPacket* data, Player const* skipped_receiver) const;
         void DirectSendPublicValueUpdate(uint32 index);
 
         void PlayDistanceSound(uint32 sound_id, Player const* target = nullptr) const;
@@ -949,9 +949,9 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         // low level function for visibility change code, must be define in all main world object subclasses
         virtual bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
 
-        void SetMap(Map * map);
-        Map * GetMap() const;
-        Map * FindMap() const { return m_currMap; }
+        void SetMap(Map* map);
+        Map* GetMap() const;
+        Map* FindMap() const { return m_currMap; }
 
         //used to check all object's GetMap() calls when object is not in world!
         void ResetMap();
@@ -1020,16 +1020,16 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         uint32 GetDefenseSkillValue(WorldObject const* target = nullptr) const;
 
         virtual Player* GetAffectingPlayer() const { return nullptr; }
-        Unit* SelectMagnetTarget(Unit *victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
+        Unit* SelectMagnetTarget(Unit* victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
 
-        void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
-        void CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
-        void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        void CastSpell(Unit* Victim, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastCustomSpell(Unit* Victim, SpellEntry const* spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
         
-        void SetCurrentCastedSpell(Spell * pSpell);
+        void SetCurrentCastedSpell(Spell* pSpell);
         Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
         Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
         bool CheckAndIncreaseCastCounter();
@@ -1052,35 +1052,35 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         
         virtual bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const { return false; }
         uint32 SpellCriticalHealingBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim) const;
-        uint32 SpellCriticalDamageBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim, Spell* spell = nullptr);
-        float  MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const *spell, Spell* spellPtr = nullptr);
-        SpellMissInfo MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
-        SpellMissInfo MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
-        int32 MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        uint32 SpellCriticalDamageBonus(SpellEntry const* spellProto, uint32 damage, Unit* pVictim, Spell* spell = nullptr);
+        float  MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MagicSpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        int32 MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
         float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
-        SpellMissInfo SpellHitResult(Unit *pVictim, SpellEntry const *spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
-        void ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const *procSpell = nullptr, Spell* spell = nullptr);
-        void CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, SpellEntry const *spellInfo, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
+        SpellMissInfo SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
+        void ProcDamageAndSpell(Unit* pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const* procSpell = nullptr, Spell* spell = nullptr);
+        void CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, int32 damage, SpellEntry const* spellInfo, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
         int32 CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr);
-        int32 SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject *pCaster, Spell* spell = nullptr) const;
+        int32 SpellBonusWithCoeffs(SpellEntry const* spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell = nullptr) const;
         static float CalculateLevelPenalty(SpellEntry const* spellProto);
-        uint32 SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        uint32 SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
         int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
-        uint32 SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        uint32 SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
         int32 SpellBaseHealingBonusDone(SpellSchoolMask schoolMask);
         uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage) const;
-        uint32 MeleeDamageBonusDone(Unit *pVictim, uint32 damage, WeaponAttackType attType, SpellEntry const *spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
+        uint32 MeleeDamageBonusDone(Unit* pVictim, uint32 damage, WeaponAttackType attType, SpellEntry const* spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
         virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
         float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
-        virtual uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell = nullptr);
-        void DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb);
-        void DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss);
-        void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log);
-        void SendSpellNonMeleeDamageLog(Unit *target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
-        void SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo);
-        int32 DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical = false);
+        virtual uint32 DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell = nullptr);
+        void DealDamageMods(Unit* pVictim, uint32 &damage, uint32* absorb);
+        void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
+        void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log);
+        void SendSpellNonMeleeDamageLog(Unit* target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
+        void SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo missInfo);
+        int32 DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* spellProto, bool critical = false);
         void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
-        void EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
+        void EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
         void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
 
         void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut);
@@ -1104,7 +1104,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         // draw distance can be expensive for updates with lots of players
         float m_visibilityModifier;
 
-        Map * m_currMap;                                    //current object's Map location
+        Map* m_currMap;                                     //current object's Map location
 
         uint32 m_mapId;                                     // object at map with map_id
         uint32 m_InstanceId;                                // in map copy with instance id

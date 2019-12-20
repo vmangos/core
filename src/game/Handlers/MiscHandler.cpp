@@ -499,7 +499,7 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleStandStateChangeOpcode(WorldPacket & recv_data)
 {
-    // DEBUG_LOG( "WORLD: Received CMSG_STANDSTATECHANGE"  ); -- too many spam in log at lags/debug stop
+    // DEBUG_LOG("WORLD: Received CMSG_STANDSTATECHANGE"); -- too many spam in log at lags/debug stop
     uint32 animstate;
     recv_data >> animstate;
 
@@ -1018,7 +1018,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data) {
     // DEBUG_LOG("Party Stats guid is " I64FMTD,guid);
 
     Player *pPlayer = sObjectMgr.GetPlayer(guid);
-    if(pPlayer)
+    if (pPlayer)
     {
         WorldPacket data(MSG_INSPECT_HONOR_STATS, (8 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
         data << guid;                                       // player guid

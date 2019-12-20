@@ -389,8 +389,8 @@ class BattleGround
         /* Packet Transfer */
         // method that should fill worldpacket with actual world states (not yet implemented for all battlegrounds!)
         virtual void FillInitialWorldStates(WorldPacket& /*data*/, uint32& /*count*/) {}
-        void SendPacketToTeam(Team team, WorldPacket *packet, Player *sender = nullptr, bool self = true);
-        void SendPacketToAll(WorldPacket *packet);
+        void SendPacketToTeam(Team team, WorldPacket* packet, Player* sender = nullptr, bool self = true);
+        void SendPacketToAll(WorldPacket* packet);
 
         template<class Do>
         void BroadcastWorker(Do& _do);

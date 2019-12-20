@@ -6499,7 +6499,7 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
     pGameObj->SetOwnerGuid(m_casterUnit->GetObjectGuid());
     if (m_casterUnit->GetTypeId() == TYPEID_PLAYER)
     {
-        if(Group * group = ((Player*)m_casterUnit)->GetGroup())
+        if (Group * group = ((Player*)m_casterUnit)->GetGroup())
             pGameObj->SetOwnerGroupId(group->GetId());
     }
     pGameObj->SetUInt32Value(GAMEOBJECT_LEVEL, m_casterUnit->GetLevel());

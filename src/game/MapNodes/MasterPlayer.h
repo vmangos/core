@@ -95,13 +95,13 @@ public:
 
     // GM SYSTEMS
     bool IsAcceptTickets() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ACCEPT_TICKETS; }
-    void SetAcceptTicket(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_GM_ACCEPT_TICKETS; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_ACCEPT_TICKETS; }
+    void SetAcceptTicket(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_GM_ACCEPT_TICKETS; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_ACCEPT_TICKETS; }
 
     bool IsAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
     bool AcceptsWhispersFrom(ObjectGuid whisperer) const { return IsAcceptWhispers() || m_allowedWhispers.find(whisperer) != m_allowedWhispers.end(); }
     void AddAllowedWhisperer(ObjectGuid whisperer) { m_allowedWhispers.insert(whisperer); }
     void ClearAllowedWhisperers() { m_allowedWhispers.clear(); }
-    void SetAcceptWhispers(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
+    void SetAcceptWhispers(bool on) { if (on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
 
     bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
 

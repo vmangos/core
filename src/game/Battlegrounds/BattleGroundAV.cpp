@@ -448,12 +448,12 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
 
     setReinforcementLevelGroundUnit(teamIdx, ressources);
 
-    if(ressources%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
+    if (ressources%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
     {
         sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
         ((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
 
-        if(ressources == 500)
+        if (ressources == 500)
         {
             if (teamIdx == 0)
                 CastSpellOnTeam(28418, ALLIANCE);
@@ -463,7 +463,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
             sprintf(sMessageRemaining,"Seasoned units are entering the battle!");
             ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
         }
-        else if(ressources == 1000)
+        else if (ressources == 1000)
         {
             if (teamIdx == 0)
                 CastSpellOnTeam(28419, ALLIANCE);
@@ -473,7 +473,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
             sprintf(sMessageRemaining,"Veteran units are entering the battle!");
             ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
         }
-        else if(ressources == 1500)
+        else if (ressources == 1500)
         {
             if (teamIdx == 0)
                 CastSpellOnTeam(28420, ALLIANCE);
@@ -516,15 +516,15 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             /** Update reinforcement infos */
 //            setReinforcementLevelGroundUnit(teamIdx, m_Team_QuestStatus[teamIdx][0]);
 
-            if((m_Team_QuestStatus[teamIdx][0]%100) == 0 && (m_Team_QuestStatus[teamIdx][0]%500) != 0&& questGiver->GetTypeId() == TYPEID_UNIT)
+            if ((m_Team_QuestStatus[teamIdx][0]%100) == 0 && (m_Team_QuestStatus[teamIdx][0]%500) != 0&& questGiver->GetTypeId() == TYPEID_UNIT)
                 ((Creature*)questGiver)->MonsterSay("Great! Let's keep those supplies coming, people!", 0, 0);
 
-/*            if(m_Team_QuestStatus[teamIdx][0]%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
+/*            if (m_Team_QuestStatus[teamIdx][0]%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
             {
                 sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
                 ((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
 
-                if(m_Team_QuestStatus[teamIdx][0] == 500)                    
+                if (m_Team_QuestStatus[teamIdx][0] == 500)                    
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28418, ALLIANCE);
@@ -534,7 +534,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                    sprintf(sMessageRemaining,"Seasoned units are entering the battle!");
                    ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
-                else if(m_Team_QuestStatus[teamIdx][0] == 1000)                    
+                else if (m_Team_QuestStatus[teamIdx][0] == 1000)                    
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28419, ALLIANCE);
@@ -544,7 +544,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                     sprintf(sMessageRemaining,"Veteran units are entering the battle!");
                     ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
-                else if(m_Team_QuestStatus[teamIdx][0] == 1500)                    
+                else if (m_Team_QuestStatus[teamIdx][0] == 1500)                    
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28420, ALLIANCE);
@@ -558,23 +558,23 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             }
 */
             /** Adding visual crates each time 100 ressources are added */
-            if((m_Team_QuestStatus[teamIdx][0]%500) == 100)
+            if ((m_Team_QuestStatus[teamIdx][0]%500) == 100)
             {
                 SpawnEvent(AV_100_SUPPLIES+teamIdx, 0, true, false);
             }
-            else if((m_Team_QuestStatus[teamIdx][0]%500) == 200)
+            else if ((m_Team_QuestStatus[teamIdx][0]%500) == 200)
             {
                 SpawnEvent(AV_200_SUPPLIES+teamIdx, 0, true, false);
             }
-            else if((m_Team_QuestStatus[teamIdx][0]%500) == 300)
+            else if ((m_Team_QuestStatus[teamIdx][0]%500) == 300)
             {
                 SpawnEvent(AV_300_SUPPLIES+teamIdx, 0, true, true);
             }
-            else if((m_Team_QuestStatus[teamIdx][0]%500) == 400)
+            else if ((m_Team_QuestStatus[teamIdx][0]%500) == 400)
             {
                 SpawnEvent(AV_400_SUPPLIES+teamIdx, 0, true, true);
             }
-            else if((m_Team_QuestStatus[teamIdx][0]%500) == 0 && m_Team_QuestStatus[teamIdx][0] !=0 )
+            else if ((m_Team_QuestStatus[teamIdx][0]%500) == 0 && m_Team_QuestStatus[teamIdx][0] !=0)
             {
                 SpawnEvent(AV_100_SUPPLIES+teamIdx, 2, true, false);
                 SpawnEvent(AV_200_SUPPLIES+teamIdx, 2, true, false);
@@ -699,26 +699,26 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             m_Team_QuestStatus[teamIdx][8]++;
             reputation = 1;
 
-            if (m_Team_QuestStatus[teamIdx][8]%25 == 0 && m_Team_QuestStatus[teamIdx][8] !=0 )
+            if (m_Team_QuestStatus[teamIdx][8]%25 == 0 && m_Team_QuestStatus[teamIdx][8] !=0)
                 questGiver->MonsterYell("The stables are filled up!", 0, 0);
             if ((m_Team_QuestStatus[teamIdx][8]%5) == 0)
                 questGiver->PMonsterSay("Thanks for the supplies, %s",player->GetName());
 
 
             /** Adding visual mount each time 5 ressources are added */
-            if((m_Team_QuestStatus[teamIdx][8]%25) == 5)
+            if ((m_Team_QuestStatus[teamIdx][8]%25) == 5)
             {
                 SpawnEvent(AV_05_TAMED+teamIdx, 0, true, false);
             }
-            else if((m_Team_QuestStatus[teamIdx][8]%25) == 10)
+            else if ((m_Team_QuestStatus[teamIdx][8]%25) == 10)
             {
                 SpawnEvent(AV_10_TAMED+teamIdx, 0, true, false);
             }
-            else if((m_Team_QuestStatus[teamIdx][8]%25) == 15)
+            else if ((m_Team_QuestStatus[teamIdx][8]%25) == 15)
             {
                 SpawnEvent(AV_15_TAMED+teamIdx, 0, true, true);
             }
-            else if((m_Team_QuestStatus[teamIdx][8]%25) == 20)
+            else if ((m_Team_QuestStatus[teamIdx][8]%25) == 20)
             {
                 SpawnEvent(AV_20_TAMED+teamIdx, 0, true, true);
             }

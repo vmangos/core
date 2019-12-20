@@ -258,7 +258,7 @@ void Object::SendForcedObjectUpdate()
         iter->second.Send(iter->first->GetSession());
 }
 
-void Object::BuildMovementUpdateBlock(UpdateData * data, uint8 flags) const
+void Object::BuildMovementUpdateBlock(UpdateData* data, uint8 flags) const
 {
     ByteBuffer buf(500);
 
@@ -270,7 +270,7 @@ void Object::BuildMovementUpdateBlock(UpdateData * data, uint8 flags) const
     data->AddUpdateBlock(buf);
 }
 
-void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) const
+void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const
 {
     if (!target)
         return;
@@ -297,12 +297,12 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
         // UPDATETYPE_CREATE_OBJECT2 for some gameobject types...
         if (isType(TYPEMASK_GAMEOBJECT))
         {
-            GameObject *go = (GameObject*)this;
+            GameObject* go = (GameObject*)this;
             switch (go->GetGoType())
             {
                 case GAMEOBJECT_TYPE_BUTTON:
                 {
-                    const LockEntry *lock = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
+                    LockEntry const* lock = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
                     if (!lock || lock->Index[1] != LOCKTYPE_SLOW_OPEN ||
                             (go->isSpawned() && !go->GetRespawnDelay()))
                         break;
@@ -387,7 +387,7 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index)
     SendObjectMessageToSet(&packet, true);
 }
 
-void Object::BuildValuesUpdateBlockForPlayer(UpdateData *data, Player *target) const
+void Object::BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const
 {
     ByteBuffer buf(500);
 
@@ -407,7 +407,7 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData *data, Player *target) c
     data->AddUpdateBlock(buf);
 }
 
-void Object::BuildOutOfRangeUpdateBlock(UpdateData * data) const
+void Object::BuildOutOfRangeUpdateBlock(UpdateData* data) const
 {
     data->AddOutOfRangeGUID(GetObjectGuid());
 }
@@ -421,7 +421,7 @@ void Object::SendOutOfRangeUpdateToPlayer(Player* player)
     player->SendDirectMessage(&packet);
 }
 
-void Object::DestroyForPlayer(Player *target) const
+void Object::DestroyForPlayer(Player* target) const
 {
     MANGOS_ASSERT(target);
 
@@ -430,7 +430,7 @@ void Object::DestroyForPlayer(Player *target) const
     target->GetSession()->SendPacket(&data);
 }
 
-void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
+void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     *data << uint8(updateFlags);                            // update flags
@@ -574,7 +574,7 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
 #endif
 }
 
-void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *updateMask, Player *target) const
+void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const
 {
     if (!target)
         return;
@@ -699,10 +699,10 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                 {
                     uint32 dynamicFlags = m_uint32Values[index];
                     if (HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TRACK_UNIT))
-                        if (Unit const * unit = ToUnit())
+                        if (Unit const* unit = ToUnit())
                         {
                             Unit::AuraList auras = unit->GetAurasByType(SPELL_AURA_MOD_STALKED);
-                            if (std::find_if(auras.begin(), auras.end(),[target](Aura *a){
+                            if (std::find_if(auras.begin(), auras.end(),[target](Aura* a){
                                 return target->GetObjectGuid() == a->GetCasterGuid();
                             }) == auras.end())
                                 dynamicFlags &= ~UNIT_DYNFLAG_TRACK_UNIT;
@@ -737,7 +737,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                     bool forceFriendly = false;
                     if (owner)
                     {
-                        FactionTemplateEntry const *ft1, *ft2;
+                        FactionTemplateEntry const* ft1,* ft2;
                         ft1 = owner->getFactionTemplateEntry();
                         ft2 = target->getFactionTemplateEntry();
                         if (ft1 && ft2 && !ft1->IsFriendlyTo(*ft2) && owner->IsInSameRaidWith(target))
@@ -933,7 +933,7 @@ void Object::_LoadIntoDataField(std::string const& data, uint32 startOffset, uin
     }
 }
 
-void Object::_SetUpdateBits(UpdateMask *updateMask, Player* /*target*/) const
+void Object::_SetUpdateBits(UpdateMask* updateMask, Player* /*target*/) const
 {
     for (uint16 index = 0; index < m_valuesCount; ++index)
     {
@@ -942,7 +942,7 @@ void Object::_SetUpdateBits(UpdateMask *updateMask, Player* /*target*/) const
     }
 }
 
-void Object::_SetCreateBits(UpdateMask *updateMask, Player* /*target*/) const
+void Object::_SetCreateBits(UpdateMask* updateMask, Player* /*target*/) const
 {
     for (uint16 index = 0; index < m_valuesCount; ++index)
     {
@@ -1258,7 +1258,7 @@ void Object::ExecuteDelayedActions()
     }
 }
 
-bool WorldObject::IsWithinLootXPDist(WorldObject const * objToLoot) const
+bool WorldObject::IsWithinLootXPDist(WorldObject const* objToLoot) const
 {
     if (objToLoot && IsInMap(objToLoot) && objToLoot->GetMap()->IsRaid())
         return true;
@@ -1883,7 +1883,7 @@ bool WorldObject::IsPositionValid() const
     return MaNGOS::IsValidMapCoord(m_position.x, m_position.y, m_position.z, m_position.o);
 }
 
-void WorldObject::SendMessageToSet(WorldPacket *data, bool /*bToSelf*/) const
+void WorldObject::SendMessageToSet(WorldPacket* data, bool /*bToSelf*/) const
 {
     //if object is in world, map for it already created!
     if (IsInWorld())
@@ -1895,7 +1895,7 @@ struct MANGOS_DLL_DECL ObjectViewersDeliverer
     WorldPacket* i_message;
     WorldObject const* i_sender;
     WorldObject const* i_except;
-    explicit ObjectViewersDeliverer(WorldObject const* sender, WorldPacket *msg, WorldObject const* except) : i_message(msg), i_sender(sender), i_except(except) {}
+    explicit ObjectViewersDeliverer(WorldObject const* sender, WorldPacket* msg, WorldObject const* except) : i_message(msg), i_sender(sender), i_except(except) {}
     void Visit(CameraMapType &m)
     {
         for (auto iter = m.begin(); iter != m.end(); ++iter)
@@ -1907,7 +1907,7 @@ struct MANGOS_DLL_DECL ObjectViewersDeliverer
     template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
 };
 
-void WorldObject::SendObjectMessageToSet(WorldPacket *data, bool self, WorldObject const* except) const
+void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except) const
 {
     if (self && this != except)
         if (Player const* me = ToPlayer())
@@ -1945,14 +1945,14 @@ void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObj
     }
 }
 
-void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*bToSelf*/) const
+void WorldObject::SendMessageToSetInRange(WorldPacket* data, float dist, bool /*bToSelf*/) const
 {
     //if object is in world, map for it already created!
     if (IsInWorld())
         GetMap()->MessageDistBroadcast(this, data, dist);
 }
 
-void WorldObject::SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver) const
+void WorldObject::SendMessageToSetExcept(WorldPacket* data, Player const* skipped_receiver) const
 {
     //if object is in world, map for it already created!
     if (IsInWorld())
@@ -1996,7 +1996,7 @@ bool WorldObject::isWithinVisibilityDistanceOf(Unit const* viewer, WorldObject c
     return true;
 }
 
-void WorldObject::SetMap(Map * map)
+void WorldObject::SetMap(Map* map)
 {
     MANGOS_ASSERT(map);
     m_currMap = map;
@@ -2035,7 +2035,7 @@ void WorldObject::AddObjectToRemoveList()
     _deleted = true;
 }
 
-Creature *Map::SummonCreature(uint32 entry, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject)
+Creature* Map::SummonCreature(uint32 entry, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject)
 {
     CreatureInfo const* pInf = sObjectMgr.GetCreatureTemplate(entry);
     if (!pInf)
@@ -2069,7 +2069,7 @@ Creature *Map::SummonCreature(uint32 entry, float x, float y, float z, float ang
 
 Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject, uint32 pacifiedTimer, CreatureAiSetter pFuncAiSetter)
 {
-    CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(id);
+    CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(id);
     if (!cinfo)
     {
         sLog.outErrorDb("WorldObject::SummonCreature: Creature (Entry: %u) not existed for summoner: %s. ", id, GetGuidStr().c_str());
@@ -2155,8 +2155,8 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
         sLog.outErrorDb("Gameobject template %u not found in database!", entry);
         return nullptr;
     }
-    Map *map = GetMap();
-    GameObject *go = new GameObject();
+    Map* map = GetMap();
+    GameObject* go = new GameObject();
     if (!go->Create(map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), entry, map, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, 100, GO_STATE_READY))
     {
         delete go;
@@ -2570,7 +2570,7 @@ void WorldObject::DestroyForNearbyPlayers()
     Cell::VisitWorldObjects(this, searcher, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
     for (std::list<Player*>::const_iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
-        Player *plr = (*iter);
+        Player* plr = (*iter);
 
         if (plr == this)
             continue;
@@ -3061,7 +3061,7 @@ void WorldObject::LoadMapCellsAround(float dist) const
     Cell::VisitAllObjects(this, notifier, dist, false);
 }
 
-Unit* WorldObject::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectIndex eff)
+Unit* WorldObject::SelectMagnetTarget(Unit* victim, Spell* spell, SpellEffectIndex eff)
 {
     if (!victim)
         return nullptr;
@@ -3085,7 +3085,7 @@ Unit* WorldObject::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectInd
             {
                 if (magnet->IsAlive() && magnet->IsWithinLOSInMap(this) && spell->CheckTarget(magnet, eff))
                 {
-                    if (SpellAuraHolder *holder = (*itr)->GetHolder())
+                    if (SpellAuraHolder* holder = (*itr)->GetHolder())
                         if (holder->DropAuraCharge())
                         {
                             magnet->RemoveAurasDueToSpell(holder->GetId()); // Remove from grounding totem also
@@ -3408,7 +3408,7 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     return SPELL_MISS_NONE;
 }
 
-void WorldObject::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellEntry const *procSpell, Spell* spell)
+void WorldObject::ProcDamageAndSpell(Unit* pVictim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellEntry const* procSpell, Spell* spell)
 {
     if ((pVictim && !IsInMap(pVictim)) || !IsInWorld())
         return;
@@ -3465,7 +3465,7 @@ float WorldObject::MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType,
     if (Unit* pUnit = ToUnit())
     {
         // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
-        if (Player * modOwner = pUnit->GetSpellModOwner())
+        if (Player* modOwner = pUnit->GetSpellModOwner())
             modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, hitChance, spellPtr);
 
         // Bonuses from attacker aura and ratings
@@ -3652,7 +3652,7 @@ int32 WorldObject::MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, S
     // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
     if (Unit* pUnit = ToUnit())
     {
-        if (Player * modOwner = pUnit->GetSpellModOwner())
+        if (Player* modOwner = pUnit->GetSpellModOwner())
         {
             modOwner->ApplySpellMod(spell->Id, SPELLMOD_RESIST_MISS_CHANCE, modHitChance, spellPtr);
             //DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELLMOD_RESIST_MISS_CHANCE : %f", modHitChance);
@@ -3745,7 +3745,7 @@ float WorldObject::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
     return resistModHitChance;
 }
 
-void WorldObject::SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo)
+void WorldObject::SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo missInfo)
 {
     WorldPacket data(SMSG_SPELLLOGMISS, (4 + 8 + 1 + 4 + 8 + 1));
     data << uint32(spellID);
@@ -3760,7 +3760,7 @@ void WorldObject::SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo miss
     SendObjectMessageToSet(&data, true);
 }
 
-uint32 WorldObject::SpellCriticalDamageBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim, Spell* spell)
+uint32 WorldObject::SpellCriticalDamageBonus(SpellEntry const* spellProto, uint32 damage, Unit* pVictim, Spell* spell)
 {
     // Calculate critical bonus
     int32 crit_bonus;
@@ -3797,7 +3797,7 @@ uint32 WorldObject::SpellCriticalDamageBonus(SpellEntry const *spellProto, uint3
     return damage;
 }
 
-uint32 WorldObject::SpellCriticalHealingBonus(SpellEntry const *spellProto, uint32 damage, Unit const* pVictim) const
+uint32 WorldObject::SpellCriticalHealingBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim) const
 {
     // Calculate critical bonus
     int32 crit_bonus;
@@ -3828,7 +3828,7 @@ uint32 WorldObject::SpellCriticalHealingBonus(SpellEntry const *spellProto, uint
     return damage;
 }
 
-int32 WorldObject::DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical)
+int32 WorldObject::DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* spellProto, bool critical)
 {
     Unit* pUnit = ToUnit();
 
@@ -3864,7 +3864,7 @@ void WorldObject::SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 D
 #endif
 }
 
-void WorldObject::EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
+void WorldObject::EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
 {
     SendEnergizeSpellLog(pVictim, SpellID, Damage, powertype);
     // needs to be called after sending spell log
@@ -3884,7 +3884,7 @@ void WorldObject::SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint
 #endif
 }
 
-void WorldObject::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log)
+void WorldObject::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log)
 {
     WorldPacket data(SMSG_SPELLNONMELEEDAMAGELOG, (16 + 4 + 4 + 1 + 4 + 4 + 1 + 1 + 4 + 4 + 1)); // we guess size
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
@@ -4021,10 +4021,10 @@ int32 WorldObject::CalculateSpellDamage(Unit const* target, SpellEntry const* sp
     return value;
 }
 
-void WorldObject::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, SpellEntry const *spellInfo, WeaponAttackType attackType, Spell* spell)
+void WorldObject::CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, int32 damage, SpellEntry const* spellInfo, WeaponAttackType attackType, Spell* spell)
 {
     SpellSchoolMask damageSchoolMask = GetSchoolMask(damageInfo->school);
-    Unit *pVictim = damageInfo->target;
+    Unit* pVictim = damageInfo->target;
     if (!pVictim)
         return;
 
@@ -4100,7 +4100,7 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
 
     // differentiate for weapon damage based spells
     bool isWeaponDamageBasedSpell = !(spellProto && (damagetype == DOT || spellProto->HasEffect(SPELL_EFFECT_SCHOOL_DAMAGE)));
-    Item*  pWeapon          = GetTypeId() == TYPEID_PLAYER ? ((Player*)this)->GetWeaponForAttack(attType, true, false) : nullptr;
+    Item* pWeapon          = GetTypeId() == TYPEID_PLAYER ? ((Player*)this)->GetWeaponForAttack(attType, true, false) : nullptr;
     uint32 creatureTypeMask = pVictim->GetCreatureTypeMask();
     uint32 schoolMask       = spellProto ? spellProto->GetSpellSchoolMask() : GetMeleeDamageSchoolMask();
 
@@ -4248,7 +4248,7 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
  * Calculates caster part of healing spell bonuses,
  * also includes different bonuses dependent from target auras
  */
-uint32 WorldObject::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack, Spell* spell)
+uint32 WorldObject::SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack, Spell* spell)
 {
     Unit* pUnit = ToUnit();
 
@@ -4276,7 +4276,7 @@ uint32 WorldObject::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spell
             DoneTotalMod *= (100.0f + (*i)->GetModifier()->m_amount) / 100.0f;
 
         // done scripted mod (take it from owner)
-        Unit *owner = pUnit->GetOwner();
+        Unit* owner = pUnit->GetOwner();
         if (!owner)
             owner = pUnit;
 
@@ -4351,7 +4351,7 @@ int32 WorldObject::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
  * Calculates caster part of spell damage bonuses,
  * also includes different bonuses dependent from target auras
  */
-uint32 WorldObject::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack, Spell* spell)
+uint32 WorldObject::SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack, Spell* spell)
 {
     if (!spellProto || !pVictim || damagetype == DIRECT_DAMAGE)
         return pdamage;
@@ -4374,7 +4374,7 @@ uint32 WorldObject::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellP
 
     float DoneTotalMod = 1.0f;
     int32 DoneTotal = 0;
-    Item*  pWeapon = GetTypeId() == TYPEID_PLAYER ? ((Player*)this)->GetWeaponForAttack(BASE_ATTACK, true, false) : nullptr;
+    Item* pWeapon = GetTypeId() == TYPEID_PLAYER ? ((Player*)this)->GetWeaponForAttack(BASE_ATTACK, true, false) : nullptr;
 
     // Creature damage
     if (GetTypeId() == TYPEID_UNIT && !((Creature*)this)->IsPet())
@@ -4416,7 +4416,7 @@ uint32 WorldObject::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellP
         DoneTotal += pUnit->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_DAMAGE_DONE_CREATURE, creatureTypeMask);
 
     // done scripted mod (take it from owner)
-    Unit *owner = pUnit ? pUnit->GetOwner() : nullptr;
+    Unit* owner = pUnit ? pUnit->GetOwner() : nullptr;
     if (!owner) owner = pUnit;
     if (owner)
     {
@@ -4513,7 +4513,7 @@ int32 WorldObject::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
     return DoneAdvertisedBenefit;
 }
 
-int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit,  DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell) const
+int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const* spellProto, int32 total, int32 benefit, int32 ap_benefit,  DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell) const
 {
     // Distribute Damage over multiple effects, reduce by AoE
     float coeff = 0.0f;
@@ -4585,7 +4585,7 @@ int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 tota
     return total;
 };
 
-void WorldObject::DealDamageMods(Unit *victim, uint32 &damage, uint32* absorb)
+void WorldObject::DealDamageMods(Unit* victim, uint32 &damage, uint32* absorb)
 {
     Unit* pUnit = ToUnit();
     // [Nostalrius] Pas de degats sous esprit de redemption
@@ -4627,10 +4627,10 @@ float WorldObject::CalculateLevelPenalty(SpellEntry const* spellProto)
     /*
         float LvlPenalty = 0.0f;
 
-        if(spellLevel < 20)
+        if (spellLevel < 20)
             LvlPenalty = 20.0f - spellLevel * 3.75f;
         float LvlFactor = (float(spellLevel) + 6.0f) / float(GetLevel());
-        if(LvlFactor > 1.0f)
+        if (LvlFactor > 1.0f)
             LvlFactor = 1.0f;
 
         return (100.0f - LvlPenalty) * LvlFactor / 100.0f;
@@ -4646,7 +4646,7 @@ float WorldObject::GetAPMultiplier(WeaponAttackType attType, bool normalized) co
     if (!normalized || GetTypeId() != TYPEID_PLAYER)
         return float(pUnit->GetAttackTime(attType)) / 1000.0f;
 
-    Item *Weapon = ((Player*)this)->GetWeaponForAttack(attType, true, false);
+    Item* Weapon = ((Player*)this)->GetWeaponForAttack(attType, true, false);
     if (!Weapon)
         return 2.4f;                                         // fist attack
 
@@ -4666,12 +4666,12 @@ float WorldObject::GetAPMultiplier(WeaponAttackType attType, bool normalized) co
     }
 }
 
-void WorldObject::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss)
+void WorldObject::DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss)
 {
     if (!damageInfo)
         return;
 
-    Unit *pVictim = damageInfo->target;
+    Unit* pVictim = damageInfo->target;
 
     if (!pVictim)
         return;
@@ -4679,7 +4679,7 @@ void WorldObject::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabili
     if (!pVictim->IsAlive() || pVictim->IsTaxiFlying() || (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode()))
         return;
 
-    SpellEntry const *spellProto = sSpellMgr.GetSpellEntry(damageInfo->SpellID);
+    SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(damageInfo->SpellID);
     if (spellProto == nullptr)
     {
         sLog.outError("WorldObject::DealSpellDamage have wrong damageInfo->SpellID: %u", damageInfo->SpellID);
@@ -4691,7 +4691,7 @@ void WorldObject::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabili
     DealDamage(pVictim, damageInfo->damage, &cleanDamage, SPELL_DIRECT_DAMAGE, GetSchoolMask(damageInfo->school), spellProto, durabilityLoss, damageInfo->spell);
 }
 
-uint32 WorldObject::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell)
+uint32 WorldObject::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell)
 {
     // Should never happen since DealDamage is overriden in Unit class.
     if (pVictim == this)
@@ -4711,7 +4711,7 @@ bool WorldObject::CheckAndIncreaseCastCounter()
     return true;
 }
 
-void WorldObject::SetCurrentCastedSpell(Spell * pSpell)
+void WorldObject::SetCurrentCastedSpell(Spell* pSpell)
 {
     MANGOS_ASSERT(pSpell);                                  // nullptr may be never passed here, use InterruptSpell or InterruptNonMeleeSpells
 
@@ -4921,7 +4921,7 @@ void WorldObject::GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, st
     }
 }
 
-DynamicObject * WorldObject::GetDynObject(uint32 spellId, SpellEffectIndex effIndex)
+DynamicObject* WorldObject::GetDynObject(uint32 spellId, SpellEffectIndex effIndex)
 {
     for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
     {
@@ -4939,7 +4939,7 @@ DynamicObject * WorldObject::GetDynObject(uint32 spellId, SpellEffectIndex effIn
     return nullptr;
 }
 
-DynamicObject * WorldObject::GetDynObject(uint32 spellId)
+DynamicObject* WorldObject::GetDynObject(uint32 spellId)
 {
     for (DynObjectGUIDs::iterator i = m_dynObjGUIDs.begin(); i != m_dynObjGUIDs.end();)
     {
@@ -4992,9 +4992,9 @@ void WorldObject::RemoveAllDynObjects()
     }
 }
 
-void WorldObject::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
+void WorldObject::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
     if (!spellInfo)
     {
@@ -5008,7 +5008,7 @@ void WorldObject::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *
     CastSpell(Victim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
 }
 
-void WorldObject::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
+void WorldObject::CastSpell(Unit* Victim, SpellEntry const* spellInfo, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
 {
     if (!spellInfo)
     {
@@ -5030,7 +5030,7 @@ void WorldObject::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool trig
         triggeredBy = triggeredByAura->GetSpellProto();
     }
 
-    Spell *spell;
+    Spell* spell;
 
     if (Unit* pUnit = ToUnit())
         spell = new Spell(pUnit, spellInfo, triggered, originalCaster, triggeredBy, nullptr, triggeredByParent);
@@ -5056,9 +5056,9 @@ void WorldObject::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool trig
     spell->prepare(std::move(targets), triggeredByAura);
 }
 
-void WorldObject::CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+void WorldObject::CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
     if (!spellInfo)
     {
@@ -5072,7 +5072,7 @@ void WorldObject::CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0
     CastCustomSpell(Victim, spellInfo, bp0, bp1, bp2, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
 }
 
-void WorldObject::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+void WorldObject::CastCustomSpell(Unit* Victim, SpellEntry const* spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
 {
     if (!spellInfo)
     {
@@ -5094,7 +5094,7 @@ void WorldObject::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int
         triggeredBy = triggeredByAura->GetSpellProto();
     }
 
-    Spell *spell;
+    Spell* spell;
 
     if (Unit* pUnit = ToUnit())
         spell = new Spell(pUnit, spellInfo, triggered, originalCaster, triggeredBy);
@@ -5119,9 +5119,9 @@ void WorldObject::CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int
 }
 
 // used for scripting
-void WorldObject::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+void WorldObject::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
     if (!spellInfo)
     {
@@ -5136,7 +5136,7 @@ void WorldObject::CastSpell(float x, float y, float z, uint32 spellId, bool trig
 }
 
 // used for scripting
-void WorldObject::CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+void WorldObject::CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
 {
     if (!spellInfo)
     {
@@ -5158,7 +5158,7 @@ void WorldObject::CastSpell(float x, float y, float z, SpellEntry const *spellIn
         triggeredBy = triggeredByAura->GetSpellProto();
     }
 
-    Spell *spell;
+    Spell* spell;
 
     if (Unit* pUnit = ToUnit())
         spell = new Spell(pUnit, spellInfo, triggered, originalCaster, triggeredBy);

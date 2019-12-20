@@ -80,7 +80,7 @@ class MasterSessionFilter final : public PacketFilter
             m_processType = PACKET_PROCESS_MASTER_SAFE;
         }
 
-        bool Process(WorldPacket * packet) { return true; }
+        bool Process(WorldPacket*  packet) { return true; }
 };
 
 void NodeSession::UnsafeUpdate(uint32 diff)

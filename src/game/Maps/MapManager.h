@@ -62,7 +62,7 @@ struct MANGOS_DLL_DECL MapID
 
     bool operator<(const MapID& val) const
     {
-        if(nMapId == val.nMapId)
+        if (nMapId == val.nMapId)
             return nInstanceId < val.nInstanceId;
 
         return nMapId < val.nMapId;
@@ -105,7 +105,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         void SetGridCleanUpDelay(uint32 t)
         {
-            if( t < MIN_GRID_DELAY )
+            if (t < MIN_GRID_DELAY)
                 i_gridCleanUpDelay = MIN_GRID_DELAY;
             else
                 i_gridCleanUpDelay = t;
@@ -113,7 +113,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         void SetMapUpdateInterval(uint32 t)
         {
-            if( t > MIN_MAP_UPDATE_DELAY )
+            if (t > MIN_MAP_UPDATE_DELAY)
                 t = MIN_MAP_UPDATE_DELAY;
 
             i_timer.SetInterval(t);
@@ -151,7 +151,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         {
             // fmod only supports positive numbers. Thus we have
             // to emulate negative numbers
-            if(o < 0)
+            if (o < 0)
             {
                 float mod = o *-1;
                 mod = fmod(mod, 2.0f*M_PI_F);

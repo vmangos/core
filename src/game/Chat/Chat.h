@@ -182,12 +182,12 @@ class MANGOS_DLL_SPEC ChatHandler
         void FillFullCommandsName(ChatCommand* table, std::string prefix);
         ChatCommand* getCommandTable();
         
-        bool HandleAnticheatCommand(char *);
-        bool HandleClientInfosCommand(char* );
-        bool HandleClientSearchCommand(char* );
+        bool HandleAnticheatCommand(char*);
+        bool HandleClientInfosCommand(char*);
+        bool HandleClientSearchCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
-        bool HandleRunTestCommand(char* );
-        bool HandleViewLogCommand(char* );
+        bool HandleRunTestCommand(char*);
+        bool HandleViewLogCommand(char*);
 
         //Cheats
         bool HandleCheatStatusCommand(char *);
@@ -213,8 +213,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugTimeCommand(char *);
         bool HandleDebugMoveFlagsCommand(char *);
         bool HandleDebugMoveSplineCommand(char *);
-        bool HandleDebugExp(char* );
-        bool HandleVideoTurn(char* );
+        bool HandleDebugExp(char*);
+        bool HandleVideoTurn(char*);
         bool HandleDebugLootTableCommand(char*);
         bool HandleDebugItemEnchantCommand(int lootid, unsigned int simCount);
         bool HandleServiceDeleteCharacters(char* args);
@@ -369,8 +369,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadInstanceBuffRemoval(char* args);
         bool HandleReloadPetitions(char* args);
         // Channel
-        bool HandleChannelJoinCommand(char* );
-        bool HandleChannelLeaveCommand(char* );
+        bool HandleChannelJoinCommand(char*);
+        bool HandleChannelLeaveCommand(char*);
 
         bool HandleAccountCommand(char* args);
         bool HandleAccountCharactersCommand(char* args);
@@ -953,7 +953,7 @@ class MANGOS_DLL_SPEC ChatHandler
 
         // Utility methods for commands
         bool ShowAccountIpListHelper(char* args, bool onlineonly);
-        void ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState = nullptr, Player * target = nullptr );
+        void ShowFactionListHelper(FactionEntry const* factionEntry, LocaleConstant loc, FactionState const* repState = nullptr, Player * target = nullptr);
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = nullptr);
         void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = nullptr);
         void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);

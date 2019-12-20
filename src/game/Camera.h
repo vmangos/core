@@ -52,10 +52,10 @@ class MANGOS_DLL_SPEC Camera
         void ResetView(bool update_far_sight_field = true);
 
         template<class T>
-        void UpdateVisibilityOf(T * obj, UpdateData &d, std::set<WorldObject*>& vis);
+        void UpdateVisibilityOf(T* obj, UpdateData &d, std::set<WorldObject*>& vis);
         void UpdateVisibilityOf(WorldObject* obj);
 
-        void ReceivePacket(WorldPacket *data);
+        void ReceivePacket(WorldPacket* data);
 
         // updates visibility of worldobjects around viewpoint for camera's owner
         void UpdateVisibilityForOwner();

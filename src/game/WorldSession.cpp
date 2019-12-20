@@ -65,7 +65,7 @@ static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& o
 }
 
 
-bool MapSessionFilter::Process(WorldPacket * packet)
+bool MapSessionFilter::Process(WorldPacket* packet)
 {
     OpcodeHandler const& opHandle = opcodeTable[packet->GetOpcode()];
     // let's check if our opcode can be really processed in Map::Update()
@@ -282,7 +282,7 @@ void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, const char *reason)
 }
 
 /// Logging helper for unexpected opcodes
-void WorldSession::LogUnprocessedTail(WorldPacket *packet)
+void WorldSession::LogUnprocessedTail(WorldPacket* packet)
 {
     sLog.outError("SESSION: opcode %s (0x%.4X) have unprocessed tail data (read stop at " SIZEFMTD " from " SIZEFMTD ")",
                   LookupOpcodeName(packet->GetOpcode()),
@@ -314,7 +314,7 @@ bool WorldSession::Update(PacketFilter& updater)
     ///- Retrieve packets from the receive queue and call the appropriate handlers
     ProcessPackets(updater);
 
-    if(CharacterScreenIdleKick(sessionUpdateTime))
+    if (CharacterScreenIdleKick(sessionUpdateTime))
         return false;
 
     sessionUpdateTime = WorldTimer::getMSTimeDiffToNow(sessionUpdateTime);
@@ -558,12 +558,12 @@ void WorldSession::ProcessPackets(PacketFilter& updater)
             if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_PACKET) && packetTime > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_PACKET))
                 sLog.out(LOG_PERFORMANCE, "Slow packet opcode %s: %ums. Account %u on IP %s", opHandle.name, packetTime, GetAccountId(), GetRemoteAddress().c_str());
         }
-        catch (ForwardToMaster_Exception& )
+        catch (ForwardToMaster_Exception&)
         {
             ASSERT(GetMasterSession());
             GetMasterSession()->ForwardClientPacket(GetAccountId(), packet);
         }
-        catch (ForwardToNode_Exception& )
+        catch (ForwardToNode_Exception&)
         {
             ASSERT(GetNodeSession());
             GetMasterSession()->ForwardClientPacket(GetAccountId(), packet);

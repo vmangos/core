@@ -427,7 +427,7 @@ void BattleGround::SetTeamStartLoc(Team team, float X, float Y, float Z, float O
     m_TeamStartLocO[teamIdx] = O;
 }
 
-void BattleGround::SendPacketToAll(WorldPacket *packet)
+void BattleGround::SendPacketToAll(WorldPacket* packet)
 {
     for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
@@ -438,7 +438,7 @@ void BattleGround::SendPacketToAll(WorldPacket *packet)
     }
 }
 
-void BattleGround::SendPacketToTeam(Team teamId, WorldPacket *packet, Player *sender, bool self)
+void BattleGround::SendPacketToTeam(Team teamId, WorldPacket* packet, Player* sender, bool self)
 {
     for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
     {
@@ -1070,7 +1070,7 @@ uint32 BattleGround::GetFreeSlotsForTeam(Team team) const
             if (otherTeam == GetInvitedCount(Team))
                 diff = 1;
             // allow join more ppl if the other side has more players
-            else if(otherTeam > GetInvitedCount(Team))
+            else if (otherTeam > GetInvitedCount(Team))
                 diff = otherTeam - GetInvitedCount(Team);
 
             // difference based on max players per team (don't allow inviting more)

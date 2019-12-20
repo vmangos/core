@@ -40,7 +40,7 @@ Camera::~Camera()
     m_source->GetViewPoint().Detach(this);
 }
 
-void Camera::ReceivePacket(WorldPacket *data)
+void Camera::ReceivePacket(WorldPacket* data)
 {
     m_owner.SendDirectMessage(data);
 }

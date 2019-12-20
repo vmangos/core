@@ -476,7 +476,7 @@ void Map::Add(Transport* obj)
     return;
 }
 
-void Map::MessageBroadcast(Player const* player, WorldPacket *msg, bool to_self)
+void Map::MessageBroadcast(Player const* player, WorldPacket* msg, bool to_self)
 {
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
 
@@ -497,7 +497,7 @@ void Map::MessageBroadcast(Player const* player, WorldPacket *msg, bool to_self)
     cell.Visit(p, message, *this, *player, GetVisibilityDistance());
 }
 
-void Map::MessageBroadcast(WorldObject const* obj, WorldPacket *msg)
+void Map::MessageBroadcast(WorldObject const* obj, WorldPacket* msg)
 {
     CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
 
@@ -520,7 +520,7 @@ void Map::MessageBroadcast(WorldObject const* obj, WorldPacket *msg)
     cell.Visit(p, message, *this, *obj, GetVisibilityDistance());
 }
 
-void Map::MessageDistBroadcast(Player const* player, WorldPacket *msg, float dist, bool to_self, bool own_team_only)
+void Map::MessageDistBroadcast(Player const* player, WorldPacket* msg, float dist, bool to_self, bool own_team_only)
 {
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
 
@@ -541,7 +541,7 @@ void Map::MessageDistBroadcast(Player const* player, WorldPacket *msg, float dis
     cell.Visit(p, message, *this, *player, dist);
 }
 
-void Map::MessageDistBroadcast(WorldObject const* obj, WorldPacket *msg, float dist)
+void Map::MessageDistBroadcast(WorldObject const* obj, WorldPacket* msg, float dist)
 {
     CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
 

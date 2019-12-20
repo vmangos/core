@@ -351,7 +351,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
 
         data << pProto->RequiredCityRank;
         data << pProto->RequiredReputationFaction;
-        data << (pProto->RequiredReputationFaction > 0  ? pProto->RequiredReputationRank : 0);   // send value only if reputation faction id setted ( needed for some items)
+        data << (pProto->RequiredReputationFaction > 0  ? pProto->RequiredReputationRank : 0);   // send value only if reputation faction id setted (needed for some items)
         data << pProto->MaxCount;
         data << pProto->Stackable;
         data << pProto->ContainerSlots;
@@ -451,7 +451,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
 
 void WorldSession::HandleReadItemOpcode(WorldPacket & recv_data)
 {
-    //DEBUG_LOG( "WORLD: CMSG_READ_ITEM");
+    //DEBUG_LOG("WORLD: CMSG_READ_ITEM");
 
     uint8 bag, slot;
     recv_data >> bag >> slot;

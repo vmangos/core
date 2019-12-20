@@ -2294,17 +2294,17 @@ void SpellMgr::LoadSpellScriptTarget()
     for(uint32 i = 1; i < sSpellMgr.GetMaxSpellId; ++i)
     {
         SpellEntry const * spellInfo = sSpellMgr.GetSpellEntry(i);
-        if(!spellInfo)
+        if (!spellInfo)
             continue;
 
         bool found = false;
         for(int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
-            if( spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT || spellInfo->EffectImplicitTargetA[j] != TARGET_SELF && spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT )
+            if (spellInfo->EffectImplicitTargetA[j] == TARGET_SCRIPT || spellInfo->EffectImplicitTargetA[j] != TARGET_SELF && spellInfo->EffectImplicitTargetB[j] == TARGET_SCRIPT)
             {
                 SpellScriptTarget::const_iterator lower = GetBeginSpellScriptTarget(spellInfo->Id);
                 SpellScriptTarget::const_iterator upper = GetEndSpellScriptTarget(spellInfo->Id);
-                if(lower==upper)
+                if (lower==upper)
                 {
                     sLog.outErrorDb("Spell (ID: %u) has effect EffectImplicitTargetA/EffectImplicitTargetB = %u (TARGET_SCRIPT), but does not have record in `spell_script_target`",spellInfo->Id,TARGET_SCRIPT);
                     break;                                  // effects of spell

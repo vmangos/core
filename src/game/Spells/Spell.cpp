@@ -662,7 +662,7 @@ void Spell::prepareDataForTriggerSystem()
     //==========================================================================================
     // Now fill data for trigger system, need know:
     // an spell trigger another or not ( m_canTrigger )
-    // Create base triggers flags for Attacker and Victim ( m_procAttacker and  m_procVictim)
+    // Create base triggers flags for Attacker and Victim (m_procAttacker and  m_procVictim)
     //==========================================================================================
     // Fill flag can spell trigger or not
     // TODO: possible exist spell attribute for this
@@ -3093,7 +3093,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     /*[-ZERO]  if (m_spellInfo->EffectMiscValueB[effIndex] == SUMMON_TYPE_POSESSED ||
                           m_spellInfo->EffectMiscValueB[effIndex] == SUMMON_TYPE_POSESSED2)
                       {
-                          if(m_targets.getUnitTarget())
+                          if (m_targets.getUnitTarget())
                               targetUnitMap.push_back(m_targets.getUnitTarget());
                       }
                       else */
@@ -3240,7 +3240,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             m_targets.setDestination(x, y, z);
         }
         default:
-            //sLog.outError( "SPELL: Unknown implicit target (%u) for spell ID %u", targetMode, m_spellInfo->Id );
+            //sLog.outError("SPELL: Unknown implicit target (%u) for spell ID %u", targetMode, m_spellInfo->Id);
             break;
     }
 
@@ -6332,7 +6332,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                     {
                         if (go->GetGoState() != GO_STATE_READY)
                             return SPELL_FAILED_BAD_TARGETS;
-                        if(!((Player*)m_caster)->CanUseBattleGroundObject())
+                        if (!((Player*)m_caster)->CanUseBattleGroundObject())
                             return SPELL_FAILED_TRY_AGAIN;
                     }
                     lockId = go->GetGOInfo()->GetLockId();

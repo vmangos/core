@@ -247,7 +247,7 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
         else
         {
             bool inMeleeRange = me->IsWithinMeleeRange(victim);
-            if ( (bIsMelee && inMeleeRange) || (!bIsMelee && !me->IsMoving() && me->IsWithinDist(victim, 30.0f)))
+            if ((bIsMelee && inMeleeRange) || (!bIsMelee && !me->IsMoving() && me->IsWithinDist(victim, 30.0f)))
             {
                 me->GetMotionMaster()->Clear();
                 if (bIsMelee && !me->HasInArc(0.2f, victim))
@@ -395,7 +395,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
                     {
                         me->CastSpell(spellTarget, spellId, false);
                         uiGlobalCD = 1500;
-                        if(!bIsMelee)
+                        if (!bIsMelee)
                             me->SetCasterChaseDistance(25.0f);
                     }
                     else

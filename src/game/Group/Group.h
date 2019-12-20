@@ -318,8 +318,8 @@ class MANGOS_DLL_SPEC Group
         void UpdateOfflineLeader(time_t time, uint32 delay);
         void BroadcastGroupUpdate();
                                                             // ignore: GUID of player that will be ignored
-        void BroadcastPacket(WorldPacket *packet, bool ignorePlayersInBGRaid, int group=-1, ObjectGuid ignore = ObjectGuid());
-        void BroadcastReadyCheck(WorldPacket *packet);
+        void BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group=-1, ObjectGuid ignore = ObjectGuid());
+        void BroadcastReadyCheck(WorldPacket* packet);
         void OfflineReadyCheck();
 
         void RewardGroupAtKill(Unit* pVictim, Player* pPlayerTap);
@@ -353,7 +353,7 @@ class MANGOS_DLL_SPEC Group
         void EndRoll(Loot* loot);
 
         void LinkMember(GroupReference *pRef) { m_memberMgr.insertFirst(pRef); }
-        void DelinkMember(GroupReference* /*pRef*/ ) { }
+        void DelinkMember(GroupReference* /*pRef*/) { }
 
         InstanceGroupBind* BindToInstance(DungeonPersistentState *save, bool permanent, bool load = false);
         void UnbindInstance(uint32 mapid, bool unload = false);

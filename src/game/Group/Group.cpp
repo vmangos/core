@@ -790,7 +790,7 @@ void Group::MasterLoot(Creature *creature, Loot* loot)
             continue;
 
         //if (looter->IsWithinDistInMap(creature, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
-        if(looter->IsWithinLootXPDist(creature))
+        if (looter->IsWithinLootXPDist(creature))
         {
             data << looter->GetObjectGuid();
             ++playerCount;
@@ -1315,7 +1315,7 @@ void Group::UpdateOfflineLeader(time_t time, uint32 delay)
     _chooseLeader(true);
 }
 
-void Group::BroadcastPacket(WorldPacket *packet, bool ignorePlayersInBGRaid, int group, ObjectGuid ignore)
+void Group::BroadcastPacket(WorldPacket* packet, bool ignorePlayersInBGRaid, int group, ObjectGuid ignore)
 {
     for (GroupReference *itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {
@@ -1328,7 +1328,7 @@ void Group::BroadcastPacket(WorldPacket *packet, bool ignorePlayersInBGRaid, int
     }
 }
 
-void Group::BroadcastReadyCheck(WorldPacket *packet)
+void Group::BroadcastReadyCheck(WorldPacket* packet)
 {
     for (GroupReference *itr = GetFirstMember(); itr != nullptr; itr = itr->next())
     {

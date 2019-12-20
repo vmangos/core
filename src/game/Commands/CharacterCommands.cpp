@@ -67,7 +67,7 @@ bool ChatHandler::HandleXpCommand(char* args)
     }
 
     pPlayer->SetPersonalXpRate(xp);
-    PSendSysMessage(LANG_XP_RATE_SET, (pPlayer != m_session->GetPlayer() ? (std::string(pPlayer->GetName()) + std::string("'s")).c_str() : "your" ), xp);
+    PSendSysMessage(LANG_XP_RATE_SET, (pPlayer != m_session->GetPlayer() ? (std::string(pPlayer->GetName()) + std::string("'s")).c_str() : "your"), xp);
     return true;
 }
 
@@ -1260,7 +1260,7 @@ std::string ChatHandler::GenerateDeletedCharacterGUIDsWhereStr(DeletedInfoList::
         }
 
         DeletedInfoList::const_iterator itr2 = itr;
-        if(++itr2 != itr_end)
+        if (++itr2 != itr_end)
             wherestr << "','";
     }
     wherestr << "')";
@@ -1659,7 +1659,7 @@ void ChatHandler::HandleCharacterLevel(Player* player, ObjectGuid player_guid, u
                 ChatHandler(player).PSendSysMessage(LANG_YOURS_LEVEL_PROGRESS_RESET, GetNameLink().c_str());
             else if (oldlevel < newlevel)
                 ChatHandler(player).PSendSysMessage(LANG_YOURS_LEVEL_UP, GetNameLink().c_str(), newlevel);
-            else                                                // if(oldlevel > newlevel)
+            else                                                // if (oldlevel > newlevel)
                 ChatHandler(player).PSendSysMessage(LANG_YOURS_LEVEL_DOWN, GetNameLink().c_str(), newlevel);
         }
     }
@@ -1771,7 +1771,7 @@ bool ChatHandler::HandleCharacterReputationCommand(char* args)
 
 bool ChatHandler::HandleCharacterHasItemCommand(char* args)
 {
-    if(!*args)
+    if (!*args)
         return false;
 
     uint32 itemId = 0;
@@ -3722,7 +3722,7 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
     //-1 is default value
     player->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, -1);
 
-    //player->SetUInt32Value(PLAYER_FIELD_BYTES, 0xEEE00000 );
+    //player->SetUInt32Value(PLAYER_FIELD_BYTES, 0xEEE00000);
     return true;
 }
 

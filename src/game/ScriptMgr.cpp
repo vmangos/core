@@ -2128,7 +2128,7 @@ void ScriptMgr::LoadEscortData()
 
             // Calcul de uiLastWaypointEntry, et mise en "cache"
             std::vector<ScriptPointMove> const points = GetPointMoveList(pTemp.uiCreatureEntry);
-            if(points.empty())
+            if (points.empty())
             {
                 sLog.outErrorDb("Le PNJ %u de script_escort_data n'a pas de donnees de Waypoints !", pTemp.uiCreatureEntry);
                 continue;
@@ -2137,7 +2137,7 @@ void ScriptMgr::LoadEscortData()
             std::vector<ScriptPointMove>::const_iterator it;
             for(it = points.begin(); it != points.end(); ++it)
             {
-                if(it->uiPointId > pTemp.uiLastWaypointEntry)
+                if (it->uiPointId > pTemp.uiLastWaypointEntry)
                     pTemp.uiLastWaypointEntry = it->uiPointId;
             }
             m_mEscortDataMap[pTemp.uiCreatureEntry] = pTemp;
@@ -2402,9 +2402,9 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, int32 c
     {
         if (sObjectMgr.GetSoundEntry(SoundId))
         {
-            if(Type == CHAT_TYPE_ZONE_YELL)
+            if (Type == CHAT_TYPE_ZONE_YELL)
             {
-                if(Map* pZone = pSource->GetMap())
+                if (Map* pZone = pSource->GetMap())
                     pZone->PlayDirectSoundToMap(SoundId);
             }
             else

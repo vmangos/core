@@ -504,7 +504,7 @@ void ObjectMgr::SetPlayerWorldMask(const uint64 guid, uint32 newWorldMask)
     //CharacterDatabase.PQuery("UPDATE characters SET world_phase_mask = %u WHERE guid = %u", newWorldMask, GUID_LOPART(guid));
 }
 
-uint32 ObjectMgr::GetSavedVariable(uint32 index, uint32 defaultValue, bool *exist)
+uint32 ObjectMgr::GetSavedVariable(uint32 index, uint32 defaultValue, bool* exist)
 {
     SavedVariablesVector::iterator it;
     for (it = m_SavedVariables.begin(); it != m_SavedVariables.end(); ++it)
@@ -772,7 +772,7 @@ uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(std::string const& name) const
     return 0;
 }
 
-PlayerCacheData* ObjectMgr::InsertPlayerInCache(Player *pPlayer)
+PlayerCacheData* ObjectMgr::InsertPlayerInCache(Player* pPlayer)
 {
     auto pSession = pPlayer->GetSession();
     if (!pSession)
@@ -932,7 +932,7 @@ void ObjectMgr::LoadCreatureLocales()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -1004,7 +1004,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint16 menuId   = fields[0].GetUInt16();
         uint16 id       = fields[1].GetUInt16();
@@ -1087,7 +1087,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -1370,7 +1370,7 @@ void ObjectMgr::CheckCreatureTemplates()
 void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* table, char const* guidEntryStr)
 {
     // Now add the auras, format "spell1 spell2 ..."
-    char *p, *s;
+    char* p,* s;
     std::vector<int> val;
     s = p = (char*)reinterpret_cast<char const*>(addon->auras);
     if (p)
@@ -1407,7 +1407,7 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
         uint32& cAura = const_cast<uint32&>(addon->auras[i]);
         cAura = uint32(val[j]);
 
-        SpellEntry const *AdditionalSpellInfo = sSpellMgr.GetSpellEntry(cAura);
+        SpellEntry const* AdditionalSpellInfo = sSpellMgr.GetSpellEntry(cAura);
         if (!AdditionalSpellInfo)
         {
             sLog.outErrorDb("Creature (%s: %u) has wrong spell %u defined in `auras` field in `%s`.", guidEntryStr, addon->guidOrEntry, cAura, table);
@@ -1504,7 +1504,7 @@ void ObjectMgr::LoadEquipmentTemplates()
             if (!eqInfo->equipentry[j])
                 continue;
 
-            ItemPrototype const *itemProto = GetItemPrototype(eqInfo->equipentry[j]);
+            ItemPrototype const* itemProto = GetItemPrototype(eqInfo->equipentry[j]);
             if (!itemProto)
             {
                 sLog.outErrorDb("Unknown item (entry=%u) in creature_equip_template.equipentry%u for entry = %u, forced to 0.", eqInfo->equipentry[j], j + 1, i);
@@ -1541,7 +1541,7 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelid)
 // generally for models having another model for the other team (totems)
 uint32 ObjectMgr::GetCreatureModelOtherTeamModel(uint32 modelId)
 {
-    if (const CreatureModelInfo *modelInfo = GetCreatureModelInfo(modelId))
+    if (const CreatureModelInfo* modelInfo = GetCreatureModelInfo(modelId))
         return modelInfo->modelid_other_team;
 
     return 0;
@@ -1549,14 +1549,14 @@ uint32 ObjectMgr::GetCreatureModelOtherTeamModel(uint32 modelId)
 
 CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_id)
 {
-    CreatureModelInfo const *minfo = GetCreatureModelInfo(display_id);
+    CreatureModelInfo const* minfo = GetCreatureModelInfo(display_id);
     if (!minfo)
         return nullptr;
 
     // If a model for another gender exists, 50% chance to use it
     if (minfo->modelid_other_gender != 0 && urand(0, 1) == 0)
     {
-        CreatureModelInfo const *minfo_tmp = GetCreatureModelInfo(minfo->modelid_other_gender);
+        CreatureModelInfo const* minfo_tmp = GetCreatureModelInfo(minfo->modelid_other_gender);
         if (!minfo_tmp)
         {
             sLog.outErrorDb("Model (Entry: %u) has modelid_other_gender %u not found in table `creature_model_info`. ", minfo->modelid, minfo->modelid_other_gender);
@@ -1576,7 +1576,7 @@ void ObjectMgr::LoadCreatureModelInfo()
     // post processing
     for (uint32 i = 1; i < sCreatureModelStorage.GetMaxEntry(); ++i)
     {
-        CreatureModelInfo const *minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(i);
+        CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(i);
         if (!minfo)
             continue;
 
@@ -1628,7 +1628,7 @@ void ObjectMgr::LoadCreatureModelInfo()
         if (!((1 << (race - 1)) & RACEMASK_ALL_PLAYABLE))
             continue;
 
-        if (CreatureModelInfo const *minfo = GetCreatureModelInfo(raceEntry->model_f))
+        if (CreatureModelInfo const* minfo = GetCreatureModelInfo(raceEntry->model_f))
         {
             if (minfo->gender != GENDER_FEMALE)
                 sLog.outErrorDb("Table `creature_model_info` have wrong gender %u for character race %u female model id %u", minfo->gender, race, raceEntry->model_f);
@@ -1651,7 +1651,7 @@ void ObjectMgr::LoadCreatureModelInfo()
         else
             sLog.outErrorDb("Table `creature_model_info` expect have data for character race %u female model id %u", race, raceEntry->model_f);
 
-        if (CreatureModelInfo const *minfo = GetCreatureModelInfo(raceEntry->model_m))
+        if (CreatureModelInfo const* minfo = GetCreatureModelInfo(raceEntry->model_m))
         {
             if (minfo->gender != GENDER_MALE)
                 sLog.outErrorDb("Table `creature_model_info` have wrong gender %u for character race %u male model id %u", minfo->gender, race, raceEntry->model_m);
@@ -1846,7 +1846,7 @@ void ObjectMgr::LoadCreatures(bool reload)
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 first_entry  = fields[ 1].GetUInt32();
@@ -2075,7 +2075,7 @@ void ObjectMgr::LoadGameobjects(bool reload)
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 entry        = fields[ 1].GetUInt32();
@@ -3296,7 +3296,7 @@ void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
         {
             do
             {
-                Field *fields = result->Fetch();
+                Field* fields = result->Fetch();
                 uint32 itemId = fields[0].GetUInt32();
                 obtainedItems.insert(itemId);
             } while (result->NextRow());
@@ -3306,7 +3306,7 @@ void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
     {
         for (uint32 spellId = 1; spellId < sSpellMgr.GetMaxSpellId(); ++spellId)
         {
-            SpellEntry const *pSpellProto = sSpellMgr.GetSpellEntry(spellId);
+            SpellEntry const* pSpellProto = sSpellMgr.GetSpellEntry(spellId);
             if (!pSpellProto)
                 continue;
 
@@ -3454,7 +3454,7 @@ void ObjectMgr::LoadItemPrototypes()
             if (proto->RequiredReputationRank == MIN_REPUTATION_RANK)
                 sLog.outErrorDb("Item (Entry: %u) has min. reputation rank in RequiredReputationRank (0) but RequiredReputationFaction > 0, faction setting is useless.", i);
         }
-        // else if(proto->RequiredReputationRank > MIN_REPUTATION_RANK)
+        // else if (proto->RequiredReputationRank > MIN_REPUTATION_RANK)
         //    sLog.outErrorDb("Item (Entry: %u) has RequiredReputationFaction ==0 but RequiredReputationRank > 0, rank setting is useless.",i);
 
         if (proto->Stackable == 0)
@@ -3620,7 +3620,7 @@ void ObjectMgr::LoadItemPrototypes()
         // Item starts a quest, insert it into the quest->startItem map
         {
             if (m_QuestStartingItemsMap.find(proto->StartQuest) == m_QuestStartingItemsMap.end())
-                m_QuestStartingItemsMap.insert( std::pair<uint32, uint32>(proto->StartQuest, proto->ItemId) );
+                m_QuestStartingItemsMap.insert(std::pair<uint32, uint32>(proto->StartQuest, proto->ItemId));
             else
                 sLog.outErrorDb("Item #%u also starts quest #%u.", i, proto->StartQuest);
         }
@@ -3648,7 +3648,7 @@ void ObjectMgr::LoadItemLocales()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -3718,7 +3718,7 @@ void ObjectMgr::LoadItemRequiredTarget()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 uiItemId      = fields[0].GetUInt32();
         uint32 uiType        = fields[1].GetUInt32();
@@ -4586,9 +4586,9 @@ void ObjectMgr::LoadGroups()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         ++count;
-        Group *group = new Group;
+        Group* group = new Group;
         if (!group->LoadGroupFromDB(fields))
         {
             group->Disband();
@@ -4620,7 +4620,7 @@ void ObjectMgr::LoadGroups()
         do
         {
             bar2.step();
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             count++;
 
             uint32 memberGuidlow = fields[0].GetUInt32();
@@ -4692,7 +4692,7 @@ void ObjectMgr::LoadGroups()
         do
         {
             bar2.step();
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             count++;
 
             uint32 leaderGuidLow = fields[0].GetUInt32();
@@ -4717,7 +4717,7 @@ void ObjectMgr::LoadGroups()
                 continue;
             }
 
-            DungeonPersistentState *state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, fields[2].GetUInt32(), (time_t)fields[4].GetUInt64(), (fields[5].GetUInt32() == 0), true);
+            DungeonPersistentState* state = (DungeonPersistentState*)sMapPersistentStateMgr.AddPersistentState(mapEntry, fields[2].GetUInt32(), (time_t)fields[4].GetUInt64(), (fields[5].GetUInt32() == 0), true);
             group->BindToInstance(state, fields[3].GetBool(), true);
         }
         while (result->NextRow());
@@ -4788,7 +4788,7 @@ void ObjectMgr::LoadQuests()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         std::unique_ptr<Quest> newQuest = std::make_unique<Quest>(fields);
         m_QuestTemplatesMap[newQuest->GetQuestId()] = std::move(newQuest);
@@ -5343,7 +5343,7 @@ void ObjectMgr::LoadQuests()
     // check QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT for spell with SPELL_EFFECT_QUEST_COMPLETE
     for (uint32 i = 0; i < sSpellMgr.GetMaxSpellId(); ++i)
     {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(i);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(i);
         if (!spellInfo)
             continue;
 
@@ -5412,7 +5412,7 @@ void ObjectMgr::LoadQuestLocales()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -5541,7 +5541,7 @@ void ObjectMgr::LoadPetCreateSpells()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 creature_id = fields[0].GetUInt32();
 
@@ -5606,7 +5606,7 @@ void ObjectMgr::LoadPetCreateSpells()
     std::map<uint32, uint32> learnCache;
     for (uint32 spell_id = 1; spell_id < sSpellMgr.GetMaxSpellId(); ++spell_id)
     {
-        SpellEntry const *spellproto = sSpellMgr.GetSpellEntry(spell_id);
+        SpellEntry const* spellproto = sSpellMgr.GetSpellEntry(spell_id);
         if (!spellproto)
             continue;
 
@@ -5758,7 +5758,7 @@ void ObjectMgr::LoadPageTextLocales()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -5900,7 +5900,7 @@ void ObjectMgr::LoadNPCText()
     {
         ++count;
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 textID = fields[0].GetUInt32();
         if (!textID)
@@ -5959,7 +5959,7 @@ public:
         uint32 item_guid = 0;
         if (result)
         {
-            Field *fields2 = result->Fetch();
+            Field* fields2 = result->Fetch();
 
             item_guid = fields2[0].GetUInt32();
             delete result;
@@ -6020,9 +6020,9 @@ public:
 
         do
         {
-            Field * fields = result->Fetch();
+            Field* fields = result->Fetch();
 
-            Mail *m = new Mail;
+            Mail* m = new Mail;
             m->messageID = fields[0].GetUInt32();
             m->messageType = fields[1].GetUInt8();
             m->sender = fields[2].GetUInt32();
@@ -6160,7 +6160,7 @@ void ObjectMgr::LoadQuestAreaTriggers()
     {
         ++count;
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 trigger_ID = fields[0].GetUInt32();
         uint32 quest_ID   = fields[1].GetUInt32();
@@ -6224,7 +6224,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
     {
         ++count;
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 triggerId      = fields[0].GetUInt32();
 
@@ -6268,7 +6268,7 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
     {
         ++count;
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 triggerId = fields[0].GetUInt32();
 
@@ -6412,7 +6412,7 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
         }
     }
 
-    CreatureInfo const *mount_info = GetCreatureTemplate(mount_entry);
+    CreatureInfo const* mount_info = GetCreatureTemplate(mount_entry);
     if (!mount_info)
         return 0;
 
@@ -6420,7 +6420,7 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
     if (!mount_id)
         return 0;
 
-    CreatureModelInfo const *minfo = GetCreatureModelRandomGender(mount_id);
+    CreatureModelInfo const* minfo = GetCreatureModelRandomGender(mount_id);
     if (minfo)
         mount_id = minfo->modelid;
 
@@ -6451,7 +6451,7 @@ void ObjectMgr::LoadGraveyardZones()
     {
         ++count;
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 safeLocId = fields[0].GetUInt32();
         uint32 zoneId = fields[1].GetUInt32();
@@ -6464,7 +6464,7 @@ void ObjectMgr::LoadGraveyardZones()
             continue;
         }
 
-        const auto *areaEntry = AreaEntry::GetById(zoneId);
+        const auto* areaEntry = AreaEntry::GetById(zoneId);
         if (!areaEntry)
         {
             sLog.outErrorDb("Table `game_graveyard_zone` has record for not existing zone id (%u), skipped.", zoneId);
@@ -6492,7 +6492,7 @@ void ObjectMgr::LoadGraveyardZones()
     sLog.outString(">> Loaded %u graveyard-zone links", count);
 }
 
-WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team)
+WorldSafeLocsEntry const* ObjectMgr::GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team)
 {
     // search for zone associated closest graveyard
     uint32 zoneId = sTerrainMgr.GetZoneId(MapId, x, y, z);
@@ -6654,7 +6654,7 @@ void ObjectMgr::LoadWorldSafeLocsFacing()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 safeLocId = fields[0].GetUInt32();
         float orientation = fields[1].GetFloat();
@@ -6704,7 +6704,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
     {
         ++count;
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 triggerId = fields[0].GetUInt32();
 
@@ -6807,7 +6807,7 @@ void ObjectMgr::PackGroupIds()
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             uint32 id = fields[0].GetUInt32();
 
@@ -6954,7 +6954,7 @@ void ObjectMgr::LoadGameObjectLocales()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -7251,7 +7251,7 @@ void ObjectMgr::LoadGameobjectsRequirements()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 guid = fields[0].GetUInt32();
         if (!GetGOData(guid))
@@ -7327,7 +7327,7 @@ void ObjectMgr::LoadExplorationBaseXP()
     {
         ++count;
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 level  = fields[0].GetUInt32();
         uint32 basexp = fields[1].GetUInt32();
@@ -7374,7 +7374,7 @@ void ObjectMgr::LoadPetNames()
     {
         ++count;
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         std::string word = fields[0].GetString();
         uint32 entry     = fields[1].GetUInt32();
@@ -7408,7 +7408,7 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
 
     if (list0.empty() || list1.empty())
     {
-        CreatureInfo const *cinfo = GetCreatureTemplate(entry);
+        CreatureInfo const* cinfo = GetCreatureTemplate(entry);
         char const* petname = GetPetName(cinfo->beast_family, sWorld.GetDefaultDbcLocale());
         if (!petname)
             petname = cinfo->name;
@@ -7443,11 +7443,11 @@ void ObjectMgr::LoadCorpses()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 guid = fields[0].GetUInt32();
 
-        Corpse *corpse = new Corpse;
+        Corpse* corpse = new Corpse;
         if (!corpse->LoadFromDB(guid, fields))
         {
             delete corpse;
@@ -7630,7 +7630,7 @@ void ObjectMgr::LoadReputationRewardRate()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 factionId        = fields[0].GetUInt32();
 
@@ -7640,7 +7640,7 @@ void ObjectMgr::LoadReputationRewardRate()
         repRate.creature_rate   = fields[2].GetFloat();
         repRate.spell_rate      = fields[3].GetFloat();
 
-        FactionEntry const *factionEntry = GetFactionEntry(factionId);
+        FactionEntry const* factionEntry = GetFactionEntry(factionId);
         if (!factionEntry)
         {
             sLog.outErrorDb("Faction (faction.dbc) %u does not exist but is used in `reputation_reward_rate`", factionId);
@@ -7700,7 +7700,7 @@ void ObjectMgr::LoadReputationOnKill()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 creature_id = fields[0].GetUInt32();
 
@@ -7724,7 +7724,7 @@ void ObjectMgr::LoadReputationOnKill()
 
         if (repOnKill.repfaction1)
         {
-            FactionEntry const *factionEntry1 = GetFactionEntry(repOnKill.repfaction1);
+            FactionEntry const* factionEntry1 = GetFactionEntry(repOnKill.repfaction1);
             if (!factionEntry1)
             {
                 sLog.outErrorDb("Faction (faction.dbc) %u does not exist but is used in `creature_onkill_reputation`", repOnKill.repfaction1);
@@ -7734,7 +7734,7 @@ void ObjectMgr::LoadReputationOnKill()
 
         if (repOnKill.repfaction2)
         {
-            FactionEntry const *factionEntry2 = GetFactionEntry(repOnKill.repfaction2);
+            FactionEntry const* factionEntry2 = GetFactionEntry(repOnKill.repfaction2);
             if (!factionEntry2)
             {
                 sLog.outErrorDb("Faction (faction.dbc) %u does not exist but is used in `creature_onkill_reputation`", repOnKill.repfaction2);
@@ -7774,7 +7774,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 factionId                = fields[0].GetUInt32();
 
@@ -7793,7 +7793,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
         repTemplate.faction_rate[3]     = fields[11].GetFloat();
         repTemplate.faction_rank[3]     = fields[12].GetUInt32();
 
-        FactionEntry const *factionEntry = GetFactionEntry(factionId);
+        FactionEntry const* factionEntry = GetFactionEntry(factionId);
 
         if (!factionEntry)
         {
@@ -7805,7 +7805,7 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
         {
             if (repTemplate.faction[i])
             {
-                FactionEntry const *factionSpillover = GetFactionEntry(repTemplate.faction[i]);
+                FactionEntry const* factionSpillover = GetFactionEntry(repTemplate.faction[i]);
 
                 if (!factionSpillover)
                 {
@@ -7827,25 +7827,25 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
             }
         }
 
-        FactionEntry const *factionEntry0 = GetFactionEntry(repTemplate.faction[0]);
+        FactionEntry const* factionEntry0 = GetFactionEntry(repTemplate.faction[0]);
         if (repTemplate.faction[0] && !factionEntry0)
         {
             sLog.outErrorDb("Faction (faction.dbc) %u does not exist but is used in `reputation_spillover_template`", repTemplate.faction[0]);
             continue;
         }
-        FactionEntry const *factionEntry1 = GetFactionEntry(repTemplate.faction[1]);
+        FactionEntry const* factionEntry1 = GetFactionEntry(repTemplate.faction[1]);
         if (repTemplate.faction[1] && !factionEntry1)
         {
             sLog.outErrorDb("Faction (faction.dbc) %u does not exist but is used in `reputation_spillover_template`", repTemplate.faction[1]);
             continue;
         }
-        FactionEntry const *factionEntry2 = GetFactionEntry(repTemplate.faction[2]);
+        FactionEntry const* factionEntry2 = GetFactionEntry(repTemplate.faction[2]);
         if (repTemplate.faction[2] && !factionEntry2)
         {
             sLog.outErrorDb("Faction (faction.dbc) %u does not exist but is used in `reputation_spillover_template`", repTemplate.faction[2]);
             continue;
         }
-        FactionEntry const *factionEntry3 = GetFactionEntry(repTemplate.faction[3]);
+        FactionEntry const* factionEntry3 = GetFactionEntry(repTemplate.faction[3]);
         if (repTemplate.faction[3] && !factionEntry3)
         {
             sLog.outErrorDb("Faction (faction.dbc) %u does not exist but is used in `reputation_spillover_template`", repTemplate.faction[3]);
@@ -7886,7 +7886,7 @@ void ObjectMgr::LoadPointsOfInterest()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 point_id = fields[0].GetUInt32();
 
@@ -7973,7 +7973,7 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 id    = fields[0].GetUInt32();
         uint32 quest = fields[1].GetUInt32();
@@ -8157,7 +8157,7 @@ void ObjectMgr::LoadTaxiPathTransitions()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 inPath = fields[0].GetUInt32();
         uint32 outPath = fields[1].GetUInt32();
@@ -8802,7 +8802,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
     sLog.outString(">> Loaded %u broadcast text locales.", count);
 }
 
-const char *ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gender, bool forceGender) const
+const char* ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gender, bool forceGender) const
 {
     if (BroadcastText const* bct = GetBroadcastTextLocale(id))
     {
@@ -8883,7 +8883,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         int32 entry = fields[0].GetInt32();
 
@@ -8974,11 +8974,11 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     return true;
 }
 
-const char *ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
+const char* ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
 {
     // locale_idx==-1 -> default, locale_idx >= 0 in to idx+1
     // Content[0] always exist if exist MangosStringLocale
-    if (MangosStringLocale const *msl = GetMangosStringLocale(entry))
+    if (MangosStringLocale const* msl = GetMangosStringLocale(entry))
     {
         if ((int32)msl->Content.size() > locale_idx + 1 && !msl->Content[locale_idx + 1].empty())
             return msl->Content[locale_idx + 1].c_str();
@@ -9016,7 +9016,7 @@ bool ObjectMgr::LoadQuestGreetings()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
         uint8 type = fields[1].GetUInt8();
@@ -9112,7 +9112,7 @@ bool ObjectMgr::LoadTrainerGreetings()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         uint32 entry = fields[0].GetUInt32();
 
         if (!ObjectMgr::GetCreatureTemplate(entry))
@@ -9177,12 +9177,12 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry  = fields[0].GetUInt32();
         int32 skill   = fields[1].GetInt32();
 
-        const auto *fArea = AreaEntry::GetById(entry);
+        const auto* fArea = AreaEntry::GetById(entry);
         if (!fArea)
         {
             sLog.outErrorDb("AreaId %u defined in `skill_fishing_base_level` does not exist", entry);
@@ -9198,7 +9198,7 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     sLog.outString(">> Loaded %u areas for fishing base skill level", count);
 }
 
-SkillRangeType GetSkillRangeType(SkillLineEntry const *pSkill, bool racial)
+SkillRangeType GetSkillRangeType(SkillLineEntry const* pSkill, bool racial)
 {
     switch (pSkill->categoryId)
     {
@@ -9253,7 +9253,7 @@ void ObjectMgr::LoadGameTele()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 id         = fields[0].GetUInt32();
         GameTele gt;
@@ -9390,7 +9390,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         uint32 entry  = fields[0].GetUInt32();
         uint32 spell  = fields[1].GetUInt32();
 
-        SpellEntry const *spellinfo = sSpellMgr.GetSpellEntry(spell);
+        SpellEntry const* spellinfo = sSpellMgr.GetSpellEntry(spell);
         if (!spellinfo)
         {
             sLog.outErrorDb("Table `%s` (Entry: %u ) has non existing spell %u, ignore", tableName, entry, spell);
@@ -10230,7 +10230,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     // We use spawn coords to spawn
     if (!map->Instanceable() && map->IsLoaded(x, y))
     {
-        GameObject *go = new GameObject;
+        GameObject* go = new GameObject;
         if (!go->LoadFromDB(guid, map))
         {
             sLog.outError("AddGOData: cannot add gameobject entry %u to map", entry);
@@ -10266,7 +10266,7 @@ bool ObjectMgr::MoveCreData(uint32 guid, uint32 mapId, const Position& pos)
         // We use spawn coords to spawn
         if (!map->Instanceable() && map->IsLoaded(data.posX, data.posY))
         {
-            Creature *creature = new Creature;
+            Creature* creature = new Creature;
             if (!creature->LoadFromDB(guid, map))
             {
                 sLog.outError("AddCreature: cannot add creature entry %u to map", guid);
@@ -10281,7 +10281,7 @@ bool ObjectMgr::MoveCreData(uint32 guid, uint32 mapId, const Position& pos)
 
 uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float x, float y, float z, float o, uint32 spawntimedelay)
 {
-    CreatureInfo const *cInfo = GetCreatureTemplate(entry);
+    CreatureInfo const* cInfo = GetCreatureTemplate(entry);
     if (!cInfo)
         return 0;
     Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId));
@@ -10392,7 +10392,7 @@ void ObjectMgr::LoadFactionChangeReputations()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
         uint32 horde = fields[1].GetUInt32();
@@ -10434,7 +10434,7 @@ void ObjectMgr::LoadFactionChangeSpells()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
         uint32 horde = fields[1].GetUInt32();
@@ -10476,7 +10476,7 @@ void ObjectMgr::LoadFactionChangeItems()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
         uint32 horde = fields[1].GetUInt32();
@@ -10518,7 +10518,7 @@ void ObjectMgr::LoadFactionChangeQuests()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
         uint32 horde = fields[1].GetUInt32();
@@ -10560,7 +10560,7 @@ void ObjectMgr::LoadFactionChangeMounts()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint8 RaceId     = fields[0].GetUInt8();
         uint8 MountNum   = fields[1].GetUInt8();
@@ -10606,7 +10606,7 @@ void ObjectMgr::RestoreDeletedItems()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 id = fields[0].GetUInt32();
         uint32 memberGuidlow = fields[1].GetUInt32();
@@ -10618,7 +10618,7 @@ void ObjectMgr::RestoreDeletedItems()
             ObjectGuid memberGuid = ObjectGuid(HIGHGUID_PLAYER, memberGuidlow);
             Player* pPlayer = ObjectAccessor::FindPlayerNotInWorld(memberGuid);
 
-            if (Item* restoredItem = Item::CreateItem(itemEntry, stackCount ? stackCount : 1, pPlayer ? pPlayer : (const Player *) 0))
+            if (Item* restoredItem = Item::CreateItem(itemEntry, stackCount ? stackCount : 1, pPlayer))
             {
                 // save new item before send
                 restoredItem->SaveToDB();
@@ -10892,7 +10892,7 @@ void ObjectMgr::GetAreaLocaleString(uint32 entry, int32 loc_idx, std::string* na
 {
     if (loc_idx >= 0)
     {
-        if (const auto *al = GetAreaLocale(entry))
+        if (const auto* al = GetAreaLocale(entry))
             if (namePtr && al->Name.size() > size_t(loc_idx) && !al->Name[loc_idx].empty())
                 *namePtr = al->Name[loc_idx].c_str();
     }

@@ -127,7 +127,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (!target->CanSeeInWorld(i_check))
         return;
 
-    if (!target->IsAlive() || target->IsTaxiFlying() )
+    if (!target->IsAlive() || target->IsTaxiFlying())
         return;
 
     if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsImmuneToAoe())
@@ -585,7 +585,7 @@ void MaNGOS::PlayerListSearcher<Check>::Visit(PlayerMapType &m)
 }
 
 template<class Builder>
-void MaNGOS::LocalizedPacketDo<Builder>::operator()( Player* p )
+void MaNGOS::LocalizedPacketDo<Builder>::operator()(Player* p)
 {
     int32 loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx + 1;
@@ -607,7 +607,7 @@ void MaNGOS::LocalizedPacketDo<Builder>::operator()( Player* p )
 }
 
 template<class Builder>
-void MaNGOS::LocalizedPacketListDo<Builder>::operator()( Player* p )
+void MaNGOS::LocalizedPacketListDo<Builder>::operator()(Player* p)
 {
     int32 loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
     uint32 cache_idx = loc_idx+1;

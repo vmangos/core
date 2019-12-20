@@ -73,7 +73,7 @@ enum CreatureFlagsExtra
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -256,7 +256,7 @@ struct CreatureModelInfo
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack()
 #else
 #pragma pack(pop)
@@ -350,16 +350,16 @@ struct VendorItemData
 
     VendorItem* GetItem(uint32 slot) const
     {
-        if(slot>=m_items.size()) return nullptr;
+        if (slot>=m_items.size()) return nullptr;
         return m_items[slot];
     }
     bool Empty() const { return m_items.empty(); }
     uint8 GetItemCount() const { return m_items.size(); }
-    void AddItem( uint32 item, uint32 maxcount, uint32 ptime, uint32 itemflags)
+    void AddItem(uint32 item, uint32 maxcount, uint32 ptime, uint32 itemflags)
     {
         m_items.push_back(new VendorItem(item, maxcount, ptime, itemflags));
     }
-    bool RemoveItem( uint32 item_id );
+    bool RemoveItem(uint32 item_id);
     VendorItem const* FindItem(uint32 item_id) const;
     size_t FindItemSlot(uint32 item_id) const;
 
@@ -591,7 +591,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool IsElite() const
         {
-            if(IsPet())
+            if (IsPet())
                 return false;
 
             uint32 rank = GetCreatureInfo()->rank;
@@ -600,7 +600,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool IsWorldBoss() const
         {
-            if(IsPet())
+            if (IsPet())
                 return false;
 
             return GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS;

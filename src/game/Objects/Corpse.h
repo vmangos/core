@@ -53,14 +53,14 @@ enum CorpseFlags
 class Corpse : public WorldObject
 {
     public:
-        explicit Corpse( CorpseType type = CORPSE_BONES );
-        ~Corpse( ) override;
+        explicit Corpse(CorpseType type = CORPSE_BONES);
+        ~Corpse() override;
 
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        bool Create( uint32 guidlow );
-        bool Create( uint32 guidlow, Player *owner );
+        bool Create(uint32 guidlow);
+        bool Create(uint32 guidlow, Player *owner);
 
         void SaveToDB();
         bool LoadFromDB(uint32 guid, Field *fields);

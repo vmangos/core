@@ -820,7 +820,7 @@ void ScourgeInvasionEvent::Update()
     if (!invasion1Loaded)
         invasion1Loaded = OnEnable(VARIABLE_NAXX_ATTACK_ZONE1, VARIABLE_NAXX_ATTACK_TIME1);
 
-    if(!invasion2Loaded)
+    if (!invasion2Loaded)
         invasion2Loaded = OnEnable(VARIABLE_NAXX_ATTACK_ZONE2, VARIABLE_NAXX_ATTACK_TIME2);
 
     // Waiting until both invasions have been loaded. OnEnable will return true
@@ -934,7 +934,7 @@ Map * ScourgeInvasionEvent::GetMap(uint32 mapId, const InvasionNecropolis & invZ
 {
     uint32 instId = sMapMgr.GetContinentInstanceId(mapId, invZone.x, invZone.y);
     Map* pMap = sMapMgr.FindMap(mapId, instId);
-    if(!pMap)
+    if (!pMap)
         sLog.outError("ScourgeInvasionEvent::GetMap found no map with mapId %d, x: %d, y: %d", mapId, invZone.x, invZone.y);
     return pMap;
 }

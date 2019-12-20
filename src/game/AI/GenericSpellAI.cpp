@@ -157,9 +157,9 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
         m_creature->SelectHostileTarget();
         if (!m_creature->GetVictim())
             return;
-        /*if(isDistanceCaster)
+        /*if (isDistanceCaster)
         { // Check du CoolDown global
-            if(casterGCD > uiDiff)
+            if (casterGCD > uiDiff)
             {
                 // Pas encore pret !
                 casterGCD -= uiDiff;

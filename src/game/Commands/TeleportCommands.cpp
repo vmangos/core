@@ -1246,7 +1246,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
             }
             // all's well, set bg id
             // when porting out from the bg, it will be reset to 0
-            if(pPlayer->GetBattleGroundId() != pTarget->GetBattleGroundId())
+            if (pPlayer->GetBattleGroundId() != pTarget->GetBattleGroundId())
             {
                 pPlayer->SetBattleGroundId(pTarget->GetBattleGroundId(), pTarget->GetBattleGroundTypeId());
                 teleFlags |= TELE_TO_FORCE_MAP_CHANGE;

@@ -127,7 +127,7 @@ class AuctionHouseObject
 
         AuctionEntry* GetAuction(uint32 id) const
         {
-            AuctionEntryMap::const_iterator itr = AuctionsMap.find( id );
+            AuctionEntryMap::const_iterator itr = AuctionsMap.find(id);
             return itr != AuctionsMap.end() ? itr->second : nullptr;
         }
 
@@ -171,9 +171,9 @@ class AuctionHouseMgr
         }
 
         //auction messages
-        void SendAuctionWonMail( AuctionEntry * auction );
-        void SendAuctionSuccessfulMail( AuctionEntry * auction );
-        void SendAuctionExpiredMail( AuctionEntry * auction );
+        void SendAuctionWonMail(AuctionEntry * auction);
+        void SendAuctionSuccessfulMail(AuctionEntry * auction);
+        void SendAuctionExpiredMail(AuctionEntry * auction);
         static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item *pItem);
 
         static uint32 GetAuctionHouseId(uint32 factionTemplateId);

@@ -626,7 +626,7 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
             return;
     }
 
-    if(mFlag != MOVEFLAG_NONE)
+    if (mFlag != MOVEFLAG_NONE)
         MovementPacketSender::SendMovementFlagChangeToObservers(pMover, mFlag, applyReceived);
 }
 

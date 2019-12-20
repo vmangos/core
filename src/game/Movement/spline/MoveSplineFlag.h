@@ -24,7 +24,7 @@
 
 namespace Movement
 {
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -136,7 +136,7 @@ namespace Movement
             bool unknown30     : 1;
             bool unknown31     : 1;
     };
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack()
 #else
 #pragma pack(pop)

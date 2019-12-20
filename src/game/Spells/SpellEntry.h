@@ -247,7 +247,7 @@ namespace Spells
 
     inline bool IsCasterSourceTarget(uint32 target)
     {
-        switch (target )
+        switch (target)
         {
             case TARGET_SELF:
             case TARGET_PET:
@@ -272,7 +272,7 @@ namespace Spells
 
     inline bool IsPointEffectTarget(SpellTarget target)
     {
-        switch (target )
+        switch (target)
         {
             case TARGET_INNKEEPER_COORDINATES:
             case TARGET_TABLE_X_Y_Z_COORDINATES:
@@ -289,7 +289,7 @@ namespace Spells
 
     inline bool IsAreaEffectPossitiveTarget(SpellTarget target)
     {
-        switch (target )
+        switch (target)
         {
             case TARGET_ALL_PARTY_AROUND_CASTER:
             case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
@@ -308,7 +308,7 @@ namespace Spells
 
     inline bool IsAreaEffectTarget(SpellTarget target)
     {
-        switch (target )
+        switch (target)
         {
             case TARGET_AREAEFFECT_INSTANT:
             case TARGET_AREAEFFECT_CUSTOM:

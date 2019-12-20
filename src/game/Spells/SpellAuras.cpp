@@ -3289,7 +3289,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
             // Charmed players are seen as hostile and not in the group for other clients, restore
             // group upon charm end
-            if(pPlayerTarget->GetGroup())
+            if (pPlayerTarget->GetGroup())
                 pPlayerTarget->GetGroup()->BroadcastGroupUpdate();
         }
     }
@@ -6474,7 +6474,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
 
     //passive auras do not get put in slots
     // Note: but totem can be not accessible for aura target in time remove (to far for find in grid)
-    //if(m_isPassive && !(caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem()))
+    //if (m_isPassive && !(caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->isTotem()))
     //    return false;
 
     uint8 slot = GetAuraSlot();

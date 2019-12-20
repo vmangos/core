@@ -158,20 +158,20 @@ namespace MaNGOS
                 ((Creature*)pUnit)->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
                 ((Creature*)pUnit)->GetCreatureInfo()->health_min > 50;
 
-            if(pUnit->GetTypeId()==TYPEID_UNIT && (
+            if (pUnit->GetTypeId()==TYPEID_UNIT && (
                 (pUnit->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||
                 (((Creature*)pUnit)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
                 pUnit->HasUnitState(UNIT_STAT_NO_KILL_REWARD)))
                 return 0;
 
             uint32 xp_gain= BaseGain(pPet->GetLevel(), pUnit->GetLevel());
-            if( xp_gain == 0 )
+            if (xp_gain == 0)
                 return 0;
 
-            if(pUnit->GetTypeId()==TYPEID_UNIT && ((Creature*)pUnit)->IsElite())
+            if (pUnit->GetTypeId()==TYPEID_UNIT && ((Creature*)pUnit)->IsElite())
                 xp_gain *= 2;
 
-            if(isPet)
+            if (isPet)
                 xp_gain *= 0.75f;
 
             float personalRate = -1.0f;
@@ -189,7 +189,7 @@ namespace MaNGOS
 
         inline float xp_in_group_rate(uint32 count, bool isRaid)
         {
-            if(isRaid)
+            if (isRaid)
             {
                 // FIX ME: must apply decrease modifiers dependent from raid size
                 return 1.0f;

@@ -234,7 +234,7 @@ bool ChatHandler::HandleAccountCreateCommand(char* args)
     ///- %Parse the command line arguments
     char *szAcc = ExtractQuotedOrLiteralArg(&args);
     char *szPassword = ExtractQuotedOrLiteralArg(&args);
-    if(!szAcc || !szPassword)
+    if (!szAcc || !szPassword)
         return false;
 
     // normalized in accmgr.CreateAccount
