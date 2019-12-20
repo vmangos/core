@@ -230,12 +230,12 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS] =
 };
 
 // Fonctions Nostalrius
-inline bool SpellCanTrigger(const SpellEntry* spellProto, const SpellEntry* procSpell, uint8 eff_idx = 0)
+inline bool SpellCanTrigger(SpellEntry const* spellProto, SpellEntry const* procSpell, uint8 eff_idx = 0)
 {
     return (procSpell && procSpell->SpellFamilyName == spellProto->SpellFamilyName && procSpell->SpellFamilyFlags & spellProto->EffectItemType[eff_idx]);
 }
 
-bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent) const
+bool Unit::IsTriggeredAtSpellProcEvent(Unit* pVictim, SpellAuraHolder* holder, SpellEntry const* procSpell, uint32 procFlag, uint32 procExtra, WeaponAttackType attType, bool isVictim, SpellProcEventEntry const*& spellProcEvent) const
 {
     SpellEntry const* spellProto = holder->GetSpellProto();
     /*
@@ -466,7 +466,7 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     return roll_chance_f(chance);
 }
 
-SpellAuraProcResult Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const * /*procSpell*/, uint32 /*procFlag*/, uint32 procEx, uint32 cooldown)
+SpellAuraProcResult Unit::HandleHasteAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* /*procSpell*/, uint32 /*procFlag*/, uint32 procEx, uint32 cooldown)
 {
     // Flurry: last charge crit will reapply the buff, don't remove any charges
     if (triggeredByAura->GetSpellProto()->SpellIconID == 108 && 
@@ -478,9 +478,9 @@ SpellAuraProcResult Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura
     return SPELL_AURA_PROC_OK;
 }
 
-SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const * procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown)
+SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlag, uint32 procEx, uint32 cooldown)
 {
-    SpellEntry const *dummySpell = triggeredByAura->GetSpellProto();
+    SpellEntry const* dummySpell = triggeredByAura->GetSpellProto();
     int32  triggerAmount = triggeredByAura->GetModifier()->m_amount;
 
     Item* castItem = triggeredByAura->GetCastItemGuid() && GetTypeId() == TYPEID_PLAYER
@@ -799,7 +799,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     }
                     
                     // Get current Ignite Aura if exist
-                    Aura *igniteAura = target->GetAura(12654, EFFECT_INDEX_0);
+                    Aura* igniteAura = target->GetAura(12654, EFFECT_INDEX_0);
                     
                     if (igniteAura)
                     {
@@ -1500,7 +1500,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
                 // procspell is triggered spell but we need mana cost of original casted spell
                 // The casted spell is in a variable: Player::m_castingSpell. Otherwise we can not find the spell that caused the proc.
 
-                SpellEntry const *originalSpell = sSpellMgr.GetSpellEntry(pPlayer->m_castingSpell);
+                SpellEntry const* originalSpell = sSpellMgr.GetSpellEntry(pPlayer->m_castingSpell);
                 if (!originalSpell)
                 {
                     sLog.outError("Unit::HandleProcTriggerSpell: Spell %u unknown but selected as original in Illu", pPlayer->m_castingSpell);
@@ -1644,9 +1644,9 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit* pVictim, uint32 d
     return SPELL_AURA_PROC_OK;
 }
 
-SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const *procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown)
+SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit* pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 procFlags, uint32 procEx, uint32 cooldown)
 {
-    SpellEntry const *spellInfo = triggeredByAura->GetSpellProto();
+    SpellEntry const* spellInfo = triggeredByAura->GetSpellProto();
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "ProcDamageAndSpell: doing %u damage from spell id %u (triggered by auratype %u of spell %u)",
                      triggeredByAura->GetModifier()->m_amount, spellInfo->Id, triggeredByAura->GetModifier()->m_auraname, triggeredByAura->GetId());
     
@@ -1685,7 +1685,7 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit *pVictim, uint32 
     return SPELL_AURA_PROC_OK;
 }
 
-SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint32 /*damage*/, Aura *triggeredByAura, SpellEntry const *procSpell, uint32 /*procFlag*/, uint32 /*procEx*/ , uint32 cooldown)
+SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit* pVictim, uint32 /*damage*/, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 /*procFlag*/, uint32 /*procEx*/ , uint32 cooldown)
 {
     int32 scriptId = triggeredByAura->GetModifier()->m_miscvalue;
 
@@ -1824,9 +1824,9 @@ SpellAuraProcResult Unit::HandleMechanicImmuneResistanceAuraProc(Unit* /*pVictim
 }
 
 // Nostalrius
-SpellAuraProcResult Unit::HandleAddTargetTriggerAuraProc(Unit *pVictim, uint32 /*damage*/, Aura *triggeredByAura, SpellEntry const *procSpell, uint32 /*procFlag*/, uint32 /*procEx*/ , uint32 cooldown)
+SpellAuraProcResult Unit::HandleAddTargetTriggerAuraProc(Unit* pVictim, uint32 /*damage*/, Aura* triggeredByAura, SpellEntry const* procSpell, uint32 /*procFlag*/, uint32 /*procEx*/ , uint32 cooldown)
 {
-    const SpellEntry* aurEntry = triggeredByAura->GetSpellProto();
+    SpellEntry const* aurEntry = triggeredByAura->GetSpellProto();
     uint32 trigger_spell_id = aurEntry->EffectTriggerSpell[0];
     float chance = 0.0f;
 
@@ -1889,7 +1889,7 @@ SpellAuraProcResult Unit::HandleAddTargetTriggerAuraProc(Unit *pVictim, uint32 /
 
 SpellAuraProcResult Unit::HandleModResistanceAuraProc(Unit* /*pVictim*/, uint32 damage, Aura* triggeredByAura, SpellEntry const* /*procSpell*/, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 /*cooldown*/)
 {
-    SpellEntry const *spellInfo = triggeredByAura->GetSpellProto();
+    SpellEntry const* spellInfo = triggeredByAura->GetSpellProto();
 
     // Inner Fire
     if (spellInfo->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_INNER_FIRE>())

@@ -133,7 +133,7 @@ uint32_t WorldSession::ChatCooldown()
     return 0;
 }
 
-void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
+void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
 {
     uint32 type;
     uint32 lang;
@@ -434,7 +434,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             MasterPlayer* masterPlr = GetMasterPlayer();
             ASSERT(masterPlr);
 
-            MasterPlayer *player = ObjectAccessor::FindMasterPlayer(to.c_str());
+            MasterPlayer* player = ObjectAccessor::FindMasterPlayer(to.c_str());
             uint32 tSecurity = GetSecurity();
             uint32 pSecurity = player ? player->GetSession()->GetSecurity() : SEC_PLAYER;
             if (!player || (tSecurity == SEC_PLAYER && pSecurity > SEC_PLAYER && !player->AcceptsWhispersFrom(masterPlr->GetObjectGuid())))
@@ -495,7 +495,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         case CHAT_MSG_PARTY: // Master Side: TODO
         {
             // if player is in battleground, he cannot say to battleground members by /p
-            Group *group = GetPlayer()->GetOriginalGroup();
+            Group* group = GetPlayer()->GetOriginalGroup();
             if (!group)
             {
                 group = _player->GetGroup();
@@ -535,7 +535,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         case CHAT_MSG_RAID: // Master side: TODO
         {
             // if player is in battleground, he cannot say to battleground members by /ra
-            Group *group = GetPlayer()->GetOriginalGroup();
+            Group* group = GetPlayer()->GetOriginalGroup();
             if (!group)
             {
                 group = GetPlayer()->GetGroup();
@@ -554,7 +554,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         case CHAT_MSG_RAID_LEADER: // Master side: TODO
         {
             // if player is in battleground, he cannot say to battleground members by /ra
-            Group *group = GetPlayer()->GetOriginalGroup();
+            Group* group = GetPlayer()->GetOriginalGroup();
             if (!group)
             {
                 group = GetPlayer()->GetGroup();
@@ -572,7 +572,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
         case CHAT_MSG_RAID_WARNING: // Master side: TODO
         {
-            Group *group = GetPlayer()->GetGroup();
+            Group* group = GetPlayer()->GetGroup();
             if (!group || !group->isRaidGroup() ||
                     !(group->IsLeader(GetPlayer()->GetObjectGuid()) || group->IsAssistant(GetPlayer()->GetObjectGuid())))
                 return;
@@ -591,7 +591,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         {
             ForwardPacketToNode();
             // battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()
-            Group *group = GetPlayer()->GetGroup();
+            Group* group = GetPlayer()->GetGroup();
             if (!group || !group->isBGGroup())
                 return;
 
@@ -608,7 +608,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         {
             ForwardPacketToNode();
             // battleground raid is always in Player->GetGroup(), never in GetOriginalGroup()
-            Group *group = GetPlayer()->GetGroup();
+            Group* group = GetPlayer()->GetGroup();
             if (!group || !group->isBGGroup() || !group->IsLeader(GetPlayer()->GetObjectGuid()))
                 return;
 
@@ -666,7 +666,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleEmoteOpcode(WorldPacket & recv_data)
+void WorldSession::HandleEmoteOpcode(WorldPacket& recv_data)
 {
     if (!GetPlayer()->IsAlive() || GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         return;
@@ -720,7 +720,7 @@ private:
 };
 }                                                           // namespace MaNGOS
 
-void WorldSession::HandleTextEmoteOpcode(WorldPacket & recv_data)
+void WorldSession::HandleTextEmoteOpcode(WorldPacket& recv_data)
 {
     if (!GetPlayer()->IsAlive())
         return;
@@ -739,7 +739,7 @@ void WorldSession::HandleTextEmoteOpcode(WorldPacket & recv_data)
     recv_data >> emoteNum;
     recv_data >> guid;
 
-    EmotesTextEntry const *em = sEmotesTextStore.LookupEntry(text_emote);
+    EmotesTextEntry const* em = sEmotesTextStore.LookupEntry(text_emote);
     if (!em)
         return;
 
@@ -782,7 +782,7 @@ void WorldSession::HandleChatIgnoredOpcode(WorldPacket& recv_data)
 
     recv_data >> iguid;
 
-    Player *player = sObjectMgr.GetPlayer(iguid);
+    Player* player = sObjectMgr.GetPlayer(iguid);
     if (!player || !player->GetSession())
         return;
 

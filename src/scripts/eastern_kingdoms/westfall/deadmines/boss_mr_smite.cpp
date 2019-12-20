@@ -204,7 +204,7 @@ struct boss_mr_smiteAI : public ScriptedAI
         AttackStart(pVictim);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         Unit * target = m_creature->GetVictim();
         if (!m_creature->SelectHostileTarget() || !target)

@@ -74,7 +74,7 @@ void ScriptedAI::Aggro(Unit* pEnemy)
 {
 }
 
-void ScriptedAI::UpdateAI(const uint32 uiDiff)
+void ScriptedAI::UpdateAI(uint32 const uiDiff)
 {
     //Check if we have a current target
     m_creature->SelectHostileTarget();
@@ -270,7 +270,7 @@ enum
     NPC_VARIMATHRAS = 2425
 };
 
-bool ScriptedAI::EnterEvadeIfOutOfCombatArea(const uint32 uiDiff)
+bool ScriptedAI::EnterEvadeIfOutOfCombatArea(uint32 const uiDiff)
 {
     if (m_uiEvadeCheckCooldown < uiDiff)
         m_uiEvadeCheckCooldown = 2500;
@@ -366,18 +366,18 @@ void ScriptedAI::DoTeleportTo(float fX, float fY, float fZ)
     me->NearTeleportTo(fX, fY, fZ, me->GetOrientation());
 }
 
-void ScriptedAI::DoTeleportTo(const float fPos[4])
+void ScriptedAI::DoTeleportTo(float const fPos[4])
 {
     me->NearTeleportTo(fPos[0], fPos[1], fPos[2], fPos[3]);
 }
 
 void ScriptedAI::DoTeleportAll(float fX, float fY, float fZ, float fO)
 {
-    Map *map = me->GetMap();
+    Map* map = me->GetMap();
     if (!map->IsDungeon())
         return;
 
-    Map::PlayerList const &PlayerList = map->GetPlayers();
+    Map::PlayerList const& PlayerList = map->GetPlayers();
     for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
         if (Player* i_pl = i->getSource())
             if (i_pl->IsAlive())

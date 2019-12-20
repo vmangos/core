@@ -262,7 +262,7 @@ class MANGOS_DLL_SPEC PlayerMenu
         QuestMenu  mQuestMenu;
 
     public:
-        explicit PlayerMenu(WorldSession *Session);
+        explicit PlayerMenu(WorldSession* Session);
         ~PlayerMenu();
 
         GossipMenu& GetGossipMenu() { return mGossipMenu; }
@@ -279,7 +279,7 @@ class MANGOS_DLL_SPEC PlayerMenu
 
         void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGuid);
         void CloseGossip();
-        void SendPointOfInterest(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char * locName);
+        void SendPointOfInterest(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, char const*  locName);
         void SendPointOfInterest(uint32 poi_id);
         void SendTalking(uint32 textID);
         void SendTalking(char const* title, char const* text);
@@ -291,10 +291,10 @@ class MANGOS_DLL_SPEC PlayerMenu
 
         void SendQuestGiverQuestList(QEmote eEmote, std::string const& Title, ObjectGuid guid);
 
-        void SendQuestQueryResponse(Quest const *pQuest);
-        void SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcGUID, bool ActivateAccept);
+        void SendQuestQueryResponse(Quest const* pQuest);
+        void SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid npcGUID, bool ActivateAccept);
 
         void SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGUID, bool EnbleNext);
-        void SendQuestGiverRequestItems(Quest const *pQuest, ObjectGuid npcGUID, bool Completable, bool CloseOnCancel);
+        void SendQuestGiverRequestItems(Quest const* pQuest, ObjectGuid npcGUID, bool Completable, bool CloseOnCancel);
 };
 #endif

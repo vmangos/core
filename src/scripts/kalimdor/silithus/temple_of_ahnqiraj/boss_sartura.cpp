@@ -161,7 +161,7 @@ struct boss_sarturaAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -335,7 +335,7 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -427,7 +427,7 @@ enum
 };
 
 // array of GUIDs permitted to emote on aggro
-static const uint32 aEmoteGUIDs[8] = { 87595, 87671, 87610, 87611, 87618, 87627, 87628, 87641 };
+static uint32 const aEmoteGUIDs[8] = { 87595, 87671, 87610, 87611, 87618, 87627, 87628, 87641 };
 
 struct mob_vekniss_guardianAI : public ScriptedAI
 {
@@ -528,7 +528,7 @@ struct mob_vekniss_guardianAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

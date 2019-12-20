@@ -71,7 +71,7 @@ struct boss_gehennasAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GEHENNAS, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

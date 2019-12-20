@@ -315,7 +315,7 @@ struct boss_rajaxxAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Waves launcher
         if (m_pInstance && (m_pInstance->GetData(TYPE_RAJAXX) == IN_PROGRESS))
@@ -405,7 +405,7 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
         DoScriptText(SAY_AQ_WAR_START, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         return;
     }
@@ -506,7 +506,7 @@ struct npc_andorovAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_pInstance)
             return;

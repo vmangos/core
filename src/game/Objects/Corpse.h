@@ -60,10 +60,10 @@ class Corpse : public WorldObject
         void RemoveFromWorld() override;
 
         bool Create(uint32 guidlow);
-        bool Create(uint32 guidlow, Player *owner);
+        bool Create(uint32 guidlow, Player* owner);
 
         void SaveToDB();
-        bool LoadFromDB(uint32 guid, Field *fields);
+        bool LoadFromDB(uint32 guid, Field* fields);
 
         void DeleteBonesFromWorld();
         void DeleteFromDB();
@@ -87,7 +87,7 @@ class Corpse : public WorldObject
         Player* lootRecipient;
         bool lootForBody;
 
-        GridReference<Corpse> &GetGridRef() { return m_gridRef; }
+        GridReference<Corpse>& GetGridRef() { return m_gridRef; }
 
         bool IsExpired(time_t t) const;
         void SetFactionTemplate(FactionTemplateEntry const* entry) { m_faction = entry; }

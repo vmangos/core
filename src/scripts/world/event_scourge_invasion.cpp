@@ -58,7 +58,7 @@ struct npc_flameshocker_spawn_pointAI : public ScriptedAI
         _checkTimer = urand(2000, 5000);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (_checkTimer < diff)
         {
@@ -99,7 +99,7 @@ struct npc_horror_pallid_spawn_pointAI : public ScriptedAI
         _checkTimer = urand(12000, 30000);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (_checkTimer < diff)
         {
@@ -247,7 +247,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
         MaNGOS::CreatureWorker<TriggerGuardsReactions> worker(m_creature, u_do);
         Cell::VisitGridObjects(m_creature, worker, 30.0f);
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (_checksTimer < diff)
         {
@@ -376,12 +376,12 @@ struct FlameshockerAI : public ScourgeInvasion_RandomAttackerAI
         m_creature->AddAura(SPELL_FLAMESHOCKERS_VISUAL);
     }
 
-    void InformGuid(const ObjectGuid guid, uint32 type = 0) override
+    void InformGuid(ObjectGuid const guid, uint32 type = 0) override
     {
         _enableAutoMove = false;
         _pallidHorror = guid;
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         ScourgeInvasion_RandomAttackerAI::UpdateAI(diff);
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -493,7 +493,7 @@ struct QuestGiverCrystalAI : public ScriptedAI
 
     uint32 _dieTimer;
     void Reset() override {}
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (_dieTimer < diff)
             m_creature->DoKillUnit();

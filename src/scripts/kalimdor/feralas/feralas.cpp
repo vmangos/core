@@ -160,7 +160,7 @@ struct npc_shay_leafrunnerAI : public FollowerAI
         FollowerAI::JustDied(killer);
     }
 
-    void BeforeStartFollow(Player* pPlayer, uint32 uiFactionForFollower, const Quest* pQuest)
+    void BeforeStartFollow(Player* pPlayer, uint32 uiFactionForFollower, Quest const* pQuest)
     {
         StartFollow(pPlayer, uiFactionForFollower, pQuest, 5);
         m_uiWanderTimer = 30000;
@@ -174,7 +174,7 @@ struct npc_shay_leafrunnerAI : public FollowerAI
         SetFollowPaused(false);
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff) override
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
         if (m_uiDespawnTimer)
         {
@@ -236,7 +236,7 @@ CreatureAI* GetAI_npc_shay_leafrunner(Creature* pCreature)
     return new npc_shay_leafrunnerAI(pCreature);
 }
 
-bool QuestAccept_npc_shay_leafrunner(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_shay_leafrunner(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_WANDERING_SHAY)
     {
@@ -330,7 +330,7 @@ struct MushgogAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -447,7 +447,7 @@ struct TheRazzaAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -541,7 +541,7 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -647,7 +647,7 @@ static const sMovementInformation asMovementInfo[11] =
     { 1, 10 }
 };
 
-static const float m_fMovePoints[11][3] =
+static float const m_fMovePoints[11][3] =
 {
     { -4531.78f, 807.50f, 59.92f },
     { -4513.14f, 765.45f, 60.72f },
@@ -750,7 +750,7 @@ struct npc_captured_sprite_darterAI : public ScriptedAI
         m_creature->ForcedDespawn(10 * IN_MILLISECONDS);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -912,7 +912,7 @@ CreatureAI* GetAI_npc_kindal_moonweaver(Creature* pCreature)
     return new npc_kindal_moonweaverAI(pCreature);
 }
 
-bool QuestAccept_npc_kindal_moonweaver(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kindal_moonweaver(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_FREEDOM_FOR_ALL_CREATURES)
     {

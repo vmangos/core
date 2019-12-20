@@ -57,7 +57,7 @@ struct boss_ironayaAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->GetFactionTemplateId() == FACTION_AWAKE && !hasMoved)
         {

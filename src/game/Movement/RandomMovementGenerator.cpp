@@ -35,7 +35,7 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
         //typedef std::vector<Vector3> PointsArray;
         Movement::PointsArray path;
         uint32 ptsPerCycle = ceil(i_wanderDistance * 2);
-        static const uint32 nbCyclesPerPacket = 1;
+        static uint32 const nbCyclesPerPacket = 1;
         for (uint32 i = 0; i <= nbCyclesPerPacket * ptsPerCycle; ++i)
             path.push_back(Vector3(i_positionX + i_wanderDistance * cos(i * 2 * M_PI / ptsPerCycle), i_positionY + i_wanderDistance * sin(i * 2 * M_PI / ptsPerCycle), i_positionZ));
         Movement::MoveSplineInit init(creature, "RandomMovementGenerator (CanFly)");
@@ -90,7 +90,7 @@ void RandomMovementGenerator::Finalize(Creature &creature)
     creature.SetWalk(!creature.HasUnitState(UNIT_STAT_RUNNING), false);
 }
 
-bool RandomMovementGenerator::Update(Creature &creature, const uint32 &diff)
+bool RandomMovementGenerator::Update(Creature &creature, uint32 const& diff)
 {
     if (i_expireTime)
     {

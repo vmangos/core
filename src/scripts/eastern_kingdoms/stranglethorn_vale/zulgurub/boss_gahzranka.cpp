@@ -107,7 +107,7 @@ struct boss_gahzrankaAI : public ScriptedAI
             m_creature->GetMotionMaster()->MovePoint(1, -11688.95f, -1777.21f, 12.593f, 0, 0, 5.81f);
     } 
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

@@ -51,7 +51,7 @@ public:
     void LoadSocial(QueryResult* result);
 
     // ACTIONS SYSTEM
-    void LoadActions(QueryResult *result);
+    void LoadActions(QueryResult* result);
     void SaveActions();
     ActionButtonList& GetActionButtons() { return m_actionButtons; }
     void SendInitialActionButtons() const;
@@ -59,7 +59,7 @@ public:
     void removeActionButton(uint8 button);
 
     // MAIL SYSTEM
-    void LoadMailedItems(QueryResult *result);
+    void LoadMailedItems(QueryResult* result);
     void LoadMails(QueryResult* result);
     void SaveMails();
     void SendMailResult(uint32 mailId, MailResponseType mailAction, MailResponseResult mailError, uint32 equipError = 0, uint32 item_guid = 0, uint32 item_count = 0);
@@ -109,7 +109,7 @@ public:
     bool IsVisibleGloballyFor(MasterPlayer* player) const;
     uint32 GetGMInvisibilityRank() const { return m_gmInvisibilityLevel; }
     Team GetTeam() const { return m_team; }
-    const char* GetName() const { return name.c_str(); }
+    char const* GetName() const { return name.c_str(); }
     uint32 GetZoneId() const { return zoneId; }
     uint32 GetAreaId() const { return areaId; }
     uint8 GetClass() const { return classId; }

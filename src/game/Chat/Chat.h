@@ -65,7 +65,7 @@ class ChatCommand
 {
 public:
         CommandServer      server;
-        const char *       Name;
+        char const*        Name;
         uint8              SecurityLevel;                   // function pointer required correct align (use uint32)
         bool               AllowConsole;
         bool (ChatHandler::*Handler)(char* args);
@@ -100,20 +100,20 @@ class MANGOS_DLL_SPEC ChatHandler
         static char* LineFromMessage(char*& pos) { char* start = strtok(pos,"\n"); pos = nullptr; return start; }
 
         // function with different implementation for chat/console
-        virtual const char *GetMangosString(int32 entry) const;
-        const char *GetOnOffStr(bool value) const;
+        virtual char const* GetMangosString(int32 entry) const;
+        char const* GetOnOffStr(bool value) const;
 
-        virtual void SendSysMessage(  const char *str);
+        virtual void SendSysMessage(char const* str);
 
-        void SendSysMessage(          int32     entry);
-        void PSendSysMessage(         const char *format, ...) ATTR_PRINTF(2,3);
-        void PSendSysMessage(         int32     entry, ...  );
+        void SendSysMessage(int32 entry);
+        void PSendSysMessage(char const* format, ...) ATTR_PRINTF(2,3);
+        void PSendSysMessage(int32 entry, ...  );
         std::string PGetParseString(int32 entry, ...);
 
-        bool ParseCommands(const char* text);
+        bool ParseCommands(char const* text);
         ChatCommand const* FindCommand(char const* text);
 
-        bool isValidChatMessage(const char* msg);
+        bool isValidChatMessage(char const* msg);
         bool HasSentErrorMessage() { return sentErrorMessage;}
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
@@ -153,7 +153,7 @@ class MANGOS_DLL_SPEC ChatHandler
     protected:
         explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false), m_cluster_is_node(true), m_cluster_is_master(true) {}      // for CLI subclass
 
-        bool hasStringAbbr(const char* name, const char* part);
+        bool hasStringAbbr(char const* name, char const* part);
 
         // function with different implementation for chat/console
         virtual uint32 GetAccountId() const;
@@ -167,14 +167,14 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid(), bool strong = false);
         bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
 
-        void SendGlobalSysMessage(const char *str);
+        void SendGlobalSysMessage(char const* str);
 
         void ForwardCommandToNode();
         void ForwardCommandToMaster();
 
-        bool SetDataForCommandInTable(ChatCommand *table, const char* text, uint8 security, std::string const& help, uint8 flags);
-        void ExecuteCommand(const char* text);
-        bool ShowHelpForCommand(ChatCommand *table, const char* cmd);
+        bool SetDataForCommandInTable(ChatCommand *table, char const* text, uint8 security, std::string const& help, uint8 flags);
+        void ExecuteCommand(char const* text);
+        bool ShowHelpForCommand(ChatCommand *table, char const* cmd);
         bool ShowHelpForSubCommands(ChatCommand *table, char const* cmd);
         ChatCommandSearchResult FindCommand(ChatCommand* table, char const*& text, ChatCommand*& command, ChatCommand** parentCommand = nullptr, std::string* cmdNamePtr = nullptr, bool allAvailable = false, bool exactlyName = false);
 
@@ -953,12 +953,12 @@ class MANGOS_DLL_SPEC ChatHandler
 
         // Utility methods for commands
         bool ShowAccountIpListHelper(char* args, bool onlineonly);
-        void ShowFactionListHelper(FactionEntry const* factionEntry, LocaleConstant loc, FactionState const* repState = nullptr, Player * target = nullptr);
+        void ShowFactionListHelper(FactionEntry const* factionEntry, LocaleConstant loc, FactionState const* repState = nullptr, Player* target = nullptr);
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = nullptr);
         void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = nullptr);
         void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
         void ShowPoolListHelper(uint16 pool_id);
-        void ShowTriggerListHelper(AreaTriggerEntry const * atEntry);
+        void ShowTriggerListHelper(AreaTriggerEntry const* atEntry);
         void ShowTriggerTargetListHelper(uint32 id, AreaTriggerTeleport const* at, bool subpart = false);
         bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = nullptr);
         bool HandleBanListHelper(QueryResult* result);
@@ -1004,7 +1004,7 @@ class MANGOS_DLL_SPEC ChatHandler
 
         void SetSentErrorMessage(bool val){ sentErrorMessage = val;};
     private:
-        WorldSession * m_session;                           // != nullptr for chat command call and nullptr for CLI command
+        WorldSession* m_session;                           // != nullptr for chat command call and nullptr for CLI command
 
         // common global flag
         static bool load_command_table;
@@ -1022,11 +1022,11 @@ class CliHandler : public ChatHandler
             : m_accountId(accountId), m_loginAccessLevel(accessLevel), m_callbackArg(callbackArg), m_print(zprint) {}
 
         // overwrite functions
-        const char *GetMangosString(int32 entry) const override;
+        char const* GetMangosString(int32 entry) const override;
         uint32 GetAccountId() const override;
         AccountTypes GetAccessLevel() const override;
         bool isAvailable(ChatCommand const& cmd) const override;
-        void SendSysMessage(const char *str) override;
+        void SendSysMessage(char const* str) override;
         std::string GetNameLink() const override;
         bool needReportToTarget(Player* chr) const override;
         LocaleConstant GetSessionDbcLocale() const override;
@@ -1045,11 +1045,11 @@ class NullChatHandler : public ChatHandler
         explicit NullChatHandler() {}
 
         // overwrite functions
-        const char *GetMangosString(int32 entry) const override;
+        char const* GetMangosString(int32 entry) const override;
         uint32 GetAccountId() const override { return 0; }
         AccountTypes GetAccessLevel() const override { return SEC_PLAYER; }
         bool isAvailable(ChatCommand const& cmd) const override { return false; }
-        void SendSysMessage(const char *str) override {}
+        void SendSysMessage(char const* str) override {}
         std::string GetNameLink() const override { return ""; }
         LocaleConstant GetSessionDbcLocale() const override;
         int GetSessionDbLocaleIndex() const override;

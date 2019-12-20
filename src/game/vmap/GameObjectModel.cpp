@@ -28,7 +28,7 @@
 
 struct GameobjectModelData
 {
-    GameobjectModelData(std::string const& name_, const G3D::AABox& box) :
+    GameobjectModelData(std::string const& name_, G3D::AABox const& box) :
         name(name_), bound(box) {}
 
     std::string name;
@@ -73,7 +73,7 @@ GameObjectModel::~GameObjectModel()
         ((VMAP::VMapManager2*)VMAP::VMapFactory::createOrGetVMapManager())->releaseModelInstance(name);
 }
 
-bool GameObjectModel::initialize(const GameObject* const pGo, const GameObjectDisplayInfoEntry* const pDisplayInfo)
+bool GameObjectModel::initialize(GameObject const* const pGo, GameObjectDisplayInfoEntry const* pDisplayInfo)
 {
     ModelList::const_iterator it = model_list.find(pDisplayInfo->Displayid);
     if (it == model_list.end())
@@ -124,7 +124,7 @@ bool GameObjectModel::initialize(const GameObject* const pGo, const GameObjectDi
     return true;
 }
 
-GameObjectModel* GameObjectModel::construct(const GameObject* const object)
+GameObjectModel* GameObjectModel::construct(GameObject const* const object)
 {
     if (GameObjectInfo const* gobjInfo = object->GetGOInfo())
     {
@@ -134,7 +134,7 @@ GameObjectModel* GameObjectModel::construct(const GameObject* const object)
         if (gobjInfo->type == GAMEOBJECT_TYPE_GOOBER && gobjInfo->goober.losOK)
             return nullptr;
     }
-    const GameObjectDisplayInfoEntry* info = sGameObjectDisplayInfoStore.LookupEntry(object->GetDisplayId());
+    GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(object->GetDisplayId());
     if (!info)
         return nullptr;
 
@@ -148,7 +148,7 @@ GameObjectModel* GameObjectModel::construct(const GameObject* const object)
     return mdl;
 }
 
-bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool StopAtFirstHit) const
+bool GameObjectModel::intersectRay(G3D::Ray const& ray, float& MaxDist, bool StopAtFirstHit) const
 {
     if (!collision_enabled)
         return false;
@@ -170,7 +170,7 @@ bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool Sto
     return hit;
 }
 
-bool GameObjectModel::Relocate(const GameObject& go)
+bool GameObjectModel::Relocate(GameObject const& go)
 {
     if (!iModel)
         return false;

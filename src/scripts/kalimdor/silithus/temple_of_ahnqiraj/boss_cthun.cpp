@@ -80,7 +80,7 @@ enum eSpells {
     SPELL_MOUTH_TENTACLE            = 26332, // Spawns the tentacle that "eats" you to stomach and mounts the player on it.
 };
 
-static const std::vector<uint32> allTentacleTypes
+static std::vector<uint32> const allTentacleTypes
 ({ MOB_EYE_TENTACLE, MOB_CLAW_TENTACLE, MOB_GIANT_CLAW_TENTACLE, MOB_GIANT_EYE_TENTACLE, MOB_FLESH_TENTACLE,
     MOB_SMALL_PORTAL, MOB_GIANT_PORTAL});
 
@@ -227,7 +227,7 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
     if (!instance) return nullptr;
     std::list<Player*> temp;
     std::list<Player*>::iterator j;
-    const Map::PlayerList& PlayerList = instance->GetMap()->GetPlayers();
+    Map::PlayerList const& PlayerList = instance->GetMap()->GetPlayers();
 
     if (!PlayerList.isEmpty())
     {
@@ -272,7 +272,7 @@ static constexpr uint32 DARK_GLARE_COOLING_DOWN         = 1000;
                                                                  // puller with green beam before random target.
 static constexpr int32  P1_GREEN_BEAM_COOLDOWN          = 3000;  // Green beam has a 2 sec cast time. If this number is > 2000, 
                                                                  // the cooldown will be P1_GREEN_BEAM_COOLDOWN - 2000
-static const uint32 P1_CLAW_TENTACLE_RESPAWN_TIMER      = 5000;  // checked against old footage & current fight
+static uint32 const P1_CLAW_TENTACLE_RESPAWN_TIMER      = 5000;  // checked against old footage & current fight
 // =======================================================
 
 // ================= TRANSITION CONSTANTS ================
@@ -296,9 +296,9 @@ static constexpr uint32 P2_FIRST_STOMACH_GRAB           = 18000 - STOMACH_GRAB_D
 // ======================= MISC ==========================
 static constexpr uint32 GROUND_RUPTURE_DELAY                   = 0;             // ms after spawn that the ground rupture will be cast
 static constexpr uint32 HAMSTRING_INITIAL_COOLDOWN             = 2000;          // Claw tentacle hamstring cooldown after spawn/tp
-static const uint32 hamstringResetCooldownFunc()               { return 5000; } // Claw tentacle hamstring cooldown after use
-static const uint32 trashResetCooldownFunc()                   { return urand(6000, 12000); }
-static const uint32 groundTremorResetCooldownFunc()            { return urand(6000, 12000); }
+static uint32 const hamstringResetCooldownFunc()               { return 5000; } // Claw tentacle hamstring cooldown after use
+static uint32 const trashResetCooldownFunc()                   { return urand(6000, 12000); }
+static uint32 const groundTremorResetCooldownFunc()            { return urand(6000, 12000); }
 //static constexpr uint32 CLAW_TENTACLE_FIRST_MELEE_DELAY      = 1000; // Earliest possible point for a claw tentacle to melee after spawn/tp
 static constexpr uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN      = 5000; // How long does a claw tentacle evade before TPing to new target
 
@@ -428,7 +428,7 @@ struct cthunTentacle : public ScriptedAI
         Unit* target = nullptr;
 
         // First checking if we have some taunt on us
-        const Unit::AuraList& tauntAuras = m_creature->GetAurasByType(SPELL_AURA_MOD_TAUNT);
+        Unit::AuraList const& tauntAuras = m_creature->GetAurasByType(SPELL_AURA_MOD_TAUNT);
         for (auto it = tauntAuras.crbegin(); it != tauntAuras.crend(); it++) {
             Unit* caster = (*it)->GetCaster();
             if (!caster) continue;
@@ -799,7 +799,7 @@ struct eye_tentacleAI : public cthunPortalTentacle
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!cthunPortalTentacle::UpdatePortalTentacle(diff))
             return;
@@ -863,7 +863,7 @@ struct claw_tentacleAI : public clawTentacle
         clawTentacle::Reset();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         clawTentacle::UpdateClawTentacle(diff);
     }
@@ -889,7 +889,7 @@ struct giant_claw_tentacleAI : public clawTentacle
         trashTimer.Reset();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!clawTentacle::UpdateClawTentacle(diff))
             return;
@@ -916,7 +916,7 @@ struct giant_eye_tentacleAI : public cthunPortalTentacle
         isCasting = false;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!isCasting)
         {
@@ -981,7 +981,7 @@ struct flesh_tentacleAI : public cthunTentacle
         cthunTentacle::Reset();
     }
 
-    void UpdateAI(const uint32 diff)  override
+    void UpdateAI(uint32 const diff)  override
     {
         UpdateMelee(true);
     }
@@ -1079,7 +1079,7 @@ struct eye_of_cthunAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -1414,7 +1414,7 @@ struct cthunAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;

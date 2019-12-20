@@ -74,7 +74,7 @@ bool getNextId(std::string const& pString, unsigned int& pStartPos, unsigned int
 parameter: String of map ids. Delimiter = ","
 */
 
-void VMapFactory::preventSpellsFromBeingTestedForLoS(const char* pSpellIdString)
+void VMapFactory::preventSpellsFromBeingTestedForLoS(char const* pSpellIdString)
 {
     if (!iIgnoreSpellIds)
         iIgnoreSpellIds = new Table<unsigned int , bool>();

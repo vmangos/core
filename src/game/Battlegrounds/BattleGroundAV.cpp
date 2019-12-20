@@ -43,7 +43,7 @@ BattleGroundAV::~BattleGroundAV()
 {
 }
 
-void BattleGroundAV::HandleKillPlayer(Player *player, Player *killer)
+void BattleGroundAV::HandleKillPlayer(Player* player, Player* killer)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -270,7 +270,7 @@ bool BattleGroundAV::isWorldBossChallengeInvocationReady(uint32 faction_id)
 }
 /*********/
 
-void BattleGroundAV::HandleKillUnit(Creature *creature, Player *killer)
+void BattleGroundAV::HandleKillUnit(Creature* creature, Player* killer)
 {
     DEBUG_LOG("BattleGroundAV: HandleKillUnit %i", creature->GetEntry());
    if (GetStatus() != STATUS_IN_PROGRESS)
@@ -432,7 +432,7 @@ uint32 BattleGroundAV::GetActualArmorRessources(uint32 teamIdx)
     return m_Team_QuestStatus[teamIdx][0];
 }
 
-void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
+void BattleGroundAV::UpgradeArmor(Object* questGiver, Player* player)
 {
     BattleGroundAVTeamIndex teamIdx = GetAVTeamIndexByTeamId(player->GetTeam());
     uint32 m_faction_id           = (player->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
@@ -494,7 +494,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
 }
 
 
-void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Player *player)
+void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Player* player)
 {
     char sMessageRemaining[200]        = "";
 
@@ -917,7 +917,7 @@ void BattleGroundAV::StartingEventOpenDoors()
     OpenDoorEvent(BG_EVENT_DOOR);
 }
 
-void BattleGroundAV::AddPlayer(Player *plr)
+void BattleGroundAV::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
     // create score and add it to map, default values are set in constructor
@@ -996,7 +996,7 @@ void BattleGroundAV::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
 }
 
-void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
+void BattleGroundAV::HandleAreaTrigger(Player* Source, uint32 Trigger)
 {
     // this is wrong way to implement these things. On official it done by gameobject spell cast.
     switch (Trigger)
@@ -1264,7 +1264,7 @@ void BattleGroundAV::PopulateNode(BG_AV_Nodes node)
 
 
 /// called when using a banner
-void BattleGroundAV::EventPlayerClickedOnFlag(Player *source, GameObject* target_obj)
+void BattleGroundAV::EventPlayerClickedOnFlag(Player* source, GameObject* target_obj)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -1424,7 +1424,7 @@ void BattleGroundAV::SendMineWorldStates(uint32 mine)
         UpdateWorldState(BG_AV_MineWorldStates[mine][m_Mine_PrevOwner[mine]], 0);
 }
 
-WorldSafeLocsEntry const* BattleGroundAV::GetClosestGraveYard(Player *plr)
+WorldSafeLocsEntry const* BattleGroundAV::GetClosestGraveYard(Player* plr)
 {
     // repop players at the entrance GY if BG is not started yet
     if (GetStatus() != STATUS_IN_PROGRESS && !plr->IsGameMaster())
@@ -1451,7 +1451,7 @@ WorldSafeLocsEntry const* BattleGroundAV::GetClosestGraveYard(Player *plr)
         {
             if (m_Nodes[i].Owner != teamIdx || m_Nodes[i].State != POINT_CONTROLLED)
                 continue;
-            WorldSafeLocsEntry const * entry = sWorldSafeLocsStore.LookupEntry(BG_AV_GraveyardIds[i]);
+            WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(BG_AV_GraveyardIds[i]);
             if (!entry)
                 continue;
             float dist = (entry->x - x) * (entry->x - x) + (entry->y - y) * (entry->y - y);
@@ -1646,7 +1646,7 @@ SendQuestCompleteEvent -> Affiche au joueur que une quête est validée.
 */
 void BattleGroundAV::CompleteQuestForAll(uint32 questId)
 {
-    Map::PlayerList const &PlayerList = GetBgMap()->GetPlayers();
+    Map::PlayerList const& PlayerList = GetBgMap()->GetPlayers();
     for (Map::PlayerList::const_iterator it = PlayerList.begin(); it != PlayerList.end(); ++it)
         if (Player* player = it->getSource())
             if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)

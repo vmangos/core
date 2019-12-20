@@ -84,7 +84,7 @@ struct mob_aquementasAI : public ScriptedAI
         DoScriptText(AGGRO_YELL_AQUE, m_creature, who);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (isFriendly)
         {
@@ -336,7 +336,7 @@ enum
     POINT_ID_TO_WATER           = 1
 };
 
-const float m_afToWaterLoc[] = { -7032.664551f, -4906.199219f, -1.606446f};
+float const m_afToWaterLoc[] = { -7032.664551f, -4906.199219f, -1.606446f};
 
 struct npc_toogaAI : public FollowerAI
 {
@@ -391,7 +391,7 @@ struct npc_toogaAI : public FollowerAI
             SetFollowComplete();
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff) override
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -471,7 +471,7 @@ CreatureAI* GetAI_npc_tooga(Creature* pCreature)
     return new npc_toogaAI(pCreature);
 }
 
-bool QuestAccept_npc_tooga(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_tooga(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TOOGA)
     {
@@ -504,7 +504,7 @@ struct go_inconspicuous_landmarkAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {
@@ -652,7 +652,7 @@ struct npc_yehkinyaAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 diff) override
+    void UpdateEscortAI(uint32 const diff) override
     {
         if (Event_Timer <= diff)
         {

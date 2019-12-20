@@ -83,10 +83,10 @@ enum
     PHASE_THREE                 = 3
 };
 
-static const float ONYXIA_AGGRO_RANGE  = 58.0f;
+static float const ONYXIA_AGGRO_RANGE  = 58.0f;
 
-static const float ONYXIA_NORMAL_SPEED = 1.28571f;
-static const float ONYXIA_BREATH_SPEED = 3.0f;
+static float const ONYXIA_NORMAL_SPEED = 1.28571f;
+static float const ONYXIA_BREATH_SPEED = 3.0f;
 
 struct sOnyxMove
 {
@@ -356,7 +356,7 @@ struct boss_onyxiaAI : public ScriptedAI
         return nullptr;
     } 
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_BELLOWINGROAR)
         {
@@ -742,7 +742,7 @@ struct boss_onyxiaAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         CheckForTargetsInAggroRadius(uiDiff);
 
@@ -828,7 +828,7 @@ struct OnyxianWhelpAI: public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

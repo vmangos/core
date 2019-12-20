@@ -95,7 +95,7 @@ struct boss_nerubenkanAI : public ScriptedAI
             m_pInstance->SetData(TYPE_NERUB, DONE);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

@@ -163,7 +163,7 @@ struct mob_TwinsBug : public ScriptedAI {
 
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -364,7 +364,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // The rest of this script requires an instance, less managment and code duplication, and a bit of lazyness
         if (!m_pInstance)
@@ -947,7 +947,7 @@ struct mob_mastersEye : public ScriptedAI {
         flightUpdate = 0;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->IsDespawned() || m_pInstance->TwinsDialogueStartedOrDone())
             return;

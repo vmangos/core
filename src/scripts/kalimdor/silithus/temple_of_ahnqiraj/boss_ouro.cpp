@@ -178,7 +178,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         }
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_SANDBLAST && pTarget)
         {
@@ -222,7 +222,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     void SetNewTarget(Unit &pNewTarget)
     {
-        const uint32 uiMaxThreat = m_creature->GetThreatManager().getThreat(m_creature->GetVictim());
+        uint32 const uiMaxThreat = m_creature->GetThreatManager().getThreat(m_creature->GetVictim());
 
         // erase current target's threat as soon as we switch the target now
         m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
@@ -269,7 +269,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no pTarget
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -398,7 +398,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                         if (pUnit && pUnit->GetDistance2d(m_creature) < 20.0f)
                             lGroundRuptureTargets.push_back(pUnit);
                     }
-                    for (auto &target : lGroundRuptureTargets)
+                    for (auto& target : lGroundRuptureTargets)
                         m_creature->CastSpell(target, SPELL_GROUND_RUPTURE, true);
 
                     m_bSubmerged        = false;
@@ -481,7 +481,7 @@ struct npc_ouro_spawnerAI : public Scripted_NoMovementAI
         }
     }
 
-    void UpdateAI(const uint32 /*uiDiff*/) override { }
+    void UpdateAI(uint32 const /*uiDiff*/) override { }
 };
 
 CreatureAI* GetAI_npc_ouro_spawner(Creature* pCreature)
@@ -521,10 +521,10 @@ struct npc_dirt_moundAI : public ScriptedAI
 	    }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         Unit *pTarget = m_creature->GetMap()->GetUnit(m_CurrentTargetGUID);
-        const bool bForceChangeTarget = !pTarget || pTarget->IsDead()
+        bool const bForceChangeTarget = !pTarget || pTarget->IsDead()
             || pTarget->IsImmuneToDamage(SPELL_SCHOOL_MASK_NATURE);
 
         if (bForceChangeTarget || m_uiChangeTargetTimer < uiDiff)
@@ -582,7 +582,7 @@ struct npc_ouro_scarabAI : public ScriptedAI
 	    }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_creature->GetVictim())
             DoMeleeAttackIfReady();

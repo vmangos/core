@@ -108,7 +108,7 @@ struct npc_professor_phizzlethorpeAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_professor_phizzlethorpe(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_professor_phizzlethorpe(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_SUNKEN_TREASURE)
     {
@@ -254,7 +254,7 @@ struct npc_shakes_o_breenAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -292,7 +292,7 @@ struct npc_shakes_o_breenAI : npc_escortAI
     }
 };
 
-bool QuestAccept_npc_shakes_o_breen(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_shakes_o_breen(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_DEATH_FROM_BELOW)
     {
@@ -398,7 +398,7 @@ struct npc_kineloryAI : public npc_escortAI
             DoScriptText(SAY_AGGRO_KINELORY, m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -431,7 +431,7 @@ CreatureAI* GetAI_npc_kinelory(Creature* pCreature)
     return new npc_kineloryAI(pCreature);
 }
 
-bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_HINTS_NEW_PLAGUE)
     {

@@ -37,7 +37,7 @@ struct WMOAreaTableTripple
     {
     }
 
-    bool operator <(const WMOAreaTableTripple& b) const
+    bool operator <(WMOAreaTableTripple const& b) const
     {
         return memcmp(this, &b, sizeof(WMOAreaTableTripple)) < 0;
     }
@@ -48,7 +48,7 @@ struct WMOAreaTableTripple
     int32 adtId;
 };
 
-typedef std::map<WMOAreaTableTripple, WMOAreaTableEntry const *> WMOAreaInfoByTripple;
+typedef std::map<WMOAreaTableTripple, WMOAreaTableEntry const* > WMOAreaInfoByTripple;
 
 static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
@@ -192,7 +192,7 @@ void LoadDBCStores(std::string const& dataPath)
 {
     std::string dbcPath = dataPath + "dbc/";
 
-    const uint32 DBCFilesCount = 39;
+    uint32 const DBCFilesCount = 39;
 
     BarGoLink bar(DBCFilesCount);
 
@@ -230,14 +230,14 @@ void LoadDBCStores(std::string const& dataPath)
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillRaceClassInfoStore,  dbcPath, "SkillRaceClassInfo.dbc");
     for (uint32 i = 1; i < sSpellMgr.GetMaxSpellId(); ++i)
     {
-        SpellEntry const * spell = sSpellMgr.GetSpellEntry(i);
+        SpellEntry const* spell = sSpellMgr.GetSpellEntry(i);
         if (spell && spell->Category)
             sSpellCategoriesStore[spell->Category].insert(i);
     }
 
     for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {
-        SkillLineAbilityEntry const *skillLine = sObjectMgr.GetSkillLineAbility(j);
+        SkillLineAbilityEntry const* skillLine = sObjectMgr.GetSkillLineAbility(j);
 
         if (!skillLine)
             continue;
@@ -275,7 +275,7 @@ void LoadDBCStores(std::string const& dataPath)
     // create talent spells set
     for (unsigned int i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
-        TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
         if (!talentInfo) continue;
         for (int j = 0; j < 5; j++)
             if (talentInfo->RankID[j])
@@ -292,10 +292,10 @@ void LoadDBCStores(std::string const& dataPath)
         TalentBitSize sTalentBitSize;
         for (uint32 i = 1; i < sTalentStore.GetNumRows(); ++i)
         {
-            TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
+            TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
             if (!talentInfo) continue;
 
-            TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
             if (!talentTabInfo)
                 continue;
 
@@ -317,7 +317,7 @@ void LoadDBCStores(std::string const& dataPath)
         // now have all max ranks (and then bit amount used for store talent ranks in inspect)
         for (uint32 talentTabId = 1; talentTabId < sTalentTabStore.GetNumRows(); ++talentTabId)
         {
-            TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
+            TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentTabId);
             if (!talentTabInfo)
                 continue;
 
@@ -336,7 +336,7 @@ void LoadDBCStores(std::string const& dataPath)
             for (TalentBitSize::iterator itr = sTalentBitSize.begin(); itr != sTalentBitSize.end(); ++itr)
             {
                 uint32 talentId = itr->first & 0xFFFF;
-                TalentEntry const *talentInfo = sTalentStore.LookupEntry(talentId);
+                TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
                 if (!talentInfo)
                     continue;
 
@@ -458,7 +458,7 @@ char const* GetPetName(uint32 petfamily, uint32 dbclang)
 {
     if (!petfamily)
         return nullptr;
-    CreatureFamilyEntry const *pet_family = sCreatureFamilyStore.LookupEntry(petfamily);
+    CreatureFamilyEntry const* pet_family = sCreatureFamilyStore.LookupEntry(petfamily);
     if (!pet_family)
         return nullptr;
     return pet_family->Name[dbclang] ? pet_family->Name[dbclang] : nullptr;

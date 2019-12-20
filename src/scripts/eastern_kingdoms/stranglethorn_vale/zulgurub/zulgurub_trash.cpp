@@ -35,7 +35,7 @@ struct GurubashiAxeThrowerAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -110,7 +110,7 @@ struct GurubashiBerserkerAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -197,7 +197,7 @@ struct npc_hakkari_doctor : public ScriptedAI
         m_uiOrionOmbreTimer = 4000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -276,7 +276,7 @@ struct npc_esprit_vaudou : public ScriptedAI
     {
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (Unit* pVictim = m_creature->GetVictim())
         {
@@ -312,7 +312,7 @@ struct npc_fils_hakkar : public ScriptedAI
         m_uiTrashTimer = 5000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

@@ -314,17 +314,17 @@ public:
 
     uint64 GetGOUuid(NaxxGOs which);
 
-    const char* Save() override { return strInstData.c_str(); }
-    void Load (const char* chrIn) override;
+    char const* Save() override { return strInstData.c_str(); }
+    void Load (char const* chrIn) override;
 
     // goth
     void SetGothTriggers();
     Creature* GetClosestAnchorForGoth(Creature* pSource, bool bRightSide);
     void GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide);
-    bool IsInRightSideGothArea(const Unit* pUnit);
+    bool IsInRightSideGothArea(Unit const* pUnit);
 
     // kel
-    void OnKTAreaTrigger(const AreaTriggerEntry* pAT); //impl in boss_kelthuzad.cpp
+    void OnKTAreaTrigger(AreaTriggerEntry const* pAT); //impl in boss_kelthuzad.cpp
     void SetChamberCenterCoords(float fX, float fY, float fZ);
     void GetChamberCenterCoords(float &fX, float &fY, float &fZ) { fX = m_fChamberCenterX; fY = m_fChamberCenterY; fZ = m_fChamberCenterZ; }
     void ToggleKelThuzadWindows(bool setOpen);
@@ -332,7 +332,7 @@ public:
     void OnPlayerDeath(Player* p) override;
     void OnCreatureDeath(Creature* pCreature) override;
 
-    void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
+    void onNaxxramasAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pAt);
 
     void UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData = -1);  // GO closes when uiData==IN_PROGRESS, otherwise opens
     void UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32 uiData, int requiredPreBossData = -1);// GO closes when uiData==IN_PROGRESS, otherwise opens

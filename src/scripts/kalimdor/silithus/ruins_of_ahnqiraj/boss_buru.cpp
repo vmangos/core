@@ -46,7 +46,7 @@ enum
     MODEL_INVISIBLE             =   11686
 };
 
-const float THREAT_LOCK = FLT_MAX;
+float const THREAT_LOCK = FLT_MAX;
 
 static SpawnLocations AddPop[] =
 {
@@ -134,7 +134,7 @@ struct boss_buruAI : public ScriptedAI
             m_pInstance->SetData(TYPE_BURU, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
 
         Creature* egg;
@@ -357,7 +357,7 @@ struct mob_buru_eggAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         return;
     }

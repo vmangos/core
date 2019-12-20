@@ -62,7 +62,7 @@ struct boss_arcanist_doanAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

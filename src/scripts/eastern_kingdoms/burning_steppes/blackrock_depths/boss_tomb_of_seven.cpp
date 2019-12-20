@@ -195,7 +195,7 @@ struct boss_doomrelAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_pInstance)
         {

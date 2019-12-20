@@ -20,7 +20,7 @@ void boss_omenAI::Reset()
     m_uiStarfallTimer = urand(8000, 12000);
 }
 
-void boss_omenAI::UpdateAI(const uint32 uiDiff)
+void boss_omenAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
@@ -46,7 +46,7 @@ void boss_omenAI::UpdateAI(const uint32 uiDiff)
     DoMeleeAttackIfReady();
 }
 
-void boss_omenAI::SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpellEntry)
+void boss_omenAI::SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry)
 {
     if (pSpellEntry->Id == SPELL_ELUNES_CANDLE)
     {
@@ -119,7 +119,7 @@ struct npc_minion_of_omenAI : ScriptedAI
 
     }
 
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpellEntry) override
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry) override
     {
         if (pSpellEntry->Id == SPELL_ELUNES_CANDLE)
         {

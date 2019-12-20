@@ -32,7 +32,7 @@
 #define SMOOTH_PATH_STEP_SIZE 2.0f
 
 ////////////////// PathInfo //////////////////
-PathInfo::PathInfo(const Unit* owner) :
+PathInfo::PathInfo(Unit const* owner) :
     m_polyLength(0), m_type(PATHFIND_BLANK), m_useStraightPath(false), m_forceDestination(false),
     m_pointPathLimit(MAX_POINT_PATH_LENGTH), m_transport(nullptr), m_sourceUnit(owner),
     m_navMesh(nullptr), m_navMeshQuery(nullptr), m_targetAllowedFlags(0)
@@ -133,7 +133,7 @@ dtPolyRef PathInfo::FindWalkPoly(dtNavMeshQuery const* query, float const* point
     return polyRef;
 }
 
-dtPolyRef PathInfo::getPolyByLocation(const float* point, float *distance, uint32 allowedFlags)
+dtPolyRef PathInfo::getPolyByLocation(float const* point, float *distance, uint32 allowedFlags)
 {
     float closestPoint[VERTEX_SIZE] = {0.0f, 0.0f, 0.0f};
     dtQueryFilter filter;
@@ -147,7 +147,7 @@ dtPolyRef PathInfo::getPolyByLocation(const float* point, float *distance, uint3
     return INVALID_POLYREF;
 }
 
-void PathInfo::BuildPolyPath(const Vector3 &startPos, const Vector3 &endPos)
+void PathInfo::BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos)
 {
     // *** getting start/end poly logic ***
 
@@ -384,7 +384,7 @@ void PathInfo::BuildPolyPath(const Vector3 &startPos, const Vector3 &endPos)
     BuildPointPath(startPoint, endPoint, distToStartPoly, distToEndPoly);
 }
 
-void PathInfo::BuildPointPath(const float *startPoint, const float *endPoint, float distToStartPoly, float distToEndPoly)
+void PathInfo::BuildPointPath(float const* startPoint, float const* endPoint, float distToStartPoly, float distToEndPoly)
 {
     // generate the point-path out of our up-to-date poly-path
     float pathPoints[MAX_POINT_PATH_LENGTH * VERTEX_SIZE];
@@ -557,7 +557,7 @@ void PathInfo::FillTargetAllowedFlags(Unit* target)
         m_targetAllowedFlags |= NAV_STEEP_SLOPES;
 }
 
-bool PathInfo::HaveTiles(const Vector3& p) const
+bool PathInfo::HaveTiles(Vector3 const& p) const
 {
     if (m_transport)
         return true;
@@ -569,8 +569,8 @@ bool PathInfo::HaveTiles(const Vector3& p) const
     return (m_navMesh->getTileAt(tx, ty, 0) != nullptr);
 }
 
-uint32 PathInfo::fixupCorridor(dtPolyRef* path, const uint32 npath, const uint32 maxPath,
-                               const dtPolyRef* visited, const uint32 nvisited)
+uint32 PathInfo::fixupCorridor(dtPolyRef* path, uint32 const npath, uint32 const maxPath,
+                               dtPolyRef const* visited, uint32 const nvisited)
 {
     int32 furthestPath = -1;
     int32 furthestVisited = -1;
@@ -621,18 +621,18 @@ int fixupShortcuts(dtPolyRef* path, int npath, dtNavMeshQuery const* navQuery)
         return npath;
 
     // Get connected polygons
-    static const int maxNeis = 16;
+    static int const maxNeis = 16;
     dtPolyRef neis[maxNeis];
     int nneis = 0;
 
-    const dtMeshTile* tile = 0;
-    const dtPoly* poly = 0;
+    dtMeshTile const* tile = 0;
+    dtPoly const* poly = 0;
     if (dtStatusFailed(navQuery->getAttachedNavMesh()->getTileAndPolyByRef(path[0], &tile, &poly)))
         return npath;
 
     for (unsigned int k = poly->firstLink; k != DT_NULL_LINK; k = tile->links[k].next)
     {
-        const dtLink* link = &tile->links[k];
+        dtLink const* link = &tile->links[k];
         if (link->ref != 0)
         {
             if (nneis < maxNeis)
@@ -642,7 +642,7 @@ int fixupShortcuts(dtPolyRef* path, int npath, dtNavMeshQuery const* navQuery)
 
     // If any of the neighbour polygons is within the next few polygons
     // in the path, short cut to that polygon directly.
-    static const int maxLookAhead = 6;
+    static int const maxLookAhead = 6;
     int cut = 0;
     for (int i = dtMin(maxLookAhead, npath) - 1; i > 1 && cut == 0; i--)
     {
@@ -666,12 +666,12 @@ int fixupShortcuts(dtPolyRef* path, int npath, dtNavMeshQuery const* navQuery)
     return npath;
 }
 
-bool PathInfo::getSteerTarget(const float* startPos, const float* endPos,
-                              const float minTargetDist, const dtPolyRef* path, const uint32 pathSize,
+bool PathInfo::getSteerTarget(float const* startPos, float const* endPos,
+                              float const minTargetDist, dtPolyRef const* path, uint32 const pathSize,
                               float* steerPos, unsigned char& steerPosFlag, dtPolyRef& steerPosRef) const
 {
     // Find steer target.
-    static const uint32 MAX_STEER_POINTS = 3;
+    static uint32 const MAX_STEER_POINTS = 3;
     float steerPath[MAX_STEER_POINTS * VERTEX_SIZE];
     unsigned char steerPathFlags[MAX_STEER_POINTS];
     dtPolyRef steerPathPolys[MAX_STEER_POINTS];
@@ -731,8 +731,8 @@ float Distance2DPointToLineYZX(float* lineA, float* lineB, float* point)
     return std::abs(CrossProduct(lineA, lineB, point) / Distance(lineA, lineB));
 }
 
-dtStatus PathInfo::findSmoothPath(const float* startPos, const float* endPos,
-                                  const dtPolyRef* polyPath, uint32 polyPathSize,
+dtStatus PathInfo::findSmoothPath(float const* startPos, float const* endPos,
+                                  dtPolyRef const* polyPath, uint32 polyPathSize,
                                   float* smoothPath, int* smoothPathSize, uint32 maxSmoothPathSize)
 {
     bool simplifyPath = false;
@@ -786,7 +786,7 @@ dtStatus PathInfo::findSmoothPath(const float* startPos, const float* endPos,
 
         // Move
         float result[VERTEX_SIZE];
-        const static uint32 MAX_VISIT_POLY = 16;
+        static uint32 const MAX_VISIT_POLY = 16;
         dtPolyRef visited[MAX_VISIT_POLY];
 
         uint32 nvisited = 0;
@@ -990,21 +990,21 @@ float PathInfo::Length() const
     return length;
 }
 
-bool PathInfo::inRangeYZX(const float* v1, const float* v2, float r, float h) const
+bool PathInfo::inRangeYZX(float const* v1, float const* v2, float r, float h) const
 {
-    const float dx = v2[0] - v1[0];
-    const float dy = v2[1] - v1[1]; // elevation
-    const float dz = v2[2] - v1[2];
+    float const dx = v2[0] - v1[0];
+    float const dy = v2[1] - v1[1]; // elevation
+    float const dz = v2[2] - v1[2];
     return (dx * dx + dz * dz) < r * r && fabsf(dy) < h;
 }
 
-bool PathInfo::inRange(const Vector3 &p1, const Vector3 &p2, float r, float h) const
+bool PathInfo::inRange(Vector3 const& p1, Vector3 const& p2, float r, float h) const
 {
     Vector3 d = p1 - p2;
     return (d.x * d.x + d.y * d.y) < r * r && fabsf(d.z) < h;
 }
 
-float PathInfo::dist3DSqr(const Vector3 &p1, const Vector3 &p2) const
+float PathInfo::dist3DSqr(Vector3 const& p1, Vector3 const& p2) const
 {
     return (p1 - p2).squaredLength();
 }

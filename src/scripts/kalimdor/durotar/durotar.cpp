@@ -67,7 +67,7 @@ struct LazyPeonAI : public ScriptedAI
     uint8      state;
     ObjectGuid playerGuid;
 
-    void DoAction(const uint32 state) override
+    void DoAction(uint32 const state) override
     {
         this->state = state;
     }
@@ -86,7 +86,7 @@ struct LazyPeonAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         switch (state)
         {

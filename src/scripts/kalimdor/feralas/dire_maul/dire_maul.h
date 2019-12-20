@@ -88,7 +88,7 @@ enum
 struct sGossipMenuItems
 {
     uint16 m_uiMenu;
-    const char* m_chItem;
+    char const* m_chItem;
 };
 
 const sGossipMenuItems sKromcrushGossips[4] =
@@ -126,8 +126,8 @@ class instance_dire_maul : public ScriptedInstance
         uint32 GetData(uint32 uiType) override;
         uint64 GetData64(uint32 uiType) override;
 
-        const char* Save() override { return strInstData.c_str(); }
-        void Load(const char* chrIn) override;
+        char const* Save() override { return strInstData.c_str(); }
+        void Load(char const* chrIn) override;
 
         uint8 GetChoRushEquipment();
         void DoSortCristalsEventMobs();

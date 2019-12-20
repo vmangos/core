@@ -133,7 +133,7 @@ struct mob_anubisath_guardianAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -218,7 +218,7 @@ struct OssirianTornadoAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -297,7 +297,7 @@ struct mob_flesh_hunterAI : public ScriptedAI
             DoCast(m_creature, SPELL_CONSUME_HEAL);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -433,7 +433,7 @@ struct ObsidianDestroyerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -515,7 +515,7 @@ struct HiveZaraSoldierAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -572,7 +572,7 @@ struct SilicateFeederAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_CLOUD_OF_DISEASE);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -613,7 +613,7 @@ struct QirajiSwarmguardAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_creature->IsWalking())
             m_creature->SetWalk(false);
@@ -677,7 +677,7 @@ struct QirajiGladiatorAI : public ScriptedAI
             m_pInstance->SetData(TYPE_QIRAJI_GLADIATOR, 1);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -732,7 +732,7 @@ struct HiveZaraStingerAI : public ScriptedAI
         m_bChargeCasted = false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -796,7 +796,7 @@ struct TuubidAI : public ScriptedAI
         m_uiSunderArmor_Timer = 6000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -906,7 +906,7 @@ struct QirajiWarriorAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         /** Needed for "marking target system" */
         if (!m_creature->GetCreatureGroup()) // Should not happen
@@ -1003,7 +1003,7 @@ struct SwarmguardNeedlerAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         /** Needed for "marking target system" */
         if (!m_creature->GetCreatureGroup()) // Should not happen

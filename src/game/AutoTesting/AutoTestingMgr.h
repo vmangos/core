@@ -99,8 +99,8 @@ public:
     void ApplyUnitFlags(uint32 num, uint32 flags);
     void DoPlayerCast(uint32 playerIdx, uint32 targetIdx, uint32 spellId);
 
-    void Fail(const char* err, ...) ATTR_PRINTF(2,3);
-    void Finish(bool success = true, const char* errMsg = nullptr);
+    void Fail(char const* err, ...) ATTR_PRINTF(2,3);
+    void Finish(bool success = true, char const* errMsg = nullptr);
     bool Finished() const { return _finished; }
     void Wait(uint32 ms) { _timer = ms; }
     void WaitPlayerSummon() { _timer = 1000; }

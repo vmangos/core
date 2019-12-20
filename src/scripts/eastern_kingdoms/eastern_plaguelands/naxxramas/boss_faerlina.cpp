@@ -47,8 +47,8 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 ^ Around 7-10sec cooldown. Times she's not casting it for 30+sec she is silenced by worshipper sacrifice.
   Might be fixed 8sec cast, but slightly delayed sometimes due to rain of fire or other reasons.
 */
-static const uint32 POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
-static const uint32 INITIAL_POISONBOLT_VOLLEY_CD = 8000;
+static uint32 const POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
+static uint32 const INITIAL_POISONBOLT_VOLLEY_CD = 8000;
 
 /*
 https://www.youtube.com/watch?v=pVjB7pCX3XM
@@ -58,16 +58,16 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 
   Initial cd seems to be around 16sec
 */
-static const uint32 RAINOFFIRE_CD() { return urand(8000, 12000); }
-static const uint32 RAINOFFIRE_INITIAL_CD = 16000;
+static uint32 const RAINOFFIRE_CD() { return urand(8000, 12000); }
+static uint32 const RAINOFFIRE_INITIAL_CD = 16000;
 
-static const float ADD_DESPAWN_TIME = 20000;
-static const float followerPos[2][4] =
+static float const ADD_DESPAWN_TIME = 20000;
+static float const followerPos[2][4] =
 {
     { 3359.75f, -3621.77f, 261.18f, 4.54f },
     {3346.29f, -3619.32f, 261.18f, 4.61f }
 };
-static const float worshipPos[4][4] =
+static float const worshipPos[4][4] =
 {
     {3350.61f, -3619.74f, 261.18f, 4.65f},
     {3341.36f, -3619.35f, 261.18f, 4.68f},
@@ -102,7 +102,7 @@ struct boss_faerlinaAI : public ScriptedAI
         m_uiEnrageTimer             = 60000;
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override 
+    void SpellHit(Unit* pWho, SpellEntry const* pSpell) override 
     {
         /*
         note from wowhead:
@@ -238,7 +238,7 @@ struct boss_faerlinaAI : public ScriptedAI
             m_pInstance->SetData(TYPE_FAERLINA, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -336,7 +336,7 @@ struct mob_faerlina_rp : public ScriptedAI
         return creatures;
     }
     
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         events.Update(diff);
         while (uint32 eventId = events.ExecuteEvent())

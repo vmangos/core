@@ -84,7 +84,7 @@ struct boss_emperor_dagran_thaurissanAI : public ScriptedAI
         DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -188,7 +188,7 @@ struct boss_moira_bronzebeardAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

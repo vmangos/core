@@ -613,7 +613,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (BeginQuete == false || CleanerSpawn == true)
             return;
@@ -703,7 +703,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
     }
 };
 
-bool QuestAccept_npc_eris_havenfire(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_eris_havenfire(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (!pPlayer || !pCreature || !pQuest)
         return true;
@@ -763,7 +763,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
             damage = urand(80, 105);
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_TIR_FLECHE)
         {
@@ -812,7 +812,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (DeplacementRequis == true)
         {
@@ -925,7 +925,7 @@ struct npc_demetriaAI : public ScriptedAI
     uint32 Resurrect_Timer;
     uint8  PsychicScream_HealthCheck;
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (Resurrect_Timer < diff)
         {
@@ -1337,7 +1337,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!_initialized)
         {
@@ -1742,7 +1742,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (EventTimer && EventTimer <= uiDiff)
         {

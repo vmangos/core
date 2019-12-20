@@ -228,7 +228,7 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-void instance_gnomeregan::Load(const char* chrIn)
+void instance_gnomeregan::Load(char const* chrIn)
 {
     if (!chrIn)
     {

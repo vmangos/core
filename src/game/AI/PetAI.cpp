@@ -33,7 +33,7 @@
 #include "Group.h"
 #include "SpellAuras.h"
 
-int PetAI::Permissible(const Creature *creature)
+int PetAI::Permissible(Creature const* creature)
 {
     if (creature->IsPet())
         return PERMIT_BASE_SPECIAL;
@@ -41,7 +41,7 @@ int PetAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-PetAI::PetAI(Creature *c) : CreatureAI(c)
+PetAI::PetAI(Creature* c) : CreatureAI(c)
 {
     UpdateAllies();
     // Warlock imp has no melee attack
@@ -86,7 +86,7 @@ void PetAI::_stopAttack()
     HandleReturnMovement();
 }
 
-void PetAI::UpdateAI(const uint32 diff)
+void PetAI::UpdateAI(uint32 const diff)
 {
     if (!m_creature->IsAlive() || !m_creature->GetCharmInfo())
         return;
@@ -186,7 +186,7 @@ void PetAI::UpdateAI(const uint32 diff)
             if (!spellID)
                 continue;
 
-            SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellID);
+            SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellID);
             if (!spellInfo)
                 continue;
 
@@ -233,7 +233,7 @@ void PetAI::UpdateAI(const uint32 diff)
                         continue;
                 }
 
-                Spell *spell = new Spell(m_creature, spellInfo, false);
+                Spell* spell = new Spell(m_creature, spellInfo, false);
                 bool spellUsed = false;
 
                 // Some spells can target enemy or friendly (DK Ghoul's Leap)
@@ -277,7 +277,7 @@ void PetAI::UpdateAI(const uint32 diff)
             }
             else if (m_creature->GetVictim() && CanAttack(m_creature->GetVictim()) && !spellInfo->IsNonCombatSpell())
             {
-                Spell *spell = new Spell(m_creature, spellInfo, false);
+                Spell* spell = new Spell(m_creature, spellInfo, false);
                 if (spell->CanAutoCast(m_creature->GetVictim()))
                     targetSpellStore.push_back(std::make_pair(m_creature->GetVictim(), spell));
                 else
@@ -334,7 +334,7 @@ void PetAI::UpdateAI(const uint32 diff)
 void PetAI::UpdateAllies()
 {
     Unit* owner = m_creature->GetCharmerOrOwner();
-    Group *group = nullptr;
+    Group* group = nullptr;
 
     m_updateAlliesTimer = 10 * IN_MILLISECONDS;              //update friendly targets every 10 seconds, lesser checks increase performance
 
@@ -355,7 +355,7 @@ void PetAI::UpdateAllies()
     m_AllySet.insert(m_creature->GetObjectGuid());
     if (group)                                             //add group
     {
-        for (GroupReference *itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             Player* target = itr->getSource();
             if (!target || !group->SameSubGroup((Player*)owner, target))

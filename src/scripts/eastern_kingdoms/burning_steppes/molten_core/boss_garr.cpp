@@ -130,7 +130,7 @@ struct boss_garrAI : ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -228,7 +228,7 @@ struct mob_fireswornAI : ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell) override
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_ERUPTION_TRIGGER)
         {
@@ -241,7 +241,7 @@ struct mob_fireswornAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

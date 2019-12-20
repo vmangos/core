@@ -26,7 +26,7 @@
 #include "ObjectMgr.h"
 #include <numeric>
 
-const int32 ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};
+int32 const ReputationMgr::PointsInRank[MAX_REPUTATION_RANK] = {36000, 3000, 3000, 3000, 6000, 12000, 21000, 1000};
 
 ReputationRank ReputationMgr::ReputationToRank(int32 standing)
 {
@@ -47,7 +47,7 @@ int32 ReputationMgr::GetRepPointsToRank(ReputationRank rank)
 
 int32 ReputationMgr::GetReputation(uint32 faction_id) const
 {
-    FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(faction_id);
+    FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(faction_id);
 
     if (!factionEntry)
     {
@@ -210,7 +210,7 @@ void ReputationMgr::Initialize()
 
     for (auto const& itr : sObjectMgr.GetFactionMap())
     {
-        FactionEntry const *factionEntry = &itr.second;
+        FactionEntry const* factionEntry = &itr.second;
 
         if (factionEntry && (factionEntry->reputationListID >= 0))
         {
@@ -231,7 +231,7 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
 {
     bool res = false;
     // if spillover definition exists in DB
-    if (const RepSpilloverTemplate *repTemplate = sObjectMgr.GetRepSpilloverTemplate(factionEntry->ID))
+    if (RepSpilloverTemplate const* repTemplate = sObjectMgr.GetRepSpilloverTemplate(factionEntry->ID))
     {
         for (uint32 i = 0; i < MAX_SPILLOVER_FACTIONS; ++i)
         {
@@ -293,11 +293,11 @@ void ReputationMgr::SetVisible(FactionTemplateEntry const*factionTemplateEntry)
     if (!factionTemplateEntry->faction)
         return;
 
-    if (FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(factionTemplateEntry->faction))
+    if (FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(factionTemplateEntry->faction))
         SetVisible(factionEntry);
 }
 
-void ReputationMgr::SetVisible(FactionEntry const *factionEntry)
+void ReputationMgr::SetVisible(FactionEntry const* factionEntry)
 {
     if (factionEntry->reputationListID < 0)
         return;
@@ -388,20 +388,20 @@ void ReputationMgr::SetInactive(FactionState* faction, bool inactive)
     faction->needSave = true;
 }
 
-void ReputationMgr::LoadFromDB(QueryResult *result)
+void ReputationMgr::LoadFromDB(QueryResult* result)
 {
     // Set initial reputations (so everything is nifty before DB data load)
     Initialize();
 
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT faction,standing,flags FROM character_reputation WHERE guid = '%u'",GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT faction,standing,flags FROM character_reputation WHERE guid = '%u'",GetGUIDLow());
 
     if (result)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
-            FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(fields[0].GetUInt32());
+            FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(fields[0].GetUInt32());
             if (factionEntry && (factionEntry->reputationListID >= 0))
             {
                 FactionState* faction = &m_factions[factionEntry->reputationListID];

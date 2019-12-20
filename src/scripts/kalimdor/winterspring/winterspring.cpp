@@ -288,7 +288,7 @@ struct npc_artoriusAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
     
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == 13555 || pSpell->Id == 25295)             // Serpent Sting (Rank 8 or Rank 9)
         {
@@ -297,7 +297,7 @@ struct npc_artoriusAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         /** Artorius the Amiable */
         if (m_bTransform)
@@ -684,7 +684,7 @@ struct npc_ranshallaAI : public npc_escortAI
     }
 
 // pretresses sont pop pile 2MIN
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -810,13 +810,13 @@ struct npc_ranshallaAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_ranshalla(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_ranshalla(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == 4901)  //QUEST_GUARDIANS_OF_THE_ALTAR
     {
         if (npc_ranshallaAI* pEscortAI = dynamic_cast<npc_ranshallaAI*>(pCreature->AI()))
         {
-            //void npc_escortAI::Start(bool bIsActiveAttacker, bool bRun, uint64 uiPlayerGUID, const Quest* pQuest, bool bInstantRespawn, bool bCanLoopPath)
+            //void npc_escortAI::Start(bool bIsActiveAttacker, bool bRun, uint64 uiPlayerGUID, Quest const* pQuest, bool bInstantRespawn, bool bCanLoopPath)
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
         }
     }
@@ -894,7 +894,7 @@ struct npc_umi_yetiAI : public ScriptedAI
     {
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_UNSUMMON_YETI)
         {
@@ -903,7 +903,7 @@ struct npc_umi_yetiAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
     }
 };

@@ -96,7 +96,7 @@ struct creature_spawn_fankrissAI : public ScriptedAI
         enrageTimer = 10000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
             return;
@@ -164,7 +164,7 @@ struct creature_vekniss_hatchlingAI : public ScriptedAI
             ScriptedAI::Aggro(u);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (engageTimer <= diff && !hasEngaged)
         {
@@ -351,7 +351,7 @@ struct boss_fankrissAI : public ScriptedAI
         }
     }
 
-    void HandleHatchlings(const uint32 uiDiff)
+    void HandleHatchlings(uint32 const uiDiff)
     {
         bool reInitWebTimers = true;
         for (size_t i = 0; i < 3; i++)
@@ -379,7 +379,7 @@ struct boss_fankrissAI : public ScriptedAI
 #ifdef ALWAYS_HATCHLINGS_IN_3_LOCATIONS
                 for (size_t x = 0; x < 3; x++)
                 {
-                    const SpawnLocation& sLoc = entangleSpells[x].second;
+                    SpawnLocation const& sLoc = entangleSpells[x].second;
                     size_t spawnAmount = GetHatchlingSpawnAmount();
                     for (size_t s = 0; s < spawnAmount; s++)
                     {
@@ -387,7 +387,7 @@ struct boss_fankrissAI : public ScriptedAI
                     }
                 }
 #else
-                const SpawnLocation& sLoc = entangleSpells[i].second;
+                SpawnLocation const& sLoc = entangleSpells[i].second;
                 size_t spawnAmount = GetHatchlingSpawnAmount();
                 for (size_t s = 0; s < spawnAmount; s++)
                 {
@@ -410,7 +410,7 @@ struct boss_fankrissAI : public ScriptedAI
         }
     }
 
-    void SummonWorm(const SpawnLocation& loc, uint32 enrageTimer)
+    void SummonWorm(SpawnLocation const& loc, uint32 enrageTimer)
     {
         if (Creature* pC = m_creature->SummonCreature(NPC_SPAWN_FANKRISS, loc.m_fX, loc.m_fY, loc.m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000))
         {
@@ -423,7 +423,7 @@ struct boss_fankrissAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->IsInCombat()) {
             Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();

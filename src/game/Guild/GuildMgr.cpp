@@ -106,7 +106,7 @@ void GuildMgr::LoadGuilds()
     uint32 count = 0;
 
     //                                                    0             1          2          3           4           5           6
-    QueryResult *result = CharacterDatabase.Query("SELECT guild.guildid,guild.name,leaderguid,EmblemStyle,EmblemColor,BorderStyle,BorderColor,"
+    QueryResult* result = CharacterDatabase.Query("SELECT guild.guildid,guild.name,leaderguid,EmblemStyle,EmblemColor,BorderStyle,BorderColor,"
                           //   7               8    9    10
                           "BackgroundColor,info,motd,createdate FROM guild ORDER BY guildid ASC");
 
@@ -123,11 +123,11 @@ void GuildMgr::LoadGuilds()
 
     // load guild ranks
     //                                                                0       1   2     3
-    QueryResult *guildRanksResult   = CharacterDatabase.Query("SELECT guildid,rid,rname,rights FROM guild_rank ORDER BY guildid ASC, rid ASC");
+    QueryResult* guildRanksResult   = CharacterDatabase.Query("SELECT guildid,rid,rname,rights FROM guild_rank ORDER BY guildid ASC, rid ASC");
 
     // load guild members
     //                                                                0       1                 2    3     4
-    QueryResult *guildMembersResult = CharacterDatabase.Query("SELECT guildid,guild_member.guid,rank,pnote,offnote,"
+    QueryResult* guildMembersResult = CharacterDatabase.Query("SELECT guildid,guild_member.guid,rank,pnote,offnote,"
                                       //   5                6                 7                 8                9                       10
                                       "characters.name, characters.level, characters.class, characters.zone, characters.logout_time, characters.account "
                                       "FROM guild_member LEFT JOIN characters ON characters.guid = guild_member.guid ORDER BY guildid ASC");
@@ -136,7 +136,7 @@ void GuildMgr::LoadGuilds()
 
     do
     {
-        //Field *fields = result->Fetch();
+        //Field* fields = result->Fetch();
 
         bar.step();
         ++count;
@@ -215,7 +215,7 @@ void GuildMgr::LoadPetitions()
     {
         do
         {
-            Field *fields = petitionSignatures->Fetch();
+            Field* fields = petitionSignatures->Fetch();
 
             ObjectGuid ownerGuid = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
             uint32 petitionId = fields[1].GetUInt32();
@@ -260,7 +260,7 @@ Petition::~Petition()
     m_signatures.clear();
 }
 
-void GuildMgr::CreatePetition(uint32 id, Player* player, const ObjectGuid& charterGuid, std::string& name)
+void GuildMgr::CreatePetition(uint32 id, Player* player, ObjectGuid const& charterGuid, std::string& name)
 {
     Petition* petition = new Petition(id, ObjectGuid(charterGuid), ObjectGuid(player->GetObjectGuid()), name);
     petition->SetTeam(player->GetTeam());
@@ -289,7 +289,7 @@ Petition* GuildMgr::GetPetitionById(uint32 id)
     return nullptr;
 }
 
-Petition* GuildMgr::GetPetitionByCharterGuid(const ObjectGuid& charterGuid)
+Petition* GuildMgr::GetPetitionByCharterGuid(ObjectGuid const& charterGuid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
     for (PetitionMap::iterator iter = m_petitionMap.begin(); iter != m_petitionMap.end(); ++iter)
@@ -302,7 +302,7 @@ Petition* GuildMgr::GetPetitionByCharterGuid(const ObjectGuid& charterGuid)
     return nullptr;
 }
 
-Petition* GuildMgr::GetPetitionByOwnerGuid(const ObjectGuid& ownerGuid)
+Petition* GuildMgr::GetPetitionByOwnerGuid(ObjectGuid const& ownerGuid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
     for (PetitionMap::iterator iter = m_petitionMap.begin(); iter != m_petitionMap.end(); ++iter)
@@ -407,7 +407,7 @@ PetitionSignature* Petition::GetSignatureForAccount(uint32 accountId)
     return nullptr;
 }
 
-PetitionSignature* Petition::GetSignatureForPlayerGuid(const ObjectGuid& guid)
+PetitionSignature* Petition::GetSignatureForPlayerGuid(ObjectGuid const& guid)
 {
     for (auto iter = m_signatures.cbegin(); iter != m_signatures.cend(); ++iter)
     {

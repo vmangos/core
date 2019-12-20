@@ -52,7 +52,7 @@ struct instance_razorfen_downs : public ScriptedInstance
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {

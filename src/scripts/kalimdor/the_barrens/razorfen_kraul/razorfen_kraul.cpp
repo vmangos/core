@@ -53,7 +53,7 @@ enum
     NPC_RAGING_AGAMAR          = 4514
 };
 
-static const float aBoarSpawn[4][3] =
+static float const aBoarSpawn[4][3] =
 {
     {2151.420f, 1733.18f, 52.10f},
     {2144.463f, 1726.89f, 51.93f},
@@ -143,7 +143,7 @@ CreatureAI* GetAI_npc_willix_the_importer(Creature* pCreature)
     return new npc_willix_the_importerAI(pCreature);
 }
 
-bool QuestAccept_npc_willix_the_importer(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_willix_the_importer(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_WILLIX_THE_IMPORTER)
     {
@@ -284,7 +284,7 @@ struct npc_snufflenose_gopherAI : public FollowerAI
         return true;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bIsMovementActive)
             return;
@@ -374,7 +374,7 @@ struct RazorfenDefenderAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

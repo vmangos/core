@@ -253,7 +253,7 @@ enum BG_AV_Graveyards
     BG_AV_GRAVE_MAIN_HORDE         = 610
 };
 
-const uint32 BG_AV_GraveyardIds[9]= {
+uint32 const BG_AV_GraveyardIds[9]= {
     BG_AV_GRAVE_STORM_AID,
     BG_AV_GRAVE_STORM_GRAVE,
     BG_AV_GRAVE_STONE_GRAVE,
@@ -294,13 +294,13 @@ enum BattleGroundAVTeamIndex
 #define BG_AV_TEAMS_COUNT 3
 
 // alliance_control horde_control neutral_control
-const uint32 BG_AV_MineWorldStates[2][BG_AV_TEAMS_COUNT] = {
+uint32 const BG_AV_MineWorldStates[2][BG_AV_TEAMS_COUNT] = {
     {1358, 1359, 1360},
     {1355, 1356, 1357}
 };
 
 // alliance_control alliance_assault h_control h_assault
-const uint32 BG_AV_NodeWorldStates[BG_AV_NODES_MAX][4] = {
+uint32 const BG_AV_NodeWorldStates[BG_AV_NODES_MAX][4] = {
     // Stormpike first aid station
     {1326,1325,1328,1327},
     // Stormpike Graveyard
@@ -425,15 +425,15 @@ class BattleGroundAV : public BattleGround
         void Update(uint32 diff) override;
 
         /* inherited from BattlegroundClass */
-        void AddPlayer(Player *plr) override;
+        void AddPlayer(Player* plr) override;
 
         void StartingEventCloseDoors() override;
         void StartingEventOpenDoors() override;
         // world states
         void FillInitialWorldStates(WorldPacket& data, uint32& count) override;
 
-        void RemovePlayer(Player *plr, ObjectGuid guid) override;
-        void HandleAreaTrigger(Player *Source, uint32 Trigger) override;
+        void RemovePlayer(Player* plr, ObjectGuid guid) override;
+        void HandleAreaTrigger(Player* Source, uint32 Trigger) override;
         void Reset() override;
 
         void ResetTamedEvent(uint32 teamIdx);
@@ -441,13 +441,13 @@ class BattleGroundAV : public BattleGround
 
         /*general stuff*/
         void UpdateScore(BattleGroundTeamIndex teamIdx, int32 points);
-        void UpdatePlayerScore(Player *Source, uint32 type, uint32 value) override;
-        void UpgradeArmor(Object* questGiver, Player *player);
+        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value) override;
+        void UpgradeArmor(Object* questGiver, Player* player);
         uint32 GetActualArmorRessources(uint32 m_faction_id);
         /*handle stuff*/ // these are functions which get called from extern scripts
-        void EventPlayerClickedOnFlag(Player *source, GameObject* target_obj) override;
-        void HandleKillPlayer(Player* player, Player *killer) override;
-        void HandleKillUnit(Creature *creature, Player *killer) override;
+        void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj) override;
+        void HandleKillPlayer(Player* player, Player* killer) override;
+        void HandleKillUnit(Creature* creature, Player* killer) override;
 
         /** Challenge handler : air or ground assault, world boss assault */
         bool   isSnivvle;
@@ -481,12 +481,12 @@ class BattleGroundAV : public BattleGround
         void   initializeChallengeInvocationGoals (void);
         void   setChallengeInvocationCounter (uint32 faction_id, uint32 challenge_type, uint32 effort_done);
 
-        void HandleQuestComplete(Unit* questGiver, uint32 questid, Player *player);
+        void HandleQuestComplete(Unit* questGiver, uint32 questid, Player* player);
         bool PlayerCanDoMineQuest(int32 GOId, Team team);
 
         void EndBattleGround(Team winner) override;
 
-        WorldSafeLocsEntry const* GetClosestGraveYard(Player *plr) override;
+        WorldSafeLocsEntry const* GetClosestGraveYard(Player* plr) override;
 
         static BattleGroundAVTeamIndex GetAVTeamIndexByTeamId(Team team) { return BattleGroundAVTeamIndex(GetTeamIndexByTeamId(team)); }
         void HandleCommand(Player* player, ChatHandler* handler, char* args) override;
@@ -505,8 +505,8 @@ class BattleGroundAV : public BattleGround
         void PopulateMineNode(uint8 mine, BattleGroundAVTeamIndex teamIdx, uint32 oldUpgradeAdvance);
 
         uint32 GetNodeName(BG_AV_Nodes node);
-        const bool IsTower(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : m_Nodes[node].Tower; }
-        const bool IsGrave(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : !m_Nodes[node].Tower; }
+        bool const IsTower(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : m_Nodes[node].Tower; }
+        bool const IsGrave(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : !m_Nodes[node].Tower; }
 
         /*mine*/
         void ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx);

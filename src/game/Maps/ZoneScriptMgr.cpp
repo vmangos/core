@@ -77,7 +77,7 @@ void ZoneScriptMgr::AddZone(uint32 zoneid, ZoneScript *handle)
     m_ZoneScriptsMap[zoneid] = handle;
 }
 
-void ZoneScriptMgr::HandlePlayerEnterZone(Player *plr, uint32 zoneid)
+void ZoneScriptMgr::HandlePlayerEnterZone(Player* plr, uint32 zoneid)
 {
     ZoneScriptsMap::iterator itr = m_ZoneScriptsMap.find(zoneid);
     if (itr == m_ZoneScriptsMap.end())
@@ -90,7 +90,7 @@ void ZoneScriptMgr::HandlePlayerEnterZone(Player *plr, uint32 zoneid)
     DEBUG_LOG("Player %u entered ZoneScript", plr->GetGUIDLow());
 }
 
-void ZoneScriptMgr::HandlePlayerLeaveZone(Player *plr, uint32 zoneid)
+void ZoneScriptMgr::HandlePlayerLeaveZone(Player* plr, uint32 zoneid)
 {
     ZoneScriptsMap::iterator itr = m_ZoneScriptsMap.find(zoneid);
     if (itr == m_ZoneScriptsMap.end())
@@ -127,7 +127,7 @@ void ZoneScriptMgr::Update(uint32 diff)
     }
 }
 
-bool ZoneScriptMgr::HandleCustomSpell(Player *plr, uint32 spellId, GameObject * go)
+bool ZoneScriptMgr::HandleCustomSpell(Player* plr, uint32 spellId, GameObject* go)
 {
     for (ZoneScriptsSet::iterator itr = m_ZoneScriptsSet.begin(); itr != m_ZoneScriptsSet.end(); ++itr)
     {
@@ -146,7 +146,7 @@ ZoneScript * ZoneScriptMgr::GetZoneScript(uint32 zoneId)
         return nullptr;
 }
 
-bool ZoneScriptMgr::HandleOpenGo(Player *plr, uint64 guid)
+bool ZoneScriptMgr::HandleOpenGo(Player* plr, uint64 guid)
 {
     for (ZoneScriptsSet::iterator itr = m_ZoneScriptsSet.begin(); itr != m_ZoneScriptsSet.end(); ++itr)
     {
@@ -156,7 +156,7 @@ bool ZoneScriptMgr::HandleOpenGo(Player *plr, uint64 guid)
     return false;
 }
 
-void ZoneScriptMgr::HandleGossipOption(Player *plr, uint64 guid, uint32 gossipid)
+void ZoneScriptMgr::HandleGossipOption(Player* plr, uint64 guid, uint32 gossipid)
 {
     for (ZoneScriptsSet::iterator itr = m_ZoneScriptsSet.begin(); itr != m_ZoneScriptsSet.end(); ++itr)
     {
@@ -165,7 +165,7 @@ void ZoneScriptMgr::HandleGossipOption(Player *plr, uint64 guid, uint32 gossipid
     }
 }
 
-void ZoneScriptMgr::HandleDropFlag(Player *plr, uint32 spellId)
+void ZoneScriptMgr::HandleDropFlag(Player* plr, uint32 spellId)
 {
     for (ZoneScriptsSet::iterator itr = m_ZoneScriptsSet.begin(); itr != m_ZoneScriptsSet.end(); ++itr)
     {

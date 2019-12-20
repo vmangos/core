@@ -54,7 +54,7 @@ void Handle_NightmareCorruption(/*const*/ Player* player)
     corrupter->MonsterWhisper(message, player);
 }
 
-bool AreaTrigger_at_twilight_grove(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_twilight_grove(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     Handle_NightmareCorruption(pPlayer);
     return false;
@@ -114,7 +114,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -225,7 +225,7 @@ struct npc_watcher_blombergAI : ScriptedAI
         m_uiSayTimer = 3000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bIsEngaged)
         {
@@ -311,7 +311,7 @@ struct npc_commander_felstromAI : ScriptedAI
             m_creature->SetLootRecipient(nullptr);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

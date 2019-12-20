@@ -192,7 +192,7 @@ void SingleTest::DoPlayerCast(uint32 playerIdx, uint32 targetIdx, uint32 spellId
     source->CastSpell(target, spellId, false);
 }
 
-void SingleTest::Fail(const char* err, ...)
+void SingleTest::Fail(char const* err, ...)
 {
     char buffer[256];
     va_list args;
@@ -202,7 +202,7 @@ void SingleTest::Fail(const char* err, ...)
     Finish(false, buffer);
 }
 
-void SingleTest::Finish(bool success, const char* errMsg)
+void SingleTest::Finish(bool success, char const* errMsg)
 {
     _finished = true;
     _failed   = !success;

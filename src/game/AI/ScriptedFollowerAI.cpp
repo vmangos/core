@@ -12,7 +12,7 @@ EndScriptData */
 #include "ScriptedFollowerAI.h"
 #include "Chat.h"
 
-const float MAX_PLAYER_DISTANCE = 100.0f;
+float const MAX_PLAYER_DISTANCE = 100.0f;
 
 enum
 {
@@ -209,7 +209,7 @@ void FollowerAI::EnterEvadeMode()
     Reset();
 }
 
-void FollowerAI::UpdateAI(const uint32 uiDiff)
+void FollowerAI::UpdateAI(uint32 const uiDiff)
 {
     if (HasFollowState(STATE_FOLLOW_INPROGRESS) && !m_creature->GetVictim())
     {
@@ -279,7 +279,7 @@ void FollowerAI::UpdateAI(const uint32 uiDiff)
     UpdateFollowerAI(uiDiff);
 }
 
-void FollowerAI::UpdateFollowerAI(const uint32 uiDiff)
+void FollowerAI::UpdateFollowerAI(uint32 const uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
@@ -318,7 +318,7 @@ void FollowerAI::MovementInform(uint32 uiMotionType, uint32 uiPointId)
     }
 }
 
-void FollowerAI::StartFollow(Player* pLeader, uint32 uiFactionForFollower, const Quest* pQuest, float followDist)
+void FollowerAI::StartFollow(Player* pLeader, uint32 uiFactionForFollower, Quest const* pQuest, float followDist)
 {
     if (m_creature->GetVictim())
     {

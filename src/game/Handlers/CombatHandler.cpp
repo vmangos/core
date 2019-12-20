@@ -27,7 +27,7 @@
 #include "ObjectGuid.h"
 #include "Player.h"
 
-void WorldSession::HandleAttackSwingOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAttackSwingOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     recv_data >> guid;
@@ -37,7 +37,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket & recv_data)
     if (!guid.IsUnit())
         return;
 
-    Unit *pEnemy = _player->GetMap()->GetUnit(guid);
+    Unit* pEnemy = _player->GetMap()->GetUnit(guid);
 
     if (!pEnemy)
     {
@@ -64,7 +64,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket & recv_data)
     _player->Attack(pEnemy, true);
 }
 
-void WorldSession::HandleAttackStopOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleAttackStopOpcode(WorldPacket& /*recv_data*/)
 {
     GetPlayer()->AttackStop();
 
@@ -80,7 +80,7 @@ void WorldSession::HandleAttackStopOpcode(WorldPacket & /*recv_data*/)
     GetPlayer()->ResetExtraAttacks();
 }
 
-void WorldSession::HandleSetSheathedOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSetSheathedOpcode(WorldPacket& recv_data)
 {
     uint32 sheathed;
     recv_data >> sheathed;

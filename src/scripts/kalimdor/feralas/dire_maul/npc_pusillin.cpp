@@ -55,7 +55,7 @@ struct npc_pusillinAI : public ScriptedAI
             (*it)->Attack(pWho,true);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!ME->SelectHostileTarget() || !ME->GetVictim())
             return;

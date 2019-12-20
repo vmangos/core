@@ -7,7 +7,7 @@ ObjectGuid PlayerWrapper<T>::GetObjectGuid() const { return player.GetObjectGuid
 template <typename T>
 Team PlayerWrapper<T>::GetTeam() const { return player.GetTeam(); }
 template <typename T>
-const char* PlayerWrapper<T>::GetName() const { return player.GetName(); }
+char const* PlayerWrapper<T>::GetName() const { return player.GetName(); }
 template <typename T>
 uint32 PlayerWrapper<T>::GetZoneId() const { return player.GetZoneId(); }
 template <typename T>

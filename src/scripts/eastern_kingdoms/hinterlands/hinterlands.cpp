@@ -161,7 +161,7 @@ struct npc_rinjiAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         //Check if we have a current target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -203,7 +203,7 @@ struct npc_rinjiAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_rinji(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_rinji(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_RINJI_TRAPPED)
     {
@@ -239,7 +239,7 @@ struct go_lards_picnic_basketAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {

@@ -357,7 +357,7 @@ typedef std::pair<SkillRaceClassInfoMap::const_iterator,SkillRaceClassInfoMap::c
 
 inline bool IsPrimaryProfessionSkill(uint32 skill)
 {
-    SkillLineEntry const *pSkill = sSkillLineStore.LookupEntry(skill);
+    SkillLineEntry const* pSkill = sSkillLineStore.LookupEntry(skill);
     if (!pSkill)
         return false;
 
@@ -545,12 +545,12 @@ class SpellMgr
             return nullptr;
         }
 
-        float GetSpellThreatMultiplier(SpellEntry const *spellInfo) const
+        float GetSpellThreatMultiplier(SpellEntry const* spellInfo) const
         {
             if (!spellInfo)
                 return 1.0f;
 
-            if (SpellThreatEntry const *entry = GetSpellThreatEntry(spellInfo->Id))
+            if (SpellThreatEntry const* entry = GetSpellThreatEntry(spellInfo->Id))
                 return entry->multiplier;
 
             return 1.0f;
@@ -575,7 +575,7 @@ class SpellMgr
             return itr->second;
         }
 
-        static bool IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellProcEvent, uint32 EventProcFlag, SpellEntry const * procSpell, uint32 procFlags, uint32 procExtra);
+        static bool IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const* spellProcEvent, uint32 EventProcFlag, SpellEntry const* procSpell, uint32 procFlags, uint32 procExtra);
 
         // Spell bonus data
         SpellBonusEntry const* GetSpellBonusData(uint32 spellId) const
@@ -664,7 +664,7 @@ class SpellMgr
             return false;
         }
 
-        bool IsRankSpellDueToSpell(SpellEntry const *spellInfo_1,uint32 spellId_2) const;
+        bool IsRankSpellDueToSpell(SpellEntry const* spellInfo_1,uint32 spellId_2) const;
         bool IsNoStackSpellDueToSpell(uint32 spellId_1, uint32 spellId_2) const;
         
         uint32 GetSpellBookSuccessorSpellId(uint32 spellId)
@@ -727,7 +727,7 @@ class SpellMgr
         }
 
         // Spell correctness for client using
-        static bool IsSpellValid(SpellEntry const * spellInfo, Player* pl = nullptr, bool msg = true);
+        static bool IsSpellValid(SpellEntry const* spellInfo, Player* pl = nullptr, bool msg = true);
 
         SkillLineAbilityMapBounds GetSkillLineAbilityMapBoundsBySpellId(uint32 spellId) const
         {
@@ -753,8 +753,8 @@ class SpellMgr
                 return nullptr;
         }
 
-        SpellCastResult GetSpellAllowedInLocationError(SpellEntry const *spellInfo, Unit const* caster, Player const* player = nullptr);
-        SpellCastResult GetSpellAllowedInLocationError(SpellEntry const *spellInfo, uint32 zone_id, uint32 area_id, Player const* player = nullptr);
+        SpellCastResult GetSpellAllowedInLocationError(SpellEntry const* spellInfo, Unit const* caster, Player const* player = nullptr);
+        SpellCastResult GetSpellAllowedInLocationError(SpellEntry const* spellInfo, uint32 zone_id, uint32 area_id, Player const* player = nullptr);
         uint32 GetRequiredAreaForSpell(uint32 spellId);
 
         SpellAreaMapBounds GetSpellAreaMapBounds(uint32 spell_id) const

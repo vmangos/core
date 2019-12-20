@@ -195,7 +195,7 @@ struct boss_ragnarosAI : ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_ELEMENTAL_FIRE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         // As Majordomo is now killed, the last timer (until attacking) must be handled with Ragnaros script
         if (pSpell->Id == SPELL_ELEMENTAL_FIRE_KILL && pTarget->GetTypeId() == TYPEID_UNIT && pTarget->GetEntry() == NPC_DOMO)
@@ -287,7 +287,7 @@ struct boss_ragnarosAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // After killing Majordomo
         if (m_uiEnterCombatTimer)
@@ -670,13 +670,13 @@ struct boss_flame_of_ragnarosAI : ScriptedAI
         Explode = false;
     }
 
-    void SpellHitTarget(Unit* /*pCaster*/, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* /*pCaster*/, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_INTENSE_HEAT)
             Explode = true;
     }
 
-    void UpdateAI(const uint32 /*diff*/) override
+    void UpdateAI(uint32 const /*diff*/) override
     {
         if (Explode == true)
             m_creature->ForcedDespawn();

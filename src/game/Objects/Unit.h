@@ -360,7 +360,7 @@ typedef std::list< ProcTriggeredData > ProcTriggeredList;
 class MANGOS_DLL_SPEC Unit : public WorldObject
 {
     public:
-        static Unit* GetUnit(WorldObject &obj, uint64 const &Guid);
+        static Unit* GetUnit(WorldObject &obj, uint64 const& Guid);
 
         typedef std::set<Unit*> AttackerSet;
         typedef std::multimap< uint32, SpellAuraHolder*> SpellAuraHolderMap;
@@ -614,7 +614,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void HandleEmoteCommand(uint32 emote_id);
         void HandleEmoteState(uint32 emote_id);
                                                                                // debug.
-        void Debug(uint32 debugType, const char* str, ...) const ATTR_PRINTF(3, 4);
+        void Debug(uint32 debugType, char const* str, ...) const ATTR_PRINTF(3, 4);
         void SetDebugger(ObjectGuid playerGuid, uint32 flags)
         {
             m_debuggerGuid = playerGuid;
@@ -708,7 +708,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
          * @param Level The current level of diminishing returns for the group, decides the new duration
          * @param isReflected Whether the spell was reflected or not, used to determine if we should do any calculations at all.
          */
-        void ApplyDiminishingToDuration(DiminishingGroup  group, int32 &duration, WorldObject const* caster, DiminishingLevels Level, bool isReflected = false);
+        void ApplyDiminishingToDuration(DiminishingGroup  group, int32& duration, WorldObject const* caster, DiminishingLevels Level, bool isReflected = false);
         /**
          * Applies a diminishing return to the given group if apply is true,
          * otherwise lowers the level by one (?)
@@ -867,7 +867,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 SpellDamageBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr) const;
         int32 SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask) const;
         uint32 SpellHealingBonusTaken(WorldObject* pCaster, SpellEntry const* spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr) const;
-        void CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32* absorb, int32* resist, SpellEntry const* spellProto = nullptr, Spell* spell = nullptr);
+        void CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, uint32 const damage, uint32* absorb, int32* resist, SpellEntry const* spellProto = nullptr, Spell* spell = nullptr);
         void CalculateAbsorbResistBlock(WorldObject* pCaster, SpellNonMeleeDamage* damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
         float RollMagicResistanceMultiplierOutcomeAgainst(float resistanceChance, SpellSchoolMask schoolMask, DamageEffectType dmgType, SpellEntry const* spellProto) const;
         bool IsSpellBlocked(WorldObject* pCaster, Unit* pVictim, SpellEntry const* spellProto, WeaponAttackType attackType = BASE_ATTACK) const;
@@ -903,7 +903,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsUnderLastManaUseEffect() const { return m_lastManaUseTimer; }
 
         void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply);
-        void ApplySpellDispelImmunity(const SpellEntry* spellProto, DispelType type, bool apply);
+        void ApplySpellDispelImmunity(SpellEntry const* spellProto, DispelType type, bool apply);
         virtual bool IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf) const;
         virtual bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr) const;
         virtual bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;

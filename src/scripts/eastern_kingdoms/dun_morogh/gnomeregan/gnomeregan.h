@@ -71,8 +71,8 @@ class instance_gnomeregan : public ScriptedInstance
         void DoActivateBombFace(uint8 uiIndex);
         void DoDeactivateBombFace(uint8 uiIndex);
 
-        const char* Save() override { return strInstData.c_str(); }
-        void Load(const char* chrIn) override;
+        char const* Save() override { return strInstData.c_str(); }
+        void Load(char const* chrIn) override;
 
     protected:
         uint32 m_auiEncounter[INSTANCE_GNOMEREGAN_MAX_ENCOUNTER];

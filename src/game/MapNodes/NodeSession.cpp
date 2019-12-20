@@ -74,7 +74,7 @@ bool NodeSession::SafeUpdate(uint32 diff)
 class MasterSessionFilter final : public PacketFilter
 {
     public:
-        MasterSessionFilter(WorldSession * pSession) : PacketFilter(pSession)
+        MasterSessionFilter(WorldSession* pSession) : PacketFilter(pSession)
         {
             m_processLogout = false;
             m_processType = PACKET_PROCESS_MASTER_SAFE;

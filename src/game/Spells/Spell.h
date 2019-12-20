@@ -97,12 +97,12 @@ class SpellCastTargets
         SpellCastTargets();
         ~SpellCastTargets();
 
-        void read(ByteBuffer& data, Unit *caster);
+        void read(ByteBuffer& data, Unit* caster);
         void write(ByteBuffer& data) const;
 
         SpellCastTargetsReader ReadForCaster(Unit* caster) { return SpellCastTargetsReader(*this,caster); }
 
-        SpellCastTargets& operator=(const SpellCastTargets &target)
+        SpellCastTargets& operator=(SpellCastTargets const& target)
         {
             m_unitTarget = target.m_unitTarget;
             m_itemTarget = target.m_itemTarget;
@@ -131,16 +131,16 @@ class SpellCastTargets
         }
 
         ObjectGuid getUnitTargetGuid() const { return m_unitTargetGUID; }
-        Unit *getUnitTarget() const { return m_unitTarget; }
-        void setUnitTarget(Unit *target);
+        Unit* getUnitTarget() const { return m_unitTarget; }
+        void setUnitTarget(Unit* target);
         void setDestination(float x, float y, float z);
         void setSource(float x, float y, float z);
         void getDestination(float& x, float& y, float& z) const { x = m_destX; y = m_destY; z = m_destZ; }
         void getSource(float& x, float& y, float& z) const { x = m_srcX; y = m_srcY, z = m_srcZ; }
 
         ObjectGuid getGOTargetGuid() const { return m_GOTargetGUID; }
-        GameObject *getGOTarget() const { return m_GOTarget; }
-        void setGOTarget(GameObject *target);
+        GameObject* getGOTarget() const { return m_GOTarget; }
+        void setGOTarget(GameObject* target);
 
         ObjectGuid getCorpseTargetGuid() const { return m_CorpseTargetGUID; }
         void setCorpseTarget(Corpse* corpse);
@@ -170,8 +170,8 @@ class SpellCastTargets
         uint16 m_targetMask;
     private:
         // objects (can be used at spell creating and after Update at casting
-        Unit *m_unitTarget;
-        GameObject *m_GOTarget;
+        Unit* m_unitTarget;
+        GameObject* m_GOTarget;
         Item *m_itemTarget;
 
         // object GUID/etc, can be used always
@@ -323,8 +323,8 @@ class Spell
         void EffectNostalrius(SpellEffectIndex eff_idx);
         void HandleAddTargetTriggerAuras();
 
-        Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, Unit* victim = nullptr, SpellEntry const* triggeredByParent = nullptr);
-        Spell(GameObject* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, Unit* victim = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        Spell(Unit* caster, SpellEntry const* info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, Unit* victim = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        Spell(GameObject* caster, SpellEntry const* info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, Unit* victim = nullptr, SpellEntry const* triggeredByParent = nullptr);
         ~Spell();
 
         SpellCastResult prepare(SpellCastTargets targets, Aura* triggeredByAura = nullptr, uint32 chance = 0);
@@ -396,7 +396,7 @@ class Spell
         void SendChannelStart(uint32 duration);
         void SendResurrectRequest(Player* target);
 
-        void HandleEffects(Unit *pUnitTarget,Item *pItemTarget,GameObject *pGOTarget,SpellEffectIndex i, float DamageMultiplier = 1.0);
+        void HandleEffects(Unit* pUnitTarget,Item *pItemTarget,GameObject* pGOTarget,SpellEffectIndex i, float DamageMultiplier = 1.0);
         void HandleThreatSpells();
         //void HandleAddAura(Unit* Target);
 
@@ -474,8 +474,8 @@ class Spell
         }
         void RemoveStealthAuras();
 
-        void AddChanneledAuraHolder(SpellAuraHolder *holder);
-        void RemoveChanneledAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode);
+        void AddChanneledAuraHolder(SpellAuraHolder* holder);
+        void RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode);
 
         void Delete() const;
 
@@ -535,7 +535,7 @@ class Spell
         bool m_immediateHandled = false;                    // were immediate actions handled? (used by delayed spells only)
 
         // Channeled spells system
-        typedef std::list<SpellAuraHolder *> SpellAuraHolderList;
+        typedef std::list<SpellAuraHolder*> SpellAuraHolderList;
         SpellAuraHolderList m_channeledHolders;             // aura holders of spell on targets for channeled spells. process in sync with spell
         SpellAuraHolderList::iterator m_channeledUpdateIterator; // maintain an iterator to the current update element so we can handle removal of multiple auras
 
@@ -638,7 +638,7 @@ class Spell
         void HandleDelayedSpellLaunch(TargetInfo *target);
         void InitializeDamageMultipliers();
         void ResetEffectDamageAndHeal();
-        void DoSpellHitOnUnit(Unit *unit, uint32 effectMask);
+        void DoSpellHitOnUnit(Unit* unit, uint32 effectMask);
         void DoAllEffectOnTarget(GOTargetInfo *target);
         void DoAllEffectOnTarget(ItemTargetInfo *target);
         bool HasValidUnitPresentInTargetList();
@@ -744,24 +744,24 @@ namespace MaNGOS
     {
         Spell::UnitList &i_data;
         Spell &i_spell;
-        const uint32& i_index;
+        uint32 const& i_index;
         float i_radius;
         WorldObject* i_originalCaster;
 
-        SpellNotifierPlayer(Spell &spell, Spell::UnitList &data, const uint32 &i, float radius)
+        SpellNotifierPlayer(Spell &spell, Spell::UnitList &data, uint32 const& i, float radius)
             : i_data(data), i_spell(spell), i_index(i), i_radius(radius)
         {
             i_originalCaster = i_spell.GetAffectiveCasterObject();
         }
 
-        void Visit(PlayerMapType &m)
+        void Visit(PlayerMapType& m)
         {
             if (!i_originalCaster)
                 return;
 
             for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
             {
-                Player * pPlayer = itr->getSource();
+                Player* pPlayer = itr->getSource();
                 if (!pPlayer->IsAlive() || pPlayer->IsTaxiFlying())
                     continue;
 
@@ -772,7 +772,7 @@ namespace MaNGOS
                     i_data.push_back(pPlayer);
             }
         }
-        template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
+        template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
     };
 }
 

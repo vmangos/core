@@ -47,7 +47,7 @@ bool ChatHandler::HandleGUIDCommand(char* /*args*/)
 
 bool ChatHandler::HandleGPSCommand(char* args)
 {
-    WorldObject *obj = nullptr;
+    WorldObject* obj = nullptr;
     if (*args)
     {
         if (ObjectGuid guid = ExtractGuidFromLink(&args))
@@ -90,7 +90,7 @@ bool ChatHandler::HandleGPSCommand(char* args)
         zone_y = 0;
     }
 
-    Map const *map = obj->GetMap();
+    Map const* map = obj->GetMap();
     float ground_z = map->GetHeight(obj->GetPositionX(), obj->GetPositionY(), MAX_HEIGHT);
     float floor_z = map->GetHeight(obj->GetPositionX(), obj->GetPositionY(), obj->GetPositionZ());
 
@@ -254,7 +254,7 @@ bool ChatHandler::HandleUnfreezeCommand(char* args)
 
 bool ChatHandler::HandlePossessCommand(char *args)
 {
-    Unit *tar = GetSelectedUnit();
+    Unit* tar = GetSelectedUnit();
     if (!tar)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -344,7 +344,7 @@ bool ChatHandler::HandleAuraCommand(char* args)
 
 bool ChatHandler::HandleUnAuraCommand(char* args)
 {
-    Unit *target = GetSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -371,7 +371,7 @@ bool ChatHandler::HandleUnAuraCommand(char* args)
 
 bool ChatHandler::HandleListAurasCommand(char* /*args*/)
 {
-    Unit *unit = GetSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     if (!unit)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -388,12 +388,12 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
     {
         bool talent = GetTalentSpellCost(itr->second->GetId()) > 0;
 
-        SpellAuraHolder *holder = itr->second;
+        SpellAuraHolder* holder = itr->second;
         char const* name = holder->GetSpellProto()->SpellName[GetSessionDbcLocale()].c_str();
 
         for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {
-            Aura *aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
+            Aura* aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
             if (!aur)
                 continue;
 
@@ -1271,7 +1271,7 @@ bool ChatHandler::HandleModifyBrCommand(char *args)
 
 bool ChatHandler::HandleDeMorphCommand(char* /*args*/)
 {
-    Unit *target = GetSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
         target = m_session->GetPlayer();
     // check online security
@@ -1290,7 +1290,7 @@ bool ChatHandler::HandleModifyMorphCommand(char* args)
 
     uint16 display_id = (uint16)atoi(args);
 
-    Unit *target = GetSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
         target = m_session->GetPlayer();
 
@@ -1406,7 +1406,7 @@ bool ChatHandler::HandleModifyASpeedCommand(char* args)
         return false;
     }
 
-    Unit *chr = GetSelectedUnit();
+    Unit* chr = GetSelectedUnit();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1444,7 +1444,7 @@ bool ChatHandler::HandleModifyScaleCommand(char* args)
         return false;
     }
 
-    Unit *target = GetSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (target == nullptr)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1489,7 +1489,7 @@ bool ChatHandler::HandleModifyHPCommand(char* args)
         return false;
     }
 
-    Unit *chr = GetSelectedUnit();
+    Unit* chr = GetSelectedUnit();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1531,7 +1531,7 @@ bool ChatHandler::HandleModifyManaCommand(char* args)
         return false;
     }
 
-    Unit *chr = GetSelectedUnit();
+    Unit* chr = GetSelectedUnit();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1555,7 +1555,7 @@ bool ChatHandler::HandleModifyManaCommand(char* args)
 
 bool ChatHandler::HandleReplenishCommand(char* args)
 {
-    Unit *pUnit = GetSelectedUnit();
+    Unit* pUnit = GetSelectedUnit();
     if (!pUnit || !pUnit->IsAlive())
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1626,9 +1626,9 @@ bool ChatHandler::HandleDamageCommand(char* args)
 
         target->CalculateDamageAbsorbAndResist(m_session->GetPlayer(), schoolmask, SPELL_DIRECT_DAMAGE, damage, &absorb, &resist, nullptr);
 
-        const uint32 bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
+        uint32 const bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
         damage += bonus;
-        const uint32 malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
+        uint32 const malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
 
         if (damage <= malus)
             return true;
@@ -1877,9 +1877,9 @@ bool ChatHandler::HandleFearCommand(char* /*args*/)
         return false;
     }
 
-    const uint32 fearID = 26641;
+    uint32 const fearID = 26641;
 
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(fearID);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(fearID);
     if (!spellInfo)
         return false;
 
@@ -1891,7 +1891,7 @@ bool ChatHandler::HandleFearCommand(char* /*args*/)
         return false;
     }
 
-    SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer(), m_session->GetPlayer());
+    SpellAuraHolder* holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer(), m_session->GetPlayer());
 
     for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
@@ -1902,7 +1902,7 @@ bool ChatHandler::HandleFearCommand(char* /*args*/)
             eff == SPELL_EFFECT_APPLY_AURA ||
             eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
         {
-            Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), nullptr, holder, target);
+            Aura* aur = CreateAura(spellInfo, SpellEffectIndex(i), nullptr, holder, target);
             holder->AddAura(aur, SpellEffectIndex(i));
         }
     }

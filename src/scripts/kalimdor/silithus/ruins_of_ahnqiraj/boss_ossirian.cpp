@@ -48,7 +48,7 @@ enum
     SPELL_SANDSTORM             =  25160
 };
 
-const std::array<uint32, 5> SpellWeakness =
+std::array<uint32, 5> const SpellWeakness =
 {
     25177u, //Fire weakness
     25178u, //Frost weakness
@@ -57,7 +57,7 @@ const std::array<uint32, 5> SpellWeakness =
     25181u  //Arcane weakness
 };
 
-const std::array<SpawnLocations, 2> TornadoSpawn =
+std::array<SpawnLocations, 2> const TornadoSpawn =
 {{
     { -9444.0f, 1857.0f, 85.55f },
     { -9352.0f, 2012.0f, 85.55f }
@@ -133,7 +133,7 @@ struct boss_ossirianAI : public ScriptedAI
         m_pInstance->SetData(TYPE_OSSIRIAN, FAIL);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_ENVELOPING_WINDS)
         {
@@ -143,7 +143,7 @@ struct boss_ossirianAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pUnit, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override
     {
         for (int i = 0; i < SpellWeakness.size(); ++i)
         {
@@ -221,7 +221,7 @@ struct boss_ossirianAI : public ScriptedAI
             DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -309,7 +309,7 @@ struct generic_random_moveAI : public ScriptedAI
         SetCombatMovement(false);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiTimer < uiDiff)
         {

@@ -55,13 +55,13 @@ public:
         m_uiWarstompTimer = 0;
     }
 
-    void SpellHitTarget(Unit* /*pTarget*/, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* /*pTarget*/, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_CHARGE)
             m_uiWarstompTimer = 500;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

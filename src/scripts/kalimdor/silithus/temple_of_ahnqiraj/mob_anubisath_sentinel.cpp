@@ -259,7 +259,7 @@ struct aqsentinelAI : public ScriptedAI
     }
 
     // Threat reduction for Knock Away
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if ((pSpell->Id == SPELL_KNOCK) && pTarget->GetTypeId() == TYPEID_PLAYER)
         {
@@ -305,7 +305,7 @@ struct aqsentinelAI : public ScriptedAI
             DoScriptText(EMOTE_TRANSFER, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

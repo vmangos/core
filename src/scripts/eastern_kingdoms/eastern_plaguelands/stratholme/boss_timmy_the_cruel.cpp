@@ -44,7 +44,7 @@ struct boss_timmy_the_cruelAI : public ScriptedAI
         m_uiRavenousClawTimer = 7000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -119,7 +119,7 @@ struct npc_crimson_guardsmanAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

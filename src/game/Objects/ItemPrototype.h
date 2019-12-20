@@ -369,7 +369,7 @@ enum ItemSubclassJunk
 
 #define MAX_ITEM_SUBCLASS_JUNK                    1
 
-const uint32 MaxItemSubclassValues[MAX_ITEM_CLASS] =
+uint32 const MaxItemSubclassValues[MAX_ITEM_CLASS] =
 {
     MAX_ITEM_SUBCLASS_CONSUMABLE,
     MAX_ITEM_SUBCLASS_CONTAINER,

@@ -55,7 +55,7 @@ public:
         }
         for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
         {
-            SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
+            SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(id);
             if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->GetLevel())
                 player->LearnSpell(id, false);
         }
@@ -147,7 +147,7 @@ public:
         std::set<uint32> items[EQUIPMENT_SLOT_END];
         for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
         {
-            ItemPrototype const *pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
+            ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
             if (!pProto)
                 continue;
             uint8 slot = player->FindEquipSlot(pProto, NULL_SLOT, true);
@@ -354,7 +354,7 @@ enum
 class cinematics_generic_charge : public SingleCinematicTest
 {
 public:
-    cinematics_generic_charge(const char* scriptname, uint32 map, uint32 faction, uint16 minlvl, uint16 maxlvl) : SingleCinematicTest(scriptname, map), faction(faction), minlevel(minlvl), maxlevel(maxlvl), spawnOrientation(0.0f)
+    cinematics_generic_charge(char const* scriptname, uint32 map, uint32 faction, uint16 minlvl, uint16 maxlvl) : SingleCinematicTest(scriptname, map), faction(faction), minlevel(minlvl), maxlevel(maxlvl), spawnOrientation(0.0f)
     {
     }
 
@@ -532,7 +532,7 @@ enum
 class cinematics_tarren_mills_fights : public SingleCinematicTest
 {
 public:
-    cinematics_tarren_mills_fights(const char* sname = "cinematics_tarren_mills_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(60000)
+    cinematics_tarren_mills_fights(char const* sname = "cinematics_tarren_mills_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(60000)
     {
     }
 
@@ -618,7 +618,7 @@ enum
 class cinematics_coldridge_valley_fights : public SingleCinematicTest
 {
 public:
-    cinematics_coldridge_valley_fights(const char* sname = "cinematics_coldridge_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
+    cinematics_coldridge_valley_fights(char const* sname = "cinematics_coldridge_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
     {
     }
 
@@ -668,7 +668,7 @@ public:
                 target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->GetAttackers();
+                    std::set<Unit*> const attackers = p->GetAttackers();
                     if (attackers.size() > 0)
                         target = *attackers.begin();
                 }
@@ -787,7 +787,7 @@ public:
 class cinematics_northshire_valley_fights : public SingleCinematicTest
 {
 public:
-    cinematics_northshire_valley_fights(const char* sname = "cinematics_northshire_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
+    cinematics_northshire_valley_fights(char const* sname = "cinematics_northshire_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
     {
     }
 
@@ -837,7 +837,7 @@ public:
                 target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->GetAttackers();
+                    std::set<Unit*> const attackers = p->GetAttackers();
                     if (attackers.size() > 0)
                         target = *attackers.begin();
                 }
@@ -907,7 +907,7 @@ enum
 class cinematics_caverns_of_time_spirit_healers : public SingleTest
 {
 public:
-    explicit cinematics_caverns_of_time_spirit_healers(const char* name = "cinematics_caverns_of_time_spirit_healers") : SingleTest(name, 1, false)
+    explicit cinematics_caverns_of_time_spirit_healers(char const* name = "cinematics_caverns_of_time_spirit_healers") : SingleTest(name, 1, false)
     {
         
     }
@@ -999,7 +999,7 @@ enum
 class cinematics_crossroads_crowd : public SingleCinematicTest
 {
 public:
-    cinematics_crossroads_crowd(const char* sname = "cinematics_crossroads_crowd") : SingleCinematicTest(sname, 1), summonIndex(0), stayOnlineTimer(60000)
+    cinematics_crossroads_crowd(char const* sname = "cinematics_crossroads_crowd") : SingleCinematicTest(sname, 1), summonIndex(0), stayOnlineTimer(60000)
     {
     }
 
@@ -1256,7 +1256,7 @@ public:
 class cinematics_theramore_crowd : public SingleCinematicTest
 {
 public:
-    cinematics_theramore_crowd(const char* sname = "cinematics_theramore_crowd") : SingleCinematicTest(sname, 1), summonIndex(0), stayOnlineTimer(120000)
+    cinematics_theramore_crowd(char const* sname = "cinematics_theramore_crowd") : SingleCinematicTest(sname, 1), summonIndex(0), stayOnlineTimer(120000)
     {
     }
 
@@ -1513,7 +1513,7 @@ public:
 class cinematics_duskwood_battle : public SingleCinematicTest
 {
 public:
-    cinematics_duskwood_battle(const char* sname = "cinematics_duskwood_battle") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
+    cinematics_duskwood_battle(char const* sname = "cinematics_duskwood_battle") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
     {
     }
 
@@ -1568,7 +1568,7 @@ public:
                 target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->GetAttackers();
+                    std::set<Unit*> const attackers = p->GetAttackers();
                     if (attackers.size() > 0)
                         target = *attackers.begin();
                 }

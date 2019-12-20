@@ -157,7 +157,7 @@ enum ItemQualities
 
 #define MAX_ITEM_QUALITY                 7
 
-const uint32 ItemQualityColors[MAX_ITEM_QUALITY] = {
+uint32 const ItemQualityColors[MAX_ITEM_QUALITY] = {
     0xff9d9d9d,        // GREY
     0xffffffff,        // WHITE
     0xff1eff00,        // GREEN

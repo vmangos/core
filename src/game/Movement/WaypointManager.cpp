@@ -42,7 +42,7 @@ bool WaypointBehavior::isEmpty()
     return true;
 }
 
-WaypointBehavior::WaypointBehavior(const WaypointBehavior &b)
+WaypointBehavior::WaypointBehavior(WaypointBehavior const& b)
 {
     emote = b.emote;
     spell = b.spell;
@@ -69,7 +69,7 @@ void WaypointManager::Load()
     // creature_movement
     // /////////////////////////////////////////////////////
 
-    QueryResult *result = WorldDatabase.Query("SELECT `id`, COUNT(`point`) FROM `creature_movement` GROUP BY `id`");
+    QueryResult* result = WorldDatabase.Query("SELECT `id`, COUNT(`point`) FROM `creature_movement` GROUP BY `id`");
 
     if (!result)
     {
@@ -113,7 +113,7 @@ void WaypointManager::Load()
         do
         {
             barRow.step();
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 id           = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
             uint32 script_id    = fields[7].GetUInt32();
@@ -129,7 +129,7 @@ void WaypointManager::Load()
                 movementScriptSet.erase(script_id);
             }
 
-            const CreatureData* cData = sObjectMgr.GetCreatureData(id);
+            CreatureData const* cData = sObjectMgr.GetCreatureData(id);
 
             if (!cData)
             {
@@ -159,7 +159,7 @@ void WaypointManager::Load()
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
             {
-                QueryResult *result1 = WorldDatabase.PQuery("SELECT `id`, `map` FROM `creature` WHERE `guid` = '%u'", id);
+                QueryResult* result1 = WorldDatabase.PQuery("SELECT `id`, `map` FROM `creature` WHERE `guid` = '%u'", id);
                 if (result1)
                     sLog.outErrorDb("Creature (guidlow %d, entry %d) have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
                                     id, result1->Fetch()[0].GetUInt32(), point, node.x, node.y);
@@ -225,8 +225,8 @@ void WaypointManager::Load()
         {
             for (std::set<uint32>::const_iterator itr = creatureNoMoveType.begin(); itr != creatureNoMoveType.end(); ++itr)
             {
-                const CreatureData* cData = sObjectMgr.GetCreatureData(*itr);
-                const CreatureInfo* cInfo = ObjectMgr::GetCreatureTemplate(cData->creature_id[0]);
+                CreatureData const* cData = sObjectMgr.GetCreatureData(*itr);
+                CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(cData->creature_id[0]);
 
                 sLog.outErrorDb("Table creature_movement has waypoint for creature guid %u (entry %u), but MovementType is not WAYPOINT_MOTION_TYPE(2). Creature will not use this path.", *itr, cData->creature_id[0]);
 
@@ -290,7 +290,7 @@ void WaypointManager::Load()
         do
         {
             bar.step();
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             uint32 entry        = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
@@ -307,7 +307,7 @@ void WaypointManager::Load()
                 movementScriptSet.erase(script_id);
             }
 
-            const CreatureInfo* cInfo = ObjectMgr::GetCreatureTemplate(entry);
+            CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(entry);
 
             if (!cInfo)
             {
@@ -441,7 +441,7 @@ void WaypointManager::Load()
         do
         {
             barRow.step();
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 id           = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
             uint32 script_id    = fields[7].GetUInt32();
@@ -547,7 +547,7 @@ void WaypointManager::Load()
 void WaypointManager::Cleanup()
 {
     // check if points need to be renumbered and do it
-    if (QueryResult *result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1"))
     {
         delete result;
         WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement");
@@ -562,7 +562,7 @@ void WaypointManager::Cleanup()
         MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement As T WHERE point <> (SELECT COUNT(*) FROM creature_movement WHERE id = T.id AND point <= T.point) LIMIT 1")));
     }
 
-    if (QueryResult *result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1"))
     {
         delete result;
         WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement_template");
@@ -577,7 +577,7 @@ void WaypointManager::Cleanup()
         MANGOS_ASSERT(!(result = WorldDatabase.Query("SELECT 1 from creature_movement_template As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_template WHERE entry = T.entry AND point <= T.point) LIMIT 1")));
     }
 
-    if (QueryResult *result = WorldDatabase.Query("SELECT 1 from creature_movement_special As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_special WHERE id = T.id AND point <= T.point) LIMIT 1"))
+    if (QueryResult* result = WorldDatabase.Query("SELECT 1 from creature_movement_special As T WHERE point <> (SELECT COUNT(*) FROM creature_movement_special WHERE id = T.id AND point <= T.point) LIMIT 1"))
     {
         delete result;
         WorldDatabase.DirectExecute("CREATE TEMPORARY TABLE temp LIKE creature_movement_special");

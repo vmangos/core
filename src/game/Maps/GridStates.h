@@ -28,35 +28,35 @@ class MANGOS_DLL_DECL GridState
 {
     public:
         virtual ~GridState() {}
-        virtual void Update(Map &, NGridType&, GridInfo &, const uint32 &x, const uint32 &y, const uint32 &t_diff) const = 0;
+        virtual void Update(Map&, NGridType&, GridInfo&, uint32 const& x, uint32 const& y, uint32 const& t_diff) const = 0;
 };
 
 class MANGOS_DLL_DECL InvalidState : public GridState
 {
     public:
         ~InvalidState() override {}
-        void Update(Map &, NGridType &, GridInfo &, const uint32 &x, const uint32 &y, const uint32 &t_diff) const override;
+        void Update(Map&, NGridType&, GridInfo&, uint32 const& x, uint32 const& y, uint32 const& t_diff) const override;
 };
 
 class MANGOS_DLL_DECL ActiveState : public GridState
 {
     public:
         ~ActiveState() override {}
-        void Update(Map &, NGridType &, GridInfo &, const uint32 &x, const uint32 &y, const uint32 &t_diff) const override;
+        void Update(Map&, NGridType&, GridInfo&, uint32 const& x, uint32 const& y, uint32 const& t_diff) const override;
 };
 
 class MANGOS_DLL_DECL IdleState : public GridState
 {
     public:
         ~IdleState() override {}
-        void Update(Map &, NGridType &, GridInfo &, const uint32 &x, const uint32 &y, const uint32 &t_diff) const override;
+        void Update(Map&, NGridType&, GridInfo&, uint32 const& x, uint32 const& y, uint32 const& t_diff) const override;
 };
 
 class MANGOS_DLL_DECL RemovalState : public GridState
 {
     public:
         ~RemovalState() override {}
-        void Update(Map &, NGridType &, GridInfo &, const uint32 &x, const uint32 &y, const uint32 &t_diff) const override;
+        void Update(Map&, NGridType&, GridInfo&, uint32 const& x, uint32 const& y, uint32 const& t_diff) const override;
 };
 
 #endif

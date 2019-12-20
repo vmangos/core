@@ -20,7 +20,7 @@ class MapSocket: public MangosSocket<NodeSession, MapSocket, NoCrypt>
     protected:
         int OnSocketOpen();
         int ProcessIncoming (WorldPacket* new_pct);
-        int iSendPacket (const WorldPacket& pct);
+        int iSendPacket (WorldPacket const& pct);
 };
 
 #endif // MAPSOCKET_H

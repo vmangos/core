@@ -71,7 +71,7 @@ struct npc_shenthulAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (CanEmote)
         {
@@ -110,7 +110,7 @@ CreatureAI* GetAI_npc_shenthul(Creature* pCreature)
     return new npc_shenthulAI(pCreature);
 }
 
-bool QuestAccept_npc_shenthul(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_shenthul(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_SHATTERED_SALUTE)
     {

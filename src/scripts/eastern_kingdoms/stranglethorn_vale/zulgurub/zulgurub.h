@@ -57,8 +57,8 @@ class instance_zulgurub : public ScriptedInstance
         void OnCreatureCreate(Creature* pCreature) override;
         void OnCreatureDeath(Creature * pCreature) override;
         void SetData(uint32 uiType, uint32 uiData) override;
-        const char* Save() override;
-        void Load(const char* chrIn) override;
+        char const* Save() override;
+        void Load(char const* chrIn) override;
         void HandleLoadCreature(uint32 dataType, uint64 &storeGuid, Creature* pCrea); // Nostalrius
 
         uint32 GetData(uint32 uiType) override;

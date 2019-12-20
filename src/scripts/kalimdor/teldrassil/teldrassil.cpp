@@ -78,7 +78,7 @@ struct npc_mistAI : public FollowerAI
     }
 
     //call not needed here, no known abilities
-    /*void UpdateFollowerAI(const uint32 uiDiff)
+    /*void UpdateFollowerAI(uint32 const uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -112,7 +112,7 @@ struct npc_sethirAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -126,7 +126,7 @@ CreatureAI* GetAI_npc_sethir(Creature* pCreature)
     return new npc_sethirAI(pCreature);
 }
 
-bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_MIST)
     {
@@ -166,7 +166,7 @@ public:
         m_uiHurricaneTimer = 27000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

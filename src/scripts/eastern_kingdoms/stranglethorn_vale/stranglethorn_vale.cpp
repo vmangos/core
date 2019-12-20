@@ -48,7 +48,7 @@ struct mob_yennikuAI : public ScriptedAI
         m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell) override
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -69,7 +69,7 @@ struct mob_yennikuAI : public ScriptedAI
 
     void Aggro(Unit *who) override {}
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (bReset)
         {
@@ -110,7 +110,7 @@ struct mob_assistant_kryll : public ScriptedAI
     }
 
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (Speach_Timer < diff)
         {
@@ -177,9 +177,9 @@ enum
     SAY_MOLTHOR_3                       = -1000849
 };
 
-static const float heartPosition[4] = { -11818.55f, 1344.4f, 7.93f, 0.0f };
-static const int emitterCount = 5;
-static const float emitterPositions[emitterCount][4] = {
+static float const heartPosition[4] = { -11818.55f, 1344.4f, 7.93f, 0.0f };
+static int const emitterCount = 5;
+static float const emitterPositions[emitterCount][4] = {
     { -11818.55f, 1344.40f,  7.93f, 0.0f }, // Zandalar Isle
     { -11771.92f, 1273.80f,  3.96f, 0.0f },
     { -11881.53f, 1250.42f,  6.72f, 0.0f },
@@ -244,7 +244,7 @@ struct npc_molthorAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (m_uiPhase)
         {
@@ -286,7 +286,7 @@ CreatureAI* GetAI_npc_molthor(Creature *pCreature)
     return new npc_molthorAI(pCreature);
 }
 
-bool QuestComplete_npc_molthor(Player *pPlayer, Creature *pCreature, const Quest *pQuest)
+bool QuestComplete_npc_molthor(Player *pPlayer, Creature *pCreature, Quest const *pQuest)
 {
     npc_molthorAI *molthorAI = dynamic_cast<npc_molthorAI*>(pCreature->AI());
 
@@ -317,8 +317,8 @@ enum
     GO_HEART_OF_HAKKAR_OBJECT                   = 180402
 };
 
-static const int servantCount = 4;
-static const float servantPositions[servantCount][4] = {
+static int const servantCount = 4;
+static float const servantPositions[servantCount][4] = {
     {-11817.5f, 1325.0f, 1.46f, 1.58f},
     {-11831.3f, 1331.3f, 1.84f, 0.75f},
     {-11834.8f, 1349.4f, 2.01f, 6.00f},
@@ -360,7 +360,7 @@ struct npc_heart_of_hakkarAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bInitialized)
         {
@@ -427,7 +427,7 @@ struct npc_servant_of_the_handAI : public ScriptedAI
             m_uiSpawnOutTimer = 0;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiSpawnOutTimer)
         {
@@ -476,7 +476,7 @@ struct npc_pats_hellfire_guyAI : public ScriptedAI
         m_uiCastDelay = 2000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiCastDelay)
         {
@@ -511,7 +511,7 @@ enum
     MAX_WAVE_COUNT                  = 3
 };
 
-const float ApesSummon[4] =
+float const ApesSummon[4] =
 {
     -13773.6231f, -3.8856f, 41.5641f, 5.7f
 };
@@ -592,7 +592,7 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
         m_bResetEvent = false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bStartEvent)
         {
@@ -641,7 +641,7 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
     }
 };
 
-bool QuestRewarded_npc_witch_doctor_unbagwa(Player* /*pPlayer*/, Creature* pCreature, const Quest* pQuest)
+bool QuestRewarded_npc_witch_doctor_unbagwa(Player* /*pPlayer*/, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_STRANHLETHORN_FEVER)
     {

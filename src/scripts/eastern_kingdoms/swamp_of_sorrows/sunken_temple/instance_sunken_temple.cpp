@@ -28,8 +28,8 @@ EndScriptData */
 #include "sunken_temple.h"
 
 // This is also the needed order for activation: S, N, SW, SE, NW, NE
-//static const uint32 m_aAtalaiStatueEvents[MAX_STATUES] = {EVENT_ID_STATUE_1, EVENT_ID_STATUE_2, EVENT_ID_STATUE_3, EVENT_ID_STATUE_4, EVENT_ID_STATUE_5, EVENT_ID_STATUE_6};
-static const uint64 m_aAtalaiStatueEvents[6] = {GO_ATALAI_STATUE_1, GO_ATALAI_STATUE_2, GO_ATALAI_STATUE_3, GO_ATALAI_STATUE_4, GO_ATALAI_STATUE_5, GO_ATALAI_STATUE_6};
+//static uint32 const m_aAtalaiStatueEvents[MAX_STATUES] = {EVENT_ID_STATUE_1, EVENT_ID_STATUE_2, EVENT_ID_STATUE_3, EVENT_ID_STATUE_4, EVENT_ID_STATUE_5, EVENT_ID_STATUE_6};
+static uint64 const m_aAtalaiStatueEvents[6] = {GO_ATALAI_STATUE_1, GO_ATALAI_STATUE_2, GO_ATALAI_STATUE_3, GO_ATALAI_STATUE_4, GO_ATALAI_STATUE_5, GO_ATALAI_STATUE_6};
 
 struct SummonLocations
 {
@@ -662,7 +662,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
@@ -721,7 +721,7 @@ struct instance_sunken_temple : public ScriptedInstance
             RemoveTimer -= uiDiff;
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {

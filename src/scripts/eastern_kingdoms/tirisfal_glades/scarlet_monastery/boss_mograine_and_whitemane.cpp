@@ -198,7 +198,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pWho, SpellEntry const* pSpell) override
     {
         //When hit with ressurection stop fake death and say text
         if (pSpell->Id == SPELL_SCARLETRESURRECTION)
@@ -215,7 +215,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -373,7 +373,7 @@ struct boss_high_inquisitor_whitemaneAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if ((!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) && !m_bStopAttack)
             return;

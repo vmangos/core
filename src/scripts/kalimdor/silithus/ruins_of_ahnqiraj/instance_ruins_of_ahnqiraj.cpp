@@ -505,12 +505,12 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-const char* instance_ruins_of_ahnqiraj::Save()
+char const* instance_ruins_of_ahnqiraj::Save()
 {
     return strInstData.c_str();
 }
 
-void instance_ruins_of_ahnqiraj::Load(const char* chrIn)
+void instance_ruins_of_ahnqiraj::Load(char const* chrIn)
 {
     if (!chrIn)
     {

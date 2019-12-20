@@ -393,12 +393,12 @@ public:
         }
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {

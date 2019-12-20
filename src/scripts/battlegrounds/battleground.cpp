@@ -64,7 +64,7 @@ struct npc_spirit_guideAI : ScriptedAI
         return uiTimerRez;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (uiTimerRez < uiDiff)
         {
@@ -166,7 +166,7 @@ struct npc_etendardAI : NullCreatureAI
     bool m_bSpawned;
     uint32 m_bAutoRepeatSpell;
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bSpawned)
         {

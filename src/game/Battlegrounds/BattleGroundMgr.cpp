@@ -141,7 +141,7 @@ bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 de
 /*********************************************************/
 
 // add group or player (grp == nullptr) to bg queue with the given leader and bg specifications
-GroupQueueInfo * BattleGroundQueue::AddGroup(Player *leader, Group* grp, BattleGroundTypeId BgTypeId, BattleGroundBracketId bracketId, bool isPremade, std::vector<uint32>* excludedMembers)
+GroupQueueInfo * BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleGroundTypeId BgTypeId, BattleGroundBracketId bracketId, bool isPremade, std::vector<uint32>* excludedMembers)
 {
     // create new ginfo
     GroupQueueInfo* ginfo = new GroupQueueInfo;
@@ -168,10 +168,10 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player *leader, Group* grp, BattleG
         //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_Lock);
         if (grp)
         {
-            const uint32 group_limit = sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_GROUP_LIMIT);
-            for (GroupReference *itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
+            uint32 const group_limit = sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_GROUP_LIMIT);
+            for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
             {
-                Player *member = itr->getSource();
+                Player* member = itr->getSource();
                 if (!member)
                     continue;   // this should never happen
                 
@@ -293,7 +293,7 @@ uint32 BattleGroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BattleG
 }
 
 // Ivina <Nostalrius> : log player inscription to bg queue.
-void BattleGroundQueue::LogQueueInscription(Player *plr, BattleGroundTypeId BgTypeId, uint32 uiAction)
+void BattleGroundQueue::LogQueueInscription(Player* plr, BattleGroundTypeId BgTypeId, uint32 uiAction)
 {
     std::string sPName = plr->GetName();
     std::string last_ip = "";
@@ -312,7 +312,7 @@ void BattleGroundQueue::LogQueueInscription(Player *plr, BattleGroundTypeId BgTy
 //remove player from queue and from group info, if group info is empty then remove it too
 void BattleGroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 {
-    //Player *plr = sObjectMgr.GetPlayer(guid);
+    //Player* plr = sObjectMgr.GetPlayer(guid);
     //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_Lock);
 
     int32 bracket_id = -1;                                     // signed for proper for-loop finish
@@ -390,7 +390,7 @@ void BattleGroundQueue::RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount)
 }
 
 //returns true when player pl_guid is in queue and is invited to bgInstanceGuid
-bool BattleGroundQueue::IsPlayerInvited(ObjectGuid pl_guid, const uint32 bgInstanceGuid, const uint32 removeTime)
+bool BattleGroundQueue::IsPlayerInvited(ObjectGuid pl_guid, uint32 const bgInstanceGuid, uint32 const removeTime)
 {
     //ACE_Guard<ACE_Recursive_Thread_Mutex> g(m_Lock);
     QueuedPlayersMap::const_iterator qItr = m_QueuedPlayers.find(pl_guid);
@@ -1043,7 +1043,7 @@ void BattleGroundMgr::BuildPvpLogDataPacket(WorldPacket* data, BattleGround *bg)
 
         *data << ObjectGuid(itr->first);
 
-        Player *plr = ObjectAccessor::FindPlayerNotInWorld(itr->first);
+        Player* plr = ObjectAccessor::FindPlayerNotInWorld(itr->first);
 
         *data << uint32(plr ? plr->GetHonorMgr().GetRank().rank : 4);
         *data << uint32(itr->second->KillingBlows);
@@ -1279,7 +1279,7 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 bgTypeID_ = fields[0].GetUInt32();
 
@@ -1384,7 +1384,7 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid 
     }
 }
 
-void BattleGroundMgr::SendToBattleGround(Player *pl, uint32 instanceId, BattleGroundTypeId bgTypeId)
+void BattleGroundMgr::SendToBattleGround(Player* pl, uint32 instanceId, BattleGroundTypeId bgTypeId)
 {
     BattleGround *bg = GetBattleGround(instanceId, bgTypeId);
     if (bg)
@@ -1469,7 +1469,7 @@ void BattleGroundMgr::LoadBattleMastersEntry()
 {
     mBattleMastersMap.clear();                              // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,bg_template FROM battlemaster_entry");
+    QueryResult* result = WorldDatabase.Query("SELECT entry,bg_template FROM battlemaster_entry");
 
     uint32 count = 0;
 
@@ -1490,7 +1490,7 @@ void BattleGroundMgr::LoadBattleMastersEntry()
         ++count;
         bar.step();
 
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
         uint32 bgTypeId  = fields[1].GetUInt32();
@@ -1558,7 +1558,7 @@ void BattleGroundMgr::LoadBattleEventIndexes()
 
     uint32 count = 0;
 
-    QueryResult *result =
+    QueryResult* result =
         //                           0         1           2                3                4              5           6
         WorldDatabase.Query("SELECT data.typ, data.guid1, data.ev1 AS ev1, data.ev2 AS ev2, data.map AS m, data.guid2, description.map, "
                             //                              7                  8                   9
@@ -1605,7 +1605,7 @@ void BattleGroundMgr::LoadBattleEventIndexes()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         if (fields[2].GetUInt8() == BG_EVENT_NONE || fields[3].GetUInt8() == BG_EVENT_NONE)
             continue;                                       // we don't need to add those to the eventmap
 
@@ -1618,7 +1618,7 @@ void BattleGroundMgr::LoadBattleEventIndexes()
         uint32 desc_map = fields[6].GetUInt32();
         uint8 desc_event1 = fields[7].GetUInt8();
         uint8 desc_event2 = fields[8].GetUInt8();
-        const char *description = fields[9].GetString();
+        char const* description = fields[9].GetString();
 
         // checking for nullptr - through right outer join this will mean following:
         if (fields[5].GetUInt32() != dbTableGuidLow)

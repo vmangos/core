@@ -46,7 +46,7 @@ struct boss_gorosh_the_dervishAI : public ScriptedAI
         Bloodlust_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

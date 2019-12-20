@@ -45,7 +45,7 @@ struct boss_landslideAI : public ScriptedAI
         Landslide_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

@@ -50,7 +50,7 @@ struct mobs_spitelashesAI : public ScriptedAI
         spellhit = false;
     }
 
-    void SpellHit(Unit *Hitter, const SpellEntry *Spellkind) override
+    void SpellHit(Unit *Hitter, SpellEntry const* Spellkind) override
     {
         if (!spellhit && Hitter->GetTypeId() == TYPEID_PLAYER)
         {
@@ -63,7 +63,7 @@ struct mobs_spitelashesAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // we mustn't remove the creature in the same round in which we cast the summon spell, otherwise there will be no summons
         if (spellhit && morphtimer >= 5000)
@@ -231,7 +231,7 @@ struct mob_mawsAI : public ScriptedAI
             LastWayPoint = uiPointId;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (InCombat)
         {

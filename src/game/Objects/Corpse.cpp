@@ -75,7 +75,7 @@ bool Corpse::Create(uint32 guidlow)
     return true;
 }
 
-bool Corpse::Create(uint32 guidlow, Player *owner)
+bool Corpse::Create(uint32 guidlow, Player* owner)
 {
     if (!owner)
         return false;
@@ -152,10 +152,10 @@ void Corpse::DeleteFromDB()
     stmt.PExecute(GetOwnerGuid().GetCounter());
 }
 
-bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
+bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 {
     ////                                                    0            1       2                  3                  4                  5                   6
-    //QueryResult *result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
+    //QueryResult* result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map,"
     ////   7     8            9         10      11    12     13           14            15              16       17
     //    "time, corpse_type, instance, gender, race, class, playerBytes, playerBytes2, equipmentCache, guildId, playerFlags FROM corpse"
     uint32 playerLowGuid = fields[1].GetUInt32();
@@ -194,7 +194,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
 
     SetObjectScale(DEFAULT_OBJECT_SCALE);
 
-    PlayerInfo const *info = sObjectMgr.GetPlayerInfo(race, _class);
+    PlayerInfo const* info = sObjectMgr.GetPlayerInfo(race, _class);
     if (!info)
     {
         sLog.outError("Player %u has incorrect race/class pair.", GetGUIDLow());
@@ -208,7 +208,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
     {
         uint32 visualbase = slot * 2;
         uint32 item_id = GetUInt32ValueFromArray(data, visualbase);
-        const ItemPrototype * proto = ObjectMgr::GetItemPrototype(item_id);
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id);
         if (!proto)
         {
             SetUInt32Value(CORPSE_FIELD_ITEM + slot, 0);

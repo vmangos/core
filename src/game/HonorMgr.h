@@ -23,7 +23,7 @@ struct HonorStanding
     float  cp;
 
     // create the standing order
-    bool operator < (const HonorStanding& hs) const
+    bool operator < (HonorStanding const& hs) const
     {
         return cp > hs.cp;
     }

@@ -129,7 +129,7 @@ struct boss_patchwerkAI : public ScriptedAI
         // Shouldnt really be possible, but hey, weirder things have happened
         if (!mainTank)
             return;
-        const ObjectGuid& mainTankGuid = mainTank->GetObjectGuid();
+        ObjectGuid const& mainTankGuid = mainTank->GetObjectGuid();
 
         Unit* pTarget = nullptr;
         uint32 uiHighestHP = 0;
@@ -224,7 +224,7 @@ struct boss_patchwerkAI : public ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!CustomGetTarget() || !m_creature->GetVictim())
             return;

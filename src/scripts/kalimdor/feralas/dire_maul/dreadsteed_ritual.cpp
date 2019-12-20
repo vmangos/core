@@ -653,7 +653,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         }
         nodeNb++;
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (eventPhase == 1 || eventPhase == 2 || eventPhase == 4) //and phase < ended
         {
@@ -734,7 +734,7 @@ struct npc_ritual_triggerAI : public ScriptedAI
     void AttackStart(Unit * unit) override {}
     void EnterEvadeMode() override {}
     uint32 timer;
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         /*if (timer < uiDiff)
         {
@@ -765,7 +765,7 @@ struct go_ritual_nodeAI: public GameObjectAI
     uint32 spell;
     /*bool OnUse(Unit* pUser){ }*/
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (me->GetGoState() == GO_STATE_ACTIVE && me->isSpawned())
         {
@@ -836,7 +836,7 @@ struct boss_lordHelNurathAI : public ScriptedAI
         m_uiSleep_Timer = 21000;
         m_uiKnockAway_Timer = 20000; //less than 20s
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -892,7 +892,7 @@ struct boss_xorothianDreadsteedAI : public ScriptedAI
         m_uiCharge_Timer = 8000;
         m_uiFlameBuffet_Timer = 10000;
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

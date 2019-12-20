@@ -655,7 +655,7 @@ enum
     SAY_KERNOBEE_END            = -1780208,
 };
 
-static const float aKernobeePositions[3][3] =
+static float const aKernobeePositions[3][3] =
 {
     { -390.82f, 42.34f, -154.795f},                          // I can see the end!
     { -330.92f, -3.03f, -152.85f},                          // End position
@@ -678,7 +678,7 @@ struct npc_kernobeeAI : public FollowerAI
 
     void Reset() override {}
 
-    void UpdateFollowerAI(const uint32 uiDiff) override
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
         FollowerAI::UpdateFollowerAI(uiDiff);               // Do combat handling
         if (nextStep == 5) //HasFollowState(STATE_FOLLOW_COMPLETE)
@@ -835,7 +835,7 @@ struct npc_kernobeeAI : public FollowerAI
         canSeeEnd = false;
         nextStep = 0;
     }
-    void StartQuest(Player* pPlayer, const Quest* pQuest)
+    void StartQuest(Player* pPlayer, Quest const* pQuest)
     {
         DoScriptText(SAY_KERNOBEE_START, m_creature);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
@@ -860,7 +860,7 @@ CreatureAI* GetAI_npc_kernobee(Creature* pCreature)
     return new npc_kernobeeAI(pCreature);
 }
 
-bool QuestAccept_npc_kernobee(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kernobee(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_A_FINE_MESS)
     {

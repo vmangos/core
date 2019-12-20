@@ -252,13 +252,13 @@ class Guild
         uint32 GetMemberSize() const { return members.size(); }
         uint32 GetAccountsNumber();
 
-        bool LoadGuildFromDB(QueryResult *guildDataResult);
+        bool LoadGuildFromDB(QueryResult* guildDataResult);
         bool CheckGuildStructure();
-        bool LoadRanksFromDB(QueryResult *guildRanksResult);
-        bool LoadMembersFromDB(QueryResult *guildMembersResult);
+        bool LoadRanksFromDB(QueryResult* guildRanksResult);
+        bool LoadMembersFromDB(QueryResult* guildMembersResult);
 
-        void BroadcastToGuild(WorldSession *session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastToOfficers(WorldSession *session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToGuild(WorldSession* session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToOfficers(WorldSession* session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
         void BroadcastPacketToRank(WorldPacket* packet, uint32 rankId);
         void BroadcastPacket(WorldPacket* packet);
 
@@ -272,7 +272,7 @@ class Guild
         void BroadcastWorker(Do& _do, Player* except = nullptr)
         {
             for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
-                if (Player *player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
+                if (Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
                     if (player != except)
                         _do(player);
         }
@@ -311,12 +311,12 @@ class Guild
             return nullptr;
         }
 
-        void Roster(WorldSession *session = nullptr);          // nullptr = broadcast
-        void Query(WorldSession *session);
+        void Roster(WorldSession* session = nullptr);          // nullptr = broadcast
+        void Query(WorldSession* session);
 
         // Guild EventLog
         void   LoadGuildEventLogFromDB();
-        void   DisplayGuildEventLog(WorldSession *session);
+        void   DisplayGuildEventLog(WorldSession* session);
         void   LogGuildEvent(uint8 EventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
 
     protected:

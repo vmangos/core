@@ -89,7 +89,7 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
 
         MovementGeneratorType GetMovementGeneratorType() const { return CHASE_MOTION_TYPE; }
 
-        bool Update(T &, const uint32 &);
+        bool Update(T &, uint32 const&);
         void Initialize(T &);
         void Finalize(T &);
         void Interrupt(T &);
@@ -137,7 +137,7 @@ class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGenerator
 
         MovementGeneratorType GetMovementGeneratorType() const { return FOLLOW_MOTION_TYPE; }
 
-        bool Update(T &, const uint32 &);
+        bool Update(T &, uint32 const&);
         void Initialize(T &);
         void Finalize(T &);
         void Interrupt(T &);

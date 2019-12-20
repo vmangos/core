@@ -187,7 +187,7 @@ struct boss_nefarianAI : ScriptedAI
     }
 
     /*
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell)
     {
         if (!pTarget)
             return;
@@ -280,7 +280,7 @@ struct boss_nefarianAI : ScriptedAI
         return bClassFound;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiTransitionTimer && !m_bTransitionDone)
         {
@@ -602,7 +602,7 @@ struct npc_corrupted_totemAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->HasAura(SPELL_ROOT_SELF))
             m_creature->AddAura(SPELL_ROOT_SELF);

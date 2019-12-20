@@ -225,7 +225,7 @@ int32 MoveSplineInit::Launch()
     return move_spline.Duration();
 }
 
-MoveSplineInit::MoveSplineInit(Unit& m, const char* mvtType) : unit(m), movementType(mvtType)
+MoveSplineInit::MoveSplineInit(Unit& m, char const* mvtType) : unit(m), movementType(mvtType)
 {
     // mix existing state into new
     args.flags.runmode = !unit.m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE);

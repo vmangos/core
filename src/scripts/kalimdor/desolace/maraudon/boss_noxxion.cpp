@@ -55,7 +55,7 @@ struct boss_noxxionAI : public ScriptedAI
                 summoned->AI()->AttackStart(victim);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (Invisible && Invisible_Timer < diff)
         {

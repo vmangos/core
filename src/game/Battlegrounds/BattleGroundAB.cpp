@@ -161,7 +161,7 @@ void BattleGroundAB::StartingEventOpenDoors()
     OpenDoorEvent(BG_EVENT_DOOR);
 }
 
-void BattleGroundAB::AddPlayer(Player *plr)
+void BattleGroundAB::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
     //create score and add it to map, default values are set in the constructor
@@ -170,12 +170,12 @@ void BattleGroundAB::AddPlayer(Player *plr)
     m_PlayerScores[plr->GetObjectGuid()] = sc;
 }
 
-void BattleGroundAB::RemovePlayer(Player * /*plr*/, ObjectGuid /*guid*/)
+void BattleGroundAB::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
 
 }
 
-void BattleGroundAB::HandleAreaTrigger(Player *Source, uint32 Trigger)
+void BattleGroundAB::HandleAreaTrigger(Player* Source, uint32 Trigger)
 {
     switch (Trigger)
     {
@@ -251,7 +251,7 @@ int32 BattleGroundAB::_GetNodeNameId(uint8 node)
 
 void BattleGroundAB::FillInitialWorldStates(WorldPacket& data, uint32& count)
 {
-    const uint8 plusArray[] = {0, 2, 3, 0, 1};
+    uint8 const plusArray[] = {0, 2, 3, 0, 1};
 
     // Node icons
     for (uint8 node = 0; node < BG_AB_NODES_MAX; ++node)
@@ -286,7 +286,7 @@ void BattleGroundAB::FillInitialWorldStates(WorldPacket& data, uint32& count)
 void BattleGroundAB::_SendNodeUpdate(uint8 node)
 {
     // Send node owner state update to refresh map icons on client
-    const uint8 plusArray[] = {0, 2, 3, 0, 1};
+    uint8 const plusArray[] = {0, 2, 3, 0, 1};
 
     if (m_prevNodes[node])
         UpdateWorldState(BG_AB_OP_NODESTATES[node] + plusArray[m_prevNodes[node]], 0);
@@ -322,7 +322,7 @@ void BattleGroundAB::_NodeOccupied(uint8 node, Team team)
 }
 
 /* Invoked if a player used a banner as a gameobject */
-void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* target_obj)
+void BattleGroundAB::EventPlayerClickedOnFlag(Player* source, GameObject* target_obj)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -550,7 +550,7 @@ WorldSafeLocsEntry const* BattleGroundAB::GetClosestGraveYard(Player* player)
     return good_entry;
 }
 
-void BattleGroundAB::UpdatePlayerScore(Player *Source, uint32 type, uint32 value)
+void BattleGroundAB::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)
 {
     BattleGroundScoreMap::iterator itr = m_PlayerScores.find(Source->GetObjectGuid());
     if (itr == m_PlayerScores.end())                          // player not found...

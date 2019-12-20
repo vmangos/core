@@ -31,7 +31,7 @@
 #include "Chat.h"
 #include "Anticheat.h"
 
-void WorldSession::HandleSplitItemOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSplitItemOpcode(WorldPacket& recv_data)
 {
     //DEBUG_LOG("WORLD: CMSG_SPLIT_ITEM");
     uint8 srcbag, srcslot, dstbag, dstslot, count;
@@ -63,7 +63,7 @@ void WorldSession::HandleSplitItemOpcode(WorldPacket & recv_data)
     _player->SplitItem(src, dst, count);
 }
 
-void WorldSession::HandleSwapInvItemOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSwapInvItemOpcode(WorldPacket& recv_data)
 {
     //DEBUG_LOG("WORLD: CMSG_SWAP_INV_ITEM");
     uint8 srcslot, dstslot;
@@ -99,7 +99,7 @@ void WorldSession::HandleSwapInvItemOpcode(WorldPacket & recv_data)
     _player->SwapItem(src, dst);
 }
 
-void WorldSession::HandleAutoEquipItemSlotOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAutoEquipItemSlotOpcode(WorldPacket& recv_data)
 {
     ObjectGuid itemGuid;
     uint8 dstslot;
@@ -118,7 +118,7 @@ void WorldSession::HandleAutoEquipItemSlotOpcode(WorldPacket & recv_data)
     _player->SwapItem(item->GetPos(), dstpos);
 }
 
-void WorldSession::HandleSwapItem(WorldPacket & recv_data)
+void WorldSession::HandleSwapItem(WorldPacket& recv_data)
 {
     //DEBUG_LOG("WORLD: CMSG_SWAP_ITEM");
     uint8 dstbag, dstslot, srcbag, srcslot;
@@ -154,7 +154,7 @@ void WorldSession::HandleSwapItem(WorldPacket & recv_data)
     _player->SwapItem(src, dst);
 }
 
-void WorldSession::HandleAutoEquipItemOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAutoEquipItemOpcode(WorldPacket& recv_data)
 {
     //DEBUG_LOG("WORLD: CMSG_AUTOEQUIP_ITEM");
     uint8 srcbag, srcslot;
@@ -248,7 +248,7 @@ void WorldSession::HandleAutoEquipItemOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleDestroyItemOpcode(WorldPacket & recv_data)
+void WorldSession::HandleDestroyItemOpcode(WorldPacket& recv_data)
 {
     //DEBUG_LOG("WORLD: CMSG_DESTROYITEM");
     uint8 bag, slot, count, data1, data2, data3;
@@ -293,7 +293,7 @@ void WorldSession::HandleDestroyItemOpcode(WorldPacket & recv_data)
 }
 
 // Only _static_ data send in this packet !!!
-void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
+void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
 {
     //DEBUG_LOG("WORLD: CMSG_ITEM_QUERY_SINGLE");
     uint32 item;
@@ -302,7 +302,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
 
     DETAIL_LOG("STORAGE: Item Query = %u", item);
 
-    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(item);
+    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(item);
     if (pProto && (pProto->m_bDiscovered || (GetSecurity() > SEC_PLAYER)))
     {
         std::string Name        = pProto->Name1;
@@ -311,7 +311,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            ItemLocale const *il = sObjectMgr.GetItemLocale(pProto->ItemId);
+            ItemLocale const* il = sObjectMgr.GetItemLocale(pProto->ItemId);
             if (il)
             {
                 if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
@@ -449,7 +449,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleReadItemOpcode(WorldPacket & recv_data)
+void WorldSession::HandleReadItemOpcode(WorldPacket& recv_data)
 {
     //DEBUG_LOG("WORLD: CMSG_READ_ITEM");
 
@@ -485,7 +485,7 @@ void WorldSession::HandleReadItemOpcode(WorldPacket & recv_data)
         _player->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, nullptr, nullptr);
 }
 
-void WorldSession::HandlePageQuerySkippedOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePageQuerySkippedOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_PAGE_TEXT_QUERY");
 
@@ -497,7 +497,7 @@ void WorldSession::HandlePageQuerySkippedOpcode(WorldPacket & recv_data)
     DETAIL_LOG("Packet Info: itemid: %u guid: %s", itemid, guid.GetString().c_str());
 }
 
-void WorldSession::HandleSellItemOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSellItemOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_SELL_ITEM");
 
@@ -515,7 +515,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recv_data)
     if (!itemGuid || !GetPlayer()->IsInWorld())
         return;
 
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: HandleSellItemOpcode - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
@@ -575,7 +575,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recv_data)
         }
     }
 
-    ItemPrototype const *pProto = pItem->GetProto();
+    ItemPrototype const* pProto = pItem->GetProto();
 
     if (!pProto)
     {
@@ -593,7 +593,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recv_data)
 
     for (auto i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
-        auto const &spell = pProto->Spells[i];
+        auto const& spell = pProto->Spells[i];
 
         // if spell charges for this item are negative, it means that the item should be destroyed once the charges are consumed.
         // it also means that the value of this item is relative to how many charges are remaining.
@@ -637,7 +637,7 @@ void WorldSession::HandleSellItemOpcode(WorldPacket & recv_data)
     _player->LogModifyMoney(money, "SellItem", pCreature->GetObjectGuid(), pItem->GetEntry());
 }
 
-void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
+void WorldSession::HandleBuybackItem(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_BUYBACK_ITEM");
 
@@ -649,7 +649,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
     recv_data >> slot;
 #endif
 
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_VENDOR);
     if (!pCreature)
     {
         DEBUG_LOG("WORLD: HandleBuybackItem - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
@@ -688,7 +688,7 @@ void WorldSession::HandleBuybackItem(WorldPacket & recv_data)
         _player->SendBuyError(BUY_ERR_CANT_FIND_ITEM, pCreature, 0, 0);
 }
 
-void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket & recv_data)
+void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_BUY_ITEM_IN_SLOT");
     ObjectGuid vendorGuid;
@@ -725,7 +725,7 @@ void WorldSession::HandleBuyItemInSlotOpcode(WorldPacket & recv_data)
     GetPlayer()->BuyItemFromVendor(vendorGuid, item, count, bag, bagslot);
 }
 
-void WorldSession::HandleBuyItemOpcode(WorldPacket & recv_data)
+void WorldSession::HandleBuyItemOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_BUY_ITEM");
     ObjectGuid vendorGuid;
@@ -737,7 +737,7 @@ void WorldSession::HandleBuyItemOpcode(WorldPacket & recv_data)
     GetPlayer()->BuyItemFromVendor(vendorGuid, item, count, NULL_BAG, NULL_SLOT);
 }
 
-void WorldSession::HandleListInventoryOpcode(WorldPacket & recv_data)
+void WorldSession::HandleListInventoryOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
 
@@ -755,7 +755,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 {
     DEBUG_LOG("WORLD: Sent SMSG_LIST_INVENTORY");
 
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorguid, UNIT_NPC_FLAG_VENDOR);
 
     if (!pCreature)
     {
@@ -804,7 +804,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 
         if (crItem)
         {
-            if (ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(crItem->item))
+            if (ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(crItem->item))
             {
                 if (!_player->IsGameMaster())
                 {
@@ -849,7 +849,7 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
     SendPacket(&data);
 }
 
-void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket& recv_data)
 {
     //DEBUG_LOG("WORLD: CMSG_AUTOSTORE_BAG_ITEM");
     uint8 srcbag, srcslot, dstbag;
@@ -1058,7 +1058,7 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
     }
 }
 
-void WorldSession::HandleSetAmmoOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSetAmmoOpcode(WorldPacket& recv_data)
 {
     if (!GetPlayer()->IsAlive())
     {
@@ -1107,14 +1107,14 @@ void WorldSession::SendItemEnchantTimeUpdate(ObjectGuid playerGuid, ObjectGuid i
     SendPacket(&data);
 }
 
-void WorldSession::HandleItemNameQueryOpcode(WorldPacket & recv_data)
+void WorldSession::HandleItemNameQueryOpcode(WorldPacket& recv_data)
 {
     uint32 itemid;
     recv_data >> itemid;
     recv_data.read_skip<uint64>();                          // guid
 
     DEBUG_LOG("WORLD: CMSG_ITEM_NAME_QUERY %u", itemid);
-    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(itemid);
+    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemid);
     if (pProto)
     {
         std::string Name;
@@ -1123,7 +1123,7 @@ void WorldSession::HandleItemNameQueryOpcode(WorldPacket & recv_data)
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            ItemLocale const *il = sObjectMgr.GetItemLocale(pProto->ItemId);
+            ItemLocale const* il = sObjectMgr.GetItemLocale(pProto->ItemId);
             if (il)
             {
                 if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())

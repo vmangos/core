@@ -1148,12 +1148,12 @@ ChatCommand * ChatHandler::getCommandTable()
         //CheckIntegrity(commandTable, nullptr);
         FillFullCommandsName(commandTable, "");
 
-        QueryResult *result = WorldDatabase.Query("SELECT `name`, `security`, `help`, `flags` FROM `command`");
+        QueryResult* result = WorldDatabase.Query("SELECT `name`, `security`, `help`, `flags` FROM `command`");
         if (result)
         {
             do
             {
-                Field *fields = result->Fetch();
+                Field* fields = result->Fetch();
                 std::string name = fields[0].GetCppString();
 
                 SetDataForCommandInTable(commandTable, name.c_str(), fields[1].GetUInt8(), fields[2].GetCppString(), fields[3].GetUInt8());
@@ -1182,12 +1182,12 @@ ChatHandler::ChatHandler(Player* player) : ChatHandler(player->GetSession()) {}
 
 ChatHandler::~ChatHandler() {}
 
-const char *ChatHandler::GetMangosString(int32 entry) const
+char const* ChatHandler::GetMangosString(int32 entry) const
 {
     return m_session->GetMangosString(entry);
 }
 
-const char *ChatHandler::GetOnOffStr(bool value) const
+char const* ChatHandler::GetOnOffStr(bool value) const
 {
     return value ?  GetMangosString(LANG_ON) : GetMangosString(LANG_OFF);
 }
@@ -1258,7 +1258,7 @@ bool ChatHandler::HasLowerSecurityAccount(WorldSession* target, uint32 target_ac
     return false;
 }
 
-bool ChatHandler::hasStringAbbr(const char* name, const char* part)
+bool ChatHandler::hasStringAbbr(char const* name, char const* part)
 {
     // non "" command
     if (*name)
@@ -1284,7 +1284,7 @@ bool ChatHandler::hasStringAbbr(const char* name, const char* part)
     return true;
 }
 
-void ChatHandler::SendSysMessage(const char *str)
+void ChatHandler::SendSysMessage(char const* str)
 {
     WorldPacket data;
 
@@ -1302,7 +1302,7 @@ void ChatHandler::SendSysMessage(const char *str)
     SetSentErrorMessage(true);
 }
 
-void ChatHandler::SendGlobalSysMessage(const char *str)
+void ChatHandler::SendGlobalSysMessage(char const* str)
 {
     // Chat output
     WorldPacket data;
@@ -1327,7 +1327,7 @@ void ChatHandler::SendSysMessage(int32 entry)
 
 void ChatHandler::PSendSysMessage(int32 entry, ...)
 {
-    const char *format = GetMangosString(entry);
+    char const* format = GetMangosString(entry);
     va_list ap;
     char str [2048];
     va_start(ap, entry);
@@ -1336,7 +1336,7 @@ void ChatHandler::PSendSysMessage(int32 entry, ...)
     SendSysMessage(str);
 }
 
-void ChatHandler::PSendSysMessage(const char *format, ...)
+void ChatHandler::PSendSysMessage(char const* format, ...)
 {
     va_list ap;
     char str [2048];
@@ -1348,7 +1348,7 @@ void ChatHandler::PSendSysMessage(const char *format, ...)
 
 std::string ChatHandler::PGetParseString(int32 entry, ...)
 {
-    const char *format = GetMangosString(entry);
+    char const* format = GetMangosString(entry);
     va_list ap;
     char str [2048];
     va_start(ap, entry);
@@ -1569,7 +1569,7 @@ ChatCommandSearchResult ChatHandler::FindCommand(ChatCommand* table, char const*
  *
  * Command output and errors in command execution will send to chat handler.
  */
-void ChatHandler::ExecuteCommand(const char* text)
+void ChatHandler::ExecuteCommand(char const* text)
 {
     std::string fullcmd = text;                             // original `text` can't be used. It content destroyed in command code processing.
 
@@ -1678,7 +1678,7 @@ void ChatHandler::ExecuteCommand(const char* text)
  *
  * All problems found while command search and updated output as to DB errors log
  */
-bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char* text, uint8 security, std::string const& help, uint8 flags)
+bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, char const* text, uint8 security, std::string const& help, uint8 flags)
 {
     std::string fullcommand = text;                         // original `text` can't be used. It content destroyed in command code processing.
 
@@ -1719,7 +1719,7 @@ bool ChatHandler::SetDataForCommandInTable(ChatCommand *commandTable, const char
     return false;
 }
 
-bool ChatHandler::ParseCommands(const char* text)
+bool ChatHandler::ParseCommands(char const* text)
 {
     MANGOS_ASSERT(text);
     MANGOS_ASSERT(*text);
@@ -1787,7 +1787,7 @@ bool ChatHandler::ShowHelpForSubCommands(ChatCommand *table, char const* cmd)
     return true;
 }
 
-bool ChatHandler::ShowHelpForCommand(ChatCommand *table, const char* cmd)
+bool ChatHandler::ShowHelpForCommand(ChatCommand *table, char const* cmd)
 {
     char const* oldCmd = cmd;
     ChatCommand* command = nullptr;
@@ -1835,7 +1835,7 @@ bool ChatHandler::ShowHelpForCommand(ChatCommand *table, const char* cmd)
     return command || childCommands;
 }
 
-bool ChatHandler::isValidChatMessage(const char* message)
+bool ChatHandler::isValidChatMessage(char const* message)
 {
     /*
 
@@ -1852,13 +1852,13 @@ bool ChatHandler::isValidChatMessage(const char* message)
     if (strlen(message) > 255)
         return false;
 
-    const char validSequence[6] = "cHhhr";
-    const char* validSequenceIterator = validSequence;
+    char const validSequence[6] = "cHhhr";
+    char const* validSequenceIterator = validSequence;
 
     // more simple checks
     if (sWorld.getConfig(CONFIG_UINT32_CHAT_STRICT_LINK_CHECKING_SEVERITY) < 3)
     {
-        const std::string validCommands = "cHhr|";
+        std::string const validCommands = "cHhr|";
 
         while (*message)
         {
@@ -1897,7 +1897,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
     uint32 color = 0;
 
     ItemPrototype const* linkedItem = nullptr;
-    const SpellEntry* linkedSpell = nullptr;
+    SpellEntry const* linkedSpell = nullptr;
 
     std::list<int> properties;
 
@@ -2119,7 +2119,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                         if (!hasRandomProperty && properties.size() > 2)
                             return false;
 
-                        const ItemRandomPropertiesEntry* iProp = nullptr;
+                        ItemRandomPropertiesEntry const* iProp = nullptr;
                         for (auto iter = properties.begin(); iter != properties.end(); ++iter)
                         {
                             auto prop = *iter;
@@ -2268,7 +2268,7 @@ void ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg msgtype, char const
     data << uint8(chatTag);
 }
 
-Player * ChatHandler::GetSelectedPlayer() const
+Player* ChatHandler::GetSelectedPlayer() const
 {
     if (!m_session)
         return nullptr;
@@ -3595,7 +3595,7 @@ int ChatHandler::GetSessionDbLocaleIndex() const
     return m_session->GetSessionDbLocaleIndex();
 }
 
-const char *CliHandler::GetMangosString(int32 entry) const
+char const* CliHandler::GetMangosString(int32 entry) const
 {
     return sObjectMgr.GetMangosStringForDBCLocale(entry);
 }
@@ -3620,7 +3620,7 @@ bool CliHandler::isAvailable(ChatCommand const& cmd) const
     return GetAccessLevel() >= (AccountTypes)cmd.SecurityLevel;
 }
 
-void CliHandler::SendSysMessage(const char *str)
+void CliHandler::SendSysMessage(char const* str)
 {
     m_print(m_callbackArg, str);
     m_print(m_callbackArg, "\r\n");
@@ -3692,14 +3692,14 @@ std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation(uint32 guid)
         if (int16 event_id = sGameEventMgr.GetGameEventId<Pool>(top_pool_id))
         {
             char buffer[100];
-            const char* format = GetMangosString(LANG_NPC_GO_INFO_POOL_EVENT_STRING);
+            char const* format = GetMangosString(LANG_NPC_GO_INFO_POOL_EVENT_STRING);
             sprintf(buffer, format, pool_id, event_id);
             str = buffer;
         }
         else
         {
             char buffer[100];
-            const char* format = GetMangosString(LANG_NPC_GO_INFO_POOL_STRING);
+            char const* format = GetMangosString(LANG_NPC_GO_INFO_POOL_STRING);
             sprintf(buffer, format, pool_id);
             str = buffer;
         }
@@ -3707,7 +3707,7 @@ std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation(uint32 guid)
     else if (int16 event_id = sGameEventMgr.GetGameEventId<T>(guid))
     {
         char buffer[100];
-        const char* format = GetMangosString(LANG_NPC_GO_INFO_EVENT_STRING);
+        char const* format = GetMangosString(LANG_NPC_GO_INFO_EVENT_STRING);
         sprintf(buffer, format, event_id);
         str = buffer;
     }
@@ -3745,7 +3745,7 @@ int NullChatHandler::GetSessionDbLocaleIndex() const
     return sObjectMgr.GetDBCLocaleIndex();
 }
 
-const char *NullChatHandler::GetMangosString(int32 entry) const
+char const* NullChatHandler::GetMangosString(int32 entry) const
 {
     return sObjectMgr.GetMangosStringForDBCLocale(entry);
 }

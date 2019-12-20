@@ -118,7 +118,7 @@ struct WorldLocation
     float o = 0.0f;
     explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
         : mapId(_mapid), x(_x), y(_y), z(_z), o(_o) {}
-    WorldLocation(WorldLocation const &loc)
+    WorldLocation(WorldLocation const& loc)
         : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
 };
 
@@ -322,7 +322,7 @@ class MANGOS_DLL_SPEC Object
     public:
         virtual ~Object();
 
-        const bool& IsInWorld() const { return m_inWorld; }
+        bool const& IsInWorld() const { return m_inWorld; }
         virtual void AddToWorld()
         {
             if (m_inWorld)
@@ -341,7 +341,7 @@ class MANGOS_DLL_SPEC Object
         }
 
         ObjectGuid const& GetObjectGuid() const { return GetGuidValue(OBJECT_FIELD_GUID); }
-        const uint64& GetGUID() const { return GetUInt64Value(OBJECT_FIELD_GUID); } // Conserve par Nostalrius
+        uint64 const& GetGUID() const { return GetUInt64Value(OBJECT_FIELD_GUID); } // Conserve par Nostalrius
         uint32 GetGUIDLow() const { return GetObjectGuid().GetCounter(); }
         PackedGuid const& GetPackGUID() const { return m_PackGUID; }
         std::string GetGuidStr() const { return GetObjectGuid().GetString(); }
@@ -383,25 +383,25 @@ class MANGOS_DLL_SPEC Object
 
         virtual void DestroyForPlayer(Player* target) const;
 
-        const int32& GetInt32Value(uint16 index) const
+        int32 const& GetInt32Value(uint16 index) const
         {
             MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_int32Values[ index ];
         }
 
-        const uint32& GetUInt32Value(uint16 index) const
+        uint32 const& GetUInt32Value(uint16 index) const
         {
             MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_uint32Values[ index ];
         }
 
-        const uint64& GetUInt64Value(uint16 index) const
+        uint64 const& GetUInt64Value(uint16 index) const
         {
             MANGOS_ASSERT(index + 1 < m_valuesCount || PrintIndexError(index , false));
             return *((uint64*)&(m_uint32Values[ index ]));
         }
 
-        const float& GetFloatValue(uint16 index) const
+        float const& GetFloatValue(uint16 index) const
         {
             MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_floatValues[ index ];
@@ -425,7 +425,7 @@ class MANGOS_DLL_SPEC Object
 
         void SetInt32Value(uint16 index, int32  value);
         void SetUInt32Value(uint16 index, uint32  value);
-        void SetUInt64Value(uint16 index, const uint64 &value);
+        void SetUInt64Value(uint16 index, uint64 const& value);
         void SetFloatValue(uint16 index, float   value);
         void SetByteValue(uint16 index, uint8 offset, uint8 value);
         void SetUInt16Value(uint16 index, uint8 offset, uint16 value);
@@ -561,7 +561,7 @@ class MANGOS_DLL_SPEC Object
 
         void ClearUpdateMask(bool remove);
 
-        bool LoadValues(const char* data);
+        bool LoadValues(char const* data);
 
         uint16 GetValuesCount() const { return m_valuesCount; }
 
@@ -640,7 +640,7 @@ class MANGOS_DLL_SPEC Object
 
         // for output helpfull error messages from ASSERTs
         bool PrintIndexError(uint32 index, bool set) const;
-        Object(const Object&) = delete;                     // prevent generation copy constructor
+        Object(Object const&) = delete;                     // prevent generation copy constructor
         Object& operator=(Object const&) = delete;          // prevent generation assigment operator
 };
 
@@ -732,8 +732,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
                 }
 
             private:
-                UpdateHelper(const UpdateHelper&);
-                UpdateHelper& operator=(const UpdateHelper&) = delete;
+                UpdateHelper(UpdateHelper const&);
+                UpdateHelper& operator=(UpdateHelper const&) = delete;
 
                 WorldObject* const m_obj;
         };
@@ -795,10 +795,10 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         InstanceData* GetInstanceData() const;
 
-        const char* GetName() const { return m_name.c_str(); }
+        char const* GetName() const { return m_name.c_str(); }
         void SetName(std::string const& newname) { m_name=newname; }
 
-        virtual const char* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
+        virtual char const* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
         virtual uint8 GetGender() const { return 0; } // used in chat builder
 
         virtual uint32 GetDefaultGossipMenuId() const { return 0; }
@@ -843,16 +843,16 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool IsInRange3d(float x, float y, float z, float minRange, float maxRange) const;
 
         float GetAngle(WorldObject const* obj) const;
-        float GetAngle(const float x, const float y) const;
-        bool HasInArc(const float arcangle, WorldObject const* obj, float offset = 0.0f) const;
-        bool HasInArc(const float arcangle, const float x, const float y) const;
+        float GetAngle(float const x, float const y) const;
+        bool HasInArc(float const arcangle, WorldObject const* obj, float offset = 0.0f) const;
+        bool HasInArc(float const arcangle, float const x, float const y) const;
         bool isInFrontInMap(WorldObject const* target,float distance, float arc = M_PI) const;
         bool isInBackInMap(WorldObject const* target, float distance, float arc = M_PI) const;
         bool isInFront(WorldObject const* target,float distance, float arc = M_PI) const;
         bool isInBack(WorldObject const* target, float distance, float arc = M_PI) const;
 
         bool CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
-        float GetLeewayBonusRange(const Unit* target, bool ability) const;
+        float GetLeewayBonusRange(Unit const* target, bool ability) const;
         float GetLeewayBonusRadius() const;
 
         // Gestion des positions
@@ -904,15 +904,15 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void PlayDirectSound(uint32 sound_id, Player const* target = nullptr) const;
         void PlayDirectMusic(uint32 music_id, Player const* target = nullptr) const;
 
-        void PMonsterSay(const char* text, ...) const;
+        void PMonsterSay(char const* text, ...) const;
         void PMonsterSay(int32 text, ...) const;
-        void PMonsterYell(const char* text, ...) const;
+        void PMonsterYell(char const* text, ...) const;
         void PMonsterYell(int32 text, ...) const;
 
-        void MonsterSay(const char* text, uint32 language = 0, Unit const* target = nullptr) const;
-        void MonsterYell(const char* text, uint32 language = 0, Unit const* target = nullptr) const;
-        void MonsterTextEmote(const char* text, Unit const* target = nullptr, bool IsBossEmote = false) const;
-        void MonsterWhisper(const char* text, Unit const* target = nullptr, bool IsBossWhisper = false) const;
+        void MonsterSay(char const* text, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterYell(char const* text, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterTextEmote(char const* text, Unit const* target = nullptr, bool IsBossEmote = false) const;
+        void MonsterWhisper(char const* text, Unit const* target = nullptr, bool IsBossWhisper = false) const;
         void MonsterSay(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
         void MonsterYell(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
         void MonsterTextEmote(int32 textId, Unit const* target = nullptr, bool IsBossEmote = false) const;
@@ -1068,12 +1068,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
         uint32 SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
         int32 SpellBaseHealingBonusDone(SpellSchoolMask schoolMask);
-        uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage) const;
+        uint32 CalcArmorReducedDamage(Unit* pVictim, uint32 const damage) const;
         uint32 MeleeDamageBonusDone(Unit* pVictim, uint32 damage, WeaponAttackType attType, SpellEntry const* spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
         virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
         float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
         virtual uint32 DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell = nullptr);
-        void DealDamageMods(Unit* pVictim, uint32 &damage, uint32* absorb);
+        void DealDamageMods(Unit* pVictim, uint32& damage, uint32* absorb);
         void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
         void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log);
         void SendSpellNonMeleeDamageLog(Unit* target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
@@ -1150,7 +1150,7 @@ inline WorldObject* ToWorldObject(Object* object)
     return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject*>(object) : nullptr;
 }
 
-inline WorldObject const* ToWorldObject(const Object* object)
+inline WorldObject const* ToWorldObject(Object const* object)
 {
     return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject const*>(object) : nullptr;
 }
@@ -1160,9 +1160,9 @@ inline GameObject* ToGameObject(Object* object)
     return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject*>(object) : nullptr;
 }
 
-inline const GameObject* ToGameObject(const Object* object)
+inline GameObject const* ToGameObject(Object const* object)
 {
-    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<const GameObject*>(object) : nullptr;
+    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject const*>(object) : nullptr;
 }
 
 inline Unit* ToUnit(Object* object)
@@ -1170,9 +1170,9 @@ inline Unit* ToUnit(Object* object)
     return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit*>(object) : nullptr;
 }
 
-inline const Unit* ToUnit(const Object* object)
+inline Unit const* ToUnit(Object const* object)
 {
-    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<const Unit*>(object) : nullptr;
+    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit const*>(object) : nullptr;
 }
 
 inline Creature* ToCreature(Object* object)
@@ -1180,9 +1180,9 @@ inline Creature* ToCreature(Object* object)
     return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature*>(object) : nullptr;
 }
 
-inline const Creature* ToCreature(const Object* object)
+inline Creature const* ToCreature(Object const* object)
 {
-    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<const Creature*>(object) : nullptr;
+    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature const*>(object) : nullptr;
 }
 
 inline Player* ToPlayer(Object* object)
@@ -1190,9 +1190,9 @@ inline Player* ToPlayer(Object* object)
     return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player*>(object) : nullptr;
 }
 
-inline const Player* ToPlayer(const Object* object)
+inline Player const* ToPlayer(Object const* object)
 {
-    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<const Player*>(object) : nullptr;
+    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player const*>(object) : nullptr;
 }
 
 #endif

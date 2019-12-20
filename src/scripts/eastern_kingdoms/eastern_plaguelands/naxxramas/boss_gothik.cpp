@@ -343,7 +343,7 @@ struct boss_gothikAI : public ScriptedAI
         uint32 num_right = 0;
         for (auto& playerRef : lPlayers)
         {
-            if (const Player* p = playerRef.getSource())
+            if (Player const* p = playerRef.getSource())
             {
                 // Don't count dead players, except those feigned
                 if (p->IsDead() && !p->HasAura(SPELL_AURA_FEIGN_DEATH))
@@ -362,7 +362,7 @@ struct boss_gothikAI : public ScriptedAI
         return (num_left < 1 || num_right < 1);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if(!m_creature->HasAura(SPELL_IMMUNE_ALL))
         {
@@ -694,7 +694,7 @@ struct gothikTriggerAI : public ScriptedAI
     void MoveInLineOfSight(Unit*) override {}
     void Aggro(Unit*) override {}
     void AttackStart(Unit*) override {}
-    void UpdateAI(const uint32 diff) override {}
+    void UpdateAI(uint32 const diff) override {}
 };
 
 CreatureAI* GetAI_GothikTrigger(Creature* pCreature)

@@ -84,7 +84,7 @@ namespace VMAP
             VMapManager2();
             ~VMapManager2();
 
-            VMAPLoadResult loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) override;
+            VMAPLoadResult loadMap(char const* pBasePath, unsigned int pMapId, int x, int y) override;
 
             void unloadMap(unsigned int pMapId, int x, int y) override;
             void unloadMap(unsigned int pMapId) override;
@@ -111,7 +111,7 @@ namespace VMAP
             {
                 return getMapFileName(pMapId);
             }
-            bool existsMap(const char* pBasePath, unsigned int pMapId, int x, int y) override;
+            bool existsMap(char const* pBasePath, unsigned int pMapId, int x, int y) override;
 
 #ifdef MMAP_GENERATOR
         public:

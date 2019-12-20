@@ -68,7 +68,7 @@ struct FirewalkerAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -207,7 +207,7 @@ struct mob_ancient_core_houndAI : public ScriptedAI
     }
     */
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -339,7 +339,7 @@ struct mob_core_houndAI : public ScriptedAI
        }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_pInstance)
@@ -438,7 +438,7 @@ struct mob_firelordAI : public ScriptedAI
         pSummoned->AI()->AttackStart(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0));
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -506,7 +506,7 @@ struct mob_lava_surgerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

@@ -200,7 +200,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         }
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
@@ -230,7 +230,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         return 0;
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {

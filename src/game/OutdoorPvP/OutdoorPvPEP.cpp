@@ -104,7 +104,7 @@ void OPvPCapturePointEP_EWT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
 }
 
-uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket &data)
+uint32 OPvPCapturePointEP_EWT::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_EWT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_EWT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -123,7 +123,7 @@ void OPvPCapturePointEP_EWT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_EWT_N , bool(m_TowerState & EP_TS_N));
 }
 
-bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player *plr)
+bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player* plr)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
@@ -136,7 +136,7 @@ bool OPvPCapturePointEP_EWT::HandlePlayerEnter(Player *plr)
     return false;
 }
 
-void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player *plr)
+void OPvPCapturePointEP_EWT::HandlePlayerLeave(Player* plr)
 {
     plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
@@ -250,7 +250,7 @@ void OPvPCapturePointEP_NPT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
 }
 
-uint32 OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket &data)
+uint32 OPvPCapturePointEP_NPT::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_NPT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_NPT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -269,7 +269,7 @@ void OPvPCapturePointEP_NPT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_NPT_N , bool(m_TowerState & EP_TS_N));
 }
 
-bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player *plr)
+bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player* plr)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
@@ -282,7 +282,7 @@ bool OPvPCapturePointEP_NPT::HandlePlayerEnter(Player *plr)
     return false;
 }
 
-void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player *plr)
+void OPvPCapturePointEP_NPT::HandlePlayerLeave(Player* plr)
 {
     plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
@@ -295,7 +295,7 @@ void OPvPCapturePointEP_NPT::SummonGO(uint32 team)
         m_SummonedGOSide = team;
         DelObject(EP_NPT_BUFF);
         AddObject(EP_NPT_BUFF, EP_NPT_LordaeronShrine.entry, EP_NPT_LordaeronShrine.map, EP_NPT_LordaeronShrine.x, EP_NPT_LordaeronShrine.y, EP_NPT_LordaeronShrine.z, EP_NPT_LordaeronShrine.o, EP_NPT_LordaeronShrine.rot0, EP_NPT_LordaeronShrine.rot1, EP_NPT_LordaeronShrine.rot2, EP_NPT_LordaeronShrine.rot3);
-        GameObject * go = m_PvP->GetGameObject(m_Objects[EP_NPT_BUFF]);
+        GameObject* go = m_PvP->GetGameObject(m_Objects[EP_NPT_BUFF]);
         if (go)
             go->SetUInt32Value(GAMEOBJECT_FACTION, (team == ALLIANCE ? 84 : 83));
     }
@@ -379,7 +379,7 @@ void OPvPCapturePointEP_CGT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
 }
 
-uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket &data)
+uint32 OPvPCapturePointEP_CGT::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_CGT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_CGT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -398,7 +398,7 @@ void OPvPCapturePointEP_CGT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_CGT_N , bool(m_TowerState & EP_TS_N));
 }
 
-bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player *plr)
+bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player* plr)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
@@ -411,7 +411,7 @@ bool OPvPCapturePointEP_CGT::HandlePlayerEnter(Player *plr)
     return false;
 }
 
-void OPvPCapturePointEP_CGT::HandlePlayerLeave(Player *plr)
+void OPvPCapturePointEP_CGT::HandlePlayerLeave(Player* plr)
 {
     plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
@@ -515,7 +515,7 @@ void OPvPCapturePointEP_PWT::SendChangePhase()
     SendUpdateWorldState(EP_UI_TOWER_SLIDER_N, m_neutralValuePct);
 }
 
-uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket &data)
+uint32 OPvPCapturePointEP_PWT::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_PWT_A << uint32(bool(m_TowerState & EP_TS_A));
     data << EP_PWT_H << uint32(bool(m_TowerState & EP_TS_H));
@@ -534,7 +534,7 @@ void OPvPCapturePointEP_PWT::UpdateTowerState()
     m_PvP->SendUpdateWorldState(EP_PWT_N , bool(m_TowerState & EP_TS_N));
 }
 
-bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player *plr)
+bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player* plr)
 {
     if (OPvPCapturePoint::HandlePlayerEnter(plr))
     {
@@ -547,7 +547,7 @@ bool OPvPCapturePointEP_PWT::HandlePlayerEnter(Player *plr)
     return false;
 }
 
-void OPvPCapturePointEP_PWT::HandlePlayerLeave(Player *plr)
+void OPvPCapturePointEP_PWT::HandlePlayerLeave(Player* plr)
 {
     plr->SendUpdateWorldState(EP_UI_TOWER_SLIDER_DISPLAY, 0);
     OPvPCapturePoint::HandlePlayerLeave(plr);
@@ -563,7 +563,7 @@ void OPvPCapturePointEP_PWT::SummonFlightMaster(uint32 team)
         /*
         // sky - we need update gso code
 
-        Creature * c = HashMapHolder<Creature>::Find(m_Creatures[EP_PWT_FLIGHTMASTER]);
+        Creature* c = HashMapHolder<Creature>::Find(m_Creatures[EP_PWT_FLIGHTMASTER]);
         //Spawn flight master as friendly to capturing team
         c->SetUInt32Value(GAMEOBJECT_FACTION,(team == ALLIANCE ? 55 : 68));
         if (c)
@@ -644,7 +644,7 @@ void OutdoorPvPEP::Update(uint32 diff)
     }
 }
 
-void OutdoorPvPEP::OnPlayerEnter(Player * plr)
+void OutdoorPvPEP::OnPlayerEnter(Player* plr)
 {
     // add buffs
     if (plr->GetTeam() == ALLIANCE)
@@ -660,7 +660,7 @@ void OutdoorPvPEP::OnPlayerEnter(Player * plr)
     OutdoorPvP::OnPlayerEnter(plr);
 }
 
-void OutdoorPvPEP::OnPlayerLeave(Player * plr)
+void OutdoorPvPEP::OnPlayerLeave(Player* plr)
 {
     // remove buffs
     if (plr->GetTeam() == ALLIANCE)
@@ -680,7 +680,7 @@ void OutdoorPvPEP::BuffTeams()
 {
     for (PlayerSet::iterator itr = m_players[0].begin(); itr != m_players[0].end(); ++itr)
     {
-        Player * plr = *itr;
+        Player* plr = *itr;
         {
             for (int i = 0; i < 4; ++i)
                 plr->RemoveAurasDueToSpell(EP_AllianceBuffs[i]);
@@ -690,7 +690,7 @@ void OutdoorPvPEP::BuffTeams()
     }
     for (PlayerSet::iterator itr = m_players[1].begin(); itr != m_players[1].end(); ++itr)
     {
-        Player * plr = *itr;
+        Player* plr = *itr;
         {
             for (int i = 0; i < 4; ++i)
                 plr->RemoveAurasDueToSpell(EP_HordeBuffs[i]);
@@ -700,7 +700,7 @@ void OutdoorPvPEP::BuffTeams()
     }
 }
 
-uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket & data)
+uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
 {
     data << EP_UI_TOWER_COUNT_A << m_AllianceTowersControlled;
     data << EP_UI_TOWER_COUNT_H << m_HordeTowersControlled;
@@ -713,7 +713,7 @@ uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket & data)
     return count;
 }
 
-void OutdoorPvPEP::SendRemoveWorldStates(Player *plr)
+void OutdoorPvPEP::SendRemoveWorldStates(Player* plr)
 {
     plr->SendUpdateWorldState(EP_UI_TOWER_COUNT_A, 0);
     plr->SendUpdateWorldState(EP_UI_TOWER_COUNT_H, 0);

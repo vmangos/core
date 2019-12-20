@@ -454,7 +454,7 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         DialogueUpdate(uiDiff);
         if (HasEscortState(STATE_ESCORT_PAUSED) && HasEscortState(STATE_ESCORT_ESCORTING))
@@ -479,7 +479,7 @@ CreatureAI* GetAI_npc_grark_lorkrub(Creature* pCreature)
     return new npc_grark_lorkrubAI(pCreature);
 }
 
-bool QuestAccept_npc_grark_lorkrub(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_grark_lorkrub(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_PRECARIOUS_PREDICAMENT)
     {
@@ -664,7 +664,7 @@ struct npc_klinfranAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
     
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell) override
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override
     {
         if (pSpell && pSpell->Id == 14277)   // Scorpid Sting (Rank 4)
         {
@@ -673,7 +673,7 @@ struct npc_klinfranAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         /** Franklin the Friendly */
         if (m_bTransform)

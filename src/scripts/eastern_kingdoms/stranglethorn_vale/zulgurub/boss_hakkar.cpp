@@ -132,7 +132,7 @@ struct boss_hakkarAI : public ScriptedAI
             m_pInstance->SetData(TYPE_HAKKAR, DONE);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

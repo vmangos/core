@@ -51,7 +51,7 @@ void CharacterDatabaseCache::LoadCharacterPet(uint32 singlePetId)
     uint32 count = 0;
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         CharacterPetCache* pCache = new CharacterPetCache;
         pCache->id = fields[0].GetUInt32();
         pCache->entry = fields[1].GetUInt32();
@@ -115,7 +115,7 @@ void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
     CharacterPetCache* lastPetCache = nullptr;
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         uint32 lowGuid = fields[0].GetUInt32();
         uint32 spellId = fields[1].GetUInt32();
         uint8  active  = fields[2].GetUInt32();
@@ -166,7 +166,7 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
 
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         uint32 lowGuid = fields[0].GetUInt32();
         uint32 spellId = fields[1].GetUInt32();
         uint64 time    = fields[2].GetUInt64();
@@ -221,7 +221,7 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
 
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         uint32 lowGuid = fields[0].GetUInt32();
 
         if (!lastPetCache || lastPetCache->id != lowGuid)

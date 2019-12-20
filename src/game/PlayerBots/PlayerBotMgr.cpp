@@ -65,7 +65,7 @@ void PlayerBotMgr::load()
     LoadConfig();
 
     // 3- Load usable account ID
-    QueryResult *result = LoginDatabase.PQuery(
+    QueryResult* result = LoginDatabase.PQuery(
                               "SELECT MAX(id)"
                               " FROM account");
     if (!result)
@@ -73,7 +73,7 @@ void PlayerBotMgr::load()
         sLog.outError("Playerbot: unable to load max account id.");
         return;
     }
-    Field *fields = result->Fetch();
+    Field* fields = result->Fetch();
     _maxAccountId = fields[0].GetUInt32() + 10000;
     delete result;
 
@@ -320,7 +320,7 @@ bool PlayerBotMgr::addBot(uint32 playerGUID, bool chatBot)
     }
 
     e->state = PB_STATE_LOADING;
-    WorldSession *session = new WorldSession(accountId, nullptr, sAccountMgr.GetSecurity(accountId), 0, LOCALE_enUS);
+    WorldSession* session = new WorldSession(accountId, nullptr, sAccountMgr.GetSecurity(accountId), 0, LOCALE_enUS);
     session->SetBot(e);
     // "It's not because you are a bot that you are allowed cheat!"
     sAnticheatLib->SessionAdded(session);

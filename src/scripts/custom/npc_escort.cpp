@@ -98,7 +98,7 @@ struct npc_escort_genericAI : public npc_escortAI
 
         m_creature->SetFactionTemplateId(m_pEscortData->uiEscortFaction);
     }
-    void OnQuestAccept(Player* pPlayer, const Quest* pQuest)
+    void OnQuestAccept(Player* pPlayer, Quest const* pQuest)
     {
         if (!m_pEscortData)
             return;
@@ -110,7 +110,7 @@ struct npc_escort_genericAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_pEscortData)
             return;
@@ -136,7 +136,7 @@ CreatureAI* GetAI_npc_escort_genericAI(Creature* pCreature)
     return (CreatureAI*)pTempAI;
 }
 
-bool QuestAccept_npc_escort_genericAI(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_escort_genericAI(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (npc_escort_genericAI* pEscortAI = dynamic_cast<npc_escort_genericAI*>(pCreature->AI()))
         pEscortAI->OnQuestAccept(pPlayer, pQuest);

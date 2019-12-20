@@ -341,12 +341,12 @@ struct instance_scholomance : public ScriptedInstance
         SummonGandlingIfPossible();
     }
     /** Load / save system */
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
             return;
@@ -447,7 +447,7 @@ struct boss_lordblackwoodAI : public ScriptedAI
             LastWayPoint = uiPointId;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

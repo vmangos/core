@@ -70,7 +70,7 @@ void MemberSlot::ChangeRank(uint32 newRank)
 {
     RankId = newRank;
 
-    Player *player = sObjectMgr.GetPlayer(guid);
+    Player* player = sObjectMgr.GetPlayer(guid);
     // If player not online data in data field will be loaded from guild tabs no need to update it !!
     if (player)
         player->SetRank(newRank);
@@ -296,12 +296,12 @@ void Guild::SetGINFO(std::string ginfo)
     CharacterDatabase.PExecute("UPDATE guild SET info='%s' WHERE guildid='%u'", ginfo.c_str(), m_Id);
 }
 
-bool Guild::LoadGuildFromDB(QueryResult *guildDataResult)
+bool Guild::LoadGuildFromDB(QueryResult* guildDataResult)
 {
     if (!guildDataResult)
         return false;
 
-    Field *fields = guildDataResult->Fetch();
+    Field* fields = guildDataResult->Fetch();
 
     m_Id              = fields[0].GetUInt32();
     m_Name            = fields[1].GetCppString();
@@ -348,7 +348,7 @@ bool Guild::CheckGuildStructure()
     return true;
 }
 
-bool Guild::LoadRanksFromDB(QueryResult *guildRanksResult)
+bool Guild::LoadRanksFromDB(QueryResult* guildRanksResult)
 {
     if (!guildRanksResult)
     {
@@ -357,7 +357,7 @@ bool Guild::LoadRanksFromDB(QueryResult *guildRanksResult)
         return true;
     }
 
-    Field *fields;
+    Field* fields;
     bool broken_ranks = false;
 
     // GUILD RANKS are sequence starting from 0 = GUILD_MASTER (ALL PRIVILEGES) to max 9 (lowest privileges)
@@ -425,14 +425,14 @@ bool Guild::LoadRanksFromDB(QueryResult *guildRanksResult)
     return true;
 }
 
-bool Guild::LoadMembersFromDB(QueryResult *guildMembersResult)
+bool Guild::LoadMembersFromDB(QueryResult* guildMembersResult)
 {
     if (!guildMembersResult)
         return false;
 
     do
     {
-        Field *fields = guildMembersResult->Fetch();
+        Field* fields = guildMembersResult->Fetch();
         // this condition will be true when all rows in QueryResult are processed and new guild without members is going to be loaded - prevent crash
         if (!fields)
             break;
@@ -554,7 +554,7 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
         SetLeader(newLeaderGUID);
 
         // If player not online data in data field will be loaded from guild tabs no need to update it !!
-        if (Player *newLeader = sObjectMgr.GetPlayer(newLeaderGUID))
+        if (Player* newLeader = sObjectMgr.GetPlayer(newLeaderGUID))
             newLeader->SetRank(GR_GUILDMASTER);
 
         // when leader non-exist (at guild load with deleted leader only) not send broadcasts
@@ -568,7 +568,7 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
     members.erase(lowguid);
     sGuildMgr.GuildMemberRemoved(lowguid);
 
-    Player *player = sObjectMgr.GetPlayer(guid);
+    Player* player = sObjectMgr.GetPlayer(guid);
     // If player not online data in data field will be loaded from guild tabs no need to update it !!
     if (player)
     {
@@ -584,7 +584,7 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
     return members.empty();
 }
 
-void Guild::BroadcastToGuild(WorldSession *session, std::string const& msg, uint32 language)
+void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint32 language)
 {
     if (!session)
         return;
@@ -601,14 +601,14 @@ void Guild::BroadcastToGuild(WorldSession *session, std::string const& msg, uint
         if (!HasRankRight(itr->second.RankId, GR_RIGHT_GCHATLISTEN))
             continue;
 
-        MasterPlayer *pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+        MasterPlayer* pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
 
         if (pl && pl->GetSession() && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
             pl->GetSession()->SendPacket(&data);
     }
 }
 
-void Guild::BroadcastToOfficers(WorldSession *session, std::string const& msg, uint32 language)
+void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, uint32 language)
 {
     if (!session)
         return;
@@ -625,7 +625,7 @@ void Guild::BroadcastToOfficers(WorldSession *session, std::string const& msg, u
         if (!HasRankRight(itr->second.RankId, GR_RIGHT_OFFCHATLISTEN))
             continue;
 
-        MasterPlayer *pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+        MasterPlayer* pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
 
         if (pl && pl->GetSession() && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
             pl->GetSession()->SendPacket(&data);
@@ -636,7 +636,7 @@ void Guild::BroadcastPacket(WorldPacket* packet)
 {
     for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
     {
-        Player *player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+        Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
         if (player)
             player->GetSession()->SendPacket(packet);
     }
@@ -648,7 +648,7 @@ void Guild::BroadcastPacketToRank(WorldPacket* packet, uint32 rankId)
     {
         if (itr->second.RankId == rankId)
         {
-            Player *player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+            Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
             if (player)
                 player->GetSession()->SendPacket(packet);
         }
@@ -749,7 +749,7 @@ void Guild::Disband()
     sGuildMgr.RemoveGuild(m_Id);
 }
 
-void Guild::Roster(WorldSession *session /*= nullptr*/)
+void Guild::Roster(WorldSession* session /*= nullptr*/)
 {
     // we can only guess size
     WorldPacket data(SMSG_GUILD_ROSTER, (4 + MOTD.length() + 1 + GINFO.length() + 1 + 4 + m_Ranks.size() * 4 + members.size() * 50));
@@ -767,7 +767,7 @@ void Guild::Roster(WorldSession *session /*= nullptr*/)
     MemberList::const_iterator itr = members.begin();
     for (; itr != members.end(); ++itr)
     {
-        if (Player *pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
+        if (Player* pl = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
         {
             data << pl->GetObjectGuid();
             data << uint8(1);
@@ -803,7 +803,7 @@ void Guild::Roster(WorldSession *session /*= nullptr*/)
     DEBUG_LOG("WORLD: Sent (SMSG_GUILD_ROSTER)");
 }
 
-void Guild::Query(WorldSession *session)
+void Guild::Query(WorldSession* session)
 {
     WorldPacket data(SMSG_GUILD_QUERY_RESPONSE, (4 + 48 + 10 * 32 + 5 * 4)); // guess size; max: name(96), rankname(64)
 
@@ -863,7 +863,7 @@ uint32 Guild::GetAccountsNumber()
 // Guild Eventlog part
 // *************************************************
 // Display guild eventlog
-void Guild::DisplayGuildEventLog(WorldSession *session)
+void Guild::DisplayGuildEventLog(WorldSession* session)
 {
     // NOSTALRIUS: Inexistant packet.
 }
@@ -872,7 +872,7 @@ void Guild::DisplayGuildEventLog(WorldSession *session)
 void Guild::LoadGuildEventLogFromDB()
 {
     //                                                     0        1          2            3            4        5
-    QueryResult *result = CharacterDatabase.PQuery("SELECT LogGuid, EventType, PlayerGuid1, PlayerGuid2, NewRank, TimeStamp FROM guild_eventlog WHERE guildid=%u ORDER BY TimeStamp DESC,LogGuid DESC LIMIT %u", m_Id, GUILD_EVENTLOG_MAX_RECORDS);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT LogGuid, EventType, PlayerGuid1, PlayerGuid2, NewRank, TimeStamp FROM guild_eventlog WHERE guildid=%u ORDER BY TimeStamp DESC,LogGuid DESC LIMIT %u", m_Id, GUILD_EVENTLOG_MAX_RECORDS);
     if (!result)
         return;
     bool isNextLogGuidSet = false;
@@ -880,7 +880,7 @@ void Guild::LoadGuildEventLogFromDB()
     // First event in list will be the oldest and the latest event is last event in list
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         if (!isNextLogGuidSet)
         {
             m_GuildEventLogNextGuid = fields[0].GetUInt32();

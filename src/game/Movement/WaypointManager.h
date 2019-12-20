@@ -46,7 +46,7 @@ struct WaypointBehavior
 
     bool isEmpty();
     WaypointBehavior() {}
-    WaypointBehavior(const WaypointBehavior &b);
+    WaypointBehavior(WaypointBehavior const& b);
 };
 
 struct WaypointNode

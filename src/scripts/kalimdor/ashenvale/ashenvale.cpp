@@ -192,7 +192,7 @@ struct npc_muglashAI : public npc_escortAI
         pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -261,7 +261,7 @@ struct npc_muglashAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_muglash(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_muglash(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_VORSHA)
     {
@@ -362,7 +362,7 @@ struct npc_ruul_snowhoofAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_ruul_snowhoof(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_ruul_snowhoof(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_FREEDOM_TO_RUUL)
     {
@@ -470,7 +470,7 @@ struct npc_torekAI : public npc_escortAI
         pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -495,7 +495,7 @@ struct npc_torekAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_torek(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_torek(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TOREK_ASSULT)
     {
@@ -546,14 +546,14 @@ enum FeeroIronhandData
  */
 
 // Distance, Angle or Offset
-static const float aSummonPositions[2][2] =
+static float const aSummonPositions[2][2] =
 {
     {30.0f, 1.25f},
     {15.0f, 0.95f}//30.0f is in the tree and gets stuck with fathfinding
 };
 
 // Hardcoded positions for the last 3 mobs
-static const float aEliteSummonPositions[3][4] =
+static float const aEliteSummonPositions[3][4] =
 {
     {4243.12f, 108.22f, 38.12f, 3.62f},
     {4240.95f, 114.04f, 38.35f, 3.56f},
@@ -677,7 +677,7 @@ CreatureAI* GetAI_npc_feero_ironhand(Creature* pCreature)
     return new npc_feero_ironhandAI(pCreature);
 }
 
-bool QuestAccept_npc_feero_ironhand(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_feero_ironhand(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_SUPPLIES_TO_AUBERDINE)
     {
@@ -792,7 +792,7 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (eventPhase == 0 || eventPhase > 4)
             return;
@@ -889,7 +889,7 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             return;
@@ -916,7 +916,7 @@ struct npc_enraged_foulwealdAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_DESTROY_KARANG_S_BANNER_2)
         {

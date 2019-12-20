@@ -598,7 +598,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
 
         // overwrite WorldObject function for proper name localization
-        const char* GetNameForLocaleIdx(int32 locale_idx) const override;
+        char const* GetNameForLocaleIdx(int32 locale_idx) const override;
 
         void SaveToDB();
         void SaveToDB(uint32 mapid);
@@ -735,7 +735,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         
         GameObject* LookupFishingHoleAround(float range);
 
-        GridReference<GameObject> &GetGridRef() { return m_gridRef; }
+        GridReference<GameObject>& GetGridRef() { return m_gridRef; }
 
         // Nostalrius
         bool IsUseRequirementMet() const;

@@ -309,12 +309,12 @@ struct instance_shadowfang_keep : public ScriptedInstance
         return 0;
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {

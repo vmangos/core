@@ -73,7 +73,7 @@ struct boss_immol_tharAI : public ScriptedAI
             m_bEngage = true;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {

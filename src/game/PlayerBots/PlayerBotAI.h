@@ -19,7 +19,7 @@ class PlayerBotAI: public PlayerAI
 
         virtual bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess);
         virtual void OnBotEntryLoad(PlayerBotEntry* entry) {}
-        void UpdateAI(const uint32 /*diff*/) override; // Handle delayed teleports
+        void UpdateAI(uint32 const /*diff*/) override; // Handle delayed teleports
         virtual void OnPlayerLogin() {}
         virtual void BeforeAddToMap(Player* player) {} // me=nullptr at call
         // Helpers
@@ -63,7 +63,7 @@ class MageOrgrimmarAttackerAI: public PlayerBotAI
         explicit MageOrgrimmarAttackerAI(Player* pPlayer = nullptr) : PlayerBotAI(pPlayer) {}
         ~MageOrgrimmarAttackerAI() override {}
         bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) override;
-        void UpdateAI(const uint32 /*diff*/) override;
+        void UpdateAI(uint32 const /*diff*/) override;
 };
 
 class PopulateAreaBotAI: public PlayerBotAI

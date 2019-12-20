@@ -247,7 +247,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_SELF_CAGE, false);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_pInstance)
             return;
@@ -370,7 +370,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_pInstance)
             return;

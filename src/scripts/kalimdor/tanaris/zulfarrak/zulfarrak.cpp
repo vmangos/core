@@ -85,7 +85,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
 //        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!pInstance)
             return;
@@ -147,7 +147,7 @@ struct npc_sergeant_blyAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void DoAction(const uint32 param) override
+    void DoAction(uint32 const param) override
     {
         postGossipStep = 1;
         Text_Timer = 0;
@@ -315,7 +315,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
             pInstance->SetData(0, DONE);*/
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (regen == false && pInstance->GetData(EVENT_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
         {
@@ -433,7 +433,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
         }
     }
 
-    void DoAction(const uint32 param) override
+    void DoAction(uint32 const param) override
     {
         sLog.outString("DoAction de npc_weegli_blastfuse : Destruction porte");
         DestroyDoor();
@@ -573,7 +573,7 @@ enum zumrahConsts
     SAY_ZUMRAH_KILLED       = 6222
 };
 
-bool OnTrigger_at_zumrah(Player* pPlayer, const AreaTriggerEntry *at)
+bool OnTrigger_at_zumrah(Player* pPlayer, AreaTriggerEntry const *at)
 {
     Creature* pZumrah = pPlayer->FindNearestCreature(NPC_WITCH_DOCTOR_ZUMRAH, 30.0f);
 
@@ -614,7 +614,7 @@ struct ward_zumrahAI : public ScriptedAI
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
 

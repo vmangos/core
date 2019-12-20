@@ -184,7 +184,7 @@ bool ChatHandler::HandleNpcSetModelCommand(char* args)
 
     uint32 displayId = (uint32) atoi(args);
 
-    Creature *pCreature = GetSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
 
     if (!pCreature || pCreature->IsPet())
     {
@@ -230,7 +230,7 @@ bool ChatHandler::HandleNpcFactionIdCommand(char* args)
     // faction is set in creature_template - not inside creature
 
     // update in memory
-    if (CreatureInfo const *cinfo = pCreature->GetCreatureInfo())
+    if (CreatureInfo const* cinfo = pCreature->GetCreatureInfo())
     {
         const_cast<CreatureInfo*>(cinfo)->faction = factionId;
     }
@@ -268,7 +268,7 @@ bool ChatHandler::HandleNpcFlagCommand(char* args)
 
 bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
 {
-    Creature *creatureTarget = GetSelectedCreature();
+    Creature* creatureTarget = GetSelectedCreature();
 
     if (!creatureTarget || creatureTarget->IsPet())
     {
@@ -277,7 +277,7 @@ bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
         return false;
     }
 
-    Player *player = m_session->GetPlayer();
+    Player* player = m_session->GetPlayer();
 
     if (player->GetPetGuid())
     {
@@ -378,7 +378,7 @@ bool ChatHandler::HandleNpcSpawnDistCommand(char* args)
     if (option > 0.0f)
         mtype = RANDOM_MOTION_TYPE;
 
-    Creature *pCreature = GetSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
     uint32 u_guidlow = 0;
 
     if (pCreature)
@@ -406,7 +406,7 @@ bool ChatHandler::HandleNpcSpawnTimeCommand(char* args)
     if (!ExtractUInt32(&args, stime))
         return false;
 
-    Creature *pCreature = GetSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
     if (!pCreature)
     {
         PSendSysMessage(LANG_SELECT_CREATURE);
@@ -545,7 +545,7 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
     if (!ExtractUint32KeyFromLink(&args, "Hcreature_entry", id))
         return false;
 
-    CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(id);
+    CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(id);
     if (!cinfo)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, id);
@@ -553,9 +553,9 @@ bool ChatHandler::HandleNpcAddCommand(char* args)
         return false;
     }
 
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     CreatureCreatePos pos(chr, chr->GetOrientation());
-    Map *map = chr->GetMap();
+    Map* map = chr->GetMap();
 
     Creature* pCreature = new Creature;
 
@@ -595,7 +595,7 @@ bool ChatHandler::HandleNpcSummonCommand(char* args)
     if (!ExtractUint32KeyFromLink(&args, "Hcreature_entry", id))
         return false;
 
-    CreatureInfo const *cinfo = ObjectMgr::GetCreatureTemplate(id);
+    CreatureInfo const* cinfo = ObjectMgr::GetCreatureTemplate(id);
     if (!cinfo)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, id);
@@ -603,7 +603,7 @@ bool ChatHandler::HandleNpcSummonCommand(char* args)
         return false;
     }
 
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     chr->SummonCreature(id, chr->GetPositionX(), chr->GetPositionY(), chr->GetPositionZ(), chr->GetOrientation());
     return true;
 }
@@ -1017,8 +1017,8 @@ bool ChatHandler::HandleComeToMeCommand(char *args)
 
 bool ChatHandler::HandleNpcFollowCommand(char* /*args*/)
 {
-    Player *player = m_session->GetPlayer();
-    Creature *creature = GetSelectedCreature();
+    Player* player = m_session->GetPlayer();
+    Creature* creature = GetSelectedCreature();
 
     if (!creature)
     {
@@ -1073,7 +1073,7 @@ bool ChatHandler::HandleNpcUnFollowCommand(char* /*args*/)
 
 bool ChatHandler::HandleNpcAllowMovementCommand(char* args)
 {
-    Creature *pCreature = GetSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
 
     if (!pCreature)
     {
@@ -1098,7 +1098,7 @@ bool ChatHandler::HandleNpcAllowMovementCommand(char* args)
 
 bool ChatHandler::HandleNpcAllowAttackCommand(char* args)
 {
-    Creature *pCreature = GetSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
 
     if (!pCreature)
     {
@@ -1153,7 +1153,7 @@ bool ChatHandler::HandleNpcGroupAddCommand(char* args)
     }
 
     bool dbsave = target->HasStaticDBSpawnData();
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     float angle = (chr->GetAngle(target) - target->GetOrientation()) + 2 * M_PI_F;
     float dist = sqrtf(pow(chr->GetPositionX() - target->GetPositionX(), int(2)) + pow(chr->GetPositionY() - target->GetPositionY(), int(2)));
 
@@ -1202,7 +1202,7 @@ bool ChatHandler::HandleNpcGroupAddRelCommand(char* args)
     }
 
     bool dbsave = target->HasStaticDBSpawnData();
-    //Player *chr = m_session->GetPlayer();
+    //Player* chr = m_session->GetPlayer();
     float angle = target->GetAngle(leader);//(chr->GetAngle(target) - target->GetOrientation()) + 2 * M_PI_F;
     float dist = sqrtf(pow(leader->GetPositionX() - target->GetPositionX(), int(2)) + pow(leader->GetPositionY() - target->GetPositionY(), int(2)));
 
@@ -1221,7 +1221,7 @@ bool ChatHandler::HandleNpcGroupAddRelCommand(char* args)
 
 bool ChatHandler::HandleNpcGroupDelCommand(char *args)
 {
-    Creature *target = GetSelectedCreature();
+    Creature* target = GetSelectedCreature();
     SetSentErrorMessage(true);
 
     if (!target || !target->HasStaticDBSpawnData())
@@ -2108,8 +2108,8 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
     if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
         return false; // must exist as normal creature in mangos.sql 'creature_template'
 
-    const CreatureInfo *cInfo = nullptr;
-    const Creature *pCreature = GetSelectedCreature();
+    CreatureInfo const* cInfo = nullptr;
+    Creature const* pCreature = GetSelectedCreature();
     uint32 cr_id;
 
     // optional number or [name] Shift-click form |color|Hcreature_entry:creature_id|h[name]|h|r
@@ -2132,7 +2132,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
     const auto pPlayer = m_session->GetPlayer();
     auto map = pPlayer->GetMap();
 
-    auto &scriptPoints = sScriptMgr.GetPointMoveList(cInfo->entry);
+    auto& scriptPoints = sScriptMgr.GetPointMoveList(cInfo->entry);
 
     if (scriptPoints.empty())
     {
@@ -2141,7 +2141,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
         return false;
     }
 
-    for (const auto &wp : scriptPoints)
+    for (const auto& wp : scriptPoints)
     {
         CreatureCreatePos pos{map, wp.fX, wp.fY, wp.fZ, pPlayer->GetOrientation()};
         Creature* wpCreature = new Creature;
@@ -2179,7 +2179,7 @@ bool ChatHandler::HandleEscortHideWpCommand(char* /*args*/)
     bool hasError = false;
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         uint32 wpGuid = fields[0].GetUInt32();
         Creature* pCreature = map->GetCreature(ObjectGuid(HIGHGUID_UNIT, VISUAL_WAYPOINT, wpGuid));
         if (!pCreature)

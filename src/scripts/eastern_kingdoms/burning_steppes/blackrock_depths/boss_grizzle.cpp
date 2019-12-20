@@ -44,7 +44,7 @@ struct boss_grizzleAI : public ScriptedAI
         Frenzy_Timer = 0;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

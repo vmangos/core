@@ -1132,12 +1132,12 @@ struct instance_blackrock_depths : ScriptedInstance
         }
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* in) override
+    void Load(char const* in) override
     {
         if (!in)
         {

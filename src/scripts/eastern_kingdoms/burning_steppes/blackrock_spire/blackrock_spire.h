@@ -92,8 +92,8 @@ class instance_blackrock_spire : public ScriptedInstance
         uint32 GetData(uint32 uiType) override;
         uint64 GetData64(uint32 uiType) override;
 
-        const char* Save() override { return strInstData.c_str(); }
-        void Load(const char* chrIn) override;
+        char const* Save() override { return strInstData.c_str(); }
+        void Load(char const* chrIn) override;
 
         void DoSortRoomEventMobs();
         void GetIncanceratorGUIDList(std::list<uint64> &lList) { lList = m_lIncanceratorGUIDList; }

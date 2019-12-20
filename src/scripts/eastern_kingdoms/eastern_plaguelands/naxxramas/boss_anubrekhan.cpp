@@ -70,7 +70,7 @@ enum
 
 
 
-static const float CGs[3][4] = 
+static float const CGs[3][4] = 
 {
     { 3291.26f, -3502.08f, 287.26f, 2.14f },
     { 3285.29f, -3446.64f, 287.26f, 4.2f },
@@ -127,7 +127,7 @@ Watch his stopatch in center of screen.
 Best guess so far is random between 12 and 18 seconds based on this video.
 Timer does not seem to reset after locust swarm, but rather continue from whatever it was when locust started.
 */
-static const uint32 IMPALE_CD() { return urand(12000, 18000); }
+static uint32 const IMPALE_CD() { return urand(12000, 18000); }
 
 
 /*
@@ -173,7 +173,7 @@ Watch his stopatch in center of screen.
 Based on those values, 90-110 or something like that does not seem far fetched as a cooldown.
 Cast time is 3 seconds. Duration is 20 seconds.
 */
-static const uint32 LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
+static uint32 const LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
 
 
 struct boss_anubrekhanAI : public ScriptedAI
@@ -383,7 +383,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -510,7 +510,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

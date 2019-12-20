@@ -106,7 +106,7 @@ struct npc_morokkAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -135,7 +135,7 @@ CreatureAI* GetAI_npc_morokk(Creature* pCreature)
     return new npc_morokkAI(pCreature);
 }
 
-bool QuestAccept_npc_morokk(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_morokk(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_CHALLENGE_MOROKK)
     {
@@ -390,7 +390,7 @@ struct npc_private_hendelAI : public ScriptedAI
             // Fleeing guards
             // 1 guard always says: It's Proudmoore! Get out of here!
             // 2 guard has a random text
-            const int guardTexts[3] = { SAY_PROGRESS_5_SEN, SAY_PROGRESS_6_SEN, SAY_PROGRESS_7_SEN };
+            int const guardTexts[3] = { SAY_PROGRESS_5_SEN, SAY_PROGRESS_6_SEN, SAY_PROGRESS_7_SEN };
 
             // check if there one of the guards is available
             bool first = true;
@@ -511,7 +511,7 @@ struct npc_private_hendelAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
 #ifdef ELYSIUM_CORE_JUST_RESPAWNED
         if (m_justCreated)
@@ -723,7 +723,7 @@ struct npc_private_hendelAI : public ScriptedAI
     }
 };
 
-bool QuestAccept_npc_private_hendel(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_private_hendel(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (!pPlayer || !pCreature || !pQuest)
         return false;
@@ -819,7 +819,7 @@ struct npc_archmage_tervoshAI : public ScriptedAI
     // used on area-trigger: if a new player arrives, reset event duration.
     void resetDespawnDelay() { m_despawnDelayTimer = TERVOSH_SPAWN_DURATION; }
     // returns the current phase in the event
-    const uint32 getCurrentPhase() const { return m_eventPhase; }
+    uint32 const getCurrentPhase() const { return m_eventPhase; }
 
     void Reset() override
     {
@@ -829,7 +829,7 @@ struct npc_archmage_tervoshAI : public ScriptedAI
         m_despawnDelayTimer = TERVOSH_SPAWN_DURATION;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_eventStarted)
         {
@@ -1044,7 +1044,7 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
         m_uiSpecialTimer = 15000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->IsNonMeleeSpellCasted())
             return;
@@ -1250,7 +1250,7 @@ struct npc_stinky_ignatzAI : public npc_escortAI
                 break;
         }
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -1297,7 +1297,7 @@ struct npc_stinky_ignatzAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_stinky_ignatz(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_stinky_ignatz(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_STINKYS_ESCAPE_A || pQuest->GetQuestId() == QUEST_STINKYS_ESCAPE_H)
     {
@@ -1325,7 +1325,7 @@ enum
     NPC_MANA_SURGE = 6550
 };
 
-static const float ManaSurgesSpawnPoint[3] =
+static float const ManaSurgesSpawnPoint[3] =
 {
     -4019.22f,	-3383.91f,	38.2265f
 };
@@ -1401,7 +1401,7 @@ struct npc_tabethaAI : ScriptedAI
                 (*itr)->ForcedDespawn();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_uiManaSurgesInProcess) return;
 
@@ -1517,7 +1517,7 @@ struct npc_emberstrifeAI : ScriptedAI
         m_bWeakened = false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

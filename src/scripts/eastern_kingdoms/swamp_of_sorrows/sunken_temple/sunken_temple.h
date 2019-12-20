@@ -143,7 +143,7 @@ struct npc_shade_hakkarAI : public ScriptedAI
     void Aggro(Unit *pWho) override;
     void JustSummoned(Creature *m_creature) override;
     void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId) override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(uint32 const uiDiff) override;
 
     void SummonJustDied(Creature *m_pcreature);
     void UpdateBrazierState(GameObject *go, bool used);

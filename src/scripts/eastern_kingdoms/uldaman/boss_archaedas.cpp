@@ -99,7 +99,7 @@ struct boss_archaedasAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
-    void SpellHit(Unit* /*caster*/, const SpellEntry* spell) override
+    void SpellHit(Unit* /*caster*/, SpellEntry const* spell) override
     {
         // Being woken up from the altar, start the awaken sequence
         if (spell->Id == SPELL_ARCHAEDAS_AWAKEN && !bWakingUp)
@@ -122,7 +122,7 @@ struct boss_archaedasAI : public ScriptedAI
         instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, NOT_STARTED);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (bJustCreated)
         {
@@ -313,7 +313,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*caster*/, const SpellEntry* spell) override
+    void SpellHit(Unit* /*caster*/, SpellEntry const* spell) override
     {
         // time to wake up, start animation
         if (spell->Id == SPELL_AWAKEN_EARTHEN_DWARF
@@ -338,7 +338,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) != IN_PROGRESS)
         {

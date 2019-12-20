@@ -262,7 +262,7 @@ struct kt_p1AddAI : public ScriptedAI
             ScriptedAI::MoveInLineOfSight(pWho);
         }
     }
-    void SpellHit(Unit* unit, const SpellEntry*) override 
+    void SpellHit(Unit* unit, SpellEntry const*) override 
     {
         if(!hasAggroed)
             ActualAttack(unit);
@@ -446,9 +446,9 @@ struct boss_kelthuzadAI : public ScriptedAI
                 double relDistance = rand_norm() + rand_norm();
                 if (relDistance > 1)
                     relDistance = 1 - relDistance;
-                const float x = alcoves[i][0];
-                const float y = alcoves[i][1];
-                const float radius = 14.0f;
+                float const x = alcoves[i][0];
+                float const y = alcoves[i][1];
+                float const radius = 14.0f;
                 float thisX = x + std::sin(angle)*relDistance*radius;
                 float thisY = y + std::cos(angle)*relDistance*radius;
                 if (Creature* pCreature = m_creature->SummonCreature(NPC_SOLDIER_FROZEN, thisX, thisY, alcoveZ, frand(0, M_PI_F * 2),
@@ -483,7 +483,7 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     bool SpawnAndSendP1Creature(uint32 type)
     {
-        const float* spawnLoc = alcoves[urand(0, NUM_ALCOVES - 1)];
+        float const* spawnLoc = alcoves[urand(0, NUM_ALCOVES - 1)];
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
         {
             float spawnAng = 3.14f + pTarget->GetAngle(spawnLoc[0], spawnLoc[1]);
@@ -651,7 +651,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                     // we can re-use the soulweave positions for where to spawn the guardians
                     // todo: is it completely random, or do we avoid re-using the same alcove twize?
                     int portalIndex = urand(0, NUM_WINDOW_PORTALS - 1);
-                    const float* pos = windowPortals[portalIndex];
+                    float const* pos = windowPortals[portalIndex];
 
                     if (Creature* pCreature = m_creature->SummonCreature(NPC_GUARDIAN, pos[0], pos[1], alcoveZ, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
@@ -779,7 +779,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -830,7 +830,7 @@ struct mob_abomAI : public kt_p1AddAI
     {
         mortalWoundTimer = 7500;
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -856,7 +856,7 @@ struct mob_soldierAI : public kt_p1AddAI
     void Reset() override
     {
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -891,7 +891,7 @@ struct mob_soulweaverAI : public kt_p1AddAI
     {
         hasHitSomeone = false;
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -940,7 +940,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
             pC->RemoveAurasDueToSpell(10955);
     }
 
-    void SpellHit(Unit*, const SpellEntry* spell) override 
+    void SpellHit(Unit*, SpellEntry const* spell) override 
     {
         // if hit by any shackle spell we check how many other guardians are shackled.
         // If more than 3, we release everyone.
@@ -976,7 +976,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1016,7 +1016,7 @@ struct mob_shadow_fissureAI : public ScriptedAI
     {
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (haveCasted)
             return;
@@ -1061,7 +1061,7 @@ CreatureAI* GetAI_mob_shadow_fissure(Creature* pCreature)
     return new mob_shadow_fissureAI(pCreature);
 }
 
-void instance_naxxramas::OnKTAreaTrigger(const AreaTriggerEntry* pAT)
+void instance_naxxramas::OnKTAreaTrigger(AreaTriggerEntry const* pAT)
 {
     if (GetData(TYPE_KELTHUZAD) != NOT_STARTED)
         return;

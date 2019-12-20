@@ -237,7 +237,7 @@ CreatureAI* GetAI_npc_gilthares(Creature* pCreature)
     return new npc_giltharesAI(pCreature);
 }
 
-bool QuestAccept_npc_gilthares(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_gilthares(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_FREE_FROM_HOLD)
     {
@@ -297,7 +297,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
         m_creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell) override
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_FLARE || spell->Id == SPELL_FOLLY)
         {
@@ -308,7 +308,7 @@ struct npc_taskmaster_fizzuleAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (IsFriend)
         {
@@ -445,7 +445,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         pUnit->SetFactionTemplateId(14);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!EventInProgress)
             return;
@@ -563,7 +563,7 @@ CreatureAI* GetAI_npc_twiggy_flathead(Creature* pCreature)
     return new npc_twiggy_flatheadAI(pCreature);
 }
 
-bool AreaTrigger_at_twiggy_flathead(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_twiggy_flathead(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (!pPlayer->IsDead() && pPlayer->GetQuestStatus(QUEST_AFFRAY) == QUEST_STATUS_INCOMPLETE)
     {
@@ -677,7 +677,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
             pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -719,7 +719,7 @@ struct npc_wizzlecranks_shredderAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_wizzlecranks_shredder(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_wizzlecranks_shredder(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ESCAPE)
     {
@@ -1042,7 +1042,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
             }
         }
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (eventPhase > 0)
         {
@@ -1117,7 +1117,7 @@ bool GossipSelect_npc_regthar_deathgate(Player* pPlayer, Creature* pCreature, ui
 // }
 // return true;
 // }
-bool QuestAccept_npc_regthar_deathgate(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_regthar_deathgate(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_COUNTERATTACK)
     {
@@ -1165,7 +1165,7 @@ struct npc_kolkar_invaderAI : public ScriptedAI
             return;
         //m_creature->CastSpell( m_creature->GetPositionX() + 10*cos( m_creature->GetOrientation()),  m_creature->GetPositionY() + 10*sin( m_creature->GetOrientation()),  m_creature->GetPositionZ(), SPELL_TORCH, false);
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -1234,7 +1234,7 @@ struct npc_axe_throwerAI : public ScriptedAI
             DoScriptText(urand(0, 1) ? SAY_HORDE : SAY_FOES, m_creature);
     }
     uint32 throwTimer;
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -1271,7 +1271,7 @@ struct npc_warlord_kromzarAI : public ScriptedAI
     {
         m_creature->CastSpell(m_creature, 13965, true); //SPELL_BANNER
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -1316,7 +1316,7 @@ struct npc_razormane_stalkerAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_STEALTH);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -1374,7 +1374,7 @@ struct npc_mission_possible_but_not_probableAI : ScriptedAI
 
     }
 
-    void SpellHit(Unit* /*caster*/, const SpellEntry* pSpell) override
+    void SpellHit(Unit* /*caster*/, SpellEntry const* pSpell) override
     {
         uint32 spellId = 0;
 

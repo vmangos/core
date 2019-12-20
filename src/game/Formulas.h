@@ -93,11 +93,11 @@ namespace MaNGOS
         }
         inline uint32 BaseGain(uint32 pl_level, uint32 mob_level)
         {
-            const uint32 nBaseExp = 45;
+            uint32 const nBaseExp = 45;
             return (pl_level * 5 + nBaseExp) * BaseGainLevelFactor(pl_level, mob_level);
         }
 
-        inline uint32 Gain(Player *pPlayer, Unit *pUnit)
+        inline uint32 Gain(Player* pPlayer, Unit* pUnit)
         {
             if (Creature* pCreature = ToCreature(pUnit))
             {
@@ -150,7 +150,7 @@ namespace MaNGOS
             return 0;
         }
 
-        inline uint32 PetGain(Pet *pPet, Unit *pUnit)
+        inline uint32 PetGain(Pet* pPet, Unit* pUnit)
         {
             bool isPet = pUnit->GetTypeId() == TYPEID_UNIT && pUnit->IsPet() &&
                 ((Creature*)pUnit)->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&

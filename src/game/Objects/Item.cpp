@@ -596,7 +596,7 @@ Player* Item::GetOwner()const
 
 uint32 Item::GetSkill()
 {
-    const static uint32 item_weapon_skills[MAX_ITEM_SUBCLASS_WEAPON] =
+    static uint32 const item_weapon_skills[MAX_ITEM_SUBCLASS_WEAPON] =
     {
         SKILL_AXES,     SKILL_2H_AXES,  SKILL_BOWS,          SKILL_GUNS,      SKILL_MACES,
         SKILL_2H_MACES, SKILL_POLEARMS, SKILL_SWORDS,        SKILL_2H_SWORDS, 0,
@@ -605,7 +605,7 @@ uint32 Item::GetSkill()
         SKILL_FISHING
     };
 
-    const static uint32 item_armor_skills[MAX_ITEM_SUBCLASS_ARMOR] =
+    static uint32 const item_armor_skills[MAX_ITEM_SUBCLASS_ARMOR] =
     {
         0, SKILL_CLOTH, SKILL_LEATHER, SKILL_MAIL, SKILL_PLATE_MAIL, 0, SKILL_SHIELD, 0, 0, 0
     };
@@ -1159,12 +1159,12 @@ bool Item::ChangeEntry(ItemPrototype const* pNewProto)
     return true;
 }
 
-void Item::GetLocalizedNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale)
+void Item::GetLocalizedNameWithSuffix(std::string& name, ItemPrototype const* proto, ItemRandomPropertiesEntry const* randomProp, int dbLocale, LocaleConstant dbcLocale)
 {
     // local name
     if (dbLocale >= 0)
     {
-        ItemLocale const *il = sObjectMgr.GetItemLocale(proto->ItemId);
+        ItemLocale const* il = sObjectMgr.GetItemLocale(proto->ItemId);
         if (il)
         {
             if (il->Name.size() > size_t(dbLocale) && !il->Name[dbLocale].empty())

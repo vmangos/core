@@ -82,7 +82,7 @@ struct boss_scornAI : public ScriptedAI
         if (uiPointId >= 0 && uiPointId < 10)
             LastWayPoint = uiPointId;
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

@@ -128,7 +128,7 @@ void ChannelMgr::CreateDefaultChannels()
         it->second->SetAnnounce(false);
 }
 
-void ChannelMgr::AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, const char* message)
+void ChannelMgr::AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, char const* message)
 {
     if (Channel* c = channelMgr(HORDE)->GetJoinChannel(channelName))
         c->Say(playerGuid, message, LANG_UNIVERSAL, true);

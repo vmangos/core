@@ -37,7 +37,7 @@ struct boss_zevrimAI : public ScriptedAI
         m_uiSacrificeTimer      = urand(9000, 12000);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->IsNonMeleeSpellCasted(false))
             return;

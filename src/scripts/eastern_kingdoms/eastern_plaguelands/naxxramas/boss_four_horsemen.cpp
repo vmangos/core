@@ -110,9 +110,9 @@ struct boss_four_horsemen_shared : public ScriptedAI
     bool m_bShieldWall1;
     bool m_bShieldWall2;
     uint32 m_uiMarkTimer;
-    const uint32 m_uiMarkId;
-    const uint32 m_uiGhostId;
-    const bool m_bIsSpirit;
+    uint32 const m_uiMarkId;
+    uint32 const m_uiGhostId;
+    bool const m_bIsSpirit;
     uint32 pullCheckTimer;
     EventMap m_events;
     uint32 killSayCooldown;
@@ -300,7 +300,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
             m_pInstance->SetData(TYPE_FOUR_HORSEMEN, SPECIAL);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
 	// TODO: find if hitten by mark target are the only ones to drop 50% aggro
         if (pSpell->Id == m_uiMarkId && pTarget)
@@ -324,7 +324,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // He is used for SM event too, sooo 
         if (m_creature->GetMapId() != 533)
@@ -439,12 +439,12 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         DoScriptText(SAY_BLAU_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         AggroRadius(uiDiff);
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
@@ -554,7 +554,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         DoScriptText(SAY_MOG_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
         if (pSpell->Id == 28882 && specialSayCooldown == 0) // Righteous Fire
@@ -564,7 +564,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         AggroRadius(uiDiff);
 
@@ -647,12 +647,12 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         DoScriptText(SAY_KORT_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         AggroRadius(uiDiff);
 
@@ -745,12 +745,12 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         DoScriptText(SAY_ZELI_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         AggroRadius(uiDiff);
 

@@ -170,17 +170,17 @@ enum
 };
 
 // Random emotes for Grim Guzzler patrons
-static const uint32 aPatronsEmotes[] =
+static uint32 const aPatronsEmotes[] =
 {
     EMOTE_ONESHOT_EXCLAMATION, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_LAUGH
 };
 
 // Used to summon the patrol in Grim Guzzler
-static const float aBarPatrolPositions[2][4] = {
+static float const aBarPatrolPositions[2][4] = {
     {872.7059f, -232.5491f, -43.7525f, 2.069044f},
     {865.5645f, -219.7471f, -43.7033f, 2.033881f}
 };
 
-static const uint32 aBarPatrolId[3] = {NPC_FIREGUARD_DESTROYER, NPC_ANVILRAGE_OFFICER, NPC_ANVILRAGE_OFFICER};
+static uint32 const aBarPatrolId[3] = {NPC_FIREGUARD_DESTROYER, NPC_ANVILRAGE_OFFICER, NPC_ANVILRAGE_OFFICER};
 
 #endif

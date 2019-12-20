@@ -56,7 +56,7 @@ struct boss_rasfrostAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_ICEARMOR, true);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

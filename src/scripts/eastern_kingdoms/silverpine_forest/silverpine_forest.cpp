@@ -204,7 +204,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_deathstalker_erland(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_deathstalker_erland(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ERLAND)
     {
@@ -366,7 +366,7 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bEventStarted && !m_uiSummonCount)
         {
@@ -409,7 +409,7 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
     }
 };
 
-bool QuestAccept_npc_deathstalker_faerleia(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_deathstalker_faerleia(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_PYREWOOD_AMBUSH)
     {
@@ -567,7 +567,7 @@ struct npc_human_worgenAI : public ScriptedAI
 #endif
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         time_t rawtime;
         time(&rawtime);

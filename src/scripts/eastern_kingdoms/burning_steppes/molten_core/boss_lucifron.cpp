@@ -59,7 +59,7 @@ struct boss_lucifronAI : public ScriptedAI
             m_Instance->SetData(TYPE_LUCIFRON, DONE);
     }
 
-    void UpdateAI(const uint32 p_Diff) override
+    void UpdateAI(uint32 const p_Diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

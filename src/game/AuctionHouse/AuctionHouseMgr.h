@@ -87,7 +87,7 @@ struct AuctionEntry
     uint32 GetHouseFaction() const { return auctionHouseEntry->faction; }
     uint32 GetAuctionCut() const;
     uint32 GetAuctionOutBid() const;
-    bool BuildAuctionInfo(WorldPacket & data) const;
+    bool BuildAuctionInfo(WorldPacket& data) const;
     void DeleteFromDB() const;
     void SaveToDB() const;
     bool IsAvailableFor(Player* player);

@@ -75,7 +75,7 @@ struct celebras_the_cursedAI : public ScriptedAI
             m_pInstance->SetData(TYPE_CELEBRAS, DONE);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -221,7 +221,7 @@ struct celebrasSpiritAI : public npc_escortAI
             Event_Timer = 1000;
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (Event_Timer && !m_creature->GetVictim())
         {

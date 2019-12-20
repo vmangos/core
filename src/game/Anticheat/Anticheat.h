@@ -47,7 +47,7 @@ class WardenInterface
     public:
         WardenInterface() {}
         virtual ~WardenInterface() {}
-        virtual void HandleWardenDataOpcode(WorldPacket & recv_data) {}
+        virtual void HandleWardenDataOpcode(WorldPacket& recv_data) {}
         virtual void Update() {}
         virtual WorldSession* GetSession() { return nullptr; }
 };
@@ -97,8 +97,8 @@ public:
     virtual void loadData() {}
     virtual void loadConfig() {}
 
-    virtual std::string normalizeMessage(const std::string &msg, uint32 mask = 0) { return msg; }
-    virtual bool filterMessage(const std::string &msg) { return 0; }
+    virtual std::string normalizeMessage(std::string const& msg, uint32 mask = 0) { return msg; }
+    virtual bool filterMessage(std::string const& msg) { return 0; }
 
     virtual void addMessage(std::string const& msg, uint32 type, PlayerPointer from, PlayerPointer to) {}
 

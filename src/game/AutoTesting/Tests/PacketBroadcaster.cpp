@@ -7,15 +7,15 @@
 class packet_broadcaster_locks : public SingleTest
 {
 public:
-    packet_broadcaster_locks(const char* name) : SingleTest(name, MAP_TESTING_ID, false)
+    packet_broadcaster_locks(char const* name) : SingleTest(name, MAP_TESTING_ID, false)
     {
 
     }
 
     void Test() override
     {
-        const int NUM_PLAYERS_PER_TICK = 50;
-        const int NUM_SPAWN_TICKS = 20;
+        int const NUM_PLAYERS_PER_TICK = 50;
+        int const NUM_SPAWN_TICKS = 20;
 
         // Spawn players
         if (GetTestStep() < NUM_SPAWN_TICKS)

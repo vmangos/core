@@ -41,7 +41,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
     m_CreatureEventAI_Event_Map.clear();
 
     // Gather event data
-    QueryResult *result = WorldDatabase.Query("SELECT id, creature_id, condition_id, event_type, event_inverse_phase_mask, event_chance, event_flags, "
+    QueryResult* result = WorldDatabase.Query("SELECT id, creature_id, condition_id, event_type, event_inverse_phase_mask, event_chance, event_flags, "
                           "event_param1, event_param2, event_param3, event_param4, "
                           "action1_script, action2_script, action3_script "
                           "FROM creature_ai_events");
@@ -53,7 +53,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
         do
         {
             bar.step();
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             CreatureEventAI_Event temp;
             temp.event_id = EventAI_Type(fields[0].GetUInt32());
@@ -101,7 +101,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
 
             if (temp.condition_id)
             {
-                const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(temp.condition_id);
+                ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(temp.condition_id);
                 if (!condition)
                 {
                     sLog.outErrorDb("CreatureEventAI: Creature %u has condition_id %u that does not exist in `conditions`, ignoring", temp.creature_id, temp.condition_id);

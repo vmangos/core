@@ -117,7 +117,7 @@ struct boss_razorgoreAI : public ScriptedAI
         m_uiEvadeTroopsTimer = 5000;
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if (!pTarget)
             return;
@@ -251,7 +251,7 @@ struct boss_razorgoreAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_creature->HasUnitState(UNIT_STAT_POSSESSED))
         {
@@ -559,7 +559,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_pInstance)
             return;

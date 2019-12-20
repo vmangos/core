@@ -112,7 +112,7 @@ std::string ScriptedInstance::GenSaveData(uint32* encounters, uint32 maxIndex)
     return saveStream.str();
 }
 
-void ScriptedInstance::LoadSaveData(const char* pStr, uint32* encounters, uint32 maxIndex)
+void ScriptedInstance::LoadSaveData(char const* pStr, uint32* encounters, uint32 maxIndex)
 {
     SAVE_LOAD_LOG("Chargement : `%s`", pStr);
     std::istringstream loadStream(pStr);

@@ -868,7 +868,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                     uint32 dynFlags = m_uint32Values[CORPSE_FIELD_DYNAMIC_FLAGS];
                     if (Corpse const* corpse = ToCorpse())
                     {
-                        const Loot* loot = &corpse->loot;
+                        Loot const* loot = &corpse->loot;
                         if (loot->isLooted()) // nothing to loot or everything looted.
                             dynFlags &= ~CORPSE_DYNFLAG_LOOTABLE;
                         if (dynFlags & CORPSE_DYNFLAG_LOOTABLE)
@@ -899,7 +899,7 @@ void Object::ClearUpdateMask(bool remove)
     _delayedActions &= ~OBJECT_DELAYED_MARK_CLIENT_UPDATE;
 }
 
-bool Object::LoadValues(const char* data)
+bool Object::LoadValues(char const* data)
 {
     if (!m_uint32Values) _InitValues();
 
@@ -973,7 +973,7 @@ void Object::SetUInt32Value(uint16 index, uint32 value)
     }
 }
 
-void Object::SetUInt64Value(uint16 index, const uint64 &value)
+void Object::SetUInt64Value(uint16 index, uint64 const& value)
 {
     MANGOS_ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
     if (*((uint64*) & (m_uint32Values[ index ])) != value)
@@ -1629,7 +1629,7 @@ bool WorldObject::CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_m
     return dx * dx + dy * dy < reach * reach;
 }
 
-float WorldObject::GetLeewayBonusRange(const Unit* target, bool ability) const
+float WorldObject::GetLeewayBonusRange(Unit const* target, bool ability) const
 {
     if (Player const* pPlayer = ToPlayer())
     {
@@ -1663,7 +1663,7 @@ float WorldObject::GetAngle(WorldObject const* obj) const
 }
 
 // Return angle in range 0..2*pi
-float WorldObject::GetAngle(const float x, const float y) const
+float WorldObject::GetAngle(float const x, float const y) const
 {
     float dx = x - GetPositionX();
     float dy = y - GetPositionY();
@@ -1673,7 +1673,7 @@ float WorldObject::GetAngle(const float x, const float y) const
     return ang;
 }
 
-bool WorldObject::HasInArc(const float arcangle, const float x, const float y) const
+bool WorldObject::HasInArc(float const arcangle, float const x, float const y) const
 {
     // always have self in arc
     if (x == m_position.x && y == m_position.y)
@@ -1701,7 +1701,7 @@ bool WorldObject::HasInArc(const float arcangle, const float x, const float y) c
     return ((angle >= lborder) && (angle <= rborder));
 }
 
-bool WorldObject::HasInArc(const float arcangle, WorldObject const* obj, float offset) const
+bool WorldObject::HasInArc(float const arcangle, WorldObject const* obj, float offset) const
 {
     // always have self in arc
     if (obj == this)
@@ -1896,7 +1896,7 @@ struct MANGOS_DLL_DECL ObjectViewersDeliverer
     WorldObject const* i_sender;
     WorldObject const* i_except;
     explicit ObjectViewersDeliverer(WorldObject const* sender, WorldPacket* msg, WorldObject const* except) : i_message(msg), i_sender(sender), i_except(except) {}
-    void Visit(CameraMapType &m)
+    void Visit(CameraMapType& m)
     {
         for (auto iter = m.begin(); iter != m.end(); ++iter)
             if (Player* player = iter->getSource()->GetOwner())
@@ -1904,7 +1904,7 @@ struct MANGOS_DLL_DECL ObjectViewersDeliverer
                     if (player->IsInVisibleList_Unsafe(i_sender))
                         player->GetSession()->SendPacket(i_message);
     }
-    template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
+    template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
 };
 
 void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except) const
@@ -2479,7 +2479,7 @@ struct WorldObjectChangeAccumulator
             i_object.BuildUpdateDataForPlayer((Player*)&i_object, i_updateDatas);
     }
 
-    void Visit(CameraMapType &m)
+    void Visit(CameraMapType& m)
     {
         for (auto iter = m.begin(); iter != m.end(); ++iter)
         {
@@ -2489,7 +2489,7 @@ struct WorldObjectChangeAccumulator
         }
     }
 
-    template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
+    template<class SKIP> void Visit(GridRefManager<SKIP>&) {}
 };
 
 void WorldObject::BuildUpdateData(UpdateDataMapType & update_players)
@@ -2873,7 +2873,7 @@ void WorldObject::PMonsterSay(int32 textId, ...) const
     va_end(ap);
 }
 
-void WorldObject::PMonsterSay(const char* text, ...) const
+void WorldObject::PMonsterSay(char const* text, ...) const
 {
     va_list ap;
     char str[2048];
@@ -2895,7 +2895,7 @@ void WorldObject::PMonsterYell(int32 textId, ...) const
     va_end(ap);
 }
 
-void WorldObject::PMonsterYell(const char* text, ...) const
+void WorldObject::PMonsterYell(char const* text, ...) const
 {
     va_list ap;
     char str[2048];
@@ -2905,7 +2905,7 @@ void WorldObject::PMonsterYell(const char* text, ...) const
     MonsterYell(str);
 }
 
-void WorldObject::MonsterSay(const char* text, uint32 language, Unit const* target) const
+void WorldObject::MonsterSay(char const* text, uint32 language, Unit const* target) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_SAY, text, Language(language), CHAT_TAG_NONE, GetObjectGuid(), GetName(),
@@ -2913,7 +2913,7 @@ void WorldObject::MonsterSay(const char* text, uint32 language, Unit const* targ
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY), true);
 }
 
-void WorldObject::MonsterYell(const char* text, uint32 language, Unit const* target) const
+void WorldObject::MonsterYell(char const* text, uint32 language, Unit const* target) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_MONSTER_YELL, text, Language(language), CHAT_TAG_NONE, GetObjectGuid(), GetName(),
@@ -2921,7 +2921,7 @@ void WorldObject::MonsterYell(const char* text, uint32 language, Unit const* tar
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_YELL), true);
 }
 
-void WorldObject::MonsterTextEmote(const char* text, Unit const* target, bool IsBossEmote) const
+void WorldObject::MonsterTextEmote(char const* text, Unit const* target, bool IsBossEmote) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, text, LANG_UNIVERSAL, CHAT_TAG_NONE, GetObjectGuid(), GetName(),
@@ -2929,7 +2929,7 @@ void WorldObject::MonsterTextEmote(const char* text, Unit const* target, bool Is
     SendMessageToSetInRange(&data, sWorld.getConfig(IsBossEmote ? CONFIG_FLOAT_LISTEN_RANGE_YELL : CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true);
 }
 
-void WorldObject::MonsterWhisper(const char* text, Unit const* target, bool IsBossWhisper) const
+void WorldObject::MonsterWhisper(char const* text, Unit const* target, bool IsBossWhisper) const
 {
     if (!target || target->GetTypeId() != TYPEID_PLAYER)
         return;
@@ -3050,7 +3050,7 @@ void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
 class MANGOS_DLL_DECL NULLNotifier
 {
 public:
-    template<class T> void Visit(GridRefManager<T> &m) {}
+    template<class T> void Visit(GridRefManager<T>& m) {}
     void Visit(CameraMapType&) {}
 };
 
@@ -3721,7 +3721,7 @@ float WorldObject::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
     if (resistModHitChance < 0.0f)
     {
         // Victim's level based skill, penalize when calculating for low levels (< 20):
-        const float skill = std::max(GetSkillMaxForLevel(victim), uint16(100));
+        float const skill = std::max(GetSkillMaxForLevel(victim), uint16(100));
         // Convert resistance value to vulnerability percentage through comparision with skill
         resistModHitChance = (float(resistModHitChance) / skill) * 100;
         return (resistModHitChance * 0.01f);
@@ -3930,7 +3930,7 @@ SpellSchoolMask WorldObject::GetMeleeDamageSchoolMask() const
     return SPELL_SCHOOL_MASK_NORMAL;
 }
 
-uint32 WorldObject::CalcArmorReducedDamage(Unit* pVictim, const uint32 damage) const
+uint32 WorldObject::CalcArmorReducedDamage(Unit* pVictim, uint32 const damage) const
 {
     uint32 newdamage = 0;
     float armor = (float)pVictim->GetArmor();
@@ -4585,7 +4585,7 @@ int32 WorldObject::SpellBonusWithCoeffs(SpellEntry const* spellProto, int32 tota
     return total;
 };
 
-void WorldObject::DealDamageMods(Unit* victim, uint32 &damage, uint32* absorb)
+void WorldObject::DealDamageMods(Unit* victim, uint32& damage, uint32* absorb)
 {
     Unit* pUnit = ToUnit();
     // [Nostalrius] Pas de degats sous esprit de redemption

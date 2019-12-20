@@ -491,11 +491,11 @@ void ObjectMgr::LoadPlayerPhaseFromDb()
     sLog.outString(">> Loaded %u character phases", total_count);
 }
 
-uint32 ObjectMgr::GetPlayerWorldMaskByGUID(const uint64 guid)
+uint32 ObjectMgr::GetPlayerWorldMaskByGUID(uint64 const guid)
 {
     return m_PlayerPhases[GUID_LOPART(guid)];
 }
-void ObjectMgr::SetPlayerWorldMask(const uint64 guid, uint32 newWorldMask)
+void ObjectMgr::SetPlayerWorldMask(uint64 const guid, uint32 newWorldMask)
 {
     if (m_PlayerPhases[GUID_LOPART(guid)] == newWorldMask)
         return;
@@ -532,7 +532,7 @@ SavedVariable& ObjectMgr::_InsertVariable(uint32 index, uint32 value, bool saved
     return m_SavedVariables[m_SavedVariables.size()-1];
 }
 
-void ObjectMgr::_SaveVariable(const SavedVariable& toSave)
+void ObjectMgr::_SaveVariable(SavedVariable const& toSave)
 {
     // Must do this in a transaction, else if worker threads > 1 we could do one before the other
     // when order is important...
@@ -782,7 +782,7 @@ PlayerCacheData* ObjectMgr::InsertPlayerInCache(Player* pPlayer)
     return InsertPlayerInCache(pPlayer->GetGUIDLow(), pPlayer->GetRace(), pPlayer->GetClass(), pPlayer->GetGender(), accountId, pPlayer->GetName(), pPlayer->GetLevel(), pPlayer->GetCachedZoneId());
 }
 
-void ObjectMgr::UpdatePlayerCachedPosition(Player *pPlayer)
+void ObjectMgr::UpdatePlayerCachedPosition(Player* pPlayer)
 {
     auto iter = m_playerCacheData.find(pPlayer->GetGUIDLow());
     PlayerCacheData* data = nullptr;
@@ -1541,7 +1541,7 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelid)
 // generally for models having another model for the other team (totems)
 uint32 ObjectMgr::GetCreatureModelOtherTeamModel(uint32 modelId)
 {
-    if (const CreatureModelInfo* modelInfo = GetCreatureModelInfo(modelId))
+    if (CreatureModelInfo const* modelInfo = GetCreatureModelInfo(modelId))
         return modelInfo->modelid_other_team;
 
     return 0;
@@ -6365,7 +6365,7 @@ uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, Te
     return id;
 }
 
-void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32 &path, uint32 &cost)
+void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32& path, uint32& cost)
 {
     TaxiPathSetBySource::iterator src_i = sTaxiPathSetBySource.find(source);
     if (src_i == sTaxiPathSetBySource.end())
@@ -7403,8 +7403,8 @@ uint32 ObjectMgr::GeneratePetNumber()
 
 std::string ObjectMgr::GeneratePetName(uint32 entry)
 {
-    std::vector<std::string> & list0 = m_PetHalfNameMap0[entry];
-    std::vector<std::string> & list1 = m_PetHalfNameMap1[entry];
+    std::vector<std::string>& list0 = m_PetHalfNameMap0[entry];
+    std::vector<std::string>& list1 = m_PetHalfNameMap1[entry];
 
     if (list0.empty() || list1.empty())
     {
@@ -8802,7 +8802,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
     sLog.outString(">> Loaded %u broadcast text locales.", count);
 }
 
-const char* ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gender, bool forceGender) const
+char const* ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gender, bool forceGender) const
 {
     if (BroadcastText const* bct = GetBroadcastTextLocale(id))
     {
@@ -8974,7 +8974,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     return true;
 }
 
-const char* ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
+char const* ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
 {
     // locale_idx==-1 -> default, locale_idx >= 0 in to idx+1
     // Content[0] always exist if exist MangosStringLocale
@@ -9300,7 +9300,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string const& name) const
     wstrToLower(wname);
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
-    const GameTele* alt = nullptr;
+    GameTele const* alt = nullptr;
     for (GameTeleMap::const_iterator itr = m_GameTeleMap.begin(); itr != m_GameTeleMap.end(); ++itr)
         if (itr->second.wnameLow == wname)
             return &itr->second;
@@ -9698,7 +9698,7 @@ void ObjectMgr::LoadGossipMenu()
 
         if (gMenu.conditionId)
         {
-            const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(gMenu.conditionId);
+            ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(gMenu.conditionId);
             if (!condition)
             {
                 sLog.outErrorDb("Table gossip_menu for menu %u, text-id %u has condition_id %u that does not exist in `conditions`, ignoring", gMenu.entry, gMenu.text_id, gMenu.conditionId);
@@ -9772,7 +9772,7 @@ void ObjectMgr::LoadGossipMenuItems()
         gossipScriptSet.insert(itr->first);
 
     // prepare menuid -> CreatureInfo map for fast access
-    typedef  std::multimap<uint32, const CreatureInfo*> Menu2CInfoMap;
+    typedef  std::multimap<uint32, CreatureInfo const*> Menu2CInfoMap;
     Menu2CInfoMap menu2CInfoMap;
     for (uint32 i = 1;  i < sCreatureStorage.GetMaxEntry(); ++i)
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
@@ -9895,7 +9895,7 @@ void ObjectMgr::LoadGossipMenuItems()
 
         if (gMenuItem.conditionId)
         {
-            const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(gMenuItem.conditionId);
+            ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(gMenuItem.conditionId);
             if (!condition)
             {
                 sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has condition_id %u that does not exist in `conditions`, ignoring", gMenuItem.menu_id, gMenuItem.id, gMenuItem.conditionId);
@@ -10245,7 +10245,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     return guid;
 }
 
-bool ObjectMgr::MoveCreData(uint32 guid, uint32 mapId, const Position& pos)
+bool ObjectMgr::MoveCreData(uint32 guid, uint32 mapId, Position const& pos)
 {
     CreatureData& data = NewOrExistCreatureData(guid);
     if (!data.creature_id[0])
@@ -10586,6 +10586,7 @@ void ObjectMgr::LoadFactionChangeMounts()
     sLog.outString();
     sLog.outString(">> Loaded %u faction change mount relacements.", count);
 }
+
 void ObjectMgr::RestoreDeletedItems()
 {
     std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `id`, `player_guid`, `item_entry`, `stack_count` FROM `character_deleted_items`"));
@@ -10643,34 +10644,11 @@ void ObjectMgr::RestoreDeletedItems()
     sLog.outString();
     sLog.outString(">> Restored %u previously deleted items to players.", count);
 }
-uint32 GetRealMountEntry(uint32 entry)
-{
-    switch (entry)
-    {
-        case 50101:
-            return 1132;
-        case 50102:
-            return 8591;
-        case 50103:
-            return 15277;
-        case 50104:
-            return 13332;
-        case 50105:
-            return 5655;
-        case 50106:
-            return 5873;
-        case 50107:
-            return 8631;
-        case 50108:
-            return 8595;
-    }
-    return entry;
-}
 
 bool ObjectMgr::GetMountDataByEntry(uint32 itemEntry, Races& race, uint8& mountNum) const
 {
     // Mount custom Nostalrius encore dans la DB.
-    itemEntry = GetRealMountEntry(itemEntry);
+    // itemEntry = GetRealMountEntry(itemEntry);
     for (FactionChangeMountsData::const_iterator it = factionchange_mounts.begin(); it != factionchange_mounts.end(); ++it)
     {
         if (it->ItemEntry == itemEntry)
@@ -10769,7 +10747,7 @@ void ObjectMgr::LoadConditions()
 // Check if a player meets condition conditionId
 bool ObjectMgr::IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const
 {
-    if (const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
+    if (ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
         return condition->Meets(target, map, source, conditionSourceType);
 
     return false;

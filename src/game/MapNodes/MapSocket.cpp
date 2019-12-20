@@ -64,7 +64,7 @@ int MapSocket::ProcessIncoming(WorldPacket* new_pct)
     return 0;
 }
 
-int MapSocket::iSendPacket(const WorldPacket& pct)
+int MapSocket::iSendPacket(WorldPacket const& pct)
 {
     if (m_OutBuffer->space() < pct.size() + sizeof(ClientPktHeader))
     {

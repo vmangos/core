@@ -56,7 +56,7 @@ void boss_dragon_of_nightmareAI::JustDied(Unit* pKiller)
     ScriptedAI::JustDied(pKiller);
 }
 
-void boss_dragon_of_nightmareAI::UpdateAI(const uint32 uiDiff)
+void boss_dragon_of_nightmareAI::UpdateAI(uint32 const uiDiff)
 {
     if (m_uiAuraOfNatureTimer <= uiDiff)
     {
@@ -179,7 +179,7 @@ struct npc_dream_fogAI : ScriptedPetAI
         }
     }
 
-    void UpdatePetAI(const uint32 uiDiff) override
+    void UpdatePetAI(uint32 const uiDiff) override
     {
         if (m_uiChangeTargetTimer <= uiDiff)
             ChangeTarget();

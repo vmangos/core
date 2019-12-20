@@ -661,9 +661,9 @@ TerrainInfo::TerrainInfo(uint32 mapid) : m_mapId(mapid)
     }
 
     // clean up GridMap objects every minute
-    const uint32 iCleanUpInterval = 60;
+    uint32 const iCleanUpInterval = 60;
     // schedule start randlomly
-    const uint32 iRandomStart = urand(20, 40);
+    uint32 const iRandomStart = urand(20, 40);
 
     i_timer.SetInterval(iCleanUpInterval * 1000);
     i_timer.SetCurrent(iRandomStart * 1000);
@@ -686,7 +686,7 @@ TerrainInfo::~TerrainInfo()
     MMAP::MMapFactory::createOrGetMMapManager()->unloadMap(m_mapId);
 }
 
-GridMap* TerrainInfo::Load(const uint32 x, const uint32 y)
+GridMap* TerrainInfo::Load(uint32 const x, uint32 const y)
 {
     MANGOS_ASSERT(x < MAX_NUMBER_OF_GRIDS);
     MANGOS_ASSERT(y < MAX_NUMBER_OF_GRIDS);
@@ -703,7 +703,7 @@ GridMap* TerrainInfo::Load(const uint32 x, const uint32 y)
 }
 
 // schedule lazy GridMap object cleanup
-void TerrainInfo::Unload(const uint32 x, const uint32 y)
+void TerrainInfo::Unload(uint32 const x, uint32 const y)
 {
     MANGOS_ASSERT(x < MAX_NUMBER_OF_GRIDS);
     MANGOS_ASSERT(y < MAX_NUMBER_OF_GRIDS);
@@ -719,7 +719,7 @@ void TerrainInfo::Unload(const uint32 x, const uint32 y)
 }
 
 // call this method only
-void TerrainInfo::CleanUpGrids(const uint32 diff)
+void TerrainInfo::CleanUpGrids(uint32 const diff)
 {
     i_timer.Update(diff);
     if (!i_timer.Passed())
@@ -729,7 +729,7 @@ void TerrainInfo::CleanUpGrids(const uint32 diff)
     {
         for (int x = 0; x < MAX_NUMBER_OF_GRIDS; ++x)
         {
-            const int16& iRef = m_GridRef[x][y];
+            int16 const& iRef = m_GridRef[x][y];
             GridMap* pMap = m_GridMaps[x][y];
 
             // delete those GridMap objects which have refcount = 0
@@ -752,7 +752,7 @@ void TerrainInfo::CleanUpGrids(const uint32 diff)
     i_timer.Reset();
 }
 
-int TerrainInfo::RefGrid(const uint32& x, const uint32& y)
+int TerrainInfo::RefGrid(uint32 const& x, uint32 const& y)
 {
     MANGOS_ASSERT(x < MAX_NUMBER_OF_GRIDS);
     MANGOS_ASSERT(y < MAX_NUMBER_OF_GRIDS);
@@ -761,7 +761,7 @@ int TerrainInfo::RefGrid(const uint32& x, const uint32& y)
     return (m_GridRef[x][y] += 1);
 }
 
-int TerrainInfo::UnrefGrid(const uint32& x, const uint32& y)
+int TerrainInfo::UnrefGrid(uint32 const& x, uint32 const& y)
 {
     MANGOS_ASSERT(x < MAX_NUMBER_OF_GRIDS);
     MANGOS_ASSERT(y < MAX_NUMBER_OF_GRIDS);
@@ -1115,7 +1115,7 @@ float TerrainInfo::GetWaterOrGroundLevel(float x, float y, float z, float* pGrou
     return VMAP_INVALID_HEIGHT_VALUE;
 }
 
-GridMap* TerrainInfo::GetGrid(const float x, const float y)
+GridMap* TerrainInfo::GetGrid(float const x, float const y)
 {
     // Giperion Elysium: It's reversed. That's ok
     int gx = (int)(32 - y / SIZE_OF_GRIDS);                 // grid x
@@ -1129,7 +1129,7 @@ GridMap* TerrainInfo::GetGrid(const float x, const float y)
     return pMap;
 }
 
-GridMap* TerrainInfo::LoadMapAndVMap(const uint32 x, const uint32 y)
+GridMap* TerrainInfo::LoadMapAndVMap(uint32 const x, uint32 const y)
 {
     // double checked lock pattern
     if (!m_GridMaps[x][y])
@@ -1155,8 +1155,8 @@ GridMap* TerrainInfo::LoadMapAndVMap(const uint32 x, const uint32 y)
             m_GridMaps[x][y] = map;
 
             // load VMAPs for current map/grid...
-            const MapEntry* i_mapEntry = sMapStorage.LookupEntry<MapEntry>(m_mapId);
-            const char* mapName = i_mapEntry ? i_mapEntry->name : "UNNAMEDMAP\x0";
+            MapEntry const* i_mapEntry = sMapStorage.LookupEntry<MapEntry>(m_mapId);
+            char const* mapName = i_mapEntry ? i_mapEntry->name : "UNNAMEDMAP\x0";
 
             int vmapLoadResult = VMAP::VMapFactory::createOrGetVMapManager()->loadMap((sWorld.GetDataPath() + "vmaps").c_str(),  m_mapId, x, y);
             switch (vmapLoadResult)
@@ -1221,7 +1221,7 @@ TerrainManager::~TerrainManager()
         delete it.second;
 }
 
-TerrainInfo* TerrainManager::LoadTerrain(const uint32 mapId)
+TerrainInfo* TerrainManager::LoadTerrain(uint32 const mapId)
 {
     Guard _guard(*this);
 
@@ -1238,7 +1238,7 @@ TerrainInfo* TerrainManager::LoadTerrain(const uint32 mapId)
     return ptr;
 }
 
-void TerrainManager::UnloadTerrain(const uint32 mapId)
+void TerrainManager::UnloadTerrain(uint32 const mapId)
 {
     if (sWorld.getConfig(CONFIG_BOOL_GRID_UNLOAD) == 0)
         return;
@@ -1258,7 +1258,7 @@ void TerrainManager::UnloadTerrain(const uint32 mapId)
     }
 }
 
-void TerrainManager::Update(const uint32 diff)
+void TerrainManager::Update(uint32 const diff)
 {
     // global garbage collection for GridMap objects and VMaps
     for (auto& iter : i_TerrainMap)

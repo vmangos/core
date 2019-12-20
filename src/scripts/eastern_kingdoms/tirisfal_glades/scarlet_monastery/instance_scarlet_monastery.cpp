@@ -189,7 +189,7 @@ struct instance_scarlet_monastery : ScriptedInstance
         return 12384;
     }
 
-    void OnCreatureSpellHit(Unit* pCaster, Creature* receiver, const SpellEntry* spell) override
+    void OnCreatureSpellHit(Unit* pCaster, Creature* receiver, SpellEntry const* spell) override
     {
         if (!m_ashbringerActive || !pCaster || !receiver || !spell)
             return;

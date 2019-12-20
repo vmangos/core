@@ -55,7 +55,7 @@ struct npc_blackhand_summonerAI : public ScriptedAI
             m_pInstance->SetData64(TYPE_ROOM_EVENT, m_creature->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->IsNonMeleeSpellCasted(false))
             return;
@@ -150,7 +150,7 @@ struct npc_blackhand_veteranAI : public ScriptedAI
             m_pInstance->SetData64(TYPE_ROOM_EVENT, m_creature->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

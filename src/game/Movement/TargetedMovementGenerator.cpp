@@ -236,7 +236,7 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
 }
 
 template<class T>
-bool ChaseMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
+bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
         return false;
@@ -542,7 +542,7 @@ void ChaseMovementGenerator<Creature>::MovementInform(Creature& unit)
 //-----------------------------------------------//
 
 template<class T>
-bool FollowMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
+bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 {
     if (!i_target.isValid() || !i_target->IsInWorld())
     return false;
@@ -742,8 +742,8 @@ template void TargetedMovementGeneratorMedium<Player, FollowMovementGenerator<Pl
 template void TargetedMovementGeneratorMedium<Creature, ChaseMovementGenerator<Creature> >::UpdateAsync(Creature &, uint32);
 template void TargetedMovementGeneratorMedium<Creature, FollowMovementGenerator<Creature> >::UpdateAsync(Creature &, uint32);
 
-template bool ChaseMovementGenerator<Player>::Update(Player &, const uint32 &);
-template bool ChaseMovementGenerator<Creature>::Update(Creature &, const uint32 &);
+template bool ChaseMovementGenerator<Player>::Update(Player &, uint32 const&);
+template bool ChaseMovementGenerator<Creature>::Update(Creature &, uint32 const&);
 template void ChaseMovementGenerator<Player>::_reachTarget(Player &);
 template void ChaseMovementGenerator<Creature>::_reachTarget(Creature &);
 template void ChaseMovementGenerator<Player>::Finalize(Player &);
@@ -754,8 +754,8 @@ template void ChaseMovementGenerator<Player>::Reset(Player &);
 template void ChaseMovementGenerator<Creature>::Reset(Creature &);
 template void ChaseMovementGenerator<Player>::MovementInform(Player&);
 
-template bool FollowMovementGenerator<Player>::Update(Player &, const uint32 &);
-template bool FollowMovementGenerator<Creature>::Update(Creature &, const uint32 &);
+template bool FollowMovementGenerator<Player>::Update(Player &, uint32 const&);
+template bool FollowMovementGenerator<Creature>::Update(Creature &, uint32 const&);
 template void FollowMovementGenerator<Player>::Finalize(Player &);
 template void FollowMovementGenerator<Creature>::Finalize(Creature &);
 template void FollowMovementGenerator<Player>::Interrupt(Player &);

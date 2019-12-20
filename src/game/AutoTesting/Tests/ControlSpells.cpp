@@ -15,7 +15,7 @@ class controls_and_movementTest : public SingleTest
 public:
     uint32 spellId;
     uint32 movementType;
-    controls_and_movementTest(uint32 _spell, uint32 _movement, const char* scriptName) : SingleTest(scriptName), spellId(_spell), movementType(_movement)
+    controls_and_movementTest(uint32 _spell, uint32 _movement, char const* scriptName) : SingleTest(scriptName), spellId(_spell), movementType(_movement)
     {
     }
     void Test() override
@@ -58,7 +58,7 @@ class controls_leave_combatTest : public SingleTest
 public:
     uint32 spellId;
     uint32 movementType;
-    controls_leave_combatTest(uint32 _spell, uint32 _movement, const char* scriptName) : SingleTest(scriptName), spellId(_spell), movementType(_movement)
+    controls_leave_combatTest(uint32 _spell, uint32 _movement, char const* scriptName) : SingleTest(scriptName), spellId(_spell), movementType(_movement)
     {
     }
     void Test() override

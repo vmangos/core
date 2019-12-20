@@ -207,7 +207,7 @@ class LootTemplate
         // True if template includes at least 1 quest drop entry
         bool HasQuestDrop(LootTemplateMap const& store, uint8 GroupId = 0) const;
         // True if template includes at least 1 quest drop for an active quest of the player
-        bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const * player, uint8 GroupId = 0) const;
+        bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player, uint8 GroupId = 0) const;
 
         // Checks integrity of the template
         void Verify(LootStore const& store, uint32 Id) const;
@@ -330,7 +330,7 @@ struct Loot
     bool FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError = false, WorldObject const* looted = nullptr);
 
     // Inserts the item into the loot (called by LootTemplate processors)
-    void AddItem(LootStoreItem const & item);
+    void AddItem(LootStoreItem const& item);
 
     LootItem* LootItemInSlot(uint32 lootslot, uint32 playerGuid, QuestItem** qitem = nullptr, QuestItem** ffaitem = nullptr, QuestItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(uint32 playerGuid) const;
@@ -372,9 +372,9 @@ struct Loot
 struct LootView
 {
     Loot &loot;
-    Player *viewer;
+    Player* viewer;
     PermissionTypes permission;
-    LootView(Loot &_loot, Player *_viewer,PermissionTypes _permission = ALL_PERMISSION)
+    LootView(Loot &_loot, Player* _viewer,PermissionTypes _permission = ALL_PERMISSION)
         : loot(_loot), viewer(_viewer), permission(_permission) {}
 };
 

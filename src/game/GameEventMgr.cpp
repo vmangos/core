@@ -85,7 +85,7 @@ void GameEventMgr::StartEvent(uint16 event_id, bool overwrite /*=false*/, bool r
     //invoke enable on hardcoded events
     if (mGameEvent[event_id].hardcoded && !mGameEvent[event_id].disabled)
     {
-        auto it = std::find_if(mGameEventHardcodedList.begin(), mGameEventHardcodedList.end(), [&](const WorldEvent* w) { return event_id == w->m_eventId; });
+        auto it = std::find_if(mGameEventHardcodedList.begin(), mGameEventHardcodedList.end(), [&](WorldEvent const* w) { return event_id == w->m_eventId; });
         if (mGameEventHardcodedList.end() != it)
         {
             (*it)->Enable();
@@ -140,7 +140,7 @@ void GameEventMgr::EnableEvent(uint16 event_id, bool enable)
         return;
 
     // disabled event should be stopped also, thus we do it here both for regular and hardcoded events
-    auto it = std::find_if(mGameEventHardcodedList.begin(), mGameEventHardcodedList.end(), [&](const WorldEvent* w) { return event_id == w->m_eventId; });
+    auto it = std::find_if(mGameEventHardcodedList.begin(), mGameEventHardcodedList.end(), [&](WorldEvent const* w) { return event_id == w->m_eventId; });
 
     if (mGameEventHardcodedList.end() != it)
     {
@@ -169,7 +169,7 @@ bool GameEventMgr::IsEnabled(uint16 event_id)
 void GameEventMgr::LoadFromDB()
 {
     {
-        QueryResult *result = WorldDatabase.Query("SELECT MAX(entry) FROM game_event");
+        QueryResult* result = WorldDatabase.Query("SELECT MAX(entry) FROM game_event");
         if (!result)
         {
             sLog.outString(">> Table game_event is empty.");
@@ -177,7 +177,7 @@ void GameEventMgr::LoadFromDB()
             return;
         }
 
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 max_event_id = fields[0].GetUInt16();
         delete result;
@@ -185,7 +185,7 @@ void GameEventMgr::LoadFromDB()
         mGameEvent.resize(max_event_id + 1);
     }
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,holiday,description,hardcoded,disabled,patch_min,patch_max FROM game_event");
+    QueryResult* result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,holiday,description,hardcoded,disabled,patch_min,patch_max FROM game_event");
     if (!result)
     {
         mGameEvent.clear();
@@ -201,7 +201,7 @@ void GameEventMgr::LoadFromDB()
         do
         {
             ++count;
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar.step();
 
@@ -294,7 +294,7 @@ void GameEventMgr::LoadFromDB()
         BarGoLink bar(result->GetRowCount());
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar.step();
 
@@ -373,7 +373,7 @@ void GameEventMgr::LoadFromDB()
         BarGoLink bar(result->GetRowCount());
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar.step();
 
@@ -465,7 +465,7 @@ void GameEventMgr::LoadFromDB()
         BarGoLink bar(result->GetRowCount());
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar.step();
             uint32 guid     = fields[0].GetUInt32();
@@ -549,7 +549,7 @@ void GameEventMgr::LoadFromDB()
         BarGoLink bar(result->GetRowCount());
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar.step();
             uint32 quest    = fields[0].GetUInt32();
@@ -567,7 +567,7 @@ void GameEventMgr::LoadFromDB()
                 continue;
             }
 
-            const Quest* pQuest = sObjectMgr.GetQuestTemplate(quest);
+            Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest);
 
             if (!pQuest)
             {
@@ -610,7 +610,7 @@ void GameEventMgr::LoadFromDB()
         BarGoLink bar(result->GetRowCount());
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar.step();
             uint16 event_id = fields[0].GetUInt16();
@@ -679,11 +679,11 @@ uint32 GameEventMgr::Initialize()                           // return the next e
 
     ActiveEvents activeAtShutdown;
 
-    if (QueryResult *result = CharacterDatabase.Query("SELECT event FROM game_event_status"))
+    if (QueryResult* result = CharacterDatabase.Query("SELECT event FROM game_event_status"))
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint16 event_id = fields[0].GetUInt16();
             activeAtShutdown.insert(event_id);
         }
@@ -1028,7 +1028,7 @@ void GameEventMgr::UpdateEventQuests(uint16 event_id, bool Activate)
 {
     for (auto itr = mGameEventQuests[event_id].begin(); itr != mGameEventQuests[event_id].end(); ++itr)
     {
-        const Quest *pQuest = sObjectMgr.GetQuestTemplate(*itr);
+        Quest const* pQuest = sObjectMgr.GetQuestTemplate(*itr);
 
         //if (Activate)
         //{

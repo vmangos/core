@@ -144,7 +144,7 @@ struct boss_jeklikAI : public ScriptedAI
         m_creature->NearTeleportTo(x, y, z, o);
     }
 
-    void UpdateAI(const uint32 lastDiff) override
+    void UpdateAI(uint32 const lastDiff) override
     {
         if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -432,14 +432,14 @@ struct mob_batriderAI : public ScriptedAI
     }
 
     // Called when spell hits creature's target
-    void SpellHitTarget(Unit* target, const SpellEntry* spell) override
+    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
         // Trigger bomb AoE on the ground
         if (target && spell && spell->Id == SPELL_THROW_LIQUID_FIRE)
             m_creature->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_BOMB, false);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -509,7 +509,7 @@ struct npc_guru_bat_riderAI : public ScriptedAI
         ScriptedAI::Aggro(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

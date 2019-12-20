@@ -97,7 +97,7 @@ public:
             AttackStart(pAttacker);
     }
 
-    void UpdateCombatAI(const uint32 uiDiff)
+    void UpdateCombatAI(uint32 const uiDiff)
     {
         // slowing poison timer
         if (m_slowingPoisonTimer < uiDiff)
@@ -123,7 +123,7 @@ public:
     }
 
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         Unit* pTarget = m_creature->GetVictim();
         if (pTarget) // in combat
@@ -274,7 +274,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         AttackStart(pAttacker);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (m_justCreated)
         {
@@ -416,7 +416,7 @@ CreatureAI* GetAI_npc_tapoke_slim_jahn(Creature* pCreature)
 }
 //-----------------------------------------------------------------------------
 // Mikhail gossip scripts
-bool QuestAccept_npc_mikhail(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_mikhail(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (!pPlayer || !pCreature || !pQuest)
         return false;

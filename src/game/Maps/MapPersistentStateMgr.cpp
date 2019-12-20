@@ -219,12 +219,12 @@ void DungeonPersistentState::UnbindThisState()
 {
     while (!m_playerList.empty())
     {
-        Player *player = *(m_playerList.begin());
+        Player* player = *(m_playerList.begin());
         player->UnbindInstance(GetMapId(), true);
     }
     while (!m_groupList.empty())
     {
-        Group *group = *(m_groupList.begin());
+        Group* group = *(m_groupList.begin());
         group->UnbindInstance(GetMapId(), true);
     }
 }
@@ -243,7 +243,7 @@ void DungeonPersistentState::SaveToDB()
     // state instance data too
     std::string data;
 
-    if (Map *map = GetMap())
+    if (Map* map = GetMap())
     {
         InstanceData *iData = map->GetInstanceData();
         if (iData && iData->Save())
@@ -275,7 +275,7 @@ void DungeonPersistentState::DeleteFromDB()
 time_t DungeonPersistentState::GetResetTimeForDB() const
 {
     // only state the reset time for normal instances
-    const MapEntry *entry = GetMapEntry();
+    MapEntry const* entry = GetMapEntry();
     if (!entry || entry->mapType == MAP_RAID)
         return 0;
     else
@@ -326,7 +326,7 @@ void DungeonResetScheduler::LoadResetTimes()
     // _____BAD_____
     ResetTimeMapType InstResetTime;
 
-    QueryResult *result = CharacterDatabase.Query("SELECT id, map, resettime FROM instance");
+    QueryResult* result = CharacterDatabase.Query("SELECT id, map, resettime FROM instance");
     if (result)
     {
         do
@@ -360,7 +360,7 @@ void DungeonResetScheduler::LoadResetTimes()
         {
             do
             {
-                Field *fields = result->Fetch();
+                Field* fields = result->Fetch();
                 uint32 instance = fields[1].GetUInt32();
                 time_t resettime = time_t(fields[0].GetUInt64() + 2 * HOUR);
                 ResetTimeMapType::iterator itr = InstResetTime.find(instance);
@@ -383,7 +383,7 @@ void DungeonResetScheduler::LoadResetTimes()
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 mapid = fields[0].GetUInt32();
 
             MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapid);
@@ -422,7 +422,7 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
     // Reset times have already been updated and set in LoadResetTimes(). We just need to start
     // the initial reset events based on them. Since LoadResetTimes() is called before
     // PackInstances(), it cannot be done there.
-    QueryResult *result = CharacterDatabase.Query("SELECT id, map, resettime FROM instance");
+    QueryResult* result = CharacterDatabase.Query("SELECT id, map, resettime FROM instance");
     if (result)
     {
         do
@@ -700,7 +700,7 @@ void MapPersistentStateManager::RemovePersistentState(uint32 mapId, uint32 insta
     }
 }
 
-void MapPersistentStateManager::_DelHelper(DatabaseType &db, const char *fields, const char *table, const char *queryTail, ...)
+void MapPersistentStateManager::_DelHelper(DatabaseType &db, char const* fields, char const* table, char const* queryTail, ...)
 {
     Tokens fieldTokens = StrSplit(fields, ", ");
     MANGOS_ASSERT(fieldTokens.size() != 0);
@@ -711,12 +711,12 @@ void MapPersistentStateManager::_DelHelper(DatabaseType &db, const char *fields,
     vsnprintf(szQueryTail, MAX_QUERY_LEN, queryTail, ap);
     va_end(ap);
 
-    QueryResult *result = db.PQuery("SELECT %s FROM %s %s", fields, table, szQueryTail);
+    QueryResult* result = db.PQuery("SELECT %s FROM %s %s", fields, table, szQueryTail);
     if (result)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             std::ostringstream ss;
             for (size_t i = 0; i < fieldTokens.size(); i++)
             {
@@ -782,12 +782,12 @@ void MapPersistentStateManager::PackInstances()
         CharacterDatabase.PExecute("UPDATE group_instance SET instance = instance + %u WHERE instance >= 0 ORDER BY instance DESC", RESERVED_INSTANCES_LAST, RESERVED_INSTANCES_LAST);
         CharacterDatabase.Execute("DELETE FROM instance WHERE map <= 1");
     CharacterDatabase.CommitTransaction();
-    QueryResult *result = CharacterDatabase.Query("SELECT id FROM instance");
+    QueryResult* result = CharacterDatabase.Query("SELECT id FROM instance");
     if (result)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             InstanceSet.insert(fields[0].GetUInt32());
         }
         while (result->NextRow());
@@ -858,7 +858,7 @@ void MapPersistentStateManager::_ResetInstance(uint32 mapid, uint32 instanceId)
             return;
         }
 
-        if (Map * iMap = itr->second->GetMap())
+        if (Map* iMap = itr->second->GetMap())
         {
             if (!iMap->IsDungeon())
             {
@@ -904,7 +904,7 @@ struct MapPersistantStateWarnWorker
 void MapPersistentStateManager::_ResetOrWarnAll(uint32 mapid, bool warn, uint32 timeLeft)
 {
     // global reset for all instances of the given map
-    MapEntry const *mapEntry = sMapStorage.LookupEntry<MapEntry>(mapid);
+    MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapid);
     if (!mapEntry->IsDungeon())
         return;
 
@@ -983,7 +983,7 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
 
     uint32 count = 0;
 
-    QueryResult *result = CharacterDatabase.Query("SELECT guid, respawntime, creature_respawn.map, instance, resettime FROM creature_respawn LEFT JOIN instance ON instance = id");
+    QueryResult* result = CharacterDatabase.Query("SELECT guid, respawntime, creature_respawn.map, instance, resettime FROM creature_respawn LEFT JOIN instance ON instance = id");
     if (!result)
     {
         BarGoLink bar(1);
@@ -999,7 +999,7 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 loguid       = fields[0].GetUInt32();
         uint64 respawn_time = fields[1].GetUInt64();
@@ -1064,7 +1064,7 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
 
     uint32 count = 0;
 
-    QueryResult *result = CharacterDatabase.Query("SELECT guid, respawntime, gameobject_respawn.map, instance, resettime FROM gameobject_respawn LEFT JOIN instance ON instance = id");
+    QueryResult* result = CharacterDatabase.Query("SELECT guid, respawntime, gameobject_respawn.map, instance, resettime FROM gameobject_respawn LEFT JOIN instance ON instance = id");
 
     if (!result)
     {
@@ -1081,7 +1081,7 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
     do
     {
         bar.step();
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 loguid       = fields[0].GetUInt32();
         uint64 respawn_time = fields[1].GetUInt64();

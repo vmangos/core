@@ -460,7 +460,7 @@ class MANGOS_DLL_SPEC Aura
         }
         uint32 GetStackAmount() const { return GetHolder()->GetStackAmount(); }
 
-        void CalculatePeriodic(Player*  modOwner, bool create);
+        void CalculatePeriodic(Player* modOwner, bool create);
         void SetLoadedState(int32 damage, uint32 periodicTime)
         {
             m_modifier.m_amount = damage;

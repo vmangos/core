@@ -108,7 +108,7 @@ struct npc_miranAI: public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_miran(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_miran(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_PROTECTING_THE_SHIPMENT)
     {

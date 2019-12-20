@@ -45,12 +45,12 @@ void UpdateData::AddOutOfRangeGUID(ObjectGuidSet& guids)
     m_outOfRangeGUIDs.insert(guids.begin(), guids.end());
 }
 
-void UpdateData::AddOutOfRangeGUID(ObjectGuid const &guid)
+void UpdateData::AddOutOfRangeGUID(ObjectGuid const& guid)
 {
     m_outOfRangeGUIDs.insert(guid);
 }
 
-void UpdateData::AddUpdateBlock(const ByteBuffer &block)
+void UpdateData::AddUpdateBlock(ByteBuffer const& block)
 {
     if (!m_datas.size())
         m_datas.push_back(UpdatePacket());

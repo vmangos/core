@@ -138,7 +138,7 @@ struct boss_moamAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if ((!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) && !m_creature->HasAura(SPELL_ENERGIZE))
             return;

@@ -36,14 +36,14 @@
 #include "World.h"
 #include "Anticheat.h"
 
-void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket & recv_data)
+void WorldSession::HandleBattlemasterHelloOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     recv_data >> guid;
 
     DEBUG_LOG("WORLD: Recvd CMSG_BATTLEMASTER_HELLO Message from %s", guid.GetString().c_str());
 
-    Creature *pCreature = GetPlayer()->GetMap()->GetCreature(guid);
+    Creature* pCreature = GetPlayer()->GetMap()->GetCreature(guid);
 
     if (!pCreature)
         return;
@@ -77,7 +77,7 @@ void WorldSession::SendBattlegGroundList(ObjectGuid guid, BattleGroundTypeId bgT
     SendPacket(&data);
 }
 
-void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket & recv_data)
+void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket& recv_data)
 {
     uint32 mapId;
     recv_data >> mapId;
@@ -93,7 +93,7 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket & recv_data)
     return;
 }
 
-void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
+void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_BATTLEMASTER_JOIN");
 
@@ -103,7 +103,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
     uint8 joinAsGroup;
     bool queuedAtBGPortal = false;
     bool isPremade = false;
-    Group * grp;
+    Group* grp;
 
     recv_data >> guid;                                      // battlemaster guid, or player guid if joining queue from BG portal
     recv_data >> mapId;
@@ -236,9 +236,9 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
         DEBUG_LOG("Battleground: the following players are joining as group:");
         GroupQueueInfo * ginfo = bgQueue.AddGroup(_player, grp, bgTypeId, bgBracketId, isPremade, &excludedMembers);
         uint32 avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bgBracketId);
-        for (GroupReference *itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
+        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
-            Player *member = itr->getSource();
+            Player* member = itr->getSource();
             if (!member) continue;  // this should never happen
             
             if (std::find(excludedMembers.begin(), excludedMembers.end(), member->GetGUIDLow()) != excludedMembers.end())
@@ -267,7 +267,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
     sBattleGroundMgr.ScheduleQueueUpdate(bgQueueTypeId, bgTypeId, bgBracketId);
 }
 
-void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket& /*recv_data*/)
 {
     // empty opcode
     //DEBUG_LOG("WORLD: Recvd MSG_BATTLEGROUND_PLAYER_POSITIONS Message");
@@ -283,11 +283,11 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket & /*recv_
             uint32 count1 = 0;                                  //always constant zero?
             uint32 count2 = 0;                                  //count of next fields
 
-            Player *ali_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());
+            Player* ali_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetAllianceFlagPickerGuid());
             if (ali_plr)
                 ++count2;
 
-            Player *horde_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGuid());
+            Player* horde_plr = sObjectMgr.GetPlayer(((BattleGroundWS*)bg)->GetHordeFlagPickerGuid());
             if (horde_plr)
                 ++count2;
 
@@ -332,7 +332,7 @@ void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket & /*recv_
     }
 }
 
-void WorldSession::HandlePVPLogDataOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandlePVPLogDataOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd MSG_PVP_LOG_DATA Message");
 
@@ -347,7 +347,7 @@ void WorldSession::HandlePVPLogDataOpcode(WorldPacket & /*recv_data*/)
     DEBUG_LOG("WORLD: Sent MSG_PVP_LOG_DATA Message");
 }
 
-void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recv_data)
+void WorldSession::HandleBattlefieldListOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 
@@ -371,7 +371,7 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recv_data)
+void WorldSession::HandleBattleFieldPortOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_BATTLEFIELD_PORT Message");
 
@@ -536,7 +536,7 @@ void WorldSession::HandleLeaveBattlefieldOpcode(WorldPacket& recv_data)
     _player->LeaveBattleground();
 }
 
-void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket& /*recv_data*/)
 {
     // empty opcode
     DEBUG_LOG("WORLD: Battleground status");
@@ -593,7 +593,7 @@ void WorldSession::HandleBattlefieldStatusOpcode(WorldPacket & /*recv_data*/)
     }
 }
 
-void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_AREA_SPIRIT_HEALER_QUERY");
 
@@ -604,7 +604,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket & recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    Creature *unit = GetPlayer()->GetMap()->GetCreature(guid);
+    Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
         return;
 
@@ -614,7 +614,7 @@ void WorldSession::HandleAreaSpiritHealerQueryOpcode(WorldPacket & recv_data)
     unit->SendAreaSpiritHealerQueryOpcode(GetPlayer());
 }
 
-void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_AREA_SPIRIT_HEALER_QUEUE");
 
@@ -625,7 +625,7 @@ void WorldSession::HandleAreaSpiritHealerQueueOpcode(WorldPacket & recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    Creature *unit = GetPlayer()->GetMap()->GetCreature(guid);
+    Creature* unit = GetPlayer()->GetMap()->GetCreature(guid);
     if (!unit)
         return;
 

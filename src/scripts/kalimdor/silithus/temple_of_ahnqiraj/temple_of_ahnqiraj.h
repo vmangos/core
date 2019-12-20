@@ -140,8 +140,8 @@ public:
 
     void GetRoyalGuardGUIDList(GuidList& lList) { lList = m_lRoyalGuardGUIDList; }
 
-    const char* Save() override { return m_strInstData.c_str(); }
-    void Load(const char* chrIn) override;
+    char const* Save() override { return m_strInstData.c_str(); }
+    void Load(char const* chrIn) override;
 
     void Update(uint32 uiDiff) override;
 
@@ -168,7 +168,7 @@ private:
     // lot easier to handle this logic if it's handled by the instance script.
 public:
     void DoHandleTempleAreaTrigger(uint32 uiTriggerId);
-    void HandleStomachTriggers(Player* pPlayer, const AreaTriggerEntry* pAt);
+    void HandleStomachTriggers(Player* pPlayer, AreaTriggerEntry const* pAt);
     void AddPlayerToStomach(Unit* p);
     bool PlayerInStomach(Unit* p);
     bool KillPlayersInStomach();
@@ -195,8 +195,8 @@ private:
             timeSincePortedToStomach(0),
             didKnockback(false)
         {}
-        static const uint32 PUNT_CAST_TIME = 3000;
-        static const uint32 ACID_REFRESH_RATE = 5000;
+        static uint32 const PUNT_CAST_TIME = 3000;
+        static uint32 const ACID_REFRESH_RATE = 5000;
     };
     using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
     void UpdateStomachOfCthun(uint32 diff);

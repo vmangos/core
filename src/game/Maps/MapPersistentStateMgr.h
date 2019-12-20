@@ -75,7 +75,7 @@ class MapPersistentState
         uint32 GetInstanceId() const { return m_instanceid; }
         uint32 GetMapId() const { return m_mapid; }
 
-        const MapEntry* GetMapEntry() const;
+        MapEntry const* GetMapEntry() const;
 
         bool IsUsedByMap() const { return m_usedByMap; }
         Map* GetMap() const { return m_usedByMap; }         // Can be nullptr if map not loaded for persistent state
@@ -184,11 +184,11 @@ class DungeonPersistentState : public MapPersistentState
 
         /* online players bound to the instance (perm/solo)
            does not include the members of the group unless they have permanent saves */
-        void AddPlayer(Player *player) { m_playerList.push_back(player); }
-        bool RemovePlayer(Player *player) { m_playerList.remove(player); return UnloadIfEmpty(); }
+        void AddPlayer(Player* player) { m_playerList.push_back(player); }
+        bool RemovePlayer(Player* player) { m_playerList.remove(player); return UnloadIfEmpty(); }
         /* all groups bound to the instance */
-        void AddGroup(Group *group) { m_groupList.push_back(group); }
-        bool RemoveGroup(Group *group) { m_groupList.remove(group); return UnloadIfEmpty(); }
+        void AddGroup(Group* group) { m_groupList.push_back(group); }
+        bool RemoveGroup(Group* group) { m_groupList.remove(group); return UnloadIfEmpty(); }
 
         /* for normal instances this corresponds to max(creature respawn time) + X hours
            for raid instances this caches the global respawn time for the map */
@@ -272,7 +272,7 @@ struct DungeonResetEvent
     DungeonResetEvent(ResetEventType t, uint32 _mapid, uint32 _instanceid)
         : type(t), mapid(_mapid), instanceId(_instanceid) {}
 
-    bool operator == (const DungeonResetEvent& e) { return e.mapid == mapid && e.instanceId == instanceId; }
+    bool operator == (DungeonResetEvent const& e) { return e.mapid == mapid && e.instanceId == instanceId; }
 };
 
 typedef std::map<uint32, std::pair<uint32, time_t> > ResetTimeMapType;
@@ -356,7 +356,7 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
         void _CleanupExpiredInstancesAtTime(time_t t);
 
         void _ResetSave(PersistentStateMap& holder, PersistentStateMap::iterator &itr);
-        void _DelHelper(DatabaseType &db, const char *fields, const char *table, const char *queryTail,...);
+        void _DelHelper(DatabaseType &db, char const* fields, char const* table, char const* queryTail,...);
         // used during global instance resets
         bool lock_instLists;
         // fast lookup by instance id for instanceable maps

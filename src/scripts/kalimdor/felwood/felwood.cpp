@@ -80,7 +80,7 @@ struct npc_kittenAI : public FollowerAI
         }
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff) override
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -113,7 +113,7 @@ bool EffectDummyCreature_npc_kitten(WorldObject* /*pCaster*/, uint32 uiSpellId, 
     if (uiSpellId == SPELL_CORRUPT_SABER_VISUAL && effIndex == EFFECT_INDEX_0)
     {
         // Not nice way, however using UpdateEntry will not be correct.
-        if (const CreatureInfo* pTemp = GetCreatureTemplateStore(NPC_CORRUPT_SABER))
+        if (CreatureInfo const* pTemp = GetCreatureTemplateStore(NPC_CORRUPT_SABER))
         {
             pCreatureTarget->SetEntry(pTemp->entry);
             pCreatureTarget->SetDisplayId(Creature::ChooseDisplayId(pTemp));
@@ -263,7 +263,7 @@ struct npc_niby_the_almightyAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bEventStarted)
         {
@@ -348,12 +348,12 @@ struct npc_cursed_oozeAI : public ScriptedAI
         Reset();
     }
     uint32 SpellTimer;
-    void SpellHit(Unit *caster, const SpellEntry *spell) override
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (spell && spell->Id == SPELL_QUEST_CURSED_JAR)
             m_creature->ForcedDespawn();
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -385,12 +385,12 @@ struct npc_tainted_oozeAI : public ScriptedAI
         Reset();
     }
     uint32 SpellTimer;
-    void SpellHit(Unit *caster, const SpellEntry *spell) override
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (spell && spell->Id == SPELL_QUEST_TAINTED_JAR)
             m_creature->ForcedDespawn();
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -557,7 +557,7 @@ struct npc_captured_arkonarinAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -590,7 +590,7 @@ CreatureAI* GetAI_npc_captured_arkonarin(Creature* pCreature)
     return new npc_captured_arkonarinAI(pCreature);
 }
 
-bool QuestAccept_npc_captured_arkonarin(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_captured_arkonarin(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_RESCUE_JAEDENAR)
     {
@@ -679,7 +679,7 @@ struct npc_areiAI : public npc_escortAI
             m_bAggroHorror = true;
         }
     }
-    void Dialogue(const uint32 uiDiff)
+    void Dialogue(uint32 const uiDiff)
     {
         if (dialogueStep > 5)
             return;
@@ -766,7 +766,7 @@ struct npc_areiAI : public npc_escortAI
         return nullptr;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         Dialogue(uiDiff);
         npc_escortAI::UpdateAI(uiDiff);
@@ -790,7 +790,7 @@ CreatureAI* GetAI_npc_arei(Creature* pCreature)
     return new npc_areiAI(pCreature);
 }
 
-bool QuestAccept_npc_arei(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_arei(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_ANCIENT_SPIRIT)
     {
@@ -857,7 +857,7 @@ public:
     uint32 cleansedEntry;
     ObjectGuid cleansedGuid;
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (me->isSpawned() && cleansedGuid)
         {
@@ -875,7 +875,7 @@ public:
             cleansed->SetSpawnedByDefault(true);
         }
 
-        if (const GameObjectData* data = me->GetGOData())
+        if (GameObjectData const* data = me->GetGOData())
             me->SetRespawnDelay(data->ComputeRespawnDelay(data->GetRandomRespawnTime()));
 
         me->Despawn();

@@ -45,7 +45,7 @@ struct boss_hazzarahAI : public ScriptedAI
         Illusions_Timer = urand(10000, 18000);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

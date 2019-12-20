@@ -160,11 +160,11 @@ struct npc_attack_masterAI : public ScriptedAI
                 SetAttackable(unit, bAttackable);
         }
     }
-    void MasterSay(const char* what)
+    void MasterSay(char const* what)
     {
         ME->MonsterSay(what, 0, 0);
     }
-    void MasterYell(const char* what)
+    void MasterYell(char const* what)
     {
         ME->MonsterYell(what, 0, 0);
     }
@@ -254,7 +254,7 @@ struct npc_attack_masterAI : public ScriptedAI
             DoSummonSummoners(i);
     }
 
-    void UpdateEvent_Summoners(const uint32 uiDiff)
+    void UpdateEvent_Summoners(uint32 const uiDiff)
     {
         switch (uiCurrentPhaseStep)
         {
@@ -351,7 +351,7 @@ struct npc_attack_masterAI : public ScriptedAI
             }
         }
     }
-    void UpdateEvent_Waves(const uint32 uiDiff)
+    void UpdateEvent_Waves(uint32 const uiDiff)
     {
         BeforeSummonNewWave();
         lCurrWaveMobsGUID.clear();
@@ -383,12 +383,12 @@ struct npc_attack_masterAI : public ScriptedAI
     {
         return Unit::GetUnit(*ME, uiCityBossGUID);
     }
-    void CityBossSay(const char *what)
+    void CityBossSay(char const *what)
     {
         if (Unit* boss = GetCityBoss())
             boss->MonsterSay(what, 0, 0);
     }
-    void CityBossYell(const char *what)
+    void CityBossYell(char const *what)
     {
         if (Unit* boss = GetCityBoss())
             boss->MonsterYell(what, 0, 0);
@@ -441,7 +441,7 @@ struct npc_attack_masterAI : public ScriptedAI
         SetAttackableInList(lAllWaveMobsGUID, true);
         SetAttackableInList(lCityBossAddsMobsGUID, true);
     }
-    void UpdateEvent_FinalFight(const uint32 uiDiff)
+    void UpdateEvent_FinalFight(uint32 const uiDiff)
     {
         switch (uiCurrentPhaseStep)
         {
@@ -525,7 +525,7 @@ struct npc_attack_masterAI : public ScriptedAI
         }
     }
 #endif
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (uiCD < uiDiff)
         {
@@ -766,7 +766,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
             return nullptr;
         return nearest;
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (ME->IsStopped() && !ME->GetVictim())
         {
@@ -852,11 +852,11 @@ struct npc_guard_masterAI : public ScriptedAI
     {
         uiTarget = 0;
     }
-    void MasterSay(const char* what)
+    void MasterSay(char const* what)
     {
         ME->MonsterSay(what, 0, 0);
     }
-    void MasterYell(const char* what)
+    void MasterYell(char const* what)
     {
         ME->MonsterYell(what, 0, 0);
     }
@@ -936,7 +936,7 @@ struct npc_guard_masterAI : public ScriptedAI
             lMyAddsMobsGUID.push_back(guard->GetGUID());
     }
 
-    void UpdateEvent_GuardsSummon(const uint32 uiDiff)
+    void UpdateEvent_GuardsSummon(uint32 const uiDiff)
     {
         // 20 Gardes au total
         if (uiCurrentPhaseStep > 0 && uiCurrentPhaseStep < 20)
@@ -969,7 +969,7 @@ struct npc_guard_masterAI : public ScriptedAI
             }
         }
     }
-    void DoAllSay(const char *what)
+    void DoAllSay(char const *what)
     {
         for (MobsGUIDListIter itr = lMyAddsMobsGUID.begin(); itr != lMyAddsMobsGUID.end(); ++itr)
         {
@@ -980,7 +980,7 @@ struct npc_guard_masterAI : public ScriptedAI
             }
         }
     }
-    void UpdateEvent_Fight(const uint32 uiDiff)
+    void UpdateEvent_Fight(uint32 const uiDiff)
     {
         uiCD = urand(60, 90) * 1000;
         switch (uiCurrentPhaseStep)
@@ -995,7 +995,7 @@ struct npc_guard_masterAI : public ScriptedAI
         }
     }
 #endif
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (uiCD < uiDiff)
         {

@@ -211,12 +211,12 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-const char* instance_zulgurub::Save()
+char const* instance_zulgurub::Save()
 {
     return strInstData.c_str();
 }
 
-void instance_zulgurub::Load(const char* chrIn)
+void instance_zulgurub::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -397,7 +397,7 @@ struct npc_brazierAI: public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (Var > 24)
             m_creature->ForcedDespawn();

@@ -84,7 +84,7 @@ class BIH
     public:
         BIH() {init_empty();}
         template< class BoundsFunc, class PrimArray >
-        void build(const PrimArray& primitives, BoundsFunc& getBounds, uint32 leafSize = 3, bool printStats = false)
+        void build(PrimArray const& primitives, BoundsFunc& getBounds, uint32 leafSize = 3, bool printStats = false)
         {
             if (primitives.size() == 0)
             {
@@ -120,7 +120,7 @@ class BIH
         size_t primCount() const { return objects.size(); }
 
         template<typename RayCallback>
-        void intersectRay(const Ray& r, RayCallback& intersectCallback, float& maxDist, bool stopAtFirst = false) const
+        void intersectRay(Ray const& r, RayCallback& intersectCallback, float& maxDist, bool stopAtFirst = false) const
         {
             float intervalMin = -1.f;
             float intervalMax = -1.f;
@@ -264,7 +264,7 @@ class BIH
         }
 
         template<typename IsectCallback>
-        void intersectPoint(const Vector3& p, IsectCallback& intersectCallback) const
+        void intersectPoint(Vector3 const& p, IsectCallback& intersectCallback) const
         {
             if (!bounds.contains(p))
                 return;

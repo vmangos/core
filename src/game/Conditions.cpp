@@ -316,8 +316,8 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_ESCORT:
         {
-            const Creature* pSource = ToCreature(source);
-            const Player* pTarget = ToPlayer(target);
+            Creature const* pSource = ToCreature(source);
+            Player const* pTarget = ToPlayer(target);
 
             if (m_value1 & CF_ESCORT_SOURCE_DEAD)
                 if (!pSource || pSource->IsDead())
@@ -389,7 +389,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_INSTANCE_DATA:
         {
-            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            Map const* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
 
             if (InstanceData const* data = pMap->GetInstanceData())
             {
@@ -408,9 +408,9 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_MAP_EVENT_DATA:
         {
-            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            Map const* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
 
-            if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(m_value1))
+            if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(m_value1))
             {
                 switch (m_value4)
                 {
@@ -426,7 +426,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_MAP_EVENT_ACTIVE:
         {
-            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            Map const* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
             return pMap->GetScriptedMapEvent(m_value1);
         }
         case CONDITION_LINE_OF_SIGHT:
@@ -506,7 +506,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             bool bSatisfied = true;
             Map* pMap = const_cast<Map*>(map ? map : (source ? source->GetMap() : target->GetMap()));
-            if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(m_value1))
+            if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(m_value1))
             {
                 for (const auto& eventTarget : pEvent->m_vTargets)
                 {
@@ -651,7 +651,7 @@ bool ConditionEntry::IsValid()
                 sLog.outErrorDb("CONDITION_NOT (entry %u, type %d) has invalid value1 %u, must be lower than entry, skipped", m_entry, m_condition, m_value1);
                 return false;
             }
-            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value1);
+            ConditionEntry const* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value1);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION_NOT (entry %u, type %d) has value1 %u without proper condition, skipped", m_entry, m_condition, m_value1);
@@ -672,13 +672,13 @@ bool ConditionEntry::IsValid()
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value2 %u, must be lower than entry, skipped", m_entry, m_condition, m_value2);
                 return false;
             }
-            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value1);
+            ConditionEntry const* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value1);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value1 %u without proper condition, skipped", m_entry, m_condition, m_value1);
                 return false;
             }
-            const ConditionEntry* condition2 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
+            ConditionEntry const* condition2 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
             if (!condition2)
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
@@ -691,7 +691,7 @@ bool ConditionEntry::IsValid()
                     sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value3 %u, must be lower than entry, skipped", m_entry, m_condition, m_value3);
                     return false;
                 }
-                const ConditionEntry* condition3 = sConditionStorage.LookupEntry<ConditionEntry>(m_value3);
+                ConditionEntry const* condition3 = sConditionStorage.LookupEntry<ConditionEntry>(m_value3);
                 if (!condition3)
                 {
                     sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value3 %u without proper condition, skipped", m_entry, m_condition, m_value3);
@@ -705,7 +705,7 @@ bool ConditionEntry::IsValid()
                     sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value4 %u, must be lower than entry, skipped", m_entry, m_condition, m_value4);
                     return false;
                 }
-                const ConditionEntry* condition4 = sConditionStorage.LookupEntry<ConditionEntry>(m_value4);
+                ConditionEntry const* condition4 = sConditionStorage.LookupEntry<ConditionEntry>(m_value4);
                 if (!condition4)
                 {
                     sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value4 %u without proper condition, skipped", m_entry, m_condition, m_value4);
@@ -1075,7 +1075,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_MAP_EVENT_TARGETS:
         {
-            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
+            ConditionEntry const* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION_MAP_EVENT_TARGETS (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
@@ -1099,7 +1099,7 @@ bool ConditionEntry::IsValid()
                 sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %u) uses nonexistent GameObject guid %u", m_entry, m_condition, m_value1);
                 return false;
             }
-            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
+            ConditionEntry const* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
@@ -1174,7 +1174,7 @@ bool ConditionEntry::CanBeUsedWithoutPlayer(uint32 entry)
 
 bool IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType)
 {
-    if (const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
+    if (ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
         return condition->Meets(target, map, source, conditionSourceType);
 
     return false;

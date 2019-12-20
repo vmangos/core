@@ -502,9 +502,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void AddToWorld() override;
         void RemoveFromWorld() override;
 
-        bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, Team team, uint32 firstCreatureId, const CreatureData *data = nullptr, GameEventCreatureData const* eventData = nullptr);
+        bool Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, Team team, uint32 firstCreatureId, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
         bool LoadCreatureAddon(bool reload = false);
-        void UnloadCreatureAddon(const CreatureDataAddon* data);
+        void UnloadCreatureAddon(CreatureDataAddon const* data);
 
         // CreatureGroups
         CreatureGroup* GetCreatureGroup() const { return _creatureGroup; }
@@ -514,12 +514,12 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 GetSpawnFlags() const;
 
         // Fonctions utilisees par les links, et appelle CreatureAI.
-        void OnEnterCombat(Unit *pAttacker, bool notInCombat = false) override;
+        void OnEnterCombat(Unit* pAttacker, bool notInCombat = false) override;
         void OnLeaveCombat() override;
         // En cas de modification "manuelle" des stats.
         void ResetStats();
 
-        void SelectLevel(const CreatureInfo *cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
+        void SelectLevel(CreatureInfo const* cinfo, float percentHealth = 100.0f, float percentMana = 100.0f);
         void LoadEquipment(uint32 equip_entry, bool force=false);
 
         bool HasStaticDBSpawnData() const;                  // listed in `creature` table and have fixed in DB guid
@@ -585,9 +585,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsOutOfThreatArea(Unit* pVictim) const;
         void FillGuidsListFromThreatList(std::vector<ObjectGuid>& guids, uint32 maxamount = 0);
 
-        bool IsImmuneToSpell(SpellEntry const *spellInfo, bool castOnSelf) const override;
+        bool IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf) const override;
         bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr) const override;
-        bool IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
+        bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
 
         bool IsElite() const
         {
@@ -625,7 +625,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool HasSpell(uint32 spellID) const override;
 
-        bool UpdateEntry(uint32 entry, Team team = ALLIANCE, const CreatureData* data = nullptr, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
+        bool UpdateEntry(uint32 entry, Team team = ALLIANCE, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
 
         void ApplyGameEventSpells(GameEventCreatureData const* eventData, bool activated);
         bool UpdateStats(Stats stat) override;
@@ -648,23 +648,23 @@ class MANGOS_DLL_SPEC Creature : public Unit
         TrainerSpellData const* GetTrainerTemplateSpells() const;
         TrainerSpellData const* GetTrainerSpells() const;
 
-        CreatureInfo const *GetCreatureInfo() const { return m_creatureInfo; }
+        CreatureInfo const* GetCreatureInfo() const { return m_creatureInfo; }
         CreatureDataAddon const* GetCreatureAddon() const;
         CreatureData const* GetCreatureData() const;
 
-        static uint32 ChooseDisplayId(const CreatureInfo *cinfo, const CreatureData *data = nullptr, GameEventCreatureData const* eventData = nullptr);
+        static uint32 ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
 
         std::string GetAIName() const;
         std::string GetScriptName() const;
         uint32 GetScriptId() const;
 
         // overwrite WorldObject function for proper name localization
-        const char* GetNameForLocaleIdx(int32 locale_idx) const override;
+        char const* GetNameForLocaleIdx(int32 locale_idx) const override;
 
         void SetDeathState(DeathState s) override;                   // overwrite virtual Unit::SetDeathState
         bool FallGround();
 
-        bool LoadFromDB(uint32 guid, Map *map);
+        bool LoadFromDB(uint32 guid, Map* map);
         void SaveToDB();
                                                             // overwrited in Pet
         virtual void SaveToDB(uint32 mapid);
@@ -706,7 +706,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }
         void SetNoSearchAssistance(bool val) { m_AlreadySearchedAssistance = val; }
         bool HasSearchedAssistance() const { return m_AlreadySearchedAssistance; }
-        bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
+        bool CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction = true) const;
         bool CanInitiateAttack();
         bool CanHaveTarget() const { return !(GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_TARGET); }
 
@@ -753,8 +753,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetInCombatWithZone(bool initialPulse = true);
         bool canStartAttack(Unit const* who, bool force) const;
-        bool _IsTargetAcceptable(Unit const *target) const;
-        bool canCreatureAttack(Unit const *pVictim, bool force) const;
+        bool _IsTargetAcceptable(Unit const* target) const;
+        bool canCreatureAttack(Unit const* pVictim, bool force) const;
         bool CantPathToVictim() const;
 
         // Smartlog
@@ -778,7 +778,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         // Used by Creature Spells system to always know result of cast
         SpellCastResult TryToCast(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags, uint8 uiChance);
-        SpellCastResult TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo, uint32 uiCastFlags, uint8 uiChance);
+        SpellCastResult TryToCast(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 uiCastFlags, uint8 uiChance);
 
         // Unit on which the creature is currently casting a spell. Used to make mobs face their cast target.
         // Client makes creatures always face unit sent in UNIT_FIELD_TARGET, orientation doesn't matter.
@@ -826,7 +826,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         uint32 GetDefaultGossipMenuId() const override { return GetCreatureInfo()->gossip_menu_id; }
 
-        GridReference<Creature> &GetGridRef() { return m_gridRef; }
+        GridReference<Creature>& GetGridRef() { return m_gridRef; }
         bool IsRegeneratingHealth() const { return m_bRegenHealth; }
         bool IsRegeneratingMana() const { return m_bRegenMana; }
         virtual uint8 GetPetAutoSpellSize() const { return CREATURE_MAX_SPELLS; }
@@ -853,7 +853,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 GetTemporaryFactionFlags() const { return m_temporaryFactionFlags; }
         int32 GetReputationId() const { return m_reputationId; }
 
-        void SendAreaSpiritHealerQueryOpcode(Player *pl);
+        void SendAreaSpiritHealerQueryOpcode(Player* pl);
 
         void DisappearAndDie();
 
@@ -935,8 +935,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
 
-        bool CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, Team team, uint32 firstCreatureId, const CreatureData *data = nullptr, GameEventCreatureData const* eventData = nullptr);
-        bool InitEntry(uint32 entry, Team team=ALLIANCE, const CreatureData* data = nullptr, GameEventCreatureData const* eventData = nullptr);
+        bool CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, Team team, uint32 firstCreatureId, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
+        bool InitEntry(uint32 entry, Team team=ALLIANCE, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
 
         uint32 m_groupLootTimer;                            // (msecs)timer used for group loot
         uint32 m_groupLootId;                               // used to find group which is looting corpse

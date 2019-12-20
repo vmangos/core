@@ -139,10 +139,10 @@ enum thaddiusEvents
 static constexpr uint32 ENRAGE_TIMER = 1000 * 60 * 5;   // 5 min enrage once p2 starts
 
                                                         // Initial polarity shift is 10s, after that every 30 sec
-static const uint32 PolarityShiftTimer(bool initial = false) { return initial ? 1000 * 10 : 1000 * 30; }
+static uint32 const PolarityShiftTimer(bool initial = false) { return initial ? 1000 * 10 : 1000 * 30; }
 
                                                         // Chain lightning timer. TODO: confirm timers. Atm is guess
-static const uint32 ChainLightningTimer() { return urand(5000, 7000); } 
+static uint32 const ChainLightningTimer() { return urand(5000, 7000); } 
 
 
 static constexpr float addPositions[2][4] =
@@ -200,7 +200,7 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
         DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN);
     }
  
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (Creature* add = m_pInstance->GetCreature(m_guid))
         {
@@ -393,7 +393,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bFakeDeath)
         {
@@ -778,7 +778,7 @@ struct boss_thaddiusAI : public ScriptedAI
         }
     }
 
-    void UpdateTransitionPhase(const uint32 diff)
+    void UpdateTransitionPhase(uint32 const diff)
     {
         m_events.Update(diff);
         while (auto l_EventId = m_events.ExecuteEvent())
@@ -880,7 +880,7 @@ struct boss_thaddiusAI : public ScriptedAI
             m_events.Repeat(ChainLightningTimer());
     }
 
-    void UpdateP2(const uint32 diff)
+    void UpdateP2(uint32 const diff)
     {
         if (!m_pInstance)
             return;
@@ -947,7 +947,7 @@ struct boss_thaddiusAI : public ScriptedAI
         }
     }
     
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         //return; // xxx debugging adds
 

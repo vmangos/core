@@ -184,7 +184,7 @@ struct boss_skeramAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SKERAM, FAIL);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // Despawn Images instantly if the True Prophet died
         if (IsImage && m_pInstance && m_pInstance->GetData(TYPE_SKERAM) == DONE)

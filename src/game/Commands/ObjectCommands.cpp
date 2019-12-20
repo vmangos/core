@@ -33,7 +33,7 @@
 bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 {
     Player* pl = m_session->GetPlayer();
-    QueryResult *result;
+    QueryResult* result;
     GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr.GetActiveEventList();
     if (*args)
     {
@@ -99,7 +99,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         lowguid = fields[0].GetUInt32();
         id =      fields[1].GetUInt32();
         x =       fields[2].GetFloat();
@@ -246,7 +246,7 @@ bool ChatHandler::HandleGameObjectMoveCommand(char* args)
 
     if (!args)
     {
-        Player *chr = m_session->GetPlayer();
+        Player* chr = m_session->GetPlayer();
 
         Map* map = obj->GetMap();
         map->Remove(obj, false);
@@ -357,7 +357,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
     if (!ExtractOptInt32(&args, spawntimeSecs, 0))
         return false;
 
-    const GameObjectInfo *gInfo = ObjectMgr::GetGameObjectInfo(id);
+    GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(id);
 
     if (!gInfo)
     {
@@ -375,12 +375,12 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
         return false;
     }
 
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     float x = float(chr->GetPositionX());
     float y = float(chr->GetPositionY());
     float z = float(chr->GetPositionZ());
     float o = float(chr->GetOrientation());
-    Map *map = chr->GetMap();
+    Map* map = chr->GetMap();
 
     GameObject* pGameObj = new GameObject;
 
@@ -431,7 +431,7 @@ bool ChatHandler::HandleGameObjectTempAddCommand(char *args)
     if (!id)
         return false;
 
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
 
     char* spawntime = strtok(nullptr, " ");
     uint32 spawntm = 300;
@@ -461,7 +461,7 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
     uint32 count = 0;
 
     Player* pl = m_session->GetPlayer();
-    QueryResult *result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
+    QueryResult* result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
                           "(POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ "
                           "FROM gameobject WHERE map='%u' AND (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) <= '%f' ORDER BY order_",
                           pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(),
@@ -471,7 +471,7 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 guid = fields[0].GetUInt32();
             uint32 entry = fields[1].GetUInt32();
             float x = fields[2].GetFloat();
@@ -479,7 +479,7 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
             float z = fields[4].GetFloat();
             int mapid = fields[5].GetUInt16();
 
-            GameObjectInfo const * gInfo = ObjectMgr::GetGameObjectInfo(entry);
+            GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(entry);
 
             if (!gInfo)
                 continue;
@@ -520,7 +520,7 @@ class NearestGameObjectInObjectRangeCheck
 
 bool ChatHandler::HandleGameObjectSelectCommand(char*)
 {
-    const float dist = 10.0f;
+    float const dist = 10.0f;
     Player* player = m_session->GetPlayer();
 
     GameObject* go = nullptr;

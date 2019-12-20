@@ -75,7 +75,7 @@ void npc_j_eevee_dreadsteedAI::MovementInform(uint32 uiType, uint32 uiPointId)
 
     }
 }
-void npc_j_eevee_dreadsteedAI::UpdateAI(const uint32 uiDiff)
+void npc_j_eevee_dreadsteedAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
     {
@@ -195,7 +195,7 @@ void npc_j_eevee_scholomanceAI::MovementInform(uint32 uiType, uint32 uiPointId)
     }
 }
 
-void npc_j_eevee_scholomanceAI::UpdateAI(const uint32 uiDiff)
+void npc_j_eevee_scholomanceAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
     {

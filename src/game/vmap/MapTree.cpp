@@ -34,7 +34,7 @@ class MapRayCallback
 {
 public:
     MapRayCallback(ModelInstance* val, bool isLos): prims(val), hit(false), los(isLos) {}
-    bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
+    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
         // Nostalrius: pas de LoS pour certains models (arbres, ...)
         if (los && prims[entry].flags & MOD_NO_BREAK_LOS)
@@ -59,7 +59,7 @@ class MapIntersectionFinderCallback
 {
 public:
     MapIntersectionFinderCallback(ModelInstance* val): result(nullptr), prims(val) {}
-    bool operator()(const G3D::Ray& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
+    bool operator()(G3D::Ray const& ray, uint32 entry, float& distance, bool pStopAtFirstHit = true)
     {
         bool hit = prims[entry].intersectRay(ray, distance, pStopAtFirstHit);
         if (hit && (!result || result->flags & MOD_NO_BREAK_LOS))
@@ -75,7 +75,7 @@ class AreaInfoCallback
 {
 public:
     AreaInfoCallback(ModelInstance* val): prims(val) {}
-    void operator()(const Vector3& point, uint32 entry)
+    void operator()(Vector3 const& point, uint32 entry)
     {
 #ifdef VMAP_DEBUG
         DEBUG_LOG("trying to intersect '%s'", prims[entry].name.c_str());
@@ -91,7 +91,7 @@ class LocationInfoCallback
 {
 public:
     LocationInfoCallback(ModelInstance* val, LocationInfo& info): prims(val), locInfo(info), result(false) {}
-    void operator()(const Vector3& point, uint32 entry)
+    void operator()(Vector3 const& point, uint32 entry)
     {
 #ifdef VMAP_DEBUG
         DEBUG_LOG("trying to intersect '%s'", prims[entry].name.c_str());
@@ -138,7 +138,7 @@ class UnderModelCallback
 {
 public:
     UnderModelCallback(ModelInstance* val): prims(val), outDist(-1), inDist(-1) {}
-    void operator()(const Vector3& point, uint32 entry)
+    void operator()(Vector3 const& point, uint32 entry)
     {
         float newOut = -1;
         float newIn = -1;
@@ -170,7 +170,7 @@ bool StaticMapTree::isUnderModel(Vector3& pos, float* outDist, float* inDist) co
     return intersectionCallBack.UnderModel();
 }
 
-bool StaticMapTree::GetLocationInfo(const Vector3& pos, LocationInfo& info) const
+bool StaticMapTree::GetLocationInfo(Vector3 const& pos, LocationInfo& info) const
 {
     LocationInfoCallback intersectionCallBack(iTreeValues, info);
     iTree.intersectPoint(pos, intersectionCallBack);
@@ -197,7 +197,7 @@ If intersection is found within pMaxDist, sets pMaxDist to intersection distance
 Else, pMaxDist is not modified and returns false;
 */
 
-bool StaticMapTree::getIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck) const
+bool StaticMapTree::getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck) const
 {
     float distance = pMaxDist;
     MapRayCallback intersectionCallBack(iTreeValues, isLosCheck);
@@ -208,7 +208,7 @@ bool StaticMapTree::getIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, b
 }
 //=========================================================
 
-bool StaticMapTree::isInLineOfSight(const Vector3& pos1, const Vector3& pos2) const
+bool StaticMapTree::isInLineOfSight(Vector3 const& pos1, Vector3 const& pos2) const
 {
     float maxDist = (pos2 - pos1).magnitude();
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
@@ -226,7 +226,7 @@ When moving from pos1 to pos2 check if we hit an object. Return true and the pos
 Return the hit pos or the original dest pos
 */
 
-bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, Vector3& pResultHitPos, float pModifyDist) const
+bool StaticMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2, Vector3& pResultHitPos, float pModifyDist) const
 {
     float maxDist = (pPos2 - pPos1).magnitude();
     // valid map coords should *never ever* produce float overflow, but this would produce NaNs too:
@@ -258,7 +258,7 @@ bool StaticMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, 
     return false;
 }
 
-ModelInstance* StaticMapTree::FindCollisionModel(const G3D::Vector3& pos1, const G3D::Vector3& pos2)
+ModelInstance* StaticMapTree::FindCollisionModel(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2)
 {
     float maxDist = (pos2 - pos1).magnitude();
     if (maxDist < 1e-10f)
@@ -274,7 +274,7 @@ ModelInstance* StaticMapTree::FindCollisionModel(const G3D::Vector3& pos1, const
 
 //=========================================================
 
-float StaticMapTree::getHeight(const Vector3& pPos, float maxSearchDist) const
+float StaticMapTree::getHeight(Vector3 const& pPos, float maxSearchDist) const
 {
     float height = G3D::inf();
     Vector3 dir = Vector3(0, 0, -1);

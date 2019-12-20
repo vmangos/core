@@ -35,7 +35,7 @@ struct npc_unstable_corpseAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_EXPLOSION, true);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -103,7 +103,7 @@ struct npc_reanimated_corpseAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_uiHealTimer)
         {
@@ -153,7 +153,7 @@ struct npc_spectral_projectionAI : public ScriptedAI
 
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_PROJECTION_LEECH)
         {

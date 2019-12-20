@@ -209,7 +209,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         }
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
@@ -252,7 +252,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         return 0;
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {
@@ -401,7 +401,7 @@ GameObjectAI* GetAIgo_fire_of_akumai(GameObject *pGo)
 {
     return new go_fire_of_akumaiAI(pGo);
 }
-static const float afAquanisPos[4] = { -782.21f, -63.26f, -42.43f, 2.36f };
+static float const afAquanisPos[4] = { -782.21f, -63.26f, -42.43f, 2.36f };
 bool GOUse_go_fathom_stone(Player* pPlayer, GameObject* pGo)
 {
     instance_blackfathom_deeps* pInstance = (instance_blackfathom_deeps*)pGo->GetInstanceData();

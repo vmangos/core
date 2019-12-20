@@ -152,7 +152,7 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
         casterGCD = 0;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff)
     {
         m_creature->SelectHostileTarget();
         if (!m_creature->GetVictim())

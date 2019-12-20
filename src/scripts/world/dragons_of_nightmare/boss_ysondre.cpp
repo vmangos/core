@@ -79,7 +79,7 @@ bool boss_ysondreAI::DoSpecialAbility()
     return true;
 }
     
-bool boss_ysondreAI::UpdateDragonAI(const uint32 uiDiff)
+bool boss_ysondreAI::UpdateDragonAI(uint32 const uiDiff)
 {
     // Lightning Wave
     if (m_uiLightningWaveTimer < uiDiff)
@@ -111,7 +111,7 @@ void npc_demented_druidAI::Reset()
     m_uiSilenceTimer        = urand(5000, 12000);
 }
 
-void npc_demented_druidAI::UpdateAI(const uint32 uiDiff)
+void npc_demented_druidAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;

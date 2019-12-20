@@ -48,7 +48,7 @@ PlayerAI::~PlayerAI()
 {
 }
 
-CanCastResult PlayerAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered, bool checkControlled)
+CanCastResult PlayerAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered, bool checkControlled)
 {
     if (!pTarget)
         return CAST_FAIL_OTHER;
@@ -70,7 +70,7 @@ CanCastResult PlayerAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bo
             return CAST_FAIL_POWER;
     }
 
-    if (const SpellRangeEntry *pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
+    if (SpellRangeEntry const* pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
     {
         if (pTarget != me)
         {
@@ -91,7 +91,7 @@ CanCastResult PlayerAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bo
         return CAST_FAIL_OTHER;
 }
 
-void PlayerAI::UpdateAI(const uint32 /*diff*/)
+void PlayerAI::UpdateAI(uint32 const /*diff*/)
 {
 }
 
@@ -128,7 +128,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
     {
         if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled)
             continue;
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(itr->first);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
         if (spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC)
             continue;
         if (spellInfo->Attributes & (SPELL_ATTR_PASSIVE | 0x80))
@@ -162,10 +162,10 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
     for (std::vector<uint32>::iterator it = usableSpells.begin(); it != usableSpells.end();)
     {
         bool foundSupRank = false;
-        SpellEntry const *pCurrSpell_1 = sSpellMgr.GetSpellEntry(*(it));
+        SpellEntry const* pCurrSpell_1 = sSpellMgr.GetSpellEntry(*(it));
         for (std::vector<uint32>::iterator it2 = usableSpells.begin(); it2 != usableSpells.end(); ++it2)
         {
-            SpellEntry const *pCurrSpell_2 = sSpellMgr.GetSpellEntry(*(it2));
+            SpellEntry const* pCurrSpell_2 = sSpellMgr.GetSpellEntry(*(it2));
             if (pCurrSpell_2->SpellFamilyName == pCurrSpell_1->SpellFamilyName && pCurrSpell_2->SpellIconID == pCurrSpell_1->SpellIconID && pCurrSpell_2->SpellVisual == pCurrSpell_1->SpellVisual) // Meme sort, rangs differents
             {
                 if (Spells::CompareAuraRanks(pCurrSpell_1->Id, pCurrSpell_2->Id) < 0) // pCurrSpell_1 < pCurrSpell_2
@@ -276,7 +276,7 @@ PlayerControlledAI::~PlayerControlledAI()
 {
 }
 
-void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
+void PlayerControlledAI::UpdateAI(uint32 const uiDiff)
 {
     if (me->IsDeleted() || !me->IsInWorld() || !me->IsAlive())
     {
@@ -329,7 +329,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
     {
         Creature* Ccontroller = controller ? controller->ToCreature() : nullptr;
 
-        // Unit * victim = controller-> getVictim ();
+        // Unit* victim = controller-> getVictim ();
         // Ivina <Nostalrius>: chooses the target randomly and not always the target of the controller.
         victim = Ccontroller ? Ccontroller->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : me->SelectNearestTarget(50.0f);
         if (Unit* v2 = me->GetVictim())
@@ -379,7 +379,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
                     return;
 
                 uint32 spellId = usableSpells[urand(0, usableSpells.size() - 1)];
-                SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
                 
                 // If its a positive spell we prioritize controller, if he's out of range,
                 // ourself, otherwise it will probably not be cast.

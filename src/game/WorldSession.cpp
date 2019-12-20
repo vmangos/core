@@ -56,7 +56,7 @@
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
 {
     // we do not process not logged in player packets
-    Player * plr = session->GetPlayer();
+    Player* plr = session->GetPlayer();
     if (!plr)
         return false;
 
@@ -273,7 +273,7 @@ void WorldSession::QueuePacket(WorldPacket* newPacket, NodeSession* from_node)
 }
 
 /// Logging helper for unexpected opcodes
-void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, const char *reason)
+void WorldSession::LogUnexpectedOpcode(WorldPacket* packet, char const* reason)
 {
     DEBUG_LOG("SESSION: received unexpected opcode %s (0x%.4X) %s",
                   LookupOpcodeName(packet->GetOpcode()),
@@ -825,7 +825,7 @@ void WorldSession::KickPlayer()
 
 /// Cancel channeling handler
 
-void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
+void WorldSession::SendAreaTriggerMessage(char const* Text, ...)
 {
     va_list ap;
     char szStr [1024];
@@ -842,7 +842,7 @@ void WorldSession::SendAreaTriggerMessage(const char* Text, ...)
     SendPacket(&data);
 }
 
-void WorldSession::SendNotification(const char *format, ...)
+void WorldSession::SendNotification(char const* format, ...)
 {
     if (format)
     {
@@ -877,7 +877,7 @@ void WorldSession::SendNotification(int32 string_id, ...)
     }
 }
 
-const char * WorldSession::GetMangosString(int32 entry) const
+char const*  WorldSession::GetMangosString(int32 entry) const
 {
     return sObjectMgr.GetMangosString(entry, GetSessionDbLocaleIndex());
 }
@@ -932,7 +932,7 @@ void WorldSession::LoadTutorialsData()
     for (int aX = 0 ; aX < 8 ; ++aX)
         m_Tutorials[ aX ] = 0;
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7 FROM character_tutorial WHERE account = '%u'", GetAccountId());
+    QueryResult* result = CharacterDatabase.PQuery("SELECT tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7 FROM character_tutorial WHERE account = '%u'", GetAccountId());
 
     if (!result)
     {
@@ -942,7 +942,7 @@ void WorldSession::LoadTutorialsData()
 
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         for (int iI = 0; iI < 8; ++iI)
             m_Tutorials[iI] = fields[iI].GetUInt32();
@@ -1051,7 +1051,7 @@ void WorldSession::ExecuteOpcode(OpcodeHandler const& opHandle, WorldPacket* pac
         LogUnprocessedTail(packet);
 }
 
-void WorldSession::SetDumpPacket(const char* file)
+void WorldSession::SetDumpPacket(char const* file)
 {
     if (!file)
     {
@@ -1069,7 +1069,7 @@ void WorldSession::SetDumpPacket(const char* file)
     }
 }
 
-void WorldSession::SetReadPacket(const char* file)
+void WorldSession::SetReadPacket(char const* file)
 {
     if (!file)
     {
@@ -1099,7 +1099,7 @@ void WorldSession::SetReadPacket(const char* file)
     }
 }
 
-void WorldSession::SetDumpRecvPackets(const char* file)
+void WorldSession::SetDumpRecvPackets(char const* file)
 {
     if (!file)
     {
@@ -1132,9 +1132,9 @@ MovementAnticheatInterface* WorldSession::GetCheatData()
     return m_cheatData ? m_cheatData : (m_cheatData = sAnticheatLib->CreateAnticheatFor(GetPlayer()));
 }
 
-void WorldSession::ProcessAnticheatAction(const char* detector, const char* reason, uint32 cheatAction, uint32 banSeconds)
+void WorldSession::ProcessAnticheatAction(char const* detector, char const* reason, uint32 cheatAction, uint32 banSeconds)
 {
-    const char* action = "";
+    char const* action = "";
     if (cheatAction & CHEAT_ACTION_MUTE_PUB_CHANS)
     {
         action = "Muted from public channels.";

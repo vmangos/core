@@ -52,27 +52,27 @@ namespace VMAP
             float iScale;
             G3D::AABox iBound;
             std::string name;
-            bool operator==(const ModelSpawn& other) const { return ID == other.ID; }
+            bool operator==(ModelSpawn const& other) const { return ID == other.ID; }
             // uint32 hashCode() const { return ID; }
             // temp?
-            const G3D::AABox& getBounds() const { return iBound; }
+            G3D::AABox const& getBounds() const { return iBound; }
 
 
             static bool readFromFile(FILE* rf, ModelSpawn& spawn);
-            static bool writeToFile(FILE* wf, const ModelSpawn& spawn);
+            static bool writeToFile(FILE* wf, ModelSpawn const& spawn);
     };
 
     class ModelInstance: public ModelSpawn
     {
         public:
             ModelInstance(): iInvScale(0), iModel(nullptr) {}
-            ModelInstance(const ModelSpawn& spawn, WorldModel* model);
+            ModelInstance(ModelSpawn const& spawn, WorldModel* model);
             void setUnloaded() { iModel = nullptr; }
-            bool intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool pStopAtFirstHit) const;
-            void intersectPoint(const G3D::Vector3& p, AreaInfo& info) const;
-            bool isUnderModel(const G3D::Vector3& p, float* outDist = nullptr, float* inDist = nullptr) const;
-            bool GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const;
-            bool GetLiquidLevel(const G3D::Vector3& p, LocationInfo& info, float& liqHeight) const;
+            bool intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit) const;
+            void intersectPoint(G3D::Vector3 const& p, AreaInfo& info) const;
+            bool isUnderModel(G3D::Vector3 const& p, float* outDist = nullptr, float* inDist = nullptr) const;
+            bool GetLocationInfo(G3D::Vector3 const& p, LocationInfo& info) const;
+            bool GetLiquidLevel(G3D::Vector3 const& p, LocationInfo& info, float& liqHeight) const;
         protected:
             G3D::Matrix3 iInvRot;
             float iInvScale;

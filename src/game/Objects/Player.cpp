@@ -157,7 +157,7 @@ void PlayerTaxi::InitTaxiNodes(uint32 race, uint32 level)
     m_taximask[0] = rEntry->startingTaxiMask;
 }
 
-void PlayerTaxi::LoadTaxiMask(const char* data)
+void PlayerTaxi::LoadTaxiMask(char const* data)
 {
     if (!data)
         return;
@@ -894,9 +894,9 @@ uint32 Player::EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage)
     else if (type == DAMAGE_SLIME)
         CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, damage, &absorb, &resist, nullptr);
 
-    const uint32 bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
+    uint32 const bonus = (resist < 0 ? uint32(std::abs(resist)) : 0);
     damage += bonus;
-    const uint32 malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
+    uint32 const malus = (resist > 0 ? (absorb + uint32(resist)) : absorb);
     damage = (damage <= malus ? 0 : (damage - malus));
 
     DealDamageMods(this, damage, &absorb);
@@ -1690,7 +1690,7 @@ bool Player::BuildEnumData(QueryResult* result, WorldPacket* p_data)
     {
         uint32 visualbase = slot * 2;                       // entry, perm ench., temp ench.
         uint32 item_id = GetUInt32ValueFromArray(data, visualbase);
-        const ItemPrototype* proto = ObjectMgr::GetItemPrototype(item_id);
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id);
         if (!proto)
         {
             *p_data << uint32(0);
@@ -2658,7 +2658,7 @@ void Player::SetGameMaster(bool on, bool notify)
 void Player::SetGMVisible(bool on, bool notify)
 {
     // 'Invisibilite superieure'
-    const uint32 VISUAL_AURA = 16380;
+    uint32 const VISUAL_AURA = 16380;
     if (on)
     {
         RemoveAurasDueToSpell(VISUAL_AURA);
@@ -5778,8 +5778,8 @@ bool Player::ModifySkillBonus(uint16 id, int16 diff, bool permanent/* = false*/)
 
     uint16 bonusIndex = PLAYER_SKILL_BONUS_INDEX(itr->second.pos);
     uint32 bonus = GetUInt32Value(bonusIndex);
-    const int16 bonusTemporary = SKILL_TEMP_BONUS(bonus);
-    const int16 bonusPermanent = SKILL_PERM_BONUS(bonus);
+    int16 const bonusTemporary = SKILL_TEMP_BONUS(bonus);
+    int16 const bonusPermanent = SKILL_PERM_BONUS(bonus);
 
     if (permanent)
         SetUInt32Value(bonusIndex, MAKE_SKILL_BONUS(bonusTemporary, (bonusPermanent + diff))); // permanent bonus stored in high part
@@ -6019,10 +6019,10 @@ bool Player::SetPosition(float x, float y, float z, float orientation, bool tele
 
     Map* m = GetMap();
 
-    const float old_x = GetPositionX();
-    const float old_y = GetPositionY();
-    const float old_z = GetPositionZ();
-    const float old_r = GetOrientation();
+    float const old_x = GetPositionX();
+    float const old_y = GetPositionY();
+    float const old_z = GetPositionZ();
+    float const old_r = GetOrientation();
 
     if (teleport || old_x != x || old_y != y || old_z != z || old_r != orientation)
     {
@@ -6146,7 +6146,7 @@ void Player::CheckAreaExploreAndOutdoor()
             // Celerite feline - Druide
             if (GetShapeshiftForm() == FORM_CAT)
             {
-                const PlayerSpellMap& sp_list = GetSpellMap();
+                PlayerSpellMap const& sp_list = GetSpellMap();
                 for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
                 {
                     if (itr->second.state == PLAYERSPELL_REMOVED)
@@ -7824,8 +7824,8 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                         loot->FillLoot(lootid, LootTemplates_Pickpocketing, this, false);
 
                     // Generate extra money for pick pocket loot
-                    const uint32 a = urand(0, creature->GetLevel() / 2);
-                    const uint32 b = urand(0, GetLevel() / 2);
+                    uint32 const a = urand(0, creature->GetLevel() / 2);
+                    uint32 const b = urand(0, GetLevel() / 2);
                     loot->gold += uint32(10 * (a + b) * sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_MONEY));
 
                     creature->lootForPickPocketed = true;
@@ -9687,7 +9687,7 @@ InventoryResult Player::CanStoreItems(Item** pItems, int count) const
 }
 
 //////////////////////////////////////////////////////////////////////////
-InventoryResult Player::CanEquipNewItem(uint8 slot, uint16 &dest, uint32 item, bool swap) const
+InventoryResult Player::CanEquipNewItem(uint8 slot, uint16& dest, uint32 item, bool swap) const
 {
     dest = 0;
     Item* pItem = Item::CreateItem(item, 1, this);
@@ -9701,7 +9701,7 @@ InventoryResult Player::CanEquipNewItem(uint8 slot, uint16 &dest, uint32 item, b
     return EQUIP_ERR_ITEM_NOT_FOUND;
 }
 
-InventoryResult Player::CanEquipItem(uint8 slot, uint16 &dest, Item* pItem, bool swap, bool not_loading) const
+InventoryResult Player::CanEquipItem(uint8 slot, uint16& dest, Item* pItem, bool swap, bool not_loading) const
 {
     dest = 0;
     if (pItem)
@@ -10960,7 +10960,7 @@ void Player::DestroyConjuredItems(bool update)
                 DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
 }
 
-void Player::DestroyItemCount(Item* pItem, uint32 &count, bool update)
+void Player::DestroyItemCount(Item* pItem, uint32& count, bool update)
 {
     if (!pItem)
         return;
@@ -13704,7 +13704,7 @@ bool Player::GetQuestRewardStatus(uint32 quest_id) const
     return false;
 }
 
-const QuestStatusData* Player::GetQuestStatusData(uint32 quest_id) const
+QuestStatusData const* Player::GetQuestStatusData(uint32 quest_id) const
 {
     auto it = mQuestStatus.find(quest_id);
 
@@ -14112,7 +14112,7 @@ void Player::TalkedToCreature(uint32 entry, ObjectGuid guid)
     }
 }
 
-void Player::LogModifyMoney(int32 d, const char* type, ObjectGuid fromGuid, uint32 data)
+void Player::LogModifyMoney(int32 d, char const* type, ObjectGuid fromGuid, uint32 data)
 {
     // Always log GM transactions regardless of threshold
     if (uint32(abs(d)) > sWorld.getConfig(CONFIG_UINT32_LOG_MONEY_TRADES_TRESHOLD) || GetSession()->GetSecurity() > SEC_PLAYER)
@@ -14329,7 +14329,7 @@ void Player::SendCanTakeQuestResponse(uint32 msg) const
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
 }
 
-void Player::SendQuestConfirmAccept(const Quest* pQuest, Player* pReceiver) const
+void Player::SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver) const
 {
     if (pReceiver)
     {
@@ -14339,7 +14339,7 @@ void Player::SendQuestConfirmAccept(const Quest* pQuest, Player* pReceiver) cons
 
         if (loc_idx >= 0)
         {
-            if (const QuestLocale* pLocale = sObjectMgr.GetQuestLocale(pQuest->GetQuestId()))
+            if (QuestLocale const* pLocale = sObjectMgr.GetQuestLocale(pQuest->GetQuestId()))
             {
                 if ((int32)pLocale->Title.size() > loc_idx && !pLocale->Title[loc_idx].empty())
                     strTitle = pLocale->Title[loc_idx];
@@ -14462,7 +14462,7 @@ bool Player::LoadPositionFromDB(ObjectGuid guid, uint32& mapid, float& x, float&
     return true;
 }
 
-void Player::_LoadIntoDataField(const char* data, uint32 startOffset, uint32 count)
+void Player::_LoadIntoDataField(char const* data, uint32 startOffset, uint32 count)
 {
     if (!data)
         return;
@@ -14650,7 +14650,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     // if server restart after player save in BG
     // player can have current coordinates in to BG map, fix this
     {
-        const WorldLocation& _loc = GetBattleGroundEntryPoint();
+        WorldLocation const& _loc = GetBattleGroundEntryPoint();
         SetLocationMapId(_loc.mapId);
         Relocate(_loc.x, _loc.y, _loc.z, _loc.o);
 
@@ -15116,7 +15116,7 @@ bool Player::IsAllowedToLoot(Creature const* creature)
     if (creature->AI() && !creature->AI()->CanBeLooted())
         return false;
 
-    const Loot* loot = &creature->loot;
+    Loot const* loot = &creature->loot;
     if (loot->isLooted()) // nothing to loot or everything looted.
         return false;
 
@@ -15297,7 +15297,7 @@ void Player::LoadCorpse()
     }
 }
 
-void Player::_LoadInventory(QueryResult* result, uint32 timediff, bool &has_epic_mount)
+void Player::_LoadInventory(QueryResult* result, uint32 timediff, bool& has_epic_mount)
 {
     //               0                1      2         3        4      5             6                 7           8     9    10    11   12    13              14
     //SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, bag, slot, item, itemEntry, generated_loot
@@ -16932,7 +16932,7 @@ Pet* Player::GetMiniPet() const
     return GetMap()->GetPet(m_miniPetGuid);
 }
 
-void Player::Say(std::string const& text, const uint32 language) const
+void Player::Say(std::string const& text, uint32 const language) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
@@ -16954,7 +16954,7 @@ float Player::GetYellRange() const
     return range;
 }
 
-void Player::Yell(std::string const& text, const uint32 language) const
+void Player::Yell(std::string const& text, uint32 const language) const
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
@@ -18183,7 +18183,7 @@ void Player::SetBattleGroundEntryPoint(Player* leader /*= nullptr*/, bool queued
         // If map is dungeon find linked graveyard
         if (leader->GetMap()->IsDungeon())
         {
-            if (const WorldSafeLocsEntry* entry = sObjectMgr.GetClosestGraveYard(leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(), leader->GetMapId(), leader->GetTeam()))
+            if (WorldSafeLocsEntry const* entry = sObjectMgr.GetClosestGraveYard(leader->GetPositionX(), leader->GetPositionY(), leader->GetPositionZ(), leader->GetMapId(), leader->GetTeam()))
             {
                 m_bgData.joinPos = WorldLocation(entry->map_id, entry->x, entry->y, entry->z, sObjectMgr.GetWorldSafeLocFacing(entry->ID));
                 m_bgData.m_needSave = true;
@@ -18433,7 +18433,7 @@ template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, GameObjec
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, DynamicObject* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject*   target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 
-void Player::SetLongSight(const Aura* aura)
+void Player::SetLongSight(Aura const* aura)
 {
     if (aura)
     {
@@ -19665,7 +19665,7 @@ Player* Player::GetNextRandomRaidMember(float radius)
 
 PartyResult Player::CanUninviteFromGroup(ObjectGuid uninvitedGuid) const
 {
-    const Group* grp = GetGroup();
+    Group const* grp = GetGroup();
     if (!grp)
         return ERR_NOT_IN_GROUP;
 
@@ -19681,9 +19681,9 @@ PartyResult Player::CanUninviteFromGroup(ObjectGuid uninvitedGuid) const
     return ERR_PARTY_RESULT_OK;
 }
 
-void Player::UpdateGroupLeaderFlag(const bool remove /*= false*/)
+void Player::UpdateGroupLeaderFlag(bool const remove /*= false*/)
 {
-    const Group* group = GetGroup();
+    Group const* group = GetGroup();
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GROUP_LEADER))
     {
         if (remove || !group || group->GetLeaderGuid() != GetObjectGuid())
@@ -20175,7 +20175,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         for (unsigned int i = 0; i < numRows; ++i)          // Loop through all talents.
         {
             // Someday, someone needs to revamp
-            const TalentEntry* tmpTalent = sTalentStore.LookupEntry(i);
+            TalentEntry const* tmpTalent = sTalentStore.LookupEntry(i);
             if (tmpTalent)                                  // the way talents are tracked
             {
                 if (tmpTalent->TalentTab == tTab)

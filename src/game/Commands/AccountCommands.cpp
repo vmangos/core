@@ -318,7 +318,7 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 
     ///- Get the list of accounts ID logged to the realm
     //                                                 0   1         2        3        4
-    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE current_realm = %u LIMIT %u", realmID, limit);
+    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE current_realm = %u LIMIT %u", realmID, limit);
     if (!result)
     {
         SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
@@ -761,7 +761,7 @@ bool ChatHandler::HandleBanInfoCharacterCommand(char* args)
 
 bool ChatHandler::HandleBanInfoHelper(uint32 accountid, char const* accountname)
 {
-    QueryResult *result = LoginDatabase.PQuery(
+    QueryResult* result = LoginDatabase.PQuery(
     "SELECT FROM_UNIXTIME(bandate), unbandate-bandate, active, unbandate,banreason,bannedby,COALESCE(name, \"NoRealm\") , gmlevel "
     "FROM account_banned LEFT JOIN realmlist ON realmlist.id = realm "
     "WHERE account_banned.id = '%u' ORDER BY bandate ASC", accountid);
@@ -812,14 +812,14 @@ bool ChatHandler::HandleBanInfoIPCommand(char* args)
     std::string IP = cIP;
 
     LoginDatabase.escape_string(IP);
-    QueryResult *result = LoginDatabase.PQuery("SELECT ip, FROM_UNIXTIME(bandate), FROM_UNIXTIME(unbandate), unbandate-UNIX_TIMESTAMP(), banreason,bannedby,unbandate-bandate FROM ip_banned WHERE ip = '%s'", IP.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT ip, FROM_UNIXTIME(bandate), FROM_UNIXTIME(unbandate), unbandate-UNIX_TIMESTAMP(), banreason,bannedby,unbandate-bandate FROM ip_banned WHERE ip = '%s'", IP.c_str());
     if (!result)
     {
         PSendSysMessage(LANG_BANINFO_NOIP);
         return true;
     }
 
-    Field *fields = result->Fetch();
+    Field* fields = result->Fetch();
     bool permanent = !fields[6].GetUInt64();
     PSendSysMessage(LANG_BANINFO_IPENTRY,
                     fields[0].GetString(), fields[1].GetString(), permanent ? GetMangosString(LANG_BANINFO_NEVER) : fields[2].GetString(),
@@ -910,7 +910,7 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
         do
         {
             SendSysMessage("-------------------------------------------------------------------------------");
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 account_id = fields[0].GetUInt32();
 
             std::string account_name;
@@ -923,10 +923,10 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
                 sAccountMgr.GetName(account_id, account_name);
 
             // No SQL injection. id is uint32.
-            QueryResult *banInfo = LoginDatabase.PQuery("SELECT bandate,unbandate,bannedby,banreason FROM account_banned WHERE id = %u ORDER BY unbandate", account_id);
+            QueryResult* banInfo = LoginDatabase.PQuery("SELECT bandate,unbandate,bannedby,banreason FROM account_banned WHERE id = %u ORDER BY unbandate", account_id);
             if (banInfo)
             {
-                Field *fields2 = banInfo->Fetch();
+                Field* fields2 = banInfo->Fetch();
                 do
                 {
                     time_t t_ban = fields2[0].GetUInt64();
@@ -1009,7 +1009,7 @@ bool ChatHandler::HandleBanListIPCommand(char* args)
         do
         {
             SendSysMessage("-------------------------------------------------------------------------------");
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             time_t t_ban = fields[1].GetUInt64();
             tm* aTm_ban = localtime(&t_ban);
             if (fields[1].GetUInt64() == fields[2].GetUInt64())

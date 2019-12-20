@@ -52,7 +52,7 @@ struct boss_mothersmolderwebAI : public ScriptedAI
             DoCastSpellIfCan(m_creature, SPELL_SUMMON_SPIRE_SPIDERLING, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

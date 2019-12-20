@@ -101,7 +101,7 @@ struct CommonInitializer
     }
 };
 
-void MoveSpline::init_spline(const MoveSplineInitArgs& args)
+void MoveSpline::init_spline(MoveSplineInitArgs const& args)
 {
     const SplineBase::EvaluationMode modes[2] = {SplineBase::ModeLinear, SplineBase::ModeCatmullrom};
     if (args.flags.cyclic)
@@ -136,7 +136,7 @@ void MoveSpline::init_spline(const MoveSplineInitArgs& args)
     point_Idx = spline.first();
 }
 
-void MoveSpline::Initialize(const MoveSplineInitArgs& args)
+void MoveSpline::Initialize(MoveSplineInitArgs const& args)
 {
     splineflags = args.flags;
     facing = args.facing;

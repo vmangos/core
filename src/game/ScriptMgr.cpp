@@ -70,7 +70,7 @@ void DisableScriptAction(ScriptInfo& script)
     script.condition = 0;
 }
 
-void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
+void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 {
     if (IsScriptScheduled())                                // function don't must be called in time scripts use.
         return;
@@ -80,7 +80,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
     scripts.clear();                                        // need for reload support
 
     //                                                  0    1       2         3         4          5          6         7           8             9          10        11        12        13        14    15 16 17 18       19
-    QueryResult *result = WorldDatabase.PQuery("SELECT id, delay, command, datalong, datalong2, datalong3, datalong4, target_param1, target_param2, target_type, data_flags, dataint, dataint2, dataint3, dataint4, x, y, z, o, condition_id FROM %s", tablename);
+    QueryResult* result = WorldDatabase.PQuery("SELECT id, delay, command, datalong, datalong2, datalong3, datalong4, target_param1, target_param2, target_type, data_flags, dataint, dataint2, dataint3, dataint4, x, y, z, o, condition_id FROM %s", tablename);
 
     uint32 count = 0;
 
@@ -100,7 +100,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
     {
         bar.step();
 
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         ScriptInfo tmp;
         tmp.id           = fields[0].GetUInt32();
         tmp.delay        = fields[1].GetUInt32();
@@ -1427,7 +1427,7 @@ void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts)
 void ScriptMgr::LoadAreaTriggerScripts()
 {
     m_AreaTriggerScripts.clear();                           // need for reload case
-    QueryResult *result = WorldDatabase.Query("SELECT entry, script_name FROM scripted_areatrigger");
+    QueryResult* result = WorldDatabase.Query("SELECT entry, script_name FROM scripted_areatrigger");
 
     uint32 count = 0;
 
@@ -1448,10 +1448,10 @@ void ScriptMgr::LoadAreaTriggerScripts()
         ++count;
         bar.step();
 
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 triggerId       = fields[0].GetUInt32();
-        const char *scriptName = fields[1].GetString();
+        char const* scriptName = fields[1].GetString();
 
         if (!sObjectMgr.GetAreaTrigger(triggerId))
         {
@@ -1473,7 +1473,7 @@ void ScriptMgr::LoadAreaTriggerScripts()
 void ScriptMgr::LoadEventIdScripts()
 {
     m_EventIdScripts.clear();                           // need for reload case
-    QueryResult *result = WorldDatabase.Query("SELECT id, script_name FROM scripted_event_id");
+    QueryResult* result = WorldDatabase.Query("SELECT id, script_name FROM scripted_event_id");
 
     uint32 count = 0;
 
@@ -1498,10 +1498,10 @@ void ScriptMgr::LoadEventIdScripts()
         ++count;
         bar.step();
 
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         uint32 eventId          = fields[0].GetUInt32();
-        const char *scriptName  = fields[1].GetString();
+        char const* scriptName  = fields[1].GetString();
 
         std::set<uint32>::const_iterator itr = eventIds.find(eventId);
         if (itr == eventIds.end())
@@ -1521,7 +1521,7 @@ void ScriptMgr::LoadEventIdScripts()
 void ScriptMgr::LoadScriptNames()
 {
     m_scriptNames.push_back("");
-    QueryResult *result = WorldDatabase.Query(
+    QueryResult* result = WorldDatabase.Query(
                               "SELECT DISTINCT(script_name) FROM creature_template WHERE script_name <> '' "
                               "UNION "
                               "SELECT DISTINCT(script_name) FROM gameobject_template WHERE script_name <> '' "
@@ -1558,7 +1558,7 @@ void ScriptMgr::LoadScriptNames()
     sLog.outString(">> Loaded %d Script Names", count);
 }
 
-uint32 ScriptMgr::GetScriptId(const char *name) const
+uint32 ScriptMgr::GetScriptId(char const* name) const
 {
     // use binary search to find the script name in the sorted vector
     // assume "" is the first element
@@ -1646,7 +1646,7 @@ bool ScriptMgr::OnGossipHello(Player* pPlayer, GameObject* pGameObject)
     return pTempScript->pGOGossipHello(pPlayer, pGameObject);
 }
 
-bool ScriptMgr::OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action, const char* code)
+bool ScriptMgr::OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action, char const* code)
 {
     sLog.outDebug("Gossip selection%s, sender: %d, action: %d", code ? " with code" : "", sender, action);
 
@@ -1672,7 +1672,7 @@ bool ScriptMgr::OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 send
     return false;
 }
 
-bool ScriptMgr::OnGossipSelect(Player* pPlayer, GameObject* pGameObject, uint32 sender, uint32 action, const char* code)
+bool ScriptMgr::OnGossipSelect(Player* pPlayer, GameObject* pGameObject, uint32 sender, uint32 action, char const* code)
 {
     sLog.outDebug("Gossip selection%s, sender: %d, action: %d", code ? " with code" : "", sender, action);
 
@@ -1853,7 +1853,7 @@ uint32 GetEventIdScriptId(uint32 eventId)
     return sScriptMgr.GetEventIdScriptId(eventId);
 }
 
-uint32 GetScriptId(const char *name)
+uint32 GetScriptId(char const* name)
 {
     return sScriptMgr.GetScriptId(name);
 }
@@ -2249,7 +2249,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
     // Load all possible script entries from spells.
     for (uint32 i = 1; i < sSpellMgr.GetMaxSpellId(); ++i)
     {
-        const SpellEntry* spell = sSpellMgr.GetSpellEntry(i);
+        SpellEntry const* spell = sSpellMgr.GetSpellEntry(i);
         if (spell)
         {
             for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
@@ -2264,7 +2264,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
     }
     
     // Load all possible script entries from SCRIPT_COMMAND_START_SCRIPT.
-    const char* script_tables[9] =
+    char const* script_tables[9] =
     {
         "creature_ai_scripts",
         "creature_movement_scripts",
@@ -2363,7 +2363,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, int32 c
 
     if (iTextEntry >= 0)
     {
-        if (const BroadcastText* bct = sObjectMgr.GetBroadcastTextLocale(iTextEntry))
+        if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(iTextEntry))
         {
             Type = bct->Type;
             Emote = bct->EmoteId0;
@@ -2378,7 +2378,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, int32 c
     }
     else
     {
-        if (const StringTextData* pData = sScriptMgr.GetTextData(iTextEntry))
+        if (StringTextData const* pData = sScriptMgr.GetTextData(iTextEntry))
         {
             Type = pData->Type;
             Emote = pData->Emote;
@@ -2490,7 +2490,7 @@ void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map*
 
     if (iTextEntry >= 0)
     {
-        if (const BroadcastText* bct = sObjectMgr.GetBroadcastTextLocale(iTextEntry))
+        if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(iTextEntry))
         {
             Type = bct->Type;
             Emote = bct->EmoteId0;
@@ -2615,17 +2615,17 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
             break;
         case TARGET_T_MAP_EVENT_SOURCE:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
-                if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
+                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(Param1))
                     return pEvent->GetSourceObject();
             break;
         case TARGET_T_MAP_EVENT_TARGET:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
-                if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
+                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(Param1))
                     return pEvent->GetTargetObject();
             break;
         case TARGET_T_MAP_EVENT_EXTRA_TARGET:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
-                if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
+                if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(Param1))
                     for (const auto& target : pEvent->m_vTargets)
                         if (WorldObject* pObject = pMap->GetWorldObject(target.target))
                             if (pObject && (pObject->GetEntry() == Param2))

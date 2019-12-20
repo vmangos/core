@@ -93,7 +93,7 @@ struct npc_kerlonianAI : public FollowerAI
         }
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_AWAKEN)
             ClearSleeping();
@@ -146,7 +146,7 @@ struct npc_kerlonianAI : public FollowerAI
         SetFollowPaused(false);
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff) override
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -176,7 +176,7 @@ CreatureAI* GetAI_npc_kerlonian(Creature* pCreature)
     return new npc_kerlonianAI(pCreature);
 }
 
-bool QuestAccept_npc_kerlonian(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kerlonian(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_SLEEPER_AWAKENED)
     {
@@ -305,7 +305,7 @@ CreatureAI* GetAI_npc_prospector_remtravel(Creature* pCreature)
     return new npc_prospector_remtravelAI(pCreature);
 }
 
-bool QuestAccept_npc_prospector_remtravel(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_prospector_remtravel(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ABSENT_MINDED_PT2)
     {
@@ -446,7 +446,7 @@ CreatureAI* GetAI_npc_therylune(Creature* pCreature)
     return new npc_theryluneAI(pCreature);
 }
 
-bool QuestAccept_npc_therylune(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_therylune(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_THERYLUNE_ESCAPE)
     {
@@ -603,7 +603,7 @@ struct npc_volcorAI : public npc_escortAI
     }
 
     // Wrapper to handle start function for both quests
-    void StartEscort(Player* pPlayer, const Quest* pQuest)
+    void StartEscort(Player* pPlayer, Quest const* pQuest)
     {
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->SetFacingToObject(pPlayer);
@@ -662,7 +662,7 @@ struct npc_volcorAI : public npc_escortAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (Player* pPlayer = GetPlayerForEscort())
         {
@@ -769,7 +769,7 @@ CreatureAI* GetAI_npc_volcor(Creature* pCreature)
     return new npc_volcorAI(pCreature);
 }
 
-bool QuestAccept_npc_volcor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_volcor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ESCAPE_THROUGH_FORCE || pQuest->GetQuestId() == QUEST_ESCAPE_THROUGH_STEALTH)
     {
@@ -808,7 +808,7 @@ struct npc_rabid_thistle_bearAI : public FollowerAI
         Rage_Timer = 5000;
     }
 
-    void UpdateFollowerAI(const uint32 diff) override
+    void UpdateFollowerAI(uint32 const diff) override
     {
         int32 SignedDiff = diff;
         if (Captured_Timer >= 0)
@@ -916,7 +916,7 @@ struct npc_tharnariun_treetenderAI : public ScriptedAI
         m_uiPlaguedLandsTimer = 1100;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_bPlaguedLandsEvent)
         { 
@@ -1143,7 +1143,7 @@ struct npc_sentinel_aynashaAI : public Scripted_NoMovementAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (WaveNB > 0 && WaveNB < 4)
         {
@@ -1222,7 +1222,7 @@ CreatureAI* GetAI_npc_sentinel_aynasha(Creature* pCreature)
     return new npc_sentinel_aynashaAI(pCreature);
 }
 
-bool QuestAccept_npc_sentinel_aynasha(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_sentinel_aynasha(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ONE_SHOT_ONE_KILL)
     {
@@ -1236,7 +1236,7 @@ bool QuestAccept_npc_sentinel_aynasha(Player* pPlayer, Creature* pCreature, cons
 //would have thought taking it out of quest_template would have been necessary
 //but turns out the quest adds the item afterwards with its check(so never adds),
 //so it's fine to leave it in quest_template.
-bool QuestAcceptGO_beached_sea(Player* player, GameObject* pGo, const Quest* pQuest)
+bool QuestAcceptGO_beached_sea(Player* player, GameObject* pGo, Quest const* pQuest)
 {
     uint32 id = 0;
     uint32 count = 1;
@@ -1283,7 +1283,7 @@ enum MurkdeepData
     SPELL_NET          = 6533
 };
 
-static const float m_fSummonPoints[3][3] =
+static float const m_fSummonPoints[3][3] =
 {
     { 4984.772f, 596.975f, -1.172f },
     { 4989.618f, 599.530f, -1.291f },
@@ -1397,7 +1397,7 @@ struct npc_murkdeepAI : public ScriptedAI
         }
     }
 
-    void DoAttack(const uint32 uiDiff)
+    void DoAttack(uint32 const uiDiff)
     {
         // TODO - add (or not) Flee at 15% hp as it was set in EventAI
         if (m_uiSunderArmorTimer < uiDiff)
@@ -1425,7 +1425,7 @@ struct npc_murkdeepAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {

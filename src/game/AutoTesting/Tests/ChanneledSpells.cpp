@@ -18,7 +18,7 @@ enum
 class interrupt_mob_channeling_mob : public SingleTest
 {
 public:
-    interrupt_mob_channeling_mob(const char* name, uint32 spellId, uint32 castTime) : SingleTest(name, MAP_TESTING_ID, false), _spellId(spellId), _castTime(castTime)
+    interrupt_mob_channeling_mob(char const* name, uint32 spellId, uint32 castTime) : SingleTest(name, MAP_TESTING_ID, false), _spellId(spellId), _castTime(castTime)
     {
 
     }

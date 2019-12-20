@@ -94,7 +94,7 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
             m_pInstance->SetData(DATA_TENDRIS_AGGRO, IN_PROGRESS);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->IsNonMeleeSpellCasted(false))
             return;

@@ -81,7 +81,7 @@ struct SpawnLocation
     float m_fX, m_fY, m_fZ;
 };
 
-static const SpawnLocation aNefarianLocs[5] =
+static SpawnLocation const aNefarianLocs[5] =
 {
     { -7599.32f, -1191.72f, 475.545f},                      // opening where red/blue/black darknid spawner appear (ori 3.05433)
     { -7526.27f, -1135.04f, 473.445f},                      // same as above, closest to door (ori 5.75959)
@@ -90,7 +90,7 @@ static const SpawnLocation aNefarianLocs[5] =
     { -7502.002f, -1256.503f, 486.758f}                    // nefarian fly to this position
 };
 
-static const uint32 aPossibleDrake[MAX_DRAKES] = {NPC_BRONZE_DRAKANOID, NPC_BLUE_DRAKANOID, NPC_RED_DRAKANOID, NPC_GREEN_DRAKANOID, NPC_BLACK_DRAKANOID};
+static uint32 const aPossibleDrake[MAX_DRAKES] = {NPC_BRONZE_DRAKANOID, NPC_BLUE_DRAKANOID, NPC_RED_DRAKANOID, NPC_GREEN_DRAKANOID, NPC_BLACK_DRAKANOID};
 
 //This script is complicated
 //Instead of morphing Victor Nefarius we will have him control phase 1
@@ -115,7 +115,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         // select two different numbers between 0..MAX_DRAKES-1
         if (m_pInstance)
         {
-            const int NUM_DRAKES = sizeof(aPossibleDrake) / sizeof(aPossibleDrake[0]);
+            int const NUM_DRAKES = sizeof(aPossibleDrake) / sizeof(aPossibleDrake[0]);
             uint32 drakesType = m_pInstance->GetData64(DATA_NEF_COLOR);
             m_uiDrakeTypeOne = aPossibleDrake[drakesType % NUM_DRAKES];
             int idx2 = drakesType / NUM_DRAKES;
@@ -127,9 +127,9 @@ struct boss_victor_nefariusAI : ScriptedAI
         boss_victor_nefariusAI::Reset();
     }
 
-    const uint32 MAX_SCEPTER_RUN_TIME = 5 * HOUR * IN_MILLISECONDS;
-    const uint32 SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
-    const uint32 SCEPTER_TAUNT_OFFSET = SCEPTER_TAUNT_INTERVAL / 2;
+    uint32 const MAX_SCEPTER_RUN_TIME = 5 * HOUR * IN_MILLISECONDS;
+    uint32 const SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
+    uint32 const SCEPTER_TAUNT_OFFSET = SCEPTER_TAUNT_INTERVAL / 2;
 
     ScriptedInstance* m_pInstance;
 
@@ -317,7 +317,7 @@ struct boss_victor_nefariusAI : ScriptedAI
             ++m_uiKilledAdds;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (NefaEventStart && !phase1)
         {

@@ -61,7 +61,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     DETAIL_LOG("WORLD: CMSG_USE_ITEM packet, bagIndex: %u, slot: %u, spell_count: %u , Item: %u, data length = %i", bagIndex, slot, spell_count, pItem->GetEntry(), (uint32)recvPacket.size());
 
-    ItemPrototype const *proto = pItem->GetProto();
+    ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
     {
         recvPacket.rpos(recvPacket.wpos());                 // prevent spam at not read packet tail
@@ -97,7 +97,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     {
         for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
         {
-            if (SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(proto->Spells[i].SpellId))
+            if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(proto->Spells[i].SpellId))
             {
                 if (spellInfo->IsNonCombatSpell())
                 {
@@ -183,7 +183,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    ItemPrototype const *proto = pItem->GetProto();
+    ItemPrototype const* proto = pItem->GetProto();
     if (!proto)
     {
         pUser->SendEquipError(EQUIP_ERR_ITEM_NOT_FOUND, pItem, nullptr);
@@ -194,7 +194,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
     uint32 lockId = proto->LockID;
     if (lockId && !pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNLOCKED))
     {
-        LockEntry const *lockInfo = sLockStore.LookupEntry(lockId);
+        LockEntry const* lockInfo = sLockStore.LookupEntry(lockId);
 
         if (!lockInfo)
         {
@@ -213,10 +213,10 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
 
     if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))// wrapped?
     {
-        QueryResult *result = CharacterDatabase.PQuery("SELECT entry, flags FROM character_gifts WHERE item_guid = '%u'", pItem->GetGUIDLow());
+        QueryResult* result = CharacterDatabase.PQuery("SELECT entry, flags FROM character_gifts WHERE item_guid = '%u'", pItem->GetGUIDLow());
         if (result)
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 entry = fields[0].GetUInt32();
             uint32 flags = fields[1].GetUInt32();
 
@@ -242,7 +242,7 @@ void WorldSession::HandleOpenItemOpcode(WorldPacket& recvPacket)
         pUser->SendLoot(pItem->GetObjectGuid(), LOOT_CORPSE);
 }
 
-void WorldSession::HandleGameObjectUseOpcode(WorldPacket & recv_data)
+void WorldSession::HandleGameObjectUseOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
 
@@ -254,7 +254,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket & recv_data)
     if (!_player->IsSelfMover())
         return;
 
-    GameObject *obj = GetPlayer()->GetMap()->GetGameObject(guid);
+    GameObject* obj = GetPlayer()->GetMap()->GetGameObject(guid);
     if (!obj || obj->IsDeleted())
         return;
 
@@ -286,7 +286,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     DEBUG_LOG("WORLD: got cast spell packet, spellId - %u, data length = %i",
               spellId, (uint32)recvPacket.size());
 
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
     if (!spellInfo)
     {
@@ -337,7 +337,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         }
 
         // if rank not found then function return nullptr but in explicit cast case original spell can be casted and later failed with appropriate error message
-        if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(spellInfo, target->GetLevel()))
+        if (SpellEntry const* actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(spellInfo, target->GetLevel()))
             spellInfo = actualSpellInfo;
     }
 
@@ -355,7 +355,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
         _player->m_castingSpell = _player->GetComboPoints();
 
-    Spell *spell = new Spell(_player, spellInfo, false, ObjectGuid(), nullptr, targets.getUnitTarget());
+    Spell* spell = new Spell(_player, spellInfo, false, ObjectGuid(), nullptr, targets.getUnitTarget());
 
     // Nostalrius : Ivina
     spell->SetClientStarted(true);
@@ -389,7 +389,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     if (spellId == 16380 && !_player->IsGMVisible())
         return;
 
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
         return;
 
@@ -445,7 +445,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    SpellAuraHolder *holder = _player->GetSpellAuraHolder(spellId);
+    SpellAuraHolder* holder = _player->GetSpellAuraHolder(spellId);
 
     // not own area auras can't be cancelled (note: maybe need to check for aura on holder and not general on spell)
     if (holder && holder->GetCasterGuid() != _player->GetObjectGuid() && holder->GetSpellProto()->HasAreaAuraEffect())
@@ -467,7 +467,7 @@ void WorldSession::HandlePetCancelAuraOpcode(WorldPacket& recvPacket)
     if (!_player->IsSelfMover())
         return;
 
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
         return;
 
@@ -500,7 +500,7 @@ void WorldSession::HandleCancelAutoRepeatSpellOpcode(WorldPacket& /*recvPacket*/
     _player->GetMover()->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
 }
 
-void WorldSession::HandleCancelChanneling(WorldPacket & recv_data)
+void WorldSession::HandleCancelChanneling(WorldPacket& recv_data)
 {
     recv_data.read_skip<uint32>();                          // spellid, not used
 
@@ -517,13 +517,13 @@ void WorldSession::HandleCancelChanneling(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleSelfResOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleSelfResOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "WORLD: CMSG_SELF_RES");                  // empty opcode
 
     if (_player->GetUInt32Value(PLAYER_SELF_RES_SPELL))
     {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL));
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(_player->GetUInt32Value(PLAYER_SELF_RES_SPELL));
         if (spellInfo)
             _player->CastSpell(_player, spellInfo, false);
 

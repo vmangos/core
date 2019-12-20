@@ -39,13 +39,13 @@ class MANGOS_DLL_DECL TotemAI : public CreatureAI
 {
     public:
 
-        explicit TotemAI(Creature *c);
+        explicit TotemAI(Creature* c);
 
-        void MoveInLineOfSight(Unit *) override { };
-        void AttackStart(Unit *) override { };
+        void MoveInLineOfSight(Unit*) override { };
+        void AttackStart(Unit*) override { };
 
-        void UpdateAI(const uint32) override;
-        static int Permissible(const Creature *);
+        void UpdateAI(uint32 const) override;
+        static int Permissible(Creature const*);
 
     private:
         ObjectGuid m_victimGuid;

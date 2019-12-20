@@ -180,7 +180,7 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, bool detailed) c
     return ss.str();
 }
 
-std::string GmTicket::FormatMessageString(ChatHandler& handler, const char* szClosedName, const char* szAssignedToName, const char* szUnassignedName, const char* szDeletedName, const char* szCompletedName) const
+std::string GmTicket::FormatMessageString(ChatHandler& handler, char const* szClosedName, char const* szAssignedToName, char const* szUnassignedName, char const* szDeletedName, char const* szCompletedName) const
 {
     std::stringstream ss;
     ss << handler.PGetParseString(LANG_COMMAND_TICKETLISTGUID, _id);
@@ -198,7 +198,7 @@ std::string GmTicket::FormatMessageString(ChatHandler& handler, const char* szCl
     return ss.str();
 }
 
-const char* GmTicket::GetTicketCategoryName(TicketType category) const
+char const* GmTicket::GetTicketCategoryName(TicketType category) const
 {
     switch (category)
     {

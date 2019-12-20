@@ -35,7 +35,7 @@ public:
     virtual ~AbstractPlayer() {}
     virtual ObjectGuid GetObjectGuid() const = 0;
     virtual Team GetTeam() const = 0;
-    virtual const char* GetName() const = 0;
+    virtual char const* GetName() const = 0;
     virtual uint32 GetZoneId() const = 0;
     virtual uint32 GetAreaId() const = 0;
     virtual uint8 GetClass() const = 0;
@@ -68,7 +68,7 @@ public:
 
     ObjectGuid GetObjectGuid() const override;
     Team GetTeam() const override;
-    const char* GetName() const override;
+    char const* GetName() const override;
     uint32 GetZoneId() const override;
     uint32 GetAreaId() const override;
     uint8 GetClass() const override;

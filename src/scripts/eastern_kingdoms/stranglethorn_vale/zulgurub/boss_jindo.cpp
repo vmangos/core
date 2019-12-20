@@ -116,7 +116,7 @@ struct boss_jindoAI : public ScriptedAI
             m_pInstance->SetData(TYPE_JINDO, NOT_STARTED);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_HEX)
         {
@@ -151,7 +151,7 @@ struct boss_jindoAI : public ScriptedAI
             Skeleton->AI()->AttackStart(initialTarget);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -311,7 +311,7 @@ struct mob_shade_of_jindoAI : public ScriptedAI
             damage = 0;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -355,7 +355,7 @@ struct mob_brain_wash_totemAI : public ScriptedAI
         SetCombatMovement(false);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || !m_pInstance)
         {

@@ -78,7 +78,7 @@ struct boss_general_angerforgeAI : public ScriptedAI
         pSummoned->GetMotionMaster()->MoveFollow(m_creature, 0.0f, 0.0f);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

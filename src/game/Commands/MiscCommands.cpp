@@ -202,7 +202,7 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
 bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
 {
     ///- Get the accounts with GM Level >0
-    QueryResult *result = LoginDatabase.PQuery("SELECT username, account_access.gmlevel FROM account, account_access "
+    QueryResult* result = LoginDatabase.PQuery("SELECT username, account_access.gmlevel FROM account, account_access "
         "WHERE account_access.id = account.id AND account_access.gmlevel > 0 AND RealmID=%u", realmID);
     if (result)
     {
@@ -214,7 +214,7 @@ bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
         ///- Circle through them. Display username and GM level
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             PSendSysMessage("|%15s|%6s|", fields[0].GetString(), fields[1].GetString());
         } while (result->NextRow());
 
@@ -267,7 +267,7 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
         return false;
     }
 
-    Player *target = GetSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
         target = m_session->GetPlayer();
 
@@ -290,7 +290,7 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
     return true;
 }
 
-bool RegisterPlayerToBG(WorldSession * sess, BattleGroundTypeId bgid)
+bool RegisterPlayerToBG(WorldSession* sess, BattleGroundTypeId bgid)
 {
     Player* pPlayer = sess->GetPlayer();
     if (!pPlayer->GetBGAccessByLevel(bgid))
@@ -644,14 +644,14 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
     Player::BoundInstancesMap &binds = player->GetBoundInstances();
     for (Player::BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end(); ++itr)
     {
-        DungeonPersistentState *state = itr->second.state;
+        DungeonPersistentState* state = itr->second.state;
         std::string timeleft = "";
         if (!itr->second.perm)
             timeleft = secsToTimeString(state->GetResetTime() - time(nullptr), true);
         else
             timeleft = secsToTimeString(sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(itr->first) - time(nullptr));
 
-        if (const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
+        if (MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
         {
             PSendSysMessage("map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
                             itr->first, entry->name, state->GetInstanceId(), itr->second.perm ? "yes" : "no",
@@ -665,19 +665,19 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
     PSendSysMessage("player binds: %d", counter);
     counter = 0;
 
-    if (Group *group = player->GetGroup())
+    if (Group* group = player->GetGroup())
     {
         Group::BoundInstancesMap &binds = group->GetBoundInstances();
         for (Group::BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end(); ++itr)
         {
-            DungeonPersistentState *state = itr->second.state;
+            DungeonPersistentState* state = itr->second.state;
             std::string timeleft = "";
             if (!itr->second.perm)
                 timeleft = secsToTimeString(state->GetResetTime() - time(nullptr), true);
             else
                 timeleft = secsToTimeString(sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(itr->first) - time(nullptr));
 
-            if (const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
+            if (MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
             {
                 PSendSysMessage("map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
                                 itr->first, entry->name, state->GetInstanceId(), itr->second.perm ? "yes" : "no",
@@ -724,10 +724,10 @@ bool ChatHandler::HandleInstanceUnbindCommand(char* args)
         }
         if (itr->first != player->GetMapId())
         {
-            DungeonPersistentState *save = itr->second.state;
+            DungeonPersistentState* save = itr->second.state;
             std::string timeleft = secsToTimeString(save->GetResetTime() - time(nullptr), true);
 
-            if (const MapEntry* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
+            if (MapEntry const* entry = sMapStorage.LookupEntry<MapEntry>(itr->first))
             {
                 PSendSysMessage("unbinding map: %d (%s) inst: %d perm: %s canReset: %s TTR: %s",
                                 itr->first, entry->name, save->GetInstanceId(), itr->second.perm ? "yes" : "no",
@@ -1066,7 +1066,7 @@ bool ChatHandler::HandleSendMailCommand(char* args)
 bool ChatHandler::HandleSendMessageCommand(char* args)
 {
     ///- Find the player
-    Player *rPlayer;
+    Player* rPlayer;
     if (!ExtractPlayerTarget(&args, &rPlayer))
         return false;
 
@@ -1340,7 +1340,7 @@ void ChatHandler::ShowTriggerTargetListHelper(uint32 id, AreaTriggerTeleport con
                         subpart ? " -> " : "", id, at->destination.mapId, at->destination.x, at->destination.y, at->destination.z);
 }
 
-void ChatHandler::ShowTriggerListHelper(AreaTriggerEntry const * atEntry)
+void ChatHandler::ShowTriggerListHelper(AreaTriggerEntry const* atEntry)
 {
 
     char const* tavern = sObjectMgr.IsTavernAreaTrigger(atEntry->id) ? GetMangosString(LANG_TRIGGER_TAVERN) : "";
@@ -1401,7 +1401,7 @@ bool ChatHandler::HandleTriggerCommand(char* args)
         // Search triggers
         for (auto const itr : sObjectMgr.GetAreaTriggersMap())
         {
-            AreaTriggerEntry const *atTestEntry = &itr.second;
+            AreaTriggerEntry const* atTestEntry = &itr.second;
             if (!atTestEntry)
                 continue;
 
@@ -1454,7 +1454,7 @@ bool ChatHandler::HandleTriggerActiveCommand(char* /*args*/)
     // Search in AreaTable.dbc
     for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = &itr.second;
+        AreaTriggerEntry const* atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -1483,7 +1483,7 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
     // Search triggers
     for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = &itr.second;
+        AreaTriggerEntry const* atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -1504,7 +1504,7 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
     // Search trigger targets
     for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = &itr.second;
+        AreaTriggerEntry const* atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -1672,7 +1672,7 @@ bool ChatHandler::HandleReplayRecordCommand(char* c)
 typedef std::map<ObjectGuid, BattleGroundPlayer> BattleGroundPlayerMap;
 bool ChatHandler::HandleBGStatusCommand(char *args)
 {
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     ASSERT(chr);
     SendSysMessage(DO_COLOR(COLOR_INFO, "-- Currently running BGs"));
     uint8 i = 0;
@@ -1762,7 +1762,7 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
 
 bool ChatHandler::HandleBGStartCommand(char *args)
 {
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     ASSERT(chr);
     BattleGround* pBg = chr->GetBattleGround();
     if (!pBg)
@@ -1778,7 +1778,7 @@ bool ChatHandler::HandleBGStartCommand(char *args)
 
 bool ChatHandler::HandleBGStopCommand(char *args)
 {
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     ASSERT(chr);
     BattleGround* pBg = chr->GetBattleGround();
     if (!pBg)
@@ -1794,7 +1794,7 @@ bool ChatHandler::HandleBGStopCommand(char *args)
 
 bool ChatHandler::HandleBGCustomCommand(char *args)
 {
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     ASSERT(chr);
     BattleGround* pBg = chr->GetBattleGround();
     if (!pBg)

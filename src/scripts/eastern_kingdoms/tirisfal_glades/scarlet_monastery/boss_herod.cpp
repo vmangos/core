@@ -168,7 +168,7 @@ struct boss_herodAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -272,7 +272,7 @@ struct mob_scarlet_traineeAI : ScriptedAI
 
     void Reset() override { }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (Start_Timer)
         {

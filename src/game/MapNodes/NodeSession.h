@@ -41,7 +41,7 @@ public:
     void QueuePacket(WorldPacket* packet);
 
     void SetName(std::string const& s) { m_name = s; }
-    const char* GetName() const { return m_name.c_str(); }
+    char const* GetName() const { return m_name.c_str(); }
     bool IsConnectedToMaster() const { return m_isConnectedToMaster; }
     bool IsReady() const { return m_isReady; }
 

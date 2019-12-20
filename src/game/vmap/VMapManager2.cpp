@@ -51,7 +51,7 @@ VMapManager2::~VMapManager2(void)
 Vector3 VMapManager2::convertPositionToInternalRep(float x, float y, float z) const
 {
     Vector3 pos;
-    const float mid = 0.5f * 64.0f * 533.33333333f;
+    float const mid = 0.5f * 64.0f * 533.33333333f;
     pos.x = mid - x;
     pos.y = mid - y;
     pos.z = z;
@@ -70,7 +70,7 @@ std::string VMapManager2::getMapFileName(unsigned int pMapId)
 
 //=========================================================
 
-VMAPLoadResult VMapManager2::loadMap(const char* pBasePath, unsigned int pMapId, int x, int y)
+VMAPLoadResult VMapManager2::loadMap(char const* pBasePath, unsigned int pMapId, int x, int y)
 {
     VMAPLoadResult result = VMAP_LOAD_RESULT_IGNORED;
     if (isMapLoadingEnabled())
@@ -334,7 +334,7 @@ void VMapManager2::releaseModelInstance(std::string const& filename)
 }
 //=========================================================
 
-bool VMapManager2::existsMap(const char* pBasePath, unsigned int pMapId, int x, int y)
+bool VMapManager2::existsMap(char const* pBasePath, unsigned int pMapId, int x, int y)
 {
     return StaticMapTree::CanLoadMap(std::string(pBasePath), pMapId, x, y);
 }

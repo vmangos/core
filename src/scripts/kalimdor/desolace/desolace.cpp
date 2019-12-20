@@ -135,7 +135,7 @@ struct npc_aged_dying_ancient_kodoAI : ScriptedAI
             m_creature->ForcedDespawn();
     }
 
-    void UpdateAI(const uint32 /*uiDiff*/) override
+    void UpdateAI(uint32 const /*uiDiff*/) override
     {
         if (m_creature->GetEntry() == NPC_TAMED_KODO)
             return;
@@ -305,7 +305,7 @@ struct npc_melizza_brimbuzzleAI : public npc_escortAI
                 break;
         }
     }
-    void Dialogue(const uint32 uiDiff)
+    void Dialogue(uint32 const uiDiff)
     {
         if (m_dialogueStep > 6)
             return;
@@ -354,7 +354,7 @@ struct npc_melizza_brimbuzzleAI : public npc_escortAI
             m_dialogueTimer  -= uiDiff;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         Dialogue(uiDiff);
         npc_escortAI::UpdateAI(uiDiff);
@@ -370,7 +370,7 @@ CreatureAI* GetAI_npc_melizza_brimbuzzle(Creature* pCreature)
     return new npc_melizza_brimbuzzleAI(pCreature);
 }
 
-bool QuestAccept_npc_melizza_brimbuzzle(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_melizza_brimbuzzle(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_GET_ME_OUT_OF_HERE)
     {
@@ -419,7 +419,7 @@ CreatureAI* GetAI_npc_dalinda_malem(Creature* pCreature)
     return new npc_dalinda_malemAI(pCreature);
 }
 
-bool QuestAccept_npc_dalinda_malem(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_dalinda_malem(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_RETURN_TO_VAHLARRIEL)
     {
@@ -451,7 +451,7 @@ struct go_serpent_statueAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {
@@ -553,7 +553,7 @@ struct go_ghost_magnetAI: public GameObjectAI
     uint16 nbToSpawn;
     bool state;//0 = already are functioning magnets, do not spawn spectre. //1 = spawning.
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {
@@ -644,7 +644,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
         isGreen=true;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -663,7 +663,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
             curseTimer -= uiDiff;
         DoMeleeAttackIfReady();
     }
-    void UpdateAI_corpse(const uint32 uiDiff) override
+    void UpdateAI_corpse(uint32 const uiDiff) override
     {
         if ( corpseTimer < uiDiff)//purpose is to delay the new spawn.
         {
@@ -888,7 +888,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
         m_lCaravanGuid.push_back(m_creature->GetObjectGuid());
         AddToFormation(m_creature, FORMATION_CORK);
 
-        for (const auto &member : Caravan)
+        for (const auto& member : Caravan)
         {
             if (const auto pCreature = m_creature->SummonCreature(member.coords.entry,
                 member.coords.x,
@@ -1019,7 +1019,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
         }
     }
 
-    void AddToFormation(Creature* const pWho, const Formation &form) const
+    void AddToFormation(Creature* const pWho, Formation const& form) const
     {
         pWho->JoinCreatureGroup(m_creature, form.distance, form.angle,
             OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER);
@@ -1258,7 +1258,7 @@ CreatureAI* GetAI_npc_cork_gizelton(Creature* pCreature)
     return new npc_cork_gizeltonAI(pCreature);
 }
 
-bool QuestAccept_npc_cork_gizelton(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_cork_gizelton(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TOP)
     {
@@ -1269,7 +1269,7 @@ bool QuestAccept_npc_cork_gizelton(Player* pPlayer, Creature* pCreature, const Q
     return true;
 }
 
-bool QuestAccept_npc_rigger_gizelton(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_rigger_gizelton(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_BOTTOM)
     {

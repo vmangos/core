@@ -657,7 +657,7 @@ private:
 
 struct TransactionPart
 {
-    static const int MAX_TRANSACTION_ITEMS = 6;
+    static int const MAX_TRANSACTION_ITEMS = 6;
     TransactionPart()
     {
         memset(this, 0, sizeof(TransactionPart));
@@ -672,14 +672,14 @@ struct TransactionPart
 
 struct PlayerTransactionData
 {
-    const char* type;
+    char const* type;
     TransactionPart parts[2];
 };
 
 /// Storage class for commands issued for delayed execution
 struct CliCommandHolder
 {
-    typedef void Print(void*, const char*);
+    typedef void Print(void*, char const*);
     typedef void CommandFinished(void*, bool success);
 
     uint32 m_cliAccountId;                                  // 0 for console and real account id for RA/soap
@@ -689,7 +689,7 @@ struct CliCommandHolder
     Print* m_print;
     CommandFinished* m_commandFinished;
 
-    CliCommandHolder(uint32 accountId, AccountTypes cliAccessLevel, void* callbackArg, const char *command, Print* zprint, CommandFinished* commandFinished)
+    CliCommandHolder(uint32 accountId, AccountTypes cliAccessLevel, void* callbackArg, char const* command, Print* zprint, CommandFinished* commandFinished)
         : m_cliAccountId(accountId), m_cliAccessLevel(cliAccessLevel), m_callbackArg(callbackArg), m_print(zprint), m_commandFinished(commandFinished)
     {
         size_t len = strlen(command)+1;
@@ -713,7 +713,7 @@ class World
         typedef std::set<WorldSession*> SessionSet;
         SessionMap GetAllSessions() { return m_sessions; }
         WorldSession* FindSession(uint32 id) const;
-        void AddSession(WorldSession *s);
+        void AddSession(WorldSession* s);
         bool RemoveSession(uint32 id);
         /// Get the number of current active sessions
         void UpdateMaxSessionCounters();
@@ -740,7 +740,7 @@ class World
         /// Set a new Message of the Day
         void SetMotd(std::string const& motd) { m_motd = motd; }
         /// Get the current Message of the Day
-        const char* GetMotd() const { return m_motd.c_str(); }
+        char const* GetMotd() const { return m_motd.c_str(); }
 
         // Get current server's WoW Patch
         uint8 GetWowPatch() const { return m_wowPatch; }
@@ -783,13 +783,13 @@ class World
         void SendWorldText(int32 string_id, ...);
          // Only for GMs with ticket notification ON
         void SendGMTicketText(int32 string_id, ...);
-        void SendGMTicketText(const char* text);
+        void SendGMTicketText(char const* text);
         void SendGMText(int32 string_id, ...);
-        void SendGlobalText(const char* text, WorldSession *self);
+        void SendGlobalText(char const* text, WorldSession* self);
         void SendGlobalMessage(WorldPacket* packet, WorldSession* self = 0, uint32 team = 0);
         void SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self = 0, uint32 team = 0);
-        void SendZoneText(uint32 zone, const char *text, WorldSession *self = 0, uint32 team = 0);
-        void SendServerMessage(ServerMessageType type, const char *text = "", Player* player = nullptr);
+        void SendZoneText(uint32 zone, char const* text, WorldSession* self = 0, uint32 team = 0);
+        void SendServerMessage(ServerMessageType type, char const* text = "", Player* player = nullptr);
 
         /// Are we in the middle of a shutdown?
         bool IsShutdowning() const { return m_ShutdownTimer > 0; }
@@ -830,7 +830,7 @@ class World
 
         void KickAll();
         void KickAllLess(AccountTypes sec);
-        void WarnAccount(uint32 accountId, std::string from, std::string reason, const char* type = "WARNING");
+        void WarnAccount(uint32 accountId, std::string from, std::string reason, char const* type = "WARNING");
         void BanAccount(uint32 accountId, uint32 duration, std::string reason, std::string author);
         BanReturn BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_secs, std::string reason, std::string author);
         bool RemoveBanAccount(BanMode mode, std::string const& source, std::string const& message, std::string nameOrIP);
@@ -881,10 +881,10 @@ class World
         /**
          * Database logs system
          */
-        void LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, const char* type, uint32 dataInt);
-        void LogCharacter(Player* character, const char* action);
-        void LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, const char* action);
-        void LogChat(WorldSession* sess, const char* type, std::string const& msg, PlayerPointer target = nullptr, uint32 chanId = 0, const char* chanStr = nullptr);
+        void LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, char const* type, uint32 dataInt);
+        void LogCharacter(Player* character, char const* action);
+        void LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, char const* action);
+        void LogChat(WorldSession* sess, char const* type, std::string const& msg, PlayerPointer target = nullptr, uint32 chanId = 0, char const* chanStr = nullptr);
         void LogTransaction(PlayerTransactionData const& data);
         void Shutdown();
         void AddSessionToSessionsMap(WorldSession* sess);
@@ -917,7 +917,7 @@ class World
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters
-        void _UpdateRealmCharCount(QueryResult *resultCharCount, uint32 accountId);
+        void _UpdateRealmCharCount(QueryResult* resultCharCount, uint32 accountId);
 
     private:
         void setConfig(eConfigUInt32Values index, char const* fieldname, uint32 defvalue);

@@ -60,7 +60,7 @@ enum
     SPELL_ENRAGE                = 28747
 };
 
-static const uint32 aPossibleBreaths[MAX_BREATHS] = {SPELL_INCINERATE, SPELL_TIME_LAPSE, SPELL_CORROSIVE_ACID, SPELL_IGNITE_FLESH, SPELL_FROST_BURN};
+static uint32 const aPossibleBreaths[MAX_BREATHS] = {SPELL_INCINERATE, SPELL_TIME_LAPSE, SPELL_CORROSIVE_ACID, SPELL_IGNITE_FLESH, SPELL_FROST_BURN};
 
 struct TimeLapseInfo
 {
@@ -188,7 +188,7 @@ struct boss_chromaggusAI : public ScriptedAI
             m_pInstance->SetData(TYPE_CHROMAGGUS, FAIL);
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if (!pTarget)
             return;
@@ -224,7 +224,7 @@ struct boss_chromaggusAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->IsInCombat() && !m_bEngagedOnce)
         {

@@ -23,7 +23,7 @@
 #include "Creature.h"
 #include "Player.h"
 
-int GuardAI::Permissible(const Creature *creature)
+int GuardAI::Permissible(Creature const* creature)
 {
     if (creature->IsGuard())
         return PERMIT_BASE_SPECIAL;
@@ -31,12 +31,12 @@ int GuardAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-GuardAI::GuardAI(Creature *c) : CreatureAI(c)
+GuardAI::GuardAI(Creature* c) : CreatureAI(c)
 {
 }
 
 // Returns whether the Unit is currently attacking other players or friendly npcs.
-bool GuardAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
+bool GuardAI::IsAttackingPlayerOrFriendly(Unit const* pWho) const
 {
     if (pWho->IsPvPContested())
         return true;
@@ -50,7 +50,7 @@ bool GuardAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
     return false;
 }
 
-void GuardAI::MoveInLineOfSight(Unit *pWho)
+void GuardAI::MoveInLineOfSight(Unit* pWho)
 {
     if (m_creature->GetVictim())
         return;
@@ -82,12 +82,12 @@ void GuardAI::MoveInLineOfSight(Unit *pWho)
     }
 }
 
-void GuardAI::EnterCombat(Unit *)
+void GuardAI::EnterCombat(Unit*)
 {
     m_creature->CallForHelp(30.0f);
 }
 
-void GuardAI::UpdateAI(const uint32 uiDiff)
+void GuardAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
@@ -98,7 +98,7 @@ void GuardAI::UpdateAI(const uint32 uiDiff)
     DoMeleeAttackIfReady();
 }
 
-void GuardAI::AttackStart(Unit *pWho)
+void GuardAI::AttackStart(Unit* pWho)
 {
     if (!pWho)
         return;
@@ -114,7 +114,7 @@ void GuardAI::AttackStart(Unit *pWho)
     }
 }
 
-void GuardAI::JustDied(Unit *pKiller)
+void GuardAI::JustDied(Unit* pKiller)
 {
     if (Player* pPlayerKiller = pKiller->GetCharmerOrOwnerPlayerOrPlayerItself())
         m_creature->SendZoneUnderAttackMessage(pPlayerKiller);

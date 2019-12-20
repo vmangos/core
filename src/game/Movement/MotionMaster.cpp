@@ -377,7 +377,7 @@ void MotionMaster::MoveTargetedHome()
     }
     else if (m_owner->GetTypeId() == TYPEID_UNIT && ((Creature*)m_owner)->GetCharmerOrOwnerGuid())
     {
-        if (Unit *target = ((Creature*)m_owner)->GetCharmerOrOwner())
+        if (Unit* target = ((Creature*)m_owner)->GetCharmerOrOwner())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
             Mutate(new FollowMovementGenerator<Creature>(*target, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE));
@@ -687,7 +687,7 @@ bool MotionMaster::GetDestination(float &x, float &y, float &z)
     if (m_owner->movespline->Finalized())
         return false;
 
-    const G3D::Vector3& dest = m_owner->movespline->FinalDestination();
+    G3D::Vector3 const& dest = m_owner->movespline->FinalDestination();
     x = dest.x;
     y = dest.y;
     z = dest.z;

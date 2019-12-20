@@ -74,7 +74,7 @@ void ScriptedPetAI::ResetPetCombat()
     Reset();
 }
 
-void ScriptedPetAI::UpdatePetAI(const uint32 uiDiff)
+void ScriptedPetAI::UpdatePetAI(uint32 const uiDiff)
 {
     if (!m_CreatureSpells.empty())
         UpdateSpellsList(uiDiff);
@@ -88,7 +88,7 @@ void ScriptedPetAI::JustRespawned()
     ResetCreature();
 }
 
-void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
+void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_creature->IsAlive())                             // should not be needed, isAlive is checked in mangos before calling UpdateAI
         return;
@@ -96,7 +96,7 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
     // UpdateAllies() is done in the generic PetAI in Mangos, but we can't do this from script side.
     // Unclear what side effects this has, but is something to be resolved from Mangos.
 
-    if (Unit * const pTarget = m_creature->GetVictim())                            // in combat
+    if (Unit* const pTarget = m_creature->GetVictim())                            // in combat
     {
         if (!pTarget->IsTargetableForAttack())
         {
@@ -127,7 +127,7 @@ void ScriptedPetAI::UpdateAI(const uint32 uiDiff)
         {
             // Not correct in all cases.
             // When mob initiate attack by spell, pet should not start attack before spell landed.
-            if (Unit * const pTarget = pOwner->GetAttackerForHelper())
+            if (Unit* const pTarget = pOwner->GetAttackerForHelper())
             {
                 // Prevent scripted pets from breaking CC effects
                 if (!pTarget->HasAuraPetShouldAvoidBreaking())

@@ -95,7 +95,7 @@ void instance_razorfen_kraul::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-void instance_razorfen_kraul::Load(const char* chrIn)
+void instance_razorfen_kraul::Load(char const* chrIn)
 {
     if (!chrIn)
     {

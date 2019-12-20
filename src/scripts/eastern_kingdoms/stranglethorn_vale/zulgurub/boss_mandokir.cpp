@@ -389,7 +389,7 @@ struct boss_mandokirAI : public ScriptedAI
                         AttackStart(pWho);
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_WATCH)
         {
@@ -402,7 +402,7 @@ struct boss_mandokirAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_VilebranchDead)
             CheckVilebranchState();
@@ -670,7 +670,7 @@ struct mob_ohganAI : public ScriptedAI
                     pMandokir->AI()->KilledUnit(pVictim);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -751,7 +751,7 @@ struct mob_chainedSpiritsAI : public ScriptedAI
         return 1;
     }
 
-    void SpellHitTarget(Unit* pDead, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pDead, SpellEntry const* pSpell) override
     {
         if (!pSpell)
         {
@@ -770,7 +770,7 @@ struct mob_chainedSpiritsAI : public ScriptedAI
             if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiTargetRezGUID))
                 m_uiRezTimer = 2500;
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_uiRezTimer)
         {
@@ -811,7 +811,7 @@ struct mob_vilebrancheAI : public ScriptedAI
         //
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

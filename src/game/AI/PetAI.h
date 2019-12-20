@@ -44,9 +44,9 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
 {
     public:
 
-        explicit PetAI(Creature *c);
+        explicit PetAI(Creature* c);
 
-        void MoveInLineOfSight(Unit *) {}
+        void MoveInLineOfSight(Unit*) {}
         void EnterEvadeMode() {}
 
         void KilledUnit(Unit* /*victim*/);
@@ -56,8 +56,8 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
         void OwnerAttacked(Unit* target);
         void AttackedBy(Unit* attacker);
 
-        void UpdateAI(const uint32);
-        static int Permissible(const Creature *);
+        void UpdateAI(uint32 const);
+        static int Permissible(Creature const*);
 
     private:
         bool _needToStop() const;

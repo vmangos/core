@@ -1627,11 +1627,11 @@ void Unit::CalculateMeleeDamage(Unit* pVictim, uint32 damage, CalcDamageInfo* da
 
             damageInfo->target->CalculateDamageAbsorbAndResist(this, subDamage->damageSchoolMask, DIRECT_DAMAGE, subDamage->damage, &subDamage->absorb, &subDamage->resist, nullptr);
 
-            const uint32 bonus = (subDamage->resist < 0 ? uint32(std::abs(subDamage->resist)) : 0);
+            uint32 const bonus = (subDamage->resist < 0 ? uint32(std::abs(subDamage->resist)) : 0);
             subDamage->damage += bonus;
             damageInfo->totalDamage += bonus;
 
-            const uint32 malus = (subDamage->resist > 0 ? (subDamage->absorb + uint32(subDamage->resist)) : subDamage->absorb);
+            uint32 const malus = (subDamage->resist > 0 ? (subDamage->absorb + uint32(subDamage->resist)) : subDamage->absorb);
 
             if (subDamage->damage <= malus)
             {
@@ -1893,7 +1893,7 @@ static ResistanceValues resistValues[] =
     {25, 55, 16, 3, 1, 75} // 300
 };
 
-void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32* absorb, int32* resist, SpellEntry const* spellProto, Spell* spell)
+void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, uint32 const damage, uint32* absorb, int32* resist, SpellEntry const* spellProto, Spell* spell)
 {
     if (!pCaster || !IsAlive() || !damage)
         return;
@@ -1924,7 +1924,7 @@ void Unit::CalculateDamageAbsorbAndResist(WorldObject* pCaster, SpellSchoolMask 
 
     if (canResist || (resistanceChance < 0))
     {
-        const float multiplier = RollMagicResistanceMultiplierOutcomeAgainst(resistanceChance, schoolMask, damagetype, spellProto);
+        float const multiplier = RollMagicResistanceMultiplierOutcomeAgainst(resistanceChance, schoolMask, damagetype, spellProto);
         *resist = int32(int64(damage) * multiplier);
         RemainingDamage -= *resist;
     }
@@ -2116,9 +2116,9 @@ void Unit::CalculateAbsorbResistBlock(WorldObject* pCaster, SpellNonMeleeDamage*
     }
     
     CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), SPELL_DIRECT_DAMAGE, damageInfo->damage, &damageInfo->absorb, &damageInfo->resist, spellProto, spell);
-    const uint32 bonus = (damageInfo->resist < 0 ? uint32(std::abs(damageInfo->resist)) : 0);
+    uint32 const bonus = (damageInfo->resist < 0 ? uint32(std::abs(damageInfo->resist)) : 0);
     damageInfo->damage += bonus;
-    const uint32 malus = (damageInfo->resist > 0 ? (damageInfo->absorb + uint32(damageInfo->resist)) : damageInfo->absorb);
+    uint32 const malus = (damageInfo->resist > 0 ? (damageInfo->absorb + uint32(damageInfo->resist)) : damageInfo->absorb);
     damageInfo->damage = (damageInfo->damage <= malus ? 0 : (damageInfo->damage - malus));
 }
 
@@ -4204,11 +4204,11 @@ public:
     RemovedSpellData(uint32 spell, Unit* target) : spellId(spell), unit(target)
     {
     }
-    bool operator <(const RemovedSpellData& b) const
+    bool operator <(RemovedSpellData const& b) const
     {
         return spellId < b.spellId;
     }
-    bool operator==(const RemovedSpellData& b) const
+    bool operator==(RemovedSpellData const& b) const
     {
         return spellId == b.spellId && unit == b.unit;
     }
@@ -4689,7 +4689,7 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
             SetFlag(UNIT_FIELD_AURASTATE, 1 << (flag - 1));
             if (IsPlayer())
             {
-                const PlayerSpellMap& sp_list = ((Player*)this)->GetSpellMap();
+                PlayerSpellMap const& sp_list = ((Player*)this)->GetSpellMap();
                 for (const auto& itr : sp_list)
                 {
                     if (itr.second.state == PLAYERSPELL_REMOVED) continue;
@@ -5459,7 +5459,7 @@ void Unit::ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply)
     }
 }
 
-void Unit::ApplySpellDispelImmunity(const SpellEntry* spellProto, DispelType type, bool apply)
+void Unit::ApplySpellDispelImmunity(SpellEntry const* spellProto, DispelType type, bool apply)
 {
     ApplySpellImmune(spellProto->Id, IMMUNITY_DISPEL, type, apply);
 
@@ -6131,7 +6131,7 @@ void Unit::SetVisibility(UnitVisibility x)
 
 bool Unit::CanDetectInvisibilityOf(Unit const* u) const
 {
-    if (const Creature* worldBoss = ToCreature())
+    if (Creature const* worldBoss = ToCreature())
         if (worldBoss->IsWorldBoss())
             return true;
 
@@ -7005,7 +7005,7 @@ void Unit::TauntFadeOut(Unit* taunter)
 
 Unit* Unit::GetTauntTarget() const
 {
-    const AuraList& tauntAuras = GetAurasByType(SPELL_AURA_MOD_TAUNT);
+    AuraList const& tauntAuras = GetAurasByType(SPELL_AURA_MOD_TAUNT);
     if (tauntAuras.empty())
         return nullptr;
 
@@ -7141,7 +7141,7 @@ void Unit::IncrDiminishing(DiminishingGroup group)
     m_Diminishing.push_back(DiminishingReturn(group, WorldTimer::getMSTime(), DIMINISHING_LEVEL_2));
 }
 
-void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32 &duration, WorldObject const* caster, DiminishingLevels Level, bool isReflected)
+void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32& duration, WorldObject const* caster, DiminishingLevels Level, bool isReflected)
 {
     if (duration == -1 || group == DIMINISHING_NONE || (!isReflected && caster->IsFriendlyTo(this)))
         return;
@@ -7359,7 +7359,7 @@ int32 Unit::GetTotalResistanceValue(SpellSchools school) const
     // value = ((base_value * base_pct) + total_value) * total_pct
     float value = GetCreateResistance(school);
 
-    const bool vulnerability = (value < 0);
+    bool const vulnerability = (value < 0);
 
     value += m_auraModifiersGroup[unitMod][BASE_VALUE];
     value *= m_auraModifiersGroup[unitMod][BASE_PCT];
@@ -9571,7 +9571,7 @@ bool Unit::CanReachWithMeleeAutoAttackAtPosition(Unit const* pVictim, float x, f
     return (dx * dx + dy * dy < reach * reach) && ((dz * dz) < zReach);
 }
 
-Unit* Unit::GetUnit(WorldObject &obj, uint64 const &Guid)
+Unit* Unit::GetUnit(WorldObject &obj, uint64 const& Guid)
 {
     if (obj.IsInWorld())
         return obj.GetMap()->GetUnit(ObjectGuid(Guid));
@@ -9950,7 +9950,7 @@ bool Unit::IsInRaidWith(Unit const* unit) const
     return false;
 }
 
-void Unit::Debug(uint32 flags, const char* format, ...) const
+void Unit::Debug(uint32 flags, char const* format, ...) const
 {
     if (!format)
         return;

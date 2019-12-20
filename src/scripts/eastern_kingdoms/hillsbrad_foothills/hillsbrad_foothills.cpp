@@ -65,7 +65,7 @@ struct go_dusty_rugAI: public GameObjectAI
     GuidList Farmers;
     uint8 step;//0 = usual, nothing giong on // 1+ event going on
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (step)
         {

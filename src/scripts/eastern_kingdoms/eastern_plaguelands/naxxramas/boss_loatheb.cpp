@@ -78,7 +78,7 @@ struct mob_rottingMaggotAI : public ScriptedAI
         m_creature->SetNoCallAssistance(true);
         Reset();
     }
-    const bool isDiseased;
+    bool const isDiseased;
     WorldLocation aggroPossition;
     static constexpr uint32 SPELL_RETCHING_PLAGUE = 30079;
 
@@ -115,7 +115,7 @@ struct mob_rottingMaggotAI : public ScriptedAI
         m_creature->GetPosition(aggroPossition);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -183,7 +183,7 @@ struct mob_eyeStalkAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         m_creature->SetNoCallAssistance(true);
         timeSinceSpawn += std::min(uiDiff, std::numeric_limits<uint32>::max() - timeSinceSpawn);
@@ -318,7 +318,7 @@ struct boss_loathebAI : public ScriptedAI
                     availableEyeLocs.erase(availableEyeLocs.begin() + availableIndex);
 
                     eyeStalks[i].myIndex = newEyeIdx;
-                    const float* pos = eyeStalkPossitions[newEyeIdx];
+                    float const* pos = eyeStalkPossitions[newEyeIdx];
 
                     Creature* pStalk = m_creature->SummonCreature(NPC_EyeStalk, pos[0], pos[1], pos[2], pos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
                     if (!pStalk)
@@ -395,7 +395,7 @@ struct boss_loathebAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit*, const SpellEntry* pSpell) override 
+    void SpellHit(Unit*, SpellEntry const* pSpell) override 
     {
         if (pSpell->Id == 15286) // vamperic embrace
         {
@@ -403,7 +403,7 @@ struct boss_loathebAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
 
         WhackAStalk(uiDiff);

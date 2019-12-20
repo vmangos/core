@@ -277,7 +277,7 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
     init.Launch();
 }
 
-bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
+bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 const& diff)
 {
     // Waypoint movement can be switched on/off
     // This is quite handy for escort quests and other stuff
@@ -439,7 +439,7 @@ void FlightPathMovementGenerator::Reset(Player & player, float modSpeed)
     init.Launch();
 }
 
-bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
+bool FlightPathMovementGenerator::Update(Player &player, uint32 const& diff)
 {
     int32 pointId = player.movespline->currentPathIdx();
     // currentPathIdx returns lastIdx + 1 at arrive
@@ -545,7 +545,7 @@ void PatrolMovementGenerator::Finalize(Creature &creature)
     creature.SetWalk(!creature.HasUnitState(UNIT_STAT_RUNNING), false);
 }
 
-bool PatrolMovementGenerator::Update(Creature &creature, const uint32 &diff)
+bool PatrolMovementGenerator::Update(Creature &creature, uint32 const& diff)
 {
     if (creature.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_DISTRACTED))
     {

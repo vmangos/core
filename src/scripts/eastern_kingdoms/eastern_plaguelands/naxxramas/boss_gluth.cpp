@@ -25,7 +25,7 @@ EndScriptData */
 #include "naxxramas.h"
 
 
-static const float aZombieSummonLoc[3][3] =
+static float const aZombieSummonLoc[3][3] =
 {
     { 3267.9f, -3172.1f, 297.42f },
     { 3253.2f, -3132.3f, 297.42f },
@@ -146,7 +146,7 @@ struct boss_gluthAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GLUTH, FAIL);
     }
 
-    void SpellHit(Unit*, const SpellEntry* pSpell) override
+    void SpellHit(Unit*, SpellEntry const* pSpell) override
     {
         // only want to do these calculations inside naxx
         if (m_pInstance->GetMap()->GetId() != 533)
@@ -164,7 +164,7 @@ struct boss_gluthAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)  override
+    void UpdateAI(uint32 const uiDiff)  override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -331,7 +331,7 @@ struct mob_zombieChow : public ScriptedAI
         return false;
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pWho, SpellEntry const* pSpell) override
     {
         ScriptedAI::SpellHit(pWho, pSpell);
         if (pWho->GetEntry() == NPC_GLUTH && pSpell->Id == SPELL_DECIMATE)
@@ -351,7 +351,7 @@ struct mob_zombieChow : public ScriptedAI
         ScriptedAI::AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (isHitByDecimate)
         {

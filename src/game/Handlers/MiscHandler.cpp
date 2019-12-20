@@ -51,7 +51,7 @@
 #include "GossipDef.h"
 #include "GameEventMgr.h"
 
-void WorldSession::HandleRepopRequestOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleRepopRequestOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_REPOP_REQUEST Message");
 
@@ -99,8 +99,8 @@ public:
         bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
         AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
 
-        const uint32 zone = sess->GetPlayer()->GetCachedZoneId();
-        const bool notInBattleground = !((zone == 2597) || (zone == 3277) || (zone == 3358));
+        uint32 const zone = sess->GetPlayer()->GetCachedZoneId();
+        bool const notInBattleground = !((zone == 2597) || (zone == 3277) || (zone == 3358));
 
         WorldPacket data(SMSG_WHO, 50);                         // guess size
         data << uint32(clientcount);                            // clientcount place holder, listed count
@@ -231,7 +231,7 @@ public:
     }
 };
 
-void WorldSession::HandleWhoOpcode(WorldPacket & recv_data)
+void WorldSession::HandleWhoOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_WHO Message");
     if (ReceivedWhoRequest())
@@ -305,7 +305,7 @@ void WorldSession::HandleWhoOpcode(WorldPacket & recv_data)
     sWorld.AddAsyncTask(task);
 }
 
-void WorldSession::HandleLFGOpcode(WorldPacket & recv_data)
+void WorldSession::HandleLFGOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Recvd MSG_LOOKING_FOR_GROUP Message");
     
@@ -314,7 +314,7 @@ void WorldSession::HandleLFGOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_LOGOUT_REQUEST Message, security - %u", GetSecurity());
 
@@ -370,12 +370,12 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
     LogoutRequest(time(nullptr));
 }
 
-void WorldSession::HandlePlayerLogoutOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandlePlayerLogoutOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_PLAYER_LOGOUT Message");
 }
 
-void WorldSession::HandleLogoutCancelOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleLogoutCancelOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_LOGOUT_CANCEL Message");
 
@@ -400,7 +400,7 @@ void WorldSession::HandleLogoutCancelOpcode(WorldPacket & /*recv_data*/)
     DEBUG_LOG("WORLD: sent SMSG_LOGOUT_CANCEL_ACK Message");
 }
 
-void WorldSession::HandleTogglePvP(WorldPacket & recv_data)
+void WorldSession::HandleTogglePvP(WorldPacket& recv_data)
 {
     // this opcode can be used in two ways: Either set explicit new status or toggle old status
     if (recv_data.size() == 1)
@@ -418,7 +418,7 @@ void WorldSession::HandleTogglePvP(WorldPacket & recv_data)
         GetPlayer()->UpdatePvP(true);
 }
 
-void WorldSession::HandleZoneUpdateOpcode(WorldPacket & recv_data)
+void WorldSession::HandleZoneUpdateOpcode(WorldPacket& recv_data)
 {
     uint32 newZone;
     recv_data >> newZone;
@@ -441,7 +441,7 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleSetTargetOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSetTargetOpcode(WorldPacket& recv_data)
 {
     // When this packet send?
     ObjectGuid guid ;
@@ -458,7 +458,7 @@ void WorldSession::HandleSetTargetOpcode(WorldPacket & recv_data)
         _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 }
 
-void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     recv_data >> guid;
@@ -478,7 +478,7 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
         _player->ClearComboPoints();
 
     // Update autoshot if need
-    if (Spell *pSpell = _player->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+    if (Spell* pSpell = _player->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
     {
         if (!unit || unit == _player)
         {
@@ -497,7 +497,7 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleStandStateChangeOpcode(WorldPacket & recv_data)
+void WorldSession::HandleStandStateChangeOpcode(WorldPacket& recv_data)
 {
     // DEBUG_LOG("WORLD: Received CMSG_STANDSTATECHANGE"); -- too many spam in log at lags/debug stop
     uint32 animstate;
@@ -519,14 +519,14 @@ void WorldSession::HandleStandStateChangeOpcode(WorldPacket & recv_data)
     _player->ScheduleStandStateChange(animstate);
 }
 
-void WorldSession::HandleFriendListOpcode(WorldPacket & recv_data)
+void WorldSession::HandleFriendListOpcode(WorldPacket& recv_data)
 {
     ASSERT(GetMasterPlayer());
     DEBUG_LOG("WORLD: Received CMSG_FRIEND_LIST");
     GetMasterPlayer()->GetSocial()->SendFriendList();
 }
 
-void WorldSession::HandleAddFriendOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAddFriendOpcode(WorldPacket& recv_data)
 {
     ASSERT(GetMasterPlayer());
     DEBUG_LOG("WORLD: Received CMSG_ADD_FRIEND");
@@ -580,7 +580,7 @@ void WorldSession::HandleAddFriendOpcode(WorldPacket & recv_data)
     DEBUG_LOG("WORLD: Sent (SMSG_FRIEND_STATUS)");
 }
 
-void WorldSession::HandleDelFriendOpcode(WorldPacket & recv_data)
+void WorldSession::HandleDelFriendOpcode(WorldPacket& recv_data)
 {
     ASSERT(GetMasterPlayer());
 
@@ -597,7 +597,7 @@ void WorldSession::HandleDelFriendOpcode(WorldPacket & recv_data)
     DEBUG_LOG("WORLD: Sent motd (SMSG_FRIEND_STATUS)");
 }
 
-void WorldSession::HandleAddIgnoreOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
 {
     ASSERT(GetMasterPlayer());
 
@@ -642,7 +642,7 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket & recv_data)
     DEBUG_LOG("WORLD: Sent (SMSG_FRIEND_STATUS)");
 }
 
-void WorldSession::HandleDelIgnoreOpcode(WorldPacket & recv_data)
+void WorldSession::HandleDelIgnoreOpcode(WorldPacket& recv_data)
 {
     ASSERT(GetMasterPlayer());
 
@@ -659,7 +659,7 @@ void WorldSession::HandleDelIgnoreOpcode(WorldPacket & recv_data)
     DEBUG_LOG("WORLD: Sent motd (SMSG_FRIEND_STATUS)");
 }
 
-void WorldSession::HandleBugOpcode(WorldPacket & recv_data)
+void WorldSession::HandleBugOpcode(WorldPacket& recv_data)
 {
     uint32 suggestion, contentlen;
     std::string content;
@@ -676,7 +676,7 @@ void WorldSession::HandleBugOpcode(WorldPacket & recv_data)
         DEBUG_LOG("WORLD: Received CMSG_BUG [Suggestion]");
 }
 
-void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
+void WorldSession::HandleReclaimCorpseOpcode(WorldPacket& recv_data)
 {
     DETAIL_LOG("WORLD: Received CMSG_RECLAIM_CORPSE");
 
@@ -690,7 +690,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
     if (!GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
         return;
 
-    Corpse *corpse = GetPlayer()->GetCorpse();
+    Corpse* corpse = GetPlayer()->GetCorpse();
 
     if (!corpse)
         return;
@@ -703,7 +703,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
         return;
 
     // Prevent exploit: die with hellfire during battleground preparation, and resurrect after the door.
-    if (BattleGround const *bg = GetPlayer()->GetBattleGround())
+    if (BattleGround const* bg = GetPlayer()->GetBattleGround())
         if (bg->GetStatus() != STATUS_IN_PROGRESS)
             return;
     // resurrect
@@ -713,7 +713,7 @@ void WorldSession::HandleReclaimCorpseOpcode(WorldPacket &recv_data)
     GetPlayer()->SpawnCorpseBones();
 }
 
-void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
+void WorldSession::HandleResurrectResponseOpcode(WorldPacket& recv_data)
 {
     DETAIL_LOG("WORLD: Received CMSG_RESURRECT_RESPONSE");
 
@@ -743,7 +743,7 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
     GetPlayer()->ResurectUsingRequestData();                // will call spawncorpsebones
 }
 
-void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_AREATRIGGER");
 
@@ -842,7 +842,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     if (!pPlayer->IsAlive() && pTargetMap->IsDungeon())
     {
         int32 corpseMapId = 0;
-        if (Corpse *corpse = pPlayer->GetCorpse())
+        if (Corpse* corpse = pPlayer->GetCorpse())
             corpseMapId = corpse->GetMapId();
 
         // Special case prior Patch 1.3 to revive your corpse if dead in Molten Core
@@ -911,7 +911,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     pPlayer->TeleportTo(pTeleTrigger->destination);
 }
 
-void WorldSession::HandleUpdateAccountData(WorldPacket & recv_data)
+void WorldSession::HandleUpdateAccountData(WorldPacket& recv_data)
 {
     DETAIL_LOG("WORLD: Received CMSG_UPDATE_ACCOUNT_DATA");
     recv_data.rpos(recv_data.wpos());                       // prevent spam at unimplemented packet
@@ -960,13 +960,13 @@ void WorldSession::HandleSetActionButtonOpcode(WorldPacket& recv_data)
     }
 }
 
-void WorldSession::HandleCompleteCinematic(WorldPacket & /*recv_data*/)
+void WorldSession::HandleCompleteCinematic(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Player is watching cinema");
     GetPlayer()->CinematicEnd();
 }
 
-void WorldSession::HandleNextCinematicCamera(WorldPacket & /*recv_data*/)
+void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Which movie to play");
 }
@@ -1003,7 +1003,7 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 
     _player->SetSelectionGuid(guid);
 
-    Player *plr = sObjectMgr.GetPlayer(guid);
+    Player* plr = sObjectMgr.GetPlayer(guid);
     if (!plr)                                               // wrong player
         return;
 
@@ -1017,7 +1017,7 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data) {
     recv_data >> guid;
     // DEBUG_LOG("Party Stats guid is " I64FMTD,guid);
 
-    Player *pPlayer = sObjectMgr.GetPlayer(guid);
+    Player* pPlayer = sObjectMgr.GetPlayer(guid);
     if (pPlayer)
     {
         WorldPacket data(MSG_INSPECT_HONOR_STATS, (8 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
@@ -1147,7 +1147,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
         return;
     }
 
-    Player *plr = sObjectMgr.GetPlayer(charname.c_str());
+    Player* plr = sObjectMgr.GetPlayer(charname.c_str());
 
     if (!plr)
     {
@@ -1157,14 +1157,14 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 
     uint32 accid = plr->GetSession()->GetAccountId();
 
-    QueryResult *result = LoginDatabase.PQuery("SELECT username,email,last_ip FROM account WHERE id=%u", accid);
+    QueryResult* result = LoginDatabase.PQuery("SELECT username,email,last_ip FROM account WHERE id=%u", accid);
     if (!result)
     {
         SendNotification(LANG_ACCOUNT_FOR_PLAYER_NOT_FOUND, charname.c_str());
         return;
     }
 
-    Field *fields = result->Fetch();
+    Field* fields = result->Fetch();
     std::string acc = fields[0].GetCppString();
     if (acc.empty())
         acc = "Unknown";
@@ -1186,7 +1186,7 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
     DEBUG_LOG("Received whois command from player %s for character %s", GetPlayer()->GetName(), charname.c_str());
 }
 
-void WorldSession::HandleFarSightOpcode(WorldPacket & recv_data)
+void WorldSession::HandleFarSightOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_FAR_SIGHT");
     //recv_data.hexlike();
@@ -1211,11 +1211,11 @@ void WorldSession::HandleFarSightOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleResetInstancesOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleResetInstancesOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("WORLD: CMSG_RESET_INSTANCES");
 
-    if (Group *pGroup = _player->GetGroup())
+    if (Group* pGroup = _player->GetGroup())
     {
         if (pGroup->IsLeader(_player->GetObjectGuid()))
             pGroup->ResetInstances(INSTANCE_RESET_ALL, _player);
@@ -1224,7 +1224,7 @@ void WorldSession::HandleResetInstancesOpcode(WorldPacket & /*recv_data*/)
         _player->ResetInstances(INSTANCE_RESET_ALL);
 }
 
-void WorldSession::HandleRequestPetInfoOpcode(WorldPacket & /*recv_data */)
+void WorldSession::HandleRequestPetInfoOpcode(WorldPacket& /*recv_data */)
 {
     DEBUG_LOG("WORLD: CMSG_REQUEST_PET_INFO");
 
@@ -1234,7 +1234,7 @@ void WorldSession::HandleRequestPetInfoOpcode(WorldPacket & /*recv_data */)
         _player->CharmSpellInitialize();
 }
 
-void WorldSession::HandleWardenDataOpcode(WorldPacket & recv_data)
+void WorldSession::HandleWardenDataOpcode(WorldPacket& recv_data)
 {
     if (!m_warden)
     {

@@ -96,7 +96,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // if no one gets to the trap in 5 seconds delete the trap
         if (m_uiCleanSandTrap_Timer < uiDiff)

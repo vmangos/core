@@ -37,7 +37,7 @@ enum
     SAY_VANNDAR_FIGHT6    = 8843
 };
 
-const uint16 vandar_fight_texts[] = { SAY_VANNDAR_FIGHT1 , SAY_VANNDAR_FIGHT2, SAY_VANNDAR_FIGHT3, SAY_VANNDAR_FIGHT4, SAY_VANNDAR_FIGHT5,  SAY_VANNDAR_FIGHT6 };
+uint16 const vandar_fight_texts[] = { SAY_VANNDAR_FIGHT1 , SAY_VANNDAR_FIGHT2, SAY_VANNDAR_FIGHT3, SAY_VANNDAR_FIGHT4, SAY_VANNDAR_FIGHT5,  SAY_VANNDAR_FIGHT6 };
 
 #define POSITION_VANNDAR_CENTER_X        722.4f
 #define POSITION_VANNDAR_CENTER_Y        -11.0f
@@ -147,7 +147,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
             AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->GetMapId() == 30)
             if (m_creature->GetDistance2d(POSITION_VANNDAR_CENTER_X, POSITION_VANNDAR_CENTER_Y) > 35.0f)
@@ -283,7 +283,7 @@ enum
     SAY_DREKTHAR_FIGHT6    = 8849
 };
 
-const uint16 drekthar_fight_texts[] = { SAY_DREKTHAR_FIGHT1, SAY_DREKTHAR_FIGHT2, SAY_DREKTHAR_FIGHT3, SAY_DREKTHAR_FIGHT4, SAY_DREKTHAR_FIGHT5, SAY_DREKTHAR_FIGHT6 };
+uint16 const drekthar_fight_texts[] = { SAY_DREKTHAR_FIGHT1, SAY_DREKTHAR_FIGHT2, SAY_DREKTHAR_FIGHT3, SAY_DREKTHAR_FIGHT4, SAY_DREKTHAR_FIGHT5, SAY_DREKTHAR_FIGHT6 };
 
 #define    POSITION_DKT_CENTER_X         -1370.9f
 #define    POSITION_DKT_CENTER_Y          -219.8f
@@ -404,7 +404,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
             AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->GetMapId() == 30)
         {
@@ -614,7 +614,7 @@ struct npc_BalindaAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -854,7 +854,7 @@ struct npc_GalvangarAI : public ScriptedAI
             AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -1060,7 +1060,7 @@ struct npc_WarMasterAI : public ScriptedAI
         m_isKilled = true;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         /* Prevents the following bug:
          *  The war master is killed
@@ -1237,7 +1237,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
             AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->IsInEvadeMode() && (!m_creature->GetVictim() || !TargetWithinShootRange(m_creature->GetVictim())))
         {
@@ -1301,7 +1301,7 @@ struct npc_AlteracDardoshAI : public ScriptedAI
         m_uiCleave_Timer = 1000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1472,7 +1472,7 @@ struct npc_ram_wolf_tamedAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         /** The tamed beast musn't attack */
         if (m_creature->GetEntry() == NPC_RAM_TAMED || m_creature->GetEntry() == NPC_WOLF_TAMED)
@@ -1533,7 +1533,7 @@ struct RamWolfMasterAI : public ScriptedAI
         m_uiCheckTimer = 200;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         /** Check if Tamed beast are in 10 meters radius */
         if (m_uiCheckTimer < uiDiff)
@@ -1733,7 +1733,7 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
     {
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         uint32 commander_id = 0;
 
@@ -1785,7 +1785,7 @@ class npc_korrak_the_bloodragerAI: public ScriptedAI
         void Reset() override
         {
         }
-        void UpdateAI(const uint32 diff) override
+        void UpdateAI(uint32 const diff) override
         {
             if (!m_appeared)
             {
@@ -1891,7 +1891,7 @@ struct AV_NpcEventAI : public npc_escortAI
         Reset();
     }
 
-    void checkTroopsStatus(const uint32 uiDiff, uint32 creature_entry)
+    void checkTroopsStatus(uint32 const uiDiff, uint32 creature_entry)
     {
         if (BattleGroundMap* bgMap = dynamic_cast<BattleGroundMap*>(m_creature->GetMap()))
         {
@@ -1999,7 +1999,7 @@ struct AV_NpcEventAI : public npc_escortAI
         }
     }
 
-    void checkCavalryStatus(const uint32 uiDiff, uint32 creature_entry)
+    void checkCavalryStatus(uint32 const uiDiff, uint32 creature_entry)
     {
         if (BattleGroundMap* bgMap = dynamic_cast<BattleGroundMap*>(m_creature->GetMap()))
         {
@@ -2064,7 +2064,7 @@ struct AV_NpcEventAI : public npc_escortAI
         }
     }
 
-    void checkAerialStatus(const uint32 uiDiff, uint32 creature_entry)
+    void checkAerialStatus(uint32 const uiDiff, uint32 creature_entry)
     {
         if (m_bWarRiderSummoned)
             return;
@@ -2562,7 +2562,7 @@ struct AV_NpcEventAI : public npc_escortAI
         }
     }
 
-    void UpdateRenferalAI(const uint32 uiDiff)
+    void UpdateRenferalAI(uint32 const uiDiff)
     {
         if (m_uiEntanglingRoots_Timer < uiDiff)
         {
@@ -2589,7 +2589,7 @@ struct AV_NpcEventAI : public npc_escortAI
             m_uiStarFire_Timer -= uiDiff;
     }
 
-    void UpdateThurlogaAI(const uint32 uiDiff)
+    void UpdateThurlogaAI(uint32 const uiDiff)
     {
         if (m_uiChainLightning_Timer < uiDiff)
         {
@@ -2639,7 +2639,7 @@ struct AV_NpcEventAI : public npc_escortAI
     }
 
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         switch (m_creature->GetEntry())
         {
@@ -3587,7 +3587,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
 
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         uint32 m_uiTroopsType = 0;
         uint16 m_uiWarcryBC;
@@ -4088,7 +4088,7 @@ struct AV_WarRiderAI : public ScriptedAI
         m_creature->GetMotionMaster()->MoveRandom();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!isMovingToPoint)
         {
@@ -4207,7 +4207,7 @@ struct AV_BeaconInvocationObjectAI : public GameObjectAI
         m_invocationTimer = 60000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_invocationTimer < uiDiff)
         {
@@ -4452,7 +4452,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!isYelling)
         {
@@ -4643,7 +4643,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (isInvocated == false)
         {
@@ -4761,7 +4761,7 @@ struct AV_CommanderAI : public ScriptedAI
     {
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         switch (m_creature->GetEntry())
         {
@@ -4844,7 +4844,7 @@ struct AV_DismountAI : public ScriptedAI
         m_creature->Unmount();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         switch (m_creature->GetEntry())
         {
@@ -4920,7 +4920,7 @@ struct FrostwolfShamanAI : public ScriptedAI
         m_creature->Unmount();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -5001,7 +5001,7 @@ struct DruidOfTheGroveAI : public ScriptedAI
         m_creature->Unmount();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -5218,7 +5218,7 @@ class npc_av_battle_npc_summoner: public ScriptedAI
                     c->DeleteLater();
         }
 
-        void UpdateAI(const uint32 diff) override
+        void UpdateAI(uint32 const diff) override
         {
             /* Despawn when the capitain is killed */
             bool despawn = false;
@@ -5364,7 +5364,7 @@ struct MineNPC_AI : public ScriptedAI
     {
         m_creature->SetInCombatWithZone();
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -5593,7 +5593,7 @@ struct AV_mineNpcAI : public ScriptedAI
         return 0;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         uint32 m_newEntry = SelectCreatureEntry();
         if (m_newEntry != 0 && m_creature->GetEntry() != m_newEntry)

@@ -74,11 +74,11 @@ enum
     MAX_WEB_WRAP_POSITIONS  = 3,
 };
 
-static const float WebWrapCooldown(bool initial = false)            { return initial ? 20000 : 40000; }
-static const float SummonSpiderlingsCooldown(bool initial = false)  { return initial ? 30000 : 40000; }
-static const float WebSprayCooldown(bool initial = false)           { return initial ? 40000 : 40000; }
-static const float PoisonShockCooldown(bool initial = false)        { return urand(9000,11000); }
-static const float NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); } 
+static float const WebWrapCooldown(bool initial = false)            { return initial ? 20000 : 40000; }
+static float const SummonSpiderlingsCooldown(bool initial = false)  { return initial ? 30000 : 40000; }
+static float const WebSprayCooldown(bool initial = false)           { return initial ? 40000 : 40000; }
+static float const PoisonShockCooldown(bool initial = false)        { return urand(9000,11000); }
+static float const NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); } 
 
 
 struct mob_webwrapAI : public ScriptedAI
@@ -128,7 +128,7 @@ struct mob_webwrapAI : public ScriptedAI
         ((TemporarySummon*)m_creature)->UnSummon();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_victimGuid)
             return;
@@ -319,7 +319,7 @@ struct boss_maexxnaAI : public ScriptedAI
         }
     }
 
-    void UpdateWraps(const uint32 uiDiff)
+    void UpdateWraps(uint32 const uiDiff)
     {
         bool wdone = false;
         for (auto& p : wraps2)
@@ -363,7 +363,7 @@ struct boss_maexxnaAI : public ScriptedAI
             wraps.clear();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

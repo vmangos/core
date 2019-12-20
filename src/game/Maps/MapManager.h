@@ -60,7 +60,7 @@ struct MANGOS_DLL_DECL MapID
     explicit MapID(uint32 id) : nMapId(id), nInstanceId(0) {}
     MapID(uint32 id, uint32 instid) : nMapId(id), nInstanceId(instid) {}
 
-    bool operator<(const MapID& val) const
+    bool operator<(MapID const& val) const
     {
         if (nMapId == val.nMapId)
             return nInstanceId < val.nInstanceId;
@@ -68,7 +68,7 @@ struct MANGOS_DLL_DECL MapID
         return nMapId < val.nMapId;
     }
 
-    bool operator==(const MapID& val) const { return nMapId == val.nMapId && nInstanceId == val.nInstanceId; }
+    bool operator==(MapID const& val) const { return nMapId == val.nMapId && nInstanceId == val.nInstanceId; }
 
     uint32 nMapId;
     uint32 nInstanceId;
@@ -88,14 +88,14 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         typedef std::map<MapID, Map* > MapMapType;
 
         uint32 GetContinentInstanceId(uint32 mapId, float x, float y, bool* transitionArea = nullptr);
-        Map* CreateMap(uint32, const WorldObject* obj);
+        Map* CreateMap(uint32, WorldObject const* obj);
         Map* CreateBgMap(uint32 mapid, BattleGround* bg);
         Map* CreateTestMap(uint32 mapid, bool instanced, float posX, float posY);
         void DeleteTestMap(Map* map);
         Map* FindMap(uint32 mapid, uint32 instanceId = 0) const;
 
 
-        void UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid, GridInfo& ginfo, const uint32 &x, const uint32 &y, const uint32 &t_diff);
+        void UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid, GridInfo& ginfo, uint32 const& x, uint32 const& y, uint32 const& t_diff);
 
         // only const version for outer users
         void DeleteInstance(uint32 mapid, uint32 instanceId);
@@ -120,7 +120,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
             i_timer.Reset();
         }
 
-        //void LoadGrid(int mapid, int instId, float x, float y, const WorldObject* obj, bool no_unload = false);
+        //void LoadGrid(int mapid, int instId, float x, float y, WorldObject const* obj, bool no_unload = false);
         void UnloadAll();
 
         static bool ExistMapAndVMap(uint32 mapid, float x, float y);
@@ -182,10 +182,10 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         void ScheduleInstanceSwitch(Player* player, uint16 newInstance);
         void SwitchPlayersInstances();
 
-        void ScheduleFarTeleport(Player *player, ScheduledTeleportData *data);
+        void ScheduleFarTeleport(Player* player, ScheduledTeleportData* data);
         void ExecuteDelayedPlayerTeleports();
-        void ExecuteSingleDelayedTeleport(Player *player);
-        void CancelDelayedPlayerTeleport(Player *player);
+        void ExecuteSingleDelayedTeleport(Player* player);
+        void CancelDelayedPlayerTeleport(Player* player);
 
         void MarkContinentUpdateFinished(int idx)
         {
@@ -215,14 +215,14 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         MapManager();
         ~MapManager();
 
-        MapManager(const MapManager &);
-        MapManager& operator=(const MapManager &);
+        MapManager(MapManager const&);
+        MapManager& operator=(MapManager const&);
 
         void InitStateMachine();
         void DeleteStateMachine();
 
-        Map* CreateInstance(uint32 id, Player * player);
-        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState *save = nullptr);
+        Map* CreateInstance(uint32 id, Player* player);
+        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState* save = nullptr);
         BattleGroundMap* CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg);
 
         uint32 i_gridCleanUpDelay;

@@ -76,7 +76,7 @@ struct boss_firemawAI : public ScriptedAI
             m_pInstance->SetData(TYPE_FIREMAW, FAIL);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_WING_BUFFET)
         {
@@ -87,7 +87,7 @@ struct boss_firemawAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

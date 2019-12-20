@@ -37,7 +37,7 @@ class MANGOS_DLL_SPEC PointMovementGenerator
         virtual void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &unit);
-        bool Update(T &, const uint32 &diff);
+        bool Update(T &, uint32 const& diff);
 
         virtual void MovementInform(T &);
 
@@ -63,7 +63,7 @@ class MANGOS_DLL_SPEC DistancingMovementGenerator
             PointMovementGenerator<Creature>(0, _x, _y, _z, MOVE_PATHFINDING | MOVE_RUN_MODE) {}
 
         MovementGeneratorType GetMovementGeneratorType() const override { return DISTANCING_MOTION_TYPE; }
-        bool Update(Creature&, const uint32 &diff);
+        bool Update(Creature&, uint32 const& diff);
         void MovementInform(Creature &) override;
 };
 
@@ -88,7 +88,7 @@ class EffectMovementGenerator : public MovementGenerator
         void Finalize(Unit &unit);
         void Interrupt(Unit &) {}
         void Reset(Unit &) {}
-        bool Update(Unit &u, const uint32 &);
+        bool Update(Unit &u, uint32 const&);
         MovementGeneratorType GetMovementGeneratorType() const override { return EFFECT_MOTION_TYPE; }
     private:
         uint32 m_Id;
@@ -110,7 +110,7 @@ class MANGOS_DLL_SPEC ChargeMovementGenerator
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &unit);
-        bool Update(T &, const uint32 &diff);
+        bool Update(T &, uint32 const& diff);
 
         MovementGeneratorType GetMovementGeneratorType() const override { return CHARGE_MOTION_TYPE; }
         void unitSpeedChanged() { _recalculateSpeed = true; }

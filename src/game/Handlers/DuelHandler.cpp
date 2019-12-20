@@ -35,8 +35,8 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     if (!GetPlayer()->duel)                                 // ignore accept from duel-sender
         return;
 
-    Player *pl       = GetPlayer();
-    Player *plTarget = pl->duel->opponent;
+    Player* pl       = GetPlayer();
+    Player* plTarget = pl->duel->opponent;
 
     if (pl == pl->duel->initiator || !plTarget || !plTarget->duel || pl == plTarget || pl->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;

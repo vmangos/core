@@ -81,7 +81,7 @@ struct npc_bartlebyAI : public ScriptedAI
     }
 };
 
-bool QuestAccept_npc_bartleby(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_bartleby(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (!pPlayer || !pCreature || !pQuest)
         return false;
@@ -256,7 +256,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         switch (m_eventPhase)
         {
@@ -416,7 +416,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
     }
 };
 
-bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (!pPlayer || !pCreature || !pQuest)
         return false;
@@ -783,7 +783,7 @@ struct npc_lord_gregor_lescovarAI : public npc_escortAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiEventTimer)
         {
@@ -1095,7 +1095,7 @@ struct npc_tyrion_spybotAI : public npc_escortAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
 
         if (m_uiEventTimer)
@@ -1200,7 +1200,7 @@ bool GossipHello_npc_tyrion(Player* pPlayer, Creature* pCreature)
 }
 
 
-bool QuestAccept_npc_tyrion(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_tyrion(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (npc_tyrionAI* ptyrionAI = dynamic_cast<npc_tyrionAI*>(pCreature->AI()))
         if (ptyrionAI->m_IsEventRunning)

@@ -23,7 +23,7 @@
 PetEventAI::PetEventAI(Creature* pCreature) : CreatureEventAI(pCreature)
 {}
 
-int PetEventAI::Permissible(const Creature *creature)
+int PetEventAI::Permissible(Creature const* creature)
 {
     if ((creature->GetAIName() == "PetEventAI") || (creature->IsPet() && (creature->GetAIName() == "EventAI")))
         return PERMIT_BASE_SPECIAL;
@@ -31,7 +31,7 @@ int PetEventAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-void PetEventAI::MoveInLineOfSight(Unit *pWho)
+void PetEventAI::MoveInLineOfSight(Unit* pWho)
 {
     if (!pWho)
         return;
@@ -151,7 +151,7 @@ bool PetEventAI::FindTargetForAttack()
         return false;
 
     // Pet has no attackers, check for anyone attacking Owner.
-    if (Unit * const pTarget = pOwner->GetAttackerForHelper())
+    if (Unit* const pTarget = pOwner->GetAttackerForHelper())
     {
         // Prevent pets from breaking CC effects
         if (!pTarget->HasAuraPetShouldAvoidBreaking())
@@ -176,7 +176,7 @@ bool PetEventAI::FindTargetForAttack()
     return false;
 }
 
-void PetEventAI::UpdateAI(const uint32 uiDiff)
+void PetEventAI::UpdateAI(uint32 const uiDiff)
 {
     bool bHasVictim = m_creature->GetVictim();
 

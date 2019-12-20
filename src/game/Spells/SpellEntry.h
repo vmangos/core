@@ -87,9 +87,9 @@ namespace Spells
     }
 
     // Different spell properties
-    inline float GetSpellRadius(SpellRadiusEntry const *radius) { return (radius ? radius->Radius : 0); }
-    inline float GetSpellMinRange(SpellRangeEntry const *range) { return (range ? range->minRange : 0); }
-    inline float GetSpellMaxRange(SpellRangeEntry const *range) { return (range ? range->maxRange : 0); }
+    inline float GetSpellRadius(SpellRadiusEntry const* radius) { return (radius ? radius->Radius : 0); }
+    inline float GetSpellMinRange(SpellRangeEntry const* range) { return (range ? range->minRange : 0); }
+    inline float GetSpellMaxRange(SpellRangeEntry const* range) { return (range ? range->maxRange : 0); }
     int32 CompareAuraRanks(uint32 spellId_1, uint32 spellId_2);
     bool CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry const* spellInfo_2);
 
@@ -243,7 +243,7 @@ namespace Spells
         return false;
     }
 
-    bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellInfo2);
+    bool IsSingleTargetSpells(SpellEntry const* spellInfo1, SpellEntry const* spellInfo2);
 
     inline bool IsCasterSourceTarget(uint32 target)
     {

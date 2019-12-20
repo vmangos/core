@@ -66,7 +66,7 @@ AccountOpResult AccountMgr::CreateAccount(std::string username, std::string pass
 
 AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
 {
-    QueryResult *result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%u'", accid);
+    QueryResult* result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%u'", accid);
     if (!result)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
     delete result;
@@ -77,7 +77,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 guidlo = fields[0].GetUInt32();
             ObjectGuid guid = ObjectGuid(HIGHGUID_PLAYER, guidlo);
 
@@ -110,7 +110,7 @@ AccountOpResult AccountMgr::DeleteAccount(uint32 accid)
 //#DEPRECATED: Not used anywhere, should we delete?
 AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, std::string new_passwd)
 {
-    QueryResult *result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%u'", accid);
+    QueryResult* result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%u'", accid);
     if (!result)
         return AOR_NAME_NOT_EXIST;                          // account doesn't exist
     delete result;
@@ -160,7 +160,7 @@ AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd,
 uint32 AccountMgr::GetId(std::string username)
 {
     LoginDatabase.escape_string(username);
-    QueryResult *result = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'", username.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'", username.c_str());
     if (!result)
         return 0;
     else
@@ -187,7 +187,7 @@ void AccountMgr::Load()
         return;
     }
 
-    Field *fields = nullptr;
+    Field* fields = nullptr;
     BarGoLink bar(result->GetRowCount());
     do
     {
@@ -237,7 +237,7 @@ void AccountMgr::SetSecurity(uint32 accId, AccountTypes sec)
 
 bool AccountMgr::GetName(uint32 acc_id, std::string &name)
 {
-    QueryResult *result = LoginDatabase.PQuery("SELECT username FROM account WHERE id = '%u'", acc_id);
+    QueryResult* result = LoginDatabase.PQuery("SELECT username FROM account WHERE id = '%u'", acc_id);
     if (result)
     {
         name = (*result)[0].GetCppString();
@@ -252,10 +252,10 @@ bool AccountMgr::GetName(uint32 acc_id, std::string &name)
 uint32 AccountMgr::GetCharactersCount(uint32 acc_id)
 {
     // check character count
-    QueryResult *result = CharacterDatabase.PQuery("SELECT COUNT(guid) FROM characters WHERE account = '%u'", acc_id);
+    QueryResult* result = CharacterDatabase.PQuery("SELECT COUNT(guid) FROM characters WHERE account = '%u'", acc_id);
     if (result)
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         uint32 charcount = fields[0].GetUInt32();
         delete result;
         return charcount;
@@ -276,7 +276,7 @@ bool AccountMgr::CheckPassword(uint32 accid, std::string passwd, std::string use
 
     normalizeString(passwd);
 
-    QueryResult *result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%u' AND sha_pass_hash='%s'", accid, CalculateShaPassHash(username, passwd).c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT 1 FROM account WHERE id='%u' AND sha_pass_hash='%s'", accid, CalculateShaPassHash(username, passwd).c_str());
     if (result)
     {
         delete result;

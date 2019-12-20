@@ -473,12 +473,12 @@ bool LFGQueue::FindRoleToGroup(ObjectGuid playerGuid, Group* group, ClassRoles r
     return false;
 }
 
-bool LFGQueue::IsPlayerInQueue(const ObjectGuid& plrGuid) const
+bool LFGQueue::IsPlayerInQueue(ObjectGuid const& plrGuid) const
 {
     return m_QueuedPlayers.find(plrGuid) != m_QueuedPlayers.end();
 }
 
-void LFGQueue::RemovePlayerFromQueue(const ObjectGuid& plrGuid, PlayerLeaveMethod leaveMethod)
+void LFGQueue::RemovePlayerFromQueue(ObjectGuid const& plrGuid, PlayerLeaveMethod leaveMethod)
 {
     QueuedPlayersMap::iterator iter = m_QueuedPlayers.find(plrGuid);
     if (iter != m_QueuedPlayers.end())
@@ -544,25 +544,25 @@ void LFGQueue::FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 te
     }
 }
 
-void LFGQueue::BuildSetQueuePacket(WorldPacket &data, uint32 areaId, uint8 status)
+void LFGQueue::BuildSetQueuePacket(WorldPacket& data, uint32 areaId, uint8 status)
 {
     data.Initialize(SMSG_MEETINGSTONE_SETQUEUE, 5);
     data << uint32(areaId);
     data << uint8(status);
 }
 
-void LFGQueue::BuildMemberAddedPacket(WorldPacket &data, ObjectGuid plrGuid)
+void LFGQueue::BuildMemberAddedPacket(WorldPacket& data, ObjectGuid plrGuid)
 {
     data.Initialize(SMSG_MEETINGSTONE_MEMBER_ADDED, 8);
     data << uint64(plrGuid);
 }
 
-void LFGQueue::BuildInProgressPacket(WorldPacket &data)
+void LFGQueue::BuildInProgressPacket(WorldPacket& data)
 {
     data.Initialize(SMSG_MEETINGSTONE_IN_PROGRESS, 0);
 }
 
-void LFGQueue::BuildCompletePacket(WorldPacket &data)
+void LFGQueue::BuildCompletePacket(WorldPacket& data)
 {
     data.Initialize(SMSG_MEETINGSTONE_COMPLETE, 0);
 }

@@ -415,7 +415,7 @@ struct go_bells : public GameObjectAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         _events.Update(diff);
 
@@ -486,7 +486,7 @@ struct go_darkmoon_faire_music : public GameObjectAI
         _events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(1));
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         _events.Update(diff);
         while (uint32 eventId = _events.ExecuteEvent())

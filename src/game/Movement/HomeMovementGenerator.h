@@ -39,7 +39,7 @@ class MANGOS_DLL_SPEC HomeMovementGenerator<Creature>
         void Finalize(Creature &);
         void Interrupt(Creature &) {}
         void Reset(Creature &);
-        bool Update(Creature &, const uint32 &);
+        bool Update(Creature &, uint32 const&);
         MovementGeneratorType GetMovementGeneratorType() const { return HOME_MOTION_TYPE; }
 
     private:

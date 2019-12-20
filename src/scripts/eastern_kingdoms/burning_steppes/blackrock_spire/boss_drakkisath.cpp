@@ -58,7 +58,7 @@ struct boss_drakkisathAI : public ScriptedAI
         m_uiPierceArmorTimer    = 5000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

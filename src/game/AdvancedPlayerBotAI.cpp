@@ -15,7 +15,7 @@
 
 
 
-void AdvancedPlayerBotAI::UpdateAI(const uint32 delta)
+void AdvancedPlayerBotAI::UpdateAI(uint32 const delta)
 {
     PlayerCreatorAI::UpdateAI(delta);
 
@@ -29,7 +29,7 @@ void AdvancedPlayerBotAI::UpdateAI(const uint32 delta)
     }
 }
 
-void AdvancedPlayerBotAI::CommonAI(const uint32 delta)
+void AdvancedPlayerBotAI::CommonAI(uint32 const delta)
 {
     //first - conditions
     GatherConditions();
@@ -81,7 +81,7 @@ void AdvancedPlayerBotAI::CommonAI(const uint32 delta)
     }
 }
 
-void AdvancedPlayerBotAI::WarriorAI(const uint32 delta)
+void AdvancedPlayerBotAI::WarriorAI(uint32 const delta)
 {
     //alright, react first to nearest attacker, then our target
     //first of all - if we not on battle stance - ENABLE
@@ -125,7 +125,7 @@ void AdvancedPlayerBotAI::WarriorAttackTarget(Unit* NearestAttacker)
     {
         uint32 Rage = me->GetPower(POWER_RAGE);
 
-        const ObjectGuid& TargetGuid = me->GetTargetGuid();
+        ObjectGuid const& TargetGuid = me->GetTargetGuid();
         if (TargetGuid != NearestAttacker->GetObjectGuid())
         {
             me->Attack(NearestAttacker, true);
@@ -168,22 +168,22 @@ void AdvancedPlayerBotAI::WarriorAttackTarget(Unit* NearestAttacker)
     }
 }
 
-void AdvancedPlayerBotAI::PaladinAI(const uint32 delta)
+void AdvancedPlayerBotAI::PaladinAI(uint32 const delta)
 {
 
 }
 
-void AdvancedPlayerBotAI::HunterAI(const uint32 delta)
+void AdvancedPlayerBotAI::HunterAI(uint32 const delta)
 {
 
 }
 
-void AdvancedPlayerBotAI::RogueAI(const uint32 delta)
+void AdvancedPlayerBotAI::RogueAI(uint32 const delta)
 {
 
 }
 
-void AdvancedPlayerBotAI::PriestAI(const uint32 delta)
+void AdvancedPlayerBotAI::PriestAI(uint32 const delta)
 {
     //if we already cast something - no need to update
     if (me->IsNonMeleeSpellCasted(false)) return;
@@ -191,12 +191,12 @@ void AdvancedPlayerBotAI::PriestAI(const uint32 delta)
 
 }
 
-void AdvancedPlayerBotAI::ShamanAI(const uint32 delta)
+void AdvancedPlayerBotAI::ShamanAI(uint32 const delta)
 {
 
 }
 
-void AdvancedPlayerBotAI::WarlockAI(const uint32 delta)
+void AdvancedPlayerBotAI::WarlockAI(uint32 const delta)
 {
     //if we already cast something - no need to update
     if (me->IsNonMeleeSpellCasted(false)) return;
@@ -238,7 +238,7 @@ void AdvancedPlayerBotAI::WarlockBattleAI(Unit* NearestAttacker)
     me->SetFacingToObject(NearestAttacker);
     me->SetInFront(NearestAttacker);
 
-    const ObjectGuid& TargetGuid = me->GetTargetGuid();
+    ObjectGuid const& TargetGuid = me->GetTargetGuid();
     if (TargetGuid != NearestAttacker->GetObjectGuid())
     {
         me->Attack(NearestAttacker, true);
@@ -281,7 +281,7 @@ void AdvancedPlayerBotAI::WarlockBattleAI(Unit* NearestAttacker)
     }
 }
 
-void AdvancedPlayerBotAI::DruidAI(const uint32 delta)
+void AdvancedPlayerBotAI::DruidAI(uint32 const delta)
 {
 
 }
@@ -294,7 +294,7 @@ enum
     AURA_REGEN_MANA = 430,
 };
 
-void AdvancedPlayerBotAI::MageAI(const uint32 delta)
+void AdvancedPlayerBotAI::MageAI(uint32 const delta)
 {
     //if we already cast something - no need to update
     if (me->IsNonMeleeSpellCasted(false)) return;

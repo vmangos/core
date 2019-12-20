@@ -581,7 +581,7 @@ struct npc_solenorAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
 
         if (pSpell && pSpell->Id == 14268)   // Wing Clip (Rank 3)
@@ -591,7 +591,7 @@ struct npc_solenorAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         /** Nelson the Nice */
         if (m_bTransform)
@@ -753,7 +753,7 @@ struct npc_prince_thunderaanAI : public ScriptedAI
         m_uiTearsTimer      = 15000;
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pCaster->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -771,7 +771,7 @@ struct npc_prince_thunderaanAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!emerged)
         {
@@ -859,7 +859,7 @@ struct npc_colossusAI : public ScriptedAI
         m_uiColossalSmashEmoteTimer = 0;
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
     }
 
@@ -876,7 +876,7 @@ struct npc_colossusAI : public ScriptedAI
         m_creature->GetMotionMaster()->MoveIdle();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1216,7 +1216,7 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
         ++uiCurrAction;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (uiCurrAction)
         {
@@ -1324,7 +1324,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         return (((float)m_creature->GetPower(POWER_MANA) / (float)m_creature->GetMaxPower(POWER_MANA)) * 100);
     }
 
-    void SpellHitTarget(Unit* target, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* target, SpellEntry const* pSpell) override
     {
         if (!target || !target->IsPlayer())
             return;
@@ -1347,7 +1347,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1969,7 +1969,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiEventTimer)
         {
@@ -2389,7 +2389,7 @@ CreatureAI* GetAI_npc_anachronos_the_ancient(Creature* pCreature)
     return new npc_anachronos_the_ancientAI(pCreature);
 }
 
-bool QuestAcceptGO_crystalline_tear(Player* pPlayer, GameObject* pGo, const Quest* pQuest)
+bool QuestAcceptGO_crystalline_tear(Player* pPlayer, GameObject* pGo, Quest const* pQuest)
 {
     // Summon the controller dragon at GO position (orientation is wrong - hardcoded)
     if (pQuest->GetQuestId() == QUEST_A_PAWN_ON_THE_ETERNAL_BOARD)
@@ -2448,7 +2448,7 @@ struct scarab_gongAI: public GameObjectAI
     // Invisible AQ barrier
     GameObject* go_aq_ghost_gate;
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (eventTimer)
         {
@@ -2749,7 +2749,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         return nullptr;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bReachedCamp)
         {
@@ -2985,7 +2985,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
         ResetEvent();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         /**
          * Note: The blizzlike behaviour here is probably to require the Hunter-Killer
@@ -3173,7 +3173,7 @@ struct npc_MerokAI : public ScriptedAI
         m_uiHealingWave = 12000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -3219,7 +3219,7 @@ struct npc_ShaiAI : public ScriptedAI
         m_uiFlashHeal = 12000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -3289,7 +3289,7 @@ struct boss_vamAI : public ScriptedAI
     {
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

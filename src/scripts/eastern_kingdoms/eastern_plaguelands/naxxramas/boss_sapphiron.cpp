@@ -91,7 +91,7 @@ enum Phase
     PHASE_DEAD
 };
 
-static const float aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
+static float const aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
 uint32 SPAWN_ANIM_TIMER = 21500;
 static constexpr float AGGRO_RADIUS = 70.0f;
 
@@ -447,7 +447,7 @@ struct boss_sapphironAI : public ScriptedAI
             m_TargetNotReachableTimer = 0;
     }
     
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (phase == PHASE_SKELETON)
         {
@@ -664,7 +664,7 @@ struct npc_wing_buffetAI : public ScriptedAI
 
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->HasAura(SPELL_PERIODIC_BUFFET))
             m_creature->CastSpell(m_creature, SPELL_PERIODIC_BUFFET, true);
@@ -776,7 +776,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         m_creature->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), MOVE_PATHFINDING);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (checkAuraTimer < uiDiff)
         {

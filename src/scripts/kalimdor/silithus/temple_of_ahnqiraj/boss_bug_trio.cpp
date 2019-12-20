@@ -162,9 +162,9 @@ struct boss_bug_trioAI : public ScriptedAI
         }
     }
 
-    virtual bool UpdateBugAI(const uint32 /*uiDiff*/) { return true; }
+    virtual bool UpdateBugAI(uint32 const /*uiDiff*/) { return true; }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -232,7 +232,7 @@ struct boss_kriAI : public boss_bug_trioAI
         boss_bug_trioAI::JustDied(pKiller);
     }
 
-    bool UpdateBugAI(const uint32 uiDiff) override
+    bool UpdateBugAI(uint32 const uiDiff) override
     {
         // Cleave
         if (m_uiCleaveTimer < uiDiff)
@@ -284,7 +284,7 @@ struct boss_yaujAI : public boss_bug_trioAI
         m_uiRavageTimer = urand(4000, 9000);
     }
 
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpellEntry) override
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry) override
     {
         // Yauj is immune to Curse of Tongues and Mind-Numbing Poison. These spells don't have a mechanic type to set an immunity mask to in vanilla so we simply remove them.
         if (m_creature->HasAuraType(SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK))
@@ -295,7 +295,7 @@ struct boss_yaujAI : public boss_bug_trioAI
     {
         // Spawn 10 Yauj Brood on death
         float fX, fY, fZ;
-        const float aCenterLoc[3] = { -8590.0f, 2138.0f, 0.0f };                    // define a central point in the room to use for LOS check
+        float const aCenterLoc[3] = { -8590.0f, 2138.0f, 0.0f };                    // define a central point in the room to use for LOS check
 
         for (int i = 0; i < 10; ++i)
         {
@@ -317,7 +317,7 @@ struct boss_yaujAI : public boss_bug_trioAI
         pSummoned->SetInCombatWithZone();
     }
 
-    bool UpdateBugAI(const uint32 uiDiff) override
+    bool UpdateBugAI(uint32 const uiDiff) override
     {
         // Fear
         if (m_uiFearTimer < uiDiff)
@@ -388,7 +388,7 @@ struct boss_vemAI : public boss_bug_trioAI
         boss_bug_trioAI::JustDied(pKiller);
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if ((pSpell->Id == SPELL_KNOCKBACK) && pTarget->GetTypeId() == TYPEID_PLAYER)
         {
@@ -397,7 +397,7 @@ struct boss_vemAI : public boss_bug_trioAI
         }
     }
 
-    bool UpdateBugAI(const uint32 uiDiff) override
+    bool UpdateBugAI(uint32 const uiDiff) override
     {
         // Charge
         if (m_uiChargeTimer < uiDiff)

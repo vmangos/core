@@ -149,7 +149,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -169,7 +169,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_daphne_stilwell(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_daphne_stilwell(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TOME_VALOR)
     {
@@ -235,7 +235,7 @@ struct npc_defias_traitorAI : public npc_escortAI
     void Reset() override { }
 };
 
-bool QuestAccept_npc_defias_traitor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_defias_traitor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_DEFIAS_BROTHERHOOD)
     {

@@ -589,7 +589,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         m_uiOutroTimer = 3000;
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -763,7 +763,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         npc_escortAI::UpdateAI(uiDiff);
 
@@ -1080,7 +1080,7 @@ CreatureAI* GetAI_npc_keeper_remulos(Creature* pCreature)
     return new npc_keeper_remulosAI(pCreature);
 }
 
-bool QuestAccept_npc_keeper_remulos(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_keeper_remulos(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     m_idQuestActive = pQuest->GetQuestId();
 
@@ -1330,7 +1330,7 @@ struct boss_eranikusAI : public ScriptedAI
         m_uiEventTimer = 11000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiEventTimer)
         {

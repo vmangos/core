@@ -341,7 +341,7 @@ bool ChatHandler::HandleCheatWaterwalkCommand(char* args)
         return false;
     }
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -375,7 +375,7 @@ bool ChatHandler::HandleCheatWallclimbCommand(char* args)
         return false;
     }
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -468,7 +468,7 @@ bool ChatHandler::HandleExploreCheatCommand(char* args)
 
     int flag = atoi(args);
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -586,7 +586,7 @@ bool ChatHandler::HandleShowAreaCommand(char* args)
     if (!*args)
         return false;
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -617,7 +617,7 @@ bool ChatHandler::HandleHideAreaCommand(char* args)
     if (!*args)
         return false;
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -660,7 +660,7 @@ bool ChatHandler::HandleMaxSkillCommand(char* /*args*/)
 
 bool ChatHandler::HandleSetSkillCommand(char* args)
 {
-    Player * target = GetSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -720,7 +720,7 @@ bool ChatHandler::HandleSetSkillCommand(char* args)
 
 bool ChatHandler::HandleRemoveRidingCommand(char* args)
 {
-    static const std::unordered_map<std::string, uint32> skills
+    static std::unordered_map<std::string, uint32> const skills
     {
         { "75", 33388 }, { "150", 33391 }, { "apprentice", 33388 }, { "journeyman", 33391 },
         { "horse", 824 }, { "kodo", 18995 }, { "ram", 826 }, { "raptor", 10861 },
@@ -762,7 +762,7 @@ bool ChatHandler::HandleRemoveRidingCommand(char* args)
     }
     else
     {
-        QueryResult *result = nullptr;
+        QueryResult* result = nullptr;
         if (it->second == 33388) // When removing Apprentice Riding check for Journeyman too. It replaces the first spell.
             result = CharacterDatabase.PQuery("SELECT spell FROM character_spell WHERE guid = %u AND spell IN (33388, 33391)", target_guid.GetCounter());
         else
@@ -1035,7 +1035,7 @@ bool ChatHandler::HandleDismountCommand(char* /*args*/)
 
 bool ChatHandler::HandleSaveCommand(char* /*args*/)
 {
-    Player *player = m_session->GetPlayer();
+    Player* player = m_session->GetPlayer();
 
     // save GM account without delay and output message (testing, etc)
     if (GetAccessLevel() > SEC_PLAYER)
@@ -1119,7 +1119,7 @@ bool ChatHandler::HandleTaxiCheatCommand(char* args)
         return false;
     }
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (!chr)
         chr = m_session->GetPlayer();
     // check online security
@@ -1545,7 +1545,7 @@ bool ChatHandler::HandleCleanCharactersToDeleteCommand(char* args)
     else
     {
         uint32 deleteCount = 0;
-        Field *fields;
+        Field* fields;
         do
         {
             fields = toDeleteCharsResult->Fetch();
@@ -1582,7 +1582,7 @@ bool ChatHandler::HandleCleanCharactersItemsCommand(char* args)
     std::vector<uint32> lDeleteEntries;
 
     uint32 deleteCount = 0;
-    Field *fields;
+    Field* fields;
     do
     {
         fields = listDeleteItems->Fetch();
@@ -1622,7 +1622,7 @@ bool ChatHandler::HandleCleanCharactersItemsCommand(char* args)
                 if (Real)
                 {
                     // InGame ?
-                    if (Player * pPlayer = sObjectMgr.GetPlayer(owner_guid))
+                    if (Player* pPlayer = sObjectMgr.GetPlayer(owner_guid))
                         pPlayer->DestroyItemCount(item_entry, 255, true);
                     else
                         Item::DeleteAllFromDB(item_guid);
@@ -1762,7 +1762,7 @@ bool ChatHandler::HandleCharacterReputationCommand(char* args)
     FactionStateList const& targetFSL = target->GetReputationMgr().GetStateList();
     for (FactionStateList::const_iterator itr = targetFSL.begin(); itr != targetFSL.end(); ++itr)
     {
-        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(itr->second.ID);
+        FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(itr->second.ID);
 
         ShowFactionListHelper(factionEntry, loc, &itr->second, target);
     }
@@ -1881,7 +1881,7 @@ bool ChatHandler::HandleCharacterFillFlysCommand(char* args)
 
 bool ChatHandler::HandleHonorShow(char* /*args*/)
 {
-    Player *target = GetSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
         target = m_session->GetPlayer();
 
@@ -1986,7 +1986,7 @@ bool ChatHandler::HandleHonorAddCommand(char* args)
     if (!*args)
         return false;
 
-    Player *target = GetSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -2005,7 +2005,7 @@ bool ChatHandler::HandleHonorAddCommand(char* args)
 
 bool ChatHandler::HandleHonorAddKillCommand(char* /*args*/)
 {
-    Unit *target = GetSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -2025,7 +2025,7 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
     if (!*args)
         return false;
 
-    Player *target = GetSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -2083,7 +2083,7 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
 
 bool ChatHandler::HandleHonorResetCommand(char* /*args*/)
 {
-    Player *target = GetSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -2108,7 +2108,7 @@ bool ChatHandler::HandleHonorSetRPCommand(char *args)
 
 bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
 {
-    static const char *allSpellList[] =
+    static char const* allSpellList[] =
     {
         "3365",
         "6233",
@@ -2810,11 +2810,11 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(char* /*args*/)
 
     for (uint32 i = 0; i < sObjectMgr.GetMaxSkillLineAbilityId(); ++i)
     {
-        SkillLineAbilityEntry const *entry = sObjectMgr.GetSkillLineAbility(i);
+        SkillLineAbilityEntry const* entry = sObjectMgr.GetSkillLineAbility(i);
         if (!entry)
             continue;
 
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(entry->spellId);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(entry->spellId);
         if (!spellInfo)
             continue;
 
@@ -2853,11 +2853,11 @@ bool ChatHandler::HandleLearnAllMyTalentsCommand(char* /*args*/)
 
     for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
-        TalentEntry const *talentInfo = sTalentStore.LookupEntry(i);
+        TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
         if (!talentInfo)
             continue;
 
-        TalentTabEntry const *talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
+        TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(talentInfo->TalentTab);
         if (!talentTabInfo)
             continue;
 
@@ -2897,7 +2897,7 @@ bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
 
     for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
     {
-        if (const CreatureInfo *cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
+        if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
             if (cInfo->npc_flags & UNIT_NPC_FLAG_FLIGHTMASTER)
             {
                 FindCreatureData worker(cInfo->entry, player);
@@ -2947,7 +2947,7 @@ void ChatHandler::HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id)
 
     for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {
-        SkillLineAbilityEntry const *skillLine = sObjectMgr.GetSkillLineAbility(j);
+        SkillLineAbilityEntry const* skillLine = sObjectMgr.GetSkillLineAbility(j);
         if (!skillLine)
             continue;
 
@@ -2979,7 +2979,7 @@ bool ChatHandler::HandleLearnAllCraftsCommand(char* /*args*/)
 {
     for (uint32 i = 0; i < sSkillLineStore.GetNumRows(); ++i)
     {
-        SkillLineEntry const *skillInfo = sSkillLineStore.LookupEntry(i);
+        SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
         if (!skillInfo)
             continue;
 
@@ -3016,10 +3016,10 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
 
     std::string name;
 
-    SkillLineEntry const *targetSkillInfo = nullptr;
+    SkillLineEntry const* targetSkillInfo = nullptr;
     for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
     {
-        SkillLineEntry const *skillInfo = sSkillLineStore.LookupEntry(i);
+        SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
         if (!skillInfo)
             continue;
 
@@ -3160,7 +3160,7 @@ bool ChatHandler::HandleAddItemCommand(char* args)
     {
         std::string itemName = cId;
         WorldDatabase.escape_string(itemName);
-        QueryResult *result = WorldDatabase.PQuery("SELECT entry FROM item_template WHERE name = '%s'", itemName.c_str());
+        QueryResult* result = WorldDatabase.PQuery("SELECT entry FROM item_template WHERE name = '%s'", itemName.c_str());
         if (!result)
         {
             PSendSysMessage(LANG_COMMAND_COULDNOTFIND, cId);
@@ -3182,7 +3182,7 @@ bool ChatHandler::HandleAddItemCommand(char* args)
 
     DETAIL_LOG(GetMangosString(LANG_ADDITEM), itemId, count);
 
-    ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(itemId);
+    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
     if (!pProto)
     {
         PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
@@ -3415,7 +3415,7 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
     bool found = false;
     for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
     {
-        ItemPrototype const *pProto = sItemStorage.LookupEntry<ItemPrototype>(id);
+        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype>(id);
         if (!pProto)
             continue;
 
@@ -3480,7 +3480,7 @@ bool ChatHandler::HandleListItemCommand(char* args)
     if (!ExtractOptUInt32(&args, count, 10))
         return false;
 
-    QueryResult *result;
+    QueryResult* result;
 
     // inventory case
     uint32 inv_count = 0;
@@ -3502,7 +3502,7 @@ bool ChatHandler::HandleListItemCommand(char* args)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 item_guid = fields[0].GetUInt32();
             uint32 item_bag = fields[1].GetUInt32();
             uint32 item_slot = fields[2].GetUInt32();
@@ -3560,7 +3560,7 @@ bool ChatHandler::HandleListItemCommand(char* args)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 item_guid        = fields[0].GetUInt32();
             uint32 item_s           = fields[1].GetUInt32();
             uint32 item_r           = fields[2].GetUInt32();
@@ -3610,7 +3610,7 @@ bool ChatHandler::HandleListItemCommand(char* args)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 item_guid       = fields[0].GetUInt32();
             uint32 owner           = fields[1].GetUInt32();
             uint32 owner_acc       = fields[2].GetUInt32();
@@ -3640,7 +3640,7 @@ bool ChatHandler::HandleListItemCommand(char* args)
 
 bool ChatHandler::HandleListTalentsCommand(char* /*args*/)
 {
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
     if (!player)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -3862,7 +3862,7 @@ bool ChatHandler::HandleModifyBlockCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -3897,7 +3897,7 @@ bool ChatHandler::HandleModifyDodgeCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -3932,7 +3932,7 @@ bool ChatHandler::HandleModifyParryCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -3968,7 +3968,7 @@ bool ChatHandler::HandleModifyMeleeCritCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -4003,7 +4003,7 @@ bool ChatHandler::HandleModifyRangedCritCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -4038,7 +4038,7 @@ bool ChatHandler::HandleModifySpellCritCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -4079,7 +4079,7 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -4240,7 +4240,7 @@ bool ChatHandler::HandleModifyRepCommand(char* args)
         }
     }
 
-    FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(factionId);
+    FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(factionId);
 
     if (!factionEntry)
     {
@@ -4276,7 +4276,7 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
         return false;
     }
 
-    Player *pPlayer = GetSelectedPlayer();
+    Player* pPlayer = GetSelectedPlayer();
     if (!pPlayer)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4302,7 +4302,7 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
     if (!*args)
         return false;
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4416,7 +4416,7 @@ bool ChatHandler::HandleModifySpeedCommand(char* args)
         return false;
     }
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4478,7 +4478,7 @@ bool ChatHandler::HandleModifySwimCommand(char* args)
         return false;
     }
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4525,7 +4525,7 @@ bool ChatHandler::HandleModifyBWalkCommand(char* args)
         return false;
     }
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4569,7 +4569,7 @@ bool ChatHandler::HandleModifyFlyCommand(char* args)
         return false;
     }
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (!chr)
         chr = m_session->GetPlayer();
     if (!chr)
@@ -4613,7 +4613,7 @@ bool ChatHandler::HandleModifyEnergyCommand(char* args)
         return false;
     }
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (!chr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4652,7 +4652,7 @@ bool ChatHandler::HandleModifyRageCommand(char* args)
         return false;
     }
 
-    Player *chr = GetSelectedPlayer();
+    Player* chr = GetSelectedPlayer();
     if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4842,7 +4842,7 @@ bool ChatHandler::HandleQuestAddCommand(char* args)
     // check item starting quest (it can work incorrectly if added without item in inventory)
     for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); ++id)
     {
-        ItemPrototype const *pProto = sItemStorage.LookupEntry<ItemPrototype>(id);
+        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype>(id);
         if (!pProto)
             continue;
 
@@ -4900,8 +4900,8 @@ bool ChatHandler::HandleQuestRemoveCommand(char* args)
     return true;
 }
 
-QuestStatusData HandleQuestStatusCommandHelper(uint32 quest_id, const Player* player,
-    const ObjectGuid* guid)
+QuestStatusData HandleQuestStatusCommandHelper(uint32 quest_id, Player const* player,
+    ObjectGuid const* guid)
 {
     QuestStatusData data;
     data.m_status = QuestStatus::QUEST_STATUS_NONE;

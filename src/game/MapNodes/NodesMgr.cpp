@@ -28,8 +28,8 @@ bool NodesMgr::OnServerStartup()
     sMapSocketMgr->SetThreads(sConfig.GetIntDefault("NodesNetwork.Threads", 1) + 1);
     sMapSocketMgr->SetTcpNodelay(sConfig.GetBoolDefault("NodesNetwork.TcpNodelay", true));
 
-    const char* listenStatus = "";
-    const char* masterStatus = "";
+    char const* listenStatus = "";
+    char const* masterStatus = "";
     bool retValue = true;
 
     if (nodesListenPort)

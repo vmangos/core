@@ -38,7 +38,7 @@ CreatureGroupMember* CreatureGroup::AddMember(ObjectGuid guid, float followDist,
     return member;
 }
 
-void CreatureGroup::OnMemberAttackStart(Creature* member, Unit *target)
+void CreatureGroup::OnMemberAttackStart(Creature* member, Unit* target)
 {
     if (!(_options & OPTION_AGGRO_TOGETHER))
         return;
@@ -142,7 +142,7 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
     _respawnGuard = false;
 }
 
-void CreatureGroup::MemberAssist(Creature* member, Unit *target)
+void CreatureGroup::MemberAssist(Creature* member, Unit* target)
 {
     if (!member || !member->IsInWorld())
         return;
@@ -246,7 +246,7 @@ void CreatureGroupsManager::Load()
     }
 
     uint32 count = 0;
-    Field *fields;
+    Field* fields;
     CreatureGroup *currentGroup = nullptr;
     BarGoLink bar(result->GetRowCount());
 

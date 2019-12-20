@@ -53,7 +53,7 @@ bool CreatureEventAIHolder::UpdateRepeatTimer(Creature* creature, uint32 repeatM
     return true;
 }
 
-int CreatureEventAI::Permissible(const Creature *creature)
+int CreatureEventAI::Permissible(Creature const* creature)
 {
     if (creature->GetAIName() == "EventAI")
         return PERMIT_BASE_SPECIAL;
@@ -65,7 +65,7 @@ void CreatureEventAI::GetAIInformation(ChatHandler& reader)
     reader.PSendSysMessage(LANG_NPC_EVENTAI_PHASE, (uint32)m_Phase);
 }
 
-CreatureEventAI::CreatureEventAI(Creature *c) : CreatureAI(c)
+CreatureEventAI::CreatureEventAI(Creature* c) : CreatureAI(c)
 {
     // Need make copy for filter unneeded steps and safe in case table reload
     CreatureEventAI_Event_Map::const_iterator creatureEventsItr = sEventAIMgr.GetCreatureEventAIMap().find(m_creature->GetEntry());
@@ -599,7 +599,7 @@ void CreatureEventAI::SummonedCreatureDespawn(Creature* pUnit)
     }
 }
 
-void CreatureEventAI::EnterCombat(Unit *enemy)
+void CreatureEventAI::EnterCombat(Unit* enemy)
 {
     //Check for on combat start events
     if (!m_bEmptyList)
@@ -631,7 +631,7 @@ void CreatureEventAI::EnterCombat(Unit *enemy)
     m_EventDiff = 0;
 }
 
-void CreatureEventAI::AttackStart(Unit *who)
+void CreatureEventAI::AttackStart(Unit* who)
 {
     if (!who)
         return;
@@ -647,7 +647,7 @@ void CreatureEventAI::AttackStart(Unit *who)
     }
 }
 
-void CreatureEventAI::MoveInLineOfSight(Unit *pWho)
+void CreatureEventAI::MoveInLineOfSight(Unit* pWho)
 {
     if (!pWho)
         return;
@@ -719,7 +719,7 @@ void CreatureEventAI::UpdateEventsOn_MoveInLineOfSight(Unit* pWho)
     }
 }
 
-void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
+void CreatureEventAI::SpellHit(Unit* pUnit, SpellEntry const* pSpell)
 {
     if (m_bEmptyList)
         return;
@@ -757,7 +757,7 @@ void CreatureEventAI::MovementInform(uint32 type, uint32 id)
                 ProcessEvent(i);
 }
 
-void CreatureEventAI::UpdateAI(const uint32 diff)
+void CreatureEventAI::UpdateAI(uint32 const diff)
 {
     //Check if we are in combat (also updates calls threat update code)
     m_creature->SelectHostileTarget();
@@ -779,7 +779,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
     }
 }
 
-void CreatureEventAI::UpdateEventsOn_UpdateAI(const uint32 diff, bool Combat)
+void CreatureEventAI::UpdateEventsOn_UpdateAI(uint32 const diff, bool Combat)
 {
     //Events are only updated once every EVENT_UPDATE_TIME ms to prevent lag with large amount of events
     if (m_EventUpdateTime < diff)

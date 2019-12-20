@@ -41,7 +41,7 @@ uint32 TriggerOrphanSpell[6][3] =
     {3552, 14305, 1687}    // Spooky Lighthouse
 };
 
-bool AreaTrigger_at_childrens_week_spot(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_childrens_week_spot(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     for (uint8 i = 0; i < 6; ++i)
     {
@@ -65,7 +65,7 @@ enum
     NPC_RAVENHOLDT          = 13936
 };
 
-bool AreaTrigger_at_ravenholdt(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_ravenholdt(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pPlayer->GetQuestStatus(QUEST_MANOR_RAVENHOLDT) == QUEST_STATUS_INCOMPLETE)
         pPlayer->KilledMonsterCredit(NPC_RAVENHOLDT);

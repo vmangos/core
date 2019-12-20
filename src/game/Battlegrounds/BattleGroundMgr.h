@@ -94,8 +94,8 @@ class BattleGroundQueue
         void RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount);
         void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo, BattleGroundBracketId bracket_id);
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BattleGroundBracketId bracket_id);
-        void LogQueueInscription(Player *plr, BattleGroundTypeId BgTypeId, uint32 uiAction);
-        bool IsPlayerInvited(ObjectGuid guid, const uint32 bgInstanceGuid, const uint32 removeTime);
+        void LogQueueInscription(Player* plr, BattleGroundTypeId BgTypeId, uint32 uiAction);
+        bool IsPlayerInvited(ObjectGuid guid, uint32 const bgInstanceGuid, uint32 const removeTime);
         bool GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo);
         void PlayerLoggedOut(ObjectGuid guid);
         bool PlayerLoggedIn(Player* player);
@@ -232,7 +232,7 @@ class BattleGroundMgr
         void CreateInitialBattleGrounds();
         void DeleteAllBattleGrounds();
 
-        void SendToBattleGround(Player *pl, uint32 InstanceID, BattleGroundTypeId bgTypeId);
+        void SendToBattleGround(Player* pl, uint32 InstanceID, BattleGroundTypeId bgTypeId);
 
         /* Battleground queues */
         //these queues are instantiated when creating BattlegroundMrg

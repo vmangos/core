@@ -660,12 +660,12 @@ struct instance_stratholme : public ScriptedInstance
 
     /** Load / save system */
     std::string strInstData;
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
             return;

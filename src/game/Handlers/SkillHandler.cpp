@@ -29,7 +29,7 @@
 #include "UpdateMask.h"
 #include "Anticheat.h"
 
-void WorldSession::HandleLearnTalentOpcode(WorldPacket & recv_data)
+void WorldSession::HandleLearnTalentOpcode(WorldPacket& recv_data)
 {
     uint32 talent_id, requested_rank;
     recv_data >> talent_id >> requested_rank;
@@ -37,13 +37,13 @@ void WorldSession::HandleLearnTalentOpcode(WorldPacket & recv_data)
     _player->LearnTalent(talent_id, requested_rank);
 }
 
-void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket & recv_data)
+void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket& recv_data)
 {
     DETAIL_LOG("MSG_TALENT_WIPE_CONFIRM");
     ObjectGuid guid;
     recv_data >> guid;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
     if (!unit)
     {
         DEBUG_LOG("WORLD: HandleTalentWipeConfirmOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
@@ -66,7 +66,7 @@ void WorldSession::HandleTalentWipeConfirmOpcode(WorldPacket & recv_data)
     unit->CastSpell(_player, 14867, true);                  //spell: "Untalent Visual Effect"
 }
 
-void WorldSession::HandleUnlearnSkillOpcode(WorldPacket & recv_data)
+void WorldSession::HandleUnlearnSkillOpcode(WorldPacket& recv_data)
 {
     uint32 skill_id;
     recv_data >> skill_id;

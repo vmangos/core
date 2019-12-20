@@ -997,13 +997,13 @@ struct npc_training_dummyAI : ScriptedAI
             AddAttackerToList(pWho);
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* /*pSpell*/) override
+    void SpellHit(Unit* pWho, SpellEntry const* /*pSpell*/) override
     {
         if (pWho)
             AddAttackerToList(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->IsInCombat())
         {
@@ -1077,7 +1077,7 @@ struct npc_summon_debugAI : ScriptedAI
         Reset();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->GetVictim())
             return;

@@ -41,7 +41,7 @@
 #include "MovementPacketSender.h"
 
 
-void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket & /*recvData*/)
+void WorldSession::HandleMoveWorldportAckOpcode(WorldPacket& /*recvData*/)
 {
     DEBUG_LOG("WORLD: Recvd MSG_MOVE_WORLDPORT_ACK.");
     HandleMoveWorldportAckOpcode();
@@ -238,8 +238,8 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
     DEBUG_LOG("Guid: %s", guid.GetString().c_str());
     DEBUG_LOG("Counter %u, time %u", counter, time / IN_MILLISECONDS);
 
-    Unit *pMover = _player->GetMover();
-    Player *pPlayerMover = pMover->GetTypeId() == TYPEID_PLAYER ? (Player*)pMover : nullptr;
+    Unit* pMover = _player->GetMover();
+    Player* pPlayerMover = pMover->GetTypeId() == TYPEID_PLAYER ? (Player*)pMover : nullptr;
 
     if (!pPlayerMover || !pPlayerMover->IsBeingTeleportedNear())
         return;
@@ -278,7 +278,7 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recvData)
     }
 }
 
-void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
+void WorldSession::HandleMovementOpcodes(WorldPacket& recvData)
 {
     uint32 const opcode = recvData.GetOpcode();
     DEBUG_LOG("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
@@ -292,7 +292,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recvData)
     if (pMover->GetObjectGuid() != _clientMoverGuid)
         return;
         
-    Player *pPlayerMover = pMover->ToPlayer();
+    Player* pPlayerMover = pMover->ToPlayer();
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
     if (pPlayerMover && pPlayerMover->IsBeingTeleported())
@@ -394,7 +394,7 @@ CMSG_FORCE_WALK_SPEED_CHANGE_ACK
 CMSG_FORCE_SWIM_BACK_SPEED_CHANGE_ACK
 CMSG_FORCE_TURN_RATE_CHANGE_ACK
 */
-void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recvData)
+void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
 {
     uint32 const opcode = recvData.GetOpcode();
     DEBUG_LOG("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
@@ -723,7 +723,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
     MovementPacketSender::SendMovementFlagChangeToObservers(pMover, MOVEFLAG_ROOT, applyReceived);
 }
 
-void WorldSession::HandleMoveKnockBackAck(WorldPacket & recvData)
+void WorldSession::HandleMoveKnockBackAck(WorldPacket& recvData)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_MOVE_KNOCK_BACK_ACK");
 
@@ -802,7 +802,7 @@ void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recvData)
     HandleMovementOpcodes(recvData);
 }
 
-void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
+void WorldSession::HandleSetActiveMoverOpcode(WorldPacket& recvData)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_SET_ACTIVE_MOVER");
 
@@ -850,7 +850,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recvData)
     _clientMoverGuid = guid;
 }
 
-void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recvData)
+void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket& recvData)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
     recvData.hexlike();
@@ -912,7 +912,7 @@ void WorldSession::HandleSummonResponseOpcode(WorldPacket& recvData)
     _player->SummonIfPossible(true);
 }
 
-void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recvData)
+void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket& recvData)
 {
     DEBUG_LOG("WORLD: Time Lag/Synchronization Resent/Update");
 

@@ -90,7 +90,7 @@ struct npc_corporal_keeshan_escortAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         //Combat check
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -121,7 +121,7 @@ CreatureAI* GetAI_npc_corporal_keeshan(Creature* pCreature)
     return new npc_corporal_keeshan_escortAI(pCreature);
 }
 
-bool QuestAccept_npc_corporal_keeshan(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_corporal_keeshan(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_MISSING_IN_ACTION)
     {

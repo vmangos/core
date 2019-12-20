@@ -33,7 +33,7 @@
 //==============================================================
 
 // The pHatingUnit is not used yet
-float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const *pThreatSpell)
+float ThreatCalcHelper::CalcThreat(Unit* pHatedUnit, Unit* /*pHatingUnit*/, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell)
 {
     // all flat mods applied early
     if (!threat)
@@ -248,7 +248,7 @@ HostileReference* ThreatContainer::addThreat(Unit* pVictim, float pThreat)
 
 //============================================================
 
-void ThreatContainer::modifyThreatPercent(Unit *pVictim, int32 pPercent)
+void ThreatContainer::modifyThreatPercent(Unit* pVictim, int32 pPercent)
 {
     if (HostileReference* ref = getReferenceByTarget(pVictim))
     {
@@ -264,7 +264,7 @@ void ThreatContainer::modifyThreatPercent(Unit *pVictim, int32 pPercent)
 
 //============================================================
 
-bool HostileReferenceSortPredicate(const HostileReference* lhs, const HostileReference* rhs)
+bool HostileReferenceSortPredicate(HostileReference const* lhs, HostileReference const* rhs)
 {
     // std::list::sort ordering predicate must be: (Pred(x,y)&&Pred(y,x))==false
     return lhs->getThreat() > rhs->getThreat();             // reverse sorting
@@ -385,7 +385,7 @@ void ThreatManager::clearReferences()
 
 //============================================================
 
-void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellSchoolMask schoolMask, SpellEntry const *pThreatSpell, bool isAssistThreat)
+void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* pThreatSpell, bool isAssistThreat)
 {
     //function deals with adding threat and adding players and pets into ThreatList
     //mobs, NPCs, guards have ThreatList and HateOfflineList
@@ -445,7 +445,7 @@ void ThreatManager::addThreatDirectly(Unit* pVictim, float threat)
 
 //============================================================
 
-void ThreatManager::modifyThreatPercent(Unit *pVictim, int32 pPercent)
+void ThreatManager::modifyThreatPercent(Unit* pVictim, int32 pPercent)
 {
     iThreatContainer.modifyThreatPercent(pVictim, pPercent);
 }
@@ -462,7 +462,7 @@ Unit* ThreatManager::getHostileTarget()
 
 //============================================================
 
-float ThreatManager::getThreat(Unit *pVictim, bool pAlsoSearchOfflineList)
+float ThreatManager::getThreat(Unit* pVictim, bool pAlsoSearchOfflineList)
 {
     float threat = 0.0f;
     HostileReference* ref = iThreatContainer.getReferenceByTarget(pVictim);
@@ -490,7 +490,7 @@ void ThreatManager::tauntApply(Unit* pTaunter)
 
 //============================================================
 
-void ThreatManager::tauntFadeOut(Unit *pTaunter)
+void ThreatManager::tauntFadeOut(Unit* pTaunter)
 {
     if (HostileReference* ref = iThreatContainer.getReferenceByTarget(pTaunter))
         ref->resetTempThreat();
@@ -553,7 +553,7 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
     }
 }
 
-void ThreatManager::setCurrentVictimIfCan(Unit * pVictim)
+void ThreatManager::setCurrentVictimIfCan(Unit* pVictim)
 {
     if (HostileReference* pHRef = iThreatContainer.getReferenceByTarget(pVictim))
     {

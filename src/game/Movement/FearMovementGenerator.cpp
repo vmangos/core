@@ -154,7 +154,7 @@ void FearMovementGenerator<T>::Reset(T &owner)
 }
 
 template<class T>
-bool FearMovementGenerator<T>::Update(T &owner, const uint32 & time_diff)
+bool FearMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 {
     if (!&owner || !owner.IsAlive())
         return false;
@@ -196,8 +196,8 @@ template void FearMovementGenerator<Player>::Interrupt(Player &);
 template void FearMovementGenerator<Creature>::Interrupt(Creature &);
 template void FearMovementGenerator<Player>::Reset(Player &);
 template void FearMovementGenerator<Creature>::Reset(Creature &);
-template bool FearMovementGenerator<Player>::Update(Player &, const uint32 &);
-template bool FearMovementGenerator<Creature>::Update(Creature &, const uint32 &);
+template bool FearMovementGenerator<Player>::Update(Player &, uint32 const&);
+template bool FearMovementGenerator<Creature>::Update(Creature &, uint32 const&);
 
 void TimedFearMovementGenerator::Initialize(Unit& owner)
 {
@@ -227,7 +227,7 @@ TimedFearMovementGenerator::TimedFearMovementGenerator(ObjectGuid fright, uint32
     i_initialFleeTime.Reset(DEFAULT_INIT_FLEE_TIME + urand(0, time * INIT_FLEE_TIME_RAND_MULT));
 }
 
-bool TimedFearMovementGenerator::Update(Unit & owner, const uint32 & time_diff)
+bool TimedFearMovementGenerator::Update(Unit & owner, uint32 const&  time_diff)
 {
     if (!owner.IsAlive())
         return false;

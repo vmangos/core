@@ -172,26 +172,26 @@ class Channel
         void SetSecurityLevel(uint8 sec) { m_securityLevel = sec; }
         uint8 GetSecurityLevel() const { return m_securityLevel; }
 
-        void Join(ObjectGuid guid, const char *password);
+        void Join(ObjectGuid guid, char const* password);
         void Leave(ObjectGuid guid, bool send = true);
-        void KickOrBan(ObjectGuid guid, const char *targetName, bool ban);
-        void Kick(ObjectGuid guid, const char *targetName) { KickOrBan(guid, targetName, false); }
-        void Ban(ObjectGuid guid, const char *targetName) { KickOrBan(guid, targetName, true); }
-        void UnBan(ObjectGuid guid, const char *targetName);
-        void Password(ObjectGuid guid, const char *pass);
-        void SetMode(ObjectGuid guid, const char *p2n, bool mod, bool set);
+        void KickOrBan(ObjectGuid guid, char const* targetName, bool ban);
+        void Kick(ObjectGuid guid, char const* targetName) { KickOrBan(guid, targetName, false); }
+        void Ban(ObjectGuid guid, char const* targetName) { KickOrBan(guid, targetName, true); }
+        void UnBan(ObjectGuid guid, char const* targetName);
+        void Password(ObjectGuid guid, char const* pass);
+        void SetMode(ObjectGuid guid, char const* p2n, bool mod, bool set);
         void SetOwner(ObjectGuid guid, bool exclaim = true);
-        void SetOwner(ObjectGuid guid, const char *newname);
+        void SetOwner(ObjectGuid guid, char const* newname);
         void SendWhoOwner(ObjectGuid guid);
-        void SetModerator(ObjectGuid guid, const char *newname) { SetMode(guid, newname, true, true); }
-        void UnsetModerator(ObjectGuid guid, const char *newname) { SetMode(guid, newname, true, false); }
-        void SetMute(ObjectGuid guid, const char *newname) { SetMode(guid, newname, false, true); }
-        void UnsetMute(ObjectGuid guid, const char *newname) { SetMode(guid, newname, false, false); }
+        void SetModerator(ObjectGuid guid, char const* newname) { SetMode(guid, newname, true, true); }
+        void UnsetModerator(ObjectGuid guid, char const* newname) { SetMode(guid, newname, true, false); }
+        void SetMute(ObjectGuid guid, char const* newname) { SetMode(guid, newname, false, true); }
+        void UnsetMute(ObjectGuid guid, char const* newname) { SetMode(guid, newname, false, false); }
         void List(PlayerPointer guid);
         void Announce(ObjectGuid guid);
         void Moderate(ObjectGuid guid);
-        void Say(ObjectGuid guid, const char *what, uint32 lang = LANG_UNIVERSAL, bool skipCheck = false);
-        void Invite(ObjectGuid guid, const char *newp);
+        void Say(ObjectGuid guid, char const* what, uint32 lang = LANG_UNIVERSAL, bool skipCheck = false);
+        void Invite(ObjectGuid guid, char const* newp);
         void Voice(ObjectGuid guid1, ObjectGuid guid2);
         void DeVoice(ObjectGuid guid1, ObjectGuid guid2);
         void JoinNotify(ObjectGuid guid);                                       // invisible notify
@@ -201,7 +201,7 @@ class Channel
         * This creates the packet informing client that the player is not on requested \ref name channel.
         * See also \ref MakeNotMember for non-static version.
         */
-        static void MakeNotOnPacket(WorldPacket* data, const std::string &name);
+        static void MakeNotOnPacket(WorldPacket* data, std::string const& name);
     private:
         // initial packet data (notify type and channel name)
         void MakeNotifyPacket(WorldPacket* data, uint8 notify_type);
@@ -283,7 +283,7 @@ class Channel
     private:
         bool        m_area_dependant; // Handled in Node side
         PlayerPointer GetPlayer(ObjectGuid guid);
-        PlayerPointer GetPlayer(const char* name);
+        PlayerPointer GetPlayer(char const* name);
         bool        m_announce;
         bool        m_moderate;
         bool        m_levelRestricted;

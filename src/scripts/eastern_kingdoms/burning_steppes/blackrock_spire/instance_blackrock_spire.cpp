@@ -474,7 +474,7 @@ void instance_blackrock_spire::SetData64(uint32 uiType, uint64 uiData)
     }
 }
 
-void instance_blackrock_spire::Load(const char* chrIn)
+void instance_blackrock_spire::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -569,7 +569,7 @@ InstanceData* GetInstanceData_instance_blackrock_spire(Map* pMap)
     return new instance_blackrock_spire(pMap);
 }
 
-bool AreaTrigger_at_blackrock_spire(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_blackrock_spire(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pPlayer->IsDead())
         return false;
@@ -746,7 +746,7 @@ struct npc_rookery_hatcherAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -821,7 +821,7 @@ CreatureAI* GetAI_npc_rookery_hatcher(Creature* pCreature)
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff)
     {
         if (!Actif && me->isSpawned())
         {
@@ -841,7 +841,7 @@ GameObjectAI* GetAIgo_rookey_egg(GameObject *pGo)
     return new go_rookey_eggAI(pGo);
 }*/
 
-bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pPlayer->IsDead())
         return false;

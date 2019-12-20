@@ -40,7 +40,7 @@ enum
     NPC_WALKING_BOMB                    = 7915,
 };
 
-static const float fBombSpawnZ  = -316.2625f;
+static float const fBombSpawnZ  = -316.2625f;
 
 struct boss_thermapluggAI : public ScriptedAI
 {
@@ -141,7 +141,7 @@ struct boss_thermapluggAI : public ScriptedAI
         m_lSummonedBombGUIDs.remove(pSummoned->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

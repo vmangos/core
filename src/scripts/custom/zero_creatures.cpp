@@ -138,7 +138,7 @@ struct Zero_boss_razorgoreAI : public ScriptedAI
         m_pInstance->SetData(TYPE_RAZORGORE, DONE);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -413,7 +413,7 @@ struct Mob_Grethok_The_ControllerAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
 
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

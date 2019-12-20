@@ -333,7 +333,7 @@ void DragonsOfNightmare::CheckSingleVariable(uint32 idx, uint32& value)
     }
 }
 
-void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> &dragons, uint32 &alive, time_t respawnTime)
+void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid>& dragons, uint32& alive, time_t respawnTime)
 {
     for (auto& guid : dragons)
     {
@@ -371,7 +371,7 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
     }
 }
 
-bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid> &dragonGUIDs)
+bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid>& dragonGUIDs)
 {
     for (uint8 i = 0; i < 4; ++i)
     {
@@ -390,7 +390,7 @@ bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid> &dragonGUIDs)
     return true;
 }
 
-//void DragonsOfNightmare::GetAliveCount(std::vector<ObjectGuid> dragonGUIDs, uint32 &alive)
+//void DragonsOfNightmare::GetAliveCount(std::vector<ObjectGuid> dragonGUIDs, uint32& alive)
 
 void DragonsOfNightmare::PermutateDragons()
 {
@@ -437,7 +437,7 @@ void DarkmoonFaire::Disable()
 
 }
 
-uint32 DarkmoonFaire::FindMonthFirstMonday(bool &foireAlly, struct tm *timeinfo)
+uint32 DarkmoonFaire::FindMonthFirstMonday(bool& foireAlly, struct tm *timeinfo)
 {
     foireAlly = timeinfo->tm_mon % 2;
     // 36 = 7*5 + 1 (+1 because tm_mday starts with 1)
@@ -568,7 +568,7 @@ void SilithusWarEffortBattle::Enable()
     float CenterX = EventPos.x;
     float CenterY = EventPos.y;
     
-    const float Radius = 45.0f;
+    float const Radius = 45.0f;
 
     //spawn several hostile mob near
     for (int mobID = 0; mobID < 15; ++mobID)
@@ -930,7 +930,7 @@ void ScourgeInvasionEvent::Disable()
     UpdateWorldState();
 }
 
-Map * ScourgeInvasionEvent::GetMap(uint32 mapId, const InvasionNecropolis & invZone)
+Map* ScourgeInvasionEvent::GetMap(uint32 mapId, InvasionNecropolis const& invZone)
 {
     uint32 instId = sMapMgr.GetContinentInstanceId(mapId, invZone.x, invZone.y);
     Map* pMap = sMapMgr.FindMap(mapId, instId);
@@ -1090,7 +1090,7 @@ bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
     return true;
 }
 
-bool ScourgeInvasionEvent::SummonNecropolis(Map * pMap, InvasionNecropolis & point)
+bool ScourgeInvasionEvent::SummonNecropolis(Map* pMap, InvasionNecropolis& point)
 {
     Creature* pRelay = pMap->SummonCreature(NPC_NECROPOLIS_RELAY, point.x, point.y, point.z - 11.5f, point.o, TEMPSUMMON_MANUAL_DESPAWN, 0, true);
     if (!pRelay) {
@@ -1218,7 +1218,7 @@ to gong ringing, gate opening and battle
 */
 
 // Per-stage enabled events
-static const uint32 warEffortStageEvents[][10] = {
+static uint32 const warEffortStageEvents[][10] = {
     { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_REP, EVENT_AQ_GATE },                     // 0
     { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS,           // 1
         EVENT_AQ_GATE },

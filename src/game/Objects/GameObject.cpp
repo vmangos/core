@@ -1099,7 +1099,7 @@ bool GameObject::ActivateToQuest(Player* pTarget) const
             QuestRelationsMapBounds bounds = sObjectMgr.GetGOQuestRelationsMapBounds(GetEntry());
 
             for (QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
-                if (const Quest* qInfo = sObjectMgr.GetQuestTemplate(itr->second))
+                if (Quest const* qInfo = sObjectMgr.GetQuestTemplate(itr->second))
                     if (pTarget->CanTakeQuest(qInfo, false))
                         return true;
 
@@ -1982,7 +1982,7 @@ void GameObject::Use(Unit* user)
 }
 
 // overwrite WorldObject function for proper name localization
-const char* GameObject::GetNameForLocaleIdx(int32 loc_idx) const
+char const* GameObject::GetNameForLocaleIdx(int32 loc_idx) const
 {
     if (loc_idx >= 0)
     {

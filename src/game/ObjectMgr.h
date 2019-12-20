@@ -137,17 +137,17 @@ struct SoundEntriesEntry
 
 struct CreatureSpellsEntry
 {
-    const uint16 spellId;
-    const uint8  probability;
-    const uint8  castTarget;
-    const uint32 targetParam1;
-    const uint32 targetParam2;
-    const uint8  castFlags;
-    const uint32 delayInitialMin;
-    const uint32 delayInitialMax;
-    const uint32 delayRepeatMin;
-    const uint32 delayRepeatMax;
-    const uint32 scriptId;
+    uint16 const spellId;
+    uint8 const  probability;
+    uint8 const  castTarget;
+    uint32 const targetParam1;
+    uint32 const targetParam2;
+    uint8 const  castFlags;
+    uint32 const delayInitialMin;
+    uint32 const delayInitialMax;
+    uint32 const delayRepeatMin;
+    uint32 const delayRepeatMax;
+    uint32 const scriptId;
     CreatureSpellsEntry(uint16 Id, uint8 Probability, uint8 CastTarget, uint32 TargetParam1, uint32 TargetParam2, uint8 CastFlags, uint32 InitialMin, uint32 InitialMax, uint32 RepeatMin, uint32 RepeatMax, uint32 ScriptId) : spellId(Id), probability(Probability), castTarget(CastTarget), targetParam1(TargetParam1), targetParam2(TargetParam2), castFlags(CastFlags), delayInitialMin(InitialMin), delayInitialMax(InitialMax), delayRepeatMin(RepeatMin), delayRepeatMax(RepeatMax), scriptId(ScriptId) {}
 };
 
@@ -593,7 +593,7 @@ class ObjectMgr
 
         typedef std::unordered_map<uint32, PetCreateSpellEntry> PetCreateSpellMap;
 
-        static Player* GetPlayer(const char* name) { return ObjectAccessor::FindPlayerByName(name);}
+        static Player* GetPlayer(char const* name) { return ObjectAccessor::FindPlayerByName(name);}
         static Player* GetPlayer(ObjectGuid guid) { return ObjectAccessor::FindPlayer(guid); }
 
         static GameObjectInfo const* GetGameObjectInfo(uint32 id) { return sGOStorage.LookupEntry<GameObjectInfo>(id); }
@@ -658,7 +658,7 @@ class ObjectMgr
         uint32 GetPlayerAccountIdByPlayerName(std::string const& name) const;
 
         uint32 GetNearestTaxiNode(float x, float y, float z, uint32 mapid, Team team);
-        void GetTaxiPath(uint32 source, uint32 destination, uint32 &path, uint32 &cost);
+        void GetTaxiPath(uint32 source, uint32 destination, uint32& path, uint32& cost);
         uint32 GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_team = false);
 
         void LoadTaxiPathTransitions();
@@ -1068,8 +1068,8 @@ class ObjectMgr
             return &itr->second;
         }
 
-        const char* GetMangosString(int32 entry, int locale_idx) const;
-        const char* GetMangosStringForDBCLocale(int32 entry) const { return GetMangosString(entry,DBCLocaleIndex); }
+        char const* GetMangosString(int32 entry, int locale_idx) const;
+        char const* GetMangosStringForDBCLocale(int32 entry) const { return GetMangosString(entry,DBCLocaleIndex); }
         int32 GetDBCLocaleIndex() const { return DBCLocaleIndex; }
         void SetDBCLocaleIndex(uint32 lang) { DBCLocaleIndex = GetIndexForLocale(LocaleConstant(lang)); }
 
@@ -1221,13 +1221,13 @@ class ObjectMgr
         std::vector<CinematicWaypointEntry> m_CinematicWaypoints;
         // Phasing
         void LoadPlayerPhaseFromDb();
-        uint32 GetPlayerWorldMaskByGUID(const uint64 guid);
-        void SetPlayerWorldMask(const uint64 guid, uint32 newWorldMask);
+        uint32 GetPlayerWorldMaskByGUID(uint64 const guid);
+        void SetPlayerWorldMask(uint64 const guid, uint32 newWorldMask);
         std::map<uint32, uint32> m_PlayerPhases;
 
         // Saving Variables
         SavedVariable& _InsertVariable(uint32 index, uint32 value, bool saved);
-        void _SaveVariable(const SavedVariable& toSave);
+        void _SaveVariable(SavedVariable const& toSave);
 
         void InitSavedVariable(uint32 index, uint32 value);
         uint32 GetSavedVariable(uint32 index, uint32 defaultValue = 0, bool* exist = nullptr);
@@ -1258,7 +1258,7 @@ class ObjectMgr
 
         uint32 AddCreData(uint32 entry, uint32 team, uint32 map, float, float, float, float, uint32 spawnDelay);
         uint32 AddGOData(uint32 entry, uint32 map, float, float, float, float, uint32 spawnTimeDelay, float, float, float, float);
-        bool MoveCreData(uint32 guid, uint32 mapId, const Position& pos);
+        bool MoveCreData(uint32 guid, uint32 mapId, Position const& pos);
 
         // Sound Entries
         void LoadSoundEntries();

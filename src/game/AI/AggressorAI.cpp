@@ -22,7 +22,7 @@
 #include "AggressorAI.h"
 #include "Creature.h"
 
-int AggressorAI::Permissible(const Creature *creature)
+int AggressorAI::Permissible(Creature const* creature)
 {
     // have some hostile factions, it will be selected by IsHostileTo check at MoveInLineOfSight
     if (!(creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO) && !creature->IsNeutralToAll())
@@ -31,7 +31,7 @@ int AggressorAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-void AggressorAI::MoveInLineOfSight(Unit *u)
+void AggressorAI::MoveInLineOfSight(Unit* u)
 {
     // Check this now to prevent calling expensive functions (IsInAccessablePlaceFor / IsWithinLOSInMap)
     if (m_creature->GetVictim() && !m_creature->GetMap()->IsDungeon())
@@ -53,7 +53,7 @@ void AggressorAI::MoveInLineOfSight(Unit *u)
 }
 
 
-void AggressorAI::UpdateAI(const uint32 uiDiff)
+void AggressorAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
@@ -64,7 +64,7 @@ void AggressorAI::UpdateAI(const uint32 uiDiff)
     DoMeleeAttackIfReady();
 }
 
-void AggressorAI::AttackStart(Unit *u)
+void AggressorAI::AttackStart(Unit* u)
 {
     if (!u)
         return;

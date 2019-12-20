@@ -46,7 +46,7 @@ void CreatureAI::AttackedBy(Unit* attacker)
         AttackStart(attacker);
 }
 
-CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered)
+CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered)
 {
     if (!pTarget)
         return CAST_FAIL_OTHER;
@@ -95,7 +95,7 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
     if (!(pSpell->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !m_creature->IsWithinLOSInMap(pTarget))
         return CAST_FAIL_NOT_IN_LOS;
 
-    if (const SpellRangeEntry *pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
+    if (SpellRangeEntry const* pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex))
     {
         if (pTarget != m_creature)
         {
@@ -127,7 +127,7 @@ CanCastResult CreatureAI::DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32
     // Allowed to cast only if not casting (unless we interrupt ourself) or if spell is triggered
     if (!pCaster->IsNonMeleeSpellCasted(false) || uiCastFlags & (CF_TRIGGERED | CF_INTERRUPT_PREVIOUS))
     {
-        if (const SpellEntry* pSpell = sSpellMgr.GetSpellEntry(uiSpell))
+        if (SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(uiSpell))
         {
             // If cast flag CF_AURA_NOT_PRESENT is active, check if target already has aura on them
             if (uiCastFlags & CF_AURA_NOT_PRESENT)
@@ -167,16 +167,16 @@ void CreatureAI::SetSpellsList(uint32 entry)
 {
     if (entry == 0)
         m_CreatureSpells.clear();
-    else if (const CreatureSpellsList* pSpellsTemplate = sObjectMgr.GetCreatureSpellsList(entry))
+    else if (CreatureSpellsList const* pSpellsTemplate = sObjectMgr.GetCreatureSpellsList(entry))
         SetSpellsList(pSpellsTemplate);
     else
         sLog.outError("CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
 }
 
-void CreatureAI::SetSpellsList(const CreatureSpellsList *pSpellsList)
+void CreatureAI::SetSpellsList(CreatureSpellsList const* pSpellsList)
 {
     m_CreatureSpells.clear();
-    for (const auto & entry : *pSpellsList)
+    for (const auto& entry : *pSpellsList)
     {
         m_CreatureSpells.push_back(CreatureAISpellsEntry(entry));
     }
@@ -188,7 +188,7 @@ void CreatureAI::SetSpellsList(const CreatureSpellsList *pSpellsList)
 // https://www.reddit.com/r/wowservers/comments/834nt5/felmyst_ai_system_research/
 #define CREATURE_CASTING_DELAY 1200
 
-void CreatureAI::UpdateSpellsList(const uint32 uiDiff)
+void CreatureAI::UpdateSpellsList(uint32 const uiDiff)
 {
     if (m_uiCastingDelay <= uiDiff)
     {
@@ -200,10 +200,10 @@ void CreatureAI::UpdateSpellsList(const uint32 uiDiff)
         m_uiCastingDelay -= uiDiff;
 }
 
-void CreatureAI::DoSpellsListCasts(const uint32 uiDiff)
+void CreatureAI::DoSpellsListCasts(uint32 const uiDiff)
 {
     bool bDontCast = false;
-    for (auto & spell : m_CreatureSpells)
+    for (auto& spell : m_CreatureSpells)
     {
         if (spell.cooldown <= uiDiff)
         {
@@ -218,7 +218,7 @@ void CreatureAI::DoSpellsListCasts(const uint32 uiDiff)
             } 
 
             // Checked on startup.
-            const SpellEntry* pSpellInfo = sSpellMgr.GetSpellEntry(spell.spellId);
+            SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(spell.spellId);
 
             Unit* pTarget = ToUnit(GetTargetByType(m_creature, m_creature, spell.castTarget, spell.targetParam1 ? spell.targetParam1 : sSpellRangeStore.LookupEntry(pSpellInfo->rangeIndex)->maxRange, spell.targetParam2));
 
@@ -303,7 +303,7 @@ void CreatureAI::ClearTargetIcon()
     }
 }
 
-void CreatureAI::SetGazeOn(Unit *target)
+void CreatureAI::SetGazeOn(Unit* target)
 {
     if (m_creature->CanAttack(target))
     {
@@ -325,7 +325,7 @@ bool CreatureAI::UpdateVictimWithGaze()
     }
 
     if (m_creature->SelectHostileTarget())
-        if (Unit *victim = m_creature->GetVictim())
+        if (Unit* victim = m_creature->GetVictim())
             AttackStart(victim);
     return m_creature->GetVictim();
 }
@@ -338,7 +338,7 @@ bool CreatureAI::UpdateVictim()
     if (!m_creature->HasReactState(REACT_PASSIVE))
     {
         if (m_creature->SelectHostileTarget())
-            if (Unit *victim = m_creature->GetVictim())
+            if (Unit* victim = m_creature->GetVictim())
                 AttackStart(victim);
         return m_creature->GetVictim();
     }

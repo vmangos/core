@@ -121,9 +121,9 @@ bool LoginQueryHolder::Initialize()
 class CharacterHandler
 {
 public:
-    void HandleCharEnumCallback(QueryResult * result, uint32 account)
+    void HandleCharEnumCallback(QueryResult* result, uint32 account)
     {
-        WorldSession * session = sWorld.FindSession(account);
+        WorldSession* session = sWorld.FindSession(account);
         if (!session)
         {
             delete result;
@@ -131,10 +131,10 @@ public:
         }
         session->HandleCharEnum(result);
     }
-    void HandlePlayerLoginCallback(QueryResult * /*dummy*/, SqlQueryHolder * holder)
+    void HandlePlayerLoginCallback(QueryResult* /*dummy*/, SqlQueryHolder * holder)
     {
         if (!holder) return;
-        WorldSession *session = sWorld.FindSession(((LoginQueryHolder*)holder)->GetAccountId());
+        WorldSession* session = sWorld.FindSession(((LoginQueryHolder*)holder)->GetAccountId());
         if (!session)
         {
             delete holder;
@@ -144,7 +144,7 @@ public:
     }
 } chrHandler;
 
-void WorldSession::HandleCharEnum(QueryResult * result)
+void WorldSession::HandleCharEnum(QueryResult* result)
 {
     WorldPacket data(SMSG_CHAR_ENUM, 100);                  // we guess size
 
@@ -176,7 +176,7 @@ void WorldSession::HandleCharEnum(QueryResult * result)
     SendPacket(&data);
 }
 
-void WorldSession::HandleCharEnumOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleCharEnumOpcode(WorldPacket& /*recv_data*/)
 {
     /// get all the data necessary for loading all characters (along with their pets) on the account
     CharacterDatabase.AsyncPQuery(&chrHandler, &CharacterHandler::HandleCharEnumCallback, GetAccountId(),
@@ -193,7 +193,7 @@ void WorldSession::HandleCharEnumOpcode(WorldPacket & /*recv_data*/)
                                   PET_SAVE_AS_CURRENT, GetAccountId());
 }
 
-void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
+void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
 {
     std::string name;
     uint8 race_, class_;
@@ -327,7 +327,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
         }
     }
 
-    Player *pNewChar = new Player(this);
+    Player* pNewChar = new Player(this);
     if (!pNewChar->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))
     {
         // Player not create (race/class problem?)
@@ -367,7 +367,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     delete pNewChar;                                        // created only to call SaveToDB()
 }
 
-void WorldSession::HandleCharDeleteOpcode(WorldPacket & recv_data)
+void WorldSession::HandleCharDeleteOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     recv_data >> guid;
@@ -418,7 +418,7 @@ void WorldSession::HandleCharDeleteOpcode(WorldPacket & recv_data)
     sWorld.LogCharacter(this, lowguid, name, "Delete");
 }
 
-void WorldSession::HandlePlayerLoginOpcode(WorldPacket & recv_data)
+void WorldSession::HandlePlayerLoginOpcode(WorldPacket& recv_data)
 {
     ObjectGuid playerGuid;
     recv_data >> playerGuid;
@@ -473,7 +473,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     ASSERT(playerGuid.IsPlayer());
 
     // If the character is online (ALT-F4 logout for example)
-    Player *pCurrChar = sObjectAccessor.FindPlayer(playerGuid);
+    Player* pCurrChar = sObjectAccessor.FindPlayer(playerGuid);
     MasterPlayer* pCurrMasterPlayer = sObjectAccessor.FindMasterPlayer(playerGuid);
     bool alreadyOnline = false;
     if (pCurrChar)
@@ -653,7 +653,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     pCurrChar->SetInGameTime(WorldTimer::getMSTime());
 
     // announce group about member online (must be after add to player list to receive announce to self)
-    if (Group *group = pCurrChar->GetGroup())
+    if (Group* group = pCurrChar->GetGroup())
         group->UpdatePlayerOnlineStatus(pCurrChar);
 
     // friend status
@@ -761,7 +761,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     ALL_SESSION_SCRIPTS(this, OnLogin(pCurrChar));
 }
 
-void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_SET_FACTION_ATWAR");
 
@@ -774,7 +774,7 @@ void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket & recv_data)
     GetPlayer()->GetReputationMgr().SetAtWar(repListID, flag);
 }
 
-void WorldSession::HandleTutorialFlagOpcode(WorldPacket & recv_data)
+void WorldSession::HandleTutorialFlagOpcode(WorldPacket& recv_data)
 {
     uint32 iFlag;
     recv_data >> iFlag;
@@ -794,19 +794,19 @@ void WorldSession::HandleTutorialFlagOpcode(WorldPacket & recv_data)
     //DEBUG_LOG("Received Tutorial Flag Set {%u}.", iFlag);
 }
 
-void WorldSession::HandleTutorialClearOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleTutorialClearOpcode(WorldPacket& /*recv_data*/)
 {
     for (uint32 iI = 0; iI < 8; ++iI)
         SetTutorialInt(iI, 0xFFFFFFFF);
 }
 
-void WorldSession::HandleTutorialResetOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleTutorialResetOpcode(WorldPacket& /*recv_data*/)
 {
     for (uint32 iI = 0; iI < 8; iI++)
         SetTutorialInt(iI, 0x00000000);
 }
 
-void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_SET_WATCHED_FACTION");
     int32 repId;
@@ -814,7 +814,7 @@ void WorldSession::HandleSetWatchedFactionOpcode(WorldPacket & recv_data)
     GetPlayer()->SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, repId);
 }
 
-void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket & recv_data)
+void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_SET_FACTION_INACTIVE");
     uint32 replistid;
@@ -824,13 +824,13 @@ void WorldSession::HandleSetFactionInactiveOpcode(WorldPacket & recv_data)
     _player->GetReputationMgr().SetInactive(replistid, inactive);
 }
 
-void WorldSession::HandleShowingHelmOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleShowingHelmOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("CMSG_SHOWING_HELM for %s", _player->GetName());
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
 }
 
-void WorldSession::HandleShowingCloakOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleShowingCloakOpcode(WorldPacket& /*recv_data*/)
 {
     DEBUG_LOG("CMSG_SHOWING_CLOAK for %s", _player->GetName());
     _player->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
@@ -883,9 +883,9 @@ void WorldSession::HandleCharRenameOpcode(WorldPacket& recv_data)
                                  );
 }
 
-void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uint32 accountId, std::string newname)
+void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult* result, uint32 accountId, std::string newname)
 {
-    WorldSession * session = sWorld.FindSession(accountId);
+    WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
     {
         delete result;

@@ -153,7 +153,7 @@ struct boss_ayamissAI : public ScriptedAI
             m_pInstance->SetData(TYPE_AYAMISS, DONE);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_PARALYZE)
         {
@@ -174,7 +174,7 @@ struct boss_ayamissAI : public ScriptedAI
         pSummoned->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -346,7 +346,7 @@ struct mob_zara_larvaAI : public ScriptedAI
         SetCombatMovement(false);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (Active > uiDiff)
         {

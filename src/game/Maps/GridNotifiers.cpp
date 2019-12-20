@@ -36,7 +36,7 @@
 using namespace MaNGOS;
 
 void
-VisibleChangesNotifier::Visit(CameraMapType &m)
+VisibleChangesNotifier::Visit(CameraMapType& m)
 {
     for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
         iter->getSource()->UpdateVisibilityOf(&i_object);
@@ -129,7 +129,7 @@ VisibleNotifier::Notify()
 }
 
 void
-MessageDeliverer::Visit(CameraMapType &m)
+MessageDeliverer::Visit(CameraMapType& m)
 {
     for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
@@ -143,7 +143,7 @@ MessageDeliverer::Visit(CameraMapType &m)
     }
 }
 
-void MessageDelivererExcept::Visit(CameraMapType &m)
+void MessageDelivererExcept::Visit(CameraMapType& m)
 {
     for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
@@ -159,7 +159,7 @@ void MessageDelivererExcept::Visit(CameraMapType &m)
 
 
 void
-ObjectMessageDeliverer::Visit(CameraMapType &m)
+ObjectMessageDeliverer::Visit(CameraMapType& m)
 {
     for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
@@ -169,11 +169,11 @@ ObjectMessageDeliverer::Visit(CameraMapType &m)
 }
 
 void
-MessageDistDeliverer::Visit(CameraMapType &m)
+MessageDistDeliverer::Visit(CameraMapType& m)
 {
     for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        Player * owner = iter->getSource()->GetOwner();
+        Player* owner = iter->getSource()->GetOwner();
 
         if ((i_toSelf || owner != &i_player) &&
                 (!i_ownTeamOnly || owner->GetTeam() == i_player.GetTeam()) &&
@@ -186,7 +186,7 @@ MessageDistDeliverer::Visit(CameraMapType &m)
 }
 
 void
-ObjectMessageDistDeliverer::Visit(CameraMapType &m)
+ObjectMessageDistDeliverer::Visit(CameraMapType& m)
 {
     for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
@@ -199,7 +199,7 @@ ObjectMessageDistDeliverer::Visit(CameraMapType &m)
 }
 
 template<class T> void
-ObjectUpdater::Visit(GridRefManager<T> &m)
+ObjectUpdater::Visit(GridRefManager<T>& m)
 {
     for (typename GridRefManager<T>::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
@@ -248,5 +248,5 @@ void MaNGOS::RespawnDo::operator()(GameObject* u) const
 }
 
 
-template void ObjectUpdater::Visit<GameObject>(GameObjectMapType &);
-template void ObjectUpdater::Visit<DynamicObject>(DynamicObjectMapType &);
+template void ObjectUpdater::Visit<GameObject>(GameObjectMapType&);
+template void ObjectUpdater::Visit<DynamicObject>(DynamicObjectMapType&);

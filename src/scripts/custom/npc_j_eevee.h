@@ -12,7 +12,7 @@ struct npc_j_eevee_dreadsteedAI : public ScriptedAI
     bool waypointReached;
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(uint32 const uiDiff) override;
 
     void SetPlayerGuid(uint64 playerGuid);
     void ShoutFreedom();
@@ -31,7 +31,7 @@ struct npc_j_eevee_scholomanceAI : public ScriptedAI
     bool finished;
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 #endif

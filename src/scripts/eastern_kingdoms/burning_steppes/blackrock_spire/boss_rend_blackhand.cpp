@@ -59,7 +59,7 @@ struct boss_rend_blackhandAI : public ScriptedAI
         m_uiWhirlWindTimer          = 0;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

@@ -57,7 +57,7 @@ void CinematicStuff::AddSpells(Player* player)
     }
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
     {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(id);
         if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->GetLevel())
             player->LearnSpell(id, false);
     }
@@ -225,7 +225,7 @@ void CinematicStuff::SearchAndDestroy(Player* player)
             target = player->GetVictim();
             if (target == nullptr)
             {
-                const std::set<Unit*> attackers = player->GetAttackers();
+                std::set<Unit*> const attackers = player->GetAttackers();
                 if (attackers.size() > 0)
                     target = *attackers.begin();
             }

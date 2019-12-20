@@ -130,8 +130,8 @@ typedef std::vector<uint32> AutoSpellList;
 
 #define HAPPINESS_LEVEL_SIZE        333000
 
-extern const uint32 LevelUpLoyalty[6];
-extern const uint32 LevelStartLoyalty[6];
+extern uint32 const LevelUpLoyalty[6];
+extern uint32 const LevelStartLoyalty[6];
 
 #define ACTIVE_SPELLS_MAX           4
 
@@ -252,13 +252,13 @@ class MANGOS_DLL_SPEC Pet : public Creature
         uint32  m_resetTalentsCost;
         time_t  m_resetTalentsTime;
 
-        const uint64& GetAuraUpdateMask() const { return m_auraUpdateMask; }
+        uint64 const& GetAuraUpdateMask() const { return m_auraUpdateMask; }
         void SetAuraUpdateSlot(uint8 slot) { m_auraUpdateMask |= (uint64(1) << slot); }
         void SetAuraUpdateMask(uint64 mask) { m_auraUpdateMask = mask; }
         void ResetAuraUpdateMask() { m_auraUpdateMask = 0; }
 
         // overwrite Creature function for name localization back to WorldObject version without localization
-        const char* GetNameForLocaleIdx(int32 locale_idx) const override { return WorldObject::GetNameForLocaleIdx(locale_idx); }
+        char const* GetNameForLocaleIdx(int32 locale_idx) const override { return WorldObject::GetNameForLocaleIdx(locale_idx); }
 
         bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
     protected:

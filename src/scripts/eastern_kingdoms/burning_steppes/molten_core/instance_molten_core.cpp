@@ -372,7 +372,7 @@ struct instance_molten_core : ScriptedInstance
         }
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         std::ostringstream saveStream;
         saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " "
@@ -520,7 +520,7 @@ struct instance_molten_core : ScriptedInstance
         }
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {

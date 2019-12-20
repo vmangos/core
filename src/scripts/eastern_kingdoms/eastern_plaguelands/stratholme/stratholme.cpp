@@ -162,7 +162,7 @@ struct mob_restless_soulAI : public ScriptedAI
         Tagged = false;
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell) override
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -187,7 +187,7 @@ struct mob_restless_soulAI : public ScriptedAI
             m_creature->SummonCreature(ENTRY_FREED, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (Tagged)
         {
@@ -237,7 +237,7 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
         Tagged = false;
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell) override
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (!Tagged && spell->Id == SPELL_EGAN_BLASTER)
             Tagged = true;
@@ -260,7 +260,7 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (Tagged)
         {
@@ -352,7 +352,7 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->IsAlive() || !m_pInstance)
             return;
@@ -464,7 +464,7 @@ struct AI_mobs_rat_pestifere : public ScriptedAI
         m_mvt_id++;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_mvt_timer < diff && m_idRat > 0)
         {
@@ -727,7 +727,7 @@ struct npc_auriusAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         switch (ui_entry)
         {
@@ -860,7 +860,7 @@ struct npc_couloir_trigger1AI : public ScriptedAI
             pSummoned->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (ScourgeStarted)
         {
@@ -1006,7 +1006,7 @@ struct npc_Scourge_TriggerAI : public ScriptedAI
         pSummoned->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (ScourgeStarted)
         {

@@ -89,7 +89,7 @@ enum
 };
 
 // Coords used to spawn Nefarius at the throne
-static const float aNefariusSpawnLoc[4] = { -7466.16f, -1040.80f, 412.053f, 2.14675f};
+static float const aNefariusSpawnLoc[4] = { -7466.16f, -1040.80f, 412.053f, 2.14675f};
 
 #define GOSSIP_ITEM_VAEL_1         "I cannot, Vaelastrasz! Surely something can be done to heal you!"
 #define GOSSIP_ITEM_VAEL_2         "Vaelastrasz, no!!!"
@@ -228,7 +228,7 @@ struct boss_vaelAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_pInstance)
             return;
@@ -480,7 +480,7 @@ bool GossipHello_boss_vael(Player* pPlayer, Creature* pCreature)
     return true;
 }
 
-bool QuestAccept_vaelastrasz(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_vaelastrasz(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
 
@@ -605,7 +605,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -692,7 +692,7 @@ struct npc_death_talon_SeetherAI : public ScriptedAI
         m_bEngaged          = false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

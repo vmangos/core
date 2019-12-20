@@ -51,7 +51,7 @@ bool ChatHandler::HandleTeleAddCommand(char* args)
     if (!*args)
         return false;
 
-    Player *player = m_session->GetPlayer();
+    Player* player = m_session->GetPlayer();
     if (!player)
         return false;
 
@@ -108,7 +108,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
     if (!*args)
         return false;
 
-    Player *player = GetSelectedPlayer();
+    Player* player = GetSelectedPlayer();
     if (!player)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -131,7 +131,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
 
     std::string nameLink = GetNameLink(player);
 
-    Group *grp = player->GetGroup();
+    Group* grp = player->GetGroup();
     if (!grp)
     {
         PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
@@ -139,9 +139,9 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
         return false;
     }
 
-    for (GroupReference *itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
+    for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
-        Player *pl = itr->getSource();
+        Player* pl = itr->getSource();
 
         if (!pl || !pl->GetSession())
             continue;
@@ -189,7 +189,7 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
     if (HasLowerSecurity(target))
         return false;
 
-    Group *grp = target->GetGroup();
+    Group* grp = target->GetGroup();
 
     std::string nameLink = GetNameLink(target);
 
@@ -215,9 +215,9 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
         return false;
     }
 
-    for (GroupReference *itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
+    for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
-        Player *pl = itr->getSource();
+        Player* pl = itr->getSource();
 
         if (!pl || pl == pPlayer || !pl->GetSession())
             continue;
@@ -460,7 +460,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
         {
             std::string name = pParam1;
             WorldDatabase.escape_string(name);
-            QueryResult *result = WorldDatabase.PQuery("SELECT guid FROM creature, creature_template WHERE creature.id = creature_template.entry AND creature_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
+            QueryResult* result = WorldDatabase.PQuery("SELECT guid FROM creature, creature_template WHERE creature.id = creature_template.entry AND creature_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
             if (!result)
             {
                 SendSysMessage(LANG_COMMAND_GOCREATNOTFOUND);
@@ -472,7 +472,7 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
 
             do
             {
-                Field *fields = result->Fetch();
+                Field* fields = result->Fetch();
                 uint32 guid = fields[0].GetUInt32();
 
                 CreatureDataPair const* cr_data = sObjectMgr.GetCreatureDataPair(guid);
@@ -615,7 +615,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
         {
             std::string name = pParam1;
             WorldDatabase.escape_string(name);
-            QueryResult *result = WorldDatabase.PQuery("SELECT guid FROM gameobject, gameobject_template WHERE gameobject.id = gameobject_template.entry AND gameobject_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
+            QueryResult* result = WorldDatabase.PQuery("SELECT guid FROM gameobject, gameobject_template WHERE gameobject.id = gameobject_template.entry AND gameobject_template.name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
             if (!result)
             {
                 SendSysMessage(LANG_COMMAND_GOOBJNOTFOUND);
@@ -627,7 +627,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
 
             do
             {
-                Field *fields = result->Fetch();
+                Field* fields = result->Fetch();
                 uint32 guid = fields[0].GetUInt32();
 
                 GameObjectDataPair const* go_data = sObjectMgr.GetGODataPair(guid);
@@ -745,7 +745,7 @@ bool ChatHandler::HandleGoHelper(Player* player, uint32 mapid, float x, float y,
             return false;
         }
 
-        TerrainInfo const *map = sTerrainMgr.LoadTerrain(mapid);
+        TerrainInfo const* map = sTerrainMgr.LoadTerrain(mapid);
         z = map->GetWaterOrGroundLevel(x, y, MAX_HEIGHT);
     }
 
@@ -941,7 +941,7 @@ bool ChatHandler::HandleGoZoneXYCommand(char* args)
     // update to parent zone if exist (client map show only zones without parents)
     const auto *zoneEntry = !areaEntry->IsZone() ? AreaEntry::GetById(areaEntry->ZoneId) : areaEntry;
 
-    MapEntry const *mapEntry = sMapStorage.LookupEntry<MapEntry>(zoneEntry->MapId);
+    MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(zoneEntry->MapId);
 
     std::string areaName = areaEntry->Name;
     sObjectMgr.GetAreaLocaleString(areaEntry->Id, GetSessionDbLocaleIndex(), &areaName);
@@ -1043,7 +1043,7 @@ bool ChatHandler::HandleGoRelativeCommand(char* args)
 
 bool ChatHandler::HandleStartCommand(char* /*args*/)
 {
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
 
     if (chr->IsTaxiFlying())
     {
@@ -1066,7 +1066,7 @@ bool ChatHandler::HandleStartCommand(char* /*args*/)
 
 bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
 {
-    Player * pPlayer = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
 
     if (!pPlayer)
         return false;
@@ -1087,7 +1087,7 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
         pPlayer->AddAura(15007); // Add Resurrection Sickness
         pPlayer->AddSpellCooldown(20939, 0, time(nullptr) + 3600000); // Trigger 1 Hour Cooldown
         // Get nearest graveyard.
-        WorldSafeLocsEntry const *ClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());
+        WorldSafeLocsEntry const* ClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());
         if (!ClosestGrave) //No nearby graveyards (stuck in void?). Send ally to Westfall, Horde to Barrens.
             ClosestGrave = pPlayer->GetTeamId() ? sWorldSafeLocsStore.LookupEntry(10) : sWorldSafeLocsStore.LookupEntry(4);
         if (ClosestGrave)
@@ -1278,13 +1278,13 @@ bool ChatHandler::HandleGonameCommand(char* args)
 
             if (!pBind)
             {
-                Group *group = pPlayer->GetGroup();
+                Group* group = pPlayer->GetGroup();
                 // if no bind exists, create a solo bind
                 InstanceGroupBind *gBind = group ? group->GetBoundInstance(pTarget->GetMapId()) : nullptr;
                 // if no bind exists, create a solo bind
                 if (!gBind)
                 {
-                    DungeonPersistentState *save = ((DungeonMap*)pTarget->GetMap())->GetPersistanceState();
+                    DungeonPersistentState* save = ((DungeonMap*)pTarget->GetMap())->GetPersistanceState();
 
                     // if player is group leader then we need add group bind
                     if (group && group->IsLeader(pPlayer->GetObjectGuid()))

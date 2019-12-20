@@ -833,7 +833,7 @@ struct instance_blackwing_lair : public ScriptedInstance
 
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
@@ -845,7 +845,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         return 0;
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {
@@ -1017,7 +1017,7 @@ struct go_engin_suppressionAI: public GameObjectAI
         m_bActive = true;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiCheckTimer <= uiDiff)
         {
@@ -1044,7 +1044,7 @@ GameObjectAI* GetAIgo_engin_suppression(GameObject *pGo)
     return new go_engin_suppressionAI(pGo);
 }
 
-bool AreaTrigger_at_orb_of_command(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_orb_of_command(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pAt->id == AT_ORB_OF_COMMAND)
     {
@@ -1060,7 +1060,7 @@ bool AreaTrigger_at_orb_of_command(Player* pPlayer, const AreaTriggerEntry* pAt)
     return false;
 }
 
-bool AreaTrigger_at_enter_vael_room(Player *pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_enter_vael_room(Player *pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pAt->id == AT_ENTER_VAEL_ROOM)
     {
@@ -1175,7 +1175,7 @@ struct npc_death_talonAI : public ScriptedAI
         return (0);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bIsOverSeer && !m_creature->HasAura(m_uiBroodPower))
             m_creature->AddAura(m_uiBroodPower);
@@ -1293,7 +1293,7 @@ struct npc_blackwing_technicianAI : public ScriptedAI
         ScriptedAI::JustDied(killer);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bVaelGob && m_creature->GetPositionZ() >= 430.0f)
             m_creature->DeleteLater();
@@ -1379,7 +1379,7 @@ struct CorruptedWhelpAI : public ScriptedAI
     }
     */
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

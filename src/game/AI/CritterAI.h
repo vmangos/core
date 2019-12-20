@@ -22,11 +22,11 @@
 class MANGOS_DLL_DECL CritterAI : public CreatureAI
 {
     public:
-        explicit CritterAI(Creature *c) : CreatureAI(c) {}
+        explicit CritterAI(Creature* c) : CreatureAI(c) {}
         static int Permissible(Creature const*);
 
-        void MoveInLineOfSight(Unit *) override {};
-        void AttackStart(Unit *) override {};
+        void MoveInLineOfSight(Unit*) override {};
+        void AttackStart(Unit*) override {};
 
         void DamageTaken(Unit*, uint32&) override;
         void SpellHit(Unit*, SpellEntry const*) override;

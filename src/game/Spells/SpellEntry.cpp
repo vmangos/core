@@ -8,7 +8,7 @@ using namespace Spells;
 
 SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
         return SPELL_NORMAL;
 
@@ -216,7 +216,7 @@ bool Spells::CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry
 
 bool Spells::IsPassiveSpell(uint32 spellId)
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
         return false;
     return spellInfo->IsPassiveSpell();
@@ -224,7 +224,7 @@ bool Spells::IsPassiveSpell(uint32 spellId)
 
 bool Spells::IsPositiveSpell(uint32 spellId)
 {
-    SpellEntry const *spellproto = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellproto = sSpellMgr.GetSpellEntry(spellId);
     if (!spellproto)
         return false;
 
@@ -233,14 +233,14 @@ bool Spells::IsPositiveSpell(uint32 spellId)
 
 bool Spells::IsPositiveSpell(uint32 spellId, Unit* caster, Unit* victim)
 {
-    SpellEntry const *spellproto = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellproto = sSpellMgr.GetSpellEntry(spellId);
     if (!spellproto)
         return false;
 
     return spellproto->IsPositiveSpell(caster, victim);
 }
 
-bool Spells::IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellInfo2)
+bool Spells::IsSingleTargetSpells(SpellEntry const* spellInfo1, SpellEntry const* spellInfo2)
 {
     // TODO - need better check
     // Equal icon and spellfamily
@@ -572,7 +572,7 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
                         return 0;
     }
 
-    SpellCastTimesEntry const *spellCastTimeEntry = sSpellCastTimesStore.LookupEntry(CastingTimeIndex);
+    SpellCastTimesEntry const* spellCastTimeEntry = sSpellCastTimesStore.LookupEntry(CastingTimeIndex);
 
     // not all spells have cast time index and this is all is pasiive abilities
     if (!spellCastTimeEntry)
@@ -801,7 +801,7 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
 
 int32 SpellEntry::GetDuration() const
 {
-    SpellDurationEntry const *du = sSpellDurationStore.LookupEntry(DurationIndex);
+    SpellDurationEntry const* du = sSpellDurationStore.LookupEntry(DurationIndex);
     if (!du)
         return 0;
     return (du->Duration[0] == -1) ? -1 : abs(du->Duration[0]);
@@ -809,7 +809,7 @@ int32 SpellEntry::GetDuration() const
 
 int32 SpellEntry::GetMaxDuration() const
 {
-    SpellDurationEntry const *du = sSpellDurationStore.LookupEntry(DurationIndex);
+    SpellDurationEntry const* du = sSpellDurationStore.LookupEntry(DurationIndex);
     if (!du)
         return 0;
     return (du->Duration[2] == -1) ? -1 : abs(du->Duration[2]);
@@ -982,7 +982,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster
                     if (Id != EffectTriggerSpell[effIndex])
                     {
                         uint32 spellTriggeredId = EffectTriggerSpell[effIndex];
-                        SpellEntry const *spellTriggeredProto = sSpellMgr.GetSpellEntry(spellTriggeredId);
+                        SpellEntry const* spellTriggeredProto = sSpellMgr.GetSpellEntry(spellTriggeredId);
 
                         if (spellTriggeredProto)
                         {
@@ -1117,7 +1117,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
     bool actAsShifted = false;
     if (form > 0)
     {
-        SpellShapeshiftFormEntry const *shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
+        SpellShapeshiftFormEntry const* shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         if (!shapeInfo)
         {
             sLog.outError("GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);

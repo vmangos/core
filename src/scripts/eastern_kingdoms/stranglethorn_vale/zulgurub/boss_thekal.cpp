@@ -147,7 +147,7 @@ struct zg_rez_add : public ScriptedAI
             m_uiRezzeurGUID = 0;
         }
     }
-    bool HandleWaitRez(const uint32 uiDiff)
+    bool HandleWaitRez(uint32 const uiDiff)
     {
         if (!m_pInstance)
             return false;
@@ -206,7 +206,7 @@ struct zg_rez_add : public ScriptedAI
             pLorkhan->AI()->AttackStart(who);
         ScriptedAI::EnterCombat(who);
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_justRevived)
         {
@@ -342,7 +342,7 @@ struct boss_thekalAI : public zg_rez_add
             zg_rez_add::JustDied(Killer);
         }
     }
-    void UpdateAI_corpse(const uint32 uiDiff) override
+    void UpdateAI_corpse(uint32 const uiDiff) override
     {
         if (PhaseTwo || !m_pInstance)
             return; // La c'est vraiment fini.
@@ -390,7 +390,7 @@ struct boss_thekalAI : public zg_rez_add
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-        const CreatureInfo *cinfo = m_creature->GetCreatureInfo();
+        CreatureInfo const *cinfo = m_creature->GetCreatureInfo();
         m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->dmg_min + ((cinfo->dmg_min / 100) * 40)));
         m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->dmg_max + ((cinfo->dmg_max / 100) * 40)));
         m_creature->UpdateDamagePhysical(BASE_ATTACK);
@@ -413,7 +413,7 @@ struct boss_thekalAI : public zg_rez_add
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->IsAlive())
             return;
@@ -562,13 +562,13 @@ struct mob_zealot_lorkhanAI : public zg_rez_add
         zg_rez_add::JustDied(Killer);
     }
 
-    void UpdateAI_corpse(const uint32 uiDiff) override
+    void UpdateAI_corpse(uint32 const uiDiff) override
     {
         if (!zg_rez_add::HandleWaitRez(uiDiff))
             zg_rez_add::SetRealyDead(true);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         zg_rez_add::UpdateAI(diff);
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -660,13 +660,13 @@ struct mob_zealot_zathAI : public zg_rez_add
         zg_rez_add::JustDied(Killer);
     }
 
-    void UpdateAI_corpse(const uint32 uiDiff) override
+    void UpdateAI_corpse(uint32 const uiDiff) override
     {
         if (!zg_rez_add::HandleWaitRez(uiDiff))
             zg_rez_add::SetRealyDead(true);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         zg_rez_add::UpdateAI(diff);
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

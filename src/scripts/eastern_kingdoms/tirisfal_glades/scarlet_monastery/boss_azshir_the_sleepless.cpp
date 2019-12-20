@@ -45,7 +45,7 @@ struct boss_azshir_the_sleeplessAI : public ScriptedAI
         Terrify_Timer = 20000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

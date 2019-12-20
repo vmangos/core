@@ -323,7 +323,7 @@ struct boss_gythAI : public ScriptedAI
         ++waveRemainingCount;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bInitialized)
         {

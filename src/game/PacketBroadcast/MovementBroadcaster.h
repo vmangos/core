@@ -48,8 +48,8 @@ public:
     MovementBroadcaster(std::size_t threads, std::chrono::milliseconds frequency);
     ~MovementBroadcaster();
 
-    void RegisterPlayer(const std::shared_ptr<PlayerBroadcaster>& player);
-    void RemovePlayer(const std::shared_ptr<PlayerBroadcaster>& player);
+    void RegisterPlayer(std::shared_ptr<PlayerBroadcaster> const& player);
+    void RemovePlayer(std::shared_ptr<PlayerBroadcaster> const& player);
 
     void StartThreads();
     void UpdateConfiguration(std::size_t new_threads_count, std::chrono::milliseconds new_frequency);

@@ -54,7 +54,7 @@ class DynamicObject : public WorldObject
         Unit* GetUnitCaster() const;
         float GetRadius() const { return m_radius; }
         DynamicObjectType GetType() const { return (DynamicObjectType)GetByteValue(DYNAMICOBJECT_BYTES,0); }
-        bool NeedsRefresh(Unit *unit) const;
+        bool NeedsRefresh(Unit* unit) const;
         bool IsChanneled() const { return m_channeled; }
         void AddAffected(Unit* unit);
         void RemoveAffected(Unit* unit);
@@ -72,7 +72,7 @@ class DynamicObject : public WorldObject
 
         bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
-        GridReference<DynamicObject> &GetGridRef() { return m_gridRef; }
+        GridReference<DynamicObject>& GetGridRef() { return m_gridRef; }
 
     protected:
         uint32 m_spellId;

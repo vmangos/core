@@ -52,7 +52,7 @@ void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender sender, uint3
 
 struct MassMailerQueryHandler
 {
-    void HandleQueryCallback(QueryResult * result, MailDraft* mailProto, MailSender sender)
+    void HandleQueryCallback(QueryResult* result, MailDraft* mailProto, MailSender sender)
     {
         if (!result)
             return;
@@ -61,7 +61,7 @@ struct MassMailerQueryHandler
 
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             recievers.insert(fields[0].GetUInt32());
 
         }
@@ -92,7 +92,7 @@ void MassMailMgr::Update(bool sendall /*= false*/)
             task.m_receivers.erase(task.m_receivers.begin());
 
             ObjectGuid receiver_guid = ObjectGuid(HIGHGUID_PLAYER, receiver_lowguid);
-            Player *receiver = sObjectMgr.GetPlayer(receiver_guid);
+            Player* receiver = sObjectMgr.GetPlayer(receiver_guid);
 
             // last case. can be just send
             if (task.m_receivers.empty())

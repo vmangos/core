@@ -326,7 +326,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 diff) override
+    void UpdateEscortAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -660,7 +660,7 @@ struct EvolvingEctoplasmAI : public ScriptedAI
         isImmune = false;
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (!isImmune)
         {
@@ -695,7 +695,7 @@ struct EvolvingEctoplasmAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiImmuneTimer < uiDiff)
         {

@@ -51,7 +51,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     void DamageTaken(Unit* /*pDoneBy*/, uint32& /*uiDamage*/) override {}
 
     // Called at World update tick
-    void UpdateAI(const uint32) override;
+    void UpdateAI(uint32 const) override;
 
     // Called at creature death
     void JustDied(Unit*) override {}
@@ -66,7 +66,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     void SummonedCreatureDespawn(Creature*) override {}
 
     // Called when hit by a spell
-    void SpellHit(Unit*, const SpellEntry*) override {}
+    void SpellHit(Unit*, SpellEntry const*) override {}
 
     // Called when creature is spawned or respawned (for reseting variables)
     void JustRespawned() override;
@@ -136,7 +136,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
 
     void SetEquipmentSlots(bool bLoadDefault, int32 uiMainHand = EQUIP_NO_CHANGE, int32 uiOffHand = EQUIP_NO_CHANGE, int32 uiRanged = EQUIP_NO_CHANGE);
 
-    bool EnterEvadeIfOutOfCombatArea(const uint32 uiDiff);
+    bool EnterEvadeIfOutOfCombatArea(uint32 const uiDiff);
     void EnterEvadeIfOutOfHomeArea();
 
     void DoGoHome();
@@ -147,7 +147,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     float DoGetThreat(Unit* pUnit);
     void DoModifyThreatPercent(Unit* pUnit, int32 pct);
     void DoTeleportTo(float fX, float fY, float fZ);
-    void DoTeleportTo(const float fPos[4]);
+    void DoTeleportTo(float const fPos[4]);
     void DoTeleportAll(float fX, float fY, float fZ, float fO);
     Creature* me;
 

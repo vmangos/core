@@ -15,7 +15,7 @@ bool PlayerBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
     return true;
 }
 
-void PlayerBotAI::UpdateAI(const uint32 diff)
+void PlayerBotAI::UpdateAI(uint32 const diff)
 {
     if (me->IsBeingTeleportedNear())
     {
@@ -64,7 +64,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     uint8 hairStyle = urand(0, 5);
     uint8 hairColor = urand(0, 5);
     uint8 facialHair = urand(0, 5);
-    Player *newChar = new Player(sess);
+    Player* newChar = new Player(sess);
     uint32 guid = botEntry->playerGUID;
     if (!newChar->Create(guid, name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))
     {
@@ -80,7 +80,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     // Set instance
     if (instanceId && mapId > 1) // Not a continent
     {
-        DungeonPersistentState *state = (DungeonPersistentState*)sMapPersistentStateMgr
+        DungeonPersistentState* state = (DungeonPersistentState*)sMapPersistentStateMgr
                 .AddPersistentState(sMapStorage.LookupEntry<MapEntry>(mapId), instanceId, time(nullptr) + 3600, false, true);
         newChar->BindToInstance(state, true, true);
     }
@@ -115,7 +115,7 @@ bool MageOrgrimmarAttackerAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSessio
     return SpawnNewPlayer(sess, CLASS_MAGE, RACE_GNOME, 1, 0, 1017.0f, -4450, 12, 0.65f);
 }
 
-void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
+void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
 {
     PlayerBotAI::UpdateAI(diff);
     if (me->GetLevel() != 60)

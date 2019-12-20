@@ -85,7 +85,7 @@ public:
         return true;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiIncreaseTimer > uiDiff)
             m_uiIncreaseTimer -= uiDiff;
@@ -204,7 +204,7 @@ struct npc_invaderAI : ScriptedAI
         sObjectMgr.SetSavedVariable(InvasionData[m_uiEventIndex].varDeadInvaders, deadInvaders, true);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

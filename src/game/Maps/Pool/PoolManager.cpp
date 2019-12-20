@@ -641,7 +641,7 @@ struct PoolMapChecker
     }
 };
 
-bool CheckPoolAndChance(const char* table, uint16 pool_id, float chance)
+bool CheckPoolAndChance(char const* table, uint16 pool_id, float chance)
 {
     if (pool_id > sPoolMgr.GetMaxPoolId())
     {
@@ -658,7 +658,7 @@ bool CheckPoolAndChance(const char* table, uint16 pool_id, float chance)
 
 void PoolManager::LoadFromDB()
 {
-    QueryResult *result = WorldDatabase.PQuery("SELECT MAX(`entry`) FROM `pool_template` WHERE %u BETWEEN `patch_min` AND `patch_max`", sWorld.GetWowPatch());
+    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(`entry`) FROM `pool_template` WHERE %u BETWEEN `patch_min` AND `patch_max`", sWorld.GetWowPatch());
     if (!result)
     {
         sLog.outString(">> Table pool_template is empty.");
@@ -667,7 +667,7 @@ void PoolManager::LoadFromDB()
     }
     else
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         max_pool_id = fields[0].GetUInt16();
         delete result;
     }
@@ -689,7 +689,7 @@ void PoolManager::LoadFromDB()
     do
     {
         ++count;
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         bar.step();
 
@@ -738,7 +738,7 @@ void PoolManager::LoadFromDB()
         BarGoLink bar2(result->GetRowCount());
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar2.step();
 
@@ -753,7 +753,7 @@ void PoolManager::LoadFromDB()
             if ((patch_min > sWorld.GetWowPatch()) || (patch_max < sWorld.GetWowPatch()))
                 continue;
 
-            const char* table = entry_id ? "pool_creature_template" : "pool_creature";
+            char const* table = entry_id ? "pool_creature_template" : "pool_creature";
 
             CreatureData const* data = sObjectMgr.GetCreatureData(guid);
             if (!data)
@@ -817,7 +817,7 @@ void PoolManager::LoadFromDB()
         BarGoLink bar2(result->GetRowCount());
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar2.step();
 
@@ -832,7 +832,7 @@ void PoolManager::LoadFromDB()
             if ((patch_min > sWorld.GetWowPatch()) || (patch_max < sWorld.GetWowPatch()))
                 continue;
 
-            const char* table = entry_id ? "pool_gameobject_template" : "pool_gameobject";
+            char const* table = entry_id ? "pool_gameobject_template" : "pool_gameobject";
 
             GameObjectData const* data = sObjectMgr.GetGOData(guid);
             if (!data)
@@ -900,7 +900,7 @@ void PoolManager::LoadFromDB()
         BarGoLink bar2(result->GetRowCount());
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             bar2.step();
 

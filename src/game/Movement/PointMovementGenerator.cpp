@@ -77,7 +77,7 @@ void PointMovementGenerator<T>::Reset(T &unit)
 }
 
 template<class T>
-bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
+bool PointMovementGenerator<T>::Update(T &unit, uint32 const& diff)
 {
     if (!&unit)
         return false;
@@ -138,10 +138,10 @@ template void PointMovementGenerator<Player>::Interrupt(Player&);
 template void PointMovementGenerator<Creature>::Interrupt(Creature&);
 template void PointMovementGenerator<Player>::Reset(Player&);
 template void PointMovementGenerator<Creature>::Reset(Creature&);
-template bool PointMovementGenerator<Player>::Update(Player &, const uint32 &diff);
-template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32 &diff);
+template bool PointMovementGenerator<Player>::Update(Player &, uint32 const& diff);
+template bool PointMovementGenerator<Creature>::Update(Creature&, uint32 const& diff);
 
-bool DistancingMovementGenerator::Update(Creature &unit, const uint32 &diff)
+bool DistancingMovementGenerator::Update(Creature &unit, uint32 const& diff)
 {
     if (!&unit)
         return false;
@@ -194,7 +194,7 @@ void AssistanceMovementGenerator::Finalize(Creature &unit)
         unit.GetMotionMaster()->MoveSeekAssistanceDistract(sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_ASSISTANCE_DELAY));
 }
 
-bool EffectMovementGenerator::Update(Unit &unit, const uint32 &)
+bool EffectMovementGenerator::Update(Unit &unit, uint32 const&)
 {
     return !unit.movespline->Finalized();
 }
@@ -339,7 +339,7 @@ void ChargeMovementGenerator<T>::Reset(T &unit)
 }
 
 template<class T>
-bool ChargeMovementGenerator<T>::Update(T &unit, const uint32 &diff)
+bool ChargeMovementGenerator<T>::Update(T &unit, uint32 const& diff)
 {
     if (!&unit)
         return false;
@@ -371,5 +371,5 @@ template void ChargeMovementGenerator<Player>::Interrupt(Player&);
 template void ChargeMovementGenerator<Creature>::Interrupt(Creature&);
 template void ChargeMovementGenerator<Player>::Reset(Player&);
 template void ChargeMovementGenerator<Creature>::Reset(Creature&);
-template bool ChargeMovementGenerator<Player>::Update(Player &, const uint32 &diff);
-template bool ChargeMovementGenerator<Creature>::Update(Creature&, const uint32 &diff);
+template bool ChargeMovementGenerator<Player>::Update(Player &, uint32 const& diff);
+template bool ChargeMovementGenerator<Creature>::Update(Creature&, uint32 const& diff);

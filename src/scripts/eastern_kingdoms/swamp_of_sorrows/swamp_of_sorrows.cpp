@@ -113,7 +113,7 @@ struct npc_galen_goodwardAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
 
         if (m_uiPeriodicSay < uiDiff)
@@ -132,7 +132,7 @@ struct npc_galen_goodwardAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_galen_goodward(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_galen_goodward(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_GALENS_ESCAPE)
     {

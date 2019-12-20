@@ -317,7 +317,7 @@ struct npc_AQwar_collectorAI : CreatureAI
         m_updateTimer = 0; // every minute update this npc's resource, do first update instantly though
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // Update the war effort stock gobjects
         if (m_updateTimer <= diff)
@@ -838,7 +838,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (playerDetected)
         {
@@ -958,7 +958,7 @@ struct npc_infantrymanAI : ScriptedAI
         Reset();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // Once the event is activated, we want to set the home position of the unit
         // and make them move there.
@@ -1241,7 +1241,7 @@ struct npc_aqwar_cenarionhold_attackAI : ScriptedAI
 
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_waveCount == m_maxWaveCount)
             return;
@@ -1314,7 +1314,7 @@ struct MovementPath {
     float o;
 };
 
-const std::array<MovementPath, 12> saurfangGatePath {{
+std::array<MovementPath, 12> const saurfangGatePath {{
     { -7002.48f, 967.38f, 6.70f, 3.15f },
     { -7205.49f, 967.08f, 0.95f, 2.9f },
     { -7265.48f, 995.34f, 2.55f, 3.16f },
@@ -1417,7 +1417,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->IsAlive())
             return;

@@ -102,7 +102,7 @@ struct boss_ladyFaltheressAI : public ScriptedAI
         m_creature->SetDisplayId(MODEL_ID_UNDEAD);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -275,7 +275,7 @@ struct npc_belnistraszAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (HasEscortState(STATE_ESCORT_PAUSED))
         {
@@ -380,7 +380,7 @@ CreatureAI* GetAI_npc_belnistrasz(Creature* pCreature)
     return new npc_belnistraszAI(pCreature);
 }
 
-bool QuestAccept_npc_belnistrasz(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_belnistrasz(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_EXTINGUISHING_THE_IDOL)
     {
@@ -437,7 +437,7 @@ struct npc_tomb_creatureAI : public ScriptedAI
         uiWebTimer = urand(5000, 8000);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!UpdateVictim())
             return;

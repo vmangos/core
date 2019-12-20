@@ -118,8 +118,8 @@ class MANGOS_DLL_SPEC Referencable
         bool IsReferenced() const { return (m_count > 0); }
 
     private:
-        Referencable(const Referencable&);
-        Referencable& operator=(const Referencable&);
+        Referencable(Referencable const&);
+        Referencable& operator=(Referencable const&);
 
         Countable m_count;
 };
@@ -170,25 +170,25 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         // to cleanup unreferenced GridMap objects - they are too heavy
         // to destroy them dynamically, especially on highly populated servers
         // THIS METHOD IS NOT THREAD-SAFE!!!! AND IT SHOULDN'T BE THREAD-SAFE!!!!
-        void CleanUpGrids(const uint32 diff);
+        void CleanUpGrids(uint32 const diff);
 
     protected:
         friend class Map;
         // load/unload terrain data
-        GridMap* Load(const uint32 x, const uint32 y);
-        void Unload(const uint32 x, const uint32 y);
+        GridMap* Load(uint32 const x, uint32 const y);
+        void Unload(uint32 const x, uint32 const y);
 
     private:
-        TerrainInfo(const TerrainInfo&);
-        TerrainInfo& operator=(const TerrainInfo&);
+        TerrainInfo(TerrainInfo const&);
+        TerrainInfo& operator=(TerrainInfo const&);
 
-        GridMap* GetGrid(const float x, const float y);
-        GridMap* LoadMapAndVMap(const uint32 x, const uint32 y);
+        GridMap* GetGrid(float const x, float const y);
+        GridMap* LoadMapAndVMap(uint32 const x, uint32 const y);
 
-        int RefGrid(const uint32& x, const uint32& y);
-        int UnrefGrid(const uint32& x, const uint32& y);
+        int RefGrid(uint32 const& x, uint32 const& y);
+        int UnrefGrid(uint32 const& x, uint32 const& y);
 
-        const uint32 m_mapId;
+        uint32 const m_mapId;
 
         GridMap* m_GridMaps[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
         int16 m_GridRef[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
@@ -209,10 +209,10 @@ class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, 
         friend class MaNGOS::OperatorNew<TerrainManager>;
 
     public:
-        TerrainInfo* LoadTerrain(const uint32 mapId);
-        void UnloadTerrain(const uint32 mapId);
+        TerrainInfo* LoadTerrain(uint32 const mapId);
+        void UnloadTerrain(uint32 const mapId);
 
-        void Update(const uint32 diff);
+        void Update(uint32 const diff);
         void UnloadAll();
 
         // Liquid Types
@@ -245,8 +245,8 @@ class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, 
         TerrainManager();
         ~TerrainManager();
 
-        TerrainManager(const TerrainManager&);
-        TerrainManager& operator=(const TerrainManager&);
+        TerrainManager(TerrainManager const&);
+        TerrainManager& operator=(TerrainManager const&);
 
         typedef MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex>::Lock Guard;
         TerrainDataMap i_TerrainMap;

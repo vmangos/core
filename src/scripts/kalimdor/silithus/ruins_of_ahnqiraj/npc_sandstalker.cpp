@@ -40,7 +40,7 @@ struct npc_sandstalkerAI : public ScriptedAI
         LeaveVanish();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->IsInCombat())
             EnterVanish();

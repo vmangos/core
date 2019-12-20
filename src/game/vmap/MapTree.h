@@ -33,7 +33,7 @@ namespace VMAP
     {
         LocationInfo() : hitInstance(nullptr), hitModel(nullptr), ground_Z(-G3D::inf()) {};
         const ModelInstance* hitInstance;
-        const GroupModel* hitModel;
+        GroupModel const* hitModel;
         float ground_Z;
     };
 
@@ -57,7 +57,7 @@ namespace VMAP
             std::string iBasePath;
 
         private:
-            bool getIntersectionTime(const G3D::Ray& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck) const;
+            bool getIntersectionTime(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit, bool isLosCheck) const;
             // bool containsLoadedMapTile(unsigned int pTileIdent) const { return(iLoadedMapTiles.containsKey(pTileIdent)); }
         public:
             static std::string getTileFileName(uint32 mapID, uint32 tileX, uint32 tileY);
@@ -68,13 +68,13 @@ namespace VMAP
             StaticMapTree(uint32 mapID, std::string const& basePath);
             ~StaticMapTree();
 
-            bool isInLineOfSight(const G3D::Vector3& pos1, const G3D::Vector3& pos2) const;
-            ModelInstance* FindCollisionModel(const G3D::Vector3& pos1, const G3D::Vector3& pos2);
-            bool getObjectHitPos(const G3D::Vector3& pos1, const G3D::Vector3& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
-            float getHeight(const G3D::Vector3& pPos, float maxSearchDist) const;
+            bool isInLineOfSight(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2) const;
+            ModelInstance* FindCollisionModel(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2);
+            bool getObjectHitPos(G3D::Vector3 const& pos1, G3D::Vector3 const& pos2, G3D::Vector3& pResultHitPos, float pModifyDist) const;
+            float getHeight(G3D::Vector3 const& pPos, float maxSearchDist) const;
             bool getAreaInfo(G3D::Vector3& pos, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const;
             bool isUnderModel(G3D::Vector3& pos, float* outDist = nullptr, float* inDist = nullptr) const;
-            bool GetLocationInfo(const Vector3& pos, LocationInfo& info) const;
+            bool GetLocationInfo(Vector3 const& pos, LocationInfo& info) const;
 
             bool InitMap(std::string const& fname, VMapManager2* vm);
             void UnloadMap(VMapManager2* vm);

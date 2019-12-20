@@ -170,9 +170,9 @@ void TransportMgr::GeneratePath(GameObjectInfo const* goInfo, TransportTemplate*
     // last to first is always "teleport", even for closed paths
     keyFrames.back().Teleport = true;
 
-    const float speed = float(goInfo->moTransport.moveSpeed);
-    const float accel = float(goInfo->moTransport.accelRate);
-    const float accel_dist = 0.5f * speed * speed / accel;
+    float const speed = float(goInfo->moTransport.moveSpeed);
+    float const accel = float(goInfo->moTransport.accelRate);
+    float const accel_dist = 0.5f * speed * speed / accel;
 
     transport->accelTime = speed / accel;
     transport->accelDist = accel_dist;

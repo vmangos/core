@@ -81,7 +81,7 @@ struct boss_magistrate_barthilasAI : public ScriptedAI
         m_creature->SetDisplayId(MODEL_HUMAN);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_mvt_id > 0)
         {

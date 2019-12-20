@@ -250,7 +250,7 @@ struct npc_highprotectorlorikAI : public ScriptedAI
         m_uiShieldSlamTimer         = 2000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->HasAura(SPELL_RETRIBUTIONAURA))
             m_creature->CastSpell(m_creature, SPELL_RETRIBUTIONAURA, true);

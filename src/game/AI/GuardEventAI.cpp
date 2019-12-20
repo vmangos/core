@@ -21,7 +21,7 @@
 GuardEventAI::GuardEventAI(Creature* pCreature) : CreatureEventAI(pCreature)
 {}
 
-int GuardEventAI::Permissible(const Creature *creature)
+int GuardEventAI::Permissible(Creature const* creature)
 {
     if ((creature->GetAIName() == "GuardEventAI") || (creature->IsGuard() && (creature->GetAIName() == "EventAI")))
         return PERMIT_BASE_SPECIAL;
@@ -30,7 +30,7 @@ int GuardEventAI::Permissible(const Creature *creature)
 }
 
 // Returns whether the Unit is currently attacking other players or friendly npcs.
-bool GuardEventAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
+bool GuardEventAI::IsAttackingPlayerOrFriendly(Unit const* pWho) const
 {
     if (pWho->IsPvPContested())
         return true;
@@ -44,7 +44,7 @@ bool GuardEventAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
     return false;
 }
 
-void GuardEventAI::MoveInLineOfSight(Unit *pWho)
+void GuardEventAI::MoveInLineOfSight(Unit* pWho)
 {
     if (!pWho)
         return;
@@ -83,13 +83,13 @@ void GuardEventAI::MoveInLineOfSight(Unit *pWho)
     }
 }
 
-void GuardEventAI::EnterCombat(Unit *pWho)
+void GuardEventAI::EnterCombat(Unit* pWho)
 {
     CreatureEventAI::EnterCombat(pWho);
     m_creature->CallForHelp(30.0f);
 }
 
-void GuardEventAI::JustDied(Unit *pKiller)
+void GuardEventAI::JustDied(Unit* pKiller)
 {
     CreatureEventAI::JustDied(pKiller);
 

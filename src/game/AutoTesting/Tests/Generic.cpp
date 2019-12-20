@@ -96,7 +96,7 @@ public:
 class map_tester : public SingleTest
 {
 public:
-    map_tester(const char* name) : SingleTest(name)
+    map_tester(char const* name) : SingleTest(name)
     {
     }
     void LoadMap(uint32 map, float x, float y, float z)
@@ -128,7 +128,7 @@ public:
         filter.setIncludeFlags(0xF);
         filter.setExcludeFlags(NAV_STEEP_SLOPES);
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
-        const dtNavMeshQuery* navMeshQuery = mmap->GetNavMeshQuery(map);
+        dtNavMeshQuery const* navMeshQuery = mmap->GetNavMeshQuery(map);
         TEST_ASSERT(navMeshQuery);
         if (!PathInfo::FindWalkPoly(navMeshQuery, points, filter, closestPoint))
             Fail("Unable to find walk poly [%.2f %.2f %.2f map:%u]", x, y, z, map);

@@ -245,7 +245,7 @@ struct arena_szerelmesAI : public ScriptedAI
             Add->DisappearAndDie();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

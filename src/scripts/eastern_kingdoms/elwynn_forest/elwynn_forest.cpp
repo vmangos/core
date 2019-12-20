@@ -53,7 +53,7 @@ struct npc_henze_faulkAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *who) override { }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->IsStandingUp())
         {
@@ -64,7 +64,7 @@ struct npc_henze_faulkAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit *Hitter, const SpellEntry *Spellkind) override
+    void SpellHit(Unit *Hitter, SpellEntry const* Spellkind) override
     {
         if (Spellkind->Id == 8593 && !spellHit)
         {
@@ -101,7 +101,7 @@ struct go_marshal_haggards_chestAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {

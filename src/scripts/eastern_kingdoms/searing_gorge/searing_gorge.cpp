@@ -132,7 +132,7 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
             pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -146,7 +146,7 @@ CreatureAI* GetAI_npc_dorius_stonetender(Creature* pCreature)
     return new npc_dorius_stonetenderAI(pCreature);
 }
 
-bool QuestAccept_npc_dorius_stonetender(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_dorius_stonetender(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_SUNTARA_STONES)
     {
@@ -248,7 +248,7 @@ struct npc_obsidionAI : public ScriptedAI
         Reset();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_IsEventRunning)
             return;
@@ -336,7 +336,7 @@ bool GossipHello_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature)
 }
 
 
-bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_RISE_OBSIDION)
     {

@@ -61,7 +61,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         bAshbringer = false;
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == 28441 && !bAshbringer && pCaster && me->IsWithinLOSInMap(pCaster))
         {
@@ -73,7 +73,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

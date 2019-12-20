@@ -243,10 +243,10 @@ void DynamicObject::Delay(int32 delaytime)
     m_aliveDuration -= delaytime;
     for (AffectedMap::iterator iter = m_affected.begin(); iter != m_affected.end();)
     {
-        Unit *target = GetMap()->GetUnit(iter->first);
+        Unit* target = GetMap()->GetUnit(iter->first);
         if (target)
         {
-            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
+            SpellAuraHolder* holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
             if (!holder)
             {
                 ++iter;

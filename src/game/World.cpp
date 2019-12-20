@@ -1924,7 +1924,7 @@ void World::Update(uint32 diff)
     if (m_timers[WUPDATE_GROUPS].Passed())
     {
         m_timers[WUPDATE_GROUPS].Reset();
-        if (const uint32 delay = getConfig(CONFIG_UINT32_GROUP_OFFLINE_LEADER_DELAY))
+        if (uint32 const delay = getConfig(CONFIG_UINT32_GROUP_OFFLINE_LEADER_DELAY))
         {
             for (ObjectMgr::GroupMap::const_iterator i = sObjectMgr.GetGroupMapBegin(); i != sObjectMgr.GetGroupMapEnd(); ++i)
                 i->second->UpdateOfflineLeader(m_gameTime, delay);
@@ -2092,7 +2092,7 @@ void World::SendWorldText(int32 string_id, ...)
     va_end(ap);
 }
 
-void World::SendGMTicketText(const char* text)
+void World::SendGMTicketText(char const* text)
 {
     for (const auto& itr : m_sessions)
     {
@@ -2159,7 +2159,7 @@ void World::SendGMText(int32 string_id, ...)
 }
 
 /// DEPRICATED, only for debug purpose. Send a System Message to all players (except self if mentioned)
-void World::SendGlobalText(const char* text, WorldSession *self)
+void World::SendGlobalText(char const* text, WorldSession* self)
 {
     WorldPacket data;
 
@@ -2198,7 +2198,7 @@ void World::SendZoneMessage(uint32 zone, WorldPacket* packet, WorldSession* self
 }
 
 /// Send a System Message to all players in the zone (except self if mentioned)
-void World::SendZoneText(uint32 zone, const char* text, WorldSession *self, uint32 team)
+void World::SendZoneText(uint32 zone, char const* text, WorldSession* self, uint32 team)
 {
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, text);
@@ -2227,7 +2227,7 @@ void World::KickAllLess(AccountTypes sec)
                 session->KickPlayer();
 }
 
-void World::WarnAccount(uint32 accountId, std::string from, std::string reason, const char* type)
+void World::WarnAccount(uint32 accountId, std::string from, std::string reason, char const* type)
 {
     LoginDatabase.escape_string(from);
     reason = std::string(type) + ": " + reason;
@@ -2536,7 +2536,7 @@ void World::ShutdownCancel()
 }
 
 /// Send a server message to the user(s)
-void World::SendServerMessage(ServerMessageType type, const char *text, Player* player)
+void World::SendServerMessage(ServerMessageType type, char const* text, Player* player)
 {
     WorldPacket data(SMSG_SERVER_MESSAGE, 50);              // guess size
     data << uint32(type);
@@ -2593,7 +2593,7 @@ void World::UpdateSessions(uint32 diff)
         next = itr;
         ++next;
         ///- and remove not active sessions from the list
-        WorldSession * pSession = itr->second;
+        WorldSession* pSession = itr->second;
         WorldSessionFilter updater(pSession);
 
         if (!pSession->Update(updater))
@@ -2611,7 +2611,7 @@ void World::UpdateSessions(uint32 diff)
     {
         next = itr;
         ++next;
-        WorldSession * pSession = *itr;
+        WorldSession* pSession = *itr;
 
         if (!pSession->UpdateDisconnected(diff))
         {
@@ -2658,11 +2658,11 @@ void World::UpdateRealmCharCount(uint32 accountId)
                                   "SELECT COUNT(guid) FROM characters WHERE account = '%u'", accountId);
 }
 
-void World::_UpdateRealmCharCount(QueryResult *resultCharCount, uint32 accountId)
+void World::_UpdateRealmCharCount(QueryResult* resultCharCount, uint32 accountId)
 {
     if (resultCharCount)
     {
-        Field *fields = resultCharCount->Fetch();
+        Field* fields = resultCharCount->Fetch();
         uint32 charCount = fields[0].GetUInt32();
         delete resultCharCount;
 
@@ -2875,7 +2875,7 @@ void World::SetSessionDisconnected(WorldSession* sess)
     m_disconnectedSessions.insert(sess);
 }
 
-void World::LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, const char* type, uint32 dataInt)
+void World::LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount, char const* type, uint32 dataInt)
 {
     if (!LogsDatabase || !sWorld.getConfig(CONFIG_BOOL_LOGSDB_TRADES))
         return;
@@ -2891,7 +2891,7 @@ void World::LogMoneyTrade(ObjectGuid sender, ObjectGuid receiver, uint32 amount,
     logStmt.Execute();
 }
 
-void World::LogCharacter(Player* character, const char* action)
+void World::LogCharacter(Player* character, char const* action)
 {
     if (!LogsDatabase || !sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHARACTERS))
         return;
@@ -2908,7 +2908,7 @@ void World::LogCharacter(Player* character, const char* action)
     logStmt.Execute();
 }
 
-void World::LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, const char* action)
+void World::LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& charName, char const* action)
 {
     if (!LogsDatabase || !sWorld.getConfig(CONFIG_BOOL_LOGSDB_CHARACTERS))
         return;
@@ -2925,7 +2925,7 @@ void World::LogCharacter(WorldSession* sess, uint32 lowGuid, std::string const& 
     logStmt.Execute();
 }
 
-void World::LogChat(WorldSession* sess, const char* type, std::string const& msg, PlayerPointer target, uint32 chanId, const char* chanStr)
+void World::LogChat(WorldSession* sess, char const* type, std::string const& msg, PlayerPointer target, uint32 chanId, char const* chanStr)
 {
     ASSERT(sess);
     PlayerPointer plr = sess->GetPlayerPointer();

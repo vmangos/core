@@ -59,13 +59,13 @@ struct boss_thebeastAI : public ScriptedAI
         m_uiFireBlastTimer      = urand(8000, 11000);
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Effect[0] == SPELL_EFFECT_SKINNING)
             pCaster->CastSpell(pCaster, SPELL_SUMMON_FINKLE, true);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->HasAura(AURA_IMMOLATE))
             m_creature->CastSpell(m_creature, AURA_IMMOLATE, true);

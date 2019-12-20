@@ -119,7 +119,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry *auction)
         return;
 
     ObjectGuid bidder_guid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
-    Player *bidder = sObjectMgr.GetPlayer(bidder_guid);
+    Player* bidder = sObjectMgr.GetPlayer(bidder_guid);
 
     uint32 bidder_accId = 0;
 
@@ -202,7 +202,7 @@ void AuctionHouseMgr::SendAuctionWonMail(AuctionEntry *auction)
 void AuctionHouseMgr::SendAuctionSuccessfulMail(AuctionEntry * auction)
 {
     ObjectGuid owner_guid = ObjectGuid(HIGHGUID_PLAYER, auction->owner);
-    Player *owner = sObjectMgr.GetPlayer(owner_guid);
+    Player* owner = sObjectMgr.GetPlayer(owner_guid);
 
     uint32 owner_accId = 0;
     if (!owner)
@@ -250,7 +250,7 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry * auction)
     }
 
     ObjectGuid owner_guid = ObjectGuid(HIGHGUID_PLAYER, auction->owner);
-    Player *owner = sObjectMgr.GetPlayer(owner_guid);
+    Player* owner = sObjectMgr.GetPlayer(owner_guid);
 
     uint32 owner_accId = 0;
     if (!owner)
@@ -347,7 +347,7 @@ void AuctionHouseMgr::LoadAuctionHouses()
 void AuctionHouseMgr::LoadAuctionItems()
 {
     //               0                1      2         3        4      5             6                 7           8           9       10       11
-    QueryResult *result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, itemguid, itemEntry FROM auction JOIN item_instance ON itemguid = guid");
+    QueryResult* result = CharacterDatabase.Query("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, itemguid, itemEntry FROM auction JOIN item_instance ON itemguid = guid");
 
     if (!result)
     {
@@ -362,7 +362,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
     uint32 count = 0;
 
-    Field *fields;
+    Field* fields;
     do
     {
         bar.step();
@@ -371,7 +371,7 @@ void AuctionHouseMgr::LoadAuctionItems()
         uint32 item_guid        = fields[10].GetUInt32();
         uint32 item_template    = fields[11].GetUInt32();
 
-        ItemPrototype const *proto = ObjectMgr::GetItemPrototype(item_template);
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_template);
 
         if (!proto)
         {
@@ -399,7 +399,7 @@ void AuctionHouseMgr::LoadAuctionItems()
 
 void AuctionHouseMgr::LoadAuctions()
 {
-    QueryResult *result = CharacterDatabase.Query("SELECT COUNT(*) FROM auction");
+    QueryResult* result = CharacterDatabase.Query("SELECT COUNT(*) FROM auction");
     if (!result)
     {
         BarGoLink bar(1);
@@ -409,7 +409,7 @@ void AuctionHouseMgr::LoadAuctions()
         return;
     }
 
-    Field *fields = result->Fetch();
+    Field* fields = result->Fetch();
     uint32 AuctionCount = fields[0].GetUInt32();
     delete result;
 
@@ -774,7 +774,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
             continue;
 
         {
-            ItemPrototype const *proto = item->GetProto();
+            ItemPrototype const* proto = item->GetProto();
 
             if (query.auctionMainCategory != 0xffffffff && proto->Class != query.auctionMainCategory)
                 continue;
@@ -811,7 +811,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                     continue;
 
                 int32 propertyId = item->GetItemRandomPropertyId();
-                const ItemRandomPropertiesEntry* randomProperty = nullptr;
+                ItemRandomPropertiesEntry const* randomProperty = nullptr;
                 if (propertyId > 0)
                      randomProperty = sItemRandomPropertiesStore.LookupEntry(static_cast<uint32>(propertyId));
 
@@ -833,7 +833,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
 }
 
 // this function inserts to WorldPacket auction's data
-bool AuctionEntry::BuildAuctionInfo(WorldPacket & data) const
+bool AuctionEntry::BuildAuctionInfo(WorldPacket& data) const
 {
     Item *pItem = sAuctionMgr.GetAItem(itemGuidLow);
     if (!pItem)

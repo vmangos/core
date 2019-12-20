@@ -1070,7 +1070,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-void instance_naxxramas::Load(const char* chrIn)
+void instance_naxxramas::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -1180,7 +1180,7 @@ void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList
     }
 }
 
-bool instance_naxxramas::IsInRightSideGothArea(const Unit* pUnit)
+bool instance_naxxramas::IsInRightSideGothArea(Unit const* pUnit)
 {
     if (GameObject* pCombatGate = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
         return (pCombatGate->GetPositionY() >= pUnit->GetPositionY());
@@ -1374,7 +1374,7 @@ InstanceData* GetInstanceData_instance_naxxramas(Map* pMap)
     return new instance_naxxramas(pMap);
 }
 
-void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt)
+void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     switch (pAt->id)
     {
@@ -1423,7 +1423,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
     }
 }
 
-bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_naxxramas(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
         return false;
@@ -1471,7 +1471,7 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
         DespawnPortal();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1569,7 +1569,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1613,7 +1613,7 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
     void ChangeColor()
     {
         uint32 spell = urand(28987, 28990);
-        if(const SpellEntry* entry = sSpellMgr.GetSpellEntry(spell))
+        if(SpellEntry const* entry = sSpellMgr.GetSpellEntry(spell))
             m_creature->UpdateEntry(entry->EffectMiscValue[0]);
         if (prev_spell)
             m_creature->RemoveAurasDueToSpell(prev_spell);
@@ -1633,7 +1633,7 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
         m_creature->CallForHelp(10.0f);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1674,7 +1674,7 @@ struct mob_toxic_tunnelAI : public ScriptedAI
             _evadeTimer = 5000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!!_evadeTimer)
         {
@@ -1734,7 +1734,7 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

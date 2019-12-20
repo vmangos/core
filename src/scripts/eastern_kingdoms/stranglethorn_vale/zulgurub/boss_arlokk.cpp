@@ -201,7 +201,7 @@ struct boss_arlokkAI : public ScriptedAI
         EnterEvadeMode();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -333,7 +333,7 @@ struct boss_arlokkAI : public ScriptedAI
                 // Transformation en panthere
                 m_creature->CastSpell(m_creature, SPELL_PANTHER_TRANSFORM, false);
                 m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.7f);
-                const CreatureInfo *cinfo = m_creature->GetCreatureInfo();
+                CreatureInfo const *cinfo = m_creature->GetCreatureInfo();
                 m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, (cinfo->dmg_min + ((cinfo->dmg_min / 100) * 35)));
                 m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, (cinfo->dmg_max + ((cinfo->dmg_max / 100) * 35)));
                 m_creature->UpdateDamagePhysical(BASE_ATTACK);
@@ -407,7 +407,7 @@ struct mob_prowlerAI : public ScriptedAI
             pArlokkAI->m_uiSummonCount--;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiUpdateTarget_Timer <= uiDiff)
         {

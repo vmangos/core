@@ -36,7 +36,7 @@ struct boss_lordblackwoodAI : public ScriptedAI
         MultiShot_Timer = 1000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

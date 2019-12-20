@@ -67,7 +67,7 @@ enum eSpell
     SPELL_SUM_GUARD_SW2 = 29268,
 };
 
-static const uint32 ChampionSpells[10] =
+static uint32 const ChampionSpells[10] =
 {
     //g1
     SPELL_SUM_CHAMP_SW1,
@@ -84,9 +84,9 @@ static const uint32 ChampionSpells[10] =
     SPELL_SUM_CHAMP_NE2,
 };
 
-static const uint8 g1_start = 0, g1_size = 4;
-static const uint8 g2_start = 4, g2_size = 4;
-static const uint8 g3_start = 8, g3_size = 2;
+static uint8 const g1_start = 0, g1_size = 4;
+static uint8 const g2_start = 4, g2_size = 4;
+static uint8 const g3_start = 8, g3_size = 2;
 
 enum eScriptText
 {
@@ -391,7 +391,7 @@ struct boss_nothAI : public ScriptedAI
         if (isOnBalc && uiDamage > 0)
             uiDamage = 0;
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!isOnBalc)
         {

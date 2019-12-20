@@ -95,7 +95,7 @@ struct boss_golemaggAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GOLEMAGG, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -181,7 +181,7 @@ struct mob_core_ragerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

@@ -72,7 +72,7 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
     DEBUG_LOG("WORLD: Received CMSG_GUILD_INVITE");
 
     std::string Invitedname, plname;
-    Player * player = nullptr;
+    Player* player = nullptr;
 
     recvPacket >> Invitedname;
 
@@ -202,7 +202,7 @@ void WorldSession::HandleGuildRemoveOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildAcceptOpcode(WorldPacket& /*recvPacket*/)
 {
     Guild *guild;
-    Player *player = GetPlayer();
+    Player* player = GetPlayer();
 
     DEBUG_LOG("WORLD: Received CMSG_GUILD_ACCEPT");
 
@@ -442,7 +442,7 @@ void WorldSession::HandleGuildLeaderOpcode(WorldPacket& recvPacket)
     std::string name;
     recvPacket >> name;
 
-    Player *oldLeader = GetPlayer();
+    Player* oldLeader = GetPlayer();
 
     if (!normalizePlayerName(name))
         return;
@@ -727,7 +727,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     recvPacket >> vendorGuid;
     recvPacket >> EmblemStyle >> EmblemColor >> BorderStyle >> BorderColor >> BackgroundColor;
 
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!pCreature)
     {
         //[-ZERO] fails silently, not "That's not an emblem vendor!"

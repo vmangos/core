@@ -38,7 +38,7 @@ void CritterAI::DamageTaken(Unit* pWho, uint32& uiDamage)
     }
 }
 
-void CritterAI::SpellHit(Unit* pWho, const SpellEntry* pSpell)
+void CritterAI::SpellHit(Unit* pWho, SpellEntry const* pSpell)
 {
     if (!pSpell->IsPositiveSpell())
     {
@@ -48,7 +48,7 @@ void CritterAI::SpellHit(Unit* pWho, const SpellEntry* pSpell)
     }
 }
 
-void CritterAI::UpdateAI(const uint32 diff)
+void CritterAI::UpdateAI(uint32 const diff)
 {
     if (m_creature->IsInCombat())
     {

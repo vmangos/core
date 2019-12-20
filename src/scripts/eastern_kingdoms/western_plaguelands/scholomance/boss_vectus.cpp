@@ -90,7 +90,7 @@ struct boss_vectusAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Chakor@Nostalrius : Event Du Gambit
         if (!eventGambitDone)
@@ -225,7 +225,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
 
     void Reset() override {}
 
-    void SpellHit(Unit *pCaster, const SpellEntry *pSpell) override
+    void SpellHit(Unit *pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT)
         {

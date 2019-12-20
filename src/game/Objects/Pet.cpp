@@ -117,7 +117,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
 
     uint32 ownerid = owner->GetGUIDLow();
 
-    //QueryResult *result;
+    //QueryResult* result;
 
     if (petnumber)
     {
@@ -160,7 +160,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         return false;
     }
 
-    //Field *fields = result->Fetch();
+    //Field* fields = result->Fetch();
 
     // update for case of current pet "slot = 0"
     petentry = m_pTmpCache->entry;
@@ -171,7 +171,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         return false;
     }
 
-    CreatureInfo const *creatureInfo = ObjectMgr::GetCreatureTemplate(petentry);
+    CreatureInfo const* creatureInfo = ObjectMgr::GetCreatureTemplate(petentry);
     if (!creatureInfo)
     {
         sLog.outError("Pet entry %u does not exist but used at pet load (owner: %s).", petentry, owner->GetGuidStr().c_str());
@@ -223,7 +223,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         m_movementInfo.t_pos.z = owner->m_movementInfo.t_pos.z;
     }
 
-    Map *map = owner->GetMap();
+    Map* map = owner->GetMap();
     CreatureCreatePos pos(owner, owner->GetOrientation(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
     uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_PET);
@@ -248,7 +248,7 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
     SetUInt32Value(UNIT_CREATED_BY_SPELL, summon_spell_id);
 
     // reget for sure use real creature info selected for Pet at load/creating
-    CreatureInfo const *cinfo = GetCreatureInfo();
+    CreatureInfo const* cinfo = GetCreatureInfo();
     if (cinfo->type == CREATURE_TYPE_CRITTER)
     {
         AIM_Initialize();
@@ -645,7 +645,7 @@ void Pet::SetDeathState(DeathState s)                       // overwrite virtual
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
 
         //lose happiness when died and not in BG
-        const MapEntry *mapEntry = GetMap()->GetMapEntry();
+        MapEntry const* mapEntry = GetMap()->GetMapEntry();
         if (!mapEntry || (mapEntry->mapType != MAP_BATTLEGROUND))
             ModifyPower(POWER_HAPPINESS, -HAPPINESS_LEVEL_SIZE);
 
@@ -1106,7 +1106,7 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= nullptr*/)
             {
                 //returning of reagents only for players, so best done here
                 uint32 spellId = GetUInt32Value(UNIT_CREATED_BY_SPELL);
-                SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
                 if (spellInfo)
                 {
@@ -1153,7 +1153,7 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= nullptr*/)
             {
                 // Alert summoner that we're about to despawn. Do it before we clear
                 // the guardian ref, so it can still be utilized if necessary
-                if (Creature *creature = owner->ToCreature())
+                if (Creature* creature = owner->ToCreature())
                 {
                     if (creature->AI())
                         creature->AI()->SummonedCreatureDespawn(this);
@@ -1178,13 +1178,13 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= nullptr*/)
 
     // If we're being possessed, remove the possesion. If we don't, and the caster
     // is a player, they are left with a dangling pointer for Player::m_mover
-    if (Unit *possessor = GetUnit(*this, GetPossessorGuid()))
+    if (Unit* possessor = GetUnit(*this, GetPossessorGuid()))
     {
         // Remove any auras due to the spell if they exist
         if (uint32 spellId = GetUInt32Value(UNIT_CREATED_BY_SPELL))
             possessor->RemoveAurasDueToSpell(spellId);
 
-        if (Player *pPlayerPossessor = possessor->ToPlayer())
+        if (Player* pPlayerPossessor = possessor->ToPlayer())
             pPlayerPossessor->ModPossessPet(this, false, AURA_REMOVE_BY_DEFAULT);
     }
 
@@ -1276,7 +1276,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     if (!Create(guid, pos, creature->GetCreatureInfo(), pet_number))
         return false;
 
-    CreatureInfo const *cinfo = GetCreatureInfo();
+    CreatureInfo const* cinfo = GetCreatureInfo();
     if (!cinfo)
     {
         sLog.outError("CreateBaseAtCreature() failed, creatureInfo is missing!");
@@ -1326,7 +1326,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
 
 bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 {
-    CreatureInfo const *cinfo = GetCreatureInfo();
+    CreatureInfo const* cinfo = GetCreatureInfo();
     MANGOS_ASSERT(cinfo);
 
     if (!owner)
@@ -1565,7 +1565,7 @@ void Pet::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
         if (itr->second.state == PETSPELL_REMOVED)
             continue;
         uint32 unSpellId = itr->first;
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(unSpellId);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(unSpellId);
         if (!spellInfo)
         {
             MANGOS_ASSERT(spellInfo);
@@ -1590,7 +1590,7 @@ void Pet::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
 
 void Pet::_LoadSpellCooldowns()
 {
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT spell,time FROM pet_spell_cooldown WHERE guid = '%u'",m_charmInfo->GetPetNumber());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT spell,time FROM pet_spell_cooldown WHERE guid = '%u'",m_charmInfo->GetPetNumber());
 
     if (m_pTmpCache)
     {
@@ -1603,7 +1603,7 @@ void Pet::_LoadSpellCooldowns()
 
         for (PetSpellCDs::iterator it = m_pTmpCache->spellCooldown.begin(); it != m_pTmpCache->spellCooldown.end(); ++it)
         {
-            //Field *fields = result->Fetch();
+            //Field* fields = result->Fetch();
 
             uint32 spell_id = it->spell;//fields[0].GetUInt32();
             time_t db_time  = (time_t)it->time;//fields[1].GetUInt64();
@@ -1678,13 +1678,13 @@ void Pet::_SaveSpellCooldowns()
 
 void Pet::_LoadSpells()
 {
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT spell,active FROM pet_spell WHERE guid = '%u'",m_charmInfo->GetPetNumber());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT spell,active FROM pet_spell WHERE guid = '%u'",m_charmInfo->GetPetNumber());
 
     if (m_pTmpCache)
     {
         for (PetSpells::iterator it = m_pTmpCache->spells.begin(); it != m_pTmpCache->spells.end(); ++it)
         {
-            //Field *fields = result->Fetch();
+            //Field* fields = result->Fetch();
             AddSpell(it->spell, ActiveStates(it->active), PETSPELL_UNCHANGED);
         }
         //while (result->NextRow());
@@ -1755,7 +1755,7 @@ void Pet::_LoadAuras(uint32 timediff)
     for (int i = UNIT_FIELD_AURA; i <= UNIT_FIELD_AURASTATE; ++i)
         SetUInt32Value(i, 0);
 
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM pet_aura WHERE guid = '%u'",m_charmInfo->GetPetNumber());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM pet_aura WHERE guid = '%u'",m_charmInfo->GetPetNumber());
     if (m_pTmpCache)
     {
         for (PetAuras::iterator it = m_pTmpCache->auras.begin(); it != m_pTmpCache->auras.end(); ++it)
@@ -1808,7 +1808,7 @@ void Pet::_LoadAuras(uint32 timediff)
             else if (!stackcount)
                 stackcount = 1;
 
-            SpellAuraHolder *holder = CreateSpellAuraHolder(spellproto, this, nullptr, nullptr);
+            SpellAuraHolder* holder = CreateSpellAuraHolder(spellproto, this, nullptr, nullptr);
             holder->SetLoadedState(casterGuid, ObjectGuid(HIGHGUID_ITEM, item_lowguid), stackcount, remaincharges, maxduration, remaintime);
 
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -1860,7 +1860,7 @@ void Pet::_SaveAuras()
 
     for (SpellAuraHolderMap::const_iterator itr = auraHolders.begin(); itr != auraHolders.end(); ++itr)
     {
-        SpellAuraHolder *holder = itr->second;
+        SpellAuraHolder* holder = itr->second;
 
         bool save = true;
         for (int32 j = 0; j < MAX_EFFECT_INDEX; ++j)
@@ -1888,7 +1888,7 @@ void Pet::_SaveAuras()
                 damage[i] = 0;
                 periodicTime[i] = 0;
 
-                if (Aura *aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
+                if (Aura* aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i)))
                 {
                     // don't save not own area auras
                     if (aur->IsAreaAura() && holder->GetCasterGuid() != GetObjectGuid())
@@ -1945,7 +1945,7 @@ void Pet::_SaveAuras()
 
 bool Pet::AddSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpellState state /*= PETSPELL_NEW*/, PetSpellType type /*= PETSPELL_NORMAL*/)
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spell_id);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell_id);
     if (!spellInfo)
     {
         // do pet spell book cleanup
@@ -2129,7 +2129,7 @@ void Pet::InitPetCreateSpells()
             if (!CreateSpells->spellid[i])
                 break;
 
-            SpellEntry const *learn_spellproto = sSpellMgr.GetSpellEntry(CreateSpells->spellid[i]);
+            SpellEntry const* learn_spellproto = sSpellMgr.GetSpellEntry(CreateSpells->spellid[i]);
             if (!learn_spellproto)
                 continue;
 

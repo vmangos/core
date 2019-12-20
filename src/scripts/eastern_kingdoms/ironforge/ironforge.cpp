@@ -147,14 +147,14 @@ public:
         }
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_KNOCK_AWAY)
             if (m_creature->GetThreatManager().getThreat(pTarget))
                 m_creature->GetThreatManager().modifyThreatPercent(pTarget, -25);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

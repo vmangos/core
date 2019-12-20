@@ -23,7 +23,7 @@
 #include "Player.h"
 #include "World.h"
 
-Quest::Quest(Field * questRecord)
+Quest::Quest(Field* questRecord)
 {
     QuestId = questRecord[0].GetUInt32();
     QuestMethod = questRecord[1].GetUInt32();
@@ -170,7 +170,7 @@ Quest::Quest(Field * questRecord)
     }
 }
 
-uint32 Quest::XPValue(Player *pPlayer) const
+uint32 Quest::XPValue(Player* pPlayer) const
 {
     if (pPlayer)
     {

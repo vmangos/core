@@ -143,7 +143,7 @@ void npc_reginald_windsorAI::SituationFinale()
     }
 }
 
-void npc_reginald_windsorAI::UpdateAI_corpse(const uint32 uiDiff)
+void npc_reginald_windsorAI::UpdateAI_corpse(uint32 const uiDiff)
 {
     if (PhaseFinale == false)
         return;
@@ -242,13 +242,13 @@ void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
     }
 }
 
-void npc_reginald_windsorAI::SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpellEntry)
+void npc_reginald_windsorAI::SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry)
 {
     if (pSpellEntry->Id == SPELL_WINDSOR_DEATH)
         m_creature->SetFeignDeath(true);
 }
 
-void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
+void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
 {
     // in case of idle / afk players
     if (m_uiDespawnTimer < uiDiff)
@@ -761,7 +761,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
         Timer -= uiDiff;
 }
 
-bool QuestAccept_npc_reginald_windsor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_reginald_windsor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_THE_GREAT_MASQUERADE)
     {
@@ -858,7 +858,7 @@ void npc_squire_roweAI::MovementInform(uint32 uiType, uint32 uiPointId)
     }
 }
 
-void npc_squire_roweAI::UpdateAI(const uint32 uiDiff)
+void npc_squire_roweAI::UpdateAI(uint32 const uiDiff)
 {
     if (m_bEventProcessed)
     {

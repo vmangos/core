@@ -29,7 +29,7 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 
-int TotemAI::Permissible(const Creature *creature)
+int TotemAI::Permissible(Creature const* creature)
 {
     if (creature->IsTotem())
         return PERMIT_BASE_PROACTIVE;
@@ -37,7 +37,7 @@ int TotemAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature *pCreature) : CreatureAI(pCreature)
+TotemAI::TotemAI(Creature* pCreature) : CreatureAI(pCreature)
 {
     pCreature->AddUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
 
@@ -63,7 +63,7 @@ TotemAI::TotemAI(Creature *pCreature) : CreatureAI(pCreature)
     }
 }
 
-void TotemAI::UpdateAI(const uint32 /*diff*/)
+void TotemAI::UpdateAI(uint32 const /*diff*/)
 {
     if (m_totemType != TOTEM_ACTIVE)
         return;
@@ -71,7 +71,7 @@ void TotemAI::UpdateAI(const uint32 /*diff*/)
     if (!m_creature->IsAlive() || m_creature->IsNonMeleeSpellCasted(false))
         return;
 
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(m_spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(m_spellId);
     if (!spellInfo)
         return;
 

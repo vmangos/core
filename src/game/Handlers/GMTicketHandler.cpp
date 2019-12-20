@@ -30,7 +30,7 @@
 #include "SpellAuras.h"
 #include "World.h"
 
-void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket& /*recv_data*/)
 {
     SendQueryTimeResponse();
 
@@ -45,7 +45,7 @@ void WorldSession::HandleGMTicketGetTicketOpcode(WorldPacket & /*recv_data*/)
         sTicketMgr->SendTicket(this, nullptr);
 }
 
-void WorldSession::HandleGMTicketUpdateTextOpcode(WorldPacket & recv_data)
+void WorldSession::HandleGMTicketUpdateTextOpcode(WorldPacket& recv_data)
 {
     uint8 type;
     std::string ticketText;
@@ -75,7 +75,7 @@ void WorldSession::HandleGMTicketUpdateTextOpcode(WorldPacket & recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleGMTicketDeleteTicketOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketDeleteTicketOpcode(WorldPacket& /*recv_data*/)
 {
     if (GmTicket* ticket = sTicketMgr->GetTicketByPlayer(GetPlayer()->GetGUID()))
     {
@@ -145,7 +145,7 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
     SendPacket(&data);
 }
 
-void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket & /*recv_data*/)
+void WorldSession::HandleGMTicketSystemStatusOpcode(WorldPacket& /*recv_data*/)
 {
     // Note: This only disables the ticket UI at client side and is not fully reliable
     // are we sure this is a uint32? Should ask Zor

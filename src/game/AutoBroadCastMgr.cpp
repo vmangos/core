@@ -36,7 +36,7 @@ void AutoBroadCastMgr::load()
     uint32 count = 0;
     BarGoLink bar(result->GetRowCount());
 
-    Field *fields;
+    Field* fields;
     do
     {
         bar.step();

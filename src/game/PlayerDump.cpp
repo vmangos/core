@@ -129,7 +129,7 @@ std::string gettablename(std::string &str)
     return str.substr(s, e - s);
 }
 
-bool changenth(std::string &str, int n, const char *with, bool insert = false, bool nonzero = false)
+bool changenth(std::string &str, int n, char const* with, bool insert = false, bool nonzero = false)
 {
     std::string::size_type s, e;
     if (!findnth(str, n, s, e))
@@ -154,7 +154,7 @@ std::string getnth(std::string &str, int n)
     return str.substr(s, e - s);
 }
 
-bool changetoknth(std::string &str, int n, const char *with, bool insert = false, bool nonzero = false)
+bool changetoknth(std::string &str, int n, char const* with, bool insert = false, bool nonzero = false)
 {
     std::string::size_type s = 0, e = 0;
     if (!findtoknth(str, n, s, e))
@@ -169,7 +169,7 @@ bool changetoknth(std::string &str, int n, const char *with, bool insert = false
     return true;
 }
 
-uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32> &guidMap, uint32 hiGuid)
+uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32>& guidMap, uint32 hiGuid)
 {
     std::map<uint32, uint32>::const_iterator itr = guidMap.find(oldGuid);
     if (itr != guidMap.end())
@@ -180,7 +180,7 @@ uint32 registerNewGuid(uint32 oldGuid, std::map<uint32, uint32> &guidMap, uint32
     return newguid;
 }
 
-bool changeGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, uint32 hiGuid, bool nonzero = false)
+bool changeGuid(std::string &str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
     uint32 oldGuid = atoi(getnth(str, n).c_str());
@@ -193,7 +193,7 @@ bool changeGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, uint
     return changenth(str, n, chritem, false, nonzero);
 }
 
-bool changetokGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, uint32 hiGuid, bool nonzero = false)
+bool changetokGuid(std::string &str, int n, std::map<uint32, uint32>& guidMap, uint32 hiGuid, bool nonzero = false)
 {
     char chritem[20];
     uint32 oldGuid = atoi(gettoknth(str, n).c_str());
@@ -206,14 +206,14 @@ bool changetokGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, u
     return changetoknth(str, n, chritem, false, nonzero);
 }
 
-std::string CreateDumpString(char const* tableName, QueryResult *result)
+std::string CreateDumpString(char const* tableName, QueryResult* result)
 {
     if (!tableName || !result)
         return "";
 
     std::ostringstream ss;
     ss << "INSERT INTO " << _TABLE_SIM_ << tableName << _TABLE_SIM_ << " VALUES (";
-    Field *fields = result->Fetch();
+    Field* fields = result->Fetch();
     for (uint32 i = 0; i < result->GetFieldCount(); ++i)
     {
         if (i != 0)
@@ -262,7 +262,7 @@ std::string PlayerDumpWriter::GenerateWhereStr(char const* field, GUIDs const& g
     return wherestr.str();
 }
 
-void StoreGUID(QueryResult *result, uint32 field, std::set<uint32>& guids)
+void StoreGUID(QueryResult* result, uint32 field, std::set<uint32>& guids)
 {
     Field* fields = result->Fetch();
     uint32 guid = fields[field].GetUInt32();
@@ -270,7 +270,7 @@ void StoreGUID(QueryResult *result, uint32 field, std::set<uint32>& guids)
         guids.insert(guid);
 }
 
-void StoreGUID(QueryResult *result, uint32 data, uint32 field, std::set<uint32>& guids)
+void StoreGUID(QueryResult* result, uint32 data, uint32 field, std::set<uint32>& guids)
 {
     Field* fields = result->Fetch();
     std::string dataStr = fields[data].GetCppString();
@@ -340,7 +340,7 @@ void PlayerDumpWriter::DumpTableContent(std::string& dump, uint32 guid, char con
         else                                                // not set case, get single guid string
             wherestr = GenerateWhereStr(fieldname, guid);
 
-        QueryResult *result = CharacterDatabase.PQuery("SELECT * FROM %s WHERE %s", tableFrom, wherestr.c_str());
+        QueryResult* result = CharacterDatabase.PQuery("SELECT * FROM %s WHERE %s", tableFrom, wherestr.c_str());
         if (!result)
             return;
 
@@ -451,7 +451,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     if (!fin)
         return DUMP_FILE_OPEN_ERROR;
 
-    QueryResult * result = nullptr;
+    QueryResult* result = nullptr;
     char newguid[20], chraccount[20], newpetid[20], currpetid[20], lastpetid[20];
 
     // make sure the same guid doesn't already exist and is safe to use

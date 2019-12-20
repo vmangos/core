@@ -171,7 +171,7 @@ struct boss_dathrohan_balnazzarAI : public ScriptedAI
         m_creature->MonsterYell("Today you have unmade what took me years to create! For this you shall all die by my hand!");
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;

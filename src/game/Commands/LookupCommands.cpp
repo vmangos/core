@@ -45,7 +45,7 @@ bool ChatHandler::HandleListObjectCommand(char* args)
         return false;
     }
 
-    GameObjectInfo const * gInfo = ObjectMgr::GetGameObjectInfo(go_id);
+    GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(go_id);
     if (!gInfo)
     {
         PSendSysMessage(LANG_COMMAND_LISTOBJINVALIDID, go_id);
@@ -57,7 +57,7 @@ bool ChatHandler::HandleListObjectCommand(char* args)
     if (!ExtractOptUInt32(&args, count, 10))
         return false;
 
-    QueryResult *result;
+    QueryResult* result;
 
     uint32 obj_count = 0;
     result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM gameobject WHERE id='%u'", go_id);
@@ -81,7 +81,7 @@ bool ChatHandler::HandleListObjectCommand(char* args)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 guid = fields[0].GetUInt32();
             float x = fields[1].GetFloat();
             float y = fields[2].GetFloat();
@@ -128,7 +128,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
     if (!ExtractOptUInt32(&args, count, 10))
         return false;
 
-    QueryResult *result;
+    QueryResult* result;
 
     uint32 cr_count = 0;
     result = WorldDatabase.PQuery("SELECT COUNT(guid) FROM creature WHERE id='%u'", cr_id);
@@ -152,7 +152,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 guid = fields[0].GetUInt32();
             float x = fields[1].GetFloat();
             float y = fields[2].GetFloat();
@@ -175,13 +175,13 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
 
 void ChatHandler::ShowItemListHelper(uint32 itemId, int loc_idx, Player* target /*=nullptr*/)
 {
-    ItemPrototype const *itemProto = sItemStorage.LookupEntry<ItemPrototype >(itemId);
+    ItemPrototype const* itemProto = sItemStorage.LookupEntry<ItemPrototype >(itemId);
     if (!itemProto)
         return;
 
     std::string name;
 
-    if (ItemLocale const *il = loc_idx >= 0 ? sObjectMgr.GetItemLocale(itemProto->ItemId) : nullptr)
+    if (ItemLocale const* il = loc_idx >= 0 ? sObjectMgr.GetItemLocale(itemProto->ItemId) : nullptr)
         name = il->Name[loc_idx];
 
     if (name.empty())
@@ -222,14 +222,14 @@ bool ChatHandler::HandleLookupItemCommand(char* args)
     // Search in `item_template`
     for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
     {
-        ItemPrototype const *pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
+        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
         if (!pProto)
             continue;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            ItemLocale const *il = sObjectMgr.GetItemLocale(pProto->ItemId);
+            ItemLocale const* il = sObjectMgr.GetItemLocale(pProto->ItemId);
             if (il)
             {
                 if ((int32)il->Name.size() > loc_idx && !il->Name[loc_idx].empty())
@@ -282,7 +282,7 @@ bool ChatHandler::HandleLookupItemSetCommand(char* args)
     // Search in ItemSet.dbc
     for (uint32 id = 0; id < sItemSetStore.GetNumRows(); id++)
     {
-        ItemSetEntry const *set = sItemSetStore.LookupEntry(id);
+        ItemSetEntry const* set = sItemSetStore.LookupEntry(id);
         if (set)
         {
             int loc = GetSessionDbcLocale();
@@ -345,7 +345,7 @@ bool ChatHandler::HandleLookupSkillCommand(char* args)
     // Search in SkillLine.dbc
     for (uint32 id = 0; id < sSkillLineStore.GetNumRows(); id++)
     {
-        SkillLineEntry const *skillInfo = sSkillLineStore.LookupEntry(id);
+        SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(id);
         if (skillInfo)
         {
             int loc = GetSessionDbcLocale();
@@ -470,7 +470,7 @@ bool ChatHandler::HandleLookupSpellCommand(char* args)
     // Search in Spell.dbc
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
     {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(id);
         if (spellInfo)
         {
             int loc = GetSessionDbcLocale();
@@ -515,7 +515,7 @@ void ChatHandler::ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* tar
 
     std::string title;
 
-    if (QuestLocale const *il = loc_idx >= 0 ? sObjectMgr.GetQuestLocale(qinfo->GetQuestId()) : nullptr)
+    if (QuestLocale const* il = loc_idx >= 0 ? sObjectMgr.GetQuestLocale(qinfo->GetQuestId()) : nullptr)
         title = il->Title[loc_idx];
 
     if (title.empty())
@@ -571,7 +571,7 @@ bool ChatHandler::HandleLookupQuestCommand(char* args)
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            QuestLocale const *il = sObjectMgr.GetQuestLocale(qinfo->GetQuestId());
+            QuestLocale const* il = sObjectMgr.GetQuestLocale(qinfo->GetQuestId());
             if (il)
             {
                 if ((int32)il->Title.size() > loc_idx && !il->Title[loc_idx].empty())
@@ -630,7 +630,7 @@ bool ChatHandler::HandleLookupCreatureCommand(char* args)
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            CreatureLocale const *cl = sObjectMgr.GetCreatureLocale(id);
+            CreatureLocale const* cl = sObjectMgr.GetCreatureLocale(id);
             if (cl)
             {
                 if ((int32)cl->Name.size() > loc_idx && !cl->Name[loc_idx].empty())
@@ -808,7 +808,7 @@ bool ChatHandler::HandleLookupObjectCommand(char* args)
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
         {
-            GameObjectLocale const *gl = sObjectMgr.GetGameObjectLocale(itr->id);
+            GameObjectLocale const* gl = sObjectMgr.GetGameObjectLocale(itr->id);
             if (gl)
             {
                 if ((int32)gl->Name.size() > loc_idx && !gl->Name[loc_idx].empty())
@@ -867,7 +867,7 @@ bool ChatHandler::HandleLookupTaxiNodeCommand(char * args)
     // Search in taxi nodes table
     for (uint32 id = 0; id < sObjectMgr.GetMaxTaxiNodeId(); id++)
     {
-        TaxiNodesEntry const *nodeEntry = sObjectMgr.GetTaxiNodeEntry(id);
+        TaxiNodesEntry const* nodeEntry = sObjectMgr.GetTaxiNodeEntry(id);
         if (nodeEntry)
         {
             int loc = GetSessionDbcLocale();
@@ -946,7 +946,7 @@ bool ChatHandler::ShowAccountIpListHelper(char* args, bool onlineonly)
     std::string ip = ipStr;
     LoginDatabase.escape_string(ip);
 
-    const char *query = onlineonly
+    char const* query = onlineonly
         ? "SELECT id, username, last_ip, 0, expansion FROM account WHERE online = 1 AND last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u"
         : "SELECT id, username, last_ip, 0, expansion FROM account WHERE                last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u";
 
@@ -1281,7 +1281,7 @@ bool ChatHandler::HandleLookupTeleCommand(char * args)
 
     std::ostringstream reply;
 
-    GameTeleMap const & teleMap = sObjectMgr.GetGameTeleMap();
+    GameTeleMap const& teleMap = sObjectMgr.GetGameTeleMap();
     for (GameTeleMap::const_iterator itr = teleMap.begin(); itr != teleMap.end(); ++itr)
     {
         GameTele const* tele = &itr->second;
@@ -1380,7 +1380,7 @@ static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
     LANG_REP_FRIENDLY, LANG_REP_HONORED, LANG_REP_REVERED,    LANG_REP_EXALTED
 };
 
-void ChatHandler::ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState /*= nullptr*/, Player * target /*= nullptr */)
+void ChatHandler::ShowFactionListHelper(FactionEntry const*  factionEntry, LocaleConstant loc, FactionState const* repState /*= nullptr*/, Player* target /*= nullptr */)
 {
     std::string name = factionEntry->name[loc];
     // send faction in "id - [faction] rank reputation [visible] [at war] [own team] [unknown] [invisible] [inactive]" format
@@ -1423,7 +1423,7 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
         return false;
 
     // Can be nullptr at console call
-    Player *target = GetSelectedPlayer();
+    Player* target = GetSelectedPlayer();
 
     std::string namepart = args;
     std::wstring wnamepart;
@@ -1438,7 +1438,7 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
 
     for (auto const& itr : sObjectMgr.GetFactionMap())
     {
-        FactionEntry const *factionEntry = &itr.second;
+        FactionEntry const* factionEntry = &itr.second;
         if (factionEntry)
         {
             int loc = GetSessionDbcLocale();

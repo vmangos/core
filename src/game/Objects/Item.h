@@ -229,7 +229,7 @@ struct ItemRequiredTarget
     bool IsFitToRequirements(Unit* pUnitTarget) const;
 };
 
-bool ItemCanGoIntoBag(ItemPrototype const *proto, ItemPrototype const *pBagProto);
+bool ItemCanGoIntoBag(ItemPrototype const* proto, ItemPrototype const* pBagProto);
 
 class MANGOS_DLL_SPEC Item : public Object
 {
@@ -352,7 +352,7 @@ class MANGOS_DLL_SPEC Item : public Object
         bool HasGeneratedLootSecondary() {  return generatedLoot; } // todo, remove and add condition to HasGeneratedLoot
 
         bool IsCharter() const { return GetEntry() == 5863u; }
-        static void GetLocalizedNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale);
+        static void GetLocalizedNameWithSuffix(std::string& name, ItemPrototype const* proto, ItemRandomPropertiesEntry const* randomProp, int dbLocale, LocaleConstant dbcLocale);
 
     private:
         bool generatedLoot;

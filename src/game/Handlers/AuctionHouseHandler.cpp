@@ -38,12 +38,12 @@
 // post-incrementation is always slower than pre-incrementation !
 
 // void called when player click on auctioneer npc
-void WorldSession::HandleAuctionHelloOpcode(WorldPacket & recv_data)
+void WorldSession::HandleAuctionHelloOpcode(WorldPacket& recv_data)
 {
     ObjectGuid auctioneerGuid;                              // NPC guid
     recv_data >> auctioneerGuid;
 
-    Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(auctioneerGuid, UNIT_NPC_FLAG_AUCTIONEER);
+    Creature* unit = GetPlayer()->GetNPCIfCanInteractWith(auctioneerGuid, UNIT_NPC_FLAG_AUCTIONEER);
     if (!unit)
     {
         DEBUG_LOG("WORLD: HandleAuctionHelloOpcode - %s not found or you can't interact with him.", auctioneerGuid.GetString().c_str());
@@ -161,7 +161,7 @@ void WorldSession::SendAuctionRemovedNotification(AuctionEntry* auction)
 void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction)
 {
     ObjectGuid oldBidder_guid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
-    Player *oldBidder = sObjectMgr.GetPlayer(oldBidder_guid);
+    Player* oldBidder = sObjectMgr.GetPlayer(oldBidder_guid);
 
     uint32 oldBidder_accId = 0;
     if (!oldBidder)
@@ -186,7 +186,7 @@ void WorldSession::SendAuctionOutbiddedMail(AuctionEntry *auction)
 void WorldSession::SendAuctionCancelledToBidderMail(AuctionEntry* auction)
 {
     ObjectGuid bidder_guid = ObjectGuid(HIGHGUID_PLAYER, auction->bidder);
-    Player *bidder = sObjectMgr.GetPlayer(bidder_guid);
+    Player* bidder = sObjectMgr.GetPlayer(bidder_guid);
 
     uint32 bidder_accId = 0;
     if (!bidder)
@@ -240,7 +240,7 @@ AuctionHouseEntry const* WorldSession::GetCheckedAuctionHouseForAuctioneer(Objec
 }
 
 // this void creates new auction and adds auction to some auctionhouse
-void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
+void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionSellItem");
 
@@ -272,7 +272,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
     if (!sWorld.getConfig(CONFIG_BOOL_GM_ALLOW_TRADES) && GetSecurity() > SEC_PLAYER)
         return;
 
-    Player *pl = GetPlayer();
+    Player* pl = GetPlayer();
 
     AuctionHouseEntry const* auctionHouseEntry = GetCheckedAuctionHouseForAuctioneer(auctioneerGuid);
     if (!auctionHouseEntry)
@@ -415,7 +415,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
 }
 
 // this function is called when client bids or buys out auction
-void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
+void WorldSession::HandleAuctionPlaceBid(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionPlaceBid");
 
@@ -443,7 +443,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     AuctionEntry *auction = auctionHouse->GetAuction(auctionId);
-    Player *pl = GetPlayer();
+    Player* pl = GetPlayer();
 
     if (!auction)
     {
@@ -563,7 +563,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
 }
 
 // this void is called when auction_owner cancels his auction
-void WorldSession::HandleAuctionRemoveItem(WorldPacket & recv_data)
+void WorldSession::HandleAuctionRemoveItem(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionRemoveItem");
 
@@ -585,7 +585,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket & recv_data)
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     AuctionEntry *auction = auctionHouse->GetAuction(auctionId);
-    Player *pl = GetPlayer();
+    Player* pl = GetPlayer();
 
     if (auction && auction->owner == pl->GetGUIDLow())
     {
@@ -650,7 +650,7 @@ public:
         {
             sess->SetReceivedAHListRequest(false);
 
-            Player *player = sess->GetPlayer();
+            Player* player = sess->GetPlayer();
             if (!player || !player->IsInWorld())
                 return;
 
@@ -712,7 +712,7 @@ public:
 };
 
 // called when player lists his bids
-void WorldSession::HandleAuctionListBidderItems(WorldPacket & recv_data)
+void WorldSession::HandleAuctionListBidderItems(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionListBidderItems");
     if (ReceivedAHListRequest())
@@ -756,7 +756,7 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket & recv_data)
 }
 
 // this void sends player info about his auctions
-void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recv_data)
+void WorldSession::HandleAuctionListOwnerItems(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionListOwnerItems");
     if (ReceivedAHListRequest())
@@ -784,7 +784,7 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recv_data)
     sWorld.AddAsyncTask(task);
 }
 
-void WorldSession::HandleAuctionListItems(WorldPacket & recv_data)
+void WorldSession::HandleAuctionListItems(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionListItems");
     if (ReceivedAHListRequest())

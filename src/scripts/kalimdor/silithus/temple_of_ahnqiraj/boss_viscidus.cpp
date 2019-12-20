@@ -84,7 +84,7 @@ enum
     SPELL_WAND_SHOOT            = 5019,
 };
 
-static const uint32 auiGlobSummonSpells[MAX_VISCIDUS_GLOBS] = { 25865, 25866, 25867, 25868, 25869, 25870, 25871, 25872, 25873, 25874, 25875, 25876, 25877, 25878, 25879, 25880, 25881, 25882, 25883, 25884 };
+static uint32 const auiGlobSummonSpells[MAX_VISCIDUS_GLOBS] = { 25865, 25866, 25867, 25868, 25869, 25870, 25871, 25872, 25873, 25874, 25875, 25876, 25877, 25878, 25879, 25880, 25881, 25882, 25883, 25884 };
 
 //-----------------------------------------------------------------------------
 // mob_viscidus_globAI
@@ -111,7 +111,7 @@ struct mob_viscidus_globAI : public ScriptedAI
     void MoveInLineOfSight(Unit* /*pWho*/) override { }
 
     // Implements acceleration on timer, prevents combat.
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiGlobStartAccelerationTimer <= uiDiff)
         {
@@ -152,7 +152,7 @@ struct mob_viscidus_triggerAI : public ScriptedAI
     void AttackStart(Unit* /*pWho*/) override { }
     void MoveInLineOfSight(Unit* /*pWho*/) override { }
     // Implements toxin cloud on timer, prevents combat.
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiToxinDelayTimer <= uiDiff)
         {
@@ -355,7 +355,7 @@ struct boss_viscidusAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_VISCIDUS_EXPLODE)
         {
@@ -392,7 +392,7 @@ struct boss_viscidusAI : public ScriptedAI
         // if it's frost damage, use a trigger spell
         if (pSpell->Id == SPELL_WAND_SHOOT)
         {
-            const Player* pPlayer = dynamic_cast<Player*>(pCaster);
+            Player const* pPlayer = dynamic_cast<Player*>(pCaster);
             if (!pPlayer)
                 return;
 
@@ -460,7 +460,7 @@ struct boss_viscidusAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -571,7 +571,7 @@ CreatureAI* GetAI_boss_viscidus(Creature* pCreature)
     return new boss_viscidusAI(pCreature);
 }
 
-bool EffectAuraDummy_spell_aura_dummy_viscidus_freeze(const Aura* pAura, bool bApply)
+bool EffectAuraDummy_spell_aura_dummy_viscidus_freeze(Aura const* pAura, bool bApply)
 {
     // On Aura removal inform the boss
     if (pAura->GetId() == SPELL_VISCIDUS_FREEZE && pAura->GetEffIndex() == EFFECT_INDEX_1 && !bApply)

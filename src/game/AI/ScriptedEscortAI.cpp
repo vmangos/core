@@ -14,8 +14,8 @@ EndScriptData */
 #include "Chat.h"
 #include "PointMovementGenerator.h"
 
-const float DEFAULT_MAX_PLAYER_DISTANCE = 100.0f;
-const float DEFAULT_MAX_ASSIST_DISTANCE =  40.0f;
+float const DEFAULT_MAX_PLAYER_DISTANCE = 100.0f;
+float const DEFAULT_MAX_ASSIST_DISTANCE =  40.0f;
 
 enum
 {
@@ -235,7 +235,7 @@ bool npc_escortAI::IsPlayerOrGroupInRange() const
     return false;
 }
 
-void npc_escortAI::UpdateAI(const uint32 uiDiff)
+void npc_escortAI::UpdateAI(uint32 const uiDiff)
 {
     //Waypoint Updating
     if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_creature->IsInCombat() && m_uiWPWaitTimer && !HasEscortState(STATE_ESCORT_RETURNING))
@@ -332,7 +332,7 @@ void npc_escortAI::ResetEscort()
         m_creature->Respawn();
 }
 
-void npc_escortAI::UpdateEscortAI(const uint32 uiDiff)
+void npc_escortAI::UpdateEscortAI(uint32 const uiDiff)
 {
     // Make nearby enemies aggro passive escort npcs
     if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_creature->IsInCombat())
@@ -425,7 +425,7 @@ void npc_escortAI::MovementInform(uint32 uiMoveType, uint32 uiPointId)
 
 void npc_escortAI::FillPointMovementListForCreature()
 {
-    auto const & pPointsEntries = sScriptMgr.GetPointMoveList(m_creature->GetEntry());
+    auto const& pPointsEntries = sScriptMgr.GetPointMoveList(m_creature->GetEntry());
 
     if (pPointsEntries.empty())
         return;
@@ -456,7 +456,7 @@ void npc_escortAI::SetRun(bool bRun)
     m_bIsRunning = bRun;
 }
 
-void npc_escortAI::Start(bool bRun, uint64 uiPlayerGUID, const Quest* pQuest, bool bInstantRespawn, bool bCanLoopPath)
+void npc_escortAI::Start(bool bRun, uint64 uiPlayerGUID, Quest const* pQuest, bool bInstantRespawn, bool bCanLoopPath)
 {
     if (m_creature->IsInCombat())
     {

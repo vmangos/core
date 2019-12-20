@@ -32,7 +32,7 @@ using std::pair;
 
 template<> struct BoundsTrait<VMAP::ModelSpawn*>
 {
-    static void getBounds(const VMAP::ModelSpawn* const& obj, G3D::AABox& out)
+    static void getBounds(VMAP::ModelSpawn const* const& obj, G3D::AABox& out)
     {
         out = obj->getBounds();
     }
@@ -40,13 +40,13 @@ template<> struct BoundsTrait<VMAP::ModelSpawn*>
 
 namespace VMAP
 {
-bool readChunk(FILE* rf, char* dest, const char* compare, uint32 len)
+bool readChunk(FILE* rf, char* dest, char const* compare, uint32 len)
 {
     if (fread(dest, sizeof(char), len, rf) != len) return false;
     return memcmp(dest, compare, len) == 0;
 }
 
-Vector3 ModelPosition::transform(const Vector3& pIn) const
+Vector3 ModelPosition::transform(Vector3 const& pIn) const
 {
     Vector3 out = pIn * iScale;
     out = iRotation * out;
@@ -141,7 +141,7 @@ bool TileAssembler::convertWorld2()
         TileMap::iterator tile;
         for (tile = tileEntries.begin(); tile != tileEntries.end(); ++tile)
         {
-            const ModelSpawn& spawn = map_iter->second->UniqueEntries[tile->second];
+            ModelSpawn const& spawn = map_iter->second->UniqueEntries[tile->second];
             if (spawn.flags & MOD_WORLDSPAWN)           // WDT spawn, saved as tile 65/65 currently...
                 continue;
             uint32 nSpawns = tileEntries.count(tile->first);
@@ -163,7 +163,7 @@ bool TileAssembler::convertWorld2()
                     ++tile;
                 if (tile == tileEntries.end())
                     break;
-                const ModelSpawn& spawn2 = map_iter->second->UniqueEntries[tile->second];
+                ModelSpawn const& spawn2 = map_iter->second->UniqueEntries[tile->second];
                 success = success && ModelSpawn::writeToFile(tilefile, spawn2);
                 // MapTree nodes to update when loading tile:
                 std::map<uint32, uint32>::iterator nIdx = modelNodeIdx.find(spawn2.ID);
@@ -487,7 +487,7 @@ GroupModel_Raw::~GroupModel_Raw()
     delete liquid;
 }
 
-bool WorldModel_Raw::Read(const char* path)
+bool WorldModel_Raw::Read(char const* path)
 {
     FILE* rf = fopen(path, "rb");
     if (!rf)

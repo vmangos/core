@@ -82,7 +82,7 @@ struct npc_malfurionAI : public ScriptedAI
 
     void Reset() override {}
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // We are in Sunken Temple
         if (m_inDungeon)
@@ -218,7 +218,7 @@ struct SpawnLocation
     float m_fX, m_fY, m_fZ, m_fO;
 };
 
-static const SpawnLocation aMobLocs[8] =
+static SpawnLocation const aMobLocs[8] =
 {
     { -451.838f, 270.88f, -90.5418f, 2.39622f},
     { -477.712f, 283.707f, -90.5464f, 3.9631f},
@@ -230,7 +230,7 @@ static const SpawnLocation aMobLocs[8] =
     { -457.922f, 286.686f, -90.5413f, 1.02569f}
 };
 
-static const SpawnLocation aMobDest[8] =
+static SpawnLocation const aMobDest[8] =
 {
     { -441.838f, 270.387f, -90.791f, 6.23f},
     { -487.712f, 291.707f, -90.7024f, 2.448f},
@@ -247,7 +247,7 @@ enum
     SPELL_SUPPRESSION   = 12623
 };
 
-static const uint32 brazierEntries[] = { GO_ETERNAL_FLAME_1, GO_ETERNAL_FLAME_2, GO_ETERNAL_FLAME_3, GO_ETERNAL_FLAME_4 };
+static uint32 const brazierEntries[] = { GO_ETERNAL_FLAME_1, GO_ETERNAL_FLAME_2, GO_ETERNAL_FLAME_3, GO_ETERNAL_FLAME_4 };
 
 npc_shade_hakkarAI::npc_shade_hakkarAI(Creature* pCreature) : ScriptedAI(pCreature)
 {
@@ -468,7 +468,7 @@ void npc_shade_hakkarAI::SummonedMovementInform(Creature* pSummoned, uint32 uiMo
     }
 }
 
-void npc_shade_hakkarAI::UpdateAI(const uint32 uiDiff)
+void npc_shade_hakkarAI::UpdateAI(uint32 const uiDiff)
 {
     if (CheckTimer <= uiDiff && !EngagedOnce)
     {

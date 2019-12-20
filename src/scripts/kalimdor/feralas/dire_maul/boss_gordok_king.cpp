@@ -50,7 +50,7 @@ struct boss_king_gordokAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -204,11 +204,11 @@ struct boss_chorushAI : public ScriptedAI
         }
     }
 
-    void UpdateAIMage(const uint32 uiDiff);
-    void UpdateAIShaman(const uint32 uiDiff);
-    void UpdateAIPrist(const uint32 uiDiff);
+    void UpdateAIMage(uint32 const uiDiff);
+    void UpdateAIShaman(uint32 const uiDiff);
+    void UpdateAIPrist(uint32 const uiDiff);
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -247,7 +247,7 @@ struct boss_chorushAI : public ScriptedAI
 };
 
 // MAGE
-void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
+void boss_chorushAI::UpdateAIMage(uint32 const uiDiff)
 {
     // Fireball
     if (m_uiSpellTimers[0] < uiDiff) 
@@ -341,7 +341,7 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
 };
 
 // SHAMAN
-void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
+void boss_chorushAI::UpdateAIShaman(uint32 const uiDiff)
 {
     // Earthgrab Totem
     if (m_uiSpellTimers[2] < uiDiff) 
@@ -420,7 +420,7 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
 };
 
 // PRIEST
-void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
+void boss_chorushAI::UpdateAIPrist(uint32 const uiDiff)
 {
     // Heal
     if (m_uiSpellTimers[3] < uiDiff) 

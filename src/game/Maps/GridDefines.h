@@ -77,7 +77,7 @@ typedef NGrid<MAX_NUMBER_OF_CELLS, Player, AllWorldObjectTypes, AllGridObjectTyp
 typedef TypeMapContainer<AllGridObjectTypes> GridTypeMapContainer;
 typedef TypeMapContainer<AllWorldObjectTypes> WorldTypeMapContainer;
 
-template<const unsigned int LIMIT>
+template<unsigned int const LIMIT>
 struct MANGOS_DLL_DECL CoordPair
 {
     CoordPair(int32 x=0, int32 y=0) : x_coord(x), y_coord(y)
@@ -92,17 +92,17 @@ struct MANGOS_DLL_DECL CoordPair
         else if (y >= LIMIT)
             y_coord = LIMIT - 1;
     }
-    CoordPair(const CoordPair<LIMIT> &obj) : x_coord(obj.x_coord), y_coord(obj.y_coord) {}
-    bool operator==(const CoordPair<LIMIT> &obj) const { return (obj.x_coord == x_coord && obj.y_coord == y_coord); }
-    bool operator!=(const CoordPair<LIMIT> &obj) const { return !operator==(obj); }
-    CoordPair<LIMIT>& operator=(const CoordPair<LIMIT> &obj)
+    CoordPair(CoordPair<LIMIT> const& obj) : x_coord(obj.x_coord), y_coord(obj.y_coord) {}
+    bool operator==(CoordPair<LIMIT> const& obj) const { return (obj.x_coord == x_coord && obj.y_coord == y_coord); }
+    bool operator!=(CoordPair<LIMIT> const& obj) const { return !operator==(obj); }
+    CoordPair<LIMIT>& operator=(CoordPair<LIMIT> const& obj)
     {
         x_coord = obj.x_coord;
         y_coord = obj.y_coord;
         return *this;
     }
 
-    void operator<<(const uint32 val)
+    void operator<<(uint32 const val)
     {
         if (x_coord > val)
             x_coord -= val;
@@ -110,7 +110,7 @@ struct MANGOS_DLL_DECL CoordPair
             x_coord = 0;
     }
 
-    void operator>>(const uint32 val)
+    void operator>>(uint32 const val)
     {
         if (x_coord+val < LIMIT)
             x_coord += val;
@@ -118,7 +118,7 @@ struct MANGOS_DLL_DECL CoordPair
             x_coord = LIMIT - 1;
     }
 
-    void operator-=(const uint32 val)
+    void operator-=(uint32 const val)
     {
         if (y_coord > val)
             y_coord -= val;
@@ -126,7 +126,7 @@ struct MANGOS_DLL_DECL CoordPair
             y_coord = 0;
     }
 
-    void operator+=(const uint32 val)
+    void operator+=(uint32 const val)
     {
         if (y_coord+val < LIMIT)
             y_coord += val;

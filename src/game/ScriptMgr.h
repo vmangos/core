@@ -1230,25 +1230,25 @@ struct Script
     bool (*pQuestAcceptNPC          )(Player*, Creature*, Quest const*);
     bool (*pGossipSelect            )(Player*, Creature*, uint32, uint32);
     bool (*pGOGossipSelect          )(Player*, GameObject*, uint32, uint32);
-    bool (*pGossipSelectWithCode    )(Player*, Creature*, uint32, uint32, const char*);
-    bool (*pGOGossipSelectWithCode  )(Player*, GameObject*, uint32, uint32, const char*);
-//    bool (*pQuestSelect             )(Player*, Creature*, const Quest*);
-    bool (*pQuestComplete           )(Player*, Creature*, const Quest*);
+    bool (*pGossipSelectWithCode    )(Player*, Creature*, uint32, uint32, char const*);
+    bool (*pGOGossipSelectWithCode  )(Player*, GameObject*, uint32, uint32, char const*);
+//    bool (*pQuestSelect             )(Player*, Creature*, Quest const*);
+    bool (*pQuestComplete           )(Player*, Creature*, Quest const*);
     uint32 (*pNPCDialogStatus       )(Player*, Creature*);
     uint32 (*pGODialogStatus        )(Player*, GameObject*);
     bool (*pQuestRewardedNPC        )(Player*, Creature*, Quest const*);
     bool (*pQuestRewardedGO         )(Player*, GameObject*, Quest const*);
-    bool (*pItemHello               )(Player*, Item*, const Quest*);
+    bool (*pItemHello               )(Player*, Item*, Quest const*);
     bool (*pGOHello                 )(Player*, GameObject*);
-    bool (*pAreaTrigger             )(Player*, const AreaTriggerEntry*);
+    bool (*pAreaTrigger             )(Player*, AreaTriggerEntry const*);
     bool (*pProcessEventId          )(uint32, Object*, Object*, bool);
-    bool (*pItemQuestAccept         )(Player*, Item*, const Quest*);
-    bool (*pGOQuestAccept           )(Player*, GameObject*, const Quest*);
-//    bool (*pGOChooseReward          )(Player*, GameObject*, const Quest*, uint32);
+    bool (*pItemQuestAccept         )(Player*, Item*, Quest const*);
+    bool (*pGOQuestAccept           )(Player*, GameObject*, Quest const*);
+//    bool (*pGOChooseReward          )(Player*, GameObject*, Quest const*, uint32);
     bool (*pItemUse                 )(Player*, Item*, SpellCastTargets const&);
     bool (*pEffectDummyCreature     )(WorldObject*, uint32, SpellEffectIndex, Creature*);
     bool (*pEffectDummyGameObj      )(WorldObject*, uint32, SpellEffectIndex, GameObject*);
-    bool (*pEffectAuraDummy         )(const Aura*, bool);
+    bool (*pEffectAuraDummy         )(Aura const*, bool);
     bool (*GOOpen                   )(Player* pUser, GameObject* gobj);
     GameObjectAI* (*GOGetAI         )(GameObject* pGo);
 
@@ -1283,8 +1283,8 @@ class ScriptMgr
         uint32 GetAreaTriggerScriptId(uint32 triggerId) const;
         uint32 GetEventIdScriptId(uint32 eventId) const;
 
-        const char* GetScriptName(uint32 id) const { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
-        uint32 GetScriptId(const char *name) const;
+        char const* GetScriptName(uint32 id) const { return id < m_scriptNames.size() ? m_scriptNames[id].c_str() : ""; }
+        uint32 GetScriptId(char const* name) const;
         uint32 GetScriptIdsCount() const { return m_scriptNames.size(); }
         
         void Initialize();
@@ -1315,7 +1315,7 @@ class ScriptMgr
             return &itr->second;
         }
 
-        std::vector<ScriptPointMove> const &GetPointMoveList(uint32 uiCreatureEntry) const
+        std::vector<ScriptPointMove> const& GetPointMoveList(uint32 uiCreatureEntry) const
         {
             static std::vector<ScriptPointMove> vEmpty;
 
@@ -1338,8 +1338,8 @@ class ScriptMgr
 
         bool OnGossipHello(Player* pPlayer, Creature* pCreature);
         bool OnGossipHello(Player* pPlayer, GameObject* pGameObject);
-        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action, const char* code);
-        bool OnGossipSelect(Player* pPlayer, GameObject* pGameObject, uint32 sender, uint32 action, const char* code);
+        bool OnGossipSelect(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action, char const* code);
+        bool OnGossipSelect(Player* pPlayer, GameObject* pGameObject, uint32 sender, uint32 action, char const* code);
         bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* pQuest);
         bool OnQuestAccept(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest);
         bool OnQuestRewarded(Player* pPlayer, Creature* pCreature, Quest const* pQuest);
@@ -1356,7 +1356,7 @@ class ScriptMgr
 
     private:
         void CollectPossibleEventIds(std::set<uint32>& eventIds);
-        void LoadScripts(ScriptMapMap& scripts, const char* tablename);
+        void LoadScripts(ScriptMapMap& scripts, char const* tablename);
         void CheckScriptTexts(ScriptMapMap const& scripts);
 
         typedef std::vector<std::string> ScriptNameMap;
@@ -1385,7 +1385,7 @@ class ScriptMgr
 
 MANGOS_DLL_SPEC uint32 GetAreaTriggerScriptId(uint32 triggerId);
 MANGOS_DLL_SPEC uint32 GetEventIdScriptId(uint32 eventId);
-MANGOS_DLL_SPEC uint32 GetScriptId(const char *name);
+MANGOS_DLL_SPEC uint32 GetScriptId(char const* name);
 MANGOS_DLL_SPEC char const* GetScriptName(uint32 id);
 MANGOS_DLL_SPEC uint32 GetScriptIdsCount();
 

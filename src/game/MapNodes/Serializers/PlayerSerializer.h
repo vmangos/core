@@ -165,12 +165,12 @@ void Player::Serialize(OP& buf)
 
     // Not needed:
     /*
-    _LoadActions(QueryResult *result);
-    _LoadMails(QueryResult *result);
-    _LoadMailedItems(QueryResult *result);
-    _LoadBoundInstances(QueryResult *result);
-    _LoadGroup(QueryResult *result);
-    _LoadFriendList(QueryResult *result);
+    _LoadActions(QueryResult* result);
+    _LoadMails(QueryResult* result);
+    _LoadMailedItems(QueryResult* result);
+    _LoadBoundInstances(QueryResult* result);
+    _LoadGroup(QueryResult* result);
+    _LoadFriendList(QueryResult* result);
     */
     // TODO:
     /**
@@ -181,7 +181,7 @@ void Player::Serialize(OP& buf)
     SerializeInventory(buf);
     SerializeQuestStatus(buf);
     m_reputationMgr.Serialize(buf);
-    //_LoadHonorCP(QueryResult *result); // Needed for Player::CalculateTotalKills(victim)
+    //_LoadHonorCP(QueryResult* result); // Needed for Player::CalculateTotalKills(victim)
 }
 
 
@@ -571,7 +571,7 @@ void ReputationMgr::Serialize(MaNGOS::Serializer::ReadSerializer& buf)
         if (!f_id)
             break;
 
-        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(f_id);
+        FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(f_id);
         ASSERT(factionEntry);
         FactionState& faction = m_factions[factionEntry->reputationListID];
 

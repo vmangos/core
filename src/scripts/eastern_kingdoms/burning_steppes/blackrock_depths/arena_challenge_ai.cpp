@@ -68,7 +68,7 @@ struct npc_theldrenAI : public ScriptedAI
         m_uiFearTimer = 30000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -128,7 +128,7 @@ struct npc_va_jashniAI : public ScriptedAI
         m_uiRenewTimer = 30000;  // renew is 2000 health every 3 sec...
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_uiFlashHealTimer < diff)
         {
@@ -190,7 +190,7 @@ struct npc_korvAI : public ScriptedAI
         m_uiFireNovaTimer = 20000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -245,7 +245,7 @@ struct npc_leftyAI : public ScriptedAI
         m_uiFiveFingerTimer = 2000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -287,7 +287,7 @@ struct npc_snokh_blackspineAI : public ScriptedAI
         m_uiPolymorphTimer = 30000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -353,7 +353,7 @@ struct npc_volidaAI : public ScriptedAI
         m_uiConeOfColdTimer = 20000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -433,7 +433,7 @@ struct npc_malgen_longspearAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_bIsFeigned && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;

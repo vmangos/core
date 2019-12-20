@@ -95,7 +95,7 @@ struct mob_deathknightUnderstudyAI : public ScriptedAI
         m_creature->CallForHelp(30.0f);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (runAttack)
         {
@@ -306,7 +306,7 @@ struct boss_razuviousAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->IsInCombat())
             UpdateRP(uiDiff);

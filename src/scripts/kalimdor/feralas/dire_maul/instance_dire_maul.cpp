@@ -480,7 +480,7 @@ void instance_dire_maul::SetData64(uint32 uiType, uint64 uiData)
     }
 }
 
-void instance_dire_maul::Load(const char* chrIn)
+void instance_dire_maul::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -609,7 +609,7 @@ struct npc_reste_manaAI : public ScriptedAI
             m_pInstance->SetData64(TYPE_CRISTAL_EVENT, m_creature->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -687,7 +687,7 @@ struct npc_arcane_aberrationAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -784,7 +784,7 @@ struct npc_residual_montruosityAI : public ScriptedAI
         m_creature->SetSpeedRate(MOVE_WALK, newspeed);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -885,7 +885,7 @@ struct npc_mizzle_the_craftyAI : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         m_creature->SetOrientation(3.170f);
     }
@@ -1142,7 +1142,7 @@ struct GordokBruteAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1272,13 +1272,13 @@ struct boss_guardsAI : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_KNOCK_AWAY)
             m_creature->GetThreatManager().modifyThreatPercent(pCaster, -50);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Workaround fix for bug where Slip'kik doesnt leave combat properly if he charges through the trap
         if (m_uiCombatBugTimer)
@@ -1588,7 +1588,7 @@ struct boss_kromcrushAI : public ScriptedAI
         //m_creature->CastSpell(m_creature, SPELL_CALL_REAVERS, false);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1724,7 +1724,7 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_THRASH, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {       
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1825,7 +1825,7 @@ enum
     SPELL_DISARM                = 22691
 };
 
-static const float ALZZIN_COORDS[2][3] =
+static float const ALZZIN_COORDS[2][3] =
 {
     {274.844f, -427.251f, -119.962f},
     {262.298f, -445.57f,  -119.962f}
@@ -2023,7 +2023,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Thorns
         if (m_bCastThorns)
@@ -2052,7 +2052,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
             {
                 //m_creature->HandleEmote(0);
                 m_creature->InterruptNonMeleeSpells(false);
-                const float *point = ALZZIN_COORDS[m_uiOOCPhase];
+                float const *point = ALZZIN_COORDS[m_uiOOCPhase];
                 m_creature->GetMotionMaster()->MovePoint(m_uiOOCPhase, point[0], point[1], point[2]);
 
                 m_uiOOCPhase ^= 1;
@@ -2265,7 +2265,7 @@ struct boss_ferraAI : public ScriptedAI
         }              
     }   
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())            
             return;
@@ -2339,7 +2339,7 @@ struct boss_magister_kalendrisAI:public ScriptedAI
         m_uiDominateMindTimer       = urand(20000, 30000);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {       
 
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())

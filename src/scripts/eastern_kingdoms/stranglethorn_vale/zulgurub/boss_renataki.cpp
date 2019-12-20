@@ -70,7 +70,7 @@ struct boss_renatakiAI : public ScriptedAI
         LeaveVanish();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!Light)
         {

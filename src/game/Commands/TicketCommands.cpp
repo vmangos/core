@@ -279,7 +279,7 @@ bool ChatHandler::HandleGMTicketListEscalatedCommand(char* /*args*/)
 
 bool ChatHandler::HandleGMTicketListCommand(char* args)
 {
-    static const std::unordered_map<std::string, uint8> categories
+    static std::unordered_map<std::string, uint8> const categories
     {
         { "stuck", 1 },{ "behavior", 2 },{ "harassment", 2 },{ "guild", 3 },
         { "item", 4 },{ "environment", 5 },{ "world", 5 },{ "npc", 6 },
@@ -299,7 +299,7 @@ bool ChatHandler::HandleGMTicketListCommand(char* args)
 
 bool ChatHandler::HandleGMTicketListOnlineCommand(char* args)
 {
-    static const std::unordered_map<std::string, uint8> categories
+    static std::unordered_map<std::string, uint8> const categories
     {
         { "stuck", 1 },{ "behavior", 2 },{ "harassment", 2 },{ "guild", 3 },
         { "item", 4 },{ "environment", 5 },{ "world", 5 },{ "npc", 6 },

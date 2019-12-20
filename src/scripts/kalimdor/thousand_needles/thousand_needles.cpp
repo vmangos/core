@@ -43,7 +43,7 @@ enum
     NPC_GALAK_ASS               = 10720
 };
 
-const float m_afGalakLoc[] = { -4867.387695f, -1357.353760f, -48.226f};
+float const m_afGalakLoc[] = { -4867.387695f, -1357.353760f, -48.226f};
 
 struct npc_kanatiAI : public npc_escortAI
 {
@@ -95,7 +95,7 @@ CreatureAI* GetAI_npc_kanati(Creature* pCreature)
     return new npc_kanatiAI(pCreature);
 }
 
-bool QuestAccept_npc_kanati(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kanati(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_PROTECT_KANATI)
     {
@@ -181,7 +181,7 @@ CreatureAI* GetAI_npc_lakota_windsong(Creature* pCreature)
     return new npc_lakota_windsongAI(pCreature);
 }
 
-bool QuestAccept_npc_lakota_windsong(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_lakota_windsong(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_FREE_AT_LAST)
     {
@@ -256,7 +256,7 @@ CreatureAI* GetAI_npc_paoka_swiftmountain(Creature* pCreature)
     return new npc_paoka_swiftmountainAI(pCreature);
 }
 
-bool QuestAccept_npc_paoka_swiftmountain(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_paoka_swiftmountain(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_HOMEWARD)
     {
@@ -333,7 +333,7 @@ struct npc_plucky_johnsonAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
         {
@@ -484,7 +484,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
         pSummoned->loot.clear();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiTimer < uiDiff)
         {

@@ -246,7 +246,7 @@ void MailDraft::CloneFrom(MailDraft const& draft)
  */
 void MailDraft::SendReturnToSender(uint32 sender_acc, ObjectGuid sender_guid, ObjectGuid receiver_guid)
 {
-    Player *receiver = sObjectMgr.GetPlayer(receiver_guid);
+    Player* receiver = sObjectMgr.GetPlayer(receiver_guid);
 
     uint32 rc_account = 0;
     if (!receiver)

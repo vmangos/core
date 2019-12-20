@@ -144,7 +144,7 @@ struct boss_majordomoAI : public ScriptedAI
             {
                 if ((*itr)->IsAlive() && AddVivant > 0)
                 {
-                    const CreatureInfo *cinfo = (*itr)->GetCreatureInfo();
+                    CreatureInfo const *cinfo = (*itr)->GetCreatureInfo();
                     (*itr)->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min + cinfo->dmg_min / AddVivant);
                     (*itr)->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max + cinfo->dmg_max / AddVivant);
                 }
@@ -319,7 +319,7 @@ struct boss_majordomoAI : public ScriptedAI
             }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->GetFactionTemplateId() != 35 && AddSpawn == false)
         {

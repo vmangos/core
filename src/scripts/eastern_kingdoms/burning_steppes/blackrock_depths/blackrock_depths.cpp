@@ -303,7 +303,7 @@ struct npc_grimstoneAI : public npc_escortAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -527,7 +527,7 @@ CreatureAI* GetAI_npc_grimstone(Creature* pCreature)
     return new npc_grimstoneAI(pCreature);
 }
 
-bool AreaTrigger_at_ring_of_law(Player* pPlayer, const AreaTriggerEntry *at)
+bool AreaTrigger_at_ring_of_law(Player* pPlayer, AreaTriggerEntry const *at)
 {
     if (ScriptedInstance* pInstance = (ScriptedInstance*)pPlayer->GetInstanceData())
     {
@@ -619,7 +619,7 @@ struct mob_phalanxAI : public ScriptedAI
             m_creature->GetMotionMaster()->MovePoint(1, 868.122f, -223.884f, -43.695f, MOVE_PATHFINDING, 0, 2.06059f); 
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -865,7 +865,7 @@ struct npc_mistress_nagmaraAI : public ScriptedAI
         m_uiPhase = 1;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiPhaseTimer)
        {
@@ -996,7 +996,7 @@ enum
     QUEST_ALE          = 4295
 };
 
-static const float aPosNagmaraRocknot[3] = {878.1779f, -222.0662f, -49.96714f};
+static float const aPosNagmaraRocknot[3] = {878.1779f, -222.0662f, -49.96714f};
 
 
 struct npc_rocknotAI : public npc_escortAI
@@ -1104,7 +1104,7 @@ struct npc_rocknotAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_pInstance)
             return;
@@ -1407,7 +1407,7 @@ struct npc_hurley_blackbreathAI : public ScriptedAI
         DoScriptText(SAY_HURLEY_AGGRO, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return; 
@@ -1524,7 +1524,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1589,7 +1589,7 @@ struct npc_ribbly_fermevanneAI : public ScriptedAI
         Suriner_Timer = urand(2000, 10000);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1690,7 +1690,7 @@ struct npc_golem_lord_argelmachAI : public ScriptedAI
         Horion_Timer = 2000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -1733,7 +1733,7 @@ CreatureAI* GetAI_npc_golem_lord_argelmach(Creature* pCreature)
 ## at_shadowforge_bridge
 ######*/
 
-static const float aGuardSpawnPositions[2][4] =
+static float const aGuardSpawnPositions[2][4] =
 {
     {642.3660f, -274.5155f, -43.10918f, 0.4712389f},                // First guard spawn position
     {740.1137f, -283.3448f, -42.75082f, 2.8623400f}                 // Second guard spawn position
@@ -1801,9 +1801,9 @@ enum
     SPELL_PICKPOCKET                = 921,
 };
 
-static const int aRandomSays[] = { SAY_OOC_1, SAY_OOC_2, SAY_OOC_3, SAY_OOC_4 };
+static int const aRandomSays[] = { SAY_OOC_1, SAY_OOC_2, SAY_OOC_3, SAY_OOC_4 };
 
-static const int aRandomYells[] = { YELL_STOLEN_1, YELL_STOLEN_2, YELL_STOLEN_3 };
+static int const aRandomYells[] = { YELL_STOLEN_1, YELL_STOLEN_2, YELL_STOLEN_3 };
 
 struct boss_plugger_spazzringAI : public ScriptedAI
 {
@@ -1859,7 +1859,7 @@ struct boss_plugger_spazzringAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pCaster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -1887,7 +1887,7 @@ struct boss_plugger_spazzringAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Combat check
         if (m_creature->SelectHostileTarget() && m_creature->GetVictim())
@@ -2090,7 +2090,7 @@ struct npc_dughal_stormwingAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_pInstance || m_pInstance->GetData(TYPE_QUEST_JAIL_BREAK) != IN_PROGRESS)
             return;
@@ -2279,7 +2279,7 @@ struct npc_marshal_reginald_windsorAI : npc_escortAI
         m_pInstance->SetData(TYPE_QUEST_JAIL_BREAK, FAIL);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_pInstance || m_pInstance->GetData(TYPE_QUEST_JAIL_BREAK) != IN_PROGRESS)
             return;
@@ -2465,7 +2465,7 @@ struct npc_marshal_windsorAI : npc_escortAI
         m_pInstance->SetData(TYPE_QUEST_JAIL_BREAK, FAIL);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_pInstance || m_pInstance->GetData(TYPE_QUEST_JAIL_BREAK) != IN_PROGRESS)
             return;
@@ -2489,7 +2489,7 @@ struct npc_marshal_windsorAI : npc_escortAI
 
 };
 
-bool QuestAccept_npc_marshal_windsor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_marshal_windsor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_JAIL_BREAK)
     {
@@ -2549,7 +2549,7 @@ struct npc_tobias_seecherAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!m_pInstance || m_pInstance->GetData(TYPE_QUEST_JAIL_BREAK) != IN_PROGRESS)
             return;

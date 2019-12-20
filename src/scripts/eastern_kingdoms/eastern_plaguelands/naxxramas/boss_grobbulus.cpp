@@ -65,8 +65,8 @@ enum eGrobbulusEvents
 };
 
 
-static const uint32 POISONCLOUD_CD()            { return 15000; } //return urand(20000, 25000); }
-static const uint32 SLIMESPRAY_CD(bool initial) { return initial ? urand(20000, 30000): urand(30000,35000); }
+static uint32 const POISONCLOUD_CD()            { return 15000; } //return urand(20000, 25000); }
+static uint32 const SLIMESPRAY_CD(bool initial) { return initial ? urand(20000, 30000): urand(30000,35000); }
 static constexpr uint32 BERSERK_TIMER           = 12 * 60 * 1000; // 12 minute enrage
 
 static constexpr uint32 SLIMESTREAM_REPEAT_CD   = 1500; // used every 1500ms if current target is out of melee range
@@ -155,7 +155,7 @@ struct boss_grobbulusAI : public ScriptedAI
             return false;
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if ((pSpell->Id == SPELL_SLIME_SPRAY) && pTarget->GetTypeId() == TYPEID_PLAYER)
             if (Creature* pSlime = m_creature->SummonCreature(NPC_FALLOUT_SLIME, 
@@ -182,7 +182,7 @@ struct boss_grobbulusAI : public ScriptedAI
         }
     }
     
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -249,7 +249,7 @@ struct grob_poison_cloud : public ScriptedAI
     void AttackStart(Unit* /*pWho*/) override { }
     void MoveInLineOfSight(Unit* /*pWho*/) override { }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (untilDespawn == 70000)
             m_creature->CastSpell(m_creature, SPELL_POISON_CLOUD_PASSIVE, true);

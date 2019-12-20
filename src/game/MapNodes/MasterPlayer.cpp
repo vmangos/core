@@ -233,7 +233,7 @@ void MasterPlayer::AddNewMailDeliverTime(time_t deliver_time)
 
 
 // load mailed item which should receive current player
-void MasterPlayer::LoadMailedItems(QueryResult *result)
+void MasterPlayer::LoadMailedItems(QueryResult* result)
 {
     // data needs to be at first place for Item::LoadFromDB
     //         0                1        2         3       4       5       6           7               8           9       10     11        12            13
@@ -243,7 +243,7 @@ void MasterPlayer::LoadMailedItems(QueryResult *result)
 
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         uint32 mail_id       = fields[10].GetUInt32();
         uint32 item_guid_low = fields[11].GetUInt32();
         uint32 item_template = fields[12].GetUInt32();
@@ -253,7 +253,7 @@ void MasterPlayer::LoadMailedItems(QueryResult *result)
             continue;
         mail->AddItem(item_guid_low, item_template);
 
-        ItemPrototype const *proto = ObjectMgr::GetItemPrototype(item_template);
+        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_template);
 
         if (!proto)
         {
@@ -286,7 +286,7 @@ void MasterPlayer::LoadMailedItems(QueryResult *result)
     while (result->NextRow());
 }
 
-void MasterPlayer::LoadMails(QueryResult *result)
+void MasterPlayer::LoadMails(QueryResult* result)
 {
     m_mail.clear();
     Player* player = GetSession()->GetPlayer();
@@ -298,7 +298,7 @@ void MasterPlayer::LoadMails(QueryResult *result)
 
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         Mail *m = new Mail;
         m->messageID = fields[0].GetUInt32();
         m->messageType = fields[1].GetUInt8();
@@ -384,17 +384,17 @@ void MasterPlayer::removeActionButton(uint8 button)
         buttonItr->second.uState = ACTIONBUTTON_DELETED;    // saved, will deleted at next save
 }
 
-void MasterPlayer::LoadActions(QueryResult *result)
+void MasterPlayer::LoadActions(QueryResult* result)
 {
     m_actionButtons.clear();
 
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT button,action,type FROM character_action WHERE guid = '%u' ORDER BY button",GetGUIDLow());
+    //QueryResult* result = CharacterDatabase.PQuery("SELECT button,action,type FROM character_action WHERE guid = '%u' ORDER BY button",GetGUIDLow());
 
     if (result)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
 
             uint8 button = fields[0].GetUInt8();
             uint32 action = fields[1].GetUInt32();

@@ -96,7 +96,7 @@ struct npc_ame01AI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_ame01(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_ame01(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_CHASING_AME)
     {
@@ -194,7 +194,7 @@ struct npc_ringoAI : public FollowerAI
         }
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (HasFollowState(STATE_FOLLOW_INPROGRESS | STATE_FOLLOW_PAUSED) && pSpell->Id == SPELL_REVIVE_RINGO)
             ClearFaint();
@@ -253,7 +253,7 @@ struct npc_ringoAI : public FollowerAI
         SetFollowPaused(false);
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff) override
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -339,7 +339,7 @@ CreatureAI* GetAI_npc_ringo(Creature* pCreature)
     return new npc_ringoAI(pCreature);
 }
 
-bool QuestAccept_npc_ringo(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_ringo(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_A_LITTLE_HELP)
     {
@@ -402,7 +402,7 @@ struct mob_captured_felwood_oozeAI : public ScriptedAI
         mergeDone = false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (initialTimer < uiDiff)
         {
@@ -504,7 +504,7 @@ struct npc_precious_the_devourerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
@@ -707,7 +707,7 @@ struct npc_simone_seductressAI : public ScriptedAI
         }
     }
     
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell) override
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override
     {
         if (pSpell && pSpell->Id == 14280)   // Viper Sting (Rank 3)
         {
@@ -716,7 +716,7 @@ struct npc_simone_seductressAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiDespawn_Timer < uiDiff)
         {
@@ -872,7 +872,7 @@ struct npc_simone_the_inconspicuousAI : public ScriptedAI
         m_bTransform = true;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bTransform) 
         {

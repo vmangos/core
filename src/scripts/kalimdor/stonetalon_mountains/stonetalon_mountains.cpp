@@ -82,7 +82,7 @@ struct npc_piznikAI : public ScriptedAI
 
         ScriptedAI::AttackStart(pWho);
     }
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_creature->SelectHostileTarget() || m_creature->GetVictim())
                 DoMeleeAttackIfReady();
@@ -131,7 +131,7 @@ CreatureAI* GetAI_npc_piznik(Creature* pCreature)
     return new npc_piznikAI(pCreature);
 }
 
-bool QuestAccept_npc_piznik(Player *pPlayer, Creature *pCreature, const Quest *pQuest)
+bool QuestAccept_npc_piznik(Player *pPlayer, Creature *pCreature, Quest const *pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_GERENOS_ORDERS)
     {
