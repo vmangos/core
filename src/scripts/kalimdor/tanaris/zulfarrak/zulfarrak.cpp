@@ -317,7 +317,7 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
 
     void UpdateAI(uint32 const diff) override
     {
-        if (regen == false && pInstance->GetData(EVENT_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
+        if (!regen && pInstance->GetData(EVENT_PYRAMID) == PYRAMID_KILLED_ALL_TROLLS)
         {
             regen = true;
 

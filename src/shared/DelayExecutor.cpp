@@ -34,10 +34,10 @@ DelayExecutor::DelayExecutor()
 
 DelayExecutor::~DelayExecutor()
 {
-    if (pre_svc_hook_)
+    
         delete pre_svc_hook_;
 
-    if (post_svc_hook_)
+    
         delete post_svc_hook_;
 
     deactivate();
@@ -85,10 +85,10 @@ int DelayExecutor::activate(int num_threads, ACE_Method_Request* pre_svc_hook, A
     if (num_threads < 1)
         return -1;
 
-    if (pre_svc_hook_)
+    
         delete pre_svc_hook_;
 
-    if (post_svc_hook_)
+    
         delete post_svc_hook_;
 
     pre_svc_hook_ = pre_svc_hook;

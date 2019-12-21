@@ -467,9 +467,7 @@ struct go_serpent_statueAI: public GameObjectAI
     }
     bool CheckCanStartEvent()
     {
-        if (!state && !me->GetMap()->GetCreature(guid_kragaru))
-            return true;
-        return false;
+        return !state && !me->GetMap()->GetCreature(guid_kragaru);
     }
 
     void SetInUse(Creature* kragaru)

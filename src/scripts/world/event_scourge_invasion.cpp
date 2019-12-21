@@ -221,8 +221,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
                     if (who->IsTargetableForAttack())
                         if (!who->IsWithinDistInMap(m_creature, 20.0f))
                             AttackStart(who);
-        return;
-    }
+   }
 
     Creature* SelectWaypoint()
     {

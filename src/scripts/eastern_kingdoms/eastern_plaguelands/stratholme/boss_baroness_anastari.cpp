@@ -198,7 +198,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
                             }
                         }
 
-                        if (Position_memorized == false)
+                        if (!Position_memorized)
                         {
                             /** Memorize old position of the Banshee */
                             old_Position.x = m_creature->GetPositionX();

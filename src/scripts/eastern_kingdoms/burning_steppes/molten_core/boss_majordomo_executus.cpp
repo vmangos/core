@@ -321,7 +321,7 @@ struct boss_majordomoAI : public ScriptedAI
 
     void UpdateAI(uint32 const diff) override
     {
-        if (m_creature->GetFactionTemplateId() != 35 && AddSpawn == false)
+        if (m_creature->GetFactionTemplateId() != 35 && !AddSpawn)
         {
             Creature* DomoAdd[8];
             for (int i = 0; i < 8; i++)
@@ -344,7 +344,7 @@ struct boss_majordomoAI : public ScriptedAI
             AddSpawn = true;
         }
 
-        if (RagnarosEventStart == true && m_creature->GetFactionTemplateId() == 35)
+        if (RagnarosEventStart && m_creature->GetFactionTemplateId() == 35)
         {
             bool Up = false;
             DialogRagnarosTimer += diff;

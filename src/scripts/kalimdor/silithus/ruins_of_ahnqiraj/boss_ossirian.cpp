@@ -322,7 +322,7 @@ struct generic_random_moveAI : public ScriptedAI
                     if (i->getSource()->GetDistance2d(m_creature) < MAX_VISIBILITY_DISTANCE)
                         PlayerList.push_back(i->getSource());
                 }
-                if (PlayerList.size())
+                if (!PlayerList.empty())
                 {
                     Player *tmp = PlayerList[urand(0, PlayerList.size() - 1)];
                     m_creature->MonsterMove(tmp->GetPositionX(), tmp->GetPositionY(), tmp->GetPositionZ());

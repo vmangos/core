@@ -521,7 +521,7 @@ ChatChannelsEntry const* GetChannelEntryFor(std::string const& name)
                 std::string entryName(ch->pattern[loc]);
                 std::size_t removeString = entryName.find("%s");
                 // Not loaded locale
-                if (!entryName.size())
+                if (entryName.empty())
                     continue;
 
                 if (removeString != std::string::npos)

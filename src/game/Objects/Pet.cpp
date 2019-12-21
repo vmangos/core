@@ -929,9 +929,7 @@ bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
 bool Pet::HasTPForSpell(uint32 spellid)
 {
     int32 neededtrainp = GetTPForSpell(spellid);
-    if ((m_TrainingPoints - neededtrainp < 0 || neededtrainp < 0) && neededtrainp != 0)
-        return false;
-    return true;
+    return !((m_TrainingPoints - neededtrainp < 0 || neededtrainp < 0) && neededtrainp != 0);
 }
 
 int32 Pet::GetTPForSpell(uint32 spellid)
@@ -2057,9 +2055,7 @@ bool Pet::LearnSpell(uint32 spell_id)
 
 bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
-    if (RemoveSpell(spell_id, learn_prev, clear_ab))
-        return true;
-    return false;
+    return RemoveSpell(spell_id, learn_prev, clear_ab);
 }
 
 bool Pet::RemoveSpell(uint32 spell_id, bool learn_prev, bool clear_ab)

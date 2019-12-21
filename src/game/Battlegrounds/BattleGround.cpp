@@ -1639,9 +1639,7 @@ Team BattleGround::GetPlayerTeam(ObjectGuid guid)
 bool BattleGround::IsPlayerInBattleGround(ObjectGuid guid)
 {
     BattleGroundPlayerMap::const_iterator itr = m_Players.find(guid);
-    if (itr != m_Players.end())
-        return true;
-    return false;
+    return itr != m_Players.end();
 }
 
 void BattleGround::PlayerAddedToBGCheckIfBGIsRunning(Player* plr)
@@ -1726,7 +1724,7 @@ void BattleGround::HandleCommand(Player* player, ChatHandler* handler, char* arg
         in >> eventIdx;
         handler->PSendSysMessage("Event %u current status: %u", eventIdx, m_ActiveEvents[eventIdx]);
         for (int j = 0; j < 0xFF; ++j)
-            if (m_EventObjects[MAKE_PAIR32(eventIdx, j)].gameobjects.size() || m_EventObjects[MAKE_PAIR32(eventIdx, j)].creatures.size())
+            if (!m_EventObjects[MAKE_PAIR32(eventIdx, j)].gameobjects.empty() || !m_EventObjects[MAKE_PAIR32(eventIdx, j)].creatures.empty())
                 handler->PSendSysMessage("Event (%u, %u): %u gobj / %u creatures", eventIdx, j, m_EventObjects[MAKE_PAIR32(eventIdx, j)].gameobjects.size(), m_EventObjects[MAKE_PAIR32(eventIdx, j)].creatures.size());
     }
 }

@@ -1575,10 +1575,7 @@ bool Creature::CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, Team t
 
     SetWalk(true, true);
 
-    if (!UpdateEntry(cinfo->entry, team, data, eventData, false))
-        return false;
-
-    return true;
+    return UpdateEntry(cinfo->entry, team, data, eventData, false);
 }
 
 bool Creature::LoadFromDB(uint32 guidlow, Map* map)
@@ -2692,7 +2689,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
     ThreatList::const_iterator itr = threatlist.begin();
     ThreatList::const_reverse_iterator ritr = threatlist.rbegin();
 
-    if (position >= threatlist.size() || !threatlist.size())
+    if (position >= threatlist.size() || threatlist.empty())
         return nullptr;
 
     switch (target)
@@ -3560,9 +3557,7 @@ bool Creature::canCreatureAttack(Unit const* pVictim, bool force) const
     else if (!pVictim->IsWithinDist3d(m_HomeX, m_HomeY, m_HomeZ, dist))
         return false;
 
-    if (!pVictim->IsInAccessablePlaceFor(this))
-        return false;
-    return true;
+    return pVictim->IsInAccessablePlaceFor(this);
 }
 
 time_t Creature::GetCombatTime(bool total) const
@@ -3764,10 +3759,7 @@ void Creature::LeaveCreatureGroup()
 bool Creature::HasWeapon() const
 {
     uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (0 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
-    if (itemClass == ITEM_CLASS_WEAPON)
-        return true;
-
-    return false;
+    return itemClass == ITEM_CLASS_WEAPON;
 }
 
 void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)

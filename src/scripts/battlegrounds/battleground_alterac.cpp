@@ -1899,7 +1899,7 @@ struct AV_NpcEventAI : public npc_escortAI
             {
                 if (bg->getPlayerGoStatus(BG_TEAM_HORDE, BG_AV_GROUND_ASSAULT) && creature_entry == AV_NPC_QUARTERMASTER)
                 {
-                    if (b_isTroopsSpawned == false)
+                    if (!b_isTroopsSpawned)
                     {
                         b_isTroopsSpawned = true;
                         bg->setPlayerGoStatus(BG_TEAM_HORDE, BG_AV_GROUND_ASSAULT, false);
@@ -1952,7 +1952,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 }
                 else if (bg->getPlayerGoStatus(BG_TEAM_ALLIANCE, BG_AV_GROUND_ASSAULT) && creature_entry == AV_NPC_QUARTERMASTER_A)
                 {
-                    if (b_isTroopsSpawned == false)
+                    if (!b_isTroopsSpawned)
                     {
                         b_isTroopsSpawned = true;
                         bg->setPlayerGoStatus(BG_TEAM_ALLIANCE, BG_AV_GROUND_ASSAULT, false);
@@ -2081,7 +2081,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     if (m_uiTransform_Timer < uiDiff)
                     {
-                        if (b_isTransformed == false)
+                        if (!b_isTransformed)
                         {
                             m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                             b_isTransformed = true;
@@ -2751,7 +2751,7 @@ struct AV_NpcEventAI : public npc_escortAI
             GameObject* pInvocation = m_creature->FindNearestGameObject(OBJECT_WB_H_INVOCATION, 250.0f);
             if (isGobSummoned && !pInvocation && m_creature->GetDistance(-360.16f, -130.41f, 27.07f) < 100)
             {
-                if (m_bThurlogaBoss == false)
+                if (!m_bThurlogaBoss)
                 {
                     m_bThurlogaBoss = true;
                     DoScriptText(SAY_LOKHOLAR_SPAWNED, m_creature);
@@ -2783,7 +2783,7 @@ struct AV_NpcEventAI : public npc_escortAI
             GameObject* pInvocation = m_creature->FindNearestGameObject(OBJECT_WB_A_INVOCATION, 250.0f);
             if (isGobSummoned && !pInvocation && m_creature->GetDistance(-199.64f, -342.7f, 7.67f) < 100.0f)
             {
-                if (m_bRenferalBoss == false)
+                if (!m_bRenferalBoss)
                 {
                     m_bRenferalBoss = true;
                     m_uiDespawn_Timer = 6000;
@@ -3609,7 +3609,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
             {
                 case 2:
                 {
-                    if (b_isSpeechDone == false)
+                    if (!b_isSpeechDone)
                     {
                         b_isSpeechDone = true;
                         m_creature->SetWalk(false);
@@ -4466,7 +4466,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
             isYelling = true;
         }
 
-        if (isInvocated == false)
+        if (!isInvocated)
         {
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
             m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
@@ -4474,7 +4474,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
             m_creature->SetWalk(false);
             isInvocated = true;
         }
-        if (m_uiEngageTimer < uiDiff && isEngageModeStarted == false)
+        if (m_uiEngageTimer < uiDiff && !isEngageModeStarted)
         {
             /** Start waypoint path system */
             Start(false, 0, nullptr, false);
@@ -4645,7 +4645,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
     void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (isInvocated == false)
+        if (!isInvocated)
         {
             DoScriptText(SAY_IVUS_SPAWNED, m_creature);
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
@@ -4655,7 +4655,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
             isInvocated = true;
         }
 
-        if (m_uiEngageTimer < uiDiff && isEngageModeStarted == false)
+        if (m_uiEngageTimer < uiDiff && !isEngageModeStarted)
         {
             /** Start waypoint path system */
             Start(false, 0, nullptr, false);

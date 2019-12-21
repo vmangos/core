@@ -608,27 +608,27 @@ struct instance_stratholme : public ScriptedInstance
             }
             case TYPE_SH_AELMAR:
             {
-                IsSilverHandDead[0] = (uiData) ? true : false;
+                IsSilverHandDead[0] = (uiData) != 0;
                 break;
             }
             case TYPE_SH_CATHELA:
             {
-                IsSilverHandDead[1] = (uiData) ? true : false;
+                IsSilverHandDead[1] = (uiData) != 0;
                 break;
             }
             case TYPE_SH_GREGOR:
             {
-                IsSilverHandDead[2] = (uiData) ? true : false;
+                IsSilverHandDead[2] = (uiData) != 0;
                 break;
             }
             case TYPE_SH_NEMAS:
             {
-                IsSilverHandDead[3] = (uiData) ? true : false;
+                IsSilverHandDead[3] = (uiData) != 0;
                 break;
             }
             case TYPE_SH_VICAR:
             {
-                IsSilverHandDead[4] = (uiData) ? true : false;
+                IsSilverHandDead[4] = (uiData) != 0;
                 break;
             }
             case TYPE_POSTMASTER:

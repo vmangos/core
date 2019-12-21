@@ -104,7 +104,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     }
 
     // reset instance validity, except if going to an instance inside an instance
-    if (GetPlayer()->m_InstanceValid == false && !mEntry->IsDungeon())
+    if (!GetPlayer()->m_InstanceValid && !mEntry->IsDungeon())
         GetPlayer()->m_InstanceValid = true;
 
     // relocate the player to the teleport destination
@@ -534,7 +534,7 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
     movementInfo.UpdateTime(recvData.GetPacketTime());
     uint32 applyInt;
     recvData >> applyInt;
-    bool applyReceived = applyInt == 0u ? false : true;
+    bool applyReceived = applyInt != 0u;
     /*----------------*/
 
     // make sure this client is allowed to control the unit which guid is provided

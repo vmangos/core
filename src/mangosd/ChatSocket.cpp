@@ -281,7 +281,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
         }
         else if (messageType == OFFLINE_CHAT_GM_COMMAND)
         {
-            if (message == "")
+            if (message.empty())
             {
                 sendf("err_empty\n");
                 return 0;

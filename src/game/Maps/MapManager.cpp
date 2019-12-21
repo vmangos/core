@@ -315,7 +315,7 @@ void MapManager::Update(uint32 diff)
         iter->second->SetMapUpdateIndex(-1);
         if (iter->second->Instanceable())
         {
-            if (instanceUpdaters.size())
+            if (!instanceUpdaters.empty())
             {
                 instanceUpdaters[mapIdx % instanceUpdaters.size()]->maps.push_back(iter->second);
                 ++mapIdx;

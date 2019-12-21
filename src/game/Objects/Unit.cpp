@@ -228,10 +228,10 @@ Unit::~Unit()
     delete movespline;
 
     // those should be already removed at "RemoveFromWorld()" call
-    MANGOS_ASSERT(m_gameObj.size() == 0);
-    MANGOS_ASSERT(m_dynObjGUIDs.size() == 0);
-    MANGOS_ASSERT(m_deletedAuras.size() == 0);
-    MANGOS_ASSERT(m_deletedHolders.size() == 0);
+    MANGOS_ASSERT(m_gameObj.empty());
+    MANGOS_ASSERT(m_dynObjGUIDs.empty());
+    MANGOS_ASSERT(m_deletedAuras.empty());
+    MANGOS_ASSERT(m_deletedHolders.empty());
     MANGOS_ASSERT(!m_needUpdateVisibility);
 }
 
@@ -499,10 +499,7 @@ bool Unit::HaveOffhandWeapon() const
     else
     {
         uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (1 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
-        if (itemClass == ITEM_CLASS_WEAPON)
-            return true;
-
-        return false;
+        return itemClass == ITEM_CLASS_WEAPON;
     }
 }
 
@@ -5183,10 +5180,7 @@ bool Unit::IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellS
 
     DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "%s [ID:%u] Crit chance %f.", spellProto->SpellName[2].c_str(), spellProto->Id, crit_chance);
 
-    if (roll_chance_f(crit_chance))
-        return true;
-
-    return false;
+    return roll_chance_f(crit_chance);
 }
 
 /**

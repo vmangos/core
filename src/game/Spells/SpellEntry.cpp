@@ -917,9 +917,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster
             if (EffectImplicitTargetA[effIndex] == TARGET_SELF && EffectImplicitTargetB[effIndex] == TARGET_NONE)
                 return true;
             // Sacrifice is a positive spell - for the warlock :)
-            if (IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>())
-                return true;
-            return false;
+            return IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>();
         // Dispel can be positive or negative depending on the target
         case SPELL_EFFECT_DISPEL:
             if (caster && victim)

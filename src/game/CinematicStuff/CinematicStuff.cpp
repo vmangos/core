@@ -226,7 +226,7 @@ void CinematicStuff::SearchAndDestroy(Player* player)
             if (target == nullptr)
             {
                 std::set<Unit*> const attackers = player->GetAttackers();
-                if (attackers.size() > 0)
+                if (!attackers.empty())
                     target = *attackers.begin();
             }
         }
@@ -237,7 +237,7 @@ void CinematicStuff::SearchAndDestroy(Player* player)
         player->GetMotionMaster()->MoveChase(target);
         player->SetFacingToObject(target);
         player->SetInFront(target);
-        player->Attack(target, player->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+        player->Attack(target, player->IsInRange(target, 0, MELEE_RANGE));
     }
     else
     {

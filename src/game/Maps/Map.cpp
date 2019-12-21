@@ -75,7 +75,7 @@ Map::~Map()
     if (m_TerrainData->Release())
         sTerrainMgr.UnloadTerrain(m_TerrainData->GetMapId());
 
-    if (_corpseToRemove.size() > 0)
+    if (!_corpseToRemove.empty())
         sLog.outError("[MAP] Map %u (instance %u) deleted while there are still corpses to remove", GetId(), GetInstanceId());
 
     delete m_weatherSystem;
@@ -472,8 +472,6 @@ void Map::Add(Transport* obj)
 
     // Broadcast creation to players
     obj->SendCreateUpdateToMap();
-
-    return;
 }
 
 void Map::MessageBroadcast(Player const* player, WorldPacket* msg, bool to_self)
@@ -2221,7 +2219,7 @@ void DungeonMap::UnloadAll(bool pForce)
         }
     }
 
-    if (m_resetAfterUnload == true)
+    if (m_resetAfterUnload)
         GetPersistanceState()->DeleteRespawnTimesAndData();
 
     Map::UnloadAll(pForce);
@@ -2865,7 +2863,7 @@ void Map::SendObjectUpdates()
     }
 
     // If we timeout, use more threads !
-    if (i_objectsToClientUpdate.size())
+    if (!i_objectsToClientUpdate.empty())
         ++_objUpdatesThreads;
     else
         --_objUpdatesThreads;
@@ -2968,7 +2966,7 @@ void Map::UpdateVisibilityForRelocations()
             delete updaters[i];
     }
 
-    if (i_unitsRelocated.size())
+    if (!i_unitsRelocated.empty())
         ++_unitRelocationThreads;
     else
         --_unitRelocationThreads;
@@ -3028,7 +3026,7 @@ public:
     {
         char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx) : sObjectMgr.GetMangosString(i_textId, loc_idx);
 
-        std::string nameForLocale = "";
+        std::string nameForLocale;
         if (loc_idx >= 0)
         {
             CreatureLocale const* cl = sObjectMgr.GetCreatureLocale(i_cInfo->entry);
@@ -3458,7 +3456,7 @@ bool Map::ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit)
     if (!update)
     {
         ACE_Guard<MapMutexType> guard(_corpseRemovalLock);
-        if (_corpseToRemove.size() > 0)
+        if (!_corpseToRemove.empty())
             update = true;
     }
 

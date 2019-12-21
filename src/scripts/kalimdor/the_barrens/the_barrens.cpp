@@ -126,7 +126,7 @@ struct npc_pollyAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        if (b_text == false)
+        if (!b_text)
         {
             m_creature->MonsterSay("MmmmmMmmmm... Enormous chemically altered cracker...", 0, 0);
             m_creature->MonsterSay("What the squawk? Squawk squawk, squawk? SQUAWK!", 0, 0);

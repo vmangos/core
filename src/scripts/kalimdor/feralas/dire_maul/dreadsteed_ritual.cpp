@@ -343,7 +343,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                         uint8 nbOkNodes = 0;
                         for (uint8 i = 0; i < 3; i++)
                         {
-                            if (nodes[i].up == true)
+                            if (nodes[i].up)
                                 nbOkNodes++;
                         }
                         if (nbOkNodes == 3)
@@ -585,7 +585,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         uint8 nbOkNodes = 0;
         for (uint8 i = 0; i < 3; i++)
         {
-            if (nodes[i].up == true)
+            if (nodes[i].up)
                 nbOkNodes++;
         }
         if (nbOkNodes < 2)
@@ -599,7 +599,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             uint8 count = 0;
             for (uint8 i = 0; i < 3; i++)
             {
-                if (nodes[i].up == true)
+                if (nodes[i].up)
                 {
                     if (nodeToBreak == count)
                     {
@@ -689,8 +689,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                 break;
             }
         }
-        return;
-    }
+           }
 };
 GameObjectAI* GetAIgo_pedestal_of_immol_thar(GameObject *pGo)
 {

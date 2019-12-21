@@ -274,10 +274,7 @@ struct boss_rajaxxAI : public ScriptedAI
             return false;
 
         // Count of dead mobs per wave is managed by instance script
-        if (m_pInstance->GetData(m_uiNextWaveIndex - 1 + WAVE_OFFSET) == 0)
-            return true;
-
-        return false;
+        return m_pInstance->GetData(m_uiNextWaveIndex - 1 + WAVE_OFFSET) == 0;
     }
 
     void OnKillReputationReward()
@@ -290,7 +287,7 @@ struct boss_rajaxxAI : public ScriptedAI
         std::list<Creature*> helpers;
         GetCreatureListWithEntryInGrid(helpers, m_creature, { 15473, 15478, 15471, 987001 }, 400.0f);
         
-        if (!helpers.size())
+        if (helpers.empty())
             return;
         int alive = 0;
         for (auto it : helpers)
@@ -407,8 +404,7 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        return;
-    }
+           }
 
     bool FillLoot(Loot* loot, Player* looter) const override
     {

@@ -127,7 +127,7 @@ void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathN
         GetPlayer()->Mount(mountDisplayId);
 
     // Check if it's a multi path
-    if (GetPlayer()->m_taxi.GetTaxiPath().size())
+    if (!GetPlayer()->m_taxi.GetTaxiPath().empty())
         GetPlayer()->GetMotionMaster()->MoveTaxiFlight();
     else
         GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);

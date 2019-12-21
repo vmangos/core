@@ -1199,7 +1199,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
                     delete result;
                 }
 
-                if (list.size() < 1)
+                if (list.empty())
                     return false;
                 std::stringstream accountStream;
                 std::copy(list.begin(), list.end(), std::ostream_iterator<int>(accountStream, ","));
@@ -4251,13 +4251,13 @@ bool ChatHandler::HandleModifyRepCommand(char* args)
 
     if (factionEntry->reputationListID < 0)
     {
-        PSendSysMessage(LANG_COMMAND_FACTION_NOREP_ERROR, factionEntry->name[GetSessionDbcLocale()], factionId);
+        PSendSysMessage(LANG_COMMAND_FACTION_NOREP_ERROR, factionEntry->name[GetSessionDbcLocale()].c_str(), factionId);
         SetSentErrorMessage(true);
         return false;
     }
 
     target->GetReputationMgr().SetReputation(factionEntry, amount);
-    PSendSysMessage(LANG_COMMAND_MODIFY_REP, factionEntry->name[GetSessionDbcLocale()], factionId,
+    PSendSysMessage(LANG_COMMAND_MODIFY_REP, factionEntry->name[GetSessionDbcLocale()].c_str(), factionId,
                     GetNameLink(target).c_str(), target->GetReputationMgr().GetReputation(factionEntry));
     return true;
 }

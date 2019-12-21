@@ -131,9 +131,7 @@ bool BattleGroundQueue::SelectionPool::AddGroup(GroupQueueInfo *ginfo, uint32 de
         PlayerCount += ginfo->Players.size();
         return true;
     }
-    if (PlayerCount < desiredCount)
-        return true;
-    return false;
+    return PlayerCount < desiredCount;
 }
 
 /*********************************************************/
@@ -213,7 +211,7 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player* leader, Group* grp, BattleG
         }
 
         //add GroupInfo to m_QueuedGroups
-        if (ginfo->Players.size())
+        if (!ginfo->Players.empty())
             m_QueuedGroups[bracketId][index].push_back(ginfo);
         else
             return ginfo; // group size was above limit
@@ -296,7 +294,7 @@ uint32 BattleGroundQueue::GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BattleG
 void BattleGroundQueue::LogQueueInscription(Player* plr, BattleGroundTypeId BgTypeId, uint32 uiAction)
 {
     std::string sPName = plr->GetName();
-    std::string last_ip = "";
+    std::string last_ip;
     time_t queuing_time = time(nullptr);
     if (WorldSession* session = plr->GetSession())
         last_ip = session->GetRemoteAddress();

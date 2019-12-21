@@ -568,7 +568,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recv_data)
     }
 
     // Prevent spoofed packet accessing mail that doesn't actually have items
-    if (!m->HasItems() || m->items.size() == 0)
+    if (!m->HasItems() || m->items.empty())
     {
         pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -777,7 +777,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
         data << uint32((*itr)->stationery);                 // stationery (Stationery.dbc)
 
         // 1.12.1 can have only single item
-        Item *item = (*itr)->items.size() > 0 ? pl->GetMItem((*itr)->items[0].item_guid) : nullptr;
+        Item *item = !(*itr)->items.empty() ? pl->GetMItem((*itr)->items[0].item_guid) : nullptr;
 
         if (item)
         {

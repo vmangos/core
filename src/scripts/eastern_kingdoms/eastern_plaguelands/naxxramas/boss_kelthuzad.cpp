@@ -357,8 +357,7 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* pWho) override
     {
-        return;
-    }
+           }
 
     void AttackStart(Unit* who) override
     {

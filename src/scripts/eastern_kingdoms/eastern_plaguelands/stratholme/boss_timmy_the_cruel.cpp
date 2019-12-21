@@ -81,10 +81,7 @@ struct npc_crimson_guardsmanAI : public ScriptedAI
     npc_crimson_guardsmanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
-        if (pCreature->GetDBTableGUIDLow() == 54070)
-            m_bIsTimmySpawner = true;
-        else
-            m_bIsTimmySpawner = false;
+        m_bIsTimmySpawner = pCreature->GetDBTableGUIDLow() == 54070;
     }
 
     bool m_bIsTimmySpawner;

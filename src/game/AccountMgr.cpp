@@ -34,7 +34,7 @@
 #include "MasterPlayer.h"
 #include "Anticheat.h"
 
-extern DatabaseType LoginDatabase;
+
 
 INSTANTIATE_SINGLETON_1(AccountMgr);
 
@@ -136,7 +136,7 @@ AccountOpResult AccountMgr::ChangeUsername(uint32 accid, std::string new_uname, 
 
 AccountOpResult AccountMgr::ChangePassword(uint32 accid, std::string new_passwd, std::string username)
 {
-    if (username == "")
+    if (username.empty())
     {
         if (!GetName(accid, username))
             return AOR_NAME_NOT_EXIST;
@@ -266,7 +266,7 @@ uint32 AccountMgr::GetCharactersCount(uint32 acc_id)
 
 bool AccountMgr::CheckPassword(uint32 accid, std::string passwd, std::string username)
 {
-    if (username == "")
+    if (username.empty())
     {
         if (!GetName(accid, username))
             return false;
@@ -412,17 +412,13 @@ void AccountMgr::LoadAccountBanList(bool silent)
 bool AccountMgr::IsIPBanned(std::string const& ip) const
 {
     std::map<std::string, uint32>::const_iterator it = _ipBanned.find(ip);
-    if (it == _ipBanned.end() || it->second < time(nullptr))
-        return false;
-    return true;
+    return !(it == _ipBanned.end() || it->second < time(nullptr));
 }
 
 bool AccountMgr::IsAccountBanned(uint32 acc) const
 {
     std::map<uint32, uint32>::const_iterator it = _accountBanned.find(acc);
-    if (it == _accountBanned.end() || it->second < time(nullptr))
-        return false;
-    return true;
+    return !(it == _accountBanned.end() || it->second < time(nullptr));
 }
 
 bool AccountMgr::CheckInstanceCount(uint32 accountId, uint32 instanceId, uint32 maxCount)

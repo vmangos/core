@@ -897,7 +897,7 @@ void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
     // Lookup target in already in list
     for (TargetList::iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
-        if (ihit->deleted == true)
+        if (ihit->deleted)
             continue;
 
         if (targetGUID == ihit->targetGUID)                 // Found in list
@@ -1900,9 +1900,7 @@ bool Spell::HasValidUnitPresentInTargetList()
     // It does not stop unless it dies of course.
     if (!needTargetsMask)
     {
-        if (m_casterUnit && m_casterUnit->IsAlive() == m_spellInfo->IsDeathOnlySpell())
-            return false;
-        return true;
+        return !(m_casterUnit && m_casterUnit->IsAlive() == m_spellInfo->IsDeathOnlySpell());
     }
 
     for (TargetList::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
@@ -3479,7 +3477,7 @@ void Spell::cancel()
         return;
 
     // channeled spells don't display interrupted message even if they are interrupted, possible other cases with no "Interrupted" message
-    bool sendInterrupt = m_channeled && m_spellState != SPELL_STATE_PREPARING ? false : true;
+    bool sendInterrupt = !(m_channeled && m_spellState != SPELL_STATE_PREPARING);
 
     m_autoRepeat = false;
     switch (m_spellState)
@@ -3844,10 +3842,10 @@ void Spell::handle_immediate()
     m_targetNum = 0;
     for (auto ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
     {
-        if (m_destroyed == true || ihit == m_UniqueTargetInfo.end() || m_UniqueTargetInfo.size() == 0)
+        if (m_destroyed || ihit == m_UniqueTargetInfo.end() || m_UniqueTargetInfo.empty())
             break;
 
-        if (ihit->deleted == true)
+        if (ihit->deleted)
             continue;
 
         ++m_targetNum;
@@ -3861,10 +3859,10 @@ void Spell::handle_immediate()
 
     for (auto ihit = m_UniqueGOTargetInfo.begin(); ihit != m_UniqueGOTargetInfo.end(); ++ihit)
     {
-        if (m_destroyed == true || ihit == m_UniqueGOTargetInfo.end() || m_UniqueGOTargetInfo.size() == 0)
+        if (m_destroyed || ihit == m_UniqueGOTargetInfo.end() || m_UniqueGOTargetInfo.empty())
             break;
 
-        if (ihit->deleted == true)
+        if (ihit->deleted)
             continue;
 
         DoAllEffectOnTarget(&(*ihit));
@@ -6394,7 +6392,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if (m_spellInfo->Id == 15958)
                 { 
-                    if (m_UniqueGOTargetInfo.size())
+                    if (!m_UniqueGOTargetInfo.empty())
                     {
                         ObjectGuid eggGuid = m_UniqueGOTargetInfo.back().targetGUID;
                         if (GameObject* pRookeryEgg = m_caster->GetMap()->GetGameObject(eggGuid))
@@ -6410,7 +6408,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
                 else if (m_spellInfo->Id == 16447)
                 {
-                    if (!m_UniqueGOTargetInfo.size())
+                    if (m_UniqueGOTargetInfo.empty())
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
                 }
                 break;
@@ -7340,10 +7338,7 @@ bool Spell::IgnoreItemRequirements() const
 
         /// Some triggered spells have same reagents that have master spell
         /// expected in test: master spell have reagents in first slot then triggered don't must use own
-        if (m_triggeredBySpellInfo && !m_triggeredBySpellInfo->Reagent[0])
-            return false;
-
-        return true;
+        return !(m_triggeredBySpellInfo && !m_triggeredBySpellInfo->Reagent[0]);
     }
 
     return false;
@@ -8005,11 +8000,8 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
             break;
     }
 
-    if (target->GetTypeId() != TYPEID_PLAYER && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER
-            && m_spellInfo->EffectImplicitTargetA[eff] != TARGET_SCRIPT && m_spellInfo->EffectImplicitTargetA[eff] != TARGET_SELF)
-        return false;
-
-    return true;
+    return !(target->GetTypeId() != TYPEID_PLAYER && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER
+            && m_spellInfo->EffectImplicitTargetA[eff] != TARGET_SCRIPT && m_spellInfo->EffectImplicitTargetA[eff] != TARGET_SELF);
 }
 
 bool Spell::IsNeedSendToClient() const

@@ -716,11 +716,11 @@ bool HonorMgr::Add(float cp, uint8 type, Unit* source)
     float honor = (type == DISHONORABLE) ? -cp : cp;
 
     // get IP if source is player
-    std::string ip = "";
+    std::string ip;
     if (Player* victim = source->ToPlayer())
         ip = victim->GetSession()->GetRemoteAddress();
 
-    bool plr = source->GetTypeId() == TYPEID_PLAYER ? true : false;
+    bool plr = source->GetTypeId() == TYPEID_PLAYER;
 
     if (m_owner->GetMap()->IsBattleGround())
         sLog.outHonor("[BATTLEGROUND]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",

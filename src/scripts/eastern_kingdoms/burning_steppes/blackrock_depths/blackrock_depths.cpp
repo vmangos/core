@@ -2476,7 +2476,7 @@ struct npc_marshal_windsorAI : npc_escortAI
             m_pInstance->SetData(GO_JAIL_DOOR_DUGHAL, false);
         }
 
-        if (m_pInstance->GetData(TYPE_JAIL_DUGHAL) == IN_PROGRESS && m_uiSaidJustOnce == false && m_uiWP == 7)
+        if (m_pInstance->GetData(TYPE_JAIL_DUGHAL) == IN_PROGRESS && !m_uiSaidJustOnce && m_uiWP == 7)
         {
             SetEscortPaused(false);
             m_uiSaidJustOnce = true;

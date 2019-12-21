@@ -280,7 +280,7 @@ struct DoSpellProcEvent
         if (!spe.schoolMask && !spe.procFlags &&
                 !spe.procEx && !spe.ppmRate && !spe.customChance && !spe.cooldown)
         {
-            bool empty = !spe.spellFamilyName ? true : false;
+            bool empty = spe.spellFamilyName == 0;
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
                 if (spe.spellFamilyMask[i])
@@ -803,7 +803,7 @@ bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) 
             }
         }
     }
-    if (spellGroupIds.size() == 0)
+    if (spellGroupIds.empty())
         return false;
     for (spellGroupIdsIt = spellGroupIds.begin(); spellGroupIdsIt != spellGroupIds.end(); ++spellGroupIdsIt)
     {
@@ -846,7 +846,7 @@ bool SpellMgr::ListLessPowerfullSpells(uint32 spellId, std::list<uint32>& list) 
             }
         }
     }
-    if (spellGroupIds.size() == 0)
+    if (spellGroupIds.empty())
         return false;
     for (spellGroupIdsIt = spellGroupIds.begin(); spellGroupIdsIt != spellGroupIds.end(); ++spellGroupIdsIt)
     {

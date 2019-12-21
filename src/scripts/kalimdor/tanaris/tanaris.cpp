@@ -310,7 +310,7 @@ CreatureAI* GetAI_npc_stone_watcher_of_norgannon(Creature* creature)
 {
     std::list<Creature*> creatures;
     creature->GetCreatureListWithEntryInGrid(creatures, creature->GetEntry(), 20.0f);
-    if (creatures.size())
+    if (!creatures.empty())
         creature->DeleteLater();
     return nullptr;
 }
@@ -520,9 +520,7 @@ struct go_inconspicuous_landmarkAI: public GameObjectAI
     }
     bool CheckCanStartEvent()
     {
-        if (!state)
-            return true;
-        return false;
+        return !state;
     }
 
     void SetInUse()

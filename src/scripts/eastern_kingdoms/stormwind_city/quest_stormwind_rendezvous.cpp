@@ -145,7 +145,7 @@ void npc_reginald_windsorAI::SituationFinale()
 
 void npc_reginald_windsorAI::UpdateAI_corpse(uint32 const uiDiff)
 {
-    if (PhaseFinale == false)
+    if (!PhaseFinale)
         return;
 
     if (FinalTimer < uiDiff)
@@ -177,7 +177,7 @@ void npc_reginald_windsorAI::UpdateAI_corpse(uint32 const uiDiff)
     else
         FinalTimer -= uiDiff;
 
-    if (TheEnd == true)
+    if (TheEnd)
     {
         if (FinalTimer < uiDiff)
         {
@@ -218,7 +218,7 @@ void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
             Victim->GetEntry() == NPC_STORMWIND_ROYAL_GUARD ||
             Victim->GetEntry() == NPC_STORMWIND_CITY_PATROL)
         {
-            if (Victim->GetDistance2d(m_creature) < 8.0f && NeedCheck == true)
+            if (Victim->GetDistance2d(m_creature) < 8.0f && NeedCheck)
             {
                 bool Continuer = true;
                 for (int i = 0; i < 30; i++)
@@ -226,7 +226,7 @@ void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
                     if (Victim->GetGUID() == GardesGUIDs[i] || m_creature->GetPositionY() < 360)
                         Continuer = false;
                 }
-                if (Continuer == true)
+                if (Continuer)
                 {
                     Victim->SetFacingToObject(m_creature);
                     Victim->HandleEmote(EMOTE_ONESHOT_SALUTE);
@@ -261,7 +261,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
 
     for (int i = 0; i < 6; i++)
     {
-        if (GardeNeed[i] == true)
+        if (GardeNeed[i])
         {
             if (GardeTimer[i] < uiDiff)
             {
@@ -737,7 +737,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
             Y = m_creature->GetPositionY() - WindsorDeplacement[Var].y;
             Timer = 1000 + sqrt(X * X + Y * Y) / (m_creature->GetSpeed(MOVE_WALK) * 0.001f);
         }
-        else if (PhaseFinale == true)
+        else if (PhaseFinale)
         {
             if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
             {

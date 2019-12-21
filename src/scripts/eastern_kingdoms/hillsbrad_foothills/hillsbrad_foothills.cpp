@@ -16,6 +16,7 @@ struct go_helcular_s_graveAI: public GameObjectAI
     {
         guid_helcular = 0;
     }
+
     uint64 guid_helcular;
 
     bool CheckHelcularSpawned()
@@ -24,11 +25,13 @@ struct go_helcular_s_graveAI: public GameObjectAI
             return true;
         return false;
     }
+
     void SetHelcularGuid(Creature* crea)
     {
         guid_helcular = crea->GetGUID();
     }
 };
+
 GameObjectAI* GetAIgo_helcular_s_grave(GameObject *pGo)
 {
     return new go_helcular_s_graveAI(pGo);
@@ -54,6 +57,7 @@ enum
     GO_TAINTED_KEG          = 1729,
     GO_TAINTED_KEG_SMOKE    = 1730
 };
+
 struct go_dusty_rugAI: public GameObjectAI
 {
     go_dusty_rugAI(GameObject* pGo) : GameObjectAI(pGo)
@@ -131,7 +135,6 @@ struct go_dusty_rugAI: public GameObjectAI
         }
     }
 
-
     void StartEvent()
     {
         if (step)
@@ -145,10 +148,12 @@ struct go_dusty_rugAI: public GameObjectAI
         }
     }
 };
+
 GameObjectAI* GetAIgo_dusty_rug(GameObject *pGo)
 {
     return new go_dusty_rugAI(pGo);
 }
+
 bool QuestRewarded_go_dusty_rug(Player* pPlayer, GameObject* pGo, Quest const* pQuest)
 {
     if (go_dusty_rugAI* pRugAI = dynamic_cast<go_dusty_rugAI*>(pGo->AI()))

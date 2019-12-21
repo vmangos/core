@@ -362,7 +362,7 @@ struct boss_sapphironAI : public ScriptedAI
                 suitableUnits.push_back(pTarget);
             }
 
-        if (suitableUnits.size() == 0)
+        if (suitableUnits.empty())
         {
             RescheduleIcebolt();
             return;
@@ -697,18 +697,15 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 
     void AttackStart(Unit*) override
     {
-        return;
-    }
+           }
 
     void MoveInLineOfSight(Unit*) override
     {
-        return;
-    }
+           }
 
     void Aggro(Unit*) override
     {
-        return;
-    }
+           }
 
     void MovementInform(uint32 uiType, uint32 pointId) override
     {

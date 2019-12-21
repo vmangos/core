@@ -308,7 +308,7 @@ struct boss_loathebAI : public ScriptedAI
                 // Summoning a new eye
                 if (eyeStalks[i].timer < diff)
                 {
-                    if (availableEyeLocs.size() == 0)
+                    if (availableEyeLocs.empty())
                     {
                         sLog.outError("boss_loatheb.cpp - availableEyeLocs size 0, should not happen!");
                         return;

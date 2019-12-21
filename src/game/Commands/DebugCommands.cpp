@@ -1597,14 +1597,14 @@ bool ChatHandler::HandleDebugOverflowCommand(char* args)
     return true;
 }
 
-extern LootStore LootTemplates_Creature;
-extern LootStore LootTemplates_Fishing;
-extern LootStore LootTemplates_Gameobject;
-extern LootStore LootTemplates_Item;
-extern LootStore LootTemplates_Mail;
-extern LootStore LootTemplates_Pickpocketing;
-extern LootStore LootTemplates_Skinning;
-extern LootStore LootTemplates_Disenchant;
+
+
+
+
+
+
+
+
 
 bool ChatHandler::HandleDebugLootTableCommand(char* args)
 {

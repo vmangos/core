@@ -805,7 +805,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         if (!who->IsAlive())
             return;
 
-        playerDetected = m_creature->IsWithinDistInMap(who, MAX_SIGHT_DISTANCE) ? true : false;
+        playerDetected = m_creature->IsWithinDistInMap(who, MAX_SIGHT_DISTANCE);
     }
 
     bool MoreThanOnePlayerNear()

@@ -611,7 +611,7 @@ void WaypointManager::Unload()
 void WaypointManager::_clearPath(WaypointPath &path)
 {
     for (WaypointPath::const_iterator itr = path.begin(); itr != path.end(); ++itr)
-        if (itr->second.behavior)
+        
             delete itr->second.behavior;
     path.clear();
 }

@@ -491,7 +491,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 }
             }
 
-            if (lUnitList.size() == 0)
+            if (lUnitList.empty())
                 return;
 
             iter = lUnitList.begin();
@@ -533,7 +533,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     {
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
 
-        if (tList.size() == 0)
+        if (tList.empty())
             return nullptr;
 
         std::list<Player*> candidates;
@@ -552,7 +552,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             }
         }
 
-        if (candidates.size() == 0)
+        if (candidates.empty())
             return nullptr;
 
         auto candIt = candidates.begin();
@@ -855,7 +855,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         std::list<HostileReference*> candidates;
 
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-        if (tList.size() < 1)
+        if (tList.empty())
             return nullptr;
 
         for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i) {
@@ -867,7 +867,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
             }
         }
 
-        if (!candidates.size())
+        if (candidates.empty())
             return nullptr;
 
         auto it = candidates.begin();

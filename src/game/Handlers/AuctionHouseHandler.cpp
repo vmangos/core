@@ -377,7 +377,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket& recv_data)
     AH->bidder = 0;
     AH->bid = 0;
     AH->buyout = buyout;
-    AH->lockedIpAddress = GetRemoteAddress().c_str();
+    AH->lockedIpAddress = GetRemoteAddress();
     AH->depositTime = time(nullptr);
     AH->expireTime = time(nullptr) + auction_time;
     AH->deposit = deposit;

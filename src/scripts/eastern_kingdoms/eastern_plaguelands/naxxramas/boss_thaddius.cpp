@@ -139,10 +139,10 @@ enum thaddiusEvents
 static constexpr uint32 ENRAGE_TIMER = 1000 * 60 * 5;   // 5 min enrage once p2 starts
 
                                                         // Initial polarity shift is 10s, after that every 30 sec
-static uint32 const PolarityShiftTimer(bool initial = false) { return initial ? 1000 * 10 : 1000 * 30; }
+static uint32 PolarityShiftTimer(bool initial = false) { return initial ? 1000 * 10 : 1000 * 30; }
 
                                                         // Chain lightning timer. TODO: confirm timers. Atm is guess
-static uint32 const ChainLightningTimer() { return urand(5000, 7000); } 
+static uint32 ChainLightningTimer() { return urand(5000, 7000); } 
 
 
 static constexpr float addPositions[2][4] =

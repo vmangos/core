@@ -573,7 +573,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                 if (!changenth(line, 2, chraccount))        // characters.account update
                     ROLLBACK(DUMP_FILE_BROKEN);
 
-                if (name == "")
+                if (name.empty())
                 {
                     // check if the original name already exists
                     name = getnth(line, 3);                 // characters.name

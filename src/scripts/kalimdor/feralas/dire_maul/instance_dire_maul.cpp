@@ -1902,10 +1902,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         m_uiEvadeTimer             = 3000;
         m_bSummoned                = false;
 
-        if (DoCastSpellIfCan(m_creature, SPELL_THORNS) == CAST_OK)
-            m_bCastThorns = false;
-        else
-            m_bCastThorns = true;
+        m_bCastThorns = DoCastSpellIfCan(m_creature, SPELL_THORNS) != CAST_OK;
     }
 
     void SummonAdds()

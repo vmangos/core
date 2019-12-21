@@ -296,9 +296,9 @@ static constexpr uint32 P2_FIRST_STOMACH_GRAB           = 18000 - STOMACH_GRAB_D
 // ======================= MISC ==========================
 static constexpr uint32 GROUND_RUPTURE_DELAY                   = 0;             // ms after spawn that the ground rupture will be cast
 static constexpr uint32 HAMSTRING_INITIAL_COOLDOWN             = 2000;          // Claw tentacle hamstring cooldown after spawn/tp
-static uint32 const hamstringResetCooldownFunc()               { return 5000; } // Claw tentacle hamstring cooldown after use
-static uint32 const trashResetCooldownFunc()                   { return urand(6000, 12000); }
-static uint32 const groundTremorResetCooldownFunc()            { return urand(6000, 12000); }
+static uint32 hamstringResetCooldownFunc()               { return 5000; } // Claw tentacle hamstring cooldown after use
+static uint32 trashResetCooldownFunc()                   { return urand(6000, 12000); }
+static uint32 groundTremorResetCooldownFunc()            { return urand(6000, 12000); }
 //static constexpr uint32 CLAW_TENTACLE_FIRST_MELEE_DELAY      = 1000; // Earliest possible point for a claw tentacle to melee after spawn/tp
 static constexpr uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN      = 5000; // How long does a claw tentacle evade before TPing to new target
 
@@ -562,10 +562,7 @@ public:
                 birthTimer -= diff;
             }
         }
-        if (birthTimer <= diff) {
-            return true;
-        }
-        return false;
+        return birthTimer <= diff;
     }
 
     void FixPortalPosition() {
@@ -1629,7 +1626,7 @@ struct cthunAI : public ScriptedAI
     void UpdateInvulnerablePhase(uint32 diff)
     {
         // Weaken if both Flesh Tentacles are killed
-        if (fleshTentacles.size() == 0) {
+        if (fleshTentacles.empty()) {
             weaknessTimer = WEAKNESS_DURATION;
 
             DoScriptText(EMOTE_WEAKENED, m_creature);
@@ -1672,7 +1669,7 @@ struct cthunAI : public ScriptedAI
     
     void SpawnFleshTentacles() {
 
-        if (fleshTentacles.size() != 0) {
+        if (!fleshTentacles.empty()) {
             sLog.outError("SpawnFleshTentacles() called, but there are already %i tentacles up.", fleshTentacles.size());
         }
         //Spawn 2 flesh tentacles in C'thun stomach

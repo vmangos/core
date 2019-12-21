@@ -158,7 +158,7 @@ public:
                 items[slot].insert(id);
         }
         for (int i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            if (items[i].size())
+            if (!items[i].empty())
             {
                 auto it = items[i].begin();
                 std::advance(it, urand(0, items[i].size() - 1)),
@@ -669,7 +669,7 @@ public:
                 if (target == nullptr)
                 {
                     std::set<Unit*> const attackers = p->GetAttackers();
-                    if (attackers.size() > 0)
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }            
@@ -680,7 +680,7 @@ public:
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {
@@ -838,7 +838,7 @@ public:
                 if (target == nullptr)
                 {
                     std::set<Unit*> const attackers = p->GetAttackers();
-                    if (attackers.size() > 0)
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }
@@ -849,7 +849,7 @@ public:
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {
@@ -1569,7 +1569,7 @@ public:
                 if (target == nullptr)
                 {
                     std::set<Unit*> const attackers = p->GetAttackers();
-                    if (attackers.size() > 0)
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }
@@ -1580,7 +1580,7 @@ public:
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {

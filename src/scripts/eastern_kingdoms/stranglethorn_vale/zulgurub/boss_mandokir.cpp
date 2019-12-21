@@ -551,7 +551,7 @@ struct boss_mandokirAI : public ScriptedAI
         else
         {
             m_uiCharge_Timer -= diff;
-            if (m_bChargeCasted == true)
+            if (m_bChargeCasted)
             {
                 m_uiChargeCasted_Timer -= diff;
                 if (m_uiChargeCasted_Timer < diff)

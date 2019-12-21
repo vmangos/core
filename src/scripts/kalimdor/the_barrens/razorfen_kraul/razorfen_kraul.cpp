@@ -278,10 +278,7 @@ struct npc_snufflenose_gopherAI : public FollowerAI
                 return false;
 
         // Check that tuber is not more than 15 yards above or below current position
-        if (fabs(viewPoint->GetPositionZ() - tuber->GetPositionZ()) > 15)
-            return false;
-
-        return true;
+        return fabs(viewPoint->GetPositionZ() - tuber->GetPositionZ()) <= 15;
     }
 
     void UpdateAI(uint32 const uiDiff) override

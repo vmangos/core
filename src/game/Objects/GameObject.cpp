@@ -86,7 +86,7 @@ GameObject::~GameObject()
     delete i_AI;
     delete m_model;
 
-    MANGOS_ASSERT(m_dynObjGUIDs.size() == 0);
+    MANGOS_ASSERT(m_dynObjGUIDs.empty());
 }
 
 void GameObject::AddToWorld()
@@ -112,7 +112,7 @@ void GameObject::AddToWorld()
 
 void GameObject::AIM_Initialize()
 {
-    if (i_AI)
+    
         delete i_AI;
     i_AI = sScriptMgr.GetGameObjectAI(this);
 }
@@ -2182,10 +2182,7 @@ bool GameObject::PlayerCanUse(Player* pl)
         }
     }
 
-    if (!IsUseRequirementMet())
-        return false;
-
-    return true;
+    return IsUseRequirementMet();
 }
 
 void GameObject::SetLootState(LootState state)

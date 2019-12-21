@@ -115,9 +115,9 @@ bool DBCFileLoader::Load(const char *filename, const char *fmt)
 
 DBCFileLoader::~DBCFileLoader()
 {
-    if(data)
+    
         delete [] data;
-    if(fieldsOffset)
+    
         delete [] fieldsOffset;
 }
 

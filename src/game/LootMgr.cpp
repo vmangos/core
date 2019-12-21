@@ -1097,7 +1097,7 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot const& loot) const
                 continue;
             indexesOk.push_back(i);
         }
-        if (indexesOk.size())
+        if (!indexesOk.empty())
             return &EqualChanced[indexesOk[urand(0, indexesOk.size() - 1)]];
     }
 

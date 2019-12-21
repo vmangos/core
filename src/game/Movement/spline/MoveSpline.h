@@ -110,11 +110,11 @@ namespace Movement
             uint32 GetId() const { return m_Id;}
             bool Finalized() const { return splineflags.done; }
             bool isCyclic() const { return splineflags.cyclic;}
-            Vector3 const FinalDestination() const { return Initialized() ? spline.getPoint(spline.last()) : Vector3();}
-            Vector3 const CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1) : Vector3();}
-            Vector3 const PreviousDestination() const { return Initialized() ? spline.getPoint(point_Idx) : Vector3(); }
-            Vector3 const GetPoint(uint32 idx) const { return spline.getPoint(idx); }
-            uint32 const CountSplinePoints() const { return spline.last(); }
+            Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last()) : Vector3();}
+            Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1) : Vector3();}
+            Vector3 PreviousDestination() const { return Initialized() ? spline.getPoint(point_Idx) : Vector3(); }
+            Vector3 GetPoint(uint32 idx) const { return spline.getPoint(idx); }
+            uint32 CountSplinePoints() const { return spline.last(); }
             int32 currentPathIdx() const;
             int32 getLastPointSent() const { return last_point_sent_Idx; }
             void setLastPointSent(int i) { last_point_sent_Idx = i; }

@@ -583,9 +583,7 @@ struct npc_tyrionAI : public ScriptedAI
     bool AreCreaturesRequiredForQuestPresent(float fMaxSearchRange = 40.0f)
     {
         // m_guidTyrion Spybot
-        if (!GetClosestCreatureWithEntry(m_creature, NPC_TYRIONS_SPYBOT, VISIBLE_RANGE))
-            return false;
-        return true;
+        return GetClosestCreatureWithEntry(m_creature, NPC_TYRIONS_SPYBOT, VISIBLE_RANGE) != nullptr;
     }
 
 };

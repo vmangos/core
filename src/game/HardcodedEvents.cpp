@@ -508,10 +508,7 @@ bool LunarFestivalFirework::IsHourBeginning(uint8 minutes) const
     struct tm* timeinfo;
     timeinfo = localtime(&rawtime);
 
-    if (timeinfo->tm_min < minutes)
-        return true;
-
-    return false;
+    return timeinfo->tm_min < minutes;
 }
 
 SilithusWarEffortBattle::SilithusWarEffortBattle() : WorldEvent (EVENT_SILITHUS_WE_START)

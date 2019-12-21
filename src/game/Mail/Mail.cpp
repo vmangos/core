@@ -171,7 +171,7 @@ bool MailDraft::prepareItems(Player* receiver)
     mailLoot.FillLoot(m_mailTemplateId, LootTemplates_Mail, receiver, true, true);
 
     uint32 max_slot = mailLoot.GetMaxSlotInLootFor(receiver->GetGUIDLow());
-    for (uint32 i = 0; m_items.size() < MAX_MAIL_ITEMS && i < max_slot; ++i)
+    for (uint32 i = 0; m_items.empty() && i < max_slot; ++i)
     {
         if (LootItem* lootitem = mailLoot.LootItemInSlot(i, receiver->GetGUIDLow()))
         {
@@ -403,7 +403,7 @@ void Mail::prepareTemplateItems(Player* receiver)
     CharacterDatabase.PExecute("UPDATE mail SET has_items = 1 WHERE id = %u", messageID);
 
     uint32 max_slot = mailLoot.GetMaxSlotInLootFor(receiver->GetGUIDLow());
-    for (uint32 i = 0; items.size() < MAX_MAIL_ITEMS && i < max_slot; ++i)
+    for (uint32 i = 0; items.empty() && i < max_slot; ++i)
     {
         if (LootItem* lootitem = mailLoot.LootItemInSlot(i, receiver->GetGUIDLow()))
         {

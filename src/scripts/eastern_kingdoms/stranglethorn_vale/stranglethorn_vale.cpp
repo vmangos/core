@@ -64,7 +64,6 @@ struct mob_yennikuAI : public ScriptedAI
                 Reset_Timer = 60000;
             }
         }
-        return;
     }
 
     void Aggro(Unit *who) override {}

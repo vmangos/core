@@ -65,10 +65,7 @@ bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32
 
     ChatHandler handler(this);
 
-    if (handler.ParseCommands(msg.c_str()))
-        return false;
-
-    return true;
+    return !handler.ParseCommands(msg.c_str());
 }
 
 bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)

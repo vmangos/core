@@ -329,7 +329,7 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
     uint32 count = 0;
     AccountSearchHandler::ShowAccountListHelper(result, *this, count, limit, true);
 
-    if (result)
+    
         delete result;
 
     return true;
@@ -548,7 +548,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
     do
     {
         Field* fields = result->Fetch();
-        if (allAccounts.str() != "")
+        if (!allAccounts.str().empty())
             allAccounts << ",";
         allAccounts << fields[0].GetUInt32();
         accountsToBan.insert(fields[0].GetUInt32());
@@ -1218,7 +1218,7 @@ bool ChatHandler::HandleMuteCommand(char* args)
     ASSERT(playerData);
     std::stringstream reason;
     reason << playerData->sName << " muted " << notspeaktime << " minutes";
-    if (givenReason != "")
+    if (!givenReason.empty())
         reason << " for \"" << givenReason << "\"";
     sWorld.WarnAccount(playerData->uiAccount, authorName, reason.str(), "WARNING");
     return true;

@@ -96,12 +96,9 @@ bool Config::GetBoolDefault(const char* name, bool def)
         return def;
 
     const char* str = val.c_str();
-    if (strcmp(str, "true") == 0 || strcmp(str, "TRUE") == 0 ||
+    return strcmp(str, "true") == 0 || strcmp(str, "TRUE") == 0 ||
         strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
-        strcmp(str, "1") == 0)
-        return true;
-    else
-        return false;
+        strcmp(str, "1") == 0;
 }
 
 

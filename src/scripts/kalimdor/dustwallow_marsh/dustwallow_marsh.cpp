@@ -819,7 +819,7 @@ struct npc_archmage_tervoshAI : public ScriptedAI
     // used on area-trigger: if a new player arrives, reset event duration.
     void resetDespawnDelay() { m_despawnDelayTimer = TERVOSH_SPAWN_DURATION; }
     // returns the current phase in the event
-    uint32 const getCurrentPhase() const { return m_eventPhase; }
+    uint32 getCurrentPhase() const { return m_eventPhase; }
 
     void Reset() override
     {

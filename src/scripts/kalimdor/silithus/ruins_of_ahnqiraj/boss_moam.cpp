@@ -85,7 +85,7 @@ struct boss_moamAI : public ScriptedAI
     {
         m_creature->SetInCombatWithZone();
         DoScriptText(EMOTE_AGGRO, m_creature);
-        if (m_bIsInCombat == false)
+        if (!m_bIsInCombat)
         {
             m_creature->SetPower(POWER_MANA, 0);
             m_bIsInCombat = true;

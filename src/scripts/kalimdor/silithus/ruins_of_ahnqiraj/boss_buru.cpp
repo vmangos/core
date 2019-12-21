@@ -359,8 +359,7 @@ struct mob_buru_eggAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        return;
-    }
+           }
 };
 
 CreatureAI* GetAI_boss_buru(Creature* pCreature)

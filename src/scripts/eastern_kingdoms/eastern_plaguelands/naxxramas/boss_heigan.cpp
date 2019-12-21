@@ -369,7 +369,7 @@ struct boss_heiganAI : public ScriptedAI
 
         for (int i = 0; i < 3; i++)
         {
-            if (candidates.size() == 0)
+            if (candidates.empty())
                 break;
 
             uint32 idx = urand(0, candidates.size() - 1);

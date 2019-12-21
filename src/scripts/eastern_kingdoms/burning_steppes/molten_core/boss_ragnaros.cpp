@@ -678,7 +678,7 @@ struct boss_flame_of_ragnarosAI : ScriptedAI
 
     void UpdateAI(uint32 const /*diff*/) override
     {
-        if (Explode == true)
+        if (Explode)
             m_creature->ForcedDespawn();
     }
 };

@@ -47,7 +47,7 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 ^ Around 7-10sec cooldown. Times she's not casting it for 30+sec she is silenced by worshipper sacrifice.
   Might be fixed 8sec cast, but slightly delayed sometimes due to rain of fire or other reasons.
 */
-static uint32 const POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
+static uint32 POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
 static uint32 const INITIAL_POISONBOLT_VOLLEY_CD = 8000;
 
 /*
@@ -58,7 +58,7 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 
   Initial cd seems to be around 16sec
 */
-static uint32 const RAINOFFIRE_CD() { return urand(8000, 12000); }
+static uint32 RAINOFFIRE_CD() { return urand(8000, 12000); }
 static uint32 const RAINOFFIRE_INITIAL_CD = 16000;
 
 static float const ADD_DESPAWN_TIME = 20000;

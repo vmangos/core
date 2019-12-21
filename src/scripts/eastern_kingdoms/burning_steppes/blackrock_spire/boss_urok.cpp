@@ -160,7 +160,7 @@ struct go_urok_challengeAI: public GameObjectAI
 
     void EventBannerDestroyed(uint64 sourceGuid)
     {
-        if(_actived == false)
+        if(!_actived)
             return;
         _actived = false;
         DespawnRunes();

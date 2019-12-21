@@ -645,7 +645,7 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
     for (Player::BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end(); ++itr)
     {
         DungeonPersistentState* state = itr->second.state;
-        std::string timeleft = "";
+        std::string timeleft;
         if (!itr->second.perm)
             timeleft = secsToTimeString(state->GetResetTime() - time(nullptr), true);
         else
@@ -671,7 +671,7 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
         for (Group::BoundInstancesMap::const_iterator itr = binds.begin(); itr != binds.end(); ++itr)
         {
             DungeonPersistentState* state = itr->second.state;
-            std::string timeleft = "";
+            std::string timeleft;
             if (!itr->second.perm)
                 timeleft = secsToTimeString(state->GetResetTime() - time(nullptr), true);
             else
@@ -1689,7 +1689,7 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
             uiAllianceCount = 0;
             uiHordeCount    = 0;
             BattleGroundPlayerMap const& pPlayers = it->second->GetPlayers();
-            std::string playerName = "";
+            std::string playerName;
 
             for (BattleGroundPlayerMap::const_iterator itr = pPlayers.begin(); itr != pPlayers.end(); ++itr)
             {
@@ -1697,7 +1697,7 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
                     uiHordeCount++;
                 else
                     uiAllianceCount++;
-                if (playerName == "")
+                if (playerName.empty())
                     if (sObjectMgr.GetPlayerNameByGUID(itr->first, playerName))
                         playerName = playerLink(playerName);
             }

@@ -74,11 +74,11 @@ enum
     MAX_WEB_WRAP_POSITIONS  = 3,
 };
 
-static float const WebWrapCooldown(bool initial = false)            { return initial ? 20000 : 40000; }
-static float const SummonSpiderlingsCooldown(bool initial = false)  { return initial ? 30000 : 40000; }
-static float const WebSprayCooldown(bool initial = false)           { return initial ? 40000 : 40000; }
-static float const PoisonShockCooldown(bool initial = false)        { return urand(9000,11000); }
-static float const NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); } 
+static float WebWrapCooldown(bool initial = false)            { return initial ? 20000 : 40000; }
+static float SummonSpiderlingsCooldown(bool initial = false)  { return initial ? 30000 : 40000; }
+static float WebSprayCooldown(bool initial = false)           { return initial ? 40000 : 40000; }
+static float PoisonShockCooldown(bool initial = false)        { return urand(9000,11000); }
+static float NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); } 
 
 
 struct mob_webwrapAI : public ScriptedAI
@@ -110,8 +110,7 @@ struct mob_webwrapAI : public ScriptedAI
         m_victimGuid = pVictim->GetObjectGuid();
         m_creature->GetMotionMaster()->MovePoint(0, pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ(),
             MOVE_FLY_MODE | MOVE_CYCLIC, 0.0f, 0);
-        return;
-    }
+   }
 
     void JustDied(Unit* /*pKiller*/) override
     {
@@ -260,14 +259,14 @@ struct boss_maexxnaAI : public ScriptedAI
         }
         
 
-        if (!candidates.size())
+        if (candidates.empty())
             return false;
 
         std::shuffle(wepWrapLoc.begin(), wepWrapLoc.end(), m_random);
 
         for (int i = 0; i < 3; i++)
         {
-            if (!candidates.size())
+            if (candidates.empty())
                 break;
             auto candIt = candidates.begin();
 

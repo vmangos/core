@@ -236,12 +236,11 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
     void AttackedBy(Unit* Attacker) override
     {
-        return;
-    }
+           }
 
     void MoveInLineOfSight(Unit* who) override
     {
-        if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && CleanerSpawn == false && BeginQuete == true)
+        if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && !CleanerSpawn && BeginQuete)
         {
             if (who->GetGUID() != JoueurGUID || who->IsPet())
             {   
@@ -484,13 +483,13 @@ struct npc_eris_havenfireAI : public ScriptedAI
             float X = 0.0f;
             float Y = 0.0f;
             float Z = 0.0f;
-            if (Paysants == true)
+            if (Paysants)
             {
                 Entry = i >= Rand ? NPC_PAYSANT_0 : NPC_PAYSANT_1;
                 m_creature->GetRandomPoint(ErisHavenfireEvent[PaysantsSpawn].X, ErisHavenfireEvent[PaysantsSpawn].Y, ErisHavenfireEvent[PaysantsSpawn].Z, 6.0f, X, Y, Z);
                 if (Creature* Cre = m_creature->SummonCreature(Entry, X, Y, Z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
                 {
-                    if (Yell == false)
+                    if (!Yell)
                     {
                         ++Vague;
                         Yell = true;
@@ -523,11 +522,11 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
     int GenererVagueNombre(bool Paysants)
     {
-        if (Vague > 4 && Paysants == true)
+        if (Vague > 4 && Paysants)
             return 0;
 
         int Nombre = 0;
-        if (Paysants == true)
+        if (Paysants)
         {
             Nombre = 12;
             if (Vague == 3)
@@ -569,7 +568,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
         uint32 myArea = m_creature->GetAreaId();
-        if (!pl.isEmpty() && myArea && BeginQuete == true)
+        if (!pl.isEmpty() && myArea && BeginQuete)
         {
             for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
             {
@@ -593,7 +592,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
     {
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
         uint32 myArea = m_creature->GetAreaId();
-        if (!pl.isEmpty() && myArea && CleanerSpawn == false)
+        if (!pl.isEmpty() && myArea && !CleanerSpawn)
         {
             if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
             {
@@ -615,7 +614,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (BeginQuete == false || CleanerSpawn == true)
+        if (!BeginQuete || CleanerSpawn)
             return;
 
         if (IsPlayerInterfering())
@@ -778,7 +777,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
             if (npc_eris_havenfireAI* pErisEventAI = dynamic_cast<npc_eris_havenfireAI*>(eris->AI()))
             {
-                if (pCaster->GetGUID() != pErisEventAI->JoueurGUID && pErisEventAI->BeginQuete == true && pErisEventAI->CleanerSpawn == false)
+                if (pCaster->GetGUID() != pErisEventAI->JoueurGUID && pErisEventAI->BeginQuete && !pErisEventAI->CleanerSpawn)
                 {
                     if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
                     {
@@ -814,7 +813,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-        if (DeplacementRequis == true)
+        if (DeplacementRequis)
         {
             float Vitesse = m_creature->GetEntry() == NPC_PAYSANT_0 ? 1.0f : 1.7f;
             m_creature->SetWalk(true);

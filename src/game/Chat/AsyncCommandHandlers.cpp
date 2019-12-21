@@ -134,7 +134,7 @@ void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
     {
         delete data;
 
-        if (result)
+        
             delete result;
 
         return;
@@ -304,7 +304,7 @@ void PlayerCharacterLookupDisplayTask::run()
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
     {
-        if (query)
+        
             delete query;
         return;
     }
@@ -402,7 +402,7 @@ void AccountSearchDisplayTask::run()
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
     {
-        if (query)
+        
             delete query;
 
         return;
@@ -499,7 +499,7 @@ void PlayerGoldRemovalHandler::HandleGoldLookupResult(QueryResult* result, uint3
     WorldSession* session = sWorld.FindSession(accountId);
     if (!session)
     {
-        if (result)
+        
             delete result;
 
         return;

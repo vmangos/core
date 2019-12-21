@@ -683,7 +683,7 @@ void instance_ruins_of_ahnqiraj::SpawnNewCrystals(ObjectGuid usedCrystal)
     float minDistanceLimit = maxDistanceLimit / 2;
 
     // We already have another crystal spawned. Use that as the hint
-    if (crystalIndexes.size() > 0)
+    if (!crystalIndexes.empty())
     {
         maxDistanceLimit *= 0.75f;
         minDistanceLimit *= 0.75f;

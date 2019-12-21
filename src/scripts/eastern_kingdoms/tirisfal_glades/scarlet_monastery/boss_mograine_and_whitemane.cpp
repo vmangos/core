@@ -155,9 +155,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_bDivineShield = false;
         m_bHasDied = true;
         m_bFakeDeath = true;
-
-        return;
-    }
+   }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {

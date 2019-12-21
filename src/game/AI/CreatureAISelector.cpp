@@ -70,7 +70,7 @@ CreatureAI* selectAI(Creature* creature)
 
     // select by script name
     if (!ai_factory && !ainame.empty())
-        ai_factory = ai_registry.GetRegistryItem(ainame.c_str());
+        ai_factory = ai_registry.GetRegistryItem(ainame);
 
     if (!ai_factory && creature->IsGuard())
         ai_factory = ai_registry.GetRegistryItem("GuardAI");

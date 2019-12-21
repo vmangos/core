@@ -584,10 +584,7 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
         return false;
     }
 
-    if (!database.CheckRequiredMigrations(migrations))
-        return false;
-
-    return true;
+    return database.CheckRequiredMigrations(migrations);
 }
 /// Initialize connection to the databases
 bool Master::_StartDB()

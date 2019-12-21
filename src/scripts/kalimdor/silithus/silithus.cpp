@@ -889,10 +889,7 @@ struct npc_colossusAI : public ScriptedAI
                 m_uiColossalSmashTimer = firstSmash ? 10000 : 60000;
                 m_uiColossalSmashEmoteTimer = 5000;
 
-                if (firstSmash)
-                    firstSmash = false;
-                else
-                    firstSmash = true;
+                firstSmash = !firstSmash;
             }
         }
         else

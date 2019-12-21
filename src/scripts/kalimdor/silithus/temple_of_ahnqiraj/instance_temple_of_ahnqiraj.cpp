@@ -482,7 +482,7 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
         }
     }
     
-    if (!candidates.size())
+    if (candidates.empty())
         return;
 
     j = candidates.begin();
@@ -519,10 +519,7 @@ bool instance_temple_of_ahnqiraj::CheckConditionCriteriaMeet(Player const* playe
     if (instance_condition_id >= MAX_ENCOUNTER)
         return false;
 
-    if (m_auiEncounter[instance_condition_id] == DONE)
-        return true;
-    else
-        return false;
+    return m_auiEncounter[instance_condition_id] == DONE;
 }
 
 bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, AreaTriggerEntry const* pAt)
@@ -553,10 +550,7 @@ instance_temple_of_ahnqiraj::CThunStomachList::iterator instance_temple_of_ahnqi
 
     return std::find_if(playersInStomach.begin(), playersInStomach.end(),
         [unit](std::pair<ObjectGuid, StomachTimers> const& e) {
-        if (unit->GetObjectGuid() == e.first) {
-            return true;
-        }
-        return false;
+        return unit->GetObjectGuid() == e.first;
     });
 }
 
@@ -661,7 +655,7 @@ bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
         iter = playersInStomach.erase(iter);
     }
 
-    return playersInStomach.size() == 0;
+    return playersInStomach.empty();
 }
 
 void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)

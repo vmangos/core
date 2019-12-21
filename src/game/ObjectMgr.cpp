@@ -76,10 +76,7 @@ bool normalizePlayerName(std::string& name, size_t max_len)
     for (size_t i = 1; i < len; ++i)
         wstr_buf[i] = wcharToLower(wstr_buf[i]);
 
-    if (!WStrToUtf8(wstr_buf, name))
-        return false;
-
-    return true;
+    return WStrToUtf8(wstr_buf, name);
 }
 
 LanguageDesc lang_description[LANGUAGES_COUNT] =
@@ -8900,7 +8897,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
 
         MangosStringLocale& data = m_MangosStringLocaleMap[entry];
 
-        if (data.Content.size() > 0)
+        if (!data.Content.empty())
         {
             sLog.outErrorDb("Table `%s` contain data for already loaded entry  %i (from another table?), ignored.", table, entry);
             continue;
@@ -10367,8 +10364,6 @@ void ObjectMgr::RemoveGraveYardLink(uint32 id, uint32 zoneId, Team team, bool in
     // remove link from DB
     if (inDB)
         WorldDatabase.PExecute("DELETE FROM `game_graveyard_zone` WHERE `id` = '%u' AND `ghost_zone` = '%u' AND `faction` = '%u'", id, zoneId, team);
-
-    return;
 }
 
 void ObjectMgr::LoadFactionChangeReputations()
@@ -10872,6 +10867,6 @@ void ObjectMgr::GetAreaLocaleString(uint32 entry, int32 loc_idx, std::string* na
     {
         if (const auto* al = GetAreaLocale(entry))
             if (namePtr && al->Name.size() > size_t(loc_idx) && !al->Name[loc_idx].empty())
-                *namePtr = al->Name[loc_idx].c_str();
+                *namePtr = al->Name[loc_idx];
     }
 }

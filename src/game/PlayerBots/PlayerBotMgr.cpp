@@ -109,7 +109,7 @@ void PlayerBotMgr::load()
     }
 
     // 5- Check config/DB
-    if (confMinBots >= m_bots.size() && m_bots.size() != 0)
+    if (confMinBots >= m_bots.size() && !m_bots.empty())
         confMinBots = m_bots.size() - 1;
     if (confMaxBots > m_bots.size())
         confMaxBots = m_bots.size();
@@ -413,26 +413,19 @@ bool PlayerBotMgr::ForceAccountConnection(WorldSession* sess)
         return sess->GetBot()->state != PB_STATE_OFFLINE;
 
     // Bots temporaires
-    if (m_tempBots.find(sess->GetAccountId()) != m_tempBots.end())
-        return true;
-
-    return false;
+    return m_tempBots.find(sess->GetAccountId()) != m_tempBots.end();
 }
 
 bool PlayerBotMgr::IsPermanentBot(uint32 playerGUID)
 {
     std::map<uint32, PlayerBotEntry*>::iterator iter = m_bots.find(playerGUID);
-    if (iter != m_bots.end())
-        return true;
-    return false;
+    return iter != m_bots.end();
 }
 
 bool PlayerBotMgr::IsChatBot(uint32 playerGuid)
 {
     std::map<uint32, PlayerBotEntry*>::iterator iter = m_bots.find(playerGuid);
-    if (iter != m_bots.end() && iter->second->isChatBot)
-        return true;
-    return false;
+    return iter != m_bots.end() && iter->second->isChatBot;
 }
 
 void PlayerBotMgr::addAllBots()

@@ -111,8 +111,8 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
         uint8 ticketType;
         uint32 mapId;
         float x, y, z;
-        std::string ticketText = "";
-        std::string reservedForFutureUse = "";
+        std::string ticketText;
+        std::string reservedForFutureUse;
 
         recvData >> ticketType >> mapId >> x >> y >> z;                        // last check 2.4.3
         recvData >> ticketText;

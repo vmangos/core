@@ -447,9 +447,7 @@ bool ChatHandler::HandleGameObjectTempAddCommand(char *args)
     float rot2 = sin(ang / 2);
     float rot3 = cos(ang / 2);
 
-    if (!chr->SummonGameObject(id, x, y, z, ang, 0, 0, rot2, rot3, spawntm))
-        return false;
-    return true;
+    return chr->SummonGameObject(id, x, y, z, ang, 0, 0, rot2, rot3, spawntm) != nullptr;
 }
 
 bool ChatHandler::HandleGameObjectNearCommand(char* args)

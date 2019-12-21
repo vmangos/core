@@ -118,9 +118,9 @@ WorldSession::~WorldSession()
     SetReadPacket(nullptr);
     SetDumpRecvPackets(nullptr);
 
-    if (m_warden)
+    
         delete m_warden;
-    if (m_cheatData)
+    
         delete m_cheatData;
 }
 
@@ -1153,7 +1153,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
             sWorld.BanAccount(BAN_ACCOUNT, GetUsername(), banSeconds, _reason, detector);
             std::stringstream banIpReason;
             banIpReason << "Cf account " << GetUsername();
-            sWorld.BanAccount(BAN_IP, GetRemoteAddress(), banSeconds, banIpReason.str().c_str(), detector);
+            sWorld.BanAccount(BAN_IP, GetRemoteAddress(), banSeconds, banIpReason.str(), detector);
         }
     }
     else if (cheatAction & CHEAT_ACTION_BAN_ACCOUNT)
@@ -1260,7 +1260,7 @@ bool WorldSession::AllowPacket(uint16 opcode)
         reason << _floodPacketsCount[FLOOD_SLOW_OPCODES] << " slow packets";
     if (_floodPacketsCount[FLOOD_TOTAL_PACKETS] > 300)
         reason << _floodPacketsCount[FLOOD_TOTAL_PACKETS] << " packets";
-    if (reason.str() != "")
+    if (!reason.str().empty())
     {
         reason << " (" << LookupOpcodeName(opcode) << ")";
         ProcessAnticheatAction("AntiFlood", reason.str().c_str(), sWorld.getConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION));
@@ -1310,7 +1310,7 @@ void WorldSession::ComputeClientHash()
 
 bool WorldSession::ShouldBeBanned(uint32 currentLevel) const
 {
-    return _scheduleBanReason.size() && urand(2, _scheduleBanLevel) <= currentLevel;
+    return !_scheduleBanReason.empty() && urand(2, _scheduleBanLevel) <= currentLevel;
 }
 
 void WorldSession::LoginPlayerToNode(NodeSession* session)

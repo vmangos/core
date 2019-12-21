@@ -217,10 +217,7 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(std::string const& values, Team 
     }
 
     // can't load taxi path without mount set (quest taxi path?)
-    if (!sObjectMgr.GetTaxiMountDisplayId(GetTaxiSource(), team, true))
-        return false;
-
-    return true;
+    return sObjectMgr.GetTaxiMountDisplayId(GetTaxiSource(), team, true) != 0;
 }
 
 std::string PlayerTaxi::SaveTaxiDestinationsToString() const
@@ -12464,7 +12461,7 @@ void Player::SendPreparedQuest(ObjectGuid guid)
         QEmote qe;
         qe._Delay = 0;
         qe._Emote = 0;
-        std::string title = "";
+        std::string title;
 
         // need pet case for some quests
         if (Creature* pCreature = GetMap()->GetAnyTypeCreature(guid))
@@ -12611,11 +12608,8 @@ bool Player::CanCompleteQuest(uint32 quest_id) const
     if (qInfo->HasQuestFlag(QUEST_FLAGS_AUTO_REWARDED))
     {
         // a few checks, not all "satisfy" is needed
-        if (SatisfyQuestPreviousQuest(qInfo, false) && SatisfyQuestLevel(qInfo, false) &&
-                SatisfyQuestSkill(qInfo, false) && SatisfyQuestRace(qInfo, false) && SatisfyQuestClass(qInfo, false))
-            return true;
-
-        return false;
+        return SatisfyQuestPreviousQuest(qInfo, false) && SatisfyQuestLevel(qInfo, false) &&
+                SatisfyQuestSkill(qInfo, false) && SatisfyQuestRace(qInfo, false) && SatisfyQuestClass(qInfo, false);
     }
 
     // auto complete quest
@@ -12662,10 +12656,7 @@ bool Player::CanCompleteQuest(uint32 quest_id) const
     }
 
     uint32 repFacId = qInfo->GetRepObjectiveFaction();
-    if (repFacId && GetReputationMgr().GetReputation(repFacId) < qInfo->GetRepObjectiveValue())
-        return false;
-
-    return true;
+    return !(repFacId && GetReputationMgr().GetReputation(repFacId) < qInfo->GetRepObjectiveValue());
 }
 
 bool Player::CanCompleteRepeatableQuest(Quest const* pQuest) const
@@ -16889,10 +16880,7 @@ bool Player::IsInInterFactionMode() const
         return true;
 
     Map* tMap = FindMap();
-    if ((tMap != nullptr) && (tMap->IsDungeon()))
-        return true;
-
-    return false;
+    return (tMap != nullptr) && (tMap->IsDungeon());
 }
 
 void Player::UpdateDuelFlag(time_t currTime)
@@ -18238,9 +18226,7 @@ void Player::LeaveBattleground(bool teleportToEntryPoint)
 bool Player::CanJoinToBattleground() const
 {
     // check Deserter debuff
-    if (HasAura(26013))
-        return false;
-    return true;
+    return !HasAura(26013);
 }
 
 bool Player::IsVisibleInGridForPlayer(Player const* pl) const

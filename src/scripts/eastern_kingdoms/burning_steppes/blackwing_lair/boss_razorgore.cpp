@@ -478,7 +478,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
         if (!bSpawnTwo)
         {
-            bool bSide = urand(0, 1) ? true : false;
+            bool bSide = urand(0, 1) != 0;
             switch (uiHow)
             {
                 case 0:
