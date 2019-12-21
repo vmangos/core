@@ -108,7 +108,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     void DoCastSpell(Unit* pwho, SpellEntry const* pSpellInfo, bool bTriggered = false);
 
     // Plays a sound to all nearby players
-    void DoPlaySoundToSet(WorldObject* pSource, uint32 uiSoundId);
+    static void DoPlaySoundToSet(WorldObject* pSource, uint32 uiSoundId);
 
     // Drops all threat to 0%. Does not remove players from the threat list
     void DoResetThreat();

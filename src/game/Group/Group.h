@@ -339,12 +339,12 @@ class MANGOS_DLL_SPEC Group
         /***                   LOOT SYSTEM                     ***/
         /*********************************************************/
 
-        void SendLooter(Creature* creature, Player* pLooter);
-        void SendLootStartRoll(uint32 CountDown, Roll const& r);
+        static void SendLooter(Creature* creature, Player* pLooter);
+        static void SendLootStartRoll(uint32 CountDown, Roll const& r);
         void SendLootStartRollsForPlayer(Player* player); // send every active rolls
-        void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, Roll const& r);
-        void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, Roll const& r);
-        void SendLootAllPassed(Roll const& r);
+        static void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, Roll const& r);
+        static void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, Roll const& r);
+        static void SendLootAllPassed(Roll const& r);
         void GroupLoot(Creature* creature, Loot *loot);
         void NeedBeforeGreed(Creature* creature, Loot *loot);
         void MasterLoot(Creature* creature, Loot *loot);
@@ -377,7 +377,7 @@ class MANGOS_DLL_SPEC Group
         bool _setMainTank(ObjectGuid guid);
         bool _setMainAssistant(ObjectGuid guid);
 
-        void _homebindIfInstance(Player* player);
+        static void _homebindIfInstance(Player* player);
 
         void _initRaidSubGroupsCounter()
         {

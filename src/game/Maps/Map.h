@@ -412,7 +412,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         bool CreatureRespawnRelocation(Creature* c, bool forGridUnload = false);        // used only in CreatureRelocation and ObjectGridUnloader
 
-        bool CheckGridIntegrity(Creature* c, bool moved) const;
+        static bool CheckGridIntegrity(Creature* c, bool moved);
 
         uint32 GetInstanceId() const { return i_InstanceId; }
         virtual bool CanEnter(Player* /*player*/) { return true; }
@@ -669,7 +669,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         void SetTimer(uint32 t) { i_gridExpiry = t < MIN_GRID_DELAY ? MIN_GRID_DELAY : t; }
 
-        void SendInitSelf(Player* player);
+        static void SendInitSelf(Player* player);
 
         void SendInitTransports(Player* player);
         void SendRemoveTransports(Player* player);

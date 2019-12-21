@@ -504,7 +504,7 @@ class BattleGroundAV : public BattleGround
         void PopulateNode(BG_AV_Nodes node);
         void PopulateMineNode(uint8 mine, BattleGroundAVTeamIndex teamIdx, uint32 oldUpgradeAdvance);
 
-        uint32 GetNodeName(BG_AV_Nodes node);
+        static uint32 GetNodeName(BG_AV_Nodes node);
         bool IsTower(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : m_Nodes[node].Tower; }
         bool IsGrave(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : !m_Nodes[node].Tower; }
 
@@ -512,7 +512,7 @@ class BattleGroundAV : public BattleGround
         void ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx);
 
         /*worldstates*/
-        uint8 GetWorldStateType(uint8 state, BattleGroundAVTeamIndex teamIdx) const { return teamIdx * BG_AV_MAX_STATES + state; }
+        static uint8 GetWorldStateType(uint8 state, BattleGroundAVTeamIndex teamIdx) { return teamIdx * BG_AV_MAX_STATES + state; }
         void SendMineWorldStates(uint32 mine);
         void UpdateNodeWorldState(BG_AV_Nodes node);
 

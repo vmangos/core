@@ -96,7 +96,7 @@ namespace MMAP
             uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
         private:
             bool loadMapData(uint32 mapId);
-            uint32 packTileID(int32 x, int32 y) const;
+            static uint32 packTileID(int32 x, int32 y);
 
             MMapDataSet loadedMMaps;
             ACE_RW_Mutex loadedMMaps_lock;

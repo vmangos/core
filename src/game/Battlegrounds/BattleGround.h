@@ -404,11 +404,11 @@ class BattleGround
         void SendRewardMarkByMail(Player* plr,uint32 mark, uint32 count);
         void RewardItem(Player* plr, uint32 item_id, uint32 count);
         void RewardQuestComplete(Player* plr);
-        void RewardSpellCast(Player* plr, uint32 spell_id);
+        static void RewardSpellCast(Player* plr, uint32 spell_id);
         void UpdateWorldState(uint32 Field, uint32 Value);
-        void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player* Source);
+        static void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player* Source);
         virtual void EndBattleGround(Team winner);
-        void BlockMovement(Player* plr);
+        static void BlockMovement(Player* plr);
 
         void SendMessageToAll(int32 entry, ChatMsg type, Player const* source = nullptr);
         void SendYellToAll(int32 entry, uint32 language, ObjectGuid guid);
@@ -478,7 +478,7 @@ class BattleGround
         ObjectGuid GetSingleCreatureGuid(uint8 event1, uint8 event2);
 
         void OpenDoorEvent(uint8 event1, uint8 event2 = 0);
-        bool IsDoor(uint8 event1, uint8 event2);
+        static bool IsDoor(uint8 event1, uint8 event2);
 
         void HandleTriggerBuff(ObjectGuid go_guid);
 
