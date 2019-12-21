@@ -1495,7 +1495,7 @@ void Map::UnloadAll(bool pForce)
     }
 }
 
-bool Map::CheckGridIntegrity(Creature* c, bool moved) const
+bool Map::CheckGridIntegrity(Creature* c, bool moved)
 {
     Cell const& cur_cell = c->GetCurrentCell();
 

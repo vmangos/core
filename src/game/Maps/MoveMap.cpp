@@ -115,7 +115,7 @@ bool MMapManager::loadMapData(uint32 mapId)
     return true;
 }
 
-uint32 MMapManager::packTileID(int32 x, int32 y) const
+uint32 MMapManager::packTileID(int32 x, int32 y)
 {
     return uint32(x << 16 | y);
 }
