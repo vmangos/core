@@ -402,9 +402,7 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
         DoScriptText(SAY_AQ_WAR_START, m_creature);
     }
 
-    void UpdateAI(uint32 const uiDiff) override
-    {
-           }
+    void UpdateAI(uint32 const /*uiDiff*/) override {}
 
     bool FillLoot(Loot* loot, Player* looter) const override
     {

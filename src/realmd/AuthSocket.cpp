@@ -48,8 +48,6 @@
 #include <ace/OS_NS_fcntl.h>
 #include <ace/OS_NS_sys_stat.h>
 
-
-
 enum AccountFlags
 {
     ACCOUNT_FLAG_GM         = 0x00000001,

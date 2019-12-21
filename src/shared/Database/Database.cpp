@@ -250,8 +250,7 @@ void Database::HaltDelayThread()
     }
     delete[] m_threadsBodies;
     delete[] m_delayThreads;
-    
-        delete[] m_serialDelayQueue;
+    delete[] m_serialDelayQueue;
     m_delayThreads = nullptr;
     m_threadsBodies = nullptr;
     m_serialDelayQueue = nullptr;

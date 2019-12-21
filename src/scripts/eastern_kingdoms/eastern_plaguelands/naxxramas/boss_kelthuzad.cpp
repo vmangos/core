@@ -355,9 +355,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         EvadeAllGuardians();
     }
 
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-           }
+    void MoveInLineOfSight(Unit* /*pWho*/) override {}
 
     void AttackStart(Unit* who) override
     {

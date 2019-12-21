@@ -79,7 +79,7 @@ namespace VMAP
             WorldModel* iModel;
 
         public:
-            WorldModel* getWorldModel()  { return iModel; }
+            WorldModel* getWorldModel() const  { return iModel; }
             float getScale() const             { return iInvScale; }
             G3D::Matrix3 const& getRot() const { return iInvRot; }
     };

@@ -689,7 +689,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                 break;
             }
         }
-           }
+    }
 };
 GameObjectAI* GetAIgo_pedestal_of_immol_thar(GameObject *pGo)
 {

@@ -118,10 +118,8 @@ WorldSession::~WorldSession()
     SetReadPacket(nullptr);
     SetDumpRecvPackets(nullptr);
 
-    
-        delete m_warden;
-    
-        delete m_cheatData;
+    delete m_warden;
+    delete m_cheatData;
 }
 
 void WorldSession::SizeError(WorldPacket const& packet, uint32 size) const

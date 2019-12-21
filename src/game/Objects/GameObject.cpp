@@ -112,8 +112,7 @@ void GameObject::AddToWorld()
 
 void GameObject::AIM_Initialize()
 {
-    
-        delete i_AI;
+    delete i_AI;
     i_AI = sScriptMgr.GetGameObjectAI(this);
 }
 

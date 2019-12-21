@@ -697,15 +697,15 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 
     void AttackStart(Unit*) override
     {
-           }
+    }
 
     void MoveInLineOfSight(Unit*) override
     {
-           }
+    }
 
     void Aggro(Unit*) override
     {
-           }
+    }
 
     void MovementInform(uint32 uiType, uint32 pointId) override
     {

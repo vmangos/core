@@ -97,8 +97,8 @@ bool Config::GetBoolDefault(const char* name, bool def)
 
     const char* str = val.c_str();
     return strcmp(str, "true") == 0 || strcmp(str, "TRUE") == 0 ||
-        strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
-        strcmp(str, "1") == 0;
+           strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
+           strcmp(str, "1") == 0;
 }
 
 

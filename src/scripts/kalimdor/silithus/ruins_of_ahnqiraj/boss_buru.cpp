@@ -136,7 +136,6 @@ struct boss_buruAI : public ScriptedAI
 
     void UpdateAI(uint32 const uiDiff) override
     {
-
         Creature* egg;
         for (int i = 0; i < 6 && !m_bIsEnraged; i++)
         {
@@ -357,9 +356,7 @@ struct mob_buru_eggAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(uint32 const uiDiff) override
-    {
-           }
+    void UpdateAI(uint32 const /*uiDiff*/) override {}
 };
 
 CreatureAI* GetAI_boss_buru(Creature* pCreature)

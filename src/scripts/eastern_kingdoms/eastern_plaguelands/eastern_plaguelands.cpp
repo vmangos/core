@@ -234,9 +234,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
             VillageoisGUIDs[i] = 0;
     }
 
-    void AttackedBy(Unit* Attacker) override
-    {
-           }
+    void AttackedBy(Unit* /*Attacker*/) override {}
 
     void MoveInLineOfSight(Unit* who) override
     {

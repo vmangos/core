@@ -68,15 +68,12 @@ enum
     
 };
 
-
-
 static float const CGs[3][4] = 
 {
     { 3291.26f, -3502.08f, 287.26f, 2.14f },
     { 3285.29f, -3446.64f, 287.26f, 4.2f },
     { 3316.46f, -3476.23f, 287.26f, 3.18f } // this third entry is used as spawn loc during fight.
 };
-
 
 static constexpr uint32 CRYPTGUARD_CLEAVE_CD    = 6000;  // Todo: find correct timer
 static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, so 12sec cd makes sense. 

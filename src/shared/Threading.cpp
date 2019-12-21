@@ -226,8 +226,7 @@ Thread * Thread::current()
         _thread->m_hThreadHandle = Thread::currentHandle();
 
         Thread * _oldValue = m_ThreadStorage.ts_object(_thread);
-        
-            delete _oldValue;
+        delete _oldValue;
     }
 
     return _thread;

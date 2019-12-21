@@ -1597,15 +1597,6 @@ bool ChatHandler::HandleDebugOverflowCommand(char* args)
     return true;
 }
 
-
-
-
-
-
-
-
-
-
 bool ChatHandler::HandleDebugLootTableCommand(char* args)
 {
     std::stringstream in(args);

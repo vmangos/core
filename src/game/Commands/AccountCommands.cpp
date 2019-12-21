@@ -328,10 +328,7 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 
     uint32 count = 0;
     AccountSearchHandler::ShowAccountListHelper(result, *this, count, limit, true);
-
-    
-        delete result;
-
+    delete result;
     return true;
 }
 
