@@ -228,9 +228,9 @@ class MANGOS_DLL_SPEC Group
         bool IsLeader(ObjectGuid guid) const { return GetLeaderGuid() == guid; }
         ObjectGuid GetMemberGuid(std::string const& name)
         {
-            for(const auto & m_memberSlot : m_memberSlots)
-                if (m_memberSlot.name == name)
-                    return m_memberSlot.guid;
+            for(const auto & itr : m_memberSlots)
+                if (itr.name == name)
+                    return itr.guid;
 
             return ObjectGuid();
         }
@@ -387,8 +387,8 @@ class MANGOS_DLL_SPEC Group
 
             memset((void*)m_subGroupsCounts, 0, MAX_RAID_SUBGROUPS*sizeof(uint8));
 
-            for (const auto & m_memberSlot : m_memberSlots)
-                ++m_subGroupsCounts[m_memberSlot.group];
+            for (const auto & itr : m_memberSlots)
+                ++m_subGroupsCounts[itr.group];
         }
 
         member_citerator _getMemberCSlot(ObjectGuid guid) const

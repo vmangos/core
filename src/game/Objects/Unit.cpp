@@ -10201,13 +10201,13 @@ void Unit::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 item
     {
         if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId))
         {
-            for (const auto & Spell : proto->Spells)
+            for (const auto & itr : proto->Spells)
             {
-                if (Spell.SpellId == spellInfo->Id)
+                if (itr.SpellId == spellInfo->Id)
                 {
-                    cat    = Spell.SpellCategory;
-                    rec    = Spell.SpellCooldown;
-                    catrec = Spell.SpellCategoryCooldown;
+                    cat    = itr.SpellCategory;
+                    rec    = itr.SpellCooldown;
+                    catrec = itr.SpellCategoryCooldown;
                     break;
                 }
             }

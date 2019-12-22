@@ -5359,11 +5359,11 @@ SpellCastResult Spell::CheckCast(bool strict)
         // used when item spells have custom categories due to wrong category
         // on spell
         ItemPrototype const* proto = m_CastItem->GetProto();
-        for (const auto & Spell : proto->Spells)
+        for (const auto & itr : proto->Spells)
         {
-            if (Spell.SpellId == m_spellInfo->Id)
+            if (itr.SpellId == m_spellInfo->Id)
             {
-                spellCat = Spell.SpellCategory;
+                spellCat = itr.SpellCategory;
                 break;
             }
         }

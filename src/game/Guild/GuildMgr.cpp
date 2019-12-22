@@ -254,8 +254,8 @@ void GuildMgr::LoadPetitions()
 
 Petition::~Petition()
 {
-    for (auto & m_signature : m_signatures)
-        delete m_signature;
+    for (auto & itr : m_signatures)
+        delete itr;
 
     m_signatures.clear();
 }

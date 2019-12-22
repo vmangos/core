@@ -109,8 +109,8 @@ Group::~Group()
     // it is undefined whether objectmgr (which stores the groups) or instancesavemgr
     // will be unloaded first so we must be prepared for both cases
     // this may unload some dungeon persistent state
-    for (auto & m_boundInstance : m_boundInstances)
-        m_boundInstance.second.state->RemoveGroup(this);
+    for (auto & itr : m_boundInstances)
+        itr.second.state->RemoveGroup(this);
 
     // Sub group counters clean up
     delete[] m_subGroupsCounts;
@@ -233,8 +233,8 @@ void Group::ConvertToRaid()
     SendUpdate();
 
     // update quest related GO states (quest activity dependent from raid membership)
-    for (const auto & m_memberSlot : m_memberSlots)
-        if (Player* player = sObjectMgr.GetPlayer(m_memberSlot.guid))
+    for (const auto & itr : m_memberSlots)
+        if (Player* player = sObjectMgr.GetPlayer(itr.guid))
             player->UpdateForQuestWorldObjects();
 }
 
@@ -282,10 +282,10 @@ uint32 Group::RemoveInvite(Player* player)
 
 void Group::RemoveAllInvites()
 {
-    for (auto m_invitee : m_invitees)
+    for (auto itr : m_invitees)
     {
-        ASSERT(m_invitee->GetGroupInvite() == this);
-        m_invitee->SetGroupInvite(nullptr);
+        ASSERT(itr->GetGroupInvite() == this);
+        itr->SetGroupInvite(nullptr);
     }
 
     m_invitees.clear();
@@ -293,19 +293,19 @@ void Group::RemoveAllInvites()
 
 Player* Group::GetInvited(ObjectGuid guid) const
 {
-    for (auto m_invitee : m_invitees)
-        if (m_invitee->GetObjectGuid() == guid)
-            return m_invitee;
+    for (auto itr : m_invitees)
+        if (itr->GetObjectGuid() == guid)
+            return itr;
 
     return nullptr;
 }
 
 Player* Group::GetInvited(std::string const& name) const
 {
-    for (auto m_invitee : m_invitees)
+    for (auto itr : m_invitees)
     {
-        if (m_invitee->GetName() == name)
-            return m_invitee;
+        if (itr->GetName() == name)
+            return itr;
     }
     return nullptr;
 }
@@ -459,9 +459,9 @@ void Group::Disband(bool hideDestroy)
 {
     Player* player;
 
-    for (const auto & m_memberSlot : m_memberSlots)
+    for (const auto & itr : m_memberSlots)
     {
-        player = sObjectMgr.GetPlayer(m_memberSlot.guid);
+        player = sObjectMgr.GetPlayer(itr.guid);
         if (!player)
             continue;
 
@@ -1230,15 +1230,15 @@ void Group::SendUpdate()
         data << (uint8)(citr->group | (citr->assistant ? 0x80 : 0)); // own flags (groupid | (assistant?0x80:0))
 
         data << uint32(GetMembersCount() - 1);
-        for (const auto & m_memberSlot : m_memberSlots)
+        for (const auto & itr : m_memberSlots)
         {
-            if (citr->guid == m_memberSlot.guid)
+            if (citr->guid == itr.guid)
                 continue;
 
-            data << m_memberSlot.name;
-            data << m_memberSlot.guid;
-            data << uint8(GetGroupMemberStatus(sObjectMgr.GetPlayer(m_memberSlot.guid)));
-            data << (uint8)(m_memberSlot.group | (m_memberSlot.assistant ? 0x80 : 0));
+            data << itr.name;
+            data << itr.guid;
+            data << uint8(GetGroupMemberStatus(sObjectMgr.GetPlayer(itr.guid)));
+            data << (uint8)(itr.group | (itr.assistant ? 0x80 : 0));
         }
 
         data << m_leaderGuid;                               // leader guid
@@ -1477,25 +1477,25 @@ void Group::_chooseLeader(bool offline /*= false*/)
     ObjectGuid first = ObjectGuid(); // First available: if no suitable canditates are found
     ObjectGuid chosen = ObjectGuid(); // Player matching prio creteria
 
-    for (const auto & m_memberSlot : m_memberSlots)
+    for (const auto & itr : m_memberSlots)
     {
-        if (m_memberSlot.guid == m_leaderGuid)
+        if (itr.guid == m_leaderGuid)
             continue;
 
         // Prioritize online players
-        Player* player = sObjectMgr.GetPlayer(m_memberSlot.guid);
+        Player* player = sObjectMgr.GetPlayer(itr.guid);
         if (!player || !player->GetSession() || player->GetGroup() != this)
             continue;
 
         // Prioritize assistants for raids
-        if (isRaidGroup() && !m_memberSlot.assistant)
+        if (isRaidGroup() && !itr.assistant)
         {
             if (first.IsEmpty())
-                first = m_memberSlot.guid;
+                first = itr.guid;
             continue;
         }
 
-        chosen = m_memberSlot.guid;
+        chosen = itr.guid;
         break;
     }
 
@@ -1948,9 +1948,9 @@ void Group::ResetInstances(InstanceResetMethod method, Player* SendMsgTo)
             if (SendMsgTo)
             {
                 bool offline_players = false;
-                for (const auto & m_memberSlot : m_memberSlots)
+                for (const auto & itr : m_memberSlots)
                 {
-                    Player* pl = sObjectMgr.GetPlayer(m_memberSlot.guid);
+                    Player* pl = sObjectMgr.GetPlayer(itr.guid);
                     if (!pl || !pl->GetSession())
                     {
                         offline_players = true;
@@ -2213,9 +2213,9 @@ struct BroadcastGroupUpdateHelper
 // Nostalrius : RAID ally-horde
 void Group::BroadcastGroupUpdate()
 {
-    for (const auto & m_memberSlot : m_memberSlots)
+    for (const auto & itr : m_memberSlots)
     {
-        Player* pp = sObjectMgr.GetPlayer(m_memberSlot.guid);
+        Player* pp = sObjectMgr.GetPlayer(itr.guid);
         if (pp && pp->IsInWorld())
         {
             pp->ForceValuesUpdateAtIndex(PLAYER_FLAGS);
@@ -2331,9 +2331,9 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
     // SendUpdate clears the target icons, send an icon update
     if (!isRaidGroup()) 
     {
-        for (const auto & m_memberSlot : m_memberSlots)
+        for (const auto & itr : m_memberSlots)
         {
-            Player* player = sObjectMgr.GetPlayer(m_memberSlot.guid);
+            Player* player = sObjectMgr.GetPlayer(itr.guid);
             if (!player || !player->GetSession() || player->GetGroup() != this)
                 continue;
 

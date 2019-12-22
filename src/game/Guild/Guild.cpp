@@ -759,8 +759,8 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
     data << GINFO;
 
     data << uint32(m_Ranks.size());
-    for (const auto & m_Rank : m_Ranks)
-        data << uint32(m_Rank.Rights);
+    for (const auto & itr : m_Ranks)
+        data << uint32(itr.Rights);
 
     MemberList::const_iterator itr = members.begin();
     for (; itr != members.end(); ++itr)

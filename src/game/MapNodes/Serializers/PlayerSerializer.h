@@ -367,14 +367,14 @@ void Player::SerializeSpells(MaNGOS::Serializer::WriteSerializer& buf)
     uint32 spell_id;
     bool is_spell_active;
     bool is_spell_disabled;
-    for (auto & m_spell : m_spells)
+    for (auto & spell : m_spells)
     {
         // add only changed/new not dependent spells
-        if (!m_spell.second.dependent)
+        if (!spell.second.dependent)
         {
-            spell_id = m_spell.first;
-            is_spell_active = m_spell.second.active;
-            is_spell_disabled = m_spell.second.disabled;
+            spell_id = spell.first;
+            is_spell_active = spell.second.active;
+            is_spell_disabled = spell.second.disabled;
 
             buf(spell_id);
             buf(is_spell_active);
@@ -408,14 +408,14 @@ void Player::SerializeSpellCooldowns(MaNGOS::Serializer::WriteSerializer& buf)
 {
     static uint32 last_spell_id = 0;
     time_t currTime = time(nullptr);
-    for (const auto & m_spellCooldown : m_spellCooldowns)
+    for (const auto & itr : m_spellCooldowns)
     {
-        if (m_spellCooldown.second.end > currTime && m_spellCooldown.second.end <= currTime + infinityCooldownDelayCheck)
+        if (itr.second.end > currTime && itr.second.end <= currTime + infinityCooldownDelayCheck)
         {
-            uint32 spell_id = m_spellCooldown.first;
-            uint32 item_id = m_spellCooldown.second.itemid;
-            uint64 cooldown_end = m_spellCooldown.second.end;
-            uint64 cat_cooldown_end = m_spellCooldown.second.categoryEnd;
+            uint32 spell_id = itr.first;
+            uint32 item_id = itr.second.itemid;
+            uint64 cooldown_end = itr.second.end;
+            uint64 cat_cooldown_end = itr.second.categoryEnd;
 
             buf(spell_id);
             buf(item_id);

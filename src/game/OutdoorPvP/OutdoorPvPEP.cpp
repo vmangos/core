@@ -706,8 +706,8 @@ uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
     data << EP_UI_TOWER_SLIDER_POS << uint32(50);
     data << EP_UI_TOWER_SLIDER_N << uint32(100);
     uint32 count = 5;
-    for (auto & m_capturePoint : m_capturePoints)
-        count += m_capturePoint.second->FillInitialWorldStates(data);
+    for (auto & itr : m_capturePoints)
+        count += itr.second->FillInitialWorldStates(data);
     return count;
 }
 

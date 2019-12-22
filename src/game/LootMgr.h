@@ -285,20 +285,23 @@ struct Loot
     // void clear()
     void clear(bool clearQuestItems = true)
     {
-    if (clearQuestItems)
-    {
-            for (const auto & m_playerQuestItem : m_playerQuestItems)
-                delete m_playerQuestItem.second;
-            m_playerQuestItems.clear();
+        if (clearQuestItems)
+        {
+                for (const auto & itr : m_playerQuestItems)
+                    delete itr.second;
+                m_playerQuestItems.clear();
 
-            m_questItems.clear();
-    }
-        for (const auto & m_playerFFAItem : m_playerFFAItems)
-            delete m_playerFFAItem.second;
+                m_questItems.clear();
+        }
+
+        for (const auto & itr : m_playerFFAItems)
+            delete itr.second;
+
         m_playerFFAItems.clear();
 
-        for (const auto & m_playerNonQuestNonFFAConditionalItem : m_playerNonQuestNonFFAConditionalItems)
-            delete m_playerNonQuestNonFFAConditionalItem.second;
+        for (const auto & itr : m_playerNonQuestNonFFAConditionalItems)
+            delete itr.second;
+
         m_playerNonQuestNonFFAConditionalItems.clear();
 
         m_playersLooting.clear();

@@ -382,26 +382,26 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << (float)pProto->RangedModRange;
 #endif
 
-        for (const auto & Spell : pProto->Spells)
+        for (const auto & itr : pProto->Spells)
         {
             // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
             // use `item_template` or if not set then only use spell cooldowns
-            SpellEntry const* spell = sSpellMgr.GetSpellEntry(Spell.SpellId);
+            SpellEntry const* spell = sSpellMgr.GetSpellEntry(itr.SpellId);
             if (spell)
             {
-                bool db_data = Spell.SpellCooldown >= 0 || Spell.SpellCategoryCooldown >= 0;
+                bool db_data = itr.SpellCooldown >= 0 || itr.SpellCategoryCooldown >= 0;
 
-                data << Spell.SpellId;
-                data << Spell.SpellTrigger;
+                data << itr.SpellId;
+                data << itr.SpellTrigger;
 
                 // let the database control the sign here.  negative means that the item should be consumed once the charges are consumed.
-                data << Spell.SpellCharges;
+                data << itr.SpellCharges;
 
                 if (db_data)
                 {
-                    data << uint32(Spell.SpellCooldown);
-                    data << uint32(Spell.SpellCategory);
-                    data << uint32(Spell.SpellCategoryCooldown);
+                    data << uint32(itr.SpellCooldown);
+                    data << uint32(itr.SpellCategory);
+                    data << uint32(itr.SpellCategoryCooldown);
                 }
                 else
                 {

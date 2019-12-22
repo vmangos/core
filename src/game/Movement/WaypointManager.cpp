@@ -62,8 +62,8 @@ void WaypointManager::Load()
 
     std::set<uint32> movementScriptSet;
 
-    for (const auto & sCreatureMovementScript : sCreatureMovementScripts)
-        movementScriptSet.insert(sCreatureMovementScript.first);
+    for (const auto & itr : sCreatureMovementScripts)
+        movementScriptSet.insert(itr.first);
 
     // /////////////////////////////////////////////////////
     // creature_movement
@@ -818,30 +818,34 @@ inline void CheckWPText(std::string table, uint32 entryOrGuid, uint32 point, Way
 
 void WaypointManager::CheckTextsExistance()
 {
-    for (const auto & pmItr : m_pathMap)
+    for (const auto & path : m_pathMap)
     {
-        for (WaypointPath::const_iterator pItr = pmItr.second.begin(); pItr != pmItr.second.end(); ++pItr)
-            if (pItr->second.behavior)
+        for (const auto& point : path.second)
+        {
+            if (point.second.behavior)
             {
-                CheckWPText("`creature_movement` Id:", pmItr.first, pItr->first, pItr->second.behavior);
+                CheckWPText("`creature_movement` Id:", path.first, point.first, point.second.behavior);
+            }
+        }  
+    }
+
+    for (const auto & path : m_pathTemplateMap)
+    {
+        for (const auto& point : path.second)
+            if (point.second.behavior)
+            {
+                CheckWPText("`creature_movement_template` Entry:", path.first, point.first, point.second.behavior);
             }
     }
 
-    for (const auto & pmItr : m_pathTemplateMap)
+    for (const auto & path : m_pathSpecialMap)
     {
-        for (WaypointPath::const_iterator pItr = pmItr.second.begin(); pItr != pmItr.second.end(); ++pItr)
-            if (pItr->second.behavior)
+        for (const auto& point : path.second)
+        {
+            if (point.second.behavior)
             {
-                CheckWPText("`creature_movement_template` Entry:", pmItr.first, pItr->first, pItr->second.behavior);
+                CheckWPText("`creature_movement_special` Id:", path.first, point.first, point.second.behavior);
             }
-    }
-
-    for (const auto & pmItr : m_pathSpecialMap)
-    {
-        for (WaypointPath::const_iterator pItr = pmItr.second.begin(); pItr != pmItr.second.end(); ++pItr)
-            if (pItr->second.behavior)
-            {
-                CheckWPText("`creature_movement_special` Id:", pmItr.first, pItr->first, pItr->second.behavior);
-            }
+        } 
     }
 }

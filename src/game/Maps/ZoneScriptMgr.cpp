@@ -34,8 +34,8 @@ ZoneScriptMgr::~ZoneScriptMgr()
 {
     for (auto itr : m_ZoneScriptsSet)
         delete itr;
-    for (auto & m_ZoneScripts_Script : m_ZoneScripts_Scripts)
-        delete m_ZoneScripts_Script;
+    for (auto & itr : m_ZoneScripts_Scripts)
+        delete itr;
 }
 
 void ZoneScriptMgr::InitZoneScripts()
@@ -47,12 +47,12 @@ void ZoneScriptMgr::InitMapZoneScripts(uint32 mapId, Map* pMap)
 {
     ZoneScript* pScript = nullptr;
     uint32 counter = 0;
-    for (auto & m_ZoneScripts_Script : m_ZoneScripts_Scripts)
+    for (auto & itr : m_ZoneScripts_Scripts)
     {
-        if (m_ZoneScripts_Script->GetMapId() != mapId)
+        if (itr->GetMapId() != mapId)
             continue;
 
-        pScript = m_ZoneScripts_Script->GetZoneScript();
+        pScript = itr->GetZoneScript();
         if (!pScript)
         {
             sLog.outError("Could not initialize ZoneScript object. Got nullptr pointer from script.");

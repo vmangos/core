@@ -95,9 +95,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     if (pUser->IsInCombat())
     {
-        for (const auto & Spell : proto->Spells)
+        for (const auto & itr : proto->Spells)
         {
-            if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(Spell.SpellId))
+            if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.SpellId))
             {
                 if (spellInfo->IsNonCombatSpell())
                 {
@@ -136,11 +136,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
         // search spell for spell error
         uint32 spellid = 0;
-        for (const auto & Spell : proto->Spells)
+        for (const auto & itr : proto->Spells)
         {
-            if (Spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || Spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+            if (itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
             {
-                spellid = Spell.SpellId;
+                spellid = itr.SpellId;
                 break;
             }
         }
@@ -409,7 +409,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
             for (uint32 k : spellInfo->EffectApplyAuraName)
             {
                 if (k == SPELL_AURA_MOD_POSSESS ||
-                        k == SPELL_AURA_MOD_POSSESS_PET)
+                    k == SPELL_AURA_MOD_POSSESS_PET)
                 {
                     allow = true;
                     break;

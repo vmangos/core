@@ -192,9 +192,9 @@ bool MailDraft::prepareItems(Player* receiver)
  */
 void MailDraft::deleteIncludedItems(bool inDB /**= false*/)
 {
-    for (auto & m_item : m_items)
+    for (auto & itr : m_items)
     {
-        Item* item = m_item.second;
+        Item* item = itr.second;
 
         if (inDB)
             CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid='%u'", item->GetGUIDLow());
@@ -226,9 +226,9 @@ void MailDraft::CloneFrom(MailDraft const& draft)
     m_money = draft.GetMoney();
     m_COD = draft.GetCOD();
 
-    for (const auto & m_item : draft.m_items)
+    for (const auto & itr : draft.m_items)
     {
-        Item* item = m_item.second;
+        Item* item = itr.second;
 
         if (Item* newitem = item->CloneItem(item->GetCount()))
         {
@@ -268,9 +268,9 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, ObjectGuid sender_guid, Ob
 
         // set owner to new receiver (to prevent delete item with sender char deleting)
         CharacterDatabase.BeginTransaction();
-        for (auto & m_item : m_items)
+        for (auto & itr : m_items)
         {
-            Item* item = m_item.second;
+            Item* item = itr.second;
             item->SaveToDB();                      // item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
             CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = '%u' WHERE guid='%u'", receiver_guid.GetCounter(), item->GetGUIDLow());
@@ -332,9 +332,9 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
                                "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%s', '%u', '%u', '" UI64FMTD "','" UI64FMTD "', '%u', '%u', '%u')",
                                mailId, sender.GetMailMessageType(), sender.GetStationery(), GetMailTemplateId(), sender.GetSenderId(), receiver.GetPlayerGuid().GetCounter(), safe_subject.c_str(), GetBodyId(), (has_items ? 1 : 0), (uint64)expire_time, (uint64)deliver_time, m_money, m_COD, checked);
 
-    for (const auto & m_item : m_items)
+    for (const auto & itr : m_items)
     {
-        Item* item = m_item.second;
+        Item* item = itr.second;
         CharacterDatabase.PExecute("INSERT INTO mail_items (mail_id,item_guid,item_template,receiver) VALUES ('%u', '%u', '%u','%u')",
                                    mailId, item->GetGUIDLow(), item->GetEntry(), receiver.GetPlayerGuid().GetCounter());
     }
@@ -353,9 +353,9 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
         m->money = GetMoney();
         m->COD = GetCOD();
 
-        for (const auto & m_item : m_items)
+        for (const auto & itr : m_items)
         {
-            Item* item = m_item.second;
+            Item* item = itr.second;
             m->AddItem(item->GetGUIDLow(), item->GetEntry());
         }
 
@@ -372,8 +372,8 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
 
         if (!m_items.empty())
         {
-            for (auto & m_item : m_items)
-                masterReceiver->AddMItem(m_item.second);
+            for (auto & itr : m_items)
+                masterReceiver->AddMItem(itr.second);
         }
     }
     else if (!m_items.empty())

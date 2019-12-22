@@ -3411,9 +3411,9 @@ void ObjectMgr::LoadItemPrototypes()
             bool req = proto->InventoryType != INVTYPE_NON_EQUIP || proto->PageText;
             if (!req)
             {
-                for (const auto & Spell : proto->Spells)
+                for (const auto & itr : proto->Spells)
                 {
-                    if (Spell.SpellId)
+                    if (itr.SpellId)
                     {
                         req = true;
                         break;

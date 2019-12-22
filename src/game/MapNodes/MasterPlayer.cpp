@@ -22,8 +22,8 @@ MasterPlayer::~MasterPlayer()
     for (PlayerMails::const_iterator itr =  m_mail.begin(); itr != m_mail.end(); ++itr)
         delete *itr;
 
-    for (const auto & mMitem : mMitems)
-        delete mMitem.second;                                //if item is duplicated... then server may crash ... but that item should be deallocated
+    for (const auto & itr : mMitems)
+        delete itr.second;                                //if item is duplicated... then server may crash ... but that item should be deallocated
 }
 
 void MasterPlayer::Create(Player* player)

@@ -611,8 +611,8 @@ Player::~Player()
     CleanupsBeforeDelete();
 
     // Note: buy back item already deleted from DB when player was saved
-    for (auto & m_item : m_items)
-        delete m_item;
+    for (auto & item : m_items)
+        delete item;
 
     CleanupChannels();
 
@@ -671,8 +671,8 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
         return false;
     }
 
-    for (auto & m_item : m_items)
-        m_item = nullptr;
+    for (auto & item : m_items)
+        item = nullptr;
 
     SetLocationMapId(info->mapId);
     Relocate(info->positionX, info->positionY, info->positionZ, info->orientation);
@@ -3298,11 +3298,11 @@ void Player::SendInitialSpells() const
         {
             if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(m_spellCooldown.second.itemid))
             {
-                for (const auto & Spell : proto->Spells)
+                for (const auto & itr : proto->Spells)
                 {
-                    if (Spell.SpellId == m_spellCooldown.first)
+                    if (itr.SpellId == m_spellCooldown.first)
                     {
-                        category = Spell.SpellCategory;
+                        category = itr.SpellCategory;
                         break;
                     }
                 }
@@ -3855,11 +3855,11 @@ void Player::_LoadSpellCooldowns(QueryResult* result)
             {
                 if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id))
                 {
-                    for (const auto & Spell : proto->Spells)
+                    for (const auto & itr : proto->Spells)
                     {
-                        if (Spell.SpellId == spell->Id)
+                        if (itr.SpellId == spell->Id)
                         {
-                            category = Spell.SpellCategory;
+                            category = itr.SpellCategory;
                             break;
                         }
                     }

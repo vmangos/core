@@ -745,10 +745,10 @@ public:
     virtual void run()
     {
         int i = 0;
-        for (auto update : updates)
+        for (auto itr : updates)
             if (((++i) % nThreads) == threadIdx)
-                if (update->IsInWorld())
-                    update->GetMotionMaster()->UpdateMotionAsync(diff);
+                if (itr->IsInWorld())
+                    itr->GetMotionMaster()->UpdateMotionAsync(diff);
     }
     int threadIdx;
     int nThreads;
@@ -1609,13 +1609,14 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     bool hasTransport = false;
-    for (auto _transport : _transports)
-        if (_transport != player->GetTransport())
+    for (auto itr : _transports)
+    {
+        if (itr != player->GetTransport())
         {
             hasTransport = true;
-            _transport->BuildCreateUpdateBlockForPlayer(&transData, player);
+            itr->BuildCreateUpdateBlockForPlayer(&transData, player);
         }
-
+    }
     transData.Send(player->GetSession(), hasTransport);
 }
 
@@ -1624,13 +1625,14 @@ void Map::SendRemoveTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     bool hasTransport = false;
-    for (auto _transport : _transports)
-        if (_transport != player->GetTransport())
+    for (auto itr : _transports)
+    {
+        if (itr != player->GetTransport())
         {
             hasTransport = true;
-            _transport->BuildOutOfRangeUpdateBlock(&transData);
+            itr->BuildOutOfRangeUpdateBlock(&transData);
         }
-
+    }
     transData.Send(player->GetSession(), hasTransport);
 }
 
@@ -2783,8 +2785,8 @@ public:
             (*current)->BuildUpdateData(update_players);
         }
 
-        for (auto & update_player : update_players)
-            update_player.second.Send(update_player.first->GetSession());
+        for (auto & itr : update_players)
+            itr.second.Send(itr.first->GetSession());
     }
     std::set<Object*>::iterator begin;
     std::set<Object*>::iterator current;

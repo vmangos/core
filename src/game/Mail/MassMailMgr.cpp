@@ -127,8 +127,8 @@ void MassMailMgr::GetStatistic(uint32& tasks, uint32& mails, uint32& needTime) c
     tasks = m_massMails.size();
 
     uint32 mailsCount = 0;
-    for (const auto & m_massMail : m_massMails)
-        mailsCount += m_massMail.m_receivers.size();
+    for (const auto & itr : m_massMails)
+        mailsCount += itr.m_receivers.size();
 
     mails = mailsCount;
 

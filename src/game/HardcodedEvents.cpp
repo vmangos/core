@@ -412,7 +412,7 @@ void DarkmoonFaire::Update()
 {
     auto event = GetDarkmoonState();
 
-    for (unsigned short i : DMFValidEvent)
+    for (uint16 i : DMFValidEvent)
     {
         if (!sGameEventMgr.IsValidEvent(i))
             continue;
@@ -1471,8 +1471,8 @@ void WarEffortEvent::CompleteWarEffort()
         EVENT_WAR_EFFORT_BATTLE_ZORA
     } };
 
-    for (auto & stopEvent : stopEvents)
-        DisableAndStopEvent(stopEvent);
+    for (auto & itr : stopEvents)
+        DisableAndStopEvent(itr);
 
     stage = WAR_EFFORT_STAGE_COMPLETE;
     sObjectMgr.SetSavedVariable(VAR_WE_STAGE, stage, true);

@@ -50,8 +50,8 @@ MapManager::MapManager()
 
 MapManager::~MapManager()
 {
-    for (auto & i_map : i_maps)
-        delete i_map.second;
+    for (auto & itr : i_maps)
+        delete itr.second;
 
     DeleteStateMachine();
 }
@@ -103,8 +103,8 @@ void MapManager::UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid,
 
 void MapManager::InitializeVisibilityDistanceInfo()
 {
-    for (auto & i_map : i_maps)
-        i_map.second->InitVisibilityDistance();
+    for (auto & itr : i_maps)
+        itr.second->InitVisibilityDistance();
 }
 
 Map* MapManager::CreateMap(uint32 id, WorldObject const* obj)
@@ -304,29 +304,29 @@ void MapManager::Update(uint32 diff)
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
     uint32 inactiveTimeLimit = sWorld.getConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME);
-    for (auto & i_map : i_maps)
+    for (auto & itr : i_maps)
     {
         // If this map has been empty for too long, we no longer update it.
-        if (!i_map.second->ShouldUpdateMap(now, inactiveTimeLimit))
+        if (!itr.second->ShouldUpdateMap(now, inactiveTimeLimit))
             continue;
 
-        i_map.second->UpdateSync(mapsDiff);
-        i_map.second->MarkNotUpdated();
-        i_map.second->SetMapUpdateIndex(-1);
-        if (i_map.second->Instanceable())
+        itr.second->UpdateSync(mapsDiff);
+        itr.second->MarkNotUpdated();
+        itr.second->SetMapUpdateIndex(-1);
+        if (itr.second->Instanceable())
         {
             if (!instanceUpdaters.empty())
             {
-                instanceUpdaters[mapIdx % instanceUpdaters.size()]->maps.push_back(i_map.second);
+                instanceUpdaters[mapIdx % instanceUpdaters.size()]->maps.push_back(itr.second);
                 ++mapIdx;
             }
             else
-                i_map.second->Update(mapsDiff);
+                itr.second->Update(mapsDiff);
         }
         else // One threat per continent part
         {
-            i_map.second->SetMapUpdateIndex(continentsIdx++);
-            ContinentAsyncUpdater* task = new ContinentAsyncUpdater(mapsDiff, i_map.second);
+            itr.second->SetMapUpdateIndex(continentsIdx++);
+            ContinentAsyncUpdater* task = new ContinentAsyncUpdater(mapsDiff, itr.second);
             continentsUpdaters.push_back(task);
         }
     }
@@ -401,8 +401,8 @@ void MapManager::Update(uint32 diff)
 
 void MapManager::RemoveAllObjectsInRemoveList()
 {
-    for (auto & i_map : i_maps)
-        i_map.second->RemoveAllObjectsInRemoveList();
+    for (auto & itr : i_maps)
+        itr.second->RemoveAllObjectsInRemoveList();
 }
 
 bool MapManager::ExistMapAndVMap(uint32 mapid, float x, float y)
@@ -422,8 +422,8 @@ bool MapManager::IsValidMAP(uint32 mapid)
 
 void MapManager::UnloadAll()
 {
-    for (auto & i_map : i_maps)
-        i_map.second->UnloadAll(true);
+    for (auto & itr : i_maps)
+        itr.second->UnloadAll(true);
 
     // Execute any delayed teleports scheduled during unloading. Must be done before
     // the maps are deleted
@@ -455,9 +455,9 @@ void MapManager::InitMaxInstanceId()
 uint32 MapManager::GetNumInstances()
 {
     uint32 ret = 0;
-    for (auto & i_map : i_maps)
+    for (auto & itr : i_maps)
     {
-        Map* map = i_map.second;
+        Map* map = itr.second;
         if (!map->IsDungeon()) continue;
         ret += 1;
     }
@@ -469,9 +469,9 @@ uint32 MapManager::GetNumPlayersInInstances()
     Guard guard(*this);
 
     uint32 ret = 0;
-    for (auto & i_map : i_maps)
+    for (auto & itr : i_maps)
     {
-        Map* map = i_map.second;
+        Map* map = itr.second;
         if (!map->IsDungeon()) continue;
         ret += map->GetPlayers().getSize();
     }
