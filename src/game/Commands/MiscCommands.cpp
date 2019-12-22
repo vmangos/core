@@ -621,9 +621,9 @@ bool ChatHandler::HandleInstancePerfInfosCommand(char* args)
         return false;
     map->PrintInfos(*this);
     uint32 playersInClient = 0, gobjsInClient = 0, unitsInClient = 0, corpsesInClient = 0;
-    for (auto m_visibleGUID : player->m_visibleGUIDs)
+    for (auto itr : player->m_visibleGUIDs)
     {
-        switch (m_visibleGUID.GetHigh())
+        switch (itr.GetHigh())
         {
             case HIGHGUID_PLAYER: ++playersInClient; break;
             case HIGHGUID_GAMEOBJECT: ++gobjsInClient; break;
@@ -1131,20 +1131,20 @@ bool ChatHandler::HandlePoolSpawnsCommand(char* args)
     SpawnedPoolData const& spawns = mapState->GetSpawnedPoolData();
 
     SpawnedPoolObjects const& crSpawns = spawns.GetSpawnedCreatures();
-    for (std::_Simple_types<unsigned int>::value_type crSpawn : crSpawns)
-        if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<Creature>(crSpawn))
-            if (CreatureData const* data = sObjectMgr.GetCreatureData(crSpawn))
+    for (std::_Simple_types<unsigned int>::value_type itr : crSpawns)
+        if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<Creature>(itr))
+            if (CreatureData const* data = sObjectMgr.GetCreatureData(itr))
                 if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
-                    PSendSysMessage(LANG_CREATURE_LIST_CHAT, crSpawn, PrepareStringNpcOrGoSpawnInformation<Creature>(crSpawn).c_str(),
-                                    crSpawn, info->name, data->posX, data->posY, data->posZ, data->mapid);
+                    PSendSysMessage(LANG_CREATURE_LIST_CHAT, itr, PrepareStringNpcOrGoSpawnInformation<Creature>(itr).c_str(),
+                                    itr, info->name, data->posX, data->posY, data->posZ, data->mapid);
 
     SpawnedPoolObjects const& goSpawns = spawns.GetSpawnedGameobjects();
-    for (std::_Simple_types<unsigned int>::value_type goSpawn : goSpawns)
-        if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<GameObject>(goSpawn))
-            if (GameObjectData const* data = sObjectMgr.GetGOData(goSpawn))
+    for (std::_Simple_types<unsigned int>::value_type itr : goSpawns)
+        if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<GameObject>(itr))
+            if (GameObjectData const* data = sObjectMgr.GetGOData(itr))
                 if (GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id))
-                    PSendSysMessage(LANG_GO_LIST_CHAT, goSpawn, PrepareStringNpcOrGoSpawnInformation<GameObject>(goSpawn).c_str(),
-                                    goSpawn, info->name, data->posX, data->posY, data->posZ, data->mapid);
+                    PSendSysMessage(LANG_GO_LIST_CHAT, itr, PrepareStringNpcOrGoSpawnInformation<GameObject>(itr).c_str(),
+                                    itr, info->name, data->posX, data->posY, data->posZ, data->mapid);
 
     return true;
 }
@@ -1691,14 +1691,14 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
             BattleGroundPlayerMap const& pPlayers = it->second->GetPlayers();
             std::string playerName;
 
-            for (const auto & pPlayer : pPlayers)
+            for (const auto & itr : pPlayers)
             {
-                if (pPlayer.second.PlayerTeam == HORDE)
+                if (itr.second.PlayerTeam == HORDE)
                     uiHordeCount++;
                 else
                     uiAllianceCount++;
                 if (playerName.empty())
-                    if (sObjectMgr.GetPlayerNameByGUID(pPlayer.first, playerName))
+                    if (sObjectMgr.GetPlayerNameByGUID(itr.first, playerName))
                         playerName = playerLink(playerName);
             }
 
@@ -1741,9 +1741,9 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
         BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(BattleGroundTypeId(bgTypeId));
         // Doit etre une référence (&), sinon crash par la suite ...
         BattleGroundQueue& queue = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId];
-        for (const auto & m_QueuedPlayer : queue.m_QueuedPlayers)
+        for (const auto & itr : queue.m_QueuedPlayers)
         {
-            if (m_QueuedPlayer.second.GroupInfo->GroupTeam == HORDE)
+            if (itr.second.GroupInfo->GroupTeam == HORDE)
                 uiHordeCount++;
             else
                 uiAllianceCount++;

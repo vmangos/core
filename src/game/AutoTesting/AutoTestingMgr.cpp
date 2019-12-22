@@ -62,8 +62,9 @@ void SingleTest::ClearObjects()
     Map* map = GetMap();
     if (!map)
         return;
-    for (auto & _testObject : _testObjects)
-        if (WorldObject* obj = map->GetWorldObject(_testObject.second))
+    for (auto & itr : _testObjects)
+    { 
+        if (WorldObject* obj = map->GetWorldObject(itr.second))
         {
             if (obj->GetTypeId() == TYPEID_PLAYER)
             {
@@ -73,6 +74,7 @@ void SingleTest::ClearObjects()
             else
                 obj->AddObjectToRemoveList();
         }
+    }
     _testObjects.clear();
     _initializedObjects.clear();
 }
@@ -213,30 +215,32 @@ void SingleTest::Finish(bool success, char const* errMsg)
 
 void AutoTestingMgr::Update(uint32 diff)
 {
-    for (auto & _test : _tests)
-        if (!_test->Finished())
+    for (auto & itr : _tests)
+    {
+        if (!itr->Finished())
         {
-            _test->Update(diff);
-            if (_test->Finished())
+            itr->Update(diff);
+            if (itr->Finished())
             {
-                sLog.outString("TEST: %8s [%20s] %s", _test->Failed() ? "FAIL" : "SUCCESS", _test->GetName().c_str(), _test->GetError().c_str());
-                _test->Reset();
+                sLog.outString("TEST: %8s [%20s] %s", itr->Failed() ? "FAIL" : "SUCCESS", itr->GetName().c_str(), itr->GetError().c_str());
+                itr->Reset();
             }
         }
+    }
 }
 
 void AutoTestingMgr::Run(std::string names, ChatHandler* handler)
 {
-    for (auto & _test : _tests)
+    for (auto & itr : _tests)
     {
-        if (!_test->Finished())
+        if (!itr->Finished())
             continue;
-        std::string currentName = _test->GetName();
+        std::string currentName = itr->GetName();
         if (currentName.find(names) != std::string::npos)
         {
             if (handler)
                 handler->PSendSysMessage("Starting test %s", currentName.c_str());
-            _test->Setup();
+            itr->Setup();
         }
     }
 }

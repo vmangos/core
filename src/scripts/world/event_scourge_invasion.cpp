@@ -348,8 +348,8 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
     }
     void OnRemoveFromWorld() override
     {
-        for (std::set<ObjectGuid>::iterator it = _guards.begin(); it != _guards.end(); ++it)
-            if (Creature* c = m_creature->GetMap()->GetCreature(*it))
+        for (auto _guard : _guards)
+            if (Creature* c = m_creature->GetMap()->GetCreature(_guard))
                 if (!c->IsInCombat())
                     c->AddObjectToRemoveList();
     }
@@ -461,8 +461,8 @@ struct PallidHorrorAI : public ScourgeInvasion_RandomAttackerAI
 
     void OnRemoveFromWorld() override
     {
-        for (std::set<ObjectGuid>::iterator it = _flameshockers.begin(); it != _flameshockers.end(); ++it)
-            if (Creature* c = m_creature->GetMap()->GetCreature(*it))
+        for (auto _flameshocker : _flameshockers)
+            if (Creature* c = m_creature->GetMap()->GetCreature(_flameshocker))
                 c->AddObjectToRemoveList();
         ScourgeInvasion_RandomAttackerAI::OnRemoveFromWorld();
     }

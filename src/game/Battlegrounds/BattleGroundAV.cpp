@@ -101,28 +101,28 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
     m_ui_buff_a = 120000 + urand(0,4)* 60000;
     m_ui_buff_h = 120000 + urand(0,4)* 60000;
 
-    for (auto & m_challengeStatu : m_challengeStatus)
+    for (auto & i : m_challengeStatus)
         for (int j = 0; j < BG_AV_NB_CHALLENGES; j++)
-            m_challengeStatu[j] = 0;
+            i[j] = 0;
 
     /** Reinforcement level for Troops invocation */
     m_reinforcementLevel[BG_TEAM_ALLIANCE] = AV_NPC_BASIC;
     m_reinforcementLevel[BG_TEAM_HORDE]    = AV_NPC_BASIC;
 
     /** Minimum resources are necessary for challenges */
-    for (auto & m_challengeGoal : m_challengeGoals)
+    for (int i = 0; i < BG_TEAMS_COUNT; ++i)
     {
-        m_challengeGoal[BG_AV_SOLDIER_AIR_ASSAULT]                     = 90; /** Real value 90  */
-        m_challengeGoal[BG_AV_LIEUTENANT_AIR_ASSAULT]                  = 60; /** Real value 60  */
-        m_challengeGoal[BG_AV_COMMANDER_AIR_ASSAULT]                   = 30; /** Real value 30  */
-        m_challengeGoal[BG_AV_HIDE_CAVALRY_ASSAULT]                    = 25; /** Real value 25  */
-        m_challengeGoal[BG_AV_TAMED_CAVALRY_ASSAULT]                   = 25; /** Real value 25  */
+        m_challengeGoals[i][BG_AV_SOLDIER_AIR_ASSAULT]                     = 90; /** Real value 90  */
+        m_challengeGoals[i][BG_AV_LIEUTENANT_AIR_ASSAULT]                  = 60; /** Real value 60  */
+        m_challengeGoals[i][BG_AV_COMMANDER_AIR_ASSAULT]                   = 30; /** Real value 30  */
+        m_challengeGoals[i][BG_AV_HIDE_CAVALRY_ASSAULT]                    = 25; /** Real value 25  */
+        m_challengeGoals[i][BG_AV_TAMED_CAVALRY_ASSAULT]                   = 25; /** Real value 25  */
         m_challengeGoals[BG_TEAM_ALLIANCE][BG_AV_IRONDEEP_GROUND_ASSAULT]  = 280; /** Real value 280 */
         m_challengeGoals[BG_TEAM_ALLIANCE][BG_AV_COLDTOOTH_GROUND_ASSAULT] = 70; /** Real value 70  */
         m_challengeGoals[BG_TEAM_HORDE][BG_AV_IRONDEEP_GROUND_ASSAULT]     = 70; /** Real value 70 */
         m_challengeGoals[BG_TEAM_HORDE][BG_AV_COLDTOOTH_GROUND_ASSAULT]    = 280; /** Real value 280  */
-        m_challengeGoal[BG_AV_BLOOD_WORLDBOSS_ASSAULT]                 = 200; /** Real value 200 */
-    }
+        m_challengeGoals[i][BG_AV_BLOOD_WORLDBOSS_ASSAULT]                 = 200; /** Real value 200 */
+}
 
     /** Minimum reputation are required for challenges */
     for (unsigned int & i : m_challengeMinReputationNeeded)
@@ -147,9 +147,9 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
     m_challengeTimerStart[BG_AV_WORLDBOSS_ASSAULT]            = 172800000; /** Real value N/A */
 
     /** Go status sent by players */
-    for (auto & m_challengePlayerGoStatu : m_challengePlayerGoStatus)
+    for (int i = 0; i < BG_TEAMS_COUNT; ++i)
         for (int j = 0; j < BG_AV_NB_ASSAULTS; ++j)
-            m_challengePlayerGoStatu[j] = false;
+            m_challengePlayerGoStatus[i][j] = false;
 }
 
 uint32 BattleGroundAV::getMinReputationNeeded(uint32 assault)

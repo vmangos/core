@@ -84,13 +84,13 @@ struct go_dusty_rugAI: public GameObjectAI
                         {
                             std::list<Creature*> lCrea;
                             me->GetCreatureListWithEntryInGrid(lCrea, NPC_CAPTURED_FARMER, 30.0f);
-                            for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
+                            for (auto & it : lCrea)
                             {
-                                if ((*it)->IsAlive())
+                                if (it->IsAlive())
                                 {
-                                    Farmers.push_back((*it)->GetGUID());
-                                    pKeg->GetContactPoint((*it), fX, fY, fZ, CONTACT_DISTANCE);
-                                    (*it)->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_PATHFINDING);
+                                    Farmers.push_back(it->GetGUID());
+                                    pKeg->GetContactPoint(it, fX, fY, fZ, CONTACT_DISTANCE);
+                                    it->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_PATHFINDING);
                                 }
                             }
                         }

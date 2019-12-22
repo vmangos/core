@@ -97,8 +97,8 @@ struct boss_buruAI : public ScriptedAI
         m_uiSpeed_Timer = 30000;
         m_uiCreepingPlague_Timer = 6000;
 
-        for (int i = 0; i < 6; i++)
-            m_uiRespawnEgg_Timer[i] = 120000;
+        for (unsigned int & i : m_uiRespawnEgg_Timer)
+            i = 120000;
 
         Creature* egg;
         for (int i = 0; i < 6; i++)
@@ -127,8 +127,8 @@ struct boss_buruAI : public ScriptedAI
     {
         // Le debuff fade quand il est mort, sinon le raid se fait decimer
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-            i->getSource()->RemoveAurasDueToSpell(SPELL_CREEPING_PLAGUE);
+        for (const auto & i : liste)
+            i.getSource()->RemoveAurasDueToSpell(SPELL_CREEPING_PLAGUE);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_BURU, DONE);
@@ -209,31 +209,31 @@ struct boss_buruAI : public ScriptedAI
                     m_creature->SetFacingToObject(m_creature->GetVictim());
 
                 // Despawn des oeufs lors de l'enrage
-                for (int i = 0 ; i < 6 ; i++)
+                for (unsigned long long & i : m_eggsGUID)
                 {
-                    if (m_eggsGUID[i])
+                    if (i)
                     {
-                        if (Creature* egg = m_pInstance->GetCreature(m_eggsGUID[i]))
+                        if (Creature* egg = m_pInstance->GetCreature(i))
                             egg->AddObjectToRemoveList();
 
-                        m_eggsGUID[i] = 0;
+                        i = 0;
                     }
                 }
             }
             else if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()) < (THREAT_LOCK / 1000))
             {
                 uint64 GUIDs[40];
-                for (int i = 0; i < 40; i++)
-                    GUIDs[i] = 0;
+                for (unsigned long long & GUID : GUIDs)
+                    GUID = 0;
 
                 int var = 0;
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+                for (auto itr : tList)
                 {
-                    Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
+                    Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
                     if (pPlayer && pPlayer->IsAlive())
                     {
-                        GUIDs[var] = (*itr)->getUnitGuid();
+                        GUIDs[var] = itr->getUnitGuid();
                         ++var;
                     }
                 }
@@ -279,9 +279,9 @@ struct boss_buruAI : public ScriptedAI
             // Pop des add lors de l'enrage (3, mais je ne suis pas sur de ce nombre et ne sait pas s'ils arrivent tous d'un coup)
             if (!m_HatchPop)
             {
-                for (int i = 0; i < 3; i++)
+                for (auto & i : AddPop)
                 {
-                    if (Creature* summoned = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, AddPop[i].x, AddPop[i].y, AddPop[i].z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                    if (Creature* summoned = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                         summoned->SetInCombatWithZone();
                 }
                 m_HatchPop = true;

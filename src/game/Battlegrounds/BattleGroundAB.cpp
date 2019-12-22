@@ -264,12 +264,13 @@ void BattleGroundAB::FillInitialWorldStates(WorldPacket& data, uint32& count)
 
     // How many bases each team owns
     uint8 ally = 0, horde = 0;
-    for (unsigned char m_Node : m_Nodes)
-        if (m_Node == BG_AB_NODE_STATUS_ALLY_OCCUPIED)
+    for (unsigned char i : m_Nodes)
+    {
+        if (i == BG_AB_NODE_STATUS_ALLY_OCCUPIED)
             ++ally;
-        else if (m_Node == BG_AB_NODE_STATUS_HORDE_OCCUPIED)
+        else if (i == BG_AB_NODE_STATUS_HORDE_OCCUPIED)
             ++horde;
-
+    }
     FillInitialWorldState(data, count, BG_AB_OP_OCCUPIED_BASES_ALLY, ally);
     FillInitialWorldState(data, count, BG_AB_OP_OCCUPIED_BASES_HORDE, horde);
 
@@ -297,12 +298,13 @@ void BattleGroundAB::_SendNodeUpdate(uint8 node)
 
     // How many bases each team owns
     uint8 ally = 0, horde = 0;
-    for (unsigned char m_Node : m_Nodes)
-        if (m_Node == BG_AB_NODE_STATUS_ALLY_OCCUPIED)
+    for (unsigned char i : m_Nodes)
+    {
+        if (i == BG_AB_NODE_STATUS_ALLY_OCCUPIED)
             ++ally;
-        else if (m_Node == BG_AB_NODE_STATUS_HORDE_OCCUPIED)
+        else if (i == BG_AB_NODE_STATUS_HORDE_OCCUPIED)
             ++horde;
-
+    }
     UpdateWorldState(BG_AB_OP_OCCUPIED_BASES_ALLY, ally);
     UpdateWorldState(BG_AB_OP_OCCUPIED_BASES_HORDE, horde);
 }
@@ -310,9 +312,9 @@ void BattleGroundAB::_SendNodeUpdate(uint8 node)
 void BattleGroundAB::_NodeOccupied(uint8 node, Team team)
 {
     uint8 capturedNodes = 0;
-    for (unsigned int m_NodeTimer : m_NodeTimers)
+    for (unsigned int i : m_NodeTimers)
     {
-        if (m_Nodes[node] == GetTeamIndexByTeamId(team) + BG_AB_NODE_TYPE_OCCUPIED && !m_NodeTimer)
+        if (m_Nodes[node] == GetTeamIndexByTeamId(team) + BG_AB_NODE_TYPE_OCCUPIED && !i)
             ++capturedNodes;
     }
     if (capturedNodes >= 5)

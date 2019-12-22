@@ -62,13 +62,13 @@ BattleGroundQueue::BattleGroundQueue()
 BattleGroundQueue::~BattleGroundQueue()
 {
     m_QueuedPlayers.clear();
-    for (auto & m_QueuedGroup : m_QueuedGroups)
+    for (auto & group : m_QueuedGroups)
     {
         for (uint32 j = 0; j < BG_QUEUE_GROUP_TYPES_COUNT; ++j)
         {
-            for (GroupsQueueType::iterator itr = m_QueuedGroup[j].begin(); itr != m_QueuedGroup[j].end(); ++itr)
+            for (GroupsQueueType::iterator itr = group[j].begin(); itr != group[j].end(); ++itr)
                 delete(*itr);
-            m_QueuedGroup[j].clear();
+            group[j].clear();
         }
     }
 }
@@ -710,10 +710,10 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             FillPlayersToBG(bg, bracket_id);
 
             // now everything is set, invite players
-            for (auto SelectedGroup : m_SelectionPools[BG_TEAM_ALLIANCE].SelectedGroups)
-                InviteGroupToBG(SelectedGroup, bg, SelectedGroup->GroupTeam);
-            for (auto SelectedGroup : m_SelectionPools[BG_TEAM_HORDE].SelectedGroups)
-                InviteGroupToBG(SelectedGroup, bg, SelectedGroup->GroupTeam);
+            for (auto itr : m_SelectionPools[BG_TEAM_ALLIANCE].SelectedGroups)
+                InviteGroupToBG(itr, bg, itr->GroupTeam);
+            for (auto itr : m_SelectionPools[BG_TEAM_HORDE].SelectedGroups)
+                InviteGroupToBG(itr, bg, itr->GroupTeam);
 
             if (!bg->HasFreeSlots())
             {
@@ -794,8 +794,8 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             }
             //invite those selection pools
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
-                for (auto SelectedGroup : m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups)
-                    InviteGroupToBG(SelectedGroup, bg2, SelectedGroup->GroupTeam);
+                for (auto itr : m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups)
+                    InviteGroupToBG(itr, bg2, itr->GroupTeam);
             //start bg
             bg2->SetLevelRange(q_min_level, q_max_level - 1);
             bg2->StartBattleGround();
@@ -819,8 +819,8 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
 
             // invite those selection pools
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
-                for (auto SelectedGroup : m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups)
-                    InviteGroupToBG(SelectedGroup, bg2, SelectedGroup->GroupTeam);
+                for (auto itr : m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups)
+                    InviteGroupToBG(itr, bg2, itr->GroupTeam);
 
             // start bg
             bg2->SetLevelRange(q_min_level, q_max_level - 1);

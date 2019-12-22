@@ -161,9 +161,9 @@ void instance_temple_of_ahnqiraj::Initialize()
 
 bool instance_temple_of_ahnqiraj::IsEncounterInProgress() const
 {
-    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+    for (unsigned int i : m_auiEncounter)
     {
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+        if (i == IN_PROGRESS || i == SPECIAL)
             return true;
     }
 
@@ -383,8 +383,8 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         break;
     case TYPE_CTHUN:
         m_auiEncounter[uiType] = uiData;
-        for (auto it = graspsOfCthun.begin(); it != graspsOfCthun.end(); it++) {
-            if (GameObject* pGo = GetGameObject(*it)) {
+        for (auto & it : graspsOfCthun) {
+            if (GameObject* pGo = GetGameObject(it)) {
                 pGo->SetVisible(uiData != DONE);
             }
         }
@@ -396,8 +396,8 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        for (int i = 0; i < MAX_ENCOUNTER; ++i)
-            saveStream << m_auiEncounter[i] << " ";
+        for (unsigned int i : m_auiEncounter)
+            saveStream << i << " ";
 
         m_strInstData = saveStream.str();
 
@@ -417,11 +417,11 @@ void instance_temple_of_ahnqiraj::Load(char const* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-	   for (int i = 0; i < MAX_ENCOUNTER; ++i)
+	   for (unsigned int & i : m_auiEncounter)
     {
-        loadStream >> m_auiEncounter[i];
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+        loadStream >> i;
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
     }
     
     if (m_auiEncounter[TYPE_TWINS] == DONE) {
@@ -468,9 +468,9 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (PlayerList.isEmpty())
         return;
 
-    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+    for (const auto & itr : PlayerList)
     {
-        if (Player* player = itr->getSource())
+        if (Player* player = itr.getSource())
         {
             if (!player->IsDead()) {
                 auto find_it = std::find_if(cthunWhisperMutes.begin(), cthunWhisperMutes.end(), 
@@ -790,9 +790,9 @@ struct AI_QirajiMindslayer : public ScriptedAI {
         Player* closestPlayer = nullptr;
         float closestDist = std::numeric_limits<float>::max();
         MapRefManager const &list = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = list.begin(); i != list.end(); ++i)
+        for (const auto & i : list)
         {
-            if (Player* player = i->getSource()) {
+            if (Player* player = i.getSource()) {
                 if (player->IsAlive()) { 
                     float dist = m_creature->GetDistance(player);
                     if (dist < closestDist) {

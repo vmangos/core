@@ -3650,17 +3650,17 @@ bool ChatHandler::HandleListTalentsCommand(char* /*args*/)
     uint32 count = 0;
     uint32 cost = 0;
     PlayerSpellMap const& uSpells = player->GetSpellMap();
-    for (const auto & uSpell : uSpells)
+    for (const auto & itr : uSpells)
     {
-        if (uSpell.second.state == PLAYERSPELL_REMOVED || uSpell.second.disabled)
+        if (itr.second.state == PLAYERSPELL_REMOVED || itr.second.disabled)
             continue;
 
-        uint32 cost_itr = GetTalentSpellCost(uSpell.first);
+        uint32 cost_itr = GetTalentSpellCost(itr.first);
 
         if (cost_itr == 0)
             continue;
 
-        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(uSpell.first);
+        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(itr.first);
         if (!spellEntry)
             continue;
 

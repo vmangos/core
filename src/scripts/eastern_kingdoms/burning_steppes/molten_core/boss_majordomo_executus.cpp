@@ -105,8 +105,8 @@ struct boss_majordomoAI : public ScriptedAI
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
         Reflection_Timer =  30000;
         Blastwave_Timer = 10000;
-        for (int i = 0; i < 2; i++)
-            TPDomo_Timer[i] = 10000 + rand() % 20000;
+        for (unsigned int & i : TPDomo_Timer)
+            i = 10000 + rand() % 20000;
         AddSpawn = false;
         AddVivant = 8;
         Immune = 0;
@@ -140,13 +140,13 @@ struct boss_majordomoAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(AddListe, m_creature, 11664, 150.0f);
         if (!AddListe.empty())
         {
-            for (std::list<Creature*>::iterator itr = AddListe.begin(); itr != AddListe.end(); ++itr)
+            for (auto & itr : AddListe)
             {
-                if ((*itr)->IsAlive() && AddVivant > 0)
+                if (itr->IsAlive() && AddVivant > 0)
                 {
-                    CreatureInfo const *cinfo = (*itr)->GetCreatureInfo();
-                    (*itr)->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min + cinfo->dmg_min / AddVivant);
-                    (*itr)->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max + cinfo->dmg_max / AddVivant);
+                    CreatureInfo const *cinfo = itr->GetCreatureInfo();
+                    itr->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min + cinfo->dmg_min / AddVivant);
+                    itr->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max + cinfo->dmg_max / AddVivant);
                 }
             }
         }
@@ -155,13 +155,13 @@ struct boss_majordomoAI : public ScriptedAI
         {
             if (!AddListe.empty())
             {
-                for (std::list<Creature*>::iterator itr = AddListe.begin(); itr != AddListe.end(); ++itr)
+                for (auto & itr : AddListe)
                 {
-                    if ((*itr)->IsAlive())
+                    if (itr->IsAlive())
                     {
-                        (*itr)->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                        (*itr)->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                        (*itr)->RemoveSpellsCausingAura(SPELL_AURA_MOD_CONFUSE);
+                        itr->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                        itr->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                        itr->RemoveSpellsCausingAura(SPELL_AURA_MOD_CONFUSE);
                     }
                 }
             }
@@ -171,13 +171,13 @@ struct boss_majordomoAI : public ScriptedAI
         {
             if (!AddListe.empty())
             {
-                for (std::list<Creature*>::iterator itr = AddListe.begin(); itr != AddListe.end(); ++itr)
+                for (auto & itr : AddListe)
                 {
-                    if ((*itr)->IsAlive())
+                    if (itr->IsAlive())
                     {
                         m_creature->MonsterYell(SAY_LAST_ADD);
-                        (*itr)->SetPower(POWER_MANA, (*itr)->GetMaxPower(POWER_MANA));
-                        (*itr)->SetHealthPercent(100.0f);
+                        itr->SetPower(POWER_MANA, itr->GetMaxPower(POWER_MANA));
+                        itr->SetHealthPercent(100.0f);
                     }
                 }
             }
@@ -324,8 +324,8 @@ struct boss_majordomoAI : public ScriptedAI
         if (m_creature->GetFactionTemplateId() != 35 && !AddSpawn)
         {
             Creature* DomoAdd[8];
-            for (int i = 0; i < 8; i++)
-                DomoAdd[i] = nullptr;
+            for (auto & i : DomoAdd)
+                i = nullptr;
 
             for (int i = 0; i < 8; i++)
                 DomoAdd[i] = m_creature->SummonCreature(m_aBosspawnLocs[i].m_uiEntry, m_aBosspawnLocs[i].m_fX, m_aBosspawnLocs[i].m_fY, m_aBosspawnLocs[i].m_fZ, m_aBosspawnLocs[i].m_fO, TEMPSUMMON_DEAD_DESPAWN, 0);

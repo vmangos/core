@@ -150,11 +150,11 @@ public:
         ASSERT(pTechnician);
         m_vTechniciansGuid.push_back(pTechnician->GetObjectGuid());
         ThreatList threatList = pTechnician->GetThreatManager().getThreatList();
-        for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+        for (auto i : threatList)
         {
-            if (Unit *pUnit = m_pInstance->instance->GetCreature((*i)->getUnitGuid()))
+            if (Unit *pUnit = m_pInstance->instance->GetCreature(i->getUnitGuid()))
             {
-                m_mThreatGuid[pUnit->GetObjectGuid()] += (*i)->getThreat();
+                m_mThreatGuid[pUnit->GetObjectGuid()] += i->getThreat();
                 pTechnician->GetThreatManager().modifyThreatPercent(pUnit, -100);
             }
         }
@@ -177,12 +177,12 @@ public:
         float fMaxThreat = 0.0f;
         ObjectGuid victimGuid;
 
-        for (std::map<ObjectGuid, float>::const_iterator itr = m_mThreatGuid.begin(); itr != m_mThreatGuid.end(); ++itr)
+        for (const auto & itr : m_mThreatGuid)
         {
-            if (fMaxThreat <= itr->second)
+            if (fMaxThreat <= itr.second)
             {
-                fMaxThreat = itr->second;
-                victimGuid = itr->first;
+                fMaxThreat = itr.second;
+                victimGuid = itr.first;
             }
         }
         return victimGuid;
@@ -215,19 +215,19 @@ public:
             // for an integer overflow
             m_uiTechniciansUpdate = m_vTechniciansGuid.size();
             m_bUpdated = true;
-            for (std::vector<ObjectGuid>::iterator itr = m_vTechniciansGuid.begin(); itr != m_vTechniciansGuid.end(); ++itr)
+            for (auto & itr : m_vTechniciansGuid)
             {
-                if (Creature *pCreature = m_pInstance->instance->GetCreature(*itr))
+                if (Creature *pCreature = m_pInstance->instance->GetCreature(itr))
                 {
                     if (!pCreature->IsAlive())
                         continue;
                     // Copy the list, since it may get invalidated at 'modifyThreatPercent' call
                     ThreatList threatList = pCreature->GetThreatManager().getThreatList();
-                    for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+                    for (auto i : threatList)
                     {
-                        if (Unit *pUnit = m_pInstance->instance->GetUnit((*i)->getUnitGuid()))
+                        if (Unit *pUnit = m_pInstance->instance->GetUnit(i->getUnitGuid()))
                         {
-                            m_mThreatGuid[pUnit->GetObjectGuid()] += (*i)->getThreat();
+                            m_mThreatGuid[pUnit->GetObjectGuid()] += i->getThreat();
                             pCreature->GetThreatManager().modifyThreatPercent(pUnit, -100);
                         }
                     }
@@ -655,9 +655,9 @@ struct instance_blackwing_lair : public ScriptedInstance
                     if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
                         DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
                 }
-                for (std::list<ObjectGuid>::iterator itr = m_lVaelGobs.begin(); itr != m_lVaelGobs.end(); ++itr)
+                for (auto & m_lVaelGob : m_lVaelGobs)
                 {
-                    if (Creature *pCreature = instance->GetCreature(*itr))
+                    if (Creature *pCreature = instance->GetCreature(m_lVaelGob))
                     {
                         pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     }
@@ -751,9 +751,9 @@ struct instance_blackwing_lair : public ScriptedInstance
             if (uiData == DONE)
             {
                 bool bYelled = false;
-                for (std::list<ObjectGuid>::iterator itr = m_lVaelGobs.begin(); itr != m_lVaelGobs.end(); ++itr)
+                for (auto & m_lVaelGob : m_lVaelGobs)
                 {
-                    if (Creature *pCreature = instance->GetCreature(*itr))
+                    if (Creature *pCreature = instance->GetCreature(m_lVaelGob))
                     {
                         if (!bYelled)
                         {
@@ -878,11 +878,11 @@ struct instance_blackwing_lair : public ScriptedInstance
         {
             std::list<GameObject *> lGameObjects;
             pCreature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_OEUF_RAZ, 250.0f);
-            for (std::list<GameObject *>::iterator itr = lGameObjects.begin(); itr != lGameObjects.end(); ++itr)
-                (*itr)->DeleteLater();
+            for (auto & lGameObject : lGameObjects)
+                lGameObject->DeleteLater();
 
-            for (uint8 i = 0; i < (sizeof(RazOeufs) / sizeof(RazOeufs[0])); ++i)
-                pCreature->SummonGameObject(GO_OEUF_RAZ, RazOeufs[i].X, RazOeufs[i].Y, RazOeufs[i].Z, RazOeufs[i].O);
+            for (auto & RazOeuf : RazOeufs)
+                pCreature->SummonGameObject(GO_OEUF_RAZ, RazOeuf.X, RazOeuf.Y, RazOeuf.Z, RazOeuf.O);
         }
     }
 
@@ -1000,11 +1000,11 @@ struct go_engin_suppressionAI: public GameObjectAI
     {
         me->SendGameObjectCustomAnim();
         Map::PlayerList const &liste = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+        for (const auto & i : liste)
         {
-            if (me->GetDistance(i->getSource()) <= 15.0f)
-                if (!i->getSource()->HasStealthAura() && i->getSource()->IsAlive() && !i->getSource()->IsGameMaster())
-                    i->getSource()->AddAura(SPELL_SUPPRESSION_AURA);
+            if (me->GetDistance(i.getSource()) <= 15.0f)
+                if (!i.getSource()->HasStealthAura() && i.getSource()->IsAlive() && !i.getSource()->IsGameMaster())
+                    i.getSource()->AddAura(SPELL_SUPPRESSION_AURA);
         }
     }
 

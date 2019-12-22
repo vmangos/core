@@ -1689,21 +1689,23 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
         }
     }
     PSendSysMessage("%u items dropped after %u attempts for loot %s.%u", lootChances.size(), simCount, tableName.c_str(), lootid);
-    for (const auto & lootChance : lootChances)
-        if (lootChance.first == checkItem || !checkItem)
+    for (const auto & itr : lootChances)
+    {
+        if (itr.first == checkItem || !checkItem)
         {
-            ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(lootChance.first);
+            ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(itr.first);
             if (!proto)
                 continue;
 
             std::stringstream chance;
-            chance << 100 * lootChance.second / float(simCount);
+            chance << 100 * itr.second / float(simCount);
             chance << "%";
             if (m_session)
-                PSendSysMessage(LANG_ITEM_LIST_CHAT, lootChance.first, lootChance.first, proto->Name1, chance.str().c_str());
+                PSendSysMessage(LANG_ITEM_LIST_CHAT, itr.first, itr.first, proto->Name1, chance.str().c_str());
             else
-                PSendSysMessage(LANG_ITEM_LIST_CONSOLE, lootChance.first, proto->Name1, chance.str().c_str());
+                PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr.first, proto->Name1, chance.str().c_str());
         }
+    }
     return true;
 }
 
@@ -1742,18 +1744,18 @@ bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, unsigned int simCoun
     }
 
     PSendSysMessage("%u items dropped after %u attempts for item %s.", lootChances.size(), simCount, proto->Name1);
-    for (const auto & lootChance : lootChances)
+    for (const auto & itr : lootChances)
     {
         std::stringstream chance;
-        chance << 100 * lootChance.second / float(simCount);
+        chance << 100 * itr.second / float(simCount);
         chance << "%";
-        ItemRandomPropertiesEntry const* randomProp = sItemRandomPropertiesStore.LookupEntry(lootChance.first);
+        ItemRandomPropertiesEntry const* randomProp = sItemRandomPropertiesStore.LookupEntry(itr.first);
         if (!randomProp)
             continue;
         if (m_session)
-            PSendSysMessage(LANG_ITEM_LIST_CHAT, lootChance.first, lootid, randomProp->internalName, chance.str().c_str());
+            PSendSysMessage(LANG_ITEM_LIST_CHAT, itr.first, lootid, randomProp->internalName, chance.str().c_str());
         else
-            PSendSysMessage(LANG_ITEM_LIST_CONSOLE, lootChance.first, randomProp->internalName, chance.str().c_str());
+            PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr.first, randomProp->internalName, chance.str().c_str());
     }
     return true;
 }

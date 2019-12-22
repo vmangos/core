@@ -1896,9 +1896,9 @@ bool ChatHandler::HandleWpShowCommand(char* args)
     {
         UnsummonVisualWaypoints(m_session->GetPlayer(), wpOwner->GetObjectGuid());
 
-        for (const auto & pItr : *wpPath)
+        for (const auto & itr : *wpPath)
         {
-            if (!Helper_CreateWaypointFor(wpOwner, wpOrigin, wpPathId, pItr.first, &(pItr.second), waypointInfo))
+            if (!Helper_CreateWaypointFor(wpOwner, wpOrigin, wpPathId, itr.first, &(itr.second), waypointInfo))
             {
                 printf("error %s wpPathId %i", wpOwner->GetName(), wpPathId);
                 PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);

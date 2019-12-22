@@ -87,9 +87,9 @@ void ScriptedInstance::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 
     if (!lPlayers.isEmpty())
     {
-        for(const auto & lPlayer : lPlayers)
+        for(const auto & itr : lPlayers)
         {
-            if (Player* pPlayer = lPlayer.getSource())
+            if (Player* pPlayer = itr.getSource())
                 pPlayer->SendUpdateWorldState(uiStateId, uiStateData);
         }
     }
@@ -129,9 +129,9 @@ Player* ScriptedInstance::GetPlayerInMap(bool bOnlyAlive /*=false*/, bool bCanBe
 {
     Map::PlayerList const& lPlayers = instance->GetPlayers();
 
-    for (const auto & lPlayer : lPlayers)
+    for (const auto & itr : lPlayers)
     {
-        Player* pPlayer = lPlayer.getSource();
+        Player* pPlayer = itr.getSource();
         if (pPlayer && (!bOnlyAlive || pPlayer->IsAlive()) && (bCanBeGamemaster || !pPlayer->IsGameMaster()))
             return pPlayer;
     }

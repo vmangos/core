@@ -140,8 +140,8 @@ public:
 
     ~AutoTestingMgr()
     {
-        for (auto & _test : _tests)
-            delete _test;
+        for (auto & itr : _tests)
+            delete itr;
     }
 
     static void Load()

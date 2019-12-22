@@ -165,21 +165,21 @@ struct boss_faerlinaAI : public ScriptedAI
         switch (pSummoned->GetEntry())
         {
         case MOB_FOLLOWER:
-            for (int i = 0; i < 2; i++)
+            for (auto & follower : followers)
             {
-                if (followers[i] == pSummoned->GetObjectGuid())
+                if (follower == pSummoned->GetObjectGuid())
                 {
-                    followers[i] = 0;
+                    follower = 0;
                     break;
                 }
             }
             break;
         case MOB_WORSHIPPER:
-            for (int i = 0; i < 4; i++)
+            for (auto & worshipper : worshippers)
             {
-                if (worshippers[i] == pSummoned->GetObjectGuid())
+                if (worshipper == pSummoned->GetObjectGuid())
                 {
-                    worshippers[i] = 0;
+                    worshipper = 0;
                     break;
                 }
             }
@@ -201,13 +201,13 @@ struct boss_faerlinaAI : public ScriptedAI
         if (m_pInstance)
             m_pInstance->SetData(TYPE_FAERLINA, IN_PROGRESS);
 
-        for (int i = 0; i < 2; i++) {
-            if (Creature* c = m_pInstance->GetCreature(followers[i]))
+        for (auto follower : followers) {
+            if (Creature* c = m_pInstance->GetCreature(follower))
                 c->AI()->AttackStart(pWho);
         }
 
-        for (int i = 0; i < 4; i++) {
-            if (Creature* c = m_pInstance->GetCreature(worshippers[i]))
+        for (auto worshipper : worshippers) {
+            if (Creature* c = m_pInstance->GetCreature(worshipper))
                 c->AI()->AttackStart(pWho);
         }
     }

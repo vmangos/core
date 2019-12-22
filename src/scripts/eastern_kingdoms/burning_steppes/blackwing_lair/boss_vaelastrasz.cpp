@@ -365,9 +365,9 @@ struct boss_vaelAI : public ScriptedAI
         {
             std::vector<ObjectGuid> vPossibleVictim;
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+            for (auto itr : tList)
             {
-                Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
+                Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
                 if (pPlayer && pPlayer->IsAlive() && pPlayer->GetPowerType() == POWER_MANA && !pPlayer->HasAura(SPELL_BURNING_ADRENALINE, EFFECT_INDEX_0))
                     vPossibleVictim.push_back(pPlayer->GetObjectGuid());
             }
@@ -585,23 +585,23 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_WYRMIDE_GRIFFEMORT, 50.0f);
         GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_RONGE_GRIFFEMORT, 50.0f);
 
-        for (std::list<Creature *>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
+        for (auto & itr : lCreature)
         {
-            if (!(*itr)->IsAlive())
+            if (!itr->IsAlive())
                 continue;
 
             if (on && m_creature->IsAlive())
             {
-                if (m_creature->IsWithinDistInMap((*itr), 15.0f))
+                if (m_creature->IsWithinDistInMap(itr, 15.0f))
                 {
-                    if (!(*itr)->HasAura(SPELL_AURA_FLAMES))
-                        (*itr)->AddAura(SPELL_AURA_FLAMES);
+                    if (!itr->HasAura(SPELL_AURA_FLAMES))
+                        itr->AddAura(SPELL_AURA_FLAMES);
                 }
                 else
-                    (*itr)->RemoveAurasDueToSpell(SPELL_AURA_FLAMES);
+                    itr->RemoveAurasDueToSpell(SPELL_AURA_FLAMES);
             }
             else
-                (*itr)->RemoveAurasDueToSpell(SPELL_AURA_FLAMES);
+                itr->RemoveAurasDueToSpell(SPELL_AURA_FLAMES);
         }
     }
 

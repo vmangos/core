@@ -300,14 +300,14 @@ void npc_shade_hakkarAI::Reset()
     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-    for (uint32 i = 0; i < SHADE_SPAWN_TYPES; ++i)
-        eventSpawns[i] = 0;
+    for (unsigned int & eventSpawn : eventSpawns)
+        eventSpawn = 0;
 
     if (m_pInstance)
     {
-        for (uint32 i = 0; i < NUM_BRAZIERS; ++i)
+        for (unsigned int brazierEntrie : brazierEntries)
         {
-            if (GameObject *go = m_pInstance->GetGameObject(m_pInstance->GetData64(brazierEntries[i])))
+            if (GameObject *go = m_pInstance->GetGameObject(m_pInstance->GetData64(brazierEntrie)))
                 UpdateBrazierState(go, false);
         }
     }

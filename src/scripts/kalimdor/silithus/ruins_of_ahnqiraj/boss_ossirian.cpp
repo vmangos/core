@@ -145,9 +145,9 @@ struct boss_ossirianAI : public ScriptedAI
 
     void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override
     {
-        for (int i = 0; i < SpellWeakness.size(); ++i)
+        for (unsigned int SpellWeaknes : SpellWeakness)
         {
-            if (pSpell->Id == SpellWeakness[i])
+            if (pSpell->Id == SpellWeaknes)
             {
                 m_uiStrengthOfOssirian_Timer = 45000;
 
@@ -167,12 +167,12 @@ struct boss_ossirianAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
         DoCast(m_creature, SPELL_STRENGTH_OF_OSSIRIAN);
-        for (uint8 i = 0; i < TornadoSpawn.size(); ++i)
+        for (auto i : TornadoSpawn)
         {
             Creature *pCreature = m_creature->SummonCreature(NPC_TORNADO,
-                                  TornadoSpawn[i].x,
-                                  TornadoSpawn[i].y,
-                                  TornadoSpawn[i].z,
+                                  i.x,
+                                  i.y,
+                                  i.z,
                                   0,
                                   TEMPSUMMON_MANUAL_DESPAWN,
                                   0);
@@ -317,10 +317,10 @@ struct generic_random_moveAI : public ScriptedAI
             {
                 std::vector<Player*> PlayerList;
                 Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+                for (const auto & i : liste)
                 {
-                    if (i->getSource()->GetDistance2d(m_creature) < MAX_VISIBILITY_DISTANCE)
-                        PlayerList.push_back(i->getSource());
+                    if (i.getSource()->GetDistance2d(m_creature) < MAX_VISIBILITY_DISTANCE)
+                        PlayerList.push_back(i.getSource());
                 }
                 if (!PlayerList.empty())
                 {

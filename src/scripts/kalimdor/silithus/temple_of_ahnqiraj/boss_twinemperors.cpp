@@ -318,9 +318,8 @@ struct boss_twinemperorsAI : public ScriptedAI
         bool bOpenEntrance = false;
         std::list<Creature*> lst;
         GetCreatureListWithEntryInGrid(lst, m_creature, NPC_ANUBISATH_DEFENDER, 800);
-        for (auto it = lst.begin(); it != lst.end(); it++)
+        for (auto pC : lst)
         {
-            Creature* pC = *it;
             if (pC->IsDead()) continue;
             pC->SetActiveObjectState(true);
             pC->SetInCombatWithZone();
@@ -858,12 +857,12 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         if (tList.empty())
             return nullptr;
 
-        for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i) {
-            Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+        for (auto i : tList) {
+            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
             if (!pUnit) continue;
 
             if (m_creature->IsWithinMeleeRange(pUnit)) {
-                candidates.push_back((*i));
+                candidates.push_back(i);
             }
         }
 

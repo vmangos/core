@@ -224,9 +224,9 @@ struct go_pierre_ventsAI: public GameObjectAI
     uint32 SelectRandomBoss(uint32 stoneType)
     {
         std::vector<uint32> possibleBosses;
-        for (int i = 0; i < sizeof(windStonesBosses) / sizeof(windStonesBosses[0]); ++i)
-            if (windStonesBosses[i].stoneType == stoneType)
-                possibleBosses.push_back(windStonesBosses[i].summonEntry);
+        for (const auto & windStonesBosse : windStonesBosses)
+            if (windStonesBosse.stoneType == stoneType)
+                possibleBosses.push_back(windStonesBosse.summonEntry);
         ASSERT(!possibleBosses.empty());
         return possibleBosses[urand(0, possibleBosses.size() - 1)];
     }
@@ -294,10 +294,10 @@ struct go_pierre_ventsAI: public GameObjectAI
         //player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION + stoneType - 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
-        for (int i = 0; i < sizeof(windStonesBosses) / sizeof(windStonesBosses[0]); ++i)
-            if (windStonesBosses[i].stoneType == stoneType)
-                if (player->HasItemCount(windStonesBosses[i].reqItem, 1))
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, windStonesBosses[i].gossipOption, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + windStonesBosses[i].action);
+        for (const auto & windStonesBosse : windStonesBosses)
+            if (windStonesBosse.stoneType == stoneType)
+                if (player->HasItemCount(windStonesBosse.reqItem, 1))
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, windStonesBosse.gossipOption, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + windStonesBosse.action);
 
         player->SEND_GOSSIP_MENU(GOSSIP_STONE_FIRST_HELLO + stoneType - 1, me->GetGUID());
         return true;
@@ -328,12 +328,12 @@ struct go_pierre_ventsAI: public GameObjectAI
                 textId = 10686;
                 break;
         }
-        for (int i = 0; i < sizeof(windStonesBosses) / sizeof(windStonesBosses[0]); ++i)
-            if (windStonesBosses[i].stoneType == stoneType && action == GOSSIP_ACTION_INFO_DEF + windStonesBosses[i].action)
-                if (player->HasItemCount(windStonesBosses[i].reqItem, 1))
+        for (const auto & windStonesBosse : windStonesBosses)
+            if (windStonesBosse.stoneType == stoneType && action == GOSSIP_ACTION_INFO_DEF + windStonesBosse.action)
+                if (player->HasItemCount(windStonesBosse.reqItem, 1))
                 {
-                    summonEntry = windStonesBosses[i].summonEntry;
-                    player->DestroyItemCount(windStonesBosses[i].reqItem, 1, true, false);
+                    summonEntry = windStonesBosse.summonEntry;
+                    player->DestroyItemCount(windStonesBosse.reqItem, 1, true, false);
                 }
 
         if (!summonEntry && action != GOSSIP_ACTION_INFO_DEF)
@@ -563,9 +563,9 @@ struct npc_solenorAI : public ScriptedAI
             {
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
 
-                for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
+                for (auto itr : tList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     {
                         if (pUnit->IsAlive())
                         {
@@ -1010,9 +1010,9 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             }
             case 2:
             {
-                for (std::list<uint64>::iterator it = lCrystalGUIDs.begin(); it != lCrystalGUIDs.end(); ++it)
+                for (std::_Simple_types<unsigned long long>::value_type & lCrystalGUID : lCrystalGUIDs)
                 {
-                    if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(*it))
+                    if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(lCrystalGUID))
                         pCrystal->Use(m_creature);
                 }
                 uiNextActionTimer = 5000;
@@ -1187,9 +1187,9 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             }
             case 27:
             {
-                for (std::list<uint64>::iterator it = lCrystalGUIDs.begin(); it != lCrystalGUIDs.end(); ++it)
+                for (std::_Simple_types<unsigned long long>::value_type & lCrystalGUID : lCrystalGUIDs)
                 {
-                    if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(*it))
+                    if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(lCrystalGUID))
                         pCrystal->Delete();
                 }
                 lCrystalGUIDs.clear();
@@ -1295,8 +1295,8 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         m_creature->AllowManaRegen(false);
         m_creature->SetPower(POWER_MANA, 0);
 
-        for (int i = 0; i < 60; i++)
-            PlayerGuids[i] = 0;
+        for (unsigned long long & PlayerGuid : PlayerGuids)
+            PlayerGuid = 0;
     }
 
     void SummonedCreatureJustDied(Creature* unit) override
@@ -1328,15 +1328,15 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
         if (pSpell->Id == SPELL_WILT || pSpell->Id == SPELL_SUFFERING_OF_SANITY || pSpell->Id == SPELL_SYSTEM_SHOCK)
         {
-            for (int i = 0; i < 60; i++)
-                if (PlayerGuids[i] == target->GetGUID())
+            for (unsigned long long PlayerGuid : PlayerGuids)
+                if (PlayerGuid == target->GetGUID())
                     return;
 
-            for (int i = 0; i < 60; i++)
+            for (unsigned long long & PlayerGuid : PlayerGuids)
             {
-                if (PlayerGuids[i] == 0)
+                if (PlayerGuid == 0)
                 {
-                    PlayerGuids[i] = target->GetGUID();
+                    PlayerGuid = target->GetGUID();
                     break;
                 }
             }
@@ -1367,8 +1367,8 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
         if (m_uiWiltTimer < uiDiff)
         {
-            for (int i = 0; i < 60; i++)
-                PlayerGuids[i] = 0;
+            for (unsigned long long & PlayerGuid : PlayerGuids)
+                PlayerGuid = 0;
             if (DoCastSpellIfCan(m_creature, SPELL_WILT) == CAST_OK)
                 m_uiWiltTimer = urand(3000, 5000);
         }
@@ -1379,8 +1379,8 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         {
             if (m_uiSanityTimer < uiDiff)
             {
-                for (int i = 0; i < 60; i++)
-                    PlayerGuids[i] = 0;
+                for (unsigned long long & PlayerGuid : PlayerGuids)
+                    PlayerGuid = 0;
                 if (DoCastSpellIfCan(m_creature, SPELL_SUFFERING_OF_SANITY) == CAST_OK)
                     m_uiSanityTimer = 1000;
             }
@@ -1397,12 +1397,12 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
         if (m_uiCheckPlayerTimer < uiDiff)
         {
-            for (int i = 0; i < 60; i++)
+            for (unsigned long long & PlayerGuid : PlayerGuids)
             {
-                if (PlayerGuids[i] == 0)
+                if (PlayerGuid == 0)
                     continue;
 
-                if (Unit* pTarget = m_creature->GetMap()->GetUnit(PlayerGuids[i]))
+                if (Unit* pTarget = m_creature->GetMap()->GetUnit(PlayerGuid))
                 {
                     pTarget->SetInCombatWith(m_creature);
                     if (pTarget->IsDead())
@@ -1412,7 +1412,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
                         float MaxMana = m_creature->GetMaxPower(POWER_MANA);
                         m_creature->SetPower(POWER_MANA, (currMana + MaxMana * 0.02f) < MaxMana ? (currMana + MaxMana * 0.02f) : MaxMana);
 
-                        PlayerGuids[i] = 0;
+                        PlayerGuid = 0;
                     }
                 }
             }
@@ -1739,8 +1739,8 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoSummonDragons()
     {
-        for (uint8 i = 0; i < MAX_DRAGONS; ++i)
-            m_creature->SummonCreature(aEternalBoardNPCs[i].m_uiEntry, aEternalBoardNPCs[i].m_fX, aEternalBoardNPCs[i].m_fY, aEternalBoardNPCs[i].m_fZ, aEternalBoardNPCs[i].m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        for (auto & aEternalBoardNPC : aEternalBoardNPCs)
+            m_creature->SummonCreature(aEternalBoardNPC.m_uiEntry, aEternalBoardNPC.m_fX, aEternalBoardNPC.m_fY, aEternalBoardNPC.m_fZ, aEternalBoardNPC.m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
     void DoSummonWarriors()
@@ -1767,23 +1767,23 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         }
 
         // Also summon the 3 anubisath conquerors
-        for (uint8 i = 0; i < MAX_CONQUERORS; ++i)
-            m_creature->SummonCreature(NPC_ANUBISATH_CONQUEROR, aQirajiWarriors[i].m_fX, aQirajiWarriors[i].m_fY, aQirajiWarriors[i].m_fZ, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        for (auto & aQirajiWarrior : aQirajiWarriors)
+            m_creature->SummonCreature(NPC_ANUBISATH_CONQUEROR, aQirajiWarrior.m_fX, aQirajiWarrior.m_fY, aQirajiWarrior.m_fZ, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
     void DoUnsummonArmy()
     {
-        for (std::list<uint64>::const_iterator itr = m_lQirajiWarriorsList.begin(); itr != m_lQirajiWarriorsList.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type itr : m_lQirajiWarriorsList)
         {
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
                 pTemp->DisappearAndDie();
         }
     }
 
     void AddKaldoreiThreat(Creature* npc)
     {
-        for (auto itr = m_lQirajiWarriorsList.begin(); itr != m_lQirajiWarriorsList.end(); itr++)
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
+        for (std::_Simple_types<unsigned long long>::value_type & itr : m_lQirajiWarriorsList)
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
                 if (pTemp->GetEntry() == NPC_KALDOREI_INFANTRY)
                     npc->AddThreat(pTemp, 100.0f);
 
@@ -1845,9 +1845,9 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoCastTriggerSpellOnEnemies(uint32 spell)
     {
-        for (std::list<uint64>::const_iterator itr = m_lQirajiWarriorsList.begin(); itr != m_lQirajiWarriorsList.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type itr : m_lQirajiWarriorsList)
         {
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
             {
                 // Cast trigger spell only on enemies
                 if (pTemp->GetEntry() == NPC_ANUBISATH_CONQUEROR || pTemp->GetEntry() == NPC_QIRAJI_DRONE ||
@@ -1870,9 +1870,9 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoTimeStopArmy()
     {
-        for (std::list<uint64>::const_iterator itr = m_lQirajiWarriorsList.begin(); itr != m_lQirajiWarriorsList.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type itr : m_lQirajiWarriorsList)
         {
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
             {
                 // Stop movement/attacks and freeze whole combat
                 pTemp->RemoveAllAttackers();
@@ -2732,9 +2732,9 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
     Unit* GetVictimInRangePlayerOnly(float min, float max)
     {
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-        for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+        for (auto itr : tList)
         {
-            if (ObjectGuid uiTargetGuid = (*itr)->getUnitGuid())
+            if (ObjectGuid uiTargetGuid = itr->getUnitGuid())
             {
                 if (Unit* pTarget = m_creature->GetMap()->GetUnit(uiTargetGuid))
                 {
@@ -3067,10 +3067,10 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
                 if (!gruntList.empty())
                 {
-                    for (std::list<Creature*>::iterator itr = gruntList.begin(); itr != gruntList.end(); ++itr)
+                    for (auto & itr : gruntList)
                     {
-                        if ((*itr)->IsAlive())
-                            DoScriptText(SAY_LINE_9, (*itr));
+                        if (itr->IsAlive())
+                            DoScriptText(SAY_LINE_9, itr);
                     }
                 }
                 m_bGruntSpeech = false;

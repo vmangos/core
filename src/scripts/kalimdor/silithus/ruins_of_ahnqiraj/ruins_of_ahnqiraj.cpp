@@ -426,10 +426,10 @@ struct ObsidianDestroyerAI : public ScriptedAI
     void FillPlayerList()
     {
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+        for (const auto & i : liste)
         {
-            if (i->getSource()->IsAlive() && i->getSource()->GetPowerType() == POWER_MANA)
-                PlayerList.push_back(i->getSource()->GetObjectGuid());
+            if (i.getSource()->IsAlive() && i.getSource()->GetPowerType() == POWER_MANA)
+                PlayerList.push_back(i.getSource()->GetObjectGuid());
         }
     }
 

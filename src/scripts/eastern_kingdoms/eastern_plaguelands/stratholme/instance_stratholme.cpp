@@ -133,8 +133,8 @@ struct instance_stratholme : public ScriptedInstance
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-        for (uint8 i = 0; i < 5; ++i)
-            IsSilverHandDead[i] = false;
+        for (bool & i : IsSilverHandDead)
+            i = false;
 
         m_phaseBaron = 0;
         m_uiBaronRun_Timer = 0;
@@ -186,8 +186,8 @@ struct instance_stratholme : public ScriptedInstance
 
     bool IsEncounterInProgress() const override
     {
-        for (uint8 i = 0; i < STRAT_MAX_ENCOUNTER; i++)
-            if (m_auiEncounter[i] == IN_PROGRESS)
+        for (unsigned int i : m_auiEncounter)
+            if (i == IN_PROGRESS)
                 return true;
         return false;
     }
@@ -196,9 +196,9 @@ struct instance_stratholme : public ScriptedInstance
     {
         uint32 uiCount = crystalsGUID.size();
 
-        for (std::set<uint64>::iterator i = crystalsGUID.begin(); i != crystalsGUID.end(); ++i)
+        for (std::_Simple_types<unsigned long long>::value_type i : crystalsGUID)
         {
-            if (Creature* pCristal = instance->GetCreature(*i))
+            if (Creature* pCristal = instance->GetCreature(i))
             {
                 if (!pCristal->IsAlive())
                     --uiCount;
@@ -487,9 +487,9 @@ struct instance_stratholme : public ScriptedInstance
                     }
 
                     uint32 uiCount = abomnationGUID.size();
-                    for (std::set<uint64>::iterator i = abomnationGUID.begin(); i != abomnationGUID.end(); ++i)
+                    for (std::_Simple_types<unsigned long long>::value_type i : abomnationGUID)
                     {
-                        if (Creature* pAbom = instance->GetCreature(*i))
+                        if (Creature* pAbom = instance->GetCreature(i))
                         {
                             if (!pAbom->IsAlive())
                                 --uiCount;
@@ -559,9 +559,9 @@ struct instance_stratholme : public ScriptedInstance
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_5MIN);
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_1MIN);
 
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            for (const auto & player : players)
                             {
-                                if (Player* pPlayer = itr->getSource())
+                                if (Player* pPlayer = player.getSource())
                                 {
                                     for (spells_itr = baronSpells.begin(); spells_itr != baronSpells.end(); ++spells_itr)
                                         if (pPlayer->HasAura(*spells_itr))
@@ -650,8 +650,8 @@ struct instance_stratholme : public ScriptedInstance
         if (uiData == DONE)
         {
             std::ostringstream saveStream;
-            for (uint8 i = 0; i < STRAT_MAX_ENCOUNTER; ++i)
-                saveStream << m_auiEncounter[i] << " ";
+            for (unsigned int i : m_auiEncounter)
+                saveStream << i << " ";
             strInstData = saveStream.str();
 
             SaveToDB();
@@ -670,11 +670,11 @@ struct instance_stratholme : public ScriptedInstance
         if (!chrIn)
             return;
         std::istringstream loadStream(chrIn);
-        for (uint8 i = 0; i < STRAT_MAX_ENCOUNTER; ++i)
+        for (unsigned int & i : m_auiEncounter)
         {
-            loadStream >> m_auiEncounter[i];
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+            loadStream >> i;
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
         }
         if (GetData(TYPE_RAMSTEIN_EVENT) == DONE && GetData(TYPE_RAMSTEIN) != DONE)
             SummonRamstein();
@@ -693,7 +693,7 @@ struct instance_stratholme : public ScriptedInstance
         //float y4 = -3544.6f;
 
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = listeJoueur.begin(); itr != listeJoueur.end(); ++itr)
+        for (const auto & itr : listeJoueur)
         {
             /*
             la zone est un paralelograme
@@ -704,15 +704,15 @@ struct instance_stratholme : public ScriptedInstance
              |->x    /------------/
                     ^x1             ^x3
             */
-            if (itr->getSource()->IsAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible())
+            if (itr.getSource()->IsAlive() && !itr.getSource()->IsGameMaster() && itr.getSource()->IsGMVisible())
             {
                 //hauteur corect ?
-                if (itr->getSource()->GetPositionZ() < 135 && itr->getSource()->GetPositionZ() > 130)
+                if (itr.getSource()->GetPositionZ() < 135 && itr.getSource()->GetPositionZ() > 130)
                     continue;
 
                 //carre central ?
-                if (itr->getSource()->GetPositionX() < x3 && itr->getSource()->GetPositionX() > x2 &&
-                        itr->getSource()->GetPositionY() < y3 && itr->getSource()->GetPositionY() > y2 + 4)
+                if (itr.getSource()->GetPositionX() < x3 && itr.getSource()->GetPositionX() > x2 &&
+                        itr.getSource()->GetPositionY() < y3 && itr.getSource()->GetPositionY() > y2 + 4)
                     continue;
 
                 return true;
@@ -724,12 +724,12 @@ struct instance_stratholme : public ScriptedInstance
     bool JoueurDansPiegeRat2()
     {
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = listeJoueur.begin(); itr != listeJoueur.end(); ++itr)
+        for (const auto & itr : listeJoueur)
         {
-            if (itr->getSource()->IsAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible() &&
-                    itr->getSource()->GetPositionX() < 3621.32 && itr->getSource()->GetPositionX() > 3603.18 &&
-                    itr->getSource()->GetPositionY() < -3335 && itr->getSource()->GetPositionY() > -3340.46 &&
-                    itr->getSource()->GetPositionZ() < 130 && itr->getSource()->GetPositionZ() > 123)
+            if (itr.getSource()->IsAlive() && !itr.getSource()->IsGameMaster() && itr.getSource()->IsGMVisible() &&
+                    itr.getSource()->GetPositionX() < 3621.32 && itr.getSource()->GetPositionX() > 3603.18 &&
+                    itr.getSource()->GetPositionY() < -3335 && itr.getSource()->GetPositionY() > -3340.46 &&
+                    itr.getSource()->GetPositionZ() < 130 && itr.getSource()->GetPositionZ() > 123)
                 return true;
         }
         return false;
@@ -771,9 +771,9 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (!itr->getSource()->HasAura(SPELL_BARON_ULTIMATUM_45MIN, EFFECT_INDEX_0))
-                            itr->getSource()->CastSpell(itr->getSource(), SPELL_BARON_ULTIMATUM_45MIN, true);
+                    for (const auto & player : players)
+                        if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_45MIN, EFFECT_INDEX_0))
+                            player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_45MIN, true);
             }
             if (m_uiBaronRun_Timer <= 10*MINUTE*IN_MILLISECONDS && m_phaseBaron == 1)
             {
@@ -784,9 +784,9 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (!itr->getSource()->HasAura(SPELL_BARON_ULTIMATUM_10MIN, EFFECT_INDEX_0))
-                            itr->getSource()->CastSpell(itr->getSource(), SPELL_BARON_ULTIMATUM_10MIN, true);
+                    for (const auto & player : players)
+                        if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_10MIN, EFFECT_INDEX_0))
+                            player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_10MIN, true);
             }
             if (m_uiBaronRun_Timer <= 5*MINUTE*IN_MILLISECONDS && m_phaseBaron == 2)
             {
@@ -797,9 +797,9 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (!itr->getSource()->HasAura(SPELL_BARON_ULTIMATUM_5MIN, EFFECT_INDEX_0))
-                            itr->getSource()->CastSpell(itr->getSource(), SPELL_BARON_ULTIMATUM_5MIN, true);
+                    for (const auto & player : players)
+                        if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_5MIN, EFFECT_INDEX_0))
+                            player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_5MIN, true);
             }
             if (m_uiBaronRun_Timer <= 5*MINUTE*IN_MILLISECONDS - 3000 && m_phaseBaron == 3)
             {
@@ -814,9 +814,9 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (!itr->getSource()->HasAura(SPELL_BARON_ULTIMATUM_1MIN, EFFECT_INDEX_0))
-                            itr->getSource()->CastSpell(itr->getSource(), SPELL_BARON_ULTIMATUM_1MIN, true);
+                    for (const auto & player : players)
+                        if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_1MIN, EFFECT_INDEX_0))
+                            player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_1MIN, true);
             }
             if (m_uiBaronRun_Timer <= uiDiff)
             {

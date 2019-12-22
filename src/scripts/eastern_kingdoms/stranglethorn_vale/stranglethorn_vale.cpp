@@ -227,12 +227,12 @@ struct npc_molthorAI : public npc_escortAI
         if (!player)
             return;
 
-        for (int i = 0; i < emitterCount; ++i)
+        for (auto emitterPosition : emitterPositions)
         {
-            float x = emitterPositions[i][0];
-            float y = emitterPositions[i][1];
-            float z = emitterPositions[i][2];
-            float o = emitterPositions[i][3];
+            float x = emitterPosition[0];
+            float y = emitterPosition[1];
+            float z = emitterPosition[2];
+            float o = emitterPosition[3];
 
             GameObject *emitter = m_creature->SummonGameObject(GO_HEART_OF_HAKKAR_SPELL_EMITTER, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 5000);
             if (emitter) {
@@ -342,12 +342,12 @@ struct npc_heart_of_hakkarAI : public ScriptedAI
 
     void SummonServants()
     {
-        for (int i = 0; i < servantCount; ++i)
+        for (auto servantPosition : servantPositions)
         {
-            float x = servantPositions[i][0];
-            float y = servantPositions[i][1];
-            float z = servantPositions[i][2];
-            float o = servantPositions[i][3];
+            float x = servantPosition[0];
+            float y = servantPosition[1];
+            float z = servantPosition[2];
+            float o = servantPosition[3];
 
             Creature *servant = m_creature->SummonCreature(NPC_SERVANT_OF_THE_HAND, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 30000);
 

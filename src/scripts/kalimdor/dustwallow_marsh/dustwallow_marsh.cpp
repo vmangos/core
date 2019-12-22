@@ -262,8 +262,8 @@ struct npc_private_hendelAI : public ScriptedAI
     npc_private_hendelAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         // zero init required to prevent crash
-        for (ptrdiff_t i = 0; i < 2; ++i)
-            m_guards[i] = nullptr;
+        for (auto & m_guard : m_guards)
+            m_guard = nullptr;
         for (ptrdiff_t i = 0; i < 3; ++i)
         {
             m_allies[i] = nullptr;
@@ -296,11 +296,11 @@ struct npc_private_hendelAI : public ScriptedAI
         // reset private hendel's faction
         m_creature->SetFactionTemplateId(FACTION_THERAMORE); // theramore faction
         // reset his guards faction
-        for (ptrdiff_t i = 0; i < 2; ++i)
+        for (auto & m_guard : m_guards)
         {
-            if (m_guards[i] && m_guards[i]->IsAlive())
+            if (m_guard && m_guard->IsAlive())
             {
-                m_guards[i]->SetFactionTemplateId(FACTION_THERAMORE); // theramore faction
+                m_guard->SetFactionTemplateId(FACTION_THERAMORE); // theramore faction
             }
         }
         // reset phase flags
@@ -394,9 +394,8 @@ struct npc_private_hendelAI : public ScriptedAI
 
             // check if there one of the guards is available
             bool first = true;
-            for (ptrdiff_t guardIndex = 0; guardIndex < 2; ++guardIndex)
+            for (auto guard : m_guards)
             {
-                Creature* guard = m_guards[guardIndex];
                 // if guard is valid
                 if (guard && guard->IsAlive())
                 {
@@ -441,13 +440,13 @@ struct npc_private_hendelAI : public ScriptedAI
             }
 
             // remove guards
-            for (ptrdiff_t i = 0; i < 2; ++i)
+            for (auto & m_guard : m_guards)
             {
                 // if guard is valid
-                if (m_guards[i])
+                if (m_guard)
                 {
-                    static_cast<TemporarySummon*>(m_guards[i])->UnSummon();
-                    m_guards[i] = nullptr;
+                    static_cast<TemporarySummon*>(m_guard)->UnSummon();
+                    m_guard = nullptr;
                 }
             }
 
@@ -532,8 +531,8 @@ struct npc_private_hendelAI : public ScriptedAI
             if (m_nextPhaseDelayTimer < uiDiff)
             {
                 // make allies face private hendel
-                for (ptrdiff_t i = 0; i < 3; ++i)
-                    m_allies[i]->SetFacingToObject(m_creature);
+                for (auto & m_allie : m_allies)
+                    m_allie->SetFacingToObject(m_creature);
 
                 // Tervosh is index 0
                 Creature* tervosh = m_allies[0];
@@ -559,13 +558,13 @@ struct npc_private_hendelAI : public ScriptedAI
                 case 0: // remove guards, say0
                 {
                     // remove guards
-                    for (ptrdiff_t i = 0; i < 2; ++i)
+                    for (auto & m_guard : m_guards)
                     {
                         // if guard is valid
-                        if (m_guards[i])
+                        if (m_guard)
                         {
-                            static_cast<TemporarySummon*>(m_guards[i])->UnSummon();
-                            m_guards[i] = nullptr;
+                            static_cast<TemporarySummon*>(m_guard)->UnSummon();
+                            m_guard = nullptr;
                         }
                     }
 
@@ -661,25 +660,25 @@ struct npc_private_hendelAI : public ScriptedAI
                 case 3: // Final, despawn
                 {
                     // remove allies
-                    for (ptrdiff_t i = 0; i < 3; ++i)
+                    for (auto & m_allie : m_allies)
                     {
                         // if ally is valid
-                        if (m_allies[i])
+                        if (m_allie)
                         {
-                            static_cast<TemporarySummon*>(m_allies[i])->UnSummon();
-                            m_allies[i] = nullptr;
+                            static_cast<TemporarySummon*>(m_allie)->UnSummon();
+                            m_allie = nullptr;
                         }
                     }
 
                     // restore original allies in Theramore
-                    for (ptrdiff_t i = 0; i < 3; ++i)
+                    for (auto & i : m_alliesOriginal)
                     {
-                        if (m_alliesOriginal[i])
+                        if (i)
                         {
                             // Make them temporary invisible
-                            m_alliesOriginal[i]->SetVisibility(VISIBILITY_ON);
+                            i->SetVisibility(VISIBILITY_ON);
                             // teleport effect
-                            m_alliesOriginal[i]->CastSpell(m_alliesOriginal[i], TELEPORT_VISUAL, false);
+                            i->CastSpell(i, TELEPORT_VISUAL, false);
                         }
                     }
 
@@ -709,16 +708,16 @@ struct npc_private_hendelAI : public ScriptedAI
     void SummonedCreatureDespawn(Creature* creature) override 
     {
         // No dangling pointers
-        for (ptrdiff_t i = 0; i < 3; ++i)
+        for (auto & m_allie : m_allies)
         {
-            if (m_allies[i] == creature)
-                m_allies[i] = 0;
+            if (m_allie == creature)
+                m_allie = 0;
         }
 
-        for (ptrdiff_t i = 0; i < 2; ++i)
+        for (auto & m_guard : m_guards)
         {
-            if (m_guards[i] == creature)
-                m_guards[i] = 0;
+            if (m_guard == creature)
+                m_guard = 0;
         }
     }
 };
@@ -745,9 +744,8 @@ bool QuestAccept_npc_private_hendel(Player* pPlayer, Creature* pCreature, Quest 
                                                    // switch quest event phase to FIGHT
             privateHendelAI->m_mdQuestPhase = MDQP_FIGHT;
             // set his guards faction to hostile
-            for (ptrdiff_t i = 0; i < 2; ++i)
+            for (auto guard : privateHendelAI->m_guards)
             {
-                Creature* guard = privateHendelAI->m_guards[i];
                 // if guard is valid
                 if (guard)
                 {
@@ -1396,9 +1394,9 @@ struct npc_tabethaAI : ScriptedAI
 
         if (manaSurges.empty()) return;
 
-        for (auto itr = manaSurges.begin(); itr != manaSurges.end(); ++itr)
-            if ((*itr)->IsAlive())
-                (*itr)->ForcedDespawn();
+        for (auto & manaSurge : manaSurges)
+            if (manaSurge->IsAlive())
+                manaSurge->ForcedDespawn();
     }
 
     void UpdateAI(uint32 const uiDiff) override

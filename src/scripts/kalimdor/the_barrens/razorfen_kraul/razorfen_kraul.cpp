@@ -237,11 +237,11 @@ struct npc_snufflenose_gopherAI : public FollowerAI
         GameObject* pNearestTuber = nullptr;
 
         // Always need to find new ones
-        for (std::list<GameObject*>::const_iterator itr = lTubersInRange.begin(); itr != lTubersInRange.end(); ++itr)
+        for (auto itr : lTubersInRange)
         {
-            if (IsValidTuber(*itr))
+            if (IsValidTuber(itr))
             {
-                pNearestTuber = *itr;
+                pNearestTuber = itr;
                 break;
             }
 
@@ -273,8 +273,8 @@ struct npc_snufflenose_gopherAI : public FollowerAI
             return false;
 
         // Check if tuber is in list of already found tubers
-        for (std::list<ObjectGuid>::const_iterator itr2 = m_foundTubers.begin(); itr2 != m_foundTubers.end(); ++itr2)
-            if (tuber->GetObjectGuid() == (*itr2))
+        for (auto m_foundTuber : m_foundTubers)
+            if (tuber->GetObjectGuid() == m_foundTuber)
                 return false;
 
         // Check that tuber is not more than 15 yards above or below current position

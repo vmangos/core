@@ -520,32 +520,32 @@ void Channel::List(PlayerPointer player)
     AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
 
     uint32 count = 0;
-    for (const auto & m_player : m_players)
+    for (const auto & itr : m_players)
     {
         if (masterPlayer)
         {
-            MasterPlayer* pPlayer = sObjectAccessor.FindMasterPlayer(m_player.first);
+            MasterPlayer* pPlayer = sObjectAccessor.FindMasterPlayer(itr.first);
             // PLAYER can't see MODERATOR, GAME MASTER, ADMINISTRATOR characters
             // MODERATOR, GAME MASTER, ADMINISTRATOR can see all
             if (pPlayer && (masterPlayer->GetSession()->GetSecurity() > SEC_PLAYER || pPlayer->GetSession()->GetSecurity() <= gmLevelInWhoList) &&
                 pPlayer->IsVisibleGloballyFor(masterPlayer))
             {
-                data << ObjectGuid(m_player.first);
-                data << uint8(m_player.second.flags);             // flags seems to be changed...
+                data << ObjectGuid(itr.first);
+                data << uint8(itr.second.flags);             // flags seems to be changed...
                 ++count;
             }
         }
         else
         {
-            Player* pPlayer = sObjectMgr.GetPlayer(m_player.first);
+            Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
 
             // PLAYER can't see MODERATOR, GAME MASTER, ADMINISTRATOR characters
             // MODERATOR, GAME MASTER, ADMINISTRATOR can see all
             if (pPlayer && (asPlayer->GetSession()->GetSecurity() > SEC_PLAYER || pPlayer->GetSession()->GetSecurity() <= gmLevelInWhoList) &&
                 pPlayer->IsVisibleGloballyFor(asPlayer))
             {
-                data << ObjectGuid(m_player.first);
-                data << uint8(m_player.second.flags);             // flags seems to be changed...
+                data << ObjectGuid(itr.first);
+                data << uint8(itr.second.flags);             // flags seems to be changed...
                 ++count;
             }
         }
@@ -776,9 +776,9 @@ void Channel::SetOwner(ObjectGuid guid, bool exclaim)
 
 void Channel::SendToAll(WorldPacket* data, ObjectGuid guid)
 {
-    for (const auto & m_player : m_players)
+    for (const auto & itr : m_players)
     {
-        if (PlayerPointer pPlayer = GetPlayer(m_player.first))
+        if (PlayerPointer pPlayer = GetPlayer(itr.first))
             if (!pPlayer->GetSocial()->HasIgnore(guid))
                 pPlayer->GetSession()->SendPacket(data);
     }
