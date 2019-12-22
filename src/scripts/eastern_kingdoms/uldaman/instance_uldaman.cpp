@@ -77,7 +77,7 @@ struct instance_uldaman : public ScriptedInstance
 
     bool IsEncounterInProgress() const override
     {
-        for (unsigned int i : m_auiEncounter)
+        for (uint32 i : m_auiEncounter)
         {
             if (i == IN_PROGRESS)
             {
@@ -519,7 +519,7 @@ struct instance_uldaman : public ScriptedInstance
         OUT_LOAD_INST_DATA(chrIn);
         std::istringstream loadStream(chrIn);
         loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2];
-        for (unsigned int & i : m_auiEncounter)
+        for (uint32 & i : m_auiEncounter)
             if (i != DONE)
                 i = NOT_STARTED;
         OUT_LOAD_INST_DATA_COMPLETE;

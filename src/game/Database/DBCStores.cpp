@@ -248,7 +248,7 @@ void LoadDBCStores(std::string const& dataPath)
         if (!spellInfo || !(spellInfo->Attributes & SPELL_ATTR_PASSIVE))
             continue;
 
-        for (unsigned int i = 1; i < sCreatureFamilyStore.GetNumRows(); ++i)
+        for (uint32 i = 1; i < sCreatureFamilyStore.GetNumRows(); ++i)
         {
             CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(i);
             if (!cFamily)
@@ -273,7 +273,7 @@ void LoadDBCStores(std::string const& dataPath)
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sTalentStore,              dbcPath, "Talent.dbc");
 
     // create talent spells set
-    for (unsigned int i = 0; i < sTalentStore.GetNumRows(); ++i)
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
         if (!talentInfo) continue;

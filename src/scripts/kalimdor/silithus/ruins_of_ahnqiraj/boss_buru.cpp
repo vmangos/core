@@ -97,7 +97,7 @@ struct boss_buruAI : public ScriptedAI
         m_uiSpeed_Timer = 30000;
         m_uiCreepingPlague_Timer = 6000;
 
-        for (unsigned int & i : m_uiRespawnEgg_Timer)
+        for (uint32 & i : m_uiRespawnEgg_Timer)
             i = 120000;
 
         Creature* egg;

@@ -46,7 +46,7 @@ instance_ruins_of_ahnqiraj::instance_ruins_of_ahnqiraj(Map* pMap) : ScriptedInst
 void instance_ruins_of_ahnqiraj::Initialize()
 {
     m_uiKurinnaxxGUID = 0;
-    for (unsigned int & waveIndex : m_uiWaveMembersCount)
+    for (uint32 & waveIndex : m_uiWaveMembersCount)
         waveIndex = WAVE_MEMBERS_INIT_COUNT;
     m_uiBuruGUID = 0;
     m_uiOssirianGUID = 0;
@@ -74,7 +74,7 @@ void instance_ruins_of_ahnqiraj::Initialize()
 
 bool instance_ruins_of_ahnqiraj::IsEncounterInProgress() const
 {
-    for (unsigned int i : m_auiEncounter)
+    for (uint32 i : m_auiEncounter)
         if (i == IN_PROGRESS || i == SPECIAL)
             return true;
     return false;
@@ -434,7 +434,7 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
                     SetAndorovSquadRespawnTime(AQ_RESPAWN_15_MINUTES);
 
                 /** Reset waves casualities count */
-                for (unsigned int & waveIndex : m_uiWaveMembersCount)
+                for (uint32 & waveIndex : m_uiWaveMembersCount)
                     waveIndex = WAVE_MEMBERS_INIT_COUNT;
             }
             if (uiData == DONE)
@@ -525,7 +525,7 @@ void instance_ruins_of_ahnqiraj::Load(char const* chrIn)
     loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3]
         >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6];
 
-    for (unsigned int & i : m_auiEncounter)
+    for (uint32 & i : m_auiEncounter)
         if (i == IN_PROGRESS || i > SPECIAL)           // Do not load an encounter as "In Progress" - reset it instead.
             i = NOT_STARTED;
 

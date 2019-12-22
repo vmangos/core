@@ -1278,7 +1278,7 @@ void ScriptMgr::LoadSpellScripts()
 
         //check for correct spellEffect
         bool found = false;
-        for (unsigned int i : spellInfo->Effect)
+        for (uint32 i : spellInfo->Effect)
         {
             // skip empty effects
             if (!i)

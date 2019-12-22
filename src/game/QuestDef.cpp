@@ -157,13 +157,13 @@ Quest::Quest(Field* questRecord)
             ++m_reqCreatureOrGOcount;
     }
 
-    for (unsigned int i : RewItemId)
+    for (uint32 i : RewItemId)
     {
         if (i)
             ++m_rewitemscount;
     }
 
-    for (unsigned int i : RewChoiceItemId)
+    for (uint32 i : RewChoiceItemId)
     {
         if (i)
             ++m_rewchoiceitemscount;

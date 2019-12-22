@@ -3386,12 +3386,12 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
 
         bool is_triggered_by_spell = false;
         // prevent triggering aura of removing aura that triggered it
-        for (unsigned int j : i_spellProto->EffectTriggerSpell)
+        for (uint32 j : i_spellProto->EffectTriggerSpell)
             if (j == spellId)
                 is_triggered_by_spell = true;
 
         // prevent triggered aura of removing aura that triggering it (triggered effect early some aura of parent spell
-        for (unsigned int j : spellProto->EffectTriggerSpell)
+        for (uint32 j : spellProto->EffectTriggerSpell)
             if (j == i_spellId)
                 is_triggered_by_spell = true;
 
@@ -7797,11 +7797,11 @@ void CharmInfo::InitPossessCreateSpells()
     if (!pCreature)                                         
         return;
 
-    for (unsigned int m_spell : pCreature->m_spells)
+    for (uint32 spell : pCreature->m_spells)
     {
-        if (Spells::IsPassiveSpell(m_spell))
-            m_unit->CastSpell(m_unit, m_spell, true);
-        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(m_spell))
+        if (Spells::IsPassiveSpell(spell))
+            m_unit->CastSpell(m_unit, spell, true);
+        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spell))
 
             // World of Warcraft Client Patch 1.10.0 (2006-03-28)
             // - Charm spells on charmed creatures are no longer available to the
@@ -7810,7 +7810,7 @@ void CharmInfo::InitPossessCreateSpells()
             if (!pSpellEntry->IsCharmSpell())
 #endif
 
-                AddSpellToActionBar(m_spell, ACT_PASSIVE);
+                AddSpellToActionBar(spell, ACT_PASSIVE);
     }
 }
 

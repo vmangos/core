@@ -458,9 +458,9 @@ struct mob_vekniss_guardianAI : public ScriptedAI
 
     void Aggro(Unit* /*pWho*/) override
     {
-        for (unsigned int aEmoteGUID : aEmoteGUIDs)
+        for (uint32 i : aEmoteGUIDs)
         {
-            if (m_creature->GetGUIDLow() == aEmoteGUID)
+            if (m_creature->GetGUIDLow() == i)
             {
                 m_uiEmoteTimer = 2500;
                 break;

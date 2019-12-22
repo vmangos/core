@@ -575,7 +575,7 @@ struct instance_blackrock_depths : ScriptedInstance
                     }
 
                     // One Fireguard Destroyer and two Anvilrage Officers are spawned
-                    for (unsigned int i : aBarPatrolId)
+                    for (uint32 i : aBarPatrolId)
                     {
                         float fX, fY, fZ;
                         // spawn them behind the bar door
@@ -1154,7 +1154,7 @@ struct instance_blackrock_depths : ScriptedInstance
                    >> m_auiEncounter[12] >> m_auiEncounter[13] >> m_auiEncounter[14] >> m_auiEncounter[15]
                    >> m_auiEncounter[16] >> m_auiEncounter[17] >> m_auiEncounter[18] >> m_auiEncounter[19];
 
-        for (unsigned int & i : m_auiEncounter)
+        for (uint32 & i : m_auiEncounter)
             if (i == IN_PROGRESS)
                 i = NOT_STARTED;
 

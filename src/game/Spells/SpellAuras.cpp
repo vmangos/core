@@ -7249,7 +7249,7 @@ void SpellAuraHolder::CalculateForDebuffLimit()
     }
 
     // Gestion des priorites par type d'aura
-    for (unsigned int i : m_spellProto->EffectApplyAuraName)
+    for (uint32 i : m_spellProto->EffectApplyAuraName)
     {
         if (!i)
             continue;

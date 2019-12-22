@@ -331,7 +331,7 @@ struct instance_scholomance : public ScriptedInstance
         if (uiData == DONE)
         {
             std::ostringstream saveStream;
-            for (unsigned int i : m_auiEncounter)
+            for (uint32 i : m_auiEncounter)
                 saveStream << i << " ";
             strInstData = saveStream.str();
 
@@ -351,7 +351,7 @@ struct instance_scholomance : public ScriptedInstance
         if (!chrIn)
             return;
         std::istringstream loadStream(chrIn);
-        for (unsigned int & i : m_auiEncounter)
+        for (uint32 & i : m_auiEncounter)
         {
             loadStream >> i;
             if (i == IN_PROGRESS)

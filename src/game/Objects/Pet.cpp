@@ -1930,7 +1930,7 @@ void Pet::_SaveAuras()
             for (int i : damage)
                 stmt.addInt32(i);
 
-            for (unsigned int i : periodicTime)
+            for (uint32 i : periodicTime)
                 stmt.addUInt32(i);
 
             stmt.addInt32(holder->GetAuraMaxDuration());
@@ -2120,7 +2120,7 @@ void Pet::InitPetCreateSpells()
         Unit* owner = GetOwner();
         Player* p_owner = owner && owner->GetTypeId() == TYPEID_PLAYER ? (Player*)owner : nullptr;
 
-        for (unsigned int i : CreateSpells->spellid)
+        for (uint32 i : CreateSpells->spellid)
         {
             if (!i)
                 break;

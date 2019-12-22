@@ -614,8 +614,8 @@ OutdoorPvPEP::OutdoorPvPEP()
 
 bool OutdoorPvPEP::SetupZoneScript()
 {
-    for (unsigned int EPBuffZone : EPBuffZones)
-        RegisterZone(EPBuffZone);
+    for (uint32 i : EPBuffZones)
+        RegisterZone(i);
 
     AddCapturePoint(new OPvPCapturePointEP_EWT(this));
     AddCapturePoint(new OPvPCapturePointEP_PWT(this));
@@ -631,11 +631,11 @@ void OutdoorPvPEP::Update(uint32 diff)
     {
         m_AllianceTowersControlled = 0;
         m_HordeTowersControlled = 0;
-        for (unsigned int EP_Control : EP_Controls)
+        for (uint32 i : EP_Controls)
         {
-            if (EP_Control == ALLIANCE)
+            if (i == ALLIANCE)
                 ++m_AllianceTowersControlled;
-            else if (EP_Control == HORDE)
+            else if (i == HORDE)
                 ++m_HordeTowersControlled;
             SendUpdateWorldState(EP_UI_TOWER_COUNT_A, m_AllianceTowersControlled);
             SendUpdateWorldState(EP_UI_TOWER_COUNT_H, m_HordeTowersControlled);
@@ -665,13 +665,13 @@ void OutdoorPvPEP::OnPlayerLeave(Player* plr)
     // remove buffs
     if (plr->GetTeam() == ALLIANCE)
     {
-        for (unsigned int EP_AllianceBuff : EP_AllianceBuffs)
-            plr->RemoveAurasDueToSpell(EP_AllianceBuff);
+        for (uint32 i : EP_AllianceBuffs)
+            plr->RemoveAurasDueToSpell(i);
     }
     else
     {
-        for (unsigned int EP_HordeBuff : EP_HordeBuffs)
-            plr->RemoveAurasDueToSpell(EP_HordeBuff);
+        for (uint32 i : EP_HordeBuffs)
+            plr->RemoveAurasDueToSpell(i);
     }
     OutdoorPvP::OnPlayerLeave(plr);
 }
@@ -681,8 +681,8 @@ void OutdoorPvPEP::BuffTeams()
     for (auto plr : m_players[0])
     {
         {
-            for (unsigned int EP_AllianceBuff : EP_AllianceBuffs)
-                plr->RemoveAurasDueToSpell(EP_AllianceBuff);
+            for (uint32 i : EP_AllianceBuffs)
+                plr->RemoveAurasDueToSpell(i);
             if (m_AllianceTowersControlled && m_AllianceTowersControlled < 5)
                 plr->CastSpell(plr, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
         }
@@ -690,8 +690,8 @@ void OutdoorPvPEP::BuffTeams()
     for (auto plr : m_players[1])
     {
         {
-            for (unsigned int EP_HordeBuff : EP_HordeBuffs)
-                plr->RemoveAurasDueToSpell(EP_HordeBuff);
+            for (uint32 i : EP_HordeBuffs)
+                plr->RemoveAurasDueToSpell(i);
             if (m_HordeTowersControlled && m_HordeTowersControlled < 5)
                 plr->CastSpell(plr, EP_HordeBuffs[m_HordeTowersControlled - 1], true);
         }

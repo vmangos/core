@@ -306,7 +306,7 @@ bool WorldSession::ForcePlayerLogoutDelay()
 bool WorldSession::Update(PacketFilter& updater)
 {
     uint32 sessionUpdateTime = WorldTimer::getMSTime();
-    for (unsigned int & i : _floodPacketsCount)
+    for (uint32 & i : _floodPacketsCount)
         i = 0;
 
     ///- Retrieve packets from the receive queue and call the appropriate handlers
@@ -927,8 +927,8 @@ void WorldSession::SendAuthWaitQue(uint32 position)
 
 void WorldSession::LoadTutorialsData()
 {
-    for (unsigned int & m_Tutorial : m_Tutorials)
-        m_Tutorial = 0;
+    for (uint32 & tutorial : m_Tutorials)
+        tutorial = 0;
 
     QueryResult* result = CharacterDatabase.PQuery("SELECT tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7 FROM character_tutorial WHERE account = '%u'", GetAccountId());
 
@@ -955,8 +955,8 @@ void WorldSession::LoadTutorialsData()
 void WorldSession::SendTutorialsData()
 {
     WorldPacket data(SMSG_TUTORIAL_FLAGS, 4 * 8);
-    for (unsigned int m_Tutorial : m_Tutorials)
-        data << m_Tutorial;
+    for (uint32 tutorial : m_Tutorials)
+        data << tutorial;
     SendPacket(&data);
 }
 
@@ -970,8 +970,8 @@ void WorldSession::SaveTutorialsData()
         case TUTORIALDATA_CHANGED:
         {
             SqlStatement stmt = CharacterDatabase.CreateStatement(updTutorial, "UPDATE character_tutorial SET tut0=?, tut1=?, tut2=?, tut3=?, tut4=?, tut5=?, tut6=?, tut7=? WHERE account = ?");
-            for (unsigned int m_Tutorial : m_Tutorials)
-                stmt.addUInt32(m_Tutorial);
+            for (uint32 tutorial : m_Tutorials)
+                stmt.addUInt32(tutorial);
 
             stmt.addUInt32(GetAccountId());
             stmt.Execute();
@@ -983,8 +983,8 @@ void WorldSession::SaveTutorialsData()
             SqlStatement stmt = CharacterDatabase.CreateStatement(insTutorial, "INSERT INTO character_tutorial (account,tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             stmt.addUInt32(GetAccountId());
-            for (unsigned int m_Tutorial : m_Tutorials)
-                stmt.addUInt32(m_Tutorial);
+            for (uint32 tutorial : m_Tutorials)
+                stmt.addUInt32(tutorial);
 
             stmt.Execute();
         }

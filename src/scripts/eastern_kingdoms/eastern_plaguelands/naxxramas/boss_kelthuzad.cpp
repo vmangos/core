@@ -428,10 +428,10 @@ struct boss_kelthuzadAI : public ScriptedAI
         events.ScheduleEvent(EVENT_SKELETON, Seconds(20));
         //events.ScheduleEvent(EVENT_SOUL_WEAVER, Seconds(35));
         //events.ScheduleEvent(EVENT_ABOMINATION, Seconds(43));
-        for (unsigned int abominationSpawnM : abominationSpawnMs)
-            events.ScheduleEvent(EVENT_ABOMINATION, abominationSpawnM);
-        for (unsigned int soulweaverSpawnM : soulweaverSpawnMs)
-            events.ScheduleEvent(EVENT_SOUL_WEAVER, soulweaverSpawnM);
+        for (uint32 i : abominationSpawnMs)
+            events.ScheduleEvent(EVENT_ABOMINATION, i);
+        for (uint32 i : soulweaverSpawnMs)
+            events.ScheduleEvent(EVENT_SOUL_WEAVER, i);
 
         m_pInstance->DoUseDoorOrButton(pullPortalGuid);
 

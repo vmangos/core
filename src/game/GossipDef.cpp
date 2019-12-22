@@ -687,7 +687,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGU
     data << uint32(EnableNext ? 1 : 0);                     // Auto Finish
 
     uint32 EmoteCount = 0;
-    for (unsigned int i : pQuest->OfferRewardEmote)
+    for (uint32 i : pQuest->OfferRewardEmote)
     {
         if (i <= 0)
             break;

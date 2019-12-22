@@ -145,9 +145,9 @@ struct boss_ossirianAI : public ScriptedAI
 
     void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override
     {
-        for (unsigned int SpellWeaknes : SpellWeakness)
+        for (uint32 i : SpellWeakness)
         {
-            if (pSpell->Id == SpellWeaknes)
+            if (pSpell->Id == i)
             {
                 m_uiStrengthOfOssirian_Timer = 45000;
 

@@ -317,10 +317,10 @@ struct FactionTemplateEntry
     {
         if (entry.faction)
         {
-            for(unsigned int i : enemyFaction)
+            for(uint32 i : enemyFaction)
                 if (i  == entry.faction)
                     return false;
-            for(unsigned int i : friendFaction)
+            for(uint32 i : friendFaction)
                 if (i == entry.faction)
                     return true;
         }
@@ -330,10 +330,10 @@ struct FactionTemplateEntry
     {
         if (entry.faction)
         {
-            for(unsigned int i : enemyFaction)
+            for(uint32 i : enemyFaction)
                 if (i  == entry.faction)
                     return true;
-            for(unsigned int i : friendFaction)
+            for(uint32 i : friendFaction)
                 if (i == entry.faction)
                     return false;
         }
@@ -342,7 +342,7 @@ struct FactionTemplateEntry
     bool IsHostileToPlayers() const { return (hostileMask & FACTION_MASK_PLAYER) !=0; }
     bool IsNeutralToAll() const
     {
-        for(unsigned int i : enemyFaction)
+        for(uint32 i : enemyFaction)
             if (i != 0)
                 return false;
         return hostileMask == 0 && friendlyMask == 0;

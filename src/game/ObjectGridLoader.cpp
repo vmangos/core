@@ -265,10 +265,10 @@ void ObjectGridLoader::LoadN(void)
     i_creatures = 0;
     i_corpses = 0;
     i_cell.data.Part.cell_y = 0;
-    for (unsigned int x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
+    for (uint32 x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
     {
         i_cell.data.Part.cell_x = x;
-        for (unsigned int y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
+        for (uint32 y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
         {
             i_cell.data.Part.cell_y = y;
             GridLoader<Player, AllWorldObjectTypes, AllGridObjectTypes> loader;
@@ -280,9 +280,9 @@ void ObjectGridLoader::LoadN(void)
 
 void ObjectGridUnloader::MoveToRespawnN()
 {
-    for (unsigned int x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
+    for (uint32 x = 0; x < MAX_NUMBER_OF_CELLS; ++x)
     {
-        for (unsigned int y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
+        for (uint32 y = 0; y < MAX_NUMBER_OF_CELLS; ++y)
         {
             ObjectGridRespawnMover mover;
             mover.Move(i_grid(x, y));

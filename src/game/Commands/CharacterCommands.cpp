@@ -2775,7 +2775,7 @@ bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
         23965,  // Instant Heal
     };
 
-    for (unsigned int spell : gmSpellList)
+    for (uint32 spell : gmSpellList)
     {
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell);
         if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, m_session->GetPlayer()))

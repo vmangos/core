@@ -109,9 +109,9 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
 
-    for (unsigned int j = 0; j < MAX_NUMBER_OF_GRIDS; ++j)
+    for (uint32 j = 0; j < MAX_NUMBER_OF_GRIDS; ++j)
     {
-        for (unsigned int idx = 0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
+        for (uint32 idx = 0; idx < MAX_NUMBER_OF_GRIDS; ++idx)
         {
             //z code
             m_bLoadedGrids[idx][j] = false;

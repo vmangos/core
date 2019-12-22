@@ -747,7 +747,7 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
 
 bool instance_naxxramas::IsEncounterInProgress() const
 {
-    for (unsigned int i : m_auiEncounter)
+    for (uint32 i : m_auiEncounter)
         if (i == IN_PROGRESS || i == SPECIAL)
             return true;
 
@@ -1060,7 +1060,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        for (unsigned int i : m_auiEncounter)
+        for (uint32 i : m_auiEncounter)
             saveStream << i << " ";
 
         strInstData = saveStream.str();
@@ -1081,7 +1081,7 @@ void instance_naxxramas::Load(char const* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-    for (unsigned int & i : m_auiEncounter)
+    for (uint32 & i : m_auiEncounter)
     {
         loadStream >> i;
         if (i == IN_PROGRESS)

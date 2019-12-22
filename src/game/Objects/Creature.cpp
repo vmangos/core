@@ -185,8 +185,8 @@ Creature::Creature(CreatureSubtype subtype) :
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
 
-    for (unsigned int & m_spell : m_spells)
-        m_spell = 0;
+    for (uint32 & spell : m_spells)
+        spell = 0;
 }
 
 Creature::~Creature()

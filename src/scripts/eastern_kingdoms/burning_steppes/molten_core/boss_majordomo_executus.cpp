@@ -105,7 +105,7 @@ struct boss_majordomoAI : public ScriptedAI
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
         Reflection_Timer =  30000;
         Blastwave_Timer = 10000;
-        for (unsigned int & i : TPDomo_Timer)
+        for (uint32 & i : TPDomo_Timer)
             i = 10000 + rand() % 20000;
         AddSpawn = false;
         AddVivant = 8;

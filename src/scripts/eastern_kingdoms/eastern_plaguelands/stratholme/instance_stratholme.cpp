@@ -186,7 +186,7 @@ struct instance_stratholme : public ScriptedInstance
 
     bool IsEncounterInProgress() const override
     {
-        for (unsigned int i : m_auiEncounter)
+        for (uint32 i : m_auiEncounter)
             if (i == IN_PROGRESS)
                 return true;
         return false;
@@ -650,7 +650,7 @@ struct instance_stratholme : public ScriptedInstance
         if (uiData == DONE)
         {
             std::ostringstream saveStream;
-            for (unsigned int i : m_auiEncounter)
+            for (uint32 i : m_auiEncounter)
                 saveStream << i << " ";
             strInstData = saveStream.str();
 
@@ -670,7 +670,7 @@ struct instance_stratholme : public ScriptedInstance
         if (!chrIn)
             return;
         std::istringstream loadStream(chrIn);
-        for (unsigned int & i : m_auiEncounter)
+        for (uint32 & i : m_auiEncounter)
         {
             loadStream >> i;
             if (i == IN_PROGRESS)

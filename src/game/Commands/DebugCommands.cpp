@@ -1600,9 +1600,9 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
 {
     std::stringstream in(args);
     std::string tableName;
-    int lootid = 0;
-    int checkItem = 0;
-    unsigned int simCount = 0;
+    int32 lootid = 0;
+    int32 checkItem = 0;
+    uint32 simCount = 0;
     in >> tableName >> lootid >> simCount >> checkItem;
     simCount = simCount ? simCount : 10000;
     SetSentErrorMessage(true);
@@ -1647,10 +1647,10 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     if (checkItem)
         lootChances[checkItem] = 0;
 
-    unsigned int const MAX_TIME = 30;
+    uint32 const MAX_TIME = 30;
     auto startTime = time(nullptr);
 
-    for (unsigned int i = 0; i < simCount; ++i)
+    for (uint32 i = 0; i < simCount; ++i)
     {
         Loot l(nullptr);
         if (lootOwner)
@@ -1709,10 +1709,10 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, unsigned int simCount)
+bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, uint32 simCount)
 {
     std::map<uint32, uint32> lootChances;
-    unsigned int const MAX_TIME = 30;
+    uint32 const MAX_TIME = 30;
     auto startTime = time(nullptr);
 
     ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(lootid);
@@ -1727,7 +1727,7 @@ bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, unsigned int simCoun
         return false;
     }
 
-    for (unsigned int i = 0; i < simCount; ++i)
+    for (uint32 i = 0; i < simCount; ++i)
     {
         uint32 enchant = GetItemEnchantMod(proto->RandomProperty);
         lootChances[enchant]++;

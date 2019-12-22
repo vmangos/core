@@ -736,7 +736,7 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
 
             uint32 foundModelCounter = 0;
             uint32 totalModelCounter = 0;
-            for (unsigned int id : cInfo->display_id)
+            for (uint32 id : cInfo->display_id)
             {
                 if (id)
                 { 

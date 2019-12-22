@@ -3307,7 +3307,7 @@ void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
             if (!pSpellProto)
                 continue;
 
-            for (unsigned int i : pSpellProto->Totem)
+            for (uint32 i : pSpellProto->Totem)
             {
                 if (i)
                     obtainedItems.insert(i);

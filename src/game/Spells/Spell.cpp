@@ -5628,7 +5628,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
 
         // check pet presents
-        for (unsigned int j : m_spellInfo->EffectImplicitTargetA)
+        for (uint32 j : m_spellInfo->EffectImplicitTargetA)
         {
             if (j == TARGET_PET)
             {
@@ -5670,7 +5670,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             bool target_hostile = false;
             bool target_hostile_checked = false;
             bool target_friendly_checked = false;
-            for (unsigned int k : m_spellInfo->EffectImplicitTargetA)
+            for (uint32 k : m_spellInfo->EffectImplicitTargetA)
             {
                 if (IsExplicitPositiveTarget(k))
                 {
@@ -6909,7 +6909,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             target = m_targets.getUnitTarget();
 
         bool need = false;
-        for (unsigned int i : m_spellInfo->EffectImplicitTargetA)
+        for (uint32 i : m_spellInfo->EffectImplicitTargetA)
         {
             if (i == TARGET_CHAIN_DAMAGE ||
                     i == TARGET_SINGLE_FRIEND ||
@@ -6943,7 +6943,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
             else
             {
                 bool checkValidAttackTarget = true;
-                for (unsigned int j : m_spellInfo->EffectImplicitTargetA)
+                for (uint32 j : m_spellInfo->EffectImplicitTargetA)
                 {
                     if (j == TARGET_UNIT_TARGET_ANY ||
                         j == TARGET_IN_FRONT_OF_CASTER ||
@@ -7133,7 +7133,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 {
     Unit* target = m_targets.getUnitTarget();
     // Pour 'TARGET_PET', 'getUnitTarget' renvoit le caster >.<
-    for (unsigned int i : m_spellInfo->EffectImplicitTargetA)
+    for (uint32 i : m_spellInfo->EffectImplicitTargetA)
         if (i == TARGET_PET)
             if (m_casterUnit)
                 if (Pet* pPet = m_casterUnit->GetPet())
@@ -7354,7 +7354,7 @@ SpellCastResult Spell::CheckItems()
         // If the unit is disarmed and the skill requires a weapon, it cannot be cast
         if (creature->HasWeapon() && !creature->CanUseEquippedWeapon(BASE_ATTACK))
         {
-            for (unsigned int i : m_spellInfo->Effect)
+            for (uint32 i : m_spellInfo->Effect)
             {
                 if (i == SPELL_EFFECT_WEAPON_DAMAGE || i == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL)
                     return SPELL_FAILED_EQUIPPED_ITEM;
@@ -7526,7 +7526,7 @@ SpellCastResult Spell::CheckItems()
 
         // check totem-item requirements (items presence in inventory)
         uint32 totems = MAX_SPELL_TOTEMS;
-        for (unsigned int i : m_spellInfo->Totem)
+        for (uint32 i : m_spellInfo->Totem)
         {
             if (i != 0)
             {
@@ -8598,7 +8598,7 @@ void Spell::OnSpellLaunch()
     if (!unitTarget || !unitTarget->IsInWorld())
         return;
     bool isCharge = false;
-    for (unsigned int i : m_spellInfo->Effect)
+    for (uint32 i : m_spellInfo->Effect)
         if (i == SPELL_EFFECT_CHARGE)
             isCharge = true;
     if (!isCharge)

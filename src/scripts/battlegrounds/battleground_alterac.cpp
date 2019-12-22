@@ -64,8 +64,8 @@ class npc_alterac_bossHelper
         void AggroLinkedMobsIfNeeded()
         {
             std::list<Creature*> creaturesLinked;
-            for (unsigned int m_linkedEntrie : m_linkedEntries)
-                GetCreatureListWithEntryInGrid(creaturesLinked, me, m_linkedEntrie, 100.0f);
+            for (uint32 entry : m_linkedEntries)
+                GetCreatureListWithEntryInGrid(creaturesLinked, me, entry, 100.0f);
             for (auto & it : creaturesLinked)
                 if (it->IsAlive() && !it->IsInCombat())
                 {

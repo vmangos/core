@@ -4828,7 +4828,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     uint32 spells[4] = {26272, 26157, 26273, 26274};
 
                     // check presence
-                    for (unsigned int spell : spells)
+                    for (uint32 spell : spells)
                         if (unitTarget->HasAura(spell, EFFECT_INDEX_0))
                             return;
 

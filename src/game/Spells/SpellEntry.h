@@ -519,7 +519,7 @@ class SpellEntry
             uint32 mask = 0;
             if (Mechanic)
                 mask |= 1 << (Mechanic - 1);
-            for (unsigned int i : EffectMechanic)
+            for (uint32 i : EffectMechanic)
                 if (i)
                     mask |= 1 << (i-1);
             return mask;
@@ -533,7 +533,7 @@ class SpellEntry
 
         inline bool HasEffect(SpellEffects effect) const
         {
-            for (unsigned int i : Effect)
+            for (uint32 i : Effect)
                 if (SpellEffects(i) == effect)
                     return true;
             return false;
@@ -594,7 +594,7 @@ class SpellEntry
 
         inline bool HasAura(AuraType aura) const
         {
-            for (unsigned int i : EffectApplyAuraName)
+            for (uint32 i : EffectApplyAuraName)
                 if (AuraType(i) == aura)
                     return true;
             return false;
@@ -746,7 +746,7 @@ class SpellEntry
 
         inline bool HasAuraWithSpellTriggerEffect() const
         {
-            for (unsigned int i : EffectApplyAuraName)
+            for (uint32 i : EffectApplyAuraName)
             {
                 switch (i)
                 {

@@ -406,7 +406,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         {
             // except own aura spells
             bool allow = false;
-            for (unsigned int k : spellInfo->EffectApplyAuraName)
+            for (uint32 k : spellInfo->EffectApplyAuraName)
             {
                 if (k == SPELL_AURA_MOD_POSSESS ||
                         k == SPELL_AURA_MOD_POSSESS_PET)
@@ -426,7 +426,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
 
     // prevent last relocation opcode handling: CancelAura is handled before Mover is changed
     // thus the last movement data is written into pMover, that should not happen
-    for (unsigned int i : spellInfo->Effect)
+    for (uint32 i : spellInfo->Effect)
     {
         // Eye of Kilrogg case
         if (i == SPELL_EFFECT_SUMMON_POSSESSED)

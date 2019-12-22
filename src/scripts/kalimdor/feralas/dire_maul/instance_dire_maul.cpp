@@ -495,7 +495,7 @@ void instance_dire_maul::Load(char const* chrIn)
                >> m_auiEncounter[6] >> m_auiEncounter[7] >> m_auiEncounter[8] >> m_auiEncounter[9]
                >> m_auiEncounter[10] >> m_auiEncounter[11];
 
-    for (unsigned int & i : m_auiEncounter)
+    for (uint32 & i : m_auiEncounter)
         if (i == IN_PROGRESS)
             i = NOT_STARTED;
 

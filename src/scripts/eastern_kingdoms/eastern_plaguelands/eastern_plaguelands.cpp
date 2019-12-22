@@ -1179,7 +1179,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
     void DespawnAll()
     {
         _cleanupDone = true;
-        for (unsigned int & i : MobTimer)
+        for (uint32 & i : MobTimer)
             i = 0;
         PhaseTimer = 0;
 

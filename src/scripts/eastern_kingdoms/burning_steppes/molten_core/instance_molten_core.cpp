@@ -92,7 +92,7 @@ struct instance_molten_core : ScriptedInstance
 
     bool IsEncounterInProgress() const override
     {
-        for (unsigned int i : m_auiEncounter)
+        for (uint32 i : m_auiEncounter)
             if (i == IN_PROGRESS || i == SPECIAL)
                 return true;
 
@@ -538,7 +538,7 @@ struct instance_molten_core : ScriptedInstance
                    >> RuneActive[0] >> RuneActive[1] >> RuneActive[2] >> RuneActive[3]
                    >> RuneActive[4] >> RuneActive[5] >> RuneActive[6];
 
-        for (unsigned int & i : m_auiEncounter)
+        for (uint32 & i : m_auiEncounter)
             if (i == IN_PROGRESS)           // Do not load an encounter as "In Progress" - reset it instead.
                 i = NOT_STARTED;
 

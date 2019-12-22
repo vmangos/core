@@ -1612,7 +1612,7 @@ void SpellMgr::LoadSpellChains()
     mSpellChainsNext.clear();                               // need for reload case
 
     // load known data for talents
-    for (unsigned int i = 0; i < sTalentStore.GetNumRows(); ++i)
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
         if (!talentInfo)
@@ -3326,7 +3326,7 @@ namespace SpellInternal
         if (!spellInfo->IsPassiveSpell())
             return false;
 
-        for (unsigned int i : spellInfo->Effect)
+        for (uint32 i : spellInfo->Effect)
         {
             if (SpellEffects(i) == SPELL_EFFECT_APPLY_AURA || SpellEffects(i) == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
                 return false;
@@ -3372,7 +3372,7 @@ namespace SpellInternal
 
     bool IsDirectDamageSpell(SpellEntry const* spellInfo)
     {
-        for (unsigned int i : spellInfo->Effect)
+        for (uint32 i : spellInfo->Effect)
         {
             switch (i)
             {
@@ -3423,7 +3423,7 @@ namespace SpellInternal
 
     bool HasAreaAuraEffect(SpellEntry const* spellInfo)
     {
-        for (unsigned int i : spellInfo->Effect)
+        for (uint32 i : spellInfo->Effect)
             if (IsAreaAuraEffect(i))
                 return true;
         return false;

@@ -161,7 +161,7 @@ void instance_temple_of_ahnqiraj::Initialize()
 
 bool instance_temple_of_ahnqiraj::IsEncounterInProgress() const
 {
-    for (unsigned int i : m_auiEncounter)
+    for (uint32 i : m_auiEncounter)
     {
         if (i == IN_PROGRESS || i == SPECIAL)
             return true;
@@ -396,7 +396,7 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        for (unsigned int i : m_auiEncounter)
+        for (uint32 i : m_auiEncounter)
             saveStream << i << " ";
 
         m_strInstData = saveStream.str();
@@ -417,7 +417,7 @@ void instance_temple_of_ahnqiraj::Load(char const* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-	   for (unsigned int & i : m_auiEncounter)
+	   for (uint32 & i : m_auiEncounter)
     {
         loadStream >> i;
         if (i == IN_PROGRESS)

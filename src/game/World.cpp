@@ -130,17 +130,17 @@ World::World()
     m_defaultDbcLocale = LOCALE_enUS;
     m_availableDbcLocaleMask = 0;
 
-    for (unsigned int & m_configUint32Value : m_configUint32Values)
-        m_configUint32Value = 0;
+    for (uint32 & i : m_configUint32Values)
+        i = 0;
 
-    for (int & m_configInt32Value : m_configInt32Values)
-        m_configInt32Value = 0;
+    for (int32 & i : m_configInt32Values)
+        i = 0;
 
-    for (float & m_configFloatValue : m_configFloatValues)
-        m_configFloatValue = 0.0f;
+    for (float & i : m_configFloatValues)
+        i = 0.0f;
 
-    for (bool & m_configBoolValue : m_configBoolValues)
-        m_configBoolValue = false;
+    for (bool & i : m_configBoolValues)
+        i = false;
 
     m_timeRate = 1.0f;
     m_charDbWorkerThread    = nullptr;

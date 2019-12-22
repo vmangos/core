@@ -178,12 +178,12 @@ void PlayerTaxi::AppendTaximaskTo(ByteBuffer& data, bool all)
 {
     if (all)
     {
-        for (unsigned int i : sTaxiNodesMask)
+        for (uint32 i : sTaxiNodesMask)
             data << uint32(i);              // all existing nodes
     }
     else
     {
-        for (unsigned int i : m_taximask)
+        for (uint32 i : m_taximask)
             data << uint32(i);                  // known nodes
     }
 }
@@ -262,7 +262,7 @@ uint32 PlayerTaxi::GetCurrentTaxiCost() const
 
 std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi)
 {
-    for (unsigned int i : taxi.m_taximask)
+    for (uint32 i : taxi.m_taximask)
         ss << i << " ";
     return ss;
 }
@@ -3475,7 +3475,7 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
         {
             if (TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentPos->talent_id))
             {
-                for (unsigned int rankSpellId : talentInfo->RankID)
+                for (uint32 rankSpellId : talentInfo->RankID)
                 {
                     // skip learning spell and no rank spell case
                     if (!rankSpellId || rankSpellId == spell_id)
@@ -3973,7 +3973,7 @@ bool Player::ResetTalents(bool no_cost)
         }
     }
 
-    for (unsigned int i = 0; i < sTalentStore.GetNumRows(); ++i)
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
     {
         TalentEntry const* talentInfo = sTalentStore.LookupEntry(i);
 
@@ -3990,11 +3990,11 @@ bool Player::ResetTalents(bool no_cost)
         if ((GetClassMask() & talentTabInfo->ClassMask) == 0)
             continue;
 
-        for (unsigned int j : talentInfo->RankID)
+        for (uint32 j : talentInfo->RankID)
         {
             SpellEntry const* pInfos = sSpellMgr.GetSpellEntry(j);
             if (pInfos)
-                for (unsigned int eff : pInfos->EffectTriggerSpell)
+                for (uint32 eff : pInfos->EffectTriggerSpell)
                     if (eff)
                         RemoveAurasDueToSpell(eff);
 
@@ -6771,7 +6771,7 @@ void Player::DuelComplete(DuelCompleteType type)
             auras2remove.push_back(vAura.second->GetId());
     }
 
-    for (unsigned int i : auras2remove)
+    for (uint32 i : auras2remove)
         duel->opponent->RemoveAurasDueToSpell(i);
 
     auras2remove.clear();
@@ -6781,7 +6781,7 @@ void Player::DuelComplete(DuelCompleteType type)
         if (!aura.second->IsPositive() && aura.second->GetCasterGuid() == duel->opponent->GetObjectGuid() && aura.second->GetAuraApplyTime() >= duel->startTime)
             auras2remove.push_back(aura.second->GetId());
     }
-    for (unsigned int i : auras2remove)
+    for (uint32 i : auras2remove)
         RemoveAurasDueToSpell(i);
 
     // cleanup combo points
@@ -12809,13 +12809,13 @@ void Player::AddQuest(Quest const* pQuest, Object* questGiver)
 
     if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_DELIVER))
     {
-        for (unsigned int & i : questStatusData.m_itemcount)
+        for (uint32 & i : questStatusData.m_itemcount)
             i = 0;
     }
 
     if (pQuest->HasSpecialFlag(QuestSpecialFlags(QUEST_SPECIAL_FLAG_KILL_OR_CAST | QUEST_SPECIAL_FLAG_SPEAKTO)))
     {
-        for (unsigned int & i : questStatusData.m_creatureOrGOcount)
+        for (uint32 & i : questStatusData.m_creatureOrGOcount)
             i = 0;
     }
 
@@ -12873,7 +12873,7 @@ void Player::AddQuest(Quest const* pQuest, Object* questGiver)
     {
         // destroy not required for quest finish quest starting item
         bool notRequiredItem = true;
-        for (unsigned int i : pQuest->ReqItemId)
+        for (uint32 i : pQuest->ReqItemId)
         {
             if (i == questGiver->GetEntry())
             {
@@ -16267,7 +16267,7 @@ void Player::_SaveAuras()
         for (int i : s.damage)
             stmt.addInt32(i);
 
-        for (unsigned int i : s.periodicTime)
+        for (uint32 i : s.periodicTime)
             stmt.addUInt32(i);
 
         stmt.addInt32(s.maxduration);
@@ -16467,9 +16467,9 @@ void Player::_SaveQuestStatus()
                 stmt.addUInt8(i->second.m_rewarded);
                 stmt.addUInt8(i->second.m_explored);
                 stmt.addUInt64(uint64(i->second.m_timer / IN_MILLISECONDS + sWorld.GetGameTime()));
-                for (unsigned int k : i->second.m_creatureOrGOcount)
+                for (uint32 k : i->second.m_creatureOrGOcount)
                     stmt.addUInt32(k);
-                for (unsigned int k : i->second.m_itemcount)
+                for (uint32 k : i->second.m_itemcount)
                     stmt.addUInt32(k);
                 stmt.addUInt32(i->second.m_reward_choice);
                 stmt.Execute();
@@ -16485,9 +16485,9 @@ void Player::_SaveQuestStatus()
                 stmt.addUInt32(i->second.m_reward_choice);
                 stmt.addUInt8(i->second.m_explored);
                 stmt.addUInt64(uint64(i->second.m_timer / IN_MILLISECONDS + sWorld.GetGameTime()));
-                for (unsigned int k : i->second.m_creatureOrGOcount)
+                for (uint32 k : i->second.m_creatureOrGOcount)
                     stmt.addUInt32(k);
-                for (unsigned int k : i->second.m_itemcount)
+                for (uint32 k : i->second.m_itemcount)
                     stmt.addUInt32(k);
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(i->first);
@@ -17411,7 +17411,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
 
     // No hack here
     if (!IsTaxiCheater() && !nocheck)
-        for (unsigned int node : nodes)
+        for (uint32 node : nodes)
             if (!m_taxi.IsTaximaskNodeKnown(node))
             {
                 GetSession()->ProcessAnticheatAction("PassiveAnticheat", "Taxi: Attempt to use unknown node.", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
@@ -20141,8 +20141,8 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     uint32 tTab = talentInfo->TalentTab;
     if (talentInfo->Row > 0)
     {
-        unsigned int numRows = sTalentStore.GetNumRows();
-        for (unsigned int i = 0; i < numRows; ++i)          // Loop through all talents.
+        uint32 numRows = sTalentStore.GetNumRows();
+        for (uint32 i = 0; i < numRows; ++i)          // Loop through all talents.
         {
             // Someday, someone needs to revamp
             TalentEntry const* tmpTalent = sTalentStore.LookupEntry(i);

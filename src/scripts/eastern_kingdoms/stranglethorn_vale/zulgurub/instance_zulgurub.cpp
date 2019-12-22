@@ -61,7 +61,7 @@ void instance_zulgurub::LowerHakkarHitPoints()
 
 bool instance_zulgurub::IsEncounterInProgress() const
 {
-    for (unsigned int i : m_auiEncounter)
+    for (uint32 i : m_auiEncounter)
         if (i == IN_PROGRESS || i == SPECIAL)
             return true;
     return false;
@@ -228,7 +228,7 @@ void instance_zulgurub::Load(char const* chrIn)
 
     LoadSaveData(chrIn, m_auiEncounter, 11);
 
-    for (unsigned int & i : m_auiEncounter)
+    for (uint32 & i : m_auiEncounter)
     {
         if (i == IN_PROGRESS)
             i = NOT_STARTED;

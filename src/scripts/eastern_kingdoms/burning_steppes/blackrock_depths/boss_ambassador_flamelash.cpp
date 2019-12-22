@@ -54,7 +54,7 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
 
     void Reset() override
     {
-        for (unsigned int & i : m_uiSpiritTimer)
+        for (uint32 & i : m_uiSpiritTimer)
             i = 5 * IN_MILLISECONDS;
     }
 

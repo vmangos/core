@@ -25,7 +25,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             {
                 bool food = false;
                 bool drink = false;
-                for (unsigned int i : spellInfo->EffectApplyAuraName)
+                for (uint32 i : spellInfo->EffectApplyAuraName)
                 {
                     switch (i)
                     {
@@ -120,7 +120,7 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             if (spellInfo->SpellIconID == 561 && spellInfo->SpellVisual == 5652)
                 return SPELL_JUDGEMENT;
 
-            for (unsigned int i : spellInfo->Effect)
+            for (uint32 i : spellInfo->Effect)
             {
                 // only paladin auras have this
                 if (i == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
@@ -335,7 +335,7 @@ void SpellEntry::ComputeNonPeriodicDispel()
 void SpellEntry::ComputeDispel()
 {
     _isDispel = false;
-    for (unsigned int i : Effect)
+    for (uint32 i : Effect)
     {
         if (i == SPELL_EFFECT_DISPEL)
         {
@@ -502,7 +502,7 @@ bool SpellEntry::IsPvEHeartBeat() const
     if (!(Attributes & SPELL_ATTR_DIMINISHING_RETURNS))
         return false;
 
-    for (unsigned int i : EffectApplyAuraName)
+    for (uint32 i : EffectApplyAuraName)
     {
         switch (i)
         {

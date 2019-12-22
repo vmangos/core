@@ -395,9 +395,9 @@ struct npc_keeper_remulosAI : public npc_escortAI
 
             m_uiMalfurionGUID.Clear();
 
-            for (unsigned int & j : m_uiTabMovementsTimer)
+            for (uint32 & j : m_uiTabMovementsTimer)
                 j = 0;
-            for (unsigned int & k : m_uiTabDialogsTimer)
+            for (uint32 & k : m_uiTabDialogsTimer)
                 k = 0;
         }
     }

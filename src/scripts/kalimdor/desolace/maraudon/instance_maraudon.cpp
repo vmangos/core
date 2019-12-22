@@ -93,7 +93,7 @@ struct instance_maraudon : public ScriptedInstance
         if (!chrIn)
             return;
         std::istringstream loadStream(chrIn);
-        for (unsigned int & i : m_auiEncounter)
+        for (uint32 & i : m_auiEncounter)
         {
             loadStream >> i;
             if (i == IN_PROGRESS)
@@ -145,7 +145,7 @@ struct instance_maraudon : public ScriptedInstance
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            for (unsigned int i : m_auiEncounter)
+            for (uint32 i : m_auiEncounter)
                 saveStream << i << " ";
 
             strInstData = saveStream.str();

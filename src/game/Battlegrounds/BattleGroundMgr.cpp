@@ -963,7 +963,7 @@ void BattleGroundMgr::Update(uint32 diff)
             //release lock
         }
 
-        for (unsigned int i : scheduled)
+        for (uint32 i : scheduled)
         {
             BattleGroundQueueTypeId bgQueueTypeId = BattleGroundQueueTypeId(i >> 16 & 255);
             BattleGroundTypeId bgTypeId = BattleGroundTypeId((i >> 8) & 255);
@@ -1446,7 +1446,7 @@ void BattleGroundMgr::ScheduleQueueUpdate(BattleGroundQueueTypeId bgQueueTypeId,
     //we will use only 1 number created of bgTypeId and queue_id
     uint32 schedule_id = (bgQueueTypeId << 16) | (bgTypeId << 8) | bracket_id;
     bool found = false;
-    for (unsigned int i : m_QueueUpdateScheduler)
+    for (uint32 i : m_QueueUpdateScheduler)
     {
         if (i == schedule_id)
         {

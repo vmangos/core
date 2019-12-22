@@ -125,7 +125,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         m_lWaveMobsGUIDList.clear();
         m_uiCheckEventEnd = 1000;
 
-        for (unsigned int & i : m_uiSpawnMobsTimer)
+        for (uint32 & i : m_uiSpawnMobsTimer)
             i = 0;
     }
 
@@ -265,7 +265,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         std::istringstream loadStream(chrIn);
         loadStream >> m_auiEncounter[BFD_ENCOUNTER_KELRIS] >> m_auiEncounter[BFD_ENCOUNTER_SHRINE] >> m_auiEncounter[BFD_ENCOUNTER_AQUANIS];
 
-        for (unsigned int & i : m_auiEncounter)
+        for (uint32 & i : m_auiEncounter)
             if (i == IN_PROGRESS)
                 i = NOT_STARTED;
 

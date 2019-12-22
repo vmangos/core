@@ -1701,7 +1701,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (!m_bExist || m_bDone)
             return;
 
-        for (unsigned int l : Launcher)
+        for (uint32 l : Launcher)
         {
             if (auto pGo = GetClosestGameObjectWithEntry(m_creature, l, CONTACT_DISTANCE))
             {
