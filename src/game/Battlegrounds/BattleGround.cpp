@@ -160,8 +160,8 @@ private:
 template<class Do>
 void BattleGround::BroadcastWorker(Do& _do)
 {
-    for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
-        if (Player* plr = ObjectAccessor::FindPlayer(itr->first))
+    for (const auto & m_Player : m_Players)
+        if (Player* plr = ObjectAccessor::FindPlayer(m_Player.first))
             _do(plr);
 }
 
@@ -254,8 +254,8 @@ BattleGround::~BattleGround()
     // remove from bg free slot queue
     this->RemoveFromBGFreeSlotQueue();
 
-    for (BattleGroundScoreMap::const_iterator itr = m_PlayerScores.begin(); itr != m_PlayerScores.end(); ++itr)
-        delete itr->second;
+    for (const auto & m_PlayerScore : m_PlayerScores)
+        delete m_PlayerScore.second;
 }
 
 void BattleGround::Update(uint32 diff)
@@ -429,30 +429,30 @@ void BattleGround::SetTeamStartLoc(Team team, float X, float Y, float Z, float O
 
 void BattleGround::SendPacketToAll(WorldPacket* packet)
 {
-    for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (const auto & m_Player : m_Players)
     {
-        if (Player* plr = sObjectMgr.GetPlayer(itr->first))
+        if (Player* plr = sObjectMgr.GetPlayer(m_Player.first))
             plr->GetSession()->SendPacket(packet);
         else
-            sLog.outError("BattleGround:SendPacketToAll: %s not found!", itr->first.GetString().c_str());
+            sLog.outError("BattleGround:SendPacketToAll: %s not found!", m_Player.first.GetString().c_str());
     }
 }
 
 void BattleGround::SendPacketToTeam(Team teamId, WorldPacket* packet, Player* sender, bool self)
 {
-    for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (const auto & m_Player : m_Players)
     {
-        Player* plr = sObjectMgr.GetPlayer(itr->first);
+        Player* plr = sObjectMgr.GetPlayer(m_Player.first);
         if (!plr)
         {
-            sLog.outError("BattleGround:SendPacketToTeam: %s not found!", itr->first.GetString().c_str());
+            sLog.outError("BattleGround:SendPacketToTeam: %s not found!", m_Player.first.GetString().c_str());
             continue;
         }
 
         if (!self && sender == plr)
             continue;
 
-        Team team = itr->second.PlayerTeam;
+        Team team = m_Player.second.PlayerTeam;
         if (!team) team = plr->GetTeam();
 
         if (team == teamId)
@@ -471,16 +471,16 @@ void BattleGround::PlaySoundToTeam(uint32 SoundID, Team teamId)
 {
     WorldPacket data;
 
-    for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (const auto & m_Player : m_Players)
     {
-        Player* plr = sObjectMgr.GetPlayer(itr->first);
+        Player* plr = sObjectMgr.GetPlayer(m_Player.first);
         if (!plr)
         {
-            sLog.outError("BattleGround:PlaySoundToTeam: %s not found!", itr->first.GetString().c_str());
+            sLog.outError("BattleGround:PlaySoundToTeam: %s not found!", m_Player.first.GetString().c_str());
             continue;
         }
 
-        Team team = itr->second.PlayerTeam;
+        Team team = m_Player.second.PlayerTeam;
         if (!team) team = plr->GetTeam();
 
         if (team == teamId)
@@ -493,17 +493,17 @@ void BattleGround::PlaySoundToTeam(uint32 SoundID, Team teamId)
 
 void BattleGround::CastSpellOnTeam(uint32 SpellID, Team teamId)
 {
-    for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (const auto & m_Player : m_Players)
     {
-        Player* plr = sObjectMgr.GetPlayer(itr->first);
+        Player* plr = sObjectMgr.GetPlayer(m_Player.first);
 
         if (!plr)
         {
-            sLog.outError("BattleGround:CastSpellOnTeam: %s not found!", itr->first.GetString().c_str());
+            sLog.outError("BattleGround:CastSpellOnTeam: %s not found!", m_Player.first.GetString().c_str());
             continue;
         }
 
-        Team team = itr->second.PlayerTeam;
+        Team team = m_Player.second.PlayerTeam;
         if (!team) team = plr->GetTeam();
 
         if (team == teamId)
@@ -513,17 +513,17 @@ void BattleGround::CastSpellOnTeam(uint32 SpellID, Team teamId)
 
 void BattleGround::RewardHonorToTeam(uint32 Honor, Team teamId)
 {
-    for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (const auto & m_Player : m_Players)
     {
-        Player* plr = sObjectMgr.GetPlayer(itr->first);
+        Player* plr = sObjectMgr.GetPlayer(m_Player.first);
 
         if (!plr)
         {
-            sLog.outError("BattleGround:RewardHonorToTeam: %s not found!", itr->first.GetString().c_str());
+            sLog.outError("BattleGround:RewardHonorToTeam: %s not found!", m_Player.first.GetString().c_str());
             continue;
         }
 
-        Team team = itr->second.PlayerTeam;
+        Team team = m_Player.second.PlayerTeam;
         if (!team) team = plr->GetTeam();
 
         if (team == teamId)
@@ -538,17 +538,17 @@ void BattleGround::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
     if (!factionEntry)
         return;
 
-    for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (const auto & m_Player : m_Players)
     {
-        Player* plr = sObjectMgr.GetPlayer(itr->first);
+        Player* plr = sObjectMgr.GetPlayer(m_Player.first);
 
         if (!plr)
         {
-            sLog.outError("BattleGround:RewardReputationToTeam: %s not found!", itr->first.GetString().c_str());
+            sLog.outError("BattleGround:RewardReputationToTeam: %s not found!", m_Player.first.GetString().c_str());
             continue;
         }
 
-        Team team = itr->second.PlayerTeam;
+        Team team = m_Player.second.PlayerTeam;
         if (!team) team = plr->GetTeam();
 
         if (team == teamId)
@@ -609,14 +609,14 @@ void BattleGround::EndBattleGround(Team winner)
     //we must set it this way, because end time is sent in packet!
     m_EndTime = TIME_TO_AUTOREMOVE;
 
-    for (BattleGroundPlayerMap::iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (auto & m_Player : m_Players)
     {
-        Team team = itr->second.PlayerTeam;
+        Team team = m_Player.second.PlayerTeam;
 
-        Player* plr = sObjectMgr.GetPlayer(itr->first);
+        Player* plr = sObjectMgr.GetPlayer(m_Player.first);
         if (!plr)
         {
-            sLog.outError("BattleGround:EndBattleGround %s not found!", itr->first.GetString().c_str());
+            sLog.outError("BattleGround:EndBattleGround %s not found!", m_Player.first.GetString().c_str());
             continue;
         }
 
@@ -657,7 +657,7 @@ void BattleGround::EndBattleGround(Team winner)
 
         if (LogsDatabase && sWorld.getConfig(CONFIG_BOOL_LOGSDB_BATTLEGROUNDS))
         {
-            BattleGroundScoreMap::const_iterator score = m_PlayerScores.find(itr->first);
+            BattleGroundScoreMap::const_iterator score = m_PlayerScores.find(m_Player.first);
             if (score != m_PlayerScores.end())
             {
                 static SqlStatementID insLogBg;
@@ -672,7 +672,7 @@ void BattleGround::EndBattleGround(Team winner)
                 logStmt.addUInt32(GetStartTime() / 1000);
                 logStmt.addUInt32(GetPlayersCountByTeam(team));
 
-                logStmt.addUInt32(itr->first);
+                logStmt.addUInt32(m_Player.first);
                 logStmt.addUInt32(team);
                 logStmt.addUInt32(score->second->Deaths);
                 logStmt.addUInt32(score->second->BonusHonor);
@@ -939,8 +939,8 @@ void BattleGround::Reset()
 
     m_Players.clear();
 
-    for (BattleGroundScoreMap::const_iterator itr = m_PlayerScores.begin(); itr != m_PlayerScores.end(); ++itr)
-        delete itr->second;
+    for (const auto & m_PlayerScore : m_PlayerScores)
+        delete m_PlayerScore.second;
     m_PlayerScores.clear();
 }
 
@@ -1220,10 +1220,10 @@ void BattleGround::OnObjectDBLoad(Creature* creature)
     ASSERT(eventsVector.size());
     if (eventsVector[0].event1 == BG_EVENT_NONE)
         return;
-    for (int i = 0; i < eventsVector.size(); ++i)
+    for (auto i : eventsVector)
     {
-        m_EventObjects[MAKE_PAIR32(eventsVector[i].event1, eventsVector[i].event2)].creatures.push_back(creature->GetObjectGuid());
-        if (!IsActiveEvent(eventsVector[i].event1, eventsVector[i].event2))
+        m_EventObjects[MAKE_PAIR32(i.event1, i.event2)].creatures.push_back(creature->GetObjectGuid());
+        if (!IsActiveEvent(i.event1, i.event2))
             SpawnBGCreature(creature->GetObjectGuid(), DESPAWN_FORCED);
     }
 }
@@ -1242,15 +1242,15 @@ void BattleGround::OnObjectDBLoad(GameObject* obj)
     ASSERT(eventsVector.size());
     if (eventsVector[0].event1 == BG_EVENT_NONE)
         return;
-    for (int i = 0; i < eventsVector.size(); ++i)
+    for (auto i : eventsVector)
     {
-        m_EventObjects[MAKE_PAIR32(eventsVector[i].event1, eventsVector[i].event2)].gameobjects.push_back(obj->GetObjectGuid());
-        if (!IsActiveEvent(eventsVector[i].event1, eventsVector[i].event2))
+        m_EventObjects[MAKE_PAIR32(i.event1, i.event2)].gameobjects.push_back(obj->GetObjectGuid());
+        if (!IsActiveEvent(i.event1, i.event2))
             SpawnBGObject(obj->GetObjectGuid(), RESPAWN_ONE_DAY);
         else
         {
             // it's possible, that doors aren't spawned anymore (wsg)
-            if (GetStatus() >= STATUS_IN_PROGRESS && IsDoor(eventsVector[i].event1, eventsVector[i].event2))
+            if (GetStatus() >= STATUS_IN_PROGRESS && IsDoor(i.event1, i.event2))
                 DoorOpen(obj->GetObjectGuid());
         }
     }
@@ -1307,9 +1307,9 @@ void BattleGround::StartingEventDespawnDoors()
 void BattleGround::ReturnPlayersToHomeGY()
 {
     // return bastards back homie
-    for (auto itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (auto & m_Player : m_Players)
     {
-        auto player = sObjectMgr.GetPlayer(itr->first);
+        auto player = sObjectMgr.GetPlayer(m_Player.first);
 
         if (!player || player->IsGameMaster())
             continue;
@@ -1347,9 +1347,9 @@ void BattleGround::SpawnEvent(uint8 event1, uint8 event2, bool spawn, bool force
         std::vector<BattleGroundEventIdx> const& eventsVector = sBattleGroundMgr.GetCreatureEventsVector(itr->GetCounter());
         ASSERT(eventsVector.size());
         bool spawnThisCreature = spawn;
-        for (int i = 0; i < eventsVector.size(); ++i)
+        for (auto i : eventsVector)
         {
-            if (!IsActiveEvent(eventsVector[i].event1, eventsVector[i].event2))
+            if (!IsActiveEvent(i.event1, i.event2))
             {
                 spawnThisCreature = false;
                 break;
@@ -1377,9 +1377,9 @@ void BattleGround::SetSpawnEventMode(uint8 event1, uint8 event2, BattleGroundCre
         std::vector<BattleGroundEventIdx> const& eventsVector = sBattleGroundMgr.GetCreatureEventsVector(itr->GetCounter());
         ASSERT(eventsVector.size());
         bool spawnThisCreature = true;
-        for (int i = 0; i < eventsVector.size(); ++i)
+        for (auto i : eventsVector)
         {
-            if (!IsActiveEvent(eventsVector[i].event1, eventsVector[i].event2))
+            if (!IsActiveEvent(i.event1, i.event2))
             {
                 spawnThisCreature = false;
                 break;
@@ -1606,9 +1606,9 @@ void BattleGround::HandleKillPlayer(Player* player, Player* killer)
         UpdatePlayerScore(killer, SCORE_HONORABLE_KILLS, 1);
         UpdatePlayerScore(killer, SCORE_KILLING_BLOWS, 1);
 
-        for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+        for (const auto & m_Player : m_Players)
         {
-            Player* plr = sObjectMgr.GetPlayer(itr->first);
+            Player* plr = sObjectMgr.GetPlayer(m_Player.first);
 
             if (!plr || plr == killer)
                 continue;
@@ -1662,11 +1662,11 @@ void BattleGround::PlayerAddedToBGCheckIfBGIsRunning(Player* plr)
 uint32 BattleGround::GetAlivePlayersCountByTeam(Team team) const
 {
     int count = 0;
-    for (BattleGroundPlayerMap::const_iterator itr = m_Players.begin(); itr != m_Players.end(); ++itr)
+    for (const auto & m_Player : m_Players)
     {
-        if (itr->second.PlayerTeam == team)
+        if (m_Player.second.PlayerTeam == team)
         {
-            Player* pl = sObjectMgr.GetPlayer(itr->first);
+            Player* pl = sObjectMgr.GetPlayer(m_Player.first);
             if (pl && pl->IsAlive())
                 ++count;
         }

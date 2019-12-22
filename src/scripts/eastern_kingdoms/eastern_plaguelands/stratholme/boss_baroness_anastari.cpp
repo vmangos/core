@@ -182,9 +182,9 @@ struct boss_baroness_anastariAI : public ScriptedAI
                             PlayerAggro[i] = 0;
                         }
                         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                        for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+                        for (auto i : tList)
                         {
-                            Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+                            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
                             if (pUnit && pUnit->IsPlayer())
                             {
                                 for (int i = 0; i < 5; i++)

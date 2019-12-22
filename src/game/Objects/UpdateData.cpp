@@ -145,8 +145,8 @@ bool UpdateData::BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket,
         buf << (uint32) m_outOfRangeGUIDs.size();
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        for (ObjectGuidSet::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
-            buf << i->WriteAsPacked();
+        for (auto m_outOfRangeGUID : m_outOfRangeGUIDs)
+            buf << m_outOfRangeGUID.WriteAsPacked();
 #else
         for (ObjectGuidSet::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
             buf << *i;
@@ -193,9 +193,9 @@ void UpdateData::Send(WorldSession* session, bool hasTransport)
         m_outOfRangeGUIDs.clear();
         return;
     }
-    for (std::list<UpdatePacket>::iterator it = m_datas.begin(); it != m_datas.end(); ++it)
+    for (auto & m_data : m_datas)
     {
-        BuildPacket(&data, &(*it), hasTransport);
+        BuildPacket(&data, &m_data, hasTransport);
         session->SendPacket(&data);
         data.clear();
         m_outOfRangeGUIDs.clear();

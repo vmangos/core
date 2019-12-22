@@ -154,9 +154,9 @@ struct npc_attack_masterAI : public ScriptedAI
     }
     void SetAttackableInList(MobsGUIDList mobsList, bool bAttackable)
     {
-        for (MobsGUIDListIter itr = mobsList.begin(); itr != mobsList.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type & itr : mobsList)
         {
-            if (Unit* unit = Unit::GetUnit(*ME, *itr))
+            if (Unit* unit = Unit::GetUnit(*ME, itr))
                 SetAttackable(unit, bAttackable);
         }
     }
@@ -226,9 +226,9 @@ struct npc_attack_masterAI : public ScriptedAI
         ME->RemoveAurasDueToSpell(SPELL_INVOCATION_ON_MASTER);
         // On desactive les invocateurs
         uint8 num = 0;
-        for (MobsGUIDListIter itr = lInvocatorMobsGUID.begin(); itr != lInvocatorMobsGUID.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type & itr : lInvocatorMobsGUID)
         {
-            if (Unit* invoc = Unit::GetUnit(*ME, *itr))
+            if (Unit* invoc = Unit::GetUnit(*ME, itr))
             {
                 if (invoc->IsAlive())
                 {
@@ -335,9 +335,9 @@ struct npc_attack_masterAI : public ScriptedAI
     {
         if (!lCurrWaveMobsGUID.empty())
         {
-            for (MobsGUIDListIter it = lCurrWaveMobsGUID.begin(); it != lCurrWaveMobsGUID.end(); ++it)
+            for (std::_Simple_types<unsigned long long>::value_type & it : lCurrWaveMobsGUID)
             {
-                if (Unit* waveMob = Unit::GetUnit(*ME, *it))
+                if (Unit* waveMob = Unit::GetUnit(*ME, it))
                 {
                     if (waveMob->IsAlive())
                     {
@@ -730,35 +730,35 @@ struct npc_event_wave_mobAI : public ScriptedAI
         Cell::VisitAllObjects(ME, searcher, 120.0f);
         Unit* nearest = nullptr;
         uint32 quality = 0;
-        for (std::list<Unit*>::iterator iter = targets.begin(); iter != targets.end(); ++iter)
+        for (auto & target : targets)
         {
             uint32 currVictimQuality = 0;
-            if ((*iter)->GetFactionTemplateId() == ME->GetFactionTemplateId())
+            if (target->GetFactionTemplateId() == ME->GetFactionTemplateId())
                 continue;
-            if (!(*iter)->IsAlive())
+            if (!target->IsAlive())
                 continue;
-            uint32 entry = (*iter)->GetEntry();
+            uint32 entry = target->GetEntry();
             if (entry == NPC_BOSS_CAPITAL_ADD1 || entry == NPC_BOSS_CAPITAL_ADD2
                     || entry == NPC_MASTER_ADD1 || entry == NPC_MASTER_ADD2)
                 currVictimQuality += 0xF0;
             if (!nearest)
             {
-                nearest = (*iter);
+                nearest = target;
                 currVictimQuality += 0x1;
             }
             // Priorite a attaquer dans la LoS
-            if ((*iter)->IsWithinLOSInMap(ME))
+            if (target->IsWithinLOSInMap(ME))
                 currVictimQuality += 0x4;
             // Plus pret ?
-            if ((*iter)->GetDistance2d(ME) <= nearest->GetDistance2d(ME))
+            if (target->GetDistance2d(ME) <= nearest->GetDistance2d(ME))
                 currVictimQuality += 0x2;
             // Autre priorite : le niveau
-            if ((*iter)->GetLevel() > 50)
-                currVictimQuality += ((*iter)->GetLevel() - 50);
+            if (target->GetLevel() > 50)
+                currVictimQuality += (target->GetLevel() - 50);
             if (currVictimQuality > quality)
             {
                 quality = currVictimQuality;
-                nearest = (*iter);
+                nearest = target;
             }
         }
         // Il faut quand meme s'arreter a un moment, sinon toute la foret d'Elwynn va y passer.
@@ -960,9 +960,9 @@ struct npc_guard_masterAI : public ScriptedAI
     // La garde est invoquee : maintenant elle doit attaquer
     void DoAllAttack(Unit* pUnit)
     {
-        for (MobsGUIDListIter itr = lMyAddsMobsGUID.begin(); itr != lMyAddsMobsGUID.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type & itr : lMyAddsMobsGUID)
         {
-            if (Unit* crea = Unit::GetUnit(*ME, *itr))
+            if (Unit* crea = Unit::GetUnit(*ME, itr))
             {
                 if (crea->IsAlive())
                     ((Creature*)crea)->AI()->AttackStart(crea);
@@ -971,9 +971,9 @@ struct npc_guard_masterAI : public ScriptedAI
     }
     void DoAllSay(char const *what)
     {
-        for (MobsGUIDListIter itr = lMyAddsMobsGUID.begin(); itr != lMyAddsMobsGUID.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type & itr : lMyAddsMobsGUID)
         {
-            if (Unit* crea = Unit::GetUnit(*ME, *itr))
+            if (Unit* crea = Unit::GetUnit(*ME, itr))
             {
                 if (crea->IsAlive())
                     ((Creature*)crea)->MonsterSay(what, 0, 0);

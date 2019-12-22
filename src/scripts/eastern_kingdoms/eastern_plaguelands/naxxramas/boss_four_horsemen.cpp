@@ -156,9 +156,9 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto & itr : PlayerList)
         {
-            Player* pPlayer = itr->getSource();
+            Player* pPlayer = itr.getSource();
             
             if (m_creature->GetDistance3dToCenter(pPlayer) > 74.0f)
                 continue;
@@ -352,9 +352,9 @@ struct boss_four_horsemen_shared : public ScriptedAI
                 m_uiMarkTimer = 12000;
                 //todo: this behavior should get some more confirmation
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
+                for (auto itr : tList)
                 {
-                    Unit* pUnit = m_creature->GetMap()->GetUnit( (*itr)->getUnitGuid());
+                    Unit* pUnit = m_creature->GetMap()->GetUnit( itr->getUnitGuid());
 
                     if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
                         m_creature->GetThreatManager().modifyThreatPercent(pUnit, -50);
@@ -375,9 +375,9 @@ struct boss_four_horsemen_shared : public ScriptedAI
             return;
         float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY);
         Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        for (const auto & player : players)
         {
-            Player* pPlayer = itr->getSource();
+            Player* pPlayer = player.getSource();
             if (m_creature->IsWithinDistInMap(pPlayer, range))
             {
                 m_creature->PlayDirectSound(pData->SoundId, pPlayer);

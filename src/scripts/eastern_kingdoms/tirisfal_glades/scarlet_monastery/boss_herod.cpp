@@ -106,9 +106,9 @@ struct boss_herodAI : ScriptedAI
         if (!victim)
             return;
 
-        for (auto itr = m_lMyrmidonGuids.begin(); itr != m_lMyrmidonGuids.end(); ++itr)
+        for (auto & m_lMyrmidonGuid : m_lMyrmidonGuids)
         {
-            if (auto pMyrmidon = m_creature->GetMap()->GetCreature(*itr))
+            if (auto pMyrmidon = m_creature->GetMap()->GetCreature(m_lMyrmidonGuid))
             {
                 if (!pMyrmidon->IsAlive() || pMyrmidon->GetVictim())
                     continue;
@@ -133,9 +133,9 @@ struct boss_herodAI : ScriptedAI
 
     void DespawnMyrmidons()
     {
-        for (auto itr = m_lMyrmidonGuids.begin(); itr != m_lMyrmidonGuids.end(); ++itr)
+        for (auto & m_lMyrmidonGuid : m_lMyrmidonGuids)
         {
-            if (auto pMyrmidon = m_creature->GetMap()->GetCreature(*itr))
+            if (auto pMyrmidon = m_creature->GetMap()->GetCreature(m_lMyrmidonGuid))
             {
                 if (pMyrmidon->IsAlive() && !pMyrmidon->GetVictim())
                     pMyrmidon->ForcedDespawn();

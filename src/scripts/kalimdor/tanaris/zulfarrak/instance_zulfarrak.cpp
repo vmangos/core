@@ -343,11 +343,11 @@ public:
 
     void SpawnPyramidWave(uint32 wave)
     {
-        for (int i = 0; i < pyramidSpawnTotal; i++)
+        for (auto & pyramidSpawn : pyramidSpawns)
         {
-            if (pyramidSpawns[i][0] == (float)wave)
+            if (pyramidSpawn[0] == (float)wave)
             {
-                Creature* ts = instance->SummonCreature(pyramidSpawns[i][1], pyramidSpawns[i][2], pyramidSpawns[i][3], 8.87f, 0.0f);
+                Creature* ts = instance->SummonCreature(pyramidSpawn[1], pyramidSpawn[2], pyramidSpawn[3], 8.87f, 0.0f);
                 //ts->GetMotionMaster()->MoveRandom(10);
                 addsAtBase.push_back(ts->GetGUID());
             }
@@ -356,17 +356,17 @@ public:
 
     bool IsWaveAllDead()
     {
-        for (std::list<uint64>::iterator itr = addsAtBase.begin(); itr != addsAtBase.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type & itr : addsAtBase)
         {
-            if (Creature* add = instance->GetCreature((*itr)))
+            if (Creature* add = instance->GetCreature(itr))
             {
                 if (add->IsAlive())
                     return false;
             }
         }
-        for (std::list<uint64>::iterator itr = movedadds.begin(); itr != movedadds.end(); ++itr)
+        for (std::_Simple_types<unsigned long long>::value_type & movedadd : movedadds)
         {
-            if (Creature* add = instance->GetCreature(((*itr))))
+            if (Creature* add = instance->GetCreature((movedadd)))
             {
                 if (add->IsAlive())
                     return false;

@@ -159,8 +159,8 @@ struct npc_saeanAI : public ScriptedAI
     npc_saeanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         // zero init required to prevent crash
-        for (ptrdiff_t i = 0; i < 2; ++i)
-            m_darkIronAmbusher[i] = nullptr;
+        for (auto & i : m_darkIronAmbusher)
+            i = nullptr;
         m_numSummonedAmbushers = 0;
 
         m_eventStarted = false;
@@ -179,8 +179,8 @@ struct npc_saeanAI : public ScriptedAI
     void JustDied(Unit* pVictim) override
     {
         // It is safe to forget about ambushers, they will despawn automatically.
-        for (ptrdiff_t i = 0; i < 2; ++i)
-            m_darkIronAmbusher[i] = nullptr;
+        for (auto & i : m_darkIronAmbusher)
+            i = nullptr;
         m_numSummonedAmbushers = 0;
 
         m_eventStarted = false;

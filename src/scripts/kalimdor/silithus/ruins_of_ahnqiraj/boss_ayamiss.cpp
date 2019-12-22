@@ -125,16 +125,16 @@ struct boss_ayamissAI : public ScriptedAI
         /** Force despawn of invocated Hornet and Larva from Hive'Zara */
         std::list<Creature*> GardiensListe;
         GetCreatureListWithEntryInGrid(GardiensListe, m_creature, NPC_HIVEZARA_HORNET, 300.0f);
-        for (std::list<Creature*>::iterator itr = GardiensListe.begin(); itr != GardiensListe.end(); ++itr)
+        for (auto & itr : GardiensListe)
         {
-            if ((*itr)->IsAlive())
-                (*itr)->AddObjectToRemoveList();
+            if (itr->IsAlive())
+                itr->AddObjectToRemoveList();
         }
         GetCreatureListWithEntryInGrid(GardiensListe, m_creature, NPC_HIVEZARA_SWARMER, 300.0f);
-        for (std::list<Creature*>::iterator itr = GardiensListe.begin(); itr != GardiensListe.end(); ++itr)
+        for (auto & itr : GardiensListe)
         {
-            if ((*itr)->IsAlive())
-                (*itr)->AddObjectToRemoveList();
+            if (itr->IsAlive())
+                itr->AddObjectToRemoveList();
         }
 
         if (m_pInstance)
@@ -205,9 +205,9 @@ struct boss_ayamissAI : public ScriptedAI
 
             /** Aggro list reset */
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+            for (auto i : tList)
             {
-                Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+                Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
                 if (pUnit && (pUnit->GetTypeId() == TYPEID_PLAYER))
                     m_creature->GetThreatManager().modifyThreatPercent(pUnit, -100);
             }
@@ -234,8 +234,8 @@ struct boss_ayamissAI : public ScriptedAI
             }
             std::list<Creature*> SwarmerList;
             GetCreatureListWithEntryInGrid(SwarmerList, m_creature, NPC_HIVEZARA_SWARMER, 300.0f);
-            for (std::list<Creature*>::iterator itr = SwarmerList.begin(); itr != SwarmerList.end(); ++itr)
-                (*itr)->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING);
+            for (auto & itr : SwarmerList)
+                itr->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING);
 
             m_uiSummonSwarmer_Timer = 60000;
         }
@@ -354,10 +354,10 @@ struct mob_zara_larvaAI : public ScriptedAI
             return;
         }
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+        for (const auto & i : liste)
         {
 
-            if (i->getSource()->HasAura(SPELL_PARALYZE) &&
+            if (i.getSource()->HasAura(SPELL_PARALYZE) &&
                     m_creature->GetPositionX() == LarvaMove[0].x &&
                     m_creature->GetPositionY() == LarvaMove[0].y &&
                     m_creature->GetPositionZ() == LarvaMove[0].z && m_waypoint == 1)
@@ -365,7 +365,7 @@ struct mob_zara_larvaAI : public ScriptedAI
                 m_creature->MonsterMove(LarvaMove[1].x, LarvaMove[1].y, LarvaMove[1].z);
                 ++m_waypoint;
             }
-            else if (i->getSource()->HasAura(SPELL_PARALYZE) &&
+            else if (i.getSource()->HasAura(SPELL_PARALYZE) &&
                      m_creature->GetPositionX() == LarvaMove[1].x &&
                      m_creature->GetPositionY() == LarvaMove[1].y &&
                      m_creature->GetPositionZ() == LarvaMove[1].z && m_waypoint == 2)
@@ -373,7 +373,7 @@ struct mob_zara_larvaAI : public ScriptedAI
                 m_creature->MonsterMove(LarvaMove[2].x, LarvaMove[2].y, LarvaMove[2].z);
                 ++m_waypoint;
             }
-            else if (i->getSource()->HasAura(SPELL_PARALYZE) &&
+            else if (i.getSource()->HasAura(SPELL_PARALYZE) &&
                      m_creature->GetPositionX() == LarvaMove[2].x &&
                      m_creature->GetPositionY() == LarvaMove[2].y &&
                      m_creature->GetPositionZ() == LarvaMove[2].z && m_waypoint == 3)
@@ -381,19 +381,19 @@ struct mob_zara_larvaAI : public ScriptedAI
                 m_creature->MonsterMove(LarvaMove[3].x, LarvaMove[3].y, LarvaMove[3].z);
                 ++m_waypoint;
             }
-            else if (i->getSource()->HasAura(SPELL_PARALYZE) && m_waypoint == 0)
+            else if (i.getSource()->HasAura(SPELL_PARALYZE) && m_waypoint == 0)
             {
                 m_creature->MonsterMove(LarvaMove[m_waypoint].x,
                                         LarvaMove[m_waypoint].y,
                                         LarvaMove[m_waypoint].z);
                 ++m_waypoint;
-                m_victim = i->getSource();
+                m_victim = i.getSource();
                 m_creature->AI()->AttackStart(m_victim);
                 m_creature->GetThreatManager().addThreat(m_victim, 5000000000);
             }
             else if (m_victim)
             {
-                if (i->getSource()->HasAura(SPELL_PARALYZE) &&
+                if (i.getSource()->HasAura(SPELL_PARALYZE) &&
                         m_creature->GetPositionX() == LarvaMove[3].x &&
                         m_creature->GetPositionY() == LarvaMove[3].y &&
                         m_creature->GetPositionZ() == LarvaMove[3].z && m_waypoint == 4)

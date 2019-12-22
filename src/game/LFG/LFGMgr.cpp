@@ -62,10 +62,10 @@ void LFGPlayerQueueInfo::CalculateRoles(Classes playerClass)
 
 RolesPriority LFGPlayerQueueInfo::GetRolePriority(ClassRoles role)
 {
-    for (auto iter = rolePriority.cbegin(); iter != rolePriority.cend(); ++iter)
+    for (const auto & iter : rolePriority)
     {
-        if (iter->first == role)
-            return iter->second;
+        if (iter.first == role)
+            return iter.second;
     }
 
     return LFG_PRIORITY_NONE;
@@ -388,21 +388,21 @@ bool LFGQueue::FindRoleToGroup(ObjectGuid playerGuid, Group* group, ClassRoles r
         bool queueTimePriority = qPlayer->second.hasQueuePriority;
         bool classPriority = qPlayer->second.GetRolePriority(role);
         // Iterate over QueuedPlayersMap to find if players have been longer in Queue.
-        for (QueuedPlayersMap::iterator iter = m_QueuedPlayers.begin(); iter != m_QueuedPlayers.end(); ++iter)
+        for (auto & m_QueuedPlayer : m_QueuedPlayers)
         {
-            if (qPlayer->first == iter->first)
+            if (qPlayer->first == m_QueuedPlayer.first)
                 continue;
 
             // Ignore players queuing for a different dungeon or from opposite factions
-            if (qPlayer->second.areaId != iter->second.areaId || qPlayer->second.team != iter->second.team)
+            if (qPlayer->second.areaId != m_QueuedPlayer.second.areaId || qPlayer->second.team != m_QueuedPlayer.second.team)
                 continue;
 
             // Compare priority/queue time to players that can fill the same role
-            if ((iter->second.roleMask & role) == role)
+            if ((m_QueuedPlayer.second.roleMask & role) == role)
             {
-                bool otherTimePriority = iter->second.hasQueuePriority;
-                bool otherClassPriority = iter->second.GetRolePriority(role);
-                bool otherLongerInQueue = iter->second.timeInLFG > qPlayer->second.timeInLFG;
+                bool otherTimePriority = m_QueuedPlayer.second.hasQueuePriority;
+                bool otherClassPriority = m_QueuedPlayer.second.GetRolePriority(role);
+                bool otherLongerInQueue = m_QueuedPlayer.second.timeInLFG > qPlayer->second.timeInLFG;
 
                 // Another player is more valuable in this role, they have priority
                 if (otherClassPriority > classPriority)
@@ -534,13 +534,13 @@ void LFGQueue::RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod
 
 void LFGQueue::FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude)
 {
-    for (QueuedPlayersMap::iterator itr = m_QueuedPlayers.begin(); itr != m_QueuedPlayers.end(); ++itr)
+    for (auto & m_QueuedPlayer : m_QueuedPlayers)
     {
-        if (itr->first == exclude)
+        if (m_QueuedPlayer.first == exclude)
             continue;
 
-        if (itr->second.areaId == area && itr->second.team == team)
-            players.push_back(itr->first);
+        if (m_QueuedPlayer.second.areaId == area && m_QueuedPlayer.second.team == team)
+            players.push_back(m_QueuedPlayer.first);
     }
 }
 

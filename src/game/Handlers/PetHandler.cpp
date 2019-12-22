@@ -231,9 +231,9 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             if (pCharmedUnit->GetGlobalCooldownMgr().HasGlobalCooldown(spellInfo))
                 return;
 
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (unsigned int i : spellInfo->EffectImplicitTargetA)
             {
-                if (spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA || spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA_INSTANT || spellInfo->EffectImplicitTargetA[i] == TARGET_ALL_ENEMY_IN_AREA_CHANNELED)
+                if (i == TARGET_ALL_ENEMY_IN_AREA || i == TARGET_ALL_ENEMY_IN_AREA_INSTANT || i == TARGET_ALL_ENEMY_IN_AREA_CHANNELED)
                     return;
             }
 

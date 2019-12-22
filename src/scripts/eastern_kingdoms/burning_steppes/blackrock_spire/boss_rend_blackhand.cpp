@@ -70,9 +70,9 @@ struct boss_rend_blackhandAI : public ScriptedAI
         {
             m_uiCloseCombatCount = 0;
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+            for (auto i : tList)
             {
-                Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+                Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
                 if (pUnit && (pUnit->GetTypeId() == TYPEID_PLAYER) && (pUnit->GetDistance2d(m_creature) < 7.0f))
                     m_uiCloseCombatCount++;
             }

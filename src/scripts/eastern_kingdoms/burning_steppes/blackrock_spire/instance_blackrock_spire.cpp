@@ -487,10 +487,10 @@ void instance_blackrock_spire::Load(char const* chrIn)
     std::istringstream loadStream(chrIn);
     loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6];
 
-    for (uint8 i = 0; i < INSTANCE_BRS_MAX_ENCOUNTER; ++i)
+    for (unsigned int & i : m_auiEncounter)
     {
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
     }
 
     OUT_LOAD_INST_DATA_COMPLETE;
@@ -547,12 +547,12 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
     {
         if (GameObject* pRune = instance->GetGameObject(m_auiRoomRuneGUID[i]))
         {
-            for (std::list<uint64>::const_iterator itr = m_lRoomEventMobGUIDList.begin(); itr != m_lRoomEventMobGUIDList.end(); itr++)
+            for (std::_Simple_types<unsigned long long>::value_type itr : m_lRoomEventMobGUIDList)
             {
-                if (Creature* pCreature = instance->GetCreature(*itr))
+                if (Creature* pCreature = instance->GetCreature(itr))
                 {
                     if (pCreature->IsAlive() && pCreature->GetDistance(pRune) < 10.0f)
-                        m_alRoomEventMobGUIDSorted[i].push_back(*itr);
+                        m_alRoomEventMobGUIDSorted[i].push_back(itr);
                 }
 #ifdef DEBUG_ON
                 sLog.outString("Alcove %u : %u mobs", i,  m_alRoomEventMobGUIDSorted[i].size());

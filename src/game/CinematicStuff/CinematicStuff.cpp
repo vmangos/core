@@ -69,11 +69,11 @@ void CinematicStuff::Mount(Player* p, uint32 mountItem)
     {
         // search spell for spell error
         uint32 spellid = 0;
-        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        for (const auto & Spell : item->GetProto()->Spells)
         {
-            if (item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+            if (Spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || Spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
             {
-                spellid = item->GetProto()->Spells[i].SpellId;
+                spellid = Spell.SpellId;
                 break;
             }
         }

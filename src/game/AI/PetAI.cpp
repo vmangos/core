@@ -254,9 +254,9 @@ void PetAI::UpdateAI(uint32 const diff)
                 // No enemy, check friendly
                 if (!spellUsed)
                 {
-                    for (std::set<uint64>::const_iterator tar = m_AllySet.begin(); tar != m_AllySet.end(); ++tar)
+                    for (std::_Simple_types<unsigned long long>::value_type tar : m_AllySet)
                     {
-                        Unit* ally = m_creature->GetMap()->GetUnit(*tar);
+                        Unit* ally = m_creature->GetMap()->GetUnit(tar);
 
                         //only buff targets that are in combat, unless the spell can only be cast while out of combat
                         if (!ally)
@@ -322,8 +322,8 @@ void PetAI::UpdateAI(uint32 const diff)
         }
 
         // deleted cached Spell objects
-        for (TargetSpellList::const_iterator itr = targetSpellStore.begin(); itr != targetSpellStore.end(); ++itr)
-            itr->second->Delete();
+        for (const auto & itr : targetSpellStore)
+            itr.second->Delete();
     }
 
     // Update speed as needed to prevent dropping too far behind and despawning

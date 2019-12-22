@@ -107,10 +107,8 @@ bool Guild::Create(Petition* petition, Player* leader)
         return false;
 
     PetitionSignatureList signatures = petition->GetSignatureList();
-    for (auto iter = signatures.cbegin(); iter != signatures.cend(); ++iter)
+    for (auto signature : signatures)
     {
-        PetitionSignature* signature = *iter;
-
         if (signature->GetSignatureGuid().IsEmpty())
             continue;
 
@@ -341,9 +339,9 @@ bool Guild::CheckGuildStructure()
         SetLeader(m_LeaderGuid);
 
     // Allow only 1 guildmaster, set other to officer
-    for (MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
-        if (itr->second.RankId == GR_GUILDMASTER && m_LeaderGuid != itr->second.guid)
-            itr->second.ChangeRank(GR_OFFICER);
+    for (auto & member : members)
+        if (member.second.RankId == GR_GUILDMASTER && m_LeaderGuid != member.second.guid)
+            member.second.ChangeRank(GR_OFFICER);
 
     return true;
 }
@@ -533,18 +531,18 @@ bool Guild::DelMember(ObjectGuid guid, bool isDisbanding)
         MemberSlot* oldLeader = nullptr;
         MemberSlot* best = nullptr;
         ObjectGuid newLeaderGUID;
-        for (Guild::MemberList::iterator i = members.begin(); i != members.end(); ++i)
+        for (auto & member : members)
         {
-            if (i->first == lowguid)
+            if (member.first == lowguid)
             {
-                oldLeader = &(i->second);
+                oldLeader = &(member.second);
                 continue;
             }
 
-            if (!best || best->RankId > i->second.RankId)
+            if (!best || best->RankId > member.second.RankId)
             {
-                best = &(i->second);
-                newLeaderGUID = ObjectGuid(HIGHGUID_PLAYER, i->first);
+                best = &(member.second);
+                newLeaderGUID = ObjectGuid(HIGHGUID_PLAYER, member.first);
             }
         }
 
@@ -596,12 +594,12 @@ void Guild::BroadcastToGuild(WorldSession* session, std::string const& msg, uint
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_GUILD, msg.c_str(), Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
 
-    for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
+    for (const auto & member : members)
     {
-        if (!HasRankRight(itr->second.RankId, GR_RIGHT_GCHATLISTEN))
+        if (!HasRankRight(member.second.RankId, GR_RIGHT_GCHATLISTEN))
             continue;
 
-        MasterPlayer* pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+        MasterPlayer* pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
 
         if (pl && pl->GetSession() && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
             pl->GetSession()->SendPacket(&data);
@@ -620,12 +618,12 @@ void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, u
     WorldPacket data;
     ChatHandler::BuildChatPacket(data, CHAT_MSG_OFFICER, msg.c_str(), Language(language), pPlayer->GetChatTag(), pPlayer->GetObjectGuid(), pPlayer->GetName());
 
-    for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
+    for (const auto & member : members)
     {
-        if (!HasRankRight(itr->second.RankId, GR_RIGHT_OFFCHATLISTEN))
+        if (!HasRankRight(member.second.RankId, GR_RIGHT_OFFCHATLISTEN))
             continue;
 
-        MasterPlayer* pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+        MasterPlayer* pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
 
         if (pl && pl->GetSession() && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
             pl->GetSession()->SendPacket(&data);
@@ -634,9 +632,9 @@ void Guild::BroadcastToOfficers(WorldSession* session, std::string const& msg, u
 
 void Guild::BroadcastPacket(WorldPacket* packet)
 {
-    for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
+    for (const auto & member : members)
     {
-        Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+        Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
         if (player)
             player->GetSession()->SendPacket(packet);
     }
@@ -644,11 +642,11 @@ void Guild::BroadcastPacket(WorldPacket* packet)
 
 void Guild::BroadcastPacketToRank(WorldPacket* packet, uint32 rankId)
 {
-    for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
+    for (const auto & member : members)
     {
-        if (itr->second.RankId == rankId)
+        if (member.second.RankId == rankId)
         {
-            Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+            Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, member.first));
             if (player)
                 player->GetSession()->SendPacket(packet);
         }
@@ -761,8 +759,8 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
     data << GINFO;
 
     data << uint32(m_Ranks.size());
-    for (RankList::const_iterator ritr = m_Ranks.begin(); ritr != m_Ranks.end(); ++ritr)
-        data << uint32(ritr->Rights);
+    for (const auto & m_Rank : m_Ranks)
+        data << uint32(m_Rank.Rights);
 
     MemberList::const_iterator itr = members.begin();
     for (; itr != members.end(); ++itr)
@@ -851,8 +849,8 @@ uint32 Guild::GetAccountsNumber()
 
     //We use a set to be sure each element will be unique
     std::set<uint32> accountsIdSet;
-    for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
-        accountsIdSet.insert(itr->second.accountId);
+    for (const auto & member : members)
+        accountsIdSet.insert(member.second.accountId);
 
     m_accountsNumber = accountsIdSet.size();
 

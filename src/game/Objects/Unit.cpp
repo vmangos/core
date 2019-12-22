@@ -144,14 +144,14 @@ Unit::Unit()
     m_canModifyStats = false;
     m_modelCollisionHeight = 2.f;
 
-    for (int i = 0; i < MAX_SPELL_IMMUNITY; ++i)
-        m_spellImmune[i].clear();
-    for (int i = 0; i < UNIT_MOD_END; ++i)
+    for (auto & i : m_spellImmune)
+        i.clear();
+    for (auto & i : m_auraModifiersGroup)
     {
-        m_auraModifiersGroup[i][BASE_VALUE] = 0.0f;
-        m_auraModifiersGroup[i][BASE_PCT] = 1.0f;
-        m_auraModifiersGroup[i][TOTAL_VALUE] = 0.0f;
-        m_auraModifiersGroup[i][TOTAL_PCT] = 1.0f;
+        i[BASE_VALUE] = 0.0f;
+        i[BASE_PCT] = 1.0f;
+        i[TOTAL_VALUE] = 0.0f;
+        i[TOTAL_PCT] = 1.0f;
     }
     // implement 50% base damage from offhand
     m_auraModifiersGroup[UNIT_MOD_DAMAGE_OFFHAND][TOTAL_PCT] = 0.5f;
@@ -168,8 +168,8 @@ Unit::Unit()
         m_weaponDamageCount[i] = 1;
     }
 
-    for (int i = 0; i < MAX_STATS; ++i)
-        m_createStats[i] = 0.0f;
+    for (float & m_createStat : m_createStats)
+        m_createStat = 0.0f;
 
     for (auto& m_createResistance : m_createResistances)
         m_createResistance = 0;
@@ -185,11 +185,11 @@ Unit::Unit()
     m_lastManaUseSpellId = 0;
 
     //m_victimThreat = 0.0f;
-    for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
-        m_threatModifier[i] = 1.0f;
+    for (float & i : m_threatModifier)
+        i = 1.0f;
     
-    for (int i = 0; i < MAX_MOVE_TYPE; ++i)
-        m_speed_rate[i] = 1.0f;
+    for (float & i : m_speed_rate)
+        i = 1.0f;
 
     m_charmInfo = nullptr;
 
@@ -242,12 +242,12 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 
     // Nostalrius : systeme de contresort des mobs.
     // Boucle 1 pour regler les timers
-    for (ProhibitSpellList::iterator it = m_prohibitSpell.begin(); it != m_prohibitSpell.end(); ++it)
+    for (auto & it : m_prohibitSpell)
     {
-        if (it->RestingMsTime < update_diff)
-            it->RestingMsTime = 0;
+        if (it.RestingMsTime < update_diff)
+            it.RestingMsTime = 0;
         else
-            it->RestingMsTime -= update_diff;
+            it.RestingMsTime -= update_diff;
     }
     // Boucle 2 : supprimer les sorts avec Timer=0
     for (ProhibitSpellList::iterator it = m_prohibitSpell.begin(); it != m_prohibitSpell.end();)
@@ -3386,13 +3386,13 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder* holder)
 
         bool is_triggered_by_spell = false;
         // prevent triggering aura of removing aura that triggered it
-        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
-            if (i_spellProto->EffectTriggerSpell[j] == spellId)
+        for (unsigned int j : i_spellProto->EffectTriggerSpell)
+            if (j == spellId)
                 is_triggered_by_spell = true;
 
         // prevent triggered aura of removing aura that triggering it (triggered effect early some aura of parent spell
-        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
-            if (spellProto->EffectTriggerSpell[j] == i_spellId)
+        for (unsigned int j : spellProto->EffectTriggerSpell)
+            if (j == i_spellId)
                 is_triggered_by_spell = true;
 
         if (is_triggered_by_spell)
@@ -3822,9 +3822,9 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode)
     holder->UnregisterSingleCastHolder();
     holder->HandleCastOnAuraRemoval();
 
-    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (auto aura : holder->m_auras)
     {
-        if (Aura* aura = holder->m_auras[i])
+        if (aura)
             RemoveAura(aura, mode);
     }
 
@@ -4975,8 +4975,8 @@ Totem* Unit::GetTotem(TotemSlot slot) const
 
 bool Unit::IsAllTotemSlotsUsed() const
 {
-    for (int i = 0; i < MAX_TOTEM_SLOT; ++i)
-        if (!m_TotemSlot[i])
+    for (auto i : m_TotemSlot)
+        if (!i)
             return false;
     return true;
 }
@@ -4989,11 +4989,11 @@ void Unit::_AddTotem(TotemSlot slot, Totem* totem)
 
 void Unit::_RemoveTotem(Totem* totem)
 {
-    for (int i = 0; i < MAX_TOTEM_SLOT; ++i)
+    for (auto & i : m_TotemSlot)
     {
-        if (m_TotemSlot[i] == totem->GetObjectGuid())
+        if (i == totem->GetObjectGuid())
         {
-            m_TotemSlot[i].Clear();
+            i.Clear();
             break;
         }
     }
@@ -7762,8 +7762,8 @@ CharmInfo::CharmInfo(Unit* unit)
       _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
       _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
 {
-    for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
-        m_charmspells[i].SetActionAndType(0, ACT_DISABLED);
+    for (auto & m_charmspell : m_charmspells)
+        m_charmspell.SetActionAndType(0, ACT_DISABLED);
 }
 
 void CharmInfo::InitPetActionBar()
@@ -7797,11 +7797,11 @@ void CharmInfo::InitPossessCreateSpells()
     if (!pCreature)                                         
         return;
 
-    for (uint32 x = 0; x < CREATURE_MAX_SPELLS; ++x)
+    for (unsigned int m_spell : pCreature->m_spells)
     {
-        if (Spells::IsPassiveSpell(pCreature->m_spells[x]))
-            m_unit->CastSpell(m_unit, pCreature->m_spells[x], true);
-        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(pCreature->m_spells[x]))
+        if (Spells::IsPassiveSpell(m_spell))
+            m_unit->CastSpell(m_unit, m_spell, true);
+        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(m_spell))
 
             // World of Warcraft Client Patch 1.10.0 (2006-03-28)
             // - Charm spells on charmed creatures are no longer available to the
@@ -7810,7 +7810,7 @@ void CharmInfo::InitPossessCreateSpells()
             if (!pSpellEntry->IsCharmSpell())
 #endif
 
-                AddSpellToActionBar(pCreature->m_spells[x], ACT_PASSIVE);
+                AddSpellToActionBar(m_spell, ACT_PASSIVE);
     }
 }
 
@@ -7880,13 +7880,13 @@ bool CharmInfo::AddSpellToActionBar(uint32 spell_id, ActiveStates newstate)
     uint32 first_id = sSpellMgr.GetFirstSpellInChain(spell_id);
 
     // new spell rank can be already listed
-    for (uint8 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
+    for (auto & i : PetActionBar)
     {
-        if (uint32 action = PetActionBar[i].GetAction())
+        if (uint32 action = i.GetAction())
         {
-            if (PetActionBar[i].IsActionBarForSpell() && sSpellMgr.GetFirstSpellInChain(action) == first_id)
+            if (i.IsActionBarForSpell() && sSpellMgr.GetFirstSpellInChain(action) == first_id)
             {
-                PetActionBar[i].SetAction(spell_id);
+                i.SetAction(spell_id);
                 return true;
             }
         }
@@ -7928,9 +7928,9 @@ void CharmInfo::ToggleCreatureAutocast(uint32 spellid, bool apply)
     if (Spells::IsPassiveSpell(spellid))
         return;
 
-    for (uint32 x = 0; x < CREATURE_MAX_SPELLS; ++x)
-        if (spellid == m_charmspells[x].GetAction())
-            m_charmspells[x].SetType(apply ? ACT_ENABLED : ACT_DISABLED);
+    for (auto & m_charmspell : m_charmspells)
+        if (spellid == m_charmspell.GetAction())
+            m_charmspell.SetType(apply ? ACT_ENABLED : ACT_DISABLED);
 }
 
 void CharmInfo::SetPetNumber(uint32 petnumber, bool statwindow)
@@ -7970,17 +7970,17 @@ void CharmInfo::LoadPetActionBar(std::string const& data)
 
 void CharmInfo::BuildActionBar(WorldPacket* data)
 {
-    for (uint32 i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
-        *data << uint32(PetActionBar[i].packedData);
+    for (auto & i : PetActionBar)
+        *data << uint32(i.packedData);
 }
 
 void CharmInfo::SetSpellAutocast(uint32 spell_id, bool state)
 {
-    for (int i = 0; i < MAX_UNIT_ACTION_BAR_INDEX; ++i)
+    for (auto & i : PetActionBar)
     {
-        if (spell_id == PetActionBar[i].GetAction() && PetActionBar[i].IsActionBarForSpell())
+        if (spell_id == i.GetAction() && i.IsActionBarForSpell())
         {
-            PetActionBar[i].SetType(state ? ACT_ENABLED : ACT_DISABLED);
+            i.SetType(state ? ACT_ENABLED : ACT_DISABLED);
             break;
         }
     }
@@ -10201,13 +10201,13 @@ void Unit::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 item
     {
         if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId))
         {
-            for (int idx = 0; idx < MAX_ITEM_PROTO_SPELLS; ++idx)
+            for (const auto & Spell : proto->Spells)
             {
-                if (proto->Spells[idx].SpellId == spellInfo->Id)
+                if (Spell.SpellId == spellInfo->Id)
                 {
-                    cat    = proto->Spells[idx].SpellCategory;
-                    rec    = proto->Spells[idx].SpellCooldown;
-                    catrec = proto->Spells[idx].SpellCategoryCooldown;
+                    cat    = Spell.SpellCategory;
+                    rec    = Spell.SpellCooldown;
+                    catrec = Spell.SpellCategoryCooldown;
                     break;
                 }
             }

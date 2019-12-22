@@ -519,9 +519,9 @@ class SpellEntry
             uint32 mask = 0;
             if (Mechanic)
                 mask |= 1 << (Mechanic - 1);
-            for (int i=0; i< MAX_EFFECT_INDEX; ++i)
-                if (EffectMechanic[i])
-                    mask |= 1 << (EffectMechanic[i]-1);
+            for (unsigned int i : EffectMechanic)
+                if (i)
+                    mask |= 1 << (i-1);
             return mask;
         }
 
@@ -533,8 +533,8 @@ class SpellEntry
 
         inline bool HasEffect(SpellEffects effect) const
         {
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-                if (SpellEffects(Effect[i]) == effect)
+            for (unsigned int i : Effect)
+                if (SpellEffects(i) == effect)
                     return true;
             return false;
         }
@@ -594,8 +594,8 @@ class SpellEntry
 
         inline bool HasAura(AuraType aura) const
         {
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-                if (AuraType(EffectApplyAuraName[i]) == aura)
+            for (unsigned int i : EffectApplyAuraName)
+                if (AuraType(i) == aura)
                     return true;
             return false;
         }
@@ -746,9 +746,9 @@ class SpellEntry
 
         inline bool HasAuraWithSpellTriggerEffect() const
         {
-            for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (unsigned int i : EffectApplyAuraName)
             {
-                switch (EffectApplyAuraName[i])
+                switch (i)
                 {
                     case SPELL_AURA_PROC_TRIGGER_SPELL:
                         return true;

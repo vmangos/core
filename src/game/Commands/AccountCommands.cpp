@@ -564,12 +564,12 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
     }
 
     uint32 bannedCount = 0;
-    for (std::set<uint32>::const_iterator it = accountsToBan.begin(); it != accountsToBan.end(); ++it)
+    for (std::_Simple_types<unsigned int>::value_type it : accountsToBan)
     {
-        if (sAccountMgr.IsAccountBanned(*it))
+        if (sAccountMgr.IsAccountBanned(it))
             continue;
-        sWorld.BanAccount(BAN_ACCOUNT, accountsIdToName[*it], 0, reason, m_session ? m_session->GetPlayerName() : "");
-        PSendSysMessage("Account '%s' permanently banned.", accountsIdToName[*it].c_str(), reason);
+        sWorld.BanAccount(BAN_ACCOUNT, accountsIdToName[it], 0, reason, m_session ? m_session->GetPlayerName() : "");
+        PSendSysMessage("Account '%s' permanently banned.", accountsIdToName[it].c_str(), reason);
         ++bannedCount;
     }
     PSendSysMessage("%u accounts banned for %s (%u on this IP)", bannedCount, reason, accountsIdToName.size());
@@ -1056,8 +1056,8 @@ bool ChatHandler::HandleListAddonsCommand(char* args)
 
     std::set<std::string> const& addons = player->GetSession()->GetAddons();
     PSendSysMessage("%u addons on target.", addons.size());
-    for (std::set<std::string>::const_iterator it = addons.begin(); it != addons.end(); ++it)
-        PSendSysMessage(">> %s", it->c_str());
+    for (const auto & addon : addons)
+        PSendSysMessage(">> %s", addon.c_str());
     return true;
 }
 
@@ -1070,8 +1070,8 @@ bool ChatHandler::HandleClientInfosCommand(char* args)
         return false;
 
     PSendSysMessage("Account %s has %u client identifiers.", player->GetSession()->GetUsername().c_str(), player->GetSession()->GetClientIdentifiers().size());
-    for (ClientIdentifiersMap::const_iterator it = player->GetSession()->GetClientIdentifiers().begin(); it != player->GetSession()->GetClientIdentifiers().end(); ++it)
-        PSendSysMessage("%u: %s", it->first, it->second.c_str());
+    for (const auto & it : player->GetSession()->GetClientIdentifiers())
+        PSendSysMessage("%u: %s", it.first, it.second.c_str());
     player->GetSession()->ComputeClientHash();
     PSendSysMessage("Hash is %s", playerLink(player->GetSession()->GetClientHash()).c_str());
     return true;
@@ -1083,18 +1083,18 @@ bool ChatHandler::HandleClientSearchCommand(char* args)
     std::string searchedHash = args;
     uint32 i = 0;
     World::SessionMap const& sessMap = sWorld.GetAllSessions();
-    for (World::SessionMap::const_iterator itr = sessMap.begin(); itr != sessMap.end(); ++itr)
+    for (const auto & itr : sessMap)
     {
-        if (!itr->second)
+        if (!itr.second)
             continue;
 
-        std::string currentHash = itr->second->GetClientHash();
+        std::string currentHash = itr.second->GetClientHash();
         if (currentHash.find(searchedHash) != std::string::npos)
         {
             PSendSysMessage("%s on account %s, %s",
-                            playerLink(itr->second->GetPlayerName()).c_str(),
-                            playerLink(itr->second->GetUsername()).c_str(),
-                            playerLink(itr->second->GetRemoteAddress()).c_str());
+                            playerLink(itr.second->GetPlayerName()).c_str(),
+                            playerLink(itr.second->GetUsername()).c_str(),
+                            playerLink(itr.second->GetRemoteAddress()).c_str());
             ++i;
         }
     }

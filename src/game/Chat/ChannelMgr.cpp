@@ -43,8 +43,8 @@ ChannelMgr* channelMgr(Team team)
 
 ChannelMgr::~ChannelMgr()
 {
-    for (ChannelMap::iterator itr = channels.begin(); itr != channels.end(); ++itr)
-        delete itr->second;
+    for (auto & channel : channels)
+        delete channel.second;
 
     channels.clear();
 }
@@ -124,8 +124,8 @@ void ChannelMgr::CreateDefaultChannels()
     GetJoinChannel("ChatSpam")->SetSecurityLevel(SEC_MODERATOR);
     GetJoinChannel("LowLevelBots")->SetSecurityLevel(SEC_GAMEMASTER);
 
-    for (ChannelMap::iterator it = channels.begin(); it != channels.end(); ++it)
-        it->second->SetAnnounce(false);
+    for (auto & channel : channels)
+        channel.second->SetAnnounce(false);
 }
 
 void ChannelMgr::AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, char const* message)

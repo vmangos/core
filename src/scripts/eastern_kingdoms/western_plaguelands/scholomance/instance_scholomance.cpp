@@ -331,8 +331,8 @@ struct instance_scholomance : public ScriptedInstance
         if (uiData == DONE)
         {
             std::ostringstream saveStream;
-            for (uint8 i = 0; i < INSTANCE_SCHOLOMANCE_MAX_ENCOUNTER; ++i)
-                saveStream << m_auiEncounter[i] << " ";
+            for (unsigned int i : m_auiEncounter)
+                saveStream << i << " ";
             strInstData = saveStream.str();
 
             SaveToDB();
@@ -351,11 +351,11 @@ struct instance_scholomance : public ScriptedInstance
         if (!chrIn)
             return;
         std::istringstream loadStream(chrIn);
-        for (uint8 i = 0; i < INSTANCE_SCHOLOMANCE_MAX_ENCOUNTER; ++i)
+        for (unsigned int & i : m_auiEncounter)
         {
-            loadStream >> m_auiEncounter[i];
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+            loadStream >> i;
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
         }
         SummonGandlingIfPossible();
 

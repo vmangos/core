@@ -230,8 +230,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
             TimerArcher[i] = 5000;
             ArchersGUIDs[i] = 0;
         }
-        for (int i = 0; i < 50; i++)
-            VillageoisGUIDs[i] = 0;
+        for (unsigned long long & VillageoisGUID : VillageoisGUIDs)
+            VillageoisGUID = 0;
     }
 
     void AttackedBy(Unit* /*Attacker*/) override {}
@@ -458,8 +458,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
             TimerArcher[i] = 5000;
             ArchersGUIDs[i] = 0;
         }
-        for (int i = 0; i < 50; i++)
-            VillageoisGUIDs[i] = 0;
+        for (unsigned long long & VillageoisGUID : VillageoisGUIDs)
+            VillageoisGUID = 0;
 
         for (int i = ArcherPop0; i < Fin; i++)
             m_creature->SummonCreature(NPC_ARCHER, ErisHavenfireEvent[i].X, ErisHavenfireEvent[i].Y, ErisHavenfireEvent[i].Z, ErisHavenfireEvent[i].O, TEMPSUMMON_DEAD_DESPAWN, 0);
@@ -568,9 +568,9 @@ struct npc_eris_havenfireAI : public ScriptedAI
         uint32 myArea = m_creature->GetAreaId();
         if (!pl.isEmpty() && myArea && BeginQuete)
         {
-            for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
+            for (const auto & it : pl)
             {
-                Player* currPlayer =  it->getSource();
+                Player* currPlayer =  it.getSource();
                 if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
                 {
                     if (currPlayer->IsGameMaster())
@@ -599,9 +599,9 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 Player* player = GetPlayer();
                 EchecEvent(player, false);
 
-                for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
+                for (const auto & it : pl)
                 {
-                    Player* currPlayer =  it->getSource();
+                    Player* currPlayer =  it.getSource();
                     if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
                         if (player && player != currPlayer && currPlayer->IsAlive() && !currPlayer->IsGameMaster())
                             Crea->AddThreat(currPlayer, 1000.0f);
@@ -668,8 +668,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
                         int Damage = urand(50, 100);
                         uint64 GUIDs[50];
 
-                        for (int j = 0; j < 50; j++)
-                            GUIDs[j] = 0;
+                        for (unsigned long long & GUID : GUIDs)
+                            GUID = 0;
 
                         while (Var < 50)
                         {
@@ -907,9 +907,9 @@ struct npc_demetriaAI : public ScriptedAI
     }
     void DespawnTroopers()
     {
-        for (int i = 0; i < 9; i++)
+        for (unsigned long long i : guidScarletTrooper)
         {
-            if (Creature* pTrooper = m_creature->GetMap()->GetCreature(guidScarletTrooper[i]))
+            if (Creature* pTrooper = m_creature->GetMap()->GetCreature(i))
                 pTrooper->AddObjectToRemoveList();
         }
     }
@@ -1137,9 +1137,9 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         uint32 myArea = m_creature->GetAreaId();
         if (!pl.isEmpty() && myArea)
         {
-            for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
+            for (const auto & it : pl)
             {
-                Player* pPlayer =  it->getSource();
+                Player* pPlayer =  it.getSource();
                 if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster() && m_creature->IsWithinDist(pPlayer, 20.0f, false))
                 {
                     if (pPlayer->GetQuestStatus(QUEST_BATTLE_DARROWSHIRE) == QUEST_STATUS_INCOMPLETE)
@@ -1179,12 +1179,12 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
     void DespawnAll()
     {
         _cleanupDone = true;
-        for (int i = 0; i < 7; i++)
-            MobTimer[i] = 0;
+        for (unsigned int & i : MobTimer)
+            i = 0;
         PhaseTimer = 0;
 
-        for (std::list<ObjectGuid>::const_iterator itr = summonedMobsList.begin(); itr != summonedMobsList.end(); ++itr)
-            if (Creature* creature = m_creature->GetMap()->GetCreature(*itr))
+        for (auto itr : summonedMobsList)
+            if (Creature* creature = m_creature->GetMap()->GetCreature(itr))
                 if (creature->IsAlive() && creature->GetEntry() != NPC_JOSEPH_REDPATH && creature->GetEntry() != NPC_DAVIL_CROKFORD)
                     creature->ForcedDespawn(5000);
 
@@ -1484,9 +1484,9 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                     }
                     case 6: // gestion patrouille NPC_DAVIL_LIGHTFIRE NPC_BLOODLETTER NPC_CAPTAIN_REDPATH
                     {
-                        for (std::list<ObjectGuid>::const_iterator itr = summonedMobsList.begin(); itr != summonedMobsList.end(); ++itr)
+                        for (auto itr : summonedMobsList)
                         {
-                            if (Creature* Crea = m_creature->GetMap()->GetCreature(*itr))
+                            if (Creature* Crea = m_creature->GetMap()->GetCreature(itr))
                             {
                                 if (Crea->GetEntry() != NPC_BLOODLETTER && Crea->GetEntry() != NPC_DAVIL_LIGHTFIRE && Crea->GetEntry() != NPC_CAPTAIN_REDPATH)
                                     continue;

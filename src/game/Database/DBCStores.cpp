@@ -333,9 +333,9 @@ void LoadDBCStores(std::string const& dataPath)
 
             // add total amount bits for first rank starting from talent tab first talent rank pos.
             uint32 pos = 0;
-            for (TalentBitSize::iterator itr = sTalentBitSize.begin(); itr != sTalentBitSize.end(); ++itr)
+            for (auto & itr : sTalentBitSize)
             {
-                uint32 talentId = itr->first & 0xFFFF;
+                uint32 talentId = itr.first & 0xFFFF;
                 TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
                 if (!talentInfo)
                     continue;
@@ -344,7 +344,7 @@ void LoadDBCStores(std::string const& dataPath)
                     continue;
 
                 sTalentPosInInspect[talentId] = pos;
-                pos += itr->second;
+                pos += itr.second;
             }
         }
     }
@@ -396,10 +396,10 @@ void LoadDBCStores(std::string const& dataPath)
             if (src_i != sTaxiPathSetBySource.end() && !src_i->second.empty())
             {
                 bool ok = false;
-                for (TaxiPathSetForSource::const_iterator dest_i = src_i->second.begin(); dest_i != src_i->second.end(); ++dest_i)
+                for (const auto & dest_i : src_i->second)
                 {
                     // not spell path
-                    if (spellPaths.find(dest_i->second.ID) == spellPaths.end())
+                    if (spellPaths.find(dest_i.second.ID) == spellPaths.end())
                     {
                         ok = true;
                         break;
@@ -442,8 +442,8 @@ void LoadDBCStores(std::string const& dataPath)
     else if (!bad_dbc_files.empty())
     {
         std::string str;
-        for (std::list<std::string>::iterator i = bad_dbc_files.begin(); i != bad_dbc_files.end(); ++i)
-            str += *i + "\n";
+        for (auto & bad_dbc_file : bad_dbc_files)
+            str += bad_dbc_file + "\n";
 
         sLog.outError("\nSome required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFilesCount, str.c_str());
         Log::WaitBeforeContinueIfNeed();
@@ -516,9 +516,9 @@ ChatChannelsEntry const* GetChannelEntryFor(std::string const& name)
         if (ch)
         {
             // need to remove %s from entryName if it exists before we match
-            for (int loc = 0; loc < MAX_DBC_LOCALE; ++loc)
+            for (auto loc : ch->pattern)
             {
-                std::string entryName(ch->pattern[loc]);
+                std::string entryName(loc);
                 std::size_t removeString = entryName.find("%s");
                 // Not loaded locale
                 if (entryName.empty())

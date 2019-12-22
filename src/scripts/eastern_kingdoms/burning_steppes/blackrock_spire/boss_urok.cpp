@@ -94,8 +94,8 @@ struct go_urok_challengeAI: public GameObjectAI
                 }
                 // Mise en combat avec tout le monde
                 Map::PlayerList const& list = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
-                    if (Player* player = it->getSource())
+                for (const auto & it : list)
+                    if (Player* player = it.getSource())
                         if (player->IsAlive() && !invoc->IsFriendlyTo(player))
                             invoc->AI()->AttackStart(player);
             }
@@ -116,8 +116,8 @@ struct go_urok_challengeAI: public GameObjectAI
 
     void DespawnRunes()
     {
-        for (int i = 0; i < 6; i++)
-            if (GameObject* go = me->GetMap()->GetGameObject(_runes[i]))
+        for (auto _rune : _runes)
+            if (GameObject* go = me->GetMap()->GetGameObject(_rune))
                 go->AddObjectToRemoveList();
     }
 

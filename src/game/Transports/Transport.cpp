@@ -359,8 +359,8 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
 void Transport::UpdatePassengerPositions(PassengerSet& passengers)
 {
-    for (PassengerSet::iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
-        UpdatePassengerPosition(*itr);
+    for (auto passenger : passengers)
+        UpdatePassengerPosition(passenger);
 }
 void Transport::UpdatePassengerPosition(WorldObject* passenger)
 {
@@ -416,8 +416,8 @@ void Transport::BuildUpdate(UpdateDataMapType& data_map)
     if (players.isEmpty())
         return;
 
-    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-        BuildUpdateDataForPlayer(itr->getSource(), data_map);
+    for (const auto & player : players)
+        BuildUpdateDataForPlayer(player.getSource(), data_map);
 
     ClearUpdateMask(true);
 }
@@ -432,9 +432,9 @@ void Transport::SendOutOfRangeUpdateToMap()
         BuildOutOfRangeUpdateBlock(&data);
         WorldPacket packet;
         data.BuildPacket(&packet);
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (itr->getSource()->GetTransport() != this)
-                itr->getSource()->SendDirectMessage(&packet);
+        for (const auto & player : players)
+            if (player.getSource()->GetTransport() != this)
+                player.getSource()->SendDirectMessage(&packet);
     }
 }
 
@@ -443,12 +443,12 @@ void Transport::SendCreateUpdateToMap()
     Map::PlayerList const& players = GetMap()->GetPlayers();
     if (!players.isEmpty())
     {
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (itr->getSource()->GetTransport() != this)
+        for (const auto & player : players)
+            if (player.getSource()->GetTransport() != this)
             {
                 UpdateData data;
-                BuildCreateUpdateBlockForPlayer(&data, itr->getSource());
-                data.Send(itr->getSource()->GetSession());
+                BuildCreateUpdateBlockForPlayer(&data, player.getSource());
+                data.Send(player.getSource()->GetSession());
             }
     }
 }

@@ -27,8 +27,8 @@ private:
 public:
 
     MD5Hash() {
-        for (int i = 0; i < 16; ++i) {
-            value[i] = 0;
+        for (unsigned char & i : value) {
+            i = 0;
         }
     }
 

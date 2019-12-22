@@ -120,16 +120,16 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
                     GameObject* pCaveInNorth = instance->GetGameObject(m_uiCaveInNorthGUID);
                     if (pCaveInSouth && pCaveInNorth)
                     {
-                        for (std::list<GameObject*>::iterator itr = m_lExplosiveCharges.begin(); itr != m_lExplosiveCharges.end(); itr++)
+                        for (auto & m_lExplosiveCharge : m_lExplosiveCharges)
                         {
-                            if ((*itr)->GetDistanceOrder(pCaveInSouth, pCaveInNorth) && uiCounterSouth < MAX_EXPLOSIVES_PER_SIDE)
+                            if (m_lExplosiveCharge->GetDistanceOrder(pCaveInSouth, pCaveInNorth) && uiCounterSouth < MAX_EXPLOSIVES_PER_SIDE)
                             {
-                                m_auiExplosiveSortedGUIDs[0][uiCounterSouth] = (*itr)->GetGUID();
+                                m_auiExplosiveSortedGUIDs[0][uiCounterSouth] = m_lExplosiveCharge->GetGUID();
                                 uiCounterSouth++;
                             }
                             else if (uiCounterNorth < MAX_EXPLOSIVES_PER_SIDE)
                             {
-                                m_auiExplosiveSortedGUIDs[1][uiCounterNorth] = (*itr)->GetGUID();
+                                m_auiExplosiveSortedGUIDs[1][uiCounterNorth] = m_lExplosiveCharge->GetGUID();
                                 uiCounterNorth++;
                             }
                         }
@@ -144,8 +144,8 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
             }
             if (uiData == DONE)
             {
-                for (std::list<uint64>::const_iterator itr = m_lRedRocketGUIDs.begin(); itr != m_lRedRocketGUIDs.end(); itr++)
-                    DoRespawnGameObject(*itr, HOUR);
+                for (std::_Simple_types<unsigned long long>::value_type m_lRedRocketGUID : m_lRedRocketGUIDs)
+                    DoRespawnGameObject(m_lRedRocketGUID, HOUR);
             }
             break;
         case TYPE_EXPLOSIVE_CHARGE:
@@ -171,9 +171,9 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
                     Creature* pBlastmaster = instance->GetCreature(m_uiBlastmasterShortfuseGUID);
                     if (!pBlastmaster)
                         break;
-                    for (std::list<uint64>::const_iterator itr = m_luiSpawnedExplosiveChargeGUIDs.begin(); itr != m_luiSpawnedExplosiveChargeGUIDs.end(); itr++)
+                    for (std::_Simple_types<unsigned long long>::value_type m_luiSpawnedExplosiveChargeGUID : m_luiSpawnedExplosiveChargeGUIDs)
                     {
-                        if (GameObject* pExplosive = instance->GetGameObject(*itr))
+                        if (GameObject* pExplosive = instance->GetGameObject(m_luiSpawnedExplosiveChargeGUID))
                             pExplosive->Use(pBlastmaster);
                     }
                     m_luiSpawnedExplosiveChargeGUIDs.clear();
@@ -241,9 +241,9 @@ void instance_gnomeregan::Load(char const* chrIn)
     std::istringstream loadStream(chrIn);
     loadStream >> m_auiEncounter[0] >> m_auiEncounter[1];
 
-    for (uint8 i = 0; i < INSTANCE_GNOMEREGAN_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+    for (unsigned int & i : m_auiEncounter)
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
 
     OUT_LOAD_INST_DATA_COMPLETE;
 }

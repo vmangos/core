@@ -540,9 +540,9 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                 if (spellId)
                 {
                     // TODO find out why this is here, because m_UniqueUsers is empty for GAMEOBJECT_TYPE_GOOBER
-                    for (GuidsSet::const_iterator itr = m_UniqueUsers.begin(); itr != m_UniqueUsers.end(); ++itr)
+                    for (auto m_UniqueUser : m_UniqueUsers)
                     {
-                        if (Player* owner = GetMap()->GetPlayer(*itr))
+                        if (Player* owner = GetMap()->GetPlayer(m_UniqueUser))
                             owner->CastSpell(owner, spellId, false, nullptr, nullptr, GetObjectGuid());
                     }
 

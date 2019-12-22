@@ -225,11 +225,11 @@ struct boss_loathebAI : public ScriptedAI
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
 
-        for (int i = 0; i < MAX_STALKS_UP; i++)
+        for (auto & eyeStalk : eyeStalks)
         {
-            eyeStalks[i].currentState = EyeStalkInfo::COOLDOWN;
-            eyeStalks[i].timer = urand(0, 10000);
-            eyeStalks[i].guid = 0;
+            eyeStalk.currentState = EyeStalkInfo::COOLDOWN;
+            eyeStalk.timer = urand(0, 10000);
+            eyeStalk.guid = 0;
         }
         availableEyeLocs.clear();
         for (uint8 i = 0; i < max_stalks; i++)
@@ -296,17 +296,17 @@ struct boss_loathebAI : public ScriptedAI
     */
     void WhackAStalk(uint32 diff)
     {
-        for (int i = 0; i < MAX_STALKS_UP; i++)
+        for (auto & eyeStalk : eyeStalks)
         {
-            if (eyeStalks[i].timer >= diff)
-                eyeStalks[i].timer -= diff;
+            if (eyeStalk.timer >= diff)
+                eyeStalk.timer -= diff;
 
-            switch (eyeStalks[i].currentState)
+            switch (eyeStalk.currentState)
             {
             case EyeStalkInfo::COOLDOWN:
             {
                 // Summoning a new eye
-                if (eyeStalks[i].timer < diff)
+                if (eyeStalk.timer < diff)
                 {
                     if (availableEyeLocs.empty())
                     {
@@ -317,7 +317,7 @@ struct boss_loathebAI : public ScriptedAI
                     uint8 newEyeIdx = availableEyeLocs[availableIndex];
                     availableEyeLocs.erase(availableEyeLocs.begin() + availableIndex);
 
-                    eyeStalks[i].myIndex = newEyeIdx;
+                    eyeStalk.myIndex = newEyeIdx;
                     float const* pos = eyeStalkPossitions[newEyeIdx];
 
                     Creature* pStalk = m_creature->SummonCreature(NPC_EyeStalk, pos[0], pos[1], pos[2], pos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
@@ -326,17 +326,17 @@ struct boss_loathebAI : public ScriptedAI
                         sLog.outError("Heigans WhackAStalk failed to summon eye stalk");
                         return;
                     }
-                    eyeStalks[i].guid = pStalk->GetObjectGuid();
-                    eyeStalks[i].currentState = EyeStalkInfo::UP;
-                    eyeStalks[i].timer = urand(15000, 20000);
+                    eyeStalk.guid = pStalk->GetObjectGuid();
+                    eyeStalk.currentState = EyeStalkInfo::UP;
+                    eyeStalk.timer = urand(15000, 20000);
                 }
                 break;
             }
             case EyeStalkInfo::UP:
                 // Initiating unsummon
-                if (eyeStalks[i].timer < diff)
+                if (eyeStalk.timer < diff)
                 {
-                    if (Creature* pCreature = m_pInstance->GetCreature(eyeStalks[i].guid))
+                    if (Creature* pCreature = m_pInstance->GetCreature(eyeStalk.guid))
                     {
                         // If the eye is currently channeling mind flay we wait with unsummoning it
                         if (!pCreature->IsNonMeleeSpellCasted())
@@ -360,18 +360,18 @@ struct boss_loathebAI : public ScriptedAI
     {
         if (pCreature->GetEntry() == NPC_EyeStalk)
         {
-            for (int i = 0; i < MAX_STALKS_UP; i++)
+            for (auto & eyeStalk : eyeStalks)
             {
-                if (eyeStalks[i].guid == pCreature->GetObjectGuid())
+                if (eyeStalk.guid == pCreature->GetObjectGuid())
                 {
                     // if currentState already is COOLDOWN it means it was killed
-                    if (eyeStalks[i].currentState != EyeStalkInfo::COOLDOWN)
+                    if (eyeStalk.currentState != EyeStalkInfo::COOLDOWN)
                     {
-                        eyeStalks[i].currentState = EyeStalkInfo::COOLDOWN;
-                        eyeStalks[i].timer = urand(1000, 5000);
+                        eyeStalk.currentState = EyeStalkInfo::COOLDOWN;
+                        eyeStalk.timer = urand(1000, 5000);
                     }
-                    eyeStalks[i].guid = 0;
-                    availableEyeLocs.push_back(eyeStalks[i].myIndex);
+                    eyeStalk.guid = 0;
+                    availableEyeLocs.push_back(eyeStalk.myIndex);
                     break;
                 }
             }
@@ -383,12 +383,12 @@ struct boss_loathebAI : public ScriptedAI
         if (pCreature->GetEntry() == NPC_EyeStalk)
         {
             // was killed, so it receives an additional 10 seconds cooldown
-            for (int i = 0; i < MAX_STALKS_UP; i++)
+            for (auto & eyeStalk : eyeStalks)
             {
-                if (eyeStalks[i].guid == pCreature->GetObjectGuid())
+                if (eyeStalk.guid == pCreature->GetObjectGuid())
                 {
-                    eyeStalks[i].currentState = EyeStalkInfo::COOLDOWN;
-                    eyeStalks[i].timer = urand(1000, 5000) + 20000;
+                    eyeStalk.currentState = EyeStalkInfo::COOLDOWN;
+                    eyeStalk.timer = urand(1000, 5000) + 20000;
                     break;
                 }
             }

@@ -349,8 +349,8 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     case 26789:                             // Shard of the Fallen Star
                     {
                         uint32 count = 0;
-                        for (TargetList::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
-                            if (ihit->effectMask & (1 << effect_idx))
+                        for (const auto & ihit : m_UniqueTargetInfo)
+                            if (ihit.effectMask & (1 << effect_idx))
                                 ++count;
 
                         damage /= count;                    // divide to all targets
@@ -454,13 +454,13 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 {
                     // for caster applied auras only
                     Unit::AuraList const& mPeriodic = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for (Unit::AuraList::const_iterator i = mPeriodic.begin(); i != mPeriodic.end(); ++i)
+                    for (auto i : mPeriodic)
                     {
                         // Immolate
-                        if ((*i)->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
-                            (*i)->GetCasterGuid() == m_caster->GetObjectGuid())
+                        if (i->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
+                            i->GetCasterGuid() == m_caster->GetObjectGuid())
                         {
-                            unitTarget->RemoveAurasByCasterSpell((*i)->GetId(), m_caster->GetObjectGuid());
+                            unitTarget->RemoveAurasByCasterSpell(i->GetId(), m_caster->GetObjectGuid());
                             break;
                         }
                     }
@@ -993,13 +993,13 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     //immediately finishes the cooldown on certain Rogue abilities
                     SpellCooldowns cm = ((Player*)m_caster)->GetSpellCooldownMap();
-                    for (SpellCooldowns::const_iterator itr = cm.begin(); itr != cm.end(); ++itr)
+                    for (const auto & itr : cm)
                     {
-                        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
+                        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
 
                         if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE &&
                                 spellInfo->Id != m_spellInfo->Id && spellInfo->GetRecoveryTime() > 0)
-                            ((Player*)m_caster)->RemoveSpellCooldown(itr->first, true);
+                            ((Player*)m_caster)->RemoveSpellCooldown(itr.first, true);
                     }
                     return;
                 }
@@ -1091,9 +1091,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     // Need remove self if Lightning Shield not active
                     Unit::SpellAuraHolderMap const& auras = unitTarget->GetSpellAuraHolderMap();
-                    for (Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+                    for (const auto & aura : auras)
                     {
-                        SpellEntry const* spell = itr->second->GetSpellProto();
+                        SpellEntry const* spell = aura.second->GetSpellProto();
                         if (spell->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_LIGHTNING_SHIELD>())
                             return;
                     }
@@ -1740,11 +1740,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     int32 mana = dmg;
 
                     Unit::AuraList const& auraDummy = m_casterUnit->GetAurasByType(SPELL_AURA_DUMMY);
-                    for (Unit::AuraList::const_iterator itr = auraDummy.begin(); itr != auraDummy.end(); ++itr)
+                    for (auto itr : auraDummy)
                     {
                         // only Imp. Life Tap have this in combination with dummy aura
-                        if ((*itr)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK && (*itr)->GetSpellProto()->SpellIconID == 208)
-                            mana = ((*itr)->GetModifier()->m_amount + 100) * mana / 100;
+                        if (itr->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK && itr->GetSpellProto()->SpellIconID == 208)
+                            mana = (itr->GetModifier()->m_amount + 100) * mana / 100;
                     }
 
                     m_casterUnit->CastCustomSpell(m_casterUnit, 31818, &mana, nullptr, nullptr, true, nullptr);
@@ -2077,13 +2077,13 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
             // get highest rank of the Stealth spell
             uint32 spellId = 0;
             PlayerSpellMap const& sp_list = ((Player*)unitTarget)->GetSpellMap();
-            for (PlayerSpellMap::const_iterator itr = sp_list.begin(); itr != sp_list.end(); ++itr)
+            for (const auto & itr : sp_list)
             {
                 // only highest rank is shown in spell book, so simply check if shown in spell book
-                if (!itr->second.active || itr->second.disabled || itr->second.state == PLAYERSPELL_REMOVED)
+                if (!itr.second.active || itr.second.disabled || itr.second.state == PLAYERSPELL_REMOVED)
                     continue;
 
-                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
+                SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
                 if (!spellInfo)
                     continue;
 
@@ -2442,12 +2442,12 @@ void Spell::EffectHeal(SpellEffectIndex eff_idx)
             Unit::AuraList const& RejorRegr = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_HEAL);
             // find most short by duration
             Aura* targetAura = nullptr;
-            for (Unit::AuraList::const_iterator i = RejorRegr.begin(); i != RejorRegr.end(); ++i)
+            for (auto i : RejorRegr)
             {
                 // Regrowth or Rejuvenation
-                if ((*i)->GetSpellProto()->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION, CF_DRUID_REGROWTH>())
-                    if (!targetAura || (*i)->GetAuraDuration() < targetAura->GetAuraDuration())
-                        targetAura = *i;
+                if (i->GetSpellProto()->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION, CF_DRUID_REGROWTH>())
+                    if (!targetAura || i->GetAuraDuration() < targetAura->GetAuraDuration())
+                        targetAura = i;
             }
 
             if (!targetAura)
@@ -3135,9 +3135,9 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
     int32 dispel_type = m_spellInfo->EffectMiscValue[eff_idx];
     uint32 dispelMask  = GetDispellMask(dispel_type < 0 ? DISPEL_ALL : DispelType(dispel_type));
     Unit::SpellAuraHolderMap const& auras = unitTarget->GetSpellAuraHolderMap();
-    for (Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
+    for (const auto & aura : auras)
     {
-        SpellAuraHolder* holder = itr->second;
+        SpellAuraHolder* holder = aura.second;
         if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
         {
             if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC ||
@@ -3212,11 +3212,11 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             else
             {
                 bool foundDispelled = false;
-                for (std::list<std::pair<SpellAuraHolder*, uint32> >::iterator success_iter = success_list.begin(); success_iter != success_list.end(); ++success_iter)
+                for (auto & success_iter : success_list)
                 {
-                    if (success_iter->first->GetId() == holder->GetId() && success_iter->first->GetCasterGuid() == holder->GetCasterGuid())
+                    if (success_iter.first->GetId() == holder->GetId() && success_iter.first->GetCasterGuid() == holder->GetCasterGuid())
                     {
-                        success_iter->second += 1;
+                        success_iter.second += 1;
                         foundDispelled = true;
                         break;
                     }
@@ -3238,11 +3238,11 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             data << m_caster->GetGUID();                // Caster GUID
 #endif
             data << uint32(count);
-            for (std::list<std::pair<SpellAuraHolder*, uint32> >::iterator j = success_list.begin(); j != success_list.end(); ++j)
+            for (auto & j : success_list)
             {
-                SpellAuraHolder* dispelledHolder = j->first;
+                SpellAuraHolder* dispelledHolder = j.first;
                 data << uint32(dispelledHolder->GetId());   // Spell Id
-                unitTarget->RemoveAuraHolderDueToSpellByDispel(dispelledHolder->GetId(), j->second, dispelledHolder->GetCasterGuid());
+                unitTarget->RemoveAuraHolderDueToSpellByDispel(dispelledHolder->GetId(), j.second, dispelledHolder->GetCasterGuid());
             }
             m_caster->SendMessageToSet(&data, true);
 
@@ -3283,8 +3283,8 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             WorldPacket data(SMSG_DISPEL_FAILED, 8 + 8 + 4 * fail_list.size());
             data << m_caster->GetObjectGuid();              // Caster GUID
             data << unitTarget->GetObjectGuid();            // Victim GUID
-            for (std::list< uint32 >::iterator j = fail_list.begin(); j != fail_list.end(); ++j)
-                data << uint32(*j);                         // Spell Id
+            for (std::_Simple_types<unsigned int>::value_type & j : fail_list)
+                data << uint32(j);                         // Spell Id
             m_caster->SendMessageToSet(&data, true);
         }
     }
@@ -4317,8 +4317,8 @@ void Spell::EffectHealMaxHealth(SpellEffectIndex eff_idx)
     if (m_casterUnit)
     {
         std::list <Aura*> const& mHealingDonePct = m_casterUnit->GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
-        for (std::list <Aura*>::const_iterator i = mHealingDonePct.begin(); i != mHealingDonePct.end(); ++i)
-            DoneTotalMod *= (100.0f + (*i)->GetModifier()->m_amount) / 100.0f;
+        for (auto i : mHealingDonePct)
+            DoneTotalMod *= (100.0f + i->GetModifier()->m_amount) / 100.0f;
     }
 
     heal *= DoneTotalMod;
@@ -4828,8 +4828,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     uint32 spells[4] = {26272, 26157, 26273, 26274};
 
                     // check presence
-                    for (int j = 0; j < 4; ++j)
-                        if (unitTarget->HasAura(spells[j], EFFECT_INDEX_0))
+                    for (unsigned int spell : spells)
+                        if (unitTarget->HasAura(spell, EFFECT_INDEX_0))
                             return;
 
                     unitTarget->CastSpell(unitTarget, spells[urand(0, 3)], true);
@@ -4904,11 +4904,11 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     // Select maintank + 4 random targets
                     std::vector<Unit*> viableTargets;
                     ThreatList const& tl = m_casterUnit->GetThreatManager().getThreatList();
-                    for (auto it = tl.begin(); it != tl.end(); it++)
+                    for (auto it : tl)
                     {
-                        if ((*it)->getUnitGuid().IsPlayer())
+                        if (it->getUnitGuid().IsPlayer())
                         {
-                            if (Unit* pUnit = m_casterUnit->GetMap()->GetUnit((*it)->getUnitGuid()))
+                            if (Unit* pUnit = m_casterUnit->GetMap()->GetUnit(it->getUnitGuid()))
                             {
                                 if (pUnit->IsAlive())
                                     viableTargets.push_back(pUnit);
@@ -5052,14 +5052,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     uint32 itemtype;
                     uint32 rank = 0;
                     Unit::AuraList const& mDummyAuras = unitTarget->GetAurasByType(SPELL_AURA_DUMMY);
-                    for (Unit::AuraList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
+                    for (auto mDummyAura : mDummyAuras)
                     {
-                        if ((*i)->GetId() == 18692)
+                        if (mDummyAura->GetId() == 18692)
                         {
                             rank = 1;
                             break;
                         }
-                        else if ((*i)->GetId() == 18693)
+                        else if (mDummyAura->GetId() == 18693)
                         {
                             rank = 2;
                             break;
@@ -5160,22 +5160,22 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                 // all seals have aura dummy
                 Unit::AuraList const& m_dummyAuras = m_casterUnit->GetAurasByType(SPELL_AURA_DUMMY);
-                for (Unit::AuraList::const_iterator itr = m_dummyAuras.begin(); itr != m_dummyAuras.end(); ++itr)
+                for (auto m_dummyAura : m_dummyAuras)
                 {
-                    SpellEntry const* spellInfo = (*itr)->GetSpellProto();
+                    SpellEntry const* spellInfo = m_dummyAura->GetSpellProto();
 
                     // search seal (all seals have judgement's aura dummy spell id in 2 effect
-                    if (!spellInfo || !(*itr)->GetSpellProto()->IsSealSpell() || (*itr)->GetEffIndex() != 2)
+                    if (!spellInfo || !m_dummyAura->GetSpellProto()->IsSealSpell() || m_dummyAura->GetEffIndex() != 2)
                         continue;
 
                     // must be calculated base at raw base points in spell proto, GetModifier()->m_value for S.Righteousness modified by SPELLMOD_DAMAGE
-                    spellId2 = (*itr)->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_2);
+                    spellId2 = m_dummyAura->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_2);
 
                     if (spellId2 <= 1)
                         continue;
 
                     // found, remove seal
-                    m_casterUnit->RemoveAurasDueToSpell((*itr)->GetId());
+                    m_casterUnit->RemoveAurasDueToSpell(m_dummyAura->GetId());
                     break;
                 }
 
@@ -5663,24 +5663,24 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
     {
         Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_MOD_ATTACK_POWER);
-        for (Unit::AuraList::const_iterator i = auras.begin(); i != auras.end(); ++i)
+        for (auto aura : auras)
         {
-            if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN &&
+            if (aura->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN &&
                     // Bene de puissance inf et sup
-                    ((*i)->GetSpellProto()->SpellIconID == 298 || (*i)->GetSpellProto()->SpellIconID == 1802))
+                    (aura->GetSpellProto()->SpellIconID == 298 || aura->GetSpellProto()->SpellIconID == 1802))
             {
-                unitTarget->RemoveAurasDueToSpell((*i)->GetSpellProto()->Id);
+                unitTarget->RemoveAurasDueToSpell(aura->GetSpellProto()->Id);
                 break; // Normalement on ne peut avoir qu'une seule bene de ce type.
             }
         }
         Unit::AuraList const& auras2 = unitTarget->GetAurasByType(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE);
-        for (Unit::AuraList::const_iterator i = auras2.begin(); i != auras2.end(); ++i)
+        for (auto i : auras2)
         {
-            if ((*i)->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN &&
+            if (i->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN &&
                     // Bene des rois inf et sup
-                    ((*i)->GetSpellProto()->Id == 20217 || (*i)->GetSpellProto()->Id == 25898))
+                    (i->GetSpellProto()->Id == 20217 || i->GetSpellProto()->Id == 25898))
             {
-                unitTarget->RemoveAurasDueToSpell((*i)->GetSpellProto()->Id);
+                unitTarget->RemoveAurasDueToSpell(i->GetSpellProto()->Id);
                 break; // Normalement on ne peut avoir qu'une seule bene de ce type.
             }
         }

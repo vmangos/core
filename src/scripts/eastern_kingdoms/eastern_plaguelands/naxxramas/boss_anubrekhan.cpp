@@ -308,8 +308,8 @@ struct boss_anubrekhanAI : public ScriptedAI
         // Setting in combat with zone and pulling the two crypt-guards
         m_creature->SetInCombatWithZone();
 
-        for (int i = 0; i < summonedCryptGuards.size(); i++) {
-            if (Creature* cg = m_pInstance->GetCreature(summonedCryptGuards[i])) {
+        for (auto summonedCryptGuard : summonedCryptGuards) {
+            if (Creature* cg = m_pInstance->GetCreature(summonedCryptGuard)) {
                 cg->AI()->AttackStart(pWho);
                 cg->SetInCombatWithZone();
             }

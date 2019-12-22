@@ -161,13 +161,13 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
 
     void DoSummonPack(uint8 uiIndex)
     {
-        for (uint8 i = 0; i < MAX_SUMMON_POSITIONS; ++i)
+        for (const auto & i : asSummonInfo)
         {
             // This requires order of the array
-            if (asSummonInfo[i].uiPosition > uiIndex)
+            if (i.uiPosition > uiIndex)
                 break;
-            if (asSummonInfo[i].uiPosition == uiIndex)
-                m_creature->SummonCreature(asSummonInfo[i].uiEntry, asSummonInfo[i].fX, asSummonInfo[i].fY, asSummonInfo[i].fZ, asSummonInfo[i].fO, TEMPSUMMON_DEAD_DESPAWN, 0);
+            if (i.uiPosition == uiIndex)
+                m_creature->SummonCreature(i.uiEntry, i.fX, i.fY, i.fZ, i.fO, TEMPSUMMON_DEAD_DESPAWN, 0);
         }
     }
 
@@ -255,9 +255,9 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
         if (m_bNorthernCaveInOpened)                        // close northern cave-in door
             m_pInstance->DoUseDoorOrButton(m_pInstance->GetData64(GO_CAVE_IN_NORTH));
 
-        for (GuidList::const_iterator itr = m_luiSummonedMobGUIDs.begin(); itr != m_luiSummonedMobGUIDs.end(); ++itr)
+        for (auto m_luiSummonedMobGUID : m_luiSummonedMobGUIDs)
         {
-            if (Creature* pSummoned = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pSummoned = m_creature->GetMap()->GetCreature(m_luiSummonedMobGUID))
                 pSummoned->ForcedDespawn();
         }
     }

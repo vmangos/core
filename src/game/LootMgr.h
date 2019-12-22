@@ -287,18 +287,18 @@ struct Loot
     {
     if (clearQuestItems)
     {
-            for (QuestItemMap::const_iterator itr = m_playerQuestItems.begin(); itr != m_playerQuestItems.end(); ++itr)
-                delete itr->second;
+            for (const auto & m_playerQuestItem : m_playerQuestItems)
+                delete m_playerQuestItem.second;
             m_playerQuestItems.clear();
 
             m_questItems.clear();
     }
-        for (QuestItemMap::const_iterator itr = m_playerFFAItems.begin(); itr != m_playerFFAItems.end(); ++itr)
-            delete itr->second;
+        for (const auto & m_playerFFAItem : m_playerFFAItems)
+            delete m_playerFFAItem.second;
         m_playerFFAItems.clear();
 
-        for (QuestItemMap::const_iterator itr = m_playerNonQuestNonFFAConditionalItems.begin(); itr != m_playerNonQuestNonFFAConditionalItems.end(); ++itr)
-            delete itr->second;
+        for (const auto & m_playerNonQuestNonFFAConditionalItem : m_playerNonQuestNonFFAConditionalItems)
+            delete m_playerNonQuestNonFFAConditionalItem.second;
         m_playerNonQuestNonFFAConditionalItems.clear();
 
         m_playersLooting.clear();

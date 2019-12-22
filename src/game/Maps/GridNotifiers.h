@@ -245,31 +245,31 @@ namespace MaNGOS
 
         void Visit(GameObjectMapType& m)
         {
-            for(GameObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         void Visit(PlayerMapType& m)
         {
-            for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
         void Visit(CreatureMapType& m)
         {
-            for(CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         void Visit(CorpseMapType& m)
         {
-            for(CorpseMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         void Visit(DynamicObjectMapType& m)
         {
-            for(DynamicObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
@@ -437,8 +437,8 @@ namespace MaNGOS
 
         void Visit(CreatureMapType& m)
         {
-            for(CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
@@ -495,8 +495,8 @@ namespace MaNGOS
 
         void Visit(PlayerMapType& m)
         {
-            for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
@@ -514,9 +514,9 @@ namespace MaNGOS
 
         void Visit(CameraMapType& m)
         {
-            for(CameraMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->getSource()->GetBody()->IsWithinDist(i_searcher,i_dist))
-                    i_do(itr->getSource()->GetOwner());
+            for(auto & itr : m)
+                if (itr.getSource()->GetBody()->IsWithinDist(i_searcher,i_dist))
+                    i_do(itr.getSource()->GetOwner());
         }
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
     };
@@ -1322,8 +1322,8 @@ namespace MaNGOS
             : m_pObject(pObject), entries(entries), m_fRange(fMaxRange) {}
         bool operator() (Unit* pUnit)
         {
-            for (auto it = entries.cbegin(); it != entries.cend(); ++it) {
-                if (pUnit->GetEntry() == (*it) && m_pObject->IsWithinDist(pUnit, m_fRange, false)) {
+            for (std::_Simple_types<unsigned int>::value_type entrie : entries) {
+                if (pUnit->GetEntry() == entrie && m_pObject->IsWithinDist(pUnit, m_fRange, false)) {
                     return true;
                 }
             }

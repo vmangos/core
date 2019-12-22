@@ -186,18 +186,18 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 player->GroupEventFailHappens(QUEST_MISSING_DIPLO_PT8);
 
             // remove thugs
-            for (ptrdiff_t i = 0; i < 2; ++i)
+            for (auto & m_thug : m_thugs)
             {
-                if (m_thugs[i] && m_thugs[i]->IsAlive())
+                if (m_thug && m_thug->IsAlive())
                 {
-                    static_cast<TemporarySummon*>(m_thugs[i])->UnSummon();
+                    static_cast<TemporarySummon*>(m_thug)->UnSummon();
                 }
             }
         }
 
         // zero init required to prevent crash
-        for (ptrdiff_t i = 0; i < 2; ++i)
-            m_thugs[i] = nullptr;
+        for (auto & m_thug : m_thugs)
+            m_thug = nullptr;
 
         m_questFightStarted = false;
         m_eventPhase = MDQP_NONE;
@@ -232,17 +232,17 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                     pMotionMaster->MoveTargetedHome();
 
                 // check if thugs are alive
-                for (ptrdiff_t i = 0; i < 2; ++i)
+                for (auto & m_thug : m_thugs)
                 {
-                    if (m_thugs[i] && m_thugs[i]->IsAlive())
+                    if (m_thug && m_thug->IsAlive())
                     {
-                        m_thugs[i]->RemoveAllAuras();
-                        m_thugs[i]->DeleteThreatList();
-                        m_thugs[i]->CombatStop();
+                        m_thug->RemoveAllAuras();
+                        m_thug->DeleteThreatList();
+                        m_thug->CombatStop();
 
-                        m_thugs[i]->SetFactionTemplateId(FACTION_FRIENDLY_TO_ALL);
+                        m_thug->SetFactionTemplateId(FACTION_FRIENDLY_TO_ALL);
 
-                        if (MotionMaster* pMotionMaster = m_thugs[i]->GetMotionMaster())
+                        if (MotionMaster* pMotionMaster = m_thug->GetMotionMaster())
                             pMotionMaster->MoveTargetedHome();
 
                         m_thugsAlive = true;
@@ -383,12 +383,12 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         if (m_dialogStarted || m_questFightStarted)
         {
             // remove thugs
-            for (ptrdiff_t i = 0; i < 2; ++i)
+            for (auto & m_thug : m_thugs)
             {
-                if (m_thugs[i])
+                if (m_thug)
                 {
-                    static_cast<TemporarySummon*>(m_thugs[i])->UnSummon();
-                    m_thugs[i] = nullptr;
+                    static_cast<TemporarySummon*>(m_thug)->UnSummon();
+                    m_thug = nullptr;
                 }
             }
         }
@@ -399,19 +399,19 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         // If the thug died for whatever reason, clear the pointer. Otherwise, if
         // combat is extended, the thug may despawn and we'll access a dangling
         // pointer
-        for (ptrdiff_t i = 0; i < 2; ++i)
+        for (auto & m_thug : m_thugs)
         {
-            if (m_thugs[i] == creature)
-                m_thugs[i] = nullptr;
+            if (m_thug == creature)
+                m_thug = nullptr;
         }
     }
 
     void SummonedCreatureDespawn(Creature* creature) override
     {
-        for (ptrdiff_t i = 0; i < 2; ++i)
+        for (auto & m_thug : m_thugs)
         {
-            if (m_thugs[i] == creature)
-                m_thugs[i] = nullptr;
+            if (m_thug == creature)
+                m_thug = nullptr;
         }
     }
 };
@@ -1013,9 +1013,8 @@ struct npc_tyrion_spybotAI : public npc_escortAI
             if (lGardenStormwindRoyalGuards.empty())
                 return true;
 
-            for (std::list<Creature*>::iterator iter = lGardenStormwindRoyalGuards.begin(); iter != lGardenStormwindRoyalGuards.end(); ++iter)
+            for (auto GardenStormwindRoyalGuard : lGardenStormwindRoyalGuards)
             {
-                Creature* GardenStormwindRoyalGuard = (*iter);
                 if (GardenStormwindRoyalGuard->IsDead() || !GardenStormwindRoyalGuard->IsAlive())
                     GardenStormwindRoyalGuard->Respawn();
 

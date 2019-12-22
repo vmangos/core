@@ -364,9 +364,9 @@ struct go_pile_dechetsAI: public GameObjectAI
 
                 Map::PlayerList const& players = Guru->GetMap()->GetPlayers();
                 bool OtherPlayerFound = false;
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                for (const auto & player : players)
                 {
-                    Player* pPlayer = itr->getSource();
+                    Player* pPlayer = player.getSource();
                     if (pPlayer && pPlayer->IsAlive() && pUser->IsWithinDistInMap(pPlayer, 60.0f) && pUser->IsWithinLOSInMap(pPlayer) &&
                             pPlayer != pUser->ToPlayer() && !pPlayer->IsGameMaster())
                     {
@@ -410,9 +410,9 @@ struct go_pile_dechetsAI: public GameObjectAI
                     GetCreatureListWithEntryInGrid(MobList, Guru, 14826, 45.0f);          // Troll sacrifié
                     GetCreatureListWithEntryInGrid(MobList, Guru, 11351, 45.0f);          // Chasseur tête
 
-                    for (std::list<Creature*>::iterator itr = MobList.begin(); itr != MobList.end(); ++itr)
+                    for (auto & itr : MobList)
                     {
-                        if (pUser->IsWithinLOSInMap(*itr) && pUser->IsWithinDistInMap((*itr), 45.0f) && (*itr)->IsAlive())
+                        if (pUser->IsWithinLOSInMap(itr) && pUser->IsWithinDistInMap(itr, 45.0f) && itr->IsAlive())
                         {
                             if (Player* pPlay = pUser->ToPlayer())
                             {
@@ -421,8 +421,8 @@ struct go_pile_dechetsAI: public GameObjectAI
                                 else if (pPlay->GetTeam() == ALLIANCE)
                                     Guru->SetFactionTemplateId(2);    // Orc
 
-                                Guru->AddThreat(*itr);
-                                Guru->SetInCombatWith(*itr);
+                                Guru->AddThreat(itr);
+                                Guru->SetInCombatWith(itr);
                                 Guru->CastSpell(pUser, 24178, true);
                                 Guru->AddUnitState(UNIT_STAT_ROOT);
                                 Guru->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);

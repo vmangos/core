@@ -747,8 +747,8 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
 
 bool instance_naxxramas::IsEncounterInProgress() const
 {
-    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+    for (unsigned int i : m_auiEncounter)
+        if (i == IN_PROGRESS || i == SPECIAL)
             return true;
 
     return false;
@@ -890,9 +890,9 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 if (factionEntry)
                 {
                     Map::PlayerList const &liste = GetMap()->GetPlayers();
-                    for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+                    for (const auto & i : liste)
                     {
-                        if (Player* pPlayer = i->getSource())
+                        if (Player* pPlayer = i.getSource())
                         {
                             pPlayer->GetReputationMgr().ModifyReputation(factionEntry, 100);
                         }
@@ -953,9 +953,9 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 
                     bool bCanBegin = true;
 
-                    for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+                    for (const auto & lPlayer : lPlayers)
                     {
-                        if (Player* pPlayer = itr->getSource())
+                        if (Player* pPlayer = lPlayer.getSource())
                         {
                             if (!pPlayer->IsWithinDist2d(m_fChamberCenterX, m_fChamberCenterY, 15.0f))
                                 bCanBegin = false;
@@ -1060,8 +1060,8 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        for (int i = 0; i < MAX_ENCOUNTER; ++i)
-            saveStream << m_auiEncounter[i] << " ";
+        for (unsigned int i : m_auiEncounter)
+            saveStream << i << " ";
 
         strInstData = saveStream.str();
 
@@ -1081,11 +1081,11 @@ void instance_naxxramas::Load(char const* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-    for (int i = 0; i < MAX_ENCOUNTER; ++i)
+    for (unsigned int & i : m_auiEncounter)
     {
-        loadStream >> m_auiEncounter[i];
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+        loadStream >> i;
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
     }
     if (m_auiEncounter[TYPE_THADDIUS] == SPECIAL)
         m_auiEncounter[TYPE_THADDIUS] = FAIL;
@@ -1127,9 +1127,9 @@ void instance_naxxramas::SetGothTriggers()
     if (!pGoth)
         return;
 
-    for (std::list<uint64>::iterator itr = m_lGothTriggerList.begin(); itr != m_lGothTriggerList.end(); ++itr)
+    for (std::_Simple_types<unsigned long long>::value_type & itr : m_lGothTriggerList)
     {
-        if (Creature* pTrigger = instance->GetCreature(*itr))
+        if (Creature* pTrigger = instance->GetCreature(itr))
         {
             GothTrigger pGt;
             pGt.bIsAnchorHigh = (pTrigger->GetPositionZ() >= (pGoth->GetPositionZ() - 5.0f));
@@ -1144,15 +1144,15 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
 {
     std::list<Creature* > lList;
 
-    for (auto itr = m_mGothTriggerMap.begin(); itr != m_mGothTriggerMap.end(); ++itr)
+    for (auto & itr : m_mGothTriggerMap)
     {
-        if (!itr->second.bIsAnchorHigh)
+        if (!itr.second.bIsAnchorHigh)
             continue;
 
-        if (itr->second.bIsRightSide != bRightSide)
+        if (itr.second.bIsRightSide != bRightSide)
             continue;
 
-        if (Creature* pCreature = instance->GetCreature(itr->first))
+        if (Creature* pCreature = instance->GetCreature(itr.first))
             lList.push_back(pCreature);
     }
 
@@ -1167,15 +1167,15 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
 
 void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide)
 {
-    for (std::unordered_map<uint64, GothTrigger>::iterator itr = m_mGothTriggerMap.begin(); itr != m_mGothTriggerMap.end(); ++itr)
+    for (auto & itr : m_mGothTriggerMap)
     {
-        if (itr->second.bIsAnchorHigh)
+        if (itr.second.bIsAnchorHigh)
             continue;
 
-        if (itr->second.bIsRightSide != bRightSide)
+        if (itr.second.bIsRightSide != bRightSide)
             continue;
 
-        if (Creature* pCreature = instance->GetCreature(itr->first))
+        if (Creature* pCreature = instance->GetCreature(itr.first))
             lList.push_back(pCreature);
     }
 }

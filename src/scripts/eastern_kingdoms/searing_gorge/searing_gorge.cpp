@@ -278,9 +278,9 @@ struct npc_obsidionAI : public ScriptedAI
 
             if (m_nextText < SAY_LATHORIC2) // finished talking, start fighting
             {
-                for (GuidList::const_iterator it = m_playerList.begin(); it != m_playerList.end(); ++it)
+                for (auto it : m_playerList)
                 {
-                    if (Player* player = m_creature->GetMap()->GetPlayer(*it))
+                    if (Player* player = m_creature->GetMap()->GetPlayer(it))
                     {
                         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
                         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);

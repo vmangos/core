@@ -101,32 +101,32 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
     m_ui_buff_a = 120000 + urand(0,4)* 60000;
     m_ui_buff_h = 120000 + urand(0,4)* 60000;
 
-    for (int i = 0; i < BG_TEAMS_COUNT; i++)
+    for (auto & m_challengeStatu : m_challengeStatus)
         for (int j = 0; j < BG_AV_NB_CHALLENGES; j++)
-            m_challengeStatus[i][j] = 0;
+            m_challengeStatu[j] = 0;
 
     /** Reinforcement level for Troops invocation */
     m_reinforcementLevel[BG_TEAM_ALLIANCE] = AV_NPC_BASIC;
     m_reinforcementLevel[BG_TEAM_HORDE]    = AV_NPC_BASIC;
 
     /** Minimum resources are necessary for challenges */
-    for (int i = 0; i < BG_TEAMS_COUNT; ++i)
+    for (auto & m_challengeGoal : m_challengeGoals)
     {
-        m_challengeGoals[i][BG_AV_SOLDIER_AIR_ASSAULT]                     = 90; /** Real value 90  */
-        m_challengeGoals[i][BG_AV_LIEUTENANT_AIR_ASSAULT]                  = 60; /** Real value 60  */
-        m_challengeGoals[i][BG_AV_COMMANDER_AIR_ASSAULT]                   = 30; /** Real value 30  */
-        m_challengeGoals[i][BG_AV_HIDE_CAVALRY_ASSAULT]                    = 25; /** Real value 25  */
-        m_challengeGoals[i][BG_AV_TAMED_CAVALRY_ASSAULT]                   = 25; /** Real value 25  */
+        m_challengeGoal[BG_AV_SOLDIER_AIR_ASSAULT]                     = 90; /** Real value 90  */
+        m_challengeGoal[BG_AV_LIEUTENANT_AIR_ASSAULT]                  = 60; /** Real value 60  */
+        m_challengeGoal[BG_AV_COMMANDER_AIR_ASSAULT]                   = 30; /** Real value 30  */
+        m_challengeGoal[BG_AV_HIDE_CAVALRY_ASSAULT]                    = 25; /** Real value 25  */
+        m_challengeGoal[BG_AV_TAMED_CAVALRY_ASSAULT]                   = 25; /** Real value 25  */
         m_challengeGoals[BG_TEAM_ALLIANCE][BG_AV_IRONDEEP_GROUND_ASSAULT]  = 280; /** Real value 280 */
         m_challengeGoals[BG_TEAM_ALLIANCE][BG_AV_COLDTOOTH_GROUND_ASSAULT] = 70; /** Real value 70  */
         m_challengeGoals[BG_TEAM_HORDE][BG_AV_IRONDEEP_GROUND_ASSAULT]     = 70; /** Real value 70 */
         m_challengeGoals[BG_TEAM_HORDE][BG_AV_COLDTOOTH_GROUND_ASSAULT]    = 280; /** Real value 280  */
-        m_challengeGoals[i][BG_AV_BLOOD_WORLDBOSS_ASSAULT]                 = 200; /** Real value 200 */
+        m_challengeGoal[BG_AV_BLOOD_WORLDBOSS_ASSAULT]                 = 200; /** Real value 200 */
     }
 
     /** Minimum reputation are required for challenges */
-    for (int i = 0; i < BG_AV_NB_ASSAULTS; ++i)
-        m_challengeMinReputationNeeded[i]   = REP_NEUTRAL; /** Real value REP_REVERED */
+    for (unsigned int & i : m_challengeMinReputationNeeded)
+        i   = REP_NEUTRAL; /** Real value REP_REVERED */
 
     m_challengeMinReputationNeeded[BG_AV_WORLDBOSS_ASSAULT]             = REP_NEUTRAL;
     m_challengeMinReputationNeeded[BG_AV_CAVALRY_ASSAULT]               = REP_HONORED;
@@ -147,9 +147,9 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
     m_challengeTimerStart[BG_AV_WORLDBOSS_ASSAULT]            = 172800000; /** Real value N/A */
 
     /** Go status sent by players */
-    for (int i = 0; i < BG_TEAMS_COUNT; ++i)
+    for (auto & m_challengePlayerGoStatu : m_challengePlayerGoStatus)
         for (int j = 0; j < BG_AV_NB_ASSAULTS; ++j)
-            m_challengePlayerGoStatus[i][j] = false;
+            m_challengePlayerGoStatu[j] = false;
 }
 
 uint32 BattleGroundAV::getMinReputationNeeded(uint32 assault)
@@ -947,9 +947,9 @@ void BattleGroundAV::EndBattleGround(Team winner)
             i != BG_AV_NODES_FROSTWOLF_HUT && i != BG_AV_NODES_FIRSTAID_STATION)
             ++graves_owned[m_Nodes[i].Owner];
 
-    for (uint32 i = 0; i < BG_AV_MAX_MINES; ++i)
-        if (m_Mine_Owner[i] != BG_AV_TEAM_NEUTRAL)
-            ++mines_owned[m_Mine_Owner[i]];
+    for (auto & i : m_Mine_Owner)
+        if (i != BG_AV_TEAM_NEUTRAL)
+            ++mines_owned[i];
 
     // now we have the values give the honor/reputation to the teams:
     Team team[BG_TEAMS_COUNT]      = { ALLIANCE, HORDE };
@@ -1647,8 +1647,8 @@ SendQuestCompleteEvent -> Affiche au joueur que une quête est validée.
 void BattleGroundAV::CompleteQuestForAll(uint32 questId)
 {
     Map::PlayerList const& PlayerList = GetBgMap()->GetPlayers();
-    for (Map::PlayerList::const_iterator it = PlayerList.begin(); it != PlayerList.end(); ++it)
-        if (Player* player = it->getSource())
+    for (const auto & it : PlayerList)
+        if (Player* player = it.getSource())
             if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
                 player->FullQuestComplete(questId);
 }

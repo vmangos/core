@@ -129,11 +129,11 @@ struct npc_grimstoneAI : public npc_escortAI
         MobCount = 0;
         MobDeath_Timer = 0;
 
-        for (uint8 i = 0; i < MAX_MOB_AMOUNT; ++i)
-            RingMobGUID[i] = 0;
+        for (unsigned long long & i : RingMobGUID)
+            i = 0;
 
-        for (uint8 i = 0; i < 4; ++i)
-            ChallengeMobGUID[i] = 0;
+        for (unsigned long long & i : ChallengeMobGUID)
+            i = 0;
 
         RingBossGUID = 0;
 
@@ -330,12 +330,12 @@ struct npc_grimstoneAI : public npc_escortAI
 
                     if (ArenaChallenge)
                     {
-                        for (uint8 i = 0; i < 4; ++i)
+                        for (unsigned long long & i : ChallengeMobGUID)
                         {
-                            Creature *mob = m_creature->GetMap()->GetCreature(ChallengeMobGUID[i]);
+                            Creature *mob = m_creature->GetMap()->GetCreature(i);
                             if (mob && !mob->IsAlive() && mob->IsDead())
                             {
-                                ChallengeMobGUID[i] = 0;
+                                i = 0;
                                 --MobCount;
                             }
                         }
@@ -343,12 +343,12 @@ struct npc_grimstoneAI : public npc_escortAI
                 }
                 else 
                 {
-                    for (uint8 i = 0; i < MAX_MOB_AMOUNT; ++i)
+                    for (unsigned long long & i : RingMobGUID)
                     {
-                        Creature *mob = m_creature->GetMap()->GetCreature(RingMobGUID[i]);
+                        Creature *mob = m_creature->GetMap()->GetCreature(i);
                         if (mob && !mob->IsAlive() && mob->IsDead())
                         {
-                            RingMobGUID[i] = 0;
+                            i = 0;
                             --MobCount;
 
                             //seems all are gone, so set timer to continue and discontinue this
@@ -472,9 +472,9 @@ struct npc_grimstoneAI : public npc_escortAI
 
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
 
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto & itr : PlayerList)
         {
-            Player *player = itr->getSource();
+            Player *player = itr.getSource();
 
             if (player && player->IsWithinDistInMap(m_creature, 80.0f) && player->IsInCombat()) {
                 wiped = false;
@@ -1511,14 +1511,14 @@ struct npc_watchman_doomgripAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(m_lGolems, m_creature, NPC_WARBRINGER_CONSTRUCT, 20.0f);
         if (!m_lGolems.empty())
         {
-            for (std::list<Creature*>::iterator itr = m_lGolems.begin(); itr != m_lGolems.end(); ++itr)
+            for (auto & m_lGolem : m_lGolems)
             {
-                if ((*itr)->IsAlive())
+                if (m_lGolem->IsAlive())
                 {
-                    (*itr)->RemoveAurasDueToSpell(10255);
-                    (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                    m_lGolem->RemoveAurasDueToSpell(10255);
+                    m_lGolem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
                     if (pWho)
-                        (*itr)->AI()->AttackStart(pWho);
+                        m_lGolem->AI()->AttackStart(pWho);
                 }
             }
         }

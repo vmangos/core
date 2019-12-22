@@ -51,8 +51,8 @@ struct npc_pusillinAI : public ScriptedAI
     {
         std::list<Creature*> m_impList;
         GetCreatureListWithEntryInGrid(m_impList, ME, 13276, 100.0f);
-        for (std::list<Creature*>::iterator it = m_impList.begin(); it != m_impList.end(); ++it)
-            (*it)->Attack(pWho,true);
+        for (auto & it : m_impList)
+            it->Attack(pWho,true);
     }
 
     void UpdateAI(uint32 const uiDiff) override

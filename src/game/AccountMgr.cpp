@@ -505,8 +505,8 @@ bool AccountPersistentData::CanMail(uint32 targetAccount)
 
     uint32 totalScore = 0;
     time_t lastNonExpired = time(nullptr) - sWorld.getConfig(CONFIG_UINT32_MAILSPAM_EXPIRE_SECS);
-    for (auto it = _mailsSent.begin(); it != _mailsSent.end(); ++it)
-        if (it->second >= lastNonExpired)
+    for (auto & it : _mailsSent)
+        if (it.second >= lastNonExpired)
             totalScore++;
     uint32 allowedScore = sWorld.getConfig(CONFIG_UINT32_MAILSPAM_MAX_MAILS);
     return totalScore < allowedScore;

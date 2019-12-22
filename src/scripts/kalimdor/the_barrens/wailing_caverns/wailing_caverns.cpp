@@ -368,10 +368,10 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         Map::PlayerList const &PlayerList = map->GetPlayers();
                         if (!PlayerList.isEmpty())
                         {
-                            for (Map::PlayerList::const_iterator i = PlayerList.begin(); i != PlayerList.end(); ++i)
+                            for (const auto & i : PlayerList)
                             {
-                                if (i->getSource()->IsAlive() && (i->getSource()->GetDistance(m_creature) < 30))
-                                    m_creature->CastSpell(i->getSource(), SPELL_MARK, false);
+                                if (i.getSource()->IsAlive() && (i.getSource()->GetDistance(m_creature) < 30))
+                                    m_creature->CastSpell(i.getSource(), SPELL_MARK, false);
                             }
                         }
                     }

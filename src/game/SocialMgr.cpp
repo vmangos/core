@@ -43,9 +43,9 @@ PlayerSocial::~PlayerSocial()
 uint32 PlayerSocial::GetNumberOfSocialsWithFlag(SocialFlag flag)
 {
     uint32 counter = 0;
-    for (PlayerSocialMap::const_iterator itr = m_playerSocialMap.begin(); itr != m_playerSocialMap.end(); ++itr)
+    for (const auto & itr : m_playerSocialMap)
     {
-        if (itr->second.Flags & flag)
+        if (itr.second.Flags & flag)
             ++counter;
     }
     return counter;
@@ -115,19 +115,19 @@ void PlayerSocial::SendFriendList()
     WorldPacket data(SMSG_FRIEND_LIST, (1 + size * 25)); // just can guess size
     data << uint8(size);                                   // friends count
 
-    for (PlayerSocialMap::iterator itr = m_playerSocialMap.begin(); itr != m_playerSocialMap.end(); ++itr)
+    for (auto & itr : m_playerSocialMap)
     {
-        if (itr->second.Flags & SOCIAL_FLAG_FRIEND)         // if IsFriend()
+        if (itr.second.Flags & SOCIAL_FLAG_FRIEND)         // if IsFriend()
         {
-            sSocialMgr.GetFriendInfo(plr, itr->first, itr->second);
+            sSocialMgr.GetFriendInfo(plr, itr.first, itr.second);
 
-            data << ObjectGuid(HIGHGUID_PLAYER, itr->first);// player guid
-            data << uint8(itr->second.Status);              // online/offline/etc?
-            if (itr->second.Status)                         // if online
+            data << ObjectGuid(HIGHGUID_PLAYER, itr.first);// player guid
+            data << uint8(itr.second.Status);              // online/offline/etc?
+            if (itr.second.Status)                         // if online
             {
-                data << uint32(itr->second.Area);           // player area
-                data << uint32(itr->second.Level);          // player level
-                data << uint32(itr->second.Class);          // player class
+                data << uint32(itr.second.Area);           // player area
+                data << uint32(itr.second.Level);          // player level
+                data << uint32(itr.second.Class);          // player class
             }
         }
     }
@@ -146,9 +146,9 @@ void PlayerSocial::SendIgnoreList()
     WorldPacket data(SMSG_IGNORE_LIST, (1 + size * 8));     // just can guess size
     data << uint8(size);                                    // friends count
 
-    for (PlayerSocialMap::const_iterator itr = m_playerSocialMap.begin(); itr != m_playerSocialMap.end(); ++itr)
-        if (itr->second.Flags & SOCIAL_FLAG_IGNORED)
-            data << ObjectGuid(HIGHGUID_PLAYER, itr->first);// player guid
+    for (const auto & itr : m_playerSocialMap)
+        if (itr.second.Flags & SOCIAL_FLAG_IGNORED)
+            data << ObjectGuid(HIGHGUID_PLAYER, itr.first);// player guid
 
 
     plr->GetSession()->SendPacket(&data);
@@ -286,12 +286,12 @@ void SocialMgr::BroadcastToFriendListers(MasterPlayer* player, WorldPacket* pack
     bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
 
     ACE_Guard<ACE_Thread_Mutex> guard(_socialMapLock);
-    for (SocialMap::const_iterator itr = m_socialMap.begin(); itr != m_socialMap.end(); ++itr)
+    for (const auto & itr : m_socialMap)
     {
-        PlayerSocialMap::const_iterator itr2 = itr->second.m_playerSocialMap.find(guid);
-        if (itr2 != itr->second.m_playerSocialMap.end() && (itr2->second.Flags & SOCIAL_FLAG_FRIEND))
+        PlayerSocialMap::const_iterator itr2 = itr.second.m_playerSocialMap.find(guid);
+        if (itr2 != itr.second.m_playerSocialMap.end() && (itr2->second.Flags & SOCIAL_FLAG_FRIEND))
         {
-            MasterPlayer* pFriend = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
+            MasterPlayer* pFriend = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr.first));
 
             // PLAYER see his team only and PLAYER can't see MODERATOR, GAME MASTER, ADMINISTRATOR characters
             // MODERATOR, GAME MASTER, ADMINISTRATOR can see all

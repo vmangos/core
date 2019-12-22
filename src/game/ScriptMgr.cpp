@@ -54,8 +54,8 @@ ScriptMgr::ScriptMgr() : m_scheduledScripts(0)
 ScriptMgr::~ScriptMgr()
 {
     // Free resources before library unload
-    for (ScriptVector::iterator itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
-        delete *itr;
+    for (auto & m_script : m_scripts)
+        delete m_script;
 
     m_scripts.clear();
 
@@ -237,11 +237,11 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     continue;
                 }
 
-                for (int i = 0; i < MAX_TEXT_ID; ++i)
+                for (int i : tmp.talk.textId)
                 {
-                    if (tmp.talk.textId[i] < 0)
+                    if (i < 0)
                     {
-                        sLog.outErrorDb("Table `%s` has out of range broadcast text id (dataint = %i, expected positive value) in SCRIPT_COMMAND_TALK for script id %u", tablename, tmp.talk.textId[i], tmp.id);
+                        sLog.outErrorDb("Table `%s` has out of range broadcast text id (dataint = %i, expected positive value) in SCRIPT_COMMAND_TALK for script id %u", tablename, i, tmp.id);
                         continue;
                     }
                 }
@@ -1216,11 +1216,11 @@ void ScriptMgr::LoadGameObjectScripts()
     LoadScripts(sGameObjectScripts, "gameobject_scripts");
 
     // check ids
-    for (ScriptMapMap::const_iterator itr = sGameObjectScripts.begin(); itr != sGameObjectScripts.end(); ++itr)
+    for (const auto & sGameObjectScript : sGameObjectScripts)
     {
-        if (!sObjectMgr.GetGOData(itr->first))
-            if (!sObjectMgr.IsExistingGameObjectGuid(itr->first))
-                sLog.outErrorDb("Table `gameobject_scripts` has not existing gameobject (GUID: %u) as script id", itr->first);
+        if (!sObjectMgr.GetGOData(sGameObjectScript.first))
+            if (!sObjectMgr.IsExistingGameObjectGuid(sGameObjectScript.first))
+                sLog.outErrorDb("Table `gameobject_scripts` has not existing gameobject (GUID: %u) as script id", sGameObjectScript.first);
     }
 }
 
@@ -1229,10 +1229,10 @@ void ScriptMgr::LoadQuestEndScripts()
     LoadScripts(sQuestEndScripts, "quest_end_scripts");
 
     // check ids
-    for (ScriptMapMap::const_iterator itr = sQuestEndScripts.begin(); itr != sQuestEndScripts.end(); ++itr)
+    for (const auto & sQuestEndScript : sQuestEndScripts)
     {
-        if (!sObjectMgr.GetQuestTemplate(itr->first) && !sObjectMgr.IsExistingQuestId(itr->first))
-            sLog.outErrorDb("Table `quest_end_scripts` has not existing quest (Id: %u) as script id", itr->first);
+        if (!sObjectMgr.GetQuestTemplate(sQuestEndScript.first) && !sObjectMgr.IsExistingQuestId(sQuestEndScript.first))
+            sLog.outErrorDb("Table `quest_end_scripts` has not existing quest (Id: %u) as script id", sQuestEndScript.first);
     }
 }
 
@@ -1241,10 +1241,10 @@ void ScriptMgr::LoadQuestStartScripts()
     LoadScripts(sQuestStartScripts, "quest_start_scripts");
 
     // check ids
-    for (ScriptMapMap::const_iterator itr = sQuestStartScripts.begin(); itr != sQuestStartScripts.end(); ++itr)
+    for (const auto & sQuestStartScript : sQuestStartScripts)
     {
-        if (!sObjectMgr.GetQuestTemplate(itr->first) && !sObjectMgr.IsExistingQuestId(itr->first))
-            sLog.outErrorDb("Table `quest_start_scripts` has not existing quest (Id: %u) as script id", itr->first);
+        if (!sObjectMgr.GetQuestTemplate(sQuestStartScript.first) && !sObjectMgr.IsExistingQuestId(sQuestStartScript.first))
+            sLog.outErrorDb("Table `quest_start_scripts` has not existing quest (Id: %u) as script id", sQuestStartScript.first);
     }
 }
 
@@ -1265,37 +1265,37 @@ void ScriptMgr::LoadSpellScripts()
     }
 
     // check ids
-    for (ScriptMapMap::const_iterator itr = sSpellScripts.begin(); itr != sSpellScripts.end(); ++itr)
+    for (const auto & sSpellScript : sSpellScripts)
     {
-        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(sSpellScript.first);
 
         if (!spellInfo)
         {
-            if (!sSpellMgr.IsExistingSpellId(itr->first))
-                sLog.outErrorDb("Table `spell_scripts` has not existing spell (Id: %u) as script id", itr->first);
+            if (!sSpellMgr.IsExistingSpellId(sSpellScript.first))
+                sLog.outErrorDb("Table `spell_scripts` has not existing spell (Id: %u) as script id", sSpellScript.first);
             continue;
         }
 
         //check for correct spellEffect
         bool found = false;
-        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        for (unsigned int i : spellInfo->Effect)
         {
             // skip empty effects
-            if (!spellInfo->Effect[i])
+            if (!i)
                 continue;
 
-            if (spellInfo->Effect[i] == SPELL_EFFECT_SCRIPT_EFFECT)
+            if (i == SPELL_EFFECT_SCRIPT_EFFECT)
             {
                 found =  true;
                 break;
             }
         }
 
-        if (scriptSpells.find(itr->first) != scriptSpells.cend())
+        if (scriptSpells.find(sSpellScript.first) != scriptSpells.cend())
             found = true;
 
         if (!found)
-            sLog.outErrorDb("Table `spell_scripts` has unsupported spell (Id: %u) without SPELL_EFFECT_SCRIPT_EFFECT (%u) spell effect", itr->first, SPELL_EFFECT_SCRIPT_EFFECT);
+            sLog.outErrorDb("Table `spell_scripts` has unsupported spell (Id: %u) without SPELL_EFFECT_SCRIPT_EFFECT (%u) spell effect", sSpellScript.first, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 }
 
@@ -1308,12 +1308,12 @@ void ScriptMgr::LoadEventScripts()
     CollectPossibleEventIds(eventIds);
 
     // Then check if all scripts are in above list of possible script entries
-    for (ScriptMapMap::const_iterator itr = sEventScripts.begin(); itr != sEventScripts.end(); ++itr)
+    for (const auto & sEventScript : sEventScripts)
     {
-        std::set<uint32>::const_iterator itr2 = eventIds.find(itr->first);
+        std::set<uint32>::const_iterator itr2 = eventIds.find(sEventScript.first);
         if (itr2 == eventIds.end())
             sLog.outErrorDb("Table `event_scripts` has script (Id: %u) not referring to any gameobject_template type 10 data2 field, type 3 data6 field, type 13 data 2 field, type 29 or any spell effect %u",
-                            itr->first, SPELL_EFFECT_SEND_EVENT);
+                            sEventScript.first, SPELL_EFFECT_SEND_EVENT);
     }
 }
 
@@ -1383,11 +1383,11 @@ void ScriptMgr::LoadCreatureEventAIScripts()
     }
 
     // Then check if all scripts are in above list of used script Ids.
-    for (ScriptMapMap::const_iterator itr = sCreatureAIScripts.begin(); itr != sCreatureAIScripts.end(); ++itr)
+    for (const auto & sCreatureAIScript : sCreatureAIScripts)
     {
-        std::set<uint32>::const_iterator itr2 = actionIds.find(itr->first);
+        std::set<uint32>::const_iterator itr2 = actionIds.find(sCreatureAIScript.first);
         if (itr2 == actionIds.end())
-            sLog.outErrorDb("Table `creature_ai_scripts` has script (Id: %u) not used by any creature AI events.", itr->first);
+            sLog.outErrorDb("Table `creature_ai_scripts` has script (Id: %u) not used by any creature AI events.", sCreatureAIScript.first);
     }
 }
 
@@ -1408,16 +1408,16 @@ void ScriptMgr::CheckAllScriptTexts()
 
 void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts)
 {
-    for (ScriptMapMap::const_iterator itrMM = scripts.begin(); itrMM != scripts.end(); ++itrMM)
+    for (const auto & script : scripts)
     {
-        for (ScriptMap::const_iterator itrM = itrMM->second.begin(); itrM != itrMM->second.end(); ++itrM)
+        for (ScriptMap::const_iterator itrM = script.second.begin(); itrM != script.second.end(); ++itrM)
         {
             if (itrM->second.command == SCRIPT_COMMAND_TALK)
             {
-                for (int i = 0; i < MAX_TEXT_ID; ++i)
+                for (int i : itrM->second.talk.textId)
                 {
-                    if (itrM->second.talk.textId[i] && !sObjectMgr.GetBroadcastTextLocale(itrM->second.talk.textId[i]))
-                        sLog.outErrorDb("Table `broadcast_text` is missing text id %u, used in database script id %u.", itrM->second.talk.textId[i], itrMM->first);
+                    if (i && !sObjectMgr.GetBroadcastTextLocale(i))
+                        sLog.outErrorDb("Table `broadcast_text` is missing text id %u, used in database script id %u.", i, script.first);
                 }
             }
         }
@@ -2276,10 +2276,10 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         "quest_end_scripts",
         "quest_start_scripts"
     };
-    for (uint8 i = 0; i < 9; i++)
+    for (auto & script_table : script_tables)
     {
         // From SCRIPT_COMMAND_START_SCRIPT.
-        result.reset(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command`=39", script_tables[i]));
+        result.reset(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command`=39", script_table));
 
         if (result)
         {
@@ -2302,7 +2302,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         }
 
         // From SCRIPT_COMMAND_TEMP_SUMMON_CREATURE.
-        result.reset(WorldDatabase.PQuery("SELECT `dataint2` FROM `%s` WHERE `command`=10 && `dataint2`!=0", script_tables[i]));
+        result.reset(WorldDatabase.PQuery("SELECT `dataint2` FROM `%s` WHERE `command`=10 && `dataint2`!=0", script_table));
 
         if (result)
         {
@@ -2316,7 +2316,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         }
 
         // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL.
-        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command`=68", script_tables[i]));
+        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command`=68", script_table));
 
         if (result)
         {
@@ -2330,7 +2330,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         }
 
         // From SCRIPT_COMMAND_START_MAP_EVENT, SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET and SCRIPT_COMMAND_EDIT_MAP_EVENT.
-        result.reset(WorldDatabase.PQuery("SELECT `dataint2`, `dataint4` FROM `%s` WHERE `command` IN (61, 63, 69)", script_tables[i]));
+        result.reset(WorldDatabase.PQuery("SELECT `dataint2`, `dataint4` FROM `%s` WHERE `command` IN (61, 63, 69)", script_table));
 
         if (result)
         {

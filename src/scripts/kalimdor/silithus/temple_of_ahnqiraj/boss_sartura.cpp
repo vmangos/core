@@ -152,9 +152,9 @@ struct boss_sarturaAI : public ScriptedAI
     {
         GuidList m_lRoyalGuardsGuid;
         m_pInstance->GetRoyalGuardGUIDList(m_lRoyalGuardsGuid);
-        for (GuidList::const_iterator itr = m_lRoyalGuardsGuid.begin(); itr != m_lRoyalGuardsGuid.end(); ++itr)
+        for (auto itr : m_lRoyalGuardsGuid)
         {
-            if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(itr))
             {
                 if (pRoyalGuard->IsDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
             }
@@ -324,9 +324,9 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
 
                 GuidList m_lRoyalGuardsGuid;
                 m_pInstance->GetRoyalGuardGUIDList(m_lRoyalGuardsGuid);
-                for (GuidList::const_iterator itr = m_lRoyalGuardsGuid.begin(); itr != m_lRoyalGuardsGuid.end(); ++itr)
+                for (auto itr : m_lRoyalGuardsGuid)
                 {
-                    if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(*itr))
+                    if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(itr))
                     {
                         if (pRoyalGuard->IsDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
                     }
@@ -458,9 +458,9 @@ struct mob_vekniss_guardianAI : public ScriptedAI
 
     void Aggro(Unit* /*pWho*/) override
     {
-        for (uint8 i = 0; i < 8; ++i)
+        for (unsigned int aEmoteGUID : aEmoteGUIDs)
         {
-            if (m_creature->GetGUIDLow() == aEmoteGUIDs[i])
+            if (m_creature->GetGUIDLow() == aEmoteGUID)
             {
                 m_uiEmoteTimer = 2500;
                 break;
@@ -510,16 +510,16 @@ struct mob_vekniss_guardianAI : public ScriptedAI
             std::list<Creature*> lAssistList;
             GetCreatureListWithEntryInGrid(lAssistList, m_creature, 15233, 45.0f);
 
-            for (std::list<Creature*>::iterator itr = lAssistList.begin(); itr != lAssistList.end(); ++itr)
+            for (auto & itr : lAssistList)
             {
-                if ((*itr)->GetObjectGuid() == m_creature->GetObjectGuid())
+                if (itr->GetObjectGuid() == m_creature->GetObjectGuid())
                     continue;
 
-                if ((*itr)->IsAlive() && m_creature->IsWithinLOSInMap((*itr)))
+                if (itr->IsAlive() && m_creature->IsWithinLOSInMap(itr))
                 {
                     if (m_bIsAlone)
                         m_bIsAlone = false;
-                    if (mob_vekniss_guardianAI* pVeknissAI = dynamic_cast<mob_vekniss_guardianAI*>((*itr)->AI()))
+                    if (mob_vekniss_guardianAI* pVeknissAI = dynamic_cast<mob_vekniss_guardianAI*>(itr->AI()))
                         pVeknissAI->ImpaleAssist(m_creature);
                 }
             }

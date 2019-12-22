@@ -66,9 +66,9 @@ struct instance_razorfen_downs : public ScriptedInstance
         loadStream >> m_auiEncounter[0];
 
 
-        for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+        for (unsigned int & i : m_auiEncounter)
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
 
         OUT_LOAD_INST_DATA_COMPLETE;
     }

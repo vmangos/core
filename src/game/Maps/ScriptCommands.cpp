@@ -80,11 +80,11 @@ bool Map::ScriptCommand_Emote(ScriptInfo const& script, WorldObject* source, Wor
     // find the emote
     std::vector<uint32> emotes;
     emotes.push_back(script.emote.emoteId);
-    for (int i = 0; i < MAX_EMOTE_ID; ++i)
+    for (unsigned int randomEmote : script.emote.randomEmotes)
     {
-        if (!script.emote.randomEmotes[i])
+        if (!randomEmote)
             continue;
-        emotes.push_back(uint32(script.emote.randomEmotes[i]));
+        emotes.push_back(uint32(randomEmote));
     }
 
     pSource->HandleEmote(emotes[urand(0, emotes.size() - 1)]);
@@ -960,8 +960,8 @@ bool Map::ScriptCommand_ModifyThreat(ScriptInfo const& script, WorldObject* sour
     if (script.modThreat.target == SO_MODIFYTHREAT_ALL_ATTACKERS)
     {
         ThreatList const& threatList = pSource->GetThreatManager().getThreatList();
-        for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-            if (Unit* Temp = pSource->GetMap()->GetUnit((*i)->getUnitGuid()))
+        for (auto i : threatList)
+            if (Unit* Temp = pSource->GetMap()->GetUnit(i->getUnitGuid()))
                 pSource->GetThreatManager().modifyThreatPercent(Temp, script.x);
     }
     else

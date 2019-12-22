@@ -267,8 +267,8 @@ struct boss_victor_nefariusAI : ScriptedAI
 
         std::list<GameObject*> lGameObjects;
         m_creature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_DRAKONID_BONES, 250.0f);
-        for (auto itr = lGameObjects.begin(); itr != lGameObjects.end(); ++itr)
-            (*itr)->DeleteLater();
+        for (auto & lGameObject : lGameObjects)
+            lGameObject->DeleteLater();
 
         // @TODO: Find out why there is this reset bug !!
         //m_creature->SetRespawnDelay(900); // 15mn 900
@@ -339,9 +339,9 @@ struct boss_victor_nefariusAI : ScriptedAI
                         m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
 
                         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-                            if (i->getSource() && i->getSource()->IsAlive())
-                                m_creature->AddThreat(i->getSource(), 10000.0f);
+                        for (const auto & i : liste)
+                            if (i.getSource() && i.getSource()->IsAlive())
+                                m_creature->AddThreat(i.getSource(), 10000.0f);
 
                         DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED); // root
                         break;

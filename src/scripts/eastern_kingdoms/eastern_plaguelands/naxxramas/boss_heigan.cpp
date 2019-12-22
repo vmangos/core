@@ -243,10 +243,9 @@ struct boss_heiganAI : public ScriptedAI
             if (uiArea == (eruptionPhase % 6) || uiArea == 6 - (eruptionPhase % 6))
                 continue;
 
-            for (GuidList::const_iterator itr = m_pInstance->m_alHeiganTrapGuids[uiArea].begin();
-                itr != m_pInstance->m_alHeiganTrapGuids[uiArea].end(); ++itr)
+            for (auto itr : m_pInstance->m_alHeiganTrapGuids[uiArea])
             {
-                if (GameObject* pTrap = m_pInstance->GetGameObject(*itr))
+                if (GameObject* pTrap = m_pInstance->GetGameObject(itr))
                 {
                     pTrap->Use(fissureCreature);
                     pTrap->SendGameObjectCustomAnim();
@@ -256,8 +255,8 @@ struct boss_heiganAI : public ScriptedAI
             switch (uiArea)
             {
             case 0:
-                for (int i = 0; i < 3; i++)
-                    SendEruptCustomLocation(sect1SafeSpot[i][0], sect1SafeSpot[i][1], sect1SafeSpot[i][2]);
+                for (auto i : sect1SafeSpot)
+                    SendEruptCustomLocation(i[0], i[1], i[2]);
                 break;
             case 1:
                 SendEruptCustomLocation(sect2SafeSpot[0], sect2SafeSpot[1], sect2SafeSpot[2]);
@@ -266,8 +265,8 @@ struct boss_heiganAI : public ScriptedAI
                 SendEruptCustomLocation(sect3SafeSpot[0], sect3SafeSpot[1], sect3SafeSpot[2]);
                 break;
             case 3:
-                for (int i = 0; i < 3; i++)
-                    SendEruptCustomLocation(sect4SafeSpot[i][0], sect4SafeSpot[i][1], sect4SafeSpot[i][2]);
+                for (auto i : sect4SafeSpot)
+                    SendEruptCustomLocation(i[0], i[1], i[2]);
                 break;
             }
         }
@@ -275,8 +274,8 @@ struct boss_heiganAI : public ScriptedAI
         // safespot avoidance in tunnel
         if (currentPhase == PHASE_DANCE)
         {
-            for (int i = 0; i < 3; i++)
-                SendEruptCustomLocation(safespotFissures[i][0], safespotFissures[i][1], safespotFissures[i][2]);
+            for (auto safespotFissure : safespotFissures)
+                SendEruptCustomLocation(safespotFissure[0], safespotFissure[1], safespotFissure[2]);
         }
 
         ++eruptionPhase;
@@ -315,9 +314,9 @@ struct boss_heiganAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_ERUPT, Seconds(4));
         
         // the regular ones
-        for (int i = 0; i < max_stalks; i++)
+        for (auto eyeStalkPossition : eyeStalkPossitions)
         {
-            SummmonPlagueCloud(eyeStalkPossitions[i][0], eyeStalkPossitions[i][1], eyeStalkPossitions[i][2], eyeStalkPossitions[i][3]);
+            SummmonPlagueCloud(eyeStalkPossition[0], eyeStalkPossition[1], eyeStalkPossition[2], eyeStalkPossition[3]);
         }
         
         DoScriptText(SAY_CHANNELING, m_creature);
@@ -417,13 +416,13 @@ struct boss_heiganAI : public ScriptedAI
         // within 25yd range (radius of SPELL_MANABURN). If there is one we cast SPELL_MANABURN
         const auto& tl = m_creature->GetThreatManager().getThreatList();
         bool found_mana_in_range = false;
-        for (auto it = tl.begin(); it != tl.end(); ++it)
+        for (auto it : tl)
         {
-            if (Unit* pTarget = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
+            if (Unit* pTarget = m_creature->GetMap()->GetUnit(it->getUnitGuid()))
             {
                 if (pTarget->GetPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->IsAlive())
                 {
-                    if (m_creature->GetDistance3dToCenter((*it)->getTarget()) < 28.0f)
+                    if (m_creature->GetDistance3dToCenter(it->getTarget()) < 28.0f)
                     {
                         found_mana_in_range = true;
                         break;

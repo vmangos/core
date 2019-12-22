@@ -62,8 +62,8 @@ void OutdoorPvPSI::UpdateWorldState()
 
 bool OutdoorPvPSI::SetupZoneScript()
 {
-    for (uint8 i = 0; i < OutdoorPvPSIBuffZonesNum; ++i)
-        RegisterZone(OutdoorPvPSIBuffZones[i]);
+    for (unsigned int OutdoorPvPSIBuffZone : OutdoorPvPSIBuffZones)
+        RegisterZone(OutdoorPvPSIBuffZone);
     // On reprend les donnees precedentes (avant dernier reboot)
     m_MaxRessources = sObjectMgr.GetSavedVariable(uint32(SI_SILITHYST_MAX), SI_MAX_RESOURCES_DEFAULT);
 

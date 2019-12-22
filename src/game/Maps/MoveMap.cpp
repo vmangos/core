@@ -48,8 +48,8 @@ void MMapFactory::clear()
 // ######################## MMapManager ########################
 MMapManager::~MMapManager()
 {
-    for (MMapDataSet::iterator i = loadedMMaps.begin(); i != loadedMMaps.end(); ++i)
-        delete i->second;
+    for (auto & loadedMMap : loadedMMaps)
+        delete loadedMMap.second;
 
     // by now we should not have maps loaded
     // if we had, tiles in MMapData->mmapLoadedTiles, their actual data is lost!

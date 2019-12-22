@@ -124,18 +124,18 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
     }
     PlayerSpellMap spells = me->GetSpellMap();
     usableSpells.clear();
-    for (PlayerSpellMap::iterator itr = spells.begin(); itr != spells.end(); ++itr)
+    for (auto & spell : spells)
     {
-        if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled)
+        if (spell.second.state == PLAYERSPELL_REMOVED || spell.second.disabled)
             continue;
-        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr->first);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell.first);
         if (spellInfo->SpellFamilyName == SPELLFAMILY_GENERIC)
             continue;
         if (spellInfo->Attributes & (SPELL_ATTR_PASSIVE | 0x80))
             continue;
         if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE)
             continue;
-        if (Spells::IsPositiveSpell(itr->first) && !enablePositiveSpells)
+        if (Spells::IsPositiveSpell(spell.first) && !enablePositiveSpells)
             continue;
         switch (pPlayer->GetClass())
         {
@@ -148,24 +148,24 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
         case CLASS_WARLOCK:
             break;
         case CLASS_HUNTER:
-            if (std::find(hunterSkipSpells.begin(), hunterSkipSpells.end(), itr->first) != hunterSkipSpells.end())
+            if (std::find(hunterSkipSpells.begin(), hunterSkipSpells.end(), spell.first) != hunterSkipSpells.end())
                 continue;
             break;
         case CLASS_PRIEST:
-            if (std::find(priestSkipSpells.begin(), priestSkipSpells.end(), itr->first) != priestSkipSpells.end())
+            if (std::find(priestSkipSpells.begin(), priestSkipSpells.end(), spell.first) != priestSkipSpells.end())
                 continue;
             break;
         }
-        usableSpells.push_back(itr->first);
+        usableSpells.push_back(spell.first);
     }
     // Suppression des sorts dont on a deja des rangs superieurs
     for (std::vector<uint32>::iterator it = usableSpells.begin(); it != usableSpells.end();)
     {
         bool foundSupRank = false;
         SpellEntry const* pCurrSpell_1 = sSpellMgr.GetSpellEntry(*(it));
-        for (std::vector<uint32>::iterator it2 = usableSpells.begin(); it2 != usableSpells.end(); ++it2)
+        for (std::_Simple_types<unsigned int>::value_type & usableSpell : usableSpells)
         {
-            SpellEntry const* pCurrSpell_2 = sSpellMgr.GetSpellEntry(*(it2));
+            SpellEntry const* pCurrSpell_2 = sSpellMgr.GetSpellEntry(usableSpell);
             if (pCurrSpell_2->SpellFamilyName == pCurrSpell_1->SpellFamilyName && pCurrSpell_2->SpellIconID == pCurrSpell_1->SpellIconID && pCurrSpell_2->SpellVisual == pCurrSpell_1->SpellVisual) // Meme sort, rangs differents
             {
                 if (Spells::CompareAuraRanks(pCurrSpell_1->Id, pCurrSpell_2->Id) < 0) // pCurrSpell_1 < pCurrSpell_2

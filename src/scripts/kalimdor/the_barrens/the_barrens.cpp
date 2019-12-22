@@ -401,8 +401,8 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         PlayerGUID = 0;
         BigWillGUID = 0;
 
-        for (uint8 i = 0; i < 6; ++i)
-            AffrayChallenger[i] = 0;
+        for (unsigned long long & i : AffrayChallenger)
+            i = 0;
     }
 
     bool CanStartEvent(Player* pPlayer)
@@ -454,14 +454,14 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         {
             if (ChallengerDeath_Timer <= diff)
             {
-                for (uint8 i = 0; i < 6; ++i)
+                for (unsigned long long & i : AffrayChallenger)
                 {
-                    Creature *challenger = m_creature->GetMap()->GetCreature(AffrayChallenger[i]);
+                    Creature *challenger = m_creature->GetMap()->GetCreature(i);
                     if (challenger && !challenger->IsAlive() && challenger->IsDead())
                     {
                         DoScriptText(SAY_TWIGGY_DOWN, m_creature);
                         challenger->RemoveCorpse();
-                        AffrayChallenger[i] = 0;
+                        i = 0;
                         continue;
                     }
                 }
@@ -539,15 +539,15 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
             }
             std::list<Creature*> lCrea;
             m_creature->GetCreatureListWithEntryInGrid(lCrea, NPC_AFFRAY_SPECTATOR, 30.0f);
-            for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
+            for (auto & it : lCrea)
             {
                 switch (urand(0, 10))
                 {
                     case 0:
-                        (*it)->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
+                        it->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
                         break;
                     case 1:
-                        (*it)->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
+                        it->HandleEmoteCommand(EMOTE_ONESHOT_RUDE);
                         break;
                 }
             }
@@ -930,16 +930,16 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         eventPhase = 0;
         deadKolkarCount = 0;
         Creature* pDefender;
-        for (int i = 0; i < 9; i++)
+        for (unsigned long long GuidPhaseOneGuard : GuidPhaseOneGuards)
         {
             pDefender = nullptr;
-            if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseOneGuards[i]))
+            if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseOneGuard))
                 static_cast<TemporarySummon*>(pDefender)->UnSummon();
         }
-        for (int i = 0; i < 8; i++)
+        for (unsigned long long GuidPhaseTwoGuard : GuidPhaseTwoGuards)
         {
             pDefender = nullptr;
-            if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseTwoGuards[i]))
+            if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseTwoGuard))
                 static_cast<TemporarySummon*>(pDefender)->UnSummon();
         }
         while (!AllKolkars.empty())
@@ -982,9 +982,9 @@ struct npc_regthar_deathgateAI : public ScriptedAI
             {
                 eventPhase = 3;
                 //enlever le respawn des guardes de la phase1
-                for (uint8 i = 0; i < 9; ++i)
+                for (unsigned long long GuidPhaseOneGuard : GuidPhaseOneGuards)
                 {
-                    if (Creature* b = m_creature->GetMap()->GetCreature(GuidPhaseOneGuards[i]))
+                    if (Creature* b = m_creature->GetMap()->GetCreature(GuidPhaseOneGuard))
                     {
                         b->SetRespawnTime(6000000);
                         b->SetRespawnDelay(6000000);
@@ -1510,13 +1510,13 @@ bool ProcessEventId_event_the_principle_source(uint32 eventId, Object* pSource, 
     if (!pPlayer)
         return true;
 
-    for (uint8 i = 0; i < 3; ++i)
+    for (const auto & i : Toxicologist)
     {
-        if (auto pToxicologist = pPlayer->SummonCreature(Toxicologist[i].entry,
-            Toxicologist[i].x,
-            Toxicologist[i].y,
-            Toxicologist[i].z,
-            Toxicologist[i].o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 2*MINUTE*IN_MILLISECONDS))
+        if (auto pToxicologist = pPlayer->SummonCreature(i.entry,
+            i.x,
+            i.y,
+            i.z,
+            i.o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 2*MINUTE*IN_MILLISECONDS))
         {
             pToxicologist->AI()->AttackStart(pPlayer);
         }        

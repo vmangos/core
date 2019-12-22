@@ -274,9 +274,9 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                     sLog.outString("Immol'Thar (%u) rendu attaquable, %u gardiens trouves.", pImmolThar->GetGUIDLow(), m_lImmolTharGardiensMobGUIDList.size());
 #endif
                     bool bHasYelled = false;
-                    for (std::list<uint64>::const_iterator itr = m_lImmolTharGardiensMobGUIDList.begin(); itr != m_lImmolTharGardiensMobGUIDList.end(); itr++)
+                    for (std::_Simple_types<unsigned long long>::value_type itr : m_lImmolTharGardiensMobGUIDList)
                     {
-                        if (Creature* pCreature = instance->GetCreature(*itr))
+                        if (Creature* pCreature = instance->GetCreature(itr))
                         {
                             // Ne pas non plus aggro toute l'instance.
                             if (pCreature->IsAlive())
@@ -417,8 +417,8 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
 
                 if (!m_lFelvineShardGUIDs.empty())
                 {
-                    for (std::list<uint64>::iterator i = m_lFelvineShardGUIDs.begin(); i != m_lFelvineShardGUIDs.end(); ++i)
-                        DoRespawnGameObject(*i);
+                    for (std::_Simple_types<unsigned long long>::value_type & m_lFelvineShardGUID : m_lFelvineShardGUIDs)
+                        DoRespawnGameObject(m_lFelvineShardGUID);
                 }
             }
             m_auiEncounter[uiType] = uiData;
@@ -495,9 +495,9 @@ void instance_dire_maul::Load(char const* chrIn)
                >> m_auiEncounter[6] >> m_auiEncounter[7] >> m_auiEncounter[8] >> m_auiEncounter[9]
                >> m_auiEncounter[10] >> m_auiEncounter[11];
 
-    for (uint8 i = 0; i < INSTANCE_DIRE_MAUL_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+    for (unsigned int & i : m_auiEncounter)
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
 
     OUT_LOAD_INST_DATA_COMPLETE;
 }
@@ -555,12 +555,12 @@ void instance_dire_maul::DoSortCristalsEventMobs()
     {
         if (GameObject* pRune = instance->GetGameObject(m_auiCristalsGUID[i]))
         {
-            for (std::list<uint64>::const_iterator itr = m_lCristalsEventtMobGUIDList.begin(); itr != m_lCristalsEventtMobGUIDList.end(); itr++)
+            for (std::_Simple_types<unsigned long long>::value_type itr : m_lCristalsEventtMobGUIDList)
             {
-                if (Creature* pCreature = instance->GetCreature(*itr))
+                if (Creature* pCreature = instance->GetCreature(itr))
                 {
                     if (pCreature->IsAlive() && pCreature->GetDistance(pRune) < 20.0f)
-                        m_alCristalsEventtMobGUIDSorted[i].push_back(*itr);
+                        m_alCristalsEventtMobGUIDSorted[i].push_back(itr);
                 }
             }
 #ifdef DEBUG_ON
@@ -757,19 +757,19 @@ struct npc_residual_montruosityAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(montruosityList, m_creature, 11484, 45.0f);
             if (!montruosityList.empty())
             {
-                for (std::list<Creature*>::iterator itr = montruosityList.begin(); itr != montruosityList.end(); ++itr)
+                for (auto & itr : montruosityList)
                 {
-                    if ((*itr) != m_creature)
+                    if (itr != m_creature)
                     {
-                        if (!(*itr)->isInFrontInMap(m_creature, 45.0f, M_PI_F))
+                        if (!itr->isInFrontInMap(m_creature, 45.0f, M_PI_F))
                         {
-                            float distance = m_creature->GetDistance((*itr));
+                            float distance = m_creature->GetDistance(itr);
                             if (distance < closestbefore)
                                 closestbefore = distance;
                         }
                         else
                         {
-                            float distance = m_creature->GetDistance((*itr));
+                            float distance = m_creature->GetDistance(itr);
                             if (distance < closestbehind)
                                 closestbehind = distance;
                         }
@@ -1743,9 +1743,9 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
         {
             bool m_bMeleeAttackers = false;
             Unit::AttackerSet attackers = m_creature->GetAttackers();
-            for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+            for (auto itr : attackers)
             {
-                if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
+                if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
                 {
                     if (m_creature->IsInRange(attacker, 0.0f, 7.0f, false)) 
                     {
@@ -1929,10 +1929,10 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         GetCreatureListWithEntryInGrid(m_lHelpers, m_creature, NPC_ALZZINS_MINION, 80.0f);
         if (!m_lHelpers.empty())
         {
-            for (auto iter = m_lHelpers.begin(); iter != m_lHelpers.end(); ++iter)
+            for (auto & m_lHelper : m_lHelpers)
             {
-                if (*iter && !(*iter)->IsAlive())
-                    static_cast<TemporarySummon*>(*iter)->UnSummon();
+                if (m_lHelper && !m_lHelper->IsAlive())
+                    static_cast<TemporarySummon*>(m_lHelper)->UnSummon();
             }
             m_lHelpers.clear();
         }

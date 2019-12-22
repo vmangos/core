@@ -190,13 +190,13 @@ struct boss_jindoAI : public ScriptedAI
                 bool AuraRemoved = false;
 
                 uint32 var = 0;
-                for (std::list<uint64>::const_iterator itr = BrainWashedPlayerGuid.begin(); itr != BrainWashedPlayerGuid.end(); itr++)
+                for (std::_Simple_types<unsigned long long>::value_type itr : BrainWashedPlayerGuid)
                 {
-                    if (Player* pTarget = m_creature->GetMap()->GetPlayer((*itr)))
+                    if (Player* pTarget = m_creature->GetMap()->GetPlayer(itr))
                     {
                         if ((pTarget->IsAlive() && !pTarget->HasAura(24261, EFFECT_INDEX_0)) || pTarget->IsDead()) // SPELL_BRAINWASH 24261
                         {
-                            PlayerBrainWashedGuid = *itr;
+                            PlayerBrainWashedGuid = itr;
                             if (pTarget->IsDead())
                                 PlayerDead = true;
                             else

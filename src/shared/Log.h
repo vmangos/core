@@ -148,11 +148,11 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
             fclose(honorLogfile);
         honorLogfile = nullptr;
 
-        for (int i = 0; i < LOG_MAX_FILES; ++i)
-            if (logFiles[i] != nullptr)
+        for (auto & logFile : logFiles)
+            if (logFile != nullptr)
             {
-                fclose(logFiles[i]);
-                logFiles[i] = nullptr;
+                fclose(logFile);
+                logFile = nullptr;
             }
     }
     public:

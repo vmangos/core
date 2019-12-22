@@ -365,8 +365,8 @@ struct VendorItemData
 
     void Clear()
     {
-        for (VendorItemList::const_iterator itr = m_items.begin(); itr != m_items.end(); ++itr)
-            delete *itr;
+        for (auto m_item : m_items)
+            delete m_item;
         m_items.clear();
     }
 };

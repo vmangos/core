@@ -49,11 +49,11 @@ void npc_reginald_windsorAI::ResetCreature()
         GardeTimer[i] = 0;
         GardeNeed[i] = false;
     }
-    for (uint8 i = 0; i < 30; i++)
-        GardesGUIDs[i] = 0;
+    for (unsigned long long & GardesGUID : GardesGUIDs)
+        GardesGUID = 0;
 
-    for (uint8 i = 0; i < 10; i++)
-        DragsGUIDs[i] = 0;
+    for (unsigned long long & DragsGUID : DragsGUIDs)
+        DragsGUID = 0;
 }
 
 void npc_reginald_windsorAI::JustDied(Unit* /*pKiller*/)
@@ -90,11 +90,11 @@ void npc_reginald_windsorAI::SituationFinale()
     std::list<Creature*> MobListe;
 
     GetCreatureListWithEntryInGrid(MobListe, m_creature, NPC_ONYXIA_ELITE_GUARD, 150.0f);
-    for (auto itr = MobListe.begin(); itr != MobListe.end(); ++itr)
+    for (auto & itr : MobListe)
     {
-        (*itr)->Respawn();
-        (*itr)->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
-        (*itr)->AIM_Initialize();
+        itr->Respawn();
+        itr->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
+        itr->AIM_Initialize();
     }
 
     if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
@@ -221,9 +221,9 @@ void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
             if (Victim->GetDistance2d(m_creature) < 8.0f && NeedCheck)
             {
                 bool Continuer = true;
-                for (int i = 0; i < 30; i++)
+                for (unsigned long long GardesGUID : GardesGUIDs)
                 {
-                    if (Victim->GetGUID() == GardesGUIDs[i] || m_creature->GetPositionY() < 360)
+                    if (Victim->GetGUID() == GardesGUID || m_creature->GetPositionY() < 360)
                         Continuer = false;
                 }
                 if (Continuer)
@@ -628,14 +628,14 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
                 Onyxia->MonsterSay("Yesss... Guards, come to your lord's aid!");
                 int Var = 0;
                 GetCreatureListWithEntryInGrid(DragListe, Onyxia, NPC_STORMWIND_ROYAL_GUARD, 25.0f);
-                for (auto itr = DragListe.begin(); itr != DragListe.end(); ++itr)
+                for (auto & itr : DragListe)
                 {
-                    DragsGUIDs[Var] = (*itr)->GetGUID();
-                    (*itr)->UpdateEntry(NPC_ONYXIA_ELITE_GUARD);
-                    (*itr)->AIM_Initialize();
-                    (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    DragsGUIDs[Var] = itr->GetGUID();
+                    itr->UpdateEntry(NPC_ONYXIA_ELITE_GUARD);
+                    itr->AIM_Initialize();
+                    itr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     if (!urand(0, 2))
-                        (*itr)->MonsterTextEmote("Onyxia's Elite Guard hisses.");
+                        itr->MonsterTextEmote("Onyxia's Elite Guard hisses.");
                     Var++;
                 }
             }

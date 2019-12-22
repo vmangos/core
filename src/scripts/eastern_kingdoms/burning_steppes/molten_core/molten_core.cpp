@@ -354,11 +354,11 @@ struct mob_core_houndAI : public ScriptedAI
 
                 std::list<Creature*> m_CoreHoundList;
                 GetCreatureListWithEntryInGrid(m_CoreHoundList, m_creature, NPC_CORE_HOUND, 100.0f);
-                for (std::list<Creature*>::const_iterator itr = m_CoreHoundList.begin(); itr != m_CoreHoundList.end(); ++itr)
+                for (auto itr : m_CoreHoundList)
                 {
-                    if ((*itr) && (*itr)->IsInCombat())
+                    if (itr && itr->IsInCombat())
                     {
-                        if ((*itr)->GetHealth() > 0)
+                        if (itr->GetHealth() > 0)
                             m_bResurrectionOkay = true;
                     }
                 }

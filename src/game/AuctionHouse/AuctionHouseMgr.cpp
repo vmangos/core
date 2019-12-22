@@ -703,15 +703,15 @@ void AuctionHouseObject::Update()
 
 void AuctionHouseObject::BuildListBidderItems(WorldPacket& data, Player* player, uint32 listfrom, uint32& count, uint32& totalcount)
 {
-    for (AuctionEntryMap::const_iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); ++itr)
+    for (const auto & itr : AuctionsMap)
     {
-        AuctionEntry *Aentry = itr->second;
+        AuctionEntry *Aentry = itr.second;
         if (Aentry && Aentry->bidder == player->GetGUIDLow())
         {
             ++totalcount;
 
             if (count < 50 && totalcount > listfrom)
-                if (itr->second->BuildAuctionInfo(data))
+                if (itr.second->BuildAuctionInfo(data))
                     ++count;
         }
     }
@@ -766,9 +766,9 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     std::string name;
     name.reserve(140);
 
-    for (auto itr = OrderedAuctionMap.cbegin(); itr != OrderedAuctionMap.cend(); ++itr)
+    for (const auto & itr : OrderedAuctionMap)
     {
-        AuctionEntry *Aentry = itr->second;
+        AuctionEntry *Aentry = itr.second;
         Item *item = sAuctionMgr.GetAItem(Aentry->itemGuidLow);
         if (!item)
             continue;
