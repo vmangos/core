@@ -152,7 +152,7 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
             {
                 Creature *Marli = instance->GetCreature(m_uiMarliGUID);
                 Unit* pVictim = Marli->GetVictim();
-                for (std::_Simple_types<unsigned long long>::value_type itr : m_lMarliTrashGUIDList)
+                for (const auto itr : m_lMarliTrashGUIDList)
                 {
                     if (Creature* MarliTrash = instance->GetCreature(itr))
                         if (MarliTrash->IsAlive() && !MarliTrash->IsInCombat())

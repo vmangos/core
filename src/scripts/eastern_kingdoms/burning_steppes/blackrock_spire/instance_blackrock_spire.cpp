@@ -547,7 +547,7 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
     {
         if (GameObject* pRune = instance->GetGameObject(m_auiRoomRuneGUID[i]))
         {
-            for (std::_Simple_types<unsigned long long>::value_type itr : m_lRoomEventMobGUIDList)
+            for (const auto itr : m_lRoomEventMobGUIDList)
             {
                 if (Creature* pCreature = instance->GetCreature(itr))
                 {

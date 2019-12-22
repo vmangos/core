@@ -2313,7 +2313,7 @@ void Pet::LearnPetPassives()
     PetFamilySpellsStore::const_iterator petStore = sPetFamilySpellsStore.find(cFamily->ID);
     if (petStore != sPetFamilySpellsStore.end())
     {
-        for (std::_Simple_types<unsigned int>::value_type petSet : petStore->second)
+        for (const auto petSet : petStore->second)
             AddSpell(petSet, ACT_DECIDE, PETSPELL_NEW, PETSPELL_FAMILY);
     }
 }

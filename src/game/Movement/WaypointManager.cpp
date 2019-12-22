@@ -223,7 +223,7 @@ void WaypointManager::Load()
 
         if (!creatureNoMoveType.empty())
         {
-            for (std::_Simple_types<unsigned int>::value_type itr : creatureNoMoveType)
+            for (const auto itr : creatureNoMoveType)
             {
                 CreatureData const* cData = sObjectMgr.GetCreatureData(itr);
                 CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(cData->creature_id[0]);
@@ -539,7 +539,7 @@ void WaypointManager::Load()
 
     if (!movementScriptSet.empty())
     {
-        for (std::_Simple_types<unsigned int>::value_type itr : movementScriptSet)
+        for (const auto itr : movementScriptSet)
             sLog.outErrorDb("Table `creature_movement_scripts` contain unused script, id %u.", itr);
     }
 }

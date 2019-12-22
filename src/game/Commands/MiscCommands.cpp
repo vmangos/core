@@ -1131,7 +1131,7 @@ bool ChatHandler::HandlePoolSpawnsCommand(char* args)
     SpawnedPoolData const& spawns = mapState->GetSpawnedPoolData();
 
     SpawnedPoolObjects const& crSpawns = spawns.GetSpawnedCreatures();
-    for (std::_Simple_types<unsigned int>::value_type itr : crSpawns)
+    for (const auto itr : crSpawns)
         if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<Creature>(itr))
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr))
                 if (CreatureInfo const* info = ObjectMgr::GetCreatureTemplate(data->creature_id[0]))
@@ -1139,7 +1139,7 @@ bool ChatHandler::HandlePoolSpawnsCommand(char* args)
                                     itr, info->name, data->posX, data->posY, data->posZ, data->mapid);
 
     SpawnedPoolObjects const& goSpawns = spawns.GetSpawnedGameobjects();
-    for (std::_Simple_types<unsigned int>::value_type itr : goSpawns)
+    for (const auto itr : goSpawns)
         if (!pool_id || pool_id == sPoolMgr.IsPartOfAPool<GameObject>(itr))
             if (GameObjectData const* data = sObjectMgr.GetGOData(itr))
                 if (GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id))

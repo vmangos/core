@@ -799,7 +799,7 @@ void MapPersistentStateManager::PackInstances()
 
     uint32 InstanceNumber = RESERVED_INSTANCES_LAST;
     // we do assume std::set is sorted properly on integer value
-    for (std::_Simple_types<unsigned int>::value_type i : InstanceSet)
+    for (const auto i : InstanceSet)
     {
         if (i != InstanceNumber)
         {

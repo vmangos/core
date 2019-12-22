@@ -190,7 +190,7 @@ struct boss_jindoAI : public ScriptedAI
                 bool AuraRemoved = false;
 
                 uint32 var = 0;
-                for (std::_Simple_types<unsigned long long>::value_type itr : BrainWashedPlayerGuid)
+                for (const auto itr : BrainWashedPlayerGuid)
                 {
                     if (Player* pTarget = m_creature->GetMap()->GetPlayer(itr))
                     {

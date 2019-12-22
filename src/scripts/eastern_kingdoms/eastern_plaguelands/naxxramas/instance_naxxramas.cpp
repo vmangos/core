@@ -1127,7 +1127,7 @@ void instance_naxxramas::SetGothTriggers()
     if (!pGoth)
         return;
 
-    for (std::_Simple_types<unsigned long long>::value_type & itr : m_lGothTriggerList)
+    for (const auto & itr : m_lGothTriggerList)
     {
         if (Creature* pTrigger = instance->GetCreature(itr))
         {

@@ -243,7 +243,7 @@ void LootStore::CheckLootRefs(LootIdSet* ref_set) const
 void LootStore::ReportUnusedIds(LootIdSet const& ids_set) const
 {
     // all still listed ids isn't referenced
-    for (std::_Simple_types<unsigned int>::value_type itr : ids_set)
+    for (const auto itr : ids_set)
     {
         sLog.outErrorDb("Table '%s' entry %d isn't %s and not referenced from loot, and then useless.", GetName(), itr, GetEntryName());
         sLog.out(LOG_DBERRFIX, "DELETE FROM %s WHERE entry=%u;", GetName(), itr);
@@ -1362,7 +1362,7 @@ void LoadLootTemplates_Creature()
             }
         }
     }
-    for (std::_Simple_types<unsigned int>::value_type itr : ids_setUsed)
+    for (const auto itr : ids_setUsed)
         ids_set.erase(itr);
 
     // for alterac valley we've defined Player-loot inside creature_loot_template id=0
@@ -1392,7 +1392,7 @@ void LoadLootTemplates_Disenchant()
             }
         }
     }
-    for (std::_Simple_types<unsigned int>::value_type itr : ids_setUsed)
+    for (const auto itr : ids_setUsed)
         ids_set.erase(itr);
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Disenchant.ReportUnusedIds(ids_set);
@@ -1430,7 +1430,7 @@ void LoadLootTemplates_Gameobject()
                 ids_setUsed.insert(lootid);
         }
     }
-    for (std::_Simple_types<unsigned int>::value_type itr : ids_setUsed)
+    for (const auto itr : ids_setUsed)
         ids_set.erase(itr);
 
     // output error for any still listed (not referenced from appropriate table) ids
@@ -1481,7 +1481,7 @@ void LoadLootTemplates_Pickpocketing()
             }
         }
     }
-    for (std::_Simple_types<unsigned int>::value_type itr : ids_setUsed)
+    for (const auto itr : ids_setUsed)
         ids_set.erase(itr);
 
     // output error for any still listed (not referenced from appropriate table) ids
@@ -1521,7 +1521,7 @@ void LoadLootTemplates_Skinning()
             }
         }
     }
-    for (std::_Simple_types<unsigned int>::value_type itr : ids_setUsed)
+    for (const auto itr : ids_setUsed)
         ids_set.erase(itr);
 
     // output error for any still listed (not referenced from appropriate table) ids

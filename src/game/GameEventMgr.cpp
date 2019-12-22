@@ -815,7 +815,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         return;
     }
 
-    for (std::_Simple_types<unsigned int>::value_type & itr : mGameEventCreatureGuids[internal_event_id])
+    for (const auto & itr : mGameEventCreatureGuids[internal_event_id])
     {
         // Add to correct cell
         CreatureData const* data = sObjectMgr.GetCreatureData(itr);
@@ -845,7 +845,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         return;
     }
 
-    for (std::_Simple_types<unsigned int>::value_type & itr : mGameEventGameobjectGuids[internal_event_id])
+    for (const auto & itr : mGameEventGameobjectGuids[internal_event_id])
     {
         // Add to correct cell
         GameObjectData const* data = sObjectMgr.GetGOData(itr);
@@ -892,7 +892,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         return;
     }
 
-    for (std::_Simple_types<unsigned int>::value_type & itr : mGameEventCreatureGuids[internal_event_id])
+    for (const auto & itr : mGameEventCreatureGuids[internal_event_id])
     {
         // Remove the creature from grid
         if (CreatureData const* data = sObjectMgr.GetCreatureData(itr))
@@ -922,7 +922,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         return;
     }
 
-    for (std::_Simple_types<unsigned int>::value_type & itr : mGameEventGameobjectGuids[internal_event_id])
+    for (const auto & itr : mGameEventGameobjectGuids[internal_event_id])
     {
         // Remove the gameobject from grid
         if (GameObjectData const* data = sObjectMgr.GetGOData(itr))
@@ -1023,7 +1023,7 @@ void GameEventMgr::UpdateCreatureData(int16 event_id, bool activate)
 
 void GameEventMgr::UpdateEventQuests(uint16 event_id, bool Activate)
 {
-    for (std::_Simple_types<unsigned int>::value_type & itr : mGameEventQuests[event_id])
+    for (const auto & itr : mGameEventQuests[event_id])
     {
         Quest const* pQuest = sObjectMgr.GetQuestTemplate(itr);
 

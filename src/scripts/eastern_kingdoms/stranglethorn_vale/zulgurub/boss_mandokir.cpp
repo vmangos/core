@@ -322,9 +322,9 @@ struct boss_mandokirAI : public ScriptedAI
     {
         if (!m_lSpirits.empty())
         {
-            for (std::_Simple_types<unsigned long long>::value_type & m_lSpirit : m_lSpirits)
+            for (const auto & guid : m_lSpirits)
             {
-                if (Creature* pSpirit = m_creature->GetMap()->GetCreature(m_lSpirit))
+                if (Creature* pSpirit = m_creature->GetMap()->GetCreature(guid))
                     if (pSpirit->IsAlive())
                         pSpirit->AddObjectToRemoveList();
             }
@@ -422,9 +422,9 @@ struct boss_mandokirAI : public ScriptedAI
                     // Find nearest spirit ready to resurrect
                     Creature* spirit = nullptr;
                     float spiritDist = 0.0f;
-                    for (std::_Simple_types<unsigned long long>::value_type & m_lSpirit : m_lSpirits)
+                    for (const auto & guid : m_lSpirits)
                     {
-                        if (Creature* current = m_creature->GetMap()->GetCreature(m_lSpirit))
+                        if (Creature* current = m_creature->GetMap()->GetCreature(guid))
                         {
                             // Ready to resurrect ?
                             if (current->AI() && current->AI()->GetData(0))

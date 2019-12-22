@@ -1805,7 +1805,7 @@ void ObjectMgr::LoadCreatureSpells()
 
     } while (result->NextRow());
 
-    for (std::_Simple_types<unsigned int>::value_type itr : spellScriptSet)
+    for (const auto itr : spellScriptSet)
         sLog.outErrorDb("Table `creature_spells_scripts` contains unused script, id %u.", itr);
 
     sLog.outString();
@@ -5722,7 +5722,7 @@ void ObjectMgr::LoadPageTexts()
             {
                 std::ostringstream ss;
                 ss << "The text page(s) ";
-                for (std::_Simple_types<unsigned int>::value_type checkedPage : checkedPages)
+                for (const auto checkedPage : checkedPages)
                     ss << checkedPage << " ";
                 ss << "create(s) a circular reference, which can cause the server to freeze. Changing Next_Page of page "
                    << pageItr->Page_ID << " to 0";
@@ -6827,7 +6827,7 @@ void ObjectMgr::PackGroupIds()
 
     uint32 groupId = 1;
     // we do assume std::set is sorted properly on integer value
-    for (std::_Simple_types<unsigned int>::value_type i : groupIds)
+    for (const auto i : groupIds)
     {
         if (i != groupId)
         {
@@ -9517,7 +9517,7 @@ void ObjectMgr::LoadTrainerTemplates()
         } while (result->NextRow());
     }
 
-    for (std::_Simple_types<unsigned int>::value_type trainer_id : trainer_ids)
+    for (const auto trainer_id : trainer_ids)
         sLog.outErrorDb("Table `npc_trainer_template` has trainer template %u not used by any trainers ", trainer_id);
 }
 
@@ -9603,7 +9603,7 @@ void ObjectMgr::LoadVendorTemplates()
         } while (result->NextRow());
     }
 
-    for (std::_Simple_types<unsigned int>::value_type vendor_id : vendor_ids)
+    for (const auto vendor_id : vendor_ids)
         sLog.outErrorDb("Table `npc_vendor_template` has vendor template %u not used by any vendors ", vendor_id);
 }
 
@@ -9907,12 +9907,12 @@ void ObjectMgr::LoadGossipMenuItems()
     }
     while (result->NextRow());
 
-    for (std::_Simple_types<unsigned int>::value_type itr : gossipScriptSet)
+    for (const auto itr : gossipScriptSet)
         sLog.outErrorDb("Table `gossip_scripts` contain unused script, id %u.", itr);
 
     if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
     {
-        for (std::_Simple_types<unsigned int>::value_type menu_id : menu_ids)
+        for (const auto menu_id : menu_ids)
             sLog.outErrorDb("Table `gossip_menu` contain unused (in creature or GO or menu options) menu id %u.", menu_id);
     }
 

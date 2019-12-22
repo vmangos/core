@@ -3283,7 +3283,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             WorldPacket data(SMSG_DISPEL_FAILED, 8 + 8 + 4 * fail_list.size());
             data << m_caster->GetObjectGuid();              // Caster GUID
             data << unitTarget->GetObjectGuid();            // Victim GUID
-            for (std::_Simple_types<unsigned int>::value_type & j : fail_list)
+            for (const auto & j : fail_list)
                 data << uint32(j);                         // Spell Id
             m_caster->SendMessageToSet(&data, true);
         }

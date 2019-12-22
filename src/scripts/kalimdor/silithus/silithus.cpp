@@ -1010,9 +1010,9 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             }
             case 2:
             {
-                for (std::_Simple_types<unsigned long long>::value_type & lCrystalGUID : lCrystalGUIDs)
+                for (const auto & guid : lCrystalGUIDs)
                 {
-                    if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(lCrystalGUID))
+                    if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(guid))
                         pCrystal->Use(m_creature);
                 }
                 uiNextActionTimer = 5000;
@@ -1187,9 +1187,9 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             }
             case 27:
             {
-                for (std::_Simple_types<unsigned long long>::value_type & lCrystalGUID : lCrystalGUIDs)
+                for (const auto & guid : lCrystalGUIDs)
                 {
-                    if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(lCrystalGUID))
+                    if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(guid))
                         pCrystal->Delete();
                 }
                 lCrystalGUIDs.clear();
@@ -1773,7 +1773,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoUnsummonArmy()
     {
-        for (std::_Simple_types<unsigned long long>::value_type itr : m_lQirajiWarriorsList)
+        for (const auto itr : m_lQirajiWarriorsList)
         {
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
                 pTemp->DisappearAndDie();
@@ -1782,7 +1782,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void AddKaldoreiThreat(Creature* npc)
     {
-        for (std::_Simple_types<unsigned long long>::value_type & itr : m_lQirajiWarriorsList)
+        for (const auto & itr : m_lQirajiWarriorsList)
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
                 if (pTemp->GetEntry() == NPC_KALDOREI_INFANTRY)
                     npc->AddThreat(pTemp, 100.0f);
@@ -1845,7 +1845,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoCastTriggerSpellOnEnemies(uint32 spell)
     {
-        for (std::_Simple_types<unsigned long long>::value_type itr : m_lQirajiWarriorsList)
+        for (const auto itr : m_lQirajiWarriorsList)
         {
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
             {
@@ -1870,7 +1870,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoTimeStopArmy()
     {
-        for (std::_Simple_types<unsigned long long>::value_type itr : m_lQirajiWarriorsList)
+        for (const auto itr : m_lQirajiWarriorsList)
         {
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
             {

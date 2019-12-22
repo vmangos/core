@@ -254,9 +254,9 @@ void PetAI::UpdateAI(uint32 const diff)
                 // No enemy, check friendly
                 if (!spellUsed)
                 {
-                    for (std::_Simple_types<unsigned long long>::value_type tar : m_AllySet)
+                    for (const auto guid : m_AllySet)
                     {
-                        Unit* ally = m_creature->GetMap()->GetUnit(tar);
+                        Unit* ally = m_creature->GetMap()->GetUnit(guid);
 
                         //only buff targets that are in combat, unless the spell can only be cast while out of combat
                         if (!ally)

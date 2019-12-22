@@ -600,9 +600,9 @@ void instance_ruins_of_ahnqiraj::SetAndorovSquadRespawnTime(uint32 nextRespawnDe
         if (!pAndorov->IsAlive())
             pAndorov->SetRespawnTime(nextRespawnDelay);
     }
-    for (std::_Simple_types<unsigned long long>::value_type & m_lKaldoreiElite : m_lKaldoreiElites)
+    for (const auto & guid : m_lKaldoreiElites)
     {
-        if (Creature* pElite = instance->GetCreature(m_lKaldoreiElite))
+        if (Creature* pElite = instance->GetCreature(guid))
         {
             if (!pElite->IsAlive())
                 pElite->SetRespawnTime(nextRespawnDelay);
@@ -617,9 +617,9 @@ void instance_ruins_of_ahnqiraj::SetAndorovSquadFaction(uint32 faction)
         pAndorov->SetFactionTemplateId(faction);
         pAndorov->SetPvP(true);
     }
-    for (std::_Simple_types<unsigned long long>::value_type & m_lKaldoreiElite : m_lKaldoreiElites)
+    for (const auto & guid : m_lKaldoreiElites)
     {
-        if (Creature* pElite = instance->GetCreature(m_lKaldoreiElite))
+        if (Creature* pElite = instance->GetCreature(guid))
         {
             pElite->SetFactionTemplateId(faction);
             pElite->SetPvP(true);
@@ -634,9 +634,9 @@ void instance_ruins_of_ahnqiraj::ForceAndorovSquadDespawn(uint32 timeToDespawn)
         pAndorov->ForcedDespawn(timeToDespawn);
         pAndorov->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
     }
-    for (std::_Simple_types<unsigned long long>::value_type & m_lKaldoreiElite : m_lKaldoreiElites)
+    for (const auto & guid : m_lKaldoreiElites)
     {
-        if (Creature* pElite = instance->GetCreature(m_lKaldoreiElite))
+        if (Creature* pElite = instance->GetCreature(guid))
         {
             pElite->ForcedDespawn(timeToDespawn);
             pElite->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);

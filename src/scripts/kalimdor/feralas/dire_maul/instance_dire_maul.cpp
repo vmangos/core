@@ -274,7 +274,7 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                     sLog.outString("Immol'Thar (%u) rendu attaquable, %u gardiens trouves.", pImmolThar->GetGUIDLow(), m_lImmolTharGardiensMobGUIDList.size());
 #endif
                     bool bHasYelled = false;
-                    for (std::_Simple_types<unsigned long long>::value_type itr : m_lImmolTharGardiensMobGUIDList)
+                    for (const auto itr : m_lImmolTharGardiensMobGUIDList)
                     {
                         if (Creature* pCreature = instance->GetCreature(itr))
                         {
@@ -417,8 +417,8 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
 
                 if (!m_lFelvineShardGUIDs.empty())
                 {
-                    for (std::_Simple_types<unsigned long long>::value_type & m_lFelvineShardGUID : m_lFelvineShardGUIDs)
-                        DoRespawnGameObject(m_lFelvineShardGUID);
+                    for (const auto & guid : m_lFelvineShardGUIDs)
+                        DoRespawnGameObject(guid);
                 }
             }
             m_auiEncounter[uiType] = uiData;
@@ -555,7 +555,7 @@ void instance_dire_maul::DoSortCristalsEventMobs()
     {
         if (GameObject* pRune = instance->GetGameObject(m_auiCristalsGUID[i]))
         {
-            for (std::_Simple_types<unsigned long long>::value_type itr : m_lCristalsEventtMobGUIDList)
+            for (const auto itr : m_lCristalsEventtMobGUIDList)
             {
                 if (Creature* pCreature = instance->GetCreature(itr))
                 {

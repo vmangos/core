@@ -716,12 +716,12 @@ void SpellMgr::LoadSpellGroups()
         }
     }
 
-    for (std::_Simple_types<unsigned int>::value_type group : groups)
+    for (const auto group : groups)
     {
         std::set<uint32> spells;
         GetSetOfSpellsInSpellGroup(SpellGroup(group), spells);
 
-        for (std::_Simple_types<unsigned int>::value_type spell : spells)
+        for (const auto spell : spells)
         {
             ++count;
             mSpellSpellGroup.insert(SpellSpellGroupMap::value_type(spell, SpellGroup(group)));

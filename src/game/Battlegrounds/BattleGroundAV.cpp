@@ -101,9 +101,9 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
     m_ui_buff_a = 120000 + urand(0,4)* 60000;
     m_ui_buff_h = 120000 + urand(0,4)* 60000;
 
-    for (auto & i : m_challengeStatus)
+    for (int i = 0; i < BG_TEAMS_COUNT; i++)
         for (int j = 0; j < BG_AV_NB_CHALLENGES; j++)
-            i[j] = 0;
+            m_challengeStatus[i][j] = 0;
 
     /** Reinforcement level for Troops invocation */
     m_reinforcementLevel[BG_TEAM_ALLIANCE] = AV_NPC_BASIC;
@@ -125,8 +125,8 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
 }
 
     /** Minimum reputation are required for challenges */
-    for (unsigned int & i : m_challengeMinReputationNeeded)
-        i   = REP_NEUTRAL; /** Real value REP_REVERED */
+    for (int i = 0; i < BG_AV_NB_ASSAULTS; ++i)
+        m_challengeMinReputationNeeded[i] = REP_NEUTRAL; /** Real value REP_REVERED */
 
     m_challengeMinReputationNeeded[BG_AV_WORLDBOSS_ASSAULT]             = REP_NEUTRAL;
     m_challengeMinReputationNeeded[BG_AV_CAVALRY_ASSAULT]               = REP_HONORED;
@@ -947,9 +947,9 @@ void BattleGroundAV::EndBattleGround(Team winner)
             i != BG_AV_NODES_FROSTWOLF_HUT && i != BG_AV_NODES_FIRSTAID_STATION)
             ++graves_owned[m_Nodes[i].Owner];
 
-    for (auto & i : m_Mine_Owner)
-        if (i != BG_AV_TEAM_NEUTRAL)
-            ++mines_owned[i];
+    for (uint32 i = 0; i < BG_AV_MAX_MINES; ++i)
+        if (m_Mine_Owner[i] != BG_AV_TEAM_NEUTRAL)
+            ++mines_owned[m_Mine_Owner[i]];
 
     // now we have the values give the honor/reputation to the teams:
     Team team[BG_TEAMS_COUNT]      = { ALLIANCE, HORDE };

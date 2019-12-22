@@ -159,7 +159,7 @@ void TransportMgr::GeneratePath(GameObjectInfo const* goInfo, TransportTemplate*
 
     if (transport->mapsUsed.size() > 1)
     {
-        for (std::_Simple_types<unsigned int>::value_type itr : transport->mapsUsed)
+        for (const auto itr : transport->mapsUsed)
             ASSERT(!sMapStorage.LookupEntry<MapEntry>(itr)->Instanceable());
 
         transport->inInstance = false;
@@ -424,6 +424,6 @@ void TransportMgr::CreateInstanceTransports(Map* map)
         return;
 
     // create transports
-    for (std::_Simple_types<unsigned int>::value_type itr : mapTransports->second)
+    for (const auto itr : mapTransports->second)
         CreateTransport(itr, 0, map);
 }

@@ -1322,8 +1322,8 @@ namespace MaNGOS
             : m_pObject(pObject), entries(entries), m_fRange(fMaxRange) {}
         bool operator() (Unit* pUnit)
         {
-            for (std::_Simple_types<unsigned int>::value_type entrie : entries) {
-                if (pUnit->GetEntry() == entrie && m_pObject->IsWithinDist(pUnit, m_fRange, false)) {
+            for (const auto entry : entries) {
+                if (pUnit->GetEntry() == entry && m_pObject->IsWithinDist(pUnit, m_fRange, false)) {
                     return true;
                 }
             }

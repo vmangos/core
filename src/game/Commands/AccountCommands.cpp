@@ -564,7 +564,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
     }
 
     uint32 bannedCount = 0;
-    for (std::_Simple_types<unsigned int>::value_type it : accountsToBan)
+    for (const auto it : accountsToBan)
     {
         if (sAccountMgr.IsAccountBanned(it))
             continue;

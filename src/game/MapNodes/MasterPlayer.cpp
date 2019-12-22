@@ -114,7 +114,7 @@ void MasterPlayer::SaveMails()
             {
                 stmt = CharacterDatabase.CreateStatement(deleteMailItems, "DELETE FROM mail_items WHERE item_guid = ?");
 
-                for (std::_Simple_types<unsigned int>::value_type removedItem : m->removedItems)
+                for (const auto removedItem : m->removedItems)
                     stmt.PExecute(removedItem);
 
                 m->removedItems.clear();

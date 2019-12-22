@@ -384,11 +384,11 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
 
     Unit::SpellAuraHolderMap const& uAuras = unit->GetSpellAuraHolderMap();
     PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, uAuras.size());
-    for (const auto & uAura : uAuras)
+    for (const auto & aura : uAuras)
     {
-        bool talent = GetTalentSpellCost(uAura.second->GetId()) > 0;
+        bool talent = GetTalentSpellCost(aura.second->GetId()) > 0;
 
-        SpellAuraHolder* holder = uAura.second;
+        SpellAuraHolder* holder = aura.second;
         char const* name = holder->GetSpellProto()->SpellName[GetSessionDbcLocale()].c_str();
 
         for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -400,7 +400,7 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
             if (m_session)
             {
                 std::ostringstream ss_name;
-                ss_name << "|cffffffff|Hspell:" << uAura.second->GetId() << "|h[" << name << "]|h|r";
+                ss_name << "|cffffffff|Hspell:" << aura.second->GetId() << "|h[" << name << "]|h|r";
 
                 PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
                     aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(),

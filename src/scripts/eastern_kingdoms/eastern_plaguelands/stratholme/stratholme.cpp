@@ -375,7 +375,7 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
             return;
         }
 
-        for (std::_Simple_types<unsigned long long>::value_type itr : acolyte)
+        for (const auto itr : acolyte)
             if (Creature *pCreature = m_pInstance->instance->GetCreature(itr))
                 if (pCreature && pCreature->IsAlive())
                     return;

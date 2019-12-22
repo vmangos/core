@@ -144,8 +144,8 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
             }
             if (uiData == DONE)
             {
-                for (std::_Simple_types<unsigned long long>::value_type m_lRedRocketGUID : m_lRedRocketGUIDs)
-                    DoRespawnGameObject(m_lRedRocketGUID, HOUR);
+                for (const auto guid : m_lRedRocketGUIDs)
+                    DoRespawnGameObject(guid, HOUR);
             }
             break;
         case TYPE_EXPLOSIVE_CHARGE:
@@ -171,9 +171,9 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
                     Creature* pBlastmaster = instance->GetCreature(m_uiBlastmasterShortfuseGUID);
                     if (!pBlastmaster)
                         break;
-                    for (std::_Simple_types<unsigned long long>::value_type m_luiSpawnedExplosiveChargeGUID : m_luiSpawnedExplosiveChargeGUIDs)
+                    for (const auto guid : m_luiSpawnedExplosiveChargeGUIDs)
                     {
-                        if (GameObject* pExplosive = instance->GetGameObject(m_luiSpawnedExplosiveChargeGUID))
+                        if (GameObject* pExplosive = instance->GetGameObject(guid))
                             pExplosive->Use(pBlastmaster);
                     }
                     m_luiSpawnedExplosiveChargeGUIDs.clear();

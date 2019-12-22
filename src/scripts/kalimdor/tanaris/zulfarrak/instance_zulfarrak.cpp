@@ -356,17 +356,17 @@ public:
 
     bool IsWaveAllDead()
     {
-        for (std::_Simple_types<unsigned long long>::value_type & itr : addsAtBase)
+        for (const auto & guid : addsAtBase)
         {
-            if (Creature* add = instance->GetCreature(itr))
+            if (Creature* add = instance->GetCreature(guid))
             {
                 if (add->IsAlive())
                     return false;
             }
         }
-        for (std::_Simple_types<unsigned long long>::value_type & movedadd : movedadds)
+        for (const auto & guid : movedadds)
         {
-            if (Creature* add = instance->GetCreature((movedadd)))
+            if (Creature* add = instance->GetCreature((guid)))
             {
                 if (add->IsAlive())
                     return false;

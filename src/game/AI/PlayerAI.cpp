@@ -163,7 +163,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
     {
         bool foundSupRank = false;
         SpellEntry const* pCurrSpell_1 = sSpellMgr.GetSpellEntry(*(it));
-        for (std::_Simple_types<unsigned int>::value_type & usableSpell : usableSpells)
+        for (const auto & usableSpell : usableSpells)
         {
             SpellEntry const* pCurrSpell_2 = sSpellMgr.GetSpellEntry(usableSpell);
             if (pCurrSpell_2->SpellFamilyName == pCurrSpell_1->SpellFamilyName && pCurrSpell_2->SpellIconID == pCurrSpell_1->SpellIconID && pCurrSpell_2->SpellVisual == pCurrSpell_1->SpellVisual) // Meme sort, rangs differents

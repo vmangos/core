@@ -13534,7 +13534,7 @@ bool Player::SatisfyQuestPrevChain(Quest const* qInfo, bool msg) const
     if (qInfo->prevChainQuests.empty())
         return true;
 
-    for (std::_Simple_types<unsigned int>::value_type prevId : qInfo->prevChainQuests)
+    for (const auto prevId : qInfo->prevChainQuests)
     {
         // If any of the previous quests in chain active, return false
         if (IsCurrentQuest(prevId))
@@ -18700,13 +18700,13 @@ void Player::LearnDefaultSpells()
     if (!info)
         return;
 
-    for (std::_Simple_types<unsigned int>::value_type tspell : info->spell)
+    for (const auto spell : info->spell)
     {
-        DEBUG_LOG("PLAYER (Class: %u Race: %u): Adding initial spell, id = %u", uint32(GetClass()), uint32(GetRace()), tspell);
+        DEBUG_LOG("PLAYER (Class: %u Race: %u): Adding initial spell, id = %u", uint32(GetClass()), uint32(GetRace()), spell);
         if (!IsInWorld())                                   // will send in INITIAL_SPELLS in list anyway at map add
-            AddSpell(tspell, true, true, true, false);
+            AddSpell(spell, true, true, true, false);
         else                                                // but send in normal spell in game learn case
-            LearnSpell(tspell, true);
+            LearnSpell(spell, true);
     }
 }
 
@@ -20612,9 +20612,9 @@ bool Player::ChangeSpellsForRace(uint8 oldRace, uint8 newRace)
 
     PlayerInfo const* info = sObjectMgr.GetPlayerInfo(oldRace, GetClass());
     ASSERT(info);
-    for (std::_Simple_types<unsigned int>::value_type tspell : info->spell)
+    for (const auto spell : info->spell)
     {
-        ConvertSpell(tspell, 0);
+        ConvertSpell(spell, 0);
     }
     // Spell conversion
     for (std::map<uint32, uint32>::const_iterator it = sObjectMgr.factionchange_spells.begin(); it != sObjectMgr.factionchange_spells.end(); ++it)

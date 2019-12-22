@@ -196,7 +196,7 @@ struct instance_stratholme : public ScriptedInstance
     {
         uint32 uiCount = crystalsGUID.size();
 
-        for (std::_Simple_types<unsigned long long>::value_type i : crystalsGUID)
+        for (const auto i : crystalsGUID)
         {
             if (Creature* pCristal = instance->GetCreature(i))
             {
@@ -487,7 +487,7 @@ struct instance_stratholme : public ScriptedInstance
                     }
 
                     uint32 uiCount = abomnationGUID.size();
-                    for (std::_Simple_types<unsigned long long>::value_type i : abomnationGUID)
+                    for (const auto i : abomnationGUID)
                     {
                         if (Creature* pAbom = instance->GetCreature(i))
                         {
