@@ -1541,11 +1541,11 @@ void WarEffortEvent::UpdateStageEvents()
     }
 
     // Disable any remaining events
-    for (std::_Simple_types<unsigned short>::value_type & iter : active)
+    for (const auto & iter : active)
         DisableAndStopEvent(iter);
 
     // Enable any events that need to be enabled
-    for (std::_Simple_types<unsigned short>::value_type iter : required)
+    for (const auto iter : required)
     {
         // Just double check in case our lists are inconsistent
         if (!sGameEventMgr.IsActiveEvent(iter))

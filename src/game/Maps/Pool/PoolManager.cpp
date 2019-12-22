@@ -962,7 +962,7 @@ void PoolManager::LoadFromDB()
                 {
                     std::ostringstream ss;
                     ss << "The pool(s) ";
-                    for (std::_Simple_types<unsigned short>::value_type checkedPool : checkedPools)
+                    for (const auto checkedPool : checkedPools)
                         ss << checkedPool << " ";
                     ss << "create(s) a circular reference, which can cause the server to freeze.\nRemoving the last link between mother pool "
                        << poolItr->first << " and child pool " << poolItr->second;

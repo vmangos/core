@@ -700,8 +700,8 @@ void GameEventMgr::Initialize(MapPersistentState* state)
 {
     // At map persistent state creating need only apply pool spawn modifications
     // other data is global and will be auto-apply
-    for (std::_Simple_types<unsigned short>::value_type m_ActiveEvent : m_ActiveEvents)
-        for (auto pool_itr = mGameEventSpawnPoolIds[m_ActiveEvent].begin(); pool_itr != mGameEventSpawnPoolIds[m_ActiveEvent].end(); ++pool_itr)
+    for (const auto i : m_ActiveEvents)
+        for (auto pool_itr = mGameEventSpawnPoolIds[i].begin(); pool_itr != mGameEventSpawnPoolIds[i].end(); ++pool_itr)
             sPoolMgr.InitSpawnPool(*state, *pool_itr);
 }
 
@@ -877,7 +877,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
             return;
         }
 
-        for (std::_Simple_types<unsigned short>::value_type & itr : mGameEventSpawnPoolIds[event_id])
+        for (const auto & itr : mGameEventSpawnPoolIds[event_id])
             sPoolMgr.SpawnPoolInMaps(itr, true);
     }
 }
@@ -954,7 +954,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
             return;
         }
 
-        for (std::_Simple_types<unsigned short>::value_type & itr : mGameEventSpawnPoolIds[event_id])
+        for (const auto & itr : mGameEventSpawnPoolIds[event_id])
             sPoolMgr.DespawnPoolInMaps(itr);
     }
 }
@@ -1105,8 +1105,8 @@ bool GameEventMgr::IsActiveHoliday(HolidayIds id)
     if (id == HOLIDAY_NONE)
         return false;
 
-    for (std::_Simple_types<unsigned short>::value_type m_ActiveEvent : m_ActiveEvents)
-        if (mGameEvent[m_ActiveEvent].holiday_id == id)
+    for (const auto i : m_ActiveEvents)
+        if (mGameEvent[i].holiday_id == id)
             return true;
 
     return false;

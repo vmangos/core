@@ -64,7 +64,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
         eventFilter << " AND (event IS NULL ";
         bool initString = true;
 
-        for (std::_Simple_types<unsigned short>::value_type itr : activeEventsList)
+        for (const auto itr : activeEventsList)
         {
             if (initString)
             {
