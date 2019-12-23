@@ -410,7 +410,7 @@ struct go_pile_dechetsAI: public GameObjectAI
                     GetCreatureListWithEntryInGrid(MobList, Guru, 14826, 45.0f);          // Troll sacrifié
                     GetCreatureListWithEntryInGrid(MobList, Guru, 11351, 45.0f);          // Chasseur tête
 
-                    for (auto & itr : MobList)
+                    for (const auto & itr : MobList)
                     {
                         if (pUser->IsWithinLOSInMap(itr) && pUser->IsWithinDistInMap(itr, 45.0f) && itr->IsAlive())
                         {

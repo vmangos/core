@@ -90,7 +90,7 @@ void npc_reginald_windsorAI::SituationFinale()
     std::list<Creature*> mobList;
 
     GetCreatureListWithEntryInGrid(mobList, m_creature, NPC_ONYXIA_ELITE_GUARD, 150.0f);
-    for (auto & pMob : mobList)
+    for (const auto & pMob : mobList)
     {
         pMob->Respawn();
         pMob->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
@@ -628,7 +628,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
                 Onyxia->MonsterSay("Yesss... Guards, come to your lord's aid!");
                 int Var = 0;
                 GetCreatureListWithEntryInGrid(DragListe, Onyxia, NPC_STORMWIND_ROYAL_GUARD, 25.0f);
-                for (auto & itr : DragListe)
+                for (const auto & itr : DragListe)
                 {
                     DragsGUIDs[Var] = itr->GetGUID();
                     itr->UpdateEntry(NPC_ONYXIA_ELITE_GUARD);

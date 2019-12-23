@@ -186,7 +186,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 player->GroupEventFailHappens(QUEST_MISSING_DIPLO_PT8);
 
             // remove thugs
-            for (auto & pThug : m_thugs)
+            for (const auto & pThug : m_thugs)
             {
                 if (pThug && pThug->IsAlive())
                 {
@@ -232,7 +232,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                     pMotionMaster->MoveTargetedHome();
 
                 // check if thugs are alive
-                for (auto & pThug : m_thugs)
+                for (const auto & pThug : m_thugs)
                 {
                     if (pThug && pThug->IsAlive())
                     {

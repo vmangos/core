@@ -2491,7 +2491,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 
                 if (!tempTargetGOList.empty())
                 {
-                    for (auto & iter : tempTargetGOList)
+                    for (const auto & iter : tempTargetGOList)
                         AddGOTarget(iter, effIndex);
                 }
             }
@@ -2521,7 +2521,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
 
             if (!tempTargetGOList.empty())
             {
-                for (auto & iter : tempTargetGOList)
+                for (const auto & iter : tempTargetGOList)
                     AddGOTarget(iter, effIndex);
             }
 
@@ -4669,7 +4669,7 @@ void Spell::WriteSpellGoTargets(WorldPacket* data)
     uint32 miss = 0;
     size_t missPos = data->wpos();
     *data << (uint8)0; // placeholder
-    for (auto & ihit : m_UniqueTargetInfo)
+    for (const auto & ihit : m_UniqueTargetInfo)
     {
         if (ihit.missCondition != SPELL_MISS_NONE)        // Add only miss
         {
@@ -4702,7 +4702,7 @@ void Spell::SendLogExecute()
 
     uint32 effectCount = 0;
 
-    for (auto & i : m_executeLogInfo)
+    for (const auto & i : m_executeLogInfo)
     {
         if (!i.empty())
             effectCount++;

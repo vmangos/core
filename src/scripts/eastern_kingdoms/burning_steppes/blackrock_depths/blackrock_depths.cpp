@@ -1511,7 +1511,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(lGolems, m_creature, NPC_WARBRINGER_CONSTRUCT, 20.0f);
         if (!lGolems.empty())
         {
-            for (auto & pGolem : lGolems)
+            for (const auto & pGolem : lGolems)
             {
                 if (pGolem->IsAlive())
                 {

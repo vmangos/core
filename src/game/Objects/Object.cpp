@@ -1898,7 +1898,7 @@ struct MANGOS_DLL_DECL ObjectViewersDeliverer
     explicit ObjectViewersDeliverer(WorldObject const* sender, WorldPacket* msg, WorldObject const* except) : i_message(msg), i_sender(sender), i_except(except) {}
     void Visit(CameraMapType& m)
     {
-        for (auto & iter : m)
+        for (const auto & iter : m)
             if (Player* player = iter.getSource()->GetOwner())
                 if (player != i_except && player != i_sender)
                     if (player->IsInVisibleList_Unsafe(i_sender))
@@ -2481,7 +2481,7 @@ struct WorldObjectChangeAccumulator
 
     void Visit(CameraMapType& m)
     {
-        for (auto & iter : m)
+        for (const auto & iter : m)
         {
             Player* owner = iter.getSource()->GetOwner();
             if (owner != &i_object && owner->IsInVisibleList_Unsafe(&i_object))

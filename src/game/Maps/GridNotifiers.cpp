@@ -38,7 +38,7 @@ using namespace MaNGOS;
 void
 VisibleChangesNotifier::Visit(CameraMapType& m)
 {
-    for (auto & iter : m)
+    for (const auto & iter : m)
         iter.getSource()->UpdateVisibilityOf(&i_object);
 }
 
@@ -131,7 +131,7 @@ VisibleNotifier::Notify()
 void
 MessageDeliverer::Visit(CameraMapType& m)
 {
-    for (auto & iter : m)
+    for (const auto & iter : m)
     {
         Player* owner = iter.getSource()->GetOwner();
 
@@ -145,7 +145,7 @@ MessageDeliverer::Visit(CameraMapType& m)
 
 void MessageDelivererExcept::Visit(CameraMapType& m)
 {
-    for (auto & iter : m)
+    for (const auto & iter : m)
     {
         Player* owner = iter.getSource()->GetOwner();
 
@@ -161,7 +161,7 @@ void MessageDelivererExcept::Visit(CameraMapType& m)
 void
 ObjectMessageDeliverer::Visit(CameraMapType& m)
 {
-    for (auto & iter : m)
+    for (const auto & iter : m)
     {
         if (WorldSession* session = iter.getSource()->GetOwner()->GetSession())
             session->SendPacket(i_message);
@@ -171,7 +171,7 @@ ObjectMessageDeliverer::Visit(CameraMapType& m)
 void
 MessageDistDeliverer::Visit(CameraMapType& m)
 {
-    for (auto & iter : m)
+    for (const auto & iter : m)
     {
         Player* owner = iter.getSource()->GetOwner();
 
@@ -188,7 +188,7 @@ MessageDistDeliverer::Visit(CameraMapType& m)
 void
 ObjectMessageDistDeliverer::Visit(CameraMapType& m)
 {
-    for (auto & iter : m)
+    for (const auto & iter : m)
     {
         if (!i_dist || iter.getSource()->GetBody()->IsWithinDist(&i_object, i_dist))
         {

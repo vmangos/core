@@ -531,7 +531,7 @@ struct go_ghost_magnetAI: public GameObjectAI
         state = 1;
         std::list<GameObject*> lGobj;
         me->GetGameObjectListWithEntryInGrid(lGobj, GO_GHOST_MAGNET_AURA, 30.0f);
-        for (auto & it : lGobj)
+        for (const auto & it : lGobj)
         {
             if (it->isSpawned())
             {

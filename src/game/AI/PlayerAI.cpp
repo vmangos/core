@@ -124,7 +124,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
     }
     PlayerSpellMap spells = me->GetSpellMap();
     usableSpells.clear();
-    for (auto & spell : spells)
+    for (const auto & spell : spells)
     {
         if (spell.second.state == PLAYERSPELL_REMOVED || spell.second.disabled)
             continue;

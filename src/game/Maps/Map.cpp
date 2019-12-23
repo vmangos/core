@@ -694,7 +694,7 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
     for (int i = 0; i < (nthreads - 1); ++i)
         threads.push_back(new ACE_Based::Thread(new MapAsynchCellsWorker(i, nthreads, diff, now, 0, this)));
     UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 0);
-    for (auto & thread : threads)
+    for (const auto & thread : threads)
     {
         thread->wait();
         delete thread;
@@ -704,7 +704,7 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
     for (int i = 0; i < (nthreads - 1); ++i)
         threads.push_back(new ACE_Based::Thread(new MapAsynchCellsWorker(i, nthreads, diff, now, 1, this)));
     UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 1);
-    for (auto & thread : threads)
+    for (const auto & thread : threads)
     {
         thread->wait();
         delete thread;
@@ -776,7 +776,7 @@ inline void Map::UpdateCells(uint32 map_diff)
         std::vector<ACE_Based::Thread*> threads;
         for (int i = 0; i < nthreads; ++i)
             threads.push_back(new ACE_Based::Thread(new UnitsMovementUpdater(i, nthreads, unitsMvtUpdate, diff)));
-        for (auto & thread : threads)
+        for (const auto & thread : threads)
         {
             thread->wait();
             delete thread;
@@ -2149,7 +2149,7 @@ bool DungeonMap::Reset(InstanceResetMethod method)
         if (method == INSTANCE_RESET_ALL)
         {
             // notify the players to leave the instance so it can be reset
-            for (auto & itr : m_mapRefManager)
+            for (const auto & itr : m_mapRefManager)
                 itr.getSource()->SendResetFailedNotify();
         }
         else
@@ -2157,7 +2157,7 @@ bool DungeonMap::Reset(InstanceResetMethod method)
             if (method == INSTANCE_RESET_GLOBAL)
             {
                 // set the homebind timer for players inside (1 minute)
-                for (auto & itr : m_mapRefManager)
+                for (const auto & itr : m_mapRefManager)
                     itr.getSource()->m_InstanceValid = false;
             }
 
@@ -2181,7 +2181,7 @@ void DungeonMap::PermBindAllPlayers(Player* player)
 {
     Group* group = player->GetGroup();
     // group members outside the instance group don't get bound
-    for (auto & itr : m_mapRefManager)
+    for (const auto & itr : m_mapRefManager)
     {
         Player* plr = itr.getSource();
         // players inside an instance cannot be bound to other instances

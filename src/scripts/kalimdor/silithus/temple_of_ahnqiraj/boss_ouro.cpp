@@ -142,7 +142,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_creature->GetCreatureListWithEntryInGrid(lCreature, NPC_DIRT_MOUND, 250.0f);
         if (ShouldDespawnScarabs)
             m_creature->GetCreatureListWithEntryInGrid(lCreature, NPC_OURO_SCARAB, 250.0f);
-        for (auto & itr : lCreature)
+        for (const auto & itr : lCreature)
             itr->ForcedDespawn();
     }
 

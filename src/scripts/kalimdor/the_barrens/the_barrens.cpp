@@ -539,7 +539,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
             }
             std::list<Creature*> lCrea;
             m_creature->GetCreatureListWithEntryInGrid(lCrea, NPC_AFFRAY_SPECTATOR, 30.0f);
-            for (auto & it : lCrea)
+            for (const auto & it : lCrea)
             {
                 switch (urand(0, 10))
                 {

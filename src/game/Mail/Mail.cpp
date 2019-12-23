@@ -192,7 +192,7 @@ bool MailDraft::prepareItems(Player* receiver)
  */
 void MailDraft::deleteIncludedItems(bool inDB /**= false*/)
 {
-    for (auto & itr : m_items)
+    for (const auto & itr : m_items)
     {
         Item* item = itr.second;
 
@@ -268,7 +268,7 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, ObjectGuid sender_guid, Ob
 
         // set owner to new receiver (to prevent delete item with sender char deleting)
         CharacterDatabase.BeginTransaction();
-        for (auto & itr : m_items)
+        for (const auto & itr : m_items)
         {
             Item* item = itr.second;
             item->SaveToDB();                      // item not in inventory and can be save standalone
@@ -372,7 +372,7 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
 
         if (!m_items.empty())
         {
-            for (auto & itr : m_items)
+            for (const auto & itr : m_items)
                 masterReceiver->AddMItem(itr.second);
         }
     }

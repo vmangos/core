@@ -204,7 +204,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 if (m_uiSpawnPatrolOnBaronDeath <= uiDiff)
                 {
                     GetCreatureListWithEntryInGrid(m_EscortList, pBaron, 3854, 400.0f);
-                    for (auto & it : m_EscortList)
+                    for (const auto & it : m_EscortList)
                         if (it->GetRespawnDelay() == 7201)
                         {
                             it->SetVisibility(VISIBILITY_ON);
@@ -226,7 +226,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 if (m_uiSpawnPatrolOnCmdDeath <= uiDiff)
                 {
                     GetCreatureListWithEntryInGrid(m_EscortList, pCmd, 3854, 400.0f);
-                    for (auto & it : m_EscortList)
+                    for (const auto & it : m_EscortList)
                         if (it->GetRespawnDelay() == 7202)
                         {
                             it->SetVisibility(VISIBILITY_ON);

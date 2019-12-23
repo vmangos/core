@@ -48,7 +48,7 @@ void MMapFactory::clear()
 // ######################## MMapManager ########################
 MMapManager::~MMapManager()
 {
-    for (auto & loadedMMap : loadedMMaps)
+    for (const auto & loadedMMap : loadedMMaps)
         delete loadedMMap.second;
 
     // by now we should not have maps loaded

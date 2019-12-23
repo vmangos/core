@@ -27,7 +27,7 @@ TransportTemplate::~TransportTemplate()
 {
     // Collect shared pointers into a set to avoid deleting the same memory more than once
     std::set<TransportSpline*> splines;
-    for (auto & keyFrame : keyFrames)
+    for (const auto & keyFrame : keyFrames)
         splines.insert(keyFrame.Spline);
 
     for (auto spline : splines)

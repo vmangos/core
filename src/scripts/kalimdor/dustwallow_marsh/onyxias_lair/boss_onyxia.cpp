@@ -303,7 +303,7 @@ struct boss_onyxiaAI : public ScriptedAI
 
         std::list<Creature*> WarderList;
         GetCreatureListWithEntryInGrid(WarderList, m_creature, NPC_ONYXIAN_WARDER, 200.0f);
-        for (auto & itr : WarderList)
+        for (const auto & itr : WarderList)
             if (!itr->IsAlive())
                 itr->Respawn();
     }
@@ -318,7 +318,7 @@ struct boss_onyxiaAI : public ScriptedAI
     {
         std::list<Creature*> WhelpList;
         GetCreatureListWithEntryInGrid(WhelpList, m_creature, NPC_ONYXIAN_WHELP, 200.0f);
-        for (auto & itr : WhelpList)            
+        for (const auto & itr : WhelpList)
             itr->ForcedDespawn();
         
         ScriptedAI::EnterEvadeMode();

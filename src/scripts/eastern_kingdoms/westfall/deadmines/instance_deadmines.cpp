@@ -211,7 +211,7 @@ struct instance_deadmines : public ScriptedInstance
                 if (m_uiSpawnPatrolOnRhahkDeath <= uiDiff)
                 {
                     GetCreatureListWithEntryInGrid(m_EscortList, pRhahk, 634, 400.0f);
-                    for (auto & it : m_EscortList)
+                    for (const auto & it : m_EscortList)
                         if (it->GetRespawnDelay() == 43199)
                         {
                             it->SetVisibility(VISIBILITY_ON);
@@ -220,7 +220,7 @@ struct instance_deadmines : public ScriptedInstance
                     m_EscortList.clear();
 
                     GetCreatureListWithEntryInGrid(m_EscortList, pRhahk, 1729, 400.0f);
-                    for (auto & it : m_EscortList)
+                    for (const auto & it : m_EscortList)
                         if (it->GetRespawnDelay() == 43199)
                         {
                             it->SetVisibility(VISIBILITY_ON);
@@ -242,7 +242,7 @@ struct instance_deadmines : public ScriptedInstance
                 if (m_uiSpawnPatrolOnGilnidDeath <= uiDiff)
                 {
                     GetCreatureListWithEntryInGrid(m_EscortList, pGilnid, 4417, 400.0f);
-                    for (auto & it : m_EscortList)
+                    for (const auto & it : m_EscortList)
                         if (it->GetRespawnDelay() == 43201)
                         {
                             it->SetVisibility(VISIBILITY_ON);
@@ -251,7 +251,7 @@ struct instance_deadmines : public ScriptedInstance
                     m_EscortList.clear();
 
                     GetCreatureListWithEntryInGrid(m_EscortList, pGilnid, 4418, 400.0f);
-                    for (auto & it : m_EscortList)
+                    for (const auto & it : m_EscortList)
                         if (it->GetRespawnDelay() == 43201)
                         {
                             it->SetVisibility(VISIBILITY_ON);
@@ -278,7 +278,7 @@ struct instance_deadmines : public ScriptedInstance
                         case 0:
                             DoScriptText(INST_SAY_ALARM1, pMrSmite);
                             GetCreatureListWithEntryInGrid(m_EscortList, pMrSmite, 657, 400.0f);
-                            for (auto & it : m_EscortList)
+                            for (const auto & it : m_EscortList)
                                 if (it->GetRespawnDelay() == 43202)
                                     it->GetMotionMaster()->MovePoint(0, -99.6611f, -671.071655f, 7.42241f, MOVE_PATHFINDING | MOVE_RUN_MODE);
                             m_EscortList.clear();

@@ -37,7 +37,7 @@ Bag::Bag(): Item()
 
 Bag::~Bag()
 {
-    for (auto & i : m_bagslot)
+    for (const auto & i : m_bagslot)
         delete i;
 }
 
@@ -119,7 +119,7 @@ bool Bag::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint32
 
 void Bag::DeleteFromDB()
 {
-    for (auto & i : m_bagslot)
+    for (const auto & i : m_bagslot)
         if (i)
             i->DeleteFromDB();
 

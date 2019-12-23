@@ -343,7 +343,7 @@ public:
 
     void SpawnPyramidWave(uint32 wave)
     {
-        for (auto & pyramidSpawn : pyramidSpawns)
+        for (const auto & pyramidSpawn : pyramidSpawns)
         {
             if (pyramidSpawn[0] == (float)wave)
             {

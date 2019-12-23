@@ -6857,7 +6857,7 @@ void Aura::HandleAuraSafeFall(bool Apply, bool Real)
 SpellAuraHolder::~SpellAuraHolder()
 {
     // note: auras in delete list won't be affected since they clear themselves from holder when adding to deletedAuraslist
-    for (auto & aura : m_auras)
+    for (const auto & aura : m_auras)
         delete aura;
 
     delete _pveHeartBeatData;

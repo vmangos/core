@@ -267,7 +267,7 @@ struct boss_victor_nefariusAI : ScriptedAI
 
         std::list<GameObject*> lGameObjects;
         m_creature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_DRAKONID_BONES, 250.0f);
-        for (auto & pGo : lGameObjects)
+        for (const auto & pGo : lGameObjects)
             pGo->DeleteLater();
 
         // @TODO: Find out why there is this reset bug !!

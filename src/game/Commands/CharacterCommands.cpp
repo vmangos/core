@@ -1416,7 +1416,7 @@ bool ChatHandler::HandleCharacterDeletedRestoreCommand(char* args)
     if (newCharName.empty())
     {
         // Drop nonexistent account cases
-        for (auto & itr : foundList)
+        for (const auto & itr : foundList)
             HandleCharacterDeletedRestoreHelper(itr);
     }
     else if (foundList.size() == 1 && normalizePlayerName(newCharName))

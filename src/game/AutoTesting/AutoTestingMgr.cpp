@@ -62,7 +62,7 @@ void SingleTest::ClearObjects()
     Map* map = GetMap();
     if (!map)
         return;
-    for (auto & itr : _testObjects)
+    for (const auto & itr : _testObjects)
     { 
         if (WorldObject* obj = map->GetWorldObject(itr.second))
         {
@@ -215,7 +215,7 @@ void SingleTest::Finish(bool success, char const* errMsg)
 
 void AutoTestingMgr::Update(uint32 diff)
 {
-    for (auto & itr : _tests)
+    for (const auto & itr : _tests)
     {
         if (!itr->Finished())
         {
@@ -231,7 +231,7 @@ void AutoTestingMgr::Update(uint32 diff)
 
 void AutoTestingMgr::Run(std::string names, ChatHandler* handler)
 {
-    for (auto & itr : _tests)
+    for (const auto & itr : _tests)
     {
         if (!itr->Finished())
             continue;

@@ -383,10 +383,10 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         break;
     case TYPE_CTHUN:
         m_auiEncounter[uiType] = uiData;
-        for (auto & it : graspsOfCthun) {
-            if (GameObject* pGo = GetGameObject(it)) {
+        for (const auto & guid : graspsOfCthun)
+        {
+            if (GameObject* pGo = GetGameObject(guid))
                 pGo->SetVisible(uiData != DONE);
-            }
         }
         break;
     }

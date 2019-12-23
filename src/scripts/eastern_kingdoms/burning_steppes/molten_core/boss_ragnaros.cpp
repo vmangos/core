@@ -371,7 +371,7 @@ struct boss_ragnarosAI : ScriptedAI
                 std::list<Creature*> FilsListe;
                 GetCreatureListWithEntryInGrid(FilsListe, m_creature, NPC_SON_OF_FLAME, 150.0f);
 
-                for (auto & itr : FilsListe)
+                for (const auto & itr : FilsListe)
                 {
                     if (itr->IsAlive())
                     {

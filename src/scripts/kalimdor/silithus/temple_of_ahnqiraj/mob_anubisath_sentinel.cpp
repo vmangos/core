@@ -187,7 +187,7 @@ struct aqsentinelAI : public ScriptedAI
         if (assistList.empty())
             return;
 
-        for (auto & iter : assistList)
+        for (const auto & iter : assistList)
             AddBuddyToList(iter);
     }
 

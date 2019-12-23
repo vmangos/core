@@ -1112,7 +1112,7 @@ bool ScourgeInvasionEvent::SummonNecropolis(Map* pMap, InvasionNecropolis& point
 
 bool ScourgeInvasionEvent::isValidZoneId(uint32 zoneId)
 {
-    for (auto & invasionPoint : invasionPoints)
+    for (const auto & invasionPoint : invasionPoints)
         if (invasionPoint.zoneId == zoneId)
             return true;
 
@@ -1133,7 +1133,7 @@ ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetZone(uint32 zoneId)
 uint32 ScourgeInvasionEvent::GetNewRandomZone(uint32 curr1, uint32 curr2)
 {
     std::vector<uint32> validZones;
-    for (auto & invasionPoint : invasionPoints)
+    for (const auto & invasionPoint : invasionPoints)
     {
         if (invasionPoint.zoneId != curr1 && invasionPoint.zoneId != curr2)
             validZones.push_back(invasionPoint.zoneId);
@@ -1471,7 +1471,7 @@ void WarEffortEvent::CompleteWarEffort()
         EVENT_WAR_EFFORT_BATTLE_ZORA
     } };
 
-    for (auto & itr : stopEvents)
+    for (const auto & itr : stopEvents)
         DisableAndStopEvent(itr);
 
     stage = WAR_EFFORT_STAGE_COMPLETE;
@@ -1516,7 +1516,7 @@ void WarEffortEvent::UpdateStageEvents()
         required.push_back(warEffortStageEvents[stage][i]);
     }
 
-    for (auto & event : events)
+    for (const auto & event : events)
     {
         if (!event)
             continue;

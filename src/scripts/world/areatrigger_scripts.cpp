@@ -43,7 +43,7 @@ uint32 TriggerOrphanSpell[6][3] =
 
 bool AreaTrigger_at_childrens_week_spot(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    for (auto & i : TriggerOrphanSpell)
+    for (const auto & i : TriggerOrphanSpell)
     {
         if (pAt->id == i[0] &&
                 pPlayer->GetMiniPet() && pPlayer->GetMiniPet()->GetEntry() == i[1])

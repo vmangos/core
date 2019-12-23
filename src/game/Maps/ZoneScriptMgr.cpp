@@ -32,9 +32,9 @@ ZoneScriptMgr::ZoneScriptMgr()
 
 ZoneScriptMgr::~ZoneScriptMgr()
 {
-    for (auto itr : m_ZoneScriptsSet)
+    for (const auto & itr : m_ZoneScriptsSet)
         delete itr;
-    for (auto & itr : m_ZoneScripts_Scripts)
+    for (const auto & itr : m_ZoneScripts_Scripts)
         delete itr;
 }
 
@@ -47,7 +47,7 @@ void ZoneScriptMgr::InitMapZoneScripts(uint32 mapId, Map* pMap)
 {
     ZoneScript* pScript = nullptr;
     uint32 counter = 0;
-    for (auto & itr : m_ZoneScripts_Scripts)
+    for (const auto & itr : m_ZoneScripts_Scripts)
     {
         if (itr->GetMapId() != mapId)
             continue;

@@ -1119,7 +1119,7 @@ BattleGround * BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 inst
     if (!bg)
         return nullptr;
 
-    for (auto & itr : m_BattleGrounds[bgTypeId])
+    for (const auto & itr : m_BattleGrounds[bgTypeId])
     {
         if (itr.second->GetClientInstanceID() == instanceId)
             return itr.second;

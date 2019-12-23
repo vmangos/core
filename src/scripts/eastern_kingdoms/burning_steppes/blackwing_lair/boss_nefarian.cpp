@@ -451,7 +451,7 @@ struct boss_nefarianAI : ScriptedAI
             std::list<GameObject*> GOListe;
             GetGameObjectListWithEntryInGrid(GOListe, m_creature, 179804, 200.0f);
 
-            for (auto & itr : GOListe)
+            for (const auto & itr : GOListe)
             {
                 m_creature->SummonCreature(NPC_BONE_CONSTRUCT,
                     itr->GetPositionX(),

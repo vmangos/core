@@ -2275,7 +2275,7 @@ bool ChatHandler::HandleMmapTestArea(char* args)
 
         float x, y, z;
         m_session->GetPlayer()->GetPosition(x, y, z);
-        for (auto & itr : creatureList)
+        for (const auto & itr : creatureList)
         {
             if (itr->GetTypeId() != TYPEID_UNIT)
                 continue;

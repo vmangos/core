@@ -165,7 +165,7 @@ struct boss_marliAI : public ScriptedAI
         else
         {
             lEggs.sort(ObjectDistanceOrder(m_creature));
-            for (auto & pEgg : lEggs)
+            for (const auto & pEgg : lEggs)
             {
                 if (pEgg->GetGoState() == (GO_STATE_READY))
                     return pEgg;

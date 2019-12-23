@@ -109,7 +109,7 @@ Group::~Group()
     // it is undefined whether objectmgr (which stores the groups) or instancesavemgr
     // will be unloaded first so we must be prepared for both cases
     // this may unload some dungeon persistent state
-    for (auto & itr : m_boundInstances)
+    for (const auto & itr : m_boundInstances)
         itr.second.state->RemoveGroup(this);
 
     // Sub group counters clean up

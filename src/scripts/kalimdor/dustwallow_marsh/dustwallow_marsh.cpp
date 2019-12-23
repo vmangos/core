@@ -296,7 +296,7 @@ struct npc_private_hendelAI : public ScriptedAI
         // reset private hendel's faction
         m_creature->SetFactionTemplateId(FACTION_THERAMORE); // theramore faction
         // reset his guards faction
-        for (auto & guard : m_guards)
+        for (const auto & guard : m_guards)
         {
             if (guard && guard->IsAlive())
             {
@@ -531,7 +531,7 @@ struct npc_private_hendelAI : public ScriptedAI
             if (m_nextPhaseDelayTimer < uiDiff)
             {
                 // make allies face private hendel
-                for (auto & ally : m_allies)
+                for (const auto & ally : m_allies)
                     ally->SetFacingToObject(m_creature);
 
                 // Tervosh is index 0
@@ -671,7 +671,7 @@ struct npc_private_hendelAI : public ScriptedAI
                     }
 
                     // restore original allies in Theramore
-                    for (auto & i : m_alliesOriginal)
+                    for (const auto & i : m_alliesOriginal)
                     {
                         if (i)
                         {
@@ -1394,7 +1394,7 @@ struct npc_tabethaAI : ScriptedAI
 
         if (manaSurges.empty()) return;
 
-        for (auto & manaSurge : manaSurges)
+        for (const auto & manaSurge : manaSurges)
             if (manaSurge->IsAlive())
                 manaSurge->ForcedDespawn();
     }

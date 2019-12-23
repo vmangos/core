@@ -35,7 +35,7 @@ GuildMgr::GuildMgr()
 
 GuildMgr::~GuildMgr()
 {
-    for (auto & itr : m_GuildMap)
+    for (const auto & itr : m_GuildMap)
         delete itr.second;
 
     CleanUpPetitions();
@@ -43,7 +43,7 @@ GuildMgr::~GuildMgr()
 
 void GuildMgr::CleanUpPetitions()
 {
-    for (auto & iter : m_petitionMap)
+    for (const auto & iter : m_petitionMap)
         delete iter.second; // will clean up signatures too
 
     m_petitionMap.clear();
@@ -254,7 +254,7 @@ void GuildMgr::LoadPetitions()
 
 Petition::~Petition()
 {
-    for (auto & itr : m_signatures)
+    for (const auto & itr : m_signatures)
         delete itr;
 
     m_signatures.clear();
@@ -292,7 +292,7 @@ Petition* GuildMgr::GetPetitionById(uint32 id)
 Petition* GuildMgr::GetPetitionByCharterGuid(ObjectGuid const& charterGuid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
-    for (auto & iter : m_petitionMap)
+    for (const auto & iter : m_petitionMap)
     {
         Petition* petition = iter.second;
         if (petition->GetCharterGuid() == charterGuid)
@@ -305,7 +305,7 @@ Petition* GuildMgr::GetPetitionByCharterGuid(ObjectGuid const& charterGuid)
 Petition* GuildMgr::GetPetitionByOwnerGuid(ObjectGuid const& ownerGuid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
-    for (auto & iter : m_petitionMap)
+    for (const auto & iter : m_petitionMap)
     {
         Petition* petition = iter.second;
         if (petition->GetOwnerGuid() == ownerGuid)

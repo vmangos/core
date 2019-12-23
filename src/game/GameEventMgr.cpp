@@ -712,7 +712,7 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= nullptr*/)
     time_t currenttime = time(nullptr);
     uint32 nextEventDelay = max_ge_check_delay;             // 1 day
 
-    for (auto & hEvent_iter : mGameEventHardcodedList)
+    for (const auto & hEvent_iter : mGameEventHardcodedList)
     {
         if (!mGameEvent[hEvent_iter->m_eventId].disabled)
         {

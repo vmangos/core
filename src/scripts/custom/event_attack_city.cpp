@@ -730,7 +730,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
         Cell::VisitAllObjects(ME, searcher, 120.0f);
         Unit* nearest = nullptr;
         uint32 quality = 0;
-        for (auto & target : targets)
+        for (const auto & target : targets)
         {
             uint32 currVictimQuality = 0;
             if (target->GetFactionTemplateId() == ME->GetFactionTemplateId())

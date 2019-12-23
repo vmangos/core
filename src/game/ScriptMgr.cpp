@@ -54,7 +54,7 @@ ScriptMgr::ScriptMgr() : m_scheduledScripts(0)
 ScriptMgr::~ScriptMgr()
 {
     // Free resources before library unload
-    for (auto & script : m_scripts)
+    for (const auto & script : m_scripts)
         delete script;
 
     m_scripts.clear();
@@ -2276,7 +2276,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         "quest_end_scripts",
         "quest_start_scripts"
     };
-    for (auto & script_table : script_tables)
+    for (const auto & script_table : script_tables)
     {
         // From SCRIPT_COMMAND_START_SCRIPT.
         result.reset(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command`=39", script_table));

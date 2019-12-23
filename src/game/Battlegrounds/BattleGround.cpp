@@ -609,7 +609,7 @@ void BattleGround::EndBattleGround(Team winner)
     //we must set it this way, because end time is sent in packet!
     m_EndTime = TIME_TO_AUTOREMOVE;
 
-    for (auto & itr : m_Players)
+    for (const auto & itr : m_Players)
     {
         Team team = itr.second.PlayerTeam;
 
@@ -1307,7 +1307,7 @@ void BattleGround::StartingEventDespawnDoors()
 void BattleGround::ReturnPlayersToHomeGY()
 {
     // return bastards back homie
-    for (auto & itr : m_Players)
+    for (const auto & itr : m_Players)
     {
         auto player = sObjectMgr.GetPlayer(itr.first);
 

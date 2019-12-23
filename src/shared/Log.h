@@ -149,11 +149,13 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         honorLogfile = nullptr;
 
         for (auto & logFile : logFiles)
+        {
             if (logFile != nullptr)
             {
                 fclose(logFile);
                 logFile = nullptr;
             }
+        } 
     }
     public:
         void Initialize();

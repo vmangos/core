@@ -269,7 +269,7 @@ struct boss_gluthAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(chowableZombies, m_creature, NPC_ZOMBIE_CHOW, 15.0f);
         if (chowableZombies.empty())
             return;
-        for (auto & chowableZombie : chowableZombies)
+        for (const auto & chowableZombie : chowableZombies)
         {
             if (!chowableZombie->IsAlive())
                 continue;

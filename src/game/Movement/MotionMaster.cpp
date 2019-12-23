@@ -254,7 +254,7 @@ void MotionMaster::DelayedClean(bool reset, bool all)
         pop();
         mvtGensToFinalize.push_back(curr);
     }
-    for (auto & it : mvtGensToFinalize)
+    for (const auto & it : mvtGensToFinalize)
     {
         it->Finalize(*m_owner);
 
@@ -326,7 +326,7 @@ void MotionMaster::DelayedExpire(bool reset)
         pop();
         mvtGensToFinalize.push_back(temp);
     }
-    for (auto & it : mvtGensToFinalize)
+    for (const auto & it : mvtGensToFinalize)
     {
         it->Finalize(*m_owner);
         m_expList->push_back(it);

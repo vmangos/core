@@ -192,7 +192,7 @@ struct boss_razorgoreAI : public ScriptedAI
             m_creature->GetCreatureListWithEntryInGrid(lCreature, BLACKWING_MAGE, 250.0f);
             m_creature->GetCreatureListWithEntryInGrid(lCreature, DEATH_TALON_DRAGONSPAWN, 250.0f);
 
-            for (auto & itr : lCreature)
+            for (const auto & itr : lCreature)
                 itr->DeleteLater();
 
             if (GameObject* pGO = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(DATA_ORB_DOMINATION_GUID)))
@@ -218,7 +218,7 @@ struct boss_razorgoreAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(GardesListe, m_creature, MOB_GARDE_AILE_NOIRE, 150.0f);
             GetCreatureListWithEntryInGrid(GardesListe, m_creature, MOB_GRETHOK, 150.0f);
 
-            for (auto & itr : GardesListe)
+            for (const auto & itr : GardesListe)
             {
                 if (!itr->IsAlive())
                     itr->Respawn();
@@ -244,7 +244,7 @@ struct boss_razorgoreAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, BLACKWING_MAGE, 250.0f);
         GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, DEATH_TALON_DRAGONSPAWN, 250.0f);
 
-        for (auto & it : lCreatureNear)
+        for (const auto & it : lCreatureNear)
         {
             if (it->IsAlive())
                 it->AI()->EnterEvadeMode();
@@ -392,7 +392,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, BLACKWING_MAGE, 250.0f);
         GetCreatureListWithEntryInGrid(lCreatureNear, m_creature, DEATH_TALON_DRAGONSPAWN, 250.0f);
 
-        for (auto & it : lCreatureNear)
+        for (const auto & it : lCreatureNear)
         {
             if (it->IsAlive())
             {
@@ -576,7 +576,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                 GetCreatureListWithEntryInGrid(lGuards, m_creature, MOB_GARDE_AILE_NOIRE, 150.0f);
                 GetCreatureListWithEntryInGrid(lGuards, m_creature, MOB_GRETHOK, 150.0f);
 
-                for (auto & pGuard : lGuards)
+                for (const auto & pGuard : lGuards)
                 {
                     if (!pGuard->IsInCombat())
                     {
@@ -626,7 +626,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                         GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_LEGGIONAIRE, 150.0f);
                         GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_MAGE, 150.0f);
 
-                        for (auto & itr : lCreature)
+                        for (const auto & itr : lCreature)
                         {
                             if (itr->GetThreatManager().getThreat(pRazorgore))
                             {
@@ -651,7 +651,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                         GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_LEGGIONAIRE, 150.0f);
                         GetCreatureListWithEntryInGrid(lCreature, m_creature, BLACKWING_MAGE, 150.0f);
 
-                        for (auto & itr : lCreature)
+                        for (const auto & itr : lCreature)
                             itr->GetThreatManager().modifyThreatPercent(pRazorgore, -100);
 
                         // Razorgore must attack the possessor

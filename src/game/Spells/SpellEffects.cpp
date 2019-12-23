@@ -3238,7 +3238,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             data << m_caster->GetGUID();                // Caster GUID
 #endif
             data << uint32(count);
-            for (auto & j : success_list)
+            for (const auto & j : success_list)
             {
                 SpellAuraHolder* dispelledHolder = j.first;
                 data << uint32(dispelledHolder->GetId());   // Spell Id

@@ -140,7 +140,7 @@ public:
 
     ~AutoTestingMgr()
     {
-        for (auto & itr : _tests)
+        for (const auto & itr : _tests)
             delete itr;
     }
 

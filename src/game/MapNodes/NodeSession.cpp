@@ -154,7 +154,7 @@ void NodeSession::Close()
     // Will kick all connected users.
     // TODO: Go back to character selection screen ?
     m_socketsLock.acquire_write();
-    for (auto & itr : m_accountSockets)
+    for (const auto & itr : m_accountSockets)
     {
         itr.second->CloseSocket();
         itr.second->RemoveReference();

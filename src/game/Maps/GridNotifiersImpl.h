@@ -47,9 +47,9 @@ inline void MaNGOS::VisibleNotifier::Visit(GridRefManager<T>& m)
 inline void MaNGOS::ObjectUpdater::Visit(CreatureMapType& m)
 {
     std::vector<Creature*> creaturesToUpdate;
-    for (auto & iter : m)
+    for (const auto & iter : m)
         creaturesToUpdate.push_back(iter.getSource());
-    for (auto & it : creaturesToUpdate)
+    for (const auto & it : creaturesToUpdate)
     {
         WorldObject::UpdateHelper helper(it);
         helper.UpdateRealTime(i_now, i_timeDiff);
@@ -569,7 +569,7 @@ void MaNGOS::PlayerSearcher<Check>::Visit(PlayerMapType& m)
 template<class Check>
 void MaNGOS::PlayerLastSearcher<Check>::Visit(PlayerMapType& m)
 {
-    for (auto & itr : m)
+    for (const auto & itr : m)
     {
         if (i_check(itr.getSource()))
             i_object = itr.getSource();

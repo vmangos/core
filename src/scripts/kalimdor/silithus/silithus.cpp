@@ -1744,7 +1744,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoSummonDragons()
     {
-        for (auto & spawnData : aEternalBoardNPCs)
+        for (const auto & spawnData : aEternalBoardNPCs)
             m_creature->SummonCreature(spawnData.m_uiEntry, spawnData.m_fX, spawnData.m_fY, spawnData.m_fZ, spawnData.m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
@@ -1772,7 +1772,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         }
 
         // Also summon the 3 anubisath conquerors
-        for (auto & spawnData : aQirajiWarriors)
+        for (const auto & spawnData : aQirajiWarriors)
             m_creature->SummonCreature(NPC_ANUBISATH_CONQUEROR, spawnData.m_fX, spawnData.m_fY, spawnData.m_fZ, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
@@ -2737,7 +2737,7 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
     Unit* GetVictimInRangePlayerOnly(float min, float max)
     {
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-        for (auto itr : tList)
+        for (const auto itr : tList)
         {
             if (ObjectGuid uiTargetGuid = itr->getUnitGuid())
             {
@@ -3072,7 +3072,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
                 if (!gruntList.empty())
                 {
-                    for (auto & itr : gruntList)
+                    for (const auto & itr : gruntList)
                     {
                         if (itr->IsAlive())
                             DoScriptText(SAY_LINE_9, itr);

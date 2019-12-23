@@ -100,7 +100,7 @@ LanguageDesc lang_description[LANGUAGES_COUNT] =
 
 LanguageDesc const* GetLanguageDescByID(uint32 lang)
 {
-    for (auto & i : lang_description)
+    for (const auto & i : lang_description)
     {
         if (uint32(i.lang_id) == lang)
             return &i;
@@ -3871,7 +3871,7 @@ void ObjectMgr::LoadPetLevelInfo()
     }
 
     // Fill gaps and check integrity
-    for (auto & itr : m_PetInfoMap)
+    for (const auto & itr : m_PetInfoMap)
     {
         PetLevelInfo* pInfo = itr.second;
 
@@ -8037,7 +8037,7 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
 {
     LoadQuestRelationsHelper(m_CreatureQuestInvolvedRelations, "creature_involvedrelation");
 
-    for (auto & itr : m_CreatureQuestInvolvedRelations)
+    for (const auto & itr : m_CreatureQuestInvolvedRelations)
     {
         CreatureInfo const* cInfo = GetCreatureTemplate(itr.first);
         if (!cInfo)

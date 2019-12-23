@@ -534,7 +534,7 @@ void LFGQueue::RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod
 
 void LFGQueue::FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude)
 {
-    for (auto & itr : m_QueuedPlayers)
+    for (const auto & itr : m_QueuedPlayers)
     {
         if (itr.first == exclude)
             continue;

@@ -386,7 +386,7 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void EvadeAllGuardians()
     {
-        for (auto & guardian : guardians)
+        for (const auto & guardian : guardians)
         {
             if (Creature* pCreature = m_pInstance->GetCreature(guardian.first))
             {

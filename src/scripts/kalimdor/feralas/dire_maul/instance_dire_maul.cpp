@@ -757,7 +757,7 @@ struct npc_residual_montruosityAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(montruosityList, m_creature, 11484, 45.0f);
             if (!montruosityList.empty())
             {
-                for (auto & itr : montruosityList)
+                for (const auto & itr : montruosityList)
                 {
                     if (itr != m_creature)
                     {
@@ -1929,7 +1929,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         GetCreatureListWithEntryInGrid(m_lHelpers, m_creature, NPC_ALZZINS_MINION, 80.0f);
         if (!m_lHelpers.empty())
         {
-            for (auto & pCreature : m_lHelpers)
+            for (const auto & pCreature : m_lHelpers)
             {
                 if (pCreature && !pCreature->IsAlive())
                     static_cast<TemporarySummon*>(pCreature)->UnSummon();

@@ -140,7 +140,7 @@ struct boss_majordomoAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(AddListe, m_creature, 11664, 150.0f);
         if (!AddListe.empty())
         {
-            for (auto & itr : AddListe)
+            for (const auto & itr : AddListe)
             {
                 if (itr->IsAlive() && AddVivant > 0)
                 {
@@ -155,7 +155,7 @@ struct boss_majordomoAI : public ScriptedAI
         {
             if (!AddListe.empty())
             {
-                for (auto & itr : AddListe)
+                for (const auto & itr : AddListe)
                 {
                     if (itr->IsAlive())
                     {
@@ -171,7 +171,7 @@ struct boss_majordomoAI : public ScriptedAI
         {
             if (!AddListe.empty())
             {
-                for (auto & itr : AddListe)
+                for (const auto & itr : AddListe)
                 {
                     if (itr->IsAlive())
                     {

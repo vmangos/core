@@ -585,7 +585,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_WYRMIDE_GRIFFEMORT, 50.0f);
         GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_RONGE_GRIFFEMORT, 50.0f);
 
-        for (auto & itr : lCreature)
+        for (const auto & itr : lCreature)
         {
             if (!itr->IsAlive())
                 continue;

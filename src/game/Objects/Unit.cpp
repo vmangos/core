@@ -7970,7 +7970,7 @@ void CharmInfo::LoadPetActionBar(std::string const& data)
 
 void CharmInfo::BuildActionBar(WorldPacket* data)
 {
-    for (auto & i : PetActionBar)
+    for (const auto & i : PetActionBar)
         *data << uint32(i.packedData);
 }
 

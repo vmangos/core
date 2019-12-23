@@ -333,7 +333,7 @@ void LoadDBCStores(std::string const& dataPath)
 
             // add total amount bits for first rank starting from talent tab first talent rank pos.
             uint32 pos = 0;
-            for (auto & itr : sTalentBitSize)
+            for (const auto & itr : sTalentBitSize)
             {
                 uint32 talentId = itr.first & 0xFFFF;
                 TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
@@ -442,7 +442,7 @@ void LoadDBCStores(std::string const& dataPath)
     else if (!bad_dbc_files.empty())
     {
         std::string str;
-        for (auto & bad_dbc_file : bad_dbc_files)
+        for (const auto & bad_dbc_file : bad_dbc_files)
             str += bad_dbc_file + "\n";
 
         sLog.outError("\nSome required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFilesCount, str.c_str());

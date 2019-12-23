@@ -1217,7 +1217,7 @@ struct rat_des_profondeursAI : public ScriptedAI
             // Et on ".die" les autres rats.
             std::list<Creature*> pCreaList;
             m_creature->GetCreatureListWithEntryInGrid(pCreaList, NPC_RAT_ENSORCELE, 100.0f);
-            for (auto & pCreature : pCreaList)
+            for (const auto & pCreature : pCreaList)
             {
                 if (pCreature->AI()->GetData(0) == m_FollowingPlayerGuid.GetCounter())
                     pCreature->DisappearAndDie();

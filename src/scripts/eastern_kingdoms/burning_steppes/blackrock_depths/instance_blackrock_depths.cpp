@@ -778,7 +778,7 @@ struct instance_blackrock_depths : ScriptedInstance
                         std::list<Creature*> AnvilrageList;
                         GetCreatureListWithEntryInGrid(AnvilrageList, magnus, 8901, 400.0f);
 
-                        for (auto & it : AnvilrageList)
+                        for (const auto & it : AnvilrageList)
                             it->SetRespawnDelay(345600);
                     }
                 }

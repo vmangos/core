@@ -244,7 +244,7 @@ struct npc_paoka_swiftmountainAI : public npc_escortAI
 
     void DoSpawnWyvern()
     {
-        for (auto & pos : m_afWyvernLoc)
+        for (const auto & pos : m_afWyvernLoc)
             m_creature->SummonCreature(NPC_WYVERN,
                                        pos[0], pos[1], pos[2], 0.0f,
                                        TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);

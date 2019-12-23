@@ -277,7 +277,7 @@ struct boss_buruAI : public ScriptedAI
             // Pop des add lors de l'enrage (3, mais je ne suis pas sur de ce nombre et ne sait pas s'ils arrivent tous d'un coup)
             if (!m_HatchPop)
             {
-                for (auto & i : AddPop)
+                for (const auto & i : AddPop)
                 {
                     if (Creature* summoned = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                         summoned->SetInCombatWithZone();

@@ -157,7 +157,7 @@ public:
             if (player->CanEquipNewItem(slot, dest, id, true))
                 items[slot].insert(id);
         }
-        for (auto & item : items)
+        for (const auto & item : items)
             if (!item.empty())
             {
                 auto it = item.begin();
