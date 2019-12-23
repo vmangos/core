@@ -2120,7 +2120,7 @@ bool ChatHandler::isValidChatMessage(char const* message)
                             return false;
 
                         ItemRandomPropertiesEntry const* iProp = nullptr;
-                        for (std::_Simple_types<int>::value_type prop : properties)
+                        for (const auto prop : properties)
                         {
                             iProp = nullptr;
 

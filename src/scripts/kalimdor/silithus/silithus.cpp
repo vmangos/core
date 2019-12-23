@@ -224,9 +224,9 @@ struct go_pierre_ventsAI: public GameObjectAI
     uint32 SelectRandomBoss(uint32 stoneType)
     {
         std::vector<uint32> possibleBosses;
-        for (const auto & windStonesBosse : windStonesBosses)
-            if (windStonesBosse.stoneType == stoneType)
-                possibleBosses.push_back(windStonesBosse.summonEntry);
+        for (const auto & stone : windStonesBosses)
+            if (stone.stoneType == stoneType)
+                possibleBosses.push_back(stone.summonEntry);
         ASSERT(!possibleBosses.empty());
         return possibleBosses[urand(0, possibleBosses.size() - 1)];
     }
@@ -294,10 +294,10 @@ struct go_pierre_ventsAI: public GameObjectAI
         //player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION + stoneType - 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
-        for (const auto & windStonesBosse : windStonesBosses)
-            if (windStonesBosse.stoneType == stoneType)
-                if (player->HasItemCount(windStonesBosse.reqItem, 1))
-                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, windStonesBosse.gossipOption, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + windStonesBosse.action);
+        for (const auto & stone : windStonesBosses)
+            if (stone.stoneType == stoneType)
+                if (player->HasItemCount(stone.reqItem, 1))
+                    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, stone.gossipOption, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + stone.action);
 
         player->SEND_GOSSIP_MENU(GOSSIP_STONE_FIRST_HELLO + stoneType - 1, me->GetGUID());
         return true;
@@ -328,13 +328,18 @@ struct go_pierre_ventsAI: public GameObjectAI
                 textId = 10686;
                 break;
         }
-        for (const auto & windStonesBosse : windStonesBosses)
-            if (windStonesBosse.stoneType == stoneType && action == GOSSIP_ACTION_INFO_DEF + windStonesBosse.action)
-                if (player->HasItemCount(windStonesBosse.reqItem, 1))
+
+        for (const auto & stone : windStonesBosses)
+        {
+            if (stone.stoneType == stoneType && action == GOSSIP_ACTION_INFO_DEF + stone.action)
+            {
+                if (player->HasItemCount(stone.reqItem, 1))
                 {
-                    summonEntry = windStonesBosse.summonEntry;
-                    player->DestroyItemCount(windStonesBosse.reqItem, 1, true, false);
+                    summonEntry = stone.summonEntry;
+                    player->DestroyItemCount(stone.reqItem, 1, true, false);
                 }
+            }   
+        }
 
         if (!summonEntry && action != GOSSIP_ACTION_INFO_DEF)
         {
@@ -1739,8 +1744,8 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoSummonDragons()
     {
-        for (auto & aEternalBoardNPC : aEternalBoardNPCs)
-            m_creature->SummonCreature(aEternalBoardNPC.m_uiEntry, aEternalBoardNPC.m_fX, aEternalBoardNPC.m_fY, aEternalBoardNPC.m_fZ, aEternalBoardNPC.m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        for (auto & spawnData : aEternalBoardNPCs)
+            m_creature->SummonCreature(spawnData.m_uiEntry, spawnData.m_fX, spawnData.m_fY, spawnData.m_fZ, spawnData.m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
     void DoSummonWarriors()
@@ -1767,8 +1772,8 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         }
 
         // Also summon the 3 anubisath conquerors
-        for (auto & aQirajiWarrior : aQirajiWarriors)
-            m_creature->SummonCreature(NPC_ANUBISATH_CONQUEROR, aQirajiWarrior.m_fX, aQirajiWarrior.m_fY, aQirajiWarrior.m_fZ, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        for (auto & spawnData : aQirajiWarriors)
+            m_creature->SummonCreature(NPC_ANUBISATH_CONQUEROR, spawnData.m_fX, spawnData.m_fY, spawnData.m_fZ, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
     void DoUnsummonArmy()

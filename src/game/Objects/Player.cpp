@@ -13303,7 +13303,7 @@ bool Player::SatisfyQuestPreviousQuest(Quest const* qInfo, bool msg) const
     if (qInfo->prevQuests.empty())
         return true;
 
-    for (std::_Simple_types<int>::value_type prevQuest : qInfo->prevQuests)
+    for (const auto prevQuest : qInfo->prevQuests)
     {
         uint32 prevId = abs(prevQuest);
 

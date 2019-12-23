@@ -318,12 +318,12 @@ struct boss_twinemperorsAI : public ScriptedAI
         bool bOpenEntrance = false;
         std::list<Creature*> lst;
         GetCreatureListWithEntryInGrid(lst, m_creature, NPC_ANUBISATH_DEFENDER, 800);
-        for (auto pC : lst)
+        for (auto pCreature : lst)
         {
-            if (pC->IsDead()) continue;
-            pC->SetActiveObjectState(true);
-            pC->SetInCombatWithZone();
-            pC->AI()->AttackStart(pWho);
+            if (pCreature->IsDead()) continue;
+            pCreature->SetActiveObjectState(true);
+            pCreature->SetInCombatWithZone();
+            pCreature->AI()->AttackStart(pWho);
             bOpenEntrance = true;
         }
         

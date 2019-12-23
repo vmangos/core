@@ -839,21 +839,20 @@ void npc_kindal_moonweaverAI::BeginEvent()
 
     pGoGate->SetGoState(GO_STATE_READY);
 
-    std::list<Creature*> m_lSprites;
-    GetCreatureListWithEntryInGrid(m_lSprites, pGoGate, NPC_CAPTURED_SPRITE_DARTER, 40.0f);
+    std::list<Creature*> lSprites;
+    GetCreatureListWithEntryInGrid(lSprites, pGoGate, NPC_CAPTURED_SPRITE_DARTER, 40.0f);
 
-    if (!m_lSprites.empty())
+    for (auto & pSprite : lSprites)
     {
-        for (auto & m_lSprite : m_lSprites)
+        if (pSprite)
         {
-            if (m_lSprite)
-                if (auto pSpriteAI = dynamic_cast<npc_captured_sprite_darterAI*>(m_lSprite->AI()))
-                {
-                    pSpriteAI->Reset();
-                    pSpriteAI->m_uiKindalGUID = m_creature->GetObjectGuid();
-                    pSpriteAI->m_uiGateGUID = pGoGate->GetObjectGuid();
-                    pSpriteAI->m_bEventStart = true;
-                }
+            if (auto pSpriteAI = dynamic_cast<npc_captured_sprite_darterAI*>(pSprite->AI()))
+            {
+                pSpriteAI->Reset();
+                pSpriteAI->m_uiKindalGUID = m_creature->GetObjectGuid();
+                pSpriteAI->m_uiGateGUID = pGoGate->GetObjectGuid();
+                pSpriteAI->m_bEventStart = true;
+            }
         }
     }
 }

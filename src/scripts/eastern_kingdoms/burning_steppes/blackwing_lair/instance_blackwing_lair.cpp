@@ -655,9 +655,9 @@ struct instance_blackwing_lair : public ScriptedInstance
                     if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
                         DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
                 }
-                for (auto & m_lVaelGob : m_lVaelGobs)
+                for (const auto & guid : m_lVaelGobs)
                 {
-                    if (Creature *pCreature = instance->GetCreature(m_lVaelGob))
+                    if (Creature *pCreature = instance->GetCreature(guid))
                     {
                         pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     }
@@ -751,9 +751,9 @@ struct instance_blackwing_lair : public ScriptedInstance
             if (uiData == DONE)
             {
                 bool bYelled = false;
-                for (auto & m_lVaelGob : m_lVaelGobs)
+                for (const auto & guid : m_lVaelGobs)
                 {
-                    if (Creature *pCreature = instance->GetCreature(m_lVaelGob))
+                    if (Creature *pCreature = instance->GetCreature(guid))
                     {
                         if (!bYelled)
                         {
@@ -878,11 +878,11 @@ struct instance_blackwing_lair : public ScriptedInstance
         {
             std::list<GameObject *> lGameObjects;
             pCreature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_OEUF_RAZ, 250.0f);
-            for (auto & lGameObject : lGameObjects)
-                lGameObject->DeleteLater();
+            for (auto pGo : lGameObjects)
+                pGo->DeleteLater();
 
-            for (auto & RazOeuf : RazOeufs)
-                pCreature->SummonGameObject(GO_OEUF_RAZ, RazOeuf.X, RazOeuf.Y, RazOeuf.Z, RazOeuf.O);
+            for (const auto & position : RazOeufs)
+                pCreature->SummonGameObject(GO_OEUF_RAZ, position.X, position.Y, position.Z, position.O);
         }
     }
 

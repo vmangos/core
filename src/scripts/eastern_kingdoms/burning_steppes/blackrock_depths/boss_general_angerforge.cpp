@@ -100,8 +100,8 @@ struct boss_general_angerforgeAI : public ScriptedAI
             {
                 DoScriptText(EMOTE_ALARM, m_creature);
 
-                for (auto & m_aAddspawnLoc : m_aAddspawnLocs)
-                    m_creature->SummonCreature(m_aAddspawnLoc.m_uiEntry, m_aAddspawnLoc.m_fX, m_aAddspawnLoc.m_fY, m_aAddspawnLoc.m_fZ, m_aAddspawnLoc.m_fO, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30 * IN_MILLISECONDS);
+                for (auto & spawnData : m_aAddspawnLocs)
+                    m_creature->SummonCreature(spawnData.m_uiEntry, spawnData.m_fX, spawnData.m_fY, spawnData.m_fZ, spawnData.m_fO, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30 * IN_MILLISECONDS);
 
                 m_uiAlarmTimer = 3 * MINUTE * IN_MILLISECONDS;
             }

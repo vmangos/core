@@ -5213,8 +5213,8 @@ class npc_av_battle_npc_summoner: public ScriptedAI
 
         void OnRemoveFromWorld() override
         {
-            for (auto i : m_summoned)
-                if (Creature* c = m_creature->GetMap()->GetCreature(i))
+            for (const auto& guid : m_summoned)
+                if (Creature* c = m_creature->GetMap()->GetCreature(guid))
                     c->DeleteLater();
         }
 
@@ -5253,15 +5253,16 @@ class npc_av_battle_npc_summoner: public ScriptedAI
             if (m_timer < diff)
             {
                 m_timer = TIMER_CHECK_NPC_SPAWN;
-                for (auto & i : m_summoned)
-                    if (!m_creature->GetMap()->GetCreature(i))
+                for (auto & guid : m_summoned)
+                {
+                    if (!m_creature->GetMap()->GetCreature(guid))
                     {
                         float x, y, z;
                         m_creature->GetPosition(x, y, z);
                         m_creature->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, 5.0f);
                         if (Creature* c = m_creature->SummonCreature(SelectCreatureEntry(), x, y, z, 0.0f, TEMPSUMMON_CORPSE_DESPAWN))
                         {
-                            i = c->GetObjectGuid();
+                            guid = c->GetObjectGuid();
                             x = m_destX;
                             y = m_destY;
                             z = m_destZ;
@@ -5274,6 +5275,7 @@ class npc_av_battle_npc_summoner: public ScriptedAI
                             break;
                         }
                     }
+                }  
             }
             else
                 m_timer -= diff;

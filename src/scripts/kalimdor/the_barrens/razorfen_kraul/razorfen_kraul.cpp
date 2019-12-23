@@ -273,8 +273,8 @@ struct npc_snufflenose_gopherAI : public FollowerAI
             return false;
 
         // Check if tuber is in list of already found tubers
-        for (auto m_foundTuber : m_foundTubers)
-            if (tuber->GetObjectGuid() == m_foundTuber)
+        for (auto guid : m_foundTubers)
+            if (tuber->GetObjectGuid() == guid)
                 return false;
 
         // Check that tuber is not more than 15 yards above or below current position

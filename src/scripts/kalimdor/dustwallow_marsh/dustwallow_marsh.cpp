@@ -262,8 +262,8 @@ struct npc_private_hendelAI : public ScriptedAI
     npc_private_hendelAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         // zero init required to prevent crash
-        for (auto & m_guard : m_guards)
-            m_guard = nullptr;
+        for (auto & guard : m_guards)
+            guard = nullptr;
         for (ptrdiff_t i = 0; i < 3; ++i)
         {
             m_allies[i] = nullptr;
@@ -296,11 +296,11 @@ struct npc_private_hendelAI : public ScriptedAI
         // reset private hendel's faction
         m_creature->SetFactionTemplateId(FACTION_THERAMORE); // theramore faction
         // reset his guards faction
-        for (auto & m_guard : m_guards)
+        for (auto & guard : m_guards)
         {
-            if (m_guard && m_guard->IsAlive())
+            if (guard && guard->IsAlive())
             {
-                m_guard->SetFactionTemplateId(FACTION_THERAMORE); // theramore faction
+                guard->SetFactionTemplateId(FACTION_THERAMORE); // theramore faction
             }
         }
         // reset phase flags
@@ -440,13 +440,13 @@ struct npc_private_hendelAI : public ScriptedAI
             }
 
             // remove guards
-            for (auto & m_guard : m_guards)
+            for (auto & guard : m_guards)
             {
                 // if guard is valid
-                if (m_guard)
+                if (guard)
                 {
-                    static_cast<TemporarySummon*>(m_guard)->UnSummon();
-                    m_guard = nullptr;
+                    static_cast<TemporarySummon*>(guard)->UnSummon();
+                    guard = nullptr;
                 }
             }
 
@@ -531,8 +531,8 @@ struct npc_private_hendelAI : public ScriptedAI
             if (m_nextPhaseDelayTimer < uiDiff)
             {
                 // make allies face private hendel
-                for (auto & m_allie : m_allies)
-                    m_allie->SetFacingToObject(m_creature);
+                for (auto & ally : m_allies)
+                    ally->SetFacingToObject(m_creature);
 
                 // Tervosh is index 0
                 Creature* tervosh = m_allies[0];
@@ -558,13 +558,13 @@ struct npc_private_hendelAI : public ScriptedAI
                 case 0: // remove guards, say0
                 {
                     // remove guards
-                    for (auto & m_guard : m_guards)
+                    for (auto & guard : m_guards)
                     {
                         // if guard is valid
-                        if (m_guard)
+                        if (guard)
                         {
-                            static_cast<TemporarySummon*>(m_guard)->UnSummon();
-                            m_guard = nullptr;
+                            static_cast<TemporarySummon*>(guard)->UnSummon();
+                            guard = nullptr;
                         }
                     }
 
@@ -660,13 +660,13 @@ struct npc_private_hendelAI : public ScriptedAI
                 case 3: // Final, despawn
                 {
                     // remove allies
-                    for (auto & m_allie : m_allies)
+                    for (auto & ally : m_allies)
                     {
                         // if ally is valid
-                        if (m_allie)
+                        if (ally)
                         {
-                            static_cast<TemporarySummon*>(m_allie)->UnSummon();
-                            m_allie = nullptr;
+                            static_cast<TemporarySummon*>(ally)->UnSummon();
+                            ally = nullptr;
                         }
                     }
 
@@ -708,16 +708,16 @@ struct npc_private_hendelAI : public ScriptedAI
     void SummonedCreatureDespawn(Creature* creature) override 
     {
         // No dangling pointers
-        for (auto & m_allie : m_allies)
+        for (auto & ally : m_allies)
         {
-            if (m_allie == creature)
-                m_allie = 0;
+            if (ally == creature)
+                ally = 0;
         }
 
-        for (auto & m_guard : m_guards)
+        for (auto & guard : m_guards)
         {
-            if (m_guard == creature)
-                m_guard = 0;
+            if (guard == creature)
+                guard = 0;
         }
     }
 };
