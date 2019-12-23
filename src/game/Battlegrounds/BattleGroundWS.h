@@ -149,7 +149,7 @@ class BattleGroundWS : public BattleGround
 
         void RemovePlayer(Player* plr, ObjectGuid guid);
         void HandleAreaTrigger(Player* Source, uint32 Trigger);
-        void HandleKillPlayer(Player* player, Player* killer);
+        void HandleKillPlayer(Player* pVictim, Player* pKiller);
         bool SetupBattleGround();
         virtual void Reset();
         void EndBattleGround(Team winner);

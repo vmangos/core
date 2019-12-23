@@ -533,7 +533,7 @@ WorldSafeLocsEntry const* BattleGroundAB::GetClosestGraveYard(Player* player)
         float plr_y = player->GetPositionY();
 
         float mindist = 999999.0f;
-        for (unsigned char node : nodes)
+        for (uint8 node : nodes)
         {
             WorldSafeLocsEntry const*entry = sWorldSafeLocsStore.LookupEntry(BG_AB_GraveyardIds[node]);
             if (!entry)

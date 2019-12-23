@@ -611,18 +611,18 @@ Player::~Player()
     CleanupsBeforeDelete();
 
     // Note: buy back item already deleted from DB when player was saved
-    for (auto & item : m_items)
+    for (const auto & item : m_items)
         delete item;
 
     CleanupChannels();
 
     delete PlayerTalkClass;
 
-    for (auto & x : m_ItemSetEff)
+    for (const auto & x : m_ItemSetEff)
          delete x;
 
     // clean up player-instance binds, may unload some instance saves
-    for (auto & itr : m_boundInstances)
+    for (const auto & itr : m_boundInstances)
         itr.second.state->RemovePlayer(this);
 
     // Cleanup delayed teleport if it was not executed before object deletion
@@ -756,7 +756,7 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     LearnDefaultSpells();
 
     // Starting items.
-    for (auto item_id_itr : info->item)
+    for (const auto& item_id_itr : info->item)
         StoreNewItemInBestSlots(item_id_itr.item_id, item_id_itr.item_amount);
 
     // bags and main-hand weapon must equipped at this moment
@@ -929,7 +929,7 @@ int32 Player::GetMaxTimer(MirrorTimerType timer)
                 return DISABLED_MIRROR_TIMER;
             int32 UnderWaterTime = sWorld.getConfig(CONFIG_UINT32_TIMERBAR_BREATH_MAX) * IN_MILLISECONDS;
             AuraList const& mModWaterBreathing = GetAurasByType(SPELL_AURA_MOD_WATER_BREATHING);
-            for (auto i : mModWaterBreathing)
+            for (const auto i : mModWaterBreathing)
                 UnderWaterTime = uint32(UnderWaterTime * (100.0f + i->GetModifier()->m_amount) / 100.0f);
             return UnderWaterTime;
         }
@@ -2226,21 +2226,21 @@ void Player::HandleFoodEmotes(uint32 diff)
     // 5 seconds over and over again which confirms my theory that we have a independed timer.
     if (m_foodEmoteTimer <= diff)
     {
-        AuraList const& ModRegenAuras = GetAurasByType(SPELL_AURA_MOD_REGEN);
-        AuraList const& ModPowerRegenAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
+        AuraList const& lModRegenAuras = GetAurasByType(SPELL_AURA_MOD_REGEN);
+        AuraList const& lModPowerRegenAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN);
 
-        for (auto ModRegenAura : ModRegenAuras)
+        for (const auto pAura : lModRegenAuras)
         {
-            if (ModRegenAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && ModRegenAura->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_REGEN) && pAura->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_FOOD);
                 break;
             }
         }
 
-        for (auto ModPowerRegenAura : ModPowerRegenAuras)
+        for (const auto pAura : lModPowerRegenAuras)
         {
-            if (ModPowerRegenAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && ModPowerRegenAura->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
+            if (pAura->GetSpellProto()->HasAura(SPELL_AURA_MOD_POWER_REGEN) && pAura->GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {
                 SendPlaySpellVisual(SPELL_VISUAL_KIT_DRINK);
                 break;
@@ -2317,8 +2317,8 @@ void Player::Regenerate(Powers power)
     // Exist only for POWER_MANA, POWER_ENERGY, POWER_FOCUS auras
     if (power != POWER_MANA)
     {
-        AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-        for (auto itr : ModPowerRegenPCTAuras)
+        AuraList const& lModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
+        for (const auto itr : lModPowerRegenPCTAuras)
             if (itr->GetModifier()->m_miscvalue == int32(power))
                 addvalue *= (itr->GetModifier()->m_amount + 100) / 100.0f;
     }
@@ -2359,8 +2359,8 @@ void Player::RegenerateHealth()
         addvalue = GetRegenHPPerSpirit() * HealthIncreaseRate;
         if (!IsInCombat())
         {
-            AuraList const& mModHealthRegenPct = GetAurasByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
-            for (auto i : mModHealthRegenPct)
+            AuraList const& lModHealthRegenPct = GetAurasByType(SPELL_AURA_MOD_HEALTH_REGEN_PERCENT);
+            for (const auto i : lModHealthRegenPct)
                 addvalue *= (100.0f + i->GetModifier()->m_amount) / 100.0f;
         }
         else if (HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
@@ -5043,7 +5043,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
 
 void Player::LeaveLFGChannel()
 {
-    for (auto & channel : m_channels)
+    for (const auto & channel : m_channels)
     {
         if (channel->IsLFG())
         {
@@ -5628,14 +5628,14 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
         {
             // Unapply skill bonuses
             // temporary bonuses
-            AuraList const& mModSkill = GetAurasByType(SPELL_AURA_MOD_SKILL);
-            for (auto j : mModSkill)
+            AuraList const& lModSkill = GetAurasByType(SPELL_AURA_MOD_SKILL);
+            for (const auto j : lModSkill)
                 if (j->GetModifier()->m_miscvalue == int32(id))
                     j->ApplyModifier(false);
 
             // permanent bonuses
-            AuraList const& mModSkillTalent = GetAurasByType(SPELL_AURA_MOD_SKILL_TALENT);
-            for (auto j : mModSkillTalent)
+            AuraList const& lModSkillTalent = GetAurasByType(SPELL_AURA_MOD_SKILL_TALENT);
+            for (const auto j : lModSkillTalent)
                 if (j->GetModifier()->m_miscvalue == int32(id))
                     j->ApplyModifier(false);
 
@@ -5708,14 +5708,14 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
                 SetUInt32Value(PLAYER_SKILL_BONUS_INDEX(i), 0);
 
                 // temporary bonuses
-                AuraList const& mModSkill = GetAurasByType(SPELL_AURA_MOD_SKILL);
-                for (auto j : mModSkill)
+                AuraList const& lModSkill = GetAurasByType(SPELL_AURA_MOD_SKILL);
+                for (const auto j : lModSkill)
                     if (j->GetModifier()->m_miscvalue == int32(id))
                         j->ApplyModifier(true);
 
                 // permanent bonuses
-                AuraList const& mModSkillTalent = GetAurasByType(SPELL_AURA_MOD_SKILL_TALENT);
-                for (auto j : mModSkillTalent)
+                AuraList const& lModSkillTalent = GetAurasByType(SPELL_AURA_MOD_SKILL_TALENT);
+                for (const auto j : lModSkillTalent)
                     if (j->GetModifier()->m_miscvalue == int32(id))
                         j->ApplyModifier(true);
 
@@ -6872,7 +6872,7 @@ void Player::_ApplyItemBonuses(ItemPrototype const* proto, uint8 slot, bool appl
     if (slot >= INVENTORY_SLOT_BAG_END || !proto)
         return;
 
-    for (auto i : proto->ItemStat)
+    for (const auto& i : proto->ItemStat)
     {
         float val = float(i.ItemStatValue);
 
@@ -6998,15 +6998,15 @@ void Player::_ApplyWeaponDependentAuraMods(Item* item, WeaponAttackType attackTy
         return;
 
     AuraList const& auraCritList = GetAurasByType(SPELL_AURA_MOD_CRIT_PERCENT);
-    for (auto itr : auraCritList)
+    for (const auto itr : auraCritList)
         _ApplyWeaponDependentAuraCritMod(item, attackType, itr, apply);
 
     AuraList const& auraDamageFlatList = GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE);
-    for (auto itr : auraDamageFlatList)
+    for (const auto itr : auraDamageFlatList)
         _ApplyWeaponDependentAuraDamageMod(item, attackType, itr, apply);
 
     AuraList const& auraDamagePCTList = GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-    for (auto itr : auraDamagePCTList)
+    for (const auto itr : auraDamagePCTList)
         _ApplyWeaponDependentAuraDamageMod(item, attackType, itr, apply);
 }
 
@@ -8407,7 +8407,7 @@ uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) 
     {
         if (swap || !GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
         {
-            for (unsigned char i : slots)
+            for (uint8 i : slots)
             {
                 if (i == slot)
                     return slot;
@@ -8417,7 +8417,7 @@ uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) 
     else
     {
         // search free slot at first
-        for (unsigned char slot : slots)
+        for (uint8 slot : slots)
         {
             if (slot != NULL_SLOT && !GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
             {
@@ -8428,7 +8428,7 @@ uint8 Player::FindEquipSlot(ItemPrototype const* proto, uint32 slot, bool swap) 
         }
 
         // if not found free and can swap return first appropriate from used
-        for (unsigned char slot : slots)
+        for (uint8 slot : slots)
         {
             if (slot != NULL_SLOT && swap)
                 return slot;
@@ -10179,7 +10179,7 @@ void Player::RemoveAmmo()
 Item* Player::StoreNewItem(ItemPosCountVec const& dest, uint32 item, bool update, int32 randomPropertyId)
 {
     uint32 count = 0;
-    for (auto itr : dest)
+    for (const auto& itr : dest)
         count += itr.count;
 
     Item* pItem = Item::CreateItem(item, count, this);
@@ -11898,13 +11898,13 @@ void Player::ApplyEnchantment(Item* item, EnchantmentSlot slot, bool apply, bool
 
 void Player::SendEnchantmentDurations() const
 {
-    for (auto itr : m_enchantDuration)
+    for (const auto& itr : m_enchantDuration)
         GetSession()->SendItemEnchantTimeUpdate(GetObjectGuid(), itr.item->GetObjectGuid(), itr.slot, uint32(itr.leftduration) / 1000);
 }
 
 void Player::SendItemDurations() const
 {
-    for (auto itr : m_itemDuration)
+    for (const auto& itr : m_itemDuration)
         itr->SendTimeUpdate(this);
 }
 
@@ -13605,7 +13605,7 @@ void Player::GiveQuestSourceItemIfNeed(Quest const* pQuest)
     if (CanGiveQuestSourceItemIfNeed(pQuest, &dest) && !dest.empty())
     {
         uint32 count = 0;
-        for (auto c_itr : dest)
+        for (const auto& c_itr : dest)
             count += c_itr.count;
 
         Item* item = StoreNewItem(dest, pQuest->GetSrcItemId(), true);
@@ -16351,13 +16351,13 @@ void Player::_SaveInventory()
     }
 
     // update enchantment durations
-    for (auto itr : m_enchantDuration)
+    for (auto& itr : m_enchantDuration)
         itr.item->SetEnchantmentDuration(itr.slot, itr.leftduration);
 
     // if no changes
     if (m_itemUpdateQueue.empty()) return;
 
-    for (auto item : m_itemUpdateQueue)
+    for (auto& item : m_itemUpdateQueue)
     {
         if (!item)
             continue;
@@ -17215,7 +17215,7 @@ void Player::SendSpellMod(SpellModifier const* mod) const
 
 SpellModifier* Player::GetSpellMod(SpellModOp op, uint32 spellId) const
 {
-    for (auto itr : m_spellMods[op])
+    for (const auto itr : m_spellMods[op])
         if (itr->spellId == spellId)
             return itr;
 
@@ -17278,7 +17278,7 @@ void Player::RemoveSpellMods(Spell* spell)
     if (spell->m_appliedMods.empty())
         return;
 
-    for (auto & modList : m_spellMods)
+    for (const auto & modList : m_spellMods)
     {
         for (SpellModList::const_iterator itr = modList.begin(); itr != modList.end();)
         {
@@ -19269,7 +19269,7 @@ uint32 Player::GetResurrectionSpellId() const
     uint32 prio = 0;
     uint32 spell_id = 0;
     AuraList const& dummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
-    for (auto dummyAura : dummyAuras)
+    for (const auto dummyAura : dummyAuras)
     {
         // Soulstone Resurrection                           // prio: 3 (max, non death persistent)
         if (prio < 2 && dummyAura->GetSpellProto()->SpellVisual == 99 && dummyAura->GetSpellProto()->SpellIconID == 92)
@@ -19843,7 +19843,7 @@ bool Player::IsTotalImmune() const
     AuraList const& immune = GetAurasByType(SPELL_AURA_SCHOOL_IMMUNITY);
 
     uint32 immuneMask = 0;
-    for (auto itr : immune)
+    for (const auto itr : immune)
     {
         immuneMask |= itr->GetModifier()->m_miscvalue;
     }
@@ -21126,7 +21126,7 @@ void Player::RewardHonorOnDeath()
     uint32 totalDamage = 0;
     std::map<Group*, uint32> damagePerGroup;
     std::map<Player*, uint32> damagePerAlonePlayer;
-    for (auto itr : m_damageTakenHistory)
+    for (const auto& itr : m_damageTakenHistory)
     {
         totalDamage += itr.second;
         if (Player* attacker = GetMap()->GetPlayer(itr.first))
@@ -21145,11 +21145,11 @@ void Player::RewardHonorOnDeath()
     }
 
     // Distribute honor ratio per group
-    for (auto itr : damagePerGroup)
+    for (const auto& itr : damagePerGroup)
     {
         Group* g = itr.first;
         std::list<Player*> rewarded;
-        for (auto grItr : g->GetMemberSlots())
+        for (const auto& grItr : g->GetMemberSlots())
             if (Player* pl = GetMap()->GetPlayer(grItr.guid))
                 if (pl->IsAtGroupRewardDistance(this) && pl->IsAlive() && pl->GetTeam() != GetTeam())
                     rewarded.push_back(pl);
@@ -21160,7 +21160,7 @@ void Player::RewardHonorOnDeath()
         honorRate /= totalDamage;
         honorRate /= totalRewarded;
 
-        for (auto rewItr : rewarded)
+        for (const auto& rewItr : rewarded)
         {
             if (!rewItr->IsHonorOrXPTarget(this))
                 continue;
@@ -21172,7 +21172,7 @@ void Player::RewardHonorOnDeath()
     }
 
     // Distribute honor to single players
-    for (auto rewItr : damagePerAlonePlayer)
+    for (const auto& rewItr : damagePerAlonePlayer)
     {
         if (!rewItr.first->IsHonorOrXPTarget(this))
             continue;
@@ -21284,7 +21284,7 @@ void Player::HandleStealthedUnitsDetection()
     Cell::VisitAllObjects(this, searcher, sWorld.getConfig(CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE));
 
     WorldObject const* viewPoint = GetCamera().GetBody();
-    for (auto stealthedUnit : stealthedUnits)
+    for (const auto stealthedUnit : stealthedUnits)
     {
         if (stealthedUnit == this)
             continue;

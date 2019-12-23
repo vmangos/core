@@ -1309,7 +1309,7 @@ inline void UnsummonVisualWaypoints(Player const* player, ObjectGuid ownerGuid)
     MaNGOS::CreatureListSearcher<MaNGOS::AllCreaturesOfEntryInRange> searcher(waypoints, checkerForWaypoint);
     Cell::VisitGridObjects(player, searcher, SIZE_OF_GRIDS);
 
-    for (auto & waypoint : waypoints)
+    for (const auto & waypoint : waypoints)
     {
         if (waypoint->GetSubtype() != CREATURE_SUBTYPE_TEMPORARY_SUMMON)
             continue;

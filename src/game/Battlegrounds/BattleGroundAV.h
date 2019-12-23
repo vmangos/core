@@ -446,7 +446,7 @@ class BattleGroundAV : public BattleGround
         uint32 GetActualArmorRessources(uint32 m_faction_id);
         /*handle stuff*/ // these are functions which get called from extern scripts
         void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj) override;
-        void HandleKillPlayer(Player* player, Player* killer) override;
+        void HandleKillPlayer(Player* pVictim, Player* pKiller) override;
         void HandleKillUnit(Creature* creature, Player* killer) override;
 
         /** Challenge handler : air or ground assault, world boss assault */
@@ -505,8 +505,8 @@ class BattleGroundAV : public BattleGround
         void PopulateMineNode(uint8 mine, BattleGroundAVTeamIndex teamIdx, uint32 oldUpgradeAdvance);
 
         static uint32 GetNodeName(BG_AV_Nodes node);
-        bool IsTower(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : m_Nodes[node].Tower; }
-        bool IsGrave(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : !m_Nodes[node].Tower; }
+        bool IsTower(BG_AV_Nodes node) const { return (node >= BG_AV_NODES_MAX) ? false : m_Nodes[node].Tower; }
+        bool IsGrave(BG_AV_Nodes node) const { return (node >= BG_AV_NODES_MAX) ? false : !m_Nodes[node].Tower; }
 
         /*mine*/
         void ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx);

@@ -589,14 +589,14 @@ void BattleGroundWS::EndBattleGround(Team winner)
     BattleGround::EndBattleGround(winner);
 }
 
-void BattleGroundWS::HandleKillPlayer(Player* player, Player* killer)
+void BattleGroundWS::HandleKillPlayer(Player* pVictim, Player* pKiller)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    EventPlayerDroppedFlag(player);
+    EventPlayerDroppedFlag(pVictim);
 
-    BattleGround::HandleKillPlayer(player, killer);
+    BattleGround::HandleKillPlayer(pVictim, pKiller);
 }
 
 void BattleGroundWS::UpdatePlayerScore(Player* Source, uint32 type, uint32 value)

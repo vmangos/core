@@ -43,14 +43,14 @@ BattleGroundAV::~BattleGroundAV()
 {
 }
 
-void BattleGroundAV::HandleKillPlayer(Player* player, Player* killer)
+void BattleGroundAV::HandleKillPlayer(Player* pVictim, Player* pKiller)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    BattleGround::HandleKillPlayer(player, killer);
-    if (!player->HasAura(27827)) // Esprit de redemption
-        UpdateScore(GetTeamIndexByTeamId(player->GetTeam()), -1);
+    BattleGround::HandleKillPlayer(pVictim, pKiller);
+    if (!pVictim->HasAura(27827)) // Esprit de redemption
+        UpdateScore(GetTeamIndexByTeamId(pVictim->GetTeam()), -1);
 }
 
 /*********/
@@ -122,7 +122,7 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
         m_challengeGoals[BG_TEAM_HORDE][BG_AV_IRONDEEP_GROUND_ASSAULT]     = 70; /** Real value 70 */
         m_challengeGoals[BG_TEAM_HORDE][BG_AV_COLDTOOTH_GROUND_ASSAULT]    = 280; /** Real value 280  */
         m_challengeGoals[i][BG_AV_BLOOD_WORLDBOSS_ASSAULT]                 = 200; /** Real value 200 */
-}
+    }
 
     /** Minimum reputation are required for challenges */
     for (int i = 0; i < BG_AV_NB_ASSAULTS; ++i)

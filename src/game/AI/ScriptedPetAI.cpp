@@ -135,12 +135,11 @@ void ScriptedPetAI::UpdateAI(uint32 const uiDiff)
                 else
                 {
                     // Main target is CC-ed, so pick another attacker.
-                    Unit::AttackerSet attackers = pOwner->GetAttackers();
-                    for (auto attacker : attackers)
+                    for (const auto pAttacker : pOwner->GetAttackers())
                     {
-                        if (attacker->IsInMap(m_creature) && attacker->IsTargetableForAttack() && !attacker->HasAuraPetShouldAvoidBreaking())
+                        if (pAttacker->IsInMap(m_creature) && pAttacker->IsTargetableForAttack() && !pAttacker->HasAuraPetShouldAvoidBreaking())
                         { 
-                            AttackStart(attacker);
+                            AttackStart(pAttacker);
                             return;
                         }
                     }
