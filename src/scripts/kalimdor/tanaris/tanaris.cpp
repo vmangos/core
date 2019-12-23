@@ -572,18 +572,18 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                         pirate3->SetRespawnDelay(350000);
                     }
 
-                    for (int & i : extraPirateType)
+                    for (int & pirateEntry : extraPirateType)
                     {
                         switch (urand(0, 2))
                         {
                             case 0:
-                                i = NPC_PIRATES_1;
+                                pirateEntry = NPC_PIRATES_1;
                                 break;
                             case 1:
-                                i = NPC_PIRATES_2;
+                                pirateEntry = NPC_PIRATES_2;
                                 break;
                             case 2:
-                                i = NPC_PIRATES_3;
+                                pirateEntry = NPC_PIRATES_3;
                                 break;
                         }
                     }

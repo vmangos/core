@@ -451,7 +451,7 @@ struct instance_molten_core : ScriptedInstance
         Map::PlayerList const &liste = instance->GetPlayers();
         if (liste.getFirst() != nullptr)
         {
-            for (unsigned long long & i : GOUseGuidList)
+            for (uint64 & i : GOUseGuidList)
             {
                 if (i)
                 {
@@ -558,7 +558,7 @@ struct instance_molten_core : ScriptedInstance
         };
         */
 
-        for (unsigned long long i : RuneActive)
+        for (uint64 i : RuneActive)
             SetData((TypeRuneActive0 + 16), i);
     }
 };

@@ -953,9 +953,9 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 
                     bool bCanBegin = true;
 
-                    for (const auto & lPlayer : lPlayers)
+                    for (const auto & itr : lPlayers)
                     {
-                        if (Player* pPlayer = lPlayer.getSource())
+                        if (Player* pPlayer = itr.getSource())
                         {
                             if (!pPlayer->IsWithinDist2d(m_fChamberCenterX, m_fChamberCenterY, 15.0f))
                                 bCanBegin = false;
@@ -1144,7 +1144,7 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
 {
     std::list<Creature* > lList;
 
-    for (auto & itr : m_mGothTriggerMap)
+    for (const auto & itr : m_mGothTriggerMap)
     {
         if (!itr.second.bIsAnchorHigh)
             continue;
@@ -1167,7 +1167,7 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
 
 void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide)
 {
-    for (auto & itr : m_mGothTriggerMap)
+    for (const auto & itr : m_mGothTriggerMap)
     {
         if (itr.second.bIsAnchorHigh)
             continue;

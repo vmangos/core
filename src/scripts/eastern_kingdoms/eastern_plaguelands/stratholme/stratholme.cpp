@@ -45,13 +45,13 @@ bool GOHello_go_entree_de_service(Player* pPlayer, GameObject* pGo)
 
     std::list<Creature*> listBarthilas;
     GetCreatureListWithEntryInGrid(listBarthilas, pGo, 10435, 1000);
-    for (auto listBarthila : listBarthilas)
+    for (auto pCreature : listBarthilas)
     {
-        if (!listBarthila->IsAlive())
+        if (!pCreature->IsAlive())
             continue;
 
-        listBarthila->AI()->ReceiveEmote(pPlayer, 1000);
-        listBarthila->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        pCreature->AI()->ReceiveEmote(pPlayer, 1000);
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
     pGo->UseDoorOrButton(5);
 
@@ -375,8 +375,8 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
             return;
         }
 
-        for (const auto itr : acolyte)
-            if (Creature *pCreature = m_pInstance->instance->GetCreature(itr))
+        for (const auto guid : acolyte)
+            if (Creature *pCreature = m_pInstance->instance->GetCreature(guid))
                 if (pCreature && pCreature->IsAlive())
                     return;
 

@@ -230,8 +230,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
             TimerArcher[i] = 5000;
             ArchersGUIDs[i] = 0;
         }
-        for (unsigned long long & VillageoisGUID : VillageoisGUIDs)
-            VillageoisGUID = 0;
+        for (uint64 & guid : VillageoisGUIDs)
+            guid = 0;
     }
 
     void AttackedBy(Unit* /*Attacker*/) override {}
@@ -458,8 +458,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
             TimerArcher[i] = 5000;
             ArchersGUIDs[i] = 0;
         }
-        for (unsigned long long & VillageoisGUID : VillageoisGUIDs)
-            VillageoisGUID = 0;
+        for (uint64 & guid : VillageoisGUIDs)
+            guid = 0;
 
         for (int i = ArcherPop0; i < Fin; i++)
             m_creature->SummonCreature(NPC_ARCHER, ErisHavenfireEvent[i].X, ErisHavenfireEvent[i].Y, ErisHavenfireEvent[i].Z, ErisHavenfireEvent[i].O, TEMPSUMMON_DEAD_DESPAWN, 0);
@@ -668,8 +668,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
                         int Damage = urand(50, 100);
                         uint64 GUIDs[50];
 
-                        for (unsigned long long & GUID : GUIDs)
-                            GUID = 0;
+                        for (uint64 & guid : GUIDs)
+                            guid = 0;
 
                         while (Var < 50)
                         {
@@ -907,9 +907,9 @@ struct npc_demetriaAI : public ScriptedAI
     }
     void DespawnTroopers()
     {
-        for (unsigned long long i : guidScarletTrooper)
+        for (uint64 guid : guidScarletTrooper)
         {
-            if (Creature* pTrooper = m_creature->GetMap()->GetCreature(i))
+            if (Creature* pTrooper = m_creature->GetMap()->GetCreature(guid))
                 pTrooper->AddObjectToRemoveList();
         }
     }
@@ -1183,8 +1183,8 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
             i = 0;
         PhaseTimer = 0;
 
-        for (auto itr : summonedMobsList)
-            if (Creature* creature = m_creature->GetMap()->GetCreature(itr))
+        for (const auto& guid : summonedMobsList)
+            if (Creature* creature = m_creature->GetMap()->GetCreature(guid))
                 if (creature->IsAlive() && creature->GetEntry() != NPC_JOSEPH_REDPATH && creature->GetEntry() != NPC_DAVIL_CROKFORD)
                     creature->ForcedDespawn(5000);
 

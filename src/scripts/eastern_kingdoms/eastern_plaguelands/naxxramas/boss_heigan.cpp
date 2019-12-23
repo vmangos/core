@@ -243,9 +243,9 @@ struct boss_heiganAI : public ScriptedAI
             if (uiArea == (eruptionPhase % 6) || uiArea == 6 - (eruptionPhase % 6))
                 continue;
 
-            for (auto itr : m_pInstance->m_alHeiganTrapGuids[uiArea])
+            for (auto guid : m_pInstance->m_alHeiganTrapGuids[uiArea])
             {
-                if (GameObject* pTrap = m_pInstance->GetGameObject(itr))
+                if (GameObject* pTrap = m_pInstance->GetGameObject(guid))
                 {
                     pTrap->Use(fissureCreature);
                     pTrap->SendGameObjectCustomAnim();

@@ -554,19 +554,19 @@ void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
 
 void ObjectMgr::SetSavedVariable(uint32 index, uint32 value, bool autoSave)
 {
-    for (auto & m_SavedVariable : m_SavedVariables)
+    for (auto & itr : m_SavedVariables)
     {
-        if (m_SavedVariable.uiIndex == index)
+        if (itr.uiIndex == index)
         {
             // If the value has not changed.
-            if (m_SavedVariable.uiValue == value)
+            if (itr.uiValue == value)
                 return;
 
-            m_SavedVariable.uiValue = value;
+            itr.uiValue = value;
             if (autoSave)
-                _SaveVariable(m_SavedVariable);
+                _SaveVariable(itr);
             else
-                m_SavedVariable.bSavedInDb = false;
+                itr.bSavedInDb = false;
             return;
         }
     }
@@ -1399,7 +1399,7 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
     const_cast<uint32*&>(addon->auras) = new uint32[val.size() + 1];
 
     uint32 i = 0;
-    for (int j : val)
+    for (int32 j : val)
     {
         uint32& cAura = const_cast<uint32&>(addon->auras[i]);
         cAura = uint32(j);
@@ -3313,13 +3313,13 @@ void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
                     obtainedItems.insert(i);
             }
 
-            for (int i : pSpellProto->Reagent)
+            for (int32 i : pSpellProto->Reagent)
             {
                 if (i)
                     obtainedItems.insert(i);
             }
             
-            for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
+            for (int32 i = 0; i < MAX_SPELL_EFFECTS; i++)
             {
                 if (pSpellProto->Effect[i] == SPELL_EFFECT_CREATE_ITEM)
                     obtainedItems.insert(pSpellProto->EffectItemType[i]);
@@ -3732,12 +3732,12 @@ void ObjectMgr::LoadItemRequiredTarget()
 
         bool bIsItemSpellValid = false;
 
-        for (const auto & Spell : pItemProto->Spells)
+        for (const auto & itr : pItemProto->Spells)
         {
-            if (SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(Spell.SpellId))
+            if (SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(itr.SpellId))
             {
-                if (Spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE ||
-                        Spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+                if (itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE ||
+                    itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
                 {
                     SpellScriptTargetBounds bounds = sSpellMgr.GetSpellScriptTargetBounds(pSpellInfo->Id);
                     if (bounds.first != bounds.second)
@@ -7995,13 +7995,13 @@ void ObjectMgr::LoadGameobjectQuestRelations()
 {
     LoadQuestRelationsHelper(m_GOQuestRelations, "gameobject_questrelation");
 
-    for (auto & m_GOQuestRelation : m_GOQuestRelations)
+    for (const auto & itr : m_GOQuestRelations)
     {
-        GameObjectInfo const* goInfo = GetGameObjectInfo(m_GOQuestRelation.first);
+        GameObjectInfo const* goInfo = GetGameObjectInfo(itr.first);
         if (!goInfo)
-            sLog.outErrorDb("Table `gameobject_questrelation` have data for nonexistent gameobject entry (%u) and existing quest %u", m_GOQuestRelation.first, m_GOQuestRelation.second);
+            sLog.outErrorDb("Table `gameobject_questrelation` have data for nonexistent gameobject entry (%u) and existing quest %u", itr.first, itr.second);
         else if (goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
-            sLog.outErrorDb("Table `gameobject_questrelation` have data gameobject entry (%u) for quest %u, but GO is not GAMEOBJECT_TYPE_QUESTGIVER", m_GOQuestRelation.first, m_GOQuestRelation.second);
+            sLog.outErrorDb("Table `gameobject_questrelation` have data gameobject entry (%u) for quest %u, but GO is not GAMEOBJECT_TYPE_QUESTGIVER", itr.first, itr.second);
     }
 }
 
@@ -8009,13 +8009,13 @@ void ObjectMgr::LoadGameobjectInvolvedRelations()
 {
     LoadQuestRelationsHelper(m_GOQuestInvolvedRelations, "gameobject_involvedrelation");
 
-    for (auto & m_GOQuestInvolvedRelation : m_GOQuestInvolvedRelations)
+    for (const auto & itr : m_GOQuestInvolvedRelations)
     {
-        GameObjectInfo const* goInfo = GetGameObjectInfo(m_GOQuestInvolvedRelation.first);
+        GameObjectInfo const* goInfo = GetGameObjectInfo(itr.first);
         if (!goInfo)
-            sLog.outErrorDb("Table `gameobject_involvedrelation` have data for nonexistent gameobject entry (%u) and existing quest %u", m_GOQuestInvolvedRelation.first, m_GOQuestInvolvedRelation.second);
+            sLog.outErrorDb("Table `gameobject_involvedrelation` have data for nonexistent gameobject entry (%u) and existing quest %u", itr.first, itr.second);
         else if (goInfo->type != GAMEOBJECT_TYPE_QUESTGIVER)
-            sLog.outErrorDb("Table `gameobject_involvedrelation` have data gameobject entry (%u) for quest %u, but GO is not GAMEOBJECT_TYPE_QUESTGIVER", m_GOQuestInvolvedRelation.first, m_GOQuestInvolvedRelation.second);
+            sLog.outErrorDb("Table `gameobject_involvedrelation` have data gameobject entry (%u) for quest %u, but GO is not GAMEOBJECT_TYPE_QUESTGIVER", itr.first, itr.second);
     }
 }
 
@@ -8023,13 +8023,13 @@ void ObjectMgr::LoadCreatureQuestRelations()
 {
     LoadQuestRelationsHelper(m_CreatureQuestRelations, "creature_questrelation");
 
-    for (auto & m_CreatureQuestRelation : m_CreatureQuestRelations)
+    for (const auto & itr : m_CreatureQuestRelations)
     {
-        CreatureInfo const* cInfo = GetCreatureTemplate(m_CreatureQuestRelation.first);
+        CreatureInfo const* cInfo = GetCreatureTemplate(itr.first);
         if (!cInfo)
-            sLog.outErrorDb("Table `creature_questrelation` have data for nonexistent creature entry (%u) and existing quest %u", m_CreatureQuestRelation.first, m_CreatureQuestRelation.second);
+            sLog.outErrorDb("Table `creature_questrelation` have data for nonexistent creature entry (%u) and existing quest %u", itr.first, itr.second);
         else if (!(cInfo->npc_flags & UNIT_NPC_FLAG_QUESTGIVER))
-            sLog.outDetail("Table `creature_questrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", m_CreatureQuestRelation.first, m_CreatureQuestRelation.second);
+            sLog.outDetail("Table `creature_questrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", itr.first, itr.second);
     }
 }
 
@@ -8037,13 +8037,13 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
 {
     LoadQuestRelationsHelper(m_CreatureQuestInvolvedRelations, "creature_involvedrelation");
 
-    for (auto & m_CreatureQuestInvolvedRelation : m_CreatureQuestInvolvedRelations)
+    for (auto & itr : m_CreatureQuestInvolvedRelations)
     {
-        CreatureInfo const* cInfo = GetCreatureTemplate(m_CreatureQuestInvolvedRelation.first);
+        CreatureInfo const* cInfo = GetCreatureTemplate(itr.first);
         if (!cInfo)
-            sLog.outErrorDb("Table `creature_involvedrelation` have data for nonexistent creature entry (%u) and existing quest %u", m_CreatureQuestInvolvedRelation.first, m_CreatureQuestInvolvedRelation.second);
+            sLog.outErrorDb("Table `creature_involvedrelation` have data for nonexistent creature entry (%u) and existing quest %u", itr.first, itr.second);
         else if (!(cInfo->npc_flags & UNIT_NPC_FLAG_QUESTGIVER))
-            sLog.outDetail("Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", m_CreatureQuestInvolvedRelation.first, m_CreatureQuestInvolvedRelation.second);
+            sLog.outDetail("Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", itr.first, itr.second);
     }
 }
 
@@ -9765,8 +9765,8 @@ void ObjectMgr::LoadGossipMenuItems()
 
     std::set<uint32> gossipScriptSet;
 
-    for (const auto & sGossipScript : sGossipScripts)
-        gossipScriptSet.insert(sGossipScript.first);
+    for (const auto & itr : sGossipScripts)
+        gossipScriptSet.insert(itr.first);
 
     // prepare menuid -> CreatureInfo map for fast access
     typedef  std::multimap<uint32, CreatureInfo const*> Menu2CInfoMap;
@@ -10644,12 +10644,12 @@ bool ObjectMgr::GetMountDataByEntry(uint32 itemEntry, Races& race, uint8& mountN
 {
     // Mount custom Nostalrius encore dans la DB.
     // itemEntry = GetRealMountEntry(itemEntry);
-    for (auto factionchange_mount : factionchange_mounts)
+    for (auto itr : factionchange_mounts)
     {
-        if (factionchange_mount.ItemEntry == itemEntry)
+        if (itr.ItemEntry == itemEntry)
         {
-            race = factionchange_mount.RaceId;
-            mountNum = factionchange_mount.MountNum;
+            race = itr.RaceId;
+            mountNum = itr.MountNum;
             return true;
         }
     }
@@ -10658,9 +10658,9 @@ bool ObjectMgr::GetMountDataByEntry(uint32 itemEntry, Races& race, uint8& mountN
 
 uint32 ObjectMgr::GetMountItemEntry(Races race, uint8 num) const
 {
-    for (auto factionchange_mount : factionchange_mounts)
-        if (factionchange_mount.RaceId == race && factionchange_mount.MountNum == num)
-            return factionchange_mount.ItemEntry;
+    for (auto itr : factionchange_mounts)
+        if (itr.RaceId == race && itr.MountNum == num)
+            return itr.ItemEntry;
 
     return false;
 }
@@ -10669,20 +10669,20 @@ uint32 ObjectMgr::GetRandomMountForRace(Races race) const
 {
     // 1- Compter le nombre total de montures de cette race
     uint32 count = 0;
-    for (auto factionchange_mount : factionchange_mounts)
-        if (factionchange_mount.RaceId == race)
+    for (auto itr : factionchange_mounts)
+        if (itr.RaceId == race)
             ++count;
     // 2- Quelques verifs / Generer index aleatoire
     if (!count)
         return 0;
     count -= urand(0, count - 1);
     // 3- Reboucler
-    for (auto factionchange_mount : factionchange_mounts)
+    for (auto itr : factionchange_mounts)
     {
-        if (factionchange_mount.RaceId == race)
+        if (itr.RaceId == race)
         {
             if (count == 0)
-                return factionchange_mount.ItemEntry;
+                return itr.ItemEntry;
             --count;
         }
     }

@@ -120,16 +120,16 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
                     GameObject* pCaveInNorth = instance->GetGameObject(m_uiCaveInNorthGUID);
                     if (pCaveInSouth && pCaveInNorth)
                     {
-                        for (auto & m_lExplosiveCharge : m_lExplosiveCharges)
+                        for (auto & pGo : m_lExplosiveCharges)
                         {
-                            if (m_lExplosiveCharge->GetDistanceOrder(pCaveInSouth, pCaveInNorth) && uiCounterSouth < MAX_EXPLOSIVES_PER_SIDE)
+                            if (pGo->GetDistanceOrder(pCaveInSouth, pCaveInNorth) && uiCounterSouth < MAX_EXPLOSIVES_PER_SIDE)
                             {
-                                m_auiExplosiveSortedGUIDs[0][uiCounterSouth] = m_lExplosiveCharge->GetGUID();
+                                m_auiExplosiveSortedGUIDs[0][uiCounterSouth] = pGo->GetGUID();
                                 uiCounterSouth++;
                             }
                             else if (uiCounterNorth < MAX_EXPLOSIVES_PER_SIDE)
                             {
-                                m_auiExplosiveSortedGUIDs[1][uiCounterNorth] = m_lExplosiveCharge->GetGUID();
+                                m_auiExplosiveSortedGUIDs[1][uiCounterNorth] = pGo->GetGUID();
                                 uiCounterNorth++;
                             }
                         }

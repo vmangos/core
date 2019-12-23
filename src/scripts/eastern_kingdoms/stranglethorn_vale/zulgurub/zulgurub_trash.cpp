@@ -364,9 +364,9 @@ struct go_pile_dechetsAI: public GameObjectAI
 
                 Map::PlayerList const& players = Guru->GetMap()->GetPlayers();
                 bool OtherPlayerFound = false;
-                for (const auto & player : players)
+                for (const auto & itr : players)
                 {
-                    Player* pPlayer = player.getSource();
+                    Player* pPlayer = itr.getSource();
                     if (pPlayer && pPlayer->IsAlive() && pUser->IsWithinDistInMap(pPlayer, 60.0f) && pUser->IsWithinLOSInMap(pPlayer) &&
                             pPlayer != pUser->ToPlayer() && !pPlayer->IsGameMaster())
                     {

@@ -218,14 +218,14 @@ struct boss_ragnarosAI : ScriptedAI
 
     void SummonSonsOfFlame() const
     {
-        for (auto & PositionOfAdd : PositionOfAdds)
+        for (const auto & position : PositionOfAdds)
         {
             ThreatListCopier* dataCopier = new ThreatListCopier(m_creature);
             if (Creature* Crea = m_creature->SummonCreature(NPC_SON_OF_FLAME, 
-                PositionOfAdd[0], 
-                PositionOfAdd[1], 
-                PositionOfAdd[2], 
-                PositionOfAdd[3], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
+                position[0],
+                position[1],
+                position[2],
+                position[3], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
             {
                 m_creature->ProcessThreatList(dataCopier);
                 if (Unit* randomTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))

@@ -139,9 +139,9 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
 
         // Le combat avec les adds commence
         m_pInstance->SetData(TYPE_EMBERSEER, SPECIAL);
-        for (auto & canaliseur : canaliseurs)
+        for (const auto & guid : canaliseurs)
         {
-            Creature *currCanaliseur = m_creature->GetMap()->GetCreature(canaliseur);
+            Creature *currCanaliseur = m_creature->GetMap()->GetCreature(guid);
             if (!currCanaliseur)
                 continue;
             currCanaliseur->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);

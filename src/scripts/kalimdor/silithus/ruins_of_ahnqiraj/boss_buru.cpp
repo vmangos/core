@@ -209,22 +209,20 @@ struct boss_buruAI : public ScriptedAI
                     m_creature->SetFacingToObject(m_creature->GetVictim());
 
                 // Despawn des oeufs lors de l'enrage
-                for (unsigned long long & i : m_eggsGUID)
+                for (uint64 & guid : m_eggsGUID)
                 {
-                    if (i)
+                    if (guid)
                     {
-                        if (Creature* egg = m_pInstance->GetCreature(i))
+                        if (Creature* egg = m_pInstance->GetCreature(guid))
                             egg->AddObjectToRemoveList();
 
-                        i = 0;
+                        guid = 0;
                     }
                 }
             }
             else if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()) < (THREAT_LOCK / 1000))
             {
-                uint64 GUIDs[40];
-                for (unsigned long long & GUID : GUIDs)
-                    GUID = 0;
+                std::array<uint64, 40> GUIDs = { };
 
                 int var = 0;
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();

@@ -186,18 +186,18 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 player->GroupEventFailHappens(QUEST_MISSING_DIPLO_PT8);
 
             // remove thugs
-            for (auto & m_thug : m_thugs)
+            for (auto & pThug : m_thugs)
             {
-                if (m_thug && m_thug->IsAlive())
+                if (pThug && pThug->IsAlive())
                 {
-                    static_cast<TemporarySummon*>(m_thug)->UnSummon();
+                    static_cast<TemporarySummon*>(pThug)->UnSummon();
                 }
             }
         }
 
         // zero init required to prevent crash
-        for (auto & m_thug : m_thugs)
-            m_thug = nullptr;
+        for (auto & pThug : m_thugs)
+            pThug = nullptr;
 
         m_questFightStarted = false;
         m_eventPhase = MDQP_NONE;
@@ -232,17 +232,17 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                     pMotionMaster->MoveTargetedHome();
 
                 // check if thugs are alive
-                for (auto & m_thug : m_thugs)
+                for (auto & pThug : m_thugs)
                 {
-                    if (m_thug && m_thug->IsAlive())
+                    if (pThug && pThug->IsAlive())
                     {
-                        m_thug->RemoveAllAuras();
-                        m_thug->DeleteThreatList();
-                        m_thug->CombatStop();
+                        pThug->RemoveAllAuras();
+                        pThug->DeleteThreatList();
+                        pThug->CombatStop();
 
-                        m_thug->SetFactionTemplateId(FACTION_FRIENDLY_TO_ALL);
+                        pThug->SetFactionTemplateId(FACTION_FRIENDLY_TO_ALL);
 
-                        if (MotionMaster* pMotionMaster = m_thug->GetMotionMaster())
+                        if (MotionMaster* pMotionMaster = pThug->GetMotionMaster())
                             pMotionMaster->MoveTargetedHome();
 
                         m_thugsAlive = true;
@@ -383,12 +383,12 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         if (m_dialogStarted || m_questFightStarted)
         {
             // remove thugs
-            for (auto & m_thug : m_thugs)
+            for (auto & pThug : m_thugs)
             {
-                if (m_thug)
+                if (pThug)
                 {
-                    static_cast<TemporarySummon*>(m_thug)->UnSummon();
-                    m_thug = nullptr;
+                    static_cast<TemporarySummon*>(pThug)->UnSummon();
+                    pThug = nullptr;
                 }
             }
         }
@@ -399,19 +399,19 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         // If the thug died for whatever reason, clear the pointer. Otherwise, if
         // combat is extended, the thug may despawn and we'll access a dangling
         // pointer
-        for (auto & m_thug : m_thugs)
+        for (auto & pThug : m_thugs)
         {
-            if (m_thug == creature)
-                m_thug = nullptr;
+            if (pThug == creature)
+                pThug = nullptr;
         }
     }
 
     void SummonedCreatureDespawn(Creature* creature) override
     {
-        for (auto & m_thug : m_thugs)
+        for (auto & pThug : m_thugs)
         {
-            if (m_thug == creature)
-                m_thug = nullptr;
+            if (pThug == creature)
+                pThug = nullptr;
         }
     }
 };
@@ -1013,20 +1013,20 @@ struct npc_tyrion_spybotAI : public npc_escortAI
             if (lGardenStormwindRoyalGuards.empty())
                 return true;
 
-            for (auto GardenStormwindRoyalGuard : lGardenStormwindRoyalGuards)
+            for (auto pRoyalGuard : lGardenStormwindRoyalGuards)
             {
-                if (GardenStormwindRoyalGuard->IsDead() || !GardenStormwindRoyalGuard->IsAlive())
-                    GardenStormwindRoyalGuard->Respawn();
+                if (pRoyalGuard->IsDead() || !pRoyalGuard->IsAlive())
+                    pRoyalGuard->Respawn();
 
                 if (m_uiGardenGuardsCounter == 0)
                 {
-                    m_guidGuard1 = GardenStormwindRoyalGuard->GetObjectGuid();
+                    m_guidGuard1 = pRoyalGuard->GetObjectGuid();
                     m_uiGardenGuardsCounter++;
                     continue;
                 }
                 else if (m_uiGardenGuardsCounter == 1)
                 {
-                    m_guidGuard2 = GardenStormwindRoyalGuard->GetObjectGuid();
+                    m_guidGuard2 = pRoyalGuard->GetObjectGuid();
                     m_uiGardenGuardsCounter++;
                     continue;
                 }

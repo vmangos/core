@@ -54,8 +54,8 @@ ScriptMgr::ScriptMgr() : m_scheduledScripts(0)
 ScriptMgr::~ScriptMgr()
 {
     // Free resources before library unload
-    for (auto & m_script : m_scripts)
-        delete m_script;
+    for (auto & script : m_scripts)
+        delete script;
 
     m_scripts.clear();
 
@@ -1216,11 +1216,11 @@ void ScriptMgr::LoadGameObjectScripts()
     LoadScripts(sGameObjectScripts, "gameobject_scripts");
 
     // check ids
-    for (const auto & sGameObjectScript : sGameObjectScripts)
+    for (const auto & itr : sGameObjectScripts)
     {
-        if (!sObjectMgr.GetGOData(sGameObjectScript.first))
-            if (!sObjectMgr.IsExistingGameObjectGuid(sGameObjectScript.first))
-                sLog.outErrorDb("Table `gameobject_scripts` has not existing gameobject (GUID: %u) as script id", sGameObjectScript.first);
+        if (!sObjectMgr.GetGOData(itr.first))
+            if (!sObjectMgr.IsExistingGameObjectGuid(itr.first))
+                sLog.outErrorDb("Table `gameobject_scripts` has not existing gameobject (GUID: %u) as script id", itr.first);
     }
 }
 
@@ -1229,10 +1229,10 @@ void ScriptMgr::LoadQuestEndScripts()
     LoadScripts(sQuestEndScripts, "quest_end_scripts");
 
     // check ids
-    for (const auto & sQuestEndScript : sQuestEndScripts)
+    for (const auto & itr : sQuestEndScripts)
     {
-        if (!sObjectMgr.GetQuestTemplate(sQuestEndScript.first) && !sObjectMgr.IsExistingQuestId(sQuestEndScript.first))
-            sLog.outErrorDb("Table `quest_end_scripts` has not existing quest (Id: %u) as script id", sQuestEndScript.first);
+        if (!sObjectMgr.GetQuestTemplate(itr.first) && !sObjectMgr.IsExistingQuestId(itr.first))
+            sLog.outErrorDb("Table `quest_end_scripts` has not existing quest (Id: %u) as script id", itr.first);
     }
 }
 
@@ -1241,10 +1241,10 @@ void ScriptMgr::LoadQuestStartScripts()
     LoadScripts(sQuestStartScripts, "quest_start_scripts");
 
     // check ids
-    for (const auto & sQuestStartScript : sQuestStartScripts)
+    for (const auto & itr : sQuestStartScripts)
     {
-        if (!sObjectMgr.GetQuestTemplate(sQuestStartScript.first) && !sObjectMgr.IsExistingQuestId(sQuestStartScript.first))
-            sLog.outErrorDb("Table `quest_start_scripts` has not existing quest (Id: %u) as script id", sQuestStartScript.first);
+        if (!sObjectMgr.GetQuestTemplate(itr.first) && !sObjectMgr.IsExistingQuestId(itr.first))
+            sLog.outErrorDb("Table `quest_start_scripts` has not existing quest (Id: %u) as script id", itr.first);
     }
 }
 
@@ -1265,14 +1265,14 @@ void ScriptMgr::LoadSpellScripts()
     }
 
     // check ids
-    for (const auto & sSpellScript : sSpellScripts)
+    for (const auto & itr : sSpellScripts)
     {
-        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(sSpellScript.first);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
 
         if (!spellInfo)
         {
-            if (!sSpellMgr.IsExistingSpellId(sSpellScript.first))
-                sLog.outErrorDb("Table `spell_scripts` has not existing spell (Id: %u) as script id", sSpellScript.first);
+            if (!sSpellMgr.IsExistingSpellId(itr.first))
+                sLog.outErrorDb("Table `spell_scripts` has not existing spell (Id: %u) as script id", itr.first);
             continue;
         }
 
@@ -1291,11 +1291,11 @@ void ScriptMgr::LoadSpellScripts()
             }
         }
 
-        if (scriptSpells.find(sSpellScript.first) != scriptSpells.cend())
+        if (scriptSpells.find(itr.first) != scriptSpells.cend())
             found = true;
 
         if (!found)
-            sLog.outErrorDb("Table `spell_scripts` has unsupported spell (Id: %u) without SPELL_EFFECT_SCRIPT_EFFECT (%u) spell effect", sSpellScript.first, SPELL_EFFECT_SCRIPT_EFFECT);
+            sLog.outErrorDb("Table `spell_scripts` has unsupported spell (Id: %u) without SPELL_EFFECT_SCRIPT_EFFECT (%u) spell effect", itr.first, SPELL_EFFECT_SCRIPT_EFFECT);
     }
 }
 
@@ -1308,12 +1308,12 @@ void ScriptMgr::LoadEventScripts()
     CollectPossibleEventIds(eventIds);
 
     // Then check if all scripts are in above list of possible script entries
-    for (const auto & sEventScript : sEventScripts)
+    for (const auto & itr : sEventScripts)
     {
-        std::set<uint32>::const_iterator itr2 = eventIds.find(sEventScript.first);
+        std::set<uint32>::const_iterator itr2 = eventIds.find(itr.first);
         if (itr2 == eventIds.end())
             sLog.outErrorDb("Table `event_scripts` has script (Id: %u) not referring to any gameobject_template type 10 data2 field, type 3 data6 field, type 13 data 2 field, type 29 or any spell effect %u",
-                            sEventScript.first, SPELL_EFFECT_SEND_EVENT);
+                itr.first, SPELL_EFFECT_SEND_EVENT);
     }
 }
 
@@ -1383,11 +1383,11 @@ void ScriptMgr::LoadCreatureEventAIScripts()
     }
 
     // Then check if all scripts are in above list of used script Ids.
-    for (const auto & sCreatureAIScript : sCreatureAIScripts)
+    for (const auto & itr : sCreatureAIScripts)
     {
-        std::set<uint32>::const_iterator itr2 = actionIds.find(sCreatureAIScript.first);
+        std::set<uint32>::const_iterator itr2 = actionIds.find(itr.first);
         if (itr2 == actionIds.end())
-            sLog.outErrorDb("Table `creature_ai_scripts` has script (Id: %u) not used by any creature AI events.", sCreatureAIScript.first);
+            sLog.outErrorDb("Table `creature_ai_scripts` has script (Id: %u) not used by any creature AI events.", itr.first);
     }
 }
 

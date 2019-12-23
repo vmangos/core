@@ -177,12 +177,12 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellPair& cell, CorpseMapType
     if (cell_corpses.empty())
         return;
 
-    for (const auto & cell_corpse : cell_corpses)
+    for (const auto & itr : cell_corpses)
     {
-        if (cell_corpse.second != map->GetInstanceId())
+        if (itr.second != map->GetInstanceId())
             continue;
 
-        uint32 player_lowguid = cell_corpse.first;
+        uint32 player_lowguid = itr.first;
 
         Corpse* obj = sObjectAccessor.GetCorpseForPlayerGUID(ObjectGuid(HIGHGUID_PLAYER, player_lowguid));
         if (!obj)

@@ -255,9 +255,9 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
         if (m_bNorthernCaveInOpened)                        // close northern cave-in door
             m_pInstance->DoUseDoorOrButton(m_pInstance->GetData64(GO_CAVE_IN_NORTH));
 
-        for (auto m_luiSummonedMobGUID : m_luiSummonedMobGUIDs)
+        for (auto guid : m_luiSummonedMobGUIDs)
         {
-            if (Creature* pSummoned = m_creature->GetMap()->GetCreature(m_luiSummonedMobGUID))
+            if (Creature* pSummoned = m_creature->GetMap()->GetCreature(guid))
                 pSummoned->ForcedDespawn();
         }
     }

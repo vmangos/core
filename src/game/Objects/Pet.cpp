@@ -778,9 +778,9 @@ void Pet::RegenerateFocus()
     float addvalue = 25 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
 
     AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-    for (auto ModPowerRegenPCTAura : ModPowerRegenPCTAuras)
-        if (ModPowerRegenPCTAura->GetModifier()->m_miscvalue == int32(POWER_FOCUS))
-            addvalue *= (ModPowerRegenPCTAura->GetModifier()->m_amount + 100) / 100.0f;
+    for (auto itr : ModPowerRegenPCTAuras)
+        if (itr->GetModifier()->m_miscvalue == int32(POWER_FOCUS))
+            addvalue *= (itr->GetModifier()->m_amount + 100) / 100.0f;
 
     ModifyPower(POWER_FOCUS, (int32)addvalue);
 }
@@ -897,15 +897,15 @@ bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
 
     chainstartstore[0] = sSpellMgr.GetFirstSpellInChain(spellid);
 
-    for (const auto & m_petSpell : m_petSpells)
+    for (const auto & itr : m_petSpells)
     {
-        if (m_petSpell.second.state == PETSPELL_REMOVED)
+        if (itr.second.state == PETSPELL_REMOVED)
             continue;
 
-        if (Spells::IsPassiveSpell(m_petSpell.first))
+        if (Spells::IsPassiveSpell(itr.first))
             continue;
 
-        uint32 chainstart = sSpellMgr.GetFirstSpellInChain(m_petSpell.first);
+        uint32 chainstart = sSpellMgr.GetFirstSpellInChain(itr.first);
 
         uint8 x;
 
@@ -949,14 +949,14 @@ int32 Pet::GetTPForSpell(uint32 spellid)
     uint32 spenttrainp = 0;
     uint32 chainstart = sSpellMgr.GetFirstSpellInChain(spellid);
 
-    for (auto & m_petSpell : m_petSpells)
+    for (const auto & itr : m_petSpells)
     {
-        if (m_petSpell.second.state == PETSPELL_REMOVED)
+        if (itr.second.state == PETSPELL_REMOVED)
             continue;
 
-        if (sSpellMgr.GetFirstSpellInChain(m_petSpell.first) == chainstart)
+        if (sSpellMgr.GetFirstSpellInChain(itr.first) == chainstart)
         {
-            SkillLineAbilityMapBounds _bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(m_petSpell.first);
+            SkillLineAbilityMapBounds _bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(itr.first);
 
             for (SkillLineAbilityMap::const_iterator _spell_idx2 = _bounds.first; _spell_idx2 != _bounds.second; ++_spell_idx2)
             {
@@ -1558,11 +1558,11 @@ void Pet::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8);
     data << GetObjectGuid();
     time_t curTime = time(nullptr);
-    for (auto & m_petSpell : m_petSpells)
+    for (const auto & itr : m_petSpells)
     {
-        if (m_petSpell.second.state == PETSPELL_REMOVED)
+        if (itr.second.state == PETSPELL_REMOVED)
             continue;
-        uint32 unSpellId = m_petSpell.first;
+        uint32 unSpellId = itr.first;
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(unSpellId);
         if (!spellInfo)
         {
@@ -1599,7 +1599,7 @@ void Pet::_LoadSpellCooldowns()
         data << ObjectGuid(GetObjectGuid());
         //[-ZERO] data << uint8(0x0);                                 // flags (0x1, 0x2)
 
-        for (auto & it : m_pTmpCache->spellCooldown)
+        for (const auto & it : m_pTmpCache->spellCooldown)
         {
             //Field* fields = result->Fetch();
 
@@ -1680,7 +1680,7 @@ void Pet::_LoadSpells()
 
     if (m_pTmpCache)
     {
-        for (auto & spell : m_pTmpCache->spells)
+        for (const auto & spell : m_pTmpCache->spells)
         {
             //Field* fields = result->Fetch();
             AddSpell(spell.spell, ActiveStates(spell.active), PETSPELL_UNCHANGED);
@@ -1756,7 +1756,7 @@ void Pet::_LoadAuras(uint32 timediff)
     //QueryResult* result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM pet_aura WHERE guid = '%u'",m_charmInfo->GetPetNumber());
     if (m_pTmpCache)
     {
-        for (auto & it : m_pTmpCache->auras)
+        for (const auto & it : m_pTmpCache->auras)
         {
             ObjectGuid casterGuid  = ObjectGuid(it.caster_guid);
             uint32 item_lowguid = it.item_guid;
@@ -1927,7 +1927,7 @@ void Pet::_SaveAuras()
             stmt.addUInt32(holder->GetStackAmount());
             stmt.addUInt8(holder->GetAuraCharges());
 
-            for (int i : damage)
+            for (int32 i : damage)
                 stmt.addInt32(i);
 
             for (uint32 i : periodicTime)
@@ -2000,26 +2000,26 @@ bool Pet::AddSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpe
 
     if (sSpellMgr.GetSpellRank(spell_id) != 0)
     {
-        for (const auto & m_petSpell : m_petSpells)
+        for (const auto & itr : m_petSpells)
         {
-            if (m_petSpell.second.state == PETSPELL_REMOVED) continue;
+            if (itr.second.state == PETSPELL_REMOVED) continue;
 
-            if (sSpellMgr.IsRankSpellDueToSpell(spellInfo, m_petSpell.first))
+            if (sSpellMgr.IsRankSpellDueToSpell(spellInfo, itr.first))
             {
                 // replace by new high rank
-                if (sSpellMgr.IsHighRankOfSpell(spell_id, m_petSpell.first))
+                if (sSpellMgr.IsHighRankOfSpell(spell_id, itr.first))
                 {
-                    newspell.active = m_petSpell.second.active;
+                    newspell.active = itr.second.active;
 
                     if (newspell.active == ACT_ENABLED)
-                        ToggleAutocast(m_petSpell.first, false);
+                        ToggleAutocast(itr.first, false);
 
-                    oldspell_id = m_petSpell.first;
-                    unlearnSpell(m_petSpell.first, false, false);
+                    oldspell_id = itr.first;
+                    unlearnSpell(itr.first, false, false);
                     break;
                 }
                 // ignore new lesser rank
-                else if (sSpellMgr.IsHighRankOfSpell(m_petSpell.first, spell_id))
+                else if (sSpellMgr.IsHighRankOfSpell(itr.first, spell_id))
                     return false;
             }
         }

@@ -759,7 +759,7 @@ namespace MaNGOS
             if (!i_originalCaster)
                 return;
 
-            for(auto & itr : m)
+            for(const auto & itr : m)
             {
                 Player* pPlayer = itr.getSource();
                 if (!pPlayer->IsAlive() || pPlayer->IsTaxiFlying())

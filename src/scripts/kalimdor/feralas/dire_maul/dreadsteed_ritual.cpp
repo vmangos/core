@@ -163,9 +163,9 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
     {
         //write it in m_pInstance?
         GameObject* gobj;
-        for (unsigned long long i : guidFlameTab)
+        for (uint64 guid : guidFlameTab)
         {
-            if (gobj = me->GetMap()->GetGameObject(i))
+            if (gobj = me->GetMap()->GetGameObject(guid))
                 gobj->Despawn();
         }
         eventPhase++;
@@ -190,14 +190,14 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
     {
         eventPhase = 0;
         GameObject* gobj;
-        for (unsigned long long i : guidFlameTab)
+        for (uint64 guid : guidFlameTab)
         {
-            if (gobj = me->GetMap()->GetGameObject(i))
+            if (gobj = me->GetMap()->GetGameObject(guid))
                 gobj->Despawn();
         }
-        for (unsigned long long i : guidGlyphTab)
+        for (uint64 guid : guidGlyphTab)
         {
-            if (gobj = me->GetMap()->GetGameObject(i))
+            if (gobj = me->GetMap()->GetGameObject(guid))
             {
                 gobj->SetSpawnedByDefault(false);
                 gobj->Refresh();

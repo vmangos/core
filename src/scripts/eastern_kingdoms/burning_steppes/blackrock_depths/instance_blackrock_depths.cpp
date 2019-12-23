@@ -696,9 +696,9 @@ struct instance_blackrock_depths : ScriptedInstance
             return;
 
         bool needsReplacing = true;
-        for (const auto & player : players)
+        for (const auto & itr : players)
         {
-            if (Player* pPlayer = player.getSource())
+            if (Player* pPlayer = itr.getSource())
             {
                 // if at least one player didn't complete the quest, return false
                 if ((pPlayer->GetTeam() == ALLIANCE && !pPlayer->GetQuestRewardStatus(QUEST_FATE_KINGDOM))

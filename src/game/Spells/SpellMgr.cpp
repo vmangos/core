@@ -281,7 +281,7 @@ struct DoSpellProcEvent
                 !spe.procEx && !spe.ppmRate && !spe.customChance && !spe.cooldown)
         {
             bool empty = spe.spellFamilyName == 0;
-            for (unsigned long long i : spe.spellFamilyMask)
+            for (uint64 i : spe.spellFamilyMask)
             {
                 if (i)
                 {
@@ -1873,58 +1873,58 @@ void SpellMgr::LoadSpellChains()
     while (result->NextRow());
 
     // additional integrity checks
-    for (const auto & mSpellChain : mSpellChains)
+    for (const auto & itr : mSpellChains)
     {
-        if (mSpellChain.second.prev)
+        if (itr.second.prev)
         {
-            SpellChainMap::const_iterator i_prev = mSpellChains.find(mSpellChain.second.prev);
+            SpellChainMap::const_iterator i_prev = mSpellChains.find(itr.second.prev);
             if (i_prev == mSpellChains.end())
             {
                 sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has not found previous rank spell in table.",
-                                mSpellChain.first, mSpellChain.second.prev, mSpellChain.second.first, mSpellChain.second.rank, mSpellChain.second.req);
+                                itr.first, itr.second.prev, itr.second.first, itr.second.rank, itr.second.req);
             }
-            else if (i_prev->second.first != mSpellChain.second.first)
+            else if (i_prev->second.first != itr.second.first)
             {
                 sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has different first spell in chain compared to previous rank spell (prev: %u, first: %u, rank: %d, req: %u).",
-                                mSpellChain.first, mSpellChain.second.prev, mSpellChain.second.first, mSpellChain.second.rank, mSpellChain.second.req,
+                                itr.first, itr.second.prev, itr.second.first, itr.second.rank, itr.second.req,
                                 i_prev->second.prev, i_prev->second.first, i_prev->second.rank, i_prev->second.req);
             }
-            else if (i_prev->second.rank + 1 != mSpellChain.second.rank)
+            else if (i_prev->second.rank + 1 != itr.second.rank)
             {
                 sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has different rank compared to previous rank spell (prev: %u, first: %u, rank: %d, req: %u).",
-                                mSpellChain.first, mSpellChain.second.prev, mSpellChain.second.first, mSpellChain.second.rank, mSpellChain.second.req,
+                                itr.first, itr.second.prev, itr.second.first, itr.second.rank, itr.second.req,
                                 i_prev->second.prev, i_prev->second.first, i_prev->second.rank, i_prev->second.req);
             }
         }
 
-        if (mSpellChain.second.req)
+        if (itr.second.req)
         {
-            SpellChainMap::const_iterator i_req = mSpellChains.find(mSpellChain.second.req);
+            SpellChainMap::const_iterator i_req = mSpellChains.find(itr.second.req);
             if (i_req == mSpellChains.end())
             {
                 sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has not found required rank spell in table.",
-                                mSpellChain.first, mSpellChain.second.prev, mSpellChain.second.first, mSpellChain.second.rank, mSpellChain.second.req);
+                                itr.first, itr.second.prev, itr.second.first, itr.second.rank, itr.second.req);
             }
-            else if (i_req->second.first == mSpellChain.second.first)
+            else if (i_req->second.first == itr.second.first)
             {
                 sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has required rank spell from same spell chain (prev: %u, first: %u, rank: %d, req: %u).",
-                                mSpellChain.first, mSpellChain.second.prev, mSpellChain.second.first, mSpellChain.second.rank, mSpellChain.second.req,
+                                itr.first, itr.second.prev, itr.second.first, itr.second.rank, itr.second.req,
                                 i_req->second.prev, i_req->second.first, i_req->second.rank, i_req->second.req);
             }
             else if (i_req->second.req)
             {
                 sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has required rank spell with required spell (prev: %u, first: %u, rank: %d, req: %u).",
-                                mSpellChain.first, mSpellChain.second.prev, mSpellChain.second.first, mSpellChain.second.rank, mSpellChain.second.req,
+                                itr.first, itr.second.prev, itr.second.first, itr.second.rank, itr.second.req,
                                 i_req->second.prev, i_req->second.first, i_req->second.rank, i_req->second.req);
             }
         }
     }
 
     // fill next rank cache
-    for (const auto & mSpellChain : mSpellChains)
+    for (const auto & itr : mSpellChains)
     {
-        uint32 spell_id = mSpellChain.first;
-        SpellChainNode const& node = mSpellChain.second;
+        uint32 spell_id = itr.first;
+        SpellChainNode const& node = itr.second;
 
         if (node.prev)
             mSpellChainsNext.insert(SpellChainMapNext::value_type(node.prev, spell_id));
@@ -1934,16 +1934,16 @@ void SpellMgr::LoadSpellChains()
     }
 
     // check single rank redundant cases (single rank talents not added by default so this can be only custom cases)
-    for (const auto & mSpellChain : mSpellChains)
+    for (const auto & itr : mSpellChains)
     {
         // skip non-first ranks, and spells with additional reqs
-        if (mSpellChain.second.rank > 1 || mSpellChain.second.req)
+        if (itr.second.rank > 1 || itr.second.req)
             continue;
 
-        if (mSpellChainsNext.find(mSpellChain.first) == mSpellChainsNext.end())
+        if (mSpellChainsNext.find(itr.first) == mSpellChainsNext.end())
         {
             sLog.outErrorDb("Spell %u (prev: %u, first: %u, rank: %d, req: %u) listed in `spell_chain` has single rank data, so redundant.",
-                            mSpellChain.first, mSpellChain.second.prev, mSpellChain.second.first, mSpellChain.second.rank, mSpellChain.second.req);
+                            itr.first, itr.second.prev, itr.second.first, itr.second.rank, itr.second.req);
         }
     }
 

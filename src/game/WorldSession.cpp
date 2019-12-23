@@ -1290,13 +1290,13 @@ void WorldSession::AddClientIdentifier(uint32 i, std::string str)
 void WorldSession::ComputeClientHash()
 {
     std::stringstream oss;
-    for (const auto & _clientIdentifier : _clientIdentifiers)
+    for (const auto & itr : _clientIdentifiers)
     {
         Sha1Hash sha;
-        sha.UpdateData(_clientIdentifier.second);
+        sha.UpdateData(itr.second);
         sha.Finalize();
         uint8* digest = sha.GetDigest();
-        char c = _clientIdentifier.first + '0';
+        char c = itr.first + '0';
         if (c > '9')
             c = c - '9' + 'A' - 1;
         oss << c;

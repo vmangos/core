@@ -576,13 +576,13 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                 GetCreatureListWithEntryInGrid(lGuards, m_creature, MOB_GARDE_AILE_NOIRE, 150.0f);
                 GetCreatureListWithEntryInGrid(lGuards, m_creature, MOB_GRETHOK, 150.0f);
 
-                for (auto & lGuard : lGuards)
+                for (auto & pGuard : lGuards)
                 {
-                    if (!lGuard->IsInCombat())
+                    if (!pGuard->IsInCombat())
                     {
-                        lGuard->SetInCombatWithZone();
-                        if (lGuard->GetEntry() == MOB_GRETHOK)
-                            lGuard->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+                        pGuard->SetInCombatWithZone();
+                        if (pGuard->GetEntry() == MOB_GRETHOK)
+                            pGuard->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
                     }
                 }
             }

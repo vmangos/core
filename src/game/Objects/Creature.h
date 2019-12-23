@@ -365,8 +365,8 @@ struct VendorItemData
 
     void Clear()
     {
-        for (auto m_item : m_items)
-            delete m_item;
+        for (auto item : m_items)
+            delete item;
         m_items.clear();
     }
 };

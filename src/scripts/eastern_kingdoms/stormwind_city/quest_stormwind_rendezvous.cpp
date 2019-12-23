@@ -49,11 +49,11 @@ void npc_reginald_windsorAI::ResetCreature()
         GardeTimer[i] = 0;
         GardeNeed[i] = false;
     }
-    for (unsigned long long & GardesGUID : GardesGUIDs)
-        GardesGUID = 0;
+    for (uint64 & guid : GardesGUIDs)
+        guid = 0;
 
-    for (unsigned long long & DragsGUID : DragsGUIDs)
-        DragsGUID = 0;
+    for (uint64 & guid : DragsGUIDs)
+        guid = 0;
 }
 
 void npc_reginald_windsorAI::JustDied(Unit* /*pKiller*/)
@@ -87,14 +87,14 @@ void npc_reginald_windsorAI::DoTalk(Unit* pWho, bool yell, Unit* pTarget)
 void npc_reginald_windsorAI::SituationFinale()
 {
     Player* pPlayer = GetPlayer();
-    std::list<Creature*> MobListe;
+    std::list<Creature*> mobList;
 
-    GetCreatureListWithEntryInGrid(MobListe, m_creature, NPC_ONYXIA_ELITE_GUARD, 150.0f);
-    for (auto & itr : MobListe)
+    GetCreatureListWithEntryInGrid(mobList, m_creature, NPC_ONYXIA_ELITE_GUARD, 150.0f);
+    for (auto & pMob : mobList)
     {
-        itr->Respawn();
-        itr->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
-        itr->AIM_Initialize();
+        pMob->Respawn();
+        pMob->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
+        pMob->AIM_Initialize();
     }
 
     if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
@@ -221,9 +221,9 @@ void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
             if (Victim->GetDistance2d(m_creature) < 8.0f && NeedCheck)
             {
                 bool Continuer = true;
-                for (unsigned long long GardesGUID : GardesGUIDs)
+                for (uint64 guid : GardesGUIDs)
                 {
-                    if (Victim->GetGUID() == GardesGUID || m_creature->GetPositionY() < 360)
+                    if (Victim->GetGUID() == guid || m_creature->GetPositionY() < 360)
                         Continuer = false;
                 }
                 if (Continuer)

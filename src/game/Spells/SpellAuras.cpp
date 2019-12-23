@@ -6335,8 +6335,8 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
             break;
     }
 
-    for (auto & m_aura : m_auras)
-        m_aura = nullptr;
+    for (auto & aura : m_auras)
+        aura = nullptr;
     m_makesTargetSecondaryFocus = !GetSpellProto()->IsPositiveSpell() && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE
                                                                     ||  m_spellProto->HasAura(SPELL_AURA_MOD_CONFUSE)
                                                                     ||  m_spellProto->HasAura(SPELL_AURA_MOD_FEAR));
@@ -6857,8 +6857,8 @@ void Aura::HandleAuraSafeFall(bool Apply, bool Real)
 SpellAuraHolder::~SpellAuraHolder()
 {
     // note: auras in delete list won't be affected since they clear themselves from holder when adding to deletedAuraslist
-    for (auto & m_aura : m_auras)
-        delete m_aura;
+    for (auto & aura : m_auras)
+        delete aura;
 
     delete _pveHeartBeatData;
 }
@@ -7036,11 +7036,11 @@ void SpellAuraHolder::SetAuraMaxDuration(int32 duration)
 
 uint32 SpellAuraHolder::GetAuraPeriodicTickTimer(SpellEffectIndex index) const
 {
-    Aura* aur = m_auras[index];
-    if (!aur)
+    Aura* aura = m_auras[index];
+    if (!aura)
         return -1;
 
-    return aur->GetAuraPeriodicTimer();
+    return aura->GetAuraPeriodicTimer();
 }
 
 bool SpellAuraHolder::HasMechanic(uint32 mechanic) const
@@ -7067,35 +7067,35 @@ bool SpellAuraHolder::HasMechanicMask(uint32 mechanicMask) const
 
 bool SpellAuraHolder::IsPersistent() const
 {
-    for (auto aur : m_auras)
-        if (aur)
-            if (aur->IsPersistent())
+    for (auto aura : m_auras)
+        if (aura)
+            if (aura->IsPersistent())
                 return true;
     return false;
 }
 
 bool SpellAuraHolder::IsAreaAura() const
 {
-    for (auto aur : m_auras)
-        if (aur)
-            if (aur->IsAreaAura())
+    for (auto aura : m_auras)
+        if (aura)
+            if (aura->IsAreaAura())
                 return true;
     return false;
 }
 
 bool SpellAuraHolder::IsPositive() const
 {
-    for (auto aur : m_auras)
-        if (aur)
-            if (!aur->IsPositive())
+    for (auto aura : m_auras)
+        if (aura)
+            if (!aura->IsPositive())
                 return false;
     return true;
 }
 
 bool SpellAuraHolder::IsEmptyHolder() const
 {
-    for (auto m_aura : m_auras)
-        if (m_aura)
+    for (auto aura : m_auras)
+        if (aura)
             return false;
     return true;
 }

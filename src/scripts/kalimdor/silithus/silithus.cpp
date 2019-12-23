@@ -1295,8 +1295,8 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         m_creature->AllowManaRegen(false);
         m_creature->SetPower(POWER_MANA, 0);
 
-        for (unsigned long long & PlayerGuid : PlayerGuids)
-            PlayerGuid = 0;
+        for (uint64 & guid : PlayerGuids)
+            guid = 0;
     }
 
     void SummonedCreatureJustDied(Creature* unit) override
@@ -1328,15 +1328,15 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
         if (pSpell->Id == SPELL_WILT || pSpell->Id == SPELL_SUFFERING_OF_SANITY || pSpell->Id == SPELL_SYSTEM_SHOCK)
         {
-            for (unsigned long long PlayerGuid : PlayerGuids)
-                if (PlayerGuid == target->GetGUID())
+            for (uint64 guid : PlayerGuids)
+                if (guid == target->GetGUID())
                     return;
 
-            for (unsigned long long & PlayerGuid : PlayerGuids)
+            for (uint64 & guid : PlayerGuids)
             {
-                if (PlayerGuid == 0)
+                if (guid == 0)
                 {
-                    PlayerGuid = target->GetGUID();
+                    guid = target->GetGUID();
                     break;
                 }
             }
@@ -1367,8 +1367,8 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
         if (m_uiWiltTimer < uiDiff)
         {
-            for (unsigned long long & PlayerGuid : PlayerGuids)
-                PlayerGuid = 0;
+            for (uint64 & guid : PlayerGuids)
+                guid = 0;
             if (DoCastSpellIfCan(m_creature, SPELL_WILT) == CAST_OK)
                 m_uiWiltTimer = urand(3000, 5000);
         }
@@ -1379,8 +1379,8 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         {
             if (m_uiSanityTimer < uiDiff)
             {
-                for (unsigned long long & PlayerGuid : PlayerGuids)
-                    PlayerGuid = 0;
+                for (uint64 & guid : PlayerGuids)
+                    guid = 0;
                 if (DoCastSpellIfCan(m_creature, SPELL_SUFFERING_OF_SANITY) == CAST_OK)
                     m_uiSanityTimer = 1000;
             }
@@ -1397,12 +1397,12 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
         if (m_uiCheckPlayerTimer < uiDiff)
         {
-            for (unsigned long long & PlayerGuid : PlayerGuids)
+            for (uint64 & guid : PlayerGuids)
             {
-                if (PlayerGuid == 0)
+                if (guid == 0)
                     continue;
 
-                if (Unit* pTarget = m_creature->GetMap()->GetUnit(PlayerGuid))
+                if (Unit* pTarget = m_creature->GetMap()->GetUnit(guid))
                 {
                     pTarget->SetInCombatWith(m_creature);
                     if (pTarget->IsDead())
@@ -1412,7 +1412,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
                         float MaxMana = m_creature->GetMaxPower(POWER_MANA);
                         m_creature->SetPower(POWER_MANA, (currMana + MaxMana * 0.02f) < MaxMana ? (currMana + MaxMana * 0.02f) : MaxMana);
 
-                        PlayerGuid = 0;
+                        guid = 0;
                     }
                 }
             }

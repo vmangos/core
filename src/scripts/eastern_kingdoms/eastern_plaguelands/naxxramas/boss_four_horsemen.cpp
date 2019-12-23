@@ -375,9 +375,9 @@ struct boss_four_horsemen_shared : public ScriptedAI
             return;
         float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY);
         Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
-        for (const auto & player : players)
+        for (const auto & itr : players)
         {
-            Player* pPlayer = player.getSource();
+            Player* pPlayer = itr.getSource();
             if (m_creature->IsWithinDistInMap(pPlayer, range))
             {
                 m_creature->PlayDirectSound(pData->SoundId, pPlayer);

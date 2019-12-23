@@ -144,14 +144,14 @@ Unit::Unit()
     m_canModifyStats = false;
     m_modelCollisionHeight = 2.f;
 
-    for (auto & i : m_spellImmune)
-        i.clear();
-    for (auto & i : m_auraModifiersGroup)
+    for (auto & immunityList : m_spellImmune)
+        immunityList.clear();
+    for (auto & modifier : m_auraModifiersGroup)
     {
-        i[BASE_VALUE] = 0.0f;
-        i[BASE_PCT] = 1.0f;
-        i[TOTAL_VALUE] = 0.0f;
-        i[TOTAL_PCT] = 1.0f;
+        modifier[BASE_VALUE] = 0.0f;
+        modifier[BASE_PCT] = 1.0f;
+        modifier[TOTAL_VALUE] = 0.0f;
+        modifier[TOTAL_PCT] = 1.0f;
     }
     // implement 50% base damage from offhand
     m_auraModifiersGroup[UNIT_MOD_DAMAGE_OFFHAND][TOTAL_PCT] = 0.5f;
@@ -168,8 +168,8 @@ Unit::Unit()
         m_weaponDamageCount[i] = 1;
     }
 
-    for (float & m_createStat : m_createStats)
-        m_createStat = 0.0f;
+    for (float & stat : m_createStats)
+        stat = 0.0f;
 
     for (auto& m_createResistance : m_createResistances)
         m_createResistance = 0;
@@ -185,11 +185,11 @@ Unit::Unit()
     m_lastManaUseSpellId = 0;
 
     //m_victimThreat = 0.0f;
-    for (float & i : m_threatModifier)
-        i = 1.0f;
+    for (float & threatMod : m_threatModifier)
+        threatMod = 1.0f;
     
-    for (float & i : m_speed_rate)
-        i = 1.0f;
+    for (float & speed : m_speed_rate)
+        speed = 1.0f;
 
     m_charmInfo = nullptr;
 
@@ -4975,8 +4975,8 @@ Totem* Unit::GetTotem(TotemSlot slot) const
 
 bool Unit::IsAllTotemSlotsUsed() const
 {
-    for (auto i : m_TotemSlot)
-        if (!i)
+    for (const auto& guid : m_TotemSlot)
+        if (!guid)
             return false;
     return true;
 }
@@ -4989,11 +4989,11 @@ void Unit::_AddTotem(TotemSlot slot, Totem* totem)
 
 void Unit::_RemoveTotem(Totem* totem)
 {
-    for (auto & i : m_TotemSlot)
+    for (auto & guid : m_TotemSlot)
     {
-        if (i == totem->GetObjectGuid())
+        if (guid == totem->GetObjectGuid())
         {
-            i.Clear();
+            guid.Clear();
             break;
         }
     }
@@ -7762,8 +7762,8 @@ CharmInfo::CharmInfo(Unit* unit)
       _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
       _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
 {
-    for (auto & m_charmspell : m_charmspells)
-        m_charmspell.SetActionAndType(0, ACT_DISABLED);
+    for (auto & itr : m_charmspells)
+        itr.SetActionAndType(0, ACT_DISABLED);
 }
 
 void CharmInfo::InitPetActionBar()
@@ -7928,9 +7928,9 @@ void CharmInfo::ToggleCreatureAutocast(uint32 spellid, bool apply)
     if (Spells::IsPassiveSpell(spellid))
         return;
 
-    for (auto & m_charmspell : m_charmspells)
-        if (spellid == m_charmspell.GetAction())
-            m_charmspell.SetType(apply ? ACT_ENABLED : ACT_DISABLED);
+    for (auto & itr : m_charmspells)
+        if (spellid == itr.GetAction())
+            itr.SetType(apply ? ACT_ENABLED : ACT_DISABLED);
 }
 
 void CharmInfo::SetPetNumber(uint32 petnumber, bool statwindow)

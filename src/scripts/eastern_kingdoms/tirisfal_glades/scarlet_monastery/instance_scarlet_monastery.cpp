@@ -347,9 +347,9 @@ struct instance_scarlet_monastery : ScriptedInstance
         if (lPlayers.isEmpty())
             return;
         bool anyAshbringerEquipped = false;
-        for (const auto & lPlayer : lPlayers)
+        for (const auto & itr : lPlayers)
         {
-            if (Player* pPlayer = lPlayer.getSource())
+            if (Player* pPlayer = itr.getSource())
             {
                 Item* item = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
                 if (!item)

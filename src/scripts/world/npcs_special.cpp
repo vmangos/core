@@ -429,12 +429,12 @@ void npc_doctorAI::BeginEvent(Player* pPlayer)
     switch (m_creature->GetEntry())
     {
         case DOCTOR_ALLIANCE:
-            for (auto & AllianceCoord : AllianceCoords)
-                Coordinates.push_back(&AllianceCoord);
+            for (auto & allianceCoord : AllianceCoords)
+                Coordinates.push_back(&allianceCoord);
             break;
         case DOCTOR_HORDE:
-            for (auto & HordeCoord : HordeCoords)
-                Coordinates.push_back(&HordeCoord);
+            for (auto & hordeCoord : HordeCoords)
+                Coordinates.push_back(&hordeCoord);
             break;
     }
 
@@ -1217,10 +1217,10 @@ struct rat_des_profondeursAI : public ScriptedAI
             // Et on ".die" les autres rats.
             std::list<Creature*> pCreaList;
             m_creature->GetCreatureListWithEntryInGrid(pCreaList, NPC_RAT_ENSORCELE, 100.0f);
-            for (auto & it : pCreaList)
+            for (auto & pCreature : pCreaList)
             {
-                if (it->AI()->GetData(0) == m_FollowingPlayerGuid.GetCounter())
-                    it->DisappearAndDie();
+                if (pCreature->AI()->GetData(0) == m_FollowingPlayerGuid.GetCounter())
+                    pCreature->DisappearAndDie();
             }
         }
         else
@@ -1701,9 +1701,9 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (!m_bExist || m_bDone)
             return;
 
-        for (uint32 l : Launcher)
+        for (uint32 goEntry : Launcher)
         {
-            if (auto pGo = GetClosestGameObjectWithEntry(m_creature, l, CONTACT_DISTANCE))
+            if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
             {
                 pGo->SendGameObjectCustomAnim();
                 break;

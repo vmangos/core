@@ -254,8 +254,8 @@ void Object::SendForcedObjectUpdate()
     BuildUpdateData(update_players);
     RemoveFromClientUpdateList();
 
-    for (auto & update_player : update_players)
-        update_player.second.Send(update_player.first->GetSession());
+    for (auto & itr : update_players)
+        itr.second.Send(itr.first->GetSession());
 }
 
 void Object::BuildMovementUpdateBlock(UpdateData* data, uint8 flags) const

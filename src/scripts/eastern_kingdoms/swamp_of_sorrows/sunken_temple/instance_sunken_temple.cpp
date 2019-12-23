@@ -130,8 +130,8 @@ struct instance_sunken_temple : public ScriptedInstance
         // Spawn the big green lights
         //for (GUIDList::const_iterator itr = m_luiBigLightGUIDs.begin(); itr != m_luiBigLightGUIDs.end(); ++itr)
         //DoRespawnGameObject(*itr, 30*MINUTE);
-        for (unsigned long long m_luiBigLightGUID : m_luiBigLightGUIDs)
-            DoRespawnGameObject(m_luiBigLightGUID, HOUR * IN_MILLISECONDS);
+        for (uint64 guid : m_luiBigLightGUIDs)
+            DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
     }
 
     bool ProcessStatueEvent(uint32 uiStatueEntry)
@@ -166,9 +166,9 @@ struct instance_sunken_temple : public ScriptedInstance
 
     void DoUpdateFlamesFlags(bool bRestore)
     {
-        for (unsigned long long m_luiFlameGUID : m_luiFlameGUIDs)
+        for (uint64 guid : m_luiFlameGUIDs)
         {
-            if (GameObject* pFlame = instance->GetGameObject(m_luiFlameGUID))
+            if (GameObject* pFlame = instance->GetGameObject(guid))
             {
                 // Remove the flags of the flames for Hakkar event
                 if (!bRestore)
@@ -224,17 +224,17 @@ struct instance_sunken_temple : public ScriptedInstance
                 m_luiAtalaiStatueGUIDs[5] = pGo->GetGUID();
                 break;
             case GO_ATALAI_LIGHT_BIG:
-                for (unsigned long long m_luiBigLightGUID : m_luiBigLightGUIDs)
+                for (uint64 guid : m_luiBigLightGUIDs)
                 {
-                    if (m_luiBigLightGUID != 0 && m_luiBigLightGUID != pGo->GetGUID())
+                    if (guid != 0 && guid != pGo->GetGUID())
                         ++countLight;
                 }
                 m_luiBigLightGUIDs[countLight] = pGo->GetGUID();
                 break;
             case GO_EVIL_CIRCLE:
-                for (unsigned long long m_luiCircleGUID : m_luiCircleGUIDs)
+                for (uint64 guid : m_luiCircleGUIDs)
                 {
-                    if (m_luiCircleGUID != 0 && m_luiCircleGUID != pGo->GetGUID())
+                    if (guid != 0 && guid != pGo->GetGUID())
                         ++countCircle;
                 }
                 m_luiCircleGUIDs[countCircle] = pGo->GetGUID();
@@ -377,9 +377,9 @@ struct instance_sunken_temple : public ScriptedInstance
                 if (uiData == DONE)
                 {
                     DoSpawnAtalarionIfCan();
-                    for (unsigned long long m_luiAtalaiStatueGUID : m_luiAtalaiStatueGUIDs)
+                    for (uint64 guid : m_luiAtalaiStatueGUIDs)
                     {
-                        if (GameObject* pGob = instance->GetGameObject(m_luiAtalaiStatueGUID))
+                        if (GameObject* pGob = instance->GetGameObject(guid))
                             pGob->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
                     }
                 }
@@ -432,9 +432,9 @@ struct instance_sunken_temple : public ScriptedInstance
                 if (uiData == DONE)
                 {
                     bool bAllDead = true;
-                    for (unsigned long long m_luiProtectorGUID : m_luiProtectorGUIDs)
+                    for (uint64 guid : m_luiProtectorGUIDs)
                     {
-                        if (Creature* pProt = instance->GetCreature(m_luiProtectorGUID))
+                        if (Creature* pProt = instance->GetCreature(guid))
                         {
                             if (pProt->IsAlive())
                             {
@@ -535,8 +535,8 @@ struct instance_sunken_temple : public ScriptedInstance
 
                     if (m_auiEncounter[4] != IN_PROGRESS)
                     {
-                        for (unsigned long long m_luiCircleGUID : m_luiCircleGUIDs)
-                            DoRespawnGameObject(m_luiCircleGUID, HOUR * IN_MILLISECONDS);
+                        for (uint64 guid : m_luiCircleGUIDs)
+                            DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
                     }
                 }
                 else if (uiData == FAIL)
@@ -559,9 +559,9 @@ struct instance_sunken_temple : public ScriptedInstance
                     // We only get one attempt
                     DoUpdateFlamesFlags(false);
 
-                    for (unsigned long long m_luiCircleGUID : m_luiCircleGUIDs)
+                    for (uint64 guid : m_luiCircleGUIDs)
                     {
-                        if (GameObject* pGob = instance->GetGameObject(m_luiCircleGUID))
+                        if (GameObject* pGob = instance->GetGameObject(guid))
                             pGob->Use(pShade);
                     }
                     m_uiFlameCounter = 0;

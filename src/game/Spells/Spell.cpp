@@ -5286,17 +5286,17 @@ void Spell::AddPrecastSpell(uint32 spellId)
 
 void Spell::CastTriggerSpells()
 {
-    for (auto m_TriggerSpell : m_TriggerSpells)
+    for (auto spellInfo : m_TriggerSpells)
     {
-        Spell* spell = m_casterUnit ? new Spell(m_casterUnit, m_TriggerSpell, true, m_originalCasterGUID) : new Spell(m_casterGo, m_TriggerSpell, true, m_originalCasterGUID);
+        Spell* spell = m_casterUnit ? new Spell(m_casterUnit, spellInfo, true, m_originalCasterGUID) : new Spell(m_casterGo, spellInfo, true, m_originalCasterGUID);
         spell->prepare(m_targets);                         // use original spell original targets
     }
 }
 
 void Spell::CastPreCastSpells(Unit* target)
 {
-    for (auto m_preCastSpell : m_preCastSpells)
-        m_caster->CastSpell(target, m_preCastSpell, true, m_CastItem);
+    for (auto spellInfo : m_preCastSpells)
+        m_caster->CastSpell(target, spellInfo, true, m_CastItem);
 }
 
 void Spell::AddChanneledAuraHolder(SpellAuraHolder* holder)
@@ -7557,14 +7557,14 @@ SpellCastResult Spell::CheckItems()
             uint32 rank = 0;
             uint32 itemtype;
             Unit::AuraList const& mDummyAuras = p_caster->GetAurasByType(SPELL_AURA_DUMMY);
-            for (auto mDummyAura : mDummyAuras)
+            for (auto aura : mDummyAuras)
             {
-                if (mDummyAura->GetId() == 18692)
+                if (aura->GetId() == 18692)
                 {
                     rank = 1;
                     break;
                 }
-                else if (mDummyAura->GetId() == 18693)
+                else if (aura->GetId() == 18693)
                 {
                     rank = 2;
                     break;
@@ -8620,8 +8620,8 @@ void Spell::OnSpellLaunch()
 
 bool Spell::HasModifierApplied(SpellModifier* mod)
 {
-    for (auto m_appliedMod : m_appliedMods)
-        if (m_appliedMod == mod)
+    for (auto itr : m_appliedMods)
+        if (itr == mod)
             return true;
     return false;
 }

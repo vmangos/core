@@ -263,8 +263,8 @@ struct boss_thekalAI : public zg_rez_add
 {
     boss_thekalAI(Creature* pCreature) : zg_rez_add(pCreature, TYPE_THEKAL)
     {
-        for (unsigned long long & TigerGUID : TigerGUIDs)
-            TigerGUID = 0;
+        for (uint64 & guid : TigerGUIDs)
+            guid = 0;
         Reset();
     }
 
@@ -512,8 +512,8 @@ struct boss_thekalAI : public zg_rez_add
 
             if (CheckTigers_Timer < diff)
             {
-                for (unsigned long long & TigerGUID : TigerGUIDs)
-                    CheckTiger(TigerGUID);
+                for (uint64 & guid : TigerGUIDs)
+                    CheckTiger(guid);
                 CheckTigers_Timer = 10000;
             }
             else

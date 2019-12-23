@@ -235,9 +235,9 @@ struct boss_onyxiaAI : public ScriptedAI
         if (!m_creature->IsInCombat() && !m_creature->IsInEvadeMode())
         {
             Map::PlayerList const& lPlayers = m_creature->GetMap()->GetPlayers();
-            for (const auto & lPlayer : lPlayers)
+            for (const auto & itr : lPlayers)
             {
-                if (Player* pPlayer = lPlayer.getSource())
+                if (Player* pPlayer = itr.getSource())
                 {
                     if (m_creature->IsWithinDistInMap(pPlayer, ONYXIA_AGGRO_RANGE) && pPlayer->IsTargetableForAttack())
                     {

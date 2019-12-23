@@ -101,12 +101,14 @@ uint32 MovementBroadcaster::IdentifySlowMap(std::size_t thread_id)
 
     uint32 max_number_packets = 0;
     uint32 max_instance_id = 0;
-    for (auto & map_packet : map_packets)
-        if (map_packet.second > max_number_packets)
+    for (const auto & itr : map_packets)
+    {
+        if (itr.second > max_number_packets)
         {
-            max_instance_id = map_packet.first;
-            max_number_packets = map_packet.second;
+            max_instance_id = itr.first;
+            max_number_packets = itr.second;
         }
+    }
     return max_instance_id;
 }
 

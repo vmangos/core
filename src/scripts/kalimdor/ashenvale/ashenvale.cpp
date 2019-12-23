@@ -773,14 +773,14 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
 
         Creature* foulweald;
         int pos = 0;
-        for (unsigned long long & i : guidCurrentEnragedFoulweald)
+        for (uint64 & guid : guidCurrentEnragedFoulweald)
         {
-            if (creatureGUID == i)
+            if (creatureGUID == guid)
             {
                 pos = urand(0, 3);
                 if (foulweald = me->SummonCreature(NPC_ENRAGED_FOULWEALD, foulwealdSpawnCoords[pos][0], foulwealdSpawnCoords[pos][1], foulwealdSpawnCoords[pos][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 420000))
                 {
-                    i = foulweald->GetGUID();
+                    guid = foulweald->GetGUID();
                     float x, y, z;
                     me->GetPosition(x, y, z);
                     foulweald->GetMotionMaster()->MovePoint(1, x, y, z, true);

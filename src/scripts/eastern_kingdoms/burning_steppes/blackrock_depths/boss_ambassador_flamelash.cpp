@@ -84,9 +84,9 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
                 pRune->ResetDoorOrButton();
         }
 
-        for (auto lBurningSpirit : lBurningSpirits)
+        for (auto guid : lBurningSpirits)
         {
-            if (Creature* pSummon = m_creature->GetMap()->GetCreature(lBurningSpirit))
+            if (Creature* pSummon = m_creature->GetMap()->GetCreature(guid))
                 pSummon->ForcedDespawn();
         }
 

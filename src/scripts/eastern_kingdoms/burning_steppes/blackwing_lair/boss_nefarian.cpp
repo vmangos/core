@@ -211,9 +211,9 @@ struct boss_nefarianAI : ScriptedAI
         // Clear mage GUIDs or we'll be adding the same players again for subsequent
         // mage class calls, resulting in far more polymorphs than intended
         MagePlayerGUID.clear();
-        for (const auto & player : players)
+        for (const auto & itr : players)
         {
-            Player* pPlayer = player.getSource();
+            Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive())
             {
                 if (pPlayer->GetClass() == ClassCalled)

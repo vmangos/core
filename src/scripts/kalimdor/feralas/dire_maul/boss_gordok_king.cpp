@@ -187,8 +187,8 @@ struct boss_chorushAI : public ScriptedAI
         if (pInstance)
             m_uiEquipment = pInstance->GetChoRushEquipment();
 
-        for (uint32 & i : m_uiSpellTimers)
-            i = urand(1000, 2000);
+        for (uint32 & timer : m_uiSpellTimers)
+            timer = urand(1000, 2000);
 
         switch (m_uiEquipment)
         {

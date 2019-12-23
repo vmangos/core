@@ -84,8 +84,8 @@ struct npc_twilight_corrupterAI : ScriptedAI
         CoNPlayerAggro  = 0;
         bEngaged        = false;
 
-        for (unsigned long long & GUID : GUIDs)
-            GUID = 0;
+        for (uint64 & guid : GUIDs)
+            guid = 0;
     }
 
     void Aggro(Unit* /*pWho*/) override
@@ -99,8 +99,8 @@ struct npc_twilight_corrupterAI : ScriptedAI
 
     void FillPlayerList()
     {
-        for (unsigned long long & GUID : GUIDs)
-            GUID = 0;
+        for (uint64 & guid : GUIDs)
+            guid = 0;
 
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
         for (auto i : tList)
@@ -108,9 +108,9 @@ struct npc_twilight_corrupterAI : ScriptedAI
             Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
 
             if (pUnit && pUnit->IsPlayer())
-                for (unsigned long long & GUID : GUIDs)
-                    if (GUID == 0)
-                        GUID = pUnit->GetGUID();
+                for (uint64 & guid : GUIDs)
+                    if (guid == 0)
+                        guid = pUnit->GetGUID();
         }
     }
 
@@ -163,9 +163,9 @@ struct npc_twilight_corrupterAI : ScriptedAI
         if (m_uiCheckTimer < uiDiff)
         {
             FillPlayerList();
-            for (unsigned long long & GUID : GUIDs)
+            for (uint64 & guid : GUIDs)
             {
-                if (Player* player = m_creature->GetMap()->GetPlayer(GUID))
+                if (Player* player = m_creature->GetMap()->GetPlayer(guid))
                 {
                     if (player->IsDead())
                     {
@@ -173,7 +173,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
                         sprintf(eMessage, "Twilight Corrupter squeezes the last bit of life out of %s and swallows their soul.", player->GetName());
                         m_creature->MonsterTextEmote(eMessage, nullptr, false);
                         m_creature->CastSpell(m_creature, SPELL_SWELL_OF_SOULS, true);
-                        GUID = 0;
+                        guid = 0;
                     }
                 }
             }

@@ -812,9 +812,9 @@ struct npc_resonating_CrystalAI : public ScriptedAI
     {
         Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
         int var = 0;
-        for (const auto & player : players)
+        for (const auto & itr : players)
         {
-            Player* pPlayer = player.getSource();
+            Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
                 ++var;
 
@@ -827,9 +827,9 @@ struct npc_resonating_CrystalAI : public ScriptedAI
     void AggroAllPlayerNear()
     {
         Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
-        for (const auto & player : players)
+        for (const auto & itr : players)
         {
-            Player* pPlayer = player.getSource();
+            Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
             {
                 m_creature->AddThreat(pPlayer);

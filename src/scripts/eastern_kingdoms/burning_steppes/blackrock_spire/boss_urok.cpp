@@ -116,8 +116,8 @@ struct go_urok_challengeAI: public GameObjectAI
 
     void DespawnRunes()
     {
-        for (auto _rune : _runes)
-            if (GameObject* go = me->GetMap()->GetGameObject(_rune))
+        for (const auto& guid : _runes)
+            if (GameObject* go = me->GetMap()->GetGameObject(guid))
                 go->AddObjectToRemoveList();
     }
 

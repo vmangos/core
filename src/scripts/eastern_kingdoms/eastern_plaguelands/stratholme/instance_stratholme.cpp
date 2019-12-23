@@ -559,9 +559,9 @@ struct instance_stratholme : public ScriptedInstance
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_5MIN);
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_1MIN);
 
-                            for (const auto & player : players)
+                            for (const auto & itr : players)
                             {
-                                if (Player* pPlayer = player.getSource())
+                                if (Player* pPlayer = itr.getSource())
                                 {
                                     for (spells_itr = baronSpells.begin(); spells_itr != baronSpells.end(); ++spells_itr)
                                         if (pPlayer->HasAura(*spells_itr))

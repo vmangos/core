@@ -5052,14 +5052,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     uint32 itemtype;
                     uint32 rank = 0;
                     Unit::AuraList const& mDummyAuras = unitTarget->GetAurasByType(SPELL_AURA_DUMMY);
-                    for (auto mDummyAura : mDummyAuras)
+                    for (auto aura : mDummyAuras)
                     {
-                        if (mDummyAura->GetId() == 18692)
+                        if (aura->GetId() == 18692)
                         {
                             rank = 1;
                             break;
                         }
-                        else if (mDummyAura->GetId() == 18693)
+                        else if (aura->GetId() == 18693)
                         {
                             rank = 2;
                             break;
@@ -5160,22 +5160,22 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                 // all seals have aura dummy
                 Unit::AuraList const& m_dummyAuras = m_casterUnit->GetAurasByType(SPELL_AURA_DUMMY);
-                for (auto m_dummyAura : m_dummyAuras)
+                for (auto aura : m_dummyAuras)
                 {
-                    SpellEntry const* spellInfo = m_dummyAura->GetSpellProto();
+                    SpellEntry const* spellInfo = aura->GetSpellProto();
 
                     // search seal (all seals have judgement's aura dummy spell id in 2 effect
-                    if (!spellInfo || !m_dummyAura->GetSpellProto()->IsSealSpell() || m_dummyAura->GetEffIndex() != 2)
+                    if (!spellInfo || !aura->GetSpellProto()->IsSealSpell() || aura->GetEffIndex() != 2)
                         continue;
 
                     // must be calculated base at raw base points in spell proto, GetModifier()->m_value for S.Righteousness modified by SPELLMOD_DAMAGE
-                    spellId2 = m_dummyAura->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_2);
+                    spellId2 = aura->GetSpellProto()->CalculateSimpleValue(EFFECT_INDEX_2);
 
                     if (spellId2 <= 1)
                         continue;
 
                     // found, remove seal
-                    m_casterUnit->RemoveAurasDueToSpell(m_dummyAura->GetId());
+                    m_casterUnit->RemoveAurasDueToSpell(aura->GetId());
                     break;
                 }
 
@@ -5674,13 +5674,13 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
             }
         }
         Unit::AuraList const& auras2 = unitTarget->GetAurasByType(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE);
-        for (auto i : auras2)
+        for (auto aura : auras2)
         {
-            if (i->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN &&
+            if (aura->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN &&
                     // Bene des rois inf et sup
-                    (i->GetSpellProto()->Id == 20217 || i->GetSpellProto()->Id == 25898))
+                    (aura->GetSpellProto()->Id == 20217 || aura->GetSpellProto()->Id == 25898))
             {
-                unitTarget->RemoveAurasDueToSpell(i->GetSpellProto()->Id);
+                unitTarget->RemoveAurasDueToSpell(aura->GetSpellProto()->Id);
                 break; // Normalement on ne peut avoir qu'une seule bene de ce type.
             }
         }

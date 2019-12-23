@@ -129,11 +129,11 @@ struct npc_grimstoneAI : public npc_escortAI
         MobCount = 0;
         MobDeath_Timer = 0;
 
-        for (unsigned long long & i : RingMobGUID)
-            i = 0;
+        for (uint64 & guid : RingMobGUID)
+            guid = 0;
 
-        for (unsigned long long & i : ChallengeMobGUID)
-            i = 0;
+        for (uint64 & guid : ChallengeMobGUID)
+            guid = 0;
 
         RingBossGUID = 0;
 
@@ -330,12 +330,12 @@ struct npc_grimstoneAI : public npc_escortAI
 
                     if (ArenaChallenge)
                     {
-                        for (unsigned long long & i : ChallengeMobGUID)
+                        for (uint64 & guid : ChallengeMobGUID)
                         {
-                            Creature *mob = m_creature->GetMap()->GetCreature(i);
+                            Creature *mob = m_creature->GetMap()->GetCreature(guid);
                             if (mob && !mob->IsAlive() && mob->IsDead())
                             {
-                                i = 0;
+                                guid = 0;
                                 --MobCount;
                             }
                         }
@@ -343,12 +343,12 @@ struct npc_grimstoneAI : public npc_escortAI
                 }
                 else 
                 {
-                    for (unsigned long long & i : RingMobGUID)
+                    for (uint64 & guid : RingMobGUID)
                     {
-                        Creature *mob = m_creature->GetMap()->GetCreature(i);
+                        Creature *mob = m_creature->GetMap()->GetCreature(guid);
                         if (mob && !mob->IsAlive() && mob->IsDead())
                         {
-                            i = 0;
+                            guid = 0;
                             --MobCount;
 
                             //seems all are gone, so set timer to continue and discontinue this
@@ -1507,18 +1507,18 @@ struct npc_watchman_doomgripAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        std::list<Creature*> m_lGolems;
-        GetCreatureListWithEntryInGrid(m_lGolems, m_creature, NPC_WARBRINGER_CONSTRUCT, 20.0f);
-        if (!m_lGolems.empty())
+        std::list<Creature*> lGolems;
+        GetCreatureListWithEntryInGrid(lGolems, m_creature, NPC_WARBRINGER_CONSTRUCT, 20.0f);
+        if (!lGolems.empty())
         {
-            for (auto & m_lGolem : m_lGolems)
+            for (auto & pGolem : lGolems)
             {
-                if (m_lGolem->IsAlive())
+                if (pGolem->IsAlive())
                 {
-                    m_lGolem->RemoveAurasDueToSpell(10255);
-                    m_lGolem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                    pGolem->RemoveAurasDueToSpell(10255);
+                    pGolem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
                     if (pWho)
-                        m_lGolem->AI()->AttackStart(pWho);
+                        pGolem->AI()->AttackStart(pWho);
                 }
             }
         }

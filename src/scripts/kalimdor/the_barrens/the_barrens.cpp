@@ -401,7 +401,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         PlayerGUID = 0;
         BigWillGUID = 0;
 
-        for (unsigned long long & i : AffrayChallenger)
+        for (uint64 & i : AffrayChallenger)
             i = 0;
     }
 
@@ -454,7 +454,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
         {
             if (ChallengerDeath_Timer <= diff)
             {
-                for (unsigned long long & i : AffrayChallenger)
+                for (uint64 & i : AffrayChallenger)
                 {
                     Creature *challenger = m_creature->GetMap()->GetCreature(i);
                     if (challenger && !challenger->IsAlive() && challenger->IsDead())
@@ -930,16 +930,16 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         eventPhase = 0;
         deadKolkarCount = 0;
         Creature* pDefender;
-        for (unsigned long long GuidPhaseOneGuard : GuidPhaseOneGuards)
+        for (uint64 guid : GuidPhaseOneGuards)
         {
             pDefender = nullptr;
-            if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseOneGuard))
+            if (pDefender = m_creature->GetMap()->GetCreature(guid))
                 static_cast<TemporarySummon*>(pDefender)->UnSummon();
         }
-        for (unsigned long long GuidPhaseTwoGuard : GuidPhaseTwoGuards)
+        for (uint64 guid : GuidPhaseTwoGuards)
         {
             pDefender = nullptr;
-            if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseTwoGuard))
+            if (pDefender = m_creature->GetMap()->GetCreature(guid))
                 static_cast<TemporarySummon*>(pDefender)->UnSummon();
         }
         while (!AllKolkars.empty())
@@ -982,9 +982,9 @@ struct npc_regthar_deathgateAI : public ScriptedAI
             {
                 eventPhase = 3;
                 //enlever le respawn des guardes de la phase1
-                for (unsigned long long GuidPhaseOneGuard : GuidPhaseOneGuards)
+                for (uint64 guid : GuidPhaseOneGuards)
                 {
-                    if (Creature* b = m_creature->GetMap()->GetCreature(GuidPhaseOneGuard))
+                    if (Creature* b = m_creature->GetMap()->GetCreature(guid))
                     {
                         b->SetRespawnTime(6000000);
                         b->SetRespawnDelay(6000000);

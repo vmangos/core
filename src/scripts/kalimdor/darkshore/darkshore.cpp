@@ -1370,11 +1370,11 @@ struct npc_murkdeepAI : public ScriptedAI
         switch (m_uiEventPhase)
         {
             case 1:
-                for (auto m_fSummonPoint : m_fSummonPoints)
+                for (auto position : m_fSummonPoints)
                     m_creature->SummonCreature(NPC_MURLOC_COATRUNNER,
-                        m_fSummonPoint[0],
-                        m_fSummonPoint[1],
-                        m_fSummonPoint[2],
+                        position[0],
+                        position[1],
+                        position[2],
                         m_creature->GetOrientation(),
                         TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 10 * MINUTE*IN_MILLISECONDS);
                 break;

@@ -1929,10 +1929,10 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         GetCreatureListWithEntryInGrid(m_lHelpers, m_creature, NPC_ALZZINS_MINION, 80.0f);
         if (!m_lHelpers.empty())
         {
-            for (auto & m_lHelper : m_lHelpers)
+            for (auto & pCreature : m_lHelpers)
             {
-                if (m_lHelper && !m_lHelper->IsAlive())
-                    static_cast<TemporarySummon*>(m_lHelper)->UnSummon();
+                if (pCreature && !pCreature->IsAlive())
+                    static_cast<TemporarySummon*>(pCreature)->UnSummon();
             }
             m_lHelpers.clear();
         }

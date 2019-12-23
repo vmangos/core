@@ -109,9 +109,9 @@ struct boss_venoxisAI : public ScriptedAI
         m_bPhaseTwo = false;
         if (!lAddsGUIDs.empty())
         {
-            for (auto lAddsGUID : lAddsGUIDs)
+            for (auto guid : lAddsGUIDs)
             {
-                if (Creature *pSerpent = m_creature->GetMap()->GetCreature(lAddsGUID))
+                if (Creature *pSerpent = m_creature->GetMap()->GetCreature(guid))
                     pSerpent->AddObjectToRemoveList();
             }
         }

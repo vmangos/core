@@ -96,9 +96,9 @@ size_t VendorItemData::FindItemSlot(uint32 item_id) const
 
 VendorItem const* VendorItemData::FindItem(uint32 item_id) const
 {
-    for (auto m_item : m_items)
-        if (m_item->item == item_id)
-            return m_item;
+    for (const auto item : m_items)
+        if (item->item == item_id)
+            return item;
     return nullptr;
 }
 

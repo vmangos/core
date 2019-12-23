@@ -130,17 +130,17 @@ World::World()
     m_defaultDbcLocale = LOCALE_enUS;
     m_availableDbcLocaleMask = 0;
 
-    for (uint32 & i : m_configUint32Values)
-        i = 0;
+    for (uint32 & value : m_configUint32Values)
+        value = 0;
 
-    for (int32 & i : m_configInt32Values)
-        i = 0;
+    for (int32 & value : m_configInt32Values)
+        value = 0;
 
-    for (float & i : m_configFloatValues)
-        i = 0.0f;
+    for (float & value : m_configFloatValues)
+        value = 0.0f;
 
-    for (bool & i : m_configBoolValues)
-        i = false;
+    for (bool & value : m_configBoolValues)
+        value = false;
 
     m_timeRate = 1.0f;
     m_charDbWorkerThread    = nullptr;
@@ -1863,12 +1863,12 @@ public:
 void World::Update(uint32 diff)
 {
     ///- Update the different timers
-    for (auto & m_timer : m_timers)
+    for (auto & timer : m_timers)
     {
-        if (m_timer.GetCurrent() >= 0)
-            m_timer.Update(diff);
+        if (timer.GetCurrent() >= 0)
+            timer.Update(diff);
         else
-            m_timer.SetCurrent(0);
+            timer.SetCurrent(0);
     }
 
     ///- Update the game time and check for shutdown time

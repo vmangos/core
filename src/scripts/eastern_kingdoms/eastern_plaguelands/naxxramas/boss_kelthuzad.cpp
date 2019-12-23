@@ -397,9 +397,9 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void DespawnAllIntroCreatures()
     {
-        for (auto & p1_add : p1_adds)
+        for (const auto & guid : p1_adds)
         {
-            if (Creature* pSoldier = m_pInstance->instance->GetCreature(p1_add))
+            if (Creature* pSoldier = m_pInstance->instance->GetCreature(guid))
                 ((TemporarySummon*)pSoldier)->UnSummon();
         }
         p1_adds.clear();
@@ -457,9 +457,9 @@ struct boss_kelthuzadAI : public ScriptedAI
                 }
             }
         }
-        for (auto abomPo : abomPos)
+        for (auto position : abomPos)
         {
-            if (Creature* pCreature = m_creature->SummonCreature(NPC_UNSTOPPABLE_ABOM, abomPo[0], abomPo[1], alcoveZ, frand(0, M_PI_F * 2),
+            if (Creature* pCreature = m_creature->SummonCreature(NPC_UNSTOPPABLE_ABOM, position[0], position[1], alcoveZ, frand(0, M_PI_F * 2),
                 TEMPSUMMON_MANUAL_DESPAWN))
             {
                 p1_adds.push_back(pCreature->GetObjectGuid());
@@ -467,9 +467,9 @@ struct boss_kelthuzadAI : public ScriptedAI
             }
 
         }
-        for (auto soulweaverPo : soulweaverPos)
+        for (auto position : soulweaverPos)
         {
-            if (Creature* pCreature = m_creature->SummonCreature(NPC_SOUL_WEAVER, soulweaverPo[0], soulweaverPo[1], alcoveZ, frand(0, M_PI_F * 2),
+            if (Creature* pCreature = m_creature->SummonCreature(NPC_SOUL_WEAVER, position[0], position[1], alcoveZ, frand(0, M_PI_F * 2),
                 TEMPSUMMON_MANUAL_DESPAWN))
             {
                 p1_adds.push_back(pCreature->GetObjectGuid());
