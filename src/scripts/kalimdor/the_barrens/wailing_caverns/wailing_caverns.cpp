@@ -335,9 +335,9 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         if (!Naralex)
             return;
 
-        for (const auto& it : vSummoned)
+        for (const auto& guid : vSummoned)
         {
-            if (Creature* pSummon = m_pInstance->GetCreature(it))
+            if (Creature* pSummon = m_pInstance->GetCreature(guid))
             {
                 if (!pSummon->GetVictim() && m_creature->IsAlive())
                 {

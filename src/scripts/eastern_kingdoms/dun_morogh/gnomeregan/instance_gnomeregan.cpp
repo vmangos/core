@@ -144,7 +144,7 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
             }
             if (uiData == DONE)
             {
-                for (const auto guid : m_lRedRocketGUIDs)
+                for (const auto& guid : m_lRedRocketGUIDs)
                     DoRespawnGameObject(guid, HOUR);
             }
             break;
@@ -171,7 +171,7 @@ void instance_gnomeregan::SetData(uint32 uiType, uint32 uiData)
                     Creature* pBlastmaster = instance->GetCreature(m_uiBlastmasterShortfuseGUID);
                     if (!pBlastmaster)
                         break;
-                    for (const auto guid : m_luiSpawnedExplosiveChargeGUIDs)
+                    for (const auto& guid : m_luiSpawnedExplosiveChargeGUIDs)
                     {
                         if (GameObject* pExplosive = instance->GetGameObject(guid))
                             pExplosive->Use(pBlastmaster);

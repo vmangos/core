@@ -497,9 +497,9 @@ struct npc_stitchesAI : npc_escortAI
 
     void DespawnWatcher()
     {
-        for (auto & itr : m_lWatchman)
+        for (const auto & guid : m_lWatchman)
         {
-            if (auto pWatchman = m_creature->GetMap()->GetCreature(itr))
+            if (auto pWatchman = m_creature->GetMap()->GetCreature(guid))
             {
                 if (pWatchman->IsAlive())
                     pWatchman->DisappearAndDie();

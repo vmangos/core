@@ -329,9 +329,9 @@ struct instance_blackfathom_deeps : public ScriptedInstance
             return false;
 
         // Check if all mobs are dead
-        for (const auto itr : m_lWaveMobsGUIDList)
+        for (const auto& guid : m_lWaveMobsGUIDList)
         {
-            if (Creature* WaveMob = instance->GetCreature(itr))
+            if (Creature* WaveMob = instance->GetCreature(guid))
                 if (WaveMob->IsAlive())
                     return false;
         }

@@ -547,12 +547,12 @@ void instance_blackrock_spire::DoSortRoomEventMobs()
     {
         if (GameObject* pRune = instance->GetGameObject(m_auiRoomRuneGUID[i]))
         {
-            for (const auto itr : m_lRoomEventMobGUIDList)
+            for (const auto& guid : m_lRoomEventMobGUIDList)
             {
-                if (Creature* pCreature = instance->GetCreature(itr))
+                if (Creature* pCreature = instance->GetCreature(guid))
                 {
                     if (pCreature->IsAlive() && pCreature->GetDistance(pRune) < 10.0f)
-                        m_alRoomEventMobGUIDSorted[i].push_back(itr);
+                        m_alRoomEventMobGUIDSorted[i].push_back(guid);
                 }
 #ifdef DEBUG_ON
                 sLog.outString("Alcove %u : %u mobs", i,  m_alRoomEventMobGUIDSorted[i].size());

@@ -152,9 +152,9 @@ struct boss_sarturaAI : public ScriptedAI
     {
         GuidList m_lRoyalGuardsGuid;
         m_pInstance->GetRoyalGuardGUIDList(m_lRoyalGuardsGuid);
-        for (auto itr : m_lRoyalGuardsGuid)
+        for (const auto& guid : m_lRoyalGuardsGuid)
         {
-            if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(itr))
+            if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(guid))
             {
                 if (pRoyalGuard->IsDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
             }
@@ -324,9 +324,9 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
 
                 GuidList m_lRoyalGuardsGuid;
                 m_pInstance->GetRoyalGuardGUIDList(m_lRoyalGuardsGuid);
-                for (auto itr : m_lRoyalGuardsGuid)
+                for (const auto& guid : m_lRoyalGuardsGuid)
                 {
-                    if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(itr))
+                    if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(guid))
                     {
                         if (pRoyalGuard->IsDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
                     }

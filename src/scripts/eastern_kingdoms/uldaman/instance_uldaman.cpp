@@ -304,9 +304,9 @@ struct instance_uldaman : public ScriptedInstance
                         /** Check the list of Stone Keeper created at instance creation */
                         Creature* target = nullptr;
                         bool encounterDone = true;
-                        for (const auto& it : vStoneKeeper)
+                        for (const auto& guid : vStoneKeeper)
                         {
-                            Creature* current = instance->GetCreature(it);
+                            Creature* current = instance->GetCreature(guid);
 
                             /* Do nothing if one is already alive and awaken */
                             if (current && current->IsAlive() && current->GetFactionTemplateId() == FACTION_AWAKE)
@@ -341,9 +341,9 @@ struct instance_uldaman : public ScriptedInstance
                     }
                     case FAIL:
                         m_auiEncounter[ULDAMAN_ENCOUNTER_STONE_KEEPERS] = uiData;
-                        for (const auto& it : vStoneKeeper)
+                        for (const auto& guid : vStoneKeeper)
                         {
-                            Creature* target = instance->GetCreature(it);
+                            Creature* target = instance->GetCreature(guid);
                             if (!target)
                             {
                                 continue;

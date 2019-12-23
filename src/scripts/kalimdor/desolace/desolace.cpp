@@ -922,11 +922,11 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void DespawnCaravan()
     {
-        for (auto & itr : m_lCaravanGuid)
+        for (const auto & guid : m_lCaravanGuid)
         {
-            if (itr != m_creature->GetObjectGuid())
+            if (guid != m_creature->GetObjectGuid())
             {
-                if (auto pKillMe = m_creature->GetMap()->GetCreature(itr))
+                if (auto pKillMe = m_creature->GetMap()->GetCreature(guid))
                     pKillMe->DespawnOrUnsummon();
             }
         }
@@ -936,11 +936,11 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void CaravanFaction(bool apply)
     {
-        for (auto & itr : m_lCaravanGuid)
+        for (const auto & guid : m_lCaravanGuid)
         {
-            if (itr != m_creature->GetObjectGuid())
+            if (guid != m_creature->GetObjectGuid())
             {
-                if (Creature* pCreature = m_creature->GetMap()->GetCreature(itr))
+                if (Creature* pCreature = m_creature->GetMap()->GetCreature(guid))
                 {
                     if (apply)
                         pCreature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_NONE);

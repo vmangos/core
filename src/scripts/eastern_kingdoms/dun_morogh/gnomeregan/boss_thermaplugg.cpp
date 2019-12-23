@@ -107,7 +107,7 @@ struct boss_thermapluggAI : public ScriptedAI
             m_pInstance->SetData(TYPE_THERMAPLUGG, FAIL);
 
         // Remove remaining bombs
-        for (const auto guid : m_lSummonedBombGUIDs)
+        for (const auto& guid : m_lSummonedBombGUIDs)
         {
             if (Creature* pBomb = m_creature->GetMap()->GetCreature(guid))
                 pBomb->ForcedDespawn();
@@ -149,7 +149,7 @@ struct boss_thermapluggAI : public ScriptedAI
         // Movement of Summoned mobs
         if (!m_lLandedBombGUIDs.empty())
         {
-            for (const auto guid : m_lLandedBombGUIDs)
+            for (const auto& guid : m_lLandedBombGUIDs)
             {
                 if (Creature* pBomb = m_creature->GetMap()->GetCreature(guid))
                     pBomb->GetMotionMaster()->MoveFollow(m_creature, 0.0f, 0.0f);

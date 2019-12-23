@@ -142,7 +142,7 @@ void LoadHelper(CellGuidSet const& guid_set, CellPair& cell, GridRefManager<T>& 
 {
     BattleGround* bg = map->IsBattleGround() ? ((BattleGroundMap*)map)->GetBG() : nullptr;
 
-    for (const auto guid : guid_set)
+    for (const auto& guid : guid_set)
     {
         if (!IsEnabledOnMap<T>(map, guid))
             continue;

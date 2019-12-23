@@ -375,7 +375,7 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
             return;
         }
 
-        for (const auto guid : acolyte)
+        for (const auto& guid : acolyte)
             if (Creature *pCreature = m_pInstance->instance->GetCreature(guid))
                 if (pCreature && pCreature->IsAlive())
                     return;

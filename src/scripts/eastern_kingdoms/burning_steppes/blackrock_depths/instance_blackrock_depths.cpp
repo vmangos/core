@@ -480,7 +480,7 @@ struct instance_blackrock_depths : ScriptedInstance
             if (GetData(TYPE_PLUGGER) == DONE)
                 return;
 
-            for (const auto guid : m_sBarPatronNpcGuids)
+            for (const auto& guid : m_sBarPatronNpcGuids)
             {
                  // About 5% of patrons do emote at a given time
                 // So avoid executing follow up code for the 95% others
@@ -500,7 +500,7 @@ struct instance_blackrock_depths : ScriptedInstance
             // Only by patrons near the broken barrel react to Rocknot's rampage
             if (GameObject* pGo = instance->GetGameObject(m_uiGoBarKegTrapGUID))
             {
-                for (const auto guid : m_sBarPatronNpcGuids)
+                for (const auto& guid : m_sBarPatronNpcGuids)
                 {
                     if (Creature* pPatron = instance->GetCreature(guid))
                     {
@@ -528,7 +528,7 @@ struct instance_blackrock_depths : ScriptedInstance
 
             m_bBarHostile = true;
 
-            for (const auto guid : m_sBarPatronNpcGuids)
+            for (const auto& guid : m_sBarPatronNpcGuids)
             {
                 if (Creature* pPatron = instance->GetCreature(guid))
                 {
@@ -594,7 +594,7 @@ struct instance_blackrock_depths : ScriptedInstance
                     break;
                 }
             case 1:
-                for (const auto guid : m_sBarPatrolGuids)
+                for (const auto& guid : m_sBarPatrolGuids)
                 {
                     if (Creature* pCreature = instance->GetCreature(guid))
                     {
@@ -609,7 +609,7 @@ struct instance_blackrock_depths : ScriptedInstance
                 }
                 break;
             case 2:
-                for (const auto guid : m_sBarPatrolGuids)
+                for (const auto& guid : m_sBarPatrolGuids)
                 {
                     if (Creature* pCreature = instance->GetCreature(guid))
                     {
@@ -723,9 +723,9 @@ struct instance_blackrock_depths : ScriptedInstance
             case TYPE_RING_OF_LAW:
                 if (uiData == DONE)
                 {
-                    for (const auto itr : m_lArenaSpectatorMobGUIDList)
+                    for (const auto& guid : m_lArenaSpectatorMobGUIDList)
                     {
-                        if (Creature* pCreature = instance->GetCreature(itr))
+                        if (Creature* pCreature = instance->GetCreature(guid))
                         {
                             if (pCreature->IsAlive())
                                 pCreature->SetFactionTemplateId(674);
@@ -828,9 +828,9 @@ struct instance_blackrock_depths : ScriptedInstance
             case TYPE_RIBBLY:
                 if (uiData == DONE)
                 {
-                    for (const auto itr : m_lRibblySCronyMobGUIDList)
+                    for (const auto& guid : m_lRibblySCronyMobGUIDList)
                     {
-                        if (Creature* pCreature = instance->GetCreature(itr))
+                        if (Creature* pCreature = instance->GetCreature(guid))
                         {
                             if (pCreature->IsAlive())
                             {
@@ -849,8 +849,8 @@ struct instance_blackrock_depths : ScriptedInstance
                 {
                     if (Creature* argelmach = instance->GetCreature(m_uiGolemLordArgelmachGUID))
                         if (Unit* pVictim = argelmach->GetVictim())
-                            for (const auto itr : m_lArgelmachProtectorsMobGUIDList)
-                                if (Creature* protector = instance->GetCreature(itr))
+                            for (const auto& guid : m_lArgelmachProtectorsMobGUIDList)
+                                if (Creature* protector = instance->GetCreature(guid))
                                     if (protector->IsAlive() && protector->AI() && protector->IsWithinDist(argelmach, 80.0f))
                                         protector->AI()->AttackStart(pVictim);
                 }

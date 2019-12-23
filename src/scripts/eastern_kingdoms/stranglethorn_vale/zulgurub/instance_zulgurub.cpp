@@ -152,9 +152,9 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
             {
                 Creature *Marli = instance->GetCreature(m_uiMarliGUID);
                 Unit* pVictim = Marli->GetVictim();
-                for (const auto itr : m_lMarliTrashGUIDList)
+                for (const auto& guid : m_lMarliTrashGUIDList)
                 {
-                    if (Creature* MarliTrash = instance->GetCreature(itr))
+                    if (Creature* MarliTrash = instance->GetCreature(guid))
                         if (MarliTrash->IsAlive() && !MarliTrash->IsInCombat())
                             if (MarliTrash->GetMapId() == 309 && MarliTrash->GetZoneId() == 1977 && MarliTrash->GetAreaId() == 3379)
                                 MarliTrash->AI()->AttackStart(pVictim);

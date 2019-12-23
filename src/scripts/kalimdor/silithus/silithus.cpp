@@ -1778,17 +1778,17 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoUnsummonArmy()
     {
-        for (const auto itr : m_lQirajiWarriorsList)
+        for (const auto& guid : m_lQirajiWarriorsList)
         {
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(guid))
                 pTemp->DisappearAndDie();
         }
     }
 
     void AddKaldoreiThreat(Creature* npc)
     {
-        for (const auto & itr : m_lQirajiWarriorsList)
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
+        for (const auto & guid : m_lQirajiWarriorsList)
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(guid))
                 if (pTemp->GetEntry() == NPC_KALDOREI_INFANTRY)
                     npc->AddThreat(pTemp, 100.0f);
 
@@ -1850,9 +1850,9 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoCastTriggerSpellOnEnemies(uint32 spell)
     {
-        for (const auto itr : m_lQirajiWarriorsList)
+        for (const auto& guid : m_lQirajiWarriorsList)
         {
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(guid))
             {
                 // Cast trigger spell only on enemies
                 if (pTemp->GetEntry() == NPC_ANUBISATH_CONQUEROR || pTemp->GetEntry() == NPC_QIRAJI_DRONE ||
@@ -1875,9 +1875,9 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoTimeStopArmy()
     {
-        for (const auto itr : m_lQirajiWarriorsList)
+        for (const auto& guid : m_lQirajiWarriorsList)
         {
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
+            if (Creature* pTemp = m_creature->GetMap()->GetCreature(guid))
             {
                 // Stop movement/attacks and freeze whole combat
                 pTemp->RemoveAllAttackers();

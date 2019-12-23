@@ -283,9 +283,9 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 //break;ok so... it turns out I kill them BEFORE  we get to the paused ^.^
 
                 // Set all the dragons in combat
-                for (auto itr : m_lSearscaleGuidList)
+                for (const auto& guid : m_lSearscaleGuidList)
                 {
-                    if (Creature* pTemp = m_creature->GetMap()->GetCreature(itr))
+                    if (Creature* pTemp = m_creature->GetMap()->GetCreature(guid))
                         pTemp->AI()->AttackStart(pPlayer);
                 }
                 break;

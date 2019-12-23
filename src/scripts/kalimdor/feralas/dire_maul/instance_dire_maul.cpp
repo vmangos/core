@@ -274,9 +274,9 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                     sLog.outString("Immol'Thar (%u) rendu attaquable, %u gardiens trouves.", pImmolThar->GetGUIDLow(), m_lImmolTharGardiensMobGUIDList.size());
 #endif
                     bool bHasYelled = false;
-                    for (const auto itr : m_lImmolTharGardiensMobGUIDList)
+                    for (const auto& guid : m_lImmolTharGardiensMobGUIDList)
                     {
-                        if (Creature* pCreature = instance->GetCreature(itr))
+                        if (Creature* pCreature = instance->GetCreature(guid))
                         {
                             // Ne pas non plus aggro toute l'instance.
                             if (pCreature->IsAlive())
@@ -555,12 +555,12 @@ void instance_dire_maul::DoSortCristalsEventMobs()
     {
         if (GameObject* pRune = instance->GetGameObject(m_auiCristalsGUID[i]))
         {
-            for (const auto itr : m_lCristalsEventtMobGUIDList)
+            for (const auto& guid : m_lCristalsEventtMobGUIDList)
             {
-                if (Creature* pCreature = instance->GetCreature(itr))
+                if (Creature* pCreature = instance->GetCreature(guid))
                 {
                     if (pCreature->IsAlive() && pCreature->GetDistance(pRune) < 20.0f)
-                        m_alCristalsEventtMobGUIDSorted[i].push_back(itr);
+                        m_alCristalsEventtMobGUIDSorted[i].push_back(guid);
                 }
             }
 #ifdef DEBUG_ON

@@ -1484,9 +1484,9 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                     }
                     case 6: // gestion patrouille NPC_DAVIL_LIGHTFIRE NPC_BLOODLETTER NPC_CAPTAIN_REDPATH
                     {
-                        for (auto itr : summonedMobsList)
+                        for (const auto& guid : summonedMobsList)
                         {
-                            if (Creature* Crea = m_creature->GetMap()->GetCreature(itr))
+                            if (Creature* Crea = m_creature->GetMap()->GetCreature(guid))
                             {
                                 if (Crea->GetEntry() != NPC_BLOODLETTER && Crea->GetEntry() != NPC_DAVIL_LIGHTFIRE && Crea->GetEntry() != NPC_CAPTAIN_REDPATH)
                                     continue;

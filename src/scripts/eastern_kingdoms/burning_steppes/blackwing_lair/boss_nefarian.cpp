@@ -407,9 +407,9 @@ struct boss_nefarianAI : ScriptedAI
         {
             if (m_uiMageTriggerTimer < uiDiff)
             {
-                for (auto itr : MagePlayerGUID)
+                for (const auto& guid : MagePlayerGUID)
                 {
-                    if (Player* pMage = m_creature->GetMap()->GetPlayer(itr))
+                    if (Player* pMage = m_creature->GetMap()->GetPlayer(guid))
                     {
                         if (pMage->HasAura(SPELL_MAGE))
                         {

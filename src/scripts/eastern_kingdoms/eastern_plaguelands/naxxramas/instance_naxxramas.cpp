@@ -1127,9 +1127,9 @@ void instance_naxxramas::SetGothTriggers()
     if (!pGoth)
         return;
 
-    for (const auto & itr : m_lGothTriggerList)
+    for (const auto & guid : m_lGothTriggerList)
     {
-        if (Creature* pTrigger = instance->GetCreature(itr))
+        if (Creature* pTrigger = instance->GetCreature(guid))
         {
             GothTrigger pGt;
             pGt.bIsAnchorHigh = (pTrigger->GetPositionZ() >= (pGoth->GetPositionZ() - 5.0f));

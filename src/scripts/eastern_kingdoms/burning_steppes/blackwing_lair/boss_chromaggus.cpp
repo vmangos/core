@@ -130,9 +130,9 @@ struct boss_chromaggusAI : public ScriptedAI
         m_bEnraged          = false;
         m_lRedAfflictionPlayerGUID.clear();
 
-        for (auto itr : m_lChromaticPlayerGUID)
+        for (const auto& guid : m_lChromaticPlayerGUID)
         {
-            if (Player* pTarget = m_creature->GetMap()->GetPlayer(itr))
+            if (Player* pTarget = m_creature->GetMap()->GetPlayer(guid))
             {
                 pTarget->RemoveAurasDueToSpell(23175);
                 pTarget->RemoveAurasDueToSpell(23177);

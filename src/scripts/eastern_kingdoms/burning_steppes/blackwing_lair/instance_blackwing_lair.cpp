@@ -215,9 +215,9 @@ public:
             // for an integer overflow
             m_uiTechniciansUpdate = m_vTechniciansGuid.size();
             m_bUpdated = true;
-            for (auto & itr : m_vTechniciansGuid)
+            for (const auto & guid : m_vTechniciansGuid)
             {
-                if (Creature *pCreature = m_pInstance->instance->GetCreature(itr))
+                if (Creature *pCreature = m_pInstance->instance->GetCreature(guid))
                 {
                     if (!pCreature->IsAlive())
                         continue;
