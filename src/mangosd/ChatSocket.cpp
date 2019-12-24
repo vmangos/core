@@ -152,7 +152,7 @@ int OfflineChatSocket::handle_output (ACE_HANDLE)
 /// Read data from the network
 std::string TrimLeft(const std::string& s)
 {
-    size_t startpos = s.find_first_not_of(" ");
+    size_t startpos = s.find_first_not_of(' ');
     return (startpos == std::string::npos) ? "" : s.substr(startpos);
 }
 

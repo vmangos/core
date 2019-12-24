@@ -773,9 +773,9 @@ inline void Map::UpdateCells(uint32 map_diff)
     int nthreads = sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS);
     if (IsContinent() && nthreads)
     {
-        std::vector<ACE_Based::Thread*> threads;
+        std::vector<ACE_Based::Thread*> threads(nthreads);
         for (int i = 0; i < nthreads; ++i)
-            threads.push_back(new ACE_Based::Thread(new UnitsMovementUpdater(i, nthreads, unitsMvtUpdate, diff)));
+            threads[i] = new ACE_Based::Thread(new UnitsMovementUpdater(i, nthreads, unitsMvtUpdate, diff));
         for (const auto& thread : threads)
         {
             thread->wait();

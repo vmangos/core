@@ -99,7 +99,7 @@ bool findnth(std::string &str, int n, std::string::size_type &s, std::string::si
 
     do
     {
-        e = str.find("'", s);
+        e = str.find('\'', s);
         if (e == std::string::npos)
             return false;
     }
@@ -110,7 +110,7 @@ bool findnth(std::string &str, int n, std::string::size_type &s, std::string::si
         do
         {
             s = e + 4;
-            e = str.find("'", s);
+            e = str.find('\'', s);
             if (e == std::string::npos)
                 return false;
         }

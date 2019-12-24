@@ -1907,10 +1907,10 @@ void World::Update(uint32 diff)
 
     ///- Update objects (maps, transport, creatures,...)
     uint32 updateMapSystemTime = WorldTimer::getMSTime();
-    std::vector<ACE_Based::Thread*> asyncTaskThreads;
     int threadsCount = getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT);
+    std::vector<ACE_Based::Thread*> asyncTaskThreads(threadsCount);
     for (int i = 0; i < threadsCount; ++i)
-        asyncTaskThreads.push_back(new ACE_Based::Thread(new WorldAsyncTasksExecutor()));
+        asyncTaskThreads[i] = new ACE_Based::Thread(new WorldAsyncTasksExecutor());
 
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
