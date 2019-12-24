@@ -3103,6 +3103,26 @@ void Creature::ResetHomePosition()
         GetSummonPoint(m_HomeX, m_HomeY, m_HomeZ, m_HomeOrientation);
 }
 
+void Creature::RemoveAurasAtReset()
+{
+    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE)
+    {
+        RemoveAllNegativeAuras(AURA_REMOVE_BY_DEFAULT);
+        return;
+    }
+
+    for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end();)
+    {
+        if (!(iter->second->GetCasterGuid().IsPlayer() && !iter->second->IsPermanent() && iter->second->IsPositive()))
+        {
+            RemoveSpellAuraHolder(iter->second, AURA_REMOVE_BY_DEFAULT);
+            iter = m_spellAuraHolders.begin();
+        }
+        else
+            ++iter;
+    }
+}
+
 void Creature::OnLeaveCombat()
 {
     UpdateCombatState(false);

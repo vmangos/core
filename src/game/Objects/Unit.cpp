@@ -3937,19 +3937,6 @@ void Unit::RemoveAllNegativeAuras(AuraRemoveMode mode /*= AURA_REMOVE_BY_DEFAULT
     }
 }
 
-void Unit::RemoveAurasAtReset(AuraRemoveMode mode /*= AURA_REMOVE_BY_DEFAULT*/)
-{
-    // @TODO: Some buffs should maybe not get removed ? Self casted buffs ? ...
-    if (Creature* c = ToCreature())
-        if (CreatureInfo const* info = c->GetCreatureInfo())
-            if (info->flags_extra & CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE)
-            {
-                RemoveAllNegativeAuras(mode);
-                return;
-            }
-    RemoveAllAuras(mode);
-}
-
 void Unit::RemoveAuraTypeOnDeath(AuraType auraType)
 {
     for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
