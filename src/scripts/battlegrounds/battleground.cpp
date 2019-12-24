@@ -87,7 +87,7 @@ struct npc_spirit_guideAI : ScriptedAI
 
         Map::PlayerList const &PlayerList = pMap->GetPlayers();
 
-        for (const auto & itr : PlayerList)
+        for (const auto& itr : PlayerList)
         {
             Player* pPlayer = itr.getSource();
             if (!pPlayer || !pPlayer->IsWithinDistInMap(m_creature, 20.0f) || !pPlayer->HasAura(SPELL_WAITING_TO_RESURRECT) || pPlayer->IsAlive())

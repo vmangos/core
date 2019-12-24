@@ -287,19 +287,19 @@ struct Loot
     {
         if (clearQuestItems)
         {
-                for (const auto & itr : m_playerQuestItems)
+                for (const auto& itr : m_playerQuestItems)
                     delete itr.second;
                 m_playerQuestItems.clear();
 
                 m_questItems.clear();
         }
 
-        for (const auto & itr : m_playerFFAItems)
+        for (const auto& itr : m_playerFFAItems)
             delete itr.second;
 
         m_playerFFAItems.clear();
 
-        for (const auto & itr : m_playerNonQuestNonFFAConditionalItems)
+        for (const auto& itr : m_playerNonQuestNonFFAConditionalItems)
             delete itr.second;
 
         m_playerNonQuestNonFFAConditionalItems.clear();

@@ -131,7 +131,7 @@ struct boss_moamAI : public ScriptedAI
     void FillPlayerList()
     {
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (const auto & i : liste)
+        for (const auto& i : liste)
         {
             if (i.getSource()->IsAlive() && i.getSource()->GetPowerType() == POWER_MANA)
                 PlayerList.push_back(i.getSource());

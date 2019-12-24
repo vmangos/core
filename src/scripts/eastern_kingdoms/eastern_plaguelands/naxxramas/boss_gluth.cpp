@@ -154,7 +154,7 @@ struct boss_gluthAI : public ScriptedAI
         if (pSpell->Id == SPELL_DECIMATE)
         {
             Map::PlayerList const& pList = m_pInstance->GetMap()->GetPlayers();
-            for (const auto & it : pList)
+            for (const auto& it : pList)
             {
                 Player* pPlayer = it.getSource();
                 if (!pPlayer) continue;
@@ -269,7 +269,7 @@ struct boss_gluthAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(chowableZombies, m_creature, NPC_ZOMBIE_CHOW, 15.0f);
         if (chowableZombies.empty())
             return;
-        for (const auto & chowableZombie : chowableZombies)
+        for (const auto& chowableZombie : chowableZombies)
         {
             if (!chowableZombie->IsAlive())
                 continue;

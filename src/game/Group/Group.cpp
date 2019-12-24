@@ -109,7 +109,7 @@ Group::~Group()
     // it is undefined whether objectmgr (which stores the groups) or instancesavemgr
     // will be unloaded first so we must be prepared for both cases
     // this may unload some dungeon persistent state
-    for (const auto & itr : m_boundInstances)
+    for (const auto& itr : m_boundInstances)
         itr.second.state->RemoveGroup(this);
 
     // Sub group counters clean up
@@ -233,7 +233,7 @@ void Group::ConvertToRaid()
     SendUpdate();
 
     // update quest related GO states (quest activity dependent from raid membership)
-    for (const auto & itr : m_memberSlots)
+    for (const auto& itr : m_memberSlots)
         if (Player* player = sObjectMgr.GetPlayer(itr.guid))
             player->UpdateForQuestWorldObjects();
 }
@@ -282,7 +282,7 @@ uint32 Group::RemoveInvite(Player* player)
 
 void Group::RemoveAllInvites()
 {
-    for (auto itr : m_invitees)
+    for (const auto itr : m_invitees)
     {
         ASSERT(itr->GetGroupInvite() == this);
         itr->SetGroupInvite(nullptr);
@@ -293,7 +293,7 @@ void Group::RemoveAllInvites()
 
 Player* Group::GetInvited(ObjectGuid guid) const
 {
-    for (auto itr : m_invitees)
+    for (const auto itr : m_invitees)
         if (itr->GetObjectGuid() == guid)
             return itr;
 
@@ -302,7 +302,7 @@ Player* Group::GetInvited(ObjectGuid guid) const
 
 Player* Group::GetInvited(std::string const& name) const
 {
-    for (auto itr : m_invitees)
+    for (const auto itr : m_invitees)
     {
         if (itr->GetName() == name)
             return itr;
@@ -459,7 +459,7 @@ void Group::Disband(bool hideDestroy)
 {
     Player* player;
 
-    for (const auto & itr : m_memberSlots)
+    for (const auto& itr : m_memberSlots)
     {
         player = sObjectMgr.GetPlayer(itr.guid);
         if (!player)
@@ -551,7 +551,7 @@ void Group::CalculateLFGRoles(LFGGroupQueueInfo& data)
 
     std::list<ObjectGuid> processed;
 
-    for (const auto & citr : GetMemberSlots())
+    for (const auto& citr : GetMemberSlots())
     {
         Classes playerClass = (Classes)sObjectMgr.GetPlayerClassByGUID(citr.guid);
         ClassRoles lfgRole = LFGQueue::CalculateRoles(playerClass);
@@ -581,7 +581,7 @@ bool Group::FillPremadeLFG(ObjectGuid const& plrGuid, Classes playerClass, Class
     // We grant the role unless someone else in the group has higher priority for it
     RolesPriority priority = LFGQueue::getPriority(playerClass, requiredRole);
 
-    for (const auto & citr : GetMemberSlots())
+    for (const auto& citr : GetMemberSlots())
     {
         if (plrGuid == citr.guid)
             continue;
@@ -642,7 +642,7 @@ void Group::SendLootStartRoll(uint32 CountDown, Roll const& r)
     data << uint32(r.itemRandomPropId);                     // item random property ID
     data << uint32(CountDown);                              // the countdown time to choose "need" or "greed"
 
-    for (const auto & itr : r.playerVote)
+    for (const auto& itr : r.playerVote)
     {
         Player* p = sObjectMgr.GetPlayer(itr.first);
         if (!p || !p->GetSession())
@@ -667,7 +667,7 @@ void Group::SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 r
     data << uint8(rollNumber);                              // 0: "Need for: [item name]" > 127: "you passed on: [item name]"      Roll number
     data << uint8(rollType);                                // 0: "Need for: [item name]" 0: "You have selected need for [item name] 1: need roll 2: greed roll
 
-    for (const auto & itr : r.playerVote)
+    for (const auto& itr : r.playerVote)
     {
         Player* p = sObjectMgr.GetPlayer(itr.first);
         if (!p || !p->GetSession())
@@ -690,7 +690,7 @@ void Group::SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, Roll
     data << uint8(rollNumber);                              // rollnumber related to SMSG_LOOT_ROLL
     data << uint8(rollType);                                // Rolltype related to SMSG_LOOT_ROLL
 
-    for (const auto & itr : r.playerVote)
+    for (const auto& itr : r.playerVote)
     {
         Player* p = sObjectMgr.GetPlayer(itr.first);
         if (!p || !p->GetSession())
@@ -710,7 +710,7 @@ void Group::SendLootAllPassed(Roll const& r)
     data << uint32(r.itemRandomPropId);                     // Item random property ID
     data << uint32(0);                                      // Item random suffix ID - not used ?
 
-    for (const auto & itr : r.playerVote)
+    for (const auto& itr : r.playerVote)
     {
         Player* p = sObjectMgr.GetPlayer(itr.first);
         if (!p || !p->GetSession())
@@ -769,7 +769,7 @@ void Group::NeedBeforeGreed(Creature* creature, Loot *loot)
 
 void Group::MasterLoot(Creature* creature, Loot* loot)
 {
-    for (auto & i : loot->items)
+    for (auto& i : loot->items)
     {
         ItemPrototype const* item = ObjectMgr::GetItemPrototype(i.itemid);
         if (!item)
@@ -929,7 +929,7 @@ void Group::SendLootStartRollsForPlayer(Player* pPlayer)
     if (!pPlayer || !pPlayer->GetSession())
         return;
 
-    for (auto roll : RollId)
+    for (const auto roll : RollId)
     {
         if (!roll->isValid())
             continue;
@@ -1230,7 +1230,7 @@ void Group::SendUpdate()
         data << (uint8)(citr->group | (citr->assistant ? 0x80 : 0)); // own flags (groupid | (assistant?0x80:0))
 
         data << uint32(GetMembersCount() - 1);
-        for (const auto & itr : m_memberSlots)
+        for (const auto& itr : m_memberSlots)
         {
             if (citr->guid == itr.guid)
                 continue;
@@ -1477,7 +1477,7 @@ void Group::_chooseLeader(bool offline /*= false*/)
     ObjectGuid first = ObjectGuid(); // First available: if no suitable canditates are found
     ObjectGuid chosen = ObjectGuid(); // Player matching prio creteria
 
-    for (const auto & itr : m_memberSlots)
+    for (const auto& itr : m_memberSlots)
     {
         if (itr.guid == m_leaderGuid)
             continue;
@@ -1948,7 +1948,7 @@ void Group::ResetInstances(InstanceResetMethod method, Player* SendMsgTo)
             if (SendMsgTo)
             {
                 bool offline_players = false;
-                for (const auto & itr : m_memberSlots)
+                for (const auto& itr : m_memberSlots)
                 {
                     Player* pl = sObjectMgr.GetPlayer(itr.guid);
                     if (!pl || !pl->GetSession())
@@ -2213,7 +2213,7 @@ struct BroadcastGroupUpdateHelper
 // Nostalrius : RAID ally-horde
 void Group::BroadcastGroupUpdate()
 {
-    for (const auto & itr : m_memberSlots)
+    for (const auto& itr : m_memberSlots)
     {
         Player* pp = sObjectMgr.GetPlayer(itr.guid);
         if (pp && pp->IsInWorld())
@@ -2331,7 +2331,7 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
     // SendUpdate clears the target icons, send an icon update
     if (!isRaidGroup()) 
     {
-        for (const auto & itr : m_memberSlots)
+        for (const auto& itr : m_memberSlots)
         {
             Player* player = sObjectMgr.GetPlayer(itr.guid);
             if (!player || !player->GetSession() || player->GetGroup() != this)

@@ -50,7 +50,7 @@ MapManager::MapManager()
 
 MapManager::~MapManager()
 {
-    for (const auto & itr : i_maps)
+    for (const auto& itr : i_maps)
         delete itr.second;
 
     DeleteStateMachine();
@@ -103,7 +103,7 @@ void MapManager::UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid,
 
 void MapManager::InitializeVisibilityDistanceInfo()
 {
-    for (const auto & itr : i_maps)
+    for (const auto& itr : i_maps)
         itr.second->InitVisibilityDistance();
 }
 
@@ -246,7 +246,7 @@ public:
         WorldDatabase.ThreadStart();
         do
         {
-            for (const auto & map : maps)
+            for (const auto& map : maps)
             {
                 if (loops && *updateFinished)
                     break;
@@ -297,14 +297,14 @@ void MapManager::Update(uint32 diff)
     asyncMapUpdating = true;
     std::vector<MapAsyncUpdater*> instanceUpdaters(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS));
     std::vector<ContinentAsyncUpdater*> continentsUpdaters;
-    for (auto & instanceUpdater : instanceUpdaters)
+    for (auto& instanceUpdater : instanceUpdaters)
         instanceUpdater = new MapAsyncUpdater(&updateFinished, mapsDiff); // Will be deleted at thread end
 
     int mapIdx = 0;
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
     uint32 inactiveTimeLimit = sWorld.getConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME);
-    for (const auto & itr : i_maps)
+    for (const auto& itr : i_maps)
     {
         // If this map has been empty for too long, we no longer update it.
         if (!itr.second->ShouldUpdateMap(now, inactiveTimeLimit))
@@ -401,7 +401,7 @@ void MapManager::Update(uint32 diff)
 
 void MapManager::RemoveAllObjectsInRemoveList()
 {
-    for (const auto & itr : i_maps)
+    for (const auto& itr : i_maps)
         itr.second->RemoveAllObjectsInRemoveList();
 }
 
@@ -422,7 +422,7 @@ bool MapManager::IsValidMAP(uint32 mapid)
 
 void MapManager::UnloadAll()
 {
-    for (const auto & itr : i_maps)
+    for (const auto& itr : i_maps)
         itr.second->UnloadAll(true);
 
     // Execute any delayed teleports scheduled during unloading. Must be done before
@@ -455,7 +455,7 @@ void MapManager::InitMaxInstanceId()
 uint32 MapManager::GetNumInstances()
 {
     uint32 ret = 0;
-    for (const auto & itr : i_maps)
+    for (const auto& itr : i_maps)
     {
         Map* map = itr.second;
         if (!map->IsDungeon()) continue;
@@ -469,7 +469,7 @@ uint32 MapManager::GetNumPlayersInInstances()
     Guard guard(*this);
 
     uint32 ret = 0;
-    for (const auto & itr : i_maps)
+    for (const auto& itr : i_maps)
     {
         Map* map = itr.second;
         if (!map->IsDungeon()) continue;

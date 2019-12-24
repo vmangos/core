@@ -254,7 +254,7 @@ void Object::SendForcedObjectUpdate()
     BuildUpdateData(update_players);
     RemoveFromClientUpdateList();
 
-    for (auto & itr : update_players)
+    for (auto& itr : update_players)
         itr.second.Send(itr.first->GetSession());
 }
 
@@ -1898,7 +1898,7 @@ struct MANGOS_DLL_DECL ObjectViewersDeliverer
     explicit ObjectViewersDeliverer(WorldObject const* sender, WorldPacket* msg, WorldObject const* except) : i_message(msg), i_sender(sender), i_except(except) {}
     void Visit(CameraMapType& m)
     {
-        for (const auto & iter : m)
+        for (const auto& iter : m)
             if (Player* player = iter.getSource()->GetOwner())
                 if (player != i_except && player != i_sender)
                     if (player->IsInVisibleList_Unsafe(i_sender))
@@ -2481,7 +2481,7 @@ struct WorldObjectChangeAccumulator
 
     void Visit(CameraMapType& m)
     {
-        for (const auto & iter : m)
+        for (const auto& iter : m)
         {
             Player* owner = iter.getSource()->GetOwner();
             if (owner != &i_object && owner->IsInVisibleList_Unsafe(&i_object))
@@ -2568,7 +2568,7 @@ void WorldObject::DestroyForNearbyPlayers()
     MaNGOS::AnyPlayerInObjectRangeCheck check(this, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
     MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(targets, check);
     Cell::VisitWorldObjects(this, searcher, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
-    for (auto plr : targets)
+    for (const auto plr : targets)
     {
         if (plr == this)
             continue;
@@ -2964,7 +2964,7 @@ void WorldObject::MonsterYellToZone(int32 textId, uint32 language, Unit const* t
     uint32 zoneid = GetZoneId();
 
     auto const& pList = GetMap()->GetPlayers();
-    for (const auto & itr : pList)
+    for (const auto& itr : pList)
         if (itr.getSource()->GetZoneId() == zoneid)
             say_do(itr.getSource());
 }
@@ -2977,7 +2977,7 @@ void WorldObject::MonsterScriptToZone(int32 textId, ChatMsg type, uint32 languag
     uint32 zoneid = GetZoneId();
 
     auto const& pList = GetMap()->GetPlayers();
-    for (const auto & itr : pList)
+    for (const auto& itr : pList)
         if (itr.getSource()->GetZoneId() == zoneid)
             say_do(itr.getSource());
 }
@@ -3077,7 +3077,7 @@ Unit* WorldObject::SelectMagnetTarget(Unit* victim, Spell* spell, SpellEffectInd
     if ((pProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC || pProto->SpellVisual == 7250) && pProto->Dispel != DISPEL_POISON && !(pProto->Attributes & 0x10))
     {
         Unit::AuraList const& magnetAuras = victim->GetAurasByType(SPELL_AURA_SPELL_MAGNET);
-        for (auto magnetAura : magnetAuras)
+        for (const auto magnetAura : magnetAuras)
         {
             if (Unit* magnet = magnetAura->GetCaster())
             {
@@ -3382,7 +3382,7 @@ SpellMissInfo WorldObject::SpellHitResult(Unit* pVictim, SpellEntry const* spell
     {
         int32 reflectchance = pVictim->GetTotalAuraModifier(SPELL_AURA_REFLECT_SPELLS);
         Unit::AuraList const& mReflectSpellsSchool = pVictim->GetAurasByType(SPELL_AURA_REFLECT_SPELLS_SCHOOL);
-        for (auto i : mReflectSpellsSchool)
+        for (const auto i : mReflectSpellsSchool)
             if (i->GetModifier()->m_miscvalue & spell->GetSpellSchoolMask())
                 reflectchance += i->GetModifier()->m_amount;
         if (reflectchance > 0 && roll_chance_i(reflectchance))
@@ -4113,7 +4113,7 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
     if (pUnit && !isWeaponDamageBasedSpell)
     {
         Unit::AuraList const& mModDamageDone = pUnit->GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE);
-        for (auto i : mModDamageDone)
+        for (const auto i : mModDamageDone)
         {
             if (i->GetModifier()->m_miscvalue & schoolMask &&                         // schoolmask has to fit with the intrinsic spell school
                     (i->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask() ||    // AND schoolmask has to fit with weapon damage school (essential for non-physical spells)
@@ -4154,7 +4154,7 @@ uint32 WorldObject::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAt
     if (pUnit && !isWeaponDamageBasedSpell)
     {
         Unit::AuraList const& mModDamagePercentDone = pUnit->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        for (auto i : mModDamagePercentDone)
+        for (const auto i : mModDamagePercentDone)
         {
             if (i->GetModifier()->m_miscvalue & schoolMask &&                         // schoolmask has to fit with the intrinsic spell school
                     i->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask() &&         // AND schoolmask has to fit with weapon damage school (essential for non-physical spells)
@@ -4270,7 +4270,7 @@ uint32 WorldObject::SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spell
     {
         // Healing done percent
         Unit::AuraList const& mHealingDonePct = pUnit->GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
-        for (auto i : mHealingDonePct)
+        for (const auto i : mHealingDonePct)
             DoneTotalMod *= (100.0f + i->GetModifier()->m_amount) / 100.0f;
 
         // done scripted mod (take it from owner)
@@ -4279,7 +4279,7 @@ uint32 WorldObject::SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spell
             owner = pUnit;
 
         Unit::AuraList const& mOverrideClassScript = owner->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-        for (auto i : mOverrideClassScript)
+        for (const auto i : mOverrideClassScript)
         {
             if (!i->isAffectedOnSpell(spellProto))
                 continue;
@@ -4324,7 +4324,7 @@ int32 WorldObject::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
     if (Unit* pUnit = ToUnit())
     {
         Unit::AuraList const& mHealingDone = pUnit->GetAurasByType(SPELL_AURA_MOD_HEALING_DONE);
-        for (auto i : mHealingDone)
+        for (const auto i : mHealingDone)
             if ((i->GetModifier()->m_miscvalue & schoolMask) != 0)
                 AdvertisedBenefit += i->GetModifier()->m_amount;
 
@@ -4333,7 +4333,7 @@ int32 WorldObject::SpellBaseHealingBonusDone(SpellSchoolMask schoolMask)
         {
             // Healing bonus from stats
             Unit::AuraList const& mHealingDoneOfStatPercent = pUnit->GetAurasByType(SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT);
-            for (auto i : mHealingDoneOfStatPercent)
+            for (const auto i : mHealingDoneOfStatPercent)
             {
                 // 1.12.* have only 1 stat type support
                 Stats usedStat = STAT_SPIRIT;
@@ -4381,7 +4381,7 @@ uint32 WorldObject::SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellP
     if (pUnit)
     {
         Unit::AuraList const& mModDamagePercentDone = pUnit->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        for (auto i : mModDamagePercentDone)
+        for (const auto i : mModDamagePercentDone)
         {
             if ((i->GetModifier()->m_miscvalue & spellProto->GetSpellSchoolMask()) &&
                 i->GetSpellProto()->EquippedItemClass == -1 &&
@@ -4419,7 +4419,7 @@ uint32 WorldObject::SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellP
     if (owner)
     {
         Unit::AuraList const& mOverrideClassScript = owner->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-        for (auto i : mOverrideClassScript)
+        for (const auto i : mOverrideClassScript)
         {
             if (!i->isAffectedOnSpell(spellProto))
                 continue;
@@ -4484,7 +4484,7 @@ int32 WorldObject::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
     if (Unit* pUnit = ToUnit())
     {
         Unit::AuraList const& mDamageDone = pUnit->GetAurasByType(SPELL_AURA_MOD_DAMAGE_DONE);
-        for (auto i : mDamageDone)
+        for (const auto i : mDamageDone)
         {
             if ((i->GetModifier()->m_miscvalue & schoolMask) != 0 &&
                 i->GetSpellProto()->EquippedItemClass == -1 &&                   // -1 == any item class (not wand then)
@@ -4496,7 +4496,7 @@ int32 WorldObject::SpellBaseDamageBonusDone(SpellSchoolMask schoolMask)
         {
             // Damage bonus from stats
             Unit::AuraList const& mDamageDoneOfStatPercent = pUnit->GetAurasByType(SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT);
-            for (auto i : mDamageDoneOfStatPercent)
+            for (const auto i : mDamageDoneOfStatPercent)
             {
                 if (i->GetModifier()->m_miscvalue & schoolMask)
                 {

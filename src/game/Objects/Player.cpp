@@ -514,7 +514,7 @@ Player::Player(WorldSession* session) : Unit(),
 
     m_swingErrorMsg = ATTACK_RESULT_OK;
 
-    for (auto & j : m_bgBattleGroundQueueID)
+    for (auto& j : m_bgBattleGroundQueueID)
     {
         j.bgQueueTypeId  = BATTLEGROUND_QUEUE_NONE;
         j.invitedToInstance = 0;
@@ -549,7 +549,7 @@ Player::Player(WorldSession* session) : Unit(),
     m_HomebindTimer = 0;
     m_InstanceValid = true;
 
-    for (auto & i : m_auraBaseMod)
+    for (auto& i : m_auraBaseMod)
     {
         i[FLAT_MOD] = 0.0f;
         i[PCT_MOD] = 1.0f;
@@ -611,18 +611,18 @@ Player::~Player()
     CleanupsBeforeDelete();
 
     // Note: buy back item already deleted from DB when player was saved
-    for (const auto & item : m_items)
+    for (const auto& item : m_items)
         delete item;
 
     CleanupChannels();
 
     delete PlayerTalkClass;
 
-    for (const auto & x : m_ItemSetEff)
+    for (const auto& x : m_ItemSetEff)
          delete x;
 
     // clean up player-instance binds, may unload some instance saves
-    for (const auto & itr : m_boundInstances)
+    for (const auto& itr : m_boundInstances)
         itr.second.state->RemovePlayer(this);
 
     // Cleanup delayed teleport if it was not executed before object deletion
@@ -671,7 +671,7 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
         return false;
     }
 
-    for (auto & item : m_items)
+    for (auto& item : m_items)
         item = nullptr;
 
     SetLocationMapId(info->mapId);
@@ -3265,7 +3265,7 @@ void Player::SendInitialSpells() const
     size_t countPos = data.wpos();
     data << uint16(spellCount);                             // spell count placeholder
 
-    for (const auto & spell : m_spells)
+    for (const auto& spell : m_spells)
     {
         if (spell.second.state == PLAYERSPELL_REMOVED)
             continue;
@@ -3283,7 +3283,7 @@ void Player::SendInitialSpells() const
 
     uint16 spellCooldowns = m_spellCooldowns.size();
     data << uint16(spellCooldowns);
-    for (const auto & spellCooldown : m_spellCooldowns)
+    for (const auto& spellCooldown : m_spellCooldowns)
     {
         SpellEntry const* sEntry = sSpellMgr.GetSpellEntry(spellCooldown.first);
         if (!sEntry)
@@ -3298,7 +3298,7 @@ void Player::SendInitialSpells() const
         {
             if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(spellCooldown.second.itemid))
             {
-                for (const auto & itr : proto->Spells)
+                for (const auto& itr : proto->Spells)
                 {
                     if (itr.SpellId == spellCooldown.first)
                     {
@@ -3796,7 +3796,7 @@ void Player::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + m_spells.size() * 8);
     data << GetObjectGuid();
     time_t curTime = time(nullptr);
-    for (const auto & itr : m_spells)
+    for (const auto& itr : m_spells)
     {
         if (itr.second.state == PLAYERSPELL_REMOVED)
             continue;
@@ -3855,7 +3855,7 @@ void Player::_LoadSpellCooldowns(QueryResult* result)
             {
                 if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id))
                 {
-                    for (const auto & itr : proto->Spells)
+                    for (const auto& itr : proto->Spells)
                     {
                         if (itr.SpellId == spell->Id)
                         {
@@ -5043,7 +5043,7 @@ void Player::UpdateLocalChannels(uint32 newZone)
 
 void Player::LeaveLFGChannel()
 {
-    for (const auto & channel : m_channels)
+    for (const auto& channel : m_channels)
     {
         if (channel->IsLFG())
         {
@@ -5654,7 +5654,7 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
             UpdateSkillTrainedSpells(id, 0);
 
             // remove all quests related to this skill (else the spell will be automatically learned at next login, cf Player::LearnQuestRewardedSpells)
-            for (auto & itr : mQuestStatus)
+            for (auto& itr : mQuestStatus)
             { 
                 if (Quest const* quest = sObjectMgr.GetQuestTemplate(itr.first))
                 {
@@ -6147,7 +6147,7 @@ void Player::CheckAreaExploreAndOutdoor()
             if (GetShapeshiftForm() == FORM_CAT)
             {
                 PlayerSpellMap const& sp_list = GetSpellMap();
-                for (const auto & itr : sp_list)
+                for (const auto& itr : sp_list)
                 {
                     if (itr.second.state == PLAYERSPELL_REMOVED)
                         continue;
@@ -6769,7 +6769,7 @@ void Player::DuelComplete(DuelCompleteType type)
     /* remove auras */
     std::vector<uint32> auras2remove;
     SpellAuraHolderMap const& vAuras = duel->opponent->GetSpellAuraHolderMap();
-    for (const auto & itr : vAuras)
+    for (const auto& itr : vAuras)
     {
         if (!itr.second->IsPositive() && itr.second->GetCasterGuid() == GetObjectGuid() && itr.second->GetAuraApplyTime() >= duel->startTime)
             auras2remove.push_back(itr.second->GetId());
@@ -6780,7 +6780,7 @@ void Player::DuelComplete(DuelCompleteType type)
 
     auras2remove.clear();
     SpellAuraHolderMap const& auras = GetSpellAuraHolderMap();
-    for (const auto & aura : auras)
+    for (const auto& aura : auras)
     {
         if (!aura.second->IsPositive() && aura.second->GetCasterGuid() == duel->opponent->GetObjectGuid() && aura.second->GetAuraApplyTime() >= duel->startTime)
             auras2remove.push_back(aura.second->GetId());
@@ -7101,7 +7101,7 @@ void Player::ApplyItemEquipSpell(Item* item, bool apply, bool form_change)
     if (!proto)
         return;
 
-    for (const auto & spellData : proto->Spells)
+    for (const auto& spellData : proto->Spells)
     {
         // no spell
         if (!spellData.SpellId)
@@ -7197,12 +7197,12 @@ void Player::UpdateEquipSpellsAtFormChange()
     }
 
     // item set bonuses not dependent from item broken state
-    for (auto eff : m_ItemSetEff)
+    for (const auto eff : m_ItemSetEff)
     {
         if (!eff)
             continue;
 
-        for (auto spellInfo : eff->spells)
+        for (const auto spellInfo : eff->spells)
         {
             if (!spellInfo)
                 continue;
@@ -7228,7 +7228,7 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
 
     uint32 WeaponSpeed = proto->Delay;
 
-    for (const auto & spellData : proto->Spells)
+    for (const auto& spellData : proto->Spells)
     {
         // no spell
         if (!spellData.SpellId)
@@ -7323,7 +7323,7 @@ void Player::CastItemUseSpell(Item* item, SpellCastTargets const& targets)
     int count = 0;
 
     // item spells casted at use
-    for (const auto & spellData : proto->Spells)
+    for (const auto& spellData : proto->Spells)
     {
         // no spell
         if (!spellData.SpellId)
@@ -15087,7 +15087,7 @@ void Player::SendPacketsAtRelogin()
 {
     SendProficiency(ITEM_CLASS_WEAPON, GetWeaponProficiency());
     SendProficiency(ITEM_CLASS_ARMOR, GetArmorProficiency());
-    for (const auto & modList : m_spellMods)
+    for (const auto& modList : m_spellMods)
     {
         for (const auto& mod : modList)
             SendSpellMod(mod);
@@ -15822,7 +15822,7 @@ void Player::SendRaidInfo() const
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
 
-    for (const auto & itr : m_boundInstances)
+    for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)
         {
@@ -15852,7 +15852,7 @@ void Player::SendSavedInstances() const
     bool hasBeenSaved = false;
     WorldPacket data;
 
-    for (const auto & itr : m_boundInstances)
+    for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)                               // only permanent binds are sent
         {
@@ -15869,7 +15869,7 @@ void Player::SendSavedInstances() const
     if (!hasBeenSaved)
         return;
 
-    for (const auto & itr : m_boundInstances)
+    for (const auto& itr : m_boundInstances)
     {
         if (itr.second.perm)
         {
@@ -16256,7 +16256,7 @@ void Player::_SaveAuras()
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     AuraSaveStruct s;
-    for (const auto & auraHolder : auraHolders)
+    for (const auto& auraHolder : auraHolders)
     {
         SpellAuraHolder* holder = auraHolder.second;
 
@@ -17228,7 +17228,7 @@ void Player::RestoreSpellMods(Spell* spell, uint32 ownerAuraId, Aura* aura)
     if (!spell || spell->m_appliedMods.empty())
         return;
 
-    for (const auto & modList : m_spellMods)
+    for (const auto& modList : m_spellMods)
     {
         for (const auto& mod : modList)
         {
@@ -17278,7 +17278,7 @@ void Player::RemoveSpellMods(Spell* spell)
     if (spell->m_appliedMods.empty())
         return;
 
-    for (const auto & modList : m_spellMods)
+    for (const auto& modList : m_spellMods)
     {
         for (SpellModList::const_iterator itr = modList.begin(); itr != modList.end();)
         {
@@ -18656,7 +18656,7 @@ void Player::ApplyEquipCooldown(Item* pItem)
     if (pItem->GetProto()->Flags & ITEM_FLAG_NO_EQUIP_COOLDOWN)
         return;
 
-    for (const auto & spellData : pItem->GetProto()->Spells)
+    for (const auto& spellData : pItem->GetProto()->Spells)
     {
         // no spell
         if (!spellData.SpellId)
@@ -18690,7 +18690,7 @@ void Player::ResetSpells()
     // and we can't use original map for safe iterative with visit each spell at loop end
     PlayerSpellMap smap = GetSpellMap();
 
-    for (const auto & iter : smap)
+    for (const auto& iter : smap)
         RemoveSpell(iter.first, false, false);             // only iter->first can be accessed, object by iter->second can be deleted already
 
     LearnDefaultSpells();
@@ -18758,7 +18758,7 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
         if (learnedInfo->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_TRADE_SKILL && learnedInfo->Effect[EFFECT_INDEX_1] == 0)
         {
             // search other specialization for same prof
-            for (const auto & itr : m_spells)
+            for (const auto& itr : m_spells)
             {
                 if (itr.second.state == PLAYERSPELL_REMOVED || itr.first == learned_0)
                     continue;
@@ -18788,7 +18788,7 @@ void Player::LearnQuestRewardedSpells(Quest const* quest)
 void Player::LearnQuestRewardedSpells()
 {
     // learn spells received from quest completing
-    for (const auto & itr : mQuestStatus)
+    for (const auto& itr : mQuestStatus)
     {
         // skip no rewarded quests
         if (!itr.second.m_rewarded)
@@ -19222,7 +19222,7 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
         // skip if not item dependent or have alternative item
         // NOSTALRIUS
         bool auraOfItem = false;
-        for (const auto & spellData : itemProto->Spells)
+        for (const auto& spellData : itemProto->Spells)
         {
             if (spellData.SpellId == holder->GetId())
             {
@@ -19252,7 +19252,7 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
                     InterruptSpell(CurrentSpellTypes(i));
                 else
                 {
-                    for (const auto & spellData : itemProto->Spells)
+                    for (const auto& spellData : itemProto->Spells)
                     {
                         if (spellData.SpellId == spell->m_spellInfo->Id && spellData.SpellTrigger == 0)
                             InterruptSpell(CurrentSpellTypes(i));
@@ -20584,7 +20584,7 @@ bool Player::ConvertSpell(uint32 oldSpellId, uint32 newSpellId)
     ASSERT(GetSession()->IsMaster());
     // Conversion des boutons d'actions
     ActionButtonList& actions = GetSession()->GetMasterPlayer()->GetActionButtons();
-    for (auto & action : actions)
+    for (auto& action : actions)
     {
         if (action.second.uState == ACTIONBUTTON_DELETED)
             continue;
@@ -20857,7 +20857,7 @@ bool Player::ChangeQuestsForRace(uint8 oldRace, uint8 newRace)
         if (!pNewQuest)
             continue;
         uint32 removeQuestId = newTeam == ALLIANCE ? it->second : it->first;
-        for (auto & itr : mQuestStatus)
+        for (auto& itr : mQuestStatus)
         {
             if (itr.first == removeQuestId)
             {
@@ -20987,7 +20987,7 @@ Item* Player::AddItem(uint32 itemId, uint32 count)
 void Player::SendDestroyGroupMembers(bool includingSelf)
 {
     if (Group* group = GetGroup())
-        for (const auto & itr : group->GetMemberSlots())
+        for (const auto& itr : group->GetMemberSlots())
         {
             if (!includingSelf && itr.guid == GetObjectGuid())
                 continue;

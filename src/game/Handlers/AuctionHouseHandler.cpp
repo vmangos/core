@@ -671,7 +671,7 @@ public:
                 case AUCTION_QUERY_LIST_BIDDER:
                 {
                     data.SetOpcode(SMSG_AUCTION_BIDDER_LIST_RESULT);
-                    for (const auto & outbiddedAuctionId : outbiddedAuctionIds)
+                    for (const auto& outbiddedAuctionId : outbiddedAuctionIds)
                     {
                         --outbiddedCount;
                         AuctionEntry* auction = auctionHouse->GetAuction(outbiddedAuctionId);

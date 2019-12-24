@@ -960,7 +960,7 @@ bool Map::ScriptCommand_ModifyThreat(ScriptInfo const& script, WorldObject* sour
     if (script.modThreat.target == SO_MODIFYTHREAT_ALL_ATTACKERS)
     {
         ThreatList const& threatList = pSource->GetThreatManager().getThreatList();
-        for (auto i : threatList)
+        for (const auto i : threatList)
             if (Unit* Temp = pSource->GetMap()->GetUnit(i->getUnitGuid()))
                 pSource->GetThreatManager().modifyThreatPercent(Temp, script.x);
     }
@@ -1898,7 +1898,7 @@ bool Map::ScriptCommand_StartScriptForAll(ScriptInfo const& script, WorldObject*
 
     Cell::VisitAllObjects(source, searcher, script.startScriptForAll.searchRadius);
 
-    for (auto pWorldObject : targets)
+    for (const auto pWorldObject : targets)
     {
         if (!pWorldObject)
             continue;

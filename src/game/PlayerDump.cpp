@@ -393,7 +393,7 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
     {
         QueryFieldNames const& namesMap = result->GetFieldNames();
         std::string reqName;
-        for (const auto & itr : namesMap)
+        for (const auto& itr : namesMap)
         {
             if (itr.substr(0, 9) == "required_")
             {

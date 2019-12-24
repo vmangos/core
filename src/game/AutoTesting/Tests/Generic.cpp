@@ -373,7 +373,7 @@ public:
                 // Count immolation auras
                 Player* warrior = GetTestPlayer(0);
                 uint32 count = 0;
-                for (const auto & it : warrior->GetSpellAuraHolderMap())
+                for (const auto& it : warrior->GetSpellAuraHolderMap())
                     if (it.second->GetId() == SPELL_IMMOLATE)
                         ++count;
                 TEST_ASSERT(count <= sWorld.getConfig(CONFIG_UINT32_DEBUFF_LIMIT));

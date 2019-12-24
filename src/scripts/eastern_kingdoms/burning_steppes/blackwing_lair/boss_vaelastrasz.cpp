@@ -365,7 +365,7 @@ struct boss_vaelAI : public ScriptedAI
         {
             std::vector<ObjectGuid> vPossibleVictim;
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (auto itr : tList)
+            for (const auto itr : tList)
             {
                 Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
                 if (pPlayer && pPlayer->IsAlive() && pPlayer->GetPowerType() == POWER_MANA && !pPlayer->HasAura(SPELL_BURNING_ADRENALINE, EFFECT_INDEX_0))
@@ -585,7 +585,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_WYRMIDE_GRIFFEMORT, 50.0f);
         GetCreatureListWithEntryInGrid(lCreature, m_creature, MOB_RONGE_GRIFFEMORT, 50.0f);
 
-        for (const auto & itr : lCreature)
+        for (const auto& itr : lCreature)
         {
             if (!itr->IsAlive())
                 continue;

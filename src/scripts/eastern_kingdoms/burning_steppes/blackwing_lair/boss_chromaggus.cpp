@@ -149,7 +149,7 @@ struct boss_chromaggusAI : public ScriptedAI
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
         }
 
-        for (const auto & itr : m_vTimeLapseInfo)
+        for (const auto& itr : m_vTimeLapseInfo)
             delete itr;
         m_vTimeLapseInfo.clear();
     }
@@ -177,7 +177,7 @@ struct boss_chromaggusAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CHROMAGGUS, DONE);
-        for (const auto & itr : m_vTimeLapseInfo)
+        for (const auto& itr : m_vTimeLapseInfo)
             delete itr;
         m_vTimeLapseInfo.clear();
     }
@@ -353,7 +353,7 @@ struct boss_chromaggusAI : public ScriptedAI
 
             std::vector<ObjectGuid> m_vPossibleVictim;
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (auto itr : tList)
+            for (const auto itr : tList)
                 if (Player* target = m_creature->GetMap()->GetPlayer(itr->getUnitGuid()))
                     m_vPossibleVictim.push_back(target->GetObjectGuid());
 

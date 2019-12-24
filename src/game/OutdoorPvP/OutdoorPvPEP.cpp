@@ -678,7 +678,7 @@ void OutdoorPvPEP::OnPlayerLeave(Player* plr)
 
 void OutdoorPvPEP::BuffTeams()
 {
-    for (auto plr : m_players[0])
+    for (const auto plr : m_players[0])
     {
         {
             for (uint32 i : EP_AllianceBuffs)
@@ -687,7 +687,7 @@ void OutdoorPvPEP::BuffTeams()
                 plr->CastSpell(plr, EP_AllianceBuffs[m_AllianceTowersControlled - 1], true);
         }
     }
-    for (auto plr : m_players[1])
+    for (const auto plr : m_players[1])
     {
         {
             for (uint32 i : EP_HordeBuffs)
@@ -706,7 +706,7 @@ uint32 OutdoorPvPEP::FillInitialWorldStates(WorldPacket& data)
     data << EP_UI_TOWER_SLIDER_POS << uint32(50);
     data << EP_UI_TOWER_SLIDER_N << uint32(100);
     uint32 count = 5;
-    for (const auto & itr : m_capturePoints)
+    for (const auto& itr : m_capturePoints)
         count += itr.second->FillInitialWorldStates(data);
     return count;
 }

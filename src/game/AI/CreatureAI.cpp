@@ -290,7 +290,7 @@ void CreatureAI::ClearTargetIcon()
     std::set<Group*> instanceGroups;
 
     // Clear target icon for every unique group in instance
-    for (const auto & player : players)
+    for (const auto& player : players)
     {
         if (Group* pGroup = player.getSource()->GetGroup())
         {

@@ -1647,7 +1647,7 @@ SendQuestCompleteEvent -> Affiche au joueur que une quête est validée.
 void BattleGroundAV::CompleteQuestForAll(uint32 questId)
 {
     Map::PlayerList const& PlayerList = GetBgMap()->GetPlayers();
-    for (const auto & it : PlayerList)
+    for (const auto& it : PlayerList)
         if (Player* player = it.getSource())
             if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
                 player->FullQuestComplete(questId);

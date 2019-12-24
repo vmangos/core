@@ -1309,7 +1309,7 @@ inline void UnsummonVisualWaypoints(Player const* player, ObjectGuid ownerGuid)
     MaNGOS::CreatureListSearcher<MaNGOS::AllCreaturesOfEntryInRange> searcher(waypoints, checkerForWaypoint);
     Cell::VisitGridObjects(player, searcher, SIZE_OF_GRIDS);
 
-    for (const auto & waypoint : waypoints)
+    for (const auto& waypoint : waypoints)
     {
         if (waypoint->GetSubtype() != CREATURE_SUBTYPE_TEMPORARY_SUMMON)
             continue;
@@ -1467,7 +1467,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
     // Unsummon old visuals, summon new ones
     UnsummonVisualWaypoints(m_session->GetPlayer(), wpOwner->GetObjectGuid());
     WaypointPath const* wpPath = sWaypointMgr.GetPathFromOrigin(wpOwner->GetEntry(), wpOwner->GetGUIDLow(), wpPathId, wpDestination);
-    for (const auto & itr : *wpPath)
+    for (const auto& itr : *wpPath)
     {
         if (!Helper_CreateWaypointFor(wpOwner, wpDestination, wpPathId, itr.first, &itr.second, waypointInfo))
         {
@@ -1896,7 +1896,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
     {
         UnsummonVisualWaypoints(m_session->GetPlayer(), wpOwner->GetObjectGuid());
 
-        for (const auto & itr : *wpPath)
+        for (const auto& itr : *wpPath)
         {
             if (!Helper_CreateWaypointFor(wpOwner, wpOrigin, wpPathId, itr.first, &(itr.second), waypointInfo))
             {

@@ -62,7 +62,7 @@ void LFGPlayerQueueInfo::CalculateRoles(Classes playerClass)
 
 RolesPriority LFGPlayerQueueInfo::GetRolePriority(ClassRoles role)
 {
-    for (const auto & iter : rolePriority)
+    for (const auto& iter : rolePriority)
     {
         if (iter.first == role)
             return iter.second;
@@ -388,7 +388,7 @@ bool LFGQueue::FindRoleToGroup(ObjectGuid playerGuid, Group* group, ClassRoles r
         bool queueTimePriority = qPlayer->second.hasQueuePriority;
         bool classPriority = qPlayer->second.GetRolePriority(role);
         // Iterate over QueuedPlayersMap to find if players have been longer in Queue.
-        for (auto & itr : m_QueuedPlayers)
+        for (auto& itr : m_QueuedPlayers)
         {
             if (qPlayer->first == itr.first)
                 continue;
@@ -534,7 +534,7 @@ void LFGQueue::RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod
 
 void LFGQueue::FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude)
 {
-    for (const auto & itr : m_QueuedPlayers)
+    for (const auto& itr : m_QueuedPlayers)
     {
         if (itr.first == exclude)
             continue;

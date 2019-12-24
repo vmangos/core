@@ -43,7 +43,7 @@ PlayerSocial::~PlayerSocial()
 uint32 PlayerSocial::GetNumberOfSocialsWithFlag(SocialFlag flag)
 {
     uint32 counter = 0;
-    for (const auto & itr : m_playerSocialMap)
+    for (const auto& itr : m_playerSocialMap)
     {
         if (itr.second.Flags & flag)
             ++counter;
@@ -115,7 +115,7 @@ void PlayerSocial::SendFriendList()
     WorldPacket data(SMSG_FRIEND_LIST, (1 + size * 25)); // just can guess size
     data << uint8(size);                                   // friends count
 
-    for (auto & itr : m_playerSocialMap)
+    for (auto& itr : m_playerSocialMap)
     {
         if (itr.second.Flags & SOCIAL_FLAG_FRIEND)         // if IsFriend()
         {
@@ -146,7 +146,7 @@ void PlayerSocial::SendIgnoreList()
     WorldPacket data(SMSG_IGNORE_LIST, (1 + size * 8));     // just can guess size
     data << uint8(size);                                    // friends count
 
-    for (const auto & itr : m_playerSocialMap)
+    for (const auto& itr : m_playerSocialMap)
         if (itr.second.Flags & SOCIAL_FLAG_IGNORED)
             data << ObjectGuid(HIGHGUID_PLAYER, itr.first);// player guid
 
@@ -286,7 +286,7 @@ void SocialMgr::BroadcastToFriendListers(MasterPlayer* player, WorldPacket* pack
     bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
 
     ACE_Guard<ACE_Thread_Mutex> guard(_socialMapLock);
-    for (const auto & itr : m_socialMap)
+    for (const auto& itr : m_socialMap)
     {
         PlayerSocialMap::const_iterator itr2 = itr.second.m_playerSocialMap.find(guid);
         if (itr2 != itr.second.m_playerSocialMap.end() && (itr2->second.Flags & SOCIAL_FLAG_FRIEND))

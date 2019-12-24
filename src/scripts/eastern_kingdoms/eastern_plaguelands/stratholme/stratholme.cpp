@@ -45,7 +45,7 @@ bool GOHello_go_entree_de_service(Player* pPlayer, GameObject* pGo)
 
     std::list<Creature*> listBarthilas;
     GetCreatureListWithEntryInGrid(listBarthilas, pGo, 10435, 1000);
-    for (auto pCreature : listBarthilas)
+    for (const auto pCreature : listBarthilas)
     {
         if (!pCreature->IsAlive())
             continue;

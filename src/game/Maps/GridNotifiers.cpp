@@ -38,7 +38,7 @@ using namespace MaNGOS;
 void
 VisibleChangesNotifier::Visit(CameraMapType& m)
 {
-    for (const auto & iter : m)
+    for (const auto& iter : m)
         iter.getSource()->UpdateVisibilityOf(&i_object);
 }
 
@@ -50,7 +50,7 @@ VisibleNotifier::Notify()
     // but exist one case when this possible and object not out of range: transports
     if (Transport* transport = player.GetTransport())
     {
-        for (auto itr : transport->GetPassengers())
+        for (const auto itr : transport->GetPassengers())
         {
             if (i_clientGUIDs.find(itr->GetObjectGuid()) != i_clientGUIDs.end())
             {
@@ -105,7 +105,7 @@ VisibleNotifier::Notify()
 
         // send out of range to other players if need
         ObjectGuidSet const& oor = i_data.GetOutOfRangeGUIDs();
-        for (auto iter : oor)
+        for (const auto& iter : oor)
         {
             if (!iter.IsPlayer())
                 continue;
@@ -131,7 +131,7 @@ VisibleNotifier::Notify()
 void
 MessageDeliverer::Visit(CameraMapType& m)
 {
-    for (const auto & iter : m)
+    for (const auto& iter : m)
     {
         Player* owner = iter.getSource()->GetOwner();
 
@@ -145,7 +145,7 @@ MessageDeliverer::Visit(CameraMapType& m)
 
 void MessageDelivererExcept::Visit(CameraMapType& m)
 {
-    for (const auto & iter : m)
+    for (const auto& iter : m)
     {
         Player* owner = iter.getSource()->GetOwner();
 
@@ -161,7 +161,7 @@ void MessageDelivererExcept::Visit(CameraMapType& m)
 void
 ObjectMessageDeliverer::Visit(CameraMapType& m)
 {
-    for (const auto & iter : m)
+    for (const auto& iter : m)
     {
         if (WorldSession* session = iter.getSource()->GetOwner()->GetSession())
             session->SendPacket(i_message);
@@ -171,7 +171,7 @@ ObjectMessageDeliverer::Visit(CameraMapType& m)
 void
 MessageDistDeliverer::Visit(CameraMapType& m)
 {
-    for (const auto & iter : m)
+    for (const auto& iter : m)
     {
         Player* owner = iter.getSource()->GetOwner();
 
@@ -188,7 +188,7 @@ MessageDistDeliverer::Visit(CameraMapType& m)
 void
 ObjectMessageDistDeliverer::Visit(CameraMapType& m)
 {
-    for (const auto & iter : m)
+    for (const auto& iter : m)
     {
         if (!i_dist || iter.getSource()->GetBody()->IsWithinDist(&i_object, i_dist))
         {

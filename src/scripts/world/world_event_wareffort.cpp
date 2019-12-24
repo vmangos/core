@@ -249,7 +249,7 @@ uint32 GetWarEffortGossipTextId(uint32 item, TeamId team, bool objectiveReached)
 
 const WarEffortGossip& GetWarEffortGossip(uint32 item)
 {
-    for (const auto & i : WarEffortGossipText)
+    for (const auto& i : WarEffortGossipText)
     {
         if (item == i.itemId)
             return i;
@@ -812,7 +812,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
     {
         Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
         int var = 0;
-        for (const auto & itr : players)
+        for (const auto& itr : players)
         {
             Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
@@ -827,7 +827,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
     void AggroAllPlayerNear()
     {
         Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
-        for (const auto & itr : players)
+        for (const auto& itr : players)
         {
             Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())

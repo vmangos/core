@@ -186,7 +186,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                 player->GroupEventFailHappens(QUEST_MISSING_DIPLO_PT8);
 
             // remove thugs
-            for (const auto & pThug : m_thugs)
+            for (const auto& pThug : m_thugs)
             {
                 if (pThug && pThug->IsAlive())
                 {
@@ -196,7 +196,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         }
 
         // zero init required to prevent crash
-        for (auto & pThug : m_thugs)
+        for (auto& pThug : m_thugs)
             pThug = nullptr;
 
         m_questFightStarted = false;
@@ -232,7 +232,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
                     pMotionMaster->MoveTargetedHome();
 
                 // check if thugs are alive
-                for (const auto & pThug : m_thugs)
+                for (const auto& pThug : m_thugs)
                 {
                     if (pThug && pThug->IsAlive())
                     {
@@ -383,7 +383,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         if (m_dialogStarted || m_questFightStarted)
         {
             // remove thugs
-            for (auto & pThug : m_thugs)
+            for (auto& pThug : m_thugs)
             {
                 if (pThug)
                 {
@@ -399,7 +399,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         // If the thug died for whatever reason, clear the pointer. Otherwise, if
         // combat is extended, the thug may despawn and we'll access a dangling
         // pointer
-        for (auto & pThug : m_thugs)
+        for (auto& pThug : m_thugs)
         {
             if (pThug == creature)
                 pThug = nullptr;
@@ -408,7 +408,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
 
     void SummonedCreatureDespawn(Creature* creature) override
     {
-        for (auto & pThug : m_thugs)
+        for (auto& pThug : m_thugs)
         {
             if (pThug == creature)
                 pThug = nullptr;
@@ -1013,7 +1013,7 @@ struct npc_tyrion_spybotAI : public npc_escortAI
             if (lGardenStormwindRoyalGuards.empty())
                 return true;
 
-            for (auto pRoyalGuard : lGardenStormwindRoyalGuards)
+            for (const auto pRoyalGuard : lGardenStormwindRoyalGuards)
             {
                 if (pRoyalGuard->IsDead() || !pRoyalGuard->IsAlive())
                     pRoyalGuard->Respawn();

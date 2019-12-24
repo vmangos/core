@@ -154,7 +154,7 @@ struct npc_attack_masterAI : public ScriptedAI
     }
     void SetAttackableInList(MobsGUIDList mobsList, bool bAttackable)
     {
-        for (const auto & itr : mobsList)
+        for (const auto& itr : mobsList)
         {
             if (Unit* unit = Unit::GetUnit(*ME, itr))
                 SetAttackable(unit, bAttackable);
@@ -226,7 +226,7 @@ struct npc_attack_masterAI : public ScriptedAI
         ME->RemoveAurasDueToSpell(SPELL_INVOCATION_ON_MASTER);
         // On desactive les invocateurs
         uint8 num = 0;
-        for (const auto & itr : lInvocatorMobsGUID)
+        for (const auto& itr : lInvocatorMobsGUID)
         {
             if (Unit* invoc = Unit::GetUnit(*ME, itr))
             {
@@ -335,7 +335,7 @@ struct npc_attack_masterAI : public ScriptedAI
     {
         if (!lCurrWaveMobsGUID.empty())
         {
-            for (const auto & it : lCurrWaveMobsGUID)
+            for (const auto& it : lCurrWaveMobsGUID)
             {
                 if (Unit* waveMob = Unit::GetUnit(*ME, it))
                 {
@@ -730,7 +730,7 @@ struct npc_event_wave_mobAI : public ScriptedAI
         Cell::VisitAllObjects(ME, searcher, 120.0f);
         Unit* nearest = nullptr;
         uint32 quality = 0;
-        for (const auto & target : targets)
+        for (const auto& target : targets)
         {
             uint32 currVictimQuality = 0;
             if (target->GetFactionTemplateId() == ME->GetFactionTemplateId())
@@ -960,7 +960,7 @@ struct npc_guard_masterAI : public ScriptedAI
     // La garde est invoquee : maintenant elle doit attaquer
     void DoAllAttack(Unit* pUnit)
     {
-        for (const auto & itr : lMyAddsMobsGUID)
+        for (const auto& itr : lMyAddsMobsGUID)
         {
             if (Unit* crea = Unit::GetUnit(*ME, itr))
             {
@@ -971,7 +971,7 @@ struct npc_guard_masterAI : public ScriptedAI
     }
     void DoAllSay(char const *what)
     {
-        for (const auto & itr : lMyAddsMobsGUID)
+        for (const auto& itr : lMyAddsMobsGUID)
         {
             if (Unit* crea = Unit::GetUnit(*ME, itr))
             {

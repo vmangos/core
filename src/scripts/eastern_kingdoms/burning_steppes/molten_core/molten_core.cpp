@@ -354,7 +354,7 @@ struct mob_core_houndAI : public ScriptedAI
 
                 std::list<Creature*> m_CoreHoundList;
                 GetCreatureListWithEntryInGrid(m_CoreHoundList, m_creature, NPC_CORE_HOUND, 100.0f);
-                for (auto itr : m_CoreHoundList)
+                for (const auto itr : m_CoreHoundList)
                 {
                     if (itr && itr->IsInCombat())
                     {

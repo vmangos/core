@@ -218,7 +218,7 @@ struct boss_ragnarosAI : ScriptedAI
 
     void SummonSonsOfFlame() const
     {
-        for (const auto & position : PositionOfAdds)
+        for (const auto& position : PositionOfAdds)
         {
             ThreatListCopier* dataCopier = new ThreatListCopier(m_creature);
             if (Creature* Crea = m_creature->SummonCreature(NPC_SON_OF_FLAME, 
@@ -371,7 +371,7 @@ struct boss_ragnarosAI : ScriptedAI
                 std::list<Creature*> FilsListe;
                 GetCreatureListWithEntryInGrid(FilsListe, m_creature, NPC_SON_OF_FLAME, 150.0f);
 
-                for (const auto & itr : FilsListe)
+                for (const auto& itr : FilsListe)
                 {
                     if (itr->IsAlive())
                     {
@@ -486,7 +486,7 @@ struct boss_ragnarosAI : ScriptedAI
             std::vector<Player*> manaPlayers;
 
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (auto itr : tList)
+            for (const auto itr : tList)
             {
                 Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
                 if (pPlayer && pPlayer->IsAlive() && pPlayer->GetPowerType() == POWER_MANA && !pPlayer->IsGameMaster())

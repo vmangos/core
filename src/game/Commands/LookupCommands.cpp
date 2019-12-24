@@ -564,7 +564,7 @@ bool ChatHandler::HandleLookupQuestCommand(char* args)
     uint32 counter = 0 ;
 
     ObjectMgr::QuestMap const& qTemplates = sObjectMgr.GetQuestTemplates();
-    for (const auto & itr : qTemplates)
+    for (const auto& itr : qTemplates)
     {
         const auto& qinfo = itr.second;
 
@@ -1286,7 +1286,7 @@ bool ChatHandler::HandleLookupTeleCommand(char * args)
     std::ostringstream reply;
 
     GameTeleMap const& teleMap = sObjectMgr.GetGameTeleMap();
-    for (const auto & itr : teleMap)
+    for (const auto& itr : teleMap)
     {
         GameTele const* tele = &itr.second;
 

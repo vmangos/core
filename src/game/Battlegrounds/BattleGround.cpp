@@ -160,7 +160,7 @@ private:
 template<class Do>
 void BattleGround::BroadcastWorker(Do& _do)
 {
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
         if (Player* pPlayer = ObjectAccessor::FindPlayer(itr.first))
             _do(pPlayer);
 }
@@ -254,7 +254,7 @@ BattleGround::~BattleGround()
     // remove from bg free slot queue
     this->RemoveFromBGFreeSlotQueue();
 
-    for (const auto & itr : m_PlayerScores)
+    for (const auto& itr : m_PlayerScores)
         delete itr.second;
 }
 
@@ -429,7 +429,7 @@ void BattleGround::SetTeamStartLoc(Team team, float X, float Y, float Z, float O
 
 void BattleGround::SendPacketToAll(WorldPacket* packet)
 {
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         if (Player* pPlayer = sObjectMgr.GetPlayer(itr.first))
             pPlayer->GetSession()->SendPacket(packet);
@@ -440,7 +440,7 @@ void BattleGround::SendPacketToAll(WorldPacket* packet)
 
 void BattleGround::SendPacketToTeam(Team teamId, WorldPacket* packet, Player* sender, bool self)
 {
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
         if (!pPlayer)
@@ -471,7 +471,7 @@ void BattleGround::PlaySoundToTeam(uint32 SoundID, Team teamId)
 {
     WorldPacket data;
 
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
         if (!pPlayer)
@@ -493,7 +493,7 @@ void BattleGround::PlaySoundToTeam(uint32 SoundID, Team teamId)
 
 void BattleGround::CastSpellOnTeam(uint32 SpellID, Team teamId)
 {
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
 
@@ -513,7 +513,7 @@ void BattleGround::CastSpellOnTeam(uint32 SpellID, Team teamId)
 
 void BattleGround::RewardHonorToTeam(uint32 Honor, Team teamId)
 {
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
 
@@ -538,7 +538,7 @@ void BattleGround::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, 
     if (!factionEntry)
         return;
 
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
 
@@ -609,7 +609,7 @@ void BattleGround::EndBattleGround(Team winner)
     //we must set it this way, because end time is sent in packet!
     m_EndTime = TIME_TO_AUTOREMOVE;
 
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         Team team = itr.second.PlayerTeam;
 
@@ -939,7 +939,7 @@ void BattleGround::Reset()
 
     m_Players.clear();
 
-    for (const auto & itr : m_PlayerScores)
+    for (const auto& itr : m_PlayerScores)
         delete itr.second;
     m_PlayerScores.clear();
 }
@@ -1220,7 +1220,7 @@ void BattleGround::OnObjectDBLoad(Creature* creature)
     ASSERT(eventsVector.size());
     if (eventsVector[0].event1 == BG_EVENT_NONE)
         return;
-    for (auto i : eventsVector)
+    for (const auto& i : eventsVector)
     {
         m_EventObjects[MAKE_PAIR32(i.event1, i.event2)].creatures.push_back(creature->GetObjectGuid());
         if (!IsActiveEvent(i.event1, i.event2))
@@ -1242,7 +1242,7 @@ void BattleGround::OnObjectDBLoad(GameObject* obj)
     ASSERT(eventsVector.size());
     if (eventsVector[0].event1 == BG_EVENT_NONE)
         return;
-    for (auto i : eventsVector)
+    for (const auto& i : eventsVector)
     {
         m_EventObjects[MAKE_PAIR32(i.event1, i.event2)].gameobjects.push_back(obj->GetObjectGuid());
         if (!IsActiveEvent(i.event1, i.event2))
@@ -1307,7 +1307,7 @@ void BattleGround::StartingEventDespawnDoors()
 void BattleGround::ReturnPlayersToHomeGY()
 {
     // return bastards back homie
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         auto player = sObjectMgr.GetPlayer(itr.first);
 
@@ -1347,7 +1347,7 @@ void BattleGround::SpawnEvent(uint8 event1, uint8 event2, bool spawn, bool force
         std::vector<BattleGroundEventIdx> const& eventsVector = sBattleGroundMgr.GetCreatureEventsVector(itr->GetCounter());
         ASSERT(eventsVector.size());
         bool spawnThisCreature = spawn;
-        for (auto i : eventsVector)
+        for (const auto& i : eventsVector)
         {
             if (!IsActiveEvent(i.event1, i.event2))
             {
@@ -1377,7 +1377,7 @@ void BattleGround::SetSpawnEventMode(uint8 event1, uint8 event2, BattleGroundCre
         std::vector<BattleGroundEventIdx> const& eventsVector = sBattleGroundMgr.GetCreatureEventsVector(itr->GetCounter());
         ASSERT(eventsVector.size());
         bool spawnThisCreature = true;
-        for (auto i : eventsVector)
+        for (const auto& i : eventsVector)
         {
             if (!IsActiveEvent(i.event1, i.event2))
             {
@@ -1606,7 +1606,7 @@ void BattleGround::HandleKillPlayer(Player* pVictim, Player* pKiller)
         UpdatePlayerScore(pKiller, SCORE_HONORABLE_KILLS, 1);
         UpdatePlayerScore(pKiller, SCORE_KILLING_BLOWS, 1);
 
-        for (const auto & itr : m_Players)
+        for (const auto& itr : m_Players)
         {
             Player* pPlayer = sObjectMgr.GetPlayer(itr.first);
 
@@ -1662,7 +1662,7 @@ void BattleGround::PlayerAddedToBGCheckIfBGIsRunning(Player* pPlayer)
 uint32 BattleGround::GetAlivePlayersCountByTeam(Team team) const
 {
     int count = 0;
-    for (const auto & itr : m_Players)
+    for (const auto& itr : m_Players)
     {
         if (itr.second.PlayerTeam == team)
         {

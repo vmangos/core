@@ -121,7 +121,7 @@ void ReputationMgr::SendForceReactions()
     WorldPacket data;
     data.Initialize(SMSG_SET_FORCED_REACTIONS, 4 + m_forcedReactions.size() * (4 + 4));
     data << uint32(m_forcedReactions.size());
-    for (const auto & itr : m_forcedReactions)
+    for (const auto& itr : m_forcedReactions)
     {
         data << uint32(itr.first);                         // faction_id (Faction.dbc)
         data << uint32(itr.second);                        // reputation rank
@@ -140,7 +140,7 @@ void ReputationMgr::SendState(FactionState const* faction)
     data << (uint32) faction->ReputationListID;
     data << (uint32) faction->Standing;
 
-    for (auto & itr : m_factions)
+    for (auto& itr : m_factions)
     {
         if (itr.second.needSend)
         {
@@ -165,7 +165,7 @@ void ReputationMgr::SendInitialReputations()
 
     RepListID a = 0;
 
-    for (auto & itr : m_factions)
+    for (auto& itr : m_factions)
     {
         // fill in absent fields
         for (; a != itr.first; a++)
@@ -450,7 +450,7 @@ void ReputationMgr::SaveToDB()
     SqlStatement stmtDel = CharacterDatabase.CreateStatement(delRep, "DELETE FROM character_reputation WHERE guid = ? AND faction=?");
     SqlStatement stmtIns = CharacterDatabase.CreateStatement(insRep, "INSERT INTO character_reputation (guid,faction,standing,flags) VALUES (?, ?, ?, ?)");
 
-    for (auto & itr : m_factions)
+    for (auto& itr : m_factions)
     {
         if (itr.second.needSave)
         {

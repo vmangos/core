@@ -84,7 +84,7 @@ struct go_dusty_rugAI: public GameObjectAI
                         {
                             std::list<Creature*> lCrea;
                             me->GetCreatureListWithEntryInGrid(lCrea, NPC_CAPTURED_FARMER, 30.0f);
-                            for (const auto & it : lCrea)
+                            for (const auto& it : lCrea)
                             {
                                 if (it->IsAlive())
                                 {

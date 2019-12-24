@@ -404,7 +404,7 @@ void Map::ExistingPlayerLogin(Player* player)
     UpdateObjectVisibility(player, cell, p);
 
     // Refresh aura durations
-    for (const auto & it : player->GetSpellAuraHolderMap())
+    for (const auto& it : player->GetSpellAuraHolderMap())
         it.second->UpdateAuraDuration();
 }
 
@@ -694,7 +694,7 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
     for (int i = 0; i < (nthreads - 1); ++i)
         threads.push_back(new ACE_Based::Thread(new MapAsynchCellsWorker(i, nthreads, diff, now, 0, this)));
     UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 0);
-    for (const auto & thread : threads)
+    for (const auto& thread : threads)
     {
         thread->wait();
         delete thread;
@@ -704,7 +704,7 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
     for (int i = 0; i < (nthreads - 1); ++i)
         threads.push_back(new ACE_Based::Thread(new MapAsynchCellsWorker(i, nthreads, diff, now, 1, this)));
     UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 1);
-    for (const auto & thread : threads)
+    for (const auto& thread : threads)
     {
         thread->wait();
         delete thread;
@@ -745,7 +745,7 @@ public:
     virtual void run()
     {
         int i = 0;
-        for (auto itr : updates)
+        for (const auto itr : updates)
             if (((++i) % nThreads) == threadIdx)
                 if (itr->IsInWorld())
                     itr->GetMotionMaster()->UpdateMotionAsync(diff);
@@ -776,7 +776,7 @@ inline void Map::UpdateCells(uint32 map_diff)
         std::vector<ACE_Based::Thread*> threads;
         for (int i = 0; i < nthreads; ++i)
             threads.push_back(new ACE_Based::Thread(new UnitsMovementUpdater(i, nthreads, unitsMvtUpdate, diff)));
-        for (const auto & thread : threads)
+        for (const auto& thread : threads)
         {
             thread->wait();
             delete thread;
@@ -1550,7 +1550,7 @@ void Map::UpdateActiveObjectVisibility(Player* player)
 // Not compressed
 void Map::UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGuids)
 {
-    for (auto obj : m_activeNonPlayers)
+    for (const auto obj : m_activeNonPlayers)
     {
         if (obj->IsInWorld())
         {
@@ -1563,7 +1563,7 @@ void Map::UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGui
 // Support for compressed data packet
 void Map::UpdateActiveObjectVisibility(Player* player, ObjectGuidSet& visibleGuids, UpdateData& data, std::set<WorldObject*>& visibleNow)
 {
-    for (auto obj : m_activeNonPlayers)
+    for (const auto obj : m_activeNonPlayers)
     {
         if (obj->IsInWorld())
         {
@@ -1594,7 +1594,7 @@ void Map::SendInitSelf(Player* player)
 
     // build other passengers at transport also (they always visible and marked as visible and will not send at visibility update at add to map
     if (Transport* transport = player->GetTransport())
-        for (auto itr : transport->GetPassengers())
+        for (const auto itr : transport->GetPassengers())
             if (player != itr && player->IsInVisibleList(itr))
             {
                 hasTransport = true;
@@ -1609,7 +1609,7 @@ void Map::SendInitTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     bool hasTransport = false;
-    for (auto itr : _transports)
+    for (const auto itr : _transports)
     {
         if (itr != player->GetTransport())
         {
@@ -1625,7 +1625,7 @@ void Map::SendRemoveTransports(Player* player)
     // Hack to send out transports
     UpdateData transData;
     bool hasTransport = false;
-    for (auto itr : _transports)
+    for (const auto itr : _transports)
     {
         if (itr != player->GetTransport())
         {
@@ -1704,7 +1704,7 @@ void Map::RemoveAllObjectsInRemoveList()
 uint32 Map::GetPlayersCountExceptGMs() const
 {
     uint32 count = 0;
-    for (const auto & itr : m_mapRefManager)
+    for (const auto& itr : m_mapRefManager)
         if (!itr.getSource()->IsGameMaster())
             ++count;
     return count;
@@ -1712,14 +1712,14 @@ uint32 Map::GetPlayersCountExceptGMs() const
 
 void Map::SendToPlayers(WorldPacket const* data) const
 {
-    for (const auto & itr : m_mapRefManager)
+    for (const auto& itr : m_mapRefManager)
         itr.getSource()->GetSession()->SendPacket(data);
 }
 
 bool Map::SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const
 {
     bool foundPlayer = false;
-    for (const auto & itr : m_mapRefManager)
+    for (const auto& itr : m_mapRefManager)
     {
         if (itr.getSource()->GetZoneId() == zoneId)
         {
@@ -1747,7 +1747,7 @@ bool Map::ActiveObjectsNearGrid(uint32 x, uint32 y) const
     cell_max >> cell_range;
     cell_max += cell_range;
 
-    for (const auto & iter : m_mapRefManager)
+    for (const auto& iter : m_mapRefManager)
     {
         Player* plr = iter.getSource();
 
@@ -1757,7 +1757,7 @@ bool Map::ActiveObjectsNearGrid(uint32 x, uint32 y) const
             return true;
     }
 
-    for (auto obj : m_activeNonPlayers)
+    for (const auto obj : m_activeNonPlayers)
     {
         CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
         if ((cell_min.x_coord <= p.x_coord && p.x_coord <= cell_max.x_coord) &&
@@ -2149,7 +2149,7 @@ bool DungeonMap::Reset(InstanceResetMethod method)
         if (method == INSTANCE_RESET_ALL)
         {
             // notify the players to leave the instance so it can be reset
-            for (const auto & itr : m_mapRefManager)
+            for (const auto& itr : m_mapRefManager)
                 itr.getSource()->SendResetFailedNotify();
         }
         else
@@ -2157,7 +2157,7 @@ bool DungeonMap::Reset(InstanceResetMethod method)
             if (method == INSTANCE_RESET_GLOBAL)
             {
                 // set the homebind timer for players inside (1 minute)
-                for (const auto & itr : m_mapRefManager)
+                for (const auto& itr : m_mapRefManager)
                     itr.getSource()->m_InstanceValid = false;
             }
 
@@ -2181,7 +2181,7 @@ void DungeonMap::PermBindAllPlayers(Player* player)
 {
     Group* group = player->GetGroup();
     // group members outside the instance group don't get bound
-    for (const auto & itr : m_mapRefManager)
+    for (const auto& itr : m_mapRefManager)
     {
         Player* plr = itr.getSource();
         // players inside an instance cannot be bound to other instances
@@ -2225,7 +2225,7 @@ void DungeonMap::UnloadAll(bool pForce)
 
 void DungeonMap::SendResetWarnings(uint32 timeLeft) const
 {
-    for (const auto & itr : m_mapRefManager)
+    for (const auto& itr : m_mapRefManager)
         itr.getSource()->SendInstanceResetWarning(GetId(), timeLeft);
 }
 
@@ -2357,7 +2357,7 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, WorldObject* sour
     ScriptMap const* s2 = &(s->second);
     bool immedScript = false;
     m_scriptSchedule_lock.acquire();
-    for (const auto & iter : *s2)
+    for (const auto& iter : *s2)
     {
         ScriptAction sa;
         sa.sourceGuid = sourceGuid;
@@ -2785,7 +2785,7 @@ public:
             (*current)->BuildUpdateData(update_players);
         }
 
-        for (auto & itr : update_players)
+        for (auto& itr : update_players)
             itr.second.Send(itr.first->GetSession());
     }
     std::set<Object*>::iterator begin;
@@ -3097,7 +3097,7 @@ void Map::MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, Language lan
     MaNGOS::LocalizedPacketDo<StaticMonsterChatBuilder> say_do(say_build);
 
     Map::PlayerList const& pList = GetPlayers();
-    for (const auto & itr : pList)
+    for (const auto& itr : pList)
         say_do(itr.getSource());
 }
 

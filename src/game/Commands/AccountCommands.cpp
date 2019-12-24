@@ -1056,7 +1056,7 @@ bool ChatHandler::HandleListAddonsCommand(char* args)
 
     std::set<std::string> const& addons = player->GetSession()->GetAddons();
     PSendSysMessage("%u addons on target.", addons.size());
-    for (const auto & addon : addons)
+    for (const auto& addon : addons)
         PSendSysMessage(">> %s", addon.c_str());
     return true;
 }
@@ -1070,7 +1070,7 @@ bool ChatHandler::HandleClientInfosCommand(char* args)
         return false;
 
     PSendSysMessage("Account %s has %u client identifiers.", player->GetSession()->GetUsername().c_str(), player->GetSession()->GetClientIdentifiers().size());
-    for (const auto & it : player->GetSession()->GetClientIdentifiers())
+    for (const auto& it : player->GetSession()->GetClientIdentifiers())
         PSendSysMessage("%u: %s", it.first, it.second.c_str());
     player->GetSession()->ComputeClientHash();
     PSendSysMessage("Hash is %s", playerLink(player->GetSession()->GetClientHash()).c_str());
@@ -1083,7 +1083,7 @@ bool ChatHandler::HandleClientSearchCommand(char* args)
     std::string searchedHash = args;
     uint32 i = 0;
     World::SessionMap const& sessMap = sWorld.GetAllSessions();
-    for (const auto & itr : sessMap)
+    for (const auto& itr : sessMap)
     {
         if (!itr.second)
             continue;

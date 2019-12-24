@@ -290,7 +290,7 @@ struct boss_rajaxxAI : public ScriptedAI
         if (helpers.empty())
             return;
         int alive = 0;
-        for (auto it : helpers)
+        for (const auto it : helpers)
             if (it->IsAlive()) ++alive;
 
         if (Player* pLootRecepient = m_creature->GetLootRecipient()) {

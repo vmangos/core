@@ -318,7 +318,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         bool bOpenEntrance = false;
         std::list<Creature*> lst;
         GetCreatureListWithEntryInGrid(lst, m_creature, NPC_ANUBISATH_DEFENDER, 800);
-        for (auto pCreature : lst)
+        for (const auto pCreature : lst)
         {
             if (pCreature->IsDead()) continue;
             pCreature->SetActiveObjectState(true);
@@ -857,7 +857,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         if (tList.empty())
             return nullptr;
 
-        for (auto i : tList) {
+        for (const auto i : tList) {
             Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
             if (!pUnit) continue;
 

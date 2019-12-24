@@ -133,7 +133,7 @@ struct boss_grobbulusAI : public ScriptedAI
         std::vector<Unit*> suitableTargets;
         ThreatList const& threatList = m_creature->GetThreatManager().getThreatList();
 
-        for (auto itr : threatList)
+        for (const auto itr : threatList)
         {
             if (Unit* pTarget = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
             {

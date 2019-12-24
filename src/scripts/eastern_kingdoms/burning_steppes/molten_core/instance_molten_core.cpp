@@ -218,7 +218,7 @@ struct instance_molten_core : ScriptedInstance
                 GetCreatureListWithEntryInGrid(DomoListe, pCreature, NPC_DOMO, 150.0f);
                 if (!DomoListe.empty())
                 {
-                    for (const auto & itr : DomoListe)
+                    for (const auto& itr : DomoListe)
                     {
                         if (itr->IsAlive() && !itr->IsInCombat())
                             itr->SetInCombatWith(victim);

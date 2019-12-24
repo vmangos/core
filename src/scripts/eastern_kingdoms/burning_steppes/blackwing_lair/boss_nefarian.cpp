@@ -211,7 +211,7 @@ struct boss_nefarianAI : ScriptedAI
         // Clear mage GUIDs or we'll be adding the same players again for subsequent
         // mage class calls, resulting in far more polymorphs than intended
         MagePlayerGUID.clear();
-        for (const auto & itr : players)
+        for (const auto& itr : players)
         {
             Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive())
@@ -415,7 +415,7 @@ struct boss_nefarianAI : ScriptedAI
                         {
                             std::vector<ObjectGuid> m_vPossibleVictim;
                             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                            for (auto itr2 : tList)
+                            for (const auto itr2 : tList)
                             {
                                 Unit* pUnit = m_creature->GetMap()->GetUnit(itr2->getUnitGuid());
                                 if (pUnit && pUnit->IsCreature() && pUnit->ToCreature()->IsTotem())
@@ -451,7 +451,7 @@ struct boss_nefarianAI : ScriptedAI
             std::list<GameObject*> GOListe;
             GetGameObjectListWithEntryInGrid(GOListe, m_creature, 179804, 200.0f);
 
-            for (const auto & itr : GOListe)
+            for (const auto& itr : GOListe)
             {
                 m_creature->SummonCreature(NPC_BONE_CONSTRUCT,
                     itr->GetPositionX(),

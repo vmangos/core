@@ -225,7 +225,7 @@ struct boss_loathebAI : public ScriptedAI
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
 
-        for (auto & eyeStalk : eyeStalks)
+        for (auto& eyeStalk : eyeStalks)
         {
             eyeStalk.currentState = EyeStalkInfo::COOLDOWN;
             eyeStalk.timer = urand(0, 10000);
@@ -296,7 +296,7 @@ struct boss_loathebAI : public ScriptedAI
     */
     void WhackAStalk(uint32 diff)
     {
-        for (auto & eyeStalk : eyeStalks)
+        for (auto& eyeStalk : eyeStalks)
         {
             if (eyeStalk.timer >= diff)
                 eyeStalk.timer -= diff;
@@ -360,7 +360,7 @@ struct boss_loathebAI : public ScriptedAI
     {
         if (pCreature->GetEntry() == NPC_EyeStalk)
         {
-            for (auto & eyeStalk : eyeStalks)
+            for (auto& eyeStalk : eyeStalks)
             {
                 if (eyeStalk.guid == pCreature->GetObjectGuid())
                 {
@@ -383,7 +383,7 @@ struct boss_loathebAI : public ScriptedAI
         if (pCreature->GetEntry() == NPC_EyeStalk)
         {
             // was killed, so it receives an additional 10 seconds cooldown
-            for (auto & eyeStalk : eyeStalks)
+            for (auto& eyeStalk : eyeStalks)
             {
                 if (eyeStalk.guid == pCreature->GetObjectGuid())
                 {

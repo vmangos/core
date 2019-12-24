@@ -112,7 +112,7 @@ class AuctionHouseObject
         AuctionHouseObject() {}
         ~AuctionHouseObject()
         {
-            for (const auto & itr : AuctionsMap)
+            for (const auto& itr : AuctionsMap)
                 delete itr.second;
         }
 

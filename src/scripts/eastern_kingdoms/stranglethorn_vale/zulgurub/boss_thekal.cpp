@@ -333,7 +333,7 @@ struct boss_thekalAI : public zg_rez_add
             // Mettre tout le monde en combat.
             DEBUG_UNIT(m_creature, DEBUG_AI, "Thekal fake death. Put map in combat.");
             Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
-            for (const auto & player : players)
+            for (const auto& player : players)
                 if (player.getSource()->GetDistance(m_creature) < 200.0f)
                 {
                     player.getSource()->SetCombatTimer(20000);
@@ -433,7 +433,7 @@ struct boss_thekalAI : public zg_rez_add
                     Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
                     float nearestDist = 200.0f;
                     Player* target = nullptr;
-                    for (const auto & player : players)
+                    for (const auto& player : players)
                         if (m_creature->CanAttack(player.getSource()))
                             if (player.getSource()->GetDistance(m_creature) < nearestDist)
                             {

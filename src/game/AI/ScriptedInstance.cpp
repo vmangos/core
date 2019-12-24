@@ -129,7 +129,7 @@ Player* ScriptedInstance::GetPlayerInMap(bool bOnlyAlive /*=false*/, bool bCanBe
 {
     Map::PlayerList const& lPlayers = instance->GetPlayers();
 
-    for (const auto & itr : lPlayers)
+    for (const auto& itr : lPlayers)
     {
         Player* pPlayer = itr.getSource();
         if (pPlayer && (!bOnlyAlive || pPlayer->IsAlive()) && (bCanBeGamemaster || !pPlayer->IsGameMaster()))

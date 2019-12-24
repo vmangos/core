@@ -384,7 +384,7 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
 
     Unit::SpellAuraHolderMap const& uAuras = unit->GetSpellAuraHolderMap();
     PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, uAuras.size());
-    for (const auto & aura : uAuras)
+    for (const auto& aura : uAuras)
     {
         bool talent = GetTalentSpellCost(aura.second->GetId()) > 0;
 

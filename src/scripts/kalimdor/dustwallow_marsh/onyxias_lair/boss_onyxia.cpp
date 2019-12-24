@@ -235,7 +235,7 @@ struct boss_onyxiaAI : public ScriptedAI
         if (!m_creature->IsInCombat() && !m_creature->IsInEvadeMode())
         {
             Map::PlayerList const& lPlayers = m_creature->GetMap()->GetPlayers();
-            for (const auto & itr : lPlayers)
+            for (const auto& itr : lPlayers)
             {
                 if (Player* pPlayer = itr.getSource())
                 {
@@ -303,7 +303,7 @@ struct boss_onyxiaAI : public ScriptedAI
 
         std::list<Creature*> WarderList;
         GetCreatureListWithEntryInGrid(WarderList, m_creature, NPC_ONYXIAN_WARDER, 200.0f);
-        for (const auto & itr : WarderList)
+        for (const auto& itr : WarderList)
             if (!itr->IsAlive())
                 itr->Respawn();
     }
@@ -318,7 +318,7 @@ struct boss_onyxiaAI : public ScriptedAI
     {
         std::list<Creature*> WhelpList;
         GetCreatureListWithEntryInGrid(WhelpList, m_creature, NPC_ONYXIAN_WHELP, 200.0f);
-        for (const auto & itr : WhelpList)
+        for (const auto& itr : WhelpList)
             itr->ForcedDespawn();
         
         ScriptedAI::EnterEvadeMode();

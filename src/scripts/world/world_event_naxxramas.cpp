@@ -246,7 +246,7 @@ struct npc_necrotic_shard : public ScriptedAI
 
     void DespawnAdds()
     {
-        for (auto guid : _adds)
+        for (const auto& guid : _adds)
             if (Creature* add = m_creature->GetMap()->GetCreature(guid))
                 add->AddObjectToRemoveList();
         _adds.clear();

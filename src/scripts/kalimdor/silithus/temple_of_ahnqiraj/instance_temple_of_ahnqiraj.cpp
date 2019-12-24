@@ -383,7 +383,7 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         break;
     case TYPE_CTHUN:
         m_auiEncounter[uiType] = uiData;
-        for (const auto & guid : graspsOfCthun)
+        for (const auto& guid : graspsOfCthun)
         {
             if (GameObject* pGo = GetGameObject(guid))
                 pGo->SetVisible(uiData != DONE);
@@ -468,7 +468,7 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
     if (PlayerList.isEmpty())
         return;
 
-    for (const auto & itr : PlayerList)
+    for (const auto& itr : PlayerList)
     {
         if (Player* player = itr.getSource())
         {
@@ -790,7 +790,7 @@ struct AI_QirajiMindslayer : public ScriptedAI {
         Player* closestPlayer = nullptr;
         float closestDist = std::numeric_limits<float>::max();
         MapRefManager const &list = m_creature->GetMap()->GetPlayers();
-        for (const auto & i : list)
+        for (const auto& i : list)
         {
             if (Player* player = i.getSource()) {
                 if (player->IsAlive()) { 

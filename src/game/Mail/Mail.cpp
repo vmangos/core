@@ -192,7 +192,7 @@ bool MailDraft::prepareItems(Player* receiver)
  */
 void MailDraft::deleteIncludedItems(bool inDB /**= false*/)
 {
-    for (const auto & itr : m_items)
+    for (const auto& itr : m_items)
     {
         Item* item = itr.second;
 
@@ -226,7 +226,7 @@ void MailDraft::CloneFrom(MailDraft const& draft)
     m_money = draft.GetMoney();
     m_COD = draft.GetCOD();
 
-    for (const auto & itr : draft.m_items)
+    for (const auto& itr : draft.m_items)
     {
         Item* item = itr.second;
 
@@ -268,7 +268,7 @@ void MailDraft::SendReturnToSender(uint32 sender_acc, ObjectGuid sender_guid, Ob
 
         // set owner to new receiver (to prevent delete item with sender char deleting)
         CharacterDatabase.BeginTransaction();
-        for (const auto & itr : m_items)
+        for (const auto& itr : m_items)
         {
             Item* item = itr.second;
             item->SaveToDB();                      // item not in inventory and can be save standalone
@@ -332,7 +332,7 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
                                "VALUES ('%u', '%u', '%u', '%u', '%u', '%u', '%s', '%u', '%u', '" UI64FMTD "','" UI64FMTD "', '%u', '%u', '%u')",
                                mailId, sender.GetMailMessageType(), sender.GetStationery(), GetMailTemplateId(), sender.GetSenderId(), receiver.GetPlayerGuid().GetCounter(), safe_subject.c_str(), GetBodyId(), (has_items ? 1 : 0), (uint64)expire_time, (uint64)deliver_time, m_money, m_COD, checked);
 
-    for (const auto & itr : m_items)
+    for (const auto& itr : m_items)
     {
         Item* item = itr.second;
         CharacterDatabase.PExecute("INSERT INTO mail_items (mail_id,item_guid,item_template,receiver) VALUES ('%u', '%u', '%u','%u')",
@@ -353,7 +353,7 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
         m->money = GetMoney();
         m->COD = GetCOD();
 
-        for (const auto & itr : m_items)
+        for (const auto& itr : m_items)
         {
             Item* item = itr.second;
             m->AddItem(item->GetGUIDLow(), item->GetEntry());
@@ -372,7 +372,7 @@ void MailDraft::SendMailTo(MailReceiver const& receiver, MailSender const& sende
 
         if (!m_items.empty())
         {
-            for (const auto & itr : m_items)
+            for (const auto& itr : m_items)
                 masterReceiver->AddMItem(itr.second);
         }
     }

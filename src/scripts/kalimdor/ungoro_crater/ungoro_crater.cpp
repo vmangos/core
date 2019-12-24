@@ -653,7 +653,7 @@ struct npc_simone_seductressAI : public ScriptedAI
             {
                 ThreatList const& SimonetList = m_creature->GetThreatManager().getThreatList();
                 
-                for (auto itr : SimonetList)
+                for (const auto itr : SimonetList)
                 {
                     if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     {
@@ -670,7 +670,7 @@ struct npc_simone_seductressAI : public ScriptedAI
                 {
                     ThreatList const& PrecioustList = pPrecious->GetThreatManager().getThreatList();
                 
-                    for (auto itr : PrecioustList)
+                    for (const auto itr : PrecioustList)
                     {
                         if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                         {

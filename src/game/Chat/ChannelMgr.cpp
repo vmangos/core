@@ -43,7 +43,7 @@ ChannelMgr* channelMgr(Team team)
 
 ChannelMgr::~ChannelMgr()
 {
-    for (const auto & channel : channels)
+    for (const auto& channel : channels)
         delete channel.second;
 
     channels.clear();
@@ -124,7 +124,7 @@ void ChannelMgr::CreateDefaultChannels()
     GetJoinChannel("ChatSpam")->SetSecurityLevel(SEC_MODERATOR);
     GetJoinChannel("LowLevelBots")->SetSecurityLevel(SEC_GAMEMASTER);
 
-    for (const auto & channel : channels)
+    for (const auto& channel : channels)
         channel.second->SetAnnounce(false);
 }
 

@@ -45,7 +45,7 @@ void AddItemsSetItem(Player* player, Item* item)
 
     ItemSetEffect* eff = nullptr;
 
-    for (const auto & x : player->m_ItemSetEff)
+    for (const auto& x : player->m_ItemSetEff)
     {
         if (x && x->setid == setid)
         {
@@ -90,7 +90,7 @@ void AddItemsSetItem(Player* player, Item* item)
             continue;
 
         // new spell
-        for (auto & spell : eff->spells)
+        for (auto& spell : eff->spells)
         {
             if (!spell)                             // free slot
             {
@@ -148,7 +148,7 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
         if (set->items_to_triggerspell[x] <= eff->item_count)
             continue;
 
-        for (auto & spell : eff->spells)
+        for (auto& spell : eff->spells)
         {
             if (spell && spell->Id == set->spells[x])
             {

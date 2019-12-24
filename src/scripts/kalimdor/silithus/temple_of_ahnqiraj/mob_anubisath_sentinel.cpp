@@ -143,9 +143,9 @@ struct aqsentinelAI : public ScriptedAI
         {
             if (aqsentinelAI* sentinelAI = dynamic_cast<aqsentinelAI*>(buddy->AI()))
             {
-                for (auto iter : nearby)
+                for (const auto& guid : nearby)
                 {
-                    if (Creature* otherBuddy = m_creature->GetMap()->GetCreature(iter))
+                    if (Creature* otherBuddy = m_creature->GetMap()->GetCreature(guid))
                     {
                         sentinelAI->AddBuddyToList(otherBuddy);
                     }
@@ -157,17 +157,17 @@ struct aqsentinelAI : public ScriptedAI
 
     void SendMyListToBuddies()
     {
-        for (auto iter : nearby)
+        for (const auto& guid : nearby)
         {
-            GiveBuddyMyList(iter);
+            GiveBuddyMyList(guid);
         }
     }
 
     void CallBuddiesToAttack(Unit *who)
     {
-        for (auto iter : nearby)
+        for (const auto& guid : nearby)
         {
-            if (Creature* creature = m_creature->GetMap()->GetCreature(iter))
+            if (Creature* creature = m_creature->GetMap()->GetCreature(guid))
             {
                 if (creature->IsInCombat())
                     continue;
@@ -187,7 +187,7 @@ struct aqsentinelAI : public ScriptedAI
         if (assistList.empty())
             return;
 
-        for (const auto & iter : assistList)
+        for (const auto& iter : assistList)
             AddBuddyToList(iter);
     }
 
@@ -215,9 +215,9 @@ struct aqsentinelAI : public ScriptedAI
         ClearBuddyList();
         AddSentinelsNear(m_creature);
 
-        for (auto iter : nearby)
+        for (const auto& guid : nearby)
         {
-            if (Creature* buddy = m_creature->GetMap()->GetCreature(iter))
+            if (Creature* buddy = m_creature->GetMap()->GetCreature(guid))
             {
                 if (aqsentinelAI* sentinelAI = dynamic_cast<aqsentinelAI*>(buddy->AI()))
                 {
@@ -237,9 +237,9 @@ struct aqsentinelAI : public ScriptedAI
     {
         if (!m_creature->IsDead())
         {
-            for (auto iter : nearby)
+            for (const auto& guid : nearby)
             {
-                if (Creature* buddy = m_creature->GetMap()->GetCreature(iter))
+                if (Creature* buddy = m_creature->GetMap()->GetCreature(guid))
                 {
                     if (buddy->IsDead())
                         buddy->Respawn();
@@ -282,9 +282,9 @@ struct aqsentinelAI : public ScriptedAI
     void JustDied(Unit* killer) override
     {
         m_bAlone = true;
-        for (auto iter : nearby)
+        for (const auto& guid : nearby)
         {
-            if (Creature* buddy = m_creature->GetMap()->GetCreature(iter))
+            if (Creature* buddy = m_creature->GetMap()->GetCreature(guid))
             {
                 if (buddy->IsDead())
                     continue;

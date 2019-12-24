@@ -62,7 +62,7 @@ BattleGroundQueue::BattleGroundQueue()
 BattleGroundQueue::~BattleGroundQueue()
 {
     m_QueuedPlayers.clear();
-    for (auto & group : m_QueuedGroups)
+    for (auto& group : m_QueuedGroups)
     {
         for (uint32 j = 0; j < BG_QUEUE_GROUP_TYPES_COUNT; ++j)
         {
@@ -710,9 +710,9 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             FillPlayersToBG(bg, bracket_id);
 
             // now everything is set, invite players
-            for (auto itr : m_SelectionPools[BG_TEAM_ALLIANCE].SelectedGroups)
+            for (const auto itr : m_SelectionPools[BG_TEAM_ALLIANCE].SelectedGroups)
                 InviteGroupToBG(itr, bg, itr->GroupTeam);
-            for (auto itr : m_SelectionPools[BG_TEAM_HORDE].SelectedGroups)
+            for (const auto itr : m_SelectionPools[BG_TEAM_HORDE].SelectedGroups)
                 InviteGroupToBG(itr, bg, itr->GroupTeam);
 
             if (!bg->HasFreeSlots())
@@ -794,7 +794,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             }
             //invite those selection pools
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
-                for (auto itr : m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups)
+                for (const auto itr : m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups)
                     InviteGroupToBG(itr, bg2, itr->GroupTeam);
             //start bg
             bg2->SetLevelRange(q_min_level, q_max_level - 1);
@@ -819,7 +819,7 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
 
             // invite those selection pools
             for (uint32 i = 0; i < BG_TEAMS_COUNT; i++)
-                for (auto itr : m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups)
+                for (const auto itr : m_SelectionPools[BG_TEAM_ALLIANCE + i].SelectedGroups)
                     InviteGroupToBG(itr, bg2, itr->GroupTeam);
 
             // start bg
@@ -1119,7 +1119,7 @@ BattleGround * BattleGroundMgr::GetBattleGroundThroughClientInstance(uint32 inst
     if (!bg)
         return nullptr;
 
-    for (const auto & itr : m_BattleGrounds[bgTypeId])
+    for (const auto& itr : m_BattleGrounds[bgTypeId])
     {
         if (itr.second->GetClientInstanceID() == instanceId)
             return itr.second;

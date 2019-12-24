@@ -231,7 +231,7 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
 
     if (!PlayerList.isEmpty())
     {
-        for (const auto & itr : PlayerList)
+        for (const auto& itr : PlayerList)
         {
             if (Player* player = itr.getSource())
             {
@@ -1344,7 +1344,7 @@ struct cthunAI : public ScriptedAI
         // Force despawn any tentacles or portals alive. 
         std::list<Creature*> creaturesToDespawn;
         GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, allTentacleTypes, 2000.0f);
-        for (auto it : creaturesToDespawn) {
+        for (const auto it : creaturesToDespawn) {
             if (cthunPortalTentacle* cpt = dynamic_cast<cthunPortalTentacle*>(it->AI())) {
                 cpt->DespawnPortal();
             }
@@ -1519,7 +1519,7 @@ struct cthunAI : public ScriptedAI
             m_pInstance->SetData(TYPE_CTHUN, DONE);
             std::list<Creature*> creaturesToDespawn;
             GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, MOB_FLESH_TENTACLE, 2000.0f);
-            for (auto it : creaturesToDespawn) {
+            for (const auto it : creaturesToDespawn) {
                 if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(it)) {
                     ts->UnSummon();
                 }
@@ -1562,7 +1562,7 @@ struct cthunAI : public ScriptedAI
     {
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (const auto & itr : PlayerList)
+        for (const auto& itr : PlayerList)
         {
             Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())
@@ -1673,13 +1673,14 @@ struct cthunAI : public ScriptedAI
             sLog.outError("SpawnFleshTentacles() called, but there are already %i tentacles up.", fleshTentacles.size());
         }
         //Spawn 2 flesh tentacles in C'thun stomach
-        for (auto fleshTentaclePosition : fleshTentaclePositions) {
+        for (const auto& fleshTentaclePosition : fleshTentaclePositions)
+        {
             m_creature->SummonCreature(MOB_FLESH_TENTACLE,
-                fleshTentaclePosition[0],
-                fleshTentaclePosition[1],
-                fleshTentaclePosition[2],
-                fleshTentaclePosition[3],
-                TENTACLE_DESPAWN_FLAG, 1500);
+                                       fleshTentaclePosition[0],
+                                       fleshTentaclePosition[1],
+                                       fleshTentaclePosition[2],
+                                       fleshTentaclePosition[3],
+                                       TENTACLE_DESPAWN_FLAG, 1500);
         }
         
     }
@@ -1741,7 +1742,7 @@ struct cthunAI : public ScriptedAI
         //float radius = 30.0f;
         //float angle = 360.0f / 8.0f;
 
-        for (auto eyeTentaclePosition : eyeTentaclePositions)
+        for (const auto& eyeTentaclePosition : eyeTentaclePositions)
         {
             //float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
             //float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;

@@ -890,7 +890,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 if (factionEntry)
                 {
                     Map::PlayerList const &liste = GetMap()->GetPlayers();
-                    for (const auto & i : liste)
+                    for (const auto& i : liste)
                     {
                         if (Player* pPlayer = i.getSource())
                         {
@@ -953,7 +953,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 
                     bool bCanBegin = true;
 
-                    for (const auto & itr : lPlayers)
+                    for (const auto& itr : lPlayers)
                     {
                         if (Player* pPlayer = itr.getSource())
                         {
@@ -1127,7 +1127,7 @@ void instance_naxxramas::SetGothTriggers()
     if (!pGoth)
         return;
 
-    for (const auto & guid : m_lGothTriggerList)
+    for (const auto& guid : m_lGothTriggerList)
     {
         if (Creature* pTrigger = instance->GetCreature(guid))
         {
@@ -1144,7 +1144,7 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
 {
     std::list<Creature* > lList;
 
-    for (const auto & itr : m_mGothTriggerMap)
+    for (const auto& itr : m_mGothTriggerMap)
     {
         if (!itr.second.bIsAnchorHigh)
             continue;
@@ -1167,7 +1167,7 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
 
 void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide)
 {
-    for (const auto & itr : m_mGothTriggerMap)
+    for (const auto& itr : m_mGothTriggerMap)
     {
         if (itr.second.bIsAnchorHigh)
             continue;

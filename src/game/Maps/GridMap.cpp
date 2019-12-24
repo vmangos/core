@@ -679,7 +679,7 @@ void TerrainInfo::LoadAll()
 TerrainInfo::~TerrainInfo()
 {
     for (int k = 0; k < MAX_NUMBER_OF_GRIDS; ++k)
-        for (const auto & itr : m_GridMaps)
+        for (const auto& itr : m_GridMaps)
             delete itr[k];
 
     VMAP::VMapFactory::createOrGetVMapManager()->unloadMap(m_mapId);

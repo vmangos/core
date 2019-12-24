@@ -645,7 +645,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit* pVictim, uint32 damage, Aura
                     // find Mage Armor
                     bool found = false;
                     AuraList const& mRegenInterupt = GetAurasByType(SPELL_AURA_MOD_MANA_REGEN_INTERRUPT);
-                    for (auto iter : mRegenInterupt)
+                    for (const auto iter : mRegenInterupt)
                     {
                         if (SpellEntry const* iterSpellProto = iter->GetSpellProto())
                         {

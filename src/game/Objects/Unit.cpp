@@ -144,9 +144,9 @@ Unit::Unit()
     m_canModifyStats = false;
     m_modelCollisionHeight = 2.f;
 
-    for (auto & immunityList : m_spellImmune)
+    for (auto& immunityList : m_spellImmune)
         immunityList.clear();
-    for (auto & modifier : m_auraModifiersGroup)
+    for (auto& modifier : m_auraModifiersGroup)
     {
         modifier[BASE_VALUE] = 0.0f;
         modifier[BASE_PCT] = 1.0f;
@@ -242,7 +242,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 
     // Nostalrius : systeme de contresort des mobs.
     // Boucle 1 pour regler les timers
-    for (auto & it : m_prohibitSpell)
+    for (auto& it : m_prohibitSpell)
     {
         if (it.RestingMsTime < update_diff)
             it.RestingMsTime = 0;
@@ -3822,7 +3822,7 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode)
     holder->UnregisterSingleCastHolder();
     holder->HandleCastOnAuraRemoval();
 
-    for (auto aura : holder->m_auras)
+    for (const auto aura : holder->m_auras)
     {
         if (aura)
             RemoveAura(aura, mode);
@@ -4989,7 +4989,7 @@ void Unit::_AddTotem(TotemSlot slot, Totem* totem)
 
 void Unit::_RemoveTotem(Totem* totem)
 {
-    for (auto & guid : m_TotemSlot)
+    for (auto& guid : m_TotemSlot)
     {
         if (guid == totem->GetObjectGuid())
         {
@@ -7762,7 +7762,7 @@ CharmInfo::CharmInfo(Unit* unit)
       _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
       _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
 {
-    for (auto & itr : m_charmspells)
+    for (auto& itr : m_charmspells)
         itr.SetActionAndType(0, ACT_DISABLED);
 }
 
@@ -7880,7 +7880,7 @@ bool CharmInfo::AddSpellToActionBar(uint32 spell_id, ActiveStates newstate)
     uint32 first_id = sSpellMgr.GetFirstSpellInChain(spell_id);
 
     // new spell rank can be already listed
-    for (auto & i : PetActionBar)
+    for (auto& i : PetActionBar)
     {
         if (uint32 action = i.GetAction())
         {
@@ -7928,7 +7928,7 @@ void CharmInfo::ToggleCreatureAutocast(uint32 spellid, bool apply)
     if (Spells::IsPassiveSpell(spellid))
         return;
 
-    for (auto & itr : m_charmspells)
+    for (auto& itr : m_charmspells)
         if (spellid == itr.GetAction())
             itr.SetType(apply ? ACT_ENABLED : ACT_DISABLED);
 }
@@ -7970,13 +7970,13 @@ void CharmInfo::LoadPetActionBar(std::string const& data)
 
 void CharmInfo::BuildActionBar(WorldPacket* data)
 {
-    for (const auto & i : PetActionBar)
+    for (const auto& i : PetActionBar)
         *data << uint32(i.packedData);
 }
 
 void CharmInfo::SetSpellAutocast(uint32 spell_id, bool state)
 {
-    for (auto & i : PetActionBar)
+    for (auto& i : PetActionBar)
     {
         if (spell_id == i.GetAction() && i.IsActionBarForSpell())
         {
@@ -10201,7 +10201,7 @@ void Unit::AddSpellAndCategoryCooldowns(SpellEntry const* spellInfo, uint32 item
     {
         if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itemId))
         {
-            for (const auto & itr : proto->Spells)
+            for (const auto& itr : proto->Spells)
             {
                 if (itr.SpellId == spellInfo->Id)
                 {

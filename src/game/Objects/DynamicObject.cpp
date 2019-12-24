@@ -193,7 +193,7 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
     if (m_aliveDuration == 0 && (!m_channeled || (caster->IsUnit() && static_cast<Unit*>(caster)->GetChannelObjectGuid() != GetObjectGuid())))
         deleteThis = true;
 
-    for (auto & iter : m_affected)
+    for (auto& iter : m_affected)
         iter.second += update_diff;
 
     // have radius and work as persistent effect

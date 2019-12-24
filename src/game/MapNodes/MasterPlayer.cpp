@@ -22,7 +22,7 @@ MasterPlayer::~MasterPlayer()
     for (PlayerMails::const_iterator itr =  m_mail.begin(); itr != m_mail.end(); ++itr)
         delete *itr;
 
-    for (const auto & itr : mMitems)
+    for (const auto& itr : mMitems)
         delete itr.second;                                //if item is duplicated... then server may crash ... but that item should be deallocated
 }
 
@@ -33,7 +33,7 @@ void MasterPlayer::Create(Player* player)
     ASSERT(info);
 
     // original action bar
-    for (auto action_itr : info->action)
+    for (const auto& action_itr : info->action)
         addActionButton(action_itr.button, action_itr.action, action_itr.type);
 }
 
@@ -126,7 +126,7 @@ void MasterPlayer::SaveMails()
             if (m->HasItems())
             {
                 SqlStatement stmt = CharacterDatabase.CreateStatement(deleteItem, "DELETE FROM item_instance WHERE guid = ?");
-                for (auto item : m->items)
+                for (const auto& item : m->items)
                     stmt.PExecute(item.item_guid);
             }
 

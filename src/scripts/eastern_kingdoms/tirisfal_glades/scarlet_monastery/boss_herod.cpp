@@ -106,7 +106,7 @@ struct boss_herodAI : ScriptedAI
         if (!victim)
             return;
 
-        for (const auto & guid : m_lMyrmidonGuids)
+        for (const auto& guid : m_lMyrmidonGuids)
         {
             if (auto pMyrmidon = m_creature->GetMap()->GetCreature(guid))
             {
@@ -133,7 +133,7 @@ struct boss_herodAI : ScriptedAI
 
     void DespawnMyrmidons()
     {
-        for (const auto & guid : m_lMyrmidonGuids)
+        for (const auto& guid : m_lMyrmidonGuids)
         {
             if (auto pMyrmidon = m_creature->GetMap()->GetCreature(guid))
             {

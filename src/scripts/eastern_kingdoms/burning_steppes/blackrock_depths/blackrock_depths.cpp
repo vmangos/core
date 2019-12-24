@@ -472,7 +472,7 @@ struct npc_grimstoneAI : public npc_escortAI
 
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
 
-        for (const auto & itr : PlayerList)
+        for (const auto& itr : PlayerList)
         {
             Player *player = itr.getSource();
 
@@ -1511,7 +1511,7 @@ struct npc_watchman_doomgripAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(lGolems, m_creature, NPC_WARBRINGER_CONSTRUCT, 20.0f);
         if (!lGolems.empty())
         {
-            for (const auto & pGolem : lGolems)
+            for (const auto& pGolem : lGolems)
             {
                 if (pGolem->IsAlive())
                 {

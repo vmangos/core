@@ -209,7 +209,7 @@ public:
 
     GmTicket* GetTicketByPlayer(ObjectGuid playerGuid)
     {
-        for (const auto & itr : _ticketList)
+        for (const auto& itr : _ticketList)
             if (itr.second && itr.second->IsFromPlayer(playerGuid) && !itr.second->IsClosed())
                 return itr.second;
 
@@ -218,7 +218,7 @@ public:
 
     GmTicket* GetOldestOpenTicket()
     {
-        for (const auto & itr : _ticketList)
+        for (const auto& itr : _ticketList)
             if (itr.second && !itr.second->IsClosed() && !itr.second->IsCompleted())
                 return itr.second;
 
@@ -227,7 +227,7 @@ public:
 
     GmTicket* GetNextTicket(uint32 counter)
     {
-        for (const auto & itr : _ticketList)
+        for (const auto& itr : _ticketList)
             if (itr.first > counter && !itr.second->IsClosed() && !itr.second->IsCompleted())
                 return itr.second;
 

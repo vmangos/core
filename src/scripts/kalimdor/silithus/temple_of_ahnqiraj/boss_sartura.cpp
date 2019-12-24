@@ -510,7 +510,7 @@ struct mob_vekniss_guardianAI : public ScriptedAI
             std::list<Creature*> lAssistList;
             GetCreatureListWithEntryInGrid(lAssistList, m_creature, 15233, 45.0f);
 
-            for (const auto & itr : lAssistList)
+            for (const auto& itr : lAssistList)
             {
                 if (itr->GetObjectGuid() == m_creature->GetObjectGuid())
                     continue;

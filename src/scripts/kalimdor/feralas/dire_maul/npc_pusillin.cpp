@@ -51,7 +51,7 @@ struct npc_pusillinAI : public ScriptedAI
     {
         std::list<Creature*> m_impList;
         GetCreatureListWithEntryInGrid(m_impList, ME, 13276, 100.0f);
-        for (const auto & it : m_impList)
+        for (const auto& it : m_impList)
             it->Attack(pWho,true);
     }
 

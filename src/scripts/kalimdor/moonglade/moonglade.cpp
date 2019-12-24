@@ -1409,7 +1409,7 @@ struct boss_eranikusAI : public ScriptedAI
         if (!m_creature->IsWithinMeleeRange(pTarget))
         {
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (auto itr : tList)
+            for (const auto itr : tList)
             {
                 if (Unit* pAttacker = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     if (m_creature->IsWithinMeleeRange(pAttacker))

@@ -386,7 +386,7 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void EvadeAllGuardians()
     {
-        for (const auto & guardian : guardians)
+        for (const auto& guardian : guardians)
         {
             if (Creature* pCreature = m_pInstance->GetCreature(guardian.first))
             {
@@ -397,7 +397,7 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void DespawnAllIntroCreatures()
     {
-        for (const auto & guid : p1_adds)
+        for (const auto& guid : p1_adds)
         {
             if (Creature* pSoldier = m_pInstance->instance->GetCreature(guid))
                 ((TemporarySummon*)pSoldier)->UnSummon();
@@ -435,7 +435,7 @@ struct boss_kelthuzadAI : public ScriptedAI
 
         m_pInstance->DoUseDoorOrButton(pullPortalGuid);
 
-        for (auto alcove : alcoves)
+        for (const auto& alcove : alcoves)
         {
             for (int j = 0; j < 10; j++)
             {
@@ -457,7 +457,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                 }
             }
         }
-        for (auto position : abomPos)
+        for (const auto& position : abomPos)
         {
             if (Creature* pCreature = m_creature->SummonCreature(NPC_UNSTOPPABLE_ABOM, position[0], position[1], alcoveZ, frand(0, M_PI_F * 2),
                 TEMPSUMMON_MANUAL_DESPAWN))
@@ -467,7 +467,7 @@ struct boss_kelthuzadAI : public ScriptedAI
             }
 
         }
-        for (auto position : soulweaverPos)
+        for (const auto& position : soulweaverPos)
         {
             if (Creature* pCreature = m_creature->SummonCreature(NPC_SOUL_WEAVER, position[0], position[1], alcoveZ, frand(0, M_PI_F * 2),
                 TEMPSUMMON_MANUAL_DESPAWN))

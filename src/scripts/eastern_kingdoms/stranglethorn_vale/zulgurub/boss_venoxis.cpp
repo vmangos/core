@@ -109,7 +109,7 @@ struct boss_venoxisAI : public ScriptedAI
         m_bPhaseTwo = false;
         if (!lAddsGUIDs.empty())
         {
-            for (auto guid : lAddsGUIDs)
+            for (const auto& guid : lAddsGUIDs)
             {
                 if (Creature *pSerpent = m_creature->GetMap()->GetCreature(guid))
                     pSerpent->AddObjectToRemoveList();
@@ -128,7 +128,7 @@ struct boss_venoxisAI : public ScriptedAI
         // Despawn snakes immediately when we're running home.
         std::list<Creature*> cobras;
         GetCreatureListWithEntryInGrid(cobras, m_creature, NPC_RAZZASHI_COBRA, DEFAULT_VISIBILITY_INSTANCE);
-        for (auto cobra : cobras)
+        for (const auto cobra : cobras)
             cobra->ForcedDespawn();
         
         ScriptedAI::EnterEvadeMode();
@@ -142,7 +142,7 @@ struct boss_venoxisAI : public ScriptedAI
 
         if (!cobras.empty())
         {
-            for (auto cobra : cobras)
+            for (const auto cobra : cobras)
             {
                 if (cobra && !cobra->IsAlive())
                     cobra->Respawn();

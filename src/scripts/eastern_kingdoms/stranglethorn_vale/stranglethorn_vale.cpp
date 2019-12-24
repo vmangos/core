@@ -227,7 +227,7 @@ struct npc_molthorAI : public npc_escortAI
         if (!player)
             return;
 
-        for (auto emitterPosition : emitterPositions)
+        for (const auto& emitterPosition : emitterPositions)
         {
             float x = emitterPosition[0];
             float y = emitterPosition[1];
@@ -342,7 +342,7 @@ struct npc_heart_of_hakkarAI : public ScriptedAI
 
     void SummonServants()
     {
-        for (auto servantPosition : servantPositions)
+        for (const auto& servantPosition : servantPositions)
         {
             float x = servantPosition[0];
             float y = servantPosition[1];

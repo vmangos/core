@@ -214,7 +214,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
 
     if (cSpells)
     {
-        for (const auto & itr : cSpells->spellList)
+        for (const auto& itr : cSpells->spellList)
         {
             TrainerSpell const* tSpell = &itr.second;
 
@@ -233,7 +233,7 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
 
     if (tSpells)
     {
-        for (const auto & itr : tSpells->spellList)
+        for (const auto& itr : tSpells->spellList)
         {
             TrainerSpell const* tSpell = &itr.second;
 
@@ -604,7 +604,7 @@ void WorldSession::SendStablePet(ObjectGuid guid)
     CharPetMap const& pets = sCharacterDatabaseCache.GetCharPetsMap();
     CharPetMap::const_iterator myPets = pets.find(GetPlayer()->GetGUIDLow());
     if (myPets != pets.end())
-        for (auto it : myPets->second)
+        for (const auto it : myPets->second)
             if (it->slot >= PET_SAVE_FIRST_STABLE_SLOT && it->slot <= PET_SAVE_LAST_STABLE_SLOT)
             {
                 data << uint32(it->id);                 // petnumber
@@ -690,7 +690,7 @@ void WorldSession::HandleStablePet(WorldPacket& recv_data)
     CharPetMap const& pets = sCharacterDatabaseCache.GetCharPetsMap();
     CharPetMap::const_iterator myPets = pets.find(GetPlayer()->GetGUIDLow());
     if (myPets != pets.end())
-        for (auto it : myPets->second)
+        for (const auto it : myPets->second)
             if (it->slot >= PET_SAVE_FIRST_STABLE_SLOT && it->slot <= PET_SAVE_LAST_STABLE_SLOT)
                 usedSlots[it->slot - PET_SAVE_FIRST_STABLE_SLOT] = true;
 

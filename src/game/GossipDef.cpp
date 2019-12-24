@@ -377,7 +377,7 @@ void QuestMenu::AddMenuItem(uint32 QuestId, uint8 Icon)
 
 bool QuestMenu::HasItem(uint32 questid)
 {
-    for (auto qItem : m_qItems)
+    for (const auto& qItem : m_qItems)
         if (qItem.m_qId == questid)
             return true;
     return false;

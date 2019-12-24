@@ -364,7 +364,7 @@ struct go_pile_dechetsAI: public GameObjectAI
 
                 Map::PlayerList const& players = Guru->GetMap()->GetPlayers();
                 bool OtherPlayerFound = false;
-                for (const auto & itr : players)
+                for (const auto& itr : players)
                 {
                     Player* pPlayer = itr.getSource();
                     if (pPlayer && pPlayer->IsAlive() && pUser->IsWithinDistInMap(pPlayer, 60.0f) && pUser->IsWithinLOSInMap(pPlayer) &&
@@ -410,7 +410,7 @@ struct go_pile_dechetsAI: public GameObjectAI
                     GetCreatureListWithEntryInGrid(MobList, Guru, 14826, 45.0f);          // Troll sacrifié
                     GetCreatureListWithEntryInGrid(MobList, Guru, 11351, 45.0f);          // Chasseur tête
 
-                    for (const auto & itr : MobList)
+                    for (const auto& itr : MobList)
                     {
                         if (pUser->IsWithinLOSInMap(itr) && pUser->IsWithinDistInMap(itr, 45.0f) && itr->IsAlive())
                         {

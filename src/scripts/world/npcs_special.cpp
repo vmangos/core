@@ -429,11 +429,11 @@ void npc_doctorAI::BeginEvent(Player* pPlayer)
     switch (m_creature->GetEntry())
     {
         case DOCTOR_ALLIANCE:
-            for (auto & allianceCoord : AllianceCoords)
+            for (auto& allianceCoord : AllianceCoords)
                 Coordinates.push_back(&allianceCoord);
             break;
         case DOCTOR_HORDE:
-            for (auto & hordeCoord : HordeCoords)
+            for (auto& hordeCoord : HordeCoords)
                 Coordinates.push_back(&hordeCoord);
             break;
     }
@@ -1217,7 +1217,7 @@ struct rat_des_profondeursAI : public ScriptedAI
             // Et on ".die" les autres rats.
             std::list<Creature*> pCreaList;
             m_creature->GetCreatureListWithEntryInGrid(pCreaList, NPC_RAT_ENSORCELE, 100.0f);
-            for (const auto & pCreature : pCreaList)
+            for (const auto& pCreature : pCreaList)
             {
                 if (pCreature->AI()->GetData(0) == m_FollowingPlayerGuid.GetCounter())
                     pCreature->DisappearAndDie();

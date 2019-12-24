@@ -84,7 +84,7 @@ void ElementalInvasion::Enable()
 
 void ElementalInvasion::Disable()
 {
-    for (const auto & i : InvasionData)
+    for (const auto& i : InvasionData)
     {
         // Stop rifts
         if (sGameEventMgr.IsActiveEvent(i.eventRift))
@@ -140,7 +140,7 @@ void ElementalInvasion::StopLocalInvasion(uint8 index, uint32 stage, uint8 delay
 
 void ElementalInvasion::ResetThings()
 {
-    for (const auto & i : InvasionData)
+    for (const auto& i : InvasionData)
     {
         // reset delays for each sub
         sObjectMgr.SetSavedVariable(i.varDelay, 3, true);
@@ -828,7 +828,7 @@ void ScourgeInvasionEvent::Update()
 
     time_t now = time(nullptr);
 
-    for (auto & invasionPoint : invasionPoints)
+    for (auto& invasionPoint : invasionPoints)
     {
         uint32 numNecrosAlive = 0;
         for (auto& point : invasionPoint.points)
@@ -1112,7 +1112,7 @@ bool ScourgeInvasionEvent::SummonNecropolis(Map* pMap, InvasionNecropolis& point
 
 bool ScourgeInvasionEvent::isValidZoneId(uint32 zoneId)
 {
-    for (const auto & invasionPoint : invasionPoints)
+    for (const auto& invasionPoint : invasionPoints)
         if (invasionPoint.zoneId == zoneId)
             return true;
 
@@ -1121,7 +1121,7 @@ bool ScourgeInvasionEvent::isValidZoneId(uint32 zoneId)
 
 ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetZone(uint32 zoneId)
 {
-    for (auto & invasionPoint : invasionPoints)
+    for (auto& invasionPoint : invasionPoints)
     {
         if (invasionPoint.zoneId == zoneId)
             return &invasionPoint;
@@ -1133,7 +1133,7 @@ ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetZone(uint32 zoneId)
 uint32 ScourgeInvasionEvent::GetNewRandomZone(uint32 curr1, uint32 curr2)
 {
     std::vector<uint32> validZones;
-    for (const auto & invasionPoint : invasionPoints)
+    for (const auto& invasionPoint : invasionPoints)
     {
         if (invasionPoint.zoneId != curr1 && invasionPoint.zoneId != curr2)
             validZones.push_back(invasionPoint.zoneId);
@@ -1183,7 +1183,7 @@ void ScourgeInvasionEvent::UpdateWorldState()
         return;
     }
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
-    for (const auto & itr : m)
+    for (const auto& itr : m)
     {
         Player* pl = itr.second;
         // do not process players which are not in world
@@ -1471,7 +1471,7 @@ void WarEffortEvent::CompleteWarEffort()
         EVENT_WAR_EFFORT_BATTLE_ZORA
     } };
 
-    for (const auto & itr : stopEvents)
+    for (const auto& itr : stopEvents)
         DisableAndStopEvent(itr);
 
     stage = WAR_EFFORT_STAGE_COMPLETE;
@@ -1516,7 +1516,7 @@ void WarEffortEvent::UpdateStageEvents()
         required.push_back(warEffortStageEvents[stage][i]);
     }
 
-    for (const auto & event : events)
+    for (const auto& event : events)
     {
         if (!event)
             continue;
@@ -1541,7 +1541,7 @@ void WarEffortEvent::UpdateStageEvents()
     }
 
     // Disable any remaining events
-    for (const auto & iter : active)
+    for (const auto& iter : active)
         DisableAndStopEvent(iter);
 
     // Enable any events that need to be enabled
@@ -1619,7 +1619,7 @@ void WarEffortEvent::UpdateHiveColossusEvents()
     if (colossusMask & WAR_EFFORT_REGAL_REWARD)
         events.push_back(EVENT_WAR_EFFORT_BATTLE_REGAL);
 
-    for (auto event : events)
+    for (const auto event : events)
     {
         if (!sGameEventMgr.IsActiveEvent(event))
             sGameEventMgr.StartEvent(event, true);

@@ -717,7 +717,7 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
     if (list_queue)
     {
         std::vector<Item *>& updateQueue = player->GetItemUpdateQueue();
-        for (auto item : updateQueue)
+        for (const auto item : updateQueue)
         {
             if (!item) continue;
 
@@ -1656,25 +1656,25 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
         if (lootOwner)
             l.SetTeam(lootOwner->GetTeam());
         tab->Process(l, *store, store->IsRatesAllowed());
-        for (const auto & item : l.items)
+        for (const auto& item : l.items)
             if (!lootOwner || !item.conditionId)
                 lootChances[item.itemid]++;
-        for (const auto & m_questItem : l.m_questItems)
+        for (const auto& m_questItem : l.m_questItems)
             lootChances[m_questItem.itemid]++;
         if (lootOwner)
         {
             l.FillNotNormalLootFor(lootOwner);
             QuestItemMap::const_iterator itemsList = l.m_playerFFAItems.find(lootOwner->GetGUIDLow());
             if (itemsList != l.m_playerFFAItems.end())
-                for (auto it : *itemsList->second)
+                for (const auto& it : *itemsList->second)
                     lootChances[l.items[it.index].itemid]++;
             itemsList = l.m_playerQuestItems.find(lootOwner->GetGUIDLow());
             if (itemsList != l.m_playerQuestItems.end())
-                for (auto it : *itemsList->second)
+                for (const auto& it : *itemsList->second)
                     lootChances[l.m_questItems[it.index].itemid]++;
             itemsList = l.m_playerNonQuestNonFFAConditionalItems.find(lootOwner->GetGUIDLow());
             if (itemsList != l.m_playerNonQuestNonFFAConditionalItems.end())
-                for (auto it : *itemsList->second)
+                for (const auto& it : *itemsList->second)
                     lootChances[l.items[it.index].itemid]++;
         }
 
@@ -1689,7 +1689,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
         }
     }
     PSendSysMessage("%u items dropped after %u attempts for loot %s.%u", lootChances.size(), simCount, tableName.c_str(), lootid);
-    for (const auto & itr : lootChances)
+    for (const auto& itr : lootChances)
     {
         if (itr.first == checkItem || !checkItem)
         {
@@ -1744,7 +1744,7 @@ bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, uint32 simCount)
     }
 
     PSendSysMessage("%u items dropped after %u attempts for item %s.", lootChances.size(), simCount, proto->Name1);
-    for (const auto & itr : lootChances)
+    for (const auto& itr : lootChances)
     {
         std::stringstream chance;
         chance << 100 * itr.second / float(simCount);
@@ -1896,7 +1896,7 @@ bool ChatHandler::HandleDebugExp(char*)
 
     cell.Visit(pair, visitor, *(selection->GetMap()), *selection, searchCreaturesRange);
 
-    for (auto target : targets)
+    for (const auto target : targets)
     {
         float x = target->GetPositionX() + moveDist * cos(target->GetOrientation());
         float y = target->GetPositionY() + moveDist * sin(target->GetOrientation());
@@ -2275,7 +2275,7 @@ bool ChatHandler::HandleMmapTestArea(char* args)
 
         float x, y, z;
         m_session->GetPlayer()->GetPosition(x, y, z);
-        for (const auto & itr : creatureList)
+        for (const auto& itr : creatureList)
         {
             if (itr->GetTypeId() != TYPEID_UNIT)
                 continue;
@@ -2345,7 +2345,7 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
     // this entry visible only to GM's with "gm on"
     static uint32 const WAYPOINT_NPC_ENTRY = 1;
     Creature* wp = nullptr;
-    for (auto & i : pointPath)
+    for (auto& i : pointPath)
     {
         if (transport)
             transport->CalculatePassengerPosition(i.x, i.y, i.z);

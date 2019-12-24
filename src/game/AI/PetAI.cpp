@@ -322,7 +322,7 @@ void PetAI::UpdateAI(uint32 const diff)
         }
 
         // deleted cached Spell objects
-        for (const auto & itr : targetSpellStore)
+        for (const auto& itr : targetSpellStore)
             itr.second->Delete();
     }
 

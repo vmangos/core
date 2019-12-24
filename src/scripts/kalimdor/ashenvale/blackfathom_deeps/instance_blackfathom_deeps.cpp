@@ -287,7 +287,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         float fX_resp, fY_resp, fZ_resp;
         pKelris->GetRespawnCoord(fX_resp, fY_resp, fZ_resp);
 
-        for (auto i : aWaveSummonInformation)
+        for (const auto& i : aWaveSummonInformation)
         {
             if (i.m_uiWaveIndex != uiWaveIndex)
                 continue;

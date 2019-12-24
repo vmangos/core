@@ -124,7 +124,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
     }
     PlayerSpellMap spells = me->GetSpellMap();
     usableSpells.clear();
-    for (const auto & spell : spells)
+    for (const auto& spell : spells)
     {
         if (spell.second.state == PLAYERSPELL_REMOVED || spell.second.disabled)
             continue;
@@ -163,7 +163,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : PlayerAI
     {
         bool foundSupRank = false;
         SpellEntry const* pCurrSpell_1 = sSpellMgr.GetSpellEntry(*(it));
-        for (const auto & usableSpell : usableSpells)
+        for (const auto& usableSpell : usableSpells)
         {
             SpellEntry const* pCurrSpell_2 = sSpellMgr.GetSpellEntry(usableSpell);
             if (pCurrSpell_2->SpellFamilyName == pCurrSpell_1->SpellFamilyName && pCurrSpell_2->SpellIconID == pCurrSpell_1->SpellIconID && pCurrSpell_2->SpellVisual == pCurrSpell_1->SpellVisual) // Meme sort, rangs differents

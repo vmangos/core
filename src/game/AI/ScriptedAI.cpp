@@ -176,7 +176,7 @@ void ScriptedAI::DoResetThreat()
     }
 
     ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-    for (auto itr : tList)
+    for (const auto itr : tList)
     {
         Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid());
 
@@ -378,7 +378,7 @@ void ScriptedAI::DoTeleportAll(float fX, float fY, float fZ, float fO)
         return;
 
     Map::PlayerList const& PlayerList = map->GetPlayers();
-    for (const auto & i : PlayerList)
+    for (const auto& i : PlayerList)
         if (Player* i_pl = i.getSource())
             if (i_pl->IsAlive())
                 i_pl->TeleportTo(me->GetMapId(), fX, fY, fZ, fO, TELE_TO_NOT_LEAVE_COMBAT);
@@ -397,7 +397,7 @@ void ScriptedAI::EnterVanish()
         return;
 
     ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-    for (auto itr : tList)
+    for (const auto itr : tList)
     {
         Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid());
 

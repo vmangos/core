@@ -243,7 +243,7 @@ struct boss_heiganAI : public ScriptedAI
             if (uiArea == (eruptionPhase % 6) || uiArea == 6 - (eruptionPhase % 6))
                 continue;
 
-            for (auto guid : m_pInstance->m_alHeiganTrapGuids[uiArea])
+            for (const auto& guid : m_pInstance->m_alHeiganTrapGuids[uiArea])
             {
                 if (GameObject* pTrap = m_pInstance->GetGameObject(guid))
                 {
@@ -255,7 +255,7 @@ struct boss_heiganAI : public ScriptedAI
             switch (uiArea)
             {
             case 0:
-                for (auto i : sect1SafeSpot)
+                for (const auto& i : sect1SafeSpot)
                     SendEruptCustomLocation(i[0], i[1], i[2]);
                 break;
             case 1:
@@ -265,7 +265,7 @@ struct boss_heiganAI : public ScriptedAI
                 SendEruptCustomLocation(sect3SafeSpot[0], sect3SafeSpot[1], sect3SafeSpot[2]);
                 break;
             case 3:
-                for (auto i : sect4SafeSpot)
+                for (const auto& i : sect4SafeSpot)
                     SendEruptCustomLocation(i[0], i[1], i[2]);
                 break;
             }
@@ -274,7 +274,7 @@ struct boss_heiganAI : public ScriptedAI
         // safespot avoidance in tunnel
         if (currentPhase == PHASE_DANCE)
         {
-            for (auto safespotFissure : safespotFissures)
+            for (const auto& safespotFissure : safespotFissures)
                 SendEruptCustomLocation(safespotFissure[0], safespotFissure[1], safespotFissure[2]);
         }
 
@@ -314,7 +314,7 @@ struct boss_heiganAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_ERUPT, Seconds(4));
         
         // the regular ones
-        for (auto eyeStalkPossition : eyeStalkPossitions)
+        for (const auto& eyeStalkPossition : eyeStalkPossitions)
         {
             SummmonPlagueCloud(eyeStalkPossition[0], eyeStalkPossition[1], eyeStalkPossition[2], eyeStalkPossition[3]);
         }
@@ -416,7 +416,7 @@ struct boss_heiganAI : public ScriptedAI
         // within 25yd range (radius of SPELL_MANABURN). If there is one we cast SPELL_MANABURN
         const auto& tl = m_creature->GetThreatManager().getThreatList();
         bool found_mana_in_range = false;
-        for (auto it : tl)
+        for (const auto it : tl)
         {
             if (Unit* pTarget = m_creature->GetMap()->GetUnit(it->getUnitGuid()))
             {

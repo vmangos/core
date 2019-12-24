@@ -35,7 +35,7 @@ GuildMgr::GuildMgr()
 
 GuildMgr::~GuildMgr()
 {
-    for (const auto & itr : m_GuildMap)
+    for (const auto& itr : m_GuildMap)
         delete itr.second;
 
     CleanUpPetitions();
@@ -43,7 +43,7 @@ GuildMgr::~GuildMgr()
 
 void GuildMgr::CleanUpPetitions()
 {
-    for (const auto & iter : m_petitionMap)
+    for (const auto& iter : m_petitionMap)
         delete iter.second; // will clean up signatures too
 
     m_petitionMap.clear();
@@ -74,7 +74,7 @@ Guild* GuildMgr::GetGuildById(uint32 guildId) const
 Guild* GuildMgr::GetGuildByName(std::string const& name) const
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
-    for (const auto & itr : m_GuildMap)
+    for (const auto& itr : m_GuildMap)
         if (itr.second->GetName() == name)
             return itr.second;
 
@@ -84,7 +84,7 @@ Guild* GuildMgr::GetGuildByName(std::string const& name) const
 Guild* GuildMgr::GetGuildByLeader(ObjectGuid const& guid) const
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
-    for (const auto & itr : m_GuildMap)
+    for (const auto& itr : m_GuildMap)
         if (itr.second->GetLeaderGuid() == guid)
             return itr.second;
 
@@ -254,7 +254,7 @@ void GuildMgr::LoadPetitions()
 
 Petition::~Petition()
 {
-    for (const auto & itr : m_signatures)
+    for (const auto& itr : m_signatures)
         delete itr;
 
     m_signatures.clear();
@@ -292,7 +292,7 @@ Petition* GuildMgr::GetPetitionById(uint32 id)
 Petition* GuildMgr::GetPetitionByCharterGuid(ObjectGuid const& charterGuid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
-    for (const auto & iter : m_petitionMap)
+    for (const auto& iter : m_petitionMap)
     {
         Petition* petition = iter.second;
         if (petition->GetCharterGuid() == charterGuid)
@@ -305,7 +305,7 @@ Petition* GuildMgr::GetPetitionByCharterGuid(ObjectGuid const& charterGuid)
 Petition* GuildMgr::GetPetitionByOwnerGuid(ObjectGuid const& ownerGuid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
-    for (const auto & iter : m_petitionMap)
+    for (const auto& iter : m_petitionMap)
     {
         Petition* petition = iter.second;
         if (petition->GetOwnerGuid() == ownerGuid)
@@ -350,7 +350,7 @@ void Petition::Delete()
 
 void Petition::BuildSignatureData(WorldPacket& data)
 {
-    for (auto signature : m_signatures)
+    for (const auto signature : m_signatures)
     {
         data << signature->GetSignatureGuid();
         data << 0;
@@ -396,7 +396,7 @@ PetitionSignature* Petition::GetSignatureForPlayer(Player* player)
 
 PetitionSignature* Petition::GetSignatureForAccount(uint32 accountId)
 {
-    for (auto signature : m_signatures)
+    for (const auto signature : m_signatures)
     {
         if (signature->GetSignatureAccountId() == accountId)
             return signature;
@@ -407,7 +407,7 @@ PetitionSignature* Petition::GetSignatureForAccount(uint32 accountId)
 
 PetitionSignature* Petition::GetSignatureForPlayerGuid(ObjectGuid const& guid)
 {
-    for (auto signature : m_signatures)
+    for (const auto signature : m_signatures)
     {
         if (signature->GetSignatureGuid() == guid)
             return signature;

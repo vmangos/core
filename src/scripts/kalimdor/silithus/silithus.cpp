@@ -224,7 +224,7 @@ struct go_pierre_ventsAI: public GameObjectAI
     uint32 SelectRandomBoss(uint32 stoneType)
     {
         std::vector<uint32> possibleBosses;
-        for (const auto & stone : windStonesBosses)
+        for (const auto& stone : windStonesBosses)
             if (stone.stoneType == stoneType)
                 possibleBosses.push_back(stone.summonEntry);
         ASSERT(!possibleBosses.empty());
@@ -294,7 +294,7 @@ struct go_pierre_ventsAI: public GameObjectAI
         //player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION + stoneType - 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
-        for (const auto & stone : windStonesBosses)
+        for (const auto& stone : windStonesBosses)
             if (stone.stoneType == stoneType)
                 if (player->HasItemCount(stone.reqItem, 1))
                     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, stone.gossipOption, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + stone.action);
@@ -329,7 +329,7 @@ struct go_pierre_ventsAI: public GameObjectAI
                 break;
         }
 
-        for (const auto & stone : windStonesBosses)
+        for (const auto& stone : windStonesBosses)
         {
             if (stone.stoneType == stoneType && action == GOSSIP_ACTION_INFO_DEF + stone.action)
             {
@@ -568,7 +568,7 @@ struct npc_solenorAI : public ScriptedAI
             {
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
 
-                for (auto itr : tList)
+                for (const auto itr : tList)
                 {
                     if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     {
@@ -1015,7 +1015,7 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             }
             case 2:
             {
-                for (const auto & guid : lCrystalGUIDs)
+                for (const auto& guid : lCrystalGUIDs)
                 {
                     if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(guid))
                         pCrystal->Use(m_creature);
@@ -1192,7 +1192,7 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             }
             case 27:
             {
-                for (const auto & guid : lCrystalGUIDs)
+                for (const auto& guid : lCrystalGUIDs)
                 {
                     if (GameObject* pCrystal = m_creature->GetMap()->GetGameObject(guid))
                         pCrystal->Delete();
@@ -1744,7 +1744,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void DoSummonDragons()
     {
-        for (const auto & spawnData : aEternalBoardNPCs)
+        for (const auto& spawnData : aEternalBoardNPCs)
             m_creature->SummonCreature(spawnData.m_uiEntry, spawnData.m_fX, spawnData.m_fY, spawnData.m_fZ, spawnData.m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
@@ -1772,7 +1772,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         }
 
         // Also summon the 3 anubisath conquerors
-        for (const auto & spawnData : aQirajiWarriors)
+        for (const auto& spawnData : aQirajiWarriors)
             m_creature->SummonCreature(NPC_ANUBISATH_CONQUEROR, spawnData.m_fX, spawnData.m_fY, spawnData.m_fZ, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
@@ -1787,7 +1787,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void AddKaldoreiThreat(Creature* npc)
     {
-        for (const auto & guid : m_lQirajiWarriorsList)
+        for (const auto& guid : m_lQirajiWarriorsList)
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(guid))
                 if (pTemp->GetEntry() == NPC_KALDOREI_INFANTRY)
                     npc->AddThreat(pTemp, 100.0f);
@@ -3072,7 +3072,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
                 if (!gruntList.empty())
                 {
-                    for (const auto & itr : gruntList)
+                    for (const auto& itr : gruntList)
                     {
                         if (itr->IsAlive())
                             DoScriptText(SAY_LINE_9, itr);

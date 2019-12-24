@@ -343,7 +343,7 @@ public:
 
     void SpawnPyramidWave(uint32 wave)
     {
-        for (const auto & pyramidSpawn : pyramidSpawns)
+        for (const auto& pyramidSpawn : pyramidSpawns)
         {
             if (pyramidSpawn[0] == (float)wave)
             {
@@ -356,7 +356,7 @@ public:
 
     bool IsWaveAllDead()
     {
-        for (const auto & guid : addsAtBase)
+        for (const auto& guid : addsAtBase)
         {
             if (Creature* add = instance->GetCreature(guid))
             {
@@ -364,7 +364,7 @@ public:
                     return false;
             }
         }
-        for (const auto & guid : movedadds)
+        for (const auto& guid : movedadds)
         {
             if (Creature* add = instance->GetCreature((guid)))
             {

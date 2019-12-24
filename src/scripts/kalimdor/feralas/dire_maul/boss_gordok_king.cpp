@@ -282,7 +282,7 @@ void boss_chorushAI::UpdateAIMage(uint32 const uiDiff)
     {
         bool m_bMeleeAttackers = false;
         Unit::AttackerSet attackers = m_creature->GetAttackers();
-        for (auto itr : attackers)
+        for (const auto itr : attackers)
             if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
                 {
@@ -302,7 +302,7 @@ void boss_chorushAI::UpdateAIMage(uint32 const uiDiff)
     {
         bool m_bMeleeAttackers = false;
         Unit::AttackerSet attackers = m_creature->GetAttackers();
-        for (auto itr : attackers)
+        for (const auto itr : attackers)
             if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
                 {
@@ -348,7 +348,7 @@ void boss_chorushAI::UpdateAIShaman(uint32 const uiDiff)
     {
         bool m_bMeleeAttackers = false;
         Unit::AttackerSet attackers = m_creature->GetAttackers();
-        for (auto itr : attackers)
+        for (const auto itr : attackers)
             if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
                 if (m_creature->IsInRange(attacker, 0.0f, 6.0f, false)) 
                 {
@@ -463,7 +463,7 @@ void boss_chorushAI::UpdateAIPrist(uint32 const uiDiff)
     {
         bool m_bMeleeAttackers = false;
         Unit::AttackerSet attackers = m_creature->GetAttackers();
-        for (auto itr : attackers)
+        for (const auto itr : attackers)
             if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
                 {

@@ -35,6 +35,6 @@ bool ChatHandler::HandleNodeServersSwitchCommand(char* args)
 void NodesMgr::ListServers(ChatHandler& handler)
 {
     handler.PSendSysMessage("%u nodes.", m_nodes.size());
-    for (const auto & node : m_nodes)
+    for (const auto& node : m_nodes)
         handler.PSendSysMessage("[%3u][%s] %s", node.first, node.second->IsConnectedToMaster() ? "MSTR" : "NODE", node.second->GetName());
 }

@@ -62,7 +62,7 @@ void WaypointManager::Load()
 
     std::set<uint32> movementScriptSet;
 
-    for (const auto & itr : sCreatureMovementScripts)
+    for (const auto& itr : sCreatureMovementScripts)
         movementScriptSet.insert(itr.first);
 
     // /////////////////////////////////////////////////////
@@ -595,22 +595,22 @@ void WaypointManager::Cleanup()
 
 void WaypointManager::Unload()
 {
-    for (auto & itr : m_pathMap)
+    for (auto& itr : m_pathMap)
         _clearPath(itr.second);
     m_pathMap.clear();
 
-    for (auto & itr : m_pathTemplateMap)
+    for (auto& itr : m_pathTemplateMap)
         _clearPath(itr.second);
     m_pathTemplateMap.clear();
 
-    for (auto & itr : m_pathSpecialMap)
+    for (auto& itr : m_pathSpecialMap)
         _clearPath(itr.second);
     m_pathSpecialMap.clear();
 }
 
 void WaypointManager::_clearPath(WaypointPath &path)
 {
-    for (const auto & itr : path)
+    for (const auto& itr : path)
     delete itr.second.behavior;
     path.clear();
 }
@@ -818,7 +818,7 @@ inline void CheckWPText(std::string table, uint32 entryOrGuid, uint32 point, Way
 
 void WaypointManager::CheckTextsExistance()
 {
-    for (const auto & path : m_pathMap)
+    for (const auto& path : m_pathMap)
     {
         for (const auto& point : path.second)
         {
@@ -829,7 +829,7 @@ void WaypointManager::CheckTextsExistance()
         }  
     }
 
-    for (const auto & path : m_pathTemplateMap)
+    for (const auto& path : m_pathTemplateMap)
     {
         for (const auto& point : path.second)
             if (point.second.behavior)
@@ -838,7 +838,7 @@ void WaypointManager::CheckTextsExistance()
             }
     }
 
-    for (const auto & path : m_pathSpecialMap)
+    for (const auto& path : m_pathSpecialMap)
     {
         for (const auto& point : path.second)
         {

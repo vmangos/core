@@ -72,7 +72,7 @@ struct boss_golemaggAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(ChiensListe, m_creature, 11672, 150.0f);
         if (!ChiensListe.empty())
         {
-            for (const auto & itr : ChiensListe)
+            for (const auto& itr : ChiensListe)
             {
                 if (itr->GetDeathState() == ALIVE)
                     itr->DealDamage(itr, itr->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);

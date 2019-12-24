@@ -54,7 +54,7 @@ ScriptMgr::ScriptMgr() : m_scheduledScripts(0)
 ScriptMgr::~ScriptMgr()
 {
     // Free resources before library unload
-    for (const auto & script : m_scripts)
+    for (const auto& script : m_scripts)
         delete script;
 
     m_scripts.clear();
@@ -1216,7 +1216,7 @@ void ScriptMgr::LoadGameObjectScripts()
     LoadScripts(sGameObjectScripts, "gameobject_scripts");
 
     // check ids
-    for (const auto & itr : sGameObjectScripts)
+    for (const auto& itr : sGameObjectScripts)
     {
         if (!sObjectMgr.GetGOData(itr.first))
             if (!sObjectMgr.IsExistingGameObjectGuid(itr.first))
@@ -1229,7 +1229,7 @@ void ScriptMgr::LoadQuestEndScripts()
     LoadScripts(sQuestEndScripts, "quest_end_scripts");
 
     // check ids
-    for (const auto & itr : sQuestEndScripts)
+    for (const auto& itr : sQuestEndScripts)
     {
         if (!sObjectMgr.GetQuestTemplate(itr.first) && !sObjectMgr.IsExistingQuestId(itr.first))
             sLog.outErrorDb("Table `quest_end_scripts` has not existing quest (Id: %u) as script id", itr.first);
@@ -1241,7 +1241,7 @@ void ScriptMgr::LoadQuestStartScripts()
     LoadScripts(sQuestStartScripts, "quest_start_scripts");
 
     // check ids
-    for (const auto & itr : sQuestStartScripts)
+    for (const auto& itr : sQuestStartScripts)
     {
         if (!sObjectMgr.GetQuestTemplate(itr.first) && !sObjectMgr.IsExistingQuestId(itr.first))
             sLog.outErrorDb("Table `quest_start_scripts` has not existing quest (Id: %u) as script id", itr.first);
@@ -1265,7 +1265,7 @@ void ScriptMgr::LoadSpellScripts()
     }
 
     // check ids
-    for (const auto & itr : sSpellScripts)
+    for (const auto& itr : sSpellScripts)
     {
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
 
@@ -1308,7 +1308,7 @@ void ScriptMgr::LoadEventScripts()
     CollectPossibleEventIds(eventIds);
 
     // Then check if all scripts are in above list of possible script entries
-    for (const auto & itr : sEventScripts)
+    for (const auto& itr : sEventScripts)
     {
         std::set<uint32>::const_iterator itr2 = eventIds.find(itr.first);
         if (itr2 == eventIds.end())
@@ -1383,7 +1383,7 @@ void ScriptMgr::LoadCreatureEventAIScripts()
     }
 
     // Then check if all scripts are in above list of used script Ids.
-    for (const auto & itr : sCreatureAIScripts)
+    for (const auto& itr : sCreatureAIScripts)
     {
         std::set<uint32>::const_iterator itr2 = actionIds.find(itr.first);
         if (itr2 == actionIds.end())
@@ -1408,7 +1408,7 @@ void ScriptMgr::CheckAllScriptTexts()
 
 void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts)
 {
-    for (const auto & script : scripts)
+    for (const auto& script : scripts)
     {
         for (ScriptMap::const_iterator itrM = script.second.begin(); itrM != script.second.end(); ++itrM)
         {
@@ -2276,7 +2276,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         "quest_end_scripts",
         "quest_start_scripts"
     };
-    for (const auto & script_table : script_tables)
+    for (const auto& script_table : script_tables)
     {
         // From SCRIPT_COMMAND_START_SCRIPT.
         result.reset(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command`=39", script_table));

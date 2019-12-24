@@ -121,7 +121,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
 
         if (!mograinesAssist.empty())
         {
-            for (const auto & itr : mograinesAssist)
+            for (const auto& itr : mograinesAssist)
             {
                 if (itr->IsAlive() && itr->AI())
                     itr->AI()->AttackStart(pWho);

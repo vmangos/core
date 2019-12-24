@@ -32,9 +32,9 @@ ZoneScriptMgr::ZoneScriptMgr()
 
 ZoneScriptMgr::~ZoneScriptMgr()
 {
-    for (const auto & itr : m_ZoneScriptsSet)
+    for (const auto& itr : m_ZoneScriptsSet)
         delete itr;
-    for (const auto & itr : m_ZoneScripts_Scripts)
+    for (const auto& itr : m_ZoneScripts_Scripts)
         delete itr;
 }
 
@@ -47,7 +47,7 @@ void ZoneScriptMgr::InitMapZoneScripts(uint32 mapId, Map* pMap)
 {
     ZoneScript* pScript = nullptr;
     uint32 counter = 0;
-    for (const auto & itr : m_ZoneScripts_Scripts)
+    for (const auto& itr : m_ZoneScripts_Scripts)
     {
         if (itr->GetMapId() != mapId)
             continue;
@@ -121,7 +121,7 @@ void ZoneScriptMgr::Update(uint32 diff)
     m_UpdateTimer += diff;
     if (m_UpdateTimer > OUTDOORPVP_OBJECTIVE_UPDATE_INTERVAL)
     {
-        for (auto itr : m_ZoneScriptsSet)
+        for (const auto itr : m_ZoneScriptsSet)
             itr->Update(m_UpdateTimer);
         m_UpdateTimer = 0;
     }
@@ -129,7 +129,7 @@ void ZoneScriptMgr::Update(uint32 diff)
 
 bool ZoneScriptMgr::HandleCustomSpell(Player* plr, uint32 spellId, GameObject* go)
 {
-    for (auto itr : m_ZoneScriptsSet)
+    for (const auto itr : m_ZoneScriptsSet)
     {
         if (itr->HandleCustomSpell(plr, spellId, go))
             return true;
@@ -148,7 +148,7 @@ ZoneScript * ZoneScriptMgr::GetZoneScript(uint32 zoneId)
 
 bool ZoneScriptMgr::HandleOpenGo(Player* plr, uint64 guid)
 {
-    for (auto itr : m_ZoneScriptsSet)
+    for (const auto itr : m_ZoneScriptsSet)
     {
         if (itr->HandleOpenGo(plr, guid))
             return true;
@@ -158,7 +158,7 @@ bool ZoneScriptMgr::HandleOpenGo(Player* plr, uint64 guid)
 
 void ZoneScriptMgr::HandleGossipOption(Player* plr, uint64 guid, uint32 gossipid)
 {
-    for (auto itr : m_ZoneScriptsSet)
+    for (const auto itr : m_ZoneScriptsSet)
     {
         if (itr->HandleGossipOption(plr, guid, gossipid))
             return;
@@ -167,7 +167,7 @@ void ZoneScriptMgr::HandleGossipOption(Player* plr, uint64 guid, uint32 gossipid
 
 void ZoneScriptMgr::HandleDropFlag(Player* plr, uint32 spellId)
 {
-    for (auto itr : m_ZoneScriptsSet)
+    for (const auto itr : m_ZoneScriptsSet)
     {
         if (itr->HandleDropFlag(plr, spellId))
             return;

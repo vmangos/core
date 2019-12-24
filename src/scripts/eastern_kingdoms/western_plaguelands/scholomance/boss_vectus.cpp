@@ -126,7 +126,7 @@ struct boss_vectusAI : public ScriptedAI
 
                     std::list<Creature*> creatures;
                     m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
-                    for (const auto & creature : creatures)
+                    for (const auto& creature : creatures)
                     {
                         creature->CastSpell(creature, SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, true);
                         if (CreatureGroup* myGroup = creature->GetCreatureGroup())
@@ -160,7 +160,7 @@ struct boss_vectusAI : public ScriptedAI
         {
             std::list<Creature*> creatures;
             m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
-            for (const auto & creature : creatures)
+            for (const auto& creature : creatures)
             {
                 creature->SetFactionTemplateId(14);
                 creature->AI()->AttackStart(m_creature->GetVictim());
@@ -244,7 +244,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         // set the viewing room and Marduk and Vectus to hostile on aggro
         std::list<Creature*> creatures;
         m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
-        for (const auto & creature : creatures)
+        for (const auto& creature : creatures)
             creature->SetFactionTemplateId(14);
 
         if (Creature* pMarduck = m_creature->FindNearestCreature(NPC_MARDUK_BLACKPOOL, 100.0f))

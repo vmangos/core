@@ -787,7 +787,7 @@ bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) 
     std::vector<uint32> spellGroupIds;
     std::vector<uint32>::iterator spellGroupIdsIt;
     // first = groupid, second = spellId
-    for (const auto & itr : mSpellGroupSpell)
+    for (const auto& itr : mSpellGroupSpell)
     {
         if (itr.second == spellId)
         {
@@ -808,7 +808,7 @@ bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) 
     for (spellGroupIdsIt = spellGroupIds.begin(); spellGroupIdsIt != spellGroupIds.end(); ++spellGroupIdsIt)
     {
         bool spellPassed = false;
-        for (const auto & itr : mSpellGroupSpell)
+        for (const auto& itr : mSpellGroupSpell)
         {
             if (itr.first != *(spellGroupIdsIt))
                 continue;
@@ -830,7 +830,7 @@ bool SpellMgr::ListLessPowerfullSpells(uint32 spellId, std::list<uint32>& list) 
     std::vector<uint32> spellGroupIds;
     std::vector<uint32>::iterator spellGroupIdsIt;
     // first = groupid, second = spellId
-    for (const auto & itr : mSpellGroupSpell)
+    for (const auto& itr : mSpellGroupSpell)
     {
         if (itr.second == spellId)
         {
@@ -850,7 +850,7 @@ bool SpellMgr::ListLessPowerfullSpells(uint32 spellId, std::list<uint32>& list) 
         return false;
     for (spellGroupIdsIt = spellGroupIds.begin(); spellGroupIdsIt != spellGroupIds.end(); ++spellGroupIdsIt)
     {
-        for (const auto & itr : mSpellGroupSpell)
+        for (const auto& itr : mSpellGroupSpell)
         {
             if (itr.first != *(spellGroupIdsIt))
                 continue;
@@ -1648,7 +1648,7 @@ void SpellMgr::LoadSpellChains()
     {
         // we can calculate ranks only after full data generation
         AbilitySpellPrevMap prevRanks;
-        for (const auto & ab_itr : mSkillLineAbilityMapBySpellId)
+        for (const auto& ab_itr : mSkillLineAbilityMapBySpellId)
         {
             uint32 spell_id = ab_itr.first;
 
@@ -1873,7 +1873,7 @@ void SpellMgr::LoadSpellChains()
     while (result->NextRow());
 
     // additional integrity checks
-    for (const auto & itr : mSpellChains)
+    for (const auto& itr : mSpellChains)
     {
         if (itr.second.prev)
         {
@@ -1921,7 +1921,7 @@ void SpellMgr::LoadSpellChains()
     }
 
     // fill next rank cache
-    for (const auto & itr : mSpellChains)
+    for (const auto& itr : mSpellChains)
     {
         uint32 spell_id = itr.first;
         SpellChainNode const& node = itr.second;
@@ -1934,7 +1934,7 @@ void SpellMgr::LoadSpellChains()
     }
 
     // check single rank redundant cases (single rank talents not added by default so this can be only custom cases)
-    for (const auto & itr : mSpellChains)
+    for (const auto& itr : mSpellChains)
     {
         // skip non-first ranks, and spells with additional reqs
         if (itr.second.rank > 1 || itr.second.req)

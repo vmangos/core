@@ -74,7 +74,7 @@ private:
 //Remove all data and free all memory
 void LootStore::Clear()
 {
-    for (const auto & itr : m_LootTemplates)
+    for (const auto& itr : m_LootTemplates)
         delete itr.second;
     m_LootTemplates.clear();
 }
@@ -83,7 +83,7 @@ void LootStore::Clear()
 // Actual checks are done within LootTemplate::Verify() which is called for every template
 void LootStore::Verify() const
 {
-    for (const auto & itr : m_LootTemplates)
+    for (const auto& itr : m_LootTemplates)
         itr.second->Verify(*this, itr.first);
 }
 
@@ -230,13 +230,13 @@ void LootStore::LoadAndCollectLootIds(LootIdSet& ids_set)
 {
     LoadLootTable();
 
-    for (const auto & itr : m_LootTemplates)
+    for (const auto& itr : m_LootTemplates)
         ids_set.insert(itr.first);
 }
 
 void LootStore::CheckLootRefs(LootIdSet* ref_set) const
 {
-    for (const auto & itr : m_LootTemplates)
+    for (const auto& itr : m_LootTemplates)
         itr.second->CheckLootRefs(ref_set);
 }
 
@@ -517,7 +517,7 @@ bool Loot::FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, 
                     FillNotNormalLootFor(pl);
                 }
             }
-        for (auto & item : items)
+        for (auto& item : items)
             if (ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item.itemid))
                 if (proto->Quality < uint32(group->GetLootThreshold()))
                     item.is_underthreshold = true;
@@ -534,7 +534,7 @@ bool Loot::IsAllowedLooter(ObjectGuid guid, bool doPersonalCheck) const
     if (doPersonalCheck && m_personal)
         return true;
 
-    for (auto itr : m_allowedLooters)
+    for (const auto& itr : m_allowedLooters)
         if (itr == guid)
             return true;
     return false;
@@ -760,7 +760,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, uint32 playerGuid, QuestItem** q
             QuestItemMap::const_iterator itr = m_playerFFAItems.find(playerGuid);
             if (itr != m_playerFFAItems.end())
             {
-                for (auto iter : *itr->second)
+                for (const auto& iter : *itr->second)
                     if (iter.index == lootSlot)
                     {
                         QuestItem* ffaitem2 = (QuestItem*) & iter;
@@ -776,7 +776,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, uint32 playerGuid, QuestItem** q
             QuestItemMap::const_iterator itr = m_playerNonQuestNonFFAConditionalItems.find(playerGuid);
             if (itr != m_playerNonQuestNonFFAConditionalItems.end())
             {
-                for (auto iter : *itr->second)
+                for (const auto& iter : *itr->second)
                 {
                     if (iter.index == lootSlot)
                     {
@@ -948,7 +948,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     if (ffa_itr != lootPlayerFFAItems.end())
     {
         QuestItemList *ffa_list = ffa_itr->second;
-        for (auto fi : *ffa_list)
+        for (const auto& fi : *ffa_list)
         {
             LootItem &item = l.items[fi.index];
             if (!fi.is_looted && !item.is_looted)
@@ -965,7 +965,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     if (nn_itr != lootPlayerNonQuestNonFFAConditionalItems.end())
     {
         QuestItemList *conditional_list =  nn_itr->second;
-        for (auto ci : *conditional_list)
+        for (const auto& ci : *conditional_list)
         {
             LootItem &item = l.items[ci.index];
 
@@ -994,7 +994,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 // return true if there is any item over the group threshold (i.e. not underthreshold).
 bool Loot::hasOverThresholdItem() const
 {
-    for (const auto & item : items)
+    for (const auto& item : items)
         if (!item.is_looted && !item.is_underthreshold && !item.freeforall)
             return true;
 
@@ -1009,7 +1009,7 @@ bool Loot::hasItemFor(Player* player) const
     if (q_itr != lootPlayerQuestItems.end())
     {
         QuestItemList *q_list = q_itr->second;
-        for (auto qi : *q_list)
+        for (const auto& qi : *q_list)
         {
             LootItem const& item = m_questItems[qi.index];
             if (!qi.is_looted && !item.is_looted)
@@ -1022,7 +1022,7 @@ bool Loot::hasItemFor(Player* player) const
     if (ffa_itr != lootPlayerFFAItems.end())
     {
         QuestItemList* ffa_list = ffa_itr->second;
-        for (auto fi : *ffa_list)
+        for (const auto& fi : *ffa_list)
         {
             LootItem const& item = items[fi.index];
             if (!fi.is_looted && !item.is_looted)
@@ -1035,7 +1035,7 @@ bool Loot::hasItemFor(Player* player) const
     if (nn_itr != lootPlayerNonQuestNonFFAConditionalItems.end())
     {
         QuestItemList* conditional_list =  nn_itr->second;
-        for (auto ci : *conditional_list)
+        for (const auto& ci : *conditional_list)
         {
             LootItem const& item = items[ci.index];
             if (!ci.is_looted && !item.is_looted)
@@ -1071,7 +1071,7 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot const& loot) const
     {
         float Roll = rand_chance_f();
 
-        for (const auto & i : ExplicitlyChanced) //check each explicitly chanced entry in the template and modify its chance based on quality.
+        for (const auto& i : ExplicitlyChanced) //check each explicitly chanced entry in the template and modify its chance based on quality.
         {
             if (!i.AllowedForTeam(loot))
                 continue;
@@ -1107,10 +1107,10 @@ LootStoreItem const* LootTemplate::LootGroup::Roll(Loot const& loot) const
 // True if group includes at least 1 quest drop entry
 bool LootTemplate::LootGroup::HasQuestDrop() const
 {
-    for (auto i : ExplicitlyChanced)
+    for (const auto& i : ExplicitlyChanced)
         if (i.needs_quest)
             return true;
-    for (auto i : EqualChanced)
+    for (const auto& i : EqualChanced)
         if (i.needs_quest)
             return true;
     return false;
@@ -1119,10 +1119,10 @@ bool LootTemplate::LootGroup::HasQuestDrop() const
 // True if group includes at least 1 quest drop entry for active quests of the player
 bool LootTemplate::LootGroup::HasQuestDropForPlayer(Player const* player) const
 {
-    for (auto i : ExplicitlyChanced)
+    for (const auto& i : ExplicitlyChanced)
         if (player->HasQuestForItem(i.itemid))
             return true;
-    for (auto i : EqualChanced)
+    for (const auto& i : EqualChanced)
         if (player->HasQuestForItem(i.itemid))
             return true;
     return false;
@@ -1141,7 +1141,7 @@ float LootTemplate::LootGroup::RawTotalChance() const
 {
     float result = 0;
 
-    for (auto i : ExplicitlyChanced)
+    for (const auto& i : ExplicitlyChanced)
         if (!i.needs_quest)
             result += i.chance;
 
@@ -1174,7 +1174,7 @@ void LootTemplate::LootGroup::Verify(LootStore const& lootstore, uint32 id, uint
 
 void LootTemplate::LootGroup::CheckLootRefs(LootIdSet* ref_set) const
 {
-    for (auto ieItr : ExplicitlyChanced)
+    for (const auto& ieItr : ExplicitlyChanced)
     {
         if (ieItr.mincountOrRef < 0)
         {
@@ -1185,7 +1185,7 @@ void LootTemplate::LootGroup::CheckLootRefs(LootIdSet* ref_set) const
         }
     }
 
-    for (auto ieItr : EqualChanced)
+    for (const auto& ieItr : EqualChanced)
     {
         if (ieItr.mincountOrRef < 0)
         {
@@ -1227,7 +1227,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, bool rate, uint8 
     }
 
     // Rolling non-grouped items
-    for (auto itr : Entries)
+    for (const auto& itr : Entries)
     {
         if (!itr.Roll(rate))
             continue;                                       // Bad luck for the entry
@@ -1247,7 +1247,7 @@ void LootTemplate::Process(Loot& loot, LootStore const& store, bool rate, uint8 
     }
 
     // Now processing groups
-    for (const auto & group : Groups)
+    for (const auto& group : Groups)
         group.Process(loot);
 }
 
@@ -1261,7 +1261,7 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
         return Groups[groupId - 1].HasQuestDrop();
     }
 
-    for (auto itr : Entries)
+    for (const auto& itr : Entries)
     {
         if (itr.mincountOrRef < 0)                          // References
         {
@@ -1276,7 +1276,7 @@ bool LootTemplate::HasQuestDrop(LootTemplateMap const& store, uint8 groupId) con
     }
 
     // Now processing groups
-    for (const auto & group : Groups)
+    for (const auto& group : Groups)
         if (group.HasQuestDrop())
             return true;
 
@@ -1294,7 +1294,7 @@ bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player co
     }
 
     // Checking non-grouped entries
-    for (auto itr : Entries)
+    for (const auto& itr : Entries)
     {
         if (itr.mincountOrRef < 0)                          // References processing
         {
@@ -1309,7 +1309,7 @@ bool LootTemplate::HasQuestDropForPlayer(LootTemplateMap const& store, Player co
     }
 
     // Now checking groups
-    for (const auto & group : Groups)
+    for (const auto& group : Groups)
         if (group.HasQuestDropForPlayer(player))
             return true;
 
@@ -1328,7 +1328,7 @@ void LootTemplate::Verify(LootStore const& lootstore, uint32 id) const
 
 void LootTemplate::CheckLootRefs(LootIdSet* ref_set) const
 {
-    for (auto itr : Entries)
+    for (const auto& itr : Entries)
     {
         if (itr.mincountOrRef < 0)
         {
@@ -1339,7 +1339,7 @@ void LootTemplate::CheckLootRefs(LootIdSet* ref_set) const
         }
     }
 
-    for (const auto & group : Groups)
+    for (const auto& group : Groups)
         group.CheckLootRefs(ref_set);
 }
 

@@ -559,7 +559,7 @@ struct instance_stratholme : public ScriptedInstance
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_5MIN);
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_1MIN);
 
-                            for (const auto & itr : players)
+                            for (const auto& itr : players)
                             {
                                 if (Player* pPlayer = itr.getSource())
                                 {
@@ -693,7 +693,7 @@ struct instance_stratholme : public ScriptedInstance
         //float y4 = -3544.6f;
 
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
-        for (const auto & itr : listeJoueur)
+        for (const auto& itr : listeJoueur)
         {
             /*
             la zone est un paralelograme
@@ -724,7 +724,7 @@ struct instance_stratholme : public ScriptedInstance
     bool JoueurDansPiegeRat2()
     {
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
-        for (const auto & itr : listeJoueur)
+        for (const auto& itr : listeJoueur)
         {
             if (itr.getSource()->IsAlive() && !itr.getSource()->IsGameMaster() && itr.getSource()->IsGMVisible() &&
                     itr.getSource()->GetPositionX() < 3621.32 && itr.getSource()->GetPositionX() > 3603.18 &&
@@ -771,7 +771,7 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (const auto & player : players)
+                    for (const auto& player : players)
                         if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_45MIN, EFFECT_INDEX_0))
                             player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_45MIN, true);
             }
@@ -784,7 +784,7 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (const auto & player : players)
+                    for (const auto& player : players)
                         if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_10MIN, EFFECT_INDEX_0))
                             player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_10MIN, true);
             }
@@ -797,7 +797,7 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (const auto & player : players)
+                    for (const auto& player : players)
                         if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_5MIN, EFFECT_INDEX_0))
                             player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_5MIN, true);
             }
@@ -814,7 +814,7 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (const auto & player : players)
+                    for (const auto& player : players)
                         if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_1MIN, EFFECT_INDEX_0))
                             player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_1MIN, true);
             }

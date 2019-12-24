@@ -366,7 +366,7 @@ void npc_shade_hakkarAI::SummonTheAvatar()
     std::list<GameObject*> circles;
     m_creature->GetGameObjectListWithEntryInGrid(circles, GO_EVIL_CIRCLE, 20);
 
-    for (auto go : circles)
+    for (const auto go : circles)
         go->Use(m_creature);
 
     m_creature->ForcedDespawn(500);

@@ -237,7 +237,7 @@ struct npc_snufflenose_gopherAI : public FollowerAI
         GameObject* pNearestTuber = nullptr;
 
         // Always need to find new ones
-        for (auto itr : lTubersInRange)
+        for (const auto itr : lTubersInRange)
         {
             if (IsValidTuber(itr))
             {
@@ -273,7 +273,7 @@ struct npc_snufflenose_gopherAI : public FollowerAI
             return false;
 
         // Check if tuber is in list of already found tubers
-        for (auto guid : m_foundTubers)
+        for (const auto& guid : m_foundTubers)
             if (tuber->GetObjectGuid() == guid)
                 return false;
 

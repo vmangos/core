@@ -108,7 +108,7 @@ public:
 
         // TODO: Guard Player map
         HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
-        for (const auto & itr : m)
+        for (const auto& itr : m)
         {
             Player* pPlayer = itr.second;
 

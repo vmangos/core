@@ -43,7 +43,7 @@ INSTANTIATE_CLASS_MUTEX(ObjectAccessor, ACE_Thread_Mutex);
 ObjectAccessor::ObjectAccessor() {}
 ObjectAccessor::~ObjectAccessor()
 {
-    for (const auto & itr : i_player2corpse)
+    for (const auto& itr : i_player2corpse)
     {
         if (itr.first.IsCorpse())
             continue;
@@ -164,7 +164,7 @@ ObjectAccessor::SaveAllPlayers()
 {
     HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
-    for (const auto & itr : m)
+    for (const auto& itr : m)
         itr.second->SaveToDB();
 }
 
@@ -234,7 +234,7 @@ void
 ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair, GridType& grid, Map* map)
 {
     Guard guard(i_corpseGuard);
-    for (const auto & iter : i_player2corpse)
+    for (const auto& iter : i_player2corpse)
     {
         if (!iter.first.IsPlayer())
             continue;

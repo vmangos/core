@@ -778,7 +778,7 @@ void Pet::RegenerateFocus()
     float addvalue = 25 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
 
     AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-    for (auto itr : ModPowerRegenPCTAuras)
+    for (const auto itr : ModPowerRegenPCTAuras)
         if (itr->GetModifier()->m_miscvalue == int32(POWER_FOCUS))
             addvalue *= (itr->GetModifier()->m_amount + 100) / 100.0f;
 
@@ -897,7 +897,7 @@ bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
 
     chainstartstore[0] = sSpellMgr.GetFirstSpellInChain(spellid);
 
-    for (const auto & itr : m_petSpells)
+    for (const auto& itr : m_petSpells)
     {
         if (itr.second.state == PETSPELL_REMOVED)
             continue;
@@ -949,7 +949,7 @@ int32 Pet::GetTPForSpell(uint32 spellid)
     uint32 spenttrainp = 0;
     uint32 chainstart = sSpellMgr.GetFirstSpellInChain(spellid);
 
-    for (const auto & itr : m_petSpells)
+    for (const auto& itr : m_petSpells)
     {
         if (itr.second.state == PETSPELL_REMOVED)
             continue;
@@ -1558,7 +1558,7 @@ void Pet::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8);
     data << GetObjectGuid();
     time_t curTime = time(nullptr);
-    for (const auto & itr : m_petSpells)
+    for (const auto& itr : m_petSpells)
     {
         if (itr.second.state == PETSPELL_REMOVED)
             continue;
@@ -1599,7 +1599,7 @@ void Pet::_LoadSpellCooldowns()
         data << ObjectGuid(GetObjectGuid());
         //[-ZERO] data << uint8(0x0);                                 // flags (0x1, 0x2)
 
-        for (const auto & it : m_pTmpCache->spellCooldown)
+        for (const auto& it : m_pTmpCache->spellCooldown)
         {
             //Field* fields = result->Fetch();
 
@@ -1680,7 +1680,7 @@ void Pet::_LoadSpells()
 
     if (m_pTmpCache)
     {
-        for (const auto & spell : m_pTmpCache->spells)
+        for (const auto& spell : m_pTmpCache->spells)
         {
             //Field* fields = result->Fetch();
             AddSpell(spell.spell, ActiveStates(spell.active), PETSPELL_UNCHANGED);
@@ -1756,7 +1756,7 @@ void Pet::_LoadAuras(uint32 timediff)
     //QueryResult* result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM pet_aura WHERE guid = '%u'",m_charmInfo->GetPetNumber());
     if (m_pTmpCache)
     {
-        for (const auto & it : m_pTmpCache->auras)
+        for (const auto& it : m_pTmpCache->auras)
         {
             ObjectGuid casterGuid  = ObjectGuid(it.caster_guid);
             uint32 item_lowguid = it.item_guid;
@@ -1856,7 +1856,7 @@ void Pet::_SaveAuras()
             "basepoints0, basepoints1, basepoints2, periodictime0, periodictime1, periodictime2, maxduration, remaintime, effIndexMask) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    for (const auto & auraHolder : auraHolders)
+    for (const auto& auraHolder : auraHolders)
     {
         SpellAuraHolder* holder = auraHolder.second;
 
@@ -2000,7 +2000,7 @@ bool Pet::AddSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpe
 
     if (sSpellMgr.GetSpellRank(spell_id) != 0)
     {
-        for (const auto & itr : m_petSpells)
+        for (const auto& itr : m_petSpells)
         {
             if (itr.second.state == PETSPELL_REMOVED) continue;
 

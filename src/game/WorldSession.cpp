@@ -111,7 +111,7 @@ WorldSession::~WorldSession()
 
     ///- empty incoming packet queue
     WorldPacket* packet = nullptr;
-    for (auto & i : _recvQueue)
+    for (auto& i : _recvQueue)
         while (i.next(packet))
             delete packet;
     SetDumpPacket(nullptr);
@@ -1290,7 +1290,7 @@ void WorldSession::AddClientIdentifier(uint32 i, std::string str)
 void WorldSession::ComputeClientHash()
 {
     std::stringstream oss;
-    for (const auto & itr : _clientIdentifiers)
+    for (const auto& itr : _clientIdentifiers)
     {
         Sha1Hash sha;
         sha.UpdateData(itr.second);

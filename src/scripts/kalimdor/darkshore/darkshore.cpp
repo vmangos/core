@@ -1370,7 +1370,7 @@ struct npc_murkdeepAI : public ScriptedAI
         switch (m_uiEventPhase)
         {
             case 1:
-                for (auto position : m_fSummonPoints)
+                for (const auto& position : m_fSummonPoints)
                     m_creature->SummonCreature(NPC_MURLOC_COATRUNNER,
                         position[0],
                         position[1],

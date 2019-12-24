@@ -468,7 +468,7 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         case TYPE_OSSIRIAN:
             if (uiData == FAIL || uiData == DONE)
             {
-                for (auto crystalGuid : crystalGuids)
+                for (const auto& crystalGuid : crystalGuids)
                 {
                     if (GameObject* invoc = instance->GetGameObject(crystalGuid))
                         invoc->AddObjectToRemoveList();
@@ -600,7 +600,7 @@ void instance_ruins_of_ahnqiraj::SetAndorovSquadRespawnTime(uint32 nextRespawnDe
         if (!pAndorov->IsAlive())
             pAndorov->SetRespawnTime(nextRespawnDelay);
     }
-    for (const auto & guid : m_lKaldoreiElites)
+    for (const auto& guid : m_lKaldoreiElites)
     {
         if (Creature* pElite = instance->GetCreature(guid))
         {
@@ -617,7 +617,7 @@ void instance_ruins_of_ahnqiraj::SetAndorovSquadFaction(uint32 faction)
         pAndorov->SetFactionTemplateId(faction);
         pAndorov->SetPvP(true);
     }
-    for (const auto & guid : m_lKaldoreiElites)
+    for (const auto& guid : m_lKaldoreiElites)
     {
         if (Creature* pElite = instance->GetCreature(guid))
         {
@@ -634,7 +634,7 @@ void instance_ruins_of_ahnqiraj::ForceAndorovSquadDespawn(uint32 timeToDespawn)
         pAndorov->ForcedDespawn(timeToDespawn);
         pAndorov->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
     }
-    for (const auto & guid : m_lKaldoreiElites)
+    for (const auto& guid : m_lKaldoreiElites)
     {
         if (Creature* pElite = instance->GetCreature(guid))
         {

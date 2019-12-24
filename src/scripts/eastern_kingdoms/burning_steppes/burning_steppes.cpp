@@ -646,7 +646,7 @@ struct npc_klinfranAI : public ScriptedAI
             {
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 
-                for (auto itr : tList)
+                for (const auto itr : tList)
                 {
                     if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     {

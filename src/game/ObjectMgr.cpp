@@ -100,7 +100,7 @@ LanguageDesc lang_description[LANGUAGES_COUNT] =
 
 LanguageDesc const* GetLanguageDescByID(uint32 lang)
 {
-    for (const auto & i : lang_description)
+    for (const auto& i : lang_description)
     {
         if (uint32(i.lang_id) == lang)
             return &i;
@@ -137,31 +137,31 @@ ObjectMgr::ObjectMgr() :
 
 ObjectMgr::~ObjectMgr()
 {
-    for (auto & i : m_PetInfoMap)
+    for (auto& i : m_PetInfoMap)
         delete[] i.second;
 
     // free only if loaded
-    for (auto & class_ : m_PlayerClassInfo)
+    for (auto& class_ : m_PlayerClassInfo)
         delete[] class_.levelInfo;
 
-    for (auto & race : m_PlayerInfo)
+    for (auto& race : m_PlayerInfo)
         for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
             delete[] race[class_].levelInfo;
 
     // free objects
-    for (auto & itr : m_GroupMap)
+    for (auto& itr : m_GroupMap)
         delete itr.second;
 
-    for (auto & itr : m_CacheVendorTemplateItemMap)
+    for (auto& itr : m_CacheVendorTemplateItemMap)
         itr.second.Clear();
 
-    for (auto & itr : m_CacheVendorItemMap)
+    for (auto& itr : m_CacheVendorItemMap)
         itr.second.Clear();
 
-    for (auto & itr : m_CacheTrainerSpellMap)
+    for (auto& itr : m_CacheTrainerSpellMap)
         itr.second.Clear();
 
-    for (auto & itr : m_playerCacheData)
+    for (auto& itr : m_playerCacheData)
         delete itr.second;
 }
 
@@ -554,7 +554,7 @@ void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
 
 void ObjectMgr::SetSavedVariable(uint32 index, uint32 value, bool autoSave)
 {
-    for (auto & itr : m_SavedVariables)
+    for (auto& itr : m_SavedVariables)
     {
         if (itr.uiIndex == index)
         {
@@ -879,7 +879,7 @@ void ObjectMgr::ChangePlayerNameInCache(uint32 guidLow, std::string const& oldNa
 
 void ObjectMgr::GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData*>& data) const
 {
-    for (const auto & iter : m_playerCacheData)
+    for (const auto& iter : m_playerCacheData)
     {
         if (iter.second->uiAccount == accountId)
             data.push_back(iter.second);
@@ -897,7 +897,7 @@ Group* ObjectMgr::GetGroupById(uint32 id) const
 
 Group* ObjectMgr::GetGroupByMember(ObjectGuid memberGuid)
 {
-    for (const auto & itr : m_GroupMap)
+    for (const auto& itr : m_GroupMap)
         if (itr.second->IsMember(memberGuid))
             return itr.second;
     return nullptr;
@@ -3411,7 +3411,7 @@ void ObjectMgr::LoadItemPrototypes()
             bool req = proto->InventoryType != INVTYPE_NON_EQUIP || proto->PageText;
             if (!req)
             {
-                for (const auto & itr : proto->Spells)
+                for (const auto& itr : proto->Spells)
                 {
                     if (itr.SpellId)
                     {
@@ -3732,7 +3732,7 @@ void ObjectMgr::LoadItemRequiredTarget()
 
         bool bIsItemSpellValid = false;
 
-        for (const auto & itr : pItemProto->Spells)
+        for (const auto& itr : pItemProto->Spells)
         {
             if (SpellEntry const* pSpellInfo = sSpellMgr.GetSpellEntry(itr.SpellId))
             {
@@ -3871,7 +3871,7 @@ void ObjectMgr::LoadPetLevelInfo()
     }
 
     // Fill gaps and check integrity
-    for (const auto & itr : m_PetInfoMap)
+    for (const auto& itr : m_PetInfoMap)
     {
         PetLevelInfo* pInfo = itr.second;
 
@@ -4796,7 +4796,7 @@ void ObjectMgr::LoadQuests()
 
     std::map<uint32, uint32> usedMailTemplates;
 
-    for (auto & iter : m_QuestTemplatesMap)
+    for (auto& iter : m_QuestTemplatesMap)
     {
         const auto& qinfo = iter.second;
 
@@ -6760,7 +6760,7 @@ AreaTriggerTeleport const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
     if (!mapEntry || !mapEntry->IsDungeon())
         return nullptr;
 
-    for (const auto & itr : m_AreaTriggerTeleportMap)
+    for (const auto& itr : m_AreaTriggerTeleportMap)
     {
         if (itr.second.destination.mapId == uint32(mapEntry->ghostEntranceMap))
         {
@@ -6777,7 +6777,7 @@ AreaTriggerTeleport const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
  */
 AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 {
-    for (const auto & itr : m_AreaTriggerTeleportMap)
+    for (const auto& itr : m_AreaTriggerTeleportMap)
     {
         if (itr.second.destination.mapId == Map)
         {
@@ -7995,7 +7995,7 @@ void ObjectMgr::LoadGameobjectQuestRelations()
 {
     LoadQuestRelationsHelper(m_GOQuestRelations, "gameobject_questrelation");
 
-    for (const auto & itr : m_GOQuestRelations)
+    for (const auto& itr : m_GOQuestRelations)
     {
         GameObjectInfo const* goInfo = GetGameObjectInfo(itr.first);
         if (!goInfo)
@@ -8009,7 +8009,7 @@ void ObjectMgr::LoadGameobjectInvolvedRelations()
 {
     LoadQuestRelationsHelper(m_GOQuestInvolvedRelations, "gameobject_involvedrelation");
 
-    for (const auto & itr : m_GOQuestInvolvedRelations)
+    for (const auto& itr : m_GOQuestInvolvedRelations)
     {
         GameObjectInfo const* goInfo = GetGameObjectInfo(itr.first);
         if (!goInfo)
@@ -8023,7 +8023,7 @@ void ObjectMgr::LoadCreatureQuestRelations()
 {
     LoadQuestRelationsHelper(m_CreatureQuestRelations, "creature_questrelation");
 
-    for (const auto & itr : m_CreatureQuestRelations)
+    for (const auto& itr : m_CreatureQuestRelations)
     {
         CreatureInfo const* cInfo = GetCreatureTemplate(itr.first);
         if (!cInfo)
@@ -8037,7 +8037,7 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
 {
     LoadQuestRelationsHelper(m_CreatureQuestInvolvedRelations, "creature_involvedrelation");
 
-    for (const auto & itr : m_CreatureQuestInvolvedRelations)
+    for (const auto& itr : m_CreatureQuestInvolvedRelations)
     {
         CreatureInfo const* cInfo = GetCreatureTemplate(itr.first);
         if (!cInfo)
@@ -8992,7 +8992,7 @@ char const* ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
 
 bool ObjectMgr::LoadQuestGreetings()
 {
-    for (auto & i : m_QuestGreetingLocaleMap)
+    for (auto& i : m_QuestGreetingLocaleMap)
         i.clear(); // need for reload case
 
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `type`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `Emote`, `EmoteDelay` FROM `quest_greeting`"));
@@ -9298,7 +9298,7 @@ GameTele const* ObjectMgr::GetGameTele(std::string const& name) const
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
     GameTele const* alt = nullptr;
-    for (const auto & itr : m_GameTeleMap)
+    for (const auto& itr : m_GameTeleMap)
         if (itr.second.wnameLow == wname)
             return &itr.second;
         else if (alt == nullptr && itr.second.wnameLow.find(wname) != std::wstring::npos)
@@ -9311,7 +9311,7 @@ bool ObjectMgr::AddGameTele(GameTele& tele)
 {
     // find max id
     uint32 new_id = 0;
-    for (const auto & itr : m_GameTeleMap)
+    for (const auto& itr : m_GameTeleMap)
         if (itr.first > new_id)
             new_id = itr.first;
 
@@ -9357,7 +9357,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
     CacheTrainerSpellMap& trainerList = isTemplates ? m_CacheTrainerTemplateSpellMap : m_CacheTrainerSpellMap;
 
     // For reload case
-    for (auto & itr : trainerList)
+    for (auto& itr : trainerList)
         itr.second.Clear();
     trainerList.clear();
 
@@ -9494,7 +9494,7 @@ void ObjectMgr::LoadTrainerTemplates()
     // post loading check
     std::set<uint32> trainer_ids;
 
-    for (const auto & tItr : m_CacheTrainerTemplateSpellMap)
+    for (const auto& tItr : m_CacheTrainerTemplateSpellMap)
         trainer_ids.insert(tItr.first);
 
     // We need to use a query to get all used trainer ids because of progression.
@@ -9526,7 +9526,7 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
     CacheVendorItemMap& vendorList = isTemplates ? m_CacheVendorTemplateItemMap : m_CacheVendorItemMap;
 
     // For reload case
-    for (auto & itr : vendorList)
+    for (auto& itr : vendorList)
         itr.second.Clear();
     vendorList.clear();
 
@@ -9580,7 +9580,7 @@ void ObjectMgr::LoadVendorTemplates()
     // post loading check
     std::set<uint32> vendor_ids;
 
-    for (const auto & vItr : m_CacheVendorTemplateItemMap)
+    for (const auto& vItr : m_CacheVendorTemplateItemMap)
         vendor_ids.insert(vItr.first);
 
     // We need to use a query to get all used vendor ids because of progression.
@@ -9749,7 +9749,7 @@ void ObjectMgr::LoadGossipMenuItems()
     std::set<uint32> menu_ids;                              // for later integrity check
     if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))   // check unused menu ids only in strict mode
     {
-        for (const auto & itr : m_GossipMenusMap)
+        for (const auto& itr : m_GossipMenusMap)
             if (itr.first)
                 menu_ids.insert(itr.first);
 
@@ -9765,7 +9765,7 @@ void ObjectMgr::LoadGossipMenuItems()
 
     std::set<uint32> gossipScriptSet;
 
-    for (const auto & itr : sGossipScripts)
+    for (const auto& itr : sGossipScripts)
         gossipScriptSet.insert(itr.first);
 
     // prepare menuid -> CreatureInfo map for fast access
@@ -10644,7 +10644,7 @@ bool ObjectMgr::GetMountDataByEntry(uint32 itemEntry, Races& race, uint8& mountN
 {
     // Mount custom Nostalrius encore dans la DB.
     // itemEntry = GetRealMountEntry(itemEntry);
-    for (auto itr : factionchange_mounts)
+    for (const auto& itr : factionchange_mounts)
     {
         if (itr.ItemEntry == itemEntry)
         {
@@ -10658,7 +10658,7 @@ bool ObjectMgr::GetMountDataByEntry(uint32 itemEntry, Races& race, uint8& mountN
 
 uint32 ObjectMgr::GetMountItemEntry(Races race, uint8 num) const
 {
-    for (auto itr : factionchange_mounts)
+    for (const auto& itr : factionchange_mounts)
         if (itr.RaceId == race && itr.MountNum == num)
             return itr.ItemEntry;
 
@@ -10669,7 +10669,7 @@ uint32 ObjectMgr::GetRandomMountForRace(Races race) const
 {
     // 1- Compter le nombre total de montures de cette race
     uint32 count = 0;
-    for (auto itr : factionchange_mounts)
+    for (const auto& itr : factionchange_mounts)
         if (itr.RaceId == race)
             ++count;
     // 2- Quelques verifs / Generer index aleatoire
@@ -10677,7 +10677,7 @@ uint32 ObjectMgr::GetRandomMountForRace(Races race) const
         return 0;
     count -= urand(0, count - 1);
     // 3- Reboucler
-    for (auto itr : factionchange_mounts)
+    for (const auto& itr : factionchange_mounts)
     {
         if (itr.RaceId == race)
         {

@@ -568,7 +568,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         uint32 myArea = m_creature->GetAreaId();
         if (!pl.isEmpty() && myArea && BeginQuete)
         {
-            for (const auto & it : pl)
+            for (const auto& it : pl)
             {
                 Player* currPlayer =  it.getSource();
                 if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
@@ -599,7 +599,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 Player* player = GetPlayer();
                 EchecEvent(player, false);
 
-                for (const auto & it : pl)
+                for (const auto& it : pl)
                 {
                     Player* currPlayer =  it.getSource();
                     if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
@@ -1137,7 +1137,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         uint32 myArea = m_creature->GetAreaId();
         if (!pl.isEmpty() && myArea)
         {
-            for (const auto & it : pl)
+            for (const auto& it : pl)
             {
                 Player* pPlayer =  it.getSource();
                 if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster() && m_creature->IsWithinDist(pPlayer, 20.0f, false))

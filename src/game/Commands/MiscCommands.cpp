@@ -233,7 +233,7 @@ bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
     {
         HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
         HashMapHolder<Player>::MapType &m = sObjectAccessor.GetPlayers();
-        for (const auto & itr : m)
+        for (const auto& itr : m)
         {
             AccountTypes itr_sec = itr.second->GetSession()->GetSecurity();
             if ((itr.second->IsGameMaster() || (itr_sec > SEC_PLAYER && itr_sec <= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_GM_LIST))) &&
@@ -248,7 +248,7 @@ bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
 
         char const* accepts = GetMangosString(LANG_GM_ACCEPTS_WHISPER);
         char const* not_accept = GetMangosString(LANG_GM_NO_WHISPER);
-        for (const auto & name : names)
+        for (const auto& name : names)
             PSendSysMessage("%s - %s", name.first.c_str(), name.second ? accepts : not_accept);
     }
     else
@@ -621,7 +621,7 @@ bool ChatHandler::HandleInstancePerfInfosCommand(char* args)
         return false;
     map->PrintInfos(*this);
     uint32 playersInClient = 0, gobjsInClient = 0, unitsInClient = 0, corpsesInClient = 0;
-    for (auto itr : player->m_visibleGUIDs)
+    for (const auto& itr : player->m_visibleGUIDs)
     {
         switch (itr.GetHigh())
         {
@@ -642,7 +642,7 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
     uint32 counter = 0;
 
     Player::BoundInstancesMap &binds = player->GetBoundInstances();
-    for (const auto & bind : binds)
+    for (const auto& bind : binds)
     {
         DungeonPersistentState* state = bind.second.state;
         std::string timeleft;
@@ -668,7 +668,7 @@ bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
     if (Group* group = player->GetGroup())
     {
         Group::BoundInstancesMap &binds = group->GetBoundInstances();
-        for (const auto & bind : binds)
+        for (const auto& bind : binds)
         {
             DungeonPersistentState* state = bind.second.state;
             std::string timeleft;
@@ -889,7 +889,7 @@ bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
     // fill mail
     draft.SetSubjectAndBody(msgSubject, msgText);
 
-    for (const auto & itr : items)
+    for (const auto& itr : items)
     {
         if (Item* item = Item::CreateItem(itr.first, itr.second, m_session ? m_session->GetPlayer() : 0))
         {
@@ -1185,7 +1185,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     if (!poolCreaturesEx.empty())
     {
         SendSysMessage(LANG_POOL_CHANCE_CREATURE_LIST_HEADER);
-        for (auto itr : poolCreaturesEx)
+        for (const auto& itr : poolCreaturesEx)
         {
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr.guid))
             {
@@ -1207,7 +1207,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     if (!poolCreaturesEq.empty())
     {
         SendSysMessage(LANG_POOL_CREATURE_LIST_HEADER);
-        for (auto itr : poolCreaturesEq)
+        for (const auto& itr : poolCreaturesEq)
         {
             if (CreatureData const* data = sObjectMgr.GetCreatureData(itr.guid))
             {
@@ -1232,7 +1232,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     if (!poolGameObjectsEx.empty())
     {
         SendSysMessage(LANG_POOL_CHANCE_GO_LIST_HEADER);
-        for (auto itr : poolGameObjectsEx)
+        for (const auto& itr : poolGameObjectsEx)
         {
             if (GameObjectData const* data = sObjectMgr.GetGOData(itr.guid))
             {
@@ -1254,7 +1254,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     if (!poolGameObjectsEq.empty())
     {
         SendSysMessage(LANG_POOL_GO_LIST_HEADER);
-        for (auto itr : poolGameObjectsEq)
+        for (const auto& itr : poolGameObjectsEq)
         {
             if (GameObjectData const* data = sObjectMgr.GetGOData(itr.guid))
             {
@@ -1279,7 +1279,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     if (!poolPoolsEx.empty())
     {
         SendSysMessage(LANG_POOL_CHANCE_POOL_LIST_HEADER);
-        for (auto itr : poolPoolsEx)
+        for (const auto& itr : poolPoolsEx)
         {
             PoolTemplateData const& itr_template = sPoolMgr.GetPoolTemplate(itr.guid);
             char const* active = poolSpawns && poolSpawns->find(itr.guid) != poolSpawns->end() ? active_str.c_str() : "";
@@ -1300,7 +1300,7 @@ bool ChatHandler::HandlePoolInfoCommand(char* args)
     if (!poolPoolsEq.empty())
     {
         SendSysMessage(LANG_POOL_POOL_LIST_HEADER);
-        for (auto itr : poolPoolsEq)
+        for (const auto& itr : poolPoolsEq)
         {
             PoolTemplateData const& itr_template = sPoolMgr.GetPoolTemplate(itr.guid);
             char const* active = poolSpawns && poolSpawns->find(itr.guid) != poolSpawns->end() ? active_str.c_str() : "";
@@ -1399,7 +1399,7 @@ bool ChatHandler::HandleTriggerCommand(char* args)
         Player* pl = m_session->GetPlayer();
 
         // Search triggers
-        for (auto const itr : sObjectMgr.GetAreaTriggersMap())
+        for (auto const& itr : sObjectMgr.GetAreaTriggersMap())
         {
             AreaTriggerEntry const* atTestEntry = &itr.second;
             if (!atTestEntry)
@@ -1452,7 +1452,7 @@ bool ChatHandler::HandleTriggerActiveCommand(char* /*args*/)
     Player* pl = m_session->GetPlayer();
 
     // Search in AreaTable.dbc
-    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
+    for (auto const& itr : sObjectMgr.GetAreaTriggersMap())
     {
         AreaTriggerEntry const* atEntry = &itr.second;
         if (!atEntry)
@@ -1481,7 +1481,7 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
     Player* pl = m_session->GetPlayer();
 
     // Search triggers
-    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
+    for (auto const& itr : sObjectMgr.GetAreaTriggersMap())
     {
         AreaTriggerEntry const* atEntry = &itr.second;
         if (!atEntry)
@@ -1502,7 +1502,7 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
     }
 
     // Search trigger targets
-    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
+    for (auto const& itr : sObjectMgr.GetAreaTriggersMap())
     {
         AreaTriggerEntry const* atEntry = &itr.second;
         if (!atEntry)
@@ -1691,7 +1691,7 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
             BattleGroundPlayerMap const& pPlayers = it->second->GetPlayers();
             std::string playerName;
 
-            for (const auto & itr : pPlayers)
+            for (const auto& itr : pPlayers)
             {
                 if (itr.second.PlayerTeam == HORDE)
                     uiHordeCount++;
@@ -1741,7 +1741,7 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
         BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(BattleGroundTypeId(bgTypeId));
         // Doit etre une référence (&), sinon crash par la suite ...
         BattleGroundQueue& queue = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId];
-        for (const auto & itr : queue.m_QueuedPlayers)
+        for (const auto& itr : queue.m_QueuedPlayers)
         {
             if (itr.second.GroupInfo->GroupTeam == HORDE)
                 uiHordeCount++;

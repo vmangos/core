@@ -1863,7 +1863,7 @@ public:
 void World::Update(uint32 diff)
 {
     ///- Update the different timers
-    for (auto & timer : m_timers)
+    for (auto& timer : m_timers)
     {
         if (timer.GetCurrent() >= 0)
             timer.Update(diff);
@@ -2964,7 +2964,7 @@ void World::LogTransaction(PlayerTransactionData const& data)
         "INSERT INTO logs_transactions SET type=?, guid1=?, money1=?, spell1=?, items1=?, "
         "guid2=?, money2=?, spell2=?, items2=?");
     logStmt.addString(data.type);
-    for (const auto & part : data.parts)
+    for (const auto& part : data.parts)
     {
         logStmt.addUInt32(part.lowGuid);
         logStmt.addUInt32(part.money);

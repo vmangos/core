@@ -127,7 +127,7 @@ struct boss_buruAI : public ScriptedAI
     {
         // Le debuff fade quand il est mort, sinon le raid se fait decimer
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (const auto & i : liste)
+        for (const auto& i : liste)
             i.getSource()->RemoveAurasDueToSpell(SPELL_CREEPING_PLAGUE);
 
         if (m_pInstance)
@@ -226,7 +226,7 @@ struct boss_buruAI : public ScriptedAI
 
                 int var = 0;
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                for (auto itr : tList)
+                for (const auto itr : tList)
                 {
                     Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
                     if (pPlayer && pPlayer->IsAlive())
@@ -277,7 +277,7 @@ struct boss_buruAI : public ScriptedAI
             // Pop des add lors de l'enrage (3, mais je ne suis pas sur de ce nombre et ne sait pas s'ils arrivent tous d'un coup)
             if (!m_HatchPop)
             {
-                for (const auto & i : AddPop)
+                for (const auto& i : AddPop)
                 {
                     if (Creature* summoned = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                         summoned->SetInCombatWithZone();

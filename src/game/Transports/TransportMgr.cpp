@@ -27,10 +27,10 @@ TransportTemplate::~TransportTemplate()
 {
     // Collect shared pointers into a set to avoid deleting the same memory more than once
     std::set<TransportSpline*> splines;
-    for (const auto & keyFrame : keyFrames)
+    for (const auto& keyFrame : keyFrames)
         splines.insert(keyFrame.Spline);
 
-    for (auto spline : splines)
+    for (const auto& spline : splines)
         delete spline;
 }
 
@@ -258,7 +258,7 @@ void TransportMgr::GeneratePath(GameObjectInfo const* goInfo, TransportTemplate*
             tmpDist = 0.0f;
     }
 
-    for (auto & keyFrame : keyFrames)
+    for (auto& keyFrame : keyFrames)
     {
         float total_dist = keyFrame.DistSinceStop + keyFrame.DistUntilStop;
         if (total_dist < 2 * accel_dist) // won't reach full speed

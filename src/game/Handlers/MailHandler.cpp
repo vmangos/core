@@ -525,7 +525,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recv_data)
 
         if (m->HasItems())
         {
-            for (const auto & itr2 : m->items)
+            for (const auto& itr2 : m->items)
             {
                 if (Item *item = pl->GetMItem(itr2.item_guid))
                     draft.AddItem(item);

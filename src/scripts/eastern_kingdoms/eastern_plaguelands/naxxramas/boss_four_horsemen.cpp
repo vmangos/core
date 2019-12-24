@@ -156,7 +156,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (const auto & itr : PlayerList)
+        for (const auto& itr : PlayerList)
         {
             Player* pPlayer = itr.getSource();
             
@@ -352,7 +352,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
                 m_uiMarkTimer = 12000;
                 //todo: this behavior should get some more confirmation
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                for (auto itr : tList)
+                for (const auto itr : tList)
                 {
                     Unit* pUnit = m_creature->GetMap()->GetUnit( itr->getUnitGuid());
 
@@ -375,7 +375,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
             return;
         float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY);
         Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
-        for (const auto & itr : players)
+        for (const auto& itr : players)
         {
             Player* pPlayer = itr.getSource();
             if (m_creature->IsWithinDistInMap(pPlayer, range))

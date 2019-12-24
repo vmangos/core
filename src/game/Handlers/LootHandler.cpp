@@ -271,7 +271,7 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket& /*recv_data*/)
 
             uint32 money_per_player = uint32((pLoot->gold) / (playersNear.size()));
 
-            for (auto i : playersNear)
+            for (const auto i : playersNear)
             {
                 i->LootMoney(money_per_player, pLoot);
                 //Offset surely incorrect, but works

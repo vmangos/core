@@ -349,7 +349,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     case 26789:                             // Shard of the Fallen Star
                     {
                         uint32 count = 0;
-                        for (const auto & ihit : m_UniqueTargetInfo)
+                        for (const auto& ihit : m_UniqueTargetInfo)
                             if (ihit.effectMask & (1 << effect_idx))
                                 ++count;
 
@@ -454,7 +454,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 {
                     // for caster applied auras only
                     Unit::AuraList const& mPeriodic = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_DAMAGE);
-                    for (auto i : mPeriodic)
+                    for (const auto i : mPeriodic)
                     {
                         // Immolate
                         if (i->GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_IMMOLATE>() &&
@@ -993,7 +993,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     //immediately finishes the cooldown on certain Rogue abilities
                     SpellCooldowns cm = ((Player*)m_caster)->GetSpellCooldownMap();
-                    for (const auto & itr : cm)
+                    for (const auto& itr : cm)
                     {
                         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.first);
 
@@ -1091,7 +1091,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     // Need remove self if Lightning Shield not active
                     Unit::SpellAuraHolderMap const& auras = unitTarget->GetSpellAuraHolderMap();
-                    for (const auto & aura : auras)
+                    for (const auto& aura : auras)
                     {
                         SpellEntry const* spell = aura.second->GetSpellProto();
                         if (spell->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_LIGHTNING_SHIELD>())
@@ -1740,7 +1740,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     int32 mana = dmg;
 
                     Unit::AuraList const& auraDummy = m_casterUnit->GetAurasByType(SPELL_AURA_DUMMY);
-                    for (auto itr : auraDummy)
+                    for (const auto itr : auraDummy)
                     {
                         // only Imp. Life Tap have this in combination with dummy aura
                         if (itr->GetSpellProto()->SpellFamilyName == SPELLFAMILY_WARLOCK && itr->GetSpellProto()->SpellIconID == 208)
@@ -2077,7 +2077,7 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
             // get highest rank of the Stealth spell
             uint32 spellId = 0;
             PlayerSpellMap const& sp_list = ((Player*)unitTarget)->GetSpellMap();
-            for (const auto & itr : sp_list)
+            for (const auto& itr : sp_list)
             {
                 // only highest rank is shown in spell book, so simply check if shown in spell book
                 if (!itr.second.active || itr.second.disabled || itr.second.state == PLAYERSPELL_REMOVED)
@@ -2442,7 +2442,7 @@ void Spell::EffectHeal(SpellEffectIndex eff_idx)
             Unit::AuraList const& RejorRegr = unitTarget->GetAurasByType(SPELL_AURA_PERIODIC_HEAL);
             // find most short by duration
             Aura* targetAura = nullptr;
-            for (auto i : RejorRegr)
+            for (const auto i : RejorRegr)
             {
                 // Regrowth or Rejuvenation
                 if (i->GetSpellProto()->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION, CF_DRUID_REGROWTH>())
@@ -3135,7 +3135,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
     int32 dispel_type = m_spellInfo->EffectMiscValue[eff_idx];
     uint32 dispelMask  = GetDispellMask(dispel_type < 0 ? DISPEL_ALL : DispelType(dispel_type));
     Unit::SpellAuraHolderMap const& auras = unitTarget->GetSpellAuraHolderMap();
-    for (const auto & aura : auras)
+    for (const auto& aura : auras)
     {
         SpellAuraHolder* holder = aura.second;
         if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
@@ -3212,7 +3212,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             else
             {
                 bool foundDispelled = false;
-                for (auto & success_iter : success_list)
+                for (auto& success_iter : success_list)
                 {
                     if (success_iter.first->GetId() == holder->GetId() && success_iter.first->GetCasterGuid() == holder->GetCasterGuid())
                     {
@@ -3238,7 +3238,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             data << m_caster->GetGUID();                // Caster GUID
 #endif
             data << uint32(count);
-            for (const auto & j : success_list)
+            for (const auto& j : success_list)
             {
                 SpellAuraHolder* dispelledHolder = j.first;
                 data << uint32(dispelledHolder->GetId());   // Spell Id
@@ -3283,7 +3283,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
             WorldPacket data(SMSG_DISPEL_FAILED, 8 + 8 + 4 * fail_list.size());
             data << m_caster->GetObjectGuid();              // Caster GUID
             data << unitTarget->GetObjectGuid();            // Victim GUID
-            for (const auto & j : fail_list)
+            for (const auto& j : fail_list)
                 data << uint32(j);                         // Spell Id
             m_caster->SendMessageToSet(&data, true);
         }
@@ -4317,7 +4317,7 @@ void Spell::EffectHealMaxHealth(SpellEffectIndex eff_idx)
     if (m_casterUnit)
     {
         std::list <Aura*> const& mHealingDonePct = m_casterUnit->GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
-        for (auto i : mHealingDonePct)
+        for (const auto i : mHealingDonePct)
             DoneTotalMod *= (100.0f + i->GetModifier()->m_amount) / 100.0f;
     }
 
@@ -4904,7 +4904,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     // Select maintank + 4 random targets
                     std::vector<Unit*> viableTargets;
                     ThreatList const& tl = m_casterUnit->GetThreatManager().getThreatList();
-                    for (auto it : tl)
+                    for (const auto it : tl)
                     {
                         if (it->getUnitGuid().IsPlayer())
                         {
@@ -5052,7 +5052,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     uint32 itemtype;
                     uint32 rank = 0;
                     Unit::AuraList const& mDummyAuras = unitTarget->GetAurasByType(SPELL_AURA_DUMMY);
-                    for (auto aura : mDummyAuras)
+                    for (const auto aura : mDummyAuras)
                     {
                         if (aura->GetId() == 18692)
                         {
@@ -5160,7 +5160,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                 // all seals have aura dummy
                 Unit::AuraList const& m_dummyAuras = m_casterUnit->GetAurasByType(SPELL_AURA_DUMMY);
-                for (auto aura : m_dummyAuras)
+                for (const auto aura : m_dummyAuras)
                 {
                     SpellEntry const* spellInfo = aura->GetSpellProto();
 
@@ -5663,7 +5663,7 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
     {
         Unit::AuraList const& auras = unitTarget->GetAurasByType(SPELL_AURA_MOD_ATTACK_POWER);
-        for (auto aura : auras)
+        for (const auto aura : auras)
         {
             if (aura->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN &&
                     // Bene de puissance inf et sup
@@ -5674,7 +5674,7 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
             }
         }
         Unit::AuraList const& auras2 = unitTarget->GetAurasByType(SPELL_AURA_MOD_TOTAL_STAT_PERCENTAGE);
-        for (auto aura : auras2)
+        for (const auto aura : auras2)
         {
             if (aura->GetSpellProto()->SpellFamilyName == SPELLFAMILY_PALADIN &&
                     // Bene des rois inf et sup

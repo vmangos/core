@@ -398,7 +398,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     //Process actions, normal case
     if (!(pHolder.Event.event_flags & EFLAG_RANDOM_ACTION))
     {
-        for (const auto & action : pHolder.Event.action)
+        for (const auto& action : pHolder.Event.action)
             ProcessAction(action, pHolder.Event.event_id, pActionInvoker);
     }
     //Process actions, random case
@@ -406,7 +406,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     {
         // amount of real actions
         uint32 count = 0;
-        for (const auto & action : pHolder.Event.action)
+        for (const auto& action : pHolder.Event.action)
             if (action)
                 ++count;
 

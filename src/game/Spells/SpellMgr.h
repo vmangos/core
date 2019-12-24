@@ -454,7 +454,7 @@ class SpellMgr
 
             SpellGroupStackRule rule = SPELL_GROUP_STACK_RULE_DEFAULT;
 
-            for (auto itr : groups)
+            for (const auto itr : groups)
             {
                 SpellGroupStackMap::const_iterator found = mSpellGroupStack.find(itr);
                 if (found != mSpellGroupStack.end())
@@ -479,7 +479,7 @@ class SpellMgr
         bool IsMorePowerfullSpell(uint32 powerfullSpell, uint32 otherSpell, SpellGroup group) const
         {
             // The most powerfull spell appears after less powerfull spells in the list.
-            for (const auto & itr : mSpellGroupSpell)
+            for (const auto& itr : mSpellGroupSpell)
             {
                 if (itr.first != group)
                     continue;

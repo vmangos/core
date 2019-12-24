@@ -150,7 +150,7 @@ public:
         ASSERT(pTechnician);
         m_vTechniciansGuid.push_back(pTechnician->GetObjectGuid());
         ThreatList threatList = pTechnician->GetThreatManager().getThreatList();
-        for (auto i : threatList)
+        for (const auto i : threatList)
         {
             if (Unit *pUnit = m_pInstance->instance->GetCreature(i->getUnitGuid()))
             {
@@ -177,7 +177,7 @@ public:
         float fMaxThreat = 0.0f;
         ObjectGuid victimGuid;
 
-        for (const auto & itr : m_mThreatGuid)
+        for (const auto& itr : m_mThreatGuid)
         {
             if (fMaxThreat <= itr.second)
             {
@@ -215,7 +215,7 @@ public:
             // for an integer overflow
             m_uiTechniciansUpdate = m_vTechniciansGuid.size();
             m_bUpdated = true;
-            for (const auto & guid : m_vTechniciansGuid)
+            for (const auto& guid : m_vTechniciansGuid)
             {
                 if (Creature *pCreature = m_pInstance->instance->GetCreature(guid))
                 {
@@ -223,7 +223,7 @@ public:
                         continue;
                     // Copy the list, since it may get invalidated at 'modifyThreatPercent' call
                     ThreatList threatList = pCreature->GetThreatManager().getThreatList();
-                    for (auto i : threatList)
+                    for (const auto i : threatList)
                     {
                         if (Unit *pUnit = m_pInstance->instance->GetUnit(i->getUnitGuid()))
                         {
@@ -655,7 +655,7 @@ struct instance_blackwing_lair : public ScriptedInstance
                     if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
                         DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
                 }
-                for (const auto & guid : m_lVaelGobs)
+                for (const auto& guid : m_lVaelGobs)
                 {
                     if (Creature *pCreature = instance->GetCreature(guid))
                     {
@@ -751,7 +751,7 @@ struct instance_blackwing_lair : public ScriptedInstance
             if (uiData == DONE)
             {
                 bool bYelled = false;
-                for (const auto & guid : m_lVaelGobs)
+                for (const auto& guid : m_lVaelGobs)
                 {
                     if (Creature *pCreature = instance->GetCreature(guid))
                     {
@@ -878,10 +878,10 @@ struct instance_blackwing_lair : public ScriptedInstance
         {
             std::list<GameObject *> lGameObjects;
             pCreature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_OEUF_RAZ, 250.0f);
-            for (auto pGo : lGameObjects)
+            for (const auto pGo : lGameObjects)
                 pGo->DeleteLater();
 
-            for (const auto & position : RazOeufs)
+            for (const auto& position : RazOeufs)
                 pCreature->SummonGameObject(GO_OEUF_RAZ, position.X, position.Y, position.Z, position.O);
         }
     }
@@ -1000,7 +1000,7 @@ struct go_engin_suppressionAI: public GameObjectAI
     {
         me->SendGameObjectCustomAnim();
         Map::PlayerList const &liste = me->GetMap()->GetPlayers();
-        for (const auto & i : liste)
+        for (const auto& i : liste)
         {
             if (me->GetDistance(i.getSource()) <= 15.0f)
                 if (!i.getSource()->HasStealthAura() && i.getSource()->IsAlive() && !i.getSource()->IsGameMaster())

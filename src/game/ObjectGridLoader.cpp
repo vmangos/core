@@ -177,7 +177,7 @@ void LoadHelper(CellCorpseSet const& cell_corpses, CellPair& cell, CorpseMapType
     if (cell_corpses.empty())
         return;
 
-    for (const auto & itr : cell_corpses)
+    for (const auto& itr : cell_corpses)
     {
         if (itr.second != map->GetInstanceId())
             continue;
@@ -329,7 +329,7 @@ void
 ObjectGridStoper::Visit(CreatureMapType& m)
 {
     // stop any fights at grid de-activation and remove dynobjects created at cast by creatures
-    for (const auto & iter : m)
+    for (const auto& iter : m)
     {
         iter.getSource()->AI()->EnterEvadeMode();
         iter.getSource()->DeleteThreatList();
@@ -341,7 +341,7 @@ void
 ObjectGridStoper::Visit(GameObjectMapType& m)
 {
     // remove dynobjects created at cast at grid de-activation
-    for (const auto & iter : m)
+    for (const auto& iter : m)
     {
         iter.getSource()->RemoveAllDynObjects();
     }

@@ -441,7 +441,7 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
         delete result;
     }
 
-    for (const auto & itr : InstResetTime)
+    for (const auto& itr : InstResetTime)
     {
         ScheduleReset(true, itr.second.second, DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, itr.second.first, itr.first));
 
@@ -591,9 +591,9 @@ MapPersistentStateManager::~MapPersistentStateManager()
     // it is undefined whether this or objectmgr will be unloaded first
     // so we must be prepared for both cases
     lock_instLists = true;
-    for (const auto & itr : m_instanceSaveByInstanceId)
+    for (const auto& itr : m_instanceSaveByInstanceId)
         delete  itr.second;
-    for (const auto & itr : m_instanceSaveByMapId)
+    for (const auto& itr : m_instanceSaveByMapId)
         delete  itr.second;
 }
 
@@ -960,7 +960,7 @@ void MapPersistentStateManager::GetStatistics(uint32& numStates, uint32& numBoun
     numBoundGroups = 0;
 
     // only instanceable maps have bounds
-    for (const auto & itr : m_instanceSaveByInstanceId)
+    for (const auto& itr : m_instanceSaveByInstanceId)
     {
         if (!itr.second->GetMapEntry()->IsDungeon())
             continue;

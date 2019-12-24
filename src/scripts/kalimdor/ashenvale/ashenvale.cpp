@@ -423,7 +423,7 @@ struct npc_torekAI : public npc_escortAI
     {
         std::list<Creature*> lCrea;
         m_creature->GetCreatureListWithEntryInGrid(lCrea, NPC_SPLINTERTREE_RAIDER, 40.0f);
-        for (const auto & it : lCrea)
+        for (const auto& it : lCrea)
             it->DisappearAndDie();
         npc_escortAI::JustDied(pKiller);
     }
@@ -459,7 +459,7 @@ struct npc_torekAI : public npc_escortAI
             case 22:
                 std::list<Creature*> lCrea;
                 m_creature->GetCreatureListWithEntryInGrid(lCrea, NPC_SPLINTERTREE_RAIDER, 40.0f);
-                for (const auto & it : lCrea)
+                for (const auto& it : lCrea)
                     it->DisappearAndDie();
                 break;
         }

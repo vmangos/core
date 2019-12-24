@@ -72,7 +72,7 @@ void PlayerBroadcaster::ProcessQueue(uint32& num_packets)
         if (data.sendToSelf && data.except != GetGUID())
             SendPacket(data.packet);
 
-        for (const auto & itr : m_listeners)
+        for (const auto& itr : m_listeners)
         {
             if (itr.first == data.except)
                 continue;

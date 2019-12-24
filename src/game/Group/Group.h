@@ -387,7 +387,7 @@ class MANGOS_DLL_SPEC Group
 
             memset((void*)m_subGroupsCounts, 0, MAX_RAID_SUBGROUPS*sizeof(uint8));
 
-            for (const auto & itr : m_memberSlots)
+            for (const auto& itr : m_memberSlots)
                 ++m_subGroupsCounts[itr.group];
         }
 

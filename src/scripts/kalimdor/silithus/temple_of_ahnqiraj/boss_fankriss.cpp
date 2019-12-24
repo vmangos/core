@@ -312,7 +312,7 @@ struct boss_fankrissAI : public ScriptedAI
     {
         if (pSummoned->GetEntry() == NPC_VEKNISS_HATCHLING)
         {
-            for (auto & it : hatchlingVec)
+            for (auto& it : hatchlingVec)
             {
                 it.hatchlings.remove(pSummoned->GetObjectGuid());
             }
@@ -427,7 +427,7 @@ struct boss_fankrissAI : public ScriptedAI
     {
         if (!m_creature->IsInCombat()) {
             Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-            for (const auto & itr : PlayerList)
+            for (const auto& itr : PlayerList)
             {
                 Player* pPlayer = itr.getSource();
                 if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())

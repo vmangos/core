@@ -262,7 +262,7 @@ struct npc_private_hendelAI : public ScriptedAI
     npc_private_hendelAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         // zero init required to prevent crash
-        for (auto & guard : m_guards)
+        for (auto& guard : m_guards)
             guard = nullptr;
         for (ptrdiff_t i = 0; i < 3; ++i)
         {
@@ -296,7 +296,7 @@ struct npc_private_hendelAI : public ScriptedAI
         // reset private hendel's faction
         m_creature->SetFactionTemplateId(FACTION_THERAMORE); // theramore faction
         // reset his guards faction
-        for (const auto & guard : m_guards)
+        for (const auto& guard : m_guards)
         {
             if (guard && guard->IsAlive())
             {
@@ -394,7 +394,7 @@ struct npc_private_hendelAI : public ScriptedAI
 
             // check if there one of the guards is available
             bool first = true;
-            for (auto guard : m_guards)
+            for (const auto guard : m_guards)
             {
                 // if guard is valid
                 if (guard && guard->IsAlive())
@@ -440,7 +440,7 @@ struct npc_private_hendelAI : public ScriptedAI
             }
 
             // remove guards
-            for (auto & guard : m_guards)
+            for (auto& guard : m_guards)
             {
                 // if guard is valid
                 if (guard)
@@ -531,7 +531,7 @@ struct npc_private_hendelAI : public ScriptedAI
             if (m_nextPhaseDelayTimer < uiDiff)
             {
                 // make allies face private hendel
-                for (const auto & ally : m_allies)
+                for (const auto& ally : m_allies)
                     ally->SetFacingToObject(m_creature);
 
                 // Tervosh is index 0
@@ -558,7 +558,7 @@ struct npc_private_hendelAI : public ScriptedAI
                 case 0: // remove guards, say0
                 {
                     // remove guards
-                    for (auto & guard : m_guards)
+                    for (auto& guard : m_guards)
                     {
                         // if guard is valid
                         if (guard)
@@ -660,7 +660,7 @@ struct npc_private_hendelAI : public ScriptedAI
                 case 3: // Final, despawn
                 {
                     // remove allies
-                    for (auto & ally : m_allies)
+                    for (auto& ally : m_allies)
                     {
                         // if ally is valid
                         if (ally)
@@ -671,7 +671,7 @@ struct npc_private_hendelAI : public ScriptedAI
                     }
 
                     // restore original allies in Theramore
-                    for (const auto & i : m_alliesOriginal)
+                    for (const auto& i : m_alliesOriginal)
                     {
                         if (i)
                         {
@@ -708,13 +708,13 @@ struct npc_private_hendelAI : public ScriptedAI
     void SummonedCreatureDespawn(Creature* creature) override 
     {
         // No dangling pointers
-        for (auto & ally : m_allies)
+        for (auto& ally : m_allies)
         {
             if (ally == creature)
                 ally = 0;
         }
 
-        for (auto & guard : m_guards)
+        for (auto& guard : m_guards)
         {
             if (guard == creature)
                 guard = 0;
@@ -744,7 +744,7 @@ bool QuestAccept_npc_private_hendel(Player* pPlayer, Creature* pCreature, Quest 
                                                    // switch quest event phase to FIGHT
             privateHendelAI->m_mdQuestPhase = MDQP_FIGHT;
             // set his guards faction to hostile
-            for (auto guard : privateHendelAI->m_guards)
+            for (const auto guard : privateHendelAI->m_guards)
             {
                 // if guard is valid
                 if (guard)
@@ -1394,7 +1394,7 @@ struct npc_tabethaAI : ScriptedAI
 
         if (manaSurges.empty()) return;
 
-        for (const auto & manaSurge : manaSurges)
+        for (const auto& manaSurge : manaSurges)
             if (manaSurge->IsAlive())
                 manaSurge->ForcedDespawn();
     }

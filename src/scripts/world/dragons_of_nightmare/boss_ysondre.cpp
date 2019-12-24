@@ -59,7 +59,7 @@ bool boss_ysondreAI::DoSpecialAbility()
     auto const& attackers = m_creature->GetThreatManager().getThreatList();
     uint8 attackersCount = 0;
 
-    for (auto attacker : attackers)
+    for (const auto attacker : attackers)
     {
         Player* pPlayer = m_creature->GetMap()->GetPlayer(attacker->getUnitGuid());
         if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())

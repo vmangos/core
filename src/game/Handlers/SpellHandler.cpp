@@ -95,7 +95,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     if (pUser->IsInCombat())
     {
-        for (const auto & itr : proto->Spells)
+        for (const auto& itr : proto->Spells)
         {
             if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.SpellId))
             {
@@ -136,7 +136,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
         // search spell for spell error
         uint32 spellid = 0;
-        for (const auto & itr : proto->Spells)
+        for (const auto& itr : proto->Spells)
         {
             if (itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
             {

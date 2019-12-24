@@ -142,7 +142,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_creature->GetCreatureListWithEntryInGrid(lCreature, NPC_DIRT_MOUND, 250.0f);
         if (ShouldDespawnScarabs)
             m_creature->GetCreatureListWithEntryInGrid(lCreature, NPC_OURO_SCARAB, 250.0f);
-        for (const auto & itr : lCreature)
+        for (const auto& itr : lCreature)
             itr->ForcedDespawn();
     }
 
@@ -392,13 +392,13 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
                     std::list<Unit*> lGroundRuptureTargets;
                     ThreatList const& lThreat = m_creature->GetThreatManager().getThreatList();
-                    for (auto i : lThreat)
+                    for (const auto i : lThreat)
                     {
                         Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
                         if (pUnit && pUnit->GetDistance2d(m_creature) < 20.0f)
                             lGroundRuptureTargets.push_back(pUnit);
                     }
-                    for (auto& target : lGroundRuptureTargets)
+                    for (const auto& target : lGroundRuptureTargets)
                         m_creature->CastSpell(target, SPELL_GROUND_RUPTURE, true);
 
                     m_bSubmerged        = false;

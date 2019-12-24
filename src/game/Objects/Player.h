@@ -2259,7 +2259,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         bool InBattleGroundQueue() const
         {
-            for (auto i : m_bgBattleGroundQueueID)
+            for (const auto& i : m_bgBattleGroundQueueID)
                 if (i.bgQueueTypeId != BATTLEGROUND_QUEUE_NONE)
                     return true;
             return false;
@@ -2267,7 +2267,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         BattleGroundQueueTypeId GetQueuedBattleground() const
         {
-            for (auto i : m_bgBattleGroundQueueID)
+            for (const auto& i : m_bgBattleGroundQueueID)
                 if (i.bgQueueTypeId != BATTLEGROUND_QUEUE_NONE)
                     return i.bgQueueTypeId;
             return BATTLEGROUND_QUEUE_NONE;
@@ -2283,7 +2283,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         }
         bool IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId bgQueueTypeId) const
         {
-            for (auto i : m_bgBattleGroundQueueID)
+            for (const auto& i : m_bgBattleGroundQueueID)
                 if (i.bgQueueTypeId == bgQueueTypeId)
                     return i.invitedToInstance != 0;
             return false;
@@ -2315,7 +2315,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool HasFreeBattleGroundQueueId() const;
         void RemoveBattleGroundQueueId(BattleGroundQueueTypeId val)
         {
-            for (auto & i : m_bgBattleGroundQueueID)
+            for (auto& i : m_bgBattleGroundQueueID)
             {
                 if (i.bgQueueTypeId == val)
                 {
@@ -2327,13 +2327,13 @@ class MANGOS_DLL_SPEC Player final: public Unit
         }
         void SetInviteForBattleGroundQueueType(BattleGroundQueueTypeId bgQueueTypeId, uint32 instanceId)
         {
-            for (auto & i : m_bgBattleGroundQueueID)
+            for (auto& i : m_bgBattleGroundQueueID)
                 if (i.bgQueueTypeId == bgQueueTypeId)
                     i.invitedToInstance = instanceId;
         }
         bool IsInvitedForBattleGroundInstance(uint32 instanceId) const
         {
-            for (auto i : m_bgBattleGroundQueueID)
+            for (const auto& i : m_bgBattleGroundQueueID)
                 if (i.invitedToInstance == instanceId)
                     return true;
             return false;
@@ -2522,7 +2522,7 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
     if (!spellInfo) return 0;
     int32 totalpct = 0;
     int32 totalflat = 0;
-    for (auto mod : m_spellMods[op])
+    for (const auto mod : m_spellMods[op])
     {
         if (!IsAffectedBySpellmod(spellInfo,mod,spell))
             continue;

@@ -333,7 +333,7 @@ void LoadDBCStores(std::string const& dataPath)
 
             // add total amount bits for first rank starting from talent tab first talent rank pos.
             uint32 pos = 0;
-            for (const auto & itr : sTalentBitSize)
+            for (const auto& itr : sTalentBitSize)
             {
                 uint32 talentId = itr.first & 0xFFFF;
                 TalentEntry const* talentInfo = sTalentStore.LookupEntry(talentId);
@@ -396,7 +396,7 @@ void LoadDBCStores(std::string const& dataPath)
             if (src_i != sTaxiPathSetBySource.end() && !src_i->second.empty())
             {
                 bool ok = false;
-                for (const auto & dest_i : src_i->second)
+                for (const auto& dest_i : src_i->second)
                 {
                     // not spell path
                     if (spellPaths.find(dest_i.second.ID) == spellPaths.end())
@@ -442,7 +442,7 @@ void LoadDBCStores(std::string const& dataPath)
     else if (!bad_dbc_files.empty())
     {
         std::string str;
-        for (const auto & bad_dbc_file : bad_dbc_files)
+        for (const auto& bad_dbc_file : bad_dbc_files)
             str += bad_dbc_file + "\n";
 
         sLog.outError("\nSome required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFilesCount, str.c_str());
@@ -516,7 +516,7 @@ ChatChannelsEntry const* GetChannelEntryFor(std::string const& name)
         if (ch)
         {
             // need to remove %s from entryName if it exists before we match
-            for (auto loc : ch->pattern)
+            for (const auto loc : ch->pattern)
             {
                 std::string entryName(loc);
                 std::size_t removeString = entryName.find("%s");

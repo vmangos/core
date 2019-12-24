@@ -430,7 +430,7 @@ void GameEventMgr::LoadFromDB()
     }
 
     // now recheck that all eventPools linked with events after our skip pools with parents
-    for (const auto & itr : pool2event)
+    for (const auto& itr : pool2event)
     {
         uint16 pool_id = itr.first;
         int16 event_id = itr.second;
@@ -712,7 +712,7 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= nullptr*/)
     time_t currenttime = time(nullptr);
     uint32 nextEventDelay = max_ge_check_delay;             // 1 day
 
-    for (const auto & hEvent_iter : mGameEventHardcodedList)
+    for (const auto& hEvent_iter : mGameEventHardcodedList)
     {
         if (!mGameEvent[hEvent_iter->m_eventId].disabled)
         {
@@ -815,7 +815,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         return;
     }
 
-    for (const auto & itr : mGameEventCreatureGuids[internal_event_id])
+    for (const auto& itr : mGameEventCreatureGuids[internal_event_id])
     {
         // Add to correct cell
         CreatureData const* data = sObjectMgr.GetCreatureData(itr);
@@ -845,7 +845,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
         return;
     }
 
-    for (const auto & itr : mGameEventGameobjectGuids[internal_event_id])
+    for (const auto& itr : mGameEventGameobjectGuids[internal_event_id])
     {
         // Add to correct cell
         GameObjectData const* data = sObjectMgr.GetGOData(itr);
@@ -877,7 +877,7 @@ void GameEventMgr::GameEventSpawn(int16 event_id)
             return;
         }
 
-        for (const auto & itr : mGameEventSpawnPoolIds[event_id])
+        for (const auto& itr : mGameEventSpawnPoolIds[event_id])
             sPoolMgr.SpawnPoolInMaps(itr, true);
     }
 }
@@ -892,7 +892,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         return;
     }
 
-    for (const auto & itr : mGameEventCreatureGuids[internal_event_id])
+    for (const auto& itr : mGameEventCreatureGuids[internal_event_id])
     {
         // Remove the creature from grid
         if (CreatureData const* data = sObjectMgr.GetCreatureData(itr))
@@ -922,7 +922,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
         return;
     }
 
-    for (const auto & itr : mGameEventGameobjectGuids[internal_event_id])
+    for (const auto& itr : mGameEventGameobjectGuids[internal_event_id])
     {
         // Remove the gameobject from grid
         if (GameObjectData const* data = sObjectMgr.GetGOData(itr))
@@ -954,7 +954,7 @@ void GameEventMgr::GameEventUnspawn(int16 event_id)
             return;
         }
 
-        for (const auto & itr : mGameEventSpawnPoolIds[event_id])
+        for (const auto& itr : mGameEventSpawnPoolIds[event_id])
             sPoolMgr.DespawnPoolInMaps(itr);
     }
 }
@@ -976,7 +976,7 @@ GameEventCreatureData const* GameEventMgr::GetCreatureUpdateDataForActiveEvent(u
     if (!event_id)
         return nullptr;
 
-    for (const auto & itr : mGameEventCreatureData[event_id])
+    for (const auto& itr : mGameEventCreatureData[event_id])
         if (itr.first == lowguid)
             return &itr.second;
 
@@ -1008,7 +1008,7 @@ struct GameEventUpdateCreatureDataInMapsWorker
 
 void GameEventMgr::UpdateCreatureData(int16 event_id, bool activate)
 {
-    for (auto & itr : mGameEventCreatureData[event_id])
+    for (auto& itr : mGameEventCreatureData[event_id])
     {
         // Remove the creature from grid
         CreatureData const* data = sObjectMgr.GetCreatureData(itr.first);
@@ -1023,7 +1023,7 @@ void GameEventMgr::UpdateCreatureData(int16 event_id, bool activate)
 
 void GameEventMgr::UpdateEventQuests(uint16 event_id, bool Activate)
 {
-    for (const auto & itr : mGameEventQuests[event_id])
+    for (const auto& itr : mGameEventQuests[event_id])
     {
         Quest const* pQuest = sObjectMgr.GetQuestTemplate(itr);
 
@@ -1042,7 +1042,7 @@ void GameEventMgr::SendEventMails(int16 event_id)
 
     MailList const& mails = mGameEventMails[internal_event_id];
 
-    for (auto mail : mails)
+    for (const auto& mail : mails)
     {
         if (mail.questId)
         {

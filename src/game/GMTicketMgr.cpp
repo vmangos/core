@@ -281,7 +281,7 @@ TicketMgr::TicketMgr() : _status(true), _lastTicketId(0), _lastSurveyId(0), _ope
 
 TicketMgr::~TicketMgr()
 {
-    for (const auto & itr : _ticketList)
+    for (const auto& itr : _ticketList)
         delete itr.second;
 }
 
@@ -315,7 +315,7 @@ void TicketMgr::LoadTickets()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
-    for (const auto & itr : _ticketList)
+    for (const auto& itr : _ticketList)
         delete itr.second;
     _ticketList.clear();
 
@@ -402,7 +402,7 @@ void TicketMgr::RemoveTicket(uint32 ticketId)
 void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly, uint8 category) const
 {
     handler.SendSysMessage(onlineOnly ? LANG_COMMAND_TICKETSHOWONLINELIST : LANG_COMMAND_TICKETSHOWLIST);
-    for (const auto & itr : _ticketList)
+    for (const auto& itr : _ticketList)
         if (!itr.second->IsClosed() && !itr.second->IsCompleted())
             if ((!onlineOnly || itr.second->GetPlayer()) && (!category || (itr.second->GetTicketType() == TicketType(category))))
                 handler.SendSysMessage(itr.second->FormatMessageString(handler).c_str());
@@ -411,7 +411,7 @@ void TicketMgr::ShowList(ChatHandler& handler, bool onlineOnly, uint8 category) 
 void TicketMgr::ShowClosedList(ChatHandler& handler) const
 {
     handler.SendSysMessage(LANG_COMMAND_TICKETSHOWCLOSEDLIST);
-    for (const auto & itr : _ticketList)
+    for (const auto& itr : _ticketList)
         if (itr.second->IsClosed())
             handler.SendSysMessage(itr.second->FormatMessageString(handler).c_str());
 }
@@ -419,7 +419,7 @@ void TicketMgr::ShowClosedList(ChatHandler& handler) const
 void TicketMgr::ShowEscalatedList(ChatHandler& handler) const
 {
     handler.SendSysMessage(LANG_COMMAND_TICKETSHOWESCALATEDLIST);
-    for (const auto & itr : _ticketList)
+    for (const auto& itr : _ticketList)
         if (!itr.second->IsClosed() && itr.second->GetEscalatedStatus() == TICKET_IN_ESCALATION_QUEUE)
             handler.PSendSysMessage(LANG_COMMAND_TICKETESCALATED_TICKET, itr.second->FormatMessageString(handler).c_str(), itr.second->GetNeededSecurityLevel());
 }

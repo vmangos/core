@@ -368,7 +368,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         Map::PlayerList const &PlayerList = map->GetPlayers();
                         if (!PlayerList.isEmpty())
                         {
-                            for (const auto & i : PlayerList)
+                            for (const auto& i : PlayerList)
                             {
                                 if (i.getSource()->IsAlive() && (i.getSource()->GetDistance(m_creature) < 30))
                                     m_creature->CastSpell(i.getSource(), SPELL_MARK, false);

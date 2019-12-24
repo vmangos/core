@@ -98,7 +98,7 @@ void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
     else
     {
         // Clear previously stored spells
-        for (const auto & it : m_petsByGuid)
+        for (const auto& it : m_petsByGuid)
             it.second->spells.clear();
 
         sLog.outString("* Loading `pet_spell`");
@@ -148,7 +148,7 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
     else
     {
         // Clear previously stored cooldowns
-        for (const auto & it : m_petsByGuid)
+        for (const auto& it : m_petsByGuid)
             it.second->spellCooldown.clear();
 
         sLog.outString("* Loading `pet_spell_cooldown`");
@@ -200,7 +200,7 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
     else
     {
         // Clear previously stored auras
-        for (const auto & it : m_petsByGuid)
+        for (const auto& it : m_petsByGuid)
             it.second->auras.clear();
 
         sLog.outString("* Loading table `pet_aura`");
@@ -271,7 +271,7 @@ CharacterPetCache* CharacterDatabaseCache::GetCharacterPetCacheByOwnerAndId(uint
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(owner);
     if (ownerPets == m_petsByCharacter.end())
         return nullptr;
-    for (const auto & it : ownerPets->second)
+    for (const auto& it : ownerPets->second)
         if (it->id == id)
             return it;
 
@@ -284,7 +284,7 @@ CharacterPetCache* CharacterDatabaseCache::GetCharacterCurrentPet(uint64 owner)
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(owner);
     if (ownerPets == m_petsByCharacter.end())
         return nullptr;
-    for (const auto & it : ownerPets->second)
+    for (const auto& it : ownerPets->second)
         if (it->slot == PET_SAVE_AS_CURRENT)
             return it;
 
@@ -297,7 +297,7 @@ CharacterPetCache* CharacterDatabaseCache::GetCharacterPetByOwnerAndEntry(uint64
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(owner);
     if (ownerPets == m_petsByCharacter.end())
         return nullptr;
-    for (const auto & it : ownerPets->second)
+    for (const auto& it : ownerPets->second)
         if (it->entry == entry && (it->slot == PET_SAVE_AS_CURRENT || it->slot > PET_SAVE_LAST_STABLE_SLOT))
             return it;
 
@@ -310,7 +310,7 @@ CharacterPetCache* CharacterDatabaseCache::GetCharacterPetByOwner(uint64 owner)
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(owner);
     if (ownerPets == m_petsByCharacter.end())
         return nullptr;
-    for (const auto & it : ownerPets->second)
+    for (const auto& it : ownerPets->second)
         if (it->slot == PET_SAVE_AS_CURRENT || it->slot > PET_SAVE_LAST_STABLE_SLOT)
             return it;
 
@@ -322,7 +322,7 @@ void CharacterDatabaseCache::CharacterPetSetOthersNotInSlot(CharacterPetCache* p
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(pCache->owner);
     if (ownerPets == m_petsByCharacter.end())
         return;
-    for (const auto & it : ownerPets->second)
+    for (const auto& it : ownerPets->second)
         if (it->id != pCache->id && it->slot == PET_SAVE_AS_CURRENT)
             it->slot = PET_SAVE_NOT_IN_SLOT;
 }

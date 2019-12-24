@@ -264,7 +264,7 @@ struct boss_sapphironAI : public ScriptedAI
 
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (const auto & itr : PlayerList)
+        for (const auto& itr : PlayerList)
         {
             Player* pPlayer = itr.getSource();
             
@@ -350,7 +350,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
 
         std::vector<Unit*> suitableUnits;
-        for (auto itr : threatlist)
+        for (const auto itr : threatlist)
             if (Unit* pTarget = m_creature->GetMap()->GetPlayer(itr->getUnitGuid()))
             {
                 if (pTarget->IsDead())

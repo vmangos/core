@@ -103,7 +103,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
             guid = 0;
 
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-        for (auto i : tList)
+        for (const auto i : tList)
         {
             Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
 
@@ -497,7 +497,7 @@ struct npc_stitchesAI : npc_escortAI
 
     void DespawnWatcher()
     {
-        for (const auto & guid : m_lWatchman)
+        for (const auto& guid : m_lWatchman)
         {
             if (auto pWatchman = m_creature->GetMap()->GetCreature(guid))
             {

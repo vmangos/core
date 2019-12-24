@@ -167,7 +167,7 @@ struct boss_ossirianAI : public ScriptedAI
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
         DoCast(m_creature, SPELL_STRENGTH_OF_OSSIRIAN);
-        for (auto i : TornadoSpawn)
+        for (const auto& i : TornadoSpawn)
         {
             Creature *pCreature = m_creature->SummonCreature(NPC_TORNADO,
                                   i.x,
@@ -317,7 +317,7 @@ struct generic_random_moveAI : public ScriptedAI
             {
                 std::vector<Player*> PlayerList;
                 Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-                for (const auto & i : liste)
+                for (const auto& i : liste)
                 {
                     if (i.getSource()->GetDistance2d(m_creature) < MAX_VISIBILITY_DISTANCE)
                         PlayerList.push_back(i.getSource());

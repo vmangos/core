@@ -145,7 +145,7 @@ MotionMaster::~MotionMaster()
 
     if (m_expList)
     {
-        for (auto mg : *m_expList)
+        for (const auto mg : *m_expList)
         {
             if (!isStatic(mg))
                 delete mg;
@@ -173,7 +173,7 @@ void MotionMaster::UpdateMotion(uint32 diff)
 
     if (m_expList)
     {
-        for (auto mg : *m_expList)
+        for (const auto mg : *m_expList)
         {
             if (!isStatic(mg))
                 delete mg;
@@ -254,7 +254,7 @@ void MotionMaster::DelayedClean(bool reset, bool all)
         pop();
         mvtGensToFinalize.push_back(curr);
     }
-    for (const auto & it : mvtGensToFinalize)
+    for (const auto& it : mvtGensToFinalize)
     {
         it->Finalize(*m_owner);
 
@@ -326,7 +326,7 @@ void MotionMaster::DelayedExpire(bool reset)
         pop();
         mvtGensToFinalize.push_back(temp);
     }
-    for (const auto & it : mvtGensToFinalize)
+    for (const auto& it : mvtGensToFinalize)
     {
         it->Finalize(*m_owner);
         m_expList->push_back(it);

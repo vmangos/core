@@ -355,12 +355,12 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->MaxCount;
         data << pProto->Stackable;
         data << pProto->ContainerSlots;
-        for (auto i : pProto->ItemStat)
+        for (const auto& i : pProto->ItemStat)
         {
             data << i.ItemStatType;
             data << i.ItemStatValue;
         }
-        for (auto i : pProto->Damage)
+        for (const auto& i : pProto->Damage)
         {
             data << i.DamageMin;
             data << i.DamageMax;
@@ -382,7 +382,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << (float)pProto->RangedModRange;
 #endif
 
-        for (const auto & itr : pProto->Spells)
+        for (const auto& itr : pProto->Spells)
         {
             // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
             // use `item_template` or if not set then only use spell cooldowns

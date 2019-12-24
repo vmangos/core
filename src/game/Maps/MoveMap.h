@@ -54,7 +54,7 @@ namespace MMAP
         MMapData(dtNavMesh* mesh) : navMesh(mesh) {}
         ~MMapData()
         {
-            for (const auto & itr : navMeshQueries)
+            for (const auto& itr : navMeshQueries)
                 dtFreeNavMeshQuery(itr.second);
 
             if (navMesh)

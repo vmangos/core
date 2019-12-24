@@ -949,7 +949,7 @@ class ObjectMgr
         template<typename Worker>
         void DoCreatureData(Worker& worker) const
         {
-            for (const auto & itr : m_CreatureDataMap)
+            for (const auto& itr : m_CreatureDataMap)
                 if (worker(itr))
                     break;
         }
@@ -1044,7 +1044,7 @@ class ObjectMgr
         template<typename Worker>
         void DoGOData(Worker& worker) const
         {
-            for (const auto & itr : m_GameObjectDataMap)
+            for (const auto& itr : m_GameObjectDataMap)
                 if (worker(itr))                           // arg = GameObjectDataPair
                     break;
         }

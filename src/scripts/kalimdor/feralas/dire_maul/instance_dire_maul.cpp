@@ -417,7 +417,7 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
 
                 if (!m_lFelvineShardGUIDs.empty())
                 {
-                    for (const auto & guid : m_lFelvineShardGUIDs)
+                    for (const auto& guid : m_lFelvineShardGUIDs)
                         DoRespawnGameObject(guid);
                 }
             }
@@ -757,7 +757,7 @@ struct npc_residual_montruosityAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(montruosityList, m_creature, 11484, 45.0f);
             if (!montruosityList.empty())
             {
-                for (const auto & itr : montruosityList)
+                for (const auto& itr : montruosityList)
                 {
                     if (itr != m_creature)
                     {
@@ -1743,7 +1743,7 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
         {
             bool m_bMeleeAttackers = false;
             Unit::AttackerSet attackers = m_creature->GetAttackers();
-            for (auto itr : attackers)
+            for (const auto itr : attackers)
             {
                 if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
                 {
@@ -1929,7 +1929,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         GetCreatureListWithEntryInGrid(m_lHelpers, m_creature, NPC_ALZZINS_MINION, 80.0f);
         if (!m_lHelpers.empty())
         {
-            for (const auto & pCreature : m_lHelpers)
+            for (const auto& pCreature : m_lHelpers)
             {
                 if (pCreature && !pCreature->IsAlive())
                     static_cast<TemporarySummon*>(pCreature)->UnSummon();

@@ -267,7 +267,7 @@ struct boss_victor_nefariusAI : ScriptedAI
 
         std::list<GameObject*> lGameObjects;
         m_creature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_DRAKONID_BONES, 250.0f);
-        for (const auto & pGo : lGameObjects)
+        for (const auto& pGo : lGameObjects)
             pGo->DeleteLater();
 
         // @TODO: Find out why there is this reset bug !!
@@ -339,7 +339,7 @@ struct boss_victor_nefariusAI : ScriptedAI
                         m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
 
                         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-                        for (const auto & i : liste)
+                        for (const auto& i : liste)
                             if (i.getSource() && i.getSource()->IsAlive())
                                 m_creature->AddThreat(i.getSource(), 10000.0f);
 

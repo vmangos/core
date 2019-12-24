@@ -220,7 +220,7 @@ HostileReference* ThreatContainer::getReferenceByTarget(Unit* pVictim)
 
     HostileReference* result = nullptr;
     ObjectGuid guid = pVictim->GetObjectGuid();
-    for (auto i : iThreatList)
+    for (const auto i : iThreatList)
     {
         if (i->getUnitGuid() == guid)
         {

@@ -539,7 +539,7 @@ struct npc_twiggy_flatheadAI : public ScriptedAI
             }
             std::list<Creature*> lCrea;
             m_creature->GetCreatureListWithEntryInGrid(lCrea, NPC_AFFRAY_SPECTATOR, 30.0f);
-            for (const auto & it : lCrea)
+            for (const auto& it : lCrea)
             {
                 switch (urand(0, 10))
                 {
@@ -1035,7 +1035,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
 
             GetGameObjectListWithEntryInGrid(banners, pCreature, GO_KOLKAR_BANNER, 15.0f);
 
-            for (auto banner : banners)
+            for (const auto banner : banners)
             {
                 if (!banner->isSpawned()) // looted, safe to remove
                     banner->AddObjectToRemoveList();
@@ -1510,7 +1510,7 @@ bool ProcessEventId_event_the_principle_source(uint32 eventId, Object* pSource, 
     if (!pPlayer)
         return true;
 
-    for (const auto & i : Toxicologist)
+    for (const auto& i : Toxicologist)
     {
         if (auto pToxicologist = pPlayer->SummonCreature(i.entry,
             i.x,

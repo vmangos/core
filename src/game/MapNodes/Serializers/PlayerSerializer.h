@@ -194,7 +194,7 @@ void Player::SerializeAuras(MaNGOS::Serializer::WriteSerializer& buf)
     buf(size);
 
     AuraSaveStruct s;
-    for (const auto & auraHolder : auraHolders)
+    for (const auto& auraHolder : auraHolders)
     {
         uint8 hasAura = SaveAura(auraHolder.second, s);
         buf(hasAura);
@@ -367,7 +367,7 @@ void Player::SerializeSpells(MaNGOS::Serializer::WriteSerializer& buf)
     uint32 spell_id;
     bool is_spell_active;
     bool is_spell_disabled;
-    for (const auto & spell : m_spells)
+    for (const auto& spell : m_spells)
     {
         // add only changed/new not dependent spells
         if (!spell.second.dependent)
@@ -408,7 +408,7 @@ void Player::SerializeSpellCooldowns(MaNGOS::Serializer::WriteSerializer& buf)
 {
     static uint32 last_spell_id = 0;
     time_t currTime = time(nullptr);
-    for (const auto & itr : m_spellCooldowns)
+    for (const auto& itr : m_spellCooldowns)
     {
         if (itr.second.end > currTime && itr.second.end <= currTime + infinityCooldownDelayCheck)
         {

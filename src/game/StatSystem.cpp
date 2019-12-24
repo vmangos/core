@@ -147,7 +147,7 @@ void Player::UpdateArmor()
         if ((form == FORM_DIREBEAR) || (form == FORM_BEAR))
         {
             Unit::AuraList const& mDummy = GetAurasByType(SPELL_AURA_DUMMY);
-            for (auto itr : mDummy)
+            for (const auto itr : mDummy)
             {
                 // Enrage
                 if (itr->GetId() == 5229)
@@ -297,7 +297,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                     case FORM_MOONKIN:
                     {
                         Unit::AuraList const& mDummy = GetAurasByType(SPELL_AURA_DUMMY);
-                        for (auto itr : mDummy)
+                        for (const auto itr : mDummy)
                         {
                             // Predatory Strikes
                             if (itr->GetSpellProto()->SpellIconID == 1563)

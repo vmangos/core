@@ -269,7 +269,7 @@ struct npc_melizza_brimbuzzleAI : public npc_escortAI
                 m_creature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
                 break;
             case 4:
-                for (auto i : aMarauderSpawn)
+                for (const auto& i : aMarauderSpawn)
                 {
                     for (uint8 j = 0; j < MAX_MARAUDERS; ++j)
                     {
@@ -531,7 +531,7 @@ struct go_ghost_magnetAI: public GameObjectAI
         state = 1;
         std::list<GameObject*> lGobj;
         me->GetGameObjectListWithEntryInGrid(lGobj, GO_GHOST_MAGNET_AURA, 30.0f);
-        for (const auto & it : lGobj)
+        for (const auto& it : lGobj)
         {
             if (it->isSpawned())
             {
@@ -922,7 +922,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void DespawnCaravan()
     {
-        for (const auto & guid : m_lCaravanGuid)
+        for (const auto& guid : m_lCaravanGuid)
         {
             if (guid != m_creature->GetObjectGuid())
             {
@@ -936,7 +936,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void CaravanFaction(bool apply)
     {
-        for (const auto & guid : m_lCaravanGuid)
+        for (const auto& guid : m_lCaravanGuid)
         {
             if (guid != m_creature->GetObjectGuid())
             {

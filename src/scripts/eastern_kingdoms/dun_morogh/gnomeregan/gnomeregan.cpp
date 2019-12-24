@@ -161,7 +161,7 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
 
     void DoSummonPack(uint8 uiIndex)
     {
-        for (const auto & i : asSummonInfo)
+        for (const auto& i : asSummonInfo)
         {
             // This requires order of the array
             if (i.uiPosition > uiIndex)
@@ -255,7 +255,7 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
         if (m_bNorthernCaveInOpened)                        // close northern cave-in door
             m_pInstance->DoUseDoorOrButton(m_pInstance->GetData64(GO_CAVE_IN_NORTH));
 
-        for (auto guid : m_luiSummonedMobGUIDs)
+        for (const auto& guid : m_luiSummonedMobGUIDs)
         {
             if (Creature* pSummoned = m_creature->GetMap()->GetCreature(guid))
                 pSummoned->ForcedDespawn();

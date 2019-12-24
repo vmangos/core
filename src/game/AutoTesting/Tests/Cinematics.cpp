@@ -82,7 +82,7 @@ public:
         {
             // search spell for spell error
             uint32 spellid = 0;
-            for (const auto & spell : item->GetProto()->Spells)
+            for (const auto& spell : item->GetProto()->Spells)
             {
                 if (spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
                 {
@@ -157,7 +157,7 @@ public:
             if (player->CanEquipNewItem(slot, dest, id, true))
                 items[slot].insert(id);
         }
-        for (const auto & item : items)
+        for (const auto& item : items)
             if (!item.empty())
             {
                 auto it = item.begin();
