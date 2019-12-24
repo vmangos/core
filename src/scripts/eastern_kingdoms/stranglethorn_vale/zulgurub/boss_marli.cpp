@@ -165,10 +165,10 @@ struct boss_marliAI : public ScriptedAI
         else
         {
             lEggs.sort(ObjectDistanceOrder(m_creature));
-            for (std::list<GameObject*>::iterator iter = lEggs.begin(); iter != lEggs.end(); ++iter)
+            for (const auto& pEgg : lEggs)
             {
-                if ((*iter)->GetGoState() == (GO_STATE_READY))
-                    return (*iter);
+                if (pEgg->GetGoState() == (GO_STATE_READY))
+                    return pEgg;
             }
         }
         return nullptr;

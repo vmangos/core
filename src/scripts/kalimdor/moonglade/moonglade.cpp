@@ -395,10 +395,10 @@ struct npc_keeper_remulosAI : public npc_escortAI
 
             m_uiMalfurionGUID.Clear();
 
-            for (int j = 0; j < 5; j++)
-                m_uiTabMovementsTimer[j] = 0;
-            for (int k = 0; k < 10; k++)
-                m_uiTabDialogsTimer[k] = 0;
+            for (uint32 & j : m_uiTabMovementsTimer)
+                j = 0;
+            for (uint32 & k : m_uiTabDialogsTimer)
+                k = 0;
         }
     }
 
@@ -1409,9 +1409,9 @@ struct boss_eranikusAI : public ScriptedAI
         if (!m_creature->IsWithinMeleeRange(pTarget))
         {
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+            for (const auto itr : tList)
             {
-                if (Unit* pAttacker = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+                if (Unit* pAttacker = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     if (m_creature->IsWithinMeleeRange(pAttacker))
                         m_creature->GetThreatManager().modifyThreatPercent(pAttacker, 5);
             }

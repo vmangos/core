@@ -46,8 +46,8 @@ instance_ruins_of_ahnqiraj::instance_ruins_of_ahnqiraj(Map* pMap) : ScriptedInst
 void instance_ruins_of_ahnqiraj::Initialize()
 {
     m_uiKurinnaxxGUID = 0;
-    for (uint8 waveIndex = 0; waveIndex < WAVE_MAX; ++waveIndex)
-        m_uiWaveMembersCount[waveIndex] = WAVE_MEMBERS_INIT_COUNT;
+    for (uint32 & waveIndex : m_uiWaveMembersCount)
+        waveIndex = WAVE_MEMBERS_INIT_COUNT;
     m_uiBuruGUID = 0;
     m_uiOssirianGUID = 0;
     m_uiAndorovGUID = 0;
@@ -74,8 +74,8 @@ void instance_ruins_of_ahnqiraj::Initialize()
 
 bool instance_ruins_of_ahnqiraj::IsEncounterInProgress() const
 {
-    for (uint8 i = 0; i < INSTANCE_RUINS_AQ_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+    for (uint32 i : m_auiEncounter)
+        if (i == IN_PROGRESS || i == SPECIAL)
             return true;
     return false;
 }
@@ -434,8 +434,8 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
                     SetAndorovSquadRespawnTime(AQ_RESPAWN_15_MINUTES);
 
                 /** Reset waves casualities count */
-                for (uint8 waveIndex = 0; waveIndex < WAVE_MAX; ++waveIndex)
-                    m_uiWaveMembersCount[waveIndex] = WAVE_MEMBERS_INIT_COUNT;
+                for (uint32 & waveIndex : m_uiWaveMembersCount)
+                    waveIndex = WAVE_MEMBERS_INIT_COUNT;
             }
             if (uiData == DONE)
             {
@@ -468,9 +468,9 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         case TYPE_OSSIRIAN:
             if (uiData == FAIL || uiData == DONE)
             {
-                for (auto iter = crystalGuids.cbegin(); iter != crystalGuids.cend(); ++iter)
+                for (const auto& crystalGuid : crystalGuids)
                 {
-                    if (GameObject* invoc = instance->GetGameObject(*iter))
+                    if (GameObject* invoc = instance->GetGameObject(crystalGuid))
                         invoc->AddObjectToRemoveList();
                 }
 
@@ -525,9 +525,9 @@ void instance_ruins_of_ahnqiraj::Load(char const* chrIn)
     loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3]
         >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6];
 
-    for (uint8 i = 0; i < INSTANCE_RUINS_AQ_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] > SPECIAL)           // Do not load an encounter as "In Progress" - reset it instead.
-            m_auiEncounter[i] = NOT_STARTED;
+    for (uint32 & i : m_auiEncounter)
+        if (i == IN_PROGRESS || i > SPECIAL)           // Do not load an encounter as "In Progress" - reset it instead.
+            i = NOT_STARTED;
 
     if (m_auiEncounter[TYPE_GENERAL_ANDOROV] == DONE)
         m_auiEncounter[TYPE_GENERAL_ANDOROV] = NOT_STARTED;
@@ -600,9 +600,9 @@ void instance_ruins_of_ahnqiraj::SetAndorovSquadRespawnTime(uint32 nextRespawnDe
         if (!pAndorov->IsAlive())
             pAndorov->SetRespawnTime(nextRespawnDelay);
     }
-    for (std::list<uint64>::iterator it = m_lKaldoreiElites.begin(); it != m_lKaldoreiElites.end(); ++it)
+    for (const auto& guid : m_lKaldoreiElites)
     {
-        if (Creature* pElite = instance->GetCreature(*it))
+        if (Creature* pElite = instance->GetCreature(guid))
         {
             if (!pElite->IsAlive())
                 pElite->SetRespawnTime(nextRespawnDelay);
@@ -617,9 +617,9 @@ void instance_ruins_of_ahnqiraj::SetAndorovSquadFaction(uint32 faction)
         pAndorov->SetFactionTemplateId(faction);
         pAndorov->SetPvP(true);
     }
-    for (std::list<uint64>::iterator it = m_lKaldoreiElites.begin(); it != m_lKaldoreiElites.end(); ++it)
+    for (const auto& guid : m_lKaldoreiElites)
     {
-        if (Creature* pElite = instance->GetCreature(*it))
+        if (Creature* pElite = instance->GetCreature(guid))
         {
             pElite->SetFactionTemplateId(faction);
             pElite->SetPvP(true);
@@ -634,9 +634,9 @@ void instance_ruins_of_ahnqiraj::ForceAndorovSquadDespawn(uint32 timeToDespawn)
         pAndorov->ForcedDespawn(timeToDespawn);
         pAndorov->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
     }
-    for (std::list<uint64>::iterator it = m_lKaldoreiElites.begin(); it != m_lKaldoreiElites.end(); ++it)
+    for (const auto& guid : m_lKaldoreiElites)
     {
-        if (Creature* pElite = instance->GetCreature(*it))
+        if (Creature* pElite = instance->GetCreature(guid))
         {
             pElite->ForcedDespawn(timeToDespawn);
             pElite->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
@@ -683,7 +683,7 @@ void instance_ruins_of_ahnqiraj::SpawnNewCrystals(ObjectGuid usedCrystal)
     float minDistanceLimit = maxDistanceLimit / 2;
 
     // We already have another crystal spawned. Use that as the hint
-    if (crystalIndexes.size() > 0)
+    if (!crystalIndexes.empty())
     {
         maxDistanceLimit *= 0.75f;
         minDistanceLimit *= 0.75f;

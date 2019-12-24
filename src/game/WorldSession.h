@@ -402,12 +402,12 @@ class MANGOS_DLL_SPEC WorldSession
 
         //auction
         void SendAuctionHello(Unit* unit);
-        void SendAuctionCommandResult(AuctionEntry *auc, AuctionAction Action, AuctionError ErrorCode, InventoryResult invError = EQUIP_ERR_OK);
-        void SendAuctionBidderNotification(AuctionEntry *auction, bool won);
-        void SendAuctionOwnerNotification(AuctionEntry *auction, bool sold);
+        void SendAuctionCommandResult(AuctionEntry* auc, AuctionAction Action, AuctionError ErrorCode, InventoryResult invError = EQUIP_ERR_OK);
+        void SendAuctionBidderNotification(AuctionEntry* auction, bool won);
+        void SendAuctionOwnerNotification(AuctionEntry* auction, bool sold);
         void SendAuctionRemovedNotification(AuctionEntry* auction);
-        void SendAuctionOutbiddedMail(AuctionEntry *auction);
-        void SendAuctionCancelledToBidderMail(AuctionEntry *auction);
+        void SendAuctionOutbiddedMail(AuctionEntry* auction);
+        void SendAuctionCancelledToBidderMail(AuctionEntry* auction);
         AuctionHouseEntry const* GetCheckedAuctionHouseForAuctioneer(ObjectGuid guid);
 
         //Item Enchantment

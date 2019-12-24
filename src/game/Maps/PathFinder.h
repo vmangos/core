@@ -121,9 +121,9 @@ class PathInfo
             m_polyLength = 0;
             m_pathPoints.clear();
         }
-        bool inRange(Vector3 const& p1, Vector3 const& p2, float r, float h) const;
-        float dist3DSqr(Vector3 const& p1, Vector3 const& p2) const;
-        bool inRangeYZX(float const* v1, float const* v2, float r, float h) const;
+        static bool inRange(Vector3 const& p1, Vector3 const& p2, float r, float h);
+        static float dist3DSqr(Vector3 const& p1, Vector3 const& p2);
+        static bool inRangeYZX(float const* v1, float const* v2, float r, float h);
 
         dtPolyRef getPolyByLocation(float const* point, float *distance, uint32 flags = 0);
         bool HaveTiles(Vector3 const& p) const;
@@ -137,14 +137,14 @@ class PathInfo
         void updateFilter();
 
         // smooth path functions
-        uint32 fixupCorridor(dtPolyRef* path, uint32 const npath, uint32 const maxPath,
-                             dtPolyRef const* visited, uint32 const nvisited);
+        static uint32 fixupCorridor(dtPolyRef* path, uint32 const npath, uint32 const maxPath,
+                                    dtPolyRef const* visited, uint32 const nvisited);
         bool getSteerTarget(float const* startPos, float const* endPos, float const minTargetDist,
                             dtPolyRef const* path, uint32 const pathSize, float* steerPos,
                             unsigned char& steerPosFlag, dtPolyRef& steerPosRef) const;
         dtStatus findSmoothPath(float const* startPos, float const* endPos,
-                              dtPolyRef const* polyPath, uint32 polyPathSize,
-                              float* smoothPath, int* smoothPathSize, uint32 maxSmoothPathSize);
+                                dtPolyRef const* polyPath, uint32 polyPathSize,
+                                float* smoothPath, int* smoothPathSize, uint32 maxSmoothPathSize);
 };
 
 typedef PathInfo PathFinder;

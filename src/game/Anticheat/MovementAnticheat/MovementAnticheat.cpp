@@ -168,7 +168,7 @@ uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason)
 
             if (threshold && count >= threshold)
             {
-                if (reason.str() != "")
+                if (!reason.str().empty())
                     reason << "/";
                 reason << GetMovementCheatName(cheatType) << (total ? "(Total:" : "(Tick:") << count << ")";
                 action |= penalty;
@@ -830,14 +830,11 @@ bool MovementCheatData::CheckNoFallTime(MovementInfo const& movementInfo, uint16
             m_jumpFlagTime = movementInfo.time;
     }
     
-    if (m_jumpFlagTime &&
+    return m_jumpFlagTime &&
        (m_jumpFlagCount > JUMP_FLAG_THRESHOLD) &&
        (movementInfo.time - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
        (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
-       (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY))
-        return true;
-
-    return false;
+       (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY);
 }
 
 uint32 MovementCheatData::CheckTimeDesync(MovementInfo const& movementInfo)
@@ -913,10 +910,7 @@ bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 
     float const angleRad = atan(deltaZ / deltaXY);
     //float const angleDeg = angleRad * (360 / (M_PI_F * 2));
 
-    if (angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE))
-        return true;
-
-    return false;
+    return angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE);
 }
 
 bool MovementCheatData::CheckForbiddenArea(MovementInfo const& movementInfo) const
@@ -1247,8 +1241,5 @@ bool MovementCheatData::IsTeleportAllowed(MovementInfo const& movementInfo) cons
             maxDistance = std::max(maxDistance, ALLOWED_TRANSPORT_DISTANCE);
     }
 
-    if (distance < maxDistance)
-        return true;
-
-    return false;
+    return distance < maxDistance;
 }

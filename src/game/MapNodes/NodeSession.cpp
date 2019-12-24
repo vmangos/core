@@ -102,8 +102,9 @@ void NodeSession::UnsafeUpdate(uint32 diff)
     if (!IsConnectedToMaster())
     {
         m_socketsLock.acquire_read();
-        for (SocketsMap::const_iterator it = m_accountSockets.begin(); it != m_accountSockets.end(); ++it)
-            if (WorldSession* wsess = sWorld.FindSession(it->first))
+        for (const auto& itr : m_accountSockets)
+        { 
+            if (WorldSession* wsess = sWorld.FindSession(itr.first))
             {
                 PacketFilter f(wsess);
                 f.SetProcessType(PACKET_PROCESS_MASTER_SAFE);
@@ -111,7 +112,7 @@ void NodeSession::UnsafeUpdate(uint32 diff)
                 f.SetProcessType(PACKET_PROCESS_DB_QUERY);
                 wsess->Update(f);
             }
-
+        }
         m_socketsLock.release();
     }
     // Lost sockets ?
@@ -153,10 +154,10 @@ void NodeSession::Close()
     // Will kick all connected users.
     // TODO: Go back to character selection screen ?
     m_socketsLock.acquire_write();
-    for (SocketsMap::iterator it = m_accountSockets.begin(); it != m_accountSockets.end(); ++it)
+    for (const auto& itr : m_accountSockets)
     {
-        it->second->CloseSocket();
-        it->second->RemoveReference();
+        itr.second->CloseSocket();
+        itr.second->RemoveReference();
     }
     m_accountSockets.clear();
     m_socketsLock.release();

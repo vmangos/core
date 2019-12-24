@@ -163,41 +163,41 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
     {
         //write it in m_pInstance?
         GameObject* gobj;
-        for (int i = 0; i < 18; i++)
+        for (uint64 guid : guidFlameTab)
         {
-            if (gobj = me->GetMap()->GetGameObject(guidFlameTab[i]))
+            if (gobj = me->GetMap()->GetGameObject(guid))
                 gobj->Despawn();
         }
         eventPhase++;
 
         std::list<Creature*> lCrea;
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_XOROTHIAN_IMP, 30.0f);
-        for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
+        for (const auto& it : lCrea)
         {
-            if ((*it)->IsAlive())
-                DoScriptText(SAY_IMP_DESPAWN, (*it));
-            (*it)->DisappearAndDie();
+            if (it->IsAlive())
+                DoScriptText(SAY_IMP_DESPAWN, it);
+            it->DisappearAndDie();
         }
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_DREAD_GUARD, 30.0f);
-        for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
+        for (const auto& it : lCrea)
         {
-            if ((*it)->IsAlive())
-                DoScriptText(SAY_DREAD_GUARD_DESPAWN, (*it));
-            (*it)->DisappearAndDie();
+            if (it->IsAlive())
+                DoScriptText(SAY_DREAD_GUARD_DESPAWN, it);
+            it->DisappearAndDie();
         }
     }
     void EventEndedFail()
     {
         eventPhase = 0;
         GameObject* gobj;
-        for (int i = 0; i < 18; i++)
+        for (uint64 guid : guidFlameTab)
         {
-            if (gobj = me->GetMap()->GetGameObject(guidFlameTab[i]))
+            if (gobj = me->GetMap()->GetGameObject(guid))
                 gobj->Despawn();
         }
-        for (int i = 0; i < 9; i++)
+        for (uint64 guid : guidGlyphTab)
         {
-            if (gobj = me->GetMap()->GetGameObject(guidGlyphTab[i]))
+            if (gobj = me->GetMap()->GetGameObject(guid))
             {
                 gobj->SetSpawnedByDefault(false);
                 gobj->Refresh();
@@ -208,9 +208,9 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             gobj->SetSpawnedByDefault(false);
             gobj->Refresh();
         }
-        for (int i = 0; i < 3; i++)
+        for (const auto& node : nodes)
         {
-            if (gobj = me->GetMap()->GetGameObject(nodes[i].highGuid))
+            if (gobj = me->GetMap()->GetGameObject(node.highGuid))
             {
                 gobj->SetSpawnedByDefault(false);
                 gobj->Refresh();
@@ -218,18 +218,18 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         }
         std::list<Creature*> lCrea;
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_XOROTHIAN_IMP, 30.0f);
-        for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
+        for (const auto& it : lCrea)
         {
-            if ((*it)->IsAlive())
-                DoScriptText(SAY_IMP_DESPAWN, (*it));
-            (*it)->DisappearAndDie();
+            if (it->IsAlive())
+                DoScriptText(SAY_IMP_DESPAWN, it);
+            it->DisappearAndDie();
         }
         me->GetCreatureListWithEntryInGrid(lCrea, NPC_DREAD_GUARD, 30.0f);
-        for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
+        for (const auto& it : lCrea)
         {
-            if ((*it)->IsAlive())
-                DoScriptText(SAY_DREAD_GUARD_DESPAWN, (*it));
-            (*it)->DisappearAndDie();
+            if (it->IsAlive())
+                DoScriptText(SAY_DREAD_GUARD_DESPAWN, it);
+            it->DisappearAndDie();
         }
         reset();
     }
@@ -341,9 +341,9 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                     case 10:
                         //well basicaly  pause basicaly before p3. wait for 3 nodes to be back up
                         uint8 nbOkNodes = 0;
-                        for (uint8 i = 0; i < 3; i++)
+                        for (const auto& node : nodes)
                         {
-                            if (nodes[i].up == true)
+                            if (node.up)
                                 nbOkNodes++;
                         }
                         if (nbOkNodes == 3)
@@ -583,9 +583,9 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
     void BreakNode()
     {
         uint8 nbOkNodes = 0;
-        for (uint8 i = 0; i < 3; i++)
+        for (const auto& node : nodes)
         {
-            if (nodes[i].up == true)
+            if (node.up)
                 nbOkNodes++;
         }
         if (nbOkNodes < 2)
@@ -599,7 +599,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             uint8 count = 0;
             for (uint8 i = 0; i < 3; i++)
             {
-                if (nodes[i].up == true)
+                if (nodes[i].up)
                 {
                     if (nodeToBreak == count)
                     {
@@ -681,15 +681,14 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
     //keep an eye on nodes
     void NodeUpped(GameObject* pGo)
     {
-        for (int i = 0; i < 3; i++)
+        for (auto& node : nodes)
         {
-            if (nodes[i].highGuid == pGo->GetGUID())
+            if (node.highGuid == pGo->GetGUID())
             {
-                nodes[i].up = true;
+                node.up = true;
                 break;
             }
         }
-        return;
     }
 };
 GameObjectAI* GetAIgo_pedestal_of_immol_thar(GameObject *pGo)

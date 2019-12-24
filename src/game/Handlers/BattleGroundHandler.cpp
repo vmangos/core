@@ -90,7 +90,6 @@ void WorldSession::HandleBattlefieldJoinOpcode(WorldPacket& recv_data)
     data << uint8(0);
 
     HandleBattlemasterJoinOpcode(data);
-    return;
 }
 
 void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
@@ -670,5 +669,4 @@ void WorldSession::SendBattleGroundJoinError(uint8 err)
     }
     ChatHandler::BuildChatPacket(data, CHAT_MSG_BG_SYSTEM_NEUTRAL, GetMangosString(msg), LANG_UNIVERSAL);
     SendPacket(&data);
-    return;
 }

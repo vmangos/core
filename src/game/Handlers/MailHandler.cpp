@@ -525,12 +525,12 @@ void WorldSession::HandleMailReturnToSender(WorldPacket& recv_data)
 
         if (m->HasItems())
         {
-            for (MailItemInfoVec::iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
+            for (const auto& itr2 : m->items)
             {
-                if (Item *item = pl->GetMItem(itr2->item_guid))
+                if (Item *item = pl->GetMItem(itr2.item_guid))
                     draft.AddItem(item);
 
-                pl->RemoveMItem(itr2->item_guid);
+                pl->RemoveMItem(itr2.item_guid);
             }
         }
 
@@ -568,7 +568,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket& recv_data)
     }
 
     // Prevent spoofed packet accessing mail that doesn't actually have items
-    if (!m->HasItems() || m->items.size() == 0)
+    if (!m->HasItems() || m->items.empty())
     {
         pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
         return;
@@ -777,7 +777,7 @@ void WorldSession::HandleGetMailList(WorldPacket& recv_data)
         data << uint32((*itr)->stationery);                 // stationery (Stationery.dbc)
 
         // 1.12.1 can have only single item
-        Item *item = (*itr)->items.size() > 0 ? pl->GetMItem((*itr)->items[0].item_guid) : nullptr;
+        Item *item = !(*itr)->items.empty() ? pl->GetMItem((*itr)->items[0].item_guid) : nullptr;
 
         if (item)
         {

@@ -99,7 +99,7 @@ bool findnth(std::string &str, int n, std::string::size_type &s, std::string::si
 
     do
     {
-        e = str.find("'", s);
+        e = str.find('\'', s);
         if (e == std::string::npos)
             return false;
     }
@@ -110,7 +110,7 @@ bool findnth(std::string &str, int n, std::string::size_type &s, std::string::si
         do
         {
             s = e + 4;
-            e = str.find("'", s);
+            e = str.find('\'', s);
             if (e == std::string::npos)
                 return false;
         }
@@ -393,11 +393,11 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
     {
         QueryFieldNames const& namesMap = result->GetFieldNames();
         std::string reqName;
-        for (QueryFieldNames::const_iterator itr = namesMap.begin(); itr != namesMap.end(); ++itr)
+        for (const auto& itr : namesMap)
         {
-            if (itr->substr(0, 9) == "required_")
+            if (itr.substr(0, 9) == "required_")
             {
-                reqName = *itr;
+                reqName = itr;
                 break;
             }
         }
@@ -573,7 +573,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
                 if (!changenth(line, 2, chraccount))        // characters.account update
                     ROLLBACK(DUMP_FILE_BROKEN);
 
-                if (name == "")
+                if (name.empty())
                 {
                     // check if the original name already exists
                     name = getnth(line, 3);                 // characters.name

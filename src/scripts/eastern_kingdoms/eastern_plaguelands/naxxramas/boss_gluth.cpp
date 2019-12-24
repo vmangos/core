@@ -154,9 +154,9 @@ struct boss_gluthAI : public ScriptedAI
         if (pSpell->Id == SPELL_DECIMATE)
         {
             Map::PlayerList const& pList = m_pInstance->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator it = pList.begin(); it != pList.end(); ++it)
+            for (const auto& it : pList)
             {
-                Player* pPlayer = (*it).getSource();
+                Player* pPlayer = it.getSource();
                 if (!pPlayer) continue;
                 if (pPlayer->IsDead()) continue;
                 DoCastSpellIfCan(pPlayer, SPELL_DECIMATE_OTHER, CF_TRIGGERED);
@@ -269,16 +269,16 @@ struct boss_gluthAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(chowableZombies, m_creature, NPC_ZOMBIE_CHOW, 15.0f);
         if (chowableZombies.empty())
             return;
-        for (auto it = chowableZombies.begin(); it != chowableZombies.end(); ++it)
+        for (const auto& chowableZombie : chowableZombies)
         {
-            if (!(*it)->IsAlive())
+            if (!chowableZombie->IsAlive())
                 continue;
 
             // Using 2d distance, should do fine
-            if ((*it)->GetDistance2d(m_creature) < 15.0f) // distance based on dbc for spellid 289236
+            if (chowableZombie->GetDistance2d(m_creature) < 15.0f) // distance based on dbc for spellid 289236
             {
-                m_creature->SetFacingToObject(*it);
-                m_creature->DealDamage((*it), (*it)->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                m_creature->SetFacingToObject(chowableZombie);
+                m_creature->DealDamage(chowableZombie, chowableZombie->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 
                 // heals gluth for 5%. SetHealth truncates to maxhealth internally
                 m_creature->SetHealth(m_creature->GetHealth() + five_percent);

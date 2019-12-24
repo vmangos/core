@@ -231,9 +231,9 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
 
     if (!PlayerList.isEmpty())
     {
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto& itr : PlayerList)
         {
-            if (Player* player = itr->getSource())
+            if (Player* player = itr.getSource())
             {
                 if (!player->IsDead() && !player->IsGameMaster() && player->IsInCombat() && !instance->PlayerInStomach(player)) {
                     temp.push_back(player);
@@ -296,9 +296,9 @@ static constexpr uint32 P2_FIRST_STOMACH_GRAB           = 18000 - STOMACH_GRAB_D
 // ======================= MISC ==========================
 static constexpr uint32 GROUND_RUPTURE_DELAY                   = 0;             // ms after spawn that the ground rupture will be cast
 static constexpr uint32 HAMSTRING_INITIAL_COOLDOWN             = 2000;          // Claw tentacle hamstring cooldown after spawn/tp
-static uint32 const hamstringResetCooldownFunc()               { return 5000; } // Claw tentacle hamstring cooldown after use
-static uint32 const trashResetCooldownFunc()                   { return urand(6000, 12000); }
-static uint32 const groundTremorResetCooldownFunc()            { return urand(6000, 12000); }
+static uint32 hamstringResetCooldownFunc()               { return 5000; } // Claw tentacle hamstring cooldown after use
+static uint32 trashResetCooldownFunc()                   { return urand(6000, 12000); }
+static uint32 groundTremorResetCooldownFunc()            { return urand(6000, 12000); }
 //static constexpr uint32 CLAW_TENTACLE_FIRST_MELEE_DELAY      = 1000; // Earliest possible point for a claw tentacle to melee after spawn/tp
 static constexpr uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN      = 5000; // How long does a claw tentacle evade before TPing to new target
 
@@ -562,10 +562,7 @@ public:
                 birthTimer -= diff;
             }
         }
-        if (birthTimer <= diff) {
-            return true;
-        }
-        return false;
+        return birthTimer <= diff;
     }
 
     void FixPortalPosition() {
@@ -1347,11 +1344,11 @@ struct cthunAI : public ScriptedAI
         // Force despawn any tentacles or portals alive. 
         std::list<Creature*> creaturesToDespawn;
         GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, allTentacleTypes, 2000.0f);
-        for (auto it = creaturesToDespawn.cbegin(); it != creaturesToDespawn.cend(); it++) {
-            if (cthunPortalTentacle* cpt = dynamic_cast<cthunPortalTentacle*>((*it)->AI())) {
+        for (const auto it : creaturesToDespawn) {
+            if (cthunPortalTentacle* cpt = dynamic_cast<cthunPortalTentacle*>(it->AI())) {
                 cpt->DespawnPortal();
             }
-            if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(*it)) {
+            if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(it)) {
                 ts->UnSummon();
             }
         }
@@ -1522,8 +1519,8 @@ struct cthunAI : public ScriptedAI
             m_pInstance->SetData(TYPE_CTHUN, DONE);
             std::list<Creature*> creaturesToDespawn;
             GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, MOB_FLESH_TENTACLE, 2000.0f);
-            for (auto it = creaturesToDespawn.cbegin(); it != creaturesToDespawn.cend(); it++) {
-                if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(*it)) {
+            for (const auto it : creaturesToDespawn) {
+                if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(it)) {
                     ts->UnSummon();
                 }
             }
@@ -1565,9 +1562,9 @@ struct cthunAI : public ScriptedAI
     {
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto& itr : PlayerList)
         {
-            Player* pPlayer = itr->getSource();
+            Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())
             {
                 if (UnitShouldPull(pPlayer)) {
@@ -1629,7 +1626,7 @@ struct cthunAI : public ScriptedAI
     void UpdateInvulnerablePhase(uint32 diff)
     {
         // Weaken if both Flesh Tentacles are killed
-        if (fleshTentacles.size() == 0) {
+        if (fleshTentacles.empty()) {
             weaknessTimer = WEAKNESS_DURATION;
 
             DoScriptText(EMOTE_WEAKENED, m_creature);
@@ -1672,17 +1669,18 @@ struct cthunAI : public ScriptedAI
     
     void SpawnFleshTentacles() {
 
-        if (fleshTentacles.size() != 0) {
+        if (!fleshTentacles.empty()) {
             sLog.outError("SpawnFleshTentacles() called, but there are already %i tentacles up.", fleshTentacles.size());
         }
         //Spawn 2 flesh tentacles in C'thun stomach
-        for (uint32 i = 0; i < 2; i++) {
+        for (const auto& fleshTentaclePosition : fleshTentaclePositions)
+        {
             m_creature->SummonCreature(MOB_FLESH_TENTACLE,
-                fleshTentaclePositions[i][0],
-                fleshTentaclePositions[i][1],
-                fleshTentaclePositions[i][2],
-                fleshTentaclePositions[i][3],
-                TENTACLE_DESPAWN_FLAG, 1500);
+                                       fleshTentaclePosition[0],
+                                       fleshTentaclePosition[1],
+                                       fleshTentaclePosition[2],
+                                       fleshTentaclePosition[3],
+                                       TENTACLE_DESPAWN_FLAG, 1500);
         }
         
     }
@@ -1744,16 +1742,16 @@ struct cthunAI : public ScriptedAI
         //float radius = 30.0f;
         //float angle = 360.0f / 8.0f;
 
-        for (uint8 i = 0; i < 8; i++)
+        for (const auto& eyeTentaclePosition : eyeTentaclePositions)
         {
             //float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
             //float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
             //float z = relToThisCreature->GetMap()->GetHeight(x, y, relToThisCreature->GetPositionZ()) + 0.1f;
             //sLog.outBasic("{%.6f, %.6f, %.6f},", x, y, z);
 
-            float x = eyeTentaclePositions[i][0];
-            float y = eyeTentaclePositions[i][1];
-            float z = eyeTentaclePositions[i][2];
+            float x = eyeTentaclePosition[0];
+            float y = eyeTentaclePosition[1];
+            float z = eyeTentaclePosition[2];
             if (Creature* Spawned = m_creature->SummonCreature(MOB_EYE_TENTACLE, x, y, z, 0,
                 TENTACLE_DESPAWN_FLAG, 1500))
                 //TEMPSUMMON_CORPSE_TIMED_DESPAWN, 1500))

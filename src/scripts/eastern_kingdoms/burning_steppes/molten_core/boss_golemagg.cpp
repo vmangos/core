@@ -70,13 +70,13 @@ struct boss_golemaggAI : public ScriptedAI
 
         std::list<Creature*> ChiensListe;
         GetCreatureListWithEntryInGrid(ChiensListe, m_creature, 11672, 150.0f);
-        if (ChiensListe.empty() == false)
+        if (!ChiensListe.empty())
         {
-            for (std::list<Creature*>::iterator itr = ChiensListe.begin(); itr != ChiensListe.end(); ++itr)
+            for (const auto& itr : ChiensListe)
             {
-                if ((*itr)->GetDeathState() == ALIVE)
-                    (*itr)->DealDamage((*itr), (*itr)->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-                (*itr)->Respawn();
+                if (itr->GetDeathState() == ALIVE)
+                    itr->DealDamage(itr, itr->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                itr->Respawn();
             }
         }
         //    available in creature_addon

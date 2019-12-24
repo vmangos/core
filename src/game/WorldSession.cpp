@@ -111,17 +111,15 @@ WorldSession::~WorldSession()
 
     ///- empty incoming packet queue
     WorldPacket* packet = nullptr;
-    for (int i = 0; i < PACKET_PROCESS_MAX_TYPE; ++i)
-        while (_recvQueue[i].next(packet))
+    for (auto& i : _recvQueue)
+        while (i.next(packet))
             delete packet;
     SetDumpPacket(nullptr);
     SetReadPacket(nullptr);
     SetDumpRecvPackets(nullptr);
 
-    if (m_warden)
-        delete m_warden;
-    if (m_cheatData)
-        delete m_cheatData;
+    delete m_warden;
+    delete m_cheatData;
 }
 
 void WorldSession::SizeError(WorldPacket const& packet, uint32 size) const
@@ -308,8 +306,8 @@ bool WorldSession::ForcePlayerLogoutDelay()
 bool WorldSession::Update(PacketFilter& updater)
 {
     uint32 sessionUpdateTime = WorldTimer::getMSTime();
-    for (int i = 0; i < FLOOD_MAX_OPCODES_TYPE; ++i)
-        _floodPacketsCount[i] = 0;
+    for (uint32 & i : _floodPacketsCount)
+        i = 0;
 
     ///- Retrieve packets from the receive queue and call the appropriate handlers
     ProcessPackets(updater);
@@ -929,8 +927,8 @@ void WorldSession::SendAuthWaitQue(uint32 position)
 
 void WorldSession::LoadTutorialsData()
 {
-    for (int aX = 0 ; aX < 8 ; ++aX)
-        m_Tutorials[ aX ] = 0;
+    for (uint32 & tutorial : m_Tutorials)
+        tutorial = 0;
 
     QueryResult* result = CharacterDatabase.PQuery("SELECT tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7 FROM character_tutorial WHERE account = '%u'", GetAccountId());
 
@@ -957,8 +955,8 @@ void WorldSession::LoadTutorialsData()
 void WorldSession::SendTutorialsData()
 {
     WorldPacket data(SMSG_TUTORIAL_FLAGS, 4 * 8);
-    for (uint32 i = 0; i < 8; ++i)
-        data << m_Tutorials[i];
+    for (uint32 tutorial : m_Tutorials)
+        data << tutorial;
     SendPacket(&data);
 }
 
@@ -972,8 +970,8 @@ void WorldSession::SaveTutorialsData()
         case TUTORIALDATA_CHANGED:
         {
             SqlStatement stmt = CharacterDatabase.CreateStatement(updTutorial, "UPDATE character_tutorial SET tut0=?, tut1=?, tut2=?, tut3=?, tut4=?, tut5=?, tut6=?, tut7=? WHERE account = ?");
-            for (int i = 0; i < ACCOUNT_TUTORIALS_COUNT; ++i)
-                stmt.addUInt32(m_Tutorials[i]);
+            for (uint32 tutorial : m_Tutorials)
+                stmt.addUInt32(tutorial);
 
             stmt.addUInt32(GetAccountId());
             stmt.Execute();
@@ -985,8 +983,8 @@ void WorldSession::SaveTutorialsData()
             SqlStatement stmt = CharacterDatabase.CreateStatement(insTutorial, "INSERT INTO character_tutorial (account,tut0,tut1,tut2,tut3,tut4,tut5,tut6,tut7) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
             stmt.addUInt32(GetAccountId());
-            for (int i = 0; i < ACCOUNT_TUTORIALS_COUNT; ++i)
-                stmt.addUInt32(m_Tutorials[i]);
+            for (uint32 tutorial : m_Tutorials)
+                stmt.addUInt32(tutorial);
 
             stmt.Execute();
         }
@@ -1153,7 +1151,7 @@ void WorldSession::ProcessAnticheatAction(char const* detector, char const* reas
             sWorld.BanAccount(BAN_ACCOUNT, GetUsername(), banSeconds, _reason, detector);
             std::stringstream banIpReason;
             banIpReason << "Cf account " << GetUsername();
-            sWorld.BanAccount(BAN_IP, GetRemoteAddress(), banSeconds, banIpReason.str().c_str(), detector);
+            sWorld.BanAccount(BAN_IP, GetRemoteAddress(), banSeconds, banIpReason.str(), detector);
         }
     }
     else if (cheatAction & CHEAT_ACTION_BAN_ACCOUNT)
@@ -1260,7 +1258,7 @@ bool WorldSession::AllowPacket(uint16 opcode)
         reason << _floodPacketsCount[FLOOD_SLOW_OPCODES] << " slow packets";
     if (_floodPacketsCount[FLOOD_TOTAL_PACKETS] > 300)
         reason << _floodPacketsCount[FLOOD_TOTAL_PACKETS] << " packets";
-    if (reason.str() != "")
+    if (!reason.str().empty())
     {
         reason << " (" << LookupOpcodeName(opcode) << ")";
         ProcessAnticheatAction("AntiFlood", reason.str().c_str(), sWorld.getConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION));
@@ -1292,13 +1290,13 @@ void WorldSession::AddClientIdentifier(uint32 i, std::string str)
 void WorldSession::ComputeClientHash()
 {
     std::stringstream oss;
-    for (ClientIdentifiersMap::const_iterator it = _clientIdentifiers.begin(); it != _clientIdentifiers.end(); ++it)
+    for (const auto& itr : _clientIdentifiers)
     {
         Sha1Hash sha;
-        sha.UpdateData(it->second);
+        sha.UpdateData(itr.second);
         sha.Finalize();
         uint8* digest = sha.GetDigest();
-        char c = it->first + '0';
+        char c = itr.first + '0';
         if (c > '9')
             c = c - '9' + 'A' - 1;
         oss << c;
@@ -1310,7 +1308,7 @@ void WorldSession::ComputeClientHash()
 
 bool WorldSession::ShouldBeBanned(uint32 currentLevel) const
 {
-    return _scheduleBanReason.size() && urand(2, _scheduleBanLevel) <= currentLevel;
+    return !_scheduleBanReason.empty() && urand(2, _scheduleBanLevel) <= currentLevel;
 }
 
 void WorldSession::LoginPlayerToNode(NodeSession* session)

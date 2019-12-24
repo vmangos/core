@@ -48,8 +48,8 @@ void MMapFactory::clear()
 // ######################## MMapManager ########################
 MMapManager::~MMapManager()
 {
-    for (MMapDataSet::iterator i = loadedMMaps.begin(); i != loadedMMaps.end(); ++i)
-        delete i->second;
+    for (const auto& loadedMMap : loadedMMaps)
+        delete loadedMMap.second;
 
     // by now we should not have maps loaded
     // if we had, tiles in MMapData->mmapLoadedTiles, their actual data is lost!
@@ -115,7 +115,7 @@ bool MMapManager::loadMapData(uint32 mapId)
     return true;
 }
 
-uint32 MMapManager::packTileID(int32 x, int32 y) const
+uint32 MMapManager::packTileID(int32 x, int32 y)
 {
     return uint32(x << 16 | y);
 }

@@ -38,8 +38,8 @@ using namespace MaNGOS;
 void
 VisibleChangesNotifier::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
-        iter->getSource()->UpdateVisibilityOf(&i_object);
+    for (const auto& iter : m)
+        iter.getSource()->UpdateVisibilityOf(&i_object);
 }
 
 void
@@ -50,25 +50,25 @@ VisibleNotifier::Notify()
     // but exist one case when this possible and object not out of range: transports
     if (Transport* transport = player.GetTransport())
     {
-        for (Transport::PassengerSet::const_iterator itr = transport->GetPassengers().begin(); itr != transport->GetPassengers().end(); ++itr)
+        for (const auto itr : transport->GetPassengers())
         {
-            if (i_clientGUIDs.find((*itr)->GetObjectGuid()) != i_clientGUIDs.end())
+            if (i_clientGUIDs.find(itr->GetObjectGuid()) != i_clientGUIDs.end())
             {
-                i_clientGUIDs.erase((*itr)->GetObjectGuid());
-                switch ((*itr)->GetTypeId())
+                i_clientGUIDs.erase(itr->GetObjectGuid());
+                switch (itr->GetTypeId())
                 {
                     case TYPEID_GAMEOBJECT:
-                        player.UpdateVisibilityOf(&player, (*itr)->ToGameObject(), i_data, i_visibleNow);
+                        player.UpdateVisibilityOf(&player, itr->ToGameObject(), i_data, i_visibleNow);
                         break;
                     case TYPEID_PLAYER:
-                        player.UpdateVisibilityOf(&player, (*itr)->ToPlayer(), i_data, i_visibleNow);
-                        (*itr)->ToPlayer()->UpdateVisibilityOf(*itr, &player);
+                        player.UpdateVisibilityOf(&player, itr->ToPlayer(), i_data, i_visibleNow);
+                        itr->ToPlayer()->UpdateVisibilityOf(itr, &player);
                         break;
                     case TYPEID_UNIT:
-                        player.UpdateVisibilityOf(&player, (*itr)->ToCreature(), i_data, i_visibleNow);
+                        player.UpdateVisibilityOf(&player, itr->ToCreature(), i_data, i_visibleNow);
                         break;
                     case TYPEID_DYNAMICOBJECT:
-                        player.UpdateVisibilityOf(&player, (DynamicObject*)(*itr), i_data, i_visibleNow);
+                        player.UpdateVisibilityOf(&player, (DynamicObject*)itr, i_data, i_visibleNow);
                         break;
                     default:
                         break;
@@ -105,12 +105,12 @@ VisibleNotifier::Notify()
 
         // send out of range to other players if need
         ObjectGuidSet const& oor = i_data.GetOutOfRangeGUIDs();
-        for (ObjectGuidSet::const_iterator iter = oor.begin(); iter != oor.end(); ++iter)
+        for (const auto& iter : oor)
         {
-            if (!iter->IsPlayer())
+            if (!iter.IsPlayer())
                 continue;
 
-            if (Player* plr = ObjectAccessor::FindPlayer(*iter))
+            if (Player* plr = ObjectAccessor::FindPlayer(iter))
                 plr->UpdateVisibilityOf(plr->GetCamera().GetBody(), &player);
         }
     }
@@ -131,9 +131,9 @@ VisibleNotifier::Notify()
 void
 MessageDeliverer::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for (const auto& iter : m)
     {
-        Player* owner = iter->getSource()->GetOwner();
+        Player* owner = iter.getSource()->GetOwner();
 
         if (i_toSelf || owner != &i_player)
         {
@@ -145,9 +145,9 @@ MessageDeliverer::Visit(CameraMapType& m)
 
 void MessageDelivererExcept::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for (const auto& iter : m)
     {
-        Player* owner = iter->getSource()->GetOwner();
+        Player* owner = iter.getSource()->GetOwner();
 
         if (owner == i_skipped_receiver)
             continue;
@@ -161,9 +161,9 @@ void MessageDelivererExcept::Visit(CameraMapType& m)
 void
 ObjectMessageDeliverer::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for (const auto& iter : m)
     {
-        if (WorldSession* session = iter->getSource()->GetOwner()->GetSession())
+        if (WorldSession* session = iter.getSource()->GetOwner()->GetSession())
             session->SendPacket(i_message);
     }
 }
@@ -171,13 +171,13 @@ ObjectMessageDeliverer::Visit(CameraMapType& m)
 void
 MessageDistDeliverer::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for (const auto& iter : m)
     {
-        Player* owner = iter->getSource()->GetOwner();
+        Player* owner = iter.getSource()->GetOwner();
 
         if ((i_toSelf || owner != &i_player) &&
                 (!i_ownTeamOnly || owner->GetTeam() == i_player.GetTeam()) &&
-                (!i_dist || iter->getSource()->GetBody()->IsWithinDist(&i_player, i_dist)))
+                (!i_dist || iter.getSource()->GetBody()->IsWithinDist(&i_player, i_dist)))
         {
             if (WorldSession* session = owner->GetSession())
                 session->SendPacket(i_message);
@@ -188,11 +188,11 @@ MessageDistDeliverer::Visit(CameraMapType& m)
 void
 ObjectMessageDistDeliverer::Visit(CameraMapType& m)
 {
-    for (CameraMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
+    for (const auto& iter : m)
     {
-        if (!i_dist || iter->getSource()->GetBody()->IsWithinDist(&i_object, i_dist))
+        if (!i_dist || iter.getSource()->GetBody()->IsWithinDist(&i_object, i_dist))
         {
-            if (WorldSession* session = iter->getSource()->GetOwner()->GetSession())
+            if (WorldSession* session = iter.getSource()->GetOwner()->GetSession())
                 session->SendPacket(i_message);
         }
     }
@@ -213,10 +213,7 @@ bool CannibalizeObjectCheck::operator()(Corpse* u)
     if (u->IsFriendlyTo(i_fobj))
         return false;
 
-    if (i_fobj->IsWithinDistInMap(u, i_range))
-        return true;
-
-    return false;
+    return i_fobj->IsWithinDistInMap(u, i_range);
 }
 
 void MaNGOS::RespawnDo::operator()(Creature* u) const

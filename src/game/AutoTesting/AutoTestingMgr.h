@@ -140,8 +140,8 @@ public:
 
     ~AutoTestingMgr()
     {
-        for (auto it = _tests.begin(); it != _tests.end(); ++it)
-            delete *it;
+        for (const auto& itr : _tests)
+            delete itr;
     }
 
     static void Load()

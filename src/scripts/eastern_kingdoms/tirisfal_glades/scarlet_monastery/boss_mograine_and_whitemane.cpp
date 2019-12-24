@@ -121,10 +121,10 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
 
         if (!mograinesAssist.empty())
         {
-            for (std::list<Creature*>::iterator itr = mograinesAssist.begin(); itr != mograinesAssist.end(); ++itr)
+            for (const auto& itr : mograinesAssist)
             {
-                if ((*itr)->IsAlive() && (*itr)->AI())
-                    (*itr)->AI()->AttackStart(pWho);
+                if (itr->IsAlive() && itr->AI())
+                    itr->AI()->AttackStart(pWho);
             }
         }
     }
@@ -155,9 +155,7 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         m_bDivineShield = false;
         m_bHasDied = true;
         m_bFakeDeath = true;
-
-        return;
-    }
+   }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {

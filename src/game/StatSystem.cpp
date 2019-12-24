@@ -147,14 +147,14 @@ void Player::UpdateArmor()
         if ((form == FORM_DIREBEAR) || (form == FORM_BEAR))
         {
             Unit::AuraList const& mDummy = GetAurasByType(SPELL_AURA_DUMMY);
-            for (Unit::AuraList::const_iterator itr = mDummy.begin(); itr != mDummy.end(); ++itr)
+            for (const auto itr : mDummy)
             {
                 // Enrage
-                if ((*itr)->GetId() == 5229)
+                if (itr->GetId() == 5229)
                 {
                     float enrageModifier = 0.0f;
                     enrageModifier = GetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE);
-                    enrageModifier *= (*itr)->GetModifier()->m_amount / 100.0f;
+                    enrageModifier *= itr->GetModifier()->m_amount / 100.0f;
                     dynamic += enrageModifier;
                     break;
                 }
@@ -297,12 +297,12 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
                     case FORM_MOONKIN:
                     {
                         Unit::AuraList const& mDummy = GetAurasByType(SPELL_AURA_DUMMY);
-                        for (Unit::AuraList::const_iterator itr = mDummy.begin(); itr != mDummy.end(); ++itr)
+                        for (const auto itr : mDummy)
                         {
                             // Predatory Strikes
-                            if ((*itr)->GetSpellProto()->SpellIconID == 1563)
+                            if (itr->GetSpellProto()->SpellIconID == 1563)
                             {
-                                mLevelMult = (*itr)->GetModifier()->m_amount / 100.0f;
+                                mLevelMult = itr->GetModifier()->m_amount / 100.0f;
                                 break;
                             }
                         }

@@ -264,9 +264,9 @@ struct boss_sapphironAI : public ScriptedAI
 
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto& itr : PlayerList)
         {
-            Player* pPlayer = itr->getSource();
+            Player* pPlayer = itr.getSource();
             
             float dx = pPlayer->GetPositionX() - x;
             float dy = pPlayer->GetPositionY() - y;
@@ -350,8 +350,8 @@ struct boss_sapphironAI : public ScriptedAI
         }
 
         std::vector<Unit*> suitableUnits;
-        for (auto itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-            if (Unit* pTarget = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid()))
+        for (const auto itr : threatlist)
+            if (Unit* pTarget = m_creature->GetMap()->GetPlayer(itr->getUnitGuid()))
             {
                 if (pTarget->IsDead())
                     continue;
@@ -362,7 +362,7 @@ struct boss_sapphironAI : public ScriptedAI
                 suitableUnits.push_back(pTarget);
             }
 
-        if (suitableUnits.size() == 0)
+        if (suitableUnits.empty())
         {
             RescheduleIcebolt();
             return;
@@ -697,17 +697,14 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 
     void AttackStart(Unit*) override
     {
-        return;
     }
 
     void MoveInLineOfSight(Unit*) override
     {
-        return;
     }
 
     void Aggro(Unit*) override
     {
-        return;
     }
 
     void MovementInform(uint32 uiType, uint32 pointId) override

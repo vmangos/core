@@ -300,14 +300,14 @@ void npc_shade_hakkarAI::Reset()
     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 
-    for (uint32 i = 0; i < SHADE_SPAWN_TYPES; ++i)
-        eventSpawns[i] = 0;
+    for (uint32 & eventSpawn : eventSpawns)
+        eventSpawn = 0;
 
     if (m_pInstance)
     {
-        for (uint32 i = 0; i < NUM_BRAZIERS; ++i)
+        for (uint32 i : brazierEntries)
         {
-            if (GameObject *go = m_pInstance->GetGameObject(m_pInstance->GetData64(brazierEntries[i])))
+            if (GameObject *go = m_pInstance->GetGameObject(m_pInstance->GetData64(i)))
                 UpdateBrazierState(go, false);
         }
     }
@@ -366,7 +366,7 @@ void npc_shade_hakkarAI::SummonTheAvatar()
     std::list<GameObject*> circles;
     m_creature->GetGameObjectListWithEntryInGrid(circles, GO_EVIL_CIRCLE, 20);
 
-    for (auto go : circles)
+    for (const auto go : circles)
         go->Use(m_creature);
 
     m_creature->ForcedDespawn(500);

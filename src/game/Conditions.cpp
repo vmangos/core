@@ -208,8 +208,8 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_AD_COMMISSION_AURA:
         {
             Unit::SpellAuraHolderMap const& auras = target->ToPlayer()->GetSpellAuraHolderMap();
-            for (Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
-                if ((itr->second->GetSpellProto()->Attributes & SPELL_ATTR_CASTABLE_WHILE_MOUNTED || itr->second->GetSpellProto()->Attributes & SPELL_ATTR_IS_ABILITY) && itr->second->GetSpellProto()->SpellVisual == 3580)
+            for (const auto& aura : auras)
+                if ((aura.second->GetSpellProto()->Attributes & SPELL_ATTR_CASTABLE_WHILE_MOUNTED || aura.second->GetSpellProto()->Attributes & SPELL_ATTR_IS_ABILITY) && aura.second->GetSpellProto()->SpellVisual == 3580)
                     return true;
             return false;
         }
@@ -234,9 +234,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_RACE_CLASS:
         {
             Player const* pPlayer = target->ToPlayer();
-            if ((!m_value1 || (pPlayer->GetRaceMask() & m_value1)) && (!m_value2 || (pPlayer->GetClassMask() & m_value2)))
-                return true;
-            return false;
+            return (!m_value1 || (pPlayer->GetRaceMask() & m_value1)) && (!m_value2 || (pPlayer->GetClassMask() & m_value2));
         }
         case CONDITION_LEVEL:
         {
@@ -293,9 +291,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_QUEST_NONE:
         {
             Player const* pPlayer = target->ToPlayer();
-            if (!pPlayer->IsCurrentQuest(m_value1) && !pPlayer->GetQuestRewardStatus(m_value1))
-                return true;
-            return false;
+            return !pPlayer->IsCurrentQuest(m_value1) && !pPlayer->GetQuestRewardStatus(m_value1);
         }
         case CONDITION_ITEM_WITH_BANK:
         {
@@ -382,10 +378,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             uint32 mapId = map ? map->GetId() : (source ? source->GetMapId() : target->GetMapId());
 
-            if (mapId == m_value1)
-                return true;
-
-            return false;
+            return mapId == m_value1;
         }
         case CONDITION_INSTANCE_DATA:
         {

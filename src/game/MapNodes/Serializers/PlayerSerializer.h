@@ -194,9 +194,9 @@ void Player::SerializeAuras(MaNGOS::Serializer::WriteSerializer& buf)
     buf(size);
 
     AuraSaveStruct s;
-    for (SpellAuraHolderMap::const_iterator itr = auraHolders.begin(); itr != auraHolders.end(); ++itr)
+    for (const auto& auraHolder : auraHolders)
     {
-        uint8 hasAura = SaveAura(itr->second, s);
+        uint8 hasAura = SaveAura(auraHolder.second, s);
         buf(hasAura);
         if (hasAura)
             buf.DoStruct(s);
@@ -367,14 +367,14 @@ void Player::SerializeSpells(MaNGOS::Serializer::WriteSerializer& buf)
     uint32 spell_id;
     bool is_spell_active;
     bool is_spell_disabled;
-    for (PlayerSpellMap::iterator itr = m_spells.begin(); itr != m_spells.end(); ++itr)
+    for (const auto& spell : m_spells)
     {
         // add only changed/new not dependent spells
-        if (!itr->second.dependent)
+        if (!spell.second.dependent)
         {
-            spell_id = itr->first;
-            is_spell_active = itr->second.active;
-            is_spell_disabled = itr->second.disabled;
+            spell_id = spell.first;
+            is_spell_active = spell.second.active;
+            is_spell_disabled = spell.second.disabled;
 
             buf(spell_id);
             buf(is_spell_active);
@@ -408,14 +408,14 @@ void Player::SerializeSpellCooldowns(MaNGOS::Serializer::WriteSerializer& buf)
 {
     static uint32 last_spell_id = 0;
     time_t currTime = time(nullptr);
-    for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
+    for (const auto& itr : m_spellCooldowns)
     {
-        if (itr->second.end > currTime && itr->second.end <= currTime + infinityCooldownDelayCheck)
+        if (itr.second.end > currTime && itr.second.end <= currTime + infinityCooldownDelayCheck)
         {
-            uint32 spell_id = itr->first;
-            uint32 item_id = itr->second.itemid;
-            uint64 cooldown_end = itr->second.end;
-            uint64 cat_cooldown_end = itr->second.categoryEnd;
+            uint32 spell_id = itr.first;
+            uint32 item_id = itr.second.itemid;
+            uint64 cooldown_end = itr.second.end;
+            uint64 cat_cooldown_end = itr.second.categoryEnd;
 
             buf(spell_id);
             buf(item_id);

@@ -130,17 +130,17 @@ World::World()
     m_defaultDbcLocale = LOCALE_enUS;
     m_availableDbcLocaleMask = 0;
 
-    for (int i = 0; i < CONFIG_UINT32_VALUE_COUNT; ++i)
-        m_configUint32Values[i] = 0;
+    for (uint32 & value : m_configUint32Values)
+        value = 0;
 
-    for (int i = 0; i < CONFIG_INT32_VALUE_COUNT; ++i)
-        m_configInt32Values[i] = 0;
+    for (int32 & value : m_configInt32Values)
+        value = 0;
 
-    for (int i = 0; i < CONFIG_FLOAT_VALUE_COUNT; ++i)
-        m_configFloatValues[i] = 0.0f;
+    for (float & value : m_configFloatValues)
+        value = 0.0f;
 
-    for (int i = 0; i < CONFIG_BOOL_VALUE_COUNT; ++i)
-        m_configBoolValues[i] = false;
+    for (bool & value : m_configBoolValues)
+        value = false;
 
     m_timeRate = 1.0f;
     m_charDbWorkerThread    = nullptr;
@@ -1863,12 +1863,12 @@ public:
 void World::Update(uint32 diff)
 {
     ///- Update the different timers
-    for (int i = 0; i < WUPDATE_COUNT; ++i)
+    for (auto& timer : m_timers)
     {
-        if (m_timers[i].GetCurrent() >= 0)
-            m_timers[i].Update(diff);
+        if (timer.GetCurrent() >= 0)
+            timer.Update(diff);
         else
-            m_timers[i].SetCurrent(0);
+            timer.SetCurrent(0);
     }
 
     ///- Update the game time and check for shutdown time
@@ -1907,10 +1907,10 @@ void World::Update(uint32 diff)
 
     ///- Update objects (maps, transport, creatures,...)
     uint32 updateMapSystemTime = WorldTimer::getMSTime();
-    std::vector<ACE_Based::Thread*> asyncTaskThreads;
     int threadsCount = getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT);
+    std::vector<ACE_Based::Thread*> asyncTaskThreads(threadsCount);
     for (int i = 0; i < threadsCount; ++i)
-        asyncTaskThreads.push_back(new ACE_Based::Thread(new WorldAsyncTasksExecutor()));
+        asyncTaskThreads[i] = new ACE_Based::Thread(new WorldAsyncTasksExecutor());
 
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
@@ -2964,9 +2964,8 @@ void World::LogTransaction(PlayerTransactionData const& data)
         "INSERT INTO logs_transactions SET type=?, guid1=?, money1=?, spell1=?, items1=?, "
         "guid2=?, money2=?, spell2=?, items2=?");
     logStmt.addString(data.type);
-    for (int i = 0; i < 2; ++i)
+    for (const auto& part : data.parts)
     {
-        TransactionPart const& part = data.parts[i];
         logStmt.addUInt32(part.lowGuid);
         logStmt.addUInt32(part.money);
         logStmt.addUInt32(part.spell);

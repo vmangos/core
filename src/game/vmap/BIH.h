@@ -398,7 +398,7 @@ class BIH
 
         void buildHierarchy(std::vector<uint32>& tempTree, buildData& dat, BuildStats& stats);
 
-        void createNode(std::vector<uint32>& tempTree, int nodeIndex, uint32 left, uint32 right) const
+        static void createNode(std::vector<uint32>& tempTree, int nodeIndex, uint32 left, uint32 right)
         {
             // write leaf node
             tempTree[nodeIndex + 0] = (3 << 30) | left;

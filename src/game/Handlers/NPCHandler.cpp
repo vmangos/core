@@ -214,9 +214,9 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
 
     if (cSpells)
     {
-        for (TrainerSpellMap::const_iterator itr = cSpells->spellList.begin(); itr != cSpells->spellList.end(); ++itr)
+        for (const auto& itr : cSpells->spellList)
         {
-            TrainerSpell const* tSpell = &itr->second;
+            TrainerSpell const* tSpell = &itr.second;
 
             uint32 triggerSpell = sSpellMgr.GetSpellEntry(tSpell->spell)->EffectTriggerSpell[0];
 
@@ -233,9 +233,9 @@ void WorldSession::SendTrainerList(ObjectGuid guid)
 
     if (tSpells)
     {
-        for (TrainerSpellMap::const_iterator itr = tSpells->spellList.begin(); itr != tSpells->spellList.end(); ++itr)
+        for (const auto& itr : tSpells->spellList)
         {
-            TrainerSpell const* tSpell = &itr->second;
+            TrainerSpell const* tSpell = &itr.second;
 
             uint32 triggerSpell = sSpellMgr.GetSpellEntry(tSpell->spell)->EffectTriggerSpell[0];
 
@@ -604,15 +604,15 @@ void WorldSession::SendStablePet(ObjectGuid guid)
     CharPetMap const& pets = sCharacterDatabaseCache.GetCharPetsMap();
     CharPetMap::const_iterator myPets = pets.find(GetPlayer()->GetGUIDLow());
     if (myPets != pets.end())
-        for (CharPetVector::const_iterator it = myPets->second.begin(); it != myPets->second.end(); ++it)
-            if ((*it)->slot >= PET_SAVE_FIRST_STABLE_SLOT && (*it)->slot <= PET_SAVE_LAST_STABLE_SLOT)
+        for (const auto it : myPets->second)
+            if (it->slot >= PET_SAVE_FIRST_STABLE_SLOT && it->slot <= PET_SAVE_LAST_STABLE_SLOT)
             {
-                data << uint32((*it)->id);                 // petnumber
-                data << uint32((*it)->entry);              // creature entry
-                data << uint32((*it)->level);              // level
-                data << (*it)->name;                       // name
-                data << uint32((*it)->loyalty);            // loyalty
-                data << uint8((*it)->slot + 1);            // slot
+                data << uint32(it->id);                 // petnumber
+                data << uint32(it->entry);              // creature entry
+                data << uint32(it->level);              // level
+                data << it->name;                       // name
+                data << uint32(it->loyalty);            // loyalty
+                data << uint8(it->slot + 1);            // slot
                 ++num;
             }
 
@@ -690,9 +690,9 @@ void WorldSession::HandleStablePet(WorldPacket& recv_data)
     CharPetMap const& pets = sCharacterDatabaseCache.GetCharPetsMap();
     CharPetMap::const_iterator myPets = pets.find(GetPlayer()->GetGUIDLow());
     if (myPets != pets.end())
-        for (CharPetVector::const_iterator it = myPets->second.begin(); it != myPets->second.end(); ++it)
-            if ((*it)->slot >= PET_SAVE_FIRST_STABLE_SLOT && (*it)->slot <= PET_SAVE_LAST_STABLE_SLOT)
-                usedSlots[(*it)->slot - PET_SAVE_FIRST_STABLE_SLOT] = true;
+        for (const auto it : myPets->second)
+            if (it->slot >= PET_SAVE_FIRST_STABLE_SLOT && it->slot <= PET_SAVE_LAST_STABLE_SLOT)
+                usedSlots[it->slot - PET_SAVE_FIRST_STABLE_SLOT] = true;
 
     for (free_slot = PET_SAVE_FIRST_STABLE_SLOT; free_slot <= PET_SAVE_LAST_STABLE_SLOT && usedSlots[free_slot - PET_SAVE_FIRST_STABLE_SLOT]; ++free_slot);
 

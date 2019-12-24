@@ -54,8 +54,8 @@ namespace MMAP
         MMapData(dtNavMesh* mesh) : navMesh(mesh) {}
         ~MMapData()
         {
-            for (NavMeshQuerySet::iterator i = navMeshQueries.begin(); i != navMeshQueries.end(); ++i)
-                dtFreeNavMeshQuery(i->second);
+            for (const auto& itr : navMeshQueries)
+                dtFreeNavMeshQuery(itr.second);
 
             if (navMesh)
                 dtFreeNavMesh(navMesh);
@@ -96,7 +96,7 @@ namespace MMAP
             uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
         private:
             bool loadMapData(uint32 mapId);
-            uint32 packTileID(int32 x, int32 y) const;
+            static uint32 packTileID(int32 x, int32 y);
 
             MMapDataSet loadedMMaps;
             ACE_RW_Mutex loadedMMaps_lock;

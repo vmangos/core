@@ -71,9 +71,9 @@ struct boss_garrAI : ScriptedAI
             GetCreatureListWithEntryInGrid(firesworn, m_creature, NPC_FIRESWORN, 150.0f);
             m_lFiresworn.clear();
 
-            for (auto itr = firesworn.begin(); itr != firesworn.end(); ++itr)
+            for (const auto& itr : firesworn)
             {
-                m_lFiresworn.push_back((*itr)->GetObjectGuid());
+                m_lFiresworn.push_back(itr->GetObjectGuid());
             }
         }
     }

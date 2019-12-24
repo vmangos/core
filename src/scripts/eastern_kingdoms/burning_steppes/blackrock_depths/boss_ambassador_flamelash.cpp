@@ -54,8 +54,8 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
 
     void Reset() override
     {
-        for (uint8 i = 0; i < DWARF_RUNES_MAX; i++)
-            m_uiSpiritTimer[i] = 5 * IN_MILLISECONDS;
+        for (uint32 & i : m_uiSpiritTimer)
+            i = 5 * IN_MILLISECONDS;
     }
 
     void JustSummoned(Creature* pSummoned) override
@@ -84,9 +84,9 @@ struct boss_ambassador_flamelashAI : public ScriptedAI
                 pRune->ResetDoorOrButton();
         }
 
-        for (GuidList::const_iterator itr = lBurningSpirits.begin(); itr != lBurningSpirits.end(); ++itr)
+        for (const auto& guid : lBurningSpirits)
         {
-            if (Creature* pSummon = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pSummon = m_creature->GetMap()->GetCreature(guid))
                 pSummon->ForcedDespawn();
         }
 

@@ -322,9 +322,9 @@ struct boss_mandokirAI : public ScriptedAI
     {
         if (!m_lSpirits.empty())
         {
-            for (std::vector<uint64>::iterator it = m_lSpirits.begin(); it != m_lSpirits.end(); ++it)
+            for (const auto& guid : m_lSpirits)
             {
-                if (Creature* pSpirit = m_creature->GetMap()->GetCreature(*it))
+                if (Creature* pSpirit = m_creature->GetMap()->GetCreature(guid))
                     if (pSpirit->IsAlive())
                         pSpirit->AddObjectToRemoveList();
             }
@@ -422,9 +422,9 @@ struct boss_mandokirAI : public ScriptedAI
                     // Find nearest spirit ready to resurrect
                     Creature* spirit = nullptr;
                     float spiritDist = 0.0f;
-                    for (std::vector<uint64>::iterator it = m_lSpirits.begin(); it != m_lSpirits.end(); ++it)
+                    for (const auto& guid : m_lSpirits)
                     {
-                        if (Creature* current = m_creature->GetMap()->GetCreature(*it))
+                        if (Creature* current = m_creature->GetMap()->GetCreature(guid))
                         {
                             // Ready to resurrect ?
                             if (current->AI() && current->AI()->GetData(0))
@@ -551,7 +551,7 @@ struct boss_mandokirAI : public ScriptedAI
         else
         {
             m_uiCharge_Timer -= diff;
-            if (m_bChargeCasted == true)
+            if (m_bChargeCasted)
             {
                 m_uiChargeCasted_Timer -= diff;
                 if (m_uiChargeCasted_Timer < diff)

@@ -32,8 +32,6 @@
 
 INSTANTIATE_SINGLETON_1( RealmList );
 
-extern DatabaseType LoginDatabase;
-
 // list sorted from high to low build and first build used as low bound for accepted by default range (any > it will accepted by realmd at least)
 static RealmBuildInfo ExpectedRealmdClientBuilds[] = {
     {13930, 3, 3, 5,  'a', {{}}, {{}}},                                  // 3.3.5a China Mainland build

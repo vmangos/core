@@ -272,7 +272,7 @@ void Log::Initialize()
         {
             bool m_gmlog_timestamp = sConfig.GetBoolDefault("GmLogTimestamp",false);
 
-            size_t dot_pos = m_gmlog_filename_format.find_last_of(".");
+            size_t dot_pos = m_gmlog_filename_format.find_last_of('.');
             if (dot_pos!=m_gmlog_filename_format.npos)
             {
                 if (m_gmlog_timestamp)
@@ -343,7 +343,7 @@ FILE* Log::openLogFile(char const* configFileName,char const* configTimeStampFla
 
     if (configTimeStampFlag && sConfig.GetBoolDefault(configTimeStampFlag,false))
     {
-        size_t dot_pos = logfn.find_last_of(".");
+        size_t dot_pos = logfn.find_last_of('.');
         if (dot_pos!=logfn.npos)
             logfn.insert(dot_pos,m_logsTimestamp);
         else

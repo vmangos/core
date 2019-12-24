@@ -95,9 +95,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     if (pUser->IsInCombat())
     {
-        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        for (const auto& itr : proto->Spells)
         {
-            if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(proto->Spells[i].SpellId))
+            if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(itr.SpellId))
             {
                 if (spellInfo->IsNonCombatSpell())
                 {
@@ -136,11 +136,11 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
         // search spell for spell error
         uint32 spellid = 0;
-        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        for (const auto& itr : proto->Spells)
         {
-            if (proto->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || proto->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+            if (itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || itr.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
             {
-                spellid = proto->Spells[i].SpellId;
+                spellid = itr.SpellId;
                 break;
             }
         }
@@ -406,10 +406,10 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         {
             // except own aura spells
             bool allow = false;
-            for (int k = 0; k < MAX_EFFECT_INDEX; ++k)
+            for (uint32 k : spellInfo->EffectApplyAuraName)
             {
-                if (spellInfo->EffectApplyAuraName[k] == SPELL_AURA_MOD_POSSESS ||
-                        spellInfo->EffectApplyAuraName[k] == SPELL_AURA_MOD_POSSESS_PET)
+                if (k == SPELL_AURA_MOD_POSSESS ||
+                    k == SPELL_AURA_MOD_POSSESS_PET)
                 {
                     allow = true;
                     break;
@@ -426,10 +426,10 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
 
     // prevent last relocation opcode handling: CancelAura is handled before Mover is changed
     // thus the last movement data is written into pMover, that should not happen
-    for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    for (uint32 i : spellInfo->Effect)
     {
         // Eye of Kilrogg case
-        if (spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_POSSESSED)
+        if (i == SPELL_EFFECT_SUMMON_POSSESSED)
         {
             _player->SetNextRelocationsIgnoredCount(1);
             break;

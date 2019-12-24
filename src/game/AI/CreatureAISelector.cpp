@@ -70,7 +70,7 @@ CreatureAI* selectAI(Creature* creature)
 
     // select by script name
     if (!ai_factory && !ainame.empty())
-        ai_factory = ai_registry.GetRegistryItem(ainame.c_str());
+        ai_factory = ai_registry.GetRegistryItem(ainame);
 
     if (!ai_factory && creature->IsGuard())
         ai_factory = ai_registry.GetRegistryItem("GuardAI");
@@ -84,9 +84,9 @@ CreatureAI* selectAI(Creature* creature)
         int best_val = PERMIT_BASE_NO;
         typedef CreatureAIRegistry::RegistryMapType RMT;
         RMT const& l = ai_registry.GetRegisteredItems();
-        for (RMT::const_iterator iter = l.begin(); iter != l.end(); ++iter)
+        for (const auto& iter : l)
         {
-            const CreatureAICreator *factory = iter->second;
+            const CreatureAICreator *factory = iter.second;
             const SelectableAI *p = dynamic_cast<const SelectableAI *>(factory);
             MANGOS_ASSERT(p != nullptr);
             int val = p->Permit(creature);

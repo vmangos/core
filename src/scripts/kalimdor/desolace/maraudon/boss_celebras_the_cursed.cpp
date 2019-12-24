@@ -184,8 +184,8 @@ struct celebrasSpiritAI : public npc_escortAI
                 DoScriptText(SAY_WP_6, m_creature);
 
                 GetGameObjectListWithEntryInGrid(scepterList, m_creature, GO_CREATOR, 40.0f);
-                for (std::list<GameObject*>::iterator it = scepterList.begin(); it != scepterList.end(); ++it)
-                    (*it)->UseDoorOrButton(0, false);
+                for (const auto& it : scepterList)
+                    it->UseDoorOrButton(0, false);
                 scepterList.clear();
 
                 break;
@@ -298,9 +298,9 @@ bool GOHello_go_book_celebras(Player* pPlayer, GameObject* pGo)
 
         std::list<Creature*> celebrasList;
         GetCreatureListWithEntryInGrid(celebrasList, pPlayer, NPC_CELEBRAS_REDEEMED, 40.0f);
-        for (std::list<Creature*>::iterator it = celebrasList.begin(); it != celebrasList.end(); ++it)
+        for (const auto& it : celebrasList)
         {
-            if (celebrasSpiritAI* pcelebrasSpirit = dynamic_cast<celebrasSpiritAI*>((*it)->AI()))
+            if (celebrasSpiritAI* pcelebrasSpirit = dynamic_cast<celebrasSpiritAI*>(it->AI()))
                 pcelebrasSpirit->BookRead();
         }
         celebrasList.clear();

@@ -446,7 +446,7 @@ class BattleGroundAV : public BattleGround
         uint32 GetActualArmorRessources(uint32 m_faction_id);
         /*handle stuff*/ // these are functions which get called from extern scripts
         void EventPlayerClickedOnFlag(Player* source, GameObject* target_obj) override;
-        void HandleKillPlayer(Player* player, Player* killer) override;
+        void HandleKillPlayer(Player* pVictim, Player* pKiller) override;
         void HandleKillUnit(Creature* creature, Player* killer) override;
 
         /** Challenge handler : air or ground assault, world boss assault */
@@ -504,15 +504,15 @@ class BattleGroundAV : public BattleGround
         void PopulateNode(BG_AV_Nodes node);
         void PopulateMineNode(uint8 mine, BattleGroundAVTeamIndex teamIdx, uint32 oldUpgradeAdvance);
 
-        uint32 GetNodeName(BG_AV_Nodes node);
-        bool const IsTower(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : m_Nodes[node].Tower; }
-        bool const IsGrave(BG_AV_Nodes node) { return (node >= BG_AV_NODES_MAX) ? false : !m_Nodes[node].Tower; }
+        static uint32 GetNodeName(BG_AV_Nodes node);
+        bool IsTower(BG_AV_Nodes node) const { return (node >= BG_AV_NODES_MAX) ? false : m_Nodes[node].Tower; }
+        bool IsGrave(BG_AV_Nodes node) const { return (node >= BG_AV_NODES_MAX) ? false : !m_Nodes[node].Tower; }
 
         /*mine*/
         void ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx);
 
         /*worldstates*/
-        uint8 GetWorldStateType(uint8 state, BattleGroundAVTeamIndex teamIdx) const { return teamIdx * BG_AV_MAX_STATES + state; }
+        static uint8 GetWorldStateType(uint8 state, BattleGroundAVTeamIndex teamIdx) { return teamIdx * BG_AV_MAX_STATES + state; }
         void SendMineWorldStates(uint32 mine);
         void UpdateNodeWorldState(BG_AV_Nodes node);
 

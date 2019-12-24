@@ -355,16 +355,16 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << pProto->MaxCount;
         data << pProto->Stackable;
         data << pProto->ContainerSlots;
-        for (int i = 0; i < MAX_ITEM_PROTO_STATS; ++i)
+        for (const auto& i : pProto->ItemStat)
         {
-            data << pProto->ItemStat[i].ItemStatType;
-            data << pProto->ItemStat[i].ItemStatValue;
+            data << i.ItemStatType;
+            data << i.ItemStatValue;
         }
-        for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; ++i)
+        for (const auto& i : pProto->Damage)
         {
-            data << pProto->Damage[i].DamageMin;
-            data << pProto->Damage[i].DamageMax;
-            data << pProto->Damage[i].DamageType;
+            data << i.DamageMin;
+            data << i.DamageMax;
+            data << i.DamageType;
         }
 
         // resistances (7)
@@ -382,26 +382,26 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
         data << (float)pProto->RangedModRange;
 #endif
 
-        for (int s = 0; s < MAX_ITEM_PROTO_SPELLS; ++s)
+        for (const auto& itr : pProto->Spells)
         {
             // send DBC data for cooldowns in same way as it used in Spell::SendSpellCooldown
             // use `item_template` or if not set then only use spell cooldowns
-            SpellEntry const* spell = sSpellMgr.GetSpellEntry(pProto->Spells[s].SpellId);
+            SpellEntry const* spell = sSpellMgr.GetSpellEntry(itr.SpellId);
             if (spell)
             {
-                bool db_data = pProto->Spells[s].SpellCooldown >= 0 || pProto->Spells[s].SpellCategoryCooldown >= 0;
+                bool db_data = itr.SpellCooldown >= 0 || itr.SpellCategoryCooldown >= 0;
 
-                data << pProto->Spells[s].SpellId;
-                data << pProto->Spells[s].SpellTrigger;
+                data << itr.SpellId;
+                data << itr.SpellTrigger;
 
                 // let the database control the sign here.  negative means that the item should be consumed once the charges are consumed.
-                data << pProto->Spells[s].SpellCharges;
+                data << itr.SpellCharges;
 
                 if (db_data)
                 {
-                    data << uint32(pProto->Spells[s].SpellCooldown);
-                    data << uint32(pProto->Spells[s].SpellCategory);
-                    data << uint32(pProto->Spells[s].SpellCategoryCooldown);
+                    data << uint32(itr.SpellCooldown);
+                    data << uint32(itr.SpellCategory);
+                    data << uint32(itr.SpellCategoryCooldown);
                 }
                 else
                 {

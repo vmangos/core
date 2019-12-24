@@ -82,9 +82,9 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, 
     // If the unit is disarmed and the skill requires a weapon, it cannot be cast
     if (m_creature->HasWeapon() && !m_creature->CanUseEquippedWeapon(BASE_ATTACK))
     {
-        for (int i = 0; i < MAX_EFFECT_INDEX; i++)
+        for (uint32 effect : pSpell->Effect)
         {
-            if (pSpell->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE || pSpell->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL)
+            if (effect == SPELL_EFFECT_WEAPON_DAMAGE || effect == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL)
                 return CAST_FAIL_OTHER;
         }
     }
@@ -290,9 +290,9 @@ void CreatureAI::ClearTargetIcon()
     std::set<Group*> instanceGroups;
 
     // Clear target icon for every unique group in instance
-    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+    for (const auto& player : players)
     {
-        if (Group* pGroup = itr->getSource()->GetGroup())
+        if (Group* pGroup = player.getSource()->GetGroup())
         {
             if (instanceGroups.find(pGroup) == instanceGroups.end())
             {

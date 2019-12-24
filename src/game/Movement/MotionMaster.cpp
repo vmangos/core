@@ -145,9 +145,8 @@ MotionMaster::~MotionMaster()
 
     if (m_expList)
     {
-        for (size_t i = 0; i < m_expList->size(); ++i)
+        for (const auto mg : *m_expList)
         {
-            MovementGenerator* mg = (*m_expList)[i];
             if (!isStatic(mg))
                 delete mg;
         }
@@ -174,9 +173,8 @@ void MotionMaster::UpdateMotion(uint32 diff)
 
     if (m_expList)
     {
-        for (size_t i = 0; i < m_expList->size(); ++i)
+        for (const auto mg : *m_expList)
         {
-            MovementGenerator* mg = (*m_expList)[i];
             if (!isStatic(mg))
                 delete mg;
         }
@@ -256,12 +254,12 @@ void MotionMaster::DelayedClean(bool reset, bool all)
         pop();
         mvtGensToFinalize.push_back(curr);
     }
-    for (MvtGenList::iterator it = mvtGensToFinalize.begin(); it != mvtGensToFinalize.end(); ++it)
+    for (const auto& it : mvtGensToFinalize)
     {
-        (*it)->Finalize(*m_owner);
+        it->Finalize(*m_owner);
 
-        if (!isStatic((*it)))
-            m_expList->push_back((*it));
+        if (!isStatic(it))
+            m_expList->push_back(it);
     }
 }
 
@@ -328,10 +326,10 @@ void MotionMaster::DelayedExpire(bool reset)
         pop();
         mvtGensToFinalize.push_back(temp);
     }
-    for (MvtGenList::iterator it = mvtGensToFinalize.begin(); it != mvtGensToFinalize.end(); ++it)
+    for (const auto& it : mvtGensToFinalize)
     {
-        (*it)->Finalize(*m_owner);
-        m_expList->push_back(*it);
+        it->Finalize(*m_owner);
+        m_expList->push_back(it);
     }
 
     curr->Finalize(*m_owner);
@@ -555,7 +553,7 @@ void MotionMaster::MoveTaxiFlight()
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
     {
         TaxiPathNodeList const& path = m_owner->ToPlayer()->GetTaxi().GetTaxiPath();
-        if (path.size())
+        if (!path.empty())
         {
             uint32 foundPath = 0;
             std::stringstream debugString;

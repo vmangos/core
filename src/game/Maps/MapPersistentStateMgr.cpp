@@ -441,13 +441,13 @@ void DungeonResetScheduler::ScheduleAllDungeonResets()
         delete result;
     }
 
-    for (ResetTimeMapType::iterator itr = InstResetTime.begin(); itr != InstResetTime.end(); ++itr)
+    for (const auto& itr : InstResetTime)
     {
-        ScheduleReset(true, itr->second.second, DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, itr->second.first, itr->first));
+        ScheduleReset(true, itr.second.second, DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, itr.second.first, itr.first));
 
-        if (now > itr->second.second)
+        if (now > itr.second.second)
             sLog.outInfo("[DungeonReset] Instance %u (map %u) has reset time before now, but was not cleaned up. Likely expired during load",
-                itr->first, itr->second.first);
+                itr.first, itr.second.first);
     }
 
     uint32 diff = sWorld.getConfig(CONFIG_UINT32_INSTANCE_RESET_TIME_HOUR) * HOUR;
@@ -591,10 +591,10 @@ MapPersistentStateManager::~MapPersistentStateManager()
     // it is undefined whether this or objectmgr will be unloaded first
     // so we must be prepared for both cases
     lock_instLists = true;
-    for (PersistentStateMap::iterator itr = m_instanceSaveByInstanceId.begin(); itr != m_instanceSaveByInstanceId.end(); ++itr)
-        delete  itr->second;
-    for (PersistentStateMap::iterator itr = m_instanceSaveByMapId.begin(); itr != m_instanceSaveByMapId.end(); ++itr)
-        delete  itr->second;
+    for (const auto& itr : m_instanceSaveByInstanceId)
+        delete  itr.second;
+    for (const auto& itr : m_instanceSaveByMapId)
+        delete  itr.second;
 }
 
 /*
@@ -703,7 +703,7 @@ void MapPersistentStateManager::RemovePersistentState(uint32 mapId, uint32 insta
 void MapPersistentStateManager::_DelHelper(DatabaseType &db, char const* fields, char const* table, char const* queryTail, ...)
 {
     Tokens fieldTokens = StrSplit(fields, ", ");
-    MANGOS_ASSERT(fieldTokens.size() != 0);
+    MANGOS_ASSERT(!fieldTokens.empty());
 
     va_list ap;
     char szQueryTail [MAX_QUERY_LEN];
@@ -799,18 +799,18 @@ void MapPersistentStateManager::PackInstances()
 
     uint32 InstanceNumber = RESERVED_INSTANCES_LAST;
     // we do assume std::set is sorted properly on integer value
-    for (std::set<uint32>::iterator i = InstanceSet.begin(); i != InstanceSet.end(); ++i)
+    for (const auto i : InstanceSet)
     {
-        if (*i != InstanceNumber)
+        if (i != InstanceNumber)
         {
             CharacterDatabase.BeginTransaction();
             // remap instance id
-            CharacterDatabase.PExecute("UPDATE creature_respawn SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
-            CharacterDatabase.PExecute("UPDATE gameobject_respawn SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
-            CharacterDatabase.PExecute("UPDATE corpse SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
-            CharacterDatabase.PExecute("UPDATE character_instance SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
-            CharacterDatabase.PExecute("UPDATE instance SET id = '%u' WHERE id = '%u'", InstanceNumber, *i);
-            CharacterDatabase.PExecute("UPDATE group_instance SET instance = '%u' WHERE instance = '%u'", InstanceNumber, *i);
+            CharacterDatabase.PExecute("UPDATE creature_respawn SET instance = '%u' WHERE instance = '%u'", InstanceNumber, i);
+            CharacterDatabase.PExecute("UPDATE gameobject_respawn SET instance = '%u' WHERE instance = '%u'", InstanceNumber, i);
+            CharacterDatabase.PExecute("UPDATE corpse SET instance = '%u' WHERE instance = '%u'", InstanceNumber, i);
+            CharacterDatabase.PExecute("UPDATE character_instance SET instance = '%u' WHERE instance = '%u'", InstanceNumber, i);
+            CharacterDatabase.PExecute("UPDATE instance SET id = '%u' WHERE id = '%u'", InstanceNumber, i);
+            CharacterDatabase.PExecute("UPDATE group_instance SET instance = '%u' WHERE instance = '%u'", InstanceNumber, i);
             //execute transaction synchronously
             CharacterDatabase.CommitTransaction();
         }
@@ -960,14 +960,14 @@ void MapPersistentStateManager::GetStatistics(uint32& numStates, uint32& numBoun
     numBoundGroups = 0;
 
     // only instanceable maps have bounds
-    for (PersistentStateMap::iterator itr = m_instanceSaveByInstanceId.begin(); itr != m_instanceSaveByInstanceId.end(); ++itr)
+    for (const auto& itr : m_instanceSaveByInstanceId)
     {
-        if (!itr->second->GetMapEntry()->IsDungeon())
+        if (!itr.second->GetMapEntry()->IsDungeon())
             continue;
 
         ++numStates;
-        numBoundPlayers += ((DungeonPersistentState*)itr->second)->GetPlayerCount();
-        numBoundGroups += ((DungeonPersistentState*)itr->second)->GetGroupCount();
+        numBoundPlayers += ((DungeonPersistentState*)itr.second)->GetPlayerCount();
+        numBoundGroups += ((DungeonPersistentState*)itr.second)->GetGroupCount();
     }
 }
 

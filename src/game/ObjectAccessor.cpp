@@ -43,12 +43,12 @@ INSTANTIATE_CLASS_MUTEX(ObjectAccessor, ACE_Thread_Mutex);
 ObjectAccessor::ObjectAccessor() {}
 ObjectAccessor::~ObjectAccessor()
 {
-    for (Player2CorpsesMapType::const_iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); ++itr)
+    for (const auto& itr : i_player2corpse)
     {
-        if (itr->first.IsCorpse())
+        if (itr.first.IsCorpse())
             continue;
-        itr->second->RemoveFromWorld();
-        delete itr->second;
+        itr.second->RemoveFromWorld();
+        delete itr.second;
     }
 }
 
@@ -164,8 +164,8 @@ ObjectAccessor::SaveAllPlayers()
 {
     HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
-    for (HashMapHolder<Player>::MapType::iterator itr = m.begin(); itr != m.end(); ++itr)
-        itr->second->SaveToDB();
+    for (const auto& itr : m)
+        itr.second->SaveToDB();
 }
 
 void ObjectAccessor::KickPlayer(ObjectGuid guid)
@@ -234,21 +234,21 @@ void
 ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair, GridType& grid, Map* map)
 {
     Guard guard(i_corpseGuard);
-    for (Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
+    for (const auto& iter : i_player2corpse)
     {
-        if (!iter->first.IsPlayer())
+        if (!iter.first.IsPlayer())
             continue;
 
-        if (iter->second->GetGrid() == gridpair)
+        if (iter.second->GetGrid() == gridpair)
         {
             // verify, if the corpse in our instance (add only corpses which are)
             if (map->Instanceable())
             {
-                if (iter->second->GetInstanceId() == map->GetInstanceId())
-                    grid.AddWorldObject(iter->second);
+                if (iter.second->GetInstanceId() == map->GetInstanceId())
+                    grid.AddWorldObject(iter.second);
             }
             else
-                grid.AddWorldObject(iter->second);
+                grid.AddWorldObject(iter.second);
         }
     }
 }

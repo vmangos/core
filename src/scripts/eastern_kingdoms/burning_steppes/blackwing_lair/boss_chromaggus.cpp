@@ -130,9 +130,9 @@ struct boss_chromaggusAI : public ScriptedAI
         m_bEnraged          = false;
         m_lRedAfflictionPlayerGUID.clear();
 
-        for (AfflictionGuids::const_iterator itr = m_lChromaticPlayerGUID.begin(); itr != m_lChromaticPlayerGUID.end(); ++itr)
+        for (const auto& guid : m_lChromaticPlayerGUID)
         {
-            if (Player* pTarget = m_creature->GetMap()->GetPlayer(*itr))
+            if (Player* pTarget = m_creature->GetMap()->GetPlayer(guid))
             {
                 pTarget->RemoveAurasDueToSpell(23175);
                 pTarget->RemoveAurasDueToSpell(23177);
@@ -149,8 +149,8 @@ struct boss_chromaggusAI : public ScriptedAI
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
         }
 
-        for (std::vector<TimeLapseInfo*>::iterator itr = m_vTimeLapseInfo.begin(); itr != m_vTimeLapseInfo.end(); ++itr)
-            delete *itr;
+        for (const auto& itr : m_vTimeLapseInfo)
+            delete itr;
         m_vTimeLapseInfo.clear();
     }
 
@@ -177,8 +177,8 @@ struct boss_chromaggusAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CHROMAGGUS, DONE);
-        for (std::vector<TimeLapseInfo*>::iterator itr = m_vTimeLapseInfo.begin(); itr != m_vTimeLapseInfo.end(); ++itr)
-            delete *itr;
+        for (const auto& itr : m_vTimeLapseInfo)
+            delete itr;
         m_vTimeLapseInfo.clear();
     }
 
@@ -353,8 +353,8 @@ struct boss_chromaggusAI : public ScriptedAI
 
             std::vector<ObjectGuid> m_vPossibleVictim;
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
-                if (Player* target = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid()))
+            for (const auto itr : tList)
+                if (Player* target = m_creature->GetMap()->GetPlayer(itr->getUnitGuid()))
                     m_vPossibleVictim.push_back(target->GetObjectGuid());
 
             int affli_rand = urand(0, 18);

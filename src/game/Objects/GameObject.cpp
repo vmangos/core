@@ -86,7 +86,7 @@ GameObject::~GameObject()
     delete i_AI;
     delete m_model;
 
-    MANGOS_ASSERT(m_dynObjGUIDs.size() == 0);
+    MANGOS_ASSERT(m_dynObjGUIDs.empty());
 }
 
 void GameObject::AddToWorld()
@@ -112,8 +112,7 @@ void GameObject::AddToWorld()
 
 void GameObject::AIM_Initialize()
 {
-    if (i_AI)
-        delete i_AI;
+    delete i_AI;
     i_AI = sScriptMgr.GetGameObjectAI(this);
 }
 
@@ -541,9 +540,9 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                 if (spellId)
                 {
                     // TODO find out why this is here, because m_UniqueUsers is empty for GAMEOBJECT_TYPE_GOOBER
-                    for (GuidsSet::const_iterator itr = m_UniqueUsers.begin(); itr != m_UniqueUsers.end(); ++itr)
+                    for (const auto& guid : m_UniqueUsers)
                     {
-                        if (Player* owner = GetMap()->GetPlayer(*itr))
+                        if (Player* owner = GetMap()->GetPlayer(guid))
                             owner->CastSpell(owner, spellId, false, nullptr, nullptr, GetObjectGuid());
                     }
 
@@ -2182,10 +2181,7 @@ bool GameObject::PlayerCanUse(Player* pl)
         }
     }
 
-    if (!IsUseRequirementMet())
-        return false;
-
-    return true;
+    return IsUseRequirementMet();
 }
 
 void GameObject::SetLootState(LootState state)

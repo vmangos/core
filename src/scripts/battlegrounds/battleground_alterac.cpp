@@ -64,12 +64,12 @@ class npc_alterac_bossHelper
         void AggroLinkedMobsIfNeeded()
         {
             std::list<Creature*> creaturesLinked;
-            for (int i = 0; i < m_linkedEntries.size(); ++i)
-                GetCreatureListWithEntryInGrid(creaturesLinked, me, m_linkedEntries[i], 100.0f);
-            for (std::list<Creature*>::iterator it = creaturesLinked.begin(); it != creaturesLinked.end(); ++it)
-                if ((*it)->IsAlive() && !(*it)->IsInCombat())
+            for (uint32 entry : m_linkedEntries)
+                GetCreatureListWithEntryInGrid(creaturesLinked, me, entry, 100.0f);
+            for (const auto& it : creaturesLinked)
+                if (it->IsAlive() && !it->IsInCombat())
                 {
-                    ThreatListCopier* c = new ThreatListCopier(*it);
+                    ThreatListCopier* c = new ThreatListCopier(it);
                     me->ProcessThreatList(c);
                     delete c;
                 }
@@ -362,15 +362,15 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
         std::list<Creature*> m_Wolf;
         GetCreatureListWithEntryInGrid(m_Wolf, m_creature, 12121, 100.0f);
-        for (std::list<Creature*>::iterator it = m_Wolf.begin(); it != m_Wolf.end(); ++it)
-            if (!(*it)->IsAlive())
-                (*it)->Respawn();
+        for (const auto& it : m_Wolf)
+            if (!it->IsAlive())
+                it->Respawn();
         m_Wolf.clear();
 
         GetCreatureListWithEntryInGrid(m_Wolf, m_creature, 12122, 100.0f);
-        for (std::list<Creature*>::iterator it = m_Wolf.begin(); it != m_Wolf.end(); ++it)
-            if (!(*it)->IsAlive())
-                (*it)->Respawn();
+        for (const auto& it : m_Wolf)
+            if (!it->IsAlive())
+                it->Respawn();
         m_Wolf.clear();
 
     }
@@ -668,9 +668,9 @@ struct npc_BalindaAI : public ScriptedAI
             {
                 uint32 uiTargetInRangeCount = 0;
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+                for (const auto i : tList)
                 {
-                    if (ObjectGuid uiTargetGuid = (*i)->getUnitGuid())
+                    if (ObjectGuid uiTargetGuid = i->getUnitGuid())
                     {
                         if (Unit* pTarget = m_creature->GetMap()->GetUnit(uiTargetGuid))
                         {
@@ -916,9 +916,9 @@ struct npc_GalvangarAI : public ScriptedAI
             {
                 uint32 uiTargetInRangeCount = 0;
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+                for (const auto i : tList)
                 {
-                    if (ObjectGuid uiTargetGuid = (*i)->getUnitGuid())
+                    if (ObjectGuid uiTargetGuid = i->getUnitGuid())
                     {
                         if (Unit* pTarget = m_creature->GetMap()->GetUnit(uiTargetGuid))
                         {
@@ -1388,10 +1388,10 @@ bool GossipHello_AV_npc_ram_wolf(Player* pPlayer, Creature* pCreature)
     std::list<Creature*> ramWolfTamedList;
     GetCreatureListWithEntryInGrid(ramWolfTamedList, pCreature, entryCreature, 250.0f);
 
-    for (std::list<Creature*>::iterator it = ramWolfTamedList.begin(); it != ramWolfTamedList.end(); ++it)
+    for (const auto& it : ramWolfTamedList)
     {
         /** Check if the Tamed beast has a player as owner */
-        ObjectGuid playerOwner(HIGHGUID_PLAYER, (*it)->AI()->GetData(0));
+        ObjectGuid playerOwner(HIGHGUID_PLAYER, it->AI()->GetData(0));
         if (Player* player = pCreature->GetMap()->GetPlayer(playerOwner))
             if (player->GetGUID() == pPlayer->GetGUID())
                 isAllowedToGetItem = false;
@@ -1544,28 +1544,28 @@ struct RamWolfMasterAI : public ScriptedAI
                 std::list<Creature*> ramWolfTamedList;
                 GetCreatureListWithEntryInGrid(ramWolfTamedList, m_creature, m_uiEntryCreature, 10.0f);
 
-                for (std::list<Creature*>::iterator it = ramWolfTamedList.begin(); it != ramWolfTamedList.end(); ++it)
+                for (const auto& it : ramWolfTamedList)
                 {
                     /** Check if the Tamed beast has a player as owner */
-                    ObjectGuid playerOwner(HIGHGUID_PLAYER, (*it)->AI()->GetData(0));
+                    ObjectGuid playerOwner(HIGHGUID_PLAYER, it->AI()->GetData(0));
                     if (Player* player = m_creature->GetMap()->GetPlayer(playerOwner))
                     {
                         /** If the quest isn't completed, complete it */
-                        player->GroupEventHappens(m_uiEntryQuest, (*it));
+                        player->GroupEventHappens(m_uiEntryQuest, it);
                         player->SendQuestCompleteEvent(m_uiEntryQuest); //Visual event doesn't validate the quest
                         player->SetQuestStatus(m_uiEntryQuest, QUEST_STATUS_COMPLETE);
 
                         /** Make the tamed beast disappears, respawn in 2min30 */
-                        (*it)->SetRespawnDelay(180);
-                        (*it)->SetDeathState(JUST_DIED);
+                        it->SetRespawnDelay(180);
+                        it->SetDeathState(JUST_DIED);
 
                         /** Change back entry to standard beast */
-                        if ((*it)->GetEntry() == NPC_RAM_TAMED)
-                            (*it)->UpdateEntry(NPC_RAM);
-                        else if ((*it)->GetEntry() == NPC_WOLF_TAMED)
-                            (*it)->UpdateEntry(NPC_WOLF);
+                        if (it->GetEntry() == NPC_RAM_TAMED)
+                            it->UpdateEntry(NPC_RAM);
+                        else if (it->GetEntry() == NPC_WOLF_TAMED)
+                            it->UpdateEntry(NPC_WOLF);
 
-                        (*it)->RemoveCorpse();
+                        it->RemoveCorpse();
                     }
                 }
                 ramWolfTamedList.clear();
@@ -1746,8 +1746,8 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
         {
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, commander_id, 200.0f);
-            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-                if ((*it)->IsDead())
+            for (const auto& it : m_RamRiderList)
+                if (it->IsDead())
                     isLeaderDead = true;
             m_RamRiderList.clear();
         }
@@ -1899,7 +1899,7 @@ struct AV_NpcEventAI : public npc_escortAI
             {
                 if (bg->getPlayerGoStatus(BG_TEAM_HORDE, BG_AV_GROUND_ASSAULT) && creature_entry == AV_NPC_QUARTERMASTER)
                 {
-                    if (b_isTroopsSpawned == false)
+                    if (!b_isTroopsSpawned)
                     {
                         b_isTroopsSpawned = true;
                         bg->setPlayerGoStatus(BG_TEAM_HORDE, BG_AV_GROUND_ASSAULT, false);
@@ -1952,7 +1952,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 }
                 else if (bg->getPlayerGoStatus(BG_TEAM_ALLIANCE, BG_AV_GROUND_ASSAULT) && creature_entry == AV_NPC_QUARTERMASTER_A)
                 {
-                    if (b_isTroopsSpawned == false)
+                    if (!b_isTroopsSpawned)
                     {
                         b_isTroopsSpawned = true;
                         bg->setPlayerGoStatus(BG_TEAM_ALLIANCE, BG_AV_GROUND_ASSAULT, false);
@@ -2081,7 +2081,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     if (m_uiTransform_Timer < uiDiff)
                     {
-                        if (b_isTransformed == false)
+                        if (!b_isTransformed)
                         {
                             m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                             b_isTransformed = true;
@@ -2174,10 +2174,10 @@ struct AV_NpcEventAI : public npc_escortAI
         {
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 1000.0f);
-            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+            for (const auto& it : m_RamRiderList)
             {
-                (*it)->Unmount();
-                (*it)->Respawn();
+                it->Unmount();
+                it->Respawn();
             }
             m_RamRiderList.clear();
         }
@@ -2186,10 +2186,10 @@ struct AV_NpcEventAI : public npc_escortAI
         {
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 1000.0f);
-            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+            for (const auto& it : m_RamRiderList)
             {
-                (*it)->Unmount();
-                (*it)->Respawn();
+                it->Unmount();
+                it->Respawn();
             }
             m_RamRiderList.clear();
         }
@@ -2199,9 +2199,9 @@ struct AV_NpcEventAI : public npc_escortAI
             b_isCavalrySpawned = false;
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 1000.0f);
-            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+            for (const auto& it : m_RamRiderList)
             {
-                (*it)->DisappearAndDie();
+                it->DisappearAndDie();
             }
             m_RamRiderList.clear();
         }
@@ -2210,11 +2210,11 @@ struct AV_NpcEventAI : public npc_escortAI
             Stop();
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 1000.0f);
-            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+            for (const auto& it : m_RamRiderList)
             {
-                (*it)->SetRespawnDelay(432000);
-                (*it)->SetDeathState(JUST_DIED);
-                (*it)->RemoveCorpse();
+                it->SetRespawnDelay(432000);
+                it->SetDeathState(JUST_DIED);
+                it->RemoveCorpse();
             }
             m_RamRiderList.clear();
         }
@@ -2315,8 +2315,8 @@ struct AV_NpcEventAI : public npc_escortAI
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 40.0f);
-                    for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-                        (*it)->Mount(9695); //2786
+                    for (const auto& it : m_RamRiderList)
+                        it->Mount(9695); //2786
                     m_RamRiderList.clear();
                 }
                 break;
@@ -2338,8 +2338,8 @@ struct AV_NpcEventAI : public npc_escortAI
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 40.0f);
-                    for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-                        (*it)->Mount(10278);
+                    for (const auto& it : m_RamRiderList)
+                        it->Mount(10278);
                     m_RamRiderList.clear();
                 }
                 break;
@@ -2353,8 +2353,8 @@ struct AV_NpcEventAI : public npc_escortAI
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 40.0f);
-                    for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-                        (*it)->Unmount();
+                    for (const auto& it : m_RamRiderList)
+                        it->Unmount();
                     m_RamRiderList.clear();
                 }
                 break;
@@ -2366,8 +2366,8 @@ struct AV_NpcEventAI : public npc_escortAI
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 30.0f);
-                    for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-                        (*it)->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
+                    for (const auto& it : m_RamRiderList)
+                        it->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
                     m_RamRiderList.clear();
 
                     m_creature->SummonGameObject(OBJECT_WB_H_INVOCATION, -360.006989f, -130.33f, 26.4321f, 5.6635f, 0, 0, 0, 0, -1, false);
@@ -2386,8 +2386,8 @@ struct AV_NpcEventAI : public npc_escortAI
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 40.0f);
-                    for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-                        (*it)->Unmount();
+                    for (const auto& it : m_RamRiderList)
+                        it->Unmount();
                     m_RamRiderList.clear();
                 }
                 break;
@@ -2399,8 +2399,8 @@ struct AV_NpcEventAI : public npc_escortAI
 
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 30.0f);
-                    for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-                        (*it)->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
+                    for (const auto& it : m_RamRiderList)
+                        it->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
                     m_RamRiderList.clear();
 
                     m_creature->SummonGameObject(OBJECT_WB_A_INVOCATION, -199.7f, -342.698f, 6.809f, 1.69646f, 0, 0, 0, 0, -1, false);
@@ -2547,12 +2547,12 @@ struct AV_NpcEventAI : public npc_escortAI
 
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, m_followers, 100.0f);
-            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+            for (const auto& it : m_RamRiderList)
             {
-                if (AV_NpcEventTroopsAI* pEscortAI = dynamic_cast<AV_NpcEventTroopsAI*>((*it)->AI()))
+                if (AV_NpcEventTroopsAI* pEscortAI = dynamic_cast<AV_NpcEventTroopsAI*>(it->AI()))
                 {
                     pEscortAI->Reset();
-                    (*it)->SetRespawnDelay(432000);
+                    it->SetRespawnDelay(432000);
                     pEscortAI->Start(true, 0, nullptr, false);
                     pEscortAI->setCurrentWP(getCurrentWP());
                 }
@@ -2700,13 +2700,13 @@ struct AV_NpcEventAI : public npc_escortAI
 
                             std::list<Creature*> m_RamRiderList;
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 50.0f);
-                            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+                            for (const auto& it : m_RamRiderList)
                             {
-                                DoScriptText(SAY_WARCRY_HORDE, (*it));
-                                (*it)->SetWalk(false);
-                                (*it)->JoinCreatureGroup(m_creature,
-                                                         m_creature->GetAngle((*it)) - (*it)->GetOrientation(),
-                                                         m_creature->GetDistance((*it)),
+                                DoScriptText(SAY_WARCRY_HORDE, it);
+                                it->SetWalk(false);
+                                it->JoinCreatureGroup(m_creature,
+                                                         m_creature->GetAngle(it) - it->GetOrientation(),
+                                                         m_creature->GetDistance(it),
                                                          OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
                             }
                             m_RamRiderList.clear();
@@ -2724,13 +2724,13 @@ struct AV_NpcEventAI : public npc_escortAI
 
                             std::list<Creature*> m_RamRiderList;
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_RAMRIDER, 20.0f);
-                            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+                            for (const auto& it : m_RamRiderList)
                             {
-                                DoScriptText(SAY_WARCRY_ALIANCE, (*it));
-                                (*it)->SetWalk(false);
-                                (*it)->JoinCreatureGroup(m_creature,
-                                                         m_creature->GetAngle((*it)) - (*it)->GetOrientation(),
-                                                         m_creature->GetDistance((*it)),
+                                DoScriptText(SAY_WARCRY_ALIANCE, it);
+                                it->SetWalk(false);
+                                it->JoinCreatureGroup(m_creature,
+                                                         m_creature->GetAngle(it) - it->GetOrientation(),
+                                                         m_creature->GetDistance(it),
                                                          OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
                             }
                             m_RamRiderList.clear();
@@ -2751,7 +2751,7 @@ struct AV_NpcEventAI : public npc_escortAI
             GameObject* pInvocation = m_creature->FindNearestGameObject(OBJECT_WB_H_INVOCATION, 250.0f);
             if (isGobSummoned && !pInvocation && m_creature->GetDistance(-360.16f, -130.41f, 27.07f) < 100)
             {
-                if (m_bThurlogaBoss == false)
+                if (!m_bThurlogaBoss)
                 {
                     m_bThurlogaBoss = true;
                     DoScriptText(SAY_LOKHOLAR_SPAWNED, m_creature);
@@ -2765,10 +2765,10 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 100.0f);
-                    for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+                    for (const auto& it : m_RamRiderList)
                     {
-                        (*it)->Unmount();
-                        (*it)->DisappearAndDie();
+                        it->Unmount();
+                        it->DisappearAndDie();
                     }
                     m_RamRiderList.clear();
                     m_creature->DisappearAndDie();
@@ -2783,7 +2783,7 @@ struct AV_NpcEventAI : public npc_escortAI
             GameObject* pInvocation = m_creature->FindNearestGameObject(OBJECT_WB_A_INVOCATION, 250.0f);
             if (isGobSummoned && !pInvocation && m_creature->GetDistance(-199.64f, -342.7f, 7.67f) < 100.0f)
             {
-                if (m_bRenferalBoss == false)
+                if (!m_bRenferalBoss)
                 {
                     m_bRenferalBoss = true;
                     m_uiDespawn_Timer = 6000;
@@ -2796,10 +2796,10 @@ struct AV_NpcEventAI : public npc_escortAI
                 {
                     std::list<Creature*> m_RamRiderList;
                     GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 100.0f);
-                    for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+                    for (const auto& it : m_RamRiderList)
                     {
-                        (*it)->Unmount();
-                        (*it)->DisappearAndDie();
+                        it->Unmount();
+                        it->DisappearAndDie();
                     }
                     m_RamRiderList.clear();
                     m_creature->DisappearAndDie();
@@ -3575,10 +3575,10 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
         {
             std::list<Creature*> m_RamRiderList;
             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, m_uiTroopsType + i, 100.0f);
-            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+            for (const auto& it : m_RamRiderList)
             {
                 /** Start escort for troops since leader is dead */
-                if (AV_npc_troops_chief_EventAI* pEscortAI = dynamic_cast<AV_npc_troops_chief_EventAI*>((*it)->AI()))
+                if (AV_npc_troops_chief_EventAI* pEscortAI = dynamic_cast<AV_npc_troops_chief_EventAI*>(it->AI()))
                     pEscortAI->Start(true, 0, nullptr, false);
             }
             m_RamRiderList.clear();
@@ -3609,7 +3609,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
             {
                 case 2:
                 {
-                    if (b_isSpeechDone == false)
+                    if (!b_isSpeechDone)
                     {
                         b_isSpeechDone = true;
                         m_creature->SetWalk(false);
@@ -3619,15 +3619,15 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
                         {
                             std::list<Creature*> m_RamRiderList;
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, m_uiTroopsType + i, 40.0f);
-                            for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
+                            for (const auto& it : m_RamRiderList)
                             {
-                                DoScriptText(m_uiWarcryBC, (*it));
-                                (*it)->SetWalk(false);
+                                DoScriptText(m_uiWarcryBC, it);
+                                it->SetWalk(false);
 
                                 /** Link all the troops to the leader */
-                                (*it)->JoinCreatureGroup(m_creature,
-                                                         m_creature->GetAngle((*it)) - (*it)->GetOrientation(),
-                                                         m_creature->GetDistance((*it)),
+                                it->JoinCreatureGroup(m_creature,
+                                                         m_creature->GetAngle(it) - it->GetOrientation(),
+                                                         m_creature->GetDistance(it),
                                                          OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER);
                             }
                             m_RamRiderList.clear();
@@ -4356,10 +4356,10 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         isInvocated = false;
 
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+        for (const auto& i : liste)
         {
-            if (i->getSource()->IsAlive())
-                i->getSource()->RemoveAurasDueToSpell(11206);
+            if (i.getSource()->IsAlive())
+                i.getSource()->RemoveAurasDueToSpell(11206);
         }
 
         /** Once invocation is done, World Boss doesn't start waypoint path for 10 minutes. */
@@ -4368,20 +4368,20 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         /** Once WB is invocated, suppress invocation rune to disable further invocation (only one per Battleground) */
         std::list<GameObject*> invocationObjectList;
         GetGameObjectListWithEntryInGrid(invocationObjectList, m_creature, OBJECT_WB_H_INVOCATION, 200.0f);
-        for (std::list<GameObject*>::iterator it = invocationObjectList.begin(); it != invocationObjectList.end(); ++it)
-            (*it)->Delete();
+        for (const auto& it : invocationObjectList)
+            it->Delete();
 
         /** Stop invocation from Frostwolf Shaman */
         std::list<Creature*> ramRidersList;
         GetCreatureListWithEntryInGrid(ramRidersList, m_creature, AV_NPC_FROSTWOLF_SHAMAN, 200.0f);
-        for (std::list<Creature*>::iterator it = ramRidersList.begin(); it != ramRidersList.end(); ++it)
-            (*it)->InterruptNonMeleeSpells(true);
+        for (const auto& it : ramRidersList)
+            it->InterruptNonMeleeSpells(true);
 
         /** Stop invocation from Thurloga */
         std::list<Creature*> thurlogaList;
         GetCreatureListWithEntryInGrid(thurlogaList, m_creature, AV_NPC_PRIMALIST_THURLOGA, 200.0f);
-        for (std::list<Creature*>::iterator it = thurlogaList.begin(); it != thurlogaList.end(); ++it)
-            (*it)->InterruptNonMeleeSpells(true);
+        for (const auto& it : thurlogaList)
+            it->InterruptNonMeleeSpells(true);
 
         isYelling = false;
         Reset();
@@ -4466,7 +4466,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
             isYelling = true;
         }
 
-        if (isInvocated == false)
+        if (!isInvocated)
         {
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
             m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
@@ -4474,7 +4474,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
             m_creature->SetWalk(false);
             isInvocated = true;
         }
-        if (m_uiEngageTimer < uiDiff && isEngageModeStarted == false)
+        if (m_uiEngageTimer < uiDiff && !isEngageModeStarted)
         {
             /** Start waypoint path system */
             Start(false, 0, nullptr, false);
@@ -4566,31 +4566,31 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
         isInvocated = false;
 
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+        for (const auto& i : liste)
         {
-            if (i->getSource()->IsAlive())
-                i->getSource()->RemoveAurasDueToSpell(11206);
+            if (i.getSource()->IsAlive())
+                i.getSource()->RemoveAurasDueToSpell(11206);
         }
 
         /** Once WB is invocated, suppress invocation rune to disable further invocation (only one per Battleground) */
         std::list<GameObject*> m_invocationObjectList;
         GetGameObjectListWithEntryInGrid(m_invocationObjectList, m_creature, OBJECT_WB_A_INVOCATION, 200.0f);
-        for (std::list<GameObject*>::iterator it = m_invocationObjectList.begin(); it != m_invocationObjectList.end(); ++it)
-            (*it)->Delete();
+        for (const auto& it : m_invocationObjectList)
+            it->Delete();
         m_invocationObjectList.clear();
 
         /** Stop invocation from Druid of the Grove */
         std::list<Creature*> m_RamRiderList;
         GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_DRUID_OF_THE_GROVE, 200.0f);
-        for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
-            (*it)->InterruptNonMeleeSpells(true);
+        for (const auto& it : m_RamRiderList)
+            it->InterruptNonMeleeSpells(true);
         m_RamRiderList.clear();
 
         /** Stop invocation from Renferal */
         std::list<Creature*> m_RenferalList;
         GetCreatureListWithEntryInGrid(m_RenferalList, m_creature, AV_NPC_ARCHDRUID_RENFERAL, 200.0f);
-        for (std::list<Creature*>::iterator it = m_RenferalList.begin(); it != m_RenferalList.end(); ++it)
-            (*it)->InterruptNonMeleeSpells(true);
+        for (const auto& it : m_RenferalList)
+            it->InterruptNonMeleeSpells(true);
         m_RenferalList.clear();
 
         Reset();
@@ -4645,7 +4645,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
     void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (isInvocated == false)
+        if (!isInvocated)
         {
             DoScriptText(SAY_IVUS_SPAWNED, m_creature);
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
@@ -4655,7 +4655,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
             isInvocated = true;
         }
 
-        if (m_uiEngageTimer < uiDiff && isEngageModeStarted == false)
+        if (m_uiEngageTimer < uiDiff && !isEngageModeStarted)
         {
             /** Start waypoint path system */
             Start(false, 0, nullptr, false);
@@ -5213,8 +5213,8 @@ class npc_av_battle_npc_summoner: public ScriptedAI
 
         void OnRemoveFromWorld() override
         {
-            for (int i = 0; i < TOTAL_NPC_PER_SPAWN; ++i)
-                if (Creature* c = m_creature->GetMap()->GetCreature(m_summoned[i]))
+            for (const auto& guid : m_summoned)
+                if (Creature* c = m_creature->GetMap()->GetCreature(guid))
                     c->DeleteLater();
         }
 
@@ -5253,15 +5253,16 @@ class npc_av_battle_npc_summoner: public ScriptedAI
             if (m_timer < diff)
             {
                 m_timer = TIMER_CHECK_NPC_SPAWN;
-                for (int i = 0; i < TOTAL_NPC_PER_SPAWN; ++i)
-                    if (!m_creature->GetMap()->GetCreature(m_summoned[i]))
+                for (auto& guid : m_summoned)
+                {
+                    if (!m_creature->GetMap()->GetCreature(guid))
                     {
                         float x, y, z;
                         m_creature->GetPosition(x, y, z);
                         m_creature->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, 5.0f);
                         if (Creature* c = m_creature->SummonCreature(SelectCreatureEntry(), x, y, z, 0.0f, TEMPSUMMON_CORPSE_DESPAWN))
                         {
-                            m_summoned[i] = c->GetObjectGuid();
+                            guid = c->GetObjectGuid();
                             x = m_destX;
                             y = m_destY;
                             z = m_destZ;
@@ -5274,6 +5275,7 @@ class npc_av_battle_npc_summoner: public ScriptedAI
                             break;
                         }
                     }
+                }  
             }
             else
                 m_timer -= diff;

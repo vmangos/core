@@ -304,9 +304,9 @@ class Guild
 
         MemberSlot* GetMemberSlot(std::string const& name)
         {
-            for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
-                if (itr->second.Name == name)
-                    return &itr->second;
+            for(auto & member : members)
+                if (member.second.Name == name)
+                    return &member.second;
 
             return nullptr;
         }

@@ -1199,7 +1199,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
                     delete result;
                 }
 
-                if (list.size() < 1)
+                if (list.empty())
                     return false;
                 std::stringstream accountStream;
                 std::copy(list.begin(), list.end(), std::ostream_iterator<int>(accountStream, ","));
@@ -1286,18 +1286,18 @@ void ChatHandler::HandleCharacterDeletedListHelper(DeletedInfoList const& foundL
         SendSysMessage(LANG_CHARACTER_DELETED_LIST_BAR);
     }
 
-    for (DeletedInfoList::const_iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
+    for (const auto& itr : foundList)
     {
-        std::string dateStr = TimeToTimestampStr(itr->deleteDate);
+        std::string dateStr = TimeToTimestampStr(itr.deleteDate);
 
         if (!m_session)
             PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CONSOLE,
-                itr->lowguid, itr->name.c_str(), itr->accountName.empty() ? "<nonexistent>" : itr->accountName.c_str(),
-                itr->accountId, dateStr.c_str());
+                itr.lowguid, itr.name.c_str(), itr.accountName.empty() ? "<nonexistent>" : itr.accountName.c_str(),
+                itr.accountId, dateStr.c_str());
         else
             PSendSysMessage(LANG_CHARACTER_DELETED_LIST_LINE_CHAT,
-                itr->lowguid, itr->name.c_str(), itr->accountName.empty() ? "<nonexistent>" : itr->accountName.c_str(),
-                itr->accountId, dateStr.c_str());
+                itr.lowguid, itr.name.c_str(), itr.accountName.empty() ? "<nonexistent>" : itr.accountName.c_str(),
+                itr.accountId, dateStr.c_str());
     }
 
     if (!m_session)
@@ -1416,8 +1416,8 @@ bool ChatHandler::HandleCharacterDeletedRestoreCommand(char* args)
     if (newCharName.empty())
     {
         // Drop nonexistent account cases
-        for (DeletedInfoList::iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
-            HandleCharacterDeletedRestoreHelper(*itr);
+        for (const auto& itr : foundList)
+            HandleCharacterDeletedRestoreHelper(itr);
     }
     else if (foundList.size() == 1 && normalizePlayerName(newCharName))
     {
@@ -1471,8 +1471,8 @@ bool ChatHandler::HandleCharacterDeletedDeleteCommand(char* args)
     HandleCharacterDeletedListHelper(foundList);
 
     // Call the appropriate function to delete them (current account for deleted characters is 0)
-    for(DeletedInfoList::const_iterator itr = foundList.begin(); itr != foundList.end(); ++itr)
-        Player::DeleteFromDB(ObjectGuid(HIGHGUID_PLAYER, itr->lowguid), 0, false, true);
+    for(const auto & itr : foundList)
+        Player::DeleteFromDB(ObjectGuid(HIGHGUID_PLAYER, itr.lowguid), 0, false, true);
 
     return true;
 }
@@ -1760,11 +1760,11 @@ bool ChatHandler::HandleCharacterReputationCommand(char* args)
     LocaleConstant loc = GetSessionDbcLocale();
 
     FactionStateList const& targetFSL = target->GetReputationMgr().GetStateList();
-    for (FactionStateList::const_iterator itr = targetFSL.begin(); itr != targetFSL.end(); ++itr)
+    for (const auto& itr : targetFSL)
     {
-        FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(itr->second.ID);
+        FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(itr.second.ID);
 
-        ShowFactionListHelper(factionEntry, loc, &itr->second, target);
+        ShowFactionListHelper(factionEntry, loc, &itr.second, target);
     }
     return true;
 }
@@ -2775,10 +2775,8 @@ bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
         23965,  // Instant Heal
     };
 
-    for (int i = 0; i < sizeof(gmSpellList) / sizeof(uint32); i++)
+    for (uint32 spell : gmSpellList)
     {
-        uint32 spell = gmSpellList[i];
-
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell);
         if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, m_session->GetPlayer()))
         {
@@ -3225,8 +3223,8 @@ bool ChatHandler::HandleAddItemCommand(char* args)
 
     // remove binding (let GM give it to another player later)
     if (pl == plTarget)
-        for (ItemPosCountVec::const_iterator itr = dest.begin(); itr != dest.end(); ++itr)
-            if (Item* item1 = pl->GetItemByPos(itr->pos))
+        for (const auto& itr : dest)
+            if (Item* item1 = pl->GetItemByPos(itr.pos))
                 item1->SetBinding(false);
 
     if (count > 0 && item)
@@ -3652,17 +3650,17 @@ bool ChatHandler::HandleListTalentsCommand(char* /*args*/)
     uint32 count = 0;
     uint32 cost = 0;
     PlayerSpellMap const& uSpells = player->GetSpellMap();
-    for (PlayerSpellMap::const_iterator itr = uSpells.begin(); itr != uSpells.end(); ++itr)
+    for (const auto& itr : uSpells)
     {
-        if (itr->second.state == PLAYERSPELL_REMOVED || itr->second.disabled)
+        if (itr.second.state == PLAYERSPELL_REMOVED || itr.second.disabled)
             continue;
 
-        uint32 cost_itr = GetTalentSpellCost(itr->first);
+        uint32 cost_itr = GetTalentSpellCost(itr.first);
 
         if (cost_itr == 0)
             continue;
 
-        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(itr->first);
+        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(itr.first);
         if (!spellEntry)
             continue;
 
@@ -3851,8 +3849,8 @@ bool ChatHandler::HandleResetAllCommand(char* args)
 
     CharacterDatabase.PExecute("UPDATE characters SET at_login = at_login | '%u' WHERE (at_login & '%u') = '0'", atLogin, atLogin);
     HashMapHolder<Player>::MapType const& plist = sObjectAccessor.GetPlayers();
-    for (HashMapHolder<Player>::MapType::const_iterator itr = plist.begin(); itr != plist.end(); ++itr)
-        itr->second->SetAtLoginFlag(atLogin);
+    for (const auto& itr : plist)
+        itr.second->SetAtLoginFlag(atLogin);
 
     return true;
 }
@@ -4251,13 +4249,13 @@ bool ChatHandler::HandleModifyRepCommand(char* args)
 
     if (factionEntry->reputationListID < 0)
     {
-        PSendSysMessage(LANG_COMMAND_FACTION_NOREP_ERROR, factionEntry->name[GetSessionDbcLocale()], factionId);
+        PSendSysMessage(LANG_COMMAND_FACTION_NOREP_ERROR, factionEntry->name[GetSessionDbcLocale()].c_str(), factionId);
         SetSentErrorMessage(true);
         return false;
     }
 
     target->GetReputationMgr().SetReputation(factionEntry, amount);
-    PSendSysMessage(LANG_COMMAND_MODIFY_REP, factionEntry->name[GetSessionDbcLocale()], factionId,
+    PSendSysMessage(LANG_COMMAND_MODIFY_REP, factionEntry->name[GetSessionDbcLocale()].c_str(), factionId,
                     GetNameLink(target).c_str(), target->GetReputationMgr().GetReputation(factionEntry));
     return true;
 }
@@ -5056,9 +5054,9 @@ bool ChatHandler::HandlePetListCommand(char* args)
     CharPetMap::const_iterator charPets = petsMap.find(playerGuid.GetCounter());
     uint32 count = 0;
     if (charPets != petsMap.end())
-        for (CharPetVector::const_iterator it = charPets->second.begin(); it != charPets->second.end(); ++it)
+        for (const auto it : charPets->second)
         {
-            PSendSysMessage("#%u: \"%s\" (%s)", (*it)->id, (*it)->name.c_str(), (*it)->slot == PET_SAVE_AS_CURRENT ? "Current pet" : "In stable");
+            PSendSysMessage("#%u: \"%s\" (%s)", it->id, it->name.c_str(), it->slot == PET_SAVE_AS_CURRENT ? "Current pet" : "In stable");
             ++count;
         }
     PSendSysMessage("Found %u pets for character %s (#%u).", count, charName.c_str(), playerGuid.GetCounter());

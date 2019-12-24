@@ -245,31 +245,31 @@ namespace MaNGOS
 
         void Visit(GameObjectMapType& m)
         {
-            for(GameObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         void Visit(PlayerMapType& m)
         {
-            for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
         void Visit(CreatureMapType& m)
         {
-            for(CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         void Visit(CorpseMapType& m)
         {
-            for(CorpseMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         void Visit(DynamicObjectMapType& m)
         {
-            for(DynamicObjectMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
@@ -437,8 +437,8 @@ namespace MaNGOS
 
         void Visit(CreatureMapType& m)
         {
-            for(CreatureMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
@@ -495,8 +495,8 @@ namespace MaNGOS
 
         void Visit(PlayerMapType& m)
         {
-            for(PlayerMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                i_do(itr->getSource());
+            for(auto & itr : m)
+                i_do(itr.getSource());
         }
 
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
@@ -514,9 +514,9 @@ namespace MaNGOS
 
         void Visit(CameraMapType& m)
         {
-            for(CameraMapType::iterator itr=m.begin(); itr != m.end(); ++itr)
-                if (itr->getSource()->GetBody()->IsWithinDist(i_searcher,i_dist))
-                    i_do(itr->getSource()->GetOwner());
+            for(auto & itr : m)
+                if (itr.getSource()->GetBody()->IsWithinDist(i_searcher,i_dist))
+                    i_do(itr.getSource()->GetOwner());
         }
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
     };
@@ -724,10 +724,7 @@ namespace MaNGOS
 
             bool operator()(GameObject* go)
             {
-                if (go->GetEntry() == i_entry && go->IsWithinDist3d(i_x, i_y, i_z, i_range))
-                    return true;
-
-                return false;
+                return go->GetEntry() == i_entry && go->IsWithinDist3d(i_x, i_y, i_z, i_range);
             }
 
             float GetLastRange() const { return i_range; }
@@ -775,12 +772,8 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if (u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT)))
-                {
-                    return true;
-                }
-                return false;
+                return u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
+                    (u->IsCharmed() || u->IsFrozen() || u->HasUnitState(UNIT_STAT_CAN_NOT_REACT));
             }
         private:
             WorldObject const* i_obj;
@@ -794,12 +787,8 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if (u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
-                    !(u->HasAura(i_spell, EFFECT_INDEX_0) || u->HasAura(i_spell, EFFECT_INDEX_1) || u->HasAura(i_spell, EFFECT_INDEX_2)))
-                {
-                    return true;
-                }
-                return false;
+                return u->IsAlive() && u->IsInCombat() && !i_obj->IsHostileTo(u) && i_obj->IsWithinDistInMap(u, i_range) &&
+                    !(u->HasAura(i_spell, EFFECT_INDEX_0) || u->HasAura(i_spell, EFFECT_INDEX_1) || u->HasAura(i_spell, EFFECT_INDEX_2));
             }
         private:
             WorldObject const* i_obj;
@@ -816,9 +805,7 @@ namespace MaNGOS
             {
                 if (!i_funit->CanSeeInWorld(u))
                     return false;
-                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u))
-                    return true;
-                return false;
+                return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && !i_funit->IsFriendlyTo(u);
             }
         private:
             WorldObject const* i_obj;
@@ -852,9 +839,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_obj->IsFriendlyTo(u) && u->CanSeeInWorld(i_obj))
-                    return true;
-                return false;
+                return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && i_obj->IsFriendlyTo(u) && u->CanSeeInWorld(i_obj);
             }
         private:
             WorldObject const* i_obj;
@@ -868,10 +853,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
-                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && u->CanSeeInWorld(i_obj))
-                    return true;
-
-                return false;
+                return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range) && u->CanSeeInWorld(i_obj);
             }
         private:
             WorldObject const* i_obj;
@@ -1051,10 +1033,7 @@ namespace MaNGOS
                 if (!u->CanSeeInWorld(i_funit))
                     return false;
 
-                if (u->IsAlive() && u->IsHostileTo(i_funit) && i_funit->IsWithinDistInMap(u, u->GetAttackDistance(i_funit)))
-                    return true;
-
-                return false;
+                return u->IsAlive() && u->IsHostileTo(i_funit) && i_funit->IsWithinDistInMap(u, u->GetAttackDistance(i_funit));
             }
         private:
             Unit* const i_funit;
@@ -1231,10 +1210,7 @@ namespace MaNGOS
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Player* u)
             {
-                if (u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range, b_3dDist))
-                    return true;
-
-                return false;
+                return u->IsAlive() && i_obj->IsWithinDistInMap(u, i_range, b_3dDist);
             }
         private:
             WorldObject const* i_obj;
@@ -1302,10 +1278,7 @@ namespace MaNGOS
             AllFriendlyCreaturesInGrid(Unit const* obj) : pUnit(obj) {}
             bool operator() (Unit* u)
             {
-                if (u->IsAlive() && u->GetVisibility() == VISIBILITY_ON && u->IsFriendlyTo(pUnit))
-                    return true;
-
-                return false;
+                return u->IsAlive() && u->GetVisibility() == VISIBILITY_ON && u->IsFriendlyTo(pUnit);
             }
 
         private:
@@ -1318,10 +1291,7 @@ namespace MaNGOS
             AllGameObjectsWithEntryInRange(WorldObject const* pObject, uint32 uiEntry, float fMaxRange) : m_pObject(pObject), m_uiEntry(uiEntry), m_fRange(fMaxRange) {}
             bool operator() (GameObject* pGo)
             {
-                if (pGo->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(pGo,m_fRange,false))
-                    return true;
-
-                return false;
+                return pGo->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(pGo,m_fRange,false);
             }
 
         private:
@@ -1336,10 +1306,7 @@ namespace MaNGOS
         AllCreaturesOfEntryInRange(WorldObject const* pObject, uint32 uiEntry, float fMaxRange) : m_pObject(pObject), m_uiEntry(uiEntry), m_fRange(fMaxRange) {}
         bool operator() (Unit* pUnit)
         {
-            if (pUnit->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(pUnit, m_fRange, false))
-                return true;
-
-            return false;
+            return pUnit->GetEntry() == m_uiEntry && m_pObject->IsWithinDist(pUnit, m_fRange, false);
         }
 
     private:
@@ -1355,8 +1322,8 @@ namespace MaNGOS
             : m_pObject(pObject), entries(entries), m_fRange(fMaxRange) {}
         bool operator() (Unit* pUnit)
         {
-            for (auto it = entries.cbegin(); it != entries.cend(); ++it) {
-                if (pUnit->GetEntry() == (*it) && m_pObject->IsWithinDist(pUnit, m_fRange, false)) {
+            for (const auto entry : entries) {
+                if (pUnit->GetEntry() == entry && m_pObject->IsWithinDist(pUnit, m_fRange, false)) {
                     return true;
                 }
             }
@@ -1376,10 +1343,7 @@ namespace MaNGOS
             bool operator() (Player* pPlayer)
             {
                 //No threat list check, must be done explicit if expected to be in combat with creature
-                if (!pPlayer->IsGameMaster() && pPlayer->IsAlive() && !pUnit->IsWithinDist(pPlayer,fRange,false))
-                    return true;
-
-                return false;
+                return !pPlayer->IsGameMaster() && pPlayer->IsAlive() && !pUnit->IsWithinDist(pPlayer,fRange,false);
             }
 
         private:

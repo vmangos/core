@@ -263,8 +263,8 @@ struct boss_thekalAI : public zg_rez_add
 {
     boss_thekalAI(Creature* pCreature) : zg_rez_add(pCreature, TYPE_THEKAL)
     {
-        for (int i = 0; i < TIGER_COUNT; ++i)
-            TigerGUIDs[i] = 0;
+        for (uint64 & guid : TigerGUIDs)
+            guid = 0;
         Reset();
     }
 
@@ -333,11 +333,11 @@ struct boss_thekalAI : public zg_rez_add
             // Mettre tout le monde en combat.
             DEBUG_UNIT(m_creature, DEBUG_AI, "Thekal fake death. Put map in combat.");
             Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                if (itr->getSource()->GetDistance(m_creature) < 200.0f)
+            for (const auto& player : players)
+                if (player.getSource()->GetDistance(m_creature) < 200.0f)
                 {
-                    itr->getSource()->SetCombatTimer(20000);
-                    itr->getSource()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
+                    player.getSource()->SetCombatTimer(20000);
+                    player.getSource()->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
                 }
             zg_rez_add::JustDied(Killer);
         }
@@ -433,12 +433,12 @@ struct boss_thekalAI : public zg_rez_add
                     Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
                     float nearestDist = 200.0f;
                     Player* target = nullptr;
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (m_creature->CanAttack(itr->getSource()))
-                            if (itr->getSource()->GetDistance(m_creature) < nearestDist)
+                    for (const auto& player : players)
+                        if (m_creature->CanAttack(player.getSource()))
+                            if (player.getSource()->GetDistance(m_creature) < nearestDist)
                             {
-                                nearestDist = itr->getSource()->GetDistance(m_creature);
-                                target = itr->getSource();
+                                nearestDist = player.getSource()->GetDistance(m_creature);
+                                target = player.getSource();
                             }
                     if (target)
                         AttackStart(target);
@@ -512,8 +512,8 @@ struct boss_thekalAI : public zg_rez_add
 
             if (CheckTigers_Timer < diff)
             {
-                for (int i = 0; i < TIGER_COUNT; ++i)
-                    CheckTiger(TigerGUIDs[i]);
+                for (uint64 & guid : TigerGUIDs)
+                    CheckTiger(guid);
                 CheckTigers_Timer = 10000;
             }
             else

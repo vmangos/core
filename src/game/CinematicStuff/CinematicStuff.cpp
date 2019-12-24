@@ -69,11 +69,11 @@ void CinematicStuff::Mount(Player* p, uint32 mountItem)
     {
         // search spell for spell error
         uint32 spellid = 0;
-        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        for (const auto& spell : item->GetProto()->Spells)
         {
-            if (item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+            if (spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
             {
-                spellid = item->GetProto()->Spells[i].SpellId;
+                spellid = spell.SpellId;
                 break;
             }
         }
@@ -226,7 +226,7 @@ void CinematicStuff::SearchAndDestroy(Player* player)
             if (target == nullptr)
             {
                 std::set<Unit*> const attackers = player->GetAttackers();
-                if (attackers.size() > 0)
+                if (!attackers.empty())
                     target = *attackers.begin();
             }
         }
@@ -237,7 +237,7 @@ void CinematicStuff::SearchAndDestroy(Player* player)
         player->GetMotionMaster()->MoveChase(target);
         player->SetFacingToObject(target);
         player->SetInFront(target);
-        player->Attack(target, player->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+        player->Attack(target, player->IsInRange(target, 0, MELEE_RANGE));
     }
     else
     {

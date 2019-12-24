@@ -108,9 +108,9 @@ public:
 
         // TODO: Guard Player map
         HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
-        for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
+        for (const auto& itr : m)
         {
-            Player* pPlayer = itr->second;
+            Player* pPlayer = itr.second;
 
             if (security == SEC_PLAYER)
             {

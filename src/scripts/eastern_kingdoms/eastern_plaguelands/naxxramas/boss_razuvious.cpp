@@ -287,7 +287,7 @@ struct boss_razuviousAI : public ScriptedAI
                 {
                     std::list<Creature*> lst;
                     GetCreatureListWithEntryInGrid(lst, b, 16211, 5.0f);
-                    if (lst.size())
+                    if (!lst.empty())
                         b->SetFacingToObject((*lst.begin()));
                 }
                 break;

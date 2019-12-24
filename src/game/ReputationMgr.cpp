@@ -121,10 +121,10 @@ void ReputationMgr::SendForceReactions()
     WorldPacket data;
     data.Initialize(SMSG_SET_FORCED_REACTIONS, 4 + m_forcedReactions.size() * (4 + 4));
     data << uint32(m_forcedReactions.size());
-    for (ForcedReactions::const_iterator itr = m_forcedReactions.begin(); itr != m_forcedReactions.end(); ++itr)
+    for (const auto& itr : m_forcedReactions)
     {
-        data << uint32(itr->first);                         // faction_id (Faction.dbc)
-        data << uint32(itr->second);                        // reputation rank
+        data << uint32(itr.first);                         // faction_id (Faction.dbc)
+        data << uint32(itr.second);                        // reputation rank
     }
     m_player->SendDirectMessage(&data);
 }
@@ -140,15 +140,15 @@ void ReputationMgr::SendState(FactionState const* faction)
     data << (uint32) faction->ReputationListID;
     data << (uint32) faction->Standing;
 
-    for (FactionStateList::iterator itr = m_factions.begin(); itr != m_factions.end(); ++itr)
+    for (auto& itr : m_factions)
     {
-        if (itr->second.needSend)
+        if (itr.second.needSend)
         {
-            itr->second.needSend = false;
-            if (itr->second.ReputationListID != faction->ReputationListID)
+            itr.second.needSend = false;
+            if (itr.second.ReputationListID != faction->ReputationListID)
             {
-                data << (uint32) itr->second.ReputationListID;
-                data << (uint32) itr->second.Standing;
+                data << (uint32)itr.second.ReputationListID;
+                data << (uint32)itr.second.Standing;
                 ++count;
             }
         }
@@ -165,20 +165,20 @@ void ReputationMgr::SendInitialReputations()
 
     RepListID a = 0;
 
-    for (FactionStateList::iterator itr = m_factions.begin(); itr != m_factions.end(); ++itr)
+    for (auto& itr : m_factions)
     {
         // fill in absent fields
-        for (; a != itr->first; a++)
+        for (; a != itr.first; a++)
         {
             data << uint8(0x00);
             data << uint32(0x00000000);
         }
 
         // fill in encountered data
-        data << uint8(itr->second.Flags);
-        data << uint32(itr->second.Standing);
+        data << uint8(itr.second.Flags);
+        data << uint32(itr.second.Standing);
 
-        itr->second.needSend = false;
+        itr.second.needSend = false;
 
         ++a;
     }
@@ -450,13 +450,13 @@ void ReputationMgr::SaveToDB()
     SqlStatement stmtDel = CharacterDatabase.CreateStatement(delRep, "DELETE FROM character_reputation WHERE guid = ? AND faction=?");
     SqlStatement stmtIns = CharacterDatabase.CreateStatement(insRep, "INSERT INTO character_reputation (guid,faction,standing,flags) VALUES (?, ?, ?, ?)");
 
-    for (FactionStateList::iterator itr = m_factions.begin(); itr != m_factions.end(); ++itr)
+    for (auto& itr : m_factions)
     {
-        if (itr->second.needSave)
+        if (itr.second.needSave)
         {
-            stmtDel.PExecute(m_player->GetGUIDLow(), itr->second.ID);
-            stmtIns.PExecute(m_player->GetGUIDLow(), itr->second.ID, itr->second.Standing, itr->second.Flags);
-            itr->second.needSave = false;
+            stmtDel.PExecute(m_player->GetGUIDLow(), itr.second.ID);
+            stmtIns.PExecute(m_player->GetGUIDLow(), itr.second.ID, itr.second.Standing, itr.second.Flags);
+            itr.second.needSave = false;
         }
     }
 }

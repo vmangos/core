@@ -22,8 +22,8 @@ MasterPlayer::~MasterPlayer()
     for (PlayerMails::const_iterator itr =  m_mail.begin(); itr != m_mail.end(); ++itr)
         delete *itr;
 
-    for (ItemMap::const_iterator iter = mMitems.begin(); iter != mMitems.end(); ++iter)
-        delete iter->second;                                //if item is duplicated... then server may crash ... but that item should be deallocated
+    for (const auto& itr : mMitems)
+        delete itr.second;                                //if item is duplicated... then server may crash ... but that item should be deallocated
 }
 
 void MasterPlayer::Create(Player* player)
@@ -33,8 +33,8 @@ void MasterPlayer::Create(Player* player)
     ASSERT(info);
 
     // original action bar
-    for (PlayerCreateInfoActions::const_iterator action_itr = info->action.begin(); action_itr != info->action.end(); ++action_itr)
-        addActionButton(action_itr->button, action_itr->action, action_itr->type);
+    for (const auto& action_itr : info->action)
+        addActionButton(action_itr.button, action_itr.action, action_itr.type);
 }
 
 void MasterPlayer::LoadPlayer(Player* player)
@@ -110,12 +110,12 @@ void MasterPlayer::SaveMails()
             stmt.addUInt32(m->messageID);
             stmt.Execute();
 
-            if (m->removedItems.size())
+            if (!m->removedItems.empty())
             {
                 stmt = CharacterDatabase.CreateStatement(deleteMailItems, "DELETE FROM mail_items WHERE item_guid = ?");
 
-                for (std::vector<uint32>::const_iterator itr2 = m->removedItems.begin(); itr2 != m->removedItems.end(); ++itr2)
-                    stmt.PExecute(*itr2);
+                for (const auto removedItem : m->removedItems)
+                    stmt.PExecute(removedItem);
 
                 m->removedItems.clear();
             }
@@ -126,8 +126,8 @@ void MasterPlayer::SaveMails()
             if (m->HasItems())
             {
                 SqlStatement stmt = CharacterDatabase.CreateStatement(deleteItem, "DELETE FROM item_instance WHERE guid = ?");
-                for (MailItemInfoVec::const_iterator itr2 = m->items.begin(); itr2 != m->items.end(); ++itr2)
-                    stmt.PExecute(itr2->item_guid);
+                for (const auto& item : m->items)
+                    stmt.PExecute(item.item_guid);
             }
 
             if (m->itemTextId && m->stationery != MAIL_STATIONERY_DEFAULT)

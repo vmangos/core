@@ -25,9 +25,9 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             {
                 bool food = false;
                 bool drink = false;
-                for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+                for (uint32 i : spellInfo->EffectApplyAuraName)
                 {
-                    switch (spellInfo->EffectApplyAuraName[i])
+                    switch (i)
                     {
                         // Food
                         case SPELL_AURA_MOD_REGEN:
@@ -120,10 +120,10 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             if (spellInfo->SpellIconID == 561 && spellInfo->SpellVisual == 5652)
                 return SPELL_JUDGEMENT;
 
-            for (int i = 0; i < 3; ++i)
+            for (uint32 i : spellInfo->Effect)
             {
                 // only paladin auras have this
-                if (spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
+                if (i == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
                     return SPELL_AURA;
             }
             break;
@@ -335,9 +335,9 @@ void SpellEntry::ComputeNonPeriodicDispel()
 void SpellEntry::ComputeDispel()
 {
     _isDispel = false;
-    for (int i = 0; i < 3; ++i)
+    for (uint32 i : Effect)
     {
-        if (Effect[i] == SPELL_EFFECT_DISPEL)
+        if (i == SPELL_EFFECT_DISPEL)
         {
             _isDispel = true;
             break;
@@ -502,9 +502,9 @@ bool SpellEntry::IsPvEHeartBeat() const
     if (!(Attributes & SPELL_ATTR_DIMINISHING_RETURNS))
         return false;
 
-    for (int i = 0; i < 3; ++i)
+    for (uint32 i : EffectApplyAuraName)
     {
-        switch (EffectApplyAuraName[i])
+        switch (i)
         {
             case SPELL_AURA_MOD_FEAR:
             case SPELL_AURA_MOD_ROOT:
@@ -917,9 +917,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster
             if (EffectImplicitTargetA[effIndex] == TARGET_SELF && EffectImplicitTargetB[effIndex] == TARGET_NONE)
                 return true;
             // Sacrifice is a positive spell - for the warlock :)
-            if (IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>())
-                return true;
-            return false;
+            return IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>();
         // Dispel can be positive or negative depending on the target
         case SPELL_EFFECT_DISPEL:
             if (caster && victim)

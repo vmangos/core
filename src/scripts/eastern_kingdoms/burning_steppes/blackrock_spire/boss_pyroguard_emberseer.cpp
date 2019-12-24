@@ -118,9 +118,9 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         std::set<Player*>::iterator it;
         GameObject* pGo = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(GO_BLACKROCK_ALTAR));
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it2 = pl.begin(); it2 != pl.end(); ++it2)
+        for (const auto& it2 : pl)
         {
-            Player* currPlayer = it2->getSource();
+            Player* currPlayer = it2.getSource();
             if (currPlayer)
             {
                 it = sSummoners.find(currPlayer);
@@ -139,9 +139,9 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
 
         // Le combat avec les adds commence
         m_pInstance->SetData(TYPE_EMBERSEER, SPECIAL);
-        for (auto it = canaliseurs.begin(); it != canaliseurs.end(); ++it)
+        for (const auto& guid : canaliseurs)
         {
-            Creature *currCanaliseur = m_creature->GetMap()->GetCreature(*it);
+            Creature *currCanaliseur = m_creature->GetMap()->GetCreature(guid);
             if (!currCanaliseur)
                 continue;
             currCanaliseur->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
@@ -168,9 +168,9 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
         // On attaque tout le monde.
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it2 = pl.begin(); it2 != pl.end(); ++it2)
+        for (const auto& it2 : pl)
         {
-            Player* currPlayer = it2->getSource();
+            Player* currPlayer = it2.getSource();
             if (currPlayer && currPlayer->IsAlive() && m_creature->IsInRange(currPlayer, 0.0f, 50.0f))
                 AttackStart(currPlayer);
         }

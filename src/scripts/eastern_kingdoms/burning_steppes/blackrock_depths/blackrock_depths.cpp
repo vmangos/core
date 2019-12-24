@@ -129,11 +129,11 @@ struct npc_grimstoneAI : public npc_escortAI
         MobCount = 0;
         MobDeath_Timer = 0;
 
-        for (uint8 i = 0; i < MAX_MOB_AMOUNT; ++i)
-            RingMobGUID[i] = 0;
+        for (uint64 & guid : RingMobGUID)
+            guid = 0;
 
-        for (uint8 i = 0; i < 4; ++i)
-            ChallengeMobGUID[i] = 0;
+        for (uint64 & guid : ChallengeMobGUID)
+            guid = 0;
 
         RingBossGUID = 0;
 
@@ -330,12 +330,12 @@ struct npc_grimstoneAI : public npc_escortAI
 
                     if (ArenaChallenge)
                     {
-                        for (uint8 i = 0; i < 4; ++i)
+                        for (uint64 & guid : ChallengeMobGUID)
                         {
-                            Creature *mob = m_creature->GetMap()->GetCreature(ChallengeMobGUID[i]);
+                            Creature *mob = m_creature->GetMap()->GetCreature(guid);
                             if (mob && !mob->IsAlive() && mob->IsDead())
                             {
-                                ChallengeMobGUID[i] = 0;
+                                guid = 0;
                                 --MobCount;
                             }
                         }
@@ -343,12 +343,12 @@ struct npc_grimstoneAI : public npc_escortAI
                 }
                 else 
                 {
-                    for (uint8 i = 0; i < MAX_MOB_AMOUNT; ++i)
+                    for (uint64 & guid : RingMobGUID)
                     {
-                        Creature *mob = m_creature->GetMap()->GetCreature(RingMobGUID[i]);
+                        Creature *mob = m_creature->GetMap()->GetCreature(guid);
                         if (mob && !mob->IsAlive() && mob->IsDead())
                         {
-                            RingMobGUID[i] = 0;
+                            guid = 0;
                             --MobCount;
 
                             //seems all are gone, so set timer to continue and discontinue this
@@ -472,9 +472,9 @@ struct npc_grimstoneAI : public npc_escortAI
 
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
 
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto& itr : PlayerList)
         {
-            Player *player = itr->getSource();
+            Player *player = itr.getSource();
 
             if (player && player->IsWithinDistInMap(m_creature, 80.0f) && player->IsInCombat()) {
                 wiped = false;
@@ -1507,18 +1507,18 @@ struct npc_watchman_doomgripAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        std::list<Creature*> m_lGolems;
-        GetCreatureListWithEntryInGrid(m_lGolems, m_creature, NPC_WARBRINGER_CONSTRUCT, 20.0f);
-        if (!m_lGolems.empty())
+        std::list<Creature*> lGolems;
+        GetCreatureListWithEntryInGrid(lGolems, m_creature, NPC_WARBRINGER_CONSTRUCT, 20.0f);
+        if (!lGolems.empty())
         {
-            for (std::list<Creature*>::iterator itr = m_lGolems.begin(); itr != m_lGolems.end(); ++itr)
+            for (const auto& pGolem : lGolems)
             {
-                if ((*itr)->IsAlive())
+                if (pGolem->IsAlive())
                 {
-                    (*itr)->RemoveAurasDueToSpell(10255);
-                    (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                    pGolem->RemoveAurasDueToSpell(10255);
+                    pGolem->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
                     if (pWho)
-                        (*itr)->AI()->AttackStart(pWho);
+                        pGolem->AI()->AttackStart(pWho);
                 }
             }
         }
@@ -2476,7 +2476,7 @@ struct npc_marshal_windsorAI : npc_escortAI
             m_pInstance->SetData(GO_JAIL_DOOR_DUGHAL, false);
         }
 
-        if (m_pInstance->GetData(TYPE_JAIL_DUGHAL) == IN_PROGRESS && m_uiSaidJustOnce == false && m_uiWP == 7)
+        if (m_pInstance->GetData(TYPE_JAIL_DUGHAL) == IN_PROGRESS && !m_uiSaidJustOnce && m_uiWP == 7)
         {
             SetEscortPaused(false);
             m_uiSaidJustOnce = true;

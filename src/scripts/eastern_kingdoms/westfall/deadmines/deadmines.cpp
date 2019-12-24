@@ -33,10 +33,7 @@ bool GOHello_go_door_lever_dm(Player* pPlayer, GameObject* pGo)
 
     GameObject* pGoDoor = pInstance->instance->GetGameObject(pInstance->GetData64(DATA_DEFIAS_DOOR));
 
-    if (pGoDoor && pGoDoor->GetGoState() == 1)
-        return false;
-
-    return true;
+    return !(pGoDoor && pGoDoor->GetGoState() == 1);
 }
 
 bool GOHello_go_defias_cannon(Player* pPlayer, GameObject* pGo)

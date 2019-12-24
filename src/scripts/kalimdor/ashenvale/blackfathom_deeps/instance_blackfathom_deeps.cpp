@@ -125,8 +125,8 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         m_lWaveMobsGUIDList.clear();
         m_uiCheckEventEnd = 1000;
 
-        for (int i = 0; i < 4; i++)
-            m_uiSpawnMobsTimer[i] = 0;
+        for (uint32 & i : m_uiSpawnMobsTimer)
+            i = 0;
     }
 
     void OnCreatureCreate(Creature* pCreature) override
@@ -265,9 +265,9 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         std::istringstream loadStream(chrIn);
         loadStream >> m_auiEncounter[BFD_ENCOUNTER_KELRIS] >> m_auiEncounter[BFD_ENCOUNTER_SHRINE] >> m_auiEncounter[BFD_ENCOUNTER_AQUANIS];
 
-        for (uint8 i = 0; i < INSTANCE_BFD_MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+        for (uint32 & i : m_auiEncounter)
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
 
         OUT_LOAD_INST_DATA_COMPLETE;
     }
@@ -287,27 +287,27 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         float fX_resp, fY_resp, fZ_resp;
         pKelris->GetRespawnCoord(fX_resp, fY_resp, fZ_resp);
 
-        for (uint8 i = 0; i < sizeof(aWaveSummonInformation) / sizeof(SummonInformation); ++i)
+        for (const auto& i : aWaveSummonInformation)
         {
-            if (aWaveSummonInformation[i].m_uiWaveIndex != uiWaveIndex)
+            if (i.m_uiWaveIndex != uiWaveIndex)
                 continue;
 
             // Summon mobs at positions
             for (uint8 j = 0; j < 3; ++j)
             {
-                for (uint8 k = 0; k < aWaveSummonInformation[i].m_aCountAndPos[j].m_uiCount; ++k)
+                for (uint8 k = 0; k < i.m_aCountAndPos[j].m_uiCount; ++k)
                 {
-                    uint8 uiPos = aWaveSummonInformation[i].m_aCountAndPos[j].m_uiSummonPosition;
+                    uint8 uiPos = i.m_aCountAndPos[j].m_uiSummonPosition;
                     float fPosX = aSpawnLocations[uiPos].m_fX;
                     float fPosY = aSpawnLocations[uiPos].m_fY;
                     float fPosZ = aSpawnLocations[uiPos].m_fZ;
                     float fPosO = aSpawnLocations[uiPos].m_fO;
 
                     // Adapt fPosY slightly in case of higher summon-counts
-                    if (aWaveSummonInformation[i].m_aCountAndPos[j].m_uiCount > 1)
-                        fPosY = fPosY - INTERACTION_DISTANCE / 2 + k * INTERACTION_DISTANCE / aWaveSummonInformation[i].m_aCountAndPos[j].m_uiCount;
+                    if (i.m_aCountAndPos[j].m_uiCount > 1)
+                        fPosY = fPosY - INTERACTION_DISTANCE / 2 + k * INTERACTION_DISTANCE / i.m_aCountAndPos[j].m_uiCount;
 
-                    if (Creature* pSummoned = pKelris->SummonCreature(aWaveSummonInformation[i].m_uiNpcEntry, fPosX, fPosY, fPosZ, fPosO, TEMPSUMMON_DEAD_DESPAWN, 0))
+                    if (Creature* pSummoned = pKelris->SummonCreature(i.m_uiNpcEntry, fPosX, fPosY, fPosZ, fPosO, TEMPSUMMON_DEAD_DESPAWN, 0))
                     {
                         pSummoned->SetWalk(true);
                         pSummoned->CastSpell(pSummoned, 7741, true);  // Summoned Demon (Visual)
@@ -329,9 +329,9 @@ struct instance_blackfathom_deeps : public ScriptedInstance
             return false;
 
         // Check if all mobs are dead
-        for (std::list<uint64>::const_iterator itr = m_lWaveMobsGUIDList.begin(); itr != m_lWaveMobsGUIDList.end(); itr++)
+        for (const auto& guid : m_lWaveMobsGUIDList)
         {
-            if (Creature* WaveMob = instance->GetCreature(*itr))
+            if (Creature* WaveMob = instance->GetCreature(guid))
                 if (WaveMob->IsAlive())
                     return false;
         }

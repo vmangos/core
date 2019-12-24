@@ -404,11 +404,11 @@ class BattleGround
         void SendRewardMarkByMail(Player* plr,uint32 mark, uint32 count);
         void RewardItem(Player* plr, uint32 item_id, uint32 count);
         void RewardQuestComplete(Player* plr);
-        void RewardSpellCast(Player* plr, uint32 spell_id);
+        static void RewardSpellCast(Player* plr, uint32 spell_id);
         void UpdateWorldState(uint32 Field, uint32 Value);
-        void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player* Source);
+        static void UpdateWorldStateForPlayer(uint32 Field, uint32 Value, Player* Source);
         virtual void EndBattleGround(Team winner);
-        void BlockMovement(Player* plr);
+        static void BlockMovement(Player* plr);
 
         void SendMessageToAll(int32 entry, ChatMsg type, Player const* source = nullptr);
         void SendYellToAll(int32 entry, uint32 language, ObjectGuid guid);
@@ -439,8 +439,8 @@ class BattleGround
         // must be implemented in BG subclass
         virtual void HandleAreaTrigger(Player* /*Source*/, uint32 /*Trigger*/) {}
         // must be implemented in BG subclass if need AND call base class generic code
-        virtual void HandleKillPlayer(Player* player, Player* killer);
-        virtual void HandleKillUnit(Creature* /*unit*/, Player* /*killer*/) { return; };
+        virtual void HandleKillPlayer(Player* pVictim, Player* pKiller);
+        virtual void HandleKillUnit(Creature* /*unit*/, Player* /*killer*/) { };
 
         /* Battleground events */
         virtual void EventPlayerDroppedFlag(Player* /*player*/) {}
@@ -478,7 +478,7 @@ class BattleGround
         ObjectGuid GetSingleCreatureGuid(uint8 event1, uint8 event2);
 
         void OpenDoorEvent(uint8 event1, uint8 event2 = 0);
-        bool IsDoor(uint8 event1, uint8 event2);
+        static bool IsDoor(uint8 event1, uint8 event2);
 
         void HandleTriggerBuff(ObjectGuid go_guid);
 

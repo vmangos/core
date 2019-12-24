@@ -306,10 +306,10 @@ struct MushgogAI : public ScriptedAI
         {
             std::list<Creature*> m_AggroList;
             GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
+            for (const auto& it : m_AggroList)
             {
-                if ((*it)->IsAlive())
-                    (*it)->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_01);
+                if (it->IsAlive())
+                    it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_01);
             }
             m_bAggro = true;
         }
@@ -427,10 +427,10 @@ struct TheRazzaAI : public ScriptedAI
         {
             std::list<Creature*> m_AggroList;
             GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
+            for (const auto& it : m_AggroList)
             {
-                if ((*it)->IsAlive())
-                    (*it)->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02);
+                if (it->IsAlive())
+                    it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_02);
             }
             m_bAggro = true;
         }
@@ -440,10 +440,10 @@ struct TheRazzaAI : public ScriptedAI
     {
         std::list<Creature*> m_AggroList;
         GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-        for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
+        for (const auto& it : m_AggroList)
         {
-            if ((*it)->IsAlive())
-                (*it)->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03);
+            if (it->IsAlive())
+                it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_03);
         }
     }
 
@@ -532,10 +532,10 @@ struct SkarrTheUnbreakableAI : public ScriptedAI
         {
             std::list<Creature*> m_AggroList;
             GetCreatureListWithEntryInGrid(m_AggroList, m_creature, 14395, 1800.0f);
-            for (std::list<Creature*>::iterator it = m_AggroList.begin(); it != m_AggroList.end(); ++it)
+            for (const auto& it : m_AggroList)
             {
-                if ((*it)->IsAlive())
-                     (*it)->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04);
+                if (it->IsAlive())
+                     it->MonsterYell(GRINIBLIX_THE_SPECTATOR_ANNOUNCE_TEXT_04);
             }
             m_bAggro = true;
         }
@@ -839,21 +839,20 @@ void npc_kindal_moonweaverAI::BeginEvent()
 
     pGoGate->SetGoState(GO_STATE_READY);
 
-    std::list<Creature*> m_lSprites;
-    GetCreatureListWithEntryInGrid(m_lSprites, pGoGate, NPC_CAPTURED_SPRITE_DARTER, 40.0f);
+    std::list<Creature*> lSprites;
+    GetCreatureListWithEntryInGrid(lSprites, pGoGate, NPC_CAPTURED_SPRITE_DARTER, 40.0f);
 
-    if (!m_lSprites.empty())
+    for (const auto& pSprite : lSprites)
     {
-        for (auto iter = m_lSprites.begin(); iter != m_lSprites.end(); ++iter)
+        if (pSprite)
         {
-            if (*iter)
-                if (auto pSpriteAI = dynamic_cast<npc_captured_sprite_darterAI*>((*iter)->AI()))
-                {
-                    pSpriteAI->Reset();
-                    pSpriteAI->m_uiKindalGUID = m_creature->GetObjectGuid();
-                    pSpriteAI->m_uiGateGUID = pGoGate->GetObjectGuid();
-                    pSpriteAI->m_bEventStart = true;
-                }
+            if (auto pSpriteAI = dynamic_cast<npc_captured_sprite_darterAI*>(pSprite->AI()))
+            {
+                pSpriteAI->Reset();
+                pSpriteAI->m_uiKindalGUID = m_creature->GetObjectGuid();
+                pSpriteAI->m_uiGateGUID = pGoGate->GetObjectGuid();
+                pSpriteAI->m_bEventStart = true;
+            }
         }
     }
 }

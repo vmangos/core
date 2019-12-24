@@ -175,10 +175,7 @@ bool BufferedSocket::send(const char *buf, size_t len)
     }
 
     // tell reactor to call handle_output() when we can send more data
-    if(this->reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK) == -1)
-        return false;
-
-    return true;
+    return this->reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK) != -1;
 }
 
 /*virtual*/ int BufferedSocket::handle_output(ACE_HANDLE /*= ACE_INVALID_HANDLE*/)

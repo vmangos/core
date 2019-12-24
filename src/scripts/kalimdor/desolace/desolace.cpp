@@ -269,13 +269,13 @@ struct npc_melizza_brimbuzzleAI : public npc_escortAI
                 m_creature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
                 break;
             case 4:
-                for (uint8 i = 0; i < MAX_MARAUDERS; ++i)
+                for (const auto& i : aMarauderSpawn)
                 {
                     for (uint8 j = 0; j < MAX_MARAUDERS; ++j)
                     {
                         // Summon 2 Marauders on each point
                         float fX, fY, fZ;
-                        m_creature->GetRandomPoint(aMarauderSpawn[i].m_fX, aMarauderSpawn[i].m_fY, aMarauderSpawn[i].m_fZ, 7.0f, fX, fY, fZ);
+                        m_creature->GetRandomPoint(i.m_fX, i.m_fY, i.m_fZ, 7.0f, fX, fY, fZ);
                         m_creature->SummonCreature(NPC_MARAUDINE_MARAUDER, fX, fY, fZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
                     }
                 }
@@ -467,9 +467,7 @@ struct go_serpent_statueAI: public GameObjectAI
     }
     bool CheckCanStartEvent()
     {
-        if (!state && !me->GetMap()->GetCreature(guid_kragaru))
-            return true;
-        return false;
+        return !state && !me->GetMap()->GetCreature(guid_kragaru);
     }
 
     void SetInUse(Creature* kragaru)
@@ -533,9 +531,9 @@ struct go_ghost_magnetAI: public GameObjectAI
         state = 1;
         std::list<GameObject*> lGobj;
         me->GetGameObjectListWithEntryInGrid(lGobj, GO_GHOST_MAGNET_AURA, 30.0f);
-        for (std::list<GameObject*>::iterator it = lGobj.begin(); it != lGobj.end(); ++it)
+        for (const auto& it : lGobj)
         {
-            if ((*it)->isSpawned())
+            if (it->isSpawned())
             {
                 state = 0;
                 break;
@@ -924,11 +922,11 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void DespawnCaravan()
     {
-        for (auto itr = m_lCaravanGuid.begin(); itr != m_lCaravanGuid.end(); ++itr)
+        for (const auto& guid : m_lCaravanGuid)
         {
-            if (*itr != m_creature->GetObjectGuid())
+            if (guid != m_creature->GetObjectGuid())
             {
-                if (auto pKillMe = m_creature->GetMap()->GetCreature(*itr))
+                if (auto pKillMe = m_creature->GetMap()->GetCreature(guid))
                     pKillMe->DespawnOrUnsummon();
             }
         }
@@ -938,11 +936,11 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void CaravanFaction(bool apply)
     {
-        for (auto itr = m_lCaravanGuid.begin(); itr != m_lCaravanGuid.end(); ++itr)
+        for (const auto& guid : m_lCaravanGuid)
         {
-            if (*itr != m_creature->GetObjectGuid())
+            if (guid != m_creature->GetObjectGuid())
             {
-                if (Creature* pCreature = m_creature->GetMap()->GetCreature(*itr))
+                if (Creature* pCreature = m_creature->GetMap()->GetCreature(guid))
                 {
                     if (apply)
                         pCreature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_NONE);

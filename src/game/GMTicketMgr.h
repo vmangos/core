@@ -209,27 +209,27 @@ public:
 
     GmTicket* GetTicketByPlayer(ObjectGuid playerGuid)
     {
-        for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-            if (itr->second && itr->second->IsFromPlayer(playerGuid) && !itr->second->IsClosed())
-                return itr->second;
+        for (const auto& itr : _ticketList)
+            if (itr.second && itr.second->IsFromPlayer(playerGuid) && !itr.second->IsClosed())
+                return itr.second;
 
         return nullptr;
     }
 
     GmTicket* GetOldestOpenTicket()
     {
-        for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-            if (itr->second && !itr->second->IsClosed() && !itr->second->IsCompleted())
-                return itr->second;
+        for (const auto& itr : _ticketList)
+            if (itr.second && !itr.second->IsClosed() && !itr.second->IsCompleted())
+                return itr.second;
 
         return nullptr;
     }
 
     GmTicket* GetNextTicket(uint32 counter)
     {
-        for (GmTicketList::const_iterator itr = _ticketList.begin(); itr != _ticketList.end(); ++itr)
-            if (itr->first > counter && !itr->second->IsClosed() && !itr->second->IsCompleted())
-                return itr->second;
+        for (const auto& itr : _ticketList)
+            if (itr.first > counter && !itr.second->IsClosed() && !itr.second->IsCompleted())
+                return itr.second;
 
         return nullptr;
     }

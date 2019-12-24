@@ -318,13 +318,12 @@ struct boss_twinemperorsAI : public ScriptedAI
         bool bOpenEntrance = false;
         std::list<Creature*> lst;
         GetCreatureListWithEntryInGrid(lst, m_creature, NPC_ANUBISATH_DEFENDER, 800);
-        for (auto it = lst.begin(); it != lst.end(); it++)
+        for (const auto pCreature : lst)
         {
-            Creature* pC = *it;
-            if (pC->IsDead()) continue;
-            pC->SetActiveObjectState(true);
-            pC->SetInCombatWithZone();
-            pC->AI()->AttackStart(pWho);
+            if (pCreature->IsDead()) continue;
+            pCreature->SetActiveObjectState(true);
+            pCreature->SetInCombatWithZone();
+            pCreature->AI()->AttackStart(pWho);
             bOpenEntrance = true;
         }
         
@@ -491,7 +490,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 }
             }
 
-            if (lUnitList.size() == 0)
+            if (lUnitList.empty())
                 return;
 
             iter = lUnitList.begin();
@@ -533,7 +532,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     {
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
 
-        if (tList.size() == 0)
+        if (tList.empty())
             return nullptr;
 
         std::list<Player*> candidates;
@@ -552,7 +551,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             }
         }
 
-        if (candidates.size() == 0)
+        if (candidates.empty())
             return nullptr;
 
         auto candIt = candidates.begin();
@@ -855,19 +854,19 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         std::list<HostileReference*> candidates;
 
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-        if (tList.size() < 1)
+        if (tList.empty())
             return nullptr;
 
-        for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i) {
-            Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+        for (const auto i : tList) {
+            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
             if (!pUnit) continue;
 
             if (m_creature->IsWithinMeleeRange(pUnit)) {
-                candidates.push_back((*i));
+                candidates.push_back(i);
             }
         }
 
-        if (!candidates.size())
+        if (candidates.empty())
             return nullptr;
 
         auto it = candidates.begin();

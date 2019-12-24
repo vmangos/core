@@ -148,7 +148,7 @@ struct boss_nerubenkanAI : public ScriptedAI
         {
             if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
-                RaiseUndeadScarab(target, (urand(0, 1) ? true : false));
+                RaiseUndeadScarab(target, (urand(0, 1) != 0));
                 RaiseUndeadScarab_Timer = urand(6000, 10000);
             }
         }

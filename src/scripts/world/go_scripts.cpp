@@ -419,7 +419,7 @@ struct go_bells : public GameObjectAI
     {
         _events.Update(diff);
 
-        if (sGameEventMgr.IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once == true)
+        if (sGameEventMgr.IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once)
         {
             // Reset
             once = false;

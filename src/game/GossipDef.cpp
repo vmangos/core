@@ -377,8 +377,8 @@ void QuestMenu::AddMenuItem(uint32 QuestId, uint8 Icon)
 
 bool QuestMenu::HasItem(uint32 questid)
 {
-    for (QuestMenuItemList::const_iterator i = m_qItems.begin(); i != m_qItems.end(); ++i)
-        if (i->m_qId == questid)
+    for (const auto& qItem : m_qItems)
+        if (qItem.m_qId == questid)
             return true;
     return false;
 }
@@ -687,9 +687,9 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGU
     data << uint32(EnableNext ? 1 : 0);                     // Auto Finish
 
     uint32 EmoteCount = 0;
-    for (uint32 i = 0; i < QUEST_EMOTE_COUNT; ++i)
+    for (uint32 i : pQuest->OfferRewardEmote)
     {
-        if (pQuest->OfferRewardEmote[i] <= 0)
+        if (i <= 0)
             break;
         ++EmoteCount;
     }

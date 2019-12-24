@@ -77,9 +77,9 @@ struct instance_uldaman : public ScriptedInstance
 
     bool IsEncounterInProgress() const override
     {
-        for (uint8 i = 0; i < ULDAMAN_MAX_ENCOUNTER; ++i)
+        for (uint32 i : m_auiEncounter)
         {
-            if (m_auiEncounter[i] == IN_PROGRESS)
+            if (i == IN_PROGRESS)
             {
                 return true;
             }
@@ -304,9 +304,9 @@ struct instance_uldaman : public ScriptedInstance
                         /** Check the list of Stone Keeper created at instance creation */
                         Creature* target = nullptr;
                         bool encounterDone = true;
-                        for (const auto& it : vStoneKeeper)
+                        for (const auto& guid : vStoneKeeper)
                         {
-                            Creature* current = instance->GetCreature(it);
+                            Creature* current = instance->GetCreature(guid);
 
                             /* Do nothing if one is already alive and awaken */
                             if (current && current->IsAlive() && current->GetFactionTemplateId() == FACTION_AWAKE)
@@ -341,9 +341,9 @@ struct instance_uldaman : public ScriptedInstance
                     }
                     case FAIL:
                         m_auiEncounter[ULDAMAN_ENCOUNTER_STONE_KEEPERS] = uiData;
-                        for (const auto& it : vStoneKeeper)
+                        for (const auto& guid : vStoneKeeper)
                         {
-                            Creature* target = instance->GetCreature(it);
+                            Creature* target = instance->GetCreature(guid);
                             if (!target)
                             {
                                 continue;
@@ -519,9 +519,9 @@ struct instance_uldaman : public ScriptedInstance
         OUT_LOAD_INST_DATA(chrIn);
         std::istringstream loadStream(chrIn);
         loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2];
-        for (uint8 i = 0; i < ULDAMAN_MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] != DONE)
-                m_auiEncounter[i] = NOT_STARTED;
+        for (uint32 & i : m_auiEncounter)
+            if (i != DONE)
+                i = NOT_STARTED;
         OUT_LOAD_INST_DATA_COMPLETE;
     }
 

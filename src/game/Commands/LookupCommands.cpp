@@ -564,9 +564,9 @@ bool ChatHandler::HandleLookupQuestCommand(char* args)
     uint32 counter = 0 ;
 
     ObjectMgr::QuestMap const& qTemplates = sObjectMgr.GetQuestTemplates();
-    for (ObjectMgr::QuestMap::const_iterator iter = qTemplates.begin(); iter != qTemplates.end(); ++iter)
+    for (const auto& itr : qTemplates)
     {
-        const auto& qinfo = iter->second;
+        const auto& qinfo = itr.second;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
@@ -728,21 +728,23 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
         if (!modelId)
             break;
 
-        for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
+        for (uint32 creature_id = 0; creature_id < sCreatureStorage.GetMaxEntry(); ++creature_id)
         {
-            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(id);
+            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creature_id);
             if (!cInfo)
                 continue;
 
             uint32 foundModelCounter = 0;
             uint32 totalModelCounter = 0;
-            for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
-                if (cInfo->display_id[i])
-                    if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(cInfo->display_id[i]))
+            for (uint32 id : cInfo->display_id)
+            {
+                if (id)
+                { 
+                    if (CreatureDisplayInfoEntry const* displayInfo = sCreatureDisplayInfoStore.LookupEntry(id))
                     {
-                        if (display->ModelId)
+                        if (displayInfo->ModelId)
                             totalModelCounter++;
-                        if (display->ModelId == modelId)
+                        if (displayInfo->ModelId == modelId)
                         {
                             if (!foundModelCounter)
                             {
@@ -751,15 +753,17 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
                                 {
                                     creatureCounter++;
                                     if (fileExport)
-                                        toExport << id << ", /* " << cInfo->name << " */\n";
-                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, cInfo->name);
+                                        toExport << creature_id << ", /* " << cInfo->name << " */\n";
+                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, creature_id, creature_id, cInfo->name);
                                 }
                             }
                             foundModelCounter++;
                         }
                     }
+                }
+            }
             if (fileExport && foundModelCounter && totalModelCounter != foundModelCounter)
-                toExport << "-- WARNING " << id << " " << cInfo->name << " uses more than one model !\n";
+                toExport << "-- WARNING " << creature_id << " " << cInfo->name << " uses more than one model !\n";
         }
         modelId = 0;
     }
@@ -1282,17 +1286,17 @@ bool ChatHandler::HandleLookupTeleCommand(char * args)
     std::ostringstream reply;
 
     GameTeleMap const& teleMap = sObjectMgr.GetGameTeleMap();
-    for (GameTeleMap::const_iterator itr = teleMap.begin(); itr != teleMap.end(); ++itr)
+    for (const auto& itr : teleMap)
     {
-        GameTele const* tele = &itr->second;
+        GameTele const* tele = &itr.second;
 
         if (tele->wnameLow.find(wnamepart) == std::wstring::npos)
             continue;
 
         if (m_session)
-            reply << "  |cffffffff|Htele:" << itr->first << "|h[" << tele->name << "]|h|r\n";
+            reply << "  |cffffffff|Htele:" << itr.first << "|h[" << tele->name << "]|h|r\n";
         else
-            reply << "  " << itr->first << " " << tele->name << "\n";
+            reply << "  " << itr.first << " " << tele->name << "\n";
     }
 
     if (reply.str().empty())

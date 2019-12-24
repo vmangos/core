@@ -85,7 +85,7 @@ struct boss_moamAI : public ScriptedAI
     {
         m_creature->SetInCombatWithZone();
         DoScriptText(EMOTE_AGGRO, m_creature);
-        if (m_bIsInCombat == false)
+        if (!m_bIsInCombat)
         {
             m_creature->SetPower(POWER_MANA, 0);
             m_bIsInCombat = true;
@@ -131,10 +131,10 @@ struct boss_moamAI : public ScriptedAI
     void FillPlayerList()
     {
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+        for (const auto& i : liste)
         {
-            if (i->getSource()->IsAlive() && i->getSource()->GetPowerType() == POWER_MANA)
-                PlayerList.push_back(i->getSource());
+            if (i.getSource()->IsAlive() && i.getSource()->GetPowerType() == POWER_MANA)
+                PlayerList.push_back(i.getSource());
         }
     }
 

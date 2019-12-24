@@ -312,7 +312,7 @@ void VMapManager2::releaseModelInstance(std::string const& filename)
         return;
     }
     int decreasedValue = model->second.decRefCount();
-    if (isModelUnloadDisabled() == false && decreasedValue <= 0)
+    if (!isModelUnloadDisabled() && decreasedValue <= 0)
     {
         m_modelsLock.release();
         m_modelsLock.acquire_write();

@@ -82,11 +82,11 @@ public:
         {
             // search spell for spell error
             uint32 spellid = 0;
-            for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+            for (const auto& spell : item->GetProto()->Spells)
             {
-                if (item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+                if (spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
                 {
-                    spellid = item->GetProto()->Spells[i].SpellId;
+                    spellid = spell.SpellId;
                     break;
                 }
             }
@@ -157,11 +157,11 @@ public:
             if (player->CanEquipNewItem(slot, dest, id, true))
                 items[slot].insert(id);
         }
-        for (int i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            if (items[i].size())
+        for (const auto& item : items)
+            if (!item.empty())
             {
-                auto it = items[i].begin();
-                std::advance(it, urand(0, items[i].size() - 1)),
+                auto it = item.begin();
+                std::advance(it, urand(0, item.size() - 1)),
                     AddStuff(player, *it);
             }
     }
@@ -669,7 +669,7 @@ public:
                 if (target == nullptr)
                 {
                     std::set<Unit*> const attackers = p->GetAttackers();
-                    if (attackers.size() > 0)
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }            
@@ -680,7 +680,7 @@ public:
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {
@@ -838,7 +838,7 @@ public:
                 if (target == nullptr)
                 {
                     std::set<Unit*> const attackers = p->GetAttackers();
-                    if (attackers.size() > 0)
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }
@@ -849,7 +849,7 @@ public:
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {
@@ -1569,7 +1569,7 @@ public:
                 if (target == nullptr)
                 {
                     std::set<Unit*> const attackers = p->GetAttackers();
-                    if (attackers.size() > 0)
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }
@@ -1580,7 +1580,7 @@ public:
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {

@@ -423,8 +423,8 @@ struct npc_torekAI : public npc_escortAI
     {
         std::list<Creature*> lCrea;
         m_creature->GetCreatureListWithEntryInGrid(lCrea, NPC_SPLINTERTREE_RAIDER, 40.0f);
-        for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
-            (*it)->DisappearAndDie();
+        for (const auto& it : lCrea)
+            it->DisappearAndDie();
         npc_escortAI::JustDied(pKiller);
     }
 
@@ -459,8 +459,8 @@ struct npc_torekAI : public npc_escortAI
             case 22:
                 std::list<Creature*> lCrea;
                 m_creature->GetCreatureListWithEntryInGrid(lCrea, NPC_SPLINTERTREE_RAIDER, 40.0f);
-                for (std::list<Creature*>::iterator it = lCrea.begin(); it != lCrea.end(); ++it)
-                    (*it)->DisappearAndDie();
+                for (const auto& it : lCrea)
+                    it->DisappearAndDie();
                 break;
         }
     }
@@ -773,14 +773,14 @@ struct go_foulweald_totem_moundAI: public GameObjectAI
 
         Creature* foulweald;
         int pos = 0;
-        for (int i = 0; i < 2; i++)
+        for (uint64 & guid : guidCurrentEnragedFoulweald)
         {
-            if (creatureGUID == guidCurrentEnragedFoulweald[i])
+            if (creatureGUID == guid)
             {
                 pos = urand(0, 3);
                 if (foulweald = me->SummonCreature(NPC_ENRAGED_FOULWEALD, foulwealdSpawnCoords[pos][0], foulwealdSpawnCoords[pos][1], foulwealdSpawnCoords[pos][2], 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 420000))
                 {
-                    guidCurrentEnragedFoulweald[i] = foulweald->GetGUID();
+                    guid = foulweald->GetGUID();
                     float x, y, z;
                     me->GetPosition(x, y, z);
                     foulweald->GetMotionMaster()->MovePoint(1, x, y, z, true);

@@ -218,14 +218,14 @@ struct boss_ragnarosAI : ScriptedAI
 
     void SummonSonsOfFlame() const
     {
-        for (uint8 i = 0; i < MAX_ADDS_IN_SUBMERGE; ++i)
+        for (const auto& position : PositionOfAdds)
         {
             ThreatListCopier* dataCopier = new ThreatListCopier(m_creature);
             if (Creature* Crea = m_creature->SummonCreature(NPC_SON_OF_FLAME, 
-                PositionOfAdds[i][0], 
-                PositionOfAdds[i][1], 
-                PositionOfAdds[i][2], 
-                PositionOfAdds[i][3], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
+                position[0],
+                position[1],
+                position[2],
+                position[3], TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
             {
                 m_creature->ProcessThreatList(dataCopier);
                 if (Unit* randomTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
@@ -371,11 +371,11 @@ struct boss_ragnarosAI : ScriptedAI
                 std::list<Creature*> FilsListe;
                 GetCreatureListWithEntryInGrid(FilsListe, m_creature, NPC_SON_OF_FLAME, 150.0f);
 
-                for (std::list<Creature*>::iterator itr = FilsListe.begin(); itr != FilsListe.end(); ++itr)
+                for (const auto& itr : FilsListe)
                 {
-                    if ((*itr)->IsAlive())
+                    if (itr->IsAlive())
                     {
-                        if (!(*itr)->HasUnitState(UNIT_STAT_ISOLATED)) // banished
+                        if (!itr->HasUnitState(UNIT_STAT_ISOLATED)) // banished
                         {
                             Allbanished = false;
                             break;
@@ -486,9 +486,9 @@ struct boss_ragnarosAI : ScriptedAI
             std::vector<Player*> manaPlayers;
 
             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-            for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+            for (const auto itr : tList)
             {
-                Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
+                Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
                 if (pPlayer && pPlayer->IsAlive() && pPlayer->GetPowerType() == POWER_MANA && !pPlayer->IsGameMaster())
                     manaPlayers.push_back(pPlayer);
             }
@@ -678,7 +678,7 @@ struct boss_flame_of_ragnarosAI : ScriptedAI
 
     void UpdateAI(uint32 const /*diff*/) override
     {
-        if (Explode == true)
+        if (Explode)
             m_creature->ForcedDespawn();
     }
 };

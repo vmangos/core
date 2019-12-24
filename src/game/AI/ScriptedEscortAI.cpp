@@ -430,9 +430,9 @@ void npc_escortAI::FillPointMovementListForCreature()
     if (pPointsEntries.empty())
         return;
 
-    for (auto itr = pPointsEntries.begin(); itr != pPointsEntries.end(); ++itr)
+    for (const auto& itr : pPointsEntries)
     {
-        Escort_Waypoint pPoint(itr->uiPointId, itr->fX, itr->fY, itr->fZ, itr->uiWaitTime);
+        Escort_Waypoint pPoint(itr.uiPointId, itr.fX, itr.fY, itr.fZ, itr.uiWaitTime);
         WaypointList.push_back(pPoint);
     }
 }

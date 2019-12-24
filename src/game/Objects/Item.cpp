@@ -45,11 +45,11 @@ void AddItemsSetItem(Player* player, Item* item)
 
     ItemSetEffect* eff = nullptr;
 
-    for (size_t x = 0; x < player->m_ItemSetEff.size(); ++x)
+    for (const auto& x : player->m_ItemSetEff)
     {
-        if (player->m_ItemSetEff[x] && player->m_ItemSetEff[x]->setid == setid)
+        if (x && x->setid == setid)
         {
-            eff = player->m_ItemSetEff[x];
+            eff = x;
             break;
         }
     }
@@ -90,9 +90,9 @@ void AddItemsSetItem(Player* player, Item* item)
             continue;
 
         // new spell
-        for (uint32 y = 0; y < 8; y++)
+        for (auto& spell : eff->spells)
         {
-            if (!eff->spells[y])                             // free slot
+            if (!spell)                             // free slot
             {
                 SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(set->spells[x]);
                 if (!spellInfo)
@@ -103,7 +103,7 @@ void AddItemsSetItem(Player* player, Item* item)
 
                 // spell casted only if fit form requirement, in other case will casted at form change
                 player->ApplyEquipSpell(spellInfo, nullptr, true);
-                eff->spells[y] = spellInfo;
+                spell = spellInfo;
                 break;
             }
         }
@@ -148,13 +148,13 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
         if (set->items_to_triggerspell[x] <= eff->item_count)
             continue;
 
-        for (uint32 z = 0; z < 8; z++)
+        for (auto& spell : eff->spells)
         {
-            if (eff->spells[z] && eff->spells[z]->Id == set->spells[x])
+            if (spell && spell->Id == set->spells[x])
             {
                 // spell can be not active if not fit form requirement
-                player->ApplyEquipSpell(eff->spells[z], nullptr, false);
-                eff->spells[z] = nullptr;
+                player->ApplyEquipSpell(spell, nullptr, false);
+                spell = nullptr;
                 break;
             }
         }
@@ -477,7 +477,7 @@ bool Item::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint3
 
 
     std::string enchants = fields[6].GetString();
-    _LoadIntoDataField(enchants.c_str(), ITEM_FIELD_ENCHANTMENT, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET);
+    _LoadIntoDataField(enchants, ITEM_FIELD_ENCHANTMENT, MAX_ENCHANTMENT_SLOT * MAX_ENCHANTMENT_OFFSET);
     SetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID, fields[7].GetInt16());
 
     uint32 durability = fields[8].GetUInt16();

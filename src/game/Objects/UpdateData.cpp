@@ -52,7 +52,7 @@ void UpdateData::AddOutOfRangeGUID(ObjectGuid const& guid)
 
 void UpdateData::AddUpdateBlock(ByteBuffer const& block)
 {
-    if (!m_datas.size())
+    if (m_datas.empty())
         m_datas.push_back(UpdatePacket());
     std::list<UpdatePacket>::iterator it = m_datas.end();
     --it;
@@ -124,7 +124,7 @@ void PacketCompressor::Compress(void* dst, uint32* dst_size, void* src, int src_
 
 bool UpdateData::BuildPacket(WorldPacket* packet, bool hasTransport)
 {
-    if (!m_datas.size())
+    if (m_datas.empty())
         return BuildPacket(packet, nullptr, hasTransport);
     return BuildPacket(packet, &(m_datas.front()), hasTransport);
 }
@@ -145,11 +145,11 @@ bool UpdateData::BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket,
         buf << (uint32) m_outOfRangeGUIDs.size();
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-        for (ObjectGuidSet::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
-            buf << i->WriteAsPacked();
+        for (const auto& guid : m_outOfRangeGUIDs)
+            buf << guid.WriteAsPacked();
 #else
-        for (ObjectGuidSet::const_iterator i = m_outOfRangeGUIDs.begin(); i != m_outOfRangeGUIDs.end(); ++i)
-            buf << *i;
+        for (const auto& guid : m_outOfRangeGUIDs)
+            buf << guid;
 #endif
     }
 
@@ -186,16 +186,16 @@ bool UpdateData::BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket,
 void UpdateData::Send(WorldSession* session, bool hasTransport)
 {
     WorldPacket data;
-    if (!m_datas.size() && !m_outOfRangeGUIDs.empty())
+    if (m_datas.empty() && !m_outOfRangeGUIDs.empty())
     {
         BuildPacket(&data, nullptr, hasTransport);
         session->SendPacket(&data);
         m_outOfRangeGUIDs.clear();
         return;
     }
-    for (std::list<UpdatePacket>::iterator it = m_datas.begin(); it != m_datas.end(); ++it)
+    for (const auto& itr : m_datas)
     {
-        BuildPacket(&data, &(*it), hasTransport);
+        BuildPacket(&data, &itr, hasTransport);
         session->SendPacket(&data);
         data.clear();
         m_outOfRangeGUIDs.clear();

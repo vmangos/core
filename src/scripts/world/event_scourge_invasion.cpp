@@ -221,8 +221,7 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
                     if (who->IsTargetableForAttack())
                         if (!who->IsWithinDistInMap(m_creature, 20.0f))
                             AttackStart(who);
-        return;
-    }
+   }
 
     Creature* SelectWaypoint()
     {
@@ -349,8 +348,8 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
     }
     void OnRemoveFromWorld() override
     {
-        for (std::set<ObjectGuid>::iterator it = _guards.begin(); it != _guards.end(); ++it)
-            if (Creature* c = m_creature->GetMap()->GetCreature(*it))
+        for (const auto& guid : _guards)
+            if (Creature* c = m_creature->GetMap()->GetCreature(guid))
                 if (!c->IsInCombat())
                     c->AddObjectToRemoveList();
     }
@@ -462,8 +461,8 @@ struct PallidHorrorAI : public ScourgeInvasion_RandomAttackerAI
 
     void OnRemoveFromWorld() override
     {
-        for (std::set<ObjectGuid>::iterator it = _flameshockers.begin(); it != _flameshockers.end(); ++it)
-            if (Creature* c = m_creature->GetMap()->GetCreature(*it))
+        for (const auto& guid : _flameshockers)
+            if (Creature* c = m_creature->GetMap()->GetCreature(guid))
                 c->AddObjectToRemoveList();
         ScourgeInvasion_RandomAttackerAI::OnRemoveFromWorld();
     }

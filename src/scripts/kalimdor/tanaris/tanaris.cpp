@@ -310,7 +310,7 @@ CreatureAI* GetAI_npc_stone_watcher_of_norgannon(Creature* creature)
 {
     std::list<Creature*> creatures;
     creature->GetCreatureListWithEntryInGrid(creatures, creature->GetEntry(), 20.0f);
-    if (creatures.size())
+    if (!creatures.empty())
         creature->DeleteLater();
     return nullptr;
 }
@@ -520,9 +520,7 @@ struct go_inconspicuous_landmarkAI: public GameObjectAI
     }
     bool CheckCanStartEvent()
     {
-        if (!state)
-            return true;
-        return false;
+        return !state;
     }
 
     void SetInUse()
@@ -574,18 +572,18 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                         pirate3->SetRespawnDelay(350000);
                     }
 
-                    for (int i = 0; i < 2; i++)
+                    for (int & pirateEntry : extraPirateType)
                     {
                         switch (urand(0, 2))
                         {
                             case 0:
-                                extraPirateType[i] = NPC_PIRATES_1;
+                                pirateEntry = NPC_PIRATES_1;
                                 break;
                             case 1:
-                                extraPirateType[i] = NPC_PIRATES_2;
+                                pirateEntry = NPC_PIRATES_2;
                                 break;
                             case 2:
-                                extraPirateType[i] = NPC_PIRATES_3;
+                                pirateEntry = NPC_PIRATES_3;
                                 break;
                         }
                     }

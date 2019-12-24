@@ -84,8 +84,8 @@ struct npc_twilight_corrupterAI : ScriptedAI
         CoNPlayerAggro  = 0;
         bEngaged        = false;
 
-        for (int i = 0; i < 40; i++)
-            GUIDs[i] = 0;
+        for (uint64 & guid : GUIDs)
+            guid = 0;
     }
 
     void Aggro(Unit* /*pWho*/) override
@@ -99,18 +99,18 @@ struct npc_twilight_corrupterAI : ScriptedAI
 
     void FillPlayerList()
     {
-        for (int i = 0; i < 40; i++)
-            GUIDs[i] = 0;
+        for (uint64 & guid : GUIDs)
+            guid = 0;
 
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-        for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+        for (const auto i : tList)
         {
-            Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
 
             if (pUnit && pUnit->IsPlayer())
-                for (int i = 0; i < 40; i++)
-                    if (GUIDs[i] == 0)
-                        GUIDs[i] = pUnit->GetGUID();
+                for (uint64 & guid : GUIDs)
+                    if (guid == 0)
+                        guid = pUnit->GetGUID();
         }
     }
 
@@ -163,9 +163,9 @@ struct npc_twilight_corrupterAI : ScriptedAI
         if (m_uiCheckTimer < uiDiff)
         {
             FillPlayerList();
-            for (int i = 0; i < 40; i++)
+            for (uint64 & guid : GUIDs)
             {
-                if (Player* player = m_creature->GetMap()->GetPlayer(GUIDs[i]))
+                if (Player* player = m_creature->GetMap()->GetPlayer(guid))
                 {
                     if (player->IsDead())
                     {
@@ -173,7 +173,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
                         sprintf(eMessage, "Twilight Corrupter squeezes the last bit of life out of %s and swallows their soul.", player->GetName());
                         m_creature->MonsterTextEmote(eMessage, nullptr, false);
                         m_creature->CastSpell(m_creature, SPELL_SWELL_OF_SOULS, true);
-                        GUIDs[i] = 0;
+                        guid = 0;
                     }
                 }
             }
@@ -497,9 +497,9 @@ struct npc_stitchesAI : npc_escortAI
 
     void DespawnWatcher()
     {
-        for (auto itr = m_lWatchman.begin(); itr != m_lWatchman.end(); ++itr)
+        for (const auto& guid : m_lWatchman)
         {
-            if (auto pWatchman = m_creature->GetMap()->GetCreature(*itr))
+            if (auto pWatchman = m_creature->GetMap()->GetCreature(guid))
             {
                 if (pWatchman->IsAlive())
                     pWatchman->DisappearAndDie();

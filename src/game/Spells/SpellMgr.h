@@ -454,9 +454,9 @@ class SpellMgr
 
             SpellGroupStackRule rule = SPELL_GROUP_STACK_RULE_DEFAULT;
 
-            for (std::set<SpellGroup>::iterator itr = groups.begin() ; itr!= groups.end() ; ++itr)
+            for (const auto itr : groups)
             {
-                SpellGroupStackMap::const_iterator found = mSpellGroupStack.find(*itr);
+                SpellGroupStackMap::const_iterator found = mSpellGroupStack.find(itr);
                 if (found != mSpellGroupStack.end())
                 {
                     rule = found->second;
@@ -479,13 +479,13 @@ class SpellMgr
         bool IsMorePowerfullSpell(uint32 powerfullSpell, uint32 otherSpell, SpellGroup group) const
         {
             // The most powerfull spell appears after less powerfull spells in the list.
-            for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
+            for (const auto& itr : mSpellGroupSpell)
             {
-                if (itr->first != group)
+                if (itr.first != group)
                     continue;
-                if (itr->second == powerfullSpell)
+                if (itr.second == powerfullSpell)
                     return false;
-                if (itr->second == otherSpell)
+                if (itr.second == otherSpell)
                     return true;
             }
             MANGOS_ASSERT(false && "Both spells not in the given group !");

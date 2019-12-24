@@ -211,9 +211,9 @@ struct boss_nefarianAI : ScriptedAI
         // Clear mage GUIDs or we'll be adding the same players again for subsequent
         // mage class calls, resulting in far more polymorphs than intended
         MagePlayerGUID.clear();
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        for (const auto& itr : players)
         {
-            Player* pPlayer = itr->getSource();
+            Player* pPlayer = itr.getSource();
             if (pPlayer && pPlayer->IsAlive())
             {
                 if (pPlayer->GetClass() == ClassCalled)
@@ -407,17 +407,17 @@ struct boss_nefarianAI : ScriptedAI
         {
             if (m_uiMageTriggerTimer < uiDiff)
             {
-                for (std::list<ObjectGuid>::const_iterator itr = MagePlayerGUID.begin(); itr != MagePlayerGUID.end(); ++itr)
+                for (const auto& guid : MagePlayerGUID)
                 {
-                    if (Player* pMage = m_creature->GetMap()->GetPlayer(*itr))
+                    if (Player* pMage = m_creature->GetMap()->GetPlayer(guid))
                     {
                         if (pMage->HasAura(SPELL_MAGE))
                         {
                             std::vector<ObjectGuid> m_vPossibleVictim;
                             ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-                            for (ThreatList::const_iterator itr2 = tList.begin(); itr2 != tList.end(); ++itr2)
+                            for (const auto itr2 : tList)
                             {
-                                Unit* pUnit = m_creature->GetMap()->GetUnit((*itr2)->getUnitGuid());
+                                Unit* pUnit = m_creature->GetMap()->GetUnit(itr2->getUnitGuid());
                                 if (pUnit && pUnit->IsCreature() && pUnit->ToCreature()->IsTotem())
                                     pUnit = nullptr;
                                 if (pUnit && pUnit->GetDistance(pMage) < 60.0f && !pUnit->HasAura(SPELL_POLYMORPH))
@@ -451,14 +451,14 @@ struct boss_nefarianAI : ScriptedAI
             std::list<GameObject*> GOListe;
             GetGameObjectListWithEntryInGrid(GOListe, m_creature, 179804, 200.0f);
 
-            for (auto itr = GOListe.begin(); itr != GOListe.end(); ++itr)
+            for (const auto& itr : GOListe)
             {
                 m_creature->SummonCreature(NPC_BONE_CONSTRUCT,
-                    (*itr)->GetPositionX(),
-                    (*itr)->GetPositionY(),
-                    (*itr)->GetPositionZ(),
-                    (*itr)->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-                (*itr)->DeleteLater();
+                    itr->GetPositionX(),
+                    itr->GetPositionY(),
+                    itr->GetPositionZ(),
+                    itr->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
+                itr->DeleteLater();
             }
         }
 

@@ -778,9 +778,9 @@ void Pet::RegenerateFocus()
     float addvalue = 25 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
 
     AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
-    for (AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
-        if ((*i)->GetModifier()->m_miscvalue == int32(POWER_FOCUS))
-            addvalue *= ((*i)->GetModifier()->m_amount + 100) / 100.0f;
+    for (const auto itr : ModPowerRegenPCTAuras)
+        if (itr->GetModifier()->m_miscvalue == int32(POWER_FOCUS))
+            addvalue *= (itr->GetModifier()->m_amount + 100) / 100.0f;
 
     ModifyPower(POWER_FOCUS, (int32)addvalue);
 }
@@ -897,15 +897,15 @@ bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
 
     chainstartstore[0] = sSpellMgr.GetFirstSpellInChain(spellid);
 
-    for (PetSpellMap::const_iterator itr = m_petSpells.begin(); itr != m_petSpells.end(); ++itr)
+    for (const auto& itr : m_petSpells)
     {
-        if (itr->second.state == PETSPELL_REMOVED)
+        if (itr.second.state == PETSPELL_REMOVED)
             continue;
 
-        if (Spells::IsPassiveSpell(itr->first))
+        if (Spells::IsPassiveSpell(itr.first))
             continue;
 
-        uint32 chainstart = sSpellMgr.GetFirstSpellInChain(itr->first);
+        uint32 chainstart = sSpellMgr.GetFirstSpellInChain(itr.first);
 
         uint8 x;
 
@@ -929,9 +929,7 @@ bool Pet::CanTakeMoreActiveSpells(uint32 spellid)
 bool Pet::HasTPForSpell(uint32 spellid)
 {
     int32 neededtrainp = GetTPForSpell(spellid);
-    if ((m_TrainingPoints - neededtrainp < 0 || neededtrainp < 0) && neededtrainp != 0)
-        return false;
-    return true;
+    return !((m_TrainingPoints - neededtrainp < 0 || neededtrainp < 0) && neededtrainp != 0);
 }
 
 int32 Pet::GetTPForSpell(uint32 spellid)
@@ -951,14 +949,14 @@ int32 Pet::GetTPForSpell(uint32 spellid)
     uint32 spenttrainp = 0;
     uint32 chainstart = sSpellMgr.GetFirstSpellInChain(spellid);
 
-    for (PetSpellMap::iterator itr = m_petSpells.begin(); itr != m_petSpells.end(); ++itr)
+    for (const auto& itr : m_petSpells)
     {
-        if (itr->second.state == PETSPELL_REMOVED)
+        if (itr.second.state == PETSPELL_REMOVED)
             continue;
 
-        if (sSpellMgr.GetFirstSpellInChain(itr->first) == chainstart)
+        if (sSpellMgr.GetFirstSpellInChain(itr.first) == chainstart)
         {
-            SkillLineAbilityMapBounds _bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(itr->first);
+            SkillLineAbilityMapBounds _bounds = sSpellMgr.GetSkillLineAbilityMapBoundsBySpellId(itr.first);
 
             for (SkillLineAbilityMap::const_iterator _spell_idx2 = _bounds.first; _spell_idx2 != _bounds.second; ++_spell_idx2)
             {
@@ -1560,11 +1558,11 @@ void Pet::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8);
     data << GetObjectGuid();
     time_t curTime = time(nullptr);
-    for (PetSpellMap::iterator itr = m_petSpells.begin(); itr != m_petSpells.end(); ++itr)
+    for (const auto& itr : m_petSpells)
     {
-        if (itr->second.state == PETSPELL_REMOVED)
+        if (itr.second.state == PETSPELL_REMOVED)
             continue;
-        uint32 unSpellId = itr->first;
+        uint32 unSpellId = itr.first;
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(unSpellId);
         if (!spellInfo)
         {
@@ -1601,12 +1599,12 @@ void Pet::_LoadSpellCooldowns()
         data << ObjectGuid(GetObjectGuid());
         //[-ZERO] data << uint8(0x0);                                 // flags (0x1, 0x2)
 
-        for (PetSpellCDs::iterator it = m_pTmpCache->spellCooldown.begin(); it != m_pTmpCache->spellCooldown.end(); ++it)
+        for (const auto& it : m_pTmpCache->spellCooldown)
         {
             //Field* fields = result->Fetch();
 
-            uint32 spell_id = it->spell;//fields[0].GetUInt32();
-            time_t db_time  = (time_t)it->time;//fields[1].GetUInt64();
+            uint32 spell_id = it.spell;//fields[0].GetUInt32();
+            time_t db_time  = (time_t)it.time;//fields[1].GetUInt64();
             time_t db_cat_time = 0; // TODO ?
             SpellEntry const* spell = sSpellMgr.GetSpellEntry(spell_id);
 
@@ -1682,10 +1680,10 @@ void Pet::_LoadSpells()
 
     if (m_pTmpCache)
     {
-        for (PetSpells::iterator it = m_pTmpCache->spells.begin(); it != m_pTmpCache->spells.end(); ++it)
+        for (const auto& spell : m_pTmpCache->spells)
         {
             //Field* fields = result->Fetch();
-            AddSpell(it->spell, ActiveStates(it->active), PETSPELL_UNCHANGED);
+            AddSpell(spell.spell, ActiveStates(spell.active), PETSPELL_UNCHANGED);
         }
         //while (result->NextRow());
         //delete result;
@@ -1758,25 +1756,25 @@ void Pet::_LoadAuras(uint32 timediff)
     //QueryResult* result = CharacterDatabase.PQuery("SELECT caster_guid,item_guid,spell,stackcount,remaincharges,basepoints0,basepoints1,basepoints2,periodictime0,periodictime1,periodictime2,maxduration,remaintime,effIndexMask FROM pet_aura WHERE guid = '%u'",m_charmInfo->GetPetNumber());
     if (m_pTmpCache)
     {
-        for (PetAuras::iterator it = m_pTmpCache->auras.begin(); it != m_pTmpCache->auras.end(); ++it)
+        for (const auto& it : m_pTmpCache->auras)
         {
-            ObjectGuid casterGuid  = ObjectGuid(it->caster_guid);
-            uint32 item_lowguid = it->item_guid;
-            uint32 spellid      = it->spell;
+            ObjectGuid casterGuid  = ObjectGuid(it.caster_guid);
+            uint32 item_lowguid = it.item_guid;
+            uint32 spellid      = it.spell;
 
-            uint32 stackcount   = it->stackcount;
-            int32 remaincharges = (int32)it->remaincharges;
+            uint32 stackcount   = it.stackcount;
+            int32 remaincharges = (int32)it.remaincharges;
             int32 damage[MAX_EFFECT_INDEX];
             int32 periodicTime[MAX_EFFECT_INDEX];
 
             for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
             {
-                damage[i]      = it->basepoints[i];
-                periodicTime[i] = it->periodictime[i];
+                damage[i]      = it.basepoints[i];
+                periodicTime[i] = it.periodictime[i];
             }
-            int32 maxduration = it->maxduration;
-            int32 remaintime = it->remaintime;
-            uint32 effIndexMask = it->effIndexMask;
+            int32 maxduration = it.maxduration;
+            int32 remaintime = it.remaintime;
+            uint32 effIndexMask = it.effIndexMask;
 
             SpellEntry const* spellproto = sSpellMgr.GetSpellEntry(spellid);
             if (!spellproto)
@@ -1858,9 +1856,9 @@ void Pet::_SaveAuras()
             "basepoints0, basepoints1, basepoints2, periodictime0, periodictime1, periodictime2, maxduration, remaintime, effIndexMask) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
-    for (SpellAuraHolderMap::const_iterator itr = auraHolders.begin(); itr != auraHolders.end(); ++itr)
+    for (const auto& auraHolder : auraHolders)
     {
-        SpellAuraHolder* holder = itr->second;
+        SpellAuraHolder* holder = auraHolder.second;
 
         bool save = true;
         for (int32 j = 0; j < MAX_EFFECT_INDEX; ++j)
@@ -1929,11 +1927,11 @@ void Pet::_SaveAuras()
             stmt.addUInt32(holder->GetStackAmount());
             stmt.addUInt8(holder->GetAuraCharges());
 
-            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-                stmt.addInt32(damage[i]);
+            for (int32 i : damage)
+                stmt.addInt32(i);
 
-            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-                stmt.addUInt32(periodicTime[i]);
+            for (uint32 i : periodicTime)
+                stmt.addUInt32(i);
 
             stmt.addInt32(holder->GetAuraMaxDuration());
             stmt.addInt32(holder->GetAuraDuration());
@@ -2002,26 +2000,26 @@ bool Pet::AddSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpe
 
     if (sSpellMgr.GetSpellRank(spell_id) != 0)
     {
-        for (PetSpellMap::const_iterator itr2 = m_petSpells.begin(); itr2 != m_petSpells.end(); ++itr2)
+        for (const auto& itr : m_petSpells)
         {
-            if (itr2->second.state == PETSPELL_REMOVED) continue;
+            if (itr.second.state == PETSPELL_REMOVED) continue;
 
-            if (sSpellMgr.IsRankSpellDueToSpell(spellInfo, itr2->first))
+            if (sSpellMgr.IsRankSpellDueToSpell(spellInfo, itr.first))
             {
                 // replace by new high rank
-                if (sSpellMgr.IsHighRankOfSpell(spell_id, itr2->first))
+                if (sSpellMgr.IsHighRankOfSpell(spell_id, itr.first))
                 {
-                    newspell.active = itr2->second.active;
+                    newspell.active = itr.second.active;
 
                     if (newspell.active == ACT_ENABLED)
-                        ToggleAutocast(itr2->first, false);
+                        ToggleAutocast(itr.first, false);
 
-                    oldspell_id = itr2->first;
-                    unlearnSpell(itr2->first, false, false);
+                    oldspell_id = itr.first;
+                    unlearnSpell(itr.first, false, false);
                     break;
                 }
                 // ignore new lesser rank
-                else if (sSpellMgr.IsHighRankOfSpell(itr2->first, spell_id))
+                else if (sSpellMgr.IsHighRankOfSpell(itr.first, spell_id))
                     return false;
             }
         }
@@ -2057,9 +2055,7 @@ bool Pet::LearnSpell(uint32 spell_id)
 
 bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
-    if (RemoveSpell(spell_id, learn_prev, clear_ab))
-        return true;
-    return false;
+    return RemoveSpell(spell_id, learn_prev, clear_ab);
 }
 
 bool Pet::RemoveSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
@@ -2124,12 +2120,12 @@ void Pet::InitPetCreateSpells()
         Unit* owner = GetOwner();
         Player* p_owner = owner && owner->GetTypeId() == TYPEID_PLAYER ? (Player*)owner : nullptr;
 
-        for (uint8 i = 0; i < 4; ++i)
+        for (uint32 i : CreateSpells->spellid)
         {
-            if (!CreateSpells->spellid[i])
+            if (!i)
                 break;
 
-            SpellEntry const* learn_spellproto = sSpellMgr.GetSpellEntry(CreateSpells->spellid[i]);
+            SpellEntry const* learn_spellproto = sSpellMgr.GetSpellEntry(i);
             if (!learn_spellproto)
                 continue;
 
@@ -2317,8 +2313,8 @@ void Pet::LearnPetPassives()
     PetFamilySpellsStore::const_iterator petStore = sPetFamilySpellsStore.find(cFamily->ID);
     if (petStore != sPetFamilySpellsStore.end())
     {
-        for (PetFamilySpellsSet::const_iterator petSet = petStore->second.begin(); petSet != petStore->second.end(); ++petSet)
-            AddSpell(*petSet, ACT_DECIDE, PETSPELL_NEW, PETSPELL_FAMILY);
+        for (const auto petSet : petStore->second)
+            AddSpell(petSet, ACT_DECIDE, PETSPELL_NEW, PETSPELL_FAMILY);
     }
 }
 

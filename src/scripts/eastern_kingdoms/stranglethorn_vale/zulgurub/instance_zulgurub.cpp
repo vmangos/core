@@ -61,8 +61,8 @@ void instance_zulgurub::LowerHakkarHitPoints()
 
 bool instance_zulgurub::IsEncounterInProgress() const
 {
-    for (uint8 i = 0; i < ZULGURUB_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+    for (uint32 i : m_auiEncounter)
+        if (i == IN_PROGRESS || i == SPECIAL)
             return true;
     return false;
 }
@@ -152,9 +152,9 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
             {
                 Creature *Marli = instance->GetCreature(m_uiMarliGUID);
                 Unit* pVictim = Marli->GetVictim();
-                for (std::list<uint64>::const_iterator itr = m_lMarliTrashGUIDList.begin(); itr != m_lMarliTrashGUIDList.end(); itr++)
+                for (const auto& guid : m_lMarliTrashGUIDList)
                 {
-                    if (Creature* MarliTrash = instance->GetCreature(*itr))
+                    if (Creature* MarliTrash = instance->GetCreature(guid))
                         if (MarliTrash->IsAlive() && !MarliTrash->IsInCombat())
                             if (MarliTrash->GetMapId() == 309 && MarliTrash->GetZoneId() == 1977 && MarliTrash->GetAreaId() == 3379)
                                 MarliTrash->AI()->AttackStart(pVictim);
@@ -228,10 +228,10 @@ void instance_zulgurub::Load(char const* chrIn)
 
     LoadSaveData(chrIn, m_auiEncounter, 11);
 
-    for (uint8 i = 0; i < ZULGURUB_MAX_ENCOUNTER; ++i)
+    for (uint32 & i : m_auiEncounter)
     {
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
     }
     if (!m_randomBossSpawned)
         SpawnRandomBoss();

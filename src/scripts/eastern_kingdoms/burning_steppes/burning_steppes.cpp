@@ -283,9 +283,9 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 //break;ok so... it turns out I kill them BEFORE  we get to the paused ^.^
 
                 // Set all the dragons in combat
-                for (GuidList::const_iterator itr = m_lSearscaleGuidList.begin(); itr != m_lSearscaleGuidList.end(); ++itr)
+                for (const auto& guid : m_lSearscaleGuidList)
                 {
-                    if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
+                    if (Creature* pTemp = m_creature->GetMap()->GetCreature(guid))
                         pTemp->AI()->AttackStart(pPlayer);
                 }
                 break;
@@ -646,9 +646,9 @@ struct npc_klinfranAI : public ScriptedAI
             {
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 
-                for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
+                for (const auto itr : tList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     {
                         if (pUnit->IsAlive())
                         {

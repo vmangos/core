@@ -80,7 +80,7 @@ class UpdateData
         void Send(WorldSession* session, bool hasTransport = false);
         bool BuildPacket(WorldPacket* packet, bool hasTransport = false);
         bool BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket, bool hasTransport = false);
-        bool HasData() { return m_datas.size() || !m_outOfRangeGUIDs.empty(); }
+        bool HasData() { return !m_datas.empty() || !m_outOfRangeGUIDs.empty(); }
         void Clear();
 
         ObjectGuidSet const& GetOutOfRangeGUIDs() const { return m_outOfRangeGUIDs; }

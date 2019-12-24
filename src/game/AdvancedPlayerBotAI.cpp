@@ -398,7 +398,7 @@ void AdvancedPlayerBotAI::GatherConditions()
     if (Conditions.IsAttacked)
     {
         Unit::AttackerSet AttackerTable = me->GetAttackers();
-        if (AttackerTable.size() == 0)
+        if (AttackerTable.empty())
         {
             Conditions.IsAttacked = false;
         }
@@ -410,7 +410,7 @@ void AdvancedPlayerBotAI::GatherConditions()
 Unit* AdvancedPlayerBotAI::PickNearestAttacker()
 {
     Unit::AttackerSet AttackerTable = me->GetAttackers();
-    if (AttackerTable.size() > 0)
+    if (!AttackerTable.empty())
     {
         //pick nearest
         Unit* NearestUnit = nullptr;

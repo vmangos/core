@@ -295,7 +295,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         std::list<PlayerCacheData*> characters;
         sObjectMgr.GetPlayerDataForAccount(GetAccountId(), characters);
 
-        if (characters.size() > 0)
+        if (!characters.empty())
         {
             PlayerCacheData* cData = characters.front();
             Team team_ = Player::TeamForRace(race_);

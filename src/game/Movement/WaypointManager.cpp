@@ -35,8 +35,8 @@ bool WaypointBehavior::isEmpty()
     if (emote || spell || model1 || model2)
         return false;
 
-    for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
-        if (textid[i])
+    for (int i : textid)
+        if (i)
             return false;
 
     return true;
@@ -62,8 +62,8 @@ void WaypointManager::Load()
 
     std::set<uint32> movementScriptSet;
 
-    for (ScriptMapMap::const_iterator itr = sCreatureMovementScripts.begin(); itr != sCreatureMovementScripts.end(); ++itr)
-        movementScriptSet.insert(itr->first);
+    for (const auto& itr : sCreatureMovementScripts)
+        movementScriptSet.insert(itr.first);
 
     // /////////////////////////////////////////////////////
     // creature_movement
@@ -223,12 +223,12 @@ void WaypointManager::Load()
 
         if (!creatureNoMoveType.empty())
         {
-            for (std::set<uint32>::const_iterator itr = creatureNoMoveType.begin(); itr != creatureNoMoveType.end(); ++itr)
+            for (const auto itr : creatureNoMoveType)
             {
-                CreatureData const* cData = sObjectMgr.GetCreatureData(*itr);
+                CreatureData const* cData = sObjectMgr.GetCreatureData(itr);
                 CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(cData->creature_id[0]);
 
-                sLog.outErrorDb("Table creature_movement has waypoint for creature guid %u (entry %u), but MovementType is not WAYPOINT_MOTION_TYPE(2). Creature will not use this path.", *itr, cData->creature_id[0]);
+                sLog.outErrorDb("Table creature_movement has waypoint for creature guid %u (entry %u), but MovementType is not WAYPOINT_MOTION_TYPE(2). Creature will not use this path.", itr, cData->creature_id[0]);
 
                 if (cInfo->movement_type == WAYPOINT_MOTION_TYPE)
                     sLog.outErrorDb("    creature_template for this entry has MovementType WAYPOINT_MOTION_TYPE(2), did you intend to use creature_movement_template ?");
@@ -539,8 +539,8 @@ void WaypointManager::Load()
 
     if (!movementScriptSet.empty())
     {
-        for (std::set<uint32>::const_iterator itr = movementScriptSet.begin(); itr != movementScriptSet.end(); ++itr)
-            sLog.outErrorDb("Table `creature_movement_scripts` contain unused script, id %u.", *itr);
+        for (const auto itr : movementScriptSet)
+            sLog.outErrorDb("Table `creature_movement_scripts` contain unused script, id %u.", itr);
     }
 }
 
@@ -595,24 +595,23 @@ void WaypointManager::Cleanup()
 
 void WaypointManager::Unload()
 {
-    for (WaypointPathMap::iterator itr = m_pathMap.begin(); itr != m_pathMap.end(); ++itr)
-        _clearPath(itr->second);
+    for (auto& itr : m_pathMap)
+        _clearPath(itr.second);
     m_pathMap.clear();
 
-    for (WaypointPathMap::iterator itr = m_pathTemplateMap.begin(); itr != m_pathTemplateMap.end(); ++itr)
-        _clearPath(itr->second);
+    for (auto& itr : m_pathTemplateMap)
+        _clearPath(itr.second);
     m_pathTemplateMap.clear();
 
-    for (WaypointPathMap::iterator itr = m_pathSpecialMap.begin(); itr != m_pathSpecialMap.end(); ++itr)
-        _clearPath(itr->second);
+    for (auto& itr : m_pathSpecialMap)
+        _clearPath(itr.second);
     m_pathSpecialMap.clear();
 }
 
 void WaypointManager::_clearPath(WaypointPath &path)
 {
-    for (WaypointPath::const_iterator itr = path.begin(); itr != path.end(); ++itr)
-        if (itr->second.behavior)
-            delete itr->second.behavior;
+    for (const auto& itr : path)
+    delete itr.second.behavior;
     path.clear();
 }
 
@@ -819,30 +818,34 @@ inline void CheckWPText(std::string table, uint32 entryOrGuid, uint32 point, Way
 
 void WaypointManager::CheckTextsExistance()
 {
-    for (WaypointPathMap::const_iterator pmItr = m_pathMap.begin(); pmItr != m_pathMap.end(); ++pmItr)
+    for (const auto& path : m_pathMap)
     {
-        for (WaypointPath::const_iterator pItr = pmItr->second.begin(); pItr != pmItr->second.end(); ++pItr)
-            if (pItr->second.behavior)
+        for (const auto& point : path.second)
+        {
+            if (point.second.behavior)
             {
-                CheckWPText("`creature_movement` Id:", pmItr->first, pItr->first, pItr->second.behavior);
+                CheckWPText("`creature_movement` Id:", path.first, point.first, point.second.behavior);
+            }
+        }  
+    }
+
+    for (const auto& path : m_pathTemplateMap)
+    {
+        for (const auto& point : path.second)
+            if (point.second.behavior)
+            {
+                CheckWPText("`creature_movement_template` Entry:", path.first, point.first, point.second.behavior);
             }
     }
 
-    for (WaypointPathMap::const_iterator pmItr = m_pathTemplateMap.begin(); pmItr != m_pathTemplateMap.end(); ++pmItr)
+    for (const auto& path : m_pathSpecialMap)
     {
-        for (WaypointPath::const_iterator pItr = pmItr->second.begin(); pItr != pmItr->second.end(); ++pItr)
-            if (pItr->second.behavior)
+        for (const auto& point : path.second)
+        {
+            if (point.second.behavior)
             {
-                CheckWPText("`creature_movement_template` Entry:", pmItr->first, pItr->first, pItr->second.behavior);
+                CheckWPText("`creature_movement_special` Id:", path.first, point.first, point.second.behavior);
             }
-    }
-
-    for (WaypointPathMap::const_iterator pmItr = m_pathSpecialMap.begin(); pmItr != m_pathSpecialMap.end(); ++pmItr)
-    {
-        for (WaypointPath::const_iterator pItr = pmItr->second.begin(); pItr != pmItr->second.end(); ++pItr)
-            if (pItr->second.behavior)
-            {
-                CheckWPText("`creature_movement_special` Id:", pmItr->first, pItr->first, pItr->second.behavior);
-            }
+        } 
     }
 }

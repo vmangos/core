@@ -49,11 +49,11 @@ void npc_reginald_windsorAI::ResetCreature()
         GardeTimer[i] = 0;
         GardeNeed[i] = false;
     }
-    for (uint8 i = 0; i < 30; i++)
-        GardesGUIDs[i] = 0;
+    for (uint64 & guid : GardesGUIDs)
+        guid = 0;
 
-    for (uint8 i = 0; i < 10; i++)
-        DragsGUIDs[i] = 0;
+    for (uint64 & guid : DragsGUIDs)
+        guid = 0;
 }
 
 void npc_reginald_windsorAI::JustDied(Unit* /*pKiller*/)
@@ -87,14 +87,14 @@ void npc_reginald_windsorAI::DoTalk(Unit* pWho, bool yell, Unit* pTarget)
 void npc_reginald_windsorAI::SituationFinale()
 {
     Player* pPlayer = GetPlayer();
-    std::list<Creature*> MobListe;
+    std::list<Creature*> mobList;
 
-    GetCreatureListWithEntryInGrid(MobListe, m_creature, NPC_ONYXIA_ELITE_GUARD, 150.0f);
-    for (auto itr = MobListe.begin(); itr != MobListe.end(); ++itr)
+    GetCreatureListWithEntryInGrid(mobList, m_creature, NPC_ONYXIA_ELITE_GUARD, 150.0f);
+    for (const auto& pMob : mobList)
     {
-        (*itr)->Respawn();
-        (*itr)->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
-        (*itr)->AIM_Initialize();
+        pMob->Respawn();
+        pMob->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
+        pMob->AIM_Initialize();
     }
 
     if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
@@ -145,7 +145,7 @@ void npc_reginald_windsorAI::SituationFinale()
 
 void npc_reginald_windsorAI::UpdateAI_corpse(uint32 const uiDiff)
 {
-    if (PhaseFinale == false)
+    if (!PhaseFinale)
         return;
 
     if (FinalTimer < uiDiff)
@@ -177,7 +177,7 @@ void npc_reginald_windsorAI::UpdateAI_corpse(uint32 const uiDiff)
     else
         FinalTimer -= uiDiff;
 
-    if (TheEnd == true)
+    if (TheEnd)
     {
         if (FinalTimer < uiDiff)
         {
@@ -218,15 +218,15 @@ void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
             Victim->GetEntry() == NPC_STORMWIND_ROYAL_GUARD ||
             Victim->GetEntry() == NPC_STORMWIND_CITY_PATROL)
         {
-            if (Victim->GetDistance2d(m_creature) < 8.0f && NeedCheck == true)
+            if (Victim->GetDistance2d(m_creature) < 8.0f && NeedCheck)
             {
                 bool Continuer = true;
-                for (int i = 0; i < 30; i++)
+                for (uint64 guid : GardesGUIDs)
                 {
-                    if (Victim->GetGUID() == GardesGUIDs[i] || m_creature->GetPositionY() < 360)
+                    if (Victim->GetGUID() == guid || m_creature->GetPositionY() < 360)
                         Continuer = false;
                 }
-                if (Continuer == true)
+                if (Continuer)
                 {
                     Victim->SetFacingToObject(m_creature);
                     Victim->HandleEmote(EMOTE_ONESHOT_SALUTE);
@@ -261,7 +261,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
 
     for (int i = 0; i < 6; i++)
     {
-        if (GardeNeed[i] == true)
+        if (GardeNeed[i])
         {
             if (GardeTimer[i] < uiDiff)
             {
@@ -628,14 +628,14 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
                 Onyxia->MonsterSay("Yesss... Guards, come to your lord's aid!");
                 int Var = 0;
                 GetCreatureListWithEntryInGrid(DragListe, Onyxia, NPC_STORMWIND_ROYAL_GUARD, 25.0f);
-                for (auto itr = DragListe.begin(); itr != DragListe.end(); ++itr)
+                for (const auto& itr : DragListe)
                 {
-                    DragsGUIDs[Var] = (*itr)->GetGUID();
-                    (*itr)->UpdateEntry(NPC_ONYXIA_ELITE_GUARD);
-                    (*itr)->AIM_Initialize();
-                    (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    DragsGUIDs[Var] = itr->GetGUID();
+                    itr->UpdateEntry(NPC_ONYXIA_ELITE_GUARD);
+                    itr->AIM_Initialize();
+                    itr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     if (!urand(0, 2))
-                        (*itr)->MonsterTextEmote("Onyxia's Elite Guard hisses.");
+                        itr->MonsterTextEmote("Onyxia's Elite Guard hisses.");
                     Var++;
                 }
             }
@@ -737,7 +737,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
             Y = m_creature->GetPositionY() - WindsorDeplacement[Var].y;
             Timer = 1000 + sqrt(X * X + Y * Y) / (m_creature->GetSpeed(MOVE_WALK) * 0.001f);
         }
-        else if (PhaseFinale == true)
+        else if (PhaseFinale)
         {
             if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
             {

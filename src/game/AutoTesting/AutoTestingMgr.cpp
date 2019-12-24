@@ -62,8 +62,9 @@ void SingleTest::ClearObjects()
     Map* map = GetMap();
     if (!map)
         return;
-    for (TestObjectGuids::iterator it = _testObjects.begin(); it != _testObjects.end(); ++it)
-        if (WorldObject* obj = map->GetWorldObject(it->second))
+    for (const auto& itr : _testObjects)
+    { 
+        if (WorldObject* obj = map->GetWorldObject(itr.second))
         {
             if (obj->GetTypeId() == TYPEID_PLAYER)
             {
@@ -73,6 +74,7 @@ void SingleTest::ClearObjects()
             else
                 obj->AddObjectToRemoveList();
         }
+    }
     _testObjects.clear();
     _initializedObjects.clear();
 }
@@ -213,30 +215,32 @@ void SingleTest::Finish(bool success, char const* errMsg)
 
 void AutoTestingMgr::Update(uint32 diff)
 {
-    for (TestsArray::iterator it = _tests.begin(); it != _tests.end(); ++it)
-        if (!(*it)->Finished())
+    for (const auto& itr : _tests)
+    {
+        if (!itr->Finished())
         {
-            (*it)->Update(diff);
-            if ((*it)->Finished())
+            itr->Update(diff);
+            if (itr->Finished())
             {
-                sLog.outString("TEST: %8s [%20s] %s", (*it)->Failed() ? "FAIL" : "SUCCESS", (*it)->GetName().c_str(), (*it)->GetError().c_str());
-                (*it)->Reset();
+                sLog.outString("TEST: %8s [%20s] %s", itr->Failed() ? "FAIL" : "SUCCESS", itr->GetName().c_str(), itr->GetError().c_str());
+                itr->Reset();
             }
         }
+    }
 }
 
 void AutoTestingMgr::Run(std::string names, ChatHandler* handler)
 {
-    for (TestsArray::iterator it = _tests.begin(); it != _tests.end(); ++it)
+    for (const auto& itr : _tests)
     {
-        if (!(*it)->Finished())
+        if (!itr->Finished())
             continue;
-        std::string currentName = (*it)->GetName();
+        std::string currentName = itr->GetName();
         if (currentName.find(names) != std::string::npos)
         {
             if (handler)
                 handler->PSendSysMessage("Starting test %s", currentName.c_str());
-            (*it)->Setup();
+            itr->Setup();
         }
     }
 }

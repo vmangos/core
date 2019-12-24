@@ -135,15 +135,15 @@ struct boss_patchwerkAI : public ScriptedAI
         uint32 uiHighestHP = 0;
 
         ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
-        for (ThreatList::const_iterator iter = tList.begin(); iter != tList.end(); ++iter)
+        for (const auto iter : tList)
         {
             // Skipping maintank, only using him if there is no other viable target todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
-            if ((*iter)->getUnitGuid() == mainTankGuid)
+            if (iter->getUnitGuid() == mainTankGuid)
                 continue;
-            if (!(*iter)->getUnitGuid().IsPlayer())
+            if (!iter->getUnitGuid().IsPlayer())
                 continue;
 
-            if (Unit* pTempTarget = m_creature->GetMap()->GetUnit((*iter)->getUnitGuid()))
+            if (Unit* pTempTarget = m_creature->GetMap()->GetUnit(iter->getUnitGuid()))
             {
                 // target has higher hp than anyone checked so far
                 if (pTempTarget->GetHealth() > uiHighestHP)
@@ -212,9 +212,9 @@ struct boss_patchwerkAI : public ScriptedAI
         // Note: creature not have targeted movement generator but have attacker in this case
         if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
         {
-            for (std::set<Unit*>::const_iterator itr = m_creature->GetAttackers().begin(); itr != m_creature->GetAttackers().end(); ++itr)
+            for (const auto itr : m_creature->GetAttackers())
             {
-                if ((*itr)->IsInMap(m_creature) && (*itr)->IsTargetableForAttack())
+                if (itr->IsInMap(m_creature) && itr->IsTargetableForAttack())
                     return false;
             }
         }

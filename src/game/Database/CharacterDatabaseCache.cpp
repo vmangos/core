@@ -98,8 +98,8 @@ void CharacterDatabaseCache::LoadPetSpell(uint32 singlePetId)
     else
     {
         // Clear previously stored spells
-        for (PetGuidToPetMap::iterator it = m_petsByGuid.begin(); it != m_petsByGuid.end(); ++it)
-            it->second->spells.clear();
+        for (const auto& it : m_petsByGuid)
+            it.second->spells.clear();
 
         sLog.outString("* Loading `pet_spell`");
         result.reset(CharacterDatabase.Query(
@@ -148,8 +148,8 @@ void CharacterDatabaseCache::LoadPetSpellCooldown(uint32 singlePetId)
     else
     {
         // Clear previously stored cooldowns
-        for (PetGuidToPetMap::iterator it = m_petsByGuid.begin(); it != m_petsByGuid.end(); ++it)
-            it->second->spellCooldown.clear();
+        for (const auto& it : m_petsByGuid)
+            it.second->spellCooldown.clear();
 
         sLog.outString("* Loading `pet_spell_cooldown`");
         result.reset(CharacterDatabase.Query(
@@ -200,8 +200,8 @@ void CharacterDatabaseCache::LoadPetAura(uint32 singlePetId)
     else
     {
         // Clear previously stored auras
-        for (PetGuidToPetMap::iterator it = m_petsByGuid.begin(); it != m_petsByGuid.end(); ++it)
-            it->second->auras.clear();
+        for (const auto& it : m_petsByGuid)
+            it.second->auras.clear();
 
         sLog.outString("* Loading table `pet_aura`");
         result.reset(CharacterDatabase.Query(
@@ -271,9 +271,9 @@ CharacterPetCache* CharacterDatabaseCache::GetCharacterPetCacheByOwnerAndId(uint
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(owner);
     if (ownerPets == m_petsByCharacter.end())
         return nullptr;
-    for (CharPetVector::iterator it = ownerPets->second.begin(); it != ownerPets->second.end(); ++it)
-        if ((*it)->id == id)
-            return (*it);
+    for (const auto& it : ownerPets->second)
+        if (it->id == id)
+            return it;
 
     return nullptr;
 }
@@ -284,9 +284,9 @@ CharacterPetCache* CharacterDatabaseCache::GetCharacterCurrentPet(uint64 owner)
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(owner);
     if (ownerPets == m_petsByCharacter.end())
         return nullptr;
-    for (CharPetVector::iterator it = ownerPets->second.begin(); it != ownerPets->second.end(); ++it)
-        if ((*it)->slot == PET_SAVE_AS_CURRENT)
-            return (*it);
+    for (const auto& it : ownerPets->second)
+        if (it->slot == PET_SAVE_AS_CURRENT)
+            return it;
 
     return nullptr;
 }
@@ -297,9 +297,9 @@ CharacterPetCache* CharacterDatabaseCache::GetCharacterPetByOwnerAndEntry(uint64
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(owner);
     if (ownerPets == m_petsByCharacter.end())
         return nullptr;
-    for (CharPetVector::iterator it = ownerPets->second.begin(); it != ownerPets->second.end(); ++it)
-        if ((*it)->entry == entry && ((*it)->slot == PET_SAVE_AS_CURRENT || (*it)->slot > PET_SAVE_LAST_STABLE_SLOT))
-            return (*it);
+    for (const auto& it : ownerPets->second)
+        if (it->entry == entry && (it->slot == PET_SAVE_AS_CURRENT || it->slot > PET_SAVE_LAST_STABLE_SLOT))
+            return it;
 
     return nullptr;
 }
@@ -310,9 +310,9 @@ CharacterPetCache* CharacterDatabaseCache::GetCharacterPetByOwner(uint64 owner)
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(owner);
     if (ownerPets == m_petsByCharacter.end())
         return nullptr;
-    for (CharPetVector::iterator it = ownerPets->second.begin(); it != ownerPets->second.end(); ++it)
-        if ((*it)->slot == PET_SAVE_AS_CURRENT || (*it)->slot > PET_SAVE_LAST_STABLE_SLOT)
-            return (*it);
+    for (const auto& it : ownerPets->second)
+        if (it->slot == PET_SAVE_AS_CURRENT || it->slot > PET_SAVE_LAST_STABLE_SLOT)
+            return it;
 
     return nullptr;
 }
@@ -322,9 +322,9 @@ void CharacterDatabaseCache::CharacterPetSetOthersNotInSlot(CharacterPetCache* p
     CharPetMap::iterator ownerPets = m_petsByCharacter.find(pCache->owner);
     if (ownerPets == m_petsByCharacter.end())
         return;
-    for (CharPetVector::iterator it = ownerPets->second.begin(); it != ownerPets->second.end(); ++it)
-        if ((*it)->id != pCache->id && (*it)->slot == PET_SAVE_AS_CURRENT)
-            (*it)->slot = PET_SAVE_NOT_IN_SLOT;
+    for (const auto& it : ownerPets->second)
+        if (it->id != pCache->id && it->slot == PET_SAVE_AS_CURRENT)
+            it->slot = PET_SAVE_NOT_IN_SLOT;
 }
 
 void CharacterDatabaseCache::InsertCharacterPet(CharacterPetCache* cache)

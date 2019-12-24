@@ -84,15 +84,15 @@ void ElementalInvasion::Enable()
 
 void ElementalInvasion::Disable()
 {
-    for (uint8 i = 0; i < 4; ++i)
+    for (const auto& i : InvasionData)
     {
         // Stop rifts
-        if (sGameEventMgr.IsActiveEvent(InvasionData[i].eventRift))
-            sGameEventMgr.StopEvent(InvasionData[i].eventRift, true);
+        if (sGameEventMgr.IsActiveEvent(i.eventRift))
+            sGameEventMgr.StopEvent(i.eventRift, true);
 
         // Stop bosses
-        if (sGameEventMgr.IsActiveEvent(InvasionData[i].eventBoss))
-            sGameEventMgr.StopEvent(InvasionData[i].eventBoss, true);
+        if (sGameEventMgr.IsActiveEvent(i.eventBoss))
+            sGameEventMgr.StopEvent(i.eventBoss, true);
     }
     // stop main event
     if (sGameEventMgr.IsActiveEvent(EVENT_INVASION))
@@ -140,19 +140,19 @@ void ElementalInvasion::StopLocalInvasion(uint8 index, uint32 stage, uint8 delay
 
 void ElementalInvasion::ResetThings()
 {
-    for (uint8 i = 0; i < 4; ++i)
+    for (const auto& i : InvasionData)
     {
         // reset delays for each sub
-        sObjectMgr.SetSavedVariable(InvasionData[i].varDelay, 3, true);
+        sObjectMgr.SetSavedVariable(i.varDelay, 3, true);
 
         // reset kills for each sub
-        sObjectMgr.SetSavedVariable(InvasionData[i].varKills, 0, true);
+        sObjectMgr.SetSavedVariable(i.varKills, 0, true);
 
         // reset stage for each sub
-        sObjectMgr.SetSavedVariable(InvasionData[i].varStage, 1, true);
+        sObjectMgr.SetSavedVariable(i.varStage, 1, true);
 
         // ready bosses respawn timers
-        CharacterDatabase.PExecute("DELETE FROM `creature_respawn` WHERE `guid` = '%u'", InvasionData[i].bossGuid);
+        CharacterDatabase.PExecute("DELETE FROM `creature_respawn` WHERE `guid` = '%u'", i.bossGuid);
     }
 }
 
@@ -373,14 +373,14 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
 
 bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid>& dragonGUIDs)
 {
-    for (uint8 i = 0; i < 4; ++i)
+    for (uint32 entry : NightmareDragons)
     {
         // lookup the dragon
-        auto dCreatureGuid = sObjectMgr.GetOneCreatureByEntry(NightmareDragons[i]);
+        auto dCreatureGuid = sObjectMgr.GetOneCreatureByEntry(entry);
 
         if (dCreatureGuid.IsEmpty())
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature %u not found in world!", NightmareDragons[i]);
+            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature %u not found in world!", entry);
             return false;
         }
 
@@ -412,18 +412,18 @@ void DarkmoonFaire::Update()
 {
     auto event = GetDarkmoonState();
 
-    for (auto i = 0; i < 4; ++i)
+    for (uint16 i : DMFValidEvent)
     {
-        if (!sGameEventMgr.IsValidEvent(DMFValidEvent[i]))
+        if (!sGameEventMgr.IsValidEvent(i))
             continue;
 
-        if (DMFValidEvent[i] == event)
+        if (i == event)
         {
-            if (!sGameEventMgr.IsActiveEvent(DMFValidEvent[i]))
-                sGameEventMgr.StartEvent(DMFValidEvent[i], true);
+            if (!sGameEventMgr.IsActiveEvent(i))
+                sGameEventMgr.StartEvent(i, true);
         }
-        else if (sGameEventMgr.IsActiveEvent(DMFValidEvent[i]))
-            sGameEventMgr.StopEvent(DMFValidEvent[i], true);
+        else if (sGameEventMgr.IsActiveEvent(i))
+            sGameEventMgr.StopEvent(i, true);
     }
 }
 
@@ -508,10 +508,7 @@ bool LunarFestivalFirework::IsHourBeginning(uint8 minutes) const
     struct tm* timeinfo;
     timeinfo = localtime(&rawtime);
 
-    if (timeinfo->tm_min < minutes)
-        return true;
-
-    return false;
+    return timeinfo->tm_min < minutes;
 }
 
 SilithusWarEffortBattle::SilithusWarEffortBattle() : WorldEvent (EVENT_SILITHUS_WE_START)
@@ -831,15 +828,15 @@ void ScourgeInvasionEvent::Update()
 
     time_t now = time(nullptr);
 
-    for (auto it = invasionPoints.begin(); it != invasionPoints.end(); ++it)
+    for (auto& invasionPoint : invasionPoints)
     {
         uint32 numNecrosAlive = 0;
-        for (auto& point : it->points)
+        for (auto& point : invasionPoint.points)
         {
-            Map* mapPtr = GetMap(it->map, point);
+            Map* mapPtr = GetMap(invasionPoint.map, point);
             if (!mapPtr)
             {
-                sLog.outError("ScourgeInvasionEvent::Update no map for zone %d", it->map);
+                sLog.outError("ScourgeInvasionEvent::Update no map for zone %d", invasionPoint.map);
                 continue;
             }
 
@@ -854,16 +851,16 @@ void ScourgeInvasionEvent::Update()
         // If this is an active invasion zone, and there are no necropolises alive,
         // we initialize the cooldown variable which will make a new zone active at
         // now + NECROPOLIS_ATTACK_TIMER
-        if (numNecrosAlive == 0 && it->zoneId == current1)
+        if (numNecrosAlive == 0 && invasionPoint.zoneId == current1)
         {
-            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME1, VARIABLE_NAXX_ATTACK_ZONE1, it->remainingVar, now, it->zoneId);
+            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME1, VARIABLE_NAXX_ATTACK_ZONE1, invasionPoint.remainingVar, now, invasionPoint.zoneId);
         }
-        else if (numNecrosAlive == 0 && it->zoneId == current2)
+        else if (numNecrosAlive == 0 && invasionPoint.zoneId == current2)
         {
-            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME2, VARIABLE_NAXX_ATTACK_ZONE2, it->remainingVar, now, it->zoneId);
+            HandleActiveZone(VARIABLE_NAXX_ATTACK_TIME2, VARIABLE_NAXX_ATTACK_ZONE2, invasionPoint.remainingVar, now, invasionPoint.zoneId);
         }
 
-        sObjectMgr.SetSavedVariable(it->remainingVar, numNecrosAlive, true);
+        sObjectMgr.SetSavedVariable(invasionPoint.remainingVar, numNecrosAlive, true);
     }
        
     UpdateWorldState();
@@ -1115,8 +1112,8 @@ bool ScourgeInvasionEvent::SummonNecropolis(Map* pMap, InvasionNecropolis& point
 
 bool ScourgeInvasionEvent::isValidZoneId(uint32 zoneId)
 {
-    for (auto it = invasionPoints.begin(); it != invasionPoints.end(); ++it)
-        if (it->zoneId == zoneId)
+    for (const auto& invasionPoint : invasionPoints)
+        if (invasionPoint.zoneId == zoneId)
             return true;
 
     return false;
@@ -1124,10 +1121,10 @@ bool ScourgeInvasionEvent::isValidZoneId(uint32 zoneId)
 
 ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetZone(uint32 zoneId)
 {
-    for (auto it = invasionPoints.begin(); it != invasionPoints.end(); ++it)
+    for (auto& invasionPoint : invasionPoints)
     {
-        if (it->zoneId == zoneId)
-            return &(*it);
+        if (invasionPoint.zoneId == zoneId)
+            return &invasionPoint;
     }
     sLog.outError("ScourgeInvasionEvent::GetZone unknown zoneid: %d", zoneId);
     return nullptr;
@@ -1136,10 +1133,10 @@ ScourgeInvasionEvent::InvasionZone* ScourgeInvasionEvent::GetZone(uint32 zoneId)
 uint32 ScourgeInvasionEvent::GetNewRandomZone(uint32 curr1, uint32 curr2)
 {
     std::vector<uint32> validZones;
-    for (auto it = invasionPoints.begin(); it != invasionPoints.end(); ++it)
+    for (const auto& invasionPoint : invasionPoints)
     {
-        if (it->zoneId != curr1 && it->zoneId != curr2)
-            validZones.push_back(it->zoneId);
+        if (invasionPoint.zoneId != curr1 && invasionPoint.zoneId != curr2)
+            validZones.push_back(invasionPoint.zoneId);
     }
 
     if (validZones.empty())
@@ -1186,9 +1183,9 @@ void ScourgeInvasionEvent::UpdateWorldState()
         return;
     }
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
-    for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
+    for (const auto& itr : m)
     {
-        Player* pl = itr->second;
+        Player* pl = itr.second;
         // do not process players which are not in world
         if (!pl->IsInWorld())
             continue;
@@ -1474,8 +1471,8 @@ void WarEffortEvent::CompleteWarEffort()
         EVENT_WAR_EFFORT_BATTLE_ZORA
     } };
 
-    for (int i = 0; i < stopEvents.size(); ++i)
-        DisableAndStopEvent(stopEvents[i]);
+    for (const auto& itr : stopEvents)
+        DisableAndStopEvent(itr);
 
     stage = WAR_EFFORT_STAGE_COMPLETE;
     sObjectMgr.SetSavedVariable(VAR_WE_STAGE, stage, true);
@@ -1519,13 +1516,13 @@ void WarEffortEvent::UpdateStageEvents()
         required.push_back(warEffortStageEvents[stage][i]);
     }
 
-    for (int i = 0; i < 20; ++i)
+    for (const auto& event : events)
     {
-        if (!events[i])
+        if (!event)
             continue;
 
-        if (sGameEventMgr.IsActiveEvent(events[i]))
-            active.push_back(events[i]);
+        if (sGameEventMgr.IsActiveEvent(event))
+            active.push_back(event);
     }
 
     // Find which events need to be activated, or disabled. Any active events not in
@@ -1544,19 +1541,19 @@ void WarEffortEvent::UpdateStageEvents()
     }
 
     // Disable any remaining events
-    for (std::vector<uint16>::iterator iter = active.begin(); iter != active.end(); ++iter)
-        DisableAndStopEvent(*iter);
+    for (const auto& iter : active)
+        DisableAndStopEvent(iter);
 
     // Enable any events that need to be enabled
-    for (std::vector<uint16>::const_iterator iter = required.begin(); iter != required.end(); ++iter)
+    for (const auto iter : required)
     {
         // Just double check in case our lists are inconsistent
-        if (!sGameEventMgr.IsActiveEvent(*iter))
-            EnableAndStartEvent(*iter);
+        if (!sGameEventMgr.IsActiveEvent(iter))
+            EnableAndStartEvent(iter);
         else
         {
             sLog.outError("[WarEffortEvent] Event %u is already active for stage %u, but not defined in overall event list",
-                *iter, stage);
+                iter, stage);
         }
     }
 }
@@ -1622,10 +1619,10 @@ void WarEffortEvent::UpdateHiveColossusEvents()
     if (colossusMask & WAR_EFFORT_REGAL_REWARD)
         events.push_back(EVENT_WAR_EFFORT_BATTLE_REGAL);
 
-    for (std::list<WarEffortGameEvents>::const_iterator iter = events.begin(); iter != events.end(); ++iter)
+    for (const auto event : events)
     {
-        if (!sGameEventMgr.IsActiveEvent(*iter))
-            sGameEventMgr.StartEvent(*iter, true);
+        if (!sGameEventMgr.IsActiveEvent(event))
+            sGameEventMgr.StartEvent(event, true);
     }
 }
 

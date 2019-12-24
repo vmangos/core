@@ -208,19 +208,19 @@ bool OPvPCapturePoint::DelCapturePoint()
 
 void OPvPCapturePoint::DeleteSpawns()
 {
-    for (std::map<uint32, uint64>::iterator i = m_Objects.begin(); i != m_Objects.end(); ++i)
-        DelObject(i->first);
-    for (std::map<uint32, uint64>::iterator i = m_Creatures.begin(); i != m_Creatures.end(); ++i)
-        DelCreature(i->first);
+    for (const auto& itr : m_Objects)
+        DelObject(itr.first);
+    for (const auto& itr : m_Creatures)
+        DelCreature(itr.first);
     DelCapturePoint();
 }
 
 void OutdoorPvP::DeleteSpawns()
 {
-    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (const auto& itr : m_capturePoints)
     {
-        itr->second->DeleteSpawns();
-        delete itr->second;
+        itr.second->DeleteSpawns();
+        delete itr.second;
     }
     m_capturePoints.clear();
 }
@@ -237,8 +237,8 @@ OutdoorPvP::~OutdoorPvP()
 {
     // `Map`s should already be unloaded at this point
     // DeleteSpawns();
-    for (OPvPCapturePointMap::iterator it = m_capturePoints.begin(); it != m_capturePoints.end(); ++it)
-        delete it->second;
+    for (const auto& itr : m_capturePoints)
+        delete itr.second;
 }
 
 ZoneScript::~ZoneScript()
@@ -262,8 +262,8 @@ void ZoneScript::OnPlayerLeave(Player* plr)
 void OutdoorPvP::OnPlayerLeave(Player* plr)
 {
     // inform the objectives of the leaving
-    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        itr->second->HandlePlayerLeave(plr);
+    for (const auto& itr : m_capturePoints)
+        itr.second->HandlePlayerLeave(plr);
     ZoneScript::OnPlayerLeave(plr);
 }
 
@@ -278,9 +278,9 @@ void ZoneScript::Update(uint32 diff)
 void OutdoorPvP::Update(uint32 diff)
 {
     m_objective_changed = false;
-    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
+    for (const auto& itr : m_capturePoints)
     {
-        if (itr->second->Update(diff))
+        if (itr.second->Update(diff))
             m_objective_changed = true;
     }
 }
@@ -292,9 +292,9 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
     float radius = (float)m_capturePoint->GetGOInfo()->capturePoint.radius;
 
-    for (uint32 team = 0; team < 2; ++team)
+    for (const auto& playersPerTeam : m_activePlayers)
     {
-        for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end();)
+        for (PlayerSet::const_iterator itr = playersPerTeam.cbegin(); itr != playersPerTeam.cend();)
         {
             Player* player = *itr;
             ++itr;
@@ -308,12 +308,12 @@ bool OPvPCapturePoint::Update(uint32 diff)
     MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, checker);
     Cell::VisitWorldObjects(m_capturePoint, searcher, radius);
 
-    for (std::list<Player*>::iterator itr = players.begin(); itr != players.end(); ++itr)
+    for (const auto& player : players)
     {
-        if ((*itr)->IsOutdoorPvPActive())
+        if (player->IsOutdoorPvPActive())
         {
-            if (m_activePlayers[(*itr)->GetTeamId()].insert(*itr).second)
-                HandlePlayerEnter(*itr);
+            if (m_activePlayers[player->GetTeamId()].insert(player).second)
+                HandlePlayerEnter(player);
         }
     }
 
@@ -406,17 +406,17 @@ bool OPvPCapturePoint::Update(uint32 diff)
 
 void ZoneScript::SendUpdateWorldState(uint32 field, uint32 value)
 {
-    for (int i = 0; i < 2; ++i)
-        for (PlayerSet::iterator itr = m_players[i].begin(); itr != m_players[i].end(); ++itr)
+    for (const auto& playerPerTeam : m_players)
+        for (PlayerSet::iterator itr = playerPerTeam.begin(); itr != playerPerTeam.end(); ++itr)
             (*itr)->SendUpdateWorldState(field, value);
 }
 
 void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
 {
-    for (uint32 team = 0; team < 2; ++team)
+    for (const auto& playerPerTeam : m_activePlayers)
     {
         // send to all players present in the area
-        for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end(); ++itr)
+        for (PlayerSet::iterator itr = playerPerTeam.begin(); itr != playerPerTeam.end(); ++itr)
             (*itr)->SendUpdateWorldState(field, value);
     }
 }
@@ -437,8 +437,8 @@ void OPvPCapturePoint::SendObjectiveComplete(uint32 id, uint64 guid)
     }
 
     // send to all players present in the area
-    for (PlayerSet::iterator itr = m_activePlayers[team].begin(); itr != m_activePlayers[team].end(); ++itr)
-        (*itr)->KilledMonsterCredit(id, guid);
+    for (const auto itr : m_activePlayers[team])
+        itr->KilledMonsterCredit(id, guid);
 }
 
 void OutdoorPvP::HandleKill(Player* killer, Unit* killed)
@@ -472,8 +472,8 @@ void OutdoorPvP::HandleKill(Player* killer, Unit* killed)
 
 bool OutdoorPvP::IsInsideObjective(Player* plr) const
 {
-    for (OPvPCapturePointMap::const_iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        if (itr->second->IsInsideObjective(plr))
+    for (const auto& itr : m_capturePoints)
+        if (itr.second->IsInsideObjective(plr))
             return true;
 
     return false;
@@ -486,8 +486,8 @@ bool OPvPCapturePoint::IsInsideObjective(Player* plr) const
 
 bool OutdoorPvP::HandleCustomSpell(Player* plr, uint32 spellId, GameObject* go)
 {
-    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        if (itr->second->HandleCustomSpell(plr, spellId, go))
+    for (const auto& itr : m_capturePoints)
+        if (itr.second->HandleCustomSpell(plr, spellId, go))
             return true;
 
     return false;
@@ -502,8 +502,8 @@ bool OPvPCapturePoint::HandleCustomSpell(Player* plr, uint32 /*spellId*/, GameOb
 
 bool OutdoorPvP::HandleOpenGo(Player* plr, uint64 guid)
 {
-    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        if (itr->second->HandleOpenGo(plr, guid) >= 0)
+    for (const auto& itr : m_capturePoints)
+        if (itr.second->HandleOpenGo(plr, guid) >= 0)
             return true;
 
     return false;
@@ -511,8 +511,8 @@ bool OutdoorPvP::HandleOpenGo(Player* plr, uint64 guid)
 
 bool OutdoorPvP::HandleGossipOption(Player* plr, uint64 guid, uint32 id)
 {
-    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        if (itr->second->HandleGossipOption(plr, guid, id))
+    for (const auto& itr : m_capturePoints)
+        if (itr.second->HandleGossipOption(plr, guid, id))
             return true;
 
     return false;
@@ -520,8 +520,8 @@ bool OutdoorPvP::HandleGossipOption(Player* plr, uint64 guid, uint32 id)
 
 bool OutdoorPvP::HandleDropFlag(Player* plr, uint32 id)
 {
-    for (OPvPCapturePointMap::iterator itr = m_capturePoints.begin(); itr != m_capturePoints.end(); ++itr)
-        if (itr->second->HandleDropFlag(plr, id))
+    for (const auto& itr : m_capturePoints)
+        if (itr.second->HandleDropFlag(plr, id))
             return true;
 
     return false;
@@ -553,8 +553,8 @@ bool OutdoorPvP::HandleAreaTrigger(Player* /*plr*/, uint32 /*trigger*/)
 void ZoneScript::BroadcastPacket(WorldPacket& data) const
 {
     // This is faster than sWorld.SendZoneMessage
-    for (uint32 team = 0; team < 2; ++team)
-        for (PlayerSet::const_iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
+    for (const auto& playerPerTeam : m_players)
+        for (PlayerSet::const_iterator itr = playerPerTeam.begin(); itr != playerPerTeam.end(); ++itr)
             (*itr)->GetSession()->SendPacket(&data);
 }
 
@@ -571,11 +571,11 @@ bool ZoneScript::HasPlayer(Player* plr) const
 void ZoneScript::TeamCastSpell(TeamId team, int32 spellId)
 {
     if (spellId > 0)
-        for (PlayerSet::iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
-            (*itr)->CastSpell(*itr, (uint32)spellId, true);
+        for (const auto itr : m_players[team])
+            itr->CastSpell(itr, (uint32)spellId, true);
     else
-        for (PlayerSet::iterator itr = m_players[team].begin(); itr != m_players[team].end(); ++itr)
-            (*itr)->RemoveAurasDueToSpell((uint32) - spellId); // by stack?
+        for (const auto itr : m_players[team])
+            itr->RemoveAurasDueToSpell((uint32) - spellId); // by stack?
 }
 
 void ZoneScript::TeamApplyBuff(TeamId team, uint32 spellId, uint32 spellId2)

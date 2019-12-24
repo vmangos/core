@@ -47,7 +47,7 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 ^ Around 7-10sec cooldown. Times she's not casting it for 30+sec she is silenced by worshipper sacrifice.
   Might be fixed 8sec cast, but slightly delayed sometimes due to rain of fire or other reasons.
 */
-static uint32 const POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
+static uint32 POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
 static uint32 const INITIAL_POISONBOLT_VOLLEY_CD = 8000;
 
 /*
@@ -58,7 +58,7 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 
   Initial cd seems to be around 16sec
 */
-static uint32 const RAINOFFIRE_CD() { return urand(8000, 12000); }
+static uint32 RAINOFFIRE_CD() { return urand(8000, 12000); }
 static uint32 const RAINOFFIRE_INITIAL_CD = 16000;
 
 static float const ADD_DESPAWN_TIME = 20000;
@@ -165,21 +165,21 @@ struct boss_faerlinaAI : public ScriptedAI
         switch (pSummoned->GetEntry())
         {
         case MOB_FOLLOWER:
-            for (int i = 0; i < 2; i++)
+            for (auto& follower : followers)
             {
-                if (followers[i] == pSummoned->GetObjectGuid())
+                if (follower == pSummoned->GetObjectGuid())
                 {
-                    followers[i] = 0;
+                    follower = 0;
                     break;
                 }
             }
             break;
         case MOB_WORSHIPPER:
-            for (int i = 0; i < 4; i++)
+            for (auto& worshipper : worshippers)
             {
-                if (worshippers[i] == pSummoned->GetObjectGuid())
+                if (worshipper == pSummoned->GetObjectGuid())
                 {
-                    worshippers[i] = 0;
+                    worshipper = 0;
                     break;
                 }
             }
@@ -201,13 +201,13 @@ struct boss_faerlinaAI : public ScriptedAI
         if (m_pInstance)
             m_pInstance->SetData(TYPE_FAERLINA, IN_PROGRESS);
 
-        for (int i = 0; i < 2; i++) {
-            if (Creature* c = m_pInstance->GetCreature(followers[i]))
+        for (const auto& follower : followers) {
+            if (Creature* c = m_pInstance->GetCreature(follower))
                 c->AI()->AttackStart(pWho);
         }
 
-        for (int i = 0; i < 4; i++) {
-            if (Creature* c = m_pInstance->GetCreature(worshippers[i]))
+        for (const auto& worshipper : worshippers) {
+            if (Creature* c = m_pInstance->GetCreature(worshipper))
                 c->AI()->AttackStart(pWho);
         }
     }

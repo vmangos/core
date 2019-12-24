@@ -270,9 +270,9 @@ struct npc_artoriusAI : public ScriptedAI
             {
                 ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
                 
-                for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
+                for (const auto itr : tList)
                 {
-                    if (Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+                    if (Unit* pUnit = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     {
                         if (pUnit->IsAlive())
                         {

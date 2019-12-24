@@ -68,15 +68,12 @@ enum
     
 };
 
-
-
 static float const CGs[3][4] = 
 {
     { 3291.26f, -3502.08f, 287.26f, 2.14f },
     { 3285.29f, -3446.64f, 287.26f, 4.2f },
     { 3316.46f, -3476.23f, 287.26f, 3.18f } // this third entry is used as spawn loc during fight.
 };
-
 
 static constexpr uint32 CRYPTGUARD_CLEAVE_CD    = 6000;  // Todo: find correct timer
 static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, so 12sec cd makes sense. 
@@ -127,7 +124,7 @@ Watch his stopatch in center of screen.
 Best guess so far is random between 12 and 18 seconds based on this video.
 Timer does not seem to reset after locust swarm, but rather continue from whatever it was when locust started.
 */
-static uint32 const IMPALE_CD() { return urand(12000, 18000); }
+static uint32 IMPALE_CD() { return urand(12000, 18000); }
 
 
 /*
@@ -173,7 +170,7 @@ Watch his stopatch in center of screen.
 Based on those values, 90-110 or something like that does not seem far fetched as a cooldown.
 Cast time is 3 seconds. Duration is 20 seconds.
 */
-static uint32 const LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
+static uint32 LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
 
 
 struct boss_anubrekhanAI : public ScriptedAI
@@ -311,8 +308,10 @@ struct boss_anubrekhanAI : public ScriptedAI
         // Setting in combat with zone and pulling the two crypt-guards
         m_creature->SetInCombatWithZone();
 
-        for (int i = 0; i < summonedCryptGuards.size(); i++) {
-            if (Creature* cg = m_pInstance->GetCreature(summonedCryptGuards[i])) {
+        for (const auto& guid : summonedCryptGuards)
+        {
+            if (Creature* cg = m_pInstance->GetCreature(guid))
+            {
                 cg->AI()->AttackStart(pWho);
                 cg->SetInCombatWithZone();
             }
@@ -342,7 +341,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     
     bool ExplodeOneDeadCryptGuard()
     {
-        if (deadCryptGuards.size() == 0)
+        if (deadCryptGuards.empty())
             return false;
          
         int idx = urand(0, deadCryptGuards.size() - 1);
