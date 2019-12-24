@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20191224190612');
 -- Add your query below.
 
 
-INSERT INTO `spell_mod` (`Id`, `AttributesEx2`, `Comment`) VALUES (26275, 4, 'PX-238 Winter Wondervolt TRAP - Ignore LOS');
+INSERT INTO `spell_mod` (`Id`, `AttributesEx2`, `rangeIndex`, `Comment`) VALUES (26275, 4, 12, 'PX-238 Winter Wondervolt TRAP - Ignore LOS');
 
 
 -- End of migration.
