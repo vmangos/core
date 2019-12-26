@@ -4832,8 +4832,8 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     // check presence
                     for (uint32 spell : spells)
-                        if (unitTarget->HasAura(spell, EFFECT_INDEX_0))
-                            return;
+                        if (unitTarget->HasAura(spell))
+                            unitTarget->RemoveAurasDueToSpellByCancel(spell);
 
                     unitTarget->CastSpell(unitTarget, spells[urand(0, 3)], true);
                     return;
