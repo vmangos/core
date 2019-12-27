@@ -74,7 +74,6 @@
 #include "CreatureGroups.h"
 #include "MoveMap.h"
 #include "SpellModMgr.h"
-#include "NodesMgr.h"
 #include "Anticheat.h"
 #include "MovementBroadcaster.h"
 #include "HonorMgr.h"
@@ -269,16 +268,13 @@ void World::AddSession_(WorldSession* s)
         return;
     }
 
-    if (!s->GetMasterSession())
-    {
-        // Checked for 1.12.2
-        WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4);
-        packet << uint8(AUTH_OK);
-        packet << uint32(0);                                    // BillingTimeRemaining
-        packet << uint8(0);                                     // BillingPlanFlags
-        packet << uint32(0);                                    // BillingTimeRested
-        s->SendPacket(&packet);
-    }
+    // Checked for 1.12.2
+    WorldPacket packet(SMSG_AUTH_RESPONSE, 1 + 4 + 1 + 4);
+    packet << uint8(AUTH_OK);
+    packet << uint32(0);                                    // BillingTimeRemaining
+    packet << uint8(0);                                     // BillingPlanFlags
+    packet << uint32(0);                                    // BillingTimeRested
+    s->SendPacket(&packet);
 
     UpdateMaxSessionCounters();
 
@@ -857,7 +853,6 @@ void World::LoadConfigSettings(bool reload)
     sLog.outString("WORLD: VMap data directory is: %svmaps", m_dataPath.c_str());
     setConfig(CONFIG_BOOL_MMAP_ENABLED, "mmap.enabled", true);
     sLog.outString("WORLD: mmap pathfinding %sabled", getConfig(CONFIG_BOOL_MMAP_ENABLED) ? "en" : "dis");
-    setConfig(CONFIG_BOOL_IS_MAPSERVER, "IsMapServer", false);
 
     setConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME, "MapUpdate.Empty.UpdateTime", 0);
     setConfigMinMax(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS, "MapUpdate.ObjectsUpdate.MaxThreads", 4, 1, 20);
@@ -1193,7 +1188,6 @@ void World::SetInitialWorldSettings()
 
     ///- Initialize config settings
     LoadConfigSettings();
-    bool isMapServer = getConfig(CONFIG_BOOL_IS_MAPSERVER);
 
     ///- Check the existence of the map files for all races start areas.
     if (!MapManager::ExistMapAndVMap(0, -6240.32f, 331.033f) ||
@@ -1240,11 +1234,8 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading GM security access ...");
     sAccountMgr.Load();
 
-    if (!isMapServer)
-    {
-        ///- Remove the bones (they should not exist in DB though) and old corpses after a restart
-        CharacterDatabase.PExecute("DELETE FROM corpse WHERE corpse_type = '0' OR time < (UNIX_TIMESTAMP()-'%u')", 3 * DAY);
-    }
+    ///- Remove the bones (they should not exist in DB though) and old corpses after a restart
+    CharacterDatabase.PExecute("DELETE FROM corpse WHERE corpse_type = '0' OR time < (UNIX_TIMESTAMP()-'%u')", 3 * DAY);
 
     sLog.outString("Loading spells ...");
     sSpellMgr.LoadSpells();
@@ -1304,21 +1295,18 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading SkillRaceClassInfoMultiMap Data...");
     sSpellMgr.LoadSkillRaceClassInfoMap();
 
-    if (!isMapServer)
-    {
-        ///- Clean up and pack instances
-        sLog.outString("Cleaning up instances...");
-        sMapPersistentStateMgr.CleanupInstances();              // must be called before `creature_respawn`/`gameobject_respawn` tables
+    ///- Clean up and pack instances
+    sLog.outString("Cleaning up instances...");
+    sMapPersistentStateMgr.CleanupInstances();              // must be called before `creature_respawn`/`gameobject_respawn` tables
 
-        sLog.outString("Packing instances...");
-        sMapPersistentStateMgr.PackInstances();
+    sLog.outString("Packing instances...");
+    sMapPersistentStateMgr.PackInstances();
 
-        sLog.outString("Packing groups...");
-        sObjectMgr.PackGroupIds();                              // must be after CleanupInstances
+    sLog.outString("Packing groups...");
+    sObjectMgr.PackGroupIds();                              // must be after CleanupInstances
 
-        sLog.outString("Scheduling normal instance reset...");
-        sMapPersistentStateMgr.ScheduleInstanceResets();        // Must be after cleanup and packing
-    }
+    sLog.outString("Scheduling normal instance reset...");
+    sMapPersistentStateMgr.ScheduleInstanceResets();        // Must be after cleanup and packing
 
     ///- Init highest guids before any guid using table loading to prevent using not initialized guids in some code.
     sObjectMgr.SetHighestGuids();                           // must be after packing instances
@@ -1333,11 +1321,8 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading Game Object Templates...");     // must be after LoadPageTexts
     sObjectMgr.LoadGameobjectInfo();
 
-    if (!isMapServer)
-    {
-        sLog.outString("Loading Transport templates...");
-        sTransportMgr->LoadTransportTemplates();
-    }
+    sLog.outString("Loading Transport templates...");
+    sTransportMgr->LoadTransportTemplates();
 
     sLog.outString("Loading Spell Chain Data...");
     sSpellMgr.LoadSpellChains();
@@ -1515,25 +1500,19 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading Pet Name Parts...");
     sObjectMgr.LoadPetNames();
 
-    if (!isMapServer)
-    {
-        CharacterDatabaseCleaner::CleanDatabase();
+    CharacterDatabaseCleaner::CleanDatabase();
 
-        sLog.outString("Loading character cache data...");
-        sObjectMgr.LoadPlayerCacheData();
+    sLog.outString("Loading character cache data...");
+    sObjectMgr.LoadPlayerCacheData();
 
-        sLog.outString("Loading the max pet number...");
-        sObjectMgr.LoadPetNumber();
-    }
+    sLog.outString("Loading the max pet number...");
+    sObjectMgr.LoadPetNumber();
 
     sLog.outString("Loading pet level stats...");
     sObjectMgr.LoadPetLevelInfo();
 
-    if (!isMapServer)
-    {
-        sLog.outString("Loading Player Corpses...");
-        sObjectMgr.LoadCorpses();
-    }
+    sLog.outString("Loading Player Corpses...");
+    sObjectMgr.LoadCorpses();
 
     sLog.outString("Loading Loot Tables...");
     sLog.outString();
@@ -1586,28 +1565,25 @@ void World::SetInitialWorldSettings()
     sLog.outString();
 
     ///- Load dynamic data tables from the database
-    if (!isMapServer)
-    {
-        sLog.outString("Loading Auctions...");
-        sLog.outString();
-        sAuctionMgr.LoadAuctionHouses();
-        sAuctionMgr.LoadAuctionItems();
-        sAuctionMgr.LoadAuctions();
-        sLog.outString(">>> Auctions loaded");
-        sLog.outString();
+    sLog.outString("Loading Auctions...");
+    sLog.outString();
+    sAuctionMgr.LoadAuctionHouses();
+    sAuctionMgr.LoadAuctionItems();
+    sAuctionMgr.LoadAuctions();
+    sLog.outString(">>> Auctions loaded");
+    sLog.outString();
 
-        sLog.outString("Loading Guilds...");
-        sGuildMgr.LoadGuilds();
+    sLog.outString("Loading Guilds...");
+    sGuildMgr.LoadGuilds();
 
-        sLog.outString("Loading Petitions...");
-        sGuildMgr.LoadPetitions();
+    sLog.outString("Loading Petitions...");
+    sGuildMgr.LoadPetitions();
 
-        sLog.outString("Loading Groups...");
-        sObjectMgr.LoadGroups();
+    sLog.outString("Loading Groups...");
+    sObjectMgr.LoadGroups();
 
-        sLog.outString("Loading ReservedNames...");
-        sObjectMgr.LoadReservedPlayersNames();
-    }
+    sLog.outString("Loading ReservedNames...");
+    sObjectMgr.LoadReservedPlayersNames();
 
     sLog.outString("Loading GameObjects for quests...");
     sObjectMgr.LoadGameObjectForQuests();
@@ -1624,17 +1600,14 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading Taxi path transitions...");
     sObjectMgr.LoadTaxiPathTransitions();
 
-    if (!isMapServer)
-    {
-        sLog.outString("Loading GM tickets and surveys...");
-        sTicketMgr->Initialize();
-        sTicketMgr->LoadTickets();
-        sTicketMgr->LoadSurveys();
+    sLog.outString("Loading GM tickets and surveys...");
+    sTicketMgr->Initialize();
+    sTicketMgr->LoadTickets();
+    sTicketMgr->LoadSurveys();
 
-        ///- Handle outdated emails (delete/return)
-        sLog.outString("Returning old mails...");
-        sObjectMgr.ReturnOrDeleteOldMails(false);
-    }
+    ///- Handle outdated emails (delete/return)
+    sLog.outString("Returning old mails...");
+    sObjectMgr.ReturnOrDeleteOldMails(false);
 
     ///- Load and initialize scripts
     sLog.outString("Loading Scripts...");
@@ -1680,8 +1653,8 @@ void World::SetInitialWorldSettings()
     LoginDatabase.PExecute("INSERT INTO uptime (realmid, starttime, startstring, uptime) VALUES('%u', " UI64FMTD ", '%s', 0)",
                            realmID, uint64(m_startTime), isoDate);
 
-    if (!isMapServer)
-        m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
+
+    m_timers[WUPDATE_AUCTIONS].SetInterval(MINUTE * IN_MILLISECONDS);
     m_timers[WUPDATE_UPTIME].SetInterval(getConfig(CONFIG_UINT32_UPTIME_UPDATE)*MINUTE * IN_MILLISECONDS);
     //Update "uptime" table based on configuration entry in minutes.
     m_timers[WUPDATE_CORPSES].SetInterval(20 * MINUTE * IN_MILLISECONDS);
@@ -1709,17 +1682,14 @@ void World::SetInitialWorldSettings()
     sZoneScriptMgr.InitZoneScripts();
 
     //Not sure if this can be moved up in the sequence (with static data loading) as it uses MapManager
-    if (!isMapServer)
-    {
-        sLog.outString("Loading Transports...");
-        sTransportMgr->SpawnContinentTransports();
+    sLog.outString("Loading Transports...");
+    sTransportMgr->SpawnContinentTransports();
 
-        sLog.outString("Deleting expired bans...");
-        LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
+    sLog.outString("Deleting expired bans...");
+    LoginDatabase.Execute("DELETE FROM ip_banned WHERE unbandate<=UNIX_TIMESTAMP() AND unbandate<>bandate");
 
-        sHonorMaintenancer.Initialize();
-        sHonorMaintenancer.DoMaintenance();
-    }
+    sHonorMaintenancer.Initialize();
+    sHonorMaintenancer.DoMaintenance();
 
     sLog.outString("Starting Game Event system...");
     uint32 nextGameEvent = sGameEventMgr.Initialize();
@@ -1732,31 +1702,28 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading anticheat library");
     sAnticheatLib->LoadAnticheatData();
 
-    if (!isMapServer)
-    {
-        sLog.outString("Loading auto broadcast");
-        sAutoBroadCastMgr.load();
+    sLog.outString("Loading auto broadcast");
+    sAutoBroadCastMgr.load();
 
-        sLog.outString("Loading AH bot");
-        sAuctionHouseBotMgr.Load();
+    sLog.outString("Loading AH bot");
+    sAuctionHouseBotMgr.Load();
 
-        sLog.outString("Caching player phases (obsolete)");
-        sObjectMgr.LoadPlayerPhaseFromDb();
+    sLog.outString("Caching player phases (obsolete)");
+    sObjectMgr.LoadPlayerPhaseFromDb();
 
-        sLog.outString("Caching player pets ...");
-        sCharacterDatabaseCache.LoadAll();
+    sLog.outString("Caching player pets ...");
+    sCharacterDatabaseCache.LoadAll();
 
-        sLog.outString("Loading PlayerBot ..."); // Requires Players cache
-        sPlayerBotMgr.load();
+    sLog.outString("Loading PlayerBot ..."); // Requires Players cache
+    sPlayerBotMgr.load();
 
-        sLog.outString();
-        sLog.outString("Loading faction change ...");
-        sObjectMgr.LoadFactionChangeReputations();
-        sObjectMgr.LoadFactionChangeSpells();
-        sObjectMgr.LoadFactionChangeItems();
-        sObjectMgr.LoadFactionChangeQuests();
-        sObjectMgr.LoadFactionChangeMounts();
-    }
+    sLog.outString();
+    sLog.outString("Loading faction change ...");
+    sObjectMgr.LoadFactionChangeReputations();
+    sObjectMgr.LoadFactionChangeSpells();
+    sObjectMgr.LoadFactionChangeItems();
+    sObjectMgr.LoadFactionChangeQuests();
+    sObjectMgr.LoadFactionChangeMounts();
 
     sLog.outString("Loading loot-disabled map list");
     sObjectMgr.LoadMapLootDisabled();
@@ -1782,8 +1749,7 @@ void World::SetInitialWorldSettings()
         std::make_unique<MovementBroadcaster>(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
 
-    if (!isMapServer)
-        m_charDbWorkerThread = new ACE_Based::Thread(new CharactersDatabaseWorkerThread());
+    m_charDbWorkerThread = new ACE_Based::Thread(new CharactersDatabaseWorkerThread());
 
     sLog.outString();
     sLog.outString("==========================================================");
@@ -1792,7 +1758,7 @@ void World::SetInitialWorldSettings()
     sLog.outString("==========================================================");
     sLog.outString();
 
-    sLog.outString("%s initialized.", isMapServer ? "Node" : "World");
+    sLog.outString("World initialized.");
 
     uint32 uStartInterval = WorldTimer::getMSTimeDiff(uStartTime, WorldTimer::getMSTime());
     sLog.outString("SERVER STARTUP TIME: %i minutes %i seconds", uStartInterval / 60000, (uStartInterval % 60000) / 1000);
@@ -1918,7 +1884,6 @@ void World::Update(uint32 diff)
     sGuardMgr.Update(diff);
     sZoneScriptMgr.Update(diff);
     sAutoTestingMgr->Update(diff);
-    sNodesMgr->OnWorldUpdate(diff);
 
     ///- Update groups with offline leaders
     if (m_timers[WUPDATE_GROUPS].Passed())

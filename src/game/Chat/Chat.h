@@ -151,7 +151,7 @@ class MANGOS_DLL_SPEC ChatHandler
             ObjectGuid const& targetGuid = ObjectGuid(), char const* targetName = nullptr,
             char const* channelName = nullptr, uint8 playerRank = 0);
     protected:
-        explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false), m_cluster_is_node(true), m_cluster_is_master(true) {}      // for CLI subclass
+        explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false) {}      // for CLI subclass
 
         bool hasStringAbbr(char const* name, char const* part);
 
@@ -168,9 +168,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
 
         void SendGlobalSysMessage(char const* str);
-
-        void ForwardCommandToNode();
-        void ForwardCommandToMaster();
 
         bool SetDataForCommandInTable(ChatCommand *table, char const* text, uint8 security, std::string const& help, uint8 flags);
         void ExecuteCommand(char const* text);
@@ -868,9 +865,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleChangeWeatherCommand(char* args);
         bool HandleKickPlayerCommand(char* args);
 
-        bool HandleNodeServersListCommand(char* args);
-        bool HandleNodeServersSwitchCommand(char* args);
-
         // GM Tickets commands
         bool ViewTicketByIdOrName(char* ticketId, char* name);
         bool ViewTicket(GmTicket* ticket);
@@ -1009,9 +1003,6 @@ class MANGOS_DLL_SPEC ChatHandler
         // common global flag
         static bool load_command_table;
         bool sentErrorMessage;
-
-        bool m_cluster_is_node;
-        bool m_cluster_is_master;
 };
 
 class CliHandler : public ChatHandler

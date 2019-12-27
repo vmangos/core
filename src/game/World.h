@@ -33,7 +33,7 @@
 #include "ace/Atomic_Op.h"
 #include "Commands/Nostalrius.h"
 #include "ObjectGuid.h"
-#include "MapNodes/AbstractPlayer.h"
+#include "Chat/AbstractPlayer.h"
 #include "WorldPacket.h"
 
 #include <map>
@@ -449,7 +449,6 @@ enum eConfigBoolValues
 {
     CONFIG_BOOL_GRID_UNLOAD = 0,
     CONFIG_BOOL_OBJECT_HEALTH_VALUE_SHOW,
-    CONFIG_BOOL_IS_MAPSERVER,
     CONFIG_BOOL_GMS_ALLOW_PUBLIC_CHANNELS,
     CONFIG_BOOL_GMTICKETS_ENABLE,
     CONFIG_BOOL_TAG_IN_BATTLEGROUNDS,

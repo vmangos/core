@@ -76,7 +76,6 @@
 #include "AccountMgr.h"
 #include "MoveSpline.h"
 #include "Anticheat.h"
-#include "NodeSession.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
 #include "GameEventMgr.h"
@@ -20581,7 +20580,6 @@ uint32 GetCapitalReputationForRace(uint8 race)
 
 bool Player::ConvertSpell(uint32 oldSpellId, uint32 newSpellId)
 {
-    ASSERT(GetSession()->IsMaster());
     // Conversion des boutons d'actions
     ActionButtonList& actions = GetSession()->GetMasterPlayer()->GetActionButtons();
     for (auto& action : actions)

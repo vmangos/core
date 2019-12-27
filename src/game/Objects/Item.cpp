@@ -999,10 +999,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player)
 
         Item* pItem = NewItemOrBag(pProto);
         uint32 lowGuid = 0;
-        if (player)
-            lowGuid = player->GetSession()->GenerateItemLowGuid();
-        else
-            lowGuid = sObjectMgr.GenerateItemLowGuid();
+        lowGuid = sObjectMgr.GenerateItemLowGuid();
 
         if (pItem->Create(lowGuid, item, player ? player->GetObjectGuid() : ObjectGuid()))
         {

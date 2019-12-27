@@ -26,8 +26,6 @@
 #include "ItemPrototype.h"
 #include "Unit.h"
 #include "Item.h"
-#include "MapNodes/AbstractPlayer.h"
-
 #include "Database/DatabaseEnv.h"
 #include "NPCHandler.h"
 #include "QuestDef.h"
@@ -2472,44 +2470,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
         static uint32 GetRankFromDB(ObjectGuid guid);
         int GetGuildIdInvited() { return m_GuildIdInvited; }
         static void RemovePetitionsAndSigns(ObjectGuid guid);
-
-        /*********************************************************/
-        /***                       OTHER                       ***/
-        /*********************************************************/
-
-    public:
-        /**
-         * @brief Handles serialization / unserialization of the Object.
-         * Should not be called directly. Cf Serializer.h
-         * @param buf
-         */
-        template <typename OP>
-        void Serialize(OP& buf);
-        /**
-         * @brief Call this before reading unserialization
-         * @return false iif the player is corrupt.
-         */
-        bool PrepareWakeUp(ObjectGuid guid);
-        /**
-         * @brief Call this once unserialized to get a proper Player (add to Map, etc ...)
-         * @return false iif the player is corrupt.
-         */
-        bool WakeUp();
-    protected:
-        template <typename OP>
-        void SerializeAuras(OP& buf);
-        template <typename OP>
-        void SerializeInventory(OP& buf);
-        template <typename OP>
-        void SerializeItemLoot(OP& buf);
-        template <typename OP>
-        void SerializeQuestStatus(OP& buf);
-        template <typename OP>
-        void SerializeSkills(OP& buf);
-        template <typename OP>
-        void SerializeSpells(OP& buf);
-        template <typename OP>
-        void SerializeSpellCooldowns(OP& buf);
 };
 
 void AddItemsSetItem(Player*player,Item* item);

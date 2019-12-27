@@ -362,25 +362,6 @@ class MANGOS_DLL_SPEC Item : public Object
         int16 uQueuePos;
         bool mb_in_trade;                                   // true if item is currently in trade-window
         ItemLootUpdateState m_lootState;
-
-    public:
-        /**
-         * @brief Handles serialization / unserialization of the Object.
-         * Should not be called directly. Cf Serializer.h
-         * @param buf
-         */
-        template <typename OP>
-        void Serialize(OP& buf);
-        /**
-         * @brief Call this before reading unserialization
-         * @return false iif the Item is corrupt.
-         */
-        virtual bool PrepareWakeUp(uint32 low_guid, ItemPrototype const* proto, Player const* owner);
-        /**
-         * @brief Call this once unserialized to get a proper Player (add to Map, etc ...)
-         * @return false iif the Item is corrupt.
-         */
-        bool WakeUp();
 };
 
 #endif

@@ -36,8 +36,8 @@
 #include "Player.h"
 #include "Corpse.h"
 #include "Transport.h"
-#include "MapNodes/MasterPlayer.h"
-#include "MapNodes/AbstractPlayer.h"
+#include "Chat/MasterPlayer.h"
+#include "Chat/AbstractPlayer.h"
 
 #include <set>
 #include <list>

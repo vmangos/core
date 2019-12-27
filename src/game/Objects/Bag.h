@@ -64,13 +64,6 @@ class Bag : public Item
         void DeleteFromDB() override;
 
         void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const override;
-
-        /**
-         * @brief Call this before reading unserialization
-         * @return false iif the Item is corrupt.
-         */
-        bool PrepareWakeUp(uint32 low_guid, ItemPrototype const* proto, Player const* owner) override;
-
     protected:
 
         // Bag Storage space

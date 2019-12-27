@@ -946,12 +946,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "appendln",       SEC_TICKETMASTER,   true,  &ChatHandler::HandleGMTicketResponseAppendLnCommand, "", nullptr },
         { MSTR, nullptr,          0,                  false, nullptr,                                             "", nullptr }
     };
-    static ChatCommand nodeServersCommandTable[] =
-    {
-        { NODE, "list",          SEC_ADMINISTRATOR,   true,  &ChatHandler::HandleNodeServersListCommand,          "", nullptr },
-        { NODE, "switch",        SEC_ADMINISTRATOR,   true,  &ChatHandler::HandleNodeServersSwitchCommand,        "", nullptr },
-        { MSTR, nullptr,         0,                   false, nullptr,                                             "", nullptr }
-    };
     static ChatCommand ticketCommandTable[] =
     {
         { NODE, "assign",        SEC_TICKETMASTER,  true,  &ChatHandler::HandleGMTicketAssignToCommand,         "", nullptr },
@@ -1131,7 +1125,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "groupspell",     SEC_ADMINISTRATOR,  true, nullptr,                                         "", groupSpellCommandTable},
         { NODE, "pet",            SEC_GAMEMASTER,     true, nullptr,                                         "", petCommandTable},
         { NODE, "channel",        SEC_MODERATOR,      false, nullptr,                                        "", channelCommandTable},
-        { NODE, "nodes",          SEC_ADMINISTRATOR,  true, nullptr,                                         "", nodeServersCommandTable},
         { MSTR, "runtest",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleRunTestCommand,             "", nullptr },
         { MSTR, "log",            SEC_GAMEMASTER,     true,  &ChatHandler::HandleViewLogCommand,             "", nullptr },
         { MSTR, "spamer",         SEC_MODERATOR,      true, nullptr,                                         "", spamerCommandTable },
@@ -1168,14 +1161,8 @@ ChatCommand * ChatHandler::getCommandTable()
 }
 
 ChatHandler::ChatHandler(WorldSession* session) :
-    m_session(session), sentErrorMessage(false),
-    m_cluster_is_node(true), m_cluster_is_master(true)
+    m_session(session), sentErrorMessage(false)
 {
-    if (session)
-    {
-        m_cluster_is_master = session->IsMaster();
-        m_cluster_is_node = session->IsNode();
-    }
 }
 
 ChatHandler::ChatHandler(Player* player) : ChatHandler(player->GetSession()) {}
@@ -1583,11 +1570,6 @@ void ChatHandler::ExecuteCommand(char const* text)
         case CHAT_COMMAND_OK:
         {
             std::string realCommandFull = command->FullName;
-
-            if (command->server == NODE)
-                ForwardCommandToNode();
-            else if (command->server == MSTR)
-                ForwardCommandToMaster();
 
             if (text[0])
             {
@@ -3712,18 +3694,6 @@ std::string ChatHandler::PrepareStringNpcOrGoSpawnInformation(uint32 guid)
     }
 
     return str;
-}
-
-void ChatHandler::ForwardCommandToNode()
-{
-    if (!m_cluster_is_node)
-        throw ForwardToNode_Exception();
-}
-
-void ChatHandler::ForwardCommandToMaster()
-{
-    if (!m_cluster_is_master)
-        throw ForwardToMaster_Exception();
 }
 
 // Instantiate template for helper function
