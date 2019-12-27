@@ -998,8 +998,7 @@ Item* Item::CreateItem(uint32 item, uint32 count, Player const* player)
         MANGOS_ASSERT(count != 0 && "pProto->Stackable == 0 but checked at loading already");
 
         Item* pItem = NewItemOrBag(pProto);
-        uint32 lowGuid = 0;
-        lowGuid = sObjectMgr.GenerateItemLowGuid();
+        uint32 lowGuid = sObjectMgr.GenerateItemLowGuid();
 
         if (pItem->Create(lowGuid, item, player ? player->GetObjectGuid() : ObjectGuid()))
         {
