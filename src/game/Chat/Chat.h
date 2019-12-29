@@ -55,16 +55,9 @@ enum CommandFlags
     COMMAND_FLAGS_CRITICAL          = 0x2,
 };
 
-enum CommandServer
-{
-    NODE,
-    MSTR,
-};
-
 class ChatCommand
 {
 public:
-        CommandServer      server;
         char const*        Name;
         uint8              SecurityLevel;                   // function pointer required correct align (use uint32)
         bool               AllowConsole;
