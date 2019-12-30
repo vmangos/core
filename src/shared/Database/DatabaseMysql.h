@@ -96,7 +96,7 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
         bool _TransactionCmd(char const* sql);
         bool _Query(char const* sql, MYSQL_RES** pResult, MYSQL_FIELD** pFields, uint64* pRowCount, uint32* pFieldCount);
 
-        MYSQL *mMysql;
+        MYSQL* mMysql;
 };
 
 class MANGOS_DLL_SPEC DatabaseMysql : public Database

@@ -2002,7 +2002,8 @@ bool Pet::AddSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpe
     {
         for (const auto& itr : m_petSpells)
         {
-            if (itr.second.state == PETSPELL_REMOVED) continue;
+            if (itr.second.state == PETSPELL_REMOVED)
+                continue;
 
             if (sSpellMgr.IsRankSpellDueToSpell(spellInfo, itr.first))
             {

@@ -260,7 +260,7 @@ bool
 Database::DelayQueryHolderUnsafe(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder* holder)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    MaNGOS::QueryCallback<Class, SqlQueryHolder*> *cb = new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, (QueryResult*)nullptr, holder);
+    MaNGOS::QueryCallback<Class, SqlQueryHolder*>* cb = new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, (QueryResult*)nullptr, holder);
     cb->threadSafe = false;
     return holder->Execute(cb, this, m_pResultQueue);
 }
@@ -286,7 +286,7 @@ bool
 Database::DelayQueryHolderUnsafe(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
-    MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1> *cb = new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, (QueryResult*)nullptr, holder, param1);
+    MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>* cb = new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, (QueryResult*)nullptr, holder, param1);
     cb->threadSafe = false;
     return holder->Execute(cb, this, m_pResultQueue);
 }
