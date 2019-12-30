@@ -89,13 +89,13 @@ namespace ACE_Based
             static void Sleep(unsigned long msecs);
             static ACE_thread_t currentId();
             static ACE_hthread_t currentHandle();
-            static Thread * current();
+            static Thread* current();
 
         private:
-            Thread(const Thread&);
-            Thread& operator=(const Thread&);
+            Thread(Thread const&);
+            Thread& operator=(Thread const&);
 
-            static ACE_THR_FUNC_RETURN ThreadTask(void * param);
+            static ACE_THR_FUNC_RETURN ThreadTask(void* param);
 
             ACE_thread_t m_iThreadId;
             ACE_hthread_t m_hThreadHandle;

@@ -66,7 +66,7 @@ bool WinServiceInstall()
     }
 
     char path[_MAX_PATH + 10];
-    if (!GetModuleFileName( 0, path, sizeof(path)/sizeof(path[0])))
+    if (!GetModuleFileName(0, path, sizeof(path)/sizeof(path[0])))
     {
         CloseServiceHandle(serviceControlManager);
         sLog.outError("SERVICE: Can't get service binary filename.");
@@ -200,7 +200,7 @@ void WINAPI ServiceControlHandler(DWORD controlCode)
             break;
 
         default:
-            if ( controlCode >= 128 && controlCode <= 255 )
+            if (controlCode >= 128 && controlCode <= 255)
                 // user defined control code
                 break;
             else
@@ -224,7 +224,7 @@ void WINAPI ServiceMain(DWORD argc, char *argv[])
 
     serviceStatusHandle = RegisterServiceCtrlHandler(serviceName, ServiceControlHandler);
 
-    if ( serviceStatusHandle )
+    if (serviceStatusHandle)
     {
         char path[_MAX_PATH + 1];
         unsigned int i, last_slash = 0;
@@ -248,7 +248,7 @@ void WINAPI ServiceMain(DWORD argc, char *argv[])
         // running
         serviceStatus.dwControlsAccepted |= (SERVICE_ACCEPT_STOP | SERVICE_ACCEPT_SHUTDOWN);
         serviceStatus.dwCurrentState = SERVICE_RUNNING;
-        SetServiceStatus( serviceStatusHandle, &serviceStatus );
+        SetServiceStatus(serviceStatusHandle, &serviceStatus);
 
         ////////////////////////
         // service main cycle //

@@ -41,28 +41,28 @@
 class MANGOS_DLL_SPEC MySqlPreparedStatement : public SqlPreparedStatement
 {
 public:
-    MySqlPreparedStatement(const std::string& fmt, SqlConnection& conn, MYSQL * mysql);
+    MySqlPreparedStatement(std::string const& fmt, SqlConnection& conn, MYSQL* mysql);
     ~MySqlPreparedStatement() override;
 
     //prepare statement
     bool prepare() override;
 
     //bind input parameters
-    void bind(const SqlStmtParameters& holder) override;
+    void bind(SqlStmtParameters const& holder) override;
 
     //execute DML statement
     bool execute() override;
 
 protected:
     //bind parameters
-    void addParam(int nIndex, const SqlStmtFieldData& data);
+    void addParam(int nIndex, SqlStmtFieldData const& data);
 
-    static enum_field_types ToMySQLType( const SqlStmtFieldData &data, my_bool &bUnsigned );
+    static enum_field_types ToMySQLType(SqlStmtFieldData const& data, my_bool& bUnsigned);
 
 private:
     void RemoveBinds();
 
-    MYSQL * m_pMySQLConn;
+    MYSQL* m_pMySQLConn;
     MYSQL_STMT * m_stmt;
     MYSQL_BIND * m_pInputArgs;
     MYSQL_BIND * m_pResult;
@@ -79,22 +79,22 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
         bool Reconnect();
         bool HandleMySQLError(uint32 errNo);
 
-        QueryResult* Query(const char *sql) override;
-        QueryNamedResult* QueryNamed(const char *sql) override;
-        bool Execute(const char *sql) override;
+        QueryResult* Query(char const* sql) override;
+        QueryNamedResult* QueryNamed(char const* sql) override;
+        bool Execute(char const* sql) override;
 
-        unsigned long escape_string(char *to, const char *from, unsigned long length) override;
+        unsigned long escape_string(char *to, char const* from, unsigned long length) override;
 
         bool BeginTransaction() override;
         bool CommitTransaction() override;
         bool RollbackTransaction() override;
 
     protected:
-        SqlPreparedStatement * CreateStatement(const std::string& fmt) override;
+        SqlPreparedStatement * CreateStatement(std::string const& fmt) override;
 
     private:
-        bool _TransactionCmd(const char *sql);
-        bool _Query(const char *sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount);
+        bool _TransactionCmd(char const* sql);
+        bool _Query(char const* sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount);
 
         MYSQL *mMysql;
 };
@@ -116,7 +116,7 @@ class MANGOS_DLL_SPEC DatabaseMysql : public Database
         void ThreadEnd() override;
 
     protected:
-        SqlConnection * CreateConnection() override;
+        SqlConnection* CreateConnection() override;
 
     private:
         static size_t db_count;

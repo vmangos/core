@@ -32,12 +32,12 @@ public:
     static uint32 getMSTime();
 
     //get time difference between two timestamps
-    static uint32 getMSTimeDiff(const uint32& oldMSTime, const uint32& newMSTime)
+    static uint32 getMSTimeDiff(uint32 const& oldMSTime, uint32 const& newMSTime)
     {
         if (oldMSTime > newMSTime)
         {
-            const uint32 diff_1 = (uint32(0xFFFFFFFF) - oldMSTime) + newMSTime;
-            const uint32 diff_2 = oldMSTime - newMSTime;
+            uint32 const diff_1 = (uint32(0xFFFFFFFF) - oldMSTime) + newMSTime;
+            uint32 const diff_2 = oldMSTime - newMSTime;
 
             return std::min(diff_1, diff_2);
         }
@@ -55,7 +55,7 @@ public:
 
 private:
     WorldTimer();
-    WorldTimer(const WorldTimer& );
+    WorldTimer(WorldTimer const&);
 
     //analogue to getMSTime() but it persists m_SystemTickTime
     static uint32 getMSTime_internal(bool savetime = false);

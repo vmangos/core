@@ -51,7 +51,7 @@ ThreadPriority::ThreadPriority()
 
     if(_tmp.size() >= MAXPRIORITYNUM)
     {
-        const size_t max_pos = _tmp.size();
+        size_t const max_pos = _tmp.size();
         size_t min_pos = 1;
         size_t norm_pos = 0;
         for (size_t i = 0; i < max_pos; ++i)
@@ -67,7 +67,7 @@ ThreadPriority::ThreadPriority()
         //and 3 we know already (Idle, Normal, Realtime) so
         //we need to split each list [Idle...Normal] and [Normal...Realtime]
         //into pieces
-        const size_t _divider = 4;
+        size_t const _divider = 4;
         size_t _div = (norm_pos - min_pos) / _divider;
         if(_div == 0)
             _div = 1;
@@ -187,7 +187,7 @@ void Thread::resume()
     ACE_Thread::resume(m_hThreadHandle);
 }
 
-ACE_THR_FUNC_RETURN Thread::ThreadTask(void * param)
+ACE_THR_FUNC_RETURN Thread::ThreadTask(void* param)
 {
     unsigned int seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     srand(seed);
@@ -216,16 +216,16 @@ ACE_hthread_t Thread::currentHandle()
     return _handle;
 }
 
-Thread * Thread::current()
+Thread* Thread::current()
 {
-    Thread * _thread = m_ThreadStorage.ts_object();
+    Thread* _thread = m_ThreadStorage.ts_object();
     if(!_thread)
     {
         _thread = new Thread();
         _thread->m_iThreadId = Thread::currentId();
         _thread->m_hThreadHandle = Thread::currentHandle();
 
-        Thread * _oldValue = m_ThreadStorage.ts_object(_thread);
+        Thread* _oldValue = m_ThreadStorage.ts_object(_thread);
         delete _oldValue;
     }
 

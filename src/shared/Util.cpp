@@ -32,7 +32,7 @@ typedef ACE_TSS<MTRand> MTRandTSS;
 static MTRandTSS mtRand;
 
 
-Tokenizer::Tokenizer(const std::string &src, const char sep, uint32 vectorReserve)
+Tokenizer::Tokenizer(std::string const& src, char const sep, uint32 vectorReserve)
 {
     m_str = new char[src.length() + 1];
     memcpy(m_str, src.c_str(), src.length() + 1);
@@ -94,7 +94,7 @@ uint32 WorldTimer::getMSTime()
 uint32 WorldTimer::getMSTime_internal(bool /*savetime*/ /*= false*/)
 {
     //get current time
-    const ACE_Time_Value currTime = ACE_OS::gettimeofday();
+    ACE_Time_Value const currTime = ACE_OS::gettimeofday();
     //calculate time diff between two world ticks
     //special case: curr_time < old_time - we suppose that our time has not ticked at all
     //this should be constant value otherwise it is possible that our time can start ticking backwards until next world tick!!!
@@ -155,7 +155,7 @@ Milliseconds randtime(Milliseconds const& min, Milliseconds const& max)
     return min + Milliseconds(urand(0, diff));
 }
 
-Tokens StrSplit(const std::string &src, const std::string &sep)
+Tokens StrSplit(std::string const& src, std::string const& sep)
 {
     Tokens r;
     std::string s;
@@ -278,13 +278,13 @@ std::string secsToTimeString(time_t timeInSecs, bool shortText, bool hoursOnly)
     return ss.str();
 }
 
-uint32 TimeStringToSecs(const std::string& timestring)
+uint32 TimeStringToSecs(std::string const& timestring)
 {
     uint32 secs       = 0;
     uint32 buffer     = 0;
     uint32 multiplier = 0;
 
-    for(std::string::const_iterator itr = timestring.begin(); itr != timestring.end(); itr++ )
+    for(std::string::const_iterator itr = timestring.begin(); itr != timestring.end(); itr++)
     {
         if(isdigit(*itr))
         {
@@ -336,9 +336,9 @@ bool IsIPAddress(char const* ipaddress)
 }
 
 /// create PID file
-uint32 CreatePIDFile(const std::string& filename)
+uint32 CreatePIDFile(std::string const& filename)
 {
-    FILE* pid_file = fopen (filename.c_str(), "w" );
+    FILE* pid_file = fopen (filename.c_str(), "w");
     if (pid_file == nullptr)
         return 0;
 
@@ -348,7 +348,7 @@ uint32 CreatePIDFile(const std::string& filename)
     pid_t pid = getpid();
 #endif
 
-    fprintf(pid_file, "%lu", pid );
+    fprintf(pid_file, "%lu", pid);
     fclose(pid_file);
 
     return (uint32)pid;
@@ -367,7 +367,7 @@ size_t utf8length(std::string& utf8str)
     }
 }
 
-bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr, size_t max_len)
+bool Utf8toWStr(std::string const& utf8str, std::wstring& wstr, size_t max_len)
 {
     if (utf8str.empty())
     {
@@ -428,7 +428,7 @@ bool WStrToUtf8(std::wstring& wstr, std::string& utf8str)
 
 typedef wchar_t const* const* wstrlist;
 
-bool utf8ToConsole(const std::string& utf8str, std::string& conStr)
+bool utf8ToConsole(std::string const& utf8str, std::string& conStr)
 {
 #if PLATFORM == PLATFORM_WINDOWS
     std::wstring wstr;
@@ -445,7 +445,7 @@ bool utf8ToConsole(const std::string& utf8str, std::string& conStr)
     return true;
 }
 
-bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
+bool consoleToUtf8(std::string const& conStr, std::string& utf8str)
 {
 #if PLATFORM == PLATFORM_WINDOWS
     std::wstring wstr;
@@ -460,7 +460,7 @@ bool consoleToUtf8(const std::string& conStr, std::string& utf8str)
 #endif
 }
 
-bool Utf8FitTo(const std::string& str, std::wstring search)
+bool Utf8FitTo(std::string const& str, std::wstring search)
 {
     std::wstring temp;
 
@@ -473,7 +473,7 @@ bool Utf8FitTo(const std::string& str, std::wstring search)
     return temp.find(search) != std::wstring::npos;
 }
 
-void utf8printf(FILE* out, const char *str, ...)
+void utf8printf(FILE* out, char const* str, ...)
 {
     va_list ap;
     va_start(ap, str);
@@ -481,7 +481,7 @@ void utf8printf(FILE* out, const char *str, ...)
     va_end(ap);
 }
 
-void vutf8printf(FILE* out, const char *str, va_list* ap)
+void vutf8printf(FILE* out, char const* str, va_list* ap)
 {
 #if PLATFORM == PLATFORM_WINDOWS
     std::string temp_buf;

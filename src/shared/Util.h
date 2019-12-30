@@ -311,12 +311,12 @@ inline bool isLeapYear(int year)
 
 inline void strToUpper(std::string& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), toupper );
+    std::transform(str.begin(), str.end(), str.begin(), toupper);
 }
 
 inline void strToLower(std::string& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), tolower );
+    std::transform(str.begin(), str.end(), str.begin(), tolower);
 }
 
 inline wchar_t wcharToUpper(wchar_t wchar)
@@ -372,12 +372,12 @@ inline wchar_t wcharToLower(wchar_t wchar)
 
 inline void wstrToUpper(std::wstring& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), wcharToUpper );
+    std::transform(str.begin(), str.end(), str.begin(), wcharToUpper);
 }
 
 inline void wstrToLower(std::wstring& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), wcharToLower );
+    std::transform(str.begin(), str.end(), str.begin(), wcharToLower);
 }
 
 bool utf8ToConsole(std::string const& utf8str, std::string& conStr);

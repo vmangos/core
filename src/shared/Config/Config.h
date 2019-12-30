@@ -38,21 +38,21 @@ class MANGOS_DLL_SPEC Config
         Config();
         ~Config();
 
-        bool SetSource(const char *file);
+        bool SetSource(char const* file);
         bool Reload();
 
-        std::string GetStringDefault(const char* name, const char* def);
-        bool GetBoolDefault(const char* name, const bool def = false);
-        int32 GetIntDefault(const char* name, const int32 def);
-        float GetFloatDefault(const char* name, const float def);
+        std::string GetStringDefault(char const* name, char const* def);
+        bool GetBoolDefault(char const* name, bool const def = false);
+        int32 GetIntDefault(char const* name, int32 const def);
+        float GetFloatDefault(char const* name, float const def);
 
         std::string GetFilename() const { return mFilename; }
-        bool GetValueHelper(const char* name, ACE_TString &result);
+        bool GetValueHelper(char const* name, ACE_TString &result);
 
     private:
 
         std::string mFilename;
-        ACE_Configuration_Heap *mConf;
+        ACE_Configuration_Heap* mConf;
 
         typedef ACE_Thread_Mutex LockType;
         typedef ACE_Guard<LockType> GuardType;

@@ -2342,14 +2342,11 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
     PSendSysMessage("Building %s", useStraightPath ? "StraightPath" : "SmoothPath");
     PSendSysMessage("length %i (dist %f) type %u", pointPath.size(), path.Length(), path.getPathType());
 
-    // this entry visible only to GM's with "gm on"
-    static uint32 const WAYPOINT_NPC_ENTRY = 1;
-    Creature* wp = nullptr;
     for (auto& i : pointPath)
     {
         if (transport)
             transport->CalculatePassengerPosition(i.x, i.y, i.z);
-        if (wp = player->SummonCreature(WAYPOINT_NPC_ENTRY, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN, 18000))
+        if (Creature* wp = player->SummonCreature(VISUAL_WAYPOINT, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN, 18000))
         {
             wp->SetFly(true);
             if (transport)

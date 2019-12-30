@@ -36,15 +36,15 @@ class WorldPacket : public ByteBuffer
         }
         explicit WorldPacket(uint16 opcode, size_t res=200) : ByteBuffer(res), m_opcode(opcode), m_recvdTime(0) { }
                                                             // copy constructor
-        WorldPacket(const WorldPacket &packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode), m_recvdTime(0)
+        WorldPacket(WorldPacket const& packet)              : ByteBuffer(packet), m_opcode(packet.m_opcode), m_recvdTime(0)
         {
         }
 
-        WorldPacket(WorldPacket &&packet) : ByteBuffer(std::move(packet)), m_opcode(packet.m_opcode), m_recvdTime(packet.m_recvdTime)
+        WorldPacket(WorldPacket&& packet) : ByteBuffer(std::move(packet)), m_opcode(packet.m_opcode), m_recvdTime(packet.m_recvdTime)
         {
         }
 
-        WorldPacket& operator=(WorldPacket &&rhs)
+        WorldPacket& operator=(WorldPacket&& rhs)
         {
             m_opcode = rhs.m_opcode;
             m_recvdTime = rhs.m_recvdTime;
