@@ -91,7 +91,7 @@ uint32 WorldTimer::getMSTime()
     return getMSTime_internal();
 }
 
-uint32 WorldTimer::getMSTime_internal(bool savetime /*= false*/)
+uint32 WorldTimer::getMSTime_internal(bool /*savetime*/ /*= false*/)
 {
     //get current time
     const ACE_Time_Value currTime = ACE_OS::gettimeofday();
@@ -338,7 +338,7 @@ bool IsIPAddress(char const* ipaddress)
 /// create PID file
 uint32 CreatePIDFile(const std::string& filename)
 {
-    FILE * pid_file = fopen (filename.c_str(), "w" );
+    FILE* pid_file = fopen (filename.c_str(), "w" );
     if (pid_file == nullptr)
         return 0;
 
@@ -473,7 +473,7 @@ bool Utf8FitTo(const std::string& str, std::wstring search)
     return temp.find(search) != std::wstring::npos;
 }
 
-void utf8printf(FILE *out, const char *str, ...)
+void utf8printf(FILE* /*out*/, const char *str, ...)
 {
     va_list ap;
     va_start(ap, str);
@@ -481,7 +481,7 @@ void utf8printf(FILE *out, const char *str, ...)
     va_end(ap);
 }
 
-void vutf8printf(FILE *out, const char *str, va_list* ap)
+void vutf8printf(FILE* out, const char *str, va_list* ap)
 {
 #if PLATFORM == PLATFORM_WINDOWS
     std::string temp_buf;

@@ -175,7 +175,7 @@ inline void LoadDBC(uint32& availableDbcLocales, BarGoLink& bar, StoreProblemLis
     else
     {
         // sort problematic dbc to (1) non compatible and (2) nonexistent
-        FILE * f = fopen(dbc_filename.c_str(), "rb");
+        FILE* f = fopen(dbc_filename.c_str(), "rb");
         if (f)
         {
             char buf[100];

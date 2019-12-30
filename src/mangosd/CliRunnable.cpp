@@ -34,7 +34,7 @@
 
 #include <iterator>
 
-void utf8print(void* arg, const char* str)
+void utf8print(void* /*arg*/, const char* str)
 {
 #if PLATFORM == PLATFORM_WINDOWS
     std::wstring wtemp_buf;
@@ -57,7 +57,7 @@ void utf8print(void* arg, const char* str)
 #endif
 }
 
-void commandFinished(void*, bool sucess)
+void commandFinished(void*, bool /*sucess*/)
 {
     printf("mangos>");
     fflush(stdout);

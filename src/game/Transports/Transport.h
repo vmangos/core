@@ -38,7 +38,7 @@ class Transport : public GameObject
         bool Create(uint32 guidlow, uint32 entry, uint32 mapid, float x, float y, float z, float ang, uint32 animprogress);
         void CleanupsBeforeDelete() override;
 
-        void Update(uint32 diff, uint32) override;
+        void Update(uint32 update_diff, uint32 /*time_diff*/) override;
 
         void BuildUpdate(UpdateDataMapType& data_map);
 

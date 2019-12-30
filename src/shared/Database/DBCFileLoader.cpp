@@ -41,7 +41,7 @@ bool DBCFileLoader::Load(const char *filename, const char *fmt)
         data=nullptr;
     }
 
-    FILE * f=fopen(filename,"rb");
+    FILE* f=fopen(filename,"rb");
     if(!f)return false;
 
     if(fread(&header,4,1,f)!=1)                             // Number of records

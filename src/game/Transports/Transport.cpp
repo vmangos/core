@@ -113,12 +113,12 @@ void Transport::CleanupsBeforeDelete()
     GameObject::CleanupsBeforeDelete();
 }
 
-void Transport::Update(uint32 diff, uint32)
+void Transport::Update(uint32 update_diff, uint32 /*time_diff*/)
 {
     uint32 const positionUpdateDelay = 50;
 
     if (AI())
-        AI()->UpdateAI(diff);
+        AI()->UpdateAI(update_diff);
     else
         AIM_Initialize();
 
@@ -126,7 +126,7 @@ void Transport::Update(uint32 diff, uint32)
         return;
 
     if (IsMoving() || !_pendingStop)
-        _pathProgress = (_pathProgress + diff) % GetPeriod();
+        _pathProgress = (_pathProgress + update_diff) % GetPeriod();
 
     // Set current waypoint
     // Desired outcome: _currentFrame->DepartureTime < _pathProgress < _nextFrame->ArriveTime
@@ -164,7 +164,7 @@ void Transport::Update(uint32 diff, uint32)
     }
 
     // Set position
-    _positionChangeTimer.Update(diff);
+    _positionChangeTimer.Update(update_diff);
     if (_positionChangeTimer.Passed())
     {
         _positionChangeTimer.Reset(positionUpdateDelay);

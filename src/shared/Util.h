@@ -383,8 +383,8 @@ inline void wstrToLower(std::wstring& str)
 bool utf8ToConsole(std::string const& utf8str, std::string& conStr);
 bool consoleToUtf8(std::string const& conStr,std::string& utf8str);
 bool Utf8FitTo(std::string const& str, std::wstring search);
-void utf8printf(FILE *out, char const* str, ...);
-void vutf8printf(FILE *out, char const* str, va_list* ap);
+void utf8printf(FILE* out, char const* str, ...);
+void vutf8printf(FILE* out, char const* str, va_list* ap);
 
 bool IsIPAddress(char const* ipaddress);
 uint32 CreatePIDFile(std::string const& filename);

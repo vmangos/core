@@ -426,7 +426,7 @@ std::string PlayerDumpWriter::GetDump(uint32 guid)
 
 DumpReturn PlayerDumpWriter::WriteDump(std::string const& file, uint32 guid)
 {
-    FILE *fout = fopen(file.c_str(), "w");
+    FILE* fout = fopen(file.c_str(), "w");
     if (!fout)
         return DUMP_FILE_OPEN_ERROR;
 
@@ -447,7 +447,7 @@ DumpReturn PlayerDumpReader::LoadDump(std::string const& file, uint32 account, s
     if (charcount >= 10)
         return DUMP_TOO_MANY_CHARS;
 
-    FILE *fin = fopen(file.c_str(), "r");
+    FILE* fin = fopen(file.c_str(), "r");
     if (!fin)
         return DUMP_FILE_OPEN_ERROR;
 

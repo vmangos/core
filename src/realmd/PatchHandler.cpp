@@ -155,7 +155,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
     // Try to open the patch file
     std::string path = "./patches/";
     path += szFileName;
-    FILE * pPatch = fopen(path.c_str (), "rb");
+    FILE* pPatch = fopen(path.c_str (), "rb");
     DEBUG_LOG("Loading patch info from %s", path.c_str());
 
     if(!pPatch)

@@ -77,7 +77,7 @@ void PointMovementGenerator<T>::Reset(T &unit)
 }
 
 template<class T>
-bool PointMovementGenerator<T>::Update(T &unit, uint32 const& diff)
+bool PointMovementGenerator<T>::Update(T &unit, uint32 const& /*diff*/)
 {
     if (!&unit)
         return false;

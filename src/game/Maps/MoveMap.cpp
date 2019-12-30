@@ -143,7 +143,7 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
     char *fileName = new char[pathLen];
     snprintf(fileName, pathLen, (sWorld.GetDataPath() + "mmaps/%03i%02i%02i.mmtile").c_str(), mapId, y, x);
 
-    FILE *file = fopen(fileName, "rb");
+    FILE* file = fopen(fileName, "rb");
     if (!file)
     {
         //mmaps not generated on every tile. But it's often generating, where vmap placed (most of the time)

@@ -439,7 +439,7 @@ void FlightPathMovementGenerator::Reset(Player & player, float modSpeed)
     init.Launch();
 }
 
-bool FlightPathMovementGenerator::Update(Player &player, uint32 const& diff)
+bool FlightPathMovementGenerator::Update(Player &player, uint32 const& /*diff*/)
 {
     int32 pointId = player.movespline->currentPathIdx();
     // currentPathIdx returns lastIdx + 1 at arrive
