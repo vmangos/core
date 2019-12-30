@@ -4376,7 +4376,7 @@ uint32 WorldObject::SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellP
 
     // Creature damage
     if (GetTypeId() == TYPEID_UNIT && !((Creature*)this)->IsPet())
-        DoneTotalMod *= ((Creature*)this)->GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
+        DoneTotalMod *= Creature::_GetSpellDamageMod(((Creature*)this)->GetCreatureInfo()->rank);
 
     if (pUnit)
     {

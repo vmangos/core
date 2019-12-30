@@ -639,7 +639,10 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
         void UpdateDamagePhysical(WeaponAttackType attType) override;
         uint32 GetCurrentEquipmentId() const { return m_equipmentId; }
-        float GetSpellDamageMod(int32 Rank);
+
+        static float _GetHealthMod(int32 rank);             ///< Get custom factor to scale health (default 1, CONFIG_FLOAT_RATE_CREATURE_*_HP)
+        static float _GetDamageMod(int32 rank);             ///< Get custom factor to scale damage (default 1, CONFIG_FLOAT_RATE_*_DAMAGE)
+        static float _GetSpellDamageMod(int32 rank);        ///< Get custom factor to scale spell damage (default 1, CONFIG_FLOAT_RATE_*_SPELLDAMAGE)
 
         VendorItemData const* GetVendorItems() const;
         VendorItemData const* GetVendorTemplateItems() const;
@@ -945,9 +948,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         // vendor items
         VendorItemCounts m_vendorItemCounts;
-
-        static float _GetHealthMod(int32 Rank);
-        static float _GetDamageMod(int32 Rank);
 
         uint32 m_lootMoney;
         ObjectGuid m_lootRecipientGuid;                     // player who will have rights for looting if m_lootGroupRecipient==0 or group disbanded
