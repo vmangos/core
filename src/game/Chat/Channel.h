@@ -26,7 +26,7 @@
 #include "ObjectGuid.h"
 #include "WorldPacket.h"
 #include "Opcodes.h"
-#include "MapNodes/AbstractPlayer.h"
+#include "Chat/AbstractPlayer.h"
 
 #include <list>
 #include <map>

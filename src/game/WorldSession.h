@@ -32,7 +32,7 @@
 #include "AuctionHouseMgr.h"
 #include "Item.h"
 #include "GossipDef.h"
-#include "MapNodes/AbstractPlayer.h"
+#include "Chat/AbstractPlayer.h"
 
 struct ItemPrototype;
 struct AuctionEntry;
@@ -249,9 +249,6 @@ class WorldSessionFilter : public PacketFilter
         }
         ~WorldSessionFilter() override {}
 };
-
-class ForwardToMaster_Exception {};
-class ForwardToNode_Exception {};
 
 typedef std::map<uint8, std::string> ClientIdentifiersMap;
 
@@ -941,16 +938,8 @@ class MANGOS_DLL_SPEC WorldSession
 
         std::set<std::string> _addons;
 
-        /// Clustering system
+        /// Clustering system (TODO remove this)
     public:
-        uint32 GenerateItemLowGuid();
-        uint32 GeneratePetNumber();
-        NodeSession* GetMasterSession() const { return m_masterSession; }
-        void SetMasterSession(NodeSession* s) { m_masterSession = s; }
-        NodeSession* GetNodeSession() const { return m_nodeSession; }
-        void SetNodeSession(NodeSession* s) { m_nodeSession = s; }
-        bool IsNode() const { return m_nodeSession == nullptr; }
-        bool IsMaster() const { return m_masterSession == nullptr; }
         MasterPlayer* GetMasterPlayer() const { return m_masterPlayer; }
         PlayerPointer GetPlayerPointer() const
         {
@@ -960,26 +949,7 @@ class MANGOS_DLL_SPEC WorldSession
                 return PlayerPointer(new PlayerWrapper<MasterPlayer>(GetMasterPlayer()));
             return PlayerPointer(nullptr);
         }
-
-        /**
-         * @brief Interrupts current packet handler and forwards packet to Master.
-         * If we are the master, the function returns without doing anything.
-         */
-        void ForwardPacketToMaster();
-        /**
-         * @brief Interrupts current packet handler and forwards packet to Node.
-         * If we are the node, the function returns without doing anything.
-         */
-        void ForwardPacketToNode();
-        /**
-         * @brief Will login current player to given node.
-         * The player should not be on a map, SMSG_TRANSFER_PENDING has already been sent
-         * @param s
-         */
-        void LoginPlayerToNode(NodeSession* s);
     protected:
-        NodeSession*    m_masterSession;
-        NodeSession*    m_nodeSession;
         MasterPlayer*   m_masterPlayer;
         /// End of clustering system
 };

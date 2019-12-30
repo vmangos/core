@@ -28,8 +28,6 @@
 #endif
 
 #include "WorldSocketMgr.h"
-#include "MapNodes/NodesMgr.h"
-
 #include "Common.h"
 #include "Master.h"
 #include "WorldSocket.h"
@@ -392,36 +390,26 @@ int Master::Run()
         freeze_thread->setPriority(ACE_Based::Highest);
     }
 
-    if (!sNodesMgr->OnServerStartup())
+    // Wait for clients ?
+    ///- Launch the world listener socket
+    uint16 wsport = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
+    std::string bind_ip = sConfig.GetStringDefault("BindIP", "0.0.0.0");
+
+    // Start WorldSockets
+    sWorldSocketMgr->SetOutKBuff(sConfig.GetIntDefault("Network.OutKBuff", -1));
+    sWorldSocketMgr->SetOutUBuff(sConfig.GetIntDefault("Network.OutUBuff", 65536));
+    sWorldSocketMgr->SetThreads(sConfig.GetIntDefault("Network.Threads", 1) + 1);
+    sWorldSocketMgr->SetInterval(sConfig.GetIntDefault("Network.Interval", 10));
+    sWorldSocketMgr->SetTcpNodelay(sConfig.GetBoolDefault("Network.TcpNodelay", true));
+
+    if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
     {
-        sLog.outError ("[FATAL] Unable to start cluster NodesMgr");
+        sLog.outError("Failed to start WorldSocket network");
         Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
+        // go down and shutdown the server
     }
-
-    // Wait for clients ?
-    if (!sWorld.getConfig(CONFIG_BOOL_IS_MAPSERVER))
-    {
-        ///- Launch the world listener socket
-        uint16 wsport = sWorld.getConfig (CONFIG_UINT32_PORT_WORLD);
-        std::string bind_ip = sConfig.GetStringDefault ("BindIP", "0.0.0.0");
-
-        // Start WorldSockets
-        sWorldSocketMgr->SetOutKBuff(sConfig.GetIntDefault("Network.OutKBuff", -1));
-        sWorldSocketMgr->SetOutUBuff(sConfig.GetIntDefault("Network.OutUBuff", 65536));
-        sWorldSocketMgr->SetThreads(sConfig.GetIntDefault("Network.Threads", 1) + 1);
-        sWorldSocketMgr->SetInterval(sConfig.GetIntDefault("Network.Interval", 10));
-        sWorldSocketMgr->SetTcpNodelay(sConfig.GetBoolDefault("Network.TcpNodelay", true));
-
-        if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
-        {
-            sLog.outError ("Failed to start WorldSocket network");
-            Log::WaitBeforeContinueIfNeed();
-            World::StopNow(ERROR_EXIT_CODE);
-            // go down and shutdown the server
-        }
-        sWorldSocketMgr->Wait();
-    }
+    sWorldSocketMgr->Wait();
 
     ///- Stop freeze protection before shutdown tasks
     if (freeze_thread)

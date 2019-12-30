@@ -120,8 +120,6 @@ class ReputationMgr
         void SendInitialReputations();
         void SendForceReactions();
         void SendState(FactionState const* faction);
-        template <typename OP>
-        void Serialize(OP& buf);
 
     private:                                                // internal helper functions
         void Initialize();

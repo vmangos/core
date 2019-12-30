@@ -94,6 +94,9 @@ set (game_SRCS
     Chat/ChannelMgr.cpp
     Chat/Chat.cpp
     Chat/AsyncCommandHandlers.cpp
+    Chat/AbstractPlayer.cpp
+    Chat/MasterPlayer.cpp
+    Chat/MasterPlayerChat.cpp
     CinematicStuff/CinematicStuff.cpp
     CinematicStuff/CinematicStuff.h
     Commands/AccountCommands.cpp
@@ -145,20 +148,6 @@ set (game_SRCS
     LFG/LFGMgr.cpp
     Mail/Mail.cpp
     Mail/MassMailMgr.cpp
-    MapNodes/AbstractPlayer.cpp
-    MapNodes/GMCommands.cpp
-    MapNodes/MapSocket.cpp
-    MapNodes/MapSocketMgr.cpp
-    MapNodes/MasterPlayer.cpp
-    MapNodes/MasterPlayerChat.cpp
-    MapNodes/NodeSession.cpp
-    MapNodes/NodesMgr.cpp
-    MapNodes/NodesOpcodes.cpp
-    MapNodes/Handlers/GuidsSynchronization.cpp
-    MapNodes/Handlers/Protocol.cpp
-    MapNodes/Handlers/SessionTransfert.cpp
-    MapNodes/Serializers/ItemSerializer.cpp
-    MapNodes/Serializers/PlayerSerializer.cpp
     Maps/GridMap.cpp
     Maps/GridNotifiers.cpp
     Maps/GridSearchers.cpp
@@ -307,6 +296,8 @@ set (game_SRCS
     Chat/ChannelMgr.h
     Chat/Chat.h
     Chat/AsyncCommandHandlers.h
+    Chat/AbstractPlayer.h
+    Chat/MasterPlayer.h
     Commands/Nostalrius.h
     Database/CharacterDatabaseCache.h
     Database/CharacterDatabaseCleaner.h
@@ -327,16 +318,6 @@ set (game_SRCS
     LFG/LFGMgr.h
     Mail/Mail.h
     Mail/MassMailMgr.h
-    MapNodes/AbstractPlayer.h
-    MapNodes/MapSocket.h
-    MapNodes/MapSocketMgr.h
-    MapNodes/MasterPlayer.h
-    MapNodes/NodeSession.h
-    MapNodes/NodesMgr.h
-    MapNodes/NodesOpcodes.h
-    MapNodes/Serializers/ItemSerializer.h
-    MapNodes/Serializers/PlayerSerializer.h
-    MapNodes/Serializers/Serializer.h
     Maps/Cell.h
     Maps/CellImpl.h
     Maps/GridDefines.h
@@ -495,9 +476,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Handlers
   ${CMAKE_CURRENT_SOURCE_DIR}/LFG
   ${CMAKE_CURRENT_SOURCE_DIR}/Mail
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes/Handlers
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes/Serializers
   ${CMAKE_CURRENT_SOURCE_DIR}/Maps
   ${CMAKE_CURRENT_SOURCE_DIR}/Maps/Pool
   ${CMAKE_CURRENT_SOURCE_DIR}/Movement

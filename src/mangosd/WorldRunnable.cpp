@@ -24,7 +24,6 @@
 */
 
 #include "WorldSocketMgr.h"
-#include "NodesMgr.h"
 #include "Common.h"
 #include "World.h"
 #include "WorldRunnable.h"
@@ -113,7 +112,6 @@ void WorldRunnable::run()
     sBattleGroundMgr.DeleteAllBattleGrounds();
 
     sWorldSocketMgr->StopNetwork();
-    sNodesMgr->OnServerShutdown();
 
     sMapMgr.UnloadAll();                                    // unload all grids (including locked in memory)
 
