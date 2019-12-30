@@ -63,10 +63,10 @@ private:
     void RemoveBinds();
 
     MYSQL* m_pMySQLConn;
-    MYSQL_STMT * m_stmt;
-    MYSQL_BIND * m_pInputArgs;
-    MYSQL_BIND * m_pResult;
-    MYSQL_RES *m_pResultMetadata;
+    MYSQL_STMT* m_stmt;
+    MYSQL_BIND* m_pInputArgs;
+    MYSQL_BIND* m_pResult;
+    MYSQL_RES* m_pResultMetadata;
 };
 
 class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
@@ -83,18 +83,18 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
         QueryNamedResult* QueryNamed(char const* sql) override;
         bool Execute(char const* sql) override;
 
-        unsigned long escape_string(char *to, char const* from, unsigned long length) override;
+        unsigned long escape_string(char* to, char const* from, unsigned long length) override;
 
         bool BeginTransaction() override;
         bool CommitTransaction() override;
         bool RollbackTransaction() override;
 
     protected:
-        SqlPreparedStatement * CreateStatement(std::string const& fmt) override;
+        SqlPreparedStatement* CreateStatement(std::string const& fmt) override;
 
     private:
         bool _TransactionCmd(char const* sql);
-        bool _Query(char const* sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount);
+        bool _Query(char const* sql, MYSQL_RES** pResult, MYSQL_FIELD** pFields, uint64* pRowCount, uint32* pFieldCount);
 
         MYSQL *mMysql;
 };

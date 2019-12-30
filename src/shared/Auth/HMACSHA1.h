@@ -32,12 +32,12 @@ class HMACSHA1
     public:
         HMACSHA1(uint32 len, uint8* seed);
         ~HMACSHA1();
-        void UpdateBigNumber(BigNumber *bn);
+        void UpdateBigNumber(BigNumber* bn);
         void UpdateData(std::vector<uint8> const& data);
         void UpdateData(uint8 const* data, int length);
         void UpdateData(std::string const& str);
         void Finalize();
-        uint8* ComputeHash(BigNumber *bn);
+        uint8* ComputeHash(BigNumber* bn);
         uint8* GetDigest() { return (uint8*)m_digest; }
         int GetLength() { return SHA_DIGEST_LENGTH; }
     private:

@@ -164,7 +164,7 @@ bool PostgreSQLConnection::Execute(char const* sql)
 
     uint32 _s = WorldTimer::getMSTime();
 
-    PGresult *res = PQexec(mPGconn, sql);
+    PGresult* res = PQexec(mPGconn, sql);
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
         sLog.outErrorDb("SQL: %s", sql);
@@ -185,7 +185,7 @@ bool PostgreSQLConnection::_TransactionCmd(char const* sql)
     if (!mPGconn)
         return false;
 
-    PGresult *res = PQexec(mPGconn, sql);
+    PGresult* res = PQexec(mPGconn, sql);
     if (PQresultStatus(res) != PGRES_COMMAND_OK)
     {
         sLog.outError("SQL: %s", sql);
@@ -214,7 +214,7 @@ bool PostgreSQLConnection::RollbackTransaction()
     return _TransactionCmd("ROLLBACK");
 }
 
-unsigned long PostgreSQLConnection::escape_string(char *to, char const* from, unsigned long length)
+unsigned long PostgreSQLConnection::escape_string(char* to, char const* from, unsigned long length)
 {
     if (!mPGconn || !to || !from || !length)
         return 0;

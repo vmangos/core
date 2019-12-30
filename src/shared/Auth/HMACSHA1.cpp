@@ -39,7 +39,7 @@ HMACSHA1::~HMACSHA1()
 #endif
 }
 
-void HMACSHA1::UpdateBigNumber(BigNumber *bn)
+void HMACSHA1::UpdateBigNumber(BigNumber* bn)
 {
     UpdateData(bn->AsByteArray());
 }
@@ -78,7 +78,7 @@ void HMACSHA1::Finalize()
     //MANGOS_ASSERT(length == SHA_DIGEST_LENGTH);
 }
 
-uint8* HMACSHA1::ComputeHash(BigNumber *bn)
+uint8* HMACSHA1::ComputeHash(BigNumber* bn)
 {
     auto byteArray = bn->AsByteArray();
 #if defined(OPENSSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x10100000L

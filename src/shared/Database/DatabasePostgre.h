@@ -49,7 +49,7 @@ class MANGOS_DLL_SPEC PostgreSQLConnection : public SqlConnection
         QueryNamedResult* QueryNamed(char const* sql);
         bool Execute(char const* sql);
 
-        unsigned long escape_string(char *to, char const* from, unsigned long length);
+        unsigned long escape_string(char* to, char const* from, unsigned long length);
 
         bool BeginTransaction();
         bool CommitTransaction();
@@ -57,9 +57,9 @@ class MANGOS_DLL_SPEC PostgreSQLConnection : public SqlConnection
 
     private:
         bool _TransactionCmd(char const* sql);
-        bool _Query(char const* sql, PGresult **pResult, uint64* pRowCount, uint32* pFieldCount);
+        bool _Query(char const* sql, PGresult** pResult, uint64* pRowCount, uint32* pFieldCount);
 
-        PGconn *mPGconn;
+        PGconn* mPGconn;
 };
 
 class MANGOS_DLL_SPEC DatabasePostgre : public Database

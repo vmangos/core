@@ -81,9 +81,9 @@ class DBCFileLoader
                 }
 
             private:
-                Record(DBCFileLoader &file_, unsigned char *offset_): offset(offset_), file(file_) {}
-                unsigned char *offset;
-                DBCFileLoader &file;
+                Record(DBCFileLoader& file_, unsigned char* offset_): offset(offset_), file(file_) {}
+                unsigned char* offset;
+                DBCFileLoader& file;
 
                 friend class DBCFileLoader;
 
@@ -107,7 +107,7 @@ class DBCFileLoader
         uint32 fieldCount;
         uint32 stringSize;
         uint32* fieldsOffset;
-        unsigned char *data;
-        unsigned char *stringTable;
+        unsigned char* data;
+        unsigned char* stringTable;
 };
 #endif

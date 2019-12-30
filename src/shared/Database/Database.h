@@ -60,7 +60,7 @@ class MANGOS_DLL_SPEC SqlConnection
         virtual bool Execute(char const* sql) = 0;
 
         //escape string generation
-        virtual unsigned long escape_string(char *to, char const* from, unsigned long length) { strncpy(to,from,length); return length; }
+        virtual unsigned long escape_string(char* to, char const* from, unsigned long length) { strncpy(to,from,length); return length; }
 
         // nothing do if DB not support transactions
         virtual bool BeginTransaction() { return true; }
@@ -90,9 +90,9 @@ class MANGOS_DLL_SPEC SqlConnection
     protected:
         SqlConnection(Database& db) : m_db(db) {}
 
-        virtual SqlPreparedStatement * CreateStatement(std::string const& fmt);
+        virtual SqlPreparedStatement* CreateStatement(std::string const& fmt);
         //allocate prepared statement and return statement ID
-        SqlPreparedStatement * GetStmt(int nIndex);
+        SqlPreparedStatement* GetStmt(int nIndex);
 
         Database& m_db;
 
@@ -111,7 +111,7 @@ class MANGOS_DLL_SPEC SqlConnection
         typedef ACE_Recursive_Thread_Mutex LOCK_TYPE;
         LOCK_TYPE m_mutex;
 
-        typedef std::vector<SqlPreparedStatement * > StmtHolder;
+        typedef std::vector<SqlPreparedStatement*> StmtHolder;
         StmtHolder m_holder;
 };
 
@@ -157,17 +157,17 @@ class MANGOS_DLL_SPEC Database
 
         // Query / member
         template<class Class>
-            bool AsyncQuery(Class *object, void (Class::*method)(QueryResult*), char const* sql);
+            bool AsyncQuery(Class* object, void (Class::*method)(QueryResult*), char const* sql);
         template<class Class>
-            bool AsyncQueryUnsafe(Class *object, void (Class::*method)(QueryResult*), char const* sql);
+            bool AsyncQueryUnsafe(Class* object, void (Class::*method)(QueryResult*), char const* sql);
         template<class Class, typename ParamType1>
-            bool AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql);
+            bool AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql);
         template<class Class, typename ParamType1>
-            bool AsyncQueryUnsafe(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql);
+            bool AsyncQueryUnsafe(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql);
         template<class Class, typename ParamType1, typename ParamType2>
-            bool AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* sql);
+            bool AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* sql);
         template<class Class, typename ParamType1, typename ParamType2, typename ParamType3>
-            bool AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* sql);
+            bool AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* sql);
         // Query / static
         template<typename ParamType1>
             bool AsyncQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql);
@@ -181,17 +181,17 @@ class MANGOS_DLL_SPEC Database
             bool AsyncQueryUnsafe(void(*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* sql);
         // PQuery / member
         template<class Class>
-            bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*), char const* format,...) ATTR_PRINTF(4,5);
+            bool AsyncPQuery(Class* object, void (Class::*method)(QueryResult*), char const* format,...) ATTR_PRINTF(4,5);
         template<class Class>
-            bool AsyncPQueryUnsafe(Class *object, void (Class::*method)(QueryResult*), char const* format,...) ATTR_PRINTF(4,5);
+            bool AsyncPQueryUnsafe(Class* object, void (Class::*method)(QueryResult*), char const* format,...) ATTR_PRINTF(4,5);
         template<class Class, typename ParamType1>
-            bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...) ATTR_PRINTF(5,6);
+            bool AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...) ATTR_PRINTF(5,6);
         template<class Class, typename ParamType1>
-            bool AsyncPQueryUnsafe(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...) ATTR_PRINTF(5,6);
+            bool AsyncPQueryUnsafe(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...) ATTR_PRINTF(5,6);
         template<class Class, typename ParamType1, typename ParamType2>
-            bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* format,...) ATTR_PRINTF(6,7);
+            bool AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* format,...) ATTR_PRINTF(6,7);
         template<class Class, typename ParamType1, typename ParamType2, typename ParamType3>
-            bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* format,...) ATTR_PRINTF(7,8);
+            bool AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* format,...) ATTR_PRINTF(7,8);
         // PQuery / static
         template<typename ParamType1>
             bool AsyncPQuery(void (*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...) ATTR_PRINTF(4,5);
@@ -205,17 +205,17 @@ class MANGOS_DLL_SPEC Database
             bool AsyncPQueryUnsafe(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* format, ...) ATTR_PRINTF(5, 6);
         // QueryHolder
         template<class Class>
-            bool DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder);
+            bool DelayQueryHolder(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder* holder);
         template<class Class>
-            bool DelayQueryHolderUnsafe(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder);
+            bool DelayQueryHolderUnsafe(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder* holder);
         template<class Class, typename ParamType1>
-            bool DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1);
+            bool DelayQueryHolder(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1);
 
         // QueryHolder / static
         template<typename ParamType1>
-            bool DelayQueryHolder(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1);
+            bool DelayQueryHolder(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1);
         template<typename ParamType1>
-            bool DelayQueryHolderUnsafe(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1);
+            bool DelayQueryHolderUnsafe(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1);
 
         bool Execute(char const* sql);
         bool PExecute(char const* format,...) ATTR_PRINTF(2,3);
@@ -264,12 +264,12 @@ class MANGOS_DLL_SPEC Database
         inline void AddToDelayQueue(SqlOperation* op) { m_delayQueue->add(op); }
         inline bool NextDelayedOperation(SqlOperation*& op) { return m_delayQueue->next(op); }
 
-        inline void AddToSerialDelayQueue(int workerId, SqlOperation *op) { m_serialDelayQueue[workerId]->add(op); }
+        inline void AddToSerialDelayQueue(int workerId, SqlOperation* op) { m_serialDelayQueue[workerId]->add(op); }
         bool NextSerialDelayedOperation(int workerId, SqlOperation*& op);
 
         bool HasAsyncQuery();
 
-        void AddToSerialDelayQueue(SqlOperation *op);
+        void AddToSerialDelayQueue(SqlOperation* op);
 
         // Frees data, cancels scheduled queries, closes connection
         void StopServer();

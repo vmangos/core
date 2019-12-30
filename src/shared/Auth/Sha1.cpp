@@ -45,17 +45,17 @@ void Sha1Hash::UpdateData(std::string const& str)
     UpdateData((uint8 const*)str.c_str(), str.length());
 }
 
-void Sha1Hash::UpdateBigNumbers(BigNumber *bn0, ...)
+void Sha1Hash::UpdateBigNumbers(BigNumber* bn0, ...)
 {
     va_list v;
-    BigNumber *bn;
+    BigNumber* bn;
 
     va_start(v, bn0);
     bn = bn0;
     while (bn)
     {
         UpdateData(bn->AsByteArray());
-        bn = va_arg(v, BigNumber *);
+        bn = va_arg(v, BigNumber*);
     }
     va_end(v);
 }

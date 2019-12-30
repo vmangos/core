@@ -23,7 +23,7 @@
 
 #include "DatabaseEnv.h"
 
-QueryResultPostgre::QueryResultPostgre(PGresult *result, uint64 rowCount, uint32 fieldCount) :
+QueryResultPostgre::QueryResultPostgre(PGresult* result, uint64 rowCount, uint32 fieldCount) :
     QueryResult(rowCount, fieldCount), mResult(result),  mTableIndex(0)
 {
 

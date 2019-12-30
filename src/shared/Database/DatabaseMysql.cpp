@@ -193,7 +193,7 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
     }
 }
 
-bool MySQLConnection::_Query(char const* sql, MYSQL_RES **pResult, MYSQL_FIELD **pFields, uint64* pRowCount, uint32* pFieldCount)
+bool MySQLConnection::_Query(char const* sql, MYSQL_RES** pResult, MYSQL_FIELD** pFields, uint64* pRowCount, uint32* pFieldCount)
 {
     if (!mMysql && !Reconnect())
     {
@@ -239,8 +239,8 @@ bool MySQLConnection::_Query(char const* sql, MYSQL_RES **pResult, MYSQL_FIELD *
 
 QueryResult* MySQLConnection::Query(char const* sql)
 {
-    MYSQL_RES *result = nullptr;
-    MYSQL_FIELD *fields = nullptr;
+    MYSQL_RES* result = nullptr;
+    MYSQL_FIELD* fields = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
@@ -255,8 +255,8 @@ QueryResult* MySQLConnection::Query(char const* sql)
 
 QueryNamedResult* MySQLConnection::QueryNamed(char const* sql)
 {
-    MYSQL_RES *result = nullptr;
-    MYSQL_FIELD *fields = nullptr;
+    MYSQL_RES* result = nullptr;
+    MYSQL_FIELD* fields = nullptr;
     uint64 rowCount = 0;
     uint32 fieldCount = 0;
 
@@ -329,7 +329,7 @@ bool MySQLConnection::RollbackTransaction()
     return _TransactionCmd("ROLLBACK");
 }
 
-unsigned long MySQLConnection::escape_string(char *to, char const* from, unsigned long length)
+unsigned long MySQLConnection::escape_string(char* to, char const* from, unsigned long length)
 {
     if (!mMysql || !to || !from || !length)
         return 0;
@@ -338,7 +338,7 @@ unsigned long MySQLConnection::escape_string(char *to, char const* from, unsigne
 }
 
 //////////////////////////////////////////////////////////////////////////
-SqlPreparedStatement * MySQLConnection::CreateStatement(std::string const& fmt)
+SqlPreparedStatement* MySQLConnection::CreateStatement(std::string const& fmt)
 {
     return new MySqlPreparedStatement(fmt, *this, mMysql);
 }

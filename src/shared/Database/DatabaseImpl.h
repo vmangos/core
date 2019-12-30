@@ -50,7 +50,7 @@
 
 template<class Class>
 bool
-Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*), char const* sql)
+Database::AsyncQuery(Class* object, void (Class::*method)(QueryResult*), char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
     AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class>(object, method, (QueryResult*)nullptr), m_pResultQueue));
@@ -59,7 +59,7 @@ Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*), char co
 
 template<class Class>
 bool
-Database::AsyncQueryUnsafe(Class *object, void (Class::*method)(QueryResult*), char const* sql)
+Database::AsyncQueryUnsafe(Class* object, void (Class::*method)(QueryResult*), char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
     MaNGOS::QueryCallback<Class>* cb = new MaNGOS::QueryCallback<Class>(object, method, (QueryResult*)nullptr);
@@ -70,7 +70,7 @@ Database::AsyncQueryUnsafe(Class *object, void (Class::*method)(QueryResult*), c
 
 template<class Class, typename ParamType1>
 bool
-Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql)
+Database::AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
     AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1>(object, method, (QueryResult*)nullptr, param1), m_pResultQueue));
@@ -78,7 +78,7 @@ Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamTyp
 }
 template<class Class, typename ParamType1>
 bool
-Database::AsyncQueryUnsafe(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql)
+Database::AsyncQueryUnsafe(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
     MaNGOS::QueryCallback<Class, ParamType1>* cb = new MaNGOS::QueryCallback<Class, ParamType1>(object, method, (QueryResult*)nullptr, param1);
@@ -89,7 +89,7 @@ Database::AsyncQueryUnsafe(Class *object, void (Class::*method)(QueryResult*, Pa
 
 template<class Class, typename ParamType1, typename ParamType2>
 bool
-Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* sql)
+Database::AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
     AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2>(object, method, (QueryResult*)nullptr, param1, param2), m_pResultQueue));
@@ -98,7 +98,7 @@ Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamTyp
 
 template<class Class, typename ParamType1, typename ParamType2, typename ParamType3>
 bool
-Database::AsyncQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* sql)
+Database::AsyncQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* sql)
 {
     ASYNC_QUERY_BODY(sql)
     AddToDelayQueue(new SqlQuery(sql, new MaNGOS::QueryCallback<Class, ParamType1, ParamType2, ParamType3>(object, method, (QueryResult*)nullptr, param1, param2, param3), m_pResultQueue));
@@ -160,7 +160,7 @@ Database::AsyncQueryUnsafe(void(*method)(QueryResult*, ParamType1, ParamType2), 
 
 template<class Class>
 bool
-Database::AsyncPQuery(Class *object, void (Class::*method)(QueryResult*), char const* format,...)
+Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*), char const* format,...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(object, method, szQuery);
@@ -168,7 +168,7 @@ Database::AsyncPQuery(Class *object, void (Class::*method)(QueryResult*), char c
 
 template<class Class>
 bool
-Database::AsyncPQueryUnsafe(Class *object, void (Class::*method)(QueryResult*), char const* format,...)
+Database::AsyncPQueryUnsafe(Class* object, void (Class::*method)(QueryResult*), char const* format,...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQueryUnsafe(object, method, szQuery);
@@ -176,21 +176,21 @@ Database::AsyncPQueryUnsafe(Class *object, void (Class::*method)(QueryResult*), 
 
 template<class Class, typename ParamType1>
 bool
-Database::AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...)
+Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(object, method, param1, szQuery);
 }
 template<class Class, typename ParamType1>
 bool
-Database::AsyncPQueryUnsafe(Class *object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...)
+Database::AsyncPQueryUnsafe(Class* object, void (Class::*method)(QueryResult*, ParamType1), ParamType1 param1, char const* format,...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQueryUnsafe(object, method, param1, szQuery);
 }
 template<class Class, typename ParamType1, typename ParamType2>
 bool
-Database::AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* format,...)
+Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, char const* format,...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(object, method, param1, param2, szQuery);
@@ -198,7 +198,7 @@ Database::AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamTy
 
 template<class Class, typename ParamType1, typename ParamType2, typename ParamType3>
 bool
-Database::AsyncPQuery(Class *object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* format,...)
+Database::AsyncPQuery(Class* object, void (Class::*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, char const* format,...)
 {
     ASYNC_PQUERY_BODY(format, szQuery)
     return AsyncQuery(object, method, param1, param2, param3, szQuery);
@@ -250,14 +250,14 @@ Database::AsyncPQueryUnsafe(void(*method)(QueryResult*, ParamType1, ParamType2),
 
 template<class Class>
 bool
-Database::DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder)
+Database::DelayQueryHolder(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder* holder)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
     return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, (QueryResult*)nullptr, holder), this, m_pResultQueue);
 }
 template<class Class>
 bool
-Database::DelayQueryHolderUnsafe(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder)
+Database::DelayQueryHolderUnsafe(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder* holder)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
     MaNGOS::QueryCallback<Class, SqlQueryHolder*> *cb = new MaNGOS::QueryCallback<Class, SqlQueryHolder*>(object, method, (QueryResult*)nullptr, holder);
@@ -266,7 +266,7 @@ Database::DelayQueryHolderUnsafe(Class *object, void (Class::*method)(QueryResul
 }
 template<class Class, typename ParamType1>
 bool
-Database::DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1)
+Database::DelayQueryHolder(Class* object, void (Class::*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
     return holder->Execute(new MaNGOS::QueryCallback<Class, SqlQueryHolder*, ParamType1>(object, method, (QueryResult*)nullptr, holder, param1), this, m_pResultQueue);
@@ -275,7 +275,7 @@ Database::DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, Sq
 // -- QueryHolder static --
 template<typename ParamType1>
 bool
-Database::DelayQueryHolder(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1)
+Database::DelayQueryHolder(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
     return holder->Execute(new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, (QueryResult*)nullptr, holder, param1), this, m_pResultQueue);
@@ -283,7 +283,7 @@ Database::DelayQueryHolder(void (*method)(QueryResult*, SqlQueryHolder*, ParamTy
 
 template<typename ParamType1>
 bool
-Database::DelayQueryHolderUnsafe(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1)
+Database::DelayQueryHolderUnsafe(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder* holder, ParamType1 param1)
 {
     ASYNC_DELAYHOLDER_BODY(holder)
     MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1> *cb = new MaNGOS::SQueryCallback<SqlQueryHolder*, ParamType1>(method, (QueryResult*)nullptr, holder, param1);

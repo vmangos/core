@@ -31,7 +31,7 @@ class Sha1Hash
         Sha1Hash();
         ~Sha1Hash();
 
-        void UpdateBigNumbers(BigNumber *bn0, ...);
+        void UpdateBigNumbers(BigNumber* bn0, ...);
 
         void UpdateData(uint8 const* dta, int len);
         void UpdateData(std::string const& str);

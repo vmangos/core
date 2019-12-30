@@ -821,7 +821,7 @@ DWORD64 modBase,
 DWORD dwTypeIndex,
 unsigned nestingLevel,
 DWORD_PTR offset,
-bool & bHandled,
+bool& bHandled,
 char* Name)
 {
     bHandled = false;

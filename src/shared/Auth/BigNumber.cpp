@@ -174,7 +174,7 @@ std::vector<uint8> BigNumber::AsByteArray(int minSize, bool reverse)
     // Padding should add leading zeroes, not trailing
     int paddingOffset = length - GetNumBytes();
 
-    BN_bn2bin(_bn, (unsigned char *)byteArray.data() + paddingOffset);
+    BN_bn2bin(_bn, (unsigned char*)byteArray.data() + paddingOffset);
 
     if (reverse)
         std::reverse(byteArray.begin(), byteArray.end());

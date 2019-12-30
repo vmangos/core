@@ -65,13 +65,13 @@ class SqlPlainRequest : public SqlOperation
 class SqlTransaction : public SqlOperation
 {
     private:
-        std::vector<SqlOperation * > m_queue;
+        std::vector<SqlOperation*> m_queue;
 
     public:
         SqlTransaction(uint32 serialId) : SqlOperation(serialId) {}
         ~SqlTransaction();
 
-        void DelayExecute(SqlOperation * sql)   {   m_queue.push_back(sql); }
+        void DelayExecute(SqlOperation* sql)   {   m_queue.push_back(sql); }
 
         bool Execute(SqlConnection* conn);
 };
@@ -147,11 +147,11 @@ class SqlQueryHolder
 class SqlQueryHolderEx : public SqlOperation
 {
     private:
-        SqlQueryHolder * m_holder;
+        SqlQueryHolder* m_holder;
         MaNGOS::IQueryCallback* m_callback;
         SqlResultQueue* m_queue;
     public:
-        SqlQueryHolderEx(SqlQueryHolder *holder, MaNGOS::IQueryCallback* callback, SqlResultQueue* queue, uint32 id)
+        SqlQueryHolderEx(SqlQueryHolder* holder, MaNGOS::IQueryCallback* callback, SqlResultQueue* queue, uint32 id)
             : SqlOperation(id), m_holder(holder), m_callback(callback), m_queue(queue) {}
         bool Execute(SqlConnection* conn);
 };

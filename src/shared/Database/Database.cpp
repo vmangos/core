@@ -33,7 +33,7 @@
 #define MAX_CONNECTION_POOL_SIZE 16
 
 //////////////////////////////////////////////////////////////////////////
-SqlPreparedStatement * SqlConnection::CreateStatement(std::string const& fmt)
+SqlPreparedStatement* SqlConnection::CreateStatement(std::string const& fmt)
 {
     return new SqlPlainPreparedStatement(fmt, *this);
 }
@@ -49,7 +49,7 @@ void SqlConnection::FreePreparedStatements()
     m_holder.clear();
 }
 
-SqlPreparedStatement * SqlConnection::GetStmt(int nIndex)
+SqlPreparedStatement* SqlConnection::GetStmt(int nIndex)
 {
     if(nIndex < 0)
         return nullptr;
@@ -58,7 +58,7 @@ SqlPreparedStatement * SqlConnection::GetStmt(int nIndex)
     if(m_holder.size() <= nIndex)
         m_holder.resize(nIndex + 1, nullptr);
 
-    SqlPreparedStatement * pStmt = nullptr;
+    SqlPreparedStatement* pStmt = nullptr;
 
     //create stmt if needed
     if(m_holder[nIndex] == nullptr)
@@ -124,7 +124,7 @@ bool SqlConnection::ExecuteStmt(int nIndex, SqlStmtParameters const& id)
         return false;
 
     //get prepared statement object
-    if (SqlPreparedStatement * pStmt = GetStmt(nIndex))
+    if (SqlPreparedStatement* pStmt = GetStmt(nIndex))
     {
         //bind parameters
         pStmt->bind(id);
@@ -539,7 +539,7 @@ bool Database::RollbackTransaction()
     return true;
 }
 
-void Database::AddToSerialDelayQueue(SqlOperation *op)
+void Database::AddToSerialDelayQueue(SqlOperation* op)
 {
     if (op->GetSerialId() == 0 || m_numAsyncWorkers == 0)
     {
