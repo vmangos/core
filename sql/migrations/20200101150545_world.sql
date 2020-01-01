@@ -9,8 +9,8 @@ INSERT INTO `migrations` VALUES ('20200101150545');
 -- Add your query below.
 
 
--- Change default movement type for Winter Revelers
-UPDATE `creature_template` SET `movement_type`=0, `dmg_min`=45, `dmg_max`=60 WHERE `entry`=15760;
+-- Change default movement type, level, and damage for Winter Revelers
+UPDATE `creature_template` SET `movement_type`=0, `level_min`=30, `level_max`=40, `dmg_min`=45, `dmg_max`=60 WHERE `entry`=15760;
 
 -- Set equipment for Winter Revelers.
 UPDATE `creature_template` SET `equipment_id`=15760 WHERE `entry` IN (15780, 15781, 15782, 15783, 15784, 15785, 15786, 15787, 15788, 15789, 15790, 15791, 15792, 15793, 15794, 15795);
