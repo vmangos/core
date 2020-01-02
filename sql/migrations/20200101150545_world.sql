@@ -115,106 +115,148 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `eq
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89400, 15760, 0, 0, 0, 1, 0, 0, 2754.04, -420.25, 111.471, 0.611771, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89399, 6, 0, 0, 1, 16, 0, 0, '26245');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89400, 6, 0, 0, 1, 16, 0, 0, '26246');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89399, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89400, 2);
 -- Darnassus
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89401, 15760, 0, 0, 0, 1, 0, 0, 10128.2, 2218.37, 1329.99, 6.02016, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89402, 15760, 0, 0, 0, 1, 0, 0, 10130.1, 2217.92, 1329.99, 2.76861, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89401, 6, 0, 0, 1, 16, 0, 0, '26245');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89402, 6, 0, 0, 1, 16, 0, 0, '26246');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89401, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89402, 2);
 -- Nijel's Point
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89403, 15760, 0, 0, 0, 1, 0, 0, 246.91, 1259.09, 192.164, 0.951099, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89404, 15760, 0, 0, 0, 1, 0, 0, 248.217, 1261.58, 192.159, 4.40921, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89403, 6, 0, 0, 1, 16, 0, 0, '26239');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89404, 6, 0, 0, 1, 16, 0, 0, '26245');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89403, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89404, 2);
 -- Shadowprey Village
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89407, 15760, 0, 0, 0, 1, 0, 0, -1587.93, 3158.76, 47.1655, 5.62972, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89408, 15760, 0, 0, 0, 1, 0, 0, -1586.06, 3157.71, 47.1656, 2.63029, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89407, 6, 0, 0, 1, 16, 0, 0, '26252');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89408, 6, 0, 0, 1, 16, 0, 0, '26251');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89407, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89408, 2);
 -- Feathermoon Stronghold
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89409, 15760, 0, 0, 0, 1, 0, 0, -4350.65, 3289.7, 18.6701, 4.79722, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89410, 15760, 0, 0, 0, 1, 0, 0, -4350.71, 3287.48, 18.6706, 1.54567, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89409, 6, 0, 0, 1, 16, 0, 0, '26245');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89410, 6, 0, 0, 1, 16, 0, 0, '26246');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89409, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89410, 2);
 -- Camp Mojache
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89411, 15760, 0, 0, 0, 1, 0, 0, -4443.01, 253.042, 39.1077, 5.21849, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89412, 15760, 0, 0, 0, 1, 0, 0, -4441.91, 250.713, 39.1075, 2.04155, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89411, 6, 0, 0, 1, 16, 0, 0, '26250');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89412, 6, 0, 0, 1, 16, 0, 0, '26249');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89411, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89412, 2);
 -- Loch Modan
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89415, 15760, 0, 0, 0, 0, 0, 0, -5380.95, -2967.57, 322.058, 2.63296, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89419, 15760, 0, 0, 0, 0, 0, 0, -5383.01, -2966.14, 322.058, 5.6489, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89415, 6, 0, 0, 1, 16, 0, 0, '26241');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89419, 6, 0, 0, 1, 16, 0, 0, '26242');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89415, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89419, 2);
 -- Silithus
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89420, 15760, 0, 0, 0, 1, 0, 0, -6854.37, 737.732, 45.6625, 5.16703, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89421, 15760, 0, 0, 0, 1, 0, 0, -6853.6, 735.501, 45.6626, 2.02544, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89420, 6, 0, 0, 1, 16, 0, 0, '26249');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89421, 6, 0, 0, 1, 16, 0, 0, '26246');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89420, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89421, 2);
 -- Stonetalon Mountains
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (89422, 15760, 0, 0, 0, 1, 0, 0, 910.056, 917.04, 106.258, 4.11374, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90179, 15760, 0, 0, 0, 1, 0, 0, 908.816, 914.926, 106.258, 1.00356, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (89422, 6, 0, 0, 1, 16, 0, 0, '26250');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90179, 6, 0, 0, 1, 16, 0, 0, '26249');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (89422, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90179, 2);
 -- Tanaris
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90180, 15760, 0, 0, 0, 1, 0, 0, -7161.89, -3844.66, 8.72069, 6.08667, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90181, 15760, 0, 0, 0, 1, 0, 0, -7160.14, -3845.1, 8.78221, 2.9647, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90180, 6, 0, 0, 1, 16, 0, 0, '26244');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90181, 6, 0, 0, 1, 16, 0, 0, '26243');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90180, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90181, 2);
 -- Aerie Peak
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90182, 15760, 0, 0, 0, 0, 0, 0, 397.73, -2093.59, 131.562, 4.9087, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90183, 15760, 0, 0, 0, 0, 0, 0, 397.985, -2094.86, 131.562, 1.76318, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90182, 6, 0, 0, 1, 16, 0, 0, '26241');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90183, 6, 0, 0, 1, 16, 0, 0, '26242');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90182, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90183, 2);
 -- Revantusk Village
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90185, 15760, 0, 0, 0, 0, 0, 0, -629.182, -4575, 12.3582, 3.99785, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90186, 15760, 0, 0, 0, 0, 0, 0, -631.062, -4576.8, 12.3582, 0.772996, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90185, 6, 0, 0, 1, 16, 0, 0, '26252');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90186, 6, 0, 0, 1, 16, 0, 0, '26251');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90185, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90186, 2);
 -- Darkshore
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90187, 15760, 0, 0, 0, 1, 0, 0, 6408.19, 518.432, 8.64959, 2.7685, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90188, 15760, 0, 0, 0, 1, 0, 0, 6406.53, 519.057, 8.65005, 5.95719, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90187, 6, 0, 0, 1, 16, 0, 0, '26246');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90188, 6, 0, 0, 1, 16, 0, 0, '26245');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90187, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90188, 2);
 -- Theramore Isle
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90189, 15760, 0, 0, 0, 1, 0, 0, -3620.36, -4462.42, 13.6222, 1.57957, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90190, 15760, 0, 0, 0, 1, 0, 0, -3620.28, -4460.99, 13.6224, 4.71723, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90189, 6, 0, 0, 1, 16, 0, 0, '26240');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90190, 6, 0, 0, 1, 16, 0, 0, '26239');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90189, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90190, 2);
 -- Silverpine Forest
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90191, 15760, 0, 0, 0, 0, 0, 0, 509.914, 1639.02, 125.942, 3.19987, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90192, 15760, 0, 0, 0, 0, 0, 0, 505.762, 1638.93, 125.942, 0.00329638, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90191, 6, 0, 0, 1, 16, 0, 0, '26254');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90192, 6, 0, 0, 1, 16, 0, 0, '26253');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90191, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90192, 2);
 -- Stranglethorn Vale
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90193, 15760, 0, 0, 0, 0, 0, 0, -12427.3, 212.364, 2.36578, 2.979, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90194, 15760, 0, 0, 0, 0, 0, 0, -12429.3, 212.967, 2.36578, 6.03811, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90193, 6, 0, 0, 1, 16, 0, 0, '26248');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90194, 6, 0, 0, 1, 16, 0, 0, '26247');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90193, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90194, 2);
 -- Swamp of Sorrow
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90195, 15760, 0, 0, 0, 0, 0, 0, -10488.7, -3251, 21.031, 2.35859, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90196, 15760, 0, 0, 0, 0, 0, 0, -10490.9, -3248.7, 21.0323, 5.47271, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90195, 6, 0, 0, 1, 16, 0, 0, '26248');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90196, 6, 0, 0, 1, 16, 0, 0, '26247');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90195, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90196, 2);
 -- Thousand Needles
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90197, 15760, 0, 0, 0, 1, 0, 0, -5461.82, -2454.93, 89.8208, 2.02411, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90233, 15760, 0, 0, 0, 1, 0, 0, -5462.77, -2452.31, 89.7673, 5.07143, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90197, 6, 0, 0, 1, 16, 0, 0, '26250');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90233, 6, 0, 0, 1, 16, 0, 0, '26249');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90197, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90233, 2);
 -- Wetlands
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90281, 15760, 0, 0, 0, 0, 0, 0, -3804.54, -826.874, 10.0928, 2.22376, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90282, 15760, 0, 0, 0, 0, 0, 0, -3806.34, -825.119, 10.0928, 5.33786, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90281, 6, 0, 0, 1, 16, 0, 0, '26241');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90282, 6, 0, 0, 1, 16, 0, 0, '26242');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90281, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90282, 2);
 -- Winterspring
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90283, 15760, 0, 0, 0, 1, 0, 0, 6689.98, -4678.31, 721.716, 6.19404, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90284, 15760, 0, 0, 0, 1, 0, 0, 6691.95, -4678.56, 721.716, 3.08385, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90283, 6, 0, 0, 1, 16, 0, 0, '26244');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90284, 6, 0, 0, 1, 16, 0, 0, '26243');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90283, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90284, 2);
 -- Hammerfall
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90285, 15760, 0, 0, 0, 0, 0, 0, -921.846, -3528.56, 72.5878, 4.71034, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90288, 15760, 0, 0, 0, 0, 0, 0, -921.963, -3531.02, 72.5776, 1.54518, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90285, 6, 0, 0, 1, 16, 0, 0, '26248');
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90288, 6, 0, 0, 1, 16, 0, 0, '26247');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90285, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90288, 2);
 
 -- Events list for Winter Reveler
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15760;
