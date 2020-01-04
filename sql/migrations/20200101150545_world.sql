@@ -257,6 +257,20 @@ INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`,
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90288, 6, 0, 0, 1, 16, 0, 0, '26247');
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90285, 2);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90288, 2);
+-- Ratchet
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90289, 15760, 0, 0, 0, 1, 0, 0, -1046.4, -3668.4, 23.8867, 1.39719, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90296, 15760, 0, 0, 0, 1, 0, 0, -1045.47, -3664.27, 23.8897, 4.51522, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
+INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90289, 6, 0, 0, 1, 16, 0, 0, '26244');
+INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90296, 6, 0, 0, 1, 16, 0, 0, '26243');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90289, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90296, 2);
+-- Camp Taurajo
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90377, 15760, 0, 0, 0, 1, 0, 0, -2363.67, -1979, 96.7049, 2.6105, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90378, 15760, 0, 0, 0, 1, 0, 0, -2365.86, -1977.85, 96.7051, 5.77053, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
+INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90377, 6, 0, 0, 1, 16, 0, 0, '26248');
+INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90378, 6, 0, 0, 1, 16, 0, 0, '26249');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90377, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90378, 2);
 
 -- Events list for Winter Reveler
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15760;
