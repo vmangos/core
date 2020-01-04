@@ -271,6 +271,13 @@ INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`,
 INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90378, 6, 0, 0, 1, 16, 0, 0, '26249');
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90377, 2);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90378, 2);
+-- Splintertree Post
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90380, 15760, 0, 0, 0, 1, 0, 0, 2336.32, -2578.54, 102.773, 5.92544, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (90426, 15760, 0, 0, 0, 1, 0, 0, 2338.5, -2579.34, 102.773, 2.71708, 300, 480, 0, 0, 100, 0, 0, 0, 0, 0, 6, 10);
+INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90380, 6, 0, 0, 1, 16, 0, 0, '26248');
+INSERT INTO `creature_addon` (`guid`, `patch`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES (90426, 6, 0, 0, 1, 16, 0, 0, '26247');
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90380, 2);
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (90426, 2);
 
 -- Events list for Winter Reveler
 DELETE FROM `creature_ai_events` WHERE `creature_id`=15760;

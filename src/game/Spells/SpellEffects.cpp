@@ -4825,7 +4825,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 26275:                                 // PX-238 Winter Wondervolt TRAP
                 {
-                    if (!unitTarget || !m_caster->IsWithinDist(unitTarget, INTERACTION_DISTANCE))
+                    if (!unitTarget || !m_caster->IsWithinDist(unitTarget, 1.0f))
                         return;
 
                     uint32 spells[4] = {26272, 26157, 26273, 26274};
