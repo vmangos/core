@@ -27,6 +27,9 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (42101, 2),
 (42102, 2);
 
+-- Correct count of Snowballs in Holiday Snow.
+UPDATE `gameobject_loot_template` SET `mincountOrRef`=3, `maxcount`=6 WHERE `entry`=15540 && `item`=17202;
+
 
 -- End of migration.
 END IF;
