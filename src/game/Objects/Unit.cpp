@@ -1767,15 +1767,30 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
             if (alreadyDone.find(*i) == alreadyDone.end())
             {
                 alreadyDone.insert(*i);
+                SpellEntry const* pSpellProto = (*i)->GetSpellProto();
+                
+                // Damage shield can be resisted...
+                if (SpellMissInfo missInfo = pVictim->SpellHitResult(this, pSpellProto, (*i)->GetEffIndex()))
+                {
+                    pVictim->SendSpellMiss(this, pSpellProto->Id, missInfo);
+                    continue;
+                }
+
+                // ...or immuned
+                if (IsImmuneToDamage(pSpellProto->GetSpellSchoolMask()))
+                {
+                    pVictim->SendSpellOrDamageImmune(this, pSpellProto->Id);
+                    continue;
+                }
+
                 uint32 damage = (*i)->GetModifier()->m_amount;
-                SpellEntry const* i_spellProto = (*i)->GetSpellProto();
 
                 // Apply damage percentage modifiers (#1601)
                 float DoneTotalMod = 1.0f;
                 AuraList const& mModDamagePercentDone = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
                 for (const auto& j : mModDamagePercentDone)
                 {
-                    if ((j->GetModifier()->m_miscvalue & i_spellProto->GetSpellSchoolMask()) &&
+                    if ((j->GetModifier()->m_miscvalue & pSpellProto->GetSpellSchoolMask()) &&
                         j->GetSpellProto()->EquippedItemClass == -1 &&
                         j->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
                     {
@@ -1788,7 +1803,7 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
                 // for example, Death Talon Seethers with Aura of Flames reflect 1200 damage to tanks with Mark of Flame
                 if (pVictim->IsCreature())
                 {
-                    int32 spellDmgTakenBonus = this->SpellBaseDamageBonusTaken(i_spellProto->GetSpellSchoolMask());
+                    int32 spellDmgTakenBonus = this->SpellBaseDamageBonusTaken(pSpellProto->GetSpellSchoolMask());
                     // don't allow damage shields to be reduced by Blessing of Sanctuary, etc.
                     if (spellDmgTakenBonus > 0) damage += spellDmgTakenBonus;
                 }
@@ -1805,10 +1820,10 @@ void Unit::DealMeleeDamage(CalcDamageInfo* damageInfo, bool durabilityLoss)
                 data << pVictim->GetObjectGuid();
                 data << GetObjectGuid();
                 data << uint32(damage);
-                data << uint32(i_spellProto->School);
+                data << uint32(pSpellProto->School);
                 pVictim->SendObjectMessageToSet(&data, true);
 
-                pVictim->DealDamage(this, damage, nullptr, SPELL_DIRECT_DAMAGE, i_spellProto->GetSpellSchoolMask(), i_spellProto, true);
+                pVictim->DealDamage(this, damage, nullptr, SPELL_DIRECT_DAMAGE, pSpellProto->GetSpellSchoolMask(), pSpellProto, true);
 
                 i = vDamageShields.begin();
             }
@@ -5348,6 +5363,26 @@ bool Unit::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex i
             if (itr.type == aura)
                 return true;
     }
+    return false;
+}
+
+bool Unit::IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const
+{
+    if (!spellInfo->HasAttribute(SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY))           // can remove immune (by dispell or immune it)
+    {
+        SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
+        for (auto itr : schoolList)
+        {
+            SpellEntry const* pImmuneSpell = sSpellMgr.GetSpellEntry(itr.spellId);
+            if (pImmuneSpell && pImmuneSpell == spellInfo) // do not let itself immune out - fixes 39872 - Tidal Shield
+                continue;
+
+            if (!(pImmuneSpell && pImmuneSpell->IsPositiveSpell() && spellInfo->IsPositiveEffectMask(effectMask) && !pImmuneSpell->HasAttribute(SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE)) &&
+                (itr.type & spellInfo->GetSpellSchoolMask()))
+                return true;
+        }
+    }
+
     return false;
 }
 

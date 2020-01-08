@@ -1570,7 +1570,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
     {
         // Recheck  UNIT_FLAG_NON_ATTACKABLE for delayed spells
         if (unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&
-                unit->GetCharmerOrOwnerGuid() != m_caster->GetObjectGuid())
+            unit->GetCharmerOrOwnerGuid() != m_caster->GetObjectGuid())
         {
             pRealCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
             ResetEffectDamageAndHeal();

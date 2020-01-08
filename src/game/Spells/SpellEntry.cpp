@@ -880,7 +880,7 @@ bool SpellEntry::IsPositiveSpell(WorldObject* caster, Unit* victim) const
     return true;
 }
 
-bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster, Unit* victim) const
+bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* caster, WorldObject const* victim) const
 {
     // Nostalrius (SpellMod)
     if (Custom & SPELL_CUSTOM_POSITIVE)
@@ -922,9 +922,13 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster
         case SPELL_EFFECT_DISPEL:
             if (caster && victim)
             {
-                if (CharmInfo *charm = victim->GetCharmInfo())
-                    if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                        return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
+                if (Unit const* pUnit = victim->ToUnit())
+                {
+                    if (CharmInfo const* charm = pUnit->GetCharmInfo())
+                        if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
+                            return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
+                }
+                
                 return caster->IsFriendlyTo(victim);
             }
         // non-positive aura use

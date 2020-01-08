@@ -5550,8 +5550,14 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             // Check for immune (not use charges)
-            if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
-                return;
+            if (!spellProto->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)) // confirmed Impaling spine goes through immunity
+            {
+                if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
+                {
+                    pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                    return;
+                }
+            }   
 
             uint32 absorb = 0;
             int32 resist = 0;
@@ -5676,8 +5682,14 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             // Check for immune
-            if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
-                return;
+            if (!spellProto->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
+            {
+                if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
+                {
+                    pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                    return;
+                }
+            }
 
             uint32 absorb = 0;
             int32 resist = 0;
@@ -5767,6 +5779,12 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // heal for caster damage (must be alive)
             if (target != pCaster && spellProto->SpellVisual == 163 && !pCaster->IsAlive())
                 return;
+
+            if (target->IsImmuneToSchool(spellProto, (1 << GetEffIndex())))
+            {
+                pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                return;
+            }
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
             // Ignore non positive values (can be result apply spellmods to aura damage).
@@ -5861,8 +5879,14 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             // Check for immune (not use charges)
-            if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
-                return;
+            if (!spellProto->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)) // confirmed Impaling spine goes through immunity
+            {
+                if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
+                {
+                    pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                    return;
+                }
+            }
 
             // ignore non positive values (can be result apply spellmods to aura damage
             uint32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
@@ -5924,6 +5948,17 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (!target->IsAlive())
                 return;
 
+            Unit* pCaster = GetCaster();
+
+            if (pCaster)
+            {
+                if (target->IsImmuneToSchool(spellProto, (1 << GetEffIndex())))
+                {
+                    pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                    return;
+                }
+            }
+
             // ignore non positive values (can be result apply spellmods to aura damage
             uint32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
 
@@ -5943,8 +5978,10 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             int32 gain = target->ModifyPower(power, pdamage);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             if (power != POWER_MANA)     // 1.9 - Mana regeneration over time will no longer generate threat.
-                if (Unit* pCaster = GetCaster())
+#endif
+                if (pCaster)
                     target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
             break;
         }
@@ -5953,6 +5990,17 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             // don't energize target if not alive, possible death persistent effects
             if (!target->IsAlive())
                 return;
+
+            Unit* pCaster = GetCaster();
+
+            if (pCaster)
+            {
+                if (target->IsImmuneToSchool(spellProto, (1 << GetEffIndex())))
+                {
+                    pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                    return;
+                }
+            }
 
             // ignore non positive values (can be result apply spellmods to aura damage
             uint32 amount = (m_modifier.m_amount > 0 ? uint32(m_modifier.m_amount) : 0);
@@ -5970,7 +6018,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             int32 gain = target->ModifyPower(POWER_MANA, pdamage);
 
-            if (Unit* pCaster = GetCaster())
+            if (pCaster)
                 target->GetHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
             break;
         }
@@ -5985,8 +6033,14 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             // Check for immune (not use charges)
-            if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
-                return;
+            if (!spellProto->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)) // confirmed Impaling spine goes through immunity
+            {
+                if (target->IsImmuneToDamage(spellProto->GetSpellSchoolMask(), spellProto))
+                {
+                    pCaster->SendSpellOrDamageImmune(target, spellProto->Id);
+                    return;
+                }
+            }
 
             int32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
 

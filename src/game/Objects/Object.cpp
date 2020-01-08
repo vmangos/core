@@ -3758,6 +3758,16 @@ void WorldObject::SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo miss
     SendObjectMessageToSet(&data, true);
 }
 
+void WorldObject::SendSpellOrDamageImmune(Unit* target, uint32 spellID) const
+{
+    WorldPacket data(SMSG_SPELLORDAMAGE_IMMUNE, (8 + 8 + 4 + 1));
+    data << GetObjectGuid();
+    data << target->GetObjectGuid();
+    data << uint32(spellID);
+    data << uint8(0);
+    SendMessageToSet(&data, true);
+}
+
 uint32 WorldObject::SpellCriticalDamageBonus(SpellEntry const* spellProto, uint32 damage, Unit* pVictim, Spell* spell)
 {
     // Calculate critical bonus

@@ -660,7 +660,18 @@ class SpellEntry
         }
 
         bool IsPositiveSpell(WorldObject* caster, Unit* victim) const;
-        bool IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster = nullptr, Unit* victim = nullptr) const;
+        bool IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* caster = nullptr, WorldObject const* victim = nullptr) const;
+
+        // this is propably the correct check for most positivity / negativity decisions
+        inline bool IsPositiveEffectMask(uint8 effectMask, WorldObject const* caster = nullptr, WorldObject const* target = nullptr) const
+        {
+            // spells with at least one negative effect are considered negative
+            // some self-applied spells have negative effects but in self casting case negative check ignored.
+            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+                if (Effect[i] && (effectMask & (1 << i)) && !IsPositiveEffect(SpellEffectIndex(i), caster, target))
+                    return false;
+            return true;
+        }
 
         inline bool IsHealSpell() const
         {
