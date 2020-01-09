@@ -868,7 +868,7 @@ uint16 SpellEntry::GetAuraMaxTicks() const
     return 6;
 }
 
-bool SpellEntry::IsPositiveSpell(WorldObject* caster, Unit* victim) const
+bool SpellEntry::IsPositiveSpell(WorldObject const* caster, WorldObject const* victim) const
 {
     if (Attributes & SPELL_ATTR_NEGATIVE)
         return false;
@@ -922,9 +922,9 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
         case SPELL_EFFECT_DISPEL:
             if (caster && victim)
             {
-                if (Unit const* pUnit = victim->ToUnit())
+                if (victim->IsUnit())
                 {
-                    if (CharmInfo const* charm = pUnit->GetCharmInfo())
+                    if (CharmInfo const* charm = static_cast<Unit const*>(victim)->GetCharmInfo())
                         if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
                             return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
                 }
