@@ -99,30 +99,6 @@ struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 
-struct Position
-{
-    Position() = default;
-    Position(float position_x, float position_y, float position_z, float orientation) : x(position_x), y(position_y), z(position_z), o(orientation) {}
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float o = 0.0f;
-};
-
-struct WorldLocation
-{
-    uint32 mapId = 0;
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float o = 0.0f;
-    explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
-        : mapId(_mapid), x(_x), y(_y), z(_z), o(_o) {}
-    WorldLocation(WorldLocation const& loc)
-        : mapId(loc.mapId), x(loc.x), y(loc.y), z(loc.z), o(loc.o) {}
-};
-
-
 //use this class to measure time between world update ticks
 //essential for units updating their spells after cells become active
 class WorldUpdateCounter

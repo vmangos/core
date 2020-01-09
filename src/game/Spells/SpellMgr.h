@@ -38,7 +38,6 @@
 class Player;
 class Spell;
 class Unit;
-struct WorldLocation;
 
 // Spell affects related declarations (accessed using SpellMgr functions)
 typedef std::map<uint32, uint64> SpellAffectMap;
