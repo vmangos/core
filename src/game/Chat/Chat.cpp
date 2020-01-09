@@ -3178,9 +3178,9 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
             if (!tele)
                 return false;
             mapid = tele->mapId;
-            x = tele->position_x;
-            y = tele->position_y;
-            z = tele->position_z;
+            x = tele->x;
+            y = tele->y;
+            z = tele->z;
             return true;
         }
         case LOCATION_LINK_TAXINODE:

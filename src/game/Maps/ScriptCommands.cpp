@@ -241,7 +241,7 @@ bool Map::ScriptCommand_TeleportTo(ScriptInfo const& script, WorldObject* source
     if (pSource->GetTypeId() == TYPEID_PLAYER)
         (static_cast<Player*>(pSource))->TeleportTo(script.teleportTo.mapId, script.x, script.y, script.z, script.o, script.teleportTo.teleportOptions);
     else
-        pSource->NearTeleportTo(script.x, script.y, script.z, script.o, script.teleportTo.teleportOptions);
+        pSource->NearTeleportTo(script, script.teleportTo.teleportOptions);
 
     return false;
 }

@@ -227,14 +227,7 @@ typedef std::multimap<uint32,SpellTargetEntry> SpellScriptTarget;
 typedef std::pair<SpellScriptTarget::const_iterator,SpellScriptTarget::const_iterator> SpellScriptTargetBounds;
 
 // coordinates for spells (accessed using SpellMgr functions)
-struct SpellTargetPosition
-{
-    uint32 target_mapId;
-    float  target_X;
-    float  target_Y;
-    float  target_Z;
-    float  target_Orientation;
-};
+typedef WorldLocation SpellTargetPosition;
 
 typedef std::unordered_map<uint32, SpellTargetPosition> SpellTargetPositionMap;
 

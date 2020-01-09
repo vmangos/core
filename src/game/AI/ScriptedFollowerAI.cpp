@@ -304,15 +304,10 @@ void FollowerAI::MovementInform(uint32 uiMotionType, uint32 uiPointId)
         }
         else
         {
-            // Ustaag <Nostalrius> : vilain fix des mobs qui voulaient pas respawn à leur point de spawn
+            // ugly fix mobs who didn't want to spawn at their spawn point
             SetFollowPaused(false);
-            float x = 0.0f;
-            float y = 0.0f;
-            float z = 0.0f;
-            float o = 0.0f;
-            m_creature->GetHomePosition(x, y, z, o);
             m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-            m_creature->NearTeleportTo(x, y, z, o);
+            m_creature->NearTeleportTo(m_creature->GetHomePosition());
             m_creature->ForcedDespawn();
         }
     }

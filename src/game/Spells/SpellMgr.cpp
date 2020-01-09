@@ -74,20 +74,20 @@ void SpellMgr::LoadSpellTargetPositions()
 
         SpellTargetPosition st;
 
-        st.target_mapId       = fields[1].GetUInt32();
-        st.target_X           = fields[2].GetFloat();
-        st.target_Y           = fields[3].GetFloat();
-        st.target_Z           = fields[4].GetFloat();
-        st.target_Orientation = fields[5].GetFloat();
+        st.mapId       = fields[1].GetUInt32();
+        st.x           = fields[2].GetFloat();
+        st.y           = fields[3].GetFloat();
+        st.z           = fields[4].GetFloat();
+        st.o           = fields[5].GetFloat();
 
-        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(st.target_mapId);
+        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(st.mapId);
         if (!mapEntry)
         {
-            sLog.outErrorDb("Spell (ID:%u) target map (ID: %u) does not exist in `Map.dbc`.", Spell_ID, st.target_mapId);
+            sLog.outErrorDb("Spell (ID:%u) target map (ID: %u) does not exist in `Map.dbc`.", Spell_ID, st.mapId);
             continue;
         }
 
-        if (st.target_X == 0 && st.target_Y == 0 && st.target_Z == 0)
+        if (st.x == 0 && st.y == 0 && st.z == 0)
         {
             sLog.outErrorDb("Spell (ID:%u) target coordinates not provided.", Spell_ID);
             continue;

@@ -51,11 +51,11 @@ class Item;
 
 struct GameTele
 {
-    float  position_x;
-    float  position_y;
-    float  position_z;
-    float  orientation;
-    uint32 mapId;
+    float  x = 0.0f;
+    float  y = 0.0f;
+    float  z = 0.0f;
+    float  o = 0.0f;
+    uint32 mapId = 0;
     std::string name;
     std::wstring wnameLow;
 };

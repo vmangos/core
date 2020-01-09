@@ -2941,10 +2941,10 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 // teleportspells are handled in another way
                 if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_TELEPORT_UNITS)
                     break;
-                if (st->target_mapId == m_caster->GetMapId())
-                    m_targets.setDestination(st->target_X, st->target_Y, st->target_Z);
+                if (st->mapId == m_caster->GetMapId())
+                    m_targets.setDestination(st->x, st->y, st->z);
                 else
-                    sLog.outError("SPELL: wrong map (%u instead %u) target coordinates for spell ID %u", st->target_mapId, m_caster->GetMapId(), m_spellInfo->Id);
+                    sLog.outError("SPELL: wrong map (%u instead %u) target coordinates for spell ID %u", st->mapId, m_caster->GetMapId(), m_spellInfo->Id);
             }
             else
                 sLog.outError("SPELL: unknown target coordinates for spell ID %u", m_spellInfo->Id);

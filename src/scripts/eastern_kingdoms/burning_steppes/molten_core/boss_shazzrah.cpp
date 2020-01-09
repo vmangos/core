@@ -120,8 +120,7 @@ struct boss_shazzrahAI : public ScriptedAI
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
                 {
                     DoResetThreat();
-                    //if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                    m_creature->NearTeleportTo(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), m_creature->GetOrientation());
+                    m_creature->NearTeleportTo(pTarget->GetPosition());
                     m_creature->Attack(pTarget, true);
                 }
 

@@ -577,8 +577,7 @@ Player::Player(WorldSession* session) : Unit(),
     m_lastFromClientCastedSpellID = 0;
 
     // Anti undermap
-    _undermapPosValid = false;
-    _lastSafeX = _lastSafeY = _lastSafeZ = 0.f;
+    m_undermapPosValid = false;
     session->InitCheatData(this);
     m_petEntry = 0;
     m_petSpell = 0;

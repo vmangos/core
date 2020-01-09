@@ -159,9 +159,7 @@ struct boss_gothikAI : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode();
         m_creature->Respawn();
-        float x, y, z, o;
-        m_creature->GetHomePosition(x, y, z, o);
-        m_creature->NearTeleportTo(x, y, z, o);
+        m_creature->NearTeleportTo(m_creature->GetHomePosition());
     }
 
     void KilledUnit(Unit* pVictim) override

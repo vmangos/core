@@ -1731,7 +1731,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         */
         bool SwitchInstance(uint32 newInstanceId);
         bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, std::function<void()> recover = std::function<void()>());
-        bool TeleportTo(WorldLocation const& loc, uint32 options = 0, std::function<void()> recover = std::function<void()>())
+        template <class T>
+        bool TeleportTo(T const& loc, uint32 options = 0, std::function<void()> recover = std::function<void()>())
         {
             return TeleportTo(loc.mapId, loc.x, loc.y, loc.z, loc.o, options, recover);
         }
@@ -1826,30 +1827,29 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SetFly(bool enable) override;
 
         // Anti undermap
-        void SaveNoUndermapPosition(float x, float y, float z)
+        void SaveNoUndermapPosition(float x, float y, float z, float o)
         {
-            _lastSafeX = x;
-            _lastSafeY = y;
-            _lastSafeZ = z;
-            _undermapPosValid = true;
+            m_lastSafePosition.x = x;
+            m_lastSafePosition.y = y;
+            m_lastSafePosition.z = z + 2.0f;
+            m_lastSafePosition.o = 0;
+            m_undermapPosValid = true;
         }
         bool UndermapRecall()
         {
-            if (!_undermapPosValid || IsBeingTeleported())
+            if (!m_undermapPosValid || IsBeingTeleported())
                 return false;
-            if (GetDistance2d(_lastSafeX, _lastSafeY) > 100.0f)
+            if (GetDistance2d(m_lastSafePosition) > 100.0f)
             {
-                _undermapPosValid = false;
+                m_undermapPosValid = false;
                 return false;
             }
-            NearTeleportTo(_lastSafeX, _lastSafeY, _lastSafeZ + 2.0f, GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
-            _undermapPosValid = false;
+            NearTeleportTo(m_lastSafePosition, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET);
+            m_undermapPosValid = false;
             return true;
         }
-        float _lastSafeX;
-        float _lastSafeY;
-        float _lastSafeZ;
-        bool  _undermapPosValid;
+        Position m_lastSafePosition;
+        bool  m_undermapPosValid;
 
         uint32 GetHomeBindMap() const { return m_homebindMapId; }
         uint16 GetHomeBindAreaId() const { return m_homebindAreaId; }

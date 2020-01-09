@@ -809,15 +809,19 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         float GetDistance(WorldObject const* obj) const;
         float GetDistance(float x, float y, float z) const;
         float GetDistance(WorldLocation const& position) const { return GetDistance(position.x, position.y, position.z); }
+        float GetDistance(Position const& position) const { return GetDistance(position.x, position.y, position.z); }
         float GetDistance2d(WorldObject const* obj) const;
         float GetDistance2d(float x, float y) const;
         float GetDistance2d(WorldLocation const& position) const { return GetDistance2d(position.x, position.y); }
+        float GetDistance2d(Position const& position) const { return GetDistance2d(position.x, position.y); }
         float GetDistanceZ(WorldObject const* obj) const;
         float GetDistanceSqr(float x, float y, float z) const;
         bool IsInMap(WorldObject const* obj) const;
-        bool IsWithinDist3d(WorldLocation const& position, float dist2compare) const { return IsWithinDist3d(position.x, position.y, position.z, dist2compare); }
+        template <class T>
+        bool IsWithinDist3d(T const& position, float dist2compare) const { return IsWithinDist3d(position.x, position.y, position.z, dist2compare); }
         bool IsWithinDist3d(float x, float y, float z, float dist2compare) const;
-        bool IsWithinDist2d(WorldLocation const& position, float dist2compare) const { return IsWithinDist2d(position.x, position.y, dist2compare); }
+        template <class T >
+        bool IsWithinDist2d(T const& position, float dist2compare) const { return IsWithinDist2d(position.x, position.y, dist2compare); }
         bool IsWithinDist2d(float x, float y, float dist2compare) const;
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
 

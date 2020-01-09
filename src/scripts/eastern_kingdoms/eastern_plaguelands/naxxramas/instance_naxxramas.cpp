@@ -112,69 +112,69 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
 {
     if (pWho->IsInEvadeMode())
         return false;
+
     uint32 entry = pWho->GetEntry();
     float dist;
     switch (entry)
     {
-    case NPC_GROBBULUS:
-        dist = 180.0f;
-        break;
-    case NPC_FAERLINA:
-        if (pWho->GetPositionZ() > 266.0f)
+        case NPC_GROBBULUS:
+            dist = 180.0f;
+            break;
+        case NPC_FAERLINA:
+            if (pWho->GetPositionZ() > 266.0f)
+            {
+                pWho->AI()->EnterEvadeMode();
+                return false;
+            }
+            return true;
+        case NPC_ANUB_REKHAN:
+            dist = 130.0f;
+            break;
+        case NPC_NOTH:
+            dist = 120.0f;
+            break;
+        case NPC_HEIGAN:
         {
-            pWho->AI()->EnterEvadeMode();
-            return false;
+            // evade if brought out of room towards bat/grub/beast gauntlet
+            if (pWho->GetPositionX() > 2825.0f)
+            {
+                pWho->AI()->EnterEvadeMode();
+                return false;
+            }
+            dist = 90.0f;
+            break;
         }
-        return true;
-    case NPC_ANUB_REKHAN:
-        dist = 130.0f;
-        break;
-    case NPC_NOTH:
-        dist = 120.0f;
-        break;
-    case NPC_HEIGAN:
-    {
-        // evade if brought out of room towards bat/grub/beast gauntlet
-        if (pWho->GetPositionX() > 2825.0f)
+        case NPC_LOATHEB:
+            dist = 100.0f;
+            break;
+        case NPC_GOTHIK:
         {
-            pWho->AI()->EnterEvadeMode();
-            return false;
+            dist = 150.0f;
+            break;
         }
-        dist = 90.0f;
-        break;
+        case NPC_RAZUVIOUS:
+            if (pWho->GetPositionZ() > 275.0f)
+            {
+                pWho->AI()->EnterEvadeMode();
+                return false;
+            }
+            return true;
+        case NPC_KELTHUZAD:
+            dist = 130.0f;
+            break;
+        case NPC_BLAUMEUX:
+        case NPC_MOGRAINE:
+        case NPC_ZELIEK:
+        case NPC_THANE:
+            dist = 115.0f;
+            break;
+        default:
+            sLog.outError("instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
+            dist = 9999.0f;
+            break;
     }
-    case NPC_LOATHEB:
-        dist = 100.0f;
-        break;
-    case NPC_GOTHIK:
-    {
-        dist = 150.0f;
-        break;
-    }
-    case NPC_RAZUVIOUS:
-        if (pWho->GetPositionZ() > 275.0f)
-        {
-            pWho->AI()->EnterEvadeMode();
-            return false;
-        }
-        return true;
-    case NPC_KELTHUZAD:
-        dist = 130.0f;
-        break;
-    case NPC_BLAUMEUX:
-    case NPC_MOGRAINE:
-    case NPC_ZELIEK:
-    case NPC_THANE:
-        dist = 115.0f;
-        break;
-    default:
-        sLog.outError("instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
-        dist = 9999.0f;
-        break;
-    }
-    float x, y, z, o;
-    pWho->GetHomePosition(x, y, z, o);
-    if (pWho->GetDistance2d(x, y) > dist)
+
+    if (pWho->GetDistance2d(pWho->GetHomePosition()) > dist)
     {
         if (entry == NPC_BLAUMEUX || entry == NPC_MOGRAINE || entry == NPC_ZELIEK || entry == NPC_THANE)
         {

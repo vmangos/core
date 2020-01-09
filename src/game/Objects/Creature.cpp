@@ -176,8 +176,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_AlreadySearchedAssistance(false),
     m_bRegenHealth(true), m_bRegenMana(true), m_AI_locked(false), m_isDeadByDefault(false), m_temporaryFactionFlags(TEMPFACTION_NONE),
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _creatureGroup(nullptr),
-    m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
-    m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
+    m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f), m_reactState(REACT_PASSIVE),
     _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
     m_AI_InitializeOnRespawn(false), m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0),
     _isEscortable(false), m_reputationId(-1), m_castingTargetGuid(0)
@@ -2812,13 +2811,13 @@ time_t Creature::GetRespawnTimeEx() const
 void Creature::GetRespawnCoord(float &x, float &y, float &z, float* ori, float* dist) const
 {
     // Nostalrius : pouvoir changer point de spawn d'un mob -> Creature::SetHomePosition
-    if (m_HomeX > 0.1f || m_HomeX < -0.1f)
+    if (m_homePosition.x > 0.1f || m_homePosition.y < -0.1f)
     {
-        x = m_HomeX;
-        y = m_HomeY;
-        z = m_HomeZ;
+        x = m_homePosition.x;
+        y = m_homePosition.y;
+        z = m_homePosition.z;
         if (ori)
-            *ori = m_HomeOrientation;
+            *ori = m_homePosition.o;
         if (dist)
             *dist = GetRespawnRadius();
     }
@@ -3075,12 +3074,12 @@ void Creature::DisappearAndDie()
 
 void Creature::GetHomePosition(float &x, float &y, float &z, float &o, float* dist)
 {
-    if (m_HomeX != 0.0f)
+    if (m_homePosition.x != 0.0f)
     {
-        x = m_HomeX;
-        y = m_HomeY;
-        z = m_HomeZ;
-        o = m_HomeOrientation;
+        x = m_homePosition.x;
+        y = m_homePosition.y;
+        z = m_homePosition.z;
+        o = m_homePosition.o;
         if (dist)
             (*dist) = GetRespawnRadius();
         return;
@@ -3089,10 +3088,10 @@ void Creature::GetHomePosition(float &x, float &y, float &z, float &o, float* di
 }
 void Creature::SetHomePosition(float x, float y, float z, float o)
 {
-    m_HomeX = x;
-    m_HomeY = y;
-    m_HomeZ = z;
-    m_HomeOrientation = o;
+    m_homePosition.x = x;
+    m_homePosition.y = y;
+    m_homePosition.z = z;
+    m_homePosition.o = o;
 }
 
 void Creature::ResetHomePosition()
@@ -3100,7 +3099,7 @@ void Creature::ResetHomePosition()
     if (CreatureData const* data = sObjectMgr.GetCreatureData(GetGUIDLow()))
         SetHomePosition(data->posX, data->posY, data->posZ, data->orientation);
     else if (IsTemporarySummon())
-        GetSummonPoint(m_HomeX, m_HomeY, m_HomeZ, m_HomeOrientation);
+        GetSummonPoint(m_homePosition.x, m_homePosition.y, m_homePosition.z, m_homePosition.o);
 }
 
 void Creature::RemoveAurasAtReset()
@@ -3574,7 +3573,7 @@ bool Creature::canCreatureAttack(Unit const* pVictim, bool force) const
         if (!pVictim->IsWithinDist(unit, dist))
             return false;
     }
-    else if (!pVictim->IsWithinDist3d(m_HomeX, m_HomeY, m_HomeZ, dist))
+    else if (!pVictim->IsWithinDist3d(m_homePosition, dist))
         return false;
 
     return pVictim->IsInAccessablePlaceFor(this);

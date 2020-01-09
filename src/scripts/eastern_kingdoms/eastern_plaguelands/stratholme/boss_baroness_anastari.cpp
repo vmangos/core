@@ -211,7 +211,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
                             Position_memorized =  true;
                         }
 
-                        m_creature->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.0f);
+                        m_creature->NearTeleportTo(target->GetPosition());
                         if (DoCastSpellIfCan(target, SPELL_POSSESS) == CAST_OK)
                         {
                             m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, true);

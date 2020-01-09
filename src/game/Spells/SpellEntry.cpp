@@ -1100,6 +1100,13 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
     return true;
 }
 
+bool SpellEntry::IsReflectableSpell(WorldObject const* caster, WorldObject const* victim) const
+{
+    return DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !HasAttribute(SPELL_ATTR_IS_ABILITY)
+        && !HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
+        && !HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(caster, victim);
+}
+
 SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
 {
     // talents that learn spells can have stance requirements that need ignore

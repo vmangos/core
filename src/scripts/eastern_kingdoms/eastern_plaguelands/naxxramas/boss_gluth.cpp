@@ -246,9 +246,7 @@ struct boss_gluthAI : public ScriptedAI
                 }
                 else
                 {
-                    float x, y, z, o;
-                    m_creature->GetHomePosition(x, y, z, o);
-                    if (m_creature->GetDistance2d(x, y) > 150.0f)
+                    if (m_creature->GetDistance2d(m_creature->GetHomePosition()) > 150.0f)
                     {
                         EnterEvadeMode();
                     }

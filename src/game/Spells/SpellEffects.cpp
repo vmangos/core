@@ -229,7 +229,7 @@ void Spell::EffectResurrectNew(SpellEffectIndex eff_idx)
             return;
         uint32 health = damage;
 
-        pet->NearTeleportTo(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), m_caster->GetOrientation(), false);
+        pet->NearTeleportTo(m_caster->GetPosition(), 0);
         pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
         pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
         pet->SetDeathState(ALIVE);
@@ -2218,10 +2218,10 @@ void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
                 return;
             }
 
-            if (st->target_mapId == unitTarget->GetMapId())
-                unitTarget->NearTeleportTo(st->target_X, st->target_Y, st->target_Z, st->target_Orientation, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget == m_caster ? TELE_TO_SPELL : 0));
+            if (st->mapId == unitTarget->GetMapId())
+                unitTarget->NearTeleportTo(*st, TELE_TO_NOT_LEAVE_COMBAT | TELE_TO_NOT_UNSUMMON_PET | (unitTarget == m_caster ? TELE_TO_SPELL : 0));
             else if (unitTarget->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)unitTarget)->TeleportTo(st->target_mapId, st->target_X, st->target_Y, st->target_Z, st->target_Orientation, unitTarget == m_caster ? TELE_TO_SPELL : 0);
+                ((Player*)unitTarget)->TeleportTo(*st, unitTarget == m_caster ? TELE_TO_SPELL : 0);
             break;
         }
         case TARGET_EFFECT_SELECT:
@@ -5418,8 +5418,8 @@ void Spell::EffectStuck(SpellEffectIndex /*eff_idx*/)
         return;
 
     // TP to last overmap position
-    if (fabs(pTarget->_lastSafeX) > 0.1f && fabs(pTarget->_lastSafeY) > 0.1f)
-        pTarget->TeleportTo(pTarget->GetMapId(), pTarget->_lastSafeX, pTarget->_lastSafeY, pTarget->_lastSafeZ - 2.0f + 0.7f, 0.0f);
+    if (fabs(pTarget->m_lastSafePosition.x) > 0.1f && fabs(pTarget->m_lastSafePosition.y) > 0.1f)
+        pTarget->TeleportTo(pTarget->GetMapId(), pTarget->m_lastSafePosition.x, pTarget->m_lastSafePosition.y, pTarget->m_lastSafePosition.z - 2.0f + 0.7f, pTarget->m_lastSafePosition.o);
 }
 
 void Spell::EffectSummonPlayer(SpellEffectIndex /*eff_idx*/)
@@ -6272,7 +6272,7 @@ void Spell::EffectSummonDeadPet(SpellEffectIndex /*eff_idx*/)
         return;
 
     // Chakor : Teleport the pet to the player's location
-    pet->NearTeleportTo(_player->GetPositionX(), _player->GetPositionY(), _player->GetPositionZ(), _player->GetOrientation(), false);
+    pet->NearTeleportTo(_player->GetPosition(), false);
     pet->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
     pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);
     pet->SetDeathState(ALIVE);

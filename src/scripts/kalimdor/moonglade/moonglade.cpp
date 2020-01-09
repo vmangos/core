@@ -609,13 +609,8 @@ struct npc_keeper_remulosAI : public npc_escortAI
                             //m_creature->ForcedDespawn(3000);
                             // Alita : piqué ce morceau de code à ScriptedFollowerAI.h, car NON il ne se replaçait pas forcément correctement (p-etre lié à mon code dans evade mode)
                             //Ustaag <Nostalrius> : vilain fix des mobs qui voulaient pas respawn à leur point de spawn
-                            float x = 0.0f;
-                            float y = 0.0f;
-                            float z = 0.0f;
-                            float o = 0.0f;
-                            m_creature->GetHomePosition(x, y, z, o);
                             //m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(),nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-                            m_creature->NearTeleportTo(x, y, z, o);
+                            m_creature->NearTeleportTo(m_creature->GetHomePosition());
                             m_creature->ForcedDespawn();
                             m_uiOutroTimer = 0;
                             break;
@@ -1052,12 +1047,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                     {
                         if (m_uiQuestComplete <= uiDiff)
                         {
-                            float x = 0.0f;
-                            float y = 0.0f;
-                            float z = 0.0f;
-                            float o = 0.0f;
-                            m_creature->GetHomePosition(x, y, z, o);
-                            m_creature->NearTeleportTo(x, y, z, o);
+                            m_creature->NearTeleportTo(m_creature->GetHomePosition());
                             if (pPlayer->GetQuestStatus(QUEST_WAKING_LEGENDS) == QUEST_STATUS_INCOMPLETE)
                                 pPlayer->GroupEventHappens(QUEST_WAKING_LEGENDS, m_creature);
                             m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
