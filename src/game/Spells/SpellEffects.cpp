@@ -4994,8 +4994,25 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 {
                     if (Player* player = m_caster->ToPlayer())
                     {
-                        // Remove minipet without consuming a snowball
-                        if (player->GetMiniPet())
+                        /* Set which npc entry should we check later to see if we should despawn the pet
+                           or just summon a new one */
+                        uint32 entryToCheck;
+                        switch (m_spellInfo->Id) {
+                            case 26532: // Green Helper
+                                entryToCheck = 15698;
+                                break;
+                            case 26541: // Red Helper
+                                entryToCheck = 15705;
+                                break;
+                            case 26469: // Tiny Snowman
+                                entryToCheck = 15710;
+                                break;
+                            case 26528: // Winter Reindeer
+                                entryToCheck = 15706;
+                                break;
+                        }
+                        // Remove minipet without consuming a snowball (only if it's the same pet)
+                        if (player->GetMiniPet() && player->GetMiniPet()->GetEntry() == entryToCheck)
                         {
                             player->RemoveMiniPet();
                             return;

@@ -28,6 +28,8 @@
 *.exp
 *.res
 
+# CLion files
+cmake-build-debug
 
 #
 # Top-level generic files
