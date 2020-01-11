@@ -373,7 +373,7 @@ enum BellHourlySoundFX
 enum BellHourlySoundAreas
 {
     TIRISFAL_ZONE = 85,
-	UNDERCITY_ZONE = 1497,
+    UNDERCITY_ZONE = 1497,
     IRONFORGE_1_AREA = 809,
     IRONFORGE_2_AREA = 1,
     DARNASSUS_AREA = 1657,
