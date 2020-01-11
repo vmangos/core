@@ -39,7 +39,10 @@
 
 INSTANTIATE_SINGLETON_1(MapPersistentStateManager);
 
-static uint32 resetEventTypeDelay[MAX_RESET_EVENT_TYPE] = { 0, 3600, 900, 300, 60 };
+static uint32 resetEventTypeDelay[MAX_RESET_EVENT_TYPE] = { 0,                      // not used
+                                                            3600, 900, 300, 60,     // (seconds) normal and official timer delay to inform player about instance reset
+                                                            60, 30, 10, 5           // (seconds) fast reset by gm command inform timer
+};
 
 //== MapPersistentState functions ==========================
 MapPersistentState::MapPersistentState(uint16 MapId, uint32 InstanceId)
@@ -546,8 +549,10 @@ void DungeonResetScheduler::Update()
         {
             // global reset/warning for a certain map
             time_t resetTime = GetResetTimeFor(event.mapid);
-            m_InstanceSaves._ResetOrWarnAll(event.mapid, event.type != RESET_EVENT_INFORM_LAST, uint32(resetTime - now));
-            if (event.type != RESET_EVENT_INFORM_LAST)
+            uint32 timeLeft = uint32(std::max(int32(resetTime - now), 0));
+            bool warn = event.type != RESET_EVENT_INFORM_LAST && event.type != RESET_EVENT_FORCED_INFORM_LAST;
+            m_InstanceSaves._ResetOrWarnAll(event.mapid, warn, timeLeft);
+            if (event.type != RESET_EVENT_INFORM_LAST && event.type != RESET_EVENT_FORCED_INFORM_LAST)
             {
                 // schedule the next warning/reset
                 event.type = ResetEventType(event.type + 1);
@@ -578,6 +583,32 @@ void DungeonResetScheduler::Update()
         }
         m_resetTimeQueue.erase(m_resetTimeQueue.begin());
     }
+}
+
+void DungeonResetScheduler::ResetAllRaid()
+{
+    time_t now = time(nullptr);
+    ResetTimeQueue rTQ;
+    rTQ.clear();
+
+    time_t timeleft = resetEventTypeDelay[RESET_EVENT_FORCED_INFORM_1];
+
+    for (auto& itr : m_resetTimeQueue)
+    {
+        DungeonResetEvent& event = itr.second;
+
+        // we only reset raid dungeon
+        if (event.type == RESET_EVENT_NORMAL_DUNGEON)
+        {
+            rTQ.insert(std::pair<time_t, DungeonResetEvent>(itr.first, event));
+            continue;
+        }
+        event.type = RESET_EVENT_FORCED_INFORM_1;
+        time_t next_reset = now + timeleft;
+        SetResetTimeFor(event.mapid, next_reset);
+        rTQ.insert(std::pair<time_t, DungeonResetEvent>(now, event));
+    }
+    m_resetTimeQueue = rTQ;
 }
 
 //== MapPersistentStateManager functions =========================
@@ -881,7 +912,7 @@ struct MapPersistantStateResetWorker
     MapPersistantStateResetWorker() {};
     void operator()(Map* map)
     {
-        map->TeleportAllPlayersToHomeBind();
+        map->TeleportAllPlayersTo(TELEPORT_LOCATION_HOMEBIND);
         // Mark the map to be removed. In ~Map, the persistent state gets removed
         // Also prevents players from joining the map again
         ((DungeonMap*)map)->Reset(INSTANCE_RESET_GLOBAL);
@@ -949,6 +980,7 @@ void MapPersistentStateManager::_ResetOrWarnAll(uint32 mapid, bool warn, uint32 
         return;
     }
 
+    // note: this isn't fast but it's meant to be executed very rarely
     MapPersistantStateWarnWorker worker(timeLeft);
     sMapMgr.DoForAllMapsWithMapId(mapid, worker);
 }

@@ -1883,25 +1883,41 @@ void Map::CreateInstanceData(bool load)
     }
 }
 
-void Map::TeleportAllPlayersToHomeBind()
+void Map::SetWeather(uint32 zoneId, WeatherType type, float grade, bool permanently)
+{
+    Weather* wth = m_weatherSystem->FindOrCreateWeather(zoneId);
+    wth->SetWeather(WeatherType(type), grade, this, permanently);
+}
+
+void Map::TeleportAllPlayersTo(TeleportLocation loc)
 {
     while (HavePlayers())
     {
         if (Player* plr = m_mapRefManager.getFirst()->getSource())
         {
             // Teleport to specified location and removes the player from this map (if the map exists).
-            plr->TeleportToHomebind();
+            // Todo : we can add some specific location if needed (ex: map exit location for dungeon)
+            switch (loc)
+            {
+                case TELEPORT_LOCATION_HOMEBIND:
+                {
+                    ASSERT(plr->GetHomeBindMap() != GetId());
+                    plr->TeleportToHomebind();
+                    break;
+                }
+                case TELEPORT_LOCATION_BG_ENTRY_POINT:
+                {
+                    plr->TeleportToBGEntryPoint();
+                    break;
+                }
+                default:
+                    break;
+            }
             // just in case, remove the player from the list explicitly here as well to prevent a possible infinite loop
             // note that this remove is not needed if the code works well in other places
             plr->GetMapRef().unlink();
         }
     }
-}
-
-void Map::SetWeather(uint32 zoneId, WeatherType type, float grade, bool permanently)
-{
-    Weather* wth = m_weatherSystem->FindOrCreateWeather(zoneId);
-    wth->SetWeather(WeatherType(type), grade, this, permanently);
 }
 
 template void Map::Add(Corpse*);
@@ -2202,19 +2218,7 @@ void DungeonMap::PermBindAllPlayers(Player* player)
 
 void DungeonMap::UnloadAll(bool pForce)
 {
-    if (HavePlayers())
-    {
-        sLog.outError("DungeonMap::UnloadAll: there are still players in the instance at unload, should not happen!");
-        MapRefManager::iterator itr = m_mapRefManager.begin();
-        while (itr != m_mapRefManager.end())
-        {
-            Player* plr = itr->getSource();
-            ASSERT(plr->GetHomeBindMap() != GetId());
-            plr->TeleportToHomebind();
-            plr->GetMapRef().unlink();
-            itr = m_mapRefManager.begin();
-        }
-    }
+    TeleportAllPlayersTo(TELEPORT_LOCATION_HOMEBIND);
 
     if (m_resetAfterUnload)
         GetPersistanceState()->DeleteRespawnTimesAndData();
@@ -2326,16 +2330,7 @@ void BattleGroundMap::SetUnload()
 
 void BattleGroundMap::UnloadAll(bool pForce)
 {
-    while (HavePlayers())
-    {
-        if (Player* plr = m_mapRefManager.getFirst()->getSource())
-        {
-            plr->TeleportTo(plr->GetBattleGroundEntryPoint());
-            // Far teleports may be delayed until the next map update. Remove the player from
-            // the list explicitly here to prevent an infinite loop
-            plr->GetMapRef().unlink();
-        }
-    }
+    TeleportAllPlayersTo(TELEPORT_LOCATION_BG_ENTRY_POINT);
 
     Map::UnloadAll(pForce);
 }
