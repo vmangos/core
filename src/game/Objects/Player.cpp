@@ -11488,7 +11488,7 @@ void Player::AddItemToBuyBackSlot(Item* pItem, uint32 money, ObjectGuid vendorGu
     SetUInt32Value(PLAYER_FIELD_BUYBACK_ITEM_ID, pItem->GetEntry());
     SetUInt32Value(PLAYER_FIELD_BUYBACK_RANDOM_PROPERTIES_ID, pItem->GetItemRandomPropertyId());
     SetUInt32Value(PLAYER_FIELD_BUYBACK_SEED, pItem->GetItemSuffixFactor());
-    SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE, pItem->GetProto()->BuyPrice);
+    SetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE, (pItem->GetProto()->BuyPrice / pItem->GetProto()->BuyCount) * pItem->GetCount());
     SetUInt32Value(PLAYER_FIELD_BUYBACK_DURABILITY, pItem->GetUInt32Value(ITEM_FIELD_DURABILITY));
     SetUInt32Value(PLAYER_FIELD_BUYBACK_COUNT, pItem->GetCount());
     SetUInt64Value(PLAYER_FIELD_BUYBACK_NPC, vendorGuid);
