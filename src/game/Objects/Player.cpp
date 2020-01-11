@@ -798,7 +798,7 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     return true;
 }
 
-bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
+bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount, uint32 enchantId)
 {
     DEBUG_LOG("STORAGE: Creating initial item, itemId = %u, count = %u", titem_id, titem_amount);
 
@@ -824,7 +824,14 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount)
     uint8 msg = CanStoreNewItem(INVENTORY_SLOT_BAG_0, NULL_SLOT, sDest, titem_id, titem_amount);
     if (msg == EQUIP_ERR_OK)
     {
-        StoreNewItem(sDest, titem_id, true, Item::GenerateItemRandomPropertyId(titem_id));
+        if (Item* pItem = StoreNewItem(sDest, titem_id, true, Item::GenerateItemRandomPropertyId(titem_id)))
+        {
+            if (enchantId)
+            {
+                pItem->ClearEnchantment(PERM_ENCHANTMENT_SLOT);
+                pItem->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantId, 0, 0);
+            }
+        }
         return true;                                        // stored
     }
 

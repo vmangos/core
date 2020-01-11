@@ -555,6 +555,24 @@ public:
 
 class PvPMaintenanceMaker;
 
+struct PlayerPremadeItem
+{
+    PlayerPremadeItem(uint32 item, uint32 enchant, uint32 team) : itemId(item), enchantId(enchant), requiredTeam(team) {};
+    uint32 itemId = 0;
+    uint32 enchantId = 0;
+    uint32 requiredTeam = 0;
+};
+struct PlayerPremadeTemplate
+{
+    uint32 entry = 0;
+    uint8 level = 0;
+    uint8 requiredClass = 0;
+    std::string name;
+    std::vector<PlayerPremadeItem> items;
+    std::vector<uint32> spells;
+};
+typedef std::unordered_map<uint32, PlayerPremadeTemplate> PlayerPremadeTemplatesMap;
+
 class ObjectMgr
 {
     friend class PlayerDumpReader;
@@ -1351,6 +1369,9 @@ class ObjectMgr
         void ResetOldMailCounter() { m_OldMailCounter = 0; }
         void IncrementOldMailCounter(uint32 count) { m_OldMailCounter += count; }
 
+        void LoadPlayerPremadeTemplates();
+        void ApplyPremadeTemplateToPlayer(uint32 entry, Player* pPlayer) const;
+        PlayerPremadeTemplatesMap const& GetPlayerPremadeTemplates() const { return m_playerPremadeTemplateMap; }
     protected:
 
         // first free id for selected id type
@@ -1509,6 +1530,8 @@ class ObjectMgr
         CacheVendorItemMap m_CacheVendorItemMap;
         CacheTrainerSpellMap m_CacheTrainerTemplateSpellMap;
         CacheTrainerSpellMap m_CacheTrainerSpellMap;
+
+        PlayerPremadeTemplatesMap m_playerPremadeTemplateMap;
 };
 
 #define sObjectMgr MaNGOS::Singleton<ObjectMgr>::Instance()

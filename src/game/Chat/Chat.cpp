@@ -190,6 +190,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "race",           SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleCharacterChangeRaceCommand, "", nullptr },
         { "skin",           SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleCharacterCopySkinCommand,   "", nullptr },
         { "fillflys",       SEC_GAMEMASTER,     true,  &ChatHandler::HandleCharacterFillFlysCommand,   "", nullptr },
+        { "premade",        SEC_BASIC_ADMIN,    false, &ChatHandler::HandleCharacterPremadeCommand,    "", nullptr },
         { "clean",          SEC_ADMINISTRATOR,  true,  nullptr,                                        "", characterCleanCommandTable },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };

@@ -1818,6 +1818,45 @@ bool ChatHandler::HandleCharacterHasItemCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleCharacterPremadeCommand(char* args)
+{
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        return false;
+    }
+        
+    if (!*args)
+        return false;
+
+    uint32 entry = atoi(args);
+
+    if (!entry)
+    {
+        std::string name = args;
+        for (auto itr : sObjectMgr.GetPlayerPremadeTemplates())
+        {
+            if (itr.second.name == name && itr.second.requiredClass == pPlayer->GetClass())
+            {
+                entry = itr.first;
+                break;
+            }
+        }
+    }
+
+    if (!entry)
+    {
+        SendSysMessage("No matching premade player template found.");
+        return false;
+    }
+
+    sObjectMgr.ApplyPremadeTemplateToPlayer(entry, pPlayer);
+
+    PSendSysMessage("Premade template %u applied to player %s.", entry, pPlayer->GetName());
+    return true;
+}
+
 bool ChatHandler::HandleCharacterChangeRaceCommand(char* args)
 {
     if (Player* pPlayer = GetSelectedPlayer())

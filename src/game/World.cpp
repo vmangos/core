@@ -1737,6 +1737,8 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading spell group stack rules ...");
     sSpellMgr.LoadSpellGroupStackRules();
 
+    sObjectMgr.LoadPlayerPremadeTemplates();
+
     if (getConfig(CONFIG_BOOL_RESTORE_DELETED_ITEMS))
     {
         sLog.outString("Restoring deleted items to players ...");

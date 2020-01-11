@@ -10870,3 +10870,204 @@ void ObjectMgr::GetAreaLocaleString(uint32 entry, int32 loc_idx, std::string* na
                 *namePtr = al->Name[loc_idx];
     }
 }
+
+void ObjectMgr::LoadPlayerPremadeTemplates()
+{
+    {
+        sLog.outString("Loading player premade templates ...");
+        m_playerPremadeTemplateMap.clear();
+
+        //                                                               0        1        2        3
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `class`, `level`, `name` FROM `player_premade_template`"));
+
+        if (!result)
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString(">> Loaded 0 premade player templates. DB table `player_premade_template` is empty.");
+            return;
+        }
+
+        BarGoLink bar(result->GetRowCount());
+
+        do
+        {
+            bar.step();
+            auto fields = result->Fetch();
+
+            uint32 entry = fields[0].GetUInt32();
+            uint8 requiredClass = fields[1].GetUInt8();
+            uint8 level = fields[2].GetUInt8();
+            std::string name = fields[3].GetCppString();
+
+            switch (requiredClass)
+            {
+                case CLASS_WARRIOR:
+                case CLASS_PALADIN:
+                case CLASS_HUNTER:
+                case CLASS_ROGUE:
+                case CLASS_PRIEST:
+                case CLASS_SHAMAN:
+                case CLASS_MAGE:
+                case CLASS_WARLOCK:
+                case CLASS_DRUID:
+                    break;
+                default:
+                    sLog.outErrorDb("Wrong class %hhu for entry %u in table `player_premade_template`", requiredClass, entry);
+                    continue;;
+            }
+
+            if (!(level >= 1 && level <= PLAYER_MAX_LEVEL))
+            {
+                sLog.outErrorDb("Wrong level %hhu for entry %u in table `player_premade_template`", level, entry);
+                continue;
+            }
+
+            PlayerPremadeTemplate& data = m_playerPremadeTemplateMap[entry];
+            data.entry = entry;
+            data.requiredClass = requiredClass;
+            data.level = level;
+            data.name = name;
+
+        } while (result->NextRow());
+
+        sLog.outString(">> Loaded " SIZEFMTD " premade player templates", m_playerPremadeTemplateMap.size());
+        sLog.outString();
+    }
+
+    {
+        sLog.outString("Loading player premade items ...");
+        //                                                               0        1       2          3
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `item`, `enchant`, `team` FROM `player_premade_item`"));
+
+        if (!result)
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString(">> Loaded 0 premade player items. DB table `player_premade_item` is empty.");
+            return;
+        }
+
+        BarGoLink bar(result->GetRowCount());
+
+        do
+        {
+            bar.step();
+            auto fields = result->Fetch();
+
+            uint32 entry = fields[0].GetUInt32();
+            uint32 item = fields[1].GetUInt32();
+            uint32 enchant = fields[2].GetUInt32();
+            uint32 team = fields[3].GetUInt32();
+
+            auto itr = m_playerPremadeTemplateMap.find(entry);
+            if (itr == m_playerPremadeTemplateMap.end())
+            {
+                sLog.outErrorDb("Wrong entry %u in table `player_premade_item`", entry);
+                continue;
+            }
+
+            if (!GetItemPrototype(item))
+                continue;
+            if (enchant && !sSpellItemEnchantmentStore.LookupEntry(enchant))
+                continue;
+
+            switch (team)
+            {
+                case TEAM_NONE:
+                case HORDE:
+                case ALLIANCE:
+                    break;
+                default:
+                    sLog.outErrorDb("Wrong team %u for entry %u in table `player_premade_item`", team, entry);
+                    continue;
+            }
+
+            itr->second.items.emplace_back(item, enchant, team);
+        } while (result->NextRow());
+
+        sLog.outString(">> Loaded " SIZEFMTD " premade player items", m_playerPremadeTemplateMap.size());
+        sLog.outString();
+    }
+
+    {
+        sLog.outString("Loading player premade spells ...");
+        //                                                               0        1
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `spell` FROM `player_premade_spell`"));
+
+        if (!result)
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString(">> Loaded 0 premade player spells. DB table `player_premade_spell` is empty.");
+            return;
+        }
+
+        BarGoLink bar(result->GetRowCount());
+
+        do
+        {
+            bar.step();
+            auto fields = result->Fetch();
+
+            uint32 entry = fields[0].GetUInt32();
+            uint32 spell = fields[1].GetUInt32();
+            
+            auto itr = m_playerPremadeTemplateMap.find(entry);
+            if (itr == m_playerPremadeTemplateMap.end())
+            {
+                sLog.outErrorDb("Wrong entry %u in table `player_premade_spell`", entry);
+                continue;
+            }
+
+            if (!sSpellMgr.GetSpellEntry(spell))
+                continue;
+            
+            itr->second.spells.push_back(spell);
+        } while (result->NextRow());
+
+        sLog.outString(">> Loaded " SIZEFMTD " premade player spells", m_playerPremadeTemplateMap.size());
+        sLog.outString();
+    }
+}
+
+void ObjectMgr::ApplyPremadeTemplateToPlayer(uint32 entry, Player* pPlayer) const
+{
+    auto itr = m_playerPremadeTemplateMap.find(entry);
+    if (itr == m_playerPremadeTemplateMap.end())
+    {
+        sLog.outError("Attempt to apply non-existent premade template to player (%u)", entry);
+        return;
+    }
+
+    if (pPlayer->GetClass() != itr->second.requiredClass)
+    {
+        sLog.outError("Attempt to apply premade template (%u) to a player with wrong class", entry);
+        return;
+    }
+
+    pPlayer->GiveLevel(itr->second.level);
+    pPlayer->InitTalentForLevel();
+    pPlayer->SetUInt32Value(PLAYER_XP, 0);
+
+    if (!itr->second.spells.empty())
+    {
+        pPlayer->ResetTalents(true);
+        for (auto spellId : itr->second.spells)
+        {
+            uint32 const firstRankId = sSpellMgr.GetFirstSpellInChain(spellId);
+            if (firstRankId && firstRankId != spellId && GetTalentSpellPos(firstRankId))
+                pPlayer->LearnSpell(firstRankId, false, true);
+            pPlayer->LearnSpell(spellId, false, (firstRankId == spellId && GetTalentSpellPos(firstRankId)));
+        }
+    }
+
+    for (auto item : itr->second.items)
+    {
+        if (!item.requiredTeam || (pPlayer->GetTeam() == item.requiredTeam))
+            pPlayer->StoreNewItemInBestSlots(item.itemId, 1, item.enchantId);
+    }
+}
