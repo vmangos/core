@@ -372,7 +372,8 @@ enum BellHourlySoundFX
 
 enum BellHourlySoundAreas
 {
-    UNDERCITY_AREA = 1497,
+    TIRISFAL_ZONE = 85,
+	UNDERCITY_ZONE = 1497,
     IRONFORGE_1_AREA = 809,
     IRONFORGE_2_AREA = 1,
     DARNASSUS_AREA = 1657,
@@ -397,11 +398,23 @@ struct go_bells : public GameObjectAI
 {
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
+		// switch bell gameobject
         switch (me->GetEntry())
         {
             case GO_HORDE_BELL:
-                _soundId = me->GetAreaId() == UNDERCITY_AREA ? BELLTOLLHORDE : BELLTOLLTRIBAL;
-                break;
+			{
+				if (me->GetZoneId() == TIRISFAL_ZONE || me->GetZoneId() == UNDERCITY_ZONE) 
+				{
+					// undead area hourly sound (bell)
+					_soundId = BELLTOLLHORDE;
+				}
+				else
+				{
+					// default horde hourly sound (drum)
+					_soundId = BELLTOLLTRIBAL;
+				}
+				break;
+			}
             case GO_ALLIANCE_BELL:
             {
                 if (me->GetAreaId() == IRONFORGE_1_AREA || me->GetAreaId() == IRONFORGE_2_AREA)
