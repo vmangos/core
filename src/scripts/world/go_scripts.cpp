@@ -396,37 +396,37 @@ enum BellHourlyMisc
 
 struct go_bells : public GameObjectAI
 {
-    go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
-    {
+	go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
+	{
 		// switch bell gameobject
-        switch (me->GetEntry())
-        {
-            case GO_HORDE_BELL:
+		switch (me->GetEntry())
+		{
+		case GO_HORDE_BELL:
+		{
+			if (me->GetZoneId() == TIRISFAL_ZONE || me->GetZoneId() == UNDERCITY_ZONE)
 			{
-				if (me->GetZoneId() == TIRISFAL_ZONE || me->GetZoneId() == UNDERCITY_ZONE) 
-				{
-					// undead area hourly sound (bell)
-					_soundId = BELLTOLLHORDE;
-				}
-				else
-				{
-					// default horde hourly sound (drum)
-					_soundId = BELLTOLLTRIBAL;
-				}
-				break;
+				// undead area hourly sound (bell)
+				_soundId = BELLTOLLHORDE;
 			}
-            case GO_ALLIANCE_BELL:
-            {
-                if (me->GetAreaId() == IRONFORGE_1_AREA || me->GetAreaId() == IRONFORGE_2_AREA)
-                    _soundId = BELLTOLLDWARFGNOME;
-                else if (me->GetAreaId() == DARNASSUS_AREA || me->GetZoneId() == TELDRASSIL_ZONE)
-                    _soundId = BELLTOLLNIGHTELF;
-                else
-                    _soundId = BELLTOLLALLIANCE;
-                break;
-            }
-        }
-    }
+			else
+			{
+				// default horde hourly sound (drum)
+				_soundId = BELLTOLLTRIBAL;
+			}
+			break;
+		}
+		case GO_ALLIANCE_BELL:
+		{
+			if (me->GetAreaId() == IRONFORGE_1_AREA || me->GetAreaId() == IRONFORGE_2_AREA)
+				_soundId = BELLTOLLDWARFGNOME;
+			else if (me->GetAreaId() == DARNASSUS_AREA || me->GetZoneId() == TELDRASSIL_ZONE)
+				_soundId = BELLTOLLNIGHTELF;
+			else
+				_soundId = BELLTOLLALLIANCE;
+			break;
+		}
+		}
+	}
 
     void UpdateAI(uint32 const diff) override
     {
