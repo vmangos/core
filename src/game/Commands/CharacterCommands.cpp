@@ -1834,8 +1834,7 @@ bool ChatHandler::HandleCharacterPremadeGearCommand(char* args)
         {
             if (itr.second.requiredClass == pPlayer->GetClass())
             {
-                PSendSysMessage("%u - %s", itr.first, itr.second.name);
-                break;
+                PSendSysMessage("%u - %s", itr.first, itr.second.name.c_str());
             }
         }
         return true;
@@ -1884,8 +1883,7 @@ bool ChatHandler::HandleCharacterPremadeSpecCommand(char* args)
         {
             if (itr.second.requiredClass == pPlayer->GetClass())
             {
-                PSendSysMessage("%u - %s", itr.first, itr.second.name);
-                break;
+                PSendSysMessage("%u - %s", itr.first, itr.second.name.c_str());
             }
         }
         return true;

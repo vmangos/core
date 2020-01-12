@@ -26,7 +26,11 @@ INSERT INTO `player_premade_item_template` (`entry`, `class`, `level`, `name`) V
 (6, 7, 60, 'dpspreraidbis'),
 (7, 8, 60, 'dpspreraidbis'),
 (8, 9, 60, 'dpspreraidbis'),
-(9, 11, 60, 'dpspreraidbis');
+(9, 11, 60, 'dpspreraidbis'),
+(10, 2, 60, 'healpreraidbis'),
+(11, 5, 60, 'healpreraidbis'),
+(12, 7, 60, 'healpreraidbis'),
+(13, 11, 60, 'healpreraidbis');
 
 CREATE TABLE IF NOT EXISTS `player_premade_spell_template` (
   `entry` int(10) unsigned NOT NULL,
@@ -41,11 +45,15 @@ INSERT INTO `player_premade_spell_template` (`entry`, `class`, `level`, `name`) 
 (2, 2, 60, 'retribution-pve'),
 (3, 3, 60, 'mm-sv-pve'),
 (4, 4, 60, 'combat-swords-pve'),
-(5, 5, 60, 'holy-pve'),
+(5, 5, 60, 'shadow-pve'),
 (6, 7, 60, 'elemental-pve'),
 (7, 8, 60, 'arcane-power-frost-pve'),
 (8, 9, 60, 'ds-ruin-pve'),
-(9, 11, 60, 'balance-pve');
+(9, 11, 60, 'balance-pve'),
+(10, 2, 60, 'holy-pve'),
+(11, 5, 60, 'holy-pve'),
+(12, 7, 60, 'resto-pve'),
+(13, 11, 60, 'resto-swiftmend-pve');
 
 CREATE TABLE IF NOT EXISTS `player_premade_item` (
   `entry` int(10) unsigned NOT NULL,
@@ -425,7 +433,7 @@ INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (5, 14136, 1891, 0), -- Robe of Winter Night
 (5, 11766, 1883, 0), -- Flameweave Cuffs of Shadow Wrath
 (5, 13170, 1509, 0), -- Skyshroud Leggings
-(5, 13253, 0, 0), -- Hands of Power
+(5, 13253, 930, 0), -- Hands of Power
 (5, 11662, 0, 0), -- Ban'thok Sash
 (5, 11822, 911, 0), -- Omnicast Boots
 (5, 12543, 0, 469), -- Songstone of Ironforge
@@ -494,7 +502,7 @@ INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (6, 12624, 1891, 0), -- Wildthorn Mail
 (6, 11765, 1883, 0), -- Pyremail Wristguards of Nature's Wrath
 (6, 13170, 2544, 0), -- Skyshroud Leggings
-(6, 13253, 0, 0), -- Hands of Power
+(6, 13253, 930, 0), -- Hands of Power
 (6, 11662, 0, 0), -- Ban'thok Sash
 (6, 13954, 911, 0), -- Verdant Footpads
 (6, 13001, 0, 0), -- Maiden's Circle
@@ -818,6 +826,317 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (9, 25298),
 (9, 25299),
 (9, 29166);
+
+-- Holy Paladin Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(10, 12633, 1509, 0), -- Whitesoul Helm
+(10, 13141, 0, 0), -- Tooth of Gnarr
+(10, 12625, 2488, 0), -- Dawnbringer Shoulders
+(10, 11623, 1888, 0), -- Spritecaster Cape
+(10, 13346, 1891, 0), -- Robes of the Exalted
+(10, 13969, 1883, 0), -- Loomguard Armbraces
+(10, 13170, 1509, 0), -- Skyshroud Leggings
+(10, 12554, 930, 0), -- Hands of the Exalted Herald
+(10, 14553, 0, 0), -- Sash of Mercy
+(10, 13954, 911, 0), -- Verdant Footpads
+(10, 16058, 0, 0), -- Fordring's Seal
+(10, 13178, 0, 0), -- Rosewine Circle
+(10, 11819, 0, 0), -- Second Wind
+(10, 12930, 0, 0), -- Briarwood Reed
+(10, 11923, 2505, 0), -- The Hammer of Grace
+(10, 11928, 0, 0); -- Thaurissan's Royal Scepter
+-- Holy Paladin PvE
+INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
+(10, 1020),
+(10, 1038),
+(10, 1044),
+(10, 1152),
+(10, 3127),
+(10, 4987),
+(10, 5573),
+(10, 10278),
+(10, 10293),
+(10, 10301),
+(10, 10308),
+(10, 10310),
+(10, 10314),
+(10, 10318),
+(10, 10326),
+(10, 13819),
+(10, 19746),
+(10, 19752),
+(10, 19896),
+(10, 19898),
+(10, 19900),
+(10, 19943),
+(10, 19979),
+(10, 20048),
+(10, 20142),
+(10, 20164),
+(10, 20175),
+(10, 20193),
+(10, 20208),
+(10, 20215),
+(10, 20216),
+(10, 20217),
+(10, 20235),
+(10, 20239),
+(10, 20245),
+(10, 20261),
+(10, 20271),
+(10, 20293),
+(10, 20308),
+(10, 20349),
+(10, 20357),
+(10, 20361),
+(10, 20729),
+(10, 20773),
+(10, 20924),
+(10, 20930),
+(10, 23214),
+(10, 24239),
+(10, 25290),
+(10, 25291),
+(10, 25292),
+(10, 25780),
+(10, 25829),
+(10, 25836),
+(10, 25890),
+(10, 25895),
+(10, 25898),
+(10, 25916),
+(10, 25918),
+(10, 33391);
+
+-- Priest Healing Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(11, 13102, 1509, 0), -- Cassandra's Grace
+(11, 13141, 0, 0), -- Tooth of Gnarr
+(11, 13013, 2488, 0), -- Elder Wizard's Mantle
+(11, 13386, 1888, 0), -- Archivist Cape
+(11, 14154, 1891, 0), -- Truefaith Vestments
+(11, 13107, 1884, 0), -- Magiskull Cuffs
+(11, 13170, 1509, 0), -- Skyshroud Leggings
+(11, 12554, 930, 0), -- Hands of the Exalted Herald
+(11, 12589, 0, 0), -- Dustfeather Sash
+(11, 11822, 911, 0), -- Omnicast Boots
+(11, 16058, 0, 0), -- Fordring's Seal
+(11, 13001, 0, 0), -- Maiden's Circle
+(11, 11819, 0, 0), -- Second Wind
+(11, 12930, 0, 0), -- Briarwood Reed
+(11, 11923, 2505, 0), -- The Hammer of Grace
+(11, 11928, 0, 0), -- Thaurissan's Royal Scepter
+(11, 13938, 0, 0); -- Bonecreeper Stylus
+-- Holy Priest PvE
+INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
+(11, 528),
+(11, 552),
+(11, 988),
+(11, 1706),
+(11, 2053),
+(11, 6064),
+(11, 9485),
+(11, 10876),
+(11, 10890),
+(11, 10894),
+(11, 10901),
+(11, 10909),
+(11, 10912),
+(11, 10917),
+(11, 10934),
+(11, 10938),
+(11, 10942),
+(11, 10947),
+(11, 10952),
+(11, 10953),
+(11, 10958),
+(11, 14523),
+(11, 14751),
+(11, 14767),
+(11, 14769),
+(11, 14777),
+(11, 14783),
+(11, 14791),
+(11, 15011),
+(11, 15014),
+(11, 15020),
+(11, 15031),
+(11, 15261),
+(11, 15356),
+(11, 15363),
+(11, 18535),
+(11, 20770),
+(11, 21564),
+(11, 25314),
+(11, 25315),
+(11, 25316),
+(11, 27681),
+(11, 27683),
+(11, 27789),
+(11, 27801),
+(11, 27841);
+
+-- Restoration Shaman Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(12, 13216, 1509, 0), -- Crown of the Penitent
+(12, 13141, 0, 0), -- Tooth of Gnarr
+(12, 14548, 2488, 0), -- Royal Cap Spaulders
+(12, 13386, 1888, 0), -- Archivist Cape
+(12, 13346, 1891, 0), -- Robes of the Exalted
+(12, 13969, 1883, 0), -- Loomguard Armbraces
+(12, 11841, 1509, 0), -- Senior Designer's Pantaloons
+(12, 12554, 930, 0), -- Hands of the Exalted Herald
+(12, 14553, 0, 0), -- Sash of Mercy
+(12, 11822, 911, 0), -- Omnicast Boots
+(12, 16058, 0, 0), -- Fordring's Seal
+(12, 13178, 0, 0), -- Rosewine Circle
+(12, 12930, 0, 0), -- Briarwood Reed
+(12, 11819, 0, 0), -- Second Wind
+(12, 11923, 2505, 0), -- The Hammer of Grace
+(12, 17718, 929, 0); -- Gizlock's Hypertech Buckler
+-- Restoration Shaman PvE
+INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
+(12, 131),
+(12, 526),
+(12, 546),
+(12, 556),
+(12, 2484),
+(12, 2645),
+(12, 2870),
+(12, 6196),
+(12, 6495),
+(12, 8012),
+(12, 8143),
+(12, 8166),
+(12, 8170),
+(12, 8177),
+(12, 10408),
+(12, 10414),
+(12, 10428),
+(12, 10432),
+(12, 10438),
+(12, 10463),
+(12, 10468),
+(12, 10473),
+(12, 10479),
+(12, 10497),
+(12, 10538),
+(12, 10587),
+(12, 10601),
+(12, 10605),
+(12, 10614),
+(12, 10623),
+(12, 11315),
+(12, 15112),
+(12, 15208),
+(12, 16188),
+(12, 16189),
+(12, 16190),
+(12, 16208),
+(12, 16209),
+(12, 16213),
+(12, 16217),
+(12, 16221),
+(12, 16225),
+(12, 16229),
+(12, 16234),
+(12, 16240),
+(12, 16316),
+(12, 16342),
+(12, 16356),
+(12, 16362),
+(12, 16387),
+(12, 17489),
+(12, 20608),
+(12, 20777),
+(12, 25357),
+(12, 25359),
+(12, 25361),
+(12, 25908),
+(12, 29202),
+(12, 29228);
+
+-- Restoration Druid Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(13, 13102, 1483, 0), -- Cassandra's Grace
+(13, 13141, 0, 0), -- Tooth of Gnarr
+(13, 15061, 2488, 0), -- Living Shoulders
+(13, 13386, 1888, 0), -- Archivist Cape
+(13, 13346, 1891, 0), -- Robes of the Exalted
+(13, 13208, 1884, 0), -- Bleak Howler Armguards
+(13, 12554, 930, 0), -- Hands of the Exalted Herald
+(13, 14553, 0, 0), -- Sash of Mercy
+(13, 11841, 1483, 0), -- Senior Designer's Pantaloons
+(13, 13954, 911, 0), -- Verdant Footpads
+(13, 13143, 0, 0), -- Mark of the Dragon Lord
+(13, 13178, 0, 0), -- Rosewine Circle
+(13, 12930, 0, 0), -- Briarwood Reed
+(13, 11819, 0, 0), -- Second Wind
+(13, 11923, 2505, 0), -- The Hammer of Grace
+(13, 11928, 0, 0); -- Thaurissan's Royal Scepter 
+-- Swiftmend Restoration Druid PvE
+INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
+(13, 768),
+(13, 783),
+(13, 1066),
+(13, 2782),
+(13, 2893),
+(13, 5209),
+(13, 5225),
+(13, 5229),
+(13, 6795),
+(13, 8983),
+(13, 9634),
+(13, 9821),
+(13, 9827),
+(13, 9830),
+(13, 9835),
+(13, 9846),
+(13, 9850),
+(13, 9853),
+(13, 9858),
+(13, 9863),
+(13, 9867),
+(13, 9881),
+(13, 9885),
+(13, 9892),
+(13, 9896),
+(13, 9898),
+(13, 9901),
+(13, 9904),
+(13, 9907),
+(13, 9908),
+(13, 9910),
+(13, 9912),
+(13, 9913),
+(13, 16818),
+(13, 16820),
+(13, 16840),
+(13, 17055),
+(13, 17065),
+(13, 17073),
+(13, 17078),
+(13, 17108),
+(13, 17113),
+(13, 17116),
+(13, 17249),
+(13, 17329),
+(13, 17402),
+(13, 18562),
+(13, 18658),
+(13, 20719),
+(13, 20748),
+(13, 21850),
+(13, 22812),
+(13, 22829),
+(13, 22896),
+(13, 24946),
+(13, 24972),
+(13, 24977),
+(13, 25297),
+(13, 25298),
+(13, 25299),
+(13, 29166);
 
 
 -- End of migration.
