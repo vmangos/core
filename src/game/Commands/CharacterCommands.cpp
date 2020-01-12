@@ -1818,7 +1818,7 @@ bool ChatHandler::HandleCharacterHasItemCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleCharacterPremadeCommand(char* args)
+bool ChatHandler::HandleCharacterPremadeGearCommand(char* args)
 {
     Player* pPlayer = GetSelectedPlayer();
     if (!pPlayer)
@@ -1828,14 +1828,25 @@ bool ChatHandler::HandleCharacterPremadeCommand(char* args)
     }
         
     if (!*args)
-        return false;
+    {
+        PSendSysMessage("Listing available premade templates for %s:", pPlayer->GetName());
+        for (auto itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+        {
+            if (itr.second.requiredClass == pPlayer->GetClass())
+            {
+                PSendSysMessage("%u - %s", itr.first, itr.second.name);
+                break;
+            }
+        }
+        return true;
+    }
 
     uint32 entry = atoi(args);
 
     if (!entry)
     {
         std::string name = args;
-        for (auto itr : sObjectMgr.GetPlayerPremadeTemplates())
+        for (auto itr : sObjectMgr.GetPlayerPremadeGearTemplates())
         {
             if (itr.second.name == name && itr.second.requiredClass == pPlayer->GetClass())
             {
@@ -1851,7 +1862,57 @@ bool ChatHandler::HandleCharacterPremadeCommand(char* args)
         return false;
     }
 
-    sObjectMgr.ApplyPremadeTemplateToPlayer(entry, pPlayer);
+    sObjectMgr.ApplyPremadeGearTemplateToPlayer(entry, pPlayer);
+
+    PSendSysMessage("Premade template %u applied to player %s.", entry, pPlayer->GetName());
+    return true;
+}
+
+bool ChatHandler::HandleCharacterPremadeSpecCommand(char* args)
+{
+    Player* pPlayer = GetSelectedPlayer();
+    if (!pPlayer)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        return false;
+    }
+
+    if (!*args)
+    {
+        PSendSysMessage("Listing available premade templates for %s:", pPlayer->GetName());
+        for (auto itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+        {
+            if (itr.second.requiredClass == pPlayer->GetClass())
+            {
+                PSendSysMessage("%u - %s", itr.first, itr.second.name);
+                break;
+            }
+        }
+        return true;
+    }
+
+    uint32 entry = atoi(args);
+
+    if (!entry)
+    {
+        std::string name = args;
+        for (auto itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+        {
+            if (itr.second.name == name && itr.second.requiredClass == pPlayer->GetClass())
+            {
+                entry = itr.first;
+                break;
+            }
+        }
+    }
+
+    if (!entry)
+    {
+        SendSysMessage("No matching premade player template found.");
+        return false;
+    }
+
+    sObjectMgr.ApplyPremadeSpecTemplateToPlayer(entry, pPlayer);
 
     PSendSysMessage("Premade template %u applied to player %s.", entry, pPlayer->GetName());
     return true;

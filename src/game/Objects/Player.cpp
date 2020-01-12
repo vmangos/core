@@ -5471,7 +5471,7 @@ void Player::UpdateWeaponSkill(WeaponAttackType attType)
             if (!tmpitem)
                 UpdateSkill(SKILL_UNARMED, weapon_skill_gain);
             else if (tmpitem->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_FISHING_POLE)
-                UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
+                UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
             break;
         }
         case OFF_ATTACK:
@@ -5479,7 +5479,7 @@ void Player::UpdateWeaponSkill(WeaponAttackType attType)
         {
             Item* tmpitem = GetWeaponForAttack(attType, true, true);
             if (tmpitem)
-                UpdateSkill(tmpitem->GetSkill(), weapon_skill_gain);
+                UpdateSkill(tmpitem->GetProto()->GetProficiencySkill(), weapon_skill_gain);
             break;
         }
     }
@@ -10068,7 +10068,7 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
             if (msg != EQUIP_ERR_OK)
                 return msg;
 
-            if (uint32 skill = pItem->GetSkill())
+            if (uint32 skill = pProto->GetProficiencySkill())
             {
                 // Fist weapons use unarmed skill calculations, but we must query fist weapon skill presence to use this item
                 if (pProto->SubClass == ITEM_SUBCLASS_WEAPON_FIST)
@@ -19445,7 +19445,7 @@ uint32 Player::GetBaseWeaponSkillValue(WeaponAttackType attType) const
         return 0;
 
     // weapon skill or (unarmed for base attack)
-    uint32  skill = item ? item->GetSkill() : uint32(SKILL_UNARMED);
+    uint32  skill = item ? item->GetProto()->GetProficiencySkill() : uint32(SKILL_UNARMED);
     return GetSkillValuePure(skill);
 }
 

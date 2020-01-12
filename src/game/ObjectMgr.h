@@ -562,16 +562,24 @@ struct PlayerPremadeItem
     uint32 enchantId = 0;
     uint32 requiredTeam = 0;
 };
-struct PlayerPremadeTemplate
+struct PlayerPremadeGearTemplate
 {
     uint32 entry = 0;
     uint8 level = 0;
     uint8 requiredClass = 0;
     std::string name;
     std::vector<PlayerPremadeItem> items;
+};
+struct PlayerPremadeSpecTemplate
+{
+    uint32 entry = 0;
+    uint8 level = 0;
+    uint8 requiredClass = 0;
+    std::string name;
     std::vector<uint32> spells;
 };
-typedef std::unordered_map<uint32, PlayerPremadeTemplate> PlayerPremadeTemplatesMap;
+typedef std::unordered_map<uint32, PlayerPremadeGearTemplate> PlayerPremadeGearMap;
+typedef std::unordered_map<uint32, PlayerPremadeSpecTemplate> PlayerPremadeSpecMap;
 
 class ObjectMgr
 {
@@ -1370,8 +1378,11 @@ class ObjectMgr
         void IncrementOldMailCounter(uint32 count) { m_OldMailCounter += count; }
 
         void LoadPlayerPremadeTemplates();
-        void ApplyPremadeTemplateToPlayer(uint32 entry, Player* pPlayer) const;
-        PlayerPremadeTemplatesMap const& GetPlayerPremadeTemplates() const { return m_playerPremadeTemplateMap; }
+        void ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) const;
+        void ApplyPremadeSpecTemplateToPlayer(uint32 entry, Player* pPlayer) const;
+        PlayerPremadeGearMap const& GetPlayerPremadeGearTemplates() const { return m_playerPremadeGearMap; }
+        PlayerPremadeSpecMap const& GetPlayerPremadeSpecTemplates() const { return m_playerPremadeSpecMap; }
+
     protected:
 
         // first free id for selected id type
@@ -1531,7 +1542,8 @@ class ObjectMgr
         CacheTrainerSpellMap m_CacheTrainerTemplateSpellMap;
         CacheTrainerSpellMap m_CacheTrainerSpellMap;
 
-        PlayerPremadeTemplatesMap m_playerPremadeTemplateMap;
+        PlayerPremadeGearMap m_playerPremadeGearMap;
+        PlayerPremadeSpecMap m_playerPremadeSpecMap;
 };
 
 #define sObjectMgr MaNGOS::Singleton<ObjectMgr>::Instance()

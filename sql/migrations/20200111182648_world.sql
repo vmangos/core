@@ -9,15 +9,15 @@ INSERT INTO `migrations` VALUES ('20200111182648');
 -- Add your query below.
 
 
-CREATE TABLE IF NOT EXISTS `player_premade_template` (
+CREATE TABLE IF NOT EXISTS `player_premade_item_template` (
   `entry` int(10) unsigned NOT NULL,
   `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `level` tinyint(3) unsigned NOT NULL DEFAULT '60',
-  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT '0',
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT '',
   PRIMARY KEY (`entry`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
-INSERT INTO `player_premade_template` (`entry`, `class`, `level`, `name`) VALUES
+INSERT INTO `player_premade_item_template` (`entry`, `class`, `level`, `name`) VALUES
 (1, 1, 60, 'dpspreraidbis'),
 (2, 2, 60, 'dpspreraidbis'),
 (3, 3, 60, 'dpspreraidbis'),
@@ -27,6 +27,25 @@ INSERT INTO `player_premade_template` (`entry`, `class`, `level`, `name`) VALUES
 (7, 8, 60, 'dpspreraidbis'),
 (8, 9, 60, 'dpspreraidbis'),
 (9, 11, 60, 'dpspreraidbis');
+
+CREATE TABLE IF NOT EXISTS `player_premade_spell_template` (
+  `entry` int(10) unsigned NOT NULL,
+  `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `level` tinyint(3) unsigned NOT NULL DEFAULT '60',
+  `name` varchar(50) COLLATE utf8_unicode_ci DEFAULT '',
+  PRIMARY KEY (`entry`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+INSERT INTO `player_premade_spell_template` (`entry`, `class`, `level`, `name`) VALUES
+(1, 1, 60, 'dw-fury-pve'),
+(2, 2, 60, 'retribution-pve'),
+(3, 3, 60, 'mm-sv-pve'),
+(4, 4, 60, 'combat-swords-pve'),
+(5, 5, 60, 'holy-pve'),
+(6, 7, 60, 'elemental-pve'),
+(7, 8, 60, 'arcane-power-frost-pve'),
+(8, 9, 60, 'ds-ruin-pve'),
+(9, 11, 60, 'balance-pve');
 
 CREATE TABLE IF NOT EXISTS `player_premade_item` (
   `entry` int(10) unsigned NOT NULL,
@@ -41,25 +60,27 @@ CREATE TABLE IF NOT EXISTS `player_premade_spell` (
   PRIMARY KEY (`entry`,`spell`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
--- Fury Warrior
-INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`) VALUES
-(1, 12640, 1506), -- Lionheart Helm
-(1, 15411, 0), -- Mark of Fordring
-(1, 12927, 2488), -- Truestrike Shoulders
-(1, 13340, 849), -- Cape of the Black Baron
-(1, 11726, 1891), -- Savage Gladiator Chain
-(1, 12936, 1885), -- Battleborn Armbraces
-(1, 15063, 927), -- Devilsaur Gauntlets
-(1, 13142, 0), -- Brigam Girdle
-(1, 15062, 1506), -- Devilsaur Leggings
-(1, 12555, 911), -- Battlechaser's Greaves
-(1, 17713, 0), -- Blackstone Ring
-(1, 18500, 0), -- Tarnished Elven Ring
-(1, 11815, 0), -- Hand of Justice
-(1, 13965, 0), -- Blackhand's Breadth
-(1, 11684, 1900), -- Ironfoe
-(1, 15806, 1900), -- Mirah's Song
-(1, 12651, 664); -- Blackcrow
+-- Fury Warrior Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(1, 12640, 1506, 0), -- Lionheart Helm
+(1, 15411, 0, 0), -- Mark of Fordring
+(1, 12927, 2488, 0), -- Truestrike Shoulders
+(1, 13340, 849, 0), -- Cape of the Black Baron
+(1, 11726, 1891, 0), -- Savage Gladiator Chain
+(1, 12936, 1885, 0), -- Battleborn Armbraces
+(1, 15063, 927, 0), -- Devilsaur Gauntlets
+(1, 13142, 0, 0), -- Brigam Girdle
+(1, 15062, 1506, 0), -- Devilsaur Leggings
+(1, 12555, 911, 0), -- Battlechaser's Greaves
+(1, 17713, 0, 0), -- Blackstone Ring
+(1, 18500, 0, 0), -- Tarnished Elven Ring
+(1, 11815, 0, 0), -- Hand of Justice
+(1, 13965, 0, 0), -- Blackhand's Breadth
+(1, 11684, 1900, 0), -- Ironfoe
+(1, 15806, 1900, 0), -- Mirah's Song
+(1, 12651, 664, 0); -- Blackcrow
+
+-- Dual Wield Fury Warrior PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (1, 71),
 (1, 355),
@@ -109,24 +130,26 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (1, 25288),
 (1, 25289);
 
--- Retribution Paladin
-INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`) VALUES
-(2, 12640, 1506), -- Lionheart Helm
-(2, 15411, 0), -- Mark of Fordring
-(2, 12927, 2488), -- Truestrike Shoulders
-(2, 13340, 849), -- Cape of the Black Baron
-(2, 11726, 1891), -- Savage Gladiator Chain
-(2, 12936, 1885), -- Battleborn Armbraces
-(2, 13957, 927), -- Gargoyle Slashers
-(2, 13959, 0), -- Omokk's Girth Restrainer
-(2, 14554, 1506), -- Cloudkeeper Legplates
-(2, 14616, 1887), -- Bloodmail Boots
-(2, 13098, 0), -- Painweaver Band
-(2, 12548, 469), -- Magni's Will
-(2, 17713, 67), -- Blackstone Ring
-(2, 11815, 0), -- Hand of Justice
-(2, 13965, 0), -- Blackhand's Breadth
-(2, 12784, 1900); -- Arcanite Reaper
+-- Retribution Paladin Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(2, 12640, 1506, 0), -- Lionheart Helm
+(2, 15411, 0, 0), -- Mark of Fordring
+(2, 12927, 2488, 0), -- Truestrike Shoulders
+(2, 13340, 849, 0), -- Cape of the Black Baron
+(2, 11726, 1891, 0), -- Savage Gladiator Chain
+(2, 12936, 1885, 0), -- Battleborn Armbraces
+(2, 13957, 927, 0), -- Gargoyle Slashers
+(2, 13959, 0, 0), -- Omokk's Girth Restrainer
+(2, 14554, 1506, 0), -- Cloudkeeper Legplates
+(2, 14616, 1887, 0), -- Bloodmail Boots
+(2, 13098, 0, 0), -- Painweaver Band
+(2, 12548, 469, 0), -- Magni's Will
+(2, 17713, 67, 0), -- Blackstone Ring
+(2, 11815, 0, 0), -- Hand of Justice
+(2, 13965, 0, 0), -- Blackhand's Breadth
+(2, 12784, 1900, 0); -- Arcanite Reaper
+
+-- Retribution Paladin PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (2, 1020),
 (2, 1038),
@@ -187,25 +210,27 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (2, 26023),
 (2, 33391);
 
--- Marksmanship Hunter
-INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`) VALUES
-(3, 13404, 1508), -- Mask of the Unforgiven
-(3, 15411, 0), -- Mark of Fordring
-(3, 12927, 2488), -- Truestrike Shoulders
-(3, 13340, 849), -- Cape of the Black Baron
-(3, 11726, 1891), -- Savage Gladiator Chain
-(3, 13211, 247), -- Slashclaw Bracers
-(3, 15062, 1508), -- Devilsaur Leggings
-(3, 15063, 1887), -- Devilsaur Gauntlets
-(3, 12634, 0), -- Chiselbrand Girdle
-(3, 16675, 1887), -- Beaststalker's Boots
-(3, 17713, 0), -- Blackstone Ring
-(3, 13098, 0), -- Painweaver Band
-(3, 13965, 0), -- Blackhand's Breadth
-(3, 11815, 0), -- Hand of Justice
-(3, 12940, 1897), -- Dal'Rend's Sacred Charge
-(3, 12939, 1897), -- Dal'Rend's Tribal Guardian
-(3, 2099, 664); -- Dwarven Hand Cannon
+-- Hunter Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(3, 13404, 1508, 0), -- Mask of the Unforgiven
+(3, 15411, 0, 0), -- Mark of Fordring
+(3, 12927, 2488, 0), -- Truestrike Shoulders
+(3, 13340, 849, 0), -- Cape of the Black Baron
+(3, 11726, 1891, 0), -- Savage Gladiator Chain
+(3, 13211, 247, 0), -- Slashclaw Bracers
+(3, 15062, 1508, 0), -- Devilsaur Leggings
+(3, 15063, 1887, 0), -- Devilsaur Gauntlets
+(3, 12634, 0, 0), -- Chiselbrand Girdle
+(3, 16675, 1887, 0), -- Beaststalker's Boots
+(3, 17713, 0, 0), -- Blackstone Ring
+(3, 13098, 0, 0), -- Painweaver Band
+(3, 13965, 0, 0), -- Blackhand's Breadth
+(3, 11815, 0, 0), -- Hand of Justice
+(3, 12940, 1897, 0), -- Dal'Rend's Sacred Charge
+(3, 12939, 1897, 0), -- Dal'Rend's Tribal Guardian
+(3, 2099, 664, 0); -- Dwarven Hand Cannon
+
+-- Marksmanship / Survival PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (3, 883),
 (3, 982),
@@ -317,25 +342,27 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (3, 25295),
 (3, 25296);
 
--- Combat Rogue
-INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`) VALUES
-(4, 13404, 1508), -- Mask of the Unforgiven
-(4, 15411, 0), -- Mark of Fordring
-(4, 12927, 2488), -- Truestrike Shoulders
-(4, 13340, 849), -- Cape of the Black Baron
-(4, 14637, 1891), -- Cadaverous Armor
-(4, 13120, 1885), -- Deepfury Bracers
-(4, 15062, 1508), -- Devilsaur Leggings
-(4, 15063, 1887), -- Devilsaur Gauntlets
-(4, 13252, 0), -- Cloudrunner Girdle
-(4, 12553, 1887), -- Swiftwalker Boots
-(4, 17713, 0), -- Blackstone Ring
-(4, 13098, 0), -- Painweaver Band
-(4, 11815, 0), -- Hand of Justice
-(4, 13965, 0), -- Blackhand's Breadth
-(4, 12940, 1897), -- Dal'Rend's Sacred Charge
-(4, 12939, 1900), -- Dal'Rend's Tribal Guardian
-(4, 12651, 664); -- Blackcrow
+-- Rogue Sword Spec Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(4, 13404, 1508, 0), -- Mask of the Unforgiven
+(4, 15411, 0, 0), -- Mark of Fordring
+(4, 12927, 2488, 0), -- Truestrike Shoulders
+(4, 13340, 849, 0), -- Cape of the Black Baron
+(4, 14637, 1891, 0), -- Cadaverous Armor
+(4, 13120, 1885, 0), -- Deepfury Bracers
+(4, 15062, 1508, 0), -- Devilsaur Leggings
+(4, 15063, 1887, 0), -- Devilsaur Gauntlets
+(4, 13252, 0, 0), -- Cloudrunner Girdle
+(4, 12553, 1887, 0), -- Swiftwalker Boots
+(4, 17713, 0, 0), -- Blackstone Ring
+(4, 13098, 0, 0), -- Painweaver Band
+(4, 11815, 0, 0), -- Hand of Justice
+(4, 13965, 0, 0), -- Blackhand's Breadth
+(4, 12940, 1897, 0), -- Dal'Rend's Sacred Charge
+(4, 12939, 1900, 0), -- Dal'Rend's Tribal Guardian
+(4, 12651, 664, 0); -- Blackcrow
+
+-- Combat Swords Rogue PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (4, 921),
 (4, 1725),
@@ -389,7 +416,7 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (4, 25347),
 (4, 30920);
 
--- Shadow Priest
+-- Shadow Priest Pre Raid Bis
 INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (5, 14111, 1509, 0), -- Felcloth Hood
 (5, 12103, 0, 0), -- Star of Mystaria
@@ -409,6 +436,8 @@ INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (5, 13349, 2504, 0), -- Scepter of the Unholy
 (5, 11904, 0, 0), -- Spirit of Aquementas
 (5, 13396, 0, 0); -- Skul's Ghastly Touch
+
+-- Shadow Priest PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (5, 528),
 (5, 552),
@@ -456,7 +485,7 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (5, 25316),
 (5, 27683);
 
--- Elemental Shaman
+-- Elemental Shaman Pre Raid Bis
 INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (6, 12752, 2544, 0), -- Cap of the Scarlet Savant
 (6, 12103, 0, 0), -- Star of Mystaria
@@ -474,6 +503,8 @@ INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (6, 12930, 0, 0), -- Briarwood Reed
 (6, 13968, 0, 0), -- Eye of the Beast
 (6, 13161, 2504, 0); -- Trindlehaven Staff
+
+-- Elemental Shaman PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (6, 131),
 (6, 526),
@@ -537,7 +568,7 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (6, 29000),
 (6, 29228);
 
--- Frost Mage
+-- Frost Mage Pre Raid Bis
 INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (7, 14332, 1509, 0), -- Eternal Crown
 (7, 12103, 0, 0), -- Star of Mystaria
@@ -556,6 +587,8 @@ INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (7, 13964, 2443, 0), -- Witchblade
 (7, 10796, 0, 0), -- Drakestone
 (7, 13938, 0, 0); -- Bonecreeper Stylus
+
+-- Arcane Power / Frost Mage PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (7, 130),
 (7, 475),
@@ -615,7 +648,7 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (7, 29440),
 (7, 29446);
 
--- DS Ruin Warlock
+-- Warlock Pre Raid Bis
 INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (8, 12752, 1509, 0), -- Cap of the Scarlet Savant
 (8, 12103, 0, 0), -- Star of Mystaria
@@ -635,6 +668,8 @@ INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (8, 17719, 0, 0), -- Inventor's Focal Sword
 (8, 10796, 0, 0), -- Drakestone
 (8, 13396, 0, 0); -- Skul's Ghastly Touch
+
+-- Demonic Sacrifice / Ruin Warlock PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (8, 126),
 (8, 132),
@@ -700,7 +735,7 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (8, 28610),
 (8, 33391);
 
--- Balance Druid
+-- Balance Druid Pre Raid Bis
 INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (9, 10504, 1509, 0), -- Green Lens
 (9, 12103, 0, 0), -- Star of Mystaria
@@ -719,6 +754,8 @@ INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
 (9, 13968, 0, 0), -- Eye of the Beast
 (9, 13964, 0, 0), -- Witchblade
 (9, 10796, 0, 0); -- Drakestone
+
+-- Balance Druid PvE
 INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
 (9, 768),
 (9, 783),
