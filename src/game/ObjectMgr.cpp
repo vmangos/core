@@ -11123,6 +11123,10 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
         pPlayer->SetUInt32Value(PLAYER_XP, 0);
     }
 
+    // Unequip current gear
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+        pPlayer->AutoUnequipItemFromSlot(i);
+
     // Learn Dual Wield Specialization
     if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE)
         if (!pPlayer->HasSpell(674))
