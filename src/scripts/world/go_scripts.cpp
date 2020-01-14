@@ -427,9 +427,9 @@ struct go_bells : public GameObjectAI
         {
             if (zoneId == IRONFORGE_ZONE || zoneId == DUN_MOROGH_ZONE)
                 _soundId = BELLTOLLDWARFGNOME; // horn sound
-            else if (zoneId == DARNASSUS_ZONE || zoneId == TELDRASSIL_ZONE)
+            else if (zoneId == DARNASSUS_ZONE || zoneId == TELDRASSIL_ZONE || areaId == ASTRANAAR_AREA)
                 _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
-            else if (zoneId == STORMWIND_ZONE || zoneId == ELWYN_FOREST_ZONE || areaId == ASTRANAAR_AREA)
+            else if (zoneId == STORMWIND_ZONE || zoneId == ELWYN_FOREST_ZONE)
                 _soundId = BELLTOLLALLIANCE;   // human bell sound
             else
                 _soundId = BELLTOLLALLIANCE;   // use human bell sound as Alliance defalut
