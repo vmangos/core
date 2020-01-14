@@ -383,7 +383,10 @@ enum BellHourlySoundZones
     TELDRASSIL_ZONE   = 141,
     DARNASSUS_ZONE    = 1657,
     STORMWIND_ZONE    = 1519,
-    ELWYN_FOREST_ZONE = 12
+    ELWYN_FOREST_ZONE = 12,
+    ASTRANAAR_AREA    = 331,
+    TARREN_MILL_AREA  = 272,
+    DARKSHIRE_AREA    = 42
 };
 
 enum BellHourlyObjects
@@ -406,12 +409,13 @@ struct go_bells : public GameObjectAI
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
         uint32 zoneId = me->GetZoneId();
+        uint32 areaId = me->GetAreaId();
 
         switch (me->GetEntry())
         {
         case GO_HORDE_BELL:
         {
-            if (zoneId == TIRISFAL_ZONE || zoneId == UNDERCITY_ZONE)
+            if (zoneId == TIRISFAL_ZONE || zoneId == UNDERCITY_ZONE || areaId == TARREN_MILL_AREA || areaId == DARKSHIRE_AREA)
                 _soundId = BELLTOLLHORDE;  // undead bell sound 
             else if (zoneId == THUNDERBLUFF_ZONE || zoneId == MULGORE_ZONE || zoneId == ORGRIMMAR_ZONE || zoneId == DUROTAR_ZONE)
                 _soundId = BELLTOLLTRIBAL; // drum sound
@@ -425,7 +429,7 @@ struct go_bells : public GameObjectAI
                 _soundId = BELLTOLLDWARFGNOME; // horn sound
             else if (zoneId == DARNASSUS_ZONE || zoneId == TELDRASSIL_ZONE)
                 _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
-            else if (zoneId == STORMWIND_ZONE || zoneId == ELWYN_FOREST_ZONE)
+            else if (zoneId == STORMWIND_ZONE || zoneId == ELWYN_FOREST_ZONE || areaId == ASTRANAAR_AREA)
                 _soundId = BELLTOLLALLIANCE;   // human bell sound
             else
                 _soundId = BELLTOLLALLIANCE;   // use human bell sound as Alliance defalut
