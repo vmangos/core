@@ -384,7 +384,7 @@ enum BellHourlySoundZones
     DARNASSUS_ZONE    = 1657,
     STORMWIND_ZONE    = 1519,
     ELWYN_FOREST_ZONE = 12,
-    ASTRANAAR_AREA    = 331,
+    ASHENVALE_ZONE    = 331,
     TARREN_MILL_AREA  = 272,
     DARKSHIRE_AREA    = 42
 };
@@ -427,7 +427,7 @@ struct go_bells : public GameObjectAI
         {
             if (zoneId == IRONFORGE_ZONE || zoneId == DUN_MOROGH_ZONE)
                 _soundId = BELLTOLLDWARFGNOME; // horn sound
-            else if (zoneId == DARNASSUS_ZONE || zoneId == TELDRASSIL_ZONE || areaId == ASTRANAAR_AREA)
+            else if (zoneId == DARNASSUS_ZONE || zoneId == TELDRASSIL_ZONE || zoneId == ASHENVALE_ZONE)
                 _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
             else if (zoneId == STORMWIND_ZONE || zoneId == ELWYN_FOREST_ZONE)
                 _soundId = BELLTOLLALLIANCE;   // human bell sound
