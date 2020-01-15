@@ -610,7 +610,7 @@ bool GossipHello_EnchantNPC(Player* player, Creature* creature)
     player->ADD_GOSSIP_ITEM(5, "Mainhand", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_MAINHAND);
     player->ADD_GOSSIP_ITEM(5, "Offhand", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_OFFHAND);
 
-    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
     return true;
 }
 bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
@@ -873,9 +873,7 @@ bool GossipHello_ProfessionNPC(Player* player, Creature* creature)
     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Fishing",              GOSSIP_SENDER_MAIN, 13);
     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Cooking",              GOSSIP_SENDER_MAIN, 14);
 
-    player->PlayerTalkClass->SendGossipMenu(1, creature->GetGUID());
-
-    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
     return true;
 }
 void CompleteLearnProfession(Player *pPlayer, Creature *pCreature, SkillType skill)
@@ -947,6 +945,56 @@ bool GossipSelect_ProfessionNPC(Player* player, Creature* creature, uint32 sende
         break;
     }
 
+    player->CLOSE_GOSSIP_MENU();
+    return true;
+}
+
+/*
+* Custom premade gear and spec scripts
+*/
+
+#define SPELL_LIGHTNING_VISUAL 24240
+
+bool GossipHello_PremadeGearNPC(Player* player, Creature* creature)
+{
+    for (auto itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+    {
+        if (itr.second.requiredClass == player->GetClass())
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, itr.second.name.c_str(), GOSSIP_SENDER_MAIN, itr.first);
+        }
+    }
+
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_PremadeGearNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
+{
+    player->SendSpellGo(player, SPELL_LIGHTNING_VISUAL);
+    sObjectMgr.ApplyPremadeGearTemplateToPlayer(action, player);
+    player->CLOSE_GOSSIP_MENU();
+    return true;
+}
+
+bool GossipHello_PremadeSpecNPC(Player* player, Creature* creature)
+{
+    for (auto itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+    {
+        if (itr.second.requiredClass == player->GetClass())
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, itr.second.name.c_str(), GOSSIP_SENDER_MAIN, itr.first);
+        }
+    }
+
+    player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+    return true;
+}
+
+bool GossipSelect_PremadeSpecNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
+{
+    player->SendSpellGo(player, SPELL_LIGHTNING_VISUAL);
+    sObjectMgr.ApplyPremadeSpecTemplateToPlayer(action, player);
     player->CLOSE_GOSSIP_MENU();
     return true;
 }
@@ -1114,6 +1162,18 @@ void AddSC_custom_creatures()
     newscript->Name = "custom_professions_npc";
     newscript->pGossipHello = &GossipHello_ProfessionNPC;
     newscript->pGossipSelect = &GossipSelect_ProfessionNPC;
+    newscript->RegisterSelf(false);
+
+    newscript = new Script;
+    newscript->Name = "custom_premade_gear_npc";
+    newscript->pGossipHello = &GossipHello_PremadeGearNPC;
+    newscript->pGossipSelect = &GossipSelect_PremadeGearNPC;
+    newscript->RegisterSelf(false);
+
+    newscript = new Script;
+    newscript->Name = "custom_premade_spec_npc";
+    newscript->pGossipHello = &GossipHello_PremadeSpecNPC;
+    newscript->pGossipSelect = &GossipSelect_PremadeSpecNPC;
     newscript->RegisterSelf(false);
 
     newscript = new Script;

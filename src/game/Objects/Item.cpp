@@ -594,7 +594,7 @@ Player* Item::GetOwner()const
     return sObjectMgr.GetPlayer(GetOwnerGuid());
 }
 
-uint32 Item::GetSkill()
+uint32 ItemPrototype::GetProficiencySkill() const
 {
     static uint32 const item_weapon_skills[MAX_ITEM_SUBCLASS_WEAPON] =
     {
@@ -610,35 +610,31 @@ uint32 Item::GetSkill()
         0, SKILL_CLOTH, SKILL_LEATHER, SKILL_MAIL, SKILL_PLATE_MAIL, 0, SKILL_SHIELD, 0, 0, 0
     };
 
-    ItemPrototype const* proto = GetProto();
-
-    switch (proto->Class)
+    switch (Class)
     {
         case ITEM_CLASS_WEAPON:
-            if (proto->SubClass >= MAX_ITEM_SUBCLASS_WEAPON)
+            if (SubClass >= MAX_ITEM_SUBCLASS_WEAPON)
                 return 0;
             else
-                return item_weapon_skills[proto->SubClass];
+                return item_weapon_skills[SubClass];
 
         case ITEM_CLASS_ARMOR:
-            if (proto->SubClass >= MAX_ITEM_SUBCLASS_ARMOR)
+            if (SubClass >= MAX_ITEM_SUBCLASS_ARMOR)
                 return 0;
             else
-                return item_armor_skills[proto->SubClass];
+                return item_armor_skills[SubClass];
 
         default:
             return 0;
     }
 }
 
-uint32 Item::GetSpell()
+uint32 ItemPrototype::GetProficiencySpell() const
 {
-    ItemPrototype const* proto = GetProto();
-
-    switch (proto->Class)
+    switch (Class)
     {
         case ITEM_CLASS_WEAPON:
-            switch (proto->SubClass)
+            switch (SubClass)
             {
                 case ITEM_SUBCLASS_WEAPON_AXE:
                     return  196;
@@ -673,7 +669,7 @@ uint32 Item::GetSpell()
             }
             return 0;
         case ITEM_CLASS_ARMOR:
-            switch (proto->SubClass)
+            switch (SubClass)
             {
                 case ITEM_SUBCLASS_ARMOR_CLOTH:
                     return 9078;

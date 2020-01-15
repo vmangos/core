@@ -534,6 +534,9 @@ struct ItemPrototype
     bool IsWeapon() const { return Class == ITEM_CLASS_WEAPON; }
     bool IsRangedWeapon() const { return IsWeapon() && (InventoryType == INVTYPE_RANGED || InventoryType == INVTYPE_THROWN || InventoryType == INVTYPE_RANGEDRIGHT); }
     bool HasSignature() const { return GetMaxStackSize() == 1 && Class != ITEM_CLASS_CONSUMABLE && Class != ITEM_CLASS_QUEST && (Flags & ITEM_FLAG_NO_CREATOR) == 0 && ItemId != 6948; /*Hearthstone*/ }
+
+    uint32 GetProficiencySkill() const;
+    uint32 GetProficiencySpell() const;
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform

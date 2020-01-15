@@ -179,6 +179,13 @@ ChatCommand * ChatHandler::getCommandTable()
         { nullptr,          0,                  false, nullptr,                                                "", nullptr }
     };
 
+    static ChatCommand characterPremadeCommandTable[] =
+    {
+        { "gear",          SEC_BASIC_ADMIN,     false, &ChatHandler::HandleCharacterPremadeGearCommand, "", nullptr },
+        { "spec",          SEC_BASIC_ADMIN,     false, &ChatHandler::HandleCharacterPremadeSpecCommand, "", nullptr },
+        { nullptr,         0,                   false, nullptr,                                         "", nullptr }
+    };
+
     static ChatCommand characterCommandTable[] =
     {
         { "deleted",        SEC_GAMEMASTER,     true, nullptr,                                         "", characterDeletedCommandTable},
@@ -190,6 +197,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "race",           SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleCharacterChangeRaceCommand, "", nullptr },
         { "skin",           SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleCharacterCopySkinCommand,   "", nullptr },
         { "fillflys",       SEC_GAMEMASTER,     true,  &ChatHandler::HandleCharacterFillFlysCommand,   "", nullptr },
+        { "premade",        SEC_BASIC_ADMIN,    false, nullptr,                                        "", characterPremadeCommandTable },
         { "clean",          SEC_ADMINISTRATOR,  true,  nullptr,                                        "", characterCleanCommandTable },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };

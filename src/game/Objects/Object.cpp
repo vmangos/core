@@ -3317,7 +3317,7 @@ uint32 WorldObject::GetWeaponSkillValue(WeaponAttackType attType, WorldObject co
             return GetSkillMaxForLevel();              // always maximized SKILL_FERAL_COMBAT in fact
 
         // weapon skill or (unarmed for base attack)
-        uint32  skill = item ? item->GetSkill() : SKILL_UNARMED;
+        uint32  skill = item ? item->GetProto()->GetProficiencySkill() : SKILL_UNARMED;
 
 // Daemon: pas en preBC !
 //        // in PvP use full skill instead current skill value
