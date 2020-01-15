@@ -18,22 +18,22 @@ CREATE TABLE IF NOT EXISTS `player_premade_item_template` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `player_premade_item_template` (`entry`, `class`, `level`, `name`) VALUES
-(1, 1, 60, 'dpspreraidbis'),
-(2, 2, 60, 'dpspreraidbis'),
-(3, 3, 60, 'dpspreraidbis'),
-(4, 4, 60, 'dpspreraidbis'),
-(5, 5, 60, 'dpspreraidbis'),
-(6, 7, 60, 'dpspreraidbis'),
-(7, 8, 60, 'dpspreraidbis'),
-(8, 9, 60, 'dpspreraidbis'),
-(9, 11, 60, 'dpspreraidbis'),
-(10, 2, 60, 'healpreraidbis'),
-(11, 5, 60, 'healpreraidbis'),
-(12, 7, 60, 'healpreraidbis'),
-(13, 11, 60, 'healpreraidbis'),
-(14, 1, 60, 'tankpreraidbis'),
-(15, 2, 60, 'tankpreraidbis'),
-(16, 11, 60, 'tankpreraidbis');
+(1, 1, 60, 'dps-preraid-bis'),
+(2, 2, 60, 'dps-preraid-bis'),
+(3, 3, 60, 'dps-preraid-bis'),
+(4, 4, 60, 'dps-preraid-bis'),
+(5, 5, 60, 'dps-preraid-bis'),
+(6, 7, 60, 'caster-dps-preraid-bis'),
+(7, 8, 60, 'dps-preraid-bis'),
+(8, 9, 60, 'dps-preraid-bis'),
+(9, 11, 60, 'caster-dps-preraid-bis'),
+(10, 2, 60, 'heal-preraid-bis'),
+(11, 5, 60, 'heal-preraid-bis'),
+(12, 7, 60, 'heal-preraid-bis'),
+(13, 11, 60, 'heal-preraid-bis'),
+(14, 1, 60, 'tank-preraid-bis'),
+(15, 2, 60, 'tank-preraid-bis'),
+(16, 11, 60, 'tank-preraid-bis');
 
 CREATE TABLE IF NOT EXISTS `player_premade_spell_template` (
   `entry` int(10) unsigned NOT NULL,
