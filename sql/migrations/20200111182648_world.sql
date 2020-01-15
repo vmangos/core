@@ -30,7 +30,10 @@ INSERT INTO `player_premade_item_template` (`entry`, `class`, `level`, `name`) V
 (10, 2, 60, 'healpreraidbis'),
 (11, 5, 60, 'healpreraidbis'),
 (12, 7, 60, 'healpreraidbis'),
-(13, 11, 60, 'healpreraidbis');
+(13, 11, 60, 'healpreraidbis'),
+(14, 1, 60, 'tankpreraidbis'),
+(15, 2, 60, 'tankpreraidbis'),
+(16, 11, 60, 'tankpreraidbis');
 
 CREATE TABLE IF NOT EXISTS `player_premade_spell_template` (
   `entry` int(10) unsigned NOT NULL,
@@ -41,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `player_premade_spell_template` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 INSERT INTO `player_premade_spell_template` (`entry`, `class`, `level`, `name`) VALUES
-(1, 1, 60, 'dw-fury-pve'),
+(1, 1, 60, 'fury-dw-pve'),
 (2, 2, 60, 'retribution-pve'),
 (3, 3, 60, 'mm-sv-pve'),
 (4, 4, 60, 'combat-swords-pve'),
@@ -53,7 +56,10 @@ INSERT INTO `player_premade_spell_template` (`entry`, `class`, `level`, `name`) 
 (10, 2, 60, 'holy-pve'),
 (11, 5, 60, 'holy-pve'),
 (12, 7, 60, 'resto-pve'),
-(13, 11, 60, 'resto-swiftmend-pve');
+(13, 11, 60, 'resto-swiftmend-pve'),
+(14, 1, 60, 'protection-pve'),
+(15, 2, 60, 'protection-pve'),
+(16, 11, 60, 'feral-bear-pve');
 
 CREATE TABLE IF NOT EXISTS `player_premade_item` (
   `entry` int(10) unsigned NOT NULL,
@@ -1137,6 +1143,238 @@ INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES
 (13, 25298),
 (13, 25299),
 (13, 29166);
+
+-- Protection Warrior Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(14, 12640, 1503, 0), -- Lionheart Helm
+(14, 13091, 0, 0), -- Medallion of Grand Marshal Morris
+(14, 16733, 2488, 0), -- Spaulders of Valor
+(14, 13397, 1889, 0), -- Stoneskin Gargoyle Cape
+(14, 11726, 1891, 0), -- Savage Gladiator Chain
+(14, 16735, 1886, 0), -- Bracers of Valor
+(14, 13072, 1887, 0), -- Stonegrip Gauntlets
+(14, 13142, 0, 0), -- Brigam Girdle
+(14, 14554, 1503, 0), -- Cloudkeeper Legplates
+(14, 13259, 911, 0), -- Ribsteel Footguards
+(14, 2246, 0, 0), -- Myrmidon's Signet
+(14, 17713, 0, 0), -- Blackstone Ring
+(14, 11815, 0, 0), -- Hand of Justice
+(14, 17774, 0, 0), -- Mark of the Chosen
+(14, 13015, 1900, 67), -- Serathil
+(14, 15806, 1900, 469), -- Mirah's Song
+(14, 12602, 929, 0), -- Draconian Deflector
+(14, 12651, 664, 0); -- Blackcrow
+-- Deep Protection Warrior PvE
+INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
+(14, 71),
+(14, 355),
+(14, 676),
+(14, 871),
+(14, 1161),
+(14, 1672),
+(14, 1680),
+(14, 1719),
+(14, 2458),
+(14, 2565),
+(14, 2687),
+(14, 3127),
+(14, 5246),
+(14, 6554),
+(14, 7373),
+(14, 11556),
+(14, 11574),
+(14, 11578),
+(14, 11581),
+(14, 11585),
+(14, 11597),
+(14, 11605),
+(14, 12296),
+(14, 12312),
+(14, 12679),
+(14, 12727),
+(14, 12764),
+(14, 12765),
+(14, 12792),
+(14, 12800),
+(14, 12809),
+(14, 12811),
+(14, 12818),
+(14, 12856),
+(14, 12945),
+(14, 12975),
+(14, 16466),
+(14, 16542),
+(14, 18499),
+(14, 20230),
+(14, 20560),
+(14, 20569),
+(14, 20617),
+(14, 20662),
+(14, 23925),
+(14, 25286),
+(14, 25288),
+(14, 25289);
+
+-- Protection Paladin Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(15, 871, 1900, 0), -- Flurry Axe
+(15, 1168, 863, 0), -- Skullflame Shield
+(15, 11746, 1503, 0), -- Golem Skull Helm
+(15, 14623, 1503, 0), -- Deathbone Legguards
+(15, 15413, 1891, 0), -- Ornate Adamantium Breastplate
+(15, 14552, 2488, 0), -- Stockade Pauldrons
+(15, 14622, 1887, 0), -- Deathbone Gauntlets
+(15, 13951, 923, 0), -- Vigorsteel Vambraces
+(15, 11930, 1889, 0), -- The Emperor's New Cape
+(15, 13091, 0, 0), -- Medallion of Grand Marshal Morris
+(15, 14621, 911, 0), -- Deathbone Sabatons
+(15, 14620, 0, 0), -- Deathbone Girdle
+(15, 11669, 0, 0), -- Naglering
+(15, 15855, 0, 0), -- Ring of Protection
+(15, 11810, 0, 0), -- Force of Will
+(15, 17774, 0, 0); -- Mark of the Chosen
+-- Mitigation Protection Paladin PvE
+INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
+(15, 1020),
+(15, 1038),
+(15, 1044),
+(15, 1152),
+(15, 3127),
+(15, 4987),
+(15, 5573),
+(15, 10278),
+(15, 10293),
+(15, 10301),
+(15, 10308),
+(15, 10310),
+(15, 10314),
+(15, 10318),
+(15, 10326),
+(15, 13819),
+(15, 19746),
+(15, 19752),
+(15, 19896),
+(15, 19898),
+(15, 19900),
+(15, 19943),
+(15, 19979),
+(15, 20063),
+(15, 20100),
+(15, 20105),
+(15, 20137),
+(15, 20142),
+(15, 20147),
+(15, 20150),
+(15, 20164),
+(15, 20193),
+(15, 20261),
+(15, 20271),
+(15, 20293),
+(15, 20308),
+(15, 20332),
+(15, 20349),
+(15, 20357),
+(15, 20470),
+(15, 20729),
+(15, 20773),
+(15, 20914),
+(15, 20924),
+(15, 20928),
+(15, 23214),
+(15, 24239),
+(15, 25290),
+(15, 25291),
+(15, 25292),
+(15, 25780),
+(15, 25890),
+(15, 25895),
+(15, 25899),
+(15, 25916),
+(15, 25918),
+(15, 33391);
+
+-- Druid Tanking Pre Raid Bis
+INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`, `team`) VALUES
+(16, 13404, 1508, 0), -- Mask of the Unforgiven
+(16, 11755, 0, 0), -- Verek's Collar
+(16, 12927, 2488, 0), -- Truestrike Shoulders
+(16, 12551, 849, 0), -- Stoneshield Cloak
+(16, 12757, 1891, 0), -- Breastplate of Bloodthirst
+(16, 12966, 1886, 0), -- Blackmist Armguards
+(16, 15063, 1887, 0), -- Devilsaur Gauntlets 
+(16, 14502, 0, 0), -- Frostbite Girdle
+(16, 15062, 1508, 0), -- Devilsaur Leggings
+(16, 14641, 1887, 0), -- Cadaverous Walkers
+(16, 15855, 0, 0), -- Ring of Protection
+(16, 12544, 0, 67), -- Thrall's Resolve
+(16, 11669, 0, 469), -- Naglering
+(16, 11811, 0, 0), -- Smoking Heart of the Mountain
+(16, 13966, 0, 0), -- Mark of Tyranny
+(16, 943, 2646, 0); -- Warden Staff
+-- Feral Druid Bear Tank PvE
+INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES 
+(16, 768),
+(16, 783),
+(16, 1066),
+(16, 2782),
+(16, 2893),
+(16, 5209),
+(16, 5225),
+(16, 5229),
+(16, 6795),
+(16, 8983),
+(16, 9634),
+(16, 9821),
+(16, 9827),
+(16, 9830),
+(16, 9835),
+(16, 9846),
+(16, 9850),
+(16, 9853),
+(16, 9858),
+(16, 9863),
+(16, 9867),
+(16, 9881),
+(16, 9885),
+(16, 9892),
+(16, 9896),
+(16, 9898),
+(16, 9901),
+(16, 9904),
+(16, 9907),
+(16, 9908),
+(16, 9910),
+(16, 9912),
+(16, 9913),
+(16, 16864),
+(16, 16906),
+(16, 16933),
+(16, 16938),
+(16, 16944),
+(16, 16951),
+(16, 16961),
+(16, 16975),
+(16, 16979),
+(16, 16999),
+(16, 17007),
+(16, 17061),
+(16, 17082),
+(16, 17249),
+(16, 17329),
+(16, 17392),
+(16, 17402),
+(16, 18658),
+(16, 20719),
+(16, 20748),
+(16, 21850),
+(16, 22812),
+(16, 22829),
+(16, 22896),
+(16, 24894),
+(16, 25297),
+(16, 25298),
+(16, 25299),
+(16, 29166);
 
 
 -- End of migration.
