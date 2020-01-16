@@ -363,24 +363,35 @@ bool GOSelect_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo, uint32 s
 
 enum BellHourlySoundFX
 {
-    BELLTOLLHORDE = 6595, // Horde
-    BELLTOLLTRIBAL = 6675,
-    BELLTOLLALLIANCE = 6594, // Alliance
-    BELLTOLLNIGHTELF = 6674,
-    BELLTOLLDWARFGNOME = 7234,
+    BELLTOLLHORDE      = 6595, // Undercity
+    BELLTOLLTRIBAL     = 6675, // Orgrimma/Thunderbluff
+    BELLTOLLALLIANCE   = 6594, // Stormwind
+    BELLTOLLNIGHTELF   = 6674, // Darnassus
+    BELLTOLLDWARFGNOME = 7234, // Ironforge
 };
 
-enum BellHourlySoundAreas
+enum BellHourlySoundZones
 {
-    UNDERCITY_AREA = 1497,
-    IRONFORGE_1_AREA = 809,
-    IRONFORGE_2_AREA = 1,
-    DARNASSUS_AREA = 1657,
-    TELDRASSIL_ZONE = 141,
+    TIRISFAL_ZONE     = 85,
+    UNDERCITY_ZONE    = 1497,
+    MULGORE_ZONE      = 215,
+    THUNDERBLUFF_ZONE = 1638,
+    DUROTAR_ZONE      = 14,
+    ORGRIMMAR_ZONE    = 1637,
+    DUN_MOROGH_ZONE   = 1,
+    IRONFORGE_ZONE    = 1537,
+    TELDRASSIL_ZONE   = 141,
+    DARNASSUS_ZONE    = 1657,
+    STORMWIND_ZONE    = 1519,
+    ELWYN_FOREST_ZONE = 12,
+    ASHENVALE_ZONE    = 331,
+    TARREN_MILL_AREA  = 272,
+    DARKSHIRE_AREA    = 42
 };
 
 enum BellHourlyObjects
 {
+    // bell gameobjects
     GO_HORDE_BELL = 175885,
     GO_ALLIANCE_BELL = 176573,
 };
@@ -397,21 +408,35 @@ struct go_bells : public GameObjectAI
 {
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
+        uint32 zoneId = me->GetZoneId();
+        uint32 areaId = me->GetAreaId();
+
         switch (me->GetEntry())
         {
-            case GO_HORDE_BELL:
-                _soundId = me->GetAreaId() == UNDERCITY_AREA ? BELLTOLLHORDE : BELLTOLLTRIBAL;
-                break;
-            case GO_ALLIANCE_BELL:
-            {
-                if (me->GetAreaId() == IRONFORGE_1_AREA || me->GetAreaId() == IRONFORGE_2_AREA)
-                    _soundId = BELLTOLLDWARFGNOME;
-                else if (me->GetAreaId() == DARNASSUS_AREA || me->GetZoneId() == TELDRASSIL_ZONE)
-                    _soundId = BELLTOLLNIGHTELF;
-                else
-                    _soundId = BELLTOLLALLIANCE;
-                break;
-            }
+        case GO_HORDE_BELL:
+        {
+            if (zoneId == TIRISFAL_ZONE || zoneId == UNDERCITY_ZONE || areaId == TARREN_MILL_AREA || areaId == DARKSHIRE_AREA)
+                _soundId = BELLTOLLHORDE;  // undead bell sound 
+            else if (zoneId == THUNDERBLUFF_ZONE || zoneId == MULGORE_ZONE || zoneId == ORGRIMMAR_ZONE || zoneId == DUROTAR_ZONE)
+                _soundId = BELLTOLLTRIBAL; // drum sound
+            else
+                _soundId = BELLTOLLTRIBAL; // use drum sound as Horde default
+            break;
+        }
+        case GO_ALLIANCE_BELL:
+        {
+            if (zoneId == IRONFORGE_ZONE || zoneId == DUN_MOROGH_ZONE)
+                _soundId = BELLTOLLDWARFGNOME; // horn sound
+            else if (zoneId == DARNASSUS_ZONE || zoneId == TELDRASSIL_ZONE || zoneId == ASHENVALE_ZONE)
+                _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
+            else if (zoneId == STORMWIND_ZONE || zoneId == ELWYN_FOREST_ZONE)
+                _soundId = BELLTOLLALLIANCE;   // human bell sound
+            else
+                _soundId = BELLTOLLALLIANCE;   // use human bell sound as Alliance defalut
+            break;
+        }
+        default:
+            sLog.outError("go_bells() called with invalid object, ID: %u", me->GetEntry());
         }
     }
 
