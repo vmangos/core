@@ -1038,6 +1038,8 @@ GridMapLiquidStatus TerrainInfo::getLiquidStatus(float x, float y, float z, uint
     return result;
 }
 
+#define JUMP_HEIGHT 0.6f
+
 // check if creature is in water and have enough space to swim
 bool TerrainInfo::IsSwimmable(float x, float y, float z, float radius /*= 1.5f*/, GridMapLiquidData* data /*= 0*/) const
 {
@@ -1046,7 +1048,9 @@ bool TerrainInfo::IsSwimmable(float x, float y, float z, float radius /*= 1.5f*/
     {
         GridMapLiquidData liquid_status;
         GridMapLiquidData* liquid_ptr = data ? data : &liquid_status;
-        if (getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr))
+        auto const status = getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr);
+        if (status == LIQUID_MAP_IN_WATER || status == LIQUID_MAP_UNDER_WATER || status == LIQUID_MAP_WATER_WALK || 
+           ((status == LIQUID_MAP_ABOVE_WATER) && (liquid_ptr->level + JUMP_HEIGHT >= z)))
         {
             if (liquid_ptr->level - liquid_ptr->depth_level > radius) // is unit have enough space to swim
                 return true;
@@ -1063,7 +1067,7 @@ bool TerrainInfo::IsInWater(float x, float y, float z, GridMapLiquidData* data) 
     {
         GridMapLiquidData liquid_status;
         GridMapLiquidData* liquid_ptr = data ? data : &liquid_status;
-        auto status = getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr);
+        auto const status = getLiquidStatus(x, y, z, MAP_ALL_LIQUIDS, liquid_ptr);
         if (status == LIQUID_MAP_IN_WATER || status == LIQUID_MAP_UNDER_WATER)
             return true;
     }
