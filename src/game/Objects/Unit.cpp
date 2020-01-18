@@ -594,30 +594,6 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType, SpellAuraHolder* except)
     }
 }
 
-/* Called by DealDamage for auras that have a chance to be dispelled on damage taken. */
-void Unit::RemoveSpellbyDamageTaken(AuraType auraType, uint32 damage)
-{
-    if (!HasAuraType(auraType))
-        return;
-
-    // The chance to dispel an aura depends on the damage taken with respect to the casters level.
-    uint32 max_dmg = GetLevel() > 8 ? 25 * GetLevel() - 150 : 50;
-    float chance = float(damage) / max_dmg * 100.0f;
-    if (roll_chance_f(chance))
-    {
-        for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
-        {
-            if ((*iter)->GetSpellProto()->procFlags)
-            {
-                RemoveAurasDueToSpell((*iter)->GetId());
-                iter = m_modAuras[auraType].begin();
-            }
-            else
-                ++iter;
-        }
-    }
-}
-
 // Nostalrius
 void Unit::RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype)
 {
@@ -698,10 +674,6 @@ void Unit::DoKillUnit(Unit* pVictim)
 
 uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell)
 {
-    // remove affects from victim (including from 0 damage and DoTs)
-    if (pVictim != this)
-        pVictim->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-
     // remove affects from attacker at any non-DoT damage (including 0 damage)
     if (damagetype != DOT)
     {
@@ -743,10 +715,7 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                         pVictim->RemoveFearEffectsByDamageTaken(cleanDamage->absorb, spellProto ? spellProto->Id : 0, damagetype);
                 }
 
-                if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || spellProto->HasAura(SPELL_AURA_MOD_ROOT)))
-                    pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, cleanDamage->absorb);
-
-                pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0);
+                pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0, true);
 
                 // interrupt spells like trying to mount even through absorb shields
                 if (pVictim->IsPlayer() && damagetype != DOT)
@@ -772,10 +741,6 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         if (!(IsCreature() && ((Creature*)this)->IsWorldBoss()))
             pVictim->RemoveFearEffectsByDamageTaken(damage, spellProto ? spellProto->Id : 0, damagetype);
     }
-
-    // root type spells do not dispel the root effect
-    if (!spellProto || !(spellProto->Mechanic == MECHANIC_ROOT || spellProto->HasAura(SPELL_AURA_MOD_ROOT)))
-        pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_ROOT, damage);
 
     uint32 health = pVictim->GetHealth();
     // duel ends when player has 1 or less hp
@@ -875,19 +840,6 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
                 pVictim->AttackedBy(this);
         }
 
-        // polymorphed, hex and other negative transformed cases
-        uint32 morphSpell = pVictim->GetTransForm();
-        if (morphSpell && !Spells::IsPositiveSpell(morphSpell))
-        {
-            if (SpellEntry const* morphEntry = sSpellMgr.GetSpellEntry(morphSpell))
-            {
-                if (morphEntry->HasAura(SPELL_AURA_MOD_CONFUSE))
-                    pVictim->RemoveAurasDueToSpell(morphSpell);
-                else if (morphEntry->HasAura(SPELL_AURA_MOD_PACIFY_SILENCE))
-                    pVictim->RemoveSpellbyDamageTaken(SPELL_AURA_MOD_PACIFY_SILENCE, damage);
-            }
-        }
-
         if (damagetype == DIRECT_DAMAGE || damagetype == SPELL_DIRECT_DAMAGE)
         {
             if (!spellProto || !(spellProto->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DIRECT_DAMAGE))
@@ -930,9 +882,9 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
             isProcSpell = spell->m_triggeredBySpellInfo->HasAuraWithSpellTriggerEffect();
 
         if (isProcSpell)
-            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spell->m_triggeredByParentSpellInfo->Id);
+            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spell->m_triggeredByParentSpellInfo->Id, true);
         else
-            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0);
+            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0, true);
 
         if (damagetype != NODAMAGE && damage && pVictim->IsPlayer())
         {
@@ -3729,11 +3681,13 @@ void Unit::RemoveAurasDueToItemSpell(Item* castItem, uint32 spellId)
     }
 }
 
-void Unit::RemoveAurasWithInterruptFlags(uint32 flags, uint32 except)
+void Unit::RemoveAurasWithInterruptFlags(uint32 flags, uint32 except, bool checkProcFlags)
 {
     for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end();)
     {
-        if (iter->second->GetSpellProto()->AuraInterruptFlags & flags && iter->second->GetSpellProto()->Id != except)
+        if ((!checkProcFlags || !iter->second->GetSpellProto()->procFlags) &&
+            (iter->second->GetSpellProto()->AuraInterruptFlags & flags) &&
+            (iter->second->GetSpellProto()->Id != except))
         {
             RemoveSpellAuraHolder(iter->second);
             iter = m_spellAuraHolders.begin();
