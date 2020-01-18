@@ -680,9 +680,6 @@ uint32 Unit::DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDa
         RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
         RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-        if (pVictim != this)
-            RemoveNonPassiveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
-
         if (pVictim->IsPlayer() && !pVictim->IsMounted() && !pVictim->IsStandingUp())
             pVictim->SetStandState(UNIT_STAND_STATE_STAND);
     }
