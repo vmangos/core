@@ -2879,6 +2879,14 @@ void Aura::HandleModPossess(bool apply, bool Real)
         pTarget->CastSpell(pTarget, 27771, true); // Cast Damaged Tonk
         pCaster->CastSpell(pCaster, 9179, true); // Cast 3 sec Stun on self
         pCaster->RemoveAurasDueToSpell(24935); // Unroot player
+
+        // Reset Tonk Control Console
+        if (GameObject* pConsole = pCaster->FindNearestGameObject(180524, INTERACTION_DISTANCE))
+        {
+            pConsole->SetGoState(GO_STATE_READY);
+            pConsole->SetLootState(GO_READY);
+            pConsole->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
+        }
     }
 }
 
