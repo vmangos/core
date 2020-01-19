@@ -3,9 +3,9 @@ delimiter ??
 CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
-SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20200118131229');
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20200119130500');
 IF v=0 THEN
-INSERT INTO `migrations` VALUES ('20200118131229');
+INSERT INTO `migrations` VALUES ('20200119130500');
 -- Add your query below.
 
 -- New implementation of fishing loot in Tirisfal - sniff: https://classic.wowhead.com/tirisfal-glades#fishing
