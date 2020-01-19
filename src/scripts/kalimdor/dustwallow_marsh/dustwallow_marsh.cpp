@@ -17,136 +17,17 @@
 /* ScriptData
 SDName: Dustwallow_Marsh
 SD%Complete: 95
-SDComment: Quest support: 558, 1173, 1324. Vendor Nat Pagle
+SDComment: Quest support: 558, 1324. Vendor Nat Pagle
 SDCategory: Dustwallow Marsh
 EndScriptData */
 
 /* ContentData
 npc_lady_jaina_proudmoore
-npc_morokk
 npc_private_hendel
 npc_cassa_crimsonwing
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_morokk
-######*/
-
-enum
-{
-    SAY_MOR_CHALLENGE               = -1000499,
-    SAY_MOR_SCARED                  = -1000500,
-
-    QUEST_CHALLENGE_MOROKK          = 1173,
-
-    FACTION_MOR_HOSTILE             = 168,
-    FACTION_MOR_RUNNING             = 35
-};
-
-struct npc_morokkAI : public npc_escortAI
-{
-    npc_morokkAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        m_bIsSuccess = false;
-        Reset();
-    }
-
-    bool m_bIsSuccess;
-
-    void Reset() override {}
-
-    void WaypointReached(uint32 uiPointId) override
-    {
-        switch (uiPointId)
-        {
-            case 0:
-                SetEscortPaused(true);
-                break;
-            case 1:
-                if (m_bIsSuccess)
-                    DoScriptText(SAY_MOR_SCARED, m_creature);
-                else
-                {
-                    m_creature->SetDeathState(JUST_DIED);
-                    m_creature->Respawn();
-                }
-                break;
-        }
-    }
-
-    void AttackedBy(Unit* pAttacker) override
-    {
-        if (m_creature->GetVictim())
-            return;
-
-        if (m_creature->IsFriendlyTo(pAttacker))
-            return;
-
-        AttackStart(pAttacker);
-    }
-
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
-    {
-        if (HasEscortState(STATE_ESCORT_ESCORTING))
-        {
-            if (m_creature->GetHealthPercent() < 30.0f)
-            {
-                if (Player* pPlayer = GetPlayerForEscort())
-                    pPlayer->GroupEventHappens(QUEST_CHALLENGE_MOROKK, m_creature);
-
-                m_creature->SetFactionTemplateId(FACTION_MOR_RUNNING);
-
-                m_bIsSuccess = true;
-                EnterEvadeMode();
-
-                uiDamage = 0;
-            }
-        }
-    }
-
-    void UpdateEscortAI(uint32 const uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-        {
-            if (HasEscortState(STATE_ESCORT_PAUSED))
-            {
-                if (Player* pPlayer = GetPlayerForEscort())
-                {
-                    m_bIsSuccess = false;
-                    DoScriptText(SAY_MOR_CHALLENGE, m_creature, pPlayer);
-                    m_creature->SetFactionTemplateId(FACTION_MOR_HOSTILE);
-                    AttackStart(pPlayer);
-                }
-
-                SetEscortPaused(false);
-            }
-
-            return;
-        }
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_morokk(Creature* pCreature)
-{
-    return new npc_morokkAI(pCreature);
-}
-
-bool QuestAccept_npc_morokk(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_CHALLENGE_MOROKK)
-    {
-        if (npc_morokkAI* pEscortAI = dynamic_cast<npc_morokkAI*>(pCreature->AI()))
-            pEscortAI->Start(true, pPlayer->GetGUID(), pQuest);
-
-        return true;
-    }
-
-    return false;
-}
 
 /*######
 ## npc_private_hendel
@@ -1637,12 +1518,6 @@ GameObjectAI* GetAI_go_forged_seal(GameObject* pGo)
 void AddSC_dustwallow_marsh()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_morokk";
-    newscript->GetAI = &GetAI_npc_morokk;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_morokk;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_private_hendel";
