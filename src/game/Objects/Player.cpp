@@ -2178,7 +2178,7 @@ void Player::RemoveFromWorld()
         RemoveMiniPet();
         sZoneScriptMgr.HandlePlayerLeaveZone(this, m_zoneUpdateId);
         TradeCancel(false);
-        DuelComplete(DUEL_INTERUPTED);
+        DuelComplete(DUEL_INTERRUPTED);
     }
 
     for (int i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
@@ -2189,7 +2189,7 @@ void Player::RemoveFromWorld()
 
     // remove duel before calling Unit::RemoveFromWorld
     // otherwise there will be an existing duel flag pointer but no entry in m_gameObj
-    DuelComplete(DUEL_INTERUPTED);
+    DuelComplete(DUEL_INTERRUPTED);
 
     ///- Do not add/remove the player from the object storage
     ///- It will crash when updating the ObjectAccessor
@@ -6759,11 +6759,11 @@ void Player::DuelComplete(DuelCompleteType type)
         return;
 
     WorldPacket data(SMSG_DUEL_COMPLETE, (1));
-    data << (uint8)((type != DUEL_INTERUPTED) ? 1 : 0);
+    data << (uint8)((type != DUEL_INTERRUPTED) ? 1 : 0);
     GetSession()->SendPacket(&data);
     duel->opponent->GetSession()->SendPacket(&data);
 
-    if (type != DUEL_INTERUPTED)
+    if (type != DUEL_INTERRUPTED)
     {
         data.Initialize(SMSG_DUEL_WINNER, (1 + 20));        // we guess size
         data << (uint8)((type == DUEL_WON) ? 0 : 1);        // 0 = just won; 1 = fled
@@ -6810,7 +6810,7 @@ void Player::DuelComplete(DuelCompleteType type)
         duel->opponent->ClearComboPoints();
 
     // reset extraAttacks counter
-    if (type != DUEL_INTERUPTED)
+    if (type != DUEL_INTERRUPTED)
     {
         ResetExtraAttacks();
         duel->opponent->ResetExtraAttacks();

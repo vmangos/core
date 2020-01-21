@@ -5319,7 +5319,7 @@ void Spell::EffectDuel(SpellEffectIndex eff_idx)
         if (caster->duel->startTime)
             caster->DuelComplete(DUEL_WON);
         else
-            caster->DuelComplete(DUEL_INTERUPTED);
+            caster->DuelComplete(DUEL_INTERRUPTED);
 
        delete caster->duel;
        delete target->duel;
