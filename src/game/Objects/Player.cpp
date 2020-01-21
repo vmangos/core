@@ -1199,15 +1199,13 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
     {
-        if (roll_chance_i(3) && GetTimeInnEnter() > 0)      //freeze update
+        if (GetTimeInnEnter() > 0)                          // Freeze update
         {
-            time_t time_inn = time(nullptr) - GetTimeInnEnter();
-            if (time_inn >= 10)                             //freeze update
+            time_t time_inn = now - GetTimeInnEnter();
+            if (time_inn >= 10)                             // Freeze update
             {
-                float bubble = 0.125f * sWorld.getConfig(CONFIG_FLOAT_RATE_REST_INGAME);
-                //speed collect rest bonus (section/in hour)
-                SetRestBonus(GetRestBonus() + time_inn * ((float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) / 72000)*bubble);
-                UpdateInnerTime(time(nullptr));
+                SetRestBonus(GetRestBonus() + ComputeRest(time_inn));
+                UpdateInnerTime(now);
             }
         }
     }
@@ -8220,6 +8218,27 @@ uint32 Player::GetXPRestBonus(uint32 xp)
     return rested_bonus;
 }
 
+float Player::ComputeRest(time_t timePassed, bool offline /*= false*/, bool inRestPlace /*= false*/)
+{
+    // Every 8h in resting zone we gain a bubble
+    // A bubble is 5% of the total xp so there is 20 bubbles
+    // So we gain (total XP/20 every 8h) (8h = 288800 sec)
+    // (TotalXP/20)/28800; simplified to (TotalXP/576000) per second
+    // Client automatically double the value sent so we have to divide it by 2
+    // So final formula (TotalXP/1152000)
+    float bonus = timePassed * (GetUInt32Value(PLAYER_NEXT_LEVEL_XP) / 1152000.0f); // Get the gained rest xp for given second
+    if (!offline)
+        bonus *= sWorld.getConfig(CONFIG_FLOAT_RATE_REST_INGAME);                   // Apply the custom setting
+    else
+    {
+        if (inRestPlace)
+            bonus *= sWorld.getConfig(CONFIG_FLOAT_RATE_REST_OFFLINE_IN_TAVERN_OR_CITY);
+        else
+            bonus *= sWorld.getConfig(CONFIG_FLOAT_RATE_REST_OFFLINE_IN_WILDERNESS) / 4.0f; // bonus is reduced by 4 when not in rest place
+    }
+    return bonus;
+}
+
 void Player::SetBindPoint(ObjectGuid guid) const
 {
     WorldPacket data(SMSG_BINDER_CONFIRM, 8);
@@ -14818,17 +14837,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder* holder)
     m_rest_bonus = fields[21].GetFloat();
 
     if (time_diff > 0)
-    {
-        //speed collect rest bonus in offline, in logout, far from tavern, city (section/in hour)
-        float bubble0 = 0.031f;
-        //speed collect rest bonus in offline, in logout, in tavern, city (section/in hour)
-        float bubble1 = 0.125f;
-        float bubble = fields[23].GetUInt32() > 0
-                       ? (bubble1 * sWorld.getConfig(CONFIG_FLOAT_RATE_REST_OFFLINE_IN_TAVERN_OR_CITY))
-                       : (bubble0 * sWorld.getConfig(CONFIG_FLOAT_RATE_REST_OFFLINE_IN_WILDERNESS));
-
-        SetRestBonus(GetRestBonus() + time_diff * ((float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) / 72000)*bubble);
-    }
+        SetRestBonus(GetRestBonus() + ComputeRest(time_diff, true, (fields[23].GetInt32() > 0)));
 
     // load skills after InitStatsForLevel because it triggering aura apply also
     _LoadSkills(holder->GetResult(PLAYER_LOGIN_QUERY_LOADSKILLS));

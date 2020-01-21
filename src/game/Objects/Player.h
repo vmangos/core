@@ -1913,6 +1913,15 @@ class MANGOS_DLL_SPEC Player final: public Unit
         RestType rest_type;
         void UpdateInnerTime(time_t time) { time_inn_enter = time; }
     public:
+        /**
+        * \brief: compute rest bonus
+        * \param: time_t timePassed > time from last check
+        * \param: bool offline      > is the player was offline?
+        * \param: bool inRestPlace  > if it was offline, is the player was in city/tavern/inn?
+        * \returns: float
+        **/
+        float ComputeRest(time_t timePassed, bool offline = false, bool inRestPlace = false);
+
         float GetRestBonus() const { return m_rest_bonus; }
         void SetRestBonus(float rest_bonus_new);
         RestType GetRestType() const { return rest_type; }
