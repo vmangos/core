@@ -544,11 +544,11 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             switch (m_value2)
             {
                 case 0:
-                    return visualRank == m_value1;
+                    return visualRank == int8(m_value1);
                 case 1:
-                    return visualRank >= m_value1;
+                    return visualRank >= int8(m_value1);
                 case 2:
-                    return visualRank <= m_value1;
+                    return visualRank <= int8(m_value1);
             }
             return false;
         }

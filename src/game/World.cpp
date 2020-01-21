@@ -2204,7 +2204,7 @@ void World::WarnAccount(uint32 accountId, std::string from, std::string reason, 
             accountId, from.c_str(), reason.c_str(), realmID);
 }
 
-void World::BanAccount(uint32 accountId, uint32 duration, std::string reason, std::string author)
+void World::BanAccount(uint32 accountId, uint32 duration, std::string reason, std::string const& author)
 {
     LoginDatabase.escape_string(reason);
     std::string safe_author = author;

@@ -38,16 +38,16 @@
 
 INSTANTIATE_SINGLETON_1(MassMailMgr);
 
-void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender sender, uint32 raceMask)
+void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender const& sender, uint32 raceMask)
 {
     if (RACEMASK_ALL_PLAYABLE & ~raceMask)                  // have races not included in mask
     {
         std::ostringstream ss;
-        ss << "SELECT guid FROM characters WHERE (1 << (race - 1)) & " << raceMask << " AND deleteDate IS NULL";
+        ss << "SELECT `guid` FROM `characters` WHERE (1 << (`race` - 1)) & " << raceMask << " AND `deleteDate` IS NULL";
         AddMassMailTask(mailProto, sender, ss.str().c_str());
     }
     else
-        AddMassMailTask(mailProto, sender, "SELECT guid FROM characters WHERE deleteDate IS NULL");
+        AddMassMailTask(mailProto, sender, "SELECT `guid` FROM `characters` WHERE `deleteDate` IS NULL");
 }
 
 struct MassMailerQueryHandler
@@ -70,7 +70,7 @@ struct MassMailerQueryHandler
     }
 } massMailerQueryHandler;
 
-void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender sender, char const* query)
+void MassMailMgr::AddMassMailTask(MailDraft* mailProto, MailSender const& sender, char const* query)
 {
     CharacterDatabase.AsyncPQuery(&massMailerQueryHandler, &MassMailerQueryHandler::HandleQueryCallback, mailProto, sender, query);
 }

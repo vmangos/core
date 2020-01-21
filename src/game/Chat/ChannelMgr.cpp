@@ -49,7 +49,7 @@ ChannelMgr::~ChannelMgr()
     channels.clear();
 }
 
-Channel *ChannelMgr::GetJoinChannel(std::string name, bool allowAreaDependantChans)
+Channel *ChannelMgr::GetJoinChannel(std::string const& name, bool allowAreaDependantChans)
 {
     std::wstring wname;
     Utf8toWStr(name, wname);
@@ -68,7 +68,7 @@ Channel *ChannelMgr::GetJoinChannel(std::string name, bool allowAreaDependantCha
     return channels[wname];
 }
 
-Channel *ChannelMgr::GetChannel(std::string name, PlayerPointer p, bool pkt)
+Channel *ChannelMgr::GetChannel(std::string const& name, PlayerPointer p, bool pkt)
 {
     std::wstring wname;
     Utf8toWStr(name, wname);
@@ -91,7 +91,7 @@ Channel *ChannelMgr::GetChannel(std::string name, PlayerPointer p, bool pkt)
         return i->second;
 }
 
-void ChannelMgr::LeftChannel(std::string name)
+void ChannelMgr::LeftChannel(std::string const& name)
 {
     std::wstring wname;
     Utf8toWStr(name, wname);
@@ -128,7 +128,7 @@ void ChannelMgr::CreateDefaultChannels()
         channel.second->SetAnnounce(false);
 }
 
-void ChannelMgr::AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, char const* message)
+void ChannelMgr::AnnounceBothFactionsChannel(std::string const& channelName, ObjectGuid playerGuid, char const* message)
 {
     if (Channel* c = channelMgr(HORDE)->GetJoinChannel(channelName))
         c->Say(playerGuid, message, LANG_UNIVERSAL, true);

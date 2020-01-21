@@ -830,7 +830,7 @@ class World
         void KickAll();
         void KickAllLess(AccountTypes sec);
         void WarnAccount(uint32 accountId, std::string from, std::string reason, char const* type = "WARNING");
-        void BanAccount(uint32 accountId, uint32 duration, std::string reason, std::string author);
+        void BanAccount(uint32 accountId, uint32 duration, std::string reason, std::string const& author);
         BanReturn BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_secs, std::string reason, std::string author);
         bool RemoveBanAccount(BanMode mode, std::string const& source, std::string const& message, std::string nameOrIP);
 
