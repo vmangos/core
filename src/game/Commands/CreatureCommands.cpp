@@ -1046,8 +1046,9 @@ bool ChatHandler::HandleNpcUnFollowCommand(char* /*args*/)
         return false;
     }
 
-    if (pCreature->GetMotionMaster()->empty() ||
-        pCreature->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
+    MotionMaster* creatureMotion = pCreature->GetMotionMaster();
+    if (creatureMotion->empty() ||
+        creatureMotion->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
     {
         PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU, pCreature->GetName());
         SetSentErrorMessage(true);
@@ -1055,7 +1056,7 @@ bool ChatHandler::HandleNpcUnFollowCommand(char* /*args*/)
     }
 
     FollowMovementGenerator<Creature> const* mgen
-        = static_cast<FollowMovementGenerator<Creature> const*>((pCreature->GetMotionMaster()->top()));
+        = static_cast<FollowMovementGenerator<Creature> const*>((creatureMotion->top()));
 
     if (mgen->GetTarget() != pPlayer)
     {
@@ -1065,7 +1066,7 @@ bool ChatHandler::HandleNpcUnFollowCommand(char* /*args*/)
     }
 
     // reset movement
-    pCreature->GetMotionMaster()->MovementExpired(true);
+    creatureMotion->MovementExpired(true);
 
     PSendSysMessage(LANG_CREATURE_NOT_FOLLOW_YOU_NOW, pCreature->GetName());
     return true;

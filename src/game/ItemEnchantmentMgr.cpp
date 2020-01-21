@@ -105,7 +105,8 @@ uint32 GetItemEnchantMod(uint32 entry)
     double dRoll = rand_chance();
     float fCount = 0;
 
-    for (const auto& ench_iter : tab->second)
+    EnchStoreList const& enchantList = tab->second;
+    for (const auto& ench_iter : enchantList)
     {
         fCount += ench_iter.chance;
 
@@ -116,7 +117,7 @@ uint32 GetItemEnchantMod(uint32 entry)
     dRoll = (irand(0, (int)floor(fCount * 100) + 1)) / 100.0f;
     fCount = 0;
 
-    for (const auto& ench_iter : tab->second)
+    for (const auto& ench_iter : enchantList)
     {
         fCount += ench_iter.chance;
 

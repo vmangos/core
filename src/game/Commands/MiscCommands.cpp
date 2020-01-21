@@ -235,10 +235,11 @@ bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
         HashMapHolder<Player>::MapType &m = sObjectAccessor.GetPlayers();
         for (const auto& itr : m)
         {
-            AccountTypes itr_sec = itr.second->GetSession()->GetSecurity();
-            if ((itr.second->IsGameMaster() || (itr_sec > SEC_PLAYER && itr_sec <= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_GM_LIST))) &&
-                (!m_session || itr.second->IsVisibleGloballyFor(m_session->GetPlayer())))
-                names.push_back(std::make_pair<std::string, bool>(GetNameLink(itr.second), itr.second->IsAcceptWhispers()));
+            Player* player = itr.second;
+            AccountTypes itr_sec = player->GetSession()->GetSecurity();
+            if ((player->IsGameMaster() || (itr_sec > SEC_PLAYER && itr_sec <= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_GM_LIST))) &&
+                (!m_session || player->IsVisibleGloballyFor(m_session->GetPlayer())))
+                names.push_back(std::make_pair<std::string, bool>(GetNameLink(player), player->IsAcceptWhispers()));
         }
     }
 
@@ -1074,8 +1075,10 @@ bool ChatHandler::HandleSendMessageCommand(char* args)
     if (!*args)
         return false;
 
+    WorldSession* rPlayerSession = rPlayer->GetSession();
+
     ///- Check that he is not logging out.
-    if (rPlayer->GetSession()->isLogingOut())
+    if (rPlayerSession->isLogingOut())
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
         SetSentErrorMessage(true);
@@ -1084,8 +1087,8 @@ bool ChatHandler::HandleSendMessageCommand(char* args)
 
     ///- Send the message
     //Use SendAreaTriggerMessage for fastest delivery.
-    rPlayer->GetSession()->SendAreaTriggerMessage("%s", args);
-    rPlayer->GetSession()->SendAreaTriggerMessage("|cffff0000[Message from administrator]:|r");
+    rPlayerSession->SendAreaTriggerMessage("%s", args);
+    rPlayerSession->SendAreaTriggerMessage("|cffff0000[Message from administrator]:|r");
 
     //Confirmation message
     std::string nameLink = GetNameLink(rPlayer);
