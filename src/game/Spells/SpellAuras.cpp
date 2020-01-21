@@ -394,7 +394,7 @@ Aura::~Aura()
 }
 
 AreaAura::AreaAura(SpellEntry const* spellproto, SpellEffectIndex eff, int32 *currentBasePoints, SpellAuraHolder* holder, Unit* target,
-                   Unit* caster, Item* castItem) : Aura(spellproto, eff, currentBasePoints, holder, target, caster, castItem)
+                   Unit* caster, Item* castItem, uint32 originalRankSpellId) : Aura(spellproto, eff, currentBasePoints, holder, target, caster, castItem), m_originalRankSpellId(originalRankSpellId)
 {
     m_isAreaAura = true;
 
@@ -664,9 +664,17 @@ void AreaAura::Update(uint32 diff)
                 // false if an area aura of the same spellid exists on the target
                 bool apply = true;
 
+                SpellEntry const* actualSpellInfo;
+                if (GetCasterGuid() == target->GetObjectGuid()) // if caster is same as target then no need to change rank of the spell
+                    actualSpellInfo = GetSpellProto();
+                else
+                    actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(GetSpellProto(), target->GetLevel()); // use spell id according level of the target
+                if (!actualSpellInfo)
+                    continue;
+
+                Unit::SpellAuraHolderBounds spair = target->GetSpellAuraHolderBounds(actualSpellInfo->Id);
                 // we need to ignore present caster self applied area auras sometimes
                 // in cases where this is the only aura applied for this spell effect
-                Unit::SpellAuraHolderBounds spair = target->GetSpellAuraHolderBounds(GetId());
                 for (Unit::SpellAuraHolderMap::const_iterator i = spair.first; i != spair.second; ++i)
                 {
                     if (i->second->IsDeleted())
@@ -696,57 +704,54 @@ void AreaAura::Update(uint32 diff)
                     continue;
 
                 // Skip some targets (TODO: Might require better checks, also unclear how the actual caster must/can be handled)
-                if (GetSpellProto()->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER)
+                if (actualSpellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER)
                     continue;
+                
+                int32 actualBasePoints = m_currentBasePoints;
+                // recalculate basepoints for lower rank (all AreaAura spell not use custom basepoints?)
+                if (actualSpellInfo != GetSpellProto())
+                    actualBasePoints = actualSpellInfo->CalculateSimpleValue(m_effIndex);
 
-                if (SpellEntry const* actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(GetSpellProto(), target->GetLevel()))
+                SpellAuraHolder* holder = target->GetSpellAuraHolder(actualSpellInfo->Id, GetCasterGuid());
+
+                bool addedToExisting = true;
+                if (!holder)
                 {
-                    int32 actualBasePoints = m_currentBasePoints;
-                    // recalculate basepoints for lower rank (all AreaAura spell not use custom basepoints?)
-                    if (actualSpellInfo != GetSpellProto())
-                        actualBasePoints = actualSpellInfo->CalculateSimpleValue(m_effIndex);
+                    holder = CreateSpellAuraHolder(actualSpellInfo, target, caster, caster);
+                    addedToExisting = false;
+                }
 
-                    SpellAuraHolder* holder = target->GetSpellAuraHolder(actualSpellInfo->Id, GetCasterGuid());
+                AreaAura* aur = new AreaAura(actualSpellInfo, m_effIndex, &actualBasePoints, holder, target, caster, nullptr, GetSpellProto()->Id);
+                holder->AddAura(aur, m_effIndex);
 
-                    bool addedToExisting = true;
-                    if (!holder)
+                if (!holder->IsPassive() && !holder->IsPermanent())
+                {
+                    // Aura duration has already been decremented in caster holder update, so re-add
+                    // for the target's holder or it will be one diff in the future
+                    holder->SetAuraDuration(GetAuraDuration() + diff);
+                }
+
+                // Caster's aura will tick at the end of this method, so subtract now to remain synced
+                holder->RefreshAuraPeriodicTimers(m_periodicTimer - diff);
+
+                if (addedToExisting)
+                {
+                    target->AddAuraToModList(aur);
+                    holder->SetInUse(true);
+                    aur->ApplyModifier(true, true);
+                    holder->SetInUse(false);
+                }
+                else if (!target->AddSpellAuraHolder(holder))
+                    holder = nullptr;
+
+                DETAIL_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
+
+                // Add holder to spell if it's channeled so the updates are synced
+                if (holder && IsChanneled() && !addedToExisting)
+                {
+                    if (Spell* spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                     {
-                        holder = CreateSpellAuraHolder(actualSpellInfo, target, caster, caster);
-                        addedToExisting = false;
-                    }
-
-                    AreaAura *aur = new AreaAura(actualSpellInfo, m_effIndex, &actualBasePoints, holder, target, caster, nullptr);
-                    holder->AddAura(aur, m_effIndex);
-
-                    if (!holder->IsPassive() && !holder->IsPermanent())
-                    {
-                        // Aura duration has already been decremented in caster holder update, so re-add
-                        // for the target's holder or it will be one diff in the future
-                        holder->SetAuraDuration(GetAuraDuration() + diff);
-                    }
-
-                    // Caster's aura will tick at the end of this method, so subtract now to remain synced
-                    holder->RefreshAuraPeriodicTimers(m_periodicTimer - diff);
-
-                    if (addedToExisting)
-                    {
-                        target->AddAuraToModList(aur);
-                        holder->SetInUse(true);
-                        aur->ApplyModifier(true, true);
-                        holder->SetInUse(false);
-                    }
-                    else if (!target->AddSpellAuraHolder(holder))
-                        holder = nullptr;
-
-                    DETAIL_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
-
-                    // Add holder to spell if it's channeled so the updates are synced
-                    if (holder && IsChanneled() && !addedToExisting)
-                    {
-                        if (Spell* spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                        {
-                            spell->AddChanneledAuraHolder(holder);
-                        }
+                        spell->AddChanneledAuraHolder(holder);
                     }
                 }
             }
@@ -757,6 +762,7 @@ void AreaAura::Update(uint32 diff)
     {
         Unit* caster = GetCaster();
         Unit* target = GetTarget();
+        uint32 originalRankSpellId = m_originalRankSpellId ? m_originalRankSpellId : GetId(); // caster may have different spell id if target has lower level
 
         // Aura updates in caster update, see above
         //Aura::Update(diff);
@@ -766,10 +772,11 @@ void AreaAura::Update(uint32 diff)
         // or caster is isolated or caster no longer has the aura
         // or caster is (no longer) friendly
         bool needFriendly = (m_areaAuraType != AREA_AURA_ENEMY);
-        if (!caster || caster->HasUnitState(UNIT_STAT_ISOLATED) ||
-                !caster->IsWithinDistInMap(target, m_radius) ||
-                !caster->HasAura(GetId(), GetEffIndex()) ||
-                caster->IsFriendlyTo(target) != needFriendly
+        if (!caster || 
+            caster->HasUnitState(UNIT_STAT_ISOLATED) ||
+            !caster->HasAura(originalRankSpellId, GetEffIndex()) ||
+            !caster->IsWithinDistInMap(target, m_radius) ||
+            caster->IsFriendlyTo(target) != needFriendly
             )
         {
             target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGuid(), AURA_REMOVE_BY_RANGE);
