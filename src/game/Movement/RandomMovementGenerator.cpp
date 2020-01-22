@@ -58,10 +58,17 @@ void RandomMovementGenerator::_setRandomLocation(Creature &creature)
     init.SetWalk(true);
     init.Launch();
 
-    if (roll_chance_i(40))
+    if (i_wanderSteps) // Creature has yet to do steps before pausing
+    {
+        --i_wanderSteps;
         i_nextMoveTime.Reset(50);
+    }
     else
-        i_nextMoveTime.Reset(urand(3000, 10000));
+    {
+        // Creature has made all its steps, time for a little break
+        i_nextMoveTime.Reset(urand(4, 10) * IN_MILLISECONDS); // Retails seems to use rounded numbers so we do as well
+        i_wanderSteps = urand(0, 8);
+    }
 }
 
 void RandomMovementGenerator::Initialize(Creature &creature)
