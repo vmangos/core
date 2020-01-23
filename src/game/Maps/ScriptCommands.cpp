@@ -839,11 +839,11 @@ bool Map::ScriptCommand_Morph(ScriptInfo const& script, WorldObject* source, Wor
 // SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL (24)
 bool Map::ScriptCommand_Mount(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
-    Creature* pSource;
+    Unit* pSource = ToUnit(source);
 
-    if (!((pSource = ToCreature(source)) || (pSource = ToCreature(target))))
+    if (!pSource)
     {
-        sLog.outError("SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL (script id %u) call for a nullptr or non-creature source and target (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", script.id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+        sLog.outError("SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL (script id %u) call for a nullptr or non-unit source and target (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", script.id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
 
@@ -862,7 +862,15 @@ bool Map::ScriptCommand_Mount(ScriptInfo const& script, WorldObject* source, Wor
     }
 
     if (script.mount.permanent)
-        pSource->SetDefaultMount(displayId);
+    {
+        Creature* pCreature = ToCreature(source);
+        if (!pCreature)
+        {
+            sLog.outError("SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL (script id %u) call for a nullptr or non-creature source and target (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", script.id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+            return ShouldAbortScript(script);
+        }
+        pCreature->SetDefaultMount(displayId);
+    }
 
     return false;
 }
