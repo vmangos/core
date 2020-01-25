@@ -310,6 +310,12 @@ void GameEventMgr::LoadFromDB()
                 continue;
             }
 
+            if (!sObjectMgr.IsExistingCreatureGuid(guid))
+            {
+                sLog.outErrorDb("`game_event_creature` game event id (%i) contains non-existent creature guid (%u)", event_id, guid);
+                continue;
+            }
+
             int32 internal_event_id = mGameEvent.size() + event_id - 1;
 
             ++count;
@@ -477,6 +483,12 @@ void GameEventMgr::LoadFromDB()
             if (!IsValidEvent(event_id))
             {
                 sLog.outErrorDb("`game_event_creature_data` game event id (%u) not exist in `game_event`", event_id);
+                continue;
+            }
+
+            if (!sObjectMgr.IsExistingCreatureGuid(guid))
+            {
+                sLog.outErrorDb("`game_event_creature_data` game event id (%u) contains non-existent creature guid (%u)", event_id, guid);
                 continue;
             }
 
