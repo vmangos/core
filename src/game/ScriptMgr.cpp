@@ -1402,8 +1402,6 @@ void ScriptMgr::CheckAllScriptTexts()
     CheckScriptTexts(sGossipScripts);
     CheckScriptTexts(sCreatureMovementScripts);
     CheckScriptTexts(sCreatureAIScripts);
-
-    sWaypointMgr.CheckTextsExistance();
 }
 
 void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts)

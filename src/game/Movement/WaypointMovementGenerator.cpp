@@ -153,39 +153,6 @@ bool WaypointMovementGenerator<Creature>::OnArrived(Creature& creature)
         creature.GetMap()->ScriptsStart(sCreatureMovementScripts, node.script_id, &creature, &creature);
     }
 
-    // We have reached the destination and can process behavior
-    if (WaypointBehavior* behavior = node.behavior)
-    {
-        if (behavior->emote != 0)
-            creature.HandleEmote(behavior->emote);
-
-        if (behavior->spell != 0)
-            creature.CastSpell(&creature, behavior->spell, false);
-
-        if (behavior->model1 != 0)
-            creature.SetDisplayId(behavior->model1);
-
-        if (behavior->textid[0])
-        {
-            int32 textId = behavior->textid[0];
-            // Not only one text is set
-            if (behavior->textid[1])
-            {
-                // Select one from max 5 texts (0 and 1 already checked)
-                int i = 2;
-                for (; i < MAX_WAYPOINT_TEXT; ++i)
-                {
-                    if (!behavior->textid[i])
-                        break;
-                }
-
-                textId = behavior->textid[urand(0, i - 1)];
-            }
-
-            DoScriptText(textId, &creature);
-        }
-    }
-
     // Inform script
     if (creature.AI())
     {
@@ -222,13 +189,6 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
 
     WaypointPath::const_iterator currPoint = i_path->find(i_currentNode);
     MANGOS_ASSERT(currPoint != i_path->end());
-
-    if (WaypointBehavior *behavior = i_path->at(i_currentNode).behavior)
-    {
-        if (behavior->model2 != 0)
-            creature.SetDisplayId(behavior->model2);
-        creature.SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
-    }
 
     if (m_isArrivalDone)
     {

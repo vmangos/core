@@ -30,28 +30,6 @@
 
 INSTANTIATE_SINGLETON_1(WaypointManager);
 
-bool WaypointBehavior::isEmpty()
-{
-    if (emote || spell || model1 || model2)
-        return false;
-
-    for (int i : textid)
-        if (i)
-            return false;
-
-    return true;
-}
-
-WaypointBehavior::WaypointBehavior(WaypointBehavior const& b)
-{
-    emote = b.emote;
-    spell = b.spell;
-    model1 = b.model1;
-    model2 = b.model2;
-    for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
-        textid[i] = b.textid[i];
-}
-
 void WaypointManager::Load()
 {
     Cleanup();
@@ -100,10 +78,8 @@ void WaypointManager::Load()
 
         delete result;
 
-        //                                    0     1        2             3             4             5           6                  7
-        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`,"
-        //                             8          9          10         11         12         13       14       15             16        17
-                                     "`textid1`, `textid2`, `textid3`, `textid4`, `textid5`, `emote`, `spell`, `orientation`, `model1`, `model2` FROM `creature_movement`");
+        //                                    0     1        2             3             4             5           6                  7            8
+        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation` FROM `creature_movement`");
 
         BarGoLink barRow((int)result->GetRowCount());
 
@@ -151,7 +127,7 @@ void WaypointManager::Load()
             node.x              = fields[2].GetFloat();
             node.y              = fields[3].GetFloat();
             node.z              = fields[4].GetFloat();
-            node.orientation    = fields[15].GetFloat();
+            node.orientation    = fields[8].GetFloat();
             node.delay          = fields[5].GetUInt32();
             node.wander_distance = fields[6].GetFloat();
             node.script_id      = fields[7].GetUInt32();
@@ -178,46 +154,6 @@ void WaypointManager::Load()
 
                 WorldDatabase.PExecute("UPDATE `creature_movement` SET `position_x` = '%f', `position_y` = '%f', `position_z` = '%f' WHERE `id` = '%u' AND `point` = '%u'", node.x, node.y, node.z, id, point);
             }
-
-            // WaypointBehavior can be dropped in time. Script_id added may 2010 and can handle all the below behavior.
-
-            WaypointBehavior be;
-            be.model1           = fields[16].GetUInt32();
-            be.model2           = fields[17].GetUInt32();
-            be.emote            = fields[13].GetUInt32();
-            be.spell            = fields[14].GetUInt32();
-
-            for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
-            {
-                be.textid[i]    = fields[8 + i].GetUInt32();
-
-                if (be.textid[i] < 0)
-                {
-                    sLog.outErrorDb("Broadcast text %u used in table `creature_movement` does not exist.", be.textid[i]);
-                    continue;
-                }
-            }
-
-            if (be.spell && ! sSpellMgr.GetSpellEntry(be.spell))
-            {
-                sLog.outErrorDb("Table creature_movement references unknown spellid %u. Skipping id %u with point %u.", be.spell, id, point);
-                be.spell = 0;
-            }
-
-            if (be.emote)
-            {
-                if (!sEmotesStore.LookupEntry(be.emote))
-                    sLog.outErrorDb("Waypoint path %u (Point %u) are using emote %u, but emote does not exist.", id, point, be.emote);
-            }
-
-            // save memory by not storing empty behaviors
-            if (!be.isEmpty())
-            {
-                node.behavior = new WaypointBehavior(be);
-                ++total_behaviors;
-            }
-            else
-                node.behavior = nullptr;
         }
         while (result->NextRow());
 
@@ -280,10 +216,8 @@ void WaypointManager::Load()
         sLog.outString();
         sLog.outString(">> Path templates loaded");
 
-        //                                    0        1        2             3             4             5           6                  7
-        result = WorldDatabase.Query("SELECT `entry`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`,"
-        //                             8          9          10         11         12         13       14       15             16        17
-                                     "`textid1`, `textid2`, `textid3`, `textid4`, `textid5`, `emote`, `spell`, `orientation`, `model1`, `model2` FROM `creature_movement_template`");
+        //                                    0        1        2             3             4             5           6                  7            8
+        result = WorldDatabase.Query("SELECT `entry`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation` FROM `creature_movement_template`");
 
         BarGoLink bar(result->GetRowCount());
 
@@ -326,7 +260,7 @@ void WaypointManager::Load()
             node.x              = fields[2].GetFloat();
             node.y              = fields[3].GetFloat();
             node.z              = fields[4].GetFloat();
-            node.orientation    = fields[15].GetFloat();
+            node.orientation    = fields[8].GetFloat();
             node.delay          = fields[5].GetUInt32();
             node.wander_distance = fields[6].GetFloat();
             node.script_id      = fields[7].GetUInt32();
@@ -345,44 +279,6 @@ void WaypointManager::Load()
 
                 WorldDatabase.PExecute("UPDATE `creature_movement_template` SET `position_x` = '%f', `position_y` = '%f' WHERE `entry` = %u AND `point` = %u", node.x, node.y, entry, point);
             }
-
-            WaypointBehavior be;
-            be.model1           = fields[16].GetUInt32();
-            be.model2           = fields[17].GetUInt32();
-            be.emote            = fields[13].GetUInt32();
-            be.spell            = fields[14].GetUInt32();
-
-            for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
-            {
-                be.textid[i]    = fields[8 + i].GetUInt32();
-
-                if (be.textid[i] < 0)
-                {
-                    sLog.outErrorDb("Broadcast text %u used in table `creature_movement_template` does not exist.", be.textid[i]);
-                    continue;
-                }
-            }
-
-            if (be.spell && ! sSpellMgr.GetSpellEntry(be.spell))
-            {
-                sLog.outErrorDb("Table creature_movement_template references unknown spellid %u. Skipping id %u with point %u.", be.spell, entry, point);
-                be.spell = 0;
-            }
-
-            if (be.emote)
-            {
-                if (!sEmotesStore.LookupEntry(be.emote))
-                    sLog.outErrorDb("Waypoint template path %u (point %u) are using emote %u, but emote does not exist.", entry, point, be.emote);
-            }
-
-            // save memory by not storing empty behaviors
-            if (!be.isEmpty())
-            {
-                node.behavior   = new WaypointBehavior(be);
-                ++total_behaviors;
-            }
-            else
-                node.behavior   = nullptr;
         }
         while (result->NextRow());
 
@@ -431,10 +327,8 @@ void WaypointManager::Load()
 
         delete result;
 
-        //                                    0     1        2             3             4             5           6                  7
-        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`,"
-        //                             8          9          10         11         12         13       14       15             16        17
-                                     "`textid1`, `textid2`, `textid3`, `textid4`, `textid5`, `emote`, `spell`, `orientation`, `model1`, `model2` FROM `creature_movement_special`");
+        //                                    0     1        2             3             4             5           6                  7            8
+        result = WorldDatabase.Query("SELECT `id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `wander_distance`, `script_id`, `orientation` FROM `creature_movement_special`");
 
         BarGoLink barRow((int)result->GetRowCount());
 
@@ -467,7 +361,7 @@ void WaypointManager::Load()
             node.x              = fields[2].GetFloat();
             node.y              = fields[3].GetFloat();
             node.z              = fields[4].GetFloat();
-            node.orientation    = fields[15].GetFloat();
+            node.orientation    = fields[8].GetFloat();
             node.delay          = fields[5].GetUInt32();
             node.wander_distance = fields[6].GetFloat();
             node.script_id      = fields[7].GetUInt32();
@@ -486,46 +380,6 @@ void WaypointManager::Load()
 
                 WorldDatabase.PExecute("UPDATE `creature_movement_special` SET `position_x` = '%f', `position_y` = '%f' WHERE `id` = %u AND `point` = %u", node.x, node.y, id, point);
             }
-
-            // WaypointBehavior can be dropped in time. Script_id added may 2010 and can handle all the below behavior.
-
-            WaypointBehavior be;
-            be.model1           = fields[16].GetUInt32();
-            be.model2           = fields[17].GetUInt32();
-            be.emote            = fields[13].GetUInt32();
-            be.spell            = fields[14].GetUInt32();
-
-            for (int i = 0; i < MAX_WAYPOINT_TEXT; ++i)
-            {
-                be.textid[i]    = fields[8 + i].GetUInt32();
-
-                if (be.textid[i] < 0)
-                {
-                    sLog.outErrorDb("Broadcast text %u used in table `creature_movement_special` does not exist.", be.textid[i]);
-                    continue;
-                }
-            }
-
-            if (be.spell && ! sSpellMgr.GetSpellEntry(be.spell))
-            {
-                sLog.outErrorDb("Table creature_movement_special references unknown spellid %u. Skipping id %u with point %u.", be.spell, id, point);
-                be.spell = 0;
-            }
-
-            if (be.emote)
-            {
-                if (!sEmotesStore.LookupEntry(be.emote))
-                    sLog.outErrorDb("Waypoint path %u (Point %u) are using emote %u, but emote does not exist.", id, point, be.emote);
-            }
-
-            // save memory by not storing empty behaviors
-            if (!be.isEmpty())
-            {
-                node.behavior = new WaypointBehavior(be);
-                ++total_behaviors;
-            }
-            else
-                node.behavior = nullptr;
         }
         while (result->NextRow());
 
@@ -610,8 +464,6 @@ void WaypointManager::Unload()
 
 void WaypointManager::_clearPath(WaypointPath &path)
 {
-    for (const auto& itr : path)
-    delete itr.second.behavior;
     path.clear();
 }
 
@@ -635,7 +487,7 @@ WaypointNode const* WaypointManager::AddNode(uint32 entry, uint32 dbGuid, uint32
         pointId = path.rbegin()->first + 1;
 
     uint32 nextPoint = pointId;
-    WaypointNode temp = WaypointNode(x, y, z, 100, 0, 0, 0, nullptr);
+    WaypointNode temp = WaypointNode(x, y, z, 100, 0, 0, 0);
     WaypointPath::iterator find = path.find(nextPoint);
     if (find != path.end())                                 // Point already exists
     {
@@ -783,67 +635,4 @@ bool WaypointManager::SetNodeScriptId(uint32 entry, uint32 dbGuid, uint32 point,
         find->second.script_id = scriptId;
 
     return sCreatureMovementScripts.find(scriptId) != sCreatureMovementScripts.end();
-}
-
-inline void CheckWPText(std::string table, uint32 entryOrGuid, uint32 point, WaypointBehavior* be)
-{
-    int zeroCount = 0;                                      // Counting leading zeros for futher textid shift
-    for (int j = 0; j < MAX_WAYPOINT_TEXT; ++j)
-    {
-        if (!be->textid[j])
-        {
-            ++zeroCount;
-            continue;
-        }
-        if (!sObjectMgr.GetBroadcastTextLocale(be->textid[j]))
-        {
-            sLog.outErrorDb("Table %s %u, PointId %u has textid%u with non existing textid %i.",
-                table.c_str(), entryOrGuid, point, j, be->textid[j]);
-            be->textid[j] = 0;
-            ++zeroCount;
-            continue;
-        }
-
-        // Shifting check
-        if (zeroCount)
-        {
-            // Correct textid but some zeros leading, so move it forward.
-            be->textid[j - zeroCount] = be->textid[j];
-            be->textid[j] = 0;
-        }
-    }
-}
-
-void WaypointManager::CheckTextsExistance()
-{
-    for (const auto& path : m_pathMap)
-    {
-        for (const auto& point : path.second)
-        {
-            if (point.second.behavior)
-            {
-                CheckWPText("`creature_movement` Id:", path.first, point.first, point.second.behavior);
-            }
-        }  
-    }
-
-    for (const auto& path : m_pathTemplateMap)
-    {
-        for (const auto& point : path.second)
-            if (point.second.behavior)
-            {
-                CheckWPText("`creature_movement_template` Entry:", path.first, point.first, point.second.behavior);
-            }
-    }
-
-    for (const auto& path : m_pathSpecialMap)
-    {
-        for (const auto& point : path.second)
-        {
-            if (point.second.behavior)
-            {
-                CheckWPText("`creature_movement_special` Id:", path.first, point.first, point.second.behavior);
-            }
-        } 
-    }
 }
