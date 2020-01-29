@@ -15,10 +15,10 @@ update `creature_template` set gossip_menu_id=262 where entry=2239;
 insert into `gossip_menu` (`entry`, `text_id`, `condition_id`) values('262','759','0');
 
 -- Gossip Option
-insert into `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) values('262','0','0','How can I free you?','2746','1','3','263','0','0','0','0',NULL,'0','0');
+insert into `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) values('262','0','0','How can I free you?','2746','1','3','261','0','0','0','0',NULL,'0','0');
 
 -- Gossip Option Page
-insert into `gossip_menu` (`entry`, `text_id`, `condition_id`) values('263','760','0');
+insert into `gossip_menu` (`entry`, `text_id`, `condition_id`) values('261','760','0');
 
 
 END IF;
