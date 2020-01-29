@@ -240,7 +240,10 @@ bool WmoLiquid::readFromFile(FILE* rf, WmoLiquid*& out)
     liquid->iFlags = new uint8[size];
     if (result && fread(liquid->iFlags, sizeof(uint8), size, rf) != size) result = false;
     if (!result)
+    {
         delete liquid;
+        liquid = nullptr;
+    }
     out = liquid;
     return result;
 }
