@@ -2363,10 +2363,10 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, int32 c
     {
         if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(iTextEntry))
         {
-            Type = bct->Type;
-            Emote = bct->EmoteId0;
-            Language = bct->Language;
-            SoundId = bct->SoundId;
+            Type = bct->chatType;
+            Emote = bct->emoteId1;
+            Language = bct->languageId;
+            SoundId = bct->soundId;
         }
         else
         {
@@ -2490,10 +2490,10 @@ void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map*
     {
         if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(iTextEntry))
         {
-            Type = bct->Type;
-            Emote = bct->EmoteId0;
-            LanguageId = bct->Language;
-            SoundId = bct->SoundId;
+            Type = bct->chatType;
+            Emote = bct->emoteId1;
+            LanguageId = bct->languageId;
+            SoundId = bct->soundId;
         }
         else
         {

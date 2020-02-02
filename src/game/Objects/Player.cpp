@@ -12499,8 +12499,8 @@ void Player::SendPreparedQuest(ObjectGuid guid)
             {
                 if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(gossiptext->Options[0].BroadcastTextID))
                 {
-                    qe._Emote = bct->EmoteId0;
-                    qe._Delay = bct->EmoteDelay0;
+                    qe._Emote = bct->emoteId1;
+                    qe._Delay = bct->emoteDelay1;
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     title = bct->GetText(loc_idx, pCreature->GetGender(), false);
                 }

@@ -8585,8 +8585,8 @@ void ObjectMgr::LoadBroadcastTexts()
 {
     m_BroadcastTextLocaleMap.clear(); // for reload case
 
-    //                                                               0     1           2             3        4       5           6           7           8           9              10             11
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `ID`, `MaleText`, `FemaleText`, `Sound`, `Type`, `Language`, `EmoteId0`, `EmoteId1`, `EmoteId2`, `EmoteDelay0`, `EmoteDelay1`, `EmoteDelay2` FROM `broadcast_text`"));
+    //                                                               0        1            2              3           4            5              6            7            8            9               10              11
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `male_text`, `female_text`, `chat_type`, `sound_id`, `language_id`, `emote_id1`, `emote_id2`, `emote_id3`, `emote_delay1`, `emote_delay2`, `emote_delay3` FROM `broadcast_text`"));
     if (!result)
     {
         BarGoLink bar(1);
@@ -8607,79 +8607,79 @@ void ObjectMgr::LoadBroadcastTexts()
 
         BroadcastText bct;
 
-        bct.Id = fields[0].GetUInt32();
-        bct.MaleText[LOCALE_enUS] = fields[1].GetString() ? fields[1].GetString() : std::string();
-        bct.FemaleText[LOCALE_enUS] = fields[2].GetString() ? fields[2].GetString() : std::string();
-        bct.SoundId = fields[3].GetUInt32();
-        bct.Type = fields[4].GetUInt32();
-        bct.Language = fields[5].GetUInt32();
-        bct.EmoteId0 = fields[6].GetUInt32();
-        bct.EmoteId1 = fields[7].GetUInt32();
-        bct.EmoteId2 = fields[8].GetUInt32();
-        bct.EmoteDelay0 = fields[9].GetUInt32();
-        bct.EmoteDelay1 = fields[10].GetUInt32();
-        bct.EmoteDelay2 = fields[11].GetUInt32();
+        bct.entry = fields[0].GetUInt32();
+        bct.maleText[LOCALE_enUS] = fields[1].GetString() ? fields[1].GetString() : std::string();
+        bct.femaleText[LOCALE_enUS] = fields[2].GetString() ? fields[2].GetString() : std::string();
+        bct.chatType = fields[3].GetUInt32();
+        bct.soundId = fields[4].GetUInt32();
+        bct.languageId = fields[5].GetUInt32();
+        bct.emoteId1 = fields[6].GetUInt32();
+        bct.emoteId2 = fields[7].GetUInt32();
+        bct.emoteId3 = fields[8].GetUInt32();
+        bct.emoteDelay1 = fields[9].GetUInt32();
+        bct.emoteDelay2 = fields[10].GetUInt32();
+        bct.emoteDelay3 = fields[11].GetUInt32();
 
         // Prior to 1.12, the %s parameter was not used. Emotes have the source object's name automatically appended to the beginning.
 #if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
-        if ((bct.Type == CHAT_TYPE_TEXT_EMOTE))
+        if ((bct.chatType == CHAT_TYPE_TEXT_EMOTE))
         {
-            if ((bct.MaleText[LOCALE_enUS].size() > 3) && (bct.MaleText[LOCALE_enUS].at(0) == '%') && (bct.MaleText[LOCALE_enUS].at(1) == 's'))
-                bct.MaleText[LOCALE_enUS] = bct.MaleText[LOCALE_enUS].substr(3, bct.MaleText[LOCALE_enUS].size() - 3);
-            if ((bct.FemaleText[LOCALE_enUS].size() > 3) && (bct.FemaleText[LOCALE_enUS].at(0) == '%') && (bct.FemaleText[LOCALE_enUS].at(1) == 's'))
-                bct.FemaleText[LOCALE_enUS] = bct.FemaleText[LOCALE_enUS].substr(3, bct.FemaleText[LOCALE_enUS].size() - 3);
+            if ((bct.maleText[LOCALE_enUS].size() > 3) && (bct.maleText[LOCALE_enUS].at(0) == '%') && (bct.maleText[LOCALE_enUS].at(1) == 's'))
+                bct.maleText[LOCALE_enUS] = bct.maleText[LOCALE_enUS].substr(3, bct.maleText[LOCALE_enUS].size() - 3);
+            if ((bct.femaleText[LOCALE_enUS].size() > 3) && (bct.femaleText[LOCALE_enUS].at(0) == '%') && (bct.femaleText[LOCALE_enUS].at(1) == 's'))
+                bct.femaleText[LOCALE_enUS] = bct.femaleText[LOCALE_enUS].substr(3, bct.femaleText[LOCALE_enUS].size() - 3);
         }
 #endif  
 
-        if (bct.SoundId)
+        if (bct.soundId)
         {
-            if (!GetSoundEntry(bct.SoundId))
+            if (!GetSoundEntry(bct.soundId))
             {
-                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has SoundId %u but sound does not exist.", bct.Id, bct.SoundId);
-                bct.SoundId = 0;
+                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has SoundId %u but sound does not exist.", bct.entry, bct.soundId);
+                bct.soundId = 0;
             }
         }
 
-        if (!GetLanguageDescByID(bct.Language))
+        if (!GetLanguageDescByID(bct.languageId))
         {
-            sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` using Language %u but Language does not exist.", bct.Id, bct.Language);
-            bct.Language = LANG_UNIVERSAL;
+            sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` using LanguageId %u but language does not exist.", bct.entry, bct.languageId);
+            bct.languageId = LANG_UNIVERSAL;
         }
 
-        if (bct.Type > CHAT_TYPE_ZONE_YELL)
+        if (bct.chatType > CHAT_TYPE_ZONE_YELL)
         {
-            sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has Type %u but this Chat Type does not exist.", bct.Id, bct.Type);
-            bct.Type = CHAT_TYPE_SAY;
+            sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has ChatType %u but this chat type does not exist.", bct.entry, bct.chatType);
+            bct.chatType = CHAT_TYPE_SAY;
         }
 
-        if (bct.EmoteId0)
+        if (bct.emoteId1)
         {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId0))
+            if (!sEmotesStore.LookupEntry(bct.emoteId1))
             {
-                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId0 %u but emote does not exist.", bct.Id, bct.EmoteId0);
-                bct.EmoteId0 = 0;
+                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has emoteId2 %u but emote does not exist.", bct.entry, bct.emoteId1);
+                bct.emoteId1 = 0;
             }
         }
 
-        if (bct.EmoteId1)
+        if (bct.emoteId2)
         {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId1))
+            if (!sEmotesStore.LookupEntry(bct.emoteId2))
             {
-                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId1 %u but emote does not exist.", bct.Id, bct.EmoteId1);
-                bct.EmoteId1 = 0;
+                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has emoteId3 %u but emote does not exist.", bct.entry, bct.emoteId2);
+                bct.emoteId2 = 0;
             }
         }
 
-        if (bct.EmoteId2)
+        if (bct.emoteId3)
         {
-            if (!sEmotesStore.LookupEntry(bct.EmoteId2))
+            if (!sEmotesStore.LookupEntry(bct.emoteId3))
             {
-                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist.", bct.Id, bct.EmoteId2);
-                bct.EmoteId2 = 0;
+                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId3 %u but emote does not exist.", bct.entry, bct.emoteId3);
+                bct.emoteId3 = 0;
             }
         }
 
-        m_BroadcastTextLocaleMap[bct.Id] = bct;
+        m_BroadcastTextLocaleMap[bct.entry] = bct;
     } while (result->NextRow());
 
     sLog.outString();
@@ -8688,8 +8688,8 @@ void ObjectMgr::LoadBroadcastTexts()
 
 void ObjectMgr::LoadBroadcastTextLocales()
 {
-    //                                                               0     1                2                3                4                5                6                7                8                9                  10                 11                 12                 13                 14                 15                 16
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `Id`, `MaleText_loc1`, `MaleText_loc2`, `MaleText_loc3`, `MaleText_loc4`, `MaleText_loc5`, `MaleText_loc6`, `MaleText_loc7`, `MaleText_loc8`, `FemaleText_loc1`, `FemaleText_loc2`, `FemaleText_loc3`, `FemaleText_loc4`, `FemaleText_loc5`, `FemaleText_loc6`, `FemaleText_loc7`, `FemaleText_loc8` FROM `locales_broadcast_text`"));
+    //                                                               0     1                 2                 3                 4                 5                 6                 7                 8                 9                   10                  11                  12                  13                  14                  15                  16
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `male_text_loc1`, `male_text_loc2`, `male_text_loc3`, `male_text_loc4`, `male_text_loc5`, `male_text_loc6`, `male_text_loc7`, `male_text_loc8`, `female_text_loc1`, `female_text_loc2`, `female_text_loc3`, `female_text_loc4`, `female_text_loc5`, `female_text_loc6`, `female_text_loc7`, `female_text_loc8` FROM `locales_broadcast_text`"));
 
     if (!result)
     {
@@ -8708,18 +8708,18 @@ void ObjectMgr::LoadBroadcastTextLocales()
         bar.step();
         Field* fields = result->Fetch();
 
-        uint32 id = fields[0].GetUInt32();
-        BroadcastTextLocaleMap::iterator bct = m_BroadcastTextLocaleMap.find(id);
+        uint32 entry = fields[0].GetUInt32();
+        BroadcastTextLocaleMap::iterator bct = m_BroadcastTextLocaleMap.find(entry);
 
         if (bct == m_BroadcastTextLocaleMap.end())
         {
-            sLog.outErrorDb("BroadcastText (Id: %u) in table `locales_broadcast_text` does not exist. Skipped!", id);
+            sLog.outErrorDb("BroadcastText (Id: %u) in table `locales_broadcast_text` does not exist. Skipped!", entry);
             continue;
         }
 
-        BroadcastText& data = m_BroadcastTextLocaleMap[id];
+        BroadcastText& data = m_BroadcastTextLocaleMap[entry];
 
-        // Load MaleText
+        // Load maleText
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
             std::string str = fields[i].GetCppString();
@@ -8736,15 +8736,15 @@ void ObjectMgr::LoadBroadcastTextLocales()
                 if (idx >= 0)
                 {
                     // 0 -> default, idx in to idx+1
-                    if ((int32)data.MaleText.size() <= idx + 1)
-                        data.MaleText.resize(idx + 2);
+                    if ((int32)data.maleText.size() <= idx + 1)
+                        data.maleText.resize(idx + 2);
 
-                    data.MaleText[idx + 1] = str;
+                    data.maleText[idx + 1] = str;
                 }
             }
         }
 
-        // Load FemaleText
+        // Load femaleText
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
             std::string str = fields[8 + i].GetCppString();
@@ -8761,10 +8761,10 @@ void ObjectMgr::LoadBroadcastTextLocales()
                 if (idx >= 0)
                 {
                     // 0 -> default, idx in to idx+1
-                    if ((int32)data.FemaleText.size() <= idx + 1)
-                        data.FemaleText.resize(idx + 2);
+                    if ((int32)data.femaleText.size() <= idx + 1)
+                        data.femaleText.resize(idx + 2);
 
-                    data.FemaleText[idx + 1] = str;
+                    data.femaleText[idx + 1] = str;
                 }
             }
         }
@@ -8780,19 +8780,19 @@ char const* ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gende
 {
     if (BroadcastText const* bct = GetBroadcastTextLocale(id))
     {
-        if ((gender == GENDER_FEMALE || gender == GENDER_NONE) && (forceGender || !bct->FemaleText[LOCALE_enUS].empty()))
+        if ((gender == GENDER_FEMALE || gender == GENDER_NONE) && (forceGender || !bct->femaleText[LOCALE_enUS].empty()))
         {
-            if ((int32)bct->FemaleText.size() > locale_index + 1 && !bct->FemaleText[locale_index + 1].empty())
-                return bct->FemaleText[locale_index + 1].c_str();
+            if ((int32)bct->femaleText.size() > locale_index + 1 && !bct->femaleText[locale_index + 1].empty())
+                return bct->femaleText[locale_index + 1].c_str();
             else
-                return bct->FemaleText[0].c_str();
+                return bct->femaleText[0].c_str();
         }
         // else if (gender == GENDER_MALE)
         {
-            if ((int32)bct->MaleText.size() > locale_index + 1 && !bct->MaleText[locale_index + 1].empty())
-                return bct->MaleText[locale_index + 1].c_str();
+            if ((int32)bct->maleText.size() > locale_index + 1 && !bct->maleText[locale_index + 1].empty())
+                return bct->maleText[locale_index + 1].c_str();
             else
-                return bct->MaleText[0].c_str();
+                return bct->maleText[0].c_str();
         }
     }
 

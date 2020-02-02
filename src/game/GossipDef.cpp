@@ -293,14 +293,14 @@ void PlayerMenu::SendTalking(uint32 textID)
                 else
                     data << Text_1[i];
 
-                data << bct->Language;
+                data << bct->languageId;
 
-                data << bct->EmoteDelay0;
-                data << bct->EmoteId0;
-                data << bct->EmoteDelay1;
-                data << bct->EmoteId1;
-                data << bct->EmoteDelay2;
-                data << bct->EmoteId2;
+                data << bct->emoteDelay1;
+                data << bct->emoteId1;
+                data << bct->emoteDelay2;
+                data << bct->emoteId2;
+                data << bct->emoteDelay3;
+                data << bct->emoteId3;
             }
             else
             {

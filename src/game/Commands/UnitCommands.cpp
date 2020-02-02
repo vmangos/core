@@ -1288,7 +1288,7 @@ bool ChatHandler::HandleModifyMorphCommand(char* args)
     if (!*args)
         return false;
 
-    uint16 display_id = (uint16)atoi(args);
+    uint32 display_id = (uint32)atoi(args);
     if (!sCreatureDisplayInfoStore.LookupEntry(display_id))
     {
         PSendSysMessage("Display Id %u does not exist.", display_id);
