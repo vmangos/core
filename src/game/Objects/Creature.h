@@ -79,7 +79,7 @@ enum CreatureFlagsExtra
 #pragma pack(push,1)
 #endif
 
-#define MAX_CREATURE_MODEL 4                                // only single send to client in static data
+#define MAX_DISPLAY_IDS_PER_CREATURE 4                                // only single send to client in static data
 #define CREATURE_FLEE_TEXT 1150
 
 #define SPEED_REDUCTION_NONE   1.0f
@@ -91,7 +91,7 @@ enum CreatureFlagsExtra
 struct CreatureInfo
 {
     uint32  entry;
-    uint32  display_id[MAX_CREATURE_MODEL];
+    uint32  display_id[MAX_DISPLAY_IDS_PER_CREATURE];
     char*   name;
     char*   subname;
     uint32  gossip_menu_id;
@@ -180,14 +180,14 @@ struct EquipmentInfo
     uint32  equipentry[3];
 };
 
-#define MAX_SPAWN_ID 4
+#define MAX_CREATURE_IDS_PER_SPAWN 4
 
 // from `creature` table
 struct CreatureData
 {
-    std::array<uint32, MAX_SPAWN_ID> creature_id = {};
+    std::array<uint32, MAX_CREATURE_IDS_PER_SPAWN> creature_id = {};
     uint16 mapid = 0;
-    uint32 modelid_override = 0;
+    uint32 display_id_override = 0;
     int32 equipmentId = 0;
     float posX = 0.0f;
     float posY = 0.0f;
@@ -214,7 +214,7 @@ struct CreatureData
     {
         uint32 creatureId = 0;
         uint32 creatureIdCount = 0;
-        for (; creatureIdCount < MAX_SPAWN_ID && creature_id[creatureIdCount]; ++creatureIdCount);
+        for (; creatureIdCount < MAX_CREATURE_IDS_PER_SPAWN && creature_id[creatureIdCount]; ++creatureIdCount);
 
         if (creatureIdCount)
             creatureId = creature_id[urand(0, creatureIdCount - 1)];
@@ -227,7 +227,7 @@ struct CreatureData
     uint32 GetCreatureIdCount() const
     {
         uint32 creatureIdCount = 0;
-        for (; creatureIdCount < MAX_SPAWN_ID && creature_id[creatureIdCount]; ++creatureIdCount);
+        for (; creatureIdCount < MAX_CREATURE_IDS_PER_SPAWN && creature_id[creatureIdCount]; ++creatureIdCount);
         return creatureIdCount;
     }
 };
@@ -245,14 +245,13 @@ struct CreatureDataAddon
     uint32 const* auras;                                    // loaded as char* "spell1 spell2 ... "
 };
 
-struct CreatureModelInfo
+struct CreatureDisplayInfoAddon
 {
-    uint32 modelid;
+    uint32 display_id;
     float bounding_radius;
     float combat_reach;
     uint8 gender;
-    uint32 modelid_other_gender;                            // The oposite gender for this modelid (male/female)
-    uint32 modelid_other_team;                              // The oposite team. Generally for alliance totem
+    uint32 display_id_other_gender;                         // The oposite gender for this display id (male/female)
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform

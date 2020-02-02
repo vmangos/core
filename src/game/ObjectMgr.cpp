@@ -1138,7 +1138,7 @@ void ObjectMgr::LoadCreatureTemplates()
     CheckCreatureTemplates();
 }
 
-void ObjectMgr::CorrectCreatureModels(uint32 entry, uint32& displayId)
+void ObjectMgr::CorrectCreatureDisplayIds(uint32 entry, uint32& displayId)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_2_4
     if (sWorld.GetWowPatch() == WOW_PATCH_102)
@@ -1197,9 +1197,9 @@ void ObjectMgr::CheckCreatureTemplates()
         // used later for scale
         CreatureDisplayInfoEntry const* displayScaleEntry = nullptr;
 
-        for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
+        for (int i = 0; i < MAX_DISPLAY_IDS_PER_CREATURE; ++i)
         {
-            CorrectCreatureModels(cInfo->entry, const_cast<CreatureInfo*>(cInfo)->display_id[i]);
+            CorrectCreatureDisplayIds(cInfo->entry, const_cast<CreatureInfo*>(cInfo)->display_id[i]);
 
             if (cInfo->display_id[i])
             {
@@ -1213,9 +1213,9 @@ void ObjectMgr::CheckCreatureTemplates()
                 else if (!displayScaleEntry)
                     displayScaleEntry = displayEntry;
 
-                CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(cInfo->display_id[i]);
+                CreatureDisplayInfoAddon const* minfo = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(cInfo->display_id[i]);
                 if (!minfo)
-                    sLog.outErrorDb("Creature (Entry: %u) is using display_id%d (%u), but creature_model_info data is missing for this model.", cInfo->entry, i + 1, cInfo->display_id[i]);
+                    sLog.outErrorDb("Creature (Entry: %u) is using display_id%d (%u), but creature_display_info_addon data is missing for this id.", cInfo->entry, i + 1, cInfo->display_id[i]);
             }
         }
 
@@ -1530,33 +1530,24 @@ void ObjectMgr::LoadEquipmentTemplates()
     sLog.outString();
 }
 
-CreatureModelInfo const* ObjectMgr::GetCreatureModelInfo(uint32 modelid)
+CreatureDisplayInfoAddon const* ObjectMgr::GetCreatureDisplayInfoAddon(uint32 display_id)
 {
-    return sCreatureModelStorage.LookupEntry<CreatureModelInfo>(modelid);
+    return sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(display_id);
 }
 
-// generally for models having another model for the other team (totems)
-uint32 ObjectMgr::GetCreatureModelOtherTeamModel(uint32 modelId)
+CreatureDisplayInfoAddon const* ObjectMgr::GetCreatureDisplayInfoRandomGender(uint32 display_id)
 {
-    if (CreatureModelInfo const* modelInfo = GetCreatureModelInfo(modelId))
-        return modelInfo->modelid_other_team;
-
-    return 0;
-}
-
-CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_id)
-{
-    CreatureModelInfo const* minfo = GetCreatureModelInfo(display_id);
+    CreatureDisplayInfoAddon const* minfo = GetCreatureDisplayInfoAddon(display_id);
     if (!minfo)
         return nullptr;
 
-    // If a model for another gender exists, 50% chance to use it
-    if (minfo->modelid_other_gender != 0 && urand(0, 1) == 0)
+    // If a display id for another gender exists, 50% chance to use it
+    if (minfo->display_id_other_gender != 0 && urand(0, 1) == 0)
     {
-        CreatureModelInfo const* minfo_tmp = GetCreatureModelInfo(minfo->modelid_other_gender);
+        CreatureDisplayInfoAddon const* minfo_tmp = GetCreatureDisplayInfoAddon(minfo->display_id_other_gender);
         if (!minfo_tmp)
         {
-            sLog.outErrorDb("Model (Entry: %u) has modelid_other_gender %u not found in table `creature_model_info`. ", minfo->modelid, minfo->modelid_other_gender);
+            sLog.outErrorDb("Model (Entry: %u) has display_id_other_gender %u not found in table `creature_display_info_addon`. ", minfo->display_id, minfo->display_id_other_gender);
             return minfo;                                   // not fatal, just use the previous one
         }
         else
@@ -1566,56 +1557,42 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_
         return minfo;
 }
 
-void ObjectMgr::LoadCreatureModelInfo()
+void ObjectMgr::LoadCreatureDisplayInfoAddon()
 {
-    sCreatureModelStorage.LoadProgressive(SUPPORTED_CLIENT_BUILD, "build");
+    sCreatureDisplayInfoAddonStorage.LoadProgressive(SUPPORTED_CLIENT_BUILD, "build");
 
     // post processing
-    for (uint32 i = 1; i < sCreatureModelStorage.GetMaxEntry(); ++i)
+    for (uint32 i = 1; i < sCreatureDisplayInfoAddonStorage.GetMaxEntry(); ++i)
     {
-        CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(i);
+        CreatureDisplayInfoAddon const* minfo = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(i);
         if (!minfo)
             continue;
 
-        if (!sCreatureDisplayInfoStore.LookupEntry(minfo->modelid))
-            sLog.outErrorDb("Table `creature_model_info` has model for nonexistent model id (%u).", minfo->modelid);
+        if (!sCreatureDisplayInfoStore.LookupEntry(minfo->display_id))
+            sLog.outErrorDb("Table `creature_display_info_addon` has data for nonexistent display id (%u).", minfo->display_id);
 
         if (minfo->gender > GENDER_NONE)
         {
-            sLog.outErrorDb("Table `creature_model_info` has invalid gender (%u) for model id (%u).", uint32(minfo->gender), minfo->modelid);
-            const_cast<CreatureModelInfo*>(minfo)->gender = GENDER_MALE;
+            sLog.outErrorDb("Table `creature_display_info_addon` has invalid gender (%u) for display id (%u).", uint32(minfo->gender), minfo->display_id);
+            const_cast<CreatureDisplayInfoAddon*>(minfo)->gender = GENDER_MALE;
         }
 
-        if (minfo->modelid_other_gender)
+        if (minfo->display_id_other_gender)
         {
-            if (minfo->modelid_other_gender == minfo->modelid)
+            if (minfo->display_id_other_gender == minfo->display_id)
             {
-                sLog.outErrorDb("Table `creature_model_info` has redundant modelid_other_gender model (%u) defined for model id %u.", minfo->modelid_other_gender, minfo->modelid);
-                const_cast<CreatureModelInfo*>(minfo)->modelid_other_gender = 0;
+                sLog.outErrorDb("Table `creature_display_info_addon` has redundant display_id_other_gender (%u) defined for display id %u.", minfo->display_id_other_gender, minfo->display_id);
+                const_cast<CreatureDisplayInfoAddon*>(minfo)->display_id_other_gender = 0;
             }
-            else if (!sCreatureDisplayInfoStore.LookupEntry(minfo->modelid_other_gender))
+            else if (!sCreatureDisplayInfoStore.LookupEntry(minfo->display_id_other_gender))
             {
-                sLog.outErrorDb("Table `creature_model_info` has nonexistent modelid_other_gender model (%u) defined for model id %u.", minfo->modelid_other_gender, minfo->modelid);
-                const_cast<CreatureModelInfo*>(minfo)->modelid_other_gender = 0;
-            }
-        }
-
-        if (minfo->modelid_other_team)
-        {
-            if (minfo->modelid_other_team == minfo->modelid)
-            {
-                sLog.outErrorDb("Table `creature_model_info` has redundant modelid_other_team model (%u) defined for model id %u.", minfo->modelid_other_team, minfo->modelid);
-                const_cast<CreatureModelInfo*>(minfo)->modelid_other_team = 0;
-            }
-            else if (!sCreatureDisplayInfoStore.LookupEntry(minfo->modelid_other_team))
-            {
-                sLog.outErrorDb("Table `creature_model_info` has nonexistent modelid_other_team model (%u) defined for model id %u.", minfo->modelid_other_team, minfo->modelid);
-                const_cast<CreatureModelInfo*>(minfo)->modelid_other_team = 0;
+                sLog.outErrorDb("Table `creature_display_info_addon` has nonexistent display_id_other_gender (%u) defined for display id %u.", minfo->display_id_other_gender, minfo->display_id);
+                const_cast<CreatureDisplayInfoAddon*>(minfo)->display_id_other_gender = 0;
             }
         }
     }
 
-    // character races expected have model info data in table
+    // character races expected have display info data in table
     for (uint32 race = 1; race < sChrRacesStore.GetNumRows(); ++race)
     {
         ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race);
@@ -1625,55 +1602,55 @@ void ObjectMgr::LoadCreatureModelInfo()
         if (!((1 << (race - 1)) & RACEMASK_ALL_PLAYABLE))
             continue;
 
-        if (CreatureModelInfo const* minfo = GetCreatureModelInfo(raceEntry->model_f))
+        if (CreatureDisplayInfoAddon const* minfo = GetCreatureDisplayInfoAddon(raceEntry->model_f))
         {
             if (minfo->gender != GENDER_FEMALE)
-                sLog.outErrorDb("Table `creature_model_info` have wrong gender %u for character race %u female model id %u", minfo->gender, race, raceEntry->model_f);
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong gender %u for character race %u female display id %u", minfo->gender, race, raceEntry->model_f);
 
-            if (minfo->modelid_other_gender != raceEntry->model_m)
-                sLog.outErrorDb("Table `creature_model_info` have wrong other gender model id %u for character race %u female model id %u", minfo->modelid_other_gender, race, raceEntry->model_f);
+            if (minfo->display_id_other_gender != raceEntry->model_m)
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong other gender display id %u for character race %u female display id %u", minfo->display_id_other_gender, race, raceEntry->model_f);
 
             if (minfo->bounding_radius <= 0.0f)
             {
-                sLog.outErrorDb("Table `creature_model_info` have wrong bounding_radius %f for character race %u female model id %u, use %f instead", minfo->bounding_radius, race, raceEntry->model_f, DEFAULT_WORLD_OBJECT_SIZE);
-                const_cast<CreatureModelInfo*>(minfo)->bounding_radius = DEFAULT_WORLD_OBJECT_SIZE;
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong bounding_radius %f for character race %u female display id %u, use %f instead", minfo->bounding_radius, race, raceEntry->model_f, DEFAULT_WORLD_OBJECT_SIZE);
+                const_cast<CreatureDisplayInfoAddon*>(minfo)->bounding_radius = DEFAULT_WORLD_OBJECT_SIZE;
             }
 
             if (minfo->combat_reach != 1.5f)
             {
-                sLog.outErrorDb("Table `creature_model_info` have wrong combat_reach %f for character race %u female model id %u, expected always 1.5f", minfo->combat_reach, race, raceEntry->model_f);
-                const_cast<CreatureModelInfo*>(minfo)->combat_reach = 1.5f;
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong combat_reach %f for character race %u female display id %u, expected always 1.5f", minfo->combat_reach, race, raceEntry->model_f);
+                const_cast<CreatureDisplayInfoAddon*>(minfo)->combat_reach = 1.5f;
             }
         }
         else
-            sLog.outErrorDb("Table `creature_model_info` expect have data for character race %u female model id %u", race, raceEntry->model_f);
+            sLog.outErrorDb("Table `creature_display_info_addon` expect have data for character race %u female display id %u", race, raceEntry->model_f);
 
-        if (CreatureModelInfo const* minfo = GetCreatureModelInfo(raceEntry->model_m))
+        if (CreatureDisplayInfoAddon const* minfo = GetCreatureDisplayInfoAddon(raceEntry->model_m))
         {
             if (minfo->gender != GENDER_MALE)
-                sLog.outErrorDb("Table `creature_model_info` have wrong gender %u for character race %u male model id %u", minfo->gender, race, raceEntry->model_m);
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong gender %u for character race %u male display id %u", minfo->gender, race, raceEntry->model_m);
 
-            if (minfo->modelid_other_gender != raceEntry->model_f)
-                sLog.outErrorDb("Table `creature_model_info` have wrong other gender model id %u for character race %u male model id %u", minfo->modelid_other_gender, race, raceEntry->model_m);
+            if (minfo->display_id_other_gender != raceEntry->model_f)
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong other gender display id %u for character race %u male display id %u", minfo->display_id_other_gender, race, raceEntry->model_m);
 
             if (minfo->bounding_radius <= 0.0f)
             {
-                sLog.outErrorDb("Table `creature_model_info` have wrong bounding_radius %f for character race %u male model id %u, use %f instead", minfo->bounding_radius, race, raceEntry->model_f, DEFAULT_WORLD_OBJECT_SIZE);
-                const_cast<CreatureModelInfo*>(minfo)->bounding_radius = DEFAULT_WORLD_OBJECT_SIZE;
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong bounding_radius %f for character race %u male display id %u, use %f instead", minfo->bounding_radius, race, raceEntry->model_f, DEFAULT_WORLD_OBJECT_SIZE);
+                const_cast<CreatureDisplayInfoAddon*>(minfo)->bounding_radius = DEFAULT_WORLD_OBJECT_SIZE;
             }
 
             if (minfo->combat_reach != 1.5f)
             {
-                sLog.outErrorDb("Table `creature_model_info` have wrong combat_reach %f for character race %u male model id %u, expected always 1.5f", minfo->combat_reach, race, raceEntry->model_m);
-                const_cast<CreatureModelInfo*>(minfo)->combat_reach = 1.5f;
+                sLog.outErrorDb("Table `creature_display_info_addon` have wrong combat_reach %f for character race %u male display id %u, expected always 1.5f", minfo->combat_reach, race, raceEntry->model_m);
+                const_cast<CreatureDisplayInfoAddon*>(minfo)->combat_reach = 1.5f;
             }
         }
         else
-            sLog.outErrorDb("Table `creature_model_info` expect have data for character race %u male model id %u", race, raceEntry->model_m);
+            sLog.outErrorDb("Table `creature_display_info_addon` expect have data for character race %u male display id %u", race, raceEntry->model_m);
 
     }
 
-    sLog.outString(">> Loaded %u creature model based info", sCreatureModelStorage.GetRecordCount());
+    sLog.outString(">> Loaded %u creature display based info", sCreatureDisplayInfoAddonStorage.GetRecordCount());
     sLog.outString();
 }
 
@@ -1815,8 +1792,8 @@ void ObjectMgr::LoadCreatureSpells()
 void ObjectMgr::LoadCreatures(bool reload)
 {
     uint32 count = 0;
-    //                                                                          0                  1                2                 3                 4      5      6
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `creature`.`id2`, `creature`.`id3`, `creature`.`id4`, `map`, `modelid`,"
+    //                                                                          0                  1                2                 3                 4      5                 6
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `creature`.`id2`, `creature`.`id3`, `creature`.`id4`, `map`, `creature`.`display_id`,"
     //                      7               8             9             10            11             12                  13                  14           15
                           "`equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`,"
     //                      16           17         18            19              20
@@ -1862,8 +1839,8 @@ void ObjectMgr::LoadCreatures(bool reload)
 
         if ((patch_min > patch_max) || (patch_max > 10))
         {
-            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has invalid values min_patch=%u, max_patch=%u.", guid, first_entry, patch_min, patch_max);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET min_patch=0, max_patch=10 WHERE guid=%u AND id=%u;", guid, first_entry);
+            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has invalid values patch_min=%u, patch_max=%u.", guid, first_entry, patch_min, patch_max);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature SET patch_min=0, patch_max=10 WHERE guid=%u AND id=%u;", guid, first_entry);
             patch_min = 0;
             patch_max = 10;
         }
@@ -1872,7 +1849,7 @@ void ObjectMgr::LoadCreatures(bool reload)
             existsInPatch = false;
 
         bool skip = false;
-        for (int i = 0; i < MAX_SPAWN_ID; i++)
+        for (int i = 0; i < MAX_CREATURE_IDS_PER_SPAWN; i++)
         {
             if (uint32 entry = fields[1 + i].GetUInt32())
             {
@@ -1929,7 +1906,7 @@ void ObjectMgr::LoadCreatures(bool reload)
         data.creature_id[2]     = fields[ 3].GetUInt32();
         data.creature_id[3]     = fields[ 4].GetUInt32();
         data.mapid              = fields[ 5].GetUInt32();
-        data.modelid_override   = fields[ 6].GetUInt32();
+        data.display_id_override= fields[ 6].GetUInt32();
         data.equipmentId        = fields[ 7].GetUInt32();
         data.posX               = fields[ 8].GetFloat();
         data.posY               = fields[ 9].GetFloat();
@@ -1968,11 +1945,11 @@ void ObjectMgr::LoadCreatures(bool reload)
             data.spawntimesecsmax = data.spawntimesecsmin;
         }
 
-        if (data.modelid_override > 0 && !sCreatureDisplayInfoStore.LookupEntry(data.modelid_override))
+        if (data.display_id_override > 0 && !sCreatureDisplayInfoStore.LookupEntry(data.display_id_override))
         {
-            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has model for nonexistent model id (%u), set to 0.", guid, data.creature_id[0], data.modelid_override);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET modelid=0 WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
-            data.modelid_override = 0;
+            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has nonexistent display id (%u), set to 0.", guid, data.creature_id[0], data.display_id_override);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature SET display_id=0 WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
+            data.display_id_override = 0;
         }
 
         if (data.equipmentId > 0)                           // -1 no equipment, 0 use default
@@ -2081,8 +2058,8 @@ void ObjectMgr::LoadGameobjects(bool reload)
 
         if ((patch_min > patch_max) || (patch_max > 10))
         {
-            sLog.outErrorDb("Table `gameobject` GUID %u (entry %u) has invalid values min_patch=%u, max_patch=%u.", guid, entry, patch_min, patch_max);
-            sLog.out(LOG_DBERRFIX, "UPDATE gameobject SET min_patch=0, max_patch=10 WHERE guid=%u AND id=%u;", guid, entry);
+            sLog.outErrorDb("Table `gameobject` GUID %u (entry %u) has invalid values patch_min=%u, patch_max=%u.", guid, entry, patch_min, patch_max);
+            sLog.out(LOG_DBERRFIX, "UPDATE gameobject SET patch_min=0, patch_max=10 WHERE guid=%u AND id=%u;", guid, entry);
             patch_min = 0;
             patch_max = 10;
         }
@@ -3269,7 +3246,7 @@ void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
 #endif
 }
 
-void ObjectMgr::CorrectItemModels(uint32 itemId, uint32& displayId)
+void ObjectMgr::CorrectItemDisplayIds(uint32 itemId, uint32& displayId)
 {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
     // Spry Boots
@@ -3351,7 +3328,7 @@ void ObjectMgr::LoadItemPrototypes()
             !sWorld.getConfig(CONFIG_BOOL_PREVENT_ITEM_DATAMINING))
             proto->m_bDiscovered = true;
 
-        CorrectItemModels(i, const_cast<ItemPrototype*>(proto)->DisplayInfoID);
+        CorrectItemDisplayIds(i, const_cast<ItemPrototype*>(proto)->DisplayInfoID);
 
         if (proto->Class >= MAX_ITEM_CLASS)
         {
@@ -6417,9 +6394,9 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
     if (!mount_id)
         return 0;
 
-    CreatureModelInfo const* minfo = GetCreatureModelRandomGender(mount_id);
+    CreatureDisplayInfoAddon const* minfo = GetCreatureDisplayInfoRandomGender(mount_id);
     if (minfo)
-        mount_id = minfo->modelid;
+        mount_id = minfo->display_id;
 
     return mount_id;
 }

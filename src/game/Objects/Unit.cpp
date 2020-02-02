@@ -8513,9 +8513,10 @@ bool Unit::IsAttackReady(WeaponAttackType type) const
 {
     return m_attackTimer[type] == 0;
 }
-void Unit::SetDisplayId(uint32 modelId)
+
+void Unit::SetDisplayId(uint32 displayId)
 {
-    SetUInt32Value(UNIT_FIELD_DISPLAYID, modelId);
+    SetUInt32Value(UNIT_FIELD_DISPLAYID, displayId);
 
     UpdateModelData();
 
@@ -8529,11 +8530,11 @@ void Unit::SetDisplayId(uint32 modelId)
 void Unit::UpdateModelData()
 {
     CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(GetDisplayId());
-    CreatureModelInfo const* modelInfo = sObjectMgr.GetCreatureModelInfo(GetDisplayId());
-    if (modelInfo && displayEntry && modelInfo->bounding_radius && modelInfo->combat_reach && displayEntry->scale)
+    CreatureDisplayInfoAddon const* displayAddon = sObjectMgr.GetCreatureDisplayInfoAddon(GetDisplayId());
+    if (displayAddon && displayEntry && displayAddon->bounding_radius && displayEntry->scale)
     {
         // we expect values in database to be relative to scale = 1.0
-        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / displayEntry->scale) * modelInfo->bounding_radius);
+        SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, (GetObjectScale() / displayEntry->scale) * displayAddon->bounding_radius);
 
         // never actually update combat_reach for player, it's always the same. Below player case is for initialization
         if (IsPlayer())
@@ -8546,7 +8547,7 @@ void Unit::UpdateModelData()
                 SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
         }
         else
-            SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / displayEntry->scale) * modelInfo->combat_reach);
+            SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / displayEntry->scale) * displayAddon->combat_reach);
 
         if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
         {
@@ -8558,7 +8559,7 @@ void Unit::UpdateModelData()
     }
     else
     {
-        sLog.outError("UpdateModelData : pas / mauvaises infos pour le displayid %u de '%s'", GetDisplayId(), GetGuidStr().c_str());
+        sLog.outError("Unit::UpdateModelData - %s has missing or bad info for display id %u", GetGuidStr().c_str(), GetDisplayId());
         SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
         SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.5f);
     }

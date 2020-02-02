@@ -232,8 +232,8 @@ void GameEventMgr::LoadFromDB()
 
             if ((patch_min > patch_max) || (patch_max > 10))
             {
-                sLog.outErrorDb("Table `game_event` game event id (%i) has invalid values min_patch=%u, max_patch=%u.", event_id, patch_min, patch_max);
-                sLog.out(LOG_DBERRFIX, "UPDATE game_event SET min_patch=0, max_patch=10 WHERE entry=%u;", event_id);
+                sLog.outErrorDb("Table `game_event` game event id (%i) has invalid values patch_min=%u, patch_max=%u.", event_id, patch_min, patch_max);
+                sLog.out(LOG_DBERRFIX, "UPDATE game_event SET patch_min=0, patch_max=10 WHERE entry=%u;", event_id);
                 patch_min = 0;
                 patch_max = 10;
             }
@@ -446,7 +446,7 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventCreatureData.resize(mGameEvent.size());
     //                                   0              1                             2
-    result = WorldDatabase.Query("SELECT creature.guid, game_event_creature_data.event, game_event_creature_data.modelid,"
+    result = WorldDatabase.Query("SELECT creature.guid, game_event_creature_data.event, game_event_creature_data.display_id,"
                                  //   3                                      4
                                  "game_event_creature_data.equipment_id, game_event_creature_data.entry_id, "
                                  //   5                                     6
@@ -495,7 +495,7 @@ void GameEventMgr::LoadFromDB()
             ++count;
             GameEventCreatureDataList& equiplist = mGameEventCreatureData[event_id];
             GameEventCreatureData newData;
-            newData.modelid = fields[2].GetUInt32();
+            newData.display_id = fields[2].GetUInt32();
             newData.equipment_id = fields[3].GetUInt32();
             newData.entry_id = fields[4].GetUInt32();
             newData.spell_id_start = fields[5].GetUInt32();
@@ -786,7 +786,7 @@ void GameEventMgr::UnApplyEvent(uint16 event_id)
     // spawn negative event tagget objects
     int16 event_nid = (-1) * event_id;
     GameEventSpawn(event_nid);
-    // restore equipment or model
+    // restore equipment or display id
     UpdateCreatureData(event_id, false);
     // Remove quests that are events only to non event npc
     UpdateEventQuests(event_id, false);
@@ -807,7 +807,7 @@ void GameEventMgr::ApplyNewEvent(uint16 event_id, bool resume)
     // un-spawn negative event tagged objects
     int16 event_nid = (-1) * event_id;
     GameEventUnspawn(event_nid);
-    // Change equipement or model
+    // Change equipement or display id
     UpdateCreatureData(event_id, true);
     // Add quests that are events only to non event npc
     UpdateEventQuests(event_id, true);

@@ -3792,7 +3792,7 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
 
     uint32 mountId = atoi(args);
     
-    if (!sObjectMgr.GetCreatureModelInfo(mountId))
+    if (!sObjectMgr.GetCreatureDisplayInfoAddon(mountId))
     {
         SendSysMessage(LANG_NO_MOUNT);
         SetSentErrorMessage(true);

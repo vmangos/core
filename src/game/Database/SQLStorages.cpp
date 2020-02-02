@@ -27,7 +27,7 @@
 char const CreatureInfosrcfmt[] = "iiiiissiiiiiiiiiiffffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiiiisiiiliiiiiiis";
 char const CreatureInfodstfmt[] = "iiiiissiiiiiiiiiiffffffifffiifiiiiiiiiiiffiiiiiiiiiiiiiiiiiiiisiiiliiiiiiii";
 char const CreatureDataAddonInfofmt[] = "iiibbiis";
-char const CreatureModelfmt[] = "iffbii";
+char const CreatureModelfmt[] = "iffbi";
 char const CreatureInfoAddonInfofmt[] = "iiibbiis";
 char const EquipmentInfofmt[] = "iiii";
 char const GameObjectInfosrcfmt[] = "iiisiifiiiiiiiiiiiiiiiiiiiiiiiiiis";
@@ -45,7 +45,7 @@ char const CreatureSpellDatafmt[] = "iiiii";
 
 SQLStorage sCreatureStorage(CreatureInfosrcfmt, CreatureInfodstfmt, "entry", "creature_template");
 SQLStorage sCreatureDataAddonStorage(CreatureDataAddonInfofmt, "guid", "creature_addon");
-SQLStorage sCreatureModelStorage(CreatureModelfmt, "modelid", "creature_model_info");
+SQLStorage sCreatureDisplayInfoAddonStorage(CreatureModelfmt, "display_id", "creature_display_info_addon");
 SQLStorage sCreatureInfoAddonStorage(CreatureInfoAddonInfofmt, "entry", "creature_template_addon");
 SQLStorage sEquipmentStorage(EquipmentInfofmt, "entry", "creature_equip_template");
 SQLStorage sItemStorage(ItemPrototypesrcfmt, ItemPrototypedstfmt, "entry", "item_template");

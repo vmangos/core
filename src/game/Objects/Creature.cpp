@@ -301,31 +301,21 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
     uint32 display_id = ChooseDisplayId(GetCreatureInfo(), data, eventData);
     if (!display_id)                                        // Cancel load if no display id
     {
-        sLog.outErrorDb("Creature (Entry: %u) has no model defined in table `creature_template`, can't load.", Entry);
+        sLog.outErrorDb("Creature (Entry: %u) has no display id defined in table `creature_template`, can't load.", Entry);
         return false;
     }
 
-    CreatureModelInfo const* minfo = sObjectMgr.GetCreatureModelRandomGender(display_id);
-    if (!minfo)                                             // Cancel load if no model defined
+    CreatureDisplayInfoAddon const* minfo = sObjectMgr.GetCreatureDisplayInfoRandomGender(display_id);
+    if (!minfo)                                             // Cancel load if no display info addon defined
     {
-        sLog.outErrorDb("Creature (Entry: %u) has no model info defined in table `creature_model_info`, can't load.", Entry);
+        sLog.outErrorDb("Creature (Entry: %u) has no display id data defined in table `creature_display_info_addon`, can't load.", Entry);
         return false;
     }
 
-    display_id = minfo->modelid;                            // it can be different (for another gender)
+    display_id = minfo->display_id;                            // it can be different (for another gender)
 
     SetNativeDisplayId(display_id);
-
-    // special case for totems (model for team==HORDE is stored in creature_template as the default)
-    if (team == ALLIANCE && cinfo->type == CREATURE_TYPE_TOTEM)
-    {
-        uint32 modelid_tmp = sObjectMgr.GetCreatureModelOtherTeamModel(display_id);
-        display_id = modelid_tmp ? modelid_tmp : display_id;
-    }
-
-    // normally the same as native, see above for the exeption
     SetDisplayId(display_id);
-
     SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
 
     // Load creature equipment
@@ -553,20 +543,20 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, CreatureData const* data /*=
 
 uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data /*= nullptr*/, GameEventCreatureData const* eventData /*=nullptr*/)
 {
-    // Use creature event model explicit, override any other static models
-    if (eventData && eventData->modelid)
-        return eventData->modelid;
+    // Use creature event display id explicit, override any other static models
+    if (eventData && eventData->display_id)
+        return eventData->display_id;
 
-    // Use creature model explicit, override template (creature.modelid)
-    if (data && data->modelid_override)
-        return data->modelid_override;
+    // Use creature display id explicit, override template (creature.display_id)
+    if (data && data->display_id_override)
+        return data->display_id_override;
 
     // use defaults from the template
     uint32 display_id = 0;
 
-    // model selected here may be replaced with other_gender using own function
+    // display id selected here may be replaced with other_gender using own function
     uint32 maxDisplayId = 0;
-    for (; maxDisplayId < MAX_CREATURE_MODEL && cinfo->display_id[maxDisplayId]; ++maxDisplayId);
+    for (; maxDisplayId < MAX_DISPLAY_IDS_PER_CREATURE && cinfo->display_id[maxDisplayId]; ++maxDisplayId);
 
     if (maxDisplayId)
         display_id = cinfo->display_id[urand(0, maxDisplayId - 1)];
@@ -574,7 +564,7 @@ uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* 
     // fail safe, we use creature entry 1 and make error
     if (!display_id)
     {
-        sLog.outErrorDb("Call customer support, ChooseDisplayId can not select native model for creature entry %u, model from creature entry 1 will be used instead.", cinfo->entry);
+        sLog.outErrorDb("Creature::ChooseDisplayId can not select native display id for creature entry %u, model from creature entry 1 will be used instead.", cinfo->entry);
 
         if (CreatureInfo const* creatureDefault = ObjectMgr::GetCreatureTemplate(1))
             display_id = creatureDefault->display_id[0];
@@ -1374,16 +1364,16 @@ void Creature::SaveToDB(uint32 mapid)
 
     uint32 displayId = GetNativeDisplayId();
 
-    // check if it's a custom model and if not, use 0 for displayId
+    // check if it's a custom display id and if not, use 0 for displayId
     CreatureInfo const* cinfo = GetCreatureInfo();
     if (cinfo)
     {
         if (displayId != cinfo->display_id[0] && displayId != cinfo->display_id[1] && displayId != cinfo->display_id[2] && displayId != cinfo->display_id[3])
         {
-            for (int i = 0; i < MAX_CREATURE_MODEL && displayId; ++i)
+            for (int i = 0; i < MAX_DISPLAY_IDS_PER_CREATURE && displayId; ++i)
                 if (cinfo->display_id[i])
-                    if (CreatureModelInfo const* minfo = sObjectMgr.GetCreatureModelInfo(cinfo->display_id[i]))
-                        if (displayId == minfo->modelid_other_gender)
+                    if (CreatureDisplayInfoAddon const* minfo = sObjectMgr.GetCreatureDisplayInfoAddon(cinfo->display_id[i]))
+                        if (displayId == minfo->display_id_other_gender)
                             displayId = 0;
         }
         else
@@ -1393,7 +1383,7 @@ void Creature::SaveToDB(uint32 mapid)
     // data->guid = guid don't must be update at save
     data.creature_id[0] = GetEntry();
     data.mapid = mapid;
-    data.modelid_override = displayId;
+    data.display_id_override = displayId;
     data.equipmentId = GetEquipmentId();
     data.posX = GetPositionX();
     data.posY = GetPositionY();

@@ -697,7 +697,7 @@ bool ChatHandler::HandleNpcAddEntryCommand(char* args)
         return false;
     }
 
-    for (int i = 0; i < MAX_SPAWN_ID; i++)
+    for (int i = 0; i < MAX_CREATURE_IDS_PER_SPAWN; i++)
     {
         if (pData->creature_id[i] == uiCreatureId)
         {
@@ -707,7 +707,7 @@ bool ChatHandler::HandleNpcAddEntryCommand(char* args)
         }
     }
 
-    if (pData->GetCreatureIdCount() >= MAX_SPAWN_ID)
+    if (pData->GetCreatureIdCount() >= MAX_CREATURE_IDS_PER_SPAWN)
     {
         SendSysMessage("Creature spawn has the maximum amount of entries already.");
         SetSentErrorMessage(true);
@@ -715,8 +715,8 @@ bool ChatHandler::HandleNpcAddEntryCommand(char* args)
     }
 
     int count = 0;
-    std::array<uint32, MAX_SPAWN_ID> creatureIds = pData->creature_id;
-    for (int i = 0; i < MAX_SPAWN_ID; i++)
+    std::array<uint32, MAX_CREATURE_IDS_PER_SPAWN> creatureIds = pData->creature_id;
+    for (int i = 0; i < MAX_CREATURE_IDS_PER_SPAWN; i++)
     {
         if (!creatureIds[i])
         {

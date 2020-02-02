@@ -719,7 +719,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "player_factionchange_items",  SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadFactionChangeItems,             "", nullptr },
         { "player_factionchange_quests", SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadFactionChangeQuests,            "", nullptr },
         { "player_factionchange_mounts", SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadFactionChangeMounts,            "", nullptr },
-        { "creature_model_info",         SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadCreatureModelInfo,              "", nullptr },
+        { "creature_display_info_addon", SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadCreatureDisplayInfoAddon,       "", nullptr },
         { "ip_banned",                   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadIPBanList,                      "", nullptr },
         { "account_banned",              SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadAccountBanList,                 "", nullptr },
         { "instance_buff_removal",       SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadInstanceBuffRemoval,            "", nullptr },

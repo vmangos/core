@@ -1821,10 +1821,10 @@ bool ChatHandler::HandleReloadFactionChangeMounts(char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadCreatureModelInfo(char*)
+bool ChatHandler::HandleReloadCreatureDisplayInfoAddon(char*)
 {
-    sObjectMgr.LoadCreatureModelInfo();
-    SendSysMessage(">> Table `creature_model_info` reloaded.");
+    sObjectMgr.LoadCreatureDisplayInfoAddon();
+    SendSysMessage(">> Table `creature_display_info_addon` reloaded.");
     return true;
 }
 

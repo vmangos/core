@@ -640,9 +640,8 @@ class ObjectMgr
         GroupMap::iterator GetGroupMapEnd() { return m_GroupMap.end(); }
 
         static CreatureInfo const* GetCreatureTemplate(uint32 id);
-        CreatureModelInfo const* GetCreatureModelInfo(uint32 modelid);
-        CreatureModelInfo const* GetCreatureModelRandomGender(uint32 display_id);
-        uint32 GetCreatureModelOtherTeamModel(uint32 modelId);
+        CreatureDisplayInfoAddon const* GetCreatureDisplayInfoAddon(uint32 display_id);
+        CreatureDisplayInfoAddon const* GetCreatureDisplayInfoRandomGender(uint32 display_id);
 
         EquipmentInfo const* GetEquipmentInfo(uint32 entry);
         static CreatureDataAddon const* GetCreatureAddon(uint32 lowguid)
@@ -835,11 +834,11 @@ class ObjectMgr
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
         void CheckCreatureTemplates();
-        void CorrectCreatureModels(uint32, uint32&);
+        void CorrectCreatureDisplayIds(uint32, uint32&);
 
         void LoadCreatures(bool reload = false);
         void LoadCreatureAddons();
-        void LoadCreatureModelInfo();
+        void LoadCreatureDisplayInfoAddon();
         void LoadCreatureSpells();
         void LoadEquipmentTemplates();
         void LoadGameObjectLocales();
@@ -847,7 +846,7 @@ class ObjectMgr
         void LoadItemPrototypes();
         void FillObtainedItemsList(std::set<uint32>&);
         void CorrectItemEffects(uint32, _ItemSpell&);
-        void CorrectItemModels(uint32, uint32&);
+        void CorrectItemDisplayIds(uint32, uint32&);
         void LoadItemRequiredTarget();
         void LoadItemLocales();
         void LoadQuestLocales();
