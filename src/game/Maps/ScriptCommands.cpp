@@ -1880,9 +1880,7 @@ bool Map::ScriptCommand_SetDefaultMovement(ScriptInfo const& script, WorldObject
     pSource->SetDefaultMovementType(MovementGeneratorType(script.setDefaultMovement.movementType));
 
     if (script.setDefaultMovement.movementType == RANDOM_MOTION_TYPE)
-        pSource->SetRespawnRadius(script.setDefaultMovement.param1);
-    else if (script.setDefaultMovement.movementType == WAYPOINT_MOTION_TYPE)
-        pSource->m_startwaypoint = script.setDefaultMovement.param1;
+        pSource->SetWanderDistance(script.setDefaultMovement.param1);
 
     if (pSource->IsAlive())
         pSource->GetMotionMaster()->InitializeNewDefault(script.setDefaultMovement.alwaysReplace);

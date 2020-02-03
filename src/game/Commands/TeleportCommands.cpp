@@ -501,12 +501,12 @@ bool ChatHandler::HandleGoCreatureCommand(char* args)
     }
 
     float x, y, z;
-    x = data->posX;
-    y = data->posY;
-    z = data->posZ;
+    x = data->position.x;
+    y = data->position.y;
+    z = data->position.z;
     if (Creature* creature = pPlayer->GetMap()->GetCreature(data->GetObjectGuid(lowguid)))
         creature->GetPosition(x, y, z);
-    return HandleGoHelper(pPlayer, data->mapid, x, y, &z);
+    return HandleGoHelper(pPlayer, data->position.mapId, x, y, &z);
 }
 
 enum GameobjectLinkType
@@ -654,7 +654,7 @@ bool ChatHandler::HandleGoObjectCommand(char* args)
     }
     }
 
-    return HandleGoHelper(pPlayer, data->mapid, data->posX, data->posY, &data->posZ);
+    return HandleGoHelper(pPlayer, data->position.mapId, data->position.x, data->position.y, &data->position.z);
 }
 
 

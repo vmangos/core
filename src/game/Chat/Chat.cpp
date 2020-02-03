@@ -3213,10 +3213,10 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
 
             if (CreatureData const* data = sObjectMgr.GetCreatureData(lowguid))
             {
-                mapid = data->mapid;
-                x = data->posX;
-                y = data->posY;
-                z = data->posZ;
+                mapid = data->position.mapId;
+                x = data->position.x;
+                y = data->position.y;
+                z = data->position.z;
                 return true;
             }
             else
@@ -3230,10 +3230,10 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
 
             if (GameObjectData const* data = sObjectMgr.GetGOData(lowguid))
             {
-                mapid = data->mapid;
-                x = data->posX;
-                y = data->posY;
-                z = data->posZ;
+                mapid = data->position.mapId;
+                x = data->position.x;
+                y = data->position.y;
+                z = data->position.z;
                 return true;
             }
             else
@@ -3253,10 +3253,10 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
 
                 if (CreatureDataPair const* dataPair = worker.GetResult())
                 {
-                    mapid = dataPair->second.mapid;
-                    x = dataPair->second.posX;
-                    y = dataPair->second.posY;
-                    z = dataPair->second.posZ;
+                    mapid = dataPair->second.position.mapId;
+                    x = dataPair->second.position.x;
+                    y = dataPair->second.position.y;
+                    z = dataPair->second.position.z;
                     return true;
                 }
                 else
@@ -3279,10 +3279,10 @@ bool ChatHandler::ExtractLocationFromLink(char** text, uint32& mapid, float& x, 
 
                 if (GameObjectDataPair const* dataPair = worker.GetResult())
                 {
-                    mapid = dataPair->second.mapid;
-                    x = dataPair->second.posX;
-                    y = dataPair->second.posY;
-                    z = dataPair->second.posZ;
+                    mapid = dataPair->second.position.mapId;
+                    x = dataPair->second.position.x;
+                    y = dataPair->second.position.y;
+                    z = dataPair->second.position.z;
                     return true;
                 }
                 else

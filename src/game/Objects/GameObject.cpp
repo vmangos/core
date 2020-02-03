@@ -611,9 +611,9 @@ uint32 GameObject::ComputeRespawnDelay() const
 
 uint32 GameObjectData::ComputeRespawnDelay(uint32 respawnDelay) const
 {
-    if (spawnFlags & SPAWN_FLAG_RANDOM_RESPAWN_TIME)
+    if (spawn_flags & SPAWN_FLAG_RANDOM_RESPAWN_TIME)
         respawnDelay = uint32(float(respawnDelay * urand(90, 110)) / 100.f);
-    if (spawnFlags & SPAWN_FLAG_DYNAMIC_RESPAWN_TIME && sWorld.GetActiveSessionCount() > BLIZZLIKE_REALM_POPULATION)
+    if (spawn_flags & SPAWN_FLAG_DYNAMIC_RESPAWN_TIME && sWorld.GetActiveSessionCount() > BLIZZLIKE_REALM_POPULATION)
         respawnDelay = uint32(float(respawnDelay * BLIZZLIKE_REALM_POPULATION) / float(sWorld.GetActiveSessionCount()));
     return respawnDelay;
 }
@@ -821,11 +821,11 @@ void GameObject::SaveToDB(uint32 mapid)
 
     // data->guid = guid don't must be update at save
     data.id = GetEntry();
-    data.mapid = mapid;
-    data.posX = GetFloatValue(GAMEOBJECT_POS_X);
-    data.posY = GetFloatValue(GAMEOBJECT_POS_Y);
-    data.posZ = GetFloatValue(GAMEOBJECT_POS_Z);
-    data.orientation = GetFloatValue(GAMEOBJECT_FACING);
+    data.position.mapId = mapid;
+    data.position.x = GetFloatValue(GAMEOBJECT_POS_X);
+    data.position.y = GetFloatValue(GAMEOBJECT_POS_Y);
+    data.position.z = GetFloatValue(GAMEOBJECT_POS_Z);
+    data.position.o = GetFloatValue(GAMEOBJECT_FACING);
     data.rotation0 = GetFloatValue(GAMEOBJECT_ROTATION + 0);
     data.rotation1 = GetFloatValue(GAMEOBJECT_ROTATION + 1);
     data.rotation2 = GetFloatValue(GAMEOBJECT_ROTATION + 2);
@@ -834,7 +834,7 @@ void GameObject::SaveToDB(uint32 mapid)
     data.spawntimesecsmax = m_spawnedByDefault ? (int32)m_respawnDelayTime : -(int32)m_respawnDelayTime;
     data.animprogress = GetGoAnimProgress();
     data.go_state = GetGoState();
-    data.spawnFlags = m_isActiveObject ? SPAWN_FLAG_ACTIVE : 0;
+    data.spawn_flags = m_isActiveObject ? SPAWN_FLAG_ACTIVE : 0;
 
     // updated in DB
     std::ostringstream ss;
@@ -874,16 +874,16 @@ bool GameObject::LoadFromDB(uint32 guid, Map* map)
         sLog.outErrorDb("Gameobject (GUID: %u) not found in table `gameobject`, can't load. ", guid);
         return false;
     }
-    if (data->spawnFlags & SPAWN_FLAG_DISABLED)
+    if (data->spawn_flags & SPAWN_FLAG_DISABLED)
         return false;
 
 
     uint32 entry = data->id;
-    //uint32 map_id = data->mapid;                          // already used before call
-    float x = data->posX;
-    float y = data->posY;
-    float z = data->posZ;
-    float ang = data->orientation;
+    //uint32 map_id = data->position.mapId;                          // already used before call
+    float x = data->position.x;
+    float y = data->position.y;
+    float z = data->position.z;
+    float ang = data->position.o;
 
     float rotation0 = data->rotation0;
     float rotation1 = data->rotation1;
@@ -927,8 +927,8 @@ bool GameObject::LoadFromDB(uint32 guid, Map* map)
         }
     }
 
-    m_isActiveObject = (data->spawnFlags & SPAWN_FLAG_ACTIVE);
-    m_visibilityModifier = data->visibilityModifier;
+    m_isActiveObject = (data->spawn_flags & SPAWN_FLAG_ACTIVE);
+    m_visibilityModifier = data->visibility_mod;
 
     return true;
 }
@@ -2235,7 +2235,7 @@ struct AddGameObjectToRemoveListInMapsWorker
 void GameObject::AddToRemoveListInMaps(uint32 db_guid, GameObjectData const* data)
 {
     AddGameObjectToRemoveListInMapsWorker worker(ObjectGuid(HIGHGUID_GAMEOBJECT, data->id, db_guid));
-    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+    sMapMgr.DoForAllMapsWithMapId(data->position.mapId, worker);
 }
 
 struct SpawnGameObjectInMapsWorker
@@ -2246,7 +2246,7 @@ struct SpawnGameObjectInMapsWorker
     void operator()(Map* map)
     {
         // Spawn if necessary (loaded grids only)
-        if (map->IsLoaded(i_data->posX, i_data->posY))
+        if (map->IsLoaded(i_data->position.x, i_data->position.y))
         {
             ObjectGuid guid(HIGHGUID_GAMEOBJECT, i_data->id, i_guid);
             if (GameObject* go = map->GetGameObject(guid))
@@ -2275,7 +2275,7 @@ struct SpawnGameObjectInMapsWorker
 void GameObject::SpawnInMaps(uint32 db_guid, GameObjectData const* data)
 {
     SpawnGameObjectInMapsWorker worker(db_guid, data);
-    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+    sMapMgr.DoForAllMapsWithMapId(data->position.mapId, worker);
 }
 
 bool GameObject::HasStaticDBSpawnData() const

@@ -453,7 +453,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                 {
                     p1_adds.push_back(pCreature->GetObjectGuid());
                     pCreature->SetHomePosition(x, y, alcoveZ, m_creature->GetOrientation());
-                    pCreature->SetRespawnRadius(radius);
+                    pCreature->SetWanderDistance(radius);
                 }
             }
         }
@@ -463,7 +463,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                 TEMPSUMMON_MANUAL_DESPAWN))
             {
                 p1_adds.push_back(pCreature->GetObjectGuid());
-                pCreature->SetRespawnRadius(5.0f);
+                pCreature->SetWanderDistance(5.0f);
             }
 
         }
@@ -473,7 +473,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                 TEMPSUMMON_MANUAL_DESPAWN))
             {
                 p1_adds.push_back(pCreature->GetObjectGuid());
-                pCreature->SetRespawnRadius(5.0f);
+                pCreature->SetWanderDistance(5.0f);
             }
         }
     }

@@ -1794,12 +1794,12 @@ void ObjectMgr::LoadCreatures(bool reload)
     uint32 count = 0;
     //                                                                          0                  1                2                 3                 4      5                 6
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `creature`.`id2`, `creature`.`id3`, `creature`.`id4`, `map`, `creature`.`display_id`,"
-    //                      7               8             9             10            11             12                  13                  14           15
-                          "`equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`,"
-    //                      16           17         18            19              20
-                          "`curhealth`, `curmana`, `DeathState`, `MovementType`, `event`,"
-    //                                      21                                     22            23            24                          25                      26
-                          "`pool_creature`.`pool_entry`, `pool_creature_template`.`pool_entry`, `spawnFlags`, `visibilitymod`, `creature`.`patch_min`, `creature`.`patch_max`  "
+    //                      7               8             9             10            11             12                  13                  14
+                          "`equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, "
+    //                      15                16              17               18
+                          "`health_percent`, `mana_percent`, `movement_type`, `event`,"
+    //                                      19                                     20            21             22                           23                      24
+                          "`pool_creature`.`pool_entry`, `pool_creature_template`.`pool_entry`, `spawn_flags`, `visibility_mod`, `creature`.`patch_min`, `creature`.`patch_max`  "
                           "FROM `creature` "
                           "LEFT OUTER JOIN `game_event_creature` ON `creature`.`guid` = `game_event_creature`.`guid` "
                           "LEFT OUTER JOIN `pool_creature` ON `creature`.`guid` = `pool_creature`.`guid` "
@@ -1824,11 +1824,12 @@ void ObjectMgr::LoadCreatures(bool reload)
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 first_entry  = fields[ 1].GetUInt32();
-        float curhealth     = fields[16].GetFloat();
-        float curmana       = fields[17].GetFloat();
-        bool is_dead        = fields[18].GetBool();
-        uint8 patch_min     = fields[25].GetUInt8();
-        uint8 patch_max     = fields[26].GetUInt8();
+        float curhealth     = fields[15].GetFloat();
+        float curmana       = fields[16].GetFloat();
+        uint32 spawnFlags   = fields[21].GetUInt32();
+        bool is_dead        = spawnFlags & SPAWN_FLAG_DEAD;
+        uint8 patch_min     = fields[23].GetUInt8();
+        uint8 patch_max     = fields[24].GetUInt8();
         bool existsInPatch  = true;
 
         if (!first_entry)
@@ -1840,7 +1841,7 @@ void ObjectMgr::LoadCreatures(bool reload)
         if ((patch_min > patch_max) || (patch_max > 10))
         {
             sLog.outErrorDb("Table `creature` GUID %u (entry %u) has invalid values patch_min=%u, patch_max=%u.", guid, first_entry, patch_min, patch_max);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET patch_min=0, patch_max=10 WHERE guid=%u AND id=%u;", guid, first_entry);
+            sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `patch_min`=0, `patch_max`=10 WHERE `guid`=%u AND `id`=%u;", guid, first_entry);
             patch_min = 0;
             patch_max = 10;
         }
@@ -1859,7 +1860,7 @@ void ObjectMgr::LoadCreatures(bool reload)
                     if (existsInPatch) // don't print error when it is not loaded for the current patch
                     {
                         sLog.outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, entry);
-                        sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u;", guid);
+                        sLog.out(LOG_DBERRFIX, "DELETE FROM `creature` WHERE `guid`=%u;", guid);
                     }
                     skip = true;
                     break;
@@ -1868,28 +1869,28 @@ void ObjectMgr::LoadCreatures(bool reload)
                 if ((cInfo->regeneration & REGEN_FLAG_HEALTH) && (cInfo->health_min > 0) && (curhealth < 100.0f) && !is_dead)
                 {
                     sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with REGEN_FLAG_HEALTH and low current health percent (%g%%).", guid, first_entry, curhealth);
-                    sLog.out(LOG_DBERRFIX, "UPDATE creature SET curhealth=100 WHERE guid=%u AND id=%u;", guid, first_entry);
+                    sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `health_percent`=100 WHERE `guid`=%u AND `id`=%u;", guid, first_entry);
                     curhealth = 100.0f;
                 }
 
                 if ((cInfo->regeneration & REGEN_FLAG_POWER) && (cInfo->mana_min > 0) && (curmana < 100.0f))
                 {
                     sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with REGEN_FLAG_POWER and low current mana percent (%g%%).", guid, first_entry, curmana);
-                    sLog.out(LOG_DBERRFIX, "UPDATE creature SET curmana=100 WHERE guid=%u AND id=%u;", guid, first_entry);
+                    sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `mana_percent=100 WHERE `guid`=%u AND `id`=%u;", guid, first_entry);
                     curmana = 100.0f;
                 }
 
                 if (curhealth > 100.0f)
                 {
                     sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with more than 100%% health.", guid, first_entry);
-                    sLog.out(LOG_DBERRFIX, "UPDATE creature SET curhealth=100 WHERE guid=%u AND id=%u;", guid, first_entry);
+                    sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `health_percent`=100 WHERE `guid`=%u AND `id`=%u;", guid, first_entry);
                     curhealth = 100.0f;
                 }
 
                 if (curmana > 100.0f)
                 {
                     sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with more than 100%% mana.", guid, first_entry);
-                    sLog.out(LOG_DBERRFIX, "UPDATE creature SET curmana=100 WHERE guid=%u AND id=%u;", guid, first_entry);
+                    sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `mana_percent`=100 WHERE `guid`=%u AND `id`=%u;", guid, first_entry);
                     curmana = 100.0f;
                 }
             }
@@ -1905,38 +1906,36 @@ void ObjectMgr::LoadCreatures(bool reload)
         data.creature_id[1]     = fields[ 2].GetUInt32();
         data.creature_id[2]     = fields[ 3].GetUInt32();
         data.creature_id[3]     = fields[ 4].GetUInt32();
-        data.mapid              = fields[ 5].GetUInt32();
-        data.display_id_override= fields[ 6].GetUInt32();
-        data.equipmentId        = fields[ 7].GetUInt32();
-        data.posX               = fields[ 8].GetFloat();
-        data.posY               = fields[ 9].GetFloat();
-        data.posZ               = fields[10].GetFloat();
-        data.orientation        = fields[11].GetFloat();
+        data.position.mapId     = fields[ 5].GetUInt16();
+        data.display_id         = fields[ 6].GetUInt32();
+        data.equipment_id       = fields[ 7].GetUInt32();
+        data.position.x         = fields[ 8].GetFloat();
+        data.position.y         = fields[ 9].GetFloat();
+        data.position.z         = fields[10].GetFloat();
+        data.position.o         = fields[11].GetFloat();
         data.spawntimesecsmin   = fields[12].GetUInt32();
         data.spawntimesecsmax   = fields[13].GetUInt32();
-        data.spawndist          = fields[14].GetFloat();
-        data.currentwaypoint    = fields[15].GetUInt32();
-        data.curhealth          = curhealth;
-        data.curmana            = curmana;
-        data.is_dead            = is_dead;
-        data.movementType       = fields[19].GetUInt8();
-        data.spawnFlags         = fields[23].GetUInt32();
-        data.visibilityModifier = fields[24].GetFloat();
-        data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.mapid, data.posX, data.posY);
-        int16 gameEvent         = fields[20].GetInt16();
-        int16 GuidPoolId        = fields[21].GetInt16();
-        int16 EntryPoolId       = fields[22].GetInt16();
+        data.wander_distance    = fields[14].GetFloat();
+        data.health_percent     = curhealth;
+        data.mana_percent       = curmana;
+        data.movement_type      = fields[17].GetUInt8();
+        data.spawn_flags        = spawnFlags;
+        data.visibility_mod     = fields[22].GetFloat();
+        data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.position.mapId, data.position.x, data.position.y);
+        int16 gameEvent         = fields[18].GetInt16();
+        int16 GuidPoolId        = fields[19].GetInt16();
+        int16 EntryPoolId       = fields[20].GetInt16();
 
-        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.mapid);
+        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.position.mapId);
         if (!mapEntry)
         {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u) that spawned at nonexistent map (Id: %u), skipped.", guid, data.mapid);
-            sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
+            sLog.outErrorDb("Table `creature` have creature (GUID: %u) that spawned at nonexistent map (Id: %u), skipped.", guid, data.position.mapId);
+            sLog.out(LOG_DBERRFIX, "DELETE FROM `creature` WHERE `guid`=%u AND `id`=%u;", guid, data.creature_id[0]);
             continue;
         }
 
         if (!existsInPatch)
-            data.spawnFlags |= SPAWN_FLAG_DISABLED;
+            data.spawn_flags |= SPAWN_FLAG_DISABLED;
 
         if (data.spawntimesecsmax < data.spawntimesecsmin)
         {
@@ -1945,44 +1944,44 @@ void ObjectMgr::LoadCreatures(bool reload)
             data.spawntimesecsmax = data.spawntimesecsmin;
         }
 
-        if (data.display_id_override > 0 && !sCreatureDisplayInfoStore.LookupEntry(data.display_id_override))
+        if (data.display_id > 0 && !sCreatureDisplayInfoStore.LookupEntry(data.display_id))
         {
-            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has nonexistent display id (%u), set to 0.", guid, data.creature_id[0], data.display_id_override);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET display_id=0 WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
-            data.display_id_override = 0;
+            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has nonexistent display id (%u), set to 0.", guid, data.creature_id[0], data.display_id);
+            sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `display_id`=0 WHERE `guid`=%u AND `id`=%u;", guid, data.creature_id[0]);
+            data.display_id = 0;
         }
 
-        if (data.equipmentId > 0)                           // -1 no equipment, 0 use default
+        if (data.equipment_id > 0)                           // -1 no equipment, 0 use default
         {
-            if (!GetEquipmentInfo(data.equipmentId))
+            if (!GetEquipmentInfo(data.equipment_id))
             {
-                sLog.outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", data.creature_id[0], data.equipmentId);
-                data.equipmentId = -1;
+                sLog.outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", data.creature_id[0], data.equipment_id);
+                data.equipment_id = -1;
             }
         }
 
-        if (data.spawndist < 0.0f)
+        if (data.wander_distance < 0.0f)
         {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `spawndist`< 0, set to 0.", guid, data.creature_id[0]);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET spawndist=0 WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
-            data.spawndist = 0.0f;
+            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `wander_distance`< 0, set to 0.", guid, data.creature_id[0]);
+            sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `wander_distance`=0 WHERE `guid`=%u AND `id`=%u;", guid, data.creature_id[0]);
+            data.wander_distance = 0.0f;
         }
-        else if (data.movementType == RANDOM_MOTION_TYPE)
+        else if (data.movement_type == RANDOM_MOTION_TYPE)
         {
-            if (data.spawndist == 0.0f)
+            if (data.wander_distance == 0.0f)
             {
-                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `spawndist`=0, replace by idle movement type (0).", guid, data.creature_id[0]);
-                sLog.out(LOG_DBERRFIX, "UPDATE creature SET MovementType=%u WHERE guid=%u AND id=%u;", IDLE_MOTION_TYPE, guid, data.creature_id[0]);
-                data.movementType = IDLE_MOTION_TYPE;
+                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=1 (random movement) but with `wander_distance`=0, replace by idle movement type (0).", guid, data.creature_id[0]);
+                sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `movement_type`=%u WHERE `guid`=%u AND `id`=%u;", IDLE_MOTION_TYPE, guid, data.creature_id[0]);
+                data.movement_type = IDLE_MOTION_TYPE;
             }
         }
-        else if (data.movementType == IDLE_MOTION_TYPE)
+        else if (data.movement_type == IDLE_MOTION_TYPE)
         {
-            if (data.spawndist != 0.0f)
+            if (data.wander_distance != 0.0f)
             {
-                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `spawndist`<>0, set to 0.", guid, data.creature_id[0]);
-                sLog.out(LOG_DBERRFIX, "UPDATE creature SET spawndist=0 WHERE guid=%u AND id=%u;", guid, data.creature_id[0]);
-                data.spawndist = 0.0f;
+                sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `MovementType`=0 (idle) have `wander_distance`<>0, set to 0.", guid, data.creature_id[0]);
+                sLog.out(LOG_DBERRFIX, "UPDATE `creature` SET `wander_distance`=0 WHERE `guid`=%u AND `id`=%u;", guid, data.creature_id[0]);
+                data.wander_distance = 0.0f;
             }
         }
 
@@ -1999,22 +1998,22 @@ void ObjectMgr::LoadCreatures(bool reload)
 
 void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
 {
-    CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
+    CellPair cell_pair = MaNGOS::ComputeCellPair(data->position.x, data->position.y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
     m_MapObjectGuids_lock.acquire();
-    CellObjectGuids& cell_guids = m_MapObjectGuids[data->mapid][cell_id];
+    CellObjectGuids& cell_guids = m_MapObjectGuids[data->position.mapId][cell_id];
     cell_guids.creatures.insert(guid);
     m_MapObjectGuids_lock.release();
 }
 
 void ObjectMgr::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
 {
-    CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
+    CellPair cell_pair = MaNGOS::ComputeCellPair(data->position.x, data->position.y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
     m_MapObjectGuids_lock.acquire();
-    CellObjectGuids& cell_guids = m_MapObjectGuids[data->mapid][cell_id];
+    CellObjectGuids& cell_guids = m_MapObjectGuids[data->position.mapId][cell_id];
     cell_guids.creatures.erase(guid);
     m_MapObjectGuids_lock.release();
 }
@@ -2027,8 +2026,8 @@ void ObjectMgr::LoadGameobjects(bool reload)
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `gameobject`.`guid`, `gameobject`.`id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`,"
     //                      7            8            9            10           11                12              13       14      15
                           "`rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `event`, "
-    //                                        16                                       17            18            19                            20                        21
-                          "`pool_gameobject`.`pool_entry`, `pool_gameobject_template`.`pool_entry`, `spawnFlags`, `visibilitymod`, `gameobject`.`patch_min`, `gameobject`.`patch_max` "
+    //                                        16                                       17            18             19                             20                        21
+                          "`pool_gameobject`.`pool_entry`, `pool_gameobject_template`.`pool_entry`, `spawn_flags`, `visibility_mod`, `gameobject`.`patch_min`, `gameobject`.`patch_max` "
                           "FROM `gameobject` "
                           "LEFT OUTER JOIN `game_event_gameobject` ON `gameobject`.`guid` = `game_event_gameobject`.`guid` "
                           "LEFT OUTER JOIN `pool_gameobject` ON `gameobject`.`guid` = `pool_gameobject`.`guid` "
@@ -2085,25 +2084,25 @@ void ObjectMgr::LoadGameobjects(bool reload)
         GameObjectData& data = m_GameObjectDataMap[guid];
 
         data.id               = entry;
-        data.mapid            = fields[ 2].GetUInt32();
-        data.posX             = fields[ 3].GetFloat();
-        data.posY             = fields[ 4].GetFloat();
-        data.posZ             = fields[ 5].GetFloat();
-        data.orientation      = fields[ 6].GetFloat();
+        data.position.mapId   = fields[ 2].GetUInt32();
+        data.position.x       = fields[ 3].GetFloat();
+        data.position.y       = fields[ 4].GetFloat();
+        data.position.z       = fields[ 5].GetFloat();
+        data.position.o       = fields[ 6].GetFloat();
         data.rotation0        = fields[ 7].GetFloat();
         data.rotation1        = fields[ 8].GetFloat();
         data.rotation2        = fields[ 9].GetFloat();
         data.rotation3        = fields[10].GetFloat();
         data.spawntimesecsmin = fields[11].GetInt32();
         data.spawntimesecsmax = fields[12].GetInt32();
-        data.spawnFlags       = fields[18].GetUInt32();
-        data.visibilityModifier = fields[19].GetFloat();
-        data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.mapid, data.posX, data.posY);
+        data.spawn_flags      = fields[18].GetUInt32();
+        data.visibility_mod   = fields[19].GetFloat();
+        data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.position.mapId, data.position.x, data.position.y);
 
-        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.mapid);
+        MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.position.mapId);
         if (!mapEntry)
         {
-            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) that spawned at nonexistent map (Id: %u), skip", guid, data.id, data.mapid);
+            sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) that spawned at nonexistent map (Id: %u), skip", guid, data.id, data.position.mapId);
             continue;
         }
 
@@ -2155,7 +2154,7 @@ void ObjectMgr::LoadGameobjects(bool reload)
             continue;
         }
 
-        if (!MapManager::IsValidMapCoord(data.mapid, data.posX, data.posY, data.posZ, data.orientation))
+        if (!MapManager::IsValidMapCoord(data.position.mapId, data.position.x, data.position.y, data.position.z, data.position.o))
         {
             sLog.outErrorDb("Table `gameobject` have gameobject (GUID: %u Entry: %u) with invalid coordinates, skip", guid, data.id);
             sLog.out(LOG_DBERRFIX, "DELETE FROM gameobject WHERE guid=%u;", guid);
@@ -2175,22 +2174,22 @@ void ObjectMgr::LoadGameobjects(bool reload)
 
 void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
 {
-    CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
+    CellPair cell_pair = MaNGOS::ComputeCellPair(data->position.x, data->position.y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
     m_MapObjectGuids_lock.acquire();
-    CellObjectGuids& cell_guids = m_MapObjectGuids[data->mapid][cell_id];
+    CellObjectGuids& cell_guids = m_MapObjectGuids[data->position.mapId][cell_id];
     cell_guids.gameobjects.insert(guid);
     m_MapObjectGuids_lock.release();
 }
 
 void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data)
 {
-    CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
+    CellPair cell_pair = MaNGOS::ComputeCellPair(data->position.x, data->position.y);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
     m_MapObjectGuids_lock.acquire();
-    CellObjectGuids& cell_guids = m_MapObjectGuids[data->mapid][cell_id];
+    CellObjectGuids& cell_guids = m_MapObjectGuids[data->position.mapId][cell_id];
     cell_guids.gameobjects.erase(guid);
     m_MapObjectGuids_lock.release();
 }
@@ -10084,10 +10083,10 @@ bool FindCreatureData::operator()(CreatureDataPair const& dataPair)
         return true;
 
     // skip diff. map cases
-    if (dataPair.second.mapid != i_player->GetMapId())
+    if (dataPair.second.position.mapId != i_player->GetMapId())
         return false;
 
-    float new_dist = i_player->GetDistance2d(dataPair.second.posX, dataPair.second.posY);
+    float new_dist = i_player->GetDistance2d(dataPair.second.position.x, dataPair.second.position.y);
 
     if (!i_mapData || new_dist < i_mapDist)
     {
@@ -10134,10 +10133,10 @@ bool FindGOData::operator()(GameObjectDataPair const& dataPair)
         return true;
 
     // skip diff. map cases
-    if (dataPair.second.mapid != i_player->GetMapId())
+    if (dataPair.second.position.mapId != i_player->GetMapId())
         return false;
 
-    float new_dist = i_player->GetDistance2d(dataPair.second.posX, dataPair.second.posY);
+    float new_dist = i_player->GetDistance2d(dataPair.second.position.x, dataPair.second.position.y);
 
     if (!i_mapData || new_dist < i_mapDist)
     {
@@ -10183,11 +10182,11 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT);
     GameObjectData& data = NewGOData(guid);
     data.id             = entry;
-    data.mapid          = mapId;
-    data.posX           = x;
-    data.posY           = y;
-    data.posZ           = z;
-    data.orientation    = o;
+    data.position.mapId = mapId;
+    data.position.x     = x;
+    data.position.y     = y;
+    data.position.z     = z;
+    data.position.o     = o;
     data.rotation0      = rotation0;
     data.rotation1      = rotation1;
     data.rotation2      = rotation2;
@@ -10196,7 +10195,7 @@ uint32 ObjectMgr::AddGOData(uint32 entry, uint32 mapId, float x, float y, float 
     data.spawntimesecsmax = spawntimedelay;
     data.animprogress   = 100;
     data.go_state       = GO_STATE_READY;
-    data.spawnFlags     = 0;
+    data.spawn_flags     = 0;
 
     AddGameobjectToGrid(guid, &data);
 
@@ -10226,19 +10225,19 @@ bool ObjectMgr::MoveCreData(uint32 guid, uint32 mapId, Position const& pos)
         return false;
 
     RemoveCreatureFromGrid(guid, &data);
-    if (data.posX == pos.x && data.posY == pos.y && data.posZ == pos.z)
+    if (data.position.x == pos.x && data.position.y == pos.y && data.position.z == pos.z)
         return true;
-    data.posX = pos.x;
-    data.posY = pos.y;
-    data.posZ = pos.z;
-    data.orientation = pos.o;
+    data.position.x = pos.x;
+    data.position.y = pos.y;
+    data.position.z = pos.z;
+    data.position.o = pos.o;
     AddCreatureToGrid(guid, &data);
 
     // Spawn if necessary (loaded grids only)
     if (Map* map = const_cast<Map*>(sMapMgr.FindMap(mapId)))
     {
         // We use spawn coords to spawn
-        if (!map->Instanceable() && map->IsLoaded(data.posX, data.posY))
+        if (!map->Instanceable() && map->IsLoaded(data.position.x, data.position.y))
         {
             Creature* creature = new Creature;
             if (!creature->LoadFromDB(guid, map))
@@ -10265,20 +10264,17 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float 
     uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_UNIT);
     CreatureData& data = NewOrExistCreatureData(guid);
     data.creature_id[0] = entry;
-    data.mapid = mapId;
-    data.equipmentId = cInfo->equipment_id;
-    data.posX = x;
-    data.posY = y;
-    data.posZ = z;
-    data.orientation = o;
+    data.position.mapId = mapId;
+    data.position.x = x;
+    data.position.y = y;
+    data.position.z = z;
+    data.position.o = o;
     data.spawntimesecsmin = spawntimedelay;
     data.spawntimesecsmax = spawntimedelay;
-    data.spawndist = 0;
-    data.currentwaypoint = 0;
-    data.curhealth = 100.0f;
-    data.curmana = 100.0f;
-    data.is_dead = false;
-    data.movementType = cInfo->movement_type;
+    data.wander_distance = 0;
+    data.health_percent = 100.0f;
+    data.mana_percent = 100.0f;
+    data.movement_type = cInfo->movement_type;
 
     AddCreatureToGrid(guid, &data);
 

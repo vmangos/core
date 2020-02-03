@@ -186,23 +186,17 @@ struct EquipmentInfo
 struct CreatureData
 {
     std::array<uint32, MAX_CREATURE_IDS_PER_SPAWN> creature_id = {};
-    uint16 mapid = 0;
-    uint32 display_id_override = 0;
-    int32 equipmentId = 0;
-    float posX = 0.0f;
-    float posY = 0.0f;
-    float posZ = 0.0f;
-    float orientation = 0.0f;
+    WorldLocation position;
+    uint32 display_id = 0;
+    int32 equipment_id = 0;
     uint32 spawntimesecsmin = 0;
     uint32 spawntimesecsmax = 0;
-    float spawndist = 0.0f;
-    uint32 currentwaypoint = 0;
-    float curhealth = 100.0f;
-    float curmana = 100.0f;
-    bool  is_dead = false;
-    uint8 movementType = 0;
-    uint32 spawnFlags = 0;
-    float visibilityModifier = 0.0f;
+    float wander_distance = 0.0f;
+    float health_percent = 100.0f;
+    float mana_percent = 100.0f;
+    uint8 movement_type = 0;
+    uint32 spawn_flags = 0;
+    float visibility_mod = 0.0f;
 
     // non db field
     uint32 instanciatedContinentInstanceId;
@@ -535,7 +529,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SaveHomePosition() { SetHomePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation()); }
         void SetHomePosition(float x, float y, float z, float o);
-        void GetHomePosition(float &x, float &y, float &z, float &o, float* dist = nullptr);
+        void GetHomePosition(float &x, float &y, float &z, float &o);
         Position const& GetHomePosition() { return m_homePosition; }
         float GetHomePositionO() const { return m_homePosition.o; }
         void ResetHomePosition();
@@ -729,7 +723,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsVisibleInGridForPlayer(Player const* pl) const override;
 
         void RemoveCorpse();
-        bool IsDeadByDefault() const { return m_isDeadByDefault; };
+        bool IsDeadByDefault() const;
 
         void ForcedDespawn(uint32 timeMSToDespawn = 0);
         void DespawnOrUnsummon(uint32 msTimeToDespawn = 0);
@@ -744,8 +738,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 GetRespawnDelay() const { return m_respawnDelay; }
         void SetRespawnDelay(uint32 delay) { m_respawnDelay = delay; }
 
-        float GetRespawnRadius() const { return m_respawnradius; }
-        void SetRespawnRadius(float dist) { m_respawnradius = dist; }
+        float GetWanderDistance() const { return m_wanderDistance; }
+        void SetWanderDistance(float dist) { m_wanderDistance = dist; }
 
         // Functions spawn/remove creature with DB guid in all loaded map copies (if point grid loaded in map)
         static void AddToRemoveListInMaps(uint32 db_guid, CreatureData const* data);
@@ -848,8 +842,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SetSummonPoint(CreatureCreatePos const& pos) { m_summonPos = pos.m_pos; }
         void GetSummonPoint(float &fX, float &fY, float &fZ, float &fOrient) const { fX = m_summonPos.x; fY = m_summonPos.y; fZ = m_summonPos.z; fOrient = m_summonPos.o; }
 
-        void SetDeadByDefault (bool death_state) { m_isDeadByDefault = death_state; }
-
         void SetNoXP() { AddUnitState(UNIT_STAT_NO_KILL_REWARD); }
 
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
@@ -874,8 +866,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 _pacifiedTimer;
         void AllowManaRegen(bool v) { m_bRegenMana = v; }
         uint32 m_manaRegen;
-
-        uint32 m_startwaypoint;                             // currentwaypoint from creature table
 
         void RegenerateHealth();
         void RegenerateMana();
@@ -958,7 +948,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         time_t m_respawnTime;                               // (secs) time of next respawn
         uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
         uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
-        float m_respawnradius;
+        float m_wanderDistance;
 
         time_t m_combatStartTime;
         bool m_combatState;
@@ -978,7 +968,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool m_bRegenMana;
         bool m_AI_locked;
         bool m_AI_InitializeOnRespawn;
-        bool m_isDeadByDefault;
         uint32 m_temporaryFactionFlags;                     // used for real faction changes (not auras etc)
         int32 m_reputationId;                              // Id of the creature's faction in the client reputations list.
 

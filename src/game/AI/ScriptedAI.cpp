@@ -19,7 +19,7 @@ ScriptedAI::ScriptedAI(Creature* pCreature) : CreatureAI(pCreature),
 
     if (auto cData = m_creature->GetCreatureData())
     {
-        if (cData->spawnFlags & SPAWN_FLAG_EVADE_OUT_HOME_AREA)
+        if (cData->spawn_flags & SPAWN_FLAG_EVADE_OUT_HOME_AREA)
             m_bEvadeOutOfHomeArea = true;
     }
 }

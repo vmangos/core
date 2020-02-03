@@ -72,7 +72,7 @@ public:
         }
 
         invader->SetHomePosition(x, y, z, frand(0, 2 * M_PI_F));
-        invader->SetRespawnRadius(30.f);
+        invader->SetWanderDistance(30.f);
         invader->SetDefaultMovementType(RANDOM_MOTION_TYPE);
 
         if (!invader->IsInCombat())

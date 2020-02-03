@@ -271,8 +271,8 @@ struct npc_necrotic_shard : public ScriptedAI
             if (Creature* add = m_creature->SummonCreature(GenerateAddEntry(), x, y, z, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
             {
                 add->SetCorpseDelay(120);  // 2 min for corpse to despawn
-                add->SetRespawnDelay(30); // 30 sec to respawn after despawn(?)
-                add->SetRespawnRadius(20.0f);
+                add->SetRespawnDelay(30);  // 30 sec to respawn after despawn(?)
+                add->SetWanderDistance(20.0f);
                 _adds.insert(add->GetObjectGuid());
             }
         }

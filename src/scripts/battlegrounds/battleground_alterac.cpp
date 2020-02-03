@@ -4059,7 +4059,7 @@ struct AV_WarRiderAI : public ScriptedAI
     AV_WarRiderAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_creature->SetCasterChaseDistance(25.0f);
-        m_creature->SetRespawnRadius(55.0f);
+        m_creature->SetWanderDistance(55.0f);
         isMovingToPoint = false;
         Reset();
     }
@@ -4470,7 +4470,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         {
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
             m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-            m_creature->SetRespawnRadius(55.0f);
+            m_creature->SetWanderDistance(55.0f);
             m_creature->SetWalk(false);
             isInvocated = true;
         }
@@ -4650,7 +4650,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
             DoScriptText(SAY_IVUS_SPAWNED, m_creature);
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
             m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-            m_creature->SetRespawnRadius(55.0f);
+            m_creature->SetWanderDistance(55.0f);
             m_creature->SetWalk(false);
             isInvocated = true;
         }
@@ -5268,7 +5268,7 @@ class npc_av_battle_npc_summoner: public ScriptedAI
                             z = m_destZ;
                             m_creature->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, 20.0f);
                             c->SetHomePosition(x, y, z, frand(0, 2 * M_PI_F));
-                            c->SetRespawnRadius(10.0f);
+                            c->SetWanderDistance(10.0f);
                             c->SetDefaultMovementType(RANDOM_MOTION_TYPE);
                             c->SetWalk(false);
                             c->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);

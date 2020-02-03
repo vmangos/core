@@ -536,7 +536,7 @@ struct instance_blackrock_depths : ScriptedInstance
                     pPatron->SetStandState(UNIT_STAND_STATE_STAND);
                     pPatron->HandleEmote(0);
                     pPatron->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-                    pPatron->SetRespawnRadius(3.0f);
+                    pPatron->SetWanderDistance(3.0f);
                     pPatron->GetMotionMaster()->Initialize();
                 }
             }

@@ -470,7 +470,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
                         height = 241.35f;
                     if (Creature* pVZ = m_creature->SummonCreature(16697, pTarget->GetPositionX(), pTarget->GetPositionY(), height, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
                     {
-                        pVZ->SetRespawnRadius(0.1f);
+                        pVZ->SetWanderDistance(0.1f);
                         pVZ->SetSpeedRate(UnitMoveType::MOVE_RUN, 0.1f);
                         pVZ->SetSpeedRate(UnitMoveType::MOVE_WALK, 0.1f);
                         pVZ->GetMotionMaster()->MoveRandom();

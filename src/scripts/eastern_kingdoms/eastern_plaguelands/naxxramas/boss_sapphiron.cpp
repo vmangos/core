@@ -675,7 +675,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 {
     npc_sapphiron_blizzardAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->SetRespawnRadius(60.0f);
+        m_creature->SetWanderDistance(60.0f);
         m_creature->SetReactState(ReactStates::REACT_PASSIVE);
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         checkAuraTimer = 0;

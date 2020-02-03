@@ -88,7 +88,7 @@ struct mobs_spitelashesAI : public ScriptedAI
                     {
                         summoned->SetHomePosition(summoned->GetPositionX(), summoned->GetPositionY(), summoned->GetPositionZ(), 0.0f);
                         summoned->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-                        summoned->SetRespawnRadius(55.0f);
+                        summoned->SetWanderDistance(55.0f);
                     }
                 }
 

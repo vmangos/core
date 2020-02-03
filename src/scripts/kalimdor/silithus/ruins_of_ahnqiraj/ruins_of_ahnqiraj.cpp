@@ -204,7 +204,7 @@ struct OssirianTornadoAI : public ScriptedAI
         m_creature->CastSpell(m_creature, 25160, false);
         m_creature->CastSpell(m_creature, 10092, false);
         m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
-        m_creature->SetRespawnRadius(55.0f);
+        m_creature->SetWanderDistance(55.0f);
         m_creature->GetMotionMaster()->Initialize();
         Reset();
     }

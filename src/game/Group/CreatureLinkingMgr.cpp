@@ -209,7 +209,7 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
                 sLog.outErrorDb("`creature_linking` has a non existing master (guid: %u,, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
             return false;
         }
-        if (slaveData->mapid != masterData->mapid)
+        if (slaveData->position.mapId != masterData->position.mapId)
         {
             sLog.outErrorDb("`creature_linking` has a slave and master on different maps (guid: %u, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
             return false;
@@ -664,15 +664,15 @@ bool CreatureLinkingHolder::CanSpawn(uint32 lowGuid, Map* _map, CreatureLinkingI
         CreatureData const* data = sObjectMgr.GetCreatureData(lowGuid);
         if (!data)
             return true;
-        pInfo = sCreatureLinkingMgr.GetLinkedTriggerInformation(data->creature_id[0], lowGuid, data->mapid);
+        pInfo = sCreatureLinkingMgr.GetLinkedTriggerInformation(data->creature_id[0], lowGuid, data->position.mapId);
         if (!pInfo)
             return true;
         // Has lowGuid npc actually spawning linked?
         if (!sCreatureLinkingMgr.IsSpawnedByLinkedMob(pInfo))
             return true;
 
-        sx = data->posX;                                    // Fill position data
-        sy = data->posY;
+        sx = data->position.x;                              // Fill position data
+        sy = data->position.y;
     }
 
     if (pInfo->searchRange == 0)                            // Map wide case

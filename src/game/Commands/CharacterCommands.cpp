@@ -2427,7 +2427,7 @@ bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
                 sObjectMgr.DoCreatureData(worker);
                 if (CreatureDataPair const* dataPair = worker.GetResult())
                     if (CreatureData const* data = &dataPair->second)
-                        if (uint32 taxiNode = sObjectMgr.GetNearestTaxiNode(data->posX, data->posY, data->posZ, data->mapid, player->GetTeam()))
+                        if (uint32 taxiNode = sObjectMgr.GetNearestTaxiNode(data->position.x, data->position.y, data->position.z, data->position.mapId, player->GetTeam()))
                             if (player->GetTaxi().SetTaximaskNode(taxiNode))
                             {
                                 WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);

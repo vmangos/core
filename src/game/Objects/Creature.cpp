@@ -171,14 +171,14 @@ Creature::Creature(CreatureSubtype subtype) :
     _pacifiedTimer(0), m_manaRegen(0),
     m_groupLootTimer(0), m_groupLootId(0), m_lootMoney(0), m_lootGroupRecipientId(0), m_corpseDecayTimer(0),
     m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60),
-    m_respawnradius(5.0f), m_combatStartTime(0), m_combatState(false), m_combatResetCount(0), m_subtype(subtype),
+    m_wanderDistance(5.0f), m_combatStartTime(0), m_combatState(false), m_combatResetCount(0), m_subtype(subtype),
     m_defaultMovementType(IDLE_MOTION_TYPE), m_equipmentId(0), m_AlreadyCallAssistance(false),
     m_AlreadySearchedAssistance(false),
-    m_bRegenHealth(true), m_bRegenMana(true), m_AI_locked(false), m_isDeadByDefault(false), m_temporaryFactionFlags(TEMPFACTION_NONE),
+    m_bRegenHealth(true), m_bRegenMana(true), m_AI_locked(false), m_temporaryFactionFlags(TEMPFACTION_NONE),
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _creatureGroup(nullptr),
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f), m_reactState(REACT_PASSIVE),
     _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_AI_InitializeOnRespawn(false), m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0),
+    m_AI_InitializeOnRespawn(false), m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_combatWithZoneState(false), m_mountId(0),
     _isEscortable(false), m_reputationId(-1), m_castingTargetGuid(0)
 {
     m_regenTimer = 200;
@@ -234,7 +234,7 @@ void Creature::RemoveFromWorld()
 
 void Creature::RemoveCorpse()
 {
-    if ((GetDeathState() != CORPSE && !m_isDeadByDefault) || (GetDeathState() != ALIVE && m_isDeadByDefault))
+    if ((GetDeathState() != CORPSE && !IsDeadByDefault()) || (GetDeathState() != ALIVE && IsDeadByDefault()))
         return;
 
     m_corpseDecayTimer = 0;
@@ -260,6 +260,13 @@ void Creature::RemoveCorpse()
     float x, y, z, o;
     GetRespawnCoord(x, y, z, &o);
     GetMap()->CreatureRelocation(this, x, y, z, o);
+}
+
+bool Creature::IsDeadByDefault() const
+{
+    if (CreatureData const* pData = sObjectMgr.GetCreatureData(GetGUIDLow()))
+        return pData->spawn_flags & SPAWN_FLAG_DEAD;
+    return false;
 }
 
 /**
@@ -323,15 +330,15 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
     {
         LoadEquipment(eventData->equipment_id);             // use event equipment if any for active event
     }
-    else if (!data || data->equipmentId == 0)
+    else if (!data || data->equipment_id == 0)
     {
         // use default from the template
         LoadEquipment(cinfo->equipment_id);
     }
-    else if (data && data->equipmentId != -1)
+    else if (data && data->equipment_id != -1)
     {
         // override, -1 means no equipment
-        LoadEquipment(data->equipmentId);
+        LoadEquipment(data->equipment_id);
     }
 
     SetName(normalInfo->name);                              // at normal entry always
@@ -345,9 +352,6 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
     UpdateSpeed(MOVE_RUN,  false);
     SetFly(CanFly());
 
-    if (data)
-        m_startwaypoint = data->currentwaypoint;
-
     if (!data)
         m_defaultMovementType = MovementGeneratorType(cinfo->movement_type);
 
@@ -358,7 +362,7 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
 uint32 Creature::GetSpawnFlags() const
 {
     if (CreatureData const* data = sObjectMgr.GetCreatureData(GetGUIDLow()))
-        return data->spawnFlags;
+        return data->spawn_flags;
     return 0;
 }
 
@@ -548,8 +552,8 @@ uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* 
         return eventData->display_id;
 
     // Use creature display id explicit, override template (creature.display_id)
-    if (data && data->display_id_override)
-        return data->display_id_override;
+    if (data && data->display_id)
+        return data->display_id;
 
     // use defaults from the template
     uint32 display_id = 0;
@@ -620,7 +624,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                 SelectLevel(cinfo);
                 SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_NONE);
-                if (m_isDeadByDefault)
+                if (IsDeadByDefault())
                 {
                     SetDeathState(JUST_DIED);
                     SetHealth(0);
@@ -666,7 +670,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
         case CORPSE:
         {
             Unit::Update(update_diff, diff);
-            if (m_isDeadByDefault)
+            if (IsDeadByDefault())
                 break;
 
             // Youfie - <Nostalrius>
@@ -707,7 +711,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
         }
         case ALIVE:
         {
-            if (m_isDeadByDefault)
+            if (IsDeadByDefault())
             {
                 if (m_corpseDecayTimer <= update_diff)
                 {
@@ -1382,26 +1386,23 @@ void Creature::SaveToDB(uint32 mapid)
 
     // data->guid = guid don't must be update at save
     data.creature_id[0] = GetEntry();
-    data.mapid = mapid;
-    data.display_id_override = displayId;
-    data.equipmentId = GetEquipmentId();
-    data.posX = GetPositionX();
-    data.posY = GetPositionY();
-    data.posZ = GetPositionZ();
-    data.orientation = GetOrientation();
+    data.position.mapId = mapid;
+    data.display_id = displayId;
+    data.equipment_id = GetEquipmentId();
+    data.position.x = GetPositionX();
+    data.position.y = GetPositionY();
+    data.position.z = GetPositionZ();
+    data.position.o = GetOrientation();
     data.spawntimesecsmin = m_respawnDelay;
     data.spawntimesecsmax = m_respawnDelay;
     // prevent add data integrity problems
-    data.spawndist = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0 : m_respawnradius;
-    data.currentwaypoint = 0;
-    data.is_dead = m_isDeadByDefault;
+    data.wander_distance = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0 : m_wanderDistance;;
     // prevent add data integrity problems
-    data.movementType = !m_respawnradius && GetDefaultMovementType() == RANDOM_MOTION_TYPE
+    data.movement_type = !m_wanderDistance && GetDefaultMovementType() == RANDOM_MOTION_TYPE
                         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
-    data.spawnFlags = m_isActiveObject ? SPAWN_FLAG_ACTIVE : 0;
+    data.spawn_flags = m_isActiveObject ? SPAWN_FLAG_ACTIVE : 0;
 
-    float const spawndist = GetDefaultMovementType() == RANDOM_MOTION_TYPE ? m_respawnradius : 0.0f;
-    float const curmana = GetMaxPower(POWER_MANA) ? GetPowerPercent(POWER_MANA) : 0.0f;
+    float const wander_distance = GetDefaultMovementType() == RANDOM_MOTION_TYPE ? m_wanderDistance : 0.0f;
 
     // updated in DB
     WorldDatabase.BeginTransaction();
@@ -1424,11 +1425,9 @@ void Creature::SaveToDB(uint32 mapid)
        << GetOrientation() << ","
        << data.spawntimesecsmin << ","                     // respawn time minimum
        << data.spawntimesecsmax << ","                     // respawn time maximum
-       << spawndist << ","                                 // wander distance
-       << (uint32)(0) << ","                               // currentwaypoint
-       << data.curhealth << ","                            // curhealth
-       << curmana << ","                                   // curmana
-       << (m_isDeadByDefault ? 1 : 0) << ","               // is_dead
+       << wander_distance << ","                           // wander distance
+       << data.health_percent << ","                       // health_percent
+       << data.mana_percent << ","                         // mana_percent
        << GetDefaultMovementType() << ","                  // default movement generator type
        << m_isActiveObject << ","
        << m_visibilityModifier << ","
@@ -1576,7 +1575,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
         sLog.outErrorDb("Creature (GUID: %u) not found in table `creature`, can't load. ", guidlow);
         return false;
     }
-    if (data->spawnFlags & SPAWN_FLAG_DISABLED)
+    if (data->spawn_flags & SPAWN_FLAG_DISABLED)
         return false;
 
     uint32 const creatureId = data->ChooseCreatureId();
@@ -1593,19 +1592,18 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
     if (map->GetCreature(cinfo->GetObjectGuid(guidlow)))
         return false;
 
-    CreatureCreatePos pos(map, data->posX, data->posY, data->posZ, data->orientation);
-    SetHomePosition(data->posX, data->posY, data->posZ, data->orientation);
+    CreatureCreatePos pos(map, data->position.x, data->position.y, data->position.z, data->position.o);
+    SetHomePosition(data->position.x, data->position.y, data->position.z, data->position.o);
 
     if (!Create(guidlow, pos, cinfo, TEAM_NONE, data->creature_id[0], data, eventData))
         return false;
 
-    m_respawnradius = data->spawndist;
+    m_wanderDistance = data->wander_distance;
 
     m_respawnDelay = data->GetRandomRespawnTime();
-    m_isDeadByDefault = data->is_dead;
-    m_deathState = m_isDeadByDefault ? DEAD : ALIVE;
-    m_isActiveObject = data->spawnFlags & SPAWN_FLAG_ACTIVE;
-    m_visibilityModifier = data->visibilityModifier;
+    m_deathState = data->spawn_flags & SPAWN_FLAG_DEAD ? DEAD : ALIVE;
+    m_isActiveObject = data->spawn_flags & SPAWN_FLAG_ACTIVE;
+    m_visibilityModifier = data->visibility_mod;
 
     m_respawnTime  = map->GetPersistentState()->GetCreatureRespawnTime(GetGUIDLow());
 
@@ -1614,9 +1612,9 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
         m_deathState = DEAD;
         if (CanFly())
         {
-            float tz = GetMap()->GetHeight(data->posX, data->posY, data->posZ, false);
-            if (data->posZ - tz > 0.1)
-                Relocate(data->posX, data->posY, tz);
+            float tz = GetMap()->GetHeight(data->position.x, data->position.y, data->position.z, false);
+            if (data->position.z - tz > 0.1)
+                Relocate(data->position.x, data->position.y, tz);
         }
     }
     else if (m_respawnTime)                                 // respawn time set but expired
@@ -1626,14 +1624,14 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
         GetMap()->GetPersistentState()->SaveCreatureRespawnTime(GetGUIDLow(), 0);
     }
 
-    uint32 curhealth = cinfo->health_max * data->curhealth / 100.0f;
+    uint32 curhealth = cinfo->health_max * data->health_percent / 100.0f;
     if (curhealth)
     {
         curhealth = uint32(curhealth * _GetHealthMod(GetCreatureInfo()->rank));
         if (curhealth < 1)
             curhealth = 1;
     }
-    uint32 curmana = cinfo->mana_max * data->curmana / 100.0f;
+    uint32 curmana = cinfo->mana_max * data->mana_percent / 100.0f;
 
     if (sCreatureLinkingMgr.IsSpawnedByLinkedMob(this))
     {
@@ -1645,9 +1643,9 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
             // Just set to dead, so need to relocate like above
             if (CanFly())
             {
-                float tz = GetTerrain()->GetHeightStatic(data->posX, data->posY, data->posZ, false);
-                if (data->posZ - tz > 0.1)
-                    Relocate(data->posX, data->posY, tz);
+                float tz = GetTerrain()->GetHeightStatic(data->position.x, data->position.y, data->position.z, false);
+                if (data->position.z - tz > 0.1)
+                    Relocate(data->position.x, data->position.y, tz);
             }
         }
     }
@@ -1656,13 +1654,13 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
     SetPower(POWER_MANA, curmana);
 
     // checked at creature_template loading
-    m_defaultMovementType = MovementGeneratorType(data->movementType);
+    m_defaultMovementType = MovementGeneratorType(data->movement_type);
 
     // Creature Linking, Initial load is handled like respawn
     if (m_isCreatureLinkingTrigger && IsAlive())
         GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
 
-    if (data->spawnFlags & SPAWN_FLAG_NOT_VISIBLE)
+    if (data->spawn_flags & SPAWN_FLAG_NOT_VISIBLE)
         SetVisibility(VISIBILITY_OFF);
 
     // We need to assign new AI on respawn if spawn has multiple creature ids
@@ -1742,9 +1740,9 @@ void Creature::DeleteFromDB()
 
 void Creature::DeleteFromDB(uint32 lowguid, CreatureData const* data)
 {
-    auto instanceId = sMapMgr.GetContinentInstanceId(data->mapid, data->posX, data->posY);
+    auto instanceId = sMapMgr.GetContinentInstanceId(data->position.mapId, data->position.x, data->position.y);
     CreatureRespawnDeleteWorker worker(lowguid);
-    sMapPersistentStateMgr.DoForAllStatesWithMapId(data->mapid, instanceId, worker);
+    sMapPersistentStateMgr.DoForAllStatesWithMapId(data->position.mapId, instanceId, worker);
 
     sObjectMgr.DeleteCreatureData(lowguid);
 
@@ -1803,7 +1801,7 @@ float Creature::GetAttackDistance(Unit const* pl) const
 
 void Creature::SetDeathState(DeathState s)
 {
-    if ((s == JUST_DIED && !m_isDeadByDefault) || (s == JUST_ALIVED && m_isDeadByDefault))
+    if ((s == JUST_DIED && !IsDeadByDefault()) || (s == JUST_ALIVED && IsDeadByDefault()))
     {
         auto data = sObjectMgr.GetCreatureData(GetGUIDLow());
 
@@ -1813,9 +1811,9 @@ void Creature::SetDeathState(DeathState s)
 
         if (data)
         {
-            if (data->spawnFlags & SPAWN_FLAG_RANDOM_RESPAWN_TIME)
+            if (data->spawn_flags & SPAWN_FLAG_RANDOM_RESPAWN_TIME)
                 respawnDelay *= float(urand(90, 110)) / 100.0f;
-            if (data->spawnFlags & SPAWN_FLAG_DYNAMIC_RESPAWN_TIME && sWorld.GetActiveSessionCount() > BLIZZLIKE_REALM_POPULATION)
+            if (data->spawn_flags & SPAWN_FLAG_DYNAMIC_RESPAWN_TIME && sWorld.GetActiveSessionCount() > BLIZZLIKE_REALM_POPULATION)
                 respawnDelay *= float(BLIZZLIKE_REALM_POPULATION) / float(sWorld.GetActiveSessionCount());
         }
         m_respawnTime = time(nullptr) + respawnDelay;        // respawn delay (spawntimesecs)
@@ -2057,7 +2055,7 @@ bool Creature::IsVisibleInGridForPlayer(Player const* pl) const
 
     // Live player (or with not release body see live creatures or death creatures with corpse disappearing time > 0
     if (pl->IsAlive() || pl->GetDeathTimer() > 0)
-        return (IsAlive() || m_corpseDecayTimer > 0 || (m_isDeadByDefault && m_deathState == CORPSE));
+        return (IsAlive() || m_corpseDecayTimer > 0 || (IsDeadByDefault() && m_deathState == CORPSE));
 
     // Dead player see live creatures near own corpse
     if (IsAlive())
@@ -2233,7 +2231,7 @@ void Creature::ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data)
 
     // Only affects rares and above with the forced flag
     if (GetCreatureInfo()->rank > CREATURE_ELITE_ELITE)
-        if (!data || !(data->spawnFlags & SPAWN_FLAG_FORCE_DYNAMIC_ELITE))
+        if (!data || !(data->spawn_flags & SPAWN_FLAG_FORCE_DYNAMIC_ELITE))
             return;
 
     if (GetLevel() > sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_LEVEL_BELOW))
@@ -2809,17 +2807,17 @@ void Creature::GetRespawnCoord(float &x, float &y, float &z, float* ori, float* 
         if (ori)
             *ori = m_homePosition.o;
         if (dist)
-            *dist = GetRespawnRadius();
+            *dist = GetWanderDistance();
     }
     else if (CreatureData const* data = sObjectMgr.GetCreatureData(GetGUIDLow()))
     {
-        x = data->posX;
-        y = data->posY;
-        z = data->posZ;
+        x = data->position.x;
+        y = data->position.y;
+        z = data->position.z;
         if (ori)
-            *ori = data->orientation;
+            *ori = data->position.o;
         if (dist)
-            *dist = GetRespawnRadius();
+            *dist = GetWanderDistance();
     }
     else
     {
@@ -2830,7 +2828,7 @@ void Creature::GetRespawnCoord(float &x, float &y, float &z, float* ori, float* 
         if (ori)
             *ori = orient;
         if (dist)
-            *dist = GetRespawnRadius();
+            *dist = GetWanderDistance();
     }
 
     //lets check if our creatures have valid spawn coordinates
@@ -3062,7 +3060,7 @@ void Creature::DisappearAndDie()
     RemoveCorpse();
 }
 
-void Creature::GetHomePosition(float &x, float &y, float &z, float &o, float* dist)
+void Creature::GetHomePosition(float &x, float &y, float &z, float &o)
 {
     if (m_homePosition.x != 0.0f)
     {
@@ -3070,11 +3068,9 @@ void Creature::GetHomePosition(float &x, float &y, float &z, float &o, float* di
         y = m_homePosition.y;
         z = m_homePosition.z;
         o = m_homePosition.o;
-        if (dist)
-            (*dist) = GetRespawnRadius();
         return;
     }
-    GetRespawnCoord(x, y, z, &o, dist);
+    GetRespawnCoord(x, y, z, &o);
 }
 void Creature::SetHomePosition(float x, float y, float z, float o)
 {
@@ -3087,7 +3083,7 @@ void Creature::SetHomePosition(float x, float y, float z, float o)
 void Creature::ResetHomePosition()
 {
     if (CreatureData const* data = sObjectMgr.GetCreatureData(GetGUIDLow()))
-        SetHomePosition(data->posX, data->posY, data->posZ, data->orientation);
+        SetHomePosition(data->position.x, data->position.y, data->position.z, data->position.o);
     else if (IsTemporarySummon())
         GetSummonPoint(m_homePosition.x, m_homePosition.y, m_homePosition.z, m_homePosition.o);
 }
@@ -3662,7 +3658,7 @@ struct AddCreatureToRemoveListInMapsWorker
 void Creature::AddToRemoveListInMaps(uint32 db_guid, CreatureData const* data)
 {
     AddCreatureToRemoveListInMapsWorker worker(data->GetObjectGuid(db_guid));
-    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+    sMapMgr.DoForAllMapsWithMapId(data->position.mapId, worker);
 }
 
 struct SpawnCreatureInMapsWorker
@@ -3673,7 +3669,7 @@ struct SpawnCreatureInMapsWorker
     void operator()(Map* map)
     {
         // We use spawn coords to spawn
-        if (map->IsLoaded(i_data->posX, i_data->posY))
+        if (map->IsLoaded(i_data->position.x, i_data->position.y))
         {
             Creature* pCreature = new Creature;
             //DEBUG_LOG("Spawning creature %u",*itr);
@@ -3691,7 +3687,7 @@ struct SpawnCreatureInMapsWorker
 void Creature::SpawnInMaps(uint32 db_guid, CreatureData const* data)
 {
     SpawnCreatureInMapsWorker worker(db_guid, data);
-    sMapMgr.DoForAllMapsWithMapId(data->mapid, worker);
+    sMapMgr.DoForAllMapsWithMapId(data->position.mapId, worker);
 }
 
 bool Creature::HasStaticDBSpawnData() const

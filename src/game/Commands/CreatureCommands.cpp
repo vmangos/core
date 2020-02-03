@@ -308,13 +308,14 @@ bool ChatHandler::HandleNpcSetDeathStateCommand(char* args)
         return false;
     }
 
+    CreatureData* pData = const_cast<CreatureData*>(sObjectMgr.GetCreatureData(pCreature->GetGUIDLow()));
+
     if (value)
-        pCreature->SetDeadByDefault(true);
+        pData->spawn_flags |= SPAWN_FLAG_DEAD;
     else
-        pCreature->SetDeadByDefault(false);
+        pData->spawn_flags &= ~SPAWN_FLAG_DEAD;
 
     pCreature->SaveToDB();
-
     pCreature->Respawn();
 
     return true;
@@ -386,7 +387,7 @@ bool ChatHandler::HandleNpcSpawnDistCommand(char* args)
     else
         return false;
 
-    pCreature->SetRespawnRadius((float)option);
+    pCreature->SetWanderDistance((float)option);
     pCreature->SetDefaultMovementType(mtype);
     pCreature->GetMotionMaster()->Initialize();
     if (pCreature->IsAlive())                               // dead creature will reset movement generator at respawn
@@ -866,9 +867,8 @@ bool ChatHandler::HandleNpcMoveCommand(char* args)
             SetSentErrorMessage(true);
             return false;
         }
-        
 
-        if (pPlayer->GetMapId() != data->mapid)
+        if (pPlayer->GetMapId() != data->position.mapId)
         {
             PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
             SetSentErrorMessage(true);
@@ -943,7 +943,7 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
 
         Player* player = m_session->GetPlayer();
 
-        if (player->GetMapId() != data->mapid)
+        if (player->GetMapId() != data->position.mapId)
         {
             PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, lowguid);
             SetSentErrorMessage(true);
@@ -1402,7 +1402,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
             return false;
         }
 
-        if (m_session->GetPlayer()->GetMapId() != data->mapid)
+        if (m_session->GetPlayer()->GetMapId() != data->position.mapId)
         {
             PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, dbGuid);
             SetSentErrorMessage(true);
@@ -1993,7 +1993,7 @@ bool ChatHandler::HandleWpExportCommand(char* args)
             return false;
         }
 
-        if (m_session->GetPlayer()->GetMapId() != data->mapid)
+        if (m_session->GetPlayer()->GetMapId() != data->position.mapId)
         {
             PSendSysMessage(LANG_COMMAND_CREATUREATSAMEMAP, dbGuid);
             SetSentErrorMessage(true);

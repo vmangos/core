@@ -685,7 +685,7 @@ struct gothikTriggerAI : public ScriptedAI
     }
     void Reset() override 
     {
-        m_creature->SetRespawnRadius(0.01f);
+        m_creature->SetWanderDistance(0.01f);
         m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
         m_creature->GetMotionMaster()->Initialize();
     }

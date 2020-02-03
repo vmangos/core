@@ -397,7 +397,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             pCreature->SetStandState(UNIT_STAND_STATE_DEAD);
             break;
         case NPC_SewageSlime:
-            pCreature->SetRespawnRadius(30.0f);
+            pCreature->SetWanderDistance(30.0f);
             break;
         case NPC_BileSludge:
         {

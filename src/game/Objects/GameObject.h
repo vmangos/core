@@ -532,11 +532,7 @@ enum GOState
 struct GameObjectData
 {
     uint32 id;                                              // entry in gamobject_template
-    uint32 mapid;
-    float posX;
-    float posY;
-    float posZ;
-    float orientation;
+    WorldLocation position;
     float rotation0;
     float rotation1;
     float rotation2;
@@ -545,8 +541,8 @@ struct GameObjectData
     int32  spawntimesecsmax;
     uint32 animprogress;
     GOState go_state;
-    uint32 spawnFlags;
-    float visibilityModifier;
+    uint32 spawn_flags;
+    float visibility_mod;
 
     uint32 instanciatedContinentInstanceId;
     uint32 ComputeRespawnDelay(uint32 baseDelay) const;

@@ -139,23 +139,23 @@ public:
     ActiveObjectsGridLoader(Map* _map) : map(_map) {}
     bool operator()(GameObjectDataPair const& dataPair)
     {
-        if (!(dataPair.second.spawnFlags & SPAWN_FLAG_ACTIVE) || dataPair.second.mapid != map->GetId())
+        if (!(dataPair.second.spawn_flags & SPAWN_FLAG_ACTIVE) || dataPair.second.position.mapId != map->GetId())
             return false;
         // Instanciated continents case
         if (map->IsContinent() && map->GetInstanceId() && map->GetInstanceId() != dataPair.second.instanciatedContinentInstanceId)
             return false;
-        Cell c(MaNGOS::ComputeCellPair(dataPair.second.posX, dataPair.second.posY));
+        Cell c(MaNGOS::ComputeCellPair(dataPair.second.position.x, dataPair.second.position.y));
         map->LoadGrid(c, true);
         return false;
     }
     bool operator()(CreatureDataPair const& dataPair)
     {
-        if (!(dataPair.second.spawnFlags & SPAWN_FLAG_ACTIVE) || dataPair.second.mapid != map->GetId())
+        if (!(dataPair.second.spawn_flags & SPAWN_FLAG_ACTIVE) || dataPair.second.position.mapId != map->GetId())
             return false;
         // Instanciated continents case
         if (map->IsContinent() && map->GetInstanceId() && map->GetInstanceId() != dataPair.second.instanciatedContinentInstanceId)
             return false;
-        Cell c(MaNGOS::ComputeCellPair(dataPair.second.posX, dataPair.second.posY));
+        Cell c(MaNGOS::ComputeCellPair(dataPair.second.position.x, dataPair.second.position.y));
         map->LoadGrid(c, true);
         return false;
     }

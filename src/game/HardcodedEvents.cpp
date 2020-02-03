@@ -345,14 +345,14 @@ void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGui
             continue;
         }
 
-        auto instanceId = sMapMgr.GetContinentInstanceId(cData->mapid, cData->posX, cData->posY);
+        auto instanceId = sMapMgr.GetContinentInstanceId(cData->position.mapId, cData->position.x, cData->position.y);
 
         // get the map that currently creature belongs to
-        auto map = sMapMgr.FindMap(cData->mapid, instanceId);
+        auto map = sMapMgr.FindMap(cData->position.mapId, instanceId);
 
         if (!map)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] instance %u of map %u not found!", instanceId, cData->mapid);
+            sLog.outError("GameEventMgr: [Dragons of Nightmare] instance %u of map %u not found!", instanceId, cData->position.mapId);
             continue;
         }
 
