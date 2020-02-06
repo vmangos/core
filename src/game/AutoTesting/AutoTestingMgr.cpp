@@ -27,7 +27,7 @@ void SingleTest::Reset()
         // only maps created for the testing are deleted
         if (_map->GetInstanceId() > RESERVED_INSTANCES_LAST)
             sMapMgr.DeleteTestMap(_map);
-        _map = NULL;
+        _map = nullptr;
     }
 }
 
@@ -62,8 +62,9 @@ void SingleTest::ClearObjects()
     Map* map = GetMap();
     if (!map)
         return;
-    for (TestObjectGuids::iterator it = _testObjects.begin(); it != _testObjects.end(); ++it)
-        if (WorldObject* obj = map->GetWorldObject(it->second))
+    for (const auto& itr : _testObjects)
+    { 
+        if (WorldObject* obj = map->GetWorldObject(itr.second))
         {
             if (obj->GetTypeId() == TYPEID_PLAYER)
             {
@@ -73,6 +74,7 @@ void SingleTest::ClearObjects()
             else
                 obj->AddObjectToRemoveList();
         }
+    }
     _testObjects.clear();
     _initializedObjects.clear();
 }
@@ -86,17 +88,17 @@ WorldObject* SingleTest::GetTestObject(uint32 num, uint32 options)
 {
     Map* map = GetMap();
     if (!map)
-        return NULL;
+        return nullptr;
     TestObjectGuids::const_iterator it = _testObjects.find(num);
     if (it == _testObjects.end())
-        return NULL;
+        return nullptr;
     _initializedObjects.insert(num);
     return map->GetWorldObject(it->second);
 }
 
 Unit* SingleTest::GetTestUnit(uint32 num, uint32 options)
 {
-    Unit* unit = NULL;
+    Unit* unit = nullptr;
     bool initialized = _initializedObjects.find(num) != _initializedObjects.end();
     if (WorldObject* obj = GetTestObject(num, options))
         unit = obj->ToUnit();
@@ -114,7 +116,7 @@ Unit* SingleTest::GetTestUnit(uint32 num, uint32 options)
 
 Player* SingleTest::GetTestPlayer(uint32 num, uint32 options)
 {
-    Player* p = NULL;
+    Player* p = nullptr;
     bool initialized = _initializedObjects.find(num) != _initializedObjects.end();
     if (WorldObject* obj = GetTestUnit(num, options))
         p = obj->ToPlayer();
@@ -122,15 +124,15 @@ Player* SingleTest::GetTestPlayer(uint32 num, uint32 options)
         Fail("Unable to find player %u", num);
     if (!initialized)
     {
-        p->SetGodMode(!(options & TESTPLAYER_NO_GODMODE));
-        p->SetOption(PLAYER_CHEAT_UNRANDOMIZE, true);
+        p->SetCheatGod(!(options & TESTPLAYER_NO_GODMODE));
+        //p->SetCheatOption(PLAYER_CHEAT_UNRANDOMIZE, true);
     }
     if (options & TESTPLAYER_FFA_ON)
         p->SetFFAPvP(true);
     if (options & TESTPLAYER_MAXLEVEL)
     {
         p->GiveLevel(60);
-        p->SetPower(p->getPowerType(), p->GetMaxPower(p->getPowerType()));
+        p->SetPower(p->GetPowerType(), p->GetMaxPower(p->GetPowerType()));
         p->SetFullHealth();
     }
     return p;
@@ -138,7 +140,7 @@ Player* SingleTest::GetTestPlayer(uint32 num, uint32 options)
 
 Creature* SingleTest::GetTestCreature(uint32 num, uint32 options)
 {
-    Creature* creature = NULL;
+    Creature* creature = nullptr;
     if (WorldObject* obj = GetTestUnit(num, options))
         creature = obj->ToCreature();
     if (!creature)
@@ -150,7 +152,7 @@ class TestPlayerBotAI : public PlayerCreatorAI
 {
 public:
     TestPlayerBotAI(SingleTest* test, uint32 num, uint8 _race_, uint8 _class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o) :
-        PlayerCreatorAI(NULL, _race_, _class_, mapId, instanceId, x, y, z, o), _test(test), _num(num)
+        PlayerCreatorAI(nullptr, _race_, _class_, mapId, instanceId, x, y, z, o), _test(test), _num(num)
     {
     }
     void OnPlayerLogin()
@@ -172,7 +174,7 @@ void SingleTest::SpawnPlayer(uint32 id, uint8 _class, uint32 _race, float x, flo
 Creature* SingleTest::SpawnCreature(uint32 num, uint32 entry, float x, float y, float z, float o)
 {
     ComputeCoords(x, y, z);
-    Creature* c = NULL;
+    Creature* c = nullptr;
     if (c = GetMap()->SummonCreature(entry, x, y, z, o, TEMPSUMMON_MANUAL_DESPAWN, 0))
     {
         c->SetActiveObjectState(true);
@@ -192,7 +194,7 @@ void SingleTest::DoPlayerCast(uint32 playerIdx, uint32 targetIdx, uint32 spellId
     source->CastSpell(target, spellId, false);
 }
 
-void SingleTest::Fail(const char* err, ...)
+void SingleTest::Fail(char const* err, ...)
 {
     char buffer[256];
     va_list args;
@@ -202,7 +204,7 @@ void SingleTest::Fail(const char* err, ...)
     Finish(false, buffer);
 }
 
-void SingleTest::Finish(bool success, const char* errMsg)
+void SingleTest::Finish(bool success, char const* errMsg)
 {
     _finished = true;
     _failed   = !success;
@@ -213,30 +215,32 @@ void SingleTest::Finish(bool success, const char* errMsg)
 
 void AutoTestingMgr::Update(uint32 diff)
 {
-    for (TestsArray::iterator it = _tests.begin(); it != _tests.end(); ++it)
-        if (!(*it)->Finished())
+    for (const auto& itr : _tests)
+    {
+        if (!itr->Finished())
         {
-            (*it)->Update(diff);
-            if ((*it)->Finished())
+            itr->Update(diff);
+            if (itr->Finished())
             {
-                sLog.outString("TEST: %8s [%20s] %s", (*it)->Failed() ? "FAIL" : "SUCCESS", (*it)->GetName().c_str(), (*it)->GetError().c_str());
-                (*it)->Reset();
+                sLog.outString("TEST: %8s [%20s] %s", itr->Failed() ? "FAIL" : "SUCCESS", itr->GetName().c_str(), itr->GetError().c_str());
+                itr->Reset();
             }
         }
+    }
 }
 
 void AutoTestingMgr::Run(std::string names, ChatHandler* handler)
 {
-    for (TestsArray::iterator it = _tests.begin(); it != _tests.end(); ++it)
+    for (const auto& itr : _tests)
     {
-        if (!(*it)->Finished())
+        if (!itr->Finished())
             continue;
-        std::string currentName = (*it)->GetName();
+        std::string currentName = itr->GetName();
         if (currentName.find(names) != std::string::npos)
         {
             if (handler)
                 handler->PSendSysMessage("Starting test %s", currentName.c_str());
-            (*it)->Setup();
+            itr->Setup();
         }
     }
 }

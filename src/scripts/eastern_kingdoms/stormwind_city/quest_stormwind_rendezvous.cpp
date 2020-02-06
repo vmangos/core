@@ -49,11 +49,11 @@ void npc_reginald_windsorAI::ResetCreature()
         GardeTimer[i] = 0;
         GardeNeed[i] = false;
     }
-    for (uint8 i = 0; i < 30; i++)
-        GardesGUIDs[i] = 0;
+    for (uint64 & guid : GardesGUIDs)
+        guid = 0;
 
-    for (uint8 i = 0; i < 10; i++)
-        DragsGUIDs[i] = 0;
+    for (uint64 & guid : DragsGUIDs)
+        guid = 0;
 }
 
 void npc_reginald_windsorAI::JustDied(Unit* /*pKiller*/)
@@ -87,14 +87,14 @@ void npc_reginald_windsorAI::DoTalk(Unit* pWho, bool yell, Unit* pTarget)
 void npc_reginald_windsorAI::SituationFinale()
 {
     Player* pPlayer = GetPlayer();
-    std::list<Creature*> MobListe;
+    std::list<Creature*> mobList;
 
-    GetCreatureListWithEntryInGrid(MobListe, m_creature, NPC_ONYXIA_ELITE_GUARD, 150.0f);
-    for (auto itr = MobListe.begin(); itr != MobListe.end(); ++itr)
+    GetCreatureListWithEntryInGrid(mobList, m_creature, NPC_ONYXIA_ELITE_GUARD, 150.0f);
+    for (const auto& pMob : mobList)
     {
-        (*itr)->Respawn();
-        (*itr)->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
-        (*itr)->AIM_Initialize();
+        pMob->Respawn();
+        pMob->UpdateEntry(NPC_STORMWIND_ROYAL_GUARD);
+        pMob->AIM_Initialize();
     }
 
     if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
@@ -143,9 +143,9 @@ void npc_reginald_windsorAI::SituationFinale()
     }
 }
 
-void npc_reginald_windsorAI::UpdateAI_corpse(const uint32 uiDiff)
+void npc_reginald_windsorAI::UpdateAI_corpse(uint32 const uiDiff)
 {
-    if (PhaseFinale == false)
+    if (!PhaseFinale)
         return;
 
     if (FinalTimer < uiDiff)
@@ -177,7 +177,7 @@ void npc_reginald_windsorAI::UpdateAI_corpse(const uint32 uiDiff)
     else
         FinalTimer -= uiDiff;
 
-    if (TheEnd == true)
+    if (TheEnd)
     {
         if (FinalTimer < uiDiff)
         {
@@ -212,21 +212,21 @@ uint32 GetRandomGuardText()
 
 void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
 {
-    if (Victim && Victim->isAlive())
+    if (Victim && Victim->IsAlive())
     {
         if (Victim->GetEntry() == NPC_STORMWIND_CITY_GUARD ||
             Victim->GetEntry() == NPC_STORMWIND_ROYAL_GUARD ||
             Victim->GetEntry() == NPC_STORMWIND_CITY_PATROL)
         {
-            if (Victim->GetDistance2d(m_creature) < 8.0f && NeedCheck == true)
+            if (Victim->GetDistance2d(m_creature) < 8.0f && NeedCheck)
             {
                 bool Continuer = true;
-                for (int i = 0; i < 30; i++)
+                for (uint64 guid : GardesGUIDs)
                 {
-                    if (Victim->GetGUID() == GardesGUIDs[i] || m_creature->GetPositionY() < 360)
+                    if (Victim->GetGUID() == guid || m_creature->GetPositionY() < 360)
                         Continuer = false;
                 }
-                if (Continuer == true)
+                if (Continuer)
                 {
                     Victim->SetFacingToObject(m_creature);
                     Victim->HandleEmote(EMOTE_ONESHOT_SALUTE);
@@ -242,13 +242,13 @@ void npc_reginald_windsorAI::MoveInLineOfSight(Unit* Victim)
     }
 }
 
-void npc_reginald_windsorAI::SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpellEntry)
+void npc_reginald_windsorAI::SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry)
 {
     if (pSpellEntry->Id == SPELL_WINDSOR_DEATH)
         m_creature->SetFeignDeath(true);
 }
 
-void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
+void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
 {
     // in case of idle / afk players
     if (m_uiDespawnTimer < uiDiff)
@@ -261,7 +261,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
 
     for (int i = 0; i < 6; i++)
     {
-        if (GardeNeed[i] == true)
+        if (GardeNeed[i])
         {
             if (GardeTimer[i] < uiDiff)
             {
@@ -289,7 +289,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
             if (Creature* pMercutio = m_creature->FindNearestCreature(NPC_MERCUTIO, 10.0f))
             {
                 pMercutio->SetSpeedRate(MOVE_WALK, 2.5f);
-                pMercutio->setFaction(m_creature->getFaction());
+                pMercutio->SetFactionTemplateId(m_creature->GetFactionTemplateId());
                 pMercutio->GetMotionMaster()->MovePoint(0, -9148.395508f, 371.322174f, 90.543655f);
                 pMercutio->ForcedDespawn(12000);
                 m_creature->SetFacingToObject(pMercutio);
@@ -628,14 +628,14 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
                 Onyxia->MonsterSay("Yesss... Guards, come to your lord's aid!");
                 int Var = 0;
                 GetCreatureListWithEntryInGrid(DragListe, Onyxia, NPC_STORMWIND_ROYAL_GUARD, 25.0f);
-                for (auto itr = DragListe.begin(); itr != DragListe.end(); ++itr)
+                for (const auto& itr : DragListe)
                 {
-                    DragsGUIDs[Var] = (*itr)->GetGUID();
-                    (*itr)->UpdateEntry(NPC_ONYXIA_ELITE_GUARD);
-                    (*itr)->AIM_Initialize();
-                    (*itr)->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    DragsGUIDs[Var] = itr->GetGUID();
+                    itr->UpdateEntry(NPC_ONYXIA_ELITE_GUARD);
+                    itr->AIM_Initialize();
+                    itr->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     if (!urand(0, 2))
-                        (*itr)->MonsterTextEmote("Onyxia's Elite Guard hisses.");
+                        itr->MonsterTextEmote("Onyxia's Elite Guard hisses.");
                     Var++;
                 }
             }
@@ -659,7 +659,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
                     {
                         Creature* crea = me->GetMap()->GetCreature(DragsGUIDs[Var]);
                         crea->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        crea->getThreatManager().addThreatDirectly(Bolvar, 5000.0f);
+                        crea->GetThreatManager().addThreatDirectly(Bolvar, 5000.0f);
                         crea->SetTargetGuid(Bolvar->GetGUID());
                         Bolvar->AddThreat(crea);
                         Bolvar->SetInCombatWith(crea);
@@ -737,16 +737,16 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
             Y = m_creature->GetPositionY() - WindsorDeplacement[Var].y;
             Timer = 1000 + sqrt(X * X + Y * Y) / (m_creature->GetSpeed(MOVE_WALK) * 0.001f);
         }
-        else if (PhaseFinale == true)
+        else if (PhaseFinale)
         {
             if (Creature* Bolvar = m_creature->FindNearestCreature(NPC_BOLVAR_FORDRAGON, 150.0f))
             {
-                if (!Bolvar->isInCombat())
+                if (!Bolvar->IsInCombat())
                 {
                     if (!CombatJustEnded)
                     {
                         Bolvar->SetWalk(true);
-                        Bolvar->GetMotionMaster()->MovePoint(0, -8447.39f, 335.35f, 121.747f, 1.29f);
+                        Bolvar->GetMotionMaster()->MovePoint(0, -8447.39f, 335.35f, 121.747f, 0, 0, 1.29f);
                         CombatJustEnded = true;
                         Timer = 5000;
                         Tick = 68;
@@ -761,7 +761,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
         Timer -= uiDiff;
 }
 
-bool QuestAccept_npc_reginald_windsor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_reginald_windsor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_THE_GREAT_MASQUERADE)
     {
@@ -786,7 +786,7 @@ bool GossipHello_npc_reginald_windsor(Player* pPlayer, Creature* pCreature)
     {
         if (pPlayer == pWindsorEventAI->GetPlayer() && pWindsorEventAI->QuestAccepted)
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, 8256, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        else if (pCreature->isQuestGiver())
+        else if (pCreature->IsQuestGiver())
             pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
         pPlayer->SEND_GOSSIP_MENU(5633, pCreature->GetGUID());
@@ -858,7 +858,7 @@ void npc_squire_roweAI::MovementInform(uint32 uiType, uint32 uiPointId)
     }
 }
 
-void npc_squire_roweAI::UpdateAI(const uint32 uiDiff)
+void npc_squire_roweAI::UpdateAI(uint32 const uiDiff)
 {
     if (m_bEventProcessed)
     {
@@ -982,7 +982,7 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
         return false;
 
     // If player is dead, GM mode is ON, quest complete or no quest.
-    if (!pPlayer || !pPlayer->isAlive() || pPlayer->IsGameMaster() ||
+    if (!pPlayer || !pPlayer->IsAlive() || pPlayer->IsGameMaster() ||
         !(pPlayer->IsCurrentQuest(QUEST_STORMWIND_RENDEZVOUS) || (pPlayer->GetQuestRewardStatus(QUEST_STORMWIND_RENDEZVOUS) && !pPlayer->GetQuestRewardStatus(QUEST_THE_GREAT_MASQUERADE) && !pPlayer->IsCurrentQuest(QUEST_THE_GREAT_MASQUERADE))))
         return false;
 
@@ -1025,7 +1025,7 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
 
 void AddSC_quest_stormwind_rendezvous()
 {
-    Script *pNewScript;
+    Script* pNewScript;
 
     pNewScript = new Script;
     pNewScript->Name = "npc_squire_rowe";

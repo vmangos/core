@@ -24,7 +24,7 @@
 
 namespace Movement
 {
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -78,11 +78,11 @@ namespace Movement
             };
 
             inline uint32& raw() { return (uint32&) * this;}
-            inline const uint32& raw() const { return (const uint32&) * this;}
+            inline uint32 const& raw() const { return (uint32 const&) * this;}
 
             MoveSplineFlag() { raw() = 0; }
             MoveSplineFlag(uint32 f) { raw() = f; }
-            MoveSplineFlag(const MoveSplineFlag& f) { raw() = f.raw(); }
+            MoveSplineFlag(MoveSplineFlag const& f) { raw() = f.raw(); }
 
             // Constant interface
 
@@ -136,7 +136,7 @@ namespace Movement
             bool unknown30     : 1;
             bool unknown31     : 1;
     };
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack()
 #else
 #pragma pack(pop)

@@ -168,7 +168,7 @@ uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason)
 
             if (threshold && count >= threshold)
             {
-                if (reason.str() != "")
+                if (!reason.str().empty())
                     reason << "/";
                 reason << GetMovementCheatName(cheatType) << (total ? "(Total:" : "(Tick:") << count << ")";
                 action |= penalty;
@@ -317,7 +317,7 @@ void MovementCheatData::OnExplore(AreaEntry const* pArea)
         AddCheats(1 << CHEAT_TYPE_EXPLORE);
 
     if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED) &&
-        (static_cast<int32>(me->getLevel() + 10) < pArea->AreaLevel))
+        (static_cast<int32>(me->GetLevel() + 10) < pArea->AreaLevel))
         AddCheats(1 << CHEAT_TYPE_EXPLORE_HIGH_LEVEL);
 }
 
@@ -536,7 +536,7 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     }
     
     // Do not accept position changes if player is dead and has not released spirit.
-    if (me->getDeathState() == CORPSE)
+    if (me->GetDeathState() == CORPSE)
     {
         ResetJumpCounters();
         m_knockBack = false;
@@ -699,7 +699,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     if ((currentMoveFlags & MOVEFLAG_ROOT) &&
         !(GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT) &&
         !me->HasPendingMovementChange(ROOT) &&
-        !me->hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) &&
+        !me->HasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) &&
         (opcode != CMSG_FORCE_MOVE_ROOT_ACK))
     {
         APPEND_CHEAT(CHEAT_TYPE_SELF_ROOT);
@@ -726,7 +726,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
 
     // This flag is only for creatures.
     if ((currentMoveFlags & MOVEFLAG_LEVITATING) &&
-        !me->hasUnitState(UNIT_STAT_FLYING_ALLOWED))
+        !me->HasUnitState(UNIT_STAT_FLYING_ALLOWED))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
         removeMoveFlags |= MOVEFLAG_LEVITATING;
@@ -735,7 +735,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     if ((currentMoveFlags & MOVEFLAG_SWIMMING) &&
         (currentMoveFlags & MOVEFLAG_FLYING) &&
         !me->IsTaxiFlying() &&
-        !me->hasUnitState(UNIT_STAT_FLYING_ALLOWED))
+        !me->HasUnitState(UNIT_STAT_FLYING_ALLOWED))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
         removeMoveFlags |= MOVEFLAG_SWIMMING | MOVEFLAG_FLYING;
@@ -830,14 +830,11 @@ bool MovementCheatData::CheckNoFallTime(MovementInfo const& movementInfo, uint16
             m_jumpFlagTime = movementInfo.time;
     }
     
-    if (m_jumpFlagTime &&
+    return m_jumpFlagTime &&
        (m_jumpFlagCount > JUMP_FLAG_THRESHOLD) &&
        (movementInfo.time - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
        (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
-       (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY))
-        return true;
-
-    return false;
+       (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY);
 }
 
 uint32 MovementCheatData::CheckTimeDesync(MovementInfo const& movementInfo)
@@ -913,10 +910,7 @@ bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 
     float const angleRad = atan(deltaZ / deltaXY);
     //float const angleDeg = angleRad * (360 / (M_PI_F * 2));
 
-    if (angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE))
-        return true;
-
-    return false;
+    return angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE);
 }
 
 bool MovementCheatData::CheckForbiddenArea(MovementInfo const& movementInfo) const
@@ -1247,8 +1241,5 @@ bool MovementCheatData::IsTeleportAllowed(MovementInfo const& movementInfo) cons
             maxDistance = std::max(maxDistance, ALLOWED_TRANSPORT_DISTANCE);
     }
 
-    if (distance < maxDistance)
-        return true;
-
-    return false;
+    return distance < maxDistance;
 }

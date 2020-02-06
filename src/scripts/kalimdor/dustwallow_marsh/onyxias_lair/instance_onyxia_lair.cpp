@@ -11,17 +11,17 @@ struct instance_onyxia_lair : public ScriptedInstance
     };
     uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-    void Initialize() { }
+    void Initialize() override { }
 
     bool IsEncounterInProgress() const override
     {
-        for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] == IN_PROGRESS)
+        for (uint32 i : m_auiEncounter)
+            if (i == IN_PROGRESS)
                 return true;
         return false;
     }
 
-    uint32 GetData(uint32 identifier)
+    uint32 GetData(uint32 identifier) override
     {
         switch (identifier)
         {
@@ -49,7 +49,7 @@ InstanceData* GetInstanceData_instance_onyxia_lair(Map* pMap)
 
 void AddSC_instance_onyxia_lair()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "instance_onyxia_lair";

@@ -42,13 +42,13 @@ struct mob_yennikuAI : public ScriptedAI
     uint32 Reset_Timer;
     bool bReset;
 
-    void Reset()
+    void Reset() override
     {
         Reset_Timer = 0;
         m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_NONE);
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -58,30 +58,32 @@ struct mob_yennikuAI : public ScriptedAI
                 m_creature->SetUInt32Value(UNIT_NPC_EMOTESTATE, EMOTE_STATE_STUN);
                 m_creature->CombatStop();                   //stop combat
                 m_creature->DeleteThreatList();             //unsure of this
-                m_creature->setFaction(83);                 //horde generic
+                m_creature->SetFactionTemplateId(83);                 //horde generic
 
                 bReset = true;
                 Reset_Timer = 60000;
             }
         }
-        return;
     }
 
-    void Aggro(Unit *who) {}
+    void Aggro(Unit *who) override {}
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (bReset)
+        {
             if (Reset_Timer < diff)
             {
                 EnterEvadeMode();
                 bReset = false;
-                m_creature->setFaction(28);                     //troll, bloodscalp
+                m_creature->SetFactionTemplateId(28);                     //troll, bloodscalp
             }
-            else Reset_Timer -= diff;
+            else
+                Reset_Timer -= diff;
+        }
 
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -101,13 +103,13 @@ struct mob_assistant_kryll : public ScriptedAI
 
     uint32 Speach_Timer;    
 
-    void Reset()
+    void Reset() override
     {
         Speach_Timer = 360000;
     }
 
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (Speach_Timer < diff)
         {
@@ -141,7 +143,7 @@ struct go_transpolyporterAI: public GameObjectAI
     go_transpolyporterAI(GameObject* pGo) : GameObjectAI(pGo)
     {}
 
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         if (user && user->IsPlayer())
         {
@@ -174,9 +176,9 @@ enum
     SAY_MOLTHOR_3                       = -1000849
 };
 
-static const float heartPosition[4] = { -11818.55f, 1344.4f, 7.93f, 0.0f };
-static const int emitterCount = 5;
-static const float emitterPositions[emitterCount][4] = {
+static float const heartPosition[4] = { -11818.55f, 1344.4f, 7.93f, 0.0f };
+static int const emitterCount = 5;
+static float const emitterPositions[emitterCount][4] = {
     { -11818.55f, 1344.40f,  7.93f, 0.0f }, // Zandalar Isle
     { -11771.92f, 1273.80f,  3.96f, 0.0f },
     { -11881.53f, 1250.42f,  6.72f, 0.0f },
@@ -200,7 +202,7 @@ struct npc_molthorAI : public npc_escortAI
         m_uiPhase = 0;
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         if (uiPointId == 7)
         {
@@ -225,12 +227,12 @@ struct npc_molthorAI : public npc_escortAI
         if (!player)
             return;
 
-        for (int i = 0; i < emitterCount; ++i)
+        for (const auto& emitterPosition : emitterPositions)
         {
-            float x = emitterPositions[i][0];
-            float y = emitterPositions[i][1];
-            float z = emitterPositions[i][2];
-            float o = emitterPositions[i][3];
+            float x = emitterPosition[0];
+            float y = emitterPosition[1];
+            float z = emitterPosition[2];
+            float o = emitterPosition[3];
 
             GameObject *emitter = m_creature->SummonGameObject(GO_HEART_OF_HAKKAR_SPELL_EMITTER, x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, 5000);
             if (emitter) {
@@ -241,7 +243,7 @@ struct npc_molthorAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (m_uiPhase)
         {
@@ -271,7 +273,7 @@ struct npc_molthorAI : public npc_escortAI
                 m_uiTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -283,13 +285,13 @@ CreatureAI* GetAI_npc_molthor(Creature *pCreature)
     return new npc_molthorAI(pCreature);
 }
 
-bool QuestComplete_npc_molthor(Player *pPlayer, Creature *pCreature, const Quest *pQuest)
+bool QuestComplete_npc_molthor(Player *pPlayer, Creature *pCreature, Quest const *pQuest)
 {
     npc_molthorAI *molthorAI = dynamic_cast<npc_molthorAI*>(pCreature->AI());
 
     if (pQuest->GetQuestId() == QUEST_THE_HEART_OF_HAKKAR && molthorAI)
     {
-        molthorAI->Start(false, pPlayer->GetObjectGuid(), NULL, true);
+        molthorAI->Start(false, pPlayer->GetObjectGuid(), nullptr, true);
         pCreature->MonsterSay(SAY_MOLTHOR_1);
     }
 
@@ -314,8 +316,8 @@ enum
     GO_HEART_OF_HAKKAR_OBJECT                   = 180402
 };
 
-static const int servantCount = 4;
-static const float servantPositions[servantCount][4] = {
+static int const servantCount = 4;
+static float const servantPositions[servantCount][4] = {
     {-11817.5f, 1325.0f, 1.46f, 1.58f},
     {-11831.3f, 1331.3f, 1.84f, 0.75f},
     {-11834.8f, 1349.4f, 2.01f, 6.00f},
@@ -340,12 +342,12 @@ struct npc_heart_of_hakkarAI : public ScriptedAI
 
     void SummonServants()
     {
-        for (int i = 0; i < servantCount; ++i)
+        for (const auto& servantPosition : servantPositions)
         {
-            float x = servantPositions[i][0];
-            float y = servantPositions[i][1];
-            float z = servantPositions[i][2];
-            float o = servantPositions[i][3];
+            float x = servantPosition[0];
+            float y = servantPosition[1];
+            float z = servantPosition[2];
+            float o = servantPosition[3];
 
             Creature *servant = m_creature->SummonCreature(NPC_SERVANT_OF_THE_HAND, x, y, z, o, TEMPSUMMON_TIMED_DESPAWN, 30000);
 
@@ -357,7 +359,7 @@ struct npc_heart_of_hakkarAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bInitialized)
         {
@@ -424,7 +426,7 @@ struct npc_servant_of_the_handAI : public ScriptedAI
             m_uiSpawnOutTimer = 0;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiSpawnOutTimer)
         {
@@ -437,7 +439,7 @@ struct npc_servant_of_the_handAI : public ScriptedAI
                 m_uiSpawnOutTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -473,7 +475,7 @@ struct npc_pats_hellfire_guyAI : public ScriptedAI
         m_uiCastDelay = 2000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiCastDelay)
         {
@@ -508,7 +510,7 @@ enum
     MAX_WAVE_COUNT                  = 3
 };
 
-const float ApesSummon[4] =
+float const ApesSummon[4] =
 {
     -13773.6231f, -3.8856f, 41.5641f, 5.7f
 };
@@ -547,7 +549,7 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
 
     void SummonedCreatureDespawn(Creature* pCreature) override
     {
-        if (!m_bStartEvent || !pCreature->isAlive())
+        if (!m_bStartEvent || !pCreature->IsAlive())
             return;
 
         m_bResetEvent = true;
@@ -589,7 +591,7 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
         m_bResetEvent = false;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bStartEvent)
         {
@@ -631,14 +633,14 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
     }
 };
 
-bool QuestRewarded_npc_witch_doctor_unbagwa(Player* /*pPlayer*/, Creature* pCreature, const Quest* pQuest)
+bool QuestRewarded_npc_witch_doctor_unbagwa(Player* /*pPlayer*/, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_STRANHLETHORN_FEVER)
     {
@@ -660,7 +662,7 @@ CreatureAI* GetAI_npc_witch_doctor_unbagwa(Creature* pCreature)
 
 void AddSC_stranglethorn_vale()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "mob_yenniku";

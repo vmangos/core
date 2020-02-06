@@ -37,7 +37,7 @@ DistractMovementGenerator::Initialize(Unit& owner)
     if (!owner.IsStandingUp())
         owner.SetStandState(UNIT_STAND_STATE_STAND);
 
-    owner.addUnitState(UNIT_STAT_DISTRACTED);
+    owner.AddUnitState(UNIT_STAT_DISTRACTED);
 }
 
 void
@@ -50,7 +50,7 @@ DistractMovementGenerator::Finalize(Unit& owner)
         owner.SetFacingTo(angle);
     }
 
-    owner.clearUnitState(UNIT_STAT_DISTRACTED);
+    owner.ClearUnitState(UNIT_STAT_DISTRACTED);
 }
 
 void
@@ -65,7 +65,7 @@ DistractMovementGenerator::Interrupt(Unit& /*owner*/)
 }
 
 bool
-DistractMovementGenerator::Update(Unit& /*owner*/, const uint32& time_diff)
+DistractMovementGenerator::Update(Unit& /*owner*/, uint32 const& time_diff)
 {
     if (time_diff > m_timer)
         return false;
@@ -77,10 +77,10 @@ DistractMovementGenerator::Update(Unit& /*owner*/, const uint32& time_diff)
 void
 AssistanceDistractMovementGenerator::Finalize(Unit &unit)
 {
-    unit.clearUnitState(UNIT_STAT_DISTRACTED);
-    if (Unit* victim = unit.getVictim())
+    unit.ClearUnitState(UNIT_STAT_DISTRACTED);
+    if (Unit* victim = unit.GetVictim())
     {
-        if (unit.isAlive())
+        if (unit.IsAlive())
         {
             unit.AttackStop(true);
             ((Creature*)&unit)->AI()->AttackStart(victim);

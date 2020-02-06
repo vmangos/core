@@ -33,20 +33,19 @@
  ## npc_bunthen_plainswind
  ######*/
 
-enum
+enum BunthenPlainswindData
 {
-    QUEST_SEA_LION_HORDE        = 30,
-    QUEST_SEA_LION_ALLY         = 272,
-    TAXI_PATH_ID_ALLY           = 315,
-    TAXI_PATH_ID_HORDE          = 316
+    QUEST_SEA_LION_HORDE = 30,
+    QUEST_SEA_LION_ALLY  = 272,
+    TAXI_PATH_ID_ALLY    = 315,
+    TAXI_PATH_ID_HORDE   = 316,
+    GOSSIP_ITEM_AQ_END   = 8036,
+    GOSSIP_ITEM_THUNDER  = 12804,
 };
-
-#define GOSSIP_ITEM_THUNDER     "I'd like to fly to Thunder Bluff."
-#define GOSSIP_ITEM_AQ_END      "Do you know where I can find Half Pendant of Aquatic Endurance?"
 
 bool GossipHello_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature)
 {
-    if (pPlayer->getClass() != CLASS_DRUID)
+    if (pPlayer->GetClass() != CLASS_DRUID)
         pPlayer->SEND_GOSSIP_MENU(4916, pCreature->GetGUID());
     else if (pPlayer->GetTeam() != HORDE)
     {
@@ -55,7 +54,7 @@ bool GossipHello_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature)
 
         pPlayer->SEND_GOSSIP_MENU(4917, pCreature->GetGUID());
     }
-    else if (pPlayer->getClass() == CLASS_DRUID && pPlayer->GetTeam() == HORDE)
+    else if (pPlayer->GetClass() == CLASS_DRUID && pPlayer->GetTeam() == HORDE)
     {
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_THUNDER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
@@ -74,7 +73,7 @@ bool GossipSelect_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature, u
         case GOSSIP_ACTION_INFO_DEF + 1:
             pPlayer->CLOSE_GOSSIP_MENU();
 
-            if (pPlayer->getClass() == CLASS_DRUID && pPlayer->GetTeam() == HORDE)
+            if (pPlayer->GetClass() == CLASS_DRUID && pPlayer->GetTeam() == HORDE)
                 pPlayer->ActivateTaxiPathTo(TAXI_PATH_ID_HORDE, 0, true);
 
             break;
@@ -92,10 +91,13 @@ bool GossipSelect_npc_bunthen_plainswind(Player* pPlayer, Creature* pCreature, u
  ## npc_great_bear_spirit
  ######*/
 
-#define GOSSIP_BEAR1 "What do you represent, spirit?"
-#define GOSSIP_BEAR2 "I seek to understand the importance of strength of the body."
-#define GOSSIP_BEAR3 "I seek to understand the importance of strength of the heart."
-#define GOSSIP_BEAR4 "I have heard your words, Great Bear Spirit, and I understand. I now seek your blessings to fully learn the way of the Claw."
+enum
+{
+    GOSSIP_BEAR1 = 7439,
+    GOSSIP_BEAR2 = 7442,
+    GOSSIP_BEAR3 = 7444,
+    GOSSIP_BEAR4 = 7446,
+};
 
 bool GossipHello_npc_great_bear_spirit(Player* pPlayer, Creature* pCreature)
 {
@@ -142,12 +144,15 @@ bool GossipSelect_npc_great_bear_spirit(Player* pPlayer, Creature* pCreature, ui
  ## npc_silva_filnaveth
  ######*/
 
-#define GOSSIP_ITEM_RUTHERAN    "I'd like to fly to Rut'theran Village."
-#define GOSSIP_ITEM_AQ_AGI      "Do you know where I can find Half Pendant of Aquatic Agility?"
+enum
+{
+    GOSSIP_ITEM_RUTHERAN = 7573,
+    GOSSIP_ITEM_AQ_AGI   = 8035,
+};
 
 bool GossipHello_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature)
 {
-    if (pPlayer->getClass() != CLASS_DRUID)
+    if (pPlayer->GetClass() != CLASS_DRUID)
         pPlayer->SEND_GOSSIP_MENU(4913, pCreature->GetGUID());
     else if (pPlayer->GetTeam() != ALLIANCE)
     {
@@ -156,7 +161,7 @@ bool GossipHello_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature)
 
         pPlayer->SEND_GOSSIP_MENU(4915, pCreature->GetGUID());
     }
-    else if (pPlayer->getClass() == CLASS_DRUID && pPlayer->GetTeam() == ALLIANCE)
+    else if (pPlayer->GetClass() == CLASS_DRUID && pPlayer->GetTeam() == ALLIANCE)
     {
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_RUTHERAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
@@ -175,7 +180,7 @@ bool GossipSelect_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature, uint
         case GOSSIP_ACTION_INFO_DEF + 1:
             pPlayer->CLOSE_GOSSIP_MENU();
 
-            if (pPlayer->getClass() == CLASS_DRUID && pPlayer->GetTeam() == ALLIANCE)
+            if (pPlayer->GetClass() == CLASS_DRUID && pPlayer->GetTeam() == ALLIANCE)
                 pPlayer->ActivateTaxiPathTo(TAXI_PATH_ID_ALLY, 0, true);
 
             break;
@@ -193,98 +198,87 @@ bool GossipSelect_npc_silva_filnaveth(Player* pPlayer, Creature* pCreature, uint
  ## npc_keeper_remulos
  ######*/
 
-enum
+enum KeeperRemulosData
 {
-    SPELL_CONJURE_RIFT = 25813, // summon Eranikus
-    SPELL_HEALING_TOUCH = 23381,
-    SPELL_REGROWTH = 20665,
-    SPELL_REJUVENATION = 20664,
-    SPELL_STARFIRE = 21668,
-    SPELL_ERANIKUS_REDEEMED = 25846, // transform Eranikus
-    //SPELL_MOONGLADE_TRANQUILITY = unk, // spell which acts as a spotlight over Eranikus after he is redeemed
+    SPELL_CONJURE_RIFT           = 25813, // summon Eranikus
+    SPELL_HEALING_TOUCH          = 23381,
+    SPELL_REGROWTH               = 20665,
+    SPELL_REJUVENATION           = 20664,
+    SPELL_STARFIRE               = 21668,
+    SPELL_ERANIKUS_REDEEMED      = 25846, // transform Eranikus
+  //SPELL_MOONGLADE_TRANQUILITY  = unk,   // spell which acts as a spotlight over Eranikus after he is redeemed
     SPELL_THROW_NIGHTMARE_OBJECT = 25004,
 
-    NPC_ERANIKUS_TYRANT = 15491,
-    NPC_NIGHTMARE_PHANTASM = 15629, // shadows summoned during the event - should cast 17228 and 21307
-    NPC_REMULOS = 11832,
+    NPC_ERANIKUS_TYRANT     = 15491,
+    NPC_NIGHTMARE_PHANTASM  = 15629, // shadows summoned during the event - should cast 17228 and 21307
+    NPC_REMULOS             = 11832,
     NPC_TYRANDE_WHISPERWIND = 15633, // appears with the priestess during the event to help the players - should cast healing spells
-    NPC_ELUNE_PRIESTESS = 15634,
-    NPC_MALFURION = 15362,
+    NPC_ELUNE_PRIESTESS     = 15634,
+    NPC_MALFURION           = 15362,
 
     QUEST_NIGHTMARE_MANIFESTS = 8736,
-    QUEST_WAKING_LEGENDS = 8447,
+    QUEST_WAKING_LEGENDS      = 8447,
 
     // yells -> in cronological order
-    SAY_REMULOS_INTRO_1 = -1000715, // remulos intro
-    SAY_REMULOS_INTRO_2 = -1000716,
-    SAY_REMULOS_INTRO_3 = -1000717,
-    SAY_REMULOS_INTRO_4 = -1000718,
-    SAY_REMULOS_INTRO_5 = -1000719,
-
-    EMOTE_SUMMON_ERANIKUS = -1000720, // eranikus spawn - world emote
-    SAY_ERANIKUS_SPAWN = -1000721,
-
-    SAY_REMULOS_TAUNT_1 = -1000722, // eranikus and remulos chat
-    EMOTE_ERANIKUS_LAUGH = -1000723,
-    SAY_ERANIKUS_TAUNT_2 = -1000724,
-    SAY_REMULOS_TAUNT_3 = -1000725,
-    SAY_ERANIKUS_TAUNT_4 = -1000726,
-
-    EMOTE_ERANIKUS_ATTACK = -1000727, // start attack
-    SAY_REMULOS_DEFEND_1 = -1000728,
-    SAY_REMULOS_DEFEND_2 = -1000729,
-    SAY_ERANIKUS_SHADOWS = -1000730,
-    SAY_REMULOS_DEFEND_3 = -1000731,
-    SAY_ERANIKUS_ATTACK_1 = -1000732,
-    SAY_ERANIKUS_ATTACK_2 = -1000733,
-    SAY_ERANIKUS_ATTACK_3 = -1000734,
-    SAY_ERANIKUS_KILL = -1000752,
-
-    SAY_TYRANDE_APPEAR = -1000735, // Tyrande appears
-    SAY_TYRANDE_HEAL = -1000736, // yelled by tyrande when healing is needed
-    SAY_TYRANDE_FORGIVEN_1 = -1000737,
-    SAY_TYRANDE_FORGIVEN_2 = -1000738,
-    SAY_TYRANDE_FORGIVEN_3 = -1000739,
-    SAY_ERANIKUS_DEFEAT_1 = -1000740,
-    SAY_ERANIKUS_DEFEAT_2 = -1000741,
-    SAY_ERANIKUS_DEFEAT_3 = -1000742,
-    EMOTE_ERANIKUS_REDEEM = -1000743, // world emote before WotLK //Eranikus, Tyrant of the Dream, is wholly consumed by the Light of Elune. Tranquility sets in over the Moonglade"
-
-    EMOTE_TYRANDE_KNEEL = -1000744,
-    SAY_TYRANDE_REDEEMED = -1000745,
-
-    SAY_REDEEMED_1 = -1000746, // eranikus redeemed
-    SAY_REDEEMED_2 = -1000747,
-    SAY_REDEEMED_3 = -1000748,
-    SAY_REDEEMED_4 = -1000749,
-
-    SAY_REMULOS_OUTRO_1 = -1000750, // remulos outro
-    SAY_REMULOS_OUTRO_2 = -1000751,
-
-
+    SAY_REMULOS_INTRO_1    = 11282, // remulos intro
+    SAY_REMULOS_INTRO_2    = 11283,
+    SAY_REMULOS_INTRO_3    = 11290,
+    SAY_REMULOS_INTRO_4    = 11291,
+    SAY_REMULOS_INTRO_5    = 11292,
+    EMOTE_SUMMON_ERANIKUS  = 11277, // eranikus spawn - world emote
+    SAY_ERANIKUS_SPAWN     = 11030,
+    SAY_REMULOS_TAUNT_1    = 11293, // eranikus and remulos chat
+    EMOTE_ERANIKUS_LAUGH   = 11296,
+    SAY_ERANIKUS_TAUNT_2   = 11294,
+    SAY_REMULOS_TAUNT_3    = 11295,
+    SAY_ERANIKUS_TAUNT_4   = 11297,
+    EMOTE_ERANIKUS_ATTACK  = 11298, // start attack
+    SAY_REMULOS_DEFEND_1   = 11300,
+    SAY_REMULOS_DEFEND_2   = 11301,
+    SAY_ERANIKUS_SHADOWS   = 11299,
+    SAY_REMULOS_DEFEND_3   = 11302,
+    SAY_ERANIKUS_ATTACK_1  = 11304,
+    SAY_ERANIKUS_ATTACK_2  = 11305,
+    SAY_ERANIKUS_ATTACK_3  = 11306,
+    SAY_ERANIKUS_KILL      = 11027,
+    SAY_TYRANDE_APPEAR     = 11309, // Tyrande appears
+    SAY_TYRANDE_HEAL       = 11317, // yelled by tyrande when healing is needed
+    SAY_TYRANDE_FORGIVEN_1 = 11310,
+    SAY_TYRANDE_FORGIVEN_2 = 11311,
+    SAY_TYRANDE_FORGIVEN_3 = 11312,
+    SAY_ERANIKUS_DEFEAT_1  = 11314,
+    SAY_ERANIKUS_DEFEAT_2  = 11315,
+    SAY_ERANIKUS_DEFEAT_3  = 11316,
+    EMOTE_ERANIKUS_REDEEM  = 11313, // world emote before WotLK //Eranikus, Tyrant of the Dream, is wholly consumed by the Light of Elune. Tranquility sets in over the Moonglade"
+    EMOTE_TYRANDE_KNEEL    = 11319,
+    SAY_TYRANDE_REDEEMED   = 11320,
+    SAY_REDEEMED_1         = 11323, // eranikus redeemed
+    SAY_REDEEMED_2         = 11324,
+    SAY_REDEEMED_3         = 11326,
+    SAY_REDEEMED_4         = 11327,
+    SAY_REMULOS_OUTRO_1    = 11303, // remulos outro
+    SAY_REMULOS_OUTRO_2    = 11329,
     // Texts Waking_Legends quest
+    SAY_REMULOS_1          = 10866,
+    SAY_REMULOS_2          = 10867,
+    SAY_REMULOS_3          = 10868,
+    SAY_REMULOS_4          = 10870,
+    SAY_REMULOS_5          = 10872,
+    SAY_REMULOS_6          = 10874,
+    SAY_REMULOS_7          = 10877,
+    SAY_REMULOS_8          = 10879,
+    SAY_MALFURION_1        = 10869,
+    SAY_MALFURION_2        = 10871,
+    SAY_MALFURION_3        = 10873,
+    SAY_MALFURION_4        = 10876,
+    SAY_MALFURION_5        = 10878,
 
-    SAY_REMULOS_1 = -1000672,
-    SAY_REMULOS_2 = -1000673,
-    SAY_REMULOS_3 = -1000674,
-    SAY_REMULOS_4 = -1000676,
-    SAY_REMULOS_5 = -1000678,
-    SAY_REMULOS_6 = -1000680,
-    SAY_REMULOS_7 = -1000683,
-    SAY_REMULOS_8 = -1000684,
-
-    SAY_MALFURION_1 = -1000675,
-    SAY_MALFURION_2 = -1000677,
-    SAY_MALFURION_3 = -1000679,
-    SAY_MALFURION_4 = -1000681,
-    SAY_MALFURION_5 = -1000682,
-
-    POINT_ID_ERANIKUS_FLIGHT = 0,
-    POINT_ID_ERANIKUS_COMBAT = 1,
+    POINT_ID_ERANIKUS_FLIGHT   = 0,
+    POINT_ID_ERANIKUS_COMBAT   = 1,
     POINT_ID_ERANIKUS_REDEEMED = 2,
 
-    MAX_SHADOWS = 4, // the max shadows summoned per turn
-    MAX_SUMMON_TURNS = 10, // There are about 10 summoned shade waves
+    MAX_SHADOWS      = 4, // the max shadows summoned per turn
+    MAX_SUMMON_TURNS = 10 // There are about 10 summoned shade waves
 };
 
 struct EventLocations
@@ -371,7 +365,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
 
     bool m_bIsFirstWave;
 
-    void Reset()
+    void Reset() override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -401,15 +395,15 @@ struct npc_keeper_remulosAI : public npc_escortAI
 
             m_uiMalfurionGUID.Clear();
 
-            for (int j = 0; j < 5; j++)
-                m_uiTabMovementsTimer[j] = 0;
-            for (int k = 0; k < 10; k++)
-                m_uiTabDialogsTimer[k] = 0;
+            for (uint32 & j : m_uiTabMovementsTimer)
+                j = 0;
+            for (uint32 & k : m_uiTabDialogsTimer)
+                k = 0;
         }
     }
 
     // Remulos follows player
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         npc_escortAI::EnterEvadeMode();
         if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_bIsFirstWave)
@@ -422,7 +416,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         switch (pSummoned->GetEntry())
         {
@@ -445,11 +439,10 @@ struct npc_keeper_remulosAI : public npc_escortAI
                 pSummoned->AddAura(10665);
                 pSummoned->AddAura(24999);
                 break;
-
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -473,7 +466,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -495,7 +488,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -508,7 +501,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                     m_creature->SetWalk(true);
                     break;
                 case 1:
-                    m_creature->setFaction(1254); //Alita stop Remulos from healing shades.
+                    m_creature->SetFactionTemplateId(1254); //Alita stop Remulos from healing shades.
                     //1254 is a cenarian circle faction(609), belonging to group 1, has group 8 as ennemies, and is friendly with other cenarian circle guys
                     DoScriptText(SAY_REMULOS_INTRO_2, m_creature);
                     break;
@@ -596,7 +589,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         m_uiOutroTimer = 3000;
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (m_idQuestActive == QUEST_NIGHTMARE_MANIFESTS)
         {
@@ -616,13 +609,8 @@ struct npc_keeper_remulosAI : public npc_escortAI
                             //m_creature->ForcedDespawn(3000);
                             // Alita : piqué ce morceau de code à ScriptedFollowerAI.h, car NON il ne se replaçait pas forcément correctement (p-etre lié à mon code dans evade mode)
                             //Ustaag <Nostalrius> : vilain fix des mobs qui voulaient pas respawn à leur point de spawn
-                            float x = 0.0f;
-                            float y = 0.0f;
-                            float z = 0.0f;
-                            float o = 0.0f;
-                            m_creature->GetHomePosition(x, y, z, o);
-                            //m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(),NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                            m_creature->NearTeleportTo(x, y, z, o);
+                            //m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(),nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                            m_creature->NearTeleportTo(m_creature->GetHomePosition());
                             m_creature->ForcedDespawn();
                             m_uiOutroTimer = 0;
                             break;
@@ -730,7 +718,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
             }
 
             // Combat spells
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
 
             if (m_uiHealTimer < uiDiff)
@@ -770,8 +758,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         npc_escortAI::UpdateAI(uiDiff);
 
@@ -1060,12 +1047,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
                     {
                         if (m_uiQuestComplete <= uiDiff)
                         {
-                            float x = 0.0f;
-                            float y = 0.0f;
-                            float z = 0.0f;
-                            float o = 0.0f;
-                            m_creature->GetHomePosition(x, y, z, o);
-                            m_creature->NearTeleportTo(x, y, z, o);
+                            m_creature->NearTeleportTo(m_creature->GetHomePosition());
                             if (pPlayer->GetQuestStatus(QUEST_WAKING_LEGENDS) == QUEST_STATUS_INCOMPLETE)
                                 pPlayer->GroupEventHappens(QUEST_WAKING_LEGENDS, m_creature);
                             m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
@@ -1088,7 +1070,7 @@ CreatureAI* GetAI_npc_keeper_remulos(Creature* pCreature)
     return new npc_keeper_remulosAI(pCreature);
 }
 
-bool QuestAccept_npc_keeper_remulos(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_keeper_remulos(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     m_idQuestActive = pQuest->GetQuestId();
 
@@ -1130,20 +1112,20 @@ bool EffectDummyCreature_conjure_rift(WorldObject* pCaster, uint32 uiSpellId, Sp
  ## boss_eranikus
  ######*/
 
-enum
+enum EranikusData
 {
     NPC_KEEPER_REMULOS = 11832,
 
-    SPELL_ACID_BREATH = 24839,
-    SPELL_NOXIOUS_BREATH = 24818,
+    SPELL_ACID_BREATH       = 24839,
+    SPELL_NOXIOUS_BREATH    = 24818,
     SPELL_SHADOWBOLT_VOLLEY = 25586,
     SPELL_ARCANE_CHANNELING = 23017, // used by Tyrande - not sure if it's the right id
 
     FACTION_FRIENDLY = 35,
-    MAX_PRIESTESS = 7,
+    MAX_PRIESTESS    = 7,
 
-    POINT_ID_TYRANDE_HEAL = 5,//0,
-    POINT_ID_TYRANDE_ABSOLUTION = 6,//1,
+    POINT_ID_TYRANDE_HEAL       = 5, // 0,
+    POINT_ID_TYRANDE_ABSOLUTION = 6, // 1,
 };
 
 struct boss_eranikusAI : public ScriptedAI
@@ -1167,7 +1149,7 @@ struct boss_eranikusAI : public ScriptedAI
     ObjectGuid m_uiTyrandeGUID;
     std::list<uint64> m_lPriestessList;
 
-    void Reset()
+    void Reset() override
     {
         m_uiAcidBreathTimer = 10000;
         m_uiNoxiousBreathTimer = 3000;
@@ -1185,7 +1167,7 @@ struct boss_eranikusAI : public ScriptedAI
         SetCombatMovement(false);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (m_creature->GetHealthPercent() < 20.0f)
         {
@@ -1194,7 +1176,7 @@ struct boss_eranikusAI : public ScriptedAI
             m_creature->CombatStop(true);
             m_creature->LoadCreatureAddon(true);
 
-            m_creature->SetLootRecipient(NULL);
+            m_creature->SetLootRecipient(nullptr);
 
             // Get Remulos guid and make him stop summoning shades
             if (Creature* pRemulos = GetClosestCreatureWithEntry(m_creature, NPC_REMULOS, 50.0f))
@@ -1211,7 +1193,7 @@ struct boss_eranikusAI : public ScriptedAI
 
             // redeem eranikus
             m_uiEventTimer = 5000;
-            m_creature->setFaction(FACTION_FRIENDLY);
+            m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
         }
         else
@@ -1226,7 +1208,7 @@ struct boss_eranikusAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() != TYPEID_PLAYER)
             return;
@@ -1244,7 +1226,7 @@ struct boss_eranikusAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         switch (pSummoned->GetEntry())
         {
@@ -1259,7 +1241,7 @@ struct boss_eranikusAI : public ScriptedAI
                 m_creature->GetRandomPoint(aTyrandeLocations[1].m_fX, aTyrandeLocations[1].m_fY, aTyrandeLocations[1].m_fZ, 10.0f, fX, fY, fZ);
                 //pSummoned->GetMotionMaster()->MovePoint(POINT_ID_TYRANDE_HEAL, fX, fY, fZ);
                 pSummoned->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_PATHFINDING | MOVE_RUN_MODE);
-                pSummoned->setFaction(495);//Alita : works out ^^'. 495 is an escort faction
+                pSummoned->SetFactionTemplateId(495);//Alita : works out ^^'. 495 is an escort faction
                 break;
         }
     }
@@ -1275,7 +1257,7 @@ struct boss_eranikusAI : public ScriptedAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -1329,7 +1311,7 @@ struct boss_eranikusAI : public ScriptedAI
         }
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE || uiPointId != POINT_ID_ERANIKUS_REDEEMED)
             return;
@@ -1338,7 +1320,7 @@ struct boss_eranikusAI : public ScriptedAI
         m_uiEventTimer = 11000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiEventTimer)
         {
@@ -1409,19 +1391,19 @@ struct boss_eranikusAI : public ScriptedAI
         }
 
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         //Alita : make sure he prefers targets he can hit. TO REMOVE WHEN AGGRO MECANICS WILL DO THE JOB.
-        Unit* pTarget = m_creature->getVictim();
+        Unit* pTarget = m_creature->GetVictim();
 
         if (!m_creature->IsWithinMeleeRange(pTarget))
         {
-            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-            for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+            for (const auto itr : tList)
             {
-                if (Unit* pAttacker = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
+                if (Unit* pAttacker = m_creature->GetMap()->GetUnit(itr->getUnitGuid()))
                     if (m_creature->IsWithinMeleeRange(pAttacker))
-                        m_creature->getThreatManager().modifyThreatPercent(pAttacker, 5);
+                        m_creature->GetThreatManager().modifyThreatPercent(pAttacker, 5);
             }
         }
         // Move Tyrande after she is summoned
@@ -1522,7 +1504,7 @@ CreatureAI* GetAI_boss_eranikus(Creature* pCreature)
 
 void AddSC_moonglade()
 {
-    Script *pNewScript;
+    Script* pNewScript;
 
     pNewScript = new Script;
     pNewScript->Name = "npc_bunthen_plainswind";

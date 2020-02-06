@@ -152,7 +152,7 @@ typedef off_t ACE_OFF_T;
 
 inline float finiteAlways(float f) { return finite(f) ? f : 0.0f; }
 
-#define atol(a) strtoul( a, NULL, 10)
+#define atol(a) strtoul(a, nullptr, 10)
 
 #define STRINGIZE(a) #a
 
@@ -235,7 +235,7 @@ enum DBLocaleConstant : int
 #define MAX_DBC_LOCALE 8
 #define MAX_LOCALE 9
 
-LocaleConstant GetLocaleByName(const std::string& name);
+LocaleConstant GetLocaleByName(std::string const& name);
 LocaleConstant GetDbcLocaleFromDbLocale(DBLocaleConstant localeIndex);
 
 extern char const* localeNames[MAX_LOCALE];
@@ -250,9 +250,9 @@ struct LocaleNameStr
 extern LocaleNameStr const fullLocaleNameList[];
 
 //operator new[] based version of strdup() function! Release memory by using operator delete[] !
-inline char * mangos_strdup(const char * source)
+inline char* mangos_strdup(char const* source)
 {
-    char * dest = new char[strlen(source) + 1];
+    char* dest = new char[strlen(source) + 1];
     strcpy(dest, source);
     return dest;
 }

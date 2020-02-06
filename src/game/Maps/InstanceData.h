@@ -37,20 +37,20 @@ class MANGOS_DLL_SPEC InstanceData : public ZoneScript
 {
     public:
 
-        explicit InstanceData(Map *map) : instance(map) { SetMap(map); }
-        virtual ~InstanceData() {}
+        explicit InstanceData(Map* map) : instance(map) { SetMap(map); }
+        ~InstanceData() override {}
 
-        Map *instance;
+        Map* instance;
 
         //On creation, NOT load.
         virtual void Initialize() {}
 
         //On load
-        virtual void Load(const char* /*data*/) {}
+        virtual void Load(char const* /*data*/) {}
         virtual void Create() {} // A la creation. Pas au chargement.
 
         //When save is needed, this function generates the data
-        virtual const char* Save() { return ""; }
+        virtual char const* Save() { return ""; }
 
         void SaveToDB();
 

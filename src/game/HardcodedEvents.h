@@ -133,9 +133,9 @@ struct DragonsOfNightmare : WorldEvent
     static void CheckSingleVariable(uint32 idx, uint32& value);
 
 private:
-    void GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> &dragons, uint32 &alive, time_t respawnTime);
-    bool LoadDragons(std::vector<ObjectGuid> &dragonGUIDs);
-    //void GetExistingDragons(std::vector<ObjectGuid> &dragonGUIDs, std::vector<Creature*> &existingDragons);
+    void GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid>& dragons, uint32& alive, time_t respawnTime);
+    bool LoadDragons(std::vector<ObjectGuid>& dragonGUIDs);
+    //void GetExistingDragons(std::vector<ObjectGuid>& dragonGUIDs, std::vector<Creature*>& existingDragons);
     void PermutateDragons();
 };
 
@@ -152,7 +152,7 @@ enum DarkmoonState
     DARKMOON_H2 = 5,
 };
 
-static const uint16 DMFValidEvent[] =
+static uint16 const DMFValidEvent[] =
 {
     DARKMOON_A2_INSTALLATION, DARKMOON_A2,
     DARKMOON_H2_INSTALLATION, DARKMOON_H2
@@ -167,7 +167,7 @@ struct DarkmoonFaire : WorldEvent
     void Disable() override;
 
 private:
-    uint32 FindMonthFirstMonday(bool &foireAlly, struct tm *timeinfo);
+    uint32 FindMonthFirstMonday(bool& foireAlly, struct tm *timeinfo);
     DarkmoonState GetDarkmoonState();
 };
 
@@ -219,11 +219,11 @@ public:
     {
     }
 
-    virtual ~BattlePlayerAI ()
+    ~BattlePlayerAI () override
     {
     }
 
-    virtual void OnPlayerLogin();
+    void OnPlayerLogin() override;
 
 };
 
@@ -254,7 +254,7 @@ private:
     std::vector <BotEventInfo> Bots;
 
     std::vector <Creature*> SummonedMobs;
-    const WorldLocation EventPos = WorldLocation(1, -8065.42f, 1527.93f, 2.61001f);
+    WorldLocation const EventPos = WorldLocation(1, -8065.42f, 1527.93f, 2.61001f);
 };
 
 struct ScourgeInvasionEvent : WorldEvent
@@ -301,7 +301,7 @@ private:
     bool ResumeInvasion(uint32 zoneId);
     bool SummonNecropolis(Map* pMap, InvasionNecropolis& point);
 
-    Map* GetMap(uint32 mapId, const InvasionNecropolis& invZone);
+    Map* GetMap(uint32 mapId, InvasionNecropolis const& invZone);
     bool isValidZoneId(uint32 zoneId);
     InvasionZone* GetZone(uint32 zoneId);
     uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);

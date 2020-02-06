@@ -412,6 +412,13 @@ bool ChatHandler::HandleServerCorpsesCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleServerResetAllRaidCommand(char* /*args*/)
+{
+    SendSysMessage("Global raid instances reset, all players in raid instances will be teleported to homebind!");
+    sMapPersistentStateMgr.GetScheduler().ResetAllRaid();
+    return true;
+}
+
 bool ChatHandler::HandleServerShutDownCancelCommand(char* /*args*/)
 {
     sWorld.ShutdownCancel();
@@ -607,7 +614,7 @@ bool ChatHandler::HandleGroupAddSpellCommand(char *args)
         return false;
     }
     LocaleConstant loc = GetSessionDbcLocale();
-    ShowSpellListHelper(NULL, pSpell, loc);
+    ShowSpellListHelper(nullptr, pSpell, loc);
 
     WorldDatabase.PExecute("INSERT INTO `spell_group` SET id=%u, spell_id=%u", groupId, spellId);
     PSendSysMessage("Spell added to group %u in DB.", groupId);
@@ -712,8 +719,8 @@ bool ChatHandler::HandleEventInfoCommand(char* args)
     std::string endTimeStr = TimeToTimestampStr(eventData.end);
 
     uint32 delay = sGameEventMgr.NextCheck(event_id);
-    time_t nextTime = time(NULL) + delay;
-    std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(time(NULL) + delay) : "-";
+    time_t nextTime = time(nullptr) + delay;
+    std::string nextStr = nextTime >= eventData.start && nextTime < eventData.end ? TimeToTimestampStr(time(nullptr) + delay) : "-";
 
     std::string occurenceStr = secsToTimeString(eventData.occurence * MINUTE);
     std::string lengthStr = secsToTimeString(eventData.length * MINUTE);
@@ -1814,10 +1821,10 @@ bool ChatHandler::HandleReloadFactionChangeMounts(char*)
     return true;
 }
 
-bool ChatHandler::HandleReloadCreatureModelInfo(char*)
+bool ChatHandler::HandleReloadCreatureDisplayInfoAddon(char*)
 {
-    sObjectMgr.LoadCreatureModelInfo();
-    SendSysMessage(">> Table `creature_model_info` reloaded.");
+    sObjectMgr.LoadCreatureDisplayInfoAddon();
+    SendSysMessage(">> Table `creature_display_info_addon` reloaded.");
     return true;
 }
 

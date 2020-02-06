@@ -32,7 +32,7 @@
 #include "Detour/Include/DetourNavMeshQuery.h"
 
 //  memory management
-inline void* dtCustomAlloc(int size, dtAllocHint /*hint*/)
+inline void* dtCustomAlloc(size_t size, dtAllocHint /*hint*/)
 {
     return (void*)new unsigned char[size];
 }
@@ -54,8 +54,8 @@ namespace MMAP
         MMapData(dtNavMesh* mesh) : navMesh(mesh) {}
         ~MMapData()
         {
-            for (NavMeshQuerySet::iterator i = navMeshQueries.begin(); i != navMeshQueries.end(); ++i)
-                dtFreeNavMeshQuery(i->second);
+            for (const auto& itr : navMeshQueries)
+                dtFreeNavMeshQuery(itr.second);
 
             if (navMesh)
                 dtFreeNavMesh(navMesh);
@@ -96,7 +96,7 @@ namespace MMAP
             uint32 getLoadedMapsCount() const { return loadedMMaps.size(); }
         private:
             bool loadMapData(uint32 mapId);
-            uint32 packTileID(int32 x, int32 y);
+            static uint32 packTileID(int32 x, int32 y);
 
             MMapDataSet loadedMMaps;
             ACE_RW_Mutex loadedMMaps_lock;

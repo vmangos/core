@@ -15,7 +15,7 @@
 
 
 
-void AdvancedPlayerBotAI::UpdateAI(const uint32 delta)
+void AdvancedPlayerBotAI::UpdateAI(uint32 const delta)
 {
     PlayerCreatorAI::UpdateAI(delta);
 
@@ -29,7 +29,7 @@ void AdvancedPlayerBotAI::UpdateAI(const uint32 delta)
     }
 }
 
-void AdvancedPlayerBotAI::CommonAI(const uint32 delta)
+void AdvancedPlayerBotAI::CommonAI(uint32 const delta)
 {
     //first - conditions
     GatherConditions();
@@ -39,7 +39,7 @@ void AdvancedPlayerBotAI::CommonAI(const uint32 delta)
     {
         if (Conditions.IsResurrectRequested)
         {
-            WorldPacket ResurrectAnswer(CMSG_RESURRECT_RESPONSE);
+            //WorldPacket ResurrectAnswer(CMSG_RESURRECT_RESPONSE);
             me->ResurectUsingRequestData();
         }
         return;
@@ -81,7 +81,7 @@ void AdvancedPlayerBotAI::CommonAI(const uint32 delta)
     }
 }
 
-void AdvancedPlayerBotAI::WarriorAI(const uint32 delta)
+void AdvancedPlayerBotAI::WarriorAI(uint32 const delta)
 {
     //alright, react first to nearest attacker, then our target
     //first of all - if we not on battle stance - ENABLE
@@ -101,7 +101,7 @@ void AdvancedPlayerBotAI::WarriorAI(const uint32 delta)
     else
     {
         //Search
-        if (me->getVictim() == nullptr)
+        if (me->GetVictim() == nullptr)
         {
             if (Unit* NewTarget = me->SelectNearestTarget(50.0f))
             {
@@ -111,7 +111,7 @@ void AdvancedPlayerBotAI::WarriorAI(const uint32 delta)
         }
         else
         {
-            WarriorAttackTarget(me->getVictim());
+            WarriorAttackTarget(me->GetVictim());
         }
     }
 }
@@ -125,7 +125,7 @@ void AdvancedPlayerBotAI::WarriorAttackTarget(Unit* NearestAttacker)
     {
         uint32 Rage = me->GetPower(POWER_RAGE);
 
-        const ObjectGuid& TargetGuid = me->GetTargetGuid();
+        ObjectGuid const& TargetGuid = me->GetTargetGuid();
         if (TargetGuid != NearestAttacker->GetObjectGuid())
         {
             me->Attack(NearestAttacker, true);
@@ -168,22 +168,22 @@ void AdvancedPlayerBotAI::WarriorAttackTarget(Unit* NearestAttacker)
     }
 }
 
-void AdvancedPlayerBotAI::PaladinAI(const uint32 delta)
+void AdvancedPlayerBotAI::PaladinAI(uint32 const delta)
 {
 
 }
 
-void AdvancedPlayerBotAI::HunterAI(const uint32 delta)
+void AdvancedPlayerBotAI::HunterAI(uint32 const delta)
 {
 
 }
 
-void AdvancedPlayerBotAI::RogueAI(const uint32 delta)
+void AdvancedPlayerBotAI::RogueAI(uint32 const delta)
 {
 
 }
 
-void AdvancedPlayerBotAI::PriestAI(const uint32 delta)
+void AdvancedPlayerBotAI::PriestAI(uint32 const delta)
 {
     //if we already cast something - no need to update
     if (me->IsNonMeleeSpellCasted(false)) return;
@@ -191,12 +191,12 @@ void AdvancedPlayerBotAI::PriestAI(const uint32 delta)
 
 }
 
-void AdvancedPlayerBotAI::ShamanAI(const uint32 delta)
+void AdvancedPlayerBotAI::ShamanAI(uint32 const delta)
 {
 
 }
 
-void AdvancedPlayerBotAI::WarlockAI(const uint32 delta)
+void AdvancedPlayerBotAI::WarlockAI(uint32 const delta)
 {
     //if we already cast something - no need to update
     if (me->IsNonMeleeSpellCasted(false)) return;
@@ -218,7 +218,7 @@ void AdvancedPlayerBotAI::WarlockAI(const uint32 delta)
     else
     {
         //Search
-        if (me->getVictim() == nullptr)
+        if (me->GetVictim() == nullptr)
         {
             if (Unit* NewTarget = me->SelectNearestTarget(50.0f))
             {
@@ -227,7 +227,7 @@ void AdvancedPlayerBotAI::WarlockAI(const uint32 delta)
         }
         else
         {
-            WarlockBattleAI(me->getVictim());
+            WarlockBattleAI(me->GetVictim());
         }
     }
 
@@ -238,7 +238,7 @@ void AdvancedPlayerBotAI::WarlockBattleAI(Unit* NearestAttacker)
     me->SetFacingToObject(NearestAttacker);
     me->SetInFront(NearestAttacker);
 
-    const ObjectGuid& TargetGuid = me->GetTargetGuid();
+    ObjectGuid const& TargetGuid = me->GetTargetGuid();
     if (TargetGuid != NearestAttacker->GetObjectGuid())
     {
         me->Attack(NearestAttacker, true);
@@ -255,8 +255,6 @@ void AdvancedPlayerBotAI::WarlockBattleAI(Unit* NearestAttacker)
 
     if (!me->movespline->Finalized())
         me->StopMoving();
-
-    uint32 mana = me->GetPower(POWER_MANA);
 
     float RandFactor = frand(0.0f, 1.0f);
 
@@ -283,7 +281,7 @@ void AdvancedPlayerBotAI::WarlockBattleAI(Unit* NearestAttacker)
     }
 }
 
-void AdvancedPlayerBotAI::DruidAI(const uint32 delta)
+void AdvancedPlayerBotAI::DruidAI(uint32 const delta)
 {
 
 }
@@ -296,17 +294,17 @@ enum
     AURA_REGEN_MANA = 430,
 };
 
-void AdvancedPlayerBotAI::MageAI(const uint32 delta)
+void AdvancedPlayerBotAI::MageAI(uint32 const delta)
 {
     //if we already cast something - no need to update
     if (me->IsNonMeleeSpellCasted(false)) return;
 
-    float range = me->isInCombat() ? 30.0f : frand(15, 30);
+    float range = me->IsInCombat() ? 30.0f : frand(15, 30);
     Unit* target = me->SelectNearestTarget(range);
     if (target && !me->IsWithinLOSInMap(target))
-        target = NULL;
+        target = nullptr;
     // OOM ?
-    if (me->GetPower(POWER_MANA) < 40 && target && me->isInCombat())
+    if (me->GetPower(POWER_MANA) < 40 && target && me->IsInCombat())
     {
         if (me->Attack(target, true))
             me->GetMotionMaster()->MoveChase(target);
@@ -319,7 +317,7 @@ void AdvancedPlayerBotAI::MageAI(const uint32 delta)
     if (!me->HasSpellCooldown(SPELL_FROST_NOVA) && me->GetPower(POWER_MANA) > 50)
         if (nearTarget)
             me->CastSpell(me, SPELL_FROST_NOVA, false);
-    if (nearTarget && target->hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (nearTarget && target->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
     {
         // already runing
         if (!me->movespline->Finalized())
@@ -354,7 +352,7 @@ void AdvancedPlayerBotAI::MageAI(const uint32 delta)
         return;
     }
     /// OUT OF COMBAT REGEN
-    if (!me->isInCombat() && me->GetPower(POWER_MANA) < 150)
+    if (!me->IsInCombat() && me->GetPower(POWER_MANA) < 150)
     {
         if (!me->movespline->Finalized())
             me->StopMoving();
@@ -367,7 +365,7 @@ void AdvancedPlayerBotAI::GatherConditions()
 {
     SeenCreature = nullptr;
 
-    Conditions.IsDead = me->isDead();
+    Conditions.IsDead = me->IsDead();
     if (Conditions.IsDead) 
     {
         Conditions.IsResurrectRequested = me->IsRessurectRequested();
@@ -395,12 +393,12 @@ void AdvancedPlayerBotAI::GatherConditions()
     }
 
     //Is attacked?
-    Conditions.IsAttacked = me->isInCombat();
+    Conditions.IsAttacked = me->IsInCombat();
 
     if (Conditions.IsAttacked)
     {
-        Unit::AttackerSet AttackerTable = me->getAttackers();
-        if (AttackerTable.size() == 0)
+        Unit::AttackerSet AttackerTable = me->GetAttackers();
+        if (AttackerTable.empty())
         {
             Conditions.IsAttacked = false;
         }
@@ -411,8 +409,8 @@ void AdvancedPlayerBotAI::GatherConditions()
 
 Unit* AdvancedPlayerBotAI::PickNearestAttacker()
 {
-    Unit::AttackerSet AttackerTable = me->getAttackers();
-    if (AttackerTable.size() > 0)
+    Unit::AttackerSet AttackerTable = me->GetAttackers();
+    if (!AttackerTable.empty())
     {
         //pick nearest
         Unit* NearestUnit = nullptr;

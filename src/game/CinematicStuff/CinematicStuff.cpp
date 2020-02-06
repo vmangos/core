@@ -3,7 +3,7 @@
 #include "Player.h"
 #include "ObjectMgr.h"
 #include "MoveMapSharedDefines.h"
-
+#include "WorldPacket.h"
 
 void CinematicStuff::AddStuff(Player* player, uint32 itemID)
 {
@@ -25,7 +25,7 @@ void CinematicStuff::AddStuff(Player* player, uint32 itemID)
 void CinematicStuff::AddSpells(Player* player)
 {
     uint32 familyName = 0;
-    switch (player->getClass())
+    switch (player->GetClass())
     {
         case CLASS_MAGE:
             familyName = SPELLFAMILY_MAGE;
@@ -57,8 +57,8 @@ void CinematicStuff::AddSpells(Player* player)
     }
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
     {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
-        if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->getLevel())
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(id);
+        if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->GetLevel())
             player->LearnSpell(id, false);
     }
 }
@@ -69,11 +69,11 @@ void CinematicStuff::Mount(Player* p, uint32 mountItem)
     {
         // search spell for spell error
         uint32 spellid = 0;
-        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+        for (const auto& spell : item->GetProto()->Spells)
         {
-            if (item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+            if (spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
             {
-                spellid = item->GetProto()->Spells[i].SpellId;
+                spellid = spell.SpellId;
                 break;
             }
         }
@@ -83,7 +83,7 @@ void CinematicStuff::Mount(Player* p, uint32 mountItem)
 
 void CinematicStuff::StuffLevel60(Player* player)
 {
-    switch (player->getClass())
+    switch (player->GetClass())
     {
         case CLASS_WARLOCK:
             AddStuff(player, 16931);
@@ -149,7 +149,7 @@ void CinematicStuff::StuffLevel60(Player* player)
 void CinematicStuff::AutoMountPlayer(Player* player, bool mount60 /*= false*/)
 {
     uint32 mount = 0;
-    switch (player->getRace())
+    switch (player->GetRace())
     {
         case RACE_HUMAN:
             mount = 18776;
@@ -213,31 +213,31 @@ void CinematicStuff::JumpPlayer(Player* player)
 
 void CinematicStuff::SearchAndDestroy(Player* player)
 {
-    if (!player->isAlive()) return;
+    if (!player->IsAlive()) return;
 
-    Unit* target = player->getVictim();
+    Unit* target = player->GetVictim();
     if (target == nullptr)
     {
-        if (!player->isInCombat())
+        if (!player->IsInCombat())
             target = player->SelectRandomUnfriendlyTarget(nullptr, DEFAULT_VISIBILITY_DISTANCE);
         else
         {
-            target = player->getVictim();
+            target = player->GetVictim();
             if (target == nullptr)
             {
-                const std::set<Unit*> attackers = player->getAttackers();
-                if (attackers.size() > 0)
+                std::set<Unit*> const attackers = player->GetAttackers();
+                if (!attackers.empty())
                     target = *attackers.begin();
             }
         }
     }
 
-    if (target != nullptr && target->isAlive())
+    if (target != nullptr && target->IsAlive())
     {
         player->GetMotionMaster()->MoveChase(target);
         player->SetFacingToObject(target);
         player->SetInFront(target);
-        player->Attack(target, player->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+        player->Attack(target, player->IsInRange(target, 0, MELEE_RANGE));
     }
     else
     {

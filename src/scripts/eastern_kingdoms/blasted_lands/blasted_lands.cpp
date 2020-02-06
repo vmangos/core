@@ -57,7 +57,7 @@ struct ThadiusGrimshadeAI : public ScriptedAI
     uint64 grimshadeGUID;
     uint64 playerGUID;
 
-    void Reset()
+    void Reset() override
     {
     }
 
@@ -70,7 +70,7 @@ struct ThadiusGrimshadeAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (underEvent)
         {
@@ -177,7 +177,7 @@ bool GOHello_go_stone_of_binding(Player* pPlayer, GameObject* pGo)
 }
 void AddSC_blasted_lands()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_thadius_grimshade";

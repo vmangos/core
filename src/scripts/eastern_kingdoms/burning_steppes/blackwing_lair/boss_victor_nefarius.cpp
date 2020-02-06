@@ -81,7 +81,7 @@ struct SpawnLocation
     float m_fX, m_fY, m_fZ;
 };
 
-static const SpawnLocation aNefarianLocs[5] =
+static SpawnLocation const aNefarianLocs[5] =
 {
     { -7599.32f, -1191.72f, 475.545f},                      // opening where red/blue/black darknid spawner appear (ori 3.05433)
     { -7526.27f, -1135.04f, 473.445f},                      // same as above, closest to door (ori 5.75959)
@@ -90,7 +90,7 @@ static const SpawnLocation aNefarianLocs[5] =
     { -7502.002f, -1256.503f, 486.758f}                    // nefarian fly to this position
 };
 
-static const uint32 aPossibleDrake[MAX_DRAKES] = {NPC_BRONZE_DRAKANOID, NPC_BLUE_DRAKANOID, NPC_RED_DRAKANOID, NPC_GREEN_DRAKANOID, NPC_BLACK_DRAKANOID};
+static uint32 const aPossibleDrake[MAX_DRAKES] = {NPC_BRONZE_DRAKANOID, NPC_BLUE_DRAKANOID, NPC_RED_DRAKANOID, NPC_GREEN_DRAKANOID, NPC_BLACK_DRAKANOID};
 
 //This script is complicated
 //Instead of morphing Victor Nefarius we will have him control phase 1
@@ -115,7 +115,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         // select two different numbers between 0..MAX_DRAKES-1
         if (m_pInstance)
         {
-            const int NUM_DRAKES = sizeof(aPossibleDrake) / sizeof(aPossibleDrake[0]);
+            int const NUM_DRAKES = sizeof(aPossibleDrake) / sizeof(aPossibleDrake[0]);
             uint32 drakesType = m_pInstance->GetData64(DATA_NEF_COLOR);
             m_uiDrakeTypeOne = aPossibleDrake[drakesType % NUM_DRAKES];
             int idx2 = drakesType / NUM_DRAKES;
@@ -127,9 +127,9 @@ struct boss_victor_nefariusAI : ScriptedAI
         boss_victor_nefariusAI::Reset();
     }
 
-    const uint32 MAX_SCEPTER_RUN_TIME = 5 * HOUR * IN_MILLISECONDS;
-    const uint32 SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
-    const uint32 SCEPTER_TAUNT_OFFSET = SCEPTER_TAUNT_INTERVAL / 2;
+    uint32 const MAX_SCEPTER_RUN_TIME = 5 * HOUR * IN_MILLISECONDS;
+    uint32 const SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
+    uint32 const SCEPTER_TAUNT_OFFSET = SCEPTER_TAUNT_INTERVAL / 2;
 
     ScriptedInstance* m_pInstance;
 
@@ -191,7 +191,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         scepterRun = false;
         watchScepterRun = false;
 
-        m_creature->setFaction(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
 
         // set gossip flag to begin the event
         m_creature->SetStandState(UNIT_STAND_STATE_SIT_LOW_CHAIR);
@@ -259,7 +259,7 @@ struct boss_victor_nefariusAI : ScriptedAI
 
     void JustReachedHome() override
     {
-        m_creature->setFaction(FACTION_FRIENDLY);
+        m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
         if (m_pInstance)
@@ -267,8 +267,8 @@ struct boss_victor_nefariusAI : ScriptedAI
 
         std::list<GameObject*> lGameObjects;
         m_creature->GetGameObjectListWithEntryInGrid(lGameObjects, GO_DRAKONID_BONES, 250.0f);
-        for (auto itr = lGameObjects.begin(); itr != lGameObjects.end(); ++itr)
-            (*itr)->DeleteLater();
+        for (const auto& pGo : lGameObjects)
+            pGo->DeleteLater();
 
         // @TODO: Find out why there is this reset bug !!
         //m_creature->SetRespawnDelay(900); // 15mn 900
@@ -317,7 +317,7 @@ struct boss_victor_nefariusAI : ScriptedAI
             ++m_uiKilledAdds;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (NefaEventStart && !phase1)
         {
@@ -336,12 +336,12 @@ struct boss_victor_nefariusAI : ScriptedAI
                         break;
                     case 3:
                         DoCastSpellIfCan(m_creature, SPELL_NEFARIUS_BARRIER);
-                        m_creature->setFaction(FACTION_BLACK_DRAGON);
+                        m_creature->SetFactionTemplateId(FACTION_BLACK_DRAGON);
 
                         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-                        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-                            if (i->getSource() && i->getSource()->isAlive())
-                                m_creature->AddThreat(i->getSource(), 10000.0f);
+                        for (const auto& i : liste)
+                            if (i.getSource() && i.getSource()->IsAlive())
+                                m_creature->AddThreat(i.getSource(), 10000.0f);
 
                         DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED); // root
                         break;
@@ -373,7 +373,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         }
 
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (phase2bis)
@@ -461,7 +461,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         // Shadowbolt Timer
         if (m_uiShadowBoltTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT) == CAST_OK)
                 m_uiShadowBoltTimer = urand(3000, 10000);
         }
         else
@@ -470,7 +470,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         // Shadowbolt Volley Timer
         if (m_uiShadowBoltVolleyTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT_VOLLEY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT_VOLLEY) == CAST_OK)
                 m_uiShadowBoltVolleyTimer = 15000;
         }
         else
@@ -531,8 +531,8 @@ struct boss_victor_nefariusAI : ScriptedAI
             {
                 if (!pTarget->HasAura(SPELL_SHADOW_COMMAND))
                 {
-                    m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
-                    m_creature->getThreatManager().addThreatDirectly(pTarget, m_uiMindControledPlayerAggro);
+                    m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
+                    m_creature->GetThreatManager().addThreatDirectly(pTarget, m_uiMindControledPlayerAggro);
                     DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED);    // Root self
                     m_uiMindControledPlayerGuid.Clear();
                     m_uiMindControledPlayerAggro = 0;
@@ -551,7 +551,7 @@ struct boss_victor_nefariusAI : ScriptedAI
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
             {
                 m_uiMindControledPlayerGuid = pTarget->GetObjectGuid();
-                m_uiMindControledPlayerAggro = m_creature->getThreatManager().getThreat(pTarget);
+                m_uiMindControledPlayerAggro = m_creature->GetThreatManager().getThreat(pTarget);
                 if (DoCastSpellIfCan(pTarget, SPELL_SHADOW_COMMAND, CF_AURA_NOT_PRESENT) == CAST_OK)
                     m_uiMindControlTimer = urand(25000, 40000);
             }

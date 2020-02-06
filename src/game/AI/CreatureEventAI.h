@@ -23,11 +23,10 @@
 #define MANGOS_CREATURE_EAI_H
 
 #include "Common.h"
-#include "Creature.h"
 #include "CreatureAI.h"
-#include "Unit.h"
-#include "ScriptMgr.h"
 
+class Unit;
+class Creature;
 class Player;
 class WorldObject;
 
@@ -285,7 +284,7 @@ struct CreatureEventAIHolder
 class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
 {
     public:
-        explicit CreatureEventAI(Creature *c);
+        explicit CreatureEventAI(Creature* c);
         ~CreatureEventAI()
         {
             m_CreatureEventAIList.clear();
@@ -296,25 +295,25 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void JustRespawned() override;
         void Reset();
         void JustReachedHome() override;
-        void EnterCombat(Unit *enemy) override;
+        void EnterCombat(Unit* enemy) override;
         void EnterEvadeMode() override;
         void OnCombatStop() override;
         void JustDied(Unit* killer) override;
         void KilledUnit(Unit* victim) override;
         void JustSummoned(Creature* pUnit) override;
-        void AttackStart(Unit *who) override;
-        void MoveInLineOfSight(Unit *who) override;
-        void SpellHit(Unit* pUnit, const SpellEntry* pSpell) override;
+        void AttackStart(Unit* who) override;
+        void MoveInLineOfSight(Unit* who) override;
+        void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override;
         void MovementInform(uint32 type, uint32 id) override;
         void DamageTaken(Unit* done_by, uint32& damage) override;
-        void UpdateAI(const uint32 diff) override;
+        void UpdateAI(uint32 const diff) override;
         void ReceiveEmote(Player* pPlayer, uint32 text_emote) override;
         void GroupMemberJustDied(Creature* unit, bool isLeader) override;
         void SummonedCreatureJustDied(Creature* unit) override;
         void SummonedCreatureDespawn(Creature* unit) override;
         void MapScriptEventHappened(ScriptedEvent* pEvent, uint32 uiData) override;
 
-        static int Permissible(const Creature *);
+        static int Permissible(Creature const*);
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker = nullptr);
         void ProcessAction(ScriptMap* action, uint32 EventId, Unit* pActionInvoker);
@@ -335,7 +334,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         uint32 m_InvinceabilityHpLevel;                     // Minimal health level allowed at damage apply
         bool m_bCanSummonGuards;
 
-        void UpdateEventsOn_UpdateAI(const uint32 diff, bool Combat);
+        void UpdateEventsOn_UpdateAI(uint32 const diff, bool Combat);
         void UpdateEventsOn_MoveInLineOfSight(Unit* pWho);
 };
 

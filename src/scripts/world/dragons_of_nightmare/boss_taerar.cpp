@@ -102,7 +102,7 @@ void boss_taerarAI::DoUnbanish()
     m_uiShadesDead = 0;
 }
 
-bool boss_taerarAI::UpdateDragonAI(const uint32 uiDiff)
+bool boss_taerarAI::UpdateDragonAI(uint32 const uiDiff)
 {
     if (m_uiShadesTimeoutTimer)
     {
@@ -154,11 +154,11 @@ void npc_shade_of_taerarAI::Reset()
     m_uiPoisonCloudTimer = urand(8000, 15000);
 }
 
-void npc_shade_of_taerarAI::UpdatePetAI(const uint32 uiDiff)
+void npc_shade_of_taerarAI::UpdatePetAI(uint32 const uiDiff)
 {
     if (m_uiAcidBreathTimer <= uiDiff)
     {
-        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_BREATH) == CAST_OK)
+        if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ACID_BREATH) == CAST_OK)
             m_uiAcidBreathTimer = urand(10000, 15000);
     }
     else

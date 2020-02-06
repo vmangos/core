@@ -27,11 +27,11 @@
 #include "Object.h"
 #include "LootMgr.h"
 #include "Database/DatabaseEnv.h"
-#include <mutex>
+#include <ace/Thread_Mutex.h>
 #include "Util.h"
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack(1)
 #else
 #pragma pack(push,1)
@@ -43,7 +43,7 @@ struct GameObjectInfo
     uint32  id;
     uint32  type;
     uint32  displayId;
-    char   *name;
+    char  * name;
     uint32  faction;
     uint32  flags;
     float   size;
@@ -260,6 +260,9 @@ struct GameObjectInfo
             uint32 spellId;                                 //0
             uint32 charges;                                 //1
             uint32 partyOnly;                               //2
+            uint32 allowMounted;                            //3 Is usable while on mount/vehicle. (0/1)
+            uint32 large;                                   //4
+            uint32 conditionID1;                            //5
         } spellcaster;
         //23 GAMEOBJECT_TYPE_MEETINGSTONE
         struct
@@ -361,6 +364,19 @@ struct GameObjectInfo
         }
     }
 
+    bool IsUsableMounted() const
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_MAILBOX: return true;
+            case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.allowMounted != 0;
+            case GAMEOBJECT_TYPE_TEXT: return text.allowMounted != 0;
+            case GAMEOBJECT_TYPE_GOOBER: return goober.allowMounted != 0;
+            case GAMEOBJECT_TYPE_SPELLCASTER: return spellcaster.allowMounted != 0;
+            default: return false;
+        }
+    }
+
     uint32 GetLockId() const
     {
         switch(type)
@@ -391,6 +407,21 @@ struct GameObjectInfo
             case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.noDamageImmune;
             case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.noDamageImmune;
             default: return true;
+        }
+    }
+
+    bool CannotBeUsedUnderImmunity() const // Cannot be used/activated/looted by players under immunity effects (example: Divine Shield)
+    {
+        switch (type)
+        {
+            case GAMEOBJECT_TYPE_DOOR:       return door.noDamageImmune != 0;
+            case GAMEOBJECT_TYPE_BUTTON:     return button.noDamageImmune != 0;
+            case GAMEOBJECT_TYPE_QUESTGIVER: return questgiver.noDamageImmune != 0;
+            case GAMEOBJECT_TYPE_CHEST:      return true;                           // All chests cannot be opened while immune on 3.3.5a
+            case GAMEOBJECT_TYPE_GOOBER:     return goober.noDamageImmune != 0;
+            case GAMEOBJECT_TYPE_FLAGSTAND:  return flagstand.noDamageImmune != 0;
+            case GAMEOBJECT_TYPE_FLAGDROP:   return flagdrop.noDamageImmune != 0;
+            default: return false;
         }
     }
 
@@ -491,7 +522,7 @@ struct GameObjectInfo
 };
 
 // GCC have alternative #pragma pack() syntax and old gcc version not support pack(pop), also any gcc version not support it at some platform
-#if defined( __GNUC__ )
+#if defined(__GNUC__)
 #pragma pack()
 #else
 #pragma pack(pop)
@@ -516,11 +547,7 @@ enum GOState
 struct GameObjectData
 {
     uint32 id;                                              // entry in gamobject_template
-    uint32 mapid;
-    float posX;
-    float posY;
-    float posZ;
-    float orientation;
+    WorldLocation position;
     float rotation0;
     float rotation1;
     float rotation2;
@@ -529,8 +556,8 @@ struct GameObjectData
     int32  spawntimesecsmax;
     uint32 animprogress;
     GOState go_state;
-    uint32 spawnFlags;
-    float visibilityModifier;
+    uint32 spawn_flags;
+    float visibility_mod;
 
     uint32 instanciatedContinentInstanceId;
     uint32 ComputeRespawnDelay(uint32 baseDelay) const;
@@ -565,12 +592,12 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 {
     public:
         explicit GameObject();
-        ~GameObject();
+        ~GameObject() override;
 
-        void AddToWorld();
-        void RemoveFromWorld();
+        void AddToWorld() override;
+        void RemoveFromWorld() override;
 
-        bool Create(uint32 guidlow, uint32 name_id, Map *map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
+        bool Create(uint32 guidlow, uint32 name_id, Map* map, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 animprogress, GOState go_state);
         void Update(uint32 update_diff, uint32 p_time) override;
         GameObjectInfo const* GetGOInfo() const;
 
@@ -582,11 +609,11 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void UpdateRotationFields(float rotation2 = 0.0f, float rotation3 = 0.0f);
 
         // overwrite WorldObject function for proper name localization
-        const char* GetNameForLocaleIdx(int32 locale_idx) const;
+        char const* GetNameForLocaleIdx(int32 locale_idx) const override;
 
         void SaveToDB();
         void SaveToDB(uint32 mapid);
-        bool LoadFromDB(uint32 guid, Map *map);
+        bool LoadFromDB(uint32 guid, Map* map);
         void DeleteFromDB() const;
 
         void SetOwnerGuid(ObjectGuid ownerGuid)
@@ -608,8 +635,8 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         time_t GetRespawnTime() const { return m_respawnTime; }
         time_t GetRespawnTimeEx() const
         {
-            time_t now = time(NULL);
-            if(m_respawnTime > now)
+            time_t now = time(nullptr);
+            if (m_respawnTime > now)
                 return m_respawnTime;
             else
                 return now;
@@ -619,7 +646,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void JustDespawnedWaitingRespawn();
         void SetRespawnTime(time_t respawn)
         {
-            m_respawnTime = respawn > 0 ? time(NULL) + respawn : 0;
+            m_respawnTime = respawn > 0 ? time(nullptr) + respawn : 0;
             m_respawnDelayTime = respawn > 0 ? uint32(respawn) : 0;
         }
         void SetRespawnDelay(time_t respawn)
@@ -645,7 +672,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         static void AddToRemoveListInMaps(uint32 db_guid, GameObjectData const* data);
         static void SpawnInMaps(uint32 db_guid, GameObjectData const* data);
 
-        void getFishLoot(Loot *loot, Player* loot_owner);
+        void getFishLoot(Loot* loot, Player* loot_owner);
         GameobjectTypes GetGoType() const { return GameobjectTypes(GetUInt32Value(GAMEOBJECT_TYPE_ID)); }
         void SetGoType(GameobjectTypes type) { SetUInt32Value(GAMEOBJECT_TYPE_ID, type); }
         GOState GetGoState() const { return GOState(GetUInt32Value(GAMEOBJECT_STATE)); }
@@ -668,7 +695,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void SendGameObjectCustomAnim(uint32 animId = 0);
         void SendGameObjectReset();
 
-        float GetObjectBoundingRadius() const;              // overwrite WorldObject version
+        float GetObjectBoundingRadius() const override;              // overwrite WorldObject version
 
         void Use(Unit* user);
 
@@ -698,13 +725,13 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void AddUse() { ++m_useTimes; }
         uint32 GetUseCount() const { return m_useTimes; }
 
-        void SaveRespawnTime();
+        void SaveRespawnTime() override;
 
         Loot        loot;
 
-        bool HasQuest(uint32 quest_id) const;
-        bool HasInvolvedQuest(uint32 quest_id) const;
-        bool ActivateToQuest(Player *pTarget) const;
+        bool HasQuest(uint32 quest_id) const override;
+        bool HasInvolvedQuest(uint32 quest_id) const override;
+        bool ActivateToQuest(Player* pTarget) const;
         uint32 GetDefaultGossipMenuId() const override { return GetGOInfo()->GetGossipMenuId(); }
         void UseDoorOrButton(uint32 time_to_restore = 0, bool alternative = false);
                                                             // 0 = use `gameobject`.`spawntimesecs`
@@ -719,7 +746,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         
         GameObject* LookupFishingHoleAround(float range);
 
-        GridReference<GameObject> &GetGridRef() { return m_gridRef; }
+        GridReference<GameObject>& GetGridRef() { return m_gridRef; }
 
         // Nostalrius
         bool IsUseRequirementMet() const;
@@ -735,20 +762,20 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void UpdateModel();                                 // updates model in case displayId were changed
         GameObjectModel* m_model;
         void UpdateModelPosition();
-        GameObjectData const * GetGOData() const;
+        GameObjectData const*  GetGOData() const;
 
         // Transports system
         uint64 GetRotation() const { return m_rotation; }
-        Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<Transport*>(this); else return NULL; }
-        Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return NULL; }
+        Transport* ToTransport() { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<Transport*>(this); else return nullptr; }
+        Transport const* ToTransport() const { if (GetGOInfo()->type == GAMEOBJECT_TYPE_MO_TRANSPORT) return reinterpret_cast<Transport const*>(this); else return nullptr; }
 
         bool IsVisible() const { return m_visible; }
         void SetVisible(bool b);
-        bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
+        bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const override;
 
-        uint32 getFaction() const final override { return GetGOInfo()->faction; }
-        uint32 getLevel() const final override;
-        bool IsValidAttackTarget(Unit const* target) const final override;
+        uint32 GetFactionTemplateId() const final { return GetGOInfo()->faction; }
+        uint32 GetLevel() const final ;
+        bool IsValidAttackTarget(Unit const* target) const final ;
     protected:
         bool        m_visible;
         uint32      m_spellId;
@@ -768,13 +795,13 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         // collected only for GAMEOBJECT_TYPE_SUMMONING_RITUAL
         ObjectGuid m_firstUser;                             // first GO user, in most used cases owner, but in some cases no, for example non-summoned multi-use GAMEOBJECT_TYPE_SUMMONING_RITUAL
         GuidsSet m_UniqueUsers;                             // all players who use item, some items activated after specific amount unique uses
-        std::mutex m_UniqueUsers_lock;
+        ACE_Thread_Mutex m_UniqueUsers_lock;
         ObjectGuid m_summonTarget;                          // The player who is being summoned
 
         uint64 m_rotation;
         GameObjectInfo const* m_goInfo;
 
-        GameObjectAI *i_AI;
+        GameObjectAI* i_AI;
 
         uint32 m_playerGroupId;
     private:

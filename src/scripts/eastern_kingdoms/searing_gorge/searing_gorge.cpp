@@ -34,7 +34,7 @@ EndContentData */
 
 bool GossipHello_npc_lothos_riftwaker(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestRewardStatus(7487) || pPlayer->GetQuestRewardStatus(7848))
@@ -50,8 +50,8 @@ bool GossipSelect_npc_lothos_riftwaker(Player* pPlayer, Creature* pCreature, uin
     if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
     {
         pPlayer->CLOSE_GOSSIP_MENU();
-        if (pPlayer->TeleportTo(409, 1096.0f, -467.0f, -104.6f, 3.64f))
-            if (!pPlayer->isAlive())
+        if (pPlayer->TeleportTo(409, 1091.89f, -466.985f, -105.084f, 3.64f))
+            if (!pPlayer->IsAlive())
             {
                 pPlayer->ResurrectPlayer(0.5f, false);
                 pPlayer->SpawnCorpseBones();
@@ -132,9 +132,9 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
             pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -146,7 +146,7 @@ CreatureAI* GetAI_npc_dorius_stonetender(Creature* pCreature)
     return new npc_dorius_stonetenderAI(pCreature);
 }
 
-bool QuestAccept_npc_dorius_stonetender(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_dorius_stonetender(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_SUNTARA_STONES)
     {
@@ -239,7 +239,7 @@ struct npc_obsidionAI : public ScriptedAI
 
     void SummonedCreatureDespawn(Creature* creature) override
     {
-        if (creature->GetEntry() == NPC_LATHORIC_THE_BLACK && (!m_creature->isAlive() || !m_creature->isInCombat()))
+        if (creature->GetEntry() == NPC_LATHORIC_THE_BLACK && (!m_creature->IsAlive() || !m_creature->IsInCombat()))
             Reset();
     }
 
@@ -248,13 +248,13 @@ struct npc_obsidionAI : public ScriptedAI
         Reset();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_IsEventRunning)
             return;
 
         // talking, only if not in combat
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
         {
             if (m_nextText == SAY_LATHORIC1)
             {
@@ -278,9 +278,9 @@ struct npc_obsidionAI : public ScriptedAI
 
             if (m_nextText < SAY_LATHORIC2) // finished talking, start fighting
             {
-                for (GuidList::const_iterator it = m_playerList.begin(); it != m_playerList.end(); ++it)
+                for (const auto& guid : m_playerList)
                 {
-                    if (Player* player = m_creature->GetMap()->GetPlayer(*it))
+                    if (Player* player = m_creature->GetMap()->GetPlayer(guid))
                     {
                         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
                         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
@@ -299,12 +299,12 @@ struct npc_obsidionAI : public ScriptedAI
        }
 
         // fighting
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiGroundSmashTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GROUND_SMASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_GROUND_SMASH) == CAST_OK)
                 m_uiGroundSmashTimer = 8000;
         }
         else
@@ -313,7 +313,7 @@ struct npc_obsidionAI : public ScriptedAI
 
         if (m_uiKnockAwayTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                 m_uiKnockAwayTimer = 12000;
         }
         else
@@ -336,7 +336,7 @@ bool GossipHello_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature)
 }
 
 
-bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_RISE_OBSIDION)
     {
@@ -344,13 +344,13 @@ bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, c
         {
             if (npc_obsidionAI* pObsidionAI = dynamic_cast<npc_obsidionAI*>(Obsidion->AI()))
             {
-                if (pObsidionAI->m_IsEventRunning || !Obsidion->isAlive())
+                if (pObsidionAI->m_IsEventRunning || !Obsidion->IsAlive())
                     return false;
                 pObsidionAI->StartEvent();
                 pObsidionAI->m_playerList.push_back(pPlayer->GetObjectGuid());
 
                 if (Group* pGroup = pPlayer->GetGroup())
-                    for (GroupReference* pRef = pGroup->GetFirstMember(); pRef != NULL; pRef = pRef->next())
+                    for (GroupReference* pRef = pGroup->GetFirstMember(); pRef != nullptr; pRef = pRef->next())
                         if (Player* pMember = pRef->getSource())
                             pObsidionAI->m_playerList.push_back(pMember->GetObjectGuid());
 
@@ -375,7 +375,7 @@ CreatureAI* GetAI_npc_dorius(Creature* pCreature)
 
 void AddSC_searing_gorge()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_lothos_riftwaker";

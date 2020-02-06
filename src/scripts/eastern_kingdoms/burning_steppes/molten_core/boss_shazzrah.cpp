@@ -49,7 +49,7 @@ struct boss_shazzrahAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         ArcaneExplosion_Timer = 2000;
         ShazzrahCurse_Timer = 10000;
@@ -57,31 +57,31 @@ struct boss_shazzrahAI : public ScriptedAI
         Countspell_Timer = 15000;
         Blink_Timer = urand(25000, 30000);
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_SHAZZRAH, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SHAZZRAH, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SHAZZRAH, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ArcaneExplosion_Timer
         if (ArcaneExplosion_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEEXPLOSION) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEEXPLOSION) == CAST_OK)
                 ArcaneExplosion_Timer = urand(3000, 5000);
         }
         else ArcaneExplosion_Timer -= diff;
@@ -89,7 +89,7 @@ struct boss_shazzrahAI : public ScriptedAI
         //ShazzrahCurse_Timer
         if (ShazzrahCurse_Timer < diff)
         {
-			if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHAZZRAHCURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
+			if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHAZZRAHCURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
 				ShazzrahCurse_Timer = 20000;
         }
         else ShazzrahCurse_Timer -= diff;
@@ -105,7 +105,7 @@ struct boss_shazzrahAI : public ScriptedAI
         //Countspell_Timer
         if (Countspell_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_COUNTERSPELL) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_COUNTERSPELL) == CAST_OK)
                 Countspell_Timer = urand(16000, 18000);
         }
         else Countspell_Timer -= diff;
@@ -120,8 +120,7 @@ struct boss_shazzrahAI : public ScriptedAI
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
                 {
                     DoResetThreat();
-                    //if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                    m_creature->NearTeleportTo(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), m_creature->GetOrientation());
+                    m_creature->NearTeleportTo(pTarget->GetPosition());
                     m_creature->Attack(pTarget, true);
                 }
 
@@ -140,7 +139,7 @@ CreatureAI* GetAI_boss_shazzrah(Creature* pCreature)
 
 void AddSC_boss_shazzrah()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_shazzrah";
     newscript->GetAI = &GetAI_boss_shazzrah;

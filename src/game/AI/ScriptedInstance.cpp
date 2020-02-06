@@ -87,9 +87,9 @@ void ScriptedInstance::DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData)
 
     if (!lPlayers.isEmpty())
     {
-        for(Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+        for(const auto & itr : lPlayers)
         {
-            if (Player* pPlayer = itr->getSource())
+            if (Player* pPlayer = itr.getSource())
                 pPlayer->SendUpdateWorldState(uiStateId, uiStateData);
         }
     }
@@ -112,7 +112,7 @@ std::string ScriptedInstance::GenSaveData(uint32* encounters, uint32 maxIndex)
     return saveStream.str();
 }
 
-void ScriptedInstance::LoadSaveData(const char* pStr, uint32* encounters, uint32 maxIndex)
+void ScriptedInstance::LoadSaveData(char const* pStr, uint32* encounters, uint32 maxIndex)
 {
     SAVE_LOAD_LOG("Chargement : `%s`", pStr);
     std::istringstream loadStream(pStr);
@@ -129,17 +129,17 @@ Player* ScriptedInstance::GetPlayerInMap(bool bOnlyAlive /*=false*/, bool bCanBe
 {
     Map::PlayerList const& lPlayers = instance->GetPlayers();
 
-    for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+    for (const auto& itr : lPlayers)
     {
-        Player* pPlayer = itr->getSource();
-        if (pPlayer && (!bOnlyAlive || pPlayer->isAlive()) && (bCanBeGamemaster || !pPlayer->IsGameMaster()))
+        Player* pPlayer = itr.getSource();
+        if (pPlayer && (!bOnlyAlive || pPlayer->IsAlive()) && (bCanBeGamemaster || !pPlayer->IsGameMaster()))
             return pPlayer;
     }
 
     return nullptr;
 }
 
-/// Returns a pointer to a loaded GameObject that was stored in m_mGoEntryGuidStore. Can return NULL
+/// Returns a pointer to a loaded GameObject that was stored in m_mGoEntryGuidStore. Can return nullptr
 GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
 {
     EntryGuidMap::iterator find = m_mGoEntryGuidStore.find(uiEntry);
@@ -152,7 +152,7 @@ GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
     return nullptr;
 }
 
-/// Returns a pointer to a loaded Creature that was stored in m_mGoEntryGuidStore. Can return NULL
+/// Returns a pointer to a loaded Creature that was stored in m_mGoEntryGuidStore. Can return nullptr
 Creature* ScriptedInstance::GetSingleCreatureFromStorage(uint32 uiEntry, bool bSkipDebugLog /*=false*/)
 {
     EntryGuidMap::iterator find = m_mNpcEntryGuidStore.find(uiEntry);
@@ -190,7 +190,7 @@ void ScriptedInstance_PTR::Update(uint32 diff)
             if (GetMap())
                 if (Creature* c = GetMap()->GetCreature(it->first))
                 {
-                    if (!c->isAlive())
+                    if (!c->IsAlive())
                         c->DoKillUnit();
                     c->SaveRespawnTime();
                     c->AddObjectToRemoveList();

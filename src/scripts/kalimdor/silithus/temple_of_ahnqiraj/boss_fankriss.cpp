@@ -48,7 +48,7 @@ static constexpr SpawnLocation hatchlingLocations[3] =
 static constexpr float  PULL_DISTANCE           = 80.0f;
 static constexpr SpawnLocation pullCenter       = {-8074.88f, 1193.64f, -92.11f};
 static constexpr uint32 aIndex[3]               = { 0, 1, 2 };
-static constexpr uint32 aEntangleSpells[3]      = { SPELL_ENTANGLE_1, SPELL_ENTANGLE_2, SPELL_ENTANGLE_3 };
+//static constexpr uint32 aEntangleSpells[3]      = { SPELL_ENTANGLE_1, SPELL_ENTANGLE_2, SPELL_ENTANGLE_3 };
 static constexpr size_t MAX_HATCHLINGS          = 20;   // Max hatchlings alive at any one time
 static constexpr size_t MAX_HATCHLINGS_PER_WEB  = 4;    // Max amount of hatchlings that can spawn at the same time, on one web. Its at least 4, might be 5.
 static constexpr uint32 HATCHLINGS_ATTACK_DELAY = 2500; // ~2.5sec in curse killvideo.
@@ -96,9 +96,9 @@ struct creature_spawn_fankrissAI : public ScriptedAI
         enrageTimer = 10000;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
             return;
         }
 
@@ -164,7 +164,7 @@ struct creature_vekniss_hatchlingAI : public ScriptedAI
             ScriptedAI::Aggro(u);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (engageTimer <= diff && !hasEngaged)
         {
@@ -177,7 +177,7 @@ struct creature_vekniss_hatchlingAI : public ScriptedAI
                     if (m_creature->GetDistance(pTarget) > 200) {
                         return; //avoid running after people far off in the instance somewhere
                     }
-                    m_creature->getThreatManager().addThreat(pTarget, 1);
+                    m_creature->GetThreatManager().addThreat(pTarget, 1);
                     AttackStart(pTarget);
 
                 }
@@ -188,7 +188,7 @@ struct creature_vekniss_hatchlingAI : public ScriptedAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
             return;
         }
         DoMeleeAttackIfReady();
@@ -267,7 +267,7 @@ struct boss_fankrissAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // Fankriss has an extremely large aggro radius
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 100.0f) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->IsInCombat() && m_creature->IsWithinDistInMap(pWho, 100.0f) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
         }
@@ -312,9 +312,9 @@ struct boss_fankrissAI : public ScriptedAI
     {
         if (pSummoned->GetEntry() == NPC_VEKNISS_HATCHLING)
         {
-            for (auto it = hatchlingVec.begin(); it != hatchlingVec.end(); it++)
+            for (auto& it : hatchlingVec)
             {
-                it->hatchlings.remove(pSummoned->GetObjectGuid());
+                it.hatchlings.remove(pSummoned->GetObjectGuid());
             }
             --aliveHatchlings;
         }
@@ -351,7 +351,7 @@ struct boss_fankrissAI : public ScriptedAI
         }
     }
 
-    void HandleHatchlings(const uint32 uiDiff)
+    void HandleHatchlings(uint32 const uiDiff)
     {
         bool reInitWebTimers = true;
         for (size_t i = 0; i < 3; i++)
@@ -379,7 +379,7 @@ struct boss_fankrissAI : public ScriptedAI
 #ifdef ALWAYS_HATCHLINGS_IN_3_LOCATIONS
                 for (size_t x = 0; x < 3; x++)
                 {
-                    const SpawnLocation& sLoc = entangleSpells[x].second;
+                    SpawnLocation const& sLoc = entangleSpells[x].second;
                     size_t spawnAmount = GetHatchlingSpawnAmount();
                     for (size_t s = 0; s < spawnAmount; s++)
                     {
@@ -387,7 +387,7 @@ struct boss_fankrissAI : public ScriptedAI
                     }
                 }
 #else
-                const SpawnLocation& sLoc = entangleSpells[i].second;
+                SpawnLocation const& sLoc = entangleSpells[i].second;
                 size_t spawnAmount = GetHatchlingSpawnAmount();
                 for (size_t s = 0; s < spawnAmount; s++)
                 {
@@ -410,7 +410,7 @@ struct boss_fankrissAI : public ScriptedAI
         }
     }
 
-    void SummonWorm(const SpawnLocation& loc, uint32 enrageTimer)
+    void SummonWorm(SpawnLocation const& loc, uint32 enrageTimer)
     {
         if (Creature* pC = m_creature->SummonCreature(NPC_SPAWN_FANKRISS, loc.m_fX, loc.m_fY, loc.m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000))
         {
@@ -423,14 +423,14 @@ struct boss_fankrissAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->isInCombat()) {
+        if (!m_creature->IsInCombat()) {
             Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+            for (const auto& itr : PlayerList)
             {
-                Player* pPlayer = itr->getSource();
-                if (pPlayer && pPlayer->isAlive() && !pPlayer->IsGameMaster())
+                Player* pPlayer = itr.getSource();
+                if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster())
                 {
                     // cheap way of quickly disgarding the check most of the time. No point 
                     // where he can be pulled should be higher than this point (he is at roughly -100)
@@ -446,7 +446,7 @@ struct boss_fankrissAI : public ScriptedAI
             }
         }
         
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) {
             return;
         }
 
@@ -454,7 +454,7 @@ struct boss_fankrissAI : public ScriptedAI
         // Mortal Wound
         if (m_uiMortalWoundTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
                 m_uiMortalWoundTimer = urand(4000, 8000);
         }
         else

@@ -64,7 +64,7 @@ struct npc_spirit_guideAI : ScriptedAI
         return uiTimerRez;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (uiTimerRez < uiDiff)
         {
@@ -87,10 +87,10 @@ struct npc_spirit_guideAI : ScriptedAI
 
         Map::PlayerList const &PlayerList = pMap->GetPlayers();
 
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto& itr : PlayerList)
         {
-            Player* pPlayer = itr->getSource();
-            if (!pPlayer || !pPlayer->IsWithinDistInMap(m_creature, 20.0f) || !pPlayer->HasAura(SPELL_WAITING_TO_RESURRECT) || pPlayer->isAlive())
+            Player* pPlayer = itr.getSource();
+            if (!pPlayer || !pPlayer->IsWithinDistInMap(m_creature, 20.0f) || !pPlayer->HasAura(SPELL_WAITING_TO_RESURRECT) || pPlayer->IsAlive())
                 continue;
 
             // repop player again - now this node won't be counted and another node is searched
@@ -166,7 +166,7 @@ struct npc_etendardAI : NullCreatureAI
     bool m_bSpawned;
     uint32 m_bAutoRepeatSpell;
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bSpawned)
         {

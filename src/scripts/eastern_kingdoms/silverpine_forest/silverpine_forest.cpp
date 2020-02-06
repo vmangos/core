@@ -40,14 +40,14 @@ struct npc_astor_hadrenAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
-        m_creature->setFaction(68);
+        m_creature->SetFactionTemplateId(68);
     }
 
-    void JustDied(Unit *who)
+    void JustDied(Unit *who) override
     {
-        m_creature->setFaction(68);
+        m_creature->SetFactionTemplateId(68);
     }
 };
 
@@ -76,7 +76,7 @@ bool GossipSelect_npc_astor_hadren(Player* pPlayer, Creature* pCreature, uint32 
             break;
         case GOSSIP_ACTION_INFO_DEF + 2:
             pPlayer->CLOSE_GOSSIP_MENU();
-            pCreature->setFaction(21);
+            pCreature->SetFactionTemplateId(21);
             ((npc_astor_hadrenAI*)pCreature->AI())->AttackStart(pPlayer);
             break;
     }
@@ -120,7 +120,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
     uint64 uiRaneGUID;
     uint64 uiQuinnGUID;
 
-    void MoveInLineOfSight(Unit* pUnit)
+    void MoveInLineOfSight(Unit* pUnit) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -139,7 +139,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
         npc_escortAI::MoveInLineOfSight(pUnit);
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         Player* pPlayer = GetPlayerForEscort();
 
@@ -178,7 +178,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -187,7 +187,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* who)
+    void Aggro(Unit* who) override
     {
         switch (urand(0, 2))
         {
@@ -204,7 +204,7 @@ struct npc_deathstalker_erlandAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_deathstalker_erland(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_deathstalker_erland(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ERLAND)
     {
@@ -366,7 +366,7 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bEventStarted && !m_uiSummonCount)
         {
@@ -402,14 +402,14 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
                 m_uiWaveTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
     }
 };
 
-bool QuestAccept_npc_deathstalker_faerleia(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_deathstalker_faerleia(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_PYREWOOD_AMBUSH)
     {
@@ -552,7 +552,7 @@ struct npc_human_worgenAI : public ScriptedAI
     {
         return m_creature->GetEntry() == m_uiWorgenEntry;
     }
-    void Reset()
+    void Reset() override
     {
         m_bIsInDefenseStance     = false;
         m_uiShieldBlock_Timer    = 3000;
@@ -567,7 +567,7 @@ struct npc_human_worgenAI : public ScriptedAI
 #endif
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         time_t rawtime;
         time(&rawtime);
@@ -621,7 +621,7 @@ struct npc_human_worgenAI : public ScriptedAI
                 m_uiWolfSound_Timer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         switch (m_creature->GetEntry())
@@ -666,7 +666,7 @@ struct npc_human_worgenAI : public ScriptedAI
             case PYREWOOD_TAILOR:
                 if (m_uiBackstab_Timer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKSTAB) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKSTAB) == CAST_OK)
                         m_uiBackstab_Timer = 8100;
                 }
                 else
@@ -674,7 +674,7 @@ struct npc_human_worgenAI : public ScriptedAI
 
                 if (m_uiDisarm_Timer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISARM) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISARM) == CAST_OK)
                         m_uiDisarm_Timer = 7100;
                 }
                 else
@@ -682,7 +682,7 @@ struct npc_human_worgenAI : public ScriptedAI
 
                 if (m_uiExposeWeakness_Timer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_EXPOSE_WEAKNESS) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_EXPOSE_WEAKNESS) == CAST_OK)
                         m_uiExposeWeakness_Timer = 9100;
                 }
                 else

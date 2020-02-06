@@ -25,7 +25,7 @@ class MANGOS_DLL_SPEC RandomMovementGenerator
 : public MovementGeneratorMedium< Creature, RandomMovementGenerator >
 {
     public:
-        explicit RandomMovementGenerator(const Creature &creature, bool use_current_position = false, float wander_distance = 0.0f, uint32 expire_time = 0) : i_nextMoveTime(1000), i_positionX(0.0f), i_positionY(0.0f), i_positionZ(0.0f), i_wanderDistance(5.0f), i_expireTime(expire_time)
+        explicit RandomMovementGenerator(Creature const& creature, bool use_current_position = false, float wander_distance = 0.0f, uint32 expire_time = 0) : i_nextMoveTime(1000), i_positionX(0.0f), i_positionY(0.0f), i_positionZ(0.0f), i_wanderDistance(5.0f), i_expireTime(expire_time), i_wanderSteps(0)
         {
             if (use_current_position)
                 creature.GetPosition(i_positionX, i_positionY, i_positionZ);
@@ -41,7 +41,7 @@ class MANGOS_DLL_SPEC RandomMovementGenerator
         void Finalize(Creature&);
         void Interrupt(Creature&);
         void Reset(Creature&);
-        bool Update(Creature&, const uint32 &);
+        bool Update(Creature&, uint32 const&);
         void UpdateAsync(Creature&, uint32 diff);
         MovementGeneratorType GetMovementGeneratorType() const { return RANDOM_MOTION_TYPE; }
 
@@ -53,6 +53,7 @@ class MANGOS_DLL_SPEC RandomMovementGenerator
         float i_positionZ;
         float i_wanderDistance;
         uint32 i_expireTime;
+        uint8 i_wanderSteps;
 };
 
 #endif

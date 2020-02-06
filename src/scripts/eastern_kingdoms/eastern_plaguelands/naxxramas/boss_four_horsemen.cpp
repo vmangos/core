@@ -110,9 +110,9 @@ struct boss_four_horsemen_shared : public ScriptedAI
     bool m_bShieldWall1;
     bool m_bShieldWall2;
     uint32 m_uiMarkTimer;
-    const uint32 m_uiMarkId;
-    const uint32 m_uiGhostId;
-    const bool m_bIsSpirit;
+    uint32 const m_uiMarkId;
+    uint32 const m_uiGhostId;
+    bool const m_bIsSpirit;
     uint32 pullCheckTimer;
     EventMap m_events;
     uint32 killSayCooldown;
@@ -156,20 +156,20 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto& itr : PlayerList)
         {
-            Player* pPlayer = itr->getSource();
+            Player* pPlayer = itr.getSource();
             
-            if (m_creature->GetDistanceToCenter(pPlayer) > 74.0f)
+            if (m_creature->GetDistance3dToCenter(pPlayer) > 74.0f)
                 continue;
             bool alert;
-            if (!pPlayer->isVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
+            if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
                 return;
-            if (m_creature->CanInitiateAttack() && pPlayer->isTargetableForAttack() && m_creature->IsHostileTo(pPlayer))
+            if (m_creature->CanInitiateAttack() && pPlayer->IsTargetableForAttack() && m_creature->IsHostileTo(pPlayer))
             {
-                if (pPlayer->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
+                if (pPlayer->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
                 {
-                    if (!m_creature->getVictim())
+                    if (!m_creature->GetVictim())
                     {
                         AttackStart(pPlayer);
                         return;
@@ -194,11 +194,11 @@ struct boss_four_horsemen_shared : public ScriptedAI
         if (!m_creature->IsWithinDistInMap(pWho, 75.0f))
             return;
 
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
                 else if (m_creature->GetMap()->IsDungeon())
                 {
@@ -209,7 +209,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
         }
     }
 
-    void AttackStart(Unit* pWho)
+    void AttackStart(Unit* pWho) override
     {
         if (!m_bIsSpirit)
             ScriptedAI::AttackStart(pWho);
@@ -231,7 +231,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
         if (m_bIsSpirit)
         {
-            m_creature->addUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STAT_ROOT);
             m_creature->SetInCombatWithZone();
         }
         else
@@ -300,7 +300,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
             m_pInstance->SetData(TYPE_FOUR_HORSEMEN, SPECIAL);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell) override
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
 	// TODO: find if hitten by mark target are the only ones to drop 50% aggro
         if (pSpell->Id == m_uiMarkId && pTarget)
@@ -324,7 +324,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // He is used for SM event too, sooo 
         if (m_creature->GetMapId() != 533)
@@ -351,13 +351,13 @@ struct boss_four_horsemen_shared : public ScriptedAI
             {
                 m_uiMarkTimer = 12000;
                 //todo: this behavior should get some more confirmation
-                ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-                for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
+                ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+                for (const auto itr : tList)
                 {
-                    Unit* pUnit = m_creature->GetMap()->GetUnit( (*itr)->getUnitGuid());
+                    Unit* pUnit = m_creature->GetMap()->GetUnit( itr->getUnitGuid());
 
-                    if (pUnit && m_creature->getThreatManager().getThreat(pUnit))
-                        m_creature->getThreatManager().modifyThreatPercent(pUnit, -50);
+                    if (pUnit && m_creature->GetThreatManager().getThreat(pUnit))
+                        m_creature->GetThreatManager().modifyThreatPercent(pUnit, -50);
                 }
             }
         }
@@ -375,9 +375,9 @@ struct boss_four_horsemen_shared : public ScriptedAI
             return;
         float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY);
         Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        for (const auto& itr : players)
         {
-            Player* pPlayer = itr->getSource();
+            Player* pPlayer = itr.getSource();
             if (m_creature->IsWithinDistInMap(pPlayer, range))
             {
                 m_creature->PlayDirectSound(pData->SoundId, pPlayer);
@@ -394,7 +394,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
@@ -406,7 +406,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         }
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_bIsSpirit)
             return;
@@ -417,7 +417,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(12));
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         // Not sure about that
         if (m_bIsSpirit)
@@ -430,7 +430,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_bIsSpirit)
             return;
@@ -439,15 +439,15 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         DoScriptText(SAY_BLAU_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         AggroRadius(uiDiff);
-        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
@@ -470,7 +470,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
                         height = 241.35f;
                     if (Creature* pVZ = m_creature->SummonCreature(16697, pTarget->GetPositionX(), pTarget->GetPositionY(), height, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
                     {
-                        pVZ->SetRespawnRadius(0.1f);
+                        pVZ->SetWanderDistance(0.1f);
                         pVZ->SetSpeedRate(UnitMoveType::MOVE_RUN, 0.1f);
                         pVZ->SetSpeedRate(UnitMoveType::MOVE_WALK, 0.1f);
                         pVZ->GetMotionMaster()->MoveRandom();
@@ -502,7 +502,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
@@ -517,7 +517,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         specialSayCooldown = 12000;
     }
     uint32 specialSayCooldown;
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_bIsSpirit)
             return;
@@ -528,7 +528,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         m_creature->CastSpell(m_creature, SPELL_RIGHTEOUS_FIRE, true);
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         // He is used for SM event too, sooo 
         if (m_creature->GetMapId() != 533)
@@ -545,7 +545,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_bIsSpirit)
             return;
@@ -554,7 +554,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         DoScriptText(SAY_MOG_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
         if (pSpell->Id == 28882 && specialSayCooldown == 0) // Righteous Fire
@@ -564,11 +564,11 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         AggroRadius(uiDiff);
 
-        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
@@ -601,7 +601,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
@@ -613,7 +613,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         }
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_bIsSpirit)
             return;
@@ -625,7 +625,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(30));
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         // Not sure about it
         if (m_bIsSpirit)
@@ -638,7 +638,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_bIsSpirit)
             return;
@@ -647,16 +647,16 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         DoScriptText(SAY_KORT_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         AggroRadius(uiDiff);
 
-        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
@@ -702,7 +702,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
@@ -714,7 +714,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         }
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (m_bIsSpirit)
             return;
@@ -723,7 +723,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(12));
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         // Not sure about it
         if (m_bIsSpirit)
@@ -745,17 +745,17 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         DoScriptText(SAY_ZELI_DEATH, m_creature);
     }
 
-    void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
+    void SpellHitTarget(Unit *pTarget, SpellEntry const* pSpell) override
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         AggroRadius(uiDiff);
 
         //Return since we have no target
-        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;

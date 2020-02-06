@@ -247,7 +247,7 @@ namespace std {
     template <>
     struct hash<ObjectGuid>
     {
-        std::size_t operator()(const ObjectGuid& k) const
+        std::size_t operator()(ObjectGuid const& k) const
         {
             using std::hash;
             return hash<uint64>()(k.GetRawValue());

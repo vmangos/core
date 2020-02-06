@@ -31,7 +31,7 @@ struct npc_pusillinAI : public ScriptedAI
     {
         m_pInstance = (instance_dire_maul*) pCreature->GetInstanceData();
         ME->SetObjectScale(0.5f);
-        ME->setFaction(35);
+        ME->SetFactionTemplateId(35);
         uiStep = 0;
         bInCombat = false;
         Reset();
@@ -43,24 +43,24 @@ struct npc_pusillinAI : public ScriptedAI
     float fNextPositions[3];
     uint32 uiGlobalCD;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         std::list<Creature*> m_impList;
         GetCreatureListWithEntryInGrid(m_impList, ME, 13276, 100.0f);
-        for (std::list<Creature*>::iterator it = m_impList.begin(); it != m_impList.end(); ++it)
-            (*it)->Attack(pWho,true);
+        for (const auto& it : m_impList)
+            it->Attack(pWho,true);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!ME->SelectHostileTarget() || !ME->getVictim())
+        if (!ME->SelectHostileTarget() || !ME->GetVictim())
             return;
 
-//        if (!ME->getVictim())
+//        if (!ME->GetVictim())
 //            return;
 
         if (uiGlobalCD < uiDiff)
@@ -68,15 +68,15 @@ struct npc_pusillinAI : public ScriptedAI
             switch (urand(1, 3))
             {
                 case 1: // Boule de feu
-                    ME->CastSpell(ME->getVictim(), 15228, false);
+                    ME->CastSpell(ME->GetVictim(), 15228, false);
                     uiGlobalCD = 6000;
                     break;
                 case 2: // Trait de feu
-                    ME->CastSpell(ME->getVictim(), 14145, false);
+                    ME->CastSpell(ME->GetVictim(), 14145, false);
                     uiGlobalCD = 4000;
                     break;
                 case 3: // Vague explosive
-                    ME->CastSpell(ME->getVictim(), 22424, false);
+                    ME->CastSpell(ME->GetVictim(), 22424, false);
                     uiGlobalCD = 9000;
                     break;
             }
@@ -135,7 +135,7 @@ struct npc_pusillinAI : public ScriptedAI
             case 4:
                 ME->SetHomePosition(18.19f, -701.15f, -12.64f, 0);
                 ME->MonsterSay(TEXT_5, 0, 0);
-                ME->setFaction(14);
+                ME->SetFactionTemplateId(14);
                 ME->SetObjectScale(0.7f);
                 ME->CastSpell(ME, 22735, false); // Spirit of Runn Tum
                 bInCombat = true;

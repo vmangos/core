@@ -28,13 +28,13 @@ class MANGOS_DLL_DECL AggressorAI : public CreatureAI
 {
     public:
 
-        explicit AggressorAI(Creature *c) : CreatureAI(c) {}
+        explicit AggressorAI(Creature* c) : CreatureAI(c) {}
 
-        void MoveInLineOfSight(Unit *) override;
-        void AttackStart(Unit *) override;
-        void UpdateAI(const uint32) override;
+        void MoveInLineOfSight(Unit*) override;
+        void AttackStart(Unit*) override;
+        void UpdateAI(uint32 const) override;
 
-        static int Permissible(const Creature *);
+        static int Permissible(Creature const*);
 };
 
 #endif

@@ -23,7 +23,7 @@
 #include "Creature.h"
 #include "GuardMgr.h"
 
-int ReactorAI::Permissible(const Creature *creature)
+int ReactorAI::Permissible(Creature const* creature)
 {
     if ((creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO) || creature->IsNeutralToAll())
         return PERMIT_BASE_REACTIVE;
@@ -38,7 +38,7 @@ void ReactorAI::JustRespawned()
 
 void ReactorAI::MoveInLineOfSight(Unit* pWho)
 {
-    if (!CanSummonGuards() || m_creature->isInCombat())
+    if (!CanSummonGuards() || m_creature->IsInCombat())
         return;
 
     if (!pWho->IsPlayer())
@@ -47,11 +47,11 @@ void ReactorAI::MoveInLineOfSight(Unit* pWho)
     if (!m_creature->IsWithinDistInMap(pWho, m_creature->GetDetectionRange()))
         return;
 
-    if (m_creature->IsHostileTo(pWho) && pWho->isTargetableForAttack() && m_creature->IsWithinLOSInMap(pWho))
+    if (m_creature->IsHostileTo(pWho) && pWho->IsTargetableForAttack() && m_creature->IsWithinLOSInMap(pWho))
         m_bCanSummonGuards = !sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho));
 }
 
-void ReactorAI::AttackStart(Unit *p)
+void ReactorAI::AttackStart(Unit* p)
 {
     if (!p)
         return;
@@ -70,9 +70,9 @@ void ReactorAI::AttackStart(Unit *p)
     }
 }
 
-void ReactorAI::UpdateAI(const uint32 uiDiff)
+void ReactorAI::UpdateAI(uint32 const uiDiff)
 {
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         return;
 
     if (!m_CreatureSpells.empty())

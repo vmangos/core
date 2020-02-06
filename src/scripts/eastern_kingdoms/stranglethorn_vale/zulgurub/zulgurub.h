@@ -50,19 +50,19 @@ class instance_zulgurub : public ScriptedInstance
     public:
         instance_zulgurub(Map* pMap) : ScriptedInstance(pMap), m_randomBossSpawned(false) {Initialize();};
 
-        void Initialize();
-        void Create();
+        void Initialize() override;
+        void Create() override;
 
         bool IsEncounterInProgress() const override;
-        void OnCreatureCreate(Creature* pCreature);
-        void OnCreatureDeath(Creature * pCreature);
-        void SetData(uint32 uiType, uint32 uiData);
-        const char* Save();
-        void Load(const char* chrIn);
+        void OnCreatureCreate(Creature* pCreature) override;
+        void OnCreatureDeath(Creature * pCreature) override;
+        void SetData(uint32 uiType, uint32 uiData) override;
+        char const* Save() override;
+        void Load(char const* chrIn) override;
         void HandleLoadCreature(uint32 dataType, uint64 &storeGuid, Creature* pCrea); // Nostalrius
 
-        uint32 GetData(uint32 uiType);
-        uint64 GetData64(uint32 uiData);
+        uint32 GetData(uint32 uiType) override;
+        uint64 GetData64(uint32 uiData) override;
 
         // each time High Priest dies lower Hakkar's HP
         void LowerHakkarHitPoints();

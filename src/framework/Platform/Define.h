@@ -131,7 +131,7 @@ typedef ACE_UINT32 uint32;
 typedef ACE_UINT16 uint16;
 typedef ACE_UINT8 uint8;
 
-#if COMPILER != COMPILER_MICROSOFT
+#ifndef _WIN32
 typedef uint16      WORD;
 typedef uint32      DWORD;
 #endif //COMPILER

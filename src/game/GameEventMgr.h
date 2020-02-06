@@ -62,7 +62,7 @@ struct GameEventData
 struct GameEventCreatureData
 {
     uint32 entry_id;
-    uint32 modelid;
+    uint32 display_id;
     uint32 equipment_id;
     uint32 spell_id_start;
     uint32 spell_id_end;

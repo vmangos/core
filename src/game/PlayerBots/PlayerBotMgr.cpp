@@ -65,7 +65,7 @@ void PlayerBotMgr::load()
     LoadConfig();
 
     // 3- Load usable account ID
-    QueryResult *result = LoginDatabase.PQuery(
+    QueryResult* result = LoginDatabase.PQuery(
                               "SELECT MAX(id)"
                               " FROM account");
     if (!result)
@@ -73,7 +73,7 @@ void PlayerBotMgr::load()
         sLog.outError("Playerbot: unable to load max account id.");
         return;
     }
-    Field *fields = result->Fetch();
+    Field* fields = result->Fetch();
     _maxAccountId = fields[0].GetUInt32() + 10000;
     delete result;
 
@@ -109,7 +109,7 @@ void PlayerBotMgr::load()
     }
 
     // 5- Check config/DB
-    if (confMinBots >= m_bots.size() && m_bots.size() != 0)
+    if (confMinBots >= m_bots.size() && !m_bots.empty())
         confMinBots = m_bots.size() - 1;
     if (confMaxBots > m_bots.size())
         confMaxBots = m_bots.size();
@@ -292,7 +292,7 @@ bool PlayerBotMgr::addBot(PlayerBotAI* ai)
 bool PlayerBotMgr::addBot(uint32 playerGUID, bool chatBot)
 {
     uint32 accountId = 0;
-    PlayerBotEntry *e = NULL;
+    PlayerBotEntry *e = nullptr;
     std::map<uint32, PlayerBotEntry*>::iterator iter = m_bots.find(playerGUID);
     if (iter == m_bots.end())
         accountId = sObjectMgr.GetPlayerAccountIdByGUID(playerGUID);
@@ -315,12 +315,12 @@ bool PlayerBotMgr::addBot(uint32 playerGUID, bool chatBot)
         e->chance       = 10;
         e->accountId    = accountId;
         e->isChatBot    = chatBot;
-        e->ai           = new PlayerBotAI(NULL);
+        e->ai           = new PlayerBotAI(nullptr);
         m_bots[playerGUID] = e;
     }
 
     e->state = PB_STATE_LOADING;
-    WorldSession *session = new WorldSession(accountId, NULL, sAccountMgr.GetSecurity(accountId), 0, LOCALE_enUS);
+    WorldSession* session = new WorldSession(accountId, nullptr, sAccountMgr.GetSecurity(accountId), 0, LOCALE_enUS);
     session->SetBot(e);
     // "It's not because you are a bot that you are allowed cheat!"
     sAnticheatLib->SessionAdded(session);
@@ -374,7 +374,6 @@ bool PlayerBotMgr::deleteBot(uint32 playerGUID)
     std::map<uint32, PlayerBotEntry*>::iterator iter = m_bots.find(playerGUID);
     if (iter == m_bots.end())
         return false;
-    uint32 accountId = iter->second->accountId;
 
     if (iter->second->state == PB_STATE_LOADING)
         m_stats.loadingCount--;
@@ -414,26 +413,19 @@ bool PlayerBotMgr::ForceAccountConnection(WorldSession* sess)
         return sess->GetBot()->state != PB_STATE_OFFLINE;
 
     // Bots temporaires
-    if (m_tempBots.find(sess->GetAccountId()) != m_tempBots.end())
-        return true;
-
-    return false;
+    return m_tempBots.find(sess->GetAccountId()) != m_tempBots.end();
 }
 
 bool PlayerBotMgr::IsPermanentBot(uint32 playerGUID)
 {
     std::map<uint32, PlayerBotEntry*>::iterator iter = m_bots.find(playerGUID);
-    if (iter != m_bots.end())
-        return true;
-    return false;
+    return iter != m_bots.end();
 }
 
 bool PlayerBotMgr::IsChatBot(uint32 playerGuid)
 {
     std::map<uint32, PlayerBotEntry*>::iterator iter = m_bots.find(playerGuid);
-    if (iter != m_bots.end() && iter->second->isChatBot)
-        return true;
-    return false;
+    return iter != m_bots.end() && iter->second->isChatBot;
 }
 
 void PlayerBotMgr::addAllBots()
@@ -482,7 +474,7 @@ bool ChatHandler::HandleBotAddAllCommand(char * args)
 bool ChatHandler::HandleBotAddCommand(char* args)
 {
     uint32 guid = 0;
-    char *charname = NULL;
+    char *charname = nullptr;
     if (*args)
     {
         charname = strtok((char*)args, " ");

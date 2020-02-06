@@ -53,7 +53,7 @@ struct boss_broodlordAI : public ScriptedAI
     uint32 m_uiInCombatTimer;
     bool m_bMobsDesactives;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCleaveTimer         = 8000;                     // These times are probably wrong
         m_uiBlastWaveTimer      = 20000;
@@ -62,12 +62,12 @@ struct boss_broodlordAI : public ScriptedAI
         m_uiInCombatTimer       = 2000;
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LASHLAYER, IN_PROGRESS);
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             SetMobsDesactivated(true);
             DoScriptText(SAY_AGGRO, m_creature);
@@ -75,7 +75,7 @@ struct boss_broodlordAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LASHLAYER, DONE);
@@ -83,7 +83,7 @@ struct boss_broodlordAI : public ScriptedAI
         SetMobsDesactivated(false);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LASHLAYER, FAIL);
@@ -91,17 +91,17 @@ struct boss_broodlordAI : public ScriptedAI
         SetMobsDesactivated(false);
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
-        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 40.0f) && m_creature->IsWithinLOSInMap(who) && !m_creature->isInCombat()
-                && who->isInAccessablePlaceFor(m_creature) && !who->HasStealthAura())
+        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 40.0f) && m_creature->IsWithinLOSInMap(who) && !m_creature->IsInCombat()
+                && who->IsInAccessablePlaceFor(m_creature) && !who->HasStealthAura())
             m_creature->SetInCombatWithZone();
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_KNOCK_AWAY)
-            m_creature->getThreatManager().modifyThreatPercent(pCaster, -50);
+            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -50);
     }
 
     void SetMobsDesactivated(bool on)
@@ -139,9 +139,9 @@ struct boss_broodlordAI : public ScriptedAI
         mobsEntries.clear();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiInCombatTimer < uiDiff)
@@ -156,7 +156,7 @@ struct boss_broodlordAI : public ScriptedAI
         // Cleave Timer
         if (m_uiCleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 m_uiCleaveTimer = urand(13000, 20000);
         }
         else
@@ -174,7 +174,7 @@ struct boss_broodlordAI : public ScriptedAI
         // Mortal Strike Timer
         if (m_uiMortalStrikeTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
                 m_uiMortalStrikeTimer = urand(20000, 30000);
         }
         else
@@ -183,7 +183,7 @@ struct boss_broodlordAI : public ScriptedAI
         // Knock Away Timer
         if (m_uiKnockAwayTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                 m_uiKnockAwayTimer = urand(12000, 25000);
         }
         else

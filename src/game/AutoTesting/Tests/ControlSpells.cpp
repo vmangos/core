@@ -15,13 +15,13 @@ class controls_and_movementTest : public SingleTest
 public:
     uint32 spellId;
     uint32 movementType;
-    controls_and_movementTest(uint32 _spell, uint32 _movement, const char* scriptName) : SingleTest(scriptName), spellId(_spell), movementType(_movement)
+    controls_and_movementTest(uint32 _spell, uint32 _movement, char const* scriptName) : SingleTest(scriptName), spellId(_spell), movementType(_movement)
     {
     }
     void Test() override
     {
-        Player* warlock = GetTestStep() ? GetTestPlayer(0, TESTPLAYER_MAXLEVEL) : NULL;
-        Creature* necromancer = GetTestStep() > 1 ? GetTestCreature(1) : NULL;
+        Player* warlock = GetTestStep() ? GetTestPlayer(0, TESTPLAYER_MAXLEVEL) : nullptr;
+        Creature* necromancer = GetTestStep() > 1 ? GetTestCreature(1) : nullptr;
         switch (GetTestStep())
         {
             case 0:
@@ -58,14 +58,14 @@ class controls_leave_combatTest : public SingleTest
 public:
     uint32 spellId;
     uint32 movementType;
-    controls_leave_combatTest(uint32 _spell, uint32 _movement, const char* scriptName) : SingleTest(scriptName), spellId(_spell), movementType(_movement)
+    controls_leave_combatTest(uint32 _spell, uint32 _movement, char const* scriptName) : SingleTest(scriptName), spellId(_spell), movementType(_movement)
     {
     }
     void Test() override
     {
-        Player* warlock = GetTestStep() ? GetTestPlayer(0, TESTPLAYER_MAXLEVEL) : NULL;
-        Player* hunt = GetTestStep() ? GetTestPlayer(1, TESTPLAYER_MAXLEVEL) : NULL;
-        Creature* necromancer = GetTestStep() > 1 ? GetTestCreature(2) : NULL;
+        Player* warlock = GetTestStep() ? GetTestPlayer(0, TESTPLAYER_MAXLEVEL) : nullptr;
+        Player* hunt = GetTestStep() ? GetTestPlayer(1, TESTPLAYER_MAXLEVEL) : nullptr;
+        Creature* necromancer = GetTestStep() > 1 ? GetTestCreature(2) : nullptr;
         switch (GetTestStep())
         {
             case 0:
@@ -81,7 +81,7 @@ public:
                 break;
             case 2:
                 TEST_ASSERT(necromancer->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE);
-                TEST_ASSERT(necromancer->getVictim() == hunt);
+                TEST_ASSERT(necromancer->GetVictim() == hunt);
                 DoPlayerCast(0, 2, spellId);
                 Wait(4000);
                 break;
@@ -147,7 +147,7 @@ public:
                 Player* warlock = GetTestPlayer(0);
                 Player* mage = GetTestPlayer(1);
                 Creature* necromancer = GetTestCreature(2);
-                TEST_ASSERT(mage->isInCombat() && warlock->isInCombat() && necromancer->isInCombat());
+                TEST_ASSERT(mage->IsInCombat() && warlock->IsInCombat() && necromancer->IsInCombat());
                 TEST_ASSERT(necromancer->HasAura(SHEEP_R4));
                 TEST_ASSERT(necromancer->HasAura(FEAR_R1));
                 necromancer->RemoveAllAuras();

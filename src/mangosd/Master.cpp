@@ -28,8 +28,6 @@
 #endif
 
 #include "WorldSocketMgr.h"
-#include "MapNodes/NodesMgr.h"
-
 #include "Common.h"
 #include "Master.h"
 #include "WorldSocket.h"
@@ -103,7 +101,7 @@ public:
                 sLog.outError("World Thread hangs, kicking out server!");
                 signal(SIGSEGV, 0);
                 Master::m_handleSigvSignals = false;        // disable anticrash
-                *((uint32 volatile*)NULL) = 0;              // bang crash
+                *((uint32 volatile*)nullptr) = 0;              // bang crash
             }
 #endif
         }
@@ -309,7 +307,7 @@ int Master::Run()
         LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
     }
 
-    ACE_Based::Thread* cliThread = NULL;
+    ACE_Based::Thread* cliThread = nullptr;
 
 #ifdef WIN32
     if (sConfig.GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -321,10 +319,10 @@ int Master::Run()
         cliThread = new ACE_Based::Thread(new CliRunnable);
     }
 
-    ACE_Based::Thread* rar_thread = NULL;
+    ACE_Based::Thread* rar_thread = nullptr;
     if (sConfig.GetBoolDefault ("Ra.Enable", false))
         rar_thread = new ACE_Based::Thread(new RARunnable);
-    ACE_Based::Thread* offlinechat_thread = NULL;
+    ACE_Based::Thread* offlinechat_thread = nullptr;
     if (sConfig.GetBoolDefault ("OfflineChat.Enable", false))
         offlinechat_thread = new ACE_Based::Thread(new OfflineChatRunnable);
 
@@ -372,7 +370,7 @@ int Master::Run()
     #endif
 
     ///- Start soap serving thread
-    ACE_Based::Thread* soap_thread = NULL;
+    ACE_Based::Thread* soap_thread = nullptr;
 
     if(sConfig.GetBoolDefault("SOAP.Enabled", false))
     {
@@ -383,7 +381,7 @@ int Master::Run()
     }
 
     ///- Start up freeze catcher thread
-    ACE_Based::Thread* freeze_thread = NULL;
+    ACE_Based::Thread* freeze_thread = nullptr;
     if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {
         FreezeDetectorRunnable *fdr = new FreezeDetectorRunnable();
@@ -392,36 +390,26 @@ int Master::Run()
         freeze_thread->setPriority(ACE_Based::Highest);
     }
 
-    if (!sNodesMgr->OnServerStartup())
+    // Wait for clients ?
+    ///- Launch the world listener socket
+    uint16 wsport = sWorld.getConfig(CONFIG_UINT32_PORT_WORLD);
+    std::string bind_ip = sConfig.GetStringDefault("BindIP", "0.0.0.0");
+
+    // Start WorldSockets
+    sWorldSocketMgr->SetOutKBuff(sConfig.GetIntDefault("Network.OutKBuff", -1));
+    sWorldSocketMgr->SetOutUBuff(sConfig.GetIntDefault("Network.OutUBuff", 65536));
+    sWorldSocketMgr->SetThreads(sConfig.GetIntDefault("Network.Threads", 1) + 1);
+    sWorldSocketMgr->SetInterval(sConfig.GetIntDefault("Network.Interval", 10));
+    sWorldSocketMgr->SetTcpNodelay(sConfig.GetBoolDefault("Network.TcpNodelay", true));
+
+    if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
     {
-        sLog.outError ("[FATAL] Unable to start cluster NodesMgr");
+        sLog.outError("Failed to start WorldSocket network");
         Log::WaitBeforeContinueIfNeed();
         World::StopNow(ERROR_EXIT_CODE);
+        // go down and shutdown the server
     }
-
-    // Wait for clients ?
-    if (!sWorld.getConfig(CONFIG_BOOL_IS_MAPSERVER))
-    {
-        ///- Launch the world listener socket
-        uint16 wsport = sWorld.getConfig (CONFIG_UINT32_PORT_WORLD);
-        std::string bind_ip = sConfig.GetStringDefault ("BindIP", "0.0.0.0");
-
-        // Start WorldSockets
-        sWorldSocketMgr->SetOutKBuff(sConfig.GetIntDefault("Network.OutKBuff", -1));
-        sWorldSocketMgr->SetOutUBuff(sConfig.GetIntDefault("Network.OutUBuff", 65536));
-        sWorldSocketMgr->SetThreads(sConfig.GetIntDefault("Network.Threads", 1) + 1);
-        sWorldSocketMgr->SetInterval(sConfig.GetIntDefault("Network.Interval", 10));
-        sWorldSocketMgr->SetTcpNodelay(sConfig.GetBoolDefault("Network.TcpNodelay", true));
-
-        if (sWorldSocketMgr->StartNetwork(wsport, bind_ip) == -1)
-        {
-            sLog.outError ("Failed to start WorldSocket network");
-            Log::WaitBeforeContinueIfNeed();
-            World::StopNow(ERROR_EXIT_CODE);
-            // go down and shutdown the server
-        }
-        sWorldSocketMgr->Wait();
-    }
+    sWorldSocketMgr->Wait();
 
     ///- Stop freeze protection before shutdown tasks
     if (freeze_thread)
@@ -513,7 +501,7 @@ int Master::Run()
         b[3].Event.KeyEvent.wVirtualScanCode = 0x1c;
         b[3].Event.KeyEvent.wRepeatCount = 1;
         DWORD numb;
-        BOOL ret = WriteConsoleInput(hStdIn, b, 4, &numb);
+        WriteConsoleInput(hStdIn, b, 4, &numb);
 
         cliThread->wait();
 
@@ -584,10 +572,7 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
         return false;
     }
 
-    if (!database.CheckRequiredMigrations(migrations))
-        return false;
-
-    return true;
+    return database.CheckRequiredMigrations(migrations);
 }
 /// Initialize connection to the databases
 bool Master::_StartDB()
@@ -693,7 +678,7 @@ void Master::_OnSignal(int s)
                 sObjectAccessor.SaveAllPlayers();
                 ACE_Based::Thread::Sleep(25000); // Wait enough time to execute the SQL queries.
             }
-            *((int*)NULL) = 42; // Crash for real now.
+            *((volatile int*)nullptr) = 42; // Crash for real now.
             return;
     }
 

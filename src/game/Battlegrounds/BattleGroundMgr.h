@@ -94,8 +94,8 @@ class BattleGroundQueue
         void RemovePlayer(ObjectGuid guid, bool decreaseInvitedCount);
         void PlayerInvitedToBGUpdateAverageWaitTime(GroupQueueInfo* ginfo, BattleGroundBracketId bracket_id);
         uint32 GetAverageQueueWaitTime(GroupQueueInfo* ginfo, BattleGroundBracketId bracket_id);
-        void LogQueueInscription(Player *plr, BattleGroundTypeId BgTypeId, uint32 uiAction);
-        bool IsPlayerInvited(ObjectGuid guid, const uint32 bgInstanceGuid, const uint32 removeTime);
+        void LogQueueInscription(Player* plr, BattleGroundTypeId BgTypeId, uint32 uiAction);
+        bool IsPlayerInvited(ObjectGuid guid, uint32 const bgInstanceGuid, uint32 const removeTime);
         bool GetPlayerGroupInfoData(ObjectGuid guid, GroupQueueInfo* ginfo);
         void PlayerLoggedOut(ObjectGuid guid);
         bool PlayerLoggedIn(Player* player);
@@ -200,14 +200,14 @@ class BattleGroundMgr
         void Update(uint32 diff);
 
         /* Packet Building */
-        void BuildPlayerJoinedBattleGroundPacket(WorldPacket *data, Player *plr);
-        void BuildPlayerLeftBattleGroundPacket(WorldPacket *data, ObjectGuid guid);
-        void BuildBattleGroundListPacket(WorldPacket *data, ObjectGuid guid, Player *plr, BattleGroundTypeId bgTypeId);
-        void BuildGroupJoinedBattlegroundPacket(WorldPacket *data, int32 status);
-        void BuildUpdateWorldStatePacket(WorldPacket *data, uint32 field, uint32 value);
-        void BuildPvpLogDataPacket(WorldPacket *data, BattleGround *bg);
-        void BuildBattleGroundStatusPacket(WorldPacket *data, BattleGround *bg, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2);
-        void BuildPlaySoundPacket(WorldPacket *data, uint32 soundid);
+        void BuildPlayerJoinedBattleGroundPacket(WorldPacket* data, Player* plr);
+        void BuildPlayerLeftBattleGroundPacket(WorldPacket* data, ObjectGuid guid);
+        void BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid guid, Player* plr, BattleGroundTypeId bgTypeId);
+        void BuildGroupJoinedBattlegroundPacket(WorldPacket* data, int32 status);
+        void BuildUpdateWorldStatePacket(WorldPacket* data, uint32 field, uint32 value);
+        void BuildPvpLogDataPacket(WorldPacket* data, BattleGround *bg);
+        void BuildBattleGroundStatusPacket(WorldPacket* data, BattleGround* bg, uint8 QueueSlot, uint8 StatusID, uint32 Time1, uint32 Time2);
+        void BuildPlaySoundPacket(WorldPacket* data, uint32 soundid);
 
         /* Battlegrounds */
         BattleGroundSet::iterator GetBattleGroundsBegin(BattleGroundTypeId bgTypeId) { return m_BattleGrounds[bgTypeId].begin(); };
@@ -232,7 +232,7 @@ class BattleGroundMgr
         void CreateInitialBattleGrounds();
         void DeleteAllBattleGrounds();
 
-        void SendToBattleGround(Player *pl, uint32 InstanceID, BattleGroundTypeId bgTypeId);
+        void SendToBattleGround(Player* pl, uint32 InstanceID, BattleGroundTypeId bgTypeId);
 
         /* Battleground queues */
         //these queues are instantiated when creating BattlegroundMrg
@@ -255,17 +255,17 @@ class BattleGroundMgr
         }
 
         void LoadBattleEventIndexes();
-        const BattleGroundEventIdx GetCreatureEventIndex(uint32 dbTableGuidLow) const
+        BattleGroundEventIdx GetCreatureEventIndex(uint32 dbTableGuidLow) const
         {
             CreatureBattleEventIndexesMap::const_iterator itr = m_CreatureBattleEventIndexMap.find(dbTableGuidLow);
-            if(itr != m_CreatureBattleEventIndexMap.end())
+            if (itr != m_CreatureBattleEventIndexMap.end())
                 return itr->second[0];
             return m_CreatureBattleEventIndexMap.find(-1)->second[0];
         }
-        const BattleGroundEventIdx GetGameObjectEventIndex(uint32 dbTableGuidLow) const
+        BattleGroundEventIdx GetGameObjectEventIndex(uint32 dbTableGuidLow) const
         {
             GameObjectBattleEventIndexesMap::const_iterator itr = m_GameObjectBattleEventIndexMap.find(dbTableGuidLow);
-            if(itr != m_GameObjectBattleEventIndexMap.end())
+            if (itr != m_GameObjectBattleEventIndexMap.end())
                 return itr->second[0];
             return m_GameObjectBattleEventIndexMap.find(-1)->second[0];
         }
@@ -273,14 +273,14 @@ class BattleGroundMgr
         std::vector<BattleGroundEventIdx> const& GetCreatureEventsVector(uint32 dbTableGuidLow) const
         {
             CreatureBattleEventIndexesMap::const_iterator itr = m_CreatureBattleEventIndexMap.find(dbTableGuidLow);
-            if(itr != m_CreatureBattleEventIndexMap.end())
+            if (itr != m_CreatureBattleEventIndexMap.end())
                 return itr->second;
             return m_CreatureBattleEventIndexMap.find(-1)->second;
         }
         std::vector<BattleGroundEventIdx> const& GetGameObjectEventsVector(uint32 dbTableGuidLow) const
         {
             GameObjectBattleEventIndexesMap::const_iterator itr = m_GameObjectBattleEventIndexMap.find(dbTableGuidLow);
-            if(itr != m_GameObjectBattleEventIndexMap.end())
+            if (itr != m_GameObjectBattleEventIndexMap.end())
                 return itr->second;
             return m_GameObjectBattleEventIndexMap.find(-1)->second;
         }

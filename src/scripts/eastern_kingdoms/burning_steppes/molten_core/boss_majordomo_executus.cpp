@@ -100,13 +100,13 @@ struct boss_majordomoAI : public ScriptedAI
     uint32 DialogRagnarosTimer;
     bool RagnarosEventStart;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
         Reflection_Timer =  30000;
         Blastwave_Timer = 10000;
-        for (int i = 0; i < 2; i++)
-            TPDomo_Timer[i] = 10000 + rand() % 20000;
+        for (uint32 & i : TPDomo_Timer)
+            i = 10000 + rand() % 20000;
         AddSpawn = false;
         AddVivant = 8;
         Immune = 0;
@@ -117,7 +117,7 @@ struct boss_majordomoAI : public ScriptedAI
         while (Creature* Add = m_creature->FindNearestCreature(11664, 100.0f, true))
             Add->ForcedDespawn();
 
-        if (m_pInstance && m_creature->getFaction() != 35)
+        if (m_pInstance && m_creature->GetFactionTemplateId() != 35)
         {
             if (m_pInstance->GetData(TYPE_MAJORDOMO) != DONE)
                 m_pInstance->SetData(TYPE_MAJORDOMO, NOT_STARTED);
@@ -130,7 +130,7 @@ struct boss_majordomoAI : public ScriptedAI
         RagnarosEventStart = false;
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (AddVivant > 0)
             AddVivant--;
@@ -140,13 +140,13 @@ struct boss_majordomoAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(AddListe, m_creature, 11664, 150.0f);
         if (!AddListe.empty())
         {
-            for (std::list<Creature*>::iterator itr = AddListe.begin(); itr != AddListe.end(); ++itr)
+            for (const auto& itr : AddListe)
             {
-                if ((*itr)->isAlive() && AddVivant > 0)
+                if (itr->IsAlive() && AddVivant > 0)
                 {
-                    const CreatureInfo *cinfo = (*itr)->GetCreatureInfo();
-                    (*itr)->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min + cinfo->dmg_min / AddVivant);
-                    (*itr)->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max + cinfo->dmg_max / AddVivant);
+                    CreatureInfo const *cinfo = itr->GetCreatureInfo();
+                    itr->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min + cinfo->dmg_min / AddVivant);
+                    itr->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max + cinfo->dmg_max / AddVivant);
                 }
             }
         }
@@ -155,13 +155,13 @@ struct boss_majordomoAI : public ScriptedAI
         {
             if (!AddListe.empty())
             {
-                for (std::list<Creature*>::iterator itr = AddListe.begin(); itr != AddListe.end(); ++itr)
+                for (const auto& itr : AddListe)
                 {
-                    if ((*itr)->isAlive())
+                    if (itr->IsAlive())
                     {
-                        (*itr)->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
-                        (*itr)->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
-                        (*itr)->RemoveSpellsCausingAura(SPELL_AURA_MOD_CONFUSE);
+                        itr->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_POLYMORPH, true);
+                        itr->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_STUN, true);
+                        itr->RemoveSpellsCausingAura(SPELL_AURA_MOD_CONFUSE);
                     }
                 }
             }
@@ -171,13 +171,13 @@ struct boss_majordomoAI : public ScriptedAI
         {
             if (!AddListe.empty())
             {
-                for (std::list<Creature*>::iterator itr = AddListe.begin(); itr != AddListe.end(); ++itr)
+                for (const auto& itr : AddListe)
                 {
-                    if ((*itr)->isAlive())
+                    if (itr->IsAlive())
                     {
                         m_creature->MonsterYell(SAY_LAST_ADD);
-                        (*itr)->SetPower(POWER_MANA, (*itr)->GetMaxPower(POWER_MANA));
-                        (*itr)->SetHealthPercent(100.0f);
+                        itr->SetPower(POWER_MANA, itr->GetMaxPower(POWER_MANA));
+                        itr->SetHealthPercent(100.0f);
                     }
                 }
             }
@@ -187,7 +187,7 @@ struct boss_majordomoAI : public ScriptedAI
         {
             DialogRagnarosTimer = 0;
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            m_creature->setFaction(35);
+            m_creature->SetFactionTemplateId(35);
             EnterEvadeMode();
             DoScriptText(SAY_DEFEAT, m_creature);
             if (m_pInstance)
@@ -198,15 +198,15 @@ struct boss_majordomoAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit* victim)
+    void KilledUnit(Unit* victim) override
     {
-        if (m_creature->getFaction() != 35)
+        if (m_creature->GetFactionTemplateId() != 35)
             DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
-        if (m_creature->getFaction() != 35)
+        if (m_creature->GetFactionTemplateId() != 35)
             DoScriptText(SAY_AGGRO, m_creature);
 
         if (m_pInstance)
@@ -216,7 +216,7 @@ struct boss_majordomoAI : public ScriptedAI
         }
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -255,7 +255,7 @@ struct boss_majordomoAI : public ScriptedAI
         if (Creature* Domo = m_creature->SummonCreature(m_creature->GetEntry(), 847.103f, -816.153f, -229.775f, 4.344f, TEMPSUMMON_TIMED_DESPAWN, (2 * 60 * 60 * 1000)))
         {
             Domo->SetUInt32Value(UNIT_NPC_FLAGS, 1);
-            Domo->setFaction(35);
+            Domo->SetFactionTemplateId(35);
             Domo->SetHealth(35);
             Domo->SetMaxHealth(35);
         }
@@ -319,13 +319,13 @@ struct boss_majordomoAI : public ScriptedAI
             }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (m_creature->getFaction() != 35 && AddSpawn == false)
+        if (m_creature->GetFactionTemplateId() != 35 && !AddSpawn)
         {
             Creature* DomoAdd[8];
-            for (int i = 0; i < 8; i++)
-                DomoAdd[i] = NULL;
+            for (auto& i : DomoAdd)
+                i = nullptr;
 
             for (int i = 0; i < 8; i++)
                 DomoAdd[i] = m_creature->SummonCreature(m_aBosspawnLocs[i].m_uiEntry, m_aBosspawnLocs[i].m_fX, m_aBosspawnLocs[i].m_fY, m_aBosspawnLocs[i].m_fZ, m_aBosspawnLocs[i].m_fO, TEMPSUMMON_DEAD_DESPAWN, 0);
@@ -344,7 +344,7 @@ struct boss_majordomoAI : public ScriptedAI
             AddSpawn = true;
         }
 
-        if (RagnarosEventStart == true && m_creature->getFaction() == 35)
+        if (RagnarosEventStart && m_creature->GetFactionTemplateId() == 35)
         {
             bool Up = false;
             DialogRagnarosTimer += diff;
@@ -358,9 +358,9 @@ struct boss_majordomoAI : public ScriptedAI
                 DomoEvent();
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->getFaction() == 35)
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim() || m_creature->GetFactionTemplateId() == 35)
         {
-            if (m_creature->GetDistance2d(758.089f, -1176.71f) < 2.0f && m_creature->getFaction() == 35)
+            if (m_creature->GetDistance2d(758.089f, -1176.71f) < 2.0f && m_creature->GetFactionTemplateId() == 35)
             {
                 DialogRagnarosTimer += diff;
                 if (DialogRagnarosTimer > 28000)
@@ -378,7 +378,7 @@ struct boss_majordomoAI : public ScriptedAI
         {
             uint32 Reflect = rand() % 2 ? SPELL_MAGIC_REFLECTION : SPELL_DAMAGE_REFLECTION;
 
-            if (m_creature->getVictim())
+            if (m_creature->GetVictim())
                 m_creature->CastSpell(m_creature, Reflect, true);
             Reflection_Timer = 30000;
         }
@@ -397,7 +397,7 @@ struct boss_majordomoAI : public ScriptedAI
         {
             if (TPDomo_Timer[i] < diff)
             {
-                Unit* uTarget = m_creature->getVictim();
+                Unit* uTarget = m_creature->GetVictim();
                 if (i == 1)
                     uTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
                 if (uTarget && uTarget->IsPlayer() && DoCastSpellIfCan(uTarget, SPELL_TELEPORT) == CAST_OK)
@@ -461,7 +461,7 @@ CreatureAI* GetAI_boss_majordomo(Creature* pCreature)
 
 void AddSC_boss_majordomo()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_majordomo";
     newscript->GetAI = &GetAI_boss_majordomo;

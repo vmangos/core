@@ -64,11 +64,11 @@ class ReputationMgr
         ~ReputationMgr() {}
 
         void SaveToDB();
-        void LoadFromDB(QueryResult *result);
+        void LoadFromDB(QueryResult* result);
     public:                                                 // statics
-        static const int32 PointsInRank[MAX_REPUTATION_RANK];
-        static const int32 Reputation_Cap    =  42999;
-        static const int32 Reputation_Bottom = -42000;
+        static int32 const PointsInRank[MAX_REPUTATION_RANK];
+        static int32 const Reputation_Cap    =  42999;
+        static int32 const Reputation_Bottom = -42000;
 
         static ReputationRank ReputationToRank(int32 standing);
         static int32 GetRepPointsToRank(ReputationRank rank);
@@ -77,13 +77,13 @@ class ReputationMgr
 
         FactionState const* GetState(FactionEntry const* factionEntry) const
         {
-            return factionEntry->reputationListID >= 0 ? GetState(factionEntry->reputationListID) : NULL;
+            return factionEntry->reputationListID >= 0 ? GetState(factionEntry->reputationListID) : nullptr;
         }
 
         FactionState const* GetState(RepListID id) const
         {
             FactionStateList::const_iterator repItr = m_factions.find (id);
-            return repItr != m_factions.end() ? &repItr->second : NULL;
+            return repItr != m_factions.end() ? &repItr->second : nullptr;
         }
 
         int32 GetReputation(uint32 faction_id) const;
@@ -96,7 +96,7 @@ class ReputationMgr
         ReputationRank const* GetForcedRankIfAny(FactionTemplateEntry const* factionTemplateEntry) const
         {
             ForcedReactions::const_iterator forceItr = m_forcedReactions.find(factionTemplateEntry->faction);
-            return forceItr != m_forcedReactions.end() ? &forceItr->second : NULL;
+            return forceItr != m_forcedReactions.end() ? &forceItr->second : nullptr;
         }
 
     public:                                                 // modifiers
@@ -120,12 +120,10 @@ class ReputationMgr
         void SendInitialReputations();
         void SendForceReactions();
         void SendState(FactionState const* faction);
-        template <typename OP>
-        void Serialize(OP& buf);
 
     private:                                                // internal helper functions
         void Initialize();
-        uint32 GetDefaultStateFlags(const FactionEntry *factionEntry) const;
+        uint32 GetDefaultStateFlags(FactionEntry const* factionEntry) const;
         bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool noSpillover = false);
         bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         void SetVisible(FactionState* faction);

@@ -7,7 +7,7 @@
 class check_auras_stack : public SingleTest
 {
 public:
-    check_auras_stack(const char* name, uint32 spellId1, uint32 spellId2) : SingleTest(name, MAP_TESTING_ID, false), _spellId1(spellId1), _spellId2(spellId2)
+    check_auras_stack(char const* name, uint32 spellId1, uint32 spellId2) : SingleTest(name, MAP_TESTING_ID, false), _spellId1(spellId1), _spellId2(spellId2)
     {
 
     }

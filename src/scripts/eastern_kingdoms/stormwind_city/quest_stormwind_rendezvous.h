@@ -144,10 +144,10 @@ struct npc_reginald_windsorAI : ScriptedAI
     void PokeRowe();
     void DoTalk(Unit* pWho, bool yell, Unit* pTarget = nullptr);
     void SituationFinale();
-    void UpdateAI_corpse(const uint32 uiDiff) override;
+    void UpdateAI_corpse(uint32 const uiDiff) override;
     void MoveInLineOfSight(Unit* Victim) override;
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpellEntry) override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 /*
@@ -167,7 +167,7 @@ struct npc_squire_roweAI : ScriptedAI
     void Reset() override {}
     void ResetCreature() override;
     void MovementInform(uint32 uiType, uint32 uiPointId) override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 #endif

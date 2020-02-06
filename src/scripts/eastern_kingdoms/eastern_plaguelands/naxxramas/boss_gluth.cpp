@@ -25,7 +25,7 @@ EndScriptData */
 #include "naxxramas.h"
 
 
-static const float aZombieSummonLoc[3][3] =
+static float const aZombieSummonLoc[3][3] =
 {
     { 3267.9f, -3172.1f, 297.42f },
     { 3253.2f, -3132.3f, 297.42f },
@@ -90,7 +90,7 @@ struct boss_gluthAI : public ScriptedAI
 
     uint32 five_percent;
     
-    void Reset()
+    void Reset() override
     {
         m_events.Reset();
 
@@ -116,7 +116,7 @@ struct boss_gluthAI : public ScriptedAI
     {
         // He should aggro just at the edge of the sewer pipe players jump from 
         if (pWho->GetTypeId() == TYPEID_PLAYER 
-            && !m_creature->isInCombat() 
+            && !m_creature->IsInCombat() 
             && m_creature->IsWithinDistInMap(pWho, 49.0f) 
             && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
@@ -146,7 +146,7 @@ struct boss_gluthAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GLUTH, FAIL);
     }
 
-    void SpellHit(Unit*, const SpellEntry* pSpell) override
+    void SpellHit(Unit*, SpellEntry const* pSpell) override
     {
         // only want to do these calculations inside naxx
         if (m_pInstance->GetMap()->GetId() != 533)
@@ -154,19 +154,19 @@ struct boss_gluthAI : public ScriptedAI
         if (pSpell->Id == SPELL_DECIMATE)
         {
             Map::PlayerList const& pList = m_pInstance->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator it = pList.begin(); it != pList.end(); ++it)
+            for (const auto& it : pList)
             {
-                Player* pPlayer = (*it).getSource();
+                Player* pPlayer = it.getSource();
                 if (!pPlayer) continue;
-                if (pPlayer->isDead()) continue;
+                if (pPlayer->IsDead()) continue;
                 DoCastSpellIfCan(pPlayer, SPELL_DECIMATE_OTHER, CF_TRIGGERED);
             }
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)  override
+    void UpdateAI(uint32 const uiDiff)  override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         m_events.Update(uiDiff);
@@ -177,7 +177,7 @@ struct boss_gluthAI : public ScriptedAI
             case EVENT_MORTAL_WOUND:
             {
                 // mortal wound current target every 
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALWOUND) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALWOUND) == CAST_OK)
                     m_events.Repeat(MORTAL_WOUND_CD);
                 else
                     m_events.Repeat(100);
@@ -246,9 +246,7 @@ struct boss_gluthAI : public ScriptedAI
                 }
                 else
                 {
-                    float x, y, z, o;
-                    m_creature->GetHomePosition(x, y, z, o);
-                    if (m_creature->GetDistance2d(x, y) > 150.0f)
+                    if (m_creature->GetDistance2d(m_creature->GetHomePosition()) > 150.0f)
                     {
                         EnterEvadeMode();
                     }
@@ -269,16 +267,16 @@ struct boss_gluthAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(chowableZombies, m_creature, NPC_ZOMBIE_CHOW, 15.0f);
         if (chowableZombies.empty())
             return;
-        for (auto it = chowableZombies.begin(); it != chowableZombies.end(); ++it)
+        for (const auto& chowableZombie : chowableZombies)
         {
-            if (!(*it)->isAlive())
+            if (!chowableZombie->IsAlive())
                 continue;
 
             // Using 2d distance, should do fine
-            if ((*it)->GetDistance2d(m_creature) < 15.0f) // distance based on dbc for spellid 289236
+            if (chowableZombie->GetDistance2d(m_creature) < 15.0f) // distance based on dbc for spellid 289236
             {
-                m_creature->SetFacingToObject(*it);
-                m_creature->DealDamage((*it), (*it)->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                m_creature->SetFacingToObject(chowableZombie);
+                m_creature->DealDamage(chowableZombie, chowableZombie->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 
                 // heals gluth for 5%. SetHealth truncates to maxhealth internally
                 m_creature->SetHealth(m_creature->GetHealth() + five_percent);
@@ -331,7 +329,7 @@ struct mob_zombieChow : public ScriptedAI
         return false;
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pWho, SpellEntry const* pSpell) override
     {
         ScriptedAI::SpellHit(pWho, pSpell);
         if (pWho->GetEntry() == NPC_GLUTH && pSpell->Id == SPELL_DECIMATE)
@@ -351,7 +349,7 @@ struct mob_zombieChow : public ScriptedAI
         ScriptedAI::AttackStart(pWho);
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (isHitByDecimate)
         {
@@ -362,7 +360,7 @@ struct mob_zombieChow : public ScriptedAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();

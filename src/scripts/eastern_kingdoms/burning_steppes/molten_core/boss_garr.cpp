@@ -51,7 +51,7 @@ struct boss_garrAI : ScriptedAI
         m_uiCheckAddsTimer      = 2000;
         m_uiExplodeTimer        = urand(3000, 6000);
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_GARR, NOT_STARTED);
     }
 
@@ -71,9 +71,9 @@ struct boss_garrAI : ScriptedAI
             GetCreatureListWithEntryInGrid(firesworn, m_creature, NPC_FIRESWORN, 150.0f);
             m_lFiresworn.clear();
 
-            for (auto itr = firesworn.begin(); itr != firesworn.end(); ++itr)
+            for (const auto& itr : firesworn)
             {
-                m_lFiresworn.push_back((*itr)->GetObjectGuid());
+                m_lFiresworn.push_back(itr->GetObjectGuid());
             }
         }
     }
@@ -130,9 +130,9 @@ struct boss_garrAI : ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiAntiMagicPulseTimer < diff)
@@ -205,7 +205,7 @@ struct mob_fireswornAI : ScriptedAI
 
         if (Creature* pGarr = m_pInstance->GetSingleCreatureFromStorage(NPC_GARR))
         {
-            if (pGarr->isAlive())
+            if (pGarr->IsAlive())
             {
                 if (auto pGarrAI = static_cast<boss_garrAI*>(pGarr->AI()))
                     pGarrAI->FireswornJustDied(m_creature->GetObjectGuid());                
@@ -228,7 +228,7 @@ struct mob_fireswornAI : ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell) override
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_ERUPTION_TRIGGER)
         {
@@ -241,9 +241,9 @@ struct mob_fireswornAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiAnxietyTimer < diff)
@@ -300,7 +300,7 @@ CreatureAI* GetAI_mob_firesworn(Creature* pCreature)
 
 void AddSC_boss_garr()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_garr";

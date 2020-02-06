@@ -39,7 +39,7 @@ npc_j_eevee_dreadsteedAI::npc_j_eevee_dreadsteedAI(Creature* pCreature) : Script
 {
     //m_pInstance = (instance_dire_maul*) pCreature->GetInstanceData();
     m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
-    m_creature->setFaction(35); //friendly to everyone
+    m_creature->SetFactionTemplateId(35); //friendly to everyone
     m_creature->SetWalk(true);
     Reset();
 }
@@ -75,9 +75,9 @@ void npc_j_eevee_dreadsteedAI::MovementInform(uint32 uiType, uint32 uiPointId)
 
     }
 }
-void npc_j_eevee_dreadsteedAI::UpdateAI(const uint32 uiDiff)
+void npc_j_eevee_dreadsteedAI::UpdateAI(uint32 const uiDiff)
 {
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
     {
         if (waypointReached)
         {
@@ -148,7 +148,7 @@ npc_j_eevee_scholomanceAI::npc_j_eevee_scholomanceAI(Creature* pCreature) : Scri
 
         if (Player *player = m_creature->GetMap()->GetPlayer(guidPlayer)) {
             player->HandleEmote(EMOTE_ONESHOT_KNEEL);
-            m_creature->setFaction(player->getFaction()); // player faction, friendly to player but hostile to other mobs
+            m_creature->SetFactionTemplateId(player->GetFactionTemplateId()); // player faction, friendly to player but hostile to other mobs
         }
     }
 
@@ -195,9 +195,9 @@ void npc_j_eevee_scholomanceAI::MovementInform(uint32 uiType, uint32 uiPointId)
     }
 }
 
-void npc_j_eevee_scholomanceAI::UpdateAI(const uint32 uiDiff)
+void npc_j_eevee_scholomanceAI::UpdateAI(uint32 const uiDiff)
 {
-    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+    if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
     {
         if (waypointReached || finished)
         {
@@ -270,12 +270,12 @@ CreatureAI* GetAI_npc_j_eevee(Creature* pCreature)
     else if (pCreature->GetMapId() == 289) // Map 289, Zone 2057. Scholomance
         return new npc_j_eevee_scholomanceAI(pCreature);
 
-    return NULL;
+    return nullptr;
 }
 
 void AddSC_npc_j_eevee()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_j_eevee";

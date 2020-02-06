@@ -69,7 +69,7 @@ public:
                 Player* p = GetTestPlayer(0);
                 if (!p)
                     Fail("Unable to summon a player");
-                else if (p->getClass() != CLASS_WARLOCK && p->getRace() != RACE_GNOME)
+                else if (p->GetClass() != CLASS_WARLOCK && p->GetRace() != RACE_GNOME)
                     Fail("Bad class or race");
                 else if (p->FindMap() != GetMap())
                     Fail("Bad map");
@@ -119,7 +119,7 @@ public:
                 Player* p = GetTestPlayer(0);
                 if (!p)
                     Fail("Unable to summon a player");
-                else if (p->getClass() != CLASS_WARLOCK && p->getRace() != RACE_GNOME)
+                else if (p->GetClass() != CLASS_WARLOCK && p->GetRace() != RACE_GNOME)
                     Fail("Bad player class or race");
                 else if (p->FindMap() != GetMap())
                     Fail("Bad player map");

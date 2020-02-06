@@ -37,7 +37,8 @@ char const* conditionSourceToStr[] =
     "vendor",
     "spell_area",
     "scripted map event",
-    "script action"
+    "script action",
+    "areatrigger"
 };
 
 // Stores what params need to be provided to each condition type.
@@ -91,13 +92,14 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_UNIT,        //  41
     CONDITION_REQ_TARGET_UNIT,        //  42
     CONDITION_REQ_TARGET_UNIT,        //  43
-    CONDITION_REQ_BOTH_UNITS,         //  44
+    CONDITION_REQ_BOTH_WORLDOBJECTS,  //  44
     CONDITION_REQ_TARGET_PLAYER,      //  45
     CONDITION_REQ_TARGET_UNIT,        //  46
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  47
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  48
     CONDITION_REQ_TARGET_GAMEOBJECT,  //  49
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  50
+    CONDITION_REQ_TARGET_PLAYER,      //  51
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -107,7 +109,7 @@ uint8 const* ConditionTargets = &ConditionTargetsInternal[3];
 bool ConditionEntry::Meets(WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const
 {
     DEBUG_LOG("Condition-System: Check condition %u, type %i - called from %s with params target: %s, map %i, source %s",
-              m_entry, m_condition, conditionSourceToStr[conditionSourceType], target ? target->GetGuidStr().c_str() : "<NULL>", map ? map->GetId() : -1, source ? source->GetGuidStr().c_str() : "<NULL>");
+              m_entry, m_condition, conditionSourceToStr[conditionSourceType], target ? target->GetGuidStr().c_str() : "<nullptr>", map ? map->GetId() : -1, source ? source->GetGuidStr().c_str() : "<nullptr>");
 
     if (m_flags & CONDITION_FLAG_SWAP_TARGETS)
         std::swap(source, target);
@@ -115,7 +117,7 @@ bool ConditionEntry::Meets(WorldObject const* target, Map const* map, WorldObjec
     if (!CheckParamRequirements(target, map, source))
     {
         sLog.outErrorDb("CONDITION %u type %u used with bad parameters, called from %s, used with target: %s, map %i, source %s",
-            m_entry, m_condition, conditionSourceToStr[conditionSourceType], target ? target->GetGuidStr().c_str() : "NULL", map ? map->GetId() : -1, source ? source->GetGuidStr().c_str() : "NULL");
+            m_entry, m_condition, conditionSourceToStr[conditionSourceType], target ? target->GetGuidStr().c_str() : "<nullptr>", map ? map->GetId() : -1, source ? source->GetGuidStr().c_str() : "<nullptr>");
         return false;
     } 
 
@@ -139,13 +141,24 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_OR:
         {
-            // Checked on load
+            // Third and fourth condition are optional
+            if (m_value3 && sConditionStorage.LookupEntry<ConditionEntry>(m_value3)->Meets(target, map, source, conditionSourceType))
+                return true;
+            if (m_value4 && sConditionStorage.LookupEntry<ConditionEntry>(m_value4)->Meets(target, map, source, conditionSourceType))
+                return true;
+            
             return sConditionStorage.LookupEntry<ConditionEntry>(m_value1)->Meets(target, map, source, conditionSourceType) || sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(target, map, source, conditionSourceType);
         }
         case CONDITION_AND:
         {
-            // Checked on load
-            return sConditionStorage.LookupEntry<ConditionEntry>(m_value1)->Meets(target, map, source, conditionSourceType) && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(target, map, source, conditionSourceType);
+            // Third and fourth condition are optional
+            bool extraConditionsSatisfied = true;
+            if (m_value3)
+                extraConditionsSatisfied = extraConditionsSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value3)->Meets(target, map, source, conditionSourceType);
+            if (m_value4)
+                extraConditionsSatisfied = extraConditionsSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value4)->Meets(target, map, source, conditionSourceType);
+
+            return extraConditionsSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value1)->Meets(target, map, source, conditionSourceType) && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(target, map, source, conditionSourceType);
         }
         case CONDITION_NONE:
         {
@@ -195,8 +208,8 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_AD_COMMISSION_AURA:
         {
             Unit::SpellAuraHolderMap const& auras = target->ToPlayer()->GetSpellAuraHolderMap();
-            for (Unit::SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end(); ++itr)
-                if ((itr->second->GetSpellProto()->Attributes & SPELL_ATTR_CASTABLE_WHILE_MOUNTED || itr->second->GetSpellProto()->Attributes & SPELL_ATTR_IS_ABILITY) && itr->second->GetSpellProto()->SpellVisual == 3580)
+            for (const auto& aura : auras)
+                if ((aura.second->GetSpellProto()->Attributes & SPELL_ATTR_CASTABLE_WHILE_MOUNTED || aura.second->GetSpellProto()->Attributes & SPELL_ATTR_IS_ABILITY) && aura.second->GetSpellProto()->SpellVisual == 3580)
                     return true;
             return false;
         }
@@ -221,9 +234,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_RACE_CLASS:
         {
             Player const* pPlayer = target->ToPlayer();
-            if ((!m_value1 || (pPlayer->getRaceMask() & m_value1)) && (!m_value2 || (pPlayer->getClassMask() & m_value2)))
-                return true;
-            return false;
+            return (!m_value1 || (pPlayer->GetRaceMask() & m_value1)) && (!m_value2 || (pPlayer->GetClassMask() & m_value2));
         }
         case CONDITION_LEVEL:
         {
@@ -231,11 +242,11 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             switch (m_value2)
             {
                 case 0:
-                    return pTarget->getLevel() == m_value1;
+                    return pTarget->GetLevel() == m_value1;
                 case 1:
-                    return pTarget->getLevel() >= m_value1;
+                    return pTarget->GetLevel() >= m_value1;
                 case 2:
-                    return pTarget->getLevel() <= m_value1;
+                    return pTarget->GetLevel() <= m_value1;
             }
             return false;
         }
@@ -259,7 +270,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             Player const* pPlayer = target  ? target->ToPlayer() : nullptr;
             if (!map)
-                map = pPlayer ? pPlayer->GetMap() : source->GetMap();
+                map = target ? target->GetMap() : source->GetMap();
 
             if (InstanceData const* data = map->GetInstanceData())
                 return data->CheckConditionCriteriaMeet(pPlayer, m_value1, source, m_value2);
@@ -280,9 +291,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_QUEST_NONE:
         {
             Player const* pPlayer = target->ToPlayer();
-            if (!pPlayer->IsCurrentQuest(m_value1) && !pPlayer->GetQuestRewardStatus(m_value1))
-                return true;
-            return false;
+            return !pPlayer->IsCurrentQuest(m_value1) && !pPlayer->GetQuestRewardStatus(m_value1);
         }
         case CONDITION_ITEM_WITH_BANK:
         {
@@ -303,15 +312,15 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_ESCORT:
         {
-            const Creature* pSource = ToCreature(source);
-            const Player* pTarget = ToPlayer(target);
+            Creature const* pSource = ToCreature(source);
+            Player const* pTarget = ToPlayer(target);
 
             if (m_value1 & CF_ESCORT_SOURCE_DEAD)
-                if (!pSource || pSource->isDead())
+                if (!pSource || pSource->IsDead())
                     return true;
 
             if (m_value1 & CF_ESCORT_TARGET_DEAD)
-                if (!pTarget || pTarget->isDead() || !pTarget->IsInWorld())
+                if (!pTarget || pTarget->IsDead() || !pTarget->IsInWorld())
                     return true;
 
             if (m_value2)
@@ -326,7 +335,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_GENDER:
         {
-            return target->getGender() == m_value1;
+            return target->GetGender() == m_value1;
         }
         case CONDITION_SKILL_BELOW:
         {
@@ -353,7 +362,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_LAST_WAYPOINT:
         {
-            uint32 lastReachedWp = ((Creature*)source)->GetMotionMaster()->getLastReachedWaypoint();
+            uint32 const lastReachedWp = ((Creature*)source)->GetMotionMaster()->getLastReachedWaypoint();
             switch (m_value2)
             {
                 case 0:
@@ -369,16 +378,13 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             uint32 mapId = map ? map->GetId() : (source ? source->GetMapId() : target->GetMapId());
 
-            if (mapId == m_value1)
-                return true;
-
-            return false;
+            return mapId == m_value1;
         }
         case CONDITION_INSTANCE_DATA:
         {
-            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            Map const* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
 
-            if (InstanceData const* data = map->GetInstanceData())
+            if (InstanceData const* data = pMap->GetInstanceData())
             {
                 switch (m_value3)
                 {
@@ -395,9 +401,9 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_MAP_EVENT_DATA:
         {
-            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            Map const* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
 
-            if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(m_value1))
+            if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(m_value1))
             {
                 switch (m_value4)
                 {
@@ -413,7 +419,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_MAP_EVENT_ACTIVE:
         {
-            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            Map const* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
             return pMap->GetScriptedMapEvent(m_value1);
         }
         case CONDITION_LINE_OF_SIGHT:
@@ -475,11 +481,11 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_IS_IN_COMBAT:
         {
-            return target->ToUnit()->isInCombat();
+            return target->ToUnit()->IsInCombat();
         }
         case CONDITION_IS_HOSTILE_TO:
         {
-            return target->ToUnit()->IsHostileTo(source->ToUnit());
+            return target->IsHostileTo(source);
         }
         case CONDITION_IS_IN_GROUP:
         {
@@ -487,13 +493,13 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_IS_ALIVE:
         {
-            return target->ToUnit()->isAlive();
+            return target->ToUnit()->IsAlive();
         }
         case CONDITION_MAP_EVENT_TARGETS:
         {
             bool bSatisfied = true;
             Map* pMap = const_cast<Map*>(map ? map : (source ? source->GetMap() : target->GetMap()));
-            if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(m_value1))
+            if (ScriptedEvent const* pEvent = pMap->GetScriptedMapEvent(m_value1))
             {
                 for (const auto& eventTarget : pEvent->m_vTargets)
                 {
@@ -530,6 +536,20 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             if (GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(m_value1))
                 if (GameObject* pGameObject = pMap->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, m_value1)))
                     return sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(pGameObject, map, source, conditionSourceType);
+            return false;
+        }
+        case CONDITION_PVP_RANK:
+        {
+            int8 visualRank = target->ToPlayer()->GetHonorMgr().GetRank().visualRank;
+            switch (m_value2)
+            {
+                case 0:
+                    return visualRank == int8(m_value1);
+                case 1:
+                    return visualRank >= int8(m_value1);
+                case 2:
+                    return visualRank <= int8(m_value1);
+            }
             return false;
         }
     }
@@ -624,7 +644,7 @@ bool ConditionEntry::IsValid()
                 sLog.outErrorDb("CONDITION_NOT (entry %u, type %d) has invalid value1 %u, must be lower than entry, skipped", m_entry, m_condition, m_value1);
                 return false;
             }
-            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value1);
+            ConditionEntry const* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value1);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION_NOT (entry %u, type %d) has value1 %u without proper condition, skipped", m_entry, m_condition, m_value1);
@@ -645,17 +665,45 @@ bool ConditionEntry::IsValid()
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value2 %u, must be lower than entry, skipped", m_entry, m_condition, m_value2);
                 return false;
             }
-            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value1);
+            ConditionEntry const* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value1);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value1 %u without proper condition, skipped", m_entry, m_condition, m_value1);
                 return false;
             }
-            const ConditionEntry* condition2 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
+            ConditionEntry const* condition2 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
             if (!condition2)
             {
                 sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
                 return false;
+            }
+            if (m_value3)
+            {
+                if (m_value3 >= m_entry)
+                {
+                    sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value3 %u, must be lower than entry, skipped", m_entry, m_condition, m_value3);
+                    return false;
+                }
+                ConditionEntry const* condition3 = sConditionStorage.LookupEntry<ConditionEntry>(m_value3);
+                if (!condition3)
+                {
+                    sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value3 %u without proper condition, skipped", m_entry, m_condition, m_value3);
+                    return false;
+                }
+            }
+            if (m_value4)
+            {
+                if (m_value4 >= m_entry)
+                {
+                    sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has invalid value4 %u, must be lower than entry, skipped", m_entry, m_condition, m_value4);
+                    return false;
+                }
+                ConditionEntry const* condition4 = sConditionStorage.LookupEntry<ConditionEntry>(m_value4);
+                if (!condition4)
+                {
+                    sLog.outErrorDb("CONDITION _AND or _OR (entry %u, type %d) has value4 %u without proper condition, skipped", m_entry, m_condition, m_value4);
+                    return false;
+                }
             }
             break;
         }
@@ -969,11 +1017,6 @@ bool ConditionEntry::IsValid()
                     return true;
                 }
             }
-            if (m_value2 < 0 || m_value2 > 1)
-            {
-                sLog.outErrorDb("NPC Entry condition (entry %u, type %u) has invalid criteria %u (must be 0 or 1)", m_entry, m_condition, m_value1);
-                return false;
-            }
             break;
         }
         case CONDITION_WAR_EFFORT_STAGE:
@@ -1025,7 +1068,7 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_MAP_EVENT_TARGETS:
         {
-            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
+            ConditionEntry const* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION_MAP_EVENT_TARGETS (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
@@ -1046,10 +1089,10 @@ bool ConditionEntry::IsValid()
         {
             if (!sObjectMgr.IsExistingGameObjectGuid(m_value1))
             {
-                sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %u) has invalid nonexistent GameObject guid %u", m_entry, m_condition, m_value1);
+                sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %u) uses nonexistent GameObject guid %u", m_entry, m_condition, m_value1);
                 return false;
             }
-            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
+            ConditionEntry const* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
             if (!condition1)
             {
                 sLog.outErrorDb("CONDITION_OBJECT_FIT_CONDITION (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
@@ -1057,10 +1100,29 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
+        case CONDITION_PVP_RANK:
+        {
+            if (m_value1 > 14)
+            {
+                sLog.outErrorDb("CONDITION_PVP_RANK (entry %u, type %u) has invalid honor rank %u, skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+            if (m_value2 > 2)
+            {
+                sLog.outErrorDb("CONDITION_PVP_RANK (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_HAS_FLAG:
+        {
+            // Fix field id for older client builds.
+            m_value1 = GetIndexOfUpdateFieldForCurrentBuild(m_value1);
+            break;
+        }
         case CONDITION_NONE:
         case CONDITION_INSTANCE_SCRIPT:
         case CONDITION_ACTIVE_HOLIDAY:
-        case CONDITION_HAS_FLAG:
         case CONDITION_INSTANCE_DATA:
         case CONDITION_MAP_EVENT_DATA:
         case CONDITION_MAP_EVENT_ACTIVE:
@@ -1105,7 +1167,7 @@ bool ConditionEntry::CanBeUsedWithoutPlayer(uint32 entry)
 
 bool IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType)
 {
-    if (const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
+    if (ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
         return condition->Meets(target, map, source, conditionSourceType);
 
     return false;

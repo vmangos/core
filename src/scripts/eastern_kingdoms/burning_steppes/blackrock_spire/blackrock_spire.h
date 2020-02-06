@@ -80,26 +80,26 @@ class instance_blackrock_spire : public ScriptedInstance
 {
     public:
         instance_blackrock_spire(Map* pMap);
-        ~instance_blackrock_spire() {}
+        ~instance_blackrock_spire() override {}
 
-        void Initialize();
+        void Initialize() override;
 
-        void OnObjectCreate(GameObject* pGo);
-        void OnCreatureCreate(Creature* pCreature);
+        void OnObjectCreate(GameObject* pGo) override;
+        void OnCreatureCreate(Creature* pCreature) override;
 
-        void SetData(uint32 uiType, uint32 uiData);
-        void SetData64(uint32 uiType, uint64 uiData);
-        uint32 GetData(uint32 uiType);
-        uint64 GetData64(uint32 uiType);
+        void SetData(uint32 uiType, uint32 uiData) override;
+        void SetData64(uint32 uiType, uint64 uiData) override;
+        uint32 GetData(uint32 uiType) override;
+        uint64 GetData64(uint32 uiType) override;
 
-        const char* Save() { return strInstData.c_str(); }
-        void Load(const char* chrIn);
+        char const* Save() override { return strInstData.c_str(); }
+        void Load(char const* chrIn) override;
 
         void DoSortRoomEventMobs();
         void GetIncanceratorGUIDList(std::list<uint64> &lList) { lList = m_lIncanceratorGUIDList; }
         void GetRookeryEggGUIDList(std::list<uint64> &lList) { lList = m_lRookeryEggGUIDList; }
 
-        void Update(uint32 uiDiff);
+        void Update(uint32 uiDiff) override;
 
     protected:
         uint32 m_auiEncounter[INSTANCE_BRS_MAX_ENCOUNTER];

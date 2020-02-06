@@ -57,7 +57,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
     uint32 m_uiWideSlash_Timer;
     bool m_bHasEnraged;
 
-    void Reset()
+    void Reset() override
     {
         m_uiInvocation_Timer = 10000;
         m_uiMortalWound_Timer = 7000;
@@ -70,14 +70,14 @@ struct boss_kurinnaxxAI : public ScriptedAI
             m_pInstance->SetData(TYPE_KURINNAXX, NOT_STARTED);
     }
 
-    void Aggro(Unit* pPuller)
+    void Aggro(Unit* pPuller) override
     {
         m_creature->SetInCombatWithZone();
         if (m_pInstance)
             m_pInstance->SetData(TYPE_KURINNAXX, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (!m_pInstance)
             return;
@@ -87,16 +87,16 @@ struct boss_kurinnaxxAI : public ScriptedAI
         m_pInstance->SetData(TYPE_KURINNAXX, DONE);
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         if (!m_bHasEnraged && ((m_creature->GetHealth() * 100) / m_creature->GetMaxHealth()) <= 30 && !m_creature->IsNonMeleeSpellCasted(false))
         {
-            DoCast(m_creature->getVictim(), SPELL_ENRAGE);
+            DoCast(m_creature->GetVictim(), SPELL_ENRAGE);
             m_bHasEnraged = true;
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // if no one gets to the trap in 5 seconds delete the trap
         if (m_uiCleanSandTrap_Timer < uiDiff)
@@ -110,13 +110,13 @@ struct boss_kurinnaxxAI : public ScriptedAI
         else
             m_uiCleanSandTrap_Timer -= uiDiff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         /* Moral wound */
         if (m_uiMortalWound_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALWOUND) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALWOUND) == CAST_OK)
                 m_uiMortalWound_Timer = 9000;
         }
         else
@@ -139,7 +139,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         /* WideSlash */
         if (m_uiWideSlash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WIDE_SLASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WIDE_SLASH) == CAST_OK)
                 m_uiWideSlash_Timer = 10000 + (rand() % 10000);
         }
         else
@@ -166,7 +166,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         /* Trash */
         if (m_uiTrash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRASH) == CAST_OK)
                 m_uiTrash_Timer = 10000 + (rand() % 10000);
         }
         else
@@ -183,7 +183,7 @@ CreatureAI* GetAI_boss_kurinnaxx(Creature* pCreature)
 
 void AddSC_boss_kurinnaxx()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_kurinnaxx";
     newscript->GetAI = &GetAI_boss_kurinnaxx;

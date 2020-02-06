@@ -30,32 +30,32 @@ Sha1Hash::~Sha1Hash()
     SHA1_Init(&mC);
 }
 
-void Sha1Hash::UpdateData(const uint8 *dta, int len)
+void Sha1Hash::UpdateData(uint8 const* dta, int len)
 {
     SHA1_Update(&mC, dta, len);
 }
 
-void Sha1Hash::UpdateData(const std::vector<uint8>& data)
+void Sha1Hash::UpdateData(std::vector<uint8> const& data)
 {
     SHA1_Update(&mC, data.data(), data.size());
 }
 
-void Sha1Hash::UpdateData(const std::string &str)
+void Sha1Hash::UpdateData(std::string const& str)
 {
     UpdateData((uint8 const*)str.c_str(), str.length());
 }
 
-void Sha1Hash::UpdateBigNumbers(BigNumber *bn0, ...)
+void Sha1Hash::UpdateBigNumbers(BigNumber* bn0, ...)
 {
     va_list v;
-    BigNumber *bn;
+    BigNumber* bn;
 
     va_start(v, bn0);
     bn = bn0;
     while (bn)
     {
         UpdateData(bn->AsByteArray());
-        bn = va_arg(v, BigNumber *);
+        bn = va_arg(v, BigNumber*);
     }
     va_end(v);
 }

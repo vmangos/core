@@ -79,12 +79,12 @@ struct mob_stone_keeperAI : public ScriptedAI
     
     uint32 m_uiTrample_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiTrample_Timer = urand(4000, 9000);
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (Unit* target = me->SelectNearestHostileUnitInAggroRange(true))
         {
@@ -96,21 +96,21 @@ struct mob_stone_keeperAI : public ScriptedAI
             instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, FAIL);
     }
 
-    void JustDied(Unit* pWho)
+    void JustDied(Unit* pWho) override
     {
         if (instance)
             instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, IN_PROGRESS);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }
         if (m_uiTrample_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRAMPLE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRAMPLE) == CAST_OK)
             {
                 m_uiTrample_Timer = urand(4000, 10000);
             }
@@ -140,15 +140,15 @@ struct mob_jadespine_basiliskAI : public ScriptedAI
 
     uint32 Cslumber_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Cslumber_Timer = 2000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }
@@ -157,15 +157,15 @@ struct mob_jadespine_basiliskAI : public ScriptedAI
         if (Cslumber_Timer < diff)
         {
             //Cast
-            // DoCastSpellIfCan(m_creature->getVictim(),SPELL_CRYSTALLINE_SLUMBER);
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_CRYSTALLINE_SLUMBER, false);
+            // DoCastSpellIfCan(m_creature->GetVictim(),SPELL_CRYSTALLINE_SLUMBER);
+            m_creature->CastSpell(m_creature->GetVictim(), SPELL_CRYSTALLINE_SLUMBER, false);
 
             //Stop attacking target thast asleep and pick new target
             Cslumber_Timer = 28000;
 
             Unit* Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
 
-            if (!Target || Target == m_creature->getVictim())
+            if (!Target || Target == m_creature->GetVictim())
             {
                 Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             }
@@ -276,23 +276,12 @@ bool GossipSelect_npc_lore_keeper_of_norgannon(Player* pPlayer, Creature* pCreat
     return true;
 }
 
-#define QUEST_HIDDEN_CHAMBER 2240
-
-bool OnTrigger_at_map_chamber(Player* pPlayer, const AreaTriggerEntry *at)
-{
-    if (pPlayer->GetQuestStatus(QUEST_HIDDEN_CHAMBER) == QUEST_STATUS_INCOMPLETE)
-    {
-        pPlayer->AreaExploredOrEventHappens(QUEST_HIDDEN_CHAMBER);
-    }
-    return true;
-}
-
 struct AnnoraAI : public ScriptedAI
 {
     AnnoraAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_creature->SetVisibility(VISIBILITY_OFF);
-        m_creature->setFaction(FACTION_STONED);
+        m_creature->SetFactionTemplateId(FACTION_STONED);
         m_uiNbScorpion = 0;
         isSpawned = false;
         Reset();
@@ -301,15 +290,15 @@ struct AnnoraAI : public ScriptedAI
     uint32 m_uiNbScorpion;
     bool isSpawned;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!isSpawned)
         {
@@ -319,7 +308,7 @@ struct AnnoraAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(m_EscortList, m_creature, 7078, 30.0f);
             for (const auto& it : m_EscortList)
             {
-                if (it->isAlive())
+                if (it->IsAlive())
                 {
                     m_uiNbScorpion++;
                 }
@@ -334,7 +323,7 @@ struct AnnoraAI : public ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             return;
         }
@@ -357,7 +346,7 @@ enum
 
 void AddSC_uldaman()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "mob_annora";
@@ -389,10 +378,5 @@ void AddSC_uldaman()
     newscript = new Script;
     newscript->Name = "event_awaken_stone_keeper";
     newscript->pProcessEventId = &ProcessEventId_event_awaken_stone_keeper;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "at_map_chamber";
-    newscript->pAreaTrigger = &OnTrigger_at_map_chamber;
     newscript->RegisterSelf();
 }

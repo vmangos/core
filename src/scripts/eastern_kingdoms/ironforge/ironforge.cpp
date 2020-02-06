@@ -39,7 +39,7 @@ EndContentData */
 
 bool GossipHello_npc_royal_historian_archesonus(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(3702) == QUEST_STATUS_INCOMPLETE)
@@ -88,7 +88,7 @@ bool GossipSelect_npc_royal_historian_archesonus(Player* pPlayer, Creature* pCre
 
 bool GossipHello_npc_magni_bronzebeard(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
 
@@ -101,7 +101,7 @@ bool GossipHello_npc_magni_bronzebeard(Player* pPlayer, Creature* pCreature)
 
 bool GossipHello_npc_tinker_mekkatorque(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
 
@@ -147,23 +147,23 @@ public:
         }
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_KNOCK_AWAY)
-            if (m_creature->getThreatManager().getThreat(pTarget))
-                m_creature->getThreatManager().modifyThreatPercent(pTarget, -25);
+            if (m_creature->GetThreatManager().getThreat(pTarget))
+                m_creature->GetThreatManager().modifyThreatPercent(pTarget, -25);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiStormBoltTimer <= uiDiff)
         {
             if (m_bHasStormBolted)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STORM_BOLT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STORM_BOLT) == CAST_OK)
                 {
                     m_bHasStormBolted = false;
                     m_uiStormBoltTimer = 10000;
@@ -207,7 +207,7 @@ public:
 
         if (m_uiChargeTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHARGE) == CAST_OK)
                 m_uiChargeTimer = 5000;
         }
         else
@@ -234,7 +234,7 @@ CreatureAI* GetAI_boss_magni_bronzebeard(Creature* pCreature)
 
 void AddSC_ironforge()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_royal_historian_archesonus";

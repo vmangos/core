@@ -61,16 +61,16 @@ struct npc_theldrenAI : public ScriptedAI
     uint32 m_uiMortalStrikeTimer;
     uint32 m_uiFearTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiInterceptTimer = 10000;
         m_uiMortalStrikeTimer = 10000;
         m_uiFearTimer = 30000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiInterceptTimer < diff)
@@ -85,7 +85,7 @@ struct npc_theldrenAI : public ScriptedAI
 
         if (m_uiMortalStrikeTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THELDREN_MORTAL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THELDREN_MORTAL_STRIKE) == CAST_OK)
                 m_uiMortalStrikeTimer = urand(8000, 15000);
         }
         else
@@ -93,7 +93,7 @@ struct npc_theldrenAI : public ScriptedAI
 
         if (m_uiFearTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THELDREN_INTIMIDATING_SHOUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THELDREN_INTIMIDATING_SHOUT) == CAST_OK)
                 m_uiFearTimer = urand(30000, 40000);
         }
         else
@@ -119,7 +119,7 @@ struct npc_va_jashniAI : public ScriptedAI
     uint32 m_uiShieldTimer;
     uint32 m_uiRenewTimer;
 
-    void Reset()
+    void Reset() override
     {
         // The values on the heals are huge... Maybe wrong spells. If not, they
         // should have massive cooldowns
@@ -128,7 +128,7 @@ struct npc_va_jashniAI : public ScriptedAI
         m_uiRenewTimer = 30000;  // renew is 2000 health every 3 sec...
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (m_uiFlashHealTimer < diff)
         {
@@ -160,7 +160,7 @@ struct npc_va_jashniAI : public ScriptedAI
         else
             m_uiRenewTimer -= diff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -183,16 +183,16 @@ struct npc_korvAI : public ScriptedAI
     uint32 m_uiEarthbindTimer;
     uint32 m_uiFireNovaTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFrostShockTimer = 10000;
         m_uiEarthbindTimer = 20000;
         m_uiFireNovaTimer = 20000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiFrostShockTimer < diff)
@@ -240,19 +240,19 @@ struct npc_leftyAI : public ScriptedAI
 
     uint32 m_uiFiveFingerTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFiveFingerTimer = 2000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiFiveFingerTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_LEFTY_FIVE_FAT_FINGERS) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_LEFTY_FIVE_FAT_FINGERS) == CAST_OK)
                 m_uiFiveFingerTimer = urand(2000, 3000);
         }
         else
@@ -279,7 +279,7 @@ struct npc_snokh_blackspineAI : public ScriptedAI
     uint32 m_uiFlamestrikeTimer;
     uint32 m_uiPolymorphTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPyroblastTimer = 15000;
         m_uiScorchTimer = 4000;
@@ -287,14 +287,14 @@ struct npc_snokh_blackspineAI : public ScriptedAI
         m_uiPolymorphTimer = 30000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiPyroblastTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SNOKH_BLACKSPINE_PYROBLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SNOKH_BLACKSPINE_PYROBLAST) == CAST_OK)
                 m_uiPyroblastTimer = urand(10000, 20000);
         }
         else
@@ -302,7 +302,7 @@ struct npc_snokh_blackspineAI : public ScriptedAI
 
         if (m_uiScorchTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SNOKH_BLACKSPINE_SCORCH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SNOKH_BLACKSPINE_SCORCH) == CAST_OK)
                 m_uiScorchTimer = urand(3000, 5000);
         }
         else
@@ -347,15 +347,15 @@ struct npc_volidaAI : public ScriptedAI
     uint32 m_uiBlizzardTimer;
     uint32 m_uiConeOfColdTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiBlizzardTimer = 4000;
         m_uiConeOfColdTimer = 20000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiBlizzardTimer < diff)
@@ -370,7 +370,7 @@ struct npc_volidaAI : public ScriptedAI
 
         if (m_uiConeOfColdTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_VOLIDA_CONEOFCOLD) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VOLIDA_CONEOFCOLD) == CAST_OK)
                 m_uiConeOfColdTimer = 20000;
         }
         else
@@ -399,7 +399,7 @@ struct npc_malgen_longspearAI : public ScriptedAI
     bool m_bIsFeigned;
     ObjectGuid m_petGuid;
 
-    void Reset()
+    void Reset() override
     {
         m_uiAimedShotTimer = 8000;
         m_uiMultiShotTimer = 15000;
@@ -411,7 +411,7 @@ struct npc_malgen_longspearAI : public ScriptedAI
         m_petGuid = ObjectGuid();
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         if (Creature *creature = m_creature->GetMap()->GetCreature(m_petGuid))
         {
@@ -420,7 +420,7 @@ struct npc_malgen_longspearAI : public ScriptedAI
         }
     }
 
-    void EnterCombat(Unit *enemy)
+    void EnterCombat(Unit *enemy) override
     {
         // Summon pet
         if (Creature *creature = m_creature->GetMap()->GetCreature(m_petGuid))
@@ -433,16 +433,14 @@ struct npc_malgen_longspearAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_bIsFeigned && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
+        if (!m_bIsFeigned && (!m_creature->SelectHostileTarget() || !m_creature->GetVictim()))
             return;
 
         if (m_uiFeignDeathTimer < diff)
         {
             // Feign death, lay trap, re-acquire target
-            Unit *currentTarget = m_creature->getVictim();
-
             if (DoCastSpellIfCan(m_creature, SPELL_MALGEN_LONGSPEAR_FEIGN_DEATH, CF_TRIGGERED) == CAST_OK)
             {
                 // Feign for 1 secs, then trap and repop
@@ -510,7 +508,7 @@ CreatureAI* GetAI_npc_malgen_longspear(Creature* pCreature)
 
 void AddSC_blackrock_depths_arena_challenge()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_theldren";

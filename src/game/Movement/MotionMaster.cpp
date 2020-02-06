@@ -53,13 +53,13 @@ void MotionMaster::Initialize()
     Clear(false, true);
 
     // set new default movement generator
-    if (m_owner->GetTypeId() == TYPEID_UNIT && !m_owner->hasUnitState(UNIT_STAT_POSSESSED))
+    if (m_owner->GetTypeId() == TYPEID_UNIT && !m_owner->HasUnitState(UNIT_STAT_POSSESSED))
     {
         MovementGenerator* movement = FactorySelector::selectMovementGenerator(static_cast<Creature*>(m_owner));
         push(movement == nullptr ? &si_idleMovement : movement);
         top()->Initialize(*m_owner);
         if (top()->GetMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
-            (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(static_cast<Creature*>(m_owner)), 0, static_cast<Creature*>(m_owner)->m_startwaypoint, PATH_NO_PATH, 0, 0, true);
+            (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(static_cast<Creature*>(m_owner)), 0, 0, PATH_NO_PATH, 0, 0, true);
     }
     else
         push(&si_idleMovement);
@@ -104,13 +104,13 @@ void MotionMaster::InitializeNewDefault(bool alwaysReplace)
     if (alwaysReplace || (curr->GetMovementGeneratorType() != new_default))
     {
         // Set new default movement generator
-        if (!m_owner->hasUnitState(UNIT_STAT_POSSESSED))
+        if (!m_owner->HasUnitState(UNIT_STAT_POSSESSED))
         {
             MovementGenerator* movement = FactorySelector::selectMovementGenerator(pCreature);
             push(movement == nullptr ? &si_idleMovement : movement);
             top()->Initialize(*m_owner);
             if (top()->GetMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
-                (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(pCreature), 0, pCreature->m_startwaypoint, PATH_NO_PATH, 100, 0, true);
+                (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(pCreature), 0, 0, PATH_NO_PATH, 100, 0, true);
         }
         else
             push(&si_idleMovement);
@@ -145,9 +145,8 @@ MotionMaster::~MotionMaster()
 
     if (m_expList)
     {
-        for (size_t i = 0; i < m_expList->size(); ++i)
+        for (const auto mg : *m_expList)
         {
-            MovementGenerator* mg = (*m_expList)[i];
             if (!isStatic(mg))
                 delete mg;
         }
@@ -158,7 +157,7 @@ MotionMaster::~MotionMaster()
 
 void MotionMaster::UpdateMotion(uint32 diff)
 {
-    if (m_owner->hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (m_owner->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
         return;
 
     MANGOS_ASSERT(!empty());
@@ -174,9 +173,8 @@ void MotionMaster::UpdateMotion(uint32 diff)
 
     if (m_expList)
     {
-        for (size_t i = 0; i < m_expList->size(); ++i)
+        for (const auto mg : *m_expList)
         {
-            MovementGenerator* mg = (*m_expList)[i];
             if (!isStatic(mg))
                 delete mg;
         }
@@ -198,7 +196,7 @@ void MotionMaster::UpdateMotion(uint32 diff)
 void MotionMaster::UpdateMotionAsync(uint32 diff)
 {
     m_needsAsyncUpdate = false;
-    if (m_owner->hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (m_owner->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
         return;
 
     MANGOS_ASSERT(!empty());
@@ -256,12 +254,12 @@ void MotionMaster::DelayedClean(bool reset, bool all)
         pop();
         mvtGensToFinalize.push_back(curr);
     }
-    for (MvtGenList::iterator it = mvtGensToFinalize.begin(); it != mvtGensToFinalize.end(); ++it)
+    for (const auto& it : mvtGensToFinalize)
     {
-        (*it)->Finalize(*m_owner);
+        it->Finalize(*m_owner);
 
-        if (!isStatic((*it)))
-            m_expList->push_back((*it));
+        if (!isStatic(it))
+            m_expList->push_back(it);
     }
 }
 
@@ -328,10 +326,10 @@ void MotionMaster::DelayedExpire(bool reset)
         pop();
         mvtGensToFinalize.push_back(temp);
     }
-    for (MvtGenList::iterator it = mvtGensToFinalize.begin(); it != mvtGensToFinalize.end(); ++it)
+    for (const auto& it : mvtGensToFinalize)
     {
-        (*it)->Finalize(*m_owner);
-        m_expList->push_back(*it);
+        it->Finalize(*m_owner);
+        m_expList->push_back(it);
     }
 
     curr->Finalize(*m_owner);
@@ -359,7 +357,7 @@ void MotionMaster::MoveRandom(bool use_current_position, float wander_distance, 
 
 void MotionMaster::MoveTargetedHome()
 {
-    if (m_owner->hasUnitState(UNIT_STAT_LOST_CONTROL))
+    if (m_owner->HasUnitState(UNIT_STAT_LOST_CONTROL))
         return;
 
     Clear(false);
@@ -377,7 +375,7 @@ void MotionMaster::MoveTargetedHome()
     }
     else if (m_owner->GetTypeId() == TYPEID_UNIT && ((Creature*)m_owner)->GetCharmerOrOwnerGuid())
     {
-        if (Unit *target = ((Creature*)m_owner)->GetCharmerOrOwner())
+        if (Unit* target = ((Creature*)m_owner)->GetCharmerOrOwner())
         {
             DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s follow to %s", m_owner->GetGuidStr().c_str(), target->GetGuidStr().c_str());
             Mutate(new FollowMovementGenerator<Creature>(*target, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE));
@@ -421,7 +419,7 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
 
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle)
 {
-    if (m_owner->hasUnitState(UNIT_STAT_LOST_CONTROL))
+    if (m_owner->HasUnitState(UNIT_STAT_LOST_CONTROL))
         return;
 
     Clear();
@@ -555,7 +553,7 @@ void MotionMaster::MoveTaxiFlight()
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
     {
         TaxiPathNodeList const& path = m_owner->ToPlayer()->GetTaxi().GetTaxiPath();
-        if (path.size())
+        if (!path.empty())
         {
             uint32 foundPath = 0;
             std::stringstream debugString;
@@ -621,7 +619,7 @@ void MotionMaster::Mutate(MovementGenerator *m)
     push(m);
 }
 
-void MotionMaster::propagateSpeedChange()
+void MotionMaster::PropagateSpeedChange()
 {
     Impl::container_type::iterator it = Impl::c.begin();
     for (; it != end(); ++it)
@@ -687,7 +685,7 @@ bool MotionMaster::GetDestination(float &x, float &y, float &z)
     if (m_owner->movespline->Finalized())
         return false;
 
-    const G3D::Vector3& dest = m_owner->movespline->FinalDestination();
+    G3D::Vector3 const& dest = m_owner->movespline->FinalDestination();
     x = dest.x;
     y = dest.y;
     z = dest.z;

@@ -51,7 +51,7 @@ void instance_zulgurub::LowerHakkarHitPoints()
 {
     if (Creature* pHakkar = instance->GetCreature(m_uiHakkarGUID))
     {
-        if (pHakkar->isAlive())
+        if (pHakkar->IsAlive())
         {
             pHakkar->SetMaxHealth(pHakkar->GetMaxHealth() - 50000);
             pHakkar->SetHealth(pHakkar->GetHealth() - 50000);
@@ -61,8 +61,8 @@ void instance_zulgurub::LowerHakkarHitPoints()
 
 bool instance_zulgurub::IsEncounterInProgress() const
 {
-    for (uint8 i = 0; i < ZULGURUB_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+    for (uint32 i : m_auiEncounter)
+        if (i == IN_PROGRESS || i == SPECIAL)
             return true;
     return false;
 }
@@ -151,11 +151,11 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
             if (uiData == IN_PROGRESS)
             {
                 Creature *Marli = instance->GetCreature(m_uiMarliGUID);
-                Unit* pVictim = Marli->getVictim();
-                for (std::list<uint64>::const_iterator itr = m_lMarliTrashGUIDList.begin(); itr != m_lMarliTrashGUIDList.end(); itr++)
+                Unit* pVictim = Marli->GetVictim();
+                for (const auto& guid : m_lMarliTrashGUIDList)
                 {
-                    if (Creature* MarliTrash = instance->GetCreature(*itr))
-                        if (MarliTrash->isAlive() && !MarliTrash->isInCombat())
+                    if (Creature* MarliTrash = instance->GetCreature(guid))
+                        if (MarliTrash->IsAlive() && !MarliTrash->IsInCombat())
                             if (MarliTrash->GetMapId() == 309 && MarliTrash->GetZoneId() == 1977 && MarliTrash->GetAreaId() == 3379)
                                 MarliTrash->AI()->AttackStart(pVictim);
                 }
@@ -211,12 +211,12 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-const char* instance_zulgurub::Save()
+char const* instance_zulgurub::Save()
 {
     return strInstData.c_str();
 }
 
-void instance_zulgurub::Load(const char* chrIn)
+void instance_zulgurub::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -228,10 +228,10 @@ void instance_zulgurub::Load(const char* chrIn)
 
     LoadSaveData(chrIn, m_auiEncounter, 11);
 
-    for (uint8 i = 0; i < ZULGURUB_MAX_ENCOUNTER; ++i)
+    for (uint32 & i : m_auiEncounter)
     {
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
     }
     if (!m_randomBossSpawned)
         SpawnRandomBoss();
@@ -344,15 +344,15 @@ void instance_zulgurub::SpawnRandomBoss()
 Unit* instance_zulgurub::Thekal_GetUnitThatCanRez()
 {
     if (Unit *pLorKhan = instance->GetUnit(GetData64(DATA_LORKHAN)))
-        if (pLorKhan->isAlive())
+        if (pLorKhan->IsAlive())
             return pLorKhan;
     if (Unit *pZath = instance->GetUnit(GetData64(DATA_ZATH)))
-        if (pZath->isAlive())
+        if (pZath->IsAlive())
             return pZath;
     if (Unit *pThekal = instance->GetUnit(GetData64(DATA_THEKAL)))
-        if (pThekal->isAlive())
+        if (pThekal->IsAlive())
             return pThekal;
-    return NULL;
+    return nullptr;
 }
 
 InstanceData* GetInstanceData_instance_zulgurub(Map* pMap)
@@ -370,7 +370,7 @@ struct npc_brazierAI: public ScriptedAI
     uint32 Timer;
     uint32 Var;
 
-    void Reset()
+    void Reset() override
     {
         Timer = 0;
         Var = 0;
@@ -397,7 +397,7 @@ struct npc_brazierAI: public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (Var > 24)
             m_creature->ForcedDespawn();

@@ -19,7 +19,7 @@ project (MANGOS_VMAP_ASSEMB_IO)
 
 if (NOT MSVC)
     ADD_DEFINITIONS("-Wall")
-    ADD_DEFINITIONS("-ggdb")
+    #ADD_DEFINITIONS("-ggdb")
     ADD_DEFINITIONS("-O3")
 endif()
 
@@ -32,13 +32,13 @@ include_directories(../../src/framework/)
 include_directories(${ACE_INCLUDE_DIR})
 
 add_library(vmap
-	../../src/game/vmap/BIH.cpp
-	../../src/game/vmap/VMapManager2.cpp
-	../../src/game/vmap/MapTree.cpp
-	../../src/game/vmap/TileAssembler.cpp
-	../../src/game/vmap/WorldModel.cpp
-	../../src/game/vmap/ModelInstance.cpp
-	)
+    ../../src/game/vmap/BIH.cpp
+    ../../src/game/vmap/VMapManager2.cpp
+    ../../src/game/vmap/MapTree.cpp
+    ../../src/game/vmap/TileAssembler.cpp
+    ../../src/game/vmap/WorldModel.cpp
+    ../../src/game/vmap/ModelInstance.cpp
+    )
 SET_TARGET_PROPERTIES (vmap PROPERTIES FOLDER "Game Libs")
 
 if(UNIX)
@@ -55,6 +55,7 @@ add_executable(vmap_assembler vmap_assembler.cpp)
 SET_TARGET_PROPERTIES (vmap_assembler PROPERTIES FOLDER Extractors)
 target_link_libraries(vmap_assembler 
                     vmap
+                    g3dlite
                     ${ACE_LIBRARIES}
                     shared
                     framework

@@ -249,10 +249,10 @@ uint32 GetWarEffortGossipTextId(uint32 item, TeamId team, bool objectiveReached)
 
 const WarEffortGossip& GetWarEffortGossip(uint32 item)
 {
-    for (int i = 0; i < NUM_SHARED_OBJECTIVES + 2 * NUM_FACTION_OBJECTIVES; ++i)
+    for (const auto& i : WarEffortGossipText)
     {
-        if (item == WarEffortGossipText[i].itemId)
-            return WarEffortGossipText[i];
+        if (item == i.itemId)
+            return i;
     }
 
     sLog.outError("Cannot find war effort gossip text for the given item %u", item);
@@ -297,7 +297,7 @@ struct npc_AQwar_collectorAI : CreatureAI
     {
         resourceType = WAREFFORT_BAR;
 
-        switch (creature->getFaction())
+        switch (creature->GetFactionTemplateId())
         {
             case 57:
             case 11:
@@ -317,7 +317,7 @@ struct npc_AQwar_collectorAI : CreatureAI
         m_updateTimer = 0; // every minute update this npc's resource, do first update instantly though
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // Update the war effort stock gobjects
         if (m_updateTimer <= diff)
@@ -564,7 +564,7 @@ bool GossipHello_npc_AQwar_collector(Player* pPlayer, Creature* pCreature)
 
         pCreature->HandleEmote(EMOTE_ONESHOT_BOW);
     }
-    else if (pCreature->isQuestGiver())
+    else if (pCreature->IsQuestGiver())
     {
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
         pPlayer->SEND_GOSSIP_MENU(gossipTextId, pCreature->GetObjectGuid());
@@ -765,7 +765,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
     uint32 m_uiWisperingsTimer;
     uint32 SPELL_WHISPERINGS;
 
-    void Reset()
+    void Reset() override
     {
         SetCombatMovement(false);
         playerDetected = false;
@@ -797,25 +797,25 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() != TYPEID_PLAYER || who->ToPlayer()->IsGameMaster())
             return;
 
-        if (!who->isAlive())
+        if (!who->IsAlive())
             return;
 
-        playerDetected = m_creature->IsWithinDistInMap(who, MAX_SIGHT_DISTANCE) ? true : false;
+        playerDetected = m_creature->IsWithinDistInMap(who, MAX_SIGHT_DISTANCE);
     }
 
     bool MoreThanOnePlayerNear()
     {
         Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
         int var = 0;
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        for (const auto& itr : players)
         {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
+            Player* pPlayer = itr.getSource();
+            if (pPlayer && pPlayer->IsAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
                 ++var;
 
             if (var > 1)
@@ -827,10 +827,10 @@ struct npc_resonating_CrystalAI : public ScriptedAI
     void AggroAllPlayerNear()
     {
         Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        for (const auto& itr : players)
         {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
+            Player* pPlayer = itr.getSource();
+            if (pPlayer && pPlayer->IsAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
             {
                 m_creature->AddThreat(pPlayer);
                 m_creature->SetInCombatWith(pPlayer);
@@ -838,7 +838,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (playerDetected)
         {
@@ -854,7 +854,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
                 m_uiCheckTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Whisperings of C'Thun (MC)
@@ -910,13 +910,13 @@ struct npc_infantrymanAI : ScriptedAI
         m_saurfangFollowDist = 0.0f;
     }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
             }
         }
@@ -945,7 +945,7 @@ struct npc_infantrymanAI : ScriptedAI
         m_creature->CombatStop(true);
         m_creature->LoadCreatureAddon(true);
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
         {
             if (m_followingSaurfang)
                 FollowSaurfang();
@@ -958,7 +958,7 @@ struct npc_infantrymanAI : ScriptedAI
         Reset();
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         // Once the event is activated, we want to set the home position of the unit
         // and make them move there.
@@ -1018,7 +1018,7 @@ struct npc_infantrymanAI : ScriptedAI
         double orientation = m_creature->GetHomePositionO() + (m_clockwiseRotation ? -1 : 1) * M_PI / 2;
 
         m_creature->SetHomePosition(newPos.x, newPos.y, newPos.z, orientation);
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
             m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
@@ -1195,7 +1195,7 @@ struct npc_priestessAI : npc_infantrymanAI
         position.z = height;
 
         m_creature->SetHomePosition(position.x, position.y, position.z, 2.62f);
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
             m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
@@ -1241,7 +1241,7 @@ struct npc_aqwar_cenarionhold_attackAI : ScriptedAI
 
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_waveCount == m_maxWaveCount)
             return;
@@ -1314,7 +1314,7 @@ struct MovementPath {
     float o;
 };
 
-const std::array<MovementPath, 12> saurfangGatePath {{
+std::array<MovementPath, 12> const saurfangGatePath {{
     { -7002.48f, 967.38f, 6.70f, 3.15f },
     { -7205.49f, 967.08f, 0.95f, 2.9f },
     { -7265.48f, 995.34f, 2.55f, 3.16f },
@@ -1386,13 +1386,13 @@ struct npc_aqwar_saurfangAI : ScriptedAI
         m_movementPaused = true;
     }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
-        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        if (m_creature->CanInitiateAttack() && pWho->IsTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     AttackStart(pWho);
             }
         }
@@ -1417,9 +1417,9 @@ struct npc_aqwar_saurfangAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->isAlive())
+        if (!m_creature->IsAlive())
             return;
 
         if (!m_CenarionHoldAttackWarn && sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT_CH_ATTACK))
@@ -1479,14 +1479,14 @@ struct npc_aqwar_saurfangAI : ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->getVictim()->GetHealth() <= m_creature->getVictim()->GetMaxHealth() * 0.2f)
+        if (m_creature->GetVictim()->GetHealth() <= m_creature->GetVictim()->GetMaxHealth() * 0.2f)
         {
             if (m_uiExecute_Timer < diff)
             {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_EXECUTE);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_EXECUTE);
                 m_uiExecute_Timer = 2000;
             }
             else
@@ -1495,7 +1495,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (m_uiMortalStrike_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_MORTALSTRIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_MORTALSTRIKE);
             m_uiMortalStrike_Timer = 13000;
         }
         else
@@ -1503,17 +1503,17 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (m_uiCleave_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_CLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_CLEAVE);
             m_uiCleave_Timer = 7000;
         }
         else
             m_uiCleave_Timer -= diff;
 
-        if (m_uiCharge_Timer < diff && m_creature->GetDistance(m_creature->getVictim()->GetPositionX(),
-            m_creature->getVictim()->GetPositionY(),
-            m_creature->getVictim()->GetPositionZ()) >= 8.0f)
+        if (m_uiCharge_Timer < diff && m_creature->GetDistance(m_creature->GetVictim()->GetPositionX(),
+            m_creature->GetVictim()->GetPositionY(),
+            m_creature->GetVictim()->GetPositionZ()) >= 8.0f)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_CHARGE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_CHARGE);
             m_uiCharge_Timer = 9000;
         }
         else
@@ -1521,7 +1521,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (m_uiThunderClap_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_THUNDERCLAP);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_THUNDERCLAP);
             m_uiThunderClap_Timer = 9000;
         }
         else
@@ -1529,7 +1529,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
 
         if (m_uiSaurfangRage_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SF_SAURFANGRAGE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SF_SAURFANGRAGE);
             m_uiSaurfangRage_Timer = 8000;
         }
         else
@@ -1546,7 +1546,7 @@ struct npc_aqwar_saurfangAI : ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         // Respawned back at CH. Keep running to the gate
         if (m_movingToGate)
@@ -1579,7 +1579,7 @@ CreatureAI* GetAI_npc_aqwar_saurfang(Creature *pCreature)
 
 void AddSC_war_effort()
 {
-    Script *pNewScript;
+    Script* pNewScript;
 
     pNewScript = new Script;
     pNewScript->Name = "npc_AQwar_collector";

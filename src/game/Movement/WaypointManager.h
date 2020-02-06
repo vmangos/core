@@ -35,20 +35,6 @@ enum WaypointPathOrigin
     PATH_FROM_SPECIAL       = 3
 };
 
-#define MAX_WAYPOINT_TEXT 5
-struct WaypointBehavior
-{
-    uint32 emote;
-    uint32 spell;
-    int32  textid[MAX_WAYPOINT_TEXT];
-    uint32 model1;
-    uint32 model2;
-
-    bool isEmpty();
-    WaypointBehavior() {}
-    WaypointBehavior(const WaypointBehavior &b);
-};
-
 struct WaypointNode
 {
     float x;
@@ -57,11 +43,10 @@ struct WaypointNode
     float orientation;
     uint32 delay;
     float wander_distance;
-    uint32 script_id;                                       // Added may 2010. WaypointBehavior w/DB data should in time be removed.
-    WaypointBehavior * behavior;
-    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), wander_distance(0.0f), script_id(0), behavior(NULL) {}
-    WaypointNode(float _x, float _y, float _z, float _o, uint32 _delay, float _wander_distance, uint32 _script_id, WaypointBehavior * _behavior)
-      : x(_x), y(_y), z(_z), orientation(_o), delay(_delay), script_id(_script_id), behavior(_behavior), wander_distance(_wander_distance) {}
+    uint32 script_id;
+    WaypointNode() : x(0.0f), y(0.0f), z(0.0f), orientation(0.0f), delay(0), wander_distance(0.0f), script_id(0) {}
+    WaypointNode(float _x, float _y, float _z, float _o, uint32 _delay, float _wander_distance, uint32 _script_id)
+      : x(_x), y(_y), z(_z), orientation(_o), delay(_delay), wander_distance(_wander_distance), script_id(_script_id) {}
 };
 
 typedef std::map < uint32 /*pointId*/, WaypointNode > WaypointPath;
@@ -88,9 +73,9 @@ class WaypointManager
         //        Creators need to be sure that creature_movement_template is always valid for summons.
         //        Mob that can be summoned anywhere should not have creature_movement_template for example.
 
-        WaypointPath* GetDefaultPath(uint32 entry, uint32 lowGuid, WaypointPathOrigin* wpOrigin = NULL)
+        WaypointPath* GetDefaultPath(uint32 entry, uint32 lowGuid, WaypointPathOrigin* wpOrigin = nullptr)
         {
-            WaypointPath* path = NULL;
+            WaypointPath* path = nullptr;
             path = GetPath(lowGuid);
             if (path && wpOrigin)
                 *wpOrigin = PATH_FROM_GUID;
@@ -137,7 +122,6 @@ class WaypointManager
         }
 
         void DeletePath(uint32 id);
-        void CheckTextsExistance();
 
         // Toolbox for .wp add command
         /// Add a node as position pointId. If pointId == 0 then as last point

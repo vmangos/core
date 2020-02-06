@@ -23,7 +23,7 @@ public:
     static void AddSpells(Player* player)
     {
         uint32 familyName = 0;
-        switch (player->getClass())
+        switch (player->GetClass())
         {
             case CLASS_MAGE:
                 familyName = SPELLFAMILY_MAGE;
@@ -55,8 +55,8 @@ public:
         }
         for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
         {
-            SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
-            if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->getLevel())
+            SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(id);
+            if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->GetLevel())
                 player->LearnSpell(id, false);
         }
     }
@@ -82,11 +82,11 @@ public:
         {
             // search spell for spell error
             uint32 spellid = 0;
-            for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+            for (const auto& spell : item->GetProto()->Spells)
             {
-                if (item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
+                if (spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_USE || spell.SpellTrigger == ITEM_SPELLTRIGGER_ON_NO_DELAY_USE)
                 {
-                    spellid = item->GetProto()->Spells[i].SpellId;
+                    spellid = spell.SpellId;
                     break;
                 }
             }
@@ -96,7 +96,7 @@ public:
 
     static void StuffLevel60(Player* p)
     {
-        switch (p->getClass())
+        switch (p->GetClass())
         {
             case CLASS_WARLOCK:
                 AddStuff(p, 16931);
@@ -147,7 +147,7 @@ public:
         std::set<uint32> items[EQUIPMENT_SLOT_END];
         for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
         {
-            ItemPrototype const *pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
+            ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype >(id);
             if (!pProto)
                 continue;
             uint8 slot = player->FindEquipSlot(pProto, NULL_SLOT, true);
@@ -157,11 +157,11 @@ public:
             if (player->CanEquipNewItem(slot, dest, id, true))
                 items[slot].insert(id);
         }
-        for (int i = 0; i < EQUIPMENT_SLOT_END; ++i)
-            if (items[i].size())
+        for (const auto& item : items)
+            if (!item.empty())
             {
-                auto it = items[i].begin();
-                std::advance(it, urand(0, items[i].size() - 1)),
+                auto it = item.begin();
+                std::advance(it, urand(0, item.size() - 1)),
                     AddStuff(player, *it);
             }
     }
@@ -169,7 +169,7 @@ public:
     static void AutoMountPlayer(Player* p, bool mount60 = false)
     {
         uint32 mount = 0;
-        switch (p->getRace())
+        switch (p->GetRace())
         {
             case RACE_HUMAN:
                 mount = 18776;
@@ -354,7 +354,7 @@ enum
 class cinematics_generic_charge : public SingleCinematicTest
 {
 public:
-    cinematics_generic_charge(const char* scriptname, uint32 map, uint32 faction, uint16 minlvl, uint16 maxlvl) : SingleCinematicTest(scriptname, map), faction(faction), minlevel(minlvl), maxlevel(maxlvl), spawnOrientation(0.0f)
+    cinematics_generic_charge(char const* scriptname, uint32 map, uint32 faction, uint16 minlvl, uint16 maxlvl) : SingleCinematicTest(scriptname, map), faction(faction), minlevel(minlvl), maxlevel(maxlvl), spawnOrientation(0.0f)
     {
     }
 
@@ -398,7 +398,7 @@ public:
         for (int i = step % 6; i < TARREN_CHARGE_NUM_PLAYERS; i += 6)
         {
             Player* p = GetTestPlayer(i);
-            if (p->getLevel() >= 40)
+            if (p->GetLevel() >= 40)
                 AutoMountPlayer(p, true);
         }
         TEST_DELAY(40000)*/
@@ -532,7 +532,7 @@ enum
 class cinematics_tarren_mills_fights : public SingleCinematicTest
 {
 public:
-    cinematics_tarren_mills_fights(const char* sname = "cinematics_tarren_mills_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(60000)
+    cinematics_tarren_mills_fights(char const* sname = "cinematics_tarren_mills_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(60000)
     {
     }
 
@@ -618,7 +618,7 @@ enum
 class cinematics_coldridge_valley_fights : public SingleCinematicTest
 {
 public:
-    cinematics_coldridge_valley_fights(const char* sname = "cinematics_coldridge_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
+    cinematics_coldridge_valley_fights(char const* sname = "cinematics_coldridge_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
     {
     }
 
@@ -656,31 +656,31 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
-        Unit* target = p->getVictim();
+        Unit* target = p->GetVictim();
         if (target == nullptr)
         {
-            if (!p->isInCombat())
+            if (!p->IsInCombat())
                 target = p->SelectRandomUnfriendlyTarget(nullptr, DEFAULT_VISIBILITY_DISTANCE);
             else
             {
-                target = p->getVictim();
+                target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->getAttackers();
-                    if (attackers.size() > 0)
+                    std::set<Unit*> const attackers = p->GetAttackers();
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }            
         }
 
-        if (target != nullptr && target->isAlive())
+        if (target != nullptr && target->IsAlive())
         {
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {
@@ -787,7 +787,7 @@ public:
 class cinematics_northshire_valley_fights : public SingleCinematicTest
 {
 public:
-    cinematics_northshire_valley_fights(const char* sname = "cinematics_northshire_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
+    cinematics_northshire_valley_fights(char const* sname = "cinematics_northshire_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
     {
     }
 
@@ -825,31 +825,31 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
-        Unit* target = p->getVictim();
+        Unit* target = p->GetVictim();
         if (target == nullptr)
         {
-            if (!p->isInCombat())
+            if (!p->IsInCombat())
                 target = p->SelectRandomUnfriendlyTarget(nullptr, DEFAULT_VISIBILITY_DISTANCE);
             else
             {
-                target = p->getVictim();
+                target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->getAttackers();
-                    if (attackers.size() > 0)
+                    std::set<Unit*> const attackers = p->GetAttackers();
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }
         }
 
-        if (target != nullptr && target->isAlive())
+        if (target != nullptr && target->IsAlive())
         {
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {
@@ -907,7 +907,7 @@ enum
 class cinematics_caverns_of_time_spirit_healers : public SingleTest
 {
 public:
-    explicit cinematics_caverns_of_time_spirit_healers(const char* name = "cinematics_caverns_of_time_spirit_healers") : SingleTest(name, 1, false)
+    explicit cinematics_caverns_of_time_spirit_healers(char const* name = "cinematics_caverns_of_time_spirit_healers") : SingleTest(name, 1, false)
     {
         
     }
@@ -999,7 +999,7 @@ enum
 class cinematics_crossroads_crowd : public SingleCinematicTest
 {
 public:
-    cinematics_crossroads_crowd(const char* sname = "cinematics_crossroads_crowd") : SingleCinematicTest(sname, 1), summonIndex(0), stayOnlineTimer(60000)
+    cinematics_crossroads_crowd(char const* sname = "cinematics_crossroads_crowd") : SingleCinematicTest(sname, 1), summonIndex(0), stayOnlineTimer(60000)
     {
     }
 
@@ -1042,7 +1042,7 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
         float x = p->GetPositionX();
         float y = p->GetPositionY();
@@ -1058,7 +1058,7 @@ public:
 
     static void AddSkillsPlayer(Player* player)
     {
-        switch (player->getClass())
+        switch (player->GetClass())
         {
         case CLASS_WARRIOR:
             player->LearnSpell(12294, false);
@@ -1104,7 +1104,7 @@ public:
     {
         if (p->GetTeamId() == TEAM_ALLIANCE)
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1159,7 +1159,7 @@ public:
         }
         else
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1256,7 +1256,7 @@ public:
 class cinematics_theramore_crowd : public SingleCinematicTest
 {
 public:
-    cinematics_theramore_crowd(const char* sname = "cinematics_theramore_crowd") : SingleCinematicTest(sname, 1), summonIndex(0), stayOnlineTimer(120000)
+    cinematics_theramore_crowd(char const* sname = "cinematics_theramore_crowd") : SingleCinematicTest(sname, 1), summonIndex(0), stayOnlineTimer(120000)
     {
     }
 
@@ -1299,7 +1299,7 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
         float x = p->GetPositionX();
         float y = p->GetPositionY();
@@ -1315,7 +1315,7 @@ public:
 
     static void AddSkillsPlayer(Player* player)
     {
-        switch (player->getClass())
+        switch (player->GetClass())
         {
         case CLASS_WARRIOR:
             player->LearnSpell(12294, false);
@@ -1361,7 +1361,7 @@ public:
     {
         if (p->GetTeamId() == TEAM_ALLIANCE)
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1416,7 +1416,7 @@ public:
         }
         else
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1513,7 +1513,7 @@ public:
 class cinematics_duskwood_battle : public SingleCinematicTest
 {
 public:
-    cinematics_duskwood_battle(const char* sname = "cinematics_duskwood_battle") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
+    cinematics_duskwood_battle(char const* sname = "cinematics_duskwood_battle") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
     {
     }
 
@@ -1556,31 +1556,31 @@ public:
 
     static void SearchAndDestroy(Player* p)
     {
-        if (!p->isAlive()) return;
+        if (!p->IsAlive()) return;
 
-        Unit* target = p->getVictim();
+        Unit* target = p->GetVictim();
         if (target == nullptr)
         {
-            if (!p->isInCombat())
+            if (!p->IsInCombat())
                 target = p->SelectRandomUnfriendlyTarget(nullptr, DEFAULT_VISIBILITY_DISTANCE);
             else
             {
-                target = p->getVictim();
+                target = p->GetVictim();
                 if (target == nullptr)
                 {
-                    const std::set<Unit*> attackers = p->getAttackers();
-                    if (attackers.size() > 0)
+                    std::set<Unit*> const attackers = p->GetAttackers();
+                    if (!attackers.empty())
                         target = *attackers.begin();
                 }
             }
         }
 
-        if (target != nullptr && target->isAlive())
+        if (target != nullptr && target->IsAlive())
         {
             p->GetMotionMaster()->MoveChase(target);
             p->SetFacingToObject(target);
             p->SetInFront(target);
-            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE) ? true : false);
+            p->Attack(target, p->IsInRange(target, 0, MELEE_RANGE));
         }
         else
         {
@@ -1600,7 +1600,7 @@ public:
 
     static void AddSkillsPlayer(Player* player)
     {
-        switch (player->getClass())
+        switch (player->GetClass())
         {
         case CLASS_WARRIOR:
             player->LearnSpell(12294, false);
@@ -1646,7 +1646,7 @@ public:
     {
         if (p->GetTeamId() == TEAM_ALLIANCE)
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);
@@ -1701,7 +1701,7 @@ public:
         }
         else
         {
-            switch (p->getClass())
+            switch (p->GetClass())
             {
             case CLASS_WARRIOR:
                 AddStuff(p, 16865);

@@ -25,11 +25,10 @@
 #include "World.h"
 #include "GameObjectModel.h"
 #include "DBCStores.h"
-#include "Creature.h"
 
 struct GameobjectModelData
 {
-    GameobjectModelData(const std::string& name_, const G3D::AABox& box) :
+    GameobjectModelData(std::string const& name_, G3D::AABox const& box) :
         name(name_), bound(box) {}
 
     std::string name;
@@ -74,7 +73,7 @@ GameObjectModel::~GameObjectModel()
         ((VMAP::VMapManager2*)VMAP::VMapFactory::createOrGetVMapManager())->releaseModelInstance(name);
 }
 
-bool GameObjectModel::initialize(const GameObject* const pGo, const GameObjectDisplayInfoEntry* const pDisplayInfo)
+bool GameObjectModel::initialize(GameObject const* const pGo, GameObjectDisplayInfoEntry const* pDisplayInfo)
 {
     ModelList::const_iterator it = model_list.find(pDisplayInfo->Displayid);
     if (it == model_list.end())
@@ -116,7 +115,7 @@ bool GameObjectModel::initialize(const GameObject* const pGo, const GameObjectDi
         Vector3 pos(iBound.corner(i));
         if (Creature* c = const_cast<GameObject*>(pGo)->SummonCreature(24440, pos.x, pos.y, pos.z, 0, TEMPSUMMON_MANUAL_DESPAWN, 0))
         {
-            c->setFaction(35);
+            c->SetFactionTemplateId(35);
             c->SetObjectScale(0.1f);
         }
     }
@@ -125,31 +124,31 @@ bool GameObjectModel::initialize(const GameObject* const pGo, const GameObjectDi
     return true;
 }
 
-GameObjectModel* GameObjectModel::construct(const GameObject* const object)
+GameObjectModel* GameObjectModel::construct(GameObject const* const object)
 {
     if (GameObjectInfo const* gobjInfo = object->GetGOInfo())
     {
         // TODO: What kind of gobj should block LoS or not ?
         if (gobjInfo->type == GAMEOBJECT_TYPE_BUTTON && gobjInfo->button.losOK)
-            return NULL;
+            return nullptr;
         if (gobjInfo->type == GAMEOBJECT_TYPE_GOOBER && gobjInfo->goober.losOK)
-            return NULL;
+            return nullptr;
     }
-    const GameObjectDisplayInfoEntry* info = sGameObjectDisplayInfoStore.LookupEntry(object->GetDisplayId());
+    GameObjectDisplayInfoEntry const* info = sGameObjectDisplayInfoStore.LookupEntry(object->GetDisplayId());
     if (!info)
-        return NULL;
+        return nullptr;
 
     GameObjectModel* mdl = new GameObjectModel();
     if (!mdl->initialize(object, info))
     {
         delete mdl;
-        return NULL;
+        return nullptr;
     }
 
     return mdl;
 }
 
-bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool StopAtFirstHit) const
+bool GameObjectModel::intersectRay(G3D::Ray const& ray, float& MaxDist, bool StopAtFirstHit) const
 {
     if (!collision_enabled)
         return false;
@@ -171,7 +170,7 @@ bool GameObjectModel::intersectRay(const G3D::Ray& ray, float& MaxDist, bool Sto
     return hit;
 }
 
-bool GameObjectModel::Relocate(const GameObject& go)
+bool GameObjectModel::Relocate(GameObject const& go)
 {
     if (!iModel)
         return false;

@@ -130,7 +130,7 @@ ssize_t BufferedSocket::noblk_send(ACE_Message_Block &message_block)
 
 bool BufferedSocket::send(const char *buf, size_t len)
 {
-    if(buf == NULL || len == 0)
+    if(buf == nullptr || len == 0)
         return true;
 
     ACE_Data_Block db(
@@ -175,10 +175,7 @@ bool BufferedSocket::send(const char *buf, size_t len)
     }
 
     // tell reactor to call handle_output() when we can send more data
-    if(this->reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK) == -1)
-        return false;
-
-    return true;
+    return this->reactor()->schedule_wakeup(this, ACE_Event_Handler::WRITE_MASK) != -1;
 }
 
 /*virtual*/ int BufferedSocket::handle_output(ACE_HANDLE /*= ACE_INVALID_HANDLE*/)
@@ -251,7 +248,7 @@ bool BufferedSocket::send(const char *buf, size_t len)
     return n == space ? 1 : 0;
 }
 
-/*virtual*/ int BufferedSocket::handle_close(ACE_HANDLE h, ACE_Reactor_Mask m)
+/*virtual*/ int BufferedSocket::handle_close(ACE_HANDLE /*h*/, ACE_Reactor_Mask /*m*/)
 {
     this->OnClose();
 

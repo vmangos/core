@@ -35,16 +35,16 @@ GuildMgr::GuildMgr()
 
 GuildMgr::~GuildMgr()
 {
-    for (GuildMap::iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
-        delete itr->second;
+    for (const auto& itr : m_GuildMap)
+        delete itr.second;
 
     CleanUpPetitions();
 }
 
 void GuildMgr::CleanUpPetitions()
 {
-    for (auto iter = m_petitionMap.begin(); iter != m_petitionMap.end(); ++iter)
-        delete iter->second; // will clean up signatures too
+    for (const auto& iter : m_petitionMap)
+        delete iter.second; // will clean up signatures too
 
     m_petitionMap.clear();
 }
@@ -68,27 +68,27 @@ Guild* GuildMgr::GetGuildById(uint32 guildId) const
     if (itr != m_GuildMap.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 Guild* GuildMgr::GetGuildByName(std::string const& name) const
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
-    for (GuildMap::const_iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
-        if (itr->second->GetName() == name)
-            return itr->second;
+    for (const auto& itr : m_GuildMap)
+        if (itr.second->GetName() == name)
+            return itr.second;
 
-    return NULL;
+    return nullptr;
 }
 
 Guild* GuildMgr::GetGuildByLeader(ObjectGuid const& guid) const
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
-    for (GuildMap::const_iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
-        if (itr->second->GetLeaderGuid() == guid)
-            return itr->second;
+    for (const auto& itr : m_GuildMap)
+        if (itr.second->GetLeaderGuid() == guid)
+            return itr.second;
 
-    return NULL;
+    return nullptr;
 }
 
 std::string GuildMgr::GetGuildNameById(uint32 guildId) const
@@ -106,7 +106,7 @@ void GuildMgr::LoadGuilds()
     uint32 count = 0;
 
     //                                                    0             1          2          3           4           5           6
-    QueryResult *result = CharacterDatabase.Query("SELECT guild.guildid,guild.name,leaderguid,EmblemStyle,EmblemColor,BorderStyle,BorderColor,"
+    QueryResult* result = CharacterDatabase.Query("SELECT guild.guildid,guild.name,leaderguid,EmblemStyle,EmblemColor,BorderStyle,BorderColor,"
                           //   7               8    9    10
                           "BackgroundColor,info,motd,createdate FROM guild ORDER BY guildid ASC");
 
@@ -123,11 +123,11 @@ void GuildMgr::LoadGuilds()
 
     // load guild ranks
     //                                                                0       1   2     3
-    QueryResult *guildRanksResult   = CharacterDatabase.Query("SELECT guildid,rid,rname,rights FROM guild_rank ORDER BY guildid ASC, rid ASC");
+    QueryResult* guildRanksResult   = CharacterDatabase.Query("SELECT guildid,rid,rname,rights FROM guild_rank ORDER BY guildid ASC, rid ASC");
 
     // load guild members
     //                                                                0       1                 2    3     4
-    QueryResult *guildMembersResult = CharacterDatabase.Query("SELECT guildid,guild_member.guid,rank,pnote,offnote,"
+    QueryResult* guildMembersResult = CharacterDatabase.Query("SELECT guildid,guild_member.guid,rank,pnote,offnote,"
                                       //   5                6                 7                 8                9                       10
                                       "characters.name, characters.level, characters.class, characters.zone, characters.logout_time, characters.account "
                                       "FROM guild_member LEFT JOIN characters ON characters.guid = guild_member.guid ORDER BY guildid ASC");
@@ -136,7 +136,7 @@ void GuildMgr::LoadGuilds()
 
     do
     {
-        //Field *fields = result->Fetch();
+        //Field* fields = result->Fetch();
 
         bar.step();
         ++count;
@@ -215,7 +215,7 @@ void GuildMgr::LoadPetitions()
     {
         do
         {
-            Field *fields = petitionSignatures->Fetch();
+            Field* fields = petitionSignatures->Fetch();
 
             ObjectGuid ownerGuid = ObjectGuid(HIGHGUID_PLAYER, fields[0].GetUInt32());
             uint32 petitionId = fields[1].GetUInt32();
@@ -254,13 +254,13 @@ void GuildMgr::LoadPetitions()
 
 Petition::~Petition()
 {
-    for (PetitionSignatureList::iterator iter = m_signatures.begin(); iter != m_signatures.end(); ++iter)
-        delete *iter;
+    for (const auto& itr : m_signatures)
+        delete itr;
 
     m_signatures.clear();
 }
 
-void GuildMgr::CreatePetition(uint32 id, Player* player, const ObjectGuid& charterGuid, std::string& name)
+void GuildMgr::CreatePetition(uint32 id, Player* player, ObjectGuid const& charterGuid, std::string& name)
 {
     Petition* petition = new Petition(id, ObjectGuid(charterGuid), ObjectGuid(player->GetObjectGuid()), name);
     petition->SetTeam(player->GetTeam());
@@ -289,12 +289,12 @@ Petition* GuildMgr::GetPetitionById(uint32 id)
     return nullptr;
 }
 
-Petition* GuildMgr::GetPetitionByCharterGuid(const ObjectGuid& charterGuid)
+Petition* GuildMgr::GetPetitionByCharterGuid(ObjectGuid const& charterGuid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
-    for (PetitionMap::iterator iter = m_petitionMap.begin(); iter != m_petitionMap.end(); ++iter)
+    for (const auto& iter : m_petitionMap)
     {
-        Petition* petition = iter->second;
+        Petition* petition = iter.second;
         if (petition->GetCharterGuid() == charterGuid)
             return petition;
     }
@@ -302,12 +302,12 @@ Petition* GuildMgr::GetPetitionByCharterGuid(const ObjectGuid& charterGuid)
     return nullptr;
 }
 
-Petition* GuildMgr::GetPetitionByOwnerGuid(const ObjectGuid& ownerGuid)
+Petition* GuildMgr::GetPetitionByOwnerGuid(ObjectGuid const& ownerGuid)
 {
     ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
-    for (PetitionMap::iterator iter = m_petitionMap.begin(); iter != m_petitionMap.end(); ++iter)
+    for (const auto& iter : m_petitionMap)
     {
-        Petition* petition = iter->second;
+        Petition* petition = iter.second;
         if (petition->GetOwnerGuid() == ownerGuid)
             return petition;
     }
@@ -350,9 +350,8 @@ void Petition::Delete()
 
 void Petition::BuildSignatureData(WorldPacket& data)
 {
-    for (auto iter = m_signatures.cbegin(); iter != m_signatures.cend(); ++iter)
+    for (const auto signature : m_signatures)
     {
-        PetitionSignature *signature = *iter;
         data << signature->GetSignatureGuid();
         data << 0;
     }
@@ -397,9 +396,8 @@ PetitionSignature* Petition::GetSignatureForPlayer(Player* player)
 
 PetitionSignature* Petition::GetSignatureForAccount(uint32 accountId)
 {
-    for (auto iter = m_signatures.cbegin(); iter != m_signatures.cend(); ++iter)
+    for (const auto signature : m_signatures)
     {
-        PetitionSignature* signature = *iter;
         if (signature->GetSignatureAccountId() == accountId)
             return signature;
     }
@@ -407,11 +405,10 @@ PetitionSignature* Petition::GetSignatureForAccount(uint32 accountId)
     return nullptr;
 }
 
-PetitionSignature* Petition::GetSignatureForPlayerGuid(const ObjectGuid& guid)
+PetitionSignature* Petition::GetSignatureForPlayerGuid(ObjectGuid const& guid)
 {
-    for (auto iter = m_signatures.cbegin(); iter != m_signatures.cend(); ++iter)
+    for (const auto signature : m_signatures)
     {
-        PetitionSignature* signature = *iter;
         if (signature->GetSignatureGuid() == guid)
             return signature;
     }

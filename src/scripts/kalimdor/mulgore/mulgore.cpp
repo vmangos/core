@@ -33,7 +33,7 @@ EndContentData */
 
 bool GossipHello_npc_skorn_whitecloud(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (!pPlayer->GetQuestRewardStatus(770))
@@ -62,23 +62,19 @@ struct plainVisionAI : public npc_escortAI
 
     bool isEngaged;
 
-    void Reset()
-    {
-    }
+    void Reset() override { }
 
-    void WaypointReached(uint32 i)
-    {
-    }
+    void WaypointReached(uint32 i) override { }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (!isEngaged)
         {
             isEngaged = true;
-            Start(false, NULL, NULL, false);
+            Start(false, 0, nullptr, false);
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -90,10 +86,9 @@ CreatureAI* GetAI_plainVision(Creature* pCreature)
     return new plainVisionAI(pCreature);
 }
 
-
 void AddSC_mulgore()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_plains_vision";

@@ -6,7 +6,8 @@
 #define ANTICHEAT_H
 
 #include "Common.h"
-#include "Unit.h"
+#include "AbstractPlayer.h"
+#include "UnitDefines.h"
 
 enum WardenActions
 {
@@ -29,6 +30,11 @@ enum CheatAction
     CHEAT_MAX_ACTIONS,
 };
 
+class Unit;
+class Player;
+class MovementInfo;
+class BigNumber;
+class WorldPacket;
 class WorldSession;
 class ChatHandler;
 class WardenInterface;
@@ -41,7 +47,7 @@ class WardenInterface
     public:
         WardenInterface() {}
         virtual ~WardenInterface() {}
-        virtual void HandleWardenDataOpcode(WorldPacket & recv_data) {}
+        virtual void HandleWardenDataOpcode(WorldPacket& recv_data) {}
         virtual void Update() {}
         virtual WorldSession* GetSession() { return nullptr; }
 };
@@ -91,10 +97,10 @@ public:
     virtual void loadData() {}
     virtual void loadConfig() {}
 
-    virtual std::string normalizeMessage(const std::string &msg, uint32 mask = 0) { return msg; }
-    virtual bool filterMessage(const std::string &msg) { return 0; }
+    virtual std::string normalizeMessage(std::string const& msg, uint32 mask = 0) { return msg; }
+    virtual bool filterMessage(std::string const& msg) { return 0; }
 
-    virtual void addMessage(const std::string& msg, uint32 type, PlayerPointer from, PlayerPointer to) {}
+    virtual void addMessage(std::string const& msg, uint32 type, PlayerPointer from, PlayerPointer to) {}
 
     virtual bool isMuted(uint32 accountId, bool checkChatType = false, uint32 chatType = 0) const { return false; }
     virtual void mute(uint32 accountId) {}

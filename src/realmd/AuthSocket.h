@@ -97,7 +97,7 @@ class AuthSocket: public BufferedSocket
         BigNumber K;
         BigNumber _reconnectProof;
 
-        bool _authed, promptPin;
+        bool promptPin;
 
         eStatus _status;
 
@@ -110,7 +110,6 @@ class AuthSocket: public BufferedSocket
         BigNumber serverSecuritySalt;
         LockFlag lockFlags;
         uint32 gridSeed;
-        bool _geolocked;
         uint32_t _geoUnlockPIN;
 
         static constexpr uint32 Win = 'Win';

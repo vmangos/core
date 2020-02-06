@@ -34,7 +34,7 @@ void PointMovementGenerator<T>::Initialize(T &unit)
     if (!unit.IsStopped())
         unit.StopMoving();
 
-    unit.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    unit.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     Movement::MoveSplineInit init(unit, "PointMovementGenerator<T>::Initialize");
     init.MoveTo(i_x, i_y, i_z, _options);
     if (speed > 0.0f)
@@ -57,14 +57,14 @@ void PointMovementGenerator<T>::Initialize(T &unit)
 template<class T>
 void PointMovementGenerator<T>::Finalize(T &unit)
 {
-    unit.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    unit.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     MovementInform(unit);
 }
 
 template<class T>
 void PointMovementGenerator<T>::Interrupt(T &unit)
 {
-    unit.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    unit.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
 }
 
 template<class T>
@@ -73,22 +73,22 @@ void PointMovementGenerator<T>::Reset(T &unit)
     if (!unit.IsStopped())
         unit.StopMoving();
 
-    unit.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    unit.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
 }
 
 template<class T>
-bool PointMovementGenerator<T>::Update(T &unit, const uint32 &diff)
+bool PointMovementGenerator<T>::Update(T &unit, uint32 const& /*diff*/)
 {
     if (!&unit)
         return false;
 
-    if (unit.hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (unit.HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
     {
-        unit.clearUnitState(UNIT_STAT_ROAMING_MOVE);
+        unit.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
         return true;
     }
 
-    unit.addUnitState(UNIT_STAT_ROAMING_MOVE);
+    unit.AddUnitState(UNIT_STAT_ROAMING_MOVE);
 
     if (!unit.movespline->Finalized() && _recalculateSpeed)
     {
@@ -106,7 +106,7 @@ void PointMovementGenerator<Player>::MovementInform(Player&)
 template <>
 void PointMovementGenerator<Creature>::MovementInform(Creature &unit)
 {
-    if (!unit.isAlive())
+    if (!unit.IsAlive())
         return;
 
     if (unit.AI())
@@ -138,21 +138,21 @@ template void PointMovementGenerator<Player>::Interrupt(Player&);
 template void PointMovementGenerator<Creature>::Interrupt(Creature&);
 template void PointMovementGenerator<Player>::Reset(Player&);
 template void PointMovementGenerator<Creature>::Reset(Creature&);
-template bool PointMovementGenerator<Player>::Update(Player &, const uint32 &diff);
-template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32 &diff);
+template bool PointMovementGenerator<Player>::Update(Player &, uint32 const& diff);
+template bool PointMovementGenerator<Creature>::Update(Creature&, uint32 const& diff);
 
-bool DistancingMovementGenerator::Update(Creature &unit, const uint32 &diff)
+bool DistancingMovementGenerator::Update(Creature &unit, uint32 const& diff)
 {
     if (!&unit)
         return false;
     
-    if (unit.hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (unit.HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
     {
-        unit.clearUnitState(UNIT_STAT_ROAMING_MOVE);
+        unit.ClearUnitState(UNIT_STAT_ROAMING_MOVE);
         return false;
     }
     
-    unit.addUnitState(UNIT_STAT_ROAMING_MOVE);
+    unit.AddUnitState(UNIT_STAT_ROAMING_MOVE);
 
     if (!unit.movespline->Finalized() && _recalculateSpeed)
     {
@@ -170,13 +170,13 @@ void DistancingMovementGenerator::MovementInform(Creature &unit)
 
 void AssistanceMovementGenerator::Initialize(Creature& unit)
 {
-    if (unit.hasUnitState(UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_CAN_NOT_MOVE))
+    if (unit.HasUnitState(UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_CAN_NOT_MOVE))
         return;
 
     if (!unit.IsStopped())
         unit.StopMoving();
 
-    unit.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    unit.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     Movement::MoveSplineInit init(unit, "AssistanceMovementGenerator::Initialize");
     init.MoveTo(i_x, i_y, i_z, (_options & (MOVE_PATHFINDING | MOVE_FORCE_DESTINATION)));
     init.SetWalk(true);
@@ -186,15 +186,15 @@ void AssistanceMovementGenerator::Initialize(Creature& unit)
 
 void AssistanceMovementGenerator::Finalize(Creature &unit)
 {
-    unit.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    unit.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
 
     unit.SetNoCallAssistance(false);
     unit.CallAssistance();
-    if (unit.isAlive())
+    if (unit.IsAlive())
         unit.GetMotionMaster()->MoveSeekAssistanceDistract(sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_ASSISTANCE_DELAY));
 }
 
-bool EffectMovementGenerator::Update(Unit &unit, const uint32 &)
+bool EffectMovementGenerator::Update(Unit &unit, uint32 const&)
 {
     return !unit.movespline->Finalized();
 }
@@ -217,7 +217,7 @@ void ChargeMovementGenerator<T>::Initialize(T &unit)
         unit.StopMoving();
     if (path.getPathType() & PATHFIND_NOPATH)
         return;
-    unit.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    unit.AddUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     unit.m_movementInfo.moveFlags = unit.m_movementInfo.moveFlags & ~MOVEFLAG_MASK_MOVING_OR_TURN;
     Movement::MoveSplineInit init(unit, "ChargeMovementGenerator<T>::Initialize");
     init.Move(&path);
@@ -230,12 +230,12 @@ void ChargeMovementGenerator<T>::Initialize(T &unit)
 template<class T>
 void ChargeMovementGenerator<T>::Finalize(T &unit)
 {
-    unit.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    if (unit.hasUnitState(UNIT_STAT_PENDING_ROOT))
-        unit.addUnitState(UNIT_STAT_ROOT);
-    if (unit.hasUnitState(UNIT_STAT_PENDING_STUNNED))
-        unit.addUnitState(UNIT_STAT_STUNNED);
-    if (unit.hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
+    unit.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    if (unit.HasUnitState(UNIT_STAT_PENDING_ROOT))
+        unit.AddUnitState(UNIT_STAT_ROOT);
+    if (unit.HasUnitState(UNIT_STAT_PENDING_STUNNED))
+        unit.AddUnitState(UNIT_STAT_STUNNED);
+    if (unit.HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
         unit.SetRooted(true);
     if (_triggerAttack)
         if (!unit.IsPlayer() || victimGuid == unit.ToPlayer()->GetSelectionGuid())
@@ -317,29 +317,29 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
 template<class T>
 void ChargeMovementGenerator<T>::Interrupt(T &unit)
 {
-    unit.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    if (unit.hasUnitState(UNIT_STAT_PENDING_ROOT))
-        unit.addUnitState(UNIT_STAT_ROOT);
-    if (unit.hasUnitState(UNIT_STAT_PENDING_STUNNED))
-        unit.addUnitState(UNIT_STAT_STUNNED);
-    if (unit.hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
+    unit.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    if (unit.HasUnitState(UNIT_STAT_PENDING_ROOT))
+        unit.AddUnitState(UNIT_STAT_ROOT);
+    if (unit.HasUnitState(UNIT_STAT_PENDING_STUNNED))
+        unit.AddUnitState(UNIT_STAT_STUNNED);
+    if (unit.HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
         unit.SetRooted(true);
 }
 
 template<class T>
 void ChargeMovementGenerator<T>::Reset(T &unit)
 {
-    unit.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
-    if (unit.hasUnitState(UNIT_STAT_PENDING_ROOT))
-        unit.addUnitState(UNIT_STAT_ROOT);
-    if (unit.hasUnitState(UNIT_STAT_PENDING_STUNNED))
-        unit.addUnitState(UNIT_STAT_STUNNED);
-    if (unit.hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
+    unit.ClearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+    if (unit.HasUnitState(UNIT_STAT_PENDING_ROOT))
+        unit.AddUnitState(UNIT_STAT_ROOT);
+    if (unit.HasUnitState(UNIT_STAT_PENDING_STUNNED))
+        unit.AddUnitState(UNIT_STAT_STUNNED);
+    if (unit.HasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_ROOT))
         unit.SetRooted(true);
 }
 
 template<class T>
-bool ChargeMovementGenerator<T>::Update(T &unit, const uint32 &diff)
+bool ChargeMovementGenerator<T>::Update(T &unit, uint32 const& diff)
 {
     if (!&unit)
         return false;
@@ -350,7 +350,7 @@ bool ChargeMovementGenerator<T>::Update(T &unit, const uint32 &diff)
         return false;
     }
 
-    unit.addUnitState(UNIT_STAT_ROAMING_MOVE);
+    unit.AddUnitState(UNIT_STAT_ROAMING_MOVE);
 
     if (!unit.movespline->Finalized() && _recalculateSpeed)
     {
@@ -371,5 +371,5 @@ template void ChargeMovementGenerator<Player>::Interrupt(Player&);
 template void ChargeMovementGenerator<Creature>::Interrupt(Creature&);
 template void ChargeMovementGenerator<Player>::Reset(Player&);
 template void ChargeMovementGenerator<Creature>::Reset(Creature&);
-template bool ChargeMovementGenerator<Player>::Update(Player &, const uint32 &diff);
-template bool ChargeMovementGenerator<Creature>::Update(Creature&, const uint32 &diff);
+template bool ChargeMovementGenerator<Player>::Update(Player &, uint32 const& diff);
+template bool ChargeMovementGenerator<Creature>::Update(Creature&, uint32 const& diff);

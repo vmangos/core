@@ -60,13 +60,13 @@ enum CanCastResult
 struct CreatureAISpellsEntry : CreatureSpellsEntry
 {
     uint32 cooldown;
-    CreatureAISpellsEntry(const CreatureSpellsEntry& EntryStruct) : CreatureSpellsEntry(EntryStruct), cooldown(urand(EntryStruct.delayInitialMin, EntryStruct.delayInitialMax)) {}
+    CreatureAISpellsEntry(CreatureSpellsEntry const& EntryStruct) : CreatureSpellsEntry(EntryStruct), cooldown(urand(EntryStruct.delayInitialMin, EntryStruct.delayInitialMax)) {}
 };
 
 class MANGOS_DLL_SPEC CreatureAI
 {
     public:
-        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_uLastAlertTime(0), m_uiCastingDelay(0), m_bMeleeAttack(true), m_bCombatMovement(true)
+        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_bMeleeAttack(true), m_bCombatMovement(true), m_uiCastingDelay(0), m_uLastAlertTime(0)
         {
             SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
         }
@@ -76,8 +76,8 @@ class MANGOS_DLL_SPEC CreatureAI
 
         virtual uint32 GetData(uint32 /*type*/) { return 0; }
 
-        virtual void InformGuid(const ObjectGuid /*guid*/, uint32 /*type*/=0) {}
-        virtual void DoAction(const uint32 /*type*/=0) {}
+        virtual void InformGuid(ObjectGuid const /*guid*/, uint32 /*type*/=0) {}
+        virtual void DoAction(uint32 const /*type*/=0) {}
         virtual void DoAction(Unit* /*pUnit*/, uint32 /*type*/) {}
 
         ///== Information about AI ========================
@@ -88,7 +88,7 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called when an unit moves within visibility distance
         virtual void MoveInLineOfSight(Unit*) {}
 
-        // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
+        // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
         virtual void EnterCombat(Unit* /*enemy*/) {}
 
         // Called for reaction at stopping attack at no attackers or targets
@@ -104,12 +104,12 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void HealedBy(Unit* /*healer*/, uint32& /*amount_healed*/) {}
 
         // Called at any Damage to any victim (before damage apply)
-        virtual void DamageDeal(Unit* /*done_to*/, uint32 & /*damage*/) {}
+        virtual void DamageDeal(Unit* /*done_to*/, uint32& /*damage*/) {}
 
         // Called at any Damage from any attacker (before damage apply)
         // Note: it for recalculation damage or special reaction at damage
         // for attack reaction use AttackedBy called for not DOT damage in Unit::DealDamage also
-        virtual void DamageTaken(Unit* /*done_by*/, uint32 & /*damage*/) {}
+        virtual void DamageTaken(Unit* /*done_by*/, uint32& /*damage*/) {}
 
         // Called when the creature is killed
         virtual void JustDied(Unit*) {}
@@ -136,10 +136,10 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void SummonedCreatureDespawn(Creature* /*unit*/) {}
 
         // Called when hit by a spell
-        virtual void SpellHit(Unit*, const SpellEntry*) {}
+        virtual void SpellHit(Unit*, SpellEntry const*) {}
 
         // Called when spell hits creature's target
-        virtual void SpellHitTarget(Unit*, const SpellEntry*) {}
+        virtual void SpellHitTarget(Unit*, SpellEntry const*) {}
 
         // Called when the creature is target of hostile action: swing, hostile spell landed, fear/etc)
         virtual void AttackedBy(Unit* attacker);
@@ -167,10 +167,10 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void AttackStart(Unit*) {}
 
         // Called at World update tick
-        virtual void UpdateAI(const uint32 /*diff*/) {}
+        virtual void UpdateAI(uint32 const /*diff*/) {}
 
         // Like UpdateAI, but only when the creature is a dead corpse
-        virtual void UpdateAI_corpse(const uint32 /*uiDiff*/) {}
+        virtual void UpdateAI_corpse(uint32 const /*uiDiff*/) {}
 
         // Called by scripted map events
         virtual void MapScriptEventHappened(ScriptedEvent* /*pEvent*/, uint32 /*uiData*/) {};
@@ -178,7 +178,7 @@ class MANGOS_DLL_SPEC CreatureAI
         ///== State checks =================================
 
         // called when the corpse of this creature gets removed
-        virtual void CorpseRemoved(uint32 & /*respawnDelay*/) {}
+        virtual void CorpseRemoved(uint32& /*respawnDelay*/) {}
 
         // Is corpse looting allowed ?
         virtual bool CanBeLooted() const { return true; }
@@ -211,18 +211,18 @@ class MANGOS_DLL_SPEC CreatureAI
         CanCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0, ObjectGuid uiOriginalCasterGUID = ObjectGuid());
 
         // Helper functions for cast spell
-        virtual CanCastResult CanCastSpell(Unit* pTarget, const SpellEntry* pSpell, bool isTriggered);
+        virtual CanCastResult CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered);
 
         // Clears any group/raid icons this creature may have
         void ClearTargetIcon();
 
         // Assigns a creature_spells list to the AI.
         void SetSpellsList(uint32 entry);
-        void SetSpellsList(const CreatureSpellsList* pSpellsList);
+        void SetSpellsList(CreatureSpellsList const* pSpellsList);
 
         // Goes through the creature's spells list to update timers and cast spells.
-        void UpdateSpellsList(const uint32 uiDiff);
-        void DoSpellsListCasts(const uint32 uiDiff);
+        void UpdateSpellsList(uint32 const uiDiff);
+        void DoSpellsListCasts(uint32 const uiDiff);
 
         // Enables or disables melee attacks.
         void SetMeleeAttack(bool enabled);
@@ -246,17 +246,17 @@ class MANGOS_DLL_SPEC CreatureAI
 
 struct SelectableAI : FactoryHolder<CreatureAI>, Permissible<Creature>
 {
-    explicit SelectableAI(const char* id) : FactoryHolder<CreatureAI>(id) {}
+    explicit SelectableAI(char const* id) : FactoryHolder<CreatureAI>(id) {}
 };
 
 template<class REAL_AI>
 struct CreatureAIFactory : SelectableAI
 {
-    explicit CreatureAIFactory(const char* name) : SelectableAI(name) {}
+    explicit CreatureAIFactory(char const* name) : SelectableAI(name) {}
 
     CreatureAI* Create(void*) const override;
 
-    int Permit(const Creature* c) const override { return REAL_AI::Permissible(c); }
+    int Permit(Creature const* c) const override { return REAL_AI::Permissible(c); }
 };
 
 enum Permitions

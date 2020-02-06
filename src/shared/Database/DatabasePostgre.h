@@ -40,26 +40,26 @@
 class MANGOS_DLL_SPEC PostgreSQLConnection : public SqlConnection
 {
     public:
-        PostgreSQLConnection() : mPGconn(NULL) {}
+        PostgreSQLConnection() : mPGconn(nullptr) {}
         ~PostgreSQLConnection();
 
         bool OpenConnection(bool reconnect);
 
-        QueryResult* Query(const char *sql);
-        QueryNamedResult* QueryNamed(const char *sql);
-        bool Execute(const char *sql);
+        QueryResult* Query(char const* sql);
+        QueryNamedResult* QueryNamed(char const* sql);
+        bool Execute(char const* sql);
 
-        unsigned long escape_string(char *to, const char *from, unsigned long length);
+        unsigned long escape_string(char* to, char const* from, unsigned long length);
 
         bool BeginTransaction();
         bool CommitTransaction();
         bool RollbackTransaction();
 
     private:
-        bool _TransactionCmd(const char *sql);
-        bool _Query(const char *sql, PGresult **pResult, uint64* pRowCount, uint32* pFieldCount);
+        bool _TransactionCmd(char const* sql);
+        bool _Query(char const* sql, PGresult** pResult, uint64* pRowCount, uint32* pFieldCount);
 
-        PGconn *mPGconn;
+        PGconn* mPGconn;
 };
 
 class MANGOS_DLL_SPEC DatabasePostgre : public Database
@@ -74,7 +74,7 @@ class MANGOS_DLL_SPEC DatabasePostgre : public Database
         /*! infoString should be formated like hostname;username;password;database. */
 
     protected:
-        virtual SqlConnection * CreateConnection();
+        virtual SqlConnection* CreateConnection();
 
     private:
         static size_t db_count;

@@ -22,7 +22,7 @@ struct instance_maraudon : public ScriptedInstance
     bool bRespawnSpewedLarva;
     uint32 uiSpewedLarvaTimer;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -35,7 +35,7 @@ struct instance_maraudon : public ScriptedInstance
 
     }
 
-    void OnCreatureCreate(Creature *pCreature)
+    void OnCreatureCreate(Creature *pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -54,7 +54,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    void OnGameObjectCreate(GameObject* pGo)
+    void OnGameObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -71,7 +71,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    void OnCreatureRespawn(Creature *pCreature)
+    void OnCreatureRespawn(Creature *pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -83,25 +83,25 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    const char* Save()
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn)
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
             return;
         std::istringstream loadStream(chrIn);
-        for (uint8 i = 0; i < MARAUDON_MAX_ENCOUNTER; ++i)
+        for (uint32 & i : m_auiEncounter)
         {
-            loadStream >> m_auiEncounter[i];
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+            loadStream >> i;
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
         }
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -116,7 +116,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -145,8 +145,8 @@ struct instance_maraudon : public ScriptedInstance
             OUT_SAVE_INST_DATA;
 
             std::ostringstream saveStream;
-            for (int i = 0; i < MARAUDON_MAX_ENCOUNTER; ++i)
-                saveStream << m_auiEncounter[i] << " ";
+            for (uint32 i : m_auiEncounter)
+                saveStream << i << " ";
 
             strInstData = saveStream.str();
 
@@ -155,7 +155,7 @@ struct instance_maraudon : public ScriptedInstance
         }
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -178,7 +178,7 @@ struct instance_maraudon : public ScriptedInstance
             }
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         // Remove a corrupted vine when a healed one was summoned over
         if (vineGuid)

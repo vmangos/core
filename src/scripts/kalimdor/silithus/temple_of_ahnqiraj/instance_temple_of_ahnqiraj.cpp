@@ -144,9 +144,9 @@ void TwinsIntroDialogue::JustDidDialogueStep(int32 iEntry)
 instance_temple_of_ahnqiraj::instance_temple_of_ahnqiraj(Map* pMap) :
     ScriptedInstance(pMap),
     m_uiBugTrioDeathCount(0),
+    m_twinsDeadDialogue(twinsDeathDialogue),
     m_uiCthunWhisperTimer(CTHUN_FIRST_WHISPER),
-    m_uiCthunPrevWhisperTimer(CTHUN_FIRST_WHISPER),
-    m_twinsDeadDialogue(twinsDeathDialogue)
+    m_uiCthunPrevWhisperTimer(CTHUN_FIRST_WHISPER)
 {
     Initialize();
 };
@@ -161,9 +161,9 @@ void instance_temple_of_ahnqiraj::Initialize()
 
 bool instance_temple_of_ahnqiraj::IsEncounterInProgress() const
 {
-    for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
+    for (uint32 i : m_auiEncounter)
     {
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+        if (i == IN_PROGRESS || i == SPECIAL)
             return true;
     }
 
@@ -383,10 +383,10 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         break;
     case TYPE_CTHUN:
         m_auiEncounter[uiType] = uiData;
-        for (auto it = graspsOfCthun.begin(); it != graspsOfCthun.end(); it++) {
-            if (GameObject* pGo = GetGameObject(*it)) {
+        for (const auto& guid : graspsOfCthun)
+        {
+            if (GameObject* pGo = GetGameObject(guid))
                 pGo->SetVisible(uiData != DONE);
-            }
         }
         break;
     }
@@ -396,8 +396,8 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        for (int i = 0; i < MAX_ENCOUNTER; ++i)
-            saveStream << m_auiEncounter[i] << " ";
+        for (uint32 i : m_auiEncounter)
+            saveStream << i << " ";
 
         m_strInstData = saveStream.str();
 
@@ -406,7 +406,7 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-void instance_temple_of_ahnqiraj::Load(const char* chrIn)
+void instance_temple_of_ahnqiraj::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -417,11 +417,11 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-	   for (int i = 0; i < MAX_ENCOUNTER; ++i)
+	   for (uint32 & i : m_auiEncounter)
     {
-        loadStream >> m_auiEncounter[i];
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+        loadStream >> i;
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
     }
     
     if (m_auiEncounter[TYPE_TWINS] == DONE) {
@@ -464,17 +464,17 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
 
     std::list<Player*> candidates;
     std::list<Player*>::iterator j;
-    const Map::PlayerList& PlayerList = GetMap()->GetPlayers();
+    Map::PlayerList const& PlayerList = GetMap()->GetPlayers();
     if (PlayerList.isEmpty())
         return;
 
-    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+    for (const auto& itr : PlayerList)
     {
-        if (Player* player = itr->getSource())
+        if (Player* player = itr.getSource())
         {
-            if (!player->isDead()) {
+            if (!player->IsDead()) {
                 auto find_it = std::find_if(cthunWhisperMutes.begin(), cthunWhisperMutes.end(), 
-                    [player](const std::pair<ObjectGuid, uint32>& e) {return e.first == player->GetObjectGuid(); });
+                    [player](std::pair<ObjectGuid, uint32> const& e) {return e.first == player->GetObjectGuid(); });
                 if (find_it == cthunWhisperMutes.end()) {
                     candidates.push_back(player);
                 }
@@ -482,7 +482,7 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
         }
     }
     
-    if (!candidates.size())
+    if (candidates.empty())
         return;
 
     j = candidates.begin();
@@ -519,17 +519,14 @@ bool instance_temple_of_ahnqiraj::CheckConditionCriteriaMeet(Player const* playe
     if (instance_condition_id >= MAX_ENCOUNTER)
         return false;
 
-    if (m_auiEncounter[instance_condition_id] == DONE)
-        return true;
-    else
-        return false;
+    return m_auiEncounter[instance_condition_id] == DONE;
 }
 
-bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pAt->id == AREATRIGGER_TWIN_EMPERORS || pAt->id == AREATRIGGER_SARTURA)
     {
-        if (pPlayer->IsGameMaster() || !pPlayer->isAlive())
+        if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
             return false;
 
         if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
@@ -552,18 +549,15 @@ instance_temple_of_ahnqiraj::CThunStomachList::iterator instance_temple_of_ahnqi
     if (!unit) return playersInStomach.end();
 
     return std::find_if(playersInStomach.begin(), playersInStomach.end(),
-        [unit](const std::pair<ObjectGuid, StomachTimers>& e) {
-        if (unit->GetObjectGuid() == e.first) {
-            return true;
-        }
-        return false;
+        [unit](std::pair<ObjectGuid, StomachTimers> const& e) {
+        return unit->GetObjectGuid() == e.first;
     });
 }
 
 void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
 {
     // Player is ported to center of c'thun with a small, random, offset to knock the player in a random direction.
-    const AreaTriggerEntry* cthunAreaTrigger = sObjectMgr.GetAreaTrigger(AREATRIGGER_CTHUN_KNOCKBACK);
+    AreaTriggerEntry const* cthunAreaTrigger = sObjectMgr.GetAreaTrigger(AREATRIGGER_CTHUN_KNOCKBACK);
     if (cthunAreaTrigger) {
         float x = cthunAreaTrigger->x + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
         float y = cthunAreaTrigger->y + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
@@ -580,7 +574,7 @@ void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
 
 void instance_temple_of_ahnqiraj::PerformCthunKnockback()
 {
-    const AreaTriggerEntry* pAt = sObjectMgr.GetAreaTrigger(AREATRIGGER_CTHUN_KNOCKBACK);
+    AreaTriggerEntry const* pAt = sObjectMgr.GetAreaTrigger(AREATRIGGER_CTHUN_KNOCKBACK);
     float x, y, z;
     if (pAt) {
         x = pAt->x;
@@ -604,10 +598,10 @@ bool instance_temple_of_ahnqiraj::PlayerInStomach(Unit * unit)
     return PlayerInStomachIter(unit) != playersInStomach.end();
 }
 
-void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const AreaTriggerEntry * pAt)
+void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, AreaTriggerEntry const * pAt)
 {
     if (!pPlayer) return;
-    if (pPlayer->IsGameMaster() || !pPlayer->isAlive())
+    if (pPlayer->IsGameMaster() || !pPlayer->IsAlive())
         return;
 
     if (pAt->id == AREATRIGGER_STOMACH_GROUND) {
@@ -651,7 +645,7 @@ bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
                 continue;
             }
 
-            if (p->isAlive()) {
+            if (p->IsAlive()) {
                 p->DealDamage(p, p->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
             if (p->HasAura(SPELL_DIGESTIVE_ACID)) {
@@ -661,7 +655,7 @@ bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
         iter = playersInStomach.erase(iter);
     }
 
-    return playersInStomach.size() == 0;
+    return playersInStomach.empty();
 }
 
 void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
@@ -693,7 +687,7 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
     // Update the players in the stomach
     if (playersInStomach.empty()) return;
 
-    const AreaTriggerEntry* pot = sObjectMgr.GetAreaTrigger(AREATRIGGER_STOMACH_AIR);
+    AreaTriggerEntry const* pot = sObjectMgr.GetAreaTrigger(AREATRIGGER_STOMACH_AIR);
     for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
         Player* player = GetMap()->GetPlayer(it->first);
         //Player has left instance or something and we remove him from the list. 
@@ -792,14 +786,14 @@ struct AI_QirajiMindslayer : public ScriptedAI {
             return;
 
         // finding closest player and casting manaburn on that target.
-        // todo: should we add a player->getPowerType() == POWER_MANA check too when choosing valid target?
+        // todo: should we add a player->GetPowerType() == POWER_MANA check too when choosing valid target?
         Player* closestPlayer = nullptr;
         float closestDist = std::numeric_limits<float>::max();
         MapRefManager const &list = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = list.begin(); i != list.end(); ++i)
+        for (const auto& i : list)
         {
-            if (Player* player = i->getSource()) {
-                if (player->isAlive()) { 
+            if (Player* player = i.getSource()) {
+                if (player->IsAlive()) { 
                     float dist = m_creature->GetDistance(player);
                     if (dist < closestDist) {
                         closestPlayer = player;
@@ -813,10 +807,10 @@ struct AI_QirajiMindslayer : public ScriptedAI {
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_creature->IsNonMeleeSpellCasted()) { // prevents re-targetting of topaggro from happening while channeling mindflay
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
         }
             

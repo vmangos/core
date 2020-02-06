@@ -161,13 +161,13 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
 
     void DoSummonPack(uint8 uiIndex)
     {
-        for (uint8 i = 0; i < MAX_SUMMON_POSITIONS; ++i)
+        for (const auto& i : asSummonInfo)
         {
             // This requires order of the array
-            if (asSummonInfo[i].uiPosition > uiIndex)
+            if (i.uiPosition > uiIndex)
                 break;
-            if (asSummonInfo[i].uiPosition == uiIndex)
-                m_creature->SummonCreature(asSummonInfo[i].uiEntry, asSummonInfo[i].fX, asSummonInfo[i].fY, asSummonInfo[i].fZ, asSummonInfo[i].fO, TEMPSUMMON_DEAD_DESPAWN, 0);
+            if (i.uiPosition == uiIndex)
+                m_creature->SummonCreature(i.uiEntry, i.fX, i.fY, i.fZ, i.fO, TEMPSUMMON_DEAD_DESPAWN, 0);
         }
     }
 
@@ -255,9 +255,9 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
         if (m_bNorthernCaveInOpened)                        // close northern cave-in door
             m_pInstance->DoUseDoorOrButton(m_pInstance->GetData64(GO_CAVE_IN_NORTH));
 
-        for (GuidList::const_iterator itr = m_luiSummonedMobGUIDs.begin(); itr != m_luiSummonedMobGUIDs.end(); ++itr)
+        for (const auto& guid : m_luiSummonedMobGUIDs)
         {
-            if (Creature* pSummoned = m_creature->GetMap()->GetCreature(*itr))
+            if (Creature* pSummoned = m_creature->GetMap()->GetCreature(guid))
                 pSummoned->ForcedDespawn();
         }
     }
@@ -348,7 +348,7 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
     void UpdateEscortAI(uint32 const uiDiff) override
     {
         // the phases are handled OOC (keeps them in sync with the waypoints)
-        if (m_uiPhaseTimer && !m_creature->getVictim())
+        if (m_uiPhaseTimer && !m_creature->GetVictim())
         {
             if (m_uiPhaseTimer <= uiDiff)
             {
@@ -366,7 +366,7 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
                         m_uiPhaseTimer = 3500;              // 6s delay, but 2500ms for escortstarting
                         break;
                     case 3:
-                        Start(false, m_playerGuid, NULL, false, false);
+                        Start(false, m_playerGuid, nullptr, false, false);
                         m_uiPhaseTimer = 0;
                         break;
 
@@ -594,7 +594,7 @@ struct npc_blastmaster_emi_shortfuseAI : public npc_escortAI
                 m_uiPhaseTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -655,7 +655,7 @@ enum
     SAY_KERNOBEE_END            = -1780208,
 };
 
-static const float aKernobeePositions[3][3] =
+static float const aKernobeePositions[3][3] =
 {
     { -390.82f, 42.34f, -154.795f},                          // I can see the end!
     { -330.92f, -3.03f, -152.85f},                          // End position
@@ -678,7 +678,7 @@ struct npc_kernobeeAI : public FollowerAI
 
     void Reset() override {}
 
-    void UpdateFollowerAI(const uint32 uiDiff)
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
         FollowerAI::UpdateFollowerAI(uiDiff);               // Do combat handling
         if (nextStep == 5) //HasFollowState(STATE_FOLLOW_COMPLETE)
@@ -713,7 +713,7 @@ struct npc_kernobeeAI : public FollowerAI
                 m_nextStepTimer -= uiDiff;
         }
 
-        if (m_creature->isInCombat() || !HasFollowState(STATE_FOLLOW_INPROGRESS) || HasFollowState(STATE_FOLLOW_COMPLETE))
+        if (m_creature->IsInCombat() || !HasFollowState(STATE_FOLLOW_INPROGRESS) || HasFollowState(STATE_FOLLOW_COMPLETE))
             return;
 
         if (nextStep == 1) /*HasFollowState(STATE_FOLLOW_PAUSED)*/
@@ -795,8 +795,8 @@ struct npc_kernobeeAI : public FollowerAI
                 if (Creature* crea = m_creature->GetMap()->GetCreature(bombGuid))
                 {
                     crea->CastSpell(crea, SPELL_EXPLOSION, true);
-                    crea->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                    crea->DealDamage(crea, crea->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    crea->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                    crea->DealDamage(crea, crea->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                     nextStep = 4;
                     m_nextStepTimer = 200;
                 }
@@ -810,9 +810,9 @@ struct npc_kernobeeAI : public FollowerAI
             {
                 if (Creature* crea = m_creature->GetMap()->GetCreature(bombGuid))
                 {
-                    crea->DealDamage(crea, crea->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    crea->DealDamage(crea, crea->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                     nextStep = 0;
-                    crea->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                    crea->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                 }
             }
             else
@@ -820,7 +820,7 @@ struct npc_kernobeeAI : public FollowerAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         FollowerAI::JustDied(pKiller);
         QuestReset();
@@ -835,7 +835,7 @@ struct npc_kernobeeAI : public FollowerAI
         canSeeEnd = false;
         nextStep = 0;
     }
-    void StartQuest(Player* pPlayer, const Quest* pQuest)
+    void StartQuest(Player* pPlayer, Quest const* pQuest)
     {
         DoScriptText(SAY_KERNOBEE_START, m_creature);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
@@ -860,7 +860,7 @@ CreatureAI* GetAI_npc_kernobee(Creature* pCreature)
     return new npc_kernobeeAI(pCreature);
 }
 
-bool QuestAccept_npc_kernobee(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kernobee(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_A_FINE_MESS)
     {

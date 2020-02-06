@@ -24,6 +24,7 @@ EndScriptData
 
 #include "scriptPCH.h"
 #include "../kalimdor/moonglade/boss_omen.h"
+#include "CritterAI.h"
 #include <array>
 
 /* ContentData
@@ -53,24 +54,36 @@ enum
     FACTION_CHICKEN         = 31
 };
 
-struct npc_chicken_cluckAI : public ScriptedAI
+struct npc_chicken_cluckAI : public CritterAI
 {
-    npc_chicken_cluckAI(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_chicken_cluckAI(Creature* pCreature) : CritterAI(pCreature)
     {
         Reset();
     }
 
     uint32 m_uiResetFlagTimer;
 
+    void JustRespawned() override
+    {
+        Reset();
+        CritterAI::JustRespawned();
+    }
+
+    void OnCombatStop() override
+    {
+        Reset();
+        CritterAI::OnCombatStop();
+    }
+
     void Reset()
     {
         m_uiResetFlagTimer = 120000;
 
-        m_creature->setFaction(FACTION_CHICKEN);
+        m_creature->SetFactionTemplateId(FACTION_CHICKEN);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 uiEmote)
+    void ReceiveEmote(Player* pPlayer, uint32 uiEmote) override
     {
         if (uiEmote == TEXTEMOTE_CHICKEN)
         {
@@ -79,7 +92,7 @@ struct npc_chicken_cluckAI : public ScriptedAI
                 if (pPlayer->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_NONE)
                 {
                     m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                    m_creature->setFaction(FACTION_FRIENDLY);
+                    m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
 
                     DoScriptText(EMOTE_A_HELLO, m_creature);
 
@@ -98,13 +111,13 @@ struct npc_chicken_cluckAI : public ScriptedAI
             if (pPlayer->GetQuestStatus(QUEST_CLUCK) == QUEST_STATUS_COMPLETE)
             {
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-                m_creature->setFaction(FACTION_FRIENDLY);
+                m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
                 DoScriptText(EMOTE_CLUCK_TEXT2, m_creature);
             }
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Reset flags after a certain time has passed so that the next player has to start the 'event' again
         if (m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
@@ -115,8 +128,7 @@ struct npc_chicken_cluckAI : public ScriptedAI
                 m_uiResetFlagTimer -= uiDiff;
         }
 
-        if (m_creature->SelectHostileTarget() && m_creature->getVictim())
-            DoMeleeAttackIfReady();
+        CritterAI::UpdateAI(uiDiff);
     }
 };
 
@@ -125,7 +137,7 @@ CreatureAI* GetAI_npc_chicken_cluck(Creature* pCreature)
     return new npc_chicken_cluckAI(pCreature);
 }
 
-bool QuestAccept_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_CLUCK)
     {
@@ -136,7 +148,7 @@ bool QuestAccept_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, const Q
     return true;
 }
 
-bool QuestComplete_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestComplete_npc_chicken_cluck(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_CLUCK)
     {
@@ -203,14 +215,14 @@ static Location HordeCoords[] =
 #define H_RUNTOY -3508.48f
 #define H_RUNTOZ 62.96f
 
-const uint32 AllianceSoldierId[3] =
+uint32 const AllianceSoldierId[3] =
 {
     12938,                                                  // 12938 Injured Alliance Soldier
     12936,                                                  // 12936 Badly injured Alliance Soldier
     12937                                                   // 12937 Critically injured Alliance Soldier
 };
 
-const uint32 HordeSoldierId[3] =
+uint32 const HordeSoldierId[3] =
 {
     12923,                                                  //12923 Injured Soldier
     12924,                                                  //12924 Badly injured Soldier
@@ -240,7 +252,7 @@ struct npc_doctorAI : public ScriptedAI
     std::list<uint64> Patients;
     std::vector<Location*> Coordinates;
 
-    void Reset()
+    void Reset() override
     {
         Playerguid = 0;
 
@@ -260,7 +272,7 @@ struct npc_doctorAI : public ScriptedAI
     void BeginEvent(Player* pPlayer);
     void PatientDied(Location* Point);
     void PatientSaved(Creature* soldier, Player* pPlayer, Location* Point);
-    void UpdateAI(const uint32 diff);
+    void UpdateAI(uint32 const diff) override;
 };
 
 /*#####
@@ -279,7 +291,7 @@ struct npc_injured_patientAI : public ScriptedAI
     bool Pvloss;
     uint32 _healthModTimer;
 
-    void Reset()
+    void Reset() override
     {
         Doctorguid = 0;
         Coord = nullptr;
@@ -315,9 +327,9 @@ struct npc_injured_patientAI : public ScriptedAI
         }
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
-        if (caster->GetTypeId() == TYPEID_PLAYER && m_creature->isAlive() && spell->Id == 20804)
+        if (caster->GetTypeId() == TYPEID_PLAYER && m_creature->IsAlive() && spell->Id == 20804)
         {
             if ((((Player*)caster)->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (((Player*)caster)->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE))
             {
@@ -369,7 +381,7 @@ struct npc_injured_patientAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (_healthModTimer > diff)
         {
@@ -377,7 +389,7 @@ struct npc_injured_patientAI : public ScriptedAI
             return;
         }
         _healthModTimer = 2000; // TODO: Timer ?
-        if (!m_creature->isAlive() || !Pvloss)
+        if (!m_creature->IsAlive() || !Pvloss)
             return;
 
         if (m_creature->GetHealth() <= 100)
@@ -417,12 +429,12 @@ void npc_doctorAI::BeginEvent(Player* pPlayer)
     switch (m_creature->GetEntry())
     {
         case DOCTOR_ALLIANCE:
-            for (uint8 i = 0; i < ALLIANCE_COORDS; ++i)
-                Coordinates.push_back(&AllianceCoords[i]);
+            for (auto& allianceCoord : AllianceCoords)
+                Coordinates.push_back(&allianceCoord);
             break;
         case DOCTOR_HORDE:
-            for (uint8 i = 0; i < HORDE_COORDS; ++i)
-                Coordinates.push_back(&HordeCoords[i]);
+            for (auto& hordeCoord : HordeCoords)
+                Coordinates.push_back(&hordeCoord);
             break;
     }
 
@@ -496,7 +508,7 @@ void npc_doctorAI::PatientSaved(Creature* soldier, Player* pPlayer, Location* Po
     }
 }
 
-void npc_doctorAI::UpdateAI(const uint32 diff)
+void npc_doctorAI::UpdateAI(uint32 const diff)
 {
     if (!Event)
         return;
@@ -551,7 +563,7 @@ void npc_doctorAI::UpdateAI(const uint32 diff)
         SummonPatient_Timer -= diff;
 }
 
-bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_doctor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if ((pQuest->GetQuestId() == QUEST_TRIAGE_A) || (pQuest->GetQuestId() == QUEST_TRIAGE_H))
     {
@@ -626,7 +638,7 @@ struct npc_garments_of_questsAI : public npc_escortAI
 
     uint32 RunAwayTimer;
 
-    void Reset()
+    void Reset() override
     {
         caster = 0;
 
@@ -640,12 +652,12 @@ struct npc_garments_of_questsAI : public npc_escortAI
         m_creature->SetHealth(int(m_creature->GetMaxHealth() * 0.7));
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry *Spell)
+    void SpellHit(Unit* pCaster, SpellEntry const* Spell) override
     {
         if (Spell->Id == SPELL_LESSER_HEAL_R2 || Spell->Id == SPELL_FORTITUDE_R1)
         {
             //not while in combat
-            if (m_creature->isInCombat())
+            if (m_creature->IsInCombat())
                 return;
 
             //nothing to be done now
@@ -750,13 +762,13 @@ struct npc_garments_of_questsAI : public npc_escortAI
         }
     }
 
-    void WaypointReached(uint32 uiPoint)
+    void WaypointReached(uint32 uiPoint) override
     {
     }
 
-    void UpdateEscortAI(const uint32 diff)
+    void UpdateEscortAI(uint32 const diff) override
     {
-        if (bCanRun && !m_creature->isInCombat())
+        if (bCanRun && !m_creature->IsInCombat())
         {
             if (RunAwayTimer <= diff)
             {
@@ -791,7 +803,7 @@ struct npc_garments_of_questsAI : public npc_escortAI
             else RunAwayTimer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -816,20 +828,20 @@ struct npc_guardianAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
-        if (m_creature->isAttackReady())
+        if (m_creature->IsAttackReady())
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_DEATHTOUCH, true);
-            m_creature->resetAttackTimer();
+            m_creature->CastSpell(m_creature->GetVictim(), SPELL_DEATHTOUCH, true);
+            m_creature->ResetAttackTimer();
         }
     }
 };
@@ -856,7 +868,7 @@ struct npc_tonk_mineAI : public ScriptedAI
     uint32 m_uiArmTimer;
     bool m_bArmed;
 
-    void Reset()
+    void Reset() override
     {
         m_uiArmTimer = 3000;
         m_bArmed = false;
@@ -876,15 +888,17 @@ struct npc_tonk_mineAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bArmed)
+        { 
             if (m_uiArmTimer < uiDiff)
             {
                 m_bArmed = true;
             }
             else
                 m_uiArmTimer -= uiDiff;
+        }
     }
 };
 
@@ -909,13 +923,13 @@ struct npc_tonk_mortarAI : public ScriptedAI
     uint32 m_uiExplosionTimer;
     bool m_bExploded;
 
-    void Reset()
+    void Reset() override
     {
         m_uiExplosionTimer = 1500;
         m_bExploded = false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiExplosionTimer < uiDiff)
         {
@@ -949,7 +963,7 @@ struct npc_steam_tonkAI : public ScriptedAI
 
     uint32 m_uiPossesedCheck;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPossesedCheck = 3000;
     }
@@ -959,7 +973,7 @@ struct npc_steam_tonkAI : public ScriptedAI
     void AttackStart(Unit* /*pWho*/) override {}
     void EnterCombat(Unit* /*pWho*/) override {};
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiPossesedCheck < uiDiff)
         {
@@ -1026,7 +1040,7 @@ bool GossipSelect_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature, uint
 
 bool GossipHello_npc_sayge(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->HasSpellCooldown(SPELL_INT) ||
@@ -1169,12 +1183,12 @@ struct rat_des_profondeursAI : public ScriptedAI
     ObjectGuid m_FollowingPlayerGuid;
     uint32 QuestFinishCheck_Timer;
 
-    void Reset()
+    void Reset() override
     {
         QuestFinishCheck_Timer = 0;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_FollowingPlayerGuid)
             return;
@@ -1203,17 +1217,17 @@ struct rat_des_profondeursAI : public ScriptedAI
             // Et on ".die" les autres rats.
             std::list<Creature*> pCreaList;
             m_creature->GetCreatureListWithEntryInGrid(pCreaList, NPC_RAT_ENSORCELE, 100.0f);
-            for (std::list<Creature*>::iterator it = pCreaList.begin(); it != pCreaList.end(); ++it)
+            for (const auto& pCreature : pCreaList)
             {
-                if ((*it)->AI()->GetData(0) == m_FollowingPlayerGuid.GetCounter())
-                    (*it)->DisappearAndDie();
+                if (pCreature->AI()->GetData(0) == m_FollowingPlayerGuid.GetCounter())
+                    pCreature->DisappearAndDie();
             }
         }
         else
             QuestFinishCheck_Timer -= uiDiff;
     }
 
-    void SpellHit(Unit* pCaster, SpellEntry const* pSpellInfo)
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpellInfo) override
     {
         // Ce rat est deja pris !
         if (!m_FollowingPlayerGuid.IsEmpty())
@@ -1232,7 +1246,7 @@ struct rat_des_profondeursAI : public ScriptedAI
         pCaster->ToPlayer()->RewardPlayerAndGroupAtCast(m_creature, SPELL_EXTASE_MELODIEUSE);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (!m_FollowingPlayerGuid)
             return;
@@ -1243,7 +1257,7 @@ struct rat_des_profondeursAI : public ScriptedAI
         m_FollowingPlayerGuid.Clear();
     }
 
-    uint32 GetData(uint32 dataType)
+    uint32 GetData(uint32 dataType) override
     {
         return dataType == 0 ? m_FollowingPlayerGuid.GetCounter() : 0;
     }
@@ -1272,19 +1286,19 @@ struct npc_felhound_minionAI : public ScriptedPetAI
 
     uint32 m_uiManaBurnTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiManaBurnTimer = urand(1000, 2500);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (m_creature->getVictim())
+        if (m_creature->GetVictim())
         {
             if (m_uiManaBurnTimer < uiDiff)
             {
-                if (m_creature->getVictim()->getPowerType() == POWER_MANA)
-                    DoCastSpellIfCan(m_creature->getVictim(), 15980);
+                if (m_creature->GetVictim()->GetPowerType() == POWER_MANA)
+                    DoCastSpellIfCan(m_creature->GetVictim(), 15980);
                 m_uiManaBurnTimer = urand(9800, 15200);
                 return;
             }
@@ -1353,7 +1367,7 @@ struct npc_gnomish_battle_chickenAI : ScriptedPetAI
         ScriptedPetAI::DamageTaken(pDoneBy, uiDamage);
     }
 
-    void UpdatePetAI(const uint32 uiDiff) override
+    void UpdatePetAI(uint32 const uiDiff) override
     {
         if (!m_bSquawkDone)
         {
@@ -1414,11 +1428,11 @@ struct npc_arcanite_dragonlingAI : ScriptedPetAI
         m_flamebreathTimer = urand(10000, 60000);
     }
 
-    void UpdatePetAI(const uint32 uiDiff) override
+    void UpdatePetAI(uint32 const uiDiff) override
     {
         if (m_firebuffetTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
                 m_firebuffetTimer = 22500;
         }
         else
@@ -1426,7 +1440,7 @@ struct npc_arcanite_dragonlingAI : ScriptedPetAI
 
         if (m_flamebreathTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAME_BREATH) == CAST_OK)
                 m_flamebreathTimer = urand(10000, 60000);
         }
         else
@@ -1471,11 +1485,11 @@ struct npc_emerald_dragon_whelpAI : ScriptedPetAI
         m_uiAcidSpitTimer = 1000;
     }
 
-    void UpdatePetAI(const uint32 uiDiff) override
+    void UpdatePetAI(uint32 const uiDiff) override
     {
         if (m_uiAcidSpitTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_SPIT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ACID_SPIT) == CAST_OK)
                 m_uiAcidSpitTimer = 2000;
         }
         else
@@ -1510,7 +1524,7 @@ struct npc_cannonball_runnerAI : ScriptedPetAI
         if (m_creature->GetOwner())
             m_creature->SetOrientation(m_creature->GetOwner()->GetOrientation());
 
-        m_creature->addUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT);
+        m_creature->AddUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT);
 
         npc_cannonball_runnerAI::Reset();
     }
@@ -1519,7 +1533,7 @@ struct npc_cannonball_runnerAI : ScriptedPetAI
     void MoveInLineOfSight(Unit* /*pWho*/) override {}
     void Reset() override {}
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->IsNonMeleeSpellCasted())
             if (Unit * pTarget = m_creature->SelectRandomUnfriendlyTarget((Unit *) nullptr, 40.0f, true))
@@ -1547,7 +1561,7 @@ struct npc_the_cleanerAI : public ScriptedAI
 
     uint32 m_uiDespawnTimer;
 
-    void Reset()
+    void Reset() override
     {
         DoCastSpellIfCan(m_creature, SPELL_IMMUNITY, CF_TRIGGERED);
         m_uiDespawnTimer = 3000;
@@ -1565,17 +1579,17 @@ struct npc_the_cleanerAI : public ScriptedAI
         m_creature->ForcedDespawn();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiDespawnTimer < uiDiff)
         {
-            if (m_creature->getThreatManager().getThreatList().empty())
+            if (m_creature->GetThreatManager().getThreatList().empty())
                 m_creature->ForcedDespawn();
         }
         else
             m_uiDespawnTimer -= uiDiff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -1609,7 +1623,7 @@ struct FireworkStruct
     bool m_bIsCluster;
 };
 
-const std::array<FireworkStruct, 25> Fireworks =
+std::array<FireworkStruct, 25> const Fireworks =
 { {
     { 15872, {26357, 26303, 26302, 26300, 26301}, true }, // Blue Firework Cluster
     { 15873, {26360, 26308, 26307, 26306, 26305}, true }, // Red Firework Cluster
@@ -1638,7 +1652,7 @@ const std::array<FireworkStruct, 25> Fireworks =
     { 15918, {26487, 26509, 26508, 26507, 26483}, true }, // Lucky Rocket Cluster
 }};
 
-const std::array<uint32, 7> Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
+std::array<uint32, 7> const Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1682,14 +1696,14 @@ struct npc_pats_firework_guyAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 /*diff*/) override
+    void UpdateAI(uint32 const /*diff*/) override
     {
         if (!m_bExist || m_bDone)
             return;
 
-        for (uint8 l = 0; l < Launcher.size(); ++l)
+        for (uint32 goEntry : Launcher)
         {
-            if (auto pGo = GetClosestGameObjectWithEntry(m_creature, Launcher[l], CONTACT_DISTANCE))
+            if (auto pGo = GetClosestGameObjectWithEntry(m_creature, goEntry, CONTACT_DISTANCE))
             {
                 pGo->SendGameObjectCustomAnim();
                 break;
@@ -1753,7 +1767,7 @@ CreatureAI* GetAI_npc_pats_firework_guy(Creature* creature)
  * Huge Firework Show support
  */
 
-const uint32 FireBoxPlayer[] =
+uint32 const FireBoxPlayer[] =
 {
     180854,180851,180855,180858,180857,
     180861,180862,180863,180860,180864,
@@ -1862,7 +1876,7 @@ struct npc_holiday_firestarterAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 /*uiDiff*/) override
+    void UpdateAI(uint32 const /*uiDiff*/) override
     {
         if (m_bRegular)
             DoRegularFirework(INTENSITY);
@@ -1954,7 +1968,7 @@ struct npc_riggle_bassbaitAI : ScriptedAI
         // yells should not be repeatable, quest credit should go to a single person per week
         if (sGameEventMgr.IsActiveEvent(EVENT_TOURNAMENT))
         {
-            if (!m_creature->isQuestGiver())
+            if (!m_creature->IsQuestGiver())
             {
                 auto prevWinTime = sObjectMgr.GetSavedVariable(VAR_TOURNAMENT);
 
@@ -1974,7 +1988,7 @@ struct npc_riggle_bassbaitAI : ScriptedAI
         }
         else
         {
-            if (m_creature->isQuestGiver())
+            if (m_creature->IsQuestGiver())
             {
                 m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 0, true);
@@ -2008,7 +2022,7 @@ CreatureAI* GetAI_npc_riggle_bassbait(Creature* pCreature)
     return new npc_riggle_bassbaitAI(pCreature);
 }
 
-bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_MASTER_ANGLER)
     {
@@ -2108,7 +2122,7 @@ struct npc_target_dummyAI : ScriptedAI
         
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_bActive)
             return;
@@ -2177,7 +2191,7 @@ struct npc_shahramAI : ScriptedPetAI
 
     }
 
-    void UpdatePetAI(const uint32 uiDiff) override
+    void UpdatePetAI(uint32 const uiDiff) override
     {
         ScriptedPetAI::UpdatePetAI(uiDiff);
 
@@ -2205,7 +2219,7 @@ struct npc_shahramAI : ScriptedPetAI
                     shahramSpell = SPELL_MIGHT_OF_SHAHRAM;
                 }
 
-                Unit* victim = m_creature->getVictim();
+                Unit* victim = m_creature->GetVictim();
 
                 if (!victim || !m_creature->IsInRange(victim, 0, 10.0f))
                     shahramSpell = 0;
@@ -2243,7 +2257,7 @@ struct npc_shahramAI : ScriptedPetAI
     }
 
     // Ensure Shahram despawns after a max of 10s
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         ScriptedPetAI::UpdateAI(uiDiff);
 
@@ -2308,7 +2322,7 @@ struct npc_goblin_land_mineAI : ScriptedAI
             m_bDetonation = true;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // self-despawn in 60 + 10 (live + arming) seconds or in 0.5 second after triggering
         if (!m_bDespawn)
@@ -2336,7 +2350,7 @@ struct npc_goblin_land_mineAI : ScriptedAI
 
         if (m_bDetonation && !m_bDespawn)
         {
-            DoStartNoMovement(m_creature->getVictim());
+            DoStartNoMovement(m_creature->GetVictim());
 
             if (m_uiDetonationTimer < uiDiff)
             {
@@ -2371,72 +2385,6 @@ CreatureAI* GetAI_npc_goblin_land_mine(Creature * pCreature)
 }
 
 /*
- * Critter
- */
-
-enum
-{
-    ESCAPE_TIMER    = 12000
-};
-
-struct npc_critterAI : ScriptedAI
-{
-    explicit npc_critterAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        npc_critterAI::Reset();
-    }
-
-    uint32 m_uiCombatTimer;
-
-    void Reset() override
-    {
-        m_uiCombatTimer = ESCAPE_TIMER;
-    }
-
-    void AttackStart(Unit* /*pWho*/) override {}
-
-    void DamageTaken(Unit* pWho, uint32& uiDamage) override
-    {
-        if (uiDamage < m_creature->GetHealth())
-        {
-            m_creature->GetMotionMaster()->MoveFleeing(pWho, ESCAPE_TIMER);
-            m_uiCombatTimer = ESCAPE_TIMER;
-        }
-    }
-
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
-    {
-        if (SpellAuraHolder* holder = m_creature->GetSpellAuraHolder(pSpell->Id))
-        {
-            if (!holder->IsPositive())
-            {
-                m_creature->GetMotionMaster()->MoveFleeing(pWho, ESCAPE_TIMER);
-                m_uiCombatTimer = ESCAPE_TIMER;
-            }
-        }
-    }
-
-    void UpdateAI(const uint32 diff) override
-    {
-        if (m_creature->isInCombat())
-        {
-            if (m_uiCombatTimer <= diff)
-            {
-                EnterEvadeMode();
-                m_uiCombatTimer = ESCAPE_TIMER;
-            }
-            else
-                m_uiCombatTimer -= diff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_critter(Creature* pCreature)
-{
-    return new npc_critterAI(pCreature);
-}
-
-/*
  * Curing the Sick
  */
 
@@ -2455,11 +2403,10 @@ enum
     MODEL_CURED_GAZELLE         = 1547,
 };
 
-struct npc_sickly_critterAI : npc_critterAI
+struct npc_sickly_critterAI : CritterAI
 {
-    explicit npc_sickly_critterAI(Creature* pCreature) : npc_critterAI(pCreature)
+    explicit npc_sickly_critterAI(Creature* pCreature) : CritterAI(pCreature)
     {
-        npc_sickly_critterAI::Reset();
         npc_sickly_critterAI::ResetCreature();
     }
 
@@ -2469,23 +2416,24 @@ struct npc_sickly_critterAI : npc_critterAI
     Team team;
     ObjectGuid m_PlayerGuid;
 
-    void Reset() override
+    void JustRespawned() override
     {
-
+        ResetCreature();
+        CritterAI::JustRespawned();
     }
 
-    void ResetCreature() override
+    void ResetCreature()
     {
         m_bIsHit = false;
         m_bModify = false;
         m_uiTimer = 1500;
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id != SPELL_APPLY_SALVE)
         {
-            npc_critterAI::SpellHit(pCaster, pSpell);
+            CritterAI::SpellHit(pCaster, pSpell);
             return;
         }
 
@@ -2520,14 +2468,14 @@ struct npc_sickly_critterAI : npc_critterAI
             {
                 switch (team)
                 {
-                case ALLIANCE:
-                    m_creature->SetEntry(NPC_CURED_DEER);
-                    m_creature->SetDisplayId(MODEL_CURED_DEER);
-                    break;
-                case HORDE:
-                    m_creature->SetEntry(NPC_CURED_GAZELLE);
-                    m_creature->SetDisplayId(MODEL_CURED_GAZELLE);
-                    break;
+                    case ALLIANCE:
+                        m_creature->SetEntry(NPC_CURED_DEER);
+                        m_creature->SetDisplayId(MODEL_CURED_DEER);
+                        break;
+                    case HORDE:
+                        m_creature->SetEntry(NPC_CURED_GAZELLE);
+                        m_creature->SetDisplayId(MODEL_CURED_GAZELLE);
+                        break;
                 }
 
                 m_creature->RemoveAurasDueToSpell(SPELL_SICKY_CRITTER_AURA);
@@ -2540,7 +2488,7 @@ struct npc_sickly_critterAI : npc_critterAI
                 m_uiTimer -= uiDiff;
         }
 
-        npc_critterAI::UpdateAI(uiDiff);
+        CritterAI::UpdateAI(uiDiff);
     }
 };
 
@@ -2596,7 +2544,7 @@ struct npc_goblin_bomb_dispenserAI : ScriptedPetAI
             pPet->DelayedUnsummon(5000, PET_SAVE_AS_DELETED);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bExploded)
         {
@@ -2663,7 +2611,7 @@ struct npc_explosive_sheepAI : ScriptedPetAI
             pPet->DelayedUnsummon(5000, PET_SAVE_AS_DELETED);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bExploded)
         {
@@ -2700,7 +2648,7 @@ enum FireworksZones
     STORMWIND = 1519
 };
 
-static const std::vector<Location> BootyBayPos =
+static std::vector<Location> const BootyBayPos =
 {
     { -14358.03f, 515.058f, 34.2664f,   3.68265f },
     { -14357.49f, 490.8445f, 39.47329f, 0.9773831f },
@@ -2735,7 +2683,7 @@ static const std::vector<Location> BootyBayPos =
     { -14279.6f,  714.5067f, 29.1312f, 1.153117f }
 };
 
-static const std::vector<Location> StormwindPos =
+static std::vector<Location> const StormwindPos =
 {
     { -8823.592f,    470.316f,    169.2295f,   1.239183f },
     { -8883.005f,    590.1927f,   153.1264f,   0.9773831f },
@@ -2858,7 +2806,7 @@ static const std::vector<Location> StormwindPos =
     { -8900.843751f, 563.691650f, 152.798584f, 5.223581f }
 };
 
-static const std::vector<Location> OrgrimmarPos =
+static std::vector<Location> const OrgrimmarPos =
 {
     { 1609.075f,    -4383.707f,     80.23414f,  0.3665176f },
     { 1469.648f,    -4371.285f,    103.8313f,   6.073746f },
@@ -2955,7 +2903,7 @@ static const std::vector<Location> OrgrimmarPos =
     { 1493.26253f,  -4402.19919f,   69.147816f, 2.2917f }
 };
 
-static const std::vector<Location> IronforgePos =
+static std::vector<Location> const IronforgePos =
 {
     { -5196.038f, -858.4618f, 525.0447f, 6.073746f },
     { -5195.734f, -887.6441f, 534.168f,  3.68265f },
@@ -3016,7 +2964,7 @@ static const std::vector<Location> IronforgePos =
     { -5194.976f, -759.9896f, 517.6288f, 3.630291f }
 };
 
-static const std::vector<Location> ThunderBluffPos =
+static std::vector<Location> const ThunderBluffPos =
 {
     { -1234.804f, -19.72239f, 206.5436f, 0.1396245f },
     { -1244.442f, -35.88308f, 206.82f,   4.729844f },
@@ -3078,7 +3026,7 @@ static const std::vector<Location> ThunderBluffPos =
     { -1240.617f, -41.39486f, 205.0362f, 5.846854f }
 };
 
-static const std::vector<Location> UndercityPos =
+static std::vector<Location> const UndercityPos =
 {
     { 1850.231f, 257.0156f, 124.1743f, 4.729844f },
     { 1863.302f, 193.9063f, 114.5829f, 0.9773831f },
@@ -3138,7 +3086,7 @@ static const std::vector<Location> UndercityPos =
     { 1850.288f, 267.309f,  125.0537f, 3.630291f }
 };
 
-static const std::vector<Location> DarnassusPos =
+static std::vector<Location> const DarnassusPos =
 {
     { 8578.888f, 975.2604f, 42.48742f, 5.846854f },
     { 8574.236f, 944.2083f, 44.71943f, 4.76475f },
@@ -3207,7 +3155,7 @@ struct FireworkLocations
     std::vector<Location> m_pPositions;
 };
 
-const std::array<FireworkLocations, 7> FireworkLoc 
+std::array<FireworkLocations, 7> const FireworkLoc
 {{
 
     { STRANGLETHORN_VALE, BootyBayPos },
@@ -3233,7 +3181,7 @@ struct npc_event_fireworksAI : public ScriptedAI
 
     uint32 GetTimeUntilNextShow()
     {
-        time_t theTime = time(NULL);
+        time_t theTime = time(nullptr);
         struct tm *aTime = localtime(&theTime);
         int min = aTime->tm_min;
         int hour = aTime->tm_hour;
@@ -3253,7 +3201,7 @@ struct npc_event_fireworksAI : public ScriptedAI
         }
     }
 
-    void Reset()
+    void Reset() override
     {
         m_bExist = false;
         m_uiIndex = 0;
@@ -3262,7 +3210,7 @@ struct npc_event_fireworksAI : public ScriptedAI
         IsUsable();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bExist)
             return;
@@ -3329,7 +3277,7 @@ enum
 
 };
 
-const uint32 CityZones[6] =
+uint32 const CityZones[6] =
 {
     1637, // Orgrimmar
     1638, // Thunder Bluff
@@ -3356,7 +3304,7 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
     uint32 winningFaction;
     uint32 winningZone;
 
-    void Reset() { }
+    void Reset() override { }
 
     void SetVariables()
     {
@@ -3390,7 +3338,7 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
         }
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 uiEmote)
+    void ReceiveEmote(Player* pPlayer, uint32 uiEmote) override
     {
         if (uiEmote == TEXTEMOTE_KISS)
         {
@@ -3430,7 +3378,7 @@ bool GossipHello_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature)
     return false;
 }
 
-bool QuestRewarded_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestRewarded_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() != QUEST_GIFT_A && pQuest->GetQuestId() != QUEST_GIFT_H)
         return true;
@@ -3477,35 +3425,35 @@ struct npc_oozeling_jubjubAI : public ScriptedPetAI
     }
 
     uint32 m_uiReturnTimer;
-    void Reset()
+    void Reset() override
     {
         m_uiReturnTimer = 0;
     }
 
-    void SpellHit(Unit* pUnit, const SpellEntry* pSpell)
+    void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_DARK_IRON_MUG)
             m_uiReturnTimer = 10000;
     }
 
-    void MovementInform(uint32 type, uint32 id)
+    void MovementInform(uint32 type, uint32 id) override
     {
         if (type == POINT_MOTION_TYPE && id == 1)
         {
             m_creature->MonsterTextEmote(EMOTE_GUZZLE_ALE);
-            m_creature->addUnitState(UNIT_STAT_ROOT);
+            m_creature->AddUnitState(UNIT_STAT_ROOT);
             m_uiReturnTimer = 3000;
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiReturnTimer > 0)
         {
             if (m_uiReturnTimer <= uiDiff)
             {
                 m_uiReturnTimer = 0;
-                m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_creature->ClearUnitState(UNIT_STAT_ROOT);
 
                 if (GameObject* pMug = m_creature->FindNearestGameObject(OBJECT_DARK_IRON_MUG, 1.0f))
                 {
@@ -3530,7 +3478,7 @@ CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
 
 void AddSC_npcs_special()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_chicken_cluck";
@@ -3662,11 +3610,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_goblin_land_mine";
     newscript->GetAI = &GetAI_npc_goblin_land_mine;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_critter";
-    newscript->GetAI = &GetAI_npc_critter;
     newscript->RegisterSelf();
 
     newscript = new Script;

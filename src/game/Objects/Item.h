@@ -32,6 +32,7 @@ class Bag;
 class Field;
 class QueryResult;
 class Unit;
+struct ItemRandomPropertiesEntry;
 
 struct ItemSetEffect
 {
@@ -228,7 +229,7 @@ struct ItemRequiredTarget
     bool IsFitToRequirements(Unit* pUnitTarget) const;
 };
 
-bool ItemCanGoIntoBag(ItemPrototype const *proto, ItemPrototype const *pBagProto);
+bool ItemCanGoIntoBag(ItemPrototype const* proto, ItemPrototype const* pBagProto);
 
 class MANGOS_DLL_SPEC Item : public Object
 {
@@ -239,7 +240,7 @@ class MANGOS_DLL_SPEC Item : public Object
         Item();
 
         virtual bool Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid = ObjectGuid());
-        virtual void RemoveFromWorld();
+        void RemoveFromWorld() override;
 
         ItemPrototype const* GetProto() const;
         bool ChangeEntry(ItemPrototype const* pNewProto);
@@ -297,9 +298,6 @@ class MANGOS_DLL_SPEC Item : public Object
         bool IsInBag() const { return m_container != nullptr; }
         bool IsEquipped() const;
 
-        uint32 GetSkill();
-        uint32 GetSpell();
-
         // RandomPropertyId (signed but stored as unsigned)
         int32 GetItemRandomPropertyId() const { return GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID); }
         uint32 GetItemSuffixFactor() const { return GetUInt32Value(ITEM_FIELD_PROPERTY_SEED); }
@@ -340,18 +338,18 @@ class MANGOS_DLL_SPEC Item : public Object
             uState = state;
         }
 
-        bool HasQuest(uint32 quest_id) const { return GetProto()->StartQuest == quest_id; }
-        bool HasInvolvedQuest(uint32 /*quest_id*/) const { return false; }
+        bool HasQuest(uint32 quest_id) const override { return GetProto()->StartQuest == quest_id; }
+        bool HasInvolvedQuest(uint32 /*quest_id*/) const override { return false; }
         bool IsConjuredConsumable() const { return GetProto()->IsConjuredConsumable(); }
 
-        void AddToClientUpdateList();
-        void RemoveFromClientUpdateList();
-        void BuildUpdateData(UpdateDataMapType& update_players);
+        void AddToClientUpdateList() override;
+        void RemoveFromClientUpdateList() override;
+        void BuildUpdateData(UpdateDataMapType& update_players) override;
         void SetGeneratedLoot(bool value) { generatedLoot = value; }
         bool HasGeneratedLootSecondary() {  return generatedLoot; } // todo, remove and add condition to HasGeneratedLoot
 
         bool IsCharter() const { return GetEntry() == 5863u; }
-        static void GetLocalizedNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale);
+        static void GetLocalizedNameWithSuffix(std::string& name, ItemPrototype const* proto, ItemRandomPropertiesEntry const* randomProp, int dbLocale, LocaleConstant dbcLocale);
 
     private:
         bool generatedLoot;
@@ -361,25 +359,6 @@ class MANGOS_DLL_SPEC Item : public Object
         int16 uQueuePos;
         bool mb_in_trade;                                   // true if item is currently in trade-window
         ItemLootUpdateState m_lootState;
-
-    public:
-        /**
-         * @brief Handles serialization / unserialization of the Object.
-         * Should not be called directly. Cf Serializer.h
-         * @param buf
-         */
-        template <typename OP>
-        void Serialize(OP& buf);
-        /**
-         * @brief Call this before reading unserialization
-         * @return false iif the Item is corrupt.
-         */
-        virtual bool PrepareWakeUp(uint32 low_guid, ItemPrototype const* proto, Player const* owner);
-        /**
-         * @brief Call this once unserialized to get a proper Player (add to Map, etc ...)
-         * @return false iif the Item is corrupt.
-         */
-        bool WakeUp();
 };
 
 #endif

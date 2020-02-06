@@ -42,11 +42,11 @@ class MANGOS_DLL_SPEC PlayerAI
         virtual void Remove();
 
         // Called at World update tick
-        virtual void UpdateAI(const uint32 /*diff*/);
+        virtual void UpdateAI(uint32 const /*diff*/);
         virtual void MovementInform(uint32 MovementType, uint32 Data = 0) {}
 
         ///== Helpeurs =====================================
-        CanCastResult CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered, bool checkControlled = true);
+        CanCastResult CanCastSpell(Unit* pTarget, SpellEntry const* pSpell, bool isTriggered, bool checkControlled = true);
 
         ///== Fields =======================================
 
@@ -58,12 +58,12 @@ class MANGOS_DLL_SPEC PlayerAI
 class MANGOS_DLL_SPEC PlayerControlledAI: public PlayerAI
 {
     public:
-        explicit PlayerControlledAI(Player* pPlayer, Unit* caster = NULL);
+        explicit PlayerControlledAI(Player* pPlayer, Unit* caster = nullptr);
 
-        virtual ~PlayerControlledAI();
+        ~PlayerControlledAI() override;
 
         // Called at World update tick
-        virtual void UpdateAI(const uint32 /*diff*/);
+        void UpdateAI(uint32 const /*diff*/) override;
         Unit* FindController();
         void UpdateTarget(Unit* victim);
 

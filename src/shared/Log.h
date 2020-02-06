@@ -115,7 +115,7 @@ enum LogType
     LOG_TYPE_MAX // add new entries *before* this value!
 };
 
-const int Color_count = int(WHITE)+1;
+int const Color_count = int(WHITE)+1;
 
 class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Thread_Mutex> >
 {
@@ -124,15 +124,15 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
     ~Log()
     {
-        if( logfile != nullptr )
+        if(logfile != nullptr)
             fclose(logfile);
         logfile = nullptr;
 
-        if( gmLogfile != nullptr )
+        if(gmLogfile != nullptr)
             fclose(gmLogfile);
         gmLogfile = nullptr;
 
-        if( dberLogfile != nullptr )
+        if(dberLogfile != nullptr)
             fclose(dberLogfile);
         dberLogfile = nullptr;
 
@@ -148,50 +148,52 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
             fclose(honorLogfile);
         honorLogfile = nullptr;
 
-        for (int i = 0; i < LOG_MAX_FILES; ++i)
-            if (logFiles[i] != nullptr)
+        for (auto& logFile : logFiles)
+        {
+            if (logFile != nullptr)
             {
-                fclose(logFiles[i]);
-                logFiles[i] = nullptr;
+                fclose(logFile);
+                logFile = nullptr;
             }
+        } 
     }
     public:
         void Initialize();
-        void InitColors(const std::string& init_str);
+        void InitColors(std::string const& init_str);
 
-        void InitSmartlogEntries(const std::string& str);
-        void InitSmartlogGuids(const std::string& str);
+        void InitSmartlogEntries(std::string const& str);
+        void InitSmartlogGuids(std::string const& str);
 
-        void out(LogFile t, const char* format, ...) ATTR_PRINTF(3,4);
-        void outCommand( uint32 account, const char * str, ...) ATTR_PRINTF(3,4);
+        void out(LogFile t, char const* format, ...) ATTR_PRINTF(3,4);
+        void outCommand(uint32 account, char const* str, ...) ATTR_PRINTF(3,4);
         void outString();                                   // any log level
                                                             // any log level
-        void outString( const char * str, ... )      ATTR_PRINTF(2,3);
-        void outInfo( const char * str, ...)      ATTR_PRINTF(2,3);
-        void outHonor(const char* str, ...)       ATTR_PRINTF(2, 3);
+        void outString(char const* str, ...)      ATTR_PRINTF(2,3);
+        void outInfo(char const* str, ...)      ATTR_PRINTF(2,3);
+        void outHonor(char const* str, ...)       ATTR_PRINTF(2, 3);
                                                             // any log level
-        void outError( const char * err, ... )       ATTR_PRINTF(2,3);
+        void outError(char const* err, ...)       ATTR_PRINTF(2,3);
                                                             // log level >= 1
-        void outBasic( const char * str, ... )       ATTR_PRINTF(2,3);
+        void outBasic(char const* str, ...)       ATTR_PRINTF(2,3);
                                                             // log level >= 2
-        void outDetail( const char * str, ... )      ATTR_PRINTF(2,3);
+        void outDetail(char const* str, ...)      ATTR_PRINTF(2,3);
                                                             // log level >= 3
-        void outDebug( const char * str, ... )       ATTR_PRINTF(2,3);
-        void outWarden(const char * wrd, ...)        ATTR_PRINTF(2,3);
-        void outWardenDebug(const char * wrd, ...)   ATTR_PRINTF(2,3);
-        void outAnticheat(const char* detector, const char* player, const char* reason, const char* penalty);
+        void outDebug(char const* str, ...)       ATTR_PRINTF(2,3);
+        void outWarden(char const* wrd, ...)        ATTR_PRINTF(2,3);
+        void outWardenDebug(char const* wrd, ...)   ATTR_PRINTF(2,3);
+        void outAnticheat(char const* detector, char const* player, char const* reason, char const* penalty);
 
         void outErrorDb();                                  // any log level
                                                             // any log level
-        void outErrorDb( const char * str, ... )     ATTR_PRINTF(2,3);
+        void outErrorDb(char const* str, ...)     ATTR_PRINTF(2,3);
                                                             // any log level
         void outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
                                 char const* opcodeName,
                                 ByteBuffer const* packet, bool incoming);
         // any log level
         uint32 GetLogLevel() const { return m_logLevel; }
-        void SetLogLevel(char * Level);
-        void SetLogFileLevel(char * Level);
+        void SetLogLevel(char* Level);
+        void SetLogFileLevel(char* Level);
         void SetColor(bool stdout_stream, Color color);
         void ResetColor(bool stdout_stream);
         void outTime(FILE* where);
@@ -293,12 +295,12 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
     ERROR_DB_FILTER_LOG(LOG_FILTER_DB_STRICTED_CHECK, __VA_ARGS__)
 
 // primary for script library
-void MANGOS_DLL_SPEC outstring_log(const char* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC detail_log(const char* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC debug_log(const char* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC error_log(const char* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC error_db_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC outstring_log(char const* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC detail_log(char const* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC debug_log(char const* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC error_log(char const* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC error_db_log(char const* str, ...) ATTR_PRINTF(1, 2);
 void MANGOS_DLL_SPEC setScriptLibraryErrorFile(char const* fname, char const* libName);
-void MANGOS_DLL_SPEC script_error_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC script_error_log(char const* str, ...) ATTR_PRINTF(1, 2);
 
 #endif

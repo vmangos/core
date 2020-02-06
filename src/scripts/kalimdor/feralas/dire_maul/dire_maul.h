@@ -88,7 +88,7 @@ enum
 struct sGossipMenuItems
 {
     uint16 m_uiMenu;
-    const char* m_chItem;
+    char const* m_chItem;
 };
 
 const sGossipMenuItems sKromcrushGossips[4] =
@@ -111,23 +111,23 @@ class instance_dire_maul : public ScriptedInstance
 {
     public:
         instance_dire_maul(Map* pMap);
-        ~instance_dire_maul() {}
+        ~instance_dire_maul() override {}
 
-        void Initialize();
+        void Initialize() override;
 
-        void OnPlayerEnter(Player* pPlayer);
-        void OnPlayerLeave(Player* pPlayer);
-        void OnObjectCreate(GameObject* pGo);
-        void OnCreatureDeath(Creature* pCreature);
-        void OnCreatureCreate(Creature* pCreature);
+        void OnPlayerEnter(Player* pPlayer) override;
+        void OnPlayerLeave(Player* pPlayer) override;
+        void OnObjectCreate(GameObject* pGo) override;
+        void OnCreatureDeath(Creature* pCreature) override;
+        void OnCreatureCreate(Creature* pCreature) override;
 
-        void SetData(uint32 uiType, uint32 uiData);
-        void SetData64(uint32 uiType, uint64 uiData);
-        uint32 GetData(uint32 uiType);
-        uint64 GetData64(uint32 uiType);
+        void SetData(uint32 uiType, uint32 uiData) override;
+        void SetData64(uint32 uiType, uint64 uiData) override;
+        uint32 GetData(uint32 uiType) override;
+        uint64 GetData64(uint32 uiType) override;
 
-        const char* Save() { return strInstData.c_str(); }
-        void Load(const char* chrIn);
+        char const* Save() override { return strInstData.c_str(); }
+        void Load(char const* chrIn) override;
 
         uint8 GetChoRushEquipment();
         void DoSortCristalsEventMobs();
@@ -171,7 +171,6 @@ class instance_dire_maul : public ScriptedInstance
         uint64 m_uiGordokTribute5GUID;
         uint64 m_uiGordokTribute6GUID;
 
-        uint64 m_uiKnotsBallandChainGUID;
         uint64 m_uiBrokenTrapGUID;
         bool m_bIsGordokTributeRespawned;
         bool m_bIsTanninLooted;

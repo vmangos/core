@@ -33,7 +33,7 @@ namespace Movement
     {
         public:
 
-            explicit MoveSplineInit(Unit& m, const char* movementType = "Unknown");
+            explicit MoveSplineInit(Unit& m, char const* movementType = "Unknown");
 
             /* Final pass of initialization that launches spline movement.
              * @return duration - estimated travel time
@@ -52,12 +52,12 @@ namespace Movement
              * @param path - array of points, shouldn't be empty
              * @param pointId - Id of fisrt point of the path. Example: when third path point will be done it will notify that pointId + 3 done
              */
-            void MovebyPath(const PointsArray& path, int32 pointId = 0);
-            void Move(const PathFinder* pfinder);
+            void MovebyPath(PointsArray const& path, int32 pointId = 0);
+            void Move(PathFinder const* pfinder);
 
             /* Initializes simple A to B mition, A is current unit's position, B is destination
              */
-            void MoveTo(const Vector3& destination, uint32 options = 0);
+            void MoveTo(Vector3 const& destination, uint32 options = 0);
             void MoveTo(float x, float y, float z, uint32 options = 0);
 
             /* Sets Id of fisrt point of the path. When N-th path point will be done ILisener will notify that pointId + N done
@@ -97,7 +97,7 @@ namespace Movement
 
             MoveSplineInitArgs args;
             Unit&  unit;
-            const char* movementType;
+            char const* movementType;
     };
 
     inline void MoveSplineInit::SetStop() { args.flags.done = true; }
@@ -108,7 +108,7 @@ namespace Movement
     inline void MoveSplineInit::SetVelocity(float vel) { args.velocity = vel;}
     inline void MoveSplineInit::SetTransport(uint32 guid) { args.transportGuid = guid;}
 
-    inline void MoveSplineInit::MovebyPath(const PointsArray& controls, int32 path_offset)
+    inline void MoveSplineInit::MovebyPath(PointsArray const& controls, int32 path_offset)
     {
         args.path_Idx_offset = path_offset;
         args.path.assign(controls.begin(), controls.end());
@@ -120,7 +120,7 @@ namespace Movement
         MoveTo(v, options);
     }
 
-    inline void MoveSplineInit::MoveTo(const Vector3& dest, uint32 options)
+    inline void MoveSplineInit::MoveTo(Vector3 const& dest, uint32 options)
     {
         if (options & MOVE_PATHFINDING)
         {

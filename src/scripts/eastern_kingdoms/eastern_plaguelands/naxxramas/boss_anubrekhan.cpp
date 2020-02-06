@@ -68,15 +68,12 @@ enum
     
 };
 
-
-
-static const float CGs[3][4] = 
+static float const CGs[3][4] = 
 {
     { 3291.26f, -3502.08f, 287.26f, 2.14f },
     { 3285.29f, -3446.64f, 287.26f, 4.2f },
     { 3316.46f, -3476.23f, 287.26f, 3.18f } // this third entry is used as spawn loc during fight.
 };
-
 
 static constexpr uint32 CRYPTGUARD_CLEAVE_CD    = 6000;  // Todo: find correct timer
 static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, so 12sec cd makes sense. 
@@ -127,7 +124,7 @@ Watch his stopatch in center of screen.
 Best guess so far is random between 12 and 18 seconds based on this video.
 Timer does not seem to reset after locust swarm, but rather continue from whatever it was when locust started.
 */
-static const uint32 IMPALE_CD() { return urand(12000, 18000); }
+static uint32 IMPALE_CD() { return urand(12000, 18000); }
 
 
 /*
@@ -173,7 +170,7 @@ Watch his stopatch in center of screen.
 Based on those values, 90-110 or something like that does not seem far fetched as a cooldown.
 Cast time is 3 seconds. Duration is 20 seconds.
 */
-static const uint32 LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
+static uint32 LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
 
 
 struct boss_anubrekhanAI : public ScriptedAI
@@ -229,7 +226,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         deadCryptGuards.push_back(pSummoned->GetObjectGuid());
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiImpaleTimer = IMPALE_CD();
         m_uiLocustSwarmTimer = LOCUST_SWARM_CD(true);
@@ -239,7 +236,6 @@ struct boss_anubrekhanAI : public ScriptedAI
 
         std::list<Creature*> scarabs;
         GetCreatureListWithEntryInGrid(scarabs, m_creature, MOB_CORPSE_SCARAB, 300.0f);
-        int count = 0;
         for (auto it = scarabs.begin(); it != scarabs.end();)
         {
             if (scarabs.size() < 31)
@@ -284,7 +280,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         CheckSpawnInitialCryptGuards();
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         // Scarabs are summoned by instance script when a player dies.
         // See instance_naxxramas::OnPlayerDeath(Player*)
@@ -304,7 +300,7 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (!m_pInstance)
             return;
@@ -312,8 +308,10 @@ struct boss_anubrekhanAI : public ScriptedAI
         // Setting in combat with zone and pulling the two crypt-guards
         m_creature->SetInCombatWithZone();
 
-        for (int i = 0; i < summonedCryptGuards.size(); i++) {
-            if (Creature* cg = m_pInstance->GetCreature(summonedCryptGuards[i])) {
+        for (const auto& guid : summonedCryptGuards)
+        {
+            if (Creature* cg = m_pInstance->GetCreature(guid))
+            {
                 cg->AI()->AttackStart(pWho);
                 cg->SetInCombatWithZone();
             }
@@ -322,16 +320,16 @@ struct boss_anubrekhanAI : public ScriptedAI
         DoScriptText(SAY_AGGRO3 + urand(0, 2), m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_ANUB_REKHAN, DONE);
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         if (pWho->GetTypeId() == TYPEID_PLAYER 
-            && !m_creature->isInCombat() 
+            && !m_creature->IsInCombat() 
             && m_creature->IsWithinDistInMap(pWho, 55.0f) 
             && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
@@ -343,7 +341,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     
     bool ExplodeOneDeadCryptGuard()
     {
-        if (deadCryptGuards.size() == 0)
+        if (deadCryptGuards.empty())
             return false;
          
         int idx = urand(0, deadCryptGuards.size() - 1);
@@ -384,9 +382,9 @@ struct boss_anubrekhanAI : public ScriptedAI
         return false;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -396,8 +394,8 @@ struct boss_anubrekhanAI : public ScriptedAI
         {
             if (m_uiRestoreTargetTimer <= uiDiff)
             {
-                m_creature->SetInFront(m_creature->getVictim());
-                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_creature->SetInFront(m_creature->GetVictim());
+                m_creature->SetTargetGuid(m_creature->GetVictim()->GetObjectGuid());
                 m_uiRestoreTargetTimer = 0;
             }
             else
@@ -448,8 +446,8 @@ struct boss_anubrekhanAI : public ScriptedAI
             // restore target at once if we have just done an impale
             if (m_uiRestoreTargetTimer)
             {
-                m_creature->SetInFront(m_creature->getVictim());
-                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_creature->SetInFront(m_creature->GetVictim());
+                m_creature->SetTargetGuid(m_creature->GetVictim()->GetObjectGuid());
                 m_uiRestoreTargetTimer = 0;
             }
 
@@ -501,7 +499,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         cleaveTimer     = CRYPTGUARD_CLEAVE_CD;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         // Make sure anub is pulled too. Anub will take care of pulling the other crypt-guard
         
@@ -511,9 +509,9 @@ struct mob_cryptguardsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         
         // Crypt guards enrage at 50%
@@ -535,7 +533,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         }
 
         if (cleaveTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CRYPTGUARD_CLEAVE) == CanCastResult::CAST_OK) {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_CLEAVE) == CanCastResult::CAST_OK) {
                 cleaveTimer = CRYPTGUARD_CLEAVE_CD;
             }
         }
@@ -544,7 +542,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         }
 
         if (acidSpitTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CRYPTGUARD_ACID) == CanCastResult::CAST_OK) {
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CRYPTGUARD_ACID) == CanCastResult::CAST_OK) {
                 acidSpitTimer = CRYPTGUARD_ACID_CD;
             }
         }
@@ -570,7 +568,7 @@ struct anub_doorAI : public GameObjectAI
             sLog.outError("anub_doorAI could not find instanceData");
     }
 
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         if (haveDoneIntro)
             return false;
@@ -588,7 +586,7 @@ struct anub_doorAI : public GameObjectAI
         // on door open, while the rest are said at random points during the fight?
         if (Creature* anubRekhan = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
-            if (anubRekhan->isAlive()) {
+            if (anubRekhan->IsAlive()) {
                 switch (urand(0, 4))
                 {
                 case 0:

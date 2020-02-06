@@ -43,14 +43,14 @@ BattleGroundAV::~BattleGroundAV()
 {
 }
 
-void BattleGroundAV::HandleKillPlayer(Player *player, Player *killer)
+void BattleGroundAV::HandleKillPlayer(Player* pVictim, Player* pKiller)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
 
-    BattleGround::HandleKillPlayer(player, killer);
-    if (!player->HasAura(27827)) // Esprit de redemption
-        UpdateScore(GetTeamIndexByTeamId(player->GetTeam()), -1);
+    BattleGround::HandleKillPlayer(pVictim, pKiller);
+    if (!pVictim->HasAura(27827)) // Esprit de redemption
+        UpdateScore(GetTeamIndexByTeamId(pVictim->GetTeam()), -1);
 }
 
 /*********/
@@ -126,7 +126,7 @@ void BattleGroundAV::initializeChallengeInvocationGoals(void)
 
     /** Minimum reputation are required for challenges */
     for (int i = 0; i < BG_AV_NB_ASSAULTS; ++i)
-        m_challengeMinReputationNeeded[i]   = REP_NEUTRAL; /** Real value REP_REVERED */
+        m_challengeMinReputationNeeded[i] = REP_NEUTRAL; /** Real value REP_REVERED */
 
     m_challengeMinReputationNeeded[BG_AV_WORLDBOSS_ASSAULT]             = REP_NEUTRAL;
     m_challengeMinReputationNeeded[BG_AV_CAVALRY_ASSAULT]               = REP_HONORED;
@@ -270,7 +270,7 @@ bool BattleGroundAV::isWorldBossChallengeInvocationReady(uint32 faction_id)
 }
 /*********/
 
-void BattleGroundAV::HandleKillUnit(Creature *creature, Player *killer)
+void BattleGroundAV::HandleKillUnit(Creature* creature, Player* killer)
 {
     DEBUG_LOG("BattleGroundAV: HandleKillUnit %i", creature->GetEntry());
    if (GetStatus() != STATUS_IN_PROGRESS)
@@ -432,7 +432,7 @@ uint32 BattleGroundAV::GetActualArmorRessources(uint32 teamIdx)
     return m_Team_QuestStatus[teamIdx][0];
 }
 
-void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
+void BattleGroundAV::UpgradeArmor(Object* questGiver, Player* player)
 {
     BattleGroundAVTeamIndex teamIdx = GetAVTeamIndexByTeamId(player->GetTeam());
     uint32 m_faction_id           = (player->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
@@ -448,12 +448,12 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
 
     setReinforcementLevelGroundUnit(teamIdx, ressources);
 
-    if(ressources%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
+    if (ressources%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
     {
         sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
         ((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
 
-        if(ressources == 500)
+        if (ressources == 500)
         {
             if (teamIdx == 0)
                 CastSpellOnTeam(28418, ALLIANCE);
@@ -463,7 +463,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
             sprintf(sMessageRemaining,"Seasoned units are entering the battle!");
             ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
         }
-        else if(ressources == 1000)
+        else if (ressources == 1000)
         {
             if (teamIdx == 0)
                 CastSpellOnTeam(28419, ALLIANCE);
@@ -473,7 +473,7 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
             sprintf(sMessageRemaining,"Veteran units are entering the battle!");
             ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
         }
-        else if(ressources == 1500)
+        else if (ressources == 1500)
         {
             if (teamIdx == 0)
                 CastSpellOnTeam(28420, ALLIANCE);
@@ -494,10 +494,9 @@ void BattleGroundAV::UpgradeArmor(Object* questGiver, Player *player)
 }
 
 
-void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Player *player)
+void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Player* player)
 {
     char sMessageRemaining[200]        = "";
-    uint32 faction_spell = 0;
 
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -517,15 +516,15 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             /** Update reinforcement infos */
 //            setReinforcementLevelGroundUnit(teamIdx, m_Team_QuestStatus[teamIdx][0]);
 
-            if((m_Team_QuestStatus[teamIdx][0]%100) == 0 && (m_Team_QuestStatus[teamIdx][0]%500) != 0&& questGiver->GetTypeId() == TYPEID_UNIT)
+            if ((m_Team_QuestStatus[teamIdx][0]%100) == 0 && (m_Team_QuestStatus[teamIdx][0]%500) != 0&& questGiver->GetTypeId() == TYPEID_UNIT)
                 ((Creature*)questGiver)->MonsterSay("Great! Let's keep those supplies coming, people!", 0, 0);
 
-/*            if(m_Team_QuestStatus[teamIdx][0]%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
+/*            if (m_Team_QuestStatus[teamIdx][0]%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
             {
                 sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
                 ((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
 
-                if(m_Team_QuestStatus[teamIdx][0] == 500)                    
+                if (m_Team_QuestStatus[teamIdx][0] == 500)                    
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28418, ALLIANCE);
@@ -535,7 +534,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                    sprintf(sMessageRemaining,"Seasoned units are entering the battle!");
                    ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
-                else if(m_Team_QuestStatus[teamIdx][0] == 1000)                    
+                else if (m_Team_QuestStatus[teamIdx][0] == 1000)                    
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28419, ALLIANCE);
@@ -545,7 +544,7 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
                     sprintf(sMessageRemaining,"Veteran units are entering the battle!");
                     ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
                 }
-                else if(m_Team_QuestStatus[teamIdx][0] == 1500)                    
+                else if (m_Team_QuestStatus[teamIdx][0] == 1500)                    
                 {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28420, ALLIANCE);
@@ -559,23 +558,23 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             }
 */
             /** Adding visual crates each time 100 ressources are added */
-            if((m_Team_QuestStatus[teamIdx][0]%500) == 100)
+            if ((m_Team_QuestStatus[teamIdx][0]%500) == 100)
             {
                 SpawnEvent(AV_100_SUPPLIES+teamIdx, 0, true, false);
             }
-            else if((m_Team_QuestStatus[teamIdx][0]%500) == 200)
+            else if ((m_Team_QuestStatus[teamIdx][0]%500) == 200)
             {
                 SpawnEvent(AV_200_SUPPLIES+teamIdx, 0, true, false);
             }
-            else if((m_Team_QuestStatus[teamIdx][0]%500) == 300)
+            else if ((m_Team_QuestStatus[teamIdx][0]%500) == 300)
             {
                 SpawnEvent(AV_300_SUPPLIES+teamIdx, 0, true, true);
             }
-            else if((m_Team_QuestStatus[teamIdx][0]%500) == 400)
+            else if ((m_Team_QuestStatus[teamIdx][0]%500) == 400)
             {
                 SpawnEvent(AV_400_SUPPLIES+teamIdx, 0, true, true);
             }
-            else if((m_Team_QuestStatus[teamIdx][0]%500) == 0 && m_Team_QuestStatus[teamIdx][0] !=0 )
+            else if ((m_Team_QuestStatus[teamIdx][0]%500) == 0 && m_Team_QuestStatus[teamIdx][0] !=0)
             {
                 SpawnEvent(AV_100_SUPPLIES+teamIdx, 2, true, false);
                 SpawnEvent(AV_200_SUPPLIES+teamIdx, 2, true, false);
@@ -700,26 +699,26 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
             m_Team_QuestStatus[teamIdx][8]++;
             reputation = 1;
 
-            if (m_Team_QuestStatus[teamIdx][8]%25 == 0 && m_Team_QuestStatus[teamIdx][8] !=0 )
+            if (m_Team_QuestStatus[teamIdx][8]%25 == 0 && m_Team_QuestStatus[teamIdx][8] !=0)
                 questGiver->MonsterYell("The stables are filled up!", 0, 0);
             if ((m_Team_QuestStatus[teamIdx][8]%5) == 0)
                 questGiver->PMonsterSay("Thanks for the supplies, %s",player->GetName());
 
 
             /** Adding visual mount each time 5 ressources are added */
-            if((m_Team_QuestStatus[teamIdx][8]%25) == 5)
+            if ((m_Team_QuestStatus[teamIdx][8]%25) == 5)
             {
                 SpawnEvent(AV_05_TAMED+teamIdx, 0, true, false);
             }
-            else if((m_Team_QuestStatus[teamIdx][8]%25) == 10)
+            else if ((m_Team_QuestStatus[teamIdx][8]%25) == 10)
             {
                 SpawnEvent(AV_10_TAMED+teamIdx, 0, true, false);
             }
-            else if((m_Team_QuestStatus[teamIdx][8]%25) == 15)
+            else if ((m_Team_QuestStatus[teamIdx][8]%25) == 15)
             {
                 SpawnEvent(AV_15_TAMED+teamIdx, 0, true, true);
             }
-            else if((m_Team_QuestStatus[teamIdx][8]%25) == 20)
+            else if ((m_Team_QuestStatus[teamIdx][8]%25) == 20)
             {
                 SpawnEvent(AV_20_TAMED+teamIdx, 0, true, true);
             }
@@ -918,7 +917,7 @@ void BattleGroundAV::StartingEventOpenDoors()
     OpenDoorEvent(BG_EVENT_DOOR);
 }
 
-void BattleGroundAV::AddPlayer(Player *plr)
+void BattleGroundAV::AddPlayer(Player* plr)
 {
     BattleGround::AddPlayer(plr);
     // create score and add it to map, default values are set in constructor
@@ -997,7 +996,7 @@ void BattleGroundAV::RemovePlayer(Player* /*plr*/, ObjectGuid /*guid*/)
 {
 }
 
-void BattleGroundAV::HandleAreaTrigger(Player *Source, uint32 Trigger)
+void BattleGroundAV::HandleAreaTrigger(Player* Source, uint32 Trigger)
 {
     // this is wrong way to implement these things. On official it done by gameobject spell cast.
     switch (Trigger)
@@ -1265,7 +1264,7 @@ void BattleGroundAV::PopulateNode(BG_AV_Nodes node)
 
 
 /// called when using a banner
-void BattleGroundAV::EventPlayerClickedOnFlag(Player *source, GameObject* target_obj)
+void BattleGroundAV::EventPlayerClickedOnFlag(Player* source, GameObject* target_obj)
 {
     if (GetStatus() != STATUS_IN_PROGRESS)
         return;
@@ -1425,7 +1424,7 @@ void BattleGroundAV::SendMineWorldStates(uint32 mine)
         UpdateWorldState(BG_AV_MineWorldStates[mine][m_Mine_PrevOwner[mine]], 0);
 }
 
-WorldSafeLocsEntry const* BattleGroundAV::GetClosestGraveYard(Player *plr)
+WorldSafeLocsEntry const* BattleGroundAV::GetClosestGraveYard(Player* plr)
 {
     // repop players at the entrance GY if BG is not started yet
     if (GetStatus() != STATUS_IN_PROGRESS && !plr->IsGameMaster())
@@ -1452,7 +1451,7 @@ WorldSafeLocsEntry const* BattleGroundAV::GetClosestGraveYard(Player *plr)
         {
             if (m_Nodes[i].Owner != teamIdx || m_Nodes[i].State != POINT_CONTROLLED)
                 continue;
-            WorldSafeLocsEntry const * entry = sWorldSafeLocsStore.LookupEntry(BG_AV_GraveyardIds[i]);
+            WorldSafeLocsEntry const* entry = sWorldSafeLocsStore.LookupEntry(BG_AV_GraveyardIds[i]);
             if (!entry)
                 continue;
             float dist = (entry->x - x) * (entry->x - x) + (entry->y - y) * (entry->y - y);
@@ -1647,9 +1646,9 @@ SendQuestCompleteEvent -> Affiche au joueur que une quête est validée.
 */
 void BattleGroundAV::CompleteQuestForAll(uint32 questId)
 {
-    Map::PlayerList const &PlayerList = GetBgMap()->GetPlayers();
-    for (Map::PlayerList::const_iterator it = PlayerList.begin(); it != PlayerList.end(); ++it)
-        if (Player* player = it->getSource())
+    Map::PlayerList const& PlayerList = GetBgMap()->GetPlayers();
+    for (const auto& it : PlayerList)
+        if (Player* player = it.getSource())
             if (player->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
                 player->FullQuestComplete(questId);
 }

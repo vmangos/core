@@ -233,7 +233,7 @@ public:
             case 1:
             {
                 Player* p = GetTestPlayer(0, TESTPLAYER_MAXLEVEL);
-                p->EnableOption(PLAYER_CHEAT_NO_CAST_TIME);
+                p->EnableCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
                 p->CastSpell(p, SPELL_SUMMON_IMP, false);
                 Wait(2000); // GCD
                 break;
@@ -241,7 +241,7 @@ public:
             case 2:
             {
                 Player* p = GetTestPlayer(0, TESTPLAYER_MAXLEVEL);
-                p->RemoveOption(PLAYER_CHEAT_NO_CAST_TIME);
+                p->RemoveCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
                 p->CastSpell(p, SPELL_SUMMON_IMP, false);
                 Wait(500);
                 break;
@@ -251,7 +251,7 @@ public:
                 Player* p = GetTestPlayer(0);
                 TEST_ASSERT(p->IsNonMeleeSpellCasted());
                 TEST_ASSERT(p->GetPet());
-                TEST_ASSERT(p->GetPet()->hasUnitState(UNIT_STAT_STUNNED));
+                TEST_ASSERT(p->GetPet()->HasUnitState(UNIT_STAT_STUNNED));
                 Finish();
                 break;
             }
@@ -294,7 +294,7 @@ public:
             {
                 int nbCreaWithDebuff = 0;
                 int nbCreaWithMovement = 0;
-                Creature* murloc = NULL;
+                Creature* murloc = nullptr;
                 for (int i = 1; i < 13; i++)
                 {
                     murloc = GetTestCreature(i);
@@ -344,7 +344,7 @@ public:
             {
                 Player* warlock = GetTestPlayer(0);
                 Player* victim = GetTestPlayer(1);
-                TEST_ASSERT(!victim->isAlive());
+                TEST_ASSERT(!victim->IsAlive());
                 TEST_ASSERT(warlock->HasItemCount(ITEM_SOULSHARD, 1));
                 Finish();
                 break;

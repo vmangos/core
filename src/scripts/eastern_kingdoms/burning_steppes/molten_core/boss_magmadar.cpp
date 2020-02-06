@@ -14,38 +14,21 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Magmadar
-SD%Complete: 75
-SDComment: Conflag on ground nyi, fear causes issues without VMAPs
-SDCategory: Molten Core
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "molten_core.h"
 
 enum
 {
-    EMOTE_GENERIC_FRENZY_KILL   = -1000001,
+    EMOTE_GENERIC_FRENZY_KILL   = 7797,
 
+    SPELL_LAVA_BREATH           = 19272,                    // Triggered by SPELL_FRENZY (19451)
     SPELL_FRENZY                = 19451,
-    SPELL_MAGMASPIT             = 19449,                    //This is actually a buff he gives himself
+    SPELL_MAGMASPIT             = 19449,                    // This is actually a buff he gives himself
     SPELL_PANIC                 = 19408,
-    SPELL_LAVABOMB              = 19411,                    //This calls a dummy server side effect that isn't implemented yet
-    SPELL_LAVABOMB_ALT          = 19428,                    //This is the spell that the lava bomb casts
-    SPELL_LAVA_BREATH           = 19272,
-
-    NPC_LAVABOMB                = 20006,
-
-    MODEL_INVISIBLE             = 11686,
+    SPELL_LAVABOMB              = 19411,                    // This calls a dummy server side effect that cast spell 20494 to spawn GO 177704 for 30s
+    SPELL_LAVABOMB_MANA         = 20474,                    // This calls a dummy server side effect that cast spell 20495 to spawn GO 177704 for 60s
 };
 
-/*
-DELETE FROM creature_template WHERE entry=20006 OR script_name="boss_magmadar_lavabomb";
-INSERT INTO creature_template
-SET entry=20006, modelid_1=11686, modelid_2=11686, name="LavaBomb", subname="Script", minhealth=4000, maxhealth=5000, faction=14,
-speed_walk=0.01, speed_run=0.01, script_name="boss_magmadar_lavabomb";
-*/
 struct boss_magmadarAI : public ScriptedAI
 {
     boss_magmadarAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -57,45 +40,41 @@ struct boss_magmadarAI : public ScriptedAI
     uint32 m_uiFrenzyTimer;
     uint32 m_uiPanicTimer;
     uint32 m_uiLavaBombTimer;
-    uint32 m_uiLavaBombTriggerTimer;
-    uint32 m_uiLavaBreathTimer;
-    uint32 m_uiMagmaSpitTimer;
+    uint32 m_uiLavaBombManaTimer;
     uint32 m_uiRestoreTargetTimer;
 
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFrenzyTimer          = 15000;
         m_uiPanicTimer           = 10000;
-        m_uiLavaBombTimer        = 13000;
-        m_uiLavaBombTriggerTimer = 0;
-        m_uiLavaBreathTimer      = 30000;
-        m_uiMagmaSpitTimer       = 10000;
+        m_uiLavaBombTimer        = 12000;
+        m_uiLavaBombManaTimer    = 18000;
         m_uiRestoreTargetTimer   = 0;
 
         if (!m_creature->HasAura(SPELL_MAGMASPIT))
             m_creature->CastSpell(m_creature, SPELL_MAGMASPIT, true);
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_MAGMADAR, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MAGMADAR, IN_PROGRESS);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MAGMADAR, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Frenzy
@@ -113,111 +92,60 @@ struct boss_magmadarAI : public ScriptedAI
         // Panic
         if (m_uiPanicTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PANIC) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PANIC) == CAST_OK)
                 m_uiPanicTimer = urand(30000, 35000);
         }
         else
             m_uiPanicTimer -= diff;
 
-        // Lava Bomb
+        // Lavabomb_Timer - non mana users
         if (m_uiLavaBombTimer < diff)
         {
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_LAVABOMB, SELECT_FLAG_POWER_NOT_MANA))
             {
-                if (DoCastSpellIfCan(target, SPELL_LAVABOMB) == CAST_OK)
+                if (DoCastSpellIfCan(pTarget, SPELL_LAVABOMB) == CAST_OK)
                 {
-                    m_creature->SetInFront(target);
-                    m_creature->SetTargetGuid(target->GetObjectGuid());
-                    if (Creature* Cre = m_creature->SummonCreature(NPC_LAVABOMB,
-                                        target->GetPositionX(),
-                                        target->GetPositionY(),
-                                        target->GetPositionZ(),
-                                        target->GetOrientation(),
-                                        TEMPSUMMON_TIMED_DESPAWN,
-                                        30000))
-                    {
-                        //scale at 0 is necessary for spell animation
-                        Cre->SetObjectScale(0.0f);
-                        Cre->setFaction(m_creature->getFaction());
-                    }
-                    m_uiLavaBombTimer = urand(10000, 13000);
-                    m_uiLavaBombTriggerTimer = 500;
+                    m_creature->SetInFront(pTarget);
+                    m_creature->SetTargetGuid(pTarget->GetObjectGuid());
+                    m_uiLavaBombTimer = urand(12000, 15000);
                     m_uiRestoreTargetTimer = 800;
-                }
+                }  
             }
         }
         else
             m_uiLavaBombTimer -= diff;
 
-        // every second force Lava Bomb triggers to cast Conflagrate
-        // don't refresh faster or Conflag does no damage to players sitting in the fire
-        if (m_uiLavaBombTriggerTimer)
+        // Lavabomb_Timer - mana users
+        if (m_uiLavaBombManaTimer < diff)
         {
-            if (m_uiLavaBombTriggerTimer <= diff)
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_LAVABOMB_MANA, SELECT_FLAG_POWER_MANA))
             {
-                std::list<Creature*> CreListe;
-                GetCreatureListWithEntryInGrid(CreListe, m_creature, NPC_LAVABOMB, 100.0f);
-                for (std::list<Creature*>::iterator itr = CreListe.begin(); itr != CreListe.end(); ++itr)
-                    (*itr)->CastSpell((*itr), SPELL_LAVABOMB_ALT, false);
-                m_uiLavaBombTriggerTimer = 1150;
+                if (DoCastSpellIfCan(pTarget, SPELL_LAVABOMB_MANA) == CAST_OK)
+                {
+                    m_creature->SetInFront(pTarget);
+                    m_creature->SetTargetGuid(pTarget->GetObjectGuid());
+                    m_uiLavaBombManaTimer = urand(12000, 15000);
+                    m_uiRestoreTargetTimer = 800;
+                } 
             }
-            else
-                m_uiLavaBombTriggerTimer -= diff;
         }
+        else
+            m_uiLavaBombManaTimer -= diff;
 
         // restore target after casting a Lava Bomb
         if (m_uiRestoreTargetTimer)
         {
             if (m_uiRestoreTargetTimer <= diff)
             {
-                m_creature->SetInFront(m_creature->getVictim());
-                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_creature->SetInFront(m_creature->GetVictim());
+                m_creature->SetTargetGuid(m_creature->GetVictim()->GetObjectGuid());
                 m_uiRestoreTargetTimer = 0;
             }
             else
                 m_uiRestoreTargetTimer -= diff;
         }
 
-        if (m_uiMagmaSpitTimer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 19450) == CAST_OK)
-                m_uiMagmaSpitTimer = urand(10000, 20000);
-        }
-        else
-            m_uiMagmaSpitTimer -= diff;
-
-        if (m_uiLavaBreathTimer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_LAVA_BREATH) == CAST_OK)
-                m_uiLavaBreathTimer = urand(10000, 30000);
-        }
-        else
-            m_uiLavaBreathTimer -= diff;
-
         DoMeleeAttackIfReady();
-    }
-
-    void UpdateAI_corpse(const uint32 diff)
-    {
-        // continue activating Lava Bomb triggers while dead until they've all despawned
-        if (m_uiLavaBombTriggerTimer)
-        {
-            if (m_uiLavaBombTriggerTimer <= diff)
-            {
-                bool m_bAllDespawned = true;
-
-                std::list<Creature*> CreListe;
-                GetCreatureListWithEntryInGrid(CreListe, m_creature, NPC_LAVABOMB, 100.0f);
-                for (std::list<Creature*>::iterator itr = CreListe.begin(); itr != CreListe.end(); ++itr)
-                {
-                    (*itr)->CastSpell((*itr), SPELL_LAVABOMB_ALT, false);
-                    m_bAllDespawned = false;
-                }
-                m_uiLavaBombTriggerTimer = m_bAllDespawned ? 0 : 1125;
-            }
-            else
-                m_uiLavaBombTriggerTimer -= diff;
-        }
     }
 };
 
@@ -228,7 +156,7 @@ CreatureAI* GetAI_boss_magmadar(Creature* pCreature)
 
 void AddSC_boss_magmadar()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_magmadar";
     newscript->GetAI = &GetAI_boss_magmadar;

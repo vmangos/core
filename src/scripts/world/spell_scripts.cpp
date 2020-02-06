@@ -86,7 +86,7 @@ bool EffectDummyCreature_spell_dummy_npc(WorldObject* /*pCaster*/, uint32 uiSpel
 
 void AddSC_spell_scripts()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "spell_dummy_npc";

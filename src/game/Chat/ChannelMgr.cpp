@@ -38,18 +38,18 @@ ChannelMgr* channelMgr(Team team)
     if (team == HORDE)
         return &MaNGOS::Singleton<HordeChannelMgr>::Instance();
 
-    return NULL;
+    return nullptr;
 }
 
 ChannelMgr::~ChannelMgr()
 {
-    for (ChannelMap::iterator itr = channels.begin(); itr != channels.end(); ++itr)
-        delete itr->second;
+    for (const auto& channel : channels)
+        delete channel.second;
 
     channels.clear();
 }
 
-Channel *ChannelMgr::GetJoinChannel(std::string name, bool allowAreaDependantChans)
+Channel *ChannelMgr::GetJoinChannel(std::string const& name, bool allowAreaDependantChans)
 {
     std::wstring wname;
     Utf8toWStr(name, wname);
@@ -59,7 +59,7 @@ Channel *ChannelMgr::GetJoinChannel(std::string name, bool allowAreaDependantCha
     {
         ChatChannelsEntry const* ch = GetChannelEntryFor(name);
         if (!allowAreaDependantChans && ch && ch->flags & Channel::CHANNEL_DBC_FLAG_ZONE_DEP)
-            return NULL;
+            return nullptr;
         Channel *nchan = new Channel(name);
         channels[wname] = nchan;
         return nchan;
@@ -68,7 +68,7 @@ Channel *ChannelMgr::GetJoinChannel(std::string name, bool allowAreaDependantCha
     return channels[wname];
 }
 
-Channel *ChannelMgr::GetChannel(std::string name, PlayerPointer p, bool pkt)
+Channel *ChannelMgr::GetChannel(std::string const& name, PlayerPointer p, bool pkt)
 {
     std::wstring wname;
     Utf8toWStr(name, wname);
@@ -85,13 +85,13 @@ Channel *ChannelMgr::GetChannel(std::string name, PlayerPointer p, bool pkt)
             p->GetSession()->SendPacket(&data);
         }
 
-        return NULL;
+        return nullptr;
     }
     else
         return i->second;
 }
 
-void ChannelMgr::LeftChannel(std::string name)
+void ChannelMgr::LeftChannel(std::string const& name)
 {
     std::wstring wname;
     Utf8toWStr(name, wname);
@@ -124,11 +124,11 @@ void ChannelMgr::CreateDefaultChannels()
     GetJoinChannel("ChatSpam")->SetSecurityLevel(SEC_MODERATOR);
     GetJoinChannel("LowLevelBots")->SetSecurityLevel(SEC_GAMEMASTER);
 
-    for (ChannelMap::iterator it = channels.begin(); it != channels.end(); ++it)
-        it->second->SetAnnounce(false);
+    for (const auto& channel : channels)
+        channel.second->SetAnnounce(false);
 }
 
-void ChannelMgr::AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, const char* message)
+void ChannelMgr::AnnounceBothFactionsChannel(std::string const& channelName, ObjectGuid playerGuid, char const* message)
 {
     if (Channel* c = channelMgr(HORDE)->GetJoinChannel(channelName))
         c->Say(playerGuid, message, LANG_UNIVERSAL, true);

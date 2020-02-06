@@ -18,7 +18,7 @@ enum
 class interrupt_mob_channeling_mob : public SingleTest
 {
 public:
-    interrupt_mob_channeling_mob(const char* name, uint32 spellId, uint32 castTime) : SingleTest(name, MAP_TESTING_ID, false), _spellId(spellId), _castTime(castTime)
+    interrupt_mob_channeling_mob(char const* name, uint32 spellId, uint32 castTime) : SingleTest(name, MAP_TESTING_ID, false), _spellId(spellId), _castTime(castTime)
     {
 
     }
@@ -61,7 +61,7 @@ public:
             {
                 Player* paladin = GetTestPlayer(0);
                 Creature* necromancer = GetTestCreature(1);
-                TEST_ASSERT(paladin->isInCombat() && necromancer->isInCombat());
+                TEST_ASSERT(paladin->IsInCombat() && necromancer->IsInCombat());
                 TEST_ASSERT(necromancer->HasAura(_spellId));
                 TEST_ASSERT(!paladin->HasAura(SPELL_SOUL_TAP));
                 Finish();

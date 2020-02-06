@@ -40,8 +40,8 @@ public:
             {
                 Player* player1 = GetTestPlayer(0);
                 Player* player2 = GetTestPlayer(1);
-                player1->EnableOption(PLAYER_CHEAT_NO_CAST_TIME);
-                player2->EnableOption(PLAYER_CHEAT_NO_CAST_TIME);
+                player1->EnableCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
+                player2->EnableCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
                 player1->AddItem(ITEM_SOUL_SHARD, 1);
                 player2->AddItem(ITEM_SOUL_SHARD, 1);
                 player1->CastSpell(player1, SPELL_SUMMON_SUCCUBUS, false);
@@ -83,8 +83,8 @@ public:
                 TEST_ASSERT(!player2->duel);
                 TEST_ASSERT(player1->GetPet());
                 TEST_ASSERT(player2->GetPet());
-                TEST_ASSERT(!player1->GetPet()->isInCombat());
-                TEST_ASSERT(!player2->GetPet()->isInCombat());
+                TEST_ASSERT(!player1->GetPet()->IsInCombat());
+                TEST_ASSERT(!player2->GetPet()->IsInCombat());
                 Finish();
                 break;
             }
@@ -96,7 +96,7 @@ public:
 class map_tester : public SingleTest
 {
 public:
-    map_tester(const char* name) : SingleTest(name)
+    map_tester(char const* name) : SingleTest(name)
     {
     }
     void LoadMap(uint32 map, float x, float y, float z)
@@ -128,7 +128,7 @@ public:
         filter.setIncludeFlags(0xF);
         filter.setExcludeFlags(NAV_STEEP_SLOPES);
         MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
-        const dtNavMeshQuery* navMeshQuery = mmap->GetNavMeshQuery(map);
+        dtNavMeshQuery const* navMeshQuery = mmap->GetNavMeshQuery(map);
         TEST_ASSERT(navMeshQuery);
         if (!PathInfo::FindWalkPoly(navMeshQuery, points, filter, closestPoint))
             Fail("Unable to find walk poly [%.2f %.2f %.2f map:%u]", x, y, z, map);
@@ -373,8 +373,8 @@ public:
                 // Count immolation auras
                 Player* warrior = GetTestPlayer(0);
                 uint32 count = 0;
-                for (Unit::SpellAuraHolderMap::const_iterator it = warrior->GetSpellAuraHolderMap().begin(); it != warrior->GetSpellAuraHolderMap().end(); ++it)
-                    if (it->second->GetId() == SPELL_IMMOLATE)
+                for (const auto& it : warrior->GetSpellAuraHolderMap())
+                    if (it.second->GetId() == SPELL_IMMOLATE)
                         ++count;
                 TEST_ASSERT(count <= sWorld.getConfig(CONFIG_UINT32_DEBUFF_LIMIT));
                 Finish();

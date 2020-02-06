@@ -23,7 +23,7 @@
 #include <list>
 #include <errno.h>
 
-#if defined WIN32
+#ifdef _WIN32
 #include <Windows.h>
 #include <sys/stat.h>
 #include <direct.h>
@@ -76,7 +76,7 @@ bool preciseVectorData = false;
 
 //static const char * szWorkDirMaps = ".\\Maps";
 const char* szWorkDirWmo = "./Buildings";
-const char* szRawVMAPMagic = "VMAPz04";
+const char* szRawVMAPMagic = "VMAP005";
 
 // Local testing functions
 
@@ -315,11 +315,7 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
         {
             sprintf(path, "%s.MPQ", scanmatch);
         }
-#ifdef __linux__
-        if (FILE* h = fopen64(path, "rb"))
-#else
         if (FILE* h = fopen(path, "rb"))
-#endif
         {
             fclose(h);
             //matches.push_back(path);
@@ -327,7 +323,7 @@ bool scan_patches(char* scanmatch, std::vector<std::string>& pArchiveNames)
         }
     }
 
-    return(true);
+    return true;
 }
 
 bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
@@ -341,24 +337,24 @@ bool fillArchiveNameVector(std::vector<std::string>& pArchiveNames)
 
     // open expansion and common files
     printf("Opening data files from data directory.\n");
-    sprintf(path, "%sterrain.mpq", input_path);
+    sprintf(path, "%sterrain.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%smodel.mpq", input_path);
+    sprintf(path, "%smodel.MPQ", input_path);
     //pArchiveNames.push_back(path);
     pArchiveNames.push_back(path);
-	sprintf(path, "%stexture.mpq", input_path);
+	sprintf(path, "%stexture.MPQ", input_path);
     pArchiveNames.push_back(path);
-	sprintf(path, "%swmo.mpq", input_path);
+	sprintf(path, "%swmo.MPQ", input_path);
     pArchiveNames.push_back(path);
-	sprintf(path, "%sbase.mpq", input_path);
+	sprintf(path, "%sbase.MPQ", input_path);
     pArchiveNames.push_back(path);
-    sprintf(path, "%smisc.mpq", input_path);
+    sprintf(path, "%smisc.MPQ", input_path);
 
     // now, scan for the patch levels in the core dir
     printf("Scanning patch levels from data directory.\n");
     sprintf(path, "%spatch", input_path);
     if (!scan_patches(path, pArchiveNames))
-        return(false);
+        return false;
 
     printf("\n");
 
@@ -369,7 +365,7 @@ bool processArgv(int argc, char** argv)
 {
     bool result = true;
     hasInputPathParam = false;
-    bool preciseVectorData = false;
+    preciseVectorData = false;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -383,7 +379,7 @@ bool processArgv(int argc, char** argv)
             {
                 hasInputPathParam = true;
                 strcpy(input_path, argv[i + 1]);
-                if (input_path[strlen(input_path) - 1] != '\\' || input_path[strlen(input_path) - 1] != '/')
+                if (input_path[strlen(input_path) - 1] != '\\' && input_path[strlen(input_path) - 1] != '/')
                     strcat(input_path, "/");
                 ++i;
             }
@@ -445,7 +441,7 @@ int main(int argc, char** argv)
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     // Create the working directory
     if (mkdir(szWorkDirWmo
-#ifdef __linux__
+#ifndef _WIN32
               , 0711
 #endif
              ))

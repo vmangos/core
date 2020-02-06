@@ -366,10 +366,6 @@ Anticrash.Rearm.Timer = 60000
 #        Whether to enforce Blizzlike PVP rank requirements to purchase PVP gear (i.e. lifetime or current rank).
 #        Default: 1 (require current rank)
 #
-#    PvP.AccurateZoneRequirements
-#        Whether to enforce Blizzlike PVP rank requirements to zone into the Champion and Legends halls.
-#        Default: 1
-#
 #    PvP.AccurateTimeline
 #        Whether to enforce accurate PVP timelines. eg. the honour system was not implemented before patch 1.4.
 #        If set, players will be unable to gain rank until the appropriate patch.
@@ -431,7 +427,6 @@ WowPatch = 10
 
 PvP.AccurateEquipRequirements = 1
 PvP.AccuratePurchaseRequirements = 1
-PvP.AccurateZoneRequirements = 1
 PvP.AccurateTimeline = 1
 PvP.AccurateRewards = 1
 PvP.DishonorableKills = 1
@@ -2803,17 +2798,6 @@ AHBot.ah.fid = 120
 AHBot.itemcount = 50
 #AHBot.bot.guid = 1123
 #AHBot.bot.account = 32377
-
-###################################################################################################################
-#    CLUSTERING (Not working, still WIP)
-###################################################################################################################
-
-IsMapServer = 0
-NodesListenAddress = "127.0.0.1"
-NodesListenPort = 0
-MasterListenAddress = "127.0.0.1"
-MasterListenPort = 0
-ServerName = "Master"
 
 ###################################################################################################################
 #    Database-based chat

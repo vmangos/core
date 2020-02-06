@@ -74,7 +74,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         for (it = canaliseurs.begin(); it != canaliseurs.end(); ++it)
             if (Creature* pCanaliser = m_creature->GetMap()->GetCreature(*it))
             {
-                if (!pCanaliser->isAlive())
+                if (!pCanaliser->IsAlive())
                     pCanaliser->Respawn();
                 pCanaliser->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
             }
@@ -106,7 +106,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         std::vector<ObjectGuid>::iterator it;
         for (it = canaliseurs.begin(); it != canaliseurs.end(); ++it)
             if (Creature* pCanaliser = m_creature->GetMap()->GetCreature(*it))
-                if (pCanaliser->isAlive())
+                if (pCanaliser->IsAlive())
                     return false;
         return true;
     }
@@ -118,9 +118,9 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         std::set<Player*>::iterator it;
         GameObject* pGo = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(GO_BLACKROCK_ALTAR));
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it2 = pl.begin(); it2 != pl.end(); ++it2)
+        for (const auto& it2 : pl)
         {
-            Player* currPlayer = it2->getSource();
+            Player* currPlayer = it2.getSource();
             if (currPlayer)
             {
                 it = sSummoners.find(currPlayer);
@@ -139,9 +139,9 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
 
         // Le combat avec les adds commence
         m_pInstance->SetData(TYPE_EMBERSEER, SPECIAL);
-        for (auto it = canaliseurs.begin(); it != canaliseurs.end(); ++it)
+        for (const auto& guid : canaliseurs)
         {
-            Creature *currCanaliseur = m_creature->GetMap()->GetCreature(*it);
+            Creature *currCanaliseur = m_creature->GetMap()->GetCreature(guid);
             if (!currCanaliseur)
                 continue;
             currCanaliseur->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
@@ -168,10 +168,10 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
         // On attaque tout le monde.
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it2 = pl.begin(); it2 != pl.end(); ++it2)
+        for (const auto& it2 : pl)
         {
-            Player* currPlayer = it2->getSource();
-            if (currPlayer && currPlayer->isAlive() && m_creature->IsInRange(currPlayer, 0.0f, 50.0f))
+            Player* currPlayer = it2.getSource();
+            if (currPlayer && currPlayer->IsAlive() && m_creature->IsInRange(currPlayer, 0.0f, 50.0f))
                 AttackStart(currPlayer);
         }
         m_creature->SetInCombatWithZone();
@@ -194,7 +194,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
     }
     // END NOSTALRIUS
 
-    void Reset()
+    void Reset() override
     {
         m_uiFireNovaTimer = 6000;
         m_uiFlameBuffetTimer = 3000;
@@ -207,7 +207,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
     }
 
-    void AttackStart(Unit *target)
+    void AttackStart(Unit *target) override
     {
         // $target commence a nous attaquer.
         // Pas de combat autorise avec le boss.
@@ -225,19 +225,19 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EMBERSEER, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EMBERSEER, DONE);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_EMBERSEER, FAIL);
@@ -247,7 +247,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_SELF_CAGE, false);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_pInstance)
             return;
@@ -273,7 +273,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         }
 
         // Sinon, on est "normalement" en combat.
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // FireNova Timer
@@ -344,14 +344,14 @@ struct npc_geolier_main_noireAI : public ScriptedAI
     bool fled;
     // END NOSTALRIUS
 
-    void Reset()
+    void Reset() override
     {
         MiseEnCage_Timer = urand(5000, 40000);
         Frappe_Timer     = urand(2000, 12100);
         fled = false;
     }
 
-    void AttackStart(Unit *target)
+    void AttackStart(Unit *target) override
     {
         if (!m_pInstance)
             return;
@@ -370,7 +370,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_pInstance)
             return;
@@ -385,7 +385,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
             return;
         }
         // Sinon go.
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (MiseEnCage_Timer < uiDiff)
         {
@@ -403,7 +403,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
 
         if (Frappe_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), 15580) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), 15580) == CAST_OK)
                 Frappe_Timer = urand(7900, 14000);
         }
         else

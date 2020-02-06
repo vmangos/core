@@ -134,15 +134,15 @@ enum thaddiusEvents
 
 
 
-static constexpr uint32 ADDS_RESPAWN_TIMER = 5000;      // adds respawn after 5 sec if not both area killed in that window.
+//static constexpr uint32 ADDS_RESPAWN_TIMER = 5000;      // adds respawn after 5 sec if not both area killed in that window.
 
 static constexpr uint32 ENRAGE_TIMER = 1000 * 60 * 5;   // 5 min enrage once p2 starts
 
                                                         // Initial polarity shift is 10s, after that every 30 sec
-static const uint32 PolarityShiftTimer(bool initial = false) { return initial ? 1000 * 10 : 1000 * 30; }
+static uint32 PolarityShiftTimer(bool initial = false) { return initial ? 1000 * 10 : 1000 * 30; }
 
                                                         // Chain lightning timer. TODO: confirm timers. Atm is guess
-static const uint32 ChainLightningTimer() { return urand(5000, 7000); } 
+static uint32 ChainLightningTimer() { return urand(5000, 7000); } 
 
 
 static constexpr float addPositions[2][4] =
@@ -172,7 +172,7 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
     bool hadLink;
     void Reset() override
     {
-        m_creature->SetRespawnRadius(0.01f);
+        m_creature->SetWanderDistance(0.01f);
         m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
         m_creature->GetMotionMaster()->Initialize();
         shockTimer = 0;
@@ -200,11 +200,11 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
         DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN);
     }
  
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (Creature* add = m_pInstance->GetCreature(m_guid))
         {
-            if (add->isInCombat() && !m_creature->isInCombat())
+            if (add->IsInCombat() && !m_creature->IsInCombat())
             {
                 m_creature->SetInCombatWithZone();
             }
@@ -317,7 +317,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
 
         if (Creature* pOtherAdd = GetOtherAdd())
         {
-            if (!pOtherAdd->isInCombat())
+            if (!pOtherAdd->IsInCombat())
                 pOtherAdd->AI()->AttackStart(pWho);
         }
     }
@@ -338,7 +338,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
     bool HandleMagneticPull()
     {
         if (m_bFakeDeath) return false;
-        Unit* myVictim = m_creature->getVictim();
+        Unit* myVictim = m_creature->GetVictim();
         if (!myVictim) return false;
 
         Creature* otherAdd = GetOtherAdd();
@@ -347,12 +347,12 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         {
             if (otherAI->m_bFakeDeath) return false; // can, presumably, only do it when both are alive
         }
-        Unit* otherVictim = otherAdd->getVictim();
+        Unit* otherVictim = otherAdd->GetVictim();
         if (!otherVictim) return false;
 
 
-        ThreatManager& myThreat = m_creature->getThreatManager();
-        ThreatManager& otherThreat = otherAdd->getThreatManager();
+        ThreatManager& myThreat = m_creature->GetThreatManager();
+        ThreatManager& otherThreat = otherAdd->GetThreatManager();
 
         float myTankThreat = myThreat.getThreat(myVictim);
         float myOtherTankThreat = myThreat.getThreat(otherVictim);
@@ -393,7 +393,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bFakeDeath)
         {
@@ -407,7 +407,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         timeSincePull += uiDiff;
         m_events.Update(uiDiff);
@@ -778,7 +778,7 @@ struct boss_thaddiusAI : public ScriptedAI
         }
     }
 
-    void UpdateTransitionPhase(const uint32 diff)
+    void UpdateTransitionPhase(uint32 const diff)
     {
         m_events.Update(diff);
         while (auto l_EventId = m_events.ExecuteEvent())
@@ -849,7 +849,7 @@ struct boss_thaddiusAI : public ScriptedAI
         for (auto& p : lPlayers)
         {
             Player* pPlayer = p.getSource();
-            if (pPlayer->isDead())
+            if (pPlayer->IsDead())
                 continue;
 
             playerVec.push_back(p.getSource());
@@ -880,12 +880,12 @@ struct boss_thaddiusAI : public ScriptedAI
             m_events.Repeat(ChainLightningTimer());
     }
 
-    void UpdateP2(const uint32 diff)
+    void UpdateP2(uint32 const diff)
     {
         if (!m_pInstance)
             return;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         m_events.Update(diff);
@@ -925,7 +925,7 @@ struct boss_thaddiusAI : public ScriptedAI
         // This will prevent the boss from starting to spam balls of lightning if the boss is being moved with lag or something
         if (!DoMeleeAttackIfReady())
         {
-            if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->getVictim()))
+            if (!m_creature->CanReachWithMeleeAutoAttack(m_creature->GetVictim()))
             {
                 m_uiBallLightningTimer -= std::min(diff, m_uiBallLightningTimer);
             }
@@ -942,12 +942,12 @@ struct boss_thaddiusAI : public ScriptedAI
         // it's time to start hurl some balls of lightning
         if (m_uiBallLightningTimer < diff && !m_creature->IsNonMeleeSpellCasted())
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BALL_LIGHTNING) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BALL_LIGHTNING) == CAST_OK)
                 m_uiBallLightningTimer = 1500;
         }
     }
     
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         //return; // xxx debugging adds
 
@@ -956,7 +956,7 @@ struct boss_thaddiusAI : public ScriptedAI
 
         if (m_Phase != THAD_NOT_STARTED)
         {
-            if (m_creature->getThreatManager().isThreatListEmpty())
+            if (m_creature->GetThreatManager().isThreatListEmpty())
             {
                 TransitionToPhase(THAD_NOT_STARTED);
             }
@@ -964,7 +964,7 @@ struct boss_thaddiusAI : public ScriptedAI
         else
         {
             // He can act a bit weird if you stand next to him on server startup :/
-            if (m_creature->isInCombat())
+            if (m_creature->IsInCombat())
                 TransitionToPhase(THAD_NOT_STARTED);
         }
 

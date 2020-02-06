@@ -38,22 +38,22 @@ struct boss_halyconAI : public ScriptedAI
     uint32 MightyBlow_Timer;
     bool Summoned;
 
-    void Reset()
+    void Reset() override
     {
         CrowdPummel_Timer = 8000;
         MightyBlow_Timer = 14000;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //CrowdPummel_Timer
         if (CrowdPummel_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CROWDPUMMEL);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CROWDPUMMEL);
             CrowdPummel_Timer = 14000;
         }
         else CrowdPummel_Timer -= diff;
@@ -61,14 +61,14 @@ struct boss_halyconAI : public ScriptedAI
         //MightyBlow_Timer
         if (MightyBlow_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIGHTYBLOW);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIGHTYBLOW);
             MightyBlow_Timer = 10000;
         }
         else MightyBlow_Timer -= diff;
 
         DoMeleeAttackIfReady();
     }
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         //Summon Gizrul
         if (!Summoned)
@@ -90,7 +90,7 @@ CreatureAI* GetAI_boss_halycon(Creature* pCreature)
 
 void AddSC_boss_halycon()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_halycon";
     newscript->GetAI = &GetAI_boss_halycon;

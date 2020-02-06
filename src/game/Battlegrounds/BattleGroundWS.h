@@ -108,10 +108,10 @@ enum BG_WS_Events
 };
 
 // Honor granted depending on player's level
-const uint32 BG_WSG_FlagCapturedHonor[MAX_BATTLEGROUND_BRACKETS] = {48, 82, 136, 226, 378, 396};
-const uint32 BG_WSG_WinMatchHonor[MAX_BATTLEGROUND_BRACKETS] = {24, 41, 68, 113, 189, 198};
-const uint32 BG_WSG_WinMatchHonorHolidays[MAX_BATTLEGROUND_BRACKETS] = {48, 82, 136, 226, 378, 396};
-const uint32 BG_WSG_WinMatchHonorBonusCompleteHolidays[MAX_BATTLEGROUND_BRACKETS] = {72, 123, 204, 339, 567, 594};
+uint32 const BG_WSG_FlagCapturedHonor[MAX_BATTLEGROUND_BRACKETS] = {48, 82, 136, 226, 378, 396};
+uint32 const BG_WSG_WinMatchHonor[MAX_BATTLEGROUND_BRACKETS] = {24, 41, 68, 113, 189, 198};
+uint32 const BG_WSG_WinMatchHonorHolidays[MAX_BATTLEGROUND_BRACKETS] = {48, 82, 136, 226, 378, 396};
+uint32 const BG_WSG_WinMatchHonorBonusCompleteHolidays[MAX_BATTLEGROUND_BRACKETS] = {72, 123, 204, 339, 567, 594};
 
 class BattleGroundWS : public BattleGround
 {
@@ -124,7 +124,7 @@ class BattleGroundWS : public BattleGround
         void Update(uint32 diff);
 
         /* inherited from BattlegroundClass */
-        virtual void AddPlayer(Player *plr);
+        virtual void AddPlayer(Player* plr);
         virtual void StartingEventCloseDoors();
         virtual void StartingEventOpenDoors();
 
@@ -143,13 +143,13 @@ class BattleGroundWS : public BattleGround
         uint8 GetFlagState(Team team)             { return m_FlagState[GetTeamIndexByTeamId(team)]; }
 
         /* Battleground Events */
-        virtual void EventPlayerDroppedFlag(Player *Source);
-        virtual void EventPlayerClickedOnFlag(Player *Source, GameObject* target_obj);
-        virtual void EventPlayerCapturedFlag(Player *Source);
+        virtual void EventPlayerDroppedFlag(Player* Source);
+        virtual void EventPlayerClickedOnFlag(Player* Source, GameObject* target_obj);
+        virtual void EventPlayerCapturedFlag(Player* Source);
 
-        void RemovePlayer(Player *plr, ObjectGuid guid);
-        void HandleAreaTrigger(Player *Source, uint32 Trigger);
-        void HandleKillPlayer(Player *player, Player *killer);
+        void RemovePlayer(Player* plr, ObjectGuid guid);
+        void HandleAreaTrigger(Player* Source, uint32 Trigger);
+        void HandleKillPlayer(Player* pVictim, Player* pKiller);
         bool SetupBattleGround();
         virtual void Reset();
         void EndBattleGround(Team winner);
@@ -157,7 +157,7 @@ class BattleGroundWS : public BattleGround
 
         void UpdateFlagState(Team team, uint32 value);
         void UpdateTeamScore(Team team);
-        void UpdatePlayerScore(Player *Source, uint32 type, uint32 value);
+        void UpdatePlayerScore(Player* Source, uint32 type, uint32 value);
         void SetDroppedFlagGuid(ObjectGuid guid, Team team)  { m_DroppedFlagGuid[GetTeamIndexByTeamId(team)] = guid;}
         void ClearDroppedFlagGuid(Team team)  { m_DroppedFlagGuid[GetTeamIndexByTeamId(team)].Clear();}
         ObjectGuid const& GetDroppedFlagGuid(Team team) const { return m_DroppedFlagGuid[GetTeamIndexByTeamId(team)];}

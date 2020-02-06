@@ -17,32 +17,32 @@ struct npc_sandstalkerAI : public ScriptedAI
 
     uint32 m_uiBurrow_Timer;
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         EnterVanish();
     }
 
-    void Reset()
+    void Reset() override
     {
         EnterVanish();
         m_uiBurrow_Timer = 5000;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         Unit* pVanishTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
         LeaveVanish();
         Ambush(pVanishTarget, SPELL_BURROW);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         LeaveVanish();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
             EnterVanish();
 
         if (m_uiBurrow_Timer < uiDiff)

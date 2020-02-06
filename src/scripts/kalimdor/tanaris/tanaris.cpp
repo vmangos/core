@@ -54,11 +54,11 @@ struct mob_aquementasAI : public ScriptedAI
     uint32 FrostShock_Timer;
     uint32 AquaJet_Timer;
 
-    void Reset()
+    void Reset() override
     {
         SendItem_Timer = 0;
         SwitchFaction_Timer = 10000;
-        m_creature->setFaction(35);
+        m_creature->SetFactionTemplateId(35);
         isFriendly = true;
 
         AquaJet_Timer = 5000;
@@ -73,38 +73,38 @@ struct mob_aquementasAI : public ScriptedAI
                 !((Player*)receiver)->HasItemCount(11522, 1, true))
         {
             ItemPosCountVec dest;
-            uint8 msg = ((Player*)receiver)->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 11522, 1, NULL);
+            uint8 msg = ((Player*)receiver)->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, 11522, 1, nullptr);
             if (msg == EQUIP_ERR_OK)
                 ((Player*)receiver)->StoreNewItem(dest, 11522, 1, true);
         }
     }
 
-    void Aggro(Unit* who)
+    void Aggro(Unit* who) override
     {
         DoScriptText(AGGRO_YELL_AQUE, m_creature, who);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (isFriendly)
         {
             if (SwitchFaction_Timer < diff)
             {
-                m_creature->setFaction(91);
+                m_creature->SetFactionTemplateId(91);
                 isFriendly = false;
             }
             else SwitchFaction_Timer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!isFriendly)
         {
             if (SendItem_Timer < diff)
             {
-                if (m_creature->getVictim()->GetTypeId() == TYPEID_PLAYER)
-                    SendItem(m_creature->getVictim());
+                if (m_creature->GetVictim()->GetTypeId() == TYPEID_PLAYER)
+                    SendItem(m_creature->GetVictim());
                 SendItem_Timer = 5000;
             }
             else SendItem_Timer -= diff;
@@ -112,7 +112,7 @@ struct mob_aquementasAI : public ScriptedAI
 
         if (FrostShock_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_SHOCK);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROST_SHOCK);
             FrostShock_Timer = 15000;
         }
         else FrostShock_Timer -= diff;
@@ -155,7 +155,7 @@ struct npc_custodian_of_timeAI : public npc_escortAI
         Reset();
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         Player* pPlayer = GetPlayerForEscort();
 
@@ -224,7 +224,7 @@ struct npc_custodian_of_timeAI : public npc_escortAI
         }
     }
 
-    void MoveInLineOfSight(Unit *who)
+    void MoveInLineOfSight(Unit *who) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
             return;
@@ -241,7 +241,7 @@ struct npc_custodian_of_timeAI : public npc_escortAI
         }
     }
 
-    void Reset() { }
+    void Reset() override { }
 };
 
 CreatureAI* GetAI_npc_custodian_of_time(Creature* pCreature)
@@ -262,7 +262,7 @@ CreatureAI* GetAI_npc_custodian_of_time(Creature* pCreature)
 
 bool GossipHello_npc_stone_watcher_of_norgannon(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     if (pPlayer->GetQuestStatus(2954) == QUEST_STATUS_INCOMPLETE)
@@ -310,9 +310,9 @@ CreatureAI* GetAI_npc_stone_watcher_of_norgannon(Creature* creature)
 {
     std::list<Creature*> creatures;
     creature->GetCreatureListWithEntryInGrid(creatures, creature->GetEntry(), 20.0f);
-    if (creatures.size())
+    if (!creatures.empty())
         creature->DeleteLater();
-    return NULL;
+    return nullptr;
 }
 
 /*####
@@ -336,7 +336,7 @@ enum
     POINT_ID_TO_WATER           = 1
 };
 
-const float m_afToWaterLoc[] = { -7032.664551f, -4906.199219f, -1.606446f};
+float const m_afToWaterLoc[] = { -7032.664551f, -4906.199219f, -1.606446f};
 
 struct npc_toogaAI : public FollowerAI
 {
@@ -351,7 +351,7 @@ struct npc_toogaAI : public FollowerAI
 
     ObjectGuid m_tortaGuid;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCheckSpeechTimer = 2500;
         m_uiPostEventTimer = 1000;
@@ -360,11 +360,11 @@ struct npc_toogaAI : public FollowerAI
         m_tortaGuid.Clear();
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
 
-        if (!m_creature->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE | STATE_FOLLOW_POSTEVENT) && pWho->GetEntry() == NPC_TORTA)
+        if (!m_creature->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE | STATE_FOLLOW_POSTEVENT) && pWho->GetEntry() == NPC_TORTA)
         {
             if (m_creature->IsWithinDistInMap(pWho, INTERACTION_DISTANCE))
             {
@@ -380,7 +380,7 @@ struct npc_toogaAI : public FollowerAI
         }
     }
 
-    void MovementInform(uint32 uiMotionType, uint32 uiPointId)
+    void MovementInform(uint32 uiMotionType, uint32 uiPointId) override
     {
         FollowerAI::MovementInform(uiMotionType, uiPointId);
 
@@ -391,9 +391,9 @@ struct npc_toogaAI : public FollowerAI
             SetFollowComplete();
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff)
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             //we are doing the post-event, or...
             if (HasFollowState(STATE_FOLLOW_POSTEVENT))
@@ -403,7 +403,7 @@ struct npc_toogaAI : public FollowerAI
                     m_uiPostEventTimer = 5000;
                     Unit* pTorta = m_creature->GetMap()->GetCreature(m_tortaGuid);
 
-                    if (!pTorta || !pTorta->isAlive())
+                    if (!pTorta || !pTorta->IsAlive())
                     {
                         //something happened, so just complete
                         SetFollowComplete();
@@ -471,7 +471,7 @@ CreatureAI* GetAI_npc_tooga(Creature* pCreature)
     return new npc_toogaAI(pCreature);
 }
 
-bool QuestAccept_npc_tooga(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_tooga(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TOOGA)
     {
@@ -504,7 +504,7 @@ struct go_inconspicuous_landmarkAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {
@@ -520,9 +520,7 @@ struct go_inconspicuous_landmarkAI: public GameObjectAI
     }
     bool CheckCanStartEvent()
     {
-        if (!state)
-            return true;
-        return false;
+        return !state;
     }
 
     void SetInUse()
@@ -549,12 +547,11 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
             {
                 if (pPlayer->GetQuestStatus(2882) == QUEST_STATUS_INCOMPLETE)
                 {
-                    Creature* pirate1 = NULL;
-                    Creature* pirate2 = NULL;
-                    Creature* pirate3 = NULL;
-                    Creature* pirate4 = NULL;
-                    Creature* pirate5 = NULL;
-                    GameObject* pTreasure = NULL;
+                    Creature* pirate1 = nullptr;
+                    Creature* pirate2 = nullptr;
+                    Creature* pirate3 = nullptr;
+                    Creature* pirate4 = nullptr;
+                    Creature* pirate5 = nullptr;
                     int extraPirateType[2];
                     extraPirateType[0] = NPC_PIRATES_1;
                     extraPirateType[1] = NPC_PIRATES_2;
@@ -575,18 +572,18 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                         pirate3->SetRespawnDelay(350000);
                     }
 
-                    for (int i = 0; i < 2; i++)
+                    for (int & pirateEntry : extraPirateType)
                     {
                         switch (urand(0, 2))
                         {
                             case 0:
-                                extraPirateType[i] = NPC_PIRATES_1;
+                                pirateEntry = NPC_PIRATES_1;
                                 break;
                             case 1:
-                                extraPirateType[i] = NPC_PIRATES_2;
+                                pirateEntry = NPC_PIRATES_2;
                                 break;
                             case 2:
-                                extraPirateType[i] = NPC_PIRATES_3;
+                                pirateEntry = NPC_PIRATES_3;
                                 break;
                         }
                     }
@@ -600,27 +597,6 @@ bool GOHello_go_inconspicuous_landmark(Player* pPlayer, GameObject* pGo)
                         pirate5->AI()->AttackStart(pPlayer);
                         pirate5->SetRespawnDelay(350000);
                     }
-
-                    //code pour le dev où le coffre est pas pop ET pop en invisible...
-                    /*if (! (pTreasure = pGo->FindNearestGameObject (GO_PIRATES_TREASURE, 10.000000)))
-                    {
-                        if(pTreasure = pGo->SummonGameObject(GO_PIRATES_TREASURE, -10115.037109, -4050.484863, 5.521664, 0, 0, 0, 0, 0, 13));
-                    }
-                    if(pTreasure != NULL)
-                    {
-                        //pTreasure->SetGoState(GO_STATE_READY);
-                        //pTreasure->SetLootState(GO_READY);
-                        //pTreasure->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-
-                                //if (pTreasure->isSpawned());
-
-                                pTreasure->SetRespawnTime(3);
-                                //pTreasure->SetRespawnDelay(10000); on peut pas :(
-
-                            //pTreasure->UseDoorOrButton(12, false);
-                            //pTreasure->ForcedDespawn(5000); on peut pas :(
-
-                    }*/
                 }
             }
         }
@@ -645,7 +621,7 @@ struct npc_yehkinyaAI : public npc_escortAI
     bool   isEventStarted;
     uint32 Point;   
  
-    void Reset()
+    void Reset() override
     {
         isEventStarted = false;
         m_creature->LoadEquipment(1315, true);
@@ -657,7 +633,7 @@ struct npc_yehkinyaAI : public npc_escortAI
             return;
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         switch (i)
         {
@@ -674,7 +650,7 @@ struct npc_yehkinyaAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 diff)
+    void UpdateEscortAI(uint32 const diff) override
     {
         if (Event_Timer <= diff)
         {
@@ -706,7 +682,7 @@ bool QuestRewarded_npc_yehkinya(Player* pPlayer, Creature* pCreature, Quest cons
 
         if (npc_yehkinyaAI* pEscortAI = dynamic_cast<npc_yehkinyaAI*>(pCreature->AI()))
                 {
-            pEscortAI->Start(true, NULL, NULL, true);
+            pEscortAI->Start(true, 0, nullptr, true);
                         pCreature->SetWalk(false);
                 }
     }
@@ -715,7 +691,7 @@ bool QuestRewarded_npc_yehkinya(Player* pPlayer, Creature* pCreature, Quest cons
 
 void AddSC_tanaris()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_yehkinya";

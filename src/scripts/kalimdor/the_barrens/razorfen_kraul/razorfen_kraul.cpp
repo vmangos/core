@@ -53,7 +53,7 @@ enum
     NPC_RAGING_AGAMAR          = 4514
 };
 
-static const float aBoarSpawn[4][3] =
+static float const aBoarSpawn[4][3] =
 {
     {2151.420f, 1733.18f, 52.10f},
     {2144.463f, 1726.89f, 51.93f},
@@ -143,7 +143,7 @@ CreatureAI* GetAI_npc_willix_the_importer(Creature* pCreature)
     return new npc_willix_the_importerAI(pCreature);
 }
 
-bool QuestAccept_npc_willix_the_importer(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_willix_the_importer(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_WILLIX_THE_IMPORTER)
     {
@@ -197,7 +197,7 @@ struct npc_snufflenose_gopherAI : public FollowerAI
 
     void Reset() override
     {
-        m_creature->setFaction(35);
+        m_creature->SetFactionTemplateId(35);
         m_bIsMovementActive  = false;
         m_followPausedTimer = 3000;
     }
@@ -234,14 +234,14 @@ struct npc_snufflenose_gopherAI : public FollowerAI
             return;
 
         lTubersInRange.sort(ObjectDistanceOrder(m_creature));
-        GameObject* pNearestTuber = NULL;
+        GameObject* pNearestTuber = nullptr;
 
         // Always need to find new ones
-        for (std::list<GameObject*>::const_iterator itr = lTubersInRange.begin(); itr != lTubersInRange.end(); ++itr)
+        for (const auto itr : lTubersInRange)
         {
-            if (IsValidTuber(*itr))
+            if (IsValidTuber(itr))
             {
-                pNearestTuber = *itr;
+                pNearestTuber = itr;
                 break;
             }
 
@@ -273,18 +273,15 @@ struct npc_snufflenose_gopherAI : public FollowerAI
             return false;
 
         // Check if tuber is in list of already found tubers
-        for (std::list<ObjectGuid>::const_iterator itr2 = m_foundTubers.begin(); itr2 != m_foundTubers.end(); ++itr2)
-            if (tuber->GetObjectGuid() == (*itr2))
+        for (const auto& guid : m_foundTubers)
+            if (tuber->GetObjectGuid() == guid)
                 return false;
 
         // Check that tuber is not more than 15 yards above or below current position
-        if (fabs(viewPoint->GetPositionZ() - tuber->GetPositionZ()) > 15)
-            return false;
-
-        return true;
+        return fabs(viewPoint->GetPositionZ() - tuber->GetPositionZ()) <= 15;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bIsMovementActive)
             return;
@@ -362,26 +359,26 @@ struct RazorfenDefenderAI : public ScriptedAI
     uint32 m_uiImprovedBlocking_Timer;
     uint32 m_uiShieldBash_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiImprovedBlocking_Timer = 1000;
         m_uiShieldBash_Timer      = 6600;
         DoCastSpellIfCan(m_creature, SPELL_DEFENSIVE_STANCE, true);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiShieldBash_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH) == CAST_OK)
                 m_uiShieldBash_Timer = 8100;
         }
         else

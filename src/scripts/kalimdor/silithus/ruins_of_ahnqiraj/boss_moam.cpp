@@ -62,7 +62,7 @@ struct boss_moamAI : public ScriptedAI
     ObjectGuid m_OGvictim;          // Memorize last target before turning into stone, then take it back.
     bool m_bIsInCombat;
 
-    void Reset()
+    void Reset() override
     {
         m_uiTrample_Timer = 6000;
         m_uiSummonManaFiend_Timer = 90000;
@@ -81,11 +81,11 @@ struct boss_moamAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MOAM, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
         DoScriptText(EMOTE_AGGRO, m_creature);
-        if (m_bIsInCombat == false)
+        if (!m_bIsInCombat)
         {
             m_creature->SetPower(POWER_MANA, 0);
             m_bIsInCombat = true;
@@ -95,7 +95,7 @@ struct boss_moamAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MOAM, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (GameObject *pObsidian = m_creature->SummonGameObject(181069, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, 0, 0, 0, 0, -1, false))
             pObsidian->SetRespawnTime(345600);
@@ -105,11 +105,11 @@ struct boss_moamAI : public ScriptedAI
     }
 
     /** This function seems to be unused, kept as it is in case of...*/
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0))
         {
-            if (pTarget->isAlive())
+            if (pTarget->IsAlive())
             {
                 pSummoned->AI()->AttackStart(pTarget);
                 if (pSummoned->GetEntry() == NPC_MANA_FIEND)
@@ -119,7 +119,7 @@ struct boss_moamAI : public ScriptedAI
                 }
             }
         }
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             pSummoned->AddObjectToRemoveList();
             return;
@@ -131,16 +131,16 @@ struct boss_moamAI : public ScriptedAI
     void FillPlayerList()
     {
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+        for (const auto& i : liste)
         {
-            if (i->getSource()->isAlive() && i->getSource()->getPowerType() == POWER_MANA)
-                PlayerList.push_back(i->getSource());
+            if (i.getSource()->IsAlive() && i.getSource()->GetPowerType() == POWER_MANA)
+                PlayerList.push_back(i.getSource());
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if ((!m_creature->SelectHostileTarget() || !m_creature->getVictim()) && !m_creature->HasAura(SPELL_ENERGIZE))
+        if ((!m_creature->SelectHostileTarget() || !m_creature->GetVictim()) && !m_creature->HasAura(SPELL_ENERGIZE))
             return;
 
         // Once Moam got 100% mana, take back last target and launch arcane eruption
@@ -153,13 +153,13 @@ struct boss_moamAI : public ScriptedAI
             {
                 //Check if a victim was memorize, in case of error, take a random one.
                 Unit * victim = m_creature->GetMap()->GetUnit(m_OGvictim);
-                if (victim != NULL)
+                if (victim != nullptr)
                     m_creature->AI()->AttackStart(victim);
                 else
                     m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
                 m_creature->RemoveAurasDueToSpell(SPELL_ENERGIZE);
-                DoCast(m_creature->getVictim(), SPELL_ARCANEERUPTION);
+                DoCast(m_creature->GetVictim(), SPELL_ARCANEERUPTION);
                 DoScriptText(EMOTE_MANA_FULL, m_creature);
                 m_creature->SetArmor(m_uiArmorValue);
             }
@@ -171,7 +171,7 @@ struct boss_moamAI : public ScriptedAI
         // Cast arcane eruption spell if not in energize mode and if mana is at 100%
         if (m_creature->GetPower(POWER_MANA) == m_creature->GetMaxPower(POWER_MANA))
         {
-            DoCast(m_creature->getVictim(), SPELL_ARCANEERUPTION);
+            DoCast(m_creature->GetVictim(), SPELL_ARCANEERUPTION);
             DoScriptText(EMOTE_MANA_FULL, m_creature);
         }
 
@@ -198,7 +198,7 @@ struct boss_moamAI : public ScriptedAI
 
                 m_uiSummonManaFiend_Timer = 90000;
                 m_uiTurnBackFromStone_Timer = 90000;
-                m_OGvictim = m_creature->getVictim()->GetObjectGuid(); /** Memorize actual target to take it back,
+                m_OGvictim = m_creature->GetVictim()->GetObjectGuid(); /** Memorize actual target to take it back,
                                       once the end of SPELL_ENERGIZE */
                 m_creature->AttackStop();
                 DoScriptText(EMOTE_DRAIN, m_creature);
@@ -211,7 +211,7 @@ struct boss_moamAI : public ScriptedAI
         //m_uiTrample_Timer
         if (m_uiTrample_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRAMPLE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_TRAMPLE) == CAST_OK)
                 m_uiTrample_Timer = 10000;
         }
         else
@@ -228,7 +228,7 @@ struct boss_moamAI : public ScriptedAI
                 Player *Plr = 0;
                 if ((Plr = PlayerList[Rand]))
                 {
-                    if (Plr->isAlive())
+                    if (Plr->IsAlive())
                     {
                         m_uiDrainCount++;
                         uint32 Mana = Plr->GetPower(POWER_MANA);
@@ -269,7 +269,7 @@ CreatureAI* GetAI_boss_moam(Creature* pCreature)
 
 void AddSC_boss_moam()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_moam";
     newscript->GetAI = &GetAI_boss_moam;

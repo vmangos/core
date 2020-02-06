@@ -135,7 +135,7 @@ uint32 EventMap::GetNextEventTime(uint32 eventId) const
     if (Empty())
         return 0;
 
-    for (auto const &itr : _eventMap)
+    for (auto const& itr : _eventMap)
         if (eventId == (itr.second & 0x0000FFFF))
             return itr.first;
 
@@ -144,7 +144,7 @@ uint32 EventMap::GetNextEventTime(uint32 eventId) const
 
 uint32 EventMap::GetTimeUntilEvent(uint32 eventId) const
 {
-    for (auto const &itr : _eventMap)
+    for (auto const& itr : _eventMap)
         if (eventId == (itr.second & 0x0000FFFF))
             return itr.first - _time;
 

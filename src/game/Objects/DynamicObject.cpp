@@ -30,7 +30,7 @@
 #include "GridNotifiersImpl.h"
 #include "SpellMgr.h"
 
-DynamicObject::DynamicObject() : WorldObject(), m_effIndex(EFFECT_INDEX_0), m_spellId(0), m_aliveDuration(0), m_positive(false), m_radius(0)
+DynamicObject::DynamicObject() : WorldObject(), m_spellId(0), m_effIndex(EFFECT_INDEX_0), m_aliveDuration(0), m_radius(0), m_positive(false), m_channeled(false)
 {
     m_objectType |= TYPEMASK_DYNAMICOBJECT;
     m_objectTypeId = TYPEID_DYNAMICOBJECT;
@@ -157,14 +157,14 @@ Unit* DynamicObject::GetUnitCaster() const
     return nullptr;
 }
 
-uint32 DynamicObject::getFaction() const
+uint32 DynamicObject::GetFactionTemplateId() const
 {
-    return GetCaster()->getFaction();
+    return GetCaster()->GetFactionTemplateId();
 }
 
-uint32 DynamicObject::getLevel() const
+uint32 DynamicObject::GetLevel() const
 {
-    return GetCaster()->getLevel();
+    return GetCaster()->GetLevel();
 }
 
 void DynamicObject::Update(uint32 update_diff, uint32 p_time)
@@ -193,8 +193,8 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
     if (m_aliveDuration == 0 && (!m_channeled || (caster->IsUnit() && static_cast<Unit*>(caster)->GetChannelObjectGuid() != GetObjectGuid())))
         deleteThis = true;
 
-    for (AffectedMap::iterator iter = m_affected.begin(); iter != m_affected.end(); ++iter)
-        iter->second += update_diff;
+    for (auto& iter : m_affected)
+        iter.second += update_diff;
 
     // have radius and work as persistent effect
     if (m_radius)
@@ -228,15 +228,25 @@ void DynamicObject::Delete()
     AddObjectToRemoveList();
 }
 
+void DynamicObject::AddAffected(Unit* unit)
+{
+    m_affected[unit->GetObjectGuid()] = 0;
+}
+
+void DynamicObject::RemoveAffected(Unit* unit)
+{
+    m_affected.erase(unit->GetObjectGuid());
+}
+
 void DynamicObject::Delay(int32 delaytime)
 {
     m_aliveDuration -= delaytime;
     for (AffectedMap::iterator iter = m_affected.begin(); iter != m_affected.end();)
     {
-        Unit *target = GetMap()->GetUnit(iter->first);
+        Unit* target = GetMap()->GetUnit(iter->first);
         if (target)
         {
-            SpellAuraHolder *holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
+            SpellAuraHolder* holder = target->GetSpellAuraHolder(m_spellId, GetCasterGuid());
             if (!holder)
             {
                 ++iter;
@@ -267,7 +277,7 @@ void DynamicObject::Delay(int32 delaytime)
     }
 }
 
-bool DynamicObject::isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
+bool DynamicObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
     if (!IsInWorld() || !pDetector->IsInWorld())
         return false;

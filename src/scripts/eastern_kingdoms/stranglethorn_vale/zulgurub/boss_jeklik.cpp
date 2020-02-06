@@ -81,7 +81,7 @@ struct boss_jeklikAI : public ScriptedAI
 
     bool PhaseTwo;
 
-    void Reset()
+    void Reset() override
     {
         SpawnBats_Timer = 40000;
 
@@ -102,21 +102,21 @@ struct boss_jeklikAI : public ScriptedAI
         PhaseTwo       = false;
         skillStarted   = false;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_JEKLIK, FAIL);
 
         m_creature->SetObjectScale(1.5f);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         m_creature->CastSpell(m_creature, SPELL_GREENCHANNELING, false);
         m_creature->SetObjectScale(1.0f);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
-        m_creature->addUnitState(UNIT_STAT_IGNORE_PATHFINDING);
+        m_creature->AddUnitState(UNIT_STAT_IGNORE_PATHFINDING);
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->AddAura(SPELL_BAT_FORM);
         m_creature->SetFly(true);
@@ -127,7 +127,7 @@ struct boss_jeklikAI : public ScriptedAI
         ScriptedAI::Aggro(who);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         DoScriptText(SAY_DEATH, m_creature);
 
@@ -139,14 +139,12 @@ struct boss_jeklikAI : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode();
         m_creature->Respawn();
-        float x, y, z, o;
-        m_creature->GetHomePosition(x, y, z, o);
-        m_creature->NearTeleportTo(x, y, z, o);
+        m_creature->NearTeleportTo(m_creature->GetHomePosition());
     }
 
-    void UpdateAI(const uint32 lastDiff)
+    void UpdateAI(uint32 const lastDiff) override
     {
-        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!PhaseTwo && m_creature->GetHealthPercent() < 50.0f)
@@ -244,7 +242,7 @@ struct boss_jeklikAI : public ScriptedAI
             {
                 if (!skillStarted)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCREECH) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCREECH) == CAST_OK)
                     {
                         skillStarted   = true;
                         Screech_Timer  = 30000;
@@ -262,7 +260,7 @@ struct boss_jeklikAI : public ScriptedAI
             {
                 if (!skillStarted)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SONICBURST) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SONICBURST) == CAST_OK)
                     {
                         skillStarted     = true;
                         SonicBurst_Timer = urand(20000, 24000);
@@ -278,7 +276,7 @@ struct boss_jeklikAI : public ScriptedAI
             {
                 if (!skillStarted)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SWOOP) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SWOOP) == CAST_OK)
                     {
                         skillStarted   = true;
                         Swoop_Timer    = urand(12000, 15000);
@@ -294,7 +292,7 @@ struct boss_jeklikAI : public ScriptedAI
             {
                 if (!skillStarted)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PIERCEARMOR) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PIERCEARMOR) == CAST_OK)
                     {
                         skillStarted      = true;
                         PierceArmor_Timer = urand(16000, 18000);
@@ -400,16 +398,16 @@ struct mob_batriderAI : public ScriptedAI
 
     uint32 Bomb_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Bomb_Timer = 2000;
     }
 
-    void AttackStart(Unit *pWho)
+    void AttackStart(Unit *pWho) override
     {
     }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
     }
 
@@ -432,14 +430,14 @@ struct mob_batriderAI : public ScriptedAI
     }
 
     // Called when spell hits creature's target
-    virtual void SpellHitTarget(Unit* target, const SpellEntry* spell)
+    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
         // Trigger bomb AoE on the ground
         if (target && spell && spell->Id == SPELL_THROW_LIQUID_FIRE)
             m_creature->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_BOMB, false);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -494,7 +492,7 @@ struct npc_guru_bat_riderAI : public ScriptedAI
     uint32 InfectedBite_Timer;
     uint32 Thrash_Timer;
 
-    void Reset()
+    void Reset() override
     {
         GoingToExplose     = false;
         Despawn_Timer      = 0;
@@ -503,24 +501,24 @@ struct npc_guru_bat_riderAI : public ScriptedAI
         Thrash_Timer       = 6000;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->CastSpell(m_creature, SPELL_DEMORALIZING_SHOUT, false);
         ScriptedAI::Aggro(pWho);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!GoingToExplose && m_creature->GetHealthPercent() < 40.0f)
         {
             GoingToExplose = true;
             if (urand(0, 1))
-                m_creature->MonsterTextEmote("Gurubashi Bat Rider becomes fully engulfed in flames.", NULL, false);
+                m_creature->MonsterTextEmote("Gurubashi Bat Rider becomes fully engulfed in flames.", nullptr, false);
             else
-                m_creature->MonsterTextEmote("Gurubashi Bat Rider gets a crazed look in his eye.", NULL, false);
+                m_creature->MonsterTextEmote("Gurubashi Bat Rider gets a crazed look in his eye.", nullptr, false);
             m_creature->ApplySpellImmune(0, IMMUNITY_MECHANIC, MECHANIC_FEAR, true); // fear immunity
             m_creature->CastSpell(m_creature, SPELL_EXPLOSION, false);
         }
@@ -535,7 +533,7 @@ struct npc_guru_bat_riderAI : public ScriptedAI
 
         if (InfectedBite_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_INFECTED_BITE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_INFECTED_BITE) == CAST_OK)
                 InfectedBite_Timer = 15000;
         }
         else
@@ -543,7 +541,7 @@ struct npc_guru_bat_riderAI : public ScriptedAI
 
         if (Thrash_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THRASH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_THRASH) == CAST_OK)
                 Thrash_Timer = 6000;
         }
         else
@@ -560,7 +558,7 @@ CreatureAI* GetAI_guru_bat_rider(Creature* pCreature)
 
 void AddSC_boss_jeklik()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_jeklik";
     newscript->GetAI = &GetAI_boss_jeklik;

@@ -32,7 +32,7 @@ class MANGOS_DLL_SPEC IdleMovementGenerator : public MovementGenerator
         void Finalize(Unit &) {}
         void Interrupt(Unit &) {}
         void Reset(Unit &);
-        bool Update(Unit &, const uint32 &) { return true; }
+        bool Update(Unit &, uint32 const&) { return true; }
         MovementGeneratorType GetMovementGeneratorType() const { return IDLE_MOTION_TYPE; }
 };
 
@@ -45,9 +45,9 @@ class MANGOS_DLL_SPEC DistractMovementGenerator : public MovementGenerator
 
         void Initialize(Unit& owner);
         void Finalize(Unit& owner);
-        void Interrupt(Unit& );
-        void Reset(Unit& );
-        bool Update(Unit& owner, const uint32& time_diff);
+        void Interrupt(Unit&);
+        void Reset(Unit&);
+        bool Update(Unit& owner, uint32 const& time_diff);
         MovementGeneratorType GetMovementGeneratorType() const { return DISTRACT_MOTION_TYPE; }
 
     private:

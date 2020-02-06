@@ -26,7 +26,7 @@ EndScriptData */
 
 enum
 {
-    EMOTE_GENERIC_FRENZY_KILL   = -1000001,
+    EMOTE_GENERIC_FRENZY_KILL   = 7797,
 
     SPELL_REND                  = 16509,
     SPELL_BACKHAND              = 18103,
@@ -44,28 +44,28 @@ struct boss_theolenkrastinovAI : public ScriptedAI
     uint32 m_uiBackhand_Timer;
     uint32 m_uiFrenzy_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiRend_Timer = 8000;
         m_uiBackhand_Timer = 9000;
         m_uiFrenzy_Timer = 1000;
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
             pInstance->SetData(TYPE_THEOLEN, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Rend_Timer
         if (m_uiRend_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_REND);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_REND);
             m_uiRend_Timer = 10000;
         }
         else
@@ -74,8 +74,8 @@ struct boss_theolenkrastinovAI : public ScriptedAI
         //m_uiBackhand_Timer
         if (m_uiBackhand_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKHAND);
-            DoModifyThreatPercent(m_creature->getVictim(), -100);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACKHAND);
+            DoModifyThreatPercent(m_creature->GetVictim(), -100);
             m_uiBackhand_Timer = 10000;
         }
         else
@@ -107,7 +107,7 @@ CreatureAI* GetAI_boss_theolenkrastinov(Creature* pCreature)
 
 void AddSC_boss_theolenkrastinov()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_doctor_theolen_krastinov";
     newscript->GetAI = &GetAI_boss_theolenkrastinov;

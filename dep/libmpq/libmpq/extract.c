@@ -52,8 +52,8 @@ int32_t libmpq__decompress_huffman(uint8_t *in_buf, uint32_t in_size, uint8_t *o
 	/* TODO: make typdefs of this structs? */
 	/* some common variables. */
 	int32_t tb     = 0;
-	struct huffman_tree_s *ht;
-	struct huffman_input_stream_s *is;
+	struct huffman_tree_s *ht = NULL;
+	struct huffman_input_stream_s *is = NULL;
 
 	/* allocate memory for the huffman tree. */
 	if ((ht = malloc(sizeof(struct huffman_tree_s))) == NULL ||

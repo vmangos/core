@@ -18,11 +18,13 @@
 #ifndef MOVEMENT_SENDER_H
 #define MOVEMENT_SENDER_H
 
-#include "Unit.h"
+#include "Object.h"
+#include "UnitDefines.h"
 
 class Player;
 class Unit;
 class MovementInfo;
+struct PlayerMovementPendingChange;
 
 //!
 //!   movement flag changes for player controlled units:

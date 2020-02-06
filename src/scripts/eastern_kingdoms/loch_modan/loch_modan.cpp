@@ -63,13 +63,13 @@ struct npc_miranAI: public npc_escortAI
 
     uint8 m_uiDwarves;
 
-    void Reset()
+    void Reset() override
     {
         if (!HasEscortState(STATE_ESCORT_ESCORTING))
             m_uiDwarves = 0;
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -86,7 +86,7 @@ struct npc_miranAI: public npc_escortAI
         }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_DARK_IRON_DWARF)
         {
@@ -96,7 +96,7 @@ struct npc_miranAI: public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_DARK_IRON_DWARF)
         {
@@ -108,7 +108,7 @@ struct npc_miranAI: public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_miran(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_miran(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_PROTECTING_THE_SHIPMENT)
     {
@@ -159,28 +159,28 @@ struct npc_saeanAI : public ScriptedAI
     npc_saeanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         // zero init required to prevent crash
-        for (ptrdiff_t i = 0; i < 2; ++i)
-            m_darkIronAmbusher[i] = nullptr;
+        for (auto& i : m_darkIronAmbusher)
+            i = nullptr;
         m_numSummonedAmbushers = 0;
 
         m_eventStarted = false;
     }
 
-    void Reset() { }
+    void Reset() override { }
 
     // called when Saean summons his guards
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         // optimization: safely assume, that m_numSummonedAmbushers don't go outside range
         m_darkIronAmbusher[m_numSummonedAmbushers] = pSummoned;
         ++m_numSummonedAmbushers;
     }
 
-    void JustDied(Unit* pVictim)
+    void JustDied(Unit* pVictim) override
     {
         // It is safe to forget about ambushers, they will despawn automatically.
-        for (ptrdiff_t i = 0; i < 2; ++i)
-            m_darkIronAmbusher[i] = nullptr;
+        for (auto& i : m_darkIronAmbusher)
+            i = nullptr;
         m_numSummonedAmbushers = 0;
 
         m_eventStarted = false;
@@ -197,7 +197,7 @@ CreatureAI* GetAI_npc_saean(Creature* pCreature)
 bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
 {
     // If player is dead, GM mode is ON, quest complete or no quest
-    if (!pPlayer->isAlive() || pPlayer->IsGameMaster() ||
+    if (!pPlayer->IsAlive() || pPlayer->IsGameMaster() ||
         pPlayer->GetQuestStatus(QUEST_RESUPPLYING_THE_EXCAVATION) == QUEST_STATUS_COMPLETE ||
         pPlayer->GetQuestStatus(QUEST_RESUPPLYING_THE_EXCAVATION) == QUEST_STATUS_NONE)
     return false;
@@ -212,7 +212,7 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     Creature* huldar = GetClosestCreatureWithEntry(pPlayer, NPC_HULDAR, 60.0f);
     if (huldar)
     {
-        if (!huldar->isAlive())
+        if (!huldar->IsAlive())
             return false;
     }
     else
@@ -222,7 +222,7 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
     Creature* miran = GetClosestCreatureWithEntry(pPlayer, NPC_MIRAN, 60.0f);
     if (miran)
     {
-        if (!miran->isAlive())
+        if (!miran->IsAlive())
             return false;
         else
         {
@@ -241,14 +241,14 @@ bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*
 
     
     // minor optimization: Quest NPCs are already in combat with someone, so skip further checks.
-    if (miran->isInCombat() || huldar->isInCombat())
+    if (miran->IsInCombat() || huldar->IsInCombat())
         return true;
     
     // Check if Saean is available.
     Creature* saean = GetClosestCreatureWithEntry(pPlayer, NPC_SAEAN, 60.0f);
     if (saean)
     {
-        if (saean->isAlive())
+        if (saean->IsAlive())
         {
             npc_saeanAI* saeanAI = dynamic_cast<npc_saeanAI*>(saean->AI());
             if (saeanAI)

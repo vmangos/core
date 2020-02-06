@@ -28,8 +28,8 @@ namespace Movement
     {
         Location() : orientation(0) {}
         Location(float x, float y, float z, float o) : Vector3(x, y, z), orientation(o) {}
-        Location(const Vector3& v) : Vector3(v), orientation(0) {}
-        Location(const Vector3& v, float o) : Vector3(v), orientation(o) {}
+        Location(Vector3 const& v) : Vector3(v), orientation(0) {}
+        Location(Vector3 const& v, float o) : Vector3(v), orientation(o) {}
 
         float orientation;
     };
@@ -63,9 +63,9 @@ namespace Movement
             int32           point_Idx;
             int32           last_point_sent_Idx;
             int32           point_Idx_offset;
-            const char*     mvtOrigin; // For debug purposes
+            char const*     mvtOrigin; // For debug purposes
 
-            void init_spline(const MoveSplineInitArgs& args);
+            void init_spline(MoveSplineInitArgs const& args);
             UpdateResult _updateState(int32& ms_time_diff);
 
         public:
@@ -84,7 +84,7 @@ namespace Movement
             void _Finalize();
             void _Interrupt() { splineflags.done = true;}
 
-            void Initialize(const MoveSplineInitArgs&);
+            void Initialize(MoveSplineInitArgs const&);
             bool Initialized() const { return !spline.empty();}
 
             explicit MoveSpline();
@@ -110,11 +110,11 @@ namespace Movement
             uint32 GetId() const { return m_Id;}
             bool Finalized() const { return splineflags.done; }
             bool isCyclic() const { return splineflags.cyclic;}
-            const Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last()) : Vector3();}
-            const Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1) : Vector3();}
-            const Vector3 PreviousDestination() const { return Initialized() ? spline.getPoint(point_Idx) : Vector3(); }
-            const Vector3 GetPoint(uint32 idx) const { return spline.getPoint(idx); }
-            const uint32 CountSplinePoints() const { return spline.last(); }
+            Vector3 FinalDestination() const { return Initialized() ? spline.getPoint(spline.last()) : Vector3();}
+            Vector3 CurrentDestination() const { return Initialized() ? spline.getPoint(point_Idx + 1) : Vector3();}
+            Vector3 PreviousDestination() const { return Initialized() ? spline.getPoint(point_Idx) : Vector3(); }
+            Vector3 GetPoint(uint32 idx) const { return spline.getPoint(idx); }
+            uint32 CountSplinePoints() const { return spline.last(); }
             int32 currentPathIdx() const;
             int32 getLastPointSent() const { return last_point_sent_Idx; }
             void setLastPointSent(int i) { last_point_sent_Idx = i; }
@@ -123,8 +123,8 @@ namespace Movement
             int32 Duration(int first, int last) const { return spline.length(first, last);}
 
             std::string ToString() const;
-            const char* GetMovementOrigin() const { return mvtOrigin; }
-            void SetMovementOrigin(const char* m) { mvtOrigin = m; }
+            char const* GetMovementOrigin() const { return mvtOrigin; }
+            void SetMovementOrigin(char const* m) { mvtOrigin = m; }
     };
 }
 #endif // MANGOSSERVER_MOVEPLINE_H

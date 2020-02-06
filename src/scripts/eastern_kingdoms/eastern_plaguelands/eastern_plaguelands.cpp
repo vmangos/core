@@ -43,7 +43,7 @@ struct npc_darrowshire_spiritAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         DoCastSpellIfCan(m_creature, SPELL_SPIRIT_SPAWNIN);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -69,10 +69,10 @@ bool GossipHello_npc_darrowshire_spirit(Player* pPlayer, Creature* pCreature)
 
 bool GossipHello_npc_tirion_fordring(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
-    if (pPlayer->GetQuestStatus(5742) == QUEST_STATUS_INCOMPLETE && pPlayer->getStandState() == UNIT_STAND_STATE_SIT)
+    if (pPlayer->GetQuestStatus(5742) == QUEST_STATUS_INCOMPLETE && pPlayer->GetStandState() == UNIT_STAND_STATE_SIT)
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I am ready to hear your tale, Tirion.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
@@ -214,7 +214,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         return me->GetMap()->GetPlayer(JoueurGUID);
     }
 
-    void Reset()
+    void Reset() override
     {
         Vague = 0;
         VillageoisMorts = 0;
@@ -230,18 +230,15 @@ struct npc_eris_havenfireAI : public ScriptedAI
             TimerArcher[i] = 5000;
             ArchersGUIDs[i] = 0;
         }
-        for (int i = 0; i < 50; i++)
-            VillageoisGUIDs[i] = 0;
+        for (uint64 & guid : VillageoisGUIDs)
+            guid = 0;
     }
 
-    void AttackedBy(Unit* Attacker)
-    {
-        return;
-    }
+    void AttackedBy(Unit* /*Attacker*/) override {}
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
-        if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && CleanerSpawn == false && BeginQuete == true)
+        if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && !CleanerSpawn && BeginQuete)
         {
             if (who->GetGUID() != JoueurGUID || who->IsPet())
             {   
@@ -276,22 +273,22 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 Creature* curr = tmpMobsList.front();
                 tmpMobsList.pop_front();
 
-                if (curr->isAlive())
+                if (curr->IsAlive())
                     summoned->AddThreat(curr, float(urand(100, 200)));
             }
         }
         if (Player* player = GetPlayer())
-            if (player->isAlive())
+            if (player->IsAlive())
             {
                 summoned->AddThreat(player, 50.0f);
                 if ((rand() % 4) > 0)
                 {
-                    if (Unit* victim = summoned->getVictim())
+                    if (Unit* victim = summoned->GetVictim())
                         summoned->SendMeleeAttackStop(victim);
                     summoned->AddThreat(player, 200.0f);
                     summoned->GetMotionMaster()->Clear(false);
                     summoned->GetMotionMaster()->MoveChase(player);
-                    if (Unit* victim = summoned->getVictim())
+                    if (Unit* victim = summoned->GetVictim())
                         summoned->SendMeleeAttackStart(victim);
                 }
             }
@@ -317,24 +314,16 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 Creature* curr = tmpMobsList.front();
                 tmpMobsList.pop_front();
 
-                if (curr->isAlive())
+                if (curr->IsAlive())
                     curr->ForcedDespawn();
             }
         }
         mobsEntries.clear();
     }
 
-    void JustSummoned(Creature* summoned)
+    void JustSummoned(Creature* summoned) override
     {
-        float X = 0.0f;
-        float Y = 0.0f;
-        float Z = 0.0f;
         int Var = 0;
-        int var = 0;
-        uint64 GUIDs[50];
-
-        for (int i = 0; i < 50; i++)
-            GUIDs[i] = 0;
 
         switch (summoned->GetEntry())
         {
@@ -346,7 +335,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 ArchersGUIDs[Var] = summoned->GetGUID();
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                summoned->addUnitState(UNIT_STAT_ROOT);
+                summoned->AddUnitState(UNIT_STAT_ROOT);
                 break;
             case NPC_GUERRIER:
                 SetAttackOnPeasantOrPlayer(summoned);
@@ -362,13 +351,13 @@ struct npc_eris_havenfireAI : public ScriptedAI
                     VillageoisGUIDs[Var] = summoned->GetGUID();
 
                 if (Player* player = GetPlayer())
-                    summoned->setFaction(player->getFaction());
+                    summoned->SetFactionTemplateId(player->GetFactionTemplateId());
                 summoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 break;
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId) override
     {
         if (uiMotionType != POINT_MOTION_TYPE || !pSummoned)
             return;
@@ -407,7 +396,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (!pSummoned)
             return;
@@ -469,8 +458,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
             TimerArcher[i] = 5000;
             ArchersGUIDs[i] = 0;
         }
-        for (int i = 0; i < 50; i++)
-            VillageoisGUIDs[i] = 0;
+        for (uint64 & guid : VillageoisGUIDs)
+            guid = 0;
 
         for (int i = ArcherPop0; i < Fin; i++)
             m_creature->SummonCreature(NPC_ARCHER, ErisHavenfireEvent[i].X, ErisHavenfireEvent[i].Y, ErisHavenfireEvent[i].Z, ErisHavenfireEvent[i].O, TEMPSUMMON_DEAD_DESPAWN, 0);
@@ -492,13 +481,13 @@ struct npc_eris_havenfireAI : public ScriptedAI
             float X = 0.0f;
             float Y = 0.0f;
             float Z = 0.0f;
-            if (Paysants == true)
+            if (Paysants)
             {
                 Entry = i >= Rand ? NPC_PAYSANT_0 : NPC_PAYSANT_1;
                 m_creature->GetRandomPoint(ErisHavenfireEvent[PaysantsSpawn].X, ErisHavenfireEvent[PaysantsSpawn].Y, ErisHavenfireEvent[PaysantsSpawn].Z, 6.0f, X, Y, Z);
                 if (Creature* Cre = m_creature->SummonCreature(Entry, X, Y, Z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
                 {
-                    if (Yell == false)
+                    if (!Yell)
                     {
                         ++Vague;
                         Yell = true;
@@ -531,11 +520,11 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
     int GenererVagueNombre(bool Paysants)
     {
-        if (Vague > 4 && Paysants == true)
+        if (Vague > 4 && Paysants)
             return 0;
 
         int Nombre = 0;
-        if (Paysants == true)
+        if (Paysants)
         {
             Nombre = 12;
             if (Vague == 3)
@@ -577,17 +566,17 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
         uint32 myArea = m_creature->GetAreaId();
-        if (!pl.isEmpty() && myArea && BeginQuete == true)
+        if (!pl.isEmpty() && myArea && BeginQuete)
         {
-            for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
+            for (const auto& it : pl)
             {
-                Player* currPlayer =  it->getSource();
+                Player* currPlayer =  it.getSource();
                 if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
                 {
                     if (currPlayer->IsGameMaster())
                         continue;
 
-                    if (currPlayer->isAlive() && questPlayer != currPlayer)
+                    if (currPlayer->IsAlive() && questPlayer != currPlayer)
                         return true;
                 }
             }
@@ -601,7 +590,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
     {
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
         uint32 myArea = m_creature->GetAreaId();
-        if (!pl.isEmpty() && myArea && CleanerSpawn == false)
+        if (!pl.isEmpty() && myArea && !CleanerSpawn)
         {
             if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
             {
@@ -610,20 +599,20 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 Player* player = GetPlayer();
                 EchecEvent(player, false);
 
-                for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
+                for (const auto& it : pl)
                 {
-                    Player* currPlayer =  it->getSource();
+                    Player* currPlayer =  it.getSource();
                     if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
-                        if (player && player != currPlayer && currPlayer->isAlive() && !currPlayer->IsGameMaster())
+                        if (player && player != currPlayer && currPlayer->IsAlive() && !currPlayer->IsGameMaster())
                             Crea->AddThreat(currPlayer, 1000.0f);
                 }
             }
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (BeginQuete == false || CleanerSpawn == true)
+        if (!BeginQuete || CleanerSpawn)
             return;
 
         if (IsPlayerInterfering())
@@ -679,15 +668,15 @@ struct npc_eris_havenfireAI : public ScriptedAI
                         int Damage = urand(50, 100);
                         uint64 GUIDs[50];
 
-                        for (int j = 0; j < 50; j++)
-                            GUIDs[j] = 0;
+                        for (uint64 & guid : GUIDs)
+                            guid = 0;
 
                         while (Var < 50)
                         {
                             if (VillageoisGUIDs[Var])
                             {
                                 Unit* Villagois = m_creature->GetMap()->GetCreature(VillageoisGUIDs[Var]);
-                                if (Villagois && Villagois->isAlive())
+                                if (Villagois && Villagois->IsAlive())
                                 {
                                     GUIDs[var] = VillageoisGUIDs[Var];
                                     ++var;
@@ -701,7 +690,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
                         Unit* Target = m_creature->GetMap()->GetCreature(GUIDs[urand(0, var - 1)]);
                         if (Target)
-                            Crea->CastCustomSpell(Target, SPELL_TIR_FLECHE, &Damage, NULL, NULL, true);
+                            Crea->CastCustomSpell(Target, SPELL_TIR_FLECHE, &Damage, nullptr, nullptr, true);
                         TimerArcher[i] = urand(3000, 4400);
                     }
                 }
@@ -711,7 +700,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
     }
 };
 
-bool QuestAccept_npc_eris_havenfire(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_eris_havenfire(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (!pPlayer || !pCreature || !pQuest)
         return true;
@@ -744,7 +733,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
     uint32 m_uiSayPeasantTimer;
 
-    void Reset()
+    void Reset() override
     {
         if (X == 0.0f && Y == 0.0f && Z == 0.0f)
             m_creature->GetRandomPoint(ErisHavenfireEvent[PaysantsDest].X, ErisHavenfireEvent[PaysantsDest].Y, ErisHavenfireEvent[PaysantsDest].Z, 5.0f, X, Y, Z);
@@ -760,18 +749,18 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         m_uiSayPeasantTimer = urand(10000, 30000);
     }
 
-    void KilledUnit(Unit* victim)
+    void KilledUnit(Unit* victim) override
     {
     }
 
 
-    void DamageTaken(Unit *done_by, uint32 &damage)
+    void DamageTaken(Unit *done_by, uint32 &damage) override
     {
         if (done_by->GetEntry() == NPC_ARCHER)
             damage = urand(80, 105);
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_TIR_FLECHE)
         {
@@ -786,7 +775,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
             if (npc_eris_havenfireAI* pErisEventAI = dynamic_cast<npc_eris_havenfireAI*>(eris->AI()))
             {
-                if (pCaster->GetGUID() != pErisEventAI->JoueurGUID && pErisEventAI->BeginQuete == true && pErisEventAI->CleanerSpawn == false)
+                if (pCaster->GetGUID() != pErisEventAI->JoueurGUID && pErisEventAI->BeginQuete && !pErisEventAI->CleanerSpawn)
                 {
                     if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
                     {
@@ -800,11 +789,11 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -820,9 +809,9 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (DeplacementRequis == true)
+        if (DeplacementRequis)
         {
             float Vitesse = m_creature->GetEntry() == NPC_PAYSANT_0 ? 1.0f : 1.7f;
             m_creature->SetWalk(true);
@@ -879,7 +868,7 @@ struct npc_demetriaAI : public ScriptedAI
         Reset();
     }
     uint64 guidScarletTrooper[9];
-    void MovementInform(uint32 movementType, uint32 moveId)
+    void MovementInform(uint32 movementType, uint32 moveId) override
     {
         if (movementType != WAYPOINT_MOTION_TYPE)
             return;
@@ -912,15 +901,15 @@ struct npc_demetriaAI : public ScriptedAI
             m_creature->ForcedDespawn();
         }
     }
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         DespawnTroopers();
     }
     void DespawnTroopers()
     {
-        for (int i = 0; i < 9; i++)
+        for (uint64 guid : guidScarletTrooper)
         {
-            if (Creature* pTrooper = m_creature->GetMap()->GetCreature(guidScarletTrooper[i]))
+            if (Creature* pTrooper = m_creature->GetMap()->GetCreature(guid))
                 pTrooper->AddObjectToRemoveList();
         }
     }
@@ -933,27 +922,27 @@ struct npc_demetriaAI : public ScriptedAI
     uint32 Resurrect_Timer;
     uint8  PsychicScream_HealthCheck;
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (Resurrect_Timer < diff)
         {
             if (Creature* deadTrooper = m_creature->FindNearestCreature(NPC_SCARLET_TROOPER, 40.0f, false))
             {
-                DoRessurectUnit(deadTrooper, m_creature->getVictim());
+                DoRessurectUnit(deadTrooper, m_creature->GetVictim());
                 Resurrect_Timer = 10000;
             }
         }
         else
             Resurrect_Timer -= diff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (!(m_creature->GetSpellAuraHolder(SPELL_SHADOWFORM)))
             DoCastSpellIfCan(m_creature, SPELL_SHADOWFORM);
         if (MindBlast_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_BLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_BLAST) == CAST_OK)
                 MindBlast_Timer = urand(4000, 5000);
         }
         else
@@ -996,7 +985,7 @@ struct npc_demetriaAI : public ScriptedAI
             }
             else
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISPELL_MAGIC2) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISPELL_MAGIC2) == CAST_OK)
                     DispelMagic_Timer = 6000;
             }
         }
@@ -1010,7 +999,7 @@ struct npc_demetriaAI : public ScriptedAI
         }
         DoMeleeAttackIfReady();
     }
-    void Reset()
+    void Reset() override
     {
         MindBlast_Timer = 3000;
         ShadowWordPain_Timer = 9000;
@@ -1141,17 +1130,17 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
     ObjectGuid davilGuid;
     ObjectGuid horgusGuid;
 
-    void Reset()
+    void Reset() override
     {
         // Changement de faction nécessaire pour permettre l'aggro à vue
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
         uint32 myArea = m_creature->GetAreaId();
         if (!pl.isEmpty() && myArea)
         {
-            for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
+            for (const auto& it : pl)
             {
-                Player* pPlayer =  it->getSource();
-                if (pPlayer && pPlayer->isAlive() && !pPlayer->IsGameMaster() && m_creature->IsWithinDist(pPlayer, 20.0f, false))
+                Player* pPlayer =  it.getSource();
+                if (pPlayer && pPlayer->IsAlive() && !pPlayer->IsGameMaster() && m_creature->IsWithinDist(pPlayer, 20.0f, false))
                 {
                     if (pPlayer->GetQuestStatus(QUEST_BATTLE_DARROWSHIRE) == QUEST_STATUS_INCOMPLETE)
                     {
@@ -1175,7 +1164,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
 
     bool _cleanupDone;
     bool _initialized;
-    void OnRemoveFromWorld()
+    void OnRemoveFromWorld() override
     {
         if (_cleanupDone || !_initialized)
             return;
@@ -1190,13 +1179,13 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
     void DespawnAll()
     {
         _cleanupDone = true;
-        for (int i = 0; i < 7; i++)
-            MobTimer[i] = 0;
+        for (uint32 & i : MobTimer)
+            i = 0;
         PhaseTimer = 0;
 
-        for (std::list<ObjectGuid>::const_iterator itr = summonedMobsList.begin(); itr != summonedMobsList.end(); ++itr)
-            if (Creature* creature = m_creature->GetMap()->GetCreature(*itr))
-                if (creature->isAlive() && creature->GetEntry() != NPC_JOSEPH_REDPATH && creature->GetEntry() != NPC_DAVIL_CROKFORD)
+        for (const auto& guid : summonedMobsList)
+            if (Creature* creature = m_creature->GetMap()->GetCreature(guid))
+                if (creature->IsAlive() && creature->GetEntry() != NPC_JOSEPH_REDPATH && creature->GetEntry() != NPC_DAVIL_CROKFORD)
                     creature->ForcedDespawn(5000);
 
         summonedMobsList.clear();
@@ -1209,7 +1198,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         m_creature->DeleteLater();
     }
 
-    void JustSummoned(Creature* summoned)
+    void JustSummoned(Creature* summoned) override
     {
         if (!summoned)
             return;
@@ -1221,7 +1210,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
             case NPC_DARROWSHIRE_DEFENDER:
             case NPC_SILVERHAND_DISCIPLE:
             case NPC_REDPATH_MILITIA:
-                summoned->setFaction(DefenderFaction);
+                summoned->SetFactionTemplateId(DefenderFaction);
             // no break
             case NPC_MARAUDING_CORPSE:
             case NPC_MARAUDING_SKELETON:
@@ -1235,7 +1224,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                 break;
             case NPC_DAVIL_LIGHTFIRE:
             case NPC_CAPTAIN_REDPATH:
-                summoned->setFaction(DefenderFaction);
+                summoned->SetFactionTemplateId(DefenderFaction);
                 summoned->SetWalk(false);
                 summoned->SetHomePosition(DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, DarrowshireEvent[4].O);
                 summoned->GetMotionMaster()->MovePoint(2, DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, MOVE_PATHFINDING, 5.0f);
@@ -1249,7 +1238,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         }
     }
 
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId) override
     {
         if (uiMotionType != POINT_MOTION_TYPE || !pSummoned)
             return;
@@ -1294,7 +1283,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (!pSummoned)
             return;
@@ -1345,7 +1334,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!_initialized)
         {
@@ -1495,14 +1484,14 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                     }
                     case 6: // gestion patrouille NPC_DAVIL_LIGHTFIRE NPC_BLOODLETTER NPC_CAPTAIN_REDPATH
                     {
-                        for (std::list<ObjectGuid>::const_iterator itr = summonedMobsList.begin(); itr != summonedMobsList.end(); ++itr)
+                        for (const auto& guid : summonedMobsList)
                         {
-                            if (Creature* Crea = m_creature->GetMap()->GetCreature(*itr))
+                            if (Creature* Crea = m_creature->GetMap()->GetCreature(guid))
                             {
                                 if (Crea->GetEntry() != NPC_BLOODLETTER && Crea->GetEntry() != NPC_DAVIL_LIGHTFIRE && Crea->GetEntry() != NPC_CAPTAIN_REDPATH)
                                     continue;
 
-                                if (Crea->isAlive() && !Crea->isInCombat() && Crea->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
+                                if (Crea->IsAlive() && !Crea->IsInCombat() && Crea->GetMotionMaster()->GetCurrentMovementGeneratorType() != POINT_MOTION_TYPE)
                                 {
                                     int point = 0;
                                     int Rand = 0;
@@ -1621,7 +1610,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                         {
                             PhaseStep = 5;
                             PhaseTimer = 0;
-                            marduk->DealDamage(redpath, redpath->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                            marduk->DealDamage(redpath, redpath->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                             if (Creature* redpathCorrupted = m_creature->SummonCreature(NPC_REDPATH_THE_CORRUPTED, redpath->GetPositionX(), redpath->GetPositionY(), redpath->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                             {
                                 DoScriptText(SAY_REDPATH_CORRUPTED, redpathCorrupted);
@@ -1689,7 +1678,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
     uint32 EventStep;
     uint32 EventTimer;
 
-    void Reset()
+    void Reset() override
     {
     }
 
@@ -1703,7 +1692,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
         }
     }
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -1750,7 +1739,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (EventTimer && EventTimer <= uiDiff)
         {
@@ -1867,7 +1856,7 @@ bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpe
 
 void AddSC_eastern_plaguelands()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_darrowshire_spirit";

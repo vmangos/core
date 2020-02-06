@@ -72,10 +72,10 @@ public:
         }
 
         invader->SetHomePosition(x, y, z, frand(0, 2 * M_PI_F));
-        invader->SetRespawnRadius(30.f);
+        invader->SetWanderDistance(30.f);
         invader->SetDefaultMovementType(RANDOM_MOTION_TYPE);
 
-        if (!invader->isInCombat())
+        if (!invader->IsInCombat())
         {
             invader->GetMotionMaster()->Clear(false, true);
             invader->GetMotionMaster()->MoveRandom(true, 30.0f);
@@ -85,7 +85,7 @@ public:
         return true;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiIncreaseTimer > uiDiff)
             m_uiIncreaseTimer -= uiDiff;
@@ -204,9 +204,9 @@ struct npc_invaderAI : ScriptedAI
         sObjectMgr.SetSavedVariable(InvasionData[m_uiEventIndex].varDeadInvaders, deadInvaders, true);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         switch (m_uiEventIndex)
@@ -222,7 +222,7 @@ struct npc_invaderAI : ScriptedAI
 
             if (m_uiBlastWaveTimer < uiDiff)
             {
-                auto pVictim = m_creature->getVictim();
+                auto pVictim = m_creature->GetVictim();
 
                 if (pVictim && m_creature->IsInRange(pVictim, 0.0f, 10.0f))
                     if (DoCastSpellIfCan(m_creature, SPELL_BLAST_WAVE) == CAST_OK)
@@ -243,7 +243,7 @@ struct npc_invaderAI : ScriptedAI
 
             if (m_uiWhirlwindTimer < uiDiff)
             {
-                auto pVictim = m_creature->getVictim();
+                auto pVictim = m_creature->GetVictim();
 
                 if (pVictim && m_creature->IsInRange(pVictim, 0.0f, 8.0f))
                     if (DoCastSpellIfCan(m_creature, SPELL_WHIRLWIND) == CAST_OK)
@@ -256,7 +256,7 @@ struct npc_invaderAI : ScriptedAI
         case EVENT_IND_EARTH:
             if (m_uiKnockdownTimer < uiDiff)
             {
-                auto pVictim = m_creature->getVictim();
+                auto pVictim = m_creature->GetVictim();
 
                 if (pVictim && m_creature->IsInRange(pVictim, 0.0f, 5.0f))
                     if (DoCastSpellIfCan(pVictim, SPELL_KNOCKDOWN) == CAST_OK)
@@ -267,7 +267,7 @@ struct npc_invaderAI : ScriptedAI
 
             if (m_uiShockTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_EARTH_SHOCK) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_EARTH_SHOCK) == CAST_OK)
                     m_uiShockTimer = urand(9000, 13000);
             }
             else
@@ -277,7 +277,7 @@ struct npc_invaderAI : ScriptedAI
         case EVENT_IND_WATER:
             if (m_uiChilledTimer < uiDiff)
             {
-                auto pVictim = m_creature->getVictim();
+                auto pVictim = m_creature->GetVictim();
 
                 if (pVictim && m_creature->IsInRange(pVictim, 0.0f, 5.0f))
                     if (DoCastSpellIfCan(pVictim, SPELL_CHILLED) == CAST_OK)
@@ -288,7 +288,7 @@ struct npc_invaderAI : ScriptedAI
 
             if (m_uiShockTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_SHOCK) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROST_SHOCK) == CAST_OK)
                     m_uiShockTimer = urand(8000, 15000);
             }
             else

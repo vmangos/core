@@ -55,6 +55,7 @@ set (game_SRCS
     AI/CreatureAISelector.cpp
     AI/CreatureEventAI.cpp
     AI/CreatureEventAIMgr.cpp
+    AI/CritterAI.cpp
     AI/GenericSpellAI.cpp
     AI/GuardAI.cpp
     AI/GuardEventAI.cpp
@@ -93,6 +94,9 @@ set (game_SRCS
     Chat/ChannelMgr.cpp
     Chat/Chat.cpp
     Chat/AsyncCommandHandlers.cpp
+    Chat/AbstractPlayer.cpp
+    Chat/MasterPlayer.cpp
+    Chat/MasterPlayerChat.cpp
     CinematicStuff/CinematicStuff.cpp
     CinematicStuff/CinematicStuff.h
     Commands/AccountCommands.cpp
@@ -144,20 +148,6 @@ set (game_SRCS
     LFG/LFGMgr.cpp
     Mail/Mail.cpp
     Mail/MassMailMgr.cpp
-    MapNodes/AbstractPlayer.cpp
-    MapNodes/GMCommands.cpp
-    MapNodes/MapSocket.cpp
-    MapNodes/MapSocketMgr.cpp
-    MapNodes/MasterPlayer.cpp
-    MapNodes/MasterPlayerChat.cpp
-    MapNodes/NodeSession.cpp
-    MapNodes/NodesMgr.cpp
-    MapNodes/NodesOpcodes.cpp
-    MapNodes/Handlers/GuidsSynchronization.cpp
-    MapNodes/Handlers/Protocol.cpp
-    MapNodes/Handlers/SessionTransfert.cpp
-    MapNodes/Serializers/ItemSerializer.cpp
-    MapNodes/Serializers/PlayerSerializer.cpp
     Maps/GridMap.cpp
     Maps/GridNotifiers.cpp
     Maps/GridSearchers.cpp
@@ -166,6 +156,7 @@ set (game_SRCS
     Maps/Map.cpp
     Maps/MapManager.cpp
     Maps/MapPersistentStateMgr.cpp
+    Maps/MapReference.cpp
     Maps/MoveMap.cpp
     Maps/PathFinder.cpp
     Maps/ScriptCommands.cpp
@@ -275,6 +266,7 @@ set (game_SRCS
     AI/CreatureAISelector.h
     AI/CreatureEventAI.h
     AI/CreatureEventAIMgr.h
+    AI/CritterAI.h
     AI/GameObjectAI.h
     AI/GuardAI.h
     AI/GuardEventAI.h
@@ -287,7 +279,6 @@ set (game_SRCS
     AI/ScriptedEscortAI.h
     AI/ScriptedFollowerAI.h
     AI/ScriptedGameObject.h
-    AI/ScriptedGossip.h
     AI/ScriptedInstance.h
     AI/ScriptedPetAI.h
     AI/TotemAI.h
@@ -305,6 +296,8 @@ set (game_SRCS
     Chat/ChannelMgr.h
     Chat/Chat.h
     Chat/AsyncCommandHandlers.h
+    Chat/AbstractPlayer.h
+    Chat/MasterPlayer.h
     Commands/Nostalrius.h
     Database/CharacterDatabaseCache.h
     Database/CharacterDatabaseCleaner.h
@@ -325,20 +318,11 @@ set (game_SRCS
     LFG/LFGMgr.h
     Mail/Mail.h
     Mail/MassMailMgr.h
-    MapNodes/AbstractPlayer.h
-    MapNodes/MapSocket.h
-    MapNodes/MapSocketMgr.h
-    MapNodes/MasterPlayer.h
-    MapNodes/NodeSession.h
-    MapNodes/NodesMgr.h
-    MapNodes/NodesOpcodes.h
-    MapNodes/Serializers/ItemSerializer.h
-    MapNodes/Serializers/PlayerSerializer.h
-    MapNodes/Serializers/Serializer.h
     Maps/Cell.h
     Maps/CellImpl.h
     Maps/GridDefines.h
     Maps/GridMap.h
+    Maps/GridMapDefines.h
     Maps/GridNotifiers.h
     Maps/GridNotifiersImpl.h
     Maps/GridSearchers.h
@@ -348,7 +332,6 @@ set (game_SRCS
     Maps/MapManager.h
     Maps/MapPersistentStateMgr.h
     Maps/MapReference.h
-    Maps/MapReferenceImpl.h
     Maps/MapRefManager.h
     Maps/MoveMap.h
     Maps/MoveMapSharedDefines.h
@@ -394,6 +377,7 @@ set (game_SRCS
     Objects/TemporarySummon.h
     Objects/Totem.h
     Objects/Unit.h
+    Objects/UnitDefines.h
     Objects/UpdateData.h
     Objects/UpdateFields.h
     Objects/UpdateMask.h
@@ -410,6 +394,7 @@ set (game_SRCS
     Spells/SpellAuraDefines.h
     Spells/SpellAuras.h
     Spells/SpellClassMask.h
+    Spells/SpellDefines.h
     Spells/SpellEntry.h
     Spells/SpellMgr.h
     Spells/SpellModMgr.h
@@ -437,8 +422,12 @@ set (game_SRCS
 
 if(WIN32)
   #allow exceptions in destructors
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:implicitNoexcept-")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
+  if(MSVC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Zc:implicitNoexcept-")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /D__ACE_INLINE__")
+  elseif(MINGW)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+  endif()
 endif()
 
 # Used in game ScriptMgr
@@ -487,9 +476,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Handlers
   ${CMAKE_CURRENT_SOURCE_DIR}/LFG
   ${CMAKE_CURRENT_SOURCE_DIR}/Mail
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes/Handlers
-  ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes/Serializers
   ${CMAKE_CURRENT_SOURCE_DIR}/Maps
   ${CMAKE_CURRENT_SOURCE_DIR}/Maps/Pool
   ${CMAKE_CURRENT_SOURCE_DIR}/Movement
@@ -575,7 +561,7 @@ SET_TARGET_PROPERTIES (game PROPERTIES FOLDER "Game Libs")
 
 target_link_libraries(game
   shared
-  detour
+  Detour
 )
 
 #add_dependencies(game revision.h)

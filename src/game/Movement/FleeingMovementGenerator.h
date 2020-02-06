@@ -32,10 +32,10 @@ class MANGOS_DLL_SPEC FleeingMovementGenerator : public MovementGeneratorMedium<
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
-        bool Update(T &, const uint32 &);
+        bool Update(T &, uint32 const&);
 
         void unitSpeedChanged() override { _forceUpdate = true; }
-        MovementGeneratorType GetMovementGeneratorType() const { return FLEEING_MOTION_TYPE; }
+        MovementGeneratorType GetMovementGeneratorType() const override { return FLEEING_MOTION_TYPE; }
 
     protected:
         bool _forceWalking;
@@ -56,8 +56,8 @@ class MANGOS_DLL_SPEC TimedFleeingMovementGenerator : public FleeingMovementGene
             FleeingMovementGenerator<Creature>(fright),
             i_totalFleeTime(time) {}
 
-        MovementGeneratorType GetMovementGeneratorType() const { return TIMED_FLEEING_MOTION_TYPE; }
-        bool Update(Unit &, const uint32 &);
+        MovementGeneratorType GetMovementGeneratorType() const override { return TIMED_FLEEING_MOTION_TYPE; }
+        bool Update(Unit &, uint32 const&);
         void Initialize(Unit &);
         void Finalize(Unit &);
 

@@ -28,7 +28,7 @@ enum
 
 void Handle_NightmareCorruption(/*const*/ Player* player)
 {
-    if (player->isDead() || player->GetQuestStatus(QUEST_NIGHTMARE_CORRUPTION) != QUEST_STATUS_INCOMPLETE)
+    if (player->IsDead() || player->GetQuestStatus(QUEST_NIGHTMARE_CORRUPTION) != QUEST_STATUS_INCOMPLETE)
     {
         return;
     }
@@ -54,7 +54,7 @@ void Handle_NightmareCorruption(/*const*/ Player* player)
     corrupter->MonsterWhisper(message, player);
 }
 
-bool AreaTrigger_at_twilight_grove(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_twilight_grove(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     Handle_NightmareCorruption(pPlayer);
     return false;
@@ -84,8 +84,8 @@ struct npc_twilight_corrupterAI : ScriptedAI
         CoNPlayerAggro  = 0;
         bEngaged        = false;
 
-        for (int i = 0; i < 40; i++)
-            GUIDs[i] = 0;
+        for (uint64 & guid : GUIDs)
+            guid = 0;
     }
 
     void Aggro(Unit* /*pWho*/) override
@@ -99,24 +99,24 @@ struct npc_twilight_corrupterAI : ScriptedAI
 
     void FillPlayerList()
     {
-        for (int i = 0; i < 40; i++)
-            GUIDs[i] = 0;
+        for (uint64 & guid : GUIDs)
+            guid = 0;
 
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-        for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+        ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+        for (const auto i : tList)
         {
-            Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+            Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
 
             if (pUnit && pUnit->IsPlayer())
-                for (int i = 0; i < 40; i++)
-                    if (GUIDs[i] == 0)
-                        GUIDs[i] = pUnit->GetGUID();
+                for (uint64 & guid : GUIDs)
+                    if (guid == 0)
+                        guid = pUnit->GetGUID();
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSoulCorruptionTimer < uiDiff)
@@ -133,8 +133,8 @@ struct npc_twilight_corrupterAI : ScriptedAI
             {
                 if (!pTarget->HasAura(SPELL_CREATURE_OF_NIGHTMARE))
                 {
-                    m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
-                    m_creature->getThreatManager().addThreatDirectly(pTarget, CoNPlayerAggro);
+                    m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
+                    m_creature->GetThreatManager().addThreatDirectly(pTarget, CoNPlayerAggro);
                     CoNPlayerGuid = 0;
                     CoNPlayerAggro = 0;
                 }
@@ -152,7 +152,7 @@ struct npc_twilight_corrupterAI : ScriptedAI
             if (pTarg && pTarg->IsPlayer())
             {
                 CoNPlayerGuid = pTarg->GetGUID();
-                CoNPlayerAggro = m_creature->getThreatManager().getThreat(pTarg);
+                CoNPlayerAggro = m_creature->GetThreatManager().getThreat(pTarg);
                 if (DoCastSpellIfCan(pTarg, SPELL_CREATURE_OF_NIGHTMARE) == CAST_OK)
                     m_uiCreatureOfNightmareTimer = urand(35000, 40000);
             }
@@ -163,17 +163,17 @@ struct npc_twilight_corrupterAI : ScriptedAI
         if (m_uiCheckTimer < uiDiff)
         {
             FillPlayerList();
-            for (int i = 0; i < 40; i++)
+            for (uint64 & guid : GUIDs)
             {
-                if (Player* player = m_creature->GetMap()->GetPlayer(GUIDs[i]))
+                if (Player* player = m_creature->GetMap()->GetPlayer(guid))
                 {
-                    if (player->isDead())
+                    if (player->IsDead())
                     {
                         char eMessage[200];
                         sprintf(eMessage, "Twilight Corrupter squeezes the last bit of life out of %s and swallows their soul.", player->GetName());
                         m_creature->MonsterTextEmote(eMessage, nullptr, false);
                         m_creature->CastSpell(m_creature, SPELL_SWELL_OF_SOULS, true);
-                        GUIDs[i] = 0;
+                        guid = 0;
                     }
                 }
             }
@@ -225,7 +225,7 @@ struct npc_watcher_blombergAI : ScriptedAI
         m_uiSayTimer = 3000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_bIsEngaged)
         {
@@ -311,9 +311,9 @@ struct npc_commander_felstromAI : ScriptedAI
             m_creature->SetLootRecipient(nullptr);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiSuicide_Timer < uiDiff)
@@ -467,7 +467,7 @@ struct npc_stitchesAI : npc_escortAI
     void JustDied(Unit* /*pKiller*/) override
     {
         auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-        if (pTownCrier && pTownCrier->isAlive())
+        if (pTownCrier && pTownCrier->IsAlive())
             pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_5);
 
         DespawnWatcher();
@@ -490,18 +490,18 @@ struct npc_stitchesAI : npc_escortAI
         if (pUnit && (pUnit->GetEntry() == NPC_WATCHER_SELKIN))
         {
             auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-            if (pTownCrier && pTownCrier->isAlive())
+            if (pTownCrier && pTownCrier->IsAlive())
                 pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_3);
         }
     }
 
     void DespawnWatcher()
     {
-        for (auto itr = m_lWatchman.begin(); itr != m_lWatchman.end(); ++itr)
+        for (const auto& guid : m_lWatchman)
         {
-            if (auto pWatchman = m_creature->GetMap()->GetCreature(*itr))
+            if (auto pWatchman = m_creature->GetMap()->GetCreature(guid))
             {
-                if (pWatchman->isAlive())
+                if (pWatchman->IsAlive())
                     pWatchman->DisappearAndDie();
             }
         }
@@ -583,7 +583,7 @@ struct npc_stitchesAI : npc_escortAI
         case 30:
             {
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
+                if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_1);
             }
             break;
@@ -597,7 +597,7 @@ struct npc_stitchesAI : npc_escortAI
         case 35:
             {
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
+                if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_2);
             }
             break;
@@ -616,7 +616,7 @@ struct npc_stitchesAI : npc_escortAI
                 SummonWatchman(7);
                 SummonWatchman(8);
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
-                if (pTownCrier && pTownCrier->isAlive())
+                if (pTownCrier && pTownCrier->IsAlive())
                     pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_4);
             }
             break;
@@ -652,12 +652,12 @@ struct npc_stitchesAI : npc_escortAI
                 m_uiLaunchTimer -= uiDiff;            
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiAuraOfRotTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_AURA_OF_ROT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_AURA_OF_ROT) == CAST_OK)
                 m_uiAuraOfRotTimer = 3000;
         }
         else

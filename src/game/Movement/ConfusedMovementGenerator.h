@@ -32,7 +32,7 @@ class MANGOS_DLL_SPEC ConfusedMovementGenerator : public MovementGeneratorMedium
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
-        bool Update(T &, const uint32 &);
+        bool Update(T &, uint32 const&);
 
         MovementGeneratorType GetMovementGeneratorType() const { return CONFUSED_MOTION_TYPE; }
     private:

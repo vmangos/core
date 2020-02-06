@@ -147,13 +147,13 @@ class SocialMgr
         // Misc
         void RemovePlayerSocial(uint32 guid);
 
-        void GetFriendInfo(MasterPlayer *player, uint32 friendGUID, FriendInfo &friendInfo);
+        void GetFriendInfo(MasterPlayer* player, uint32 friendGUID, FriendInfo &friendInfo);
         // Packet management
-        void MakeFriendStatusPacket(FriendsResult result, uint32 friend_guid, WorldPacket *data);
-        void SendFriendStatus(MasterPlayer *player, FriendsResult result, ObjectGuid friend_guid, bool broadcast);
-        void BroadcastToFriendListers(MasterPlayer *player, WorldPacket *packet);
+        void MakeFriendStatusPacket(FriendsResult result, uint32 friend_guid, WorldPacket* data);
+        void SendFriendStatus(MasterPlayer* player, FriendsResult result, ObjectGuid friend_guid, bool broadcast);
+        void BroadcastToFriendListers(MasterPlayer* player, WorldPacket* packet);
         // Loading
-        PlayerSocial *LoadFromDB(QueryResult *result, ObjectGuid guid);
+        PlayerSocial* LoadFromDB(QueryResult* result, ObjectGuid guid);
     private:
         SocialMap m_socialMap;
 

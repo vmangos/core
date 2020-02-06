@@ -27,6 +27,7 @@
 #include "Utilities/LinkedReference/Reference.h"
 #include "UnitEvents.h"
 #include "ObjectGuid.h"
+#include "SpellDefines.h"
 #include <list>
 
 //==============================================================
@@ -42,7 +43,7 @@ class SpellEntry;
 class ThreatCalcHelper
 {
     public:
-        static float CalcThreat(Unit* pHatedUnit, Unit* pHatingUnit, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const *threatSpell);
+        static float CalcThreat(Unit* pHatedUnit, Unit* pHatingUnit, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* threatSpell);
 };
 
 //==============================================================
@@ -72,12 +73,12 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
 
         // used for temporary setting a threat and reducting it later again.
         // the threat modification is stored
-        void setTempThreat(float pThreat) { iTempThreatModifyer = pThreat - getThreat(); if(iTempThreatModifyer != 0.0f) addThreat(iTempThreatModifyer);  }
+        void setTempThreat(float pThreat) { iTempThreatModifyer = pThreat - getThreat(); if (iTempThreatModifyer != 0.0f) addThreat(iTempThreatModifyer);  }
         void setTempThreatModifier(float thread) { iTempThreatModifyer = thread; addThreat(iTempThreatModifyer); }
 
         void resetTempThreat()
         {
-            if(iTempThreatModifyer != 0.0f)
+            if (iTempThreatModifyer != 0.0f)
             {
                 addThreat(-iTempThreatModifyer);  iTempThreatModifyer = 0.0f;
             }
@@ -94,7 +95,7 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
         void setAccessibleState(bool pIsAccessible);
         //=================================================
 
-        bool operator ==(const HostileReference& pHostileReference) const { return pHostileReference.getUnitGuid() == getUnitGuid(); }
+        bool operator ==(HostileReference const& pHostileReference) const { return pHostileReference.getUnitGuid() == getUnitGuid(); }
 
         //=================================================
 
@@ -109,7 +110,7 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
 
         //=================================================
 
-        HostileReference* next() { return ((HostileReference* ) Reference<Unit, ThreatManager>::next()); }
+        HostileReference* next() { return ((HostileReference*) Reference<Unit, ThreatManager>::next()); }
 
         //=================================================
 
@@ -155,7 +156,7 @@ public:
 
     HostileReference* addThreat(Unit* pVictim, float pThreat);
 
-    void modifyThreatPercent(Unit *pVictim, int32 percent);
+    void modifyThreatPercent(Unit* pVictim, int32 percent);
 
     HostileReference* selectNextVictim(Creature* pAttacker, HostileReference* pCurrentVictim);
 
@@ -179,21 +180,21 @@ class MANGOS_DLL_SPEC ThreatManager
 public:
     friend class HostileReference;
 
-    explicit ThreatManager(Unit *pOwner);
+    explicit ThreatManager(Unit* pOwner);
 
     ~ThreatManager() { clearReferences(); }
 
     void clearReferences();
 
-    void addThreat(Unit* pVictim, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const *threatSpell, bool isAssistThreat);
+    void addThreat(Unit* pVictim, float threat, bool crit, SpellSchoolMask schoolMask, SpellEntry const* threatSpell, bool isAssistThreat);
     void addThreat(Unit* pVictim, float threat) { addThreat(pVictim, threat, false, SPELL_SCHOOL_MASK_NONE, nullptr, false); }
 
     // add threat as raw value (ignore redirections and expection all mods applied already to it
     void addThreatDirectly(Unit* pVictim, float threat);
 
-    void modifyThreatPercent(Unit *pVictim, int32 pPercent);
+    void modifyThreatPercent(Unit* pVictim, int32 pPercent);
 
-    float getThreat(Unit *pVictim, bool pAlsoSearchOfflineList = false);
+    float getThreat(Unit* pVictim, bool pAlsoSearchOfflineList = false);
 
     bool isThreatListEmpty() const { return iThreatContainer.empty(); }
 
@@ -207,7 +208,7 @@ public:
     Unit* getHostileTarget();
 
     void tauntApply(Unit* pTaunter);
-    void tauntFadeOut(Unit *pTaunter);
+    void tauntFadeOut(Unit* pTaunter);
 
     void setCurrentVictim(HostileReference* pHostileReference);
 

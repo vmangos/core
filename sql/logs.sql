@@ -1,8 +1,8 @@
 -- --------------------------------------------------------
--- Хост:                         127.0.0.1
+-- Host:                         127.0.0.1
 -- Server version:               5.5.53 - MySQL Community Server (GPL)
 -- Server OS:                    Win32
--- HeidiSQL Версия:              9.3.0.4998
+-- HeidiSQL Version:             9.3.0.4998
 -- --------------------------------------------------------
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -112,6 +112,23 @@ CREATE TABLE IF NOT EXISTS `logs_chat` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table logs.logs_movement
+DROP TABLE IF EXISTS `logs_movement`;
+CREATE TABLE IF NOT EXISTS `logs_movement` (
+  `account` int(10) unsigned NOT NULL,
+  `guid` int(10) unsigned NOT NULL,
+  `posx` float NOT NULL,
+  `posy` float NOT NULL,
+  `posz` float NOT NULL,
+  `map` int(10) unsigned NOT NULL,
+  `desyncMs` int(11) NOT NULL,
+  `desyncDist` float NOT NULL,
+  `cheats` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table logs.logs_spamdetect
 DROP TABLE IF EXISTS `logs_spamdetect`;
 CREATE TABLE IF NOT EXISTS `logs_spamdetect` (
@@ -172,6 +189,25 @@ CREATE TABLE IF NOT EXISTS `logs_trashcharacters` (
   `cluster` tinyint(3) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table logs.logs_warden
+DROP TABLE IF EXISTS `logs_warden`;
+CREATE TABLE IF NOT EXISTS `logs_warden` (
+  `entry` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Log entry ID',
+  `check` smallint(5) unsigned NOT NULL COMMENT 'Failed Warden check ID',
+  `action` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Action taken (enum WardenActions)',
+  `account` int(11) unsigned NOT NULL COMMENT 'Account ID',
+  `guid` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Player GUID',
+  `map` int(11) unsigned DEFAULT NULL COMMENT 'Map ID',
+  `position_x` float DEFAULT NULL COMMENT 'Player position X',
+  `position_y` float DEFAULT NULL COMMENT 'Player position Y',
+  `position_z` float DEFAULT NULL COMMENT 'Player position Z',
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT 'Date of the log entry',
+  PRIMARY KEY (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Warden log of failed checks';
 
 -- Data exporting was unselected.
 

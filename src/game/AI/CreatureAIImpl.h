@@ -30,7 +30,7 @@ template<class REAL_AI>
 inline CreatureAI*
 CreatureAIFactory<REAL_AI>::Create(void *data) const
 {
-    Creature* creature = reinterpret_cast<Creature *>(data);
+    Creature* creature = reinterpret_cast<Creature* >(data);
     return (new REAL_AI(creature));
 }
 
@@ -39,14 +39,14 @@ CreatureAIFactory<REAL_AI>::Create(void *data) const
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2)
+T const& RAND(T const& v1, T const& v2)
 {
     return (urand(0,1)) ? v1 : v2;
 }
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3)
+T const& RAND(T const& v1, T const& v2, T const& v3)
 {
     switch (urand(0,2))
     {
@@ -59,7 +59,7 @@ const T& RAND(const T& v1, const T& v2, const T& v3)
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4)
 {
     switch (urand(0,3))
     {
@@ -73,7 +73,7 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4)
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5)
 {
     switch (urand(0,4))
     {
@@ -88,7 +88,7 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5)
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6)
 {
     switch (urand(0,5))
     {
@@ -104,7 +104,7 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7)
 {
     switch (urand(0,6))
     {
@@ -121,7 +121,7 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8)
 {
     switch (urand(0,7))
     {
@@ -139,8 +139,8 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8,
-              const T& v9)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8,
+              T const& v9)
 {
     switch (urand(0,8))
     {
@@ -159,8 +159,8 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8,
-              const T& v9, const T& v10)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8,
+              T const& v9, T const& v10)
 {
     switch (urand(0,9))
     {
@@ -180,8 +180,8 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8,
-              const T& v9, const T& v10, const T& v11)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8,
+              T const& v9, T const& v10, T const& v11)
 {
     switch (urand(0,10))
     {
@@ -202,8 +202,8 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8,
-              const T& v9, const T& v10, const T& v11, const T& v12)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8,
+              T const& v9, T const& v10, T const& v11, T const& v12)
 {
     switch (urand(0,11))
     {
@@ -225,8 +225,8 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8,
-              const T& v9, const T& v10, const T& v11, const T& v12, const T& v13)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8,
+              T const& v9, T const& v10, T const& v11, T const& v12, T const& v13)
 {
     switch (urand(0,12))
     {
@@ -249,8 +249,8 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8,
-              const T& v9, const T& v10, const T& v11, const T& v12, const T& v13, const T& v14)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8,
+              T const& v9, T const& v10, T const& v11, T const& v12, T const& v13, T const& v14)
 {
     switch (urand(0,13))
     {
@@ -274,8 +274,8 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8,
-              const T& v9, const T& v10, const T& v11, const T& v12, const T& v13, const T& v14, const T& v15)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8,
+              T const& v9, T const& v10, T const& v11, T const& v12, T const& v13, T const& v14, T const& v15)
 {
     switch (urand(0,14))
     {
@@ -300,8 +300,8 @@ const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, c
 
 template<class T>
 inline
-const T& RAND(const T& v1, const T& v2, const T& v3, const T& v4, const T& v5, const T& v6, const T& v7, const T& v8,
-              const T& v9, const T& v10, const T& v11, const T& v12, const T& v13, const T& v14, const T& v15, const T& v16)
+T const& RAND(T const& v1, T const& v2, T const& v3, T const& v4, T const& v5, T const& v6, T const& v7, T const& v8,
+              T const& v9, T const& v10, T const& v11, T const& v12, T const& v13, T const& v14, T const& v15, T const& v16)
 {
     switch (urand(0,15))
     {

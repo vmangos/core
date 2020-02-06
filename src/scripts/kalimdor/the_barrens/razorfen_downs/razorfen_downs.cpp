@@ -90,26 +90,26 @@ struct boss_ladyFaltheressAI : public ScriptedAI
 
     uint32 MindBlast_Timer;
 
-    void Reset()
+    void Reset() override
     {
         MindBlast_Timer = 8000;
     }
 
     void TransformIntoHostile()
     {
-        m_creature->setFaction(FACTION_SCOURGE);
+        m_creature->SetFactionTemplateId(FACTION_SCOURGE);
         //TODO : find the humain appearance she transforms out of.
         m_creature->SetDisplayId(MODEL_ID_UNDEAD);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (MindBlast_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_BLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_BLAST) == CAST_OK)
                 MindBlast_Timer = 8000;
         }
         else
@@ -191,13 +191,13 @@ struct npc_belnistraszAI : public npc_escortAI
     uint32 m_uiFireballTimer;
     uint32 m_uiFrostNovaTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFireballTimer = 1000;
         m_uiFrostNovaTimer = 6000;
     }
 
-    void AttackedBy(Unit* pAttacker)
+    void AttackedBy(Unit* pAttacker) override
     {
         if (HasEscortState(STATE_ESCORT_PAUSED))
         {
@@ -221,7 +221,7 @@ struct npc_belnistraszAI : public npc_escortAI
 
     void SpawnerSummon(Creature* pSummoner)
     {
-        Creature * crea = NULL;
+        Creature * crea = nullptr;
         if (m_uiRitualPhase > 7)
         {
             if(crea = pSummoner->SummonCreature(NPC_PLAGUEMAW_THE_ROTTING, pSummoner->GetPositionX(), pSummoner->GetPositionY(), pSummoner->GetPositionZ(), pSummoner->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 60000))
@@ -254,7 +254,7 @@ struct npc_belnistraszAI : public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         SpawnerSummon(pSummoned);
     }
@@ -266,7 +266,7 @@ struct npc_belnistraszAI : public npc_escortAI
             crea->SetRespawnDelay(600000);
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         if (uiPointId == 24)
         {
@@ -275,7 +275,7 @@ struct npc_belnistraszAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (HasEscortState(STATE_ESCORT_PAUSED))
         {
@@ -350,12 +350,12 @@ struct npc_belnistraszAI : public npc_escortAI
             return;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiFireballTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIREBALL);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FIREBALL);
             m_uiFireballTimer = urand(2000, 3000);
         }
         else
@@ -363,7 +363,7 @@ struct npc_belnistraszAI : public npc_escortAI
 
         if (m_uiFrostNovaTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_NOVA);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROST_NOVA);
             m_uiFrostNovaTimer = urand(10000, 15000);
         }
         else
@@ -380,7 +380,7 @@ CreatureAI* GetAI_npc_belnistrasz(Creature* pCreature)
     return new npc_belnistraszAI(pCreature);
 }
 
-bool QuestAccept_npc_belnistrasz(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_belnistrasz(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_EXTINGUISHING_THE_IDOL)
     {
@@ -388,7 +388,7 @@ bool QuestAccept_npc_belnistrasz(Player* pPlayer, Creature* pCreature, const Que
         {
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
             DoScriptText(SAY_BELNISTRASZ_READY, pCreature, pPlayer);
-            pCreature->setFaction(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
+            pCreature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_ACTIVE);
         }
     }
     return true;
@@ -432,12 +432,12 @@ struct npc_tomb_creatureAI : public ScriptedAI
 
     uint32 uiWebTimer;
 
-    void Reset()
+    void Reset() override
     {
         uiWebTimer = urand(5000, 8000);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!UpdateVictim())
             return;
@@ -447,7 +447,7 @@ struct npc_tomb_creatureAI : public ScriptedAI
         {
             if (uiWebTimer <= uiDiff)
             {
-                DoCast(m_creature->getVictim(), SPELL_WEB);
+                DoCast(m_creature->GetVictim(), SPELL_WEB);
                 uiWebTimer = urand(7000, 16000);
             }
             else uiWebTimer -= uiDiff;
@@ -456,7 +456,7 @@ struct npc_tomb_creatureAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (pInstance)
             pInstance->SetData(DATA_GONG_WAVES, pInstance->GetData(DATA_GONG_WAVES) + 1);

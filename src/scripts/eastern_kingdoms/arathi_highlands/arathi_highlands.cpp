@@ -55,9 +55,9 @@ struct npc_professor_phizzlethorpeAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         Player* pPlayer = GetPlayerForEscort();
 
@@ -97,22 +97,22 @@ struct npc_professor_phizzlethorpeAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->AI()->AttackStart(m_creature);
     }
 };
 
-bool QuestAccept_npc_professor_phizzlethorpe(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_professor_phizzlethorpe(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_SUNKEN_TREASURE)
     {
-        pCreature->setFaction(FACTION_ESCORT_N_NEUTRAL_PASSIVE);
+        pCreature->SetFactionTemplateId(FACTION_ESCORT_N_NEUTRAL_PASSIVE);
         DoScriptText(SAY_PROGRESS_1, pCreature, pPlayer);
 
         if (npc_professor_phizzlethorpeAI* pEscortAI = dynamic_cast<npc_professor_phizzlethorpeAI*>(pCreature->AI()))
@@ -254,7 +254,7 @@ struct npc_shakes_o_breenAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -292,7 +292,7 @@ struct npc_shakes_o_breenAI : npc_escortAI
     }
 };
 
-bool QuestAccept_npc_shakes_o_breen(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_shakes_o_breen(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_DEATH_FROM_BELOW)
     {
@@ -398,9 +398,9 @@ struct npc_kineloryAI : public npc_escortAI
             DoScriptText(SAY_AGGRO_KINELORY, m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiBearFormTimer < uiDiff)
@@ -431,7 +431,7 @@ CreatureAI* GetAI_npc_kinelory(Creature* pCreature)
     return new npc_kineloryAI(pCreature);
 }
 
-bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_HINTS_NEW_PLAGUE)
     {
@@ -446,7 +446,7 @@ bool QuestAccept_npc_kinelory(Player* pPlayer, Creature* pCreature, const Quest*
 
 void AddSC_arathi_highlands()
 {
-    Script * newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_professor_phizzlethorpe";

@@ -54,31 +54,31 @@ public:
         SeenCreature = nullptr;
     }
 
-    virtual ~AdvancedPlayerBotAI()
+    ~AdvancedPlayerBotAI() override
     {}
 
-    virtual void UpdateAI(const uint32 delta) override;
+    void UpdateAI(uint32 const delta) override;
 
 protected:
 
     //ai entry points for every class and common
     //It works as hardcoded behaviour tree
-    void CommonAI(const uint32 delta);
+    void CommonAI(uint32 const delta);
 
-    void WarriorAI(const uint32 delta);
+    void WarriorAI(uint32 const delta);
     void WarriorAttackTarget(Unit* NearestAttacker);
 
-    void PaladinAI(const uint32 delta);
-    void HunterAI(const uint32 delta);
-    void RogueAI(const uint32 delta);
-    void PriestAI(const uint32 delta);
-    void ShamanAI(const uint32 delta);
-    void MageAI(const uint32 delta);
-    void WarlockAI(const uint32 delta);
+    void PaladinAI(uint32 const delta);
+    void HunterAI(uint32 const delta);
+    void RogueAI(uint32 const delta);
+    void PriestAI(uint32 const delta);
+    void ShamanAI(uint32 const delta);
+    void MageAI(uint32 const delta);
+    void WarlockAI(uint32 const delta);
 
     void WarlockBattleAI(Unit* NearestAttacker);
 
-    void DruidAI(const uint32 delta);
+    void DruidAI(uint32 const delta);
 
 
     //Hello Source Engine ;)

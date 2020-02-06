@@ -30,21 +30,21 @@ class MANGOS_DLL_SPEC QueryResult
 {
     public:
         QueryResult(uint64 rowCount, uint32 fieldCount)
-            : mFieldCount(fieldCount), mRowCount(rowCount), mCurrentRow(nullptr){}
+            : mCurrentRow(nullptr), mFieldCount(fieldCount), mRowCount(rowCount) {}
 
         virtual ~QueryResult() {}
 
         virtual bool NextRow() = 0;
 
-        Field *Fetch() const { return mCurrentRow; }
+        Field* Fetch() const { return mCurrentRow; }
 
-        const Field & operator [] (int index) const { return mCurrentRow[index]; }
+        Field const& operator [] (int index) const { return mCurrentRow[index]; }
 
         uint32 GetFieldCount() const { return mFieldCount; }
         uint64 GetRowCount() const { return mRowCount; }
 
     protected:
-        Field *mCurrentRow;
+        Field* mCurrentRow;
         uint32 mFieldCount;
         uint64 mRowCount;
 };
@@ -59,16 +59,16 @@ class MANGOS_DLL_SPEC QueryNamedResult
 
         // compatible interface with QueryResult
         bool NextRow() { return mQuery->NextRow(); }
-        Field *Fetch() const { return mQuery->Fetch(); }
+        Field* Fetch() const { return mQuery->Fetch(); }
         uint32 GetFieldCount() const { return mQuery->GetFieldCount(); }
         uint64 GetRowCount() const { return mQuery->GetRowCount(); }
         Field const& operator[] (int index) const { return (*mQuery)[index]; }
 
         // named access
-        Field const& operator[] (const std::string &name) const { return mQuery->Fetch()[GetField_idx(name)]; }
+        Field const& operator[] (std::string const& name) const { return mQuery->Fetch()[GetField_idx(name)]; }
         QueryFieldNames const& GetFieldNames() const { return mFieldNames; }
 
-        uint32 GetField_idx(const std::string &name) const
+        uint32 GetField_idx(std::string const& name) const
         {
             for(size_t idx = 0; idx < mFieldNames.size(); ++idx)
             {
@@ -80,7 +80,7 @@ class MANGOS_DLL_SPEC QueryNamedResult
         }
 
     protected:
-        QueryResult *mQuery;
+        QueryResult* mQuery;
         QueryFieldNames mFieldNames;
 };
 

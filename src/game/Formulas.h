@@ -93,11 +93,11 @@ namespace MaNGOS
         }
         inline uint32 BaseGain(uint32 pl_level, uint32 mob_level)
         {
-            const uint32 nBaseExp = 45;
+            uint32 const nBaseExp = 45;
             return (pl_level * 5 + nBaseExp) * BaseGainLevelFactor(pl_level, mob_level);
         }
 
-        inline uint32 Gain(Player *pPlayer, Unit *pUnit)
+        inline uint32 Gain(Player* pPlayer, Unit* pUnit)
         {
             if (Creature* pCreature = ToCreature(pUnit))
             {
@@ -114,10 +114,10 @@ namespace MaNGOS
                 if (pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)
                     return 0;
 
-                if (pCreature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD))
+                if (pCreature->HasUnitState(UNIT_STAT_NO_KILL_REWARD))
                     return 0;
 
-                uint32 xp_gain = BaseGain(pPlayer->getLevel(), pUnit->getLevel());
+                uint32 xp_gain = BaseGain(pPlayer->GetLevel(), pUnit->GetLevel());
                 if (!xp_gain)
                     return 0;
 
@@ -150,7 +150,7 @@ namespace MaNGOS
             return 0;
         }
 
-        inline uint32 PetGain(Pet *pPet, Unit *pUnit)
+        inline uint32 PetGain(Pet* pPet, Unit* pUnit)
         {
             bool isPet = pUnit->GetTypeId() == TYPEID_UNIT && pUnit->IsPet() &&
                 ((Creature*)pUnit)->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
@@ -158,20 +158,20 @@ namespace MaNGOS
                 ((Creature*)pUnit)->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
                 ((Creature*)pUnit)->GetCreatureInfo()->health_min > 50;
 
-            if(pUnit->GetTypeId()==TYPEID_UNIT && (
+            if (pUnit->GetTypeId()==TYPEID_UNIT && (
                 (pUnit->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||
                 (((Creature*)pUnit)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
-                pUnit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD)))
+                pUnit->HasUnitState(UNIT_STAT_NO_KILL_REWARD)))
                 return 0;
 
-            uint32 xp_gain= BaseGain(pPet->getLevel(), pUnit->getLevel());
-            if( xp_gain == 0 )
+            uint32 xp_gain= BaseGain(pPet->GetLevel(), pUnit->GetLevel());
+            if (xp_gain == 0)
                 return 0;
 
-            if(pUnit->GetTypeId()==TYPEID_UNIT && ((Creature*)pUnit)->IsElite())
+            if (pUnit->GetTypeId()==TYPEID_UNIT && ((Creature*)pUnit)->IsElite())
                 xp_gain *= 2;
 
-            if(isPet)
+            if (isPet)
                 xp_gain *= 0.75f;
 
             float personalRate = -1.0f;
@@ -189,7 +189,7 @@ namespace MaNGOS
 
         inline float xp_in_group_rate(uint32 count, bool isRaid)
         {
-            if(isRaid)
+            if (isRaid)
             {
                 // FIX ME: must apply decrease modifiers dependent from raid size
                 return 1.0f;
