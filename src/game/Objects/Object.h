@@ -41,11 +41,11 @@
 #define INTERACTION_DISTANCE        5.0f
 #define ATTACK_DISTANCE             5.0f
 #define MAX_VISIBILITY_DISTANCE     SIZE_OF_GRIDS      // max distance for visible object show, limited in 333 yards
-#define DEFAULT_VISIBILITY_DISTANCE 100.0f      // default visible distance, 90 yards on continents
-#define DEFAULT_VISIBILITY_INSTANCE 170.0f      // default visible distance in instances, 120 yards
-#define DEFAULT_VISIBILITY_BG       533.0f      // default visible distance in BG, 180 yards
-#define DEFAULT_VISIBILITY_MODIFIER 0.0f        // default visibility modifier on some units that should be seen beyond normal visibility distances
-#define DEFAULT_CREATURE_SUMMON_LIMIT  100      // default maximum number of creatures an object can have summoned at once
+#define DEFAULT_VISIBILITY_DISTANCE 100.0f             // default visible distance on continents, used to be 90 yards
+#define DEFAULT_VISIBILITY_INSTANCE 170.0f             // default visible distance in instances, used to be 120 yards
+#define DEFAULT_VISIBILITY_BG       533.0f             // default visible distance in BG, used to be 180 yards
+#define DEFAULT_VISIBILITY_MODIFIER 0.0f               // default visibility modifier on some units that should be seen beyond normal visibility distances
+#define DEFAULT_CREATURE_SUMMON_LIMIT  100             // default maximum number of creatures an object can have summoned at once
 
 #define VISIBILITY_DISTANCE_GIGANTIC    400.0f
 #define VISIBILITY_DISTANCE_LARGE       200.0f
@@ -81,7 +81,6 @@ enum TempSummonType
     TEMPSUMMON_MANUAL_DESPAWN                 = 8,             // despawns when UnSummon() is called
     TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN   = 9,             // despawns after a specified time (in or out of combat) OR when the creature disappears
     TEMPSUMMON_TIMED_COMBAT_OR_CORPSE_DESPAWN = 10,            // despawns after a specified time (in or out of combat) OR when the creature dies
-
 };
 
 class WorldPacket;
