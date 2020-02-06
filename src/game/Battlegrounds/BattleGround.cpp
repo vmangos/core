@@ -1164,10 +1164,10 @@ bool BattleGround::AddObject(uint32 type, uint32 entry, float x, float y, float 
         GameObjectData& data = sObjectMgr.NewGOData(guid);
 
         data.id             = entry;
-        data.position.mapId          = GetMapId();
-        data.position.x           = x;
-        data.position.y           = y;
-        data.position.z           = z;
+        data.position.mapId = GetMapId();
+        data.position.x     = x;
+        data.position.y     = y;
+        data.position.z     = z;
         data.orientation    = o;
         data.rotation0      = rotation0;
         data.rotation1      = rotation1;
