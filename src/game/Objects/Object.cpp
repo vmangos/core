@@ -1929,7 +1929,7 @@ void WorldObject::SendObjectMessageToSet(WorldPacket* data, bool self, WorldObje
 
     ObjectViewersDeliverer post_man(this, data, except);
     TypeContainerVisitor<ObjectViewersDeliverer, WorldTypeMapContainer> message(post_man);
-    cell.Visit(p, message, *GetMap(), *this, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
+    cell.Visit(p, message, *GetMap(), *this, std::max(GetMap()->GetVisibilityDistance(), GetVisibilityModifier()));
 }
 
 void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except)
@@ -1958,7 +1958,7 @@ void WorldObject::SendMessageToSetExcept(WorldPacket* data, Player const* skippe
     if (IsInWorld())
     {
         MaNGOS::MessageDelivererExcept notifier(data, skipped_receiver);
-        Cell::VisitWorldObjects(this, notifier, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
+        Cell::VisitWorldObjects(this, notifier, std::max(GetMap()->GetVisibilityDistance(), GetVisibilityModifier()));
     }
 }
 
@@ -1973,10 +1973,7 @@ bool WorldObject::isWithinVisibilityDistanceOf(Unit const* viewer, WorldObject c
 {
     if (viewer->IsTaxiFlying())
     {
-        float distance = World::GetMaxVisibleDistanceInFlight() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f);
-
-        if (m_isActiveObject)
-            distance += m_visibilityModifier;
+        float distance = std::max(World::GetMaxVisibleDistanceInFlight() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), GetVisibilityModifier());
 
         // use object grey distance for all (only see objects any way)
         if (!IsWithinDistInMap(viewPoint, distance, false))
@@ -1984,10 +1981,7 @@ bool WorldObject::isWithinVisibilityDistanceOf(Unit const* viewer, WorldObject c
     }
     else if (!GetTransport() || GetTransport() != viewer->GetTransport())
     {
-        float distance = GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f);
-
-        if (m_isActiveObject)
-            distance += m_visibilityModifier;
+        float distance = std::max(GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleUnitGreyDistance() : 0.0f), GetVisibilityModifier());
 
         // Any units far than max visible distance for viewer or not in our map are not visible too
         if (!IsWithinDistInMap(viewPoint, distance, false))
@@ -2496,7 +2490,7 @@ void WorldObject::BuildUpdateData(UpdateDataMapType & update_players)
 {
     WorldObjectChangeAccumulator notifier(*this, update_players);
     // Update with modifier for long range players
-    Cell::VisitWorldObjects(this, notifier, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
+    Cell::VisitWorldObjects(this, notifier, std::max(GetMap()->GetVisibilityDistance(), GetVisibilityModifier()));
 
     ClearUpdateMask(false);
 }
@@ -2565,9 +2559,9 @@ void WorldObject::DestroyForNearbyPlayers()
 
     std::list<Player*> targets;
     // Use visibility modifier for long range players
-    MaNGOS::AnyPlayerInObjectRangeCheck check(this, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
+    MaNGOS::AnyPlayerInObjectRangeCheck check(this, std::max(GetMap()->GetVisibilityDistance(), GetVisibilityModifier()));
     MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(targets, check);
-    Cell::VisitWorldObjects(this, searcher, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
+    Cell::VisitWorldObjects(this, searcher, std::max(GetMap()->GetVisibilityDistance(), GetVisibilityModifier()));
     for (const auto plr : targets)
     {
         if (plr == this)

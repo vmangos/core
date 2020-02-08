@@ -2280,18 +2280,25 @@ GMTickets.Admin.Security = 7
 #        Delay time between creature AI reactions on nearby movements
 #        Default: 1000 (milliseconds)
 #
+#    Visibility.ForceActiveObjects
+#        Force any creatures or gameobjects with increased visibility set in template to be active objects.
+#        The modifier will not work for creatures that don't have the active flag set in spawn table otherwise.
+#        Default: 1 (enabled)
+#                 0 (disabled)
+#
 ###################################################################################################################
 
-Visibility.GroupMode = 0
-Visibility.Distance.Continents    = 100
-Visibility.Distance.Continents.Min= 60
-Visibility.Distance.Instances     = 170
-Visibility.Distance.BG            = 533
-Visibility.Distance.InFlight      = 100
-Visibility.Distance.Grey.Unit   = 1
-Visibility.Distance.Grey.Object = 10
+Visibility.GroupMode               = 0
+Visibility.Distance.Continents     = 100
+Visibility.Distance.Continents.Min = 60
+Visibility.Distance.Instances      = 170
+Visibility.Distance.BG             = 533
+Visibility.Distance.InFlight       = 100
+Visibility.Distance.Grey.Unit      = 1
+Visibility.Distance.Grey.Object    = 10
 Visibility.RelocationLowerLimit    = 10
 Visibility.AIRelocationNotifyDelay = 1000
+Visibility.ForceActiveObjects      = 1
 
 ###################################################################################################################
 # SERVER RATES

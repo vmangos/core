@@ -287,7 +287,7 @@ bool DynamicObject::IsVisibleForInState(WorldObject const* pDetector, WorldObjec
         return true;
 
     // normal case
-    return IsWithinDistInMap(viewPoint, GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
+    return IsWithinDistInMap(viewPoint, std::max(GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), GetVisibilityModifier()), false);
 }
 
 bool DynamicObject::IsHostileTo(WorldObject const* target) const
