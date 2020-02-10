@@ -209,6 +209,19 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map* map, float x, float
     SetGoAnimProgress(animprogress);
     SetName(goinfo->name);
 
+    if (GetGOInfo()->IsLargeGameObject())
+    {
+        SetVisibilityModifier(VISIBILITY_DISTANCE_LARGE);
+        if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
+            SetActiveObjectState(true);
+    }
+    if (GetGOInfo()->IsInfiniteGameObject())
+    {
+        SetVisibilityModifier(MAX_VISIBILITY_DISTANCE);
+        if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
+            SetActiveObjectState(true);
+    }
+
     //Notify the map's instance data.
     //Only works if you create the object in it, not if it is moves to that map.
     //Normally non-players do not teleport to other maps.
@@ -927,8 +940,11 @@ bool GameObject::LoadFromDB(uint32 guid, Map* map)
         }
     }
 
-    m_isActiveObject = (data->spawn_flags & SPAWN_FLAG_ACTIVE);
-    m_visibilityModifier = data->visibility_mod;
+    if (data->spawn_flags & SPAWN_FLAG_ACTIVE)
+        m_isActiveObject = true;
+
+    if (data->visibility_mod)
+        m_visibilityModifier = data->visibility_mod; // custom db change aka hack
 
     return true;
 }
@@ -1064,8 +1080,8 @@ bool GameObject::IsVisibleForInState(WorldObject const* pDetector, WorldObject c
     }
 
     // check distance
-    return IsWithinDistInMap(viewPoint, GetMap()->GetVisibilityDistance() +
-                             (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
+    return IsWithinDistInMap(viewPoint, std::max(GetMap()->GetVisibilityDistance() +
+                             (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), GetVisibilityModifier()), false);
 }
 
 void GameObject::Respawn()

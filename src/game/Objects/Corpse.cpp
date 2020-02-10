@@ -257,7 +257,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field* fields)
 
 bool Corpse::IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    return IsInWorld() && pDetector->IsInWorld() && IsWithinDist(viewPoint, pDetector->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
+    return IsInWorld() && pDetector->IsInWorld() && IsWithinDist(viewPoint, std::max(pDetector->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), GetVisibilityModifier()), false);
 }
 
 ReputationRank Corpse::GetReactionTo(WorldObject const* target) const

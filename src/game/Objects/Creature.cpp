@@ -538,6 +538,25 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, CreatureData const* data /*=
     SetLeashDistance(GetCreatureInfo()->leash_range);
     SetDetectionDistance(GetCreatureInfo()->detection_range);
 
+    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_LARGE_AOI)
+    {
+        SetVisibilityModifier(VISIBILITY_DISTANCE_LARGE);
+        if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
+            SetActiveObjectState(true);
+    }
+    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_GIGANTIC_AOI)
+    {
+        SetVisibilityModifier(VISIBILITY_DISTANCE_GIGANTIC);
+        if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
+            SetActiveObjectState(true);
+    } 
+    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INFINITE_AOI)
+    {
+        SetVisibilityModifier(MAX_VISIBILITY_DISTANCE);
+        if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
+            SetActiveObjectState(true);
+    }
+
     // if eventData set then event active and need apply spell_start
     if (eventData)
         ApplyGameEventSpells(eventData, true);
@@ -1602,8 +1621,12 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
 
     m_respawnDelay = data->GetRandomRespawnTime();
     m_deathState = data->spawn_flags & SPAWN_FLAG_DEAD ? DEAD : ALIVE;
-    m_isActiveObject = data->spawn_flags & SPAWN_FLAG_ACTIVE;
-    m_visibilityModifier = data->visibility_mod;
+
+    if (data->spawn_flags & SPAWN_FLAG_ACTIVE)
+        m_isActiveObject = true;
+    
+    if (data->visibility_mod)
+        m_visibilityModifier = data->visibility_mod;
 
     m_respawnTime  = map->GetPersistentState()->GetCreatureRespawnTime(GetGUIDLow());
 
