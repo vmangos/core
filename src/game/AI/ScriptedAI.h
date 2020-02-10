@@ -17,7 +17,7 @@ enum SCEquip
     EQUIP_UNEQUIP   = 0
 };
 
-struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
+struct ScriptedAI : CreatureAI
 {
     explicit ScriptedAI(Creature* pCreature);
     ~ScriptedAI() override {}
@@ -158,7 +158,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
         uint32 m_uiHomeArea;
 };
 
-struct MANGOS_DLL_DECL Scripted_NoMovementAI : ScriptedAI
+struct Scripted_NoMovementAI : ScriptedAI
 {
     explicit Scripted_NoMovementAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 

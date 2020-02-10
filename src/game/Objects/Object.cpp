@@ -1890,7 +1890,7 @@ void WorldObject::SendMessageToSet(WorldPacket* data, bool /*bToSelf*/) const
         GetMap()->MessageBroadcast(this, data);
 }
 
-struct MANGOS_DLL_DECL ObjectViewersDeliverer
+struct ObjectViewersDeliverer
 {
     WorldPacket* i_message;
     WorldObject const* i_sender;
@@ -3039,7 +3039,7 @@ void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
     ExecuteDelayedActions();
 }
 
-class MANGOS_DLL_DECL NULLNotifier
+class NULLNotifier
 {
 public:
     template<class T> void Visit(GridRefManager<T>& m) {}

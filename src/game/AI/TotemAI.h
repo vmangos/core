@@ -35,7 +35,7 @@ enum
     NPC_TOTEM_GLEBE = 5925,
 };
 
-class MANGOS_DLL_DECL TotemAI : public CreatureAI
+class TotemAI : public CreatureAI
 {
     public:
 

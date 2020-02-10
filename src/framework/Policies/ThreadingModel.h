@@ -32,7 +32,7 @@
 namespace MaNGOS
 {
     template<typename MUTEX>
-    class MANGOS_DLL_DECL GeneralLock
+    class GeneralLock
     {
         public:
 
@@ -55,7 +55,7 @@ namespace MaNGOS
     };
 
     template<class T>
-    class MANGOS_DLL_DECL SingleThreaded
+    class SingleThreaded
     {
         public:
 
@@ -75,7 +75,7 @@ namespace MaNGOS
     };
 
     template<class T, class MUTEX>
-    class MANGOS_DLL_DECL ObjectLevelLockable
+    class ObjectLevelLockable
     {
         public:
 
@@ -110,7 +110,7 @@ namespace MaNGOS
     };
 
     template<class T, class MUTEX>
-    class MANGOS_DLL_DECL ClassLevelLockable
+    class ClassLevelLockable
     {
         public:
 
@@ -155,6 +155,6 @@ namespace MaNGOS
 template<class T, class MUTEX> MUTEX MaNGOS::ClassLevelLockable<T, MUTEX>::si_mtx;
 
 #define INSTANTIATE_CLASS_MUTEX(CTYPE, MUTEX) \
-    template class MANGOS_DLL_DECL MaNGOS::ClassLevelLockable<CTYPE, MUTEX>
+    template class MaNGOS::ClassLevelLockable<CTYPE, MUTEX>
 
 #endif

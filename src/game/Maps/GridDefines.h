@@ -78,7 +78,7 @@ typedef TypeMapContainer<AllGridObjectTypes> GridTypeMapContainer;
 typedef TypeMapContainer<AllWorldObjectTypes> WorldTypeMapContainer;
 
 template<unsigned int const LIMIT>
-struct MANGOS_DLL_DECL CoordPair
+struct CoordPair
 {
     CoordPair(int32 x=0, int32 y=0) : x_coord(x), y_coord(y)
     {

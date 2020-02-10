@@ -30,7 +30,7 @@
 class Map;
 class WorldObject;
 
-struct MANGOS_DLL_DECL CellArea
+struct CellArea
 {
     CellArea() {}
     CellArea(CellPair low, CellPair high) : low_bound(low), high_bound(high) {}
@@ -47,7 +47,7 @@ struct MANGOS_DLL_DECL CellArea
     CellPair high_bound;
 };
 
-struct MANGOS_DLL_DECL Cell
+struct Cell
 {
     Cell() { data.All = 0; }
     Cell(Cell const& cell) { data.All = cell.data.All; }

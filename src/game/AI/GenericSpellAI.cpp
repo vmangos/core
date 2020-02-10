@@ -70,7 +70,7 @@ GenericAISpell BuildGenericAISpell(uint32 spellId, uint32 minCD, uint32 maxCD, u
 void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellInfos);
 //void LoadGenericAISpellsData();
 
-struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
+struct GenericSpellMob : public ScriptedAI
 {
     GenericSpellMob(Creature* pCreature) : ScriptedAI(pCreature)
     {

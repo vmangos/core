@@ -40,7 +40,7 @@ enum ePetSelectTargetReason : uint8
     PSTR_SUCCESS_AGGRO_RANGE,
 };
 
-class MANGOS_DLL_DECL PetAI : public CreatureAI
+class PetAI : public CreatureAI
 {
     public:
 

@@ -37,7 +37,7 @@ enum eEscortState
 
 class ChatHandler;
 
-struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
+struct npc_escortAI : ScriptedAI
 {
         explicit npc_escortAI(Creature* pCreature);
         ~npc_escortAI() override {}

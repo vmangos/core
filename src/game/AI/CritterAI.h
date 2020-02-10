@@ -19,7 +19,7 @@
 
 #include "CreatureAI.h"
 
-class MANGOS_DLL_DECL CritterAI : public CreatureAI
+class CritterAI : public CreatureAI
 {
     public:
         explicit CritterAI(Creature* c) : CreatureAI(c) {}

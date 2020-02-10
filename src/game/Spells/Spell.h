@@ -740,7 +740,7 @@ enum ReplenishType
 
 namespace MaNGOS
 {
-    struct MANGOS_DLL_DECL SpellNotifierPlayer
+    struct SpellNotifierPlayer
     {
         Spell::UnitList &i_data;
         Spell &i_spell;
