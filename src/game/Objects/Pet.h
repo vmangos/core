@@ -135,8 +135,10 @@ extern uint32 const LevelStartLoyalty[6];
 
 #define ACTIVE_SPELLS_MAX           4
 
-#define PET_FOLLOW_DIST  1.0f
+#define PET_FOLLOW_DIST 2.0f
 #define PET_FOLLOW_ANGLE (M_PI_F/2.0f)
+#define MINI_PET_FOLLOW_ANGLE (M_PI_F)
+#define MINI_PET_SUMMON_ANGLE (M_PI_F/4.0f)
 
 class Player;
 struct CharacterPetCache;

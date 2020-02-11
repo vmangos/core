@@ -210,7 +210,8 @@ void PetEventAI::UpdateAI(uint32 const uiDiff)
 
         if (hasAliveOwner && m_creature->GetCharmInfo()->HasCommandState(COMMAND_FOLLOW) && !m_creature->HasUnitState(UNIT_STAT_FOLLOW))
         {
-            m_creature->GetMotionMaster()->MoveFollow(m_creature->GetCharmerOrOwner(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+            m_creature->GetMotionMaster()->MoveFollow(m_creature->GetCharmerOrOwner(), PET_FOLLOW_DIST,
+                    m_creature->ToPet()->getPetType() == MINI_PET ? MINI_PET_FOLLOW_ANGLE : PET_FOLLOW_ANGLE);
             if (m_creature->GetCharmInfo())
                 m_creature->GetCharmInfo()->SetIsReturning(true);
         }     
