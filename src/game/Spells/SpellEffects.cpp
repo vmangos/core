@@ -6135,7 +6135,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     if (old_critter)
         player->RemoveMiniPet();
 
-    CreatureCreatePos pos(m_caster, m_caster->GetOrientation(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+    CreatureCreatePos pos(m_caster, m_caster->GetOrientation(), PET_FOLLOW_DIST, MINI_PET_SUMMON_ANGLE);
     if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
         pos = CreatureCreatePos(m_caster, m_caster->GetOrientation());
 
@@ -6161,7 +6161,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
 
     critter->AIM_Initialize();
     critter->InitPetCreateSpells();                         // e.g. disgusting oozeling has a create spell as critter...
-    critter->SelectLevel(critter->GetCreatureInfo());       // some summoned creaters have different from 1 DB data for level/hp
+    critter->SelectLevel(critter->GetCreatureInfo());       // some summoned creatures have different from 1 DB data for level/hp
     critter->SetUInt32Value(UNIT_NPC_FLAGS, critter->GetCreatureInfo()->npc_flags);
     // some mini-pets have quests
 
