@@ -13,7 +13,7 @@ enum
     SPELL_ENRAGE                = 19516,                   //Stacking enrage (stacks to 10 times)
 
     // Add spells
-    SPELL_IMMOLATE              = 15733,
+    SPELL_IMMOLATE              = 20294,
     SPELL_THRASH                = 8876,
     SPELL_SEPARATION_ANXIETY    = 23492,
     SPELL_ADD_ERUPTION          = 19497,
@@ -45,8 +45,8 @@ struct boss_garrAI : ScriptedAI
 
     void Reset() override
     {
-        m_uiAntiMagicPulseTimer = 25000;                       //These times are probably wrong
-        m_uiMagmaShacklesTimer  = 15000;
+        m_uiAntiMagicPulseTimer = 10000;
+        m_uiMagmaShacklesTimer  = 10000;
 
         m_uiExplodeTimer        = 360000; // 6 Minutes
 
@@ -139,7 +139,7 @@ struct boss_garrAI : ScriptedAI
         if (m_uiAntiMagicPulseTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_ANTIMAGICPULSE) == CAST_OK)
-                m_uiAntiMagicPulseTimer = urand(10000, 15000);
+                m_uiAntiMagicPulseTimer = 15000;
         }
         else
             m_uiAntiMagicPulseTimer -= diff;
@@ -147,7 +147,7 @@ struct boss_garrAI : ScriptedAI
         if (m_uiMagmaShacklesTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_MAGMASHACKLES) == CAST_OK)
-                m_uiMagmaShacklesTimer = urand(8000, 12000);
+                m_uiMagmaShacklesTimer = 15000;
         }
         else
             m_uiMagmaShacklesTimer -= diff;
