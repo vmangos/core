@@ -8,12 +8,12 @@
 enum
 {
     // Garr spells
-    SPELL_ANTIMAGICPULSE        = 19492,
+            SPELL_ANTIMAGICPULSE        = 19492,
     SPELL_MAGMASHACKLES         = 19496,
     SPELL_ENRAGE                = 19516,                   //Stacking enrage (stacks to 10 times)
 
     // Add spells
-    SPELL_IMMOLATE              = 15733,
+            SPELL_IMMOLATE              = 15733,
     SPELL_THRASH                = 8876,
     SPELL_SEPARATION_ANXIETY    = 23492,
     SPELL_ADD_ERUPTION          = 19497,
@@ -38,7 +38,6 @@ struct boss_garrAI : ScriptedAI
 
     uint32 m_uiAntiMagicPulseTimer;
     uint32 m_uiMagmaShacklesTimer;
-    uint32 m_uiCheckAddsTimer;
     uint32 m_uiExplodeTimer;
     std::list<ObjectGuid> m_lFiresworn;
 
@@ -48,8 +47,7 @@ struct boss_garrAI : ScriptedAI
     {
         m_uiAntiMagicPulseTimer = 25000;                       //These times are probably wrong
         m_uiMagmaShacklesTimer  = 15000;
-        m_uiCheckAddsTimer      = 2000;
-        m_uiExplodeTimer        = urand(3000, 6000);
+        m_uiExplodeTimer        = 360000; // 6 Minutes
 
         if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_GARR, NOT_STARTED);
@@ -71,9 +69,9 @@ struct boss_garrAI : ScriptedAI
             GetCreatureListWithEntryInGrid(firesworn, m_creature, NPC_FIRESWORN, 150.0f);
             m_lFiresworn.clear();
 
-            for (const auto& itr : firesworn)
+            for (auto itr = firesworn.begin(); itr != firesworn.end(); ++itr)
             {
-                m_lFiresworn.push_back(itr->GetObjectGuid());
+                m_lFiresworn.push_back((*itr)->GetObjectGuid());
             }
         }
     }
@@ -96,8 +94,8 @@ struct boss_garrAI : ScriptedAI
         {
             if (auto enrageAura = m_creature->GetAura(SPELL_ENRAGE, EFFECT_INDEX_0))
             {
-                auto amount = enrageAura->GetStackAmount();              
-                log << "Enrage stacks: <" << amount << ">.";               
+                auto amount = enrageAura->GetStackAmount();
+                log << "Enrage stacks: <" << amount << ">.";
             }
         }
         else
@@ -117,20 +115,17 @@ struct boss_garrAI : ScriptedAI
         std::advance(itr, rand() % m_lFiresworn.size());
 
         if (auto pFiresworn = m_creature->GetMap()->GetCreature(*itr))
-        { 
-            DoScriptText(EMOTE_MASSIVE_ERUPTION, m_creature);
-            m_creature->CastSpell(pFiresworn, SPELL_ERUPTION_TRIGGER, true);
-            return true;
+        {
+            if (!pFiresworn->HasAuraType(SPELL_AURA_MOD_STUN)) { // If the add is not banished, explode it
+                m_creature->CastSpell(pFiresworn, SPELL_ERUPTION_TRIGGER, true);
+                return true;
+            }
         }
-
-        std::ostringstream log;
-        log << "Unable to access Firesworn.";
-        m_creature->LogScriptInfo(log);
 
         return false;
     }
 
-    void UpdateAI(uint32 const diff) override
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -151,16 +146,14 @@ struct boss_garrAI : ScriptedAI
         else
             m_uiMagmaShacklesTimer -= diff;
 
-        if (m_creature->GetHealthPercent() < 50.0f)
+        if (m_uiExplodeTimer < diff)
         {
-            if (m_uiExplodeTimer < diff)
-            {
-                if (DoExplodeFiresworn())
-                    m_uiExplodeTimer = urand(10000, 20000);
-            }
-            else
-                m_uiExplodeTimer -= diff;
+            DoScriptText(EMOTE_MASSIVE_ERUPTION, m_creature); // he should say this even if there's no available adds
+            DoExplodeFiresworn();
+            m_uiExplodeTimer = 20000;
         }
+        else
+            m_uiExplodeTimer -= diff;
 
         DoMeleeAttackIfReady();
     }
@@ -208,7 +201,7 @@ struct mob_fireswornAI : ScriptedAI
             if (pGarr->IsAlive())
             {
                 if (auto pGarrAI = static_cast<boss_garrAI*>(pGarr->AI()))
-                    pGarrAI->FireswornJustDied(m_creature->GetObjectGuid());                
+                    pGarrAI->FireswornJustDied(m_creature->GetObjectGuid());
             }
         }
         else
@@ -228,7 +221,7 @@ struct mob_fireswornAI : ScriptedAI
         }
     }
 
-    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpell) override
+    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell) override
     {
         if (pSpell->Id == SPELL_ERUPTION_TRIGGER)
         {
@@ -241,7 +234,7 @@ struct mob_fireswornAI : ScriptedAI
         }
     }
 
-    void UpdateAI(uint32 const diff) override
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
@@ -262,7 +255,7 @@ struct mob_fireswornAI : ScriptedAI
 
                         if (result == CAST_OK)
                         {
-                            m_uiAnxietyTimer = 5000;                           
+                            m_uiAnxietyTimer = 5000;
                             log << "I'm in <Separation Anxiety>.";
                         }
                         else
@@ -300,7 +293,7 @@ CreatureAI* GetAI_mob_firesworn(Creature* pCreature)
 
 void AddSC_boss_garr()
 {
-    Script* newscript;
+    Script *newscript;
 
     newscript = new Script;
     newscript->Name = "boss_garr";
