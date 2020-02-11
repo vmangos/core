@@ -8,12 +8,12 @@
 enum
 {
     // Garr spells
-            SPELL_ANTIMAGICPULSE        = 19492,
+    SPELL_ANTIMAGICPULSE        = 19492,
     SPELL_MAGMASHACKLES         = 19496,
     SPELL_ENRAGE                = 19516,                   //Stacking enrage (stacks to 10 times)
 
     // Add spells
-            SPELL_IMMOLATE              = 15733,
+    SPELL_IMMOLATE              = 15733,
     SPELL_THRASH                = 8876,
     SPELL_SEPARATION_ANXIETY    = 23492,
     SPELL_ADD_ERUPTION          = 19497,
