@@ -702,70 +702,6 @@ CreatureAI* GetAI_npc_human_worgen(Creature *_creature)
     return new npc_human_worgenAI(_creature);
 }
 
-/*
- * Dusty Spellbooks
- */
-
-enum
-{
-    NPC_MOONRAGE_DARKRUNNER     = 1770,
-
-    QUEST_ARUGAL_FOLLY          = 422,
-};
-
-#define DARKRUNNER_SAY "The Sons of Arugal will rise against all who challenge the power of the Moonrage!"
-
-struct go_dusty_spellbooksAI : GameObjectAI
-{
-    explicit go_dusty_spellbooksAI(GameObject* pGo) : GameObjectAI(pGo)
-    {
-        m_bJustUsed = false;
-        m_uiJustUsedTimer = 0;
-    }
-
-    bool m_bJustUsed;
-    uint32 m_uiJustUsedTimer;
-
-    bool OnUse(Unit* pCaster) override
-    {
-        auto pPlayer = pCaster->ToPlayer();
-
-        if (!pPlayer) return true;
-
-        if (!(pPlayer->GetQuestStatus(QUEST_ARUGAL_FOLLY) == QUEST_STATUS_INCOMPLETE)) return true;
-
-        if (!m_bJustUsed)
-        {
-            if (auto pCreature = me->SummonCreature(NPC_MOONRAGE_DARKRUNNER, 875.38f, 1232.43f, 52.6f, 3.16f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 90000))
-            {
-                pCreature->MonsterSay(DARKRUNNER_SAY);
-                pCreature->AddThreat(pCaster);
-                m_bJustUsed = true;
-                m_uiJustUsedTimer = 1000;
-            }            
-        }
-
-        return true;
-    }
-
-    void UpdateAI(uint32 const uiDiff) override
-    {
-        if (!m_bJustUsed) return;
-
-        if (m_uiJustUsedTimer < uiDiff)
-        {
-            m_bJustUsed = false;
-        }
-        else
-            m_uiJustUsedTimer -= uiDiff;
-    }
-};
-
-GameObjectAI* GetAI_go_dusty_spellbooks(GameObject* pGo)
-{
-    return new go_dusty_spellbooksAI(pGo);
-}
-
 void AddSC_silverpine_forest()
 {
     Script* newscript;
@@ -797,10 +733,5 @@ void AddSC_silverpine_forest()
     newscript = new Script;
     newscript->Name = "npc_councilman";
     newscript->GetAI = &GetAI_npc_councilman;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_dusty_spellbooks";
-    newscript->GOGetAI = &GetAI_go_dusty_spellbooks;
     newscript->RegisterSelf();
 }

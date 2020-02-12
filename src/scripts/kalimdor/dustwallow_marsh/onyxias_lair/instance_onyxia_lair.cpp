@@ -3,6 +3,12 @@
 
 #define MAX_ENCOUNTER   1
 
+enum
+{
+    GO_WHELP_SPAWNER = 176510,
+    SPELL_SUMMON_WHELP = 17646,
+};
+
 struct instance_onyxia_lair : public ScriptedInstance
 {
     instance_onyxia_lair(Map* pMap) : ScriptedInstance(pMap)
@@ -37,6 +43,16 @@ struct instance_onyxia_lair : public ScriptedInstance
         {
             case DATA_ONYXIA_EVENT:
                 m_auiEncounter[0] = uiData;
+                break;
+        }
+    }
+
+    void OnObjectCreate(GameObject* pGo) override
+    {
+        switch (pGo->GetEntry())
+        {
+            case GO_WHELP_SPAWNER:
+                pGo->CastSpell(pGo->GetPositionX(), pGo->GetPositionY(), pGo->GetPositionZ(), SPELL_SUMMON_WHELP, true);
                 break;
         }
     }
