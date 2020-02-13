@@ -9,6 +9,36 @@ INSERT INTO `migrations` VALUES ('20200212185807');
 -- Add your query below.
 
 
+-- These fields are signed ints.
+ALTER TABLE `gameobject_template`
+	CHANGE COLUMN `data1` `data1` INT(11) NOT NULL DEFAULT '0' AFTER `data0`,
+	CHANGE COLUMN `data6` `data6` INT(11) NOT NULL DEFAULT '0' AFTER `data5`;
+
+-- Add new scripts table.
+CREATE TABLE IF NOT EXISTS `gameobject_template_scripts` (
+  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `delay` int(10) unsigned NOT NULL DEFAULT '0',
+  `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `datalong` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
+  `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
+  `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `target_param1` int(10) unsigned NOT NULL DEFAULT '0',
+  `target_param2` int(10) unsigned NOT NULL DEFAULT '0',
+  `target_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `dataint` int(11) NOT NULL DEFAULT '0',
+  `dataint2` int(11) NOT NULL DEFAULT '0',
+  `dataint3` int(11) NOT NULL DEFAULT '0',
+  `dataint4` int(11) NOT NULL DEFAULT '0',
+  `x` float NOT NULL DEFAULT '0',
+  `y` float NOT NULL DEFAULT '0',
+  `z` float NOT NULL DEFAULT '0',
+  `o` float NOT NULL DEFAULT '0',
+  `condition_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `comments` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
 -- Wrong size.
 UPDATE `gameobject_template` SET `size`=0.3 WHERE `entry`=21128;
 UPDATE `gameobject_template` SET `size`=0.946831 WHERE `entry`=32884;
@@ -756,6 +786,127 @@ UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126345;
 UPDATE `gameobject_template` SET `name`='Doodad_DwarvenBrazier195' WHERE `entry`=175667;
 UPDATE `gameobject_template` SET `type`=0, `data0`=0, `data1`=0, `data2`=0 WHERE `entry`=177000;
 
+-- Data for GAMEOBJECT_TYPE_GOOBER = 10
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180733;
+UPDATE `gameobject_template` SET `type`=6, `data3`=24803, `data4`=0 WHERE `entry`=180502;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=1770;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=176159;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=1722;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=1721;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=1761;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=3644;
+UPDATE `gameobject_template` SET `data3`=196608 WHERE `entry`=148998;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=1768;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=1769;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180703;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=3190;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=2704;
+UPDATE `gameobject_template` SET `data1`=-1, `flags`=0 WHERE `entry`=61935;
+UPDATE `gameobject_template` SET `data1`=-1, `flags`=0 WHERE `entry`=20352;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=3189;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=3192;
+UPDATE `gameobject_template` SET `type`=2, `data3`=6799, `data19`=0 WHERE `entry`=180794;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174621;
+UPDATE `gameobject_template` SET `data1`=-1, `flags`=0 WHERE `entry`=4072;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=20359;
+UPDATE `gameobject_template` SET `type`=1, `data1`=93, `data2`=655360, `data3`=178963, `data4`=0, `data6`=0 WHERE `entry`=178965;
+UPDATE `gameobject_template` SET `data1`=-1, `flags`=0 WHERE `entry`=61936;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180726;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180741;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180736;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180740;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180737;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180722;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=176160;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180708;
+UPDATE `gameobject_template` SET `type`=6, `data3`=0, `data4`=0, `data5`=0, `data6`=-65536 WHERE `entry`=178559;
+UPDATE `gameobject_template` SET `type`=2, `data3`=6540, `data4`=0, `data5`=0 WHERE `entry`=180518;
+UPDATE `gameobject_template` SET `data3`=196608 WHERE `entry`=148917;
+UPDATE `gameobject_template` SET `data3`=196608 WHERE `entry`=166872;
+UPDATE `gameobject_template` SET `data3`=196608, `data5`=0 WHERE `entry`=141832;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180730;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180721;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=164884;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180738;
+UPDATE `gameobject_template` SET `data0`=43, `data2`=4083, `data3`=0 WHERE `entry`=171943;
+UPDATE `gameobject_template` SET `type`=2, `data3`=6540, `data4`=0, `data5`=0 WHERE `entry`=180456;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=164882;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=173325;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=173326;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174610;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174612;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174614;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174615;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180704;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174617;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174618;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174620;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174711;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174714;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174715;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=176161;
+UPDATE `gameobject_template` SET `type`=6, `data5`=0, `data10`=0 WHERE `entry`=176211;
+UPDATE `gameobject_template` SET `type`=6, `data3`=0 WHERE `entry`=177984;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=177929;
+UPDATE `gameobject_template` SET `type`=6, `data3`=0 WHERE `entry`=177985;
+UPDATE `gameobject_template` SET `type`=6, `data1`=60, `data3`=21158, `data4`=0, `data10`=0 WHERE `entry`=178088;
+UPDATE `gameobject_template` SET `data1`=-1 WHERE `entry`=178090;
+UPDATE `gameobject_template` SET `type`=2, `data3`=6543, `data4`=0, `data5`=0 WHERE `entry`=180466;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180707;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180720;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180723;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180724;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180725;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180727;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180728;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180729;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180731;
+UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180739;
+UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=180788;
+UPDATE `gameobject_template` SET `data3`=196608 WHERE `entry`=180857;
+
+-- Demon Portal
+DELETE FROM `gameobject_template_scripts` WHERE `id` IN (177366. 177369, 177400, 177397, 177243, 177365, 177398, 177399);
+INSERT INTO `gameobject_template_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(177366, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177369, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177400, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177397, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177243, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177365, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177398, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177399, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use');
+UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177366;
+UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177369;
+UPDATE `gameobject_template` SET `data5`=0 WHERE `entry`=177400;
+UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177397;
+UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177243;
+UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177365;
+UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177398;
+UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177399;
+
+-- Sacred Fire of Life (Arikara)
+DELETE FROM `event_scripts` WHERE `id`=175944;
+DELETE FROM `gameobject_scripts` WHERE `id`=16778;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (16778, 5, 10, 10882, 30000, 1, 30, 0, 0, 0, 0, 8, 0, 6, 1, -5002.89, -2103.46, 83.81, 1.365, 0, 'Sacred Fire of Life - Summon Arikara');
+UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=175944;
+
+-- Sharpbeak's Cage
+DELETE FROM `event_scripts` WHERE `id`=14407001;
+DELETE FROM `gameobject_scripts` WHERE `id`=46076;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (46076, 0, 77, 0, 0, 0, 0, 92997, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sharpbeak - Disable Flying');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (46076, 1, 2, 138, 0, 0, 0, 92997, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 8023, 'Sharpbeak\'s Cage - Set Unit Field Bytes 1 (0) (Creature 8023)');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (46076, 2, 60, 3, 0, 0, 1, 92997, 0, 9, 2, 8023, 0, 0, 0, 0, 0, 0, 0, 8023, 'Sharpbeak\'s Cage - On Script - Start Waypoints (Creature 8023)');
+UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=144070;
+
+-- Thaurissan Relic
+DELETE FROM `event_scripts` WHERE `id`=3361;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3361, 0, 39, 336101, 336102, 0, 0, 0, 0, 0, 1, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Thaurissan Relic - Start Script');
+DELETE FROM `event_scripts` WHERE `id`=336101;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (336101, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4595, 4594, 4600, 4597, 0, 0, 0, 0, 0, 'Thaurissan Relic - Whisper Text');
+DELETE FROM `event_scripts` WHERE `id`=336102;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (336102, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4599, 4594, 4598, 4596, 0, 0, 0, 0, 0, 'Thaurissan Relic - Whisper Text');
+-- UPDATE `gameobject_template` SET `data1`=3702 WHERE `entry`=153556; -- blizzlike quest id is wrong?
 
 
 -- End of migration.

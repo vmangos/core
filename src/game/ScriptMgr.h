@@ -329,6 +329,9 @@ enum eScriptCommand
     SCRIPT_COMMAND_LEAVE_CREATURE_GROUP     = 79,           // source = Creature
     SCRIPT_COMMAND_SET_GO_STATE             = 80,           // source = GameObject
                                                             // datalong = GOState
+    SCRIPT_COMMAND_QUEST_CREDIT             = 81,           // source = Player
+                                                            // target = WorldObject
+                                                            // datalong = spell_id
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -997,6 +1000,11 @@ struct ScriptInfo
             uint32 state;                                   // datalong
         } setGoState;
 
+        struct                                              // SCRIPT_COMMAND_QUEST_CREDIT (81)
+        {
+            uint32 spellId;                                 // datalong
+        } questCredit;
+
         struct
         {
             uint32 data[9];
@@ -1052,6 +1060,7 @@ extern ScriptMapMap sQuestStartScripts;
 extern ScriptMapMap sSpellScripts;
 extern ScriptMapMap sCreatureSpellScripts;
 extern ScriptMapMap sGameObjectScripts;
+extern ScriptMapMap sGameObjectTemplateScripts;
 extern ScriptMapMap sEventScripts;
 extern ScriptMapMap sGossipScripts;
 extern ScriptMapMap sCreatureMovementScripts;

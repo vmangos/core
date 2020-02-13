@@ -2208,3 +2208,24 @@ bool Map::ScriptCommand_SetGoState(ScriptInfo const& script, WorldObject* source
     pGo->SetGoState(GOState(script.setGoState.state));
     return false;
 }
+
+// SCRIPT_COMMAND_QUEST_CREDIT (81)
+bool Map::ScriptCommand_QuestCredit(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    Player* pPlayer = ToPlayer(source);
+
+    if (!pPlayer)
+    {
+        sLog.outError("SCRIPT_COMMAND_QUEST_CREDIT (script id %u) call for a nullptr or non-player source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    if (!target)
+    {
+        sLog.outError("SCRIPT_COMMAND_QUEST_CREDIT (script id %u) call for a nullptr target, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    pPlayer->RewardPlayerAndGroupAtCast(target, script.questCredit.spellId);
+    return false;
+}

@@ -1192,6 +1192,24 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_QUEST_CREDIT:
+            {
+                if (tmp.questCredit.spellId)
+                {
+                    if (!sSpellMgr.GetSpellEntry(tmp.questCredit.spellId))
+                    {
+                        if (!sSpellMgr.IsExistingSpellId(tmp.questCredit.spellId))
+                        {
+                            sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_QUEST_CREDIT for script id %u",
+                                tablename, tmp.questCredit.spellId, tmp.id);
+                            continue;
+                        }
+                        else
+                            DisableScriptAction(tmp);
+                    }
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
@@ -1221,6 +1239,16 @@ void ScriptMgr::LoadGameObjectScripts()
         if (!sObjectMgr.GetGOData(itr.first))
             if (!sObjectMgr.IsExistingGameObjectGuid(itr.first))
                 sLog.outErrorDb("Table `gameobject_scripts` has not existing gameobject (GUID: %u) as script id", itr.first);
+    }
+
+    LoadScripts(sGameObjectTemplateScripts, "gameobject_template_scripts");
+
+    // check ids
+    for (const auto& itr : sGameObjectTemplateScripts)
+    {
+        if (!sObjectMgr.GetGameObjectInfo(itr.first))
+            if (!sObjectMgr.IsExistingGameObjectId(itr.first))
+                sLog.outErrorDb("Table `gameobject_template_scripts` has not existing gameobject (Entry: %u) as script id", itr.first);
     }
 }
 
@@ -1398,6 +1426,7 @@ void ScriptMgr::CheckAllScriptTexts()
     CheckScriptTexts(sSpellScripts);
     CheckScriptTexts(sCreatureSpellScripts);
     CheckScriptTexts(sGameObjectScripts);
+    CheckScriptTexts(sGameObjectTemplateScripts);
     CheckScriptTexts(sEventScripts);
     CheckScriptTexts(sGossipScripts);
     CheckScriptTexts(sCreatureMovementScripts);
