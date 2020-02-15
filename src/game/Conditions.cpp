@@ -1013,9 +1013,9 @@ bool ConditionEntry::IsValid()
         }
         case CONDITION_SOURCE_ENTRY:
         {
-            if (!sObjectMgr.GetCreatureTemplate(m_value1))
+            if (!sObjectMgr.GetCreatureTemplate(m_value1) && !sObjectMgr.GetGameObjectInfo(m_value1))
             {
-                if (!sObjectMgr.IsExistingCreatureId(m_value1))
+                if (!sObjectMgr.IsExistingCreatureId(m_value1) && !sObjectMgr.IsExistingGameObjectId(m_value1))
                 {
                     sLog.outErrorDb("NPC Entry condition (entry %u, type %u) has invalid non-existent NPC entry %u", m_entry, m_condition, m_value2);
                     return false;

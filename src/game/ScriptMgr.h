@@ -329,9 +329,9 @@ enum eScriptCommand
     SCRIPT_COMMAND_LEAVE_CREATURE_GROUP     = 79,           // source = Creature
     SCRIPT_COMMAND_SET_GO_STATE             = 80,           // source = GameObject
                                                             // datalong = GOState
-    SCRIPT_COMMAND_QUEST_CREDIT             = 81,           // source = Player
-                                                            // target = WorldObject
-                                                            // datalong = spell_id
+    SCRIPT_COMMAND_DESPAWN_GAMEOBJECT       = 81,           // source = GameObject (from datalong, provided source or target)
+                                                            // datalong = db_guid
+                                                            // datalong2 = despawn_delay
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -1000,10 +1000,11 @@ struct ScriptInfo
             uint32 state;                                   // datalong
         } setGoState;
 
-        struct                                              // SCRIPT_COMMAND_QUEST_CREDIT (81)
+        struct                                              // SCRIPT_COMMAND_DESPAWN_GAMEOBJECT (81)
         {
-            uint32 spellId;                                 // datalong
-        } questCredit;
+            uint32 goGuid;                                  // datalong
+            uint32 respawnDelay;                            // datalong2
+        } despawnGo;
 
         struct
         {
@@ -1031,6 +1032,7 @@ struct ScriptInfo
         switch(command)
         {
             case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT: return respawnGo.goGuid;
+            case SCRIPT_COMMAND_DESPAWN_GAMEOBJECT: return despawnGo.goGuid;
             case SCRIPT_COMMAND_OPEN_DOOR: return openDoor.goGuid;
             case SCRIPT_COMMAND_CLOSE_DOOR: return closeDoor.goGuid;
             default: return 0;

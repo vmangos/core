@@ -40,6 +40,7 @@ ScriptMapMap sQuestStartScripts;
 ScriptMapMap sSpellScripts;
 ScriptMapMap sCreatureSpellScripts;
 ScriptMapMap sGameObjectScripts;
+ScriptMapMap sGameObjectTemplateScripts;
 ScriptMapMap sEventScripts;
 ScriptMapMap sGossipScripts;
 ScriptMapMap sCreatureMovementScripts;
@@ -405,9 +406,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
                     if (info->type == GAMEOBJECT_TYPE_FISHINGNODE ||
                         info->type == GAMEOBJECT_TYPE_FISHINGHOLE ||
-                        info->type == GAMEOBJECT_TYPE_DOOR ||
-                        info->type == GAMEOBJECT_TYPE_BUTTON ||
-                        info->type == GAMEOBJECT_TYPE_TRAP)
+                        info->type == GAMEOBJECT_TYPE_DOOR)
                     {
                         sLog.outErrorDb("Table `%s` have gameobject type (%u) unsupported by command SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u", tablename, info->id, tmp.id);
                         continue;
@@ -1192,20 +1191,30 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 }
                 break;
             }
-            case SCRIPT_COMMAND_QUEST_CREDIT:
+            case SCRIPT_COMMAND_DESPAWN_GAMEOBJECT:
             {
-                if (tmp.questCredit.spellId)
+                if (tmp.GetGOGuid()) // cant check when using buddy\source\target instead
                 {
-                    if (!sSpellMgr.GetSpellEntry(tmp.questCredit.spellId))
+                    GameObjectData const* data = sObjectMgr.GetGOData(tmp.GetGOGuid());
+                    if (!data)
                     {
-                        if (!sSpellMgr.IsExistingSpellId(tmp.questCredit.spellId))
+                        if (!sObjectMgr.IsExistingGameObjectGuid(tmp.GetGOGuid()))
                         {
-                            sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_QUEST_CREDIT for script id %u",
-                                tablename, tmp.questCredit.spellId, tmp.id);
+                            sLog.outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_DESPAWN_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
                             continue;
                         }
                         else
+                        {
                             DisableScriptAction(tmp);
+                            break;
+                        }
+                    }
+
+                    GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id);
+                    if (!info)
+                    {
+                        sLog.outErrorDb("Table `%s` has gameobject with invalid entry (GUID: %u Entry: %u) in SCRIPT_COMMAND_DESPAWN_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), data->id, tmp.id);
+                        continue;
                     }
                 }
                 break;

@@ -330,9 +330,7 @@ bool Map::ScriptCommand_RespawnGameObject(ScriptInfo const& script, WorldObject*
     int32 time_to_despawn = script.respawnGo.despawnDelay < 5 ? 5 : script.respawnGo.despawnDelay;
 
     if (pGo->GetGoType() == GAMEOBJECT_TYPE_FISHINGNODE ||
-        pGo->GetGoType() == GAMEOBJECT_TYPE_DOOR ||
-        pGo->GetGoType() == GAMEOBJECT_TYPE_BUTTON ||
-        pGo->GetGoType() == GAMEOBJECT_TYPE_TRAP)
+        pGo->GetGoType() == GAMEOBJECT_TYPE_DOOR)
     {
         sLog.outError("SCRIPT_COMMAND_RESPAWN_GAMEOBJECT (script id %u) can not be used with gameobject of type %u (guid: %u).", script.id, uint32(pGo->GetGoType()), script.respawnGo.goGuid);
         return ShouldAbortScript(script);
@@ -2209,23 +2207,37 @@ bool Map::ScriptCommand_SetGoState(ScriptInfo const& script, WorldObject* source
     return false;
 }
 
-// SCRIPT_COMMAND_QUEST_CREDIT (81)
-bool Map::ScriptCommand_QuestCredit(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+// SCRIPT_COMMAND_DESPAWN_GAMEOBJECT (81)
+bool Map::ScriptCommand_DespawnGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target)
 {
-    Player* pPlayer = ToPlayer(source);
+    GameObject* pGo = nullptr;
+    uint32 guidlow = script.despawnGo.goGuid;
 
-    if (!pPlayer)
+    if (guidlow)
     {
-        sLog.outError("SCRIPT_COMMAND_QUEST_CREDIT (script id %u) call for a nullptr or non-player source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        GameObjectData const* goData = sObjectMgr.GetGOData(guidlow);
+        if (!goData)
+            return ShouldAbortScript(script); // checked at load
+
+        pGo = GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, goData->id, guidlow));
+    }
+    else if (target && target->GetTypeId() == TYPEID_GAMEOBJECT)
+        pGo = static_cast<GameObject*>(target);
+    else if (source && source->GetTypeId() == TYPEID_GAMEOBJECT)
+        pGo = static_cast<GameObject*>(source);
+
+    if (!pGo)
+    {
+        sLog.outError("SCRIPT_COMMAND_DESPAWN_GAMEOBJECT (script id %u) failed for gameobject(guid: %u).", script.id, guidlow);
         return ShouldAbortScript(script);
     }
 
-    if (!target)
-    {
-        sLog.outError("SCRIPT_COMMAND_QUEST_CREDIT (script id %u) call for a nullptr target, skipping.", script.id);
-        return ShouldAbortScript(script);
-    }
+    if (!pGo->isSpawned())
+        return ShouldAbortScript(script);          // gameobject already despawned
 
-    pPlayer->RewardPlayerAndGroupAtCast(target, script.questCredit.spellId);
+    pGo->SetLootState(GO_JUST_DEACTIVATED);
+    if (script.despawnGo.respawnDelay)
+        pGo->SetRespawnDelay(script.despawnGo.respawnDelay);        // respawn object in ? seconds
+
     return false;
 }

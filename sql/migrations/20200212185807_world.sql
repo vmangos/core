@@ -428,7 +428,6 @@ UPDATE `gameobject_template` SET `displayId`=306 WHERE `entry`=181130;
 -- Data for GAMEOBJECT_TYPE_DOOR = 0
 UPDATE `gameobject_template` SET `data0`=0, `data2`=196608 WHERE `entry`=176576;
 UPDATE `gameobject_template` SET `data0`=0, `data2`=196608 WHERE `entry`=176562;
-UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=164729;
 UPDATE `gameobject_template` SET `name`='Doodad_BlackRockDoors01', `data2`=196608 WHERE `entry`=170556;
 UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=175350;
 UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=175354;
@@ -438,6 +437,11 @@ UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=175351;
 UPDATE `gameobject_template` SET `data2`=196608 WHERE `entry`=175370;
 UPDATE `gameobject_template` SET `name`='Gate', `data2`=196608 WHERE `entry`=176694;
 UPDATE `gameobject_template` SET `type`=2, `displayId`=306 WHERE `entry`=177727;
+
+-- Miblon's Door
+UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=164729;
+UPDATE `gameobject` SET `spawntimesecsmin`=180, `spawntimesecsmax`=180 WHERE `id`=164729;
+UPDATE `event_scripts` SET `command`=81, `datalong2`=180 WHERE `id`=3718;
 
 -- Data for GAMEOBJECT_TYPE_BUTTON = 1
 UPDATE `gameobject_template` SET `type`=0 WHERE `entry`=124371;
@@ -456,7 +460,6 @@ UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=256;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=47;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=60;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=68;
-UPDATE `gameobject_template` SET `data1`=192, `data5`=0 WHERE `entry`=269;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=711;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=3972;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=1763;
@@ -465,7 +468,6 @@ UPDATE `gameobject_template` SET `data1`=3628 WHERE `entry`=174607;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=177904;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=2713;
 UPDATE `gameobject_template` SET `data6`=0, `data7`=0 WHERE `entry`=176392;
-UPDATE `gameobject_template` SET `type`=5, `data1`=1 WHERE `entry`=180718;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=164867;
 UPDATE `gameobject_template` SET `data1`=3622 WHERE `entry`=174596;
 UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=175524;
@@ -504,10 +506,32 @@ UPDATE `gameobject_template` SET `data6`=0, `data7`=0 WHERE `entry`=177289;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=179827;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=179913;
 
+-- Tablet of the Seven
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4296, 9, 4296, 1, 0, 0, 0);
+UPDATE `gossip_menu` SET `text_id`=2819 WHERE `entry`=2187;
+UPDATE `gossip_menu` SET `text_id`=2820 WHERE `entry`=2186;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES (2187, 0, 0, 'Transcribe the tablet.', 5177, 1, 1, 2186, 0, 218700, 0, 0, '', 0, 4296);
+DELETE FROM `gossip_scripts` WHERE `id`=218700;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (218700, 0, 15, 15065, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tablet of the Seven - Cast Spell Create Tablet Transcript');
+DELETE FROM `gameobject_involvedrelation` WHERE `quest`=4296;
+UPDATE `gameobject_template` SET `script_name`='' WHERE `entry`=169294;
+
+-- Guarded Thunder Ale Barrel
+UPDATE `gameobject_template` SET `data1`=192, `data5`=0 WHERE `entry`=269;
+UPDATE `gameobject` SET `spawntimesecsmin`=60, `spawntimesecsmax`=60 WHERE `id`=269;
+UPDATE `gameobject` SET `spawntimesecsmin`=-60, `spawntimesecsmax`=-60, `position_x`=-5607.24, `position_y`=-547.934, `position_z`=392.985, `orientation`=0.471239 WHERE `guid`=35875;
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (308, 0, 81, 1037, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Distracting Jarven: Guarded Thunder Ale Barrel - Despawn');
+
+-- The Scarab Gong
+UPDATE `gameobject_template` SET `type`=5, `data1`=1, `script_name`='' WHERE `entry`=180718;
+UPDATE `gameobject_questrelation` SET `id`=180717 WHERE `quest`=8743;
+UPDATE `gameobject_involvedrelation` SET `id`=180717 WHERE `quest`=8743;
+REPLACE INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (180717, 2, 4675, 'The Scarab Gong', 0, 4, 1, 0, 7155, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_scarab_gong');
+UPDATE `gameobject` SET `id`=180717 WHERE `id`=180718;
+
 -- Data for GAMEOBJECT_TYPE_CHEST = 3
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=3642;
 UPDATE `gameobject_template` SET `data0`=43, `data9`=0 WHERE `entry`=153471;
--- UPDATE `gameobject_template` SET `data1`=1697 WHERE `entry`=41; -- its empty, so don't assign not existing loot id
 UPDATE `gameobject_template` SET `data0`=43, `data9`=0 WHERE `entry`=3659;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=176112;
 UPDATE `gameobject_template` SET `data9`=60 WHERE `entry`=176308;
@@ -616,7 +640,6 @@ UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179496;
 UPDATE `gameobject_template` SET `data4`=1, `data5`=2 WHERE `entry`=176643;
 UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=105570;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=103821;
--- UPDATE `gameobject_template` SET `data1`=4770 WHERE `entry`=105176; -- its empty, so don't assign not existing loot id
 UPDATE `gameobject_template` SET `name`='Alliance Chest', `data9`=0, `data15`=0 WHERE `entry`=105581;
 UPDATE `gameobject_template` SET `data9`=0, `data15`=0 WHERE `entry`=106319;
 UPDATE `gameobject_template` SET `name`='Alliance Chest', `data9`=0, `data15`=0 WHERE `entry`=111095;
@@ -673,6 +696,21 @@ UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179488;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179490;
 UPDATE `gameobject_template` SET `type`=1 WHERE `entry`=179556;
 
+-- Venture Co. Strongbox. This was part of unused quest 2020.
+DELETE FROM `gameobject_loot_template` WHERE `entry`=4770;
+INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`) VALUES (4770, 7389, -100, 0, 1, 1, 0);
+UPDATE `gameobject_template` SET `data1`=4770 WHERE `entry`=105176;
+
+-- Quest Ambushed In The Forest was replaced by Children's Week in patch 1.4.
+DELETE FROM `quest_template` WHERE `entry`=172;
+INSERT INTO `quest_template` (`entry`, `patch`, `Method`, `ZoneOrSort`, `MinLevel`, `MaxLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`, `RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`, `QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`, `Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`, `ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`, `ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`, `ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`, `RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`, `RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`, `RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`, `RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`, `RewXP`, `RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `RewMailMoney`, `PointMapId`, `PointX`, `PointY`, `PointOpt`, `DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`, `IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`, `OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`, `StartScript`, `CompleteScript`) VALUES (172, 0, 2, 10, 26, 0, 29, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ambushed In The Forest', 'Lord Ebonlocke sent me to Stormwind to represent Darkshire at the recent council of the House of Nobles. I was tasked with requesting military aid in light of the undead infestation which has taken over the forest.\r\n\r\nBut on my way back a band of thieves ambushed me. I was forced to drive my cart to The Rotting Orchard in southern Duskwood.\r\n\r\nBefore the thieves could rob me of my goods, a pack of ferocious Worgen overtook the thugs. Now I need you to retrieve my satchel from the chest in the wagon.', 'Retrieve Ambassador Berrybuck\'s satchel and bring it back to him in Darkshire.', '', NULL, NULL, NULL, NULL, NULL, NULL, 1923, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 72, 0, 0, 0, 0, 100, 0, 0, 0, 0, 2350, 2500, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO `quest_template` (`entry`, `patch`, `Method`, `ZoneOrSort`, `MinLevel`, `MaxLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`, `RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`, `QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`, `Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`, `ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`, `ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`, `ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`, `ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`, `RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`, `RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`, `RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`, `RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`, `RewXP`, `RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `RewMailMoney`, `PointMapId`, `PointX`, `PointY`, `PointOpt`, `DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`, `IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`, `OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`, `StartScript`, `CompleteScript`) VALUES (172, 2, 2, -284, 10, 0, 60, 0, 0, 178, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18597, 1, 0, 'Children\'s Week', 'You\'re willing to help us here at the orphanage?  Bless you, friend; your aid during Children\'s Week will be invaluable.$B$BTake this whistle.  You will only be able to use it for a short amount of time - typically not longer than Children\'s Week itself.  When you use it, you will be able to talk with the child you\'ve agreed to look after.  Using it again will dismiss the child.$B$BBy all means $N - use the whistle and meet your ward!  I\'m sure the child will be most eager to meet you.', 'Use the Orcish Orphan Whistle to talk with the child you will be looking after during Children\'s Week.', 'Zug zug! My name is Grunth, and I guess you\'re looking after me? You\'re an adventurer, like my mom and dad were. My matron says that they died with honor in battle. I\'m happy to meet you.$B$BI hope we\'ll do plenty of things together. I have some things I\'d like to do, and the matron says you\'ll be like a big $gbrother:sister; to me during this week. I\'d like that a whole bunch.', NULL, '', '', '', '', '', 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 67, 0, 0, 0, 0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (271, 172, 0, 1);
+INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (271, 172, 0, 1);
+DELETE FROM gameobject_loot_template WHERE entry=1697;
+INSERT INTO gameobject_loot_template (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`) VALUES (1697, 1923, -100, 0, 1, 1, 0);
+UPDATE `gameobject_template` SET `data1`=1697 WHERE `entry`=41;
+
 -- Marshal Haggard's Chest: Summon Forlorn Spirit
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1562, 9, 75, 1, 0, 0, 0);
 DELETE FROM `event_scripts` WHERE `id`=264;
@@ -702,6 +740,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`) VALUES (969, 16, 
 DELETE FROM `gameobject_loot_template` WHERE `entry` IN (2775, 190483, 190484);
 DELETE FROM `gameobject_template` WHERE `entry` IN (190483, 190484);
 UPDATE `gameobject` SET `id`=176344 WHERE `id` IN (190483, 190484);
+DELETE FROM `gameobject_loot_template` WHERE `entry`=2774;
 INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (2774, 12765, -100, 0, 1, 1, 966, 0, 10);
 INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (2774, 12766, -100, 0, 1, 1, 967, 0, 10);
 INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (2774, 12768, -100, 0, 1, 1, 968, 0, 10);
@@ -733,7 +772,7 @@ DELETE FROM `gossip_scripts` WHERE `id`=6669;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (6669, 0, 17, 21107, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Give Draconic for Dummies Chap. V');
 DELETE FROM `gossip_scripts` WHERE `id`=6670;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (6670, 0, 17, 21106, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Give Draconic for Dummies Chap. IV');
-DELETE FROM `gameobject_loot_template` WHERE `entry` IN (10002, 10000)
+DELETE FROM `gameobject_loot_template` WHERE `entry` IN (10002, 10001, 10000);
 UPDATE `gameobject_template` SET `type`=2, `data0`=0, `data1`=0, `data3`=6669, `data9`=0 WHERE `entry`=180665;
 UPDATE `gameobject_template` SET `type`=2, `data0`=0, `data1`=0, `data3`=6670, `data9`=0 WHERE `entry`=180666;
 UPDATE `gameobject_template` SET `type`=2, `data0`=0, `data1`=0, `data3`=6668, `data9`=0 WHERE `entry`=180667;
@@ -774,15 +813,15 @@ UPDATE `gameobject_template` SET `name`='Bench]' WHERE `entry`=170524;
 
 -- Data for GAMEOBJECT_TYPE_SPELL_FOCUS = 8
 UPDATE `gameobject_template` SET `data0`=4, `data2`=2061 WHERE `entry`=1911;
-UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126337;
-UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126340;
+-- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126337;
+-- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126340;
 UPDATE `gameobject_template` SET `name`='Doodad_DwarvenBrazier196' WHERE `entry`=175666;
 UPDATE `gameobject_template` SET `size`=0.948003 WHERE `entry`=32885;
-UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126338;
-UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126339;
-UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126341;
-UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126342;
-UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126345;
+-- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126338;
+-- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126339;
+-- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126341;
+-- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126342;
+-- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126345;
 UPDATE `gameobject_template` SET `name`='Doodad_DwarvenBrazier195' WHERE `entry`=175667;
 UPDATE `gameobject_template` SET `type`=0, `data0`=0, `data1`=0, `data2`=0 WHERE `entry`=177000;
 
@@ -866,16 +905,16 @@ UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=180788;
 UPDATE `gameobject_template` SET `data3`=196608 WHERE `entry`=180857;
 
 -- Demon Portal
-DELETE FROM `gameobject_template_scripts` WHERE `id` IN (177366. 177369, 177400, 177397, 177243, 177365, 177398, 177399);
+DELETE FROM `gameobject_template_scripts` WHERE `id` IN (177366, 177369, 177400, 177397, 177243, 177365, 177398, 177399);
 INSERT INTO `gameobject_template_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(177366, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177369, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177400, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177397, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177243, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177365, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177398, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177399, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use');
+(177366, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177369, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177400, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177397, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177243, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177365, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177398, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
+(177399, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use');
 UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177366;
 UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177369;
 UPDATE `gameobject_template` SET `data5`=0 WHERE `entry`=177400;
@@ -907,6 +946,59 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 DELETE FROM `event_scripts` WHERE `id`=336102;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (336102, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4599, 4594, 4598, 4596, 0, 0, 0, 0, 0, 'Thaurissan Relic - Whisper Text');
 -- UPDATE `gameobject_template` SET `data1`=3702 WHERE `entry`=153556; -- blizzlike quest id is wrong?
+
+
+-- Data for GAMEOBJECT_TYPE_MOTRANSPORT = 15
+UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=176310;
+UPDATE `gameobject_template` SET `name`='TEST Ship', `data5`=0, `data6`=0 WHERE `entry`=20808;
+UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=176231;
+UPDATE `gameobject_template` SET `name`='Zeppelin - Grom\'Gol to Undercity', `data6`=0 WHERE `entry`=176495;
+UPDATE `gameobject_template` SET `name`='Zeppelin - Orgrimmar to Undercity', `data6`=0 WHERE `entry`=164871;
+UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=176244;
+UPDATE `gameobject_template` SET `name`='Zeppelin - Grom\'Gol-Orgrimar', `data6`=0 WHERE `entry`=175080;
+UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=177233;
+
+-- Data for GAMEOBJECT_TYPE_RITUAL = 18
+-- UPDATE `gameobject_template` SET `data2`=0, `data5`=0, `data7`=0 WHERE `entry`=36727;
+
+-- Data for GAMEOBJECT_TYPE_MAILBOX = 19
+UPDATE `gameobject_template` SET `name`='Doodad_PostBoxGnome01' WHERE `entry`=175668;
+
+-- Data for GAMEOBJECT_TYPE_AUCTIONHOUSE = 20
+UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=176924;
+
+-- Data for GAMEOBJECT_TYPE_MEETINGSTONE = 23
+UPDATE `gameobject_template` SET `data1`=18 WHERE `entry`=179596;
+UPDATE `gameobject_template` SET `name`='Meeting', `data0`=46, `data1`=55 WHERE `entry`=178827;
+
+-- Data for GAMEOBJECT_TYPE_FISHINGHOLE = 25
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180656;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180661;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180664;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180902;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180712;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180582;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180751;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180684;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180655;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180657;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180658;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180662;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180663;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180682;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180683;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180685;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180750;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180752;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180753;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180900;
+UPDATE `gameobject_template` SET `data4`=0 WHERE `entry`=180901;
+
+-- Data for GAMEOBJECT_TYPE_CAPTUREPOINT = 29
+UPDATE `gameobject_template` SET `data20`=50 WHERE `entry`=182098;
+UPDATE `gameobject_template` SET `data20`=50 WHERE `entry`=182097;
+UPDATE `gameobject_template` SET `data20`=50 WHERE `entry`=181899;
+UPDATE `gameobject_template` SET `data20`=50 WHERE `entry`=182096;
 
 
 -- End of migration.
