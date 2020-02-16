@@ -406,41 +406,41 @@ struct go_bells : public GameObjectAI
 
         switch (me->GetEntry())
         {
-        case GO_HORDE_BELL:
-        {
-            switch (zoneId)
+            case GO_HORDE_BELL:
             {
-            case TIRISFAL_ZONE:
-            case UNDERCITY_ZONE:
-            case HILLSBRAD_FOOTHILLS_ZONE:
-            case DUSKWOOD_ZONE:
-                _soundId = BELLTOLLHORDE;  // undead bell sound 
-                break;
-            default:
-                _soundId = BELLTOLLTRIBAL; // drum sound
-                break;
-            }
+                switch (zoneId)
+                {
+                    case TIRISFAL_ZONE:
+                    case UNDERCITY_ZONE:
+                    case HILLSBRAD_FOOTHILLS_ZONE:
+                    case DUSKWOOD_ZONE:
+                         _soundId = BELLTOLLHORDE;  // undead bell sound 
+                         break;
+                    default:
+                        _soundId = BELLTOLLTRIBAL; // drum sound
+                        break;
+                }
             break;
-        }
-        case GO_ALLIANCE_BELL:
-        {
-            switch (zoneId)
+            }
+            case GO_ALLIANCE_BELL:
             {
-            case IRONFORGE_ZONE:
-            case DUN_MOROGH_ZONE:
-                _soundId = BELLTOLLDWARFGNOME; // horn sound
-                break;
-            case TELDRASSIL_ZONE:
-            case DARNASSUS_ZONE:
-            case ASHENVALE_ZONE:
-                _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
-                break;
-            default:
-                _soundId = BELLTOLLALLIANCE;   // human bell sound
-                break;
-            }
+                switch (zoneId)
+                {
+                    case IRONFORGE_ZONE:
+                    case DUN_MOROGH_ZONE:
+                        _soundId = BELLTOLLDWARFGNOME; // horn sound
+                        break;
+                    case TELDRASSIL_ZONE:
+                    case DARNASSUS_ZONE:
+                    case ASHENVALE_ZONE:
+                        _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
+                        break;
+                    default:
+                        _soundId = BELLTOLLALLIANCE;   // human bell sound
+                        break;
+                }
             break;
-        }
+            }
         default:
             sLog.outError("go_bells() called with invalid object, ID: %u", me->GetEntry());
         }
@@ -467,8 +467,9 @@ struct go_bells : public GameObjectAI
                     time_t rawtime;
                     time(&rawtime);
                     struct tm * timeinfo = localtime(&rawtime);
-                    uint8 _rings = ((timeinfo->tm_hour) % 12);
-                    if (_rings == 0) { // 00:00 and 12:00
+                    uint8 _rings = (timeinfo->tm_hour) % 12;
+                    if (_rings == 0) // 00:00 and 12:00
+                    {
                         _rings = 12;
                     }
                     // Schedule ring event
