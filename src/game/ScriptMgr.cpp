@@ -405,9 +405,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
 
                     if (info->type == GAMEOBJECT_TYPE_FISHINGNODE ||
                         info->type == GAMEOBJECT_TYPE_FISHINGHOLE ||
-                        info->type == GAMEOBJECT_TYPE_DOOR ||
-                        info->type == GAMEOBJECT_TYPE_BUTTON ||
-                        info->type == GAMEOBJECT_TYPE_TRAP)
+                        info->type == GAMEOBJECT_TYPE_DOOR)
                     {
                         sLog.outErrorDb("Table `%s` have gameobject type (%u) unsupported by command SCRIPT_COMMAND_RESPAWN_GAMEOBJECT for script id %u", tablename, info->id, tmp.id);
                         continue;
@@ -1189,6 +1187,45 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     sLog.outErrorDb("Table `%s` using invalid go state in datalong (%u) in SCRIPT_COMMAND_SET_GO_STATE for script id %u",
                         tablename, tmp.setGoState.state, tmp.id);
                     continue;
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_DESPAWN_GAMEOBJECT:
+            {
+                if (tmp.GetGOGuid()) // cant check when using buddy\source\target instead
+                {
+                    GameObjectData const* data = sObjectMgr.GetGOData(tmp.GetGOGuid());
+                    if (!data)
+                    {
+                        if (!sObjectMgr.IsExistingGameObjectGuid(tmp.GetGOGuid()))
+                        {
+                            sLog.outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_DESPAWN_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
+                            continue;
+                        }
+                        else
+                        {
+                            DisableScriptAction(tmp);
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_LOAD_GAMEOBJECT:
+            {
+                GameObjectData const* data = sObjectMgr.GetGOData(tmp.GetGOGuid());
+                if (!data)
+                {
+                    if (!sObjectMgr.IsExistingGameObjectGuid(tmp.GetGOGuid()))
+                    {
+                        sLog.outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_LOAD_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
+                        continue;
+                    }
+                    else
+                    {
+                        DisableScriptAction(tmp);
+                        break;
+                    }
                 }
                 break;
             }

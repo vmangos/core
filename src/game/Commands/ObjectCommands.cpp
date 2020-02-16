@@ -29,6 +29,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include <ctime>
 
 bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 {
@@ -173,7 +174,15 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
     }
     
     PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
-    SendSysMessage(pGameObject->isSpawned() ? "Object is spawned." : "Not spawned.");
+    if (pGameObject->isSpawned())
+        SendSysMessage("Object is spawned.");
+    else
+    {
+        time_t respawnTime = pGameObject->GetRespawnTime();
+        std::tm* pTime = std::localtime(&respawnTime);
+        PSendSysMessage("Not spawned. Respawns in %u seconds (%u:%u:%u).", pGameObject->GetRespawnDelay(), pTime->tm_hour, pTime->tm_min, pTime->tm_sec);
+    }
+    
 
     return true;
 }

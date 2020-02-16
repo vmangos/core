@@ -3342,7 +3342,6 @@ SpellCastResult Spell::prepare(SpellCastTargets targets, Aura* triggeredByAura, 
 
 SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
 {
-
     m_spellState = SPELL_STATE_PREPARING;
     m_delayed = m_spellInfo->speed > 0.0f 
         || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer());

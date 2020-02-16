@@ -703,42 +703,6 @@ void DefineMagramiMagnet(Creature * crea, uint64 gobjGUID)
     }
 }
 
-enum
-{
-    NPC_PORTAL_DEMON_DEMON  = 11937,
-};
-
-struct go_demon_portalAI: public GameObjectAI
-{
-    go_demon_portalAI(GameObject* pGo) : GameObjectAI(pGo)
-    {
-    }
-    ObjectGuid _demonGuid;
-    bool OnUse(Unit* caster) override
-    {
-        Unit* demon;
-        if (_demonGuid)
-        {
-            demon = me->GetMap()->GetCreature(_demonGuid);
-            if (demon && demon->IsAlive())
-                return true;
-        }
-        demon = me->SummonCreature(NPC_PORTAL_DEMON_DEMON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), caster ? me->GetAngle(caster) : 0.0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
-        if (demon)
-        {
-            _demonGuid = demon->GetObjectGuid();
-            if (caster)
-                demon->AI()->AttackStart(caster);
-        }
-        return true;
-    }
-};
-
-GameObjectAI* GetAI_go_demon_portal(GameObject *go)
-{
-    return new go_demon_portalAI(go);
-}
-
 /*
  * Gizelton Caravan, Bodyguard For Hire support
  */
@@ -1350,11 +1314,6 @@ void AddSC_desolace()
     newscript = new Script;
     newscript->Name = "npc_magrami_spetre";
     newscript->GetAI = &GetAI_npc_magrami_spetre;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_demon_portal";
-    newscript->GOGetAI = &GetAI_go_demon_portal;
     newscript->RegisterSelf();
 
     newscript = new Script;

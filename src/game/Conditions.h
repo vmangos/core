@@ -216,6 +216,9 @@ enum ConditionType
                                                             // Requirement: Player Target
                                                             // Value1: rank
                                                             // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_DB_GUID               = 52,                   // Checks source object's db guid.
+                                                            // Requirement: WorldObject Source
+                                                            // Value1: guid
 };
 
 enum ConditionFlags

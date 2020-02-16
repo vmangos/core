@@ -4994,7 +4994,7 @@ void WorldObject::RemoveAllDynObjects()
     }
 }
 
-void WorldObject::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
+void WorldObject::CastSpell(Unit* pVictim, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
@@ -5007,10 +5007,10 @@ void WorldObject::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item* 
         return;
     }
 
-    CastSpell(Victim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
+    CastSpell(pVictim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
 }
 
-void WorldObject::CastSpell(Unit* Victim, SpellEntry const* spellInfo, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
+void WorldObject::CastSpell(Unit* pVictim, SpellEntry const* spellInfo, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
 {
     if (!spellInfo)
     {
@@ -5046,9 +5046,9 @@ void WorldObject::CastSpell(Unit* Victim, SpellEntry const* spellInfo, bool trig
     // Don't set unit target on destination target based spells, otherwise the spell will cancel
     // as soon as the target dies or leaves the area of the effect
     if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
-        targets.setDestination(Victim->GetPositionX(), Victim->GetPositionY(), Victim->GetPositionZ());
+        targets.setDestination(pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ());
     else
-        targets.setUnitTarget(Victim);
+        targets.setUnitTarget(pVictim);
 
     if (spellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
         if (WorldObject* caster = spell->GetCastingObject())
@@ -5058,7 +5058,7 @@ void WorldObject::CastSpell(Unit* Victim, SpellEntry const* spellInfo, bool trig
     spell->prepare(std::move(targets), triggeredByAura);
 }
 
-void WorldObject::CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+void WorldObject::CastCustomSpell(Unit* pVictim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
@@ -5071,10 +5071,10 @@ void WorldObject::CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0
         return;
     }
 
-    CastCustomSpell(Victim, spellInfo, bp0, bp1, bp2, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
+    CastCustomSpell(pVictim, spellInfo, bp0, bp1, bp2, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
 }
 
-void WorldObject::CastCustomSpell(Unit* Victim, SpellEntry const* spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+void WorldObject::CastCustomSpell(Unit* pVictim, SpellEntry const* spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
 {
     if (!spellInfo)
     {
@@ -5115,7 +5115,7 @@ void WorldObject::CastCustomSpell(Unit* Victim, SpellEntry const* spellInfo, int
         spell->m_currentBasePoints[EFFECT_INDEX_2] = *bp2;
 
     SpellCastTargets targets;
-    targets.setUnitTarget(Victim);
+    targets.setUnitTarget(pVictim);
     spell->SetCastItem(castItem);
     spell->prepare(std::move(targets), triggeredByAura);
 }

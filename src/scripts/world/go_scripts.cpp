@@ -31,7 +31,6 @@ go_field_repair_bot_74A
 go_orb_of_command
 go_resonite_cask
 go_tablet_of_madness
-go_tablet_of_the_seven
 go_silithyste
 go_restes_sha_ni
 go_Hive_Regal_Glyphed_Crystal
@@ -242,22 +241,6 @@ bool GOHello_go_tablet_of_madness(Player* pPlayer, GameObject* pGo)
 {
     if (pPlayer->HasSkill(SKILL_ALCHEMY) && pPlayer->GetSkillValue(SKILL_ALCHEMY) >= 300 && !pPlayer->HasSpell(24266))
         pPlayer->CastSpell(pPlayer, 24267, false);
-    return true;
-}
-
-/*######
-## go_tablet_of_the_seven
-######*/
-
-//TODO: use gossip option ("Transcript the Tablet") instead, if Mangos adds support.
-bool GOHello_go_tablet_of_the_seven(Player* pPlayer, GameObject* pGo)
-{
-    if (pGo->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
-        return true;
-
-    if (pPlayer->GetQuestStatus(4296) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->CastSpell(pPlayer, 15065, false);
-
     return true;
 }
 
@@ -600,11 +583,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_tablet_of_madness";
     newscript->pGOHello =           &GOHello_go_tablet_of_madness;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_tablet_of_the_seven";
-    newscript->pGOHello =           &GOHello_go_tablet_of_the_seven;
     newscript->RegisterSelf();
 
     newscript = new Script;

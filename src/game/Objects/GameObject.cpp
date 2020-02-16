@@ -1160,7 +1160,7 @@ bool GameObject::ActivateToQuest(Player* pTarget) const
         }
         case GAMEOBJECT_TYPE_GOOBER:
         {
-            if (pTarget->GetQuestStatus(GetGOInfo()->goober.questId) == QUEST_STATUS_INCOMPLETE)
+            if (GetGOInfo()->goober.questId == -1 || pTarget->GetQuestStatus(GetGOInfo()->goober.questId) == QUEST_STATUS_INCOMPLETE)
                 return true;
             break;
         }
@@ -1390,6 +1390,7 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
             TriggerLinkedGameObject(user);
             return;
         }
@@ -1519,7 +1520,7 @@ void GameObject::Use(Unit* user)
                 }
 
                 // possible quest objective for active quests
-                if (info->goober.questId && sObjectMgr.GetQuestTemplate(info->goober.questId))
+                if (info->goober.questId > 0 && sObjectMgr.GetQuestTemplate(info->goober.questId))
                 {
                     //Quest require to be active for GO using
                     if (player->GetQuestStatus(info->goober.questId) != QUEST_STATUS_INCOMPLETE)
@@ -1533,9 +1534,11 @@ void GameObject::Use(Unit* user)
                     if (!sScriptMgr.OnProcessEvent(info->goober.eventId, player, this, true))
                         GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
                 }
+                else
+                    GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
 
                 // possible quest objective for active quests
-                if (info->goober.questId && sObjectMgr.GetQuestTemplate(info->goober.questId))
+                if (info->goober.questId > 0 && sObjectMgr.GetQuestTemplate(info->goober.questId))
                 {
                     //Quest require to be active for GO using
                     if (player->GetQuestStatus(info->goober.questId) != QUEST_STATUS_INCOMPLETE)
