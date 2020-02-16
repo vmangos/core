@@ -1191,7 +1191,6 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 break;
             }
             case SCRIPT_COMMAND_DESPAWN_GAMEOBJECT:
-            case SCRIPT_COMMAND_LOAD_GAMEOBJECT:
             {
                 if (tmp.GetGOGuid()) // cant check when using buddy\source\target instead
                 {
@@ -1200,7 +1199,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     {
                         if (!sObjectMgr.IsExistingGameObjectGuid(tmp.GetGOGuid()))
                         {
-                            sLog.outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_DESPAWN_GAMEOBJECT or SCRIPT_COMMAND_LOAD_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
+                            sLog.outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_DESPAWN_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
                             continue;
                         }
                         else
@@ -1208,6 +1207,24 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                             DisableScriptAction(tmp);
                             break;
                         }
+                    }
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_LOAD_GAMEOBJECT:
+            {
+                GameObjectData const* data = sObjectMgr.GetGOData(tmp.GetGOGuid());
+                if (!data)
+                {
+                    if (!sObjectMgr.IsExistingGameObjectGuid(tmp.GetGOGuid()))
+                    {
+                        sLog.outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_LOAD_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
+                        continue;
+                    }
+                    else
+                    {
+                        DisableScriptAction(tmp);
+                        break;
                     }
                 }
                 break;
