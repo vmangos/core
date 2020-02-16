@@ -906,6 +906,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool ScriptCommand_LeaveCreatureGroup(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_SetGoState(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_DespawnGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_LoadGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         ScriptCommandFunction const m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -992,6 +993,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             &Map::ScriptCommand_LeaveCreatureGroup,     // 79
             &Map::ScriptCommand_SetGoState,             // 80
             &Map::ScriptCommand_DespawnGameObject,      // 81
+            &Map::ScriptCommand_LoadGameObject,         // 82
         };
 
     public:

@@ -1352,7 +1352,6 @@ void GameObject::Use(Unit* user)
 
             // activate script
             GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
-            GetMap()->ScriptsStart(sGameObjectTemplateScripts, GetEntry(), user, this);
             return;
         }
         case GAMEOBJECT_TYPE_BUTTON:                        // 1
@@ -1367,7 +1366,6 @@ void GameObject::Use(Unit* user)
 
             // activate script
             GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
-            GetMap()->ScriptsStart(sGameObjectTemplateScripts, GetEntry(), user, this);
 
             TriggerLinkedGameObject(user);
             return;
@@ -1538,7 +1536,6 @@ void GameObject::Use(Unit* user)
                 else
                 {
                     GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
-                    GetMap()->ScriptsStart(sGameObjectTemplateScripts, GetEntry(), user, this);
                 }   
 
                 // possible quest objective for active quests

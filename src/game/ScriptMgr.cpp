@@ -40,7 +40,6 @@ ScriptMapMap sQuestStartScripts;
 ScriptMapMap sSpellScripts;
 ScriptMapMap sCreatureSpellScripts;
 ScriptMapMap sGameObjectScripts;
-ScriptMapMap sGameObjectTemplateScripts;
 ScriptMapMap sEventScripts;
 ScriptMapMap sGossipScripts;
 ScriptMapMap sCreatureMovementScripts;
@@ -1192,6 +1191,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 break;
             }
             case SCRIPT_COMMAND_DESPAWN_GAMEOBJECT:
+            case SCRIPT_COMMAND_LOAD_GAMEOBJECT:
             {
                 if (tmp.GetGOGuid()) // cant check when using buddy\source\target instead
                 {
@@ -1200,7 +1200,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                     {
                         if (!sObjectMgr.IsExistingGameObjectGuid(tmp.GetGOGuid()))
                         {
-                            sLog.outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_DESPAWN_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
+                            sLog.outErrorDb("Table `%s` has invalid gameobject (GUID: %u) in SCRIPT_COMMAND_DESPAWN_GAMEOBJECT or SCRIPT_COMMAND_LOAD_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), tmp.id);
                             continue;
                         }
                         else
@@ -1208,13 +1208,6 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                             DisableScriptAction(tmp);
                             break;
                         }
-                    }
-
-                    GameObjectInfo const* info = ObjectMgr::GetGameObjectInfo(data->id);
-                    if (!info)
-                    {
-                        sLog.outErrorDb("Table `%s` has gameobject with invalid entry (GUID: %u Entry: %u) in SCRIPT_COMMAND_DESPAWN_GAMEOBJECT for script id %u", tablename, tmp.GetGOGuid(), data->id, tmp.id);
-                        continue;
                     }
                 }
                 break;
@@ -1248,16 +1241,6 @@ void ScriptMgr::LoadGameObjectScripts()
         if (!sObjectMgr.GetGOData(itr.first))
             if (!sObjectMgr.IsExistingGameObjectGuid(itr.first))
                 sLog.outErrorDb("Table `gameobject_scripts` has not existing gameobject (GUID: %u) as script id", itr.first);
-    }
-
-    LoadScripts(sGameObjectTemplateScripts, "gameobject_template_scripts");
-
-    // check ids
-    for (const auto& itr : sGameObjectTemplateScripts)
-    {
-        if (!sObjectMgr.GetGameObjectInfo(itr.first))
-            if (!sObjectMgr.IsExistingGameObjectId(itr.first))
-                sLog.outErrorDb("Table `gameobject_template_scripts` has not existing gameobject (Entry: %u) as script id", itr.first);
     }
 }
 
@@ -1435,7 +1418,6 @@ void ScriptMgr::CheckAllScriptTexts()
     CheckScriptTexts(sSpellScripts);
     CheckScriptTexts(sCreatureSpellScripts);
     CheckScriptTexts(sGameObjectScripts);
-    CheckScriptTexts(sGameObjectTemplateScripts);
     CheckScriptTexts(sEventScripts);
     CheckScriptTexts(sGossipScripts);
     CheckScriptTexts(sCreatureMovementScripts);

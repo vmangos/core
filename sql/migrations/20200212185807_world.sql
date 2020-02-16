@@ -14,31 +14,6 @@ ALTER TABLE `gameobject_template`
 	CHANGE COLUMN `data1` `data1` INT(11) NOT NULL DEFAULT '0' AFTER `data0`,
 	CHANGE COLUMN `data6` `data6` INT(11) NOT NULL DEFAULT '0' AFTER `data5`;
 
--- Add new scripts table.
-CREATE TABLE IF NOT EXISTS `gameobject_template_scripts` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `delay` int(10) unsigned NOT NULL DEFAULT '0',
-  `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `datalong` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
-  `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
-  `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
-  `target_param1` int(10) unsigned NOT NULL DEFAULT '0',
-  `target_param2` int(10) unsigned NOT NULL DEFAULT '0',
-  `target_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `dataint` int(11) NOT NULL DEFAULT '0',
-  `dataint2` int(11) NOT NULL DEFAULT '0',
-  `dataint3` int(11) NOT NULL DEFAULT '0',
-  `dataint4` int(11) NOT NULL DEFAULT '0',
-  `x` float NOT NULL DEFAULT '0',
-  `y` float NOT NULL DEFAULT '0',
-  `z` float NOT NULL DEFAULT '0',
-  `o` float NOT NULL DEFAULT '0',
-  `condition_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `comments` varchar(255) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
 -- Wrong size.
 UPDATE `gameobject_template` SET `size`=0.3 WHERE `entry`=21128;
 UPDATE `gameobject_template` SET `size`=0.946831 WHERE `entry`=32884;
@@ -792,7 +767,7 @@ UPDATE `gameobject_template` SET `data2`=5 WHERE `entry`=164880;
 UPDATE `gameobject_template` SET `data2`=0, `data5`=0 WHERE `entry`=165578;
 UPDATE `gameobject_template` SET `data2`=5 WHERE `entry`=164839;
 UPDATE `gameobject_template` SET `data2`=5 WHERE `entry`=164879;
-UPDATE `gameobject_template` SET `data0`=95, `data2`=0 WHERE `entry`=109515;
+-- UPDATE `gameobject_template` SET `data0`=95, `data2`=0 WHERE `entry`=109515; -- Trap for quest Plagued Lands. Doesn't work without radius.
 UPDATE `gameobject_template` SET `data2`=10 WHERE `entry`=177764;
 UPDATE `gameobject_template` SET `data5`=0 WHERE `entry`=144050;
 UPDATE `gameobject_template` SET `data2`=5 WHERE `entry`=164872;
@@ -803,6 +778,9 @@ UPDATE `gameobject_template` SET `data2`=5 WHERE `entry`=164877;
 UPDATE `gameobject_template` SET `name`='Dawn\'s Gambit Trap', `data3`=18110, `data4`=1, `data8`=1 WHERE `entry`=176110;
 UPDATE `gameobject_template` SET `data1`=0 WHERE `entry`=177485;
 UPDATE `gameobject_template` SET `type`=8, `data1`=10, `data2`=0, `data3`=0, `data5`=0 WHERE `entry`=177524;
+
+-- Add missing GO template 175622 spawn by GO Rookery Egg 175124 (guessed data)
+INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`) VALUES (175622, 6, 477, 'Rookery Egg Spawner', 1, 0, 0, 2, 15745, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Onyxia Egg Spawner
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (176510, 5, 11686, 'Onyxia Whelp Spawner', 14, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
@@ -905,16 +883,42 @@ UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=180788;
 UPDATE `gameobject_template` SET `data3`=196608 WHERE `entry`=180857;
 
 -- Demon Portal
-DELETE FROM `gameobject_template_scripts` WHERE `id` IN (177366, 177369, 177400, 177397, 177243, 177365, 177398, 177399);
-INSERT INTO `gameobject_template_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
-(177366, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177369, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177400, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177397, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177243, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177365, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177398, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use'),
-(177399, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Despawn Self on Use');
+DELETE FROM `gameobject_scripts` WHERE `id` IN (30899, 32567, 32568, 32570, 32571, 32572, 32661, 32663);
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES
+(30899, 900, 82, 30899, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Load to Map'),
+(30899, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Delete Self on Use'),
+(30899, 0, 10, 11937, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Demon Portal - Summon Demon Portal Guardian'),
+(32567, 900, 82, 32567, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Load to Map'),
+(32567, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Delete Self on Use'),
+(32567, 0, 10, 11937, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Demon Portal - Summon Demon Portal Guardian'),
+(32568, 900, 82, 32568, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Load to Map'),
+(32568, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Delete Self on Use'),
+(32568, 0, 10, 11937, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Demon Portal - Summon Demon Portal Guardian'),
+(32570, 900, 82, 32570, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Load to Map'),
+(32570, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Delete Self on Use'),
+(32570, 0, 10, 11937, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Demon Portal - Summon Demon Portal Guardian'),
+(32571, 900, 82, 32571, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Load to Map'),
+(32571, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Delete Self on Use'),
+(32571, 0, 10, 11937, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Demon Portal - Summon Demon Portal Guardian'),
+(32572, 900, 82, 32572, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Load to Map'),
+(32572, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Delete Self on Use'),
+(32572, 0, 10, 11937, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Demon Portal - Summon Demon Portal Guardian'),
+(32661, 900, 82, 32661, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Load to Map'),
+(32661, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Delete Self on Use'),
+(32661, 0, 10, 11937, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Demon Portal - Summon Demon Portal Guardian'),
+(32663, 900, 82, 32663, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Load to Map'),
+(32663, 2, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Demon Portal - Delete Self on Use'),
+(32663, 0, 10, 11937, 60000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Demon Portal - Summon Demon Portal Guardian');
+DELETE FROM `gameobject` WHERE `id`=177400;
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES 
+(30899, 177243, 1, -1944.78, 1844.43, 65.9396, 1.55334, 0, 0, 0.700909, 0.713251, 900, 900, 255, 1),
+(32567, 177365, 1, -1922.37, 1808.77, 66.7608, 3.85718, 0, 0, -0.936671, 0.35021, 900, 900, 255, 1),
+(32568, 177366, 1, -1985.62, 1944.33, 62.1731, -0.174533, 0, 0, 0.087156, -0.996195, 900, 900, 100, 1),
+(32570, 177369, 1, -1928.12, 1757.31, 74.2315, 0.174532, 0, 0, 0.0871553, 0.996195, 900, 900, 255, 1),
+(32571, 177397, 1, -1703.56, 1747.92, 60.5614, 4.2237, 0, 0, -0.857167, 0.515038, 900, 900, 255, 1),
+(32572, 177398, 1, -1669.82, 1956.21, 61.4355, 6.05629, 0, 0, -0.113203, 0.993572, 900, 900, 255, 1),
+(32661, 177399, 1, -1774.85, 1975.78, 61.1707, 0.122173, 0, 0, 0.0610485, 0.998135, 900, 900, 255, 1),
+(32663, 177400, 1, -1865.29, 1990.25, 62.8822, 4.64258, 0, 0, -0.731354, 0.681998, 900, 900, 255, 1);
 UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177366;
 UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177369;
 UPDATE `gameobject_template` SET `data5`=0 WHERE `entry`=177400;
@@ -923,6 +927,7 @@ UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177243;
 UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177365;
 UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177398;
 UPDATE `gameobject_template` SET `data5`=0, `data10`=0 WHERE `entry`=177399;
+UPDATE `gameobject_template` SET `script_name`='' WHERE `entry` IN (177366, 177369, 177400, 177397, 177243, 177365, 177398, 177399);
 
 -- Sacred Fire of Life (Arikara)
 DELETE FROM `event_scripts` WHERE `id`=175944;

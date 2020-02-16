@@ -332,6 +332,8 @@ enum eScriptCommand
     SCRIPT_COMMAND_DESPAWN_GAMEOBJECT       = 81,           // source = GameObject (from datalong, provided source or target)
                                                             // datalong = db_guid
                                                             // datalong2 = despawn_delay
+    SCRIPT_COMMAND_LOAD_GAMEOBJECT          = 82,           // source = Map
+                                                            // datalong = db_guid
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -1006,6 +1008,11 @@ struct ScriptInfo
             uint32 respawnDelay;                            // datalong2
         } despawnGo;
 
+        struct                                              // SCRIPT_COMMAND_LOAD_GAMEOBJECT (82)
+        {
+            uint32 goGuid;                                  // datalong
+        } loadGo;
+
         struct
         {
             uint32 data[9];
@@ -1033,6 +1040,7 @@ struct ScriptInfo
         {
             case SCRIPT_COMMAND_RESPAWN_GAMEOBJECT: return respawnGo.goGuid;
             case SCRIPT_COMMAND_DESPAWN_GAMEOBJECT: return despawnGo.goGuid;
+            case SCRIPT_COMMAND_LOAD_GAMEOBJECT: return loadGo.goGuid;
             case SCRIPT_COMMAND_OPEN_DOOR: return openDoor.goGuid;
             case SCRIPT_COMMAND_CLOSE_DOOR: return closeDoor.goGuid;
             default: return 0;
@@ -1062,7 +1070,6 @@ extern ScriptMapMap sQuestStartScripts;
 extern ScriptMapMap sSpellScripts;
 extern ScriptMapMap sCreatureSpellScripts;
 extern ScriptMapMap sGameObjectScripts;
-extern ScriptMapMap sGameObjectTemplateScripts;
 extern ScriptMapMap sEventScripts;
 extern ScriptMapMap sGossipScripts;
 extern ScriptMapMap sCreatureMovementScripts;

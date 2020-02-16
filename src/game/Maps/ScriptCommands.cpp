@@ -2241,3 +2241,26 @@ bool Map::ScriptCommand_DespawnGameObject(ScriptInfo const& script, WorldObject*
 
     return false;
 }
+
+// SCRIPT_COMMAND_LOAD_GAMEOBJECT (82)
+bool Map::ScriptCommand_LoadGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(script.loadGo.goGuid);
+
+    if (GetId() != pGameObjectData->position.mapId)
+    {
+        sLog.outError("SCRIPT_COMMAND_LOAD_GAMEOBJECT (script id %u) tried to spawn guid %u on wrong map %u.", script.id, script.loadGo.goGuid, GetId());
+        return ShouldAbortScript(script);
+    }
+
+    if (GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, script.loadGo.goGuid)))
+        return ShouldAbortScript(script); // already spawned
+
+    GameObject* pGameobject = new GameObject;
+    if (!pGameobject->LoadFromDB(script.loadGo.goGuid, this))
+        delete pGameobject;
+    else
+        Add(pGameobject);
+
+    return false;
+}
