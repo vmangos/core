@@ -435,7 +435,20 @@ UPDATE `gameobject_template` SET `type`=2, `displayId`=306 WHERE `entry`=177727;
 -- Miblon's Door
 UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=164729;
 UPDATE `gameobject` SET `spawntimesecsmin`=180, `spawntimesecsmax`=180 WHERE `id`=164729;
-UPDATE `event_scripts` SET `command`=81, `datalong2`=180 WHERE `id`=3718;
+DELETE FROM `event_scripts` WHERE `id`=3718;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3718, 0, 39, 9467, 0, 0, 0, 9467, 50, 8, 3, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Start Script');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (3718, 5, 81, 17428, 180, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon\'s Door - Despawn');
+DELETE FROM `event_scripts` WHERE `id`=9467;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 0, 4, 147, 1, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Remove Gossip Flag');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 2, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Set Facing to Miblon\'s Bait');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 2, 0, 2, 0, 0, 0, 0, 0, 0, 0, 4836, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Say Emoted Text 1');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 3, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Set Run');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 4, 3, 2, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Move to Miblon\'s Bait');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 7, 0, 2, 0, 0, 0, 0, 0, 0, 0, 4768, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Say Emoted Text 2');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4766, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Say Text 3');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4771, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Say Emoted Text 4');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 18, 20, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Move Home');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (9467, 20, 4, 147, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Videre Elixir: Miblon Snarltooth - Add Gossip Flag');
 
 -- Data for GAMEOBJECT_TYPE_BUTTON = 1
 UPDATE `gameobject_template` SET `type`=0 WHERE `entry`=124371;
@@ -444,7 +457,9 @@ UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=180524;
 UPDATE `gameobject_template` SET `data2`=327680 WHERE `entry`=178560;
 
 -- Altar of the Deeps.
-UPDATE `gameobject_template` SET `data3`=94039 WHERE `entry`=103016;
+DELETE FROM `gameobject_template` WHERE `entry`=103016;
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (103016, 0, 1, 402, 'Altar of the Deeps', 0, 16, 1, 0, 93, 65536, 94040, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+INSERT INTO `gameobject_template` (`entry`, `patch`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `script_name`) VALUES (103016, 7, 1, 402, 'Altar of the Deeps', 0, 16, 1, 0, 93, 65536, 94039, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
 DELETE FROM `gameobject_template` WHERE `entry`=94040 && `patch`=7;
 UPDATE `gameobject` SET `patch_max`=6 WHERE `guid`=14106;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES (14107, 94039, 48, -839.619, -477.904, -33.7343, 3.14159, 0, 0, 0.926452, 0.376412, 300, 300, 255, 1, 0, 0, 7, 10);
@@ -508,7 +523,7 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 DELETE FROM `gossip_scripts` WHERE `id`=218700;
 INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (218700, 0, 15, 15065, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tablet of the Seven - Cast Spell Create Tablet Transcript');
 DELETE FROM `gameobject_involvedrelation` WHERE `quest`=4296;
-UPDATE `gameobject_template` SET `script_name`='' WHERE `entry`=169294;
+UPDATE `gameobject_template` SET `flags`=0, `script_name`='' WHERE `entry`=169294;
 
 -- Guarded Thunder Ale Barrel
 UPDATE `gameobject_template` SET `data1`=192, `data5`=0 WHERE `entry`=269;
@@ -699,12 +714,12 @@ UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=141979;
 DELETE FROM `event_scripts` WHERE `id`=20000;
 DELETE FROM `gameobject_scripts` WHERE `id`=45332;
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45332, 2, 10, 10936, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 6, 3, 1165, -1719, 57, 2, 0, 'A Strange Historian: Joseph Redpath\'s Monument - Summon Joseph Redpath');
-INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45332, 4, 0, 4, 0, 0, 0, 10936, 50, 8, 2, 6274, 0, 0, 0, 0, 0, 0, 0, 0, 'A Strange Historian: Joseph Redpath - Wisper text 1');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45332, 4, 0, 4, 0, 0, 0, 10936, 50, 8, 2, 6274, 0, 0, 0, 0, 0, 0, 0, 0, 'A Strange Historian: Joseph Redpath - Whisper Text');
 UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=176145;
 
 -- Shadowforge Cache
 DELETE FROM `event_scripts` WHERE `id`=7091;
-DELETE FROM `gameobject_scripts`` WHERE `id`=40694;
+DELETE FROM `gameobject_scripts` WHERE `id`=40694;
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (40694, 1, 10, 7091, 120000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 24.745, 413.288, -44.823, 3, 0, 'Shadowforge Cache - Summon Shadowforge Ambusher 1');
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (40694, 1, 10, 7091, 120000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 22.386, 410.042, -44.606, 2.3, 0, 'Shadowforge Cache - Summon Shadowforge Ambusher 2');
 INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (40694, 1, 10, 7091, 120000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 19.174, 412.888, -44.872, 0.3, 4029, 'Shadowforge Cache - Summon Shadowforge Ambusher 3 (Pre-1.12)');
@@ -731,15 +746,13 @@ INSERT INTO gameobject_loot_template (`entry`, `item`, `ChanceOrQuestChance`, `g
 UPDATE `gameobject_template` SET `data1`=1697 WHERE `entry`=41;
 
 -- Marshal Haggard's Chest: Summon Forlorn Spirit
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1562, 9, 75, 1, 0, 0, 0);
 DELETE FROM `event_scripts` WHERE `id`=264;
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (264, 0, 10, 2044, 300000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, -9552.67, -1431.93, 62.3, 5.03, 1562, 'Marshal Haggard\'s Chest: Summon Forlorn Spirit');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (264, 0, 10, 2044, 300000, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, -9552.67, -1431.93, 62.3, 5.03, 0, 'Marshal Haggard\'s Chest: Summon Forlorn Spirit');
 UPDATE `gameobject_template` SET `data6`=264, `script_name`='' WHERE `entry`=1562;
 
 -- Dusty Spellbooks: Summon Moonrage Darkrunner
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1770, 9, 422, 1, 0, 0, 0);
 DELETE FROM `event_scripts` WHERE `id`=259;
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (259, 0, 10, 1770, 90000, 1, 10, 0, 0, 0, 0, 4, 1770, 0, 1, 875.38, 1232.43, 52.6, 3.16, 1770, 'Dusty Spellbooks: Summon Moonrage Darkrunner');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (259, 0, 10, 1770, 90000, 1, 10, 0, 0, 0, 1, 8, 1770, 0, 1, 875.38, 1232.43, 52.6, 3.16, 0, 'Dusty Spellbooks: Summon Moonrage Darkrunner');
 DELETE FROM `event_scripts` WHERE `id`=1770;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1770, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 502, 0, 0, 0, 0, 0, 0, 0, 0, 'Moonrage Darkrunner - Say Text');
 UPDATE `gameobject_template` SET `data6`=259, `script_name`='' WHERE `entry`=1571;
@@ -798,7 +811,7 @@ UPDATE `gameobject_template` SET `type`=2, `data0`=0, `data1`=0, `data3`=6668, `
 
 -- Data for GAMEOBJECT_TYPE_GENERIC = 5
 UPDATE `gameobject_template` SET `name`='Hanging, Door' WHERE `entry`=181021;
-UPDATE `gameobject_template` SET `type`=1 WHERE `entry`=177746; -- trap has no data, so not sure how it should work
+-- UPDATE `gameobject_template` SET `type`=1 WHERE `entry`=177746; -- trap has no data, so not sure how it should work
 
 -- GAMEOBJECT_TYPE_TRAP = 6
 UPDATE `gameobject_template` SET `data1`=0 WHERE `entry`=148837;
