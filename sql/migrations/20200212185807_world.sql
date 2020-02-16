@@ -130,6 +130,7 @@ UPDATE `gameobject_template` SET `size`=2 WHERE `entry`=180737;
 UPDATE `gameobject_template` SET `size`=2 WHERE `entry`=181060;
 UPDATE `gameobject_template` SET `size`=0.5 WHERE `entry`=181108;
 UPDATE `gameobject_template` SET `size`=0.5 WHERE `entry`=181109;
+UPDATE `gameobject_template` SET `size`='1.5' WHERE `entry`=152097;
 
 -- Wrong display id.
 UPDATE `gameobject_template` SET `displayId`=724 WHERE `entry`=2138;
@@ -399,6 +400,24 @@ UPDATE `gameobject_template` SET `displayId`=306 WHERE `entry`=179863;
 UPDATE `gameobject_template` SET `displayId`=306 WHERE `entry`=179886;
 UPDATE `gameobject_template` SET `displayId`=306 WHERE `entry`=180913;
 UPDATE `gameobject_template` SET `displayId`=306 WHERE `entry`=181130;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3888;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3894;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3906;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3904;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3900;
+UPDATE `gameobject_template` SET `displayId`=654 WHERE `entry`=3909;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3901;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3908;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=174847;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3891;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3892;
+UPDATE `gameobject_template` SET `displayId`=654 WHERE `entry`=3893;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3897;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3898;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3902;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3905;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3911;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=173187;
 
 -- Data for GAMEOBJECT_TYPE_DOOR = 0
 UPDATE `gameobject_template` SET `data0`=0, `data2`=196608 WHERE `entry`=176576;
@@ -506,6 +525,7 @@ UPDATE `gameobject` SET `id`=180717 WHERE `id`=180718;
 
 -- Data for GAMEOBJECT_TYPE_CHEST = 3
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=3642;
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=3704;
 UPDATE `gameobject_template` SET `data0`=43, `data9`=0 WHERE `entry`=153471;
 UPDATE `gameobject_template` SET `data0`=43, `data9`=0 WHERE `entry`=3659;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=176112;
@@ -621,13 +641,11 @@ UPDATE `gameobject_template` SET `name`='Alliance Chest', `data9`=0, `data15`=0 
 UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=175949;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=123333;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=141596;
--- UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=113757; -- we implement this with custom event script id https://classicdb.ch/?npc=7091#comments
 UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=113757;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=123331;
 UPDATE `gameobject_template` SET `data4`=1, `data5`=2 WHERE `entry`=123848;
 UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=128293;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179486;
--- UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=176145; -- we implement this with custom event script id
 UPDATE `gameobject_template` SET `displayId`=1327, `data9`=0 WHERE `entry`=175964;
 UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=142088;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=142191;
@@ -670,6 +688,32 @@ UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=178609;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179488;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179490;
 UPDATE `gameobject_template` SET `type`=1 WHERE `entry`=179556;
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=3703;
+UPDATE `gameobject_template` SET `data9`=0, `data15`=0 WHERE `entry`=131978;
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=17155;
+UPDATE `gameobject_template` SET `data9`=0, `data15`=0 WHERE `entry`=75300;
+UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=75297;
+UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=141979;
+
+-- Joseph Redpath's Monument
+DELETE FROM `event_scripts` WHERE `id`=20000;
+DELETE FROM `gameobject_scripts` WHERE `id`=45332;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45332, 2, 10, 10936, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 6, 3, 1165, -1719, 57, 2, 0, 'A Strange Historian: Joseph Redpath\'s Monument - Summon Joseph Redpath');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (45332, 4, 0, 4, 0, 0, 0, 10936, 50, 8, 2, 6274, 0, 0, 0, 0, 0, 0, 0, 0, 'A Strange Historian: Joseph Redpath - Wisper text 1');
+UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=176145;
+
+-- Shadowforge Cache
+DELETE FROM `event_scripts` WHERE `id`=7091;
+DELETE FROM `gameobject_scripts`` WHERE `id`=40694;
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (40694, 1, 10, 7091, 120000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 24.745, 413.288, -44.823, 3, 0, 'Shadowforge Cache - Summon Shadowforge Ambusher 1');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (40694, 1, 10, 7091, 120000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 22.386, 410.042, -44.606, 2.3, 0, 'Shadowforge Cache - Summon Shadowforge Ambusher 2');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (40694, 1, 10, 7091, 120000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 19.174, 412.888, -44.872, 0.3, 4029, 'Shadowforge Cache - Summon Shadowforge Ambusher 3 (Pre-1.12)');
+INSERT INTO `gameobject_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (40694, 1, 10, 7091, 120000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 20.165, 415.724, -45.221, 5.3, 4029, 'Shadowforge Cache - Summon Shadowforge Ambusher 4 (Pre-1.12)');
+UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=113757;
+
+-- Half-Buried Bottle
+UPDATE `gameobject_template` SET `data1`=2032, `data9`=0 WHERE `entry`=2560;
+UPDATE `gameobject_loot_template` SET `entry`=2032 WHERE `entry`=2560;
 
 -- Venture Co. Strongbox. This was part of unused quest 2020.
 DELETE FROM `gameobject_loot_template` WHERE `entry`=4770;
@@ -754,6 +798,7 @@ UPDATE `gameobject_template` SET `type`=2, `data0`=0, `data1`=0, `data3`=6668, `
 
 -- Data for GAMEOBJECT_TYPE_GENERIC = 5
 UPDATE `gameobject_template` SET `name`='Hanging, Door' WHERE `entry`=181021;
+UPDATE `gameobject_template` SET `type`=1 WHERE `entry`=177746; -- trap has no data, so not sure how it should work
 
 -- GAMEOBJECT_TYPE_TRAP = 6
 UPDATE `gameobject_template` SET `data1`=0 WHERE `entry`=148837;
@@ -802,6 +847,8 @@ UPDATE `gameobject_template` SET `size`=0.948003 WHERE `entry`=32885;
 -- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=126345;
 UPDATE `gameobject_template` SET `name`='Doodad_DwarvenBrazier195' WHERE `entry`=175667;
 UPDATE `gameobject_template` SET `type`=0, `data0`=0, `data1`=0, `data2`=0 WHERE `entry`=177000;
+-- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=151951;
+UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=151951;
 
 -- Data for GAMEOBJECT_TYPE_GOOBER = 10
 UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180733;
@@ -964,7 +1011,7 @@ UPDATE `gameobject_template` SET `name`='Zeppelin - Grom\'Gol-Orgrimar', `data6`
 UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=177233;
 
 -- Data for GAMEOBJECT_TYPE_RITUAL = 18
--- UPDATE `gameobject_template` SET `data2`=0, `data5`=0, `data7`=0 WHERE `entry`=36727;
+-- UPDATE `gameobject_template` SET `data2`=0, `data5`=0, `data7`=0 WHERE `entry`=36727; -- no visual for summoning ritual?
 
 -- Data for GAMEOBJECT_TYPE_MAILBOX = 19
 UPDATE `gameobject_template` SET `name`='Doodad_PostBoxGnome01' WHERE `entry`=175668;

@@ -1390,6 +1390,7 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
+            GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
             TriggerLinkedGameObject(user);
             return;
         }
@@ -1534,9 +1535,7 @@ void GameObject::Use(Unit* user)
                         GetMap()->ScriptsStart(sEventScripts, info->goober.eventId, player, this);
                 }
                 else
-                {
                     GetMap()->ScriptsStart(sGameObjectScripts, GetGUIDLow(), user, this);
-                }   
 
                 // possible quest objective for active quests
                 if (info->goober.questId > 0 && sObjectMgr.GetQuestTemplate(info->goober.questId))
