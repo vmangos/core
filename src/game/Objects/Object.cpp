@@ -537,14 +537,12 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
     {
         *data << uint32(0); // movement flags
         *data << uint32(WorldTimer::getMSTime());
-        if (updateFlags & UPDATEFLAG_HAS_POSITION)                     // 0x40
+        if (WorldObject const* pObject = ToWorldObject())
         {
-            WorldObject* object = ((WorldObject*)this);
-
-            *data << float(object->GetPositionX());
-            *data << float(object->GetPositionY());
-            *data << float(object->GetPositionZ());
-            *data << float(object->GetOrientation());
+            *data << float(pObject->GetPositionX());
+            *data << float(pObject->GetPositionY());
+            *data << float(pObject->GetPositionZ());
+            *data << float(pObject->GetOrientation());
         }
         else
         {

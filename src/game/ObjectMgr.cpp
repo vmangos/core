@@ -8725,7 +8725,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
             if (!str.empty())
             {
 #if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
-                if ((bct->second.Type == CHAT_TYPE_TEXT_EMOTE))
+                if ((bct->second.chatType == CHAT_TYPE_TEXT_EMOTE))
                 {
                     if ((str.size() > 3) && (str.at(0) == '%') && (str.at(1) == 's'))
                         str = str.substr(3, str.size() - 3);
@@ -8750,7 +8750,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
             if (!str.empty())
             {
 #if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
-                if ((bct->second.Type == CHAT_TYPE_TEXT_EMOTE))
+                if ((bct->second.chatType == CHAT_TYPE_TEXT_EMOTE))
                 {
                     if ((str.size() > 3) && (str.at(0) == '%') && (str.at(1) == 's'))
                         str = str.substr(3, str.size() - 3);
