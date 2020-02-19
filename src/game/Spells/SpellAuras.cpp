@@ -1739,6 +1739,17 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             case SPELLFAMILY_SHAMAN:
                 break;
+            case SPELLFAMILY_PRIEST:
+                switch (GetId())
+                {
+                    case 30238: // Lordaeron's Blessing
+                    {
+                        // Lordaeron's Blessing Effect (DND)
+                        target->CastSpell(target, 31906, true, nullptr);
+                        break;
+                    }
+                }
+                break;
         }
     }
     // AT REMOVE
@@ -1937,6 +1948,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             {
                 if (target->HasAura(29660))
                     target->RemoveAurasDueToSpell(29660);
+                break;
+            }
+            case 30238: // Lordaeron's Blessing
+            {
+                target->RemoveAurasDueToSpell(31906);
                 break;
             }
         }

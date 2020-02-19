@@ -6619,6 +6619,23 @@ void Player::UpdateArea(uint32 newArea)
     }
 
     UpdateAreaDependentAuras();
+
+    if (HasAura(30238)) // Lordaeron's Blessing
+    {
+        bool isEffectActive = HasAura(31906);
+        switch (newArea)
+        {
+            case 139: // Eastern Plaguelands
+            case 2017: // Stratholme
+            case 2057: // Scholomance
+                if (!isEffectActive)
+                    CastSpell(this, 31906, true, nullptr);
+                break;
+            default:
+                if (isEffectActive)
+                    RemoveAurasDueToSpell(31906);
+        }
+    }
 }
 
 void Player::UpdateZone(uint32 newZone, uint32 newArea)
