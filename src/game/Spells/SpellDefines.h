@@ -425,8 +425,10 @@ enum SpellCastResult
     SPELL_FAILED_TARGET_FREEFORALL                    , // Target is currently in free-for-all PvP combat
     SPELL_FAILED_NO_EDIBLE_CORPSES                    , // There are no nearby corpses to eat
     SPELL_FAILED_ONLY_BATTLEGROUNDS                   , // Can only use in battlegrounds
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     SPELL_FAILED_TARGET_NOT_GHOST                     , // Target is not a ghost
     SPELL_FAILED_TOO_MANY_SKILLS                      , // Your pet can't learn any more skills
+#endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     SPELL_FAILED_TRANSFORM_UNUSABLE                   , // You can't use the new item
     SPELL_FAILED_WRONG_WEATHER                        , // The weather isn't right for that

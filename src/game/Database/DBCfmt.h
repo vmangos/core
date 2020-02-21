@@ -50,8 +50,10 @@ char const ItemBagFamilyfmt[]="nxxxxxxxxx";
 char const ItemRandomPropertiesfmt[]="nsiiixxssssssssx";
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
 char const ItemSetEntryfmt[]="dssssssssxxxxxxxxxxxxxxxxxxiiiiiiiiiiiiiiiiii";
-#else
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
 char const ItemSetEntryfmt[] = "dssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxiiiiiiiiiiiiiiiiii";
+#else
+char const ItemSetEntryfmt[] = "dssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxiiiiiiiiiiiiiiii";
 #endif
 char const LiquidTypefmt[]="niii";
 char const LockEntryfmt[]="niiiiiiiiiiiiiiiiiiiiiiiixxxxxxxx";

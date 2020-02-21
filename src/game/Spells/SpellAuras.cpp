@@ -5190,6 +5190,7 @@ void Aura::HandleModOffhandDamagePercent(bool apply, bool Real)
 
 void Aura::HandleModPowerCostPCT(bool apply, bool Real)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     // spells required only Real aura add/remove
     if (!Real)
         return;
@@ -5198,10 +5199,12 @@ void Aura::HandleModPowerCostPCT(bool apply, bool Real)
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
         if (m_modifier.m_miscvalue & (1 << i))
             GetTarget()->ApplyModSignedFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + i, amount, apply);
+#endif
 }
 
 void Aura::HandleModPowerCost(bool apply, bool Real)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     // spells required only Real aura add/remove
     if (!Real)
         return;
@@ -5209,6 +5212,7 @@ void Aura::HandleModPowerCost(bool apply, bool Real)
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
         if (m_modifier.m_miscvalue & (1 << i))
             GetTarget()->ApplyModInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + i, m_modifier.m_amount, apply);
+#endif
 }
 
 /*********************************************************/

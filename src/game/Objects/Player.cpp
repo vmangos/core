@@ -3222,11 +3222,13 @@ void Player::InitStatsForLevel(bool reapplyMods)
 
 //[-ZERO]    SetUInt32Value(PLAYER_FIELD_MOD_TARGET_RESISTANCE,0);
 //[-ZERO]    SetUInt32Value(PLAYER_FIELD_MOD_TARGET_PHYSICAL_RESISTANCE,0);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
     {
         SetUInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + i, 0);
         SetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + i, 0.0f);
     }
+#endif
     // Init data for form but skip reapply item mods for form
     InitDataForForm(reapplyMods);
 
@@ -10117,7 +10119,11 @@ InventoryResult Player::CanUseItem(Item* pItem, bool not_loading) const
             }
 
             if (pProto->RequiredReputationFaction && uint32(GetReputationRank(pProto->RequiredReputationFaction)) < pProto->RequiredReputationRank)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 return EQUIP_ERR_CANT_EQUIP_REPUTATION;
+#else
+                return EQUIP_ERR_CANT_DO_RIGHT_NOW;
+#endif
 
             return EQUIP_ERR_OK;
         }

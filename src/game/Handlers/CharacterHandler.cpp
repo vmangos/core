@@ -765,13 +765,18 @@ void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: Received CMSG_SET_FACTION_ATWAR");
 
-    uint32 repListID;
+    uint32 repListId;
     uint8  flag;
 
-    recv_data >> repListID;
+    recv_data >> repListId;
     recv_data >> flag;
 
-    GetPlayer()->GetReputationMgr().SetAtWar(repListID, flag);
+    Player* pPlayer = GetPlayer();
+
+    if (pPlayer->IsInCombat())
+        return;
+
+    pPlayer->GetReputationMgr().SetAtWar(repListId, flag);
 }
 
 void WorldSession::HandleTutorialFlagOpcode(WorldPacket& recv_data)

@@ -350,8 +350,10 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket& recv_data)
             data << pProto->RequiredHonorRank;
 
         data << pProto->RequiredCityRank;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         data << pProto->RequiredReputationFaction;
         data << (pProto->RequiredReputationFaction > 0  ? pProto->RequiredReputationRank : 0);   // send value only if reputation faction id setted (needed for some items)
+#endif
         data << pProto->MaxCount;
         data << pProto->Stackable;
         data << pProto->ContainerSlots;

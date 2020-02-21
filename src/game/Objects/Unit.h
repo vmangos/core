@@ -392,8 +392,14 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool m_canModifyStats;
         int32 m_regenTimer;
 
-        void SetCreateStat(Stats stat, float val) { m_createStats[stat] = val; }
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+        uint32 m_createHealth = 0;
+        void SetCreateHealth(uint32 val) { m_createHealth = val; }
+#else
         void SetCreateHealth(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_HEALTH, val); }
+#endif
+
+        void SetCreateStat(Stats stat, float val) { m_createStats[stat] = val; }
         void SetCreateMana(uint32 val) { SetUInt32Value(UNIT_FIELD_BASE_MANA, val); }
         void SetCreateResistance(SpellSchools school, int32 val) { m_createResistances[school] = val; }
         void SetStat(Stats stat, int32 val) { SetStatInt32Value(UNIT_FIELD_STAT0 + stat, val); }
@@ -410,8 +416,13 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float m_modAttackSpeedPct[3];
         float m_modRecalcDamagePct[3];
 
-        float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+        uint32 GetCreateHealth() const { return m_createHealth; }
+#else
         uint32 GetCreateHealth() const { return GetUInt32Value(UNIT_FIELD_BASE_HEALTH); }
+#endif
+
+        float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
         uint32 GetCreateMana() const { return GetUInt32Value(UNIT_FIELD_BASE_MANA); }
         uint32 GetCreatePowers(Powers power) const;
         int32 GetCreateResistance(SpellSchools school) const { return m_createResistances[school]; }
