@@ -344,6 +344,15 @@ enum PlayerFieldByte2Flags
     PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW = 0x40
 };
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+enum WhoListPartyStatus
+{
+    WHO_PARTY_STATUS_NOT_IN_PARTY = 0x0,
+    WHO_PARTY_STATUS_IN_PARTY     = 0x1,
+    WHO_PARTY_STATUS_LFG          = 0x2
+};
+#endif
+
 enum ActivateTaxiReplies
 {
     ERR_TAXIOK                      = 0,
@@ -2454,6 +2463,10 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void RemoveFromGroup() { RemoveFromGroup(GetGroup(), GetObjectGuid()); }
         void SendUpdateToOutOfRangeGroupMembers();
         void SendDestroyGroupMembers(bool includingSelf = false);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+        uint32 GetWhoListPartyStatus() const;
+#endif
 
         // BattleGround Group System
         void SetBattleGroundRaid(Group* group, int8 subgroup = -1);

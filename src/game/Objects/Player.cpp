@@ -2881,6 +2881,19 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid)
     }
 }
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+uint32 Player::GetWhoListPartyStatus() const
+{
+    if (sLFGMgr.IsPlayerInQueue(GetObjectGuid()))
+        return WHO_PARTY_STATUS_LFG;
+
+    if (GetGroup())
+        return WHO_PARTY_STATUS_IN_PARTY;
+
+    return WHO_PARTY_STATUS_NOT_IN_PARTY;
+}
+#endif
+
 void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP) const
 {
     WorldPacket data(SMSG_LOG_XPGAIN, 21);

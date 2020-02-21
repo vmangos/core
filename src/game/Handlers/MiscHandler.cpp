@@ -215,7 +215,7 @@ public:
             data << uint32(pzoneid);                            // player zone id
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
-            data << uint32(0);                                  // unknown
+            data << uint32(pPlayer->GetWhoListPartyStatus());   // not actually displayed anywhere
 #endif
             // 50 is maximum player count sent to client
             if ((++clientcount) == 49)
