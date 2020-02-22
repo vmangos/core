@@ -130,7 +130,32 @@ UPDATE `gameobject_template` SET `size`=2 WHERE `entry`=180737;
 UPDATE `gameobject_template` SET `size`=2 WHERE `entry`=181060;
 UPDATE `gameobject_template` SET `size`=0.5 WHERE `entry`=181108;
 UPDATE `gameobject_template` SET `size`=0.5 WHERE `entry`=181109;
-UPDATE `gameobject_template` SET `size`='1.5' WHERE `entry`=152097;
+UPDATE `gameobject_template` SET `size`=1.5 WHERE `entry`=152097;
+UPDATE `gameobject_template` SET `size`=2 WHERE `entry`=179562;
+UPDATE `gameobject_template` SET `size`=0.842482 WHERE `entry`=32882;
+UPDATE `gameobject_template` SET `size`=1 WHERE `entry`=177211;
+UPDATE `gameobject_template` SET `size`=1 WHERE `entry`=179503;
+UPDATE `gameobject_template` SET `size`=1.5 WHERE `entry`=179544;
+UPDATE `gameobject_template` SET `size`=0.970874 WHERE `entry`=176907;
+UPDATE `gameobject_template` SET `size`=1.25 WHERE `entry`=179511;
+UPDATE `gameobject_template` SET `size`=1.42 WHERE `entry`=153723;
+UPDATE `gameobject_template` SET `size`=1.41 WHERE `entry`=179502;
+UPDATE `gameobject_template` SET `size`=1 WHERE `entry`=179506;
+UPDATE `gameobject_template` SET `size`=6.527 WHERE `entry`=179505;
+UPDATE `gameobject_template` SET `size`=2 WHERE `entry`=179561;
+UPDATE `gameobject_template` SET `size`=1.5 WHERE `entry`=179548;
+UPDATE `gameobject_template` SET `size`=0.465763 WHERE `entry`=177221;
+UPDATE `gameobject_template` SET `size`=1.48292 WHERE `entry`=177217;
+UPDATE `gameobject_template` SET `size`=3 WHERE `entry`=179485;
+UPDATE `gameobject_template` SET `size`=6.527 WHERE `entry`=177257;
+UPDATE `gameobject_template` SET `size`=6.527 WHERE `entry`=177258;
+UPDATE `gameobject_template` SET `size`=6.527 WHERE `entry`=177259;
+UPDATE `gameobject_template` SET `size`=1.2 WHERE `entry`=179499;
+UPDATE `gameobject_template` SET `size`=1.5 WHERE `entry`=177824;
+UPDATE `gameobject_template` SET `size`=6.527 WHERE `entry`=179504;
+UPDATE `gameobject_template` SET `size`=1.5 WHERE `entry`=179547;
+UPDATE `gameobject_template` SET `size`=1.02 WHERE `entry`=179550;
+UPDATE `gameobject_template` SET `size`=1 WHERE `entry`=179804;
 
 -- Wrong display id.
 UPDATE `gameobject_template` SET `displayId`=724 WHERE `entry`=2138;
@@ -418,6 +443,27 @@ UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3902;
 UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3905;
 UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3911;
 UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=173187;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3857;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3838;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3856;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3832;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3836;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3837;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3855;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3890;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3852;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3833;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3834;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3835;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3853;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3895;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=3896;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3903;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3907;
+UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3910;
+UPDATE `gameobject_template` SET `displayId`=199 WHERE `entry`=24765;
+UPDATE `gameobject_template` SET `displayId`=199 WHERE `entry`=24759;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=174846;
 
 -- Data for GAMEOBJECT_TYPE_DOOR = 0
 UPDATE `gameobject_template` SET `data0`=0, `data2`=196608 WHERE `entry`=176576;
@@ -431,6 +477,9 @@ UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=175351;
 UPDATE `gameobject_template` SET `data2`=196608 WHERE `entry`=175370;
 UPDATE `gameobject_template` SET `name`='Gate', `data2`=196608 WHERE `entry`=176694;
 UPDATE `gameobject_template` SET `type`=2, `displayId`=306 WHERE `entry`=177727;
+UPDATE `gameobject_template` SET `data1`=0, `data2`=196608 WHERE `entry`=177211;
+UPDATE `gameobject_template` SET `data1`=0 WHERE `entry`=176907;
+UPDATE `gameobject_template` SET `data0`=0, `data2`=196608 WHERE `entry`=176575;
 
 -- Miblon's Door
 UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=164729;
@@ -455,6 +504,9 @@ UPDATE `gameobject_template` SET `type`=0 WHERE `entry`=124371;
 UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=177404;
 UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=180524;
 UPDATE `gameobject_template` SET `data2`=327680 WHERE `entry`=178560;
+UPDATE `gameobject_template` SET `type`=0 WHERE `entry`=179148;
+UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=179286;
+UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=179287;
 
 -- Altar of the Deeps.
 DELETE FROM `gameobject_template` WHERE `entry`=103016;
@@ -514,6 +566,9 @@ UPDATE `gameobject_template` SET `data6`=0, `data7`=0 WHERE `entry`=176361;
 UPDATE `gameobject_template` SET `data6`=0, `data7`=0 WHERE `entry`=177289;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=179827;
 UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=179913;
+UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=179437;
+UPDATE `gameobject_template` SET `data1`=3621 WHERE `entry`=174595;
+UPDATE `gameobject_template` SET `data8`=0 WHERE `entry`=179438;
 
 -- Tablet of the Seven
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4296, 9, 4296, 1, 0, 0, 0);
@@ -709,6 +764,15 @@ UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=17155;
 UPDATE `gameobject_template` SET `data9`=0, `data15`=0 WHERE `entry`=75300;
 UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=75297;
 UPDATE `gameobject_template` SET `data15`=0 WHERE `entry`=141979;
+UPDATE `gameobject_template` SET `data9`=0, `data11`=1, `data13`=1 WHERE `entry`=179564;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=19595;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=152095;
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179528;
+UPDATE `gameobject_template` SET `data9`=0, `data12`=1 WHERE `entry`=179548;
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179499;
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179492;
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179516;
+UPDATE `gameobject_template` SET `data9`=0, `data12`=1 WHERE `entry`=179547;
 
 -- Joseph Redpath's Monument
 DELETE FROM `event_scripts` WHERE `id`=20000;
@@ -836,6 +900,8 @@ UPDATE `gameobject_template` SET `data2`=5 WHERE `entry`=164877;
 UPDATE `gameobject_template` SET `name`='Dawn\'s Gambit Trap', `data3`=18110, `data4`=1, `data8`=1 WHERE `entry`=176110;
 UPDATE `gameobject_template` SET `data1`=0 WHERE `entry`=177485;
 UPDATE `gameobject_template` SET `type`=8, `data1`=10, `data2`=0, `data3`=0, `data5`=0 WHERE `entry`=177524;
+UPDATE `gameobject_template` SET `data2`=20 WHERE `entry`=179065;
+UPDATE `gameobject_template` SET `data6`=65536 WHERE `entry`=180125;
 
 -- Add missing GO template 175622 spawn by GO Rookery Egg 175124 (guessed data)
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`) VALUES (175622, 6, 477, 'Rookery Egg Spawner', 1, 0, 0, 2, 15745, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
@@ -862,6 +928,14 @@ UPDATE `gameobject_template` SET `name`='Doodad_DwarvenBrazier195' WHERE `entry`
 UPDATE `gameobject_template` SET `type`=0, `data0`=0, `data1`=0, `data2`=0 WHERE `entry`=177000;
 -- UPDATE `gameobject_template` SET `data0`=2061 WHERE `entry`=151951;
 UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=151951;
+UPDATE `gameobject_template` SET `data0`=4, `data2`=2061 WHERE `entry`=177325;
+UPDATE `gameobject_template` SET `name`='Cooking Fire' WHERE `entry`=18343;
+UPDATE `gameobject_template` SET `data0`=4, `data2`=2061 WHERE `entry`=177327;
+UPDATE `gameobject_template` SET `data0`=4, `data2`=2061 WHERE `entry`=177324;
+UPDATE `gameobject_template` SET `name`='Ancient Unfired Sword' WHERE `entry`=179561;
+UPDATE `gameobject_template` SET `data0`=4, `data2`=2061 WHERE `entry`=177396;
+UPDATE `gameobject_template` SET `data0`=4 WHERE `entry`=177425;
+UPDATE `gameobject_template` SET `type`=5, `data0`=0, `data1`=1, `data3`=1 WHERE `entry`=178224;
 
 -- Data for GAMEOBJECT_TYPE_GOOBER = 10
 UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180733;
@@ -941,6 +1015,50 @@ UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0
 UPDATE `gameobject_template` SET `type`=1, `data2`=196608, `data3`=0, `data13`=0, `data16`=0 WHERE `entry`=180739;
 UPDATE `gameobject_template` SET `type`=5 WHERE `entry`=180788;
 UPDATE `gameobject_template` SET `data3`=196608 WHERE `entry`=180857;
+UPDATE `gameobject_template` SET `data0`=0, `data10`=19869 WHERE `entry`=177808;
+UPDATE `gameobject_template` SET `data0`=43 WHERE `entry`=174613;
+UPDATE `gameobject_template` SET `type`=1 WHERE `entry`=179881;
+UPDATE `gameobject_template` SET `type`=1 WHERE `entry`=179882;
+
+-- Drakonid Bones
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (23361, 0, 179804);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (23362, 0, 179804);
+DELETE FROM `creature_ai_events` WHERE `creature_id`=14605;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1460501, 14605, 0, 11, 0, 100, 0, 0, 0, 0, 0, 1460501, 0, 0, 'Bone Construct - Set in Combat with Zone on Spawned');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1460502, 14605, 0, 9, 0, 100, 1, 0, 5, 5000, 8000, 1460502, 0, 0, 'Bone Construct - Cast Exploit Weakness');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1460503, 14605, 0, 7, 0, 100, 0, 0, 0, 0, 0, 1460503, 0, 0, 'Bone Construct - Despawn on Evade');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1460501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1460501, 0, 39, 1460501, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Bone Construct - Start Script');
+DELETE FROM `creature_ai_scripts` WHERE `id`=1460503;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1460503, 0, 18, 10000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bone Construct - Despawn');
+DELETE FROM `event_scripts` WHERE `id`=1460501;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1460501, 1, 49, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bone Construct - Combat Pulse');
+UPDATE `gameobject_template` SET `type`=6, `data3`=23361, `data4`=1, `data5`=0 WHERE `entry`=179804;
+
+-- Skeletal Remains of Kariel Winthalus
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7482, 9, 7482, 1, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7481, 9, 7481, 1, 0, 0, 0);
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (5743, 6919, 0);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES (5743, 0, 0, 'Mourn the great loss.', 9449, 1, 1, -1, 0, 574301, 0, 0, NULL, 0, 7482);
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES (5743, 1, 0, 'Mourn the great loss.', 9449, 1, 1, -1, 0, 574302, 0, 0, NULL, 0, 7481);
+DELETE FROM `gossip_scripts` WHERE `id`=574301;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574301, 0, 7, 7482, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Remains of Kariel Winthalus: Complete Quest');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574301, 2, 35, 1, 0, 0, 0, 14368, 20, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Set Orientation');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574301, 4, 0, 0, 0, 0, 0, 14368, 20, 8, 2, 9446, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Say Text 1');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574301, 7, 0, 0, 0, 0, 0, 14368, 20, 8, 2, 9447, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Say Text 2');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574301, 13, 0, 0, 0, 0, 0, 14368, 20, 8, 2, 9448, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Say Text 3');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574301, 20, 35, 1, 0, 0, 0, 14368, 20, 8, 2, 0, 0, 0, 0, 0, 0, 0, 3.07178, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Set Orientation');
+DELETE FROM `gossip_scripts` WHERE `id`=574302;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574302, 0, 7, 7481, 5, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Remains of Kariel Winthalus: Complete Quest');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574302, 2, 35, 1, 0, 0, 0, 14368, 20, 8, 2, 0, 0, 0, 0, 0, 0, 0, 0.7, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Set Orientation');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574302, 4, 0, 0, 0, 0, 0, 14368, 20, 8, 2, 9446, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Say Text 1');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574302, 7, 0, 0, 0, 0, 0, 14368, 20, 8, 2, 9447, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Say Text 2');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574302, 13, 0, 0, 0, 0, 0, 14368, 20, 8, 2, 9448, 0, 0, 0, 0, 0, 0, 0, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Say Text 3');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (574302, 20, 35, 1, 0, 0, 0, 14368, 20, 8, 2, 0, 0, 0, 0, 0, 0, 0, 3.07178, 0, 'Skeletal Remains of Kariel Winthalus: Lorekeeper Lydros - Set Orientation');
+UPDATE `quest_template` SET `SpecialFlags`=`SpecialFlags`|2, `ReqCreatureOrGOId1`=0, `ReqCreatureOrGOCount1`=0 WHERE `entry` IN (7482, 7481);
+DELETE FROM `gameobject_template` WHERE `entry`=400000;
+DELETE FROM `gameobject` WHERE `id`=400000;
+UPDATE `gameobject_template` SET `flags`=0, `type`=2, `data0`=0, `data1`=0, `data3`=5743 WHERE `entry`=179544;
 
 -- Demon Portal
 DELETE FROM `gameobject_scripts` WHERE `id` IN (30899, 32567, 32568, 32570, 32571, 32572, 32661, 32663);
@@ -1012,6 +1130,8 @@ DELETE FROM `event_scripts` WHERE `id`=336102;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (336102, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4599, 4594, 4598, 4596, 0, 0, 0, 0, 0, 'Thaurissan Relic - Whisper Text');
 -- UPDATE `gameobject_template` SET `data1`=3702 WHERE `entry`=153556; -- blizzlike quest id is wrong?
 
+-- Data for GAMEOBJECT_TYPE_TRANSPORT = 11
+UPDATE `gameobject_template` SET `data5`=2147483647 WHERE `entry`=176084;
 
 -- Data for GAMEOBJECT_TYPE_MOTRANSPORT = 15
 UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=176310;
@@ -1025,6 +1145,7 @@ UPDATE `gameobject_template` SET `data6`=0 WHERE `entry`=177233;
 
 -- Data for GAMEOBJECT_TYPE_RITUAL = 18
 -- UPDATE `gameobject_template` SET `data2`=0, `data5`=0, `data7`=0 WHERE `entry`=36727; -- no visual for summoning ritual?
+-- UPDATE `gameobject_template` SET `data2`=0 WHERE `entry`=177193; -- no visual for ritual of doom?
 
 -- Data for GAMEOBJECT_TYPE_MAILBOX = 19
 UPDATE `gameobject_template` SET `name`='Doodad_PostBoxGnome01' WHERE `entry`=175668;

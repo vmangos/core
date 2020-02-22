@@ -13224,8 +13224,8 @@ void Player::RewardQuest(Quest const* pQuest, uint32 reward, WorldObject* questE
                 {
                     if (spellProto->Effect[i] == SPELL_EFFECT_LEARN_SPELL ||
                         spellProto->Effect[i] == SPELL_EFFECT_CREATE_ITEM ||
-                        spellProto->EffectImplicitTargetA[i] == TARGET_UNIT_TARGET_ANY ||
-                        spellProto->EffectImplicitTargetA[i] == TARGET_SINGLE_FRIEND)
+                        spellProto->EffectImplicitTargetA[i] == TARGET_UNIT ||
+                        spellProto->EffectImplicitTargetA[i] == TARGET_UNIT_FRIEND)
                     {
                         caster = (Unit*)questEnder;
                         break;

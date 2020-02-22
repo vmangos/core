@@ -177,16 +177,16 @@ namespace Spells
         switch (targetA)
         {
             // non-positive targets
-            case TARGET_CHAIN_DAMAGE:
-            case TARGET_ALL_ENEMY_IN_AREA:
-            case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
-            case TARGET_IN_FRONT_OF_CASTER:
-            case TARGET_ALL_ENEMY_IN_AREA_CHANNELED:
-            case TARGET_CURRENT_ENEMY_COORDINATES:
+            case TARGET_UNIT_ENEMY:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_IN_CONE_24:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DYNOBJ_LOC:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION:
                 return false;
             // positive or dependent
-            case TARGET_CASTER_COORDINATES:
-                return (targetB == TARGET_ALL_PARTY || targetB == TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER || targetB == TARGET_AREAEFFECT_INSTANT);
+            case TARGET_LOCATION_CASTER_SRC:
+                return (targetB == TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC || targetB == TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC || targetB == TARGET_ENUM_UNITS_SCRIPT_AOE_AT_SRC_LOC);
             default:
                 break;
         }
@@ -200,11 +200,11 @@ namespace Spells
         // positive targets that in target selection code expect target in m_targers, so not that auto-select target by spell data by m_caster and etc
         switch (targetA)
         {
-            case TARGET_SINGLE_FRIEND:
-            case TARGET_SINGLE_PARTY:
-            case TARGET_CHAIN_HEAL:
-            case TARGET_SINGLE_FRIEND_2:
-            case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            case TARGET_UNIT_FRIEND:
+            case TARGET_UNIT_PARTY:
+            case TARGET_UNIT_FRIEND_CHAIN_HEAL:
+            case TARGET_UNIT_RAID:
+            case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
             default:
                 break;
@@ -217,8 +217,8 @@ namespace Spells
         // non-positive targets that in target selection code expect target in m_targers, so not that auto-select target by spell data by m_caster and etc
         switch (targetA)
         {
-            case TARGET_CHAIN_DAMAGE:
-            case TARGET_CURRENT_ENEMY_COORDINATES:
+            case TARGET_UNIT_ENEMY:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION:
                 return true;
             default:
                 break;
@@ -231,13 +231,13 @@ namespace Spells
     {
         switch (target)
         {
-            case TARGET_CHAIN_DAMAGE:
-            case TARGET_SINGLE_FRIEND:
-            case TARGET_UNIT_TARGET_ANY:
-            case TARGET_CHAIN_HEAL:
-            case TARGET_CURRENT_ENEMY_COORDINATES :
-            case TARGET_SINGLE_FRIEND_2:
-            //case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            case TARGET_UNIT_ENEMY:
+            case TARGET_UNIT_FRIEND:
+            case TARGET_UNIT:
+            case TARGET_UNIT_FRIEND_CHAIN_HEAL:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION :
+            case TARGET_UNIT_RAID:
+            //case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
         }
         return false;
@@ -249,20 +249,20 @@ namespace Spells
     {
         switch (target)
         {
-            case TARGET_SELF:
-            case TARGET_PET:
-            case TARGET_ALL_PARTY_AROUND_CASTER:
-            case TARGET_IN_FRONT_OF_CASTER:
-            case TARGET_MASTER:
-            case TARGET_MINION:
-            case TARGET_ALL_PARTY:
-            case TARGET_ALL_PARTY_AROUND_CASTER_2:
-            case TARGET_SELF_FISHING:
-            case TARGET_TOTEM_EARTH:
-            case TARGET_TOTEM_WATER:
-            case TARGET_TOTEM_AIR:
-            case TARGET_TOTEM_FIRE:
-            case TARGET_AREAEFFECT_GO_AROUND_DEST:
+            case TARGET_UNIT_CASTER:
+            case TARGET_UNIT_CASTER_PET:
+            case TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE:
+            case TARGET_ENUM_UNITS_ENEMY_IN_CONE_24:
+            case TARGET_UNIT_CASTER_MASTER:
+            case TARGET_LOCATION_UNIT_MINION_POSITION:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_LOCATION_CASTER_FISHING_SPOT:
+            case TARGET_LOCATION_CASTER_FRONT_RIGHT:
+            case TARGET_LOCATION_CASTER_BACK_RIGHT:
+            case TARGET_LOCATION_CASTER_BACK_LEFT:
+            case TARGET_LOCATION_CASTER_FRONT_LEFT:
+            case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_DEST_LOC:
                 return true;
             default:
                 break;
@@ -274,12 +274,12 @@ namespace Spells
     {
         switch (target)
         {
-            case TARGET_INNKEEPER_COORDINATES:
-            case TARGET_TABLE_X_Y_Z_COORDINATES:
-            case TARGET_CASTER_COORDINATES:
-            case TARGET_SCRIPT_COORDINATES:
-            case TARGET_CURRENT_ENEMY_COORDINATES:
-            case TARGET_DUELVSPLAYER_COORDINATES:
+            case TARGET_LOCATION_CASTER_HOME_BIND:
+            case TARGET_LOCATION_DATABASE:
+            case TARGET_LOCATION_CASTER_SRC:
+            case TARGET_LOCATION_SCRIPT_NEAR_CASTER:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION:
+            case TARGET_LOCATION_UNIT_POSITION:
                 return true;
             default:
                 break;
@@ -291,14 +291,14 @@ namespace Spells
     {
         switch (target)
         {
-            case TARGET_ALL_PARTY_AROUND_CASTER:
-            case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
-            case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
-            case TARGET_ALL_PARTY:
-            case TARGET_ALL_PARTY_AROUND_CASTER_2:
-            case TARGET_AREAEFFECT_PARTY:
-            case TARGET_ALL_RAID_AROUND_CASTER:
-            case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            case TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_ENUM_UNITS_RAID_WITHIN_CASTER_RANGE:
+            case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
             default:
                 break;
@@ -310,21 +310,21 @@ namespace Spells
     {
         switch (target)
         {
-            case TARGET_AREAEFFECT_INSTANT:
-            case TARGET_AREAEFFECT_CUSTOM:
-            case TARGET_ALL_ENEMY_IN_AREA:
-            case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
-            case TARGET_ALL_PARTY_AROUND_CASTER:
-            case TARGET_IN_FRONT_OF_CASTER:
-            case TARGET_ALL_ENEMY_IN_AREA_CHANNELED:
-            case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
-            case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
-            case TARGET_ALL_PARTY:
-            case TARGET_ALL_PARTY_AROUND_CASTER_2:
-            case TARGET_AREAEFFECT_PARTY:
-            case TARGET_AREAEFFECT_GO_AROUND_DEST:
-            case TARGET_ALL_RAID_AROUND_CASTER:
-            case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE:
+            case TARGET_ENUM_UNITS_ENEMY_IN_CONE_24:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DYNOBJ_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_RAID_WITHIN_CASTER_RANGE:
+            case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
             default:
                 break;

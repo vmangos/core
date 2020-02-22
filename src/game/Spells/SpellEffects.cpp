@@ -666,8 +666,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         Make every attacking enemy smaller
                         Give shield-wielding enemies "Improved Blocking" for 30 seconds (this shows no visible effect other than target is hit by the ray)
                         13003 - Shrink Ray (single target)
-                        13010 - Shrink (TARGET_ALL_PARTY_AROUND_CASTER)
-                        13004 - Grow  (TARGET_ALL_PARTY_AROUND_CASTER)
+                        13010 - Shrink (TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE)
+                        13004 - Grow  (TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE)
                      */
                     uint32 r = urand(0, 99);
                     // Normal behavior
@@ -2198,7 +2198,7 @@ void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
 
     switch (m_spellInfo->EffectImplicitTargetB[eff_idx])
     {
-        case TARGET_INNKEEPER_COORDINATES:
+        case TARGET_LOCATION_CASTER_HOME_BIND:
         {
             // Only players can teleport to innkeeper
             if (unitTarget->GetTypeId() != TYPEID_PLAYER)
@@ -2208,8 +2208,8 @@ void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
             ((Player*)unitTarget)->TeleportToHomebind(unitTarget == m_caster ? TELE_TO_SPELL : 0, hearthCooldown);
             return;
         }
-        case TARGET_AREAEFFECT_INSTANT:                     // in all cases first TARGET_TABLE_X_Y_Z_COORDINATES
-        case TARGET_TABLE_X_Y_Z_COORDINATES:
+        case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_SRC_LOC:                     // in all cases first TARGET_LOCATION_DATABASE
+        case TARGET_LOCATION_DATABASE:
         {
             SpellTargetPosition const* st = sSpellMgr.GetSpellTargetPosition(m_spellInfo->Id);
             if (!st)
@@ -2224,7 +2224,7 @@ void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
                 ((Player*)unitTarget)->TeleportTo(*st, unitTarget == m_caster ? TELE_TO_SPELL : 0);
             break;
         }
-        case TARGET_EFFECT_SELECT:
+        case TARGET_LOCATION_CASTER_DEST:
         {
             if (!m_casterUnit)
                 return;
@@ -2257,7 +2257,7 @@ void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
         }
     }
 
-    // post effects for TARGET_TABLE_X_Y_Z_COORDINATES
+    // post effects for TARGET_LOCATION_DATABASE
     if (m_spellInfo->Id == 23442 && m_casterUnit)
     {
         int32 r = irand(0, 119);

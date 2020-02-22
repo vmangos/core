@@ -233,7 +233,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
 
             for (uint32 i : spellInfo->EffectImplicitTargetA)
             {
-                if (i == TARGET_ALL_ENEMY_IN_AREA || i == TARGET_ALL_ENEMY_IN_AREA_INSTANT || i == TARGET_ALL_ENEMY_IN_AREA_CHANNELED)
+                if (i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC || i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC || i == TARGET_ENUM_UNITS_ENEMY_AOE_AT_DYNOBJ_LOC)
                     return;
             }
 

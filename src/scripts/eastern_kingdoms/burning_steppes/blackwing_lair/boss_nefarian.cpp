@@ -52,7 +52,8 @@ enum
     SPELL_VEIL_OF_SHADOW        = 22687,                // old spell id 7068 -> wrong
     SPELL_CLEAVE                = 20691,
     SPELL_TAIL_LASH             = 23364,
-    SPELL_BONE_CONTRUST         = 23363,                //23362, 23361   Missing from DBC!
+    SPELL_BONE_CONTRUST         = 23363,
+    SPELL_RAISE_DRAKONID        = 23362,
 
     SPELL_MAGE                  = 23410,                // wild magic
     SPELL_WARRIOR               = 23397,                // beserk
@@ -448,18 +449,7 @@ struct boss_nefarianAI : ScriptedAI
         {
             m_bPhase3 = true;
             DoScriptText(SAY_RAISE_SKELETONS, m_creature);
-            std::list<GameObject*> GOListe;
-            GetGameObjectListWithEntryInGrid(GOListe, m_creature, 179804, 200.0f);
-
-            for (const auto& itr : GOListe)
-            {
-                m_creature->SummonCreature(NPC_BONE_CONSTRUCT,
-                    itr->GetPositionX(),
-                    itr->GetPositionY(),
-                    itr->GetPositionZ(),
-                    itr->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-                itr->DeleteLater();
-            }
+            m_creature->CastSpell(m_creature, SPELL_RAISE_DRAKONID, true);
         }
 
         // 5% hp yell

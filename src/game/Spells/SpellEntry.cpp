@@ -914,7 +914,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
         // Negative Effects
         case SPELL_EFFECT_INSTAKILL:
             // Suicide is a positive spell - ex. Garr Massive Eruption
-            if (EffectImplicitTargetA[effIndex] == TARGET_SELF && EffectImplicitTargetB[effIndex] == TARGET_NONE)
+            if (EffectImplicitTargetA[effIndex] == TARGET_UNIT_CASTER && EffectImplicitTargetB[effIndex] == TARGET_NONE)
                 return true;
             // Sacrifice is a positive spell - for the warlock :)
             return IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>();
@@ -1029,12 +1029,12 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* 
                     return false;
                 case SPELL_AURA_PERIODIC_DAMAGE:            // used in positive spells also.
                     // part of negative spell if casted at self (prevent cancel)
-                    if (EffectImplicitTargetA[effIndex] == TARGET_SELF)
+                    if (EffectImplicitTargetA[effIndex] == TARGET_UNIT_CASTER)
                         return false;
                     break;
                 case SPELL_AURA_MOD_DECREASE_SPEED:         // used in positive spells also
                     // part of positive spell if casted at self
-                    if (EffectImplicitTargetA[effIndex] == TARGET_SELF &&
+                    if (EffectImplicitTargetA[effIndex] == TARGET_UNIT_CASTER &&
                             SpellFamilyName == SPELLFAMILY_GENERIC)
                         return false;
                     // but not this if this first effect (don't found better check)
