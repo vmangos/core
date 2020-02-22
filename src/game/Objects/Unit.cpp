@@ -1288,20 +1288,10 @@ void Unit::CastStop(uint32 except_spellid)
                 InterruptSpell(CurrentSpellTypes(i), false);
 }
 
-
-
-
-
-
-
-
-
-
-
 // Obsolete func need remove, here only for comotability vs another patches
-uint32 Unit::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellID, uint32 damage)
+uint32 Unit::SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage)
 {
-    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellID);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
     CalculateSpellDamage(&damageInfo, damage, spellInfo);
     damageInfo.target->CalculateAbsorbResistBlock(this, &damageInfo, spellInfo);
@@ -8292,28 +8282,28 @@ void Unit::StopMoving(bool force)
     DisableSpline();
 }
 
-void Unit::SetFleeing(bool apply, ObjectGuid casterGuid, uint32 spellID, uint32 time)
+void Unit::SetFleeing(bool apply, ObjectGuid casterGuid, uint32 spellId, uint32 time)
 {
     if (apply && HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
         return;
 
-    ModConfuseSpell(apply, casterGuid, spellID, MOV_MOD_FLEE_FOR_ASSISTANCE, time);
+    ModConfuseSpell(apply, casterGuid, spellId, MOV_MOD_FLEE_FOR_ASSISTANCE, time);
 }
 
-void Unit::SetFeared(bool apply, ObjectGuid casterGuid, uint32 spellID, uint32 time)
+void Unit::SetFeared(bool apply, ObjectGuid casterGuid, uint32 spellId, uint32 time)
 {
     if (apply && HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
         return;
 
-    ModConfuseSpell(apply, casterGuid, spellID, MOV_MOD_FLEE_IN_FEAR, time);
+    ModConfuseSpell(apply, casterGuid, spellId, MOV_MOD_FLEE_IN_FEAR, time);
 }
 
-void Unit::SetConfused(bool apply, ObjectGuid casterGuid, uint32 spellID)
+void Unit::SetConfused(bool apply, ObjectGuid casterGuid, uint32 spellId)
 {
-    ModConfuseSpell(apply, casterGuid, spellID, MOV_MOD_CONFUSED, 0);
+    ModConfuseSpell(apply, casterGuid, spellId, MOV_MOD_CONFUSED, 0);
 }
 
-void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellID, MovementModType modType, uint32 time)
+void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, MovementModType modType, uint32 time)
 {
     if (Creature* pCreature = ToCreature())
         if (pCreature->IsTotem())
@@ -8341,7 +8331,7 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellID, Mo
 
     if (apply)
     {
-        CastStop(GetObjectGuid() == casterGuid ? spellID : 0);
+        CastStop(GetObjectGuid() == casterGuid ? spellId : 0);
 
         switch (modType)
         {
@@ -8387,9 +8377,9 @@ void Unit::ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellID, Mo
             }
         }
 
-        // If spellID = 0, it is to interrupt (eg Curse of Recklessness - 704)
+        // If spellId = 0, it is to interrupt (eg Curse of Recklessness - 704)
         // So we remove the effects even if we still have an aura of fear.
-        if (!controlFinished && spellID)
+        if (!controlFinished && spellId)
             return;
 
         if (!IsPlayer() && IsAlive())

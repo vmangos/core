@@ -736,7 +736,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendPlaySpellVisual(uint32 id) const;
         void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo* pInfo, AuraType auraTypeOverride = SPELL_AURA_NONE) const;
         void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
-        uint32 SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellID, uint32 damage);
+        uint32 SpellNonMeleeDamageLog(Unit* pVictim, uint32 spellId, uint32 damage);
 
         SpellAuraHolder* AddAura(uint32 spellId, uint32 addAuraFlags = 0, Unit* pCaster = nullptr);
         SpellAuraHolder* RefreshAura(uint32 spellId, int32 duration);
@@ -854,7 +854,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool HasAuraTypeByCaster(AuraType auraType, ObjectGuid casterGuid) const;
         bool HasAura(uint32 spellId, SpellEffectIndex effIndex) const;
         bool HasAura(uint32 spellId) const { return m_spellAuraHolders.find(spellId) != m_spellAuraHolders.end(); }
-        bool virtual HasSpell(uint32 /*spellID*/) const { return false; }
+        bool virtual HasSpell(uint32 /*spellId*/) const { return false; }
         bool HasStealthAura()      const { return HasAuraType(SPELL_AURA_MOD_STEALTH); }
         bool HasInvisibilityAura() const { return HasAuraType(SPELL_AURA_MOD_INVISIBILITY); }
         bool IsFeared()  const { return HasAuraType(SPELL_AURA_MOD_FEAR); }
@@ -920,10 +920,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
         bool IsImmuneToSchool(SpellEntry const* spellInfo, uint8 effectMask) const;
 
-        void ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellID, MovementModType modType, uint32 time = 0);
-        void SetFleeing(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);
-        void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);/*DEPRECATED METHOD*/
-        void SetConfused(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0);/*DEPRECATED METHOD*/
+        void ModConfuseSpell(bool apply, ObjectGuid casterGuid, uint32 spellId, MovementModType modType, uint32 time = 0);
+        void SetFleeing(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellId = 0, uint32 time = 0);
+        void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellId = 0, uint32 time = 0);/*DEPRECATED METHOD*/
+        void SetConfused(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellId = 0);/*DEPRECATED METHOD*/
         void SetFeignDeath(bool apply, ObjectGuid casterGuid = ObjectGuid(), bool success = true);
 
         // Cooldown management

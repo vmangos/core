@@ -3735,10 +3735,10 @@ float WorldObject::GetSpellResistChance(Unit const* victim, uint32 schoolMask, b
     return resistModHitChance;
 }
 
-void WorldObject::SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo missInfo)
+void WorldObject::SendSpellMiss(Unit* target, uint32 spellId, SpellMissInfo missInfo)
 {
     WorldPacket data(SMSG_SPELLLOGMISS, (4 + 8 + 1 + 4 + 8 + 1));
-    data << uint32(spellID);
+    data << uint32(spellId);
     data << GetObjectGuid();
     data << uint8(0);                                       // unk8
     data << uint32(1);                                      // target count
@@ -3750,12 +3750,12 @@ void WorldObject::SendSpellMiss(Unit* target, uint32 spellID, SpellMissInfo miss
     SendObjectMessageToSet(&data, true);
 }
 
-void WorldObject::SendSpellOrDamageImmune(Unit* target, uint32 spellID) const
+void WorldObject::SendSpellOrDamageImmune(Unit* target, uint32 spellId) const
 {
     WorldPacket data(SMSG_SPELLORDAMAGE_IMMUNE, (8 + 8 + 4 + 1));
     data << GetObjectGuid();
     data << target->GetObjectGuid();
-    data << uint32(spellID);
+    data << uint32(spellId);
     data << uint8(0);
     SendMessageToSet(&data, true);
 }
@@ -3907,9 +3907,9 @@ void WorldObject::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log)
     SendMessageToSet(&data, true);
 }
 
-void WorldObject::SendSpellNonMeleeDamageLog(Unit* target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit, bool split)
+void WorldObject::SendSpellNonMeleeDamageLog(Unit* target, uint32 spellId, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit, bool split)
 {
-    SpellNonMeleeDamage log(this, target, spellID, GetFirstSchoolInMask(damageSchoolMask));
+    SpellNonMeleeDamage log(this, target, spellId, GetFirstSchoolInMask(damageSchoolMask));
     log.damage = damage;
     log.damage += (resist < 0 ? uint32(std::abs(resist)) : 0);
     log.damage -= (absorbedDamage + (resist > 0 ? uint32(resist) : 0) + blocked);

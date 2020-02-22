@@ -2799,11 +2799,11 @@ bool Creature::IsInEvadeMode() const
     return !i_motionMaster.empty() && i_motionMaster.GetCurrentMovementGeneratorType() == HOME_MOTION_TYPE;
 }
 
-bool Creature::HasSpell(uint32 spellID) const
+bool Creature::HasSpell(uint32 spellId) const
 {
     uint8 i;
     for (i = 0; i < CREATURE_MAX_SPELLS; ++i)
-        if (spellID == m_spells[i])
+        if (spellId == m_spells[i])
             break;
     return i < CREATURE_MAX_SPELLS;                         // break before end of iteration of known spells
 }

@@ -38,7 +38,7 @@
 
 #include <regex>
 
-bool ChatHandler::HandleXpCommand(char* args)
+bool ChatHandler::HandleModifyXpRateCommand(char* args)
 {
     // Only a GM can modify another player's rates.
     Player* pPlayer = (m_session->GetSecurity() < SEC_GAMEMASTER) ? m_session->GetPlayer() : GetSelectedPlayer();
@@ -175,7 +175,7 @@ bool ChatHandler::HandleCheatPowerCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleCheatImmuneToAuraCommand(char* args)
+bool ChatHandler::HandleCheatDebuffImmunityCommand(char* args)
 {
     if (*args)
     {
@@ -191,11 +191,11 @@ bool ChatHandler::HandleCheatImmuneToAuraCommand(char* args)
         if (!ExtractPlayerTarget(&args, &target))
             return false;
 
-        target->SetCheatImmuneToAura(value, true);
+        target->SetCheatDebuffImmunity(value, true);
 
-        PSendSysMessage(LANG_YOU_SET_IMMUNE_TO_AURA, value ? "on" : "off", GetNameLink(target).c_str());
+        PSendSysMessage(LANG_YOU_SET_DEBUFF_IMMUNITY, value ? "on" : "off", GetNameLink(target).c_str());
         if (needReportToTarget(target))
-            ChatHandler(target).PSendSysMessage(LANG_YOUR_IMMUNE_TO_AURA_SET, value ? "on" : "off", GetNameLink().c_str());
+            ChatHandler(target).PSendSysMessage(LANG_YOUR_DEBUFF_IMMUNITY_SET, value ? "on" : "off", GetNameLink().c_str());
     }
 
     return true;
@@ -420,8 +420,8 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
         SendSysMessage("- No cast time");
     if (target->HasCheatOption(PLAYER_CHEAT_NO_POWER))
         SendSysMessage("- No power costs");
-    if (target->HasCheatOption(PLAYER_CHEAT_IMMUNE_AURA))
-        SendSysMessage("- Immune to auras");
+    if (target->HasCheatOption(PLAYER_CHEAT_DEBUFF_IMMUNITY))
+        SendSysMessage("- Debuff immunity");
     if (target->HasCheatOption(PLAYER_CHEAT_ALWAYS_CRIT))
         SendSysMessage("- Always crit");
     if (target->HasCheatOption(PLAYER_CHEAT_NO_CHECK_CAST))
@@ -432,6 +432,10 @@ bool ChatHandler::HandleCheatStatusCommand(char* args)
         SendSysMessage("- Areatrigger pass");
     if (target->HasCheatOption(PLAYER_CHEAT_IGNORE_TRIGGERS))
         SendSysMessage("- Ignore areatriggers");
+    if (target->HasMovementFlag(MOVEFLAG_WATERWALKING) && !target->HasAuraType(SPELL_AURA_WATER_WALK))
+        SendSysMessage("- Water walking");
+    if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_0))
+        SendSysMessage("- Wall climbing");
 
     return true;
 }

@@ -185,7 +185,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCheatCooldownCommand(char *);
         bool HandleCheatCastTimeCommand(char *);
         bool HandleCheatPowerCommand(char *);
-        bool HandleCheatImmuneToAuraCommand(char *);
+        bool HandleCheatDebuffImmunityCommand(char *);
         bool HandleCheatAlwaysCritCommand(char *);
         bool HandleCheatNoCastCheckCommand(char *);
         bool HandleCheatAlwaysProcCommand(char *);
@@ -836,6 +836,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleModifyEmoteStateCommand(char* args);
         bool HandleNameDieCommand(char* args);
         bool HandleDieCommand(char* args);
+        bool HandleKnockBackCommand(char* args);
         bool HandleFearCommand(char* args);
         bool HandleDamageCommand(char* args);
         bool HandleAoEDamageCommand(char* args);
@@ -849,7 +850,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNearGraveCommand(char* args);
         bool HandleExploreCheatCommand(char* args);
         bool HandleHoverCommand(char* args);
-        bool HandleXpCommand(char* args);
+        bool HandleModifyXpRateCommand(char* args);
         bool HandleLevelUpCommand(char* args);
         bool HandleShowAreaCommand(char* args);
         bool HandleHideAreaCommand(char* args);
@@ -966,7 +967,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSendMailHelper(MailDraft& draft, char* args);
         bool HandleSendMoneyHelper(MailDraft& draft, char* args);
 
-        bool HandleAuraHelper(uint32 spellID, int32 duration, Unit*);
+        bool HandleAuraHelper(uint32 spellId, int32 duration, Unit*);
         bool HandleDieHelper(Unit* target);
 
         template<typename T>

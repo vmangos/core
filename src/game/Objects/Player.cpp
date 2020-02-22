@@ -2747,13 +2747,13 @@ void Player::SetCheatNoPowerCost(bool on, bool notify)
     }
 }
 
-void Player::SetCheatImmuneToAura(bool on, bool notify)
+void Player::SetCheatDebuffImmunity(bool on, bool notify)
 {
-    SetCheatOption(PLAYER_CHEAT_IMMUNE_AURA, on);
+    SetCheatOption(PLAYER_CHEAT_DEBUFF_IMMUNITY, on);
 
     if (notify)
     {
-        GetSession()->SendNotification(on ? LANG_CHEAT_IMMUNE_TO_AURA_ON : LANG_CHEAT_IMMUNE_TO_AURA_OFF);
+        GetSession()->SendNotification(on ? LANG_CHEAT_DEBUFF_IMMUNITY_ON : LANG_CHEAT_DEBUFF_IMMUNITY_OFF);
     }
 }
 
@@ -20980,7 +20980,7 @@ bool Player::ChangeQuestsForRace(uint8 oldRace, uint8 newRace)
 
 bool Player::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const
 {
-    if (HasCheatOption(PLAYER_CHEAT_IMMUNE_AURA) && spellInfo->EffectApplyAuraName[index] && !spellInfo->IsPositiveEffect(index))
+    if (HasCheatOption(PLAYER_CHEAT_DEBUFF_IMMUNITY) && spellInfo->EffectApplyAuraName[index] && !spellInfo->IsPositiveEffect(index))
         return true;
 
     switch (spellInfo->Effect[index])

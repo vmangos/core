@@ -278,27 +278,27 @@ void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
     if (m_spellInfo->Id == 18788 && unitTarget->IsCreature() && m_casterUnit)
     {
         uint32 entry = unitTarget->GetEntry();
-        uint32 spellID;
+        uint32 spellId;
         switch (entry)
         {
             case   416:
-                spellID = 18789;
+                spellId = 18789;
                 break;               //imp
             case   417:
-                spellID = 18792;
+                spellId = 18792;
                 break;               //fellhunter
             case  1860:
-                spellID = 18790;
+                spellId = 18790;
                 break;               //void
             case  1863:
-                spellID = 18791;
+                spellId = 18791;
                 break;               //succubus
             default:
                 sLog.outError("EffectInstaKill: Unhandled creature entry (%u) case.", entry);
                 return;
         }
 
-        m_casterUnit->CastSpell(m_casterUnit, spellID, true);
+        m_casterUnit->CastSpell(m_casterUnit, spellId, true);
     }
 
     if (m_caster == unitTarget)                             // prevent interrupt message

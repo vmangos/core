@@ -621,7 +621,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         SpellSchoolMask GetMeleeDamageSchoolMask() const override { return m_meleeDamageSchoolMask; }
         void SetMeleeDamageSchool(SpellSchools school) { m_meleeDamageSchoolMask = GetSchoolMask(school); }
 
-        bool HasSpell(uint32 spellID) const override;
+        bool HasSpell(uint32 spellId) const override;
 
         bool UpdateEntry(uint32 entry, Team team = ALLIANCE, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr, bool preserveHPAndPower = true);
 

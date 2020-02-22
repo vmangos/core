@@ -208,10 +208,10 @@ ChatCommand * ChatHandler::getCommandTable()
         { "cooldown",       SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatCooldownCommand,       "", nullptr },
         { "casttime",       SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatCastTimeCommand,       "", nullptr },
         { "powercost",      SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatPowerCommand,          "", nullptr },
-        { "immunetoauras",  SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatImmuneToAuraCommand,   "", nullptr },
-        { "crit",           SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatAlwaysCritCommand,     "", nullptr },
+        { "debuffs",        SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatDebuffImmunityCommand, "", nullptr },
+        { "criticals",      SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatAlwaysCritCommand,     "", nullptr },
         { "castchecks",     SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatNoCastCheckCommand,    "", nullptr },
-        { "proc",           SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatAlwaysProcCommand,     "", nullptr },
+        { "procs",          SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatAlwaysProcCommand,     "", nullptr },
         { "triggerpass",    SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatTriggerPassCommand,    "", nullptr },
         { "ignoretriggers", SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatIgnoreTriggersCommand, "", nullptr },
         { "waterwalk",      SEC_GAMEMASTER,     false, &ChatHandler::HandleCheatWaterwalkCommand,      "", nullptr },
@@ -517,6 +517,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "parry",          SEC_BASIC_ADMIN,    false, &ChatHandler::HandleModifyParryCommand,         "", nullptr },
         { "combreach",      SEC_BASIC_ADMIN,    false, &ChatHandler::HandleModifyCrCommand,            "", nullptr },
         { "boundrad",       SEC_BASIC_ADMIN,    false, &ChatHandler::HandleModifyBrCommand,            "", nullptr },
+        { "xprate",         SEC_PLAYER,         false, &ChatHandler::HandleModifyXpRateCommand,        "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
@@ -1067,6 +1068,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "namedie",        SEC_GAMEMASTER,     false, &ChatHandler::HandleNameDieCommand,             "", nullptr },
         { "die",            SEC_GAMEMASTER,     false, &ChatHandler::HandleDieCommand,                 "", nullptr },
         { "fear",           SEC_GAMEMASTER,     false, &ChatHandler::HandleFearCommand,                "", nullptr },
+        { "knockback",      SEC_GAMEMASTER,     false, &ChatHandler::HandleKnockBackCommand,           "", nullptr },
         { "revive",         SEC_GAMEMASTER,     true,  &ChatHandler::HandleReviveCommand,              "", nullptr },
         { "dismount",       SEC_PLAYER,         false, &ChatHandler::HandleDismountCommand,            "", nullptr },
         { "gps",            SEC_MODERATOR,      false, &ChatHandler::HandleGPSCommand,                 "", nullptr },
@@ -1095,7 +1097,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { "neargrave",      SEC_TICKETMASTER,   false, &ChatHandler::HandleNearGraveCommand,           "", nullptr },
         { "explorecheat",   SEC_TICKETMASTER,   false, &ChatHandler::HandleExploreCheatCommand,        "", nullptr },
         { "hover",          SEC_TICKETMASTER,   false, &ChatHandler::HandleHoverCommand,               "", nullptr },
-        { "xp",             SEC_PLAYER,         false, &ChatHandler::HandleXpCommand,                  "", nullptr },
         { "levelup",        SEC_GAMEMASTER,     false, &ChatHandler::HandleLevelUpCommand,             "", nullptr },
         { "showarea",       SEC_TICKETMASTER,   false, &ChatHandler::HandleShowAreaCommand,            "", nullptr },
         { "hidearea",       SEC_TICKETMASTER,   false, &ChatHandler::HandleHideAreaCommand,            "", nullptr },

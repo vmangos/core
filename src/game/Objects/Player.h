@@ -397,7 +397,7 @@ enum PlayerCheatOptions : uint16
     PLAYER_CHEAT_NO_COOLDOWN     = 0x002,
     PLAYER_CHEAT_NO_CAST_TIME    = 0x004,
     PLAYER_CHEAT_NO_POWER        = 0x008,
-    PLAYER_CHEAT_IMMUNE_AURA     = 0x010,
+    PLAYER_CHEAT_DEBUFF_IMMUNITY = 0x010,
     PLAYER_CHEAT_ALWAYS_CRIT     = 0x020,
     PLAYER_CHEAT_NO_CHECK_CAST   = 0x040,
     PLAYER_CHEAT_ALWAYS_PROC     = 0x080,
@@ -918,7 +918,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SetCheatNoCooldown(bool on, bool notify = false);
         void SetCheatInstantCast(bool on, bool notify = false);
         void SetCheatNoPowerCost(bool on, bool notify = false);
-        void SetCheatImmuneToAura(bool on, bool notify = false);
+        void SetCheatDebuffImmunity(bool on, bool notify = false);
         void SetCheatAlwaysCrit(bool on, bool notify = false);
         void SetCheatNoCastCheck(bool on, bool notify = false);
         void SetCheatAlwaysProc(bool on, bool notify = false);
