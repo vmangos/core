@@ -7722,8 +7722,8 @@ CharmInfo* Unit::InitCharmInfo(Unit* charm)
 
 CharmInfo::CharmInfo(Unit* unit)
     : m_unit(unit), m_originalFactionTemplate(nullptr), m_CommandState(COMMAND_FOLLOW), m_reactState(REACT_PASSIVE), m_petnumber(0),
-      _isCommandAttack(false), _isCommandFollow(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
-      _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f)
+      m_isCommandAttack(false), m_isCommandFollow(false), m_isAtStay(false), m_isFollowing(false), m_isReturning(false),
+      m_stayX(0.0f), m_stayY(0.0f), m_stayZ(0.0f)
 {
     for (auto& itr : m_charmspells)
         itr.SetActionAndType(0, ACT_DISABLED);
@@ -7951,73 +7951,73 @@ void CharmInfo::SetSpellAutocast(uint32 spell_id, bool state)
 
 void CharmInfo::SetIsCommandAttack(bool val)
 {
-    _isCommandAttack = val;
+    m_isCommandAttack = val;
 }
 
 bool CharmInfo::IsCommandAttack()
 {
-    return _isCommandAttack;
+    return m_isCommandAttack;
 }
 
 void CharmInfo::SetIsCommandFollow(bool val)
 {
-    _isCommandFollow = val;
+    m_isCommandFollow = val;
 }
 
 bool CharmInfo::IsCommandFollow()
 {
-    return _isCommandFollow;
+    return m_isCommandFollow;
 }
 
 void CharmInfo::SaveStayPosition()
 {
     // No Unit::StopMoving while possessed
     if (m_unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
-        m_unit->GetPosition(_stayX, _stayY, _stayZ);
+        m_unit->GetPosition(m_stayX, m_stayY, m_stayZ);
     else //! At this point a new spline destination is enabled because of Unit::StopMoving()
     {
         G3D::Vector3 stayPos = m_unit->movespline->FinalDestination();
-        _stayX = stayPos.x;
-        _stayY = stayPos.y;
-        _stayZ = stayPos.z;
+        m_stayX = stayPos.x;
+        m_stayY = stayPos.y;
+        m_stayZ = stayPos.z;
     }
 }
 
 void CharmInfo::GetStayPosition(float &x, float &y, float &z)
 {
-    x = _stayX;
-    y = _stayY;
-    z = _stayZ;
+    x = m_stayX;
+    y = m_stayY;
+    z = m_stayZ;
 }
 
 void CharmInfo::SetIsAtStay(bool val)
 {
-    _isAtStay = val;
+    m_isAtStay = val;
 }
 
 bool CharmInfo::IsAtStay()
 {
-    return _isAtStay;
+    return m_isAtStay;
 }
 
 void CharmInfo::SetIsFollowing(bool val)
 {
-    _isFollowing = val;
+    m_isFollowing = val;
 }
 
 bool CharmInfo::IsFollowing()
 {
-    return _isFollowing;
+    return m_isFollowing;
 }
 
 void CharmInfo::SetIsReturning(bool val)
 {
-    _isReturning = val;
+    m_isReturning = val;
 }
 
 bool CharmInfo::IsReturning()
 {
-    return _isReturning;
+    return m_isReturning;
 }
 
 uint32 createProcExtendMask(SpellNonMeleeDamage* damageInfo, SpellMissInfo missCondition)

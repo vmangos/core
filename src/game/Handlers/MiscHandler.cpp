@@ -340,7 +340,7 @@ void WorldSession::HandleLogoutRequestOpcode(WorldPacket& /*recv_data*/)
         return;
     }
 
-    //instant logout in taverns/cities or on taxi or for admins, gm's, mod's if its enabled in mangosd.conf
+    // instant logout in taverns/cities or on taxi or for admins, gm's, mod's if its enabled in mangosd.conf
     if (GetPlayer()->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || GetPlayer()->IsTaxiFlying() ||
             GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
     {
@@ -603,17 +603,17 @@ void WorldSession::HandleAddIgnoreOpcode(WorldPacket& recv_data)
 
     DEBUG_LOG("WORLD: Received CMSG_ADD_IGNORE");
 
-    std::string IgnoreName = GetMangosString(LANG_FRIEND_IGNORE_UNKNOWN);
+    std::string ignoreName = GetMangosString(LANG_FRIEND_IGNORE_UNKNOWN);
 
-    recv_data >> IgnoreName;
+    recv_data >> ignoreName;
 
-    if (!normalizePlayerName(IgnoreName))
+    if (!normalizePlayerName(ignoreName))
         return;
 
     DEBUG_LOG("WORLD: %s asked to Ignore: '%s'",
-              GetMasterPlayer()->GetName(), IgnoreName.c_str());
+              GetMasterPlayer()->GetName(), ignoreName.c_str());
 
-    PlayerCacheData *pData = sObjectMgr.GetPlayerDataByName(IgnoreName);
+    PlayerCacheData *pData = sObjectMgr.GetPlayerDataByName(ignoreName);
     if (!pData)
         return;
 
@@ -971,18 +971,18 @@ void WorldSession::HandleNextCinematicCamera(WorldPacket& /*recv_data*/)
 
 void WorldSession::HandleSetActionBarTogglesOpcode(WorldPacket& recv_data)
 {
-    uint8 ActionBar;
+    uint8 actionBar;
 
-    recv_data >> ActionBar;
+    recv_data >> actionBar;
 
     if (!GetPlayer())                                       // ignore until not logged (check needed because STATUS_AUTHED)
     {
-        if (ActionBar != 0)
-            sLog.outError("WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored", uint32(ActionBar));
+        if (actionBar != 0)
+            sLog.outError("WorldSession::HandleSetActionBarToggles in not logged state with value: %u, ignored", uint32(actionBar));
         return;
     }
 
-    GetPlayer()->SetByteValue(PLAYER_FIELD_BYTES, 2, ActionBar);
+    GetPlayer()->SetByteValue(PLAYER_FIELD_BYTES, 2, actionBar);
 }
 
 void WorldSession::HandlePlayedTime(WorldPacket& /*recv_data*/)
@@ -1010,7 +1010,8 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
     SendPacket(&data);
 }
 
-void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data) {
+void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
+{
     ObjectGuid guid;
     recv_data >> guid;
     // DEBUG_LOG("Party Stats guid is " I64FMTD,guid);
@@ -1076,18 +1077,18 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
     // Time is ***, map=469, x=452.000000, y=6454.000000, z=2536.000000, orient=3.141593
 
     uint32 time;
-    uint32 mapid;
-    float PositionX;
-    float PositionY;
-    float PositionZ;
-    float Orientation;
+    uint32 mapId;
+    float positionX;
+    float positionY;
+    float positionZ;
+    float orientation;
 
     recv_data >> time;                                      // time in m.sec.
-    recv_data >> mapid;
-    recv_data >> PositionX;
-    recv_data >> PositionY;
-    recv_data >> PositionZ;
-    recv_data >> Orientation;                               // o (3.141593 = 180 degrees)
+    recv_data >> mapId;
+    recv_data >> positionX;
+    recv_data >> positionY;
+    recv_data >> positionZ;
+    recv_data >> orientation;                               // o (3.141593 = 180 degrees)
 
     //DEBUG_LOG("Received opcode CMSG_WORLD_TELEPORT");
 
@@ -1097,10 +1098,10 @@ void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)
         return;
     }
 
-    DEBUG_LOG("Time %u sec, map=%u, x=%f, y=%f, z=%f, orient=%f", time / 1000, mapid, PositionX, PositionY, PositionZ, Orientation);
+    DEBUG_LOG("Time %u sec, map=%u, x=%f, y=%f, z=%f, orient=%f", time / 1000, mapId, positionX, positionY, positionZ, orientation);
 
     if (GetSecurity() >= SEC_ADMINISTRATOR)
-        GetPlayer()->TeleportTo(mapid, PositionX, PositionY, PositionZ, Orientation);
+        GetPlayer()->TeleportTo(mapId, positionX, positionY, positionZ, orientation);
     else
         SendNotification(LANG_YOU_NOT_HAVE_PERMISSION);
     DEBUG_LOG("Received worldport command from player %s", GetPlayer()->GetName());
@@ -1187,7 +1188,6 @@ void WorldSession::HandleWhoisOpcode(WorldPacket& recv_data)
 void WorldSession::HandleFarSightOpcode(WorldPacket& recv_data)
 {
     DEBUG_LOG("WORLD: CMSG_FAR_SIGHT");
-    //recv_data.hexlike();
 
     uint8 op;
     recv_data >> op;

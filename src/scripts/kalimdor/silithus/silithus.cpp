@@ -1297,7 +1297,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         m_uiSanityTimer = 1;
         m_uiCheckPlayerTimer = 1000;
         m_bNeedCheck = false;
-        m_creature->AllowManaRegen(false);
+        m_creature->ClearCreatureState(CSTATE_REGEN_MANA);
         m_creature->SetPower(POWER_MANA, 0);
 
         for (uint64 & guid : PlayerGuids)
@@ -1318,7 +1318,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        m_creature->AllowManaRegen(true);
+        m_creature->AddCreatureState(CSTATE_REGEN_MANA);
     }
 
     inline float GetManaPercent()

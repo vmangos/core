@@ -168,18 +168,17 @@ bool CreatureCreatePos::Relocate(Creature* cr) const
 Creature::Creature(CreatureSubtype subtype) :
     Unit(), i_AI(nullptr),
     loot(this), lootForPickPocketed(false), lootForBody(false), lootForSkin(false), skinningForOthersTimer(5000), m_TargetNotReachableTimer(0),
-    _pacifiedTimer(0), m_manaRegen(0),
+    m_pacifiedTimer(0), m_manaRegen(0),
     m_groupLootTimer(0), m_groupLootId(0), m_lootMoney(0), m_lootGroupRecipientId(0), m_corpseDecayTimer(0),
     m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60),
-    m_wanderDistance(5.0f), m_combatStartTime(0), m_combatState(false), m_combatResetCount(0), m_subtype(subtype),
-    m_defaultMovementType(IDLE_MOTION_TYPE), m_equipmentId(0), m_AlreadyCallAssistance(false),
-    m_AlreadySearchedAssistance(false),
-    m_bRegenHealth(true), m_bRegenMana(true), m_AI_locked(false), m_temporaryFactionFlags(TEMPFACTION_NONE),
-    m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _creatureGroup(nullptr),
+    m_wanderDistance(5.0f), m_combatStartTime(0), m_combatResetCount(0), m_subtype(subtype),
+    m_defaultMovementType(IDLE_MOTION_TYPE), m_equipmentId(0), m_creatureStateFlags(0),
+    m_AI_locked(false), m_temporaryFactionFlags(TEMPFACTION_NONE),
+    m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_creatureGroup(nullptr),
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f), m_reactState(REACT_PASSIVE),
-    _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_AI_InitializeOnRespawn(false), m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_combatWithZoneState(false), m_mountId(0),
-    _isEscortable(false), m_reputationId(-1), m_castingTargetGuid(0)
+    m_lastDamageTakenForEvade(0), m_playerDamageTaken(0), m_nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
+    m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_mountId(0),
+    m_reputationId(-1), m_castingTargetGuid(0)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -206,8 +205,8 @@ void Creature::AddToWorld()
     if (!IsInWorld() && GetObjectGuid().GetHigh() == HIGHGUID_UNIT)
         GetMap()->InsertObject<Creature>(GetObjectGuid(), this);
 
-    sCreatureGroupsManager->LoadCreatureGroup(this, _creatureGroup);
-    if (_creatureGroup && _creatureGroup->IsFormation())
+    sCreatureGroupsManager->LoadCreatureGroup(this, m_creatureGroup);
+    if (m_creatureGroup && m_creatureGroup->IsFormation())
         SetActiveObjectState(true);
     Unit::AddToWorld();
 
@@ -468,8 +467,15 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, CreatureData const* data /*=
         LoadCreatureAddon(true);
     }
 
-    m_bRegenHealth = GetCreatureInfo()->regeneration & REGEN_FLAG_HEALTH;
-    m_bRegenMana = GetCreatureInfo()->regeneration & REGEN_FLAG_POWER;
+    if (GetCreatureInfo()->regeneration & REGEN_FLAG_HEALTH)
+        AddCreatureState(CSTATE_REGEN_HEALTH);
+    else
+        ClearCreatureState(CSTATE_REGEN_HEALTH);
+
+    if (GetCreatureInfo()->regeneration & REGEN_FLAG_POWER)
+        AddCreatureState(CSTATE_REGEN_MANA);
+    else
+        ClearCreatureState(CSTATE_REGEN_MANA);
 
     // creatures always have melee weapon ready if any
     SetSheath(SHEATH_STATE_MELEE);
@@ -661,7 +667,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                     // If the creature AI needs to be re-initialized after respawn, do it now
                     // Useful for swapping AIs on mobs that change entry on respawn
-                    if (m_AI_InitializeOnRespawn)
+                    if (HasCreatureState(CSTATE_INIT_AI_ON_RESPAWN))
                         AIM_Initialize();
                 }
 
@@ -750,12 +756,12 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                     m_corpseDecayTimer -= update_diff;
             }
 
-            if (_pacifiedTimer <= update_diff)
-                _pacifiedTimer = 0;
+            if (m_pacifiedTimer <= update_diff)
+                m_pacifiedTimer = 0;
             else
-                _pacifiedTimer -= update_diff;
+                m_pacifiedTimer -= update_diff;
 
-            _lastDamageTakenForEvade += update_diff;
+            m_lastDamageTakenForEvade += update_diff;
             Unit::Update(update_diff, diff);
 
             if (GetVictim())
@@ -800,7 +806,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 m_TargetNotReachableTimer = 0;
 
             bool leash = false;
-            if (m_combatState)
+            if (HasCreatureState(CSTATE_COMBAT))
             {
                 if (GetCombatTime(false) > sWorld.getConfig(CONFIG_UINT32_LONGCOMBAT))
                 {
@@ -814,7 +820,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                     if (m_leashDistance && !IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ, m_leashDistance))
                         leash = true;
                     // Raid bosses do a periodic combat pulse
-                    else if (m_combatWithZoneState)
+                    else if (HasCreatureState(CSTATE_COMBAT_WITH_ZONE))
                         SetInCombatWithZone(false);
                 }
             }
@@ -1027,7 +1033,7 @@ bool Creature::AIM_Initialize()
     }
 
     // Clear flag. Escort AI will set it if this creature is escortable
-    _isEscortable = false;
+    SetEscortable(false);
 
     i_motionMaster.Initialize();
 
@@ -1688,7 +1694,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map* map)
 
     // We need to assign new AI on respawn if spawn has multiple creature ids
     if (data->GetCreatureIdCount() > 1)
-        m_AI_InitializeOnRespawn = true;
+        AddCreatureState(CSTATE_INIT_AI_ON_RESPAWN);
 
     return true;
 }
@@ -2114,7 +2120,7 @@ void Creature::SendAIReaction(AiReaction reactionType)
 
 void Creature::CallAssistance()
 {
-    if (!m_AlreadyCallAssistance && GetVictim() && !IsPet() && !IsCharmed())
+    if (!HasCreatureState(CSTATE_ALREADY_CALL_ASSIST) && GetVictim() && !IsPet() && !IsCharmed())
     {
         SetNoCallAssistance(true);
 
@@ -2347,7 +2353,7 @@ bool Creature::IsOutOfThreatArea(Unit* pVictim) const
         //Use AttackDistance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
         float threatAreaDistance = ThreatRadius > AttackDist ? ThreatRadius : AttackDist;
         bool inThreatArea = pVictim->IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ, threatAreaDistance);
-        if (!inThreatArea && _lastDamageTakenForEvade > 12000)
+        if (!inThreatArea && m_lastDamageTakenForEvade > 12000)
             return true;
     }
 
@@ -2469,7 +2475,7 @@ void Creature::SetInCombatWithZone(bool initialPulse)
     if (PlList.isEmpty())
         return;
 
-    if (!m_combatWithZoneState)
+    if (!HasCreatureState(CSTATE_COMBAT_WITH_ZONE))
         UpdateCombatWithZoneState(true);
 
     for (const auto& i : PlList)
@@ -3143,8 +3149,8 @@ void Creature::OnLeaveCombat()
     UpdateCombatState(false);
     UpdateCombatWithZoneState(false);
 
-    if (_creatureGroup)
-        _creatureGroup->OnLeaveCombat(this);
+    if (m_creatureGroup)
+        m_creatureGroup->OnLeaveCombat(this);
 
     if (i_AI)
         i_AI->EnterEvadeMode();
@@ -3161,8 +3167,8 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
     if (i_AI && !HasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
         i_AI->AttackedBy(pWho);
 
-    if (_creatureGroup)
-        _creatureGroup->OnMemberAttackStart(this, pWho);
+    if (m_creatureGroup)
+        m_creatureGroup->OnMemberAttackStart(this, pWho);
 
     if (notInCombat)
     {
@@ -3170,7 +3176,7 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
         UpdateCombatState(true);
 
         SetStandState(UNIT_STAND_STATE_STAND);
-        _pacifiedTimer = 0;
+        m_pacifiedTimer = 0;
 
         if (m_zoneScript)
             m_zoneScript->OnCreatureEnterCombat(this);

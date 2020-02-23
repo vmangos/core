@@ -183,7 +183,7 @@ extern pAuraProcHandler AuraProcHandler[TOTAL_AURAS];
 
 struct GlobalCooldown
 {
-    explicit GlobalCooldown(uint32 _dur = 0, uint32 _time = 0) : duration(_dur), cast_time(_time) {}
+    explicit GlobalCooldown(uint32 dur = 0, uint32 time = 0) : duration(dur), cast_time(time) {}
 
     uint32 duration;
     uint32 cast_time;
@@ -321,14 +321,14 @@ private:
     ReactStates     m_reactState;
     uint32          m_petnumber;
 
-    bool _isCommandAttack;
-    bool _isCommandFollow;
-    bool _isAtStay;
-    bool _isFollowing;
-    bool _isReturning;
-    float _stayX;
-    float _stayY;
-    float _stayZ;
+    bool m_isCommandAttack;
+    bool m_isCommandFollow;
+    bool m_isAtStay;
+    bool m_isFollowing;
+    bool m_isReturning;
+    float m_stayX;
+    float m_stayY;
+    float m_stayZ;
 };
 
 typedef std::set<ObjectGuid> GuardianPetList;
