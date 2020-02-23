@@ -156,6 +156,8 @@ UPDATE `gameobject_template` SET `size`=6.527 WHERE `entry`=179504;
 UPDATE `gameobject_template` SET `size`=1.5 WHERE `entry`=179547;
 UPDATE `gameobject_template` SET `size`=1.02 WHERE `entry`=179550;
 UPDATE `gameobject_template` SET `size`=1 WHERE `entry`=179804;
+UPDATE `gameobject_template` SET `size`=2 WHERE `entry`=174619;
+UPDATE `gameobject_template` SET `size`=1.5 WHERE `entry`=178465;
 
 -- Wrong display id.
 UPDATE `gameobject_template` SET `displayId`=724 WHERE `entry`=2138;
@@ -464,6 +466,9 @@ UPDATE `gameobject_template` SET `displayId`=201 WHERE `entry`=3910;
 UPDATE `gameobject_template` SET `displayId`=199 WHERE `entry`=24765;
 UPDATE `gameobject_template` SET `displayId`=199 WHERE `entry`=24759;
 UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=174846;
+UPDATE `gameobject_template` SET `displayId`=306 WHERE `entry`=2573;
+UPDATE `gameobject_template` SET `displayId`=306 WHERE `entry`=20738;
+UPDATE `gameobject_template` SET `displayId`=408 WHERE `entry`=173189;
 
 -- Data for GAMEOBJECT_TYPE_DOOR = 0
 UPDATE `gameobject_template` SET `data0`=0, `data2`=196608 WHERE `entry`=176576;
@@ -773,6 +778,7 @@ UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179499;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179492;
 UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179516;
 UPDATE `gameobject_template` SET `data9`=0, `data12`=1 WHERE `entry`=179547;
+UPDATE `gameobject_template` SET `data9`=0 WHERE `entry`=179489;
 
 -- Joseph Redpath's Monument
 DELETE FROM `event_scripts` WHERE `id`=20000;
