@@ -7201,11 +7201,22 @@ void SpellAuraHolder::SetAuraFlag(uint32 slot, bool add)
     uint32 index    = slot >> 3;
     uint32 byte     = (slot & 7) << 2;
     uint32 val      = m_target->GetUInt32Value(UNIT_FIELD_AURAFLAGS + index);
+    val &= ~(uint32(AFLAG_MASK_ALL) << byte);
     if (add)
-        val |= ((uint32)AFLAG_MASK << byte);
-    else
-        val &= ~((uint32)AFLAG_MASK << byte);
+    {
+        uint32 flags = AFLAG_NONE;
 
+        if (IsPositive())
+        {
+            if (!m_spellProto->HasAttribute(SPELL_ATTR_CANT_CANCEL))
+                flags |= AFLAG_CANCELABLE;
+            flags |= AFLAG_UNK3;
+        }
+        else
+            flags |= AFLAG_UNK4;
+
+        val |= (flags << byte);
+    }
     m_target->SetUInt32Value(UNIT_FIELD_AURAFLAGS + index, val);
 }
 
