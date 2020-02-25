@@ -242,9 +242,10 @@ void HonorMaintenancer::CreateCalculationReport()
 {
     std::string timestamp = Log::GetTimestampStr();
     std::string filename = "HCR_" + timestamp + ".txt";
+    std::string path = sWorld.GetHonorPath() + filename;
 
     std::ofstream ofs;
-    ofs.open(filename.c_str());
+    ofs.open(path.c_str());
     if (!ofs.is_open())
     {
         sLog.outError("Can't create HCR file!");

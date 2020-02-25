@@ -751,6 +751,9 @@ class World
         /// Get the path where data (dbc, maps) are stored on disk
         std::string GetDataPath() const { return m_dataPath; }
 
+        /// Get the path where honor logs are stored on disk
+        std::string GetHonorPath() const { return m_honorPath; }
+
         /// When server started?
         time_t const& GetStartTime() const { return m_startTime; }
         /// What time is it?
@@ -972,6 +975,7 @@ class World
         bool m_allowMovement;
         std::string m_motd;
         std::string m_dataPath;
+        std::string m_honorPath;
         std::string m_wardenModuleDirectory;
 
         // for max speed access

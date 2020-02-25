@@ -22,6 +22,9 @@ ConfVersion=2010100901
 #        Default: "" - no log directory prefix. if used log names aren't absolute paths
 #                      then logs will be stored in the current directory of the running program.
 #
+#	HonorDir
+#		Folder to store HCR files. These are logs of weekly honor calculation.
+#		By default logs are stored in the current directory of the running program.	                    
 #
 #    LoginDatabase.Info
 #    WorldDatabase.Info
@@ -69,6 +72,7 @@ ConfVersion=2010100901
 RealmID = 1
 DataDir = "."
 LogsDir = ""
+HonorDir = ""
 LoginDatabase.Info              = "127.0.0.1;3306;mangos;mangos;realmd"
 LoginDatabase.Connections       = 1
 LoginDatabase.WorkerThreads     = 1
