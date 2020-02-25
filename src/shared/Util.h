@@ -393,4 +393,11 @@ void hexEncodeByteArray(uint8* bytes, uint32 arrayLen, std::string& result);
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
 void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
 
+/* Select a random element from a container. Note: make sure you explicitly empty check the container */
+template <class C> typename C::value_type const& SelectRandomContainerElement(C const& container)
+{
+    typename C::const_iterator it = container.begin();
+    std::advance(it, urand(0, container.size() - 1));
+    return *it;
+}
 #endif

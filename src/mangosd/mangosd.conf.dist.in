@@ -2852,3 +2852,9 @@ DynamicRespawn.PlayersMaxLevelDiff      = 0
 
 Spells.CCDelay = 200
 
+###################################################################################################################
+#    Server autobroadcast: interval is set in miliseconds, default value: 1800000 = 30 min
+###################################################################################################################
+
+AutoBroadcast.Timer = 1800000
+

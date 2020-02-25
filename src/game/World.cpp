@@ -1123,6 +1123,9 @@ void World::LoadConfigSettings(bool reload)
     // Smartlog data
     sLog.InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
     sLog.InitSmartlogGuids(sConfig.GetStringDefault("Smartlog.ExtraGuids", ""));
+
+    // Server autobroadcast
+    setConfig(CONFIG_UINT32_AUTOBROADCAST_INTERVAL, "AutoBroadcast.Timer", 1800000);
 }
 
 class CharactersDatabaseWorkerThread : public ACE_Based::Runnable
