@@ -82,10 +82,12 @@ bool WorldSession::IsLanguageAllowedForChatType(uint32 lang, uint32 msgType)
                 case CHAT_MSG_GUILD:
                 case CHAT_MSG_OFFICER:
                 case CHAT_MSG_RAID:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 case CHAT_MSG_RAID_LEADER:
                 case CHAT_MSG_RAID_WARNING:
                 case CHAT_MSG_BATTLEGROUND:
                 case CHAT_MSG_BATTLEGROUND_LEADER:
+#endif
                 case CHAT_MSG_CHANNEL:
                     return true;
                 default:
@@ -182,8 +184,10 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 {
                     case CHAT_MSG_PARTY:
                     case CHAT_MSG_RAID:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                     case CHAT_MSG_RAID_LEADER:
                     case CHAT_MSG_RAID_WARNING:
+#endif
                         // allow two side chat at group channel if two side group allowed
                         if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP))
                             lang = LANG_UNIVERSAL;
@@ -249,10 +253,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
         case CHAT_MSG_GUILD:
         case CHAT_MSG_OFFICER:
         case CHAT_MSG_RAID:
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case CHAT_MSG_RAID_LEADER:
         case CHAT_MSG_RAID_WARNING:
         case CHAT_MSG_BATTLEGROUND:
         case CHAT_MSG_BATTLEGROUND_LEADER:
+#endif
             recv_data >> msg;
             if (!ProcessChatMessageAfterSecurityCheck(msg, lang, type))
                 return;
@@ -493,7 +499,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             if (!group)
             {
                 group = _player->GetGroup();
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 if (!group || group->isBGGroup())
+#else
+                if (!group)
+#endif
                     return;
             }
 
@@ -531,7 +541,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             if (!group)
             {
                 group = GetPlayer()->GetGroup();
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                 if (!group || group->isBGGroup() || !group->isRaidGroup())
+#else
+                if (!group || !group->isRaidGroup())
+#endif
                     return;
             }
 
@@ -543,6 +557,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 sWorld.LogChat(this, "Raid", msg, nullptr, group->GetId());
         }
         break;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
         case CHAT_MSG_RAID_LEADER: // Master side: TODO
         {
             // if player is in battleground, he cannot say to battleground members by /ra
@@ -610,7 +625,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                 sWorld.LogChat(this, "BG", msg, nullptr, group->GetId());
         }
         break;
-
+#endif
         case CHAT_MSG_AFK: // Node side (for combat Check)
         {
             if (_player && _player->IsInCombat())

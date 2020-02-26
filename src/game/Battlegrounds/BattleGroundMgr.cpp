@@ -1360,10 +1360,14 @@ void BattleGroundMgr::BuildBattleGroundListPacket(WorldPacket* data, ObjectGuid 
     uint32 mapId = GetBattleGrounMapIdByTypeId(bgTypeId);
 
     data->Initialize(SMSG_BATTLEFIELD_LIST);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     *data << guid;                                          // battlemaster guid
+#endif
     *data << uint32(mapId);                                 // battleground id
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     *data << uint8(0x00);                                   // unk
     *data << uint32(0);                                     // number of bg instances
+#endif
 
     // battleground
     {

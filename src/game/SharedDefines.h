@@ -1349,6 +1349,7 @@ enum ChatMsg
     CHAT_MSG_IGNORED                = 0x16,
     CHAT_MSG_SKILL                  = 0x17,
     CHAT_MSG_LOOT                   = 0x18,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     CHAT_MSG_BG_SYSTEM_NEUTRAL      = 0x52,
     CHAT_MSG_BG_SYSTEM_ALLIANCE     = 0x53,
     CHAT_MSG_BG_SYSTEM_HORDE        = 0x54,
@@ -1356,6 +1357,15 @@ enum ChatMsg
     CHAT_MSG_RAID_WARNING           = 0x58,
     CHAT_MSG_BATTLEGROUND           = 0x5C,
     CHAT_MSG_BATTLEGROUND_LEADER    = 0x5D,
+#else
+    CHAT_MSG_BG_SYSTEM_NEUTRAL      = CHAT_MSG_SYSTEM,
+    CHAT_MSG_BG_SYSTEM_ALLIANCE     = CHAT_MSG_SYSTEM,
+    CHAT_MSG_BG_SYSTEM_HORDE        = CHAT_MSG_SYSTEM,
+    CHAT_MSG_RAID_LEADER            = CHAT_MSG_RAID,
+    CHAT_MSG_RAID_WARNING           = CHAT_MSG_RAID,
+    CHAT_MSG_BATTLEGROUND           = CHAT_MSG_RAID,
+    CHAT_MSG_BATTLEGROUND_LEADER    = CHAT_MSG_RAID,
+#endif
 
     // [-ZERO] Need find correct values
     // Valeurs trouvees (Nostalrius)

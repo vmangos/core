@@ -109,8 +109,10 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
     recv_data >> instanceId;                                // instance id, 0 if First Available selected
     recv_data >> joinAsGroup;                               // join as group
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (guid == GetPlayer()->GetObjectGuid())
         queuedAtBGPortal = true;
+#endif
 
     BattleGroundTypeId bgTypeId = GetBattleGroundTypeIdByMapId(mapId);
 
@@ -125,6 +127,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
         return;
     }
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     if (queuedAtBGPortal)
     {
         auto const& bgQueuePos = _player->GetBattleGroundEntryPoint();
@@ -142,6 +145,21 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket& recv_data)
             return;
         }
     }
+#else
+    if (!_player->FindNearestInteractableNpcWithFlag(UNIT_NPC_FLAG_BATTLEMASTER))
+    {
+        auto const& bgQueuePos = _player->GetBattleGroundEntryPoint();
+        if (_player->GetMapId() != bgQueuePos.mapId || !_player->IsWithinDist3d(bgQueuePos, 50.0f))
+        {
+            ProcessAnticheatAction("PassiveAnticheat", "Attempt to queue for BG through out of range portal", CHEAT_ACTION_LOG | CHEAT_ACTION_REPORT_GMS);
+            return;
+        }
+        else
+            queuedAtBGPortal = true;
+    }
+    else
+        queuedAtBGPortal = false;
+#endif
 
     // can do this, since it's battleground, not arena
     BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(bgTypeId);

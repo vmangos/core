@@ -235,7 +235,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 }
 
 /// Add an incoming packet to the queue
-void WorldSession::QueuePacket(WorldPacket* newPacket, NodeSession* from_node)
+void WorldSession::QueuePacket(WorldPacket* newPacket)
 {
     OpcodeHandler const& opHandle = opcodeTable[newPacket->GetOpcode()];
     if (opHandle.packetProcessing >= PACKET_PROCESS_MAX_TYPE)
