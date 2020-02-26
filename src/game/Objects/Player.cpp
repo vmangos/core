@@ -18043,7 +18043,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
 
         LogModifyMoney(-int32(price), "BuyItem", vendorGuid, item);
 
-        pItem = StoreNewItem(dest, item, true);
+        pItem = StoreNewItem(dest, item, true, Item::GenerateItemRandomPropertyId(item));
     }
     else if (IsEquipmentPos(bag, slot))
     {
