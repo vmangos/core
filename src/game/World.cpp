@@ -65,7 +65,6 @@
 #include "LFGMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "AuctionHouseBotMgr.h"
-#include "AutoTesting/AutoTestingMgr.h"
 #include "Transports/TransportMgr.h"
 #include "PlayerBotMgr.h"
 #include "ProgressBar.h"
@@ -1746,8 +1745,6 @@ void World::SetInitialWorldSettings()
         sObjectMgr.RestoreDeletedItems();
     }
 
-    sAutoTestingMgr->Load();
-
     m_broadcaster =
         std::make_unique<MovementBroadcaster>(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
@@ -1886,7 +1883,6 @@ void World::Update(uint32 diff)
     sLFGMgr.Update(diff);
     sGuardMgr.Update(diff);
     sZoneScriptMgr.Update(diff);
-    sAutoTestingMgr->Update(diff);
 
     ///- Update groups with offline leaders
     if (m_timers[WUPDATE_GROUPS].Passed())

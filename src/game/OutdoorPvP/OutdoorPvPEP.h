@@ -344,4 +344,3 @@ class OutdoorPvPEP : public OutdoorPvP
 #endif
 
 #endif
-
