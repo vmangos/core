@@ -7056,7 +7056,13 @@ void ObjectMgr::CheckGameObjectInfos()
             const_cast<GameObjectInfo*>(*itr)->size =  DEFAULT_OBJECT_SCALE;
         }
 
-        // some GO types have unused go template, check goInfo->displayId at GO spawn data loading or ignore
+        if (itr->type >= GAMEOBJECT_TYPE_MAX)
+        {
+            sLog.outErrorDb("Gameobject (Entry: %u) have invalid type=%u in template, forcing it to type GENERIC (5) instead.",
+                            itr->id, itr->type);
+            const_cast<GameObjectInfo*>(*itr)->type = GAMEOBJECT_TYPE_GENERIC;
+            memset(const_cast<GameObjectInfo*>(*itr)->raw.data, 0, sizeof(GameObjectInfo::raw.data));
+        }
 
         switch (itr->type)
         {
@@ -7191,6 +7197,7 @@ void ObjectMgr::CheckGameObjectInfos()
                     CheckGOLockId(*itr, itr->fishinghole.lockId, 4);
                 break;
             }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
             case GAMEOBJECT_TYPE_FLAGDROP:                  //26
             {
                 if (itr->flagdrop.lockId)
@@ -7198,6 +7205,7 @@ void ObjectMgr::CheckGameObjectInfos()
                 CheckGONoDamageImmuneId(*itr, itr->flagdrop.noDamageImmune, 3);
                 break;
             }
+#endif
         }
     }
 }

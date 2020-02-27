@@ -27,6 +27,8 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+
 OPvPCapturePoint::OPvPCapturePoint(OutdoorPvP* pvp):
     m_capturePointGUID(0), m_capturePoint(nullptr), m_maxValue(0), m_minValue(0), m_maxSpeed(0),
     m_value(0), m_team(TEAM_NEUTRAL), m_OldState(OBJECTIVESTATE_NEUTRAL),
@@ -229,34 +231,12 @@ OutdoorPvP::OutdoorPvP() : ZoneScript(), m_objective_changed(false), m_TypeId(0)
 {
 }
 
-ZoneScript::ZoneScript() : m_pMap(nullptr)
-{
-}
-
 OutdoorPvP::~OutdoorPvP()
 {
     // `Map`s should already be unloaded at this point
     // DeleteSpawns();
     for (const auto& itr : m_capturePoints)
         delete itr.second;
-}
-
-ZoneScript::~ZoneScript()
-{
-}
-
-void ZoneScript::OnPlayerEnter(Player* plr)
-{
-    m_players[plr->GetTeamId()].insert(plr);
-}
-
-void ZoneScript::OnPlayerLeave(Player* plr)
-{
-    // remove the world state information from the player (we can't keep everyone up to date, so leave out those who are not in the concerning zones)
-    if (!plr->GetSession()->PlayerLogout())
-        SendRemoveWorldStates(plr);
-    m_players[plr->GetTeamId()].erase(plr);
-    DEBUG_LOG("Player %s left a ZoneScript zone", plr->GetName());
 }
 
 void OutdoorPvP::OnPlayerLeave(Player* plr)
@@ -270,9 +250,6 @@ void OutdoorPvP::OnPlayerLeave(Player* plr)
 void OutdoorPvP::OnPlayerEnter(Player* pPlayer)
 {
     ZoneScript::OnPlayerEnter(pPlayer);
-}
-void ZoneScript::Update(uint32 diff)
-{
 }
 
 void OutdoorPvP::Update(uint32 diff)
@@ -402,13 +379,6 @@ bool OPvPCapturePoint::Update(uint32 diff)
     }
 
     return false;
-}
-
-void ZoneScript::SendUpdateWorldState(uint32 field, uint32 value)
-{
-    for (const auto& playerPerTeam : m_players)
-        for (PlayerSet::iterator itr = playerPerTeam.begin(); itr != playerPerTeam.end(); ++itr)
-            (*itr)->SendUpdateWorldState(field, value);
 }
 
 void OPvPCapturePoint::SendUpdateWorldState(uint32 field, uint32 value)
@@ -550,6 +520,61 @@ bool OutdoorPvP::HandleAreaTrigger(Player* /*plr*/, uint32 /*trigger*/)
     return false;
 }
 
+
+void OutdoorPvP::OnGameObjectCreate(GameObject* go)
+{
+    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetDBTableGUIDLow()))
+    {
+        if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
+            sLog.outError("OutdoorPvP : GameObject %u n'est pas de type GAMEOBJECT_TYPE_CAPTURE_POINT (%u)", go->GetEntry(), GAMEOBJECT_TYPE_CAPTURE_POINT);
+        cp->m_capturePoint = go;
+    }
+}
+
+void OutdoorPvP::OnGameObjectRemove(GameObject* go)
+{
+    if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
+        return;
+
+    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetDBTableGUIDLow()))
+        cp->m_capturePoint = nullptr;
+}
+
+#endif
+
+ZoneScript::ZoneScript() : m_pMap(nullptr)
+{
+}
+
+ZoneScript::~ZoneScript()
+{
+}
+
+void ZoneScript::Update(uint32 diff)
+{
+}
+
+void ZoneScript::OnPlayerEnter(Player* plr)
+{
+    m_players[plr->GetTeamId()].insert(plr);
+}
+
+void ZoneScript::OnPlayerLeave(Player* plr)
+{
+    // remove the world state information from the player (we can't keep everyone up to date, so leave out those who are not in the concerning zones)
+    if (!plr->GetSession()->PlayerLogout())
+        SendRemoveWorldStates(plr);
+    m_players[plr->GetTeamId()].erase(plr);
+    DEBUG_LOG("Player %s left a ZoneScript zone", plr->GetName());
+}
+
+void ZoneScript::SendUpdateWorldState(uint32 field, uint32 value)
+{
+    for (const auto& playerPerTeam : m_players)
+        for (PlayerSet::iterator itr = playerPerTeam.begin(); itr != playerPerTeam.end(); ++itr)
+            (*itr)->SendUpdateWorldState(field, value);
+}
+
 void ZoneScript::BroadcastPacket(WorldPacket& data) const
 {
     // This is faster than sWorld.SendZoneMessage
@@ -582,25 +607,6 @@ void ZoneScript::TeamApplyBuff(TeamId team, uint32 spellId, uint32 spellId2)
 {
     TeamCastSpell(team, spellId);
     TeamCastSpell(OTHER_TEAM(team), spellId2 ? -(int32)spellId2 : -(int32)spellId);
-}
-
-void OutdoorPvP::OnGameObjectCreate(GameObject* go)
-{
-    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetDBTableGUIDLow()))
-    {
-        if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
-            sLog.outError("OutdoorPvP : GameObject %u n'est pas de type GAMEOBJECT_TYPE_CAPTURE_POINT (%u)", go->GetEntry(), GAMEOBJECT_TYPE_CAPTURE_POINT);
-        cp->m_capturePoint = go;
-    }
-}
-
-void OutdoorPvP::OnGameObjectRemove(GameObject* go)
-{
-    if (go->GetGoType() != GAMEOBJECT_TYPE_CAPTURE_POINT)
-        return;
-
-    if (OPvPCapturePoint *cp = GetCapturePoint(go->GetDBTableGUIDLow()))
-        cp->m_capturePoint = nullptr;
 }
 
 Creature* ZoneScript::GetCreature(ObjectGuid guid)

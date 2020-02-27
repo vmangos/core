@@ -283,11 +283,18 @@ enum GameobjectTypes
     GAMEOBJECT_TYPE_MEETINGSTONE           = 23,
     GAMEOBJECT_TYPE_FLAGSTAND              = 24,
     GAMEOBJECT_TYPE_FISHINGHOLE            = 25,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     GAMEOBJECT_TYPE_FLAGDROP               = 26,
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     GAMEOBJECT_TYPE_MINI_GAME              = 27,
     GAMEOBJECT_TYPE_LOTTERY_KIOSK          = 28,
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     GAMEOBJECT_TYPE_CAPTURE_POINT          = 29,
     GAMEOBJECT_TYPE_AURA_GENERATOR         = 30,
+#endif
+    GAMEOBJECT_TYPE_MAX
 };
 
 #define MAX_GAMEOBJECT_TYPE                  31             // sending to client this or greater value can crash client.

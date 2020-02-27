@@ -90,6 +90,8 @@ class Map;
 
 typedef std::set<Player*> PlayerSet;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+
 class OPvPCapturePoint
 {
     public:
@@ -185,6 +187,8 @@ class OPvPCapturePoint
         std::map<uint64,uint32> m_CreatureTypes;
 };
 
+#endif
+
 class ZoneScript
 {
     friend class ZoneScriptMgr;
@@ -257,6 +261,8 @@ class ZoneScript
         bool HasPlayer(Player* plr) const;
         void TeamCastSpell(TeamId team, int32 spellId);
 };
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
 // base class for specific outdoor pvp handlers
 class OutdoorPvP : public ZoneScript
@@ -339,5 +345,7 @@ class OutdoorPvP : public ZoneScript
             return nullptr;
         }
 };
+
+#endif
 
 #endif /*OUTDOOR_PVP_H_*/

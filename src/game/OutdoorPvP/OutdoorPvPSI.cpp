@@ -26,6 +26,8 @@
 #include "World.h"
 #include "GameEventMgr.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+
 OutdoorPvPSI::OutdoorPvPSI()
 {
     m_TypeId = OUTDOOR_PVP_SI;
@@ -273,3 +275,5 @@ void AddSC_outdoorpvp_si()
 {
     sZoneScriptMgr.AddScript(new OutdoorPvP_silithus());
 }
+
+#endif
