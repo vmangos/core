@@ -27,6 +27,8 @@
 #include "World.h"
 #include "GossipDef.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+
 OPvPCapturePointEP_EWT::OPvPCapturePointEP_EWT(OutdoorPvP *pvp)
     : OPvPCapturePoint(pvp), m_TowerState(EP_TS_N), m_UnitsSummonedSide(0)
 {
@@ -766,3 +768,5 @@ void AddSC_outdoorpvp_ep()
 {
     sZoneScriptMgr.AddScript(new OutdoorPvP_eastern_plaguelands());
 }
+
+#endif

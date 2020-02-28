@@ -73,18 +73,6 @@ set (game_SRCS
     Anticheat/Anticheat.cpp
     AuctionHouse/AuctionHouseBotMgr.cpp
     AuctionHouse/AuctionHouseMgr.cpp
-    AutoTesting/AutoTestingMgr.cpp
-    AutoTesting/TestLoader.cpp
-    AutoTesting/Tests/AurasStack.cpp
-    AutoTesting/Tests/ChanneledSpells.cpp
-    AutoTesting/Tests/Cinematics.cpp
-    AutoTesting/Tests/ControlSpells.cpp
-    AutoTesting/Tests/Generic.cpp
-    AutoTesting/Tests/Mage.cpp
-    AutoTesting/Tests/PacketBroadcaster.cpp
-    AutoTesting/Tests/Shaman.cpp
-    AutoTesting/Tests/Test.cpp
-    AutoTesting/Tests/Warlock.cpp
     Battlegrounds/BattleGround.cpp
     Battlegrounds/BattleGroundAB.cpp
     Battlegrounds/BattleGroundAV.cpp
@@ -285,8 +273,6 @@ set (game_SRCS
     Anticheat/Anticheat.h
     AuctionHouse/AuctionHouseBotMgr.h
     AuctionHouse/AuctionHouseMgr.h
-    AutoTesting/AutoTestingMgr.h
-    AutoTesting/Tests/TestPCH.h
     Battlegrounds/BattleGround.h
     Battlegrounds/BattleGroundAB.h
     Battlegrounds/BattleGroundAV.h
@@ -465,7 +451,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/AI
   ${CMAKE_CURRENT_SOURCE_DIR}/Anticheat
   ${CMAKE_CURRENT_SOURCE_DIR}/AuctionHouse
-  ${CMAKE_CURRENT_SOURCE_DIR}/AutoTesting
   ${CMAKE_CURRENT_SOURCE_DIR}/Battlegrounds
   ${CMAKE_CURRENT_SOURCE_DIR}/Chat
   ${CMAKE_CURRENT_SOURCE_DIR}/CinematicStuff

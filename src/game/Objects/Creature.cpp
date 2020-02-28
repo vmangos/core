@@ -172,7 +172,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_groupLootTimer(0), m_groupLootId(0), m_lootMoney(0), m_lootGroupRecipientId(0), m_corpseDecayTimer(0),
     m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60),
     m_wanderDistance(5.0f), m_combatStartTime(0), m_combatResetCount(0), m_subtype(subtype),
-    m_defaultMovementType(IDLE_MOTION_TYPE), m_equipmentId(0), m_creatureStateFlags(0),
+    m_defaultMovementType(IDLE_MOTION_TYPE), m_equipmentId(0), m_creatureStateFlags(CSTATE_REGEN_HEALTH | CSTATE_REGEN_MANA),
     m_AI_locked(false), m_temporaryFactionFlags(TEMPFACTION_NONE),
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), m_creatureGroup(nullptr),
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f), m_reactState(REACT_PASSIVE),

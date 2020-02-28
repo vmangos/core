@@ -6199,7 +6199,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_NOT_KNOWN;
 
                 if (!pet->CanTakeMoreActiveSpells(learn_spellproto->Id))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                     return SPELL_FAILED_TOO_MANY_SKILLS;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (m_spellInfo->spellLevel > pet->GetLevel())
                     return SPELL_FAILED_LOWLEVEL;
@@ -6222,7 +6226,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_NOT_KNOWN;
 
                 if (!pet->CanTakeMoreActiveSpells(learn_spellproto->Id))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
                     return SPELL_FAILED_TOO_MANY_SKILLS;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (m_spellInfo->spellLevel > pet->GetLevel())
                     return SPELL_FAILED_LOWLEVEL;

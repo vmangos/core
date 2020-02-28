@@ -176,7 +176,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleClientInfosCommand(char*);
         bool HandleClientSearchCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
-        bool HandleRunTestCommand(char*);
         bool HandleViewLogCommand(char*);
 
         //Cheats

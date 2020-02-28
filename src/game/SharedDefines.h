@@ -23,12 +23,14 @@
 #define MANGOS_SHAREDDEFINES_H
 
 #include "Platform/Define.h"
+#include "Progression.h"
 #include <cassert>
 
 #define MAX_SPELL_EFFECTS 3
 #define EFFECT_0          0
 #define EFFECT_1          1
 #define EFFECT_2          2
+
 enum Gender
 {
     GENDER_MALE                        = 0,
@@ -283,11 +285,18 @@ enum GameobjectTypes
     GAMEOBJECT_TYPE_MEETINGSTONE           = 23,
     GAMEOBJECT_TYPE_FLAGSTAND              = 24,
     GAMEOBJECT_TYPE_FISHINGHOLE            = 25,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
     GAMEOBJECT_TYPE_FLAGDROP               = 26,
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     GAMEOBJECT_TYPE_MINI_GAME              = 27,
     GAMEOBJECT_TYPE_LOTTERY_KIOSK          = 28,
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
     GAMEOBJECT_TYPE_CAPTURE_POINT          = 29,
     GAMEOBJECT_TYPE_AURA_GENERATOR         = 30,
+#endif
+    GAMEOBJECT_TYPE_MAX
 };
 
 #define MAX_GAMEOBJECT_TYPE                  31             // sending to client this or greater value can crash client.
@@ -1349,6 +1358,7 @@ enum ChatMsg
     CHAT_MSG_IGNORED                = 0x16,
     CHAT_MSG_SKILL                  = 0x17,
     CHAT_MSG_LOOT                   = 0x18,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     CHAT_MSG_BG_SYSTEM_NEUTRAL      = 0x52,
     CHAT_MSG_BG_SYSTEM_ALLIANCE     = 0x53,
     CHAT_MSG_BG_SYSTEM_HORDE        = 0x54,
@@ -1356,6 +1366,15 @@ enum ChatMsg
     CHAT_MSG_RAID_WARNING           = 0x58,
     CHAT_MSG_BATTLEGROUND           = 0x5C,
     CHAT_MSG_BATTLEGROUND_LEADER    = 0x5D,
+#else
+    CHAT_MSG_BG_SYSTEM_NEUTRAL      = CHAT_MSG_SYSTEM,
+    CHAT_MSG_BG_SYSTEM_ALLIANCE     = CHAT_MSG_SYSTEM,
+    CHAT_MSG_BG_SYSTEM_HORDE        = CHAT_MSG_SYSTEM,
+    CHAT_MSG_RAID_LEADER            = CHAT_MSG_RAID,
+    CHAT_MSG_RAID_WARNING           = CHAT_MSG_RAID,
+    CHAT_MSG_BATTLEGROUND           = CHAT_MSG_RAID,
+    CHAT_MSG_BATTLEGROUND_LEADER    = CHAT_MSG_RAID,
+#endif
 
     // [-ZERO] Need find correct values
     // Valeurs trouvees (Nostalrius)

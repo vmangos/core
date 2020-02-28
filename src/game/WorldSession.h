@@ -55,7 +55,6 @@ class WardenInterface;
 class MovementAnticheatInterface;
 class BigNumber;
 class BehaviorAnalyzer;
-class NodeSession;
 class MasterPlayer;
 
 struct OpcodeHandler;
@@ -331,7 +330,7 @@ class MANGOS_DLL_SPEC WorldSession
         // Session can be safely deleted if returns false
         bool ForcePlayerLogoutDelay();
 
-        void QueuePacket(WorldPacket* new_packet, NodeSession* from_node = nullptr);
+        void QueuePacket(WorldPacket* new_packet);
 
         bool Update(PacketFilter& updater);
         /**

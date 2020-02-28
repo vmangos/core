@@ -65,7 +65,6 @@
 #include "LFGMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "AuctionHouseBotMgr.h"
-#include "AutoTesting/AutoTestingMgr.h"
 #include "Transports/TransportMgr.h"
 #include "PlayerBotMgr.h"
 #include "ProgressBar.h"
@@ -814,6 +813,27 @@ void World::LoadConfigSettings(bool reload)
         setConfigPos(CONFIG_UINT32_GUID_RESERVE_SIZE_CREATURE,   "GuidReserveSize.Creature",   100);
     if (configNoReload(reload, CONFIG_UINT32_GUID_RESERVE_SIZE_GAMEOBJECT, "GuidReserveSize.GameObject", 100))
         setConfigPos(CONFIG_UINT32_GUID_RESERVE_SIZE_GAMEOBJECT, "GuidReserveSize.GameObject", 100);
+
+    ///- Read the "Honor" directory from the config file (basically these are PvP ranking logs)
+    std::string honorPath = sConfig.GetStringDefault("HonorDir", "./");
+
+    // for empty string use current dir as for absent case
+    if (honorPath.empty())
+        honorPath = "./";
+    // normalize dir path to path/ or path\ form
+    else if (honorPath.at(honorPath.length() - 1) != '/' && honorPath.at(honorPath.length() - 1) != '\\')
+        honorPath.append("/");
+
+    if (reload)
+    {
+        if (honorPath != m_honorPath)
+            sLog.outError("HonorDir option can't be changed at mangosd.conf reload, using current value (%s).", m_honorPath.c_str());
+    }
+    else
+    {
+        m_honorPath = honorPath;
+        sLog.outString("Using HonorDir %s", m_honorPath.c_str());
+    }
 
     ///- Read the "Data" directory from the config file
     std::string dataPath = sConfig.GetStringDefault("DataDir", "./");
@@ -1746,8 +1766,6 @@ void World::SetInitialWorldSettings()
         sObjectMgr.RestoreDeletedItems();
     }
 
-    sAutoTestingMgr->Load();
-
     m_broadcaster =
         std::make_unique<MovementBroadcaster>(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_THREADS),
                                               std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
@@ -1886,7 +1904,6 @@ void World::Update(uint32 diff)
     sLFGMgr.Update(diff);
     sGuardMgr.Update(diff);
     sZoneScriptMgr.Update(diff);
-    sAutoTestingMgr->Update(diff);
 
     ///- Update groups with offline leaders
     if (m_timers[WUPDATE_GROUPS].Passed())

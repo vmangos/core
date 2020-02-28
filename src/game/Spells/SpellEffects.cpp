@@ -548,6 +548,36 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
+                case 23383: // Alliance Flag Click
+                case 23384: // Horde Flag Click
+                {
+                    if (!m_casterGo)
+                        return;
+
+                    Player* pPlayer = ToPlayer(unitTarget);
+                    if (!pPlayer || !pPlayer->CanUseBattleGroundObject())
+                        return;
+
+                    BattleGround* bg = pPlayer->GetBattleGround();
+                    if (!bg)
+                        return;
+
+                    switch (m_casterGo->GetEntry())
+                    {
+                        case 179785:    // Silverwing Flag
+                        case 179786:    // Warsong Flag
+                            if (bg->GetTypeID() == BATTLEGROUND_WS)
+                                bg->EventPlayerClickedOnFlag(pPlayer, m_casterGo);
+                            break;
+                        default:
+                            return;
+                    }
+
+                    pPlayer->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                    pPlayer->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
+                    m_casterGo->Delete();
+                    return;
+                }
                 case 6700: // Dimensional Portal (Used by Arugal)
                 {
                     if (unitTarget->GetTypeId() == TYPEID_UNIT)
@@ -4429,7 +4459,11 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
     // Wild object not have owner and check clickable by players
     map->Add(pGameObj);
 
-    if (pGameObj->GetGoType() == GAMEOBJECT_TYPE_FLAGDROP && m_caster->GetTypeId() == TYPEID_PLAYER)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    if (pGameObj->GetGoType() == GAMEOBJECT_TYPE_FLAGDROP && m_caster->IsPlayer())
+#else
+    if ((pGameObj->GetEntry() == 179785 || pGameObj->GetEntry() == 179786) && m_caster->IsPlayer())
+#endif
     {
         Player* pl = (Player*)m_caster;
         BattleGround* bg = ((Player*)m_caster)->GetBattleGround();

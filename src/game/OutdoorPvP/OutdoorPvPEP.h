@@ -21,6 +21,8 @@
 #include "DBCStructure.h"
 #include "ZoneScript.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+
 uint32 const EP_AllianceBuffs[4] = {11413, 11414, 11415, 1386};
 
 uint32 const EP_HordeBuffs[4] = {30880, 30683, 30682, 29520};
@@ -341,3 +343,4 @@ class OutdoorPvPEP : public OutdoorPvP
 
 #endif
 
+#endif

@@ -20,6 +20,8 @@
 
 #include "ZoneScript.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+
 enum OutdoorPvPSISpells
 {
     SI_SILITHYST_FLAG_GO_SPELL       = 29518,
@@ -77,5 +79,7 @@ class OutdoorPvPSI : public OutdoorPvP
 
         uint32 m_LastController;
 };
+
+#endif
 
 #endif
