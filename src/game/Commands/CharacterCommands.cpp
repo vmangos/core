@@ -2146,10 +2146,12 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
     // hack code
     if (hasStringAbbr(field, "points"))
     {
-        if (amount < 0 || amount > 255)
+        if (amount < 0)
             return false;
         // rank points is sent to client with same size of uint8(255) for each rank
         target->SetByteValue(PLAYER_FIELD_BYTES2, 0, amount);
+        target->GetHonorMgr().SetRankPoints(amount);
+        target->GetHonorMgr().Update();
     }
     else if (hasStringAbbr(field, "rank"))
     {
