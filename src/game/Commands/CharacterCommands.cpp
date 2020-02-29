@@ -3707,9 +3707,9 @@ bool ChatHandler::HandleModifyExhaustionCommand(char* args)
 
     switch (exhaustion_state)
     {
-    case 0: break;
-    case 1: target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME); break;
-    case 2: target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME); break;
+        case 0: break;
+        case 1: target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME); break;
+        case 2: target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME); break;
     }
     return true;
 }
