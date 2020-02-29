@@ -3687,6 +3687,33 @@ bool ChatHandler::HandleModifyDrunkCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleModifyExhaustionCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    uint32 exhaustion_state = (uint32)atoi(args);
+    Player* target = GetSelectedPlayer();
+
+    if (!target)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    target->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME);
+    target->RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME);
+
+    switch (exhaustion_state)
+    {
+    case 0: break;
+    case 1: target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_NO_PLAY_TIME); break;
+    case 2: target->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_PARTIAL_PLAY_TIME); break;
+    }
+    return true;
+}
+
 static uint32 ReputationRankStrIndex[MAX_REPUTATION_RANK] =
 {
     LANG_REP_HATED,    LANG_REP_HOSTILE, LANG_REP_UNFRIENDLY, LANG_REP_NEUTRAL,
