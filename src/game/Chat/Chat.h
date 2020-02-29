@@ -820,6 +820,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleTaxiCheatCommand(char* args);
         bool HandleWhispersCommand(char* args);
         bool HandleModifyDrunkCommand(char* args);
+        bool HandleModifyExhaustionCommand(char* args);
         bool HandleSetViewCommand(char* args);
 
         bool HandleGUIDCommand(char* args);
