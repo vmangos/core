@@ -8,8 +8,8 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20200225211912');
 -- Add your query below.
 
-ALTER TABLE autobroadcast DROP COLUMN delay;
-ALTER TABLE autobroadcast DROP COLUMN comment;
+ALTER TABLE `autobroadcast` DROP COLUMN `delay`;
+ALTER TABLE `autobroadcast` DROP COLUMN `comment`;
 
 -- End of migration.
 END IF;
