@@ -611,6 +611,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleModifyCrCommand(char *args);
         bool HandleModifyBrCommand(char *args);
 
+        bool HandleModifyHairStyleCommand(char *args);
+        bool HandleModifyHairColorCommand(char *args);
+        bool HandleModifySkinColorCommand(char *args);
+        bool HandleModifyAccessoriesCommand(char *args);
 
         //-----------------------Npc Commands-----------------------
         bool HandleNpcAddCommand(char* args);

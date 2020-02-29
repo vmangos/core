@@ -4201,6 +4201,89 @@ bool ChatHandler::HandleModifyRageCommand(char* args)
     return true;
 }
 
+// This is the first id in the dbc and exists in all clients.
+#define DISPLAY_ID_BOX 4
+
+bool ChatHandler::HandleModifyHairStyleCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    uint8 hairstyle = (uint8)atoi(args);
+    Player* target = GetSelectedPlayer();
+
+    if (!target)
+        target = m_session->GetPlayer();
+
+    target->SetByteValue(PLAYER_BYTES, 2, hairstyle);
+    target->SetDisplayId(DISPLAY_ID_BOX);
+    target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
+    target->DeMorph();
+
+    PSendSysMessage("Character's hair style has been changed to: %u", hairstyle);
+    return true;
+}
+
+bool ChatHandler::HandleModifyHairColorCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    uint8 haircolor = (uint8)atoi(args);
+    Player* target = GetSelectedPlayer();
+
+    if (!target)
+        target = m_session->GetPlayer();
+
+    target->SetByteValue(PLAYER_BYTES, 3, haircolor);
+    target->SetDisplayId(DISPLAY_ID_BOX);
+    target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
+    target->DeMorph();
+
+    PSendSysMessage("Character's hair color has been changed to: %u", haircolor);
+    return true;
+}
+
+bool ChatHandler::HandleModifySkinColorCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    uint8 skincolor = (uint8)atoi(args);
+    Player* target = GetSelectedPlayer();
+
+    if (!target)
+        target = m_session->GetPlayer();
+
+    target->SetByteValue(PLAYER_BYTES, 0, skincolor);
+    target->SetDisplayId(DISPLAY_ID_BOX);
+    target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
+    target->DeMorph();
+
+    PSendSysMessage("Character's skin color has been changed to: %u", skincolor);
+    return true;
+}
+
+bool ChatHandler::HandleModifyAccessoriesCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    uint8 accessories = (uint8)atoi(args);
+    Player* target = GetSelectedPlayer();
+
+    if (!target)
+        target = m_session->GetPlayer();
+
+    target->SetByteValue(PLAYER_BYTES_2, 0, accessories);
+    target->SetDisplayId(DISPLAY_ID_BOX);
+    target->DirectSendPublicValueUpdate(UNIT_FIELD_DISPLAYID);
+    target->DeMorph();
+
+    PSendSysMessage("Character's facial hair / markings / hooves have been changed to: %u", accessories);
+    return true;
+}
+
 bool ChatHandler::HandlePDumpLoadCommand(char *args)
 {
     char* file = ExtractQuotedOrLiteralArg(&args);
