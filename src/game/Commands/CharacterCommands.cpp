@@ -2199,11 +2199,21 @@ bool ChatHandler::HandleHonorResetCommand(char* /*args*/)
 
 bool ChatHandler::HandleHonorSetRPCommand(char *args)
 {
-    float value = 0.0f;
-    sscanf(args, "%f", &value);
-    m_session->GetPlayer()->GetHonorMgr().SetRankPoints(value);
-    m_session->GetPlayer()->GetHonorMgr().Update();
-    PSendSysMessage("RankPoint set to %f", value);
+    Player* target = GetSelectedPlayer();
+    if (!target)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    float value;
+    if (!ExtractFloat(&args, value))
+        return false;
+    
+    target->GetHonorMgr().SetRankPoints(value);
+    target->GetHonorMgr().Update();
+    PSendSysMessage("You have changed rank points of %s to %g.", target->GetName(), value);
     return true;
 }
 
