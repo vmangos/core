@@ -1015,8 +1015,13 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #                 0 (ignore commands)
 #
 #    Event.Announce
+#        Sends an announcement to players when a game event starts.
 #        Default: 0 (false)
 #                 1 (true)
+#
+#    AutoBroadcast.Timer
+#        Server autobroadcast interval set in miliseconds.
+#        Default: 1800000 = 30 min
 #
 #    BeepAtStart
 #        Beep at mangosd start finished (mostly work only at Unix/Linux systems)
@@ -1058,8 +1063,6 @@ ShowHealthValues = 0
 MaxPlayerLevel = 60
 StartPlayerLevel = 1
 StartPlayerMoney = 0
-MaxHonorPoints = 75000
-StartHonorPoints = 0
 MinHonorKills = 15
 MaintenanceDay = 3
 InstantLogout = 1
@@ -1096,6 +1099,7 @@ PetUnsummonAtMount = 0
 PetDefaultLoyalty = 1
 PlayerCommands = 1
 Event.Announce = 0
+AutoBroadcast.Timer = 1800000
 BeepAtStart = 1
 ShowProgressBars = 0
 WaitAtStartupError = 0
@@ -2851,10 +2855,4 @@ DynamicRespawn.PlayersMaxLevelDiff      = 0
 ###################################################################################################################
 
 Spells.CCDelay = 200
-
-###################################################################################################################
-#    Server autobroadcast: interval is set in miliseconds, default value: 1800000 = 30 min
-###################################################################################################################
-
-AutoBroadcast.Timer = 1800000
 
