@@ -625,7 +625,7 @@ struct go_cheer_speakerAI : public GameObjectAI
     go_cheer_speakerAI(GameObject* go) : GameObjectAI(go)
     {
         m_started = false;
-        m_big = true;
+        m_big = false;
     }
 
     uint32 CheerPicker()
@@ -686,7 +686,7 @@ struct go_cheer_speakerAI : public GameObjectAI
         // New Year (Only!) - One more big bang!
         if ((localTm->tm_min == 10 && localTm->tm_sec == 30 && localTm->tm_hour == 0) && sGameEventMgr.IsActiveEvent(GAME_EVENT_FIREWORKS) && m_big == true)
         {
-            m_big = false;
+            m_big = true;
             m_events.ScheduleEvent(EVENT_CHEER, Seconds(1));
             m_events.ScheduleEvent(EVENT_FIRE, Seconds(1));
             m_events.ScheduleEvent(EVENT_FIRE, Seconds(1));
