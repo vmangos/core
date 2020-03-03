@@ -1702,12 +1702,12 @@ void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
     auto moonbrook = new Moonbrook();
     auto nightmare = new DragonsOfNightmare();
     auto darkmoon = new DarkmoonFaire();
-    auto lunarfw = new FireworksShow();
+    auto fireworks = new FireworksShow();
     auto goblets = new ToastingGoblets();
     auto silithusWarEffortBattle = new SilithusWarEffortBattle();
     auto scourge_invasion = new ScourgeInvasionEvent();
     auto war_effort = new WarEffortEvent();
-    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, lunarfw, goblets, silithusWarEffortBattle, scourge_invasion, war_effort };
+    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, fireworks, goblets, silithusWarEffortBattle, scourge_invasion, war_effort };
 }
 
 

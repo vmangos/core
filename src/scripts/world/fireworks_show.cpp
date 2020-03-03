@@ -684,7 +684,7 @@ struct go_cheer_speakerAI : public GameObjectAI
         }
 
         // New Year (Only!) - One more big bang!
-        if ((localTm->tm_min == 10 && localTm->tm_sec == 30 && localTm->tm_hour == 0) && sGameEventMgr.IsActiveEvent(GAME_EVENT_FIREWORKS) && m_big == true)
+        if ((localTm->tm_min == 10 && localTm->tm_sec == 30 && localTm->tm_hour == 0) && sGameEventMgr.IsActiveEvent(GAME_EVENT_FIREWORKS) && m_big == false)
         {
             m_big = true;
             m_events.ScheduleEvent(EVENT_CHEER, Seconds(1));
