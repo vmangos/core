@@ -112,6 +112,8 @@ enum ConditionType
                                                             // Requirement: WorldObject Target
                                                             // Value1: creature_id
                                                             // Value2: search_radius
+                                                            // Value3: dead
+                                                            // Value4: not_self
     CONDITION_NEARBY_GAMEOBJECT     = 21,                   // Checks if there is a gameobject nearby with the given id.
                                                             // Requirement: WorldObject Target
                                                             // Value1: gobject_id

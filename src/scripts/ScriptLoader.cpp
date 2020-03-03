@@ -36,6 +36,7 @@ void AddSC_npc_king_gordok();
 void AddSC_areatrigger_scripts();
 void AddSC_dragons_of_nightmare();
 void AddSC_go_scripts();
+void AddSC_event_fireworks();
 void AddSC_npcs_special();
 void AddSC_Totems();
 void AddSC_world_event_naxxramas();
@@ -295,6 +296,7 @@ void AddScripts()
     AddSC_areatrigger_scripts();
     AddSC_dragons_of_nightmare();
     AddSC_go_scripts();
+    AddSC_event_fireworks();
     AddSC_npcs_special();
     AddSC_Totems();
     AddSC_world_event_naxxramas();

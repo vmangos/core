@@ -1179,13 +1179,16 @@ namespace MaNGOS
     class NearestCreatureEntryWithLiveStateInObjectRangeCheck
     {
         public:
-            NearestCreatureEntryWithLiveStateInObjectRangeCheck(WorldObject const& obj,uint32 entry, bool alive, float range)
-                : i_obj(obj), i_entry(entry), i_alive(alive), i_range(range) {}
+            NearestCreatureEntryWithLiveStateInObjectRangeCheck(WorldObject const& obj,uint32 entry, bool alive, float range, Creature const* except = nullptr)
+                : i_obj(obj), i_entry(entry), i_alive(alive), i_range(range), i_except(except) {}
             WorldObject const& GetFocusObject() const { return i_obj; }
             bool operator()(Creature* u)
             {
                 if (u->GetEntry() == i_entry && ((i_alive && u->IsAlive()) || (!i_alive && u->IsCorpse())) && i_obj.IsWithinDistInMap(u, i_range))
                 {
+                    if (u == i_except)
+                        return false;
+
                     i_range = i_obj.GetDistance(u);         // use found unit range as new range limit for next check
                     return true;
                 }
@@ -1197,6 +1200,7 @@ namespace MaNGOS
             uint32 i_entry;
             bool   i_alive;
             float  i_range;
+            Creature const* i_except;
 
             // prevent clone this object
             NearestCreatureEntryWithLiveStateInObjectRangeCheck(NearestCreatureEntryWithLiveStateInObjectRangeCheck const&);

@@ -181,13 +181,15 @@ enum
     EVENT_NEW_YEAR          = 34,
     EVENT_LUNAR_NEW_YEAR    = 38,
     EVENT_TOASTING_GOBLETS  = 39,
+    EVENT_JULY_4TH          = 41,
+    EVENT_SEPTEMBER_30TH    = 42,
 
     FIREWORKS_DURATION      = 10
 };
 
-struct NewYearFireworks : WorldEvent
+struct FireworksShow : WorldEvent
 {
-    NewYearFireworks() : WorldEvent(EVENT_FIREWORKS) {}
+    FireworksShow() : WorldEvent(EVENT_FIREWORKS) {}
 
     void Update() override;
     void Enable() override;

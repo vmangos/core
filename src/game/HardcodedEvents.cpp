@@ -469,13 +469,15 @@ DarkmoonState DarkmoonFaire::GetDarkmoonState()
 }
 
 /*
- * Lunar Festival Firework
+ * Fireworks Show
  */
 
-void NewYearFireworks::Update()
+void FireworksShow::Update()
 {
     if (sGameEventMgr.IsActiveEvent(EVENT_NEW_YEAR) ||
-        sGameEventMgr.IsActiveEvent(EVENT_LUNAR_NEW_YEAR))
+        sGameEventMgr.IsActiveEvent(EVENT_LUNAR_NEW_YEAR) ||
+        sGameEventMgr.IsActiveEvent(EVENT_JULY_4TH) ||
+        sGameEventMgr.IsActiveEvent(EVENT_SEPTEMBER_30TH))
     {
         if (sGameEventMgr.IsActiveEvent(EVENT_FIREWORKS))
         {
@@ -492,12 +494,12 @@ void NewYearFireworks::Update()
         sGameEventMgr.StopEvent(EVENT_FIREWORKS);
 }
 
-void NewYearFireworks::Enable()
+void FireworksShow::Enable()
 {
 
 }
 
-void NewYearFireworks::Disable()
+void FireworksShow::Disable()
 {
     if (sGameEventMgr.IsActiveEvent(EVENT_FIREWORKS))
         sGameEventMgr.StopEvent(EVENT_FIREWORKS);
@@ -510,7 +512,7 @@ void NewYearFireworks::Disable()
     }
 }
 
-bool NewYearFireworks::IsHourBeginning(uint8 minutes) const
+bool FireworksShow::IsHourBeginning(uint8 minutes) const
 {
     time_t rawtime;
     time(&rawtime);
@@ -1700,7 +1702,7 @@ void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
     auto moonbrook = new Moonbrook();
     auto nightmare = new DragonsOfNightmare();
     auto darkmoon = new DarkmoonFaire();
-    auto lunarfw = new NewYearFireworks();
+    auto lunarfw = new FireworksShow();
     auto goblets = new ToastingGoblets();
     auto silithusWarEffortBattle = new SilithusWarEffortBattle();
     auto scourge_invasion = new ScourgeInvasionEvent();
