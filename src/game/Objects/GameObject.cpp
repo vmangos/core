@@ -776,13 +776,13 @@ void GameObject::CleanupsBeforeDelete()
 
 void GameObject::Delete()
 {
-    if (!IsDeleted())
-        AddObjectToRemoveList();
-
     // no despawn animation for not activated rituals
     if (GetGoType() != GAMEOBJECT_TYPE_SUMMONING_RITUAL ||
         GetGoState() == GO_STATE_ACTIVE)
         SendObjectDeSpawnAnim(GetObjectGuid());
+
+    if (!IsDeleted())
+        AddObjectToRemoveList();
 
     SetGoState(GO_STATE_READY);
     SetUInt32Value(GAMEOBJECT_FLAGS, GetGOInfo()->flags);

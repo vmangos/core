@@ -722,14 +722,16 @@ struct go_cheer_speakerAI : public GameObjectAI
                         {
                             if (GameObject* firework = me->SummonGameObject(FireworksBIGOnlyPicker(), rndpos.x, rndpos.y, rndpos.z, rndpos.o, 0.f, 0.f, rndrot, rndrot2, 1))
                             {
-                                firework->SendObjectDeSpawnAnim(firework->GetObjectGuid());
+                                firework->SetRespawnTime(0);
+                                firework->Delete();
                             }
                         }
                         else
                         {
                             if (GameObject* firework = me->SummonGameObject(FireworksPicker(), rndpos.x, rndpos.y, rndpos.z, rndpos.o, 0.f, 0.f, rndrot, rndrot2, 1))
                             {
-                                firework->SendObjectDeSpawnAnim(firework->GetObjectGuid());
+                                firework->SetRespawnTime(0);
+                                firework->Delete();
                             }
                         }
                     }
