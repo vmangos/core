@@ -469,12 +469,15 @@ DarkmoonState DarkmoonFaire::GetDarkmoonState()
 }
 
 /*
- * Lunar Festival Firework
+ * Fireworks Show
  */
 
-void LunarFestivalFirework::Update()
+void FireworksShow::Update()
 {
-    if (sGameEventMgr.IsActiveEvent(EVENT_LUNAR_FIREWORKS))
+    if (sGameEventMgr.IsActiveEvent(EVENT_NEW_YEAR) ||
+        sGameEventMgr.IsActiveEvent(EVENT_LUNAR_NEW_YEAR) ||
+        sGameEventMgr.IsActiveEvent(EVENT_JULY_4TH) ||
+        sGameEventMgr.IsActiveEvent(EVENT_SEPTEMBER_30TH))
     {
         if (sGameEventMgr.IsActiveEvent(EVENT_FIREWORKS))
         {
@@ -487,20 +490,29 @@ void LunarFestivalFirework::Update()
                 sGameEventMgr.StartEvent(EVENT_FIREWORKS);
         }
     }
-}
-
-void LunarFestivalFirework::Enable()
-{
-
-}
-
-void LunarFestivalFirework::Disable()
-{
-    if (sGameEventMgr.IsActiveEvent(EVENT_FIREWORKS))
+    else if (sGameEventMgr.IsActiveEvent(EVENT_FIREWORKS))
         sGameEventMgr.StopEvent(EVENT_FIREWORKS);
 }
 
-bool LunarFestivalFirework::IsHourBeginning(uint8 minutes) const
+void FireworksShow::Enable()
+{
+
+}
+
+void FireworksShow::Disable()
+{
+    if (sGameEventMgr.IsActiveEvent(EVENT_FIREWORKS))
+        sGameEventMgr.StopEvent(EVENT_FIREWORKS);
+
+    if (sGameEventMgr.IsActiveEvent(EVENT_NEW_YEAR) ||
+        sGameEventMgr.IsActiveEvent(EVENT_LUNAR_NEW_YEAR))
+    {
+        if (IsHourBeginning(20) && !sGameEventMgr.IsActiveEvent(EVENT_TOASTING_GOBLETS))
+            sGameEventMgr.StartEvent(EVENT_TOASTING_GOBLETS, true);
+    }
+}
+
+bool FireworksShow::IsHourBeginning(uint8 minutes) const
 {
     time_t rawtime;
     time(&rawtime);
@@ -508,7 +520,60 @@ bool LunarFestivalFirework::IsHourBeginning(uint8 minutes) const
     struct tm* timeinfo;
     timeinfo = localtime(&rawtime);
 
+    // Fireworks happen only between 6 PM and 6 AM.
+    if ((timeinfo->tm_hour > 6) && (timeinfo->tm_hour < 18))
+        return false;
+
     return timeinfo->tm_min < minutes;
+}
+
+/*
+* Post Firework Show Toasting Goblets
+*/
+
+void ToastingGoblets::Update()
+{
+    if (sGameEventMgr.IsActiveEvent(EVENT_TOASTING_GOBLETS))
+    {
+        if (!ShouldEnable())
+            sGameEventMgr.StopEvent(EVENT_TOASTING_GOBLETS, true);
+    }
+    else
+    {
+        if (ShouldEnable())
+            sGameEventMgr.StartEvent(EVENT_TOASTING_GOBLETS, true);
+            
+    }
+}
+
+void ToastingGoblets::Enable()
+{
+
+}
+
+void ToastingGoblets::Disable()
+{
+    if (sGameEventMgr.IsActiveEvent(EVENT_TOASTING_GOBLETS))
+        sGameEventMgr.StopEvent(EVENT_TOASTING_GOBLETS, true);
+}
+
+bool ToastingGoblets::ShouldEnable() const
+{
+    if (!(sGameEventMgr.IsActiveEvent(EVENT_NEW_YEAR) ||
+        sGameEventMgr.IsActiveEvent(EVENT_LUNAR_NEW_YEAR)))
+        return false;
+
+    time_t rawtime;
+    time(&rawtime);
+
+    struct tm* timeinfo;
+    timeinfo = localtime(&rawtime);
+
+    // Fireworks happen only between 6 PM and 6 AM.
+    if ((timeinfo->tm_hour > 6) && (timeinfo->tm_hour < 18))
+        return false;
+
+    return timeinfo->tm_min >= 10 && timeinfo->tm_min <= 20;
 }
 
 SilithusWarEffortBattle::SilithusWarEffortBattle() : WorldEvent (EVENT_SILITHUS_WE_START)
@@ -1637,11 +1702,12 @@ void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
     auto moonbrook = new Moonbrook();
     auto nightmare = new DragonsOfNightmare();
     auto darkmoon = new DarkmoonFaire();
-    auto lunarfw = new LunarFestivalFirework();
+    auto fireworks = new FireworksShow();
+    auto goblets = new ToastingGoblets();
     auto silithusWarEffortBattle = new SilithusWarEffortBattle();
     auto scourge_invasion = new ScourgeInvasionEvent();
     auto war_effort = new WarEffortEvent();
-    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, lunarfw, silithusWarEffortBattle, scourge_invasion, war_effort };
+    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, fireworks, goblets, silithusWarEffortBattle, scourge_invasion, war_effort };
 }
 
 

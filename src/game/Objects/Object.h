@@ -955,11 +955,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype = TEMPSUMMON_DEAD_DESPAWN,uint32 despwtime = 25000, bool asActiveObject = false, uint32 pacifiedTimer = 0, CreatureAiSetter pFuncAiSetter = nullptr);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 25000, bool attach = true);
 
-        Creature* FindNearestCreature(uint32 entry, float range, bool alive = true) const;
+        Creature* FindNearestCreature(uint32 entry, float range, bool alive = true, Creature const* except = nullptr) const;
+        Creature* FindRandomCreature(uint32 entry, float range, bool alive = true, Creature const* except = nullptr) const;
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
         Player* FindNearestPlayer(float range) const;
-        void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange);
-        void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange);
+        void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+        void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
 
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
         void SetActiveObjectState(bool on);

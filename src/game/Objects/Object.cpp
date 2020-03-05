@@ -2579,7 +2579,7 @@ void WorldObject::DestroyForNearbyPlayers()
     }
 }
 
-Creature* WorldObject::FindNearestCreature(uint32 uiEntry, float range, bool alive) const
+Creature* WorldObject::FindNearestCreature(uint32 uiEntry, float range, bool alive, Creature const* except) const
 {
     Creature* pCreature = nullptr;
 
@@ -2587,7 +2587,7 @@ Creature* WorldObject::FindNearestCreature(uint32 uiEntry, float range, bool ali
     Cell cell(pair);
     cell.SetNoCreate();
 
-    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck creature_check(*this, uiEntry, alive, range);
+    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck creature_check(*this, uiEntry, alive, range, except);
     MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreature, creature_check);
 
     TypeContainerVisitor<MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck>, GridTypeMapContainer> creature_searcher(searcher);
@@ -2595,6 +2595,40 @@ Creature* WorldObject::FindNearestCreature(uint32 uiEntry, float range, bool ali
     cell.Visit(pair, creature_searcher, *(GetMap()), *this, range);
 
     return pCreature;
+}
+
+Creature* WorldObject::FindRandomCreature(uint32 uiEntry, float range, bool alive, Creature const* except) const
+{
+    std::list<Creature*> targets;
+    GetCreatureListWithEntryInGrid(targets, uiEntry, range);
+
+    // remove current target
+    if (except)
+        targets.remove((Creature*)except);
+
+    for (std::list<Creature*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    {
+        if ((alive && !(*tIter)->IsAlive()) || (!alive && (*tIter)->IsAlive()))
+        {
+            std::list<Creature*>::iterator tIter2 = tIter;
+            ++tIter;
+            targets.erase(tIter2);
+        }
+        else
+            ++tIter;
+    }
+
+    // no appropriate targets
+    if (targets.empty())
+        return nullptr;
+
+    // select random
+    uint32 rIdx = urand(0, targets.size() - 1);
+    std::list<Creature*>::const_iterator tcIter = targets.begin();
+    for (uint32 i = 0; i < rIdx; ++i)
+        ++tcIter;
+
+    return *tcIter;
 }
 
 GameObject* WorldObject::FindNearestGameObject(uint32 uiEntry, float fMaxSearchRange) const
@@ -2625,7 +2659,7 @@ Player* WorldObject::FindNearestPlayer(float range) const
     return target;
 }
 
-void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange)
+void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const
 {
     CellPair pair(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
     Cell cell(pair);
@@ -2638,7 +2672,7 @@ void WorldObject::GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList
     cell.Visit(pair, visitor, *(GetMap()), *this, fMaxSearchRange);
 }
 
-void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange)
+void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const
 {
     CellPair pair(MaNGOS::ComputeCellPair(GetPositionX(), GetPositionY()));
     Cell cell(pair);
