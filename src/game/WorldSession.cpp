@@ -41,6 +41,7 @@
 #include "MapManager.h"
 #include "SocialMgr.h"
 #include "PlayerBotMgr.h"
+#include "PlayerBotAI.h"
 #include "Anticheat.h"
 #include "Language.h"
 #include "Auth/Sha1.h"
@@ -144,6 +145,9 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     }
     if (!m_Socket)
     {
+        if (GetBot() && GetBot()->ai)
+            GetBot()->ai->OnPacketSent(packet);
+
         if (packet->GetOpcode() == SMSG_MESSAGECHAT)
         {
             WorldPacket packet2(*packet);

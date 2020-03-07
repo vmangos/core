@@ -669,6 +669,13 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
         return false;
     }
 
+    // cleanup inventory related item value fields (its will be filled correctly in _LoadInventory)
+    for (uint8 slot = EQUIPMENT_SLOT_START; slot < EQUIPMENT_SLOT_END; ++slot)
+    {
+        SetGuidValue(PLAYER_FIELD_INV_SLOT_HEAD + (slot * 2), ObjectGuid());
+        SetVisibleItemSlot(slot, nullptr);
+    }
+
     for (auto& item : m_items)
         item = nullptr;
 

@@ -10,6 +10,7 @@
 #include "Chat.h"
 #include "Player.h"
 #include "PlayerBotAI.h"
+#include "PartyBotAI.h"
 #include "Anticheat.h"
 
 INSTANTIATE_SINGLETON_1(PlayerBotMgr);
@@ -223,6 +224,32 @@ void PlayerBotMgr::update(uint32 diff)
     {
         if (!enable && !iter->second->customBot)
             continue;
+
+        if (iter->second->state == PB_STATE_ONLINE)
+        {
+            if (!iter->second->m_pendingResponses.empty())
+            {
+                for (const auto opcode : iter->second->m_pendingResponses)
+                {
+                    iter->second->ai->HandlePacketResponse(opcode);
+                }
+                iter->second->m_pendingResponses.clear();
+            }
+
+            if (iter->second->requestRemoval)
+            {
+                if (iter->second->ai && iter->second->ai->me)
+                    iter->second->ai->me->RemoveFromGroup();
+                if (iter->second->ai && iter->second->ai->me)
+                    sPlayerBotMgr.deleteBot(iter->second->ai->me->GetGUIDLow());
+                if (WorldSession* sess = sWorld.FindSession(iter->second->accountId))
+                    sess->LogoutPlayer(false);
+
+                iter->second->requestRemoval = false;
+                continue;
+            }
+        }
+
         if (iter->second->state != PB_STATE_LOADING)
             continue;
 
@@ -544,5 +571,197 @@ bool ChatHandler::HandleBotInfoCommand(char * args)
 bool ChatHandler::HandleBotStartCommand(char * args)
 {
     sPlayerBotMgr.Start();
+    return true;
+}
+
+uint8 SelectRandomRaceForClass(uint8 playerClass, Team playerTeam)
+{
+    switch (playerClass)
+    {
+        case CLASS_WARRIOR:
+        {
+            if (playerTeam == ALLIANCE)
+            {
+                std::vector<uint32> races = { RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME };
+                return SelectRandomContainerElement(races);
+            }
+            else
+            {
+                std::vector<uint32> races = { RACE_ORC, RACE_UNDEAD, RACE_TAUREN, RACE_TROLL };
+                return SelectRandomContainerElement(races);
+            }
+            break;
+        }
+        case CLASS_PALADIN:
+        {
+            return urand(0, 1) ? RACE_HUMAN : RACE_DWARF;
+        }
+        case CLASS_HUNTER:
+        {
+            if (playerTeam == ALLIANCE)
+            {
+                std::vector<uint32> races = { RACE_DWARF, RACE_NIGHTELF };
+                return SelectRandomContainerElement(races);
+            }
+            else
+            {
+                std::vector<uint32> races = { RACE_ORC, RACE_TAUREN, RACE_TROLL };
+                return SelectRandomContainerElement(races);
+            }
+            break;
+        }
+        case CLASS_ROGUE:
+        {
+            if (playerTeam == ALLIANCE)
+            {
+                std::vector<uint32> races = { RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME };
+                return SelectRandomContainerElement(races);
+            }
+            else
+            {
+                std::vector<uint32> races = { RACE_ORC, RACE_UNDEAD, RACE_TROLL };
+                return SelectRandomContainerElement(races);
+            }
+            break;
+        }
+        case CLASS_PRIEST:
+        {
+            if (playerTeam == ALLIANCE)
+            {
+                std::vector<uint32> races = { RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF };
+                return SelectRandomContainerElement(races);
+            }
+            else
+            {
+                std::vector<uint32> races = { RACE_UNDEAD, RACE_TROLL };
+                return SelectRandomContainerElement(races);
+            }
+            break;
+        }
+        case CLASS_SHAMAN:
+        {
+            std::vector<uint32> races = { RACE_ORC, RACE_TAUREN, RACE_TROLL };
+            return SelectRandomContainerElement(races);
+        }
+        case CLASS_MAGE:
+        {
+            if (playerTeam == ALLIANCE)
+            {
+                std::vector<uint32> races = { RACE_HUMAN, RACE_GNOME };
+                return SelectRandomContainerElement(races);
+            }
+            else
+            {
+                std::vector<uint32> races = { RACE_UNDEAD, RACE_TROLL };
+                return SelectRandomContainerElement(races);
+            }
+            break;
+        }
+        case CLASS_WARLOCK:
+        {
+            if (playerTeam == ALLIANCE)
+            {
+                std::vector<uint32> races = { RACE_HUMAN, RACE_GNOME };
+                return SelectRandomContainerElement(races);
+            }
+            else
+            {
+                std::vector<uint32> races = { RACE_ORC, RACE_UNDEAD };
+                return SelectRandomContainerElement(races);
+            }
+            break;
+        }
+        case CLASS_DRUID:
+        {
+            return playerTeam == ALLIANCE ? RACE_NIGHTELF : RACE_TAUREN;
+        }
+    }
+
+    return 0;
+}
+
+bool ChatHandler::HandlePartyBotAddCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    if (!pPlayer)
+        return false;
+
+    if (pPlayer->GetGroup() && pPlayer->GetGroup()->IsFull())
+    {
+        SendSysMessage("Cannot add more bots. Group is full.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (!args)
+    {
+        SendSysMessage("Expected role or class.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint8 botClass = 0;
+    PartyBotRole botRole = PB_ROLE_INVALID;
+
+    std::string option = args;
+    if (option == "warrior")
+        botClass = CLASS_WARRIOR;
+    else if (option == "paladin" && pPlayer->GetTeam() == ALLIANCE)
+        botClass = CLASS_PALADIN;
+    else if (option == "hunter")
+        botClass = CLASS_HUNTER;
+    else if (option == "rogue")
+        botClass = CLASS_ROGUE;
+    else if (option == "priest")
+        botClass = CLASS_PRIEST;
+    else if (option == "shaman" && pPlayer->GetTeam() == HORDE)
+        botClass = CLASS_SHAMAN;
+    else if (option == "mage")
+        botClass = CLASS_MAGE;
+    else if (option == "warlock")
+        botClass = CLASS_WARLOCK;
+    else if (option == "druid")
+        botClass = CLASS_DRUID;
+    else if (option == "hunter")
+        botClass = CLASS_HUNTER;
+    else if (option == "dps")
+    {
+        std::vector<uint32> dpsClasses = { CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK };
+        botClass = SelectRandomContainerElement(dpsClasses);
+        botRole = PB_ROLE_DPS;
+    }
+    else if (option == "healer")
+    {
+        std::vector<uint32> dpsClasses = { CLASS_PRIEST, CLASS_DRUID };
+        if (pPlayer->GetTeam() == HORDE)
+            dpsClasses.push_back(CLASS_SHAMAN);
+        else
+            dpsClasses.push_back(CLASS_PALADIN);
+        botClass = SelectRandomContainerElement(dpsClasses);
+        botRole = PB_ROLE_HEALER;
+    }
+    else if (option == "tank")
+    {
+        botClass = CLASS_WARRIOR;
+        botRole = PB_ROLE_TANK;
+    }
+
+    if (!botClass)
+    {
+        SendSysMessage("Expected role or class.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint8 botRace = SelectRandomRaceForClass(botClass, pPlayer->GetTeam());
+
+    float x, y, z;
+    pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
+
+    PlayerCreatorAI* ai = new PartyBotAI(pPlayer, nullptr, botRace, botClass, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
+    sPlayerBotMgr.addBot(ai);
+    
+    PSendSysMessage("[PlayerBotMgr] Bot added");
+
     return true;
 }

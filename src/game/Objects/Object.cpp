@@ -5026,7 +5026,7 @@ void WorldObject::RemoveAllDynObjects()
     }
 }
 
-void WorldObject::CastSpell(Unit* pVictim, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
+SpellCastResult WorldObject::CastSpell(Unit* pVictim, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
@@ -5036,13 +5036,13 @@ void WorldObject::CastSpell(Unit* pVictim, uint32 spellId, bool triggered, Item*
             sLog.outError("CastSpell: unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
             sLog.outError("CastSpell: unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
-        return;
+        return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
-    CastSpell(pVictim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
+    return CastSpell(pVictim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
 }
 
-void WorldObject::CastSpell(Unit* pVictim, SpellEntry const* spellInfo, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
+SpellCastResult WorldObject::CastSpell(Unit* pVictim, SpellEntry const* spellInfo, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
 {
     if (!spellInfo)
     {
@@ -5050,7 +5050,7 @@ void WorldObject::CastSpell(Unit* pVictim, SpellEntry const* spellInfo, bool tri
             sLog.outError("CastSpell: unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
             sLog.outError("CastSpell: unknown spell by caster: %s", GetGuidStr().c_str());
-        return;
+        return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
     if (castItem)
@@ -5071,7 +5071,7 @@ void WorldObject::CastSpell(Unit* pVictim, SpellEntry const* spellInfo, bool tri
     else if (GameObject* pGameObject = ToGameObject())
         spell = new Spell(pGameObject, spellInfo, triggered, originalCaster, triggeredBy, nullptr, triggeredByParent);
     else
-        return;
+        return SPELL_FAILED_ERROR;
 
     SpellCastTargets targets;
 
@@ -5087,7 +5087,7 @@ void WorldObject::CastSpell(Unit* pVictim, SpellEntry const* spellInfo, bool tri
             targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
 
     spell->SetCastItem(castItem);
-    spell->prepare(std::move(targets), triggeredByAura);
+    return spell->prepare(std::move(targets), triggeredByAura);
 }
 
 void WorldObject::CastCustomSpell(Unit* pVictim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
@@ -5153,7 +5153,7 @@ void WorldObject::CastCustomSpell(Unit* pVictim, SpellEntry const* spellInfo, in
 }
 
 // used for scripting
-void WorldObject::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+SpellCastResult WorldObject::CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
 {
     SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
@@ -5163,14 +5163,14 @@ void WorldObject::CastSpell(float x, float y, float z, uint32 spellId, bool trig
             sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s triggered by aura %u (eff %u)", spellId, GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
             sLog.outError("CastSpell(x,y,z): unknown spell id %i by caster: %s", spellId, GetGuidStr().c_str());
-        return;
+        return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
-    CastSpell(x, y, z, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
+    return CastSpell(x, y, z, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
 }
 
 // used for scripting
-void WorldObject::CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+SpellCastResult WorldObject::CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
 {
     if (!spellInfo)
     {
@@ -5178,7 +5178,7 @@ void WorldObject::CastSpell(float x, float y, float z, SpellEntry const* spellIn
             sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s triggered by aura %u (eff %u)", GetGuidStr().c_str(), triggeredByAura->GetId(), triggeredByAura->GetEffIndex());
         else
             sLog.outError("CastSpell(x,y,z): unknown spell by caster: %s", GetGuidStr().c_str());
-        return;
+        return SPELL_FAILED_SPELL_UNAVAILABLE;
     }
 
     if (castItem)
@@ -5199,12 +5199,12 @@ void WorldObject::CastSpell(float x, float y, float z, SpellEntry const* spellIn
     else if (GameObject* pGameObject = ToGameObject())
         spell = new Spell(pGameObject, spellInfo, triggered, originalCaster, triggeredBy);
     else
-        return;
+        return SPELL_FAILED_ERROR;
 
     SpellCastTargets targets;
     targets.setDestination(x, y, z);
     spell->SetCastItem(castItem);
-    spell->prepare(std::move(targets), triggeredByAura);
+    return spell->prepare(std::move(targets), triggeredByAura);
 }
 
 bool WorldObject::isVisibleFor(Player const* u, WorldObject const* viewPoint) const
