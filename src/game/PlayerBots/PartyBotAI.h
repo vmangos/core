@@ -78,6 +78,7 @@ public:
     Player* GetPartyLeader() const;
     Unit* SelectAttackTarget(Player* pLeader) const;
     Unit* SelectHealTarget(Player* pLeader) const;
+    Player* SelectResurrectionTarget() const;
     bool IsValidHealTarget(Unit* pTarget) const;
     bool IsValidHostileTarget(Unit* pTarget) const;
     void CastRandomDamageSpell(Unit* pVictim);
@@ -86,11 +87,13 @@ public:
     bool DrinkAndEat();
     void EquipOrUseNewItem();
 
+    SpellEntry const* m_resurrectionSpell = nullptr;
     std::vector<SpellEntry const*> spellListDamageAura;
     std::vector<SpellEntry const*> spellListSpellDamage;
     std::vector<SpellEntry const*> spellListWeaponDamage;
     std::vector<SpellEntry const*> spellListAuraBar;
     std::vector<SpellEntry const*> spellListTaunt;
+    std::vector<SpellEntry const*> spellListInterrupt;
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
     std::set<SpellEntry const*, AuraDurationCompare> spellListCrowdControlAura;
@@ -102,14 +105,14 @@ public:
     ObjectGuid m_leaderGuid;
 
     ObjectGuid m_cloneGuid;
-    uint8 m_race;
-    uint8 m_class;
-    uint32 m_mapId;
-    uint32 m_instanceId;
-    float m_x;
-    float m_y;
-    float m_z;
-    float m_o;
+    uint8 m_race = 0;
+    uint8 m_class = 0;
+    uint32 m_mapId = 0;
+    uint32 m_instanceId = 0;
+    float m_x = 0.0f;
+    float m_y = 0.0f;
+    float m_z = 0.0f;
+    float m_o = 0.0f;
 };
 
 

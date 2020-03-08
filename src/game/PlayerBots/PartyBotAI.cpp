@@ -83,6 +83,13 @@ void PartyBotAI::PopulateSpellData()
                 case SPELL_EFFECT_ATTACK_ME:
                     spellListTaunt.push_back(pSpellEntry);
                     break;
+                case SPELL_EFFECT_INTERRUPT_CAST:
+                    spellListInterrupt.push_back(pSpellEntry);
+                    break;
+                case SPELL_EFFECT_RESURRECT:
+                case SPELL_EFFECT_RESURRECT_NEW:
+                    m_resurrectionSpell = pSpellEntry;
+                    break;
                 case SPELL_EFFECT_APPLY_AURA:
                 {
                     switch (pSpellEntry->EffectApplyAuraName[i])
@@ -129,6 +136,9 @@ void PartyBotAI::PopulateSpellData()
                             break;
                         case SPELL_AURA_MOD_TAUNT:
                             spellListTaunt.push_back(pSpellEntry);
+                            break;
+                        case SPELL_AURA_MOD_SILENCE:
+                            spellListInterrupt.push_back(pSpellEntry);
                             break;
                     }
                     break;
@@ -224,7 +234,7 @@ bool PartyBotAI::DrinkAndEat()
 
     if (!isEating && needToEat)
     {
-        if (me->IsMoving())
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
@@ -235,7 +245,7 @@ bool PartyBotAI::DrinkAndEat()
 
     if (!isDrinking && needToDrink)
     {
-        if (me->IsMoving())
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
@@ -338,6 +348,25 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
     return nullptr;
 }
 
+Player* PartyBotAI::SelectResurrectionTarget() const
+{
+    Group* pGroup = me->GetGroup();
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            // Can't resurrect self.
+            if (pMember == me)
+                continue;
+
+            if (pMember->GetDeathState() == CORPSE)
+                return pMember;
+        }
+    }
+
+    return nullptr;
+}
+
 bool IsPhysicalDamageClass(uint8 playerClass)
 {
     switch (playerClass)
@@ -410,6 +439,17 @@ bool PartyBotAI::CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry)
 
     if (pSpellEntry->IsSpellAppliesAura() && pTarget->HasAura(pSpellEntry->Id))
         return false;
+
+    SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex);
+    if (me != pTarget)
+    {
+        float const dist = me->GetCombatDistance(pTarget);
+
+        if (dist > srange->maxRange)
+            return false;
+        if (srange->minRange && dist < srange->minRange)
+            return false;
+    }
 
     return true;
 }
@@ -512,7 +552,7 @@ void PartyBotAI::HandlePacketResponse(uint16 opcode)
             for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
             {
                 if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
-                {;
+                {
                     WorldPacket data(CMSG_BATTLEFIELD_PORT);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                     data << uint32(GetBattleGrounMapIdByTypeId(BattleGroundTypeId(i)));
@@ -629,7 +669,6 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     Player* pLeader = GetPartyLeader();
     if (!pLeader)
     {
-        printf("Removing bot.\n");
         botEntry->requestRemoval = true;
         return;
     }
@@ -682,6 +721,12 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             ChatHandler(me).HandleGonameCommand(name);
             return;
         }
+
+        if (m_resurrectionSpell && !me->IsNonMeleeSpellCasted())
+            if (Player* pTarget = SelectResurrectionTarget())
+                if (CanTryToCastSpell(pTarget, m_resurrectionSpell))
+                    if (DoCastSpell(pTarget, m_resurrectionSpell) == SPELL_CAST_OK)
+                        return;
     }
 
     if (me->GetStandState() != UNIT_STAND_STATE_STAND)
@@ -762,6 +807,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         if (!pVictim)
             return;
 
+        // If tank then taunt mobs attacking others.
         if (m_role == PB_ROLE_TANK &&
             me != pVictim->GetVictim() &&
             !spellListTaunt.empty())
@@ -771,6 +817,20 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 if (!pVictim->HasBreakableByDamageCrowdControlAura() &&
                     !pVictim->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) &&
                     CanTryToCastSpell(pVictim, pSpellEntry))
+                {
+                    if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+        }
+
+        // Interrupt enemy spell casting.
+        if (!spellListInterrupt.empty() &&
+            pVictim->IsNonMeleeSpellCasted())
+        {
+            for (const auto pSpellEntry : spellListInterrupt)
+            {
+                if (CanTryToCastSpell(pVictim, pSpellEntry))
                 {
                     if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
                         return;
