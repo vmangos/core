@@ -703,7 +703,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
 
     if (!args)
     {
-        SendSysMessage("Invalid syntax. Expected role or class.");
+        SendSysMessage("Incorrect syntax. Expected role or class.");
         SetSentErrorMessage(true);
         return false;
     }
@@ -756,7 +756,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
 
     if (!botClass)
     {
-        SendSysMessage("Invalid syntax. Expected role or class.");
+        SendSysMessage("Incorrect syntax. Expected role or class.");
         SetSentErrorMessage(true);
         return false;
     }

@@ -115,5 +115,4 @@ public:
     float m_o = 0.0f;
 };
 
-
 #endif
