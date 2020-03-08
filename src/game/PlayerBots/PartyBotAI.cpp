@@ -147,6 +147,45 @@ void PartyBotAI::PopulateSpellData()
     std::shuffle(spellListWeaponDamage.begin(), spellListWeaponDamage.end(), std::default_random_engine(seed));
 }
 
+void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
+{
+    if (pPlayer->GetLevel() != me->GetLevel())
+    {
+        me->GiveLevel(pPlayer->GetLevel());
+        me->InitTalentForLevel();
+        me->SetUInt32Value(PLAYER_XP, 0);
+    }
+
+    // Learn all of the target's spells.
+    for (const auto& spell : pPlayer->GetSpellMap())
+    {
+        if (spell.second.disabled)
+            continue;
+
+        if (spell.second.state == PLAYERSPELL_REMOVED)
+            continue;
+
+        SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spell.first);
+        if (!pSpellEntry)
+            continue;
+
+        uint32 const firstRankId = sSpellMgr.GetFirstSpellInChain(spell.first);
+        if (!me->HasSpell(spell.first))
+            me->LearnSpell(spell.first, false, (firstRankId == spell.first && GetTalentSpellPos(firstRankId)));
+    }
+
+    // Unequip current gear
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+        me->AutoUnequipItemFromSlot(i);
+
+    // Copy gear from target.
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            me->StoreNewItemInBestSlots(pItem->GetEntry(), 1);
+    }
+}
+
 void PartyBotAI::LearnPremadeSpecForClass()
 {
     for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
@@ -166,10 +205,10 @@ Player* PartyBotAI::GetPartyLeader() const
         return nullptr;
 
     ObjectGuid leaderGuid = pGroup->GetLeaderGuid();
-    if (leaderGuid == me->GetObjectGuid())
+    if (leaderGuid == me->GetObjectGuid() && !me->InBattleGround())
         return nullptr;
 
-    return ObjectAccessor::FindPlayerNotInWorld(leaderGuid);
+    return ObjectAccessor::FindPlayerNotInWorld(m_leaderGuid);
 }
 
 bool PartyBotAI::DrinkAndEat()
@@ -211,6 +250,7 @@ bool PartyBotAI::DrinkAndEat()
 bool PartyBotAI::IsValidHealTarget(Unit* pTarget) const
 {
     return (pTarget->GetHealthPercent() < 100.0f) &&
+            pTarget->IsAlive() &&
             me->IsWithinLOSInMap(pTarget) &&
             me->IsWithinDist(pTarget, 30.0f);
 }
@@ -467,6 +507,23 @@ void PartyBotAI::HandlePacketResponse(uint16 opcode)
             me->GetSession()->HandleMoveTeleportAckOpcode(data);
             break;
         }
+        case CMSG_BATTLEFIELD_PORT:
+        {
+            for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
+            {
+                if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
+                {;
+                    WorldPacket data(CMSG_BATTLEFIELD_PORT);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+                    data << uint32(GetBattleGrounMapIdByTypeId(BattleGroundTypeId(i)));
+#endif
+                    data << uint8(1);
+                    me->GetSession()->HandleBattleFieldPortOpcode(data);
+                    break;
+                }
+            }
+            break;
+        }
     }
 }
 
@@ -513,6 +570,23 @@ void PartyBotAI::OnPacketSent(WorldPacket const* packet)
             me->ResurectUsingRequestData();
             break;
         }
+        case SMSG_BATTLEFIELD_STATUS:
+        {
+            if (me->IsBeingTeleported() || me->InBattleGround())
+                m_receivedBgInvite = false;
+            else
+            {
+                for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
+                {
+                    if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
+                    {
+                        m_receivedBgInvite = true;
+                        break;
+                    }
+                }
+            }
+            break;
+        }
     }
 }
 
@@ -535,11 +609,16 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
     if (!m_initialized)
     {
+        AddToPlayerGroup();
+
         if (m_role == PB_ROLE_INVALID)
             AutoAssignRole();
 
-        AddToPlayerGroup();
-        LearnPremadeSpecForClass();
+        if (Player const* pPlayer = sObjectAccessor.FindPlayer(m_cloneGuid))
+            CloneFromPlayer(pPlayer);
+        else
+            LearnPremadeSpecForClass();
+
         PopulateSpellData();
         me->UpdateSkillsToMaxSkillsForLevel();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -548,8 +627,9 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     }
 
     Player* pLeader = GetPartyLeader();
-    if (!pLeader && me->IsInWorld())
+    if (!pLeader)
     {
+        printf("Removing bot.\n");
         botEntry->requestRemoval = true;
         return;
     }
@@ -557,26 +637,33 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     if (!pLeader->IsInWorld())
         return;
 
+    if (pLeader->InBattleGround() &&
+        !me->InBattleGround())
+    {
+        if (m_receivedBgInvite)
+        {
+            HandlePacketResponse(CMSG_BATTLEFIELD_PORT);
+            m_receivedBgInvite = false;
+            return;
+        }
+        
+        // Remain idle until we can join battleground.
+        return;
+    }
+
     if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
         return;
 
     if (me->IsDead())
-        return;
-
-    if (!spellListAuraBar.empty())
     {
-        bool noAura = true;
-        for (auto spell : spellListAuraBar)
+        if (me->InBattleGround() &&
+            me->GetDeathState() == CORPSE)
         {
-            if (me->HasAura(spell->Id))
-            {
-                noAura = false;
-                break;
-            }
+            me->BuildPlayerRepop();
+            me->RepopAtGraveyard();
         }
-
-        if (noAura)
-            me->CastSpell(me, SelectRandomContainerElement(spellListAuraBar), false);
+        
+        return;
     }
 
     if (!me->IsInCombat())
@@ -594,11 +681,27 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             strcpy(name, pLeader->GetName());
             ChatHandler(me).HandleGonameCommand(name);
             return;
-        }  
+        }
     }
 
     if (me->GetStandState() != UNIT_STAND_STATE_STAND)
         me->SetStandState(UNIT_STAND_STATE_STAND);
+
+    if (!spellListAuraBar.empty())
+    {
+        bool noAura = true;
+        for (auto spell : spellListAuraBar)
+        {
+            if (me->HasAura(spell->Id))
+            {
+                noAura = false;
+                break;
+            }
+        }
+
+        if (noAura)
+            me->CastSpell(me, SelectRandomContainerElement(spellListAuraBar), false);
+    }
 
     Unit* pVictim = me->GetVictim();
 
@@ -607,17 +710,11 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
         {
             pVictim = SelectAttackTarget(pLeader);
-            if (!pVictim && me->IsInCombat())
-            {
-                me->CombatStop();
-                return;
-            }
-
             if (me->Attack(pVictim, true))
                 me->GetMotionMaster()->MoveChase(pVictim, 1.0f);
         }
 
-        if (pVictim && !me->HasInArc(M_PI_F, pVictim) && me->IsStopped())
+        if (pVictim && !me->HasInArc(2 * M_PI_F / 3, pVictim) && !me->IsMoving())
         {
             me->SetInFront(pVictim);
             me->SetFacingToObject(pVictim);
@@ -638,7 +735,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
        (m_role != PB_ROLE_TANK))
     {
         Unit* pAttacker = *me->GetAttackers().begin();
-        if (!spellListCrowdControlAura.empty())
+        if (!spellListCrowdControlAura.empty() &&
+            !pAttacker->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
         {
             for (const auto pSpellEntry : spellListCrowdControlAura)
             {
@@ -680,8 +778,10 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             }
         }
 
+        // Make hunter use auto shot.
         if (me->HasSpell(PB_SPELL_AUTO_SHOT) &&
-            !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+           (me->GetDistance(pVictim) > 8.0f) &&
+           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
             me->CastSpell(pVictim, PB_SPELL_AUTO_SHOT, false);
 
         CastRandomDamageSpell(pVictim);

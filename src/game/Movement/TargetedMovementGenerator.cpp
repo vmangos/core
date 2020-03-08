@@ -334,8 +334,22 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 
     if (owner.movespline->Finalized())
     {
-        if (!owner.HasInArc(0.01f, i_target.getTarget()))
-            owner.SetInFront(i_target.getTarget());
+        if (owner.IsPlayer())
+        {
+            // For players need to actually send the new orientation.
+            // Creatures automatically face their target in client.
+            if (!owner.HasInArc(2 * M_PI_F / 3, i_target.getTarget()))
+            {
+                owner.SetInFront(i_target.getTarget());
+                owner.SendMovementPacket(MSG_MOVE_SET_FACING, true);
+            }
+        }
+        else
+        {
+            if (!owner.HasInArc(0.01f, i_target.getTarget()))
+                owner.SetInFront(i_target.getTarget());
+        }
+        
 
         if (m_bIsSpreading)
             m_bIsSpreading = false;

@@ -89,7 +89,9 @@ ChatCommand * ChatHandler::getCommandTable()
     };
     static ChatCommand partyBotCommandTable[] =
     {
-        { "add",        SEC_ADMINISTRATOR,      true,  &ChatHandler::HandlePartyBotAddCommand,         "", nullptr },
+        { "add",        SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAddCommand,         "", nullptr },
+        { "clone",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotCloneCommand,       "", nullptr },
+        { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
     static ChatCommand accountSetCommandTable[] =

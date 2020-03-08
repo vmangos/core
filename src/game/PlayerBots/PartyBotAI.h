@@ -49,15 +49,20 @@ enum PartyBotRole : uint8
     PB_ROLE_INVALID
 };
 
-class PartyBotAI : public PlayerCreatorAI
+class PartyBotAI : public PlayerBotAI
 {
 public:
 
-    PartyBotAI(Player* pLeader, Player* pPlayer, uint8 _race_, uint8 _class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o)
-        : PlayerCreatorAI(pPlayer, _race_, _class_, mapId, instanceId, x, y, z, o)
+    PartyBotAI(Player* pLeader, Player* pClone, PartyBotRole role, uint8 race, uint8 class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o)
+        : PlayerBotAI(nullptr), m_role(role), m_race(race), m_class(class_), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o)
     {
         m_leaderGuid = pLeader->GetObjectGuid();
+        m_cloneGuid = pClone ? pClone->GetObjectGuid() : ObjectGuid();
         m_updateTimer.Reset(2000);
+    }
+    bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) override
+    {
+        return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o, sObjectAccessor.FindPlayer(m_cloneGuid));
     }
 
     void OnPlayerLogin() override;
@@ -65,6 +70,7 @@ public:
     void OnPacketSent(WorldPacket const* packet) override;
     void HandlePacketResponse(uint16 opcode) override;
 
+    void CloneFromPlayer(Player const* pPlayer);
     void AddToPlayerGroup();
     void LearnPremadeSpecForClass();
     void PopulateSpellData();
@@ -90,9 +96,20 @@ public:
     std::set<SpellEntry const*, AuraDurationCompare> spellListCrowdControlAura;
 
     bool m_initialized = false;
+    bool m_receivedBgInvite = false;
     PartyBotRole m_role = PB_ROLE_INVALID;
     ShortTimeTracker m_updateTimer;
     ObjectGuid m_leaderGuid;
+
+    ObjectGuid m_cloneGuid;
+    uint8 m_race;
+    uint8 m_class;
+    uint32 m_mapId;
+    uint32 m_instanceId;
+    float m_x;
+    float m_y;
+    float m_z;
+    float m_o;
 };
 
 

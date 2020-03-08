@@ -746,6 +746,7 @@ bool Player::Create(uint32 guidlow, std::string const& name, uint8 race, uint8 c
     InitTaxiNodes();
     InitTalentForLevel();
     InitPrimaryProfessions();                               // to max set before any spell added
+    m_reputationMgr.LoadFromDB(nullptr);
 
     // apply original stats mods before spell loading or item equipment that call before equip _RemoveStatsMods()
     UpdateMaxHealth();                                      // Update max Health (for add bonus from stamina)

@@ -12,6 +12,7 @@
 #include "PlayerBotAI.h"
 #include "PartyBotAI.h"
 #include "Anticheat.h"
+#include "Language.h"
 
 INSTANTIATE_SINGLETON_1(PlayerBotMgr);
 
@@ -686,6 +687,13 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     if (!pPlayer)
         return false;
 
+    if (pPlayer->InBattleGround())
+    {
+        SendSysMessage("Cannot add bots inside battlegrounds.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
     if (pPlayer->GetGroup() && pPlayer->GetGroup()->IsFull())
     {
         SendSysMessage("Cannot add more bots. Group is full.");
@@ -695,7 +703,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
 
     if (!args)
     {
-        SendSysMessage("Expected role or class.");
+        SendSysMessage("Invalid syntax. Expected role or class.");
         SetSentErrorMessage(true);
         return false;
     }
@@ -748,7 +756,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
 
     if (!botClass)
     {
-        SendSysMessage("Expected role or class.");
+        SendSysMessage("Invalid syntax. Expected role or class.");
         SetSentErrorMessage(true);
         return false;
     }
@@ -758,10 +766,76 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     float x, y, z;
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
 
-    PlayerCreatorAI* ai = new PartyBotAI(pPlayer, nullptr, botRace, botClass, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
+    PartyBotAI* ai = new PartyBotAI(pPlayer, nullptr, botRole, botRace, botClass, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
     sPlayerBotMgr.addBot(ai);
     
-    PSendSysMessage("[PlayerBotMgr] Bot added");
+    SendSysMessage("New party bot added.");
 
     return true;
+}
+
+bool ChatHandler::HandlePartyBotCloneCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    if (!pPlayer)
+        return false;
+
+    if (pPlayer->InBattleGround())
+    {
+        SendSysMessage("Cannot add bots inside battlegrounds.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pPlayer->GetGroup() && pPlayer->GetGroup()->IsFull())
+    {
+        SendSysMessage("Cannot add more bots. Group is full.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget || (pTarget->GetTeam() != pPlayer->GetTeam()))
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint8 botRace = pTarget->GetRace();
+    uint8 botClass = pTarget->GetClass();
+
+    float x, y, z;
+    pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
+
+    PartyBotAI* ai = new PartyBotAI(pPlayer, pTarget, PB_ROLE_INVALID, botRace, botClass, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
+    sPlayerBotMgr.addBot(ai);
+
+    SendSysMessage("New party bot clone added.");
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
+{
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            pAI->botEntry->requestRemoval = true;
+            return true;
+        }
+    }
+
+    SendSysMessage("Target is not a party bot.");
+    SetSentErrorMessage(true);
+    return false;
 }
