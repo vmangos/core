@@ -64,7 +64,7 @@ class PathInfo
 
         // return value : true if new path was calculated
         bool calculate(float destX, float destY, float destZ, bool forceDest = false, bool offsets = false);
-        bool calculate(const Vector3& start, const Vector3& dest, bool forceDest = false, bool offsets = false);
+        bool calculate(Vector3 const& start, Vector3 dest, bool forceDest = false, bool offsets = false);
 
         void setUseStrightPath(bool useStraightPath) { m_useStraightPath = useStraightPath; };
         void setPathLengthLimit(float distance);

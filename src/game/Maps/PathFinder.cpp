@@ -56,22 +56,19 @@ bool PathInfo::calculate(float destX, float destY, float destZ, bool forceDest, 
 {
     float x, y, z;
     m_sourceUnit->GetSafePosition(x, y, z, m_transport);
-    Vector3 start(x, y, z);
 
     return calculate(Vector3(x, y, z), Vector3(destX, destY, destZ), forceDest, offsets);
 }
 
-bool PathInfo::calculate(const Vector3& start, const Vector3& dest, bool forceDest, bool offsets)
+bool PathInfo::calculate(Vector3 const& start, Vector3 dest, bool forceDest, bool offsets)
 {
-    Vector3 newDest = dest;
-
     // A m_navMeshQuery object is not thread safe, but a same PathInfo can be shared between threads.
     // So need to get a new one.
     MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
     if (m_transport)
     {
         if (!offsets)
-            m_transport->CalculatePassengerOffset(newDest.x, newDest.y, newDest.z);
+            m_transport->CalculatePassengerOffset(dest.x, dest.y, dest.z);
         m_navMeshQuery = mmap->GetModelNavMeshQuery(m_transport->GetDisplayId());
     }
     else
@@ -83,7 +80,7 @@ bool PathInfo::calculate(const Vector3& start, const Vector3& dest, bool forceDe
     m_pathPoints.clear();
 
     Vector3 oldDest = getEndPosition();
-    setEndPosition(newDest);
+    setEndPosition(dest);
     setStartPosition(start);
 
     m_forceDestination = forceDest;
@@ -94,7 +91,7 @@ bool PathInfo::calculate(const Vector3& start, const Vector3& dest, bool forceDe
     // make sure navMesh works - we can run on map w/o mmap
     // check if the start and end point have a .mmtile loaded (can we pass via not loaded tile on the way?)
     if (!m_navMesh || !m_navMeshQuery || m_sourceUnit->HasUnitState(UNIT_STAT_IGNORE_PATHFINDING) ||
-        !HaveTiles(start) || !HaveTiles(newDest))
+        !HaveTiles(start) || !HaveTiles(dest))
     {
         BuildShortcut();
         m_type = PathType(PATHFIND_NORMAL | PATHFIND_NOT_USING_PATH);
@@ -106,7 +103,7 @@ bool PathInfo::calculate(const Vector3& start, const Vector3& dest, bool forceDe
     // check if destination moved - if not we can optimize something here
     // we are following old, precalculated path?
     float dist = m_sourceUnit->GetObjectBoundingRadius();
-    if (inRange(oldDest, newDest, dist, dist) && m_pathPoints.size() > 2)
+    if (inRange(oldDest, dest, dist, dist) && m_pathPoints.size() > 2)
     {
         // our target is not moving - we just coming closer
         // we are moving on precalculated path - enjoy the ride
@@ -117,7 +114,7 @@ bool PathInfo::calculate(const Vector3& start, const Vector3& dest, bool forceDe
     else
     {
         // target moved, so we need to update the poly path
-        BuildPolyPath(start, newDest);
+        BuildPolyPath(start, dest);
         return true;
     }
 }
