@@ -232,7 +232,7 @@ void PlayerBotMgr::update(uint32 diff)
             {
                 for (const auto opcode : iter->second->m_pendingResponses)
                 {
-                    iter->second->ai->HandlePacketResponse(opcode);
+                    iter->second->ai->SendFakePacket(opcode);
                 }
                 iter->second->m_pendingResponses.clear();
             }
@@ -814,6 +814,49 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     SendSysMessage("New party bot clone added.");
 
     return true;
+}
+
+bool ChatHandler::HandlePartyBotSetRoleCommand(char* args)
+{
+    if (!args)
+        return false;
+
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PartyBotRole role = PB_ROLE_INVALID;
+    std::string roleStr = args;
+
+    if (roleStr == "tank")
+        role = PB_ROLE_TANK;
+    else if (roleStr == "dps")
+        role = PB_ROLE_DPS;
+    else if (roleStr == "healer")
+        role = PB_ROLE_HEALER;
+
+    if (role == PB_ROLE_INVALID)
+        return false;
+
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            pAI->m_role = role;
+            pAI->ResetSpellData();
+            pAI->PopulateSpellData();
+            PSendSysMessage("%s is now a %s.", pTarget->GetName(), roleStr.c_str());
+            return true;
+        }
+    }
+
+    SendSysMessage("Target is not a party bot.");
+    SetSentErrorMessage(true);
+    return false;
 }
 
 bool ChatHandler::HandlePartyBotRemoveCommand(char* args)

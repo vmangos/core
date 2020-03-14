@@ -260,6 +260,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleBotStartCommand(char * args);
         bool HandlePartyBotAddCommand(char * args);
         bool HandlePartyBotCloneCommand(char * args);
+        bool HandlePartyBotSetRoleCommand(char * args);
         bool HandlePartyBotRemoveCommand(char * args);
 
         // spell_disabled

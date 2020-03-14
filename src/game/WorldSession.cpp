@@ -146,7 +146,7 @@ void WorldSession::SendPacket(WorldPacket const* packet)
     if (!m_Socket)
     {
         if (GetBot() && GetBot()->ai)
-            GetBot()->ai->OnPacketSent(packet);
+            GetBot()->ai->OnPacketReceived(packet);
 
         if (packet->GetOpcode() == SMSG_MESSAGECHAT)
         {

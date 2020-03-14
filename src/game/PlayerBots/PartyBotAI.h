@@ -7,7 +7,7 @@ struct AuraDurationCompare
 {
     bool operator() (SpellEntry const* const lhs, SpellEntry const* const rhs) const
     {
-        return lhs->GetMaxDuration() < rhs->GetMaxDuration();
+        return lhs->GetMaxDuration() > rhs->GetMaxDuration();
     }
 };
 
@@ -67,26 +67,31 @@ public:
 
     void OnPlayerLogin() override;
     void UpdateAI(uint32 const diff) override;
-    void OnPacketSent(WorldPacket const* packet) override;
-    void HandlePacketResponse(uint16 opcode) override;
+    void OnPacketReceived(WorldPacket const* packet) override;
+    void SendFakePacket(uint16 opcode) override;
 
     void CloneFromPlayer(Player const* pPlayer);
     void AddToPlayerGroup();
     void LearnPremadeSpecForClass();
     void PopulateSpellData();
+    void ResetSpellData();
     void AutoAssignRole();
     Player* GetPartyLeader() const;
     Unit* SelectAttackTarget(Player* pLeader) const;
     Unit* SelectHealTarget(Player* pLeader) const;
     Player* SelectResurrectionTarget() const;
-    bool IsValidHealTarget(Unit* pTarget) const;
-    bool IsValidHostileTarget(Unit* pTarget) const;
+    Player* SelectBuffTarget(SpellEntry const* pSpellEntry) const;
+    bool IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
+    bool IsValidHealTarget(Unit const* pTarget) const;
+    bool IsValidHostileTarget(Unit const* pTarget) const;
     void CastRandomDamageSpell(Unit* pVictim);
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool DrinkAndEat();
     void EquipOrUseNewItem();
 
+    SpellEntry const* m_selfBuffSpell = nullptr;
+    SpellEntry const* m_partyBuffSpell = nullptr;
     SpellEntry const* m_resurrectionSpell = nullptr;
     std::vector<SpellEntry const*> spellListDamageAura;
     std::vector<SpellEntry const*> spellListSpellDamage;
@@ -100,6 +105,7 @@ public:
 
     bool m_initialized = false;
     bool m_receivedBgInvite = false;
+    bool m_checkBuffs = true;
     PartyBotRole m_role = PB_ROLE_INVALID;
     ShortTimeTracker m_updateTimer;
     ObjectGuid m_leaderGuid;
