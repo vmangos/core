@@ -701,6 +701,17 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
         return false;
     }
 
+    if (Map const* pMap = pPlayer->GetMap())
+    {
+        if (pMap->IsDungeon() &&
+            pMap->GetPlayers().getSize() >= pMap->GetMapEntry()->maxPlayers)
+        {
+            SendSysMessage("Cannot add more bots. Instance is full.");
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
     if (!args)
     {
         SendSysMessage("Incorrect syntax. Expected role or class.");
@@ -792,6 +803,17 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
         SendSysMessage("Cannot add more bots. Group is full.");
         SetSentErrorMessage(true);
         return false;
+    }
+
+    if (Map const* pMap = pPlayer->GetMap())
+    {
+        if (pMap->IsDungeon() &&
+            pMap->GetPlayers().getSize() >= pMap->GetMapEntry()->maxPlayers)
+        {
+            SendSysMessage("Cannot add more bots. Instance is full.");
+            SetSentErrorMessage(true);
+            return false;
+        }
     }
 
     Player* pTarget = GetSelectedPlayer();
