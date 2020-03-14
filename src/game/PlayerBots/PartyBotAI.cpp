@@ -12,9 +12,20 @@
 
 enum PartyBotSpells
 {
-    PB_SPELL_FOOD  = 1131,
+    PB_SPELL_FOOD = 1131,
     PB_SPELL_DRINK = 1137,
     PB_SPELL_AUTO_SHOT = 75,
+    PB_SPELL_TAME_BEAST = 13481,
+
+    PB_SPELL_SUMMON_IMP = 688,
+    PB_SPELL_SUMMON_VOIDWALKER = 697,
+    PB_SPELL_SUMMON_FELHUNTER = 691,
+    PB_SPELL_SUMMON_SUCCUBUS = 712,
+
+    PB_PET_WOLF = 565,
+    PB_PET_CAT  = 681,
+    PB_PET_BIRD = 1109,
+    PB_PET_BEAR = 3811,
 };
 
 #define PB_UPDATE_INTERVAL 1000
@@ -162,6 +173,16 @@ void PartyBotAI::PopulateSpellData()
                                 pSpellEntry->EffectBasePoints[i] > 0)
                                 m_selfBuffSpell = pSpellEntry;
                             break;
+                        case SPELL_AURA_FEIGN_DEATH:
+                            break;
+                        case SPELL_AURA_EMPATHY:
+                            break;
+                        case SPELL_AURA_MOD_POSSESS_PET:
+                            break;
+                        case SPELL_AURA_NO_PVP_CREDIT:
+                            break;
+                        case SPELL_AURA_DUMMY:
+                            break;
                         default:
                             if (pSpellEntry->IsPositiveSpell() &&
                                 pSpellEntry->GetMaxDuration() >= 30000 &&
@@ -301,11 +322,11 @@ bool PartyBotAI::IsValidHealTarget(Unit const* pTarget) const
 
 Unit* PartyBotAI::SelectHealTarget(Player* pLeader) const
 {
-    if (IsValidHealTarget(pLeader))
-        return pLeader;
-
     if (IsValidHealTarget(me))
         return me;
+
+    if (IsValidHealTarget(pLeader))
+        return pLeader;
 
     Unit* pTarget = nullptr;
     float healthPercent = 100.0f;
@@ -313,7 +334,7 @@ Unit* PartyBotAI::SelectHealTarget(Player* pLeader) const
     Group* pGroup = me->GetGroup();
     for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
     {
-        if (Player* pMember = itr->getSource())
+        if (Unit* pMember = itr->getSource())
         {
             // We already checked self and leader.
             if (pMember == me || pMember == pLeader)
@@ -323,8 +344,8 @@ Unit* PartyBotAI::SelectHealTarget(Player* pLeader) const
             if ((IsValidHealTarget(pMember) &&
                 healthPercent > pMember->GetHealthPercent()) ||
             // Or a pet if there are no injured players.
-                (!pTarget && (pTarget = pMember->GetPet()) &&
-                 IsValidHealTarget(pTarget)))
+                (!pTarget && (pMember = pMember->GetPet()) &&
+                 IsValidHealTarget(pMember)))
             {
                 healthPercent = pMember->GetHealthPercent();
                 pTarget = pMember;
@@ -445,6 +466,40 @@ Player* PartyBotAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
     }
 
     return nullptr;
+}
+
+void PartyBotAI::SummonPetIfNeeded()
+{
+    if (me->GetClass() == CLASS_HUNTER)
+    {
+        if (me->GetPetGuid())
+            return;
+
+        std::vector<uint32> vPets = { PB_PET_WOLF, PB_PET_CAT, PB_PET_BIRD, PB_PET_BEAR };
+        if (Creature* pCreature = me->SummonCreature(SelectRandomContainerElement(vPets),
+            me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f,
+            TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 3000, false, 3000))
+        {
+            pCreature->SetLevel(me->GetLevel());
+            me->CastSpell(pCreature, PB_SPELL_TAME_BEAST, true);
+        }
+    }
+    else if (me->GetClass() == CLASS_WARLOCK)
+    {
+        if (me->GetPetGuid())
+            return;
+
+        std::vector<uint32> vSummons;
+        if (me->HasSpell(PB_SPELL_SUMMON_IMP))
+            vSummons.push_back(PB_SPELL_SUMMON_IMP);
+        if (me->HasSpell(PB_SPELL_SUMMON_VOIDWALKER))
+            vSummons.push_back(PB_SPELL_SUMMON_VOIDWALKER);
+        if (me->HasSpell(PB_SPELL_SUMMON_FELHUNTER))
+            vSummons.push_back(PB_SPELL_SUMMON_FELHUNTER);
+        if (me->HasSpell(PB_SPELL_SUMMON_SUCCUBUS))
+            vSummons.push_back(PB_SPELL_SUMMON_SUCCUBUS);
+        me->CastSpell(me, SelectRandomContainerElement(vSummons), true);
+    }
 }
 
 bool IsPhysicalDamageClass(uint8 playerClass)
@@ -618,6 +673,7 @@ void PartyBotAI::SendFakePacket(uint16 opcode)
         case MSG_MOVE_WORLDPORT_ACK:
         {
             me->GetSession()->HandleMoveWorldportAckOpcode();
+            m_checkBuffs = true;
             break;
         }
         case MSG_MOVE_TELEPORT_ACK:
@@ -747,6 +803,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         PopulateSpellData();
         me->UpdateSkillsToMaxSkillsForLevel();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        SummonPetIfNeeded();
         m_initialized = true;
         return;
     }
@@ -825,14 +882,15 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                     if (DoCastSpell(me, m_selfBuffSpell) == SPELL_CAST_OK)
                         return;
                 
-
             if (m_partyBuffSpell)
                 if (Player* pTarget = SelectBuffTarget(m_partyBuffSpell))
                     if (CanTryToCastSpell(pTarget, m_partyBuffSpell))
                         if (DoCastSpell(pTarget, m_partyBuffSpell) == SPELL_CAST_OK)
                             return;
 
+            SummonPetIfNeeded();
             m_checkBuffs = false;
+            return;
         }
 
         if (DrinkAndEat())

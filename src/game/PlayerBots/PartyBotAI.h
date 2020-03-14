@@ -76,6 +76,7 @@ public:
     void PopulateSpellData();
     void ResetSpellData();
     void AutoAssignRole();
+    void SummonPetIfNeeded();
     Player* GetPartyLeader() const;
     Unit* SelectAttackTarget(Player* pLeader) const;
     Unit* SelectHealTarget(Player* pLeader) const;
