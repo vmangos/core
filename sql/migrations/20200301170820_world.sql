@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20200301170820');
 -- Add your query below.
 
-UPDATE `locales_item` set description_loc3="Anscheinend mochte jemand diesen Typen nicht besonders." WHERE entry=6301; 
+UPDATE `locales_item` SET `description_loc3`="Anscheinend mochte jemand diesen Typen nicht besonders." WHERE `entry`=6301; 
 
 UPDATE `locales_quest` SET `RequestItemsText_loc3`="Egalin war der Lehrmeister, der mich unterrichtete. Er vermochte den Leerwandler, den er beschworen hatte, fast nebenbei zu kontrollieren.$b$bAls ich an der Reihe war, es zu versuchen, überschätzte ich mich. Spielt nicht mit den Mächten, die Ihr besitzt, $N, sie können selbst den Wachsamsten verzehren." WHERE `entry`=1473;
 UPDATE `locales_quest` SET `RequestItemsText_loc3`="Ich erwarte, von Eurem Erfolg zu hören, $N. Doch solltet Ihr scheitern, wird es Eure geringste Sorge sein, dass Ihr meinen Erwartungen nicht entsprochen habt." WHERE `entry`=1471;
