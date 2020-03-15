@@ -6142,12 +6142,6 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 bool gmmode = m_triggeredBySpellInfo == nullptr;
 
-                if (gmmode && !ChatHandler(plrCaster).FindCommand("npc tame"))
-                {
-                    plrCaster->SendPetTameFailure(PETTAME_UNKNOWNERROR);
-                    return SPELL_FAILED_DONT_REPORT;
-                }
-
                 if (plrCaster->GetClass() != CLASS_HUNTER && !gmmode)
                 {
                     plrCaster->SendPetTameFailure(PETTAME_UNITSCANTTAME);
@@ -6175,7 +6169,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
 
                 if (plrCaster->GetPetGuid() || plrCaster->GetCharmGuid() ||
-                        sCharacterDatabaseCache.GetCharacterPetByOwner(plrCaster->GetGUIDLow()))
+                   (!plrCaster->GetSession()->GetBot() &&
+                    sCharacterDatabaseCache.GetCharacterPetByOwner(plrCaster->GetGUIDLow())))
                 {
                     plrCaster->SendPetTameFailure(PETTAME_ANOTHERSUMMONACTIVE);
                     return SPELL_FAILED_DONT_REPORT;

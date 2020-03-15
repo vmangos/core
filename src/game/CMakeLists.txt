@@ -189,6 +189,7 @@ set (game_SRCS
     PacketBroadcast/ChatCommands.cpp
     PacketBroadcast/MovementBroadcaster.cpp
     PacketBroadcast/PlayerBroadcaster.cpp
+    PlayerBots/PartyBotAI.cpp
     PlayerBots/PlayerBotAI.cpp
     PlayerBots/PlayerBotMgr.cpp
     Protocol/Opcodes.cpp
@@ -371,6 +372,7 @@ set (game_SRCS
     OutdoorPvP/OutdoorPvPSI.h
     PacketBroadcast/MovementBroadcaster.h
     PacketBroadcast/PlayerBroadcaster.h
+    PlayerBots/PartyBotAI.h
     PlayerBots/PlayerBotAI.h
     PlayerBots/PlayerBotMgr.h
     Protocol/Opcodes.h

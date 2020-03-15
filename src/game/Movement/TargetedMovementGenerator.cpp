@@ -136,7 +136,7 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
             (pathLength < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
             (pathType & PATHFIND_NOPATH && !petFollowing) ||
             (pathType & PATHFIND_INCOMPLETE && !owner.HasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH) && !petFollowing) ||
-            (!petFollowing && !m_bReachable))
+            (!petFollowing && !m_bReachable && !(owner.IsPlayer() && owner.HasUnitState(UNIT_STAT_FOLLOW))))
     {
         if (!losChecked)
             losResult = owner.IsWithinLOSInMap(i_target.getTarget());
@@ -334,8 +334,22 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 
     if (owner.movespline->Finalized())
     {
-        if (!owner.HasInArc(0.01f, i_target.getTarget()))
-            owner.SetInFront(i_target.getTarget());
+        if (owner.IsPlayer())
+        {
+            // For players need to actually send the new orientation.
+            // Creatures automatically face their target in client.
+            if (!owner.HasInArc(2 * M_PI_F / 3, i_target.getTarget()))
+            {
+                owner.SetInFront(i_target.getTarget());
+                owner.SendMovementPacket(MSG_MOVE_SET_FACING, true);
+            }
+        }
+        else
+        {
+            if (!owner.HasInArc(0.01f, i_target.getTarget()))
+                owner.SetInFront(i_target.getTarget());
+        }
+        
 
         if (m_bIsSpreading)
             m_bIsSpreading = false;

@@ -19,11 +19,13 @@ class PlayerBotAI: public PlayerAI
 
         virtual bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess);
         virtual void OnBotEntryLoad(PlayerBotEntry* entry) {}
+        virtual void OnPacketReceived(WorldPacket const* /*packet*/) {} // server has sent a packet to this session
+        virtual void SendFakePacket(uint16 /*opcode*/) {} // ai has scheduled delayed response to opcode
         void UpdateAI(uint32 const /*diff*/) override; // Handle delayed teleports
         virtual void OnPlayerLogin() {}
         virtual void BeforeAddToMap(Player* player) {} // me=nullptr at call
         // Helpers
-        bool SpawnNewPlayer(WorldSession* sess, uint8 _class, uint32 _race, uint32 mapId, uint32 instanceId, float dx, float dy, float dz, float o);
+        bool SpawnNewPlayer(WorldSession* sess, uint8 _class, uint32 _race, uint32 mapId, uint32 instanceId, float dx, float dy, float dz, float o, Player* pClone = nullptr);
         PlayerBotEntry* botEntry;
 };
 

@@ -505,13 +505,16 @@ bool Unit::HaveOffhandWeapon() const
 
 void Unit::SendHeartBeat(bool includingSelf)
 {
-    //m_movementInfo.ChangePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
+    SendMovementPacket(MSG_MOVE_HEARTBEAT, includingSelf);
+}
+
+void Unit::SendMovementPacket(uint16 opcode, bool includingSelf)
+{
     m_movementInfo.UpdateTime(WorldTimer::getMSTime());
+    WorldPacket data(opcode);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    WorldPacket data(MSG_MOVE_HEARTBEAT, 31);
     data << GetPackGUID();
 #else
-    WorldPacket data(MSG_MOVE_HEARTBEAT);
     data << GetGUID();
 #endif
     data << m_movementInfo;

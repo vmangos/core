@@ -1009,12 +1009,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         virtual Player* GetAffectingPlayer() const { return nullptr; }
         Unit* SelectMagnetTarget(Unit* victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
 
-        void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
-        void CastSpell(Unit* Victim, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        SpellCastResult CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        SpellCastResult CastSpell(Unit* Victim, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
         void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
         void CastCustomSpell(Unit* Victim, SpellEntry const* spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        SpellCastResult CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        SpellCastResult CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
         
         void SetCurrentCastedSpell(Spell* pSpell);
         Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
@@ -1119,17 +1119,17 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type
         // no bodies expected for this declarations
         template <typename TR>
-        void CastSpell(Unit* Victim, uint32 spell, TR triggered);
+        SpellCastResult CastSpell(Unit* Victim, uint32 spell, TR triggered);
         template <typename TR>
-        void CastSpell(Unit* Victim, SpellEntry const* spell, TR triggered);
+        SpellCastResult CastSpell(Unit* Victim, SpellEntry const* spell, TR triggered);
         template <typename TR>
         void CastCustomSpell(Unit* Victim, uint32 spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
         template <typename SP, typename TR>
         void CastCustomSpell(Unit* Victim, SpellEntry const* spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
         template <typename TR>
-        void CastSpell(float x, float y, float z, uint32 spell, TR triggered);
+        SpellCastResult CastSpell(float x, float y, float z, uint32 spell, TR triggered);
         template <typename TR>
-        void CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
+        SpellCastResult CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
 };
 
 // Helper functions to cast between different Object pointers. Useful when unsure that your object* is valid at all.

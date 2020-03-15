@@ -87,6 +87,14 @@ ChatCommand * ChatHandler::getCommandTable()
         { "ranadd",     SEC_ADMINISTRATOR,      true,  &ChatHandler::HandleBotAddRandomCommand,        "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
+    static ChatCommand partyBotCommandTable[] =
+    {
+        { "add",        SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAddCommand,         "", nullptr },
+        { "clone",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotCloneCommand,       "", nullptr },
+        { "setrole",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotSetRoleCommand,     "", nullptr },
+        { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
+        { nullptr,      0,                      false, nullptr,                                        "", nullptr },
+    };
     static ChatCommand accountSetCommandTable[] =
     {
         { "addon",          SEC_CONSOLE,        true,  &ChatHandler::HandleAccountSetAddonCommand,     "", nullptr },
@@ -1049,15 +1057,16 @@ ChatCommand * ChatHandler::getCommandTable()
         { "trigger",        SEC_TICKETMASTER,   false, nullptr,                                        "", triggerCommandTable  },
         { "wp",             SEC_TICKETMASTER,   false, nullptr,                                        "", wpCommandTable       },
         { "service",        SEC_ADMINISTRATOR,  true, nullptr,                                         "", serviceCommandTable  },
-        { "bot",            SEC_ADMINISTRATOR,  true, nullptr,                                "Manage bots", botCommandTable},
-        { "ahbot",          SEC_ADMINISTRATOR,  true, nullptr,                              "Manage AH bot", ahbotCommandTable},
-        { "world",          SEC_ADMINISTRATOR,  false, nullptr,                                        "", worldCommandTable },
-        { "possess",        SEC_GAMEMASTER,     false, &ChatHandler::HandlePossessCommand,             "", nullptr},
+        { "bot",            SEC_ADMINISTRATOR,  true, nullptr,                              "Manage bots", botCommandTable      },
+        { "ahbot",          SEC_ADMINISTRATOR,  true, nullptr,                            "Manage AH bot", ahbotCommandTable    },
+        { "partybot",       SEC_ADMINISTRATOR,  false, nullptr,                       "Manage party bots", partyBotCommandTable },
+        { "world",          SEC_ADMINISTRATOR,  false, nullptr,                                        "", worldCommandTable    },
+        { "possess",        SEC_GAMEMASTER,     false, &ChatHandler::HandlePossessCommand,             "", nullptr              },
         { "cinematic",      SEC_DEVELOPPER,     false, nullptr,                                        "", cinematicCommandTable},
-        { "escort",         SEC_TICKETMASTER,   false, nullptr,                                        "", escortCommandTable},
+        { "escort",         SEC_TICKETMASTER,   false, nullptr,                                        "", escortCommandTable   },
         { "worldstate",     SEC_ADMINISTRATOR,  false, nullptr,                                        "", worldStateCommandTable},
-        { "bg",             SEC_GAMEMASTER,     false, nullptr,                                        "", bgCommandTable},
-        { "spell",          SEC_GAMEMASTER,     true, nullptr,                                         "", spellCommandTable},
+        { "bg",             SEC_GAMEMASTER,     false, nullptr,                                        "", bgCommandTable       },
+        { "spell",          SEC_GAMEMASTER,     true, nullptr,                                         "", spellCommandTable    },
         { "variable",       SEC_DEVELOPPER,     true,  &ChatHandler::HandleVariableCommand,            "", nullptr},
         { "aura",           SEC_BASIC_ADMIN,    false, &ChatHandler::HandleAuraCommand,                "", nullptr },
         { "nameaura",       SEC_BASIC_ADMIN,    false, &ChatHandler::HandleNameAuraCommand,            "", nullptr },

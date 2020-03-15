@@ -171,6 +171,7 @@ World::~World()
 
 void World::Shutdown()
 {
+    sPlayerBotMgr.deleteAll();
     sWorld.KickAll();                                       // save and kick all players
     sWorld.UpdateSessions(1);                               // real players unload required UpdateSessions call
     if (m_charDbWorkerThread)
