@@ -40,7 +40,7 @@ void CritterAI::DamageTaken(Unit* pWho, uint32& uiDamage)
 
 void CritterAI::SpellHit(Unit* pWho, SpellEntry const* pSpell)
 {
-    if (!pSpell->IsPositiveSpell())
+    if (!pSpell->IsPositiveSpell() && !pSpell->IsDirectDamageSpell() && m_creature->IsAlive())
     {
         if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != TIMED_FLEEING_MOTION_TYPE)
             m_creature->GetMotionMaster()->MoveFleeing(pWho, ESCAPE_TIMER);

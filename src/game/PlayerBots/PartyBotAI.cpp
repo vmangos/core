@@ -22,10 +22,23 @@ enum PartyBotSpells
     PB_SPELL_SUMMON_FELHUNTER = 691,
     PB_SPELL_SUMMON_SUCCUBUS = 712,
 
-    PB_PET_WOLF = 565,
-    PB_PET_CAT  = 681,
-    PB_PET_BIRD = 1109,
-    PB_PET_BEAR = 3811,
+    PB_PET_WOLF    = 565,
+    PB_PET_CAT     = 681,
+    PB_PET_BEAR    = 822,
+    PB_PET_CRAB    = 831,
+    PB_PET_GORILLA = 1108,
+    PB_PET_BIRD    = 1109,
+    PB_PET_BOAR    = 1190,
+    PB_PET_BAT     = 1554,
+    PB_PET_CROC    = 1693,
+    PB_PET_SPIDER  = 1781,
+    PB_PET_OWL     = 1997,
+    PB_PET_STRIDER = 2322,
+    PB_PET_SCORPID = 3127,
+    PB_PET_SERPENT = 3247,
+    PB_PET_RAPTOR  = 3254,
+    PB_PET_TURTLE  = 3461,
+    PB_PET_HYENA   = 4127,
 };
 
 #define PB_UPDATE_INTERVAL 1000
@@ -118,6 +131,14 @@ void PartyBotAI::PopulateSpellData()
                 case SPELL_EFFECT_RESURRECT_NEW:
                     m_resurrectionSpell = pSpellEntry;
                     break;
+                case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                    m_fullHealSpell = pSpellEntry;
+                    break;
+                case SPELL_EFFECT_THREAT:
+                case SPELL_EFFECT_THREAT_ALL:
+                    if (pSpellEntry->EffectBasePoints[i] < 0 &&
+                        (!m_panicSpell || m_panicSpell->Id < pSpellEntry->Id))
+                        m_panicSpell = pSpellEntry;
                 case SPELL_EFFECT_APPLY_AURA:
                 {
                     switch (pSpellEntry->EffectApplyAuraName[i])
@@ -172,15 +193,20 @@ void PartyBotAI::PopulateSpellData()
                             if (m_role == PB_ROLE_TANK &&
                                 pSpellEntry->EffectBasePoints[i] > 0)
                                 m_selfBuffSpell = pSpellEntry;
+                            else if (pSpellEntry->EffectBasePoints[i] < 0)
+                                m_panicSpell = pSpellEntry;
                             break;
+                        case SPELL_AURA_MOD_TOTAL_THREAT:
+                            if (pSpellEntry->EffectBasePoints[i] < 0)
+                                m_panicSpell = pSpellEntry;
+                            break;
+                        case SPELL_AURA_SCHOOL_IMMUNITY:
                         case SPELL_AURA_FEIGN_DEATH:
+                            m_panicSpell = pSpellEntry;
                             break;
                         case SPELL_AURA_EMPATHY:
-                            break;
                         case SPELL_AURA_MOD_POSSESS_PET:
-                            break;
                         case SPELL_AURA_NO_PVP_CREDIT:
-                            break;
                         case SPELL_AURA_DUMMY:
                             break;
                         default:
@@ -328,6 +354,10 @@ Unit* PartyBotAI::SelectHealTarget(Player* pLeader) const
     if (IsValidHealTarget(pLeader))
         return pLeader;
 
+    if (Pet* pPet = pLeader->GetPet())
+        if (IsValidHealTarget(pPet))
+            return pPet;
+
     Unit* pTarget = nullptr;
     float healthPercent = 100.0f;
 
@@ -339,6 +369,10 @@ Unit* PartyBotAI::SelectHealTarget(Player* pLeader) const
             // We already checked self and leader.
             if (pMember == me || pMember == pLeader)
                 continue;
+
+            // Avoid all healers picking same target.
+            if (pTarget && !urand(0, 4))
+                return pTarget;
 
             // Check if we should heal party member.
             if ((IsValidHealTarget(pMember) &&
@@ -475,7 +509,12 @@ void PartyBotAI::SummonPetIfNeeded()
         if (me->GetPetGuid())
             return;
 
-        std::vector<uint32> vPets = { PB_PET_WOLF, PB_PET_CAT, PB_PET_BIRD, PB_PET_BEAR };
+        if (me->GetLevel() < 10)
+            return;
+
+        std::vector<uint32> vPets = { PB_PET_WOLF, PB_PET_CAT, PB_PET_BEAR, PB_PET_CRAB, PB_PET_GORILLA, PB_PET_BIRD,
+                                      PB_PET_BOAR, PB_PET_BAT, PB_PET_CROC, PB_PET_SPIDER, PB_PET_OWL, PB_PET_STRIDER,
+                                      PB_PET_SCORPID, PB_PET_SERPENT, PB_PET_RAPTOR, PB_PET_TURTLE, PB_PET_HYENA };
         if (Creature* pCreature = me->SummonCreature(SelectRandomContainerElement(vPets),
             me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f,
             TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 3000, false, 3000))
@@ -498,7 +537,8 @@ void PartyBotAI::SummonPetIfNeeded()
             vSummons.push_back(PB_SPELL_SUMMON_FELHUNTER);
         if (me->HasSpell(PB_SPELL_SUMMON_SUCCUBUS))
             vSummons.push_back(PB_SPELL_SUMMON_SUCCUBUS);
-        me->CastSpell(me, SelectRandomContainerElement(vSummons), true);
+        if (!vSummons.empty())
+            me->CastSpell(me, SelectRandomContainerElement(vSummons), true);
     }
 }
 
@@ -509,6 +549,19 @@ bool IsPhysicalDamageClass(uint8 playerClass)
         case CLASS_WARRIOR:
         case CLASS_ROGUE:
         case CLASS_HUNTER:
+            return true;
+    }
+    return false;
+}
+
+bool IsRangedDamageClass(uint8 playerClass)
+{
+    switch (playerClass)
+    {
+        case CLASS_HUNTER:
+        case CLASS_PRIEST:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
             return true;
     }
     return false;
@@ -576,7 +629,7 @@ bool PartyBotAI::CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry)
         return false;
 
     SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(pSpellEntry->rangeIndex);
-    if (me != pTarget)
+    if (me != pTarget && pSpellEntry->EffectImplicitTargetA[0] != TARGET_UNIT_CASTER)
     {
         float const dist = me->GetCombatDistance(pTarget);
 
@@ -591,17 +644,23 @@ bool PartyBotAI::CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry)
 
 SpellCastResult PartyBotAI::DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry)
 {
-    if (pSpellEntry->GetCastTime() > 0)
-        me->StopMoving();
-
-    if (me != pTarget)
+    if (me != pTarget &&
+       !me->HasInArc(2 * M_PI_F / 3, pTarget))
         me->SetFacingToObject(pTarget);
 
     if (me->IsMounted())
         me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     me->SetTargetGuid(pTarget->GetObjectGuid());
-    return me->CastSpell(pTarget, pSpellEntry, false);
+    auto result = me->CastSpell(pTarget, pSpellEntry, false);
+
+    if ((result == SPELL_FAILED_MOVING ||
+        result == SPELL_CAST_OK) &&
+        (pSpellEntry->GetCastTime() > 0) &&
+        (me->IsMoving() || !me->IsStopped()))
+        me->StopMoving();
+
+    return result;
 }
 
 void PartyBotAI::EquipOrUseNewItem()
@@ -705,6 +764,19 @@ void PartyBotAI::SendFakePacket(uint16 opcode)
             }
             break;
         }
+        case CMSG_LOOT_ROLL:
+        {
+            if (m_lootResponses.empty())
+                return;
+
+            auto loot = m_lootResponses.begin();
+            WorldPacket data(CMSG_LOOT_ROLL);
+            data << uint64((*loot).guid);
+            data << uint32((*loot).slot);
+            data << uint8(0); // pass
+            m_lootResponses.erase(loot);
+            me->GetSession()->HandleLootRoll(data);
+        }
     }
 }
 
@@ -766,6 +838,14 @@ void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
                     }
                 }
             }
+            break;
+        }
+        case SMSG_LOOT_START_ROLL:
+        {
+            uint64 guid = *((uint64*)(*packet).contents());
+            uint32 slot = *(((uint32*)(*packet).contents())+2);
+            m_lootResponses.emplace_back(LootResponseData(guid, slot ));
+            botEntry->m_pendingResponses.push_back(CMSG_LOOT_ROLL);
             break;
         }
     }
@@ -851,17 +931,23 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             {
                 me->ResurrectPlayer(0.5f);
                 me->SpawnCorpseBones();
-
-                // Fix visual bug where ghost aura looks active but actually isn't.
-                for (uint32 i = UNIT_FIELD_AURA; i < UNIT_FIELD_AURA_LAST; i++)
-                    me->ForceValuesUpdateAtIndex(i);
+                me->SendCreateUpdateToPlayer(pLeader);
             }
         }
         
         return;
     }
 
-    if (me->IsNonMeleeSpellCasted())
+    if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+    {
+        // Stop auto shot if no target.
+        if (!me->GetVictim())
+            me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+
+        return;
+    }
+
+    if (me->IsNonMeleeSpellCasted(false, false, true))
         return;
 
     if (!me->IsInCombat())
@@ -969,7 +1055,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                     me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
                 if (me->Attack(pVictim, true))
+                {
+                    if (m_role == PB_ROLE_DPS && IsRangedDamageClass(me->GetClass()) &&
+                        me->GetPowerPercent(POWER_MANA) > 10.0f && me->GetCombatDistance(pVictim) > 8.0f)
+                        me->SetCasterChaseDistance(25.0f);
+
                     me->GetMotionMaster()->MoveChase(pVictim, 1.0f);
+                } 
             }
         }
 
@@ -994,31 +1086,50 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
     // Combat Logic Below
 
+    if (pVictim && me->HasDistanceCasterMovement() &&
+        me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
+        ((me->GetPowerPercent(POWER_MANA) < 10.0f) ||
+        (!me->CanReachWithMeleeAutoAttack(pVictim) && me->GetCombatDistance(pVictim) <= 8.0f)))
+    {
+        me->SetCasterChaseDistance(0.0f);
+        me->GetMotionMaster()->MoveChase(pVictim, 1.0f);
+    }
+
     // Crowd control and run from enemies.
     if (!me->GetAttackers().empty() &&
        (m_role != PB_ROLE_TANK))
     {
         Unit* pAttacker = *me->GetAttackers().begin();
-        if (!spellListCrowdControlAura.empty() &&
-            !pAttacker->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+        if (!pAttacker->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
         {
-            for (const auto pSpellEntry : spellListCrowdControlAura)
+            if (m_panicSpell && me->GetHealthPercent() < 60.0f &&
+                CanTryToCastSpell(pAttacker, m_panicSpell))
             {
-                if (CanTryToCastSpell(pAttacker, pSpellEntry))
+                if (DoCastSpell(Spells::IsExplicitNegativeTarget(m_panicSpell->EffectImplicitTargetA[0]) ?
+                    pAttacker : me, m_panicSpell) == SPELL_CAST_OK)
+                    return;
+            }
+            if (!spellListCrowdControlAura.empty())
+            {
+                for (const auto pSpellEntry : spellListCrowdControlAura)
                 {
-                    if (DoCastSpell(pAttacker, pSpellEntry) == SPELL_CAST_OK)
+                    if (CanTryToCastSpell(pAttacker, pSpellEntry))
                     {
-                        me->AttackStop(true);
-                        return;
+                        if (DoCastSpell(pAttacker, pSpellEntry) == SPELL_CAST_OK)
+                        {
+                            if (pAttacker == me->GetVictim())
+                                me->AttackStop(true);
+                            return;
+                        }
                     }
                 }
             }
+            if (me->IsCaster() && me->IsWithinDist(pAttacker, 15.0f) && me->GetHealthPercent() < 20.0f)
+            {
+                me->GetMotionMaster()->MoveDistance(pAttacker, 20.0f);
+                return;
+            }
         }
-        else if (me->IsCaster() && me->IsWithinDist(pAttacker, 15.0f) && me->GetHealthPercent() < 20.0f)
-        {
-            me->GetMotionMaster()->MoveDistance(pAttacker, 20.0f);
-            return;
-        } 
     }
 
     if (m_role != PB_ROLE_HEALER)
@@ -1075,6 +1186,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             return;
         }
 
+        // Put a HoT on the target if only missing a little health.
         if (pTarget->GetHealthPercent() >= 80.0f)
         {
             for (const auto pSpellEntry : spellListHealAura)
@@ -1086,11 +1198,19 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                 }
             }
         }
+        // Use Lay on Hands if target is about to die.
+        else if (m_fullHealSpell && pTarget->GetHealthPercent() <= 10.0f &&
+                 CanTryToCastSpell(pTarget, m_fullHealSpell))
+        {
+            if (DoCastSpell(pTarget, m_fullHealSpell) == SPELL_CAST_OK)
+                return;
+        }
 
         SpellEntry const* pHealSpell = nullptr;
         int32 healthDiff = INT32_MAX;
         int32 const missingHealth = pTarget->GetMaxHealth() - pTarget->GetHealth();
 
+        // Find most efficient healing spell.
         for (const auto pSpellEntry : spellListHeal)
         {
             if (CanTryToCastSpell(pTarget, pSpellEntry))
@@ -1102,7 +1222,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
                     pHealSpell = pSpellEntry;
                 }
 
-                // Heal spells are sorted from strongest to weakest.
+                // Healing spells are sorted from strongest to weakest.
                 if (diff < 0)
                     break;
             }

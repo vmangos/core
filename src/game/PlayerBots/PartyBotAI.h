@@ -41,6 +41,13 @@ struct HealSpellCompare
     }
 };
 
+struct LootResponseData
+{
+    LootResponseData(uint64 guid_, uint32 slot_) : guid(guid_), slot(slot_) {}
+    uint64 guid = 0;
+    uint32 slot = 0;
+};
+
 enum PartyBotRole : uint8
 {
     PB_ROLE_DPS,
@@ -91,6 +98,8 @@ public:
     bool DrinkAndEat();
     void EquipOrUseNewItem();
 
+    SpellEntry const* m_fullHealSpell = nullptr;
+    SpellEntry const* m_panicSpell = nullptr;
     SpellEntry const* m_selfBuffSpell = nullptr;
     SpellEntry const* m_partyBuffSpell = nullptr;
     SpellEntry const* m_resurrectionSpell = nullptr;
@@ -104,6 +113,7 @@ public:
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
     std::set<SpellEntry const*, AuraDurationCompare> spellListCrowdControlAura;
 
+    std::vector<LootResponseData> m_lootResponses;
     bool m_initialized = false;
     bool m_receivedBgInvite = false;
     bool m_checkBuffs = true;

@@ -4795,7 +4795,8 @@ Corpse* Player::CreateCorpse()
     }
 
     // we not need saved corpses for BG/arenas
-    if (!GetMap()->IsBattleGround())
+    if (!GetMap()->IsBattleGround() &&
+        !GetSession()->GetBot())
         corpse->SaveToDB();
 
     // register for player, but not show
