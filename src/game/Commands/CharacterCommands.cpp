@@ -1016,17 +1016,14 @@ bool ChatHandler::HandlePInfoCommand(char* args)
 bool ChatHandler::HandleMountCommand(char* /*args*/)
 {
     Player* player = m_session->GetPlayer();
-    Creature* target = GetSelectedCreature();
-
-    uint32 modelid;
-    
     if (player->IsTaxiFlying())
     {
         SendSysMessage(LANG_YOU_IN_FLIGHT);
         SetSentErrorMessage(true);
         return false;
     }
-
+    
+    Creature* target = GetSelectedCreature();
     if (!target)
     {
         player->Unmount();
@@ -1036,8 +1033,7 @@ bool ChatHandler::HandleMountCommand(char* /*args*/)
         return false;
     }
 
-    modelid = target->GetUInt32Value(UNIT_FIELD_DISPLAYID);
-    player->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, modelid);
+    player->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, target->GetUInt32Value(UNIT_FIELD_DISPLAYID));
     player->UpdateSpeed(MOVE_RUN, false, 2.0F);
     return true;
 }
