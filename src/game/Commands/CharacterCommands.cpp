@@ -1013,6 +1013,31 @@ bool ChatHandler::HandlePInfoCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleMountCommand(char* /*args*/)
+{
+    Player* player = m_session->GetPlayer();
+    if (player->IsTaxiFlying())
+    {
+        SendSysMessage(LANG_YOU_IN_FLIGHT);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    
+    Creature* target = GetSelectedCreature();
+    if (!target)
+    {
+        player->Unmount();
+        player->UpdateSpeed(MOVE_RUN, false, 1.0F);
+        PSendSysMessage("Nothing to ride on! Target any creature with mounting points.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    player->SetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID, target->GetUInt32Value(UNIT_FIELD_DISPLAYID));
+    player->UpdateSpeed(MOVE_RUN, false, 2.0F);
+    return true;
+}
+
 bool ChatHandler::HandleDismountCommand(char* /*args*/)
 {
     Player* pPlayer = m_session->GetPlayer();
