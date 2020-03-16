@@ -84,10 +84,12 @@ enum PlayerChatTag
 };
 
 class PartyBotAI;
+class BattleBotAI;
 
 class MANGOS_DLL_SPEC ChatHandler
 {
     friend class PartyBotAI;
+    friend class BattleBotAI;
     public:
         explicit ChatHandler(WorldSession* session);
         explicit ChatHandler(Player* player);
@@ -262,6 +264,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandlePartyBotCloneCommand(char * args);
         bool HandlePartyBotSetRoleCommand(char * args);
         bool HandlePartyBotRemoveCommand(char * args);
+        bool HandleBattleBotAddCommand(char* args);
+        bool HandleBattleBotRemoveCommand(char* args);
 
         // spell_disabled
         bool HandleReloadSpellDisabledCommand(char *args);

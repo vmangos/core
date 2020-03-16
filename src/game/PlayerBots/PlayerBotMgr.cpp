@@ -11,6 +11,7 @@
 #include "Player.h"
 #include "PlayerBotAI.h"
 #include "PartyBotAI.h"
+#include "BattleBotAI.h"
 #include "Anticheat.h"
 #include "Language.h"
 
@@ -901,6 +902,117 @@ bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
     }
 
     SendSysMessage("Target is not a party bot.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandleBattleBotAddCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    if (!pPlayer)
+        return false;
+
+    if (!args)
+    {
+        SendSysMessage("Incorrect syntax. Expected faction");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint8 botClass = 0;
+    Team m_team = HORDE;
+
+    std::string option = args;
+    if (option == "horde")
+        m_team = HORDE;
+    else if (option == "alliance")
+        m_team = ALLIANCE;
+    else
+    {
+        SendSysMessage("Incorrect syntax. Expected faction");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint8 teamID = m_team;
+
+    std::vector<BattleBotRole> botRoles = { BB_ROLE_DPS, BB_ROLE_HEALER, BB_ROLE_TANK };
+    BattleBotRole botRole = SelectRandomContainerElement(botRoles);
+
+    if (botRole == BB_ROLE_DPS)
+    {
+        std::vector<uint32> dpsClasses = { CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK };
+        botClass = SelectRandomContainerElement(dpsClasses);
+        botRole = BB_ROLE_DPS;
+    }
+
+    if (botRole == BB_ROLE_HEALER)
+    {
+        std::vector<uint32> dpsClasses = { CLASS_PRIEST, CLASS_DRUID };
+        if (pPlayer->GetTeam() == HORDE)
+            dpsClasses.push_back(CLASS_SHAMAN);
+        else
+            dpsClasses.push_back(CLASS_PALADIN);
+        botClass = SelectRandomContainerElement(dpsClasses);
+        botRole = BB_ROLE_HEALER;
+    }
+
+    if (botRole == BB_ROLE_TANK)
+    {
+        botClass = CLASS_WARRIOR;
+        botRole = BB_ROLE_TANK;
+    }
+
+    if (!botClass)
+    {
+        SendSysMessage("Incorrect syntax. Expected role or class.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint8 botRace = SelectRandomRaceForClass(botClass, m_team);
+
+    float x, y, z;
+    pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
+
+    std::vector<BattleBotBGQueues> bgQueues = { BB_BG_WS, BB_BG_AB, BB_BG_AV };
+    BattleBotBGQueues botBGQueue = SelectRandomContainerElement(bgQueues);
+
+    BattleBotAI* ai = new BattleBotAI(botRole, botRace, botClass, 0, 0, x, y, z, 0.f, botBGQueue);
+    sPlayerBotMgr.addBot(ai);
+
+    if (botBGQueue == BB_BG_WS)
+        SendSysMessage("Added battle bot and queuing for WS");
+        
+    if (botBGQueue == BB_BG_AB)
+        SendSysMessage("Added battle bot and queuing for AB");
+    
+    if (botBGQueue == BB_BG_AV)
+        SendSysMessage("Added battle bot and queuing for AV");
+
+    return true;
+}
+
+bool ChatHandler::HandleBattleBotRemoveCommand(char* args)
+{
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget->AI())
+    {
+        if (BattleBotAI* pAI = dynamic_cast<BattleBotAI*>(pTarget->AI()))
+        {
+            pAI->botEntry->requestRemoval = true;
+            return true;
+        }
+    }
+
+    SendSysMessage("Target is not a battle bot.");
     SetSentErrorMessage(true);
     return false;
 }
