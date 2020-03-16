@@ -23,16 +23,23 @@ void BattleBotWaypoints::Think(Player* me)
             {
                 if (me->GetTeam() == ALLIANCE)
                 {
-
+                    me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_ALLIANCE.x, WS_WAITING_POS_ALLIANCE.y, WS_WAITING_POS_ALLIANCE.z, );
                 }
                 if (me->GetTeam() == HORDE)
                 {
-
+                    me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_HORDE.x, WS_WAITING_POS_HORDE.y, WS_WAITING_POS_HORDE.z);
                 }
             }
             if (bg->GetStatus() == STATUS_IN_PROGRESS)
             {
-
+                if (me->GetTeam() == ALLIANCE)
+                {
+                    me->GetMotionMaster()->MovePoint(0, WS_FLAG_POS_HORDE.x, WS_FLAG_POS_HORDE.y, WS_FLAG_POS_HORDE.z);
+                }
+                if (me->GetTeam() == HORDE)
+                {
+                    me->GetMotionMaster()->MovePoint(0, WS_FLAG_POS_ALLIANCE.x, WS_FLAG_POS_ALLIANCE.y, WS_FLAG_POS_ALLIANCE.z);
+                }
             }
         }
     }

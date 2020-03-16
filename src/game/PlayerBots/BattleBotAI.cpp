@@ -749,13 +749,21 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
             data << uint8(0); // pass
             m_lootResponses.erase(loot);
             me->GetSession()->HandleLootRoll(data);
+            break;
+        }
+        case CMSG_GAMEOBJ_USE:
+        {
+            WorldPacket data(CMSG_GAMEOBJ_USE);
+            data << uint32(0);
+            me->GetSession()->HandleGameObjectUseOpcode(data);
+            break;
         }
     }
 }
 
 void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
 {
-    printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
+    //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
     switch (packet->GetOpcode())
     {
         case SMSG_NEW_WORLD:
