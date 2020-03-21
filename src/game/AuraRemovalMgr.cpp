@@ -88,3 +88,30 @@ void AuraRemovalManager::PlayerEnterMap(uint32 mapId, Player* pPlayer)
             pPlayer->RemoveAurasDueToSpellByCancel(aura.auraEntry);
     }
 }
+
+void AuraRemovalManager::Update(uint32 timer)
+{
+    m_timer.Update(timer);
+    if (m_timer.Passed())
+        m_timer.Reset(AURA_REMOVAL_INTERVAL);
+    else
+        return;
+
+    uint32 const currentCount = m_counter;
+    m_maxCount = std::max(currentCount, m_maxCount);
+    for (uint32 i = 0; i < m_maxCount; i++)
+    {
+        AuraReference& entry = m_auras[i];
+        if (entry.aura && entry.references <= 0 && !entry.aura->IsInUse())
+        {
+            delete entry.aura;
+            entry.aura = nullptr;
+            entry.references = 0;
+        }
+    }
+    if (currentCount > AURA_HOLDER_COUNT_SOFT_LIMIT)
+    {
+        sLog.outInfo("[AuraRemovalManager] Resetting aura counter to prevent overflow.");
+        m_counter = 0;
+    }
+}

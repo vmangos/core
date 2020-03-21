@@ -1980,6 +1980,8 @@ void World::Update(uint32 diff)
     sAutoBroadCastMgr.update(diff);
     // Update liste des ban si besoin
     sAccountMgr.Update(diff);
+    // Delete unusude aura holders
+    sAuraRemovalMgr.Update(diff);
 
     // And last, but not least handle the issued cli commands
     ProcessCliCommands();

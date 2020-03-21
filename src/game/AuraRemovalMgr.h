@@ -36,7 +36,9 @@ struct AuraRemovalEntry
     uint32 flags;
 };
 
-#define MAX_SPELL_AURA_HOLDERS 10000000
+#define AURA_REMOVAL_INTERVAL 60000
+#define AURA_HOLDER_COUNT_SOFT_LIMIT 9990000
+#define AURA_HOLDER_COUNT_HARD_LIMIT 10000000
 
 struct AuraReference
 {
@@ -44,7 +46,7 @@ struct AuraReference
     std::atomic<int> references = 0;
 };
 
-typedef std::array<AuraReference, MAX_SPELL_AURA_HOLDERS> AuraReferenceArray;
+typedef std::array<AuraReference, AURA_HOLDER_COUNT_HARD_LIMIT> AuraReferenceArray;
 
 class Player;
 
@@ -55,17 +57,33 @@ class AuraRemovalManager
     friend struct AuraPointer;
 public:
     AuraRemovalManager() {}
-    void LoadFromDB();
-public:                                                 // Accessors
-    void PlayerEnterMap(uint32 mapId, Player* pPlayer);
+    
+    // Deletion of unused aura holders
+public:
     AuraReferenceArray const& GetAuraReferencesArray() { return m_auras; }
     uint32 GetTotalCreatedAurasCount() { return m_counter; }
+    void Update(uint32 diff);
+private:
+    // incremented every time a new aura pointer is created
+    // gets reset to 0 if soft limit is reached to prevent crash
+    std::atomic<uint32> m_counter = 0;
 
+    // highest the counter has ever reached
+    // no need to check for unused auras above this (on update)
+    uint32 m_maxCount = 0;
+
+    // stores pointers to aura holders and number of references
+    // unreferenced auras are deleted on update
+    AuraReferenceArray m_auras;
+    ShortTimeTracker m_timer{ AURA_REMOVAL_INTERVAL };
+
+    // Instance Buff Removal
+public:                                                 // Accessors
+    void LoadFromDB();
+    void PlayerEnterMap(uint32 mapId, Player* pPlayer);
 private:
     // <map ID, aura ID>
     std::map<uint32, std::vector<AuraRemovalEntry>> m_data;
-    std::atomic<uint32> m_counter = 0;
-    AuraReferenceArray m_auras;
 };
 
 #define sAuraRemovalMgr MaNGOS::Singleton<AuraRemovalManager>::Instance()
@@ -85,10 +103,10 @@ struct AuraPointer
         do
         {
             ptr->m_globalId = sAuraRemovalMgr.m_counter++;
-            MANGOS_ASSERT(ptr->m_globalId < MAX_SPELL_AURA_HOLDERS);
+            MANGOS_ASSERT(ptr->m_globalId < AURA_HOLDER_COUNT_HARD_LIMIT);
         } while (sAuraRemovalMgr.m_auras[ptr->m_globalId].aura);
 
-        sAuraRemovalMgr.m_auras[ptr->m_globalId].references++;
+        sAuraRemovalMgr.m_auras[ptr->m_globalId].references = 1;
         sAuraRemovalMgr.m_auras[ptr->m_globalId].aura = aura;
     }
 

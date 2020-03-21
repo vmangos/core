@@ -67,6 +67,7 @@ bool ChatHandler::HandleServerAuraStatsCommand(char* args)
 {
     uint32 aurasCount = sAuraRemovalMgr.GetTotalCreatedAurasCount();
     AuraReferenceArray const& aurasArray = sAuraRemovalMgr.GetAuraReferencesArray();
+    uint32 activeAuras = 0;
     uint32 deletableAuras = 0;
     uint32 deletableInUseAuras = 0;
     uint32 mostReferences = 0;
@@ -76,20 +77,19 @@ bool ChatHandler::HandleServerAuraStatsCommand(char* args)
         if (aurasArray[i].references > mostReferences)
             mostReferences = aurasArray[i].references;
 
-        if (aurasArray[i].aura && !aurasArray[i].references)
-        {
-            if (aurasArray[i].aura->IsInUse())
-                deletableInUseAuras++;
-            else
-                deletableAuras++;
-        }
-
-        if (!aurasArray[i].aura && aurasArray[i].references)
-            referencesWithoutAuras++;
-
         if (aurasArray[i].aura)
         {
-            for (uint32 j = i+1; j < aurasCount; j++)
+            if (!aurasArray[i].references)
+            {
+                if (aurasArray[i].aura->IsInUse())
+                    deletableInUseAuras++;
+                else
+                    deletableAuras++;
+            }
+            else
+                activeAuras++;
+
+            for (uint32 j = i + 1; j < aurasCount; j++)
             {
                 if (aurasArray[i].aura == aurasArray[j].aura)
                 {
@@ -98,9 +98,12 @@ bool ChatHandler::HandleServerAuraStatsCommand(char* args)
                 }
             }
         }
+        else if (aurasArray[i].references)
+            referencesWithoutAuras++;
     }
 
     PSendSysMessage("Total created auras = %u", aurasCount);
+    PSendSysMessage("Active auras = %u", activeAuras);
     PSendSysMessage("Deletable auras = %u", deletableAuras);
     PSendSysMessage("Deletable in use auras = %u", deletableInUseAuras);
     PSendSysMessage("Highest reference count = %u", mostReferences);

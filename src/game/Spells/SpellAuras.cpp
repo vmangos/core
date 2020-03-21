@@ -6606,6 +6606,9 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
             Unit::SpellAuraHolderMap const& holders = m_target->GetSpellAuraHolderMap();
             for (const auto& holder : holders)
             {
+                if (holder.second.aura == this)
+                    continue;
+
                 SpellEntry const* auraSpellInfo = holder.second.aura->GetSpellProto();
                 if (auraSpellInfo->IsFitToFamily(SpellFamily(m_spellProto->SpellFamilyName), removeFamilyFlag))
                 {
