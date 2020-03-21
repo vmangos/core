@@ -5349,7 +5349,7 @@ void Spell::AddChanneledAuraHolder(AuraPointer&& holder)
 {
     if (!holder.aura || !holder->IsChanneled())
         return;
-    printf("AddChanneledAuraHolder %u\n", holder.aura->GetId());
+    
     // Set and hold in use until clean up to prevent any delete calls destroying
     // the object before we can handle it
     holder->SetInUse(true);
