@@ -50,6 +50,7 @@
 #include "CharacterDatabaseCache.h"
 #include "GameObjectAI.h"
 #include "ZoneScript.h"
+#include "AuraRemovalMgr.h"
 
 using namespace Spells;
 
@@ -1720,6 +1721,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
     // now apply all created auras
     if (m_spellAuraHolder)
     {
+        AuraPointer pointer;
         // normally shouldn't happen
         if (!m_spellAuraHolder->IsEmptyHolder())
         {
@@ -1753,7 +1755,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
                 m_spellAuraHolder->SetAuraDuration(duration);
             }
 
-            if (!unit->AddSpellAuraHolder(m_spellAuraHolder))
+            if (!unit->AddSpellAuraHolder(m_spellAuraHolder, &pointer))
                 m_spellAuraHolder = nullptr;
         }
         else
@@ -1767,7 +1769,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
         // they are from a channeled spell
         if (m_channeled && m_spellAuraHolder)
         {
-            AddChanneledAuraHolder(m_spellAuraHolder);
+            AddChanneledAuraHolder(pointer);
         }
     }
 }
@@ -4212,7 +4214,7 @@ void Spell::update(uint32 difftime)
                     curr = m_channeledUpdateIterator;
                     ++m_channeledUpdateIterator;
 
-                    SpellAuraHolder* holder = *curr;
+                    SpellAuraHolder* holder = (*curr).aura;
                     // Holder deleted before updating, but not removed from list. Clear usage
                     // and remove
                     if (holder->IsDeleted())
@@ -4902,7 +4904,7 @@ void Spell::SendChannelUpdate(uint32 time)
         SpellAuraHolderList::iterator iter = m_channeledHolders.begin();
         while (iter != m_channeledHolders.end())
         {
-            SpellAuraHolder* holder = *iter;
+            SpellAuraHolder* holder = (*iter).aura;
             holder->SetInUse(false);
             // Remove any left over auras on all targets at channel end if they
             // have not already been marked as deleted. Cleans up non-expired
@@ -5343,9 +5345,9 @@ void Spell::CastPreCastSpells(Unit* target)
         m_caster->CastSpell(target, spellInfo, true, m_CastItem);
 }
 
-void Spell::AddChanneledAuraHolder(SpellAuraHolder* holder)
+void Spell::AddChanneledAuraHolder(AuraPointer holder)
 {
-    if (!holder || !holder->IsChanneled())
+    if (!holder.aura || !holder->IsChanneled())
         return;
 
     // Set and hold in use until clean up to prevent any delete calls destroying
@@ -5362,7 +5364,7 @@ void Spell::RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mo
     if (!holder || mode == AURA_REMOVE_BY_CHANNEL || mode == AURA_REMOVE_BY_GROUP || mode == AURA_REMOVE_BY_RANGE)
         return;
 
-    SpellAuraHolderList::iterator iter = std::find(m_channeledHolders.begin(), m_channeledHolders.end(), holder);
+    SpellAuraHolderList::iterator iter = std::find_if(m_channeledHolders.begin(), m_channeledHolders.end(), [holder](AuraPointer const& it) -> bool {return it.aura == holder;});
     if (iter != m_channeledHolders.end())
     {
         (*iter)->SetInUse(false);
@@ -6646,7 +6648,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             auto const& auras = unit_target->GetSpellAuraHolderMap();
             for (const auto& aura : auras)
             {
-                SpellAuraHolder* holder = aura.second;
+                SpellAuraHolder* holder = aura.second.aura;
                 if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
                 {
                     if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC ||
@@ -7068,7 +7070,7 @@ SpellCastResult Spell::CheckCasterAuras() const
             auto const& auras = m_casterUnit->GetSpellAuraHolderMap();
             for (const auto& itr : auras)
             {
-                SpellAuraHolder* holder = itr.second;
+                SpellAuraHolder* holder = itr.second.aura;
                 SpellEntry const* pEntry = holder->GetSpellProto();
 
                 if ((pEntry->GetSpellSchoolMask() & school_immune) && !(pEntry->AttributesEx & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE))

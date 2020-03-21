@@ -776,6 +776,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSendMassMailCommand(char* args);
         bool HandleSendMassMoneyCommand(char* args);
 
+        bool HandleServerAuraStatsCommand(char* args);
         bool HandleServerCorpsesCommand(char* args);
         bool HandleServerExitCommand(char* args);
         bool HandleServerIdleRestartCommand(char* args);

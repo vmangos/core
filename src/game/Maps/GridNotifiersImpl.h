@@ -195,6 +195,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     // Apply PersistentAreaAura on target
     // in case 2 dynobject overlap areas for same spell, same holder is selected, so dynobjects share holder
     SpellAuraHolder* holder = target->GetSpellAuraHolder(spellInfo->Id, i_dynobject.GetCasterGuid());
+    AuraPointer pointer;
     bool existing = false;
 
     if (holder)
@@ -231,7 +232,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
 
         // Debuff slots may be full, in which case holder is deleted or holder is not able to
         // be added for some reason
-        if (!target->AddSpellAuraHolder(holder))
+        if (!target->AddSpellAuraHolder(holder, &pointer))
             holder = nullptr;
     }
 
@@ -247,7 +248,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
                 if (spell->m_spellInfo->Id == spellInfo->Id)
                 {
                     if (!existing)
-                        spell->AddChanneledAuraHolder(holder);
+                        spell->AddChanneledAuraHolder(pointer);
 
                     holder->SetAuraDuration(spell->GetCastedTime());
                     holder->RefreshAuraPeriodicTimers(); // make sure we are ticking in sync with the spell cast time

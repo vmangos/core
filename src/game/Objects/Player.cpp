@@ -6817,8 +6817,8 @@ void Player::DuelComplete(DuelCompleteType type)
     SpellAuraHolderMap const& vAuras = duel->opponent->GetSpellAuraHolderMap();
     for (const auto& itr : vAuras)
     {
-        if (!itr.second->IsPositive() && itr.second->GetCasterGuid() == GetObjectGuid() && itr.second->GetAuraApplyTime() >= duel->startTime)
-            auras2remove.push_back(itr.second->GetId());
+        if (!itr.second.aura->IsPositive() && itr.second.aura->GetCasterGuid() == GetObjectGuid() && itr.second.aura->GetAuraApplyTime() >= duel->startTime)
+            auras2remove.push_back(itr.second.aura->GetId());
     }
 
     for (uint32 i : auras2remove)
@@ -6828,8 +6828,8 @@ void Player::DuelComplete(DuelCompleteType type)
     SpellAuraHolderMap const& auras = GetSpellAuraHolderMap();
     for (const auto& aura : auras)
     {
-        if (!aura.second->IsPositive() && aura.second->GetCasterGuid() == duel->opponent->GetObjectGuid() && aura.second->GetAuraApplyTime() >= duel->startTime)
-            auras2remove.push_back(aura.second->GetId());
+        if (!aura.second.aura->IsPositive() && aura.second.aura->GetCasterGuid() == duel->opponent->GetObjectGuid() && aura.second.aura->GetAuraApplyTime() >= duel->startTime)
+            auras2remove.push_back(aura.second.aura->GetId());
     }
     for (uint32 i : auras2remove)
         RemoveAurasDueToSpell(i);
@@ -7197,7 +7197,7 @@ void Player::ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply
                 SpellAuraHolderBounds spair = GetSpellAuraHolderBounds(spellInfo->Id);
                 for (SpellAuraHolderMap::const_iterator iter = spair.first; iter != spair.second; ++iter)
                 {
-                    if (!item || iter->second->GetCastItemGuid() == item->GetObjectGuid())
+                    if (!item || iter->second.aura->GetCastItemGuid() == item->GetObjectGuid())
                     {
                         found = true;
                         break;
@@ -16319,7 +16319,7 @@ void Player::_SaveAuras()
     AuraSaveStruct s;
     for (const auto& auraHolder : auraHolders)
     {
-        SpellAuraHolder* holder = auraHolder.second;
+        SpellAuraHolder* holder = auraHolder.second.aura;
 
         if (!SaveAura(holder, s))
             continue;
@@ -19271,7 +19271,7 @@ void Player::RemoveItemDependentAurasAndCasts(Item* pItem)
     SpellAuraHolderMap& auras = GetSpellAuraHolderMap();
     for (SpellAuraHolderMap::const_iterator itr = auras.begin(); itr != auras.end();)
     {
-        SpellAuraHolder* holder = itr->second;
+        SpellAuraHolder* holder = itr->second.aura;
 
         // skip passive (passive item dependent spells work in another way) and not self applied auras
         if (holder->IsPassive() ||  holder->GetCasterGuid() != GetObjectGuid())
@@ -19589,7 +19589,7 @@ void Player::UpdateAreaDependentAuras()
         // use m_zoneUpdateId for speed: UpdateArea called from UpdateZone or instead UpdateZone in both cases m_zoneUpdateId up-to-date
         if (sSpellMgr.GetSpellAllowedInLocationError(iter->second->GetSpellProto(), m_zoneUpdateId, m_areaUpdateId, this) != SPELL_CAST_OK)
         {
-            RemoveSpellAuraHolder(iter->second);
+            RemoveSpellAuraHolder(iter->second.aura);
             iter = m_spellAuraHolders.begin();
         }
         else

@@ -3136,7 +3136,7 @@ void Creature::RemoveAurasAtReset()
     {
         if (!(iter->second->GetCasterGuid().IsPlayer() && !iter->second->IsPermanent() && iter->second->IsPositive()))
         {
-            RemoveSpellAuraHolder(iter->second, AURA_REMOVE_BY_DEFAULT);
+            RemoveSpellAuraHolder(iter->second.aura, AURA_REMOVE_BY_DEFAULT);
             iter = m_spellAuraHolders.begin();
         }
         else

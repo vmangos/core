@@ -4313,7 +4313,7 @@ class av_world_boss_baseai: public npc_escortAI
             {
                 if (!iter->second->IsPositive())
                 {
-                    m_creature->RemoveSpellAuraHolder(iter->second, AURA_REMOVE_BY_DEFAULT);
+                    m_creature->RemoveSpellAuraHolder(iter->second.aura, AURA_REMOVE_BY_DEFAULT);
                     iter = creatureAuras.begin();
                 }
                 else

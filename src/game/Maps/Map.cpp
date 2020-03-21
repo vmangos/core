@@ -405,7 +405,7 @@ void Map::ExistingPlayerLogin(Player* player)
 
     // Refresh aura durations
     for (const auto& it : player->GetSpellAuraHolderMap())
-        it.second->UpdateAuraDuration();
+        it.second.aura->UpdateAuraDuration();
 }
 
 template<class T>

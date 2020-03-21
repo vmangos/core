@@ -47,6 +47,7 @@ class Item;
 class GameObject;
 class Group;
 class Aura;
+struct AuraPointer;
 
 enum SpellCastFlags
 {
@@ -474,7 +475,7 @@ class Spell
         }
         void RemoveStealthAuras();
 
-        void AddChanneledAuraHolder(SpellAuraHolder* holder);
+        void AddChanneledAuraHolder(AuraPointer holder);
         void RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode);
 
         void Delete() const;
@@ -535,7 +536,7 @@ class Spell
         bool m_immediateHandled = false;                    // were immediate actions handled? (used by delayed spells only)
 
         // Channeled spells system
-        typedef std::list<SpellAuraHolder*> SpellAuraHolderList;
+        typedef std::list<AuraPointer> SpellAuraHolderList;
         SpellAuraHolderList m_channeledHolders;             // aura holders of spell on targets for channeled spells. process in sync with spell
         SpellAuraHolderList::iterator m_channeledUpdateIterator; // maintain an iterator to the current update element so we can handle removal of multiple auras
 

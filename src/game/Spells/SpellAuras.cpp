@@ -52,6 +52,7 @@
 #include "ZoneScript.h"
 #include "PlayerAI.h"
 #include "Anticheat.h"
+#include "AuraRemovalMgr.h"
 
 using namespace Spells;
 
@@ -677,17 +678,17 @@ void AreaAura::Update(uint32 diff)
                 // in cases where this is the only aura applied for this spell effect
                 for (Unit::SpellAuraHolderMap::const_iterator i = spair.first; i != spair.second; ++i)
                 {
-                    if (i->second->IsDeleted())
+                    if (i->second.aura->IsDeleted())
                         continue;
 
-                    Aura* aur = i->second->GetAuraByEffectIndex(m_effIndex);
+                    Aura* aur = i->second.aura->GetAuraByEffectIndex(m_effIndex);
 
                     if (aur)
                     {
                         // If this unit is the caster, update the tick. Units won't tick their
                         // own area auras. Make sure we don't double tick if this unit is the caster
                         // though
-                        if (i->second->GetCasterGuid() == GetCasterGuid() && i->second->GetTarget()->GetObjectGuid() != GetCasterGuid())
+                        if (i->second.aura->GetCasterGuid() == GetCasterGuid() && i->second.aura->GetTarget()->GetObjectGuid() != GetCasterGuid())
                         {
                             aur->UpdateForAffected(diff);
                         }
@@ -741,19 +742,22 @@ void AreaAura::Update(uint32 diff)
                     aur->ApplyModifier(true, true);
                     holder->SetInUse(false);
                 }
-                else if (!target->AddSpellAuraHolder(holder))
-                    holder = nullptr;
-
-                DETAIL_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
-
-                // Add holder to spell if it's channeled so the updates are synced
-                if (holder && IsChanneled() && !addedToExisting)
+                else
                 {
-                    if (Spell* spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                    AuraPointer pointer;
+                    if (target->AddSpellAuraHolder(holder, &pointer))
                     {
-                        spell->AddChanneledAuraHolder(holder);
+                        // Add holder to spell if it's channeled so the updates are synced
+                        if (IsChanneled())
+                        {
+                            if (Spell* spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                            {
+                                spell->AddChanneledAuraHolder(pointer);
+                            }
+                        }
                     }
                 }
+                DETAIL_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
             }
         }
         Aura::Update(diff);
@@ -930,14 +934,14 @@ void Aura::ReapplyAffectedPassiveAuras(Unit* target)
     {
         // permanent passive
         // passive spells can be affected only by own or owner spell mods)
-        if (itr->second->IsPassive() && itr->second->IsPermanent() &&
+        if (itr->second.aura->IsPassive() && itr->second.aura->IsPermanent() &&
                 // non deleted and not same aura (any with same spell id)
-                !itr->second->IsDeleted() && itr->second->GetId() != GetId() &&
+                !itr->second.aura->IsDeleted() && itr->second.aura->GetId() != GetId() &&
                 // and affected by aura
-                itr->second->GetCasterGuid() == target->GetObjectGuid() &&
+                itr->second.aura->GetCasterGuid() == target->GetObjectGuid() &&
                 // and affected by spellmod
-                isAffectedOnSpell(itr->second->GetSpellProto()))
-            affectedSelf[itr->second->GetId()] = itr->second->GetCastItemGuid();
+                isAffectedOnSpell(itr->second.aura->GetSpellProto()))
+            affectedSelf[itr->second.aura->GetId()] = itr->second.aura->GetCastItemGuid();
     }
 
     if (!affectedSelf.empty())
@@ -1363,7 +1367,7 @@ void Aura::TriggerSpell()
                         Unit::SpellAuraHolderMap const& auras = triggerTarget->GetSpellAuraHolderMap();
                         for (const auto& aura : auras)
                         {
-                            SpellEntry const* spell = aura.second->GetSpellProto();
+                            SpellEntry const* spell = aura.second.aura->GetSpellProto();
                             if (spell->IsFitToFamily<SPELLFAMILY_SHAMAN, CF_SHAMAN_LIGHTNING_SHIELD>())
                                 return;
                         }
@@ -6355,7 +6359,7 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit* target, Uni
     m_stackAmount(1), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE), m_timeCla(1000),
     m_permanent(false), m_isRemovedOnShapeLost(true), m_deleted(false), m_in_use(0),
     m_debuffLimitAffected(false), m_debuffLimitScore(0), _heartBeatRandValue(0), _pveHeartBeatData(nullptr),
-    m_spellTriggered(false), m_AuraDRLevel(DIMINISHING_LEVEL_1)
+    m_spellTriggered(false), m_AuraDRLevel(DIMINISHING_LEVEL_1), m_globalId(0)
 {
     MANGOS_ASSERT(target);
     MANGOS_ASSERT(spellproto && spellproto == sSpellMgr.GetSpellEntry(spellproto->Id) && "`info` must be pointer to a sSpellMgr element");
@@ -6602,7 +6606,7 @@ void SpellAuraHolder::_RemoveSpellAuraHolder()
             Unit::SpellAuraHolderMap const& holders = m_target->GetSpellAuraHolderMap();
             for (const auto& holder : holders)
             {
-                SpellEntry const* auraSpellInfo = holder.second->GetSpellProto();
+                SpellEntry const* auraSpellInfo = holder.second.aura->GetSpellProto();
                 if (auraSpellInfo->IsFitToFamily(SpellFamily(m_spellProto->SpellFamilyName), removeFamilyFlag))
                 {
                     found = true;
@@ -7194,6 +7198,11 @@ void SpellAuraHolder::UnregisterSingleCastHolder()
 
         m_isSingleTarget = false;
     }
+}
+
+void SpellAuraHolder::SetAura(uint32 slot, bool remove)
+{
+    m_target->SetUInt32Value(UNIT_FIELD_AURA + slot, remove ? 0 : GetId());
 }
 
 void SpellAuraHolder::SetAuraFlag(uint32 slot, bool add)

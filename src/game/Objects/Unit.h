@@ -36,6 +36,7 @@
 #include "MotionMaster.h"
 #include "DBCStructure.h"
 #include "Timer.h"
+#include "AuraRemovalMgr.h"
 #include <list>
 
 
@@ -346,11 +347,11 @@ struct ProhibitSpellInfo
 
 struct ProcTriggeredData
 {
-    ProcTriggeredData(SpellProcEventEntry const* _spellProcEvent, SpellAuraHolder* _triggeredByHolder, Unit* _target, uint32 _procFlag)
+    ProcTriggeredData(SpellProcEventEntry const* _spellProcEvent, AuraPointer _triggeredByHolder, Unit* _target, uint32 _procFlag)
         : spellProcEvent(_spellProcEvent), triggeredByHolder(_triggeredByHolder), target(_target), procFlag(_procFlag)
         {}
     SpellProcEventEntry const* spellProcEvent;
-    SpellAuraHolder* triggeredByHolder;
+    AuraPointer triggeredByHolder;
     Unit* target;
     uint32 procFlag;
 };
@@ -363,10 +364,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         static Unit* GetUnit(WorldObject &obj, uint64 const& Guid);
 
         typedef std::set<Unit*> AttackerSet;
-        typedef std::multimap< uint32, SpellAuraHolder*> SpellAuraHolderMap;
+        typedef std::multimap<uint32, AuraPointer> SpellAuraHolderMap;
         typedef std::pair<SpellAuraHolderMap::iterator, SpellAuraHolderMap::iterator> SpellAuraHolderBounds;
         typedef std::pair<SpellAuraHolderMap::const_iterator, SpellAuraHolderMap::const_iterator> SpellAuraHolderConstBounds;
-        typedef std::list<SpellAuraHolder*> SpellAuraHolderList;
+        typedef std::list<AuraPointer> SpellAuraHolderList;
         typedef std::list<Aura*> AuraList;
         typedef std::list<DiminishingReturn> Diminishing;
         typedef std::set<uint32> ComboPointHolderSet;
@@ -674,7 +675,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         SpellAuraHolderMap m_spellAuraHolders;
         SpellAuraHolderMap::iterator m_spellAuraHoldersUpdateIterator; // != end() in Unit::m_spellAuraHolders update and point to next element
         AuraList m_deletedAuras;                                       // auras removed while in ApplyModifier and waiting deleted
-        SpellAuraHolderList m_deletedHolders;
         SingleCastSpellTargetMap m_singleCastSpellTargets;  // casted by unit single per-caster auras
         typedef std::list<GameObject*> GameObjectList;
         GameObjectList m_gameObj;
@@ -740,7 +740,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         SpellAuraHolder* AddAura(uint32 spellId, uint32 addAuraFlags = 0, Unit* pCaster = nullptr);
         SpellAuraHolder* RefreshAura(uint32 spellId, int32 duration);
-        bool AddSpellAuraHolder(SpellAuraHolder* holder);
+        bool AddSpellAuraHolder(SpellAuraHolder* holder, AuraPointer* pAuraPointer = nullptr);
         void AddAuraToModList(Aura* aura);
 
         // pet auras
@@ -764,7 +764,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveSingleAuraFromSpellAuraHolder(SpellAuraHolder* holder, SpellEffectIndex index, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveSingleAuraFromSpellAuraHolder(uint32 id, SpellEffectIndex index, ObjectGuid casterGuid, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
         void RemoveSingleAuraDueToItemSet(uint32 spellId, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
-        void DeleteAuraHolder(SpellAuraHolder* holder);
 
         // removing specific aura stacks by diff reasons and selections
         void RemoveAurasDueToSpell(uint32 spellId, SpellAuraHolder* except = nullptr, AuraRemoveMode mode = AURA_REMOVE_BY_DEFAULT);
@@ -822,6 +821,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Aura* GetAura(AuraType type, SpellFamily family, uint64 familyFlag, ObjectGuid casterGuid = ObjectGuid());
         SpellAuraHolder* GetSpellAuraHolder(uint32 spellid) const;
         SpellAuraHolder* GetSpellAuraHolder(uint32 spellid, ObjectGuid casterGUID) const;
+        AuraPointer GetSpellAuraHolderPointer(uint32 spellid, ObjectGuid casterGUID) const;
 
         SpellAuraHolderMap      & GetSpellAuraHolderMap() { return m_spellAuraHolders; }
         SpellAuraHolderMap const& GetSpellAuraHolderMap() const { return m_spellAuraHolders; }
