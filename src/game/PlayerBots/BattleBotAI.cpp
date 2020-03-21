@@ -414,6 +414,16 @@ Unit* BattleBotAI::SelectAttackTarget() const
         }
     }
 
+    // Search for victim
+    if (me->GetVictim() == nullptr)
+    {
+        if (Unit* NewTarget = me->SelectNearestTarget(150.0f))
+        {
+            if (IsValidHostileTarget(NewTarget))
+                return NewTarget;
+        }
+    }
+
     return nullptr;
 }
 
@@ -737,6 +747,17 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
             me->GetSession()->HandleBattlemasterJoinOpcode(data);
             break;
         }
+        case CMSG_LEAVE_BATTLEFIELD:
+        {
+            WorldPacket data(CMSG_LEAVE_BATTLEFIELD);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+            data << uint8(0);                           // unk1
+            data << uint8(0);                           // BattleGroundTypeId-1 ?
+            data << uint16(0);                          // unk2 0
+#endif
+            me->GetSession()->HandleLeaveBattlefieldOpcode(data);
+            break;
+        }
         case CMSG_LOOT_ROLL:
         {
             if (m_lootResponses.empty())
@@ -763,7 +784,7 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
 
 void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
 {
-    //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
+    printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
     switch (packet->GetOpcode())
     {
         case SMSG_NEW_WORLD:
@@ -827,6 +848,16 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
             uint32 slot = *(((uint32*)(*packet).contents())+2);
             m_lootResponses.emplace_back(LootResponseData(guid, slot ));
             botEntry->m_pendingResponses.push_back(CMSG_LOOT_ROLL);
+            break;
+        }
+        case SMSG_BATTLEFIELD_WIN:
+        {
+            SendFakePacket(CMSG_LEAVE_BATTLEFIELD);
+            break;
+        }
+        case SMSG_BATTLEFIELD_LOSE:
+        {
+            SendFakePacket(CMSG_LEAVE_BATTLEFIELD);
             break;
         }
     }
@@ -1005,6 +1036,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     else
     {
         m_checkBuffs = true; // rebuff as soon as we leave combat
+
     }
 
     if (me->GetStandState() != UNIT_STAND_STATE_STAND)
@@ -1028,10 +1060,10 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     Unit* pVictim = me->GetVictim();
 
-    if (!pVictim)
+    if (!pVictim && me->InBattleGround())
     {
-        BattleBotWaypoints think;
-        think.Think(me);
+        BattleBotWaypoints waypointAI;
+        waypointAI.WaypointAI(me);
     }
 
     if (m_role != BB_ROLE_HEALER)

@@ -975,7 +975,7 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args)
     float x, y, z;
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
 
-    std::vector<BattleBotBGQueues> bgQueues = { BB_BG_WS, BB_BG_AB, BB_BG_AV };
+    std::vector<BattleBotBGQueues> bgQueues = { BB_BG_WS/*, BB_BG_AB, BB_BG_AV*/ };
     BattleBotBGQueues botBGQueue = SelectRandomContainerElement(bgQueues);
 
     BattleBotAI* ai = new BattleBotAI(botRole, botRace, botClass, 0, 0, x, y, z, 0.f, botBGQueue);
