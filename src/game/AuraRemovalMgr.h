@@ -110,7 +110,13 @@ struct AuraPointer
         sAuraRemovalMgr.m_auras[ptr->m_globalId].aura = aura;
     }
 
-    // Copy another refernce counting pointer.
+    // Move constructor.
+    AuraPointer(AuraPointer&& other) : aura(other.aura)
+    {
+        other.aura = nullptr;
+    }
+
+    // Copy another reference counting pointer.
     // Just increase references.
     AuraPointer(AuraPointer const& other)
     {
@@ -124,7 +130,7 @@ struct AuraPointer
         aura = other.aura;
         return *this;
     }
-    
+
     SpellAuraHolder* operator->() { return aura; }
     
     // Only allow creating pointer on stack.

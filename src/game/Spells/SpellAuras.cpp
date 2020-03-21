@@ -752,7 +752,7 @@ void AreaAura::Update(uint32 diff)
                         {
                             if (Spell* spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                             {
-                                spell->AddChanneledAuraHolder(pointer);
+                                spell->AddChanneledAuraHolder(std::move(pointer));
                             }
                         }
                     }

@@ -1769,7 +1769,7 @@ void Spell::DoSpellHitOnUnit(Unit* unit, uint32 effectMask)
         // they are from a channeled spell
         if (m_channeled && m_spellAuraHolder)
         {
-            AddChanneledAuraHolder(pointer);
+            AddChanneledAuraHolder(std::move(pointer));
         }
     }
 }
@@ -5345,15 +5345,15 @@ void Spell::CastPreCastSpells(Unit* target)
         m_caster->CastSpell(target, spellInfo, true, m_CastItem);
 }
 
-void Spell::AddChanneledAuraHolder(AuraPointer holder)
+void Spell::AddChanneledAuraHolder(AuraPointer&& holder)
 {
     if (!holder.aura || !holder->IsChanneled())
         return;
-
+    printf("AddChanneledAuraHolder %u\n", holder.aura->GetId());
     // Set and hold in use until clean up to prevent any delete calls destroying
     // the object before we can handle it
     holder->SetInUse(true);
-    m_channeledHolders.push_back(holder);
+    m_channeledHolders.emplace_back(std::forward<AuraPointer>(holder));
 }
 
 // Occurs when an aura should be removed from handling due to deletion or expiration

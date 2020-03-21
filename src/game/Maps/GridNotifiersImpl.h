@@ -248,7 +248,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
                 if (spell->m_spellInfo->Id == spellInfo->Id)
                 {
                     if (!existing)
-                        spell->AddChanneledAuraHolder(pointer);
+                        spell->AddChanneledAuraHolder(std::move(pointer));
 
                     holder->SetAuraDuration(spell->GetCastedTime());
                     holder->RefreshAuraPeriodicTimers(); // make sure we are ticking in sync with the spell cast time

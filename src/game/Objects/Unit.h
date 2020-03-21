@@ -347,7 +347,7 @@ struct ProhibitSpellInfo
 
 struct ProcTriggeredData
 {
-    ProcTriggeredData(SpellProcEventEntry const* _spellProcEvent, AuraPointer _triggeredByHolder, Unit* _target, uint32 _procFlag)
+    ProcTriggeredData(SpellProcEventEntry const* _spellProcEvent, AuraPointer const& _triggeredByHolder, Unit* _target, uint32 _procFlag)
         : spellProcEvent(_spellProcEvent), triggeredByHolder(_triggeredByHolder), target(_target), procFlag(_procFlag)
         {}
     SpellProcEventEntry const* spellProcEvent;
@@ -821,7 +821,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Aura* GetAura(AuraType type, SpellFamily family, uint64 familyFlag, ObjectGuid casterGuid = ObjectGuid());
         SpellAuraHolder* GetSpellAuraHolder(uint32 spellid) const;
         SpellAuraHolder* GetSpellAuraHolder(uint32 spellid, ObjectGuid casterGUID) const;
-        AuraPointer GetSpellAuraHolderPointer(uint32 spellid, ObjectGuid casterGUID) const;
 
         SpellAuraHolderMap      & GetSpellAuraHolderMap() { return m_spellAuraHolders; }
         SpellAuraHolderMap const& GetSpellAuraHolderMap() const { return m_spellAuraHolders; }

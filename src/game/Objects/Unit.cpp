@@ -9184,16 +9184,6 @@ SpellAuraHolder* Unit::GetSpellAuraHolder(uint32 spellid, ObjectGuid casterGuid)
     return nullptr;
 }
 
-AuraPointer Unit::GetSpellAuraHolderPointer(uint32 spellid, ObjectGuid casterGuid) const
-{
-    SpellAuraHolderConstBounds bounds = GetSpellAuraHolderBounds(spellid);
-    for (SpellAuraHolderMap::const_iterator iter = bounds.first; iter != bounds.second; ++iter)
-        if (iter->second.aura->GetRealCasterGuid() == casterGuid)
-            return iter->second;
-
-    return AuraPointer();
-}
-
 class RelocationNotifyEvent : public BasicEvent
 {
 public:

@@ -475,7 +475,7 @@ class Spell
         }
         void RemoveStealthAuras();
 
-        void AddChanneledAuraHolder(AuraPointer holder);
+        void AddChanneledAuraHolder(AuraPointer&& holder);
         void RemoveChanneledAuraHolder(SpellAuraHolder* holder, AuraRemoveMode mode);
 
         void Delete() const;

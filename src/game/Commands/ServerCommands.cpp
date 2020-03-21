@@ -72,6 +72,8 @@ bool ChatHandler::HandleServerAuraStatsCommand(char* args)
     uint32 deletableInUseAuras = 0;
     uint32 mostReferences = 0;
     uint32 referencesWithoutAuras = 0;
+    std::unordered_map<uint32, uint32> aurasMap;
+
     for (uint32 i = 0; i < aurasCount; i++)
     {
         if (aurasArray[i].references > mostReferences)
@@ -79,6 +81,7 @@ bool ChatHandler::HandleServerAuraStatsCommand(char* args)
 
         if (aurasArray[i].aura)
         {
+            aurasMap[aurasArray[i].aura->GetId()]++;
             if (!aurasArray[i].references)
             {
                 if (aurasArray[i].aura->IsInUse())
@@ -102,12 +105,24 @@ bool ChatHandler::HandleServerAuraStatsCommand(char* args)
             referencesWithoutAuras++;
     }
 
+    uint32 mostCommonAuraId = 0;
+    uint32 mostCommonAuraCount = 0;
+    for (auto i : aurasMap)
+    {
+        if (i.second > mostCommonAuraCount)
+        {
+            mostCommonAuraId = i.first;
+            mostCommonAuraCount = i.second;
+        }
+    }
+
     PSendSysMessage("Total created auras = %u", aurasCount);
     PSendSysMessage("Active auras = %u", activeAuras);
     PSendSysMessage("Deletable auras = %u", deletableAuras);
     PSendSysMessage("Deletable in use auras = %u", deletableInUseAuras);
     PSendSysMessage("Highest reference count = %u", mostReferences);
     PSendSysMessage("References without aura = %u", referencesWithoutAuras);
+    PSendSysMessage("Most common aura = %u (%u)", mostCommonAuraId, mostCommonAuraCount);
 
     return true;
 }
