@@ -43,7 +43,7 @@ struct AuraRemovalEntry
 struct AuraReference
 {
     SpellAuraHolder* aura = nullptr;
-    std::atomic<int> references = 0;
+    std::atomic<int32> references{ 0 };
 };
 
 typedef std::array<AuraReference, AURA_HOLDER_COUNT_HARD_LIMIT> AuraReferenceArray;
@@ -66,11 +66,11 @@ public:
 private:
     // incremented every time a new aura pointer is created
     // gets reset to 0 if soft limit is reached to prevent crash
-    std::atomic<uint32> m_counter = 0;
+    std::atomic<uint32> m_counter{ 0 };
 
     // highest the counter has ever reached
     // no need to check for unused auras above this (on update)
-    uint32 m_maxCount = 0;
+    uint32 m_maxCount{ 0 };
 
     // stores pointers to aura holders and number of references
     // unreferenced auras are deleted on update
