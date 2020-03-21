@@ -417,9 +417,10 @@ Unit* BattleBotAI::SelectAttackTarget() const
     // Search for victim
     if (me->GetVictim() == nullptr)
     {
-        if (Unit* NewTarget = me->SelectNearestTarget(150.0f))
+        if (Unit* NewTarget = me->SelectNearestTarget(100.0f))
         {
-            if (IsValidHostileTarget(NewTarget))
+            bool rnd = urand(0, 1);
+            if (IsValidHostileTarget(NewTarget) && NewTarget->IsAlive() && rnd)
                 return NewTarget;
         }
     }
@@ -693,6 +694,7 @@ void BattleBotAI::EquipOrUseNewItem()
 
 void BattleBotAI::SendFakePacket(uint16 opcode)
 {
+    printf("Bot send %s\n", LookupOpcodeName(opcode));
     switch (opcode)
     {
         case MSG_MOVE_WORLDPORT_ACK:
@@ -784,7 +786,7 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
 
 void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
 {
-    printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
+    //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
     switch (packet->GetOpcode())
     {
         case SMSG_NEW_WORLD:
@@ -866,7 +868,9 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
 void BattleBotAI::OnPlayerLogin()
 {
     if (!m_initialized)
+    {
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+    }
 }
 
 void BattleBotAI::UpdateAI(uint32 const diff)
@@ -885,6 +889,23 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         if (m_role == BB_ROLE_INVALID)
             AutoAssignRole();
 
+        // add gear to character
+        for (auto itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+        {
+            if (itr.second.requiredClass == me->GetClass())
+            {
+                if (m_hasGear == false)
+                {
+                    std::string str = std::to_string(itr.first);
+                    char* cstr = new char[str.length() + 1];
+                    strcpy(cstr, str.c_str());
+
+                    ChatHandler(me).HandleCharacterPremadeGearCommand(cstr);
+                    m_hasGear = true;
+                }
+            }
+        }
+
         if (Player const* pPlayer = sObjectAccessor.FindPlayer(m_cloneGuid))
             CloneFromPlayer(pPlayer);
         else
@@ -894,6 +915,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         me->UpdateSkillsToMaxSkillsForLevel();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         SummonPetIfNeeded();
+
         m_initialized = true;
         return;
     }

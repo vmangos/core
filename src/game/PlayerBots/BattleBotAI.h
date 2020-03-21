@@ -83,7 +83,6 @@ public:
     BattleBotRole m_role = BB_ROLE_INVALID;
     ShortTimeTracker m_updateTimer;
     ObjectGuid m_leaderGuid;
-
     ObjectGuid m_cloneGuid;
     uint8 m_race = 0;
     uint8 m_class = 0;
@@ -93,6 +92,7 @@ public:
     float m_y = 0.0f;
     float m_z = 0.0f;
     float m_o = 0.0f;
+    bool m_hasGear = false;
 };
 
 #endif

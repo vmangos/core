@@ -51,6 +51,8 @@ void BattleBotWaypoints::GetBattleGround(Player* me)
             AlteracValleyAI(me, bg);
             break;
         }
+        default:
+            break;
     }
 }
 
@@ -69,61 +71,103 @@ void BattleBotWaypoints::WarsongGulchAI(Player* me, BattleGround* bg)
     // When bg is in progress
     if (bg->GetStatus() == STATUS_IN_PROGRESS)
     {
-        if (me->GetTeam() == ALLIANCE)
+        if (((BattleGroundWS*)bg)->IsHordeFlagPickedup() || ((BattleGroundWS*)bg)->IsAllianceFlagPickedup())
         {
-
-            if (!((BattleGroundWS*)bg)->IsHordeFlagPickedup())
+            SetWarsongObjective(me, bg, WarsongObjectives::WS_FLAG_CARRIER);
+        }
+        else
+        {
+            if (m_objective == WarsongObjectives::WS_IDLE)
             {
-                // Go for enemy flag
+                int rnd = urand(0, 0);
+                switch (rnd)
+                {
+                case 0:
+                {
+                    SetWarsongObjective(me, bg, WarsongObjectives::WS_FLAG);
+                    break;
+                }
+                case 1:
+                {
+                    SetWarsongObjective(me, bg, WarsongObjectives::WS_POWERUP);
+                    break;
+                }
+                case 2:
+                {
+                    SetWarsongObjective(me, bg, WarsongObjectives::WS_ROAM);
+                    break;
+                }
+                }
+            }
+        }
+    }
+}
+
+void BattleBotWaypoints::SetWarsongObjective(Player* me, BattleGround* bg, WarsongObjectives objective)
+{
+    if (objective == WarsongObjectives::WS_OBJECTIVE_INVALID)
+        return;
+
+    m_objective = objective;
+
+    switch (objective)
+    {
+        case WarsongObjectives::WS_FLAG_CARRIER:
+        {
+            // Find flag carrier
+            Map* pMap = me->GetMap();
+
+            if (!pMap)
+                return;
+
+            Map::PlayerList const& PlayerList = pMap->GetPlayers();
+
+            for (const auto& itr : PlayerList)
+            {
+                Player* pPlayer = itr.getSource();
+                if (pPlayer->GetTeam() != me->GetTeam()) // Attack enemy flag carrier
+                {
+                    if (pPlayer->HasAura(WS_SPELL_WARSONG_FLAG) || pPlayer->HasAura(WS_SPELL_SILVERWING_FLAG))
+                    {
+                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+                            me->GetMotionMaster()->MoveChase(pPlayer, 1.0f);
+
+                        me->Attack(pPlayer, true);
+                    }
+                }
+                else // Help team flag carrier
+                {
+                    if (pPlayer->HasAura(WS_SPELL_WARSONG_FLAG) || pPlayer->HasAura(WS_SPELL_SILVERWING_FLAG))
+                    {
+                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+                            me->GetMotionMaster()->MoveChase(pPlayer, frand(1.0f, 5.0f));
+                    }
+                }
+            }
+            break;
+        }
+        case WarsongObjectives::WS_FLAG:
+        {
+            if (me->GetTeam() == ALLIANCE)
                 SetNextWaypoint(me, WS_FLAG_POS_HORDE.x, WS_FLAG_POS_HORDE.y, WS_FLAG_POS_HORDE.z);
-            }
-            else
-            {
-                // find flag carrier
-                Map* pMap = me->GetMap();
 
-                if (!pMap)
-                    return;
-
-                Map::PlayerList const& PlayerList = pMap->GetPlayers();
-
-                for (const auto& itr : PlayerList)
-                {
-                    Player* pPlayer = itr.getSource();
-                    if (pPlayer->HasAura(WS_SPELL_SILVERWING_FLAG))
-                    {
-                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                            me->GetMotionMaster()->MoveChase(pPlayer, 1.0f);
-                    }
-                }
-            }
-        }
-
-        if (me->GetTeam() == HORDE)
-        {
-            if (!((BattleGroundWS*)bg)->IsAllianceFlagPickedup())
+            if (me->GetTeam() == HORDE)
                 SetNextWaypoint(me, WS_FLAG_POS_ALLIANCE.x, WS_FLAG_POS_ALLIANCE.y, WS_FLAG_POS_ALLIANCE.z);
-            else
-            {
-                // find flag carrier
-                Map* pMap = me->GetMap();
 
-                if (!pMap)
-                    return;
-
-                Map::PlayerList const& PlayerList = pMap->GetPlayers();
-
-                for (const auto& itr : PlayerList)
-                {
-                    Player* pPlayer = itr.getSource();
-                    if (pPlayer->HasAura(WS_SPELL_WARSONG_FLAG))
-                    {
-                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                            me->GetMotionMaster()->MoveChase(pPlayer, 1.0f);
-                    }
-                }
-            }
+            break;
         }
+        case WarsongObjectives::WS_POWERUP:
+        {
+            //SetNextWaypoint(me, WS_FLAG_POS_ALLIANCE.x, WS_FLAG_POS_ALLIANCE.y, WS_FLAG_POS_ALLIANCE.z);
+            break;
+        }
+        case WarsongObjectives::WS_ROAM:
+        {
+
+            break;
+        }
+        default:
+            break;
     }
 }
 
@@ -131,25 +175,11 @@ void BattleBotWaypoints::ArathiBasinAI(Player* me, BattleGround* bg)
 {
     if (bg->GetStatus() == STATUS_WAIT_JOIN)
     {
-        if (me->GetTeam() == ALLIANCE)
-        {
-            //StartMove(me, WS_WAITING_POS_ALLIANCE.x, WS_WAITING_POS_ALLIANCE.y, WS_WAITING_POS_ALLIANCE.z);
-        }
-        if (me->GetTeam() == HORDE)
-        {
-            //StartMove(me, WS_WAITING_POS_HORDE.x, WS_WAITING_POS_HORDE.y, WS_WAITING_POS_HORDE.z);
-        }
+
     }
     if (bg->GetStatus() == STATUS_IN_PROGRESS)
     {
-        if (me->GetTeam() == ALLIANCE)
-        {
-            //StartMove(me, POI_WS_FLAG_POS_HORDE.x, POI_WS_FLAG_POS_HORDE.y, POI_WS_FLAG_POS_HORDE.z);
-        }
-        if (me->GetTeam() == HORDE)
-        {
-            //StartMove(me, POI_WS_FLAG_POS_ALLIANCE.x, POI_WS_FLAG_POS_ALLIANCE.y, POI_WS_FLAG_POS_ALLIANCE.z);
-        }
+
     }
 }
 
@@ -157,31 +187,12 @@ void BattleBotWaypoints::AlteracValleyAI(Player* me, BattleGround* bg)
 {
     if (bg->GetStatus() == STATUS_WAIT_JOIN)
     {
-        if (me->GetTeam() == ALLIANCE)
-        {
-            //StartMove(me, WS_WAITING_POS_ALLIANCE.x, WS_WAITING_POS_ALLIANCE.y, WS_WAITING_POS_ALLIANCE.z);
-        }
-        if (me->GetTeam() == HORDE)
-        {
-            //StartMove(me, WS_WAITING_POS_HORDE.x, WS_WAITING_POS_HORDE.y, WS_WAITING_POS_HORDE.z);
-        }
+
     }
     if (bg->GetStatus() == STATUS_IN_PROGRESS)
     {
-        if (me->GetTeam() == ALLIANCE)
-        {
-            //StartMove(me, POI_WS_FLAG_POS_HORDE.x, POI_WS_FLAG_POS_HORDE.y, POI_WS_FLAG_POS_HORDE.z);
-        }
-        if (me->GetTeam() == HORDE)
-        {
-            //StartMove(me, POI_WS_FLAG_POS_ALLIANCE.x, POI_WS_FLAG_POS_ALLIANCE.y, POI_WS_FLAG_POS_ALLIANCE.z);
-        }
+
     }
-}
-
-void BattleBotWaypoints::SetObjective(Player* me, WarsongObjectives objective)
-{
-
 }
 
 void BattleBotWaypoints::SetNextWaypoint(Player* me, float waypoint_x, float waypoint_y, float waypoint_z)
@@ -202,9 +213,7 @@ void BattleBotWaypoints::StartMove(Player* me, float waypoint_x, float waypoint_
     if (me->IsMoving())
         return;
 
-    if (!me->IsStopped())
-        me->StopMoving();
-
+    me->StopMoving();
     me->GetMotionMaster()->MovementExpired();
     me->GetMotionMaster()->Clear();
     me->GetMotionMaster()->MovePoint(0, waypoint_x, waypoint_y, waypoint_z, MOVE_PATHFINDING);
@@ -212,13 +221,17 @@ void BattleBotWaypoints::StartMove(Player* me, float waypoint_x, float waypoint_
 
 bool BattleBotWaypoints::ReachedWaypoint(Player* me)
 {
-    if (3 > sqrt(((me->GetPositionX() - currentWaypointX) * (me->GetPositionX() - currentWaypointX)) + ((me->GetPositionY() - currentWaypointY) * (me->GetPositionY() - currentWaypointY)) + ((me->GetPositionZ() - currentWaypointZ) * (me->GetPositionZ() - currentWaypointZ))))
+    if (!me->IsMoving())
+        return false;
+
+    if (2 > sqrt(((me->GetPositionX() - currentWaypointX) * (me->GetPositionX() - currentWaypointX)) + ((me->GetPositionY() - currentWaypointY) * (me->GetPositionY() - currentWaypointY)) + ((me->GetPositionZ() - currentWaypointZ) * (me->GetPositionZ() - currentWaypointZ))))
     {
         currentWaypointX = 0.f;
         currentWaypointY = 0.f;
         currentWaypointZ = 0.f;
         m_setWaypoint = false;
         m_reachedWaypoint = true;
+        m_objective = WarsongObjectives::WS_IDLE;
         return true;
     }
     return false;
