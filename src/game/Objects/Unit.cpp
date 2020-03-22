@@ -65,6 +65,11 @@
 #include "InstanceStatistics.h"
 #include "MovementPacketSender.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#include "ElunaEventMgr.h"
+#endif /* ENABLE_ELUNA */
+
 #include <math.h>
 #include <stdarg.h>
 
@@ -239,6 +244,10 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 {
     if (!IsInWorld())
         return;
+
+#ifdef ENABLE_ELUNA
+    elunaEvents->Update(update_diff);
+#endif /* ENABLE_ELUNA */    
 
     // Nostalrius : systeme de contresort des mobs.
     // Boucle 1 pour regler les timers
@@ -1085,6 +1094,17 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
     if (pPlayerVictim)
         pPlayerVictim->RewardHonorOnDeath();
 
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    if(pPlayerVictim && pPlayerTap && pPlayerTap != pPlayerVictim)
+    {
+        sEluna->OnPVPKill(pPlayerTap, pPlayerVictim);
+    }else if(pCreatureVictim && pPlayerTap)
+    {
+        sEluna->OnCreatureKill(pPlayerTap, pCreatureVictim);
+    }
+#endif /* ENABLE_ELUNA */
+
     // To be replaced if possible using ProcDamageAndSpell
     if (pVictim != this) // The one who has the fatal blow
         ProcDamageAndSpell(pVictim, PROC_FLAG_KILL, PROC_FLAG_HEARTBEAT, PROC_EX_NONE, 0);
@@ -1185,6 +1205,14 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
             // durability lost message
             WorldPacket data(SMSG_DURABILITY_DAMAGE_DEATH, 0);
             pPlayerVictim->GetSession()->SendPacket(&data);
+
+            // Used by Eluna
+#ifdef ENABLE_ELUNA
+        if (Creature* killer = ToCreature())
+            {
+            sEluna->OnPlayerKilledByCreature(killer, pPlayerVictim);
+            }
+#endif /* ENABLE_ELUNA */
         }
     }
     else                                                // creature died
@@ -4610,6 +4638,22 @@ void Unit::CombatStopWithPets(bool includingCast)
     CallForAllControlledUnits(CombatStopWithPetsHelper(includingCast), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
 }
 
+#ifdef ENABLE_ELUNA
+struct IsAttackingPlayerHelper
+{
+    explicit IsAttackingPlayerHelper() {}
+    bool operator()(Unit const* unit) const { return unit->isAttackingPlayer(); }
+};
+
+bool Unit::isAttackingPlayer() const
+{
+    if (GetTargetGuid().IsPlayer())
+        { return true; }
+
+    return CheckAllControlledUnits(IsAttackingPlayerHelper(), CONTROLLED_PET | CONTROLLED_TOTEMS | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
+}
+#endif
+
 void Unit::RemoveAllAttackers()
 {
     while (!m_attackers.empty())
@@ -5553,6 +5597,13 @@ void Unit::SetInCombatState(bool bPvP, Unit* pEnemy)
         if (m_isCreatureLinkingTrigger)
             GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_AGGRO, pCreature, pEnemy);
     }
+
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    if (GetTypeId() == TYPEID_PLAYER)
+        sEluna->OnPlayerEnterCombat(ToPlayer(), pEnemy);
+#endif /* ENABLE_ELUNA */
+
 }
 
 void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/)
@@ -5660,6 +5711,12 @@ void Unit::ClearInCombat()
 
     if (IsPlayer())
         static_cast<Player*>(this)->pvpInfo.inPvPCombat = false;
+		
+	// Used by Eluna
+#ifdef ENABLE_ELUNA
+    if (GetTypeId() == TYPEID_PLAYER)
+        sEluna->OnPlayerLeaveCombat(ToPlayer());
+#endif /* ENABLE_ELUNA */
 }
 
 bool Unit::IsTargetableForAttack(bool inverseAlive /*=false*/, bool isAttackerPlayer /*=false*/) const
@@ -10098,6 +10155,22 @@ bool Unit::HasSpellCategoryCooldown(uint32 cat) const
         if (it.second.cat == cat && it.second.categoryEnd > time(nullptr))
             return true;
     return false;
+}
+
+void Unit::RemoveSpellCategoryCooldown(uint32 cat, bool update /* = false */)
+{
+	SpellCategoriesStore::const_iterator ct = sSpellCategoriesStore.find(cat);
+	if (ct == sSpellCategoriesStore.end())
+		return;
+
+	const SpellCategorySet& ct_set = ct->second;
+	for (SpellCooldowns::const_iterator i = m_spellCooldowns.begin(); i != m_spellCooldowns.end();)
+	{
+		if (ct_set.find(i->first) != ct_set.end())
+			RemoveSpellCooldown((i++)->first, update);
+		else
+			++i;
+	}
 }
 
 void Unit::RemoveAllSpellCooldown()

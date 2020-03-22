@@ -35,6 +35,10 @@
 
 #include "Database/DatabaseEnv.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
+
 #define WORLD_SLEEP_CONST 50
 
 #ifdef WIN32
@@ -56,6 +60,10 @@ void WorldRunnable::run()
     uint32 realPrevTime = WorldTimer::tick();
 
     uint32 prevSleepTime = 0;                               // used for balanced full tick time length near WORLD_SLEEP_CONST
+
+#ifdef ENABLE_ELUNA
+    sEluna->OnStartup();
+#endif /* ENABLE_ELUNA */
 
     ///- While we have not World::m_stopEvent, update the world
     while (!World::IsStopped())
@@ -106,6 +114,10 @@ void WorldRunnable::run()
         #endif
     }
 
+#ifdef ENABLE_ELUNA
+    sEluna->OnShutdown();
+#endif /* ENABLE_ELUNA */
+
     sWorld.Shutdown();
 
     // unload battleground templates before different singletons destroyed
@@ -114,6 +126,12 @@ void WorldRunnable::run()
     sWorldSocketMgr->StopNetwork();
 
     sMapMgr.UnloadAll();                                    // unload all grids (including locked in memory)
+
+#ifdef ENABLE_ELUNA
+    // Eluna must be unloaded after Maps, since ~Map calls sEluna->OnDestroy,
+    //   and must be unloaded before the DB, since it can access the DB.
+    Eluna::Uninitialize();
+#endif /* ENABLE_ELUNA */
 
     ///- End the database thread
     WorldDatabase.ThreadEnd();                              // free mySQL thread resources

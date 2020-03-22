@@ -219,22 +219,41 @@ namespace MaNGOS
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
     };
 
-    template<class Check>
-        struct WorldObjectListSearcher
-    {
-        std::list<WorldObject*>& i_objects;
-        Check& i_check;
+	#ifdef ENABLE_ELUNA
+		template<class Check>
+			struct WorldObjectLastSearcher
+		{
+			WorldObject*& i_object;
+			Check& i_check;
 
-        WorldObjectListSearcher(std::list<WorldObject*>& objects, Check & check) : i_objects(objects),i_check(check) {}
+			WorldObjectLastSearcher(WorldObject* & result, Check& check) : i_object(result), i_check(check) {}
 
-        void Visit(PlayerMapType& m);
-        void Visit(CreatureMapType& m);
-        void Visit(CorpseMapType& m);
-        void Visit(GameObjectMapType& m);
-        void Visit(DynamicObjectMapType& m);
+			void Visit(PlayerMapType& m);
+			void Visit(CreatureMapType& m);
+			void Visit(CorpseMapType& m);
+			void Visit(GameObjectMapType& m);
+			void Visit(DynamicObjectMapType& m);
 
-        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
-    };
+			template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+		};
+	#endif
+		
+	template<class Check>
+	struct WorldObjectListSearcher
+	{
+		std::list<WorldObject*>& i_objects;
+		Check& i_check;
+
+		WorldObjectListSearcher(std::list<WorldObject*>& objects, Check & check) : i_objects(objects), i_check(check) {}
+
+		void Visit(PlayerMapType& m);
+		void Visit(CreatureMapType& m);
+		void Visit(CorpseMapType& m);
+		void Visit(GameObjectMapType& m);
+		void Visit(DynamicObjectMapType& m);
+
+		template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED>&) {}
+	};
 
     template<class Do>
         struct WorldObjectWorker

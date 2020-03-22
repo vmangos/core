@@ -32,6 +32,9 @@
 #include "Log.h"
 #include "Util.h"
 #include "ProgressBar.h"
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
 
 INSTANTIATE_SINGLETON_1(WeatherMgr);
 
@@ -239,6 +242,9 @@ bool Weather::SendWeatherForPlayersInZone(Map const* _map)
     ///- Log the event
     LogWeatherState(GetWeatherState());
 
+#ifdef ENABLE_ELUNA
+    sEluna->OnChange(this, m_zone, GetWeatherState(), m_grade);
+#endif /* ENABLE_ELUNA */
     return true;
 }
 

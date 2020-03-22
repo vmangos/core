@@ -101,6 +101,9 @@ class SpellEntry;
 class Spell;
 
 struct FactionTemplateEntry;
+#ifdef ENABLE_ELUNA
+class ElunaEventProcessor;
+#endif /* ENABLE_ELUNA */
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 
@@ -720,7 +723,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
                 WorldObject* const m_obj;
         };
 
-        ~WorldObject () override {}
+		~WorldObject() override;
 
         virtual void Update(uint32 /*update_diff*/, uint32 /*time_diff*/);
 
@@ -1081,6 +1084,10 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         // Event handler
         EventProcessor m_Events;
+		
+#ifdef ENABLE_ELUNA
+		ElunaEventProcessor* elunaEvents;
+#endif /* ENABLE_ELUNA */  
     protected:
         explicit WorldObject();
 

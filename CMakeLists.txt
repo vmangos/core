@@ -33,6 +33,7 @@ option(USE_ANTICHEAT "Use anticheat" 0)
 option(SCRIPTS "Compile scripts" 1)
 option(USE_EXTRACTORS "Compile extractors" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
+option(SCRIPT_LIB_ELUNA "Compile with support for Eluna scripts" 1)
 
 find_package(PCHSupport)
 

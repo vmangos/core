@@ -51,6 +51,10 @@
 #include "GameObjectAI.h"
 #include "ZoneScript.h"
 
+#ifdef ENABLE_ELUNA
+#include "LuaEngine.h"
+#endif /* ENABLE_ELUNA */
+
 using namespace Spells;
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
@@ -3766,6 +3770,12 @@ void Spell::cast(bool skipCheck)
     // traded items have trade slot instead of guid in m_itemTargetGUID
     // set to real guid to be sent later to the client
     m_targets.updateTradeSlotItem();
+
+    // Used by Eluna
+#ifdef ENABLE_ELUNA
+    if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        sEluna->OnSpellCast(m_caster->ToPlayer(), this, skipCheck);
+#endif /* ENABLE_ELUNA */
 
     FillTargetMap();
     if (m_channeled)
