@@ -49,6 +49,7 @@ struct AuraReference
 typedef std::array<AuraReference, AURA_HOLDER_COUNT_HARD_LIMIT> AuraReferenceArray;
 
 class Player;
+struct AuraPointer;
 
 // Handles removal of auras from players on map changes, based on
 // definitions in world-db table instance_buff_removal
