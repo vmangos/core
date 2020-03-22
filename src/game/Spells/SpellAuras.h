@@ -26,6 +26,7 @@
 #include "DBCEnums.h"
 #include "ObjectGuid.h"
 #include "SpellEntry.h"
+#include "UnitDefines.h"
 
 /**
  * Used to modify what an Aura does to a player/npc.
@@ -74,7 +75,9 @@ struct HeartBeatData
     uint32 hitChance;
 };
 
+class Item;
 class Unit;
+class Player;
 struct SpellModifier;
 struct ProcTriggerSpell;
 

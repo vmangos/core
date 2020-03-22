@@ -22,6 +22,7 @@
 #include "Common.h"
 #include "Policies/Singleton.h"
 #include "SpellAuras.h"
+#include "Timer.h"
 #include <atomic>
 
 enum AuraRemovalFlags
@@ -43,7 +44,7 @@ struct AuraRemovalEntry
 struct AuraReference
 {
     SpellAuraHolder* aura = nullptr;
-    std::atomic<int32> references{ 0 };
+    std::atomic_int_fast8_t references{ 0 };
 };
 
 typedef std::array<AuraReference, AURA_HOLDER_COUNT_HARD_LIMIT> AuraReferenceArray;
