@@ -1974,13 +1974,13 @@ void World::Update(uint32 diff)
     else
         m_MaintenanceTimeChecker -= diff;
 
-    //Update PlayerBotMgr
+    // Update PlayerBotMgr
     sPlayerBotMgr.update(diff);
     // Update AutoBroadcast
     sAutoBroadCastMgr.update(diff);
-    // Update liste des ban si besoin
+    // Update ban list if necessary
     sAccountMgr.Update(diff);
-    // Delete unusude aura holders
+    // Delete unused aura holders
     sAuraRemovalMgr.Update(diff);
 
     // And last, but not least handle the issued cli commands
