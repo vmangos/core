@@ -1623,12 +1623,7 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.SpeedHack.Enable
-#        Description: Check for players moving too fast.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.SpeedHack.UseInterpolation
-#        Description: Use movement interpolation when doing speed checks.
+#        Description: Check for players moving too fast using extrapolation.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
