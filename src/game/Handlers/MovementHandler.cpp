@@ -469,17 +469,17 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
     float newSpeedRate = speedReceived / baseMoveSpeed[move_type];
     pMover->SetSpeedRateReal(move_type, newSpeedRate);
 
-    // Use lambda here to handle movement position checks separately from change ACK.
-    auto HandleMovementPositionChange = [&recvData, &pMover, &movementInfo, &speedReceived, &move_type, &opcode, this]()
+    // Use fake loop here to handle movement position checks separately from change ACK.
+    do
     {
         // Do not accept packets sent before this time.
         if (recvData.GetPacketTime() <= m_moveRejectTime)
-            return;
-
-        Player* pPlayerMover = pMover->ToPlayer();
+            break;
 
         if (!VerifyMovementInfo(movementInfo))
-            return;
+            break;
+
+        Player* pPlayerMover = pMover->ToPlayer();
 
         if (pPlayerMover)
         {
@@ -487,7 +487,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
                 !_player->GetCheatData()->HandleSpeedChangeAck(pPlayerMover, movementInfo, speedReceived, move_type, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
-                return;
+                break;
             }
         }
         
@@ -505,9 +505,8 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket& recvData)
             pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
             pMover->m_movementInfo.CorrectData(pMover);
         }
-    };
+    } while (false);
 
-    HandleMovementPositionChange();
     MovementPacketSender::SendSpeedChangeToObservers(pMover, move_type, speedReceived);
 }
 
@@ -576,17 +575,17 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
         return;
     }
 
-    // Use lambda here to handle movement position checks separately from change ACK.
-    auto HandleMovementPositionChange = [&recvData, &pMover, &movementInfo, &opcode, this]()
+    // Use fake loop here to handle movement position checks separately from change ACK.
+    do
     {
         // Do not accept packets sent before this time.
         if (recvData.GetPacketTime() <= m_moveRejectTime)
-            return;
-
-        Player* pPlayerMover = pMover->ToPlayer();
+            break;
 
         if (!VerifyMovementInfo(movementInfo))
-            return;
+            break;
+
+        Player* pPlayerMover = pMover->ToPlayer();
 
         if (pPlayerMover)
         {
@@ -594,7 +593,7 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
                 !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
-                return;
+                break;
             }
         }
 
@@ -612,9 +611,7 @@ void WorldSession::HandleMovementFlagChangeToggleAck(WorldPacket& recvData)
             pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
             pMover->m_movementInfo.CorrectData(pMover);
         }
-    };
-    
-    HandleMovementPositionChange();
+    } while (false);
 
     switch (changeTypeReceived)
     {
@@ -680,15 +677,15 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
         return;
     }
 
-    // Use lambda here to handle movement position checks separately from change ACK.
-    auto HandleMovementPositionChange = [&recvData, &pMover, &movementInfo, &opcode, this]()
+    // Use fake loop here to handle movement position checks separately from change ACK.
+    do
     {
         // Do not accept packets sent before this time.
         if (recvData.GetPacketTime() <= m_moveRejectTime)
-            return;
+            break;
 
         if (!VerifyMovementInfo(movementInfo))
-            return;
+            break;
 
         Player* pPlayerMover = pMover->ToPlayer();
 
@@ -698,7 +695,7 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
                 !_player->GetCheatData()->HandlePositionTests(pPlayerMover, movementInfo, opcode))
             {
                 m_moveRejectTime = WorldTimer::getMSTime();
-                return;
+                break;
             }
         }
 
@@ -716,9 +713,8 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recvData)
             pMover->m_movementInfo.moveFlags = movementInfo.moveFlags;
             pMover->m_movementInfo.CorrectData(pMover);
         }
-    };
-    
-    HandleMovementPositionChange();
+    } while (false);
+
     pMover->SetRootedReal(applyReceived);
     MovementPacketSender::SendMovementFlagChangeToObservers(pMover, MOVEFLAG_ROOT, applyReceived);
 }

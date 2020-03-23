@@ -1,14 +1,17 @@
 #include "Anticheat.h"
 
-#ifndef USE_ANTICHEAT
-
-AnticheatLibInterface* GetAnticheatLib()
+AnticheatManager* AnticheatManager::instance()
 {
-    static AnticheatLibInterface l;
-    return &l;
+    static AnticheatManager i;
+    return &i;
 }
 
-#else
+AnticheatManager* GetAnticheatLib()
+{
+    return AnticheatManager::instance();
+}
+
+#ifdef USE_ANTICHEAT
 
 #include "World.h"
 #include "WorldSession.h"
@@ -18,7 +21,7 @@ AnticheatLibInterface* GetAnticheatLib()
 #include "WardenAnticheat/WardenWin.h"
 #include "WardenAnticheat/WardenMac.h"
 
-void MangosAnticheatLib::LoadAnticheatData()
+void AnticheatManager::LoadAnticheatData()
 {
     sLog.outString();
     sLog.outString("Loading warden checks...");
@@ -29,15 +32,15 @@ void MangosAnticheatLib::LoadAnticheatData()
     sWardenMgr->LoadWardenModules();
 }
 
-MovementAnticheatInterface* MangosAnticheatLib::CreateAnticheatFor(Player* player)
+MovementAnticheat* AnticheatManager::CreateAnticheatFor(Player* player)
 {
-    MovementCheatData* cd = new MovementCheatData(player);
+    MovementAnticheat* cd = new MovementAnticheat(player);
     cd->Init();
     cd->InitSpeeds(player);
     return cd;
 }
 
-WardenInterface* MangosAnticheatLib::CreateWardenFor(WorldSession* client, BigNumber* K)
+Warden* AnticheatManager::CreateWardenFor(WorldSession* client, BigNumber* K)
 {
     if ((client->GetSecurity() != SEC_PLAYER) &&
         sWorld.getConfig(CONFIG_BOOL_AC_WARDEN_PLAYERS_ONLY))
@@ -56,17 +59,6 @@ WardenInterface* MangosAnticheatLib::CreateWardenFor(WorldSession* client, BigNu
     warden->Init(client, K);
 
     return warden;
-}
-
-MangosAnticheatLib* MangosAnticheatLib::instance()
-{
-    static MangosAnticheatLib i;
-    return &i;
-}
-
-AnticheatLibInterface* GetAnticheatLib()
-{
-    return MangosAnticheatLib::instance();
 }
 
 #endif

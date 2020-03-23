@@ -815,7 +815,7 @@ struct RacialSpells
     uint32 spells[MAX_RACIAL_SPELLS] = { 0 };
 };
 
-class MovementAnticheatInterface;
+class MovementAnticheat;
 
 struct AuraSaveStruct
 {
@@ -2377,7 +2377,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool FallGround(uint8 fallMode);
 
         /// Anticheat
-        MovementAnticheatInterface* GetCheatData() const { return m_session->GetCheatData(); }
+        MovementAnticheat* GetCheatData() const { return m_session->GetCheatData(); }
         void OnDisconnected();
         void RelocateToLastClientPosition();
         void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const override;
