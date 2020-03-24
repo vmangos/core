@@ -900,6 +900,53 @@ void BattleBotAI::OnPlayerLogin()
     }
 }
 
+void BattleBotAI::UpdateMovement()
+{
+    // We already have a path.
+    if (m_currentPath)
+        return;
+
+    if (me->IsMoving())
+        return;
+
+    if (!me->IsStopped())
+        return;
+
+    if (me->IsInCombat())
+        return;
+
+    if (me->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+        return;
+
+    switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+    {
+        case IDLE_MOTION_TYPE:
+        case POINT_MOTION_TYPE:
+            break;
+        default:
+            return;
+    }
+
+    if (BattleGround* bg = me->GetBattleGround())
+        if (bg->GetStatus() == STATUS_WAIT_JOIN)
+            return;
+
+    if (StartNewPathFromBeginning())
+        return;
+
+    StartNewPathFromAnywhere();
+}
+
+void BattleBotAI::OnJustDied()
+{
+    ClearPath();
+}
+
+void BattleBotAI::OnJustRevived()
+{
+    DoGraveyardJump();
+}
+
 void BattleBotAI::UpdateAI(uint32 const diff)
 {
     m_updateTimer.Update(diff);
@@ -975,7 +1022,13 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     
     if (me->IsDead())
     {
-        m_wasDead = true;
+        if (!m_wasDead)
+        {
+            m_wasDead = true;
+            OnJustDied();
+            return;
+        }
+        
         if (me->InBattleGround())
         {
             if (me->GetDeathState() == CORPSE)
@@ -1001,7 +1054,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         if (m_wasDead)
         {
             m_wasDead = false;
-            DoGraveyardJump();
+            OnJustRevived();
             return;
         }
     }
@@ -1020,6 +1073,9 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (me->IsNonMeleeSpellCasted(false, false, true))
         return;
+
+    UpdateMovement();
+    return;
 
     if (!me->IsInCombat())
     {
@@ -1118,12 +1174,6 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     }
 
     Unit* pVictim = me->GetVictim();
-
-    if (!pVictim && me->InBattleGround())
-    {
-        BattleBotWaypoints waypointAI;
-        waypointAI.WaypointAI(me);
-    }
 
     if (m_role != BB_ROLE_HEALER)
     {

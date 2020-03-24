@@ -59,7 +59,7 @@ std::vector<RecordedMovementPacket> vHordeGraveyardJumpPath =
 };
 
 // Horde Flag Room to Horde Graveyard
-std::vector<BattleBotWaypoint> vPath_WSG_HordeFlagRoom_to_HordeGraveyard =
+BattleBotPath vPath_WSG_HordeFlagRoom_to_HordeGraveyard =
 {
     { 933.331f, 1433.72f, 345.536f, nullptr },
     { 944.859f, 1423.05f, 345.437f, nullptr },
@@ -71,7 +71,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_HordeFlagRoom_to_HordeGraveyard =
     { 1029.14f, 1387.49f, 340.836f, nullptr },
 };
 // Horde Graveyard to Horde Tunnel
-std::vector<BattleBotWaypoint> vPath_WSG_HordeGraveyard_to_HordeTunnel =
+BattleBotPath vPath_WSG_HordeGraveyard_to_HordeTunnel =
 {
     { 1029.14f, 1387.49f, 340.836f, nullptr },
     { 1034.95f, 1392.62f, 340.856f, nullptr },
@@ -92,7 +92,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_HordeGraveyard_to_HordeTunnel =
     { 1124.37f, 1462.28f, 315.853f, nullptr },
 };
 // Horde Tunnel to Horde Flag Room
-std::vector<BattleBotWaypoint> vPath_WSG_HordeTunnel_to_HordeFlagRoom =
+BattleBotPath vPath_WSG_HordeTunnel_to_HordeFlagRoom =
 {
     { 1124.37f, 1462.28f, 315.853f, nullptr },
     { 1106.87f, 1462.13f, 316.558f, nullptr },
@@ -110,7 +110,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_HordeTunnel_to_HordeFlagRoom =
     { 933.331f, 1433.72f, 345.536f, nullptr },
 };
 // Horde Tunnel to Alliance Tunnel 1
-std::vector<BattleBotWaypoint> vPath_WSG_HordeTunnel_to_AllianceTunnel_1 =
+BattleBotPath vPath_WSG_HordeTunnel_to_AllianceTunnel_1 =
 {
     { 1124.37f, 1462.28f, 315.853f, nullptr },
     { 1135.07f, 1462.43f, 315.569f, nullptr },
@@ -127,8 +127,27 @@ std::vector<BattleBotWaypoint> vPath_WSG_HordeTunnel_to_AllianceTunnel_1 =
     { 1329.8f, 1461.24f, 320.267f, nullptr },
     { 1348.02f, 1461.06f, 323.167f, nullptr },
 };
+// Horde Tunnel to Alliance Tunnel 2
+BattleBotPath vPath_WSG_HordeTunnel_to_AllianceTunnel_2 =
+{
+    { 1124.37f, 1462.28f, 315.853f, nullptr },
+    { 1138.61f, 1452.12f, 312.988f, nullptr },
+    { 1154.35f, 1442.42f, 310.728f, nullptr },
+    { 1171.29f, 1438.04f, 307.462f, nullptr },
+    { 1185.03f, 1435.43f, 309.484f, nullptr },
+    { 1202.24f, 1432.26f, 310.193f, nullptr },
+    { 1219.48f, 1429.2f, 310.301f, nullptr },
+    { 1235.94f, 1429.97f, 309.727f, nullptr },
+    { 1249.3f, 1434.12f, 312.37f, nullptr },
+    { 1265.88f, 1439.71f, 314.373f, nullptr },
+    { 1282.87f, 1443.85f, 314.907f, nullptr },
+    { 1300.06f, 1447.16f, 316.737f, nullptr },
+    { 1313.79f, 1449.86f, 317.651f, nullptr },
+    { 1329.76f, 1457.36f, 320.37f, nullptr },
+    { 1348.02f, 1461.06f, 323.167f, nullptr },
+};
 // Horde GY Jump to Horde Tunnel
-std::vector<BattleBotWaypoint> vPath_WSG_HordeGYJump_to_HordeTunnel =
+BattleBotPath vPath_WSG_HordeGYJump_to_HordeTunnel =
 {
     { 1077.87f, 1400.27f, 323.153f, nullptr },
     { 1088.42f, 1402.68f, 319.605f, nullptr },
@@ -139,7 +158,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_HordeGYJump_to_HordeTunnel =
     { 1124.37f, 1462.28f, 315.853f, nullptr },
 };
 // Horde GY Jump to Alliance Tunnel
-std::vector<BattleBotWaypoint> vPath_WSG_HordeGYJump_to_AllianceTunnel =
+BattleBotPath vPath_WSG_HordeGYJump_to_AllianceTunnel =
 {
     { 1077.87f, 1400.27f, 323.153f, nullptr },
     { 1091.57f, 1397.37f, 317.739f, nullptr },
@@ -159,7 +178,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_HordeGYJump_to_AllianceTunnel =
     { 1348.02f, 1461.06f, 323.167f, nullptr },
 };
 // Alliance Flag Room to Alliance Graveyard
-std::vector<BattleBotWaypoint> vPath_WSG_AllianceFlagRoom_to_AllianceGraveyard =
+BattleBotPath vPath_WSG_AllianceFlagRoom_to_AllianceGraveyard =
 {
     { 1519.53f, 1481.87f, 352.024f, nullptr },
     { 1508.27f, 1493.17f, 352.005f, nullptr },
@@ -175,7 +194,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_AllianceFlagRoom_to_AllianceGraveyard =
     { 1415.33f, 1554.79f, 343.156f, nullptr },
 };
 // Alliance Graveyard to Alliance Tunnel
-std::vector<BattleBotWaypoint> vPath_WSG_AllianceGraveyard_to_AllianceTunnel =
+BattleBotPath vPath_WSG_AllianceGraveyard_to_AllianceTunnel =
 {
     { 1415.33f, 1554.79f, 343.156f, nullptr },
     { 1428.29f, 1551.79f, 342.751f, nullptr },
@@ -199,7 +218,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_AllianceGraveyard_to_AllianceTunnel =
     { 1348.02f, 1461.06f, 323.167f, nullptr },
 };
 // Alliance Tunnel to Alliance Flag Room
-std::vector<BattleBotWaypoint> vPath_WSG_AllianceTunnel_to_AllianceFlagRoom =
+BattleBotPath vPath_WSG_AllianceTunnel_to_AllianceFlagRoom =
 {
     { 1348.02f, 1461.06f, 323.167f, nullptr },
     { 1359.8f, 1461.49f, 324.527f, nullptr },
@@ -218,7 +237,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_AllianceTunnel_to_AllianceFlagRoom =
     { 1519.53f, 1481.87f, 352.024f, nullptr },
 };
 // Alliance GY Jump to Alliance Tunnel
-std::vector<BattleBotWaypoint> vPath_WSG_AllianceGYJump_to_AllianceTunnel =
+BattleBotPath vPath_WSG_AllianceGYJump_to_AllianceTunnel =
 {
     { 1387.85f, 1538.06f, 321.854f, nullptr },
     { 1376.87f, 1529.48f, 321.66f, nullptr },
@@ -229,7 +248,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_AllianceGYJump_to_AllianceTunnel =
     { 1348.02f, 1461.06f, 323.167f, nullptr },
 };
 // Alliance GY Jump to Horde Tunnel
-std::vector<BattleBotWaypoint> vPath_WSG_AllianceGYJump_to_HordeTunnel =
+BattleBotPath vPath_WSG_AllianceGYJump_to_HordeTunnel =
 {
     { 1387.85f, 1538.06f, 321.855f, nullptr },
     { 1377.58f, 1535.88f, 321.053f, nullptr },
@@ -256,27 +275,8 @@ std::vector<BattleBotWaypoint> vPath_WSG_AllianceGYJump_to_HordeTunnel =
     { 1135.4f, 1465.54f, 315.622f, nullptr },
     { 1124.37f, 1462.28f, 315.853f, nullptr },
 };
-// Horde Tunnel to Alliance Tunnel 2
-std::vector<BattleBotWaypoint> vPath_WSG_HordeTunnel_to_AllianceTunnel_2 =
-{
-    { 1124.37f, 1462.28f, 315.853f, nullptr },
-    { 1138.61f, 1452.12f, 312.988f, nullptr },
-    { 1154.35f, 1442.42f, 310.728f, nullptr },
-    { 1171.29f, 1438.04f, 307.462f, nullptr },
-    { 1185.03f, 1435.43f, 309.484f, nullptr },
-    { 1202.24f, 1432.26f, 310.193f, nullptr },
-    { 1219.48f, 1429.2f, 310.301f, nullptr },
-    { 1235.94f, 1429.97f, 309.727f, nullptr },
-    { 1249.3f, 1434.12f, 312.37f, nullptr },
-    { 1265.88f, 1439.71f, 314.373f, nullptr },
-    { 1282.87f, 1443.85f, 314.907f, nullptr },
-    { 1300.06f, 1447.16f, 316.737f, nullptr },
-    { 1313.79f, 1449.86f, 317.651f, nullptr },
-    { 1329.76f, 1457.36f, 320.37f, nullptr },
-    { 1348.02f, 1461.06f, 323.167f, nullptr },
-};
 // Horde GY Jump to Alliance Flag Room through Side Entrance
-std::vector<BattleBotWaypoint> vPath_WSG_HordeGYJump_to_AllianceFlagRoom =
+BattleBotPath vPath_WSG_HordeGYJump_to_AllianceFlagRoom =
 {
     { 1077.87f, 1400.27f, 323.153f, nullptr },
     { 1084.45f, 1388.76f, 319.724f, nullptr },
@@ -315,7 +315,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_HordeGYJump_to_AllianceFlagRoom =
     { 1519.53f, 1481.87f, 352.024f, nullptr },
 };
 // Alliance GY Jump to Horde Flag Room through Side Entrance
-std::vector<BattleBotWaypoint> vPath_WSG_AllianceGYJump_to_HordeFlagRoom =
+BattleBotPath vPath_WSG_AllianceGYJump_to_HordeFlagRoom =
 {
     { 1387.85f, 1538.06f, 321.855f, nullptr },
     { 1370.13f, 1549.33f, 321.122f, nullptr },
@@ -330,7 +330,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_AllianceGYJump_to_HordeFlagRoom =
     { 1173.76f, 1592.66f, 309.805f, nullptr },
     { 1147.86f, 1590.75f, 310.37f, nullptr },
     { 1124.1f, 1579.89f, 314.881f, nullptr },
-    { 1102.61f, 1573.98f, 315.804f, nullptr },
+    //{ 1102.61f, 1573.98f, 315.804f, nullptr },
     { 1091.28f, 1558.56f, 316.451f, nullptr },
     { 1092.6f, 1547.71f, 316.709f, nullptr },
     { 1086.22f, 1541.5f, 316.924f, nullptr },
@@ -349,7 +349,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_AllianceGYJump_to_HordeFlagRoom =
     { 933.331f, 1433.72f, 345.536f, nullptr },
 };
 // Horde Tunnel Middle to Horde Base Roof
-std::vector<BattleBotWaypoint> vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof =
+BattleBotPath vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof =
 {
     { 981.948f, 1459.07f, 336.154f, nullptr },
     { 981.768f, 1480.46f, 335.976f, nullptr },
@@ -372,7 +372,7 @@ std::vector<BattleBotWaypoint> vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof =
     { 952.708f, 1445.01f, 367.604f, nullptr },
 };
 // Alliance Tunnel Middle to Alliance Base Roof
-std::vector<BattleBotWaypoint> vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoof =
+BattleBotPath vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoof =
 {
     { 1471.86f, 1456.65f, 342.794f, nullptr },
     { 1470.93f, 1440.5f, 342.794f, nullptr },
@@ -398,227 +398,125 @@ std::vector<BattleBotWaypoint> vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoo
     { 1500.63f, 1472.89f, 373.707f, nullptr },
 };
 
-
-void BattleBotWaypoints::WaypointAI(Player* me)
+std::vector<BattleBotPath*> vPaths_WSG =
 {
-    if (m_setWaypoint)
-        return;
-
-    if (!m_reachedWaypoint)
-        return;
-
-    ReachedWaypoint(me);
-    GetBattleGround(me);
+    &vPath_WSG_HordeFlagRoom_to_HordeGraveyard,
+    &vPath_WSG_HordeGraveyard_to_HordeTunnel,
+    &vPath_WSG_HordeTunnel_to_HordeFlagRoom,
+    &vPath_WSG_HordeTunnel_to_AllianceTunnel_1,
+    &vPath_WSG_HordeTunnel_to_AllianceTunnel_2,
+    &vPath_WSG_HordeGYJump_to_HordeTunnel,
+    &vPath_WSG_HordeGYJump_to_AllianceTunnel,
+    &vPath_WSG_AllianceFlagRoom_to_AllianceGraveyard,
+    &vPath_WSG_AllianceGraveyard_to_AllianceTunnel,
+    &vPath_WSG_AllianceTunnel_to_AllianceFlagRoom,
+    &vPath_WSG_AllianceGYJump_to_AllianceTunnel,
+    &vPath_WSG_AllianceGYJump_to_HordeTunnel,
+    &vPath_WSG_HordeGYJump_to_AllianceFlagRoom,
+    &vPath_WSG_AllianceGYJump_to_HordeFlagRoom,
+    &vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof,
+    &vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoof,
 };
 
-void BattleBotWaypoints::GetBattleGround(Player* me)
+void BattleBotAI::MovementInform(uint32 movementType, uint32 data)
 {
-    BattleGround* bg = me->GetBattleGround();
-    if (!bg)
-        return;
-
-    switch (me->GetMapId())
-    {
-        // Warsong Gulch
-        case WS_MAP:
-        {
-            WarsongGulchAI(me, bg);
-            break;
-        }
-        // Arathi Basin
-        case AB_MAP:
-        {
-            ArathiBasinAI(me, bg);
-            break;
-        }
-        // Alterac Valley
-        case AV_MAP:
-        {
-            AlteracValleyAI(me, bg);
-            break;
-        }
-        default:
-            break;
-    }
-}
-
-void BattleBotWaypoints::WarsongGulchAI(Player* me, BattleGround* bg)
-{
-    // Waiting to start bg
-    if (bg->GetStatus() == STATUS_WAIT_JOIN)
-    {
-        if (me->GetTeam() == ALLIANCE)
-            SetNextWaypoint(me, WS_WAITING_POS_ALLIANCE.x, WS_WAITING_POS_ALLIANCE.y, WS_WAITING_POS_ALLIANCE.z);
-
-        if (me->GetTeam() == HORDE)
-            SetNextWaypoint(me, WS_WAITING_POS_HORDE.x, WS_WAITING_POS_HORDE.y, WS_WAITING_POS_HORDE.z);
-    }
-
-    // When bg is in progress
-    if (bg->GetStatus() == STATUS_IN_PROGRESS)
-    {
-        if (((BattleGroundWS*)bg)->IsHordeFlagPickedup() || ((BattleGroundWS*)bg)->IsAllianceFlagPickedup())
-        {
-            SetWarsongObjective(me, bg, WarsongObjectives::WS_FLAG_CARRIER);
-        }
+    if (movementType == POINT_MOTION_TYPE)
+    { 
+        if (m_currentPath && m_currentPath->at(data).pFunc)
+            (*m_currentPath->at(data).pFunc)(this);
         else
-        {
-            if (m_objective == WarsongObjectives::WS_IDLE)
-            {
-                int rnd = urand(0, 0);
-                switch (rnd)
-                {
-                case 0:
-                {
-                    SetWarsongObjective(me, bg, WarsongObjectives::WS_FLAG);
-                    break;
-                }
-                case 1:
-                {
-                    SetWarsongObjective(me, bg, WarsongObjectives::WS_POWERUP);
-                    break;
-                }
-                case 2:
-                {
-                    SetWarsongObjective(me, bg, WarsongObjectives::WS_ROAM);
-                    break;
-                }
-                }
-            }
-        }
+            MoveToNextPoint();
     }
 }
 
-void BattleBotWaypoints::SetWarsongObjective(Player* me, BattleGround* bg, WarsongObjectives objective)
+void BattleBotAI::MoveToNextPoint()
 {
-    if (objective == WarsongObjectives::WS_OBJECTIVE_INVALID)
+    if (!m_currentPath)
         return;
 
-    m_objective = objective;
+    uint32 const lastPointInPath = m_movingInReverse ? 0 : ((*m_currentPath).size() - 1);
 
-    switch (objective)
+    if ((m_currentPoint == lastPointInPath) ||
+        me->IsInCombat() || !me->IsAlive())
     {
-        case WarsongObjectives::WS_FLAG_CARRIER:
-        {
-            // Find flag carrier
-            Map* pMap = me->GetMap();
-
-            if (!pMap)
-                return;
-
-            Map::PlayerList const& PlayerList = pMap->GetPlayers();
-
-            for (const auto& itr : PlayerList)
-            {
-                Player* pPlayer = itr.getSource();
-                if (pPlayer->GetTeam() != me->GetTeam()) // Attack enemy flag carrier
-                {
-                    if (pPlayer->HasAura(WS_SPELL_WARSONG_FLAG) || pPlayer->HasAura(WS_SPELL_SILVERWING_FLAG))
-                    {
-                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                            me->GetMotionMaster()->MoveChase(pPlayer, 1.0f);
-
-                        me->Attack(pPlayer, true);
-                    }
-                }
-                else // Help team flag carrier
-                {
-                    if (pPlayer->HasAura(WS_SPELL_WARSONG_FLAG) || pPlayer->HasAura(WS_SPELL_SILVERWING_FLAG))
-                    {
-                        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                            me->GetMotionMaster()->MoveChase(pPlayer, frand(1.0f, 5.0f));
-                    }
-                }
-            }
-            break;
-        }
-        case WarsongObjectives::WS_FLAG:
-        {
-            if (me->GetTeam() == ALLIANCE)
-                SetNextWaypoint(me, WS_FLAG_POS_HORDE.x, WS_FLAG_POS_HORDE.y, WS_FLAG_POS_HORDE.z);
-
-            if (me->GetTeam() == HORDE)
-                SetNextWaypoint(me, WS_FLAG_POS_ALLIANCE.x, WS_FLAG_POS_ALLIANCE.y, WS_FLAG_POS_ALLIANCE.z);
-
-            break;
-        }
-        case WarsongObjectives::WS_POWERUP:
-        {
-            //SetNextWaypoint(me, WS_FLAG_POS_ALLIANCE.x, WS_FLAG_POS_ALLIANCE.y, WS_FLAG_POS_ALLIANCE.z);
-            break;
-        }
-        case WarsongObjectives::WS_ROAM:
-        {
-
-            break;
-        }
-        default:
-            break;
-    }
-}
-
-void BattleBotWaypoints::ArathiBasinAI(Player* me, BattleGround* bg)
-{
-    if (bg->GetStatus() == STATUS_WAIT_JOIN)
-    {
-
-    }
-    if (bg->GetStatus() == STATUS_IN_PROGRESS)
-    {
-
-    }
-}
-
-void BattleBotWaypoints::AlteracValleyAI(Player* me, BattleGround* bg)
-{
-    if (bg->GetStatus() == STATUS_WAIT_JOIN)
-    {
-
-    }
-    if (bg->GetStatus() == STATUS_IN_PROGRESS)
-    {
-
-    }
-}
-
-void BattleBotWaypoints::SetNextWaypoint(Player* me, float waypoint_x, float waypoint_y, float waypoint_z)
-{
-    if (!m_setWaypoint && m_reachedWaypoint)
-    {
-        currentWaypointX = waypoint_x;
-        currentWaypointY = waypoint_y;
-        currentWaypointZ = waypoint_z;
-        m_setWaypoint = true;
-        m_reachedWaypoint = false;
-        StartMove(me, waypoint_x, waypoint_y, waypoint_z);
-    }
-}
-
-void BattleBotWaypoints::StartMove(Player* me, float waypoint_x, float waypoint_y, float waypoint_z)
-{
-    if (me->IsMoving())
+        // Path is over.
+        ClearPath();
         return;
+    }
 
-    me->StopMoving();
-    me->GetMotionMaster()->MovementExpired();
-    me->GetMotionMaster()->Clear();
-    me->GetMotionMaster()->MovePoint(0, waypoint_x, waypoint_y, waypoint_z, MOVE_PATHFINDING);
+    if (m_movingInReverse)
+        m_currentPoint--;
+    else
+        m_currentPoint++;
+
+    BattleBotWaypoint& nextPoint = m_currentPath->at(m_currentPoint);
+
+    me->GetMotionMaster()->MovePoint(m_currentPoint, nextPoint.x + frand(-1, 1), nextPoint.y + frand(-1, 1), nextPoint.z, MOVE_PATHFINDING);
 }
 
-bool BattleBotWaypoints::ReachedWaypoint(Player* me)
+bool BattleBotAI::StartNewPathFromBeginning()
 {
-    if (!me->IsMoving())
+    struct AvailablePath
+    {
+        AvailablePath(BattleBotPath* pPath_, bool reverse_) : pPath(pPath_), reverse(reverse_) {}
+        BattleBotPath* pPath = nullptr;
+        bool reverse = false;
+    };
+    std::vector<AvailablePath> availablePaths;
+    for (const auto& pPath : vPaths_WSG)
+    {
+        BattleBotWaypoint* pStart = &((*pPath)[0]);
+        if (me->GetDistance(pStart->x, pStart->y, pStart->z) < INTERACTION_DISTANCE)
+            availablePaths.emplace_back(AvailablePath(pPath, false));
+        BattleBotWaypoint* pEnd = &((*pPath)[(*pPath).size()-1]);
+        if (me->GetDistance(pEnd->x, pEnd->y, pEnd->z) < INTERACTION_DISTANCE)
+            availablePaths.emplace_back(AvailablePath(pPath, true));
+    }
+
+    if (availablePaths.empty())
         return false;
 
-    if (2 > sqrt(((me->GetPositionX() - currentWaypointX) * (me->GetPositionX() - currentWaypointX)) + ((me->GetPositionY() - currentWaypointY) * (me->GetPositionY() - currentWaypointY)) + ((me->GetPositionZ() - currentWaypointZ) * (me->GetPositionZ() - currentWaypointZ))))
+    AvailablePath const* chosenPath = &SelectRandomContainerElement(availablePaths);
+    m_currentPath = chosenPath->pPath;
+    m_movingInReverse = chosenPath->reverse;
+    m_currentPoint = m_movingInReverse ? m_currentPath->size() - 1 : 0;
+    MoveToNextPoint();
+    return true;
+}
+
+void BattleBotAI::StartNewPathFromAnywhere()
+{
+    BattleBotPath* pClosestPath = nullptr;
+    uint32 closestPoint = 0;
+    float closestDistance = FLT_MAX;
+    for (const auto& pPath : vPaths_WSG)
     {
-        currentWaypointX = 0.f;
-        currentWaypointY = 0.f;
-        currentWaypointZ = 0.f;
-        m_setWaypoint = false;
-        m_reachedWaypoint = true;
-        m_objective = WarsongObjectives::WS_IDLE;
-        return true;
+        for (uint32 i = 0; i < pPath->size(); i++)
+        {
+            BattleBotWaypoint& waypoint = ((*pPath)[i]);
+            float const distanceToPoint = me->GetDistance(waypoint.x, waypoint.y, waypoint.z);
+            if (distanceToPoint < closestDistance)
+            {
+                pClosestPath = pPath;
+                closestPoint = i;
+                closestDistance = distanceToPoint;
+            }
+        }
     }
-    return false;
+
+    if (!pClosestPath)
+        return;
+
+    m_currentPath = pClosestPath;
+    m_movingInReverse = false;
+    m_currentPoint = closestPoint-1;
+    MoveToNextPoint();
+}
+
+void BattleBotAI::ClearPath()
+{
+    m_currentPath = nullptr;
+    m_currentPoint = 0;
+    m_movingInReverse = false;
+    return;
 }

@@ -57,29 +57,7 @@ struct BattleBotWaypoint
     BattleBotWaypointFunc* pFunc = nullptr;
 };
 
-class BattleBotWaypoints
-{
-public:
-    void WaypointAI(Player* me);
-    void GetBattleGround(Player* me);
-    void WarsongGulchAI(Player* me, BattleGround* bg);
-    void SetWarsongObjective(Player* me, BattleGround* bg, WarsongObjectives objective);
-    void ArathiBasinAI(Player* me, BattleGround* bg);
-    void AlteracValleyAI(Player* me, BattleGround* bg);
-    void SetNextWaypoint(Player* me, float waypoint_x, float waypoint_y, float waypoint_z);
-    void StartMove(Player* me, float waypoint_x, float waypoint_y, float waypoint_z);
-    bool ReachedWaypoint(Player* me);
+typedef std::vector<BattleBotWaypoint> BattleBotPath;
 
-    bool m_setWaypoint = false;
-    float currentWaypointX = 0.f;
-    float currentWaypointY = 0.f;
-    float currentWaypointZ = 0.f;
-    bool m_reachedWaypoint = true;
-    float nextWaypointX = 0.f;
-    float nextWaypointY = 0.f;
-    float nextWaypointZ = 0.f;
-    WarsongObjectives m_objective = WarsongObjectives::WS_IDLE;
-
-};
 
 #endif

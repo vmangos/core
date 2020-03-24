@@ -3,6 +3,7 @@
 
 #include "PlayerBotAI.h"
 #include "PartyBotAI.h"
+#include "BattleBotWaypoints.h"
 
 enum BattleBotRole : uint8
 {
@@ -38,6 +39,7 @@ public:
     void UpdateAI(uint32 const diff) override;
     void OnPacketReceived(WorldPacket const* packet) override;
     void SendFakePacket(uint16 opcode) override;
+    void MovementInform(uint32 MovementType, uint32 Data = 0) override;
 
     void CloneFromPlayer(Player const* pPlayer);
     void LearnPremadeSpecForClass();
@@ -59,7 +61,10 @@ public:
     void EquipOrUseNewItem();
     bool IsPhysicalDamageClass(uint8 playerClass);
     bool IsRangedDamageClass(uint8 playerClass);
-    void DoGraveyardJump();
+
+    void OnJustRevived();
+    void OnJustDied();
+    
 
     SpellEntry const* m_fullHealSpell = nullptr;
     SpellEntry const* m_panicSpell = nullptr;
@@ -95,7 +100,18 @@ public:
     float m_o = 0.0f;
     bool m_hasGear = false;
     bool m_wasDead = false;
+
+    // Movement System
+    void UpdateMovement();
+    void DoGraveyardJump();
+    void MoveToNextPoint();
+    bool StartNewPathFromBeginning();
+    void StartNewPathFromAnywhere();
+    void ClearPath();
     bool m_doingGraveyardJump = false;
+    bool m_movingInReverse = false;
+    uint32 m_currentPoint = 0;
+    BattleBotPath* m_currentPath = nullptr;
 };
 
 #endif
