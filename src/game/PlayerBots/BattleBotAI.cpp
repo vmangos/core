@@ -947,6 +947,33 @@ void BattleBotAI::OnJustRevived()
     DoGraveyardJump();
 }
 
+void BattleBotAI::OnEnterBattleGround()
+{
+    if (me->GetBattleGround()->GetTypeID() == BATTLEGROUND_WS)
+    {
+        m_waitingSpot = urand(BB_WSG_WAIT_SPOT_SPAWN, BB_WSG_WAIT_SPOT_RIGHT);
+        if (m_waitingSpot == BB_WSG_WAIT_SPOT_RIGHT)
+        {
+            if (me->GetTeam() == HORDE)
+                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_HORDE_1.x, WS_WAITING_POS_HORDE_1.y, WS_WAITING_POS_HORDE_1.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_HORDE_1.o);
+            else
+                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_ALLIANCE_1.x, WS_WAITING_POS_ALLIANCE_1.y, WS_WAITING_POS_ALLIANCE_1.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_ALLIANCE_1.o);
+        }
+        else if (m_waitingSpot == BB_WSG_WAIT_SPOT_LEFT)
+        {
+            if (me->GetTeam() == HORDE)
+                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_HORDE_2.x, WS_WAITING_POS_HORDE_2.y, WS_WAITING_POS_HORDE_2.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_HORDE_2.o);
+            else
+                me->GetMotionMaster()->MovePoint(0, WS_WAITING_POS_ALLIANCE_2.x, WS_WAITING_POS_ALLIANCE_2.y, WS_WAITING_POS_ALLIANCE_2.z, MOVE_PATHFINDING, 0, WS_WAITING_POS_ALLIANCE_2.o);
+        }
+    }
+}
+
+void BattleBotAI::OnLeaveBattleGround()
+{
+    ClearPath();
+}
+
 void BattleBotAI::UpdateAI(uint32 const diff)
 {
     m_updateTimer.Update(diff);
@@ -996,6 +1023,13 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (!me->InBattleGround())
     {
+        if (m_wasInBG)
+        {
+            m_wasInBG = false;
+            OnLeaveBattleGround();
+            return;
+        }
+
         if (m_receivedBgInvite)
         {
             SendFakePacket(CMSG_BATTLEFIELD_PORT);
@@ -1018,6 +1052,15 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         // Remain idle until we can join battleground.
         return;
+    }
+    else
+    {
+        if (!m_wasInBG)
+        {
+            m_wasInBG = true;
+            OnEnterBattleGround();
+            return;
+        }
     }
     
     if (me->IsDead())

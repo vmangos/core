@@ -21,6 +21,13 @@ enum BattleBotBGQueues : uint8
     BB_BG_INVALID
 };
 
+enum BattleBotWsgWaitSpot
+{
+    BB_WSG_WAIT_SPOT_SPAWN,
+    BB_WSG_WAIT_SPOT_LEFT,
+    BB_WSG_WAIT_SPOT_RIGHT
+};
+
 class BattleBotAI : public PlayerBotAI
 {
 public:
@@ -64,7 +71,8 @@ public:
 
     void OnJustRevived();
     void OnJustDied();
-    
+    void OnEnterBattleGround();
+    void OnLeaveBattleGround();
 
     SpellEntry const* m_fullHealSpell = nullptr;
     SpellEntry const* m_panicSpell = nullptr;
@@ -100,6 +108,7 @@ public:
     float m_o = 0.0f;
     bool m_hasGear = false;
     bool m_wasDead = false;
+    bool m_wasInBG = false;
 
     // Movement System
     void UpdateMovement();
@@ -112,6 +121,7 @@ public:
     bool m_movingInReverse = false;
     uint32 m_currentPoint = 0;
     BattleBotPath* m_currentPath = nullptr;
+    uint8 m_waitingSpot = BB_WSG_WAIT_SPOT_SPAWN;
 };
 
 #endif

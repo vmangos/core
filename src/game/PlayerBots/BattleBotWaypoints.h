@@ -39,10 +39,12 @@ struct RecordedMovementPacket
 extern std::vector<RecordedMovementPacket> vAllianceGraveyardJumpPath;
 extern std::vector<RecordedMovementPacket> vHordeGraveyardJumpPath;
 
-Position const WS_WAITING_POS_HORDE = { 944.981f, 1423.478f, 345.434f, 6.188937f };
-Position const WS_WAITING_POS_ALLIANCE = { 1510.502f, 1493.385f, 351.995f, 6.188937f };
-Position const WS_FLAG_POS_HORDE = { 915.958f, 1433.925f, 346.193f, 0.000000f };
-Position const WS_FLAG_POS_ALLIANCE = { 1539.219f, 1481.747f, 352.458f, 0.000000f };
+Position const WS_WAITING_POS_HORDE_1 = { 944.981f, 1423.478f, 345.434f, 6.18f };
+Position const WS_WAITING_POS_HORDE_2 = { 948.488f, 1459.834f, 343.066f, 6.27f };
+Position const WS_WAITING_POS_ALLIANCE_1 = { 1510.502f, 1493.385f, 351.995f, 3.1f };
+Position const WS_WAITING_POS_ALLIANCE_2 = { 1496.578f, 1457.900f, 344.442f, 3.1f };
+Position const WS_FLAG_POS_HORDE = { 915.958f, 1433.925f, 346.193f, 0.0f };
+Position const WS_FLAG_POS_ALLIANCE = { 1539.219f, 1481.747f, 352.458f, 0.0f };
 
 class BattleBotAI;
 typedef void(*BattleBotWaypointFunc) (BattleBotAI* pAI);
