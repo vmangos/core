@@ -51,12 +51,12 @@ typedef void(*BattleBotWaypointFunc) (BattleBotAI* pAI);
 
 struct BattleBotWaypoint
 {
-    BattleBotWaypoint(float x_, float y_, float z_, BattleBotWaypointFunc* func) :
+    BattleBotWaypoint(float x_, float y_, float z_, BattleBotWaypointFunc func) :
         x(x_), y(y_), z(z_), pFunc(func) {};
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
-    BattleBotWaypointFunc* pFunc = nullptr;
+    BattleBotWaypointFunc pFunc = nullptr;
 };
 
 typedef std::vector<BattleBotWaypoint> BattleBotPath;

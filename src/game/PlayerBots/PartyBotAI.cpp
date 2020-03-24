@@ -111,6 +111,7 @@ void PartyBotAI::PopulateSpellData()
             {
                 case SPELL_EFFECT_HEAL:
                     spellListHeal.insert(pSpellEntry);
+                    break;
                 case SPELL_EFFECT_SCHOOL_DAMAGE:
                 case SPELL_EFFECT_HEALTH_LEECH:
                     spellListSpellDamage.push_back(pSpellEntry);

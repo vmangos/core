@@ -5,14 +5,6 @@
 #include "PartyBotAI.h"
 #include "BattleBotWaypoints.h"
 
-enum BattleBotRole : uint8
-{
-    BB_ROLE_DPS,
-    BB_ROLE_HEALER,
-    BB_ROLE_TANK,
-    BB_ROLE_INVALID
-};
-
 enum BattleBotBGQueues : uint8
 {
     BB_BG_WS,
@@ -28,18 +20,26 @@ enum BattleBotWsgWaitSpot
     BB_WSG_WAIT_SPOT_RIGHT
 };
 
+#define AT_SILVERWING_FLAG 3646
+#define GO_SILVERWING_FLAG 179830
+#define AURA_SILVERWING_FLAG 23335
+
+#define AT_WARSONG_FLAG 3647
+#define GO_WARSONG_FLAG 179831
+#define AURA_WARSONG_FLAG 23333
+
 class BattleBotAI : public PlayerBotAI
 {
 public:
 
-    BattleBotAI(BattleBotRole role, uint8 race, uint8 class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, BattleBotBGQueues bgId)
-        : PlayerBotAI(nullptr), m_role(role), m_race(race), m_class(class_), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId)
+    BattleBotAI(uint8 race, uint8 class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, BattleBotBGQueues bgId)
+        : PlayerBotAI(nullptr),  m_race(race), m_class(class_), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId)
     {
         m_updateTimer.Reset(2000);
     }
     bool OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess) override
     {
-        return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o, sObjectAccessor.FindPlayer(m_cloneGuid));
+        return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o);
     }
 
     void OnPlayerLogin() override;
@@ -48,20 +48,21 @@ public:
     void SendFakePacket(uint16 opcode) override;
     void MovementInform(uint32 MovementType, uint32 Data = 0) override;
 
-    void CloneFromPlayer(Player const* pPlayer);
-    void LearnPremadeSpecForClass();
+    void AddPremadeGearAndSpells();
     void PopulateSpellData();
     void ResetSpellData();
-    void AutoAssignRole();
+
     void SummonPetIfNeeded();
+    void AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget() const;
-    Unit* SelectHealTarget() const;
-    Player* SelectResurrectionTarget() const;
+    Unit* SelectFollowTarget() const;
+    Unit* SelectHealTarget(float selfHealPercent = 100.0f) const;
     Player* SelectBuffTarget(SpellEntry const* pSpellEntry) const;
     bool IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool IsValidHealTarget(Unit const* pTarget) const;
     bool IsValidHostileTarget(Unit const* pTarget) const;
-    void CastRandomDamageSpell(Unit* pVictim);
+    void HealInjuredAlly(float selfHealPercent = 100.0f);
+
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool DrinkAndEat();
@@ -74,30 +75,43 @@ public:
     void OnEnterBattleGround();
     void OnLeaveBattleGround();
 
-    SpellEntry const* m_fullHealSpell = nullptr;
-    SpellEntry const* m_panicSpell = nullptr;
-    SpellEntry const* m_selfBuffSpell = nullptr;
-    SpellEntry const* m_partyBuffSpell = nullptr;
-    SpellEntry const* m_resurrectionSpell = nullptr;
-    std::vector<SpellEntry const*> spellListDamageAura;
-    std::vector<SpellEntry const*> spellListSpellDamage;
-    std::vector<SpellEntry const*> spellListWeaponDamage;
-    std::vector<SpellEntry const*> spellListAuraBar;
-    std::vector<SpellEntry const*> spellListTaunt;
-    std::vector<SpellEntry const*> spellListInterrupt;
+    void UpdateInCombatAI();
+    void UpdateOutOfCombatAI();
+
+    void UpdateInCombatAI_Paladin();
+    void UpdateOutOfCombatAI_Paladin();
+
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
-    std::set<SpellEntry const*, AuraDurationCompare> spellListCrowdControlAura;
+    union
+    {
+        struct
+        {
+            SpellEntry const* spells[12];
+        } raw;
+        struct
+        {
+            SpellEntry const* pBlessingOfLight;
+            SpellEntry const* pBlessingOfMight;
+            SpellEntry const* pBlessingOfWisdom;
+            SpellEntry const* pBlessingOfKings;
+            SpellEntry const* pBlessingOfSanctuary;
+            SpellEntry const* pBlessingOfProtection;
+            SpellEntry const* pBlessingOfFreedom;
+            SpellEntry const* pBlessingOfSacrifice;
+            SpellEntry const* pHammerOfJustice;
+            SpellEntry const* pSealOfCommand;
+            SpellEntry const* pSealOfRighteousness;
+            SpellEntry const* pJudgement;
+        } paladin;
+    } m_spells;
 
     std::vector<LootResponseData> m_lootResponses;
     bool m_initialized = false;
     bool m_receivedBgInvite = false;
     bool m_checkBuffs = true;
     int m_battlegroundId = 0;
-    BattleBotRole m_role = BB_ROLE_INVALID;
     ShortTimeTracker m_updateTimer;
-    ObjectGuid m_leaderGuid;
-    ObjectGuid m_cloneGuid;
     uint8 m_race = 0;
     uint8 m_class = 0;
     uint32 m_mapId = 0;

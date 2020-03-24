@@ -13,6 +13,102 @@
 #include "BattleGroundWS.h"
 #include <random>
 
+void WSG_AtAllianceFlag(BattleBotAI* pAI)
+{
+    if (GameObject* pFlag = pAI->me->FindNearestGameObject(GO_SILVERWING_FLAG, 25.0f))
+    {
+        if (pFlag->isSpawned())
+        {
+            if (pAI->me->GetTeam() == HORDE)
+            {
+                if (pAI->me->IsWithinDistInMap(pFlag, INTERACTION_DISTANCE))
+                {
+                    pAI->ClearPath();
+                    WorldPacket data(CMSG_GAMEOBJ_USE);
+                    data << pFlag->GetObjectGuid();
+                    pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
+                    return;
+                }
+                else
+                {
+                    pAI->ClearPath();
+                    ObjectGuid guid = pFlag->GetObjectGuid();
+                    pAI->me->GetMotionMaster()->MovePoint(0, pFlag->GetPositionX(), pFlag->GetPositionY(), 353.0f);
+                    pAI->me->m_Events.AddLambdaEventAtOffset([pAI, guid]
+                    {
+                        WorldPacket data(CMSG_GAMEOBJ_USE);
+                        data << guid;
+                        pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
+                    }, 2000);
+                    return;
+                }
+            }
+            else if (pAI->me->HasAura(AURA_WARSONG_FLAG))
+            {
+                pAI->ClearPath();
+                pAI->me->GetMotionMaster()->MovePoint(0, pFlag->GetPositionX(), pFlag->GetPositionY(), 353.0f);
+                pAI->me->m_Events.AddLambdaEventAtOffset([pAI]
+                {
+                    WorldPacket data(CMSG_AREATRIGGER);
+                    data << uint32(AT_SILVERWING_FLAG);
+                    pAI->me->GetSession()->HandleAreaTriggerOpcode(data);
+                }, 2000);
+                return;
+            }
+        }
+    }
+    
+    pAI->MoveToNextPoint();
+}
+
+void WSG_AtHordeFlag(BattleBotAI* pAI)
+{
+    if (GameObject* pFlag = pAI->me->FindNearestGameObject(GO_WARSONG_FLAG, 25.0f))
+    {
+        if (pFlag->isSpawned())
+        {
+            if (pAI->me->GetTeam() == ALLIANCE)
+            {
+                if (pAI->me->IsWithinDistInMap(pFlag, INTERACTION_DISTANCE))
+                {
+                    pAI->ClearPath();
+                    WorldPacket data(CMSG_GAMEOBJ_USE);
+                    data << pFlag->GetObjectGuid();
+                    pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
+                    return;
+                }
+                else
+                {
+                    pAI->ClearPath();
+                    ObjectGuid guid = pFlag->GetObjectGuid();
+                    pAI->me->GetMotionMaster()->MovePoint(0, pFlag->GetPositionX(), pFlag->GetPositionY(), pFlag->GetPositionZ());
+                    pAI->me->m_Events.AddLambdaEventAtOffset([pAI, guid]
+                    {
+                        WorldPacket data(CMSG_GAMEOBJ_USE);
+                        data << guid;
+                        pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
+                    }, 2000);
+                    return;
+                }
+            }
+            else if (pAI->me->HasAura(AURA_SILVERWING_FLAG))
+            {
+                pAI->ClearPath();
+                pAI->me->GetMotionMaster()->MovePoint(0, pFlag->GetPositionX(), pFlag->GetPositionY(), pFlag->GetPositionZ());
+                pAI->me->m_Events.AddLambdaEventAtOffset([pAI]
+                {
+                    WorldPacket data(CMSG_AREATRIGGER);
+                    data << uint32(AT_WARSONG_FLAG);
+                    pAI->me->GetSession()->HandleAreaTriggerOpcode(data);
+                }, 2000);
+                return;
+            }
+        }
+    }
+
+    pAI->MoveToNextPoint();
+}
+
 std::vector<RecordedMovementPacket> vAllianceGraveyardJumpPath =
 {
     { MSG_MOVE_START_FORWARD, 0, 1, 1415.33f, 1554.79f, 343.156f, 2.34205f },
@@ -61,7 +157,7 @@ std::vector<RecordedMovementPacket> vHordeGraveyardJumpPath =
 // Horde Flag Room to Horde Graveyard
 BattleBotPath vPath_WSG_HordeFlagRoom_to_HordeGraveyard =
 {
-    { 933.331f, 1433.72f, 345.536f, nullptr },
+    { 933.331f, 1433.72f, 345.536f, &WSG_AtHordeFlag },
     { 944.859f, 1423.05f, 345.437f, nullptr },
     { 966.691f, 1422.53f, 345.223f, nullptr },
     { 979.588f, 1422.84f, 345.46f, nullptr },
@@ -107,7 +203,7 @@ BattleBotPath vPath_WSG_HordeTunnel_to_HordeFlagRoom =
     { 965.049f, 1459.15f, 338.076f, nullptr },
     { 944.526f, 1459.0f, 344.207f, nullptr },
     { 937.479f, 1451.12f, 345.553f, nullptr },
-    { 933.331f, 1433.72f, 345.536f, nullptr },
+    { 933.331f, 1433.72f, 345.536f, &WSG_AtHordeFlag },
 };
 // Horde Tunnel to Alliance Tunnel 1
 BattleBotPath vPath_WSG_HordeTunnel_to_AllianceTunnel_1 =
@@ -180,7 +276,7 @@ BattleBotPath vPath_WSG_HordeGYJump_to_AllianceTunnel =
 // Alliance Flag Room to Alliance Graveyard
 BattleBotPath vPath_WSG_AllianceFlagRoom_to_AllianceGraveyard =
 {
-    { 1519.53f, 1481.87f, 352.024f, nullptr },
+    { 1519.53f, 1481.87f, 352.024f, &WSG_AtAllianceFlag },
     { 1508.27f, 1493.17f, 352.005f, nullptr },
     { 1490.78f, 1493.51f, 352.141f, nullptr },
     { 1469.79f, 1494.13f, 351.774f, nullptr },
@@ -234,7 +330,7 @@ BattleBotPath vPath_WSG_AllianceTunnel_to_AllianceFlagRoom =
     { 1502.27f, 1457.52f, 347.589f, nullptr },
     { 1512.87f, 1457.81f, 352.039f, nullptr },
     { 1517.53f, 1468.79f, 352.033f, nullptr },
-    { 1519.53f, 1481.87f, 352.024f, nullptr },
+    { 1519.53f, 1481.87f, 352.024f, &WSG_AtAllianceFlag },
 };
 // Alliance GY Jump to Alliance Tunnel
 BattleBotPath vPath_WSG_AllianceGYJump_to_AllianceTunnel =
@@ -312,7 +408,7 @@ BattleBotPath vPath_WSG_HordeGYJump_to_AllianceFlagRoom =
     { 1488.75f, 1474.6f, 358.79f, nullptr },
     { 1490.44f, 1485.99f, 352.112f, nullptr },
     { 1502.97f, 1493.87f, 352.199f, nullptr },
-    { 1519.53f, 1481.87f, 352.024f, nullptr },
+    { 1519.53f, 1481.87f, 352.024f, &WSG_AtAllianceFlag },
 };
 // Alliance GY Jump to Horde Flag Room through Side Entrance
 BattleBotPath vPath_WSG_AllianceGYJump_to_HordeFlagRoom =
@@ -346,11 +442,12 @@ BattleBotPath vPath_WSG_AllianceGYJump_to_HordeFlagRoom =
     { 964.566f, 1450.29f, 354.865f, nullptr },
     { 963.586f, 1432.46f, 345.206f, nullptr },
     { 953.017f, 1423.3f, 345.835f, nullptr },
-    { 933.331f, 1433.72f, 345.536f, nullptr },
+    { 933.331f, 1433.72f, 345.536f, &WSG_AtHordeFlag },
 };
 // Horde Tunnel Middle to Horde Base Roof
 BattleBotPath vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof =
 {
+    { 948.488f, 1459.834f, 343.066f, nullptr },
     { 981.948f, 1459.07f, 336.154f, nullptr },
     { 981.768f, 1480.46f, 335.976f, nullptr },
     { 974.664f, 1495.9f, 340.837f, nullptr },
@@ -374,6 +471,7 @@ BattleBotPath vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof =
 // Alliance Tunnel Middle to Alliance Base Roof
 BattleBotPath vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoof =
 {
+    { 1496.578f, 1457.900f, 344.442f, nullptr },
     { 1471.86f, 1456.65f, 342.794f, nullptr },
     { 1470.93f, 1440.5f, 342.794f, nullptr },
     { 1472.24f, 1427.49f, 342.06f, nullptr },

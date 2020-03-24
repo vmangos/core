@@ -9,6 +9,8 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
+#include "GridNotifiers.h"
+#include "TargetedMovementGenerator.h"
 #include <random>
 
 enum BattleBotSpells
@@ -48,39 +50,13 @@ enum BattleBotSpells
 #define BB_MIN_FOLLOW_ANGLE 0.0f
 #define BB_MAX_FOLLOW_ANGLE 6.0f
 
-void BattleBotAI::AutoAssignRole()
-{
-    switch (me->GetClass())
-    {
-        case CLASS_WARRIOR:
-            m_role = BB_ROLE_TANK;
-            return;
-        case CLASS_HUNTER:
-        case CLASS_ROGUE:
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-            m_role = BB_ROLE_DPS;
-            return;
-    }
-
-    // Remaining classes are healers.
-    m_role = BB_ROLE_HEALER;
-}
-
 void BattleBotAI::ResetSpellData()
 {
-    m_selfBuffSpell = nullptr;
-    m_partyBuffSpell = nullptr;
-    m_resurrectionSpell = nullptr;
-    spellListDamageAura.clear();
-    spellListSpellDamage.clear();
-    spellListWeaponDamage.clear();
-    spellListAuraBar.clear();
-    spellListTaunt.clear();
-    spellListInterrupt.clear();
+    for (auto& ptr : m_spells.raw.spells)
+        ptr = nullptr;
+
     spellListHealAura.clear();
     spellListHeal.clear();
-    spellListCrowdControlAura.clear();
 }
 
 void BattleBotAI::PopulateSpellData()
@@ -103,8 +79,85 @@ void BattleBotAI::PopulateSpellData()
         if (pSpellEntry->HasAttribute(SPELL_ATTR_HIDDEN_CLIENTSIDE))
             continue;
 
-        if (pSpellEntry->HasAttribute(SPELL_ATTR_EX2_DISPLAY_IN_STANCE_BAR))
-            spellListAuraBar.push_back(pSpellEntry);
+        switch (me->GetClass())
+        {
+            case CLASS_PALADIN:
+            {
+                if (pSpellEntry->SpellName[0].find("Seal of Righteousness") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pSealOfRighteousness ||
+                        m_spells.paladin.pSealOfRighteousness->Id < pSpellEntry->Id)
+                        m_spells.paladin.pSealOfRighteousness = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Seal of Command") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pSealOfCommand ||
+                        m_spells.paladin.pSealOfCommand->Id < pSpellEntry->Id)
+                        m_spells.paladin.pSealOfCommand = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Judgement") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pJudgement ||
+                        m_spells.paladin.pJudgement->Id < pSpellEntry->Id)
+                        m_spells.paladin.pJudgement = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Hammer of Justice") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pHammerOfJustice ||
+                        m_spells.paladin.pHammerOfJustice->Id < pSpellEntry->Id)
+                        m_spells.paladin.pHammerOfJustice = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blessing of Sacrifice") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pBlessingOfSacrifice ||
+                        m_spells.paladin.pBlessingOfSacrifice->Id < pSpellEntry->Id)
+                        m_spells.paladin.pBlessingOfSacrifice = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blessing of Freedom") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pBlessingOfFreedom ||
+                        m_spells.paladin.pBlessingOfFreedom->Id < pSpellEntry->Id)
+                        m_spells.paladin.pBlessingOfFreedom = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blessing of Protection") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pBlessingOfProtection ||
+                        m_spells.paladin.pBlessingOfProtection->Id < pSpellEntry->Id)
+                        m_spells.paladin.pBlessingOfProtection = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blessing of Sanctuary") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pBlessingOfSanctuary ||
+                        m_spells.paladin.pBlessingOfSanctuary->Id < pSpellEntry->Id)
+                        m_spells.paladin.pBlessingOfSanctuary = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blessing of Kings") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pBlessingOfKings ||
+                        m_spells.paladin.pBlessingOfKings->Id < pSpellEntry->Id)
+                        m_spells.paladin.pBlessingOfKings = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blessing of Wisdom") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pBlessingOfWisdom ||
+                        m_spells.paladin.pBlessingOfWisdom->Id < pSpellEntry->Id)
+                        m_spells.paladin.pBlessingOfWisdom = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blessing of Might") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pBlessingOfMight ||
+                        m_spells.paladin.pBlessingOfMight->Id < pSpellEntry->Id)
+                        m_spells.paladin.pBlessingOfMight = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blessing of Light") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pBlessingOfLight ||
+                        m_spells.paladin.pBlessingOfLight->Id < pSpellEntry->Id)
+                        m_spells.paladin.pBlessingOfLight = pSpellEntry;
+                }
+                break;
+            }
+        }
 
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
         {
@@ -112,179 +165,38 @@ void BattleBotAI::PopulateSpellData()
             {
                 case SPELL_EFFECT_HEAL:
                     spellListHeal.insert(pSpellEntry);
-                case SPELL_EFFECT_SCHOOL_DAMAGE:
-                case SPELL_EFFECT_HEALTH_LEECH:
-                    spellListSpellDamage.push_back(pSpellEntry);
                     break;
-                case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
-                case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                case SPELL_EFFECT_WEAPON_DAMAGE:
-                case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-                    spellListWeaponDamage.push_back(pSpellEntry);
-                    break;
-                case SPELL_EFFECT_ATTACK_ME:
-                    spellListTaunt.push_back(pSpellEntry);
-                    break;
-                case SPELL_EFFECT_INTERRUPT_CAST:
-                    spellListInterrupt.push_back(pSpellEntry);
-                    break;
-                case SPELL_EFFECT_RESURRECT:
-                case SPELL_EFFECT_RESURRECT_NEW:
-                    m_resurrectionSpell = pSpellEntry;
-                    break;
-                case SPELL_EFFECT_HEAL_MAX_HEALTH:
-                    m_fullHealSpell = pSpellEntry;
-                    break;
-                case SPELL_EFFECT_THREAT:
-                case SPELL_EFFECT_THREAT_ALL:
-                    if (pSpellEntry->EffectBasePoints[i] < 0 &&
-                        (!m_panicSpell || m_panicSpell->Id < pSpellEntry->Id))
-                        m_panicSpell = pSpellEntry;
                 case SPELL_EFFECT_APPLY_AURA:
                 {
                     switch (pSpellEntry->EffectApplyAuraName[i])
                     {
-                        case SPELL_AURA_PERIODIC_DAMAGE:
-                            spellListDamageAura.push_back(pSpellEntry);
-                            break;
                         case SPELL_AURA_PERIODIC_HEAL:
                             spellListHealAura.push_back(pSpellEntry);
-                            break;
-                        case SPELL_AURA_MOD_SHAPESHIFT:
-                        {
-                            if (m_role == BB_ROLE_TANK)
-                            {
-                                switch (pSpellEntry->EffectMiscValue[i])
-                                {
-                                    case FORM_BEAR:
-                                    case FORM_DIREBEAR:
-                                    case FORM_CREATUREBEAR:
-                                    case FORM_DEFENSIVESTANCE:
-                                        spellListAuraBar.push_back(pSpellEntry);
-                                        break;
-                                }
-                            }
-                            else if (m_role == BB_ROLE_DPS)
-                            {
-                                switch (pSpellEntry->EffectMiscValue[i])
-                                {
-                                    case FORM_MOONKIN:
-                                    case FORM_CAT:
-                                    case FORM_SHADOW:
-                                    case FORM_BATTLESTANCE:
-                                    case FORM_BERSERKERSTANCE:
-                                        spellListAuraBar.push_back(pSpellEntry);
-                                        break;
-                                }
-                            }
-                            break;
-                        }
-                        case SPELL_AURA_MOD_CONFUSE:
-                        case SPELL_AURA_MOD_FEAR:
-                        case SPELL_AURA_MOD_STUN:
-                            spellListCrowdControlAura.insert(pSpellEntry);
-                            break;
-                        case SPELL_AURA_MOD_TAUNT:
-                            spellListTaunt.push_back(pSpellEntry);
-                            break;
-                        case SPELL_AURA_MOD_SILENCE:
-                            spellListInterrupt.push_back(pSpellEntry);
-                            break;
-                        case SPELL_AURA_MOD_THREAT:
-                            if (m_role == BB_ROLE_TANK &&
-                                pSpellEntry->EffectBasePoints[i] > 0)
-                                m_selfBuffSpell = pSpellEntry;
-                            else if (pSpellEntry->EffectBasePoints[i] < 0)
-                                m_panicSpell = pSpellEntry;
-                            break;
-                        case SPELL_AURA_MOD_TOTAL_THREAT:
-                            if (pSpellEntry->EffectBasePoints[i] < 0)
-                                m_panicSpell = pSpellEntry;
-                            break;
-                        case SPELL_AURA_SCHOOL_IMMUNITY:
-                        case SPELL_AURA_FEIGN_DEATH:
-                            m_panicSpell = pSpellEntry;
-                            break;
-                        case SPELL_AURA_EMPATHY:
-                        case SPELL_AURA_MOD_POSSESS_PET:
-                        case SPELL_AURA_NO_PVP_CREDIT:
-                        case SPELL_AURA_DUMMY:
-                            break;
-                        default:
-                            if (pSpellEntry->IsPositiveSpell() &&
-                                pSpellEntry->GetMaxDuration() >= 30000 &&
-                               !pSpellEntry->Reagent[0])
-                            {
-                                SpellEntry const** pCurrentBuff = Spells::IsExplicitPositiveTarget(pSpellEntry->EffectImplicitTargetA[i]) ?
-                                                                  &m_partyBuffSpell : &m_selfBuffSpell;
-                                if (!(*pCurrentBuff) || (pSpellEntry->Id > (*pCurrentBuff)->Id) ||
-                                    !sSpellMgr.IsRankSpellDueToSpell(pSpellEntry, (*pCurrentBuff)->Id))
-                                    *pCurrentBuff = pSpellEntry;
-                            }
                             break;
                     }
                     break;
                 }
-                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-                    spellListAuraBar.push_back(pSpellEntry);
-                    break;
             }
         }
     }
-
-    uint64 seed = time(nullptr);
-    std::shuffle(spellListHealAura.begin(), spellListHealAura.end(), std::default_random_engine(seed));
-    std::shuffle(spellListDamageAura.begin(), spellListDamageAura.end(), std::default_random_engine(seed));
-    std::shuffle(spellListSpellDamage.begin(), spellListSpellDamage.end(), std::default_random_engine(seed));
-    std::shuffle(spellListWeaponDamage.begin(), spellListWeaponDamage.end(), std::default_random_engine(seed));
 }
 
-void BattleBotAI::CloneFromPlayer(Player const* pPlayer)
-{
-    if (pPlayer->GetLevel() != me->GetLevel())
-    {
-        me->GiveLevel(pPlayer->GetLevel());
-        me->InitTalentForLevel();
-        me->SetUInt32Value(PLAYER_XP, 0);
-    }
-
-    // Learn all of the target's spells.
-    for (const auto& spell : pPlayer->GetSpellMap())
-    {
-        if (spell.second.disabled)
-            continue;
-
-        if (spell.second.state == PLAYERSPELL_REMOVED)
-            continue;
-
-        SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(spell.first);
-        if (!pSpellEntry)
-            continue;
-
-        uint32 const firstRankId = sSpellMgr.GetFirstSpellInChain(spell.first);
-        if (!me->HasSpell(spell.first))
-            me->LearnSpell(spell.first, false, (firstRankId == spell.first && GetTalentSpellPos(firstRankId)));
-    }
-
-    // Unequip current gear
-    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-        me->AutoUnequipItemFromSlot(i);
-
-    // Copy gear from target.
-    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
-    {
-        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            me->StoreNewItemInBestSlots(pItem->GetEntry(), 1);
-    }
-}
-
-void BattleBotAI::LearnPremadeSpecForClass()
+void BattleBotAI::AddPremadeGearAndSpells()
 {
     for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
     {
         if (itr.second.requiredClass == me->GetClass())
         {
             sObjectMgr.ApplyPremadeSpecTemplateToPlayer(itr.first, me);
+            break;
+        }
+    }
+
+    for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
+    {
+        if (itr.second.requiredClass == me->GetClass())
+        {
+            sObjectMgr.ApplyPremadeGearTemplateToPlayer(itr.first, me);
             break;
         }
     }
@@ -326,6 +238,51 @@ bool BattleBotAI::DrinkAndEat()
     return needToEat || needToDrink;
 }
 
+void BattleBotAI::HealInjuredAlly(float selfHealPercent)
+{
+    Unit* pTarget = SelectHealTarget(selfHealPercent);
+    if (!pTarget)
+        return;
+
+    // Put a HoT on the target if only missing a little health.
+    if (pTarget->GetHealthPercent() >= 80.0f)
+    {
+        for (const auto pSpellEntry : spellListHealAura)
+        {
+            if (CanTryToCastSpell(pTarget, pSpellEntry))
+            {
+                if (DoCastSpell(pTarget, pSpellEntry) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+
+    SpellEntry const* pHealSpell = nullptr;
+    int32 healthDiff = INT32_MAX;
+    int32 const missingHealth = pTarget->GetMaxHealth() - pTarget->GetHealth();
+
+    // Find most efficient healing spell.
+    for (const auto pSpellEntry : spellListHeal)
+    {
+        if (CanTryToCastSpell(pTarget, pSpellEntry))
+        {
+            int32 const diff = pSpellEntry->EffectBasePoints[0] - missingHealth;
+            if (std::abs(diff) < healthDiff)
+            {
+                healthDiff = diff;
+                pHealSpell = pSpellEntry;
+            }
+
+            // Healing spells are sorted from strongest to weakest.
+            if (diff < 0)
+                break;
+        }
+    }
+
+    if (pHealSpell)
+        DoCastSpell(pTarget, pHealSpell);
+}
+
 bool BattleBotAI::IsValidHealTarget(Unit const* pTarget) const
 {
     return (pTarget->GetHealthPercent() < 100.0f) &&
@@ -334,9 +291,9 @@ bool BattleBotAI::IsValidHealTarget(Unit const* pTarget) const
             me->IsWithinDist(pTarget, 30.0f);
 }
 
-Unit* BattleBotAI::SelectHealTarget() const
+Unit* BattleBotAI::SelectHealTarget(float selfHealPercent) const
 {
-    if (IsValidHealTarget(me))
+    if (me->GetHealthPercent() < selfHealPercent)
         return me;
 
     Unit* pTarget = nullptr;
@@ -384,70 +341,121 @@ bool BattleBotAI::IsValidHostileTarget(Unit const* pTarget) const
            !pTarget->HasBreakableByDamageCrowdControlAura();
 }
 
+void BattleBotAI::AttackStart(Unit* pVictim)
+{
+    if (me->IsMounted())
+        me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+
+    if (me->Attack(pVictim, true))
+    {
+        ClearPath();
+
+        if (IsRangedDamageClass(me->GetClass()) &&
+            me->GetPowerPercent(POWER_MANA) > 10.0f && me->GetCombatDistance(pVictim) > 8.0f)
+            me->SetCasterChaseDistance(25.0f);
+
+        me->GetMotionMaster()->MoveChase(pVictim, 1.0f);
+    }
+}
+
 Unit* BattleBotAI::SelectAttackTarget() const
 {
-    // Who is attacking me.
-    for (const auto pAttacker : me->GetAttackers())
-    {
-        if (IsValidHostileTarget(pAttacker))
-            return pAttacker;
-    }
+    std::list<Unit*> targets;
+    HostileReference* pReference = me->GetHostileRefManager().getFirst();
 
-    // Check if other group members are under attack.
-    Group* pGroup = me->GetGroup();
-    if (pGroup)
+    while (pReference)
     {
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        if (Unit* pTarget = pReference->getSourceUnit())
         {
-            if (Player* pMember = itr->getSource())
+            if (IsValidHostileTarget(pTarget))
             {
-                // We already checked self and leader.
-                if (pMember == me)
-                    continue;
-
-                for (const auto pAttacker : pMember->GetAttackers())
+                if (me->GetTeam() == HORDE)
                 {
-                    if (IsValidHostileTarget(pAttacker))
-                        return pAttacker;
+                    if (pTarget->HasAura(AURA_WARSONG_FLAG))
+                        return pTarget;
                 }
+                else
+                {
+                    if (pTarget->HasAura(AURA_SILVERWING_FLAG))
+                        return pTarget;
+                }
+
+                targets.push_back(pTarget);
             }
         }
+        pReference = pReference->next();
     }
 
-    // Search for victim
-    if (me->GetVictim() == nullptr)
+    if (!targets.empty())
     {
-        if (Unit* NewTarget = me->SelectNearestTarget(100.0f))
+        targets.sort([this](Unit* pUnit1, const Unit* pUnit2)
         {
-            bool rnd = urand(0, 1);
-            if (IsValidHostileTarget(NewTarget) && NewTarget->IsAlive() && rnd)
-                return NewTarget;
+            return me->GetDistance(pUnit1) < me->GetDistance(pUnit2);
+        });
+
+        return *targets.begin();
+    }
+
+    std::list<Player*> players;
+    MaNGOS::AnyPlayerInObjectRangeCheck p_check(me, VISIBILITY_DISTANCE_NORMAL);
+    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, p_check);
+    Cell::VisitWorldObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
+
+    for (const auto& pTarget : players)
+    {
+        if (!IsValidHostileTarget(pTarget))
+            continue;
+
+        if (me->GetTeam() == HORDE)
+        {
+            if (pTarget->HasAura(AURA_WARSONG_FLAG))
+                return pTarget;
         }
+        else
+        {
+            if (pTarget->HasAura(AURA_SILVERWING_FLAG))
+                return pTarget;
+        }
+
+        // Aggro weak enemies from further away.
+        uint32 const aggroDistance = me->GetHealth() > pTarget->GetHealth() ? 50.0f : 20.0f;
+        if (!me->IsWithinDist(pTarget, aggroDistance))
+            continue;
+
+        if (me->IsWithinLOSInMap(pTarget))
+            return pTarget;
     }
 
     return nullptr;
 }
 
-Player* BattleBotAI::SelectResurrectionTarget() const
+Unit* BattleBotAI::SelectFollowTarget() const
 {
-    Group* pGroup = me->GetGroup();
-    if (pGroup)
-    {
-        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
-        {
-            if (Player* pMember = itr->getSource())
-            {
-                // Can't resurrect self.
-                if (pMember == me)
-                    continue;
+    std::list<Player*> players;
+    MaNGOS::AnyPlayerInObjectRangeCheck p_check(me, VISIBILITY_DISTANCE_NORMAL);
+    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, p_check);
+    Cell::VisitWorldObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
 
-                if (pMember->GetDeathState() == CORPSE)
-                    return pMember;
-            }
+    for (const auto& pTarget : players)
+    {
+        if (pTarget == me)
+            continue;
+
+        if (me->GetTeam() == ALLIANCE)
+        {
+            if (pTarget->HasAura(AURA_WARSONG_FLAG))
+                return pTarget;
+        }
+        else
+        {
+            if (pTarget->HasAura(AURA_SILVERWING_FLAG))
+                return pTarget;
         }
     }
+
     return nullptr;
 }
+
 
 bool BattleBotAI::IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const
 {
@@ -556,43 +564,6 @@ bool BattleBotAI::IsRangedDamageClass(uint8 playerClass)
     return false;
 }
 
-void BattleBotAI::CastRandomDamageSpell(Unit* pVictim)
-{
-    if (IsPhysicalDamageClass(me->GetClass()))
-    {
-        for (const auto pSpellEntry : spellListWeaponDamage)
-        {
-            if (CanTryToCastSpell(pVictim, pSpellEntry))
-            {
-                if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
-                    return;
-            }
-        }
-    }
-    if (urand(0, 1) && !spellListDamageAura.empty())
-    {
-        for (const auto pSpellEntry : spellListDamageAura)
-        {
-            if (CanTryToCastSpell(pVictim, pSpellEntry))
-            {
-                if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
-                    return;
-            }
-        }
-    }
-    else
-    {
-        for (const auto pSpellEntry : spellListSpellDamage)
-        {
-            if (CanTryToCastSpell(pVictim, pSpellEntry))
-            {
-                if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
-                    return;
-            }
-        }
-    }
-}
-
 bool BattleBotAI::CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry)
 {
     if (me->HasSpellCooldown(pSpellEntry->Id))
@@ -643,11 +614,26 @@ SpellCastResult BattleBotAI::DoCastSpell(Unit* pTarget, SpellEntry const* pSpell
     me->SetTargetGuid(pTarget->GetObjectGuid());
     auto result = me->CastSpell(pTarget, pSpellEntry, false);
 
+    printf("cast %s result %u\n", pSpellEntry->SpellName[0].c_str(), result);
+
     if ((result == SPELL_FAILED_MOVING ||
         result == SPELL_CAST_OK) &&
         (pSpellEntry->GetCastTime() > 0) &&
         (me->IsMoving() || !me->IsStopped()))
         me->StopMoving();
+
+    if ((result == SPELL_FAILED_NEED_AMMO_POUCH ||
+        result == SPELL_FAILED_ITEM_NOT_READY) &&
+        pSpellEntry->Reagent[0])
+    {
+        if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START))
+            me->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+
+        ItemPosCountVec dest;
+        uint8 msg = me->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pSpellEntry->Reagent[0], 1);
+        if (msg == EQUIP_ERR_OK)
+            me->StoreNewItem(dest, pSpellEntry->Reagent[0], true, Item::GenerateItemRandomPropertyId(pSpellEntry->Reagent[0]));
+    }
 
     return result;
 }
@@ -921,6 +907,7 @@ void BattleBotAI::UpdateMovement()
     switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
     {
         case IDLE_MOTION_TYPE:
+        case CHASE_MOTION_TYPE:
         case POINT_MOTION_TYPE:
             break;
         default:
@@ -949,6 +936,13 @@ void BattleBotAI::OnJustRevived()
 
 void BattleBotAI::OnEnterBattleGround()
 {
+    BattleGround* bg = me->GetBattleGround();
+    if (!bg)
+        return;
+
+    if (bg->GetStatus() != STATUS_WAIT_JOIN)
+        return;
+
     if (me->GetBattleGround()->GetTypeID() == BATTLEGROUND_WS)
     {
         m_waitingSpot = urand(BB_WSG_WAIT_SPOT_SPAWN, BB_WSG_WAIT_SPOT_RIGHT);
@@ -974,6 +968,94 @@ void BattleBotAI::OnLeaveBattleGround()
     ClearPath();
 }
 
+void BattleBotAI::UpdateOutOfCombatAI()
+{
+    switch (me->GetClass())
+    {
+        case CLASS_PALADIN:
+            UpdateOutOfCombatAI_Paladin();
+            break;
+    }
+}
+
+void BattleBotAI::UpdateInCombatAI()
+{
+    switch (me->GetClass())
+    {
+        case CLASS_PALADIN:
+            UpdateInCombatAI_Paladin();
+            break;
+    }
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Paladin()
+{
+    bool hasBlessing = (m_spells.paladin.pBlessingOfKings && me->HasAura(m_spells.paladin.pBlessingOfKings->Id)) ||
+                       (m_spells.paladin.pBlessingOfSanctuary && me->HasAura(m_spells.paladin.pBlessingOfSanctuary->Id)) ||
+                       (m_spells.paladin.pBlessingOfMight && me->HasAura(m_spells.paladin.pBlessingOfMight->Id)) ||
+                       (m_spells.paladin.pBlessingOfWisdom && me->HasAura(m_spells.paladin.pBlessingOfWisdom->Id)) ||
+                       (m_spells.paladin.pBlessingOfLight && me->HasAura(m_spells.paladin.pBlessingOfLight->Id));
+
+    if (!hasBlessing)
+    {
+        if (m_spells.paladin.pBlessingOfKings &&
+            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfKings) &&
+            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfKings))
+            DoCastSpell(me, m_spells.paladin.pBlessingOfKings);
+        else if (m_spells.paladin.pBlessingOfSanctuary &&
+            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfSanctuary) &&
+            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfSanctuary))
+            DoCastSpell(me, m_spells.paladin.pBlessingOfSanctuary);
+        else if (m_spells.paladin.pBlessingOfMight &&
+            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfMight) &&
+            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfMight))
+            DoCastSpell(me, m_spells.paladin.pBlessingOfMight);
+        else if (m_spells.paladin.pBlessingOfWisdom &&
+            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfWisdom) &&
+            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfWisdom))
+            DoCastSpell(me, m_spells.paladin.pBlessingOfWisdom);
+        else if (m_spells.paladin.pBlessingOfLight &&
+            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfLight) &&
+            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfLight))
+            DoCastSpell(me, m_spells.paladin.pBlessingOfLight);
+    }
+}
+
+void BattleBotAI::UpdateInCombatAI_Paladin()
+{
+    bool hasSeal = (m_spells.paladin.pSealOfCommand && me->HasAura(m_spells.paladin.pSealOfCommand->Id)) ||
+                   (m_spells.paladin.pSealOfRighteousness && me->HasAura(m_spells.paladin.pSealOfRighteousness->Id));
+
+    if (!hasSeal)
+    {
+        if (m_spells.paladin.pSealOfCommand &&
+            CanTryToCastSpell(me, m_spells.paladin.pSealOfCommand))
+            me->CastSpell(me, m_spells.paladin.pSealOfCommand, false);
+        else if (m_spells.paladin.pSealOfRighteousness &&
+            CanTryToCastSpell(me, m_spells.paladin.pSealOfRighteousness))
+            me->CastSpell(me, m_spells.paladin.pSealOfRighteousness, false);
+    }
+    
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (hasSeal && m_spells.paladin.pJudgement &&
+            CanTryToCastSpell(pVictim, m_spells.paladin.pJudgement))
+        {
+            if (DoCastSpell(pVictim, m_spells.paladin.pJudgement) == SPELL_CAST_OK)
+                return;
+        }
+        if (m_spells.paladin.pHammerOfJustice &&
+            pVictim->IsNonMeleeSpellCasted() &&
+            CanTryToCastSpell(pVictim, m_spells.paladin.pHammerOfJustice))
+        {
+            if (DoCastSpell(pVictim, m_spells.paladin.pHammerOfJustice) == SPELL_CAST_OK)
+                return;
+        }
+    }
+
+    HealInjuredAlly(40.0f);
+}
+
 void BattleBotAI::UpdateAI(uint32 const diff)
 {
     m_updateTimer.Update(diff);
@@ -987,36 +1069,12 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (!m_initialized)
     {
-        if (m_role == BB_ROLE_INVALID)
-            AutoAssignRole();
-
-        // add gear to character
-        for (auto itr : sObjectMgr.GetPlayerPremadeGearTemplates())
-        {
-            if (itr.second.requiredClass == me->GetClass())
-            {
-                if (m_hasGear == false)
-                {
-                    std::string str = std::to_string(itr.first);
-                    char* cstr = new char[str.length() + 1];
-                    strcpy(cstr, str.c_str());
-
-                    ChatHandler(me).HandleCharacterPremadeGearCommand(cstr);
-                    m_hasGear = true;
-                }
-            }
-        }
-
-        if (Player const* pPlayer = sObjectAccessor.FindPlayer(m_cloneGuid))
-            CloneFromPlayer(pPlayer);
-        else
-            LearnPremadeSpecForClass();
-
+        ResetSpellData();
+        AddPremadeGearAndSpells();
         PopulateSpellData();
         me->UpdateSkillsToMaxSkillsForLevel();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         SummonPetIfNeeded();
-
         m_initialized = true;
         return;
     }
@@ -1117,142 +1175,81 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     if (me->IsNonMeleeSpellCasted(false, false, true))
         return;
 
-    UpdateMovement();
-    return;
+    Unit* pVictim = me->GetVictim();
 
     if (!me->IsInCombat())
     {
-        if (m_checkBuffs &&
-            // dont interrupt drinking
-            me->GetStandState() == UNIT_STAND_STATE_STAND &&
-            // only buff if not low on mana
-           ((me->GetPowerType() != POWER_MANA) || (me->GetPowerPercent(POWER_MANA) > 50.0f)))
-        {
-            if (m_selfBuffSpell && me->GetGlobalCooldownMgr().HasGlobalCooldown(m_selfBuffSpell))
-                return;
-            if (m_partyBuffSpell && me->GetGlobalCooldownMgr().HasGlobalCooldown(m_partyBuffSpell))
-                return;
-
-            if (m_selfBuffSpell)
-                if (CanTryToCastSpell(me, m_selfBuffSpell))
-                    if (DoCastSpell(me, m_selfBuffSpell) == SPELL_CAST_OK)
-                        return;
-                
-            if (m_partyBuffSpell)
-                if (Player* pTarget = SelectBuffTarget(m_partyBuffSpell))
-                    if (CanTryToCastSpell(pTarget, m_partyBuffSpell))
-                        if (DoCastSpell(pTarget, m_partyBuffSpell) == SPELL_CAST_OK)
-                            return;
-
-            SummonPetIfNeeded();
-            m_checkBuffs = false;
-            return;
-        }
-
         if (DrinkAndEat())
             return;
 
-        if (m_resurrectionSpell)
-            if (Player* pTarget = SelectResurrectionTarget())
-                if (CanTryToCastSpell(pTarget, m_resurrectionSpell))
-                    if (DoCastSpell(pTarget, m_resurrectionSpell) == SPELL_CAST_OK)
-                        return;
+        if (me->GetStandState() != UNIT_STAND_STATE_STAND)
+            me->SetStandState(UNIT_STAND_STATE_STAND);
 
-        // Teleport to leader if too far away.
-        /*if (!me->IsWithinDistInMap(pLeader, 100.0f))
-        {
-            if (!me->IsStopped())
-                me->StopMoving();
-            me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MoveIdle();
-            char name[128] = {};
-            strcpy(name, pLeader->GetName());
-            ChatHandler(me).HandleGonameCommand(name);
-            return;
-        }
+        UpdateOutOfCombatAI();
 
-        // Mount if leader is mounted.
-        if (pLeader->IsMounted())
+        if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
         {
-            if (!me->IsMounted())
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
             {
-                auto auraList = pLeader->GetAurasByType(SPELL_AURA_MOUNTED);
-                if (!auraList.empty())
+                if (Unit* pFlagCarrier = SelectFollowTarget())
                 {
-                    bool oldState = me->HasCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
-                    me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, true);
-                    me->CastSpell(me, (*auraList.begin())->GetId(), true);
-                    me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, oldState);
-                } 
+                    ClearPath();
+                    me->GetMotionMaster()->MoveFollow(pFlagCarrier, frand(3.0f, 5.0f), frand(0.0f, 3.0f));
+                    return;
+                }
             }
+            else if (FollowMovementGenerator<Player> const* pMoveGen = dynamic_cast<FollowMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent()))
+            {
+                Unit* pTarget = pMoveGen->GetTarget();
+                if (!pTarget || !pTarget->IsAlive() || !pTarget->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
+                {
+                    if (!me->IsStopped())
+                        me->StopMoving();
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveIdle();
+                    return;
+                }
+            }
+
+            if (Unit* pVictim = SelectAttackTarget())
+            {
+                AttackStart(pVictim);
+                return;
+            }
+            
+            UpdateMovement();
         }
-        else if (me->IsMounted())
-            me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);*/
-
-
-    }
-    else
-    {
-        m_checkBuffs = true; // rebuff as soon as we leave combat
-
+        return;
     }
 
     if (me->GetStandState() != UNIT_STAND_STATE_STAND)
         me->SetStandState(UNIT_STAND_STATE_STAND);
 
-    if (!spellListAuraBar.empty())
+    if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura() || 
+        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
     {
-        bool noAura = true;
-        for (auto spell : spellListAuraBar)
+        if (pVictim = SelectAttackTarget())
         {
-            if (me->HasAura(spell->Id))
-            {
-                noAura = false;
-                break;
-            }
+            AttackStart(pVictim);
+            return;
         }
-
-        if (noAura)
-            me->CastSpell(me, SelectRandomContainerElement(spellListAuraBar), false);
-    }
-
-    Unit* pVictim = me->GetVictim();
-
-    if (m_role != BB_ROLE_HEALER)
-    {
-        if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
+        else if (pVictim && me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
         {
-            if (pVictim = SelectAttackTarget())
-            {
-                if (me->IsMounted())
-                    me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
-
-                if (me->Attack(pVictim, true))
-                {
-                    if (m_role == BB_ROLE_DPS && IsRangedDamageClass(me->GetClass()) &&
-                        me->GetPowerPercent(POWER_MANA) > 10.0f && me->GetCombatDistance(pVictim) > 8.0f)
-                        me->SetCasterChaseDistance(25.0f);
-
-                    me->GetMotionMaster()->MoveChase(pVictim, 1.0f);
-                } 
-            }
-        }
-
-        if (pVictim && !me->HasInArc(2 * M_PI_F / 3, pVictim) && !me->IsMoving())
-        {
-            me->SetInFront(pVictim);
-            me->SetFacingToObject(pVictim);
-            me->SendHeartBeat();
-        }
-
-        if (pVictim)
-        {
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-                me->GetMotionMaster()->MoveChase(pVictim, 1.0f);
+            me->AttackStop(true);
+            if (!me->IsStopped())
+                me->StopMoving();
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveIdle();
+            return;
         }
     }
 
-    // Combat Logic Below
+    if (pVictim && !me->HasInArc(2 * M_PI_F / 3, pVictim) && !me->IsMoving())
+    {
+        me->SetInFront(pVictim);
+        me->SetFacingToObject(pVictim);
+        me->SendHeartBeat();
+    }
 
     if (pVictim && me->HasDistanceCasterMovement() &&
         me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
@@ -1263,140 +1260,6 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         me->GetMotionMaster()->MoveChase(pVictim, 1.0f);
     }
 
-    // Crowd control and run from enemies.
-    if (!me->GetAttackers().empty() &&
-       (m_role != BB_ROLE_TANK))
-    {
-        Unit* pAttacker = *me->GetAttackers().begin();
-        if (!pAttacker->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-        {
-            if (m_panicSpell && me->GetHealthPercent() < 60.0f &&
-                CanTryToCastSpell(pAttacker, m_panicSpell))
-            {
-                if (DoCastSpell(Spells::IsExplicitNegativeTarget(m_panicSpell->EffectImplicitTargetA[0]) ?
-                    pAttacker : me, m_panicSpell) == SPELL_CAST_OK)
-                    return;
-            }
-            if (!spellListCrowdControlAura.empty())
-            {
-                for (const auto pSpellEntry : spellListCrowdControlAura)
-                {
-                    if (CanTryToCastSpell(pAttacker, pSpellEntry))
-                    {
-                        if (DoCastSpell(pAttacker, pSpellEntry) == SPELL_CAST_OK)
-                        {
-                            if (pAttacker == me->GetVictim())
-                                me->AttackStop(true);
-                            return;
-                        }
-                    }
-                }
-            }
-            if (me->IsCaster() && me->IsWithinDist(pAttacker, 15.0f) && me->GetHealthPercent() < 20.0f)
-            {
-                me->GetMotionMaster()->MoveDistance(pAttacker, 20.0f);
-                return;
-            }
-        }
-    }
-
-    if (m_role != BB_ROLE_HEALER)
-    {
-        if (!pVictim)
-            return;
-
-        // If tank then taunt mobs attacking others.
-        if (m_role == BB_ROLE_TANK &&
-            me != pVictim->GetVictim() &&
-            !spellListTaunt.empty())
-        {
-            for (const auto pSpellEntry : spellListTaunt)
-            {
-                if (!pVictim->HasBreakableByDamageCrowdControlAura() &&
-                    !pVictim->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) &&
-                    CanTryToCastSpell(pVictim, pSpellEntry))
-                {
-                    if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-        }
-
-        // Interrupt enemy spell casting.
-        if (!spellListInterrupt.empty() &&
-            pVictim->IsNonMeleeSpellCasted())
-        {
-            for (const auto pSpellEntry : spellListInterrupt)
-            {
-                if (CanTryToCastSpell(pVictim, pSpellEntry))
-                {
-                    if (DoCastSpell(pVictim, pSpellEntry) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-        }
-
-        // Make hunter use auto shot.
-        if (me->HasSpell(BB_SPELL_AUTO_SHOT) &&
-           (me->GetDistance(pVictim) > 8.0f) &&
-           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
-            me->CastSpell(pVictim, BB_SPELL_AUTO_SHOT, false);
-
-        CastRandomDamageSpell(pVictim);
-    }
-    else // Healer
-    {
-        Unit* pTarget = SelectHealTarget();
-        if (!pTarget)
-        {
-            /*if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-                me->GetMotionMaster()->MoveFollow(pLeader, frand(BB_MIN_FOLLOW_DIST, BB_MAX_FOLLOW_DIST), frand(BB_MIN_FOLLOW_ANGLE, BB_MAX_FOLLOW_ANGLE));*/
-            return;
-        }
-
-        // Put a HoT on the target if only missing a little health.
-        if (pTarget->GetHealthPercent() >= 80.0f)
-        {
-            for (const auto pSpellEntry : spellListHealAura)
-            {
-                if (CanTryToCastSpell(pTarget, pSpellEntry))
-                {
-                    if (DoCastSpell(pTarget, pSpellEntry) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-        }
-        // Use Lay on Hands if target is about to die.
-        else if (m_fullHealSpell && pTarget->GetHealthPercent() <= 10.0f &&
-                 CanTryToCastSpell(pTarget, m_fullHealSpell))
-        {
-            if (DoCastSpell(pTarget, m_fullHealSpell) == SPELL_CAST_OK)
-                return;
-        }
-
-        SpellEntry const* pHealSpell = nullptr;
-        int32 healthDiff = INT32_MAX;
-        int32 const missingHealth = pTarget->GetMaxHealth() - pTarget->GetHealth();
-
-        // Find most efficient healing spell.
-        for (const auto pSpellEntry : spellListHeal)
-        {
-            if (CanTryToCastSpell(pTarget, pSpellEntry))
-            {
-                int32 const diff = pSpellEntry->EffectBasePoints[0] - missingHealth;
-                if (std::abs(diff) < healthDiff)
-                {
-                    healthDiff = diff;
-                    pHealSpell = pSpellEntry;
-                }
-
-                // Healing spells are sorted from strongest to weakest.
-                if (diff < 0)
-                    break;
-            }
-        }
-
-        if (pHealSpell)
-            DoCastSpell(pTarget, pHealSpell);
-    }
+    if (me->IsInCombat())
+        UpdateInCombatAI();
 }
