@@ -59,6 +59,7 @@ public:
     void EquipOrUseNewItem();
     bool IsPhysicalDamageClass(uint8 playerClass);
     bool IsRangedDamageClass(uint8 playerClass);
+    void DoGraveyardJump();
 
     SpellEntry const* m_fullHealSpell = nullptr;
     SpellEntry const* m_panicSpell = nullptr;
@@ -93,6 +94,8 @@ public:
     float m_z = 0.0f;
     float m_o = 0.0f;
     bool m_hasGear = false;
+    bool m_wasDead = false;
+    bool m_doingGraveyardJump = false;
 };
 
 #endif

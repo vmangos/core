@@ -692,6 +692,33 @@ void BattleBotAI::EquipOrUseNewItem()
     }
 }
 
+void BattleBotAI::DoGraveyardJump()
+{
+    m_doingGraveyardJump = true;
+    uint32 timeOffset = 0;
+    std::vector<RecordedMovementPacket>* pPath = me->GetTeam() == HORDE ? &vHordeGraveyardJumpPath : &vAllianceGraveyardJumpPath;
+    for (uint32 i = 0; i < (*pPath).size(); i++)
+    {
+        RecordedMovementPacket* point = &((*pPath)[i]);
+        Player* pBot = me;
+        BattleBotAI* pAI = this;
+        bool isLast = i == (*pPath).size() - 1;
+        timeOffset += point->timeDiff;
+        me->m_Events.AddLambdaEventAtOffset([pBot, pAI, point, isLast]
+        {
+            if (!pBot->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+            {
+                pBot->SetUnitMovementFlags(point->moveFlags);
+                pBot->Relocate(point->position.x, point->position.y, point->position.z, point->position.o);
+                pBot->SendMovementPacket(point->opcode, false);
+            }
+
+            if (isLast)
+                pAI->m_doingGraveyardJump = false;
+        }, timeOffset);
+    }
+}
+
 void BattleBotAI::SendFakePacket(uint16 opcode)
 {
     printf("Bot send %s\n", LookupOpcodeName(opcode));
@@ -881,7 +908,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     else
         return;
 
-    if (!me->IsInWorld() || me->IsBeingTeleported())
+    if (!me->IsInWorld() || me->IsBeingTeleported() || m_doingGraveyardJump)
         return;
 
     if (!m_initialized)
@@ -951,6 +978,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (me->IsDead())
     {
+        m_wasDead = true;
         if (me->InBattleGround())
         {
             if (me->GetDeathState() == CORPSE)
@@ -970,6 +998,14 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         }
         
         return;
+    }
+    else
+    {
+        if (m_wasDead)
+        {
+            m_wasDead = false;
+            DoGraveyardJump();
+        }
     }
 
     if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))

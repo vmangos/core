@@ -24,6 +24,19 @@ enum WarsongFlagSpells
     WS_SPELL_SILVERWING_FLAG = 23335,
 };
 
+struct RecordedMovementPacket
+{
+    RecordedMovementPacket(uint16 opcode_, uint32 timeDiff_, uint32 moveFlags_, float x, float y, float z, float o) :
+        opcode(opcode_), timeDiff(timeDiff_), moveFlags(moveFlags_), position(x, y, z, o) {};
+    uint16 opcode = 0;
+    uint32 timeDiff = 0;
+    uint32 moveFlags = 0;
+    Position position;
+};
+
+extern std::vector<RecordedMovementPacket> vAllianceGraveyardJumpPath;
+extern std::vector<RecordedMovementPacket> vHordeGraveyardJumpPath;
+
 Position const WS_WAITING_POS_HORDE = { 944.981f, 1423.478f, 345.434f, 6.188937f };
 Position const WS_WAITING_POS_ALLIANCE = { 1510.502f, 1493.385f, 351.995f, 6.188937f };
 Position const WS_FLAG_POS_HORDE = { 915.958f, 1433.925f, 346.193f, 0.000000f };
