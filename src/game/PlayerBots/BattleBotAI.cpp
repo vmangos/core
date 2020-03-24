@@ -972,10 +972,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         // Remain idle until we can join battleground.
         return;
     }
-
-    if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-        return;
-
+    
     if (me->IsDead())
     {
         m_wasDead = true;
@@ -1005,8 +1002,12 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         {
             m_wasDead = false;
             DoGraveyardJump();
+            return;
         }
     }
+
+    if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+        return;
 
     if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
     {
