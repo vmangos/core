@@ -250,6 +250,34 @@ void BattleBotAI::PopulateSpellData()
                 }
                 break;
             }
+            case CLASS_HUNTER:
+            {
+                if (pSpellEntry->SpellName[0].find("Aspect of the Cheetah") != std::string::npos)
+                {
+                    if (!m_spells.hunter.pAspectOfTheCheetah ||
+                        m_spells.hunter.pAspectOfTheCheetah->Id < pSpellEntry->Id)
+                        m_spells.hunter.pAspectOfTheCheetah = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Aspect of the Hawk") != std::string::npos)
+                {
+                    if (!m_spells.hunter.pAspectOfTheHawk ||
+                        m_spells.hunter.pAspectOfTheHawk->Id < pSpellEntry->Id)
+                        m_spells.hunter.pAspectOfTheHawk = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Aspect of the Monkey") != std::string::npos)
+                {
+                    if (!m_spells.hunter.pAspectOfTheMonkey ||
+                        m_spells.hunter.pAspectOfTheMonkey->Id < pSpellEntry->Id)
+                        m_spells.hunter.pAspectOfTheMonkey = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Arcane Shot") != std::string::npos)
+                {
+                    if (!m_spells.hunter.pArcaneShot ||
+                        m_spells.hunter.pArcaneShot->Id < pSpellEntry->Id)
+                        m_spells.hunter.pArcaneShot = pSpellEntry;
+                }
+                break;
+            }
         }
 
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
@@ -349,6 +377,7 @@ bool BattleBotAI::DrinkAndEat()
     {
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
+            ClearPath();
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
         }
@@ -360,6 +389,7 @@ bool BattleBotAI::DrinkAndEat()
     {
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
+            ClearPath();
             me->StopMoving();
             me->GetMotionMaster()->MoveIdle();
         }
@@ -495,7 +525,7 @@ bool BattleBotAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSp
             friendly_dispel))
     {
         if (!friendly_dispel && !me->IsValidAttackTarget(pTarget))
-            return SPELL_FAILED_BAD_TARGETS;
+            return false;
 
         auto const& auras = pTarget->GetSpellAuraHolderMap();
         for (const auto& aura : auras)
@@ -1161,6 +1191,9 @@ void BattleBotAI::UpdateOutOfCombatAI()
         case CLASS_PALADIN:
             UpdateOutOfCombatAI_Paladin();
             break;
+        case CLASS_HUNTER:
+            UpdateOutOfCombatAI_Hunter();
+            break;
     }
 }
 
@@ -1171,6 +1204,61 @@ void BattleBotAI::UpdateInCombatAI()
         case CLASS_PALADIN:
             UpdateInCombatAI_Paladin();
             break;
+        case CLASS_HUNTER:
+            UpdateInCombatAI_Hunter();
+            break;
+    }
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Hunter()
+{
+    if (m_spells.hunter.pAspectOfTheCheetah &&
+        !me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id) &&
+        CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheCheetah))
+    {
+        if (DoCastSpell(me, m_spells.hunter.pAspectOfTheCheetah) == SPELL_CAST_OK)
+            return;
+    }
+}
+
+void BattleBotAI::UpdateInCombatAI_Hunter()
+{
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_spells.hunter.pArcaneShot &&
+            CanTryToCastSpell(pVictim, m_spells.hunter.pArcaneShot))
+        {
+            if (DoCastSpell(pVictim, m_spells.hunter.pArcaneShot) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.hunter.pAspectOfTheCheetah &&
+            me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id))
+        {
+            if (pVictim->CanReachWithMeleeAutoAttack(me))
+            {
+                if (m_spells.hunter.pAspectOfTheMonkey &&
+                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheMonkey))
+                {
+                    if (DoCastSpell(me, m_spells.hunter.pAspectOfTheMonkey) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+            else
+            {
+                if (m_spells.hunter.pAspectOfTheHawk &&
+                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheHawk))
+                {
+                    if (DoCastSpell(me, m_spells.hunter.pAspectOfTheHawk) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+        }
+
+        if (me->HasSpell(75) &&
+           (me->GetDistance(pVictim) > 8.0f) &&
+           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+            me->CastSpell(pVictim, 75, false);
     }
 }
 
@@ -1255,6 +1343,14 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
             CanTryToCastSpell(me, m_spells.paladin.pConsecration))
         {
             if (DoCastSpell(me, m_spells.paladin.pConsecration) == SPELL_CAST_OK)
+                return;
+        }
+        if (m_spells.paladin.pExorcism &&
+            pVictim->IsCreature() &&
+           (pVictim->GetCreatureType() == CREATURE_TYPE_UNDEAD) &&
+            CanTryToCastSpell(pVictim, m_spells.paladin.pExorcism))
+        {
+            if (DoCastSpell(pVictim, m_spells.paladin.pExorcism) == SPELL_CAST_OK)
                 return;
         }
     }
