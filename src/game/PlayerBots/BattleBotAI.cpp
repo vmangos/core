@@ -278,6 +278,70 @@ void BattleBotAI::PopulateSpellData()
                 }
                 break;
             }
+            case CLASS_MAGE:
+            {
+                if (pSpellEntry->SpellName[0].find("Ice Armor") != std::string::npos)
+                {
+                    if (!m_spells.mage.pIceArmor ||
+                        m_spells.mage.pIceArmor->Id < pSpellEntry->Id)
+                        m_spells.mage.pIceArmor = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Ice Barrier") != std::string::npos)
+                {
+                    if (!m_spells.mage.pIceBarrier ||
+                        m_spells.mage.pIceBarrier->Id < pSpellEntry->Id)
+                        m_spells.mage.pIceBarrier = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Arcane Intellect") != std::string::npos)
+                {
+                    if (!m_spells.mage.pArcaneIntellect ||
+                        m_spells.mage.pArcaneIntellect->Id < pSpellEntry->Id)
+                        m_spells.mage.pArcaneIntellect = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Polymorph") != std::string::npos)
+                {
+                    if (!m_spells.mage.pPolymorph ||
+                        m_spells.mage.pPolymorph->Id < pSpellEntry->Id)
+                        m_spells.mage.pPolymorph = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Frostbolt") != std::string::npos)
+                {
+                    if (!m_spells.mage.pFrostbolt ||
+                        m_spells.mage.pFrostbolt->Id < pSpellEntry->Id)
+                        m_spells.mage.pFrostbolt = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("FireBlast") != std::string::npos)
+                {
+                    if (!m_spells.mage.pFireBlast ||
+                        m_spells.mage.pFireBlast->Id < pSpellEntry->Id)
+                        m_spells.mage.pFireBlast = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Fireball") != std::string::npos)
+                {
+                    if (!m_spells.mage.pFireball ||
+                        m_spells.mage.pFireball->Id < pSpellEntry->Id)
+                        m_spells.mage.pFireball = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Arcane Explosion") != std::string::npos)
+                {
+                    if (!m_spells.mage.pArcaneExplosion ||
+                        m_spells.mage.pArcaneExplosion->Id < pSpellEntry->Id)
+                        m_spells.mage.pArcaneExplosion = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("FrostNova") != std::string::npos)
+                {
+                    if (!m_spells.mage.pFrostNova ||
+                        m_spells.mage.pFrostNova->Id < pSpellEntry->Id)
+                        m_spells.mage.pFrostNova = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Cone of Cold") != std::string::npos)
+                {
+                    if (!m_spells.mage.pConeofCold ||
+                        m_spells.mage.pConeofCold->Id < pSpellEntry->Id)
+                        m_spells.mage.pConeofCold = pSpellEntry;
+                }
+                break;
+            }
         }
 
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
@@ -1194,6 +1258,9 @@ void BattleBotAI::UpdateOutOfCombatAI()
         case CLASS_HUNTER:
             UpdateOutOfCombatAI_Hunter();
             break;
+        case CLASS_MAGE:
+            UpdateOutOfCombatAI_Mage();
+            break;
     }
 }
 
@@ -1207,58 +1274,9 @@ void BattleBotAI::UpdateInCombatAI()
         case CLASS_HUNTER:
             UpdateInCombatAI_Hunter();
             break;
-    }
-}
-
-void BattleBotAI::UpdateOutOfCombatAI_Hunter()
-{
-    if (m_spells.hunter.pAspectOfTheCheetah &&
-        !me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id) &&
-        CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheCheetah))
-    {
-        if (DoCastSpell(me, m_spells.hunter.pAspectOfTheCheetah) == SPELL_CAST_OK)
-            return;
-    }
-}
-
-void BattleBotAI::UpdateInCombatAI_Hunter()
-{
-    if (Unit* pVictim = me->GetVictim())
-    {
-        if (m_spells.hunter.pArcaneShot &&
-            CanTryToCastSpell(pVictim, m_spells.hunter.pArcaneShot))
-        {
-            if (DoCastSpell(pVictim, m_spells.hunter.pArcaneShot) == SPELL_CAST_OK)
-                return;
-        }
-
-        if (m_spells.hunter.pAspectOfTheCheetah &&
-            me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id))
-        {
-            if (pVictim->CanReachWithMeleeAutoAttack(me))
-            {
-                if (m_spells.hunter.pAspectOfTheMonkey &&
-                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheMonkey))
-                {
-                    if (DoCastSpell(me, m_spells.hunter.pAspectOfTheMonkey) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-            else
-            {
-                if (m_spells.hunter.pAspectOfTheHawk &&
-                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheHawk))
-                {
-                    if (DoCastSpell(me, m_spells.hunter.pAspectOfTheHawk) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-        }
-
-        if (me->HasSpell(75) &&
-           (me->GetDistance(pVictim) > 8.0f) &&
-           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
-            me->CastSpell(pVictim, 75, false);
+        case CLASS_MAGE:
+            UpdateInCombatAI_Mage();
+            break;
     }
 }
 
@@ -1410,6 +1428,142 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
     }
 
     HealInjuredAlly(40.0f);
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Hunter()
+{
+    if (m_spells.hunter.pAspectOfTheCheetah &&
+        !me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id) &&
+        CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheCheetah))
+    {
+        if (DoCastSpell(me, m_spells.hunter.pAspectOfTheCheetah) == SPELL_CAST_OK)
+            return;
+    }
+}
+
+void BattleBotAI::UpdateInCombatAI_Hunter()
+{
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_spells.hunter.pArcaneShot &&
+            CanTryToCastSpell(pVictim, m_spells.hunter.pArcaneShot))
+        {
+            if (DoCastSpell(pVictim, m_spells.hunter.pArcaneShot) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.hunter.pAspectOfTheCheetah &&
+            me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id))
+        {
+            if (pVictim->CanReachWithMeleeAutoAttack(me))
+            {
+                if (m_spells.hunter.pAspectOfTheMonkey &&
+                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheMonkey))
+                {
+                    if (DoCastSpell(me, m_spells.hunter.pAspectOfTheMonkey) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+            else
+            {
+                if (m_spells.hunter.pAspectOfTheHawk &&
+                    CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheHawk))
+                {
+                    if (DoCastSpell(me, m_spells.hunter.pAspectOfTheHawk) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+        }
+
+        if (me->HasSpell(75) &&
+            (me->GetDistance(pVictim) > 8.0f) &&
+            !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+            me->CastSpell(pVictim, 75, false);
+    }
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Mage()
+{
+    if (m_spells.mage.pIceArmor &&
+        !me->HasAura(m_spells.mage.pIceArmor->Id) &&
+        CanTryToCastSpell(me, m_spells.mage.pIceArmor))
+    {
+        if (DoCastSpell(me, m_spells.mage.pIceArmor) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_spells.mage.pArcaneIntellect)
+    {
+        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneIntellect))
+        {
+            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneIntellect) &&
+                IsValidBuffTarget(pTarget, m_spells.mage.pArcaneIntellect))
+            {
+                if (DoCastSpell(pTarget, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
+                {
+                    m_isBuffing = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    m_isBuffing = false;
+}
+
+void BattleBotAI::UpdateInCombatAI_Mage()
+{
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_spells.mage.pPolymorph &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pPolymorph))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.mage.pFrostbolt &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pFrostbolt))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pFrostbolt) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.mage.pFireBlast &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pFireBlast))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pFireBlast) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.mage.pFireball &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pFireball))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pFireball) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.mage.pArcaneExplosion &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pArcaneExplosion))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pArcaneExplosion) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.mage.pFrostNova &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pFrostNova))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pFrostNova) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.mage.pConeofCold &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pConeofCold))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pConeofCold) == SPELL_CAST_OK)
+                return;
+        }
+    }
 }
 
 void BattleBotAI::UpdateAI(uint32 const diff)

@@ -496,7 +496,7 @@ BattleBotPath vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoof =
     { 1500.63f, 1472.89f, 373.707f, nullptr },
 };
 
-std::vector<BattleBotPath*> vPaths_WSG =
+std::vector<BattleBotPath*> vPaths_WS =
 {
     &vPath_WSG_HordeFlagRoom_to_HordeGraveyard,
     &vPath_WSG_HordeGraveyard_to_HordeTunnel,
@@ -514,6 +514,16 @@ std::vector<BattleBotPath*> vPaths_WSG =
     &vPath_WSG_AllianceGYJump_to_HordeFlagRoom,
     &vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof,
     &vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoof,
+};
+
+std::vector<BattleBotPath*> vPaths_AB =
+{
+
+};
+
+std::vector<BattleBotPath*> vPaths_AV =
+{
+
 };
 
 void BattleBotAI::MovementInform(uint32 movementType, uint32 data)
@@ -561,12 +571,35 @@ bool BattleBotAI::StartNewPathFromBeginning()
         bool reverse = false;
     };
     std::vector<AvailablePath> availablePaths;
-    for (const auto& pPath : vPaths_WSG)
+
+    std::vector<BattleBotPath*> vPaths;
+    switch (me->GetBattleGround()->GetTypeID())
+    {
+        case BATTLEGROUND_AB:
+        {
+            vPaths = vPaths_AB;
+            break;
+        }
+        case BATTLEGROUND_AV:
+        {
+            vPaths = vPaths_AV;
+            break;
+        }
+        case BATTLEGROUND_WS:
+        {
+            vPaths = vPaths_WS;
+            break;
+        }
+        default:
+            break;
+    }
+
+    for (const auto& pPath : vPaths)
     {
         BattleBotWaypoint* pStart = &((*pPath)[0]);
         if (me->GetDistance(pStart->x, pStart->y, pStart->z) < INTERACTION_DISTANCE)
             availablePaths.emplace_back(AvailablePath(pPath, false));
-        BattleBotWaypoint* pEnd = &((*pPath)[(*pPath).size()-1]);
+        BattleBotWaypoint* pEnd = &((*pPath)[(*pPath).size() - 1]);
         if (me->GetDistance(pEnd->x, pEnd->y, pEnd->z) < INTERACTION_DISTANCE)
             availablePaths.emplace_back(AvailablePath(pPath, true));
     }
@@ -587,7 +620,30 @@ void BattleBotAI::StartNewPathFromAnywhere()
     BattleBotPath* pClosestPath = nullptr;
     uint32 closestPoint = 0;
     float closestDistance = FLT_MAX;
-    for (const auto& pPath : vPaths_WSG)
+
+    std::vector<BattleBotPath*> vPaths;
+    switch (me->GetBattleGround()->GetTypeID())
+    {
+    case BATTLEGROUND_AB:
+    {
+        vPaths = vPaths_AB;
+        break;
+    }
+    case BATTLEGROUND_AV:
+    {
+        vPaths = vPaths_AV;
+        break;
+    }
+    case BATTLEGROUND_WS:
+    {
+        vPaths = vPaths_WS;
+        break;
+    }
+    default:
+        break;
+    }
+
+    for (const auto& pPath : vPaths)
     {
         for (uint32 i = 0; i < pPath->size(); i++)
         {

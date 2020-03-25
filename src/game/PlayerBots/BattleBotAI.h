@@ -83,6 +83,8 @@ public:
     void UpdateOutOfCombatAI_Paladin();
     void UpdateInCombatAI_Hunter();
     void UpdateOutOfCombatAI_Hunter();
+    void UpdateInCombatAI_Mage();
+    void UpdateOutOfCombatAI_Mage();
 
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
@@ -90,7 +92,7 @@ public:
     {
         struct
         {
-            SpellEntry const* spells[15];
+            SpellEntry const* spells[25];
         } raw;
         struct
         {
@@ -117,6 +119,19 @@ public:
             SpellEntry const* pAspectOfTheHawk;
             SpellEntry const* pArcaneShot;
         } hunter;
+        struct
+        {
+            SpellEntry const* pIceArmor;
+            SpellEntry const* pArcaneIntellect;
+            SpellEntry const* pIceBarrier;
+            SpellEntry const* pPolymorph;
+            SpellEntry const* pFrostbolt;
+            SpellEntry const* pFireBlast;
+            SpellEntry const* pFireball;
+            SpellEntry const* pArcaneExplosion;
+            SpellEntry const* pFrostNova;
+            SpellEntry const* pConeofCold;
+        } mage;
     } m_spells;
 
     std::vector<LootResponseData> m_lootResponses;
