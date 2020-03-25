@@ -327,7 +327,7 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.mage.pArcaneExplosion->Id < pSpellEntry->Id)
                         m_spells.mage.pArcaneExplosion = pSpellEntry;
                 }
-                else if (pSpellEntry->SpellName[0].find("FrostNova") != std::string::npos)
+                else if (pSpellEntry->SpellName[0].find("Frost Nova") != std::string::npos)
                 {
                     if (!m_spells.mage.pFrostNova ||
                         m_spells.mage.pFrostNova->Id < pSpellEntry->Id)
