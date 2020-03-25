@@ -62,6 +62,20 @@ void BattleBotAI::ResetSpellData()
 
 void BattleBotAI::PopulateSpellData()
 {
+    SpellEntry const* pBlessingOfLight = nullptr;
+    SpellEntry const* pBlessingOfMight = nullptr;
+    SpellEntry const* pBlessingOfWisdom = nullptr;
+    SpellEntry const* pBlessingOfKings = nullptr;
+    SpellEntry const* pBlessingOfSanctuary = nullptr;
+
+    SpellEntry const* pDevotionAura = nullptr;
+    SpellEntry const* pConcentrationAura = nullptr;
+    SpellEntry const* pRetributionAura = nullptr;
+    SpellEntry const* pSanctityAura = nullptr;
+    SpellEntry const* pShadowResistanceAura = nullptr;
+    SpellEntry const* pFrostResistanceAura = nullptr;
+    SpellEntry const* pFireResistanceAura = nullptr;
+
     for (const auto& spell : me->GetSpellMap())
     {
         if (spell.second.disabled)
@@ -128,33 +142,111 @@ void BattleBotAI::PopulateSpellData()
                 }
                 else if (pSpellEntry->SpellName[0].find("Blessing of Sanctuary") != std::string::npos)
                 {
-                    if (!m_spells.paladin.pBlessingOfSanctuary ||
-                        m_spells.paladin.pBlessingOfSanctuary->Id < pSpellEntry->Id)
-                        m_spells.paladin.pBlessingOfSanctuary = pSpellEntry;
+                    if (!pBlessingOfSanctuary ||
+                        pBlessingOfSanctuary->Id < pSpellEntry->Id)
+                        pBlessingOfSanctuary = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Blessing of Kings") != std::string::npos)
                 {
-                    if (!m_spells.paladin.pBlessingOfKings ||
-                        m_spells.paladin.pBlessingOfKings->Id < pSpellEntry->Id)
-                        m_spells.paladin.pBlessingOfKings = pSpellEntry;
+                    if (!pBlessingOfKings ||
+                        pBlessingOfKings->Id < pSpellEntry->Id)
+                        pBlessingOfKings = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Blessing of Wisdom") != std::string::npos)
                 {
-                    if (!m_spells.paladin.pBlessingOfWisdom ||
-                        m_spells.paladin.pBlessingOfWisdom->Id < pSpellEntry->Id)
-                        m_spells.paladin.pBlessingOfWisdom = pSpellEntry;
+                    if (!pBlessingOfWisdom ||
+                        pBlessingOfWisdom->Id < pSpellEntry->Id)
+                        pBlessingOfWisdom = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Blessing of Might") != std::string::npos)
                 {
-                    if (!m_spells.paladin.pBlessingOfMight ||
-                        m_spells.paladin.pBlessingOfMight->Id < pSpellEntry->Id)
-                        m_spells.paladin.pBlessingOfMight = pSpellEntry;
+                    if (!pBlessingOfMight ||
+                        pBlessingOfMight->Id < pSpellEntry->Id)
+                        pBlessingOfMight = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Blessing of Light") != std::string::npos)
                 {
-                    if (!m_spells.paladin.pBlessingOfLight ||
-                        m_spells.paladin.pBlessingOfLight->Id < pSpellEntry->Id)
-                        m_spells.paladin.pBlessingOfLight = pSpellEntry;
+                    if (!pBlessingOfLight ||
+                        pBlessingOfLight->Id < pSpellEntry->Id)
+                        pBlessingOfLight = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Devotion Aura") != std::string::npos)
+                {
+                    if (!pDevotionAura ||
+                        pDevotionAura->Id < pSpellEntry->Id)
+                        pDevotionAura = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Retribution Aura") != std::string::npos)
+                {
+                    if (!pRetributionAura ||
+                        pRetributionAura->Id < pSpellEntry->Id)
+                        pRetributionAura = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Concentration Aura") != std::string::npos)
+                {
+                    if (!pConcentrationAura ||
+                        pConcentrationAura->Id < pSpellEntry->Id)
+                        pConcentrationAura = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Sanctity Aura") != std::string::npos)
+                {
+                    if (!pSanctityAura ||
+                        pSanctityAura->Id < pSpellEntry->Id)
+                        pSanctityAura = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shadow Resistance Aura") != std::string::npos)
+                {
+                    if (!pShadowResistanceAura ||
+                        pShadowResistanceAura->Id < pSpellEntry->Id)
+                        pShadowResistanceAura = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Frost Resistance Aura") != std::string::npos)
+                {
+                    if (!pFrostResistanceAura ||
+                        pFrostResistanceAura->Id < pSpellEntry->Id)
+                        pFrostResistanceAura = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Fire Resistance Aura") != std::string::npos)
+                {
+                    if (!pFireResistanceAura ||
+                        pFireResistanceAura->Id < pSpellEntry->Id)
+                        pFireResistanceAura = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Exorcism") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pExorcism ||
+                        m_spells.paladin.pExorcism->Id < pSpellEntry->Id)
+                        m_spells.paladin.pExorcism = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Consecration") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pConsecration ||
+                        m_spells.paladin.pConsecration->Id < pSpellEntry->Id)
+                        m_spells.paladin.pConsecration = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Hammer of Wrath") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pHammerOfWrath ||
+                        m_spells.paladin.pHammerOfWrath->Id < pSpellEntry->Id)
+                        m_spells.paladin.pHammerOfWrath = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Cleanse") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pCleanse ||
+                        m_spells.paladin.pCleanse->Id < pSpellEntry->Id)
+                        m_spells.paladin.pCleanse = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Divine Shield") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pDivineShield ||
+                        m_spells.paladin.pDivineShield->Id < pSpellEntry->Id)
+                        m_spells.paladin.pDivineShield = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Lay on Hands") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pLayOnHands ||
+                        m_spells.paladin.pLayOnHands->Id < pSpellEntry->Id)
+                        m_spells.paladin.pLayOnHands = pSpellEntry;
                 }
                 break;
             }
@@ -178,6 +270,45 @@ void BattleBotAI::PopulateSpellData()
                     break;
                 }
             }
+        }
+    }
+
+    switch (me->GetClass())
+    {
+        case CLASS_PALADIN:
+        {
+            std::vector<SpellEntry const*> blessings;
+            if (pBlessingOfLight)
+                blessings.push_back(pBlessingOfLight);
+            if (pBlessingOfMight)
+                blessings.push_back(pBlessingOfMight);
+            if (pBlessingOfWisdom)
+                blessings.push_back(pBlessingOfWisdom);
+            if (pBlessingOfKings)
+                blessings.push_back(pBlessingOfKings);
+            if (pBlessingOfSanctuary)
+                blessings.push_back(pBlessingOfSanctuary);
+            if (!blessings.empty())
+                m_spells.paladin.pBlessingBuff = SelectRandomContainerElement(blessings);
+
+            std::vector<SpellEntry const*> auras;
+            if (pDevotionAura)
+                auras.push_back(pDevotionAura);
+            if (pConcentrationAura)
+                auras.push_back(pConcentrationAura);
+            if (pRetributionAura)
+                auras.push_back(pRetributionAura);
+            if (pSanctityAura)
+                auras.push_back(pSanctityAura);
+            if (pShadowResistanceAura)
+                auras.push_back(pShadowResistanceAura);
+            if (pFrostResistanceAura)
+                auras.push_back(pFrostResistanceAura);
+            if (pFireResistanceAura)
+                auras.push_back(pFireResistanceAura);
+            if (!auras.empty())
+                m_spells.paladin.pAura = SelectRandomContainerElement(auras);
+            break;
         }
     }
 }
@@ -342,8 +473,67 @@ bool BattleBotAI::IsValidHostileTarget(Unit const* pTarget) const
            !pTarget->HasBreakableByDamageCrowdControlAura();
 }
 
+bool BattleBotAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const
+{
+    uint32 dispelMask = 0;
+    bool bFoundOneDispell = false;
+    // Compute Dispel Mask
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (pSpellEntry->Effect[i] != SPELL_EFFECT_DISPEL)
+            continue;
+
+        // Create dispel mask by dispel type
+        uint32 dispel_type = pSpellEntry->EffectMiscValue[i];
+        dispelMask |= Spells::GetDispellMask(DispelType(dispel_type));
+    }
+    bool friendly_dispel = pTarget && pTarget->IsFriendlyTo(me);
+
+    if (pTarget &&
+        // Check immune for offensive dispel
+        (!pTarget->IsImmuneToSchoolMask(pSpellEntry->GetSpellSchoolMask()) ||
+            friendly_dispel))
+    {
+        if (!friendly_dispel && !me->IsValidAttackTarget(pTarget))
+            return SPELL_FAILED_BAD_TARGETS;
+
+        auto const& auras = pTarget->GetSpellAuraHolderMap();
+        for (const auto& aura : auras)
+        {
+            SpellAuraHolder* holder = aura.second;
+            if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
+            {
+                if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC ||
+                    holder->GetSpellProto()->Dispel == DISPEL_POISON)
+                {
+                    bool positive = holder->IsPositive();
+                    // do not remove positive auras if friendly target
+                    // do not remove negative auras if non-friendly target
+                    // when removing charm auras ignore hostile reaction from the charm
+                    if (!friendly_dispel && !positive && holder->GetSpellProto()->IsCharmSpell())
+                        if (CharmInfo *charm = pTarget->GetCharmInfo())
+                            if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
+                                if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*me->getFactionTemplateEntry()))
+                                    bFoundOneDispell = true;
+                    if (positive == friendly_dispel)
+                        continue;
+                }
+                bFoundOneDispell = true;
+                break;
+            }
+        }
+    }
+
+    if (!bFoundOneDispell)
+        return false;
+
+    return true;
+}
+
 void BattleBotAI::AttackStart(Unit* pVictim)
 {
+    m_isBuffing = false;
+
     if (me->IsMounted())
         me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
@@ -398,9 +588,7 @@ Unit* BattleBotAI::SelectAttackTarget() const
     }
 
     std::list<Player*> players;
-    MaNGOS::AnyPlayerInObjectRangeCheck check(me, VISIBILITY_DISTANCE_NORMAL);
-    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, check);
-    Cell::VisitWorldObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
+    me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
 
     for (const auto& pTarget : players)
     {
@@ -433,9 +621,7 @@ Unit* BattleBotAI::SelectAttackTarget() const
 Unit* BattleBotAI::SelectFollowTarget() const
 {
     std::list<Player*> players;
-    MaNGOS::AnyPlayerInObjectRangeCheck check(me, VISIBILITY_DISTANCE_NORMAL);
-    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, check);
-    Cell::VisitWorldObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
+    me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
 
     for (const auto& pTarget : players)
     {
@@ -714,7 +900,6 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
         case MSG_MOVE_WORLDPORT_ACK:
         {
             me->GetSession()->HandleMoveWorldportAckOpcode();
-            m_checkBuffs = true;
             break;
         }
         case MSG_MOVE_TELEPORT_ACK:
@@ -991,41 +1176,47 @@ void BattleBotAI::UpdateInCombatAI()
 
 void BattleBotAI::UpdateOutOfCombatAI_Paladin()
 {
-    bool hasBlessing = (m_spells.paladin.pBlessingOfKings && me->HasAura(m_spells.paladin.pBlessingOfKings->Id)) ||
-                       (m_spells.paladin.pBlessingOfSanctuary && me->HasAura(m_spells.paladin.pBlessingOfSanctuary->Id)) ||
-                       (m_spells.paladin.pBlessingOfMight && me->HasAura(m_spells.paladin.pBlessingOfMight->Id)) ||
-                       (m_spells.paladin.pBlessingOfWisdom && me->HasAura(m_spells.paladin.pBlessingOfWisdom->Id)) ||
-                       (m_spells.paladin.pBlessingOfLight && me->HasAura(m_spells.paladin.pBlessingOfLight->Id));
-
-    if (!hasBlessing)
+    if (m_spells.paladin.pAura &&
+        !me->HasAura(m_spells.paladin.pAura->Id) &&
+        CanTryToCastSpell(me, m_spells.paladin.pAura))
     {
-        if (m_spells.paladin.pBlessingOfKings &&
-            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfKings) &&
-            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfKings))
-            DoCastSpell(me, m_spells.paladin.pBlessingOfKings);
-        else if (m_spells.paladin.pBlessingOfSanctuary &&
-            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfSanctuary) &&
-            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfSanctuary))
-            DoCastSpell(me, m_spells.paladin.pBlessingOfSanctuary);
-        else if (m_spells.paladin.pBlessingOfMight &&
-            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfMight) &&
-            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfMight))
-            DoCastSpell(me, m_spells.paladin.pBlessingOfMight);
-        else if (m_spells.paladin.pBlessingOfWisdom &&
-            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfWisdom) &&
-            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfWisdom))
-            DoCastSpell(me, m_spells.paladin.pBlessingOfWisdom);
-        else if (m_spells.paladin.pBlessingOfLight &&
-            CanTryToCastSpell(me, m_spells.paladin.pBlessingOfLight) &&
-            IsValidBuffTarget(me, m_spells.paladin.pBlessingOfLight))
-            DoCastSpell(me, m_spells.paladin.pBlessingOfLight);
+        if (DoCastSpell(me, m_spells.paladin.pAura) == SPELL_CAST_OK)
+            return;
     }
+
+    if (m_spells.paladin.pBlessingBuff)
+    {
+        if (Player* pTarget = SelectBuffTarget(m_spells.paladin.pBlessingBuff))
+        {
+            if (CanTryToCastSpell(pTarget, m_spells.paladin.pBlessingBuff) &&
+                IsValidBuffTarget(pTarget, m_spells.paladin.pBlessingBuff))
+            {
+                if (DoCastSpell(pTarget, m_spells.paladin.pBlessingBuff) == SPELL_CAST_OK)
+                {
+                    m_isBuffing = true;
+                    return;
+                }
+            }  
+        }
+    }
+
+    m_isBuffing = false;
 }
 
 void BattleBotAI::UpdateInCombatAI_Paladin()
 {
-    bool hasSeal = (m_spells.paladin.pSealOfCommand && me->HasAura(m_spells.paladin.pSealOfCommand->Id)) ||
-                   (m_spells.paladin.pSealOfRighteousness && me->HasAura(m_spells.paladin.pSealOfRighteousness->Id));
+    if (m_spells.paladin.pDivineShield &&
+       (me->GetHealthPercent() < 20.0f) &&
+       (me->GetPowerPercent(POWER_MANA) > 40.0f) &&
+       !me->HasAura(AURA_WARSONG_FLAG) &
+        CanTryToCastSpell(me, m_spells.paladin.pDivineShield))
+    {
+        if (DoCastSpell(me, m_spells.paladin.pDivineShield) == SPELL_CAST_OK)
+            return;
+    }
+
+    bool const hasSeal = (m_spells.paladin.pSealOfCommand && me->HasAura(m_spells.paladin.pSealOfCommand->Id)) ||
+                         (m_spells.paladin.pSealOfRighteousness && me->HasAura(m_spells.paladin.pSealOfRighteousness->Id));
 
     if (!hasSeal)
     {
@@ -1051,6 +1242,74 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
         {
             if (DoCastSpell(pVictim, m_spells.paladin.pHammerOfJustice) == SPELL_CAST_OK)
                 return;
+        }
+        if (m_spells.paladin.pHammerOfWrath &&
+            pVictim->GetHealthPercent() < 20.0f &&
+            CanTryToCastSpell(pVictim, m_spells.paladin.pHammerOfWrath))
+        {
+            if (DoCastSpell(pVictim, m_spells.paladin.pHammerOfWrath) == SPELL_CAST_OK)
+                return;
+        }
+        if (m_spells.paladin.pConsecration &&
+           (me->GetAttackers().size() > 2) &&
+            CanTryToCastSpell(me, m_spells.paladin.pConsecration))
+        {
+            if (DoCastSpell(me, m_spells.paladin.pConsecration) == SPELL_CAST_OK)
+                return;
+        }
+    }
+
+    if (Unit* pFriend = me->FindLowestHpFriendlyUnit(30.0f, 70, true, me))
+    {
+        if (m_spells.paladin.pBlessingOfProtection &&
+           !IsPhysicalDamageClass(pFriend->GetClass()) &&
+           !pFriend->HasAura(AURA_WARSONG_FLAG) &&
+            CanTryToCastSpell(pFriend, m_spells.paladin.pBlessingOfProtection))
+        {
+            if (DoCastSpell(pFriend, m_spells.paladin.pBlessingOfProtection) == SPELL_CAST_OK)
+                return;
+        }
+        if (m_spells.paladin.pBlessingOfSacrifice &&
+            pFriend->HasAura(AURA_WARSONG_FLAG) &&
+            CanTryToCastSpell(pFriend, m_spells.paladin.pBlessingOfSacrifice))
+        {
+            if (DoCastSpell(pFriend, m_spells.paladin.pBlessingOfSacrifice) == SPELL_CAST_OK)
+                return;
+        }
+        if (m_spells.paladin.pLayOnHands &&
+           (pFriend->GetHealthPercent() < 15.0f) &&
+            CanTryToCastSpell(pFriend, m_spells.paladin.pLayOnHands))
+        {
+            if (DoCastSpell(pFriend, m_spells.paladin.pLayOnHands) == SPELL_CAST_OK)
+                return;
+        }
+    }
+
+    if (m_spells.paladin.pBlessingOfFreedom &&
+       (me->HasUnitState(UNIT_STAT_ROOT) || me->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED)) &&
+        CanTryToCastSpell(me, m_spells.paladin.pBlessingOfFreedom))
+    {
+        if (DoCastSpell(me, m_spells.paladin.pBlessingOfFreedom) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_spells.paladin.pCleanse)
+    {
+        if (IsValidDispelTarget(me, m_spells.paladin.pCleanse) &&
+            CanTryToCastSpell(me, m_spells.paladin.pCleanse))
+        {
+            if (DoCastSpell(me, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
+        {
+            if (IsValidDispelTarget(pFriend, m_spells.paladin.pCleanse) &&
+                CanTryToCastSpell(pFriend, m_spells.paladin.pCleanse))
+            {
+                if (DoCastSpell(pFriend, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
+                    return;
+            }
         }
     }
 
@@ -1180,13 +1439,16 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (!me->IsInCombat())
     {
-        if (DrinkAndEat())
+        if (!m_isBuffing && DrinkAndEat())
             return;
 
         if (me->GetStandState() != UNIT_STAND_STATE_STAND)
             me->SetStandState(UNIT_STAND_STATE_STAND);
 
         UpdateOutOfCombatAI();
+
+        if (m_isBuffing)
+            return;
 
         if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
         {

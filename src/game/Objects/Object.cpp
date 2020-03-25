@@ -2685,6 +2685,12 @@ void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, ui
     cell.Visit(pair, visitor, *(GetMap()), *this, fMaxSearchRange);
 }
 
+void WorldObject::GetAlivePlayerListInRange(WorldObject const* pSource, std::list<Player*>& lList, float fMaxSearchRange) const
+{
+    MaNGOS::AnyPlayerInObjectRangeCheck check(pSource, fMaxSearchRange);
+    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(lList, check);
+    Cell::VisitWorldObjects(pSource, searcher, fMaxSearchRange);
+}
 
 void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z)
 {

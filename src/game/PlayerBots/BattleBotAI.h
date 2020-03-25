@@ -61,6 +61,7 @@ public:
     bool IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool IsValidHealTarget(Unit const* pTarget) const;
     bool IsValidHostileTarget(Unit const* pTarget) const;
+    bool IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     void HealInjuredAlly(float selfHealPercent = 100.0f);
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
@@ -91,11 +92,8 @@ public:
         } raw;
         struct
         {
-            SpellEntry const* pBlessingOfLight;
-            SpellEntry const* pBlessingOfMight;
-            SpellEntry const* pBlessingOfWisdom;
-            SpellEntry const* pBlessingOfKings;
-            SpellEntry const* pBlessingOfSanctuary;
+            SpellEntry const* pAura;
+            SpellEntry const* pBlessingBuff;
             SpellEntry const* pBlessingOfProtection;
             SpellEntry const* pBlessingOfFreedom;
             SpellEntry const* pBlessingOfSacrifice;
@@ -103,13 +101,18 @@ public:
             SpellEntry const* pSealOfCommand;
             SpellEntry const* pSealOfRighteousness;
             SpellEntry const* pJudgement;
+            SpellEntry const* pExorcism;
+            SpellEntry const* pConsecration;
+            SpellEntry const* pHammerOfWrath;
+            SpellEntry const* pCleanse;
+            SpellEntry const* pDivineShield;
+            SpellEntry const* pLayOnHands;
         } paladin;
     } m_spells;
 
     std::vector<LootResponseData> m_lootResponses;
     bool m_initialized = false;
     bool m_receivedBgInvite = false;
-    bool m_checkBuffs = true;
     int m_battlegroundId = 0;
     ShortTimeTracker m_updateTimer;
     uint8 m_race = 0;
@@ -123,6 +126,7 @@ public:
     bool m_hasGear = false;
     bool m_wasDead = false;
     bool m_wasInBG = false;
+    bool m_isBuffing = false;
 
     // Movement System
     void UpdateMovement();
