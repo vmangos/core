@@ -76,6 +76,11 @@ void BattleBotAI::PopulateSpellData()
     SpellEntry const* pFrostResistanceAura = nullptr;
     SpellEntry const* pFireResistanceAura = nullptr;
 
+    SpellEntry const* pPolymorphSheep = nullptr;
+    SpellEntry const* pPolymorphCow = nullptr;
+    SpellEntry const* pPolymorphPig = nullptr;
+    SpellEntry const* pPolymorphTurtle = nullptr;
+
     for (const auto& spell : me->GetSpellMap())
     {
         if (spell.second.disabled)
@@ -298,12 +303,6 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.mage.pArcaneIntellect->Id < pSpellEntry->Id)
                         m_spells.mage.pArcaneIntellect = pSpellEntry;
                 }
-                else if (pSpellEntry->SpellName[0].find("Polymorph") != std::string::npos)
-                {
-                    if (!m_spells.mage.pPolymorph ||
-                        m_spells.mage.pPolymorph->Id < pSpellEntry->Id)
-                        m_spells.mage.pPolymorph = pSpellEntry;
-                }
                 else if (pSpellEntry->SpellName[0].find("Frostbolt") != std::string::npos)
                 {
                     if (!m_spells.mage.pFrostbolt ||
@@ -339,6 +338,30 @@ void BattleBotAI::PopulateSpellData()
                     if (!m_spells.mage.pConeofCold ||
                         m_spells.mage.pConeofCold->Id < pSpellEntry->Id)
                         m_spells.mage.pConeofCold = pSpellEntry;
+                }
+                else if (pSpellEntry->Id == (12826)) // Sheep
+                {
+                    if (!pPolymorphSheep ||
+                        pPolymorphSheep->Id < pSpellEntry->Id)
+                        pPolymorphSheep = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Polymorph: Cow") != std::string::npos)
+                {
+                    if (!pPolymorphCow ||
+                        pPolymorphCow->Id < pSpellEntry->Id)
+                        pPolymorphCow = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Polymorph: Pig") != std::string::npos)
+                {
+                    if (!pPolymorphPig ||
+                        pPolymorphPig->Id < pSpellEntry->Id)
+                        pPolymorphPig = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Polymorph: Turtle") != std::string::npos)
+                {
+                    if (!pPolymorphTurtle ||
+                        pPolymorphTurtle->Id < pSpellEntry->Id)
+                        pPolymorphTurtle = pSpellEntry;
                 }
                 break;
             }
@@ -400,6 +423,21 @@ void BattleBotAI::PopulateSpellData()
                 auras.push_back(pFireResistanceAura);
             if (!auras.empty())
                 m_spells.paladin.pAura = SelectRandomContainerElement(auras);
+            break;
+        }
+        case CLASS_MAGE:
+        {
+            std::vector<SpellEntry const*> polymorph;
+            if (pPolymorphSheep)
+                polymorph.push_back(pPolymorphSheep);
+            if (pPolymorphCow)
+                polymorph.push_back(pPolymorphCow);
+            if (pPolymorphPig)
+                polymorph.push_back(pPolymorphPig);
+            if (pPolymorphTurtle)
+                polymorph.push_back(pPolymorphTurtle);
+            if (!polymorph.empty())
+                m_spells.mage.pPolymorph = SelectRandomContainerElement(polymorph);
             break;
         }
     }
@@ -1515,13 +1553,6 @@ void BattleBotAI::UpdateInCombatAI_Mage()
 {
     if (Unit* pVictim = me->GetVictim())
     {
-        if (m_spells.mage.pPolymorph &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pPolymorph))
-        {
-            if (DoCastSpell(pVictim, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
-                return;
-        }
-
         if (m_spells.mage.pFrostbolt &&
             CanTryToCastSpell(pVictim, m_spells.mage.pFrostbolt))
         {
@@ -1543,22 +1574,29 @@ void BattleBotAI::UpdateInCombatAI_Mage()
                 return;
         }
 
+        if (m_spells.mage.pPolymorph &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pPolymorph))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
+                return;
+        }
+
         if (m_spells.mage.pArcaneExplosion &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pArcaneExplosion))
+            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.mage.pArcaneExplosion))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pArcaneExplosion) == SPELL_CAST_OK)
                 return;
         }
 
         if (m_spells.mage.pFrostNova &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pFrostNova))
+            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.mage.pFrostNova))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pFrostNova) == SPELL_CAST_OK)
                 return;
         }
 
         if (m_spells.mage.pConeofCold &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pConeofCold))
+            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.mage.pConeofCold))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pConeofCold) == SPELL_CAST_OK)
                 return;
