@@ -10,6 +10,7 @@
 #include "SpellAuras.h"
 #include "Chat.h"
 #include "GridNotifiers.h"
+#include "GridNotifiersImpl.h"
 #include "TargetedMovementGenerator.h"
 #include <random>
 
@@ -397,8 +398,8 @@ Unit* BattleBotAI::SelectAttackTarget() const
     }
 
     std::list<Player*> players;
-    MaNGOS::AnyPlayerInObjectRangeCheck p_check(me, VISIBILITY_DISTANCE_NORMAL);
-    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, p_check);
+    MaNGOS::AnyPlayerInObjectRangeCheck check(me, VISIBILITY_DISTANCE_NORMAL);
+    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, check);
     Cell::VisitWorldObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
 
     for (const auto& pTarget : players)
@@ -432,8 +433,8 @@ Unit* BattleBotAI::SelectAttackTarget() const
 Unit* BattleBotAI::SelectFollowTarget() const
 {
     std::list<Player*> players;
-    MaNGOS::AnyPlayerInObjectRangeCheck p_check(me, VISIBILITY_DISTANCE_NORMAL);
-    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, p_check);
+    MaNGOS::AnyPlayerInObjectRangeCheck check(me, VISIBILITY_DISTANCE_NORMAL);
+    MaNGOS::PlayerListSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(players, check);
     Cell::VisitWorldObjects(me, searcher, VISIBILITY_DISTANCE_NORMAL);
 
     for (const auto& pTarget : players)
