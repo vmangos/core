@@ -1064,7 +1064,9 @@ bool ChatHandler::HandleDismountCommand(char* /*args*/)
 
 bool ChatHandler::HandleFlyCommand(char* args)
 {
-    if (!*args)
+    bool value;
+    
+    if (!*args || !ExtractOnOff(&args, value))
     {
         SendSysMessage("Syntax: .fly on / off");
         SetSentErrorMessage(true);
@@ -1072,16 +1074,9 @@ bool ChatHandler::HandleFlyCommand(char* args)
     }
 
     Player* target = m_session->GetPlayer();
-    bool value;
 
     if (!target)
         return false;
-
-    if (!ExtractOnOff(&args, value))
-    {
-        SetSentErrorMessage(true);
-        return false;
-    }
 
     if (value)
     {
