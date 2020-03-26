@@ -486,7 +486,6 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleGMCommand(char* args);
         bool HandleGMChatCommand(char* args);
-        bool HandleGMFlyCommand(char* args);
         bool HandleGMListFullCommand(char* args);
         bool HandleGMListIngameCommand(char* args);
         bool HandleGMVisibleCommand(char* args);
@@ -815,6 +814,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleStartCommand(char* args);
         bool HandleMountCommand(char* args);
         bool HandleDismountCommand(char* args);
+        bool HandleFlyCommand(char* args);
         bool HandleSaveCommand(char* args);
 
         bool HandleNamegoCommand(char* args);

@@ -1062,6 +1062,49 @@ bool ChatHandler::HandleDismountCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleFlyCommand(char* args)
+{
+    if (!*args)
+    {
+        SendSysMessage("Syntax: .fly on / off");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* target = m_session->GetPlayer();
+    bool value;
+
+    if (!target)
+        return false;
+
+    if (!ExtractOnOff(&args, value))
+    {
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (value)
+    {
+        target->SetFlying(true);
+        target->SetDisplayId(6299);  // Hawk Owl
+        target->SetObjectScale(0.7F);
+        target->UpdateSpeed(MOVE_SWIM, false, 6.0F);
+        // Looks better if bird doesn't appear on the ground:
+        target->NearLandTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ() + 4.0F, target->GetOrientation());
+        target->CastSpell(target, 14867, true);
+    }
+    else
+    {
+        target->SetFlying(false);
+        target->SetObjectScale(target->GetNativeScale());
+        target->UpdateSpeed(MOVE_SWIM, false, 1.0F);
+        target->UpdateSpeed(MOVE_RUN,  false, 1.0F);
+        target->UpdateSpeed(MOVE_WALK, false, 1.0F);
+        target->DeMorph();
+    }
+    return true;
+}
+
 bool ChatHandler::HandleSaveCommand(char* /*args*/)
 {
     Player* player = m_session->GetPlayer();

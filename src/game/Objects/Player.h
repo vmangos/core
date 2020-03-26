@@ -1832,7 +1832,9 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool CanWalk() const override { return true; }
         bool CanSwim() const override { return true; }
         bool CanFly() const override { return IsFlying(); }
-
+        void SetFlying(bool flying);
+        bool IsFlying() const { return m_isFlying; }
+        bool m_isFlying = false;
         void SetFly(bool enable) override;
 
         // Anti undermap

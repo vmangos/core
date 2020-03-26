@@ -6620,6 +6620,26 @@ void Player::DismountCheck()
     }
 }
 
+void Player::SetFlying(bool flying)
+{
+    if (flying)
+    {
+        m_isFlying = true;
+        m_movementInfo.AddMovementFlag(MOVEFLAG_SWIMMING);
+        m_movementInfo.AddMovementFlag(MOVEFLAG_LEVITATING);
+        m_movementInfo.AddMovementFlag(MOVEFLAG_HOVER);
+        SendHeartBeat(true);
+    }
+    else
+    {
+        m_isFlying = false;
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_LEVITATING);
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_HOVER);
+        SendHeartBeat(true);
+     // TODO: Landing curve. 
+    }
+}
+
 void Player::SetTransport(Transport* t)
 {
     WorldObject::SetTransport(t);
