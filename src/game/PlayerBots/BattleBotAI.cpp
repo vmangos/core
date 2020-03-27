@@ -303,6 +303,12 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.mage.pArcaneIntellect->Id < pSpellEntry->Id)
                         m_spells.mage.pArcaneIntellect = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Arcane Brilliance") != std::string::npos)
+                {
+                    if (!m_spells.mage.pArcaneBrilliance ||
+                        m_spells.mage.pArcaneBrilliance->Id < pSpellEntry->Id)
+                        m_spells.mage.pArcaneBrilliance = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Frostbolt") != std::string::npos)
                 {
                     if (!m_spells.mage.pFrostbolt ||
@@ -362,6 +368,118 @@ void BattleBotAI::PopulateSpellData()
                     if (!pPolymorphTurtle ||
                         pPolymorphTurtle->Id < pSpellEntry->Id)
                         pPolymorphTurtle = pSpellEntry;
+                }
+                break;
+            }
+            case CLASS_PRIEST:
+            {
+                if (pSpellEntry->SpellName[0].find("Power Word: Fortitude") != std::string::npos)
+                {
+                    if (!m_spells.priest.pPowerWordFortitude ||
+                        m_spells.priest.pPowerWordFortitude->Id < pSpellEntry->Id)
+                        m_spells.priest.pPowerWordFortitude = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Divine Spirit") != std::string::npos)
+                {
+                    if (!m_spells.priest.pDivineSpirit ||
+                        m_spells.priest.pDivineSpirit->Id < pSpellEntry->Id)
+                        m_spells.priest.pDivineSpirit = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Prayer of Spirit") != std::string::npos)
+                {
+                    if (!m_spells.priest.pPrayerofSpirit ||
+                        m_spells.priest.pPrayerofSpirit->Id < pSpellEntry->Id)
+                        m_spells.priest.pPrayerofSpirit = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Prayer of Fortitude") != std::string::npos)
+                {
+                    if (!m_spells.priest.pPrayerofFortitude ||
+                        m_spells.priest.pPrayerofFortitude->Id < pSpellEntry->Id)
+                        m_spells.priest.pPrayerofFortitude = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Inner Fire") != std::string::npos)
+                {
+                    if (!m_spells.priest.pInnerFire ||
+                        m_spells.priest.pInnerFire->Id < pSpellEntry->Id)
+                        m_spells.priest.pInnerFire = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shadow Protection") != std::string::npos)
+                {
+                    if (!m_spells.priest.pShadowProtection ||
+                        m_spells.priest.pShadowProtection->Id < pSpellEntry->Id)
+                        m_spells.priest.pShadowProtection = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Power Word: Shield") != std::string::npos)
+                {
+                    if (!m_spells.priest.pPowerWordShield ||
+                        m_spells.priest.pPowerWordShield->Id < pSpellEntry->Id)
+                        m_spells.priest.pPowerWordShield = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Holy Nova") != std::string::npos)
+                {
+                    if (!m_spells.priest.pHolyNova ||
+                        m_spells.priest.pHolyNova->Id < pSpellEntry->Id)
+                        m_spells.priest.pHolyNova = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Holy Fire") != std::string::npos)
+                {
+                    if (!m_spells.priest.pHolyFire ||
+                        m_spells.priest.pHolyFire->Id < pSpellEntry->Id)
+                        m_spells.priest.pHolyFire = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Mind Blast") != std::string::npos)
+                {
+                    if (!m_spells.priest.pMindBlast ||
+                        m_spells.priest.pMindBlast->Id < pSpellEntry->Id)
+                        m_spells.priest.pMindBlast = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shadow Word: Pain") != std::string::npos)
+                {
+                    if (!m_spells.priest.pShadowWordPain ||
+                        m_spells.priest.pShadowWordPain->Id < pSpellEntry->Id)
+                        m_spells.priest.pShadowWordPain = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Inner Focus") != std::string::npos)
+                {
+                    if (!m_spells.priest.pInnerFocus ||
+                        m_spells.priest.pInnerFocus->Id < pSpellEntry->Id)
+                        m_spells.priest.pInnerFocus = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Abolish Disease") != std::string::npos)
+                {
+                    if (!m_spells.priest.pAbolishDisease ||
+                        m_spells.priest.pAbolishDisease->Id < pSpellEntry->Id)
+                        m_spells.priest.pAbolishDisease = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Dispel Magic") != std::string::npos)
+                {
+                    if (!m_spells.priest.pDispelMagic ||
+                        m_spells.priest.pDispelMagic->Id < pSpellEntry->Id)
+                        m_spells.priest.pDispelMagic = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Fade") != std::string::npos)
+                {
+                    if (!m_spells.priest.pFade ||
+                        m_spells.priest.pFade->Id < pSpellEntry->Id)
+                        m_spells.priest.pFade = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Mana Burn") != std::string::npos)
+                {
+                    if (!m_spells.priest.pManaBurn ||
+                        m_spells.priest.pManaBurn->Id < pSpellEntry->Id)
+                        m_spells.priest.pManaBurn = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Devouring Plague") != std::string::npos)
+                {
+                    if (!m_spells.priest.pDevouringPlague ||
+                        m_spells.priest.pDevouringPlague->Id < pSpellEntry->Id)
+                        m_spells.priest.pDevouringPlague = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Psychic Scream") != std::string::npos)
+                {
+                    if (!m_spells.priest.pPsychicScream ||
+                        m_spells.priest.pPsychicScream->Id < pSpellEntry->Id)
+                        m_spells.priest.pPsychicScream = pSpellEntry;
                 }
                 break;
             }
@@ -636,6 +754,7 @@ bool BattleBotAI::IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSp
             if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
             {
                 if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC ||
+                    holder->GetSpellProto()->Dispel == DISPEL_DISEASE ||
                     holder->GetSpellProto()->Dispel == DISPEL_POISON)
                 {
                     bool positive = holder->IsPositive();
@@ -1530,14 +1649,22 @@ void BattleBotAI::UpdateOutOfCombatAI_Mage()
             return;
     }
 
-    if (m_spells.mage.pArcaneIntellect)
+    if (m_spells.mage.pIceBarrier &&
+        !me->HasAura(m_spells.mage.pIceBarrier->Id) &&
+        CanTryToCastSpell(me, m_spells.mage.pIceBarrier))
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneIntellect))
+        if (DoCastSpell(me, m_spells.mage.pIceBarrier) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_spells.mage.pArcaneBrilliance)
+    {
+        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneBrilliance))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneIntellect) &&
-                IsValidBuffTarget(pTarget, m_spells.mage.pArcaneIntellect))
+            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) &&
+                IsValidBuffTarget(pTarget, m_spells.mage.pArcaneBrilliance))
             {
-                if (DoCastSpell(pTarget, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
+                if (DoCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
                 {
                     m_isBuffing = true;
                     return;
@@ -1574,20 +1701,6 @@ void BattleBotAI::UpdateInCombatAI_Mage()
                 return;
         }
 
-        if (m_spells.mage.pPolymorph &&
-            CanTryToCastSpell(pVictim, m_spells.mage.pPolymorph))
-        {
-            if (DoCastSpell(pVictim, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
-                return;
-        }
-
-        if (m_spells.mage.pArcaneExplosion &&
-            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.mage.pArcaneExplosion))
-        {
-            if (DoCastSpell(pVictim, m_spells.mage.pArcaneExplosion) == SPELL_CAST_OK)
-                return;
-        }
-
         if (m_spells.mage.pFrostNova &&
             (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.mage.pFrostNova))
         {
@@ -1601,7 +1714,191 @@ void BattleBotAI::UpdateInCombatAI_Mage()
             if (DoCastSpell(pVictim, m_spells.mage.pConeofCold) == SPELL_CAST_OK)
                 return;
         }
+
+        if (m_spells.mage.pArcaneExplosion &&
+            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.mage.pArcaneExplosion))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pArcaneExplosion) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.mage.pPolymorph &&
+            CanTryToCastSpell(pVictim, m_spells.mage.pPolymorph))
+        {
+            if (DoCastSpell(pVictim, m_spells.mage.pPolymorph) == SPELL_CAST_OK)
+                return;
+        }
     }
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Priest()
+{
+    if (m_spells.priest.pPrayerofFortitude)
+    {
+        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofFortitude))
+        {
+            if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) &&
+                IsValidBuffTarget(pTarget, m_spells.priest.pPrayerofFortitude))
+            {
+                if (DoCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) == SPELL_CAST_OK)
+                {
+                    m_isBuffing = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    if (m_spells.priest.pPrayerofSpirit)
+    {
+        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofSpirit))
+        {
+            if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) &&
+                IsValidBuffTarget(pTarget, m_spells.priest.pPrayerofSpirit))
+            {
+                if (DoCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) == SPELL_CAST_OK)
+                {
+                    m_isBuffing = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    if (m_spells.priest.pInnerFire &&
+        !me->HasAura(m_spells.priest.pInnerFire->Id) &&
+        CanTryToCastSpell(me, m_spells.priest.pInnerFire))
+    {
+        if (DoCastSpell(me, m_spells.priest.pInnerFire) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_spells.priest.pPowerWordShield &&
+        !me->HasAura(m_spells.priest.pPowerWordShield->Id) &&
+        CanTryToCastSpell(me, m_spells.priest.pPowerWordShield))
+    {
+        if (DoCastSpell(me, m_spells.priest.pPowerWordShield) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_spells.priest.pShadowProtection)
+    {
+        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection))
+        {
+            if (CanTryToCastSpell(pTarget, m_spells.priest.pShadowProtection) &&
+                IsValidBuffTarget(pTarget, m_spells.priest.pShadowProtection))
+            {
+                if (DoCastSpell(pTarget, m_spells.priest.pShadowProtection) == SPELL_CAST_OK)
+                {
+                    m_isBuffing = true;
+                    return;
+                }
+            }
+        }
+    }
+
+    m_isBuffing = false;
+}
+
+void BattleBotAI::UpdateInCombatAI_Priest()
+{
+    // Heal
+    HealInjuredAlly(40.0f);
+
+    // Dispels
+    if (m_spells.priest.pDispelMagic)
+    {
+        if (IsValidDispelTarget(me, m_spells.priest.pDispelMagic) &&
+            CanTryToCastSpell(me, m_spells.priest.pDispelMagic))
+        {
+            if (DoCastSpell(me, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
+        {
+            if (IsValidDispelTarget(pFriend, m_spells.priest.pDispelMagic) &&
+                CanTryToCastSpell(pFriend, m_spells.priest.pDispelMagic))
+            {
+                if (DoCastSpell(pFriend, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+
+    if (m_spells.priest.pAbolishDisease)
+    {
+        if (IsValidDispelTarget(me, m_spells.priest.pAbolishDisease) &&
+            CanTryToCastSpell(me, m_spells.priest.pAbolishDisease))
+        {
+            if (DoCastSpell(me, m_spells.priest.pAbolishDisease) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
+        {
+            if (IsValidDispelTarget(pFriend, m_spells.priest.pAbolishDisease) &&
+                CanTryToCastSpell(pFriend, m_spells.priest.pAbolishDisease))
+            {
+                if (DoCastSpell(pFriend, m_spells.priest.pAbolishDisease) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+
+    // Attack
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_spells.priest.pPowerWordShield &&
+            CanTryToCastSpell(pVictim, m_spells.priest.pPowerWordShield))
+        {
+            if (DoCastSpell(pVictim, m_spells.priest.pPowerWordShield) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pMindBlast &&
+            CanTryToCastSpell(pVictim, m_spells.priest.pMindBlast))
+        {
+            if (DoCastSpell(pVictim, m_spells.priest.pMindBlast) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pShadowWordPain &&
+            CanTryToCastSpell(pVictim, m_spells.priest.pShadowWordPain))
+        {
+            if (DoCastSpell(pVictim, m_spells.priest.pShadowWordPain) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pPsychicScream &&
+            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.priest.pPsychicScream))
+        {
+            if (DoCastSpell(pVictim, m_spells.priest.pPsychicScream) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pManaBurn &&
+            CanTryToCastSpell(pVictim, m_spells.priest.pManaBurn))
+        {
+            if (DoCastSpell(pVictim, m_spells.priest.pManaBurn) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pDevouringPlague &&
+            CanTryToCastSpell(pVictim, m_spells.priest.pDevouringPlague))
+        {
+            if (DoCastSpell(pVictim, m_spells.priest.pDevouringPlague) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pHolyNova &&
+            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.priest.pHolyNova))
+        {
+            if (DoCastSpell(pVictim, m_spells.priest.pHolyNova) == SPELL_CAST_OK)
+                return;
+        }
+    }
+
 }
 
 void BattleBotAI::UpdateAI(uint32 const diff)

@@ -85,6 +85,8 @@ public:
     void UpdateOutOfCombatAI_Hunter();
     void UpdateInCombatAI_Mage();
     void UpdateOutOfCombatAI_Mage();
+    void UpdateInCombatAI_Priest();
+    void UpdateOutOfCombatAI_Priest();
 
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
@@ -92,7 +94,7 @@ public:
     {
         struct
         {
-            SpellEntry const* spells[25];
+            SpellEntry const* spells[43];
         } raw;
         struct
         {
@@ -123,6 +125,7 @@ public:
         {
             SpellEntry const* pIceArmor;
             SpellEntry const* pArcaneIntellect;
+            SpellEntry const* pArcaneBrilliance;
             SpellEntry const* pIceBarrier;
             SpellEntry const* pPolymorph;
             SpellEntry const* pFrostbolt;
@@ -132,6 +135,27 @@ public:
             SpellEntry const* pFrostNova;
             SpellEntry const* pConeofCold;
         } mage;
+        struct
+        {
+            SpellEntry const* pPowerWordFortitude;
+            SpellEntry const* pDivineSpirit;
+            SpellEntry const* pPrayerofSpirit;
+            SpellEntry const* pPrayerofFortitude;
+            SpellEntry const* pInnerFire;
+            SpellEntry const* pShadowProtection;
+            SpellEntry const* pPowerWordShield;
+            SpellEntry const* pHolyNova;
+            SpellEntry const* pHolyFire;
+            SpellEntry const* pMindBlast;
+            SpellEntry const* pShadowWordPain;
+            SpellEntry const* pInnerFocus;
+            SpellEntry const* pAbolishDisease;
+            SpellEntry const* pDispelMagic;
+            SpellEntry const* pFade;
+            SpellEntry const* pManaBurn;
+            SpellEntry const* pDevouringPlague;
+            SpellEntry const* pPsychicScream;
+        } priest;
     } m_spells;
 
     std::vector<LootResponseData> m_lootResponses;
