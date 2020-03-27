@@ -1418,6 +1418,9 @@ void BattleBotAI::UpdateOutOfCombatAI()
         case CLASS_MAGE:
             UpdateOutOfCombatAI_Mage();
             break;
+        case CLASS_PRIEST:
+            UpdateOutOfCombatAI_Priest();
+            break;
     }
 }
 
@@ -1433,6 +1436,9 @@ void BattleBotAI::UpdateInCombatAI()
             break;
         case CLASS_MAGE:
             UpdateInCombatAI_Mage();
+            break;
+        case CLASS_PRIEST:
+            UpdateInCombatAI_Priest();
             break;
     }
 }
