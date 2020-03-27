@@ -583,6 +583,88 @@ void BattleBotAI::PopulateSpellData()
                 }
                 break;
             }
+            case CLASS_WARRIOR:
+            {
+                if (pSpellEntry->SpellName[0].find("Battle Stance") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pBattleStance ||
+                        m_spells.warrior.pBattleStance->Id < pSpellEntry->Id)
+                        m_spells.warrior.pBattleStance = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Berserker Stance") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pBerserkerStance ||
+                        m_spells.warrior.pBerserkerStance->Id < pSpellEntry->Id)
+                        m_spells.warrior.pBerserkerStance = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Defensive Stance") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pDefensiveStance ||
+                        m_spells.warrior.pDefensiveStance->Id < pSpellEntry->Id)
+                        m_spells.warrior.pDefensiveStance = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Charge") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pCharge ||
+                        m_spells.warrior.pCharge->Id < pSpellEntry->Id)
+                        m_spells.warrior.pCharge = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Intercept") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pIntercept ||
+                        m_spells.warrior.pIntercept->Id < pSpellEntry->Id)
+                        m_spells.warrior.pIntercept = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Overpower") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pOverpower ||
+                        m_spells.warrior.pOverpower->Id < pSpellEntry->Id)
+                        m_spells.warrior.pOverpower = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Heroic Strike") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pHeroicStrike ||
+                        m_spells.warrior.pHeroicStrike->Id < pSpellEntry->Id)
+                        m_spells.warrior.pHeroicStrike = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Execute") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pExecute ||
+                        m_spells.warrior.pExecute->Id < pSpellEntry->Id)
+                        m_spells.warrior.pExecute = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Mortal Strike") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pMortalStrike ||
+                        m_spells.warrior.pMortalStrike->Id < pSpellEntry->Id)
+                        m_spells.warrior.pMortalStrike = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Bloodrage") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pBloodrage ||
+                        m_spells.warrior.pBloodrage->Id < pSpellEntry->Id)
+                        m_spells.warrior.pBloodrage = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Pummel") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pPummel ||
+                        m_spells.warrior.pPummel->Id < pSpellEntry->Id)
+                        m_spells.warrior.pPummel = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Rend") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pRend ||
+                        m_spells.warrior.pRend->Id < pSpellEntry->Id)
+                        m_spells.warrior.pRend = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Disarm") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pDisarm ||
+                        m_spells.warrior.pDisarm->Id < pSpellEntry->Id)
+                        m_spells.warrior.pDisarm = pSpellEntry;
+                }
+                break;
+            }
         }
 
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
@@ -1468,6 +1550,7 @@ void BattleBotAI::OnJustDied()
 
 void BattleBotAI::OnJustRevived()
 {
+    SummonPetIfNeeded();
     DoGraveyardJump();
 }
 
@@ -1479,6 +1562,8 @@ void BattleBotAI::OnEnterBattleGround()
 
     if (bg->GetStatus() != STATUS_WAIT_JOIN)
         return;
+
+    SummonPetIfNeeded();
 
     if (me->GetBattleGround()->GetTypeID() == BATTLEGROUND_WS)
     {
@@ -1524,6 +1609,9 @@ void BattleBotAI::UpdateOutOfCombatAI()
         case CLASS_WARLOCK:
             UpdateOutOfCombatAI_Warlock();
             break;
+        case CLASS_WARRIOR:
+            UpdateOutOfCombatAI_Warrior();
+            break;
     }
 }
 
@@ -1545,6 +1633,9 @@ void BattleBotAI::UpdateInCombatAI()
             break;
         case CLASS_WARLOCK:
             UpdateInCombatAI_Warlock();
+            break;
+        case CLASS_WARRIOR:
+            UpdateInCombatAI_Warrior();
             break;
     }
 }
@@ -2080,6 +2171,13 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
 {
     if (Unit* pVictim = me->GetVictim())
     {
+        if (m_spells.warlock.pShadowBolt &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pShadowBolt))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pShadowBolt) == SPELL_CAST_OK)
+                return;
+        }
+
         if (m_spells.warlock.pCorruption &&
             CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption))
         {
@@ -2108,13 +2206,6 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
                 return;
         }
 
-        if (m_spells.warlock.pShadowBolt &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pShadowBolt))
-        {
-            if (DoCastSpell(pVictim, m_spells.warlock.pShadowBolt) == SPELL_CAST_OK)
-                return;
-        }
-
         if (pVictim->IsCaster())
         {
             if (m_spells.warlock.pCurseofTongues &&
@@ -2134,10 +2225,61 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
             }
         }
 
-        if (m_spells.warlock.pHowlofTerror &&
-            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.warlock.pHowlofTerror))
+        if ((me->GetAttackers().size() > 2) && m_spells.warlock.pHowlofTerror 
+            && CanTryToCastSpell(pVictim, m_spells.warlock.pHowlofTerror))
         {
             if (DoCastSpell(pVictim, m_spells.warlock.pHowlofTerror) == SPELL_CAST_OK)
+                return;
+        }
+    }
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Warrior()
+{
+    if (m_spells.warrior.pBattleStance &&
+        CanTryToCastSpell(me, m_spells.warrior.pBattleStance))
+    {
+        if (DoCastSpell(me, m_spells.warrior.pBattleStance) == SPELL_CAST_OK)
+            return;
+    }
+}
+
+void BattleBotAI::UpdateInCombatAI_Warrior()
+{
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (me->HasAura(m_spells.warrior.pBattleStance->Id) && (me->GetAttackers().size() < 4) && m_spells.warrior.pCharge &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pCharge))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pCharge) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (me->HasAura(m_spells.warrior.pBerserkerStance->Id) && (me->GetAttackers().size() < 4) && m_spells.warrior.pIntercept &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pIntercept))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pIntercept) == SPELL_CAST_OK)
+                return;
+        }
+
+        if ((me->GetAttackers().size() > 2) && me->IsNonMeleeSpellCasted() && m_spells.warrior.pPummel &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pPummel))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pPummel) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pHeroicStrike &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pHeroicStrike))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pHeroicStrike) == SPELL_CAST_OK)
+                return;
+        }
+
+        if ((pVictim->GetHealthPercent() < 20) && m_spells.warrior.pExecute &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pExecute))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pExecute) == SPELL_CAST_OK)
                 return;
         }
     }
