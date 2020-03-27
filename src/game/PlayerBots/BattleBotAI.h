@@ -87,6 +87,8 @@ public:
     void UpdateOutOfCombatAI_Mage();
     void UpdateInCombatAI_Priest();
     void UpdateOutOfCombatAI_Priest();
+    void UpdateInCombatAI_Warlock();
+    void UpdateOutOfCombatAI_Warlock();
 
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
@@ -94,7 +96,7 @@ public:
     {
         struct
         {
-            SpellEntry const* spells[43];
+            SpellEntry const* spells[57];
         } raw;
         struct
         {
@@ -156,6 +158,27 @@ public:
             SpellEntry const* pDevouringPlague;
             SpellEntry const* pPsychicScream;
         } priest;
+        struct
+        {
+            SpellEntry const* pDetectInvisibility;
+            SpellEntry const* pShadowWard;
+            SpellEntry const* pShadowBolt;
+            SpellEntry const* pCorruption;
+            SpellEntry const* pShadowburn;
+            SpellEntry const* pSearingPain;
+            SpellEntry const* pImmolate;
+            SpellEntry const* pDrainLife;
+            SpellEntry const* pSiphonLife;
+            SpellEntry const* pFear;
+            SpellEntry const* pHowlofTerror;
+            SpellEntry const* pCurseofAgony;
+            SpellEntry const* pCurseofDoom;
+            SpellEntry const* pCurseoftheElements;
+            SpellEntry const* pCurseofShadow;
+            SpellEntry const* pCurseofRecklessness;
+            SpellEntry const* pCurseofTongues;
+            SpellEntry const* pCurseofExhaustion;
+        } warlock;
     } m_spells;
 
     std::vector<LootResponseData> m_lootResponses;

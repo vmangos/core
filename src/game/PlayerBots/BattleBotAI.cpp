@@ -483,6 +483,106 @@ void BattleBotAI::PopulateSpellData()
                 }
                 break;
             }
+            case CLASS_WARLOCK:
+            {
+                if (pSpellEntry->SpellName[0].find("Detect Invisibility") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pDetectInvisibility ||
+                        m_spells.warlock.pDetectInvisibility->Id < pSpellEntry->Id)
+                        m_spells.warlock.pDetectInvisibility = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shadow Ward") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pShadowWard ||
+                        m_spells.warlock.pShadowWard->Id < pSpellEntry->Id)
+                        m_spells.warlock.pShadowWard = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shadow Bolt") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pShadowBolt ||
+                        m_spells.warlock.pShadowBolt->Id < pSpellEntry->Id)
+                        m_spells.warlock.pShadowBolt = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Corruption") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pCorruption ||
+                        m_spells.warlock.pCorruption->Id < pSpellEntry->Id)
+                        m_spells.warlock.pCorruption = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shadowburn") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pShadowburn ||
+                        m_spells.warlock.pShadowburn->Id < pSpellEntry->Id)
+                        m_spells.warlock.pShadowburn = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Searing Pain") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pSearingPain ||
+                        m_spells.warlock.pSearingPain->Id < pSpellEntry->Id)
+                        m_spells.warlock.pSearingPain = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Immolate") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pImmolate ||
+                        m_spells.warlock.pImmolate->Id < pSpellEntry->Id)
+                        m_spells.warlock.pImmolate = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Drain Life") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pDrainLife ||
+                        m_spells.warlock.pDrainLife->Id < pSpellEntry->Id)
+                        m_spells.warlock.pDrainLife = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Siphon Life") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pSiphonLife ||
+                        m_spells.warlock.pSiphonLife->Id < pSpellEntry->Id)
+                        m_spells.warlock.pSiphonLife = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Fear") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pFear ||
+                        m_spells.warlock.pFear->Id < pSpellEntry->Id)
+                        m_spells.warlock.pFear = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Howl of Terror") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pHowlofTerror ||
+                        m_spells.warlock.pHowlofTerror->Id < pSpellEntry->Id)
+                        m_spells.warlock.pHowlofTerror = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Curse of Agony") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pCurseofAgony ||
+                        m_spells.warlock.pCurseofAgony->Id < pSpellEntry->Id)
+                        m_spells.warlock.pCurseofAgony = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Curse of the Elements") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pCurseoftheElements ||
+                        m_spells.warlock.pCurseoftheElements->Id < pSpellEntry->Id)
+                        m_spells.warlock.pCurseoftheElements = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Curse of Shadow") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pCurseofShadow ||
+                        m_spells.warlock.pCurseofShadow->Id < pSpellEntry->Id)
+                        m_spells.warlock.pCurseofShadow = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Curse of Recklessness") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pCurseofRecklessness ||
+                        m_spells.warlock.pCurseofRecklessness->Id < pSpellEntry->Id)
+                        m_spells.warlock.pCurseofRecklessness = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Curse of Tongues") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pCurseofTongues ||
+                        m_spells.warlock.pCurseofTongues->Id < pSpellEntry->Id)
+                        m_spells.warlock.pCurseofTongues = pSpellEntry;
+                }
+                break;
+            }
         }
 
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
@@ -1421,6 +1521,9 @@ void BattleBotAI::UpdateOutOfCombatAI()
         case CLASS_PRIEST:
             UpdateOutOfCombatAI_Priest();
             break;
+        case CLASS_WARLOCK:
+            UpdateOutOfCombatAI_Warlock();
+            break;
     }
 }
 
@@ -1439,6 +1542,9 @@ void BattleBotAI::UpdateInCombatAI()
             break;
         case CLASS_PRIEST:
             UpdateInCombatAI_Priest();
+            break;
+        case CLASS_WARLOCK:
+            UpdateInCombatAI_Warlock();
             break;
     }
 }
@@ -1647,6 +1753,37 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
 
 void BattleBotAI::UpdateOutOfCombatAI_Mage()
 {
+    BattleGround* bg = me->GetBattleGround();
+    if (bg && bg->GetStatus() == STATUS_WAIT_JOIN)
+    {
+        if (m_spells.mage.pArcaneBrilliance)
+        {
+            if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneBrilliance))
+            {
+                if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) &&
+                    IsValidBuffTarget(pTarget, m_spells.mage.pArcaneBrilliance))
+                {
+                    if (DoCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
+                    {
+                        m_isBuffing = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    if (bg && bg->GetStatus() == STATUS_IN_PROGRESS)
+    {
+        if (m_spells.mage.pArcaneIntellect &&
+            !me->HasAura(m_spells.mage.pArcaneIntellect->Id) &&
+            CanTryToCastSpell(me, m_spells.mage.pArcaneIntellect))
+        {
+            if (DoCastSpell(me, m_spells.mage.pArcaneIntellect) == SPELL_CAST_OK)
+                return;
+        }
+    }
+
     if (m_spells.mage.pIceArmor &&
         !me->HasAura(m_spells.mage.pIceArmor->Id) &&
         CanTryToCastSpell(me, m_spells.mage.pIceArmor))
@@ -1661,22 +1798,6 @@ void BattleBotAI::UpdateOutOfCombatAI_Mage()
     {
         if (DoCastSpell(me, m_spells.mage.pIceBarrier) == SPELL_CAST_OK)
             return;
-    }
-
-    if (m_spells.mage.pArcaneBrilliance)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.mage.pArcaneBrilliance))
-        {
-            if (CanTryToCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) &&
-                IsValidBuffTarget(pTarget, m_spells.mage.pArcaneBrilliance))
-            {
-                if (DoCastSpell(pTarget, m_spells.mage.pArcaneBrilliance) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    return;
-                }
-            }
-        }
     }
 
     m_isBuffing = false;
@@ -1739,35 +1860,74 @@ void BattleBotAI::UpdateInCombatAI_Mage()
 
 void BattleBotAI::UpdateOutOfCombatAI_Priest()
 {
-    if (m_spells.priest.pPrayerofFortitude)
+    BattleGround* bg = me->GetBattleGround();
+    if (bg && bg->GetStatus() == STATUS_WAIT_JOIN)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofFortitude))
+        if (m_spells.priest.pPrayerofFortitude)
         {
-            if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) &&
-                IsValidBuffTarget(pTarget, m_spells.priest.pPrayerofFortitude))
+            if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofFortitude))
             {
-                if (DoCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) == SPELL_CAST_OK)
+                if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) &&
+                    IsValidBuffTarget(pTarget, m_spells.priest.pPrayerofFortitude))
                 {
-                    m_isBuffing = true;
-                    return;
+                    if (DoCastSpell(pTarget, m_spells.priest.pPrayerofFortitude) == SPELL_CAST_OK)
+                    {
+                        m_isBuffing = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (m_spells.priest.pPrayerofSpirit)
+        {
+            if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofSpirit))
+            {
+                if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) &&
+                    IsValidBuffTarget(pTarget, m_spells.priest.pPrayerofSpirit))
+                {
+                    if (DoCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) == SPELL_CAST_OK)
+                    {
+                        m_isBuffing = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (m_spells.priest.pShadowProtection)
+        {
+            if (Player* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection))
+            {
+                if (CanTryToCastSpell(pTarget, m_spells.priest.pShadowProtection) &&
+                    IsValidBuffTarget(pTarget, m_spells.priest.pShadowProtection))
+                {
+                    if (DoCastSpell(pTarget, m_spells.priest.pShadowProtection) == SPELL_CAST_OK)
+                    {
+                        m_isBuffing = true;
+                        return;
+                    }
                 }
             }
         }
     }
-
-    if (m_spells.priest.pPrayerofSpirit)
+    else
+    if (bg && bg->GetStatus() == STATUS_IN_PROGRESS)
     {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pPrayerofSpirit))
+        if (m_spells.priest.pPowerWordFortitude &&
+            !me->HasAura(m_spells.priest.pPowerWordFortitude->Id) &&
+            CanTryToCastSpell(me, m_spells.priest.pPowerWordFortitude))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) &&
-                IsValidBuffTarget(pTarget, m_spells.priest.pPrayerofSpirit))
-            {
-                if (DoCastSpell(pTarget, m_spells.priest.pPrayerofSpirit) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    return;
-                }
-            }
+            if (DoCastSpell(me, m_spells.priest.pPowerWordFortitude) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pDivineSpirit &&
+            !me->HasAura(m_spells.priest.pDivineSpirit->Id) &&
+            CanTryToCastSpell(me, m_spells.priest.pDivineSpirit))
+        {
+            if (DoCastSpell(me, m_spells.priest.pDivineSpirit) == SPELL_CAST_OK)
+                return;
         }
     }
 
@@ -1785,22 +1945,6 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
     {
         if (DoCastSpell(me, m_spells.priest.pPowerWordShield) == SPELL_CAST_OK)
             return;
-    }
-
-    if (m_spells.priest.pShadowProtection)
-    {
-        if (Player* pTarget = SelectBuffTarget(m_spells.priest.pShadowProtection))
-        {
-            if (CanTryToCastSpell(pTarget, m_spells.priest.pShadowProtection) &&
-                IsValidBuffTarget(pTarget, m_spells.priest.pShadowProtection))
-            {
-                if (DoCastSpell(pTarget, m_spells.priest.pShadowProtection) == SPELL_CAST_OK)
-                {
-                    m_isBuffing = true;
-                    return;
-                }
-            }
-        }
     }
 
     m_isBuffing = false;
@@ -1905,6 +2049,98 @@ void BattleBotAI::UpdateInCombatAI_Priest()
         }
     }
 
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Warlock()
+{
+    BattleGround* bg = me->GetBattleGround();
+    if (bg && bg->GetStatus() == STATUS_WAIT_JOIN)
+    {
+        if (m_spells.warlock.pDetectInvisibility)
+        {
+            if (Player* pTarget = SelectBuffTarget(m_spells.warlock.pDetectInvisibility))
+            {
+                if (CanTryToCastSpell(pTarget, m_spells.warlock.pDetectInvisibility) &&
+                    IsValidBuffTarget(pTarget, m_spells.warlock.pDetectInvisibility))
+                {
+                    if (DoCastSpell(pTarget, m_spells.warlock.pDetectInvisibility) == SPELL_CAST_OK)
+                    {
+                        m_isBuffing = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    m_isBuffing = false;
+}
+
+void BattleBotAI::UpdateInCombatAI_Warlock()
+{
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_spells.warlock.pCorruption &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pCorruption) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pImmolate &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pImmolate))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pImmolate) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pDrainLife &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pDrainLife))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pDrainLife) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pFear &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pFear))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pFear) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pShadowBolt &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pShadowBolt))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pShadowBolt) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (pVictim->IsCaster())
+        {
+            if (m_spells.warlock.pCurseofTongues &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofTongues))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pCurseofTongues) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+        else
+        {
+            if (m_spells.warlock.pCurseofExhaustion &&
+                CanTryToCastSpell(pVictim, m_spells.warlock.pCurseofExhaustion))
+            {
+                if (DoCastSpell(pVictim, m_spells.warlock.pCurseofExhaustion) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+
+        if (m_spells.warlock.pHowlofTerror &&
+            (me->GetAttackers().size() > 2) && CanTryToCastSpell(pVictim, m_spells.warlock.pHowlofTerror))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pHowlofTerror) == SPELL_CAST_OK)
+                return;
+        }
+    }
 }
 
 void BattleBotAI::UpdateAI(uint32 const diff)
