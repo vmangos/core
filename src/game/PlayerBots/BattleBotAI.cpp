@@ -663,6 +663,12 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.warrior.pDisarm->Id < pSpellEntry->Id)
                         m_spells.warrior.pDisarm = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Whirlwind") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pWhirlwind ||
+                        m_spells.warrior.pWhirlwind->Id < pSpellEntry->Id)
+                        m_spells.warrior.pWhirlwind = pSpellEntry;
+                }
                 break;
             }
         }
@@ -2248,21 +2254,14 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
 {
     if (Unit* pVictim = me->GetVictim())
     {
-        if (me->HasAura(m_spells.warrior.pBattleStance->Id) && (me->GetAttackers().size() < 4) && m_spells.warrior.pCharge &&
+        if (me->HasAura(m_spells.warrior.pBattleStance->Id) && (me->GetAttackers().size() <= 4) && m_spells.warrior.pCharge &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pCharge))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pCharge) == SPELL_CAST_OK)
                 return;
         }
 
-        if (me->HasAura(m_spells.warrior.pBerserkerStance->Id) && (me->GetAttackers().size() < 4) && m_spells.warrior.pIntercept &&
-            CanTryToCastSpell(pVictim, m_spells.warrior.pIntercept))
-        {
-            if (DoCastSpell(pVictim, m_spells.warrior.pIntercept) == SPELL_CAST_OK)
-                return;
-        }
-
-        if ((me->GetAttackers().size() > 2) && me->IsNonMeleeSpellCasted() && m_spells.warrior.pPummel &&
+        if (me->IsNonMeleeSpellCasted() && m_spells.warrior.pPummel &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pPummel))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pPummel) == SPELL_CAST_OK)
@@ -2280,6 +2279,41 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
             CanTryToCastSpell(pVictim, m_spells.warrior.pExecute))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pExecute) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pExecute &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pBerserkerStance))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pBerserkerStance) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (me->HasAura(m_spells.warrior.pBerserkerStance->Id) && (me->GetAttackers().size() <= 4) && m_spells.warrior.pIntercept &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pIntercept))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pIntercept) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (me->HasAura(m_spells.warrior.pBerserkerStance->Id) && (me->GetAttackers().size() <= 4) && m_spells.warrior.pWhirlwind &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pWhirlwind))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pWhirlwind) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pDefensiveStance &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pDefensiveStance))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pDefensiveStance) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (me->HasAura(m_spells.warrior.pDefensiveStance->Id) && (me->GetAttackers().size() > 2) && m_spells.warrior.pDisarm
+            && CanTryToCastSpell(pVictim, m_spells.warrior.pDisarm))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pDisarm) == SPELL_CAST_OK)
                 return;
         }
     }
