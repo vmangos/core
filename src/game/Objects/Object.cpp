@@ -760,8 +760,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* u
                 // Hide real health value. Send a percent instead. See ShowHealthValues option in mangosd.conf
                 else if (!ShowHealthValues && (index == UNIT_FIELD_HEALTH || index == UNIT_FIELD_MAXHEALTH))
                 {
-                    Player* owner = ((Unit*)this)->GetCharmerOrOwnerPlayerOrPlayerItself();
-                    if (owner && owner->IsInSameRaidWith(target))
+                    if (target->CanSeeHealthOf((Unit*)this))
                         *data << m_uint32Values[index];
                     else // Hide
                     {

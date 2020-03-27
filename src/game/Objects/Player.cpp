@@ -2556,6 +2556,22 @@ bool Player::CanInteractWithGameObject(GameObject const* pGo, uint32 gameobject_
     return false;
 }
 
+bool Player::CanSeeHealthOf(Unit const* pTarget) const
+{
+    Player* pOwner = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
+    if (pOwner && IsInSameRaidWith(pOwner))
+        return true;
+
+    // Beast Lore
+    for (const auto& aura : pTarget->GetAurasByType(SPELL_AURA_EMPATHY))
+    {
+        if (aura->GetCasterGuid() == this->GetObjectGuid())
+            return true;
+    }
+
+    return false;
+}
+
 bool Player::IsUnderWater() const
 {
     return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ() + 2);
