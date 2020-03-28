@@ -35,6 +35,7 @@
 #include "PlayerDump.h"
 #include "CharacterDatabaseCache.h"
 #include "Config/Config.h"
+#include "PlayerAI.h"
 
 #include <regex>
 
