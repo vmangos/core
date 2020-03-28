@@ -207,6 +207,7 @@ public:
             SpellEntry const* pRend;
             SpellEntry const* pDisarm;
             SpellEntry const* pWhirlwind;
+            SpellEntry const* pBattleShout;
         } warrior;
     } m_spells;
 

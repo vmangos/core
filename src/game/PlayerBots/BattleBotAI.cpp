@@ -768,6 +768,12 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.warrior.pWhirlwind->Id < pSpellEntry->Id)
                         m_spells.warrior.pWhirlwind = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Battle Shout") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pBattleShout ||
+                        m_spells.warrior.pBattleShout->Id < pSpellEntry->Id)
+                        m_spells.warrior.pBattleShout = pSpellEntry;
+                }
                 break;
             }
         }
@@ -2534,6 +2540,20 @@ void BattleBotAI::UpdateOutOfCombatAI_Warrior()
     {
         if (DoCastSpell(me, m_spells.warrior.pBattleStance) == SPELL_CAST_OK)
             return;
+    }
+
+    if (m_spells.warrior.pBattleShout &&
+       !me->HasAura(m_spells.warrior.pBattleShout->Id))
+    {
+        if (m_spells.warrior.pBloodrage &&
+           (me->GetPower(POWER_RAGE) < 10) &&
+            CanTryToCastSpell(me, m_spells.warrior.pBloodrage))
+        {
+            DoCastSpell(me, m_spells.warrior.pBloodrage);
+        }
+
+        if (CanTryToCastSpell(me, m_spells.warrior.pBattleShout))
+            DoCastSpell(me, m_spells.warrior.pBattleShout);
     }
 
     if (Unit* pVictim = me->GetVictim())
