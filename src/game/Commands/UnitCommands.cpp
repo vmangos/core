@@ -234,6 +234,23 @@ bool ChatHandler::HandleGetAngleCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleUnitAIInfoCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget->IsCreature())
+        return HandleNpcAIInfoCommand(args);
+
+    return HandleCharacterAIInfoCommand(args);
+}
+
 bool ChatHandler::HandleFreezeCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();

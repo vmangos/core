@@ -410,6 +410,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCastSelfCommand(char* args);
         bool HandleCastTargetCommand(char* args);
 
+        bool HandleCharacterAIInfoCommand(char* args);
         bool HandleCharacterDeletedDeleteCommand(char* args);
         bool HandleCharacterDeletedListCommand(char* args, bool useName);
         bool HandleCharacterDeletedListAccountCommand(char* args);
@@ -659,8 +660,9 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcUnFollowCommand(char* args);
         bool HandleNpcWhisperCommand(char* args);
         bool HandleNpcYellCommand(char* args);
-
         //----------------------------------------------------------
+
+        bool HandleUnitAIInfoCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);

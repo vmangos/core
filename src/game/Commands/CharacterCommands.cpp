@@ -38,6 +38,25 @@
 
 #include <regex>
 
+bool ChatHandler::HandleCharacterAIInfoCommand(char* /*args*/)
+{
+    Player* pTarget = GetSelectedPlayer();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("AI info for %s", pTarget->GetObjectGuid().GetString().c_str());
+    char const* cstrAIClass = pTarget->AI() ? typeid(*pTarget->AI()).name() : " - ";
+    PSendSysMessage("Current AI: %s", cstrAIClass);
+    PSendSysMessage(LANG_NPC_MOTION_TYPE, pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType());
+
+    return true;
+}
+
 bool ChatHandler::HandleModifyXpRateCommand(char* args)
 {
     // Only a GM can modify another player's rates.

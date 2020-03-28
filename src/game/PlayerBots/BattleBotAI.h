@@ -54,6 +54,8 @@ public:
 
     void SummonPetIfNeeded();
     void AttackStart(Unit* pVictim);
+    uint8 GetAttackersInRangeCount(float range) const;
+    Unit* SelectAttackerDifferentFrom(Unit const* pExcept) const;
     Unit* SelectAttackTarget() const;
     Unit* SelectFollowTarget() const;
     Unit* SelectHealTarget(float selfHealPercent = 100.0f) const;
@@ -62,14 +64,12 @@ public:
     bool IsValidHealTarget(Unit const* pTarget) const;
     bool IsValidHostileTarget(Unit const* pTarget) const;
     bool IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
-    void HealInjuredAlly(float selfHealPercent = 100.0f);
+    bool HealInjuredAlly(float selfHealPercent = 100.0f);
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool DrinkAndEat();
     void EquipOrUseNewItem();
-    bool IsPhysicalDamageClass(uint8 playerClass);
-    bool IsRangedDamageClass(uint8 playerClass);
 
     void OnJustRevived();
     void OnJustDied();
@@ -123,7 +123,15 @@ public:
             SpellEntry const* pAspectOfTheCheetah;
             SpellEntry const* pAspectOfTheMonkey;
             SpellEntry const* pAspectOfTheHawk;
+            SpellEntry const* pSerpentSting;
             SpellEntry const* pArcaneShot;
+            SpellEntry const* pAimedShot;
+            SpellEntry const* pMultiShot;
+            SpellEntry const* pConcussiveShot;
+            SpellEntry const* pWingClip;
+            SpellEntry const* pHuntersMark;
+            SpellEntry const* pMongooseBite;
+            SpellEntry const* pRaptorStrike;
         } hunter;
         struct
         {
@@ -131,6 +139,7 @@ public:
             SpellEntry const* pArcaneIntellect;
             SpellEntry const* pArcaneBrilliance;
             SpellEntry const* pIceBarrier;
+            SpellEntry const* pManaShield;
             SpellEntry const* pPolymorph;
             SpellEntry const* pFrostbolt;
             SpellEntry const* pFireBlast;
@@ -138,6 +147,7 @@ public:
             SpellEntry const* pArcaneExplosion;
             SpellEntry const* pFrostNova;
             SpellEntry const* pConeofCold;
+            SpellEntry const* pBlink;
         } mage;
         struct
         {
@@ -155,7 +165,6 @@ public:
             SpellEntry const* pInnerFocus;
             SpellEntry const* pAbolishDisease;
             SpellEntry const* pDispelMagic;
-            SpellEntry const* pFade;
             SpellEntry const* pManaBurn;
             SpellEntry const* pDevouringPlague;
             SpellEntry const* pPsychicScream;

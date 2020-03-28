@@ -202,6 +202,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand characterCommandTable[] =
     {
+        { "aiinfo",         SEC_MODERATOR,      true,  &ChatHandler::HandleCharacterAIInfoCommand,     "", nullptr },
         { "deleted",        SEC_GAMEMASTER,     true, nullptr,                                         "", characterDeletedCommandTable},
         { "erase",          SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterEraseCommand,      "", nullptr },
         { "level",          SEC_DEVELOPPER,     true,  &ChatHandler::HandleCharacterLevelCommand,      "", nullptr },
@@ -583,6 +584,12 @@ ChatCommand * ChatHandler::getCommandTable()
         { "tame",           SEC_GAMEMASTER,     false, &ChatHandler::HandleNpcTameCommand,             "", nullptr },
         { "setdeathstate",  SEC_DEVELOPPER,     false, &ChatHandler::HandleNpcSetDeathStateCommand,    "", nullptr },
         { "group",          SEC_DEVELOPPER,     false, nullptr,                                        "", creatureGroupsCommandTable },
+        { nullptr,          0,                  false, nullptr,                                        "", nullptr }
+    };
+
+    static ChatCommand unitCommandTable[] =
+    {
+        { "aiinfo",         SEC_MODERATOR,      false, &ChatHandler::HandleUnitAIInfoCommand,          "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
@@ -1053,6 +1060,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "lookup",         SEC_MODERATOR,      true, nullptr,                                         "", lookupCommandTable   },
         { "modify",         SEC_TICKETMASTER,   false, nullptr,                                        "", modifyCommandTable   },
         { "npc",            SEC_MODERATOR,      false, nullptr,                                        "", npcCommandTable      },
+        { "unit",           SEC_MODERATOR,      false, nullptr,                                        "", unitCommandTable     },
         { "pool",           SEC_GAMEMASTER,     true, nullptr,                                         "", poolCommandTable     },
         { "pdump",          SEC_ADMINISTRATOR,  true, nullptr,                                         "", pdumpCommandTable    },
         { "quest",          SEC_GAMEMASTER,     false, nullptr,                                        "", questCommandTable    },

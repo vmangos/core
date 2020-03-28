@@ -47,6 +47,31 @@ enum PartyBotSpells
 #define PB_MIN_FOLLOW_ANGLE 0.0f
 #define PB_MAX_FOLLOW_ANGLE 6.0f
 
+static bool IsPhysicalDamageClass(uint8 playerClass)
+{
+    switch (playerClass)
+    {
+        case CLASS_WARRIOR:
+        case CLASS_ROGUE:
+        case CLASS_HUNTER:
+            return true;
+    }
+    return false;
+}
+
+static bool IsRangedDamageClass(uint8 playerClass)
+{
+    switch (playerClass)
+    {
+        case CLASS_HUNTER:
+        case CLASS_PRIEST:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+            return true;
+    }
+    return false;
+}
+
 void PartyBotAI::AutoAssignRole()
 {
     switch (me->GetClass())
@@ -541,31 +566,6 @@ void PartyBotAI::SummonPetIfNeeded()
         if (!vSummons.empty())
             me->CastSpell(me, SelectRandomContainerElement(vSummons), true);
     }
-}
-
-bool IsPhysicalDamageClass(uint8 playerClass)
-{
-    switch (playerClass)
-    {
-        case CLASS_WARRIOR:
-        case CLASS_ROGUE:
-        case CLASS_HUNTER:
-            return true;
-    }
-    return false;
-}
-
-bool IsRangedDamageClass(uint8 playerClass)
-{
-    switch (playerClass)
-    {
-        case CLASS_HUNTER:
-        case CLASS_PRIEST:
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-            return true;
-    }
-    return false;
 }
 
 void PartyBotAI::CastRandomDamageSpell(Unit* pVictim)
