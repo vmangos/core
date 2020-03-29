@@ -224,7 +224,6 @@ public:
             SpellEntry const* pGarrote;
             SpellEntry const* pAmbush;
             SpellEntry const* pCheapShot;
-            SpellEntry const* pSap;
             SpellEntry const* pPremeditation;
             SpellEntry const* pBackstab;
             SpellEntry const* pHemorrhage;
