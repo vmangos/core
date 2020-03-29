@@ -109,6 +109,28 @@ void WSG_AtHordeFlag(BattleBotAI* pAI)
     pAI->MoveToNextPoint();
 }
 
+void WSG_AtAllianceGraveyard(BattleBotAI* pAI)
+{
+    if ((pAI->me->GetTeam() == ALLIANCE) && urand(0, 1))
+    {
+        pAI->ClearPath();
+        pAI->DoGraveyardJump();
+    }
+    else
+        pAI->MoveToNextPoint();
+}
+
+void WSG_AtHordeGraveyard(BattleBotAI* pAI)
+{
+    if ((pAI->me->GetTeam() == HORDE) && urand(0, 1))
+    {
+        pAI->ClearPath();
+        pAI->DoGraveyardJump();
+    }
+    else
+        pAI->MoveToNextPoint();
+}
+
 std::vector<RecordedMovementPacket> vAllianceGraveyardJumpPath =
 {
     { MSG_MOVE_START_FORWARD, 0, 1, 1415.33f, 1554.79f, 343.156f, 2.34205f },
@@ -164,7 +186,7 @@ BattleBotPath vPath_WSG_HordeFlagRoom_to_HordeGraveyard =
     { 997.806f, 1422.52f, 344.623f, nullptr },
     { 1008.53f, 1417.02f, 343.206f, nullptr },
     { 1016.42f, 1402.33f, 341.352f, nullptr },
-    { 1029.14f, 1387.49f, 340.836f, nullptr },
+    { 1029.14f, 1387.49f, 340.836f, &WSG_AtHordeGraveyard },
 };
 // Horde Graveyard to Horde Tunnel
 BattleBotPath vPath_WSG_HordeGraveyard_to_HordeTunnel =
@@ -287,7 +309,7 @@ BattleBotPath vPath_WSG_AllianceFlagRoom_to_AllianceGraveyard =
     { 1441.47f, 1548.12f, 342.752f, nullptr },
     { 1433.79f, 1552.67f, 342.763f, nullptr },
     { 1422.88f, 1552.37f, 342.751f, nullptr },
-    { 1415.33f, 1554.79f, 343.156f, nullptr },
+    { 1415.33f, 1554.79f, 343.156f, &WSG_AtAllianceGraveyard },
 };
 // Alliance Graveyard to Alliance Tunnel
 BattleBotPath vPath_WSG_AllianceGraveyard_to_AllianceTunnel =
