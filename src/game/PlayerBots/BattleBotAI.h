@@ -216,7 +216,7 @@ public:
         } warrior;
         struct
         {
-            SpellEntry const* pSliceandDice;
+            SpellEntry const* pSliceAndDice;
             SpellEntry const* pSinisterStrike;
             SpellEntry const* pAdrenalineRush;
             SpellEntry const* pEviscerate;
@@ -240,8 +240,6 @@ public:
             SpellEntry const* pPreparation;
             SpellEntry const* pEvasion;
             SpellEntry const* pRiposte;
-            SpellEntry const* pFeint;
-            SpellEntry const* pDistract;
             SpellEntry const* pKick;
             SpellEntry const* pSprint;
         } rogue;

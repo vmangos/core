@@ -798,9 +798,9 @@ void BattleBotAI::PopulateSpellData()
             {
                 if (pSpellEntry->SpellName[0].find("Slice and Dice") != std::string::npos)
                 {
-                    if (!m_spells.rogue.pSliceandDice ||
-                        m_spells.rogue.pSliceandDice->Id < pSpellEntry->Id)
-                        m_spells.rogue.pSliceandDice = pSpellEntry;
+                    if (!m_spells.rogue.pSliceAndDice ||
+                        m_spells.rogue.pSliceAndDice->Id < pSpellEntry->Id)
+                        m_spells.rogue.pSliceAndDice = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Sinister Strike") != std::string::npos)
                 {
@@ -819,6 +819,138 @@ void BattleBotAI::PopulateSpellData()
                     if (!m_spells.rogue.pEviscerate ||
                         m_spells.rogue.pEviscerate->Id < pSpellEntry->Id)
                         m_spells.rogue.pEviscerate = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Stealth") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pStealth ||
+                        m_spells.rogue.pStealth->Id < pSpellEntry->Id)
+                        m_spells.rogue.pStealth = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Garrote") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pGarrote ||
+                        m_spells.rogue.pGarrote->Id < pSpellEntry->Id)
+                        m_spells.rogue.pGarrote = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Ambush") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pAmbush ||
+                        m_spells.rogue.pAmbush->Id < pSpellEntry->Id)
+                        m_spells.rogue.pAmbush = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Cheap Shot") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pCheapShot ||
+                        m_spells.rogue.pCheapShot->Id < pSpellEntry->Id)
+                        m_spells.rogue.pCheapShot = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Sap") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pSap ||
+                        m_spells.rogue.pSap->Id < pSpellEntry->Id)
+                        m_spells.rogue.pSap = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Premeditation") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pPremeditation ||
+                        m_spells.rogue.pPremeditation->Id < pSpellEntry->Id)
+                        m_spells.rogue.pPremeditation = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Backstab") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pBackstab ||
+                        m_spells.rogue.pBackstab->Id < pSpellEntry->Id)
+                        m_spells.rogue.pBackstab = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Hemorrhage") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pHemorrhage ||
+                        m_spells.rogue.pHemorrhage->Id < pSpellEntry->Id)
+                        m_spells.rogue.pHemorrhage = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Ghostly Strike") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pGhostlyStrike ||
+                        m_spells.rogue.pGhostlyStrike->Id < pSpellEntry->Id)
+                        m_spells.rogue.pGhostlyStrike = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Gouge") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pGouge ||
+                        m_spells.rogue.pGouge->Id < pSpellEntry->Id)
+                        m_spells.rogue.pGouge = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Rupture") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pRupture ||
+                        m_spells.rogue.pRupture->Id < pSpellEntry->Id)
+                        m_spells.rogue.pRupture = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Expose Armor") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pExposeArmor ||
+                        m_spells.rogue.pExposeArmor->Id < pSpellEntry->Id)
+                        m_spells.rogue.pExposeArmor = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Kidney Shot") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pKidneyShot ||
+                        m_spells.rogue.pKidneyShot->Id < pSpellEntry->Id)
+                        m_spells.rogue.pKidneyShot = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Cold Blood") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pColdBlood ||
+                        m_spells.rogue.pColdBlood->Id < pSpellEntry->Id)
+                        m_spells.rogue.pColdBlood = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blade Flurry") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pBladeFlurry ||
+                        m_spells.rogue.pBladeFlurry->Id < pSpellEntry->Id)
+                        m_spells.rogue.pBladeFlurry = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Vanish") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pVanish ||
+                        m_spells.rogue.pVanish->Id < pSpellEntry->Id)
+                        m_spells.rogue.pVanish = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blind") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pBlind ||
+                        m_spells.rogue.pBlind->Id < pSpellEntry->Id)
+                        m_spells.rogue.pBlind = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Preparation") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pPreparation ||
+                        m_spells.rogue.pPreparation->Id < pSpellEntry->Id)
+                        m_spells.rogue.pPreparation = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Evasion") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pEvasion ||
+                        m_spells.rogue.pEvasion->Id < pSpellEntry->Id)
+                        m_spells.rogue.pEvasion = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Riposte") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pRiposte ||
+                        m_spells.rogue.pRiposte->Id < pSpellEntry->Id)
+                        m_spells.rogue.pRiposte = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Kick") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pKick ||
+                        m_spells.rogue.pKick->Id < pSpellEntry->Id)
+                        m_spells.rogue.pKick = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Sprint") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pSprint ||
+                        m_spells.rogue.pSprint->Id < pSpellEntry->Id)
+                        m_spells.rogue.pSprint = pSpellEntry;
                 }
                 break;
             }
