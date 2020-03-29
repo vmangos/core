@@ -238,6 +238,7 @@ void PartyBotAI::PopulateSpellData()
                         default:
                             if (pSpellEntry->IsPositiveSpell() &&
                                 pSpellEntry->GetMaxDuration() >= 30000 &&
+                               !pSpellEntry->IsChanneledSpell() &&
                                !pSpellEntry->Reagent[0])
                             {
                                 SpellEntry const** pCurrentBuff = Spells::IsExplicitPositiveTarget(pSpellEntry->EffectImplicitTargetA[i]) ?
@@ -423,6 +424,7 @@ bool PartyBotAI::IsValidHostileTarget(Unit const* pTarget) const
 {
     return pTarget->IsTargetableForAttack(false, true) &&
            me->IsValidAttackTarget(pTarget) &&
+           pTarget->IsVisibleForOrDetect(me, me, false) &&
            !pTarget->HasBreakableByDamageCrowdControlAura();
 }
 
