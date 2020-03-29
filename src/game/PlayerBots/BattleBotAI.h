@@ -91,6 +91,8 @@ public:
     void UpdateOutOfCombatAI_Warlock();
     void UpdateInCombatAI_Warrior();
     void UpdateOutOfCombatAI_Warrior();
+    void UpdateInCombatAI_Rogue();
+    void UpdateOutOfCombatAI_Rogue();
 
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
@@ -209,6 +211,37 @@ public:
             SpellEntry const* pWhirlwind;
             SpellEntry const* pBattleShout;
         } warrior;
+        struct
+        {
+            SpellEntry const* pSliceandDice;
+            SpellEntry const* pSinisterStrike;
+            SpellEntry const* pAdrenalineRush;
+            SpellEntry const* pEviscerate;
+            SpellEntry const* pStealth;
+            SpellEntry const* pGarrote;
+            SpellEntry const* pAmbush;
+            SpellEntry const* pCheapShot;
+            SpellEntry const* pSap;
+            SpellEntry const* pPremeditation;
+            SpellEntry const* pBackstab;
+            SpellEntry const* pHemorrhage;
+            SpellEntry const* pGhostlyStrike;
+            SpellEntry const* pGouge;
+            SpellEntry const* pRupture;
+            SpellEntry const* pExposeArmor;
+            SpellEntry const* pKidneyShot;
+            SpellEntry const* pColdBlood;
+            SpellEntry const* pBladeFlurry;
+            SpellEntry const* pVanish;
+            SpellEntry const* pBlind;
+            SpellEntry const* pPreparation;
+            SpellEntry const* pEvasion;
+            SpellEntry const* pRiposte;
+            SpellEntry const* pFeint;
+            SpellEntry const* pDistract;
+            SpellEntry const* pKick;
+            SpellEntry const* pSprint;
+        } rogue;
     } m_spells;
 
     std::vector<LootResponseData> m_lootResponses;

@@ -776,6 +776,34 @@ void BattleBotAI::PopulateSpellData()
                 }
                 break;
             }
+            case CLASS_ROGUE:
+            {
+                if (pSpellEntry->SpellName[0].find("Slice and Dice") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pSliceandDice ||
+                        m_spells.rogue.pSliceandDice->Id < pSpellEntry->Id)
+                        m_spells.rogue.pSliceandDice = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Sinister Strike") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pSinisterStrike ||
+                        m_spells.rogue.pSinisterStrike->Id < pSpellEntry->Id)
+                        m_spells.rogue.pSinisterStrike = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Adrenaline Rush") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pAdrenalineRush ||
+                        m_spells.rogue.pAdrenalineRush->Id < pSpellEntry->Id)
+                        m_spells.rogue.pAdrenalineRush = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Eviscerate") != std::string::npos)
+                {
+                    if (!m_spells.rogue.pEviscerate ||
+                        m_spells.rogue.pEviscerate->Id < pSpellEntry->Id)
+                        m_spells.rogue.pEviscerate = pSpellEntry;
+                }
+                break;
+            }
         }
 
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
@@ -2590,6 +2618,127 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
 
         if (m_spells.warrior.pRend &&
            (pVictim->GetClass() == CLASS_ROGUE) &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pRend))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pRend) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (me->GetHealthPercent() < 20.0f)
+        {
+            if (m_spells.warrior.pDefensiveStance &&
+                CanTryToCastSpell(me, m_spells.warrior.pDefensiveStance))
+            {
+                DoCastSpell(me, m_spells.warrior.pDefensiveStance);
+            }
+        }
+        else
+        {
+            if (m_spells.warrior.pBerserkerStance &&
+                CanTryToCastSpell(me, m_spells.warrior.pBerserkerStance))
+            {
+                DoCastSpell(me, m_spells.warrior.pBerserkerStance);
+            }
+        }
+
+        if (m_spells.warrior.pIntercept && m_spells.warrior.pBerserkerStance &&
+            me->HasAura(m_spells.warrior.pBerserkerStance->Id) &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pIntercept))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pIntercept) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pWhirlwind && m_spells.warrior.pBerserkerStance &&
+            me->HasAura(m_spells.warrior.pBerserkerStance->Id) &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pWhirlwind))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pWhirlwind) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pDisarm && m_spells.warrior.pDefensiveStance &&
+            IsMeleeWeaponDamageClass(pVictim->GetClass()) &&
+            me->HasAura(m_spells.warrior.pDefensiveStance->Id) &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pDisarm))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pDisarm) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
+            && !me->CanReachWithMeleeAutoAttack(pVictim))
+        {
+            me->GetMotionMaster()->MoveChase(pVictim);
+        }
+
+        if (m_spells.warrior.pHeroicStrike &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pHeroicStrike))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pHeroicStrike) == SPELL_CAST_OK)
+                return;
+        }
+    }
+}
+
+
+void BattleBotAI::UpdateOutOfCombatAI_Rogue()
+{
+    if (m_spells.warrior.pBattleStance &&
+        CanTryToCastSpell(me, m_spells.warrior.pBattleStance))
+    {
+        if (DoCastSpell(me, m_spells.warrior.pBattleStance) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_spells.warrior.pBattleShout &&
+        !me->HasAura(m_spells.warrior.pBattleShout->Id))
+    {
+        if (m_spells.warrior.pBloodrage &&
+            (me->GetPower(POWER_RAGE) < 10) &&
+            CanTryToCastSpell(me, m_spells.warrior.pBloodrage))
+        {
+            DoCastSpell(me, m_spells.warrior.pBloodrage);
+        }
+
+        if (CanTryToCastSpell(me, m_spells.warrior.pBattleShout))
+            DoCastSpell(me, m_spells.warrior.pBattleShout);
+    }
+
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_spells.warrior.pCharge && m_spells.warrior.pBattleStance &&
+            me->HasAura(m_spells.warrior.pBattleStance->Id) &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pCharge))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pCharge) == SPELL_CAST_OK)
+                return;
+        }
+    }
+}
+
+void BattleBotAI::UpdateInCombatAI_Rogue()
+{
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_spells.warrior.pPummel &&
+            pVictim->IsNonMeleeSpellCasted() &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pPummel))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pPummel) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pExecute &&
+            (pVictim->GetHealthPercent() < 20.0f) &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pExecute))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pExecute) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pRend &&
+            (pVictim->GetClass() == CLASS_ROGUE) &&
             CanTryToCastSpell(pVictim, m_spells.warrior.pRend))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pRend) == SPELL_CAST_OK)
