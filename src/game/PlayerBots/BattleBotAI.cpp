@@ -1026,6 +1026,26 @@ void BattleBotAI::PopulateSpellData()
     }
 }
 
+void BattleBotAI::AddAllSpellReagents()
+{
+    for (const auto& pSpell : m_spells.raw.spells)
+    {
+        if (pSpell)
+        {
+            for (const auto& reagent : pSpell->Reagent)
+            {
+                if (reagent && !me->HasItemCount(reagent, 1))
+                    AddItemToInventory(reagent);
+            }
+            for (const auto& totem : pSpell->Totem)
+            {
+                if (totem && !me->HasItemCount(totem, 1))
+                    AddItemToInventory(totem);
+            }
+        }
+    }
+}
+
 void BattleBotAI::AddPremadeGearAndSpells()
 {
     for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
@@ -1214,6 +1234,7 @@ bool BattleBotAI::IsValidHostileTarget(Unit const* pTarget) const
 {
     return pTarget->IsTargetableForAttack(false, true) &&
            me->IsValidAttackTarget(pTarget) &&
+           pTarget->IsVisibleForOrDetect(me, me, false) &&
            !pTarget->HasBreakableByDamageCrowdControlAura();
 }
 
@@ -1565,6 +1586,13 @@ SpellCastResult BattleBotAI::DoCastSpell(Unit* pTarget, SpellEntry const* pSpell
     }
 
     return result;
+}
+void BattleBotAI::AddItemToInventory(uint32 itemId)
+{
+    ItemPosCountVec dest;
+    uint8 msg = me->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, 1);
+    if (msg == EQUIP_ERR_OK)
+        me->StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
 }
 
 void BattleBotAI::EquipOrUseNewItem()
@@ -3048,16 +3076,17 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
             }
         }
 
-        if (m_spells.rogue.pEvasion &&
-           ((GetAttackersInRangeCount(10.0f) > 2) || !IsRangedDamageClass(pVictim->GetClass())) &&
-            CanTryToCastSpell(me, m_spells.rogue.pEvasion))
-        {
-            if (DoCastSpell(me, m_spells.rogue.pEvasion) == SPELL_CAST_OK)
-                return;
-        }
-
         if (!me->HasAuraType(SPELL_AURA_MOD_STEALTH))
         {
+            if (m_spells.rogue.pEvasion &&
+               (me->GetHealthPercent() < 80.0f) &&
+               ((GetAttackersInRangeCount(10.0f) > 2) || !IsRangedDamageClass(pVictim->GetClass())) &&
+                CanTryToCastSpell(me, m_spells.rogue.pEvasion))
+            {
+                if (DoCastSpell(me, m_spells.rogue.pEvasion) == SPELL_CAST_OK)
+                    return;
+            }
+
             if (m_spells.rogue.pColdBlood &&
                 CanTryToCastSpell(me, m_spells.rogue.pColdBlood))
             {
@@ -3127,6 +3156,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         ResetSpellData();
         AddPremadeGearAndSpells();
         PopulateSpellData();
+        AddAllSpellReagents();
         me->UpdateSkillsToMaxSkillsForLevel();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         SummonPetIfNeeded();

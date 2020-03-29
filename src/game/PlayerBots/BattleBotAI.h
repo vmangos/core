@@ -51,6 +51,7 @@ public:
     void AddPremadeGearAndSpells();
     void PopulateSpellData();
     void ResetSpellData();
+    void AddAllSpellReagents();
 
     void SummonPetIfNeeded();
     void AttackStart(Unit* pVictim);
@@ -70,6 +71,7 @@ public:
     bool CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool DrinkAndEat();
     void EquipOrUseNewItem();
+    void AddItemToInventory(uint32 itemId);
 
     void OnJustRevived();
     void OnJustDied();
