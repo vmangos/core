@@ -173,6 +173,8 @@ public:
         } priest;
         struct
         {
+            SpellEntry const* pDemonArmor;
+            SpellEntry const* pDeathCoil;
             SpellEntry const* pDetectInvisibility;
             SpellEntry const* pShadowWard;
             SpellEntry const* pShadowBolt;
@@ -210,6 +212,7 @@ public:
             SpellEntry const* pDisarm;
             SpellEntry const* pWhirlwind;
             SpellEntry const* pBattleShout;
+            SpellEntry const* pHamstring;
         } warrior;
         struct
         {

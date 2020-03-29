@@ -584,7 +584,19 @@ void BattleBotAI::PopulateSpellData()
             }
             case CLASS_WARLOCK:
             {
-                if (pSpellEntry->SpellName[0].find("Detect Invisibility") != std::string::npos)
+                if (pSpellEntry->SpellName[0].find("Demon Armor") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pDemonArmor ||
+                        m_spells.warlock.pDemonArmor->Id < pSpellEntry->Id)
+                        m_spells.warlock.pDemonArmor = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Death Coil") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pDeathCoil ||
+                        m_spells.warlock.pDeathCoil->Id < pSpellEntry->Id)
+                        m_spells.warlock.pDeathCoil = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Detect Invisibility") != std::string::npos)
                 {
                     if (!m_spells.warlock.pDetectInvisibility ||
                         m_spells.warlock.pDetectInvisibility->Id < pSpellEntry->Id)
@@ -773,6 +785,12 @@ void BattleBotAI::PopulateSpellData()
                     if (!m_spells.warrior.pBattleShout ||
                         m_spells.warrior.pBattleShout->Id < pSpellEntry->Id)
                         m_spells.warrior.pBattleShout = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Hamstring") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pHamstring ||
+                        m_spells.warrior.pHamstring->Id < pSpellEntry->Id)
+                        m_spells.warrior.pHamstring = pSpellEntry;
                 }
                 break;
             }
@@ -2309,36 +2327,36 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
     else if (bg && bg->GetStatus() == STATUS_IN_PROGRESS)
     {
         if (m_spells.priest.pPowerWordFortitude &&
-            !me->HasAura(m_spells.priest.pPowerWordFortitude->Id) &&
+            IsValidBuffTarget(me, m_spells.priest.pPowerWordFortitude) &&
             CanTryToCastSpell(me, m_spells.priest.pPowerWordFortitude))
         {
             if (DoCastSpell(me, m_spells.priest.pPowerWordFortitude) == SPELL_CAST_OK)
+            {
+                m_isBuffing = true;
                 return;
+            }
         }
 
         if (m_spells.priest.pDivineSpirit &&
-            !me->HasAura(m_spells.priest.pDivineSpirit->Id) &&
+            IsValidBuffTarget(me, m_spells.priest.pDivineSpirit) &&
             CanTryToCastSpell(me, m_spells.priest.pDivineSpirit))
         {
             if (DoCastSpell(me, m_spells.priest.pDivineSpirit) == SPELL_CAST_OK)
+            {
+                m_isBuffing = true;
                 return;
+            }
         }
     }
 
     if (m_spells.priest.pInnerFire &&
-        !me->HasAura(m_spells.priest.pInnerFire->Id) &&
         CanTryToCastSpell(me, m_spells.priest.pInnerFire))
     {
         if (DoCastSpell(me, m_spells.priest.pInnerFire) == SPELL_CAST_OK)
+        {
+            m_isBuffing = true;
             return;
-    }
-
-    if (m_spells.priest.pPowerWordShield &&
-        !me->HasAura(m_spells.priest.pPowerWordShield->Id) &&
-        CanTryToCastSpell(me, m_spells.priest.pPowerWordShield))
-    {
-        if (DoCastSpell(me, m_spells.priest.pPowerWordShield) == SPELL_CAST_OK)
-            return;
+        }
     }
 
     m_isBuffing = false;
@@ -2349,6 +2367,14 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
 
 void BattleBotAI::UpdateInCombatAI_Priest()
 {
+    if (m_spells.priest.pPowerWordShield &&
+        !me->HasAura(m_spells.priest.pPowerWordShield->Id) &&
+        CanTryToCastSpell(me, m_spells.priest.pPowerWordShield))
+    {
+        if (DoCastSpell(me, m_spells.priest.pPowerWordShield) == SPELL_CAST_OK)
+            return;
+    }
+
     if (m_spells.priest.pInnerFocus &&
        (me->GetPowerPercent(POWER_MANA) < 10.0f) &&
         CanTryToCastSpell(me, m_spells.priest.pInnerFocus))
@@ -2480,6 +2506,16 @@ void BattleBotAI::UpdateOutOfCombatAI_Warlock()
         }
     }
 
+    if (m_spells.warlock.pDemonArmor &&
+        CanTryToCastSpell(me, m_spells.warlock.pDemonArmor))
+    {
+        if (DoCastSpell(me, m_spells.warlock.pDemonArmor) == SPELL_CAST_OK)
+        {
+            m_isBuffing = true;
+            return;
+        }
+    }
+
     m_isBuffing = false;
 
     if (Unit* pVictim = me->GetVictim())
@@ -2490,10 +2526,35 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
 {
     if (Unit* pVictim = me->GetVictim())
     {
-        if (m_spells.warlock.pCorruption &&
-            CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption))
+        if (m_spells.warlock.pDeathCoil &&
+           (pVictim->CanReachWithMeleeAutoAttack(me) || pVictim->IsNonMeleeSpellCasted()) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pDeathCoil))
         {
-            if (DoCastSpell(pVictim, m_spells.warlock.pCorruption) == SPELL_CAST_OK)
+            if (DoCastSpell(pVictim, m_spells.warlock.pDeathCoil) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pShadowburn &&
+           (pVictim->GetHealthPercent() < 10.0f) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pShadowburn))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pShadowburn) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pSearingPain &&
+           (pVictim->GetHealthPercent() < 20.0f) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pSearingPain))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pSearingPain) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pShadowWard &&
+           (pVictim->GetClass() == CLASS_WARLOCK) &&
+            CanTryToCastSpell(me, m_spells.warlock.pShadowWard))
+        {
+            if (DoCastSpell(me, m_spells.warlock.pShadowWard) == SPELL_CAST_OK)
                 return;
         }
 
@@ -2501,6 +2562,21 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
             CanTryToCastSpell(pVictim, m_spells.warlock.pImmolate))
         {
             if (DoCastSpell(pVictim, m_spells.warlock.pImmolate) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pCorruption &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pCorruption))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pCorruption) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warlock.pSiphonLife &&
+           (me->GetHealthPercent() < 80.0f) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pSiphonLife))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pSiphonLife) == SPELL_CAST_OK)
                 return;
         }
 
@@ -2573,15 +2649,14 @@ void BattleBotAI::UpdateOutOfCombatAI_Warrior()
     if (m_spells.warrior.pBattleShout &&
        !me->HasAura(m_spells.warrior.pBattleShout->Id))
     {
-        if (m_spells.warrior.pBloodrage &&
-           (me->GetPower(POWER_RAGE) < 10) &&
+        if (CanTryToCastSpell(me, m_spells.warrior.pBattleShout))
+            DoCastSpell(me, m_spells.warrior.pBattleShout);
+        else if (m_spells.warrior.pBloodrage &&
+            (me->GetPower(POWER_RAGE) < 10) &&
             CanTryToCastSpell(me, m_spells.warrior.pBloodrage))
         {
             DoCastSpell(me, m_spells.warrior.pBloodrage);
         }
-
-        if (CanTryToCastSpell(me, m_spells.warrior.pBattleShout))
-            DoCastSpell(me, m_spells.warrior.pBattleShout);
     }
 
     if (Unit* pVictim = me->GetVictim())
@@ -2613,6 +2688,16 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
             CanTryToCastSpell(pVictim, m_spells.warrior.pExecute))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pExecute) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pHamstring &&
+            pVictim->IsMoving() &&
+           !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
+           !pVictim->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED) &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pHamstring))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pHamstring) == SPELL_CAST_OK)
                 return;
         }
 
@@ -2676,6 +2761,15 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
             CanTryToCastSpell(pVictim, m_spells.warrior.pHeroicStrike))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pHeroicStrike) == SPELL_CAST_OK)
+                return;
+        }
+    }
+    else // no victim
+    {
+        if (m_spells.warrior.pBattleShout &&
+            CanTryToCastSpell(me, m_spells.warrior.pBattleShout))
+        {
+            if (DoCastSpell(me, m_spells.warrior.pBattleShout) == SPELL_CAST_OK)
                 return;
         }
     }
