@@ -463,7 +463,8 @@ Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
 
             for (const auto pAttacker : pMember->GetAttackers())
             {
-                if (IsValidHostileTarget(pAttacker))
+                if (IsValidHostileTarget(pAttacker) &&
+                    me->IsWithinDist(pAttacker, 50.0f))
                     return pAttacker;
             }
         }
