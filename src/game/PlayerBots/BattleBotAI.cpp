@@ -1857,7 +1857,7 @@ void BattleBotAI::UpdateMovement()
     if (me->IsInCombat())
         return;
 
-    if (me->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+    if (me->HasUnitState(UNIT_STAT_ROOT))
         return;
 
     switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
@@ -2241,7 +2241,7 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
 
         if (pVictim->CanReachWithMeleeAutoAttack(me))
         {
-            if (me->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+            if (me->HasUnitState(UNIT_STAT_ROOT))
             {
                 if (m_spells.hunter.pMongooseBite &&
                     CanTryToCastSpell(pVictim, m_spells.hunter.pMongooseBite))
@@ -2262,19 +2262,25 @@ void BattleBotAI::UpdateInCombatAI_Hunter()
                 if (m_spells.hunter.pWingClip &&
                     CanTryToCastSpell(pVictim, m_spells.hunter.pWingClip))
                 {
-                    if (DoCastSpell(pVictim, m_spells.hunter.pWingClip) == SPELL_CAST_OK)
-                    {
-                        me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
-                        return;
-                    }
+                    DoCastSpell(pVictim, m_spells.hunter.pWingClip);
                 }
             }
-            
+        }
+
+        if (!me->HasUnitState(UNIT_STAT_ROOT) &&
+            (me->GetCombatDistance(pVictim) < 8.0f) &&
+             me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE)
+        {
+            if (!me->IsStopped())
+                me->StopMoving();
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
+            return;
         }
 
         if (me->HasSpell(BB_SPELL_AUTO_SHOT) &&
            !me->IsMoving() &&
-           (me->GetDistance(pVictim) > 8.0f) &&
+           (me->GetCombatDistance(pVictim) > 8.0f) &&
            !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
             me->CastSpell(pVictim, BB_SPELL_AUTO_SHOT, false);
     }
