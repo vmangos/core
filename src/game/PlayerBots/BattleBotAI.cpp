@@ -2630,6 +2630,7 @@ void BattleBotAI::UpdateInCombatAI_Mage()
             me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
         }
         else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
+                (pVictim->GetVictim() == me) &&
                 (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
         {
             if (m_spells.mage.pConeofCold &&
@@ -3817,6 +3818,7 @@ void BattleBotAI::UpdateInCombatAI_Druid()
                     me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
                 }
                 else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
+                        (pVictim->GetVictim() == me) &&
                         !me->HasUnitState(UNIT_STAT_ROOT) &&
                         (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
                 {
