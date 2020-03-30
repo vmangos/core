@@ -906,7 +906,22 @@ bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
     return false;
 }
 
-bool ChatHandler::HandleBattleBotAddCommand(char* args)
+bool ChatHandler::HandleBattleBotAddAlteracCommand(char* args)
+{
+    return HandleBattleBotAddCommand(args, BB_BG_AV);
+}
+
+bool ChatHandler::HandleBattleBotAddArathiCommand(char* args)
+{
+    return HandleBattleBotAddCommand(args, BB_BG_AB);
+}
+
+bool ChatHandler::HandleBattleBotAddWarsongCommand(char* args)
+{
+    return HandleBattleBotAddCommand(args, BB_BG_WS);
+}
+
+bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
 {
     Player* pPlayer = m_session->GetPlayer();
     if (!pPlayer)
@@ -941,8 +956,7 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args)
     uint8 botClass = SelectRandomContainerElement(dpsClasses);
     uint8 botRace = SelectRandomRaceForClass(botClass, botTeam);
 
-    std::vector<BattleBotBGQueues> bgQueues = { BB_BG_WS/*, BB_BG_AB, BB_BG_AV*/ };
-    BattleBotBGQueues botBGQueue = SelectRandomContainerElement(bgQueues);
+    BattleBotBGQueues botBGQueue = BattleBotBGQueues(bg);
 
     // Spawn bot on GM Island
     BattleBotAI* ai = new BattleBotAI(botRace, botClass, 1, 0, 16224.356f, 16284.763f, 13.175f, 4.56f, botBGQueue);
