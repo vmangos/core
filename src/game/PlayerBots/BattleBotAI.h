@@ -209,6 +209,7 @@ public:
             SpellEntry const* pHeroicStrike;
             SpellEntry const* pExecute;
             SpellEntry const* pMortalStrike;
+            SpellEntry const* pBloodthirst;
             SpellEntry const* pBloodrage;
             SpellEntry const* pBerserkerRage;
             SpellEntry const* pPummel;

@@ -750,6 +750,12 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.warrior.pMortalStrike->Id < pSpellEntry->Id)
                         m_spells.warrior.pMortalStrike = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Bloodthirst") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pBloodthirst ||
+                        m_spells.warrior.pBloodthirst->Id < pSpellEntry->Id)
+                        m_spells.warrior.pBloodthirst = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Bloodrage") != std::string::npos)
                 {
                     if (!m_spells.warrior.pBloodrage ||
@@ -3148,6 +3154,20 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
             CanTryToCastSpell(pVictim, m_spells.warrior.pRend))
         {
             if (DoCastSpell(pVictim, m_spells.warrior.pRend) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pMortalStrike &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pMortalStrike))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pMortalStrike) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.warrior.pBloodthirst &&
+            CanTryToCastSpell(pVictim, m_spells.warrior.pBloodthirst))
+        {
+            if (DoCastSpell(pVictim, m_spells.warrior.pBloodthirst) == SPELL_CAST_OK)
                 return;
         }
 
