@@ -95,9 +95,16 @@ ChatCommand * ChatHandler::getCommandTable()
         { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
+    static ChatCommand battleBotAddCommandTable[] =
+    {
+        { "alterac",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandleBattleBotAddAlteracCommand, "", nullptr },
+        { "arathi",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandleBattleBotAddArathiCommand,  "", nullptr },
+        { "warsong",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandleBattleBotAddWarsongCommand, "", nullptr },
+        { nullptr,      0,                      false, nullptr,                                        "", nullptr },
+    };
     static ChatCommand battleBotCommandTable[] =
     {
-        { "add",        SEC_ADMINISTRATOR,      false, &ChatHandler::HandleBattleBotAddCommand,         "", nullptr },
+        { "add",        SEC_ADMINISTRATOR,      false, nullptr,           "Add a new bot", battleBotAddCommandTable },
         { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandleBattleBotRemoveCommand,      "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };

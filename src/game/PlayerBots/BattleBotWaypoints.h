@@ -39,6 +39,8 @@ struct RecordedMovementPacket
 extern std::vector<RecordedMovementPacket> vAllianceGraveyardJumpPath;
 extern std::vector<RecordedMovementPacket> vHordeGraveyardJumpPath;
 
+Position const AB_WAITING_POS_HORDE = { 706.607f, 707.211f, -17.271f, 0.77f };
+Position const AB_WAITING_POS_ALLIANCE = { 1286.054f, 1282.500f, -15.697f, 3.95f };
 Position const WS_WAITING_POS_HORDE_1 = { 944.981f, 1423.478f, 345.434f, 6.18f };
 Position const WS_WAITING_POS_HORDE_2 = { 948.488f, 1459.834f, 343.066f, 6.27f };
 Position const WS_WAITING_POS_ALLIANCE_1 = { 1510.502f, 1493.385f, 351.995f, 3.1f };
