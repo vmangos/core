@@ -95,6 +95,8 @@ public:
     void UpdateOutOfCombatAI_Warrior();
     void UpdateInCombatAI_Rogue();
     void UpdateOutOfCombatAI_Rogue();
+    void UpdateInCombatAI_Druid();
+    void UpdateOutOfCombatAI_Druid();
 
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
@@ -244,6 +246,55 @@ public:
             SpellEntry const* pKick;
             SpellEntry const* pSprint;
         } rogue;
+        struct
+        {
+            SpellEntry const* pBearForm;
+            SpellEntry const* pDireBearForm;
+            SpellEntry const* pCatForm;
+            SpellEntry const* pTravelForm;
+            SpellEntry const* pAquaticForm;
+            SpellEntry const* pMoonkinForm;
+            SpellEntry const* pWrath;
+            SpellEntry const* pMoonfire;
+            SpellEntry const* pStarfire;
+            SpellEntry const* pHurricane;
+            SpellEntry const* pInsectSwarm;
+            SpellEntry const* pBarkskin;
+            SpellEntry const* pNaturesGrasp;
+            SpellEntry const* pMarkoftheWild;
+            SpellEntry const* pGiftoftheWild;
+            SpellEntry const* pThorns;
+            SpellEntry const* pCurePoison;
+            SpellEntry const* pAbolishPoison;
+            SpellEntry const* pRebirth;
+            SpellEntry const* pFaerieFire;
+            SpellEntry const* pInnervate;
+            SpellEntry const* pNaturesSwiftness;
+            SpellEntry const* pEntanglingRoots;
+            SpellEntry const* pHibernate;
+            // Cat
+            SpellEntry const* pProwl;
+            SpellEntry const* pPounce;
+            SpellEntry const* pRavage;
+            SpellEntry const* pClaw;
+            SpellEntry const* pShred;
+            SpellEntry const* pRake;
+            SpellEntry const* pRip;
+            SpellEntry const* pFerociousBite;
+            SpellEntry const* pTigersFury;
+            SpellEntry const* pDash;
+            SpellEntry const* pFaerieFireFeral;
+            // Bear
+            SpellEntry const* pGrowl;
+            SpellEntry const* pChallengingRoar;
+            SpellEntry const* pDemoralizingRoar;
+            SpellEntry const* pEnrage;
+            SpellEntry const* pFrenziedRegeneration;
+            SpellEntry const* pSwipe;
+            SpellEntry const* pMaul;
+            SpellEntry const* pBash;
+            SpellEntry const* pFeralCharge;
+        } druid;
     } m_spells;
 
     std::vector<LootResponseData> m_lootResponses;

@@ -948,6 +948,267 @@ void BattleBotAI::PopulateSpellData()
                 }
                 break;
             }
+            case CLASS_DRUID:
+            {
+                if (pSpellEntry->SpellName[0].find("Bear Form") != std::string::npos)
+                {
+                    if (!m_spells.druid.pBearForm ||
+                        m_spells.druid.pBearForm->Id < pSpellEntry->Id)
+                        m_spells.druid.pBearForm = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Dire Bear Form") != std::string::npos)
+                {
+                    if (!m_spells.druid.pDireBearForm ||
+                        m_spells.druid.pDireBearForm->Id < pSpellEntry->Id)
+                        m_spells.druid.pDireBearForm = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Cat Form") != std::string::npos)
+                {
+                    if (!m_spells.druid.pCatForm ||
+                        m_spells.druid.pCatForm->Id < pSpellEntry->Id)
+                        m_spells.druid.pCatForm = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Travel Form") != std::string::npos)
+                {
+                    if (!m_spells.druid.pTravelForm ||
+                        m_spells.druid.pTravelForm->Id < pSpellEntry->Id)
+                        m_spells.druid.pTravelForm = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Aquatic Form") != std::string::npos)
+                {
+                    if (!m_spells.druid.pAquaticForm ||
+                        m_spells.druid.pAquaticForm->Id < pSpellEntry->Id)
+                        m_spells.druid.pAquaticForm = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Moonkin Form") != std::string::npos)
+                {
+                    if (!m_spells.druid.pMoonkinForm ||
+                        m_spells.druid.pMoonkinForm->Id < pSpellEntry->Id)
+                        m_spells.druid.pMoonkinForm = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Wrath") != std::string::npos)
+                {
+                    if (!m_spells.druid.pWrath ||
+                        m_spells.druid.pWrath->Id < pSpellEntry->Id)
+                        m_spells.druid.pWrath = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Moonfire") != std::string::npos)
+                {
+                    if (!m_spells.druid.pMoonfire ||
+                        m_spells.druid.pMoonfire->Id < pSpellEntry->Id)
+                        m_spells.druid.pMoonfire = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Starfire") != std::string::npos)
+                {
+                    if (!m_spells.druid.pStarfire ||
+                        m_spells.druid.pStarfire->Id < pSpellEntry->Id)
+                        m_spells.druid.pStarfire = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Hurricane") != std::string::npos)
+                {
+                    if (!m_spells.druid.pHurricane ||
+                        m_spells.druid.pHurricane->Id < pSpellEntry->Id)
+                        m_spells.druid.pHurricane = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Insect Swarm") != std::string::npos)
+                {
+                    if (!m_spells.druid.pInsectSwarm ||
+                        m_spells.druid.pInsectSwarm->Id < pSpellEntry->Id)
+                        m_spells.druid.pInsectSwarm = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Barkskin") != std::string::npos)
+                {
+                    if (!m_spells.druid.pBarkskin ||
+                        m_spells.druid.pBarkskin->Id < pSpellEntry->Id)
+                        m_spells.druid.pBarkskin = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Natures Grasp") != std::string::npos)
+                {
+                    if (!m_spells.druid.pNaturesGrasp ||
+                        m_spells.druid.pNaturesGrasp->Id < pSpellEntry->Id)
+                        m_spells.druid.pNaturesGrasp = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Mark of the Wild") != std::string::npos)
+                {
+                    if (!m_spells.druid.pMarkoftheWild ||
+                        m_spells.druid.pMarkoftheWild->Id < pSpellEntry->Id)
+                        m_spells.druid.pMarkoftheWild = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Gift of the Wild") != std::string::npos)
+                {
+                    if (!m_spells.druid.pGiftoftheWild ||
+                        m_spells.druid.pGiftoftheWild->Id < pSpellEntry->Id)
+                        m_spells.druid.pGiftoftheWild = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Thorns") != std::string::npos)
+                {
+                    if (!m_spells.druid.pThorns ||
+                        m_spells.druid.pThorns->Id < pSpellEntry->Id)
+                        m_spells.druid.pThorns = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Cure Poison") != std::string::npos)
+                {
+                    if (!m_spells.druid.pCurePoison ||
+                        m_spells.druid.pCurePoison->Id < pSpellEntry->Id)
+                        m_spells.druid.pCurePoison = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Abolish Poison") != std::string::npos)
+                {
+                    if (!m_spells.druid.pAbolishPoison ||
+                        m_spells.druid.pAbolishPoison->Id < pSpellEntry->Id)
+                        m_spells.druid.pAbolishPoison = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Rebirth") != std::string::npos)
+                {
+                    if (!m_spells.druid.pRebirth ||
+                        m_spells.druid.pRebirth->Id < pSpellEntry->Id)
+                        m_spells.druid.pRebirth = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Faerie Fire") != std::string::npos)
+                {
+                    if (!m_spells.druid.pFaerieFire ||
+                        m_spells.druid.pFaerieFire->Id < pSpellEntry->Id)
+                        m_spells.druid.pFaerieFire = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Innervate") != std::string::npos)
+                {
+                    if (!m_spells.druid.pInnervate ||
+                        m_spells.druid.pInnervate->Id < pSpellEntry->Id)
+                        m_spells.druid.pInnervate = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Natures Swiftness") != std::string::npos)
+                {
+                    if (!m_spells.druid.pNaturesSwiftness ||
+                        m_spells.druid.pNaturesSwiftness->Id < pSpellEntry->Id)
+                        m_spells.druid.pNaturesSwiftness = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Entangling Roots") != std::string::npos)
+                {
+                    if (!m_spells.druid.pEntanglingRoots ||
+                        m_spells.druid.pEntanglingRoots->Id < pSpellEntry->Id)
+                        m_spells.druid.pEntanglingRoots = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Hibernate") != std::string::npos)
+                {
+                    if (!m_spells.druid.pHibernate ||
+                        m_spells.druid.pHibernate->Id < pSpellEntry->Id)
+                        m_spells.druid.pHibernate = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Pounce") != std::string::npos)
+                {
+                    if (!m_spells.druid.pPounce ||
+                        m_spells.druid.pPounce->Id < pSpellEntry->Id)
+                        m_spells.druid.pPounce = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Ravage") != std::string::npos)
+                {
+                    if (!m_spells.druid.pRavage ||
+                        m_spells.druid.pRavage->Id < pSpellEntry->Id)
+                        m_spells.druid.pRavage = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Claw") != std::string::npos)
+                {
+                    if (!m_spells.druid.pClaw ||
+                        m_spells.druid.pClaw->Id < pSpellEntry->Id)
+                        m_spells.druid.pClaw = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shred") != std::string::npos)
+                {
+                    if (!m_spells.druid.pShred ||
+                        m_spells.druid.pShred->Id < pSpellEntry->Id)
+                        m_spells.druid.pShred = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Rake") != std::string::npos)
+                {
+                    if (!m_spells.druid.pRake ||
+                        m_spells.druid.pRake->Id < pSpellEntry->Id)
+                        m_spells.druid.pRake = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Rip") != std::string::npos)
+                {
+                    if (!m_spells.druid.pRip ||
+                        m_spells.druid.pRip->Id < pSpellEntry->Id)
+                        m_spells.druid.pRip = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Ferocious Bite") != std::string::npos)
+                {
+                    if (!m_spells.druid.pFerociousBite ||
+                        m_spells.druid.pFerociousBite->Id < pSpellEntry->Id)
+                        m_spells.druid.pFerociousBite = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Tigers Fury") != std::string::npos)
+                {
+                    if (!m_spells.druid.pTigersFury ||
+                        m_spells.druid.pTigersFury->Id < pSpellEntry->Id)
+                        m_spells.druid.pTigersFury = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Dash") != std::string::npos)
+                {
+                    if (!m_spells.druid.pDash ||
+                        m_spells.druid.pDash->Id < pSpellEntry->Id)
+                        m_spells.druid.pDash = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Faerie Fire (Feral)") != std::string::npos)
+                {
+                    if (!m_spells.druid.pFaerieFireFeral ||
+                        m_spells.druid.pFaerieFireFeral->Id < pSpellEntry->Id)
+                        m_spells.druid.pFaerieFireFeral = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Growl") != std::string::npos)
+                {
+                    if (!m_spells.druid.pGrowl ||
+                        m_spells.druid.pGrowl->Id < pSpellEntry->Id)
+                        m_spells.druid.pGrowl = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Challenging Roar") != std::string::npos)
+                {
+                    if (!m_spells.druid.pChallengingRoar ||
+                        m_spells.druid.pChallengingRoar->Id < pSpellEntry->Id)
+                        m_spells.druid.pChallengingRoar = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Demoralizing Roar") != std::string::npos)
+                {
+                    if (!m_spells.druid.pDemoralizingRoar ||
+                        m_spells.druid.pDemoralizingRoar->Id < pSpellEntry->Id)
+                        m_spells.druid.pDemoralizingRoar = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Enrage") != std::string::npos)
+                {
+                    if (!m_spells.druid.pEnrage ||
+                        m_spells.druid.pEnrage->Id < pSpellEntry->Id)
+                        m_spells.druid.pEnrage = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Frenzied Regeneration") != std::string::npos)
+                {
+                    if (!m_spells.druid.pFrenziedRegeneration ||
+                        m_spells.druid.pFrenziedRegeneration->Id < pSpellEntry->Id)
+                        m_spells.druid.pFrenziedRegeneration = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Swipe") != std::string::npos)
+                {
+                    if (!m_spells.druid.pSwipe ||
+                        m_spells.druid.pSwipe->Id < pSpellEntry->Id)
+                        m_spells.druid.pSwipe = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Maul") != std::string::npos)
+                {
+                    if (!m_spells.druid.pMaul ||
+                        m_spells.druid.pMaul->Id < pSpellEntry->Id)
+                        m_spells.druid.pMaul = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Bash") != std::string::npos)
+                {
+                if (!m_spells.druid.pBash ||
+                    m_spells.druid.pBash->Id < pSpellEntry->Id)
+                    m_spells.druid.pBash = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Feral Charge") != std::string::npos)
+                {
+                if (!m_spells.druid.pFeralCharge ||
+                    m_spells.druid.pFeralCharge->Id < pSpellEntry->Id)
+                    m_spells.druid.pFeralCharge = pSpellEntry;
+                }
+            }
         }
 
         for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
@@ -1952,6 +2213,9 @@ void BattleBotAI::UpdateOutOfCombatAI()
         case CLASS_ROGUE:
             UpdateOutOfCombatAI_Rogue();
             break;
+        case CLASS_DRUID:
+            UpdateOutOfCombatAI_Rogue();
+            break;
     }
 }
 
@@ -1978,6 +2242,9 @@ void BattleBotAI::UpdateInCombatAI()
             UpdateInCombatAI_Warrior();
             break;
         case CLASS_ROGUE:
+            UpdateInCombatAI_Rogue();
+            break;
+        case CLASS_DRUID:
             UpdateInCombatAI_Rogue();
             break;
     }
@@ -3144,6 +3411,169 @@ void BattleBotAI::UpdateInCombatAI_Rogue()
                 return;
         }
     }
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Druid()
+{
+    BattleGround* bg = me->GetBattleGround();
+    if (bg && bg->GetStatus() == STATUS_WAIT_JOIN)
+    {
+        if (m_spells.druid.pGiftoftheWild)
+        {
+            if (Player* pTarget = SelectBuffTarget(m_spells.druid.pGiftoftheWild))
+            {
+                if (CanTryToCastSpell(pTarget, m_spells.druid.pGiftoftheWild) &&
+                    IsValidBuffTarget(pTarget, m_spells.druid.pGiftoftheWild))
+                {
+                    if (DoCastSpell(pTarget, m_spells.druid.pGiftoftheWild) == SPELL_CAST_OK)
+                    {
+                        m_isBuffing = true;
+                        return;
+                    }
+                }
+            }
+        }
+
+        if (m_spells.druid.pThorns)
+        {
+            if (Player* pTarget = SelectBuffTarget(m_spells.druid.pThorns))
+            {
+                if (CanTryToCastSpell(pTarget, m_spells.druid.pThorns) &&
+                    IsValidBuffTarget(pTarget, m_spells.druid.pThorns))
+                {
+                    if (DoCastSpell(pTarget, m_spells.druid.pThorns) == SPELL_CAST_OK)
+                    {
+                        m_isBuffing = true;
+                        return;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        if (m_spells.druid.pMarkoftheWild &&
+            !me->HasAura(m_spells.druid.pMarkoftheWild->Id) &&
+                CanTryToCastSpell(me, m_spells.druid.pMarkoftheWild))
+        {
+            if (DoCastSpell(me, m_spells.druid.pMarkoftheWild) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.druid.pThorns && !me->HasAura(m_spells.druid.pThorns->Id) &&
+            CanTryToCastSpell(me, m_spells.druid.pThorns))
+        {
+            if (DoCastSpell(me, m_spells.druid.pThorns) == SPELL_CAST_OK)
+                return;
+        }
+    }
+
+    if (m_spells.druid.pMoonkinForm &&
+        !me->HasAura(m_spells.druid.pMoonkinForm->Id) &&
+        CanTryToCastSpell(me, m_spells.druid.pMoonkinForm))
+    {
+        if (DoCastSpell(me, m_spells.druid.pMoonkinForm) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (me->GetVictim())
+        UpdateInCombatAI_Druid();
+}
+
+void BattleBotAI::UpdateInCombatAI_Druid()
+{
+    // Dispels
+    if (m_spells.druid.pCurePoison)
+    {
+        if (IsValidDispelTarget(me, m_spells.druid.pCurePoison) &&
+            CanTryToCastSpell(me, m_spells.druid.pCurePoison))
+        {
+            if (DoCastSpell(me, m_spells.druid.pCurePoison) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
+        {
+            if (IsValidDispelTarget(pFriend, m_spells.druid.pCurePoison) &&
+                CanTryToCastSpell(pFriend, m_spells.druid.pCurePoison))
+            {
+                if (DoCastSpell(pFriend, m_spells.druid.pCurePoison) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+
+    if (m_spells.druid.pAbolishPoison)
+    {
+        if (IsValidDispelTarget(me, m_spells.druid.pAbolishPoison) &&
+            CanTryToCastSpell(me, m_spells.druid.pAbolishPoison))
+        {
+            if (DoCastSpell(me, m_spells.druid.pAbolishPoison) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
+        {
+            if (IsValidDispelTarget(pFriend, m_spells.druid.pAbolishPoison) &&
+                CanTryToCastSpell(pFriend, m_spells.druid.pAbolishPoison))
+            {
+                if (DoCastSpell(pFriend, m_spells.druid.pAbolishPoison) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+
+    // Combat
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
+            && me->GetDistance(pVictim) > 30.0f)
+        {
+            me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
+        }
+        else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
+            (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
+        {
+            me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
+
+            if (m_spells.druid.pEntanglingRoots &&
+                (GetAttackersInRangeCount(10.0f) > 1) &&
+                CanTryToCastSpell(me, m_spells.druid.pEntanglingRoots))
+            {
+                if (DoCastSpell(me, m_spells.druid.pEntanglingRoots) == SPELL_CAST_OK)
+                    return;
+            }
+            return;
+        }
+
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
+            return;
+
+        if (m_spells.druid.pWrath &&
+            CanTryToCastSpell(pVictim, m_spells.druid.pWrath))
+        {
+            if (DoCastSpell(pVictim, m_spells.druid.pWrath) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.druid.pMoonfire &&
+            CanTryToCastSpell(pVictim, m_spells.druid.pMoonfire))
+        {
+            if (DoCastSpell(pVictim, m_spells.druid.pMoonfire) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.druid.pStarfire &&
+            CanTryToCastSpell(pVictim, m_spells.druid.pStarfire))
+        {
+            if (DoCastSpell(pVictim, m_spells.druid.pStarfire) == SPELL_CAST_OK)
+                return;
+        }
+    }
+
+    // Heal
+    if (HealInjuredAlly(40.0f))
+        return;
 }
 
 void BattleBotAI::UpdateAI(uint32 const diff)
