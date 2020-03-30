@@ -1209,6 +1209,12 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.druid.pFeralCharge->Id < pSpellEntry->Id)
                         m_spells.druid.pFeralCharge = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Prowl") != std::string::npos)
+                {
+                    if (!m_spells.druid.pProwl ||
+                        m_spells.druid.pProwl->Id < pSpellEntry->Id)
+                        m_spells.druid.pProwl = pSpellEntry;
+                }
             }
         }
 
