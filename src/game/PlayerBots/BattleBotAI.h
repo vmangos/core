@@ -250,7 +250,6 @@ public:
         struct
         {
             SpellEntry const* pBearForm;
-            SpellEntry const* pDireBearForm;
             SpellEntry const* pCatForm;
             SpellEntry const* pTravelForm;
             SpellEntry const* pAquaticForm;
