@@ -1076,7 +1076,7 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.druid.pInnervate->Id < pSpellEntry->Id)
                         m_spells.druid.pInnervate = pSpellEntry;
                 }
-                else if (pSpellEntry->SpellName[0].find("Natures Swiftness") != std::string::npos)
+                else if (pSpellEntry->SpellName[0].find("Nature's Swiftness") != std::string::npos)
                 {
                     if (!m_spells.druid.pNaturesSwiftness ||
                         m_spells.druid.pNaturesSwiftness->Id < pSpellEntry->Id)
@@ -1136,7 +1136,7 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.druid.pFerociousBite->Id < pSpellEntry->Id)
                         m_spells.druid.pFerociousBite = pSpellEntry;
                 }
-                else if (pSpellEntry->SpellName[0].find("Tigers Fury") != std::string::npos)
+                else if (pSpellEntry->SpellName[0].find("Tiger's Fury") != std::string::npos)
                 {
                     if (!m_spells.druid.pTigersFury ||
                         m_spells.druid.pTigersFury->Id < pSpellEntry->Id)
