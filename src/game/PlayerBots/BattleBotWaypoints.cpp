@@ -694,5 +694,4 @@ void BattleBotAI::ClearPath()
     m_currentPath = nullptr;
     m_currentPoint = 0;
     m_movingInReverse = false;
-    return;
 }
