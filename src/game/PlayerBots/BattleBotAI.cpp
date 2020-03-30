@@ -2231,7 +2231,7 @@ void BattleBotAI::UpdateOutOfCombatAI()
             UpdateOutOfCombatAI_Rogue();
             break;
         case CLASS_DRUID:
-            UpdateOutOfCombatAI_Rogue();
+            UpdateOutOfCombatAI_Druid();
             break;
     }
 }
@@ -2262,7 +2262,7 @@ void BattleBotAI::UpdateInCombatAI()
             UpdateInCombatAI_Rogue();
             break;
         case CLASS_DRUID:
-            UpdateInCombatAI_Rogue();
+            UpdateInCombatAI_Druid();
             break;
     }
 }
@@ -3486,13 +3486,19 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
         if (m_spells.druid.pMarkoftheWild && CanTryToCastSpell(me, m_spells.druid.pMarkoftheWild))
         {
             if (DoCastSpell(me, m_spells.druid.pMarkoftheWild) == SPELL_CAST_OK)
+            {
+                m_isBuffing = true;
                 return;
+            }
         }
 
         if (m_spells.druid.pThorns && CanTryToCastSpell(me, m_spells.druid.pThorns))
         {
             if (DoCastSpell(me, m_spells.druid.pThorns) == SPELL_CAST_OK)
+            {
+                m_isBuffing = true;
                 return;
+            }
         }
     }
 
@@ -3501,6 +3507,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
         if (DoCastSpell(me, m_spells.druid.pMoonkinForm) == SPELL_CAST_OK)
             return;
     }
+
+    m_isBuffing = false;
 
     if (me->GetVictim())
         UpdateInCombatAI_Druid();
@@ -3556,19 +3564,13 @@ void BattleBotAI::UpdateInCombatAI_Druid()
         {
             case FORM_MOONKIN:
             {
-                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-                    && me->GetDistance(pVictim) > 30.0f)
+                if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE && me->GetDistance(pVictim) > 30.0f)
                 {
                     me->GetMotionMaster()->MoveChase(pVictim, 25.0f);
                 }
-                else if (pVictim->CanReachWithMeleeAutoAttack(me) &&
-                    (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
+                else if (pVictim->CanReachWithMeleeAutoAttack(me) && (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
                 {
-                    me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
-
-                    if (m_spells.druid.pEntanglingRoots &&
-                        (GetAttackersInRangeCount(10.0f) > 1) &&
-                        CanTryToCastSpell(me, m_spells.druid.pEntanglingRoots))
+                    if (m_spells.druid.pEntanglingRoots && (GetAttackersInRangeCount(10.0f) > 1) && CanTryToCastSpell(me, m_spells.druid.pEntanglingRoots))
                     {
                         if (DoCastSpell(me, m_spells.druid.pEntanglingRoots) == SPELL_CAST_OK)
                             return;
@@ -3579,28 +3581,35 @@ void BattleBotAI::UpdateInCombatAI_Druid()
                 if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
                     return;
 
-                if (m_spells.druid.pWrath &&
-                    CanTryToCastSpell(pVictim, m_spells.druid.pWrath))
+                if (m_spells.druid.pWrath && CanTryToCastSpell(pVictim, m_spells.druid.pWrath))
                 {
                     if (DoCastSpell(pVictim, m_spells.druid.pWrath) == SPELL_CAST_OK)
                         return;
                 }
 
-                if (m_spells.druid.pMoonfire &&
-                    CanTryToCastSpell(pVictim, m_spells.druid.pMoonfire))
+                if (m_spells.druid.pMoonfire && CanTryToCastSpell(pVictim, m_spells.druid.pMoonfire))
                 {
                     if (DoCastSpell(pVictim, m_spells.druid.pMoonfire) == SPELL_CAST_OK)
                         return;
                 }
 
-                if (m_spells.druid.pStarfire &&
-                    CanTryToCastSpell(pVictim, m_spells.druid.pStarfire))
+                if (m_spells.druid.pStarfire && CanTryToCastSpell(pVictim, m_spells.druid.pStarfire))
                 {
                     if (DoCastSpell(pVictim, m_spells.druid.pStarfire) == SPELL_CAST_OK)
                         return;
                 }
                 break;
             }
+            case FORM_CAT:
+            {
+                break;
+            }
+            case FORM_BEAR:
+            {
+                break;
+            }
+            default:
+                break;
         }
     }
 
