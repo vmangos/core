@@ -3964,13 +3964,6 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
         m_isBuffing = false;
     }
 
-    if (m_spells.druid.pMoonkinForm &&
-        CanTryToCastSpell(me, m_spells.druid.pMoonkinForm))
-    {
-        if (DoCastSpell(me, m_spells.druid.pMoonkinForm) == SPELL_CAST_OK)
-            return;
-    }
-
     if (me->GetShapeshiftForm() == FORM_NONE)
     {
         if (me->HasSpell(BB_SPELL_LEADER_OF_THE_PACK))
@@ -4007,11 +4000,38 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
     }
 
     if (me->GetVictim())
+    {
+        if (m_spells.druid.pMoonkinForm &&
+            CanTryToCastSpell(me, m_spells.druid.pMoonkinForm))
+        {
+            if (DoCastSpell(me, m_spells.druid.pMoonkinForm) == SPELL_CAST_OK)
+                return;
+        }
+
         UpdateInCombatAI_Druid();
+    }
+    else
+    {
+        if (m_spells.druid.pMoonkinForm &&
+            me->GetShapeshiftForm() == FORM_MOONKIN)
+            me->RemoveAurasDueToSpellByCancel(m_spells.druid.pMoonkinForm->Id);
+
+        if (m_spells.druid.pTravelForm &&
+            !me->IsMoving() &&
+            CanTryToCastSpell(me, m_spells.druid.pTravelForm))
+        {
+            if (DoCastSpell(me, m_spells.druid.pTravelForm) == SPELL_CAST_OK)
+                return;
+        }
+    }
 }
 
 void BattleBotAI::UpdateInCombatAI_Druid()
 {
+    if (m_spells.druid.pTravelForm &&
+        me->GetShapeshiftForm() == FORM_TRAVEL)
+        me->RemoveAurasDueToSpellByCancel(m_spells.druid.pTravelForm->Id);
+
     if (me->GetShapeshiftForm() == FORM_NONE)
     {
         // Heal

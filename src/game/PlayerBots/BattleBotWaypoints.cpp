@@ -824,7 +824,7 @@ BattleBotPath vPath_AB_Farm_to_LumberMill =
     { 854.326f, 1150.55f, 11.537f, &AB_AtFlag },
 };
 
-BattleBotPath vPath_AV_Horde_Cave_to_Tower_Point_Crossroads =
+BattleBotPath vPath_AV_Horde_Cave_to_Tower_Point_Crossroad =
 {
     { -885.928f, -536.612f, 55.1936f, nullptr },
     { -880.957f, -525.119f, 53.6791f, nullptr },
@@ -901,6 +901,212 @@ BattleBotPath vPath_AV_Frostwolf_Graveyard_to_Frostwolf_Graveyard_Flag =
     { -1079.61f, -345.548f, 55.1131f, nullptr },
 };
 
+BattleBotPath vPath_AV_Tower_Point_Crossroads_to_Iceblood_Graveyard_Flag =
+{
+    { -711.436f, -362.86f, 66.7543f,  nullptr },
+    { -703.169f, -363.672f, 66.3514f, nullptr },
+    { -682.166f, -374.453f, 65.6513f, nullptr },
+    { -653.798f, -387.044f, 62.0839f, nullptr },
+    { -625.062f, -397.093f, 59.0311f, nullptr },
+    { -614.138f, -396.501f, 60.8585f, nullptr },
+};
+
+BattleBotPath vPath_AV_Iceblood_Graveyard_Flag_to_Iceblood_Tower_Crossroad =
+{
+    { -614.138f, -396.501f, 60.8585f, nullptr },
+    { -620.856f, -389.074f, 58.4251f, nullptr },
+    { -622.361f, -366.641f, 56.862f, nullptr },
+    { -618.134f, -346.849f, 55.2242f, nullptr },
+    { -586.744f, -317.327f, 48.149f, nullptr },
+    { -579.697f, -315.037f, 46.345f, nullptr },
+};
+
+BattleBotPath vPath_AV_Iceblood_Tower_Crossroad_to_Iceblood_Tower =
+{
+    { -579.697f, -315.037f, 46.345f, nullptr },
+    { -579.747f, -308.986f, 46.6127f, nullptr },
+    { -575.92f, -296.013f, 48.4349f, nullptr },
+    { -567.029f, -286.975f, 50.7703f, nullptr },
+    { -557.697f, -276.264f, 52.1503f, nullptr },
+};
+
+BattleBotPath vPath_AV_Iceblood_Tower_to_Iceblood_Tower_Flag =
+{
+    { -557.697f, -276.264f, 52.1503f, nullptr },
+    { -562.505f, -271.251f, 52.9165f, nullptr },
+    { -575.986f, -258.447f, 52.5129f, nullptr },
+    { -580.103f, -261.305f, 52.5013f, nullptr },
+    { -571.844f, -269.038f, 56.8539f, nullptr },
+    { -565.86f, -261.478f, 60.5514f, nullptr },
+    { -572.102f, -256.66f, 63.3275f, nullptr },
+    { -576.45f, -262.642f, 65.8959f, nullptr },
+    { -568.831f, -268.036f, 68.4696f, nullptr },
+    { -568.091f, -260.214f, 68.4696f, nullptr },
+    { -561.978f, -254.631f, 68.4482f, nullptr },
+    { -570.682f, -250.791f, 73.0299f, nullptr },
+    { -576.069f, -252.266f, 74.9855f, nullptr },
+    { -581.294f, -260.533f, 74.9366f, nullptr },
+    { -579.309f, -268.79f, 74.9984f, nullptr },
+    { -570.275f, -271.346f, 75.0083f, nullptr },
+    { -566.436f, -268.102f, 74.9324f, nullptr },
+    { -571.044f, -263.753f, 75.0087f, nullptr },
+};
+
+BattleBotPath vPath_AV_Iceblood_Tower_to_Iceblood_Garrison =
+{
+    { -550.396f, -269.326f, 52.4539f, nullptr },
+    { -542.628f, -254.901f, 54.7447f, nullptr },
+    { -536.969f, -242.614f, 57.233f, nullptr },
+    { -532.204f, -230.96f, 56.7126f, nullptr },
+    { -499.532f, -204.606f, 57.4507f, nullptr },
+    { -492.17f, -187.077f, 57.1342f, nullptr },
+};
+
+BattleBotPath vPath_AV_Iceblood_Garrison_to_Captain_Galvangar =
+{
+    { -492.17f, -187.077f, 57.1342f, nullptr },
+    { -496.52f, -186.015f, 57.4265f, nullptr },
+    { -508.094f, -180.795f, 57.9437f, nullptr },
+    { -519.813f, -179.116f, 57.9527f, nullptr },
+    { -528.962f, -186.573f, 57.9513f, nullptr },
+    { -538.064f, -186.984f, 57.9556f, nullptr },
+    { -540.747f, -169.935f, 57.0124f, nullptr },
+};
+
+BattleBotPath vPath_AV_Iceblood_Graveyard_to_Iceblood_Graveyard_Flag =
+{
+    { -536.289f, -397.294f, 49.7357f, nullptr },
+    { -549.254f, -386.331f, 50.1129f, nullptr },
+    { -558.918f, -388.345f, 50.7527f, nullptr },
+    { -571.161f, -397.302f, 52.6324f, nullptr },
+    { -590.297f, -409.179f, 56.239f, nullptr },
+    { -602.969f, -411.808f, 59.1209f, nullptr },
+    { -613.748f, -407.195f, 59.6702f, nullptr },
+    { -614.138f, -396.501f, 60.8585f, nullptr },
+};
+
+BattleBotPath vPath_AV_Iceblood_Tower_Crossroad_to_Stonehearth_Outpost =
+{
+    { -579.697f, -315.037f, 46.345f, nullptr },
+    { -572.416f, -317.133f, 43.9943f, nullptr },
+    { -559.201f, -326.073f, 39.5171f, nullptr },
+    { -544.32f, -335.203f, 37.6494f, nullptr },
+    { -520.032f, -342.158f, 34.3473f, nullptr },
+    { -486.033f, -344.504f, 29.4772f, nullptr },
+    { -462.603f, -340.414f, 31.3555f, nullptr },
+    { -455.422f, -336.249f, 30.5176f, nullptr },
+    { -450.551f, -332.547f, 25.4498f, nullptr },
+    { -440.977f, -326.828f, 18.9782f, nullptr },
+    { -421.08f, -321.656f, 17.7909f, nullptr },
+    { -398.601f, -318.181f, 18.5789f, nullptr },
+    { -387.651f, -312.289f, 21.504f, nullptr },
+    { -360.257f, -299.908f, 9.75685f, nullptr },
+    { -294.669f, -283.616f, 6.66756f, nullptr },
+    { -244.919f, -272.52f, 6.66754f, nullptr },
+    { -206.645f, -264.661f, 6.66755f, nullptr },
+    { -171.291f, -266.565f, 9.06823f, nullptr },
+    { -147.596f, -253.494f, 6.78363f, nullptr },
+    { -119.031f, -245.732f, 9.12747f, nullptr },
+    { -69.9914f, -241.707f, 8.7055f, nullptr },
+    { -41.7233f, -231.875f, 10.2956f, nullptr },
+    { -11.2685f, -237.666f, 10.7819f, nullptr },
+    { 22.1935f, -244.842f, 14.09f, nullptr },
+    { 33.7178f, -258.971f, 14.8231f, nullptr },
+    { 29.4264f, -283.735f, 16.3003f, nullptr },
+    { 28.1264f, -302.593f, 15.076f, nullptr },
+};
+
+BattleBotPath vPath_AV_Stonehearth_Outpost_to_Captain_Balinda_Stonehearth =
+{
+    { 28.1264f, -302.593f, 15.076f, nullptr },
+    { 19.509f, -300.648f, 14.02f, nullptr },
+    { 11.9925f, -299.182f, 15.0127f, nullptr },
+    { -2.23151f, -296.73f, 15.5632f, nullptr },
+    { -20.1345f, -296.292f, 15.5632f, nullptr },
+    { -25.8903f, -306.347f, 15.5632f, nullptr },
+    { -31.9783f, -309.925f, 15.5632f, nullptr },
+    { -46.5667f, -294.841f, 15.0786f, nullptr },
+};
+
+BattleBotPath vPath_AV_Stonehearth_Outpost_to_Stonehearth_Graveyard_Crossroad =
+{
+    { 28.1264f, -302.593f, 15.076f, nullptr },
+    { 26.4279f, -302.732f, 14.7797f, nullptr },
+    { 43.9172f, -312.202f, 18.0643f, nullptr },
+    { 57.9471f, -317.071f, 25.175f, nullptr },
+    { 82.0413f, -321.368f, 33.9446f, nullptr },
+    { 102.051f, -333.675f, 39.3055f, nullptr },
+    { 117.624f, -352.173f, 42.6668f, nullptr },
+    { 121.462f, -367.206f, 43.1468f, nullptr },
+    { 123.153f, -375.134f, 42.8991f, nullptr },
+};
+
+BattleBotPath vPath_AV_Stonehearth_Graveyard_Crossroad_to_Stonehearth_Graveyard_Flag =
+{
+    { 123.153f, -375.134f, 42.8991f, nullptr },
+    { 101.9f, -389.081f, 45.0974f, nullptr },
+    { 89.1516f, -393.047f, 45.1475f, nullptr },
+    { 79.8805f, -401.379f, 46.516f, nullptr },
+};
+
+BattleBotPath vPath_AV_Stonehearth_Graveyard_to_Stonehearth_Graveyard_Flag =
+{
+    { 73.8433f, -485.163f, 48.7233f, nullptr },
+    { 74.4106f, -469.205f, 48.5722f, nullptr },
+    { 74.0364f, -450.204f, 48.7063f, nullptr },
+    { 73.3269f, -433.156f, 49.0149f, nullptr },
+    { 73.6789f, -417.638f, 48.9345f, nullptr },
+    { 79.8805f, -401.379f, 46.516f, nullptr },
+};
+
+BattleBotPath vPath_AV_Stonehearth_Graveyard_Crossroad_to_Icewing_Bunker_Crossroad =
+{
+    { 123.153f, -375.134f, 42.8991f, nullptr },
+    { 132.848f, -385.475f, 42.2487f, nullptr },
+    { 147.934f, -393.887f, 42.6617f, nullptr },
+    { 170.279f, -400.056f, 42.802f, nullptr },
+    { 209.274f, -410.47f, 42.15f, nullptr },
+    { 232.206f, -406.171f, 41.2464f, nullptr },
+};
+
+BattleBotPath vPath_AV_Icewing_Bunker_Crossroad_to_Alliance_Slope_Crossroad =
+{
+    { 232.206f, -406.171f, 41.2464f, nullptr },
+    { 245.764f, -414.729f, 34.8094f, nullptr },
+    { 260.329f, -406.891f, 26.2452f, nullptr },
+    { 277.874f, -393.876f, 11.3203f, nullptr },
+    { 292.624f, -385.478f, 3.80607f, nullptr },
+    { 315.119f, -384.083f, -0.803525f, nullptr },
+    { 352.975f, -389.716f, -0.510339f, nullptr },
+    { 383.883f, -393.12f, -1.07409f, nullptr },
+    { 401.915f, -389.568f, -1.24385f, nullptr },
+};
+
+BattleBotPath vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad =
+{
+    { 450.8f, -434.864f, 30.5126f, nullptr },
+    { 442.575f, -430.266f, 26.6539f, nullptr },
+    { 422.36f, -412.85f, 12.285f, nullptr },
+    { 401.915f, -389.568f, -1.24385f, nullptr },
+};
+
+BattleBotPath vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad =
+{
+    { 769.016f, -491.165f, 97.7772f, nullptr },
+    { 758.026f, -489.447f, 95.9521f, nullptr },
+    { 742.169f, -480.684f, 85.9649f, nullptr },
+    { 713.063f, -467.311f, 71.0884f, nullptr },
+    { 694.957f, -434.171f, 62.8627f, nullptr },
+    { 686.386f, -420.276f, 64.5562f, nullptr },
+    { 650.413f, -401.791f, 67.9546f, nullptr },
+    { 626.412f, -384.308f, 67.5032f, nullptr },
+    { 608.756f, -385.851f, 66.5105f, nullptr },
+    { 576.021f, -395.976f, 63.5599f, nullptr },
+    { 546.555f, -397.812f, 52.655f, nullptr },
+    { 514.201f, -416.131f, 42.4508f, nullptr },
+    { 450.8f, -434.864f, 30.5126f, nullptr },
+};
+
 std::vector<BattleBotPath*> vPaths_WS =
 {
     &vPath_WSG_HordeFlagRoom_to_HordeGraveyard,
@@ -939,11 +1145,27 @@ std::vector<BattleBotPath*> vPaths_AB =
 
 std::vector<BattleBotPath*> vPaths_AV =
 {
-    &vPath_AV_Horde_Cave_to_Tower_Point_Crossroads,
+    &vPath_AV_Horde_Cave_to_Tower_Point_Crossroad,
     &vPath_AV_Tower_Point_Crossroads_to_Tower_Point_Bottom,
     &vPath_AV_TowerPoint_Bottom_to_Tower_Point_Flag,
     &vPath_AV_Tower_Point_Bottom_to_Frostwolf_Graveyard_Flag,
     &vPath_AV_Frostwolf_Graveyard_to_Frostwolf_Graveyard_Flag,
+    &vPath_AV_Tower_Point_Crossroads_to_Iceblood_Graveyard_Flag,
+    &vPath_AV_Iceblood_Graveyard_Flag_to_Iceblood_Tower_Crossroad,
+    &vPath_AV_Iceblood_Tower_Crossroad_to_Iceblood_Tower,
+    &vPath_AV_Iceblood_Tower_to_Iceblood_Tower_Flag,
+    &vPath_AV_Iceblood_Tower_to_Iceblood_Garrison,
+    &vPath_AV_Iceblood_Garrison_to_Captain_Galvangar,
+    &vPath_AV_Iceblood_Graveyard_to_Iceblood_Graveyard_Flag,
+    &vPath_AV_Iceblood_Tower_Crossroad_to_Stonehearth_Outpost,
+    &vPath_AV_Stonehearth_Outpost_to_Captain_Balinda_Stonehearth,
+    &vPath_AV_Stonehearth_Outpost_to_Stonehearth_Graveyard_Crossroad,
+    &vPath_AV_Stonehearth_Graveyard_Crossroad_to_Stonehearth_Graveyard_Flag
+    &vPath_AV_Stonehearth_Graveyard_to_Stonehearth_Graveyard_Flag,
+    &vPath_AV_Stonehearth_Graveyard_Crossroad_to_Icewing_Bunker_Crossroad,
+    &vPath_AV_Icewing_Bunker_Crossroad_to_Alliance_Slope_Crossroad,
+    &vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad,
+    &vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad
 };
 
 std::vector<BattleBotPath*> vPaths_NoReverseAllowed =
@@ -954,8 +1176,11 @@ std::vector<BattleBotPath*> vPaths_NoReverseAllowed =
     &vPath_AB_HordeBase_to_Farm,
     &vPath_AB_HordeBase_to_GoldMine,
     &vPath_AB_HordeBase_to_LumberMill,
-    &vPath_AV_Horde_Cave_to_Tower_Point_Crossroads,
+    &vPath_AV_Horde_Cave_to_Tower_Point_Crossroad,
     &vPath_AV_Frostwolf_Graveyard_to_Frostwolf_Graveyard_Flag,
+    &vPath_AV_Iceblood_Graveyard_to_Iceblood_Graveyard_Flag,
+    &vPath_AV_Stonehearth_Graveyard_to_Stonehearth_Graveyard_Flag,
+    &vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad,
 };
 
 void BattleBotAI::MovementInform(uint32 movementType, uint32 data)
