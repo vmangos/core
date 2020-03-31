@@ -861,6 +861,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsInRoots() const { return HasAuraType(SPELL_AURA_MOD_ROOT); }
         bool IsPolymorphed() const;
         bool IsImmuneToSchoolMask(uint32 schoolMask) const;
+        bool IsImmuneToMechanic(Mechanics mechanic) const;
         bool IsFrozen() const { return HasAuraState(AURA_STATE_FROZEN); }
 
         bool HasBreakableByDamageCrowdControlAura(Unit* excludeCasterChannel = nullptr) const;

@@ -146,13 +146,18 @@ public:
             SpellEntry const* pFlameShock;
             SpellEntry const* pFrostShock;
             SpellEntry const* pPurge;
+            SpellEntry const* pStormstrike;
             SpellEntry const* pElementalMastery;
             SpellEntry const* pLightningShield;
             SpellEntry const* pGhostWolf;
+            SpellEntry const* pCureDisease;
+            SpellEntry const* pCurePoison;
             SpellEntry const* pAirTotem;
             SpellEntry const* pEarthTotem;
             SpellEntry const* pFireTotem;
             SpellEntry const* pWaterTotem;
+            SpellEntry const* pManaTideTotem;
+            SpellEntry const* pWeaponBuff;
         } shaman;
         struct
         {
@@ -184,6 +189,13 @@ public:
             SpellEntry const* pFrostNova;
             SpellEntry const* pConeofCold;
             SpellEntry const* pBlink;
+            SpellEntry const* pCounterspell;
+            SpellEntry const* pPresenceOfMind;
+            SpellEntry const* pArcanePower;
+            SpellEntry const* pRemoveLesserCurse;
+            SpellEntry const* pScorch;
+            SpellEntry const* pPyroblast;
+            SpellEntry const* pEvocation;
         } mage;
         struct
         {
@@ -242,6 +254,10 @@ public:
             SpellEntry const* pBloodthirst;
             SpellEntry const* pBloodrage;
             SpellEntry const* pBerserkerRage;
+            SpellEntry const* pRecklessness;
+            SpellEntry const* pRetaliation;
+            SpellEntry const* pDeathWish;
+            SpellEntry const* pIntimidatingShout;
             SpellEntry const* pPummel;
             SpellEntry const* pRend;
             SpellEntry const* pDisarm;

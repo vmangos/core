@@ -9624,6 +9624,16 @@ bool Unit::IsImmuneToSchoolMask(uint32 schoolMask) const
     return false;
 }
 
+bool Unit::IsImmuneToMechanic(Mechanics mechanic) const
+{
+    SpellImmuneList const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+    for (const auto& itr : mechanicList)
+        if (itr.type == mechanic)
+            return true;
+
+    return false;
+}
+
 void Unit::ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs)
 {
     // Still needed ... ?
