@@ -842,6 +842,12 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.priest.pMindBlast->Id < pSpellEntry->Id)
                         m_spells.priest.pMindBlast = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Mind Flay") != std::string::npos)
+                {
+                    if (!m_spells.priest.pMindFlay ||
+                        m_spells.priest.pMindFlay->Id < pSpellEntry->Id)
+                        m_spells.priest.pMindFlay = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Shadow Word: Pain") != std::string::npos)
                 {
                     if (!m_spells.priest.pShadowWordPain ||
@@ -2572,6 +2578,11 @@ void BattleBotAI::UpdateMovement()
         if (bg->GetStatus() == STATUS_WAIT_JOIN)
             return;
 
+    if ((me->HasAura(AURA_WARSONG_FLAG) ||
+        me->HasAura(AURA_SILVERWING_FLAG)) &&
+        StartNewPathToBase())
+        return;
+
     if (StartNewPathFromBeginning())
         return;
 
@@ -2904,12 +2915,26 @@ bool BattleBotAI::SummonShamanTotems()
     return false;
 }
 
+SpellCastResult BattleBotAI::CastWeaponBuff(SpellEntry const* pSpellEntry)
+{
+    Item* pWeapon = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    if (!pWeapon)
+        return SPELL_FAILED_ITEM_NOT_FOUND;
+    if (pWeapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))
+        return SPELL_FAILED_ITEM_ALREADY_ENCHANTED;
+
+    Spell* spell = new Spell(me, pSpellEntry, true, ObjectGuid(), nullptr, nullptr, nullptr);
+    SpellCastTargets targets;
+    targets.setItemTarget(pWeapon);
+    return spell->prepare(std::move(targets), nullptr);
+}
+
 void BattleBotAI::UpdateOutOfCombatAI_Shaman()
 {
     if (m_spells.shaman.pWeaponBuff &&
         CanTryToCastSpell(me, m_spells.shaman.pWeaponBuff))
     {
-        if (DoCastSpell(me, m_spells.shaman.pWeaponBuff) == SPELL_CAST_OK)
+        if (CastWeaponBuff(m_spells.shaman.pWeaponBuff) == SPELL_CAST_OK)
             return;
     }
 
@@ -3597,6 +3622,14 @@ void BattleBotAI::UpdateInCombatAI_Priest()
                 return;
         }
 
+        if (m_spells.priest.pMindFlay &&
+           !pVictim->CanReachWithMeleeAutoAttack(me) &&
+            CanTryToCastSpell(pVictim, m_spells.priest.pMindFlay))
+        {
+            if (DoCastSpell(pVictim, m_spells.priest.pMindFlay) == SPELL_CAST_OK)
+                return;
+        }
+
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
             && me->GetDistance(pVictim) > 30.0f)
         {
@@ -3716,7 +3749,7 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
         }
 
         if (m_spells.warlock.pDrainLife &&
-           (me->GetHealthPercent() < 20.0f) &&
+           (me->GetHealthPercent() < 30.0f) &&
             CanTryToCastSpell(pVictim, m_spells.warlock.pDrainLife))
         {
             if (DoCastSpell(pVictim, m_spells.warlock.pDrainLife) == SPELL_CAST_OK)
@@ -4282,7 +4315,9 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
     else if (me->GetShapeshiftForm() == FORM_CAT)
     {
         if (m_spells.druid.pProwl &&
-            CanTryToCastSpell(me, m_spells.druid.pProwl))
+            CanTryToCastSpell(me, m_spells.druid.pProwl) &&
+            !me->HasAura(AURA_WARSONG_FLAG) &&
+            !me->HasAura(AURA_SILVERWING_FLAG))
         {
             if (DoCastSpell(me, m_spells.druid.pProwl) == SPELL_CAST_OK)
                 return;

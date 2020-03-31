@@ -1286,23 +1286,23 @@ void BattleBotAI::StartNewPathFromAnywhere()
     std::vector<BattleBotPath*> vPaths;
     switch (me->GetBattleGround()->GetTypeID())
     {
-    case BATTLEGROUND_AB:
-    {
-        vPaths = vPaths_AB;
-        break;
-    }
-    case BATTLEGROUND_AV:
-    {
-        vPaths = vPaths_AV;
-        break;
-    }
-    case BATTLEGROUND_WS:
-    {
-        vPaths = vPaths_WS;
-        break;
-    }
-    default:
-        break;
+        case BATTLEGROUND_AB:
+        {
+            vPaths = vPaths_AB;
+            break;
+        }
+        case BATTLEGROUND_AV:
+        {
+            vPaths = vPaths_AV;
+            break;
+        }
+        case BATTLEGROUND_WS:
+        {
+            vPaths = vPaths_WS;
+            break;
+        }
+        default:
+            break;
     }
 
     for (const auto& pPath : vPaths)
@@ -1327,6 +1327,86 @@ void BattleBotAI::StartNewPathFromAnywhere()
     m_movingInReverse = false;
     m_currentPoint = closestPoint-1;
     MoveToNextPoint();
+}
+
+template<class A, class B>
+float GetDistance3D(A const& from, B const& to)
+{
+    float dx = from.x - to.x;
+    float dy = from.y - to.y;
+    float dz = from.z - to.z;
+    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+    return (dist > 0 ? dist : 0);
+}
+
+bool BattleBotAI::StartNewPathToBase()
+{
+    if (me->GetBattleGround()->GetTypeID() != BATTLEGROUND_WS)
+        return false;
+
+    BattleBotPath* pClosestPath = nullptr;
+    uint32 closestPoint = 0;
+    float closestDistanceToBase = FLT_MAX;
+    bool reverse = false;
+    Position homeBasePosition = me->GetTeam() == HORDE ? WS_FLAG_POS_HORDE : WS_FLAG_POS_ALLIANCE;
+
+    for (const auto& pPath : vPaths_WS)
+    {
+        {
+            BattleBotWaypoint& lastPoint = ((*pPath)[pPath->size() - 1]);
+            float const distanceFromPathEndToBase = GetDistance3D(lastPoint, homeBasePosition);
+            if (closestDistanceToBase > distanceFromPathEndToBase)
+            {
+                float closestDistanceFromMeToPoint = FLT_MAX;
+
+                for (uint32 i = 0; i < pPath->size(); i++)
+                {
+                    BattleBotWaypoint& waypoint = ((*pPath)[i]);
+                    float const distanceFromMeToPoint = me->GetDistance(waypoint.x, waypoint.y, waypoint.z);
+                    if (distanceFromMeToPoint < 50.0f && closestDistanceFromMeToPoint > distanceFromMeToPoint)
+                    {
+                        reverse = false;
+                        pClosestPath = pPath;
+                        closestPoint = i;
+                        closestDistanceToBase = distanceFromPathEndToBase;
+                        closestDistanceFromMeToPoint = distanceFromMeToPoint;
+                    }
+                }
+            }
+        }
+        
+        {
+            BattleBotWaypoint& firstPoint = ((*pPath)[0]);
+            float const distanceFromPathEndToBase = GetDistance3D(firstPoint, homeBasePosition);
+            if (closestDistanceToBase > distanceFromPathEndToBase)
+            {
+                float closestDistanceFromMeToPoint = FLT_MAX;
+
+                for (uint32 i = 0; i < pPath->size(); i++)
+                {
+                    BattleBotWaypoint& waypoint = ((*pPath)[i]);
+                    float const distanceFromMeToPoint = me->GetDistance(waypoint.x, waypoint.y, waypoint.z);
+                    if (distanceFromMeToPoint < 50.0f && closestDistanceFromMeToPoint > distanceFromMeToPoint)
+                    {
+                        reverse = true;
+                        pClosestPath = pPath;
+                        closestPoint = i;
+                        closestDistanceToBase = distanceFromPathEndToBase;
+                        closestDistanceFromMeToPoint = distanceFromMeToPoint;
+                    }
+                }
+            }
+        }
+    }
+
+    if (!pClosestPath)
+        return false;
+
+    m_currentPath = pClosestPath;
+    m_movingInReverse = reverse;
+    m_currentPoint = m_movingInReverse ? closestPoint + 1 : closestPoint - 1;
+    MoveToNextPoint();
+    return true;
 }
 
 void BattleBotAI::ClearPath()

@@ -111,6 +111,7 @@ public:
     void UpdateOutOfCombatAI_Druid();
 
     bool SummonShamanTotems();
+    SpellCastResult CastWeaponBuff(SpellEntry const* pSpellEntry);
 
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
@@ -209,6 +210,7 @@ public:
             SpellEntry const* pHolyNova;
             SpellEntry const* pHolyFire;
             SpellEntry const* pMindBlast;
+            SpellEntry const* pMindFlay;
             SpellEntry const* pShadowWordPain;
             SpellEntry const* pInnerFocus;
             SpellEntry const* pAbolishDisease;
@@ -367,6 +369,7 @@ public:
     void MoveToNextPoint();
     bool StartNewPathFromBeginning();
     void StartNewPathFromAnywhere();
+    bool StartNewPathToBase();
     void ClearPath();
     bool m_doingGraveyardJump = false;
     bool m_movingInReverse = false;
