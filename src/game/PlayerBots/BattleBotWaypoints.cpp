@@ -1147,7 +1147,7 @@ std::vector<BattleBotPath*> vPaths_AV =
 {
     &vPath_AV_Horde_Cave_to_Tower_Point_Crossroad,
     &vPath_AV_Tower_Point_Crossroads_to_Tower_Point_Bottom,
-    &vPath_AV_TowerPoint_Bottom_to_Tower_Point_Flag,
+    //&vPath_AV_TowerPoint_Bottom_to_Tower_Point_Flag,
     &vPath_AV_Tower_Point_Bottom_to_Frostwolf_Graveyard_Flag,
     &vPath_AV_Frostwolf_Graveyard_to_Frostwolf_Graveyard_Flag,
     &vPath_AV_Tower_Point_Crossroads_to_Iceblood_Graveyard_Flag,
@@ -1160,7 +1160,7 @@ std::vector<BattleBotPath*> vPaths_AV =
     &vPath_AV_Iceblood_Tower_Crossroad_to_Stonehearth_Outpost,
     &vPath_AV_Stonehearth_Outpost_to_Captain_Balinda_Stonehearth,
     &vPath_AV_Stonehearth_Outpost_to_Stonehearth_Graveyard_Crossroad,
-    &vPath_AV_Stonehearth_Graveyard_Crossroad_to_Stonehearth_Graveyard_Flag
+    &vPath_AV_Stonehearth_Graveyard_Crossroad_to_Stonehearth_Graveyard_Flag,
     &vPath_AV_Stonehearth_Graveyard_to_Stonehearth_Graveyard_Flag,
     &vPath_AV_Stonehearth_Graveyard_Crossroad_to_Icewing_Bunker_Crossroad,
     &vPath_AV_Icewing_Bunker_Crossroad_to_Alliance_Slope_Crossroad,
