@@ -108,12 +108,14 @@ void BattleBotAI::ResetSpellData()
 
 void BattleBotAI::PopulateSpellData()
 {
+    // Paladin Blessings
     SpellEntry const* pBlessingOfLight = nullptr;
     SpellEntry const* pBlessingOfMight = nullptr;
     SpellEntry const* pBlessingOfWisdom = nullptr;
     SpellEntry const* pBlessingOfKings = nullptr;
     SpellEntry const* pBlessingOfSanctuary = nullptr;
 
+    // Paladin Auras
     SpellEntry const* pDevotionAura = nullptr;
     SpellEntry const* pConcentrationAura = nullptr;
     SpellEntry const* pRetributionAura = nullptr;
@@ -122,6 +124,36 @@ void BattleBotAI::PopulateSpellData()
     SpellEntry const* pFrostResistanceAura = nullptr;
     SpellEntry const* pFireResistanceAura = nullptr;
 
+    // Air Totems
+    SpellEntry const* pGraceOfAirTotem = nullptr;
+    SpellEntry const* pNatureResistanceTotem = nullptr;
+    SpellEntry const* pWindfuryTotem = nullptr;
+    SpellEntry const* pWindwallTotem = nullptr;
+    SpellEntry const* pTranquilAirTotem = nullptr;
+
+    // Earth Totems
+    SpellEntry const* pEarthbindTotem = nullptr;
+    SpellEntry const* pStoneclawtotem = nullptr;
+    SpellEntry const* pStoneskinTotem = nullptr;
+    SpellEntry const* pStrengthOfEarthTotem = nullptr;
+    SpellEntry const* pTremorTotem = nullptr;
+
+    // Fire Totems
+    SpellEntry const* pFireNovaTotem = nullptr;
+    SpellEntry const* pMagmaTotem = nullptr;
+    SpellEntry const* pSearingTotem = nullptr;
+    SpellEntry const* pFlametongueTotem = nullptr;
+    SpellEntry const* pFrostResistanceTotem = nullptr;
+
+    // Water Totems
+    SpellEntry const* pFireResistanceTotem = nullptr;
+    SpellEntry const* pDiseaseCleansingTotem = nullptr;
+    SpellEntry const* pHealingStreamTotem = nullptr;
+    SpellEntry const* pManaSpringTotem = nullptr;
+    SpellEntry const* pPoisonCleansingTotem = nullptr;
+    SpellEntry const* pManaTideTotem = nullptr;
+
+    // Mage Polymorph
     SpellEntry const* pPolymorphSheep = nullptr;
     SpellEntry const* pPolymorphCow = nullptr;
     SpellEntry const* pPolymorphPig = nullptr;
@@ -298,6 +330,190 @@ void BattleBotAI::PopulateSpellData()
                     if (!m_spells.paladin.pLayOnHands ||
                         m_spells.paladin.pLayOnHands->Id < pSpellEntry->Id)
                         m_spells.paladin.pLayOnHands = pSpellEntry;
+                }
+                break;
+            }
+            case CLASS_SHAMAN:
+            {
+                if (pSpellEntry->SpellName[0].find("Lightning Bolt") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pLightningBolt ||
+                        m_spells.shaman.pLightningBolt->Id < pSpellEntry->Id)
+                        m_spells.shaman.pLightningBolt = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Chain Lightning") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pChainLightning ||
+                        m_spells.shaman.pChainLightning->Id < pSpellEntry->Id)
+                        m_spells.shaman.pChainLightning = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Earth Shock") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pEarthShock ||
+                        m_spells.shaman.pEarthShock->Id < pSpellEntry->Id)
+                        m_spells.shaman.pEarthShock = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Flame Shock") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pFlameShock ||
+                        m_spells.shaman.pFlameShock->Id < pSpellEntry->Id)
+                        m_spells.shaman.pFlameShock = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Frost Shock") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pFrostShock ||
+                        m_spells.shaman.pFrostShock->Id < pSpellEntry->Id)
+                        m_spells.shaman.pFrostShock = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Purge") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pPurge ||
+                        m_spells.shaman.pPurge->Id < pSpellEntry->Id)
+                        m_spells.shaman.pPurge = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Elemental Mastery") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pElementalMastery ||
+                        m_spells.shaman.pElementalMastery->Id < pSpellEntry->Id)
+                        m_spells.shaman.pElementalMastery = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Lightning Shield") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pLightningShield ||
+                        m_spells.shaman.pLightningShield->Id < pSpellEntry->Id)
+                        m_spells.shaman.pLightningShield = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Ghost Wolf") != std::string::npos)
+                {
+                    if (!m_spells.shaman.pGhostWolf ||
+                        m_spells.shaman.pGhostWolf->Id < pSpellEntry->Id)
+                        m_spells.shaman.pGhostWolf = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Grace of Air Totem") != std::string::npos)
+                {
+                    if (!pGraceOfAirTotem ||
+                        pGraceOfAirTotem->Id < pSpellEntry->Id)
+                        pGraceOfAirTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Nature Resistance Totem") != std::string::npos)
+                {
+                    if (!pNatureResistanceTotem ||
+                        pNatureResistanceTotem->Id < pSpellEntry->Id)
+                        pNatureResistanceTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Windfury Totem") != std::string::npos)
+                {
+                    if (!pWindfuryTotem ||
+                        pWindfuryTotem->Id < pSpellEntry->Id)
+                        pWindfuryTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Windwall Totem") != std::string::npos)
+                {
+                    if (!pWindwallTotem ||
+                        pWindwallTotem->Id < pSpellEntry->Id)
+                        pWindwallTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Tranquil Air Totem") != std::string::npos)
+                {
+                    if (!pTranquilAirTotem ||
+                        pTranquilAirTotem->Id < pSpellEntry->Id)
+                        pTranquilAirTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Earthbind Totem") != std::string::npos)
+                {
+                    if (!pEarthbindTotem ||
+                        pEarthbindTotem->Id < pSpellEntry->Id)
+                        pEarthbindTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Stoneclaw Totem") != std::string::npos)
+                {
+                    if (!pStoneclawtotem ||
+                        pStoneclawtotem->Id < pSpellEntry->Id)
+                        pStoneclawtotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Stoneskin Totem") != std::string::npos)
+                {
+                    if (!pStoneskinTotem ||
+                        pStoneskinTotem->Id < pSpellEntry->Id)
+                        pStoneskinTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Strength of Earth Totem") != std::string::npos)
+                {
+                    if (!pStrengthOfEarthTotem ||
+                        pStrengthOfEarthTotem->Id < pSpellEntry->Id)
+                        pStrengthOfEarthTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Tremor Totem") != std::string::npos)
+                {
+                    if (!pTremorTotem ||
+                        pTremorTotem->Id < pSpellEntry->Id)
+                        pTremorTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Fire Nova Totem") != std::string::npos)
+                {
+                    if (!pFireNovaTotem ||
+                        pFireNovaTotem->Id < pSpellEntry->Id)
+                        pFireNovaTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Magma Totem") != std::string::npos)
+                {
+                    if (!pMagmaTotem ||
+                        pMagmaTotem->Id < pSpellEntry->Id)
+                        pMagmaTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Searing Totem") != std::string::npos)
+                {
+                    if (!pSearingTotem ||
+                        pSearingTotem->Id < pSpellEntry->Id)
+                        pSearingTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Flametongue Totem") != std::string::npos)
+                {
+                    if (!pFlametongueTotem ||
+                        pFlametongueTotem->Id < pSpellEntry->Id)
+                        pFlametongueTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Frost Resistance Totem") != std::string::npos)
+                {
+                    if (!pFrostResistanceTotem ||
+                        pFrostResistanceTotem->Id < pSpellEntry->Id)
+                        pFrostResistanceTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Fire Resistance Totem") != std::string::npos)
+                {
+                    if (!pFireResistanceTotem ||
+                        pFireResistanceTotem->Id < pSpellEntry->Id)
+                        pFireResistanceTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Disease Resistance Totem") != std::string::npos)
+                {
+                    if (!pDiseaseCleansingTotem ||
+                        pDiseaseCleansingTotem->Id < pSpellEntry->Id)
+                        pDiseaseCleansingTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Healing Stream Totem") != std::string::npos)
+                {
+                    if (!pHealingStreamTotem ||
+                        pHealingStreamTotem->Id < pSpellEntry->Id)
+                        pHealingStreamTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Mana Spring Totem") != std::string::npos)
+                {
+                    if (!pManaSpringTotem ||
+                        pManaSpringTotem->Id < pSpellEntry->Id)
+                        pManaSpringTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Poison Cleansing Totem") != std::string::npos)
+                {
+                    if (!pPoisonCleansingTotem ||
+                        pPoisonCleansingTotem->Id < pSpellEntry->Id)
+                        pPoisonCleansingTotem = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Mana Tide Totem") != std::string::npos)
+                {
+                    if (!pManaTideTotem ||
+                        pManaTideTotem->Id < pSpellEntry->Id)
+                        pManaTideTotem = pSpellEntry;
                 }
                 break;
             }
@@ -1215,6 +1431,7 @@ void BattleBotAI::PopulateSpellData()
                         m_spells.druid.pProwl->Id < pSpellEntry->Id)
                         m_spells.druid.pProwl = pSpellEntry;
                 }
+                break;
             }
         }
 
@@ -1274,6 +1491,69 @@ void BattleBotAI::PopulateSpellData()
                 auras.push_back(pFireResistanceAura);
             if (!auras.empty())
                 m_spells.paladin.pAura = SelectRandomContainerElement(auras);
+
+            break;
+        }
+        case CLASS_SHAMAN:
+        {
+            std::vector<SpellEntry const*> airTotems;
+            if (pGraceOfAirTotem)
+                airTotems.push_back(pGraceOfAirTotem);
+            if (pNatureResistanceTotem)
+                airTotems.push_back(pNatureResistanceTotem);
+            if (pWindfuryTotem)
+                airTotems.push_back(pWindfuryTotem);
+            if (pWindwallTotem)
+                airTotems.push_back(pWindwallTotem);
+            if (pTranquilAirTotem)
+                airTotems.push_back(pTranquilAirTotem);
+            if (!airTotems.empty())
+                m_spells.shaman.pAirTotem = SelectRandomContainerElement(airTotems);
+
+            std::vector<SpellEntry const*> earthTotems;
+            if (pEarthbindTotem)
+                earthTotems.push_back(pEarthbindTotem);
+            if (pStoneclawtotem)
+                earthTotems.push_back(pStoneclawtotem);
+            if (pStoneskinTotem)
+                earthTotems.push_back(pStoneskinTotem);
+            if (pStrengthOfEarthTotem)
+                earthTotems.push_back(pStrengthOfEarthTotem);
+            if (pTremorTotem)
+                earthTotems.push_back(pTremorTotem);
+            if (!earthTotems.empty())
+                m_spells.shaman.pEarthTotem = SelectRandomContainerElement(earthTotems);
+
+            std::vector<SpellEntry const*> fireTotems;
+            if (pFireNovaTotem)
+                fireTotems.push_back(pFireNovaTotem);
+            if (pMagmaTotem)
+                fireTotems.push_back(pMagmaTotem);
+            if (pSearingTotem)
+                fireTotems.push_back(pSearingTotem);
+            if (pFlametongueTotem)
+                fireTotems.push_back(pFlametongueTotem);
+            if (pFrostResistanceTotem)
+                fireTotems.push_back(pFrostResistanceTotem);
+            if (!fireTotems.empty())
+                m_spells.shaman.pFireTotem = SelectRandomContainerElement(fireTotems);
+
+            std::vector<SpellEntry const*> waterTotems;
+            if (pFireResistanceTotem)
+                waterTotems.push_back(pFireResistanceTotem);
+            if (pDiseaseCleansingTotem)
+                waterTotems.push_back(pDiseaseCleansingTotem);
+            if (pHealingStreamTotem)
+                waterTotems.push_back(pHealingStreamTotem);
+            if (pManaSpringTotem)
+                waterTotems.push_back(pManaSpringTotem);
+            if (pPoisonCleansingTotem)
+                waterTotems.push_back(pPoisonCleansingTotem);
+            if (pManaTideTotem)
+                waterTotems.push_back(pManaTideTotem);
+            if (!waterTotems.empty())
+                m_spells.shaman.pWaterTotem = SelectRandomContainerElement(waterTotems);
+
             break;
         }
         case CLASS_MAGE:
@@ -1289,6 +1569,7 @@ void BattleBotAI::PopulateSpellData()
                 polymorph.push_back(pPolymorphTurtle);
             if (!polymorph.empty())
                 m_spells.mage.pPolymorph = SelectRandomContainerElement(polymorph);
+
             break;
         }
     }
@@ -1788,6 +2069,9 @@ bool BattleBotAI::CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry
     if (me->HasSpellCooldown(pSpellEntry->Id))
         return false;
 
+    if (me->GetGlobalCooldownMgr().HasGlobalCooldown(pSpellEntry))
+        return false;
+
     uint32 const powerCost = Spell::CalculatePowerCost(pSpellEntry, me);
     Powers const powerType = Powers(pSpellEntry->powerType);
 
@@ -2220,6 +2504,9 @@ void BattleBotAI::UpdateOutOfCombatAI()
         case CLASS_PALADIN:
             UpdateOutOfCombatAI_Paladin();
             break;
+        case CLASS_SHAMAN:
+            UpdateOutOfCombatAI_Shaman();
+            break;
         case CLASS_HUNTER:
             UpdateOutOfCombatAI_Hunter();
             break;
@@ -2250,6 +2537,9 @@ void BattleBotAI::UpdateInCombatAI()
     {
         case CLASS_PALADIN:
             UpdateInCombatAI_Paladin();
+            break;
+        case CLASS_SHAMAN:
+            UpdateInCombatAI_Shaman();
             break;
         case CLASS_HUNTER:
             UpdateInCombatAI_Hunter();
@@ -2301,7 +2591,12 @@ void BattleBotAI::UpdateOutOfCombatAI_Paladin()
         }
     }
 
-    m_isBuffing = false;
+    if (m_isBuffing &&
+       (!m_spells.paladin.pBlessingBuff ||
+        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.paladin.pBlessingBuff)))
+    {
+        m_isBuffing = false;
+    }
 }
 
 void BattleBotAI::UpdateInCombatAI_Paladin()
@@ -2426,6 +2721,140 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
             }
         }
     }
+
+    HealInjuredAlly(40.0f);
+}
+
+bool BattleBotAI::SummonShamanTotems()
+{
+    if (m_spells.shaman.pAirTotem &&
+        !me->GetTotem(TOTEM_SLOT_AIR) &&
+        CanTryToCastSpell(me, m_spells.shaman.pAirTotem))
+    {
+        if (DoCastSpell(me, m_spells.shaman.pAirTotem) == SPELL_CAST_OK)
+            return true;
+    }
+
+    if (m_spells.shaman.pEarthTotem &&
+        !me->GetTotem(TOTEM_SLOT_EARTH) &&
+        CanTryToCastSpell(me, m_spells.shaman.pEarthTotem))
+    {
+        if (DoCastSpell(me, m_spells.shaman.pEarthTotem) == SPELL_CAST_OK)
+            return true;
+    }
+
+    if (m_spells.shaman.pFireTotem &&
+        !me->GetTotem(TOTEM_SLOT_FIRE) &&
+        CanTryToCastSpell(me, m_spells.shaman.pFireTotem))
+    {
+        if (DoCastSpell(me, m_spells.shaman.pFireTotem) == SPELL_CAST_OK)
+            return true;
+    }
+
+    if (m_spells.shaman.pWaterTotem &&
+        !me->GetTotem(TOTEM_SLOT_WATER) &&
+        CanTryToCastSpell(me, m_spells.shaman.pWaterTotem))
+    {
+        if (DoCastSpell(me, m_spells.shaman.pWaterTotem) == SPELL_CAST_OK)
+            return true;
+    }
+
+    return false;
+}
+
+void BattleBotAI::UpdateOutOfCombatAI_Shaman()
+{
+    if (m_spells.shaman.pLightningShield &&
+        CanTryToCastSpell(me, m_spells.shaman.pLightningShield))
+    {
+        if (DoCastSpell(me, m_spells.shaman.pLightningShield) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (me->GetVictim())
+    {
+        if (SummonShamanTotems())
+            return;
+
+        UpdateInCombatAI_Shaman();
+    }
+    else
+    {
+        if (m_spells.shaman.pGhostWolf &&
+           !me->IsMoving() &&
+            CanTryToCastSpell(me, m_spells.shaman.pGhostWolf))
+        {
+            if (DoCastSpell(me, m_spells.shaman.pGhostWolf) == SPELL_CAST_OK)
+                return;
+        }
+    }
+}
+
+void BattleBotAI::UpdateInCombatAI_Shaman()
+{
+    if (m_spells.shaman.pGhostWolf &&
+        me->GetShapeshiftForm() == FORM_GHOSTWOLF)
+        me->RemoveAurasDueToSpellByCancel(m_spells.shaman.pGhostWolf->Id);
+
+    if (Unit* pVictim = me->GetVictim())
+    {
+        if (m_spells.shaman.pElementalMastery &&
+           (GetAttackersInRangeCount(10.0f) == 0) &&
+            CanTryToCastSpell(me, m_spells.shaman.pElementalMastery))
+        {
+            if (DoCastSpell(me, m_spells.shaman.pElementalMastery) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.shaman.pEarthShock &&
+            pVictim->IsNonMeleeSpellCasted() &&
+            CanTryToCastSpell(pVictim, m_spells.shaman.pEarthShock))
+        {
+            if (DoCastSpell(pVictim, m_spells.shaman.pEarthShock) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.shaman.pFrostShock &&
+            pVictim->IsMoving() &&
+            CanTryToCastSpell(pVictim, m_spells.shaman.pFrostShock))
+        {
+            if (DoCastSpell(pVictim, m_spells.shaman.pFrostShock) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.shaman.pChainLightning &&
+            CanTryToCastSpell(pVictim, m_spells.shaman.pChainLightning))
+        {
+            if (DoCastSpell(pVictim, m_spells.shaman.pChainLightning) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.shaman.pPurge &&
+            IsValidDispelTarget(pVictim, m_spells.shaman.pPurge) &&
+            CanTryToCastSpell(pVictim, m_spells.shaman.pPurge))
+        {
+            if (DoCastSpell(pVictim, m_spells.shaman.pPurge) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.shaman.pFlameShock &&
+            CanTryToCastSpell(pVictim, m_spells.shaman.pFlameShock))
+        {
+            if (DoCastSpell(pVictim, m_spells.shaman.pFlameShock) == SPELL_CAST_OK)
+                return;
+        }
+        
+        if (m_spells.shaman.pLightningBolt &&
+           !me->CanReachWithMeleeAutoAttack(pVictim) &&
+            CanTryToCastSpell(pVictim, m_spells.shaman.pLightningBolt))
+        {
+            if (DoCastSpell(pVictim, m_spells.shaman.pLightningBolt) == SPELL_CAST_OK)
+                return;
+        }
+    }
+
+    if (SummonShamanTotems())
+        return;
 
     HealInjuredAlly(40.0f);
 }
@@ -2816,7 +3245,12 @@ void BattleBotAI::UpdateOutOfCombatAI_Priest()
         }
     }
 
-    m_isBuffing = false;
+    if (m_isBuffing &&
+       (!m_spells.priest.pPowerWordFortitude ||
+        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.priest.pPowerWordFortitude)))
+    {
+        m_isBuffing = false;
+    }
 
     if (me->GetVictim())
         UpdateInCombatAI_Priest();
@@ -2973,7 +3407,12 @@ void BattleBotAI::UpdateOutOfCombatAI_Warlock()
         }
     }
 
-    m_isBuffing = false;
+    if (m_isBuffing &&
+       (!m_spells.warlock.pDetectInvisibility ||
+        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.warlock.pDetectInvisibility)))
+    {
+        m_isBuffing = false;
+    }
 
     if (Unit* pVictim = me->GetVictim())
         UpdateInCombatAI_Warlock();
@@ -3518,7 +3957,12 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
             return;
     }
 
-    m_isBuffing = false;
+    if (m_isBuffing &&
+       (!m_spells.druid.pMarkoftheWild ||
+        !me->GetGlobalCooldownMgr().HasGlobalCooldown(m_spells.druid.pMarkoftheWild)))
+    {
+        m_isBuffing = false;
+    }
 
     if (m_spells.druid.pMoonkinForm &&
         CanTryToCastSpell(me, m_spells.druid.pMoonkinForm))
@@ -4025,6 +4469,9 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         // Can enter combat from UpdateOutOfCombatAI().
         if (me->IsInCombat())
+            return;
+
+        if (me->IsNonMeleeSpellCasted())
             return;
 
         if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())

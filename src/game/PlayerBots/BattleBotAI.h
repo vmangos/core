@@ -28,14 +28,15 @@ enum BattleBotWsgWaitSpot
 #define GO_WARSONG_FLAG 179831
 #define AURA_WARSONG_FLAG 23333
 
-#define GO_HORDE_BANNER 180101
-#define GO_HORDE_BANNER2 180060
-#define GO_ALLIANCE_BANNER 180100
-#define GO_ALLIANCE_BANNER2 180058
-#define GO_CONTESTED_BANNER 180059
+#define GO_ALLIANCE_BANNER 180058
+#define GO_CONTESTED_BANNER1 180059
+#define GO_HORDE_BANNER 180060
 #define GO_CONTESTED_BANNER2 180061
-#define GO_NEUTRAL_BANNER 180089
+#define GO_STABLE_BANNER 180087
+#define GO_BLACKSMITH_BANNER 180088
 #define GO_FARM_BANNER 180089
+#define GO_LUMBER_MILL_BANNER 180090
+#define GO_GOLD_MINE_BANNER 180091
 
 class BattleBotAI : public PlayerBotAI
 {
@@ -92,6 +93,8 @@ public:
 
     void UpdateInCombatAI_Paladin();
     void UpdateOutOfCombatAI_Paladin();
+    void UpdateInCombatAI_Shaman();
+    void UpdateOutOfCombatAI_Shaman();
     void UpdateInCombatAI_Hunter();
     void UpdateOutOfCombatAI_Hunter();
     void UpdateInCombatAI_Mage();
@@ -106,6 +109,8 @@ public:
     void UpdateOutOfCombatAI_Rogue();
     void UpdateInCombatAI_Druid();
     void UpdateOutOfCombatAI_Druid();
+
+    bool SummonShamanTotems();
 
     std::vector<SpellEntry const*> spellListHealAura;
     std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
@@ -133,6 +138,22 @@ public:
             SpellEntry const* pDivineShield;
             SpellEntry const* pLayOnHands;
         } paladin;
+        struct
+        {
+            SpellEntry const* pLightningBolt;
+            SpellEntry const* pChainLightning;
+            SpellEntry const* pEarthShock;
+            SpellEntry const* pFlameShock;
+            SpellEntry const* pFrostShock;
+            SpellEntry const* pPurge;
+            SpellEntry const* pElementalMastery;
+            SpellEntry const* pLightningShield;
+            SpellEntry const* pGhostWolf;
+            SpellEntry const* pAirTotem;
+            SpellEntry const* pEarthTotem;
+            SpellEntry const* pFireTotem;
+            SpellEntry const* pWaterTotem;
+        } shaman;
         struct
         {
             SpellEntry const* pAspectOfTheCheetah;

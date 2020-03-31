@@ -131,109 +131,27 @@ void WSG_AtHordeGraveyard(BattleBotAI* pAI)
         pAI->MoveToNextPoint();
 }
 
+#define SPELL_AB_CAPTURE_BANNER 21651
+
+uint32 const AB_FlagIds[] = { GO_ALLIANCE_BANNER , GO_CONTESTED_BANNER1 , GO_HORDE_BANNER , GO_CONTESTED_BANNER2 ,
+                              GO_STABLE_BANNER, GO_BLACKSMITH_BANNER, GO_FARM_BANNER, GO_LUMBER_MILL_BANNER,
+                              GO_GOLD_MINE_BANNER };
+
 void AB_AtFlag(BattleBotAI* pAI)
 {
-    if (pAI->me->GetTeam() == ALLIANCE)
+    for (const auto& bannerId : AB_FlagIds)
     {
-        GameObject* gBanner = NULL;
-        GameObject* gHordeBanner = pAI->me->FindNearestGameObject(GO_HORDE_BANNER, 25.0f);
-        if (gHordeBanner)
-            gBanner = gHordeBanner;
-        GameObject* gHordeBanner2 = pAI->me->FindNearestGameObject(GO_HORDE_BANNER2, 25.0f);
-        if (gHordeBanner2)
-            gBanner = gHordeBanner2;
-        GameObject* gContestedBanner = pAI->me->FindNearestGameObject(GO_CONTESTED_BANNER, 25.0f);
-        if (gContestedBanner)
-            gBanner = gContestedBanner;
-        GameObject* gContestedBanner2 = pAI->me->FindNearestGameObject(GO_CONTESTED_BANNER2, 25.0f);
-        if (gContestedBanner2)
-            gBanner = gContestedBanner2;
-        GameObject* gNeutralBanner = pAI->me->FindNearestGameObject(GO_NEUTRAL_BANNER, 25.0f);
-        if (gNeutralBanner)
-            gBanner = gNeutralBanner;
-        GameObject* gFarmBanner = pAI->me->FindNearestGameObject(GO_FARM_BANNER, 25.0f);
-        if (gFarmBanner)
-            gBanner = gFarmBanner;
-
-        if (gBanner)
+        if (GameObject* pGo = pAI->me->FindNearestGameObject(bannerId, INTERACTION_DISTANCE))
         {
-            if (gBanner->isSpawned())
+            if (pGo->isSpawned() && (pAI->me->GetReactionTo(pGo) >= REP_NEUTRAL))
             {
-                if (pAI->me->IsWithinDistInMap(gBanner, INTERACTION_DISTANCE))
-                {
-                    pAI->ClearPath();
-                    WorldPacket data(CMSG_GAMEOBJ_USE);
-                    data << gBanner->GetObjectGuid();
-                    pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
-                    return;
-                }
-                else
-                {
-                    pAI->ClearPath();
-                    ObjectGuid guid = gBanner->GetObjectGuid();
-                    pAI->me->GetMotionMaster()->MovePoint(0, gBanner->GetPositionX(), gBanner->GetPositionY(), gBanner->GetPositionZ());
-                    pAI->me->m_Events.AddLambdaEventAtOffset([pAI, guid]
-                        {
-                            WorldPacket data(CMSG_GAMEOBJ_USE);
-                            data << guid;
-                            pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
-                        }, 2000);
-                    return;
-                }                    
+                pAI->ClearPath();
+                pAI->me->CastSpell(pGo, SPELL_AB_CAPTURE_BANNER, false);
+                return;
             }
         }
     }
-    else
-    {
-        GameObject* gBanner = NULL;
-        GameObject* gAllianceBanner = pAI->me->FindNearestGameObject(GO_ALLIANCE_BANNER, 25.0f);
-        if (gAllianceBanner)
-            gBanner = gAllianceBanner;
-        GameObject* gAllianceBanner2 = pAI->me->FindNearestGameObject(GO_ALLIANCE_BANNER2, 25.0f);
-        if (gAllianceBanner2)
-            gBanner = gAllianceBanner2;
-        GameObject* gContestedBanner = pAI->me->FindNearestGameObject(GO_CONTESTED_BANNER, 25.0f);
-        if (gContestedBanner)
-            gBanner = gContestedBanner;
-        GameObject* gContestedBanner2 = pAI->me->FindNearestGameObject(GO_CONTESTED_BANNER2, 25.0f);
-        if (gContestedBanner2)
-            gBanner = gContestedBanner2;
-        GameObject* gNeutralBanner = pAI->me->FindNearestGameObject(GO_NEUTRAL_BANNER, 25.0f);
-        if (gNeutralBanner)
-            gBanner = gNeutralBanner;
-        GameObject* gFarmBanner = pAI->me->FindNearestGameObject(GO_FARM_BANNER, 25.0f);
-        if (gFarmBanner)
-            gBanner = gFarmBanner;
-
-        if (gBanner)
-        {
-            if (gBanner->isSpawned())
-            {
-                if (pAI->me->IsWithinDistInMap(gBanner, INTERACTION_DISTANCE))
-                {
-                    pAI->ClearPath();
-                    WorldPacket data(CMSG_GAMEOBJ_USE);
-                    data << gBanner->GetObjectGuid();
-                    pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
-                    return;
-                }
-                else
-                {
-                    pAI->ClearPath();
-                    ObjectGuid guid = gBanner->GetObjectGuid();
-                    pAI->me->GetMotionMaster()->MovePoint(0, gBanner->GetPositionX(), gBanner->GetPositionY(), gBanner->GetPositionZ());
-                    pAI->me->m_Events.AddLambdaEventAtOffset([pAI, guid]
-                        {
-                            WorldPacket data(CMSG_GAMEOBJ_USE);
-                            data << guid;
-                            pAI->me->GetSession()->HandleGameObjectUseOpcode(data);
-                        }, 2000);
-                    return;
-                }
-            }
-        }
-    }
-
+    
     pAI->MoveToNextPoint();
 }
 
@@ -683,7 +601,7 @@ BattleBotPath vPath_AB_AllianceBase_to_LumberMill =
 // Stables to Blacksmith
 BattleBotPath vPath_AB_Stables_to_Blacksmith =
 {
-    { 1169.52f, 1198.71f, -56.2742f, nullptr },
+    { 1169.52f, 1198.71f, -56.2742f, &AB_AtFlag },
     { 1166.93f, 1185.2f, -56.3634f, nullptr },
     { 1173.84f, 1170.6f, -56.4094f, nullptr },
     { 1186.7f, 1163.92f, -56.3961f, nullptr },
@@ -784,7 +702,7 @@ BattleBotPath vPath_AB_HordeBase_to_LumberMill =
 // Farm to Blacksmith
 BattleBotPath vPath_AB_Farm_to_Blacksmith =
 {
-    { 803.826f, 874.909f, -55.2547f, nullptr },
+    { 803.826f, 874.909f, -55.2547f, &AB_AtFlag },
     { 808.763f, 887.991f, -57.4437f, nullptr },
     { 818.33f, 906.674f, -59.3554f, nullptr },
     { 828.634f, 924.972f, -60.5664f, nullptr },
@@ -803,7 +721,7 @@ BattleBotPath vPath_AB_Farm_to_Blacksmith =
 // Stables to Gold Mine
 BattleBotPath vPath_AB_Stables_to_GoldMine =
 {
-    { 1169.52f, 1198.71f, -56.2742f, nullptr },
+    { 1169.52f, 1198.71f, -56.2742f, &AB_AtFlag },
     { 1166.72f, 1183.58f, -56.3633f, nullptr },
     { 1172.14f, 1170.99f, -56.4735f, nullptr },
     { 1185.18f, 1164.02f, -56.4269f, nullptr },
@@ -827,7 +745,7 @@ BattleBotPath vPath_AB_Stables_to_GoldMine =
 // Stables to Lumber Mill
 BattleBotPath vPath_AB_Stables_to_LumberMill =
 {
-    { 1169.52f, 1198.71f, -56.2742f, nullptr },
+    { 1169.52f, 1198.71f, -56.2742f, &AB_AtFlag },
     { 1169.33f, 1203.43f, -56.5457f, nullptr },
     { 1164.77f, 1208.73f, -56.1907f, nullptr },
     { 1141.52f, 1224.99f, -53.8204f, nullptr },
@@ -852,7 +770,7 @@ BattleBotPath vPath_AB_Stables_to_LumberMill =
 // Farm to Gold Mine
 BattleBotPath vPath_AB_Farm_to_GoldMine =
 {
-    { 803.826f, 874.909f, -55.2547f, nullptr },
+    { 803.826f, 874.909f, -55.2547f, &AB_AtFlag },
     { 801.662f, 865.689f, -56.9445f, nullptr },
     { 806.433f, 860.776f, -57.5899f, nullptr },
     { 816.236f, 857.397f, -57.7029f, nullptr },
@@ -885,7 +803,7 @@ BattleBotPath vPath_AB_Farm_to_GoldMine =
 // Farm to Lumber Mill
 BattleBotPath vPath_AB_Farm_to_LumberMill =
 {
-    { 803.826f, 874.909f, -55.2547f, nullptr },
+    { 803.826f, 874.909f, -55.2547f, &AB_AtFlag },
     { 802.874f, 894.28f, -56.4661f, nullptr },
     { 806.844f, 920.39f, -57.3157f, nullptr },
     { 814.003f, 934.161f, -57.6065f, nullptr },
