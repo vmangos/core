@@ -721,7 +721,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     }
 
     uint8 botClass = 0;
-    PartyBotRole botRole = PB_ROLE_INVALID;
+    CombatBotRoles botRole = ROLE_INVALID;
 
     std::string option = args;
     if (option == "warrior")
@@ -748,7 +748,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
     {
         std::vector<uint32> dpsClasses = { CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK };
         botClass = SelectRandomContainerElement(dpsClasses);
-        botRole = PB_ROLE_DPS;
+        botRole = CombatBotBaseAI::IsMeleeDamageClass(botClass) ? ROLE_MELEE_DPS : ROLE_RANGE_DPS;
     }
     else if (option == "healer")
     {
@@ -758,12 +758,12 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
         else
             dpsClasses.push_back(CLASS_PALADIN);
         botClass = SelectRandomContainerElement(dpsClasses);
-        botRole = PB_ROLE_HEALER;
+        botRole = ROLE_HEALER;
     }
     else if (option == "tank")
     {
         botClass = CLASS_WARRIOR;
-        botRole = PB_ROLE_TANK;
+        botRole = ROLE_TANK;
     }
 
     if (!botClass)
@@ -831,7 +831,7 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     float x, y, z;
     pPlayer->GetNearPoint(pPlayer, x, y, z, 0, 5.0f, frand(0.0f, 6.0f));
 
-    PartyBotAI* ai = new PartyBotAI(pPlayer, pTarget, PB_ROLE_INVALID, botRace, botClass, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
+    PartyBotAI* ai = new PartyBotAI(pPlayer, pTarget, ROLE_INVALID, botRace, botClass, pPlayer->GetMapId(), pPlayer->GetMap()->GetInstanceId(), x, y, z, pPlayer->GetOrientation());
     sPlayerBotMgr.addBot(ai);
 
     SendSysMessage("New party bot clone added.");
@@ -852,17 +852,21 @@ bool ChatHandler::HandlePartyBotSetRoleCommand(char* args)
         return false;
     }
 
-    PartyBotRole role = PB_ROLE_INVALID;
+    CombatBotRoles role = ROLE_INVALID;
     std::string roleStr = args;
 
     if (roleStr == "tank")
-        role = PB_ROLE_TANK;
+        role = ROLE_TANK;
     else if (roleStr == "dps")
-        role = PB_ROLE_DPS;
+        role = CombatBotBaseAI::IsMeleeDamageClass(pTarget->GetClass()) ? ROLE_MELEE_DPS : ROLE_RANGE_DPS;
+    else if (roleStr == "meleedps")
+        role = ROLE_MELEE_DPS;
+    else if (roleStr == "rangedps")
+        role = ROLE_RANGE_DPS;
     else if (roleStr == "healer")
-        role = PB_ROLE_HEALER;
+        role = ROLE_HEALER;
 
-    if (role == PB_ROLE_INVALID)
+    if (role == ROLE_INVALID)
         return false;
 
     if (pTarget->AI())
