@@ -994,17 +994,17 @@ void PartyBotAI::UpdateInCombatAI_Shaman()
 
 void PartyBotAI::UpdateOutOfCombatAI_Hunter()
 {
+    if (me->HasUnitState(UNIT_STAT_DIED) &&
+        m_spells.hunter.pFeignDeath &&
+        me->HasAura(m_spells.hunter.pFeignDeath->Id))
+        me->RemoveAurasDueToSpellByCancel(m_spells.hunter.pFeignDeath->Id);
+
     if (m_spells.hunter.pAspectOfTheHawk &&
         CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheHawk))
     {
         if (DoCastSpell(me, m_spells.hunter.pAspectOfTheHawk) == SPELL_CAST_OK)
             return;
     }
-
-    if (me->HasUnitState(UNIT_STAT_DIED) &&
-        m_spells.hunter.pFeignDeath &&
-        me->HasAura(m_spells.hunter.pFeignDeath->Id))
-        me->RemoveAurasDueToSpellByCancel(m_spells.hunter.pFeignDeath->Id);
 
     if (Unit* pVictim = me->GetVictim())
     {
