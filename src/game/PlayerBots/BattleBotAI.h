@@ -5,14 +5,6 @@
 #include "PartyBotAI.h"
 #include "BattleBotWaypoints.h"
 
-enum BattleBotBGQueues : uint8
-{
-    BB_BG_WS,
-    BB_BG_AB,
-    BB_BG_AV,
-    BB_BG_INVALID
-};
-
 enum BattleBotWsgWaitSpot
 {
     BB_WSG_WAIT_SPOT_SPAWN,
@@ -42,7 +34,7 @@ class BattleBotAI : public PlayerBotAI
 {
 public:
 
-    BattleBotAI(uint8 race, uint8 class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, BattleBotBGQueues bgId)
+    BattleBotAI(uint8 race, uint8 class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, uint8 bgId)
         : PlayerBotAI(nullptr),  m_race(race), m_class(class_), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId)
     {
         m_updateTimer.Reset(2000);
@@ -348,7 +340,7 @@ public:
     std::vector<LootResponseData> m_lootResponses;
     bool m_initialized = false;
     bool m_receivedBgInvite = false;
-    int m_battlegroundId = 0;
+    uint8 m_battlegroundId = 0;
     ShortTimeTracker m_updateTimer;
     uint8 m_race = 0;
     uint8 m_class = 0;

@@ -3,29 +3,6 @@
 
 #include "SharedDefines.h"
 
-enum BattleBotWaypointsMaps
-{
-    WS_MAP = 489,
-    AB_MAP = 529,
-    AV_MAP = 30
-};
-
-enum class WarsongObjectives
-{
-    WS_FLAG,
-    WS_POWERUP,
-    WS_FLAG_CARRIER,
-    WS_ROAM,
-    WS_IDLE,
-    WS_OBJECTIVE_INVALID
-};
-
-enum WarsongFlagSpells
-{
-    WS_SPELL_WARSONG_FLAG = 23333,
-    WS_SPELL_SILVERWING_FLAG = 23335,
-};
-
 struct RecordedMovementPacket
 {
     RecordedMovementPacket(uint16 opcode_, uint32 timeDiff_, uint32 moveFlags_, float x, float y, float z, float o) :

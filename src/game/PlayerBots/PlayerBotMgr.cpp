@@ -908,17 +908,17 @@ bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
 
 bool ChatHandler::HandleBattleBotAddAlteracCommand(char* args)
 {
-    return HandleBattleBotAddCommand(args, BB_BG_AV);
+    return HandleBattleBotAddCommand(args, BATTLEGROUND_QUEUE_AV);
 }
 
 bool ChatHandler::HandleBattleBotAddArathiCommand(char* args)
 {
-    return HandleBattleBotAddCommand(args, BB_BG_AB);
+    return HandleBattleBotAddCommand(args, BATTLEGROUND_QUEUE_AB);
 }
 
 bool ChatHandler::HandleBattleBotAddWarsongCommand(char* args)
 {
-    return HandleBattleBotAddCommand(args, BB_BG_WS);
+    return HandleBattleBotAddCommand(args, BATTLEGROUND_QUEUE_WS);
 }
 
 bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
@@ -956,19 +956,17 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
     uint8 botClass = SelectRandomContainerElement(dpsClasses);
     uint8 botRace = SelectRandomRaceForClass(botClass, botTeam);
 
-    BattleBotBGQueues botBGQueue = BattleBotBGQueues(bg);
-
     // Spawn bot on GM Island
-    BattleBotAI* ai = new BattleBotAI(botRace, botClass, 1, 0, 16224.356f, 16284.763f, 13.175f, 4.56f, botBGQueue);
+    BattleBotAI* ai = new BattleBotAI(botRace, botClass, 1, 0, 16224.356f, 16284.763f, 13.175f, 4.56f, bg);
     sPlayerBotMgr.addBot(ai);
 
-    if (botBGQueue == BB_BG_WS)
+    if (bg == BATTLEGROUND_QUEUE_WS)
         SendSysMessage("Added battle bot and queuing for WS");
         
-    if (botBGQueue == BB_BG_AB)
+    if (bg == BATTLEGROUND_QUEUE_AB)
         SendSysMessage("Added battle bot and queuing for AB");
     
-    if (botBGQueue == BB_BG_AV)
+    if (bg == BATTLEGROUND_QUEUE_AV)
         SendSysMessage("Added battle bot and queuing for AV");
 
     return true;

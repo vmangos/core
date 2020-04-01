@@ -2410,12 +2410,22 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
             WorldPacket data(CMSG_BATTLEMASTER_JOIN);
             data << me->GetObjectGuid();                       // battlemaster guid, or player guid if joining queue from BG portal
 
-            if (m_battlegroundId == 0)
-                data << uint32(489);
-            else if (m_battlegroundId == 1)
-                data << uint32(529);
-            else
-                data << uint32(30);
+            switch (m_battlegroundId)
+            {
+                case BATTLEGROUND_QUEUE_AV:
+                    data << uint32(30);
+                    break;
+                case BATTLEGROUND_QUEUE_WS:
+                    data << uint32(489);
+                    break;
+                case BATTLEGROUND_QUEUE_AB:
+                    data << uint32(529);
+                    break;
+                default:
+                    sLog.outError("BattleBot: Invalid BG queue type!");
+                    botEntry->requestRemoval = true;
+                    return;
+            }
 
             data << uint32(0);                                 // instance id, 0 if First Available selected
             data << uint8(0);                                  // join as group
@@ -4718,12 +4728,22 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (!me->InBattleGroundQueue())
         {
-            if (m_battlegroundId == 0)
-                ChatHandler(me).HandleGoWarsongCommand("");
-            else if (m_battlegroundId == 1)
-                ChatHandler(me).HandleGoArathiCommand("");
-            else
-                ChatHandler(me).HandleGoAlteracCommand("");
+            switch (m_battlegroundId)
+            {
+                case BATTLEGROUND_QUEUE_AV:
+                    ChatHandler(me).HandleGoAlteracCommand("");
+                    break;
+                case BATTLEGROUND_QUEUE_WS:
+                    ChatHandler(me).HandleGoWarsongCommand("");
+                    break;
+                case BATTLEGROUND_QUEUE_AB:
+                    ChatHandler(me).HandleGoArathiCommand("");
+                    break;
+                default:
+                    sLog.outError("BattleBot: Invalid BG queue type!");
+                    botEntry->requestRemoval = true;
+                    return;
+            }
 
             SendFakePacket(CMSG_BATTLEMASTER_JOIN);
             return;
