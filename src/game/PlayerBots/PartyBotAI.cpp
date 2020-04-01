@@ -2250,6 +2250,10 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
 
     if (me->GetVictim())
     {
+        if (m_spells.druid.pTravelForm &&
+            me->GetShapeshiftForm() == FORM_TRAVEL)
+            me->RemoveAurasDueToSpellByCancel(m_spells.druid.pTravelForm->Id);
+
         if (m_spells.druid.pMoonkinForm &&
             CanTryToCastSpell(me, m_spells.druid.pMoonkinForm))
         {
