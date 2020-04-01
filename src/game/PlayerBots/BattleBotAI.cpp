@@ -2190,7 +2190,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
 
     if (me->GetShapeshiftForm() == FORM_NONE)
     {
-        if (m_role == ROLE_MELEE_DPS)
+        if (m_role == ROLE_MELEE_DPS || m_role == ROLE_TANK)
         {
             if (m_spells.druid.pCatForm &&
                 CanTryToCastSpell(me, m_spells.druid.pCatForm))
@@ -2325,7 +2325,7 @@ void BattleBotAI::UpdateInCombatAI_Druid()
                 return;
         }
 
-        if (m_role == ROLE_MELEE_DPS) // feral druid
+        if (m_role == ROLE_MELEE_DPS || m_role == ROLE_TANK)
         {
             if (Unit* pVictim = me->GetVictim())
             {

@@ -216,6 +216,10 @@ public:
             SpellEntry const* pHuntersMark;
             SpellEntry const* pMongooseBite;
             SpellEntry const* pRaptorStrike;
+            SpellEntry const* pDisengage;
+            SpellEntry const* pFeignDeath;
+            SpellEntry const* pScareBeast;
+            SpellEntry const* pVolley;
         } hunter;
         struct
         {

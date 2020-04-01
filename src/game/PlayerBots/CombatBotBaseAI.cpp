@@ -657,6 +657,30 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.hunter.pRaptorStrike->Id < pSpellEntry->Id)
                         m_spells.hunter.pRaptorStrike = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Disengage") != std::string::npos)
+                {
+                    if (!m_spells.hunter.pDisengage ||
+                        m_spells.hunter.pDisengage->Id < pSpellEntry->Id)
+                        m_spells.hunter.pDisengage = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Feign Death") != std::string::npos)
+                {
+                    if (!m_spells.hunter.pFeignDeath ||
+                        m_spells.hunter.pFeignDeath->Id < pSpellEntry->Id)
+                        m_spells.hunter.pFeignDeath = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Scare Beast") != std::string::npos)
+                {
+                    if (!m_spells.hunter.pScareBeast ||
+                        m_spells.hunter.pScareBeast->Id < pSpellEntry->Id)
+                        m_spells.hunter.pScareBeast = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Volley") != std::string::npos)
+                {
+                    if (!m_spells.hunter.pVolley ||
+                        m_spells.hunter.pVolley->Id < pSpellEntry->Id)
+                        m_spells.hunter.pVolley = pSpellEntry;
+                }
                 break;
             }
             case CLASS_MAGE:
@@ -2127,10 +2151,7 @@ SpellCastResult CombatBotBaseAI::DoCastSpell(Unit* pTarget, SpellEntry const* pS
         if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START))
             me->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
 
-        ItemPosCountVec dest;
-        uint8 msg = me->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pSpellEntry->Reagent[0], 1);
-        if (msg == EQUIP_ERR_OK)
-            me->StoreNewItem(dest, pSpellEntry->Reagent[0], true, Item::GenerateItemRandomPropertyId(pSpellEntry->Reagent[0]));
+        AddItemToInventory(pSpellEntry->Reagent[0]);
     }
 
     return result;
