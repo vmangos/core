@@ -2525,14 +2525,11 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
             botEntry->m_pendingResponses.push_back(CMSG_LOOT_ROLL);
             break;
         }
-        case SMSG_BATTLEFIELD_WIN:
+        case MSG_PVP_LOG_DATA:
         {
-            SendFakePacket(CMSG_LEAVE_BATTLEFIELD);
-            break;
-        }
-        case SMSG_BATTLEFIELD_LOSE:
-        {
-            SendFakePacket(CMSG_LEAVE_BATTLEFIELD);
+            uint8 ended = *((uint8*)(*packet).contents());
+            if (ended)
+                botEntry->m_pendingResponses.push_back(CMSG_LEAVE_BATTLEFIELD);
             break;
         }
     }
@@ -2648,6 +2645,8 @@ void BattleBotAI::OnEnterBattleGround()
 void BattleBotAI::OnLeaveBattleGround()
 {
     ClearPath();
+    me->GetMotionMaster()->Clear();
+    me->GetMotionMaster()->MoveIdle();
 }
 
 void BattleBotAI::UpdateOutOfCombatAI()
