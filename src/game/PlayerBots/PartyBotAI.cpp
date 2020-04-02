@@ -703,7 +703,6 @@ void PartyBotAI::UpdateInCombatAI()
 void PartyBotAI::UpdateOutOfCombatAI_Paladin()
 {
     if (m_spells.paladin.pAura &&
-        !me->HasAura(m_spells.paladin.pAura->Id) &&
         CanTryToCastSpell(me, m_spells.paladin.pAura))
     {
         if (DoCastSpell(me, m_spells.paladin.pAura) == SPELL_CAST_OK)
@@ -1640,9 +1639,9 @@ void PartyBotAI::UpdateInCombatAI_Priest()
 
         if (m_spells.priest.pSilence &&
             pVictim->IsNonMeleeSpellCasted() &&
-            CanTryToCastSpell(pVictim, m_spells.priest.pVampiricEmbrace))
+            CanTryToCastSpell(pVictim, m_spells.priest.pSilence))
         {
-            if (DoCastSpell(pVictim, m_spells.priest.pVampiricEmbrace) == SPELL_CAST_OK)
+            if (DoCastSpell(pVictim, m_spells.priest.pSilence) == SPELL_CAST_OK)
                 return;
         }
 

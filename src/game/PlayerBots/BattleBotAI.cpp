@@ -677,7 +677,6 @@ void BattleBotAI::UpdateInCombatAI()
 void BattleBotAI::UpdateOutOfCombatAI_Paladin()
 {
     if (m_spells.paladin.pAura &&
-        !me->HasAura(m_spells.paladin.pAura->Id) &&
         CanTryToCastSpell(me, m_spells.paladin.pAura))
     {
         if (DoCastSpell(me, m_spells.paladin.pAura) == SPELL_CAST_OK)
@@ -967,7 +966,6 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
 void BattleBotAI::UpdateOutOfCombatAI_Hunter()
 {
     if (m_spells.hunter.pAspectOfTheCheetah &&
-        !me->HasAura(m_spells.hunter.pAspectOfTheCheetah->Id) &&
         CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheCheetah))
     {
         if (DoCastSpell(me, m_spells.hunter.pAspectOfTheCheetah) == SPELL_CAST_OK)
@@ -1503,10 +1501,10 @@ void BattleBotAI::UpdateInCombatAI_Priest()
         }
 
         if (m_spells.priest.pSilence &&
-            pVictim->IsNonMeleeSpellCasted &&
-            CanTryToCastSpell(pVictim, m_spells.priest.pVampiricEmbrace))
+            pVictim->IsNonMeleeSpellCasted() &&
+            CanTryToCastSpell(pVictim, m_spells.priest.pSilence))
         {
-            if (DoCastSpell(pVictim, m_spells.priest.pVampiricEmbrace) == SPELL_CAST_OK)
+            if (DoCastSpell(pVictim, m_spells.priest.pSilence) == SPELL_CAST_OK)
                 return;
         }
 
