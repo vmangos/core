@@ -71,7 +71,8 @@ public:
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
     bool CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
-    
+    bool IsWearingShield() const;
+
     void EquipOrUseNewItem();
     void AddItemToInventory(uint32 itemId);
 
@@ -243,6 +244,9 @@ public:
             SpellEntry const* pScorch;
             SpellEntry const* pPyroblast;
             SpellEntry const* pEvocation;
+            SpellEntry const* pIceBlock;
+            SpellEntry const* pBlizzard;
+            SpellEntry const* pBlastWave;
         } mage;
         struct
         {
@@ -264,6 +268,10 @@ public:
             SpellEntry const* pManaBurn;
             SpellEntry const* pDevouringPlague;
             SpellEntry const* pPsychicScream;
+            SpellEntry const* pShadowform;
+            SpellEntry const* pVampiricEmbrace;
+            SpellEntry const* pSilence;
+            SpellEntry const* pFade;
         } priest;
         struct
         {
@@ -273,9 +281,11 @@ public:
             SpellEntry const* pShadowWard;
             SpellEntry const* pShadowBolt;
             SpellEntry const* pCorruption;
+            SpellEntry const* pConflagrate;
             SpellEntry const* pShadowburn;
             SpellEntry const* pSearingPain;
             SpellEntry const* pImmolate;
+            SpellEntry const* pDemonicSacrifice;
             SpellEntry const* pDrainLife;
             SpellEntry const* pSiphonLife;
             SpellEntry const* pFear;
@@ -297,6 +307,7 @@ public:
             SpellEntry const* pIntercept;
             SpellEntry const* pOverpower;
             SpellEntry const* pHeroicStrike;
+            SpellEntry const* pCleave;
             SpellEntry const* pExecute;
             SpellEntry const* pMortalStrike;
             SpellEntry const* pBloodthirst;
@@ -311,7 +322,18 @@ public:
             SpellEntry const* pDisarm;
             SpellEntry const* pWhirlwind;
             SpellEntry const* pBattleShout;
+            SpellEntry const* pDemoralizingShout;
             SpellEntry const* pHamstring;
+            SpellEntry const* pThunderClap;
+            SpellEntry const* pSweepingStrikes;
+            SpellEntry const* pLastStand;
+            SpellEntry const* pShieldBlock;
+            SpellEntry const* pShieldWall;
+            SpellEntry const* pShieldBash;
+            SpellEntry const* pShieldSlam;
+            SpellEntry const* pSunderArmor;
+            SpellEntry const* pConcussionBlow;
+            SpellEntry const* pPiercingHowl;
         } warrior;
         struct
         {

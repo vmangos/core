@@ -823,6 +823,24 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.mage.pEvocation->Id < pSpellEntry->Id)
                         m_spells.mage.pEvocation = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Ice Block") != std::string::npos)
+                {
+                    if (!m_spells.mage.pIceBlock ||
+                        m_spells.mage.pIceBlock->Id < pSpellEntry->Id)
+                        m_spells.mage.pIceBlock = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blizzard") != std::string::npos)
+                {
+                    if (!m_spells.mage.pBlizzard ||
+                        m_spells.mage.pBlizzard->Id < pSpellEntry->Id)
+                        m_spells.mage.pBlizzard = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Blast Wave") != std::string::npos)
+                {
+                    if (!m_spells.mage.pBlastWave ||
+                        m_spells.mage.pBlastWave->Id < pSpellEntry->Id)
+                        m_spells.mage.pBlastWave = pSpellEntry;
+                }
                 break;
             }
             case CLASS_PRIEST:
@@ -935,6 +953,30 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.priest.pPsychicScream->Id < pSpellEntry->Id)
                         m_spells.priest.pPsychicScream = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Shadowform") != std::string::npos)
+                {
+                    if (!m_spells.priest.pShadowform ||
+                        m_spells.priest.pShadowform->Id < pSpellEntry->Id)
+                        m_spells.priest.pShadowform = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Vampiric Embrace") != std::string::npos)
+                {
+                    if (!m_spells.priest.pVampiricEmbrace ||
+                        m_spells.priest.pVampiricEmbrace->Id < pSpellEntry->Id)
+                        m_spells.priest.pVampiricEmbrace = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Silence") != std::string::npos)
+                {
+                    if (!m_spells.priest.pSilence ||
+                        m_spells.priest.pSilence->Id < pSpellEntry->Id)
+                        m_spells.priest.pSilence = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Fade") != std::string::npos)
+                {
+                    if (!m_spells.priest.pFade ||
+                        m_spells.priest.pFade->Id < pSpellEntry->Id)
+                        m_spells.priest.pFade = pSpellEntry;
+                }
                 break;
             }
             case CLASS_WARLOCK:
@@ -975,6 +1017,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.warlock.pCorruption->Id < pSpellEntry->Id)
                         m_spells.warlock.pCorruption = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Conflagrate") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pConflagrate ||
+                        m_spells.warlock.pConflagrate->Id < pSpellEntry->Id)
+                        m_spells.warlock.pConflagrate = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Shadowburn") != std::string::npos)
                 {
                     if (!m_spells.warlock.pShadowburn ||
@@ -992,6 +1040,12 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (!m_spells.warlock.pImmolate ||
                         m_spells.warlock.pImmolate->Id < pSpellEntry->Id)
                         m_spells.warlock.pImmolate = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Demonic Sacrifice") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pDemonicSacrifice ||
+                        m_spells.warlock.pDemonicSacrifice->Id < pSpellEntry->Id)
+                        m_spells.warlock.pDemonicSacrifice = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Drain Life") != std::string::npos)
                 {
@@ -1093,6 +1147,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.warrior.pHeroicStrike->Id < pSpellEntry->Id)
                         m_spells.warrior.pHeroicStrike = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Cleave") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pCleave ||
+                        m_spells.warrior.pCleave->Id < pSpellEntry->Id)
+                        m_spells.warrior.pCleave = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Execute") != std::string::npos)
                 {
                     if (!m_spells.warrior.pExecute ||
@@ -1177,11 +1237,77 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.warrior.pBattleShout->Id < pSpellEntry->Id)
                         m_spells.warrior.pBattleShout = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Demoralizing Shout") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pDemoralizingShout ||
+                        m_spells.warrior.pDemoralizingShout->Id < pSpellEntry->Id)
+                        m_spells.warrior.pDemoralizingShout = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Hamstring") != std::string::npos)
                 {
                     if (!m_spells.warrior.pHamstring ||
                         m_spells.warrior.pHamstring->Id < pSpellEntry->Id)
                         m_spells.warrior.pHamstring = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Thunder Clap") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pThunderClap ||
+                        m_spells.warrior.pThunderClap->Id < pSpellEntry->Id)
+                        m_spells.warrior.pThunderClap = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Sweeping Strikes") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pSweepingStrikes ||
+                        m_spells.warrior.pSweepingStrikes->Id < pSpellEntry->Id)
+                        m_spells.warrior.pSweepingStrikes = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Last Stand") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pLastStand ||
+                        m_spells.warrior.pLastStand->Id < pSpellEntry->Id)
+                        m_spells.warrior.pLastStand = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shield Block") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pShieldBlock ||
+                        m_spells.warrior.pShieldBlock->Id < pSpellEntry->Id)
+                        m_spells.warrior.pShieldBlock = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shield Wall") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pShieldWall ||
+                        m_spells.warrior.pShieldWall->Id < pSpellEntry->Id)
+                        m_spells.warrior.pShieldWall = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shield Bash") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pShieldBash ||
+                        m_spells.warrior.pShieldBash->Id < pSpellEntry->Id)
+                        m_spells.warrior.pShieldBash = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Shield Slam") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pShieldSlam ||
+                        m_spells.warrior.pShieldSlam->Id < pSpellEntry->Id)
+                        m_spells.warrior.pShieldSlam = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Sunder Armor") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pSunderArmor ||
+                        m_spells.warrior.pSunderArmor->Id < pSpellEntry->Id)
+                        m_spells.warrior.pSunderArmor = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Concussion Blow") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pConcussionBlow ||
+                        m_spells.warrior.pConcussionBlow->Id < pSpellEntry->Id)
+                        m_spells.warrior.pConcussionBlow = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Piercing Howl") != std::string::npos)
+                {
+                    if (!m_spells.warrior.pPiercingHowl ||
+                        m_spells.warrior.pPiercingHowl->Id < pSpellEntry->Id)
+                        m_spells.warrior.pPiercingHowl = pSpellEntry;
                 }
                 break;
             }
@@ -2254,4 +2380,16 @@ SpellCastResult CombatBotBaseAI::CastWeaponBuff(SpellEntry const* pSpellEntry)
     SpellCastTargets targets;
     targets.setItemTarget(pWeapon);
     return spell->prepare(std::move(targets), nullptr);
+}
+
+bool CombatBotBaseAI::IsWearingShield() const
+{
+    Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
+    if (!pItem)
+        return false;
+
+    if (pItem->GetProto()->InventoryType == INVTYPE_SHIELD)
+        return true;
+
+    return false;
 }

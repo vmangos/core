@@ -41,6 +41,7 @@ public:
     Unit* SelectAttackTarget(Player* pLeader) const;
     Unit* SelectPartyAttackTarget() const;
     Player* SelectResurrectionTarget() const;
+    Player* SelectShieldTarget() const;
     bool DrinkAndEat();
 
     void UpdateInCombatAI() final;
