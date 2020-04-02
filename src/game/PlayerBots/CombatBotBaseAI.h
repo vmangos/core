@@ -272,6 +272,7 @@ public:
             SpellEntry const* pVampiricEmbrace;
             SpellEntry const* pSilence;
             SpellEntry const* pFade;
+            SpellEntry const* pShackleUndead;
         } priest;
         struct
         {
@@ -285,9 +286,11 @@ public:
             SpellEntry const* pShadowburn;
             SpellEntry const* pSearingPain;
             SpellEntry const* pImmolate;
+            SpellEntry const* pRainOfFire;
             SpellEntry const* pDemonicSacrifice;
             SpellEntry const* pDrainLife;
             SpellEntry const* pSiphonLife;
+            SpellEntry const* pBanish;
             SpellEntry const* pFear;
             SpellEntry const* pHowlofTerror;
             SpellEntry const* pCurseofAgony;

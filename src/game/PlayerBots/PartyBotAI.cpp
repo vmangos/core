@@ -498,12 +498,25 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         // Stop auto shot if no target.
         if (!me->GetVictim())
             me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+        else if (me->GetClass() == CLASS_HUNTER)
+        {
+            if (me->GetVictim())
+            {
+                if (me->GetCombatDistance(me->GetVictim()) < 8.0f)
+                    me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+                else
+                    UpdateInCombatAI_Hunter();
+            }
+        }
 
         return;
     }
 
     if (me->IsNonMeleeSpellCasted(false, false, true))
         return;
+
+    if (me->GetTargetGuid() == me->GetObjectGuid())
+        me->ClearTarget();
 
     if (!me->IsInCombat())
     {
@@ -1554,12 +1567,25 @@ void PartyBotAI::UpdateInCombatAI_Priest()
             return;
     }
 
-    if (m_spells.priest.pFade &&
-       !me->GetAttackers().empty() &&
-        CanTryToCastSpell(me, m_spells.priest.pFade))
+    if (!me->GetAttackers().empty())
     {
-        if (DoCastSpell(me, m_spells.priest.pFade) == SPELL_CAST_OK)
-            return;
+        if (m_spells.priest.pFade &&
+            CanTryToCastSpell(me, m_spells.priest.pFade))
+        {
+            if (DoCastSpell(me, m_spells.priest.pFade) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.priest.pShackleUndead)
+        {
+            Unit* pAttacker = *me->GetAttackers().begin();
+            if ((pAttacker->GetHealth() > me->GetHealth()) &&
+                CanTryToCastSpell(pAttacker, m_spells.priest.pShackleUndead))
+            {
+                if (DoCastSpell(pAttacker, m_spells.priest.pShackleUndead) == SPELL_CAST_OK)
+                    return;
+            }
+        }
     }
 
     if (m_spells.priest.pInnerFocus &&
@@ -1788,11 +1814,23 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
                 return;
         }
 
-        if (m_spells.warlock.pShadowWard &&
-           (pVictim->GetClass() == CLASS_WARLOCK) &&
-            CanTryToCastSpell(me, m_spells.warlock.pShadowWard))
+        if (m_spells.warlock.pBanish &&
+           !me->GetAttackers().empty())
         {
-            if (DoCastSpell(me, m_spells.warlock.pShadowWard) == SPELL_CAST_OK)
+            Unit* pAttacker = *me->GetAttackers().begin();
+            if ((pAttacker->GetHealth() > me->GetHealth()) &&
+                CanTryToCastSpell(pAttacker, m_spells.warlock.pBanish))
+            {
+                if (DoCastSpell(pAttacker, m_spells.warlock.pBanish) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+
+        if (m_spells.warlock.pRainOfFire &&
+           (me->GetEnemyCountInRadiusAround(pVictim, 10.0f) > 2) &&
+            CanTryToCastSpell(pVictim, m_spells.warlock.pRainOfFire))
+        {
+            if (DoCastSpell(pVictim, m_spells.warlock.pRainOfFire) == SPELL_CAST_OK)
                 return;
         }
 

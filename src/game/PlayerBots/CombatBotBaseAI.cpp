@@ -977,6 +977,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.priest.pFade->Id < pSpellEntry->Id)
                         m_spells.priest.pFade = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Shackle Undead") != std::string::npos)
+                {
+                    if (!m_spells.priest.pShackleUndead ||
+                        m_spells.priest.pShackleUndead->Id < pSpellEntry->Id)
+                        m_spells.priest.pShackleUndead = pSpellEntry;
+                }
                 break;
             }
             case CLASS_WARLOCK:
@@ -1041,6 +1047,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.warlock.pImmolate->Id < pSpellEntry->Id)
                         m_spells.warlock.pImmolate = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Rain of Fire") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pRainOfFire ||
+                        m_spells.warlock.pRainOfFire->Id < pSpellEntry->Id)
+                        m_spells.warlock.pRainOfFire = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Demonic Sacrifice") != std::string::npos)
                 {
                     if (!m_spells.warlock.pDemonicSacrifice ||
@@ -1058,6 +1070,12 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (!m_spells.warlock.pSiphonLife ||
                         m_spells.warlock.pSiphonLife->Id < pSpellEntry->Id)
                         m_spells.warlock.pSiphonLife = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Banish") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pBanish ||
+                        m_spells.warlock.pBanish->Id < pSpellEntry->Id)
+                        m_spells.warlock.pBanish = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Fear") != std::string::npos)
                 {

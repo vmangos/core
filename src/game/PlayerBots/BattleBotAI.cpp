@@ -2826,12 +2826,25 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         // Stop auto shot if no target.
         if (!me->GetVictim())
             me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+        else if (me->GetClass() == CLASS_HUNTER)
+        {
+            if (me->GetVictim())
+            {
+                if (me->GetCombatDistance(me->GetVictim()) < 8.0f)
+                    me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+                else
+                    UpdateInCombatAI_Hunter();
+            }
+        }
 
         return;
     }
 
     if (me->IsNonMeleeSpellCasted(false, false, true))
         return;
+
+    if (me->GetTargetGuid() == me->GetObjectGuid())
+        me->ClearTarget();
 
     Unit* pVictim = me->GetVictim();
 
