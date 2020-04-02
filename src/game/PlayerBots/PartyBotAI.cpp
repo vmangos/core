@@ -1754,6 +1754,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Warlock()
         m_isBuffing = false;
     }
 
+    SummonPetIfNeeded();
+
     if (Unit* pVictim = me->GetVictim())
         UpdateInCombatAI_Warlock();
 }
