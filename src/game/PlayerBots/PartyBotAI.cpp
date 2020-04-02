@@ -426,13 +426,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     {
         AddToPlayerGroup();
 
-        if (m_role == ROLE_INVALID)
-            AutoAssignRole();
-
         if (Player const* pPlayer = sObjectAccessor.FindPlayer(m_cloneGuid))
             CloneFromPlayer(pPlayer);
         else
             LearnPremadeSpecForClass();
+
+        if (m_role == ROLE_INVALID)
+            AutoAssignRole();
 
         ResetSpellData();
         PopulateSpellData();
