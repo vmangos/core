@@ -1936,7 +1936,8 @@ bool CombatBotBaseAI::FindAndHealInjuredAlly(float selfHealPercent)
 bool CombatBotBaseAI::HealInjuredTarget(Unit* pTarget)
 {
     // Put a HoT on the target if only missing a little health.
-    if (pTarget->GetHealthPercent() >= 80.0f)
+    if (pTarget->GetHealthPercent() >= 80.0f &&
+       !pTarget->HasAuraType(SPELL_AURA_PERIODIC_HEAL))
     {
         for (const auto pSpellEntry : spellListHealAura)
         {

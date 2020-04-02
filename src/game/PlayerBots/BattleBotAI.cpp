@@ -1878,8 +1878,8 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
         }
 
         if (pVictim->IsMoving() &&
-            !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
-            !pVictim->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
+           !pVictim->HasUnitState(UNIT_STAT_ROOT) &&
+           !pVictim->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED))
         {
             if (m_spells.warrior.pHamstring &&
                 CanTryToCastSpell(pVictim, m_spells.warrior.pHamstring))
@@ -2711,9 +2711,9 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (!m_initialized)
     {
-        AutoAssignRole();
         ResetSpellData();
         AddPremadeGearAndSpells();
+        AutoAssignRole();
         PopulateSpellData();
         AddAllSpellReagents();
         me->UpdateSkillsToMaxSkillsForLevel();

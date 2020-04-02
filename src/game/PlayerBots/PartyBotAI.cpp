@@ -1179,7 +1179,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
             if (!me->IsStopped())
                 me->StopMoving();
             me->GetMotionMaster()->Clear();
-            me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
+            me->GetMotionMaster()->MoveDistance(pVictim, 15.0f);
             return;
         }
 
@@ -1310,7 +1310,7 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                         DoCastSpell(me, m_spells.mage.pFrostNova);
                     }
 
-                    me->GetMotionMaster()->MoveDistance(pVictim, 25.0f);
+                    me->GetMotionMaster()->MoveDistance(pVictim, 15.0f);
 
                     return;
                 }
