@@ -2785,7 +2785,8 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                     return;
             }
 
-            if (GetAttackersInRangeCount(10.0f) > 1)
+            if ((me->GetPower(POWER_RAGE) > 80) ||
+                (GetAttackersInRangeCount(10.0f) > 1))
             {
                 if (m_spells.druid.pDemoralizingRoar &&
                     CanTryToCastSpell(pVictim, m_spells.druid.pDemoralizingRoar))
