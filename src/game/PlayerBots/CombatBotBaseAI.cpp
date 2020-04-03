@@ -122,8 +122,8 @@ void CombatBotBaseAI::ResetSpellData()
         ptr = nullptr;
 
     m_resurrectionSpell = nullptr;
-    spellListHealAura.clear();
-    spellListHeal.clear();
+    spellListDirectHeal.clear();
+    spellListPeriodicHeal.clear();
     spellListTaunt.clear();
 }
 

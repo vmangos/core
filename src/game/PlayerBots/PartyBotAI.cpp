@@ -2580,8 +2580,14 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             }
         }
 
+        // Prioritize applying HoTs.
+        if (Unit* pTarget = SelectPeriodicHealTarget(80.0f))
+            if (HealInjuredTargetPeriodic(pTarget))
+                return;
+
         // Heal
-        if (FindAndHealInjuredAlly(80.0f))
+        if (m_role == ROLE_HEALER &&
+            FindAndHealInjuredAlly(80.0f))
             return;
 
         // Dispels
