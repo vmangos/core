@@ -4482,7 +4482,7 @@ void Spell::SendCastResult(SpellCastResult result)
     if (result == SPELL_CAST_OK && m_IsTriggeredSpell)
         return;
 
-    SendCastResult((Player*)m_caster, m_spellInfo, result);
+    SendCastResult((Player*)m_caster, m_originalSpellInfo ? m_originalSpellInfo : m_spellInfo, result);
 }
 
 void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result)

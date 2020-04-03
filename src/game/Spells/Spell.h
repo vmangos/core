@@ -401,6 +401,7 @@ class Spell
         //void HandleAddAura(Unit* Target);
 
         SpellEntry const* m_spellInfo;
+        SpellEntry const* m_originalSpellInfo = nullptr;    // For auto down-ranking aura case, we send this in cast result packet
         SpellEntry const* m_triggeredBySpellInfo;
         SpellEntry const* m_triggeredByParentSpellInfo;     // Spell that triggered the spell that triggered this
         int32 m_currentBasePoints[MAX_EFFECT_INDEX];        // cache SpellEntry::CalculateSimpleValue and use for set custom base points
