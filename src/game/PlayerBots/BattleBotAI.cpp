@@ -2384,45 +2384,40 @@ void BattleBotAI::UpdateInCombatAI_Druid()
 
     if (me->GetShapeshiftForm() == FORM_NONE)
     {
+        if (m_spells.druid.pHibernate &&
+            !me->GetAttackers().empty())
+        {
+            Unit* pAttacker = *me->GetAttackers().begin();
+            if (CanTryToCastSpell(pAttacker, m_spells.druid.pHibernate))
+            {
+                if (DoCastSpell(pAttacker, m_spells.druid.pHibernate) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+
         // Heal
         if (FindAndHealInjuredAlly(80.0f))
             return;
 
         // Dispels
-        if (m_spells.druid.pAbolishPoison)
+       SpellEntry const* pDispelSpell = m_spells.druid.pAbolishPoison ?
+                                         m_spells.druid.pAbolishPoison :
+                                         m_spells.druid.pCurePoison;
+        if (pDispelSpell)
         {
-            if (IsValidDispelTarget(me, m_spells.druid.pAbolishPoison) &&
-                CanTryToCastSpell(me, m_spells.druid.pAbolishPoison))
+            if (IsValidDispelTarget(me, pDispelSpell) &&
+                CanTryToCastSpell(me, pDispelSpell))
             {
-                if (DoCastSpell(me, m_spells.druid.pAbolishPoison) == SPELL_CAST_OK)
+                if (DoCastSpell(me, pDispelSpell) == SPELL_CAST_OK)
                     return;
             }
 
             if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
             {
-                if (IsValidDispelTarget(pFriend, m_spells.druid.pAbolishPoison) &&
-                    CanTryToCastSpell(pFriend, m_spells.druid.pAbolishPoison))
+                if (IsValidDispelTarget(pFriend, pDispelSpell) &&
+                    CanTryToCastSpell(pFriend, pDispelSpell))
                 {
-                    if (DoCastSpell(pFriend, m_spells.druid.pAbolishPoison) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-        }
-        else if (m_spells.druid.pCurePoison)
-        {
-            if (IsValidDispelTarget(me, m_spells.druid.pCurePoison) &&
-                CanTryToCastSpell(me, m_spells.druid.pCurePoison))
-            {
-                if (DoCastSpell(me, m_spells.druid.pCurePoison) == SPELL_CAST_OK)
-                    return;
-            }
-
-            if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-            {
-                if (IsValidDispelTarget(pFriend, m_spells.druid.pCurePoison) &&
-                    CanTryToCastSpell(pFriend, m_spells.druid.pCurePoison))
-                {
-                    if (DoCastSpell(pFriend, m_spells.druid.pCurePoison) == SPELL_CAST_OK)
+                    if (DoCastSpell(pFriend, pDispelSpell) == SPELL_CAST_OK)
                         return;
                 }
             }
@@ -2611,6 +2606,21 @@ void BattleBotAI::UpdateInCombatAI_Druid()
                     CanTryToCastSpell(me, m_spells.druid.pFrenziedRegeneration))
                 {
                     if (DoCastSpell(me, m_spells.druid.pFrenziedRegeneration) == SPELL_CAST_OK)
+                        return;
+                }
+
+                if (m_spells.druid.pFaerieFireFeral &&
+                    CanTryToCastSpell(pVictim, m_spells.druid.pFaerieFireFeral))
+                {
+                    if (DoCastSpell(pVictim, m_spells.druid.pFaerieFireFeral) == SPELL_CAST_OK)
+                        return;
+                }
+
+                if (m_spells.druid.pDemoralizingRoar &&
+                    IsMeleeDamageClass(pVictim->GetClass()) &&
+                    CanTryToCastSpell(pVictim, m_spells.druid.pDemoralizingRoar))
+                {
+                    if (DoCastSpell(pVictim, m_spells.druid.pDemoralizingRoar) == SPELL_CAST_OK)
                         return;
                 }
 

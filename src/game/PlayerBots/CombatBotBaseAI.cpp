@@ -1671,6 +1671,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.druid.pDash->Id < pSpellEntry->Id)
                         m_spells.druid.pDash = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Cower") != std::string::npos)
+                {
+                    if (!m_spells.druid.pCower ||
+                        m_spells.druid.pCower->Id < pSpellEntry->Id)
+                        m_spells.druid.pCower = pSpellEntry;
+                }
                 else if (pSpellEntry->SpellName[0].find("Faerie Fire (Feral)") != std::string::npos)
                 {
                     if (!m_spells.druid.pFaerieFireFeral ||
@@ -1752,7 +1758,7 @@ void CombatBotBaseAI::PopulateSpellData()
             switch (pSpellEntry->Effect[i])
             {
                 case SPELL_EFFECT_HEAL:
-                    spellListHeal.insert(pSpellEntry);
+                    spellListDirectHeal.insert(pSpellEntry);
                     break;
                 case SPELL_EFFECT_ATTACK_ME:
                     spellListTaunt.push_back(pSpellEntry);
@@ -1766,7 +1772,7 @@ void CombatBotBaseAI::PopulateSpellData()
                     switch (pSpellEntry->EffectApplyAuraName[i])
                     {
                         case SPELL_AURA_PERIODIC_HEAL:
-                            spellListHealAura.push_back(pSpellEntry);
+                            spellListPeriodicHeal.insert(pSpellEntry);
                             break;
                         case SPELL_AURA_MOD_TAUNT:
                             spellListTaunt.push_back(pSpellEntry);
@@ -1951,32 +1957,37 @@ bool CombatBotBaseAI::FindAndHealInjuredAlly(float selfHealPercent)
     return HealInjuredTarget(pTarget);
 }
 
-bool CombatBotBaseAI::HealInjuredTarget(Unit* pTarget)
+template <class T>
+SpellEntry const* CombatBotBaseAI::SelectMostEfficientHealingSpell(Unit const* pTarget, std::set<SpellEntry const*, T>& spellList) const
 {
-    // Put a HoT on the target if only missing a little health.
-    if (pTarget->GetHealthPercent() >= 80.0f &&
-       !pTarget->HasAuraType(SPELL_AURA_PERIODIC_HEAL))
-    {
-        for (const auto pSpellEntry : spellListHealAura)
-        {
-            if (CanTryToCastSpell(pTarget, pSpellEntry))
-            {
-                if (DoCastSpell(pTarget, pSpellEntry) == SPELL_CAST_OK)
-                    return true;
-            }
-        }
-    }
-
     SpellEntry const* pHealSpell = nullptr;
     int32 healthDiff = INT32_MAX;
     int32 const missingHealth = pTarget->GetMaxHealth() - pTarget->GetHealth();
 
     // Find most efficient healing spell.
-    for (const auto pSpellEntry : spellListHeal)
+    for (const auto pSpellEntry : spellList)
     {
         if (CanTryToCastSpell(pTarget, pSpellEntry))
         {
-            int32 const diff = pSpellEntry->EffectBasePoints[0] - missingHealth;
+            int32 basePoints = 0;
+            for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
+            {
+                switch (pSpellEntry->Effect[i])
+                {
+                    case SPELL_EFFECT_HEAL:
+                        basePoints += pSpellEntry->EffectBasePoints[i];
+                        break;
+                    case SPELL_EFFECT_APPLY_AURA:
+                    case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                    case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                        if (pSpellEntry->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                            basePoints += ((pSpellEntry->GetDuration() / pSpellEntry->EffectAmplitude[i]) * pSpellEntry->EffectBasePoints[i]);
+                        break;
+                }
+            }
+
+            pSpellEntry->GetMaxDuration();
+            int32 const diff = basePoints - missingHealth;
             if (std::abs(diff) < healthDiff)
             {
                 healthDiff = diff;
@@ -1989,7 +2000,42 @@ bool CombatBotBaseAI::HealInjuredTarget(Unit* pTarget)
         }
     }
 
-    if (pHealSpell)
+    return pHealSpell;
+}
+
+bool CombatBotBaseAI::HealInjuredTarget(Unit* pTarget)
+{
+    // Put a HoT on the target if only missing a little health.
+    if (pTarget->GetHealthPercent() >= 80.0f &&
+       !pTarget->HasAuraType(SPELL_AURA_PERIODIC_HEAL))
+    {
+        if (HealInjuredTargetPeriodic(pTarget))
+            return true;
+    }
+
+    if (HealInjuredTargetDirect(pTarget))
+        return true;
+
+    return false;
+}
+
+bool CombatBotBaseAI::HealInjuredTargetPeriodic(Unit* pTarget)
+{
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, spellListPeriodicHeal))
+    {
+        if (CanTryToCastSpell(pTarget, pHealSpell))
+        {
+            if (DoCastSpell(pTarget, pHealSpell) == SPELL_CAST_OK)
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool CombatBotBaseAI::HealInjuredTargetDirect(Unit* pTarget)
+{
+    if (SpellEntry const* pHealSpell = SelectMostEfficientHealingSpell(pTarget, spellListDirectHeal))
         if (DoCastSpell(pTarget, pHealSpell) == SPELL_CAST_OK)
             return true;
 
@@ -2045,6 +2091,33 @@ Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent) const
         return nullptr;
 
     return pTarget;
+}
+
+Unit* CombatBotBaseAI::SelectPeriodicHealTarget(float selfHealPercent) const
+{
+    if (me->GetHealthPercent() < selfHealPercent &&
+       !me->HasAuraType(SPELL_AURA_PERIODIC_HEAL))
+        return me;
+
+    if (Group* pGroup = me->GetGroup())
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Unit* pMember = itr->getSource())
+            {
+                // We already checked self.
+                if (pMember == me)
+                    continue;
+
+                // Check if we should heal party member.
+                if (IsValidHealTarget(pMember) &&
+                   !pMember->HasAuraType(SPELL_AURA_PERIODIC_HEAL))
+                    return pMember;
+            }
+        }
+    }
+
+    return nullptr;
 }
 
 bool CombatBotBaseAI::IsValidHostileTarget(Unit const* pTarget) const
@@ -2218,7 +2291,7 @@ void CombatBotBaseAI::SummonPetIfNeeded()
     }
 }
 
-bool CombatBotBaseAI::CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry)
+bool CombatBotBaseAI::CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const
 {
     if (me->HasSpellCooldown(pSpellEntry->Id))
         return false;

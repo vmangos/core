@@ -33,6 +33,42 @@ struct HealSpellCompare
     }
 };
 
+struct HealAuraCompare
+{
+    bool operator() (SpellEntry const* const lhs, SpellEntry const* const rhs) const
+    {
+        uint32 spell1dmg = 0;
+        uint32 spell2dmg = 0;
+
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
+        {
+            switch (lhs->Effect[i])
+            {
+                case SPELL_EFFECT_APPLY_AURA:
+                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                    if (lhs->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                        spell1dmg += lhs->EffectBasePoints[i];
+                    break;
+            }
+        }
+        for (uint32 i = 0; i < MAX_SPELL_EFFECTS; i++)
+        {
+            switch (rhs->Effect[i])
+            {
+                case SPELL_EFFECT_APPLY_AURA:
+                case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                    if (rhs->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_HEAL)
+                        spell2dmg += rhs->EffectBasePoints[i];
+                    break;
+            }
+        }
+
+        return spell1dmg > spell2dmg;
+    }
+};
+
 enum CombatBotRoles
 {
     ROLE_INVALID,
@@ -61,6 +97,7 @@ public:
     uint8 GetAttackersInRangeCount(float range) const;
     Unit* SelectAttackerDifferentFrom(Unit const* pExcept) const;
     Unit* SelectHealTarget(float selfHealPercent = 100.0f) const;
+    Unit* SelectPeriodicHealTarget(float selfHealPercent = 100.0f) const;
     Player* SelectBuffTarget(SpellEntry const* pSpellEntry) const;
     bool IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool IsValidHealTarget(Unit const* pTarget) const;
@@ -68,9 +105,13 @@ public:
     bool IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool FindAndHealInjuredAlly(float selfHealPercent = 100.0f);
     bool HealInjuredTarget(Unit* pTarget);
+    bool HealInjuredTargetDirect(Unit* pTarget);
+    bool HealInjuredTargetPeriodic(Unit* pTarget);
+    template <class T>
+    SpellEntry const* SelectMostEfficientHealingSpell(Unit const* pTarget, std::set<SpellEntry const*, T>& spellList) const;
 
     SpellCastResult DoCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
-    bool CanTryToCastSpell(Unit* pTarget, SpellEntry const* pSpellEntry);
+    bool CanTryToCastSpell(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool IsWearingShield() const;
 
     void EquipOrUseNewItem();
@@ -156,8 +197,8 @@ public:
 
     SpellEntry const* m_resurrectionSpell = nullptr;
     std::vector<SpellEntry const*> spellListTaunt;
-    std::vector<SpellEntry const*> spellListHealAura;
-    std::set<SpellEntry const*, HealSpellCompare> spellListHeal;
+    std::set<SpellEntry const*, HealAuraCompare> spellListPeriodicHeal;
+    std::set<SpellEntry const*, HealSpellCompare> spellListDirectHeal;
     union
     {
         struct
@@ -403,6 +444,7 @@ public:
             SpellEntry const* pTigersFury;
             SpellEntry const* pDash;
             SpellEntry const* pFaerieFireFeral;
+            SpellEntry const* pCower;
             // Bear
             SpellEntry const* pGrowl;
             SpellEntry const* pChallengingRoar;

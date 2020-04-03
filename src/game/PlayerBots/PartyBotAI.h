@@ -43,6 +43,8 @@ public:
     Player* SelectResurrectionTarget() const;
     Player* SelectShieldTarget() const;
     bool DrinkAndEat();
+    void RunAwayFromTarget(Unit* pTarget);
+    bool EnterCombatDruidForm();
 
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;
