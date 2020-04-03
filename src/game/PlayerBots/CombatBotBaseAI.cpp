@@ -2042,15 +2042,15 @@ bool CombatBotBaseAI::HealInjuredTargetDirect(Unit* pTarget)
     return false;
 }
 
-bool CombatBotBaseAI::IsValidHealTarget(Unit const* pTarget) const
+bool CombatBotBaseAI::IsValidHealTarget(Unit const* pTarget, float healthPercent) const
 {
-    return (pTarget->GetHealthPercent() < 100.0f) &&
+    return (pTarget->GetHealthPercent() < healthPercent) &&
             pTarget->IsAlive() &&
             me->IsWithinLOSInMap(pTarget) &&
             me->IsWithinDist(pTarget, 30.0f);
 }
 
-Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent) const
+Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent, float otherHealPercent) const
 {
     if (me->GetHealthPercent() < selfHealPercent)
         return me;
@@ -2074,11 +2074,11 @@ Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent) const
                     return pTarget;
 
                 // Check if we should heal party member.
-                if ((IsValidHealTarget(pMember) &&
+                if ((IsValidHealTarget(pMember, otherHealPercent) &&
                     healthPercent > pMember->GetHealthPercent()) ||
                     // Or a pet if there are no injured players.
                     (!pTarget && (pMember = pMember->GetPet()) &&
-                        IsValidHealTarget(pMember)))
+                        IsValidHealTarget(pMember, otherHealPercent)))
                 {
                     healthPercent = pMember->GetHealthPercent();
                     pTarget = pMember;

@@ -96,11 +96,11 @@ public:
     
     uint8 GetAttackersInRangeCount(float range) const;
     Unit* SelectAttackerDifferentFrom(Unit const* pExcept) const;
-    Unit* SelectHealTarget(float selfHealPercent = 100.0f) const;
+    Unit* SelectHealTarget(float selfHealPercent = 100.0f, float otherHealPercent = 100.0f) const;
     Unit* SelectPeriodicHealTarget(float selfHealPercent = 100.0f) const;
     Player* SelectBuffTarget(SpellEntry const* pSpellEntry) const;
     bool IsValidBuffTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
-    bool IsValidHealTarget(Unit const* pTarget) const;
+    bool IsValidHealTarget(Unit const* pTarget, float healthPercent = 100.0f) const;
     bool IsValidHostileTarget(Unit const* pTarget) const;
     bool IsValidDispelTarget(Unit const* pTarget, SpellEntry const* pSpellEntry) const;
     bool FindAndHealInjuredAlly(float selfHealPercent = 100.0f);

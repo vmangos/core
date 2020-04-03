@@ -1387,7 +1387,6 @@ void PartyBotAI::UpdateInCombatAI_Mage()
         }
 
         if (m_spells.mage.pRemoveLesserCurse &&
-            (me->GetAttackers().size() < 3) &&
             CanTryToCastSpell(me, m_spells.mage.pRemoveLesserCurse) &&
             IsValidDispelTarget(me, m_spells.mage.pRemoveLesserCurse))
         {
@@ -2585,10 +2584,10 @@ void PartyBotAI::UpdateInCombatAI_Druid()
             if (HealInjuredTargetPeriodic(pTarget))
                 return;
 
-        // Heal
-        if (m_role == ROLE_HEALER &&
-            FindAndHealInjuredAlly(80.0f))
-            return;
+        // Direct heal.
+        if (Unit* pTarget = SelectHealTarget(80.0f, 80.0f))
+            if (HealInjuredTargetDirect(pTarget))
+                return;
 
         // Dispels
         SpellEntry const* pDispelSpell = m_spells.druid.pAbolishPoison ?
