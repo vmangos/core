@@ -758,8 +758,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Paladin()
     {
         if (Player* pTarget = SelectBuffTarget(m_spells.paladin.pBlessingBuff))
         {
-            if (CanTryToCastSpell(pTarget, m_spells.paladin.pBlessingBuff) &&
-                IsValidBuffTarget(pTarget, m_spells.paladin.pBlessingBuff))
+            if (CanTryToCastSpell(pTarget, m_spells.paladin.pBlessingBuff))
             {
                 if (DoCastSpell(pTarget, m_spells.paladin.pBlessingBuff) == SPELL_CAST_OK)
                 {
@@ -816,17 +815,9 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
 
     if (m_spells.paladin.pCleanse)
     {
-        if (IsValidDispelTarget(me, m_spells.paladin.pCleanse) &&
-            CanTryToCastSpell(me, m_spells.paladin.pCleanse))
+        if (Unit* pFriend = SelectDispelTarget(m_spells.paladin.pCleanse))
         {
-            if (DoCastSpell(me, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
-                return;
-        }
-
-        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-        {
-            if (IsValidDispelTarget(pFriend, m_spells.paladin.pCleanse) &&
-                CanTryToCastSpell(pFriend, m_spells.paladin.pCleanse))
+            if (CanTryToCastSpell(pFriend, m_spells.paladin.pCleanse))
             {
                 if (DoCastSpell(pFriend, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
                     return;
@@ -950,7 +941,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Shaman()
 void PartyBotAI::UpdateInCombatAI_Shaman()
 {
     if (m_spells.shaman.pManaTideTotem &&
-        (me->GetPowerPercent(POWER_MANA) < 50.0f) &&
+       (me->GetPowerPercent(POWER_MANA) < 50.0f) &&
         CanTryToCastSpell(me, m_spells.shaman.pManaTideTotem))
     {
         if (DoCastSpell(me, m_spells.shaman.pManaTideTotem) == SPELL_CAST_OK)
@@ -1027,24 +1018,32 @@ void PartyBotAI::UpdateInCombatAI_Shaman()
     if (SummonShamanTotems())
         return;
 
-    if (m_spells.shaman.pCureDisease &&
-        CanTryToCastSpell(me, m_spells.shaman.pCureDisease) &&
-        IsValidDispelTarget(me, m_spells.shaman.pCureDisease))
+    if (m_spells.shaman.pCureDisease)
     {
-        if (DoCastSpell(me, m_spells.shaman.pCureDisease) == SPELL_CAST_OK)
-            return;
+        if (Unit* pFriend = SelectDispelTarget(m_spells.shaman.pCureDisease))
+        {
+            if (CanTryToCastSpell(pFriend, m_spells.shaman.pCureDisease))
+            {
+                if (DoCastSpell(pFriend, m_spells.shaman.pCureDisease) == SPELL_CAST_OK)
+                    return;
+            }
+        }
     }
 
-    if (m_spells.shaman.pCurePoison &&
-        CanTryToCastSpell(me, m_spells.shaman.pCurePoison) &&
-        IsValidDispelTarget(me, m_spells.shaman.pCurePoison))
+    if (m_spells.shaman.pCurePoison)
     {
-        if (DoCastSpell(me, m_spells.shaman.pCurePoison) == SPELL_CAST_OK)
-            return;
+        if (Unit* pFriend = SelectDispelTarget(m_spells.shaman.pCurePoison))
+        {
+            if (CanTryToCastSpell(pFriend, m_spells.shaman.pCurePoison))
+            {
+                if (DoCastSpell(pFriend, m_spells.shaman.pCurePoison) == SPELL_CAST_OK)
+                    return;
+            }
+        }
     }
 
     if (m_role == ROLE_HEALER)
-        FindAndHealInjuredAlly(40.0f);
+        FindAndHealInjuredAlly(50.0f);
     else if (me->GetHealthPercent() < 20.0f)
         HealInjuredTarget(me);
 }
@@ -1211,6 +1210,7 @@ void PartyBotAI::UpdateInCombatAI_Hunter()
 
         if (!me->HasUnitState(UNIT_STAT_ROOT) &&
             (me->GetCombatDistance(pVictim) < 8.0f) &&
+            (m_role != ROLE_MELEE_DPS) &&
              me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE)
         {
             if (!me->IsStopped())
@@ -1323,7 +1323,8 @@ void PartyBotAI::UpdateInCombatAI_Mage()
                     return;
             }
 
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE)
+            if ((m_role != ROLE_MELEE_DPS) &&
+                (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != DISTANCING_MOTION_TYPE))
             {
                 if (m_spells.mage.pBlink &&
                     (me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE) ||
@@ -1590,7 +1591,8 @@ void PartyBotAI::UpdateInCombatAI_Priest()
             return;
     }
 
-    if (!me->GetAttackers().empty())
+    if (!me->GetAttackers().empty() &&
+        m_role != ROLE_TANK)
     {
         if (m_spells.priest.pFade &&
             CanTryToCastSpell(me, m_spells.priest.pFade))
@@ -1620,6 +1622,7 @@ void PartyBotAI::UpdateInCombatAI_Priest()
 
     if (m_role == ROLE_HEALER)
     {
+        // Shield allies being attacked.
         if (m_spells.priest.pPowerWordShield)
         {
             if (Player* pTarget = SelectShieldTarget())
@@ -1632,44 +1635,33 @@ void PartyBotAI::UpdateInCombatAI_Priest()
             }
         }
 
-        // Heal
-        if (FindAndHealInjuredAlly(40.0f))
-            return;
+        // Direct heal more seriously injured.
+        if (Unit* pTarget = SelectHealTarget(70.0f, 80.0f))
+            if (HealInjuredTargetDirect(pTarget))
+                return;
+
+        // Apply HoT aura for small injuries.
+        if (Unit* pTarget = SelectPeriodicHealTarget(80.0f, 90.0f))
+            if (HealInjuredTargetPeriodic(pTarget))
+                return;
 
         // Dispels
         if (m_spells.priest.pDispelMagic)
         {
-            if (IsValidDispelTarget(me, m_spells.priest.pDispelMagic) &&
-                CanTryToCastSpell(me, m_spells.priest.pDispelMagic))
+            if (Unit* pFriend = SelectDispelTarget(m_spells.priest.pDispelMagic))
             {
-                if (DoCastSpell(me, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
-                    return;
-            }
-
-            if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-            {
-                if (IsValidDispelTarget(pFriend, m_spells.priest.pDispelMagic) &&
-                    CanTryToCastSpell(pFriend, m_spells.priest.pDispelMagic))
+                if (CanTryToCastSpell(pFriend, m_spells.priest.pDispelMagic))
                 {
                     if (DoCastSpell(pFriend, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
                         return;
                 }
             }
         }
-
         if (m_spells.priest.pAbolishDisease)
         {
-            if (IsValidDispelTarget(me, m_spells.priest.pAbolishDisease) &&
-                CanTryToCastSpell(me, m_spells.priest.pAbolishDisease))
+            if (Unit* pFriend = SelectDispelTarget(m_spells.priest.pAbolishDisease))
             {
-                if (DoCastSpell(me, m_spells.priest.pAbolishDisease) == SPELL_CAST_OK)
-                    return;
-            }
-
-            if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-            {
-                if (IsValidDispelTarget(pFriend, m_spells.priest.pAbolishDisease) &&
-                    CanTryToCastSpell(pFriend, m_spells.priest.pAbolishDisease))
+                if (CanTryToCastSpell(pFriend, m_spells.priest.pAbolishDisease))
                 {
                     if (DoCastSpell(pFriend, m_spells.priest.pAbolishDisease) == SPELL_CAST_OK)
                         return;
@@ -2572,6 +2564,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
     if (form == FORM_NONE)
     {
         if (m_spells.druid.pHibernate &&
+            m_role != ROLE_TANK &&
             !me->GetAttackers().empty())
         {
             Unit* pAttacker = *me->GetAttackers().begin();
@@ -2583,12 +2576,12 @@ void PartyBotAI::UpdateInCombatAI_Druid()
         }
 
         // Prioritize applying HoTs.
-        if (Unit* pTarget = SelectPeriodicHealTarget(80.0f))
+        if (Unit* pTarget = SelectPeriodicHealTarget(80.0f, 90.0f))
             if (HealInjuredTargetPeriodic(pTarget))
                 return;
 
         // Direct heal.
-        if (Unit* pTarget = SelectHealTarget(80.0f, 80.0f))
+        if (Unit* pTarget = SelectHealTarget(60.0f, 70.0f))
             if (HealInjuredTargetDirect(pTarget))
                 return;
 
@@ -2598,17 +2591,9 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                                          m_spells.druid.pCurePoison;
         if (pDispelSpell)
         {
-            if (IsValidDispelTarget(me, pDispelSpell) &&
-                CanTryToCastSpell(me, pDispelSpell))
+            if (Unit* pFriend = SelectDispelTarget(pDispelSpell))
             {
-                if (DoCastSpell(me, pDispelSpell) == SPELL_CAST_OK)
-                    return;
-            }
-
-            if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-            {
-                if (IsValidDispelTarget(pFriend, pDispelSpell) &&
-                    CanTryToCastSpell(pFriend, pDispelSpell))
+                if (CanTryToCastSpell(pFriend, pDispelSpell))
                 {
                     if (DoCastSpell(pFriend, pDispelSpell) == SPELL_CAST_OK)
                         return;
@@ -2842,7 +2827,7 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                 return;
 
             if (m_spells.druid.pFaerieFire &&
-                (pVictim->GetClass() == CLASS_ROGUE) &&
+               (pVictim->GetClass() == CLASS_ROGUE) &&
                 CanTryToCastSpell(pVictim, m_spells.druid.pFaerieFire))
             {
                 if (DoCastSpell(pVictim, m_spells.druid.pFaerieFire) == SPELL_CAST_OK)

@@ -1948,9 +1948,9 @@ void CombatBotBaseAI::AddAllSpellReagents()
     }
 }
 
-bool CombatBotBaseAI::FindAndHealInjuredAlly(float selfHealPercent)
+bool CombatBotBaseAI::FindAndHealInjuredAlly(float selfHealPercent, float groupHealPercent)
 {
-    Unit* pTarget = SelectHealTarget(selfHealPercent);
+    Unit* pTarget = SelectHealTarget(selfHealPercent, groupHealPercent);
     if (!pTarget)
         return false;
 
@@ -2050,7 +2050,7 @@ bool CombatBotBaseAI::IsValidHealTarget(Unit const* pTarget, float healthPercent
             me->IsWithinDist(pTarget, 30.0f);
 }
 
-Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent, float otherHealPercent) const
+Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent, float groupHealPercent) const
 {
     if (me->GetHealthPercent() < selfHealPercent)
         return me;
@@ -2074,11 +2074,11 @@ Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent, float otherHealPe
                     return pTarget;
 
                 // Check if we should heal party member.
-                if ((IsValidHealTarget(pMember, otherHealPercent) &&
+                if ((IsValidHealTarget(pMember, groupHealPercent) &&
                     healthPercent > pMember->GetHealthPercent()) ||
                     // Or a pet if there are no injured players.
                     (!pTarget && (pMember = pMember->GetPet()) &&
-                        IsValidHealTarget(pMember, otherHealPercent)))
+                        IsValidHealTarget(pMember, groupHealPercent)))
                 {
                     healthPercent = pMember->GetHealthPercent();
                     pTarget = pMember;
@@ -2093,7 +2093,7 @@ Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent, float otherHealPe
     return pTarget;
 }
 
-Unit* CombatBotBaseAI::SelectPeriodicHealTarget(float selfHealPercent) const
+Unit* CombatBotBaseAI::SelectPeriodicHealTarget(float selfHealPercent, float groupHealPercent) const
 {
     if (me->GetHealthPercent() < selfHealPercent &&
        !me->HasAuraType(SPELL_AURA_PERIODIC_HEAL))
@@ -2110,7 +2110,7 @@ Unit* CombatBotBaseAI::SelectPeriodicHealTarget(float selfHealPercent) const
                     continue;
 
                 // Check if we should heal party member.
-                if (IsValidHealTarget(pMember) &&
+                if (IsValidHealTarget(pMember, groupHealPercent) &&
                    !pMember->HasAuraType(SPELL_AURA_PERIODIC_HEAL))
                     return pMember;
             }
@@ -2241,6 +2241,27 @@ Player* CombatBotBaseAI::SelectBuffTarget(SpellEntry const* pSpellEntry) const
             {
                 if (pMember->IsAlive() &&
                     IsValidBuffTarget(pMember, pSpellEntry) &&
+                    me->IsWithinLOSInMap(pMember) &&
+                    me->IsWithinDist(pMember, 30.0f))
+                    return pMember;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+Player* CombatBotBaseAI::SelectDispelTarget(SpellEntry const* pSpellEntry) const
+{
+    Group* pGroup = me->GetGroup();
+    if (pGroup)
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* pMember = itr->getSource())
+            {
+                if (pMember->IsAlive() &&
+                    IsValidDispelTarget(pMember, pSpellEntry) &&
                     me->IsWithinLOSInMap(pMember) &&
                     me->IsWithinDist(pMember, 30.0f))
                     return pMember;
