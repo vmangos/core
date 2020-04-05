@@ -459,6 +459,7 @@ void PartyBotAI::UpdateAI(uint32 const diff)
 
         ResetSpellData();
         PopulateSpellData();
+        AddAllSpellReagents();
         me->UpdateSkillsToMaxSkillsForLevel();
         me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         SummonPetIfNeeded();
