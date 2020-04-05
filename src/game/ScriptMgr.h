@@ -1237,7 +1237,7 @@ struct Script
         pGossipSelectWithCode(nullptr), pGOGossipSelectWithCode(nullptr), pQuestComplete(nullptr),
         pNPCDialogStatus(nullptr), pGODialogStatus(nullptr), pQuestRewardedNPC(nullptr), pQuestRewardedGO(nullptr), pItemHello(nullptr), pGOHello(nullptr), pAreaTrigger(nullptr),
         pProcessEventId(nullptr), pItemQuestAccept(nullptr), pGOQuestAccept(nullptr),
-        pItemUse(nullptr), pEffectDummyCreature(nullptr), pEffectDummyGameObj(nullptr),
+        pItemUse(nullptr), pItemUseSpell(nullptr), pEffectDummyCreature(nullptr), pEffectDummyGameObj(nullptr), 
         pEffectAuraDummy(nullptr), GOOpen(nullptr),
         GOGetAI(nullptr), GetAI(nullptr), GetInstanceData(nullptr)
     {}
@@ -1266,6 +1266,7 @@ struct Script
     bool (*pGOQuestAccept           )(Player*, GameObject*, Quest const*);
 //    bool (*pGOChooseReward          )(Player*, GameObject*, Quest const*, uint32);
     bool (*pItemUse                 )(Player*, Item*, SpellCastTargets const&);
+    bool (*pItemUseSpell             )(Player*, Item*, SpellCastTargets const&);
     bool (*pEffectDummyCreature     )(WorldObject*, uint32, SpellEffectIndex, Creature*);
     bool (*pEffectDummyGameObj      )(WorldObject*, uint32, SpellEffectIndex, GameObject*);
     bool (*pEffectAuraDummy         )(Aura const*, bool);
@@ -1368,6 +1369,8 @@ class ScriptMgr
         uint32 GetDialogStatus(Player* pPlayer, GameObject* pGameObject);
         bool OnGameObjectUse(Player* pPlayer, GameObject* pGameObject);
         bool OnGameObjectOpen(Player* pPlayer, GameObject* pGameObject);
+        bool OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets);
+        bool OnItemUseSpell(Player* pPlayer, Item* pItem, SpellCastTargets const& targets);
         bool OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry);
         bool OnProcessEvent(uint32 eventId, Object* pSource, Object* pTarget, bool isStart);
         bool OnEffectDummy(WorldObject* pCaster, uint32 spellId, SpellEffectIndex effIndex, Creature* pTarget);

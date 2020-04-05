@@ -504,6 +504,7 @@ struct ItemPrototype
     uint32 MaxMoneyLoot;
     uint32 ExtraFlags;                                      // see ItemExtraFlags
     uint32 OtherTeamEntry;
+    uint32 ScriptId;
 
     mutable bool m_bDiscovered = false;                     // has item been discovered by players
 

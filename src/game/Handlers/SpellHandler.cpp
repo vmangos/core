@@ -152,6 +152,8 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     }
 
     pUser->CastItemUseSpell(pItem, targets);
+    if (!sScriptMgr.OnItemUse(pUser, pItem, targets))
+        pUser->CastItemUseSpell(pItem, targets);
 }
 
 #define OPEN_CHEST 11437

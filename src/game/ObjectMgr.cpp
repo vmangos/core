@@ -1127,6 +1127,15 @@ struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader, SQLSto
     }
 };
 
+struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader, SQLStorage>
+{
+    template<class D>
+    void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
+    {
+        dst = D(sScriptMgr.GetScriptId(src));
+    }
+};
+
 void ObjectMgr::LoadCreatureTemplates()
 {
     SQLCreatureLoader loader;
@@ -3306,7 +3315,8 @@ void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
 
 void ObjectMgr::LoadItemPrototypes()
 {
-    sItemStorage.LoadProgressive(sWorld.GetWowPatch());
+    SQLItemLoader loader;
+    loader.LoadProgressive(sItemStorage, sWorld.GetWowPatch());
     m_QuestStartingItemsMap.clear();
     sLog.outString(">> Loaded %u item prototypes", sItemStorage.GetRecordCount());
     sLog.outString();

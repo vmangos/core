@@ -271,6 +271,7 @@ set (SCRIPTS_SRCS
     world/event_scourge_invasion.cpp
     world/fireworks_show.cpp
     world/go_scripts.cpp
+    world/item_scripts.cpp
     world/npcs_special.cpp
     world/spell_scripts.cpp
     world/totems.cpp
