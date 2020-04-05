@@ -625,6 +625,8 @@ enum
     REQUEST_SAVED_SPRITE_DARTER     = 6,
 
     SPELL_MANA_BURN                 = 11981,
+
+    FACTION_ESCORTEE                = 10,
 };
 
 struct sMovementInformation
@@ -765,7 +767,7 @@ struct npc_captured_sprite_darterAI : public ScriptedAI
                     {
                         if (m_uiRunStart_Timer < uiDiff)
                         {
-                            m_creature->SetFactionTemporary(FACTION_ESCORT_N_FRIEND_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
+                            m_creature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
                             m_bRun = true;
                         }
                         else

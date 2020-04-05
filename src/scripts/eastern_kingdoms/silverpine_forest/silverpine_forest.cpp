@@ -105,7 +105,8 @@ enum
 
     QUEST_ERLAND        = 435,
     NPC_RANE            = 1950,
-    NPC_QUINN           = 1951
+    NPC_QUINN           = 1951,
+    FACTION_ESCORTEE    = 232,
 };
 
 struct npc_deathstalker_erlandAI : public npc_escortAI
@@ -209,6 +210,7 @@ bool QuestAccept_npc_deathstalker_erland(Player* pPlayer, Creature* pCreature, Q
     if (pQuest->GetQuestId() == QUEST_ERLAND)
     {
         DoScriptText(SAY_START_1, pCreature);
+        pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
 
         if (npc_deathstalker_erlandAI* pEscortAI = dynamic_cast<npc_deathstalker_erlandAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
