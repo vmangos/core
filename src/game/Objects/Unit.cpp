@@ -9440,9 +9440,9 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
     float initialPosX, initialPosY, initialPosZ, o;
     GetPosition(initialPosX, initialPosY, initialPosZ);
 
-    // Moving player: try to interpolate movement a bit
+    // Moving player: try to extrapolate movement a bit
     if (IsPlayer() && IsMoving())
-        if (!ToPlayer()->GetCheatData()->InterpolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
+        if (!ToPlayer()->GetCheatData()->ExtrapolateMovement(m_movementInfo, 200, initialPosX, initialPosY, initialPosZ, o))
             GetPosition(initialPosX, initialPosY, initialPosZ);
 
     float attackerTargetDistance = sqrt(pow(initialPosX - attacker->GetPositionX(), 2) +

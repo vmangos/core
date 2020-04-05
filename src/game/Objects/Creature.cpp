@@ -2835,7 +2835,7 @@ time_t Creature::GetRespawnTimeEx() const
 void Creature::GetRespawnCoord(float &x, float &y, float &z, float* ori, float* dist) const
 {
     // Nostalrius : pouvoir changer point de spawn d'un mob -> Creature::SetHomePosition
-    if (m_homePosition.x > 0.1f || m_homePosition.y < -0.1f)
+    if (m_homePosition.x > 0.1f || m_homePosition.x < -0.1f)
     {
         x = m_homePosition.x;
         y = m_homePosition.y;

@@ -815,7 +815,7 @@ struct RacialSpells
     uint32 spells[MAX_RACIAL_SPELLS] = { 0 };
 };
 
-class MovementAnticheatInterface;
+class MovementAnticheat;
 
 struct AuraSaveStruct
 {
@@ -2088,6 +2088,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool CanInteractWithNPC(Creature const* pCreature, uint32 npcflagmask) const;
         GameObject* GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameobject_type = MAX_GAMEOBJECT_TYPE) const;
         bool CanInteractWithGameObject(GameObject const* pGo, uint32 gameobject_type = MAX_GAMEOBJECT_TYPE) const;
+        bool CanSeeHealthOf(Unit const* pTarget) const;
 
         ObjectGuid const& GetSelectedGobj() const { return m_selectedGobj; }
         void SetSelectedGobj(ObjectGuid guid) { m_selectedGobj = guid; }
@@ -2377,7 +2378,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool FallGround(uint8 fallMode);
 
         /// Anticheat
-        MovementAnticheatInterface* GetCheatData() const { return m_session->GetCheatData(); }
+        MovementAnticheat* GetCheatData() const { return m_session->GetCheatData(); }
         void OnDisconnected();
         void RelocateToLastClientPosition();
         void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const override;

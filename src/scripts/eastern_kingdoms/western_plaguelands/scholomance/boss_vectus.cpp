@@ -33,13 +33,15 @@ enum
 
     VECTUS_SPEECH_GAMBIT_EVENT_START                = 6883,
 
+    FACTION_MONSTER                                 = 16,
+
     GO_DAWN_S_GAMBIT                                = 177304,
 
     SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT     = 18115,    //spell qui transforme les étudiants élites en squelettes
     SPELL_FLAMESTRIKE                               = 18399,
     SPELL_BLAST_WAVE                                = 16046
-            //SPELL_FRENZY                                  = 28371     //spell is used by Gluth, confirm this is for this boss too
-            //SPELL_FIRE_SHIELD                             = 0         //should supposedly have some aura, but proper spell not found
+  //SPELL_FRENZY                                    = 28371     //spell is used by Gluth, confirm this is for this boss too
+  //SPELL_FIRE_SHIELD                               = 0         //should supposedly have some aura, but proper spell not found
 };
 
 struct boss_vectusAI : public ScriptedAI
@@ -119,7 +121,7 @@ struct boss_vectusAI : public ScriptedAI
                     Creature* Marduck = m_creature->FindNearestCreature(NPC_MARDUK_BLACKPOOL, 100.0f);
                     if (Marduck)
                     {
-                        Marduck->SetFactionTemplateId(14);
+                        Marduck->SetFactionTemplateId(FACTION_MONSTER);
                         Marduck->SetReactState(REACT_AGGRESSIVE);
                         Marduck->AIM_Initialize();
                     }
@@ -135,13 +137,13 @@ struct boss_vectusAI : public ScriptedAI
                             creature->SetCreatureGroup(nullptr);
                         }
 
-                        creature->SetFactionTemplateId(14);
+                        creature->SetFactionTemplateId(FACTION_MONSTER);
                         creature->SetReactState(REACT_AGGRESSIVE);
                         creature->AIM_Initialize();
                     }
 
                     m_creature->MonsterYell(VECTUS_SPEECH_GAMBIT_EVENT_START, 0, 0);
-                    m_creature->SetFactionTemplateId(14);
+                    m_creature->SetFactionTemplateId(FACTION_MONSTER);
                     m_creature->SetReactState(REACT_AGGRESSIVE);
                     m_creature->AIM_Initialize();
 
@@ -162,7 +164,7 @@ struct boss_vectusAI : public ScriptedAI
             m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
             for (const auto& creature : creatures)
             {
-                creature->SetFactionTemplateId(14);
+                creature->SetFactionTemplateId(FACTION_MONSTER);
                 creature->AI()->AttackStart(m_creature->GetVictim());
             }
             _fullAggroDone = true;
@@ -245,13 +247,13 @@ struct npc_scholomance_studentAI : public ScriptedAI
         std::list<Creature*> creatures;
         m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
         for (const auto& creature : creatures)
-            creature->SetFactionTemplateId(14);
+            creature->SetFactionTemplateId(FACTION_MONSTER);
 
         if (Creature* pMarduck = m_creature->FindNearestCreature(NPC_MARDUK_BLACKPOOL, 100.0f))
-            pMarduck->SetFactionTemplateId(14);
+            pMarduck->SetFactionTemplateId(FACTION_MONSTER);
 
         if (Creature* pVectus = m_creature->FindNearestCreature(NPC_VECTUS, 100.0f))
-			pVectus->SetFactionTemplateId(14);
+			pVectus->SetFactionTemplateId(FACTION_MONSTER);
     }
 
     void JustDied(Unit* Killer) override

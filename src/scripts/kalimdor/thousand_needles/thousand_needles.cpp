@@ -119,6 +119,7 @@ enum
 
     QUEST_FREE_AT_LAST          = 4904,
     NPC_GRIM_BANDIT             = 10758,
+    FACTION_ESCORTEE            = 33,
 
     ID_AMBUSH_1                 = 0,
     ID_AMBUSH_2                 = 2,
@@ -186,7 +187,7 @@ bool QuestAccept_npc_lakota_windsong(Player* pPlayer, Creature* pCreature, Quest
     if (pQuest->GetQuestId() == QUEST_FREE_AT_LAST)
     {
         DoScriptText(SAY_LAKO_START, pCreature, pPlayer);
-        pCreature->SetFactionTemplateId(FACTION_ESCORT_H_NEUTRAL_ACTIVE);
+        pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
 
         if (npc_lakota_windsongAI* pEscortAI = dynamic_cast<npc_lakota_windsongAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);

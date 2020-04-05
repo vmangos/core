@@ -1116,7 +1116,7 @@ bool ChatHandler::HandleSpamerMute(char* args)
 
     if (Player* player = ObjectAccessor::FindPlayerByName(cname))
     {
-        if (AntispamInterface *a = sAnticheatLib->GetAntispam())
+        if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
         {
             a->mute(player->GetSession()->GetAccountId());
             PSendSysMessage("Spamer %s was muted", cname);
@@ -1137,7 +1137,7 @@ bool ChatHandler::HandleSpamerUnmute(char* args)
 
     if (Player* player = ObjectAccessor::FindPlayerByName(cname))
     {
-        if (AntispamInterface *a = sAnticheatLib->GetAntispam())
+        if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
         {
             a->unmute(player->GetSession()->GetAccountId());
             PSendSysMessage("Spamer %s was unmuted", cname);
@@ -1149,7 +1149,7 @@ bool ChatHandler::HandleSpamerUnmute(char* args)
 
 bool ChatHandler::HandleSpamerList(char* args)
 {
-    if (AntispamInterface *a = sAnticheatLib->GetAntispam())
+    if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
         a->showMuted(GetSession());
     return true;
 }

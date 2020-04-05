@@ -1623,12 +1623,7 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.SpeedHack.Enable
-#        Description: Check for players moving too fast.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.SpeedHack.UseInterpolation
-#        Description: Use movement interpolation when doing speed checks.
+#        Description: Check for players moving too fast using extrapolation.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
@@ -1642,19 +1637,6 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     30
 #
 #    Anticheat.OverpspeedDistance.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     11 - Log, Report to GM, Kick
-#
-#    Anticheat.OverspeedZ.Enable
-#        Description: Check for players moving up or down too fast.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.OverspeedZ.Threshold
-#        Description: Detections needed to trigger a penalty.
-#        Default:     3
-#
-#    Anticheat.OverspeedZ.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
@@ -2048,13 +2030,9 @@ Anticheat.NumDesyncs.Enable = 1
 Anticheat.NumDesyncs.Threshold = 5
 Anticheat.NumDesyncs.Penalty = 11
 Anticheat.SpeedHack.Enable = 1
-Anticheat.SpeedHack.UseInterpolation = 1
 Anticheat.OverpspeedDistance.Enable = 1
 Anticheat.OverpspeedDistance.Threshold = 30
 Anticheat.OverpspeedDistance.Penalty = 11
-Anticheat.OverspeedZ.Enable = 1
-Anticheat.OverspeedZ.Threshold = 3
-Anticheat.OverspeedZ.Penalty = 11
 Anticheat.OverspeedJump.Enable = 1
 Anticheat.OverspeedJump.Reject = 1
 Anticheat.OverspeedJump.Threshold = 3

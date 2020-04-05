@@ -1371,7 +1371,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         }
 
         float x, y, z, o;
-        if (IsInWorld() && sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_INTERP) && movespline->Finalized() && GetCheatData()->InterpolateMovement(m_movementInfo, WorldTimer::getMSTime() - m_movementInfo.time,  x, y, z, o))
+        if (IsInWorld() && sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_INTERP) && movespline->Finalized() && GetCheatData()->ExtrapolateMovement(m_movementInfo, WorldTimer::getMSTime() - m_movementInfo.time,  x, y, z, o))
         {
             GetMap()->DoPlayerGridRelocation(this, x, y, z, o);
             m_position.x = x;
@@ -2556,6 +2556,22 @@ bool Player::CanInteractWithGameObject(GameObject const* pGo, uint32 gameobject_
     return false;
 }
 
+bool Player::CanSeeHealthOf(Unit const* pTarget) const
+{
+    Player* pOwner = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself();
+    if (pOwner && IsInSameRaidWith(pOwner))
+        return true;
+
+    // Beast Lore
+    for (const auto& aura : pTarget->GetAurasByType(SPELL_AURA_EMPATHY))
+    {
+        if (aura->GetCasterGuid() == this->GetObjectGuid())
+            return true;
+    }
+
+    return false;
+}
+
 bool Player::IsUnderWater() const
 {
     return GetTerrain()->IsUnderWater(GetPositionX(), GetPositionY(), GetPositionZ() + 2);
@@ -3102,7 +3118,6 @@ void Player::GiveLevel(uint32 level)
 
     if (m_session->ShouldBeBanned(GetLevel()))
         sWorld.BanAccount(BAN_ACCOUNT, m_session->GetUsername(), 0, m_session->GetScheduleBanReason(), "");
-    sAnticheatLib->OnPlayerLevelUp(this);
 }
 
 void Player::UpdateFreeTalentPoints(bool resetIfNeed)
