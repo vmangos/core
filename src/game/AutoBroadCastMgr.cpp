@@ -20,7 +20,7 @@ AutoBroadCastMgr::~AutoBroadCastMgr()
     entries.clear();
 }
 
-void AutoBroadCastMgr::load()
+void AutoBroadCastMgr::Load()
 {
     entries.clear();
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `string_id` FROM `autobroadcast`"));
@@ -57,7 +57,7 @@ void AutoBroadCastMgr::load()
 
 }
 
-void AutoBroadCastMgr::update(uint32 diff)
+void AutoBroadCastMgr::Update(uint32 diff)
 {
     if (entries.empty())
         return;

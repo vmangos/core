@@ -1886,7 +1886,7 @@ bool ChatHandler::HandleReloadSpellDisabledCommand(char *args)
 
 bool ChatHandler::HandleReloadAutoBroadcastCommand(char *args)
 {
-    sAutoBroadCastMgr.load();
+    sAutoBroadCastMgr.Load();
     SendSysMessage("DB table `autobroadcast` reloaded.");
     return true;
 }

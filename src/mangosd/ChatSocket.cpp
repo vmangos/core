@@ -263,7 +263,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
             sendf("err_loading\n");
             return 0;
         }
-        if (!sPlayerBotMgr.addBot(playerGuid, true))
+        if (!sPlayerBotMgr.AddBot(playerGuid, true))
         {
             sendf("err_internal\n");
             return 0;

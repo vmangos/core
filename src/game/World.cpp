@@ -171,7 +171,7 @@ World::~World()
 
 void World::Shutdown()
 {
-    sPlayerBotMgr.deleteAll();
+    sPlayerBotMgr.DeleteAll();
     sWorld.KickAll();                                       // save and kick all players
     sWorld.UpdateSessions(1);                               // real players unload required UpdateSessions call
     if (m_charDbWorkerThread)
@@ -1718,7 +1718,7 @@ void World::SetInitialWorldSettings()
     sAnticheatMgr->LoadAnticheatData();
 
     sLog.outString("Loading auto broadcast");
-    sAutoBroadCastMgr.load();
+    sAutoBroadCastMgr.Load();
 
     sLog.outString("Loading AH bot");
     sAuctionHouseBotMgr.Load();
@@ -1730,7 +1730,7 @@ void World::SetInitialWorldSettings()
     sCharacterDatabaseCache.LoadAll();
 
     sLog.outString("Loading PlayerBot ..."); // Requires Players cache
-    sPlayerBotMgr.load();
+    sPlayerBotMgr.Load();
 
     sLog.outString();
     sLog.outString("Loading faction change ...");
@@ -1969,9 +1969,9 @@ void World::Update(uint32 diff)
         m_MaintenanceTimeChecker -= diff;
 
     //Update PlayerBotMgr
-    sPlayerBotMgr.update(diff);
+    sPlayerBotMgr.Update(diff);
     // Update AutoBroadcast
-    sAutoBroadCastMgr.update(diff);
+    sAutoBroadCastMgr.Update(diff);
     // Update liste des ban si besoin
     sAccountMgr.Update(diff);
 
