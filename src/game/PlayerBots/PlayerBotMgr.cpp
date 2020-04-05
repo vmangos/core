@@ -229,7 +229,8 @@ void PlayerBotMgr::update(uint32 diff)
 
         if (iter->second->state == PB_STATE_ONLINE)
         {
-            if (!iter->second->m_pendingResponses.empty())
+            if (!iter->second->m_pendingResponses.empty() &&
+                iter->second->ai && iter->second->ai->me)
             {
                 for (const auto opcode : iter->second->m_pendingResponses)
                 {
@@ -242,8 +243,9 @@ void PlayerBotMgr::update(uint32 diff)
             {
                 if (iter->second->ai && iter->second->ai->me)
                     iter->second->ai->me->RemoveFromGroup();
-                if (iter->second->ai && iter->second->ai->me)
-                    sPlayerBotMgr.deleteBot(iter->second->ai->me->GetGUIDLow());
+
+                deleteBot(iter);
+
                 if (WorldSession* sess = sWorld.FindSession(iter->second->accountId))
                     sess->LogoutPlayer(false);
 
@@ -274,10 +276,15 @@ void PlayerBotMgr::update(uint32 diff)
                 m_stats.onlineCount++;
         }
         else
+        {
             sLog.outError("PLAYERBOT: Unable to load session id %u", iter->second->accountId);
+            deleteBot(iter);
+        }
     }
+
     if (!enable)
         return;
+
     uint32 updatesCount = (m_elapsedTime - m_lastBotsRefresh) / confBotsRefresh;
     for (uint32 i = 0; i < updatesCount; ++i)
     {
@@ -402,6 +409,11 @@ bool PlayerBotMgr::deleteBot(uint32 playerGUID)
     if (iter == m_bots.end())
         return false;
 
+    return deleteBot(iter);
+}
+
+bool PlayerBotMgr::deleteBot(std::map<uint32, PlayerBotEntry*>::iterator iter)
+{
     if (iter->second->state == PB_STATE_LOADING)
         m_stats.loadingCount--;
     else if (iter->second->state == PB_STATE_ONLINE)

@@ -212,8 +212,10 @@ void BattleBotAI::AttackStart(Unit* pVictim)
             me->GetPowerPercent(POWER_MANA) > 10.0f &&
             me->GetCombatDistance(pVictim) > 8.0f)
             me->SetCasterChaseDistance(25.0f);
+        else if (me->HasDistanceCasterMovement())
+            me->SetCasterChaseDistance(0.0f);
 
-        me->GetMotionMaster()->MoveChase(pVictim, 1.0f);
+        me->GetMotionMaster()->MoveChase(pVictim, 1.0f, IsMeleeDamageClass(me->GetClass()) ? 3.0f : 0.0f);
     }
 }
 
@@ -495,9 +497,7 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
 void BattleBotAI::OnPlayerLogin()
 {
     if (!m_initialized)
-    {
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-    }
 }
 
 void BattleBotAI::UpdateMovement()

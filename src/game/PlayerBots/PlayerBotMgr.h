@@ -72,6 +72,7 @@ class PlayerBotMgr
 
         bool addBot(PlayerBotAI* ai);
         bool addBot(uint32 playerGuid, bool chatBot=false);
+        bool deleteBot(std::map<uint32, PlayerBotEntry*>::iterator iter);
         bool deleteBot(uint32 playerGuid);
 
         bool addRandomBot();
