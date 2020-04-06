@@ -692,23 +692,24 @@ uint8 SelectRandomRaceForClass(uint8 playerClass, Team playerTeam)
     return 0;
 }
 
-bool ChatHandler::HandlePartyBotAddCommand(char* args)
+bool ChatHandler::PartyBotAddRequirementCheck(Player const* pPlayer, Player const* pTarget)
 {
-    Player* pPlayer = m_session->GetPlayer();
-    if (!pPlayer)
+    if (pPlayer->IsTaxiFlying())
+    {
+        SendSysMessage("Cannot add bots while flying.");
         return false;
+    }
 
+    // Spawning bots inside BG will cause server crash on BG end.
     if (pPlayer->InBattleGround())
     {
         SendSysMessage("Cannot add bots inside battlegrounds.");
-        SetSentErrorMessage(true);
         return false;
     }
 
     if (pPlayer->GetGroup() && pPlayer->GetGroup()->IsFull())
     {
         SendSysMessage("Cannot add more bots. Group is full.");
-        SetSentErrorMessage(true);
         return false;
     }
 
@@ -718,9 +719,73 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
             pMap->GetPlayers().getSize() >= pMap->GetMapEntry()->maxPlayers)
         {
             SendSysMessage("Cannot add more bots. Instance is full.");
-            SetSentErrorMessage(true);
             return false;
         }
+    }
+
+    if (pTarget && pTarget->GetTeam() != pPlayer->GetTeam())
+    {
+        SendSysMessage("Cannot clone enemy faction characters.");
+        return false;
+    }
+
+    // Restrictions when the command is made public to avoid abuse.
+    if (GetSession()->GetSecurity() <= SEC_PLAYER)
+    {
+        if (pPlayer->IsDead())
+        {
+            SendSysMessage("Cannot add bots while dead.");
+            return false;
+        }
+
+        if (pPlayer->IsInCombat())
+        {
+            SendSysMessage("Cannot add bots while in combat.");
+            return false;
+        }
+
+        if (pPlayer->GetMap()->IsDungeon())
+        {
+            SendSysMessage("Cannot add bots while inside instances.");
+            return false;
+        }
+
+        // Clone command.
+        if (pTarget)
+        {
+            if (pTarget->IsDead())
+            {
+                SendSysMessage("Cannot clone dead characters.");
+                return false;
+            }
+
+            if (pTarget->IsInCombat())
+            {
+                SendSysMessage("Cannot clone characters that are in combat.");
+                return false;
+            }
+
+            if (pTarget->GetLevel() > pPlayer->GetLevel() + 10)
+            {
+                SendSysMessage("Cannot clone higher level characters.");
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotAddCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    if (!pPlayer)
+        return false;
+
+    if (!PartyBotAddRequirementCheck(pPlayer, nullptr))
+    {
+        SetSentErrorMessage(true);
+        return false;
     }
 
     if (!args)
@@ -802,35 +867,16 @@ bool ChatHandler::HandlePartyBotCloneCommand(char* args)
     if (!pPlayer)
         return false;
 
-    if (pPlayer->InBattleGround())
-    {
-        SendSysMessage("Cannot add bots inside battlegrounds.");
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    if (pPlayer->GetGroup() && pPlayer->GetGroup()->IsFull())
-    {
-        SendSysMessage("Cannot add more bots. Group is full.");
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    if (Map const* pMap = pPlayer->GetMap())
-    {
-        if (pMap->IsDungeon() &&
-            pMap->GetPlayers().getSize() >= pMap->GetMapEntry()->maxPlayers)
-        {
-            SendSysMessage("Cannot add more bots. Instance is full.");
-            SetSentErrorMessage(true);
-            return false;
-        }
-    }
-
     Player* pTarget = GetSelectedPlayer();
-    if (!pTarget || (pTarget->GetTeam() != pPlayer->GetTeam()))
+    if (!pTarget)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (!PartyBotAddRequirementCheck(pPlayer, pTarget))
+    {
         SetSentErrorMessage(true);
         return false;
     }
