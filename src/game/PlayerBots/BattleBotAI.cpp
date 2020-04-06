@@ -215,7 +215,7 @@ bool BattleBotAI::AttackStart(Unit* pVictim)
         else if (me->HasDistanceCasterMovement())
             me->SetCasterChaseDistance(0.0f);
 
-        me->GetMotionMaster()->MoveChase(pVictim, 1.0f, IsMeleeDamageClass(me->GetClass()) ? 3.0f : 0.0f);
+        me->GetMotionMaster()->MoveChase(pVictim, 1.0f, m_role == ROLE_MELEE_DPS ? 3.0f : 0.0f);
         return true;
     }
 

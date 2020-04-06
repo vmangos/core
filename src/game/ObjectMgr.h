@@ -567,6 +567,7 @@ struct PlayerPremadeGearTemplate
     uint32 entry = 0;
     uint8 level = 0;
     uint8 requiredClass = 0;
+    CombatBotRoles role = ROLE_INVALID;
     std::string name;
     std::vector<PlayerPremadeItem> items;
 };
@@ -575,6 +576,7 @@ struct PlayerPremadeSpecTemplate
     uint32 entry = 0;
     uint8 level = 0;
     uint8 requiredClass = 0;
+    CombatBotRoles role = ROLE_INVALID;
     std::string name;
     std::vector<uint32> spells;
 };
