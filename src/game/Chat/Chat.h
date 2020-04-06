@@ -667,6 +667,7 @@ class MANGOS_DLL_SPEC ChatHandler
         //----------------------------------------------------------
 
         bool HandleUnitAIInfoCommand(char* args);
+        bool HandleUnitInfoCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);

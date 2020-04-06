@@ -51,7 +51,7 @@ public:
 
     bool DrinkAndEat();
     void AddPremadeGearAndSpells();
-    void AttackStart(Unit* pVictim);
+    bool AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget() const;
     Unit* SelectFollowTarget() const;
 

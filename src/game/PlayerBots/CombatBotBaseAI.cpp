@@ -373,6 +373,36 @@ void CombatBotBaseAI::PopulateSpellData()
                         pSealOfFury->Id < pSpellEntry->Id)
                         pSealOfFury = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Holy Shock") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pHolyShock ||
+                        m_spells.paladin.pHolyShock->Id < pSpellEntry->Id)
+                        m_spells.paladin.pHolyShock = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Divine Favor") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pDivineFavor ||
+                        m_spells.paladin.pDivineFavor->Id < pSpellEntry->Id)
+                        m_spells.paladin.pDivineFavor = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Holy Wrath") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pHolyWrath ||
+                        m_spells.paladin.pHolyWrath->Id < pSpellEntry->Id)
+                        m_spells.paladin.pHolyWrath = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Turn Evil") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pTurnEvil ||
+                        m_spells.paladin.pTurnEvil->Id < pSpellEntry->Id)
+                        m_spells.paladin.pTurnEvil = pSpellEntry;
+                }
+                else if (pSpellEntry->SpellName[0].find("Holy Shield") != std::string::npos)
+                {
+                    if (!m_spells.paladin.pHolyShield ||
+                        m_spells.paladin.pHolyShield->Id < pSpellEntry->Id)
+                        m_spells.paladin.pHolyShield = pSpellEntry;
+                }
                 break;
             }
             case CLASS_SHAMAN:
@@ -2373,6 +2403,7 @@ SpellCastResult CombatBotBaseAI::DoCastSpell(Unit* pTarget, SpellEntry const* pS
         me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     me->SetTargetGuid(pTarget->GetObjectGuid());
+    me->m_castingSpell = (me->GetClass() == CLASS_ROGUE) ? me->GetComboPoints() : pSpellEntry->Id;
     auto result = me->CastSpell(pTarget, pSpellEntry, false);
 
     printf("cast %s result %u\n", pSpellEntry->SpellName[0].c_str(), result);

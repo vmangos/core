@@ -75,6 +75,9 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
             me->LearnSpell(spell.first, false, (firstRankId == spell.first && GetTalentSpellPos(firstRankId)));
     }
 
+    me->GetHonorMgr().SetHighestRank(pPlayer->GetHonorMgr().GetHighestRank());
+    me->GetHonorMgr().SetRank(pPlayer->GetHonorMgr().GetRank());
+
     // Unequip current gear
     for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
         me->AutoUnequipItemFromSlot(i);
@@ -175,7 +178,7 @@ bool PartyBotAI::DrinkAndEat()
     return needToEat || needToDrink;
 }
 
-void PartyBotAI::AttackStart(Unit* pVictim)
+bool PartyBotAI::AttackStart(Unit* pVictim)
 {
     m_isBuffing = false;
 
@@ -192,7 +195,10 @@ void PartyBotAI::AttackStart(Unit* pVictim)
             me->SetCasterChaseDistance(0.0f);
 
         me->GetMotionMaster()->MoveChase(pVictim, 1.0f, IsMeleeDamageClass(me->GetClass()) ? 3.0f : 0.0f);
+        return true;
     }
+
+    return false;
 }
 
 Unit* PartyBotAI::SelectAttackTarget(Player* pLeader) const
@@ -625,6 +631,12 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
         else
         {
+            if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
+               (m_role == ROLE_MELEE_DPS || m_role == ROLE_TANK) &&
+                IsValidHostileTarget(pVictim) &&
+                AttackStart(pVictim))
+                return;
+
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
                 me->GetMotionMaster()->MoveChase(pVictim);
         }
@@ -775,6 +787,10 @@ void PartyBotAI::UpdateOutOfCombatAI_Paladin()
     {
         m_isBuffing = false;
     }
+
+    if (m_role == ROLE_HEALER &&
+        FindAndHealInjuredAlly())
+        return;
 }
 
 void PartyBotAI::UpdateInCombatAI_Paladin()
@@ -825,9 +841,45 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
         }
     }
 
+    if (!me->GetAttackers().empty())
+    {
+        if (m_spells.paladin.pHolyShield &&
+            CanTryToCastSpell(me, m_spells.paladin.pHolyShield))
+        {
+            if (DoCastSpell(me, m_spells.paladin.pHolyShield) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (m_spells.paladin.pTurnEvil &&
+            m_role != ROLE_TANK)
+        {
+            Unit* pAttacker = SelectAttackerDifferentFrom(me->GetVictim());
+            if (pAttacker && pAttacker->GetCreatureType() == CREATURE_TYPE_UNDEAD &&
+                CanTryToCastSpell(pAttacker, m_spells.paladin.pTurnEvil))
+            {
+                if (DoCastSpell(pAttacker, m_spells.paladin.pTurnEvil) == SPELL_CAST_OK)
+                    return;
+            }
+        }
+    }
+
     if (m_role == ROLE_HEALER)
     {
-        if (FindAndHealInjuredAlly(80.0f))
+        if (m_spells.paladin.pHolyShock &&
+            me->GetHealthPercent() < 50.0f &&
+            CanTryToCastSpell(me, m_spells.paladin.pHolyShock))
+        {
+            if (m_spells.paladin.pDivineFavor &&
+                CanTryToCastSpell(me, m_spells.paladin.pDivineFavor))
+            {
+                DoCastSpell(me, m_spells.paladin.pDivineFavor);
+            }
+
+            if (DoCastSpell(me, m_spells.paladin.pHolyShock) == SPELL_CAST_OK)
+                return;
+        }
+
+        if (FindAndHealInjuredAlly(80.0f, 90.0f))
             return;
     }
     else
@@ -874,10 +926,22 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
                     return;
             }
             if (m_spells.paladin.pConsecration &&
-                (GetAttackersInRangeCount(10.0f) > 2) &&
+               (GetAttackersInRangeCount(10.0f) > 2) &&
                 CanTryToCastSpell(me, m_spells.paladin.pConsecration))
             {
                 if (DoCastSpell(me, m_spells.paladin.pConsecration) == SPELL_CAST_OK)
+                    return;
+            }
+            if (m_spells.paladin.pHolyShock &&
+                CanTryToCastSpell(pVictim, m_spells.paladin.pHolyShock))
+            {
+                if (m_spells.paladin.pDivineFavor &&
+                    CanTryToCastSpell(me, m_spells.paladin.pDivineFavor))
+                {
+                    DoCastSpell(me, m_spells.paladin.pDivineFavor);
+                }
+
+                if (DoCastSpell(pVictim, m_spells.paladin.pHolyShock) == SPELL_CAST_OK)
                     return;
             }
             if (m_spells.paladin.pExorcism &&
@@ -886,6 +950,16 @@ void PartyBotAI::UpdateInCombatAI_Paladin()
                 CanTryToCastSpell(pVictim, m_spells.paladin.pExorcism))
             {
                 if (DoCastSpell(pVictim, m_spells.paladin.pExorcism) == SPELL_CAST_OK)
+                    return;
+            }
+            if (m_spells.paladin.pHolyWrath &&
+                pVictim->IsCreature() &&
+               (pVictim->GetCreatureType() == CREATURE_TYPE_UNDEAD ||
+                pVictim->GetCreatureType() == CREATURE_TYPE_DEMON) &&
+               (me->GetAttackers().size() < 3) && // too much pushback
+                CanTryToCastSpell(pVictim, m_spells.paladin.pHolyWrath))
+            {
+                if (DoCastSpell(pVictim, m_spells.paladin.pHolyWrath) == SPELL_CAST_OK)
                     return;
             }
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
@@ -926,7 +1000,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Shaman()
     }
 
     if (m_role == ROLE_HEALER &&
-        FindAndHealInjuredAlly(90.0f))
+        FindAndHealInjuredAlly())
         return;
 
     if (me->GetVictim())
@@ -1043,7 +1117,7 @@ void PartyBotAI::UpdateInCombatAI_Shaman()
     }
 
     if (m_role == ROLE_HEALER)
-        FindAndHealInjuredAlly(50.0f);
+        FindAndHealInjuredAlly(50.0f, 90.0f);
     else if (me->GetHealthPercent() < 20.0f)
         HealInjuredTarget(me);
 }
@@ -1575,7 +1649,7 @@ void PartyBotAI::UpdateOutOfCombatAI_Priest()
     }
 
     if (m_role == ROLE_HEALER &&
-        FindAndHealInjuredAlly(90.0f))
+        FindAndHealInjuredAlly())
         return;
 
     if (me->GetVictim())
@@ -2530,8 +2604,8 @@ void PartyBotAI::UpdateOutOfCombatAI_Druid()
         if (EnterCombatDruidForm())
             return;
 
-        if ((me->GetPowerPercent(POWER_MANA) >  80.0f) &&
-            FindAndHealInjuredAlly(80.0f))
+        if ((me->GetPowerPercent(POWER_MANA) > 80.0f) &&
+            FindAndHealInjuredAlly())
             return;
     }
     else if (me->GetShapeshiftForm() == FORM_CAT)

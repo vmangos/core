@@ -37,7 +37,7 @@ public:
     void LearnPremadeSpecForClass();
 
     Player* GetPartyLeader() const;
-    void AttackStart(Unit* pVictim);
+    bool AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget(Player* pLeader) const;
     Unit* SelectPartyAttackTarget() const;
     Player* SelectResurrectionTarget() const;

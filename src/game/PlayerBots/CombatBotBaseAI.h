@@ -223,6 +223,11 @@ public:
             SpellEntry const* pDivineShield;
             SpellEntry const* pLayOnHands;
             SpellEntry const* pRighteousFury;
+            SpellEntry const* pHolyShock;
+            SpellEntry const* pDivineFavor;
+            SpellEntry const* pHolyWrath;
+            SpellEntry const* pTurnEvil;
+            SpellEntry const* pHolyShield;
         } paladin;
         struct
         {

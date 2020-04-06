@@ -598,6 +598,7 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand unitCommandTable[] =
     {
         { "aiinfo",         SEC_MODERATOR,      false, &ChatHandler::HandleUnitAIInfoCommand,          "", nullptr },
+        { "info",           SEC_MODERATOR,      false, &ChatHandler::HandleUnitInfoCommand,            "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 

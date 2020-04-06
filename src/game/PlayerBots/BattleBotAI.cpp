@@ -197,7 +197,7 @@ bool BattleBotAI::DrinkAndEat()
     return needToEat || needToDrink;
 }
 
-void BattleBotAI::AttackStart(Unit* pVictim)
+bool BattleBotAI::AttackStart(Unit* pVictim)
 {
     m_isBuffing = false;
 
@@ -216,7 +216,10 @@ void BattleBotAI::AttackStart(Unit* pVictim)
             me->SetCasterChaseDistance(0.0f);
 
         me->GetMotionMaster()->MoveChase(pVictim, 1.0f, IsMeleeDamageClass(me->GetClass()) ? 3.0f : 0.0f);
+        return true;
     }
+
+    return false;
 }
 
 Unit* BattleBotAI::SelectAttackTarget() const
@@ -606,6 +609,240 @@ void BattleBotAI::OnLeaveBattleGround()
     me->GetMotionMaster()->MoveIdle();
 }
 
+void BattleBotAI::UpdateAI(uint32 const diff)
+{
+    m_updateTimer.Update(diff);
+    if (m_updateTimer.Passed())
+        m_updateTimer.Reset(BB_UPDATE_INTERVAL);
+    else
+        return;
+
+    if (!me->IsInWorld() || me->IsBeingTeleported() || m_doingGraveyardJump)
+        return;
+
+    if (!m_initialized)
+    {
+        ResetSpellData();
+        AddPremadeGearAndSpells();
+        AutoAssignRole();
+        PopulateSpellData();
+        AddAllSpellReagents();
+        me->UpdateSkillsToMaxSkillsForLevel();
+        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        SummonPetIfNeeded();
+        me->SetHealthPercent(100.0f);
+        me->SetPowerPercent(me->GetPowerType(), 100.0f);
+        m_initialized = true;
+        return;
+    }
+
+    if (!me->InBattleGround())
+    {
+        if (m_wasInBG)
+        {
+            m_wasInBG = false;
+            OnLeaveBattleGround();
+            return;
+        }
+
+        if (m_receivedBgInvite)
+        {
+            SendFakePacket(CMSG_BATTLEFIELD_PORT);
+            m_receivedBgInvite = false;
+            return;
+        }
+
+        if (!me->InBattleGroundQueue())
+        {
+            switch (m_battlegroundId)
+            {
+                case BATTLEGROUND_QUEUE_AV:
+                    ChatHandler(me).HandleGoAlteracCommand("");
+                    break;
+                case BATTLEGROUND_QUEUE_WS:
+                    ChatHandler(me).HandleGoWarsongCommand("");
+                    break;
+                case BATTLEGROUND_QUEUE_AB:
+                    ChatHandler(me).HandleGoArathiCommand("");
+                    break;
+                default:
+                    sLog.outError("BattleBot: Invalid BG queue type!");
+                    botEntry->requestRemoval = true;
+                    return;
+            }
+
+            SendFakePacket(CMSG_BATTLEMASTER_JOIN);
+            return;
+        }
+
+        // Remain idle until we can join battleground.
+        return;
+    }
+    else
+    {
+        if (!m_wasInBG)
+        {
+            m_wasInBG = true;
+            OnEnterBattleGround();
+            return;
+        }
+    }
+    
+    if (me->IsDead())
+    {
+        if (!m_wasDead)
+        {
+            m_wasDead = true;
+            OnJustDied();
+            return;
+        }
+        
+        if (me->InBattleGround())
+        {
+            if (me->GetDeathState() == CORPSE)
+            {
+                me->BuildPlayerRepop();
+                me->RepopAtGraveyard();
+            }
+        }
+        else
+        {
+            if (me->GetDeathState() == DEAD)
+            {
+                me->ResurrectPlayer(0.5f);
+                me->SpawnCorpseBones();
+                //me->SendCreateUpdateToPlayer(pLeader);
+            }
+        }
+        
+        return;
+    }
+    else
+    {
+        if (m_wasDead)
+        {
+            m_wasDead = false;
+            OnJustRevived();
+            return;
+        }
+    }
+
+    if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+        return;
+
+    if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+    {
+        // Stop auto shot if no target.
+        if (!me->GetVictim())
+            me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+        else if (me->GetClass() == CLASS_HUNTER)
+        {
+            if (me->GetVictim())
+            {
+                if (me->GetCombatDistance(me->GetVictim()) < 8.0f)
+                    me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+                else
+                    UpdateInCombatAI_Hunter();
+            }
+        }
+
+        return;
+    }
+
+    if (me->IsNonMeleeSpellCasted(false, false, true))
+        return;
+
+    if (me->GetTargetGuid() == me->GetObjectGuid())
+        me->ClearTarget();
+
+    Unit* pVictim = me->GetVictim();
+
+    if (!me->IsInCombat())
+    {
+        if (DrinkAndEat())
+            return;
+
+        if (me->GetStandState() != UNIT_STAND_STATE_STAND)
+            me->SetStandState(UNIT_STAND_STATE_STAND);
+
+        UpdateOutOfCombatAI();
+
+        if (m_isBuffing)
+            return;
+
+        // Can enter combat from UpdateOutOfCombatAI().
+        if (me->IsInCombat())
+            return;
+
+        if (me->IsNonMeleeSpellCasted())
+            return;
+
+        if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
+        {
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
+            {
+                if (Unit* pFlagCarrier = SelectFollowTarget())
+                {
+                    ClearPath();
+                    me->GetMotionMaster()->MoveFollow(pFlagCarrier, frand(3.0f, 5.0f), frand(0.0f, 3.0f));
+                    return;
+                }
+            }
+            else if (FollowMovementGenerator<Player> const* pMoveGen = dynamic_cast<FollowMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent()))
+            {
+                Unit* pTarget = pMoveGen->GetTarget();
+                if (!pTarget || !pTarget->IsAlive() || !pTarget->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
+                {
+                    if (!me->IsStopped())
+                        me->StopMoving();
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveIdle();
+                    return;
+                }
+            }
+
+            if (Unit* pVictim = SelectAttackTarget())
+            {
+                AttackStart(pVictim);
+                return;
+            }
+            
+            UpdateMovement();
+        }
+        return;
+    }
+
+    if (me->GetStandState() != UNIT_STAND_STATE_STAND)
+        me->SetStandState(UNIT_STAND_STATE_STAND);
+
+    if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura() || 
+        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
+    {
+        if (pVictim = SelectAttackTarget())
+        {
+            AttackStart(pVictim);
+            return;
+        }
+    }
+    else
+    {
+        if (!me->HasInArc(2 * M_PI_F / 3, pVictim) && !me->IsMoving())
+        {
+            me->SetInFront(pVictim);
+            me->SendMovementPacket(MSG_MOVE_SET_FACING, false);
+        }
+
+        if (!me->HasUnitState(UNIT_STAT_MELEE_ATTACKING) &&
+           (m_role != ROLE_HEALER) &&
+            IsValidHostileTarget(pVictim) &&
+            AttackStart(pVictim))
+            return;
+    }
+
+    if (me->IsInCombat())
+        UpdateInCombatAI();
+}
+
 void BattleBotAI::UpdateOutOfCombatAI()
 {
     switch (me->GetClass())
@@ -704,6 +941,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Paladin()
     {
         m_isBuffing = false;
     }
+
+    FindAndHealInjuredAlly();
 }
 
 void BattleBotAI::UpdateInCombatAI_Paladin()
@@ -749,11 +988,30 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
             if (DoCastSpell(pVictim, m_spells.paladin.pHammerOfWrath) == SPELL_CAST_OK)
                 return;
         }
+        if (m_spells.paladin.pHolyShield &&
+            CanTryToCastSpell(me, m_spells.paladin.pHolyShield) &&
+           (IsMeleeDamageClass(pVictim->GetClass()) || (GetAttackersInRangeCount(8.0f) > 1)))
+        {
+            if (DoCastSpell(me, m_spells.paladin.pHolyShield) == SPELL_CAST_OK)
+                return;
+        }
         if (m_spells.paladin.pConsecration &&
            (GetAttackersInRangeCount(10.0f) > 2) &&
             CanTryToCastSpell(me, m_spells.paladin.pConsecration))
         {
             if (DoCastSpell(me, m_spells.paladin.pConsecration) == SPELL_CAST_OK)
+                return;
+        }
+        if (m_spells.paladin.pHolyShock &&
+            CanTryToCastSpell(pVictim, m_spells.paladin.pHolyShock))
+        {
+            if (m_spells.paladin.pDivineFavor &&
+                CanTryToCastSpell(me, m_spells.paladin.pDivineFavor))
+            {
+                DoCastSpell(me, m_spells.paladin.pDivineFavor);
+            }
+
+            if (DoCastSpell(pVictim, m_spells.paladin.pHolyShock) == SPELL_CAST_OK)
                 return;
         }
         if (m_spells.paladin.pExorcism &&
@@ -764,8 +1022,8 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
             if (DoCastSpell(pVictim, m_spells.paladin.pExorcism) == SPELL_CAST_OK)
                 return;
         }
-        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE
-            && !me->CanReachWithMeleeAutoAttack(pVictim))
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE &&
+           !me->CanReachWithMeleeAutoAttack(pVictim))
         {
             me->GetMotionMaster()->MoveChase(pVictim);
         }
@@ -807,17 +1065,9 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
 
     if (m_spells.paladin.pCleanse)
     {
-        if (IsValidDispelTarget(me, m_spells.paladin.pCleanse) &&
-            CanTryToCastSpell(me, m_spells.paladin.pCleanse))
+        if (Unit* pFriend = SelectDispelTarget(m_spells.paladin.pCleanse))
         {
-            if (DoCastSpell(me, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
-                return;
-        }
-
-        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-        {
-            if (IsValidDispelTarget(pFriend, m_spells.paladin.pCleanse) &&
-                CanTryToCastSpell(pFriend, m_spells.paladin.pCleanse))
+            if (CanTryToCastSpell(pFriend, m_spells.paladin.pCleanse))
             {
                 if (DoCastSpell(pFriend, m_spells.paladin.pCleanse) == SPELL_CAST_OK)
                     return;
@@ -825,7 +1075,7 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
         }
     }
 
-    FindAndHealInjuredAlly(40.0f);
+    FindAndHealInjuredAlly(40.0f, 50.0f);
 }
 
 void BattleBotAI::UpdateOutOfCombatAI_Shaman()
@@ -1452,41 +1702,42 @@ void BattleBotAI::UpdateInCombatAI_Priest()
     // Dispels
     if (m_spells.priest.pDispelMagic)
     {
-        if (IsValidDispelTarget(me, m_spells.priest.pDispelMagic) &&
-            CanTryToCastSpell(me, m_spells.priest.pDispelMagic))
+        if (m_role == ROLE_HEALER)
+        {
+            if (Unit* pFriend = SelectDispelTarget(m_spells.priest.pDispelMagic))
+            {
+                if (CanTryToCastSpell(pFriend, m_spells.priest.pDispelMagic))
+                {
+                    if (DoCastSpell(pFriend, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+        }
+        else if (IsValidDispelTarget(me, m_spells.priest.pDispelMagic) &&
+                 CanTryToCastSpell(me, m_spells.priest.pDispelMagic))
         {
             if (DoCastSpell(me, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
                 return;
         }
-
-        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-        {
-            if (IsValidDispelTarget(pFriend, m_spells.priest.pDispelMagic) &&
-                CanTryToCastSpell(pFriend, m_spells.priest.pDispelMagic))
-            {
-                if (DoCastSpell(pFriend, m_spells.priest.pDispelMagic) == SPELL_CAST_OK)
-                    return;
-            }
-        }
     }
-
     if (m_spells.priest.pAbolishDisease)
     {
-        if (IsValidDispelTarget(me, m_spells.priest.pAbolishDisease) &&
-            CanTryToCastSpell(me, m_spells.priest.pAbolishDisease))
+        if (m_role == ROLE_HEALER)
+        {
+            if (Unit* pFriend = SelectDispelTarget(m_spells.priest.pAbolishDisease))
+            {
+                if (CanTryToCastSpell(pFriend, m_spells.priest.pAbolishDisease))
+                {
+                    if (DoCastSpell(pFriend, m_spells.priest.pAbolishDisease) == SPELL_CAST_OK)
+                        return;
+                }
+            }
+        }
+        else if (IsValidDispelTarget(me, m_spells.priest.pAbolishDisease) &&
+                 CanTryToCastSpell(me, m_spells.priest.pAbolishDisease))
         {
             if (DoCastSpell(me, m_spells.priest.pAbolishDisease) == SPELL_CAST_OK)
                 return;
-        }
-
-        if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-        {
-            if (IsValidDispelTarget(pFriend, m_spells.priest.pAbolishDisease) &&
-                CanTryToCastSpell(pFriend, m_spells.priest.pAbolishDisease))
-            {
-                if (DoCastSpell(pFriend, m_spells.priest.pAbolishDisease) == SPELL_CAST_OK)
-                    return;
-            }
         }
     }
 
@@ -2347,10 +2598,6 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
 
     if (me->GetVictim())
     {
-        if (m_spells.druid.pTravelForm &&
-            me->GetShapeshiftForm() == FORM_TRAVEL)
-            me->RemoveAurasDueToSpellByCancel(m_spells.druid.pTravelForm->Id);
-
         if (m_spells.druid.pMoonkinForm &&
             CanTryToCastSpell(me, m_spells.druid.pMoonkinForm))
         {
@@ -2367,7 +2614,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
             me->RemoveAurasDueToSpellByCancel(m_spells.druid.pMoonkinForm->Id);
 
         if (m_spells.druid.pTravelForm &&
-            !me->IsMoving() &&
+           !me->IsMoving() &&
             CanTryToCastSpell(me, m_spells.druid.pTravelForm))
         {
             if (DoCastSpell(me, m_spells.druid.pTravelForm) == SPELL_CAST_OK)
@@ -2403,25 +2650,26 @@ void BattleBotAI::UpdateInCombatAI_Druid()
        SpellEntry const* pDispelSpell = m_spells.druid.pAbolishPoison ?
                                          m_spells.druid.pAbolishPoison :
                                          m_spells.druid.pCurePoison;
-        if (pDispelSpell)
-        {
-            if (IsValidDispelTarget(me, pDispelSpell) &&
-                CanTryToCastSpell(me, pDispelSpell))
-            {
-                if (DoCastSpell(me, pDispelSpell) == SPELL_CAST_OK)
-                    return;
-            }
-
-            if (Unit* pFriend = me->FindFriendlyUnitCC(30.0f))
-            {
-                if (IsValidDispelTarget(pFriend, pDispelSpell) &&
-                    CanTryToCastSpell(pFriend, pDispelSpell))
-                {
-                    if (DoCastSpell(pFriend, pDispelSpell) == SPELL_CAST_OK)
-                        return;
-                }
-            }
-        }
+       if (pDispelSpell)
+       {
+           if (m_role == ROLE_HEALER)
+           {
+               if (Unit* pFriend = SelectDispelTarget(pDispelSpell))
+               {
+                   if (CanTryToCastSpell(pFriend, pDispelSpell))
+                   {
+                       if (DoCastSpell(pFriend, pDispelSpell) == SPELL_CAST_OK)
+                           return;
+                   }
+               }
+           }
+           else if (IsValidDispelTarget(me, pDispelSpell) &&
+                    CanTryToCastSpell(me, pDispelSpell))
+           {
+               if (DoCastSpell(me, pDispelSpell) == SPELL_CAST_OK)
+                   return;
+           }
+       }
 
         if (m_spells.druid.pInnervate &&
             me->GetVictim() &&
@@ -2708,230 +2956,4 @@ void BattleBotAI::UpdateInCombatAI_Druid()
             }
         }
     }
-}
-
-void BattleBotAI::UpdateAI(uint32 const diff)
-{
-    m_updateTimer.Update(diff);
-    if (m_updateTimer.Passed())
-        m_updateTimer.Reset(BB_UPDATE_INTERVAL);
-    else
-        return;
-
-    if (!me->IsInWorld() || me->IsBeingTeleported() || m_doingGraveyardJump)
-        return;
-
-    if (!m_initialized)
-    {
-        ResetSpellData();
-        AddPremadeGearAndSpells();
-        AutoAssignRole();
-        PopulateSpellData();
-        AddAllSpellReagents();
-        me->UpdateSkillsToMaxSkillsForLevel();
-        me->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        SummonPetIfNeeded();
-        me->SetHealthPercent(100.0f);
-        me->SetPowerPercent(me->GetPowerType(), 100.0f);
-        m_initialized = true;
-        return;
-    }
-
-    if (!me->InBattleGround())
-    {
-        if (m_wasInBG)
-        {
-            m_wasInBG = false;
-            OnLeaveBattleGround();
-            return;
-        }
-
-        if (m_receivedBgInvite)
-        {
-            SendFakePacket(CMSG_BATTLEFIELD_PORT);
-            m_receivedBgInvite = false;
-            return;
-        }
-
-        if (!me->InBattleGroundQueue())
-        {
-            switch (m_battlegroundId)
-            {
-                case BATTLEGROUND_QUEUE_AV:
-                    ChatHandler(me).HandleGoAlteracCommand("");
-                    break;
-                case BATTLEGROUND_QUEUE_WS:
-                    ChatHandler(me).HandleGoWarsongCommand("");
-                    break;
-                case BATTLEGROUND_QUEUE_AB:
-                    ChatHandler(me).HandleGoArathiCommand("");
-                    break;
-                default:
-                    sLog.outError("BattleBot: Invalid BG queue type!");
-                    botEntry->requestRemoval = true;
-                    return;
-            }
-
-            SendFakePacket(CMSG_BATTLEMASTER_JOIN);
-            return;
-        }
-
-        // Remain idle until we can join battleground.
-        return;
-    }
-    else
-    {
-        if (!m_wasInBG)
-        {
-            m_wasInBG = true;
-            OnEnterBattleGround();
-            return;
-        }
-    }
-    
-    if (me->IsDead())
-    {
-        if (!m_wasDead)
-        {
-            m_wasDead = true;
-            OnJustDied();
-            return;
-        }
-        
-        if (me->InBattleGround())
-        {
-            if (me->GetDeathState() == CORPSE)
-            {
-                me->BuildPlayerRepop();
-                me->RepopAtGraveyard();
-            }
-        }
-        else
-        {
-            if (me->GetDeathState() == DEAD)
-            {
-                me->ResurrectPlayer(0.5f);
-                me->SpawnCorpseBones();
-                //me->SendCreateUpdateToPlayer(pLeader);
-            }
-        }
-        
-        return;
-    }
-    else
-    {
-        if (m_wasDead)
-        {
-            m_wasDead = false;
-            OnJustRevived();
-            return;
-        }
-    }
-
-    if (me->HasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-        return;
-
-    if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
-    {
-        // Stop auto shot if no target.
-        if (!me->GetVictim())
-            me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
-        else if (me->GetClass() == CLASS_HUNTER)
-        {
-            if (me->GetVictim())
-            {
-                if (me->GetCombatDistance(me->GetVictim()) < 8.0f)
-                    me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
-                else
-                    UpdateInCombatAI_Hunter();
-            }
-        }
-
-        return;
-    }
-
-    if (me->IsNonMeleeSpellCasted(false, false, true))
-        return;
-
-    if (me->GetTargetGuid() == me->GetObjectGuid())
-        me->ClearTarget();
-
-    Unit* pVictim = me->GetVictim();
-
-    if (!me->IsInCombat())
-    {
-        if (DrinkAndEat())
-            return;
-
-        if (me->GetStandState() != UNIT_STAND_STATE_STAND)
-            me->SetStandState(UNIT_STAND_STATE_STAND);
-
-        UpdateOutOfCombatAI();
-
-        if (m_isBuffing)
-            return;
-
-        // Can enter combat from UpdateOutOfCombatAI().
-        if (me->IsInCombat())
-            return;
-
-        if (me->IsNonMeleeSpellCasted())
-            return;
-
-        if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
-        {
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
-            {
-                if (Unit* pFlagCarrier = SelectFollowTarget())
-                {
-                    ClearPath();
-                    me->GetMotionMaster()->MoveFollow(pFlagCarrier, frand(3.0f, 5.0f), frand(0.0f, 3.0f));
-                    return;
-                }
-            }
-            else if (FollowMovementGenerator<Player> const* pMoveGen = dynamic_cast<FollowMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent()))
-            {
-                Unit* pTarget = pMoveGen->GetTarget();
-                if (!pTarget || !pTarget->IsAlive() || !pTarget->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
-                {
-                    if (!me->IsStopped())
-                        me->StopMoving();
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveIdle();
-                    return;
-                }
-            }
-
-            if (Unit* pVictim = SelectAttackTarget())
-            {
-                AttackStart(pVictim);
-                return;
-            }
-            
-            UpdateMovement();
-        }
-        return;
-    }
-
-    if (me->GetStandState() != UNIT_STAND_STATE_STAND)
-        me->SetStandState(UNIT_STAND_STATE_STAND);
-
-    if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura() || 
-        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
-    {
-        if (pVictim = SelectAttackTarget())
-        {
-            AttackStart(pVictim);
-            return;
-        }
-    }
-
-    if (pVictim && !me->HasInArc(2 * M_PI_F / 3, pVictim) && !me->IsMoving())
-    {
-        me->SetInFront(pVictim);
-        me->SendMovementPacket(MSG_MOVE_SET_FACING, false);
-    }
-
-    if (me->IsInCombat())
-        UpdateInCombatAI();
 }

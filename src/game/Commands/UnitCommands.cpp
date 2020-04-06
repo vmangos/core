@@ -251,6 +251,82 @@ bool ChatHandler::HandleUnitAIInfoCommand(char* args)
     return HandleCharacterAIInfoCommand(args);
 }
 
+bool ChatHandler::HandleUnitInfoCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Unit info for %s", pTarget->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("Victim: %s", pTarget->GetVictim() ? pTarget->GetVictim()->GetObjectGuid().GetString().c_str() : ObjectGuid().GetString().c_str());
+    PSendSysMessage("Charm: %s", pTarget->GetCharmGuid().GetString().c_str());
+    PSendSysMessage("Summon: %s", pTarget->GetGuidValue(UNIT_FIELD_SUMMON).GetString().c_str());
+    PSendSysMessage("Charmed by: %s", pTarget->GetCharmerGuid().GetString().c_str());
+    PSendSysMessage("Summoned by: %s", pTarget->GetGuidValue(UNIT_FIELD_SUMMONEDBY).GetString().c_str());
+    PSendSysMessage("Created by: %s", pTarget->GetGuidValue(UNIT_FIELD_CREATEDBY).GetString().c_str());
+    PSendSysMessage("Target: %s", pTarget->GetTargetGuid().GetString().c_str());
+    PSendSysMessage("Persuaded: %s", pTarget->GetGuidValue(UNIT_FIELD_PERSUADED).GetString().c_str());
+    PSendSysMessage("Channel object: %s", pTarget->GetChannelObjectGuid().GetString().c_str());
+    /*
+    PSendSysMessage("Health: %u", pTarget->GetHealth());
+    PSendSysMessage("Max Health: %u", pTarget->GetMaxHealth());
+    PSendSysMessage("Power type: %hhu", pTarget->GetPowerType());
+    PSendSysMessage("Mana: %u", pTarget->GetPower(POWER_MANA));
+    PSendSysMessage("Max Mana: %u", pTarget->GetMaxPower(POWER_MANA));
+    PSendSysMessage("Rage: %u", pTarget->GetPower(POWER_RAGE));
+    PSendSysMessage("Max Rage: %u", pTarget->GetMaxPower(POWER_RAGE));
+    PSendSysMessage("Focus: %u", pTarget->GetPower(POWER_FOCUS));
+    PSendSysMessage("Max Focus: %u", pTarget->GetMaxPower(POWER_FOCUS));
+    PSendSysMessage("Energy: %u", pTarget->GetPower(POWER_ENERGY));
+    PSendSysMessage("Max Energy: %u", pTarget->GetMaxPower(POWER_ENERGY));
+    PSendSysMessage("Happiness: %u", pTarget->GetPower(POWER_HAPPINESS));
+    PSendSysMessage("Max Happiness: %u", pTarget->GetMaxPower(POWER_HAPPINESS));
+    */
+    PSendSysMessage("Level: %u", pTarget->GetLevel());
+    if (auto pFactionTemplate = pTarget->getFactionTemplateEntry())
+    {
+        if (auto pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction))
+            PSendSysMessage("Faction template: %u - %s", pTarget->GetFactionTemplateId(), pFaction->name[0].c_str());
+    }
+    else
+        PSendSysMessage("Faction template: %u", pTarget->GetFactionTemplateId());
+    PSendSysMessage("Race: %hhu", pTarget->GetRace());
+    PSendSysMessage("Class: %hhu", pTarget->GetClass());
+    PSendSysMessage("Gender: %hhu", pTarget->GetGender());
+    PSendSysMessage("Unit flags: %u", pTarget->GetUInt32Value(UNIT_FIELD_FLAGS));
+    PSendSysMessage("Aura state: %u", pTarget->GetUInt32Value(UNIT_FIELD_AURASTATE));
+    PSendSysMessage("Bounding radius: %f", pTarget->GetObjectBoundingRadius());
+    PSendSysMessage("Combat reach: %f", pTarget->GetCombatReach());
+    PSendSysMessage("Display id: %u", pTarget->GetDisplayId());
+    PSendSysMessage("Native display id: %u", pTarget->GetNativeDisplayId());
+    PSendSysMessage("Mount display id: %u", pTarget->GetMountID());
+    PSendSysMessage("Stand state: %hhu", pTarget->GetStandState());
+    PSendSysMessage("Loyalty level: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_1, 1));
+    PSendSysMessage("Shapeshift form: %hhu", pTarget->GetShapeshiftForm());
+    PSendSysMessage("Byte flags: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_1, 3));
+    PSendSysMessage("Dynamic flags: %u", pTarget->GetUInt32Value(UNIT_DYNAMIC_FLAGS));
+    if (auto pSpellEntry = sSpellMgr.GetSpellEntry(pTarget->GetUInt32Value(UNIT_CHANNEL_SPELL)))
+        PSendSysMessage("Channel spell: %u - %s", pTarget->GetUInt32Value(UNIT_CHANNEL_SPELL), pSpellEntry->SpellName[0].c_str());
+    else
+        PSendSysMessage("Channel spell: %u", pTarget->GetUInt32Value(UNIT_CHANNEL_SPELL));
+    if (auto pSpellEntry = sSpellMgr.GetSpellEntry(pTarget->GetUInt32Value(UNIT_CREATED_BY_SPELL)))
+        PSendSysMessage("Created by spell: %u - %s", pTarget->GetUInt32Value(UNIT_CREATED_BY_SPELL), pSpellEntry->SpellName[0].c_str());
+    else
+        PSendSysMessage("Created by spell: %u", pTarget->GetUInt32Value(UNIT_CREATED_BY_SPELL));
+    PSendSysMessage("NPC flags: %u", pTarget->GetUInt32Value(UNIT_NPC_FLAGS));
+    PSendSysMessage("NPC emote state: %u", pTarget->GetUInt32Value(UNIT_NPC_EMOTESTATE));
+    PSendSysMessage("Training points: %u", pTarget->GetUInt32Value(UNIT_TRAINING_POINTS));
+    PSendSysMessage("Unit state flags: %u", pTarget->GetUnitState());
+    PSendSysMessage("Death state: %hhu", pTarget->GetDeathState());
+
+    return true;
+}
+
 bool ChatHandler::HandleFreezeCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();
