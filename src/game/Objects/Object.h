@@ -598,7 +598,7 @@ class MANGOS_DLL_SPEC Object
         uint16 m_objectType;
 
         uint8 m_objectTypeId;
-        uint8 m_updateFlag;
+        uint8 m_updateFlag = 0;
 
         union
         {

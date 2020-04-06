@@ -111,8 +111,9 @@ Unit::Unit()
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     m_updateFlag = (UPDATEFLAG_ALL | UPDATEFLAG_LIVING | UPDATEFLAG_HAS_POSITION);
-
+#endif
     m_attackTimer[BASE_ATTACK]   = 0;
     m_attackTimer[OFF_ATTACK]    = 0;
     m_attackTimer[RANGED_ATTACK] = 0;

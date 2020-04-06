@@ -54,8 +54,9 @@ GameObject::GameObject() : WorldObject(),
 {
     m_objectType |= TYPEMASK_GAMEOBJECT;
     m_objectTypeId = TYPEID_GAMEOBJECT;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     m_updateFlag = (UPDATEFLAG_ALL | UPDATEFLAG_HAS_POSITION);
-
+#endif
     m_valuesCount = GAMEOBJECT_END;
     m_respawnTime = 0;
     m_respawnDelayTime = 25;
