@@ -632,6 +632,14 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         SummonPetIfNeeded();
         me->SetHealthPercent(100.0f);
         me->SetPowerPercent(me->GetPowerType(), 100.0f);
+
+        int32 rnd = urand(0, 1);
+        if (rnd)
+        {
+            me->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
+            me->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
+        }
+
         m_initialized = true;
         return;
     }
