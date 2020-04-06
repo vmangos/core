@@ -1001,23 +1001,25 @@ BattleBotPath vPath_AV_Tower_Point_Crossroads_to_Tower_Point_Bottom =
 BattleBotPath vPath_AV_TowerPoint_Bottom_to_Tower_Point_Flag =
 {
     { -759.771f, -342.304f, 67.2223f, nullptr },
-    { -762.995f, -350.399f, 68.6696f, nullptr },
-    { -770.643f, -369.422f, 68.3921f, nullptr },
-    { -766.399f, -370.279f, 68.3841f, nullptr },
-    { -762.111f, -359.985f, 72.7541f, nullptr },
-    { -771.674f, -357.679f, 76.4728f, nullptr },
-    { -773.29f, -365.392f, 79.265f, nullptr },
-    { -766.322f, -366.861f, 81.7915f, nullptr },
-    { -764.283f, -357.713f, 84.3558f, nullptr },
-    { -770.88f, -360.017f, 84.3558f, nullptr },
-    { -779.395f, -356.52f, 84.343f, nullptr },
-    { -779.845f, -363.948f, 88.1177f, nullptr },
-    { -776.861f, -370.506f, 90.8708f, nullptr },
-    { -767.838f, -373.057f, 90.899f, nullptr },
-    { -759.796f, -367.106f, 90.8399f, nullptr },
-    { -760.609f, -358.f, 90.8949f, nullptr },
-    { -764.209f, -355.919f, 90.8164f, nullptr },
-    { -767.259f, -361.822f, 90.8959f, &AtFlag },
+    { -762.294f, -343.172f, 67.3607f, nullptr },
+    { -764.151f, -350.571f, 68.7991f, nullptr },
+    { -766.112f, -357.945f, 68.6996f, nullptr },
+    { -770.997f, -370.089f, 68.3956f, nullptr },
+    { -763.765f, -368.338f, 69.1196f, nullptr },
+    { -761.735f, -359.76f, 72.7363f, nullptr },
+    { -771.43f, -357.941f, 76.4841f, nullptr },
+    { -773.925f, -365.214f, 79.2135f, nullptr },
+    { -766.473f, -365.891f, 81.9322f, nullptr },
+    { -765.147f, -355.981f, 84.3558f, nullptr },
+    { -771.041f, -360.772f, 84.3558f, nullptr },
+    { -779.831f, -356.316f, 84.3425f, nullptr },
+    { -780.107f, -362.818f, 87.4599f, nullptr },
+    { -775.392f, -371.248f, 90.8508f, nullptr },
+    { -767.966f, -372.722f, 90.8949f, nullptr },
+    { -759.167f, -366.147f, 90.8259f, nullptr },
+    { -760.11f, -357.787f, 90.8949f, nullptr },
+    { -764.399f, -355.108f, 90.8013f, nullptr },
+    { -767.9f, -362.019f, 90.8949f, &AtFlag },
 };
 
 BattleBotPath vPath_AV_Tower_Point_Bottom_to_Frostwolf_Graveyard_Flag =
@@ -1104,6 +1106,7 @@ BattleBotPath vPath_AV_Iceblood_Tower_to_Iceblood_Tower_Flag =
 
 BattleBotPath vPath_AV_Iceblood_Tower_to_Iceblood_Garrison =
 {
+    { -557.697f, -276.264f, 52.1503f, nullptr },
     { -550.396f, -269.326f, 52.4539f, nullptr },
     { -542.628f, -254.901f, 54.7447f, nullptr },
     { -536.969f, -242.614f, 57.233f, nullptr },
@@ -1340,6 +1343,7 @@ std::vector<BattleBotPath*> vPaths_NoReverseAllowed =
     &vPath_AV_Iceblood_Graveyard_to_Iceblood_Graveyard_Flag,
     &vPath_AV_Stonehearth_Graveyard_to_Stonehearth_Graveyard_Flag,
     &vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad,
+    &vPath_AV_Horde_Cave_to_Frostwolf_Graveyard_Flag,
 };
 
 void BattleBotAI::MovementInform(uint32 movementType, uint32 data)
