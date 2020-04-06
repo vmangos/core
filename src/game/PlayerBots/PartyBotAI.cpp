@@ -50,6 +50,9 @@ enum PartyBotSpells
 
 void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
 {
+    if (!pPlayer)
+        return;
+
     if (pPlayer->GetLevel() != me->GetLevel())
     {
         me->GiveLevel(pPlayer->GetLevel());
@@ -456,8 +459,8 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     {
         AddToPlayerGroup();
 
-        if (Player const* pPlayer = sObjectAccessor.FindPlayer(m_cloneGuid))
-            CloneFromPlayer(pPlayer);
+        if (!m_cloneGuid.IsEmpty())
+            CloneFromPlayer(sObjectAccessor.FindPlayer(m_cloneGuid));
         else
             LearnPremadeSpecForClass();
 
@@ -482,6 +485,9 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     }
 
     if (!pLeader->IsInWorld())
+        return;
+
+    if (pLeader->IsTaxiFlying())
         return;
 
     if (pLeader->InBattleGround() &&
