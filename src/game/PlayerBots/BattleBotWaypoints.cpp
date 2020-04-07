@@ -1369,7 +1369,7 @@ std::vector<BattleBotPath*> vPaths_AV =
 {
     &vPath_AV_Horde_Cave_to_Tower_Point_Crossroad,
     &vPath_AV_Tower_Point_Crossroads_to_Tower_Point_Bottom,
-    //&vPath_AV_TowerPoint_Bottom_to_Tower_Point_Flag,
+    &vPath_AV_TowerPoint_Bottom_to_Tower_Point_Flag,
     &vPath_AV_Tower_Point_Bottom_to_Frostwolf_Graveyard_Flag,
     &vPath_AV_Frostwolf_Graveyard_to_Frostwolf_Graveyard_Flag,
     &vPath_AV_Tower_Point_Crossroads_to_Iceblood_Graveyard_Flag,
