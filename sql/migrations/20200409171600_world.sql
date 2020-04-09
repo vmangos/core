@@ -15,3 +15,6 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 
 --remove In Search of Menara Voidrender (3326) from Zervost (3326)
 DELETE FROM mangos.creature_questrelation WHERE quest = 4736 AND id = 3326;
+
+--add correct completion text for Gakin's Summons (1717)
+UPDATE quest_template SET OfferRewardText = "I'm glad someone was able to get a hold of you, $n. I was beginning to fear the worst. It would be a shame to lose you, after the time we've invested in you.$b$bWe can talk later, though. Your training is the only important thing now." WHERE entry = 1717;
