@@ -182,6 +182,26 @@ void MoveToNextPointSpecial(BattleBotAI* pAI)
     pAI->me->GetMotionMaster()->MovePoint(pAI->m_currentPoint, nextPoint.x + frand(-1, 1), nextPoint.y + frand(-1, 1), nextPoint.z, MOVE_NONE);
 }
 
+void AtMountSpot(BattleBotAI* pAI)
+{
+    if (!pAI->me->IsMounted())
+    {
+        pAI->ClearPath();
+
+        bool oldState = pAI->me->HasCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
+        pAI->me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, true);
+
+        if (pAI->me->GetTeam() == HORDE)
+            pAI->me->CastSpell(pAI->me, 23509, true); // Frostwolf Howler
+        else
+            pAI->me->CastSpell(pAI->me, 23510, true); // Stormpike Battle Charger
+
+        pAI->me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, oldState);
+    }
+
+    pAI->MoveToNextPoint();
+}
+
 std::vector<RecordedMovementPacket> vAllianceGraveyardJumpPath =
 {
     { MSG_MOVE_START_FORWARD, 0, 1, 1415.33f, 1554.79f, 343.156f, 2.34205f },
@@ -853,7 +873,7 @@ BattleBotPath vPath_AB_Farm_to_LumberMill =
 
 BattleBotPath vPath_AV_Horde_Cave_to_Tower_Point_Crossroad =
 {
-    { -885.928f, -536.612f, 55.1936f, nullptr },
+    { -885.928f, -536.612f, 55.1936f, &AtMountSpot },
     { -880.957f, -525.119f, 53.6791f, nullptr },
     { -839.408f, -499.746f, 49.7505f, nullptr },
     { -820.21f, -469.193f, 49.4085f,  nullptr },
@@ -1530,7 +1550,7 @@ BattleBotPath vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad 
 
 BattleBotPath vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad =
 {
-    { 769.016f, -491.165f, 97.7772f, nullptr },
+    { 769.016f, -491.165f, 97.7772f, &AtMountSpot },
     { 758.026f, -489.447f, 95.9521f, nullptr },
     { 742.169f, -480.684f, 85.9649f, nullptr },
     { 713.063f, -467.311f, 71.0884f, nullptr },
@@ -1590,8 +1610,6 @@ std::vector<BattleBotPath*> vPaths_AV =
     &vPath_AV_Frostwolf_Graveyard_to_Frostwolf_Graveyard_Flag,
     &vPath_AV_Tower_Point_Crossroads_to_Iceblood_Graveyard_Flag,
     &vPath_AV_Iceblood_Graveyard_Flag_to_Iceblood_Tower_Crossroad,
-    &vPath_AV_Iceblood_Tower_Crossroad_to_Iceblood_Tower,
-    &vPath_AV_Iceblood_Tower_to_Iceblood_Tower_Flag,
     &vPath_AV_Iceblood_Tower_to_Iceblood_Garrison,
     &vPath_AV_Iceblood_Garrison_to_Captain_Galvangar,
     &vPath_AV_Iceblood_Graveyard_to_Iceblood_Graveyard_Flag,
@@ -1631,6 +1649,8 @@ std::vector<BattleBotPath*> vPaths_AV =
     &vPath_AV_Alliance_Base_Bunker_Second_Crossroad_to_Alliance_Base_Bunker_Third_Crossroad,
     &vPath_AV_Alliance_Base_Bunker_Third_Crossroad_to_Alliance_Base_Flag,
     &vPath_AV_Alliance_Base_Bunker_Third_Crossroad_to_Alliance_Base_Vanndar_Stormpike,
+    &vPath_AV_Iceblood_Tower_Crossroad_to_Iceblood_Tower,
+    &vPath_AV_Iceblood_Tower_to_Iceblood_Tower_Flag,
 };
 
 std::vector<BattleBotPath*> vPaths_NoReverseAllowed =
@@ -1647,6 +1667,7 @@ std::vector<BattleBotPath*> vPaths_NoReverseAllowed =
     &vPath_AV_Stonehearth_Graveyard_to_Stonehearth_Graveyard_Flag,
     &vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad,
     &vPath_AV_Horde_Cave_to_Frostwolf_Graveyard_Flag,
+    &vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad,
 };
 
 void BattleBotAI::MovementInform(uint32 movementType, uint32 data)
