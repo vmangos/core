@@ -2299,46 +2299,46 @@ bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
     return true;
 }
 
+static uint32 gmSpellList[] =
+{
+    5,      // Death Touch
+    265,    // Area Death (TEST)
+    30879,  // Permanent Area Damage 50k
+    7482,   // dmg
+    8295,   // dmg2
+    10073,  // dmg3
+    11821,  // dmg4
+    18389,  // dmg5
+    18390,  // dmg6
+    19901,  // dmg7
+    27254,  // dmg8
+    27255,  // dmg9
+    27258,  // dmg10
+    27261,  // dmg11
+    25059,  // Dmg Shield
+    26666,  // Dmg Shield2
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    456,    // SHOWLABEL Only OFF
+    2765,   // SHOWLABEL Only ON
+    1509,   // GM Only OFF
+    18139,  // GM Only ON
+    6147,   // INVIS Only OFF
+    2763,   // INVIS Only ON
+    20114,  // BM Only OFF
+    20115,  // BM Only ON
+#endif
+    24341,  // Revive
+    29313,  // CooldownAll
+    1302,   // Damage Immunity Test
+    9454,   // Freeze
+    31366,  // Root Anybody Forever
+    1908,   // Uber Heal Over Time
+    8358,   // Mana Spike
+    23965,  // Instant Heal
+};
+
 bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
 {
-    static uint32 gmSpellList[] =
-    {
-        5,      // Death Touch
-        265,    // Area Death (TEST)
-        30879,  // Permanent Area Damage 50k
-        7482,   // dmg
-        8295,   // dmg2
-        10073,  // dmg3
-        11821,  // dmg4
-        18389,  // dmg5
-        18390,  // dmg6
-        19901,  // dmg7
-        27254,  // dmg8
-        27255,  // dmg9
-        27258,  // dmg10
-        27261,  // dmg11
-        25059,  // Dmg Shield
-        26666,  // Dmg Shield2
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        456,    // SHOWLABEL Only OFF
-        2765,   // SHOWLABEL Only ON
-        1509,   // GM Only OFF
-        18139,  // GM Only ON
-        6147,   // INVIS Only OFF
-        2763,   // INVIS Only ON
-        20114,  // BM Only OFF
-        20115,  // BM Only ON
-#endif
-        24341,  // Revive
-        29313,  // CooldownAll
-        1302,   // Damage Immunity Test
-        9454,   // Freeze
-        31366,  // Root Anybody Forever
-        1908,   // Uber Heal Over Time
-        8358,   // Mana Spike
-        23965,  // Instant Heal
-    };
-
     for (uint32 spell : gmSpellList)
     {
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell);
@@ -2352,6 +2352,17 @@ bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
     }
 
     SendSysMessage(LANG_LEARNING_GM_SKILLS);
+    return true;
+}
+
+bool ChatHandler::HandleUnLearnAllGMCommand(char* /*args*/)
+{
+    for (uint32 spell : gmSpellList)
+    {
+        m_session->GetPlayer()->RemoveSpell(spell, false, false);
+    }
+
+    SendSysMessage("You have forgotten all gm spells.");
     return true;
 }
 
@@ -2537,6 +2548,22 @@ void ChatHandler::HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id)
     }
 }
 
+void ChatHandler::HandleUnLearnSkillRecipesHelper(Player* player, uint32 skill_id)
+{
+    for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
+    {
+        SkillLineAbilityEntry const* skillLine = sObjectMgr.GetSkillLineAbility(j);
+        if (!skillLine)
+            continue;
+
+        // wrong skill
+        if (skillLine->skillId != skill_id)
+            continue;
+
+        player->RemoveSpell(skillLine->spellId, false, false);
+    }
+}
+
 bool ChatHandler::HandleLearnAllCraftsCommand(char* /*args*/)
 {
     for (uint32 i = 0; i < sSkillLineStore.GetNumRows(); ++i)
@@ -2553,30 +2580,37 @@ bool ChatHandler::HandleLearnAllCraftsCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
+bool ChatHandler::HandleUnLearnAllCraftsCommand(char* /*args*/)
 {
-    //  Learns all recipes of specified profession and sets skill to max
-    //  Example: .learn all_recipes enchanting
-
-    Player* target = GetSelectedPlayer();
-    if (!target)
+    for (uint32 i = 0; i < sSkillLineStore.GetNumRows(); ++i)
     {
-        SendSysMessage(LANG_PLAYER_NOT_FOUND);
-        return false;
+        SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
+        if (!skillInfo)
+            continue;
+
+        if (skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY)
+            HandleUnLearnSkillRecipesHelper(m_session->GetPlayer(), skillInfo->id);
     }
 
+    // Some of these are removed for some reason.
+    m_session->GetPlayer()->LearnDefaultSpells();
+
+    SendSysMessage("You have forgotten all crafts.");
+    return true;
+}
+
+SkillLineEntry const* ChatHandler::FindSkillLineEntryFromProfessionName(char* args, std::string& nameOut)
+{
     if (!*args)
-        return false;
+        return nullptr;
 
     std::wstring wnamepart;
 
     if (!Utf8toWStr(args, wnamepart))
-        return false;
+        return nullptr;
 
     // converting string that we try to find to lower case
     wstrToLower(wnamepart);
-
-    std::string name;
 
     SkillLineEntry const* targetSkillInfo = nullptr;
     for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
@@ -2589,11 +2623,11 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
             continue;
 
         int loc = GetSessionDbcLocale();
-        name = skillInfo->name[loc];
-        if (name.empty())
+        nameOut = skillInfo->name[loc];
+        if (nameOut.empty())
             continue;
 
-        if (!Utf8FitTo(name, wnamepart))
+        if (!Utf8FitTo(nameOut, wnamepart))
         {
             loc = 0;
             for (; loc < MAX_DBC_LOCALE; ++loc)
@@ -2601,11 +2635,11 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
                 if (loc == GetSessionDbcLocale())
                     continue;
 
-                name = skillInfo->name[loc];
-                if (name.empty())
+                nameOut = skillInfo->name[loc];
+                if (nameOut.empty())
                     continue;
 
-                if (Utf8FitTo(name, wnamepart))
+                if (Utf8FitTo(nameOut, wnamepart))
                     break;
             }
         }
@@ -2617,6 +2651,23 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
         }
     }
 
+    return targetSkillInfo;
+}
+
+bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
+{
+    //  Learns all recipes of specified profession and sets skill to max
+    //  Example: .learn all_recipes enchanting
+
+    Player* target = GetSelectedPlayer();
+    if (!target)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        return false;
+    }
+
+    std::string name;
+    SkillLineEntry const* targetSkillInfo = FindSkillLineEntryFromProfessionName(args, name);
     if (!targetSkillInfo)
         return false;
 
@@ -2625,6 +2676,29 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
     uint16 maxLevel = target->GetSkillMaxPure(targetSkillInfo->id);
     target->SetSkill(targetSkillInfo->id, maxLevel, maxLevel);
     PSendSysMessage(LANG_COMMAND_LEARN_ALL_RECIPES, name.c_str());
+    return true;
+}
+
+bool ChatHandler::HandleUnLearnAllRecipesCommand(char* args)
+{
+    //  Unlearns all recipes of specified profession
+    //  Example: .unlearn all_recipes enchanting
+
+    Player* target = GetSelectedPlayer();
+    if (!target)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        return false;
+    }
+
+    std::string name;
+    SkillLineEntry const* targetSkillInfo = FindSkillLineEntryFromProfessionName(args, name);
+    if (!targetSkillInfo)
+        return false;
+
+    HandleUnLearnSkillRecipesHelper(target, targetSkillInfo->id);
+
+    PSendSysMessage("%s has forgotten all %s recipes.", target->GetName(), name.c_str());
     return true;
 }
 

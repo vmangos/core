@@ -349,7 +349,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
         if (go && go->ToTransport())
             buf << uint32(go->ToTransport()->GetPathProgress());
         else
-            buf << uint32(WorldTimer::getMSTime());           // ms time
+            buf << uint32(WorldTimer::getMSTime());
     }
 #endif
 
@@ -526,7 +526,7 @@ void Object::BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const
         if (go && go->ToTransport())
             *data << uint32(go->ToTransport()->GetPathProgress());
         else
-            *data << uint32(WorldTimer::getMSTime());           // ms time
+            *data << uint32(WorldTimer::getMSTime());
     }
 #else
     Unit const* unit = ToUnit();

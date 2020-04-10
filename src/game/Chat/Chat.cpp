@@ -423,6 +423,15 @@ ChatCommand * ChatHandler::getCommandTable()
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
+    static ChatCommand unlearnCommandTable[] =
+    {
+        { "all_gm",         SEC_GAMEMASTER,     false, &ChatHandler::HandleUnLearnAllGMCommand,        "", nullptr },
+        { "all_crafts",     SEC_GAMEMASTER,     false, &ChatHandler::HandleUnLearnAllCraftsCommand,    "", nullptr },
+        { "all_recipes",    SEC_GAMEMASTER,     false, &ChatHandler::HandleUnLearnAllRecipesCommand,   "", nullptr },
+        { "",               SEC_GAMEMASTER,     false, &ChatHandler::HandleUnLearnCommand,             "", nullptr },
+        { nullptr,          0,                  false, nullptr,                                        "", nullptr }
+    };
+
     static ChatCommand listCommandTable[] =
     {
         { "auras",          SEC_TICKETMASTER,  false, &ChatHandler::HandleListAurasCommand,          "", nullptr },
@@ -1091,7 +1100,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "help",           SEC_PLAYER,         true,  &ChatHandler::HandleHelpCommand,                "", nullptr },
         { "itemmove",       SEC_GAMEMASTER,     false, &ChatHandler::HandleItemMoveCommand,            "", nullptr },
         { "cooldown",       SEC_GAMEMASTER,     false, &ChatHandler::HandleCooldownCommand,            "", nullptr },
-        { "unlearn",        SEC_GAMEMASTER,     false, &ChatHandler::HandleUnLearnCommand,             "", nullptr },
+        { "unlearn",        SEC_GAMEMASTER,     false, nullptr,                                        "", unlearnCommandTable },
         { "removeriding",   SEC_GAMEMASTER,     false, &ChatHandler::HandleRemoveRidingCommand,        "", nullptr },
         { "distance",       SEC_MODERATOR,      false, &ChatHandler::HandleGetDistanceCommand,         "", nullptr },
         { "angle",          SEC_MODERATOR,      false, &ChatHandler::HandleGetAngleCommand,            "", nullptr },
