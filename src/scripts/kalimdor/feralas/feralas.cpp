@@ -626,7 +626,8 @@ enum
 
     SPELL_MANA_BURN                 = 11981,
 
-    FACTION_ESCORTEE                = 10,
+    FACTION_ESCORTEE_SPRITE         = 10,
+    FACTION_ESCORTEE_KINDAL         = 231,
 };
 
 struct sMovementInformation
@@ -767,7 +768,7 @@ struct npc_captured_sprite_darterAI : public ScriptedAI
                     {
                         if (m_uiRunStart_Timer < uiDiff)
                         {
-                            m_creature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
+                            m_creature->SetFactionTemporary(FACTION_ESCORTEE_SPRITE, TEMPFACTION_RESTORE_RESPAWN);
                             m_bRun = true;
                         }
                         else
@@ -919,7 +920,7 @@ bool QuestAccept_npc_kindal_moonweaver(Player* pPlayer, Creature* pCreature, Que
     {
         if (auto pKindalAI = dynamic_cast<npc_kindal_moonweaverAI*>(pCreature->AI()))
         {
-            pKindalAI->StartFollow(pPlayer, FACTION_ESCORT_N_FRIEND_PASSIVE, pQuest);
+            pKindalAI->StartFollow(pPlayer, FACTION_ESCORTEE_KINDAL, pQuest);
             pCreature->SetStandState(UNIT_STAND_STATE_STAND);
             pKindalAI->BeginEvent();
         }

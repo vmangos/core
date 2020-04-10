@@ -46,6 +46,7 @@ class Unit;
 class Pet;
 class GmTicket;
 struct ItemPrototype;
+struct SkillLineEntry;
 
 #define SPELL_PLAYER_MUTED_VISUAL 1852
 
@@ -854,6 +855,9 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleCooldownCommand(char* args);
         bool HandleUnLearnCommand(char* args);
+        bool HandleUnLearnAllGMCommand(char* args);
+        bool HandleUnLearnAllCraftsCommand(char* args);
+        bool HandleUnLearnAllRecipesCommand(char* args);
         bool HandleRemoveRidingCommand(char* args);
         bool HandleGetDistanceCommand(char* args);
         bool HandleGetAngleCommand(char* args);
@@ -975,13 +979,15 @@ class MANGOS_DLL_SPEC ChatHandler
         void ShowPoolListHelper(uint16 pool_id);
         void ShowTriggerListHelper(AreaTriggerEntry const* atEntry);
         void ShowTriggerTargetListHelper(uint32 id, AreaTriggerTeleport const* at, bool subpart = false);
+        SkillLineEntry const* FindSkillLineEntryFromProfessionName(char* args, std::string& nameOut);
         bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = nullptr);
         bool HandleBanListHelper(QueryResult* result);
         bool HandleBanHelper(BanMode mode, char* args);
         bool HandleBanInfoHelper(uint32 accountid, char const* accountname);
         bool HandleUnBanHelper(BanMode mode, char* args);
         void HandleCharacterLevel(Player* player, ObjectGuid player_guid, uint32 oldlevel, uint32 newlevel);
-        void HandleLearnSkillRecipesHelper(Player* player,uint32 skill_id);
+        void HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id);
+        void HandleUnLearnSkillRecipesHelper(Player* player,uint32 skill_id);
         bool HandleGoHelper(Player* _player, uint32 mapid, float x, float y, float const* zPtr = nullptr, float const* ortPtr = nullptr);
         bool HandleGetValueHelper(Object* target, uint32 field, char* typeStr);
         bool HandlerDebugModValueHelper(Object* target, uint32 field, char* typeStr, char* valStr);

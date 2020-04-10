@@ -51,7 +51,7 @@ enum MovementChangeType
     SPEED_CHANGE_SWIM_BACK,
     RATE_CHANGE_TURN,
 
-    //TELEPORT, - not used
+    TELEPORT,
     KNOCK_BACK
 };
 
@@ -144,7 +144,7 @@ enum HitInfo
 {
     HITINFO_NORMALSWING         = 0x00000000,
     HITINFO_UNK0                = 0x00000001,               // req correct packet structure
-    HITINFO_NORMALSWING2        = 0x00000002,
+    HITINFO_AFFECTS_VICTIM      = 0x00000002,               // no being hit animation on victim without it
     HITINFO_LEFTSWING           = 0x00000004,
     HITINFO_UNK3                = 0x00000008,
     HITINFO_MISS                = 0x00000010,
