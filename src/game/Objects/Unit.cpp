@@ -6213,7 +6213,7 @@ void Unit::CheckPendingMovementChanges()
         }
 
         // Not resendable change.
-        if (oldestChangeToAck.movementChangeType == INVALID || oldestChangeToAck.movementChangeType == KNOCK_BACK)
+        if (oldestChangeToAck.movementChangeType == INVALID || oldestChangeToAck.movementChangeType == TELEPORT || oldestChangeToAck.movementChangeType == KNOCK_BACK)
         {
             pController->GetCheatData()->OnFailedToAckChange();
             PopPendingMovementChange();
