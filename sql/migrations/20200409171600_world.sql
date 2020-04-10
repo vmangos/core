@@ -48,6 +48,9 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `itemflags`) 
 --add Devour Magic Rank 3 (16382) to Spackle Thornberry (5520)
 INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `itemflags`) VALUES (5520, 16382, 0, 0, 0);
 
+--add Helfire Rank 1 (5709) to Kartosh (988)
+INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES (988, 5709, 6000, 0, 0, 30, 0, 5875);
+
 
 -- End of migration.
 END IF;
