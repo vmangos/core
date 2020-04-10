@@ -93,6 +93,10 @@ namespace MovementPacketSender
         void SendSpeedChangeToObservers(Unit* unit, UnitMoveType mtype, float newRate);
         void SendSpeedChangeToAll(Unit* unit, UnitMoveType mtype, float newRate);
 
+        /* teleport */
+        void SendTeleportToController(Unit* unit, float x, float y, float z, float ang);
+        void SendTeleportToObservers(Unit* unit);
+
         /* knocback */
         void SendKnockBackToController(Unit* unit, float vcos, float vsin, float speedXY, float speedZ);
         void SendKnockBackToObservers(Unit* unit, float vcos, float vsin, float speedXY, float speedZ);

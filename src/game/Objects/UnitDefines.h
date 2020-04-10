@@ -51,7 +51,7 @@ enum MovementChangeType
     SPEED_CHANGE_SWIM_BACK,
     RATE_CHANGE_TURN,
 
-    //TELEPORT, - not used
+    TELEPORT,
     KNOCK_BACK
 };
 

@@ -142,6 +142,59 @@ void MovementPacketSender::SendSpeedChangeToAll(Unit* unit, UnitMoveType mtype, 
     unit->SendMovementMessageToSet(std::move(data), true);
 }
 
+void MovementPacketSender::SendTeleportToController(Unit* unit, float x, float y, float z, float ang)
+{
+    Player* mover = unit->GetPlayerMovingMe();
+    if (!mover)
+    {
+        sLog.outError("MovementPacketSender::SendTeleportToController: Incorrect use of the function. It was called on a unit controlled by the server!");
+        return;
+    }
+
+    uint32 mCounter = unit->GetMovementCounterAndInc();
+    PlayerMovementPendingChange pendingChange;
+    pendingChange.movementCounter = mCounter;
+    pendingChange.movementChangeType = TELEPORT;
+    pendingChange.controller = mover->GetObjectGuid();
+    unit->PushPendingMovementChange(pendingChange);
+
+    MovementInfo mi = unit->m_movementInfo;
+    mi.UpdateTime(WorldTimer::getMSTime());
+    mi.ChangePosition(x, y, z, ang);
+
+    WorldPacket data(MSG_MOVE_TELEPORT_ACK, 41);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    data << unit->GetPackGUID();
+#else
+    data << unit->GetGUID();
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    data << mCounter;                                      // this value increments every time
+#endif
+    data << mi;
+
+    mover->GetSession()->SendPacket(&data);
+}
+
+void MovementPacketSender::SendTeleportToObservers(Unit* unit)
+{
+    Player* mover = unit->GetPlayerMovingMe();
+    if (!mover)
+    {
+        sLog.outError("MovementPacketSender::SendTeleportToObservers: Incorrect use of the function. It was called on a unit controlled by the server!");
+        return;
+    }
+
+    WorldPacket data(MSG_MOVE_TELEPORT, 64);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    data << unit->GetPackGUID();
+#else
+    data << unit->GetGUID();
+#endif
+    data << unit->m_movementInfo;
+    unit->SendMovementMessageToSet(std::move(data), true, mover);
+}
+
 void MovementPacketSender::SendKnockBackToController(Unit* unit, float vcos, float vsin, float speedXY, float speedZ)
 {
     Player* mover = unit->GetPlayerMovingMe();

@@ -6376,6 +6376,25 @@ bool Unit::FindPendingMovementRootChange(uint32 movementCounter, bool applyRecei
     return false;
 }
 
+bool Unit::FindPendingMovementTeleportChange(uint32 movementCounter)
+{
+    for (auto pendingChange = m_pendingMovementChanges.begin(); pendingChange != m_pendingMovementChanges.end(); pendingChange++)
+    {
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        movementCounter = pendingChange->movementCounter;
+#endif
+
+        if (pendingChange->movementCounter != movementCounter || pendingChange->movementChangeType != TELEPORT)
+            continue;
+
+        m_pendingMovementChanges.erase(pendingChange);
+        return true;
+    }
+
+    return false;
+}
+
 bool Unit::FindPendingMovementKnockbackChange(MovementInfo& movementInfo, uint32 movementCounter)
 {
     for (auto pendingChange = m_pendingMovementChanges.begin(); pendingChange != m_pendingMovementChanges.end(); pendingChange++)
