@@ -30,6 +30,24 @@ DELETE FROM mangos.creature_questrelation WHERE quest = 4736 AND id = 3326;
 --add correct completion text for Gakin's Summons (1717)
 UPDATE quest_template SET OfferRewardText = "I'm glad someone was able to get a hold of you, $n. I was beginning to fear the worst. It would be a shame to lose you, after the time we've invested in you.$b$bWe can talk later, though. Your training is the only important thing now." WHERE entry = 1717;
 
+--remove Grimoire of Lash of Pain (Rank 6) from Cylina Darkheart (6374)
+DELETE FROM mangos.npc_vendor WHERE entry = 6374 AND item = 16374;
+
+--remove Grimoire of Soothing Kiss (Rank 2) from Wren Darkspring (6376)
+DELETE FROM mangos.npc_vendor WHERE entry = 6376 AND item = 16376;
+
+--remove Grimoire of Lash of Pain (Rank 5) from Dane Winslow (6373)
+DELETE FROM mangos.npc_vendor WHERE entry = 6373 AND item = 16373;
+
+--add Devour Magic Rank 3 (16382) to Martha Strain (5753)
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `itemflags`) VALUES (5753, 16382, 0, 0, 0);
+
+--add Devour Magic Rank 3 (16382) to Kurgul (5815)
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `itemflags`) VALUES (5815, 16382, 0, 0, 0);
+
+--add Devour Magic Rank 3 (16382) to Spackle Thornberry (5520)
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `itemflags`) VALUES (5520, 16382, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
