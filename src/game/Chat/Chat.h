@@ -339,6 +339,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCharacterFillFlysCommand(char *args);
         bool HandleCharacterPremadeGearCommand(char *args);
         bool HandleCharacterPremadeSpecCommand(char *args);
+        bool HandleCharacterPremadeSaveGearCommand(char *args);
+        bool HandleCharacterPremadeSaveSpecCommand(char *args);
         bool HandleFactionChangeItemsCommand(char *args);
         // bg
         bool HandleBGStatusCommand(char *args);

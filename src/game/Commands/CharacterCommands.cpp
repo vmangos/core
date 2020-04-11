@@ -1912,7 +1912,59 @@ bool ChatHandler::HandleCharacterPremadeGearCommand(char* args)
 
     sObjectMgr.ApplyPremadeGearTemplateToPlayer(entry, pPlayer);
 
-    PSendSysMessage("Premade template %u applied to player %s.", entry, pPlayer->GetName());
+    PSendSysMessage("Premade gear template %u applied to player %s.", entry, pPlayer->GetName());
+    return true;
+}
+
+static std::string EscapeString(std::string unescapedString)
+{
+    char* escapedString = new char[unescapedString.length() * 2 + 1];
+    mysql_escape_string(escapedString, unescapedString.c_str(), unescapedString.length());
+    std::string returnString = escapedString;
+    delete[] escapedString;
+    return returnString;
+}
+
+bool ChatHandler::HandleCharacterPremadeSaveGearCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+
+    if (!*args)
+    {
+        SendSysMessage("Incorrect syntax. Template name expected.");
+        return false;
+    }
+
+    std::string templateName = args;
+    if (templateName.find(" ") != std::string::npos)
+    {
+        SendSysMessage("Template name cannot contain spaces.");
+        return false;
+    }
+
+    uint32 entry = 0;
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`entry`) FROM `player_premade_item_template`"));
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        entry = fields[0].GetUInt32() + 1;
+    }
+
+    templateName = EscapeString(templateName);
+    if (!WorldDatabase.PExecute("INSERT INTO `player_premade_item_template` (`entry`, `class`, `level`, `name`) VALUES (%u, %u, %u, '%s')", entry, pPlayer->GetClass(), pPlayer->GetLevel(), templateName.c_str()))
+        return false;
+
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            WorldDatabase.DirectPExecute("INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`) VALUES (%u, %u, %u)", entry, pItem->GetEntry(), pItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
+        }
+    }
+
+    sObjectMgr.LoadPlayerPremadeTemplates();
+
+    PSendSysMessage("Premade gear template %u saved to database.", entry);
     return true;
 }
 
@@ -1961,7 +2013,65 @@ bool ChatHandler::HandleCharacterPremadeSpecCommand(char* args)
 
     sObjectMgr.ApplyPremadeSpecTemplateToPlayer(entry, pPlayer);
 
-    PSendSysMessage("Premade template %u applied to player %s.", entry, pPlayer->GetName());
+    PSendSysMessage("Premade spec template %u applied to player %s.", entry, pPlayer->GetName());
+    return true;
+}
+
+bool ChatHandler::HandleCharacterPremadeSaveSpecCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+
+    if (!*args)
+    {
+        SendSysMessage("Incorrect syntax. Template name expected.");
+        return false;
+    }
+
+    std::string templateName = args;
+    if (templateName.find(" ") != std::string::npos)
+    {
+        SendSysMessage("Template name cannot contain spaces.");
+        return false;
+    }
+
+    uint32 entry = 0;
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`entry`) FROM `player_premade_spell_template`"));
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        entry = fields[0].GetUInt32() + 1;
+    }
+
+    templateName = EscapeString(templateName);
+    if (!WorldDatabase.PExecute("INSERT INTO `player_premade_spell_template` (`entry`, `class`, `level`, `name`) VALUES (%u, %u, %u, '%s')", entry, pPlayer->GetClass(), pPlayer->GetLevel(), templateName.c_str()))
+        return false;
+
+    PlayerInfo const* pInfo = sObjectMgr.GetPlayerInfo(pPlayer->GetRace(), pPlayer->GetClass());
+    if (!pInfo)
+        return false;
+
+    result.reset(CharacterDatabase.PQuery("SELECT DISTINCT `spell` FROM `character_spell` WHERE `disabled`=0 && `active`=1 && `guid`=%u", pPlayer->GetGUIDLow()));
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 spellId = fields[0].GetUInt32();
+            
+            if (!sSpellMgr.GetSpellEntry(spellId))
+                continue;
+
+            if (std::find(pInfo->spell.begin(), pInfo->spell.end(), spellId) != pInfo->spell.end())
+                continue;
+
+            WorldDatabase.DirectPExecute("INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES (%u, %u)", entry, spellId);
+        } while (result->NextRow());
+    }
+
+    sObjectMgr.LoadPlayerPremadeTemplates();
+
+    PSendSysMessage("Premade spec template %u saved to database.", entry);
     return true;
 }
 
