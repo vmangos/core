@@ -295,10 +295,14 @@ Unit* BattleBotAI::SelectFollowTarget() const
 {
     std::list<Player*> players;
     me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
+    Player* pHealerFollowTarget = nullptr;
 
     for (const auto& pTarget : players)
     {
         if (pTarget == me)
+            continue;
+
+        if (me->GetTeam() != pTarget->GetTeam())
             continue;
 
         if (me->GetTeam() == ALLIANCE)
@@ -311,9 +315,17 @@ Unit* BattleBotAI::SelectFollowTarget() const
             if (pTarget->HasAura(AURA_SILVERWING_FLAG))
                 return pTarget;
         }
+
+        if (m_role == ROLE_HEALER &&
+           !IsHealerClass(pTarget->GetClass()) &&
+           !IsStealthClass(pTarget->GetClass()) &&
+           (pTarget->IsMounted() == me->IsMounted()) &&
+           (me->GetDistance2d(pTarget) <= 20.0f) &&
+           (me->GetDistanceZ(pTarget) <= 3.0f))
+            pHealerFollowTarget = pTarget;
     }
 
-    return nullptr;
+    return pHealerFollowTarget;
 }
 
 void BattleBotAI::DoGraveyardJump()
@@ -548,8 +560,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         me->SetHealthPercent(100.0f);
         me->SetPowerPercent(me->GetPowerType(), 100.0f);
 
-        int32 rnd = urand(0, 1);
-        if (rnd)
+        if (urand(0, 1))
         {
             me->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
             me->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
@@ -704,10 +715,10 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         {
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
             {
-                if (Unit* pFlagCarrier = SelectFollowTarget())
+                if (Unit* pFollowTarget = SelectFollowTarget())
                 {
                     ClearPath();
-                    me->GetMotionMaster()->MoveFollow(pFlagCarrier, frand(3.0f, 5.0f), frand(0.0f, 3.0f));
+                    me->GetMotionMaster()->MoveFollow(pFollowTarget, frand(3.0f, 5.0f), frand(0.0f, 3.0f));
                     return;
                 }
             }

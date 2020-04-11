@@ -189,6 +189,28 @@ public:
         }
         return false;
     }
+    static bool IsHealerClass(uint8 playerClass)
+    {
+        switch (playerClass)
+        {
+            case CLASS_PALADIN:
+            case CLASS_PRIEST:
+            case CLASS_SHAMAN:
+            case CLASS_DRUID:
+                return true;
+        }
+        return false;
+    }
+    static bool IsStealthClass(uint8 playerClass)
+    {
+        switch (playerClass)
+        {
+            case CLASS_ROGUE:
+            case CLASS_DRUID:
+                return true;
+        }
+        return false;
+    }
 
     SpellEntry const* m_resurrectionSpell = nullptr;
     std::vector<SpellEntry const*> spellListTaunt;
