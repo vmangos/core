@@ -13,9 +13,47 @@
 #include "BattleGroundWS.h"
 #include <random>
 
+enum GameObjectsAB
+{
+    GO_AB_ALLIANCE_BANNER    = 180058,
+    GO_AB_CONTESTED_BANNER1  = 180059,
+    GO_AB_HORDE_BANNER       = 180060,
+    GO_AB_CONTESTED_BANNER2  = 180061,
+    GO_AB_STABLE_BANNER      = 180087,
+    GO_AB_BLACKSMITH_BANNER  = 180088,
+    GO_AB_FARM_BANNER        = 180089,
+    GO_AB_LUMBER_MILL_BANNER = 180090,
+    GO_AB_GOLD_MINE_BANNER   = 180091
+};
+
+enum GameObjectsAV
+{
+    GO_AV_HORDE_BANNER1     = 178364,
+    GO_AV_HORDE_BANNER2     = 178943,
+    GO_AV_ALLIANCE_BANNER1  = 178365,
+    GO_AV_ALLIANCE_BANNER2  = 178925,
+    GO_AV_CONTESTED_BANNER1 = 178940,
+    GO_AV_CONTESTED_BANNER2 = 179286,
+    GO_AV_CONTESTED_BANNER3 = 179287,
+    GO_AV_CONTESTED_BANNER4 = 179435,
+    GO_AV_SNOWFALL_BANNER3  = 180418
+};
+
+enum GameObjectsWS
+{
+    GO_WS_SILVERWING_FLAG = 179830,
+    GO_WS_WARSONG_FLAG    = 179831
+};
+
+enum AreaTriggersWS
+{
+    AT_SILVERWING_FLAG = 3646,
+    AT_WARSONG_FLAG    = 3647
+};
+
 void WSG_AtAllianceFlag(BattleBotAI* pAI)
 {
-    if (GameObject* pFlag = pAI->me->FindNearestGameObject(GO_SILVERWING_FLAG, 25.0f))
+    if (GameObject* pFlag = pAI->me->FindNearestGameObject(GO_WS_SILVERWING_FLAG, 25.0f))
     {
         if (pFlag->isSpawned())
         {
@@ -63,7 +101,7 @@ void WSG_AtAllianceFlag(BattleBotAI* pAI)
 
 void WSG_AtHordeFlag(BattleBotAI* pAI)
 {
-    if (GameObject* pFlag = pAI->me->FindNearestGameObject(GO_WARSONG_FLAG, 25.0f))
+    if (GameObject* pFlag = pAI->me->FindNearestGameObject(GO_WS_WARSONG_FLAG, 25.0f))
     {
         if (pFlag->isSpawned())
         {
@@ -134,10 +172,10 @@ void WSG_AtHordeGraveyard(BattleBotAI* pAI)
 #define SPELL_CAPTURE_BANNER 21651
 
 uint32 const FlagIds[] = { GO_AB_ALLIANCE_BANNER , GO_AB_CONTESTED_BANNER1 , GO_AB_HORDE_BANNER , GO_AB_CONTESTED_BANNER2 ,
-                              GO_AB_STABLE_BANNER, GO_AB_BLACKSMITH_BANNER, GO_AB_FARM_BANNER, GO_AB_LUMBER_MILL_BANNER,
-                              GO_AB_GOLD_MINE_BANNER, GO_AV_HORDE_BANNER1 , GO_AV_HORDE_BANNER2 , GO_AV_ALLIANCE_BANNER1 ,
-                              GO_AV_ALLIANCE_BANNER2 , GO_AV_CONTESTED_BANNER1 , GO_AV_CONTESTED_BANNER2 , GO_AV_CONTESTED_BANNER3 ,
-                              GO_AV_CONTESTED_BANNER4 , GO_AV_SNOWFALL_BANNER3 };
+                           GO_AB_STABLE_BANNER, GO_AB_BLACKSMITH_BANNER, GO_AB_FARM_BANNER, GO_AB_LUMBER_MILL_BANNER,
+                           GO_AB_GOLD_MINE_BANNER, GO_AV_HORDE_BANNER1 , GO_AV_HORDE_BANNER2 , GO_AV_ALLIANCE_BANNER1 ,
+                           GO_AV_ALLIANCE_BANNER2 , GO_AV_CONTESTED_BANNER1 , GO_AV_CONTESTED_BANNER2 , GO_AV_CONTESTED_BANNER3 ,
+                           GO_AV_CONTESTED_BANNER4 , GO_AV_SNOWFALL_BANNER3 };
 
 void AtFlag(BattleBotAI* pAI)
 {

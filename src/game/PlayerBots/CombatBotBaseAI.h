@@ -79,6 +79,9 @@ public:
             ptr = nullptr;
     }
 
+    virtual void OnPacketReceived(WorldPacket const* packet) override;
+    virtual void SendFakePacket(uint16 opcode) override;
+
     void AutoAssignRole();
     void PopulateSpellData();
     void ResetSpellData();
@@ -161,6 +164,19 @@ public:
         }
         return false;
     }
+    static bool IsMeleeDamageClass(uint8 playerClass)
+    {
+        switch (playerClass)
+        {
+        case CLASS_WARRIOR:
+        case CLASS_PALADIN:
+        case CLASS_ROGUE:
+        case CLASS_SHAMAN:
+        case CLASS_DRUID:
+            return true;
+        }
+        return false;
+    }
     static bool IsMeleeWeaponClass(uint8 playerClass)
     {
         switch (playerClass)
@@ -169,19 +185,6 @@ public:
             case CLASS_PALADIN:
             case CLASS_ROGUE:
             case CLASS_SHAMAN:
-                return true;
-        }
-        return false;
-    }
-    static bool IsMeleeDamageClass(uint8 playerClass)
-    {
-        switch (playerClass)
-        {
-            case CLASS_WARRIOR:
-            case CLASS_PALADIN:
-            case CLASS_ROGUE:
-            case CLASS_SHAMAN:
-            case CLASS_DRUID:
                 return true;
         }
         return false;
@@ -195,7 +198,7 @@ public:
     {
         struct
         {
-            SpellEntry const* spells[67];
+            SpellEntry const* spells[44];
         } raw;
         struct
         {
@@ -457,6 +460,7 @@ public:
 
     bool m_initialized = false;
     bool m_isBuffing = false;
+    bool m_receivedBgInvite = false;
     CombatBotRoles m_role = ROLE_INVALID;
 };
 

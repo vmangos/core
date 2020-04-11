@@ -27,10 +27,10 @@ public:
         return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o, sObjectAccessor.FindPlayer(m_cloneGuid));
     }
 
-    void OnPlayerLogin() override;
-    void UpdateAI(uint32 const diff) override;
-    void OnPacketReceived(WorldPacket const* packet) override;
-    void SendFakePacket(uint16 opcode) override;
+    void OnPlayerLogin() final;
+    void UpdateAI(uint32 const diff) final;
+    void OnPacketReceived(WorldPacket const* packet) final;
+    void SendFakePacket(uint16 opcode) final;
 
     void CloneFromPlayer(Player const* pPlayer);
     void AddToPlayerGroup();
@@ -67,7 +67,6 @@ public:
     void UpdateInCombatAI_Druid() final;
     void UpdateOutOfCombatAI_Druid() final;
 
-    bool m_receivedBgInvite = false;
     std::vector<LootResponseData> m_lootResponses;
     ShortTimeTracker m_updateTimer;
     ObjectGuid m_leaderGuid;

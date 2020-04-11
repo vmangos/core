@@ -317,40 +317,6 @@ void PartyBotAI::SendFakePacket(uint16 opcode)
 {
     switch (opcode)
     {
-        case MSG_MOVE_WORLDPORT_ACK:
-        {
-            me->GetSession()->HandleMoveWorldportAckOpcode();
-            break;
-        }
-        case MSG_MOVE_TELEPORT_ACK:
-        {
-            WorldPacket data(MSG_MOVE_TELEPORT_ACK);
-            data << me->GetObjectGuid();
-    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            data << uint32(0) << uint32(time(nullptr));
-    #else
-            data << uint32(time(nullptr));
-    #endif
-            me->GetSession()->HandleMoveTeleportAckOpcode(data);
-            break;
-        }
-        case CMSG_BATTLEFIELD_PORT:
-        {
-            for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
-            {
-                if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
-                {
-                    WorldPacket data(CMSG_BATTLEFIELD_PORT);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                    data << uint32(GetBattleGrounMapIdByTypeId(BattleGroundTypeId(i)));
-#endif
-                    data << uint8(1);
-                    me->GetSession()->HandleBattleFieldPortOpcode(data);
-                    break;
-                }
-            }
-            break;
-        }
         case CMSG_LOOT_ROLL:
         {
             if (m_lootResponses.empty())
@@ -363,8 +329,11 @@ void PartyBotAI::SendFakePacket(uint16 opcode)
             data << uint8(0); // pass
             m_lootResponses.erase(loot);
             me->GetSession()->HandleLootRoll(data);
+            return;
         }
     }
+
+    CombatBotBaseAI::SendFakePacket(opcode);
 }
 
 void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
@@ -372,70 +341,17 @@ void PartyBotAI::OnPacketReceived(WorldPacket const* packet)
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
     switch (packet->GetOpcode())
     {
-        case SMSG_NEW_WORLD:
-        {
-            botEntry->m_pendingResponses.push_back(MSG_MOVE_WORLDPORT_ACK);
-            break;
-        }
-        case MSG_MOVE_TELEPORT_ACK:
-        {
-            botEntry->m_pendingResponses.push_back(MSG_MOVE_TELEPORT_ACK);
-            break;
-        }
-        case SMSG_TRADE_STATUS:
-        {
-            uint32 status = *((uint32*)(*packet).contents());
-            if (status == TRADE_STATUS_BEGIN_TRADE)
-            {
-                WorldPacket data(CMSG_BEGIN_TRADE);
-                me->GetSession()->HandleBeginTradeOpcode(data);
-            }
-            else if (status == TRADE_STATUS_TRADE_ACCEPT)
-            {
-                if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START))
-                    me->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
-
-                WorldPacket data(CMSG_ACCEPT_TRADE);
-                data << uint32(1);
-                me->GetSession()->HandleAcceptTradeOpcode(data);
-            }
-            else if (status == TRADE_STATUS_TRADE_COMPLETE)
-            {
-                EquipOrUseNewItem();
-            }
-            break;
-        }
-        case SMSG_RESURRECT_REQUEST:
-        {
-            me->ResurectUsingRequestData();
-            break;
-        }
-        case SMSG_BATTLEFIELD_STATUS:
-        {
-            if (me->IsBeingTeleported() || me->InBattleGround())
-                m_receivedBgInvite = false;
-            else
-            {
-                for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
-                {
-                    if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
-                    {
-                        m_receivedBgInvite = true;
-                        break;
-                    }
-                }
-            }
-            break;
-        }
         case SMSG_LOOT_START_ROLL:
         {
             uint64 guid = *((uint64*)(*packet).contents());
             uint32 slot = *(((uint32*)(*packet).contents())+2);
             m_lootResponses.emplace_back(LootResponseData(guid, slot ));
             botEntry->m_pendingResponses.push_back(CMSG_LOOT_ROLL);
-            break;
+            return;
         }
     }
+
+    CombatBotBaseAI::OnPacketReceived(packet);
 }
 
 void PartyBotAI::OnPlayerLogin()

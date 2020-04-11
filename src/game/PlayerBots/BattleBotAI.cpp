@@ -352,40 +352,6 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
     printf("Bot send %s\n", LookupOpcodeName(opcode));
     switch (opcode)
     {
-        case MSG_MOVE_WORLDPORT_ACK:
-        {
-            me->GetSession()->HandleMoveWorldportAckOpcode();
-            break;
-        }
-        case MSG_MOVE_TELEPORT_ACK:
-        {
-            WorldPacket data(MSG_MOVE_TELEPORT_ACK);
-            data << me->GetObjectGuid();
-    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-            data << uint32(0) << uint32(time(nullptr));
-    #else
-            data << uint32(time(nullptr));
-    #endif
-            me->GetSession()->HandleMoveTeleportAckOpcode(data);
-            break;
-        }
-        case CMSG_BATTLEFIELD_PORT:
-        {
-            for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
-            {
-                if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
-                {
-                    WorldPacket data(CMSG_BATTLEFIELD_PORT);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-                    data << uint32(GetBattleGrounMapIdByTypeId(BattleGroundTypeId(i)));
-#endif
-                    data << uint8(1);
-                    me->GetSession()->HandleBattleFieldPortOpcode(data);
-                    break;
-                }
-            }
-            break;
-        }
         case CMSG_BATTLEMASTER_JOIN:
         {
             WorldPacket data(CMSG_BATTLEMASTER_JOIN);
@@ -411,7 +377,7 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
             data << uint32(0);                                 // instance id, 0 if First Available selected
             data << uint8(0);                                  // join as group
             me->GetSession()->HandleBattlemasterJoinOpcode(data);
-            break;
+            return;
         }
         case CMSG_LEAVE_BATTLEFIELD:
         {
@@ -422,9 +388,11 @@ void BattleBotAI::SendFakePacket(uint16 opcode)
             data << uint16(0);                          // unk2 0
 #endif
             me->GetSession()->HandleLeaveBattlefieldOpcode(data);
-            break;
+            return;
         }
     }
+
+    CombatBotBaseAI::SendFakePacket(opcode);
 }
 
 void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
@@ -432,69 +400,16 @@ void BattleBotAI::OnPacketReceived(WorldPacket const* packet)
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
     switch (packet->GetOpcode())
     {
-        case SMSG_NEW_WORLD:
-        {
-            botEntry->m_pendingResponses.push_back(MSG_MOVE_WORLDPORT_ACK);
-            break;
-        }
-        case MSG_MOVE_TELEPORT_ACK:
-        {
-            botEntry->m_pendingResponses.push_back(MSG_MOVE_TELEPORT_ACK);
-            break;
-        }
-        case SMSG_TRADE_STATUS:
-        {
-            uint32 status = *((uint32*)(*packet).contents());
-            if (status == TRADE_STATUS_BEGIN_TRADE)
-            {
-                WorldPacket data(CMSG_BEGIN_TRADE);
-                me->GetSession()->HandleBeginTradeOpcode(data);
-            }
-            else if (status == TRADE_STATUS_TRADE_ACCEPT)
-            {
-                if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START))
-                    me->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
-
-                WorldPacket data(CMSG_ACCEPT_TRADE);
-                data << uint32(1);
-                me->GetSession()->HandleAcceptTradeOpcode(data);
-            }
-            else if (status == TRADE_STATUS_TRADE_COMPLETE)
-            {
-                EquipOrUseNewItem();
-            }
-            break;
-        }
-        case SMSG_RESURRECT_REQUEST:
-        {
-            me->ResurectUsingRequestData();
-            break;
-        }
-        case SMSG_BATTLEFIELD_STATUS:
-        {
-            if (me->IsBeingTeleported() || me->InBattleGround())
-                m_receivedBgInvite = false;
-            else
-            {
-                for (uint32 i = BATTLEGROUND_QUEUE_AV; i <= BATTLEGROUND_QUEUE_AB; i++)
-                {
-                    if (me->IsInvitedForBattleGroundQueueType(BattleGroundQueueTypeId(i)))
-                    {
-                        m_receivedBgInvite = true;
-                        break;
-                    }
-                }
-            }
-            break;
-        }
         case MSG_PVP_LOG_DATA:
         {
             uint8 ended = *((uint8*)(*packet).contents());
             if (ended)
                 botEntry->m_pendingResponses.push_back(CMSG_LEAVE_BATTLEFIELD);
-            break;
+            return;
         }
     }
+
+    CombatBotBaseAI::OnPacketReceived(packet);
 }
 
 void BattleBotAI::OnPlayerLogin()

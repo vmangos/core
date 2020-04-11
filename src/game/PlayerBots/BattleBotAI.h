@@ -11,33 +11,11 @@ enum BattleBotWsgWaitSpot
     BB_WSG_WAIT_SPOT_RIGHT
 };
 
-#define AT_SILVERWING_FLAG 3646
-#define GO_SILVERWING_FLAG 179830
-#define AURA_SILVERWING_FLAG 23335
-
-#define AT_WARSONG_FLAG 3647
-#define GO_WARSONG_FLAG 179831
-#define AURA_WARSONG_FLAG 23333
-
-#define GO_AB_ALLIANCE_BANNER 180058
-#define GO_AB_CONTESTED_BANNER1 180059
-#define GO_AB_HORDE_BANNER 180060
-#define GO_AB_CONTESTED_BANNER2 180061
-#define GO_AB_STABLE_BANNER 180087
-#define GO_AB_BLACKSMITH_BANNER 180088
-#define GO_AB_FARM_BANNER 180089
-#define GO_AB_LUMBER_MILL_BANNER 180090
-#define GO_AB_GOLD_MINE_BANNER 180091
-
-#define GO_AV_HORDE_BANNER1 178364
-#define GO_AV_HORDE_BANNER2 178943
-#define GO_AV_ALLIANCE_BANNER1 178365
-#define GO_AV_ALLIANCE_BANNER2 178925
-#define GO_AV_CONTESTED_BANNER1 178940
-#define GO_AV_CONTESTED_BANNER2 179286
-#define GO_AV_CONTESTED_BANNER3 179287
-#define GO_AV_CONTESTED_BANNER4 179435
-#define GO_AV_SNOWFALL_BANNER3 180418
+enum FlagSpellsWS
+{
+    AURA_WARSONG_FLAG    = 23333,
+    AURA_SILVERWING_FLAG = 23335
+};
 
 class BattleBotAI : public CombatBotBaseAI
 {
@@ -53,11 +31,11 @@ public:
         return SpawnNewPlayer(sess, m_class, m_race, m_mapId, m_instanceId, m_x, m_y, m_z, m_o);
     }
 
-    void OnPlayerLogin() override;
-    void UpdateAI(uint32 const diff) override;
-    void OnPacketReceived(WorldPacket const* packet) override;
-    void SendFakePacket(uint16 opcode) override;
-    void MovementInform(uint32 MovementType, uint32 Data = 0) override;
+    void OnPlayerLogin() final;
+    void UpdateAI(uint32 const diff) final;
+    void OnPacketReceived(WorldPacket const* packet) final;
+    void SendFakePacket(uint16 opcode) final;
+    void MovementInform(uint32 MovementType, uint32 Data = 0) final;
 
     bool DrinkAndEat();
     void AddPremadeGearAndSpells();
@@ -91,7 +69,6 @@ public:
     void UpdateInCombatAI_Druid() final;
     void UpdateOutOfCombatAI_Druid() final;
 
-    bool m_receivedBgInvite = false;
     uint8 m_battlegroundId = 0;
     ShortTimeTracker m_updateTimer;
     uint8 m_race = 0;
