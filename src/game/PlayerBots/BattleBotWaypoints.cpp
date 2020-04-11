@@ -577,10 +577,16 @@ BattleBotPath vPath_WSG_AllianceGYJump_to_HordeFlagRoom =
     { 953.017f, 1423.3f, 345.835f, nullptr },
     { 933.331f, 1433.72f, 345.536f, &WSG_AtHordeFlag },
 };
-// Horde Tunnel Middle to Horde Base Roof
-BattleBotPath vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof =
+// Horde Tunnel to Horde Base Roof
+BattleBotPath vPath_WSG_HordeTunnel_to_HordeBaseRoof =
 {
-    { 948.488f, 1459.834f, 343.066f, nullptr },
+    { 1124.37f, 1462.28f, 315.853f, nullptr },
+    { 1106.87f, 1462.13f, 316.558f, nullptr },
+    { 1089.44f, 1461.04f, 316.332f, nullptr },
+    { 1072.07f, 1459.46f, 317.449f, nullptr },
+    { 1051.09f, 1459.89f, 323.126f, nullptr },
+    { 1030.1f, 1459.58f, 330.204f, nullptr },
+    { 1010.76f, 1457.49f, 334.896f, nullptr },
     { 981.948f, 1459.07f, 336.154f, nullptr },
     { 981.768f, 1480.46f, 335.976f, nullptr },
     { 974.664f, 1495.9f, 340.837f, nullptr },
@@ -601,10 +607,16 @@ BattleBotPath vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof =
     { 952.778f, 1433.0f, 367.604f, nullptr },
     { 952.708f, 1445.01f, 367.604f, nullptr },
 };
-// Alliance Tunnel Middle to Alliance Base Roof
-BattleBotPath vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoof =
+// Alliance Tunnel to Alliance Base Roof
+BattleBotPath vPath_WSG_AllianceTunnel_to_AllianceBaseRoof =
 {
-    { 1496.578f, 1457.900f, 344.442f, nullptr },
+    { 1348.02f, 1461.06f, 323.167f, nullptr },
+    { 1359.8f, 1461.49f, 324.527f, nullptr },
+    { 1372.47f, 1461.61f, 324.354f, nullptr },
+    { 1389.08f, 1461.12f, 325.913f, nullptr },
+    { 1406.57f, 1460.48f, 330.615f, nullptr },
+    { 1424.04f, 1459.57f, 336.029f, nullptr },
+    { 1442.5f, 1459.7f, 342.024f, nullptr },
     { 1471.86f, 1456.65f, 342.794f, nullptr },
     { 1470.93f, 1440.5f, 342.794f, nullptr },
     { 1472.24f, 1427.49f, 342.06f, nullptr },
@@ -1621,8 +1633,8 @@ std::vector<BattleBotPath*> vPaths_WS =
     &vPath_WSG_AllianceGYJump_to_HordeTunnel,
     &vPath_WSG_HordeGYJump_to_AllianceFlagRoom,
     &vPath_WSG_AllianceGYJump_to_HordeFlagRoom,
-    &vPath_WSG_HordeTunnelMiddle_to_HordeBaseRoof,
-    &vPath_WSG_AllianceTunnelMiddle_to_AllianceBaseRoof,
+    &vPath_WSG_HordeTunnel_to_HordeBaseRoof,
+    &vPath_WSG_AllianceTunnel_to_AllianceBaseRoof,
 };
 
 std::vector<BattleBotPath*> vPaths_AB =
