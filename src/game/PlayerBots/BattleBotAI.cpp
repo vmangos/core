@@ -27,6 +27,30 @@ enum BattleBotSpells
     BB_SPELL_SUMMON_FELHUNTER = 691,
     BB_SPELL_SUMMON_SUCCUBUS = 712,
 
+    BB_SPELL_MOUNT_40_HUMAN = 470,
+    BB_SPELL_MOUNT_40_NELF = 10787,
+    BB_SPELL_MOUNT_40_DWARF = 6896,
+    BB_SPELL_MOUNT_40_GNOME = 17456,
+    BB_SPELL_MOUNT_40_TROLL = 10795,
+    BB_SPELL_MOUNT_40_ORC = 581,
+    BB_SPELL_MOUNT_40_TAUREN = 18363,
+    BB_SPELL_MOUNT_40_UNDEAD = 8980,
+
+    BB_SPELL_MOUNT_60_HUMAN = 22717,
+    BB_SPELL_MOUNT_60_NELF = 22723,
+    BB_SPELL_MOUNT_60_DWARF = 22720,
+    BB_SPELL_MOUNT_60_GNOME = 22719,
+    BB_SPELL_MOUNT_60_TROLL = 22721,
+    BB_SPELL_MOUNT_60_ORC = 22724,
+    BB_SPELL_MOUNT_60_TAUREN = 22718,
+    BB_SPELL_MOUNT_60_UNDEAD = 22722,
+
+    BB_SPELL_MOUNT_40_PALADIN = 13819,
+    BB_SPELL_MOUNT_60_PALADIN = 23214,
+
+    BB_SPELL_MOUNT_40_WARLOCK = 5784,
+    BB_SPELL_MOUNT_60_WARLOCK = 23161,
+
     BB_PET_WOLF    = 565,
     BB_PET_CAT     = 681,
     BB_PET_BEAR    = 822,
@@ -54,6 +78,9 @@ enum BattleBotSpells
 #define BB_MAX_FOLLOW_DIST 6.0f
 #define BB_MIN_FOLLOW_ANGLE 0.0f
 #define BB_MAX_FOLLOW_ANGLE 6.0f
+
+#define GO_WSG_DROPPED_SILVERWING_FLAG 179785
+#define GO_WSG_DROPPED_WARSONG_FLAG 179786
 
 static bool IsPhysicalDamageClass(uint8 playerClass)
 {
@@ -148,9 +175,105 @@ void BattleBotAI::AddPremadeGearAndSpells()
     }
 }
 
+uint32 BattleBotAI::GetMountSpellId() const
+{
+    if (me->GetLevel() >= 60)
+    {
+        if (me->GetClass() == CLASS_PALADIN)
+            return BB_SPELL_MOUNT_60_PALADIN;
+        if (me->GetClass() == CLASS_WARLOCK)
+            return BB_SPELL_MOUNT_60_WARLOCK;
+
+        switch (me->GetRace())
+        {
+            case RACE_HUMAN:
+                return BB_SPELL_MOUNT_60_HUMAN;
+            case RACE_NIGHTELF:
+                return BB_SPELL_MOUNT_60_NELF;
+            case RACE_DWARF:
+                return BB_SPELL_MOUNT_60_DWARF;
+            case RACE_GNOME:
+                return BB_SPELL_MOUNT_60_GNOME;
+            case RACE_TROLL:
+                return BB_SPELL_MOUNT_60_TROLL;
+            case RACE_ORC:
+                return BB_SPELL_MOUNT_60_ORC;
+            case RACE_TAUREN:
+                return BB_SPELL_MOUNT_60_HUMAN;
+            case RACE_UNDEAD:
+                return BB_SPELL_MOUNT_60_UNDEAD;
+        }
+    }
+    else if (me->GetLevel() >= 40)
+    {
+        if (me->GetClass() == CLASS_PALADIN)
+            return BB_SPELL_MOUNT_40_PALADIN;
+        if (me->GetClass() == CLASS_WARLOCK)
+            return BB_SPELL_MOUNT_40_WARLOCK;
+
+        switch (me->GetRace())
+        {
+            case RACE_HUMAN:
+                return BB_SPELL_MOUNT_40_HUMAN;
+            case RACE_NIGHTELF:
+                return BB_SPELL_MOUNT_40_NELF;
+            case RACE_DWARF:
+                return BB_SPELL_MOUNT_40_DWARF;
+            case RACE_GNOME:
+                return BB_SPELL_MOUNT_40_GNOME;
+            case RACE_TROLL:
+                return BB_SPELL_MOUNT_40_TROLL;
+            case RACE_ORC:
+                return BB_SPELL_MOUNT_40_ORC;
+            case RACE_TAUREN:
+                return BB_SPELL_MOUNT_40_HUMAN;
+            case RACE_UNDEAD:
+                return BB_SPELL_MOUNT_40_UNDEAD;
+        }
+    }
+
+    return 0;
+}
+
+bool BattleBotAI::UseMount()
+{
+    if (me->IsMounted())
+        return false;
+
+    if (me->IsMoving())
+        return false;
+
+    if (me->GetDisplayId() != me->GetNativeDisplayId())
+        return false;
+
+    if (me->GetClass() == CLASS_ROGUE ||
+       (me->GetClass() == CLASS_DRUID && m_role != ROLE_HEALER))
+        return false;
+
+    if (BattleGround* bg = me->GetBattleGround())
+        if (bg->GetStatus() == STATUS_WAIT_JOIN)
+            return false;
+
+    if (me->HasAura(AURA_WARSONG_FLAG) ||
+        me->HasAura(AURA_SILVERWING_FLAG))
+        return false;
+
+    uint32 spellId = GetMountSpellId();
+    if (!spellId)
+        return false;
+
+    if (me->CastSpell(me, spellId, false) == SPELL_CAST_OK)
+        return true;
+
+    return false;
+}
+
 bool BattleBotAI::DrinkAndEat()
 {
     if (m_isBuffing)
+        return false;
+
+    if (me->IsMounted())
         return false;
 
     if (me->GetVictim())
@@ -430,7 +553,7 @@ void BattleBotAI::OnPlayerLogin()
         me->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
 }
 
-void BattleBotAI::UpdateMovement()
+void BattleBotAI::UpdateWaypointMovement()
 {
     // We already have a path.
     if (m_currentPath)
@@ -445,7 +568,7 @@ void BattleBotAI::UpdateMovement()
     if (me->IsInCombat())
         return;
 
-    if (me->HasUnitState(UNIT_STAT_ROOT))
+    if (me->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
         return;
 
     switch (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
@@ -462,9 +585,7 @@ void BattleBotAI::UpdateMovement()
         if (bg->GetStatus() == STATUS_WAIT_JOIN)
             return;
 
-    if ((me->HasAura(AURA_WARSONG_FLAG) ||
-        me->HasAura(AURA_SILVERWING_FLAG)) &&
-        StartNewPathToBase())
+    if (StartNewPathToObjective())
         return;
 
     if (StartNewPathFromBeginning())
@@ -476,6 +597,11 @@ void BattleBotAI::UpdateMovement()
 void BattleBotAI::OnJustDied()
 {
     ClearPath();
+    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+    {
+        me->GetMotionMaster()->Clear();
+        me->GetMotionMaster()->MoveIdle();
+    }
 }
 
 void BattleBotAI::OnJustRevived()
@@ -695,10 +821,15 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     {
         if (DrinkAndEat())
             return;
+    }
 
-        if (me->GetStandState() != UNIT_STAND_STATE_STAND)
-            me->SetStandState(UNIT_STAND_STATE_STAND);
+    if (me->GetStandState() != UNIT_STAND_STATE_STAND)
+        me->SetStandState(UNIT_STAND_STATE_STAND);
 
+    UpdateBattleGroundAI();
+
+    if (!me->IsInCombat())
+    {
         UpdateOutOfCombatAI();
 
         if (m_isBuffing)
@@ -713,6 +844,12 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
         {
+            if (Unit* pVictim = SelectAttackTarget())
+            {
+                AttackStart(pVictim);
+                return;
+            }
+
             if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() != FOLLOW_MOTION_TYPE)
             {
                 if (Unit* pFollowTarget = SelectFollowTarget())
@@ -735,19 +872,13 @@ void BattleBotAI::UpdateAI(uint32 const diff)
                 }
             }
 
-            if (Unit* pVictim = SelectAttackTarget())
-            {
-                AttackStart(pVictim);
+            if (UseMount())
                 return;
-            }
             
-            UpdateMovement();
+            UpdateWaypointMovement();
         }
         return;
     }
-
-    if (me->GetStandState() != UNIT_STAND_STATE_STAND)
-        me->SetStandState(UNIT_STAND_STATE_STAND);
 
     if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura() || 
         !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
@@ -775,6 +906,25 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (me->IsInCombat())
         UpdateInCombatAI();
+}
+
+void BattleBotAI::UpdateBattleGroundAI()
+{
+    BattleGround* bg = me->GetBattleGround();
+    if (!bg)
+        return;
+
+    switch (bg->GetTypeID())
+    {
+        case BATTLEGROUND_WS:
+        {
+            if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_DROPPED_SILVERWING_FLAG, INTERACTION_DISTANCE))
+                pGo->Use(me);
+            if (GameObject* pGo = me->FindNearestGameObject(GO_WSG_DROPPED_WARSONG_FLAG, INTERACTION_DISTANCE))
+                pGo->Use(me);
+            break;
+        }
+    }
 }
 
 void BattleBotAI::UpdateOutOfCombatAI()
@@ -1017,7 +1167,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Shaman()
     if (m_spells.shaman.pWeaponBuff &&
         CanTryToCastSpell(me, m_spells.shaman.pWeaponBuff))
     {
-        if (CastWeaponBuff(m_spells.shaman.pWeaponBuff) == SPELL_CAST_OK)
+        if (CastWeaponBuff(m_spells.shaman.pWeaponBuff, EQUIPMENT_SLOT_MAINHAND) == SPELL_CAST_OK)
             return;
     }
 
@@ -1038,7 +1188,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Shaman()
     else
     {
         if (m_spells.shaman.pGhostWolf &&
-           !me->IsMoving() &&
+           !me->IsMoving() && !me->IsMounted() &&
             CanTryToCastSpell(me, m_spells.shaman.pGhostWolf))
         {
             if (DoCastSpell(me, m_spells.shaman.pGhostWolf) == SPELL_CAST_OK)
@@ -1150,6 +1300,7 @@ void BattleBotAI::UpdateInCombatAI_Shaman()
 void BattleBotAI::UpdateOutOfCombatAI_Hunter()
 {
     if (m_spells.hunter.pAspectOfTheCheetah &&
+       !me->IsMounted() &&
         CanTryToCastSpell(me, m_spells.hunter.pAspectOfTheCheetah))
     {
         if (DoCastSpell(me, m_spells.hunter.pAspectOfTheCheetah) == SPELL_CAST_OK)
@@ -2216,9 +2367,22 @@ void BattleBotAI::UpdateInCombatAI_Warrior()
     }
 }
 
-
 void BattleBotAI::UpdateOutOfCombatAI_Rogue()
 {
+    if (m_spells.rogue.pMainHandPoison &&
+        CanTryToCastSpell(me, m_spells.rogue.pMainHandPoison))
+    {
+        if (CastWeaponBuff(m_spells.rogue.pMainHandPoison, EQUIPMENT_SLOT_MAINHAND) == SPELL_CAST_OK)
+            return;
+    }
+
+    if (m_spells.rogue.pOffHandPoison &&
+        CanTryToCastSpell(me, m_spells.rogue.pOffHandPoison))
+    {
+        if (CastWeaponBuff(m_spells.rogue.pOffHandPoison, EQUIPMENT_SLOT_OFFHAND) == SPELL_CAST_OK)
+            return;
+    }
+
     if (m_spells.rogue.pStealth &&
         CanTryToCastSpell(me, m_spells.rogue.pStealth) &&
        !me->HasAura(AURA_WARSONG_FLAG) &&
@@ -2548,7 +2712,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
             me->RemoveAurasDueToSpellByCancel(m_spells.druid.pMoonkinForm->Id);
 
         if (m_spells.druid.pTravelForm &&
-           !me->IsMoving() &&
+           !me->IsMoving() && !me->IsMounted() &&
             CanTryToCastSpell(me, m_spells.druid.pTravelForm))
         {
             if (DoCastSpell(me, m_spells.druid.pTravelForm) == SPELL_CAST_OK)

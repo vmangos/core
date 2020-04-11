@@ -39,6 +39,12 @@ enum GameObjectsAV
     GO_AV_SNOWFALL_BANNER3  = 180418
 };
 
+enum CreaturesAV
+{
+    NPC_AV_GALVANGAR = 11947,
+    NPC_AV_BALINDA   = 11949
+};
+
 enum GameObjectsWS
 {
     GO_WS_SILVERWING_FLAG = 179830,
@@ -179,12 +185,28 @@ uint32 const FlagIds[] = { GO_AB_ALLIANCE_BANNER , GO_AB_CONTESTED_BANNER1 , GO_
 
 void AtFlag(BattleBotAI* pAI)
 {
+    if (Player* pFriend = pAI->me->FindNearestFriendlyPlayer(INTERACTION_DISTANCE))
+    {
+        if (pFriend->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
+            pFriend->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_CAPTURE_BANNER)
+        {
+            pAI->MoveToNextPoint();
+            return;
+        }
+    }
+
     for (const auto& bannerId : FlagIds)
     {
         if (GameObject* pGo = pAI->me->FindNearestGameObject(bannerId, INTERACTION_DISTANCE))
         {
             if (pGo->isSpawned() && (pAI->me->GetReactionTo(pGo) >= REP_NEUTRAL))
             {
+                if (pAI->me->IsMounted())
+                    pAI->me->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+
+                if (pAI->me->IsInDisallowedMountForm())
+                    pAI->me->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+
                 pAI->ClearPath();
                 pAI->me->CastSpell(pGo, SPELL_CAPTURE_BANNER, false);
                 return;
@@ -218,26 +240,6 @@ void MoveToNextPointSpecial(BattleBotAI* pAI)
     BattleBotWaypoint& nextPoint = pAI->m_currentPath->at(pAI->m_currentPoint);
 
     pAI->me->GetMotionMaster()->MovePoint(pAI->m_currentPoint, nextPoint.x + frand(-1, 1), nextPoint.y + frand(-1, 1), nextPoint.z, MOVE_NONE);
-}
-
-void AtMountSpot(BattleBotAI* pAI)
-{
-    if (!pAI->me->IsMounted())
-    {
-        pAI->ClearPath();
-
-        bool oldState = pAI->me->HasCheatOption(PLAYER_CHEAT_NO_CAST_TIME);
-        pAI->me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, true);
-
-        if (pAI->me->GetTeam() == HORDE)
-            pAI->me->CastSpell(pAI->me, 23509, true); // Frostwolf Howler
-        else
-            pAI->me->CastSpell(pAI->me, 23510, true); // Stormpike Battle Charger
-
-        pAI->me->SetCheatOption(PLAYER_CHEAT_NO_CAST_TIME, oldState);
-    }
-
-    pAI->MoveToNextPoint();
 }
 
 std::vector<RecordedMovementPacket> vAllianceGraveyardJumpPath =
@@ -911,7 +913,7 @@ BattleBotPath vPath_AB_Farm_to_LumberMill =
 
 BattleBotPath vPath_AV_Horde_Cave_to_Tower_Point_Crossroad =
 {
-    { -885.928f, -536.612f, 55.1936f, &AtMountSpot },
+    { -885.928f, -536.612f, 55.1936f, nullptr },
     { -880.957f, -525.119f, 53.6791f, nullptr },
     { -839.408f, -499.746f, 49.7505f, nullptr },
     { -820.21f, -469.193f, 49.4085f,  nullptr },
@@ -1588,7 +1590,7 @@ BattleBotPath vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad 
 
 BattleBotPath vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad =
 {
-    { 769.016f, -491.165f, 97.7772f, &AtMountSpot },
+    { 769.016f, -491.165f, 97.7772f, nullptr },
     { 758.026f, -489.447f, 95.9521f, nullptr },
     { 742.169f, -480.684f, 85.9649f, nullptr },
     { 713.063f, -467.311f, 71.0884f, nullptr },
@@ -1864,22 +1866,18 @@ float GetDistance3D(A const& from, B const& to)
     return (dist > 0 ? dist : 0);
 }
 
-bool BattleBotAI::StartNewPathToBase()
+bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::vector<BattleBotPath*>& vPaths)
 {
-    if (me->GetBattleGround()->GetTypeID() != BATTLEGROUND_WS)
-        return false;
-
     BattleBotPath* pClosestPath = nullptr;
     uint32 closestPoint = 0;
     float closestDistanceToBase = FLT_MAX;
     bool reverse = false;
-    Position homeBasePosition = me->GetTeam() == HORDE ? WS_FLAG_POS_HORDE : WS_FLAG_POS_ALLIANCE;
 
-    for (const auto& pPath : vPaths_WS)
+    for (const auto& pPath : vPaths)
     {
         {
             BattleBotWaypoint& lastPoint = ((*pPath)[pPath->size() - 1]);
-            float const distanceFromPathEndToBase = GetDistance3D(lastPoint, homeBasePosition);
+            float const distanceFromPathEndToBase = GetDistance3D(lastPoint, targetPosition);
             if (closestDistanceToBase > distanceFromPathEndToBase)
             {
                 float closestDistanceFromMeToPoint = FLT_MAX;
@@ -1902,7 +1900,7 @@ bool BattleBotAI::StartNewPathToBase()
         
         {
             BattleBotWaypoint& firstPoint = ((*pPath)[0]);
-            float const distanceFromPathEndToBase = GetDistance3D(firstPoint, homeBasePosition);
+            float const distanceFromPathEndToBase = GetDistance3D(firstPoint, targetPosition);
             if (closestDistanceToBase > distanceFromPathEndToBase)
             {
                 float closestDistanceFromMeToPoint = FLT_MAX;
@@ -1932,6 +1930,41 @@ bool BattleBotAI::StartNewPathToBase()
     m_currentPoint = m_movingInReverse ? closestPoint + 1 : closestPoint - 1;
     MoveToNextPoint();
     return true;
+}
+
+bool BattleBotAI::StartNewPathToObjective()
+{
+    BattleGround* bg = me->GetBattleGround();
+    if (!bg)
+        return false;
+
+    switch (bg->GetTypeID())
+    {
+        case BATTLEGROUND_AV:
+        {
+            if (me->GetTeam() == HORDE)
+            {
+                if (Creature* pBalinda = me->FindNearestCreature(NPC_AV_BALINDA, SIZE_OF_GRIDS))
+                    return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
+            }
+            else
+            {
+                if (Creature* pGalvangar = me->FindNearestCreature(NPC_AV_GALVANGAR, SIZE_OF_GRIDS))
+                    return StartNewPathToPosition(pGalvangar->GetPosition(), vPaths_AV);
+            }
+            break;
+        }
+        case BATTLEGROUND_WS:
+        {
+            if (me->HasAura(AURA_WARSONG_FLAG))
+                return StartNewPathToPosition(WS_FLAG_POS_ALLIANCE, vPaths_WS);
+            if (me->HasAura(AURA_SILVERWING_FLAG))
+                return StartNewPathToPosition(WS_FLAG_POS_HORDE, vPaths_WS);
+            break;
+        }
+    }
+
+    return false;
 }
 
 void BattleBotAI::ClearPath()

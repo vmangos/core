@@ -10,7 +10,7 @@
 #include "Chat.h"
 #include "TargetedMovementGenerator.h"
 
-enum BattleBotSpells
+enum CombatBotSpells
 {
     SPELL_SHIELD_SLAM = 23922,
     SPELL_HOLY_SHIELD = 20925,
@@ -26,6 +26,12 @@ enum BattleBotSpells
     SPELL_SUMMON_FELHUNTER = 691,
     SPELL_SUMMON_SUCCUBUS = 712,
     SPELL_TAME_BEAST = 13481,
+
+    SPELL_DEADLY_POISON = 2823,
+    SPELL_INSTANT_POISON = 8679,
+    SPELL_CRIPPLING_POISON = 3408,
+    SPELL_WOUND_POISON = 13219,
+    SPELL_MIND_NUMBING_POISON = 5761,
 
     PET_WOLF    = 565,
     PET_CAT     = 681,
@@ -188,6 +194,12 @@ void CombatBotBaseAI::PopulateSpellData()
     SpellEntry const* pPolymorphCow = nullptr;
     SpellEntry const* pPolymorphPig = nullptr;
     SpellEntry const* pPolymorphTurtle = nullptr;
+
+    bool hasDeadlyPoison = false;
+    bool hasInstantPoison = false;
+    bool hasCripplingPoison = false;
+    bool hasWoundPoison = false;
+    bool HasMindNumbingPoison = false;
 
     for (const auto& spell : me->GetSpellMap())
     {
@@ -1511,6 +1523,26 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.rogue.pSprint->Id < pSpellEntry->Id)
                         m_spells.rogue.pSprint = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Deadly Poison") != std::string::npos)
+                {
+                    hasDeadlyPoison = true;
+                }
+                else if (pSpellEntry->SpellName[0].find("Instant Poison") != std::string::npos)
+                {
+                    hasInstantPoison = true;
+                }
+                else if (pSpellEntry->SpellName[0].find("Crippling Poison") != std::string::npos)
+                {
+                    hasCripplingPoison = true;
+                }
+                else if (pSpellEntry->SpellName[0].find("Wound Poison") != std::string::npos)
+                {
+                    hasWoundPoison = true;
+                }
+                else if (pSpellEntry->SpellName[0].find("Mind-numbing Poison") != std::string::npos)
+                {
+                    HasMindNumbingPoison = true;
+                }
                 break;
             }
             case CLASS_DRUID:
@@ -1952,6 +1984,35 @@ void CombatBotBaseAI::PopulateSpellData()
                 polymorph.push_back(pPolymorphTurtle);
             if (!polymorph.empty())
                 m_spells.mage.pPolymorph = SelectRandomContainerElement(polymorph);
+
+            break;
+        }
+        case CLASS_ROGUE:
+        {
+            // Rogues can only craft an item that applies the poison, they don't know the actual poison enchant.
+            SpellEntry const* pDeadlyPoison = sSpellMgr.GetSpellEntry(SPELL_DEADLY_POISON);
+            SpellEntry const* pInstantPoison = sSpellMgr.GetSpellEntry(SPELL_INSTANT_POISON);
+            SpellEntry const* pCripplingPoison = sSpellMgr.GetSpellEntry(SPELL_CRIPPLING_POISON);
+            SpellEntry const* pWoundPoison = sSpellMgr.GetSpellEntry(SPELL_WOUND_POISON);
+            SpellEntry const* pMindNumbingPoison = sSpellMgr.GetSpellEntry(SPELL_MIND_NUMBING_POISON);
+
+            std::vector<SpellEntry const*> vPoisons;
+            if (pDeadlyPoison && hasDeadlyPoison)
+                vPoisons.push_back(pDeadlyPoison);
+            if (pInstantPoison && hasInstantPoison)
+                vPoisons.push_back(pInstantPoison);
+            if (pCripplingPoison && hasCripplingPoison)
+                vPoisons.push_back(pCripplingPoison);
+            if (pWoundPoison && hasWoundPoison)
+                vPoisons.push_back(pWoundPoison);
+            if (pMindNumbingPoison && HasMindNumbingPoison)
+                vPoisons.push_back(pMindNumbingPoison);
+
+            if (!vPoisons.empty())
+            {
+                m_spells.rogue.pMainHandPoison = SelectRandomContainerElement(vPoisons);
+                m_spells.rogue.pOffHandPoison = SelectRandomContainerElement(vPoisons);
+            }
 
             break;
         }
@@ -2512,9 +2573,9 @@ bool CombatBotBaseAI::SummonShamanTotems()
     return false;
 }
 
-SpellCastResult CombatBotBaseAI::CastWeaponBuff(SpellEntry const* pSpellEntry)
+SpellCastResult CombatBotBaseAI::CastWeaponBuff(SpellEntry const* pSpellEntry, EquipmentSlots slot)
 {
-    Item* pWeapon = me->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
+    Item* pWeapon = me->GetItemByPos(INVENTORY_SLOT_BAG_0, slot);
     if (!pWeapon)
         return SPELL_FAILED_ITEM_NOT_FOUND;
     if (pWeapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT))

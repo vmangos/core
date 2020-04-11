@@ -38,6 +38,8 @@ public:
     void MovementInform(uint32 MovementType, uint32 Data = 0) final;
 
     bool DrinkAndEat();
+    bool UseMount();
+    uint32 GetMountSpellId() const;
     void AddPremadeGearAndSpells();
     bool AttackStart(Unit* pVictim);
     Unit* SelectAttackTarget() const;
@@ -48,6 +50,7 @@ public:
     void OnEnterBattleGround();
     void OnLeaveBattleGround();
 
+    void UpdateBattleGroundAI();
     void UpdateInCombatAI() final;
     void UpdateOutOfCombatAI() final;
     void UpdateInCombatAI_Paladin() final;
@@ -83,12 +86,13 @@ public:
     bool m_wasInBG = false;
 
     // Movement System
-    void UpdateMovement();
+    void UpdateWaypointMovement();
     void DoGraveyardJump();
     void MoveToNextPoint();
     bool StartNewPathFromBeginning();
     void StartNewPathFromAnywhere();
-    bool StartNewPathToBase();
+    bool StartNewPathToObjective();
+    bool StartNewPathToPosition(Position const& position, std::vector<BattleBotPath*>& vPaths);
     void ClearPath();
     bool m_doingGraveyardJump = false;
     bool m_movingInReverse = false;

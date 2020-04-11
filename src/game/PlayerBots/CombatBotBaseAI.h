@@ -113,7 +113,7 @@ public:
     void AddItemToInventory(uint32 itemId);
 
     bool SummonShamanTotems();
-    SpellCastResult CastWeaponBuff(SpellEntry const* pSpellEntry);
+    SpellCastResult CastWeaponBuff(SpellEntry const* pSpellEntry, EquipmentSlots slot);
 
     virtual void UpdateInCombatAI() = 0;
     virtual void UpdateOutOfCombatAI() = 0;
@@ -428,6 +428,8 @@ public:
             SpellEntry const* pRiposte;
             SpellEntry const* pKick;
             SpellEntry const* pSprint;
+            SpellEntry const* pMainHandPoison;
+            SpellEntry const* pOffHandPoison;
         } rogue;
         struct
         {
