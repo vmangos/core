@@ -217,6 +217,19 @@ void AtFlag(BattleBotAI* pAI)
     pAI->MoveToNextPoint();
 }
 
+void AtCaveExit(BattleBotAI* pAI)
+{
+    pAI->me->StopMoving();
+
+    if (pAI->UseMount())
+    {
+        pAI->ClearPath();
+        return;
+    }
+
+    pAI->MoveToNextPoint();
+}
+
 void MoveToNextPointSpecial(BattleBotAI* pAI)
 {
     if (!pAI->m_currentPath)
@@ -925,7 +938,7 @@ BattleBotPath vPath_AB_Farm_to_LumberMill =
 
 BattleBotPath vPath_AV_Horde_Cave_to_Tower_Point_Crossroad =
 {
-    { -885.928f, -536.612f, 55.1936f, nullptr },
+    { -885.928f, -536.612f, 55.1936f, &AtCaveExit },
     { -880.957f, -525.119f, 53.6791f, nullptr },
     { -839.408f, -499.746f, 49.7505f, nullptr },
     { -820.21f, -469.193f, 49.4085f,  nullptr },
@@ -940,7 +953,7 @@ BattleBotPath vPath_AV_Horde_Cave_to_Tower_Point_Crossroad =
 
 BattleBotPath vPath_AV_Horde_Cave_to_Frostwolf_Graveyard_Flag =
 {
-    { -885.928f, -536.612f, 55.1936f, nullptr },
+    { -885.928f, -536.612f, 55.1936f, &AtCaveExit },
     { -892.195f, -527.288f, 54.3716f, nullptr },
     { -901.886f, -506.521f, 54.2415f, nullptr },
     { -908.843f, -494.624f, 46.3098f, nullptr },
@@ -1602,7 +1615,7 @@ BattleBotPath vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad 
 
 BattleBotPath vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad =
 {
-    { 769.016f, -491.165f, 97.7772f, nullptr },
+    { 769.016f, -491.165f, 97.7772f, &AtCaveExit },
     { 758.026f, -489.447f, 95.9521f, nullptr },
     { 742.169f, -480.684f, 85.9649f, nullptr },
     { 713.063f, -467.311f, 71.0884f, nullptr },

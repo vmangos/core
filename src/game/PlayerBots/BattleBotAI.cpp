@@ -199,7 +199,7 @@ uint32 BattleBotAI::GetMountSpellId() const
             case RACE_ORC:
                 return BB_SPELL_MOUNT_60_ORC;
             case RACE_TAUREN:
-                return BB_SPELL_MOUNT_60_HUMAN;
+                return BB_SPELL_MOUNT_60_TAUREN;
             case RACE_UNDEAD:
                 return BB_SPELL_MOUNT_60_UNDEAD;
         }
@@ -226,7 +226,7 @@ uint32 BattleBotAI::GetMountSpellId() const
             case RACE_ORC:
                 return BB_SPELL_MOUNT_40_ORC;
             case RACE_TAUREN:
-                return BB_SPELL_MOUNT_40_HUMAN;
+                return BB_SPELL_MOUNT_40_TAUREN;
             case RACE_UNDEAD:
                 return BB_SPELL_MOUNT_40_UNDEAD;
         }
