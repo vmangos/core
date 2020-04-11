@@ -1159,7 +1159,7 @@ void BattleBotAI::UpdateInCombatAI_Paladin()
         }
     }
 
-    FindAndHealInjuredAlly(40.0f, 50.0f);
+    FindAndHealInjuredAlly(me->IsTotalImmune() ? 80.0f : 40.0f, 50.0f);
 }
 
 void BattleBotAI::UpdateOutOfCombatAI_Shaman()
