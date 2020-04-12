@@ -1978,80 +1978,240 @@ bool BattleBotAI::StartNewPathToObjective()
     {
         case BATTLEGROUND_AV:
         {
-            if (GameObject* pGo = me->FindNearestGameObject(GO_AV_SNOWFALL_BANNER, SIZE_OF_GRIDS))
-                if (pGo->isSpawned())
-                    return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
-
             if (me->GetTeam() == HORDE)
             {
+                // End Boss
+                if (!bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 1) &&
+                    !bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 1) &&
+                    !bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 1) &&
+                    !bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 1))
+                {
+                    if (Creature* pVanndar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_A, 0)))
+                        return StartNewPathToPosition(pVanndar->GetPosition(), vPaths_AV);
+                }
+
+                // Capture Stoneheart Graveyard or Snowfall Graveyard
+                if (urand(0, 1))
+                {
+                    if (bg->IsActiveEvent(BG_AV_GRAVEYARD_STONE_GRAVE, 0) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STONE_GRAVE, 1) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STONE_GRAVE, 5))
+                    {
+                        if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_STONE_GRAVE, 0)))
+                            return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                    }
+                }
+                else
+                {
+                    if (bg->IsActiveEvent(BG_AV_GRAVEYARD_SNOWFALL, 0) || bg->IsActiveEvent(BG_AV_GRAVEYARD_SNOWFALL, 1) || bg->IsActiveEvent(BG_AV_GRAVEYARD_SNOWFALL, 5))
+                    {
+                        if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_SNOWFALL, 0)))
+                            return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                    }
+                }
+
+                // Kill Balinda
                 if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
                 {
                     if (Creature* pBalinda = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_A, 0)))
                         return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
                 }
-                else
+
+                // Get first bunkers
+                if (bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 0) || bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 1) || bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 5))
                 {
-                    if (!bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 1) &&
-                        !bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 1) &&
-                        !bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 1) &&
-                        !bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 1))
-                    {
-                        if (Creature* pVanndar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_A, 0)))
-                            return StartNewPathToPosition(pVanndar->GetPosition(), vPaths_AV);
-                            
-                    }
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_ICEWING_BUNKER, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
                 }
 
-                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_ALLIANCE_BANNER1, SIZE_OF_GRIDS))
-                    if (pGo->isSpawned())
-                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+                if (bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 0) || bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 1) || bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_STONEHEARTH_BUNKER, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
 
-                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_ALLIANCE_BANNER2, SIZE_OF_GRIDS))
-                    if (pGo->isSpawned())
-                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+                // Capture Stormpike Graveyard
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_GRAVE, 0) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_GRAVE, 1) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_GRAVE, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_STORM_GRAVE, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
 
-                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_CONTESTED_BANNER1, SIZE_OF_GRIDS))
-                    if (pGo->isSpawned())
-                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+                // Capture Stormpike Aid Station Gaveyard
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_AID, 0) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_AID, 1) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_AID, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_STORM_AID, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
 
-                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_CONTESTED_BANNER2, SIZE_OF_GRIDS))
-                    if (pGo->isSpawned())
-                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+                // Capture Bunkers
+                if (bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 0) || bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 1) || bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 0) || bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 1) || bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_DUN_BALDAR_NORTH_BUNKER, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                // Defence
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_ICE_GRAVE, 0) || bg->IsActiveEvent(BG_AV_GRAVEYARD_ICE_GRAVE, 1) || bg->IsActiveEvent(BG_AV_GRAVEYARD_ICE_GRAVE, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_ICE_GRAVE, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_FROST_HUT, 0) || bg->IsActiveEvent(BG_AV_GRAVEYARD_FROST_HUT, 1) || bg->IsActiveEvent(BG_AV_GRAVEYARD_FROST_HUT, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_FROST_HUT, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_FROSTWOLF, 0) || bg->IsActiveEvent(BG_AV_GRAVEYARD_FROSTWOLF, 1) || bg->IsActiveEvent(BG_AV_GRAVEYARD_FROSTWOLF, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_FROSTWOLF, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 0) || bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 1) || bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_ICEBLOOD_TOWER, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 0) || bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 1) || bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_TOWER_POINT_TOWER, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 0) || bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 1) || bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_EAST_FROSTWOLF_TOWER, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 0) || bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 1) || bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_WEST_FROSTWOLF_TOWER, 0)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
             }
             else // ALLIANCE
             {
+                // End boss
+                if (!bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 3) &&
+                    !bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 3) &&
+                    !bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 3) &&
+                    !bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 3))
+                {
+                    if (Creature* pDrek = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_H, 0)))
+                        return StartNewPathToPosition(pDrek->GetPosition(), vPaths_AV);
+                }
+
+                // Capture Iceblood Graveyard or Snowfall Graveyard
+                if (urand(0, 1))
+                {
+                    if (bg->IsActiveEvent(BG_AV_GRAVEYARD_ICE_GRAVE, 2) || bg->IsActiveEvent(BG_AV_GRAVEYARD_ICE_GRAVE, 3) || bg->IsActiveEvent(BG_AV_GRAVEYARD_ICE_GRAVE, 5))
+                    {
+                        if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_ICE_GRAVE, 2)))
+                            return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                    }
+                }
+                else
+                {
+                    if (bg->IsActiveEvent(BG_AV_GRAVEYARD_SNOWFALL, 2) || bg->IsActiveEvent(BG_AV_GRAVEYARD_SNOWFALL, 3) || bg->IsActiveEvent(BG_AV_GRAVEYARD_SNOWFALL, 5))
+                    {
+                        if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_SNOWFALL, 2)))
+                            return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                    }
+                }
+
+                // Kill Galvanger
                 if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0))
                 {
                     if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
                         return StartNewPathToPosition(pGalvangar->GetPosition(), vPaths_AV);
                 }
-                else
+
+                // Get Iceblood Tower
+                if (bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 2) || bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 3) || bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 5))
                 {
-                    if (!bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 3) &&
-                        !bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 3) &&
-                        !bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 3) &&
-                        !bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 3))
-                    {
-                        if (Creature* pDrek = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_H, 0)))
-                            return StartNewPathToPosition(pDrek->GetPosition(), vPaths_AV);
-                    }
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_ICEBLOOD_TOWER, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
                 }
 
-                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_HORDE_BANNER1, SIZE_OF_GRIDS))
-                    if (pGo->isSpawned())
-                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+                // Get Tower Point Tower
+                if (bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 2) || bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 3) || bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_TOWER_POINT_TOWER, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
 
-                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_HORDE_BANNER2, SIZE_OF_GRIDS))
-                    if (pGo->isSpawned())
-                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+                // Capture Frostwolf Graveyard
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_FROSTWOLF, 2) || bg->IsActiveEvent(BG_AV_GRAVEYARD_FROSTWOLF, 3) || bg->IsActiveEvent(BG_AV_GRAVEYARD_FROSTWOLF, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_FROSTWOLF, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
 
-                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_CONTESTED_BANNER3, SIZE_OF_GRIDS))
-                    if (pGo->isSpawned())
-                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+                // Towers
+                if (bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 2) || bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 3) || bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_EAST_FROSTWOLF_TOWER, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
 
-                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_CONTESTED_BANNER4, SIZE_OF_GRIDS))
-                    if (pGo->isSpawned())
-                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+                if (bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 2) || bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 3) || bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_WEST_FROSTWOLF_TOWER, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                // Capture Frost Relief Hut Graveyard
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_FROST_HUT, 2) || bg->IsActiveEvent(BG_AV_GRAVEYARD_FROST_HUT, 3) || bg->IsActiveEvent(BG_AV_GRAVEYARD_FROST_HUT, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_FROST_HUT, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                // Defence
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_STONE_GRAVE, 2) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STONE_GRAVE, 3) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STONE_GRAVE, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_STONE_GRAVE, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_AID, 2) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_AID, 3) || bg->IsActiveEvent(BG_AV_GRAVEYARD_STORM_AID, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_GRAVEYARD_STORM_AID, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 2) || bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 3) || bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_ICEWING_BUNKER, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 2) || bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 3) || bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_STONEHEARTH_BUNKER, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 2) || bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 3) || bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
+
+                if (bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 2) || bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 3) || bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 5))
+                {
+                    if (Creature* pCreature = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_DUN_BALDAR_NORTH_BUNKER, 2)))
+                        return StartNewPathToPosition(pCreature->GetPosition(), vPaths_AV);
+                }
             }
             break;
         }
