@@ -203,6 +203,15 @@ enum BG_AV_Nodes
 
 enum BG_AV_Events
 {
+    // Graveyards
+    BG_AV_GRAVEYARD_STORM_AID       = 0,
+    BG_AV_GRAVEYARD_STORM_GRAVE     = 1,
+    BG_AV_GRAVEYARD_STONE_GRAVE     = 2,
+    BG_AV_GRAVEYARD_SNOWFALL        = 3,
+    BG_AV_GRAVEYARD_ICE_GRAVE       = 4,
+    BG_AV_GRAVEYARD_FROSTWOLF       = 5,
+    BG_AV_GRAVEYARD_FROST_HUT       = 6,
+
     // Alliance Bunkers
     BG_AV_DUN_BALDAR_SOUTH_BUNKER = 22,
     BG_AV_DUN_BALDAR_NORTH_BUNKER = 23,
@@ -502,10 +511,6 @@ class BattleGroundAV : public BattleGround
 
         static BattleGroundAVTeamIndex GetAVTeamIndexByTeamId(Team team) { return BattleGroundAVTeamIndex(GetTeamIndexByTeamId(team)); }
         void HandleCommand(Player* player, ChatHandler* handler, char* args) override;
-
-        bool GetStateOfNode(BG_AV_NodeInfo m_Nodes, BG_AV_States m_State) { if (m_Nodes.State == m_State) return true; };
-        uint32 GetTimerOfNode(BG_AV_NodeInfo m_Nodes) { return m_Nodes.Timer; };
-
     private:
         /* Nodes occupying */
         void EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node);
