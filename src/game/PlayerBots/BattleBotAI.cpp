@@ -614,11 +614,7 @@ void BattleBotAI::UpdateWaypointMovement()
             return;
 
     if (StartNewPathToObjective())
-    {
-        printf("-- going to objective\n");
-        return;
-    }
-        
+        return; 
 
     if (StartNewPathFromBeginning())
         return;

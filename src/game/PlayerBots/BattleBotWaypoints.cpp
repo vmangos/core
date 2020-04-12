@@ -1,18 +1,10 @@
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
 #include "Player.h"
-#include "Log.h"
 #include "MotionMaster.h"
-#include "ObjectMgr.h"
-#include "PlayerBotMgr.h"
-#include "WorldPacket.h"
 #include "Spell.h"
-#include "SpellAuras.h"
-#include "Chat.h"
 #include "Battlegrounds/BattleGround.h"
-#include "BattleGroundWS.h"
 #include "BattleGroundAV.h"
-#include <random>
 
 enum GameObjectsAB
 {
