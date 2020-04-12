@@ -1,5 +1,6 @@
 #include "BattleBotAI.h"
 #include "BattleBotWaypoints.h"
+#include "WorldPacket.h"
 #include "Player.h"
 #include "MotionMaster.h"
 #include "Spell.h"
