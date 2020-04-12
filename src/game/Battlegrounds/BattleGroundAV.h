@@ -502,6 +502,10 @@ class BattleGroundAV : public BattleGround
 
         static BattleGroundAVTeamIndex GetAVTeamIndexByTeamId(Team team) { return BattleGroundAVTeamIndex(GetTeamIndexByTeamId(team)); }
         void HandleCommand(Player* player, ChatHandler* handler, char* args) override;
+
+        bool GetStateOfNode(BG_AV_NodeInfo m_Nodes, BG_AV_States m_State) { if (m_Nodes.State == m_State) return true; };
+        uint32 GetTimerOfNode(BG_AV_NodeInfo m_Nodes) { return m_Nodes.Timer; };
+
     private:
         /* Nodes occupying */
         void EventPlayerAssaultsPoint(Player* player, BG_AV_Nodes node);
