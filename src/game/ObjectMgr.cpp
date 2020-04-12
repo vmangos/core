@@ -11113,7 +11113,7 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
         pPlayer->AutoUnequipItemFromSlot(i);
 
     // Learn Dual Wield Specialization
-    if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE)
+    if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE || pPlayer->GetClass() == CLASS_HUNTER)
         if (!pPlayer->HasSpell(674))
             pPlayer->LearnSpell(674, false, false);
 
@@ -11160,7 +11160,7 @@ void ObjectMgr::ApplyPremadeSpecTemplateToPlayer(uint32 entry, Player* pPlayer) 
     }
 
     // Learn Dual Wield Specialization
-    if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE)
+    if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE || pPlayer->GetClass() == CLASS_HUNTER)
         if (!pPlayer->HasSpell(674))
             pPlayer->LearnSpell(674, false, false);
 
