@@ -203,6 +203,18 @@ enum BG_AV_Nodes
 
 enum BG_AV_Events
 {
+    // Alliance Bunkers
+    BG_AV_DUN_BALDAR_SOUTH_BUNKER = 22,
+    BG_AV_DUN_BALDAR_NORTH_BUNKER = 23,
+    BG_AV_ICEWING_BUNKER          = 24,
+    BG_AV_STONEHEARTH_BUNKER      = 25,
+
+    // Horde Towers
+    BG_AV_ICEBLOOD_TOWER       = 26,
+    BG_AV_TOWER_POINT_TOWER    = 27,
+    BG_AV_EAST_FROSTWOLF_TOWER = 28,
+    BG_AV_WEST_FROSTWOLF_TOWER = 29,
+
     BG_AV_MINE_BOSSES           = 46,                          // + mineid will be exact event
     BG_AV_MINE_BOSSES_NORTH     = 46,
     BG_AV_MINE_BOSSES_SOUTH     = 47,

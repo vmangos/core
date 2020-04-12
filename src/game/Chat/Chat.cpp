@@ -104,9 +104,11 @@ ChatCommand * ChatHandler::getCommandTable()
     };
     static ChatCommand battleBotCommandTable[] =
     {
-        { "add",        SEC_ADMINISTRATOR,      false, nullptr,           "Add a new bot", battleBotAddCommandTable },
-        { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandleBattleBotRemoveCommand,      "", nullptr },
-        { nullptr,      0,                      false, nullptr,                                        "", nullptr },
+        { "add",          SEC_ADMINISTRATOR,    false, nullptr,            "Add a new bot", battleBotAddCommandTable },
+        { "remove",       SEC_ADMINISTRATOR,    false, &ChatHandler::HandleBattleBotRemoveCommand,       "", nullptr },
+        { "showpath",     SEC_ADMINISTRATOR,    false, &ChatHandler::HandleBattleBotShowPathCommand,     "", nullptr },
+        { "showallpaths", SEC_ADMINISTRATOR,    false, &ChatHandler::HandleBattleBotShowAllPathsCommand, "", nullptr },
+        { nullptr,        0,                    false, nullptr,                                          "", nullptr },
     };
     static ChatCommand accountSetCommandTable[] =
     {

@@ -246,8 +246,7 @@ bool BattleBotAI::UseMount()
     if (me->GetDisplayId() != me->GetNativeDisplayId())
         return false;
 
-    if (me->GetClass() == CLASS_ROGUE ||
-       (me->GetClass() == CLASS_DRUID && m_role != ROLE_HEALER))
+    if (me->GetClass() == CLASS_ROGUE)
         return false;
 
     if (BattleGround* bg = me->GetBattleGround())
@@ -256,6 +255,9 @@ bool BattleBotAI::UseMount()
 
     if (me->HasAura(AURA_WARSONG_FLAG) ||
         me->HasAura(AURA_SILVERWING_FLAG))
+        return false;
+
+    if (me->HasAura(SPELL_AURA_MOD_STEALTH))
         return false;
 
     uint32 spellId = GetMountSpellId();
@@ -331,7 +333,8 @@ bool BattleBotAI::AttackStart(Unit* pVictim)
     {
         ClearPath();
 
-        if (m_role == ROLE_RANGE_DPS &&
+        if ((m_role == ROLE_RANGE_DPS || m_role == ROLE_HEALER) &&
+            IsRangedDamageClass(me->GetClass()) &&
             me->GetPowerPercent(POWER_MANA) > 10.0f &&
             me->GetCombatDistance(pVictim) > 8.0f)
             me->SetCasterChaseDistance(25.0f);
@@ -347,6 +350,8 @@ bool BattleBotAI::AttackStart(Unit* pVictim)
 
 Unit* BattleBotAI::SelectAttackTarget() const
 {
+    // 1. Check units we are currently in combat with.
+
     std::list<Unit*> targets;
     HostileReference* pReference = me->GetHostileRefManager().getFirst();
 
@@ -383,6 +388,8 @@ Unit* BattleBotAI::SelectAttackTarget() const
         return *targets.begin();
     }
 
+    // 2. Find enemy player in range.
+
     std::list<Player*> players;
     me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
 
@@ -409,6 +416,27 @@ Unit* BattleBotAI::SelectAttackTarget() const
 
         if (me->IsWithinLOSInMap(pTarget))
             return pTarget;
+    }
+
+    // 3. Check party attackers.
+
+    if (Group* pGroup = me->GetGroup())
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Unit* pMember = itr->getSource())
+            {
+                if (pMember == me)
+                    continue;
+
+                if (me->GetDistance(pMember) > 30.0f)
+                    continue;
+
+                if (Unit* pAttacker = pMember->GetAttackerForHelper())
+                    if (IsValidHostileTarget(pAttacker) && me->IsWithinLOSInMap(pAttacker))
+                        return pAttacker;
+            }
+        }
     }
 
     return nullptr;
@@ -586,7 +614,11 @@ void BattleBotAI::UpdateWaypointMovement()
             return;
 
     if (StartNewPathToObjective())
+    {
+        printf("-- going to objective\n");
         return;
+    }
+        
 
     if (StartNewPathFromBeginning())
         return;
@@ -1189,6 +1221,7 @@ void BattleBotAI::UpdateOutOfCombatAI_Shaman()
     {
         if (m_spells.shaman.pGhostWolf &&
            !me->IsMoving() && !me->IsMounted() &&
+           (!GetMountSpellId() || me->HasAura(AURA_WARSONG_FLAG) || me->HasAura(AURA_SILVERWING_FLAG)) &&
             CanTryToCastSpell(me, m_spells.shaman.pGhostWolf))
         {
             if (DoCastSpell(me, m_spells.shaman.pGhostWolf) == SPELL_CAST_OK)
@@ -2712,7 +2745,8 @@ void BattleBotAI::UpdateOutOfCombatAI_Druid()
             me->RemoveAurasDueToSpellByCancel(m_spells.druid.pMoonkinForm->Id);
 
         if (m_spells.druid.pTravelForm &&
-           !me->IsMoving() && !me->IsMounted() &&
+           !me->IsMounted() &&
+           (!GetMountSpellId() || me->HasAura(AURA_WARSONG_FLAG) || me->HasAura(AURA_SILVERWING_FLAG)) &&
             CanTryToCastSpell(me, m_spells.druid.pTravelForm))
         {
             if (DoCastSpell(me, m_spells.druid.pTravelForm) == SPELL_CAST_OK)

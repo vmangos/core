@@ -2149,8 +2149,7 @@ Unit* CombatBotBaseAI::SelectHealTarget(float selfHealPercent, float groupHealPe
     Unit* pTarget = nullptr;
     float healthPercent = 100.0f;
 
-    Group* pGroup = me->GetGroup();
-    if (pGroup)
+    if (Group* pGroup = me->GetGroup())
     {
         for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
@@ -2467,7 +2466,7 @@ SpellCastResult CombatBotBaseAI::DoCastSpell(Unit* pTarget, SpellEntry const* pS
     me->m_castingSpell = (me->GetClass() == CLASS_ROGUE) ? me->GetComboPoints() : pSpellEntry->Id;
     auto result = me->CastSpell(pTarget, pSpellEntry, false);
 
-    printf("cast %s result %u\n", pSpellEntry->SpellName[0].c_str(), result);
+    //printf("cast %s result %u\n", pSpellEntry->SpellName[0].c_str(), result);
 
     if ((result == SPELL_FAILED_MOVING ||
         result == SPELL_CAST_OK) &&

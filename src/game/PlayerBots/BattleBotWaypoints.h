@@ -42,5 +42,8 @@ struct BattleBotWaypoint
 
 typedef std::vector<BattleBotWaypoint> BattleBotPath;
 
+extern std::vector<BattleBotPath*> vPaths_WS;
+extern std::vector<BattleBotPath*> vPaths_AB;
+extern std::vector<BattleBotPath*> vPaths_AV;
 
 #endif

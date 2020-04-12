@@ -12,6 +12,7 @@
 #include "PlayerBotAI.h"
 #include "PartyBotAI.h"
 #include "BattleBotAI.h"
+#include "BattleBotWaypoints.h"
 #include "Anticheat.h"
 #include "Language.h"
 
@@ -1021,13 +1022,13 @@ bool ChatHandler::HandleBattleBotAddCommand(char* args, uint8 bg)
     sPlayerBotMgr.AddBot(ai);
 
     if (bg == BATTLEGROUND_QUEUE_WS)
-        SendSysMessage("Added battle bot and queuing for WS");
+        PSendSysMessage("Added %s battle bot and queuing for WS", args);
         
     if (bg == BATTLEGROUND_QUEUE_AB)
-        SendSysMessage("Added battle bot and queuing for AB");
+        PSendSysMessage("Added %s battle bot and queuing for AB", args);
     
     if (bg == BATTLEGROUND_QUEUE_AV)
-        SendSysMessage("Added battle bot and queuing for AV");
+        PSendSysMessage("Added %s battle bot and queuing for AV", args);
 
     return true;
 }
@@ -1054,4 +1055,93 @@ bool ChatHandler::HandleBattleBotRemoveCommand(char* args)
     SendSysMessage("Target is not a battle bot.");
     SetSentErrorMessage(true);
     return false;
+}
+
+#define SPELL_RED_GLOW 20370
+
+void ShowBattleBotPathHelper(Map* pMap, BattleBotPath* pPath, uint32 id)
+{
+    for (const auto& point : *pPath)
+    {
+        if (Creature* pWaypoint = pMap->SummonCreature(VISUAL_WAYPOINT, point.x, point.y, point.z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 120000, true))
+        {
+            // Show path id as level to distinguish individual paths.
+            pWaypoint->SetUInt32Value(UNIT_FIELD_LEVEL, id);
+
+            // Mark points that have script attached.
+            if (point.pFunc)
+                pWaypoint->CastSpell(pWaypoint, SPELL_RED_GLOW, true);
+        }
+    }
+}
+
+bool ChatHandler::HandleBattleBotShowPathCommand(char* args)
+{
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget->AI())
+    {
+        if (BattleBotAI* pAI = dynamic_cast<BattleBotAI*>(pTarget->AI()))
+        {
+            if (pAI->m_currentPath)
+                ShowBattleBotPathHelper(pTarget->GetMap(), pAI->m_currentPath, 1);
+            else
+                SendSysMessage("Target is not following a path.");
+
+            return true;
+        }
+    }
+
+    SendSysMessage("Target is not a battle bot.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool ChatHandler::HandleBattleBotShowAllPathsCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+    BattleGround* pBG = pPlayer->GetBattleGround();
+    if (!pBG)
+    {
+        SendSysMessage("You are not in a battleground.");
+        return false;
+    }
+
+    std::vector<BattleBotPath*>* pPaths;
+
+    switch (pBG->GetTypeID())
+    {
+        case BATTLEGROUND_AB:
+        {
+            pPaths = &vPaths_AB;
+            break;
+        }
+        case BATTLEGROUND_AV:
+        {
+            pPaths = &vPaths_AV;
+            break;
+        }
+        case BATTLEGROUND_WS:
+        {
+            pPaths = &vPaths_WS;
+            break;
+        }
+        default:
+            break;
+    }
+
+    uint32 id = 1;
+    for (const auto& path : *pPaths)
+    {
+        ShowBattleBotPathHelper(pPlayer->GetMap(), path, id++);
+    }
+
+    PSendSysMessage("Showing %u paths for battleground.", id);
+    return true;
 }

@@ -272,6 +272,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleBattleBotAddArathiCommand(char* args);
         bool HandleBattleBotAddWarsongCommand(char* args);
         bool HandleBattleBotRemoveCommand(char* args);
+        bool HandleBattleBotShowPathCommand(char* args);
+        bool HandleBattleBotShowAllPathsCommand(char* args);
 
         // spell_disabled
         bool HandleReloadSpellDisabledCommand(char *args);

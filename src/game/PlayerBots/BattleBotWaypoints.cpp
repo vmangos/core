@@ -11,6 +11,7 @@
 #include "Chat.h"
 #include "Battlegrounds/BattleGround.h"
 #include "BattleGroundWS.h"
+#include "BattleGroundAV.h"
 #include <random>
 
 enum GameObjectsAB
@@ -32,11 +33,11 @@ enum GameObjectsAV
     GO_AV_HORDE_BANNER2     = 178943,
     GO_AV_ALLIANCE_BANNER1  = 178365,
     GO_AV_ALLIANCE_BANNER2  = 178925,
-    GO_AV_CONTESTED_BANNER1 = 178940,
-    GO_AV_CONTESTED_BANNER2 = 179286,
-    GO_AV_CONTESTED_BANNER3 = 179287,
-    GO_AV_CONTESTED_BANNER4 = 179435,
-    GO_AV_SNOWFALL_BANNER3  = 180418
+    GO_AV_CONTESTED_BANNER1 = 178940, // usable by horde
+    GO_AV_CONTESTED_BANNER2 = 179286, // usable by horde
+    GO_AV_CONTESTED_BANNER3 = 179287, // usable by alliance
+    GO_AV_CONTESTED_BANNER4 = 179435, // usable by alliance
+    GO_AV_SNOWFALL_BANNER   = 180418
 };
 
 enum CreaturesAV
@@ -155,7 +156,7 @@ void WSG_AtHordeFlag(BattleBotAI* pAI)
 
 void WSG_AtAllianceGraveyard(BattleBotAI* pAI)
 {
-    if ((pAI->me->GetTeam() == ALLIANCE) && urand(0, 1))
+    if ((pAI->me->GetTeam() == ALLIANCE) && !pAI->me->IsMounted() && urand(0, 1))
     {
         pAI->ClearPath();
         pAI->DoGraveyardJump();
@@ -166,7 +167,7 @@ void WSG_AtAllianceGraveyard(BattleBotAI* pAI)
 
 void WSG_AtHordeGraveyard(BattleBotAI* pAI)
 {
-    if ((pAI->me->GetTeam() == HORDE) && urand(0, 1))
+    if ((pAI->me->GetTeam() == HORDE) && !pAI->me->IsMounted() && urand(0, 1))
     {
         pAI->ClearPath();
         pAI->DoGraveyardJump();
@@ -181,7 +182,7 @@ uint32 const FlagIds[] = { GO_AB_ALLIANCE_BANNER , GO_AB_CONTESTED_BANNER1 , GO_
                            GO_AB_STABLE_BANNER, GO_AB_BLACKSMITH_BANNER, GO_AB_FARM_BANNER, GO_AB_LUMBER_MILL_BANNER,
                            GO_AB_GOLD_MINE_BANNER, GO_AV_HORDE_BANNER1 , GO_AV_HORDE_BANNER2 , GO_AV_ALLIANCE_BANNER1 ,
                            GO_AV_ALLIANCE_BANNER2 , GO_AV_CONTESTED_BANNER1 , GO_AV_CONTESTED_BANNER2 , GO_AV_CONTESTED_BANNER3 ,
-                           GO_AV_CONTESTED_BANNER4 , GO_AV_SNOWFALL_BANNER3 };
+                           GO_AV_CONTESTED_BANNER4 , GO_AV_SNOWFALL_BANNER };
 
 void AtFlag(BattleBotAI* pAI)
 {
@@ -190,7 +191,8 @@ void AtFlag(BattleBotAI* pAI)
         if (pFriend->GetCurrentSpell(CURRENT_GENERIC_SPELL) &&
             pFriend->GetCurrentSpell(CURRENT_GENERIC_SPELL)->m_spellInfo->Id == SPELL_CAPTURE_BANNER)
         {
-            pAI->MoveToNextPoint();
+            pAI->ClearPath();
+            pAI->StartNewPathFromBeginning();
             return;
         }
     }
@@ -1895,15 +1897,15 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
 {
     BattleBotPath* pClosestPath = nullptr;
     uint32 closestPoint = 0;
-    float closestDistanceToBase = FLT_MAX;
+    float closestDistanceToTarget = FLT_MAX;
     bool reverse = false;
 
     for (const auto& pPath : vPaths)
     {
         {
             BattleBotWaypoint& lastPoint = ((*pPath)[pPath->size() - 1]);
-            float const distanceFromPathEndToBase = GetDistance3D(lastPoint, targetPosition);
-            if (closestDistanceToBase > distanceFromPathEndToBase)
+            float const distanceFromPathEndToTarget = GetDistance3D(lastPoint, targetPosition);
+            if (closestDistanceToTarget > distanceFromPathEndToTarget)
             {
                 float closestDistanceFromMeToPoint = FLT_MAX;
 
@@ -1916,17 +1918,20 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
                         reverse = false;
                         pClosestPath = pPath;
                         closestPoint = i;
-                        closestDistanceToBase = distanceFromPathEndToBase;
+                        closestDistanceToTarget = distanceFromPathEndToTarget;
                         closestDistanceFromMeToPoint = distanceFromMeToPoint;
                     }
                 }
             }
         }
         
+        if (std::find(vPaths_NoReverseAllowed.begin(), vPaths_NoReverseAllowed.end(), pPath) != vPaths_NoReverseAllowed.end())
+            continue;
+
         {
             BattleBotWaypoint& firstPoint = ((*pPath)[0]);
-            float const distanceFromPathEndToBase = GetDistance3D(firstPoint, targetPosition);
-            if (closestDistanceToBase > distanceFromPathEndToBase)
+            float const distanceFromPathBeginToTarget = GetDistance3D(firstPoint, targetPosition);
+            if (closestDistanceToTarget > distanceFromPathBeginToTarget)
             {
                 float closestDistanceFromMeToPoint = FLT_MAX;
 
@@ -1939,7 +1944,7 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
                         reverse = true;
                         pClosestPath = pPath;
                         closestPoint = i;
-                        closestDistanceToBase = distanceFromPathEndToBase;
+                        closestDistanceToTarget = distanceFromPathBeginToTarget;
                         closestDistanceFromMeToPoint = distanceFromMeToPoint;
                     }
                 }
@@ -1949,6 +1954,20 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
 
     if (!pClosestPath)
         return false;
+
+    // Prevent picking last point of path.
+    // It means we are already there.
+    if (reverse)
+    {
+        if (closestPoint == 0)
+            return false;
+            
+    }
+    else
+    {
+        if (closestPoint == pClosestPath->size() - 1)
+            return false;
+    }
 
     m_currentPath = pClosestPath;
     m_movingInReverse = reverse;
@@ -1967,15 +1986,80 @@ bool BattleBotAI::StartNewPathToObjective()
     {
         case BATTLEGROUND_AV:
         {
+            if (GameObject* pGo = me->FindNearestGameObject(GO_AV_SNOWFALL_BANNER, SIZE_OF_GRIDS))
+                if (pGo->isSpawned())
+                    return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+
             if (me->GetTeam() == HORDE)
             {
-                if (Creature* pBalinda = me->FindNearestCreature(NPC_AV_BALINDA, SIZE_OF_GRIDS))
-                    return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
+                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
+                {
+                    if (Creature* pBalinda = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_A, 0)))
+                        return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
+                }
+                else
+                {
+                    if (!bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, 1) &&
+                        !bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, 1) &&
+                        !bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, 1) &&
+                        !bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, 1))
+                    {
+                        if (Creature* pVanndar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_A, 0)))
+                            return StartNewPathToPosition(pVanndar->GetPosition(), vPaths_AV);
+                            
+                    }
+                }
+
+                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_ALLIANCE_BANNER1, SIZE_OF_GRIDS))
+                    if (pGo->isSpawned())
+                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+
+                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_ALLIANCE_BANNER2, SIZE_OF_GRIDS))
+                    if (pGo->isSpawned())
+                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+
+                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_CONTESTED_BANNER1, SIZE_OF_GRIDS))
+                    if (pGo->isSpawned())
+                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+
+                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_CONTESTED_BANNER2, SIZE_OF_GRIDS))
+                    if (pGo->isSpawned())
+                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
             }
-            else
+            else // ALLIANCE
             {
-                if (Creature* pGalvangar = me->FindNearestCreature(NPC_AV_GALVANGAR, SIZE_OF_GRIDS))
-                    return StartNewPathToPosition(pGalvangar->GetPosition(), vPaths_AV);
+                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0))
+                {
+                    if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
+                        return StartNewPathToPosition(pGalvangar->GetPosition(), vPaths_AV);
+                }
+                else
+                {
+                    if (!bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, 3) &&
+                        !bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, 3) &&
+                        !bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, 3) &&
+                        !bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, 3))
+                    {
+                        if (Creature* pDrek = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_H, 0)))
+                            return StartNewPathToPosition(pDrek->GetPosition(), vPaths_AV);
+                    }
+                }
+
+                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_HORDE_BANNER1, SIZE_OF_GRIDS))
+                    if (pGo->isSpawned())
+                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+
+                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_HORDE_BANNER2, SIZE_OF_GRIDS))
+                    if (pGo->isSpawned())
+                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+
+                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_CONTESTED_BANNER3, SIZE_OF_GRIDS))
+                    if (pGo->isSpawned())
+                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
+
+                if (GameObject* pGo = me->FindNearestGameObject(GO_AV_CONTESTED_BANNER4, SIZE_OF_GRIDS))
+                    if (pGo->isSpawned())
+                        return StartNewPathToPosition(pGo->GetPosition(), vPaths_AV);
             }
             break;
         }
