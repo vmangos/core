@@ -1969,14 +1969,8 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
     return true;
 }
 
-static std::pair<uint32, uint32> AV_HordeObjectives[] =
+static std::pair<uint32, uint32> AV_HordeAttackObjectives[] =
 {
-    // Defend
-    { BG_AV_FROSTWOLF_GY, ALLIANCE_ASSAULTED },
-    { BG_AV_EAST_FROSTWOLF_TOWER, ALLIANCE_ASSAULTED },
-    { BG_AV_WEST_FROSTWOLF_TOWER, ALLIANCE_ASSAULTED },
-    { BG_AV_TOWER_POINT_TOWER, ALLIANCE_ASSAULTED },
-    { BG_AV_ICEBLOOD_TOWER, ALLIANCE_ASSAULTED },
     // Attack
     { BG_AV_SNOWFALL_GY, ALLIANCE_CONTROLLED },
     { BG_AV_STONEHEARTH_BUNKER, ALLIANCE_CONTROLLED },
@@ -1988,14 +1982,18 @@ static std::pair<uint32, uint32> AV_HordeObjectives[] =
     { BG_AV_STORMPIKE_AID_STATION_GY, ALLIANCE_CONTROLLED }
 };
 
-static std::pair<uint32, uint32> AV_AllianceObjectives[] =
+static std::pair<uint32, uint32> AV_HordeDefendObjectives[] =
 {
     // Defend
-    { BG_AV_STORMPIKE_GY, HORDE_ASSAULTED },
-    { BG_AV_DUN_BALDAR_SOUTH_BUNKER, HORDE_ASSAULTED },
-    { BG_AV_DUN_BALDAR_NORTH_BUNKER, HORDE_ASSAULTED },
-    { BG_AV_ICEWING_BUNKER, HORDE_ASSAULTED },
-    { BG_AV_STONEHEARTH_BUNKER, HORDE_ASSAULTED },
+    { BG_AV_FROSTWOLF_GY, ALLIANCE_ASSAULTED },
+    { BG_AV_EAST_FROSTWOLF_TOWER, ALLIANCE_ASSAULTED },
+    { BG_AV_WEST_FROSTWOLF_TOWER, ALLIANCE_ASSAULTED },
+    { BG_AV_TOWER_POINT_TOWER, ALLIANCE_ASSAULTED },
+    { BG_AV_ICEBLOOD_TOWER, ALLIANCE_ASSAULTED },
+};
+
+static std::pair<uint32, uint32> AV_AllianceAttackObjectives[] =
+{
     // Attack
     { BG_AV_SNOWFALL_GY, HORDE_CONTROLLED },
     { BG_AV_ICEBLOOD_TOWER, HORDE_CONTROLLED },
@@ -2005,6 +2003,16 @@ static std::pair<uint32, uint32> AV_AllianceObjectives[] =
     { BG_AV_EAST_FROSTWOLF_TOWER, HORDE_CONTROLLED },
     { BG_AV_WEST_FROSTWOLF_TOWER, HORDE_CONTROLLED },
     { BG_AV_FROSTWOLF_RELIEF_HUT_GY, HORDE_CONTROLLED },
+};
+
+static std::pair<uint32, uint32> AV_AllianceDefendObjectives[] =
+{
+    // Defend
+    { BG_AV_STORMPIKE_GY, HORDE_ASSAULTED },
+    { BG_AV_DUN_BALDAR_SOUTH_BUNKER, HORDE_ASSAULTED },
+    { BG_AV_DUN_BALDAR_NORTH_BUNKER, HORDE_ASSAULTED },
+    { BG_AV_ICEWING_BUNKER, HORDE_ASSAULTED },
+    { BG_AV_STONEHEARTH_BUNKER, HORDE_ASSAULTED },
 };
 
 bool BattleBotAI::StartNewPathToObjective()
@@ -2029,21 +2037,42 @@ bool BattleBotAI::StartNewPathToObjective()
                         return StartNewPathToPosition(pVanndar->GetPosition(), vPaths_AV);
                 }
 
-                // Kill Balinda
-                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
+                if (urand(0, 1))
                 {
-                    if (Creature* pBalinda = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_A, 0)))
-                        return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
-                }
-
-                for (const auto& objective : AV_HordeObjectives)
-                {
-                    if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(objective.first, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                    // Kill Balinda
+                    if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
                     {
-                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
-                        else
-                            printf("Cant find GO for event %u\n", objective.first);
+                        if (Creature* pBalinda = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_A, 0)))
+                            return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
+                    }
+                }
+                else
+                {
+                    if (urand(0, 1))
+                    {
+                        for (const auto& objective : AV_HordeAttackObjectives)
+                        {
+                            if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(objective.first, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                            {
+                                if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                                    return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                                else
+                                    printf("Cant find GO for event %u\n", objective.first);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (const auto& objective : AV_HordeDefendObjectives)
+                        {
+                            if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(objective.first, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                            {
+                                if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                                    return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                                else
+                                    printf("Cant find GO for event %u\n", objective.first);
+                            }
+                        }
                     }
                 }
             }
@@ -2059,21 +2088,42 @@ bool BattleBotAI::StartNewPathToObjective()
                         return StartNewPathToPosition(pDrek->GetPosition(), vPaths_AV);
                 }
 
-                // Kill Galvanger
-                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0))
+                if (urand(0, 1))
                 {
-                    if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
-                        return StartNewPathToPosition(pGalvangar->GetPosition(), vPaths_AV);
-                }
-
-                for (const auto& objective : AV_AllianceObjectives)
-                {
-                    if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                    // Kill Galvanger
+                    if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0))
                     {
-                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
-                        else
-                            printf("Cant find GO for event %u\n", objective.first);
+                        if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
+                            return StartNewPathToPosition(pGalvangar->GetPosition(), vPaths_AV);
+                    }
+                }
+                else
+                {
+                    if (urand(0, 1))
+                    {
+                        for (const auto& objective : AV_AllianceAttackObjectives)
+                        {
+                            if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                            {
+                                if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                                    return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                                else
+                                    printf("Cant find GO for event %u\n", objective.first);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (const auto& objective : AV_AllianceDefendObjectives)
+                        {
+                            if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                            {
+                                if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                                    return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                                else
+                                    printf("Cant find GO for event %u\n", objective.first);
+                            }
+                        }
                     }
                 }
             }
