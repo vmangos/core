@@ -862,10 +862,11 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         {
             if (!me->GetMotionMaster()->GetCurrent()->IsReachable())
             {
-                printf("Target is unreachable!\n");
+                printf("%s - %s is unreachable!\n", me->GetName(), pVictim->GetName());
                 Unit* pTarget = static_cast<ChaseMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent())->GetTarget();
                 if (pTarget && pTarget->IsCreature())
                 {
+                    printf("teleporting to target\n");
                     // Cheating to prevent getting stuck because of bad mmaps.
                     me->NearTeleportTo(pTarget->GetPosition());
                     return;
