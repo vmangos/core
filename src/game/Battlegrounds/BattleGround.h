@@ -476,6 +476,7 @@ class BattleGround
             m_ActiveEvents[event1] = event2;
         }
         ObjectGuid GetSingleCreatureGuid(uint8 event1, uint8 event2);
+        ObjectGuid GetSingleGameObjectGuid(uint8 event1, uint8 event2);
 
         void OpenDoorEvent(uint8 event1, uint8 event2 = 0);
         static bool IsDoor(uint8 event1, uint8 event2);
