@@ -201,6 +201,13 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (4565, 20768, 15000, 0, 0, 50, 0, 5875),
 (4565, 20769, 26000, 0, 0, 60, 0, 5875);
 
+--add correct completion text for Doomcaller's Robes (8661)
+UPDATE `quest_template` SET `OfferRewardText` = "I did not expect you to return from your attempt, $n.$b$bYou've fulfilled a destiny greater than that of most immortal beings.$b$bBy slaying C'Thun you've not only saved all of Azeroth, you've also tipped the scales of cosmic events beyond your comprehension.$b$bAccept these robes as a symbol of the glory and burden that will come as a consequence of your actions.$b$bMay their power aid you in the challenges that await you, god-slayer!" WHERE `entry` = 8661;
+
+--add correct completion text for Doomcaller's Robes (8661)
+UPDATE `quest_template` SET `RequestItemsText` = "At his dwelling in
+Ahn'Qiraj, dread C'Thun awaits in slumber." WHERE `entry` = 8661;
+
 
 -- End of migration.
 END IF;
