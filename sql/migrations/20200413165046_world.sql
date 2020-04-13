@@ -346,6 +346,15 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (4566, 22785, 40000, 0, 0, 58, 0, 5875),
 (4566, 28403, 2000, 0, 0, 20, 5464, 5875);
 
+--add correct completion text for Enigma Leggings (8631)
+UPDATE `quest_template` SET `OfferRewardText` = "Yes... the worm's skin will make for an excellent protective layer.  Combined with the strongest parts from the Qiraji we've destroyed on our way here, this should make for a formidable piece of armor.  May it aid you in facing the unspeakable horrors that await inside! " WHERE `entry` = 8631;
+
+--add correct progress text for The Pebble of Kajaro (8102)
+UPDATE `quest_template` SET `RequestItemsText` = "Welcome back, $c. I can see that the pebble has seen much use. Many of our foes have fallen to your otherworldly abilities. Their suffering has been great. It is time that I enhance the power of the pebble. Give it to me." WHERE `entry` = 8102;
+
+--add correct progress text for The Jewel of Kajaro (8104)
+UPDATE `quest_template` SET `RequestItemsText` = "Give me the talisman, $n. I must show you something. " WHERE `entry` = 8104;
+
 
 -- End of migration.
 END IF;
