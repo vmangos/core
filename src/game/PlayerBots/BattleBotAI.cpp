@@ -410,7 +410,7 @@ Unit* BattleBotAI::SelectAttackTarget() const
         }
 
         // Aggro weak enemies from further away.
-        uint32 const aggroDistance = me->GetHealth() > pTarget->GetHealth() ? 50.0f : 20.0f;
+        uint32 const aggroDistance = me->GetHealth() > pTarget->GetHealth() ? 30.0f : 20.0f;
         if (!me->IsWithinDist(pTarget, aggroDistance))
             continue;
 
