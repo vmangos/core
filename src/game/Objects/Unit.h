@@ -1442,7 +1442,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetFacingTo(float ori);
         void SetFacingToObject(WorldObject* pObject);
         bool IsBehindTarget(Unit const* pTarget, bool strict = true) const;
-        
+        bool CantPathToVictim() const;
+
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
         MotionMaster const* GetMotionMaster() const { return &i_motionMaster; }
         void RestoreMovement();

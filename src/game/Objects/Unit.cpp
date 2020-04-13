@@ -2904,6 +2904,17 @@ bool Unit::IsBehindTarget(Unit const* pTarget, bool strict) const
     return !pTarget->HasInArc(M_PI_F, this);
 }
 
+bool Unit::CantPathToVictim() const
+{
+    if (!GetVictim())
+        return false;
+
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
+        return false;
+
+    return !GetMotionMaster()->GetCurrent()->IsReachable();
+}
+
 bool Unit::IsInAccessablePlaceFor(Creature const* c) const
 {
     if (IsInWater())

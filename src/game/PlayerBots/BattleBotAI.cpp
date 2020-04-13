@@ -858,6 +858,21 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (!me->IsInCombat())
     {
+        if (pVictim && me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+        {
+            if (!me->GetMotionMaster()->GetCurrent()->IsReachable())
+            {
+                printf("Target is unreachable!\n");
+                Unit* pTarget = static_cast<ChaseMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent())->GetTarget();
+                if (pTarget && pTarget->IsCreature())
+                {
+                    // Cheating to prevent getting stuck because of bad mmaps.
+                    me->NearTeleportTo(pTarget->GetPosition());
+                    return;
+                }
+            }
+        }
+
         UpdateOutOfCombatAI();
 
         if (m_isBuffing)
@@ -909,7 +924,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     }
 
     if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura() || 
-        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
+        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL) || me->CantPathToVictim())
     {
         if (pVictim = SelectAttackTarget())
         {
