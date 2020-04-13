@@ -2025,6 +2025,10 @@ bool BattleBotAI::StartNewPathToObjective()
     {
         case BATTLEGROUND_AV:
         {
+            // Alliance and Horde code is intentionally different.
+            // Horde bots are more united and always go together.
+            // Alliance bots can pick random objective.
+
             if (me->GetTeam() == HORDE)
             {
                 // End Boss
@@ -2038,31 +2042,28 @@ bool BattleBotAI::StartNewPathToObjective()
                 }
 
                 // Kill Balinda
-                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0) && urand(0,1))
+                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
                 {
                     if (Creature* pBalinda = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_A, 0)))
                         return StartNewPathToPosition(pBalinda->GetPosition(), vPaths_AV);
                 }
-                else if (urand(0, 1))
+
+                for (const auto& objective : AV_HordeDefendObjectives)
                 {
-                    for (const auto& objective : AV_HordeAttackObjectives)
+                    if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED))
                     {
-                        if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(objective.first, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
-                        {
-                            if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                            if (me->IsWithinDist(pGO, SIZE_OF_GRIDS))
                                 return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
-                        }
                     }
                 }
-                else
+
+                for (const auto& objective : AV_HordeAttackObjectives)
                 {
-                    for (const auto& objective : AV_HordeDefendObjectives)
+                    if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(objective.first, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
                     {
-                        if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(objective.first, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
-                        {
-                            if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                                return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
-                        }
+                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                     }
                 }
             }
@@ -2099,7 +2100,7 @@ bool BattleBotAI::StartNewPathToObjective()
                 {
                     for (const auto& objective : AV_AllianceDefendObjectives)
                     {
-                        if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
+                        if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED))
                         {
                             if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
                                 return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
