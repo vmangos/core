@@ -207,6 +207,15 @@ UPDATE `quest_template` SET `OfferRewardText` = "I did not expect you to return 
 --add correct completion text for Doomcaller's Robes (8661)
 UPDATE `quest_template` SET `RequestItemsText` = "At his dwelling in Ahn'Qiraj, dread C'Thun awaits in slumber." WHERE `entry` = 8661;
 
+--add correct progress text for Kezan's Taint (8107)
+UPDATE `quest_template` SET `RequestItemsText` = "Honor is earned amongst the Zandalar trolls, $n. With honor comes reward - friendship, alliance...$b$bHand me the talisman so that I may enhance its power." WHERE `entry` = 8107;
+
+--add correct progress text for Kezan's Taint (8108)
+UPDATE `quest_template` SET `RequestItemsText` = "I am ready for you, $c. Once more I will enhance your talisman. I only ask that you continue in your destruction of Hakkar and his minions.$b$bGive me the talisman." WHERE `entry` = 8108;
+
+--add correct progress text for Kezan's Unstoppable Taint (8109)
+UPDATE `quest_template` SET `RequestItemsText` = "Call forth your demons, $b. Let them bask in the energy of Kezan's Taint. Command them on the field of battle! Decimate the enemy!$b$bYes... The time has come to apply the final enhancement to Kezan's Taint. Give me the talisman." WHERE `entry` = 8109;
+
 
 -- End of migration.
 END IF;
