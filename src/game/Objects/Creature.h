@@ -791,7 +791,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool canStartAttack(Unit const* who, bool force) const;
         bool _IsTargetAcceptable(Unit const* target) const;
         bool canCreatureAttack(Unit const* pVictim, bool force) const;
-        bool CantPathToVictim() const;
 
         // Smartlog
         time_t GetCombatTime(bool total) const;
