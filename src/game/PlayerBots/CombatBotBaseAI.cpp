@@ -1161,6 +1161,12 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.warlock.pCurseofTongues->Id < pSpellEntry->Id)
                         m_spells.warlock.pCurseofTongues = pSpellEntry;
                 }
+                else if (pSpellEntry->SpellName[0].find("Life Tap") != std::string::npos)
+                {
+                    if (!m_spells.warlock.pLifeTap ||
+                        m_spells.warlock.pLifeTap->Id < pSpellEntry->Id)
+                        m_spells.warlock.pLifeTap = pSpellEntry;
+                }
                 break;
             }
             case CLASS_WARRIOR:

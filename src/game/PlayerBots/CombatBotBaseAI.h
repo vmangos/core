@@ -363,6 +363,7 @@ public:
             SpellEntry const* pCurseofRecklessness;
             SpellEntry const* pCurseofTongues;
             SpellEntry const* pCurseofExhaustion;
+            SpellEntry const* pLifeTap;
         } warlock;
         struct
         {

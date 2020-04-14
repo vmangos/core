@@ -1972,7 +1972,6 @@ bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::ve
 static std::pair<uint32, uint32> AV_HordeAttackObjectives[] =
 {
     // Attack
-    { BG_AV_SNOWFALL_GY, ALLIANCE_CONTROLLED },
     { BG_AV_STONEHEARTH_BUNKER, ALLIANCE_CONTROLLED },
     { BG_AV_STONEHEARTH_GY, ALLIANCE_CONTROLLED },
     { BG_AV_ICEWING_BUNKER, ALLIANCE_CONTROLLED },
@@ -1995,7 +1994,6 @@ static std::pair<uint32, uint32> AV_HordeDefendObjectives[] =
 static std::pair<uint32, uint32> AV_AllianceAttackObjectives[] =
 {
     // Attack
-    { BG_AV_SNOWFALL_GY, HORDE_CONTROLLED },
     { BG_AV_ICEBLOOD_TOWER, HORDE_CONTROLLED },
     { BG_AV_ICEBLOOD_GY, HORDE_CONTROLLED },
     { BG_AV_TOWER_POINT_TOWER, HORDE_CONTROLLED },
@@ -2041,7 +2039,14 @@ bool BattleBotAI::StartNewPathToObjective()
                         return StartNewPathToPosition(pVanndar->GetPosition(), vPaths_AV);
                 }
 
-                // Kill Balinda
+                // Only go to Snowfall Graveyard if already close to it.
+                if (bg->IsActiveEvent(BG_AV_SNOWFALL_GY, ALLIANCE_ASSAULTED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, ALLIANCE_CONTROLLED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED))
+                {
+                    if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED)))
+                        if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
+                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);  
+                }
+
                 if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_A, 0))
                 {
                     if (Creature* pBalinda = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_A, 0)))
@@ -2053,7 +2058,7 @@ bool BattleBotAI::StartNewPathToObjective()
                     if (bg->IsActiveEvent(objective.first, ALLIANCE_ASSAULTED))
                     {
                         if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                            if (me->IsWithinDist(pGO, SIZE_OF_GRIDS))
+                            if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
                                 return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                     }
                 }
@@ -2079,7 +2084,14 @@ bool BattleBotAI::StartNewPathToObjective()
                         return StartNewPathToPosition(pDrek->GetPosition(), vPaths_AV);
                 }
 
-                // Kill Galvanger
+                // Only go to Snowfall Graveyard if already close to it.
+                if (bg->IsActiveEvent(BG_AV_SNOWFALL_GY, HORDE_ASSAULTED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, HORDE_CONTROLLED) || bg->IsActiveEvent(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED))
+                {
+                    if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(BG_AV_SNOWFALL_GY, NEUTRAL_CONTROLLED)))
+                        if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
+                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                }
+
                 if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0) && urand(0,1))
                 {
                     if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
