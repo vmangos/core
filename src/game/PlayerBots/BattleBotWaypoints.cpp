@@ -1542,7 +1542,7 @@ BattleBotPath vPath_AV_Alliance_Base_Bunker_First_Crossroad_to_Alliance_Base_Nor
     { 678.008f, -125.249f, 63.6667f, nullptr },
     { 671.246f, -128.806f, 63.665f, nullptr },
     { 669.384f, -135.545f, 63.6574f, nullptr },
-    { 672.685f, -142.49f, 63.6571f, nullptr },
+    { 672.685f, -142.49f, 63.6571f, &AtFlag },
 };
 
 BattleBotPath vPath_AV_Alliance_Base_Bunker_First_Crossroad_to_Alliance_Base_Bunker_Second_Crossroad =
@@ -2097,26 +2097,22 @@ bool BattleBotAI::StartNewPathToObjective()
                     if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
                         return StartNewPathToPosition(pGalvangar->GetPosition(), vPaths_AV);
                 }
-                else if (urand(0, 1))
+
+                for (const auto& objective : AV_AllianceDefendObjectives)
                 {
-                    for (const auto& objective : AV_AllianceAttackObjectives)
+                    if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) && urand(0,1))
                     {
-                        if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
-                        {
-                            if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                                return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
-                        }
+                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                     }
                 }
-                else
+
+                for (const auto& objective : AV_AllianceAttackObjectives)
                 {
-                    for (const auto& objective : AV_AllianceDefendObjectives)
+                    if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
                     {
-                        if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED))
-                        {
-                            if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                                return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
-                        }
+                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                     }
                 }
             }
