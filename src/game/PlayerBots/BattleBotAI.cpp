@@ -300,8 +300,7 @@ bool BattleBotAI::DrinkAndEat()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
             ClearPath();
-            me->StopMoving();
-            me->GetMotionMaster()->MoveIdle();
+            StopMoving();
         }
         me->CastSpell(me, BB_SPELL_FOOD, true);
         return true;
@@ -312,8 +311,7 @@ bool BattleBotAI::DrinkAndEat()
         if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
         {
             ClearPath();
-            me->StopMoving();
-            me->GetMotionMaster()->MoveIdle();
+            StopMoving();
         }
         me->CastSpell(me, BB_SPELL_DRINK, true);
         return true;
@@ -348,7 +346,7 @@ bool BattleBotAI::AttackStart(Unit* pVictim)
     return false;
 }
 
-Unit* BattleBotAI::SelectAttackTarget() const
+Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
 {
     // 1. Check units we are currently in combat with.
 
@@ -359,6 +357,9 @@ Unit* BattleBotAI::SelectAttackTarget() const
     {
         if (Unit* pTarget = pReference->getSourceUnit())
         {
+            if (pTarget == pExcept)
+                continue;
+
             if (IsValidHostileTarget(pTarget))
             {
                 if (me->GetTeam() == HORDE)
@@ -395,6 +396,9 @@ Unit* BattleBotAI::SelectAttackTarget() const
 
     for (const auto& pTarget : players)
     {
+        if (pTarget == pExcept)
+            continue;
+
         if (!IsValidHostileTarget(pTarget))
             continue;
 
@@ -433,7 +437,9 @@ Unit* BattleBotAI::SelectAttackTarget() const
                     continue;
 
                 if (Unit* pAttacker = pMember->GetAttackerForHelper())
-                    if (IsValidHostileTarget(pAttacker) && me->IsWithinLOSInMap(pAttacker))
+                    if (IsValidHostileTarget(pAttacker) &&
+                        me->IsWithinLOSInMap(pAttacker) && 
+                        pAttacker != pExcept)
                         return pAttacker;
             }
         }
@@ -508,6 +514,13 @@ void BattleBotAI::DoGraveyardJump()
                 pAI->m_doingGraveyardJump = false;
         }, timeOffset);
     }
+}
+
+void BattleBotAI::StopMoving()
+{
+    me->StopMoving();
+    me->GetMotionMaster()->Clear();
+    me->GetMotionMaster()->MoveIdle();
 }
 
 void BattleBotAI::SendFakePacket(uint16 opcode)
@@ -626,10 +639,7 @@ void BattleBotAI::OnJustDied()
 {
     ClearPath();
     if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
-    {
-        me->GetMotionMaster()->Clear();
-        me->GetMotionMaster()->MoveIdle();
-    }
+        StopMoving();
 }
 
 void BattleBotAI::OnJustRevived()
@@ -686,8 +696,8 @@ void BattleBotAI::OnEnterBattleGround()
 void BattleBotAI::OnLeaveBattleGround()
 {
     ClearPath();
-    me->GetMotionMaster()->Clear();
-    me->GetMotionMaster()->MoveIdle();
+    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+        StopMoving();
 }
 
 void BattleBotAI::UpdateAI(uint32 const diff)
@@ -871,6 +881,13 @@ void BattleBotAI::UpdateAI(uint32 const diff)
                     me->NearTeleportTo(pTarget->GetPosition());
                     return;
                 }
+
+                if (me->GetCombatDistance(pTarget) > 30.0f)
+                {
+                    me->AttackStop(false);
+                    StopMoving();
+                    return;
+                }
             }
         }
 
@@ -888,7 +905,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura())
         {
-            if (Unit* pVictim = SelectAttackTarget())
+            if (pVictim = SelectAttackTarget(pVictim))
             {
                 AttackStart(pVictim);
                 return;
@@ -908,10 +925,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
                 Unit* pTarget = pMoveGen->GetTarget();
                 if (!pTarget || !pTarget->IsAlive() || !pTarget->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
                 {
-                    if (!me->IsStopped())
-                        me->StopMoving();
-                    me->GetMotionMaster()->Clear();
-                    me->GetMotionMaster()->MoveIdle();
+                    StopMoving();
                     return;
                 }
             }
@@ -927,9 +941,16 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura() || 
         !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL) || me->CantPathToVictim())
     {
-        if (pVictim = SelectAttackTarget())
+        if (pVictim = SelectAttackTarget(pVictim))
         {
             AttackStart(pVictim);
+            return;
+        }
+
+        if (me->GetVictim())
+        {
+            me->AttackStop(false);
+            StopMoving();
             return;
         }
     }
