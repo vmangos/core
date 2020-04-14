@@ -357,10 +357,8 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
     {
         if (Unit* pTarget = pReference->getSourceUnit())
         {
-            if (pTarget == pExcept)
-                continue;
-
-            if (IsValidHostileTarget(pTarget))
+            if (pTarget != pExcept &&
+                IsValidHostileTarget(pTarget))
             {
                 if (me->GetTeam() == HORDE)
                 {
