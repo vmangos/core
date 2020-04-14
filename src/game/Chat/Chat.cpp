@@ -612,6 +612,7 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { "aiinfo",         SEC_MODERATOR,      false, &ChatHandler::HandleUnitAIInfoCommand,          "", nullptr },
         { "info",           SEC_MODERATOR,      false, &ChatHandler::HandleUnitInfoCommand,            "", nullptr },
+        { "statinfo",       SEC_MODERATOR,      false, &ChatHandler::HandleUnitStatInfoCommand,        "", nullptr },
         { nullptr,          0,                  false, nullptr,                                        "", nullptr }
     };
 
@@ -653,6 +654,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "rename",         SEC_GAMEMASTER,     true,  &ChatHandler::HandlePetRenameCommand,            "", nullptr },
         { "delete",         SEC_GAMEMASTER,     true,  &ChatHandler::HandlePetDeleteCommand,            "", nullptr },
         { "loyalty",        SEC_GAMEMASTER,     false, &ChatHandler::HandlePetLoyaltyCommand,           "", nullptr },
+        { "info",           SEC_MODERATOR,      false, &ChatHandler::HandlePetInfoCommand,              "", nullptr },
         { nullptr,          0,                  false, nullptr,                                         "", nullptr }
     };
 

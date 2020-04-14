@@ -2635,11 +2635,36 @@ void CombatBotBaseAI::SendFakePacket(uint16 opcode)
             }
             break;
         }
+        case CMSG_BEGIN_TRADE:
+        {
+            WorldPacket data(CMSG_BEGIN_TRADE);
+            me->GetSession()->HandleBeginTradeOpcode(data);
+            break;
+        }
+        case CMSG_ACCEPT_TRADE:
+        {
+            if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START))
+                me->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
+
+            WorldPacket data(CMSG_ACCEPT_TRADE);
+            data << uint32(1);
+            me->GetSession()->HandleAcceptTradeOpcode(data);
+            break;
+        }
+        case CMSG_RESURRECT_RESPONSE:
+        {
+            WorldPacket data(CMSG_RESURRECT_RESPONSE);
+            data << me->GetResurrector();
+            data << uint8(1);
+            me->GetSession()->HandleResurrectResponseOpcode(data);
+            break;
+        }
     }
 }
 
 void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
 {
+    // Must always check "me" player pointer here!
     //printf("Bot received %s\n", LookupOpcodeName(packet->GetOpcode()));
     switch (packet->GetOpcode())
     {
@@ -2658,31 +2683,29 @@ void CombatBotBaseAI::OnPacketReceived(WorldPacket const* packet)
             uint32 status = *((uint32*)(*packet).contents());
             if (status == TRADE_STATUS_BEGIN_TRADE)
             {
-                WorldPacket data(CMSG_BEGIN_TRADE);
-                me->GetSession()->HandleBeginTradeOpcode(data);
+                botEntry->m_pendingResponses.push_back(CMSG_BEGIN_TRADE);
             }
             else if (status == TRADE_STATUS_TRADE_ACCEPT)
             {
-                if (Item* pItem = me->GetItemByPos(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START))
-                    me->DestroyItem(INVENTORY_SLOT_BAG_0, INVENTORY_SLOT_ITEM_START, true);
-
-                WorldPacket data(CMSG_ACCEPT_TRADE);
-                data << uint32(1);
-                me->GetSession()->HandleAcceptTradeOpcode(data);
+                botEntry->m_pendingResponses.push_back(CMSG_ACCEPT_TRADE);
             }
             else if (status == TRADE_STATUS_TRADE_COMPLETE)
             {
-                EquipOrUseNewItem();
+                if (me)
+                    EquipOrUseNewItem();
             }
             break;
         }
         case SMSG_RESURRECT_REQUEST:
         {
-            me->ResurectUsingRequestData();
+            botEntry->m_pendingResponses.push_back(CMSG_RESURRECT_RESPONSE);
             break;
         }
         case SMSG_BATTLEFIELD_STATUS:
         {
+            if (!me)
+                return;
+
             if (me->IsBeingTeleported() || me->InBattleGround())
                 m_receivedBgInvite = false;
             else

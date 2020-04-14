@@ -674,6 +674,7 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleUnitAIInfoCommand(char* args);
         bool HandleUnitInfoCommand(char* args);
+        bool HandleUnitStatInfoCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);
@@ -692,6 +693,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandlePetRenameCommand(char* args);
         bool HandlePetDeleteCommand(char* args);
         bool HandlePetLoyaltyCommand(char* args);
+        bool HandlePetInfoCommand(char* args);
 
         bool HandleReloadAllCommand(char* args);
         bool HandleReloadAllAreaCommand(char* args);

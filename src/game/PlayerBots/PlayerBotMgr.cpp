@@ -232,11 +232,12 @@ void PlayerBotMgr::Update(uint32 diff)
             if (!iter->second->m_pendingResponses.empty() &&
                 iter->second->ai && iter->second->ai->me)
             {
-                for (const auto opcode : iter->second->m_pendingResponses)
+                std::vector<uint16> pendingResponses = iter->second->m_pendingResponses;
+                iter->second->m_pendingResponses.clear();
+                for (const auto opcode : pendingResponses)
                 {
                     iter->second->ai->SendFakePacket(opcode);
                 }
-                iter->second->m_pendingResponses.clear();
             }
 
             if (iter->second->requestRemoval)

@@ -5022,6 +5022,25 @@ bool ChatHandler::HandlePetLoyaltyCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandlePetInfoCommand(char* args)
+{
+    Pet* pPet = GetSelectedPet();
+    if (!pPet)
+        return false;
+
+    PSendSysMessage("Info for %s", pPet->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("Owner: %s", pPet->GetOwnerGuid().GetString().c_str());
+    PSendSysMessage("Pet type: %u", pPet->getPetType());
+    PSendSysMessage("Loyalty level: %hhu", pPet->GetByteValue(UNIT_FIELD_BYTES_1, 1));
+    PSendSysMessage("Pet number: %u", pPet->GetUInt32Value(UNIT_FIELD_PETNUMBER));
+    PSendSysMessage("Pet name timestamp: %u", pPet->GetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP));
+    PSendSysMessage("Pet experience: %u", pPet->GetUInt32Value(UNIT_FIELD_PETEXPERIENCE));
+    PSendSysMessage("Pet next level xp: %u", pPet->GetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP));
+    PSendSysMessage("Training points: %u", pPet->GetUInt32Value(UNIT_TRAINING_POINTS));
+
+    return true;
+}
+
 bool ChatHandler::HandleChannelJoinCommand(char* c)
 {
     WorldPacket pkt(CMSG_JOIN_CHANNEL, 4);
