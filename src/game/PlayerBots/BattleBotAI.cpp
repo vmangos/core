@@ -446,7 +446,7 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
 
                 if (Unit* pAttacker = pMember->GetAttackerForHelper())
                     if (IsValidHostileTarget(pAttacker) &&
-                        me->IsWithinDist(pAttacker, VISIBILITY_DISTANCE_NORMAL) &&
+                        me->IsWithinDist(pAttacker, maxAggroDistance * 2.0f) &&
                         me->IsWithinLOSInMap(pAttacker) && 
                         pAttacker != pExcept)
                         return pAttacker;
