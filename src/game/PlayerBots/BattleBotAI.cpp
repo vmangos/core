@@ -709,6 +709,45 @@ void BattleBotAI::OnLeaveBattleGround()
         StopMoving();
 }
 
+bool BattleBotAI::CheckForUnreachableTarget()
+{
+    if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
+       !me->GetMotionMaster()->GetCurrent()->IsReachable())
+    {
+        if (Unit* pTarget = static_cast<ChaseMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent())->GetTarget())
+        {
+            if (!me->CanReachWithMeleeAutoAttack(pTarget))
+            {
+                if (!me->IsWithinDist(pTarget, VISIBILITY_DISTANCE_NORMAL))
+                {
+                    printf("%s - %s is too far\n", me->GetName(), pTarget->GetName());
+                    me->AttackStop(false);
+                    StopMoving();
+                    return true;
+                }
+
+                if (pTarget->IsCreature() && !me->IsMoving())
+                {
+                    printf("%s - teleporting to %s\n", me->GetName(), pTarget->GetName());
+                    // Cheating to prevent getting stuck because of bad mmaps.
+                    me->NearTeleportTo(pTarget->GetPosition());
+                    return true;
+                }
+
+                if (me->GetDistanceZ(pTarget) > 10.0f)
+                {
+                    printf("%s - %s is too high\n", me->GetName(), pTarget->GetName());
+                    me->AttackStop(false);
+                    StopMoving();
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+}
+
 void BattleBotAI::UpdateAI(uint32 const diff)
 {
     m_updateTimer.Update(diff);
@@ -732,6 +771,10 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         SummonPetIfNeeded();
         me->SetHealthPercent(100.0f);
         me->SetPowerPercent(me->GetPowerType(), 100.0f);
+
+        uint32 newzone, newarea;
+        me->GetZoneAndAreaId(newzone, newarea);
+        me->UpdateZone(newzone, newarea);
 
         if (urand(0, 1))
         {
@@ -877,32 +920,8 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (!me->IsInCombat())
     {
-        if (pVictim &&
-            me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
-           !me->GetMotionMaster()->GetCurrent()->IsReachable() &&
-           !me->CanReachWithMeleeAutoAttack(pVictim))
-        {
-            printf("%s - %s is unreachable!\n", me->GetName(), pVictim->GetName());
-            if (Unit* pTarget = static_cast<ChaseMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent())->GetTarget())
-            {
-                if (pTarget->IsCreature() && !me->IsMoving())
-                {
-                    printf("teleporting to target\n");
-                    // Cheating to prevent getting stuck because of bad mmaps.
-                    me->NearTeleportTo(pTarget->GetPosition());
-                    return;
-                }
-                
-                if ((me->GetDistanceZ(pTarget) > 10.0f) ||
-                    (me->GetDistance2d(pTarget) > 50.0f))
-                {
-                    printf("stop chasing target\n");
-                    me->AttackStop(false);
-                    StopMoving();
-                    return;
-                }
-            }
-        }
+        if (CheckForUnreachableTarget())
+            return;
 
         UpdateOutOfCombatAI();
 
