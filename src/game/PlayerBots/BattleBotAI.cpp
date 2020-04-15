@@ -471,6 +471,9 @@ Unit* BattleBotAI::SelectFollowTarget() const
         if (me->GetTeam() != pTarget->GetTeam())
             continue;
 
+        if (pTarget->IsGameMaster())
+            continue;
+
         if (me->GetTeam() == ALLIANCE)
         {
             if (pTarget->HasAura(AURA_WARSONG_FLAG))
@@ -772,15 +775,15 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         me->SetHealthPercent(100.0f);
         me->SetPowerPercent(me->GetPowerType(), 100.0f);
 
-        uint32 newzone, newarea;
-        me->GetZoneAndAreaId(newzone, newarea);
-        me->UpdateZone(newzone, newarea);
-
         if (urand(0, 1))
         {
             me->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_HELM);
             me->ToggleFlag(PLAYER_FLAGS, PLAYER_FLAGS_HIDE_CLOAK);
         }
+
+        uint32 newzone, newarea;
+        me->GetZoneAndAreaId(newzone, newarea);
+        me->UpdateZone(newzone, newarea);
 
         m_initialized = true;
         return;
