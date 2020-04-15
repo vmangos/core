@@ -320,6 +320,15 @@ bool BattleBotAI::DrinkAndEat()
     return needToEat || needToDrink;
 }
 
+float BattleBotAI::GetMaxAggroDistanceForMap() const
+{
+    if (!me->GetBattleGround() ||
+        me->GetBattleGround()->GetTypeID() != BATTLEGROUND_AV)
+        return 50.0f;
+    
+    return 30.0f;
+}
+
 bool BattleBotAI::AttackStart(Unit* pVictim)
 {
     m_isBuffing = false;
@@ -391,6 +400,7 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
 
     std::list<Player*> players;
     me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
+    float const maxAggroDistance = GetMaxAggroDistanceForMap();
 
     for (const auto& pTarget : players)
     {
@@ -412,7 +422,7 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
         }
 
         // Aggro weak enemies from further away.
-        uint32 const aggroDistance = me->GetHealth() > pTarget->GetHealth() ? 30.0f : 20.0f;
+        uint32 const aggroDistance = me->GetHealth() > pTarget->GetHealth() ? maxAggroDistance : 20.0f;
         if (!me->IsWithinDist(pTarget, aggroDistance))
             continue;
 
@@ -436,6 +446,7 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
 
                 if (Unit* pAttacker = pMember->GetAttackerForHelper())
                     if (IsValidHostileTarget(pAttacker) &&
+                        me->IsWithinDist(pAttacker, VISIBILITY_DISTANCE_NORMAL) &&
                         me->IsWithinLOSInMap(pAttacker) && 
                         pAttacker != pExcept)
                         return pAttacker;
@@ -866,22 +877,26 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
     if (!me->IsInCombat())
     {
-        if (pVictim && me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+        if (pVictim &&
+            me->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
+           !me->GetMotionMaster()->GetCurrent()->IsReachable() &&
+           !me->CanReachWithMeleeAutoAttack(pVictim))
         {
-            if (!me->GetMotionMaster()->GetCurrent()->IsReachable())
+            printf("%s - %s is unreachable!\n", me->GetName(), pVictim->GetName());
+            if (Unit* pTarget = static_cast<ChaseMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent())->GetTarget())
             {
-                printf("%s - %s is unreachable!\n", me->GetName(), pVictim->GetName());
-                Unit* pTarget = static_cast<ChaseMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent())->GetTarget();
-                if (pTarget && pTarget->IsCreature())
+                if (pTarget->IsCreature() && !me->IsMoving())
                 {
                     printf("teleporting to target\n");
                     // Cheating to prevent getting stuck because of bad mmaps.
                     me->NearTeleportTo(pTarget->GetPosition());
                     return;
                 }
-
-                if (me->GetCombatDistance(pTarget) > 30.0f)
+                
+                if ((me->GetDistanceZ(pTarget) > 10.0f) ||
+                    (me->GetDistance2d(pTarget) > 50.0f))
                 {
+                    printf("stop chasing target\n");
                     me->AttackStop(false);
                     StopMoving();
                     return;
@@ -937,7 +952,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     }
 
     if (!pVictim || pVictim->IsDead() || pVictim->HasBreakableByDamageCrowdControlAura() || 
-        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL) || me->CantPathToVictim())
+        !pVictim->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
     {
         if (pVictim = SelectAttackTarget(pVictim))
         {
@@ -945,8 +960,18 @@ void BattleBotAI::UpdateAI(uint32 const diff)
             return;
         }
 
-        if (me->GetVictim())
+        if (me->GetVictim() &&
+           (me != me->GetVictim()->GetVictim()))
         {
+            
+            printf("%s stops attacking, invalid target %s\n", me->GetName(), me->GetVictim()->GetName());
+            if (me->GetVictim()->IsDead())
+                printf("reason: IsDead\n");
+            if (me->GetVictim()->HasBreakableByDamageCrowdControlAura())
+                printf("reason: HasBreakableByDamageCrowdControlAura\n");
+            if (!me->GetVictim()->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
+                printf("reason: !IsWithinDist\n");
+
             me->AttackStop(false);
             StopMoving();
             return;
