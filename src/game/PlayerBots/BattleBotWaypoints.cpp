@@ -2105,7 +2105,7 @@ bool BattleBotAI::StartNewPathToObjective()
                 }
                 
                 // Chance to defend,
-                if (urand(0, 1))
+                if (roll_chance_u(25))
                 {
                     for (const auto& objective : AV_AllianceDefendObjectives)
                     {
@@ -2121,7 +2121,7 @@ bool BattleBotAI::StartNewPathToObjective()
                 WorldObject* pAttackObjectiveObject = nullptr;
                 float attackObjectiveDistance = FLT_MAX;
 
-                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0) && urand(0, 1))
+                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0))
                 {
                     if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
                     {
