@@ -171,13 +171,15 @@ void WSG_AtHordeGraveyard(BattleBotAI* pAI)
 
 #define SPELL_CAPTURE_BANNER 21651
 
-uint32 const FlagIds[] = { GO_AB_ALLIANCE_BANNER , GO_AB_CONTESTED_BANNER1 , GO_AB_HORDE_BANNER , GO_AB_CONTESTED_BANNER2 ,
-                           GO_AB_STABLE_BANNER, GO_AB_BLACKSMITH_BANNER, GO_AB_FARM_BANNER, GO_AB_LUMBER_MILL_BANNER,
-                           GO_AB_GOLD_MINE_BANNER, GO_AV_HORDE_BANNER1 , GO_AV_HORDE_BANNER2 , GO_AV_ALLIANCE_BANNER1 ,
-                           GO_AV_ALLIANCE_BANNER2 , GO_AV_CONTESTED_BANNER1 , GO_AV_CONTESTED_BANNER2 , GO_AV_CONTESTED_BANNER3 ,
-                           GO_AV_CONTESTED_BANNER4 , GO_AV_SNOWFALL_BANNER };
+std::vector<uint32> const vFlagsAV = { GO_AV_HORDE_BANNER1 , GO_AV_HORDE_BANNER2 , GO_AV_ALLIANCE_BANNER1 , GO_AV_ALLIANCE_BANNER2 ,
+                                       GO_AV_CONTESTED_BANNER1 , GO_AV_CONTESTED_BANNER2 , GO_AV_CONTESTED_BANNER3 ,
+                                       GO_AV_CONTESTED_BANNER4 , GO_AV_SNOWFALL_BANNER };
 
-void AtFlag(BattleBotAI* pAI)
+std::vector<uint32> const vFlagsAB = { GO_AB_ALLIANCE_BANNER , GO_AB_CONTESTED_BANNER1 , GO_AB_HORDE_BANNER , GO_AB_CONTESTED_BANNER2 ,
+                                       GO_AB_STABLE_BANNER, GO_AB_BLACKSMITH_BANNER, GO_AB_FARM_BANNER, GO_AB_LUMBER_MILL_BANNER,
+                                       GO_AB_GOLD_MINE_BANNER };
+
+void AtFlag(BattleBotAI* pAI, std::vector<uint32> const& vFlagIds)
 {
     if (Player* pFriend = pAI->me->FindNearestFriendlyPlayer(INTERACTION_DISTANCE))
     {
@@ -190,7 +192,7 @@ void AtFlag(BattleBotAI* pAI)
         }
     }
 
-    for (const auto& bannerId : FlagIds)
+    for (const auto& bannerId : vFlagIds)
     {
         if (GameObject* pGo = pAI->me->FindNearestGameObject(bannerId, INTERACTION_DISTANCE))
         {
@@ -210,6 +212,16 @@ void AtFlag(BattleBotAI* pAI)
     }
     
     pAI->MoveToNextPoint();
+}
+
+void AB_AtFlag(BattleBotAI* pAI)
+{
+    AtFlag(pAI, vFlagsAB);
+}
+
+void AV_AtFlag(BattleBotAI* pAI)
+{
+    AtFlag(pAI, vFlagsAV);
 }
 
 void AtCaveExit(BattleBotAI* pAI)
@@ -658,7 +670,7 @@ BattleBotPath vPath_AB_AllianceBase_to_Stables =
     { 1213.25f, 1224.93f, -47.5513f, nullptr },
     { 1189.29f, 1219.49f, -53.119f, nullptr },
     { 1177.17f, 1210.21f, -56.4593f, nullptr },
-    { 1167.98f, 1202.9f, -56.4743f, &AtFlag },
+    { 1167.98f, 1202.9f, -56.4743f, &AB_AtFlag },
 };
 // Alliance Base to Gold Mine
 BattleBotPath vPath_AB_AllianceBase_to_GoldMine =
@@ -679,7 +691,7 @@ BattleBotPath vPath_AB_AllianceBase_to_GoldMine =
     { 1166.29f, 913.945f, -107.214f, nullptr },
     { 1153.17f, 887.863f, -112.34f, nullptr },
     { 1148.89f, 871.391f, -111.96f, nullptr },
-    { 1145.24f, 850.82f, -110.514f, &AtFlag },
+    { 1145.24f, 850.82f, -110.514f, &AB_AtFlag },
 };
 // Alliance Base to Lumber Mill
 BattleBotPath vPath_AB_AllianceBase_to_LumberMill =
@@ -703,12 +715,12 @@ BattleBotPath vPath_AB_AllianceBase_to_LumberMill =
     { 880.329f, 1192.63f, 7.61168f, nullptr },
     { 869.965f, 1178.52f, 10.9678f, nullptr },
     { 864.74f, 1163.78f, 12.385f, nullptr },
-    { 859.165f, 1148.84f, 11.5289f, &AtFlag },
+    { 859.165f, 1148.84f, 11.5289f, &AB_AtFlag },
 };
 // Stables to Blacksmith
 BattleBotPath vPath_AB_Stables_to_Blacksmith =
 {
-    { 1169.52f, 1198.71f, -56.2742f, &AtFlag },
+    { 1169.52f, 1198.71f, -56.2742f, &AB_AtFlag },
     { 1166.93f, 1185.2f, -56.3634f, nullptr },
     { 1173.84f, 1170.6f, -56.4094f, nullptr },
     { 1186.7f, 1163.92f, -56.3961f, nullptr },
@@ -729,7 +741,7 @@ BattleBotPath vPath_AB_Stables_to_Blacksmith =
     { 1029.72f, 1014.88f, -45.3546f, nullptr },
     { 1013.94f, 1028.7f, -43.9786f, nullptr },
     { 990.89f, 1039.3f, -42.7659f, nullptr },
-    { 978.269f, 1043.84f, -44.4588f, &AtFlag },
+    { 978.269f, 1043.84f, -44.4588f, &AB_AtFlag },
 };
 // Horde Base to Farm
 BattleBotPath vPath_AB_HordeBase_to_Farm =
@@ -746,7 +758,7 @@ BattleBotPath vPath_AB_HordeBase_to_Farm =
     { 767.947f, 839.274f, -50.8574f, nullptr },
     { 773.745f, 852.013f, -52.6226f, nullptr },
     { 785.123f, 869.103f, -54.2089f, nullptr },
-    { 804.429f, 874.961f, -55.2691f, &AtFlag },
+    { 804.429f, 874.961f, -55.2691f, &AB_AtFlag },
 };
 // Horde Base to Gold Mine
 BattleBotPath vPath_AB_HordeBase_to_GoldMine =
@@ -771,7 +783,7 @@ BattleBotPath vPath_AB_HordeBase_to_GoldMine =
     { 1081.6f, 828.32f, -99.4137f, nullptr },
     { 1104.64f, 844.773f, -106.387f, nullptr },
     { 1117.56f, 853.686f, -110.716f, nullptr },
-    { 1144.9f, 850.049f, -110.522f, &AtFlag },
+    { 1144.9f, 850.049f, -110.522f, &AB_AtFlag },
 };
 // Horde Base to Lumber Mill
 BattleBotPath vPath_AB_HordeBase_to_LumberMill =
@@ -804,12 +816,12 @@ BattleBotPath vPath_AB_HordeBase_to_LumberMill =
     { 812.476f, 1131.1f, 10.439f, nullptr },
     { 829.704f, 1142.52f, 10.738f, nullptr },
     { 842.646f, 1143.51f, 11.9984f, nullptr },
-    { 857.674f, 1146.16f, 11.529f, &AtFlag },
+    { 857.674f, 1146.16f, 11.529f, &AB_AtFlag },
 };
 // Farm to Blacksmith
 BattleBotPath vPath_AB_Farm_to_Blacksmith =
 {
-    { 803.826f, 874.909f, -55.2547f, &AtFlag },
+    { 803.826f, 874.909f, -55.2547f, &AB_AtFlag },
     { 808.763f, 887.991f, -57.4437f, nullptr },
     { 818.33f, 906.674f, -59.3554f, nullptr },
     { 828.634f, 924.972f, -60.5664f, nullptr },
@@ -823,12 +835,12 @@ BattleBotPath vPath_AB_Farm_to_Blacksmith =
     { 932.418f, 1011.44f, -51.9225f, nullptr },
     { 944.244f, 1018.92f, -49.1438f, nullptr },
     { 961.55f, 1030.81f, -45.814f, nullptr },
-    { 978.122f, 1043.87f, -44.4682f, &AtFlag },
+    { 978.122f, 1043.87f, -44.4682f, &AB_AtFlag },
 };
 // Stables to Gold Mine
 BattleBotPath vPath_AB_Stables_to_GoldMine =
 {
-    { 1169.52f, 1198.71f, -56.2742f, &AtFlag },
+    { 1169.52f, 1198.71f, -56.2742f, &AB_AtFlag },
     { 1166.72f, 1183.58f, -56.3633f, nullptr },
     { 1172.14f, 1170.99f, -56.4735f, nullptr },
     { 1185.18f, 1164.02f, -56.4269f, nullptr },
@@ -847,12 +859,12 @@ BattleBotPath vPath_AB_Stables_to_GoldMine =
     { 1169.86f, 918.68f, -105.588f, nullptr },
     { 1159.36f, 900.497f, -110.461f, nullptr },
     { 1149.32f, 874.429f, -112.142f, nullptr },
-    { 1145.34f, 849.824f, -110.523f, &AtFlag },
+    { 1145.34f, 849.824f, -110.523f, &AB_AtFlag },
 };
 // Stables to Lumber Mill
 BattleBotPath vPath_AB_Stables_to_LumberMill =
 {
-    { 1169.52f, 1198.71f, -56.2742f, &AtFlag },
+    { 1169.52f, 1198.71f, -56.2742f, &AB_AtFlag },
     { 1169.33f, 1203.43f, -56.5457f, nullptr },
     { 1164.77f, 1208.73f, -56.1907f, nullptr },
     { 1141.52f, 1224.99f, -53.8204f, nullptr },
@@ -872,12 +884,12 @@ BattleBotPath vPath_AB_Stables_to_LumberMill =
     { 873.419f, 1189.27f, 9.3466f, nullptr },
     { 863.821f, 1181.72f, 9.76912f, nullptr },
     { 851.803f, 1166.3f, 10.4423f, nullptr },
-    { 853.921f, 1150.92f, 11.543f, &AtFlag },
+    { 853.921f, 1150.92f, 11.543f, &AB_AtFlag },
 };
 // Farm to Gold Mine
 BattleBotPath vPath_AB_Farm_to_GoldMine =
 {
-    { 803.826f, 874.909f, -55.2547f, &AtFlag },
+    { 803.826f, 874.909f, -55.2547f, &AB_AtFlag },
     { 801.662f, 865.689f, -56.9445f, nullptr },
     { 806.433f, 860.776f, -57.5899f, nullptr },
     { 816.236f, 857.397f, -57.7029f, nullptr },
@@ -905,12 +917,12 @@ BattleBotPath vPath_AB_Farm_to_GoldMine =
     { 1092.85f, 836.986f, -102.755f, nullptr },
     { 1114.75f, 851.21f, -109.782f, nullptr },
     { 1128.22f, 851.928f, -111.078f, nullptr },
-    { 1145.14f, 849.895f, -110.523f, &AtFlag },
+    { 1145.14f, 849.895f, -110.523f, &AB_AtFlag },
 };
 // Farm to Lumber Mill
 BattleBotPath vPath_AB_Farm_to_LumberMill =
 {
-    { 803.826f, 874.909f, -55.2547f, &AtFlag },
+    { 803.826f, 874.909f, -55.2547f, &AB_AtFlag },
     { 802.874f, 894.28f, -56.4661f, nullptr },
     { 806.844f, 920.39f, -57.3157f, nullptr },
     { 814.003f, 934.161f, -57.6065f, nullptr },
@@ -928,7 +940,7 @@ BattleBotPath vPath_AB_Farm_to_LumberMill =
     { 817.3f, 1134.59f, 10.6064f, nullptr },
     { 828.961f, 1142.98f, 10.7354f, nullptr },
     { 841.63f, 1147.75f, 11.6916f, nullptr },
-    { 854.326f, 1150.55f, 11.537f, &AtFlag },
+    { 854.326f, 1150.55f, 11.537f, &AB_AtFlag },
 };
 
 BattleBotPath vPath_AV_Horde_Cave_to_Tower_Point_Crossroad =
@@ -960,12 +972,12 @@ BattleBotPath vPath_AV_Horde_Cave_to_Frostwolf_Graveyard_Flag =
     { -1035.81f, -410.183f, 51.3285f, nullptr },
     { -1049.87f, -400.511f, 51.4724f, nullptr },
     { -1054.03f, -379.162f, 51.4679f, nullptr },
-    { -1081.32f, -348.198f, 54.5837f, &AtFlag },
+    { -1081.32f, -348.198f, 54.5837f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Frostwolf_Graveyard_Flag_to_Horde_Base_First_Crossroads =
 {
-    { -1081.32f, -348.198f, 54.5837f, &AtFlag },
+    { -1081.32f, -348.198f, 54.5837f, &AV_AtFlag },
     { -1085.54f, -349.316f, 54.5448f, nullptr },
     { -1096.08f, -339.028f, 54.5433f, nullptr },
     { -1112.8f, -338.773f, 53.4886f, nullptr },
@@ -1020,7 +1032,7 @@ BattleBotPath vPath_AV_Horde_Base_First_Crossroads_to_East_Frostwolf_Tower_Flag 
     { -1294.33f, -312.247f, 113.794f, nullptr },
     { -1302.25f, -307.602f, 113.856f, nullptr },
     { -1305.22f, -311.212f, 113.864f, nullptr },
-    { -1303.38f, -315.877f, 113.867f, &AtFlag },
+    { -1303.38f, -315.877f, 113.867f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Horde_Base_First_Crossroads_to_West_Frostwolf_Tower_Flag =
@@ -1046,7 +1058,7 @@ BattleBotPath vPath_AV_Horde_Base_First_Crossroads_to_West_Frostwolf_Tower_Flag 
     { -1299.88f, -257.96f, 114.111f, nullptr },
     { -1306.39f, -263.798f, 114.147f, nullptr },
     { -1305.91f, -269.074f, 114.066f, nullptr },
-    { -1298.82f, -267.215f, 114.151f, &AtFlag },
+    { -1298.82f, -267.215f, 114.151f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Horde_Base_First_Crossroads_to_Horde_Base_Second_Crossroads =
@@ -1091,7 +1103,7 @@ BattleBotPath vPath_AV_Horde_Base_Second_Crossroads_to_Horde_Base_Graveyard_Flag
     { -1372.69f, -308.451f, 91.2869f, nullptr },
     { -1392.43f, -318.109f, 88.7925f, nullptr },
     { -1400.8f, -314.327f, 89.0501f, nullptr },
-    { -1401.94f, -310.103f, 89.3816f, &AtFlag },
+    { -1401.94f, -310.103f, 89.3816f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Tower_Point_Crossroads_to_Tower_Point_Bottom =
@@ -1124,7 +1136,7 @@ BattleBotPath vPath_AV_TowerPoint_Bottom_to_Tower_Point_Flag =
     { -759.167f, -366.147f, 90.8259f, nullptr },
     { -760.11f, -357.787f, 90.8949f, nullptr },
     { -764.399f, -355.108f, 90.8013f, nullptr },
-    { -767.9f, -362.019f, 90.8949f, &AtFlag },
+    { -767.9f, -362.019f, 90.8949f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Tower_Point_Bottom_to_Frostwolf_Graveyard_Flag =
@@ -1145,7 +1157,7 @@ BattleBotPath vPath_AV_Tower_Point_Bottom_to_Frostwolf_Graveyard_Flag =
     { -1018.82f, -393.742f, 50.703f, nullptr },
     { -1047.38f, -380.337f, 51.1403f, nullptr },
     { -1066.7f, -361.097f, 51.3909f, nullptr },
-    { -1079.61f, -345.548f, 55.1131f, &AtFlag },
+    { -1079.61f, -345.548f, 55.1131f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Frostwolf_Graveyard_to_Frostwolf_Graveyard_Flag =
@@ -1155,7 +1167,7 @@ BattleBotPath vPath_AV_Frostwolf_Graveyard_to_Frostwolf_Graveyard_Flag =
     { -1084.83f, -307.023f, 56.5773f, nullptr },
     { -1082.81f, -327.926f, 54.863f, nullptr },
     { -1082.08f, -333.784f, 54.885f, nullptr },
-    { -1079.61f, -345.548f, 55.1131f, &AtFlag },
+    { -1079.61f, -345.548f, 55.1131f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Tower_Point_Crossroads_to_Iceblood_Graveyard_Flag =
@@ -1165,7 +1177,7 @@ BattleBotPath vPath_AV_Tower_Point_Crossroads_to_Iceblood_Graveyard_Flag =
     { -682.166f, -374.453f, 65.6513f, nullptr },
     { -653.798f, -387.044f, 62.0839f, nullptr },
     { -625.062f, -397.093f, 59.0311f, nullptr },
-    { -614.138f, -396.501f, 60.8585f, &AtFlag },
+    { -614.138f, -396.501f, 60.8585f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Iceblood_Graveyard_Flag_to_Iceblood_Tower_Crossroad =
@@ -1206,7 +1218,7 @@ BattleBotPath vPath_AV_Iceblood_Tower_to_Iceblood_Tower_Flag =
     { -579.309f, -268.79f, 74.9984f, nullptr },
     { -570.275f, -271.346f, 75.0083f, nullptr },
     { -566.436f, -268.102f, 74.9324f, nullptr },
-    { -571.044f, -263.753f, 75.0087f, &AtFlag },
+    { -571.044f, -263.753f, 75.0087f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Iceblood_Tower_to_Iceblood_Garrison =
@@ -1251,7 +1263,7 @@ BattleBotPath vPath_AV_Iceblood_Garrison_to_Snowfall_Flag =
     { -249.129f, -80.3578f, 58.6962f, nullptr },
     { -237.627f, -84.7628f, 63.982f, nullptr },
     { -226.054f, -92.6308f, 75.1362f, nullptr },
-    { -205.464f, -114.337f, 78.6167f, &AtFlag },
+    { -205.464f, -114.337f, 78.6167f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Iceblood_Graveyard_to_Iceblood_Graveyard_Flag =
@@ -1263,7 +1275,7 @@ BattleBotPath vPath_AV_Iceblood_Graveyard_to_Iceblood_Graveyard_Flag =
     { -590.297f, -409.179f, 56.239f, nullptr },
     { -602.969f, -411.808f, 59.1209f, nullptr },
     { -613.748f, -407.195f, 59.6702f, nullptr },
-    { -614.138f, -396.501f, 60.8585f, &AtFlag },
+    { -614.138f, -396.501f, 60.8585f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Iceblood_Tower_Crossroad_to_Field_of_Strife_Stoneheart_Snowfall_Crossroad =
@@ -1291,7 +1303,7 @@ BattleBotPath vPath_AV_Iceblood_Tower_Crossroad_to_Field_of_Strife_Stoneheart_Sn
 
 BattleBotPath vPath_AV_Snowfall_Flag_to_Field_of_Strife_Stoneheart_Snowfall_Crossroad =
 {
-    { -205.464f, -114.337f, 78.6167f, &AtFlag },
+    { -205.464f, -114.337f, 78.6167f, &AV_AtFlag },
     { -196.784f, -127.119f, 78.1071f, nullptr },
     { -193.525f, -137.091f, 75.7275f, nullptr },
     { -180.605f, -153.454f, 63.4406f, nullptr },
@@ -1348,7 +1360,7 @@ BattleBotPath vPath_AV_Stonehearth_Graveyard_Crossroad_to_Stonehearth_Graveyard_
     { 123.153f, -375.134f, 42.8991f, nullptr },
     { 101.9f, -389.081f, 45.0974f, nullptr },
     { 89.1516f, -393.047f, 45.1475f, nullptr },
-    { 79.8805f, -401.379f, 46.516f, &AtFlag },
+    { 79.8805f, -401.379f, 46.516f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Stonehearth_Graveyard_to_Stonehearth_Graveyard_Flag =
@@ -1358,12 +1370,12 @@ BattleBotPath vPath_AV_Stonehearth_Graveyard_to_Stonehearth_Graveyard_Flag =
     { 74.0364f, -450.204f, 48.7063f, nullptr },
     { 73.3269f, -433.156f, 49.0149f, nullptr },
     { 73.6789f, -417.638f, 48.9345f, nullptr },
-    { 79.8805f, -401.379f, 46.516f, &AtFlag },
+    { 79.8805f, -401.379f, 46.516f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Stonehearth_Graveyard_Flag_to_Stonehearth_Graveyard_Second_Crossroad =
 {
-    { 79.8805f, -401.379f, 46.516f, &AtFlag },
+    { 79.8805f, -401.379f, 46.516f, &AV_AtFlag },
     { 59.3904f, -396.459f, 46.3454f, nullptr },
     { 38.213f, -391.053f, 45.6625f, nullptr },
     { 18.563f, -398.416f, 45.6217f, nullptr },
@@ -1452,7 +1464,7 @@ BattleBotPath vPath_AV_Stonehearth_Bunker_First_Crossroad_to_Stonehearth_Bunker_
     { -165.724f, -454.853f, 40.403f, nullptr },
     { -165.652f, -447.139f, 40.403f, nullptr },
     { -161.038f, -440.504f, 40.403f, nullptr },
-    { -153.491f, -441.386f, 40.3957f, &AtFlag },
+    { -153.491f, -441.386f, 40.3957f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Stonehearth_Graveyard_Crossroad_to_Icewing_Bunker_Crossroad =
@@ -1479,7 +1491,7 @@ BattleBotPath vPath_AV_Icewing_Bunker_Crossroad_to_Icewing_Bunker_Flag =
     { 214.635f, -374.753f, 56.3819f, nullptr },
     { 206.689f, -377.633f, 56.3917f, nullptr },
     { 199.606f, -370.834f, 56.3917f, nullptr },
-    { 200.792f, -361.881f, 56.3798f, &AtFlag },
+    { 200.792f, -361.881f, 56.3798f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Icewing_Bunker_Crossroad_to_Alliance_Slope_Crossroad =
@@ -1542,7 +1554,7 @@ BattleBotPath vPath_AV_Alliance_Base_Bunker_First_Crossroad_to_Alliance_Base_Nor
     { 678.008f, -125.249f, 63.6667f, nullptr },
     { 671.246f, -128.806f, 63.665f, nullptr },
     { 669.384f, -135.545f, 63.6574f, nullptr },
-    { 672.685f, -142.49f, 63.6571f, &AtFlag },
+    { 672.685f, -142.49f, 63.6571f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Alliance_Base_Bunker_First_Crossroad_to_Alliance_Base_Bunker_Second_Crossroad =
@@ -1567,7 +1579,7 @@ BattleBotPath vPath_AV_Alliance_Base_Bunker_Second_Crossroad_to_Alliance_Base_So
     { 567.204f, -90.1402f, 51.9291f, nullptr },
     { 566.935f, -81.8903f, 51.9429f, nullptr },
     { 560.568f, -77.4604f, 51.9305f, nullptr },
-    { 555.018f, -77.9842f, 51.9347f, &AtFlag },
+    { 555.018f, -77.9842f, 51.9347f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Alliance_Base_Bunker_Second_Crossroad_to_Alliance_Base_Bunker_Third_Crossroad =
@@ -1580,7 +1592,7 @@ BattleBotPath vPath_AV_Alliance_Base_Bunker_Second_Crossroad_to_Alliance_Base_Bu
 BattleBotPath vPath_AV_Alliance_Base_Bunker_Third_Crossroad_to_Alliance_Base_Flag =
 {
     { 648.593f, -33.8686f, 47.1592f, nullptr },
-    { 640.404f, -32.0183f, 46.2328f, &AtFlag },
+    { 640.404f, -32.0183f, 46.2328f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Alliance_Base_Bunker_Third_Crossroad_to_Alliance_Base_Vanndar_Stormpike =
@@ -1597,7 +1609,7 @@ BattleBotPath vPath_AV_Alliance_Base_Bunker_Third_Crossroad_to_Alliance_Base_Van
 BattleBotPath vPath_AV_Stormpike_Crossroad_to_Stormpike_Flag =
 {
     { 638.087f, -287.84f, 30.1471f, nullptr },
-    { 667.173f, -295.225f, 30.29f, &AtFlag },
+    { 667.173f, -295.225f, 30.29f, &AV_AtFlag },
 };
 
 BattleBotPath vPath_AV_Alliance_Cave_Slop_Crossroad_to_Alliance_Slope_Crossroad =
