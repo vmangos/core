@@ -2103,19 +2103,30 @@ bool BattleBotAI::StartNewPathToObjective()
                         if (me->IsWithinDist(pGO, VISIBILITY_DISTANCE_LARGE))
                             return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                 }
-
-                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0) && urand(0,1))
+                
+                // Chance to defend,
+                if (urand(0, 1))
                 {
-                    if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
-                        return StartNewPathToPosition(pGalvangar->GetPosition(), vPaths_AV);
+                    for (const auto& objective : AV_AllianceDefendObjectives)
+                    {
+                        if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED))
+                        {
+                            if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
+                                return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                        }
+                    }
                 }
 
-                for (const auto& objective : AV_AllianceDefendObjectives)
+                // Attack closest objective.
+                WorldObject* pAttackObjectiveObject = nullptr;
+                float attackObjectiveDistance = FLT_MAX;
+
+                if (!bg->IsActiveEvent(BG_AV_NodeEventCaptainDead_H, 0) && urand(0, 1))
                 {
-                    if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) && urand(0,1))
+                    if (Creature* pGalvangar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_CAPTAIN_H, 0)))
                     {
-                        if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                        pAttackObjectiveObject = pGalvangar;
+                        attackObjectiveDistance = me->GetDistance(pGalvangar);
                     }
                 }
 
@@ -2124,9 +2135,19 @@ bool BattleBotAI::StartNewPathToObjective()
                     if (bg->IsActiveEvent(objective.first, HORDE_ASSAULTED) || bg->IsActiveEvent(objective.first, HORDE_CONTROLLED) || bg->IsActiveEvent(objective.first, NEUTRAL_CONTROLLED))
                     {
                         if (GameObject* pGO = me->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
-                            return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
+                        {
+                            float const distance = me->GetDistance(pGO);
+                            if (attackObjectiveDistance > distance)
+                            {
+                                pAttackObjectiveObject = pGO;
+                                attackObjectiveDistance = distance;
+                            }
+                        }
                     }
                 }
+
+                if (pAttackObjectiveObject)
+                    return StartNewPathToPosition(pAttackObjectiveObject->GetPosition(), vPaths_AV);
             }
             break;
         }
