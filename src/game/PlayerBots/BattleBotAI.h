@@ -94,7 +94,7 @@ public:
     bool StartNewPathFromBeginning();
     void StartNewPathFromAnywhere();
     bool StartNewPathToObjective();
-    bool StartNewPathToPosition(Position const& position, std::vector<BattleBotPath*>& vPaths);
+    bool StartNewPathToPosition(Position const& position, std::vector<BattleBotPath*> const& vPaths);
     void ClearPath();
     void StopMoving();
     bool m_doingGraveyardJump = false;

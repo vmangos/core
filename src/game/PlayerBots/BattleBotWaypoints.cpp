@@ -1637,7 +1637,7 @@ BattleBotPath vPath_AV_Alliance_Cave_to_Alliance_Cave_Slop_Crossroad =
     { 450.8f, -434.864f, 30.5126f, nullptr },
 };
 
-std::vector<BattleBotPath*> vPaths_WS =
+std::vector<BattleBotPath*> const vPaths_WS =
 {
     &vPath_WSG_HordeFlagRoom_to_HordeGraveyard,
     &vPath_WSG_HordeGraveyard_to_HordeTunnel,
@@ -1657,7 +1657,7 @@ std::vector<BattleBotPath*> vPaths_WS =
     &vPath_WSG_AllianceTunnel_to_AllianceBaseRoof,
 };
 
-std::vector<BattleBotPath*> vPaths_AB =
+std::vector<BattleBotPath*> const vPaths_AB =
 {
     &vPath_AB_AllianceBase_to_Stables,
     &vPath_AB_AllianceBase_to_GoldMine,
@@ -1673,7 +1673,7 @@ std::vector<BattleBotPath*> vPaths_AB =
     &vPath_AB_Farm_to_LumberMill,
 };
 
-std::vector<BattleBotPath*> vPaths_AV =
+std::vector<BattleBotPath*> const vPaths_AV =
 {
     &vPath_AV_Horde_Cave_to_Tower_Point_Crossroad,
     &vPath_AV_Tower_Point_Crossroads_to_Tower_Point_Bottom,
@@ -1725,7 +1725,7 @@ std::vector<BattleBotPath*> vPaths_AV =
     &vPath_AV_Iceblood_Tower_to_Iceblood_Tower_Flag,
 };
 
-std::vector<BattleBotPath*> vPaths_NoReverseAllowed =
+std::vector<BattleBotPath*> const vPaths_NoReverseAllowed =
 {
     &vPath_AB_AllianceBase_to_Stables,
     &vPath_AB_AllianceBase_to_GoldMine,
@@ -1788,29 +1788,29 @@ bool BattleBotAI::StartNewPathFromBeginning()
     };
     std::vector<AvailablePath> availablePaths;
 
-    std::vector<BattleBotPath*> vPaths;
+    std::vector<BattleBotPath*> const* vPaths;
     switch (me->GetBattleGround()->GetTypeID())
     {
         case BATTLEGROUND_AB:
         {
-            vPaths = vPaths_AB;
+            vPaths = &vPaths_AB;
             break;
         }
         case BATTLEGROUND_AV:
         {
-            vPaths = vPaths_AV;
+            vPaths = &vPaths_AV;
             break;
         }
         case BATTLEGROUND_WS:
         {
-            vPaths = vPaths_WS;
+            vPaths = &vPaths_WS;
             break;
         }
         default:
             break;
     }
 
-    for (const auto& pPath : vPaths)
+    for (const auto& pPath : *vPaths)
     {
         BattleBotWaypoint* pStart = &((*pPath)[0]);
         if (me->GetDistance(pStart->x, pStart->y, pStart->z) < INTERACTION_DISTANCE)
@@ -1842,29 +1842,29 @@ void BattleBotAI::StartNewPathFromAnywhere()
     uint32 closestPoint = 0;
     float closestDistance = FLT_MAX;
 
-    std::vector<BattleBotPath*> vPaths;
+    std::vector<BattleBotPath*> const* vPaths;
     switch (me->GetBattleGround()->GetTypeID())
     {
         case BATTLEGROUND_AB:
         {
-            vPaths = vPaths_AB;
+            vPaths = &vPaths_AB;
             break;
         }
         case BATTLEGROUND_AV:
         {
-            vPaths = vPaths_AV;
+            vPaths = &vPaths_AV;
             break;
         }
         case BATTLEGROUND_WS:
         {
-            vPaths = vPaths_WS;
+            vPaths = &vPaths_WS;
             break;
         }
         default:
             break;
     }
 
-    for (const auto& pPath : vPaths)
+    for (const auto& pPath : *vPaths)
     {
         for (uint32 i = 0; i < pPath->size(); i++)
         {
@@ -1898,7 +1898,7 @@ float GetDistance3D(A const& from, B const& to)
     return (dist > 0 ? dist : 0);
 }
 
-bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::vector<BattleBotPath*>& vPaths)
+bool BattleBotAI::StartNewPathToPosition(Position const& targetPosition, std::vector<BattleBotPath*> const& vPaths)
 {
     BattleBotPath* pClosestPath = nullptr;
     uint32 closestPoint = 0;

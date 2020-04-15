@@ -1114,7 +1114,7 @@ bool ChatHandler::HandleBattleBotShowAllPathsCommand(char* args)
         return false;
     }
 
-    std::vector<BattleBotPath*>* pPaths;
+    std::vector<BattleBotPath*> const* pPaths;
 
     switch (pBG->GetTypeID())
     {
