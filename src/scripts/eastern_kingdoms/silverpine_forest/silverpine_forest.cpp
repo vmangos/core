@@ -89,19 +89,19 @@ bool GossipSelect_npc_astor_hadren(Player* pPlayer, Creature* pCreature, uint32 
 
 enum
 {
-    SAY_START_1         = -1000306,
-    SAY_START_2         = -1000307,
-    SAY_AGGRO_1         = -1000308,
-    SAY_AGGRO_2         = -1000309,
-    SAY_AGGRO_3         = -1000310,
-    SAY_PROGRESS        = -1000311,
-    SAY_END             = -1000312,
-    SAY_RANE            = -1000313,
-    SAY_RANE_REPLY      = -1000314,
-    SAY_CHECK_NEXT      = -1000315,
-    SAY_QUINN           = -1000316,
-    SAY_QUINN_REPLY     = -1000317,
-    SAY_BYE             = -1000318,
+    SAY_START_1         = 481,
+    SAY_START_2         = 482,
+    SAY_AGGRO_1         = 543,
+    SAY_AGGRO_2         = 544,
+    SAY_AGGRO_3         = 541,
+    SAY_PROGRESS        = 483,
+    SAY_END             = 484,
+    SAY_RANE            = 534,
+    SAY_RANE_REPLY      = 535,
+    SAY_CHECK_NEXT      = 536,
+    SAY_QUINN           = 537,
+    SAY_QUINN_REPLY     = 539,
+    SAY_BYE             = 538,
 
     QUEST_ERLAND        = 435,
     NPC_RANE            = 1950,
@@ -234,8 +234,8 @@ enum
     // cast it after every wave
     SPELL_DRINK_POTION       = 3359,
 
-    SAY_START                = -1000553,
-    SAY_COMPLETED            = -1000554,
+    SAY_START                = 542,
+    SAY_COMPLETED            = 545,
 
     // 1st wave
     NPC_COUNCILMAN_SMITHERS  = 2060,
