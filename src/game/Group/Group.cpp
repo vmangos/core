@@ -2166,7 +2166,7 @@ void Group::RewardGroupAtKill(Unit* pVictim, Player* pPlayerTap)
     if (member_with_max_level)
     {
         /// not get Xp in PvP or no not gray players in group
-        xp = (PvP || !not_gray_member_with_max_level) ? 0 : MaNGOS::XP::Gain(not_gray_member_with_max_level, pVictim);
+        xp = (PvP || !not_gray_member_with_max_level) ? 0 : MaNGOS::XP::Gain(not_gray_member_with_max_level, static_cast<Creature*>(pVictim));
 
         /// skip in check PvP case (for speed, not used)
         bool is_raid = PvP ? false : sMapStorage.LookupEntry<MapEntry>(pVictim->GetMapId())->IsRaid() && isRaidGroup();

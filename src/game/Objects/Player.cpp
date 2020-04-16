@@ -19415,7 +19415,7 @@ void Player::RewardSinglePlayerAtKill(Unit* pVictim)
 {
     bool PvP = pVictim->IsCharmedOwnedByPlayerOrPlayer();
 
-    uint32 xp = PvP ? 0 : MaNGOS::XP::Gain(this, pVictim);
+    uint32 xp = PvP ? 0 : MaNGOS::XP::Gain(this, static_cast<Creature*>(pVictim));
 
     // honor can be in PvP and !PvP (racial leader) cases
     RewardHonor(pVictim, 1);
@@ -19428,7 +19428,7 @@ void Player::RewardSinglePlayerAtKill(Unit* pVictim)
 
         if (Pet* pet = GetPet())
         {
-            uint32 XP = PvP ? 0 : MaNGOS::XP::PetGain(pet, pVictim);
+            uint32 XP = PvP ? 0 : MaNGOS::XP::Gain(pet, static_cast<Creature*>(pVictim));
             pet->GivePetXP(XP);
         }
 

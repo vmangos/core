@@ -1307,7 +1307,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetCharmerGuid(ObjectGuid owner) { SetGuidValue(UNIT_FIELD_CHARMEDBY, owner); ForceValuesUpdateAtIndex(UNIT_FIELD_HEALTH); ForceValuesUpdateAtIndex(UNIT_FIELD_MAXHEALTH); }
         bool IsCharmed() const { return !GetCharmerGuid().IsEmpty(); }
         bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
-        bool IsCharmedOwnedByPlayerOrPlayer() const { return GetCharmerOrOwnerOrOwnGuid().IsPlayer(); }
+        bool IsCharmedOwnedByPlayerOrPlayer() const { return IsPlayer() || GetCharmerOrOwnerGuid().IsPlayer(); }
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return GetCharmerGuid() ? GetCharmerGuid() : GetOwnerGuid(); }
         ObjectGuid const& GetCharmerOrOwnerOrOwnGuid() const
         {
