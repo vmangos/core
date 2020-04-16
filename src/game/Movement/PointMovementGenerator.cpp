@@ -21,6 +21,7 @@
 #include "Creature.h"
 #include "CreatureAI.h"
 #include "GameObjectAI.h"
+#include "PlayerAI.h"
 #include "TemporarySummon.h"
 #include "World.h"
 #include "MoveSplineInit.h"
@@ -99,8 +100,13 @@ bool PointMovementGenerator<T>::Update(T &unit, uint32 const& /*diff*/)
 }
 
 template<>
-void PointMovementGenerator<Player>::MovementInform(Player&)
+void PointMovementGenerator<Player>::MovementInform(Player& player)
 {
+    if (!player.IsAlive())
+        return;
+
+    if (player.AI())
+        player.AI()->MovementInform(POINT_MOTION_TYPE, id);
 }
 
 template <>

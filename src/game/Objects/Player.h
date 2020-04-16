@@ -2111,6 +2111,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void ClearResurrectRequestData() { SetResurrectRequestData(ObjectGuid(), 0, 0.0f, 0.0f, 0.0f, 0, 0); }
         bool IsRessurectRequestedBy(ObjectGuid guid) const { return m_resurrectGuid == guid; }
         bool IsRessurectRequested() const { return !m_resurrectGuid.IsEmpty(); }
+        ObjectGuid const& GetResurrector() const { return m_resurrectGuid; }
         void ResurectUsingRequestData();
 
         static bool IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player* player);

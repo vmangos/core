@@ -341,7 +341,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             if (!owner.HasInArc(2 * M_PI_F / 3, i_target.getTarget()))
             {
                 owner.SetInFront(i_target.getTarget());
-                owner.SendMovementPacket(MSG_MOVE_SET_FACING, true);
+                owner.SetFacingTo(owner.GetAngle(i_target.getTarget()));
             }
         }
         else

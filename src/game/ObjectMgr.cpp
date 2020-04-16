@@ -10858,8 +10858,8 @@ void ObjectMgr::LoadPlayerPremadeTemplates()
         sLog.outString("Loading player premade gear templates ...");
         m_playerPremadeGearMap.clear();
 
-        //                                                               0        1        2        3
-        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `class`, `level`, `name` FROM `player_premade_item_template`"));
+        //                                                               0        1        2        3       4
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `class`, `level`, `role`, `name` FROM `player_premade_item_template`"));
 
         if (!result)
         {
@@ -10880,7 +10880,8 @@ void ObjectMgr::LoadPlayerPremadeTemplates()
             uint32 entry = fields[0].GetUInt32();
             uint8 requiredClass = fields[1].GetUInt8();
             uint8 level = fields[2].GetUInt8();
-            std::string name = fields[3].GetCppString();
+            uint8 role = fields[3].GetUInt8();
+            std::string name = fields[4].GetCppString();
 
             switch (requiredClass)
             {
@@ -10909,6 +10910,7 @@ void ObjectMgr::LoadPlayerPremadeTemplates()
             data.entry = entry;
             data.requiredClass = requiredClass;
             data.level = level;
+            data.role = CombatBotRoles(role);
             data.name = name;
 
         } while (result->NextRow());
@@ -10979,8 +10981,8 @@ void ObjectMgr::LoadPlayerPremadeTemplates()
         sLog.outString("Loading player premade spec templates ...");
         m_playerPremadeSpecMap.clear();
 
-        //                                                               0        1        2        3
-        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `class`, `level`, `name` FROM `player_premade_spell_template`"));
+        //                                                               0        1        2        3       4
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `class`, `level`, `role`, `name` FROM `player_premade_spell_template`"));
 
         if (!result)
         {
@@ -11001,7 +11003,8 @@ void ObjectMgr::LoadPlayerPremadeTemplates()
             uint32 entry = fields[0].GetUInt32();
             uint8 requiredClass = fields[1].GetUInt8();
             uint8 level = fields[2].GetUInt8();
-            std::string name = fields[3].GetCppString();
+            uint8 role = fields[3].GetUInt8();
+            std::string name = fields[4].GetCppString();
 
             switch (requiredClass)
             {
@@ -11030,6 +11033,7 @@ void ObjectMgr::LoadPlayerPremadeTemplates()
             data.entry = entry;
             data.requiredClass = requiredClass;
             data.level = level;
+            data.role = CombatBotRoles(role);
             data.name = name;
 
         } while (result->NextRow());
@@ -11109,7 +11113,7 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
         pPlayer->AutoUnequipItemFromSlot(i);
 
     // Learn Dual Wield Specialization
-    if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE)
+    if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE || pPlayer->GetClass() == CLASS_HUNTER)
         if (!pPlayer->HasSpell(674))
             pPlayer->LearnSpell(674, false, false);
 
@@ -11118,6 +11122,12 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
         if (!item.requiredTeam || (pPlayer->GetTeam() == item.requiredTeam))
         {
             ItemPrototype const* pItem = GetItemPrototype(item.itemId);
+
+            // Set required reputation
+            if (pItem->RequiredReputationFaction && pItem->RequiredReputationRank)
+                if (FactionEntry const* pFaction = GetFactionEntry(pItem->RequiredReputationFaction))
+                    if (pPlayer->GetReputationMgr().GetRank(pFaction) < pItem->RequiredReputationRank)
+                        pPlayer->GetReputationMgr().SetReputation(pFaction, pPlayer->GetReputationMgr().GetRepPointsToRank(ReputationRank(pItem->RequiredReputationRank)));
 
             // Learn required profession
             if (pItem->RequiredSkill && !pPlayer->HasSkill(pItem->RequiredSkill))
@@ -11156,7 +11166,7 @@ void ObjectMgr::ApplyPremadeSpecTemplateToPlayer(uint32 entry, Player* pPlayer) 
     }
 
     // Learn Dual Wield Specialization
-    if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE)
+    if (pPlayer->GetClass() == CLASS_WARRIOR || pPlayer->GetClass() == CLASS_ROGUE || pPlayer->GetClass() == CLASS_HUNTER)
         if (!pPlayer->HasSpell(674))
             pPlayer->LearnSpell(674, false, false);
 

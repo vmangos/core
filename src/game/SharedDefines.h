@@ -97,6 +97,15 @@ enum Classes
 
 #define CLASSMASK_WAND_USERS ((1<<(CLASS_PRIEST-1))|(1<<(CLASS_MAGE-1))|(1<<(CLASS_WARLOCK-1)))
 
+enum CombatBotRoles
+{
+    ROLE_INVALID,
+    ROLE_MELEE_DPS,
+    ROLE_RANGE_DPS,
+    ROLE_TANK,
+    ROLE_HEALER,
+};
+
 #define PLAYER_MAX_BATTLEGROUND_QUEUES 3
 
 enum ReputationRank : uint32

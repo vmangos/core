@@ -2904,6 +2904,17 @@ bool Unit::IsBehindTarget(Unit const* pTarget, bool strict) const
     return !pTarget->HasInArc(M_PI_F, this);
 }
 
+bool Unit::CantPathToVictim() const
+{
+    if (!GetVictim())
+        return false;
+
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
+        return false;
+
+    return !GetMotionMaster()->GetCurrent()->IsReachable();
+}
+
 bool Unit::IsInAccessablePlaceFor(Creature const* c) const
 {
     if (IsInWater())
@@ -6465,7 +6476,7 @@ bool Unit::IsMovedByPlayer() const
         if (pPossessor->GetCharmGuid() == GetObjectGuid())
             return true;
 
-    return IsPlayer();
+    return IsPlayer() && !static_cast<Player const*>(this)->GetSession()->GetBot();
 }
 
 PlayerMovementPendingChange::PlayerMovementPendingChange()
@@ -8661,6 +8672,15 @@ void Unit::UpdateReactives(uint32 p_time)
     }
 }
 
+uint8 Unit::GetEnemyCountInRadiusAround(Unit* pTarget, float radius) const
+{
+    std::list<Unit*> targets;
+    MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(pTarget, this, radius);
+    MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+    Cell::VisitAllObjects(pTarget, searcher, radius);
+    return targets.size();
+}
+
 Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= nullptr*/, float radius /*= ATTACK_DISTANCE*/, bool inFront /*= false*/, bool isValidAttackTarget /*= false*/) const
 {
     std::list<Unit*> targets;
@@ -9645,6 +9665,16 @@ bool Unit::IsImmuneToSchoolMask(uint32 schoolMask) const
         if (immuneMask & schoolMask)             // Immunise
             return true;
     }
+    return false;
+}
+
+bool Unit::IsImmuneToMechanic(Mechanics mechanic) const
+{
+    SpellImmuneList const& mechanicList = m_spellImmune[IMMUNITY_MECHANIC];
+    for (const auto& itr : mechanicList)
+        if (itr.type == mechanic)
+            return true;
+
     return false;
 }
 

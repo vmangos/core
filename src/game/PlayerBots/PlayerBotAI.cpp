@@ -126,7 +126,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
     /// DEATH
     if (!me->IsAlive())
     {
-        sPlayerBotMgr.deleteBot(me->GetGUIDLow());
+        sPlayerBotMgr.DeleteBot(me->GetGUIDLow());
         /*
         if (me->GetDeathState() < CORPSE)
             return;

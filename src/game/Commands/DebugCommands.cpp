@@ -2148,6 +2148,20 @@ bool ChatHandler::HandleDebugMoveToCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleDebugFaceMeCommand(char* args)
+{
+    Player* player = m_session->GetPlayer();
+    Unit* target = GetSelectedUnit();
+    if (!player || !target || player == target)
+    {
+        PSendSysMessage("Invalid target/source selection.");
+        return true;
+    }
+
+    target->SetFacingTo(target->GetAngle(player));
+    return true;
+}
+
 
 bool ChatHandler::HandleDebugForceUpdateCommand(char *args)
 {

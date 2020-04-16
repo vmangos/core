@@ -16091,7 +16091,7 @@ void Player::SaveToDB(bool online, bool force)
     // delay auto save at any saves (manual, in code, or autosave)
     m_nextSave = sWorld.getConfig(CONFIG_UINT32_INTERVAL_SAVE);
 
-    // Pas de sauvegarde des bots
+    // Do not save bots
     if (GetSession()->GetBot())
         return;
     if (m_DbSaveDisabled)
