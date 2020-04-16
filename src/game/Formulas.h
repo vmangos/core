@@ -143,29 +143,23 @@ namespace MaNGOS
             return std::nearbyint(xp_gain);
         }
 
-        inline float xp_in_group_rate(uint32 count, bool isRaid)
+        inline float xp_in_group_rate(uint32 count, bool /*isRaid*/)
         {
-            if (isRaid)
+            // TODO: this formula is completely guesswork only based on a logical assumption
+            switch (count)
             {
-                // FIX ME: must apply decrease modifiers dependent from raid size
-                return 1.0f;
-            }
-            else
-            {
-                switch(count)
-                {
-                    case 0:
-                    case 1:
-                    case 2:
-                        return 1.0f;
-                    case 3:
-                        return 1.166f;
-                    case 4:
-                        return 1.3f;
-                    case 5:
-                    default:
-                        return 1.4f;
-                }
+                case 0:
+                case 1:
+                case 2:
+                    return 1.0f;
+                case 3:
+                    return 1.166f;
+                case 4:
+                    return 1.3f;
+                case 5:
+                    return 1.4f;
+                default:
+                    return std::max(1.f - count * 0.05f, 0.01f);
             }
         }
     }
