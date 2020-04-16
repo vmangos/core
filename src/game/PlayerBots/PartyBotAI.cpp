@@ -1945,6 +1945,12 @@ void PartyBotAI::UpdateInCombatAI_Warlock()
             if (DoCastSpell(me, m_spells.warlock.pLifeTap) == SPELL_CAST_OK)
                 return;
         }
+
+        if (me->HasSpell(PB_SPELL_SHOOT_WAND) &&
+           !me->IsMoving() &&
+           (me->GetPowerPercent(POWER_MANA) < 5.0f) &&
+           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+            me->CastSpell(pVictim, PB_SPELL_SHOOT_WAND, false);
     }
 }
 

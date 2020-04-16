@@ -367,7 +367,8 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
         if (Unit* pTarget = pReference->getSourceUnit())
         {
             if (pTarget != pExcept &&
-                IsValidHostileTarget(pTarget))
+                IsValidHostileTarget(pTarget) &&
+                me->IsWithinDist(pTarget, VISIBILITY_DISTANCE_NORMAL))
             {
                 if (me->GetTeam() == HORDE)
                 {
@@ -537,7 +538,7 @@ void BattleBotAI::StopMoving()
 
 void BattleBotAI::SendFakePacket(uint16 opcode)
 {
-    printf("Bot send %s\n", LookupOpcodeName(opcode));
+    //printf("Bot send %s\n", LookupOpcodeName(opcode));
     switch (opcode)
     {
         case CMSG_BATTLEMASTER_JOIN:
@@ -657,7 +658,8 @@ void BattleBotAI::OnJustDied()
 void BattleBotAI::OnJustRevived()
 {
     SummonPetIfNeeded();
-    DoGraveyardJump();
+    if (!me->SelectRandomUnfriendlyTarget(nullptr, 30.0f))
+        DoGraveyardJump();
 }
 
 void BattleBotAI::OnEnterBattleGround()
@@ -723,7 +725,6 @@ bool BattleBotAI::CheckForUnreachableTarget()
             {
                 if (!me->IsWithinDist(pTarget, VISIBILITY_DISTANCE_NORMAL))
                 {
-                    printf("%s - %s is too far\n", me->GetName(), pTarget->GetName());
                     me->AttackStop(false);
                     StopMoving();
                     return true;
@@ -731,7 +732,6 @@ bool BattleBotAI::CheckForUnreachableTarget()
 
                 if (pTarget->IsCreature() && !me->IsMoving())
                 {
-                    printf("%s - teleporting to %s\n", me->GetName(), pTarget->GetName());
                     // Cheating to prevent getting stuck because of bad mmaps.
                     me->NearTeleportTo(pTarget->GetPosition());
                     return true;
@@ -739,7 +739,6 @@ bool BattleBotAI::CheckForUnreachableTarget()
 
                 if (me->GetDistanceZ(pTarget) > 10.0f)
                 {
-                    printf("%s - %s is too high\n", me->GetName(), pTarget->GetName());
                     me->AttackStop(false);
                     StopMoving();
                     return true;
@@ -985,15 +984,6 @@ void BattleBotAI::UpdateAI(uint32 const diff)
         if (me->GetVictim() &&
            (me != me->GetVictim()->GetVictim()))
         {
-            
-            printf("%s stops attacking, invalid target %s\n", me->GetName(), me->GetVictim()->GetName());
-            if (me->GetVictim()->IsDead())
-                printf("reason: IsDead\n");
-            if (me->GetVictim()->HasBreakableByDamageCrowdControlAura())
-                printf("reason: HasBreakableByDamageCrowdControlAura\n");
-            if (!me->GetVictim()->IsWithinDist(me, VISIBILITY_DISTANCE_NORMAL))
-                printf("reason: !IsWithinDist\n");
-
             me->AttackStop(false);
             StopMoving();
             return;
@@ -2216,6 +2206,12 @@ void BattleBotAI::UpdateInCombatAI_Warlock()
             if (DoCastSpell(me, m_spells.warlock.pLifeTap) == SPELL_CAST_OK)
                 return;
         }
+
+        if (me->HasSpell(BB_SPELL_SHOOT_WAND) &&
+           !me->IsMoving() &&
+           (me->GetPowerPercent(POWER_MANA) < 5.0f) &&
+           !me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+            me->CastSpell(pVictim, BB_SPELL_SHOOT_WAND, false);
     }
 }
 
