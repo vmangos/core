@@ -281,6 +281,7 @@ class Spell
         void EffectScriptEffect(SpellEffectIndex eff_idx);
         void EffectSanctuary(SpellEffectIndex eff_idx);
         void EffectAddComboPoints(SpellEffectIndex eff_idx);
+        void EffectCreateHouse(SpellEffectIndex eff_idx);
         void EffectDuel(SpellEffectIndex eff_idx);
         void EffectStuck(SpellEffectIndex eff_idx);
         void EffectSummonPlayer(SpellEffectIndex eff_idx);

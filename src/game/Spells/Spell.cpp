@@ -3117,6 +3117,10 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     else if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_TRIGGER_SPELL && m_casterUnit)
                         targetUnitMap.push_back(m_casterUnit);
                     break;
+                case SPELL_EFFECT_CREATE_HOUSE:
+                    if (m_casterUnit)
+                        targetUnitMap.push_back(m_casterUnit);
+                    break;
                 case SPELL_EFFECT_SUMMON_PLAYER:
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());

@@ -142,7 +142,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectUnused,                                   // 78 SPELL_EFFECT_ATTACK
     &Spell::EffectSanctuary,                                // 79 SPELL_EFFECT_SANCTUARY
     &Spell::EffectAddComboPoints,                           // 80 SPELL_EFFECT_ADD_COMBO_POINTS
-    &Spell::EffectUnused,                                   // 81 SPELL_EFFECT_CREATE_HOUSE             one spell: Create House (TEST)
+    &Spell::EffectCreateHouse,                              // 81 SPELL_EFFECT_CREATE_HOUSE             one spell: Create House (TEST)
     &Spell::EffectNULL,                                     // 82 SPELL_EFFECT_BIND_SIGHT
     &Spell::EffectDuel,                                     // 83 SPELL_EFFECT_DUEL
     &Spell::EffectStuck,                                    // 84 SPELL_EFFECT_STUCK
@@ -5337,6 +5337,23 @@ void Spell::EffectAddComboPoints(SpellEffectIndex /*eff_idx*/)
 
     ((Player*)m_caster)->AddComboPoints(unitTarget, damage);
     ((Player*)m_caster)->SetUInt64Value(PLAYER_FIELD_COMBO_TARGET, unitTarget->GetGUID());
+}
+
+void Spell::EffectCreateHouse(SpellEffectIndex eff_idx)
+{
+    Player* pPlayer = m_caster->ToPlayer();
+    if (!pPlayer)
+        return;
+
+    uint32 gameobjectId = m_spellInfo->EffectMiscValue[eff_idx];
+    if (!gameobjectId)
+        return;
+
+    // Remove old house.
+    pPlayer->RemoveGameObject(m_spellInfo->Id, true);
+
+    if (GameObject* pHouse = m_caster->SummonGameObject(gameobjectId, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, 0))
+        pHouse->SetSpellId(m_spellInfo->Id);
 }
 
 void Spell::EffectDuel(SpellEffectIndex eff_idx)
