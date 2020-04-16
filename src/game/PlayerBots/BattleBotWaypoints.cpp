@@ -2045,7 +2045,8 @@ bool BattleBotAI::StartNewPathToObjective()
                 if (!bg->IsActiveEvent(BG_AV_DUN_BALDAR_SOUTH_BUNKER, ALLIANCE_CONTROLLED) &&
                     !bg->IsActiveEvent(BG_AV_DUN_BALDAR_NORTH_BUNKER, ALLIANCE_CONTROLLED) &&
                     !bg->IsActiveEvent(BG_AV_ICEWING_BUNKER, ALLIANCE_CONTROLLED) &&
-                    !bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, ALLIANCE_CONTROLLED))
+                    !bg->IsActiveEvent(BG_AV_STONEHEARTH_BUNKER, ALLIANCE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_STORMPIKE_AID_STATION_GY, ALLIANCE_CONTROLLED))
                 {
                     if (Creature* pVanndar = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_A, 0)))
                         return StartNewPathToPosition(pVanndar->GetPosition(), vPaths_AV);
@@ -2090,7 +2091,8 @@ bool BattleBotAI::StartNewPathToObjective()
                 if (!bg->IsActiveEvent(BG_AV_ICEBLOOD_TOWER, HORDE_CONTROLLED) &&
                     !bg->IsActiveEvent(BG_AV_TOWER_POINT_TOWER, HORDE_CONTROLLED) &&
                     !bg->IsActiveEvent(BG_AV_EAST_FROSTWOLF_TOWER, HORDE_CONTROLLED) &&
-                    !bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, HORDE_CONTROLLED))
+                    !bg->IsActiveEvent(BG_AV_WEST_FROSTWOLF_TOWER, HORDE_CONTROLLED) &&
+                    !bg->IsActiveEvent(BG_AV_FROSTWOLF_RELIEF_HUT_GY, HORDE_CONTROLLED))
                 {
                     if (Creature* pDrek = me->GetMap()->GetCreature(bg->GetSingleCreatureGuid(BG_AV_BOSS_H, 0)))
                         return StartNewPathToPosition(pDrek->GetPosition(), vPaths_AV);
@@ -2104,7 +2106,7 @@ bool BattleBotAI::StartNewPathToObjective()
                             return StartNewPathToPosition(pGO->GetPosition(), vPaths_AV);
                 }
                 
-                // Chance to defend,
+                // Chance to defend.
                 if (roll_chance_u(25))
                 {
                     for (const auto& objective : AV_AllianceDefendObjectives)
