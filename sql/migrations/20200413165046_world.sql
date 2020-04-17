@@ -12,41 +12,47 @@ INSERT INTO `migrations` VALUES ('20200413165046');
 -- remove all incorrect trainers from Magecraft (8250)
 DELETE FROM `creature_questrelation` WHERE `quest` = 8250 AND `id` NOT IN(331, 3047, 4567, 7311, 7312);
 
---add Magecraft (8250) to correct trainers
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (331, 8250, 5, 10),
+-- add Magecraft (8250) to correct trainers
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(331, 8250, 5, 10),
 (3047, 8250, 5, 10),
 (7311, 8250, 5, 10),
 (7312, 8250, 5, 10);
 
---add Journey to the Marsh (1947) to correct trainers
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (3048, 1947, 0, 10),
-(3047, 4568, 0, 10),
-(7312, 5144, 0, 10);
+-- add Journey to the Marsh (1947) to correct trainers
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(3048, 1947, 0, 10),
+(4568, 1947, 0, 10),
+(5144, 1947, 0, 10);
+-- (5497, 1947, 0, 10),
+-- (5885, 1947, 0, 10);
 
---add High Sorcerer Andromath (1939) to Bink (5144)
+-- add High Sorcerer Andromath (1939) to Bink (5144)
 INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (5144, 1939, 0, 10);
 
---add Speak with Un'thuwa (1883) and Report to Anastasia (1959) to Thurston Xane (3049)
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (3049, 1959, 0, 10),
+-- add Speak with Un'thuwa (1883) and Report to Anastasia (1959) to Thurston Xane (3049)
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(3049, 1959, 0, 10),
 (3049, 1883, 0, 10);
 
---remove Return to the Marsh (1953) from Uthel'nay (7311)
+-- remove Return to the Marsh (1953) from Uthel'nay (7311)
 DELETE FROM `creature_questrelation` WHERE `quest` = 1953 AND `id` = 7311;
 
---add Return to the Marsh (1953) to Ursyn Ghull (3048) and Deino (5885)
-INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES (3048, 1953, 0, 10),
+-- add Return to the Marsh (1953) to Ursyn Ghull (3048) and Deino (5885)
+INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(3048, 1953, 0, 10),
 (5885, 1953, 0, 10);
 
---add correct completion text for Speak with Jennea (1860)
+-- add correct completion text for Speak with Jennea (1860)
 UPDATE `quest_template` SET `OfferRewardText` = "You have been sent to aid me in my task, $n?  Good.  It is heartening to see young mages eager to help in our cause...$b$bWhat cause, you ask?  In time, young one.  You shall know... in time." WHERE `entry` = 1860;
 
---add correct completion text for Speak with Bink (1879)
+-- add correct completion text for Speak with Bink (1879)
 UPDATE `quest_template` SET `OfferRewardText` = "Oh, I can see you have promise, yes you do! But it takes more than promise to be a good mage.  And if you're not a good mage, then you're a bad mage.  And bad mages are part of the problem, yes they are!$b$bOops, I'm getting ahead of things.  Let's begin at the start!" WHERE `entry` = 1879;
 
---add correct completion text for Speak with Un'thuwa (1883)
+-- add correct completion text for Speak with Un'thuwa (1883)
 UPDATE `quest_template` SET `OfferRewardText` = "Hail, $n.  Praise to you, for my call for aid is now answered.  Let us hope you are up to the task..." WHERE `entry` = 1883;
 
---add missing spells to Magis Sparkmantle (1228)
+-- add missing spells to Magis Sparkmantle (1228)
 DELETE FROM `npc_trainer` WHERE `entry`=1228;
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (1228, 1035, 2000, 0, 0, 20, 0, 5875),
@@ -196,7 +202,7 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (1228, 22785, 40000, 0, 0, 58, 0, 5875),
 (1228, 28403, 2000, 0, 0, 20, 5464, 5875);
 
---add missing spells to Kaelystia Hatebringer (4566)
+-- add missing spells to Kaelystia Hatebringer (4566)
 DELETE FROM `npc_trainer` WHERE `entry`=4566;
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (4566, 1035, 2000, 0, 0, 20, 0, 5875),
@@ -214,7 +220,7 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (4566, 1211, 900, 0, 0, 14, 0, 5875),
 (4566, 1214, 8000, 0, 0, 30, 0, 5875),
 (4566, 1225, 5000, 0, 0, 26, 0, 5875),
-(4566, 4566, 15000, 0, 0, 40, 0, 5875),
+(4566, 1228, 15000, 0, 0, 40, 0, 5875),
 (4566, 1241, 5000, 0, 0, 26, 0, 5875),
 (4566, 1249, 100, 0, 0, 6, 0, 5875),
 (4566, 1250, 600, 0, 0, 12, 0, 5875),
@@ -346,7 +352,7 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (4566, 22785, 40000, 0, 0, 58, 0, 5875),
 (4566, 28403, 2000, 0, 0, 20, 5464, 5875);
 
---add correct completion text for Enigma Leggings (8631)
+-- add correct completion text for Enigma Leggings (8631)
 UPDATE `quest_template` SET `OfferRewardText` = "Yes... the worm's skin will make for an excellent protective layer.  Combined with the strongest parts from the Qiraji we've destroyed on our way here, this should make for a formidable piece of armor.  May it aid you in facing the unspeakable horrors that await inside! " WHERE `entry` = 8631;
 
 
