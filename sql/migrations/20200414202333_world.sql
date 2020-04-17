@@ -9,37 +9,37 @@ INSERT INTO `migrations` VALUES ('20200414202333');
 -- Add your query below.
 
 
---update Call of Fire (1523) to Xanis Flameweaver (5906)
+-- update Call of Fire (1523) to Xanis Flameweaver (5906)
 UPDATE `creature_questrelation` SET `id` = 5906 WHERE `quest` = 1523;
 
 -- remove all incorrect trainers from Elemental Mastery (8410)
 DELETE FROM `creature_questrelation` WHERE `quest` = 8410 AND `id` NOT IN(3032, 13417);
 
---add completion text for Stormcaller's Footguards (8621)
+-- add completion text for Stormcaller's Footguards (8621)
 UPDATE `quest_template` SET `OfferRewardText` = "You've done well, $n.  You've proven you're no ordinary mortal.$b$bI give you these with the confidence they'll aid you in crushing the vile qiraji." WHERE `entry` = 8621;
 
---add completion text for Stormcaller's Diadem (8623)
+-- add completion text for Stormcaller's Diadem (8623)
 UPDATE `quest_template` SET `OfferRewardText` = "You've succeeded!  The whispers from the Twin Emperors have ceased.$b$bTake this as a reward.  The mere sight of it will strike fear in the hearts of the Qiraji... it shall remind them of their fallen leaders and of the mortal that slew them." WHERE `entry` = 8623;
 
---add completion text for Stormcaller's Hauberk (8622)
+-- add completion text for Stormcaller's Hauberk (8622)
 UPDATE `quest_template` SET `OfferRewardText` = "I did not expect you to return from your attempt, $n.$b$bYou've fulfilled a destiny greater than that of most immortal beings.$b$bBy slaying C'Thun you've not only saved all of Azeroth, you've also tipped the scales of cosmic events beyond your comprehension.$b$bAccept this breastplate as a symbol of the glory and burden that will come as a consequence of your actions.$b$bMay its power aid you in the challenges that await you, god-slayer!" WHERE `entry` = 8622;
 
---add completion text for Stormcaller's Leggings (8624)
+-- add completion text for Stormcaller's Leggings (8624)
 UPDATE `quest_template` SET `OfferRewardText` = "Yes... the worm's skin will make for an excellent protective layer.  Combined with the strongest parts from the Qiraji we've destroyed on our way here, this should make for a formidable piece of armor.  May it aid you in facing the unspeakable horrors that await inside!" WHERE `entry` = 8624;
 
---add completion text for Call of Air (1532)
+-- add completion text for Call of Air (1532)
 UPDATE `quest_template` SET `OfferRewardText` = "For the time being, I shall give you what you need to focus your spells and to call upon the spirits of air. Take this totem, and when you are ready, train with me some more." WHERE `entry` = 1532;
 
---remove quest Call of Water (2985) from Swart (3173)
+-- remove quest Call of Water (2985) from Swart (3173)
 DELETE FROM `creature_questrelation` WHERE `quest` = 2985 AND `id` = 3173;
 
---correct template for Earth Sapta (1463) to ensure it enables/disables correctly when Call of Earth (1516) is complete
+-- correct template for Earth Sapta (1463) to ensure it enables/disables correctly when Call of Earth (1516) is complete
 UPDATE `quest_template` SET `PrevQuestId` = -1517 WHERE `entry` = 1463;
 
---correct template for Earth Sapta (1462) to ensure it enables/disables correctly when Call of Earth (1520) is complete
+-- correct template for Earth Sapta (1462) to ensure it enables/disables correctly when Call of Earth (1520) is complete
 UPDATE `quest_template` SET `PrevQuestId` = -1520 WHERE `entry` = 1462;
 
---add missing spells to Haromm (986)
+-- add missing spells to Haromm (986)
 DELETE FROM `npc_trainer` WHERE `entry`=986;
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (986, 1303, 100, 0, 0, 8, 0, 5875),
