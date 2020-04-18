@@ -40,7 +40,7 @@ INSERT INTO `quest_template` (`entry`, `ZoneOrSort`, `MinLevel`, `QuestLevel`, `
 INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
 (11401, 5678, 0, 10);
 
--- remove quests Returning Home (5645) from Priestess Josetta (377)
+-- remove quests Returning Home from Priestess Josetta (377)
 DELETE FROM `creature_questrelation` WHERE `id` = 377 AND `quest` not in (5624);
 
 -- update Returning Home (5628) to Priestess Josetta (377)
