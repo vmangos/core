@@ -68,6 +68,10 @@ UPDATE `quest_template` SET `ExclusiveGroup` = 5631 WHERE `entry` IN (5630, 5632
 -- update RewSpell for Stars of Elune (5627)
 UPDATE `quest_template` SET `RewSpell` = 19350 WHERE `entry` = 5627;
 
+-- add involved relation to Priestess Alathea (11401) for quest Stars of Elune (5627)
+insert into `creature_involvedrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
+(11401 ,5627, 0, 5875);
+
 -- add completion text for Returning Home (5630, 5632, 5633)
 UPDATE `quest_template` SET `OfferRewardText` = "Wonderful, you've returned home, $n. It always pleases Tyrande and myself when those we've trained go out into the world and return to us safely. How have things been with you? Does Elune still bless your travels? Perhaps after we speak more about the business at hand, you could tell me more of your travels." WHERE `entry` IN (5630, 5632, 5633);
 
