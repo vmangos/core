@@ -1081,7 +1081,7 @@ bool ChatHandler::HandleFlyCommand(char* args)
     if (value)
     {
         target->SetFlying(true);
-        target->SetDisplayId(6299);  // Hawk Owl
+        target->SetDisplayId(target->GetTeam() == ALLIANCE ? 6299 : 4566); // Black and Brown Owls
         target->SetObjectScale(0.7F);
         target->UpdateSpeed(MOVE_SWIM, false, 6.0F);
         // Looks better if bird doesn't appear on the ground:
