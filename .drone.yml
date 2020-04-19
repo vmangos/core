@@ -31,7 +31,7 @@ steps:
   - make -j$(nproc)
   
 
----  
+#---  
 #kind: pipeline
 #type: docker
 #name: arm64
