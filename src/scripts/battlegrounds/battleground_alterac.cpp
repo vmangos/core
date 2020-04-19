@@ -1200,7 +1200,7 @@ enum
     NPC_STROMPIKEBOWMAN     = 13358,
     NPC_FROSTWOLFBOWMAN     = 13359,
     SPELL_SHOOT             = 22121,
-    SPELL_ROOT_SELF         = 23973,
+    SPELL_ROOT_SELF         = 17507,
     SHOOT_SPEED             = 1700,
 };
 

@@ -6260,7 +6260,8 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
         AreaTriggerEntry const* bgetEntry = GetAreaTrigger(triggerId);
         if (!bgetEntry)
         {
-            sLog.outErrorDb("Table `areatrigger_bg_entrance` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", triggerId);
+            if (!IsExistingAreaTriggerId(triggerId))
+                sLog.outErrorDb("Table `areatrigger_bg_entrance` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", triggerId);
             continue;
         }
 

@@ -62,7 +62,7 @@ enum
     SPELL_SILENCE                   = 22666,
     SPELL_SHADOW_COMMAND            = 22667,                // charm a player
     SPELL_SHADOW_BLINK              = 22664,                // 22681 ? // teleport around the room, possibly random
-    SPELL_ROOT                      = 23973,
+    SPELL_ROOT                      = 17507,
     SPELL_VISUAL_EFFECT             = 24180,
     SPELL_HOVER                     = 17131,
 

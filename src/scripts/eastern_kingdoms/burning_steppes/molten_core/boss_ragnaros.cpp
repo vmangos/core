@@ -451,7 +451,7 @@ struct boss_ragnarosAI : ScriptedAI
             if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL, CF_INTERRUPT_PREVIOUS) == CAST_OK)
             {
                 //Root self
-                DoCastSpellIfCan(m_creature, 23973);
+                DoCastSpellIfCan(m_creature, 17507);
 
                 DoScriptText(HasSubmergedOnce ? SAY_REINFORCEMENTS2 : SAY_REINFORCEMENTS1, m_creature);
 

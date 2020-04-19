@@ -383,6 +383,7 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
 #endif
     PSendSysMessage("Min ranged damage: %g", pTarget->GetFloatValue(UNIT_FIELD_MINRANGEDDAMAGE));
     PSendSysMessage("Max ranged damage: %g", pTarget->GetFloatValue(UNIT_FIELD_MAXRANGEDDAMAGE));
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     PSendSysMessage("Physical power cost modifier: %i", pTarget->GetInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + SPELL_SCHOOL_NORMAL));
     PSendSysMessage("Holy power cost modifier: %i", pTarget->GetInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + SPELL_SCHOOL_HOLY));
     PSendSysMessage("Fire power cost modifier: %i", pTarget->GetInt32Value(UNIT_FIELD_POWER_COST_MODIFIER + SPELL_SCHOOL_FIRE));
@@ -397,6 +398,7 @@ bool ChatHandler::HandleUnitStatInfoCommand(char* args)
     PSendSysMessage("Frost power cost multiplier: %g", pTarget->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + SPELL_SCHOOL_FROST));
     PSendSysMessage("Shadow power cost multiplier: %g", pTarget->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + SPELL_SCHOOL_SHADOW));
     PSendSysMessage("Arcane power cost multiplier: %g", pTarget->GetFloatValue(UNIT_FIELD_POWER_COST_MULTIPLIER + SPELL_SCHOOL_ARCANE));
+#endif
 
     Player* pPlayer = pTarget->ToPlayer();
     if (!pPlayer)
