@@ -19,6 +19,9 @@ UPDATE `quest_template` SET `OfferRewardText` = "Congratulations, and may the Li
 -- update The Tome of Valor (1794) to Tiza Battleforge (6179)
 UPDATE `creature_questrelation` SET `id` = 6179 WHERE `quest` = 1794;
 
+--update involved relation to Tiza Battleforge (6179) for The Tome of Valor (1794)
+UPDATE `creature_involvedrelation` SET `id` = 6179 WHERE `quest` = 1794;
+
 -- add completion text for Tome of Valor (1794)
 UPDATE `quest_template` SET `OfferRewardText` = "It has been proven that the Light is with you, $n, but as times grow more dangerous, it becomes important to know what strength lies beneath the flesh. When demons, dragons, or any other evil set foot in your lands, your mettle will be tested. Will you be strong enough?$b$bBravery, regardless of the situation, is as much a part of paladinhood as the Light, your armor, and your weapon. Protecting the weak, and not losing faith are two more lessons you must master while you study in the Cathedral of Light." WHERE `entry` = 1794;
 
