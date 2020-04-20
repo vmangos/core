@@ -408,9 +408,6 @@ void PartyBotAI::UpdateAI(uint32 const diff)
     if (!pLeader->IsInWorld())
         return;
 
-    if (pLeader->IsTaxiFlying())
-        return;
-
     if (pLeader->InBattleGround() &&
         !me->InBattleGround())
     {
@@ -422,6 +419,13 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
         
         // Remain idle until we can join battleground.
+        return;
+    }
+
+    if (pLeader->IsTaxiFlying())
+    {
+        if (me->GetMotionMaster()->GetCurrentMovementGeneratorType())
+            me->GetMotionMaster()->MoveIdle();
         return;
     }
 
@@ -458,13 +462,10 @@ void PartyBotAI::UpdateAI(uint32 const diff)
             me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
         else if (me->GetClass() == CLASS_HUNTER)
         {
-            if (me->GetVictim())
-            {
-                if (me->GetCombatDistance(me->GetVictim()) < 8.0f)
-                    me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
-                else
-                    UpdateInCombatAI_Hunter();
-            }
+            if (me->GetCombatDistance(me->GetVictim()) < 8.0f)
+                me->InterruptSpell(CURRENT_AUTOREPEAT_SPELL, true);
+            else
+                UpdateInCombatAI_Hunter();
         }
 
         return;
@@ -2853,21 +2854,11 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                 return;
             }
 
-            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
-                return;
-
             if (m_spells.druid.pFaerieFire &&
                (pVictim->GetClass() == CLASS_ROGUE) &&
                 CanTryToCastSpell(pVictim, m_spells.druid.pFaerieFire))
             {
                 if (DoCastSpell(pVictim, m_spells.druid.pFaerieFire) == SPELL_CAST_OK)
-                    return;
-            }
-
-            if (m_spells.druid.pMoonfire &&
-                CanTryToCastSpell(pVictim, m_spells.druid.pMoonfire))
-            {
-                if (DoCastSpell(pVictim, m_spells.druid.pMoonfire) == SPELL_CAST_OK)
                     return;
             }
 
@@ -2878,8 +2869,18 @@ void PartyBotAI::UpdateInCombatAI_Druid()
                     return;
             }
 
+            if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == DISTANCING_MOTION_TYPE)
+                return;
+
+            if (m_spells.druid.pMoonfire &&
+                CanTryToCastSpell(pVictim, m_spells.druid.pMoonfire))
+            {
+                if (DoCastSpell(pVictim, m_spells.druid.pMoonfire) == SPELL_CAST_OK)
+                    return;
+            }
+
             if (m_spells.druid.pStarfire &&
-                (pVictim->GetHealthPercent() > 50.0f) &&
+               (pVictim->GetHealthPercent() > 50.0f) &&
                 CanTryToCastSpell(pVictim, m_spells.druid.pStarfire))
             {
                 if (DoCastSpell(pVictim, m_spells.druid.pStarfire) == SPELL_CAST_OK)
