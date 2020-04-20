@@ -31,7 +31,7 @@ UPDATE `quest_template` SET `OfferRewardText` = "Good day, $n. The Light is with
 -- add completion text for The Test of Righteousness (1653)
 UPDATE `quest_template` SET `ExclusiveGroup` = 4485 WHERE `entry` = 1661;
 
--- add completion text for The Tome of Valor (1651)
+-- add progress text for The Tome of Valor (1651)
 UPDATE `quest_template` SET `RequestItemsText` = "We'll make our stand at the house!" WHERE `entry` = 1651;
 
 
