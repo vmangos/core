@@ -42,8 +42,8 @@ UPDATE `gameobject_template` SET `patch`=4 WHERE `entry` IN (176964, 176965, 176
 -- GameObjects only found in AQ Temple.
 UPDATE `gameobject_template` SET `patch`=7 WHERE `entry` IN (180634, 180635, 180636, 180690, 180745);
 -- GameObjects whose display id was added in patch 1.3.
-UPDATE `gameobject_template` SET `patch`=1 WHERE `entry` IN (179147, 181099, 181102, 181105, 181106, 182535, 182536);
-UPDATE `gameobject` SET `patch_min`=1 WHERE `patch_min` < 1 && `id` IN (179147, 181099, 181102, 181105, 181106, 182535, 182536);
+UPDATE `gameobject_template` SET `patch`=1 WHERE `entry` IN (179147, 181099, 182535, 182536);
+UPDATE `gameobject` SET `patch_min`=1 WHERE `patch_min` < 1 && `id` IN (179147, 181099, 182535, 182536);
 UPDATE `gameobject_loot_template` SET `patch_min`=1 WHERE `patch_min` < 1 && `entry` IN (16464, 16465, 16466, 16467, 16577, 42901, 42902, 42903, 42904, 42905, 42906);
 
 -- TBC gameobjects.
