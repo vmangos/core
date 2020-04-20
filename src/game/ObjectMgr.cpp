@@ -9796,6 +9796,14 @@ void ObjectMgr::LoadGossipMenuItems()
             }
         }
 
+        // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+        // - Hunter pets can now be untrained of all their skills from
+        //   any beast trainer in the major cities.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+        if (gMenuItem.option_id == GOSSIP_OPTION_UNLEARNPETSKILLS)
+            continue;
+#endif
+
         if ((gMenuItem.option_id == GOSSIP_OPTION_GOSSIP) && (gMenuItem.action_menu_id > 0))
         {
             if (m_GossipMenusMap.find(gMenuItem.action_menu_id) == m_GossipMenusMap.end())
