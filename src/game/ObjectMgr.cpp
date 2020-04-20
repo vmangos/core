@@ -9818,6 +9818,9 @@ void ObjectMgr::LoadGossipMenuItems()
             gMenuItem.option_icon = GOSSIP_ICON_CHAT;
         }
 
+        if (!IsValidGossipOptionIconForBuild(gMenuItem.option_icon))
+            gMenuItem.option_icon = GOSSIP_ICON_CHAT;
+
         if (gMenuItem.OptionBroadcastTextID)
         {
             if (!GetBroadcastTextLocale(gMenuItem.OptionBroadcastTextID))

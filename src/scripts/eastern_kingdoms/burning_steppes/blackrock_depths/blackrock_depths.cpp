@@ -1558,94 +1558,6 @@ CreatureAI* GetAI_npc_watchman_doomgrip(Creature* pCreature)
 }
 
 /*######
-## npc_ribbly_fermevanne
-######*/
-
-
-enum
-{
-    NPC_RIBBLY_CRONY    = 10043,
-
-    SPELL_BRISE_GENOU   = 9080,
-    SPELL_SURINER       = 12540
-};
-
-//#define GOSSIP_ITEM_ATTAQUE  "On pay bien pour votre tête..."
-#define GOSSIP_ITEM_ATTAQUE "Your family says hello, Ribbly. And they want your head!"
-
-struct npc_ribbly_fermevanneAI : public ScriptedAI
-{
-    npc_ribbly_fermevanneAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 BiseGenou_Timer;
-    uint32 Suriner_Timer;
-
-    void Reset() override
-    {
-        BiseGenou_Timer = urand(3000, 9000);
-        Suriner_Timer = urand(2000, 10000);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        //BiseGenou_Timer
-        if (BiseGenou_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BRISE_GENOU);
-            BiseGenou_Timer = urand(9000, 15000);
-        }
-        else BiseGenou_Timer -= diff;
-
-        //Suriner_Timer
-        if (Suriner_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SURINER);
-            Suriner_Timer = urand(9000, 12000);
-        }
-        else Suriner_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_ribbly_fermevanne(Creature* pCreature)
-{
-    return new npc_ribbly_fermevanneAI(pCreature);
-}
-
-bool GossipHello_npc_ribbly_fermevanne(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(4136) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, GOSSIP_ITEM_ATTAQUE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_ribbly_fermevanne(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->MonsterYell(4973, 0, pPlayer);
-        pCreature->SetFactionTemplateId(14);
-        pCreature->AI()->AttackStart(pPlayer);
-
-        if (ScriptedInstance* pInstance = (ScriptedInstance*)pCreature->GetInstanceData())
-            pInstance->SetData(TYPE_RIBBLY, DONE);
-    }
-
-    return true;
-}
-
-/*######
 ## npc_golem_lord_argelmach
 ######*/
 
@@ -2691,13 +2603,6 @@ void AddSC_blackrock_depths()
     newscript = new Script;
     newscript->Name = "npc_watchman_doomgrip";
     newscript->GetAI = &GetAI_npc_watchman_doomgrip;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_ribbly_fermevanne";
-    newscript->GetAI = &GetAI_npc_ribbly_fermevanne;
-    newscript->pGossipHello = &GossipHello_npc_ribbly_fermevanne;
-    newscript->pGossipSelect = &GossipSelect_npc_ribbly_fermevanne;
     newscript->RegisterSelf();
 
     newscript = new Script;
