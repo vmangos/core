@@ -31,7 +31,7 @@ UPDATE `quest_template` SET `OfferRewardText` = "Ah, you've returned to the Cath
 -- add completion text for The Test of Righteousness (1653)
 UPDATE `quest_template` SET `OfferRewardText` = "Good day, $n. The Light is with you, I trust?$b$bWhat's that? You were sent by Duthorian!? My wife, how is she? I knew there was going to be trouble if I left. Please tell me she's... oh, thank goodness. I'm so glad that she's safe. The Defias were a threat long before these attacks, but now the King's advisors cannot deny it.$b$bWhat else did Duthorian have to say?$b$bYou're the one that was sent to protect my wife? Then I thank you again, $n. I couldn't think of a better test of valor than that." WHERE `entry` = 1653;
 
--- add completion text for The Test of Righteousness (1653)
+-- add The Tome of Nobility (1661) to exclusive group (4485)
 UPDATE `quest_template` SET `ExclusiveGroup` = 4485 WHERE `entry` = 1661;
 
 -- add progress text for The Tome of Valor (1651)
