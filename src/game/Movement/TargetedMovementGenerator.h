@@ -57,7 +57,7 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 
         Unit* GetTarget() const { return i_target.getTarget(); }
 
-        void unitSpeedChanged() { m_bRecalculateTravel=true; }
+        void UnitSpeedChanged() { m_bRecalculateTravel=true; }
         void UpdateFinalDistance(float fDistance);
 
     protected:

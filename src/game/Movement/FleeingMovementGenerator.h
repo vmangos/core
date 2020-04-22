@@ -34,7 +34,7 @@ class MANGOS_DLL_SPEC FleeingMovementGenerator : public MovementGeneratorMedium<
         void Reset(T &);
         bool Update(T &, uint32 const&);
 
-        void unitSpeedChanged() override { _forceUpdate = true; }
+        void UnitSpeedChanged() override { _forceUpdate = true; }
         MovementGeneratorType GetMovementGeneratorType() const override { return FLEEING_MOTION_TYPE; }
 
     protected:

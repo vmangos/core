@@ -29,42 +29,42 @@ class MANGOS_DLL_SPEC PointMovementGenerator
 : public MovementGeneratorMedium< T, PointMovementGenerator<T> >
 {
     public:
-        PointMovementGenerator(uint32 _id, float _x, float _y, float _z, uint32 options, float _speed = 0.0f, float finalOrientation = -10.0f) :
-          id(_id), i_x(_x), i_y(_y), i_z(_z), _finalO(finalOrientation), _options(options), speed(_speed), _recalculateSpeed(false) {}
+        PointMovementGenerator(uint32 _id, float _x, float _y, float _z, uint32 options, float speed = 0.0f, float finalOrientation = -10.0f) :
+          m_id(_id), m_x(_x), m_y(_y), m_z(_z), m_o(finalOrientation), m_options(options), m_speed(speed), m_recalculateSpeed(false) {}
         virtual ~PointMovementGenerator() {}
 
-        virtual void Initialize(T &);
-        virtual void Finalize(T &);
-        void Interrupt(T &);
-        void Reset(T &unit);
-        bool Update(T &, uint32 const& diff);
+        virtual void Initialize(T&);
+        virtual void Finalize(T&);
+        void Interrupt(T&);
+        void Reset(T& unit);
+        bool Update(T&, uint32 const& diff);
 
-        virtual void MovementInform(T &);
+        virtual void MovementInform(T&);
 
-        void unitSpeedChanged() { _recalculateSpeed = true; }
+        void UnitSpeedChanged() override { m_recalculateSpeed = true; }
 
         MovementGeneratorType GetMovementGeneratorType() const override { return POINT_MOTION_TYPE; }
 
-        bool GetDestination(float& x, float& y, float& z) const { x=i_x; y=i_y; z=i_z; return true; }
+        bool GetDestination(float& x, float& y, float& z) const { x=m_x; y=m_y; z=m_z; return true; }
     protected:
-        uint32 id;
-        float i_x,i_y,i_z;
-        float _finalO;
-        uint32 _options;
-        float speed;
-        bool _recalculateSpeed;
+        uint32 m_id;
+        float m_x,m_y,m_z,m_o;
+        uint32 m_options;
+        float m_speed;
+        bool m_recalculateSpeed;
 };
 
+template<class T>
 class MANGOS_DLL_SPEC DistancingMovementGenerator
-: public PointMovementGenerator<Creature>
+: public PointMovementGenerator<T>
 {
     public:
         DistancingMovementGenerator(float _x, float _y, float _z) :
-            PointMovementGenerator<Creature>(0, _x, _y, _z, MOVE_PATHFINDING | MOVE_RUN_MODE) {}
+            PointMovementGenerator<T>(0, _x, _y, _z, MOVE_PATHFINDING | MOVE_RUN_MODE) {}
 
         MovementGeneratorType GetMovementGeneratorType() const override { return DISTANCING_MOTION_TYPE; }
-        bool Update(Creature&, uint32 const& diff);
-        void MovementInform(Creature &) override;
+        bool Update(T&, uint32 const& diff);
+        void MovementInform(T&) override;
 };
 
 class MANGOS_DLL_SPEC AssistanceMovementGenerator
@@ -76,22 +76,22 @@ class MANGOS_DLL_SPEC AssistanceMovementGenerator
 
         MovementGeneratorType GetMovementGeneratorType() const override { return ASSISTANCE_MOTION_TYPE; }
         void Initialize(Creature& unit) override;
-        void Finalize(Creature &) override;
+        void Finalize(Creature&) override;
 };
 
 // Does almost nothing - just doesn't allows previous movegen interrupt current effect. Can be reused for charge effect
 class EffectMovementGenerator : public MovementGenerator
 {
     public:
-        explicit EffectMovementGenerator(uint32 Id) : m_Id(Id) {}
-        void Initialize(Unit &) {}
-        void Finalize(Unit &unit);
-        void Interrupt(Unit &) {}
-        void Reset(Unit &) {}
-        bool Update(Unit &u, uint32 const&);
+        explicit EffectMovementGenerator(uint32 Id) : m_id(Id) {}
+        void Initialize(Unit&) {}
+        void Finalize(Unit& unit);
+        void Interrupt(Unit&) {}
+        void Reset(Unit&) {}
+        bool Update(Unit& u, uint32 const&);
         MovementGeneratorType GetMovementGeneratorType() const override { return EFFECT_MOTION_TYPE; }
     private:
-        uint32 m_Id;
+        uint32 m_id;
 };
 
 template<class T>
@@ -100,28 +100,28 @@ class MANGOS_DLL_SPEC ChargeMovementGenerator
 {
     public:
         ChargeMovementGenerator(T& attacker, Unit& victim, uint32 interpolationDelay = 0, bool triggerAttack = false, float speed = 0.0f) :
-            path(&attacker), victimGuid(victim.GetObjectGuid()), _recalculateSpeed(false), _triggerAttack(triggerAttack), _interpolateDelay(interpolationDelay), _scheduleStopMoving(false), _speed(speed)
+            path(&attacker), m_victimGuid(victim.GetObjectGuid()), m_recalculateSpeed(false), m_triggerAttack(triggerAttack), m_interpolateDelay(interpolationDelay), m_scheduleStopMoving(false), m_speed(speed)
         {
             ComputePath(attacker, victim);
         }
         void ComputePath(T& attacker, Unit& victim);
 
-        void Initialize(T &);
-        void Finalize(T &);
-        void Interrupt(T &);
-        void Reset(T &unit);
-        bool Update(T &, uint32 const& diff);
+        void Initialize(T&);
+        void Finalize(T&);
+        void Interrupt(T&);
+        void Reset(T& unit);
+        bool Update(T&, uint32 const& diff);
 
         MovementGeneratorType GetMovementGeneratorType() const override { return CHARGE_MOTION_TYPE; }
-        void unitSpeedChanged() { _recalculateSpeed = true; }
+        void UnitSpeedChanged() override { m_recalculateSpeed = true; }
     protected:
         PathFinder path;
-        ObjectGuid victimGuid;
-        bool _recalculateSpeed;
-        bool _triggerAttack;
-        uint32 _interpolateDelay;
-        bool _scheduleStopMoving;
-        float _speed;
+        ObjectGuid m_victimGuid;
+        bool m_recalculateSpeed;
+        bool m_triggerAttack;
+        uint32 m_interpolateDelay;
+        bool m_scheduleStopMoving;
+        float m_speed;
 };
 
 #endif

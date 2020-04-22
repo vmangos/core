@@ -36,7 +36,7 @@ public:
     void Reset(T &);
     bool Update(T &, uint32 const&);
 
-    void unitSpeedChanged() override { _forceUpdate = true; }
+    void UnitSpeedChanged() override { _forceUpdate = true; }
     MovementGeneratorType GetMovementGeneratorType() const { return FLEEING_MOTION_TYPE; }
 
     ShortTimeTracker i_initialFleeTime;
