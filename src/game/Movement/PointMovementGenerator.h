@@ -65,6 +65,9 @@ class MANGOS_DLL_SPEC DistancingMovementGenerator
         MovementGeneratorType GetMovementGeneratorType() const override { return DISTANCING_MOTION_TYPE; }
         bool Update(T&, uint32 const& diff);
         void MovementInform(T&) override;
+
+        using PointMovementGenerator<T>::m_recalculateSpeed;
+        using PointMovementGenerator<T>::Initialize;
 };
 
 class MANGOS_DLL_SPEC AssistanceMovementGenerator
