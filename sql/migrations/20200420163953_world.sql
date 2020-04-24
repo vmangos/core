@@ -19,7 +19,7 @@ UPDATE `quest_template` SET `OfferRewardText` = "Congratulations, and may the Li
 -- update The Tome of Valor (1794) to Tiza Battleforge (6179)
 UPDATE `creature_questrelation` SET `id` = 6179 WHERE `quest` = 1794;
 
---update involved relation to Tiza Battleforge (6179) for The Tome of Valor (1794)
+-- update involved relation to Tiza Battleforge (6179) for The Tome of Valor (1794)
 UPDATE `creature_involvedrelation` SET `id` = 6179 WHERE `quest` = 1794;
 
 -- add completion text for Tome of Valor (1794)
