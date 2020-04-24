@@ -91,7 +91,7 @@ INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) V
 -- update A Lack of Fear (5645) to High Priestess Laurena (376)
 UPDATE `creature_questrelation` SET `id` = 376 WHERE `quest` = 5645;
 
---update completion text for A Lack of Fear (5645)
+-- update completion text for A Lack of Fear (5645)
 UPDATE `quest_template` SET `OfferRewardText` = "It is good you've come, $n. Our race is proud and strong, and it is time you learn to not only be so yourself, but to invoke such emotion and confidence in others. You prepared, lad?" WHERE `entry` = 5645;
 
 -- add missing quest A Lack of Fear (5647)
