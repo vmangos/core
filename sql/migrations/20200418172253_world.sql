@@ -30,21 +30,6 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 -- remove starshards (all ranks) and elunes grace (all ranks) from Maxan Anvol (1226)
 DELETE FROM `npc_trainer` WHERE `entry` = 1226 AND `spell` IN (19351, 19352, 19353, 19354, 19355, 19356, 19358, 19359, 19360, 19361);
 
--- add desperate prayer (all ranks) to Maxan Anvol (1226)
-INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
-(1226, 19339, 500, 0, 0, 18, 0, 5086),
-(1226, 19339, 100, 0, 0, 18, 5302, 5875),
-(1226, 19340, 1500, 0, 0, 26, 0, 5086),
-(1226, 19340, 300, 0, 0, 26, 5302, 5875),
-(1226, 19341, 2700, 0, 0, 34, 0, 5086),
-(1226, 19341, 600, 0, 0, 34, 5302, 5875),
-(1226, 19342, 4950, 0, 0, 42, 0, 5086),
-(1226, 19342, 1100, 0, 0, 42, 5302, 5875),
-(1226, 19343, 6750, 0, 0, 50, 0, 5086),
-(1226, 19343, 1500, 0, 0, 50, 5302, 5875),
-(1226, 19344, 9900, 0, 0, 58, 0, 5086),
-(1226, 19344, 2200, 0, 0, 58, 5302, 5875);
-
 -- add prayer of spirit (27845) to Theodrus Frostbeard (5141) and High Priest Rohan (11406)
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (5141, 27845, 2300, 0, 0, 60, 5302, 5875),
