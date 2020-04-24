@@ -34,16 +34,16 @@ DELETE FROM `creature_questrelation` WHERE `quest` = 1718 AND `id` = 7315;
 INSERT INTO `creature_questrelation` (`id`, `quest`, `patch_min`, `patch_max`) VALUES
 (5480, 1638, 0, 10);
 
---update progress text for The Rethban Gauntlet (1699)
+-- update progress text for The Rethban Gauntlet (1699)
 UPDATE `quest_template` SET `RequestItemsText` = "Time is wasting, $n.  If I were you, I'd get going..." WHERE `entry` = 1699;
 
---update Klockmort Spannerspan (1704) to Dwarves and Gnomes
+-- update Klockmort Spannerspan (1704) to Dwarves and Gnomes
 UPDATE `quest_template` SET `RequiredRaces` = 68 WHERE `entry` = 1704;
 
---update Grimand Elmore (1700) to Humans
+-- update Grimand Elmore (1700) to Humans
 UPDATE `quest_template` SET `RequiredRaces` = 1 WHERE `entry` = 1700;
 
---update Mathiel (1703) to Night Elves
+-- update Mathiel (1703) to Night Elves
 UPDATE `quest_template` SET `RequiredRaces` = 8 WHERE `entry` = 1703;
 
 -- add missing abilities to Ilsa Corbin (5480)
