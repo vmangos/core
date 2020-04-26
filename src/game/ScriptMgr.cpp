@@ -509,7 +509,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
             case SCRIPT_COMMAND_REMOVE_ITEM:
             case SCRIPT_COMMAND_CREATE_ITEM:
             {
-                if (!ObjectMgr::GetItemPrototype(tmp.createItem.itemEntry))
+                if (!sObjectMgr.GetItemPrototype(tmp.createItem.itemEntry))
                 {
                     if (!sObjectMgr.IsExistingItemId(tmp.createItem.itemEntry))
                     {
@@ -541,7 +541,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
                 {
                     if (tmp.setEquipment.slot[i] > 0)
                     {
-                        if (!ObjectMgr::GetItemPrototype(tmp.setEquipment.slot[i]))
+                        if (!sObjectMgr.GetItemPrototype(tmp.setEquipment.slot[i]))
                         {
                             if (!sObjectMgr.IsExistingItemId(tmp.createItem.itemEntry))
                             {

@@ -502,7 +502,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid npcG
             data << uint32(pQuest->RewChoiceItemId[i]);
             data << uint32(pQuest->RewChoiceItemCount[i]);
 
-            IProto = ObjectMgr::GetItemPrototype(pQuest->RewChoiceItemId[i]);
+            IProto = sObjectMgr.GetItemPrototype(pQuest->RewChoiceItemId[i]);
 
             if (IProto)
                 data << uint32(IProto->DisplayInfoID);
@@ -518,7 +518,7 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid npcG
             data << uint32(pQuest->RewItemId[i]);
             data << uint32(pQuest->RewItemCount[i]);
 
-            IProto = ObjectMgr::GetItemPrototype(pQuest->RewItemId[i]);
+            IProto = sObjectMgr.GetItemPrototype(pQuest->RewItemId[i]);
 
             if (IProto)
                 data << uint32(IProto->DisplayInfoID);
@@ -706,7 +706,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGU
     data << uint32(pQuest->GetRewChoiceItemsCount());
     for (uint32 i = 0; i < pQuest->GetRewChoiceItemsCount(); ++i)
     {
-        pItem = ObjectMgr::GetItemPrototype(pQuest->RewChoiceItemId[i]);
+        pItem = sObjectMgr.GetItemPrototype(pQuest->RewChoiceItemId[i]);
 
         data << uint32(pQuest->RewChoiceItemId[i]);
         data << uint32(pQuest->RewChoiceItemCount[i]);
@@ -720,7 +720,7 @@ void PlayerMenu::SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGU
     data << uint32(pQuest->GetRewItemsCount());
     for (uint32 i = 0; i < pQuest->GetRewItemsCount(); ++i)
     {
-        pItem = ObjectMgr::GetItemPrototype(pQuest->RewItemId[i]);
+        pItem = sObjectMgr.GetItemPrototype(pQuest->RewItemId[i]);
         data << uint32(pQuest->RewItemId[i]);
         data << uint32(pQuest->RewItemCount[i]);
 
@@ -796,7 +796,7 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const* pQuest, ObjectGuid npcG
     {
         if (!pQuest->ReqItemId[i])
             continue;
-        pItem = ObjectMgr::GetItemPrototype(pQuest->ReqItemId[i]);
+        pItem = sObjectMgr.GetItemPrototype(pQuest->ReqItemId[i]);
         data << uint32(pQuest->ReqItemId[i]);
         data << uint32(pQuest->ReqItemCount[i]);
 

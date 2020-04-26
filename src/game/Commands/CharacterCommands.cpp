@@ -1834,7 +1834,7 @@ bool ChatHandler::HandleCharacterHasItemCommand(char* args)
     if (!ExtractPlayerTarget(&args, &plTarget, &target_guid, &target_name))
         return false;
 
-    ItemPrototype const* pItem = ObjectMgr::GetItemPrototype(itemId);
+    ItemPrototype const* pItem = sObjectMgr.GetItemPrototype(itemId);
 
     if (!pItem)
     {
@@ -2948,7 +2948,7 @@ bool ChatHandler::HandleAddItemCommand(char* args)
 
     DETAIL_LOG(GetMangosString(LANG_ADDITEM), itemId, count);
 
-    ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
+    ItemPrototype const* pProto = sObjectMgr.GetItemPrototype(itemId);
     if (!pProto)
     {
         PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, itemId);
@@ -3179,9 +3179,9 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
     DETAIL_LOG(GetMangosString(LANG_ADDITEMSET), itemsetId);
 
     bool found = false;
-    for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
+    for (const auto& item : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype>(id);
+        ItemPrototype const* pProto = &item.second;
         if (!pProto)
             continue;
 
@@ -3234,7 +3234,7 @@ bool ChatHandler::HandleListItemCommand(char* args)
         return false;
     }
 
-    ItemPrototype const* itemProto = ObjectMgr::GetItemPrototype(item_id);
+    ItemPrototype const* itemProto = sObjectMgr.GetItemPrototype(item_id);
     if (!itemProto)
     {
         PSendSysMessage(LANG_COMMAND_ITEMIDINVALID, item_id);
@@ -4716,9 +4716,9 @@ bool ChatHandler::HandleQuestAddCommand(char* args)
     }
 
     // check item starting quest (it can work incorrectly if added without item in inventory)
-    for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); ++id)
+    for (const auto& item : sObjectMgr.GetItemPrototypeMap())
     {
-        ItemPrototype const* pProto = sItemStorage.LookupEntry<ItemPrototype>(id);
+        ItemPrototype const* pProto = &item.second;
         if (!pProto)
             continue;
 
@@ -4844,7 +4844,7 @@ bool ChatHandler::HandleQuestStatusCommand(char* args)
     {
         rewardInfo << "item: " << questData.m_reward_choice << " ";
 
-        const auto itemProto = sItemStorage.LookupEntry<ItemPrototype>(questData.m_reward_choice);
+        const auto itemProto = sObjectMgr.GetItemPrototype(questData.m_reward_choice);
 
         if (itemProto)
         {

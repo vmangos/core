@@ -253,7 +253,7 @@ void MasterPlayer::LoadMailedItems(QueryResult* result)
             continue;
         mail->AddItem(item_guid_low, item_template);
 
-        ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_template);
+        ItemPrototype const* proto = sObjectMgr.GetItemPrototype(item_template);
 
         if (!proto)
         {
