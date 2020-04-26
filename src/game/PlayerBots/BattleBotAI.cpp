@@ -743,7 +743,7 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (!me->InBattleGroundQueue())
         {
-        	char args[] = "";
+            char args[] = "";
             switch (m_battlegroundId)
             {
                 case BATTLEGROUND_QUEUE_AV:
