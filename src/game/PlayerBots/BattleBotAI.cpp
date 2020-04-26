@@ -9,8 +9,6 @@
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
-#include "GridNotifiers.h"
-#include "GridNotifiersImpl.h"
 #include "TargetedMovementGenerator.h"
 #include <random>
 
@@ -74,70 +72,9 @@ enum BattleBotSpells
 };
 
 #define BB_UPDATE_INTERVAL 1000
-#define BB_MIN_FOLLOW_DIST 3.0f
-#define BB_MAX_FOLLOW_DIST 6.0f
-#define BB_MIN_FOLLOW_ANGLE 0.0f
-#define BB_MAX_FOLLOW_ANGLE 6.0f
 
 #define GO_WSG_DROPPED_SILVERWING_FLAG 179785
 #define GO_WSG_DROPPED_WARSONG_FLAG 179786
-
-static bool IsPhysicalDamageClass(uint8 playerClass)
-{
-    switch (playerClass)
-    {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-        case CLASS_ROGUE:
-        case CLASS_HUNTER:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            return true;
-    }
-    return false;
-}
-
-static bool IsRangedDamageClass(uint8 playerClass)
-{
-    switch (playerClass)
-    {
-        case CLASS_HUNTER:
-        case CLASS_PRIEST:
-        case CLASS_SHAMAN:
-        case CLASS_MAGE:
-        case CLASS_WARLOCK:
-        case CLASS_DRUID:
-            return true;
-    }
-    return false;
-}
-
-static bool IsMeleeWeaponClass(uint8 playerClass)
-{
-    switch (playerClass)
-    {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-        case CLASS_ROGUE:
-        case CLASS_SHAMAN:
-            return true;
-    }
-    return false;
-}
-
-static bool IsMeleeDamageClass(uint8 playerClass)
-{
-    switch (playerClass)
-    {
-        case CLASS_WARRIOR:
-        case CLASS_PALADIN:
-        case CLASS_ROGUE:
-        case CLASS_SHAMAN:
-        case CLASS_DRUID:
-            return true;
-    }
-    return false;
-}
 
 void BattleBotAI::AddPremadeGearAndSpells()
 {
@@ -806,16 +743,17 @@ void BattleBotAI::UpdateAI(uint32 const diff)
 
         if (!me->InBattleGroundQueue())
         {
+        	char args[] = "";
             switch (m_battlegroundId)
             {
                 case BATTLEGROUND_QUEUE_AV:
-                    ChatHandler(me).HandleGoAlteracCommand("");
+                    ChatHandler(me).HandleGoAlteracCommand(args);
                     break;
                 case BATTLEGROUND_QUEUE_WS:
-                    ChatHandler(me).HandleGoWarsongCommand("");
+                    ChatHandler(me).HandleGoWarsongCommand(args);
                     break;
                 case BATTLEGROUND_QUEUE_AB:
-                    ChatHandler(me).HandleGoArathiCommand("");
+                    ChatHandler(me).HandleGoArathiCommand(args);
                     break;
                 default:
                     sLog.outError("BattleBot: Invalid BG queue type!");

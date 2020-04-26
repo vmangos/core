@@ -368,7 +368,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
                 clearAcceptTradeMode(myItems, hisItems);
 
                 my_spell->Delete();
-                my_trade->SetSpell(NULL);
+                my_trade->SetSpell(0);
                 return;
             }
         }
@@ -384,7 +384,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
             {
                 if (my_spell)
                     my_spell->Delete();
-                his_trade->SetSpell(NULL);
+                his_trade->SetSpell(0);
 
                 clearAcceptTradeMode(my_trade, his_trade);
                 clearAcceptTradeMode(myItems, hisItems);
@@ -408,7 +408,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
                     my_spell->Delete();
                 his_spell->Delete();
 
-                his_trade->SetSpell(NULL);
+                his_trade->SetSpell(0);
                 return;
             }
         }
