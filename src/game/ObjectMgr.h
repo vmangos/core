@@ -657,18 +657,18 @@ class ObjectMgr
             return sCreatureInfoAddonStorage.LookupEntry<CreatureDataAddon>(entry);
         }
         // Item Prototypes
-        ItemPrototype const* GetItemPrototype(uint32 id)
-		{
-			auto iter = m_itemPrototypesMap.find(id);
-			if (iter == m_itemPrototypesMap.end())
-				return nullptr;
+        ItemPrototype const* GetItemPrototype(uint32 id) const
+        {
+            auto iter = m_itemPrototypesMap.find(id);
+            if (iter == m_itemPrototypesMap.end())
+                return nullptr;
 
-			return &iter->second;
-		}
-		ItemPrototypeMap const& GetItemPrototypeMap() const
-		{
-			return m_itemPrototypesMap;
-		}
+            return &iter->second;
+        }
+        ItemPrototypeMap const& GetItemPrototypeMap() const
+        {
+            return m_itemPrototypesMap;
+        }
 
         PetLevelInfo const* GetPetLevelInfo(uint32 creature_id, uint32 level) const;
 

@@ -3306,36 +3306,38 @@ void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
 
 void ObjectMgr::LoadItemPrototypes()
 {
-	m_itemPrototypesMap.clear();
+    m_itemPrototypesMap.clear();
 
-	//                                                                0        1        2           3       4              5       	     6          7        8            9            10            11                12                 13                14            15                16                17                     18                19                     20                    21                             22                          23           24           25                 26            27             28            29             30            31             32            33             34            35             36            37             38            39             40            41             42            43             44             45              46       47           48           49          50          51           52          53          54           55          56          57           58          59          60           61          62          63           64       65       66          67          68            69           70            71            72           73                74                75                76                 77                 78                         79           80                81                82                83                 84                 85                         86           87                88                89                90                 91                 92                         93           94                95                96                97                 98                 99                         100          101               102               103               104                105                106                        107        108          109              110              111            112        113         114       115                116       117               118           119          120         121           122              123          124               125               126            127
-	std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_count`, `stackable`, `container_slots`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `ammo_type`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `bonding`, `page_text`, `page_language`, `page_material`, `start_quest`, `lock_id`, `material`, `sheath`, `random_property`, `set_id`, `max_durability`, `area_bound`, `map_bound`, `duration`, `bag_family`, `disenchant_id`, `food_type`, `min_money_loot`, `max_money_loot`, `extra_flags`, `other_team_entry` "
-						  " FROM `item_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `item_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
-	if (!result)
-	{
-		BarGoLink bar(1);
-		bar.step();
+    //                                                                0        1        2           3       4              5                6          7        8            9            10            11                12                 13                14            15                16                17                     18                19                     20                    21                             22                          23           24           25                 26            27             28            29             30            31             32            33             34            35             36            37             38            39             40            41             42            43             44             45              46       47           48           49          50          51           52          53          54           55          56          57           58          59          60           61          62          63           64       65       66          67          68            69           70            71            72           73                74                75                76                 77                 78                         79           80                81                82                83                 84                 85                         86           87                88                89                90                 91                 92                         93           94                95                96                97                 98                 99                         100          101               102               103               104                105                106                        107        108          109              110              111            112        113         114       115                116       117               118           119          120         121           122              123          124               125               126            127
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_count`, `stackable`, `container_slots`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `ammo_type`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `bonding`, `page_text`, `page_language`, `page_material`, `start_quest`, `lock_id`, `material`, `sheath`, `random_property`, `set_id`, `max_durability`, `area_bound`, `map_bound`, `duration`, `bag_family`, `disenchant_id`, `food_type`, `min_money_loot`, `max_money_loot`, `extra_flags`, `other_team_entry` "
+                          " FROM `item_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `item_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
 
-		sLog.outString();
-		sLog.outString(">> Loaded 0 item definitions");
-		sLog.outErrorDb("`item_template` table is empty!");
-		return;
-	}
+        sLog.outString();
+        sLog.outString(">> Loaded 0 item definitions");
+        sLog.outErrorDb("`item_template` table is empty!");
+        return;
+    }
 
-	BarGoLink bar(result->GetRowCount());
+    BarGoLink bar(result->GetRowCount());
 
-	do
-	{
-		bar.step();
-		Field* fields = result->Fetch();
-		uint32 entry = fields[ 0].GetUInt32();
+    do
+    {
+        bar.step();
+        Field* fields = result->Fetch();
+        uint32 entry = fields[ 0].GetUInt32();
 
-		ItemPrototype& item = m_itemPrototypesMap[entry];
-		item.ItemId = entry;
+        ItemPrototype& item = m_itemPrototypesMap[entry];
+        item.ItemId = entry;
         item.Class = fields[ 1].GetUInt8();
         item.SubClass = fields[ 2].GetUInt8();
-        item.Name1 = fields[ 3].GetString();
-        item.Description = fields[ 4].GetString();
+        item.Name1 = new char[strlen(fields[3].GetString()) + 1];
+        strcpy(item.Name1, fields[3].GetString());
+        item.Description = new char[strlen(fields[4].GetString()) + 1];
+        strcpy(item.Description, fields[4].GetString());
         item.DisplayInfoID = fields[ 5].GetUInt32();
         item.Quality = fields[ 6].GetUInt8();
         item.Flags = fields[ 7].GetUInt32();
@@ -3359,18 +3361,18 @@ void ObjectMgr::LoadItemPrototypes()
         item.ContainerSlots = fields[25].GetUInt8();
         for (int i = 0; i < MAX_ITEM_PROTO_STATS; i++)
         {
-        	item.ItemStat[i].ItemStatType = fields[26 + i*2].GetUInt8();
-        	item.ItemStat[i].ItemStatValue = fields[27 + i*2].GetInt16();
+            item.ItemStat[i].ItemStatType = fields[26 + i*2].GetUInt8();
+            item.ItemStat[i].ItemStatValue = fields[27 + i*2].GetInt16();
         }
         item.Delay = fields[46].GetUInt16();
         item.RangedModRange = fields[47].GetFloat();
         item.AmmoType = fields[48].GetUInt8();
         for (int i = 0; i < MAX_ITEM_PROTO_DAMAGES; i++)
-		{
-			item.Damage[i].DamageMin = fields[49 + i*3].GetFloat();
-			item.Damage[i].DamageMax = fields[50 + i*3].GetFloat();
-			item.Damage[i].DamageType = fields[51 + i*3].GetUInt8();
-		}
+        {
+            item.Damage[i].DamageMin = fields[49 + i*3].GetFloat();
+            item.Damage[i].DamageMax = fields[50 + i*3].GetFloat();
+            item.Damage[i].DamageType = fields[51 + i*3].GetUInt8();
+        }
         item.Block = fields[64].GetUInt32();
         item.Armor = fields[65].GetInt16();
         item.HolyRes = fields[66].GetInt16();
@@ -3379,39 +3381,39 @@ void ObjectMgr::LoadItemPrototypes()
         item.FrostRes = fields[69].GetInt16();
         item.ShadowRes = fields[70].GetInt16();
         item.ArcaneRes = fields[71].GetInt16();
-		for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
-		{
-			item.Spells[i].SpellId = fields[72 + i*7].GetUInt32();
-			item.Spells[i].SpellTrigger = fields[73 + i*7].GetUInt8();
-			item.Spells[i].SpellCharges = fields[74 + i*7].GetInt16();
-			item.Spells[i].SpellPPMRate = fields[75 + i*7].GetFloat();
-			item.Spells[i].SpellCooldown = fields[76 + i*7].GetInt32();
-			item.Spells[i].SpellCategory = fields[77 + i*7].GetUInt16();
-			item.Spells[i].SpellCategoryCooldown = fields[78 + i*7].GetInt32();
-		}
+        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
+        {
+            item.Spells[i].SpellId = fields[72 + i*7].GetUInt32();
+            item.Spells[i].SpellTrigger = fields[73 + i*7].GetUInt8();
+            item.Spells[i].SpellCharges = fields[74 + i*7].GetInt16();
+            item.Spells[i].SpellPPMRate = fields[75 + i*7].GetFloat();
+            item.Spells[i].SpellCooldown = fields[76 + i*7].GetInt32();
+            item.Spells[i].SpellCategory = fields[77 + i*7].GetUInt16();
+            item.Spells[i].SpellCategoryCooldown = fields[78 + i*7].GetInt32();
+        }
         item.Bonding = fields[107].GetUInt8();
-		item.PageText = fields[108].GetUInt32();
-		item.LanguageID = fields[109].GetUInt8();
-		item.PageMaterial = fields[110].GetUInt8();
-		item.StartQuest = fields[111].GetUInt32();
-		item.LockID = fields[112].GetUInt32();
-		item.Material = fields[113].GetInt16();
-		item.Sheath = fields[114].GetUInt8();
-		item.RandomProperty = fields[115].GetUInt32();
-		item.ItemSet = fields[116].GetUInt32();
-		item.MaxDurability = fields[117].GetUInt32();
-		item.Area = fields[118].GetUInt32();
-		item.Map = fields[119].GetInt16();
-		item.Duration = fields[120].GetUInt32();
-		item.BagFamily = fields[121].GetInt32();
-		item.DisenchantID = fields[122].GetUInt32();
-		item.FoodType = fields[123].GetUInt8();
-		item.MinMoneyLoot = fields[124].GetUInt32();
-		item.MaxMoneyLoot = fields[125].GetUInt32();
-		item.ExtraFlags = fields[126].GetUInt8();
-		item.OtherTeamEntry = fields[127].GetUInt32();
-	}
-	while (result->NextRow());
+        item.PageText = fields[108].GetUInt32();
+        item.LanguageID = fields[109].GetUInt8();
+        item.PageMaterial = fields[110].GetUInt8();
+        item.StartQuest = fields[111].GetUInt32();
+        item.LockID = fields[112].GetUInt32();
+        item.Material = fields[113].GetInt16();
+        item.Sheath = fields[114].GetUInt8();
+        item.RandomProperty = fields[115].GetUInt32();
+        item.ItemSet = fields[116].GetUInt32();
+        item.MaxDurability = fields[117].GetUInt32();
+        item.Area = fields[118].GetUInt32();
+        item.Map = fields[119].GetInt16();
+        item.Duration = fields[120].GetUInt32();
+        item.BagFamily = fields[121].GetInt32();
+        item.DisenchantID = fields[122].GetUInt32();
+        item.FoodType = fields[123].GetUInt8();
+        item.MinMoneyLoot = fields[124].GetUInt32();
+        item.MaxMoneyLoot = fields[125].GetUInt32();
+        item.ExtraFlags = fields[126].GetUInt8();
+        item.OtherTeamEntry = fields[127].GetUInt32();
+    }
+    while (result->NextRow());
 
     m_QuestStartingItemsMap.clear();
     sLog.outString(">> Loaded %u item prototypes", m_itemPrototypesMap.size());
@@ -3424,7 +3426,7 @@ void ObjectMgr::LoadItemPrototypes()
     // check data correctness
     for (const auto& item : GetItemPrototypeMap())
     {
-    	uint32 i = item.first;
+        uint32 i = item.first;
         ItemPrototype const* proto = &item.second;
 
         if ((obtainedItems.find(i) != obtainedItems.end()) ||

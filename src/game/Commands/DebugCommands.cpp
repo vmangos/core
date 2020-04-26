@@ -1785,9 +1785,9 @@ bool IsSimilarItem(ItemPrototype const* proto1, ItemPrototype const* proto2)
 
 bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 {
-	for (const auto& item : sObjectMgr.GetItemPrototypeMap())
+    for (const auto& item : sObjectMgr.GetItemPrototypeMap())
     {
-		uint32 id = item.first;
+        uint32 id = item.first;
         ItemPrototype const* proto1 = &item.second;
         if (!proto1)
             continue;
@@ -1821,17 +1821,17 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
             ItemPrototype const* similar = nullptr;
             for (const auto& item2 : sObjectMgr.GetItemPrototypeMap())
             {
-            	ItemPrototype const* proto2 = &item2.second;
-            	if (proto1 != proto2 && IsSimilarItem(proto1, proto2))
-				{
-					if (similar)
-					{
-						// Ambiguity. Other similar items.
-						similar = nullptr;
-						break;
-					}
-					similar = proto2;
-				}
+                ItemPrototype const* proto2 = &item2.second;
+                if (proto1 != proto2 && IsSimilarItem(proto1, proto2))
+                {
+                    if (similar)
+                    {
+                        // Ambiguity. Other similar items.
+                        similar = nullptr;
+                        break;
+                    }
+                    similar = proto2;
+                }
             }
 
             PSendSysMessage("Item %u not handled ! Similar item : %u", proto1->ItemId, similar ? similar->ItemId : 0);

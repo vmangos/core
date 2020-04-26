@@ -1381,14 +1381,14 @@ void LoadLootTemplates_Disenchant()
     // remove real entries and check existence loot
     for (const auto& i : sObjectMgr.GetItemPrototypeMap())
     {
-    	ItemPrototype const* proto = &i.second;
-    	if (uint32 lootid = proto->DisenchantID)
-		{
-			if (ids_set.find(lootid) == ids_set.end())
-				LootTemplates_Disenchant.ReportNotExistedId(lootid);
-			else
-				ids_setUsed.insert(lootid);
-		}
+        ItemPrototype const* proto = &i.second;
+        if (uint32 lootid = proto->DisenchantID)
+        {
+            if (ids_set.find(lootid) == ids_set.end())
+                LootTemplates_Disenchant.ReportNotExistedId(lootid);
+            else
+                ids_setUsed.insert(lootid);
+        }
     }
 
     for (const auto itr : ids_setUsed)
@@ -1443,17 +1443,17 @@ void LoadLootTemplates_Item()
 
     // remove real entries and check existence loot
     for (const auto& i : sObjectMgr.GetItemPrototypeMap())
-	{
-		ItemPrototype const* proto = &i.second;
-		if (!(proto->Flags & ITEM_FLAG_LOOTABLE))
-			continue;
+    {
+        ItemPrototype const* proto = &i.second;
+        if (!(proto->Flags & ITEM_FLAG_LOOTABLE))
+            continue;
 
-		if (ids_set.find(proto->ItemId) != ids_set.end() || proto->MaxMoneyLoot > 0)
-			ids_set.erase(proto->ItemId);
-		// wdb have wrong data cases, so skip by default
-		else if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
-			LootTemplates_Item.ReportNotExistedId(proto->ItemId);
-	}
+        if (ids_set.find(proto->ItemId) != ids_set.end() || proto->MaxMoneyLoot > 0)
+            ids_set.erase(proto->ItemId);
+        // wdb have wrong data cases, so skip by default
+        else if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
+            LootTemplates_Item.ReportNotExistedId(proto->ItemId);
+    }
 
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Item.ReportUnusedIds(ids_set);
