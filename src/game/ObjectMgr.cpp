@@ -1141,25 +1141,35 @@ void ObjectMgr::LoadCreatureTemplates()
     }
 
     BarGoLink bar(result->GetRowCount());
-
     do
     {
         bar.step();
         Field* fields = result->Fetch();
         uint32 entry = fields[0].GetUInt32();
-
         CreatureInfo& creature = m_creatureTemplatesMap[entry];
         creature.entry = entry;
-        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
+        for (int i = 0; i < MAX_DISPLAY_IDS_PER_CREATURE; i++)
         {
             creature.display_id[i] = fields[1 + i].GetUInt32();
         }
-
-        creature.name = new char[strlen(fields[5].GetString()) + 1];
-        strcpy(creature.name, fields[5].GetString());
-        creature.subname = new char[strlen(fields[6].GetString()) + 1];
-        strcpy(creature.subname, fields[6].GetString());
-
+        if (char const* name = fields[5].GetString())
+        {
+        	creature.name = new char[strlen(fields[5].GetString()) + 1];
+        	strcpy(creature.name, fields[5].GetString());
+        }
+        else
+        {
+        	creature.name = "";
+        }
+        if (char const* subname = fields[6].GetString())
+        {
+        	creature.subname = new char[strlen(fields[6].GetString()) + 1];
+        	strcpy(creature.subname, fields[6].GetString());
+        }
+        else
+        {
+        	creature.subname = "";
+        }
         creature.gossip_menu_id = fields[7].GetUInt32();
         creature.level_min = fields[8].GetUInt32();
         creature.level_max = fields[9].GetUInt32();
@@ -1207,19 +1217,16 @@ void ObjectMgr::LoadCreatureTemplates()
         creature.frost_res = fields[51].GetInt32();
         creature.shadow_res = fields[52].GetInt32();
         creature.arcane_res = fields[53].GetInt32();
-
         for (int i = 0; i < CREATURE_MAX_SPELLS; i++)
         {
             creature.spells[i] = fields[54 + i].GetUInt32();
         }
-
         creature.spell_list_id = fields[58].GetUInt32();
         creature.pet_spell_list_id = fields[59].GetUInt32();
         creature.gold_min = fields[60].GetUInt32();
         creature.gold_max = fields[61].GetUInt32();
         creature.ai_name = new char[strlen(fields[62].GetString()) + 1];
         strcpy((char*)creature.ai_name, fields[62].GetString());
-
         creature.movement_type = fields[63].GetUInt32();
         creature.inhabit_type = fields[64].GetUInt32();
         creature.civilian = fields[65].GetUInt32();
@@ -1287,7 +1294,7 @@ void ObjectMgr::CorrectCreatureDisplayIds(uint32 entry, uint32& displayId)
 void ObjectMgr::CheckCreatureTemplates()
 {
     // check data correctness
-    for (const auto& creature : GetCreatureTemplateMap())
+    for (auto& creature : GetCreatureTemplateMap())
     {
         uint32 i = creature.first;
         CreatureInfo const* cInfo = &creature.second;
