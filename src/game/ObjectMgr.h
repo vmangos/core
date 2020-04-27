@@ -229,6 +229,7 @@ typedef std::unordered_map<uint32, FactionEntry> FactionsMap;
 typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
 typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
 typedef std::unordered_map<uint32, ItemPrototype> ItemPrototypeMap;
+typedef std::unordered_map<uint32, CreatureInfo> CreatureInfoMap;
 
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
@@ -642,7 +643,18 @@ class ObjectMgr
         GroupMap::iterator GetGroupMapBegin() { return m_GroupMap.begin(); }
         GroupMap::iterator GetGroupMapEnd() { return m_GroupMap.end(); }
 
-        static CreatureInfo const* GetCreatureTemplate(uint32 id);
+        CreatureInfo const* GetCreatureTemplate(uint32 id) const
+        {
+			auto iter = m_creatureTemplatesMap.find(id);
+			if (iter == m_creatureTemplatesMap.end())
+				return nullptr;
+
+			return &iter->second;
+		}
+        CreatureInfoMap const& GetCreatureTemplateMap() const
+		{
+			return m_creatureTemplatesMap;
+		}
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoAddon(uint32 display_id);
         CreatureDisplayInfoAddon const* GetCreatureDisplayInfoRandomGender(uint32 display_id);
 
@@ -1546,6 +1558,7 @@ class ObjectMgr
 
         SoundEntryMap m_SoundEntriesMap;
         ItemPrototypeMap m_itemPrototypesMap;
+        CreatureInfoMap m_creatureTemplatesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;
         SkillLineAbiilityStore m_SkillLineAbilities;

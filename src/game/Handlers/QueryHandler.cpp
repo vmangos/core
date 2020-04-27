@@ -168,7 +168,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket& recv_data)
     //if (unit == nullptr)
     //    sLog.outDebug("WORLD: HandleCreatureQueryOpcode - (%u) NO SUCH UNIT! (GUID: %u, ENTRY: %u)", uint32(GUID_LOPART(guid)), guid, entry);
 
-    CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(entry);
+    CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(entry);
     if (ci)
     {
 

@@ -116,7 +116,7 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
         return false;
     }
 
-    CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(cr_id);
+    CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(cr_id);
     if (!cInfo)
     {
         PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, cr_id);
@@ -621,9 +621,10 @@ bool ChatHandler::HandleLookupCreatureCommand(char* args)
 
     uint32 counter = 0;
 
-    for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
+    for (const auto& creature : sObjectMgr.GetCreatureTemplateMap())
     {
-        CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo> (id);
+        uint32 id = creature.first;
+        CreatureInfo const* cInfo = &creature.second;
         if (!cInfo)
             continue;
 
@@ -728,9 +729,10 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
         if (!modelId)
             break;
 
-        for (uint32 creature_id = 0; creature_id < sCreatureStorage.GetMaxEntry(); ++creature_id)
+        for (const auto& creature : sObjectMgr.GetCreatureTemplateMap())
         {
-            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(creature_id);
+            uint32 creature_id = creature.first;
+            CreatureInfo const* cInfo = &creature.second;
             if (!cInfo)
                 continue;
 

@@ -162,7 +162,7 @@ void WaypointManager::Load()
             for (const auto itr : creatureNoMoveType)
             {
                 CreatureData const* cData = sObjectMgr.GetCreatureData(itr);
-                CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(cData->creature_id[0]);
+                CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(cData->creature_id[0]);
 
                 ERROR_DB_STRICT_LOG("Table creature_movement has waypoint for creature guid %u (entry %u), but MovementType is not WAYPOINT_MOTION_TYPE(2). Make sure that this is actually used in a script!", itr, cData->creature_id[0]);
 
@@ -241,7 +241,7 @@ void WaypointManager::Load()
                 movementScriptSet.erase(script_id);
             }
 
-            CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(entry);
+            CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(entry);
 
             if (!cInfo)
             {

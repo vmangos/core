@@ -171,8 +171,8 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
     // Basic checks first
     if (byEntry)                                            // Entry given
     {
-        CreatureInfo const* pInfo = ObjectMgr::GetCreatureTemplate(slaveEntry);
-        CreatureInfo const* pMasterInfo = ObjectMgr::GetCreatureTemplate(pTmp->masterId);
+        CreatureInfo const* pInfo = sObjectMgr.GetCreatureTemplate(slaveEntry);
+        CreatureInfo const* pMasterInfo = sObjectMgr.GetCreatureTemplate(pTmp->masterId);
 
         if (!pInfo)
         {
@@ -456,7 +456,7 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
             else                                            // guid case
             {
                 CreatureData const* masterData = sObjectMgr.GetCreatureData(pInfo->masterDBGuid);
-                CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->creature_id[0]);
+                CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(masterData->creature_id[0]);
                 pMaster = pSource->GetMap()->GetCreature(ObjectGuid(cInfo->GetHighGuid(), cInfo->entry, pInfo->masterDBGuid));
             }
 
@@ -728,7 +728,7 @@ bool CreatureLinkingHolder::TryFollowMaster(Creature* pCreature)
     else                                                    // guid case
     {
         CreatureData const* masterData = sObjectMgr.GetCreatureData(pInfo->masterDBGuid);
-        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->creature_id[0]);
+        CreatureInfo const* cInfo = sObjectMgr.GetCreatureTemplate(masterData->creature_id[0]);
         pMaster = pCreature->GetMap()->GetCreature(ObjectGuid(cInfo->GetHighGuid(), cInfo->entry, pInfo->masterDBGuid));
     }
 

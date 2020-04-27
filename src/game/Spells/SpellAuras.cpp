@@ -2171,7 +2171,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
 
     if (apply)
     {
-        CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(m_modifier.m_miscvalue);
+        CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(m_modifier.m_miscvalue);
         if (!ci)
         {
             sLog.outErrorDb("AuraMounted: `creature_template`='%u' not found in database (only need its display_id)", m_modifier.m_miscvalue);
@@ -2601,7 +2601,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             }
             else
             {
-                CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(m_modifier.m_miscvalue);
+                CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(m_modifier.m_miscvalue);
                 if (!ci)
                 {
                     display_id = 16358;                           // pig pink ^_^
@@ -5380,7 +5380,7 @@ void Aura::HandleAuraEmpathy(bool apply, bool /*Real*/)
     if (target->GetTypeId() != TYPEID_UNIT)
         return;
 
-    CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(target->GetEntry());
+    CreatureInfo const* ci = sObjectMgr.GetCreatureTemplate(target->GetEntry());
     if (ci && ci->type == CREATURE_TYPE_BEAST)
         target->ApplyModUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_SPECIALINFO, apply);
 
