@@ -1218,7 +1218,7 @@ void ObjectMgr::LoadCreatureTemplates()
         creature.gold_min = fields[60].GetUInt32();
         creature.gold_max = fields[61].GetUInt32();
         creature.ai_name = new char[strlen(fields[62].GetString()) + 1];
-        strcpy(creature.ai_name, fields[62].GetString());
+        strcpy((char*)creature.ai_name, fields[62].GetString());
 
         creature.movement_type = fields[63].GetUInt32();
         creature.inhabit_type = fields[64].GetUInt32();
