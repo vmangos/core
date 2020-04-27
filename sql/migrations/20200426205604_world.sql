@@ -8,8 +8,13 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20200426205604');
 -- Add your query below.
 
+
 -- remove unused event game object in ironforge
 DELETE FROM `gameobject` WHERE `guid` IN (4771, 5051);
+
+-- add correct position for objects inside deeprun tram.
+UPDATE `gameobject` SET `position_z` = -4.3 WHERE `guid` IN (20738, 20739, 20740);
+
 
 -- End of migration.
 END IF;
