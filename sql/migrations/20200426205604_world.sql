@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20200426205604');
 -- Add your query below.
 
 -- remove unused event game object in ironforge
-DELETE FROM `game_event_gameobject` WHERE `guid` IN (4771, 5051);
+DELETE FROM `gameobject` WHERE `guid` IN (4771, 5051);
 
 -- End of migration.
 END IF;
