@@ -1126,7 +1126,7 @@ void ObjectMgr::LoadCreatureTemplates()
 {
     m_creatureTemplatesMap.clear();
 
-    //                                                                0        1              2              3              4              5       6          7                 8            9            10            11            12          13          14       15         16           17            18           19       20                 21                     22             23      24               25         26         27            28              29                30                  31                    32            33            34               35              36              37               38               39              40                41                42                     43      44            45         46                    47                  48          49          50            51           52            53            54           55           56           56           57               58                   59          60          61         62               63              64          65               66              67              68            69           70                      71                    72             73
+    //                                                                0        1              2              3              4              5       6          7                 8            9            10            11            12          13          14       15         16           17            18           19       20                 21                     22             23      24               25         26         27            28              29                30                  31                    32            33            34               35              36              37               38               39              40                41                42                     43      44            45         46                    47                  48          49          50            51           52            53            54           55           56           57           58               59                   60          61          62         63               64              65          66               67              68              69            70           71                      72                    73             74
     std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `scale`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `beast_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name` "
                           " FROM `creature_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `creature_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
     if (!result)
@@ -1213,25 +1213,25 @@ void ObjectMgr::LoadCreatureTemplates()
             creature.spells[i] = fields[54 + i].GetUInt32();
         }
 
-        creature.spell_list_id = fields[57].GetUInt32();
-        creature.pet_spell_list_id = fields[58].GetUInt32();
-        creature.gold_min = fields[59].GetUInt32();
-        creature.gold_max = fields[60].GetUInt32();
-        creature.ai_name = new char[strlen(fields[61].GetString()) + 1];
-        strcpy(creature.ai_name, fields[61].GetString());
+        creature.spell_list_id = fields[58].GetUInt32();
+        creature.pet_spell_list_id = fields[59].GetUInt32();
+        creature.gold_min = fields[60].GetUInt32();
+        creature.gold_max = fields[61].GetUInt32();
+        creature.ai_name = new char[strlen(fields[62].GetString()) + 1];
+        strcpy(creature.ai_name, fields[62].GetString());
 
-        creature.movement_type = fields[62].GetUInt32();
-        creature.inhabit_type = fields[63].GetUInt32();
-        creature.civilian = fields[64].GetUInt32();
-        creature.racial_leader = fields[65].GetBool();
-        creature.regeneration = fields[66].GetUInt32();
-        creature.equipment_id = fields[67].GetUInt32();
-        creature.trainer_id = fields[68].GetUInt32();
-        creature.vendor_id = fields[69].GetUInt32();
-        creature.mechanic_immune_mask = fields[70].GetUInt32();
-        creature.school_immune_mask = fields[71].GetUInt32();
-        creature.flags_extra = fields[72].GetUInt32();
-        uint32 script_id = sScriptMgr.GetScriptId(fields[73].GetString());
+        creature.movement_type = fields[63].GetUInt32();
+        creature.inhabit_type = fields[64].GetUInt32();
+        creature.civilian = fields[65].GetUInt32();
+        creature.racial_leader = fields[66].GetBool();
+        creature.regeneration = fields[67].GetUInt32();
+        creature.equipment_id = fields[68].GetUInt32();
+        creature.trainer_id = fields[69].GetUInt32();
+        creature.vendor_id = fields[70].GetUInt32();
+        creature.mechanic_immune_mask = fields[71].GetUInt32();
+        creature.school_immune_mask = fields[72].GetUInt32();
+        creature.flags_extra = fields[73].GetUInt32();
+        uint32 script_id = sScriptMgr.GetScriptId(fields[74].GetString());
     }
     while (result->NextRow());
 
@@ -10296,11 +10296,6 @@ bool LoadMangosStrings(DatabaseType& db, char const* table, int32 start_value, i
     }
 
     return sObjectMgr.LoadMangosStrings(db, table, start_value, end_value, extra_content);
-}
-
-CreatureInfo const* GetCreatureTemplateStore(uint32 entry)
-{
-    return GetCreatureTemplate(entry);
 }
 
 Quest const* GetQuestTemplateStore(uint32 entry)

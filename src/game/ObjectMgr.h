@@ -1577,7 +1577,6 @@ class ObjectMgr
 
 // scripting access functions
 MANGOS_DLL_SPEC bool LoadMangosStrings(DatabaseType& db, char const* table,int32 start_value, int32 end_value = std::numeric_limits<int32>::min(), bool extra_content = false);
-MANGOS_DLL_SPEC CreatureInfo const* GetCreatureTemplateStore(uint32 entry);
 MANGOS_DLL_SPEC Quest const* GetQuestTemplateStore(uint32 entry);
 
 #endif
