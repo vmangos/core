@@ -16,8 +16,6 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 set (game_SRCS 
-    AdvancedPlayerBotAI.h
-    AdvancedPlayerBotAI.cpp
     AccountMgr.cpp
     AuraRemovalMgr.cpp
     AutoBroadCastMgr.cpp
@@ -85,8 +83,6 @@ set (game_SRCS
     Chat/AbstractPlayer.cpp
     Chat/MasterPlayer.cpp
     Chat/MasterPlayerChat.cpp
-    CinematicStuff/CinematicStuff.cpp
-    CinematicStuff/CinematicStuff.h
     Commands/AccountCommands.cpp
     Commands/CharacterCommands.cpp
     Commands/CreatureCommands.cpp
@@ -461,7 +457,6 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/AuctionHouse
   ${CMAKE_CURRENT_SOURCE_DIR}/Battlegrounds
   ${CMAKE_CURRENT_SOURCE_DIR}/Chat
-  ${CMAKE_CURRENT_SOURCE_DIR}/CinematicStuff
   ${CMAKE_CURRENT_SOURCE_DIR}/Commands
   ${CMAKE_CURRENT_SOURCE_DIR}/Database
   ${CMAKE_CURRENT_SOURCE_DIR}/Group
