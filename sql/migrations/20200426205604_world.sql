@@ -15,6 +15,9 @@ DELETE FROM `gameobject` WHERE `guid` IN (4771, 5051);
 -- add correct position for objects inside deeprun tram.
 UPDATE `gameobject` SET `position_z` = -4.3 WHERE `guid` IN (20738, 20739, 20740);
 
+-- update correct greeting for springspindle fizzlegear
+UPDATE `npc_text` SET `BroadcastTextID0` = 7851 WHERE `ID` = 4732;
+
 
 -- End of migration.
 END IF;
