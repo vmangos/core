@@ -421,7 +421,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
 #endif
 
     // Check de la portee
-    SpellRangeEntry const* rangeEntry = GetSpellRangeStore()->LookupEntry(spellInfos->rangeIndex);
+    SpellRangeEntry const* rangeEntry = sSpellRangeStore.LookupEntry(spellInfos->rangeIndex);
     if (spellInfos->rangeIndex != 0 && rangeEntry)
     {
         spellToModify->minRange = rangeEntry->minRange;

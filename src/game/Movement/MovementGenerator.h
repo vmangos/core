@@ -31,7 +31,7 @@
 
 class Unit;
 
-class MANGOS_DLL_SPEC MovementGenerator
+class MovementGenerator
 {
     public:
         virtual ~MovementGenerator();
@@ -69,7 +69,7 @@ class MANGOS_DLL_SPEC MovementGenerator
 };
 
 template<class T, class D>
-class MANGOS_DLL_SPEC MovementGeneratorMedium : public MovementGenerator
+class MovementGeneratorMedium : public MovementGenerator
 {
     public:
         void Initialize(Unit &u) override

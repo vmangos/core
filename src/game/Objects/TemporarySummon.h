@@ -33,7 +33,7 @@ class TemporarySummon : public Creature
 
         void Update(uint32 update_diff, uint32 time) override;
         void Summon(TempSummonType type, uint32 lifetime, CreatureAiSetter pFuncAiSetter = nullptr);
-        void MANGOS_DLL_SPEC UnSummon(uint32 delayDespawnTime = 0);
+        void UnSummon(uint32 delayDespawnTime = 0);
         void CleanupsBeforeDelete() override;
         void SaveToDB();
         ObjectGuid const& GetSummonerGuid() const { return m_summoner ; }

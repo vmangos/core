@@ -87,7 +87,7 @@ enum PlayerChatTag
 class PartyBotAI;
 class BattleBotAI;
 
-class MANGOS_DLL_SPEC ChatHandler
+class ChatHandler
 {
     friend class PartyBotAI;
     friend class BattleBotAI;

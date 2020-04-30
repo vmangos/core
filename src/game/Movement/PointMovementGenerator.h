@@ -25,7 +25,7 @@
 #include "PathFinder.h"
 
 template<class T>
-class MANGOS_DLL_SPEC PointMovementGenerator
+class PointMovementGenerator
 : public MovementGeneratorMedium< T, PointMovementGenerator<T> >
 {
     public:
@@ -55,7 +55,7 @@ class MANGOS_DLL_SPEC PointMovementGenerator
 };
 
 template<class T>
-class MANGOS_DLL_SPEC DistancingMovementGenerator
+class DistancingMovementGenerator
 : public PointMovementGenerator<T>
 {
     public:
@@ -70,7 +70,7 @@ class MANGOS_DLL_SPEC DistancingMovementGenerator
         using PointMovementGenerator<T>::Initialize;
 };
 
-class MANGOS_DLL_SPEC AssistanceMovementGenerator
+class AssistanceMovementGenerator
 : public PointMovementGenerator<Creature>
 {
     public:
@@ -98,7 +98,7 @@ class EffectMovementGenerator : public MovementGenerator
 };
 
 template<class T>
-class MANGOS_DLL_SPEC ChargeMovementGenerator
+class ChargeMovementGenerator
 : public MovementGeneratorMedium< T, ChargeMovementGenerator<T> >
 {
     public:

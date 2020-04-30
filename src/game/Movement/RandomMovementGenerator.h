@@ -21,7 +21,7 @@
 
 #include "MovementGenerator.h"
 
-class MANGOS_DLL_SPEC RandomMovementGenerator
+class RandomMovementGenerator
 : public MovementGeneratorMedium< Creature, RandomMovementGenerator >
 {
     public:

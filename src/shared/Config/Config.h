@@ -30,7 +30,7 @@
 
 class ACE_Configuration_Heap;
 
-class MANGOS_DLL_SPEC Config
+class Config
 {
     friend class ACE_Singleton<Config, ACE_Recursive_Thread_Mutex>;
     public:

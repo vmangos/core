@@ -270,7 +270,7 @@ typedef std::map<std::string, WorldSessionScript*> SessionScriptsMap;
 #define ALL_SESSION_SCRIPTS(session, what) for (SessionScriptsMap::iterator it = session->scripts.begin(); it != session->scripts.end(); ++it) it->second->what;
 
 /// Player session in the World
-class MANGOS_DLL_SPEC WorldSession
+class WorldSession
 {
     friend class CharacterHandler;
     public:

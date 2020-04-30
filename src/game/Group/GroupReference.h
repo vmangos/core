@@ -27,7 +27,7 @@
 class Group;
 class Player;
 
-class MANGOS_DLL_SPEC GroupReference : public Reference<Group, Player>
+class GroupReference : public Reference<Group, Player>
 {
     protected:
         uint8 iSubGroup;

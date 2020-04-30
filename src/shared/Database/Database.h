@@ -43,7 +43,7 @@ class Database;
 typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
 
 //
-class MANGOS_DLL_SPEC SqlConnection
+class SqlConnection
 {
     public:
         virtual ~SqlConnection() {}
@@ -115,7 +115,7 @@ class MANGOS_DLL_SPEC SqlConnection
         StmtHolder m_holder;
 };
 
-class MANGOS_DLL_SPEC Database
+class Database
 {
     public:
         virtual ~Database();
@@ -284,7 +284,7 @@ class MANGOS_DLL_SPEC Database
         //factory method to create SqlConnection objects
         virtual SqlConnection* CreateConnection() = 0;
 
-        class MANGOS_DLL_SPEC TransHelper
+        class TransHelper
         {
             public:
                 TransHelper() : m_pTrans(nullptr) {}
