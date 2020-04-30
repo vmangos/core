@@ -55,6 +55,9 @@ enum MovementChangeType
     KNOCK_BACK
 };
 
+// No orientation check for auto attacks or spells below this distance.
+#define NO_FACING_CHECKS_DISTANCE 1.4f
+
 // Delay time next attack to prevent client attack animation problems
 #define ATTACK_DISPLAY_DELAY 200
 
@@ -419,9 +422,6 @@ enum NPCFlags
     UNIT_NPC_FLAG_REPAIR                = 0x00004000,       // 100%
     UNIT_NPC_FLAG_OUTDOORPVP            = 0x20000000,       // custom flag for outdoor pvp creatures || Custom flag
 };
-
-// No orientation check for auto attacks below this distance.
-#define AUTO_ATTACK_FACING_LEEWAY 1.4f
 
 enum AutoAttackCheckResult
 {

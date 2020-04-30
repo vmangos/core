@@ -392,7 +392,7 @@ AutoAttackCheckResult Unit::CanAutoAttackTarget(Unit const* pVictim) const
     if (!CanReachWithMeleeAutoAttack(pVictim) || (!IsWithinLOSInMap(pVictim) && !HasUnitState(UNIT_STAT_ALLOW_LOS_ATTACK)))
         return ATTACK_RESULT_NOT_IN_RANGE;
 
-    if (GetDistance2dToCenter(pVictim) > AUTO_ATTACK_FACING_LEEWAY)
+    if (GetDistance2dToCenter(pVictim) > NO_FACING_CHECKS_DISTANCE)
     {
         if (!HasInArc(2 * M_PI_F / 3, pVictim))
             return ATTACK_RESULT_BAD_FACING;

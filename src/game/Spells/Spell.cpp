@@ -6096,7 +6096,10 @@ SpellCastResult Spell::CheckCast(bool strict)
                 {
                     // spell different for friends and enemies
                     // hart version required facing
-                    if (m_targets.getUnitTarget() && !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) && !m_caster->HasInArc(M_PI_F, m_targets.getUnitTarget()))
+                    if (m_targets.getUnitTarget() &&
+                       !m_caster->IsFriendlyTo(m_targets.getUnitTarget()) &&
+                       (m_caster->GetDistance2dToCenter(m_targets.getUnitTarget()) > NO_FACING_CHECKS_DISTANCE) &&
+                       !m_caster->HasInArc(M_PI_F, m_targets.getUnitTarget()))
                         return SPELL_FAILED_UNIT_NOT_INFRONT;
                 }
                 else if (m_spellInfo->Id == 13278)      // Gnomish Death Ray
@@ -7205,7 +7208,8 @@ SpellCastResult Spell::CheckRange(bool strict)
                     return SPELL_CAST_OK;
 
                 // Requires target forward for these spells
-                if (!m_caster->HasInArc(M_PI_F, target))
+                if ((m_caster->GetDistance2dToCenter(target) > NO_FACING_CHECKS_DISTANCE) &&
+                    !m_caster->HasInArc(M_PI_F, target))
                     return SPELL_FAILED_UNIT_NOT_INFRONT;
 
                 float range_mod = 1.0f;
@@ -7259,7 +7263,9 @@ SpellCastResult Spell::CheckRange(bool strict)
         if (min_range && dist < min_range)
             return SPELL_FAILED_TOO_CLOSE;
         if (m_caster->IsPlayer() &&
-                (m_spellInfo->Custom & SPELL_CUSTOM_FACE_TARGET) && !m_caster->HasInArc(M_PI_F, target))
+           (m_spellInfo->Custom & SPELL_CUSTOM_FACE_TARGET) &&
+           (m_caster->GetDistance2dToCenter(target) > NO_FACING_CHECKS_DISTANCE) &&
+           !m_caster->HasInArc(M_PI_F, target))
             return SPELL_FAILED_UNIT_NOT_INFRONT;
     }
 
