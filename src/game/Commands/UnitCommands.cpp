@@ -272,6 +272,7 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("Target: %s", pTarget->GetTargetGuid().GetString().c_str());
     PSendSysMessage("Persuaded: %s", pTarget->GetGuidValue(UNIT_FIELD_PERSUADED).GetString().c_str());
     PSendSysMessage("Channel object: %s", pTarget->GetChannelObjectGuid().GetString().c_str());
+    PSendSysMessage("Scale: %g", pTarget->GetFloatValue(OBJECT_FIELD_SCALE_X));
     PSendSysMessage("Level: %u", pTarget->GetLevel());
     if (auto pFactionTemplate = pTarget->getFactionTemplateEntry())
     {
@@ -306,6 +307,8 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("NPC emote state: %u", pTarget->GetUInt32Value(UNIT_NPC_EMOTESTATE));
     PSendSysMessage("Unit state flags: %u", pTarget->GetUnitState());
     PSendSysMessage("Death state: %hhu", pTarget->GetDeathState());
+    PSendSysMessage("Sheath state: %hhu", pTarget->GetSheath());
+    PSendSysMessage("Byte flags 2: %hhu", pTarget->GetByteValue(UNIT_FIELD_BYTES_2, 1));
 
     return true;
 }
