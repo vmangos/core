@@ -688,6 +688,11 @@ class SpellEntry
             return Custom & SPELL_CUSTOM_SINGLE_TARGET_AURA;
         }
 
+        inline bool IsAuraRemovedOnEvade() const
+        {
+            return !(Custom & SPELL_CUSTOM_NOT_REMOVED_ON_EVADE);
+        }
+
         inline bool IsSpellWithCasterSourceTargetsOnly() const
         {
             return Internal & SPELL_INTERNAL_CASTER_SOURCE_TARGETS;
