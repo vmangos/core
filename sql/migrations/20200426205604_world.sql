@@ -21,6 +21,11 @@ UPDATE `npc_text` SET `BroadcastTextID0` = 7851 WHERE `ID` = 4732;
 -- remove quest the reason for the season (7062) from courier hammerfall (10877)
 DELETE FROM `creature_questrelation` WHERE `quest` = 7062 AND `id` = 10877;
 
+-- add light leather bracers and embossed leather pants to Gretta Finespindle
+INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
+(1466, 9066, 450, 165, 70, 0, 0, 5875),
+(1466, 3786, 500, 165, 75, 0, 0, 5875);
+
 
 -- End of migration.
 END IF;
