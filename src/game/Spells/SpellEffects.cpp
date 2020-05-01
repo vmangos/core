@@ -4698,6 +4698,17 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 case 24590:                                 // Brittle Armor - need remove one 24575 Brittle Armor aura
                     unitTarget->RemoveAuraHolderFromStack(24575);
                     return;
+                case 24693:                                 // Hakkar Power Down - cast by priests on death
+                {
+                    if (!m_casterUnit)
+                        return;
+
+                    if (Map* pMap = m_casterUnit->GetMap())
+                        if (InstanceData* pInstance = pMap->GetInstanceData())
+                            pInstance->SetData(0, 0);
+
+                    return;
+                }
                 case 24714:                                 // Trick
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)

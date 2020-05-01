@@ -9,6 +9,9 @@ enum
 {
     ZULGURUB_MAX_ENCOUNTER  = 13,
 
+    SPELL_HAKKAR_POWER      = 24692,
+    SPELL_HAKKAR_POWER_DOWN = 24693,
+
     NPC_LORKHAN             = 11347,
     NPC_ZATH                = 11348,
     NPC_THEKAL              = 14599,
@@ -23,7 +26,8 @@ enum
     NPC_RAZZASHI_BROODWIDOW = 11370,
     NPC_GAHZRANKA           = 15114,
     NPC_JEKLIK              = 14517,
-
+    
+    TYPE_HAKKAR_POWER       = 0, // set data triggered by spell 24693
     TYPE_ARLOKK             = 1,
     TYPE_JEKLIK             = 2,
     TYPE_VENOXIS            = 3,
@@ -65,7 +69,7 @@ class instance_zulgurub : public ScriptedInstance
         uint64 GetData64(uint32 uiData) override;
 
         // each time High Priest dies lower Hakkar's HP
-        void LowerHakkarHitPoints();
+        void UpdateHakkarPowerStacks();
         Unit* Thekal_GetUnitThatCanRez();
         uint32 GenerateRandomBoss();
         void SpawnRandomBoss();

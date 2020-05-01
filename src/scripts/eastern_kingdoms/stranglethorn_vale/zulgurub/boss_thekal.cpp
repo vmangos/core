@@ -326,6 +326,9 @@ struct boss_thekalAI : public zg_rez_add
                 m_pInstance->SetData(TYPE_THEKAL, DONE);
             }
 
+            // Remove a Hakkar Power stack.
+            m_creature->CastSpell(m_creature, SPELL_HAKKAR_POWER_DOWN, true);
+
             ScriptedAI::JustDied(Killer);
         }
         else

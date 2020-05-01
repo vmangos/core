@@ -162,6 +162,9 @@ struct boss_venoxisAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VENOXIS, DONE);
+
+        // Remove a Hakkar Power stack.
+        m_creature->CastSpell(m_creature, SPELL_HAKKAR_POWER_DOWN, true);
     }
 
     void UpdateAI(uint32 const uiDiff) override
