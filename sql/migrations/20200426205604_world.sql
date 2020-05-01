@@ -26,6 +26,9 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (1466, 9066, 450, 165, 70, 0, 0, 5875),
 (1466, 3786, 500, 165, 75, 0, 0, 5875);
 
+-- remove incorrect recipes from vosur brakthel
+DELETE FROM `npc_trainer` WHERE `entry` = 1246 AND `spell` NOT IN (2275,3184, 2339, 2340, 11536, 2341);
+
 
 -- End of migration.
 END IF;
