@@ -18,6 +18,9 @@ UPDATE `gameobject` SET `position_z` = -4.3 WHERE `guid` IN (20738, 20739, 20740
 -- update correct greeting for springspindle fizzlegear
 UPDATE `npc_text` SET `BroadcastTextID0` = 7851 WHERE `ID` = 4732;
 
+-- remove quest the reason for the season (7062) from courier hammerfall (10877)
+DELETE FROM `creature_questrelation` WHERE `quest` = 7062 AND `id` = 10877;
+
 
 -- End of migration.
 END IF;
