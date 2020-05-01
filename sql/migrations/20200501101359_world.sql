@@ -31,7 +31,7 @@ UPDATE `creature_template` SET `dmg_min`=1533, `dmg_max`=2030, `armor`=3795 WHER
 UPDATE `creature_template` SET `mana_min`=13100, `mana_max`=13100 WHERE `entry`=14515;
 
 -- Hakkar
-UPDATE `creature_template` SET `dmg_min`=4089, `dmg_max`=5413, `armor`=3795 WHERE `entry`=14834;
+UPDATE `creature_template` SET `dmg_min`=2044.5, `dmg_max`=2706.5, `armor`=3795 WHERE `entry`=14834;
 UPDATE `creature_template` SET `health_min`=719550, `health_max`=719550 WHERE `entry`=14834;
 
 -- Bloodlord Mandokir
