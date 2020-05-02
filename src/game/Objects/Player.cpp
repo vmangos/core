@@ -4708,19 +4708,21 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
     //Characters from level 11-19 will suffer from one minute of sickness
     //for each level they are above 10.
     //Characters level 20 and up suffer from ten minutes of sickness.
-    int32 startLevel = sWorld.getConfig(CONFIG_INT32_DEATH_SICKNESS_LEVEL);
+    int32 const startLevel = sWorld.getConfig(CONFIG_INT32_DEATH_SICKNESS_LEVEL);
+    ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(GetRace());
+    uint32 const spellId = raceEntry ? raceEntry->resSicknessSpellId : SPELL_ID_PASSIVE_RESURRECTION_SICKNESS;
 
     if (int32(GetLevel()) >= startLevel)
     {
         // set resurrection sickness
-        CastSpell(this, SPELL_ID_PASSIVE_RESURRECTION_SICKNESS, true);
+        CastSpell(this, spellId, true);
 
         // not full duration
         if (int32(GetLevel()) < startLevel + 9)
         {
             int32 delta = (int32(GetLevel()) - startLevel + 1) * MINUTE;
 
-            if (SpellAuraHolder* holder = GetSpellAuraHolder(SPELL_ID_PASSIVE_RESURRECTION_SICKNESS))
+            if (SpellAuraHolder* holder = GetSpellAuraHolder(spellId))
             {
                 holder->SetAuraDuration(delta * IN_MILLISECONDS);
                 holder->UpdateAuraDuration();

@@ -31,7 +31,7 @@ char const ChrClassesEntryfmt[]="nxxixssssssssxxix";
 #else
 char const ChrClassesEntryfmt[] = "nxxixssssssssxxi";
 #endif
-char const ChrRacesEntryfmt[]="niixiixxixxxxxixissssssssxxxx";
+char const ChrRacesEntryfmt[]="niixiixxiixxixixissssssssxxxx";
 char const ChatChannelsEntryfmt[]="nixssssssssxxxxxxxxxx";                 // ChatChannelsEntryfmt, index not used (more compact store)
 char const CinematicSequencesEntryfmt[]="nxxxxxxxxx";
 char const CreatureDisplayInfofmt[]="nixifxxxxxxx";

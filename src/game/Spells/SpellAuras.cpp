@@ -1850,7 +1850,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         {
                             if (casterPlayer->IsAlive() && !casterPlayer->IsInCombat() && !casterPlayer->IsTaxiFlying())
                             {
-                                casterPlayer->AddAura(15007); // Add Resurrection Sickness
+                                casterPlayer->AddAura(SPELL_ID_PASSIVE_RESURRECTION_SICKNESS); // Add Resurrection Sickness
                                 if (sObjectMgr.GetClosestGraveYard(casterPlayer->GetPositionX(), casterPlayer->GetPositionY(), casterPlayer->GetPositionZ(), casterPlayer->GetMapId(), casterPlayer->GetTeam()))
                                     casterPlayer->DealDamage(casterPlayer, casterPlayer->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
                                 else

@@ -1084,7 +1084,7 @@ bool ChatHandler::HandleUnstuckCommand(char* /*args*/)
     }
     else
     {
-        pPlayer->AddAura(15007); // Add Resurrection Sickness
+        pPlayer->AddAura(SPELL_ID_PASSIVE_RESURRECTION_SICKNESS); // Add Resurrection Sickness
         pPlayer->AddSpellCooldown(20939, 0, time(nullptr) + 3600000); // Trigger 1 Hour Cooldown
         // Get nearest graveyard.
         WorldSafeLocsEntry const* ClosestGrave = sObjectMgr.GetClosestGraveYard(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetMapId(), pPlayer->GetTeam());

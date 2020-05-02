@@ -284,6 +284,7 @@ bool ChatHandler::HandleUnitInfoCommand(char* args)
     PSendSysMessage("Race: %hhu", pTarget->GetRace());
     PSendSysMessage("Class: %hhu", pTarget->GetClass());
     PSendSysMessage("Gender: %hhu", pTarget->GetGender());
+    PSendSysMessage("Creature type: %u", pTarget->GetCreatureType());
     PSendSysMessage("Unit flags: %u", pTarget->GetUInt32Value(UNIT_FIELD_FLAGS));
     PSendSysMessage("Aura state: %u", pTarget->GetUInt32Value(UNIT_FIELD_AURASTATE));
     PSendSysMessage("Bounding radius: %f", pTarget->GetObjectBoundingRadius());
