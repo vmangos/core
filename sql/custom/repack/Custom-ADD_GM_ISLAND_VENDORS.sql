@@ -32,8 +32,9 @@ INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`,
 (90027, 0, 7209, 0, 0, 0, 'Enchants 1', '', 0, 60, 60, 1337, 1337, 0, 0, 3252, 35, 16388, 1, 1.14286, 1, 20, 5, 0, 1, 1, 42, 53, 0, 122, 1, 2000, 2000, 1, 2, 0, 0, 0, 0, 0, 0, 45.144, 62.073, 100, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 3, 0, 0, 3, 0, 0, 0, 0, 0, 64, ''),
 (90028, 0, 7209, 0, 0, 0, 'Enchants 2', '', 0, 50, 50, 4000, 5000, 200, 300, 200, 35, 1, 1, 1.14286, 1, 20, 5, 0, 1, 1, 687, 967, 0, 226, 1, 1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 2, 'custom_enchant_npc'),
 (90029, 0, 7209, 0, 0, 0, 'Professions', '', 0, 50, 50, 4000, 5000, 200, 300, 200, 35, 1, 1, 1.14286, 1, 20, 5, 0, 1, 1, 687, 967, 0, 226, 1, 1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 2, 'custom_professions_npc'),
-(90030, 0, 7217, 0, 0, 0, 'Premade Gear', '', 0, 50, 50, 4000, 5000, 200, 300, 200, 35, 1, 1, 1.14286, 1, 20, 5, 0, 1, 1, 687, 967, 0, 226, 1, 1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 2, 'custom_premade_gear_npc'),
-(90031, 0, 7217, 0, 0, 0, 'Premade Specs', '', 0, 50, 50, 4000, 5000, 200, 300, 200, 35, 1, 1, 1.14286, 1, 20, 5, 0, 1, 1, 687, 967, 0, 226, 1, 1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 2, 'custom_premade_spec_npc');
+(90030, 0, 104, 0, 0, 0, 'Premade Gear', '', 0, 50, 50, 4000, 5000, 200, 300, 200, 35, 1, 1, 1.14286, 1, 20, 5, 0, 1, 1, 687, 967, 0, 226, 1, 1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 2, 'custom_premade_gear_npc'),
+(90031, 0, 18, 0, 0, 0, 'Premade Specs', '', 0, 50, 50, 4000, 5000, 200, 300, 200, 35, 1, 1, 1.14286, 1, 20, 5, 0, 1, 1, 687, 967, 0, 226, 1, 1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 2, 'custom_premade_spec_npc'),
+(90032, 0, 108, 0, 0, 0, 'World Buffs', 'Player Test Realm', 13500, 50, 50, 4000, 5000, 200, 300, 200, 35, 1, 1, 1.14286, 1.5, 20, 5, 0, 1, 1, 687, 967, 0, 226, 1, 1000, 1000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 200, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 0, 1, 0, 0, 3, 0, 0, 0, 0, 0, 2, '');
 -- NPC_TRAINER
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`) VALUES (90000, 499, 0, 0, 0, 20);
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`) VALUES (90000, 1151, 0, 0, 0, 26);
@@ -2286,7 +2287,8 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `position_x`, `position_y`, `positi
 (2000029, 90028, 1, 16264.3, 16287.8, 14.1814, 5.77999, 120, 120, 0, 100, 100, 0),
 (2000030, 90029, 1, 16265.5, 16289.7, 14.3128, 5.94021, 120, 120, 0, 100, 100, 0),
 (2000031, 90030, 1, 16281.7, 16296.9, 12.8599, 2.36683, 120, 120, 0, 100, 100, 0),
-(2000032, 90031, 1, 16283.5, 16297.3, 12.7021, 1.94665, 120, 120, 0, 100, 100, 0);
+(2000032, 90031, 1, 16283.5, 16297.3, 12.7021, 1.94665, 120, 120, 0, 100, 100, 0),
+(2000033, 90032, 1, 16228.8, 16283, 13.1756, 3.04135, 120, 120, 0, 100, 100, 0);
 -- NPC_TEXT
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES (90000, 99990, 1);
 INSERT INTO `broadcast_text` (`entry`, `male_text`, `female_text`) VALUES (99990, 'Greetings $N. Enjoying the vendors?\r\n\r\nVisit my channel for more fun stuff:\r\nwww.youtube.com/brotalnia', 'Greetings $N. Enjoying the vendors?\r\n\r\nVisit my channel for more fun stuff:\r\nwww.youtube.com/brotalnia');
@@ -2298,6 +2300,22 @@ INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES (90003,
 INSERT INTO `broadcast_text` (`entry`, `male_text`, `female_text`) VALUES (99993, 'Select the premade gear template you want to equip.', 'Select premade gear template you want to equip.');
 INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES (90004, 99994, 1);
 INSERT INTO `broadcast_text` (`entry`, `male_text`, `female_text`) VALUES (99994, 'Select the premade spec template you want to apply.', 'Select premade spec template you want to apply.');
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES (90005, 99995, 1);
+INSERT INTO `broadcast_text` (`entry`, `male_text`, `female_text`) VALUES (99995, 'You\'re a wizard, $n!', 'You\'re a wizard, $n!');
+-- GOSSIP_MENU
+INSERT INTO `gossip_menu` VALUES (13500, 90005, 0);
+-- GOSSIP_MENU_OPTION
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `condition_id`) VALUES (13500, 0, 0, 'I\'m a what?', 1, 1, -1, 0, 13500, 0, 0, NULL, 0);
+-- GOSSIP_SCRIPTS
+DELETE FROM `gossip_scripts` WHERE `id`=13500;
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (13500, 0, 74, 24425, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'World Buffs - Add Aura Spirit of Zandalar');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (13500, 0, 74, 22888, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'World Buffs - Add Aura Rallying Cry of the Dragonslayer');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (13500, 0, 74, 15366, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'World Buffs - Add Aura Songflower Serenade');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (13500, 0, 74, 16609, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'World Buffs - Add Aura Warchief\'s Blessing');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (13500, 0, 74, 22818, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'World Buffs - Add Aura Mol\'dar\'s Moxie');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (13500, 0, 74, 22817, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'World Buffs - Add Aura Fengus\' Ferocity');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (13500, 0, 74, 22820, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'World Buffs - Add Aura Slip\'kik\'s Savvy');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (13500, 0, 16, 7594, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'World Buffs - Play Sound');
 -- NPC_GOSSIP
 INSERT INTO `npc_gossip` (`npc_guid`, `textid`) VALUES (2000000, 90000);
 INSERT INTO `npc_gossip` (`npc_guid`, `textid`) VALUES (2000001, 90000);
