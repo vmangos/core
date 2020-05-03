@@ -15,8 +15,15 @@ DELETE FROM `gameobject` WHERE `guid` IN (4771, 5051);
 -- add correct position for objects inside deeprun tram.
 UPDATE `gameobject` SET `position_z` = -4.3 WHERE `guid` IN (20738, 20739, 20740);
 
--- update correct greeting for springspindle fizzlegear
-UPDATE `npc_text` SET `BroadcastTextID0` = 7851 WHERE `ID` = 4732;
+-- add correct gossip for springspindle fizzlegear
+DELETE FROM `gossip_menu` WHERE `entry`=9362;
+DELETE FROM `gossip_menu_option` WHERE `menu_id`=9362;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (392, 7, 202, 125, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (393, 7, 202, 200, 0, 0, 0);
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (4150, 5168, 393);
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (4150, 5171, 392);
+INSERT INTO `gossip_menu` (`entry`, `text_id`, `condition_id`) VALUES (4150, 5170, 44);
+UPDATE `creature_template` SET `gossip_menu_id`=4150 WHERE `entry`=5174;
 
 -- remove quest the reason for the season (7062) from courier hammerfall (10877)
 DELETE FROM `creature_questrelation` WHERE `quest` = 7062 AND `id` = 10877;
