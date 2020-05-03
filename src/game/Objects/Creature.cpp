@@ -3502,7 +3502,8 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, SpellEntry const* pSpellInfo,
                 return SPELL_FAILED_UNKNOWN;
 
             // No point in casting if target is immune.
-            if (pTarget->IsImmuneToDamage(pSpellInfo->GetSpellSchoolMask(), pSpellInfo))
+            if (!pSpellInfo->IsPositiveSpell() &&
+                pTarget->IsImmuneToDamage(pSpellInfo->GetSpellSchoolMask(), pSpellInfo))
                 return SPELL_FAILED_IMMUNE;
         }
 
