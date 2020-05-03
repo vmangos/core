@@ -142,8 +142,10 @@ struct ClientWardenModule
 };
 
 class WorldSession;
+struct WardenCheck;
+struct WardenModule;
 
-class Warden : public WardenInterface
+class Warden
 {
     public:
         Warden();
@@ -156,16 +158,16 @@ class Warden : public WardenInterface
         virtual void HandleHashResult(ByteBuffer &buff) = 0;
         virtual void RequestData();
         virtual void HandleData(ByteBuffer &buff);
-        virtual void HandleWardenDataOpcode(WorldPacket & recv_data) override;
+        virtual void HandleWardenDataOpcode(WorldPacket & recv_data);
 
         void SendModuleToClient();
         void RequestModule();
-        void Update() override;
+        void Update();
         void DecryptData(uint8* buffer, uint32 length);
         void EncryptData(uint8* buffer, uint32 length);
 
         void SetNewState(WardenState::Value state);
-        WorldSession* GetSession() override { return m_session; }
+        WorldSession* GetSession() { return m_session; }
 
         static bool IsValidCheckSum(uint32 checksum, const uint8 *data, const uint16 length);
         static uint32 BuildChecksum(const uint8 *data, uint32 length);

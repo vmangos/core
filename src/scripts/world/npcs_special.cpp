@@ -29,7 +29,6 @@ EndScriptData
 
 /* ContentData
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
-npc_guardian            100%    guardianAI used to prevent players from accessing off-limits areas. Not in use by SD2
 npc_garments_of_quests  80%     NPC's related to all Garments of-quests 5621, 5624, 5625, 5648, 5650
 npc_injured_patient     100%    patients for triage-quests (6622 and 6624)
 npc_doctor              100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
@@ -813,42 +812,6 @@ struct npc_garments_of_questsAI : public npc_escortAI
 CreatureAI* GetAI_npc_garments_of_quests(Creature* pCreature)
 {
     return new npc_garments_of_questsAI(pCreature);
-}
-
-/*######
-## npc_guardian
-######*/
-
-#define SPELL_DEATHTOUCH                5
-
-struct npc_guardianAI : public ScriptedAI
-{
-    npc_guardianAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        if (m_creature->IsAttackReady())
-        {
-            m_creature->CastSpell(m_creature->GetVictim(), SPELL_DEATHTOUCH, true);
-            m_creature->ResetAttackTimer();
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_guardian(Creature* pCreature)
-{
-    return new npc_guardianAI(pCreature);
 }
 
 /*######
@@ -2750,11 +2713,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_garments_of_quests";
     newscript->GetAI = &GetAI_npc_garments_of_quests;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_guardian";
-    newscript->GetAI = &GetAI_npc_guardian;
     newscript->RegisterSelf();
 
     newscript = new Script;

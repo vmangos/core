@@ -800,7 +800,7 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
 
     uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
 
-    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, itemId, maxcount, incrtime, m_session->GetPlayer()))
+    if (!sObjectMgr.IsVendorItemValid(false, "npc_vendor", vendor_entry, itemId, maxcount, incrtime, 0, m_session->GetPlayer()))
     {
         SetSentErrorMessage(true);
         return false;
@@ -958,11 +958,11 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
     if (!type_str)
         return false;
 
-    if (strncmp(type_str, "stay", strlen(type_str)) == 0)
+    if (strncmp(type_str, "idle", strlen(type_str)) == 0)
         move_type = IDLE_MOTION_TYPE;
     else if (strncmp(type_str, "random", strlen(type_str)) == 0)
         move_type = RANDOM_MOTION_TYPE;
-    else if (strncmp(type_str, "way", strlen(type_str)) == 0)
+    else if (strncmp(type_str, "waypoint", strlen(type_str)) == 0)
         move_type = WAYPOINT_MOTION_TYPE;
     else
         return false;

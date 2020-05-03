@@ -35,8 +35,28 @@
 #include "PlayerDump.h"
 #include "CharacterDatabaseCache.h"
 #include "Config/Config.h"
+#include "PlayerAI.h"
 
 #include <regex>
+
+bool ChatHandler::HandleCharacterAIInfoCommand(char* /*args*/)
+{
+    Player* pTarget = GetSelectedPlayer();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("AI info for %s", pTarget->GetObjectGuid().GetString().c_str());
+    char const* cstrAIClass = pTarget->AI() ? typeid(*pTarget->AI()).name() : " - ";
+    PSendSysMessage("Current AI: %s", cstrAIClass);
+    PSendSysMessage(LANG_NPC_MOTION_TYPE, pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType());
+
+    return true;
+}
 
 bool ChatHandler::HandleModifyXpRateCommand(char* args)
 {
@@ -1892,7 +1912,59 @@ bool ChatHandler::HandleCharacterPremadeGearCommand(char* args)
 
     sObjectMgr.ApplyPremadeGearTemplateToPlayer(entry, pPlayer);
 
-    PSendSysMessage("Premade template %u applied to player %s.", entry, pPlayer->GetName());
+    PSendSysMessage("Premade gear template %u applied to player %s.", entry, pPlayer->GetName());
+    return true;
+}
+
+static std::string EscapeString(std::string unescapedString)
+{
+    char* escapedString = new char[unescapedString.length() * 2 + 1];
+    mysql_escape_string(escapedString, unescapedString.c_str(), unescapedString.length());
+    std::string returnString = escapedString;
+    delete[] escapedString;
+    return returnString;
+}
+
+bool ChatHandler::HandleCharacterPremadeSaveGearCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+
+    if (!*args)
+    {
+        SendSysMessage("Incorrect syntax. Template name expected.");
+        return false;
+    }
+
+    std::string templateName = args;
+    if (templateName.find(" ") != std::string::npos)
+    {
+        SendSysMessage("Template name cannot contain spaces.");
+        return false;
+    }
+
+    uint32 entry = 0;
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`entry`) FROM `player_premade_item_template`"));
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        entry = fields[0].GetUInt32() + 1;
+    }
+
+    templateName = EscapeString(templateName);
+    if (!WorldDatabase.PExecute("INSERT INTO `player_premade_item_template` (`entry`, `class`, `level`, `name`) VALUES (%u, %u, %u, '%s')", entry, pPlayer->GetClass(), pPlayer->GetLevel(), templateName.c_str()))
+        return false;
+
+    for (int i = EQUIPMENT_SLOT_START; i < EQUIPMENT_SLOT_END; ++i)
+    {
+        if (Item* pItem = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+        {
+            WorldDatabase.DirectPExecute("INSERT INTO `player_premade_item` (`entry`, `item`, `enchant`) VALUES (%u, %u, %u)", entry, pItem->GetEntry(), pItem->GetEnchantmentId(PERM_ENCHANTMENT_SLOT));
+        }
+    }
+
+    sObjectMgr.LoadPlayerPremadeTemplates();
+
+    PSendSysMessage("Premade gear template %u saved to database.", entry);
     return true;
 }
 
@@ -1941,7 +2013,65 @@ bool ChatHandler::HandleCharacterPremadeSpecCommand(char* args)
 
     sObjectMgr.ApplyPremadeSpecTemplateToPlayer(entry, pPlayer);
 
-    PSendSysMessage("Premade template %u applied to player %s.", entry, pPlayer->GetName());
+    PSendSysMessage("Premade spec template %u applied to player %s.", entry, pPlayer->GetName());
+    return true;
+}
+
+bool ChatHandler::HandleCharacterPremadeSaveSpecCommand(char* args)
+{
+    Player* pPlayer = m_session->GetPlayer();
+
+    if (!*args)
+    {
+        SendSysMessage("Incorrect syntax. Template name expected.");
+        return false;
+    }
+
+    std::string templateName = args;
+    if (templateName.find(" ") != std::string::npos)
+    {
+        SendSysMessage("Template name cannot contain spaces.");
+        return false;
+    }
+
+    uint32 entry = 0;
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`entry`) FROM `player_premade_spell_template`"));
+    if (result)
+    {
+        Field* fields = result->Fetch();
+        entry = fields[0].GetUInt32() + 1;
+    }
+
+    templateName = EscapeString(templateName);
+    if (!WorldDatabase.PExecute("INSERT INTO `player_premade_spell_template` (`entry`, `class`, `level`, `name`) VALUES (%u, %u, %u, '%s')", entry, pPlayer->GetClass(), pPlayer->GetLevel(), templateName.c_str()))
+        return false;
+
+    PlayerInfo const* pInfo = sObjectMgr.GetPlayerInfo(pPlayer->GetRace(), pPlayer->GetClass());
+    if (!pInfo)
+        return false;
+
+    result.reset(CharacterDatabase.PQuery("SELECT DISTINCT `spell` FROM `character_spell` WHERE `disabled`=0 && `active`=1 && `guid`=%u", pPlayer->GetGUIDLow()));
+
+    if (result)
+    {
+        do
+        {
+            Field* fields = result->Fetch();
+            uint32 spellId = fields[0].GetUInt32();
+            
+            if (!sSpellMgr.GetSpellEntry(spellId))
+                continue;
+
+            if (std::find(pInfo->spell.begin(), pInfo->spell.end(), spellId) != pInfo->spell.end())
+                continue;
+
+            WorldDatabase.DirectPExecute("INSERT INTO `player_premade_spell` (`entry`, `spell`) VALUES (%u, %u)", entry, spellId);
+        } while (result->NextRow());
+    }
+
+    sObjectMgr.LoadPlayerPremadeTemplates();
+
+    PSendSysMessage("Premade spec template %u saved to database.", entry);
     return true;
 }
 
@@ -2299,46 +2429,46 @@ bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
     return true;
 }
 
+static uint32 gmSpellList[] =
+{
+    5,      // Death Touch
+    265,    // Area Death (TEST)
+    30879,  // Permanent Area Damage 50k
+    7482,   // dmg
+    8295,   // dmg2
+    10073,  // dmg3
+    11821,  // dmg4
+    18389,  // dmg5
+    18390,  // dmg6
+    19901,  // dmg7
+    27254,  // dmg8
+    27255,  // dmg9
+    27258,  // dmg10
+    27261,  // dmg11
+    25059,  // Dmg Shield
+    26666,  // Dmg Shield2
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    456,    // SHOWLABEL Only OFF
+    2765,   // SHOWLABEL Only ON
+    1509,   // GM Only OFF
+    18139,  // GM Only ON
+    6147,   // INVIS Only OFF
+    2763,   // INVIS Only ON
+    20114,  // BM Only OFF
+    20115,  // BM Only ON
+#endif
+    24341,  // Revive
+    29313,  // CooldownAll
+    1302,   // Damage Immunity Test
+    9454,   // Freeze
+    31366,  // Root Anybody Forever
+    1908,   // Uber Heal Over Time
+    8358,   // Mana Spike
+    23965,  // Instant Heal
+};
+
 bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
 {
-    static uint32 gmSpellList[] =
-    {
-        5,      // Death Touch
-        265,    // Area Death (TEST)
-        30879,  // Permanent Area Damage 50k
-        7482,   // dmg
-        8295,   // dmg2
-        10073,  // dmg3
-        11821,  // dmg4
-        18389,  // dmg5
-        18390,  // dmg6
-        19901,  // dmg7
-        27254,  // dmg8
-        27255,  // dmg9
-        27258,  // dmg10
-        27261,  // dmg11
-        25059,  // Dmg Shield
-        26666,  // Dmg Shield2
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        456,    // SHOWLABEL Only OFF
-        2765,   // SHOWLABEL Only ON
-        1509,   // GM Only OFF
-        18139,  // GM Only ON
-        6147,   // INVIS Only OFF
-        2763,   // INVIS Only ON
-        20114,  // BM Only OFF
-        20115,  // BM Only ON
-#endif
-        24341,  // Revive
-        29313,  // CooldownAll
-        1302,   // Damage Immunity Test
-        9454,   // Freeze
-        31366,  // Root Anybody Forever
-        1908,   // Uber Heal Over Time
-        8358,   // Mana Spike
-        23965,  // Instant Heal
-    };
-
     for (uint32 spell : gmSpellList)
     {
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spell);
@@ -2352,6 +2482,17 @@ bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
     }
 
     SendSysMessage(LANG_LEARNING_GM_SKILLS);
+    return true;
+}
+
+bool ChatHandler::HandleUnLearnAllGMCommand(char* /*args*/)
+{
+    for (uint32 spell : gmSpellList)
+    {
+        m_session->GetPlayer()->RemoveSpell(spell, false, false);
+    }
+
+    SendSysMessage("You have forgotten all gm spells.");
     return true;
 }
 
@@ -2537,6 +2678,22 @@ void ChatHandler::HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id)
     }
 }
 
+void ChatHandler::HandleUnLearnSkillRecipesHelper(Player* player, uint32 skill_id)
+{
+    for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
+    {
+        SkillLineAbilityEntry const* skillLine = sObjectMgr.GetSkillLineAbility(j);
+        if (!skillLine)
+            continue;
+
+        // wrong skill
+        if (skillLine->skillId != skill_id)
+            continue;
+
+        player->RemoveSpell(skillLine->spellId, false, false);
+    }
+}
+
 bool ChatHandler::HandleLearnAllCraftsCommand(char* /*args*/)
 {
     for (uint32 i = 0; i < sSkillLineStore.GetNumRows(); ++i)
@@ -2553,30 +2710,37 @@ bool ChatHandler::HandleLearnAllCraftsCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
+bool ChatHandler::HandleUnLearnAllCraftsCommand(char* /*args*/)
 {
-    //  Learns all recipes of specified profession and sets skill to max
-    //  Example: .learn all_recipes enchanting
-
-    Player* target = GetSelectedPlayer();
-    if (!target)
+    for (uint32 i = 0; i < sSkillLineStore.GetNumRows(); ++i)
     {
-        SendSysMessage(LANG_PLAYER_NOT_FOUND);
-        return false;
+        SkillLineEntry const* skillInfo = sSkillLineStore.LookupEntry(i);
+        if (!skillInfo)
+            continue;
+
+        if (skillInfo->categoryId == SKILL_CATEGORY_PROFESSION || skillInfo->categoryId == SKILL_CATEGORY_SECONDARY)
+            HandleUnLearnSkillRecipesHelper(m_session->GetPlayer(), skillInfo->id);
     }
 
+    // Some of these are removed for some reason.
+    m_session->GetPlayer()->LearnDefaultSpells();
+
+    SendSysMessage("You have forgotten all crafts.");
+    return true;
+}
+
+SkillLineEntry const* ChatHandler::FindSkillLineEntryFromProfessionName(char* args, std::string& nameOut)
+{
     if (!*args)
-        return false;
+        return nullptr;
 
     std::wstring wnamepart;
 
     if (!Utf8toWStr(args, wnamepart))
-        return false;
+        return nullptr;
 
     // converting string that we try to find to lower case
     wstrToLower(wnamepart);
-
-    std::string name;
 
     SkillLineEntry const* targetSkillInfo = nullptr;
     for (uint32 i = 1; i < sSkillLineStore.GetNumRows(); ++i)
@@ -2589,11 +2753,11 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
             continue;
 
         int loc = GetSessionDbcLocale();
-        name = skillInfo->name[loc];
-        if (name.empty())
+        nameOut = skillInfo->name[loc];
+        if (nameOut.empty())
             continue;
 
-        if (!Utf8FitTo(name, wnamepart))
+        if (!Utf8FitTo(nameOut, wnamepart))
         {
             loc = 0;
             for (; loc < MAX_DBC_LOCALE; ++loc)
@@ -2601,11 +2765,11 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
                 if (loc == GetSessionDbcLocale())
                     continue;
 
-                name = skillInfo->name[loc];
-                if (name.empty())
+                nameOut = skillInfo->name[loc];
+                if (nameOut.empty())
                     continue;
 
-                if (Utf8FitTo(name, wnamepart))
+                if (Utf8FitTo(nameOut, wnamepart))
                     break;
             }
         }
@@ -2617,6 +2781,23 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
         }
     }
 
+    return targetSkillInfo;
+}
+
+bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
+{
+    //  Learns all recipes of specified profession and sets skill to max
+    //  Example: .learn all_recipes enchanting
+
+    Player* target = GetSelectedPlayer();
+    if (!target)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        return false;
+    }
+
+    std::string name;
+    SkillLineEntry const* targetSkillInfo = FindSkillLineEntryFromProfessionName(args, name);
     if (!targetSkillInfo)
         return false;
 
@@ -2625,6 +2806,29 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
     uint16 maxLevel = target->GetSkillMaxPure(targetSkillInfo->id);
     target->SetSkill(targetSkillInfo->id, maxLevel, maxLevel);
     PSendSysMessage(LANG_COMMAND_LEARN_ALL_RECIPES, name.c_str());
+    return true;
+}
+
+bool ChatHandler::HandleUnLearnAllRecipesCommand(char* args)
+{
+    //  Unlearns all recipes of specified profession
+    //  Example: .unlearn all_recipes enchanting
+
+    Player* target = GetSelectedPlayer();
+    if (!target)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        return false;
+    }
+
+    std::string name;
+    SkillLineEntry const* targetSkillInfo = FindSkillLineEntryFromProfessionName(args, name);
+    if (!targetSkillInfo)
+        return false;
+
+    HandleUnLearnSkillRecipesHelper(target, targetSkillInfo->id);
+
+    PSendSysMessage("%s has forgotten all %s recipes.", target->GetName(), name.c_str());
     return true;
 }
 
@@ -4815,6 +5019,25 @@ bool ChatHandler::HandlePetLoyaltyCommand(char* args)
 
     pet->ModifyLoyalty(loyaltyPoints);
     
+    return true;
+}
+
+bool ChatHandler::HandlePetInfoCommand(char* args)
+{
+    Pet* pPet = GetSelectedPet();
+    if (!pPet)
+        return false;
+
+    PSendSysMessage("Info for %s", pPet->GetObjectGuid().GetString().c_str());
+    PSendSysMessage("Owner: %s", pPet->GetOwnerGuid().GetString().c_str());
+    PSendSysMessage("Pet type: %u", pPet->getPetType());
+    PSendSysMessage("Loyalty level: %hhu", pPet->GetByteValue(UNIT_FIELD_BYTES_1, 1));
+    PSendSysMessage("Pet number: %u", pPet->GetUInt32Value(UNIT_FIELD_PETNUMBER));
+    PSendSysMessage("Pet name timestamp: %u", pPet->GetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP));
+    PSendSysMessage("Pet experience: %u", pPet->GetUInt32Value(UNIT_FIELD_PETEXPERIENCE));
+    PSendSysMessage("Pet next level xp: %u", pPet->GetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP));
+    PSendSysMessage("Training points: %u", pPet->GetUInt32Value(UNIT_TRAINING_POINTS));
+
     return true;
 }
 

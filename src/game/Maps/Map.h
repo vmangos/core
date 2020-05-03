@@ -324,7 +324,7 @@ struct ScriptedEvent
     ScriptedEvent(ScriptedEvent const&) = delete;
 };
 
-class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
+class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
 {
     friend class MapReference;
     friend class ObjectGridLoader;
@@ -1001,7 +1001,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         uint32 GetLastPlayerLeftTime() const { return _lastPlayerLeftTime; }
 };
 
-class MANGOS_DLL_SPEC WorldMap : public Map
+class WorldMap : public Map
 {
     using Map::GetPersistentState;                      // hide in subclass for overwrite
 
@@ -1013,7 +1013,7 @@ class MANGOS_DLL_SPEC WorldMap : public Map
         WorldPersistentState* GetPersistanceState() const;
 };
 
-class MANGOS_DLL_SPEC DungeonMap : public Map
+class DungeonMap : public Map
 {
     using Map::GetPersistentState;                      // hide in subclass for overwrite
 
@@ -1042,7 +1042,7 @@ class MANGOS_DLL_SPEC DungeonMap : public Map
         bool m_unloadWhenEmpty;
 };
 
-class MANGOS_DLL_SPEC BattleGroundMap : public Map
+class BattleGroundMap : public Map
 {
     using Map::GetPersistentState;                      // hide in subclass for overwrite
 

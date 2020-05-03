@@ -937,6 +937,8 @@ bool GossipHello_npc_squire_rowe(Player* pPlayer, Creature* pCreature)
         else
             pPlayer->SEND_GOSSIP_MENU(GOSSIP_ROWE_BUSY, pCreature->GetGUID());
     }
+    else if (pPlayer->GetQuestStatus(QUEST_THE_GREAT_MASQUERADE) == QUEST_STATUS_COMPLETE)
+        pPlayer->SEND_GOSSIP_MENU(GOSSIP_ROWE_COMPLETED, pCreature->GetGUID());
     else
         pPlayer->SEND_GOSSIP_MENU(GOSSIP_ROWE_NOTHING, pCreature->GetGUID());
 

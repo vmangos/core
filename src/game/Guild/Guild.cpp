@@ -128,7 +128,7 @@ bool Guild::Create(Player* leader, std::string gname)
         return false;
 
     // Check guild name (use whisper type - 6)
-    if (AntispamInterface *a = sAnticheatLib->GetAntispam())
+    if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
     {
         if (a->filterMessage(gname))
         {

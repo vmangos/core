@@ -645,7 +645,7 @@ struct InstancePlayerBind
 
 #define MAX_INSTANCE_PER_ACCOUNT_PER_HOUR 5
 
-class MANGOS_DLL_SPEC PlayerTaxi
+class PlayerTaxi
 {
     public:
         PlayerTaxi();
@@ -815,7 +815,7 @@ struct RacialSpells
     uint32 spells[MAX_RACIAL_SPELLS] = { 0 };
 };
 
-class MovementAnticheatInterface;
+class MovementAnticheat;
 
 struct AuraSaveStruct
 {
@@ -851,7 +851,7 @@ struct ScheduledTeleportData
     std::function<void()> recover = std::function<void()>();
 };
 
-class MANGOS_DLL_SPEC Player final: public Unit
+class Player final: public Unit
 {
     friend class WorldSession;
     friend void Item::AddToUpdateQueueOf(Player* player);
@@ -1274,7 +1274,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SendCanTakeQuestResponse(uint32 msg) const;
         void SendQuestConfirmAccept(Quest const* pQuest, Player* pReceiver) const;
         void SendPushToPartyResponse(Player* pPlayer, uint8 msg) const;
-        void SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32 count) const;
+        void SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32 current, uint32 count);
         void SendQuestUpdateAddCreatureOrGo(Quest const* pQuest, ObjectGuid guid, uint32 creatureOrGO_idx, uint32 count);
 
         ObjectGuid GetDividerGuid() const { return m_dividerGuid; }
@@ -1764,7 +1764,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool SetPosition(float x, float y, float z, float orientation, bool teleport = false);
         void SetBindPoint(ObjectGuid guid) const;
 
-        void BuildTeleportAckMsg(WorldPacket& data, float x, float y, float z, float ang) const;
         WorldLocation& GetTeleportDest() { return m_teleport_dest; }
         bool IsBeingTeleported() const { return mSemaphoreTeleport_Near || mSemaphoreTeleport_Far || mPendingFarTeleport; }
         bool IsBeingTeleportedNear() const { return mSemaphoreTeleport_Near; }
@@ -2088,6 +2087,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool CanInteractWithNPC(Creature const* pCreature, uint32 npcflagmask) const;
         GameObject* GetGameObjectIfCanInteractWith(ObjectGuid guid, uint32 gameobject_type = MAX_GAMEOBJECT_TYPE) const;
         bool CanInteractWithGameObject(GameObject const* pGo, uint32 gameobject_type = MAX_GAMEOBJECT_TYPE) const;
+        bool CanSeeHealthOf(Unit const* pTarget) const;
 
         ObjectGuid const& GetSelectedGobj() const { return m_selectedGobj; }
         void SetSelectedGobj(ObjectGuid guid) { m_selectedGobj = guid; }
@@ -2111,6 +2111,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void ClearResurrectRequestData() { SetResurrectRequestData(ObjectGuid(), 0, 0.0f, 0.0f, 0.0f, 0, 0); }
         bool IsRessurectRequestedBy(ObjectGuid guid) const { return m_resurrectGuid == guid; }
         bool IsRessurectRequested() const { return !m_resurrectGuid.IsEmpty(); }
+        ObjectGuid const& GetResurrector() const { return m_resurrectGuid; }
         void ResurectUsingRequestData();
 
         static bool IsActionButtonDataValid(uint8 button, uint32 action, uint8 type, Player* player);
@@ -2377,7 +2378,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool FallGround(uint8 fallMode);
 
         /// Anticheat
-        MovementAnticheatInterface* GetCheatData() const { return m_session->GetCheatData(); }
+        MovementAnticheat* GetCheatData() const { return m_session->GetCheatData(); }
         void OnDisconnected();
         void RelocateToLastClientPosition();
         void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const override;

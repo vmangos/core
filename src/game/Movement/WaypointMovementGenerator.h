@@ -39,7 +39,7 @@
 struct CreatureGroupMember;
 
 template<class T, class P>
-class MANGOS_DLL_SPEC PathMovementBase
+class PathMovementBase
 {
     public:
         PathMovementBase() : i_currentNode(0) {}
@@ -62,10 +62,10 @@ class MANGOS_DLL_SPEC PathMovementBase
  */
 
 template<class T>
-class MANGOS_DLL_SPEC WaypointMovementGenerator;
+class WaypointMovementGenerator;
 
 template<>
-class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
+class WaypointMovementGenerator<Creature>
 : public MovementGeneratorMedium< Creature, WaypointMovementGenerator<Creature> >,
   public PathMovementBase<Creature, WaypointPath const*>
 {
@@ -124,7 +124,7 @@ class MANGOS_DLL_SPEC WaypointMovementGenerator<Creature>
 /** FlightPathMovementGenerator generates movement of the player for the paths
  * and hence generates ground and activities for the player.
  */
-class MANGOS_DLL_SPEC FlightPathMovementGenerator
+class FlightPathMovementGenerator
 : public MovementGeneratorMedium< Player, FlightPathMovementGenerator >,
   public PathMovementBase<Player,TaxiPathNodeList const*>
 {
@@ -150,7 +150,7 @@ class MANGOS_DLL_SPEC FlightPathMovementGenerator
         bool GetResetPosition(Player&, float& x, float& y, float& z);
 };
 
-class MANGOS_DLL_SPEC PatrolMovementGenerator
+class PatrolMovementGenerator
 : public MovementGeneratorMedium<Creature, PatrolMovementGenerator >
 {
     public:

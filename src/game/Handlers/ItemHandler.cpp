@@ -822,6 +822,9 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
                     if (!pProto->RequiredReputationFaction && pProto->RequiredReputationRank > 0 &&
                             ReputationRank(pProto->RequiredReputationRank) > _player->GetReputationRank(pCreature->getFactionTemplateEntry()->faction))
                         continue;
+
+                    if (crItem->conditionId && !sObjectMgr.IsConditionSatisfied(crItem->conditionId, _player, pCreature->GetMap(), pCreature, CONDITION_FROM_VENDOR))
+                        continue;
                 }
 
                 ++count;

@@ -1125,9 +1125,9 @@ void BattleGroundAV::ChangeMineOwner(uint8 mine, BattleGroundAVTeamIndex teamIdx
                        (mine == BG_AV_NORTH_MINE) ? LANG_BG_AV_MINE_NORTH : LANG_BG_AV_MINE_SOUTH);
     }
 
-    if (teamIdx == BG_TEAM_ALLIANCE)
+    if (teamIdx == BG_AV_TEAM_ALLIANCE)
         CompleteQuestForAll(7122);
-    else if (teamIdx == BG_TEAM_HORDE)
+    else if (teamIdx == BG_AV_TEAM_HORDE)
         CompleteQuestForAll(7124);
 }
 

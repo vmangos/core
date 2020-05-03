@@ -200,9 +200,60 @@ enum BG_AV_Nodes
 // towers defenders are set to (30-37)
 // event2 depends on armor scraps state
 
+enum BG_AV_Event_Control_State
+{
+    ALLIANCE_ASSAULTED  = 0,
+    ALLIANCE_CONTROLLED = 1,
+    HORDE_ASSAULTED     = 2,
+    HORDE_CONTROLLED    = 3,
+    NEUTRAL_ASSAULTED   = 4,
+    NEUTRAL_CONTROLLED  = 5,
+};
 
 enum BG_AV_Events
 {
+    // Graveyards GOs
+    BG_AV_STORMPIKE_AID_STATION_GY = 0,
+    BG_AV_STORMPIKE_GY = 1,
+    BG_AV_STONEHEARTH_GY = 2,
+    BG_AV_SNOWFALL_GY = 3,
+    BG_AV_ICEBLOOD_GY = 4,
+    BG_AV_FROSTWOLF_GY = 5,
+    BG_AV_FROSTWOLF_RELIEF_HUT_GY = 6,
+
+    // Alliance Bunkers GOs
+    BG_AV_DUN_BALDAR_SOUTH_BUNKER = 7,
+    BG_AV_DUN_BALDAR_NORTH_BUNKER = 8,
+    BG_AV_ICEWING_BUNKER          = 9,
+    BG_AV_STONEHEARTH_BUNKER      = 10,
+
+    // Horde Towers GOs
+    BG_AV_ICEBLOOD_TOWER          = 11,
+    BG_AV_TOWER_POINT_TOWER       = 12,
+    BG_AV_EAST_FROSTWOLF_TOWER    = 13,
+    BG_AV_WEST_FROSTWOLF_TOWER    = 14,
+
+    // Graveyards Guards
+    BG_AV_STORMPIKE_AID_STATION_GY_GUARDS = 15,
+    BG_AV_STORMPIKE_GY_GUARDS             = 16,
+    BG_AV_STONEHEARTH_GY_GUARDS           = 17,
+    BG_AV_SNOWFALL_GY_GUARDS              = 18,
+    BG_AV_ICEBLOOD_GY_GUARDS              = 19,
+    BG_AV_FROSTWOLF_GY_GUARDS             = 20,
+    BG_AV_FROSTWOLF_RELIEF_HUT_GY_GUARDS  = 21,
+    
+    // Alliance Bunkers Marshals
+    BG_AV_DUN_BALDAR_SOUTH_BUNKER_MARSHALS = 22,
+    BG_AV_DUN_BALDAR_NORTH_BUNKER_MARSHALS = 23,
+    BG_AV_ICEWING_BUNKER_MARSHALS          = 24,
+    BG_AV_STONEHEARTH_BUNKER_MARSHALS      = 25,
+
+    // Horde Towers Marshals
+    BG_AV_ICEBLOOD_TOWER_MARSHALS       = 26,
+    BG_AV_TOWER_POINT_TOWER_MARSHALS    = 27,
+    BG_AV_EAST_FROSTWOLF_TOWER_MARSHALS = 28,
+    BG_AV_WEST_FROSTWOLF_TOWER_MARSHALS = 29,
+
     BG_AV_MINE_BOSSES           = 46,                          // + mineid will be exact event
     BG_AV_MINE_BOSSES_NORTH     = 46,
     BG_AV_MINE_BOSSES_SOUTH     = 47,

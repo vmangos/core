@@ -149,8 +149,10 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         waveStep = 0;
         if (GameObject* gobj = me->GetMap()->GetGameObject(guidRitualCircle))
         {
+            gobj->SetGoState(GO_STATE_READY);
             gobj->SetSpawnedByDefault(false);
-            gobj->Refresh();
+            gobj->SetLootState(GO_READY);
+            gobj->SetRespawnTime(1);
         }
         if (GameObject* gobj = me->FindNearestGameObject(GOBJ_DREADSTEED_PORTAL, 10.000000))
         {
@@ -161,6 +163,9 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
     }
     void PhaseTwoEndedSuccess()
     {
+        if (GameObject* gobj = me->GetMap()->GetGameObject(guidRitualCircle))
+            gobj->SetGoState(GO_STATE_ACTIVE);
+
         //write it in m_pInstance?
         GameObject* gobj;
         for (uint64 guid : guidFlameTab)
@@ -205,6 +210,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         }
         if (gobj = me->GetMap()->GetGameObject(guidRitualCircle))
         {
+            gobj->SetGoState(GO_STATE_READY);
             gobj->SetSpawnedByDefault(false);
             gobj->Refresh();
         }
@@ -305,6 +311,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                         }
                         if (gobj = me->GetMap()->GetGameObject(guidRitualCircle))
                         {
+                            gobj->SetGoState(GO_STATE_READY);
                             gobj->SetSpawnedByDefault(true);// circle
                             gobj->Refresh();
                         }
@@ -371,8 +378,10 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             crea->SetWalk(false);
             float x, y, z;
             me->GetPosition(x, y, z);
-            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
             crea->SetHomePosition(x, y, z, 0);
+            crea->GetMotionMaster()->Clear();
+            crea->GetMotionMaster()->Initialize();
+            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
         }
     }
     void SummonGuard()
@@ -384,8 +393,10 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
             //crea->SetWalk(false);
             float x, y, z;
             me->GetPosition(x, y, z);
-            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
             crea->SetHomePosition(x, y, z, 0);
+            crea->GetMotionMaster()->Clear();
+            crea->GetMotionMaster()->Initialize();
+            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
         }
     }
     EventLocations spawnPoints[18];//not using m_wait though
@@ -411,10 +422,11 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                         if (crea = me->SummonCreature(NPC_XOROTHIAN_IMP, x, y, -28, 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000))
                         {
                             crea->SetFacingToObject(me);
-                            //get the angle? :(
                             me->GetPosition(x, y, z);
-                            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
                             crea->SetHomePosition(x, y, z, 0);
+                            crea->GetMotionMaster()->Clear();
+                            crea->GetMotionMaster()->Initialize();
+                            crea->GetMotionMaster()->MovePoint(1, x, y, z, true);
                         }
                     }
                     waveTimer = 60000;

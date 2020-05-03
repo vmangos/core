@@ -27,7 +27,7 @@
 class Map;
 class Player;
 
-class MANGOS_DLL_SPEC MapReference : public Reference<Map, Player>
+class MapReference : public Reference<Map, Player>
 {
     protected:
         void targetObjectBuildLink() override;

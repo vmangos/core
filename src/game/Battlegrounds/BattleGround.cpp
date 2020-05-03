@@ -1235,6 +1235,14 @@ ObjectGuid BattleGround::GetSingleCreatureGuid(uint8 event1, uint8 event2)
     return ObjectGuid();
 }
 
+ObjectGuid BattleGround::GetSingleGameObjectGuid(uint8 event1, uint8 event2)
+{
+    BGObjects::const_iterator itr = m_EventObjects[MAKE_PAIR32(event1, event2)].gameobjects.begin();
+    if (itr != m_EventObjects[MAKE_PAIR32(event1, event2)].gameobjects.end())
+        return *itr;
+    return ObjectGuid();
+}
+
 void BattleGround::OnObjectDBLoad(GameObject* obj)
 {
     std::vector<BattleGroundEventIdx> const& eventsVector = sBattleGroundMgr.GetGameObjectEventsVector(obj->GetGUIDLow());

@@ -20,7 +20,7 @@
 #define NEXT_CHECK_TIME_UPPER_BOUND 500
 
 template<class T>
-class MANGOS_DLL_SPEC FearMovementGenerator : public MovementGeneratorMedium< T, FearMovementGenerator<T> >
+class FearMovementGenerator : public MovementGeneratorMedium< T, FearMovementGenerator<T> >
 {
 public:
     explicit FearMovementGenerator(ObjectGuid fright) : 
@@ -36,7 +36,7 @@ public:
     void Reset(T &);
     bool Update(T &, uint32 const&);
 
-    void unitSpeedChanged() override { _forceUpdate = true; }
+    void UnitSpeedChanged() override { _forceUpdate = true; }
     MovementGeneratorType GetMovementGeneratorType() const { return FLEEING_MOTION_TYPE; }
 
     ShortTimeTracker i_initialFleeTime;
@@ -56,7 +56,7 @@ private:
     bool _forceUpdate;
 };
 
-class MANGOS_DLL_SPEC TimedFearMovementGenerator : public FearMovementGenerator<Creature>
+class TimedFearMovementGenerator : public FearMovementGenerator<Creature>
 {
 public:
     TimedFearMovementGenerator(ObjectGuid fright, uint32 time);

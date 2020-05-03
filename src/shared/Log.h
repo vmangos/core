@@ -294,13 +294,4 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 #define ERROR_DB_STRICT_LOG(...) \
     ERROR_DB_FILTER_LOG(LOG_FILTER_DB_STRICTED_CHECK, __VA_ARGS__)
 
-// primary for script library
-void MANGOS_DLL_SPEC outstring_log(char const* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC detail_log(char const* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC debug_log(char const* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC error_log(char const* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC error_db_log(char const* str, ...) ATTR_PRINTF(1, 2);
-void MANGOS_DLL_SPEC setScriptLibraryErrorFile(char const* fname, char const* libName);
-void MANGOS_DLL_SPEC script_error_log(char const* str, ...) ATTR_PRINTF(1, 2);
-
 #endif

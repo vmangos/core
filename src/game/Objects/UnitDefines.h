@@ -51,9 +51,12 @@ enum MovementChangeType
     SPEED_CHANGE_SWIM_BACK,
     RATE_CHANGE_TURN,
 
-    //TELEPORT, - not used
+    TELEPORT,
     KNOCK_BACK
 };
+
+// No orientation check for auto attacks or spells below this distance.
+#define NO_FACING_CHECKS_DISTANCE 1.4f
 
 // Delay time next attack to prevent client attack animation problems
 #define ATTACK_DISPLAY_DELAY 200
@@ -144,7 +147,7 @@ enum HitInfo
 {
     HITINFO_NORMALSWING         = 0x00000000,
     HITINFO_UNK0                = 0x00000001,               // req correct packet structure
-    HITINFO_NORMALSWING2        = 0x00000002,
+    HITINFO_AFFECTS_VICTIM      = 0x00000002,               // no being hit animation on victim without it
     HITINFO_LEFTSWING           = 0x00000004,
     HITINFO_UNK3                = 0x00000008,
     HITINFO_MISS                = 0x00000010,
@@ -419,9 +422,6 @@ enum NPCFlags
     UNIT_NPC_FLAG_REPAIR                = 0x00004000,       // 100%
     UNIT_NPC_FLAG_OUTDOORPVP            = 0x20000000,       // custom flag for outdoor pvp creatures || Custom flag
 };
-
-// No orientation check for auto attacks below this distance.
-#define AUTO_ATTACK_FACING_LEEWAY 1.4f
 
 enum AutoAttackCheckResult
 {

@@ -33,7 +33,7 @@ class Creature;
 class Player;
 class SpellEntry;
 
-class MANGOS_DLL_SPEC PlayerAI
+class PlayerAI
 {
     public:
         explicit PlayerAI(Player* pPlayer) : me(pPlayer), enablePositiveSpells(false) {}
@@ -55,7 +55,7 @@ class MANGOS_DLL_SPEC PlayerAI
         bool enablePositiveSpells;
 };
 
-class MANGOS_DLL_SPEC PlayerControlledAI: public PlayerAI
+class PlayerControlledAI: public PlayerAI
 {
     public:
         explicit PlayerControlledAI(Player* pPlayer, Unit* caster = nullptr);

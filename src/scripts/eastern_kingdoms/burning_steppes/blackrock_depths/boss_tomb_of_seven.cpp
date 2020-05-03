@@ -27,7 +27,7 @@ EndScriptData */
 enum
 {
     FACTION_NEUTRAL             = 734,
-    FACTION_HOSTILE             = 754,
+    FACTION_HOSTILE             = 54,
 
     SPELL_SMELT_DARK_IRON       = 14891,
     SPELL_LEARN_SMELT           = 14894,

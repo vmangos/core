@@ -1403,10 +1403,10 @@ class ScriptMgr
 
 #define sScriptMgr MaNGOS::Singleton<ScriptMgr>::Instance()
 
-MANGOS_DLL_SPEC uint32 GetAreaTriggerScriptId(uint32 triggerId);
-MANGOS_DLL_SPEC uint32 GetEventIdScriptId(uint32 eventId);
-MANGOS_DLL_SPEC uint32 GetScriptId(char const* name);
-MANGOS_DLL_SPEC char const* GetScriptName(uint32 id);
-MANGOS_DLL_SPEC uint32 GetScriptIdsCount();
+uint32 GetAreaTriggerScriptId(uint32 triggerId);
+uint32 GetEventIdScriptId(uint32 eventId);
+uint32 GetScriptId(char const* name);
+char const* GetScriptName(uint32 id);
+uint32 GetScriptIdsCount();
 
 #endif

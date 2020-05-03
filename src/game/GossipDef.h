@@ -66,20 +66,42 @@ enum GossipOptionIcon
     GOSSIP_ICON_MONEY_BAG           = 6,                    //brown bag with yellow dot
     GOSSIP_ICON_TALK                = 7,                    //white chat bubble with black dots
     GOSSIP_ICON_TABARD              = 8,                    //tabard
-    GOSSIP_ICON_BATTLE              = 9,                    //two swords
-    GOSSIP_ICON_DOT                 = 10,                   //yellow dot
+    GOSSIP_ICON_BATTLE              = 9,                    //two swords - added in 1.7
+    GOSSIP_ICON_DOT                 = 10,                   //yellow dot - added in 1.10
     GOSSIP_ICON_CHAT_11             = 11,                   //This and below are most the same visual as GOSSIP_ICON_CHAT
     GOSSIP_ICON_CHAT_12             = 12,                   //but are still used for unknown reasons.
     GOSSIP_ICON_DOT_13              = 13,
-    GOSSIP_ICON_DOT_14              = 14,                   // probably invalid
-    GOSSIP_ICON_DOT_15              = 15,                   // probably invalid
-    GOSSIP_ICON_DOT_16              = 16,
-    GOSSIP_ICON_DOT_17              = 17,
-    GOSSIP_ICON_DOT_18              = 18,
-    GOSSIP_ICON_DOT_19              = 19,
-    GOSSIP_ICON_DOT_20              = 20,
+    GOSSIP_ICON_DOT_14              = 14,                   // added in 1.10
+    GOSSIP_ICON_DOT_15              = 15,                   // added in 1.10
+    GOSSIP_ICON_DOT_16              = 16,                   // added in 1.10
+    GOSSIP_ICON_DOT_17              = 17,                   // added in 1.10
+    GOSSIP_ICON_DOT_18              = 18,                   // added in 1.10
+    GOSSIP_ICON_DOT_19              = 19,                   // added in 1.10
+    GOSSIP_ICON_DOT_20              = 20,                   // added in 1.10
     GOSSIP_ICON_MAX
 };
+
+inline bool IsValidGossipOptionIconForBuild(uint8 icon)
+{
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_10_1
+    switch (icon)
+    {
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_7_1
+    case GOSSIP_ICON_BATTLE:
+        return false;
+#endif
+    case GOSSIP_ICON_DOT:
+        return false;
+    }
+#endif
+
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_10_1
+    if (icon > GOSSIP_ICON_DOT_13)
+        return false;
+#endif
+
+    return true;
+}
 
 //POI icons. Many more exist, list not complete.
 enum Poi_Icon
@@ -163,7 +185,7 @@ struct QuestMenuItem
 
 typedef std::vector<QuestMenuItem> QuestMenuItemList;
 
-class MANGOS_DLL_SPEC GossipMenu
+class GossipMenu
 {
     public:
         explicit GossipMenu(WorldSession* session);
@@ -255,7 +277,7 @@ class QuestMenu
         QuestMenuItemList m_qItems;
 };
 
-class MANGOS_DLL_SPEC PlayerMenu
+class PlayerMenu
 {
     private:
         GossipMenu mGossipMenu;
