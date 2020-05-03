@@ -2810,6 +2810,7 @@ PlayerBot.MinBots = 0
 PlayerBot.MaxBots = 0
 PlayerBot.Refresh = 10000
 PlayerBot.ForceLogoutDelay = 1
+PlayerBot.ShowInWhoList = 0
 
 ###################################################################################################################
 #    Mail flooding mitigation
