@@ -9,8 +9,8 @@ INSERT INTO `migrations` VALUES ('20200504023011');
 -- Add your query below.
 
 -- Delete Gadgetzan Bruiser from Un'goro
-DELETE FROM `vmangos`.`creature` WHERE  `guid`=24665;
-DELETE FROM `vmangos`.`creature` WHERE  `guid`=24664;
+DELETE FROM `creature` WHERE  `guid`=24665;
+DELETE FROM `creature` WHERE  `guid`=24664;
 
 -- End of migration.
 END IF;
