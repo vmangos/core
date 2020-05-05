@@ -334,6 +334,8 @@ enum eScriptCommand
                                                             // datalong2 = despawn_delay
     SCRIPT_COMMAND_LOAD_GAMEOBJECT          = 82,           // source = Map
                                                             // datalong = db_guid
+    SCRIPT_COMMAND_QUEST_CREDIT             = 83,           // source = Player (from provided source or target)
+                                                            // target = WorldObject (from provided source or target)
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -1012,6 +1014,8 @@ struct ScriptInfo
         {
             uint32 goGuid;                                  // datalong
         } loadGo;
+
+                                                            // SCRIPT_COMMAND_QUEST_CREDIT (83)
 
         struct
         {

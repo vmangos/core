@@ -2261,3 +2261,26 @@ bool Map::ScriptCommand_LoadGameObject(ScriptInfo const& script, WorldObject* so
 
     return false;
 }
+
+// SCRIPT_COMMAND_QUEST_CREDIT (83)
+bool Map::ScriptCommand_QuestCredit(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    Player* pPlayer;
+
+    if (!((pPlayer = ToPlayer(target)) || (pPlayer = ToPlayer(source))))
+    {
+        sLog.outError("SCRIPT_COMMAND_QUEST_CREDIT (script id %u) call for a nullptr player, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    WorldObject* pWorldObject = source && !source->IsPlayer() ? source : (target && !target->IsPlayer() ? target : nullptr);
+    if (!pWorldObject)
+    {
+        sLog.outError("SCRIPT_COMMAND_QUEST_CREDIT (script id %u) call for a nullptr target, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    pPlayer->TalkedToCreature(pWorldObject->GetEntry(), pWorldObject->GetObjectGuid());
+
+    return false;
+}
