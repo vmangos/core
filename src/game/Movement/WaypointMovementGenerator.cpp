@@ -245,8 +245,10 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
         // make sure to reset spline index as its new path
         m_nextNodeSplineIdx = -1;
 
-        // if creature should not stop at current node reach
-        if (!nextNode.delay && i_currentNode != i_path->rbegin()->first)
+        // smoothing code below
+        if (!nextNode.delay &&
+            !creature.GetCreatureGroup() && // smoothing breaks follower movement
+            i_currentNode != i_path->rbegin()->first)
         {
             // we'll add path to node after this one too to make animation more smoother
             m_nextNodeSplineIdx = genPath.size() - 1;
