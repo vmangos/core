@@ -95,9 +95,10 @@ enum
     NPC_MARCUS_JONATHAN             = 466,
     NPC_STORMWIND_ROYAL_GUARD       = 1756,
 
-    GOSSIP_ROWE_NOTHING             = 9063,
+    GOSSIP_ROWE_COMPLETED           = 9066,
     GOSSIP_ROWE_READY               = 9065,
     GOSSIP_ROWE_BUSY                = 9064,
+    GOSSIP_ROWE_NOTHING             = 9063,
 
     MOUNT_WINDSOR                   = 2410,
 
@@ -144,10 +145,10 @@ struct npc_reginald_windsorAI : ScriptedAI
     void PokeRowe();
     void DoTalk(Unit* pWho, bool yell, Unit* pTarget = nullptr);
     void SituationFinale();
-    void UpdateAI_corpse(const uint32 uiDiff) override;
+    void UpdateAI_corpse(uint32 const uiDiff) override;
     void MoveInLineOfSight(Unit* Victim) override;
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpellEntry) override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 /*
@@ -167,7 +168,7 @@ struct npc_squire_roweAI : ScriptedAI
     void Reset() override {}
     void ResetCreature() override;
     void MovementInform(uint32 uiType, uint32 uiPointId) override;
-    void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 #endif

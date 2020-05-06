@@ -91,7 +91,7 @@ enum Phase
     PHASE_DEAD
 };
 
-static const float aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
+static float const aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
 uint32 SPAWN_ANIM_TIMER = 21500;
 static constexpr float AGGRO_RADIUS = 70.0f;
 
@@ -146,7 +146,7 @@ struct boss_sapphironAI : public ScriptedAI
     uint32 m_forceTargetUpdateTimer;
     uint32 m_TargetNotReachableTimer;
 
-    void Reset()
+    void Reset() override
     {
         pullCheckTimer = 0;
         phase = PHASE_GROUND;
@@ -216,7 +216,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
         if (phase != PHASE_GROUND)
             return;
@@ -244,7 +244,7 @@ struct boss_sapphironAI : public ScriptedAI
 
     void AggroRadius(uint32 diff)
     {
-        if (m_creature->isInCombat() || m_creature->IsInEvadeMode())
+        if (m_creature->IsInCombat() || m_creature->IsInEvadeMode())
             return;
         if (phase != PHASE_GROUND && phase != PHASE_SKELETON)
             return;
@@ -264,9 +264,9 @@ struct boss_sapphironAI : public ScriptedAI
 
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (const auto& itr : PlayerList)
         {
-            Player* pPlayer = itr->getSource();
+            Player* pPlayer = itr.getSource();
             
             float dx = pPlayer->GetPositionX() - x;
             float dy = pPlayer->GetPositionY() - y;
@@ -278,10 +278,10 @@ struct boss_sapphironAI : public ScriptedAI
             
 
             bool alert;
-            if (!pPlayer->isVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
+            if (!pPlayer->IsVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
                 continue;
 
-            if (!pPlayer->isTargetableForAttack() || !m_creature->IsHostileTo(pPlayer))
+            if (!pPlayer->IsTargetableForAttack() || !m_creature->IsHostileTo(pPlayer))
                 continue;
 
             if (phase == PHASE_SKELETON)
@@ -291,9 +291,9 @@ struct boss_sapphironAI : public ScriptedAI
             }
             if (m_creature->CanInitiateAttack())
             {
-                if (pPlayer->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
+                if (pPlayer->IsInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
                 {
-                    if (!m_creature->getVictim())
+                    if (!m_creature->GetVictim())
                     {
                         AttackStart(pPlayer);
                         return;
@@ -309,7 +309,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (phase != PHASE_GROUND)
             return;
@@ -323,7 +323,7 @@ struct boss_sapphironAI : public ScriptedAI
         events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         m_creature->CastSpell(m_creature, SPELL_SAPPHIRON_DIES, true);
         UnSummonWingBuffet();
@@ -342,7 +342,7 @@ struct boss_sapphironAI : public ScriptedAI
 
     void DoIceBolt()
     {
-        ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
+        ThreatList const& threatlist = m_creature->GetThreatManager().getThreatList();
         if (threatlist.size() <= iceboltTargets.size())
         {
             RescheduleIcebolt();
@@ -350,10 +350,10 @@ struct boss_sapphironAI : public ScriptedAI
         }
 
         std::vector<Unit*> suitableUnits;
-        for (auto itr = threatlist.begin(); itr != threatlist.end(); ++itr)
-            if (Unit* pTarget = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid()))
+        for (const auto itr : threatlist)
+            if (Unit* pTarget = m_creature->GetMap()->GetPlayer(itr->getUnitGuid()))
             {
-                if (pTarget->isDead())
+                if (pTarget->IsDead())
                     continue;
                 
                 if (std::find(iceboltTargets.begin(), iceboltTargets.end(), pTarget->GetObjectGuid()) != iceboltTargets.end())
@@ -362,7 +362,7 @@ struct boss_sapphironAI : public ScriptedAI
                 suitableUnits.push_back(pTarget);
             }
 
-        if (suitableUnits.size() == 0)
+        if (suitableUnits.empty())
         {
             RescheduleIcebolt();
             return;
@@ -425,7 +425,7 @@ struct boss_sapphironAI : public ScriptedAI
 
             //m_creature->SetFly(false);
             //m_creature->SetLevitate(false);
-            m_creature->SetMeleeZLimit(MELEE_Z_LIMIT);
+            m_creature->SetMeleeZLimit(UNIT_DEFAULT_MELEE_Z_LIMIT);
         }
     }
 
@@ -433,10 +433,10 @@ struct boss_sapphironAI : public ScriptedAI
     {
         bool unreachableTarget = 
             !m_creature->GetMotionMaster()->empty() &&
-             m_creature->getVictim() &&
+             m_creature->GetVictim() &&
              m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
             !m_creature->HasDistanceCasterMovement() &&
-           (!m_creature->IsWithinDistInMap(m_creature->getVictim(), m_creature->GetMaxChaseDistance(m_creature->getVictim())) || !m_creature->IsWithinLOSInMap(m_creature->getVictim())) &&
+           (!m_creature->IsWithinDistInMap(m_creature->GetVictim(), m_creature->GetMaxChaseDistance(m_creature->GetVictim())) || !m_creature->IsWithinLOSInMap(m_creature->GetVictim())) &&
             !m_creature->GetMotionMaster()->GetCurrent()->IsReachable();
         
         if (unreachableTarget)
@@ -447,7 +447,7 @@ struct boss_sapphironAI : public ScriptedAI
             m_TargetNotReachableTimer = 0;
     }
     
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (phase == PHASE_SKELETON)
         {
@@ -470,7 +470,7 @@ struct boss_sapphironAI : public ScriptedAI
         if (phase == PHASE_GROUND)
         {
             AggroRadius(uiDiff);
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
          
             UpdateReachable(uiDiff);
@@ -493,7 +493,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
         else 
         {
-            if (m_creature->getThreatManager().isThreatListEmpty())
+            if (m_creature->GetThreatManager().isThreatListEmpty())
             {
                 EnterEvadeMode();
             }
@@ -513,7 +513,7 @@ struct boss_sapphironAI : public ScriptedAI
                 if (m_creature->GetHealthPercent() > 10.0f)
                 {
                     events.Reset();
-                    m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                    m_creature->ClearUnitState(UNIT_STAT_MELEE_ATTACKING);
                     m_creature->InterruptNonMeleeSpells(false);
                     m_creature->GetMotionMaster()->Clear(false);
                     m_creature->GetMotionMaster()->MoveIdle();
@@ -626,7 +626,7 @@ struct boss_sapphironAI : public ScriptedAI
             }
             case EVENT_CLEAVE:
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                     events.Repeat(Seconds(urand(5, 10)));
                 else
                     events.Repeat(100);
@@ -664,7 +664,7 @@ struct npc_wing_buffetAI : public ScriptedAI
 
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (!m_creature->HasAura(SPELL_PERIODIC_BUFFET))
             m_creature->CastSpell(m_creature, SPELL_PERIODIC_BUFFET, true);
@@ -675,7 +675,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 {
     npc_sapphiron_blizzardAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->SetRespawnRadius(60.0f);
+        m_creature->SetWanderDistance(60.0f);
         m_creature->SetReactState(ReactStates::REACT_PASSIVE);
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         checkAuraTimer = 0;
@@ -695,19 +695,16 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
     {
     }
 
-    void AttackStart(Unit*)
+    void AttackStart(Unit*) override
     {
-        return;
     }
 
     void MoveInLineOfSight(Unit*) override
     {
-        return;
     }
 
-    void Aggro(Unit*)
+    void Aggro(Unit*) override
     {
-        return;
     }
 
     void MovementInform(uint32 uiType, uint32 pointId) override
@@ -739,7 +736,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         }
 
         // if only "tank" alive, move random
-        ThreatList const& threatlist = pSapp->getThreatManager().getThreatList();
+        ThreatList const& threatlist = pSapp->GetThreatManager().getThreatList();
         if (threatlist.size() < 2)
         {
             SetRandomMove();
@@ -758,7 +755,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
                 if (std::find(previousTargets.begin(), previousTargets.end(), pTarget->GetObjectGuid()) != previousTargets.end())
                     continue;
                 // want to encourage the blizzard to move towards a semi-far-away target to make it spread out
-                if (m_creature->GetDistanceToCenter(pTarget) < 15.0f)
+                if (m_creature->GetDistance3dToCenter(pTarget) < 15.0f)
                     continue;
                 suitableUnits.push_back(pTarget);
             }
@@ -776,7 +773,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         m_creature->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), MOVE_PATHFINDING);
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (checkAuraTimer < uiDiff)
         {

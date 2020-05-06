@@ -44,7 +44,7 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
     uint32 Knockout_Timer;
     bool Engaged;
 
-    void Reset()
+    void Reset() override
     {
         Trample_Timer = 3000;
         Knockout_Timer = 12000;
@@ -53,14 +53,14 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
         Engaged = false;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         Engaged = true;
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAMSTEIN, IN_PROGRESS);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         for (uint8 i = 0; i < 25; ++i)
         {
@@ -75,9 +75,9 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
             m_pInstance->SetData(TYPE_RAMSTEIN, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Trample
@@ -91,9 +91,9 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
         //Knockout
         if (Knockout_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKOUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKOUT) == CAST_OK)
             {
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+                m_creature->GetThreatManager().modifyThreatPercent(m_creature->GetVictim(), -100);
                 Knockout_Timer = 10000;
             }
         }
@@ -109,7 +109,7 @@ CreatureAI* GetAI_boss_ramstein_the_gorger(Creature* pCreature)
 
 void AddSC_boss_ramstein_the_gorger()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_ramstein_the_gorger";
     newscript->GetAI = &GetAI_boss_ramstein_the_gorger;

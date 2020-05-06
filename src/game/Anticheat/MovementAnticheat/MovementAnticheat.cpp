@@ -30,8 +30,6 @@ const char* GetMovementCheatName(CheatType flagId)
             return "NumDesyncs";
         case CHEAT_TYPE_OVERSPEED_DIST:
             return "OverspeedDist";
-        case CHEAT_TYPE_OVERSPEED_Z:
-            return "OverspeedZ";
         case CHEAT_TYPE_OVERSPEED_JUMP:
             return "OverspeedJump";
         case CHEAT_TYPE_JUMP_SPEED_CHANGE:
@@ -79,7 +77,7 @@ const char* GetMovementCheatName(CheatType flagId)
     return "UnknownCheat";
 }
 
-uint32 MovementCheatData::Update(uint32 diff, std::stringstream& reason)
+uint32 MovementAnticheat::Update(uint32 diff, std::stringstream& reason)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED))
         return CHEAT_ACTION_NONE;
@@ -94,7 +92,7 @@ uint32 MovementCheatData::Update(uint32 diff, std::stringstream& reason)
     return Finalize(reason);
 }
 
-uint32 MovementCheatData::Finalize(std::stringstream& reason)
+uint32 MovementAnticheat::Finalize(std::stringstream& reason)
 {
     if (m_maxOverspeedDistance < fabs(m_overspeedDistance))
         m_maxOverspeedDistance = fabs(m_overspeedDistance);
@@ -128,7 +126,7 @@ uint32 MovementCheatData::Finalize(std::stringstream& reason)
     return result;
 }
 
-void MovementCheatData::AddCheats(uint32 cheats, uint32 count)
+void MovementAnticheat::AddCheats(uint32 cheats, uint32 count)
 {
     if (!cheats)
         return;
@@ -147,13 +145,13 @@ void MovementCheatData::AddCheats(uint32 cheats, uint32 count)
             StoreCheat(i, count);
 }
 
-void MovementCheatData::StoreCheat(uint32 type, uint32 count)
+void MovementAnticheat::StoreCheat(uint32 type, uint32 count)
 {
     m_cheatOccuranceTotal[type] += count;
     m_cheatOccuranceTick[type] += count;
 }
 
-uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason)
+uint32 MovementAnticheat::ComputeCheatAction(std::stringstream& reason)
 {
     uint32 action = CHEAT_ACTION_NONE;
 
@@ -168,7 +166,7 @@ uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason)
 
             if (threshold && count >= threshold)
             {
-                if (reason.str() != "")
+                if (!reason.str().empty())
                     reason << "/";
                 reason << GetMovementCheatName(cheatType) << (total ? "(Total:" : "(Tick:") << count << ")";
                 action |= penalty;
@@ -186,7 +184,6 @@ uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason)
     AddPenaltyForCheat(false, CHEAT_TYPE_TIME_DESYNC, CONFIG_BOOL_AC_MOVEMENT_CHEAT_TIME_DESYNC_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TIME_DESYNC_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_TIME_DESYNC_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_NUM_DESYNC, CONFIG_BOOL_AC_MOVEMENT_CHEAT_NUM_DESYNCS_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NUM_DESYNCS_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_NUM_DESYNCS_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_OVERSPEED_DIST, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_DISTANCE_PENALTY);
-    AddPenaltyForCheat(false, CHEAT_TYPE_OVERSPEED_Z, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_Z_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_Z_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_Z_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_OVERSPEED_JUMP, CONFIG_BOOL_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_OVERSPEED_JUMP_PENALTY);
     AddPenaltyForCheat(true, CHEAT_TYPE_JUMP_SPEED_CHANGE, CONFIG_BOOL_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_THRESHOLD, CONFIG_UINT32_AC_MOVEMENT_CHEAT_JUMP_SPEED_CHANGE_PENALTY);
     AddPenaltyForCheat(false, CHEAT_TYPE_MULTI_JUMP, CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_ENABLED, CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_THRESHOLD_TICK, CONFIG_UINT32_AC_MOVEMENT_CHEAT_MULTI_JUMP_PENALTY);
@@ -215,7 +212,7 @@ uint32 MovementCheatData::ComputeCheatAction(std::stringstream& reason)
     return action;
 }
 
-void MovementCheatData::HandleCommand(ChatHandler* handler) const
+void MovementAnticheat::HandleCommand(ChatHandler* handler) const
 {
     handler->PSendSysMessage("MaxSpaceDesync=%f", m_maxOverspeedDistance);
     handler->PSendSysMessage("MaxTimeDesync=%u", m_maxClientDesync);
@@ -226,7 +223,7 @@ void MovementCheatData::HandleCommand(ChatHandler* handler) const
             handler->PSendSysMessage("%2u x %s (cheat %u - 0x%x)", m_cheatOccuranceTotal[i], GetMovementCheatName(CheatType(i)), i, 1 << i);
 }
 
-void MovementCheatData::Init()
+void MovementAnticheat::Init()
 {
     m_cheatOccuranceTick.fill(0);
     m_cheatOccuranceTotal.fill(0);
@@ -245,7 +242,7 @@ void MovementCheatData::Init()
     m_updateCheckTimer = CHEATS_UPDATE_INTERVAL;
 }
 
-void MovementCheatData::InitNewPlayer(Player* pPlayer)
+void MovementAnticheat::InitNewPlayer(Player* pPlayer)
 {
     me = pPlayer;
     m_jumpCount = 0;
@@ -256,20 +253,20 @@ void MovementCheatData::InitNewPlayer(Player* pPlayer)
     InitSpeeds(pPlayer);
 }
 
-void MovementCheatData::InitSpeeds(Unit* unit)
+void MovementAnticheat::InitSpeeds(Unit* unit)
 {
     for (int i = 0; i < MAX_MOVE_TYPE; ++i)
         m_clientSpeeds[i] = unit->GetSpeed(UnitMoveType(i));
 }
 
-void MovementCheatData::ResetJumpCounters()
+void MovementAnticheat::ResetJumpCounters()
 {
     m_jumpCount = 0;
     m_jumpFlagCount = 0;
     m_jumpFlagTime = 0;
 }
 
-void MovementCheatData::OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin)
+void MovementAnticheat::OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin)
 {
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
@@ -286,7 +283,7 @@ void MovementCheatData::OnKnockBack(Player* pPlayer, float speedxy, float speedz
     m_knockBack = true;
 }
 
-void MovementCheatData::OnUnreachable(Unit* attacker)
+void MovementAnticheat::OnUnreachable(Unit* attacker)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_UNREACHABLE_ENABLED) ||
@@ -307,7 +304,7 @@ void MovementCheatData::OnUnreachable(Unit* attacker)
     AddCheats(1 << CHEAT_TYPE_PVE_FLYHACK);
 }
 
-void MovementCheatData::OnExplore(AreaEntry const* pArea)
+void MovementAnticheat::OnExplore(AreaEntry const* pArea)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
@@ -317,14 +314,14 @@ void MovementCheatData::OnExplore(AreaEntry const* pArea)
         AddCheats(1 << CHEAT_TYPE_EXPLORE);
 
     if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_EXPLORE_HIGH_LEVEL_ENABLED) &&
-        (static_cast<int32>(me->getLevel() + 10) < pArea->AreaLevel))
+        (static_cast<int32>(me->GetLevel() + 10) < pArea->AreaLevel))
         AddCheats(1 << CHEAT_TYPE_EXPLORE_HIGH_LEVEL);
 }
 
 // Deeprun tram is not properly handled as a transport.
 #define MAP_DEEPRUN_TRAM 369
 
-void MovementCheatData::OnTransport(Player* plMover, ObjectGuid transportGuid)
+void MovementAnticheat::OnTransport(Player* plMover, ObjectGuid transportGuid)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FAKE_TRANSPORT_ENABLED) ||
@@ -339,7 +336,7 @@ void MovementCheatData::OnTransport(Player* plMover, ObjectGuid transportGuid)
         AddCheats(1 << CHEAT_TYPE_FAKE_TRANSPORT);
 }
 
-void MovementCheatData::OnWrongAckData()
+void MovementAnticheat::OnWrongAckData()
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WRONG_ACK_DATA_ENABLED) ||
@@ -349,7 +346,7 @@ void MovementCheatData::OnWrongAckData()
     AddCheats(1 << CHEAT_TYPE_WRONG_ACK_DATA);
 }
 
-void MovementCheatData::OnFailedToAckChange()
+void MovementAnticheat::OnFailedToAckChange()
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         !sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_PENDING_ACK_DELAY_ENABLED) ||
@@ -359,7 +356,7 @@ void MovementCheatData::OnFailedToAckChange()
     AddCheats(1 << CHEAT_TYPE_PENDING_ACK_DELAY);
 }
 
-float MovementCheatData::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
+float MovementAnticheat::GetSpeedForMovementInfo(MovementInfo const& movementInfo) const
 {
     float speed = 0.0f;
     if (movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING))
@@ -520,7 +517,7 @@ bool ShouldAcceptCorpseMovement(Player* pPlayer, MovementInfo& movementInfo, uin
     return false;
 }
 
-bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
+bool MovementAnticheat::HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
@@ -536,7 +533,7 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
     }
     
     // Do not accept position changes if player is dead and has not released spirit.
-    if (me->getDeathState() == CORPSE)
+    if (me->GetDeathState() == CORPSE)
     {
         ResetJumpCounters();
         m_knockBack = false;
@@ -669,7 +666,7 @@ bool MovementCheatData::HandlePositionTests(Player* pPlayer, MovementInfo& movem
 #undef APPEND_CHEAT
 }
 
-bool MovementCheatData::HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode)
+bool MovementAnticheat::HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode)
 {
     if (me != pPlayer)
         InitNewPlayer(pPlayer);
@@ -680,7 +677,7 @@ bool MovementCheatData::HandleSpeedChangeAck(Player* pPlayer, MovementInfo& move
     return result;
 }
 
-bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
+bool MovementAnticheat::HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_ENABLED) ||
         (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_PLAYERS_ONLY) && (m_session->GetSecurity() != SEC_PLAYER)))
@@ -699,7 +696,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     if ((currentMoveFlags & MOVEFLAG_ROOT) &&
         !(GetLastMovementInfo().moveFlags & MOVEFLAG_ROOT) &&
         !me->HasPendingMovementChange(ROOT) &&
-        !me->hasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) &&
+        !me->HasUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) &&
         (opcode != CMSG_FORCE_MOVE_ROOT_ACK))
     {
         APPEND_CHEAT(CHEAT_TYPE_SELF_ROOT);
@@ -726,7 +723,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
 
     // This flag is only for creatures.
     if ((currentMoveFlags & MOVEFLAG_LEVITATING) &&
-        !me->hasUnitState(UNIT_STAT_FLYING_ALLOWED))
+        !me->HasUnitState(UNIT_STAT_FLYING_ALLOWED))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
         removeMoveFlags |= MOVEFLAG_LEVITATING;
@@ -735,7 +732,7 @@ bool MovementCheatData::HandleFlagTests(Player* pPlayer, MovementInfo& movementI
     if ((currentMoveFlags & MOVEFLAG_SWIMMING) &&
         (currentMoveFlags & MOVEFLAG_FLYING) &&
         !me->IsTaxiFlying() &&
-        !me->hasUnitState(UNIT_STAT_FLYING_ALLOWED))
+        !me->HasUnitState(UNIT_STAT_FLYING_ALLOWED))
     {
         APPEND_CHEAT(CHEAT_TYPE_FLY_HACK_SWIM);
         removeMoveFlags |= MOVEFLAG_SWIMMING | MOVEFLAG_FLYING;
@@ -810,7 +807,7 @@ bool ShouldResetNoFallTimeCheck(MovementInfo const& movementInfo, uint16 opcode)
     return false;
 }
 
-bool MovementCheatData::CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode)
+bool MovementAnticheat::CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_NO_FALL_TIME_ENABLED))
         return false;
@@ -830,17 +827,14 @@ bool MovementCheatData::CheckNoFallTime(MovementInfo const& movementInfo, uint16
             m_jumpFlagTime = movementInfo.time;
     }
     
-    if (m_jumpFlagTime &&
+    return m_jumpFlagTime &&
        (m_jumpFlagCount > JUMP_FLAG_THRESHOLD) &&
        (movementInfo.time - m_jumpFlagTime > (IsInKnockBack() ? FAR_FALL_FLAG_TIME * 2 : FAR_FALL_FLAG_TIME)) &&
        (movementInfo.pos.z + 1.0f > GetLastMovementInfo().pos.z) &&
-       (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY))
-        return true;
-
-    return false;
+       (movementInfo.pos.z > me->GetTerrain()->GetWaterOrGroundLevel(movementInfo.pos) + HEIGHT_LEEWAY);
 }
 
-uint32 MovementCheatData::CheckTimeDesync(MovementInfo const& movementInfo)
+uint32 MovementAnticheat::CheckTimeDesync(MovementInfo const& movementInfo)
 {
     uint32 cheatFlags = 0x0;
 #define APPEND_CHEAT(t) cheatFlags |= (1 << t)
@@ -863,7 +857,7 @@ uint32 MovementCheatData::CheckTimeDesync(MovementInfo const& movementInfo)
 #undef APPEND_CHEAT
 }
 
-bool MovementCheatData::CheckMultiJump(uint16 opcode)
+bool MovementAnticheat::CheckMultiJump(uint16 opcode)
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_MULTI_JUMP_ENABLED))
         return false;
@@ -891,7 +885,7 @@ bool MovementCheatData::CheckMultiJump(uint16 opcode)
 #define NO_WALL_CLIMB_CHECK_MOVE_FLAGS (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING | MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)
 #define NO_WALL_CLIMB_CHECK_UNIT_FLAGS (UNIT_FLAG_UNK_0 | UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING | UNIT_FLAG_POSSESSED)
 
-bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const
+bool MovementAnticheat::CheckWallClimb(MovementInfo const& movementInfo, uint16 opcode) const
 {
     // Not currently handled cases.
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_WALL_CLIMB_ENABLED) ||
@@ -913,13 +907,10 @@ bool MovementCheatData::CheckWallClimb(MovementInfo const& movementInfo, uint16 
     float const angleRad = atan(deltaZ / deltaXY);
     //float const angleDeg = angleRad * (360 / (M_PI_F * 2));
 
-    if (angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE))
-        return true;
-
-    return false;
+    return angleRad > sWorld.getConfig(CONFIG_FLOAT_AC_MOVEMENT_CHEAT_WALL_CLIMB_ANGLE);
 }
 
-bool MovementCheatData::CheckForbiddenArea(MovementInfo const& movementInfo) const
+bool MovementAnticheat::CheckForbiddenArea(MovementInfo const& movementInfo) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_FORBIDDEN_AREA_ENABLED))
         return false;
@@ -980,11 +971,10 @@ bool MovementCheatData::CheckForbiddenArea(MovementInfo const& movementInfo) con
     return false;
 }
 
-uint32 MovementCheatData::CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode)
+uint32 MovementAnticheat::CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode)
 {
-    if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_SPEED_HACK_ENABLED) ||
-       (movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT) ||
-       (opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
+    if ((movementInfo.moveFlags & MOVEFLAG_ONTRANSPORT) ||
+        (opcode == CMSG_MOVE_KNOCK_BACK_ACK) ||
         me->IsTaxiFlying() || 
         me->IsBeingTeleported())
         return 0;
@@ -1000,12 +990,12 @@ uint32 MovementCheatData::CheckSpeedHack(MovementInfo const& movementInfo, uint1
     if (sWorld.getConfig(CONFIG_INT32_AC_ANTICHEAT_MAX_ALLOWED_DESYNC) && clientTimeDiff > sWorld.getConfig(CONFIG_INT32_AC_ANTICHEAT_MAX_ALLOWED_DESYNC))
         clientTimeDiff = sWorld.getConfig(CONFIG_INT32_AC_ANTICHEAT_MAX_ALLOWED_DESYNC);
 
-    // Check vs interpolation
-    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_USE_INTERPOLATION))
+    // Check vs extrapolation
+    if (sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_SPEED_HACK_ENABLED))
     {
         float intX, intY, intZ, intO;
 
-        if (InterpolateMovement(GetLastMovementInfo(), clientTimeDiff, intX, intY, intZ, intO))
+        if (ExtrapolateMovement(GetLastMovementInfo(), clientTimeDiff, intX, intY, intZ, intO))
         {
             auto const intDX = intX - movementInfo.pos.x;
             auto const intDY = intY - movementInfo.pos.y;
@@ -1027,19 +1017,6 @@ uint32 MovementCheatData::CheckSpeedHack(MovementInfo const& movementInfo, uint1
             DEBUG_UNIT(me, DEBUG_CHEAT, "[Opcode:%u:0x%x] Flags 0x%x [DT=%u:DR=%.2f]", opcode, opcode, movementInfo.moveFlags, movementInfo.ctime - GetLastMovementInfo().ctime, interpolDist);
         }
     }
-    else if (GetMaxAllowedDist(GetLastMovementInfo(), clientTimeDiff, allowedDXY, allowedDZ))
-    {
-        // Allow some margin
-        allowedDXY += 0.5f;
-        allowedDZ += 0.5f;
-        realDistance2D_sq = pow(movementInfo.pos.x - GetLastMovementInfo().pos.x, 2) + pow(movementInfo.pos.y - GetLastMovementInfo().pos.y, 2);
-        if (realDistance2D_sq > allowedDXY * allowedDXY * 1.1f)
-            m_overspeedDistance += sqrt(realDistance2D_sq) - allowedDXY;
-        if (fabs(movementInfo.pos.z - GetLastMovementInfo().pos.z) > allowedDZ)
-            APPEND_CHEAT(CHEAT_TYPE_OVERSPEED_Z);
-
-        DEBUG_UNIT(me, DEBUG_CHEAT, "[Opcode:%u:0x%x] Flags 0x%x [ctime=%u]", opcode, opcode, movementInfo.moveFlags, movementInfo.ctime);
-    }
 
     // Client should send heartbeats every 500ms
     if (clientTimeDiff > 1000 && GetLastMovementInfo().ctime && GetLastMovementInfo().moveFlags & MOVEFLAG_MASK_MOVING)
@@ -1052,7 +1029,7 @@ uint32 MovementCheatData::CheckSpeedHack(MovementInfo const& movementInfo, uint1
 #undef APPEND_CHEAT
 }
 
-bool MovementCheatData::InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &outOrientation) const
+bool MovementAnticheat::ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &outOrientation) const
 {
     // Not currently handled cases.
     if ((mi.moveFlags & (MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_ONTRANSPORT)) || 
@@ -1156,38 +1133,7 @@ bool MovementCheatData::InterpolateMovement(MovementInfo const& mi, uint32 diffM
     return me->GetMap()->isInLineOfSight(mi.pos.x, mi.pos.y, mi.pos.z + 0.5f, x, y, z + 0.5f);
 }
 
-#define TEMINAL_VELOCITY 60.148003f
-#define TERMINAL_SAFE_FALL_VELOCITY 7.f
-
-bool MovementCheatData::GetMaxAllowedDist(MovementInfo const& mi, uint32 diffMs, float &dxy, float &dz) const
-{
-    dxy = dz = 0.001f;
-
-    if (mi.moveFlags & MOVEFLAG_ONTRANSPORT)
-        return false;
-    if (!me->movespline->Finalized())
-        return false;
-    if (!mi.ctime)
-        return false;
-    if (mi.moveFlags & MOVEFLAG_ROOT || !(mi.moveFlags & MOVEFLAG_MASK_MOVING))
-        return true;
-
-    float speed = GetSpeedForMovementInfo(mi);
-
-    if (mi.moveFlags & (MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR))
-    {
-        dxy = mi.jump.xyspeed / 1000 * diffMs;
-        dz = (mi.moveFlags & MOVEFLAG_SAFE_FALL) ? TERMINAL_SAFE_FALL_VELOCITY : TEMINAL_VELOCITY;
-        dz = dz / 1000 * diffMs;
-        return true;
-    }
-    
-    dxy = speed / 1000 * diffMs;
-    dz = speed / 1000 * diffMs;
-    return true;
-}
-
-bool MovementCheatData::CheckTeleportToTransport(MovementInfo const& movementInfo) const
+bool MovementAnticheat::CheckTeleportToTransport(MovementInfo const& movementInfo) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELE_TO_TRANSPORT_ENABLED))
         return false;
@@ -1207,7 +1153,7 @@ bool MovementCheatData::CheckTeleportToTransport(MovementInfo const& movementInf
     return false;
 }
 
-bool MovementCheatData::CheckTeleport(MovementInfo const& movementInfo) const
+bool MovementAnticheat::CheckTeleport(MovementInfo const& movementInfo) const
 {
     if (!sWorld.getConfig(CONFIG_BOOL_AC_MOVEMENT_CHEAT_TELEPORT_ENABLED))
         return false;
@@ -1223,7 +1169,7 @@ bool MovementCheatData::CheckTeleport(MovementInfo const& movementInfo) const
 
 #define ALLOWED_TRANSPORT_DISTANCE 100.0f
 
-bool MovementCheatData::IsTeleportAllowed(MovementInfo const& movementInfo) const
+bool MovementAnticheat::IsTeleportAllowed(MovementInfo const& movementInfo) const
 {
     if ((me->GetPositionX() == 0.0f || me->GetPositionY() == 0.0f || me->GetPositionZ() == 0.0f) ||
        (movementInfo.GetPos()->x == 0.0f || movementInfo.GetPos()->y == 0.0f || movementInfo.GetPos()->z == 0.0f) ||
@@ -1247,8 +1193,5 @@ bool MovementCheatData::IsTeleportAllowed(MovementInfo const& movementInfo) cons
             maxDistance = std::max(maxDistance, ALLOWED_TRANSPORT_DISTANCE);
     }
 
-    if (distance < maxDistance)
-        return true;
-
-    return false;
+    return distance < maxDistance;
 }

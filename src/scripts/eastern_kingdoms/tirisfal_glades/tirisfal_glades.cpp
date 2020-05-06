@@ -52,7 +52,7 @@ bool GOHello_go_mausoleum_door(Player* pPlayer, GameObject* pGo)
         pTrigger->SetGoState(GO_STATE_READY);
 
         Creature* ulag = pPlayer->FindNearestCreature(NPC_ULAG, 100.0f);
-        if (!ulag || ulag->isDead())
+        if (!ulag || ulag->IsDead())
             pPlayer->SummonCreature(NPC_ULAG, 2390.26f, 336.47f, 40.01f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);       
         return false;
     }
@@ -77,7 +77,7 @@ bool GOHello_go_mausoleum_trigger(Player* pPlayer, GameObject* pGo)
 
 void AddSC_tirisfal_glades()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_mausoleum_door";

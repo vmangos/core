@@ -189,13 +189,13 @@ struct instance_scarlet_monastery : ScriptedInstance
         return 12384;
     }
 
-    void OnCreatureSpellHit(Unit* pCaster, Creature* receiver, const SpellEntry* spell) override
+    void OnCreatureSpellHit(Unit* pCaster, Creature* receiver, SpellEntry const* spell) override
     {
         if (!m_ashbringerActive || !pCaster || !receiver || !spell)
             return;
         if (!pCaster->IsPlayer() || spell->Id != 28441) // AB Effect 000
             return;
-        if (receiver->isDead())
+        if (receiver->IsDead())
             return;
 
         switch (receiver->GetEntry())
@@ -218,7 +218,7 @@ struct instance_scarlet_monastery : ScriptedInstance
             receiver->StopMoving(true);
             receiver->SetFacingToObject(pCaster);
             receiver->SetStandState(UNIT_STAND_STATE_KNEEL);
-            receiver->addUnitState(UNIT_STAT_ROOT);
+            receiver->AddUnitState(UNIT_STAT_ROOT);
             if (!m_ashbringerSayTimer && urand(0,1))
             {
                 m_ashbringerSayTimer = 2000;
@@ -347,9 +347,9 @@ struct instance_scarlet_monastery : ScriptedInstance
         if (lPlayers.isEmpty())
             return;
         bool anyAshbringerEquipped = false;
-        for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+        for (const auto& itr : lPlayers)
         {
-            if (Player* pPlayer = itr->getSource())
+            if (Player* pPlayer = itr.getSource())
             {
                 Item* item = pPlayer->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
                 if (!item)
@@ -376,7 +376,7 @@ struct instance_scarlet_monastery : ScriptedInstance
 
                     for (Creature* pCreature : ScarletList)
                     {
-                        pCreature->setFaction(35);
+                        pCreature->SetFactionTemplateId(35);
                         if (pCreature->GetEntry() == NPC_COMMANDER_MOGRAINE)
                             pCreature->SetCharmerGuid(pPlayer->GetObjectGuid());
                     }
@@ -401,7 +401,7 @@ InstanceData* GetInstanceData_instance_scarlet_monastery(Map* pMap)
 
 void AddSC_instance_scarlet_monastery()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_scarlet_monastery";
     newscript->GetInstanceData = &GetInstanceData_instance_scarlet_monastery;

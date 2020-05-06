@@ -23,21 +23,21 @@ struct npc_unstable_corpseAI : public ScriptedAI
 {
     npc_unstable_corpseAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 
-    void Reset() {}
+    void Reset() override {}
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         DoCastSpellIfCan(m_creature, SPELL_DARK_PLAGUE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);        
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         m_creature->CastSpell(m_creature, SPELL_EXPLOSION, true);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -63,14 +63,14 @@ struct npc_reanimated_corpseAI : public ScriptedAI
     uint32 m_uiHealTimer;
     bool m_bHasRessed;
 
-    void Reset()
+    void Reset() override
     {
         m_uiHealTimer = 0;
         m_bHasRessed = false;
         Resurrect();
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         DoCastSpellIfCan(m_creature, SPELL_DARK_PLAGUE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);        
     }
@@ -83,7 +83,7 @@ struct npc_reanimated_corpseAI : public ScriptedAI
         m_creature->AttackStop();
     }
 
-    void DamageTaken(Unit* done_by, uint32& damage)
+    void DamageTaken(Unit* done_by, uint32& damage) override
     {
         if (damage < m_creature->GetHealth())
             return;
@@ -103,7 +103,7 @@ struct npc_reanimated_corpseAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (m_uiHealTimer)
         {
@@ -120,7 +120,7 @@ struct npc_reanimated_corpseAI : public ScriptedAI
             }
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -153,7 +153,7 @@ struct npc_spectral_projectionAI : public ScriptedAI
 
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_PROJECTION_LEECH)
         {

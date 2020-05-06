@@ -99,7 +99,7 @@ struct boss_gothikAI : public ScriptedAI
     bool m_bRightSide;
     bool m_bJustTeleported;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPhase = PHASE_SPEECH;
 
@@ -130,7 +130,7 @@ struct boss_gothikAI : public ScriptedAI
         m_creature->SetCasterChaseDistance(40);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->SetInCombatWithZone();
 
@@ -159,18 +159,16 @@ struct boss_gothikAI : public ScriptedAI
     {
         ScriptedAI::EnterEvadeMode();
         m_creature->Respawn();
-        float x, y, z, o;
-        m_creature->GetHomePosition(x, y, z, o);
-        m_creature->NearTeleportTo(x, y, z, o);
+        m_creature->NearTeleportTo(m_creature->GetHomePosition());
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
             DoScriptText(SAY_KILL, m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         OpenTheGate();
@@ -178,7 +176,7 @@ struct boss_gothikAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GOTHIK, DONE);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GOTHIK, FAIL);
@@ -186,7 +184,7 @@ struct boss_gothikAI : public ScriptedAI
 
     void SummonAdd(uint32 entry, float x, float y, float z, float o)
     {
-        if (!m_creature->isInCombat() && !m_creature->isDead())
+        if (!m_creature->IsInCombat() && !m_creature->IsDead())
             return;
 
         if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000))
@@ -268,7 +266,7 @@ struct boss_gothikAI : public ScriptedAI
         }
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (!m_pInstance)
             return;
@@ -305,13 +303,13 @@ struct boss_gothikAI : public ScriptedAI
         switch (pSummoned->GetEntry())
         {
         case NPC_UNREL_TRAINEE:
-            pTempTrigger->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+            pTempTrigger->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
             break;
         case NPC_UNREL_DEATH_KNIGHT:
-            pTempTrigger->CastSpell(pAnchor, SPELL_B_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+            pTempTrigger->CastSpell(pAnchor, SPELL_B_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
             break;
         case NPC_UNREL_RIDER:
-            pTempTrigger->CastSpell(pAnchor, SPELL_C_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+            pTempTrigger->CastSpell(pAnchor, SPELL_C_TO_ANCHOR_1, true, nullptr, nullptr, pSummoned->GetGUID());
             break;
         }
     }
@@ -343,10 +341,10 @@ struct boss_gothikAI : public ScriptedAI
         uint32 num_right = 0;
         for (auto& playerRef : lPlayers)
         {
-            if (const Player* p = playerRef.getSource())
+            if (Player const* p = playerRef.getSource())
             {
                 // Don't count dead players, except those feigned
-                if (p->isDead() && !p->HasAura(SPELL_AURA_FEIGN_DEATH))
+                if (p->IsDead() && !p->HasAura(SPELL_AURA_FEIGN_DEATH))
                     continue;
 
                 if(m_pInstance->IsInRightSideGothArea(p))
@@ -362,18 +360,18 @@ struct boss_gothikAI : public ScriptedAI
         return (num_left < 1 || num_right < 1);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if(!m_creature->HasAura(SPELL_IMMUNE_ALL))
         {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
                 return;
             if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
                 return;
         }
         else
         {
-            if (m_creature->getThreatManager().isThreatListEmpty())
+            if (m_creature->GetThreatManager().isThreatListEmpty())
             {
                 EnterEvadeMode();
             }
@@ -484,12 +482,12 @@ struct boss_gothikAI : public ScriptedAI
                 // Prevent units in the other side of the room getting aggro from dots
                 if (!gatesOpened)
                 {
-                    if (Unit* victim = m_creature->getVictim())
+                    if (Unit* victim = m_creature->GetVictim())
                     {
                         bool unitIsRight = m_pInstance->IsInRightSideGothArea(victim);
-                        if (m_bRightSide && !unitIsRight || !m_bRightSide && unitIsRight)
+                        if ((m_bRightSide && !unitIsRight) || (!m_bRightSide && unitIsRight))
                         {
-                            m_creature->getThreatManager().modifyThreatPercent(victim, -100);
+                            m_creature->GetThreatManager().modifyThreatPercent(victim, -100);
                             m_creature->SelectHostileTarget();
                         }
                     }
@@ -685,16 +683,16 @@ struct gothikTriggerAI : public ScriptedAI
     {
 
     }
-    void Reset() 
+    void Reset() override 
     {
-        m_creature->SetRespawnRadius(0.01f);
+        m_creature->SetWanderDistance(0.01f);
         m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
         m_creature->GetMotionMaster()->Initialize();
     }
     void MoveInLineOfSight(Unit*) override {}
     void Aggro(Unit*) override {}
     void AttackStart(Unit*) override {}
-    void UpdateAI(const uint32 diff) {}
+    void UpdateAI(uint32 const diff) override {}
 };
 
 CreatureAI* GetAI_GothikTrigger(Creature* pCreature)

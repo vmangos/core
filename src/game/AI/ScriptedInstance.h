@@ -25,12 +25,12 @@ enum EncounterState
 #define OUT_LOAD_INST_DATA_COMPLETE    sLog.outDebug("Instance Data Load for Instance %s (Map %d, Instance Id: %d) is complete.",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
 #define OUT_LOAD_INST_DATA_FAIL        sLog.outError("Unable to load Instance Data for Instance %s (Map %d, Instance Id: %d).",instance->GetMapName(), instance->GetId(), instance->GetInstanceId())
 
-class MANGOS_DLL_DECL ScriptedInstance : public InstanceData
+class ScriptedInstance : public InstanceData
 {
     public:
 
         explicit ScriptedInstance(Map* pMap) : InstanceData(pMap) {}
-        ~ScriptedInstance() {}
+        ~ScriptedInstance() override {}
 
         // Default accessor functions
         GameObject* GetSingleGameObjectFromStorage(uint32 uiEntry);
@@ -47,7 +47,7 @@ class MANGOS_DLL_DECL ScriptedInstance : public InstanceData
         //sends world state update to all players in instance
         void DoUpdateWorldState(uint32 uiStateId, uint32 uiStateData);
         std::string GenSaveData(uint32* encounters, uint32 maxIndex);
-        void LoadSaveData(const char* pStr, uint32* encounters, uint32 maxIndex);
+        void LoadSaveData(char const* pStr, uint32* encounters, uint32 maxIndex);
 
         // Get a Player from map
         Player* GetPlayerInMap(bool bOnlyAlive = false, bool bCanBeGamemaster = true);
@@ -66,7 +66,7 @@ class MANGOS_DLL_DECL ScriptedInstance : public InstanceData
         EntryGuidMap m_mNpcEntryGuidStore;                  ///< Store unique NPC-Guids by entry
 };
 
-class MANGOS_DLL_DECL ScriptedInstance_PTR : public ScriptedInstance
+class ScriptedInstance_PTR : public ScriptedInstance
 {
 public:
     explicit ScriptedInstance_PTR(Map* pMap) : ScriptedInstance(pMap) {}

@@ -79,13 +79,13 @@ struct npc_rinjiAI : public npc_escortAI
     uint32 m_uiPostEventTimer;
     int m_iSpawnId;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPostEventCount = 0;
         m_uiPostEventTimer = 3000;
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         m_bIsByOutrunner = false;
         m_iSpawnId = 0;
@@ -93,7 +93,7 @@ struct npc_rinjiAI : public npc_escortAI
         npc_escortAI::JustRespawned();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -128,13 +128,13 @@ struct npc_rinjiAI : public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->SetWalk(false);
         pSummoned->GetMotionMaster()->MovePoint(0, m_afAmbushMoveTo[m_iSpawnId].m_fX, m_afAmbushMoveTo[m_iSpawnId].m_fY, m_afAmbushMoveTo[m_iSpawnId].m_fZ);
     }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         Player* pPlayer = GetPlayerForEscort();
 
@@ -161,10 +161,10 @@ struct npc_rinjiAI : public npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         //Check if we have a current target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (HasEscortState(STATE_ESCORT_ESCORTING) && m_uiPostEventCount)
             {
@@ -203,7 +203,7 @@ struct npc_rinjiAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_rinji(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_rinji(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_RINJI_TRAPPED)
     {
@@ -239,7 +239,7 @@ struct go_lards_picnic_basketAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {
@@ -255,9 +255,7 @@ struct go_lards_picnic_basketAI: public GameObjectAI
     }
     bool CheckCanStartEvent()
     {
-        if (!state)
-            return true;
-        return false;
+        return !state;
     }
 
     void SetInUse()

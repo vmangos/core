@@ -26,7 +26,7 @@
 INSTANTIATE_SINGLETON_1(Config);
 
 // Defined here as it must not be exposed to end-users.
-bool Config::GetValueHelper(const char* name, ACE_TString &result)
+bool Config::GetValueHelper(char const* name, ACE_TString& result)
 {
     GuardType guard(m_configLock);
 
@@ -35,7 +35,7 @@ bool Config::GetValueHelper(const char* name, ACE_TString &result)
 
     ACE_TString section_name;
     ACE_Configuration_Section_Key section_key;
-    const ACE_Configuration_Section_Key &root_key = mConf->root_section();
+    ACE_Configuration_Section_Key const& root_key = mConf->root_section();
 
     int i = 0;
     while (mConf->enumerate_sections(root_key, i, section_name) == 0)
@@ -59,7 +59,7 @@ Config::~Config()
     delete mConf;
 }
 
-bool Config::SetSource(const char *file)
+bool Config::SetSource(char const* file)
 {
     mFilename = file;
 
@@ -83,36 +83,33 @@ bool Config::Reload()
     return false;
 }
 
-std::string Config::GetStringDefault(const char* name, const char* def)
+std::string Config::GetStringDefault(char const* name, char const* def)
 {
     ACE_TString val;
     return GetValueHelper(name, val) ? val.c_str() : def;
 }
 
-bool Config::GetBoolDefault(const char* name, bool def)
+bool Config::GetBoolDefault(char const* name, bool def)
 {
     ACE_TString val;
     if (!GetValueHelper(name, val))
         return def;
 
-    const char* str = val.c_str();
-    if (strcmp(str, "true") == 0 || strcmp(str, "TRUE") == 0 ||
-        strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
-        strcmp(str, "1") == 0)
-        return true;
-    else
-        return false;
+    char const* str = val.c_str();
+    return strcmp(str, "true") == 0 || strcmp(str, "TRUE") == 0 ||
+           strcmp(str, "yes") == 0 || strcmp(str, "YES") == 0 ||
+           strcmp(str, "1") == 0;
 }
 
 
-int32 Config::GetIntDefault(const char* name, int32 def)
+int32 Config::GetIntDefault(char const* name, int32 def)
 {
     ACE_TString val;
     return GetValueHelper(name, val) ? atoi(val.c_str()) : def;
 }
 
 
-float Config::GetFloatDefault(const char* name, float def)
+float Config::GetFloatDefault(char const* name, float def)
 {
     ACE_TString val;
     return GetValueHelper(name, val) ? (float)atof(val.c_str()) : def;

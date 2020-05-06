@@ -72,7 +72,7 @@ void WorldSession::HandleGuildInviteOpcode(WorldPacket& recvPacket)
     DEBUG_LOG("WORLD: Received CMSG_GUILD_INVITE");
 
     std::string Invitedname, plname;
-    Player * player = NULL;
+    Player* player = nullptr;
 
     recvPacket >> Invitedname;
 
@@ -202,7 +202,7 @@ void WorldSession::HandleGuildRemoveOpcode(WorldPacket& recvPacket)
 void WorldSession::HandleGuildAcceptOpcode(WorldPacket& /*recvPacket*/)
 {
     Guild *guild;
-    Player *player = GetPlayer();
+    Player* player = GetPlayer();
 
     DEBUG_LOG("WORLD: Received CMSG_GUILD_ACCEPT");
 
@@ -442,7 +442,7 @@ void WorldSession::HandleGuildLeaderOpcode(WorldPacket& recvPacket)
     std::string name;
     recvPacket >> name;
 
-    Player *oldLeader = GetPlayer();
+    Player* oldLeader = GetPlayer();
 
     if (!normalizePlayerName(name))
         return;
@@ -490,7 +490,7 @@ void WorldSession::HandleGuildMOTDOpcode(WorldPacket& recvPacket)
     if (!recvPacket.empty())
         recvPacket >> MOTD;
     else
-        MOTD = "";
+        MOTD.clear();
 
     if (MOTD.size() > GUILD_MOTD_MAX_LENGTH)
         return;
@@ -681,7 +681,7 @@ void WorldSession::HandleGuildDelRankOpcode(WorldPacket& /*recvPacket*/)
     guild->Roster();                                        // broadcast for tab rights update
 }
 
-void WorldSession::SendGuildCommandResult(uint32 typecmd, const std::string& str, uint32 cmdresult)
+void WorldSession::SendGuildCommandResult(uint32 typecmd, std::string const& str, uint32 cmdresult)
 {
     WorldPacket data(SMSG_GUILD_COMMAND_RESULT, (8 + str.size() + 1));
     data << typecmd;
@@ -727,7 +727,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     recvPacket >> vendorGuid;
     recvPacket >> EmblemStyle >> EmblemColor >> BorderStyle >> BorderColor >> BackgroundColor;
 
-    Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER);
+    Creature* pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!pCreature)
     {
         //[-ZERO] fails silently, not "That's not an emblem vendor!"
@@ -737,7 +737,7 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     }
 
     // remove fake death
-    if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
+    if (GetPlayer()->HasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
     Guild* guild = sGuildMgr.GetGuildById(GetPlayer()->GetGuildId());

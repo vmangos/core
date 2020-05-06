@@ -35,15 +35,15 @@ class SpellEntry;
 class HostileRefManager : public RefManager<Unit, ThreatManager>
 {
     public:
-        explicit HostileRefManager(Unit *pOwner);
-        ~HostileRefManager();
+        explicit HostileRefManager(Unit* pOwner);
+        ~HostileRefManager() override;
 
         Unit* getOwner() { return iOwner; }
 
         // send threat to all my hateres for the pVictim
         // The pVictim is hated than by them as well
         // use for buffs and healing threat functionality
-        void threatAssist(Unit *pVictim, float threat, SpellEntry const *threatSpell = 0, bool pSingleTarget=false);
+        void threatAssist(Unit* pVictim, float threat, SpellEntry const* threatSpell = 0, bool pSingleTarget=false);
 
         // Nostalrius
         void addTempThreat(float threat, bool apply);
@@ -57,17 +57,17 @@ class HostileRefManager : public RefManager<Unit, ThreatManager>
         // Remove specific faction references
         void deleteReferencesForFaction(uint32 faction);
 
-        HostileReference* getFirst() { return ((HostileReference* ) RefManager<Unit, ThreatManager>::getFirst()); }
+        HostileReference* getFirst() { return ((HostileReference*) RefManager<Unit, ThreatManager>::getFirst()); }
 
         void updateThreatTables();
 
         void setOnlineOfflineState(bool pIsOnline);
 
         // set state for one reference, defined by Unit
-        void setOnlineOfflineState(Unit *pCreature,bool pIsOnline);
+        void setOnlineOfflineState(Unit* pCreature,bool pIsOnline);
 
         // delete one reference, defined by Unit
-        void deleteReference(Unit *pCreature);
+        void deleteReference(Unit* pCreature);
 
     private:
         Unit* iOwner;                                       // owner of manager variable, back ref. to it, always exist

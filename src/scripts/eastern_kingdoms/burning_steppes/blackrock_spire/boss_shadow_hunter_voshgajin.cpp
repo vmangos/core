@@ -41,7 +41,7 @@ struct boss_shadowvoshAI : public ScriptedAI
     uint32 m_uiHexTimer;
     uint32 m_uiCleaveTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiCurseOfBloodTimer = 2000;
         m_uiHexTimer          = 8000;
@@ -50,10 +50,10 @@ struct boss_shadowvoshAI : public ScriptedAI
         //m_creature->CastSpell(m_creature,SPELL_ICEARMOR,true);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Curse Of Blood
@@ -80,7 +80,7 @@ struct boss_shadowvoshAI : public ScriptedAI
         // Cleave
         if (m_uiCleaveTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE);
             m_uiCleaveTimer = 7000;
         }
         else

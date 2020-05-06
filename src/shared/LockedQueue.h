@@ -56,7 +56,7 @@ namespace ACE_Based
             }
 
             //! Adds an item to the queue.
-            void add(const T& item)
+            void add(T const& item)
             {
                 ACE_Guard<LockType> g(this->_lock);
                 _queue.push_back(item);

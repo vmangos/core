@@ -49,7 +49,7 @@ struct boss_sulfuronAI : public ScriptedAI
     uint32 Flamespear_Timer;
     ScriptedInstance* m_pInstance;
 
-    void Reset()
+    void Reset() override
     {
         Darkstrike_Timer        = 10000;                     //These times are probably wrong
         DemoralizingShout_Timer = 15000;
@@ -57,32 +57,32 @@ struct boss_sulfuronAI : public ScriptedAI
         Knockdown_Timer         = 6000;
         Flamespear_Timer        = 2000;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_SULFURON, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SULFURON, IN_PROGRESS);
         m_creature->SetInCombatWithZone();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SULFURON, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //DemoralizingShout_Timer
         if (DemoralizingShout_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DEMORALIZINGSHOUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DEMORALIZINGSHOUT) == CAST_OK)
                 DemoralizingShout_Timer = urand(15000, 20000);
         }
         else DemoralizingShout_Timer -= diff;
@@ -90,7 +90,7 @@ struct boss_sulfuronAI : public ScriptedAI
         //Inspire_Timer
         if (Inspire_Timer < diff)
         {
-            Creature* target = NULL;
+            Creature* target = nullptr;
             std::list<Creature*> pList = DoFindFriendlyMissingBuff(45.0f, SPELL_INSPIRE);
             if (!pList.empty())
             {
@@ -113,7 +113,7 @@ struct boss_sulfuronAI : public ScriptedAI
         //Knockdown_Timer
         if (Knockdown_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKDOWN) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKDOWN) == CAST_OK)
                 Knockdown_Timer = urand(12000, 15000);
         }
         else Knockdown_Timer -= diff;
@@ -132,7 +132,7 @@ struct boss_sulfuronAI : public ScriptedAI
         //DarkStrike_Timer
         if (Darkstrike_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DARKSTRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DARKSTRIKE) == CAST_OK)
                 Darkstrike_Timer = urand(15000, 18000);
         }
         else Darkstrike_Timer -= diff;
@@ -148,7 +148,7 @@ CreatureAI* GetAI_boss_sulfuron(Creature* pCreature)
 
 void AddSC_boss_sulfuron()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "boss_sulfuron";

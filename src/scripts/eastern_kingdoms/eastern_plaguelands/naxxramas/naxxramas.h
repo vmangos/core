@@ -157,7 +157,7 @@ enum NaxxAreaTriggers : uint32
 
 };
 
-static const WorldLocation toFrostwyrmTPPos(533, 3498.0f, -5349.68f, 144.97f, 1.3f);
+static const WorldLocation toFrostwyrmTPPos(533, 3498.13f, -5349.6f, 144.967f, 1.48353f);
 static const WorldLocation entranceHubTPPos(533, 3023.52f, -3434.31f, 296.1f, 0.0f);
 
 enum NaxxGOs : uint32
@@ -298,9 +298,9 @@ class instance_naxxramas : public ScriptedInstance
 {
 public:
     instance_naxxramas(Map* pMap);
-    ~instance_naxxramas() {}
+    ~instance_naxxramas() override {}
 
-    void Initialize();
+    void Initialize() override;
 
     bool IsEncounterInProgress() const override;
 
@@ -308,23 +308,23 @@ public:
     void OnObjectCreate(GameObject* pGo) override;
     void OnCreatureRespawn(Creature * pCreature) override;
 
-    void SetData(uint32 uiType, uint32 uiData);
-    uint32 GetData(uint32 uiType);
-    uint64 GetData64(uint32 uiData);
+    void SetData(uint32 uiType, uint32 uiData) override;
+    uint32 GetData(uint32 uiType) override;
+    uint64 GetData64(uint32 uiData) override;
 
     uint64 GetGOUuid(NaxxGOs which);
 
-    const char* Save() { return strInstData.c_str(); }
-    void Load(const char* chrIn);
+    char const* Save() override { return strInstData.c_str(); }
+    void Load (char const* chrIn) override;
 
     // goth
     void SetGothTriggers();
     Creature* GetClosestAnchorForGoth(Creature* pSource, bool bRightSide);
     void GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide);
-    bool IsInRightSideGothArea(const Unit* pUnit);
+    bool IsInRightSideGothArea(Unit const* pUnit);
 
     // kel
-    void OnKTAreaTrigger(const AreaTriggerEntry* pAT); //impl in boss_kelthuzad.cpp
+    void OnKTAreaTrigger(AreaTriggerEntry const* pAT); //impl in boss_kelthuzad.cpp
     void SetChamberCenterCoords(float fX, float fY, float fZ);
     void GetChamberCenterCoords(float &fX, float &fY, float &fZ) { fX = m_fChamberCenterX; fY = m_fChamberCenterY; fZ = m_fChamberCenterZ; }
     void ToggleKelThuzadWindows(bool setOpen);
@@ -332,7 +332,7 @@ public:
     void OnPlayerDeath(Player* p) override;
     void OnCreatureDeath(Creature* pCreature) override;
 
-    void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
+    void onNaxxramasAreaTrigger(Player* pPlayer, AreaTriggerEntry const* pAt);
 
     void UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData = -1);  // GO closes when uiData==IN_PROGRESS, otherwise opens
     void UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32 uiData, int requiredPreBossData = -1);// GO closes when uiData==IN_PROGRESS, otherwise opens

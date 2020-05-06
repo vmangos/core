@@ -46,6 +46,7 @@ class Unit;
 class Pet;
 class GmTicket;
 struct ItemPrototype;
+struct SkillLineEntry;
 
 #define SPELL_PLAYER_MUTED_VISUAL 1852
 
@@ -55,23 +56,16 @@ enum CommandFlags
     COMMAND_FLAGS_CRITICAL          = 0x2,
 };
 
-enum CommandServer
-{
-    NODE,
-    MSTR,
-};
-
 class ChatCommand
 {
 public:
-        CommandServer      server;
-        const char *       Name;
-        uint32             SecurityLevel;                   // function pointer required correct align (use uint32)
+        char const*        Name;
+        uint8              SecurityLevel;                   // function pointer required correct align (use uint32)
         bool               AllowConsole;
         bool (ChatHandler::*Handler)(char* args);
         std::string        Help;
         ChatCommand *      ChildCommands;
-        uint32             Flags;
+        uint8              Flags;
         std::string        FullName;
 };
 
@@ -90,8 +84,13 @@ enum PlayerChatTag
     CHAT_TAG_GM                 = 3,
 };
 
-class MANGOS_DLL_SPEC ChatHandler
+class PartyBotAI;
+class BattleBotAI;
+
+class ChatHandler
 {
+    friend class PartyBotAI;
+    friend class BattleBotAI;
     public:
         explicit ChatHandler(WorldSession* session);
         explicit ChatHandler(Player* player);
@@ -100,20 +99,20 @@ class MANGOS_DLL_SPEC ChatHandler
         static char* LineFromMessage(char*& pos) { char* start = strtok(pos,"\n"); pos = nullptr; return start; }
 
         // function with different implementation for chat/console
-        virtual const char *GetMangosString(int32 entry) const;
-        const char *GetOnOffStr(bool value) const;
+        virtual char const* GetMangosString(int32 entry) const;
+        char const* GetOnOffStr(bool value) const;
 
-        virtual void SendSysMessage(  const char *str);
+        virtual void SendSysMessage(char const* str);
 
-        void SendSysMessage(          int32     entry);
-        void PSendSysMessage(         const char *format, ...) ATTR_PRINTF(2,3);
-        void PSendSysMessage(         int32     entry, ...  );
+        void SendSysMessage(int32 entry);
+        void PSendSysMessage(char const* format, ...) ATTR_PRINTF(2,3);
+        void PSendSysMessage(int32 entry, ...  );
         std::string PGetParseString(int32 entry, ...);
 
-        bool ParseCommands(const char* text);
+        bool ParseCommands(char const* text);
         ChatCommand const* FindCommand(char const* text);
 
-        bool isValidChatMessage(const char* msg);
+        bool isValidChatMessage(char const* msg);
         bool HasSentErrorMessage() { return sentErrorMessage;}
 
         std::string playerLink(std::string const& name) const { return m_session ? "|cffffffff|Hplayer:"+name+"|h["+name+"]|h|r" : name; }
@@ -151,9 +150,9 @@ class MANGOS_DLL_SPEC ChatHandler
             ObjectGuid const& targetGuid = ObjectGuid(), char const* targetName = nullptr,
             char const* channelName = nullptr, uint8 playerRank = 0);
     protected:
-        explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false), m_cluster_is_master(true), m_cluster_is_node(true) {}      // for CLI subclass
+        explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false) {}      // for CLI subclass
 
-        bool hasStringAbbr(const char* name, const char* part);
+        bool hasStringAbbr(char const* name, char const* part);
 
         // function with different implementation for chat/console
         virtual uint32 GetAccountId() const;
@@ -167,28 +166,39 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HasLowerSecurity(Player* target, ObjectGuid guid = ObjectGuid(), bool strong = false);
         bool HasLowerSecurityAccount(WorldSession* target, uint32 account, bool strong = false);
 
-        void SendGlobalSysMessage(const char *str);
+        void SendGlobalSysMessage(char const* str);
 
-        void ForwardCommandToNode();
-        void ForwardCommandToMaster();
-
-        bool SetDataForCommandInTable(ChatCommand *table, const char* text, uint32 security, std::string const& help, uint32 flags);
-        void ExecuteCommand(const char* text);
-        bool ShowHelpForCommand(ChatCommand *table, const char* cmd);
+        bool SetDataForCommandInTable(ChatCommand *table, char const* text, uint8 security, std::string const& help, uint8 flags);
+        void ExecuteCommand(char const* text);
+        bool ShowHelpForCommand(ChatCommand *table, char const* cmd);
         bool ShowHelpForSubCommands(ChatCommand *table, char const* cmd);
         ChatCommandSearchResult FindCommand(ChatCommand* table, char const*& text, ChatCommand*& command, ChatCommand** parentCommand = nullptr, std::string* cmdNamePtr = nullptr, bool allAvailable = false, bool exactlyName = false);
 
         void CheckIntegrity(ChatCommand *table, ChatCommand *parentCommand);
         void FillFullCommandsName(ChatCommand* table, std::string prefix);
         ChatCommand* getCommandTable();
-        bool HandleGodCommand(char *);
-        bool HandleGMOptionsCommand(char *);
-        bool HandleAnticheatCommand(char *);
-        bool HandleClientInfosCommand(char* );
-        bool HandleClientSearchCommand(char* );
+        
+        bool HandleAnticheatCommand(char*);
+        bool HandleClientInfosCommand(char*);
+        bool HandleClientSearchCommand(char*);
         bool HandleReloadAnticheatCommand(char*);
-        bool HandleRunTestCommand(char* );
-        bool HandleViewLogCommand(char* );
+        bool HandleViewLogCommand(char*);
+
+        //Cheats
+        bool HandleCheatStatusCommand(char *);
+        bool HandleCheatGodCommand(char *);
+        bool HandleCheatCooldownCommand(char *);
+        bool HandleCheatCastTimeCommand(char *);
+        bool HandleCheatPowerCommand(char *);
+        bool HandleCheatDebuffImmunityCommand(char *);
+        bool HandleCheatAlwaysCritCommand(char *);
+        bool HandleCheatNoCastCheckCommand(char *);
+        bool HandleCheatAlwaysProcCommand(char *);
+        bool HandleCheatTriggerPassCommand(char *);
+        bool HandleCheatIgnoreTriggersCommand(char *);
+        bool HandleCheatWaterwalkCommand(char* args);
+        bool HandleCheatWallclimbCommand(char* args);
+
         //Custom
         bool HandleListAddonsCommand(char *);
         bool HandleUpdateWorldStateCommand(char *);
@@ -198,8 +208,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugTimeCommand(char *);
         bool HandleDebugMoveFlagsCommand(char *);
         bool HandleDebugMoveSplineCommand(char *);
-        bool HandleDebugExp(char* );
-        bool HandleVideoTurn(char* );
+        bool HandleDebugExp(char*);
+        bool HandleVideoTurn(char*);
         bool HandleDebugLootTableCommand(char*);
         bool HandleDebugItemEnchantCommand(int lootid, unsigned int simCount);
         bool HandleServiceDeleteCharacters(char* args);
@@ -235,6 +245,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleMmapStatsCommand(char* args);
 
         bool HandleDebugMoveToCommand(char* args);
+        bool HandleDebugFaceMeCommand(char* args);
         // AHBot
         bool HandleAHBotReloadCommand(char *);
         bool HandleAHBotUpdateCommand(char *);
@@ -251,6 +262,18 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleBotReloadCommand(char * args);
         bool HandleBotStopCommand(char * args);
         bool HandleBotStartCommand(char * args);
+        bool PartyBotAddRequirementCheck(Player const* pPlayer, Player const* pTarget);
+        bool HandlePartyBotAddCommand(char * args);
+        bool HandlePartyBotCloneCommand(char * args);
+        bool HandlePartyBotSetRoleCommand(char * args);
+        bool HandlePartyBotRemoveCommand(char * args);
+        bool HandleBattleBotAddCommand(char* args, uint8 bg);
+        bool HandleBattleBotAddAlteracCommand(char* args);
+        bool HandleBattleBotAddArathiCommand(char* args);
+        bool HandleBattleBotAddWarsongCommand(char* args);
+        bool HandleBattleBotRemoveCommand(char* args);
+        bool HandleBattleBotShowPathCommand(char* args);
+        bool HandleBattleBotShowAllPathsCommand(char* args);
 
         // spell_disabled
         bool HandleReloadSpellDisabledCommand(char *args);
@@ -316,6 +339,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCharacterChangeRaceCommand(char *args);
         bool HandleCharacterCopySkinCommand(char *args);
         bool HandleCharacterFillFlysCommand(char *args);
+        bool HandleCharacterPremadeGearCommand(char *args);
+        bool HandleCharacterPremadeSpecCommand(char *args);
+        bool HandleCharacterPremadeSaveGearCommand(char *args);
+        bool HandleCharacterPremadeSaveSpecCommand(char *args);
         bool HandleFactionChangeItemsCommand(char *args);
         // bg
         bool HandleBGStatusCommand(char *args);
@@ -346,7 +373,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadFactionChangeItems(char* args);
         bool HandleReloadFactionChangeQuests(char* args);
         bool HandleReloadFactionChangeMounts(char* args);
-        bool HandleReloadCreatureModelInfo(char* args);
+        bool HandleReloadCreatureDisplayInfoAddon(char* args);
         bool HandleReloadIPBanList(char* args);
         bool HandleReloadAccountBanList(char* args);
         bool HandleReloadCreatureCommand(char* args);
@@ -354,8 +381,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadInstanceBuffRemoval(char* args);
         bool HandleReloadPetitions(char* args);
         // Channel
-        bool HandleChannelJoinCommand(char* );
-        bool HandleChannelLeaveCommand(char* );
+        bool HandleChannelJoinCommand(char*);
+        bool HandleChannelLeaveCommand(char*);
 
         bool HandleAccountCommand(char* args);
         bool HandleAccountCharactersCommand(char* args);
@@ -393,6 +420,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCastSelfCommand(char* args);
         bool HandleCastTargetCommand(char* args);
 
+        bool HandleCharacterAIInfoCommand(char* args);
         bool HandleCharacterDeletedDeleteCommand(char* args);
         bool HandleCharacterDeletedListCommand(char* args, bool useName);
         bool HandleCharacterDeletedListAccountCommand(char* args);
@@ -605,9 +633,14 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleModifyCrCommand(char *args);
         bool HandleModifyBrCommand(char *args);
 
+        bool HandleModifyHairStyleCommand(char *args);
+        bool HandleModifyHairColorCommand(char *args);
+        bool HandleModifySkinColorCommand(char *args);
+        bool HandleModifyAccessoriesCommand(char *args);
 
         //-----------------------Npc Commands-----------------------
         bool HandleNpcAddCommand(char* args);
+        bool HandleNpcAddEntryCommand(char* args);
         bool HandleNpcAddWeaponCommand(char* args);
         bool HandleNpcSummonCommand(char* args);
         bool HandleNpcAddVendorItemCommand(char* args);
@@ -637,8 +670,11 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcUnFollowCommand(char* args);
         bool HandleNpcWhisperCommand(char* args);
         bool HandleNpcYellCommand(char* args);
-
         //----------------------------------------------------------
+
+        bool HandleUnitAIInfoCommand(char* args);
+        bool HandleUnitInfoCommand(char* args);
+        bool HandleUnitStatInfoCommand(char* args);
 
         bool HandlePDumpLoadCommand(char* args);
         bool HandlePDumpWriteCommand(char* args);
@@ -657,6 +693,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandlePetRenameCommand(char* args);
         bool HandlePetDeleteCommand(char* args);
         bool HandlePetLoyaltyCommand(char* args);
+        bool HandlePetInfoCommand(char* args);
 
         bool HandleReloadAllCommand(char* args);
         bool HandleReloadAllAreaCommand(char* args);
@@ -767,6 +804,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleServerLogLevelCommand(char* args);
         bool HandleServerMotdCommand(char* args);
         bool HandleServerPLimitCommand(char* args);
+        bool HandleServerResetAllRaidCommand(char* args);
         bool HandleServerRestartCommand(char* args);
         bool HandleServerSetMotdCommand(char* args);
         bool HandleServerShutDownCommand(char* args);
@@ -794,6 +832,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleHelpCommand(char* args);
         bool HandleCommandsCommand(char* args);
         bool HandleStartCommand(char* args);
+        bool HandleMountCommand(char* args);
         bool HandleDismountCommand(char* args);
         bool HandleSaveCommand(char* args);
 
@@ -808,6 +847,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleTaxiCheatCommand(char* args);
         bool HandleWhispersCommand(char* args);
         bool HandleModifyDrunkCommand(char* args);
+        bool HandleModifyExhaustionCommand(char* args);
         bool HandleSetViewCommand(char* args);
 
         bool HandleGUIDCommand(char* args);
@@ -821,12 +861,16 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleCooldownCommand(char* args);
         bool HandleUnLearnCommand(char* args);
+        bool HandleUnLearnAllGMCommand(char* args);
+        bool HandleUnLearnAllCraftsCommand(char* args);
+        bool HandleUnLearnAllRecipesCommand(char* args);
         bool HandleRemoveRidingCommand(char* args);
         bool HandleGetDistanceCommand(char* args);
         bool HandleGetAngleCommand(char* args);
         bool HandleModifyEmoteStateCommand(char* args);
         bool HandleNameDieCommand(char* args);
         bool HandleDieCommand(char* args);
+        bool HandleKnockBackCommand(char* args);
         bool HandleFearCommand(char* args);
         bool HandleDamageCommand(char* args);
         bool HandleAoEDamageCommand(char* args);
@@ -840,7 +884,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNearGraveCommand(char* args);
         bool HandleExploreCheatCommand(char* args);
         bool HandleHoverCommand(char* args);
-        bool HandleXpCommand(char* args);
+        bool HandleModifyXpRateCommand(char* args);
         bool HandleLevelUpCommand(char* args);
         bool HandleShowAreaCommand(char* args);
         bool HandleHideAreaCommand(char* args);
@@ -851,9 +895,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleBankCommand(char* args);
         bool HandleChangeWeatherCommand(char* args);
         bool HandleKickPlayerCommand(char* args);
-
-        bool HandleNodeServersListCommand(char* args);
-        bool HandleNodeServersSwitchCommand(char* args);
 
         // GM Tickets commands
         bool ViewTicketByIdOrName(char* ticketId, char* name);
@@ -890,8 +931,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleCombatStopCommand(char* args);
         bool HandleRepairitemsCommand(char* args);
         bool HandleStableCommand(char* args);
-        bool HandleWaterwalkCommand(char* args);
-        bool HandleWallclimbCommand(char* args);
         bool HandleQuitCommand(char* args);
 
         //! Development Commands
@@ -939,20 +978,22 @@ class MANGOS_DLL_SPEC ChatHandler
 
         // Utility methods for commands
         bool ShowAccountIpListHelper(char* args, bool onlineonly);
-        void ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState = nullptr, Player * target = nullptr );
+        void ShowFactionListHelper(FactionEntry const* factionEntry, LocaleConstant loc, FactionState const* repState = nullptr, Player* target = nullptr);
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = nullptr);
         void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = nullptr);
         void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
         void ShowPoolListHelper(uint16 pool_id);
-        void ShowTriggerListHelper(AreaTriggerEntry const * atEntry);
+        void ShowTriggerListHelper(AreaTriggerEntry const* atEntry);
         void ShowTriggerTargetListHelper(uint32 id, AreaTriggerTeleport const* at, bool subpart = false);
+        SkillLineEntry const* FindSkillLineEntryFromProfessionName(char* args, std::string& nameOut);
         bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = nullptr);
         bool HandleBanListHelper(QueryResult* result);
         bool HandleBanHelper(BanMode mode, char* args);
         bool HandleBanInfoHelper(uint32 accountid, char const* accountname);
         bool HandleUnBanHelper(BanMode mode, char* args);
         void HandleCharacterLevel(Player* player, ObjectGuid player_guid, uint32 oldlevel, uint32 newlevel);
-        void HandleLearnSkillRecipesHelper(Player* player,uint32 skill_id);
+        void HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id);
+        void HandleUnLearnSkillRecipesHelper(Player* player,uint32 skill_id);
         bool HandleGoHelper(Player* _player, uint32 mapid, float x, float y, float const* zPtr = nullptr, float const* ortPtr = nullptr);
         bool HandleGetValueHelper(Object* target, uint32 field, char* typeStr);
         bool HandlerDebugModValueHelper(Object* target, uint32 field, char* typeStr, char* valStr);
@@ -962,7 +1003,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSendMailHelper(MailDraft& draft, char* args);
         bool HandleSendMoneyHelper(MailDraft& draft, char* args);
 
-        bool HandleAuraHelper(uint32 spellID, int32 duration, Unit*);
+        bool HandleAuraHelper(uint32 spellId, int32 duration, Unit*);
         bool HandleDieHelper(Unit* target);
 
         template<typename T>
@@ -990,14 +1031,11 @@ class MANGOS_DLL_SPEC ChatHandler
 
         void SetSentErrorMessage(bool val){ sentErrorMessage = val;};
     private:
-        WorldSession * m_session;                           // != NULL for chat command call and NULL for CLI command
+        WorldSession* m_session;                           // != nullptr for chat command call and nullptr for CLI command
 
         // common global flag
         static bool load_command_table;
         bool sentErrorMessage;
-
-        bool m_cluster_is_node;
-        bool m_cluster_is_master;
 };
 
 class CliHandler : public ChatHandler
@@ -1008,15 +1046,15 @@ class CliHandler : public ChatHandler
             : m_accountId(accountId), m_loginAccessLevel(accessLevel), m_callbackArg(callbackArg), m_print(zprint) {}
 
         // overwrite functions
-        const char *GetMangosString(int32 entry) const;
-        uint32 GetAccountId() const;
-        AccountTypes GetAccessLevel() const;
-        bool isAvailable(ChatCommand const& cmd) const;
-        void SendSysMessage(const char *str);
-        std::string GetNameLink() const;
-        bool needReportToTarget(Player* chr) const;
-        LocaleConstant GetSessionDbcLocale() const;
-        int GetSessionDbLocaleIndex() const;
+        char const* GetMangosString(int32 entry) const override;
+        uint32 GetAccountId() const override;
+        AccountTypes GetAccessLevel() const override;
+        bool isAvailable(ChatCommand const& cmd) const override;
+        void SendSysMessage(char const* str) override;
+        std::string GetNameLink() const override;
+        bool needReportToTarget(Player* chr) const override;
+        LocaleConstant GetSessionDbcLocale() const override;
+        int GetSessionDbLocaleIndex() const override;
 
     private:
         uint32 m_accountId;
@@ -1031,14 +1069,14 @@ class NullChatHandler : public ChatHandler
         explicit NullChatHandler() {}
 
         // overwrite functions
-        const char *GetMangosString(int32 entry) const;
-        uint32 GetAccountId() const { return 0; }
-        AccountTypes GetAccessLevel() const { return SEC_PLAYER; }
-        bool isAvailable(ChatCommand const& cmd) const { return false; }
-        void SendSysMessage(const char *str) {}
-        std::string GetNameLink() const { return ""; }
-        LocaleConstant GetSessionDbcLocale() const;
-        int GetSessionDbLocaleIndex() const;
+        char const* GetMangosString(int32 entry) const override;
+        uint32 GetAccountId() const override { return 0; }
+        AccountTypes GetAccessLevel() const override { return SEC_PLAYER; }
+        bool isAvailable(ChatCommand const& cmd) const override { return false; }
+        void SendSysMessage(char const* str) override {}
+        std::string GetNameLink() const override { return ""; }
+        LocaleConstant GetSessionDbcLocale() const override;
+        int GetSessionDbLocaleIndex() const override;
 };
 
 

@@ -199,7 +199,7 @@ struct MemberSlot
 
 struct RankInfo
 {
-    RankInfo(const std::string& _name, uint32 _rights) : Name(_name), Rights(_rights)
+    RankInfo(std::string const& _name, uint32 _rights) : Name(_name), Rights(_rights)
     {
     }
 
@@ -252,28 +252,28 @@ class Guild
         uint32 GetMemberSize() const { return members.size(); }
         uint32 GetAccountsNumber();
 
-        bool LoadGuildFromDB(QueryResult *guildDataResult);
+        bool LoadGuildFromDB(QueryResult* guildDataResult);
         bool CheckGuildStructure();
-        bool LoadRanksFromDB(QueryResult *guildRanksResult);
-        bool LoadMembersFromDB(QueryResult *guildMembersResult);
+        bool LoadRanksFromDB(QueryResult* guildRanksResult);
+        bool LoadMembersFromDB(QueryResult* guildMembersResult);
 
-        void BroadcastToGuild(WorldSession *session, const std::string& msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastToOfficers(WorldSession *session, const std::string& msg, uint32 language = LANG_UNIVERSAL);
-        void BroadcastPacketToRank(WorldPacket *packet, uint32 rankId);
-        void BroadcastPacket(WorldPacket *packet);
+        void BroadcastToGuild(WorldSession* session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastToOfficers(WorldSession* session, std::string const& msg, uint32 language = LANG_UNIVERSAL);
+        void BroadcastPacketToRank(WorldPacket* packet, uint32 rankId);
+        void BroadcastPacket(WorldPacket* packet);
 
-        void BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 = NULL, char const* str2 = NULL, char const* str3 = NULL);
-        void BroadcastEvent(GuildEvents event, char const* str1 = NULL, char const* str2 = NULL, char const* str3 = NULL)
+        void BroadcastEvent(GuildEvents event, ObjectGuid guid, char const* str1 = nullptr, char const* str2 = nullptr, char const* str3 = nullptr);
+        void BroadcastEvent(GuildEvents event, char const* str1 = nullptr, char const* str2 = nullptr, char const* str3 = nullptr)
         {
             BroadcastEvent(event, ObjectGuid(), str1, str2, str3);
         }
 
         template<class Do>
-        void BroadcastWorker(Do& _do, Player* except = NULL)
+        void BroadcastWorker(Do& _do, Player* except = nullptr)
         {
             for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
-                if(Player *player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
-                    if(player != except)
+                if (Player* player = ObjectAccessor::FindPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first)))
+                    if (player != except)
                         _do(player);
         }
 
@@ -299,28 +299,28 @@ class Guild
         MemberSlot* GetMemberSlot(ObjectGuid guid)
         {
             MemberList::iterator itr = members.find(guid.GetCounter());
-            return itr != members.end() ? &itr->second : NULL;
+            return itr != members.end() ? &itr->second : nullptr;
         }
 
-        MemberSlot* GetMemberSlot(const std::string& name)
+        MemberSlot* GetMemberSlot(std::string const& name)
         {
-            for(MemberList::iterator itr = members.begin(); itr != members.end(); ++itr)
-                if(itr->second.Name == name)
-                    return &itr->second;
+            for(auto & member : members)
+                if (member.second.Name == name)
+                    return &member.second;
 
-            return NULL;
+            return nullptr;
         }
 
-        void Roster(WorldSession *session = NULL);          // NULL = broadcast
-        void Query(WorldSession *session);
+        void Roster(WorldSession* session = nullptr);          // nullptr = broadcast
+        void Query(WorldSession* session);
 
         // Guild EventLog
         void   LoadGuildEventLogFromDB();
-        void   DisplayGuildEventLog(WorldSession *session);
+        void   DisplayGuildEventLog(WorldSession* session);
         void   LogGuildEvent(uint8 EventType, ObjectGuid playerGuid1, ObjectGuid playerGuid2 = ObjectGuid(), uint8 newRank = 0);
 
     protected:
-        void AddRank(const std::string& name,uint32 rights);
+        void AddRank(std::string const& name,uint32 rights);
 
         uint32 m_Id;
         std::string m_Name;

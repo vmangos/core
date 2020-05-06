@@ -29,7 +29,7 @@
 
 /// ---- ASYNC STATEMENTS / TRANSACTIONS ----
 
-bool SqlPlainRequest::Execute(SqlConnection *conn)
+bool SqlPlainRequest::Execute(SqlConnection* conn)
 {
     /// just do it
     LOCK_DB_CONN(conn);
@@ -45,7 +45,7 @@ SqlTransaction::~SqlTransaction()
     }
 }
 
-bool SqlTransaction::Execute(SqlConnection *conn)
+bool SqlTransaction::Execute(SqlConnection* conn)
 {
     if(m_queue.empty())
         return true;
@@ -54,10 +54,10 @@ bool SqlTransaction::Execute(SqlConnection *conn)
 
     conn->BeginTransaction();
 
-    const int nItems = m_queue.size();
+    int const nItems = m_queue.size();
     for (int i = 0; i < nItems; ++i)
     {
-        SqlOperation * pStmt = m_queue[i];
+        SqlOperation* pStmt = m_queue[i];
 
         if(!pStmt->Execute(conn))
         {
@@ -69,7 +69,7 @@ bool SqlTransaction::Execute(SqlConnection *conn)
     return conn->CommitTransaction();
 }
 
-SqlPreparedRequest::SqlPreparedRequest(int nIndex, SqlStmtParameters * arg ) : m_nIndex(nIndex), m_param(arg)
+SqlPreparedRequest::SqlPreparedRequest(int nIndex, SqlStmtParameters* arg) : m_nIndex(nIndex), m_param(arg)
 {
 }
 
@@ -78,7 +78,7 @@ SqlPreparedRequest::~SqlPreparedRequest()
     delete m_param;
 }
 
-bool SqlPreparedRequest::Execute( SqlConnection *conn )
+bool SqlPreparedRequest::Execute(SqlConnection* conn)
 {
     LOCK_DB_CONN(conn);
     return conn->ExecuteStmt(m_nIndex, *m_param);
@@ -86,7 +86,7 @@ bool SqlPreparedRequest::Execute( SqlConnection *conn )
 
 /// ---- ASYNC QUERIES ----
 
-bool SqlQuery::Execute(SqlConnection *conn)
+bool SqlQuery::Execute(SqlConnection* conn)
 {
     if(!m_callback || !m_queue)
         return false;
@@ -110,7 +110,7 @@ class SqlResultCallbackCaller : public ACE_Based::Runnable
             #ifndef DO_POSTGRESQL
             mysql_thread_init();
             #endif
-            MaNGOS::IQueryCallback* s = NULL;
+            MaNGOS::IQueryCallback* s = nullptr;
             while (queue.next(s))
             {
                 s->Execute();
@@ -130,7 +130,7 @@ void SqlResultQueue::Update(uint32 timeout)
     SqlResultCallbackCaller* caller = new SqlResultCallbackCaller();
     caller->incReference();
     ACE_Based::Thread** threads = new ACE_Based::Thread*[threadsCount];
-    MaNGOS::IQueryCallback* callback = NULL;
+    MaNGOS::IQueryCallback* callback = nullptr;
     int n = 0;
     while (next(callback))
     {
@@ -150,7 +150,7 @@ void SqlResultQueue::Update(uint32 timeout)
     for (int i = 0; i < threadsCount; ++i)
         threads[i] = new ACE_Based::Thread(caller);
     // Now execute thread unsafe callbacks
-    MaNGOS::IQueryCallback* s = NULL;
+    MaNGOS::IQueryCallback* s = nullptr;
     while (_threadUnsafeWaitingQueries.next(s))
     {
         s->Execute();
@@ -178,13 +178,13 @@ void SqlResultQueue::CancelAll()
     MaNGOS::IQueryCallback* cb;
     while (next(cb))
     {
-        cb->SetResult(NULL);
+        cb->SetResult(nullptr);
         cb->Execute();
         delete cb;
     }
 }
 
-bool SqlQueryHolder::Execute(MaNGOS::IQueryCallback * callback, Database *database, SqlResultQueue *queue)
+bool SqlQueryHolder::Execute(MaNGOS::IQueryCallback* callback, Database* database, SqlResultQueue* queue)
 {
     if(!callback || !database || !queue)
         return false;
@@ -197,7 +197,7 @@ bool SqlQueryHolder::Execute(MaNGOS::IQueryCallback * callback, Database *databa
     return true;
 }
 
-bool SqlQueryHolder::SetQuery(size_t index, const char *sql)
+bool SqlQueryHolder::SetQuery(size_t index, char const* sql)
 {
     if(m_queries.size() <= index)
     {
@@ -205,7 +205,7 @@ bool SqlQueryHolder::SetQuery(size_t index, const char *sql)
         return false;
     }
 
-    if(m_queries[index].first != NULL)
+    if(m_queries[index].first != nullptr)
     {
         sLog.outError("Attempt assign query to holder index (" SIZEFMTD ") where other query stored (Old: [%s] New: [%s])",
             index,m_queries[index].first,sql);
@@ -213,11 +213,11 @@ bool SqlQueryHolder::SetQuery(size_t index, const char *sql)
     }
 
     /// not executed yet, just stored (it's not called a holder for nothing)
-    m_queries[index] = SqlResultPair(mangos_strdup(sql), (QueryResult*)NULL);
+    m_queries[index] = SqlResultPair(mangos_strdup(sql), (QueryResult*)nullptr);
     return true;
 }
 
-bool SqlQueryHolder::SetPQuery(size_t index, const char *format, ...)
+bool SqlQueryHolder::SetPQuery(size_t index, char const* format, ...)
 {
     if(!format)
     {
@@ -228,7 +228,7 @@ bool SqlQueryHolder::SetPQuery(size_t index, const char *format, ...)
     va_list ap;
     char szQuery [MAX_QUERY_LEN];
     va_start(ap, format);
-    int res = vsnprintf( szQuery, MAX_QUERY_LEN, format, ap );
+    int res = vsnprintf(szQuery, MAX_QUERY_LEN, format, ap);
     va_end(ap);
 
     if(res==-1)
@@ -245,19 +245,19 @@ QueryResult* SqlQueryHolder::GetResult(size_t index)
     if(index < m_queries.size())
     {
         /// the query strings are freed on the first GetResult or in the destructor
-        if(m_queries[index].first != NULL)
+        if(m_queries[index].first != nullptr)
         {
             delete [] (const_cast<char*>(m_queries[index].first));
-            m_queries[index].first = NULL;
+            m_queries[index].first = nullptr;
         }
         /// when you get a result aways remember to delete it!
         return m_queries[index].second;
     }
     else
-        return NULL;
+        return nullptr;
 }
 
-void SqlQueryHolder::SetResult(size_t index, QueryResult *result)
+void SqlQueryHolder::SetResult(size_t index, QueryResult* result)
 {
     /// store the result in the holder
     if(index < m_queries.size())
@@ -270,13 +270,13 @@ SqlQueryHolder::~SqlQueryHolder()
     {
         /// if the result was never used, free the resources
         /// results used already (getresult called) are expected to be deleted
-        if(m_queries[i].first != NULL)
+        if(m_queries[i].first != nullptr)
         {
             delete [] (const_cast<char*>(m_queries[i].first));
             if(m_queries[i].second)
             {
                 delete m_queries[i].second;
-                m_queries[i].second = NULL;
+                m_queries[i].second = nullptr;
             }
         }
     }
@@ -288,10 +288,10 @@ void SqlQueryHolder::DeleteAllResults()
     {
         /// if the result was never used, free the resources
         /// results used already (getresult called) are expected to be deleted
-        if (m_queries[i].second != NULL)
+        if (m_queries[i].second != nullptr)
         {
             delete m_queries[i].second;
-            m_queries[i].second = NULL;
+            m_queries[i].second = nullptr;
         }
     }
 }
@@ -302,7 +302,7 @@ void SqlQueryHolder::SetSize(size_t size)
     m_queries.resize(size);
 }
 
-bool SqlQueryHolderEx::Execute(SqlConnection *conn)
+bool SqlQueryHolderEx::Execute(SqlConnection* conn)
 {
     if(!m_holder || !m_callback || !m_queue)
         return false;

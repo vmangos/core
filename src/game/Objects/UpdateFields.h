@@ -110,30 +110,46 @@ enum EUnitFields
     UNIT_FIELD_AURA                            = 0x29 + OBJECT_END, // Size:48
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     UNIT_FIELD_AURA_LAST                       = UNIT_FIELD_AURA + 47,
-#else
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     UNIT_FIELD_AURA_LAST                       = UNIT_FIELD_AURA + 63,
+#else
+    UNIT_FIELD_AURA_LAST                       = UNIT_FIELD_AURA + 55,
 #endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     UNIT_FIELD_AURAFLAGS,                      // Size:6
     UNIT_FIELD_AURAFLAGS_01,
     UNIT_FIELD_AURAFLAGS_02,
     UNIT_FIELD_AURAFLAGS_03,
     UNIT_FIELD_AURAFLAGS_04,
     UNIT_FIELD_AURAFLAGS_05,
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
     UNIT_FIELD_AURAFLAGS_06,
     UNIT_FIELD_AURAFLAGS_07,
-#endif
+    #endif
     UNIT_FIELD_AURALEVELS,                     // Size:12
-#if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4) || (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1)
+    #if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4) || (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1)
     UNIT_FIELD_AURALEVELS_LAST                 = UNIT_FIELD_AURALEVELS + 11,
-#else
+    #else
     UNIT_FIELD_AURALEVELS_LAST                 = UNIT_FIELD_AURALEVELS + 7,
-#endif
+    #endif
     UNIT_FIELD_AURAAPPLICATIONS,               // Size:12
-#if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4) || (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1)
+    #if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4) || (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1)
     UNIT_FIELD_AURAAPPLICATIONS_LAST           = UNIT_FIELD_AURAAPPLICATIONS + 11,
-#else
+    #else
     UNIT_FIELD_AURAAPPLICATIONS_LAST           = UNIT_FIELD_AURAAPPLICATIONS + 15,
+    #endif
+#else
+    UNIT_FIELD_AURALEVELS,
+    UNIT_FIELD_AURALEVELS_LAST                 = UNIT_FIELD_AURALEVELS + 9,
+    UNIT_FIELD_AURAAPPLICATIONS,
+    UNIT_FIELD_AURAAPPLICATIONS_LAST           = UNIT_FIELD_AURAAPPLICATIONS + 9,
+    UNIT_FIELD_AURAFLAGS,
+    UNIT_FIELD_AURAFLAGS_01,
+    UNIT_FIELD_AURAFLAGS_02,
+    UNIT_FIELD_AURAFLAGS_03,
+    UNIT_FIELD_AURAFLAGS_04,
+    UNIT_FIELD_AURAFLAGS_05,
+    UNIT_FIELD_AURAFLAGS_06,
 #endif
     UNIT_FIELD_AURASTATE,                      // Size:1
     UNIT_FIELD_BASEATTACKTIME,                 // Size:1
@@ -182,7 +198,9 @@ enum EUnitFields
 #else
     UNIT_FIELD_ATTACK_POWER,                   // Size:1
     UNIT_FIELD_BASE_MANA,                      // Size:1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     UNIT_FIELD_BASE_HEALTH,                    // Size:1
+#endif
     UNIT_FIELD_ATTACK_POWER_MODS,              // Size:1
     UNIT_FIELD_BYTES_2,                        // Size:1
 #endif
@@ -193,6 +211,7 @@ enum EUnitFields
 #endif
     UNIT_FIELD_MINRANGEDDAMAGE,                // Size:1
     UNIT_FIELD_MAXRANGEDDAMAGE,                // Size:1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
     UNIT_FIELD_POWER_COST_MODIFIER,            // Size:7
     UNIT_FIELD_POWER_COST_MODIFIER_01,
     UNIT_FIELD_POWER_COST_MODIFIER_02,
@@ -207,6 +226,7 @@ enum EUnitFields
     UNIT_FIELD_POWER_COST_MULTIPLIER_04,
     UNIT_FIELD_POWER_COST_MULTIPLIER_05,
     UNIT_FIELD_POWER_COST_MULTIPLIER_06,
+#endif
     UNIT_FIELD_PADDING,
     UNIT_END,
 
@@ -403,4 +423,47 @@ enum ECorpseFields
     CORPSE_FIELD_PAD                           = OBJECT_END + 0x1F,
     CORPSE_END                                 = OBJECT_END + 0x20,
 };
+
+enum UpdateFields5875
+{
+    FIELD_GAMEOBJECT_FLAGS           = 9,
+    FIELD_GAMEOBJECT_DYN_FLAGS       = 19,
+    FIELD_ITEM_FIELD_FLAGS           = 21,
+    FIELD_CORPSE_FIELD_FLAGS         = 35,
+    FIELD_CORPSE_FIELD_DYNAMIC_FLAGS = 36,
+    FIELD_UNIT_FIELD_FLAGS           = 46,
+    FIELD_UNIT_DYNAMIC_FLAGS         = 143,
+    FIELD_UNIT_NPC_FLAGS             = 147,
+    FIELD_PLAYER_FLAGS               = 190,
+};
+
+// We use exact index of update fields in some script commands,
+// but they change based on supported build, so fix them here.
+inline uint32 GetIndexOfUpdateFieldForCurrentBuild(uint32 db_index)
+{
+    switch (db_index)
+    {
+        case FIELD_GAMEOBJECT_FLAGS:
+            return GAMEOBJECT_FLAGS;
+        case FIELD_GAMEOBJECT_DYN_FLAGS:
+            return GAMEOBJECT_DYN_FLAGS;
+        case FIELD_ITEM_FIELD_FLAGS:
+            return ITEM_FIELD_FLAGS;
+        case FIELD_CORPSE_FIELD_FLAGS:
+            return CORPSE_FIELD_FLAGS;
+        case FIELD_CORPSE_FIELD_DYNAMIC_FLAGS:
+            return CORPSE_FIELD_DYNAMIC_FLAGS;
+        case FIELD_UNIT_FIELD_FLAGS:
+            return UNIT_FIELD_FLAGS;
+        case FIELD_UNIT_DYNAMIC_FLAGS:
+            return UNIT_DYNAMIC_FLAGS;
+        case FIELD_UNIT_NPC_FLAGS:
+            return UNIT_NPC_FLAGS;
+        case FIELD_PLAYER_FLAGS:
+            return PLAYER_FLAGS;
+    }
+
+    return db_index;
+}
+
 #endif

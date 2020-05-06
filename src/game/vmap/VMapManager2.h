@@ -51,9 +51,9 @@ namespace VMAP
     class ManagedModel
     {
         public:
-            ManagedModel(): iModel(0), iRefCount(0) {}
+            ManagedModel() : iModel(nullptr), iRefCount(0) {}
             void setModel(WorldModel* model) { iModel = model; }
-            WorldModel* getModel() { return iModel; }
+            WorldModel* getModel() const { return iModel; }
             void incRefCount() { ++iRefCount; }
             int decRefCount() { return --iRefCount; }
             int getRefCount() const { return iRefCount.value(); }
@@ -72,7 +72,7 @@ namespace VMAP
             ModelFileMap iLoadedModelFiles;
             InstanceTreeMap iInstanceMapTrees;
 
-            bool _loadMap(uint32 pMapId, const std::string& basePath, uint32 tileX, uint32 tileY);
+            bool _loadMap(uint32 pMapId, std::string const& basePath, uint32 tileX, uint32 tileY);
             /* void _unloadMap(uint32 pMapId, uint32 x, uint32 y); */
 
             ACE_RW_Mutex    m_modelsLock;
@@ -84,13 +84,13 @@ namespace VMAP
             VMapManager2();
             ~VMapManager2();
 
-            VMAPLoadResult loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) override;
+            VMAPLoadResult loadMap(char const* pBasePath, unsigned int pMapId, int x, int y) override;
 
             void unloadMap(unsigned int pMapId, int x, int y) override;
             void unloadMap(unsigned int pMapId) override;
 
             bool isInLineOfSight(unsigned int pMapId, float x1, float y1, float z1, float x2, float y2, float z2) override;
-            ModelInstance* FindCollisionModel(unsigned int mapId, float x0, float y0, float z0, float x1, float y1, float z1);
+            ModelInstance* FindCollisionModel(unsigned int mapId, float x0, float y0, float z0, float x1, float y1, float z1) override;
             /**
             fill the hit pos and return true, if an object was hit
             */
@@ -100,18 +100,18 @@ namespace VMAP
             bool processCommand(char* /*pCommand*/) override { return false; }      // for debug and extensions
 
             bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const override;
-            bool isUnderModel(unsigned int pMapId, float x, float y, float z, float* outDist = NULL, float* inDist = NULL) const override;
+            bool isUnderModel(unsigned int pMapId, float x, float y, float z, float* outDist = nullptr, float* inDist = nullptr) const override;
             bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 ReqLiquidType, float& level, float& floor, uint32& type) const override;
 
-            WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
-            void releaseModelInstance(const std::string& filename);
+            WorldModel* acquireModelInstance(std::string const& basepath, std::string const& filename);
+            void releaseModelInstance(std::string const& filename);
 
             // what's the use of this? o.O
             std::string getDirFileName(unsigned int pMapId, int /*x*/, int /*y*/) const override
             {
                 return getMapFileName(pMapId);
             }
-            bool existsMap(const char* pBasePath, unsigned int pMapId, int x, int y) override;
+            bool existsMap(char const* pBasePath, unsigned int pMapId, int x, int y) override;
 
 #ifdef MMAP_GENERATOR
         public:

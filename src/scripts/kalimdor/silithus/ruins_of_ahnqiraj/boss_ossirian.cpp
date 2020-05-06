@@ -48,7 +48,7 @@ enum
     SPELL_SANDSTORM             =  25160
 };
 
-const std::array<uint32, 5> SpellWeakness =
+std::array<uint32, 5> const SpellWeakness =
 {
     25177u, //Fire weakness
     25178u, //Frost weakness
@@ -57,7 +57,7 @@ const std::array<uint32, 5> SpellWeakness =
     25181u  //Arcane weakness
 };
 
-const std::array<SpawnLocations, 2> TornadoSpawn =
+std::array<SpawnLocations, 2> const TornadoSpawn =
 {{
     { -9444.0f, 1857.0f, 85.55f },
     { -9352.0f, 2012.0f, 85.55f }
@@ -93,7 +93,7 @@ struct boss_ossirianAI : public ScriptedAI
     bool m_bIsEnraged;
     bool m_bAggro;
 
-    void Reset()
+    void Reset() override
     {
         m_bAggro = false;
 
@@ -133,21 +133,21 @@ struct boss_ossirianAI : public ScriptedAI
         m_pInstance->SetData(TYPE_OSSIRIAN, FAIL);
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_ENVELOPING_WINDS)
         {
-            TmpThreatVal.push_back(m_creature->getThreatManager().getThreat(pCaster));
+            TmpThreatVal.push_back(m_creature->GetThreatManager().getThreat(pCaster));
             TmpThreatList.push_back(pCaster->GetObjectGuid());
-            m_creature->getThreatManager().modifyThreatPercent(pCaster, -100);
+            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -100);
         }
     }
 
-    void SpellHit(Unit* pUnit, const SpellEntry* pSpell)
+    void SpellHit(Unit* pUnit, SpellEntry const* pSpell) override
     {
-        for (int i = 0; i < SpellWeakness.size(); ++i)
+        for (uint32 i : SpellWeakness)
         {
-            if (pSpell->Id == SpellWeakness[i])
+            if (pSpell->Id == i)
             {
                 m_uiStrengthOfOssirian_Timer = 45000;
 
@@ -162,17 +162,17 @@ struct boss_ossirianAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
         DoCast(m_creature, SPELL_STRENGTH_OF_OSSIRIAN);
-        for (uint8 i = 0; i < TornadoSpawn.size(); ++i)
+        for (const auto& i : TornadoSpawn)
         {
             Creature *pCreature = m_creature->SummonCreature(NPC_TORNADO,
-                                  TornadoSpawn[i].x,
-                                  TornadoSpawn[i].y,
-                                  TornadoSpawn[i].z,
+                                  i.x,
+                                  i.y,
+                                  i.z,
                                   0,
                                   TEMPSUMMON_MANUAL_DESPAWN,
                                   0);
@@ -180,7 +180,7 @@ struct boss_ossirianAI : public ScriptedAI
             {
                 pCreature->CastSpell(pCreature, SPELL_SANDSTORM, true);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                pCreature->AI()->AttackStart(m_creature->getVictim());
+                pCreature->AI()->AttackStart(m_creature->GetVictim());
                 TornadoGUIDs.push_back(pCreature->GetGUID());
             }
         }
@@ -198,7 +198,7 @@ struct boss_ossirianAI : public ScriptedAI
         m_pInstance->SetData(TYPE_OSSIRIAN, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         if (!TornadoGUIDs.empty())
@@ -215,20 +215,20 @@ struct boss_ossirianAI : public ScriptedAI
         m_pInstance->SetData(TYPE_OSSIRIAN, DONE);
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
             DoScriptText(SAY_SLAY, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiCurseOfTongues_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSE_OF_TONGUES) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSE_OF_TONGUES) == CAST_OK)
                 m_uiCurseOfTongues_Timer = 10000 + rand() % 10000;
         }
         else
@@ -260,7 +260,7 @@ struct boss_ossirianAI : public ScriptedAI
 
         if (m_uiEnvelopingWinds_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ENVELOPING_WINDS) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ENVELOPING_WINDS) == CAST_OK)
                 m_uiEnvelopingWinds_Timer = 15000;
         }
         else
@@ -273,11 +273,11 @@ struct boss_ossirianAI : public ScriptedAI
             {
                 if (Unit* unit = m_creature->GetMap()->GetUnit(TmpThreatList[i]))
                 {
-                    if (unit->isAlive())
+                    if (unit->IsAlive())
                     {
                         if (unit->HasAura(SPELL_ENVELOPING_WINDS))
                             continue;
-                        m_creature->getThreatManager().addThreat(unit, TmpThreatVal[i]);
+                        m_creature->GetThreatManager().addThreat(unit, TmpThreatVal[i]);
                     }
                 }
                 TmpThreatList.erase(TmpThreatList.begin() + i);
@@ -303,13 +303,13 @@ struct generic_random_moveAI : public ScriptedAI
 
     uint32 m_uiTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiTimer = 5000;
         SetCombatMovement(false);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiTimer < uiDiff)
         {
@@ -317,12 +317,12 @@ struct generic_random_moveAI : public ScriptedAI
             {
                 std::vector<Player*> PlayerList;
                 Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+                for (const auto& i : liste)
                 {
-                    if (i->getSource()->GetDistance2d(m_creature) < MAX_VISIBILITY_DISTANCE)
-                        PlayerList.push_back(i->getSource());
+                    if (i.getSource()->GetDistance2d(m_creature) < MAX_VISIBILITY_DISTANCE)
+                        PlayerList.push_back(i.getSource());
                 }
-                if (PlayerList.size())
+                if (!PlayerList.empty())
                 {
                     Player *tmp = PlayerList[urand(0, PlayerList.size() - 1)];
                     m_creature->MonsterMove(tmp->GetPositionX(), tmp->GetPositionY(), tmp->GetPositionZ());
@@ -349,7 +349,7 @@ struct ossirian_crystalAI : public GameObjectAI
 {
     ossirian_crystalAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         instance_ruins_of_ahnqiraj* pInstance = dynamic_cast<instance_ruins_of_ahnqiraj*>(me->GetInstanceData());
 
@@ -375,7 +375,7 @@ struct ossirian_crystalAI : public GameObjectAI
         }
 
         // Encounter not started
-        if (!ossirian->SelectHostileTarget() || !ossirian->getVictim())
+        if (!ossirian->SelectHostileTarget() || !ossirian->GetVictim())
             return true;
 
         Creature* triggerCrystalPylons = me->SummonCreature(CRYSTAL_TRIGGER,
@@ -407,7 +407,7 @@ CreatureAI* GetAI_generic_random_move(Creature* pCreature)
 
 void AddSC_boss_ossirian()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_ossirian";
     newscript->GetAI = &GetAI_boss_ossirian;

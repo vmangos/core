@@ -31,7 +31,6 @@ go_field_repair_bot_74A
 go_orb_of_command
 go_resonite_cask
 go_tablet_of_madness
-go_tablet_of_the_seven
 go_silithyste
 go_restes_sha_ni
 go_Hive_Regal_Glyphed_Crystal
@@ -245,22 +244,6 @@ bool GOHello_go_tablet_of_madness(Player* pPlayer, GameObject* pGo)
     return true;
 }
 
-/*######
-## go_tablet_of_the_seven
-######*/
-
-//TODO: use gossip option ("Transcript the Tablet") instead, if Mangos adds support.
-bool GOHello_go_tablet_of_the_seven(Player* pPlayer, GameObject* pGo)
-{
-    if (pGo->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
-        return true;
-
-    if (pPlayer->GetQuestStatus(4296) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->CastSpell(pPlayer, 15065, false);
-
-    return true;
-}
-
 // go_silithyste
 bool GOHello_go_silithyste(Player* pPlayer, GameObject* pGo)
 {
@@ -363,24 +346,29 @@ bool GOSelect_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo, uint32 s
 
 enum BellHourlySoundFX
 {
-    BELLTOLLHORDE = 6595, // Horde
-    BELLTOLLTRIBAL = 6675,
-    BELLTOLLALLIANCE = 6594, // Alliance
-    BELLTOLLNIGHTELF = 6674,
-    BELLTOLLDWARFGNOME = 7234,
+    BELLTOLLHORDE      = 6595, // Undercity
+    BELLTOLLTRIBAL     = 6675, // Orgrimma/Thunderbluff
+    BELLTOLLALLIANCE   = 6594, // Stormwind
+    BELLTOLLNIGHTELF   = 6674, // Darnassus
+    BELLTOLLDWARFGNOME = 7234, // Ironforge
 };
 
-enum BellHourlySoundAreas
+enum BellHourlySoundZones
 {
-    UNDERCITY_AREA = 1497,
-    IRONFORGE_1_AREA = 809,
-    IRONFORGE_2_AREA = 1,
-    DARNASSUS_AREA = 1657,
-    TELDRASSIL_ZONE = 141,
+    TIRISFAL_ZONE            = 85,
+    UNDERCITY_ZONE           = 1497,
+    HILLSBRAD_FOOTHILLS_ZONE = 267,
+    DUSKWOOD_ZONE            = 10,
+    DUN_MOROGH_ZONE          = 1,
+    IRONFORGE_ZONE           = 1537,
+    TELDRASSIL_ZONE          = 141,
+    DARNASSUS_ZONE           = 1657,
+    ASHENVALE_ZONE           = 331,
 };
 
 enum BellHourlyObjects
 {
+    // bell gameobjects
     GO_HORDE_BELL = 175885,
     GO_ALLIANCE_BELL = 176573,
 };
@@ -397,29 +385,55 @@ struct go_bells : public GameObjectAI
 {
     go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
     {
+        uint32 zoneId = me->GetZoneId();
+
         switch (me->GetEntry())
         {
             case GO_HORDE_BELL:
-                _soundId = me->GetAreaId() == UNDERCITY_AREA ? BELLTOLLHORDE : BELLTOLLTRIBAL;
-                break;
+            {
+                switch (zoneId)
+                {
+                    case TIRISFAL_ZONE:
+                    case UNDERCITY_ZONE:
+                    case HILLSBRAD_FOOTHILLS_ZONE:
+                    case DUSKWOOD_ZONE:
+                         _soundId = BELLTOLLHORDE;  // undead bell sound 
+                         break;
+                    default:
+                        _soundId = BELLTOLLTRIBAL; // drum sound
+                        break;
+                }
+            break;
+            }
             case GO_ALLIANCE_BELL:
             {
-                if (me->GetAreaId() == IRONFORGE_1_AREA || me->GetAreaId() == IRONFORGE_2_AREA)
-                    _soundId = BELLTOLLDWARFGNOME;
-                else if (me->GetAreaId() == DARNASSUS_AREA || me->GetZoneId() == TELDRASSIL_ZONE)
-                    _soundId = BELLTOLLNIGHTELF;
-                else
-                    _soundId = BELLTOLLALLIANCE;
-                break;
+                switch (zoneId)
+                {
+                    case IRONFORGE_ZONE:
+                    case DUN_MOROGH_ZONE:
+                        _soundId = BELLTOLLDWARFGNOME; // horn sound
+                        break;
+                    case TELDRASSIL_ZONE:
+                    case DARNASSUS_ZONE:
+                    case ASHENVALE_ZONE:
+                        _soundId = BELLTOLLNIGHTELF;   // nightelf bell sound 
+                        break;
+                    default:
+                        _soundId = BELLTOLLALLIANCE;   // human bell sound
+                        break;
+                }
+            break;
             }
+        default:
+            sLog.outError("go_bells() called with invalid object, ID: %u", me->GetEntry());
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         _events.Update(diff);
 
-        if (sGameEventMgr.IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once == true)
+        if (sGameEventMgr.IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once)
         {
             // Reset
             once = false;
@@ -436,8 +450,11 @@ struct go_bells : public GameObjectAI
                     time_t rawtime;
                     time(&rawtime);
                     struct tm * timeinfo = localtime(&rawtime);
-                    uint8 _rings = ((timeinfo->tm_hour - 1) % 12 + 1);
-
+                    uint8 _rings = (timeinfo->tm_hour) % 12;
+                    if (_rings == 0) // 00:00 and 12:00
+                    {
+                        _rings = 12;
+                    }
                     // Schedule ring event
                     for (auto i = 0; i < _rings; ++i)
                         _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
@@ -486,7 +503,7 @@ struct go_darkmoon_faire_music : public GameObjectAI
         _events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(1));
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         _events.Update(diff);
         while (uint32 eventId = _events.ExecuteEvent())
@@ -515,7 +532,7 @@ GameObjectAI* GetAI_go_darkmoon_faire_music(GameObject* gameobject)
 
 void AddSC_go_scripts()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_greater_moonlight";
@@ -566,11 +583,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_tablet_of_madness";
     newscript->pGOHello =           &GOHello_go_tablet_of_madness;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_tablet_of_the_seven";
-    newscript->pGOHello =           &GOHello_go_tablet_of_the_seven;
     newscript->RegisterSelf();
 
     newscript = new Script;

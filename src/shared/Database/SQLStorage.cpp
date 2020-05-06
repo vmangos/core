@@ -33,7 +33,7 @@ SQLStorageBase::SQLStorageBase() :
     m_data(nullptr)
 {}
 
-void SQLStorageBase::Initialize(const char* tableName, const char* entry_field, const char* src_format, const char* dst_format)
+void SQLStorageBase::Initialize(char const* tableName, char const* entry_field, char const* src_format, char const* dst_format)
 {
     m_tableName = tableName;
     m_entry_field = entry_field;
@@ -146,13 +146,13 @@ void SQLStorage::LoadProgressive(uint32 wow_patch, std::string column_name /*= "
     loader.LoadProgressive(*this, wow_patch, column_name, error_at_empty);
 }
 
-SQLStorage::SQLStorage(const char* fmt, const char* _entry_field, const char* sqlname)
+SQLStorage::SQLStorage(char const* fmt, char const* _entry_field, char const* sqlname)
 {
     Initialize(sqlname, _entry_field, fmt, fmt);
     m_Index = nullptr;
 }
 
-SQLStorage::SQLStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname)
+SQLStorage::SQLStorage(char const* src_fmt, char const* dst_fmt, char const* _entry_field, char const* sqlname)
 {
     Initialize(sqlname, _entry_field, src_fmt, dst_fmt);
     m_Index = nullptr;
@@ -199,12 +199,12 @@ void SQLHashStorage::EraseEntry(uint32 id)
         find->second = nullptr;
 }
 
-SQLHashStorage::SQLHashStorage(const char* fmt, const char* _entry_field, const char* sqlname)
+SQLHashStorage::SQLHashStorage(char const* fmt, char const* _entry_field, char const* sqlname)
 {
     Initialize(sqlname, _entry_field, fmt, fmt);
 }
 
-SQLHashStorage::SQLHashStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname)
+SQLHashStorage::SQLHashStorage(char const* src_fmt, char const* dst_fmt, char const* _entry_field, char const* sqlname)
 {
     Initialize(sqlname, _entry_field, src_fmt, dst_fmt);
 }
@@ -235,12 +235,12 @@ void SQLMultiStorage::EraseEntry(uint32 id)
     m_indexMultiMap.erase(id);
 }
 
-SQLMultiStorage::SQLMultiStorage(const char* fmt, const char* _entry_field, const char* sqlname)
+SQLMultiStorage::SQLMultiStorage(char const* fmt, char const* _entry_field, char const* sqlname)
 {
     Initialize(sqlname, _entry_field, fmt, fmt);
 }
 
-SQLMultiStorage::SQLMultiStorage(const char* src_fmt, const char* dst_fmt, const char* _entry_field, const char* sqlname)
+SQLMultiStorage::SQLMultiStorage(char const* src_fmt, char const* dst_fmt, char const* _entry_field, char const* sqlname)
 {
     Initialize(sqlname, _entry_field, src_fmt, dst_fmt);
 }

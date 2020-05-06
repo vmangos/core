@@ -29,10 +29,10 @@ typedef void (* Destroyer)(void);
 
 namespace MaNGOS
 {
-    void MANGOS_DLL_SPEC at_exit(void (*func)());
+    void at_exit(void (*func)());
 
     template<class T>
-    class MANGOS_DLL_DECL ObjectLifeTime
+    class ObjectLifeTime
     {
         public:
 

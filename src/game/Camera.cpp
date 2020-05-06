@@ -40,7 +40,7 @@ Camera::~Camera()
     m_source->GetViewPoint().Detach(this);
 }
 
-void Camera::ReceivePacket(WorldPacket *data)
+void Camera::ReceivePacket(WorldPacket* data)
 {
     m_owner.SendDirectMessage(data);
 }
@@ -55,7 +55,7 @@ void Camera::UpdateForCurrentViewPoint()
     UpdateVisibilityForOwner();
 }
 
-void Camera::SetView(WorldObject *obj, bool update_far_sight_field /*= true*/)
+void Camera::SetView(WorldObject* obj, bool update_far_sight_field /*= true*/)
 {
     MANGOS_ASSERT(obj);
 
@@ -90,6 +90,7 @@ void Camera::SetView(WorldObject *obj, bool update_far_sight_field /*= true*/)
         m_owner.SetGuidValue(PLAYER_FARSIGHT, (m_source == &m_owner ? ObjectGuid() : m_source->GetObjectGuid()));
 
     UpdateForCurrentViewPoint();
+    m_owner.SendCreateUpdateToPlayer(&m_owner);
 }
 
 void Camera::Event_ViewPointVisibilityChanged()
@@ -135,16 +136,16 @@ void Camera::UpdateVisibilityOf(WorldObject* target)
 }
 
 template<class T>
-void Camera::UpdateVisibilityOf(T * target, UpdateData &data, std::set<WorldObject*>& vis)
+void Camera::UpdateVisibilityOf(T* target, UpdateData& data, std::set<WorldObject*>& vis)
 {
     m_owner.template UpdateVisibilityOf<T>(m_source, target, data, vis);
 }
 
-template void Camera::UpdateVisibilityOf(Player*        , UpdateData& , std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(Creature*      , UpdateData& , std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(Corpse*        , UpdateData& , std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(GameObject*    , UpdateData& , std::set<WorldObject*>&);
-template void Camera::UpdateVisibilityOf(DynamicObject* , UpdateData& , std::set<WorldObject*>&);
+template void Camera::UpdateVisibilityOf(Player*       , UpdateData&, std::set<WorldObject*>&);
+template void Camera::UpdateVisibilityOf(Creature*     , UpdateData&, std::set<WorldObject*>&);
+template void Camera::UpdateVisibilityOf(Corpse*       , UpdateData&, std::set<WorldObject*>&);
+template void Camera::UpdateVisibilityOf(GameObject*   , UpdateData&, std::set<WorldObject*>&);
+template void Camera::UpdateVisibilityOf(DynamicObject*, UpdateData&, std::set<WorldObject*>&);
 
 void Camera::UpdateVisibilityForOwner()
 {

@@ -26,6 +26,8 @@
 #include "World.h"
 #include "GameEventMgr.h"
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+
 OutdoorPvPSI::OutdoorPvPSI()
 {
     m_TypeId = OUTDOOR_PVP_SI;
@@ -35,7 +37,7 @@ OutdoorPvPSI::OutdoorPvPSI()
     m_LastController = 0;
 }
 
-uint32 OutdoorPvPSI::FillInitialWorldStates(WorldPacket &data)
+uint32 OutdoorPvPSI::FillInitialWorldStates(WorldPacket& data)
 {
     data << SI_GATHERED_A << m_Gathered_A;
     data << SI_GATHERED_H << m_Gathered_H;
@@ -43,7 +45,7 @@ uint32 OutdoorPvPSI::FillInitialWorldStates(WorldPacket &data)
     return 3;
 }
 
-void OutdoorPvPSI::SendRemoveWorldStates(Player *plr)
+void OutdoorPvPSI::SendRemoveWorldStates(Player* plr)
 {
     plr->SendUpdateWorldState(SI_GATHERED_A, 0);
     plr->SendUpdateWorldState(SI_GATHERED_H, 0);
@@ -62,8 +64,8 @@ void OutdoorPvPSI::UpdateWorldState()
 
 bool OutdoorPvPSI::SetupZoneScript()
 {
-    for (uint8 i = 0; i < OutdoorPvPSIBuffZonesNum; ++i)
-        RegisterZone(OutdoorPvPSIBuffZones[i]);
+    for (uint32 i : OutdoorPvPSIBuffZones)
+        RegisterZone(i);
     // On reprend les donnees precedentes (avant dernier reboot)
     m_MaxRessources = sObjectMgr.GetSavedVariable(uint32(SI_SILITHYST_MAX), SI_MAX_RESOURCES_DEFAULT);
 
@@ -76,21 +78,21 @@ void OutdoorPvPSI::Update(uint32 /*diff*/)
 {
 }
 
-void OutdoorPvPSI::OnPlayerEnter(Player * plr)
+void OutdoorPvPSI::OnPlayerEnter(Player* plr)
 {
     if (plr->GetTeam() == m_LastController)
         plr->CastSpell(plr, SI_CENARION_FAVOR, true);
     OutdoorPvP::OnPlayerEnter(plr);
 }
 
-void OutdoorPvPSI::OnPlayerLeave(Player * plr)
+void OutdoorPvPSI::OnPlayerLeave(Player* plr)
 {
     // remove buffs
     plr->RemoveAurasDueToSpell(SI_CENARION_FAVOR);
     OutdoorPvP::OnPlayerLeave(plr);
 }
 
-bool OutdoorPvPSI::HandleAreaTrigger(Player *plr, uint32 trigger)
+bool OutdoorPvPSI::HandleAreaTrigger(Player* plr, uint32 trigger)
 {
     /** If the player doesn't have a silithyst */
     if (!plr->HasAura(SI_SILITHYST_FLAG))
@@ -163,7 +165,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player *plr, uint32 trigger)
     return true;
 }
 
-bool OutdoorPvPSI::HandleDropFlag(Player *plr, uint32 spellId)
+bool OutdoorPvPSI::HandleDropFlag(Player* plr, uint32 spellId)
 {
     if (spellId == SI_SILITHYST_FLAG)
     {
@@ -236,7 +238,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player *plr, uint32 spellId)
 }
 
 /** Player taking a silithyst from geyser or from silithyst mound*/
-bool OutdoorPvPSI::HandleCustomSpell(Player *plr, uint32 spellId, GameObject *go)
+bool OutdoorPvPSI::HandleCustomSpell(Player* plr, uint32 spellId, GameObject* go)
 {
     if (!go || spellId != SI_SILITHYST_FLAG_GO_SPELL)
         return false;
@@ -273,3 +275,5 @@ void AddSC_outdoorpvp_si()
 {
     sZoneScriptMgr.AddScript(new OutdoorPvP_silithus());
 }
+
+#endif

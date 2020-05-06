@@ -51,7 +51,7 @@ ThreadPriority::ThreadPriority()
 
     if(_tmp.size() >= MAXPRIORITYNUM)
     {
-        const size_t max_pos = _tmp.size();
+        size_t const max_pos = _tmp.size();
         size_t min_pos = 1;
         size_t norm_pos = 0;
         for (size_t i = 0; i < max_pos; ++i)
@@ -67,7 +67,7 @@ ThreadPriority::ThreadPriority()
         //and 3 we know already (Idle, Normal, Realtime) so
         //we need to split each list [Idle...Normal] and [Normal...Realtime]
         //into pieces
-        const size_t _divider = 4;
+        size_t const _divider = 4;
         size_t _div = (norm_pos - min_pos) / _divider;
         if(_div == 0)
             _div = 1;
@@ -116,7 +116,7 @@ Thread::Thread(Runnable* instance) : m_iThreadId(0), m_hThreadHandle(0), m_task(
     if (m_task)
         m_task->incReference();
 
-    bool _start = start();
+    /*bool _start = */ start();
     //MANGOS_ASSERT (_start);
 }
 
@@ -173,7 +173,7 @@ void Thread::destroy()
 
     // reference set at ACE_Thread::spawn
     Runnable* task = m_task;
-    m_task = NULL;
+    m_task = nullptr;
     task->decReference(); // Prevent race conditions, because at this point, m_task may be deleted!
 }
 
@@ -187,7 +187,7 @@ void Thread::resume()
     ACE_Thread::resume(m_hThreadHandle);
 }
 
-ACE_THR_FUNC_RETURN Thread::ThreadTask(void * param)
+ACE_THR_FUNC_RETURN Thread::ThreadTask(void* param)
 {
     unsigned int seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
     srand(seed);
@@ -216,18 +216,17 @@ ACE_hthread_t Thread::currentHandle()
     return _handle;
 }
 
-Thread * Thread::current()
+Thread* Thread::current()
 {
-    Thread * _thread = m_ThreadStorage.ts_object();
+    Thread* _thread = m_ThreadStorage.ts_object();
     if(!_thread)
     {
         _thread = new Thread();
         _thread->m_iThreadId = Thread::currentId();
         _thread->m_hThreadHandle = Thread::currentHandle();
 
-        Thread * _oldValue = m_ThreadStorage.ts_object(_thread);
-        if(_oldValue)
-            delete _oldValue;
+        Thread* _oldValue = m_ThreadStorage.ts_object(_thread);
+        delete _oldValue;
     }
 
     return _thread;
@@ -237,7 +236,7 @@ void Thread::setPriority(Priority type)
 {
 #ifndef __sun__
     int _priority = m_TpEnum.getPriority(type);
-    int _ok = ACE_Thread::setprio(m_hThreadHandle, _priority);
+    /*int _ok =*/ ACE_Thread::setprio(m_hThreadHandle, _priority);
     //remove this ASSERT in case you don't want to know is thread priority change was successful or not
     //MANGOS_ASSERT (_ok == 0);
 #endif

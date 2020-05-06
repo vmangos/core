@@ -23,7 +23,7 @@
 #include "Player.h"
 #include "World.h"
 
-Quest::Quest(Field * questRecord)
+Quest::Quest(Field* questRecord)
 {
     QuestId = questRecord[0].GetUInt32();
     QuestMethod = questRecord[1].GetUInt32();
@@ -102,6 +102,7 @@ Quest::Quest(Field * questRecord)
     for (int i = 0; i < QUEST_REPUTATIONS_COUNT; ++i)
         RewRepValue[i] = questRecord[90 + i].GetInt32();
 
+    RewXP = questRecord[127].GetUInt32();
     RewOrReqMoney = questRecord[95].GetInt32();
     RewMoneyMaxLevel = questRecord[96].GetUInt32();
     RewSpell = questRecord[97].GetUInt32();
@@ -156,40 +157,28 @@ Quest::Quest(Field * questRecord)
             ++m_reqCreatureOrGOcount;
     }
 
-    for (int i = 0; i < QUEST_REWARDS_COUNT; ++i)
+    for (uint32 i : RewItemId)
     {
-        if (RewItemId[i])
+        if (i)
             ++m_rewitemscount;
     }
 
-    for (int i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+    for (uint32 i : RewChoiceItemId)
     {
-        if (RewChoiceItemId[i])
+        if (i)
             ++m_rewchoiceitemscount;
     }
 }
 
-uint32 Quest::XPValue(Player *pPlayer) const
+uint32 Quest::XPValue(Player* pPlayer) const
 {
     if (pPlayer)
     {
-        if (RewMoneyMaxLevel > 0)
+        if (RewXP > 0)
         {
-            uint32 pLevel = pPlayer->getLevel();
+            uint32 pLevel = pPlayer->GetLevel();
             uint32 qLevel = QuestLevel;
-            float fullxp = 0;
-            if (qLevel >= 65)
-                fullxp = RewMoneyMaxLevel / 6.0f;
-            else if (qLevel == 64)
-                fullxp = RewMoneyMaxLevel / 4.8f;
-            else if (qLevel == 63)
-                fullxp = RewMoneyMaxLevel / 3.6f;
-            else if (qLevel == 62)
-                fullxp = RewMoneyMaxLevel / 2.4f;
-            else if (qLevel == 61)
-                fullxp = RewMoneyMaxLevel / 1.2f;
-            else if (qLevel > 0 && qLevel <= 60)
-                fullxp = RewMoneyMaxLevel / 0.6f;
+            float fullxp = RewXP;
 
             if (pLevel <= qLevel +  5)
                 return uint32(ceilf(fullxp));

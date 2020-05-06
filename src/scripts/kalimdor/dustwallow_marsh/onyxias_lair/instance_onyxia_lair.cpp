@@ -3,6 +3,12 @@
 
 #define MAX_ENCOUNTER   1
 
+enum
+{
+    GO_WHELP_SPAWNER = 176510,
+    SPELL_SUMMON_WHELP = 17646,
+};
+
 struct instance_onyxia_lair : public ScriptedInstance
 {
     instance_onyxia_lair(Map* pMap) : ScriptedInstance(pMap)
@@ -11,17 +17,17 @@ struct instance_onyxia_lair : public ScriptedInstance
     };
     uint32 m_auiEncounter[MAX_ENCOUNTER];
 
-    void Initialize() { }
+    void Initialize() override { }
 
     bool IsEncounterInProgress() const override
     {
-        for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] == IN_PROGRESS)
+        for (uint32 i : m_auiEncounter)
+            if (i == IN_PROGRESS)
                 return true;
         return false;
     }
 
-    uint32 GetData(uint32 identifier)
+    uint32 GetData(uint32 identifier) override
     {
         switch (identifier)
         {
@@ -40,6 +46,16 @@ struct instance_onyxia_lair : public ScriptedInstance
                 break;
         }
     }
+
+    void OnObjectCreate(GameObject* pGo) override
+    {
+        switch (pGo->GetEntry())
+        {
+            case GO_WHELP_SPAWNER:
+                pGo->CastSpell(pGo->GetPositionX(), pGo->GetPositionY(), pGo->GetPositionZ(), SPELL_SUMMON_WHELP, true);
+                break;
+        }
+    }
 };
 
 InstanceData* GetInstanceData_instance_onyxia_lair(Map* pMap)
@@ -49,7 +65,7 @@ InstanceData* GetInstanceData_instance_onyxia_lair(Map* pMap)
 
 void AddSC_instance_onyxia_lair()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "instance_onyxia_lair";

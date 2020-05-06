@@ -27,21 +27,21 @@
 
 DBCFileLoader::DBCFileLoader()
 {
-    data = NULL;
-    fieldsOffset = NULL;
+    data = nullptr;
+    fieldsOffset = nullptr;
 }
 
-bool DBCFileLoader::Load(const char *filename, const char *fmt)
+bool DBCFileLoader::Load(char const* filename, char const* fmt)
 {
 
     uint32 header;
     if(data)
     {
         delete [] data;
-        data=NULL;
+        data=nullptr;
     }
 
-    FILE * f=fopen(filename,"rb");
+    FILE* f=fopen(filename,"rb");
     if(!f)return false;
 
     if(fread(&header,4,1,f)!=1)                             // Number of records
@@ -115,10 +115,8 @@ bool DBCFileLoader::Load(const char *filename, const char *fmt)
 
 DBCFileLoader::~DBCFileLoader()
 {
-    if(data)
-        delete [] data;
-    if(fieldsOffset)
-        delete [] fieldsOffset;
+    delete [] data;
+    delete [] fieldsOffset;
 }
 
 DBCFileLoader::Record DBCFileLoader::getRecord(size_t id)
@@ -127,7 +125,7 @@ DBCFileLoader::Record DBCFileLoader::getRecord(size_t id)
     return Record(*this, data + id*recordSize);
 }
 
-uint32 DBCFileLoader::GetFormatRecordSize(const char * format,int32* index_pos)
+uint32 DBCFileLoader::GetFormatRecordSize(char const* format,int32* index_pos)
 {
     uint32 recordsize = 0;
     int32 i = -1;
@@ -172,7 +170,7 @@ uint32 DBCFileLoader::GetFormatRecordSize(const char * format,int32* index_pos)
     return recordsize;
 }
 
-char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**& indexTable)
+char* DBCFileLoader::AutoProduceData(char const* format, uint32& records, char**& indexTable)
 {
     /*
     format STRING, NA, FLOAT,NA,INT <=>
@@ -185,9 +183,9 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
     this func will generate  entry[rows] data;
     */
 
-    typedef char * ptr;
+    typedef char* ptr;
     if(strlen(format)!=fieldCount)
-        return NULL;
+        return nullptr;
 
     //get struct size and index pos
     int32 i;
@@ -245,7 +243,7 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
                     offset += sizeof(uint8);
                     break;
                 case FT_STRING:
-                    *((char**)(&dataTable[offset]))=NULL;   // will be replaces non-empty or "" strings in AutoProduceStrings
+                    *((char**)(&dataTable[offset]))=nullptr;   // will be replaces non-empty or "" strings in AutoProduceStrings
                     offset += sizeof(char*);
                     break;
                 case FT_LOGIC:
@@ -265,10 +263,10 @@ char* DBCFileLoader::AutoProduceData(const char* format, uint32& records, char**
     return dataTable;
 }
 
-char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
+char* DBCFileLoader::AutoProduceStrings(char const* format, char* dataTable)
 {
     if(strlen(format)!=fieldCount)
-        return NULL;
+        return nullptr;
 
     char* stringPool= new char[stringSize];
     memcpy(stringPool,stringTable,stringSize);
@@ -297,8 +295,8 @@ char* DBCFileLoader::AutoProduceStrings(const char* format, char* dataTable)
                     char** slot = (char**)(&dataTable[offset]);
                     if(!*slot || !**slot)
                     {
-                        const char * st = getRecord(y).getString(x);
-                        *slot=stringPool+(st-(const char*)stringTable);
+                        char const* st = getRecord(y).getString(x);
+                        *slot=stringPool+(st-(char const*)stringTable);
                     }
                     offset += sizeof(char*);
                     break;

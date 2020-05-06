@@ -26,13 +26,13 @@ using G3D::Ray;
 
 namespace VMAP
 {
-ModelInstance::ModelInstance(const ModelSpawn& spawn, WorldModel* model): ModelSpawn(spawn), iModel(model)
+ModelInstance::ModelInstance(ModelSpawn const& spawn, WorldModel* model): ModelSpawn(spawn), iModel(model)
 {
     iInvRot = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iRot.y / 180.f, G3D::pi() * iRot.x / 180.f, G3D::pi() * iRot.z / 180.f).inverse();
     iInvScale = 1.f / iScale;
 }
 
-bool ModelInstance::intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool pStopAtFirstHit) const
+bool ModelInstance::intersectRay(G3D::Ray const& pRay, float& pMaxDist, bool pStopAtFirstHit) const
 {
     if (!iModel)
     {
@@ -63,7 +63,7 @@ bool ModelInstance::intersectRay(const G3D::Ray& pRay, float& pMaxDist, bool pSt
     return hit;
 }
 
-void ModelInstance::intersectPoint(const G3D::Vector3& p, AreaInfo& info) const
+void ModelInstance::intersectPoint(G3D::Vector3 const& p, AreaInfo& info) const
 {
     if (!iModel)
     {
@@ -97,7 +97,7 @@ void ModelInstance::intersectPoint(const G3D::Vector3& p, AreaInfo& info) const
     }
 }
 
-bool ModelInstance::isUnderModel(const G3D::Vector3& p, float* outDist, float* inDist) const
+bool ModelInstance::isUnderModel(G3D::Vector3 const& p, float* outDist, float* inDist) const
 {
     if (!iModel)
     {
@@ -118,14 +118,11 @@ bool ModelInstance::isUnderModel(const G3D::Vector3& p, float* outDist, float* i
     Vector3 up(0, 0, 1);
     Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
     up = iInvRot * up * iInvScale;
-    Vector3 zDirModel = iInvRot * Vector3(0.f, 0.f, -1.f);
 
-    if (iModel->IsUnderObject(pModel, up, flags & MOD_M2, outDist, inDist))
-        return true;
-    return false;
+    return iModel->IsUnderObject(pModel, up, flags & MOD_M2, outDist, inDist);
 }
 
-bool ModelInstance::GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) const
+bool ModelInstance::GetLocationInfo(G3D::Vector3 const& p, LocationInfo& info) const
 {
     if (!iModel)
     {
@@ -161,7 +158,7 @@ bool ModelInstance::GetLocationInfo(const G3D::Vector3& p, LocationInfo& info) c
     return false;
 }
 
-bool ModelInstance::GetLiquidLevel(const G3D::Vector3& p, LocationInfo& info, float& liqHeight) const
+bool ModelInstance::GetLiquidLevel(G3D::Vector3 const& p, LocationInfo& info, float& liqHeight) const
 {
     // child bounds are defined in object space:
     Vector3 pModel = iInvRot * (p - iPos) * iInvScale;
@@ -195,7 +192,7 @@ bool ModelSpawn::readFromFile(FILE* rf, ModelSpawn& spawn)
     check += fread(&spawn.iPos, sizeof(float), 3, rf);
     check += fread(&spawn.iRot, sizeof(float), 3, rf);
     check += fread(&spawn.iScale, sizeof(float), 1, rf);
-    bool has_bound = (spawn.flags & MOD_HAS_BOUND);
+    bool const has_bound = (spawn.flags & MOD_HAS_BOUND) != 0;
     if (has_bound) // only WMOs have bound in MPQ, only available after computation
     {
         Vector3 bLow, bHigh;
@@ -225,7 +222,7 @@ bool ModelSpawn::readFromFile(FILE* rf, ModelSpawn& spawn)
     return true;
 }
 
-bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn& spawn)
+bool ModelSpawn::writeToFile(FILE* wf, ModelSpawn const& spawn)
 {
     uint32 check = 0;
     check += fwrite(&spawn.flags, sizeof(uint32), 1, wf);
@@ -234,7 +231,7 @@ bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn& spawn)
     check += fwrite(&spawn.iPos, sizeof(float), 3, wf);
     check += fwrite(&spawn.iRot, sizeof(float), 3, wf);
     check += fwrite(&spawn.iScale, sizeof(float), 1, wf);
-    bool has_bound = (spawn.flags & MOD_HAS_BOUND);
+    bool const has_bound = (spawn.flags & MOD_HAS_BOUND) != 0;
     if (has_bound) // only WMOs have bound in MPQ, only available after computation
     {
         check += fwrite(&spawn.iBound.low(), sizeof(float), 3, wf);
@@ -244,7 +241,6 @@ bool ModelSpawn::writeToFile(FILE* wf, const ModelSpawn& spawn)
     check += fwrite(&nameLen, sizeof(uint32), 1, wf);
     if (check != uint32(has_bound ? 17 : 11)) return false;
     check = fwrite(spawn.name.c_str(), sizeof(char), nameLen, wf);
-    if (check != nameLen) return false;
-    return true;
+    return check == nameLen;
 }
 }

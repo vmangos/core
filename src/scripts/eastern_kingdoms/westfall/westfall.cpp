@@ -57,7 +57,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
     uint32 m_uiWPHolder;
     uint32 m_uiShootTimer;
 
-    void Reset()
+    void Reset() override
     {
         if (HasEscortState(STATE_ESCORT_ESCORTING))
         {
@@ -80,7 +80,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         m_uiShootTimer = 0;
     }
 
-    void WaypointReached(uint32 uiPoint)
+    void WaypointReached(uint32 uiPoint) override
     {
         m_uiWPHolder = uiPoint;
 
@@ -129,7 +129,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         }
     }
 
-    void AttackStart(Unit* pWho)
+    void AttackStart(Unit* pWho) override
     {
         if (!pWho)
             return;
@@ -144,22 +144,22 @@ struct npc_daphne_stilwellAI : public npc_escortAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiShootTimer < uiDiff)
         {
             m_uiShootTimer = 1000;
 
-            if (!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT);
+            if (!m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHOOT);
 
         }
         else
@@ -169,7 +169,7 @@ struct npc_daphne_stilwellAI : public npc_escortAI
     }
 };
 
-bool QuestAccept_npc_daphne_stilwell(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_daphne_stilwell(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TOME_VALOR)
     {
@@ -206,7 +206,7 @@ struct npc_defias_traitorAI : public npc_escortAI
         Reset();
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         switch (i)
         {
@@ -227,15 +227,15 @@ struct npc_defias_traitorAI : public npc_escortAI
         }
     }
 
-    void Aggro(Unit* who)
+    void Aggro(Unit* who) override
     {
         DoScriptText(urand(0, 1) ? SAY_AGGRO_1 : SAY_AGGRO_2, m_creature, who);
     }
 
-    void Reset() { }
+    void Reset() override { }
 };
 
-bool QuestAccept_npc_defias_traitor(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_defias_traitor(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_DEFIAS_BROTHERHOOD)
     {
@@ -258,7 +258,7 @@ CreatureAI* GetAI_npc_defias_traitor(Creature* pCreature)
 
 void AddSC_westfall()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_daphne_stilwell";

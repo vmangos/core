@@ -35,7 +35,7 @@
 #include "ObjectAccessor.h"
 
 Transport::Transport() : GameObject(),
-    _transportInfo(NULL), _isMoving(true), _pendingStop(false),
+    _transportInfo(nullptr), _isMoving(true), _pendingStop(false),
     _passengerTeleportItr(_passengers.begin()), _pathProgress(0)
 {
     // the path progress is the only value that seem to matter
@@ -84,7 +84,7 @@ bool Transport::Create(uint32 guidlow, uint32 entry, uint32 mapid, float x, floa
     _nextFrame = tInfo->keyFrames.begin();
     _currentFrame = _nextFrame++;
 
-    _pathProgress = time(NULL) % (tInfo->pathTime / 1000);
+    _pathProgress = time(nullptr) % (tInfo->pathTime / 1000);
     _pathProgress *= 1000;
     SetObjectScale(goinfo->size);
     SetUInt32Value(GAMEOBJECT_FACTION, goinfo->faction);
@@ -113,12 +113,12 @@ void Transport::CleanupsBeforeDelete()
     GameObject::CleanupsBeforeDelete();
 }
 
-void Transport::Update(uint32 diff, uint32)
+void Transport::Update(uint32 update_diff, uint32 /*time_diff*/)
 {
     uint32 const positionUpdateDelay = 50;
 
     if (AI())
-        AI()->UpdateAI(diff);
+        AI()->UpdateAI(update_diff);
     else
         AIM_Initialize();
 
@@ -126,7 +126,7 @@ void Transport::Update(uint32 diff, uint32)
         return;
 
     if (IsMoving() || !_pendingStop)
-        _pathProgress = (_pathProgress + diff) % GetPeriod();
+        _pathProgress = (_pathProgress + update_diff) % GetPeriod();
 
     // Set current waypoint
     // Desired outcome: _currentFrame->DepartureTime < _pathProgress < _nextFrame->ArriveTime
@@ -164,7 +164,7 @@ void Transport::Update(uint32 diff, uint32)
     }
 
     // Set position
-    _positionChangeTimer.Update(diff);
+    _positionChangeTimer.Update(update_diff);
     if (_positionChangeTimer.Passed())
     {
         _positionChangeTimer.Reset(positionUpdateDelay);
@@ -221,7 +221,7 @@ void Transport::RemovePassenger(WorldObject* passenger)
 
     if (erased)
     {
-        passenger->SetTransport(NULL);
+        passenger->SetTransport(nullptr);
         passenger->m_movementInfo.ClearTransportData();
         DEBUG_LOG("Object %s removed from transport %s.", passenger->GetName(), GetName());
     }
@@ -248,8 +248,8 @@ void Transport::MoveToNextWaypoint()
 float Transport::CalculateSegmentPos(float now)
 {
     KeyFrame const& frame = *_currentFrame;
-    const float speed = float(m_goInfo->moTransport.moveSpeed);
-    const float accel = float(m_goInfo->moTransport.accelRate);
+    float const speed = float(m_goInfo->moTransport.moveSpeed);
+    float const accel = float(m_goInfo->moTransport.accelRate);
     float timeSinceStop = frame.TimeFrom + (now - (1.0f / IN_MILLISECONDS) * frame.DepartureTime);
     float timeUntilStop = frame.TimeTo - (now - (1.0f / IN_MILLISECONDS) * frame.DepartureTime);
     float segmentPos, dist;
@@ -322,7 +322,7 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
                     break;
                 }
 
-                if (!player->isAlive())
+                if (!player->IsAlive())
                     player->ResurrectPlayer(1.0f);
 
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_CONFUSE);
@@ -359,8 +359,8 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
 void Transport::UpdatePassengerPositions(PassengerSet& passengers)
 {
-    for (PassengerSet::iterator itr = passengers.begin(); itr != passengers.end(); ++itr)
-        UpdatePassengerPosition(*itr);
+    for (const auto passenger : passengers)
+        UpdatePassengerPosition(passenger);
 }
 void Transport::UpdatePassengerPosition(WorldObject* passenger)
 {
@@ -416,8 +416,8 @@ void Transport::BuildUpdate(UpdateDataMapType& data_map)
     if (players.isEmpty())
         return;
 
-    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-        BuildUpdateDataForPlayer(itr->getSource(), data_map);
+    for (const auto& player : players)
+        BuildUpdateDataForPlayer(player.getSource(), data_map);
 
     ClearUpdateMask(true);
 }
@@ -432,9 +432,9 @@ void Transport::SendOutOfRangeUpdateToMap()
         BuildOutOfRangeUpdateBlock(&data);
         WorldPacket packet;
         data.BuildPacket(&packet);
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (itr->getSource()->GetTransport() != this)
-                itr->getSource()->SendDirectMessage(&packet);
+        for (const auto& player : players)
+            if (player.getSource()->GetTransport() != this)
+                player.getSource()->SendDirectMessage(&packet);
     }
 }
 
@@ -443,12 +443,12 @@ void Transport::SendCreateUpdateToMap()
     Map::PlayerList const& players = GetMap()->GetPlayers();
     if (!players.isEmpty())
     {
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-            if (itr->getSource()->GetTransport() != this)
+        for (const auto& player : players)
+            if (player.getSource()->GetTransport() != this)
             {
                 UpdateData data;
-                BuildCreateUpdateBlockForPlayer(&data, itr->getSource());
-                data.Send(itr->getSource()->GetSession());
+                BuildCreateUpdateBlockForPlayer(&data, player.getSource());
+                data.Send(player.getSource()->GetSession());
             }
     }
 }

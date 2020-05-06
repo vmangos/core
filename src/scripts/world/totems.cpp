@@ -10,7 +10,7 @@ struct TotemGlebeAI : public TotemAI
 {
     TotemGlebeAI(Creature* pCreature) : TotemAI(pCreature) {}
 
-    void SpellHit(Unit* /*u*/, const SpellEntry* pSpell)
+    void SpellHit(Unit* /*u*/, SpellEntry const* pSpell) override
     {
         if (pSpell->Id != SPELL_BUFF_GLEBE_PASSIVE && pSpell->Id != SPELL_BUFF_GLEBE)
         {
@@ -27,7 +27,7 @@ CreatureAI* GetAI_TotemGlebe(Creature* pCreature)
 
 void AddSC_Totems()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "TotemGlebe";

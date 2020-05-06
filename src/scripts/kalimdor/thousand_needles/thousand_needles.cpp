@@ -43,7 +43,7 @@ enum
     NPC_GALAK_ASS               = 10720
 };
 
-const float m_afGalakLoc[] = { -4867.387695f, -1357.353760f, -48.226f};
+float const m_afGalakLoc[] = { -4867.387695f, -1357.353760f, -48.226f};
 
 struct npc_kanatiAI : public npc_escortAI
 {
@@ -52,9 +52,9 @@ struct npc_kanatiAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -77,12 +77,12 @@ struct npc_kanatiAI : public npc_escortAI
                                        TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->AI()->AttackStart(m_creature);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         // set quest to failed
         if (Player* pPlayer = GetPlayerForEscort())
@@ -95,7 +95,7 @@ CreatureAI* GetAI_npc_kanati(Creature* pCreature)
     return new npc_kanatiAI(pCreature);
 }
 
-bool QuestAccept_npc_kanati(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_kanati(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_PROTECT_KANATI)
     {
@@ -119,6 +119,7 @@ enum
 
     QUEST_FREE_AT_LAST          = 4904,
     NPC_GRIM_BANDIT             = 10758,
+    FACTION_ESCORTEE            = 33,
 
     ID_AMBUSH_1                 = 0,
     ID_AMBUSH_2                 = 2,
@@ -142,9 +143,9 @@ struct npc_lakota_windsongAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -181,12 +182,12 @@ CreatureAI* GetAI_npc_lakota_windsong(Creature* pCreature)
     return new npc_lakota_windsongAI(pCreature);
 }
 
-bool QuestAccept_npc_lakota_windsong(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_lakota_windsong(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_FREE_AT_LAST)
     {
         DoScriptText(SAY_LAKO_START, pCreature, pPlayer);
-        pCreature->setFaction(FACTION_ESCORT_H_NEUTRAL_ACTIVE);
+        pCreature->SetFactionTemporary(FACTION_ESCORTEE, TEMPFACTION_RESTORE_RESPAWN);
 
         if (npc_lakota_windsongAI* pEscortAI = dynamic_cast<npc_lakota_windsongAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
@@ -222,9 +223,9 @@ struct npc_paoka_swiftmountainAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void WaypointReached(uint32 uiPointId)
+    void WaypointReached(uint32 uiPointId) override
     {
         switch (uiPointId)
         {
@@ -244,9 +245,9 @@ struct npc_paoka_swiftmountainAI : public npc_escortAI
 
     void DoSpawnWyvern()
     {
-        for (int i = 0; i < 3; ++i)
+        for (const auto& pos : m_afWyvernLoc)
             m_creature->SummonCreature(NPC_WYVERN,
-                                       m_afWyvernLoc[i][0], m_afWyvernLoc[i][1], m_afWyvernLoc[i][2], 0.0f,
+                                       pos[0], pos[1], pos[2], 0.0f,
                                        TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
     }
 };
@@ -256,12 +257,12 @@ CreatureAI* GetAI_npc_paoka_swiftmountain(Creature* pCreature)
     return new npc_paoka_swiftmountainAI(pCreature);
 }
 
-bool QuestAccept_npc_paoka_swiftmountain(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_paoka_swiftmountain(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_HOMEWARD)
     {
         DoScriptText(SAY_START, pCreature, pPlayer);
-        pCreature->setFaction(FACTION_ESCORT_H_NEUTRAL_ACTIVE);
+        pCreature->SetFactionTemplateId(FACTION_ESCORT_H_NEUTRAL_ACTIVE);
 
         if (npc_paoka_swiftmountainAI* pEscortAI = dynamic_cast<npc_paoka_swiftmountainAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
@@ -287,19 +288,19 @@ struct npc_plucky_johnsonAI : public ScriptedAI
 {
     npc_plucky_johnsonAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_uiNormFaction = pCreature->getFaction();
+        m_uiNormFaction = pCreature->GetFactionTemplateId();
         Reset();
     }
 
     uint32 m_uiNormFaction;
     uint32 m_uiResetTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiResetTimer = 120000;
 
-        if (m_creature->getFaction() != m_uiNormFaction)
-            m_creature->setFaction(m_uiNormFaction);
+        if (m_creature->GetFactionTemplateId() != m_uiNormFaction)
+            m_creature->SetFactionTemplateId(m_uiNormFaction);
 
         if (m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
             m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -307,13 +308,13 @@ struct npc_plucky_johnsonAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_PLUCKY_CHICKEN, false);
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 uiTextEmote)
+    void ReceiveEmote(Player* pPlayer, uint32 uiTextEmote) override
     {
         if (pPlayer->GetQuestStatus(QUEST_SCOOP) == QUEST_STATUS_INCOMPLETE)
         {
             if (uiTextEmote == TEXTEMOTE_BECKON)
             {
-                m_creature->setFaction(FACTION_FRIENDLY);
+                m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 m_creature->CastSpell(m_creature, SPELL_PLUCKY_HUMAN, false);
             }
@@ -325,7 +326,7 @@ struct npc_plucky_johnsonAI : public ScriptedAI
                 return;
             else
             {
-                m_creature->setFaction(FACTION_FRIENDLY);
+                m_creature->SetFactionTemplateId(FACTION_FRIENDLY);
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
                 m_creature->CastSpell(m_creature, SPELL_PLUCKY_HUMAN, false);
                 m_creature->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
@@ -333,13 +334,13 @@ struct npc_plucky_johnsonAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
         {
             if (m_uiResetTimer < uiDiff)
             {
-                if (!m_creature->getVictim())
+                if (!m_creature->GetVictim())
                     EnterEvadeMode();
                 else
                     m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -350,7 +351,7 @@ struct npc_plucky_johnsonAI : public ScriptedAI
                 m_uiResetTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -474,7 +475,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
     {
         if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_PlayerGuid))
         {
-            if (pPlayer->isAlive())
+            if (pPlayer->IsAlive())
                 pSummoned->AI()->AttackStart(pPlayer);
         }
     }
@@ -484,7 +485,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
         pSummoned->loot.clear();
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_uiTimer < uiDiff)
         {
@@ -508,7 +509,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
                     m_creature->SetVisibility(VISIBILITY_ON);
                     if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_PlayerGuid))
                     {
-                        if (pPlayer->isAlive())
+                        if (pPlayer->IsAlive())
                             m_creature->AI()->AttackStart(pPlayer);
                     }
                     ++m_uiWave;

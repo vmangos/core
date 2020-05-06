@@ -135,12 +135,12 @@ struct npc_aged_dying_ancient_kodoAI : ScriptedAI
             m_creature->ForcedDespawn();
     }
 
-    void UpdateAI(const uint32 /*uiDiff*/) override
+    void UpdateAI(uint32 const /*uiDiff*/) override
     {
         if (m_creature->GetEntry() == NPC_TAMED_KODO)
             return;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -269,13 +269,13 @@ struct npc_melizza_brimbuzzleAI : public npc_escortAI
                 m_creature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
                 break;
             case 4:
-                for (uint8 i = 0; i < MAX_MARAUDERS; ++i)
+                for (const auto& i : aMarauderSpawn)
                 {
                     for (uint8 j = 0; j < MAX_MARAUDERS; ++j)
                     {
                         // Summon 2 Marauders on each point
                         float fX, fY, fZ;
-                        m_creature->GetRandomPoint(aMarauderSpawn[i].m_fX, aMarauderSpawn[i].m_fY, aMarauderSpawn[i].m_fZ, 7.0f, fX, fY, fZ);
+                        m_creature->GetRandomPoint(i.m_fX, i.m_fY, i.m_fZ, 7.0f, fX, fY, fZ);
                         m_creature->SummonCreature(NPC_MARAUDINE_MARAUDER, fX, fY, fZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
                     }
                 }
@@ -305,7 +305,7 @@ struct npc_melizza_brimbuzzleAI : public npc_escortAI
                 break;
         }
     }
-    void Dialogue(const uint32 uiDiff)
+    void Dialogue(uint32 const uiDiff)
     {
         if (m_dialogueStep > 6)
             return;
@@ -354,11 +354,11 @@ struct npc_melizza_brimbuzzleAI : public npc_escortAI
             m_dialogueTimer  -= uiDiff;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         Dialogue(uiDiff);
         npc_escortAI::UpdateAI(uiDiff);
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -370,7 +370,7 @@ CreatureAI* GetAI_npc_melizza_brimbuzzle(Creature* pCreature)
     return new npc_melizza_brimbuzzleAI(pCreature);
 }
 
-bool QuestAccept_npc_melizza_brimbuzzle(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_melizza_brimbuzzle(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_GET_ME_OUT_OF_HERE)
     {
@@ -419,7 +419,7 @@ CreatureAI* GetAI_npc_dalinda_malem(Creature* pCreature)
     return new npc_dalinda_malemAI(pCreature);
 }
 
-bool QuestAccept_npc_dalinda_malem(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_dalinda_malem(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_RETURN_TO_VAHLARRIEL)
     {
@@ -451,7 +451,7 @@ struct go_serpent_statueAI: public GameObjectAI
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {
@@ -467,9 +467,7 @@ struct go_serpent_statueAI: public GameObjectAI
     }
     bool CheckCanStartEvent()
     {
-        if (!state && !me->GetMap()->GetCreature(guid_kragaru))
-            return true;
-        return false;
+        return !state && !me->GetMap()->GetCreature(guid_kragaru);
     }
 
     void SetInUse(Creature* kragaru)
@@ -533,9 +531,9 @@ struct go_ghost_magnetAI: public GameObjectAI
         state = 1;
         std::list<GameObject*> lGobj;
         me->GetGameObjectListWithEntryInGrid(lGobj, GO_GHOST_MAGNET_AURA, 30.0f);
-        for (std::list<GameObject*>::iterator it = lGobj.begin(); it != lGobj.end(); ++it)
+        for (const auto& it : lGobj)
         {
-            if ((*it)->isSpawned())
+            if (it->isSpawned())
             {
                 state = 0;
                 break;
@@ -553,7 +551,7 @@ struct go_ghost_magnetAI: public GameObjectAI
     uint16 nbToSpawn;
     bool state;//0 = already are functioning magnets, do not spawn spectre. //1 = spawning.
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (state)
         {
@@ -608,7 +606,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
         corpseTimer = 20000;
         Reset();
     }
-    void Reset()
+    void Reset() override
     {
         timer=0;
         curseTimer = urand(5000, 9000);
@@ -623,7 +621,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
     uint64 guidMagnet;
     bool isGreen;
 
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if(isGreen)
             return;
@@ -631,7 +629,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
             return;
         turnGreen();
     }
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if(!isGreen)
             turnGreen();
@@ -640,22 +638,22 @@ struct npc_magrami_spetreAI : public ScriptedAI
     {
         m_creature->RemoveAurasDueToSpell(SPELL_BLUE_AURA);
         m_creature->AddAura(SPELL_GREEN_AURA);
-        m_creature->setFaction(FACTION_ENNEMY);
+        m_creature->SetFactionTemplateId(FACTION_ENNEMY);
         isGreen=true;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if ( curseTimer < uiDiff)
         {
-            if(m_creature->getVictim()->HasAura(SPELL_CURSE_OF_THE_FALLEN_MAGRAM))
+            if(m_creature->GetVictim()->HasAura(SPELL_CURSE_OF_THE_FALLEN_MAGRAM))
                 curseTimer = 5000;
             else
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSE_OF_THE_FALLEN_MAGRAM) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSE_OF_THE_FALLEN_MAGRAM) == CAST_OK)
                     curseTimer = urand(15000, 21000);
             }
         }
@@ -663,7 +661,7 @@ struct npc_magrami_spetreAI : public ScriptedAI
             curseTimer -= uiDiff;
         DoMeleeAttackIfReady();
     }
-    void UpdateAI_corpse(const uint32 uiDiff)
+    void UpdateAI_corpse(uint32 const uiDiff) override
     {
         if ( corpseTimer < uiDiff)//purpose is to delay the new spawn.
         {
@@ -703,42 +701,6 @@ void DefineMagramiMagnet(Creature * crea, uint64 gobjGUID)
     {
         spectreAI->SetMagnetGuid(gobjGUID);
     }
-}
-
-enum
-{
-    NPC_PORTAL_DEMON_DEMON  = 11937,
-};
-
-struct go_demon_portalAI: public GameObjectAI
-{
-    go_demon_portalAI(GameObject* pGo) : GameObjectAI(pGo)
-    {
-    }
-    ObjectGuid _demonGuid;
-    bool OnUse(Unit* caster)
-    {
-        Unit* demon;
-        if (_demonGuid)
-        {
-            demon = me->GetMap()->GetCreature(_demonGuid);
-            if (demon && demon->isAlive())
-                return true;
-        }
-        demon = me->SummonCreature(NPC_PORTAL_DEMON_DEMON, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), caster ? me->GetAngle(caster) : 0.0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000);
-        if (demon)
-        {
-            _demonGuid = demon->GetObjectGuid();
-            if (caster)
-                demon->AI()->AttackStart(caster);
-        }
-        return true;
-    }
-};
-
-GameObjectAI* GetAI_go_demon_portal(GameObject *go)
-{
-    return new go_demon_portalAI(go);
 }
 
 /*
@@ -831,9 +793,9 @@ const Coords Ambusher[] =
 
 const CaravanMember Caravan[] =
 {
-    { NPC_CARAVAN_KODO,     -1887.26f, 2465.12f, 59.8224f, 4.48f, { 26.0f, 3.14f } },
-    { NPC_RIGGER_GIZELTON,  -1883.63f, 2471.68f, 59.8224f, 4.48f, { 18.0f, 3.14f } },
-    { NPC_CARAVAN_KODO,     -1882.11f, 2476.80f, 59.8224f, 4.48f, { 8.0f,  3.14f } }
+    { {NPC_CARAVAN_KODO,     -1887.26f, 2465.12f, 59.8224f, 4.48f}, { 26.0f, 3.14f } },
+    { {NPC_RIGGER_GIZELTON,  -1883.63f, 2471.68f, 59.8224f, 4.48f}, { 18.0f, 3.14f } },
+    { {NPC_CARAVAN_KODO,     -1882.11f, 2476.80f, 59.8224f, 4.48f}, { 8.0f,  3.14f } }
 };
 
 struct npc_cork_gizeltonAI : npc_escortAI
@@ -888,7 +850,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
         m_lCaravanGuid.push_back(m_creature->GetObjectGuid());
         AddToFormation(m_creature, FORMATION_CORK);
 
-        for (const auto &member : Caravan)
+        for (const auto& member : Caravan)
         {
             if (const auto pCreature = m_creature->SummonCreature(member.coords.entry,
                 member.coords.x,
@@ -924,11 +886,11 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void DespawnCaravan()
     {
-        for (auto itr = m_lCaravanGuid.begin(); itr != m_lCaravanGuid.end(); ++itr)
+        for (const auto& guid : m_lCaravanGuid)
         {
-            if (*itr != m_creature->GetObjectGuid())
+            if (guid != m_creature->GetObjectGuid())
             {
-                if (auto pKillMe = m_creature->GetMap()->GetCreature(*itr))
+                if (auto pKillMe = m_creature->GetMap()->GetCreature(guid))
                     pKillMe->DespawnOrUnsummon();
             }
         }
@@ -938,15 +900,17 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void CaravanFaction(bool apply)
     {
-        for (auto itr = m_lCaravanGuid.begin(); itr != m_lCaravanGuid.end(); ++itr)
+        for (const auto& guid : m_lCaravanGuid)
         {
-            if (*itr != m_creature->GetObjectGuid())
+            if (guid != m_creature->GetObjectGuid())
             {
-                if (auto pCreature = m_creature->GetMap()->GetCreature(*itr))
+                if (Creature* pCreature = m_creature->GetMap()->GetCreature(guid))
+                {
                     if (apply)
                         pCreature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_NONE);
                     else
                         pCreature->ClearTemporaryFaction();
+                }
             }
         }
 
@@ -1017,7 +981,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
         }
     }
 
-    void AddToFormation(Creature* const pWho, const Formation &form) const
+    void AddToFormation(Creature* const pWho, Formation const& form) const
     {
         pWho->JoinCreatureGroup(m_creature, form.distance, form.angle,
             OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER);
@@ -1256,7 +1220,7 @@ CreatureAI* GetAI_npc_cork_gizelton(Creature* pCreature)
     return new npc_cork_gizeltonAI(pCreature);
 }
 
-bool QuestAccept_npc_cork_gizelton(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_cork_gizelton(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_TOP)
     {
@@ -1267,7 +1231,7 @@ bool QuestAccept_npc_cork_gizelton(Player* pPlayer, Creature* pCreature, const Q
     return true;
 }
 
-bool QuestAccept_npc_rigger_gizelton(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_rigger_gizelton(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_BOTTOM)
     {
@@ -1311,7 +1275,7 @@ CreatureAI* GetAI_npc_caravan_vendor(Creature* pCreature)
 
 void AddSC_desolace()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_aged_dying_ancient_kodo";
@@ -1350,11 +1314,6 @@ void AddSC_desolace()
     newscript = new Script;
     newscript->Name = "npc_magrami_spetre";
     newscript->GetAI = &GetAI_npc_magrami_spetre;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_demon_portal";
-    newscript->GOGetAI = &GetAI_go_demon_portal;
     newscript->RegisterSelf();
 
     newscript = new Script;

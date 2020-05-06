@@ -45,13 +45,13 @@ bool GOHello_go_entree_de_service(Player* pPlayer, GameObject* pGo)
 
     std::list<Creature*> listBarthilas;
     GetCreatureListWithEntryInGrid(listBarthilas, pGo, 10435, 1000);
-    for (std::list<Creature*>::const_iterator itr = listBarthilas.begin(); itr != listBarthilas.end(); ++itr)
+    for (const auto pCreature : listBarthilas)
     {
-        if (!(*itr)->isAlive())
+        if (!pCreature->IsAlive())
             continue;
 
-        (*itr)->AI()->ReceiveEmote(pPlayer, 1000);
-        (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        pCreature->AI()->ReceiveEmote(pPlayer, 1000);
+        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
     pGo->UseDoorOrButton(5);
 
@@ -109,7 +109,7 @@ struct mob_freed_soulAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         switch (urand(0, 3))
         {
@@ -155,14 +155,14 @@ struct mob_restless_soulAI : public ScriptedAI
     uint32 Die_Timer;
     bool Tagged;
 
-    void Reset()
+    void Reset() override
     {
         Tagger = 0;
         Die_Timer = 5000;
         Tagged = false;
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (caster->GetTypeId() == TYPEID_PLAYER)
         {
@@ -174,20 +174,20 @@ struct mob_restless_soulAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature *summoned)
+    void JustSummoned(Creature *summoned) override
     {
         summoned->CastSpell(summoned, SPELL_SOUL_FREED, false);
         if (Unit* temp = m_creature->GetMap()->GetUnit(Tagger))
             summoned->GetMotionMaster()->MoveFollow(temp, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (Tagged)
             m_creature->SummonCreature(ENTRY_FREED, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 300000);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (Tagged)
         {
@@ -195,7 +195,7 @@ struct mob_restless_soulAI : public ScriptedAI
             {
                 if (Player* temp = m_creature->GetMap()->GetPlayer(Tagger))
                     temp->KilledMonsterCredit(m_creature->GetEntry(), m_creature->GetGUID());
-                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
             else Die_Timer -= diff;
         }
@@ -230,20 +230,20 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
     bool Tagged;
     bool hasEvadedOnce;
 
-    void Reset()
+    void Reset() override
     {
         Die_Timer = 5000;
         cast_Haunting = 20000;
         Tagged = false;
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (!Tagged && spell->Id == SPELL_EGAN_BLASTER)
             Tagged = true;
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (Tagged)
         {
@@ -260,21 +260,21 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (Tagged)
         {
             if (Die_Timer < diff)
-                m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             else Die_Timer -= diff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (cast_Haunting < diff)
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_HAUNTING_PHANTOM, false);
+            m_creature->CastSpell(m_creature->GetVictim(), SPELL_HAUNTING_PHANTOM, false);
             cast_Haunting = 20000;
         }
         else cast_Haunting -= diff;
@@ -282,12 +282,12 @@ struct mobs_spectral_ghostly_citizenAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 emote)
+    void ReceiveEmote(Player* pPlayer, uint32 emote) override
     {
         switch (emote)
         {
             case TEXTEMOTE_DANCE:
-                if (m_creature->isInCombat() && !hasEvadedOnce)
+                if (m_creature->IsInCombat() && !hasEvadedOnce)
                 {
                     EnterEvadeMode();
                     hasEvadedOnce = true;
@@ -336,9 +336,9 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
     uint32 uiUpdateTimer;
     std::list<uint64> acolyte;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (Creature* pop = m_creature->SummonCreature(10399, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() - 100, 0, TEMPSUMMON_TIMED_DESPAWN, 1))
         {
@@ -352,9 +352,9 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->isAlive() || !m_pInstance)
+        if (!m_creature->IsAlive() || !m_pInstance)
             return;
 
         if (uiUpdateTimer > diff)
@@ -375,12 +375,12 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
             return;
         }
 
-        for (std::list<uint64>::const_iterator itr = acolyte.begin(); itr != acolyte.end(); ++itr)
-            if (Creature *pCreature = m_pInstance->instance->GetCreature((*itr)))
-                if (pCreature && pCreature->isAlive())
+        for (const auto& guid : acolyte)
+            if (Creature *pCreature = m_pInstance->instance->GetCreature(guid))
+                if (pCreature && pCreature->IsAlive())
                     return;
 
-        m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+        m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
     }
 };
 
@@ -417,14 +417,14 @@ struct AI_mobs_rat_pestifere : public ScriptedAI
     float m_yOrigine;
     float m_zOrigine;
 
-    void Reset()
+    void Reset() override
     {
         m_idRat = 0;
         m_mvt_id = 0;
         m_mvt_timer = 0;
     }
 
-    void ReceiveEmote(Player* pPlayer, uint32 emote)
+    void ReceiveEmote(Player* pPlayer, uint32 emote) override
     {
         if (emote < 1000)
             return;
@@ -464,7 +464,7 @@ struct AI_mobs_rat_pestifere : public ScriptedAI
         m_mvt_id++;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (m_mvt_timer < diff && m_idRat > 0)
         {
@@ -673,7 +673,7 @@ struct npc_auriusAI : public ScriptedAI
     uint32 ui_entry;
     bool bIsFakeDead;
 
-    void Reset()
+    void Reset() override
     {
         if (!m_pInstance)
             return;
@@ -692,7 +692,7 @@ struct npc_auriusAI : public ScriptedAI
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNK_29);
             m_creature->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_DEAD);
             m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-            m_creature->addUnitState(UNIT_STAT_DIED);
+            m_creature->AddUnitState(UNIT_STAT_DIED);
             m_creature->CombatStop();
             //m_creature->RemoveAllAuras();
             //m_creature->DeleteThreatList();
@@ -701,11 +701,11 @@ struct npc_auriusAI : public ScriptedAI
             //m_creature->GetMotionMaster()->MoveIdle();
             m_creature->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
             m_creature->InterruptNonMeleeSpells(true);
-            m_creature->getHostileRefManager().deleteReferences();
+            m_creature->GetHostileRefManager().deleteReferences();
         }
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
     {
         if (uiDamage >= m_creature->GetHealth())
         {
@@ -727,7 +727,7 @@ struct npc_auriusAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         switch (ui_entry)
         {
@@ -752,7 +752,7 @@ struct npc_auriusAI : public ScriptedAI
                 {
                     case IN_PROGRESS :
                     {
-                        if (((m_pInstance->GetData(TYPE_EVENT_AURIUS)) == IN_PROGRESS) && (m_creature->getStandState() != UNIT_STAND_STATE_DEAD))
+                        if (((m_pInstance->GetData(TYPE_EVENT_AURIUS)) == IN_PROGRESS) && (m_creature->GetStandState() != UNIT_STAND_STATE_DEAD))
                         {
                             if (Creature* pTarget = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_BARON)))
                             {
@@ -831,14 +831,14 @@ struct npc_couloir_trigger1AI : public ScriptedAI
     bool CorridorEnded;
     bool ScourgeStarted;
 
-    void Reset()
+    void Reset() override
     {
         CorridorEnded = false;
         ScourgeStarted = false;
         m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS);
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
         {
@@ -854,13 +854,13 @@ struct npc_couloir_trigger1AI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_BERSERK || pSummoned->GetEntry() == NPC_GUARDIAN)
             pSummoned->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (ScourgeStarted)
         {
@@ -870,7 +870,7 @@ struct npc_couloir_trigger1AI : public ScriptedAI
 
                 if (Creature* Crea = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_DATHROHAN)))
                 {
-                    if (Crea->isAlive() && !Crea->isInCombat())
+                    if (Crea->IsAlive() && !Crea->IsInCombat())
                     {
                         //"The scourge has broken into our bastion!"
                         Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
@@ -916,12 +916,12 @@ struct npc_couloir_trigger2AI : public ScriptedAI
 
     bool CorridorEnded;
 
-    void Reset()
+    void Reset() override
     {
         CorridorEnded = false;
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
         {
@@ -951,12 +951,12 @@ struct npc_couloir_trigger3AI : public ScriptedAI
 
     bool CorridorEnded;
 
-    void Reset()
+    void Reset() override
     {
         CorridorEnded = false;
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !CorridorEnded)
         {
@@ -989,24 +989,24 @@ struct npc_Scourge_TriggerAI : public ScriptedAI
     uint32 m_uiScourgeTimer;
     bool ScourgeStarted;
 
-    void Reset()
+    void Reset() override
     {
         m_uiScourgeTimer = urand(10*MINUTE*IN_MILLISECONDS, 20*MINUTE*IN_MILLISECONDS); // 15 - 30 mn urand(1000000, 1800000);
         ScourgeStarted = false;
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 5.0f) && !ScourgeStarted)
             ScourgeStarted = true;
     }
 
-    void JustSummoned(Creature* pSummoned)
+    void JustSummoned(Creature* pSummoned) override
     {
         pSummoned->SetInCombatWithZone();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (ScourgeStarted)
         {
@@ -1016,7 +1016,7 @@ struct npc_Scourge_TriggerAI : public ScriptedAI
 
                 if (Creature* Crea = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(NPC_DATHROHAN)))
                 {
-                    if (Crea->isAlive() && !Crea->isInCombat())
+                    if (Crea->IsAlive() && !Crea->IsInCombat())
                     {
                         //"The scourge has broken into our bastion!"
                         Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
@@ -1062,7 +1062,7 @@ struct go_supply_crateAI: public GameObjectAI
 {
     go_supply_crateAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         uint32 maxplagued = urand(1, 4);
 
@@ -1109,11 +1109,11 @@ struct npc_piege_grille1AI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 4.0f))
         {
@@ -1166,11 +1166,11 @@ struct npc_piege_grille2AI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void MoveInLineOfSight(Unit* who)
+    void MoveInLineOfSight(Unit* who) override
     {
         if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 3.0f))
         {
@@ -1219,7 +1219,7 @@ CreatureAI* GetAI_npc_piege_grille2(Creature* pCreature)
 
 void AddSC_stratholme()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_gauntlet_gate";

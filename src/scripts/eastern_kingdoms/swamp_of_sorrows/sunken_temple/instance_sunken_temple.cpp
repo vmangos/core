@@ -28,8 +28,8 @@ EndScriptData */
 #include "sunken_temple.h"
 
 // This is also the needed order for activation: S, N, SW, SE, NW, NE
-//static const uint32 m_aAtalaiStatueEvents[MAX_STATUES] = {EVENT_ID_STATUE_1, EVENT_ID_STATUE_2, EVENT_ID_STATUE_3, EVENT_ID_STATUE_4, EVENT_ID_STATUE_5, EVENT_ID_STATUE_6};
-static const uint64 m_aAtalaiStatueEvents[6] = {GO_ATALAI_STATUE_1, GO_ATALAI_STATUE_2, GO_ATALAI_STATUE_3, GO_ATALAI_STATUE_4, GO_ATALAI_STATUE_5, GO_ATALAI_STATUE_6};
+//static uint32 const m_aAtalaiStatueEvents[MAX_STATUES] = {EVENT_ID_STATUE_1, EVENT_ID_STATUE_2, EVENT_ID_STATUE_3, EVENT_ID_STATUE_4, EVENT_ID_STATUE_5, EVENT_ID_STATUE_6};
+static uint64 const m_aAtalaiStatueEvents[6] = {GO_ATALAI_STATUE_1, GO_ATALAI_STATUE_2, GO_ATALAI_STATUE_3, GO_ATALAI_STATUE_4, GO_ATALAI_STATUE_5, GO_ATALAI_STATUE_6};
 
 struct SummonLocations
 {
@@ -73,7 +73,7 @@ struct instance_sunken_temple : public ScriptedInstance
     uint64 m_luiBigLightGUIDs[6];
     uint64 m_luiCircleGUIDs[8];
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
         memset(&m_luiProtectorGUIDs, 0, sizeof(m_luiProtectorGUIDs));
@@ -130,8 +130,8 @@ struct instance_sunken_temple : public ScriptedInstance
         // Spawn the big green lights
         //for (GUIDList::const_iterator itr = m_luiBigLightGUIDs.begin(); itr != m_luiBigLightGUIDs.end(); ++itr)
         //DoRespawnGameObject(*itr, 30*MINUTE);
-        for (int i = 0; i < 6; i++)
-            DoRespawnGameObject(m_luiBigLightGUIDs[i], HOUR * IN_MILLISECONDS);
+        for (uint64 guid : m_luiBigLightGUIDs)
+            DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
     }
 
     bool ProcessStatueEvent(uint32 uiStatueEntry)
@@ -166,9 +166,9 @@ struct instance_sunken_temple : public ScriptedInstance
 
     void DoUpdateFlamesFlags(bool bRestore)
     {
-        for (int i = 0; i < 4; i++)
+        for (uint64 guid : m_luiFlameGUIDs)
         {
-            if (GameObject* pFlame = instance->GetGameObject(m_luiFlameGUIDs[i]))
+            if (GameObject* pFlame = instance->GetGameObject(guid))
             {
                 // Remove the flags of the flames for Hakkar event
                 if (!bRestore)
@@ -185,11 +185,10 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
-        int var = 0;
-        int Var = 0;
-        int varr = 0;
+        int countCircle = 0;
+        int countLight = 0;
         switch (pGo->GetEntry())
         {
             case GO_JAMMALAN_BARRIER:
@@ -225,20 +224,20 @@ struct instance_sunken_temple : public ScriptedInstance
                 m_luiAtalaiStatueGUIDs[5] = pGo->GetGUID();
                 break;
             case GO_ATALAI_LIGHT_BIG:
-                for (int i = 0; i < 6; i++)
+                for (uint64 guid : m_luiBigLightGUIDs)
                 {
-                    if (m_luiBigLightGUIDs[i] != 0 && m_luiBigLightGUIDs[i] != pGo->GetGUID())
-                        ++Var;
+                    if (guid != 0 && guid != pGo->GetGUID())
+                        ++countLight;
                 }
-                m_luiBigLightGUIDs[Var] = pGo->GetGUID();
+                m_luiBigLightGUIDs[countLight] = pGo->GetGUID();
                 break;
             case GO_EVIL_CIRCLE:
-                for (int i = 0; i < 8; i++)
+                for (uint64 guid : m_luiCircleGUIDs)
                 {
-                    if (m_luiCircleGUIDs[i] != 0 && m_luiCircleGUIDs[i] != pGo->GetGUID())
-                        ++var;
+                    if (guid != 0 && guid != pGo->GetGUID())
+                        ++countCircle;
                 }
-                m_luiCircleGUIDs[var] = pGo->GetGUID();
+                m_luiCircleGUIDs[countCircle] = pGo->GetGUID();
                 break;
 
             case GO_ETERNAL_FLAME_1:
@@ -258,7 +257,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -328,7 +327,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnCreatureEnterCombat(Creature* pCreature)
+    void OnCreatureEnterCombat(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -355,13 +354,13 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature *pCreature)
+    void OnCreatureDeath(Creature *pCreature) override
     {
         if (m_uiShadeHakkarGUID && (pCreature->GetEntry() == NPC_HAKKARI_MINION || pCreature->GetEntry() == NPC_BLOODKEEPER))
         {
             if (Creature *shade = GetMap()->GetCreature(m_uiShadeHakkarGUID))
             {
-                if (!shade->isAlive() || !shade->AI())
+                if (!shade->IsAlive() || !shade->AI())
                     return;
 
                 if (npc_shade_hakkarAI *ai = dynamic_cast<npc_shade_hakkarAI*>(shade->AI()))
@@ -370,7 +369,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -378,9 +377,9 @@ struct instance_sunken_temple : public ScriptedInstance
                 if (uiData == DONE)
                 {
                     DoSpawnAtalarionIfCan();
-                    for (int i = 0; i < 6; i++)
+                    for (uint64 guid : m_luiAtalaiStatueGUIDs)
                     {
-                        if (GameObject* pGob = instance->GetGameObject(m_luiAtalaiStatueGUIDs[i]))
+                        if (GameObject* pGob = instance->GetGameObject(guid))
                             pGob->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
                     }
                 }
@@ -433,11 +432,11 @@ struct instance_sunken_temple : public ScriptedInstance
                 if (uiData == DONE)
                 {
                     bool bAllDead = true;
-                    for (int i = 0; i < 6; i++)
+                    for (uint64 guid : m_luiProtectorGUIDs)
                     {
-                        if (Creature* pProt = instance->GetCreature(m_luiProtectorGUIDs[i]))
+                        if (Creature* pProt = instance->GetCreature(guid))
                         {
-                            if (pProt->isAlive())
+                            if (pProt->IsAlive())
                             {
                                 bAllDead = false;
                                 break;
@@ -509,7 +508,7 @@ struct instance_sunken_temple : public ScriptedInstance
                             if (!curr->GetDBTableGUIDLow())
                                 continue;
 
-                            if (curr->isAlive())
+                            if (curr->IsAlive())
                                 curr->SetInCombatWithZone();
                         }
                     }
@@ -536,8 +535,8 @@ struct instance_sunken_temple : public ScriptedInstance
 
                     if (m_auiEncounter[4] != IN_PROGRESS)
                     {
-                        for (int i = 0; i < 8; i++)
-                            DoRespawnGameObject(m_luiCircleGUIDs[i], HOUR * IN_MILLISECONDS);
+                        for (uint64 guid : m_luiCircleGUIDs)
+                            DoRespawnGameObject(guid, HOUR * IN_MILLISECONDS);
                     }
                 }
                 else if (uiData == FAIL)
@@ -560,9 +559,9 @@ struct instance_sunken_temple : public ScriptedInstance
                     // We only get one attempt
                     DoUpdateFlamesFlags(false);
 
-                    for (int i = 0; i < 8; i++)
+                    for (uint64 guid : m_luiCircleGUIDs)
                     {
-                        if (GameObject* pGob = instance->GetGameObject(m_luiCircleGUIDs[i]))
+                        if (GameObject* pGob = instance->GetGameObject(guid))
                             pGob->Use(pShade);
                     }
                     m_uiFlameCounter = 0;
@@ -605,7 +604,7 @@ struct instance_sunken_temple : public ScriptedInstance
                             if (!curr->GetDBTableGUIDLow())
                                 continue;
 
-                            if (curr->isAlive())
+                            if (curr->IsAlive())
                                 curr->SetInCombatWithZone();
                         }
                     }
@@ -629,7 +628,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    void SetData64(uint32 uiType, uint64 uiData)
+    void SetData64(uint32 uiType, uint64 uiData) override
     {
         switch (uiType)
         {
@@ -663,12 +662,12 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    const char* Save()
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -689,7 +688,7 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
-    uint64 GetData64(uint32 uiType)
+    uint64 GetData64(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -711,7 +710,7 @@ struct instance_sunken_temple : public ScriptedInstance
         return 0;
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         if (RemoveTimer < uiDiff)
         {
@@ -722,7 +721,7 @@ struct instance_sunken_temple : public ScriptedInstance
             RemoveTimer -= uiDiff;
     }
 
-    void Load(const char* chrIn)
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {
@@ -735,10 +734,10 @@ struct instance_sunken_temple : public ScriptedInstance
         std::istringstream loadStream(chrIn);
         loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5];
 
-        for (uint8 i = 0; i < SUNKENTEMPLE_MAX_ENCOUNTER; ++i)
+        for (uint32 & i : m_auiEncounter)
         {
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
             // Here a bit custom, to have proper mechanics for the statue events
             /*if (m_auiEncounter[i] != DONE)
                 m_auiEncounter[i] = NOT_STARTED;*/

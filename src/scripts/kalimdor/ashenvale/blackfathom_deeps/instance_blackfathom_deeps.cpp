@@ -109,7 +109,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
     uint32 m_auiEncounter[INSTANCE_BFD_MAX_ENCOUNTER];
     std::string strInstData;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -125,17 +125,17 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         m_lWaveMobsGUIDList.clear();
         m_uiCheckEventEnd = 1000;
 
-        for (int i = 0; i < 4; i++)
-            m_uiSpawnMobsTimer[i] = 0;
+        for (uint32 & i : m_uiSpawnMobsTimer)
+            i = 0;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         if (pCreature->GetEntry() == 4832)
             m_uiTwilightLordKelrisGUID = pCreature->GetGUID();
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -165,7 +165,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -209,12 +209,12 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         }
     }
 
-    const char* Save()
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -229,7 +229,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -252,7 +252,7 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         return 0;
     }
 
-    void Load(const char* chrIn)
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {
@@ -265,13 +265,13 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         std::istringstream loadStream(chrIn);
         loadStream >> m_auiEncounter[BFD_ENCOUNTER_KELRIS] >> m_auiEncounter[BFD_ENCOUNTER_SHRINE] >> m_auiEncounter[BFD_ENCOUNTER_AQUANIS];
 
-        for (uint8 i = 0; i < INSTANCE_BFD_MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+        for (uint32 & i : m_auiEncounter)
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
 
         OUT_LOAD_INST_DATA_COMPLETE;
     }
-    void OnCreatureDeath(Creature* pCreature)
+    void OnCreatureDeath(Creature* pCreature) override
     {
         if (pCreature->GetEntry() == NPC_BARON_AQUANIS)
             SetData(TYPE_AQUANIS, DONE);
@@ -287,27 +287,27 @@ struct instance_blackfathom_deeps : public ScriptedInstance
         float fX_resp, fY_resp, fZ_resp;
         pKelris->GetRespawnCoord(fX_resp, fY_resp, fZ_resp);
 
-        for (uint8 i = 0; i < sizeof(aWaveSummonInformation) / sizeof(SummonInformation); ++i)
+        for (const auto& i : aWaveSummonInformation)
         {
-            if (aWaveSummonInformation[i].m_uiWaveIndex != uiWaveIndex)
+            if (i.m_uiWaveIndex != uiWaveIndex)
                 continue;
 
             // Summon mobs at positions
             for (uint8 j = 0; j < 3; ++j)
             {
-                for (uint8 k = 0; k < aWaveSummonInformation[i].m_aCountAndPos[j].m_uiCount; ++k)
+                for (uint8 k = 0; k < i.m_aCountAndPos[j].m_uiCount; ++k)
                 {
-                    uint8 uiPos = aWaveSummonInformation[i].m_aCountAndPos[j].m_uiSummonPosition;
+                    uint8 uiPos = i.m_aCountAndPos[j].m_uiSummonPosition;
                     float fPosX = aSpawnLocations[uiPos].m_fX;
                     float fPosY = aSpawnLocations[uiPos].m_fY;
                     float fPosZ = aSpawnLocations[uiPos].m_fZ;
                     float fPosO = aSpawnLocations[uiPos].m_fO;
 
                     // Adapt fPosY slightly in case of higher summon-counts
-                    if (aWaveSummonInformation[i].m_aCountAndPos[j].m_uiCount > 1)
-                        fPosY = fPosY - INTERACTION_DISTANCE / 2 + k * INTERACTION_DISTANCE / aWaveSummonInformation[i].m_aCountAndPos[j].m_uiCount;
+                    if (i.m_aCountAndPos[j].m_uiCount > 1)
+                        fPosY = fPosY - INTERACTION_DISTANCE / 2 + k * INTERACTION_DISTANCE / i.m_aCountAndPos[j].m_uiCount;
 
-                    if (Creature* pSummoned = pKelris->SummonCreature(aWaveSummonInformation[i].m_uiNpcEntry, fPosX, fPosY, fPosZ, fPosO, TEMPSUMMON_DEAD_DESPAWN, 0))
+                    if (Creature* pSummoned = pKelris->SummonCreature(i.m_uiNpcEntry, fPosX, fPosY, fPosZ, fPosO, TEMPSUMMON_DEAD_DESPAWN, 0))
                     {
                         pSummoned->SetWalk(true);
                         pSummoned->CastSpell(pSummoned, 7741, true);  // Summoned Demon (Visual)
@@ -329,16 +329,16 @@ struct instance_blackfathom_deeps : public ScriptedInstance
             return false;
 
         // Check if all mobs are dead
-        for (std::list<uint64>::const_iterator itr = m_lWaveMobsGUIDList.begin(); itr != m_lWaveMobsGUIDList.end(); itr++)
+        for (const auto& guid : m_lWaveMobsGUIDList)
         {
-            if (Creature* WaveMob = instance->GetCreature(*itr))
-                if (WaveMob->isAlive())
+            if (Creature* WaveMob = instance->GetCreature(guid))
+                if (WaveMob->IsAlive())
                     return false;
         }
         return true;
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         // Only use this function if shrine event is in progress
         if (m_auiEncounter[BFD_ENCOUNTER_SHRINE] != IN_PROGRESS)
@@ -379,7 +379,7 @@ struct go_fire_of_akumaiAI: public GameObjectAI
 {
     go_fire_of_akumaiAI(GameObject* pGo) : GameObjectAI(pGo) {}
 
-    bool OnUse(Unit* pUser)
+    bool OnUse(Unit* pUser) override
     {
         ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData();
 
@@ -401,7 +401,7 @@ GameObjectAI* GetAIgo_fire_of_akumai(GameObject *pGo)
 {
     return new go_fire_of_akumaiAI(pGo);
 }
-static const float afAquanisPos[4] = { -782.21f, -63.26f, -42.43f, 2.36f };
+static float const afAquanisPos[4] = { -782.21f, -63.26f, -42.43f, 2.36f };
 bool GOUse_go_fathom_stone(Player* pPlayer, GameObject* pGo)
 {
     instance_blackfathom_deeps* pInstance = (instance_blackfathom_deeps*)pGo->GetInstanceData();
@@ -418,7 +418,7 @@ bool GOUse_go_fathom_stone(Player* pPlayer, GameObject* pGo)
 }
 void AddSC_instance_blackfathom_deeps()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "instance_blackfathom_deeps";

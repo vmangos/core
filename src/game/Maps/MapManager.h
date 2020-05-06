@@ -55,20 +55,20 @@ enum
     MAP1_LAST           = 20,
 };
 
-struct MANGOS_DLL_DECL MapID
+struct MapID
 {
     explicit MapID(uint32 id) : nMapId(id), nInstanceId(0) {}
     MapID(uint32 id, uint32 instid) : nMapId(id), nInstanceId(instid) {}
 
-    bool operator<(const MapID& val) const
+    bool operator<(MapID const& val) const
     {
-        if(nMapId == val.nMapId)
+        if (nMapId == val.nMapId)
             return nInstanceId < val.nInstanceId;
 
         return nMapId < val.nMapId;
     }
 
-    bool operator==(const MapID& val) const { return nMapId == val.nMapId && nInstanceId == val.nInstanceId; }
+    bool operator==(MapID const& val) const { return nMapId == val.nMapId && nInstanceId == val.nInstanceId; }
 
     uint32 nMapId;
     uint32 nInstanceId;
@@ -76,7 +76,7 @@ struct MANGOS_DLL_DECL MapID
 
 struct ScheduledTeleportData;
 
-class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> >
+class MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> >
 {
     friend class MaNGOS::OperatorNew<MapManager>;
 
@@ -87,15 +87,15 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
     public:
         typedef std::map<MapID, Map* > MapMapType;
 
-        uint32 GetContinentInstanceId(uint32 mapId, float x, float y, bool* transitionArea = NULL);
-        Map* CreateMap(uint32, const WorldObject* obj);
+        uint32 GetContinentInstanceId(uint32 mapId, float x, float y, bool* transitionArea = nullptr);
+        Map* CreateMap(uint32, WorldObject const* obj);
         Map* CreateBgMap(uint32 mapid, BattleGround* bg);
         Map* CreateTestMap(uint32 mapid, bool instanced, float posX, float posY);
         void DeleteTestMap(Map* map);
         Map* FindMap(uint32 mapid, uint32 instanceId = 0) const;
 
 
-        void UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid, GridInfo& ginfo, const uint32 &x, const uint32 &y, const uint32 &t_diff);
+        void UpdateGridState(grid_state_t state, Map& map, NGridType& ngrid, GridInfo& ginfo, uint32 const& x, uint32 const& y, uint32 const& t_diff);
 
         // only const version for outer users
         void DeleteInstance(uint32 mapid, uint32 instanceId);
@@ -105,7 +105,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         void SetGridCleanUpDelay(uint32 t)
         {
-            if( t < MIN_GRID_DELAY )
+            if (t < MIN_GRID_DELAY)
                 i_gridCleanUpDelay = MIN_GRID_DELAY;
             else
                 i_gridCleanUpDelay = t;
@@ -113,14 +113,14 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         void SetMapUpdateInterval(uint32 t)
         {
-            if( t > MIN_MAP_UPDATE_DELAY )
+            if (t > MIN_MAP_UPDATE_DELAY)
                 t = MIN_MAP_UPDATE_DELAY;
 
             i_timer.SetInterval(t);
             i_timer.Reset();
         }
 
-        //void LoadGrid(int mapid, int instId, float x, float y, const WorldObject* obj, bool no_unload = false);
+        //void LoadGrid(int mapid, int instId, float x, float y, WorldObject const* obj, bool no_unload = false);
         void UnloadAll();
 
         static bool ExistMapAndVMap(uint32 mapid, float x, float y);
@@ -143,7 +143,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         static bool IsValidMapCoord(WorldLocation const& loc)
         {
-            return IsValidMapCoord(loc.mapid,loc.coord_x,loc.coord_y,loc.coord_z,loc.orientation);
+            return IsValidMapCoord(loc.mapId,loc.x,loc.y,loc.z,loc.o);
         }
 
         // modulos a radian orientation to the range of 0..2PI
@@ -151,7 +151,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         {
             // fmod only supports positive numbers. Thus we have
             // to emulate negative numbers
-            if(o < 0)
+            if (o < 0)
             {
                 float mod = o *-1;
                 mod = fmod(mod, 2.0f*M_PI_F);
@@ -182,10 +182,10 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         void ScheduleInstanceSwitch(Player* player, uint16 newInstance);
         void SwitchPlayersInstances();
 
-        void ScheduleFarTeleport(Player *player, ScheduledTeleportData *data);
+        void ScheduleFarTeleport(Player* player, ScheduledTeleportData* data);
         void ExecuteDelayedPlayerTeleports();
-        void ExecuteSingleDelayedTeleport(Player *player);
-        void CancelDelayedPlayerTeleport(Player *player);
+        void ExecuteSingleDelayedTeleport(Player* player);
+        void CancelDelayedPlayerTeleport(Player* player);
 
         void MarkContinentUpdateFinished(int idx)
         {
@@ -196,7 +196,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         {
             // Check pointer rather than deref. Deleted after
             // continent and instance updates are finished
-            if (i_continentUpdateFinished == NULL)
+            if (i_continentUpdateFinished == nullptr)
                 return true;
 
             for (int i = 0; i < i_maxContinentThread; ++i)
@@ -215,14 +215,14 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         MapManager();
         ~MapManager();
 
-        MapManager(const MapManager &);
-        MapManager& operator=(const MapManager &);
+        MapManager(MapManager const&);
+        MapManager& operator=(MapManager const&);
 
         void InitStateMachine();
         void DeleteStateMachine();
 
-        Map* CreateInstance(uint32 id, Player * player);
-        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState *save = NULL);
+        Map* CreateInstance(uint32 id, Player* player);
+        DungeonMap* CreateDungeonMap(uint32 id, uint32 InstanceId, DungeonPersistentState* save = nullptr);
         BattleGroundMap* CreateBattleGroundMap(uint32 id, uint32 InstanceId, BattleGround* bg);
 
         uint32 i_gridCleanUpDelay;

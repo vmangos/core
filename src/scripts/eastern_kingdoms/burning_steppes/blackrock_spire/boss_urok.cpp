@@ -40,7 +40,7 @@ struct go_urok_challengeAI: public GameObjectAI
 
     // Fonction appellees toutes les 100ms en moyenne.
     // Permet de gerer les timer de pop des adds par exemple.
-    void UpdateAI(uint32 const diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (_spellTimer < diff)
             _spellTimer = 0;
@@ -94,9 +94,9 @@ struct go_urok_challengeAI: public GameObjectAI
                 }
                 // Mise en combat avec tout le monde
                 Map::PlayerList const& list = me->GetMap()->GetPlayers();
-                for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
-                    if (Player* player = it->getSource())
-                        if (player->isAlive() && !invoc->IsFriendlyTo(player))
+                for (const auto& it : list)
+                    if (Player* player = it.getSource())
+                        if (player->IsAlive() && !invoc->IsFriendlyTo(player))
                             invoc->AI()->AttackStart(player);
             }
         }
@@ -116,8 +116,8 @@ struct go_urok_challengeAI: public GameObjectAI
 
     void DespawnRunes()
     {
-        for (int i = 0; i < 6; i++)
-            if (GameObject* go = me->GetMap()->GetGameObject(_runes[i]))
+        for (const auto& guid : _runes)
+            if (GameObject* go = me->GetMap()->GetGameObject(guid))
                 go->AddObjectToRemoveList();
     }
 
@@ -125,7 +125,7 @@ struct go_urok_challengeAI: public GameObjectAI
     {
         Unit* massacrer = me->FindNearestCreature(NPC_UROK_MASSACRER, 20.0f);
         Unit* mage      = me->FindNearestCreature(NPC_UROK_MAGE, 20.0f);
-        Unit* target    = NULL;
+        Unit* target    = nullptr;
         if (!mage)
             target = massacrer;
         else if (massacrer)
@@ -137,12 +137,12 @@ struct go_urok_challengeAI: public GameObjectAI
         }
         else
             target = mage;
-        // Sinon, massacre=mage=NULL, aucune cible.
+        // Sinon, massacre=mage=nullptr, aucune cible.
         return target;
     }
 
     // Clic-droit sur le gameobject.
-    bool OnUse(Unit* user)
+    bool OnUse(Unit* user) override
     {
         if (_actived)
         {
@@ -160,7 +160,7 @@ struct go_urok_challengeAI: public GameObjectAI
 
     void EventBannerDestroyed(uint64 sourceGuid)
     {
-        if(_actived == false)
+        if(!_actived)
             return;
         _actived = false;
         DespawnRunes();
@@ -203,7 +203,7 @@ struct urokUnderlingAI : public ScriptedAI
     {
         timer=0;
     }
-    void Reset()
+    void Reset() override
     {
         timer=0;
         abilityReset();
@@ -211,7 +211,7 @@ struct urokUnderlingAI : public ScriptedAI
     virtual void abilityReset(){}
     uint32 timer;
     uint64 guidMound;
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if(GameObject* gobj=m_creature->GetMap()->GetGameObject(guidMound))
         {
@@ -221,7 +221,7 @@ struct urokUnderlingAI : public ScriptedAI
             }
         }
     }
-    void MovementInform(uint32 uiType, uint32 uiPointId)
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
@@ -229,7 +229,7 @@ struct urokUnderlingAI : public ScriptedAI
             return;
         HitBanner();
     }
-    void AttackStart(Unit * unit)
+    void AttackStart(Unit * unit) override
     {
       if( m_creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
             return;
@@ -256,9 +256,9 @@ struct urokUnderlingAI : public ScriptedAI
           }
           return false;
     }
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if ( timer < uiDiff)
             {
@@ -292,16 +292,16 @@ struct urokEnforcerAI : public urokUnderlingAI
     {
         abilityReset();
     }
-    void abilityReset()
+    void abilityReset() override
     {
         m_uiStrike_Timer = 1000;
     }
     uint32 m_uiStrike_Timer;
-    void abilityCombatUpdate(uint32 uiDiff)
+    void abilityCombatUpdate(uint32 uiDiff) override
     {
         if (m_uiStrike_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STRIKE ) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE ) == CAST_OK)
                 m_uiStrike_Timer = urand(10000, 18000);
         }
         else
@@ -319,7 +319,7 @@ struct urokOgreMagusAI : public urokUnderlingAI
     {
     }
 
-    void abilityCombatUpdate(uint32 uiDiff)
+    void abilityCombatUpdate(uint32 uiDiff) override
     {
         if (!m_CreatureSpells.empty())
             UpdateSpellsList(uiDiff);
@@ -364,7 +364,7 @@ void DefineGoChallenge(Creature * crea, uint64 gobjGUID)
 }
 void AddSC_boss_urok() // Permet l'intégration dans la DB.
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "go_urok_challenge";

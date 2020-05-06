@@ -43,13 +43,13 @@ struct boss_immol_tharAI : public ScriptedAI
         return false;
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_IMMOL_THAR, DONE);
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiEnrageTimer            = 50000;
         m_uiTrampleTimer           = urand(5000, 9000);
@@ -67,15 +67,15 @@ struct boss_immol_tharAI : public ScriptedAI
         ScriptedAI::EnterEvadeMode();
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if(!m_bEngage)
             m_bEngage = true;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             // En cas de bug pathfinding
             CheckBug_Timer += uiDiff;
@@ -97,7 +97,7 @@ struct boss_immol_tharAI : public ScriptedAI
             DoCastSpellIfCan(m_creature, SPELL_TRAMPLE);
 
         if (ManageTimer(uiDiff, &m_uiInfectedBiteTimer,         urand(8000, 12000)))
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_INFECTED_BITE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_INFECTED_BITE);
 
         if (ManageTimer(uiDiff, &m_uiEyeOfImmolTharTimer,       urand(15000, 22000)))
         {
@@ -109,7 +109,7 @@ struct boss_immol_tharAI : public ScriptedAI
                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
             {
                 m_creature->SendSpellGo(tmp, 25681);
-                tmp->Attack(m_creature->getVictim(), true);
+                tmp->Attack(m_creature->GetVictim(), true);
             }
         }
 
@@ -124,7 +124,7 @@ struct boss_immol_tharAI : public ScriptedAI
                 float orientation = pTarget->GetOrientation();
                 m_creature->SendSpellGo(pTarget, 25681);
                 pTarget->NearTeleportTo(x, y, z, orientation);
-                m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
+                m_creature->GetThreatManager().modifyThreatPercent(pTarget, -100);
             }
         }
         if (m_uiEnrageTimer < uiDiff)

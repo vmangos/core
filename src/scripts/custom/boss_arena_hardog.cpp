@@ -225,7 +225,7 @@ struct arena_szerelmesAI : public ScriptedAI
     uint32 Shoot_Timer;
     uint32 add_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Shoot_Timer = 15000;
         Pummel_Timer = 7000;
@@ -233,26 +233,26 @@ struct arena_szerelmesAI : public ScriptedAI
         add_Timer = 60000;
     }
 
-    void Aggro(Unit* pPlayer)
+    void Aggro(Unit* pPlayer) override
     {
         add_Timer = 1000;
-        DoCastSpellIfCan(m_creature->getVictim(), SPELL_FAIL);
+        DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FAIL);
     }
 
-    void JustDied(Unit* Victim)
+    void JustDied(Unit* Victim) override
     {
         while (Creature* Add = m_creature->FindNearestCreature(NPC_ADD, 100.0f))
             Add->DisappearAndDie();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (Pummel_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PUMMEL) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL) == CAST_OK)
                 Pummel_Timer = 12000;
         }
         else
@@ -260,7 +260,7 @@ struct arena_szerelmesAI : public ScriptedAI
 
         if (KnockAway_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCKAWAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCKAWAY) == CAST_OK)
                 KnockAway_Timer = 14000;
         }
         else
@@ -269,7 +269,7 @@ struct arena_szerelmesAI : public ScriptedAI
         /* enlevé car trop dure!
                 if (Shoot_Timer < diff)
                 {
-                    DoCastSpellIfCan(m_creature->getVictim(),SPELL_SHOOT);
+                    DoCastSpellIfCan(m_creature->GetVictim(),SPELL_SHOOT);
                     Shoot_Timer = 2000;
                 }
                 else
@@ -340,7 +340,7 @@ struct npc_karlekAI : public ScriptedAI
     ArenaBossSzerelmesStatus eEventStatus;
     uint32 m_uiEventResetTimer;
 
-    void Reset()
+    void Reset() override
     {
     }
 
@@ -390,24 +390,24 @@ struct npc_karlekAI : public ScriptedAI
     }
 
     // L'event se reset si le boss despawn.
-    void SummonedCreatureDespawn(Creature* pSummoned)
+    void SummonedCreatureDespawn(Creature* pSummoned) override
     {
         if (pSummoned->GetObjectGuid() == m_uiSzerelmesGUID)
         {
-            m_creature->MonsterTextEmote("Vous me faites perdre mon temps !", NULL);
+            m_creature->MonsterTextEmote("Vous me faites perdre mon temps !", nullptr);
             ResetEvent();
         }
     }
 
     // L'event se complete si le boss meurt.
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (pSummoned->GetObjectGuid() == m_uiSzerelmesGUID)
             CompleteEvent();
     }
 
 
-    void UpdateAI(const uint32 diff, Player *pPlayer)
+    void UpdateAI(uint32 const diff) override
     {
         if (Creature* pSzerelmes = m_creature->GetMap()->GetCreature(m_uiSzerelmesGUID))
         {
@@ -420,11 +420,10 @@ struct npc_karlekAI : public ScriptedAI
                 ResetEvent();
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
-
     }
 };
 
@@ -542,7 +541,7 @@ bool GossipSelect_npc_laska(Player *player, Creature *pCreature, uint32 sender, 
 
 void AddSC_boss_arena_hardog()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "arena_szerelmes";
     newscript->GetAI = &GetAI_arena_szerelmes;

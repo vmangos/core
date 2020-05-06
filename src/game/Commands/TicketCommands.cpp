@@ -17,7 +17,7 @@ bool ChatHandler::HandleGMTicketAssignToCommand(char* args)
     uint32 ticketId = atoi(ticketIdStr);
 
     std::string target(GetSession() ? GetSession()->GetPlayerName() : "");
-    char* targetStr = strtok(NULL, " ");
+    char* targetStr = strtok(nullptr, " ");
     if (targetStr)
         target = targetStr;
     if (target.empty())
@@ -45,7 +45,7 @@ bool ChatHandler::HandleGMTicketAssignToCommand(char* args)
 
     // If assigned to different player other than current, leave
     //! Console can override though
-    Player* player = GetSession() ? GetSession()->GetPlayer() : NULL;
+    Player* player = GetSession() ? GetSession()->GetPlayer() : nullptr;
     if (player && ticket->IsAssignedNotTo(player->GetGUID()))
     {
         PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId(), target.c_str());
@@ -57,7 +57,7 @@ bool ChatHandler::HandleGMTicketAssignToCommand(char* args)
     ticket->SaveToDB();
     sTicketMgr->UpdateLastChange();
 
-    std::string msg = ticket->FormatMessageString(*this, NULL, target.c_str(), NULL, NULL, NULL);
+    std::string msg = ticket->FormatMessageString(*this, nullptr, target.c_str(), nullptr, nullptr, nullptr);
     sWorld.SendGMTicketText(msg.c_str());
     return true;
 }
@@ -82,7 +82,7 @@ bool ChatHandler::HandleGMTicketCloseByIdCommand(char* args)
 
     // Ticket should be assigned to the player who tries to close it.
     // Console can override though
-    Player* player = GetSession() ? GetSession()->GetPlayer() : NULL;
+    Player* player = GetSession() ? GetSession()->GetPlayer() : nullptr;
     if (player && ticket->IsAssignedNotTo(player->GetGUID()))
     {
         PSendSysMessage(LANG_COMMAND_TICKETCANNOTCLOSE, ticket->GetId());
@@ -92,7 +92,7 @@ bool ChatHandler::HandleGMTicketCloseByIdCommand(char* args)
     sTicketMgr->CloseTicket(ticket->GetId(), player ? player->GetObjectGuid() : ObjectGuid(uint64(-1)));
     sTicketMgr->UpdateLastChange();
 
-    std::string msg = ticket->FormatMessageString(*this, player ? player->GetName() : "Console", NULL, NULL, NULL, NULL);
+    std::string msg = ticket->FormatMessageString(*this, player ? player->GetName() : "Console", nullptr, nullptr, nullptr, nullptr);
     sWorld.SendGMTicketText(msg.c_str());
 
     // Inform player, who submitted this ticket, that it is closed
@@ -113,7 +113,7 @@ bool ChatHandler::HandleGMTicketCommentCommand(char* args)
     char* ticketIdStr = strtok((char*)args, " ");
     uint32 ticketId = atoi(ticketIdStr);
 
-    char* comment = strtok(NULL, "\n");
+    char const* comment = strtok(nullptr, "\n");
     if (!comment)
         comment = "";
 
@@ -126,7 +126,7 @@ bool ChatHandler::HandleGMTicketCommentCommand(char* args)
 
     // Cannot comment ticket assigned to someone else
     //! Console excluded
-    Player* player = GetSession() ? GetSession()->GetPlayer() : NULL;
+    Player* player = GetSession() ? GetSession()->GetPlayer() : nullptr;
     if (player && ticket->IsAssignedNotTo(player->GetGUID()))
     {
         PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
@@ -137,7 +137,7 @@ bool ChatHandler::HandleGMTicketCommentCommand(char* args)
     ticket->SaveToDB();
     sTicketMgr->UpdateLastChange();
 
-    std::string msg = ticket->FormatMessageString(*this, NULL, ticket->GetAssignedToName().c_str(), NULL, NULL, NULL);
+    std::string msg = ticket->FormatMessageString(*this, nullptr, ticket->GetAssignedToName().c_str(), nullptr, nullptr, nullptr);
     msg += PGetParseString(LANG_COMMAND_TICKETLISTADDCOMMENT, player ? player->GetName() : "Console", comment);
     sWorld.SendGMTicketText(msg.c_str());
 
@@ -170,12 +170,12 @@ bool ChatHandler::HandleGMTicketCompleteCommand(char* args)
         return true;
     }
 
-    char* response = strtok(NULL, "\n");
+    char* response = strtok(nullptr, "\n");
     if (response)
     {
         // Cannot add response to ticket, assigned to someone else
         //! Console excluded
-        Player* player = GetSession() ? GetSession()->GetPlayer() : NULL;
+        Player* player = GetSession() ? GetSession()->GetPlayer() : nullptr;
         if (player && ticket->IsAssignedNotTo(player->GetGUID()))
         {
             PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
@@ -194,8 +194,8 @@ bool ChatHandler::HandleGMTicketCompleteCommand(char* args)
     if (Player* player = ticket->GetPlayer())
         ticket->SendResponse(player->GetSession());
 
-    std::string msg = ticket->FormatMessageString(*this, NULL, NULL,
-        NULL, NULL, GetSession() ? GetSession()->GetPlayer()->GetName() : "Console");
+    std::string msg = ticket->FormatMessageString(*this, nullptr, nullptr,
+        nullptr, nullptr, GetSession() ? GetSession()->GetPlayer()->GetName() : "Console");
     sWorld.SendGMTicketText(msg.c_str());
     sTicketMgr->UpdateLastChange();
     return true;
@@ -220,7 +220,7 @@ bool ChatHandler::HandleGMTicketDeleteByIdCommand(char* args)
         return true;
     }
 
-    std::string msg = ticket->FormatMessageString(*this, NULL, NULL, NULL, GetSession() ? GetSession()->GetPlayer()->GetName() : "Console", NULL);
+    std::string msg = ticket->FormatMessageString(*this, nullptr, nullptr, nullptr, GetSession() ? GetSession()->GetPlayer()->GetName() : "Console", nullptr);
     sWorld.SendGMTicketText(msg.c_str());
 
     sTicketMgr->RemoveTicket(ticket->GetId());
@@ -279,7 +279,7 @@ bool ChatHandler::HandleGMTicketListEscalatedCommand(char* /*args*/)
 
 bool ChatHandler::HandleGMTicketListCommand(char* args)
 {
-    static const std::unordered_map<std::string, uint8> categories
+    static std::unordered_map<std::string, uint8> const categories
     {
         { "stuck", 1 },{ "behavior", 2 },{ "harassment", 2 },{ "guild", 3 },
         { "item", 4 },{ "environment", 5 },{ "world", 5 },{ "npc", 6 },
@@ -299,7 +299,7 @@ bool ChatHandler::HandleGMTicketListCommand(char* args)
 
 bool ChatHandler::HandleGMTicketListOnlineCommand(char* args)
 {
-    static const std::unordered_map<std::string, uint8> categories
+    static std::unordered_map<std::string, uint8> const categories
     {
         { "stuck", 1 },{ "behavior", 2 },{ "harassment", 2 },{ "guild", 3 },
         { "item", 4 },{ "environment", 5 },{ "world", 5 },{ "npc", 6 },
@@ -386,8 +386,8 @@ bool ChatHandler::HandleGMTicketUnAssignCommand(char* args)
     ticket->SaveToDB();
     sTicketMgr->UpdateLastChange();
 
-    std::string msg = ticket->FormatMessageString(*this, NULL, assignedTo.c_str(),
-        GetSession() ? GetSession()->GetPlayer()->GetName() : "Console", NULL, NULL);
+    std::string msg = ticket->FormatMessageString(*this, nullptr, assignedTo.c_str(),
+        GetSession() ? GetSession()->GetPlayer()->GetName() : "Console", nullptr, nullptr);
     sWorld.SendGMTicketText(msg.c_str());
 
     return true;
@@ -395,7 +395,7 @@ bool ChatHandler::HandleGMTicketUnAssignCommand(char* args)
 
 bool ChatHandler::ViewTicketByIdOrName(char* ticketId_c, char* name_c)
 {
-    GmTicket* ticket = NULL;
+    GmTicket* ticket = nullptr;
 
     // By ticket id
     if (ticketId_c && *ticketId_c)
@@ -459,12 +459,12 @@ bool ChatHandler::HandleGMTicketGetByIdOrNameCommand(char* args)
 
 bool ChatHandler::HandleGMTicketGetByIdCommand(char* args)
 {
-    return ViewTicketByIdOrName(args, NULL);
+    return ViewTicketByIdOrName(args, nullptr);
 }
 
 bool ChatHandler::HandleGMTicketGetByNameCommand(char* args)
 {
-    return ViewTicketByIdOrName(NULL, args);
+    return ViewTicketByIdOrName(nullptr, args);
 }
 
 bool ChatHandler::HandleGMTicketResponseResetCommand(char* args)
@@ -484,7 +484,7 @@ bool ChatHandler::HandleGMTicketResponseResetCommand(char* args)
 
     // Cannot add response to ticket, assigned to someone else
     //! Console excluded
-    Player* player = GetSession() ? GetSession()->GetPlayer() : NULL;
+    Player* player = GetSession() ? GetSession()->GetPlayer() : nullptr;
     if (player && ticket->IsAssignedNotTo(player->GetGUID()))
     {
         PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());
@@ -505,7 +505,7 @@ bool _HandleGMTicketResponseAppendCommand(char* args, bool newLine, ChatHandler*
     char* ticketIdStr = strtok((char*)args, " ");
     uint32 ticketId = atoi(ticketIdStr);
 
-    char* response = strtok(NULL, "\n");
+    char* response = strtok(nullptr, "\n");
     if (!response)
         return false;
 
@@ -518,7 +518,7 @@ bool _HandleGMTicketResponseAppendCommand(char* args, bool newLine, ChatHandler*
 
     // Cannot add response to ticket, assigned to someone else
     //! Console excluded
-    Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : NULL;
+    Player* player = handler->GetSession() ? handler->GetSession()->GetPlayer() : nullptr;
     if (player && ticket->IsAssignedNotTo(player->GetGUID()))
     {
         handler->PSendSysMessage(LANG_COMMAND_TICKETALREADYASSIGNED, ticket->GetId());

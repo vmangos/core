@@ -46,23 +46,50 @@ void instance_zulgurub::Initialize()
     m_uiGahzrankaGUID = 0;
 }
 
-// each time High Priest dies lower Hakkar's HP
-void instance_zulgurub::LowerHakkarHitPoints()
+void instance_zulgurub::UpdateHakkarPowerStacks()
 {
     if (Creature* pHakkar = instance->GetCreature(m_uiHakkarGUID))
     {
-        if (pHakkar->isAlive())
+        if (pHakkar->IsAlive())
         {
-            pHakkar->SetMaxHealth(pHakkar->GetMaxHealth() - 50000);
-            pHakkar->SetHealth(pHakkar->GetHealth() - 50000);
+            uint32 neededStacks = 0;
+            for (uint8 i = 0; i < 5; ++i)
+            {
+                if (m_auiEncounter[i] != DONE)
+                    neededStacks++;
+            }
+
+            uint32 currentStacks = 0;
+            if (SpellAuraHolder* pAura = pHakkar->GetSpellAuraHolder(SPELL_HAKKAR_POWER))
+                currentStacks = pAura->GetStackAmount();
+
+            if (neededStacks == currentStacks)
+                return;
+
+            if (neededStacks == 0)
+            {
+                pHakkar->RemoveAurasDueToSpell(SPELL_HAKKAR_POWER);
+                return;
+            }
+
+            if (currentStacks == 0)
+            {
+                for (uint8 i = 0; i < neededStacks; ++i)
+                    pHakkar->CastSpell(pHakkar, SPELL_HAKKAR_POWER, true);
+            }
+            else
+            {
+                if (SpellAuraHolder* pAura = pHakkar->GetSpellAuraHolder(SPELL_HAKKAR_POWER))
+                    pAura->SetStackAmount(neededStacks);
+            }
         }
     }
 }
 
 bool instance_zulgurub::IsEncounterInProgress() const
 {
-    for (uint8 i = 0; i < ZULGURUB_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+    for (uint32 i : m_auiEncounter)
+        if (i == IN_PROGRESS || i == SPECIAL)
             return true;
     return false;
 }
@@ -80,27 +107,30 @@ void instance_zulgurub::OnCreatureCreate(Creature* pCreature)
             break;
         case NPC_THEKAL:
             HandleLoadCreature(TYPE_THEKAL, m_uiThekalGUID, pCreature);
+            UpdateHakkarPowerStacks();
             break;
         case NPC_JINDO:
             m_uiJindoGUID = pCreature->GetGUID();
             break;
         case NPC_HAKKAR:
             HandleLoadCreature(TYPE_HAKKAR, m_uiHakkarGUID, pCreature);
-            for (uint8 i = 0; i < 5; ++i)
-            {
-                if (m_auiEncounter[i] == DONE)
-                    LowerHakkarHitPoints();
-            }
+            UpdateHakkarPowerStacks();
             break;
         case NPC_VENOXIS:
             HandleLoadCreature(TYPE_VENOXIS, nullGuid, pCreature);
+            UpdateHakkarPowerStacks();
             break;
         case NPC_ARLOKK:
             HandleLoadCreature(TYPE_ARLOKK, nullGuid, pCreature);
+            UpdateHakkarPowerStacks();
             break;
         case NPC_MARLI:
             HandleLoadCreature(TYPE_MARLI, nullGuid, pCreature);
             m_uiMarliGUID = pCreature->GetGUID();
+            UpdateHakkarPowerStacks();
+            break;
+        case NPC_JEKLIK:
+            UpdateHakkarPowerStacks();
             break;
         case NPC_RAZZASHI_SKITTERER:
         case NPC_RAZZASHI_VENOMBROOD:
@@ -129,33 +159,28 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
 {
     switch (uiType)
     {
+        case TYPE_HAKKAR_POWER:
+            UpdateHakkarPowerStacks();
+            break;
         case TYPE_ARLOKK:
             m_auiEncounter[0] = uiData;
-            if (uiData == DONE)
-                LowerHakkarHitPoints();
             break;
         case TYPE_JEKLIK:
             m_auiEncounter[1] = uiData;
-            if (uiData == DONE)
-                LowerHakkarHitPoints();
             break;
         case TYPE_VENOXIS:
             m_auiEncounter[2] = uiData;
-            if (uiData == DONE)
-                LowerHakkarHitPoints();
             break;
         case TYPE_MARLI:
             m_auiEncounter[3] = uiData;
-            if (uiData == DONE)
-                LowerHakkarHitPoints();
             if (uiData == IN_PROGRESS)
             {
                 Creature *Marli = instance->GetCreature(m_uiMarliGUID);
-                Unit* pVictim = Marli->getVictim();
-                for (std::list<uint64>::const_iterator itr = m_lMarliTrashGUIDList.begin(); itr != m_lMarliTrashGUIDList.end(); itr++)
+                Unit* pVictim = Marli->GetVictim();
+                for (const auto& guid : m_lMarliTrashGUIDList)
                 {
-                    if (Creature* MarliTrash = instance->GetCreature(*itr))
-                        if (MarliTrash->isAlive() && !MarliTrash->isInCombat())
+                    if (Creature* MarliTrash = instance->GetCreature(guid))
+                        if (MarliTrash->IsAlive() && !MarliTrash->IsInCombat())
                             if (MarliTrash->GetMapId() == 309 && MarliTrash->GetZoneId() == 1977 && MarliTrash->GetAreaId() == 3379)
                                 MarliTrash->AI()->AttackStart(pVictim);
                 }
@@ -163,8 +188,6 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
             break;
         case TYPE_THEKAL:
             m_auiEncounter[4] = uiData;
-            if (uiData == DONE)
-                LowerHakkarHitPoints();
             break;
         case TYPE_LORKHAN:
             m_auiEncounter[5] = uiData;
@@ -211,12 +234,12 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-const char* instance_zulgurub::Save()
+char const* instance_zulgurub::Save()
 {
     return strInstData.c_str();
 }
 
-void instance_zulgurub::Load(const char* chrIn)
+void instance_zulgurub::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -228,10 +251,10 @@ void instance_zulgurub::Load(const char* chrIn)
 
     LoadSaveData(chrIn, m_auiEncounter, 11);
 
-    for (uint8 i = 0; i < ZULGURUB_MAX_ENCOUNTER; ++i)
+    for (uint32 & i : m_auiEncounter)
     {
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
     }
     if (!m_randomBossSpawned)
         SpawnRandomBoss();
@@ -344,15 +367,15 @@ void instance_zulgurub::SpawnRandomBoss()
 Unit* instance_zulgurub::Thekal_GetUnitThatCanRez()
 {
     if (Unit *pLorKhan = instance->GetUnit(GetData64(DATA_LORKHAN)))
-        if (pLorKhan->isAlive())
+        if (pLorKhan->IsAlive())
             return pLorKhan;
     if (Unit *pZath = instance->GetUnit(GetData64(DATA_ZATH)))
-        if (pZath->isAlive())
+        if (pZath->IsAlive())
             return pZath;
     if (Unit *pThekal = instance->GetUnit(GetData64(DATA_THEKAL)))
-        if (pThekal->isAlive())
+        if (pThekal->IsAlive())
             return pThekal;
-    return NULL;
+    return nullptr;
 }
 
 InstanceData* GetInstanceData_instance_zulgurub(Map* pMap)
@@ -370,7 +393,7 @@ struct npc_brazierAI: public ScriptedAI
     uint32 Timer;
     uint32 Var;
 
-    void Reset()
+    void Reset() override
     {
         Timer = 0;
         Var = 0;
@@ -397,7 +420,7 @@ struct npc_brazierAI: public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (Var > 24)
             m_creature->ForcedDespawn();

@@ -60,7 +60,7 @@ struct Chunk
 
 PatchHandler::PatchHandler(ACE_HANDLE socket, ACE_HANDLE patch)
 {
-    reactor(NULL);
+    reactor(nullptr);
     set_handle(socket);
     patch_fd_ = patch;
 }
@@ -155,7 +155,7 @@ void PatchCache::LoadPatchMD5(const char* szFileName)
     // Try to open the patch file
     std::string path = "./patches/";
     path += szFileName;
-    FILE * pPatch = fopen(path.c_str (), "rb");
+    FILE* pPatch = fopen(path.c_str (), "rb");
     DEBUG_LOG("Loading patch info from %s", path.c_str());
 
     if(!pPatch)
@@ -203,7 +203,7 @@ void PatchCache::LoadPatchesInfo()
 
     ACE_DIRENT* dp;
 
-    while((dp = ACE_OS::readdir(dirp)) != NULL)
+    while((dp = ACE_OS::readdir(dirp)) != nullptr)
     {
         int l = strlen(dp->d_name);
         if (l < 8)

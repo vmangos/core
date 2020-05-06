@@ -209,7 +209,7 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
                 sLog.outErrorDb("`creature_linking` has a non existing master (guid: %u,, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
             return false;
         }
-        if (slaveData->mapid != masterData->mapid)
+        if (slaveData->position.mapId != masterData->position.mapId)
         {
             sLog.outErrorDb("`creature_linking` has a slave and master on different maps (guid: %u, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
             return false;
@@ -456,7 +456,7 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
             else                                            // guid case
             {
                 CreatureData const* masterData = sObjectMgr.GetCreatureData(pInfo->masterDBGuid);
-                CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->id);
+                CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->creature_id[0]);
                 pMaster = pSource->GetMap()->GetCreature(ObjectGuid(cInfo->GetHighGuid(), cInfo->entry, pInfo->masterDBGuid));
             }
 
@@ -468,17 +468,17 @@ void CreatureLinkingHolder::DoCreatureLinkingEvent(CreatureLinkingEvent eventTyp
                     if (pMaster->IsControlledByPlayer())
                         return;
 
-                    if (pMaster->isInCombat())
+                    if (pMaster->IsInCombat())
                         pMaster->SetInCombatWith(pEnemy);
                     else
                         pMaster->AI()->AttackStart(pEnemy);
                     break;
                 case LINKING_EVENT_EVADE:
-                    if (!pMaster->isAlive())
+                    if (!pMaster->IsAlive())
                         pMaster->Respawn();
                     break;
                 case LINKING_EVENT_RESPAWN:
-                    if (pMaster->isAlive())
+                    if (pMaster->IsAlive())
                         SetFollowing(pSource, pMaster);
                     break;
                 case LINKING_EVENT_DIE:                 // Nothing linked for this case
@@ -529,7 +529,7 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
             if (pSlave->IsControlledByPlayer())
                 return;
 
-            if (pSlave->isInCombat())
+            if (pSlave->IsInCombat())
             {
                 if (pSource->GetMap()->IsDungeon() && (pSource->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_AGGRO_ZONE))
                     pSlave->SetInCombatWithZone();
@@ -544,30 +544,30 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
         }
         break;
     case LINKING_EVENT_EVADE:
-        if (flag & FLAG_DESPAWN_ON_EVADE && pSlave->isAlive())
+        if (flag & FLAG_DESPAWN_ON_EVADE && pSlave->IsAlive())
             pSlave->ForcedDespawn();
-        if (flag & FLAG_RESPAWN_ON_EVADE && !pSlave->isAlive())
+        if (flag & FLAG_RESPAWN_ON_EVADE && !pSlave->IsAlive())
             pSlave->Respawn();
         break;
     case LINKING_EVENT_DIE:
-        if (flag & FLAG_SELFKILL_ON_DEATH && pSlave->isAlive())
+        if (flag & FLAG_SELFKILL_ON_DEATH && pSlave->IsAlive())
             pSlave->DealDamage(pSlave, pSlave->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-        if (flag & FLAG_DESPAWN_ON_DEATH && pSlave->isAlive())
+        if (flag & FLAG_DESPAWN_ON_DEATH && pSlave->IsAlive())
             pSlave->ForcedDespawn();
-        if (flag & FLAG_RESPAWN_ON_DEATH && !pSlave->isAlive())
+        if (flag & FLAG_RESPAWN_ON_DEATH && !pSlave->IsAlive())
             pSlave->Respawn();
         break;
     case LINKING_EVENT_RESPAWN:
         if (flag & FLAG_RESPAWN_ON_RESPAWN)
         {
             // Additional check to prevent endless loops (in case whole group respawns on first respawn)
-            if (!pSlave->isAlive() && pSlave->GetRespawnTime() > time(nullptr))
+            if (!pSlave->IsAlive() && pSlave->GetRespawnTime() > time(nullptr))
                 pSlave->Respawn();
         }
-        else if (flag & FLAG_DESPAWN_ON_RESPAWN && pSlave->isAlive())
+        else if (flag & FLAG_DESPAWN_ON_RESPAWN && pSlave->IsAlive())
             pSlave->ForcedDespawn();
 
-        if (flag & FLAG_FOLLOW && pSlave->isAlive() && !pSlave->isInCombat())
+        if (flag & FLAG_FOLLOW && pSlave->IsAlive() && !pSlave->IsInCombat())
             SetFollowing(pSlave, pSource);
 
         break;
@@ -664,15 +664,15 @@ bool CreatureLinkingHolder::CanSpawn(uint32 lowGuid, Map* _map, CreatureLinkingI
         CreatureData const* data = sObjectMgr.GetCreatureData(lowGuid);
         if (!data)
             return true;
-        pInfo = sCreatureLinkingMgr.GetLinkedTriggerInformation(data->id, lowGuid, data->mapid);
+        pInfo = sCreatureLinkingMgr.GetLinkedTriggerInformation(data->creature_id[0], lowGuid, data->position.mapId);
         if (!pInfo)
             return true;
         // Has lowGuid npc actually spawning linked?
         if (!sCreatureLinkingMgr.IsSpawnedByLinkedMob(pInfo))
             return true;
 
-        sx = data->posX;                                    // Fill position data
-        sy = data->posY;
+        sx = data->position.x;                              // Fill position data
+        sy = data->position.y;
     }
 
     if (pInfo->searchRange == 0)                            // Map wide case
@@ -696,9 +696,9 @@ bool CreatureLinkingHolder::CanSpawn(uint32 lowGuid, Map* _map, CreatureLinkingI
         if (pMaster && IsSlaveInRangeOfBoss(pMaster, sx, sy, pInfo->searchRange))
         {
             if (pInfo->linkingFlag & FLAG_CANT_SPAWN_IF_BOSS_DEAD)
-                return pMaster->isAlive();
+                return pMaster->IsAlive();
             else if (pInfo->linkingFlag & FLAG_CANT_SPAWN_IF_BOSS_ALIVE)
-                return !pMaster->isAlive();
+                return !pMaster->IsAlive();
             else
                 return true;
         }
@@ -728,11 +728,11 @@ bool CreatureLinkingHolder::TryFollowMaster(Creature* pCreature)
     else                                                    // guid case
     {
         CreatureData const* masterData = sObjectMgr.GetCreatureData(pInfo->masterDBGuid);
-        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->id);
+        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(masterData->creature_id[0]);
         pMaster = pCreature->GetMap()->GetCreature(ObjectGuid(cInfo->GetHighGuid(), cInfo->entry, pInfo->masterDBGuid));
     }
 
-    if (pMaster && pMaster->isAlive())
+    if (pMaster && pMaster->IsAlive())
     {
         SetFollowing(pCreature, pMaster);
         return true;

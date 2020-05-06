@@ -46,7 +46,7 @@ enum
     MODEL_INVISIBLE             =   11686
 };
 
-const float THREAT_LOCK = FLT_MAX;
+float const THREAT_LOCK = FLT_MAX;
 
 static SpawnLocations AddPop[] =
 {
@@ -86,7 +86,7 @@ struct boss_buruAI : public ScriptedAI
 
     uint64 m_eggsGUID[6];
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetDisplayId(15654);
         m_creature->RemoveAllAuras();
@@ -97,14 +97,14 @@ struct boss_buruAI : public ScriptedAI
         m_uiSpeed_Timer = 30000;
         m_uiCreepingPlague_Timer = 6000;
 
-        for (int i = 0; i < 6; i++)
-            m_uiRespawnEgg_Timer[i] = 120000;
+        for (uint32 & i : m_uiRespawnEgg_Timer)
+            i = 120000;
 
         Creature* egg;
         for (int i = 0; i < 6; i++)
         {
             egg = m_pInstance->GetCreature(m_eggsGUID[i]);
-            if (egg != NULL)
+            if (egg != nullptr)
                 egg->AddObjectToRemoveList();
             if (Creature* egg = m_creature->SummonCreature(NPC_BURU_EGG, Eggs[i].x, Eggs[i].y, Eggs[i].z, 0))
                 m_eggsGUID[i] = egg->GetGUID();
@@ -114,7 +114,7 @@ struct boss_buruAI : public ScriptedAI
             m_pInstance->SetData(TYPE_BURU, NOT_STARTED);
     }
 
-    void Aggro(Unit *pWho)
+    void Aggro(Unit *pWho) override
     {
         m_creature->SetInCombatWithZone();
         DoCast(m_creature, SPELL_THORNS);
@@ -123,30 +123,29 @@ struct boss_buruAI : public ScriptedAI
             m_pInstance->SetData(TYPE_BURU, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         // Le debuff fade quand il est mort, sinon le raid se fait decimer
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-            i->getSource()->RemoveAurasDueToSpell(SPELL_CREEPING_PLAGUE);
+        for (const auto& i : liste)
+            i.getSource()->RemoveAurasDueToSpell(SPELL_CREEPING_PLAGUE);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_BURU, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-
         Creature* egg;
         for (int i = 0; i < 6 && !m_bIsEnraged; i++)
         {
             egg = m_pInstance->GetCreature(m_eggsGUID[i]);
-            if (egg == NULL)
+            if (egg == nullptr)
             {
                 if (Creature* egg = m_creature->SummonCreature(NPC_BURU_EGG, Eggs[i].x, Eggs[i].y, Eggs[i].z, 0))
                     m_eggsGUID[i] = egg->GetGUID();
             }
-            else if (!egg->isAlive())
+            else if (!egg->IsAlive())
             {
                 if (m_uiRespawnEgg_Timer[i] < uiDiff)
                 {
@@ -178,7 +177,7 @@ struct boss_buruAI : public ScriptedAI
         }
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Si il n'est pas enrage et qu'il n'a plus de threat list, il choisi une personne a focus au hasard
@@ -206,35 +205,33 @@ struct boss_buruAI : public ScriptedAI
                 m_creature->RemoveAurasDueToSpell(SPELL_GAIN_SPEED);
                 m_creature->UpdateSpeed(MOVE_RUN, true, 1.0f);
 
-                if (m_creature->getVictim())
-                    m_creature->SetFacingToObject(m_creature->getVictim());
+                if (m_creature->GetVictim())
+                    m_creature->SetFacingToObject(m_creature->GetVictim());
 
                 // Despawn des oeufs lors de l'enrage
-                for (int i = 0 ; i < 6 ; i++)
+                for (uint64 & guid : m_eggsGUID)
                 {
-                    if (m_eggsGUID[i])
+                    if (guid)
                     {
-                        if (Creature* egg = m_pInstance->GetCreature(m_eggsGUID[i]))
+                        if (Creature* egg = m_pInstance->GetCreature(guid))
                             egg->AddObjectToRemoveList();
 
-                        m_eggsGUID[i] = 0;
+                        guid = 0;
                     }
                 }
             }
-            else if (m_creature->getThreatManager().getThreat(m_creature->getVictim()) < (THREAT_LOCK / 1000))
+            else if (m_creature->GetThreatManager().getThreat(m_creature->GetVictim()) < (THREAT_LOCK / 1000))
             {
-                uint64 GUIDs[40];
-                for (int i = 0; i < 40; i++)
-                    GUIDs[i] = 0;
+                std::array<uint64, 40> GUIDs = { };
 
                 int var = 0;
-                ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-                for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+                ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+                for (const auto itr : tList)
                 {
-                    Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
-                    if (pPlayer && pPlayer->isAlive())
+                    Player* pPlayer = m_creature->GetMap()->GetPlayer(itr->getUnitGuid());
+                    if (pPlayer && pPlayer->IsAlive())
                     {
-                        GUIDs[var] = (*itr)->getUnitGuid();
+                        GUIDs[var] = itr->getUnitGuid();
                         ++var;
                     }
                 }
@@ -247,7 +244,7 @@ struct boss_buruAI : public ScriptedAI
                         DoScriptText(EMOTE_TARGET, m_creature, pTarget);
 
                         // Pour verouiller la cible, on applique une menace tres elevee
-                        m_creature->getThreatManager().addThreat(pTarget, THREAT_LOCK);
+                        m_creature->GetThreatManager().addThreat(pTarget, THREAT_LOCK);
 
                         m_creature->RemoveAurasDueToSpell(SPELL_GAIN_SPEED);
                         m_creature->UpdateSpeed(MOVE_RUN, true, 0.5f);
@@ -260,7 +257,7 @@ struct boss_buruAI : public ScriptedAI
         // Dismember - A stacking bleed effect that does 1248 damage every 2 second. Buru will use this if he catches up to whoever he is targeting.
         if (m_uiDismember_Timer < uiDiff && !m_bIsEnraged)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISMEMBER) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISMEMBER) == CAST_OK)
                 m_uiDismember_Timer = 6000;
         }
         else
@@ -280,9 +277,9 @@ struct boss_buruAI : public ScriptedAI
             // Pop des add lors de l'enrage (3, mais je ne suis pas sur de ce nombre et ne sait pas s'ils arrivent tous d'un coup)
             if (!m_HatchPop)
             {
-                for (int i = 0; i < 3; i++)
+                for (const auto& i : AddPop)
                 {
-                    if (Creature* summoned = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, AddPop[i].x, AddPop[i].y, AddPop[i].z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                    if (Creature* summoned = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
                         summoned->SetInCombatWithZone();
                 }
                 m_HatchPop = true;
@@ -314,24 +311,24 @@ struct mob_buru_eggAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     Creature* pBuru;
 
-    void Reset()
+    void Reset() override
     {
         // Empêche les oeufs d'aggro et de tourner
         SetCombatMovement(false);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         // Aggro de Buru quand on tape un oeuf
         if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))
         {
-            if (!pBuru->isInCombat())
+            if (!pBuru->IsInCombat())
                 pBuru->SetInCombatWithZone();
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (!m_pInstance)
             return;
@@ -348,19 +345,16 @@ struct mob_buru_eggAI : public ScriptedAI
         // Si Buru est a portee, il inflige des degats a celui-ci et changement de cible
         if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))
         {
-            if (pBuru->isAlive() && pBuru->GetDistance2d(m_creature) < 5.0f && pBuru->GetHealthPercent() >= 20)
+            if (pBuru->IsAlive() && pBuru->GetDistance2d(m_creature) < 5.0f && pBuru->GetHealthPercent() >= 20)
             {
-                pBuru->getThreatManager().modifyThreatPercent(pBuru->getVictim(), -100);
+                pBuru->GetThreatManager().modifyThreatPercent(pBuru->GetVictim(), -100);
 
                 pBuru->SetHealth(pBuru->GetHealth() - 45000);
             }
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
-    {
-        return;
-    }
+    void UpdateAI(uint32 const /*uiDiff*/) override {}
 };
 
 CreatureAI* GetAI_boss_buru(Creature* pCreature)
@@ -375,7 +369,7 @@ CreatureAI* GetAI_mob_buru_egg(Creature* pCreature)
 
 void AddSC_boss_buru()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_buru";
     newscript->GetAI = &GetAI_boss_buru;

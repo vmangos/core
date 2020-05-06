@@ -35,8 +35,8 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     if (!GetPlayer()->duel)                                 // ignore accept from duel-sender
         return;
 
-    Player *pl       = GetPlayer();
-    Player *plTarget = pl->duel->opponent;
+    Player* pl       = GetPlayer();
+    Player* plTarget = pl->duel->opponent;
 
     if (pl == pl->duel->initiator || !plTarget || !plTarget->duel || pl == plTarget || pl->duel->startTime != 0 || plTarget->duel->startTime != 0)
         return;
@@ -45,7 +45,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "Player 1 is: %u (%s)", pl->GetGUIDLow(), pl->GetName());
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "Player 2 is: %u (%s)", plTarget->GetGUIDLow(), plTarget->GetName());
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     pl->duel->startTimer = now;
     plTarget->duel->startTimer = now;
 
@@ -55,7 +55,7 @@ void WorldSession::HandleDuelAcceptedOpcode(WorldPacket& recvPacket)
 
 void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
 {
-    //DEBUG_LOG( "WORLD: received CMSG_DUEL_CANCELLED" );
+    //DEBUG_LOG("WORLD: received CMSG_DUEL_CANCELLED");
 
     auto pPlayer = GetPlayer();
     // no duel requested
@@ -79,5 +79,5 @@ void WorldSession::HandleDuelCancelledOpcode(WorldPacket& recvPacket)
     ObjectGuid guid;
     recvPacket >> guid;
 
-    pPlayer->DuelComplete(DUEL_INTERUPTED);
+    pPlayer->DuelComplete(DUEL_INTERRUPTED);
 }

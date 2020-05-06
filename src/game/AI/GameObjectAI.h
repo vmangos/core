@@ -5,7 +5,7 @@
 
 class GameObject;
 
-class MANGOS_DLL_SPEC GameObjectAI
+class GameObjectAI
 {
     public:
         explicit GameObjectAI(GameObject* pGo): me(pGo) {}

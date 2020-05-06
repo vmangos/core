@@ -90,15 +90,15 @@ struct npc_corporal_keeshan_escortAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
         //Combat check
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiMockingBlowTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_MOCKING_BLOW);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MOCKING_BLOW);
             m_uiMockingBlowTimer = 5000;
         }
         else
@@ -106,7 +106,7 @@ struct npc_corporal_keeshan_escortAI : npc_escortAI
 
         if (m_uiShieldBashTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH);
             m_uiShieldBashTimer = 8000;
         }
         else
@@ -121,7 +121,7 @@ CreatureAI* GetAI_npc_corporal_keeshan(Creature* pCreature)
     return new npc_corporal_keeshan_escortAI(pCreature);
 }
 
-bool QuestAccept_npc_corporal_keeshan(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_corporal_keeshan(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_MISSING_IN_ACTION)
     {

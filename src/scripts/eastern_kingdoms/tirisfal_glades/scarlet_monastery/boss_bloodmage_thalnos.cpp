@@ -48,7 +48,7 @@ struct boss_bloodmage_thalnosAI : public ScriptedAI
     uint32 FlameSpike_Timer;
     uint32 FireNova_Timer;
 
-    void Reset()
+    void Reset() override
     {
         HpYell = false;
         FlameShock_Timer = 10000;
@@ -57,19 +57,19 @@ struct boss_bloodmage_thalnosAI : public ScriptedAI
         FireNova_Timer = 40000;
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         DoScriptText(SAY_AGGRO, m_creature);
     }
 
-    void KilledUnit(Unit* Victim)
+    void KilledUnit(Unit* Victim) override
     {
         DoScriptText(SAY_KILL, m_creature);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //If we are <35% hp
@@ -82,7 +82,7 @@ struct boss_bloodmage_thalnosAI : public ScriptedAI
         //FlameShock_Timer
         if (FlameShock_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAMESHOCK);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAMESHOCK);
             FlameShock_Timer = urand(10000, 15000);
         }
         else FlameShock_Timer -= diff;
@@ -90,7 +90,7 @@ struct boss_bloodmage_thalnosAI : public ScriptedAI
         //FlameSpike_Timer
         if (FlameSpike_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAMESPIKE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FLAMESPIKE);
             FlameSpike_Timer = 30000;
         }
         else FlameSpike_Timer -= diff;
@@ -98,7 +98,7 @@ struct boss_bloodmage_thalnosAI : public ScriptedAI
         //FireNova_Timer
         if (FireNova_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_FIRENOVA);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FIRENOVA);
             FireNova_Timer = 40000;
         }
         else FireNova_Timer -= diff;
@@ -106,7 +106,7 @@ struct boss_bloodmage_thalnosAI : public ScriptedAI
         //ShadowBolt_Timer
         if (ShadowBolt_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOWBOLT);
             ShadowBolt_Timer = 2000;
         }
         else ShadowBolt_Timer -= diff;
@@ -122,7 +122,7 @@ CreatureAI* GetAI_boss_bloodmage_thalnos(Creature* pCreature)
 
 void AddSC_boss_bloodmage_thalnos()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_bloodmage_thalnos";
     newscript->GetAI = &GetAI_boss_bloodmage_thalnos;

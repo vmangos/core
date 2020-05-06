@@ -129,12 +129,12 @@ struct instance_stratholme : public ScriptedInstance
     uint32 m_uiYsidaReward_Timer;
     uint32 m_uiPostboxesUsed;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-        for (uint8 i = 0; i < 5; ++i)
-            IsSilverHandDead[i] = false;
+        for (bool & i : IsSilverHandDead)
+            i = false;
 
         m_phaseBaron = 0;
         m_uiBaronRun_Timer = 0;
@@ -184,10 +184,10 @@ struct instance_stratholme : public ScriptedInstance
         m_uiPostboxesUsed = 0;
     }
 
-    bool IsEncounterInProgress() const
+    bool IsEncounterInProgress() const override
     {
-        for (uint8 i = 0; i < STRAT_MAX_ENCOUNTER; i++)
-            if (m_auiEncounter[i] == IN_PROGRESS)
+        for (uint32 i : m_auiEncounter)
+            if (i == IN_PROGRESS)
                 return true;
         return false;
     }
@@ -196,11 +196,11 @@ struct instance_stratholme : public ScriptedInstance
     {
         uint32 uiCount = crystalsGUID.size();
 
-        for (std::set<uint64>::iterator i = crystalsGUID.begin(); i != crystalsGUID.end(); ++i)
+        for (const auto i : crystalsGUID)
         {
-            if (Creature* pCristal = instance->GetCreature(*i))
+            if (Creature* pCristal = instance->GetCreature(i))
             {
-                if (!pCristal->isAlive())
+                if (!pCristal->IsAlive())
                     --uiCount;
             }
             else
@@ -236,7 +236,7 @@ struct instance_stratholme : public ScriptedInstance
         }
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -280,7 +280,7 @@ struct instance_stratholme : public ScriptedInstance
         npc_placeEcarlateGUID.insert(pCreature->GetGUID());
     }
 
-    void OnGameObjectCreate(GameObject* pGo)
+    void OnGameObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -348,7 +348,7 @@ struct instance_stratholme : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature *who)
+    void OnCreatureDeath(Creature *who) override
     {
         switch (who->GetEntry())
         {
@@ -363,7 +363,7 @@ struct instance_stratholme : public ScriptedInstance
         }
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -377,7 +377,7 @@ struct instance_stratholme : public ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -395,7 +395,7 @@ struct instance_stratholme : public ScriptedInstance
         return 0;
     }
 
-    void SetData64(uint32 uiType, uint64 uiData)
+    void SetData64(uint32 uiType, uint64 uiData) override
     {
         switch (uiType)
         {
@@ -404,7 +404,7 @@ struct instance_stratholme : public ScriptedInstance
                 break;
         }
     }
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -487,11 +487,11 @@ struct instance_stratholme : public ScriptedInstance
                     }
 
                     uint32 uiCount = abomnationGUID.size();
-                    for (std::set<uint64>::iterator i = abomnationGUID.begin(); i != abomnationGUID.end(); ++i)
+                    for (const auto i : abomnationGUID)
                     {
-                        if (Creature* pAbom = instance->GetCreature(*i))
+                        if (Creature* pAbom = instance->GetCreature(i))
                         {
-                            if (!pAbom->isAlive())
+                            if (!pAbom->IsAlive())
                                 --uiCount;
                         }
                     }
@@ -559,9 +559,9 @@ struct instance_stratholme : public ScriptedInstance
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_5MIN);
                             baronSpells.push_back(SPELL_BARON_ULTIMATUM_1MIN);
 
-                            for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                            for (const auto& itr : players)
                             {
-                                if (Player* pPlayer = itr->getSource())
+                                if (Player* pPlayer = itr.getSource())
                                 {
                                     for (spells_itr = baronSpells.begin(); spells_itr != baronSpells.end(); ++spells_itr)
                                         if (pPlayer->HasAura(*spells_itr))
@@ -608,27 +608,27 @@ struct instance_stratholme : public ScriptedInstance
             }
             case TYPE_SH_AELMAR:
             {
-                IsSilverHandDead[0] = (uiData) ? true : false;
+                IsSilverHandDead[0] = (uiData) != 0;
                 break;
             }
             case TYPE_SH_CATHELA:
             {
-                IsSilverHandDead[1] = (uiData) ? true : false;
+                IsSilverHandDead[1] = (uiData) != 0;
                 break;
             }
             case TYPE_SH_GREGOR:
             {
-                IsSilverHandDead[2] = (uiData) ? true : false;
+                IsSilverHandDead[2] = (uiData) != 0;
                 break;
             }
             case TYPE_SH_NEMAS:
             {
-                IsSilverHandDead[3] = (uiData) ? true : false;
+                IsSilverHandDead[3] = (uiData) != 0;
                 break;
             }
             case TYPE_SH_VICAR:
             {
-                IsSilverHandDead[4] = (uiData) ? true : false;
+                IsSilverHandDead[4] = (uiData) != 0;
                 break;
             }
             case TYPE_POSTMASTER:
@@ -650,8 +650,8 @@ struct instance_stratholme : public ScriptedInstance
         if (uiData == DONE)
         {
             std::ostringstream saveStream;
-            for (uint8 i = 0; i < STRAT_MAX_ENCOUNTER; ++i)
-                saveStream << m_auiEncounter[i] << " ";
+            for (uint32 i : m_auiEncounter)
+                saveStream << i << " ";
             strInstData = saveStream.str();
 
             SaveToDB();
@@ -660,21 +660,21 @@ struct instance_stratholme : public ScriptedInstance
 
     /** Load / save system */
     std::string strInstData;
-    const char* Save()
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn)
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
             return;
         std::istringstream loadStream(chrIn);
-        for (uint8 i = 0; i < STRAT_MAX_ENCOUNTER; ++i)
+        for (uint32 & i : m_auiEncounter)
         {
-            loadStream >> m_auiEncounter[i];
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+            loadStream >> i;
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
         }
         if (GetData(TYPE_RAMSTEIN_EVENT) == DONE && GetData(TYPE_RAMSTEIN) != DONE)
             SummonRamstein();
@@ -683,17 +683,17 @@ struct instance_stratholme : public ScriptedInstance
 
     bool JoueurDansPiegeRat1()
     {
-        float x1 = 3907.45f;
-        float y1 = -3550.41f;
+        //float x1 = 3907.45f;
+        //float y1 = -3550.41f;
         float x2 = 3909.34f;
         float y2 = -3540.14f;
         float x3 = 3930.1f;
         float y3 = -3554.4f;
-        float x4 = 3931.9f;
-        float y4 = -3544.6f;
+        //float x4 = 3931.9f;
+        //float y4 = -3544.6f;
 
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = listeJoueur.begin(); itr != listeJoueur.end(); ++itr)
+        for (const auto& itr : listeJoueur)
         {
             /*
             la zone est un paralelograme
@@ -704,15 +704,15 @@ struct instance_stratholme : public ScriptedInstance
              |->x    /------------/
                     ^x1             ^x3
             */
-            if (itr->getSource()->isAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible())
+            if (itr.getSource()->IsAlive() && !itr.getSource()->IsGameMaster() && itr.getSource()->IsGMVisible())
             {
                 //hauteur corect ?
-                if (itr->getSource()->GetPositionZ() < 135 && itr->getSource()->GetPositionZ() > 130)
+                if (itr.getSource()->GetPositionZ() < 135 && itr.getSource()->GetPositionZ() > 130)
                     continue;
 
                 //carre central ?
-                if (itr->getSource()->GetPositionX() < x3 && itr->getSource()->GetPositionX() > x2 &&
-                        itr->getSource()->GetPositionY() < y3 && itr->getSource()->GetPositionY() > y2 + 4)
+                if (itr.getSource()->GetPositionX() < x3 && itr.getSource()->GetPositionX() > x2 &&
+                        itr.getSource()->GetPositionY() < y3 && itr.getSource()->GetPositionY() > y2 + 4)
                     continue;
 
                 return true;
@@ -724,12 +724,12 @@ struct instance_stratholme : public ScriptedInstance
     bool JoueurDansPiegeRat2()
     {
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = listeJoueur.begin(); itr != listeJoueur.end(); ++itr)
+        for (const auto& itr : listeJoueur)
         {
-            if (itr->getSource()->isAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible() &&
-                    itr->getSource()->GetPositionX() < 3621.32 && itr->getSource()->GetPositionX() > 3603.18 &&
-                    itr->getSource()->GetPositionY() < -3335 && itr->getSource()->GetPositionY() > -3340.46 &&
-                    itr->getSource()->GetPositionZ() < 130 && itr->getSource()->GetPositionZ() > 123)
+            if (itr.getSource()->IsAlive() && !itr.getSource()->IsGameMaster() && itr.getSource()->IsGMVisible() &&
+                    itr.getSource()->GetPositionX() < 3621.32 && itr.getSource()->GetPositionX() > 3603.18 &&
+                    itr.getSource()->GetPositionY() < -3335 && itr.getSource()->GetPositionY() > -3340.46 &&
+                    itr.getSource()->GetPositionZ() < 130 && itr.getSource()->GetPositionZ() > 123)
                 return true;
         }
         return false;
@@ -746,7 +746,7 @@ struct instance_stratholme : public ScriptedInstance
 
             if (Creature* pAbom = instance->GetCreature(*Iter))
             {
-                if (pAbom->isAlive() && !pAbom->isInCombat())
+                if (pAbom->IsAlive() && !pAbom->IsInCombat())
                 {
                     pAbom->GetMotionMaster()->MovePoint(0, 4037.194f, -3473.741943f, 121.738808f);
                     //pAbom->GetMotionMaster()->MovePoint(1, 4038.45288f, -3487.635498f, 121.742157f);
@@ -758,7 +758,7 @@ struct instance_stratholme : public ScriptedInstance
         }
     }
 
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         if (m_uiBaronRun_Timer)
         {
@@ -771,9 +771,9 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (!itr->getSource()->HasAura(SPELL_BARON_ULTIMATUM_45MIN, EFFECT_INDEX_0))
-                            itr->getSource()->CastSpell(itr->getSource(), SPELL_BARON_ULTIMATUM_45MIN, true);
+                    for (const auto& player : players)
+                        if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_45MIN, EFFECT_INDEX_0))
+                            player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_45MIN, true);
             }
             if (m_uiBaronRun_Timer <= 10*MINUTE*IN_MILLISECONDS && m_phaseBaron == 1)
             {
@@ -784,9 +784,9 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (!itr->getSource()->HasAura(SPELL_BARON_ULTIMATUM_10MIN, EFFECT_INDEX_0))
-                            itr->getSource()->CastSpell(itr->getSource(), SPELL_BARON_ULTIMATUM_10MIN, true);
+                    for (const auto& player : players)
+                        if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_10MIN, EFFECT_INDEX_0))
+                            player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_10MIN, true);
             }
             if (m_uiBaronRun_Timer <= 5*MINUTE*IN_MILLISECONDS && m_phaseBaron == 2)
             {
@@ -797,9 +797,9 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (!itr->getSource()->HasAura(SPELL_BARON_ULTIMATUM_5MIN, EFFECT_INDEX_0))
-                            itr->getSource()->CastSpell(itr->getSource(), SPELL_BARON_ULTIMATUM_5MIN, true);
+                    for (const auto& player : players)
+                        if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_5MIN, EFFECT_INDEX_0))
+                            player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_5MIN, true);
             }
             if (m_uiBaronRun_Timer <= 5*MINUTE*IN_MILLISECONDS - 3000 && m_phaseBaron == 3)
             {
@@ -814,9 +814,9 @@ struct instance_stratholme : public ScriptedInstance
 
                 Map::PlayerList const& players = instance->GetPlayers();
                 if (!players.isEmpty())
-                    for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-                        if (!itr->getSource()->HasAura(SPELL_BARON_ULTIMATUM_1MIN, EFFECT_INDEX_0))
-                            itr->getSource()->CastSpell(itr->getSource(), SPELL_BARON_ULTIMATUM_1MIN, true);
+                    for (const auto& player : players)
+                        if (!player.getSource()->HasAura(SPELL_BARON_ULTIMATUM_1MIN, EFFECT_INDEX_0))
+                            player.getSource()->CastSpell(player.getSource(), SPELL_BARON_ULTIMATUM_1MIN, true);
             }
             if (m_uiBaronRun_Timer <= uiDiff)
             {
@@ -937,7 +937,7 @@ InstanceData* GetInstanceData_instance_stratholme(Map* pMap)
 
 void AddSC_instance_stratholme()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_stratholme";
     newscript->GetInstanceData = &GetInstanceData_instance_stratholme;

@@ -32,6 +32,7 @@ class Bag;
 class Field;
 class QueryResult;
 class Unit;
+struct ItemRandomPropertiesEntry;
 
 struct ItemSetEffect
 {
@@ -40,76 +41,85 @@ struct ItemSetEffect
     SpellEntry const* spells[8] = {};
 };
 
-// [-ZERO] Need fix, possible uptodate in mangos-0.6
 enum InventoryResult
 {
     EQUIP_ERR_OK                                 = 0,
-    EQUIP_ERR_CANT_EQUIP_LEVEL_I                 = 1,       // ERR_CANT_EQUIP_LEVEL_I
-    EQUIP_ERR_CANT_EQUIP_SKILL                   = 2,       // ERR_CANT_EQUIP_SKILL
-    EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT             = 3,       // ERR_WRONG_SLOT
-    EQUIP_ERR_BAG_FULL                           = 4,       // ERR_BAG_FULL
-    EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG        = 5,       // ERR_BAG_IN_BAG
-    EQUIP_ERR_CANT_TRADE_EQUIP_BAGS              = 6,       // ERR_TRADE_EQUIPPED_BAG
-    EQUIP_ERR_ONLY_AMMO_CAN_GO_HERE              = 7,       // ERR_AMMO_ONLY
-    EQUIP_ERR_NO_REQUIRED_PROFICIENCY            = 8,       // ERR_PROFICIENCY_NEEDED
-    EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE        = 9,       // ERR_NO_SLOT_AVAILABLE
-    EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM        = 10,      // ERR_CANT_EQUIP_EVER
-    EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM2       = 11,      // ERR_CANT_EQUIP_EVER
-    EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE2       = 12,      // ERR_NO_SLOT_AVAILABLE
-    EQUIP_ERR_CANT_EQUIP_WITH_TWOHANDED          = 13,      // ERR_2HANDED_EQUIPPED
-    EQUIP_ERR_CANT_DUAL_WIELD                    = 14,      // ERR_2HSKILLNOTFOUND
-    EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG            = 15,      // ERR_WRONG_BAG_TYPE
-    EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG2           = 16,      // ERR_WRONG_BAG_TYPE
-    EQUIP_ERR_CANT_CARRY_MORE_OF_THIS            = 17,      // ERR_ITEM_MAX_COUNT
-    EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE3       = 18,      // ERR_NO_SLOT_AVAILABLE
-    EQUIP_ERR_ITEM_CANT_STACK                    = 19,      // ERR_CANT_STACK
-    EQUIP_ERR_ITEM_CANT_BE_EQUIPPED              = 20,      // ERR_NOT_EQUIPPABLE
-    EQUIP_ERR_ITEMS_CANT_BE_SWAPPED              = 21,      // ERR_CANT_SWAP
-    EQUIP_ERR_SLOT_IS_EMPTY                      = 22,      // ERR_SLOT_EMPTY
-    EQUIP_ERR_ITEM_NOT_FOUND                     = 23,      // ERR_ITEM_NOT_FOUND
-    EQUIP_ERR_CANT_DROP_SOULBOUND                = 24,      // ERR_DROP_BOUND_ITEM
-    EQUIP_ERR_OUT_OF_RANGE                       = 25,      // ERR_OUT_OF_RANGE
-    EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT     = 26,      // ERR_TOO_FEW_TO_SPLIT
-    EQUIP_ERR_COULDNT_SPLIT_ITEMS                = 27,      // ERR_SPLIT_FAILED
-    EQUIP_ERR_MISSING_REAGENT                    = 28,      // ERR_SPELL_FAILED_REAGENTS_GENERIC
-    EQUIP_ERR_NOT_ENOUGH_MONEY                   = 29,      // ERR_NOT_ENOUGH_MONEY
-    EQUIP_ERR_NOT_A_BAG                          = 30,      // ERR_NOT_A_BAG
-    EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS        = 31,      // ERR_DESTROY_NONEMPTY_BAG
-    EQUIP_ERR_DONT_OWN_THAT_ITEM                 = 32,      // ERR_NOT_OWNER
-    EQUIP_ERR_CAN_EQUIP_ONLY1_QUIVER             = 33,      // ERR_ONLY_ONE_QUIVER
-    EQUIP_ERR_MUST_PURCHASE_THAT_BAG_SLOT        = 34,      // ERR_NO_BANK_SLOT
-    EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK             = 35,      // ERR_NO_BANK_HERE
-    EQUIP_ERR_ITEM_LOCKED                        = 36,      // ERR_ITEM_LOCKED
-    EQUIP_ERR_YOU_ARE_STUNNED                    = 37,      // ERR_GENERIC_STUNNED
-    EQUIP_ERR_YOU_ARE_DEAD                       = 38,      // ERR_PLAYER_DEAD
-    EQUIP_ERR_CANT_DO_RIGHT_NOW                  = 39,      // ERR_CLIENT_LOCKED_OUT
-    EQUIP_ERR_INT_BAG_ERROR                      = 40,      // ERR_INTERNAL_BAG_ERROR
-    EQUIP_ERR_CAN_EQUIP_ONLY1_BOLT               = 41,      // ERR_ONLY_ONE_BOLT
-    EQUIP_ERR_CAN_EQUIP_ONLY1_AMMOPOUCH          = 42,      // ERR_ONLY_ONE_AMMO
-    EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED          = 43,      // ERR_CANT_WRAP_STACKABLE
-    EQUIP_ERR_EQUIPPED_CANT_BE_WRAPPED           = 44,      // ERR_CANT_WRAP_EQUIPPED
-    EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED            = 45,      // ERR_CANT_WRAP_WRAPPED
-    EQUIP_ERR_BOUND_CANT_BE_WRAPPED              = 46,      // ERR_CANT_WRAP_BOUND
-    EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED             = 47,      // ERR_CANT_WRAP_UNIQUE
-    EQUIP_ERR_BAGS_CANT_BE_WRAPPED               = 48,      // ERR_CANT_WRAP_BAGS
-    EQUIP_ERR_ALREADY_LOOTED                     = 49,      // ERR_LOOT_GONE
-    EQUIP_ERR_INVENTORY_FULL                     = 50,      // ERR_INV_FULL
-    EQUIP_ERR_BANK_FULL                          = 51,      // ERR_BAG_FULL
-    EQUIP_ERR_ITEM_IS_CURRENTLY_SOLD_OUT         = 52,      // ERR_VENDOR_SOLD_OUT
-    EQUIP_ERR_BAG_FULL3                          = 53,      // ERR_BAG_FULL
-    EQUIP_ERR_ITEM_NOT_FOUND2                    = 54,      // ERR_ITEM_NOT_FOUND
-    EQUIP_ERR_ITEM_CANT_STACK2                   = 55,      // ERR_CANT_STACK
-    EQUIP_ERR_BAG_FULL4                          = 56,      // ERR_BAG_FULL
-    EQUIP_ERR_ITEM_SOLD_OUT                      = 57,      // ERR_VENDOR_SOLD_OUT
-    EQUIP_ERR_OBJECT_IS_BUSY                     = 58,      // ERR_OBJECT_IS_BUSY
-    EQUIP_ERR_NONE                               = 59,      // ERR_CANT_BE_DISENCHANTED
-    EQUIP_ERR_NOT_IN_COMBAT                      = 60,      // ERR_NOT_IN_COMBAT
-    EQUIP_ERR_NOT_WHILE_DISARMED                 = 61,      // ERR_NOT_WHILE_DISARMED
-    EQUIP_ERR_BAG_FULL6                          = 62,      // ERR_BAG_FULL
-    EQUIP_ERR_CANT_EQUIP_RANK                    = 63,      // ERR_CANT_EQUIP_RANK
-    EQUIP_ERR_CANT_EQUIP_REPUTATION              = 64,      // ERR_CANT_EQUIP_REPUTATION
-    EQUIP_ERR_TOO_MANY_SPECIAL_BAGS              = 65,      // ERR_TOO_MANY_SPECIAL_BAGS
-    EQUIP_ERR_LOOT_CANT_LOOT_THAT_NOW            = 66,      // ERR_LOOT_CANT_LOOT_THAT_NOW
+    EQUIP_ERR_CANT_EQUIP_LEVEL_I,                // ERR_CANT_EQUIP_LEVEL_I
+    EQUIP_ERR_CANT_EQUIP_SKILL,                  // ERR_CANT_EQUIP_SKILL
+    EQUIP_ERR_ITEM_DOESNT_GO_TO_SLOT,            // ERR_WRONG_SLOT
+    EQUIP_ERR_BAG_FULL,                          // ERR_BAG_FULL
+    EQUIP_ERR_NONEMPTY_BAG_OVER_OTHER_BAG,       // ERR_BAG_IN_BAG
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    EQUIP_ERR_CANT_TRADE_EQUIP_BAGS,             // ERR_TRADE_EQUIPPED_BAG
+#endif
+    EQUIP_ERR_ONLY_AMMO_CAN_GO_HERE,             // ERR_AMMO_ONLY
+    EQUIP_ERR_NO_REQUIRED_PROFICIENCY,           // ERR_PROFICIENCY_NEEDED
+    EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE,       // ERR_NO_SLOT_AVAILABLE
+    EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM,       // ERR_CANT_EQUIP_EVER
+    EQUIP_ERR_YOU_CAN_NEVER_USE_THAT_ITEM2,      // ERR_CANT_EQUIP_EVER
+    EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE2,      // ERR_NO_SLOT_AVAILABLE
+    EQUIP_ERR_CANT_EQUIP_WITH_TWOHANDED,         // ERR_2HANDED_EQUIPPED
+    EQUIP_ERR_CANT_DUAL_WIELD,                   // ERR_2HSKILLNOTFOUND
+    EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG,           // ERR_WRONG_BAG_TYPE
+    EQUIP_ERR_ITEM_DOESNT_GO_INTO_BAG2,          // ERR_WRONG_BAG_TYPE
+    EQUIP_ERR_CANT_CARRY_MORE_OF_THIS,           // ERR_ITEM_MAX_COUNT
+    EQUIP_ERR_NO_EQUIPMENT_SLOT_AVAILABLE3,      // ERR_NO_SLOT_AVAILABLE
+    EQUIP_ERR_ITEM_CANT_STACK,                   // ERR_CANT_STACK
+    EQUIP_ERR_ITEM_CANT_BE_EQUIPPED,             // ERR_NOT_EQUIPPABLE
+    EQUIP_ERR_ITEMS_CANT_BE_SWAPPED,             // ERR_CANT_SWAP
+    EQUIP_ERR_SLOT_IS_EMPTY,                     // ERR_SLOT_EMPTY
+    EQUIP_ERR_ITEM_NOT_FOUND,                    // ERR_ITEM_NOT_FOUND
+    EQUIP_ERR_CANT_DROP_SOULBOUND,               // ERR_DROP_BOUND_ITEM
+    EQUIP_ERR_OUT_OF_RANGE,                      // ERR_OUT_OF_RANGE
+    EQUIP_ERR_TRIED_TO_SPLIT_MORE_THAN_COUNT,    // ERR_TOO_FEW_TO_SPLIT
+    EQUIP_ERR_COULDNT_SPLIT_ITEMS,               // ERR_SPLIT_FAILED
+    EQUIP_ERR_MISSING_REAGENT,                   // ERR_SPELL_FAILED_REAGENTS_GENERIC
+    EQUIP_ERR_NOT_ENOUGH_MONEY,                  // ERR_NOT_ENOUGH_MONEY
+    EQUIP_ERR_NOT_A_BAG,                         // ERR_NOT_A_BAG
+    EQUIP_ERR_CAN_ONLY_DO_WITH_EMPTY_BAGS,       // ERR_DESTROY_NONEMPTY_BAG
+    EQUIP_ERR_DONT_OWN_THAT_ITEM,                // ERR_NOT_OWNER
+    EQUIP_ERR_CAN_EQUIP_ONLY1_QUIVER,            // ERR_ONLY_ONE_QUIVER
+    EQUIP_ERR_MUST_PURCHASE_THAT_BAG_SLOT,       // ERR_NO_BANK_SLOT
+    EQUIP_ERR_TOO_FAR_AWAY_FROM_BANK,            // ERR_NO_BANK_HERE
+    EQUIP_ERR_ITEM_LOCKED,                       // ERR_ITEM_LOCKED
+    EQUIP_ERR_YOU_ARE_STUNNED,                   // ERR_GENERIC_STUNNED
+    EQUIP_ERR_YOU_ARE_DEAD,                      // ERR_PLAYER_DEAD
+    EQUIP_ERR_CANT_DO_RIGHT_NOW,                 // ERR_CLIENT_LOCKED_OUT
+    EQUIP_ERR_INT_BAG_ERROR,                     // ERR_INTERNAL_BAG_ERROR
+    EQUIP_ERR_CAN_EQUIP_ONLY1_BOLT,              // ERR_ONLY_ONE_BOLT
+    EQUIP_ERR_CAN_EQUIP_ONLY1_AMMOPOUCH,         // ERR_ONLY_ONE_AMMO
+    EQUIP_ERR_STACKABLE_CANT_BE_WRAPPED,         // ERR_CANT_WRAP_STACKABLE
+    EQUIP_ERR_EQUIPPED_CANT_BE_WRAPPED,          // ERR_CANT_WRAP_EQUIPPED
+    EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED,           // ERR_CANT_WRAP_WRAPPED
+    EQUIP_ERR_BOUND_CANT_BE_WRAPPED,             // ERR_CANT_WRAP_BOUND
+    EQUIP_ERR_UNIQUE_CANT_BE_WRAPPED,            // ERR_CANT_WRAP_UNIQUE
+    EQUIP_ERR_BAGS_CANT_BE_WRAPPED,              // ERR_CANT_WRAP_BAGS
+    EQUIP_ERR_ALREADY_LOOTED,                    // ERR_LOOT_GONE
+    EQUIP_ERR_INVENTORY_FULL,                    // ERR_INV_FULL
+    EQUIP_ERR_BANK_FULL,                         // ERR_BAG_FULL
+    EQUIP_ERR_ITEM_IS_CURRENTLY_SOLD_OUT,        // ERR_VENDOR_SOLD_OUT
+    EQUIP_ERR_BAG_FULL3,                         // ERR_BAG_FULL
+    EQUIP_ERR_ITEM_NOT_FOUND2,                   // ERR_ITEM_NOT_FOUND
+    EQUIP_ERR_ITEM_CANT_STACK2,                  // ERR_CANT_STACK
+    EQUIP_ERR_BAG_FULL4,                         // ERR_BAG_FULL
+    EQUIP_ERR_ITEM_SOLD_OUT,                     // ERR_VENDOR_SOLD_OUT
+    EQUIP_ERR_OBJECT_IS_BUSY,                    // ERR_OBJECT_IS_BUSY
+    EQUIP_ERR_NONE,                              // ERR_CANT_BE_DISENCHANTED
+    EQUIP_ERR_NOT_IN_COMBAT,                     // ERR_NOT_IN_COMBAT
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    EQUIP_ERR_NOT_WHILE_DISARMED,                // ERR_NOT_WHILE_DISARMED
+#endif
+    EQUIP_ERR_BAG_FULL6,                         // ERR_BAG_FULL
+    EQUIP_ERR_CANT_EQUIP_RANK,                   // ERR_CANT_EQUIP_RANK
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    EQUIP_ERR_CANT_EQUIP_REPUTATION,             // ERR_CANT_EQUIP_REPUTATION
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    EQUIP_ERR_TOO_MANY_SPECIAL_BAGS,             // ERR_TOO_MANY_SPECIAL_BAGS
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    EQUIP_ERR_LOOT_CANT_LOOT_THAT_NOW,           // ERR_LOOT_CANT_LOOT_THAT_NOW
+#endif
     // any greater values show as "bag full"
 };
 
@@ -228,9 +238,9 @@ struct ItemRequiredTarget
     bool IsFitToRequirements(Unit* pUnitTarget) const;
 };
 
-bool ItemCanGoIntoBag(ItemPrototype const *proto, ItemPrototype const *pBagProto);
+bool ItemCanGoIntoBag(ItemPrototype const* proto, ItemPrototype const* pBagProto);
 
-class MANGOS_DLL_SPEC Item : public Object
+class Item : public Object
 {
     public:
         static Item* CreateItem(uint32 item, uint32 count, Player const* player = nullptr);
@@ -239,7 +249,7 @@ class MANGOS_DLL_SPEC Item : public Object
         Item();
 
         virtual bool Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid = ObjectGuid());
-        virtual void RemoveFromWorld();
+        void RemoveFromWorld() override;
 
         ItemPrototype const* GetProto() const;
         bool ChangeEntry(ItemPrototype const* pNewProto);
@@ -297,9 +307,6 @@ class MANGOS_DLL_SPEC Item : public Object
         bool IsInBag() const { return m_container != nullptr; }
         bool IsEquipped() const;
 
-        uint32 GetSkill();
-        uint32 GetSpell();
-
         // RandomPropertyId (signed but stored as unsigned)
         int32 GetItemRandomPropertyId() const { return GetInt32Value(ITEM_FIELD_RANDOM_PROPERTIES_ID); }
         uint32 GetItemSuffixFactor() const { return GetUInt32Value(ITEM_FIELD_PROPERTY_SEED); }
@@ -340,18 +347,18 @@ class MANGOS_DLL_SPEC Item : public Object
             uState = state;
         }
 
-        bool HasQuest(uint32 quest_id) const { return GetProto()->StartQuest == quest_id; }
-        bool HasInvolvedQuest(uint32 /*quest_id*/) const { return false; }
+        bool HasQuest(uint32 quest_id) const override { return GetProto()->StartQuest == quest_id; }
+        bool HasInvolvedQuest(uint32 /*quest_id*/) const override { return false; }
         bool IsConjuredConsumable() const { return GetProto()->IsConjuredConsumable(); }
 
-        void AddToClientUpdateList();
-        void RemoveFromClientUpdateList();
-        void BuildUpdateData(UpdateDataMapType& update_players);
+        void AddToClientUpdateList() override;
+        void RemoveFromClientUpdateList() override;
+        void BuildUpdateData(UpdateDataMapType& update_players) override;
         void SetGeneratedLoot(bool value) { generatedLoot = value; }
         bool HasGeneratedLootSecondary() {  return generatedLoot; } // todo, remove and add condition to HasGeneratedLoot
 
         bool IsCharter() const { return GetEntry() == 5863u; }
-        static void GetLocalizedNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale);
+        static void GetLocalizedNameWithSuffix(std::string& name, ItemPrototype const* proto, ItemRandomPropertiesEntry const* randomProp, int dbLocale, LocaleConstant dbcLocale);
 
     private:
         bool generatedLoot;
@@ -361,25 +368,6 @@ class MANGOS_DLL_SPEC Item : public Object
         int16 uQueuePos;
         bool mb_in_trade;                                   // true if item is currently in trade-window
         ItemLootUpdateState m_lootState;
-
-    public:
-        /**
-         * @brief Handles serialization / unserialization of the Object.
-         * Should not be called directly. Cf Serializer.h
-         * @param buf
-         */
-        template <typename OP>
-        void Serialize(OP& buf);
-        /**
-         * @brief Call this before reading unserialization
-         * @return false iif the Item is corrupt.
-         */
-        virtual bool PrepareWakeUp(uint32 low_guid, ItemPrototype const* proto, Player const* owner);
-        /**
-         * @brief Call this once unserialized to get a proper Player (add to Map, etc ...)
-         * @return false iif the Item is corrupt.
-         */
-        bool WakeUp();
 };
 
 #endif

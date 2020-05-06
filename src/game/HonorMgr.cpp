@@ -6,7 +6,6 @@
 #include "HonorMgr.h"
 #include "Language.h"
 #include "World.h"
-#include "Unit.h"
 #include "Creature.h"
 #include "Player.h"
 #include "Database/DatabaseEnv.h"
@@ -16,9 +15,6 @@
 #include <fstream>
 
 INSTANTIATE_SINGLETON_1(HonorMaintenancer);
-
-char const* AlliancePvPRankNames[] = { "None", "Private", "Corporal", "Sergeant", "Master Sergeant", "Sergeant Major", "Knight", "Knight-Lieutenant", "Knight-Captain", "Knight-Champion", "Lieutenant Commander", "Commander", "Marshal", "Field Marshal", "Grand Marshal" };
-char const* HordePvPRankNames[] = { "None", "Scout", "Grunt", "Sergeant", "Senior Sergeant", "First Sergeant", "Stone Guard", "Blood Guard", "Legionnare", "Centurion", "Champion", "Lieutenant General", "General", "Warlord", "High Warlord" };
 
 HonorStandingList& HonorMaintenancer::GetStandingListByTeam(Team team)
 {
@@ -246,9 +242,10 @@ void HonorMaintenancer::CreateCalculationReport()
 {
     std::string timestamp = Log::GetTimestampStr();
     std::string filename = "HCR_" + timestamp + ".txt";
+    std::string path = sWorld.GetHonorPath() + filename;
 
     std::ofstream ofs;
-    ofs.open(filename.c_str());
+    ofs.open(path.c_str());
     if (!ofs.is_open())
     {
         sLog.outError("Can't create HCR file!");
@@ -425,8 +422,8 @@ HonorScores HonorMaintenancer::GenerateScores(HonorStandingList& standingList)
     }
 
     // get the WS scores at the top of each break point
-    for (uint8 group = 0; group < 14; group++)
-        sc.BRK[group] = floor((sc.BRK[group] * standingList.size()) + 0.5f);
+    for (float & group : sc.BRK)
+        group = floor((group * standingList.size()) + 0.5f);
 
     // initialize RP array
     // set the low point
@@ -720,11 +717,11 @@ bool HonorMgr::Add(float cp, uint8 type, Unit* source)
     float honor = (type == DISHONORABLE) ? -cp : cp;
 
     // get IP if source is player
-    std::string ip = "";
+    std::string ip;
     if (Player* victim = source->ToPlayer())
         ip = victim->GetSession()->GetRemoteAddress();
 
-    bool plr = source->GetTypeId() == TYPEID_PLAYER ? true : false;
+    bool plr = source->GetTypeId() == TYPEID_PLAYER;
 
     if (m_owner->GetMap()->IsBattleGround())
         sLog.outHonor("[BATTLEGROUND]: Player %s (account: %u) got %f honor for type %u, source %s %s (IP: %s)",
@@ -955,12 +952,10 @@ float HonorMgr::HonorableKillPoints(Player* killer, Player* victim, uint32 group
     if (!killer || !victim || !groupSize)
         return 0.0;
 
-    uint32 today = sWorld.GetGameDay();
-
     uint32 totalKills = killer->GetHonorMgr().CalculateTotalKills(victim);
     uint32 victimRank = victim->GetHonorMgr().GetRank().visualRank;
-    uint8 killerLevel = killer->getLevel();
-    uint8 victimLevel = victim->getLevel();
+    uint8 killerLevel = killer->GetLevel();
+    uint8 victimLevel = victim->GetLevel();
         
     return MaNGOS::Honor::GetHonorGain(killerLevel, victimLevel, victimRank, totalKills, groupSize);
 }

@@ -152,7 +152,7 @@ int OfflineChatSocket::handle_output (ACE_HANDLE)
 /// Read data from the network
 std::string TrimLeft(const std::string& s)
 {
-    size_t startpos = s.find_first_not_of(" ");
+    size_t startpos = s.find_first_not_of(' ');
     return (startpos == std::string::npos) ? "" : s.substr(startpos);
 }
 
@@ -263,7 +263,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
             sendf("err_loading\n");
             return 0;
         }
-        if (!sPlayerBotMgr.addBot(playerGuid, true))
+        if (!sPlayerBotMgr.AddBot(playerGuid, true))
         {
             sendf("err_internal\n");
             return 0;
@@ -281,7 +281,7 @@ int OfflineChatSocket::handle_input(ACE_HANDLE)
         }
         else if (messageType == OFFLINE_CHAT_GM_COMMAND)
         {
-            if (message == "")
+            if (message.empty())
             {
                 sendf("err_empty\n");
                 return 0;

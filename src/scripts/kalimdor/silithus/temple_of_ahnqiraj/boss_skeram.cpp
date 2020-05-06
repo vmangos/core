@@ -80,7 +80,7 @@ struct boss_skeramAI : public ScriptedAI
 
     bool IsImage;
 
-    void Reset()
+    void Reset() override
     {
         ArcaneExplosion_Timer = urand(6000, 8000);
         EarthShock_Timer = 1000;
@@ -100,7 +100,7 @@ struct boss_skeramAI : public ScriptedAI
         // an mmap system that let them add invisible ramps for creatures). However, we can
         // obtain partial paths next to it. Normally, these are ignored, but we can set a
         // flag to allow them. They may put us out of LoS so allow autos through them too.
-        m_creature->addUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH | UNIT_STAT_ALLOW_LOS_ATTACK);
+        m_creature->AddUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH | UNIT_STAT_ALLOW_LOS_ATTACK);
         m_creature->SetMeleeZReach(74.0f);
     }
 
@@ -118,14 +118,14 @@ struct boss_skeramAI : public ScriptedAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // The bug trio have a larger than normal aggro radius
-        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 28.0f, true) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->IsInCombat() && m_creature->IsWithinDistInMap(pWho, 28.0f, true) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
         }
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void KilledUnit(Unit* victim)
+    void KilledUnit(Unit* victim) override
     {
         switch (urand(0,8))
         {
@@ -135,7 +135,7 @@ struct boss_skeramAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (IsImage)
         {
@@ -154,7 +154,7 @@ struct boss_skeramAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SKERAM, DONE);
     }
 
-    void Aggro(Unit *who)
+    void Aggro(Unit *who) override
     {
         if (IsImage)
             return;
@@ -173,7 +173,7 @@ struct boss_skeramAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SKERAM, IN_PROGRESS);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         CancelFulfillment();
 
@@ -184,14 +184,14 @@ struct boss_skeramAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SKERAM, FAIL);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         // Despawn Images instantly if the True Prophet died
         if (IsImage && m_pInstance && m_pInstance->GetData(TYPE_SKERAM) == DONE)
             m_creature->DoKillUnit();
 
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (ArcaneExplosion_Timer < diff)
@@ -202,21 +202,21 @@ struct boss_skeramAI : public ScriptedAI
 
             if (players.size() > 4)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_EXPLOSION) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANE_EXPLOSION) == CAST_OK)
                     ArcaneExplosion_Timer = urand(6000, 14000);
             }
         }
         else ArcaneExplosion_Timer -= diff;
 
         //If we are within range, melee the target
-        if (m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if (m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
             DoMeleeAttackIfReady();
         else
         // Target not in melee range. Spam Earthshock
         {
             if (EarthShock_Timer < diff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_EARTH_SHOCK) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_EARTH_SHOCK) == CAST_OK)
                     EarthShock_Timer = 1000;
             }
             else
@@ -264,7 +264,7 @@ struct boss_skeramAI : public ScriptedAI
 
     }
 
-    void JustSummoned(Creature* skeramImage)
+    void JustSummoned(Creature* skeramImage) override
     {
         if (m_creature->GetEntry() != skeramImage->GetEntry())
             return;
@@ -357,7 +357,7 @@ CreatureAI* GetAI_boss_skeram(Creature* pCreature) { return new boss_skeramAI(pC
 
 void AddSC_boss_skeram()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_skeram";
     newscript->GetAI = &GetAI_boss_skeram;

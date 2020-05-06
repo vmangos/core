@@ -71,6 +71,11 @@ if(WIN32)
     debug ${MYSQL_DEBUG_LIBRARY}
     debug ${OPENSSL_DEBUG_LIBRARIES}
   )
+  if(MINGW)
+    target_link_libraries(${EXECUTABLE_NAME}
+      -lws2_32
+    )
+  endif()
   if(PLATFORM MATCHES X86)
     target_link_libraries(${EXECUTABLE_NAME})
   endif()

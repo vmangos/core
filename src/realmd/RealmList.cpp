@@ -32,8 +32,6 @@
 
 INSTANTIATE_SINGLETON_1( RealmList );
 
-extern DatabaseType LoginDatabase;
-
 // list sorted from high to low build and first build used as low bound for accepted by default range (any > it will accepted by realmd at least)
 static RealmBuildInfo ExpectedRealmdClientBuilds[] = {
     {13930, 3, 3, 5,  'a', {{}}, {{}}},                                  // 3.3.5a China Mainland build
@@ -60,6 +58,7 @@ static RealmBuildInfo ExpectedRealmdClientBuilds[] = {
     {5086,  1, 9, 4,  ' ', {{}}, {{}}},
     {4878,  1, 8, 4,  ' ', {{}}, {{}}},
     {4695,  1, 7, 1,  ' ', {{}}, {{}}},
+    {4544,  1, 6, 1,  ' ', {{}}, {{}}},
     {0,     0, 0, 0,  ' ', {{}}, {{}}}                                   // terminator
 };
 
@@ -75,10 +74,10 @@ RealmBuildInfo const* FindBuildInfo(uint16 _build)
             return &ExpectedRealmdClientBuilds[i];
 
     // none appropriate build
-    return NULL;
+    return nullptr;
 }
 
-RealmList::RealmList( ) : m_UpdateInterval(0), m_NextUpdateTime(time(NULL))
+RealmList::RealmList( ) : m_UpdateInterval(0), m_NextUpdateTime(time(nullptr))
 {
 }
 
@@ -140,10 +139,10 @@ void RealmList::UpdateRealm( uint32 ID, const std::string& name, const std::stri
 void RealmList::UpdateIfNeed()
 {
     // maybe disabled or updated recently
-    if(!m_UpdateInterval || m_NextUpdateTime > time(NULL))
+    if(!m_UpdateInterval || m_NextUpdateTime > time(nullptr))
         return;
 
-    m_NextUpdateTime = time(NULL) + m_UpdateInterval;
+    m_NextUpdateTime = time(nullptr) + m_UpdateInterval;
 
     // Clears Realm list
     m_realms.clear();

@@ -63,10 +63,6 @@ enum
     SPELL_DISPELL_SHACKLES              = 28471,            // not used, doing it "manually"
 };
 
-static float M_F_ANGLE = 0.2f;                              // to adjust for map rotation
-static float M_F_HEIGHT = 2.0f;                             // adjust for height difference
-static float M_F_RANGE = 55.0f;                             // ~ range from center of chamber to center of alcove
-static float centerCoord[3] = { 3716.379883f, -5106.779785f, 141.289993f };
 enum AddSpells
 {
     // guardian of icecrown
@@ -234,7 +230,7 @@ struct kt_p1AddAI : public ScriptedAI
         hasAggroed = false;
     }
     bool hasAggroed;
-    virtual void Reset() = 0;
+    void Reset() override = 0;
     void ActualAttack(Unit* target)
     {
         m_creature->AddThreat(target, 300.0f);
@@ -266,7 +262,7 @@ struct kt_p1AddAI : public ScriptedAI
             ScriptedAI::MoveInLineOfSight(pWho);
         }
     }
-    void SpellHit(Unit* unit, const SpellEntry*) override 
+    void SpellHit(Unit* unit, SpellEntry const*) override 
     {
         if(!hasAggroed)
             ActualAttack(unit);
@@ -301,7 +297,7 @@ struct boss_kelthuzadAI : public ScriptedAI
     uint32 timeSinceLastAEFrostBolt;
     uint32 killSayTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->SetHealth(m_creature->GetMaxHealth());
         events.Reset();
@@ -341,7 +337,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         }
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         if (!killSayTimer)
         {
@@ -350,7 +346,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoScriptText(SAY_DEATH, m_creature);
         if (m_pInstance)
@@ -359,10 +355,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         EvadeAllGuardians();
     }
 
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-        return;
-    }
+    void MoveInLineOfSight(Unit* /*pWho*/) override {}
 
     void AttackStart(Unit* who) override
     {
@@ -379,7 +372,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
         {
@@ -393,9 +386,9 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void EvadeAllGuardians()
     {
-        for (auto it = guardians.begin(); it != guardians.end(); it++)
+        for (const auto& guardian : guardians)
         {
-            if (Creature* pCreature = m_pInstance->GetCreature(it->first))
+            if (Creature* pCreature = m_pInstance->GetCreature(guardian.first))
             {
                 pCreature->AI()->EnterEvadeMode();
             }
@@ -404,9 +397,9 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void DespawnAllIntroCreatures()
     {
-        for (auto it = p1_adds.begin(); it != p1_adds.end(); it++)
+        for (const auto& guid : p1_adds)
         {
-            if (Creature* pSoldier = m_pInstance->instance->GetCreature(*it))
+            if (Creature* pSoldier = m_pInstance->instance->GetCreature(guid))
                 ((TemporarySummon*)pSoldier)->UnSummon();
         }
         p1_adds.clear();
@@ -435,14 +428,14 @@ struct boss_kelthuzadAI : public ScriptedAI
         events.ScheduleEvent(EVENT_SKELETON, Seconds(20));
         //events.ScheduleEvent(EVENT_SOUL_WEAVER, Seconds(35));
         //events.ScheduleEvent(EVENT_ABOMINATION, Seconds(43));
-        for (uint32 i = 0; i < NUM_UNDEAD_SPAWNS; i++)
-            events.ScheduleEvent(EVENT_ABOMINATION, abominationSpawnMs[i]);
-        for (uint32 i = 0; i < NUM_UNDEAD_SPAWNS; i++)
-            events.ScheduleEvent(EVENT_SOUL_WEAVER, soulweaverSpawnMs[i]);
+        for (uint32 i : abominationSpawnMs)
+            events.ScheduleEvent(EVENT_ABOMINATION, i);
+        for (uint32 i : soulweaverSpawnMs)
+            events.ScheduleEvent(EVENT_SOUL_WEAVER, i);
 
         m_pInstance->DoUseDoorOrButton(pullPortalGuid);
 
-        for (int i = 0; i < NUM_ALCOVES; i++)
+        for (const auto& alcove : alcoves)
         {
             for (int j = 0; j < 10; j++)
             {
@@ -450,9 +443,9 @@ struct boss_kelthuzadAI : public ScriptedAI
                 double relDistance = rand_norm() + rand_norm();
                 if (relDistance > 1)
                     relDistance = 1 - relDistance;
-                const float x = alcoves[i][0];
-                const float y = alcoves[i][1];
-                const float radius = 14.0f;
+                float const x = alcove[0];
+                float const y = alcove[1];
+                float const radius = 14.0f;
                 float thisX = x + std::sin(angle)*relDistance*radius;
                 float thisY = y + std::cos(angle)*relDistance*radius;
                 if (Creature* pCreature = m_creature->SummonCreature(NPC_SOLDIER_FROZEN, thisX, thisY, alcoveZ, frand(0, M_PI_F * 2),
@@ -460,34 +453,34 @@ struct boss_kelthuzadAI : public ScriptedAI
                 {
                     p1_adds.push_back(pCreature->GetObjectGuid());
                     pCreature->SetHomePosition(x, y, alcoveZ, m_creature->GetOrientation());
-                    pCreature->SetRespawnRadius(radius);
+                    pCreature->SetWanderDistance(radius);
                 }
             }
         }
-        for (int i = 0; i < NUM_ABOM; i++)
+        for (const auto& position : abomPos)
         {
-            if (Creature* pCreature = m_creature->SummonCreature(NPC_UNSTOPPABLE_ABOM, abomPos[i][0], abomPos[i][1], alcoveZ, frand(0, M_PI_F * 2),
+            if (Creature* pCreature = m_creature->SummonCreature(NPC_UNSTOPPABLE_ABOM, position[0], position[1], alcoveZ, frand(0, M_PI_F * 2),
                 TEMPSUMMON_MANUAL_DESPAWN))
             {
                 p1_adds.push_back(pCreature->GetObjectGuid());
-                pCreature->SetRespawnRadius(5.0f);
+                pCreature->SetWanderDistance(5.0f);
             }
 
         }
-        for (int i = 0; i < NUM_SOULWEAVER; i++)
+        for (const auto& position : soulweaverPos)
         {
-            if (Creature* pCreature = m_creature->SummonCreature(NPC_SOUL_WEAVER, soulweaverPos[i][0], soulweaverPos[i][1], alcoveZ, frand(0, M_PI_F * 2),
+            if (Creature* pCreature = m_creature->SummonCreature(NPC_SOUL_WEAVER, position[0], position[1], alcoveZ, frand(0, M_PI_F * 2),
                 TEMPSUMMON_MANUAL_DESPAWN))
             {
                 p1_adds.push_back(pCreature->GetObjectGuid());
-                pCreature->SetRespawnRadius(5.0f);
+                pCreature->SetWanderDistance(5.0f);
             }
         }
     }
 
     bool SpawnAndSendP1Creature(uint32 type)
     {
-        const float* spawnLoc = alcoves[urand(0, NUM_ALCOVES - 1)];
+        float const* spawnLoc = alcoves[urand(0, NUM_ALCOVES - 1)];
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
         {
             float spawnAng = 3.14f + pTarget->GetAngle(spawnLoc[0], spawnLoc[1]);
@@ -528,9 +521,6 @@ struct boss_kelthuzadAI : public ScriptedAI
             {
                 if (numSkeletons < 120)
                 {
-
-                    float t = 3.0f / 150.0f * (p1Timer / 1000.0f - 150.0f);
-                    uint32 repeat_next = std::max(uint32(t * 1000 + 2000), uint32(2000));
                     if (SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN))
                     {
                         uint32 repeat_next = std::max(uint32(3750 - 25 * numSkeletons), uint32(2000));
@@ -630,7 +620,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         timeSinceLastShadowFissure += diff;
         timeSinceLastAEFrostBolt += diff;
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->GetHealthPercent() < 40.0f && !p3Started)
@@ -658,7 +648,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                     // we can re-use the soulweave positions for where to spawn the guardians
                     // todo: is it completely random, or do we avoid re-using the same alcove twize?
                     int portalIndex = urand(0, NUM_WINDOW_PORTALS - 1);
-                    const float* pos = windowPortals[portalIndex];
+                    float const* pos = windowPortals[portalIndex];
 
                     if (Creature* pCreature = m_creature->SummonCreature(NPC_GUARDIAN, pos[0], pos[1], alcoveZ, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
                     {
@@ -729,7 +719,7 @@ struct boss_kelthuzadAI : public ScriptedAI
             case EVENT_FROSTBOLT:
             {
                 events.Repeat(Seconds(urand(5, 7))); // todo: this is guesswork
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BOLT);
+                DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FROST_BOLT);
                 break;
             }
             case EVENT_SHADOW_FISSURE:
@@ -786,7 +776,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (!m_pInstance)
             return;
@@ -794,7 +784,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         if (hasPutInCombat)
         {
             // won't have a victim if we are in p1, even if selectHostileTarget returns true, so check that before return
-            if (!m_creature->SelectHostileTarget() || (!m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && !m_creature->getVictim()))
+            if (!m_creature->SelectHostileTarget() || (!m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && !m_creature->GetVictim()))
                 return;
         }
         
@@ -837,15 +827,15 @@ struct mob_abomAI : public kt_p1AddAI
     {
         mortalWoundTimer = 7500;
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (mortalWoundTimer < diff)
         {
-            if(m_creature->getVictim() && m_creature->IsWithinMeleeRange(m_creature->getVictim()))
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
+            if(m_creature->GetVictim() && m_creature->IsWithinMeleeRange(m_creature->GetVictim()))
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
                     mortalWoundTimer = 7500;
         }
         else
@@ -863,24 +853,24 @@ struct mob_soldierAI : public kt_p1AddAI
     void Reset() override
     {
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (!m_creature->HasAura(SPELL_DARK_BLAST_AUR))
             m_creature->CastSpell(m_creature, SPELL_DARK_BLAST_AUR, true);
 
-        //if (m_creature->getVictim() && m_creature->getVictim()->IsPlayer()) 
+        //if (m_creature->GetVictim() && m_creature->GetVictim()->IsPlayer()) 
         //{
-        //    bool inVisibleList = m_creature->getVictim()->ToPlayer()->IsInVisibleList(m_creature);
-        //    sLog.outBasic("%s visible: %d", m_creature->getVictim()->GetName(), inVisibleList);
+        //    bool inVisibleList = m_creature->GetVictim()->ToPlayer()->IsInVisibleList(m_creature);
+        //    sLog.outBasic("%s visible: %d", m_creature->GetVictim()->GetName(), inVisibleList);
         //}
         //m_creature->ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
 
         // to avoid melees being able to dps while casters hold aggro, this is most likely a logic that's supposed to exist
         if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
         {
-            if (m_creature->getVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
+            if (m_creature->GetVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
             {
                 ScriptedAI::AttackStart(pNearest);
             }
@@ -898,9 +888,9 @@ struct mob_soulweaverAI : public kt_p1AddAI
     {
         hasHitSomeone = false;
     }
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (!m_creature->HasAura(SPELL_WAIL_SOULS_AUR))
             m_creature->CastSpell(m_creature, SPELL_WAIL_SOULS_AUR, true);
@@ -908,7 +898,7 @@ struct mob_soulweaverAI : public kt_p1AddAI
         // to avoid melees being able to dps while casters hold aggro, this is most likely a logic that's supposed to exist
         if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
         {
-            if (m_creature->getVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
+            if (m_creature->GetVictim() != pNearest && m_creature->CanReachWithMeleeAutoAttack(pNearest))
             {
                 ScriptedAI::AttackStart(pNearest);
             }
@@ -947,7 +937,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
             pC->RemoveAurasDueToSpell(10955);
     }
 
-    void SpellHit(Unit*, const SpellEntry* spell) override 
+    void SpellHit(Unit*, SpellEntry const* spell) override 
     {
         // if hit by any shackle spell we check how many other guardians are shackled.
         // If more than 3, we release everyone.
@@ -983,14 +973,14 @@ struct mob_guardian_icecrownAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (bloodTapTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLOOD_TAP) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BLOOD_TAP) == CAST_OK)
                 bloodTapTimer = 15000;
         }
         else bloodTapTimer -= diff;
@@ -1023,7 +1013,7 @@ struct mob_shadow_fissureAI : public ScriptedAI
     {
     }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (haveCasted)
             return;
@@ -1068,7 +1058,7 @@ CreatureAI* GetAI_mob_shadow_fissure(Creature* pCreature)
     return new mob_shadow_fissureAI(pCreature);
 }
 
-void instance_naxxramas::OnKTAreaTrigger(const AreaTriggerEntry* pAT)
+void instance_naxxramas::OnKTAreaTrigger(AreaTriggerEntry const* pAT)
 {
     if (GetData(TYPE_KELTHUZAD) != NOT_STARTED)
         return;

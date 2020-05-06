@@ -23,6 +23,7 @@
 #include "Policies/Singleton.h"
 #include "DBCStructure.h"
 #include "GridDefines.h"
+#include "Maps/GridMapDefines.h"
 #include "Object.h"
 #include "SharedDefines.h"
 #include <memory>
@@ -37,85 +38,6 @@ class Group;
 class BattleGround;
 class Map;
 struct LiquidTypeEntry;
-
-struct GridMapFileHeader
-{
-    uint32 mapMagic;
-    uint32 versionMagic;
-    uint32 areaMapOffset;
-    uint32 areaMapSize;
-    uint32 heightMapOffset;
-    uint32 heightMapSize;
-    uint32 liquidMapOffset;
-    uint32 liquidMapSize;
-    uint32 holesOffset;
-    uint32 holesSize;
-};
-
-#define MAP_AREA_NO_AREA      0x0001
-
-struct GridMapAreaHeader
-{
-    uint32 fourcc;
-    uint16 flags;
-    uint16 gridArea;
-};
-
-#define MAP_HEIGHT_NO_HEIGHT  0x0001
-#define MAP_HEIGHT_AS_INT16   0x0002
-#define MAP_HEIGHT_AS_INT8    0x0004
-
-struct GridMapHeightHeader
-{
-    uint32 fourcc;
-    uint32 flags;
-    float gridHeight;
-    float gridMaxHeight;
-};
-
-#define MAP_LIQUID_NO_TYPE    0x0001
-#define MAP_LIQUID_NO_HEIGHT  0x0002
-
-struct GridMapLiquidHeader
-{
-    uint32 fourcc;
-    uint16 flags;
-    uint16 liquidType;
-    uint8 offsetX;
-    uint8 offsetY;
-    uint8 width;
-    uint8 height;
-    float liquidLevel;
-};
-
-enum GridMapLiquidStatus
-{
-    LIQUID_MAP_NO_WATER     = 0x00000000,
-    LIQUID_MAP_ABOVE_WATER  = 0x00000001,
-    LIQUID_MAP_WATER_WALK   = 0x00000002,
-    LIQUID_MAP_IN_WATER     = 0x00000004,
-    LIQUID_MAP_UNDER_WATER  = 0x00000008
-};
-
-// defined in DBC and left shifted for flag usage
-#define MAP_LIQUID_TYPE_NO_WATER    0x00
-#define MAP_LIQUID_TYPE_MAGMA       0x01
-#define MAP_LIQUID_TYPE_OCEAN       0x02
-#define MAP_LIQUID_TYPE_SLIME       0x04
-#define MAP_LIQUID_TYPE_WATER       0x08
-
-#define MAP_ALL_LIQUIDS   (MAP_LIQUID_TYPE_WATER | MAP_LIQUID_TYPE_MAGMA | MAP_LIQUID_TYPE_OCEAN | MAP_LIQUID_TYPE_SLIME)
-
-#define MAP_LIQUID_TYPE_DARK_WATER  0x10
-#define MAP_LIQUID_TYPE_WMO_WATER   0x20
-
-struct GridMapLiquidData
-{
-    uint32 type_flags;
-    uint32 entry;
-    float level;
-    float depth_level;
-};
 
 class GridMap
 {
@@ -144,7 +66,8 @@ class GridMap
         };
 
         // Liquid data
-        uint16 m_liquidType;
+        uint16 m_liquidGlobalEntry;
+        uint8 m_liquidGlobalFlags;
         uint8 m_liquid_offX;
         uint8 m_liquid_offY;
         uint8 m_liquid_width;
@@ -171,21 +94,21 @@ class GridMap
         GridMap();
         ~GridMap();
 
-        bool loadData(char* filaname);
+        bool loadData(char const* filaname);
         void unloadData();
 
         static bool ExistMap(uint32 mapid, int gx, int gy);
         static bool ExistVMap(uint32 mapid, int gx, int gy);
 
-        uint16 getArea(float x, float y);
-        float getHeight(float x, float y) { return (this->*m_gridGetHeight)(x, y); }
-        float getLiquidLevel(float x, float y);
-        uint8 getTerrainType(float x, float y);
+        uint16 getArea(float x, float y) const;
+        inline float getHeight(float x, float y) const { return (this->*m_gridGetHeight)(x, y); }
+        float getLiquidLevel(float x, float y) const;
+        uint8 getTerrainType(float x, float y) const;
         GridMapLiquidStatus getLiquidStatus(float x, float y, float z, uint8 ReqLiquidType, GridMapLiquidData* data = 0);
 };
 
 template<typename Countable>
-class MANGOS_DLL_SPEC Referencable
+class Referencable
 {
     public:
         Referencable() { m_count = 0; }
@@ -195,8 +118,8 @@ class MANGOS_DLL_SPEC Referencable
         bool IsReferenced() const { return (m_count > 0); }
 
     private:
-        Referencable(const Referencable&);
-        Referencable& operator=(const Referencable&);
+        Referencable(Referencable const&);
+        Referencable& operator=(Referencable const&);
 
         Countable m_count;
 };
@@ -211,7 +134,7 @@ typedef ACE_Atomic_Op<ACE_Thread_Mutex, int> AtomicLong;
 #define DEFAULT_WATER_SEARCH      50.0f                     // default search distance to case detection water level
 
 // class for sharing and managin GridMap objects
-class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
+class TerrainInfo : public Referencable<AtomicLong>
 {
     public:
         TerrainInfo(uint32 mapid);
@@ -222,9 +145,10 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         // TODO: move all terrain/vmaps data info query functions
         // from 'Map' class into this class
         float GetHeightStatic(float x, float y, float z, bool checkVMap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
-        float GetWaterLevel(float x, float y, float z, float* pGround = NULL) const;
-        float GetWaterOrGroundLevel(Position const& position, float* pGround = NULL, bool swim = false) const;
-        float GetWaterOrGroundLevel(float x, float y, float z, float* pGround = NULL, bool swim = false) const;
+        float GetWaterLevel(float x, float y, float z, float* pGround = nullptr) const;
+        float GetWaterOrGroundLevel(Position const& position, float* pGround = nullptr, bool swim = false) const;
+        float GetWaterOrGroundLevel(float x, float y, float z, float* pGround = nullptr, bool swim = false) const;
+        bool IsSwimmable(float x, float y, float z, float radius = 1.5f, GridMapLiquidData* data = 0) const;
         bool IsInWater(float x, float y, float z, GridMapLiquidData* data = 0) const;
         bool IsUnderWater(float x, float y, float z) const;
 
@@ -246,25 +170,25 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         // to cleanup unreferenced GridMap objects - they are too heavy
         // to destroy them dynamically, especially on highly populated servers
         // THIS METHOD IS NOT THREAD-SAFE!!!! AND IT SHOULDN'T BE THREAD-SAFE!!!!
-        void CleanUpGrids(const uint32 diff);
+        void CleanUpGrids(uint32 const diff);
 
     protected:
         friend class Map;
         // load/unload terrain data
-        GridMap* Load(const uint32 x, const uint32 y);
-        void Unload(const uint32 x, const uint32 y);
+        GridMap* Load(uint32 const x, uint32 const y);
+        void Unload(uint32 const x, uint32 const y);
 
     private:
-        TerrainInfo(const TerrainInfo&);
-        TerrainInfo& operator=(const TerrainInfo&);
+        TerrainInfo(TerrainInfo const&);
+        TerrainInfo& operator=(TerrainInfo const&);
 
-        GridMap* GetGrid(const float x, const float y);
-        GridMap* LoadMapAndVMap(const uint32 x, const uint32 y);
+        GridMap* GetGrid(float const x, float const y);
+        GridMap* LoadMapAndVMap(uint32 const x, uint32 const y);
 
-        int RefGrid(const uint32& x, const uint32& y);
-        int UnrefGrid(const uint32& x, const uint32& y);
+        int RefGrid(uint32 const& x, uint32 const& y);
+        int UnrefGrid(uint32 const& x, uint32 const& y);
 
-        const uint32 m_mapId;
+        uint32 const m_mapId;
 
         GridMap* m_GridMaps[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
         int16 m_GridRef[MAX_NUMBER_OF_GRIDS][MAX_NUMBER_OF_GRIDS];
@@ -279,16 +203,16 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
 };
 
 // class for managing TerrainData object and all sort of geometry querying operations
-class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> >
+class TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> >
 {
         typedef std::unordered_map<uint32,  TerrainInfo*> TerrainDataMap;
         friend class MaNGOS::OperatorNew<TerrainManager>;
 
     public:
-        TerrainInfo* LoadTerrain(const uint32 mapId);
-        void UnloadTerrain(const uint32 mapId);
+        TerrainInfo* LoadTerrain(uint32 const mapId);
+        void UnloadTerrain(uint32 const mapId);
 
-        void Update(const uint32 diff);
+        void Update(uint32 const diff);
         void UnloadAll();
 
         // Liquid Types
@@ -321,8 +245,8 @@ class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, 
         TerrainManager();
         ~TerrainManager();
 
-        TerrainManager(const TerrainManager&);
-        TerrainManager& operator=(const TerrainManager&);
+        TerrainManager(TerrainManager const&);
+        TerrainManager& operator=(TerrainManager const&);
 
         typedef MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex>::Lock Guard;
         TerrainDataMap i_TerrainMap;

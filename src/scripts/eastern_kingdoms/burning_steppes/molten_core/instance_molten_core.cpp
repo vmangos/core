@@ -84,7 +84,7 @@ struct instance_molten_core : ScriptedInstance
         for (int i = 0; i < 7; i++)
         {
             RuneActive[i] = NOT_STARTED;
-            GOUseGuidList[i] = NULL;
+            GOUseGuidList[i] = 0;
         }
 
         DomoSpawn = NOT_STARTED;
@@ -92,8 +92,8 @@ struct instance_molten_core : ScriptedInstance
 
     bool IsEncounterInProgress() const override
     {
-        for (uint8 i = 0; i < INSTANCE_MC_MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+        for (uint32 i : m_auiEncounter)
+            if (i == IN_PROGRESS || i == SPECIAL)
                 return true;
 
         return false;
@@ -204,7 +204,7 @@ struct instance_molten_core : ScriptedInstance
 
     void OnCreatureEnterCombat(Creature* pCreature) override
     {
-        Unit* victim = pCreature->getVictim();
+        Unit* victim = pCreature->GetVictim();
         if (!victim)
             return;
         std::list<Creature*> DomoListe;
@@ -218,10 +218,10 @@ struct instance_molten_core : ScriptedInstance
                 GetCreatureListWithEntryInGrid(DomoListe, pCreature, NPC_DOMO, 150.0f);
                 if (!DomoListe.empty())
                 {
-                    for (std::list<Creature*>::iterator itr = DomoListe.begin(); itr != DomoListe.end(); ++itr)
+                    for (const auto& itr : DomoListe)
                     {
-                        if ((*itr)->isAlive() && !(*itr)->isInCombat())
-                            (*itr)->SetInCombatWith(victim);
+                        if (itr->IsAlive() && !itr->IsInCombat())
+                            itr->SetInCombatWith(victim);
                     }
                 }
                 break;
@@ -372,7 +372,7 @@ struct instance_molten_core : ScriptedInstance
         }
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         std::ostringstream saveStream;
         saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " "
@@ -451,12 +451,11 @@ struct instance_molten_core : ScriptedInstance
         Map::PlayerList const &liste = instance->GetPlayers();
         if (liste.getFirst() != nullptr)
         {
-            for (int i = 0; i < 7; i++)
+            for (uint64 & i : GOUseGuidList)
             {
-                if (GOUseGuidList[i])
+                if (i)
                 {
-                    GameObject* Rune = instance->GetGameObject(GOUseGuidList[i]);
-                    bool End = true;
+                    GameObject* Rune = instance->GetGameObject(i);
                     switch (Rune->GetEntry())
                     {
                         case 176951:                                    //Sulfuron
@@ -464,7 +463,7 @@ struct instance_molten_core : ScriptedInstance
                             {
                                 Feu->Delete();
                                 Rune->Use(liste.getFirst()->getSource());
-                                GOUseGuidList[i] = NULL;
+                                i = 0;
                             }
                             break;
                         case 176952:                                    //Geddon
@@ -472,7 +471,7 @@ struct instance_molten_core : ScriptedInstance
                             {
                                 Feu->Delete();
                                 Rune->Use(liste.getFirst()->getSource());
-                                GOUseGuidList[i] = NULL;
+                                i = 0;
                             }
                             break;
                         case 176953:                                    //Shazzrah
@@ -480,7 +479,7 @@ struct instance_molten_core : ScriptedInstance
                             {
                                 Feu->Delete();
                                 Rune->Use(liste.getFirst()->getSource());
-                                GOUseGuidList[i] = NULL;
+                                i = 0;
                             }
                             break;
                         case 176954:                                    //Golemagg
@@ -488,7 +487,7 @@ struct instance_molten_core : ScriptedInstance
                             {
                                 Feu->Delete();
                                 Rune->Use(liste.getFirst()->getSource());
-                                GOUseGuidList[i] = NULL;
+                                i = 0;
                             }
                             break;
                         case 176955:                                    //Garr
@@ -496,7 +495,7 @@ struct instance_molten_core : ScriptedInstance
                             {
                                 Feu->Delete();
                                 Rune->Use(liste.getFirst()->getSource());
-                                GOUseGuidList[i] = NULL;
+                                i = 0;
                             }
                             break;
                         case 176956:                                    //Magmadar
@@ -504,7 +503,7 @@ struct instance_molten_core : ScriptedInstance
                             {
                                 Feu->Delete();
                                 Rune->Use(liste.getFirst()->getSource());
-                                GOUseGuidList[i] = NULL;
+                                i = 0;
                             }
                             break;
                         case 176957:                                    //Gehennas
@@ -512,7 +511,7 @@ struct instance_molten_core : ScriptedInstance
                             {
                                 Feu->Delete();
                                 Rune->Use(liste.getFirst()->getSource());
-                                GOUseGuidList[i] = NULL;
+                                i = 0;
                             }
                             break;
                     }
@@ -521,7 +520,7 @@ struct instance_molten_core : ScriptedInstance
         }
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {
@@ -539,13 +538,14 @@ struct instance_molten_core : ScriptedInstance
                    >> RuneActive[0] >> RuneActive[1] >> RuneActive[2] >> RuneActive[3]
                    >> RuneActive[4] >> RuneActive[5] >> RuneActive[6];
 
-        for (uint8 i = 0; i < INSTANCE_MC_MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] == IN_PROGRESS)           // Do not load an encounter as "In Progress" - reset it instead.
-                m_auiEncounter[i] = NOT_STARTED;
+        for (uint32 & i : m_auiEncounter)
+            if (i == IN_PROGRESS)           // Do not load an encounter as "In Progress" - reset it instead.
+                i = NOT_STARTED;
 
         for (int i = 0; i < INSTANCE_MC_MAX_ENCOUNTER; i++)
             SetData(i, m_auiEncounter[i]);
 
+        /*
         uint64 GuidRunes[7] =
         {
             m_uiRuneKoroGUID,
@@ -556,10 +556,10 @@ struct instance_molten_core : ScriptedInstance
             m_uiRuneKressGUID,
             m_uiRuneMohnGUID
         };
+        */
 
-
-        for (int i = 0; i < 7; i++)
-            SetData((TypeRuneActive0 + 16), RuneActive[i]);
+        for (uint64 i : RuneActive)
+            SetData((TypeRuneActive0 + 16), i);
     }
 };
 
@@ -674,7 +674,7 @@ InstanceData* GetInstance_instance_molten_core(Map* pMap)
 
 void AddSC_instance_molten_core()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_molten_core";
     newscript->GetInstanceData = &GetInstance_instance_molten_core;

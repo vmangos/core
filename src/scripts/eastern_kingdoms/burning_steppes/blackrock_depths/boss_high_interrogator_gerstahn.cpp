@@ -43,7 +43,7 @@ struct boss_high_interrogator_gerstahnAI : public ScriptedAI
     uint32 m_uiPsychicScream_Timer;
     uint32 m_uiShadowShield_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiShadowWordPain_Timer = 4000;
         m_uiManaBurn_Timer = 14000;
@@ -51,10 +51,10 @@ struct boss_high_interrogator_gerstahnAI : public ScriptedAI
         m_uiShadowShield_Timer = 8000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ShadowWordPain_Timer
@@ -82,7 +82,7 @@ struct boss_high_interrogator_gerstahnAI : public ScriptedAI
         //PsychicScream_Timer
         if (m_uiPsychicScream_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_PSYCHICSCREAM);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PSYCHICSCREAM);
             m_uiPsychicScream_Timer = 30000;
         }
         else
@@ -108,7 +108,7 @@ CreatureAI* GetAI_boss_high_interrogator_gerstahn(Creature* pCreature)
 
 void AddSC_boss_high_interrogator_gerstahn()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_high_interrogator_gerstahn";
     newscript->GetAI = &GetAI_boss_high_interrogator_gerstahn;

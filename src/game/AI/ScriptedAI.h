@@ -17,10 +17,10 @@ enum SCEquip
     EQUIP_UNEQUIP   = 0
 };
 
-struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
+struct ScriptedAI : CreatureAI
 {
     explicit ScriptedAI(Creature* pCreature);
-    ~ScriptedAI() {}
+    ~ScriptedAI() override {}
 
     //*************
     //CreatureAI Functions
@@ -32,7 +32,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     // Called at each attack of m_creature by any victim
     void AttackStart(Unit*) override;
 
-    // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
+    // Called for reaction at enter to combat if not in combat yet (enemy can be nullptr)
     void EnterCombat(Unit*) override;
 
     // Called at stoping attack by any attacker
@@ -51,7 +51,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     void DamageTaken(Unit* /*pDoneBy*/, uint32& /*uiDamage*/) override {}
 
     // Called at World update tick
-    void UpdateAI(const uint32) override;
+    void UpdateAI(uint32 const) override;
 
     // Called at creature death
     void JustDied(Unit*) override {}
@@ -66,7 +66,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     void SummonedCreatureDespawn(Creature*) override {}
 
     // Called when hit by a spell
-    void SpellHit(Unit*, const SpellEntry*) override {}
+    void SpellHit(Unit*, SpellEntry const*) override {}
 
     // Called when creature is spawned or respawned (for reseting variables)
     void JustRespawned() override;
@@ -108,7 +108,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     void DoCastSpell(Unit* pwho, SpellEntry const* pSpellInfo, bool bTriggered = false);
 
     // Plays a sound to all nearby players
-    void DoPlaySoundToSet(WorldObject* pSource, uint32 uiSoundId);
+    static void DoPlaySoundToSet(WorldObject* pSource, uint32 uiSoundId);
 
     // Drops all threat to 0%. Does not remove players from the threat list
     void DoResetThreat();
@@ -136,7 +136,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
 
     void SetEquipmentSlots(bool bLoadDefault, int32 uiMainHand = EQUIP_NO_CHANGE, int32 uiOffHand = EQUIP_NO_CHANGE, int32 uiRanged = EQUIP_NO_CHANGE);
 
-    bool EnterEvadeIfOutOfCombatArea(const uint32 uiDiff);
+    bool EnterEvadeIfOutOfCombatArea(uint32 const uiDiff);
     void EnterEvadeIfOutOfHomeArea();
 
     void DoGoHome();
@@ -147,7 +147,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     float DoGetThreat(Unit* pUnit);
     void DoModifyThreatPercent(Unit* pUnit, int32 pct);
     void DoTeleportTo(float fX, float fY, float fZ);
-    void DoTeleportTo(const float fPos[4]);
+    void DoTeleportTo(float const fPos[4]);
     void DoTeleportAll(float fX, float fY, float fZ, float fO);
     Creature* me;
 
@@ -158,7 +158,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
         uint32 m_uiHomeArea;
 };
 
-struct MANGOS_DLL_DECL Scripted_NoMovementAI : ScriptedAI
+struct Scripted_NoMovementAI : ScriptedAI
 {
     explicit Scripted_NoMovementAI(Creature* pCreature) : ScriptedAI(pCreature) {}
 

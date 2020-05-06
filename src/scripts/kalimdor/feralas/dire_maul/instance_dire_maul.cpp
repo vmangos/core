@@ -16,18 +16,26 @@ void EnableCreature(Creature* pCreature)
 
 instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     // East
-    m_uiCorruptVineGUID(0),
-    m_uiCrumbleWallGUID(0),
-    m_uiOldIronbarkGUID(0),
     m_uiDoorAlzzinInGUID(0),
+    m_uiCrumbleWallGUID(0),
+    m_uiCorruptVineGUID(0),
+    
     // West
-    m_uiForceFieldGUID(0),
-    m_uiTortheldrinGUID(0),
-    m_uiImmolTharGUID(0),
-    m_uiTendrisGUID(0),
     m_uiMagicVortexGUID(0),
+    m_uiForceFieldGUID(0),
+    m_uiImmolTharGUID(0),
+    m_uiTortheldrinGUID(0),
+    
     // North
     m_uiGuardAliveCount(6),
+    m_uiTendrisGUID(0),
+    m_uiOldIronbarkGUID(0),
+    m_uiSlipKikGUID(0),
+    m_uiCaptainKromcrushGUID(0),
+    m_uiKingGordokGUID(0),
+    m_uiChoRushTheObserverGUID(0),
+    m_uiChoRushEquipment(0),
+
     m_uiGordokTribute0GUID(0),
     m_uiGordokTribute1GUID(0),
     m_uiGordokTribute2GUID(0),
@@ -35,14 +43,10 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     m_uiGordokTribute4GUID(0),
     m_uiGordokTribute5GUID(0),
     m_uiGordokTribute6GUID(0),
+
+    m_uiBrokenTrapGUID(0),
     m_bIsGordokTributeRespawned(false),
-    m_bIsTanninLooted(false),
-    m_uiSlipKikGUID(0),
-    m_uiCaptainKromcrushGUID(0),
-    m_uiKingGordokGUID(0),
-    m_uiChoRushTheObserverGUID(0),
-    m_uiChoRushEquipment(0),
-    m_uiBrokenTrapGUID(0)
+    m_bIsTanninLooted(false)
 {
     Initialize();
 }
@@ -190,7 +194,7 @@ void instance_dire_maul::OnCreatureDeath(Creature* pCreature)
 
             if (Creature* pChorush = instance->GetCreature(m_uiChoRushTheObserverGUID))
             {
-                if (pChorush->isAlive())
+                if (pChorush->IsAlive())
                 {
                     pChorush->SetFactionTemporary(FACTION_FRIENDLY, 0);
                     pChorush->m_Events.AddLambdaEventAtOffset([pChorush]() { DoScriptText(SAY_KING_DEAD, pChorush); }, 5000);
@@ -243,7 +247,7 @@ void instance_dire_maul::OnCreatureCreate(Creature* pCreature)
 
             if (GetData(TYPE_GORDOK_TRIBUTE) == DONE)
             {
-                pCreature->setFaction(35);
+                pCreature->SetFactionTemplateId(35);
                 pCreature->SetStandState(UNIT_STAND_STATE_SIT);
             }
             break; 
@@ -270,19 +274,19 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                     sLog.outString("Immol'Thar (%u) rendu attaquable, %u gardiens trouves.", pImmolThar->GetGUIDLow(), m_lImmolTharGardiensMobGUIDList.size());
 #endif
                     bool bHasYelled = false;
-                    for (std::list<uint64>::const_iterator itr = m_lImmolTharGardiensMobGUIDList.begin(); itr != m_lImmolTharGardiensMobGUIDList.end(); itr++)
+                    for (const auto& guid : m_lImmolTharGardiensMobGUIDList)
                     {
-                        if (Creature* pCreature = instance->GetCreature(*itr))
+                        if (Creature* pCreature = instance->GetCreature(guid))
                         {
                             // Ne pas non plus aggro toute l'instance.
-                            if (pCreature->isAlive())
+                            if (pCreature->IsAlive())
                             {
                                 EnableCreature(pCreature);
 
                                 if (pCreature->GetDistance(pImmolThar) > 100.0f)
                                     continue;
 
-                                pCreature->setFaction(100);
+                                pCreature->SetFactionTemplateId(100);
 
                                 if (!bHasYelled)
                                 {
@@ -413,8 +417,8 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
 
                 if (!m_lFelvineShardGUIDs.empty())
                 {
-                    for (std::list<uint64>::iterator i = m_lFelvineShardGUIDs.begin(); i != m_lFelvineShardGUIDs.end(); ++i)
-                        DoRespawnGameObject(*i);
+                    for (const auto& guid : m_lFelvineShardGUIDs)
+                        DoRespawnGameObject(guid);
                 }
             }
             m_auiEncounter[uiType] = uiData;
@@ -476,7 +480,7 @@ void instance_dire_maul::SetData64(uint32 uiType, uint64 uiData)
     }
 }
 
-void instance_dire_maul::Load(const char* chrIn)
+void instance_dire_maul::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -491,9 +495,9 @@ void instance_dire_maul::Load(const char* chrIn)
                >> m_auiEncounter[6] >> m_auiEncounter[7] >> m_auiEncounter[8] >> m_auiEncounter[9]
                >> m_auiEncounter[10] >> m_auiEncounter[11];
 
-    for (uint8 i = 0; i < INSTANCE_DIRE_MAUL_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+    for (uint32 & i : m_auiEncounter)
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
 
     OUT_LOAD_INST_DATA_COMPLETE;
 }
@@ -551,12 +555,12 @@ void instance_dire_maul::DoSortCristalsEventMobs()
     {
         if (GameObject* pRune = instance->GetGameObject(m_auiCristalsGUID[i]))
         {
-            for (std::list<uint64>::const_iterator itr = m_lCristalsEventtMobGUIDList.begin(); itr != m_lCristalsEventtMobGUIDList.end(); itr++)
+            for (const auto& guid : m_lCristalsEventtMobGUIDList)
             {
-                if (Creature* pCreature = instance->GetCreature(*itr))
+                if (Creature* pCreature = instance->GetCreature(guid))
                 {
-                    if (pCreature->isAlive() && pCreature->GetDistance(pRune) < 20.0f)
-                        m_alCristalsEventtMobGUIDSorted[i].push_back(*itr);
+                    if (pCreature->IsAlive() && pCreature->GetDistance(pRune) < 20.0f)
+                        m_alCristalsEventtMobGUIDSorted[i].push_back(guid);
                 }
             }
 #ifdef DEBUG_ON
@@ -592,22 +596,22 @@ struct npc_reste_manaAI : public ScriptedAI
     uint32 m_uiChainLighting_Timer;
     uint32 m_uiBlink_Timer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiBlink_Timer = urand(12000, 23000);
         m_uiChainLighting_Timer = urand(2000, 6000);
         m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData64(TYPE_CRISTAL_EVENT, m_creature->GetGUID());
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->IsNonMeleeSpellCasted(false))
@@ -615,7 +619,7 @@ struct npc_reste_manaAI : public ScriptedAI
 
         if (m_uiBlink_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLINK);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BLINK);
             m_uiBlink_Timer = 6000;
             return;
         }   
@@ -624,7 +628,7 @@ struct npc_reste_manaAI : public ScriptedAI
 
         if (m_uiChainLighting_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHAINLIGHTNING);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHAINLIGHTNING);
             m_uiChainLighting_Timer = 6000;
             return;
         }
@@ -658,20 +662,20 @@ struct npc_arcane_aberrationAI : public ScriptedAI
     uint32 m_uiArcaneBoltTimer;
     bool m_bManaBurnDone;
 
-    void Reset()
+    void Reset() override
     {
         m_uiArcaneBoltTimer = urand(0, 400);
         m_bManaBurnDone = false;
         m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData64(TYPE_CRISTAL_EVENT, m_creature->GetGUID());
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
     {
         if (m_creature->GetHealthPercent() > 5.0f)
             return;
@@ -683,9 +687,9 @@ struct npc_arcane_aberrationAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_creature->IsNonMeleeSpellCasted(false))
@@ -693,7 +697,7 @@ struct npc_arcane_aberrationAI : public ScriptedAI
 
         if (m_uiArcaneBoltTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEBOLT);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEBOLT);
             m_uiArcaneBoltTimer = urand(2400, 3800);
             return;
         }
@@ -728,14 +732,14 @@ struct npc_residual_montruosityAI : public ScriptedAI
     uint32 m_uiArcaneBoltTimer;
     uint32 m_uiArcaneBlastTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiArcaneBlastTimer = urand(1000, 2500);
         m_uiArcaneBoltTimer = urand(0, 400);
         m_creature->ApplySpellImmune(0, IMMUNITY_SCHOOL, SPELL_SCHOOL_MASK_ARCANE, true);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         DoCastSpellIfCan(m_creature, SPELL_SUMMON_MANABURSTS);
     }
@@ -743,7 +747,7 @@ struct npc_residual_montruosityAI : public ScriptedAI
     void UpdateFormationSpeed()
     {
         float newspeed = 1.79f;
-        if (!m_creature->getVictim())
+        if (!m_creature->GetVictim())
         {
 
             float closestbefore = 45.0f;
@@ -753,19 +757,19 @@ struct npc_residual_montruosityAI : public ScriptedAI
             GetCreatureListWithEntryInGrid(montruosityList, m_creature, 11484, 45.0f);
             if (!montruosityList.empty())
             {
-                for (std::list<Creature*>::iterator itr = montruosityList.begin(); itr != montruosityList.end(); ++itr)
+                for (const auto& itr : montruosityList)
                 {
-                    if ((*itr) != m_creature)
+                    if (itr != m_creature)
                     {
-                        if (!(*itr)->isInFrontInMap(m_creature, 45.0f, M_PI_F))
+                        if (!itr->isInFrontInMap(m_creature, 45.0f, M_PI_F))
                         {
-                            float distance = m_creature->GetDistance((*itr));
+                            float distance = m_creature->GetDistance(itr);
                             if (distance < closestbefore)
                                 closestbefore = distance;
                         }
                         else
                         {
-                            float distance = m_creature->GetDistance((*itr));
+                            float distance = m_creature->GetDistance(itr);
                             if (distance < closestbehind)
                                 closestbehind = distance;
                         }
@@ -780,10 +784,10 @@ struct npc_residual_montruosityAI : public ScriptedAI
         m_creature->SetSpeedRate(MOVE_WALK, newspeed);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             UpdateFormationSpeed();
             return;
@@ -794,7 +798,7 @@ struct npc_residual_montruosityAI : public ScriptedAI
 
         if (m_uiArcaneBoltTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEBOLT2);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEBOLT2);
             m_uiArcaneBoltTimer = urand(2400, 3800);
             return;
         }
@@ -869,9 +873,9 @@ struct npc_mizzle_the_craftyAI : public ScriptedAI
     bool m_bJustReachedHome;
     instance_dire_maul* m_pInstance;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (!m_bJustReachedHome)
         {
@@ -881,7 +885,7 @@ struct npc_mizzle_the_craftyAI : public ScriptedAI
         }
     }
 
-    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pTarget, SpellEntry const* pSpell) override
     {
         m_creature->SetOrientation(3.170f);
     }
@@ -930,7 +934,7 @@ bool GossipSelect_npc_mizzle_the_crafty(Player* pPlayer, Creature* pCreature, ui
                 }
             }
             else
-                if (!pPlayer->isInCombat())
+                if (!pPlayer->IsInCombat())
                     pCreature->CastSpell(pPlayer, SPELL_KING_OF_GORDOK, true);
     }
     return true;
@@ -967,9 +971,9 @@ struct npc_knot_thimblejackAI : public ScriptedAI
 
     instance_dire_maul* m_pInstance;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void MovementInform(uint32 type, uint32 id)
+    void MovementInform(uint32 type, uint32 id) override
     {
         if (type != POINT_MOTION_TYPE)
             return;
@@ -1026,7 +1030,7 @@ CreatureAI* GetAI_npc_knot_thimblejack(Creature* pCreature)
 
 bool GossipHello_npc_knot_thimblejack(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Why should I bother fixing the trap? Why not just eliminate the guard the old fashioned way?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+1);
@@ -1107,7 +1111,7 @@ struct GordokBruteAI : public ScriptedAI
     uint32 m_uiUppercut_Timer;
     bool m_bEnrage;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->LoadEquipment(m_uiEquipment_id, true);
         m_uiBackhand_Timer     = 2000;
@@ -1117,7 +1121,7 @@ struct GordokBruteAI : public ScriptedAI
         m_bEnrage = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         uint32 yellChance = urand(0, 4);
         switch (yellChance)
@@ -1138,16 +1142,16 @@ struct GordokBruteAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         /** Spell above 30% of life */
         if (m_uiBruisingBlow_Timer < uiDiff)
         {
             if(m_creature->GetHealthPercent() > 30.0f)
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BRUISING_BLOW) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BRUISING_BLOW) == CAST_OK)
                     m_uiBruisingBlow_Timer = urand(3000, 8000);
         }
         else
@@ -1155,8 +1159,8 @@ struct GordokBruteAI : public ScriptedAI
 
         if (m_uiPummel_Timer < uiDiff)
         {
-            if(m_creature->GetHealthPercent() > 30.0f && m_creature->getVictim()->IsNonMeleeSpellCasted(true))
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PUMMEL) == CAST_OK)
+            if(m_creature->GetHealthPercent() > 30.0f && m_creature->GetVictim()->IsNonMeleeSpellCasted(true))
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_PUMMEL) == CAST_OK)
                     m_uiPummel_Timer = urand(8000, 10000);
         }
         else
@@ -1168,7 +1172,7 @@ struct GordokBruteAI : public ScriptedAI
             char eMessage[100];
             sprintf(eMessage, "Gordok Brute puts his club away and begins swinging wildly!");
             m_creature->LoadEquipment(0, true);
-            m_creature->MonsterTextEmote(eMessage, NULL, false);
+            m_creature->MonsterTextEmote(eMessage, nullptr, false);
 
             m_creature->CastSpell(m_creature, SPELL_ENRAGE, false);
             m_bEnrage = true;
@@ -1178,7 +1182,7 @@ struct GordokBruteAI : public ScriptedAI
         {
             if (m_uiBackhand_Timer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACK_HAND) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BACK_HAND) == CAST_OK)
                     m_uiBackhand_Timer = urand(5000, 9000);
             }
             else
@@ -1187,7 +1191,7 @@ struct GordokBruteAI : public ScriptedAI
 
         if (m_uiUppercut_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_UPPERCUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_UPPERCUT) == CAST_OK)
                 m_uiUppercut_Timer = urand(6000, 10000);
         }
         else
@@ -1247,7 +1251,7 @@ struct boss_guardsAI : public ScriptedAI
 
     uint32 m_uiCombatBugTimer;
     
-    void Reset()
+    void Reset() override
     {
         m_uiShieldCharge_Timer = 500;
         m_uiStrike_Timer       = urand(10000, 20000);
@@ -1258,30 +1262,30 @@ struct boss_guardsAI : public ScriptedAI
         m_uiCombatBugTimer = 0;
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         // Guards no longer drop loot after contributing to the Tribute
         if (pInstance->GetData(TYPE_GORDOK_TRIBUTE) == DONE)
         {
             m_creature->MonsterSay("Why... Boss.. betray.. us...?", 0, 0);
-            m_creature->SetLootRecipient(NULL);
+            m_creature->SetLootRecipient(nullptr);
         }
     }
 
-    void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_KNOCK_AWAY)
-            m_creature->getThreatManager().modifyThreatPercent(pCaster, -50);
+            m_creature->GetThreatManager().modifyThreatPercent(pCaster, -50);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Workaround fix for bug where Slip'kik doesnt leave combat properly if he charges through the trap
         if (m_uiCombatBugTimer)
         {
             if (m_uiCombatBugTimer <= uiDiff)
             {
-                if (m_creature->isInCombat() && m_creature->HasAura(SPELL_ICE_LOCK))
+                if (m_creature->IsInCombat() && m_creature->HasAura(SPELL_ICE_LOCK))
                 {
                     m_creature->CombatStop(true);
                     m_creature->DeleteThreatList();
@@ -1292,7 +1296,7 @@ struct boss_guardsAI : public ScriptedAI
                 m_uiCombatBugTimer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;       
 
         // Shield Charge
@@ -1311,9 +1315,9 @@ struct boss_guardsAI : public ScriptedAI
         // Shield Bash 
         if (m_uiShieldBash_Timer < uiDiff) 
         {
-            if (m_creature->getVictim()->IsNonMeleeSpellCasted(true))
+            if (m_creature->GetVictim()->IsNonMeleeSpellCasted(true))
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHIELD_BASH) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHIELD_BASH) == CAST_OK)
                     m_uiShieldBash_Timer = urand(10000, 15000);
             }
         } 
@@ -1323,7 +1327,7 @@ struct boss_guardsAI : public ScriptedAI
         // Strike
         if (m_uiStrike_Timer < uiDiff) 
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_STRIKE) == CAST_OK)
                 m_uiStrike_Timer = urand(10000, 15000);
         } 
         else 
@@ -1332,7 +1336,7 @@ struct boss_guardsAI : public ScriptedAI
         // Knock Away
         if (m_uiKnockAway_Timer < uiDiff) 
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                 m_uiKnockAway_Timer = urand(20000, 30000);
         } 
         else 
@@ -1433,7 +1437,7 @@ struct go_fixed_trap : public GameObjectAI
 
     instance_dire_maul* pInstance;
 
-    void UpdateAI(uint32 const diff)
+    void UpdateAI(uint32 const diff) override
     {
        if (Creature* pSlipkik = me->GetMap()->GetCreature(pInstance->GetData64(NPC_GUARD_SLIPKIK)))
         {
@@ -1444,7 +1448,7 @@ struct go_fixed_trap : public GameObjectAI
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-                pSlipkik->CastSpell(pSlipkik, SPELL_ICE_LOCK, true, NULL);
+                pSlipkik->CastSpell(pSlipkik, SPELL_ICE_LOCK, true, nullptr);
                 me->SendGameObjectCustomAnim();
                 me->Delete();
             }
@@ -1493,7 +1497,7 @@ struct boss_kromcrushAI : public ScriptedAI
     bool m_bRetaliationUsed;
     bool m_bCallReavers;
 
-    void Reset()
+    void Reset() override
     {
         m_uiMortalCleave_Timer      = urand(7000, 13000);
         m_uiIntimidatingShout_Timer = 10000;
@@ -1512,12 +1516,12 @@ struct boss_kromcrushAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_AGGRO, m_creature, pWho);
     }
 
-    void MovementInform(uint32 uiMovementType, uint32 uiData) 
+    void MovementInform(uint32 uiMovementType, uint32 uiData) override 
     {
         if (uiMovementType == POINT_MOTION_TYPE)
         {
@@ -1540,17 +1544,17 @@ struct boss_kromcrushAI : public ScriptedAI
         }
     }
 
-    void JustDied(Unit* /*pKiller*/)
+    void JustDied(Unit* /*pKiller*/) override
     {
         // Kromcrush no longer drops loot after contributing to the Tribute
         if (pInstance->GetData(TYPE_GORDOK_TRIBUTE) == DONE)
         {
             m_creature->MonsterSay("Why... Boss.. betray.. us...?", 0, 0);
-            m_creature->SetLootRecipient(NULL);
+            m_creature->SetLootRecipient(nullptr);
         }
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         ScriptedAI::EnterEvadeMode();
 
@@ -1561,7 +1565,7 @@ struct boss_kromcrushAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature *pSummoned)
+    void JustSummoned(Creature *pSummoned) override
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             pSummoned->AI()->AttackStart(pTarget);
@@ -1584,15 +1588,15 @@ struct boss_kromcrushAI : public ScriptedAI
         //m_creature->CastSpell(m_creature, SPELL_CALL_REAVERS, false);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Mortal Cleave
         if (m_uiMortalCleave_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_CLEAVE) == CAST_OK)
                 m_uiMortalCleave_Timer = urand(15000, 20000);
         } 
         else 
@@ -1601,7 +1605,7 @@ struct boss_kromcrushAI : public ScriptedAI
         // Intimidating Shout
         if (m_uiIntimidatingShout_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_INTIMIDATING_SHOUT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_INTIMIDATING_SHOUT) == CAST_OK)
                 m_uiIntimidatingShout_Timer = urand(30000, 35000);
         }
         else 
@@ -1629,7 +1633,7 @@ struct boss_kromcrushAI : public ScriptedAI
 
 bool GossipHello_boss_kromcrush(Player* pPlayer, Creature * pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
     if (instance_dire_maul* pInstance = (instance_dire_maul*)pCreature->GetInstanceData())
@@ -1709,7 +1713,7 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
     uint32 summonTimer;    
     uint32 whirlwindTimer;    
 
-    void Reset()
+    void Reset() override
     {
         arcaneBlastTimer     = urand(15000, 20000);
         counterspellTimer    = urand(10000, 20000);
@@ -1720,15 +1724,15 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_THRASH, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {       
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Summon
         if (summonTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SUMMON) == CAST_OK)            
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUMMON) == CAST_OK)            
                 summonTimer = urand(13000, 20000);
         }
         else 
@@ -1738,10 +1742,10 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
         if (whirlwindTimer < uiDiff)
         {
             bool m_bMeleeAttackers = false;
-            Unit::AttackerSet attackers = m_creature->getAttackers();
-            for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+            Unit::AttackerSet attackers = m_creature->GetAttackers();
+            for (const auto itr : attackers)
             {
-                if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
+                if (Unit* attacker = m_creature->GetMap()->GetUnit(itr->GetGUID()))
                 {
                     if (m_creature->IsInRange(attacker, 0.0f, 7.0f, false)) 
                     {
@@ -1760,7 +1764,7 @@ struct boss_prince_tortheldrinAI:public ScriptedAI
         // Arcane Blast
         if (arcaneBlastTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_BLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANE_BLAST) == CAST_OK)
             {
                 DoResetThreat();
                 arcaneBlastTimer = urand(10000, 15000);
@@ -1821,7 +1825,7 @@ enum
     SPELL_DISARM                = 22691
 };
 
-static const float ALZZIN_COORDS[2][3] =
+static float const ALZZIN_COORDS[2][3] =
 {
     {274.844f, -427.251f, -119.962f},
     {262.298f, -445.57f,  -119.962f}
@@ -1898,10 +1902,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         m_uiEvadeTimer             = 3000;
         m_bSummoned                = false;
 
-        if (DoCastSpellIfCan(m_creature, SPELL_THORNS) == CAST_OK)
-            m_bCastThorns = false;
-        else
-            m_bCastThorns = true;
+        m_bCastThorns = DoCastSpellIfCan(m_creature, SPELL_THORNS) != CAST_OK;
     }
 
     void SummonAdds()
@@ -1915,7 +1916,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
                 m_fCoordMinions[i][2], 
                 m_fCoordMinions[i][3], TEMPSUMMON_MANUAL_DESPAWN, 20 * IN_MILLISECONDS))
             {
-                pAdds->AI()->AttackStart(m_creature->getVictim());                
+                pAdds->AI()->AttackStart(m_creature->GetVictim());                
             }
 
             ++m_uiImpCount;
@@ -1928,10 +1929,10 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         GetCreatureListWithEntryInGrid(m_lHelpers, m_creature, NPC_ALZZINS_MINION, 80.0f);
         if (!m_lHelpers.empty())
         {
-            for (auto iter = m_lHelpers.begin(); iter != m_lHelpers.end(); ++iter)
+            for (const auto& pCreature : m_lHelpers)
             {
-                if (*iter && !(*iter)->isAlive())
-                    static_cast<TemporarySummon*>(*iter)->UnSummon();
+                if (pCreature && !pCreature->IsAlive())
+                    static_cast<TemporarySummon*>(pCreature)->UnSummon();
             }
             m_lHelpers.clear();
         }
@@ -2019,7 +2020,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Thorns
         if (m_bCastThorns)
@@ -2039,7 +2040,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
                 m_uiThornsTimer -= uiDiff;
         }
         
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (!m_uiOOCTimer)
                 return;
@@ -2048,7 +2049,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
             {
                 //m_creature->HandleEmote(0);
                 m_creature->InterruptNonMeleeSpells(false);
-                const float *point = ALZZIN_COORDS[m_uiOOCPhase];
+                float const *point = ALZZIN_COORDS[m_uiOOCPhase];
                 m_creature->GetMotionMaster()->MovePoint(m_uiOOCPhase, point[0], point[1], point[2]);
 
                 m_uiOOCPhase ^= 1;
@@ -2100,7 +2101,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
             // Wither
             if (m_uiWitherTimer < uiDiff)
             {                    
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WITHER, CF_AURA_NOT_PRESENT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WITHER, CF_AURA_NOT_PRESENT) == CAST_OK)
                     m_uiWitherTimer = urand(8000, 10000);
             }
             else
@@ -2121,7 +2122,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
             // Mangle
             if (m_uiMangleTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MANGLE, CF_AURA_NOT_PRESENT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MANGLE, CF_AURA_NOT_PRESENT) == CAST_OK)
                     m_uiMangleTimer = urand(8000, 10000);
             }
             else
@@ -2130,7 +2131,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
             // Vicious Bite
             if (m_uiViciousBiteTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_VICIOUS_BITE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_VICIOUS_BITE) == CAST_OK)
                     m_uiViciousBiteTimer = urand(8000, 15000);
             }
             else
@@ -2142,7 +2143,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
             // Knock Away
             if (m_uiKnockAwayTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
                     m_uiKnockAwayTimer = urand(16000, 20000);
             }
             else
@@ -2151,7 +2152,7 @@ struct boss_alzzin_the_wildshaperAI : ScriptedAI
             // Disarm
             if (m_uiDisarmTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISARM) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_DISARM) == CAST_OK)
                     m_uiDisarmTimer = urand(16000, 20000);
             }
             else
@@ -2186,16 +2187,16 @@ struct npc_alzzins_minionAI : ScriptedAI
     {
         if (Unit* pSummoner = m_creature->GetMap()->GetUnit(((TemporarySummon*)m_creature)->GetSummonerGuid()))
         {
-            if (pSummoner->isAlive())
+            if (pSummoner->IsAlive())
                 m_creature->GetMotionMaster()->MoveFollow(pSummoner, PET_FOLLOW_DIST, frand(0.0f, 6.2832f));
         }
     }
 
     void MoveInLineOfSight(Unit *pWho) override
     {
-        if (!m_creature->isInCombat())
+        if (!m_creature->IsInCombat())
         {
-            if (pWho->IsPlayer() && pWho->isTargetableForAttack() && m_creature->IsWithinDistInMap(pWho, 30.0f) && m_creature->IsWithinLOSInMap(pWho))
+            if (pWho->IsPlayer() && pWho->IsTargetableForAttack() && m_creature->IsWithinDistInMap(pWho, 30.0f) && m_creature->IsWithinLOSInMap(pWho))
                 m_creature->AttackedBy(pWho);
         }
     }
@@ -2204,7 +2205,7 @@ struct npc_alzzins_minionAI : ScriptedAI
     {
         if (Unit* pSummoner = m_creature->GetMap()->GetUnit(((TemporarySummon*)m_creature)->GetSummonerGuid()))
         {
-            if (!pSummoner->isAlive() || !pSummoner->isInCombat())
+            if (!pSummoner->IsAlive() || !pSummoner->IsInCombat())
                 ((TemporarySummon*)m_creature)->UnSummon();
         }
     }
@@ -2239,7 +2240,7 @@ struct boss_ferraAI : public ScriptedAI
     uint32 m_uiCharge_Timer;
     uint32 m_uiMaul_Timer;
 
-    void Reset() 
+    void Reset() override 
     {    
         m_uiCharge_Timer        = 0;
         m_uiMaul_Timer          = urand(5000, 10000);
@@ -2247,12 +2248,12 @@ struct boss_ferraAI : public ScriptedAI
 		m_creature->SetNoCallAssistance(true);
     }   
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {        
-        if (!m_creature->isInCombat()) 
+        if (!m_creature->IsInCombat()) 
         {
             if (pWho->IsPlayer() && m_creature->IsWithinDistInMap(pWho, 80.0f) && m_creature->IsWithinLOSInMap(pWho)
-            &&  pWho->isTargetableForAttack())
+            &&  pWho->IsTargetableForAttack())
             {
                 // don't aggro people through the floor, ever!
                 if ((m_creature->GetPositionZ() - pWho->GetPositionZ()) < 10.0f)
@@ -2261,15 +2262,15 @@ struct boss_ferraAI : public ScriptedAI
         }              
     }   
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())            
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())            
             return;
 
         // Maul
         if (m_uiMaul_Timer < uiDiff) 
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MAUL) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MAUL) == CAST_OK)
                 m_uiMaul_Timer = urand(15000, 20000);
         }
         else 
@@ -2278,7 +2279,7 @@ struct boss_ferraAI : public ScriptedAI
         // Charge
         if (m_uiCharge_Timer < uiDiff) 
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CHARGE) == CAST_OK)
                 m_uiCharge_Timer = urand(6000, 10000);
         }
         else 
@@ -2326,7 +2327,7 @@ struct boss_magister_kalendrisAI:public ScriptedAI
     bool m_bShadowformUsed;
     bool m_bInMeele;
 
-    void Reset()
+    void Reset() override
     {
         m_bShadowformUsed = false;
         m_uiShadowWordPainTimer     = urand(5000, 10000);
@@ -2335,16 +2336,16 @@ struct boss_magister_kalendrisAI:public ScriptedAI
         m_uiDominateMindTimer       = urand(20000, 30000);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {       
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Shadow Word Pain
         if (m_uiShadowWordPainTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_WORD_PAIN, CF_AURA_NOT_PRESENT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOW_WORD_PAIN, CF_AURA_NOT_PRESENT) == CAST_OK)
                 m_uiShadowWordPainTimer = urand(9000, 11000);
         }
         else
@@ -2353,7 +2354,7 @@ struct boss_magister_kalendrisAI:public ScriptedAI
         // MindFlay
         if (m_uiMindFlayTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_FLAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_FLAY) == CAST_OK)
                 m_uiMindFlayTimer = urand(18000, 23000);
         }
         else
@@ -2362,7 +2363,7 @@ struct boss_magister_kalendrisAI:public ScriptedAI
         // Mind Blast
         if (m_uiMindBlastTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_BLAST) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MIND_BLAST) == CAST_OK)
                 m_uiMindBlastTimer = (m_bInMeele ? urand(7000, 10000) : urand(2000, 3000));
         }
         else
@@ -2386,21 +2387,21 @@ struct boss_magister_kalendrisAI:public ScriptedAI
 
         if (!IsCombatMovementEnabled())
         { //Melee
-            if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->getVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 30.0f || !m_creature->IsWithinLOSInMap(m_creature->getVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
+            if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->GetVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->GetVictim()) > 30.0f || !m_creature->IsWithinLOSInMap(m_creature->GetVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
             {
                 SetCombatMovement(true);
-                DoStartMovement(m_creature->getVictim());
+                DoStartMovement(m_creature->GetVictim());
                 m_bInMeele = true;
                 return;
             }
         }
         else                
         { //Range
-            if (m_bInMeele && m_creature->GetDistance2d(m_creature->getVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->getVictim()) <= 30.0f && m_creature->IsWithinLOSInMap(m_creature->getVictim()) && m_creature->GetPowerPercent(POWER_MANA) >= 5.0f)
+            if (m_bInMeele && m_creature->GetDistance2d(m_creature->GetVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->GetVictim()) <= 30.0f && m_creature->IsWithinLOSInMap(m_creature->GetVictim()) && m_creature->GetPowerPercent(POWER_MANA) >= 5.0f)
             {
                 SetCombatMovement(false);
                 m_bInMeele = false;
-                DoStartNoMovement(m_creature->getVictim());
+                DoStartNoMovement(m_creature->GetVictim());
                 return;
             }
         }

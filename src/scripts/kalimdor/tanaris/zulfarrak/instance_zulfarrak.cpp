@@ -114,7 +114,7 @@ public:
     uint32 addGroupSize;
     uint32 waypoint;
 
-    void Initialize()
+    void Initialize() override
     {
         EndDoorEncounter = NOT_STARTED;
         GahzRillaEncounter = NOT_STARTED;
@@ -135,7 +135,7 @@ public:
         EndDoorGUID = 0;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -174,7 +174,7 @@ public:
         }
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -186,7 +186,7 @@ public:
         }
     }
 
-    uint32 GetData(uint32 type)
+    uint32 GetData(uint32 type) override
     {
         switch (type)
         {
@@ -196,7 +196,7 @@ public:
         return 0;
     }
 
-    uint64 GetData64(uint32 data)
+    uint64 GetData64(uint32 data) override
     {
         switch (data)
         {
@@ -220,7 +220,7 @@ public:
         return 0;
     }
 
-    void SetData(uint32 type, uint32 data)
+    void SetData(uint32 type, uint32 data) override
     {
         switch (type)
         {
@@ -243,7 +243,7 @@ public:
         }
     }
 
-    virtual void Update(uint32 diff)
+    void Update(uint32 diff) override
     {
         switch (PyramidPhase)
         {
@@ -332,7 +332,7 @@ public:
     {
         if (Creature* npc = instance->GetCreature(GetData64(entry)))
         {
-            if (npc->isAlive())
+            if (npc->IsAlive())
             {
                 npc->GetMotionMaster()->MovePoint(1, x, y, z, MOVE_PATHFINDING | MOVE_WALK_MODE);
                 npc->SetCombatStartPosition(x, y, z);
@@ -343,11 +343,11 @@ public:
 
     void SpawnPyramidWave(uint32 wave)
     {
-        for (int i = 0; i < pyramidSpawnTotal; i++)
+        for (const auto& pyramidSpawn : pyramidSpawns)
         {
-            if (pyramidSpawns[i][0] == (float)wave)
+            if (pyramidSpawn[0] == (float)wave)
             {
-                Creature* ts = instance->SummonCreature(pyramidSpawns[i][1], pyramidSpawns[i][2], pyramidSpawns[i][3], 8.87f, 0.0f);
+                Creature* ts = instance->SummonCreature(pyramidSpawn[1], pyramidSpawn[2], pyramidSpawn[3], 8.87f, 0.0f);
                 //ts->GetMotionMaster()->MoveRandom(10);
                 addsAtBase.push_back(ts->GetGUID());
             }
@@ -356,19 +356,19 @@ public:
 
     bool IsWaveAllDead()
     {
-        for (std::list<uint64>::iterator itr = addsAtBase.begin(); itr != addsAtBase.end(); ++itr)
+        for (const auto& guid : addsAtBase)
         {
-            if (Creature* add = instance->GetCreature((*itr)))
+            if (Creature* add = instance->GetCreature(guid))
             {
-                if (add->isAlive())
+                if (add->IsAlive())
                     return false;
             }
         }
-        for (std::list<uint64>::iterator itr = movedadds.begin(); itr != movedadds.end(); ++itr)
+        for (const auto& guid : movedadds)
         {
-            if (Creature* add = instance->GetCreature(((*itr))))
+            if (Creature* add = instance->GetCreature((guid)))
             {
-                if (add->isAlive())
+                if (add->IsAlive())
                     return false;
             }
         }
@@ -382,7 +382,7 @@ public:
         {
             if (Creature* add = instance->GetCreature(*addsAtBase.begin()))
             {
-                if (add->isAlive())
+                if (add->IsAlive())
                 {
                     add->GetMotionMaster()->MovePoint(0, 1880 + urand(0, 10), 1274, 42, MOVE_PATHFINDING | MOVE_RUN_MODE);
                     add->SetWalk(false);
@@ -393,12 +393,12 @@ public:
         }
     }
 
-    const char* Save() override
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn) override
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {
@@ -423,7 +423,7 @@ InstanceData* GetInstanceData_instance_zulfarak(Map* pMap)
 
 void AddSC_instance_zulfarrak()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_zulfarrak";
     newscript->GetInstanceData = &GetInstanceData_instance_zulfarak;

@@ -72,7 +72,7 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
     bool bShadowPortalCasted;
     uint64 ShadowPortalTargetGUID;
 
-    void Reset()
+    void Reset() override
     {
         ArcaneMissiles_Timer = 4500;
         ShadowShield_Timer = 12000;
@@ -82,7 +82,7 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
         ShadowPortalTargetGUID = 0;
     }
 
-    void JustDied(Unit *killer)
+    void JustDied(Unit *killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GANDLING, DONE);
@@ -90,21 +90,21 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
         DoScriptText(SAY_GANDLING_DEATH, m_creature);
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GANDLING, FAIL);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //ArcaneMissiles_Timer
         if (ArcaneMissiles_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEMISSILES) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ARCANEMISSILES) == CAST_OK)
                 ArcaneMissiles_Timer = urand(10000, 16000);
         }
         else ArcaneMissiles_Timer -= diff;
@@ -120,7 +120,7 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
         //Curse_Timer
         if (Curse_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CURSE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CURSE) == CAST_OK)
                 Curse_Timer = urand(15000, 27000);
         }
         else Curse_Timer -= diff;
@@ -146,11 +146,11 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
                 }
                 else if (Unit* target = m_creature->GetMap()->GetUnit(ShadowPortalTargetGUID))
                 {
-                    m_creature->getThreatManager().modifyThreatPercent(target, -100);
+                    m_creature->GetThreatManager().modifyThreatPercent(target, -100);
                     ShadowPortalTargetGUID = 0;
                     bShadowPortalCasted = false;
 
-                    if (target->isAlive())
+                    if (target->IsAlive())
                     {
                         switch (urand(0, 5))
                         {
@@ -160,19 +160,19 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
                                 if (Creature* Summoned = m_creature->SummonCreature(30000, 229.229f, 5.39118f, 85.2283f, 0.0961165f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30000, 229.503f, 0.00814369f, 85.2283f, 0.0961165f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30000, 229.727f, -4.39616f, 85.2283f, 0.0961165f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 break;
@@ -182,25 +182,25 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
                                 if (Creature* Summoned = m_creature->SummonCreature(30001, 186.217f, -50.0985f, 85.2283f, 4.75432f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30001, 181.568f, -56.2009f, 84.841f, 4.75432f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30001, 188.325f, -55.6766f, 85.2283f, 4.75432f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30001, 173.013f, -56.4198f, 85.2283f, 4.75432f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 break;
@@ -210,19 +210,19 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
                                 if (Creature* Summoned = m_creature->SummonCreature(30002, 128.205f, 5.00569f, 85.2283f, 3.09949f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30002, 128.06f, -6.1269f, 85.2283f, 3.09949f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30002, 128.124f, -1.71736f, 85.3764f, 3.09949f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 break;
@@ -232,19 +232,19 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
                                 if (Creature* Summoned = m_creature->SummonCreature(30003, 235.598f, 0.588147f, 72.6727f, 2.92513f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30003, 235.51f, -5.92126f, 72.6727f, 0.331743f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30003, 229.127f, -3.10989f, 72.6727f, 3.17017f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 break;
@@ -254,25 +254,25 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
                                 if (Creature* Summoned = m_creature->SummonCreature(30004, 170.96f, -56.9603f, 75.3971f, 3.75058f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30004, 182.708f, -55.8739f, 75.3971f, 1.88447f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30004, 175.353f, -55.9977f, 75.3971f, 0.461331f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30004, 191.41f, -55.4289f, 75.3971f, 3.75058f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 break;
@@ -282,19 +282,19 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
                                 if (Creature* Summoned = m_creature->SummonCreature(30005, 138.599f, 4.62909f, 75.397f, 0.065487f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30005, 136.525f, -1.6351f, 75.397f, 0.065487f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 if (Creature* Summoned = m_creature->SummonCreature(30005, 139.392f, -7.35632f, 75.397f, 0.039568f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000))
                                 {
                                     Summoned->SetInCombatWith(target);
-                                    Summoned->getThreatManager().addThreatDirectly(target, 100000.0f);
+                                    Summoned->GetThreatManager().addThreatDirectly(target, 100000.0f);
                                     Summoned->GetMotionMaster()->MoveChase(target);
                                 }
                                 break;
@@ -316,7 +316,7 @@ CreatureAI* GetAI_boss_darkmaster_gandling(Creature* pCreature)
 
 void AddSC_boss_darkmaster_gandling()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_darkmaster_gandling";
     newscript->GetAI = &GetAI_boss_darkmaster_gandling;

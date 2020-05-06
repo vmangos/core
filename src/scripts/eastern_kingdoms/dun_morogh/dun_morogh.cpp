@@ -31,7 +31,7 @@ struct npc_narm_faulkAI : ScriptedAI
 
     void MoveInLineOfSight(Unit *who) override { }
 
-    void UpdateAI(const uint32 diff) override
+    void UpdateAI(uint32 const diff) override
     {
         if (m_creature->IsStandingUp())
         {
@@ -42,7 +42,7 @@ struct npc_narm_faulkAI : ScriptedAI
         }
     }
 
-    void SpellHit(Unit *Hitter, const SpellEntry *Spellkind) override
+    void SpellHit(Unit *Hitter, SpellEntry const* Spellkind) override
     {
         if (Spellkind->Id == 8593 && !spellHit)
         {
@@ -131,7 +131,7 @@ void npc_angusAI::MovementInform(uint32 uiType, uint32 uiPointId)
     m_creature->GetMotionMaster()->MovePoint(nPoint, AngusMove[nPoint][0], AngusMove[nPoint][1], AngusMove[nPoint][2], MOVE_PATHFINDING, 0, orient);
 }
 
-void npc_angusAI::UpdateAI(const uint32 uiDiff)
+void npc_angusAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_bSubEventProcessed)
     {
@@ -236,7 +236,7 @@ void npc_rifleman_middlecampAI::MovementInform(uint32 uiType, uint32 uiPointId)
     m_creature->GetMotionMaster()->MovePoint(nPoint, MiddlecampMove[nPoint][0], MiddlecampMove[nPoint][1], MiddlecampMove[nPoint][2], MOVE_PATHFINDING, 0, orient);
 }
 
-void npc_rifleman_middlecampAI::UpdateAI(const uint32 uiDiff)
+void npc_rifleman_middlecampAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_bSubEventProcessed)
     {
@@ -524,7 +524,7 @@ void npc_rifleman_wheelerAI::MovementInform(uint32 uiType, uint32 uiPointId)
     m_creature->GetMotionMaster()->MovePoint(nPoint, WheelerMove[nPoint][0], WheelerMove[nPoint][1], WheelerMove[nPoint][2], MOVE_PATHFINDING, 0, orient);
 }
 
-void npc_rifleman_wheelerAI::UpdateAI(const uint32 uiDiff)
+void npc_rifleman_wheelerAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_bSubEventProcessed)
     {
@@ -737,7 +737,7 @@ void npc_shortyAI::MovementInform(uint32 uiType, uint32 uiPointId)
     m_creature->GetMotionMaster()->MovePoint(nPoint, ShortyMove[nPoint][0], ShortyMove[nPoint][1], ShortyMove[nPoint][2], MOVE_PATHFINDING, 3.0f, orient);
 }
 
-void npc_shortyAI::UpdateAI(const uint32 uiDiff)
+void npc_shortyAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_bSubEventProcessed)
     {
@@ -1149,7 +1149,7 @@ void npc_spotter_klemmyAI::MovementInform(uint32 uiType, uint32 uiPointId)
     m_creature->GetMotionMaster()->MovePoint(nPoint, KlemmyMove[nPoint][0], KlemmyMove[nPoint][1], KlemmyMove[nPoint][2], MOVE_PATHFINDING, 0, orient);
 }
 
-void npc_spotter_klemmyAI::UpdateAI(const uint32 uiDiff)
+void npc_spotter_klemmyAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_bSubEventProcessed)
     {
@@ -1373,7 +1373,7 @@ void npc_mortar_team_watcherAI::PokeAll(bool start)
     }
 }
 
-void npc_mortar_team_watcherAI::UpdateAI(const uint32 uiDiff)
+void npc_mortar_team_watcherAI::UpdateAI(uint32 const uiDiff)
 {
     if (!m_bEventStartSent)
     {
@@ -1434,7 +1434,7 @@ void npc_mortar_team_target_dummyAI::Reset()
 
 }
 
-void npc_mortar_team_target_dummyAI::SpellHit(Unit*, const SpellEntry* pSpell)
+void npc_mortar_team_target_dummyAI::SpellHit(Unit*, SpellEntry const* pSpell)
 {
     if (pSpell->Id == SPELL_MORTAR_SHOT)
     {
@@ -1442,7 +1442,7 @@ void npc_mortar_team_target_dummyAI::SpellHit(Unit*, const SpellEntry* pSpell)
     }
 }
 
-void npc_mortar_team_target_dummyAI::UpdateAI(const uint32 uiDiff)
+void npc_mortar_team_target_dummyAI::UpdateAI(uint32 const uiDiff)
 {
 
 }
@@ -1454,7 +1454,7 @@ CreatureAI* GetAI_npc_mortar_team_target_dummy(Creature* pCreature)
 
 void AddSC_dun_morogh()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_narm_faulk";

@@ -19,7 +19,7 @@
 #ifndef _IVMAPMANAGER_H
 #define _IVMAPMANAGER_H
 
-#include<string>
+#include <string>
 #include <Platform/Define.h>
 
 //===========================================================
@@ -55,9 +55,9 @@ namespace VMAP
 
             virtual ~IVMapManager(void) {}
 
-            virtual VMAPLoadResult loadMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
+            virtual VMAPLoadResult loadMap(char const* pBasePath, unsigned int pMapId, int x, int y) = 0;
 
-            virtual bool existsMap(const char* pBasePath, unsigned int pMapId, int x, int y) = 0;
+            virtual bool existsMap(char const* pBasePath, unsigned int pMapId, int x, int y) = 0;
 
             virtual void unloadMap(unsigned int pMapId, int x, int y) = 0;
             virtual void unloadMap(unsigned int pMapId) = 0;
@@ -102,7 +102,7 @@ namespace VMAP
             \param z gets adjusted to the ground height for which this are info is valid
             */
             virtual bool getAreaInfo(unsigned int pMapId, float x, float y, float& z, uint32& flags, int32& adtId, int32& rootId, int32& groupId) const = 0;
-            virtual bool isUnderModel(unsigned int pMapId, float x, float y, float z, float* outDist = NULL, float* inDist = NULL) const = 0;
+            virtual bool isUnderModel(unsigned int pMapId, float x, float y, float z, float* outDist = nullptr, float* inDist = nullptr) const = 0;
             virtual bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 ReqLiquidType, float& level, float& floor, uint32& type) const = 0;
     };
 }

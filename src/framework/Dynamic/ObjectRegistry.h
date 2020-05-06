@@ -33,7 +33,7 @@
 /** ObjectRegistry holds all registry item of the same type
  */
 template<class T, class Key = std::string>
-class MANGOS_DLL_DECL ObjectRegistry
+class ObjectRegistry
 {
     public:
         typedef std::map<Key, T *> RegistryMapType;

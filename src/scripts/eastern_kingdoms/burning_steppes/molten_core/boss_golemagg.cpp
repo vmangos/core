@@ -57,47 +57,47 @@ struct boss_golemaggAI : public ScriptedAI
     uint32 TickTimer;
     bool m_bEnraged;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPyroblastTimer = 7 * IN_MILLISECONDS;            // These timers are probably wrong
         m_uiEarthquakeTimer = 3 * IN_MILLISECONDS;
         TickTimer = 10000;
         m_bEnraged = false;
 
-        if (m_pInstance && m_creature->isAlive())
+        if (m_pInstance && m_creature->IsAlive())
             m_pInstance->SetData(TYPE_GOLEMAGG, NOT_STARTED);
 
 
         std::list<Creature*> ChiensListe;
         GetCreatureListWithEntryInGrid(ChiensListe, m_creature, 11672, 150.0f);
-        if (ChiensListe.empty() == false)
+        if (!ChiensListe.empty())
         {
-            for (std::list<Creature*>::iterator itr = ChiensListe.begin(); itr != ChiensListe.end(); ++itr)
+            for (const auto& itr : ChiensListe)
             {
-                if ((*itr)->getDeathState() == ALIVE)
-                    (*itr)->DealDamage((*itr), (*itr)->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-                (*itr)->Respawn();
+                if (itr->GetDeathState() == ALIVE)
+                    itr->DealDamage(itr, itr->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+                itr->Respawn();
             }
         }
         //    available in creature_addon
         //    m_creature->CastSpell(m_creature, SPELL_MAGMASPLASH, true);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GOLEMAGG, IN_PROGRESS);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GOLEMAGG, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Pyroblast
@@ -131,7 +131,7 @@ struct boss_golemaggAI : public ScriptedAI
         {
             if (m_uiEarthquakeTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_EARTHQUAKE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_EARTHQUAKE) == CAST_OK)
                     m_uiEarthquakeTimer = 3 * IN_MILLISECONDS;
             }
             else
@@ -155,19 +155,19 @@ struct mob_core_ragerAI : public ScriptedAI
     uint32 m_uiMangleTimer;
     uint32 TickTimer;
 
-    void Reset()
+    void Reset() override
     {
         TickTimer = 1000;
         m_uiMangleTimer = 7 * IN_MILLISECONDS;               // These times are probably wrong
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32& uiDamage)
+    void DamageTaken(Unit* pDoneBy, uint32& uiDamage) override
     {
         if (m_pInstance)
         {
             if (Creature* pGolemagg = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_GOLEMAGG)))
             {
-                if (pGolemagg->isAlive())
+                if (pGolemagg->IsAlive())
                 {
                     if (m_creature->GetHealthPercent() < 50.0f)
                     {
@@ -181,15 +181,15 @@ struct mob_core_ragerAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Mangle
         if (m_uiMangleTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MANGLE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MANGLE) == CAST_OK)
                 m_uiMangleTimer = 10 * IN_MILLISECONDS;
         }
         else

@@ -49,7 +49,7 @@ struct boss_rend_blackhandAI : public ScriptedAI
     uint32 m_uiCloseCombatCount;
     uint32 m_uiWhirlWindTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_uiMortalStrikeTimer       = 1000;
         m_uiCleaveTimer             = 4000;
@@ -59,20 +59,20 @@ struct boss_rend_blackhandAI : public ScriptedAI
         m_uiWhirlWindTimer          = 0;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // WhirlWind Check
         if (m_uiCloseCombatCheckTimer < uiDiff)
         {
             m_uiCloseCombatCount = 0;
-            ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-            for (ThreatList::const_iterator i = tList.begin(); i != tList.end(); ++i)
+            ThreatList const& tList = m_creature->GetThreatManager().getThreatList();
+            for (const auto i : tList)
             {
-                Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+                Unit* pUnit = m_creature->GetMap()->GetUnit(i->getUnitGuid());
                 if (pUnit && (pUnit->GetTypeId() == TYPEID_PLAYER) && (pUnit->GetDistance2d(m_creature) < 7.0f))
                     m_uiCloseCombatCount++;
             }
@@ -96,7 +96,7 @@ struct boss_rend_blackhandAI : public ScriptedAI
             // Mortal Strike
             if (m_uiMortalStrikeTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTALSTRIKE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALSTRIKE) == CAST_OK)
                     m_uiMortalStrikeTimer = urand(6000, 10000);
             }
             else
@@ -105,7 +105,7 @@ struct boss_rend_blackhandAI : public ScriptedAI
             // Cleave
             if (m_uiCleaveTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                     m_uiCleaveTimer = urand(4000, 6000);
             }
             else

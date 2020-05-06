@@ -37,8 +37,8 @@ enum ObjectUpdateType
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     UPDATETYPE_CREATE_OBJECT2       = 3,
 #endif
-    UPDATETYPE_OUT_OF_RANGE_OBJECTS = 4,
-    UPDATETYPE_NEAR_OBJECTS         = 5
+    UPDATETYPE_OUT_OF_RANGE_OBJECTS,
+    UPDATETYPE_NEAR_OBJECTS
 };
 
 // checked for 1.12.1
@@ -47,11 +47,13 @@ enum ObjectUpdateFlags
     UPDATEFLAG_NONE         = 0x0000,
     UPDATEFLAG_SELF         = 0x0001,
     UPDATEFLAG_TRANSPORT    = 0x0002,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     UPDATEFLAG_FULLGUID     = 0x0004,
     UPDATEFLAG_HIGHGUID     = 0x0008,
     UPDATEFLAG_ALL          = 0x0010,
     UPDATEFLAG_LIVING       = 0x0020,
     UPDATEFLAG_HAS_POSITION = 0x0040
+#endif
 };
 
 class UpdatePacket
@@ -65,7 +67,7 @@ class UpdatePacket
 class PacketCompressor
 {
     public:
-        static void Compress(void* dst, uint32 *dst_size, void* src, int src_size);
+        static void Compress(void* dst, uint32* dst_size, void* src, int src_size);
 };
 
 class UpdateData
@@ -75,12 +77,12 @@ class UpdateData
         ~UpdateData();
 
         void AddOutOfRangeGUID(ObjectGuidSet& guids);
-        void AddOutOfRangeGUID(ObjectGuid const &guid);
-        void AddUpdateBlock(const ByteBuffer &block);
+        void AddOutOfRangeGUID(ObjectGuid const& guid);
+        void AddUpdateBlock(ByteBuffer const& block);
         void Send(WorldSession* session, bool hasTransport = false);
-        bool BuildPacket(WorldPacket *packet, bool hasTransport = false);
-        bool BuildPacket(WorldPacket *packet, UpdatePacket const* updPacket, bool hasTransport = false);
-        bool HasData() { return m_datas.size() || !m_outOfRangeGUIDs.empty(); }
+        bool BuildPacket(WorldPacket* packet, bool hasTransport = false);
+        bool BuildPacket(WorldPacket* packet, UpdatePacket const* updPacket, bool hasTransport = false);
+        bool HasData() { return !m_datas.empty() || !m_outOfRangeGUIDs.empty(); }
         void Clear();
 
         ObjectGuidSet const& GetOutOfRangeGUIDs() const { return m_outOfRangeGUIDs; }
@@ -93,7 +95,7 @@ class UpdateData
 class MovementData
 {
     public:
-        MovementData(WorldObject* owner = NULL) : _buffer(100), _owner(owner) {}
+        MovementData(WorldObject* owner = nullptr) : _buffer(100), _owner(owner) {}
         ~MovementData() {}
         void AddPacket(WorldPacket& data);
         void SetUnitSpeed(uint32 opcode, ObjectGuid const& unit, float value);

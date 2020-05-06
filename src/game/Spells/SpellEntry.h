@@ -25,246 +25,13 @@
 #include <array>
 #include "DBCStructure.h"
 #include "SharedDefines.h"
+#include "SpellDefines.h"
 #include "SpellAuraDefines.h"
 
 class Spell;
 class Unit;
 class WorldObject;
 class SpellEntry;
-
-// Custom flags assigned in the db
-enum SpellAttributeCustom
-{
-    SPELL_CUSTOM_NONE                       = 0x000,
-    SPELL_CUSTOM_ALLOW_STACK_BETWEEN_CASTER = 0x001,     // For example 'Siphon Soul' must be able to stack between the warlocks on a mob
-    SPELL_CUSTOM_NEGATIVE                   = 0x002,
-    SPELL_CUSTOM_POSITIVE                   = 0x004,
-    SPELL_CUSTOM_CHAN_NO_DIST_LIMIT         = 0x008,
-    SPELL_CUSTOM_FIXED_DAMAGE               = 0x010,     // Not affected by damage/healing done bonus
-    SPELL_CUSTOM_IGNORE_ARMOR               = 0x020,
-    SPELL_CUSTOM_BEHIND_TARGET              = 0x040,     // For spells that require the caster to be behind the target
-    SPELL_CUSTOM_FACE_TARGET                = 0x080,     // For spells that require the target to be in front of the caster
-    SPELL_CUSTOM_SINGLE_TARGET_AURA         = 0x100,     // Aura applied by spell can only be on 1 target at a time
-    SPELL_CUSTOM_AURA_APPLY_BREAKS_STEALTH  = 0x200,     // Stealth is removed when this aura is applied
-};
-
-// Custom flags assigned by the core based on spell template data
-enum SpellAttributeInternal
-{
-    SPELL_INTERNAL_APPLIES_AURA             = 0x001,
-    SPELL_INTERNAL_APPLIES_PERIODIC_AURA    = 0x002,
-    SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS = 0x004,
-    SPELL_INTERNAL_POSITIVE                 = 0x008,
-    SPELL_INTERNAL_HEAL                     = 0x010,
-    SPELL_INTERNAL_DIRECT_DAMAGE            = 0x020,
-    SPELL_INTERNAL_CASTER_SOURCE_TARGETS    = 0x040,
-    SPELL_INTERNAL_AOE                      = 0x080,
-    SPELL_INTERNAL_AOE_AURA                 = 0x100,
-    SPELL_INTERNAL_DISMOUNT                 = 0x200,
-    SPELL_INTERNAL_CHARM                    = 0x400,
-    SPELL_INTERNAL_REFLECTABLE              = 0x800,
-};
-
-// original names, do not edit
-enum SpellCategories
-{
-    SPELLCATEGORY_DEFAULT = 1,
-    SPELLCATEGORY_DIRECT_DAMAGE_SPELL = 2,
-    SPELLCATEGORY_ITEM_COMBAT_CONSUMABLE_POTION = 4,
-    SPELLCATEGORY_ITEM_FOOD = 11,
-    SPELLCATEGORY_HEALING_SPELL = 12,
-    SPELLCATEGORY_QUICK_BUFF_RESIST_SPELL = 17,
-    SPELLCATEGORY_DAMAGE_OVER_TIME_SPELL = 18,
-    SPELLCATEGORY_QUICK_DAMAGE_SPELL = 19,
-    SPELLCATEGORY_INVULNERABILITY_OTHER = 20,
-    SPELLCATEGORY_QUICK_BUFF_SPELL = 21,
-    SPELLCATEGORY_QUICK_DEBUFF_SPELL = 22,
-    SPELLCATEGORY_SUMMONING = 23,
-    SPELLCATEGORY_ITEM_COMBAT_CONSUMABLE_AGGRESSIVE = 24,
-    SPELLCATEGORY_QUICK_HEAL_SPELL = 25,
-    SPELLCATEGORY_RESURRECTION_FULL = 26,
-    SPELLCATEGORY_ITEM_SCROLL = 27,
-    SPELLCATEGORY_ITEM_QUICK_BUFF = 28,
-    SPELLCATEGORY_ITEM_DEBUFF = 29,
-    SPELLCATEGORY_ITEM_HEALING = 30,
-    SPELLCATEGORY_CONJURE_SHORT = 31,
-    SPELLCATEGORY_STUN = 32,
-    SPELLCATEGORY_MEZ = 33,
-    SPELLCATEGORY_ROOT = 34,
-    SPELLCATEGORY_DIRECT_DAMAGE_AE_SPELL = 35,
-    SPELLCATEGORY_DEBUFF_SPELL = 36,
-    SPELLCATEGORY_INVULNERABILITY = 37,
-    SPELLCATEGORY_AURA = 38,
-    SPELLCATEGORY_SHAPESHIFT = 39,
-    SPELLCATEGORY_MELEE_GENERIC = 40,
-    SPELLCATEGORY_CRITICAL = 41,
-    SPELLCATEGORY_SNARE = 42,
-    SPELLCATEGORY_SHOUT = 43,
-    SPELLCATEGORY_SPEED = 44,
-    SPELLCATEGORY_TOTEM_STONECLAW = 45,
-    SPELLCATEGORY_HEALING_GROUP_SPELL = 46,
-    SPELLCATEGORY_COMBAT_STATES = 47,
-    SPELLCATEGORY_DIRECT_DAMAGE_AE_ABILITY = 49,
-    SPELLCATEGORY_DIRECT_DAMAGE_AECONE_ABILITY = 50,
-    SPELLCATEGORY_QUICK_DEBUFF_DPS_SPELL = 51,
-    SPELLCATEGORY_QUICK_DEBUFF_DR_SPELL = 52,
-    SPELLCATEGORY_QUICK_BUFF_DR_SPELL = 54,
-    SPELLCATEGORY_QUICK_BUFF_DPS_SPELL = 55,
-    SPELLCATEGORY_INSTANT_HEAL_SPELL = 56,
-    SPELLCATEGORY_QUICK_HEAL_GROUP_SPELL = 57,
-    SPELLCATEGORY_INSTANT_HEAL_GROUP_SPELL = 58,
-    SPELLCATEGORY_ITEM_DRINK = 59,
-    SPELLCATEGORY_INVULNERABILITY_TEMP = 60,
-    SPELLCATEGORY_ENERGIZE_GROUP_SPELL = 61,
-    SPELLCATEGORY_ENERGIZE_SPELL = 62,
-    SPELLCATEGORY_BIG_DIRECT_DAMAGE_SPELL = 63,
-    SPELLCATEGORY_MINIMAP_SPECIAL = 64,
-    SPELLCATEGORY_MELEE_SPECIAL = 65,
-    SPELLCATEGORY_DODGE_MANEUVER = 66,
-    SPELLCATEGORY_BLOCK_MANEUVER = 67,
-    SPELLCATEGORY_PARRY_MANEUVER = 68,
-    SPELLCATEGORY_DIRECT_DAMAGE_AEPERSISTENT_SPELL = 72,
-    SPELLCATEGORY_MARTIAL_ARTS_GENERIC = 73,
-    SPELLCATEGORY_MARTIAL_ARTS_SPECIAL = 74,
-    SPELLCATEGORY_DETECT = 75,
-    SPELLCATEGORY_SHOOT_THROW = 76,
-    SPELLCATEGORY_TRADE_HERBALISM = 77,
-    SPELLCATEGORY_TRADE_MINING = 78,
-    SPELLCATEGORY_ITEM_POTION_NONCOMBAT = 79,
-    SPELLCATEGORY_TAUNT_DETAUNT = 82,
-    SPELLCATEGORY_TAMING = 83,
-    SPELLCATEGORY_TAUNT_AE = 84,
-    SPELLCATEGORY_DIRECT_DAMAGE_AECHAIN_ABILITY = 85,
-    SPELLCATEGORY_PET = 86,
-    SPELLCATEGORY_CONJURE_LONG = 87,
-    SPELLCATEGORY_SILENCE = 88,
-    SPELLCATEGORY_PORTAL = 89,
-    SPELLCATEGORY_CHARM = 93,
-    SPELLCATEGORY_ITEM_SUMMONING = 94,
-    SPELLCATEGORY_RACIAL_ABILITY = 95,
-    SPELLCATEGORY_RACIAL_ABILITY_2 = 96,
-    SPELLCATEGORY_SECONDARY_SURVIVAL = 97,
-    SPELLCATEGORY_BIG_DIRECT_DAMAGE_SPELL_2 = 98,
-    SPELLCATEGORY_INSTANT_SPELL = 99,
-    SPELLCATEGORY_ITEM_MANA_GEM = 100,
-    SPELLCATEGORY_FELHUNTER = 101,
-    SPELLCATEGORY_ITEM_LONG_BUFF = 102,
-    SPELLCATEGORY_ITEM_EPIC = 103,
-    SPELLCATEGORY_TOTEM_HEALING = 104,
-    SPELLCATEGORY_TOTEM_SERPENT = 105,
-    SPELLCATEGORY_TOTEM_SLOWING = 106,
-    SPELLCATEGORY_TOTEM_MANA = 107,
-    SPELLCATEGORY_TOTEM_INVISIBILITY = 108,
-    SPELLCATEGORY_MELEE_DISARM = 109,
-    SPELLCATEGORY_DISCIPLINE = 132,
-    SPELLCATEGORY_GLOBAL = 133,
-    SPELLCATEGORY_ITEM_BANDAGE = 150,
-    SPELLCATEGORY_FINISHING_MOVE_WEAPONSCALED = 170,
-    SPELLCATEGORY_BANISH = 190,
-    SPELLCATEGORY_TOTEM_GROUNDING = 230,
-    SPELLCATEGORY_BLAST_WAVE = 250,
-    SPELLCATEGORY_KIDNEY_SHOT = 270,
-    SPELLCATEGORY_PYROBLAST_REUSE = 290,
-    SPELLCATEGORY_TRANSMUTE_ALCHEMY = 310,
-    SPELLCATEGORY_MOUNT = 330,
-    SPELLCATEGORY_INNER_RAGE = 350,
-    SPELLCATEGORY_RANGED_WEAPON = 351,
-    SPELLCATEGORY_LIGHTNING_SHIELD = 371,
-    SPELLCATEGORY_QUEST_FELCURSE = 391,
-    SPELLCATEGORY_TRAP = 411,
-    SPELLCATEGORY_HOLY_NOVA = 431,
-    SPELLCATEGORY_HOLY_FIRE = 451,
-    SPELLCATEGORY_ICE_BARRIER = 471,
-    SPELLCATEGORY_ASTRAL_RECALL = 511,
-    SPELLCATEGORY_NATURES_GRASP = 531, 
-    SPELLCATEGORY_AURA_OF_THE_PIOUS = 551,
-    SPELLCATEGORY_HURRICANE = 571,
-    SPELLCATEGORY_TOTEM_MANA_TIDE = 591,
-    SPELLCATEGORY_WINGS_OF_HOPE = 611,
-    SPELLCATEGORY_SOUL_FIRE = 631,
-    SPELLCATEGORY_DEATH_COIL = 633,
-    SPELLCATEGORY_HOWL_OF_TERROR = 634,
-    SPELLCATEGORY_SHADOWBURN = 651,
-    SPELLCATEGORY_DESPERATE_PRAYER = 671,
-    SPELLCATEGORY_CONFLAGRATE = 672,
-    SPELLCATEGORY_DEVOURING_PLAGUE = 691,
-    SPELLCATEGORY_SUMMON_INFERNAL = 731,
-    SPELLCATEGORY_TREE_FORM = 751,
-    SPELLCATEGORY_ITEM_SALT_SHAKER = 791,
-    SPELLCATEGORY_DIVINE_INTERVENTION = 811,
-    SPELLCATEGORY_SOULSTONE = 831,
-    SPELLCATEGORY_RESTORATION = 851,
-    SPELLCATEGORY_SHADOWMELD = 871,
-    SPELLCATEGORY_INTERCEPT = 872,
-    SPELLCATEGORY_WHIRLWIND = 891,
-    SPELLCATEGORY_HOLY_SHOCK = 892,
-    SPELLCATEGORY_DISTRACTING_SHOT = 911,
-    SPELLCATEGORY_HOLY_SHIELD = 931,
-    SPELLCATEGORY_CONSECRATION = 932,
-    SPELLCATEGORY_PVP_BATTLEFIELD_ITEM_LONG_30_MINS = 951,
-    SPELLCATEGORY_MORTAL_STRIKE = 971,
-    SPELLCATEGORY_ITEM_SNOWMASTER = 991,
-    SPELLCATEGORY_FRENZIED_HEALING = 1011,
-    SPELLCATEGORY_ITEM_HALF_HOUR = 1031,
-    SPELLCATEGORY_ITEM_JUMPER_CABLES = 1051,
-    SPELLCATEGORY_ITEM_HATCH_JUBLING = 1071,
-    SPELLCATEGORY_BATTLEGROUNDS_RECALL = 1091,
-    SPELLCATEGORY_WYVERN_STING = 1111,
-    SPELLCATEGORY_HAMMER_OF_VENGEANCE = 1131,
-    SPELLCATEGORY_INTIMIDATION = 1132,
-    SPELLCATEGORY_FAERIE_FIRE_FERAL = 1133,
-    SPELLCATEGORY_RIPOSTE = 1134,
-    SPELLCATEGORY_COUNTERATTACK = 1135,
-    SPELLCATEGORY_HOLIDAY_FIREWORK_ROCKETS = 1136,
-    SPELLCATEGORY_HOLIDAY_FIRECRACKER = 1137,
-    SPELLCATEGORY_RC_WEAPONS = 1138,
-    SPELLCATEGORY_ITEM_QUEST_10_MINUTES = 1139,
-    SPELLCATEGORY_ITEM_QUEST_1_MIN = 1140,
-    SPELLCATEGORY_ITEM_BURST_TRINKET = 1141,
-    SPELLCATEGORY_HOLIDAY_VALENTINE_PERFUME_COLOGNE = 1142,
-    SPELLCATEGORY_ITEM_TARGET_DUMMY = 1143,
-    SPELLCATEGORY_PRIEST_RACIAL = 1144,
-    SPELLCATEGORY_LIGHTWELL = 1145,
-    SPELLCATEGORY_QUEST_1_HOUR = 1149,
-    SPELLCATEGORY_SHADOWTHUNDERSTRIKE = 1150,
-    SPELLCATEGORY_TALENT_DPS = 1151,
-    SPELLCATEGORY_CREATURE_SPECIAL = 1152,
-    SPELLCATEGORY_ITEM_COMBAT_CONSUMABLE_NONAGGRESSIVE = 1153,
-    SPELLCATEGORY_ARATHI_BASIN_TRINKET = 1155,
-    SPELLCATEGORY_CREATURE_SPECIAL_2 = 1159,
-    SPELLCATEGORY_ITEM_PRIEST_EPIC_STAFF = 1160,
-    SPELLCATEGORY_REINCARNATION = 1161
-};
-
-// Spell clasification
-enum SpellSpecific
-{
-    SPELL_NORMAL            = 0,
-    SPELL_SEAL              = 1,
-    SPELL_BLESSING          = 2,
-    SPELL_AURA              = 3,
-    SPELL_STING             = 4,
-    SPELL_CURSE             = 5,
-    SPELL_ASPECT            = 6,
-    SPELL_TRACKER           = 7,
-    SPELL_WARLOCK_ARMOR     = 8,
-    SPELL_MAGE_ARMOR        = 9,
-    SPELL_ELEMENTAL_SHIELD  = 10,
-    SPELL_MAGE_POLYMORPH    = 11,
-    SPELL_POSITIVE_SHOUT    = 12,
-    SPELL_JUDGEMENT         = 13,
-    SPELL_BATTLE_ELIXIR     = 14,
-    SPELL_GUARDIAN_ELIXIR   = 15,
-    SPELL_FLASK_ELIXIR      = 16,
-    //SPELL_PRESENCE          = 17,                         // used in 3.x
-    //SPELL_HAND              = 18,                         // used in 3.x
-    SPELL_WELL_FED          = 19,
-    SPELL_FOOD              = 20,
-    SPELL_DRINK             = 21,
-    SPELL_FOOD_AND_DRINK    = 22,
-    SPELL_NEGATIVE_HASTE    = 23,
-    SPELL_SNARE             = 24,
-};
 
 namespace Spells
 {
@@ -320,9 +87,9 @@ namespace Spells
     }
 
     // Different spell properties
-    inline float GetSpellRadius(SpellRadiusEntry const *radius) { return (radius ? radius->Radius : 0); }
-    inline float GetSpellMinRange(SpellRangeEntry const *range) { return (range ? range->minRange : 0); }
-    inline float GetSpellMaxRange(SpellRangeEntry const *range) { return (range ? range->maxRange : 0); }
+    inline float GetSpellRadius(SpellRadiusEntry const* radius) { return (radius ? radius->Radius : 0); }
+    inline float GetSpellMinRange(SpellRangeEntry const* range) { return (range ? range->minRange : 0); }
+    inline float GetSpellMaxRange(SpellRangeEntry const* range) { return (range ? range->maxRange : 0); }
     int32 CompareAuraRanks(uint32 spellId_1, uint32 spellId_2);
     bool CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry const* spellInfo_2);
 
@@ -410,16 +177,16 @@ namespace Spells
         switch (targetA)
         {
             // non-positive targets
-            case TARGET_CHAIN_DAMAGE:
-            case TARGET_ALL_ENEMY_IN_AREA:
-            case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
-            case TARGET_IN_FRONT_OF_CASTER:
-            case TARGET_ALL_ENEMY_IN_AREA_CHANNELED:
-            case TARGET_CURRENT_ENEMY_COORDINATES:
+            case TARGET_UNIT_ENEMY:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_IN_CONE_24:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DYNOBJ_LOC:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION:
                 return false;
             // positive or dependent
-            case TARGET_CASTER_COORDINATES:
-                return (targetB == TARGET_ALL_PARTY || targetB == TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER || targetB == TARGET_AREAEFFECT_INSTANT);
+            case TARGET_LOCATION_CASTER_SRC:
+                return (targetB == TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC || targetB == TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC || targetB == TARGET_ENUM_UNITS_SCRIPT_AOE_AT_SRC_LOC);
             default:
                 break;
         }
@@ -433,11 +200,11 @@ namespace Spells
         // positive targets that in target selection code expect target in m_targers, so not that auto-select target by spell data by m_caster and etc
         switch (targetA)
         {
-            case TARGET_SINGLE_FRIEND:
-            case TARGET_SINGLE_PARTY:
-            case TARGET_CHAIN_HEAL:
-            case TARGET_SINGLE_FRIEND_2:
-            case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            case TARGET_UNIT_FRIEND:
+            case TARGET_UNIT_PARTY:
+            case TARGET_UNIT_FRIEND_CHAIN_HEAL:
+            case TARGET_UNIT_RAID:
+            case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
             default:
                 break;
@@ -450,8 +217,8 @@ namespace Spells
         // non-positive targets that in target selection code expect target in m_targers, so not that auto-select target by spell data by m_caster and etc
         switch (targetA)
         {
-            case TARGET_CHAIN_DAMAGE:
-            case TARGET_CURRENT_ENEMY_COORDINATES:
+            case TARGET_UNIT_ENEMY:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION:
                 return true;
             default:
                 break;
@@ -464,38 +231,38 @@ namespace Spells
     {
         switch (target)
         {
-            case TARGET_CHAIN_DAMAGE:
-            case TARGET_SINGLE_FRIEND:
-            case TARGET_UNIT_TARGET_ANY:
-            case TARGET_CHAIN_HEAL:
-            case TARGET_CURRENT_ENEMY_COORDINATES :
-            case TARGET_SINGLE_FRIEND_2:
-            //case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            case TARGET_UNIT_ENEMY:
+            case TARGET_UNIT_FRIEND:
+            case TARGET_UNIT:
+            case TARGET_UNIT_FRIEND_CHAIN_HEAL:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION :
+            case TARGET_UNIT_RAID:
+            //case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
         }
         return false;
     }
 
-    bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellInfo2);
+    bool IsSingleTargetSpells(SpellEntry const* spellInfo1, SpellEntry const* spellInfo2);
 
     inline bool IsCasterSourceTarget(uint32 target)
     {
-        switch (target )
+        switch (target)
         {
-            case TARGET_SELF:
-            case TARGET_PET:
-            case TARGET_ALL_PARTY_AROUND_CASTER:
-            case TARGET_IN_FRONT_OF_CASTER:
-            case TARGET_MASTER:
-            case TARGET_MINION:
-            case TARGET_ALL_PARTY:
-            case TARGET_ALL_PARTY_AROUND_CASTER_2:
-            case TARGET_SELF_FISHING:
-            case TARGET_TOTEM_EARTH:
-            case TARGET_TOTEM_WATER:
-            case TARGET_TOTEM_AIR:
-            case TARGET_TOTEM_FIRE:
-            case TARGET_AREAEFFECT_GO_AROUND_DEST:
+            case TARGET_UNIT_CASTER:
+            case TARGET_UNIT_CASTER_PET:
+            case TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE:
+            case TARGET_ENUM_UNITS_ENEMY_IN_CONE_24:
+            case TARGET_UNIT_CASTER_MASTER:
+            case TARGET_LOCATION_UNIT_MINION_POSITION:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_LOCATION_CASTER_FISHING_SPOT:
+            case TARGET_LOCATION_CASTER_FRONT_RIGHT:
+            case TARGET_LOCATION_CASTER_BACK_RIGHT:
+            case TARGET_LOCATION_CASTER_BACK_LEFT:
+            case TARGET_LOCATION_CASTER_FRONT_LEFT:
+            case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_DEST_LOC:
                 return true;
             default:
                 break;
@@ -505,14 +272,14 @@ namespace Spells
 
     inline bool IsPointEffectTarget(SpellTarget target)
     {
-        switch (target )
+        switch (target)
         {
-            case TARGET_INNKEEPER_COORDINATES:
-            case TARGET_TABLE_X_Y_Z_COORDINATES:
-            case TARGET_CASTER_COORDINATES:
-            case TARGET_SCRIPT_COORDINATES:
-            case TARGET_CURRENT_ENEMY_COORDINATES:
-            case TARGET_DUELVSPLAYER_COORDINATES:
+            case TARGET_LOCATION_CASTER_HOME_BIND:
+            case TARGET_LOCATION_DATABASE:
+            case TARGET_LOCATION_CASTER_SRC:
+            case TARGET_LOCATION_SCRIPT_NEAR_CASTER:
+            case TARGET_LOCATION_CASTER_TARGET_POSITION:
+            case TARGET_LOCATION_UNIT_POSITION:
                 return true;
             default:
                 break;
@@ -522,16 +289,16 @@ namespace Spells
 
     inline bool IsAreaEffectPossitiveTarget(SpellTarget target)
     {
-        switch (target )
+        switch (target)
         {
-            case TARGET_ALL_PARTY_AROUND_CASTER:
-            case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
-            case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
-            case TARGET_ALL_PARTY:
-            case TARGET_ALL_PARTY_AROUND_CASTER_2:
-            case TARGET_AREAEFFECT_PARTY:
-            case TARGET_ALL_RAID_AROUND_CASTER:
-            case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            case TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_ENUM_UNITS_RAID_WITHIN_CASTER_RANGE:
+            case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
             default:
                 break;
@@ -541,23 +308,23 @@ namespace Spells
 
     inline bool IsAreaEffectTarget(SpellTarget target)
     {
-        switch (target )
+        switch (target)
         {
-            case TARGET_AREAEFFECT_INSTANT:
-            case TARGET_AREAEFFECT_CUSTOM:
-            case TARGET_ALL_ENEMY_IN_AREA:
-            case TARGET_ALL_ENEMY_IN_AREA_INSTANT:
-            case TARGET_ALL_PARTY_AROUND_CASTER:
-            case TARGET_IN_FRONT_OF_CASTER:
-            case TARGET_ALL_ENEMY_IN_AREA_CHANNELED:
-            case TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER:
-            case TARGET_ALL_FRIENDLY_UNITS_IN_AREA:
-            case TARGET_ALL_PARTY:
-            case TARGET_ALL_PARTY_AROUND_CASTER_2:
-            case TARGET_AREAEFFECT_PARTY:
-            case TARGET_AREAEFFECT_GO_AROUND_DEST:
-            case TARGET_ALL_RAID_AROUND_CASTER:
-            case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_SCRIPT_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_WITHIN_CASTER_RANGE:
+            case TARGET_ENUM_UNITS_ENEMY_IN_CONE_24:
+            case TARGET_ENUM_UNITS_ENEMY_AOE_AT_DYNOBJ_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_FRIEND_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_SRC_LOC:
+            case TARGET_ENUM_UNITS_PARTY_AOE_AT_DEST_LOC:
+            case TARGET_UNIT_FRIEND_AND_PARTY:
+            case TARGET_ENUM_GAMEOBJECTS_SCRIPT_AOE_AT_DEST_LOC:
+            case TARGET_ENUM_UNITS_RAID_WITHIN_CASTER_RANGE:
+            case TARGET_UNIT_RAID_AND_CLASS:
                 return true;
             default:
                 break;
@@ -752,9 +519,9 @@ class SpellEntry
             uint32 mask = 0;
             if (Mechanic)
                 mask |= 1 << (Mechanic - 1);
-            for (int i=0; i< MAX_EFFECT_INDEX; ++i)
-                if (EffectMechanic[i])
-                    mask |= 1 << (EffectMechanic[i]-1);
+            for (uint32 i : EffectMechanic)
+                if (i)
+                    mask |= 1 << (i-1);
             return mask;
         }
 
@@ -766,8 +533,8 @@ class SpellEntry
 
         inline bool HasEffect(SpellEffects effect) const
         {
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-                if (SpellEffects(Effect[i]) == effect)
+            for (uint32 i : Effect)
+                if (SpellEffects(i) == effect)
                     return true;
             return false;
         }
@@ -827,8 +594,8 @@ class SpellEntry
 
         inline bool HasAura(AuraType aura) const
         {
-            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-                if (AuraType(EffectApplyAuraName[i]) == aura)
+            for (uint32 i : EffectApplyAuraName)
+                if (AuraType(i) == aura)
                     return true;
             return false;
         }
@@ -892,8 +659,19 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_POSITIVE;
         }
 
-        bool IsPositiveSpell(WorldObject* caster, Unit* victim) const;
-        bool IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster = nullptr, Unit* victim = nullptr) const;
+        bool IsPositiveSpell(WorldObject const* caster, WorldObject const* victim) const;
+        bool IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* caster = nullptr, WorldObject const* victim = nullptr) const;
+
+        // this is propably the correct check for most positivity / negativity decisions
+        inline bool IsPositiveEffectMask(uint8 effectMask, WorldObject const* caster = nullptr, WorldObject const* target = nullptr) const
+        {
+            // spells with at least one negative effect are considered negative
+            // some self-applied spells have negative effects but in self casting case negative check ignored.
+            for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+                if (Effect[i] && (effectMask & (1 << i)) && !IsPositiveEffect(SpellEffectIndex(i), caster, target))
+                    return false;
+            return true;
+        }
 
         inline bool IsHealSpell() const
         {
@@ -908,6 +686,11 @@ class SpellEntry
         inline bool HasSingleTargetAura() const
         {
             return Custom & SPELL_CUSTOM_SINGLE_TARGET_AURA;
+        }
+
+        inline bool IsAuraRemovedOnEvade() const
+        {
+            return !(Custom & SPELL_CUSTOM_NOT_REMOVED_ON_EVADE);
         }
 
         inline bool IsSpellWithCasterSourceTargetsOnly() const
@@ -940,12 +723,7 @@ class SpellEntry
             return Internal & SPELL_INTERNAL_REFLECTABLE;
         }
 
-        inline bool IsReflectableSpell(WorldObject* caster, Unit* victim) const
-        {
-            return DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !HasAttribute(SPELL_ATTR_IS_ABILITY)
-                && !HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
-                && !HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(caster, victim);
-        }
+        bool IsReflectableSpell(WorldObject const* caster, WorldObject const* victim) const;
 
         inline bool IsAutoRepeatRangedSpell() const
         {
@@ -979,9 +757,9 @@ class SpellEntry
 
         inline bool HasAuraWithSpellTriggerEffect() const
         {
-            for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            for (uint32 i : EffectApplyAuraName)
             {
-                switch (EffectApplyAuraName[i])
+                switch (i)
                 {
                     case SPELL_AURA_PROC_TRIGGER_SPELL:
                         return true;
@@ -997,8 +775,8 @@ class SpellEntry
 
             // passive spells with SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT are already active without shapeshift, do no recast!
             // Feline Swiftness Passive 2a not have 0x1 mask in Stance field in spell data as expected
-            return ((Stances & (1 << (form - 1)) || Id == 24864 && form == FORM_CAT) &&
-                !(AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
+            return ((Stances & (1 << (form - 1)) || (Id == 24864 && form == FORM_CAT)) &&
+                !HasAttribute(SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
         }
 
         // Spell effects require a specific power type on the target

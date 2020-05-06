@@ -25,7 +25,6 @@
 #include "Common.h"
 #include "ObjectGuid.h"
 #include "Creature.h"
-#include "Unit.h"
 
 enum PetType
 {
@@ -131,22 +130,24 @@ typedef std::vector<uint32> AutoSpellList;
 
 #define HAPPINESS_LEVEL_SIZE        333000
 
-extern const uint32 LevelUpLoyalty[6];
-extern const uint32 LevelStartLoyalty[6];
+extern uint32 const LevelUpLoyalty[6];
+extern uint32 const LevelStartLoyalty[6];
 
 #define ACTIVE_SPELLS_MAX           4
 
-#define PET_FOLLOW_DIST  1.0f
+#define PET_FOLLOW_DIST 2.0f
 #define PET_FOLLOW_ANGLE (M_PI_F/2.0f)
+#define MINI_PET_FOLLOW_ANGLE (M_PI_F)
+#define MINI_PET_SUMMON_ANGLE (M_PI_F/4.0f)
 
 class Player;
 struct CharacterPetCache;
 
-class MANGOS_DLL_SPEC Pet : public Creature
+class Pet : public Creature
 {
     public:
         explicit Pet(PetType type = MAX_PET_TYPE);
-        virtual ~Pet();
+        ~Pet() override;
 
         void AddToWorld() override;
         void RemoveFromWorld() override;
@@ -159,7 +160,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
 
         bool Create (uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* cinfo, uint32 pet_number);
         bool CreateBaseAtCreature(Creature* creature);
-        bool LoadPetFromDB( Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false );
+        bool LoadPetFromDB(Player* owner,uint32 petentry = 0,uint32 petnumber = 0, bool current = false);
         void SavePetToDB(PetSaveMode mode);
         void Unsummon(PetSaveMode mode, Unit* owner = nullptr);
         void DelayedUnsummon(uint32 timeMSToDespawn, PetSaveMode mode);
@@ -253,13 +254,13 @@ class MANGOS_DLL_SPEC Pet : public Creature
         uint32  m_resetTalentsCost;
         time_t  m_resetTalentsTime;
 
-        const uint64& GetAuraUpdateMask() const { return m_auraUpdateMask; }
+        uint64 const& GetAuraUpdateMask() const { return m_auraUpdateMask; }
         void SetAuraUpdateSlot(uint8 slot) { m_auraUpdateMask |= (uint64(1) << slot); }
         void SetAuraUpdateMask(uint64 mask) { m_auraUpdateMask = mask; }
         void ResetAuraUpdateMask() { m_auraUpdateMask = 0; }
 
         // overwrite Creature function for name localization back to WorldObject version without localization
-        const char* GetNameForLocaleIdx(int32 locale_idx) const override { return WorldObject::GetNameForLocaleIdx(locale_idx); }
+        char const* GetNameForLocaleIdx(int32 locale_idx) const override { return WorldObject::GetNameForLocaleIdx(locale_idx); }
 
         bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
     protected:

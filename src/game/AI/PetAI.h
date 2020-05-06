@@ -29,13 +29,24 @@
 class Creature;
 class Spell;
 
-class MANGOS_DLL_DECL PetAI : public CreatureAI
+enum ePetSelectTargetReason : uint8
+{
+    PSTR_FAIL_DEFAULT,
+    PSTR_FAIL_NOT_ENABLED,
+    PSTR_FAIL_PASSIVE,
+    PSTR_FAIL_NO_OWNER,
+    PSTR_FAIL_RETURNING,
+    PSTR_SUCCESS_OWNER_ATTACKER,
+    PSTR_SUCCESS_AGGRO_RANGE,
+};
+
+class PetAI : public CreatureAI
 {
     public:
 
-        explicit PetAI(Creature *c);
+        explicit PetAI(Creature* c);
 
-        void MoveInLineOfSight(Unit *) {}
+        void MoveInLineOfSight(Unit*) {}
         void EnterEvadeMode() {}
 
         void KilledUnit(Unit* /*victim*/);
@@ -45,8 +56,8 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
         void OwnerAttacked(Unit* target);
         void AttackedBy(Unit* attacker);
 
-        void UpdateAI(const uint32);
-        static int Permissible(const Creature *);
+        void UpdateAI(uint32 const);
+        static int Permissible(Creature const*);
 
     private:
         bool _needToStop() const;
@@ -54,12 +65,11 @@ class MANGOS_DLL_DECL PetAI : public CreatureAI
 
         void UpdateAllies();
 
-        bool inCombat;
         bool hasMelee;
         std::set<uint64> m_AllySet;
         uint32 m_updateAlliesTimer;
 
-        Unit* SelectNextTarget(bool allowAutoSelect) const;
+        std::pair<Unit*, ePetSelectTargetReason> SelectNextTarget(bool allowAutoSelect) const;
         void HandleReturnMovement();
         void DoAttack(Unit* target, bool chase);
         bool CanAttack(Unit* target);

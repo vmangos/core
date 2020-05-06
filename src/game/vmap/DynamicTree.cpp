@@ -25,7 +25,7 @@
 
 template<> struct HashTrait< GameObjectModel>
 {
-    static size_t hashCode(const GameObjectModel& g)
+    static size_t hashCode(GameObjectModel const& g)
     {
         return (size_t)(void*)&g;
     }
@@ -33,7 +33,7 @@ template<> struct HashTrait< GameObjectModel>
 
 template<> struct PositionTrait< GameObjectModel>
 {
-    static void getPosition(const GameObjectModel& g, Vector3& p)
+    static void getPosition(GameObjectModel const& g, Vector3& p)
     {
         p = g.getPosition();
     }
@@ -41,18 +41,18 @@ template<> struct PositionTrait< GameObjectModel>
 
 template<> struct BoundsTrait< GameObjectModel>
 {
-    static void getBounds(const GameObjectModel& g, G3D::AABox& out)
+    static void getBounds(GameObjectModel const& g, G3D::AABox& out)
     {
         out = g.getBounds();
     }
-    static void getBounds2(const GameObjectModel* g, G3D::AABox& out)
+    static void getBounds2(GameObjectModel const* g, G3D::AABox& out)
     {
         out = g->getBounds();
     }
 };
 
 /*
-static bool operator == (const GameObjectModel& mdl, const GameObjectModel& mdl2){
+static bool operator == (GameObjectModel const& mdl, GameObjectModel const& mdl2){
     return &mdl == &mdl2;
 }
 */
@@ -75,13 +75,13 @@ struct DynTreeImpl : public ParentTree/*, public Intersectable*/
     {
     }
 
-    void insert(const Model& mdl)
+    void insert(Model const& mdl)
     {
         base::insert(mdl);
         ++unbalanced_times;
     }
 
-    void remove(const Model& mdl)
+    void remove(Model const& mdl)
     {
         base::remove(mdl);
         ++unbalanced_times;
@@ -120,17 +120,17 @@ DynamicMapTree::~DynamicMapTree()
     delete &impl;
 }
 
-void DynamicMapTree::insert(const GameObjectModel& mdl)
+void DynamicMapTree::insert(GameObjectModel const& mdl)
 {
     impl.insert(mdl);
 }
 
-void DynamicMapTree::remove(const GameObjectModel& mdl)
+void DynamicMapTree::remove(GameObjectModel const& mdl)
 {
     impl.remove(mdl);
 }
 
-bool DynamicMapTree::contains(const GameObjectModel& mdl) const
+bool DynamicMapTree::contains(GameObjectModel const& mdl) const
 {
     return impl.contains(mdl);
 }
@@ -154,7 +154,7 @@ struct DynamicTreeIntersectionCallback
 {
     bool did_hit;
     DynamicTreeIntersectionCallback() : did_hit(false) {}
-    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance)
+    bool operator()(G3D::Ray const& r, GameObjectModel const& obj, float& distance)
     {
         did_hit = obj.intersectRay(r, distance, true);
         return did_hit;
@@ -172,7 +172,7 @@ struct DynamicTreeIntersectionCallback_WithLogger
     {
         DEBUG_LOG("Dynamic Intersection log");
     }
-    bool operator()(const G3D::Ray& r, const GameObjectModel& obj, float& distance)
+    bool operator()(G3D::Ray const& r, GameObjectModel const& obj, float& distance)
     {
         DEBUG_LOG("testing intersection with %s", obj.name.c_str());
         bool hit = obj.intersectRay(r, distance, true);
@@ -195,7 +195,7 @@ If intersection is found within pMaxDist, sets pMaxDist to intersection distance
 Else, pMaxDist is not modified and returns false;
 */
 
-bool DynamicMapTree::getIntersectionTime(const G3D::Ray& ray, const Vector3& endPos, float& pMaxDist) const
+bool DynamicMapTree::getIntersectionTime(G3D::Ray const& ray, Vector3 const& endPos, float& pMaxDist) const
 {
     float distance = pMaxDist;
     DynamicTreeIntersectionCallback callback;
@@ -223,7 +223,7 @@ bool DynamicMapTree::getObjectHitPos(float x1, float y1, float z1, float x2, flo
 When moving from pos1 to pos2 check if we hit an object. Return true and the position if we hit one
 Return the hit pos or the original dest pos
 */
-bool DynamicMapTree::getObjectHitPos(const Vector3& pPos1, const Vector3& pPos2, Vector3& pResultHitPos, float pModifyDist) const
+bool DynamicMapTree::getObjectHitPos(Vector3 const& pPos1, Vector3 const& pPos2, Vector3& pResultHitPos, float pModifyDist) const
 {
     bool result = false;
     float maxDist = (pPos2 - pPos1).magnitude();
@@ -286,6 +286,5 @@ float DynamicMapTree::getHeight(float x, float y, float z, float maxSearchDist) 
 
     if (callback.didHit())
         return v.z - maxSearchDist;
-    else
-        return -G3D::inf();
+    return -G3D::inf();
 }

@@ -26,20 +26,22 @@ EndScriptData */
 
 enum
 {
-    //EMOTE_GENERIC_FRENZY_KILL   = -1000001,
+    //EMOTE_GENERIC_FRENZY_KILL   = 7797,
 
     NPC_STUDENT                                     = 10475,
     NPC_MARDUK_BLACKPOOL                            = 10433,
 
     VECTUS_SPEECH_GAMBIT_EVENT_START                = 6883,
 
+    FACTION_MONSTER                                 = 16,
+
     GO_DAWN_S_GAMBIT                                = 177304,
 
     SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT     = 18115,    //spell qui transforme les étudiants élites en squelettes
     SPELL_FLAMESTRIKE                               = 18399,
     SPELL_BLAST_WAVE                                = 16046
-            //SPELL_FRENZY                                  = 28371     //spell is used by Gluth, confirm this is for this boss too
-            //SPELL_FIRE_SHIELD                             = 0         //should supposedly have some aura, but proper spell not found
+  //SPELL_FRENZY                                    = 28371     //spell is used by Gluth, confirm this is for this boss too
+  //SPELL_FIRE_SHIELD                               = 0         //should supposedly have some aura, but proper spell not found
 };
 
 struct boss_vectusAI : public ScriptedAI
@@ -51,7 +53,7 @@ struct boss_vectusAI : public ScriptedAI
         eventGambitStart        = false;
         findGambit              = false;
         m_uiGambitEvent_Timer   = 0;
-        pGambit     = NULL;
+        pGambit     = nullptr;
         Reset();
     }
 
@@ -67,7 +69,7 @@ struct boss_vectusAI : public ScriptedAI
 
     bool m_bStartedDialogue;
 
-    void Reset()
+    void Reset() override
     {
         m_uiFlameStrike_Timer   = 2000;
         m_uiBlastWave_Timer     = 14000;
@@ -90,7 +92,7 @@ struct boss_vectusAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         // Chakor@Nostalrius : Event Du Gambit
         if (!eventGambitDone)
@@ -119,29 +121,29 @@ struct boss_vectusAI : public ScriptedAI
                     Creature* Marduck = m_creature->FindNearestCreature(NPC_MARDUK_BLACKPOOL, 100.0f);
                     if (Marduck)
                     {
-                        Marduck->setFaction(14);
+                        Marduck->SetFactionTemplateId(FACTION_MONSTER);
                         Marduck->SetReactState(REACT_AGGRESSIVE);
                         Marduck->AIM_Initialize();
                     }
 
                     std::list<Creature*> creatures;
                     m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
-                    for (std::list<Creature*>::iterator it = creatures.begin(); it != creatures.end(); ++it)
+                    for (const auto& creature : creatures)
                     {
-                        (*it)->CastSpell((*it), SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, true);
-                        if (CreatureGroup* myGroup = (*it)->GetCreatureGroup())
+                        creature->CastSpell(creature, SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, true);
+                        if (CreatureGroup* myGroup = creature->GetCreatureGroup())
                         {
-                            myGroup->RemoveMember((*it)->GetGUID());
-                            (*it)->SetCreatureGroup(NULL);
+                            myGroup->RemoveMember(creature->GetGUID());
+                            creature->SetCreatureGroup(nullptr);
                         }
 
-                        (*it)->setFaction(14);
-                        (*it)->SetReactState(REACT_AGGRESSIVE);
-                        (*it)->AIM_Initialize();
+                        creature->SetFactionTemplateId(FACTION_MONSTER);
+                        creature->SetReactState(REACT_AGGRESSIVE);
+                        creature->AIM_Initialize();
                     }
 
                     m_creature->MonsterYell(VECTUS_SPEECH_GAMBIT_EVENT_START, 0, 0);
-                    m_creature->setFaction(14);
+                    m_creature->SetFactionTemplateId(FACTION_MONSTER);
                     m_creature->SetReactState(REACT_AGGRESSIVE);
                     m_creature->AIM_Initialize();
 
@@ -152,7 +154,7 @@ struct boss_vectusAI : public ScriptedAI
                 m_uiGambitEvent_Timer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // NOSTALRIUS: Aggro toute la salle lorsqu'il est pull.
@@ -160,10 +162,10 @@ struct boss_vectusAI : public ScriptedAI
         {
             std::list<Creature*> creatures;
             m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
-            for (std::list<Creature*>::iterator it = creatures.begin(); it != creatures.end(); ++it)
+            for (const auto& creature : creatures)
             {
-                (*it)->setFaction(14);
-                (*it)->AI()->AttackStart(m_creature->getVictim());
+                creature->SetFactionTemplateId(FACTION_MONSTER);
+                creature->AI()->AttackStart(m_creature->GetVictim());
             }
             _fullAggroDone = true;
         }
@@ -180,7 +182,7 @@ struct boss_vectusAI : public ScriptedAI
         //BlastWave_Timer
         if (m_uiBlastWave_Timer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLAST_WAVE);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_BLAST_WAVE);
             m_uiBlastWave_Timer = 12000;
         }
         else
@@ -223,9 +225,9 @@ struct npc_scholomance_studentAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
     bool isTransformed;
 
-    void Reset() {}
+    void Reset() override {}
 
-    void SpellHit(Unit *pCaster, const SpellEntry *pSpell)
+    void SpellHit(Unit *pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT)
         {
@@ -239,22 +241,22 @@ struct npc_scholomance_studentAI : public ScriptedAI
         }
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void Aggro(Unit* /*pWho*/) override
     {
         // set the viewing room and Marduk and Vectus to hostile on aggro
         std::list<Creature*> creatures;
         m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
-        for (std::list<Creature*>::iterator it = creatures.begin(); it != creatures.end(); ++it)
-            (*it)->setFaction(14);
+        for (const auto& creature : creatures)
+            creature->SetFactionTemplateId(FACTION_MONSTER);
 
         if (Creature* pMarduck = m_creature->FindNearestCreature(NPC_MARDUK_BLACKPOOL, 100.0f))
-            pMarduck->setFaction(14);
+            pMarduck->SetFactionTemplateId(FACTION_MONSTER);
 
         if (Creature* pVectus = m_creature->FindNearestCreature(NPC_VECTUS, 100.0f))
-			pVectus->setFaction(14);
+			pVectus->SetFactionTemplateId(FACTION_MONSTER);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (isTransformed)
         {
@@ -271,8 +273,8 @@ struct npc_scholomance_studentAI : public ScriptedAI
                         {
                             myGroup->RemoveMember(Vectus->GetGUID());
                             myGroup->RemoveMember(Marduke->GetGUID());
-                            Vectus->SetCreatureGroup(NULL);
-                            Marduke->SetCreatureGroup(NULL);
+                            Vectus->SetCreatureGroup(nullptr);
+                            Marduke->SetCreatureGroup(nullptr);
                         }
                     }
                 }
@@ -283,7 +285,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         }
     }
 
-    void JustRespawned()
+    void JustRespawned() override
     {
         if (isTransformed)
             m_creature->AddAura(SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, ADD_AURA_NO_OPTION, m_creature);
@@ -291,7 +293,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         Reset();
     }
 
-    void EnterEvadeMode()
+    void EnterEvadeMode() override
     {
         m_creature->RemoveAllAuras();
         m_creature->DeleteThreatList();
@@ -301,10 +303,10 @@ struct npc_scholomance_studentAI : public ScriptedAI
         if (isTransformed)
             m_creature->AddAura(SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, ADD_AURA_NO_OPTION, m_creature);
 
-        if (m_creature->isAlive())
+        if (m_creature->IsAlive())
             m_creature->GetMotionMaster()->MoveTargetedHome();
 
-        m_creature->SetLootRecipient(NULL);
+        m_creature->SetLootRecipient(nullptr);
 
         Reset();
     }
@@ -317,7 +319,7 @@ CreatureAI* GetAI_npc_scholomance_student(Creature* pCreature)
 
 void AddSC_boss_vectus()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "boss_vectus";
     newscript->GetAI = &GetAI_boss_vectus;

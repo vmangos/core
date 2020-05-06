@@ -42,7 +42,7 @@ public:
     typedef StorageType::const_reference const_reference;
 
 public:
-    Tokenizer(const std::string &src, char const sep, uint32 vectorReserve = 0);
+    Tokenizer(std::string const& src, char const sep, uint32 vectorReserve = 0);
     ~Tokenizer() { delete[] m_str; }
 
     const_iterator begin() const { return m_storage.begin(); }
@@ -60,14 +60,14 @@ private:
 
 typedef std::vector<std::string> Tokens;
 
-Tokens StrSplit(const std::string &src, const std::string &sep);
+Tokens StrSplit(std::string const& src, std::string const& sep);
 uint32 GetUInt32ValueFromArray(Tokens const& data, uint16 index);
 float GetFloatValueFromArray(Tokens const& data, uint16 index);
 
 void stripLineInvisibleChars(std::string &src);
 
 std::string secsToTimeString(time_t timeInSecs, bool shortText = false, bool hoursOnly = false);
-uint32 TimeStringToSecs(const std::string& timestring);
+uint32 TimeStringToSecs(std::string const& timestring);
 std::string TimeToTimestampStr(time_t t);
 
 inline uint32 secsToTimeBitFields(time_t secs)
@@ -77,31 +77,31 @@ inline uint32 secsToTimeBitFields(time_t secs)
 }
 
 /* Return a random number in the range min..max; (max-min) must be smaller than 32768. */
-MANGOS_DLL_SPEC int32 irand(int32 min, int32 max);
+int32 irand(int32 min, int32 max);
 
 /* Return a random number in the range min..max (inclusive). For reliable results, the difference
 * between max and min should be less than RAND32_MAX. */
-MANGOS_DLL_SPEC uint32 urand(uint32 min, uint32 max);
+uint32 urand(uint32 min, uint32 max);
 
 /* Return a random number in the range min..max (inclusive). */
-MANGOS_DLL_SPEC float frand(float min, float max);
+float frand(float min, float max);
 
 /* Return a random number in the range 0 .. RAND32_MAX. */
-MANGOS_DLL_SPEC int32 rand32();
+int32 rand32();
 
 /* Return a random double from 0.0 to 1.0 (exclusive). Floats support only 7 valid decimal digits.
  * A double supports up to 15 valid decimal digits and is used internally (RAND32_MAX has 10 digits).
  * With an FPU, there is usually no difference in performance between float and double. */
-MANGOS_DLL_SPEC double rand_norm(void);
+double rand_norm(void);
 
-MANGOS_DLL_SPEC float rand_norm_f(void);
+float rand_norm_f(void);
 
 /* Return a random double from 0.0 to 99.9999999999999. Floats support only 7 valid decimal digits.
  * A double supports up to 15 valid decimal digits and is used internaly (RAND32_MAX has 10 digits).
  * With an FPU, there is usually no difference in performance between float and double. */
-MANGOS_DLL_SPEC double rand_chance(void);
+double rand_chance(void);
 
-MANGOS_DLL_SPEC float rand_chance_f(void);
+float rand_chance_f(void);
 
 Milliseconds randtime(Milliseconds const& min, Milliseconds const& max);
 
@@ -155,7 +155,7 @@ inline void ApplyPercentModFloatVar(float& var, float val, bool apply)
     var *= (apply?(100.0f+val)/100.0f : 100.0f / (100.0f+val));
 }
 
-bool Utf8toWStr(const std::string& utf8str, std::wstring& wstr, size_t max_len = 0);
+bool Utf8toWStr(std::string const& utf8str, std::wstring& wstr, size_t max_len = 0);
 // in wsize==max size of buffer, out wsize==real string size
 
 bool WStrToUtf8(std::wstring& wstr, std::string& utf8str);
@@ -270,7 +270,7 @@ inline bool isNumeric(std::wstring const& str)
     return true;
 }
 
-inline bool isBasicLatinString(std::wstring wstr, bool numericOrSpace)
+inline bool isBasicLatinString(std::wstring const& wstr, bool numericOrSpace)
 {
     for(size_t i = 0; i < wstr.size(); ++i)
         if(!isBasicLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
@@ -278,7 +278,7 @@ inline bool isBasicLatinString(std::wstring wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isExtendedLatinString(std::wstring wstr, bool numericOrSpace)
+inline bool isExtendedLatinString(std::wstring const& wstr, bool numericOrSpace)
 {
     for(size_t i = 0; i < wstr.size(); ++i)
         if(!isExtendedLatinCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
@@ -286,7 +286,7 @@ inline bool isExtendedLatinString(std::wstring wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isCyrillicString(std::wstring wstr, bool numericOrSpace)
+inline bool isCyrillicString(std::wstring const& wstr, bool numericOrSpace)
 {
     for(size_t i = 0; i < wstr.size(); ++i)
         if(!isCyrillicCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
@@ -294,7 +294,7 @@ inline bool isCyrillicString(std::wstring wstr, bool numericOrSpace)
     return true;
 }
 
-inline bool isEastAsianString(std::wstring wstr, bool numericOrSpace)
+inline bool isEastAsianString(std::wstring const& wstr, bool numericOrSpace)
 {
     for(size_t i = 0; i < wstr.size(); ++i)
         if(!isEastAsianCharacter(wstr[i]) && (!numericOrSpace || !isNumericOrSpace(wstr[i])))
@@ -311,12 +311,12 @@ inline bool isLeapYear(int year)
 
 inline void strToUpper(std::string& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), toupper );
+    std::transform(str.begin(), str.end(), str.begin(), toupper);
 }
 
 inline void strToLower(std::string& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), tolower );
+    std::transform(str.begin(), str.end(), str.begin(), tolower);
 }
 
 inline wchar_t wcharToUpper(wchar_t wchar)
@@ -372,25 +372,32 @@ inline wchar_t wcharToLower(wchar_t wchar)
 
 inline void wstrToUpper(std::wstring& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), wcharToUpper );
+    std::transform(str.begin(), str.end(), str.begin(), wcharToUpper);
 }
 
 inline void wstrToLower(std::wstring& str)
 {
-    std::transform( str.begin(), str.end(), str.begin(), wcharToLower );
+    std::transform(str.begin(), str.end(), str.begin(), wcharToLower);
 }
 
-bool utf8ToConsole(const std::string& utf8str, std::string& conStr);
-bool consoleToUtf8(const std::string& conStr,std::string& utf8str);
-bool Utf8FitTo(const std::string& str, std::wstring search);
-void utf8printf(FILE *out, const char *str, ...);
-void vutf8printf(FILE *out, const char *str, va_list* ap);
+bool utf8ToConsole(std::string const& utf8str, std::string& conStr);
+bool consoleToUtf8(std::string const& conStr,std::string& utf8str);
+bool Utf8FitTo(std::string const& str, std::wstring search);
+void utf8printf(FILE* out, char const* str, ...);
+void vutf8printf(FILE* out, char const* str, va_list* ap);
 
 bool IsIPAddress(char const* ipaddress);
-uint32 CreatePIDFile(const std::string& filename);
+uint32 CreatePIDFile(std::string const& filename);
 
 void hexEncodeByteArray(uint8* bytes, uint32 arrayLen, std::string& result);
 std::string ByteArrayToHexStr(uint8 const* bytes, uint32 length, bool reverse = false);
 void HexStrToByteArray(std::string const& str, uint8* out, bool reverse = false);
 
+/* Select a random element from a container. Note: make sure you explicitly empty check the container */
+template <class C> typename C::value_type const& SelectRandomContainerElement(C const& container)
+{
+    typename C::const_iterator it = container.begin();
+    std::advance(it, urand(0, container.size() - 1));
+    return *it;
+}
 #endif

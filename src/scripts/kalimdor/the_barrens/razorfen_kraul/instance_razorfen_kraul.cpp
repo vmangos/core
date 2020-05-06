@@ -95,7 +95,7 @@ void instance_razorfen_kraul::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
-void instance_razorfen_kraul::Load(const char* chrIn)
+void instance_razorfen_kraul::Load(char const* chrIn)
 {
     if (!chrIn)
     {
@@ -108,9 +108,9 @@ void instance_razorfen_kraul::Load(const char* chrIn)
     std::istringstream loadStream(chrIn);
     loadStream >> m_auiEncounter[0];
 
-    for (uint8 i = 0; i < RFK_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS)
-            m_auiEncounter[i] = NOT_STARTED;
+    for (uint32 & i : m_auiEncounter)
+        if (i == IN_PROGRESS)
+            i = NOT_STARTED;
 
     OUT_LOAD_INST_DATA_COMPLETE;
 }

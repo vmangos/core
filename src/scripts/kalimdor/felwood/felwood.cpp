@@ -68,21 +68,21 @@ struct npc_kittenAI : public FollowerAI
 
     uint32 m_uiMoonwellCooldown;
 
-    void Reset() { }
+    void Reset() override { }
 
-    void MoveInLineOfSight(Unit* pWho)
+    void MoveInLineOfSight(Unit* pWho) override
     {
         //should not have npc_flags by default, so set when expected
-        if (!m_creature->getVictim() && !m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && HasFollowState(STATE_FOLLOW_INPROGRESS) && pWho->GetEntry() == NPC_WINNA)
+        if (!m_creature->GetVictim() && !m_creature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && HasFollowState(STATE_FOLLOW_INPROGRESS) && pWho->GetEntry() == NPC_WINNA)
         {
             if (m_creature->IsWithinDistInMap(pWho, INTERACTION_DISTANCE))
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
         }
     }
 
-    void UpdateFollowerAI(const uint32 uiDiff)
+    void UpdateFollowerAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
         {
             if (HasFollowState(STATE_FOLLOW_PAUSED))
             {
@@ -113,7 +113,7 @@ bool EffectDummyCreature_npc_kitten(WorldObject* /*pCaster*/, uint32 uiSpellId, 
     if (uiSpellId == SPELL_CORRUPT_SABER_VISUAL && effIndex == EFFECT_INDEX_0)
     {
         // Not nice way, however using UpdateEntry will not be correct.
-        if (const CreatureInfo* pTemp = GetCreatureTemplateStore(NPC_CORRUPT_SABER))
+        if (CreatureInfo const* pTemp = sObjectMgr.GetCreatureTemplate(NPC_CORRUPT_SABER))
         {
             pCreatureTarget->SetEntry(pTemp->entry);
             pCreatureTarget->SetDisplayId(Creature::ChooseDisplayId(pTemp));
@@ -176,7 +176,7 @@ enum
 
 bool GossipHello_npcs_riverbreeze_and_silversky(Player* pPlayer, Creature* pCreature)
 {
-    if (pCreature->isQuestGiver())
+    if (pCreature->IsQuestGiver())
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
     switch (pCreature->GetEntry())
@@ -248,7 +248,7 @@ struct npc_niby_the_almightyAI : public ScriptedAI
 
     bool m_bEventStarted;
 
-    void Reset()
+    void Reset() override
     {
         m_uiSummonTimer = 500;
         m_uiSpeech = 0;
@@ -263,7 +263,7 @@ struct npc_niby_the_almightyAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (m_bEventStarted)
         {
@@ -348,14 +348,14 @@ struct npc_cursed_oozeAI : public ScriptedAI
         Reset();
     }
     uint32 SpellTimer;
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (spell && spell->Id == SPELL_QUEST_CURSED_JAR)
             m_creature->ForcedDespawn();
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (SpellTimer < diff)
         {
@@ -366,7 +366,7 @@ struct npc_cursed_oozeAI : public ScriptedAI
             SpellTimer -= diff;
         DoMeleeAttackIfReady();
     }
-    void Reset()
+    void Reset() override
     {
         SpellTimer = 3000;
     }
@@ -385,14 +385,14 @@ struct npc_tainted_oozeAI : public ScriptedAI
         Reset();
     }
     uint32 SpellTimer;
-    void SpellHit(Unit *caster, const SpellEntry *spell)
+    void SpellHit(Unit *caster, SpellEntry const* spell) override
     {
         if (spell && spell->Id == SPELL_QUEST_TAINTED_JAR)
             m_creature->ForcedDespawn();
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
         if (SpellTimer < diff)
         {
@@ -403,7 +403,7 @@ struct npc_tainted_oozeAI : public ScriptedAI
             SpellTimer -= diff;
         DoMeleeAttackIfReady();
     }
-    void Reset()
+    void Reset() override
     {
         SpellTimer = 3000;
     }
@@ -557,16 +557,16 @@ struct npc_captured_arkonarinAI : npc_escortAI
         }
     }
 
-    void UpdateEscortAI(const uint32 uiDiff) override
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_bCanAttack)
         {
             if (m_uiMortalStrikeTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTAL_STRIKE) == CAST_OK)
                     m_uiMortalStrikeTimer = urand(7000, 10000);
             }
             else
@@ -574,7 +574,7 @@ struct npc_captured_arkonarinAI : npc_escortAI
 
             if (m_uiCleaveTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                     m_uiCleaveTimer = urand(3000, 6000);
             }
             else
@@ -590,7 +590,7 @@ CreatureAI* GetAI_npc_captured_arkonarin(Creature* pCreature)
     return new npc_captured_arkonarinAI(pCreature);
 }
 
-bool QuestAccept_npc_captured_arkonarin(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_captured_arkonarin(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_RESCUE_JAEDENAR)
     {
@@ -679,7 +679,7 @@ struct npc_areiAI : public npc_escortAI
             m_bAggroHorror = true;
         }
     }
-    void Dialogue(const uint32 uiDiff)
+    void Dialogue(uint32 const uiDiff)
     {
         if (dialogueStep > 5)
             return;
@@ -688,7 +688,7 @@ struct npc_areiAI : public npc_escortAI
             switch (dialogueStep)
             {
                 case 1:
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WITHER_STRIKE) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WITHER_STRIKE) == CAST_OK)
                     {
                         if (Player* pPlayer = GetPlayerForEscort())
                             DoScriptText(SAY_ASHENVALE, m_creature, pPlayer);
@@ -763,19 +763,19 @@ struct npc_areiAI : public npc_escortAI
         if (uiEntry == NPC_AREI)
             return m_creature;
 
-        return NULL;
+        return nullptr;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
         Dialogue(uiDiff);
         npc_escortAI::UpdateAI(uiDiff);
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiWitherStrikeTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WITHER_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WITHER_STRIKE) == CAST_OK)
                 m_uiWitherStrikeTimer = urand(3000, 6000);
         }
         else
@@ -790,7 +790,7 @@ CreatureAI* GetAI_npc_arei(Creature* pCreature)
     return new npc_areiAI(pCreature);
 }
 
-bool QuestAccept_npc_arei(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_arei(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_ID_ANCIENT_SPIRIT)
     {
@@ -857,7 +857,7 @@ public:
     uint32 cleansedEntry;
     ObjectGuid cleansedGuid;
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (me->isSpawned() && cleansedGuid)
         {
@@ -875,7 +875,7 @@ public:
             cleansed->SetSpawnedByDefault(true);
         }
 
-        if (const GameObjectData* data = me->GetGOData())
+        if (GameObjectData const* data = me->GetGOData())
             me->SetRespawnDelay(data->ComputeRespawnDelay(data->GetRandomRespawnTime()));
 
         me->Despawn();
@@ -916,7 +916,7 @@ bool AreaTrigger_at_irontree_wood(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pAt->id == AT_IRONTREE_WOOD)
     {
-        if (pPlayer->getClass() == CLASS_HUNTER && pPlayer->GetQuestStatus(QUEST_THE_ANCIENT_LEAF) == QUEST_STATUS_COMPLETE)
+        if (pPlayer->GetClass() == CLASS_HUNTER && pPlayer->GetQuestStatus(QUEST_THE_ANCIENT_LEAF) == QUEST_STATUS_COMPLETE)
         {
             Creature* pAncient = GetClosestCreatureWithEntry(pPlayer, NPC_HASTAT_THE_ANCIENT, 100.0f);
             if (!pAncient)

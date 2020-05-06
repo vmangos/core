@@ -17,9 +17,10 @@ ADD_DEFINITIONS(-DMMAP_GENERATOR -DDEBUG)
 # zlib
 ADD_DEFINITIONS( -DNO_vsnprintf )
 
-if(!WIN32)
-	ADD_DEFINITIONS("-ggdb")
-	ADD_DEFINITIONS("-O3")
+if(NOT MSVC)
+    ADD_DEFINITIONS("-Wall")
+    #ADD_DEFINITIONS("-ggdb")
+    ADD_DEFINITIONS("-O3")
 endif()
 
 include_directories(
@@ -50,7 +51,7 @@ SET_TARGET_PROPERTIES (MoveMapGen PROPERTIES FOLDER Extractors)
 
 target_link_libraries(MoveMapGen 
                         vmap 
-                        detour
+                        Detour
                         Recast
                         ${ACE_LIBRARIES}
                         shared

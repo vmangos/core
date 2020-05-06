@@ -8,7 +8,7 @@ using namespace Spells;
 
 SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
         return SPELL_NORMAL;
 
@@ -25,9 +25,9 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             {
                 bool food = false;
                 bool drink = false;
-                for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+                for (uint32 i : spellInfo->EffectApplyAuraName)
                 {
-                    switch (spellInfo->EffectApplyAuraName[i])
+                    switch (i)
                     {
                         // Food
                         case SPELL_AURA_MOD_REGEN:
@@ -120,10 +120,10 @@ SpellSpecific Spells::GetSpellSpecific(uint32 spellId)
             if (spellInfo->SpellIconID == 561 && spellInfo->SpellVisual == 5652)
                 return SPELL_JUDGEMENT;
 
-            for (int i = 0; i < 3; ++i)
+            for (uint32 i : spellInfo->Effect)
             {
                 // only paladin auras have this
-                if (spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
+                if (i == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
                     return SPELL_AURA;
             }
             break;
@@ -216,7 +216,7 @@ bool Spells::CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry
 
 bool Spells::IsPassiveSpell(uint32 spellId)
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellId);
     if (!spellInfo)
         return false;
     return spellInfo->IsPassiveSpell();
@@ -224,7 +224,7 @@ bool Spells::IsPassiveSpell(uint32 spellId)
 
 bool Spells::IsPositiveSpell(uint32 spellId)
 {
-    SpellEntry const *spellproto = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellproto = sSpellMgr.GetSpellEntry(spellId);
     if (!spellproto)
         return false;
 
@@ -233,14 +233,14 @@ bool Spells::IsPositiveSpell(uint32 spellId)
 
 bool Spells::IsPositiveSpell(uint32 spellId, Unit* caster, Unit* victim)
 {
-    SpellEntry const *spellproto = sSpellMgr.GetSpellEntry(spellId);
+    SpellEntry const* spellproto = sSpellMgr.GetSpellEntry(spellId);
     if (!spellproto)
         return false;
 
     return spellproto->IsPositiveSpell(caster, victim);
 }
 
-bool Spells::IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellInfo2)
+bool Spells::IsSingleTargetSpells(SpellEntry const* spellInfo1, SpellEntry const* spellInfo2)
 {
     // TODO - need better check
     // Equal icon and spellfamily
@@ -335,9 +335,9 @@ void SpellEntry::ComputeNonPeriodicDispel()
 void SpellEntry::ComputeDispel()
 {
     _isDispel = false;
-    for (int i = 0; i < 3; ++i)
+    for (uint32 i : Effect)
     {
-        if (Effect[i] == SPELL_EFFECT_DISPEL)
+        if (i == SPELL_EFFECT_DISPEL)
         {
             _isDispel = true;
             break;
@@ -502,9 +502,9 @@ bool SpellEntry::IsPvEHeartBeat() const
     if (!(Attributes & SPELL_ATTR_DIMINISHING_RETURNS))
         return false;
 
-    for (int i = 0; i < 3; ++i)
+    for (uint32 i : EffectApplyAuraName)
     {
-        switch (EffectApplyAuraName[i])
+        switch (i)
         {
             case SPELL_AURA_MOD_FEAR:
             case SPELL_AURA_MOD_ROOT:
@@ -572,7 +572,7 @@ uint32 SpellEntry::GetCastTime(Spell* spell) const
                         return 0;
     }
 
-    SpellCastTimesEntry const *spellCastTimeEntry = sSpellCastTimesStore.LookupEntry(CastingTimeIndex);
+    SpellCastTimesEntry const* spellCastTimeEntry = sSpellCastTimesStore.LookupEntry(CastingTimeIndex);
 
     // not all spells have cast time index and this is all is pasiive abilities
     if (!spellCastTimeEntry)
@@ -801,7 +801,7 @@ float SpellEntry::CalculateCustomCoefficient(WorldObject const* caster, DamageEf
 
 int32 SpellEntry::GetDuration() const
 {
-    SpellDurationEntry const *du = sSpellDurationStore.LookupEntry(DurationIndex);
+    SpellDurationEntry const* du = sSpellDurationStore.LookupEntry(DurationIndex);
     if (!du)
         return 0;
     return (du->Duration[0] == -1) ? -1 : abs(du->Duration[0]);
@@ -809,7 +809,7 @@ int32 SpellEntry::GetDuration() const
 
 int32 SpellEntry::GetMaxDuration() const
 {
-    SpellDurationEntry const *du = sSpellDurationStore.LookupEntry(DurationIndex);
+    SpellDurationEntry const* du = sSpellDurationStore.LookupEntry(DurationIndex);
     if (!du)
         return 0;
     return (du->Duration[2] == -1) ? -1 : abs(du->Duration[2]);
@@ -868,7 +868,7 @@ uint16 SpellEntry::GetAuraMaxTicks() const
     return 6;
 }
 
-bool SpellEntry::IsPositiveSpell(WorldObject* caster, Unit* victim) const
+bool SpellEntry::IsPositiveSpell(WorldObject const* caster, WorldObject const* victim) const
 {
     if (Attributes & SPELL_ATTR_NEGATIVE)
         return false;
@@ -880,7 +880,7 @@ bool SpellEntry::IsPositiveSpell(WorldObject* caster, Unit* victim) const
     return true;
 }
 
-bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster, Unit* victim) const
+bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject const* caster, WorldObject const* victim) const
 {
     // Nostalrius (SpellMod)
     if (Custom & SPELL_CUSTOM_POSITIVE)
@@ -914,19 +914,21 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster
         // Negative Effects
         case SPELL_EFFECT_INSTAKILL:
             // Suicide is a positive spell - ex. Garr Massive Eruption
-            if (EffectImplicitTargetA[effIndex] == TARGET_SELF && EffectImplicitTargetB[effIndex] == TARGET_NONE)
+            if (EffectImplicitTargetA[effIndex] == TARGET_UNIT_CASTER && EffectImplicitTargetB[effIndex] == TARGET_NONE)
                 return true;
             // Sacrifice is a positive spell - for the warlock :)
-            if (IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>())
-                return true;
-            return false;
+            return IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>();
         // Dispel can be positive or negative depending on the target
         case SPELL_EFFECT_DISPEL:
             if (caster && victim)
             {
-                if (CharmInfo *charm = victim->GetCharmInfo())
-                    if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
-                        return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
+                if (victim->IsUnit())
+                {
+                    if (CharmInfo const* charm = static_cast<Unit const*>(victim)->GetCharmInfo())
+                        if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
+                            return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
+                }
+                
                 return caster->IsFriendlyTo(victim);
             }
         // non-positive aura use
@@ -982,7 +984,7 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster
                     if (Id != EffectTriggerSpell[effIndex])
                     {
                         uint32 spellTriggeredId = EffectTriggerSpell[effIndex];
-                        SpellEntry const *spellTriggeredProto = sSpellMgr.GetSpellEntry(spellTriggeredId);
+                        SpellEntry const* spellTriggeredProto = sSpellMgr.GetSpellEntry(spellTriggeredId);
 
                         if (spellTriggeredProto)
                         {
@@ -1027,12 +1029,12 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster
                     return false;
                 case SPELL_AURA_PERIODIC_DAMAGE:            // used in positive spells also.
                     // part of negative spell if casted at self (prevent cancel)
-                    if (EffectImplicitTargetA[effIndex] == TARGET_SELF)
+                    if (EffectImplicitTargetA[effIndex] == TARGET_UNIT_CASTER)
                         return false;
                     break;
                 case SPELL_AURA_MOD_DECREASE_SPEED:         // used in positive spells also
                     // part of positive spell if casted at self
-                    if (EffectImplicitTargetA[effIndex] == TARGET_SELF &&
+                    if (EffectImplicitTargetA[effIndex] == TARGET_UNIT_CASTER &&
                             SpellFamilyName == SPELLFAMILY_GENERIC)
                         return false;
                     // but not this if this first effect (don't found better check)
@@ -1098,6 +1100,13 @@ bool SpellEntry::IsPositiveEffect(SpellEffectIndex effIndex, WorldObject* caster
     return true;
 }
 
+bool SpellEntry::IsReflectableSpell(WorldObject const* caster, WorldObject const* victim) const
+{
+    return DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !HasAttribute(SPELL_ATTR_IS_ABILITY)
+        && !HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
+        && !HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(caster, victim);
+}
+
 SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
 {
     // talents that learn spells can have stance requirements that need ignore
@@ -1117,7 +1126,7 @@ SpellCastResult SpellEntry::GetErrorAtShapeshiftedCast(uint32 form) const
     bool actAsShifted = false;
     if (form > 0)
     {
-        SpellShapeshiftFormEntry const *shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
+        SpellShapeshiftFormEntry const* shapeInfo = sSpellShapeshiftFormStore.LookupEntry(form);
         if (!shapeInfo)
         {
             sLog.outError("GetErrorAtShapeshiftedCast: unknown shapeshift %u", form);

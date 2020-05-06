@@ -62,28 +62,28 @@ struct celebras_the_cursedAI : public ScriptedAI
     uint32 EntanglingRoots_Timer;
     uint32 CorruptForces_Timer;
 
-    void Reset()
+    void Reset() override
     {
         Wrath_Timer = 8000;
         EntanglingRoots_Timer = 2000;
         CorruptForces_Timer = 30000;
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CELEBRAS, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         //Wrath
         if (Wrath_Timer < diff)
         {
-            Unit* target = NULL;
+            Unit* target = nullptr;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target)
                 DoCastSpellIfCan(target, SPELL_WRATH);
@@ -94,7 +94,7 @@ struct celebras_the_cursedAI : public ScriptedAI
         //EntanglingRoots
         if (EntanglingRoots_Timer < diff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_ENTANGLINGROOTS);
+            DoCastSpellIfCan(m_creature->GetVictim(), SPELL_ENTANGLINGROOTS);
             EntanglingRoots_Timer = 20000;
         }
         else EntanglingRoots_Timer -= diff;
@@ -134,7 +134,7 @@ struct celebrasSpiritAI : public npc_escortAI
     uint64 auraGUID;
     bool m_bBookRead;
 
-    void Reset()
+    void Reset() override
     {
         m_uiPhase = 0;
         Event_Timer = 0;
@@ -142,7 +142,7 @@ struct celebrasSpiritAI : public npc_escortAI
         m_bBookRead = false;
     }
 
-    void WaypointReached(uint32 i)
+    void WaypointReached(uint32 i) override
     {
         std::list<GameObject*> scepterList;
         switch (i)
@@ -184,8 +184,8 @@ struct celebrasSpiritAI : public npc_escortAI
                 DoScriptText(SAY_WP_6, m_creature);
 
                 GetGameObjectListWithEntryInGrid(scepterList, m_creature, GO_CREATOR, 40.0f);
-                for (std::list<GameObject*>::iterator it = scepterList.begin(); it != scepterList.end(); ++it)
-                    (*it)->UseDoorOrButton(0, false);
+                for (const auto& it : scepterList)
+                    it->UseDoorOrButton(0, false);
                 scepterList.clear();
 
                 break;
@@ -221,9 +221,9 @@ struct celebrasSpiritAI : public npc_escortAI
             Event_Timer = 1000;
     }
 
-    void UpdateEscortAI(const uint32 uiDiff)
+    void UpdateEscortAI(uint32 const uiDiff) override
     {
-        if (Event_Timer && !m_creature->getVictim())
+        if (Event_Timer && !m_creature->GetVictim())
         {
             if (Event_Timer <= uiDiff)
             {
@@ -282,7 +282,7 @@ struct celebrasSpiritAI : public npc_escortAI
                 Event_Timer -= uiDiff;
         }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -298,9 +298,9 @@ bool GOHello_go_book_celebras(Player* pPlayer, GameObject* pGo)
 
         std::list<Creature*> celebrasList;
         GetCreatureListWithEntryInGrid(celebrasList, pPlayer, NPC_CELEBRAS_REDEEMED, 40.0f);
-        for (std::list<Creature*>::iterator it = celebrasList.begin(); it != celebrasList.end(); ++it)
+        for (const auto& it : celebrasList)
         {
-            if (celebrasSpiritAI* pcelebrasSpirit = dynamic_cast<celebrasSpiritAI*>((*it)->AI()))
+            if (celebrasSpiritAI* pcelebrasSpirit = dynamic_cast<celebrasSpiritAI*>(it->AI()))
                 pcelebrasSpirit->BookRead();
         }
         celebrasList.clear();
@@ -325,7 +325,7 @@ CreatureAI* GetAI_celebras_spirit(Creature* pCreature)
 
 void AddSC_boss_celebras_the_cursed()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "celebras_the_cursed";
     newscript->GetAI = &GetAI_celebras_the_cursed;

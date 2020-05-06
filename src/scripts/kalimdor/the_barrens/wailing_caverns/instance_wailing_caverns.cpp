@@ -47,7 +47,7 @@ struct instance_wailing_caverns : public ScriptedInstance
     // to be despawn when the nightmare is over
     std::vector<uint64> vNightmareMonsters;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
@@ -59,7 +59,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         Assaulted = false;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -84,12 +84,12 @@ struct instance_wailing_caverns : public ScriptedInstance
                     break;*/
         }
         if ((pCreature->GetCreatureType() != CREATURE_TYPE_CRITTER) &&
-            pCreature->getFaction() != 35 && // the 2 druids
+            pCreature->GetFactionTemplateId() != 35 && // the 2 druids
             pCreature->GetEntry() != 3653) // Kresh is cool
             vNightmareMonsters.push_back(pCreature->GetGUID());
     }
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         if (pGo->GetEntry() == GO_DMF_CHEST)
         {
@@ -98,7 +98,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         }
     }
 
-    void OnPlayerEnter(Player* pPlayer)
+    void OnPlayerEnter(Player* pPlayer) override
     {
         if (!pPlayer)
             return;
@@ -111,7 +111,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         }
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -120,16 +120,16 @@ struct instance_wailing_caverns : public ScriptedInstance
                 if (uiData == DONE && !Assaulted)
                 {
                     if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->isAlive())
+                        if (pSerpentis->IsAlive())
                             DoScriptText(SERPENTIS_YELL, pSerpentis);
                     Assaulted = true;
                 }
                 if (uiData == SPECIAL)
                 {
                     if (Creature* pAna = instance->GetCreature(m_uiAnacondraGUID))
-                        if (pAna->isAlive())
+                        if (pAna->IsAlive())
                             if (Creature* pDruid = GetClosestCreatureWithEntry(pAna, 3840, INTERACTION_DISTANCE))
-                                if (pDruid->isAlive())
+                                if (pDruid->IsAlive())
                                     pDruid->DisappearAndDie();
                 }
                 break;
@@ -138,7 +138,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                 if (uiData == DONE && !Assaulted)
                 {
                     if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->isAlive())
+                        if (pSerpentis->IsAlive())
                             DoScriptText(SERPENTIS_YELL, pSerpentis);
                     Assaulted = true;
                 }
@@ -148,7 +148,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                 if (uiData == DONE && !Assaulted)
                 {
                     if (Creature* pSerpentis = instance->GetCreature(m_uiSerpentisGUID))
-                        if (pSerpentis->isAlive())
+                        if (pSerpentis->IsAlive())
                             DoScriptText(SERPENTIS_YELL, pSerpentis);
                     Assaulted = true;
                 }
@@ -162,7 +162,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                     {
                         if (Creature* pCreature = instance->GetCreature(*it))
                         {
-                            if (pCreature->isAlive() || pCreature->loot.empty())
+                            if (pCreature->IsAlive() || pCreature->loot.empty())
                                 pCreature->ForcedDespawn();
                         }
                         it = vNightmareMonsters.erase(it);
@@ -200,12 +200,12 @@ struct instance_wailing_caverns : public ScriptedInstance
         }
     }
 
-    const char* Save()
+    char const* Save() override
     {
         return strInstData.c_str();
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -220,7 +220,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         return 0;
     }
 
-    uint64 GetData64(uint32 uiData)
+    uint64 GetData64(uint32 uiData) override
     {
         switch (uiData)
         {
@@ -230,7 +230,7 @@ struct instance_wailing_caverns : public ScriptedInstance
         return 0;
     }
 
-    void Load(const char* chrIn)
+    void Load(char const* chrIn) override
     {
         if (!chrIn)
         {
@@ -243,9 +243,9 @@ struct instance_wailing_caverns : public ScriptedInstance
         std::istringstream loadStream(chrIn);
         loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3] >> m_auiEncounter[4] >> m_auiEncounter[5];
 
-        for (uint8 i = 0; i < WAILING_CAVERNS_MAX_ENCOUNTER; ++i)
-            if (m_auiEncounter[i] == IN_PROGRESS)
-                m_auiEncounter[i] = NOT_STARTED;
+        for (uint32 & i : m_auiEncounter)
+            if (i == IN_PROGRESS)
+                i = NOT_STARTED;
 
         OUT_LOAD_INST_DATA_COMPLETE;
     }
@@ -258,7 +258,7 @@ InstanceData* GetInstanceData_instance_wailing_caverns(Map* pMap)
 
 void AddSC_instance_wailing_caverns()
 {
-    Script *newscript;
+    Script* newscript;
     newscript = new Script;
     newscript->Name = "instance_wailing_caverns";
     newscript->GetInstanceData = &GetInstanceData_instance_wailing_caverns;

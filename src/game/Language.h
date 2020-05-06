@@ -76,7 +76,7 @@ enum MangosStrings
     LANG_NON_EXIST_CHARACTER            = 47,
     LANG_FRIEND_IGNORE_UNKNOWN          = 48,
     LANG_LEVEL_MINREQUIRED              = 49,
-    LANG_LEVEL_MINREQUIRED_AND_ITEM     = 50,
+    //                                  = 50, not used
     LANG_NPC_TAINER_HELLO               = 51,
     LANG_COMMAND_INVALID_ITEM_COUNT     = 52,
     LANG_COMMAND_MAIL_ITEMS_LIMIT       = 53,
@@ -345,10 +345,10 @@ enum MangosStrings
     LANG_GOD_OFF                        = 350,
     LANG_YOU_SET_WALLCLIMB              = 351,
     LANG_YOUR_WALLCLIMB_SET             = 352,
-    //                                    353 not used
-    //                                    354 not used
-    //                                    355 not used
-    //                                    356 not used
+    LANG_CHEAT_NO_CD_ON                 = 353,
+    LANG_CHEAT_NO_CD_OFF                = 354,
+    LANG_YOU_SET_NO_CD                  = 355,
+    LANG_YOUR_NO_CD_SET                 = 356,
     LANG_AREATRIGER_NOT_HAS_TARGET      = 357,
     LANG_COMMAND_NOTRIGGERFOUND         = 358,
     LANG_TRIGGER_TARGET_LIST_CHAT       = 359,
@@ -360,11 +360,11 @@ enum MangosStrings
     LANG_TRIGGER_QUEST                  = 365,
     LANG_TRIGGER_EXPLORE_QUEST          = 366,
     LANG_TRIGGER_REQ_LEVEL              = 367,
-    LANG_TRIGGER_REQ_ITEMS              = 368,
-    LANG_TRIGGER_REQ_QUEST              = 369,
-    //                                    370 used in master branch
-    //                                    371 used in master branch
-    //                                    372 used in master branch
+    LANG_YOU_SET_GOD                    = 368,
+    LANG_YOUR_GOD_SET                   = 369,
+    LANG_CHEAT_INSTANT_CAST_ON          = 370,
+    LANG_CHEAT_INSTANT_CAST_OFF         = 371,
+    LANG_GROUP_INFO                     = 372,
     LANG_COMMAND_TICKETRESPONSE         = 373,
     LANG_COMMAND_TICKETCOUNT_CONSOLE    = 374,
     LANG_COMMAND_TICKETNOTEXIST_NAME    = 375,
@@ -575,8 +575,6 @@ enum MangosStrings
     LANG_PINFO_LEVEL                    = 549,
     LANG_PINFO_NO_REP                   = 550,
 
-    LANG_GROUP_INFO                     = 640,
-
     LANG_YOU_SET_EXPLORE_ALL            = 551,
     LANG_YOU_SET_EXPLORE_NOTHING        = 552,
     LANG_YOURS_EXPLORE_SET_ALL          = 553,
@@ -661,9 +659,37 @@ enum MangosStrings
     LANG_COMMAND_SOUND_NOT_FOUND        = 617,
     LANG_COMMAND_SOUND_LIST             = 618,
 
-    //LANG_BG_EY_START_ONE_MINUTE       = 636,
-    //LANG_BG_EY_START_HALF_MINUTE      = 637,
-    //LANG_BG_EY_HAS_BEGUN              = 638,
+    // cheat commands
+    LANG_YOU_SET_INSTANT_CAST           = 619,
+    LANG_YOUR_INSTANT_CAST_SET          = 620,
+    LANG_CHEAT_NO_POWER_COST_ON         = 621,
+    LANG_CHEAT_NO_POWER_COST_OFF        = 622,
+    LANG_YOU_SET_NO_POWER_COST          = 623,
+    LANG_YOUR_NO_POWER_COST_SET         = 624,
+    LANG_CHEAT_DEBUFF_IMMUNITY_ON       = 625,
+    LANG_CHEAT_DEBUFF_IMMUNITY_OFF      = 626,
+    LANG_YOU_SET_DEBUFF_IMMUNITY        = 627,
+    LANG_YOUR_DEBUFF_IMMUNITY_SET       = 628,
+    LANG_CHEAT_ALWAYS_CRIT_ON           = 629,
+    LANG_CHEAT_ALWAYS_CRIT_OFF          = 630,
+    LANG_YOU_SET_ALWAYS_CRIT            = 631,
+    LANG_YOUR_ALWAYS_CRIT_SET           = 632,
+    LANG_CHEAT_NO_CAST_CHECK_ON         = 633,
+    LANG_CHEAT_NO_CAST_CHECK_OFF        = 634,
+    LANG_YOU_SET_NO_CAST_CHECK          = 635,
+    LANG_YOUR_NO_CAST_CHECK_SET         = 636,
+    LANG_CHEAT_ALWAYS_PROC_ON           = 637,
+    LANG_CHEAT_ALWAYS_PROC_OFF          = 638,
+    LANG_YOU_SET_ALWAYS_PROC            = 639,
+    LANG_YOUR_ALWAYS_PROC_SET           = 640,
+    LANG_CHEAT_TRIGGER_PASS_ON          = 641,
+    LANG_CHEAT_TRIGGER_PASS_OFF         = 642,
+    LANG_YOU_SET_TRIGGER_PASS           = 643,
+    LANG_YOUR_TRIGGER_PASS_SET          = 644,
+    LANG_CHEAT_IGNORE_TRIGGERS_ON       = 645,
+    LANG_CHEAT_IGNORE_TRIGGERS_OFF      = 646,
+    LANG_YOU_SET_IGNORE_TRIGGERS        = 647,
+    LANG_YOUR_IGNORE_TRIGGERS_SET       = 648,
 
     // 639 - 649 not used
     LANG_BG_ALLY                        = 650,

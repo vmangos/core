@@ -56,7 +56,7 @@ void LoadRandomEnchantmentsTable()
     uint32 entry, ench;
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, ench, chance FROM item_enchantment_template WHERE ((%u >= patch_min) && (%u <= patch_max))", sWorld.GetWowPatch(), sWorld.GetWowPatch());
+    QueryResult* result = WorldDatabase.PQuery("SELECT entry, ench, chance FROM item_enchantment_template WHERE ((%u >= patch_min) && (%u <= patch_max))", sWorld.GetWowPatch(), sWorld.GetWowPatch());
 
     if (result)
     {
@@ -64,7 +64,7 @@ void LoadRandomEnchantmentsTable()
 
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             bar.step();
 
             entry = fields[0].GetUInt32();
@@ -105,22 +105,23 @@ uint32 GetItemEnchantMod(uint32 entry)
     double dRoll = rand_chance();
     float fCount = 0;
 
-    for (EnchStoreList::const_iterator ench_iter = tab->second.begin(); ench_iter != tab->second.end(); ++ench_iter)
+    EnchStoreList const& enchantList = tab->second;
+    for (const auto& ench_iter : enchantList)
     {
-        fCount += ench_iter->chance;
+        fCount += ench_iter.chance;
 
-        if (fCount > dRoll) return ench_iter->ench;
+        if (fCount > dRoll) return ench_iter.ench;
     }
 
     //we could get here only if sum of all enchantment chances is lower than 100%
     dRoll = (irand(0, (int)floor(fCount * 100) + 1)) / 100.0f;
     fCount = 0;
 
-    for (EnchStoreList::const_iterator ench_iter = tab->second.begin(); ench_iter != tab->second.end(); ++ench_iter)
+    for (const auto& ench_iter : enchantList)
     {
-        fCount += ench_iter->chance;
+        fCount += ench_iter.chance;
 
-        if (fCount > dRoll) return ench_iter->ench;
+        if (fCount > dRoll) return ench_iter.ench;
     }
 
     return 0;

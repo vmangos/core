@@ -22,6 +22,9 @@ ConfVersion=2010100901
 #        Default: "" - no log directory prefix. if used log names aren't absolute paths
 #                      then logs will be stored in the current directory of the running program.
 #
+#	HonorDir
+#		Folder to store HCR files. These are logs of weekly honor calculation.
+#		By default logs are stored in the current directory of the running program.	                    
 #
 #    LoginDatabase.Info
 #    WorldDatabase.Info
@@ -69,6 +72,7 @@ ConfVersion=2010100901
 RealmID = 1
 DataDir = "."
 LogsDir = ""
+HonorDir = ""
 LoginDatabase.Info              = "127.0.0.1;3306;mangos;mangos;realmd"
 LoginDatabase.Connections       = 1
 LoginDatabase.WorkerThreads     = 1
@@ -366,10 +370,6 @@ Anticrash.Rearm.Timer = 60000
 #        Whether to enforce Blizzlike PVP rank requirements to purchase PVP gear (i.e. lifetime or current rank).
 #        Default: 1 (require current rank)
 #
-#    PvP.AccurateZoneRequirements
-#        Whether to enforce Blizzlike PVP rank requirements to zone into the Champion and Legends halls.
-#        Default: 1
-#
 #    PvP.AccurateTimeline
 #        Whether to enforce accurate PVP timelines. eg. the honour system was not implemented before patch 1.4.
 #        If set, players will be unable to gain rank until the appropriate patch.
@@ -431,7 +431,6 @@ WowPatch = 10
 
 PvP.AccurateEquipRequirements = 1
 PvP.AccuratePurchaseRequirements = 1
-PvP.AccurateZoneRequirements = 1
 PvP.AccurateTimeline = 1
 PvP.AccurateRewards = 1
 PvP.DishonorableKills = 1
@@ -1020,8 +1019,13 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #                 0 (ignore commands)
 #
 #    Event.Announce
+#        Sends an announcement to players when a game event starts.
 #        Default: 0 (false)
 #                 1 (true)
+#
+#    AutoBroadcast.Timer
+#        Server autobroadcast interval set in miliseconds.
+#        Default: 1800000 = 30 min
 #
 #    BeepAtStart
 #        Beep at mangosd start finished (mostly work only at Unix/Linux systems)
@@ -1063,8 +1067,6 @@ ShowHealthValues = 0
 MaxPlayerLevel = 60
 StartPlayerLevel = 1
 StartPlayerMoney = 0
-MaxHonorPoints = 75000
-StartHonorPoints = 0
 MinHonorKills = 15
 MaintenanceDay = 3
 InstantLogout = 1
@@ -1101,6 +1103,7 @@ PetUnsummonAtMount = 0
 PetDefaultLoyalty = 1
 PlayerCommands = 1
 Event.Announce = 0
+AutoBroadcast.Timer = 1800000
 BeepAtStart = 1
 ShowProgressBars = 0
 WaitAtStartupError = 0
@@ -1620,12 +1623,7 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     11 - Log, Report to GM, Kick
 #
 #    Anticheat.SpeedHack.Enable
-#        Description: Check for players moving too fast.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.SpeedHack.UseInterpolation
-#        Description: Use movement interpolation when doing speed checks.
+#        Description: Check for players moving too fast using extrapolation.
 #        Default:     1 - (Enabled)
 #                     0 - (Disabled)
 #
@@ -1639,19 +1637,6 @@ Warden.ModuleDir             = "warden_modules"
 #        Default:     30
 #
 #    Anticheat.OverpspeedDistance.Penalty
-#        Description: Action to take upon failing this check.
-#        Default:     11 - Log, Report to GM, Kick
-#
-#    Anticheat.OverspeedZ.Enable
-#        Description: Check for players moving up or down too fast.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
-#
-#    Anticheat.OverspeedZ.Threshold
-#        Description: Detections needed to trigger a penalty.
-#        Default:     3
-#
-#    Anticheat.OverspeedZ.Penalty
 #        Description: Action to take upon failing this check.
 #        Default:     11 - Log, Report to GM, Kick
 #
@@ -2045,13 +2030,9 @@ Anticheat.NumDesyncs.Enable = 1
 Anticheat.NumDesyncs.Threshold = 5
 Anticheat.NumDesyncs.Penalty = 11
 Anticheat.SpeedHack.Enable = 1
-Anticheat.SpeedHack.UseInterpolation = 1
 Anticheat.OverpspeedDistance.Enable = 1
 Anticheat.OverpspeedDistance.Threshold = 30
 Anticheat.OverpspeedDistance.Penalty = 11
-Anticheat.OverspeedZ.Enable = 1
-Anticheat.OverspeedZ.Threshold = 3
-Anticheat.OverspeedZ.Penalty = 11
 Anticheat.OverspeedJump.Enable = 1
 Anticheat.OverspeedJump.Reject = 1
 Anticheat.OverspeedJump.Threshold = 3
@@ -2285,18 +2266,25 @@ GMTickets.Admin.Security = 7
 #        Delay time between creature AI reactions on nearby movements
 #        Default: 1000 (milliseconds)
 #
+#    Visibility.ForceActiveObjects
+#        Force any creatures or gameobjects with increased visibility set in template to be active objects.
+#        The modifier will not work for creatures that don't have the active flag set in spawn table otherwise.
+#        Default: 1 (enabled)
+#                 0 (disabled)
+#
 ###################################################################################################################
 
-Visibility.GroupMode = 0
-Visibility.Distance.Continents    = 90
-Visibility.Distance.Continents.Min= 60
-Visibility.Distance.Instances     = 120
-Visibility.Distance.BG            = 180
-Visibility.Distance.InFlight      = 100
-Visibility.Distance.Grey.Unit   = 1
-Visibility.Distance.Grey.Object = 10
+Visibility.GroupMode               = 0
+Visibility.Distance.Continents     = 100
+Visibility.Distance.Continents.Min = 60
+Visibility.Distance.Instances      = 170
+Visibility.Distance.BG             = 533
+Visibility.Distance.InFlight       = 100
+Visibility.Distance.Grey.Unit      = 1
+Visibility.Distance.Grey.Object    = 10
 Visibility.RelocationLowerLimit    = 10
 Visibility.AIRelocationNotifyDelay = 1000
+Visibility.ForceActiveObjects      = 1
 
 ###################################################################################################################
 # SERVER RATES
@@ -2805,17 +2793,6 @@ AHBot.itemcount = 50
 #AHBot.bot.account = 32377
 
 ###################################################################################################################
-#    CLUSTERING (Not working, still WIP)
-###################################################################################################################
-
-IsMapServer = 0
-NodesListenAddress = "127.0.0.1"
-NodesListenPort = 0
-MasterListenAddress = "127.0.0.1"
-MasterListenPort = 0
-ServerName = "Master"
-
-###################################################################################################################
 #    Database-based chat
 ###################################################################################################################
 OfflineChat.Enable = 0
@@ -2833,6 +2810,7 @@ PlayerBot.MinBots = 0
 PlayerBot.MaxBots = 0
 PlayerBot.Refresh = 10000
 PlayerBot.ForceLogoutDelay = 1
+PlayerBot.ShowInWhoList = 0
 
 ###################################################################################################################
 #    Mail flooding mitigation

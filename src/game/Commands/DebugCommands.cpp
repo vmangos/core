@@ -27,7 +27,6 @@
 #include "Opcodes.h"
 #include "Chat.h"
 #include "Log.h"
-#include "Unit.h"
 #include "GossipDef.h"
 #include "Language.h"
 #include "BattleGroundMgr.h"
@@ -72,7 +71,7 @@ bool ChatHandler::HandleSpellEffectsCommand(char *args)
         return false;
     }
     LocaleConstant loc = GetSessionDbcLocale();
-    ShowSpellListHelper(NULL, pSpell, loc);
+    ShowSpellListHelper(nullptr, pSpell, loc);
     for (uint8 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         if (pSpell->Effect[i] == 0)
@@ -98,7 +97,7 @@ bool ChatHandler::HandleSpellEffectsCommand(char *args)
                 pSpell->Effect[i] == SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY ||
                 pSpell->Effect[i] == SPELL_EFFECT_ENCHANT_HELD_ITEM)
         {
-            SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(pSpell->EffectMiscValue[i]);
+            SpellItemEnchantmentEntry const* pEnchant = sSpellItemEnchantmentStore.LookupEntry(pSpell->EffectMiscValue[i]);
             if (pEnchant)
             {
                 PSendSysMessage("* Enchantement id %u [Aura`%u`:Slot`%u]`", pSpell->EffectMiscValue[i], pEnchant->aura_id, pEnchant->slot);
@@ -110,7 +109,7 @@ bool ChatHandler::HandleSpellEffectsCommand(char *args)
         }
 
         if (SpellEntry const* pTriggered = sSpellMgr.GetSpellEntry(pSpell->EffectTriggerSpell[i]))
-            ShowSpellListHelper(NULL, pTriggered, loc);
+            ShowSpellListHelper(nullptr, pTriggered, loc);
         else
             PSendSysMessage("(existe pas)");
     }
@@ -130,7 +129,7 @@ bool ChatHandler::HandleSpellInfosCommand(char *args)
         return false;
     }
     LocaleConstant loc = GetSessionDbcLocale();
-    ShowSpellListHelper(NULL, pSpell, loc);
+    ShowSpellListHelper(nullptr, pSpell, loc);
 
     PSendSysMessage("School%u:Category%u:Dispel%u:Mechanic%u", pSpell->School, pSpell->Category, pSpell->Dispel, pSpell->Mechanic);
     PSendSysMessage("Attributes0x%x:Ex[0x%x:0x%x:0x%x:0x%x]", pSpell->Attributes, pSpell->AttributesEx, pSpell->AttributesEx2, pSpell->AttributesEx3, pSpell->AttributesEx4);
@@ -158,7 +157,7 @@ bool ChatHandler::HandleSpellSearchCommand(char *args)
         return false;
     PSendSysMessage("* Results for SpellFamilyName %u and SpellFamilyFlags & 0x%x", familyName, familyFlags);
     LocaleConstant loc = GetSessionDbcLocale();
-    SpellEntry const* pSpell = NULL;
+    SpellEntry const* pSpell = nullptr;
     for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); ++id)
     {
         pSpell = sSpellMgr.GetSpellEntry(id);
@@ -166,7 +165,7 @@ bool ChatHandler::HandleSpellSearchCommand(char *args)
             continue;
         if (pSpell->SpellFamilyName == familyName && pSpell->SpellFamilyFlags & familyFlags)
         {
-            ShowSpellListHelper(NULL, pSpell, loc);
+            ShowSpellListHelper(nullptr, pSpell, loc);
             ++results;
         }
     }
@@ -196,7 +195,7 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
     if (!ExtractOptUInt32(&args, failarg2, 0))
         return false;
 
-    char* unk = strtok(NULL, " ");
+    char* unk = strtok(nullptr, " ");
     uint8 unkI = unk ? (uint8)atoi(unk) : 2;
 
     WorldPacket data(SMSG_CAST_RESULT, 4 + 1 + 1);
@@ -230,7 +229,7 @@ bool ChatHandler::HandleDebugSendNextChannelSpellVisualCommand(char *args)
         return true;
     }
     uint32 id = 0;
-    SpellEntry const *spellInfo = NULL;
+    SpellEntry const* spellInfo = nullptr;
     for (id = uiPlayId + 1; id <= sSpellMgr.GetMaxSpellId(); id++)
     {
         spellInfo = sSpellMgr.GetSpellEntry(id);
@@ -267,7 +266,7 @@ bool ChatHandler::HandleSendSpellChannelVisualCommand(char *args)
         data << uint32(60000);
         m_session->GetPlayer()->SendDirectMessage(&data);
         m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, uiPlayId);
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(uiPlayId);
+        SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(uiPlayId);
         PSendSysMessage("Playing channel visual of spell %u %s %s", uiPlayId, spellInfo->SpellName[0].c_str(), spellInfo->Rank[0].c_str());
         return true;
     }
@@ -286,7 +285,7 @@ bool ChatHandler::HandleSendSpellChannelVisualCommand(char *args)
 
 bool ChatHandler::HandleDebugSendPoiCommand(char* args)
 {
-    Player *pPlayer = m_session->GetPlayer();
+    Player* pPlayer = m_session->GetPlayer();
     Unit* target = GetSelectedUnit();
     if (!target)
     {
@@ -313,7 +312,7 @@ bool ChatHandler::HandleDebugSendEquipErrorCommand(char* args)
         return false;
 
     uint8 msg = atoi(args);
-    m_session->GetPlayer()->SendEquipError(InventoryResult(msg), NULL, NULL);
+    m_session->GetPlayer()->SendEquipError(InventoryResult(msg), nullptr, nullptr);
     return true;
 }
 
@@ -339,7 +338,7 @@ bool ChatHandler::HandleDebugSendBuyErrorCommand(char* args)
 
 bool ChatHandler::HandleDebugSendOpenBagCommand(char *args)
 {
-    Player *pTarget = GetSelectedPlayer();
+    Player* pTarget = GetSelectedPlayer();
     if (!pTarget)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -353,7 +352,7 @@ bool ChatHandler::HandleDebugSendOpenBagCommand(char *args)
 
 bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
 {
-    Unit *unit = GetSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
         unit = m_session->GetPlayer();
 
@@ -371,7 +370,7 @@ bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
         std::string type;
         ifs >> type;
 
-        if (type == "")
+        if (type.empty())
             break;
 
         if (type == "uint8")
@@ -575,7 +574,7 @@ bool ChatHandler::HandleDebugConditionCommand(char* args)
 //Send notification in channel
 bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
 {
-    const char *name = "test";
+    char const* name = "test";
 
     uint32 code;
     if (!ExtractUInt32(&args, code) || code > 255)
@@ -593,7 +592,7 @@ bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
 //Send notification in chat
 bool ChatHandler::HandleDebugSendChatMsgCommand(char* args)
 {
-    const char *msg = "testtest";
+    char const* msg = "testtest";
 
     uint32 type;
     if (!ExtractUInt32(&args, type) || type > 255)
@@ -717,10 +716,9 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
 
     if (list_queue)
     {
-        std::vector<Item *> &updateQueue = player->GetItemUpdateQueue();
-        for (size_t i = 0; i < updateQueue.size(); ++i)
+        std::vector<Item *>& updateQueue = player->GetItemUpdateQueue();
+        for (const auto item : updateQueue)
         {
-            Item *item = updateQueue[i];
             if (!item) continue;
 
             Bag *container = item->GetContainer();
@@ -753,7 +751,7 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
     if (check_all)
     {
         bool error = false;
-        std::vector<Item *> &updateQueue = player->GetItemUpdateQueue();
+        std::vector<Item *>& updateQueue = player->GetItemUpdateQueue();
         for (uint8 i = PLAYER_SLOT_START; i < PLAYER_SLOT_END; ++i)
         {
             if (i >= BUYBACK_SLOT_START && i < BUYBACK_SLOT_END)
@@ -799,9 +797,9 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
                     continue;
                 }
 
-                if (updateQueue[qp] == NULL)
+                if (updateQueue[qp] == nullptr)
                 {
-                    PSendSysMessage("%s at slot %u has a queuepos (%d) that points to NULL in the queue!",
+                    PSendSysMessage("%s at slot %u has a queuepos (%d) that points to nullptr in the queue!",
                                     item->GetGuidStr().c_str(), item->GetSlot(), qp);
                     error = true;
                     continue;
@@ -878,9 +876,9 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
                             continue;
                         }
 
-                        if (updateQueue[qp] == NULL)
+                        if (updateQueue[qp] == nullptr)
                         {
-                            PSendSysMessage("%s in bag %u at slot %u has a queuepos (%d) that points to NULL in the queue!",
+                            PSendSysMessage("%s in bag %u at slot %u has a queuepos (%d) that points to nullptr in the queue!",
                                             item2->GetGuidStr().c_str(), bag->GetSlot(), item2->GetSlot(), qp);
                             error = true;
                             continue;
@@ -931,7 +929,7 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
             if (item->GetState() == ITEM_REMOVED) continue;
             Item *test = player->GetItemByPos(item->GetBagSlot(), item->GetSlot());
 
-            if (test == NULL)
+            if (test == nullptr)
             {
                 PSendSysMessage("queue(" SIZEFMTD "): %s has incorrect (bag %u slot %u) values, the player doesn't have an item at that position!",
                                 i, item->GetGuidStr().c_str(), item->GetBagSlot(), item->GetSlot());
@@ -1210,11 +1208,12 @@ bool ChatHandler::HandleDebugGetValueCommand(char* args)
 bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char* typeStr, char* valStr)
 {
     ObjectGuid guid = target->GetObjectGuid();
+    char const* guidString = guid.GetString().c_str();
 
     // not allow access to nonexistent or critical for work field
     if (field >= target->GetValuesCount() || field <= OBJECT_FIELD_ENTRY)
     {
-        PSendSysMessage(LANG_TOO_BIG_INDEX, field, guid.GetString().c_str(), target->GetValuesCount());
+        PSendSysMessage(LANG_TOO_BIG_INDEX, field, guidString, target->GetValuesCount());
         return false;
     }
 
@@ -1245,23 +1244,23 @@ bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char*
             default:
             case 1:                                         // int +
                 value = uint32(int32(value) + int32(iValue));
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_INT32), guid.GetString().c_str(), field, iValue, value, value);
-                PSendSysMessage(LANG_CHANGE_INT32_FIELD, guid.GetString().c_str(), field, iValue, value, value);
+                DEBUG_LOG(GetMangosString(LANG_CHANGE_INT32), guidString, field, iValue, value, value);
+                PSendSysMessage(LANG_CHANGE_INT32_FIELD, guidString, field, iValue, value, value);
                 break;
             case 2:                                         // |= bit or
                 value |= iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guid.GetString().c_str(), field, typeStr, iValue, value);
-                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guid.GetString().c_str(), field, typeStr, iValue, value);
+                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
             case 3:                                         // &= bit and
                 value &= iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guid.GetString().c_str(), field, typeStr, iValue, value);
-                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guid.GetString().c_str(), field, typeStr, iValue, value);
+                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
             case 4:                                         // &=~ bit and not
                 value &= ~iValue;
-                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guid.GetString().c_str(), field, typeStr, iValue, value);
-                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guid.GetString().c_str(), field, typeStr, iValue, value);
+                DEBUG_LOG(GetMangosString(LANG_CHANGE_HEX), guidString, field, typeStr, iValue, value);
+                PSendSysMessage(LANG_CHANGE_HEX_FIELD, guidString, field, typeStr, iValue, value);
                 break;
         }
 
@@ -1277,8 +1276,8 @@ bool ChatHandler::HandlerDebugModValueHelper(Object* target, uint32 field, char*
 
         value += fValue;
 
-        DEBUG_LOG(GetMangosString(LANG_CHANGE_FLOAT), guid.GetString().c_str(), field, fValue, value);
-        PSendSysMessage(LANG_CHANGE_FLOAT_FIELD, guid.GetString().c_str(), field, fValue, value);
+        DEBUG_LOG(GetMangosString(LANG_CHANGE_FLOAT), guidString, field, fValue, value);
+        PSendSysMessage(LANG_CHANGE_FLOAT_FIELD, guidString, field, fValue, value);
 
         target->SetFloatValue(field, value);
     }
@@ -1342,7 +1341,7 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     if (!spellid)
         return false;
 
-    SpellEntry const * spellEntry = sSpellMgr.GetSpellEntry(spellid);
+    SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellid);
     if (!spellEntry)
         return false;
 
@@ -1413,8 +1412,8 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
     if (!ExtractInt32(&args, value))
         return false;
 
-    Player *chr = GetSelectedPlayer();
-    if (chr == NULL)
+    Player* chr = GetSelectedPlayer();
+    if (chr == nullptr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
         SetSentErrorMessage(true);
@@ -1506,7 +1505,7 @@ bool ChatHandler::HandleDebugLoSAllowCommand(char* args)
 
 bool ChatHandler::HandleSendSpellVisualCommand(char *args)
 {
-    Unit *pTarget = GetSelectedUnit();
+    Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1544,7 +1543,7 @@ bool ChatHandler::HandleSendSpellVisualCommand(char *args)
 
 bool ChatHandler::HandleSendSpellImpactCommand(char *args)
 {
-    Unit *pTarget = GetSelectedUnit();
+    Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1598,27 +1597,18 @@ bool ChatHandler::HandleDebugOverflowCommand(char* args)
     return true;
 }
 
-extern LootStore LootTemplates_Creature;
-extern LootStore LootTemplates_Fishing;
-extern LootStore LootTemplates_Gameobject;
-extern LootStore LootTemplates_Item;
-extern LootStore LootTemplates_Mail;
-extern LootStore LootTemplates_Pickpocketing;
-extern LootStore LootTemplates_Skinning;
-extern LootStore LootTemplates_Disenchant;
-
 bool ChatHandler::HandleDebugLootTableCommand(char* args)
 {
     std::stringstream in(args);
     std::string tableName;
-    int lootid = 0;
-    int checkItem = 0;
-    unsigned int simCount = 0;
+    int32 lootid = 0;
+    int32 checkItem = 0;
+    uint32 simCount = 0;
     in >> tableName >> lootid >> simCount >> checkItem;
     simCount = simCount ? simCount : 10000;
     SetSentErrorMessage(true);
 
-    LootStore const* store = NULL;
+    LootStore const* store = nullptr;
     if (tableName == "creature")
         store = &LootTemplates_Creature;
     else if (tableName == "reference")
@@ -1658,35 +1648,35 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
     if (checkItem)
         lootChances[checkItem] = 0;
 
-    const unsigned int MAX_TIME = 30;
+    uint32 const MAX_TIME = 30;
     auto startTime = time(nullptr);
 
-    for (unsigned int i = 0; i < simCount; ++i)
+    for (uint32 i = 0; i < simCount; ++i)
     {
-        Loot l(NULL);
+        Loot l(nullptr);
         if (lootOwner)
             l.SetTeam(lootOwner->GetTeam());
         tab->Process(l, *store, store->IsRatesAllowed());
-        for (LootItemList::const_iterator it = l.items.begin(); it != l.items.end(); ++it)
-            if (!lootOwner || !it->conditionId)
-                lootChances[it->itemid]++;
-        for (LootItemList::const_iterator it = l.m_questItems.begin(); it != l.m_questItems.end(); ++it)
-            lootChances[it->itemid]++;
+        for (const auto& item : l.items)
+            if (!lootOwner || !item.conditionId)
+                lootChances[item.itemid]++;
+        for (const auto& m_questItem : l.m_questItems)
+            lootChances[m_questItem.itemid]++;
         if (lootOwner)
         {
             l.FillNotNormalLootFor(lootOwner);
             QuestItemMap::const_iterator itemsList = l.m_playerFFAItems.find(lootOwner->GetGUIDLow());
             if (itemsList != l.m_playerFFAItems.end())
-                for (QuestItemList::const_iterator it = itemsList->second->begin(); it != itemsList->second->end(); ++it)
-                    lootChances[l.items[it->index].itemid]++;
+                for (const auto& it : *itemsList->second)
+                    lootChances[l.items[it.index].itemid]++;
             itemsList = l.m_playerQuestItems.find(lootOwner->GetGUIDLow());
             if (itemsList != l.m_playerQuestItems.end())
-                for (QuestItemList::const_iterator it = itemsList->second->begin(); it != itemsList->second->end(); ++it)
-                    lootChances[l.m_questItems[it->index].itemid]++;
+                for (const auto& it : *itemsList->second)
+                    lootChances[l.m_questItems[it.index].itemid]++;
             itemsList = l.m_playerNonQuestNonFFAConditionalItems.find(lootOwner->GetGUIDLow());
             if (itemsList != l.m_playerNonQuestNonFFAConditionalItems.end())
-                for (QuestItemList::const_iterator it = itemsList->second->begin(); it != itemsList->second->end(); ++it)
-                    lootChances[l.items[it->index].itemid]++;
+                for (const auto& it : *itemsList->second)
+                    lootChances[l.items[it.index].itemid]++;
         }
 
         if (i % 1000000 == 0) // check the time every million iterations
@@ -1700,31 +1690,33 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
         }
     }
     PSendSysMessage("%u items dropped after %u attempts for loot %s.%u", lootChances.size(), simCount, tableName.c_str(), lootid);
-    for (std::map<uint32, uint32>::const_iterator it = lootChances.begin(); it != lootChances.end(); ++it)
-        if (it->first == checkItem || !checkItem)
+    for (const auto& itr : lootChances)
+    {
+        if (itr.first == checkItem || !checkItem)
         {
-            ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype >(it->first);
+            ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(itr.first);
             if (!proto)
                 continue;
 
             std::stringstream chance;
-            chance << 100 * it->second / float(simCount);
+            chance << 100 * itr.second / float(simCount);
             chance << "%";
             if (m_session)
-                PSendSysMessage(LANG_ITEM_LIST_CHAT, it->first, it->first, proto->Name1, chance.str().c_str());
+                PSendSysMessage(LANG_ITEM_LIST_CHAT, itr.first, itr.first, proto->Name1, chance.str().c_str());
             else
-                PSendSysMessage(LANG_ITEM_LIST_CONSOLE, it->first, proto->Name1, chance.str().c_str());
+                PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr.first, proto->Name1, chance.str().c_str());
         }
+    }
     return true;
 }
 
-bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, unsigned int simCount)
+bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, uint32 simCount)
 {
     std::map<uint32, uint32> lootChances;
-    const unsigned int MAX_TIME = 30;
+    uint32 const MAX_TIME = 30;
     auto startTime = time(nullptr);
 
-    ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype >(lootid);
+    ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(lootid);
     if (!proto)
     {
         PSendSysMessage("Error: invalid item id %u", lootid);
@@ -1736,7 +1728,7 @@ bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, unsigned int simCoun
         return false;
     }
 
-    for (unsigned int i = 0; i < simCount; ++i)
+    for (uint32 i = 0; i < simCount; ++i)
     {
         uint32 enchant = GetItemEnchantMod(proto->RandomProperty);
         lootChances[enchant]++;
@@ -1753,18 +1745,18 @@ bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, unsigned int simCoun
     }
 
     PSendSysMessage("%u items dropped after %u attempts for item %s.", lootChances.size(), simCount, proto->Name1);
-    for (std::map<uint32, uint32>::const_iterator it = lootChances.begin(); it != lootChances.end(); ++it)
+    for (const auto& itr : lootChances)
     {
         std::stringstream chance;
-        chance << 100 * it->second / float(simCount);
+        chance << 100 * itr.second / float(simCount);
         chance << "%";
-        ItemRandomPropertiesEntry const* randomProp = sItemRandomPropertiesStore.LookupEntry(it->first);
+        ItemRandomPropertiesEntry const* randomProp = sItemRandomPropertiesStore.LookupEntry(itr.first);
         if (!randomProp)
             continue;
         if (m_session)
-            PSendSysMessage(LANG_ITEM_LIST_CHAT, it->first, lootid, randomProp->internalName, chance.str().c_str());
+            PSendSysMessage(LANG_ITEM_LIST_CHAT, itr.first, lootid, randomProp->internalName, chance.str().c_str());
         else
-            PSendSysMessage(LANG_ITEM_LIST_CONSOLE, it->first, randomProp->internalName, chance.str().c_str());
+            PSendSysMessage(LANG_ITEM_LIST_CONSOLE, itr.first, randomProp->internalName, chance.str().c_str());
     }
     return true;
 }
@@ -1795,7 +1787,7 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 {
     for (uint32 id = 0; id < sItemStorage.GetMaxEntry(); id++)
     {
-        ItemPrototype const * proto1 = sItemStorage.LookupEntry<ItemPrototype>(id);
+        ItemPrototype const* proto1 = sItemStorage.LookupEntry<ItemPrototype>(id);
         if (!proto1)
             continue;
         Races currMountRace;
@@ -1825,9 +1817,9 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 
         if (!canEquip)
         {
-            ItemPrototype const* similar = NULL;
+            ItemPrototype const* similar = nullptr;
             for (uint32 id2 = 0; id2 < sItemStorage.GetMaxEntry(); id2++)
-                if (ItemPrototype const * proto2 = sItemStorage.LookupEntry<ItemPrototype>(id2))
+                if (ItemPrototype const* proto2 = sItemStorage.LookupEntry<ItemPrototype>(id2))
                     if (proto1 != proto2 && IsSimilarItem(proto1, proto2))
                     {
                         if (similar)
@@ -1848,13 +1840,13 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 
 bool ChatHandler::HandleVideoTurn(char*)
 {
-    const float radiusBegin = 40.0f;
-    const float radiusEnd = 10.0f;
-    const float zBegin = 30.0f;
-    const float zEnd = 10.0f;
-    const float angleBegin = 0.0f;
-    const float angleEnd = 10 * M_PI_F;
-    const float moveSpeed = 30.0f;
+    float const radiusBegin = 40.0f;
+    float const radiusEnd = 10.0f;
+    float const zBegin = 30.0f;
+    float const zEnd = 10.0f;
+    float const angleBegin = 0.0f;
+    float const angleEnd = 10 * M_PI_F;
+    float const moveSpeed = 30.0f;
     std::list<Creature*> targets;
     Unit* selection = GetSelectedUnit();
     if (!selection)
@@ -1884,10 +1876,10 @@ bool ChatHandler::HandleVideoTurn(char*)
 
 bool ChatHandler::HandleDebugExp(char*)
 {
-    const float moveDist = 80.0f;
-    const float searchCreaturesRange = 60.0f;
-    const float retournementRayon = 2.0f;
-    const float moveSpeed = 6.0f;
+    float const moveDist = 80.0f;
+    float const searchCreaturesRange = 60.0f;
+    float const retournementRayon = 2.0f;
+    float const moveSpeed = 6.0f;
     std::list<Creature*> targets;
     Unit* selection = GetSelectedUnit();
     if (!selection)
@@ -1905,9 +1897,8 @@ bool ChatHandler::HandleDebugExp(char*)
 
     cell.Visit(pair, visitor, *(selection->GetMap()), *selection, searchCreaturesRange);
 
-    for (std::list<Creature*>::iterator it = targets.begin(); it != targets.end(); ++it)
+    for (const auto target : targets)
     {
-        Unit* target = *it;
         float x = target->GetPositionX() + moveDist * cos(target->GetOrientation());
         float y = target->GetPositionY() + moveDist * sin(target->GetOrientation());
         float z = target->GetPositionZ();
@@ -2079,7 +2070,7 @@ bool ChatHandler::HandleDebugMoveSplineCommand(char* args)
     PSendSysMessage("Target: %s", unit->GetGuidStr().c_str());
     PSendSysMessage("MoveSpline: %s", unit->movespline->Finalized() ? "finalized" : "running");
     PSendSysMessage("MvtOrigin: %s", unit->movespline->GetMovementOrigin());
-    const std::vector<Vector3>& path = unit->movespline->getPath();
+    std::vector<Vector3> const& path = unit->movespline->getPath();
     for (size_t i = 0; i < path.size(); ++i)
         PSendSysMessage("Point%u %f %f %f", i, path[i].x, path[i].y, path[i].z);
     return true;
@@ -2092,13 +2083,13 @@ bool ChatHandler::HandleUnitStatCommand(char *args)
         return false;
     uint32 unitStat = 0x0;
     for (int i = 1; i < UNIT_STAT_IGNORE_PATHFINDING; i *= 2)
-        if (pTarget->hasUnitState(i))
+        if (pTarget->HasUnitState(i))
             unitStat |= i;
     PSendSysMessage("UnitState = 0x%x (%u)", unitStat, unitStat);
     if (ExtractUInt32(&args, unitStat))
     {
-        pTarget->clearUnitState(UNIT_STAT_ALL_STATE);
-        pTarget->addUnitState(unitStat);
+        pTarget->ClearUnitState(UNIT_STAT_ALL_STATE);
+        pTarget->AddUnitState(unitStat);
         PSendSysMessage("UnitState changed to 0x%x (%u)", unitStat, unitStat);
     }
     return true;
@@ -2154,6 +2145,20 @@ bool ChatHandler::HandleDebugMoveToCommand(char* args)
     sscanf(args, "%x", &flags);
     player->GetMotionMaster()->MovePoint(0, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), flags);
     PSendSysMessage("Moving to \"%s\" (flags 0x%x)", target->GetName(), flags);
+    return true;
+}
+
+bool ChatHandler::HandleDebugFaceMeCommand(char* args)
+{
+    Player* player = m_session->GetPlayer();
+    Unit* target = GetSelectedUnit();
+    if (!player || !target || player == target)
+    {
+        PSendSysMessage("Invalid target/source selection.");
+        return true;
+    }
+
+    target->SetFacingTo(target->GetAngle(player));
     return true;
 }
 
@@ -2285,11 +2290,11 @@ bool ChatHandler::HandleMmapTestArea(char* args)
 
         float x, y, z;
         m_session->GetPlayer()->GetPosition(x, y, z);
-        for (MmapTestUnitList::iterator itr = creatureList.begin(); itr != creatureList.end(); ++itr)
+        for (const auto& itr : creatureList)
         {
-            if ((*itr)->GetTypeId() != TYPEID_UNIT)
+            if (itr->GetTypeId() != TYPEID_UNIT)
                 continue;
-            Creature* target = (*itr)->ToCreature();
+            Creature* target = itr->ToCreature();
             if (target->IsTrigger() || target->GetEntry() <= 2)
                 continue;
             PathInfo path(target);
@@ -2352,14 +2357,11 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
     PSendSysMessage("Building %s", useStraightPath ? "StraightPath" : "SmoothPath");
     PSendSysMessage("length %i (dist %f) type %u", pointPath.size(), path.Length(), path.getPathType());
 
-    // this entry visible only to GM's with "gm on"
-    static const uint32 WAYPOINT_NPC_ENTRY = 1;
-    Creature* wp = NULL;
-    for (uint32 i = 0; i < pointPath.size(); ++i)
+    for (auto& i : pointPath)
     {
         if (transport)
-            transport->CalculatePassengerPosition(pointPath[i].x, pointPath[i].y, pointPath[i].z);
-        if (wp = player->SummonCreature(WAYPOINT_NPC_ENTRY, pointPath[i].x, pointPath[i].y, pointPath[i].z, 0, TEMPSUMMON_TIMED_DESPAWN, 18000))
+            transport->CalculatePassengerPosition(i.x, i.y, i.z);
+        if (Creature* wp = player->SummonCreature(VISUAL_WAYPOINT, i.x, i.y, i.z, 0, TEMPSUMMON_TIMED_DESPAWN, 18000))
         {
             wp->SetFly(true);
             if (transport)
@@ -2394,7 +2396,7 @@ bool ChatHandler::HandleMmapLocCommand(char* /*args*/)
     {
         transport->CalculatePassengerOffset(location[2], location[0], location[1]);
         PSendSysMessage("* On transport navmesh 'go%03u.mmap' offsets [%f %f %f]", transport->GetDisplayId(), location[2], location[0], location[1]);
-        const dtNavMeshQuery* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetModelNavMeshQuery(transport->GetDisplayId());
+        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetModelNavMeshQuery(transport->GetDisplayId());
         if (!navmeshquery)
         {
             SendSysMessage("No navmeshloaded");
@@ -2424,15 +2426,15 @@ bool ChatHandler::HandleMmapLocCommand(char* /*args*/)
     PSendSysMessage("tile [%i,%i]", gy, gx); // Recast coords are swapped.
 
     // calculate navmesh tile location
-    const dtNavMesh* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(unit->GetMapId());
-    const dtNavMeshQuery* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(unit->GetMapId());
+    dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(unit->GetMapId());
+    dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(unit->GetMapId());
     if (!navmesh || !navmeshquery)
     {
         PSendSysMessage("NavMesh not loaded for current map.");
         return true;
     }
 
-    const float* min = navmesh->getParams()->orig;
+    float const* min = navmesh->getParams()->orig;
     int32 tilex = int32((y - min[0]) / SIZE_OF_GRIDS);
     int32 tiley = int32((x - min[2]) / SIZE_OF_GRIDS);
 
@@ -2445,8 +2447,8 @@ bool ChatHandler::HandleMmapLocCommand(char* /*args*/)
         PSendSysMessage("Dt     [??,??] (invalid poly, probably no tile loaded)");
     else
     {
-        const dtMeshTile* tile;
-        const dtPoly* poly;
+        dtMeshTile const* tile;
+        dtPoly const* poly;
         navmesh->getTileAndPolyByRef(polyRef, &tile, &poly);
         if (tile)
             PSendSysMessage("Dt     [%02i,%02i]", tile->header->x, tile->header->y);
@@ -2468,8 +2470,8 @@ bool ChatHandler::HandleMmapLoadedTilesCommand(char* /*args*/)
 {
     uint32 mapid = m_session->GetPlayer()->GetMapId();
 
-    const dtNavMesh* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(mapid);
-    const dtNavMeshQuery* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(mapid);
+    dtNavMesh const* navmesh = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMesh(mapid);
+    dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetNavMeshQuery(mapid);
     if (!navmesh || !navmeshquery)
     {
         PSendSysMessage("NavMesh not loaded for current map.");
@@ -2480,7 +2482,7 @@ bool ChatHandler::HandleMmapLoadedTilesCommand(char* /*args*/)
 
     for (int32 i = 0; i < navmesh->getMaxTiles(); ++i)
     {
-        const dtMeshTile* tile = navmesh->getTile(i);
+        dtMeshTile const* tile = navmesh->getTile(i);
         if (!tile || !tile->header)
             continue;
 
@@ -2498,11 +2500,11 @@ bool ChatHandler::HandleMmapStatsCommand(char* /*args*/)
     MMAP::MMapManager *manager = MMAP::MMapFactory::createOrGetMMapManager();
     PSendSysMessage(" %u maps loaded with %u tiles overall", manager->getLoadedMapsCount(), manager->getLoadedTilesCount());
 
-    const dtNavMesh* navmesh = manager->GetNavMesh(m_session->GetPlayer()->GetMapId());
+    dtNavMesh const* navmesh = manager->GetNavMesh(m_session->GetPlayer()->GetMapId());
     if (Transport* transport = m_session->GetPlayer()->GetTransport())
     {
-        const dtNavMeshQuery* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetModelNavMeshQuery(transport->GetDisplayId());
-        navmesh = navmeshquery ? navmeshquery->getAttachedNavMesh() : NULL;
+        dtNavMeshQuery const* navmeshquery = MMAP::MMapFactory::createOrGetMMapManager()->GetModelNavMeshQuery(transport->GetDisplayId());
+        navmesh = navmeshquery ? navmeshquery->getAttachedNavMesh() : nullptr;
     }
 
     if (!navmesh)
@@ -2520,7 +2522,7 @@ bool ChatHandler::HandleMmapStatsCommand(char* /*args*/)
     uint32 dataSize = 0;
     for (int32 i = 0; i < navmesh->getMaxTiles(); ++i)
     {
-        const dtMeshTile* tile = navmesh->getTile(i);
+        dtMeshTile const* tile = navmesh->getTile(i);
         if (!tile || !tile->header)
             continue;
 

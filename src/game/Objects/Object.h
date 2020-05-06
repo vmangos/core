@@ -28,21 +28,33 @@
 #include "UpdateData.h"
 #include "ObjectGuid.h"
 #include "Camera.h"
-#include "SpellEntry.h"
+#include "SharedDefines.h"
+#include "SpellDefines.h"
+#include "DBCEnums.h"
 #include "Utilities/EventProcessor.h"
 
 #include <set>
 #include <string>
+#include <array>
 
 #define CONTACT_DISTANCE            0.5f
 #define INTERACTION_DISTANCE        5.0f
 #define ATTACK_DISTANCE             5.0f
-#define MAX_VISIBILITY_DISTANCE     333.0f      // max distance for visible object show, limited in 333 yards
-#define DEFAULT_VISIBILITY_DISTANCE 90.0f       // default visible distance, 90 yards on continents
-#define DEFAULT_VISIBILITY_INSTANCE 120.0f      // default visible distance in instances, 120 yards
-#define DEFAULT_VISIBILITY_BG       180.0f      // default visible distance in BG, 180 yards
-#define DEFAULT_VISIBILITY_MODIFIER 0.0f        // default visibility modifier on some units that should be seen beyond normal visibility distances
-#define DEFAULT_CREATURE_SUMMON_LIMIT  100      // default maximum number of creatures an object can have summoned at once
+#define INSPECT_DISTANCE            10.0f
+#define TRADE_DISTANCE              11.11f
+
+#define MAX_VISIBILITY_DISTANCE     SIZE_OF_GRIDS      // max distance for visible object show, used to be 333 yards
+#define DEFAULT_VISIBILITY_DISTANCE 100.0f             // default visible distance on continents, used to be 90 yards
+#define DEFAULT_VISIBILITY_INSTANCE 170.0f             // default visible distance in instances, used to be 120 yards
+#define DEFAULT_VISIBILITY_BG       533.0f             // default visible distance in BG, used to be 180 yards
+#define DEFAULT_VISIBILITY_MODIFIER 0.0f               // default visibility modifier on some units that should be seen beyond normal visibility distances
+#define DEFAULT_CREATURE_SUMMON_LIMIT  100             // default maximum number of creatures an object can have summoned at once
+
+#define VISIBILITY_DISTANCE_GIGANTIC    400.0f
+#define VISIBILITY_DISTANCE_LARGE       200.0f
+#define VISIBILITY_DISTANCE_NORMAL      100.0f
+#define VISIBILITY_DISTANCE_SMALL       50.0f
+#define VISIBILITY_DISTANCE_TINY        25.0f
 
 #define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // currently used (correctly?) for any non Unit world objects. This is actually the bounding_radius, like player/creature from creature_model_data
 #define DEFAULT_OBJECT_SCALE        1.0f                    // player/item scale as default, npc/go from database, pets from dbc
@@ -72,7 +84,6 @@ enum TempSummonType
     TEMPSUMMON_MANUAL_DESPAWN                 = 8,             // despawns when UnSummon() is called
     TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN   = 9,             // despawns after a specified time (in or out of combat) OR when the creature disappears
     TEMPSUMMON_TIMED_COMBAT_OR_CORPSE_DESPAWN = 10,            // despawns after a specified time (in or out of combat) OR when the creature dies
-
 };
 
 class WorldPacket;
@@ -89,32 +100,12 @@ class InstanceData;
 class TerrainInfo;
 class ZoneScript;
 class Transport;
+class SpellEntry;
+class Spell;
+
+struct FactionTemplateEntry;
 
 typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
-
-struct Position
-{
-    Position() = default;
-    Position(float position_x, float position_y, float position_z, float orientation) : x(position_x), y(position_y), z(position_z), o(orientation) {}
-    float x = 0.0f;
-    float y = 0.0f;
-    float z = 0.0f;
-    float o = 0.0f;
-};
-
-struct WorldLocation
-{
-    uint32 mapid = 0;
-    float coord_x = 0.0f;
-    float coord_y = 0.0f;
-    float coord_z = 0.0f;
-    float orientation = 0.0f;
-    explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
-        : mapid(_mapid), coord_x(_x), coord_y(_y), coord_z(_z), orientation(_o) {}
-    WorldLocation(WorldLocation const &loc)
-        : mapid(loc.mapid), coord_x(loc.coord_x), coord_y(loc.coord_y), coord_z(loc.coord_z), orientation(loc.orientation) {}
-};
-
 
 //use this class to measure time between world update ticks
 //essential for units updating their spells after cells become active
@@ -125,7 +116,7 @@ class WorldUpdateCounter
 
         uint32 timeElapsed()
         {
-            if(!m_tmStart)
+            if (!m_tmStart)
                 m_tmStart = WorldTimer::tickPrevTime();
 
             return WorldTimer::getMSTimeDiff(m_tmStart, WorldTimer::tickTime());
@@ -153,6 +144,7 @@ enum ObjectSpawnFlags
     SPAWN_FLAG_FORCE_DYNAMIC_ELITE  = 0x10, // creature only
     SPAWN_FLAG_EVADE_OUT_HOME_AREA  = 0x20, // creature only
     SPAWN_FLAG_NOT_VISIBLE          = 0x40, // creature only
+    SPAWN_FLAG_DEAD                 = 0x80, // creature only
 };
 
 // [-ZERO] Need check and update
@@ -232,7 +224,7 @@ class MovementInfo
         void SetMovementFlags(MovementFlags f) { moveFlags = f; }
 
         // Position manipulations
-        Position const *GetPos() const { return &pos; }
+        Position const* GetPos() const { return &pos; }
         void SetTransportData(ObjectGuid guid, float x, float y, float z, float o, uint32 time)
         {
             t_guid = guid;
@@ -252,7 +244,7 @@ class MovementInfo
             t_time = 0;
         }
         ObjectGuid const& GetTransportGuid() const { return t_guid; }
-        Position const *GetTransportPos() const { return &t_pos; }
+        Position const* GetTransportPos() const { return &t_pos; }
         Position* GetTransportPos() { return &t_pos; }
         uint32 GetTransportTime() const { return t_time; }
         uint32 GetFallTime() const { return fallTime; }
@@ -308,15 +300,17 @@ enum ObjectDelayedAction
     OBJECT_DELAYED_ADD_TO_REMOVE_LIST       = 0x4,
 };
 
-class MANGOS_DLL_SPEC Object
+typedef void(*CreatureAiSetter) (Creature* pCreature);
+
+class Object
 {
     public:
         virtual ~Object();
 
-        const bool& IsInWorld() const { return m_inWorld; }
+        bool const& IsInWorld() const { return m_inWorld; }
         virtual void AddToWorld()
         {
-            if(m_inWorld)
+            if (m_inWorld)
                 return;
 
             m_inWorld = true;
@@ -332,7 +326,7 @@ class MANGOS_DLL_SPEC Object
         }
 
         ObjectGuid const& GetObjectGuid() const { return GetGuidValue(OBJECT_FIELD_GUID); }
-        const uint64& GetGUID() const { return GetUInt64Value(OBJECT_FIELD_GUID); } // Conserve par Nostalrius
+        uint64 const& GetGUID() const { return GetUInt64Value(OBJECT_FIELD_GUID); } // Conserve par Nostalrius
         uint32 GetGUIDLow() const { return GetObjectGuid().GetCounter(); }
         PackedGuid const& GetPackGUID() const { return m_PackGUID; }
         std::string GetGuidStr() const { return GetObjectGuid().GetString(); }
@@ -350,7 +344,7 @@ class MANGOS_DLL_SPEC Object
         uint8 GetTypeId() const { return m_objectTypeId; }
         bool isType(TypeMask mask) const { return (mask & m_objectType); }
 
-        virtual void BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
+        virtual void BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) const;
         void SendCreateUpdateToPlayer(Player* player);
 
         // must be overwrite in appropriate subclasses (WorldObject, Item currently), or will crash
@@ -362,100 +356,100 @@ class MANGOS_DLL_SPEC Object
         void AddDelayedAction(ObjectDelayedAction e) { _delayedActions |= e; }
         void ExecuteDelayedActions();
 
-        void BuildValuesUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
-        void BuildOutOfRangeUpdateBlock( UpdateData *data ) const;
-        void BuildMovementUpdateBlock( UpdateData * data, uint8 flags = 0 ) const;
+        void BuildValuesUpdateBlockForPlayer(UpdateData* data, Player* target) const;
+        void BuildOutOfRangeUpdateBlock(UpdateData* data) const;
+        void BuildMovementUpdateBlock(UpdateData* data, uint8 flags = 0) const;
 
-        void BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const;
-        void BuildValuesUpdate(uint8 updatetype, ByteBuffer *data, UpdateMask *updateMask, Player *target ) const;
+        void BuildMovementUpdate(ByteBuffer* data, uint8 updateFlags) const;
+        void BuildValuesUpdate(uint8 updatetype, ByteBuffer* data, UpdateMask* updateMask, Player* target) const;
         void BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_players);
 
         void SendOutOfRangeUpdateToPlayer(Player* player);
 
-        virtual void DestroyForPlayer( Player *target ) const;
+        virtual void DestroyForPlayer(Player* target) const;
 
-        const int32& GetInt32Value( uint16 index ) const
+        int32 const& GetInt32Value(uint16 index) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_int32Values[ index ];
         }
 
-        const uint32& GetUInt32Value( uint16 index ) const
+        uint32 const& GetUInt32Value(uint16 index) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_uint32Values[ index ];
         }
 
-        const uint64& GetUInt64Value( uint16 index ) const
+        uint64 const& GetUInt64Value(uint16 index) const
         {
-            MANGOS_ASSERT( index + 1 < m_valuesCount || PrintIndexError( index , false) );
+            MANGOS_ASSERT(index + 1 < m_valuesCount || PrintIndexError(index , false));
             return *((uint64*)&(m_uint32Values[ index ]));
         }
 
-        const float& GetFloatValue( uint16 index ) const
+        float const& GetFloatValue(uint16 index) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return m_floatValues[ index ];
         }
 
-        uint8 GetByteValue( uint16 index, uint8 offset) const
+        uint8 GetByteValue(uint16 index, uint8 offset) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false) );
-            MANGOS_ASSERT( offset < 4 );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
+            MANGOS_ASSERT(offset < 4);
             return *(((uint8*)&m_uint32Values[ index ])+offset);
         }
 
-        uint16 GetUInt16Value( uint16 index, uint8 offset) const
+        uint16 GetUInt16Value(uint16 index, uint8 offset) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false) );
-            MANGOS_ASSERT( offset < 2 );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
+            MANGOS_ASSERT(offset < 2);
             return *(((uint16*)&m_uint32Values[ index ])+offset);
         }
 
-        ObjectGuid const& GetGuidValue( uint16 index ) const { return *reinterpret_cast<ObjectGuid const*>(&GetUInt64Value(index)); }
+        ObjectGuid const& GetGuidValue(uint16 index) const { return *reinterpret_cast<ObjectGuid const*>(&GetUInt64Value(index)); }
 
-        void SetInt32Value(  uint16 index,        int32  value );
-        void SetUInt32Value( uint16 index,       uint32  value );
-        void SetUInt64Value( uint16 index, const uint64 &value );
-        void SetFloatValue(  uint16 index,       float   value );
-        void SetByteValue(   uint16 index, uint8 offset, uint8 value );
-        void SetUInt16Value( uint16 index, uint8 offset, uint16 value );
-        void SetInt16Value(  uint16 index, uint8 offset, int16 value ) { SetUInt16Value(index,offset,(uint16)value); }
-        void SetGuidValue( uint16 index, ObjectGuid const& value ) { SetUInt64Value(index, value.GetRawValue()); }
-        void SetStatFloatValue( uint16 index, float value);
-        void SetStatInt32Value( uint16 index, int32 value);
+        void SetInt32Value(uint16 index, int32  value);
+        void SetUInt32Value(uint16 index, uint32  value);
+        void SetUInt64Value(uint16 index, uint64 const& value);
+        void SetFloatValue(uint16 index, float   value);
+        void SetByteValue(uint16 index, uint8 offset, uint8 value);
+        void SetUInt16Value(uint16 index, uint8 offset, uint16 value);
+        void SetInt16Value(uint16 index, uint8 offset, int16 value) { SetUInt16Value(index,offset,(uint16)value); }
+        void SetGuidValue(uint16 index, ObjectGuid const& value) { SetUInt64Value(index, value.GetRawValue()); }
+        void SetStatFloatValue(uint16 index, float value);
+        void SetStatInt32Value(uint16 index, int32 value);
 
         void ApplyModUInt32Value(uint16 index, int32 val, bool apply);
         void ApplyModInt32Value(uint16 index, int32 val, bool apply);
-        void ApplyModPositiveFloatValue( uint16 index, float val, bool apply);
-        void ApplyModSignedFloatValue( uint16 index, float val, bool apply);
+        void ApplyModPositiveFloatValue(uint16 index, float val, bool apply);
+        void ApplyModSignedFloatValue(uint16 index, float val, bool apply);
 
         void ForceValuesUpdateAtIndex(uint16 index);
 
         void ApplyPercentModFloatValue(uint16 index, float val, bool apply)
         {
             val = val != -100.0f ? val : -99.9f ;
-            SetFloatValue(index, GetFloatValue(index) * (apply?(100.0f+val)/100.0f : 100.0f / (100.0f+val)) );
+            SetFloatValue(index, GetFloatValue(index) * (apply?(100.0f+val)/100.0f : 100.0f / (100.0f+val)));
         }
 
-        void SetFlag( uint16 index, uint32 newFlag );
-        void RemoveFlag( uint16 index, uint32 oldFlag );
+        void SetFlag(uint16 index, uint32 newFlag);
+        void RemoveFlag(uint16 index, uint32 oldFlag);
 
-        void ToggleFlag( uint16 index, uint32 flag)
+        void ToggleFlag(uint16 index, uint32 flag)
         {
-            if(HasFlag(index, flag))
+            if (HasFlag(index, flag))
                 RemoveFlag(index, flag);
             else
                 SetFlag(index, flag);
         }
 
-        bool HasFlag( uint16 index, uint32 flag ) const
+        bool HasFlag(uint16 index, uint32 flag) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return (m_uint32Values[ index ] & flag) != 0;
         }
 
-        void ApplyModFlag( uint16 index, uint32 flag, bool apply)
+        void ApplyModFlag(uint16 index, uint32 flag, bool apply)
         {
             if (apply)
                 SetFlag(index, flag);
@@ -463,10 +457,10 @@ class MANGOS_DLL_SPEC Object
                 RemoveFlag(index, flag);
         }
 
-        void SetByteFlag( uint16 index, uint8 offset, uint8 newFlag );
-        void RemoveByteFlag( uint16 index, uint8 offset, uint8 newFlag );
+        void SetByteFlag(uint16 index, uint8 offset, uint8 newFlag);
+        void RemoveByteFlag(uint16 index, uint8 offset, uint8 newFlag);
 
-        void ToggleByteFlag( uint16 index, uint8 offset, uint8 flag )
+        void ToggleByteFlag(uint16 index, uint8 offset, uint8 flag)
         {
             if (HasByteFlag(index, offset, flag))
                 RemoveByteFlag(index, offset, flag);
@@ -474,14 +468,14 @@ class MANGOS_DLL_SPEC Object
                 SetByteFlag(index, offset, flag);
         }
 
-        bool HasByteFlag( uint16 index, uint8 offset, uint8 flag ) const
+        bool HasByteFlag(uint16 index, uint8 offset, uint8 flag) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
-            MANGOS_ASSERT( offset < 4 );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
+            MANGOS_ASSERT(offset < 4);
             return (((uint8*)&m_uint32Values[index])[offset] & flag) != 0;
         }
 
-        void ApplyModByteFlag( uint16 index, uint8 offset, uint32 flag, bool apply)
+        void ApplyModByteFlag(uint16 index, uint8 offset, uint32 flag, bool apply)
         {
             if (apply)
                 SetByteFlag(index, offset, flag);
@@ -492,7 +486,7 @@ class MANGOS_DLL_SPEC Object
         void SetShortFlag(uint16 index, bool highpart, uint16 newFlag);
         void RemoveShortFlag(uint16 index, bool highpart, uint16 oldFlag);
 
-        void ToggleShortFlag( uint16 index, bool highpart, uint8 flag )
+        void ToggleShortFlag(uint16 index, bool highpart, uint8 flag)
         {
             if (HasShortFlag(index, highpart, flag))
                 RemoveShortFlag(index, highpart, flag);
@@ -500,13 +494,13 @@ class MANGOS_DLL_SPEC Object
                 SetShortFlag(index, highpart, flag);
         }
 
-        bool HasShortFlag( uint16 index, bool highpart, uint8 flag ) const
+        bool HasShortFlag(uint16 index, bool highpart, uint8 flag) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
             return (((uint16*)&m_uint32Values[index])[highpart ? 1 : 0] & flag) != 0;
         }
 
-        void ApplyModShortFlag( uint16 index, bool highpart, uint32 flag, bool apply)
+        void ApplyModShortFlag(uint16 index, bool highpart, uint32 flag, bool apply)
         {
             if (apply)
                 SetShortFlag(index, highpart, flag);
@@ -514,21 +508,21 @@ class MANGOS_DLL_SPEC Object
                 RemoveShortFlag(index, highpart, flag);
         }
 
-        void SetFlag64( uint16 index, uint64 newFlag )
+        void SetFlag64(uint16 index, uint64 newFlag)
         {
             uint64 oldval = GetUInt64Value(index);
             uint64 newval = oldval | newFlag;
             SetUInt64Value(index,newval);
         }
 
-        void RemoveFlag64( uint16 index, uint64 oldFlag )
+        void RemoveFlag64(uint16 index, uint64 oldFlag)
         {
             uint64 oldval = GetUInt64Value(index);
             uint64 newval = oldval & ~oldFlag;
             SetUInt64Value(index,newval);
         }
 
-        void ToggleFlag64( uint16 index, uint64 flag)
+        void ToggleFlag64(uint16 index, uint64 flag)
         {
             if (HasFlag64(index, flag))
                 RemoveFlag64(index, flag);
@@ -536,13 +530,13 @@ class MANGOS_DLL_SPEC Object
                 SetFlag64(index, flag);
         }
 
-        bool HasFlag64( uint16 index, uint64 flag ) const
+        bool HasFlag64(uint16 index, uint64 flag) const
         {
-            MANGOS_ASSERT( index < m_valuesCount || PrintIndexError( index , false ) );
-            return (GetUInt64Value( index ) & flag) != 0;
+            MANGOS_ASSERT(index < m_valuesCount || PrintIndexError(index , false));
+            return (GetUInt64Value(index) & flag) != 0;
         }
 
-        void ApplyModFlag64( uint16 index, uint64 flag, bool apply)
+        void ApplyModFlag64(uint16 index, uint64 flag, bool apply)
         {
             if (apply)
                 SetFlag64(index, flag);
@@ -552,7 +546,7 @@ class MANGOS_DLL_SPEC Object
 
         void ClearUpdateMask(bool remove);
 
-        bool LoadValues(const char* data);
+        bool LoadValues(char const* data);
 
         uint16 GetValuesCount() const { return m_valuesCount; }
 
@@ -594,29 +588,29 @@ class MANGOS_DLL_SPEC Object
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
     protected:
 
-        Object ( );
+        Object ();
 
         void _InitValues();
         void _Create (uint32 guidlow, uint32 entry, HighGuid guidhigh);
 
-        virtual void _SetUpdateBits(UpdateMask *updateMask, Player *target) const;
+        virtual void _SetUpdateBits(UpdateMask* updateMask, Player* target) const;
         void _LoadIntoDataField(std::string const& data, uint32 startOffset, uint32 count);
 
-        virtual void _SetCreateBits(UpdateMask *updateMask, Player *target) const;
+        virtual void _SetCreateBits(UpdateMask* updateMask, Player* target) const;
 
         uint16 m_objectType;
 
         uint8 m_objectTypeId;
-        uint8 m_updateFlag;
+        uint8 m_updateFlag = 0;
 
         union
         {
-            int32  *m_int32Values;
-            uint32 *m_uint32Values;
-            float  *m_floatValues;
+            int32* m_int32Values;
+            uint32* m_uint32Values;
+            float* m_floatValues;
         };
 
-        uint32 *m_uint32Values_mirror;
+        uint32* m_uint32Values_mirror;
 
         uint16 m_valuesCount;
 
@@ -631,7 +625,7 @@ class MANGOS_DLL_SPEC Object
 
         // for output helpfull error messages from ASSERTs
         bool PrintIndexError(uint32 index, bool set) const;
-        Object(const Object&) = delete;                     // prevent generation copy constructor
+        Object(Object const&) = delete;                     // prevent generation copy constructor
         Object& operator=(Object const&) = delete;          // prevent generation assigment operator
 };
 
@@ -654,13 +648,13 @@ enum MeleeHitOutcome
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
 struct SpellNonMeleeDamage {
-    SpellNonMeleeDamage(WorldObject *_attacker, Unit *_target, uint32 _SpellID, SpellSchools _school)
+    SpellNonMeleeDamage(WorldObject* _attacker, Unit* _target, uint32 _SpellID, SpellSchools _school)
         : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
         absorb(0), resist(0), periodicLog(false), unused(false), blocked(0), HitInfo(0), spell(nullptr)
     {}
 
-    Unit   *target;
-    WorldObject   *attacker;
+    Unit* target;
+    WorldObject* attacker;
     uint32 SpellID;
     uint32 damage;
     SpellSchools school;
@@ -670,7 +664,7 @@ struct SpellNonMeleeDamage {
     bool   unused;
     uint32 blocked;
     uint32 HitInfo;
-    Spell *spell;
+    Spell* spell;
 };
 
 struct CleanDamage
@@ -696,7 +690,7 @@ enum CurrentSpellTypes
 #define CURRENT_FIRST_NON_MELEE_SPELL 1
 #define CURRENT_MAX_SPELL             4
 
-class MANGOS_DLL_SPEC WorldObject : public Object
+class WorldObject : public Object
 {
     friend struct WorldObjectChangeAccumulator;
 
@@ -704,10 +698,10 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         //class is used to manipulate with WorldUpdateCounter
         //it is needed in order to get time diff between two object's Update() calls
-        class MANGOS_DLL_SPEC UpdateHelper
+        class UpdateHelper
         {
             public:
-                explicit UpdateHelper(WorldObject * obj) : m_obj(obj) {}
+                explicit UpdateHelper(WorldObject* obj) : m_obj(obj) {}
                 ~UpdateHelper() { }
 
                 void Update(uint32 time_diff)
@@ -723,17 +717,17 @@ class MANGOS_DLL_SPEC WorldObject : public Object
                 }
 
             private:
-                UpdateHelper(const UpdateHelper&);
-                UpdateHelper& operator=(const UpdateHelper&) = delete;
+                UpdateHelper(UpdateHelper const&);
+                UpdateHelper& operator=(UpdateHelper const&) = delete;
 
-                WorldObject * const m_obj;
+                WorldObject* const m_obj;
         };
 
-        virtual ~WorldObject ( ) {}
+        ~WorldObject () override {}
 
         virtual void Update(uint32 /*update_diff*/, uint32 /*time_diff*/);
 
-        void _Create( uint32 guidlow, HighGuid guidhigh );
+        void _Create(uint32 guidlow, HighGuid guidhigh);
 
         void Relocate(float x, float y, float z, float orientation);
         void Relocate(float x, float y, float z);
@@ -741,22 +735,21 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void SetOrientation(float orientation);
 
         Position const& GetPosition() const { return m_position; }
-        float GetPositionX( ) const { return m_position.x; }
-        float GetPositionY( ) const { return m_position.y; }
-        float GetPositionZ( ) const { return m_position.z; }
+        float GetPositionX() const { return m_position.x; }
+        float GetPositionY() const { return m_position.y; }
+        float GetPositionZ() const { return m_position.z; }
         virtual void GetSafePosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const { GetPosition(x, y, z, onTransport); }
-        void GetPosition( float &x, float &y, float &z, Transport* onTransport = nullptr) const;
-        void GetPosition( WorldLocation &loc ) const
-            { loc.mapid = m_mapId; GetPosition(loc.coord_x, loc.coord_y, loc.coord_z); loc.orientation = GetOrientation(); }
-        float GetOrientation( ) const { return m_position.o; }
-        void GetNearPoint2D( float &x, float &y, float distance, float absAngle) const;
+        void GetPosition(float &x, float &y, float &z, Transport* onTransport = nullptr) const;
+        void GetPosition(WorldLocation &loc) const { loc.mapId = m_mapId; GetPosition(loc.x, loc.y, loc.z); loc.o = GetOrientation(); }
+        float GetOrientation() const { return m_position.o; }
+        void GetNearPoint2D(float &x, float &y, float distance, float absAngle) const;
         void GetNearPoint(WorldObject const* searcher, float &x, float &y, float &z, float searcher_bounding_radius, float distance2d, float absAngle) const;
-        void GetClosePoint(float &x, float &y, float &z, float bounding_radius, float distance2d = 0, float angle = 0, const WorldObject* obj = nullptr ) const
+        void GetClosePoint(float &x, float &y, float &z, float bounding_radius, float distance2d = 0, float angle = 0, WorldObject const* obj = nullptr) const
         {
             // angle calculated from current orientation
             GetNearPoint(obj, x, y, z, bounding_radius, distance2d, GetOrientation() + angle);
         }
-        void GetContactPoint( const WorldObject* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const
+        void GetContactPoint(WorldObject const* obj, float &x, float &y, float &z, float distance2d = CONTACT_DISTANCE) const
         {
             // Nostalrius: On est deja au contact !
             if (GetDistance2d(obj) < distance2d)
@@ -787,26 +780,33 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         InstanceData* GetInstanceData() const;
 
-        const char* GetName() const { return m_name.c_str(); }
-        void SetName(const std::string& newname) { m_name=newname; }
+        char const* GetName() const { return m_name.c_str(); }
+        void SetName(std::string const& newname) { m_name=newname; }
 
-        virtual const char* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
-        virtual uint8 getGender() const { return 0; } // used in chat builder
+        virtual char const* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
+        virtual uint8 GetGender() const { return 0; } // used in chat builder
 
         virtual uint32 GetDefaultGossipMenuId() const { return 0; }
 
-        float GetCombatDistance(const WorldObject* target) const;
-        float GetDistanceToCenter(const WorldObject* target) const;
-        float GetExactDistance( const WorldObject* obj ) const;
-        float GetExactDistance(float x, float y, float z) const;
-        float GetDistance( const WorldObject* obj ) const;
+        float GetCombatDistance(WorldObject const* target) const;
+        float GetDistance2dToCenter(WorldObject const* target) const;
+        float GetDistance3dToCenter(WorldObject const* target) const;
+        float GetDistance(WorldObject const* obj) const;
         float GetDistance(float x, float y, float z) const;
-        float GetDistance2d(const WorldObject* obj) const;
+        float GetDistance(WorldLocation const& position) const { return GetDistance(position.x, position.y, position.z); }
+        float GetDistance(Position const& position) const { return GetDistance(position.x, position.y, position.z); }
+        float GetDistance2d(WorldObject const* obj) const;
         float GetDistance2d(float x, float y) const;
-        float GetDistanceZ(const WorldObject* obj) const;
+        float GetDistance2d(WorldLocation const& position) const { return GetDistance2d(position.x, position.y); }
+        float GetDistance2d(Position const& position) const { return GetDistance2d(position.x, position.y); }
+        float GetDistanceZ(WorldObject const* obj) const;
         float GetDistanceSqr(float x, float y, float z) const;
-        bool IsInMap(const WorldObject* obj) const;
+        bool IsInMap(WorldObject const* obj) const;
+        template <class T>
+        bool IsWithinDist3d(T const& position, float dist2compare) const { return IsWithinDist3d(position.x, position.y, position.z, dist2compare); }
         bool IsWithinDist3d(float x, float y, float z, float dist2compare) const;
+        template <class T >
+        bool IsWithinDist2d(T const& position, float dist2compare) const { return IsWithinDist2d(position.x, position.y, dist2compare); }
         bool IsWithinDist2d(float x, float y, float dist2compare) const;
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
 
@@ -825,23 +825,23 @@ class MANGOS_DLL_SPEC WorldObject : public Object
             return obj && IsInMap(obj) && (GetCombatDistance(obj) <= dist2compare);
         }
         bool IsWithinLOS(float x, float y, float z, bool checkDynLos = true, float targetHeight = 2.f) const;
-        bool IsWithinLOSInMap(const WorldObject* obj, bool checkDynLos = true) const;
+        bool IsWithinLOSInMap(WorldObject const* obj, bool checkDynLos = true) const;
         bool GetDistanceOrder(WorldObject const* obj1, WorldObject const* obj2, bool is3D = true) const;
         bool IsInRange(WorldObject const* obj, float minRange, float maxRange, bool is3D = true) const;
         bool IsInRange2d(float x, float y, float minRange, float maxRange) const;
         bool IsInRange3d(float x, float y, float z, float minRange, float maxRange) const;
 
-        float GetAngle( const WorldObject* obj ) const;
-        float GetAngle( const float x, const float y ) const;
-        bool HasInArc(const float arcangle, const WorldObject* obj, float offset = 0.0f) const;
-        bool HasInArc(const float arcangle, const float x, const float y) const;
+        float GetAngle(WorldObject const* obj) const;
+        float GetAngle(float const x, float const y) const;
+        bool HasInArc(float const arcangle, WorldObject const* obj, float offset = 0.0f) const;
+        bool HasInArc(float const arcangle, float const x, float const y) const;
         bool isInFrontInMap(WorldObject const* target,float distance, float arc = M_PI) const;
         bool isInBackInMap(WorldObject const* target, float distance, float arc = M_PI) const;
         bool isInFront(WorldObject const* target,float distance, float arc = M_PI) const;
         bool isInBack(WorldObject const* target, float distance, float arc = M_PI) const;
 
         bool CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
-        float GetLeewayBonusRange(const Unit* target, bool ability) const;
+        float GetLeewayBonusRange(Unit const* target, bool ability) const;
         float GetLeewayBonusRadius() const;
 
         // Gestion des positions
@@ -852,7 +852,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         // Transports / Movement
         Transport* GetTransport() const { return m_transport; }
-        virtual void SetTransport(Transport * t) { m_transport = t; }
+        virtual void SetTransport(Transport* t) { m_transport = t; }
 
         float GetTransOffsetX() const { return m_movementInfo.GetTransportPos()->x; }
         float GetTransOffsetY() const { return m_movementInfo.GetTransportPos()->y; }
@@ -875,33 +875,33 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool IsMovingButNotWalking() const { return IsMoving() && !(IsWalking() || IsWalkingBackward()); }
 
         MovementInfo m_movementInfo;
-        Transport * m_transport;
+        Transport* m_transport;
 
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
         // Send to players
-        virtual void SendMessageToSet(WorldPacket *data, bool self) const;
+        virtual void SendMessageToSet(WorldPacket* data, bool self) const;
         // Send to players who have object at client
-        void SendObjectMessageToSet(WorldPacket *data, bool self, WorldObject const* except = nullptr) const;
+        void SendObjectMessageToSet(WorldPacket* data, bool self, WorldObject const* except = nullptr) const;
         void SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except = nullptr);
 
-        virtual void SendMessageToSetInRange(WorldPacket *data, float dist, bool self) const;
-        void SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver) const;
+        virtual void SendMessageToSetInRange(WorldPacket* data, float dist, bool self) const;
+        void SendMessageToSetExcept(WorldPacket* data, Player const* skipped_receiver) const;
         void DirectSendPublicValueUpdate(uint32 index);
 
         void PlayDistanceSound(uint32 sound_id, Player const* target = nullptr) const;
         void PlayDirectSound(uint32 sound_id, Player const* target = nullptr) const;
         void PlayDirectMusic(uint32 music_id, Player const* target = nullptr) const;
 
-        void PMonsterSay(const char* text, ...) const;
+        void PMonsterSay(char const* text, ...) const;
         void PMonsterSay(int32 text, ...) const;
-        void PMonsterYell(const char* text, ...) const;
+        void PMonsterYell(char const* text, ...) const;
         void PMonsterYell(int32 text, ...) const;
 
-        void MonsterSay(const char* text, uint32 language = 0, Unit const* target = nullptr) const;
-        void MonsterYell(const char* text, uint32 language = 0, Unit const* target = nullptr) const;
-        void MonsterTextEmote(const char* text, Unit const* target = nullptr, bool IsBossEmote = false) const;
-        void MonsterWhisper(const char* text, Unit const* target = nullptr, bool IsBossWhisper = false) const;
+        void MonsterSay(char const* text, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterYell(char const* text, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterTextEmote(char const* text, Unit const* target = nullptr, bool IsBossEmote = false) const;
+        void MonsterWhisper(char const* text, Unit const* target = nullptr, bool IsBossWhisper = false) const;
         void MonsterSay(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
         void MonsterYell(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
         void MonsterTextEmote(int32 textId, Unit const* target = nullptr, bool IsBossEmote = false) const;
@@ -913,12 +913,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         virtual bool IsHostileTo(WorldObject const* target) const =0;
         virtual bool IsFriendlyTo(WorldObject const* target) const =0;
-        virtual uint32 getFaction() const = 0;
+        virtual uint32 GetFactionTemplateId() const = 0;
         FactionTemplateEntry const* getFactionTemplateEntry() const;
         virtual ReputationRank GetReactionTo(WorldObject const* target) const;
         ReputationRank static GetFactionReactionTo(FactionTemplateEntry const* factionTemplateEntry, WorldObject const* target);
         virtual bool IsValidAttackTarget(Unit const* target) const { return false; }
-        virtual bool isVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return isVisibleForInState(pDetector, viewPoint, inVisibleList); }
+        virtual bool IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const* viewPoint, bool detect, bool inVisibleList = false, bool* alert = nullptr) const { return IsVisibleForInState(pDetector, viewPoint, inVisibleList); }
 
         bool IsControlledByPlayer() const;
         bool IsLikePlayer() const;
@@ -936,11 +936,11 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         bool isVisibleFor(Player const* u, WorldObject const* viewPoint) const;
 
         // low level function for visibility change code, must be define in all main world object subclasses
-        virtual bool isVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
+        virtual bool IsVisibleForInState(WorldObject const* pDetector, WorldObject const* viewPoint, bool inVisibleList) const = 0;
 
-        void SetMap(Map * map);
-        Map * GetMap() const;
-        Map * FindMap() const { return m_currMap; }
+        void SetMap(Map* map);
+        Map* GetMap() const;
+        Map* FindMap() const { return m_currMap; }
 
         //used to check all object's GetMap() calls when object is not in world!
         void ResetMap();
@@ -955,14 +955,16 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void RemoveFromClientUpdateList() override;
         void BuildUpdateData(UpdateDataMapType &) override;
 
-        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype = TEMPSUMMON_DEAD_DESPAWN,uint32 despwtime = 25000, bool asActiveObject = false, uint32 pacifiedTimer = 0);
+        Creature* SummonCreature(uint32 id, float x, float y, float z, float ang,TempSummonType spwtype = TEMPSUMMON_DEAD_DESPAWN,uint32 despwtime = 25000, bool asActiveObject = false, uint32 pacifiedTimer = 0, CreatureAiSetter pFuncAiSetter = nullptr);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 25000, bool attach = true);
 
-        Creature* FindNearestCreature(uint32 entry, float range, bool alive = true) const;
+        Creature* FindNearestCreature(uint32 entry, float range, bool alive = true, Creature const* except = nullptr) const;
+        Creature* FindRandomCreature(uint32 entry, float range, bool alive = true, Creature const* except = nullptr) const;
         GameObject* FindNearestGameObject(uint32 entry, float range) const;
         Player* FindNearestPlayer(float range) const;
-        void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange);
-        void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange);
+        void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+        void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange) const;
+        void GetAlivePlayerListInRange(WorldObject const* pSource, std::list<Player*>& lList, float fMaxSearchRange) const;
 
         bool isActiveObject() const { return m_isActiveObject || m_viewPoint.hasViewers(); }
         void SetActiveObjectState(bool on);
@@ -1001,7 +1003,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         uint32 GetCreatureSummonLimit() const { return m_creatureSummonLimit; }
         void SetCreatureSummonLimit(uint32 limit);
 
-        virtual uint32 getLevel() const = 0;
+        virtual uint32 GetLevel() const = 0;
         uint32 GetLevelForTarget(WorldObject const* target = nullptr) const;
         uint16 GetSkillMaxForLevel(WorldObject const* target = nullptr) const { return GetLevelForTarget(target) * 5; };
         uint32 GetWeaponSkillValue(WeaponAttackType attType, WorldObject const* target = nullptr) const;
@@ -1009,16 +1011,18 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         uint32 GetDefenseSkillValue(WorldObject const* target = nullptr) const;
 
         virtual Player* GetAffectingPlayer() const { return nullptr; }
-        Unit* SelectMagnetTarget(Unit *victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
+        Unit* SelectMagnetTarget(Unit* victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
 
-        void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
-        void CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
-        void CastCustomSpell(Unit* Victim, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastCustomSpell(Unit* Victim, SpellEntry const *spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
-        void CastSpell(float x, float y, float z, SpellEntry const *spellInfo, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        SpellCastResult CastSpell(Unit* pTarget, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        SpellCastResult CastSpell(Unit* pTarget, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        SpellCastResult CastSpell(GameObject* pTarget, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        SpellCastResult CastSpell(GameObject* pTarget, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
+        void CastCustomSpell(Unit* pTarget, uint32 spellId, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        void CastCustomSpell(Unit* pTarget, SpellEntry const* spellInfo, int32 const* bp0, int32 const* bp1, int32 const* bp2, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        SpellCastResult CastSpell(float x, float y, float z, uint32 spellId, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
+        SpellCastResult CastSpell(float x, float y, float z, SpellEntry const* spellInfo, bool triggered, Item* castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr);
         
-        void SetCurrentCastedSpell(Spell * pSpell);
+        void SetCurrentCastedSpell(Spell* pSpell);
         Spell* GetCurrentSpell(CurrentSpellTypes spellType) const { return m_currentSpells[spellType]; }
         Spell* FindCurrentSpellBySpellId(uint32 spell_id) const;
         bool CheckAndIncreaseCastCounter();
@@ -1041,35 +1045,36 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         
         virtual bool IsSpellCrit(Unit const* pVictim, SpellEntry const* spellProto, SpellSchoolMask schoolMask, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr) const { return false; }
         uint32 SpellCriticalHealingBonus(SpellEntry const* spellProto, uint32 damage, Unit const* pVictim) const;
-        uint32 SpellCriticalDamageBonus(SpellEntry const *spellProto, uint32 damage, Unit *pVictim, Spell* spell = nullptr);
-        float  MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const *spell, Spell* spellPtr = nullptr);
-        SpellMissInfo MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
-        SpellMissInfo MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
-        int32 MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
+        uint32 SpellCriticalDamageBonus(SpellEntry const* spellProto, uint32 damage, Unit* pVictim, Spell* spell = nullptr);
+        float  MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType, int32 skillDiff, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MeleeSpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        SpellMissInfo MagicSpellHitResult(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
+        int32 MagicSpellHitChance(Unit* pVictim, SpellEntry const* spell, Spell* spellPtr = nullptr);
         float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
-        SpellMissInfo SpellHitResult(Unit *pVictim, SpellEntry const *spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
-        void ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const *procSpell = nullptr, Spell* spell = nullptr);
-        void CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, SpellEntry const *spellInfo, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
+        SpellMissInfo SpellHitResult(Unit* pVictim, SpellEntry const* spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
+        void ProcDamageAndSpell(Unit* pVictim, uint32 procAttacker, uint32 procVictim, uint32 procEx, uint32 amount, WeaponAttackType attType = BASE_ATTACK, SpellEntry const* procSpell = nullptr, Spell* spell = nullptr);
+        void CalculateSpellDamage(SpellNonMeleeDamage* damageInfo, int32 damage, SpellEntry const* spellInfo, WeaponAttackType attackType = BASE_ATTACK, Spell* spell = nullptr);
         int32 CalculateSpellDamage(Unit const* target, SpellEntry const* spellProto, SpellEffectIndex effect_index, int32 const* basePoints = nullptr, Spell* spell = nullptr);
-        int32 SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject *pCaster, Spell* spell = nullptr);
+        int32 SpellBonusWithCoeffs(SpellEntry const* spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, WorldObject* pCaster, Spell* spell = nullptr) const;
         static float CalculateLevelPenalty(SpellEntry const* spellProto);
-        uint32 SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        uint32 SpellDamageBonusDone(Unit* pVictim, SpellEntry const* spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
         int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
-        uint32 SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
+        uint32 SpellHealingBonusDone(Unit* pVictim, SpellEntry const* spellProto, int32 healamount, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
         int32 SpellBaseHealingBonusDone(SpellSchoolMask schoolMask);
-        uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage) const;
-        uint32 MeleeDamageBonusDone(Unit *pVictim, uint32 damage, WeaponAttackType attType, SpellEntry const *spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
+        uint32 CalcArmorReducedDamage(Unit* pVictim, uint32 const damage) const;
+        uint32 MeleeDamageBonusDone(Unit* pVictim, uint32 damage, WeaponAttackType attType, SpellEntry const* spellProto = nullptr, DamageEffectType damagetype = DIRECT_DAMAGE, uint32 stack = 1, Spell* spell = nullptr, bool flat = true);
         virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
         float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
-        virtual uint32 DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const *spellProto, bool durabilityLoss, Spell* spell = nullptr);
-        void DealDamageMods(Unit *pVictim, uint32 &damage, uint32* absorb);
-        void DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss);
-        void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log);
-        void SendSpellNonMeleeDamageLog(Unit *target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
-        void SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo);
-        int32 DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical = false);
+        virtual uint32 DealDamage(Unit* pVictim, uint32 damage, CleanDamage const* cleanDamage, DamageEffectType damagetype, SpellSchoolMask damageSchoolMask, SpellEntry const* spellProto, bool durabilityLoss, Spell* spell = nullptr);
+        void DealDamageMods(Unit* pVictim, uint32& damage, uint32* absorb);
+        void DealSpellDamage(SpellNonMeleeDamage* damageInfo, bool durabilityLoss);
+        void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage* log);
+        void SendSpellNonMeleeDamageLog(Unit* target, uint32 spellId, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
+        void SendSpellMiss(Unit* target, uint32 spellId, SpellMissInfo missInfo);
+        void SendSpellOrDamageImmune(Unit* target, uint32 spellId) const;
+        int32 DealHeal(Unit* pVictim, uint32 addhealth, SpellEntry const* spellProto, bool critical = false);
         void SendHealSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, bool critical = false) const;
-        void EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
+        void EnergizeBySpell(Unit* pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
         void SendEnergizeSpellLog(Unit const* pVictim, uint32 SpellID, uint32 Damage, Powers powertype) const;
 
         void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut);
@@ -1093,7 +1098,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         // draw distance can be expensive for updates with lots of players
         float m_visibilityModifier;
 
-        Map * m_currMap;                                    //current object's Map location
+        Map* m_currMap;                                     //current object's Map location
 
         uint32 m_mapId;                                     // object at map with map_id
         uint32 m_InstanceId;                                // in map copy with instance id
@@ -1120,17 +1125,17 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type
         // no bodies expected for this declarations
         template <typename TR>
-        void CastSpell(Unit* Victim, uint32 spell, TR triggered);
+        SpellCastResult CastSpell(Unit* Victim, uint32 spell, TR triggered);
         template <typename TR>
-        void CastSpell(Unit* Victim, SpellEntry const* spell, TR triggered);
+        SpellCastResult CastSpell(Unit* Victim, SpellEntry const* spell, TR triggered);
         template <typename TR>
         void CastCustomSpell(Unit* Victim, uint32 spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
         template <typename SP, typename TR>
         void CastCustomSpell(Unit* Victim, SpellEntry const* spell, int32 const* bp0, int32 const* bp1, int32 const* bp2, TR triggered);
         template <typename TR>
-        void CastSpell(float x, float y, float z, uint32 spell, TR triggered);
+        SpellCastResult CastSpell(float x, float y, float z, uint32 spell, TR triggered);
         template <typename TR>
-        void CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
+        SpellCastResult CastSpell(float x, float y, float z, SpellEntry const* spell, TR triggered);
 };
 
 // Helper functions to cast between different Object pointers. Useful when unsure that your object* is valid at all.
@@ -1139,9 +1144,9 @@ inline WorldObject* ToWorldObject(Object* object)
     return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject*>(object) : nullptr;
 }
 
-inline const WorldObject* ToWorldObject(const Object* object)
+inline WorldObject const* ToWorldObject(Object const* object)
 {
-    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<const WorldObject*>(object) : nullptr;
+    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject const*>(object) : nullptr;
 }
 
 inline GameObject* ToGameObject(Object* object)
@@ -1149,9 +1154,9 @@ inline GameObject* ToGameObject(Object* object)
     return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject*>(object) : nullptr;
 }
 
-inline const GameObject* ToGameObject(const Object* object)
+inline GameObject const* ToGameObject(Object const* object)
 {
-    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<const GameObject*>(object) : nullptr;
+    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject const*>(object) : nullptr;
 }
 
 inline Unit* ToUnit(Object* object)
@@ -1159,9 +1164,9 @@ inline Unit* ToUnit(Object* object)
     return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit*>(object) : nullptr;
 }
 
-inline const Unit* ToUnit(const Object* object)
+inline Unit const* ToUnit(Object const* object)
 {
-    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<const Unit*>(object) : nullptr;
+    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit const*>(object) : nullptr;
 }
 
 inline Creature* ToCreature(Object* object)
@@ -1169,9 +1174,9 @@ inline Creature* ToCreature(Object* object)
     return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature*>(object) : nullptr;
 }
 
-inline const Creature* ToCreature(const Object* object)
+inline Creature const* ToCreature(Object const* object)
 {
-    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<const Creature*>(object) : nullptr;
+    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature const*>(object) : nullptr;
 }
 
 inline Player* ToPlayer(Object* object)
@@ -1179,9 +1184,9 @@ inline Player* ToPlayer(Object* object)
     return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player*>(object) : nullptr;
 }
 
-inline const Player* ToPlayer(const Object* object)
+inline Player const* ToPlayer(Object const* object)
 {
-    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<const Player*>(object) : nullptr;
+    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player const*>(object) : nullptr;
 }
 
 #endif

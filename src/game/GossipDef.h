@@ -66,20 +66,42 @@ enum GossipOptionIcon
     GOSSIP_ICON_MONEY_BAG           = 6,                    //brown bag with yellow dot
     GOSSIP_ICON_TALK                = 7,                    //white chat bubble with black dots
     GOSSIP_ICON_TABARD              = 8,                    //tabard
-    GOSSIP_ICON_BATTLE              = 9,                    //two swords
-    GOSSIP_ICON_DOT                 = 10,                   //yellow dot
+    GOSSIP_ICON_BATTLE              = 9,                    //two swords - added in 1.7
+    GOSSIP_ICON_DOT                 = 10,                   //yellow dot - added in 1.10
     GOSSIP_ICON_CHAT_11             = 11,                   //This and below are most the same visual as GOSSIP_ICON_CHAT
     GOSSIP_ICON_CHAT_12             = 12,                   //but are still used for unknown reasons.
     GOSSIP_ICON_DOT_13              = 13,
-    GOSSIP_ICON_DOT_14              = 14,                   // probably invalid
-    GOSSIP_ICON_DOT_15              = 15,                   // probably invalid
-    GOSSIP_ICON_DOT_16              = 16,
-    GOSSIP_ICON_DOT_17              = 17,
-    GOSSIP_ICON_DOT_18              = 18,
-    GOSSIP_ICON_DOT_19              = 19,
-    GOSSIP_ICON_DOT_20              = 20,
+    GOSSIP_ICON_DOT_14              = 14,                   // added in 1.10
+    GOSSIP_ICON_DOT_15              = 15,                   // added in 1.10
+    GOSSIP_ICON_DOT_16              = 16,                   // added in 1.10
+    GOSSIP_ICON_DOT_17              = 17,                   // added in 1.10
+    GOSSIP_ICON_DOT_18              = 18,                   // added in 1.10
+    GOSSIP_ICON_DOT_19              = 19,                   // added in 1.10
+    GOSSIP_ICON_DOT_20              = 20,                   // added in 1.10
     GOSSIP_ICON_MAX
 };
+
+inline bool IsValidGossipOptionIconForBuild(uint8 icon)
+{
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_10_1
+    switch (icon)
+    {
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_7_1
+    case GOSSIP_ICON_BATTLE:
+        return false;
+#endif
+    case GOSSIP_ICON_DOT:
+        return false;
+    }
+#endif
+
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_10_1
+    if (icon > GOSSIP_ICON_DOT_13)
+        return false;
+#endif
+
+    return true;
+}
 
 //POI icons. Many more exist, list not complete.
 enum Poi_Icon
@@ -163,18 +185,18 @@ struct QuestMenuItem
 
 typedef std::vector<QuestMenuItem> QuestMenuItemList;
 
-class MANGOS_DLL_SPEC GossipMenu
+class GossipMenu
 {
     public:
         explicit GossipMenu(WorldSession* session);
         ~GossipMenu();
 
-        void AddMenuItem(uint8 Icon, const std::string& Message, bool Coded = false);
-        void AddMenuItem(uint8 Icon, const std::string& Message, uint32 dtSender, uint32 dtAction, const std::string& BoxMessage, bool Coded = false);
+        void AddMenuItem(uint8 Icon, std::string const& Message, bool Coded = false);
+        void AddMenuItem(uint8 Icon, std::string const& Message, uint32 dtSender, uint32 dtAction, std::string const& BoxMessage, bool Coded = false);
 
         // for using from scripts, don't must be inlined
         void AddMenuItem(uint8 Icon, char const* Message, bool Coded = false);
-        void AddMenuItem(uint8 Icon, char const* Message, uint32 dtSender, uint32 dtAction, char const* BoxMessage = NULL, bool Coded = false);
+        void AddMenuItem(uint8 Icon, char const* Message, uint32 dtSender, uint32 dtAction, char const* BoxMessage = nullptr, bool Coded = false);
         void AddMenuItem(uint8 Icon, int32 itemText, uint32 dtSender, uint32 dtAction, int32 boxText = 0, bool Coded = false);
 
         void SetMenuId(uint32 menu_id) { m_gMenuId = menu_id; }
@@ -196,7 +218,7 @@ class MANGOS_DLL_SPEC GossipMenu
             return m_gItems.empty();
         }
 
-        GossipMenuItem const& GetItem( unsigned int Id )
+        GossipMenuItem const& GetItem(unsigned int Id)
         {
             return m_gItems[ Id ];
         }
@@ -206,9 +228,9 @@ class MANGOS_DLL_SPEC GossipMenu
             return m_gItemsData[indexId];
         }
 
-        uint32 MenuItemSender( unsigned int ItemId );
-        uint32 MenuItemAction( unsigned int ItemId );
-        bool MenuItemCoded( unsigned int ItemId );
+        uint32 MenuItemSender(unsigned int ItemId);
+        uint32 MenuItemAction(unsigned int ItemId);
+        bool MenuItemCoded(unsigned int ItemId);
 
         void ClearMenu();
 
@@ -231,7 +253,7 @@ class QuestMenu
         QuestMenu();
         ~QuestMenu();
 
-        void AddMenuItem( uint32 QuestId, uint8 Icon);
+        void AddMenuItem(uint32 QuestId, uint8 Icon);
         void ClearMenu();
 
         uint8 MenuItemCount() const
@@ -244,25 +266,25 @@ class QuestMenu
             return m_qItems.empty();
         }
 
-        bool HasItem( uint32 questid );
+        bool HasItem(uint32 questid);
 
-        QuestMenuItem const& GetItem( uint16 Id )
+        QuestMenuItem const& GetItem(uint16 Id)
         {
-            return m_qItems[ Id ];
+            return m_qItems[Id];
         }
 
     protected:
         QuestMenuItemList m_qItems;
 };
 
-class MANGOS_DLL_SPEC PlayerMenu
+class PlayerMenu
 {
     private:
         GossipMenu mGossipMenu;
         QuestMenu  mQuestMenu;
 
     public:
-        explicit PlayerMenu(WorldSession *Session);
+        explicit PlayerMenu(WorldSession* Session);
         ~PlayerMenu();
 
         GossipMenu& GetGossipMenu() { return mGossipMenu; }
@@ -273,28 +295,28 @@ class MANGOS_DLL_SPEC PlayerMenu
         bool Empty() const { return mGossipMenu.Empty() && mQuestMenu.Empty(); }
 
         void ClearMenus();
-        uint32 GossipOptionSender( unsigned int Selection );
-        uint32 GossipOptionAction( unsigned int Selection );
-        bool GossipOptionCoded( unsigned int Selection );
+        uint32 GossipOptionSender(unsigned int Selection);
+        uint32 GossipOptionAction(unsigned int Selection);
+        bool GossipOptionCoded(unsigned int Selection);
 
         void SendGossipMenu(uint32 titleTextId, ObjectGuid objectGuid);
         void CloseGossip();
-        void SendPointOfInterest( float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, const char * locName );
-        void SendPointOfInterest( uint32 poi_id );
-        void SendTalking( uint32 textID );
-        void SendTalking( char const * title, char const * text );
+        void SendPointOfInterest(float X, float Y, uint32 Icon, uint32 Flags, uint32 Data, char const*  locName);
+        void SendPointOfInterest(uint32 poi_id);
+        void SendTalking(uint32 textID);
+        void SendTalking(char const* title, char const* text);
 
         /*********************************************************/
         /***                    QUEST SYSTEM                   ***/
         /*********************************************************/
         void SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID);
 
-        void SendQuestGiverQuestList(QEmote eEmote, const std::string& Title, ObjectGuid guid);
+        void SendQuestGiverQuestList(QEmote eEmote, std::string const& Title, ObjectGuid guid);
 
-        void SendQuestQueryResponse(Quest const *pQuest);
-        void SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcGUID, bool ActivateAccept);
+        void SendQuestQueryResponse(Quest const* pQuest);
+        void SendQuestGiverQuestDetails(Quest const* pQuest, ObjectGuid npcGUID, bool ActivateAccept);
 
         void SendQuestGiverOfferReward(Quest const* pQuest, ObjectGuid npcGUID, bool EnbleNext);
-        void SendQuestGiverRequestItems(Quest const *pQuest, ObjectGuid npcGUID, bool Completable, bool CloseOnCancel);
+        void SendQuestGiverRequestItems(Quest const* pQuest, ObjectGuid npcGUID, bool Completable, bool CloseOnCancel);
 };
 #endif

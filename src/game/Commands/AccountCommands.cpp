@@ -56,7 +56,7 @@ bool ChatHandler::HandleAccountSetAddonCommand(char* args)
     // Let set addon state only for lesser (strong) security level
     // or to self account
     if (GetAccountId() && GetAccountId() != account_id &&
-        HasLowerSecurityAccount(NULL, account_id, true))
+        HasLowerSecurityAccount(nullptr, account_id, true))
         return false;
 
     uint32 lev;
@@ -74,7 +74,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
     char* accountStr = ExtractOptNotLastArg(&args);
 
     std::string targetAccountName;
-    Player* targetPlayer = NULL;
+    Player* targetPlayer = nullptr;
     uint32 targetAccountId = ExtractAccountId(&accountStr, &targetAccountName, &targetPlayer);
     if (!targetAccountId)
         return false;
@@ -96,7 +96,7 @@ bool ChatHandler::HandleAccountSetGmLevelCommand(char* args)
 
     /// can set security level only for target with less security and to less security that we have
     /// This is also reject self apply in fact
-    if (HasLowerSecurityAccount(NULL, targetAccountId, true))
+    if (HasLowerSecurityAccount(nullptr, targetAccountId, true))
         return false;
 
     /// account can't set security to same or grater level, need more power GM or console
@@ -137,7 +137,7 @@ bool ChatHandler::HandleAccountSetPasswordCommand(char* args)
 
     /// can set password only for target with less security
     /// This is also reject self apply in fact
-    if (HasLowerSecurityAccount(NULL, targetAccountId, true))
+    if (HasLowerSecurityAccount(nullptr, targetAccountId, true))
         return false;
 
     if (strcmp(szPassword1, szPassword2))
@@ -185,7 +185,7 @@ bool ChatHandler::HandleAccountSetLockedCommand(char* args)
     // Let set locked state only for lesser (strong) security level
     // or to self account
     if (GetAccountId() && GetAccountId() != account_id &&
-        HasLowerSecurityAccount(NULL, account_id, true))
+        HasLowerSecurityAccount(nullptr, account_id, true))
         return false;
 
     uint32 value;
@@ -214,7 +214,7 @@ bool ChatHandler::HandleAccountCharactersCommand(char* args)
 {
     ///- Get the command line arguments
     std::string account_name;
-    Player* target = NULL;                                  // only for triggering use targeted player account
+    Player* target = nullptr;                                  // only for triggering use targeted player account
     uint32 account_id = ExtractAccountId(&args, &account_name, &target);
     if (!account_id)
         return false;
@@ -234,7 +234,7 @@ bool ChatHandler::HandleAccountCreateCommand(char* args)
     ///- %Parse the command line arguments
     char *szAcc = ExtractQuotedOrLiteralArg(&args);
     char *szPassword = ExtractQuotedOrLiteralArg(&args);
-    if(!szAcc || !szPassword)
+    if (!szAcc || !szPassword)
         return false;
 
     // normalized in accmgr.CreateAccount
@@ -283,7 +283,7 @@ bool ChatHandler::HandleAccountDeleteCommand(char* args)
     /// Commands not recommended call from chat, but support anyway
     /// can delete only for account with less security
     /// This is also reject self apply in fact
-    if (HasLowerSecurityAccount (NULL, account_id, true))
+    if (HasLowerSecurityAccount (nullptr, account_id, true))
         return false;
 
     AccountOpResult result = sAccountMgr.DeleteAccount(account_id);
@@ -318,14 +318,17 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 
     ///- Get the list of accounts ID logged to the realm
     //                                                 0   1         2        3        4
-    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE current_realm = %u LIMIT %u", realmID, limit);
+    QueryResult* result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE current_realm = %u LIMIT %u", realmID, limit);
+    if (!result)
+    {
+        SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     uint32 count = 0;
     AccountSearchHandler::ShowAccountListHelper(result, *this, count, limit, true);
-
-    if (result)
-        delete result;
-
+    delete result;
     return true;
 }
 
@@ -421,7 +424,7 @@ bool ChatHandler::HandleAccountPasswordCommand(char* args)
 bool ChatHandler::HandleAddCharacterNoteCommand(char* args)
 {
     ObjectGuid playerGuid;
-    if (!ExtractPlayerTarget(&args, NULL, &playerGuid))
+    if (!ExtractPlayerTarget(&args, nullptr, &playerGuid))
     {
         PSendSysMessage(LANG_PLAYER_NOT_FOUND);
         SetSentErrorMessage(true);
@@ -435,7 +438,7 @@ bool ChatHandler::HandleAddCharacterNoteCommand(char* args)
         return false;
     }
     std::string authorName = m_session ? m_session->GetPlayerName() : "Console";
-    char* reason = ExtractQuotedOrLiteralArg(&args);
+    char const* reason = ExtractQuotedOrLiteralArg(&args);
     if (!reason)
         reason = "<no reason given>";
 
@@ -448,7 +451,7 @@ bool ChatHandler::HandleAddCharacterNoteCommand(char* args)
 bool ChatHandler::HandleWarnCharacterCommand(char* args)
 {
     ObjectGuid playerGuid;
-    if (!ExtractPlayerTarget(&args, NULL, &playerGuid))
+    if (!ExtractPlayerTarget(&args, nullptr, &playerGuid))
     {
         PSendSysMessage(LANG_PLAYER_NOT_FOUND);
         SetSentErrorMessage(true);
@@ -462,7 +465,7 @@ bool ChatHandler::HandleWarnCharacterCommand(char* args)
         return false;
     }
     std::string authorName = m_session ? m_session->GetPlayerName() : "Console";
-    char* reason = ExtractQuotedOrLiteralArg(&args);
+    char const* reason = ExtractQuotedOrLiteralArg(&args);
     if (!reason)
         reason = "<no reason given>";
 
@@ -520,7 +523,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
     if (!ipStr)
         return false;
 
-    char* reason = ExtractQuotedOrLiteralArg(&args);
+    char const* reason = ExtractQuotedOrLiteralArg(&args);
     if (!reason)
         reason = "<no reason given>";
 
@@ -542,7 +545,7 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
     do
     {
         Field* fields = result->Fetch();
-        if (allAccounts.str() != "")
+        if (!allAccounts.str().empty())
             allAccounts << ",";
         allAccounts << fields[0].GetUInt32();
         accountsToBan.insert(fields[0].GetUInt32());
@@ -561,12 +564,12 @@ bool ChatHandler::HandleBanAllIPCommand(char* args)
     }
 
     uint32 bannedCount = 0;
-    for (std::set<uint32>::const_iterator it = accountsToBan.begin(); it != accountsToBan.end(); ++it)
+    for (const auto it : accountsToBan)
     {
-        if (sAccountMgr.IsAccountBanned(*it))
+        if (sAccountMgr.IsAccountBanned(it))
             continue;
-        sWorld.BanAccount(BAN_ACCOUNT, accountsIdToName[*it], 0, reason, m_session ? m_session->GetPlayerName() : "");
-        PSendSysMessage("Account '%s' permanently banned.", accountsIdToName[*it].c_str(), reason);
+        sWorld.BanAccount(BAN_ACCOUNT, accountsIdToName[it], 0, reason, m_session ? m_session->GetPlayerName() : "");
+        PSendSysMessage("Account '%s' permanently banned.", accountsIdToName[it].c_str(), reason);
         ++bannedCount;
     }
     PSendSysMessage("%u accounts banned for %s (%u on this IP)", bannedCount, reason, accountsIdToName.size());
@@ -640,15 +643,15 @@ void ChatHandler::SendBanResult(BanMode mode, BanReturn result, std::string& ban
         case BAN_NOTFOUND:
             switch (mode)
             {
-            default:
-                PSendSysMessage(LANG_BAN_NOTFOUND, "account", banTarget.c_str());
-                break;
-            case BAN_CHARACTER:
-                PSendSysMessage(LANG_BAN_NOTFOUND, "character", banTarget.c_str());
-                break;
-            case BAN_IP:
-                PSendSysMessage(LANG_BAN_NOTFOUND, "ip", banTarget.c_str());
-                break;
+                default:
+                    PSendSysMessage(LANG_BAN_NOTFOUND, "account", banTarget.c_str());
+                    break;
+                case BAN_CHARACTER:
+                    PSendSysMessage(LANG_BAN_NOTFOUND, "character", banTarget.c_str());
+                    break;
+                case BAN_IP:
+                    PSendSysMessage(LANG_BAN_NOTFOUND, "ip", banTarget.c_str());
+                    break;
             }
             SetSentErrorMessage(true);
             return;
@@ -738,7 +741,7 @@ bool ChatHandler::HandleBanInfoCharacterCommand(char* args)
 {
     Player* target;
     ObjectGuid target_guid;
-    if (!ExtractPlayerTarget(&args, &target, &target_guid,NULL,true))
+    if (!ExtractPlayerTarget(&args, &target, &target_guid,nullptr,true))
         return false;
 
     uint32 accountid = target ? target->GetSession()->GetAccountId() : sObjectMgr.GetPlayerAccountIdByGUID(target_guid);
@@ -755,7 +758,7 @@ bool ChatHandler::HandleBanInfoCharacterCommand(char* args)
 
 bool ChatHandler::HandleBanInfoHelper(uint32 accountid, char const* accountname)
 {
-    QueryResult *result = LoginDatabase.PQuery(
+    QueryResult* result = LoginDatabase.PQuery(
     "SELECT FROM_UNIXTIME(bandate), unbandate-bandate, active, unbandate,banreason,bannedby,COALESCE(name, \"NoRealm\") , gmlevel "
     "FROM account_banned LEFT JOIN realmlist ON realmlist.id = realm "
     "WHERE account_banned.id = '%u' ORDER BY bandate ASC", accountid);
@@ -772,7 +775,7 @@ bool ChatHandler::HandleBanInfoHelper(uint32 accountid, char const* accountname)
 
         time_t unbandate = time_t(fields[3].GetUInt64());
         bool active = false;
-        if (fields[2].GetBool() && (fields[1].GetUInt64() == (uint64)0 || unbandate >= time(NULL)))
+        if (fields[2].GetBool() && (fields[1].GetUInt64() == (uint64)0 || unbandate >= time(nullptr)))
             active = true;
         bool permanent = (fields[1].GetUInt64() == (uint64)0);
         uint32 reqGmLevel = fields[6].GetUInt8();
@@ -806,14 +809,14 @@ bool ChatHandler::HandleBanInfoIPCommand(char* args)
     std::string IP = cIP;
 
     LoginDatabase.escape_string(IP);
-    QueryResult *result = LoginDatabase.PQuery("SELECT ip, FROM_UNIXTIME(bandate), FROM_UNIXTIME(unbandate), unbandate-UNIX_TIMESTAMP(), banreason,bannedby,unbandate-bandate FROM ip_banned WHERE ip = '%s'", IP.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT ip, FROM_UNIXTIME(bandate), FROM_UNIXTIME(unbandate), unbandate-UNIX_TIMESTAMP(), banreason,bannedby,unbandate-bandate FROM ip_banned WHERE ip = '%s'", IP.c_str());
     if (!result)
     {
         PSendSysMessage(LANG_BANINFO_NOIP);
         return true;
     }
 
-    Field *fields = result->Fetch();
+    Field* fields = result->Fetch();
     bool permanent = !fields[6].GetUInt64();
     PSendSysMessage(LANG_BANINFO_IPENTRY,
                     fields[0].GetString(), fields[1].GetString(), permanent ? GetMangosString(LANG_BANINFO_NEVER) : fields[2].GetString(),
@@ -904,7 +907,7 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
         do
         {
             SendSysMessage("-------------------------------------------------------------------------------");
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 account_id = fields[0].GetUInt32();
 
             std::string account_name;
@@ -917,10 +920,10 @@ bool ChatHandler::HandleBanListHelper(QueryResult* result)
                 sAccountMgr.GetName(account_id, account_name);
 
             // No SQL injection. id is uint32.
-            QueryResult *banInfo = LoginDatabase.PQuery("SELECT bandate,unbandate,bannedby,banreason FROM account_banned WHERE id = %u ORDER BY unbandate", account_id);
+            QueryResult* banInfo = LoginDatabase.PQuery("SELECT bandate,unbandate,bannedby,banreason FROM account_banned WHERE id = %u ORDER BY unbandate", account_id);
             if (banInfo)
             {
-                Field *fields2 = banInfo->Fetch();
+                Field* fields2 = banInfo->Fetch();
                 do
                 {
                     time_t t_ban = fields2[0].GetUInt64();
@@ -1003,7 +1006,7 @@ bool ChatHandler::HandleBanListIPCommand(char* args)
         do
         {
             SendSysMessage("-------------------------------------------------------------------------------");
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             time_t t_ban = fields[1].GetUInt64();
             tm* aTm_ban = localtime(&t_ban);
             if (fields[1].GetUInt64() == fields[2].GetUInt64())
@@ -1032,7 +1035,7 @@ bool ChatHandler::HandleBanListIPCommand(char* args)
 
 bool ChatHandler::HandleAnticheatCommand(char* args)
 {
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!ExtractPlayerTarget(&args, &player) && m_session)
         player = m_session->GetPlayer();
     if (!player)
@@ -1053,22 +1056,22 @@ bool ChatHandler::HandleListAddonsCommand(char* args)
 
     std::set<std::string> const& addons = player->GetSession()->GetAddons();
     PSendSysMessage("%u addons on target.", addons.size());
-    for (std::set<std::string>::const_iterator it = addons.begin(); it != addons.end(); ++it)
-        PSendSysMessage(">> %s", it->c_str());
+    for (const auto& addon : addons)
+        PSendSysMessage(">> %s", addon.c_str());
     return true;
 }
 
 bool ChatHandler::HandleClientInfosCommand(char* args)
 {
-    Player* player = NULL;
+    Player* player = nullptr;
     if (!ExtractPlayerTarget(&args, &player) && m_session)
         player = m_session->GetPlayer();
     if (!player)
         return false;
 
     PSendSysMessage("Account %s has %u client identifiers.", player->GetSession()->GetUsername().c_str(), player->GetSession()->GetClientIdentifiers().size());
-    for (ClientIdentifiersMap::const_iterator it = player->GetSession()->GetClientIdentifiers().begin(); it != player->GetSession()->GetClientIdentifiers().end(); ++it)
-        PSendSysMessage("%u: %s", it->first, it->second.c_str());
+    for (const auto& it : player->GetSession()->GetClientIdentifiers())
+        PSendSysMessage("%u: %s", it.first, it.second.c_str());
     player->GetSession()->ComputeClientHash();
     PSendSysMessage("Hash is %s", playerLink(player->GetSession()->GetClientHash()).c_str());
     return true;
@@ -1080,18 +1083,18 @@ bool ChatHandler::HandleClientSearchCommand(char* args)
     std::string searchedHash = args;
     uint32 i = 0;
     World::SessionMap const& sessMap = sWorld.GetAllSessions();
-    for (World::SessionMap::const_iterator itr = sessMap.begin(); itr != sessMap.end(); ++itr)
+    for (const auto& itr : sessMap)
     {
-        if (!itr->second)
+        if (!itr.second)
             continue;
 
-        std::string currentHash = itr->second->GetClientHash();
+        std::string currentHash = itr.second->GetClientHash();
         if (currentHash.find(searchedHash) != std::string::npos)
         {
             PSendSysMessage("%s on account %s, %s",
-                            playerLink(itr->second->GetPlayerName()).c_str(),
-                            playerLink(itr->second->GetUsername()).c_str(),
-                            playerLink(itr->second->GetRemoteAddress()).c_str());
+                            playerLink(itr.second->GetPlayerName()).c_str(),
+                            playerLink(itr.second->GetUsername()).c_str(),
+                            playerLink(itr.second->GetRemoteAddress()).c_str());
             ++i;
         }
     }
@@ -1113,7 +1116,7 @@ bool ChatHandler::HandleSpamerMute(char* args)
 
     if (Player* player = ObjectAccessor::FindPlayerByName(cname))
     {
-        if (AntispamInterface *a = sAnticheatLib->GetAntispam())
+        if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
         {
             a->mute(player->GetSession()->GetAccountId());
             PSendSysMessage("Spamer %s was muted", cname);
@@ -1134,7 +1137,7 @@ bool ChatHandler::HandleSpamerUnmute(char* args)
 
     if (Player* player = ObjectAccessor::FindPlayerByName(cname))
     {
-        if (AntispamInterface *a = sAnticheatLib->GetAntispam())
+        if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
         {
             a->unmute(player->GetSession()->GetAccountId());
             PSendSysMessage("Spamer %s was unmuted", cname);
@@ -1146,7 +1149,7 @@ bool ChatHandler::HandleSpamerUnmute(char* args)
 
 bool ChatHandler::HandleSpamerList(char* args)
 {
-    if (AntispamInterface *a = sAnticheatLib->GetAntispam())
+    if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
         a->showMuted(GetSession());
     return true;
 }
@@ -1183,7 +1186,7 @@ bool ChatHandler::HandleMuteCommand(char* args)
     if (HasLowerSecurity(target, target_guid, true))
         return false;
 
-    time_t mutetime = time(NULL) + notspeaktime * MINUTE;
+    time_t mutetime = time(nullptr) + notspeaktime * MINUTE;
 
     if (target)
         target->GetSession()->m_muteTime = mutetime;
@@ -1212,7 +1215,7 @@ bool ChatHandler::HandleMuteCommand(char* args)
     ASSERT(playerData);
     std::stringstream reason;
     reason << playerData->sName << " muted " << notspeaktime << " minutes";
-    if (givenReason != "")
+    if (!givenReason.empty())
         reason << " for \"" << givenReason << "\"";
     sWorld.WarnAccount(playerData->uiAccount, authorName, reason.str(), "WARNING");
     return true;

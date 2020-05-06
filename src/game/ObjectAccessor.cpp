@@ -43,37 +43,37 @@ INSTANTIATE_CLASS_MUTEX(ObjectAccessor, ACE_Thread_Mutex);
 ObjectAccessor::ObjectAccessor() {}
 ObjectAccessor::~ObjectAccessor()
 {
-    for (Player2CorpsesMapType::const_iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); ++itr)
+    for (const auto& itr : i_player2corpse)
     {
-        if (itr->first.IsCorpse())
+        if (itr.first.IsCorpse())
             continue;
-        itr->second->RemoveFromWorld();
-        delete itr->second;
+        itr.second->RemoveFromWorld();
+        delete itr.second;
     }
 }
 
 Unit*
-ObjectAccessor::GetUnit(WorldObject const &u, ObjectGuid guid)
+ObjectAccessor::GetUnit(WorldObject const& u, ObjectGuid guid)
 {
     if (!guid)
-        return NULL;
+        return nullptr;
 
     if (guid.IsPlayer())
         return FindPlayer(guid);
 
     if (!u.IsInWorld())
-        return NULL;
+        return nullptr;
 
     return u.GetMap()->GetAnyTypeCreature(guid);
 }
 
 Corpse* ObjectAccessor::GetCorpseInMap(ObjectGuid guid, uint32 mapid)
 {
-    Corpse * ret = HashMapHolder<Corpse>::Find(guid);
+    Corpse* ret = HashMapHolder<Corpse>::Find(guid);
     if (!ret)
-        return NULL;
+        return nullptr;
     if (ret->GetMapId() != mapid)
-        return NULL;
+        return nullptr;
 
     return ret;
 }
@@ -87,14 +87,14 @@ Player* ObjectAccessor::FindPlayerNotInWorld(ObjectGuid guid)
 
 Player* ObjectAccessor::FindPlayer(ObjectGuid guid)
 {
-    Player * plr = FindPlayerNotInWorld(guid);
+    Player* plr = FindPlayerNotInWorld(guid);
     if (!plr || !plr->IsInWorld())
         return nullptr;
 
     return plr;
 }
 
-Player* ObjectAccessor::FindPlayerByNameNotInWorld(const char *name)
+Player* ObjectAccessor::FindPlayerByNameNotInWorld(char const* name)
 {
     std::string cppname(name);
     if (!normalizePlayerName(cppname))
@@ -104,10 +104,10 @@ Player* ObjectAccessor::FindPlayerByNameNotInWorld(const char *name)
     if (it != playerNameToPlayerPointer.end())
         return it->second;
 
-    return NULL;
+    return nullptr;
 }
 
-Player* ObjectAccessor::FindPlayerByName(const char *name)
+Player* ObjectAccessor::FindPlayerByName(char const* name)
 {
     Player* player = FindPlayerByNameNotInWorld(name);
     if (!player || !player->IsInWorld())
@@ -115,7 +115,7 @@ Player* ObjectAccessor::FindPlayerByName(const char *name)
     return player;
 }
 
-MasterPlayer* ObjectAccessor::FindMasterPlayer(const char *name)
+MasterPlayer* ObjectAccessor::FindMasterPlayer(char const* name)
 {
     std::string cppname(name);
     if (!normalizePlayerName(cppname))
@@ -125,13 +125,13 @@ MasterPlayer* ObjectAccessor::FindMasterPlayer(const char *name)
     if (it != playerNameToMasterPlayerPointer.end())
         return it->second;
 
-    return NULL;
+    return nullptr;
 }
 
 MasterPlayer* ObjectAccessor::FindMasterPlayer(ObjectGuid guid)
 {
     if (!guid)
-        return NULL;
+        return nullptr;
 
     return HashMapHolder<MasterPlayer>::Find(guid);;
 }
@@ -145,10 +145,10 @@ PlayerPointer ObjectAccessor::FindPlayerPointer(ObjectGuid guid)
     MasterPlayer* mplr = FindMasterPlayer(guid);
     if (mplr)
         return PlayerPointer(new PlayerWrapper<MasterPlayer>(mplr));
-    return PlayerPointer(NULL);
+    return PlayerPointer(nullptr);
 }
 
-PlayerPointer ObjectAccessor::FindPlayerPointer(const char* name)
+PlayerPointer ObjectAccessor::FindPlayerPointer(char const* name)
 {
     Player* player = FindPlayerByNameNotInWorld(name);
     if (player)
@@ -156,7 +156,7 @@ PlayerPointer ObjectAccessor::FindPlayerPointer(const char* name)
     MasterPlayer* mplr = FindMasterPlayer(name);
     if (mplr)
         return PlayerPointer(new PlayerWrapper<MasterPlayer>(mplr));
-    return PlayerPointer(NULL);
+    return PlayerPointer(nullptr);
 }
 
 void
@@ -164,8 +164,8 @@ ObjectAccessor::SaveAllPlayers()
 {
     HashMapHolder<Player>::ReadGuard g(HashMapHolder<Player>::GetLock());
     HashMapHolder<Player>::MapType& m = sObjectAccessor.GetPlayers();
-    for (HashMapHolder<Player>::MapType::iterator itr = m.begin(); itr != m.end(); ++itr)
-        itr->second->SaveToDB();
+    for (const auto& itr : m)
+        itr.second->SaveToDB();
 }
 
 void ObjectAccessor::KickPlayer(ObjectGuid guid)
@@ -187,7 +187,7 @@ ObjectAccessor::GetCorpseForPlayerGUID(ObjectGuid guid)
 
     Player2CorpsesMapType::iterator iter = i_player2corpse.find(guid);
     if (iter == i_player2corpse.end())
-        return NULL;
+        return nullptr;
 
     MANGOS_ASSERT(iter->second->GetType() != CORPSE_BONES);
 
@@ -195,7 +195,7 @@ ObjectAccessor::GetCorpseForPlayerGUID(ObjectGuid guid)
 }
 
 void
-ObjectAccessor::RemoveCorpse(Corpse *corpse)
+ObjectAccessor::RemoveCorpse(Corpse* corpse)
 {
     MANGOS_ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
 
@@ -215,7 +215,7 @@ ObjectAccessor::RemoveCorpse(Corpse *corpse)
 }
 
 void
-ObjectAccessor::AddCorpse(Corpse *corpse)
+ObjectAccessor::AddCorpse(Corpse* corpse)
 {
     MANGOS_ASSERT(corpse && corpse->GetType() != CORPSE_BONES);
 
@@ -234,21 +234,21 @@ void
 ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair, GridType& grid, Map* map)
 {
     Guard guard(i_corpseGuard);
-    for (Player2CorpsesMapType::iterator iter = i_player2corpse.begin(); iter != i_player2corpse.end(); ++iter)
+    for (const auto& iter : i_player2corpse)
     {
-        if (!iter->first.IsPlayer())
+        if (!iter.first.IsPlayer())
             continue;
 
-        if (iter->second->GetGrid() == gridpair)
+        if (iter.second->GetGrid() == gridpair)
         {
             // verify, if the corpse in our instance (add only corpses which are)
             if (map->Instanceable())
             {
-                if (iter->second->GetInstanceId() == map->GetInstanceId())
-                    grid.AddWorldObject(iter->second);
+                if (iter.second->GetInstanceId() == map->GetInstanceId())
+                    grid.AddWorldObject(iter.second);
             }
             else
-                grid.AddWorldObject(iter->second);
+                grid.AddWorldObject(iter.second);
         }
     }
 }
@@ -257,7 +257,7 @@ void ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid player_guid, Player* loot
 {
     ASSERT(player_guid.IsPlayer());
 
-    Corpse *corpse = GetCorpseForPlayerGUID(player_guid);
+    Corpse* corpse = GetCorpseForPlayerGUID(player_guid);
     if (!corpse)
         return;
 
@@ -266,7 +266,7 @@ void ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid player_guid, Player* loot
 
     // remove resurrectable corpse from grid object registry (loaded state checked into call)
     // do not load the map if it's not loaded
-    Map *map = sMapMgr.FindMap(corpse->GetMapId(), corpse->GetInstanceId());
+    Map* map = sMapMgr.FindMap(corpse->GetMapId(), corpse->GetInstanceId());
 
     // If the corpse is not in the same map as the player, then we cannot safely remove
     // the corpse now. Instead, add it to a list in the map for delayed processing.
@@ -290,7 +290,7 @@ void ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid player_guid, Player* loot
 
 void ObjectAccessor::RemoveOldCorpses()
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     Player2CorpsesMapType::iterator next;
     for (Player2CorpsesMapType::iterator itr = i_player2corpse.begin(); itr != i_player2corpse.end(); itr = next)
     {
@@ -306,22 +306,22 @@ void ObjectAccessor::RemoveOldCorpses()
 ObjectAccessor::NameToPlayerPtr ObjectAccessor::playerNameToPlayerPointer;
 ObjectAccessor::NameToMasterPlayerPtr ObjectAccessor::playerNameToMasterPlayerPointer;
 
-void ObjectAccessor::AddObject(Player *player)
+void ObjectAccessor::AddObject(Player* player)
 {
     HashMapHolder<Player>::Insert(player);
     playerNameToPlayerPointer[player->GetName()] = player;
 }
-void ObjectAccessor::RemoveObject(Player *player)
+void ObjectAccessor::RemoveObject(Player* player)
 {
     HashMapHolder<Player>::Remove(player);
     playerNameToPlayerPointer.erase(player->GetName());
 }
-void ObjectAccessor::AddObject(MasterPlayer *player)
+void ObjectAccessor::AddObject(MasterPlayer* player)
 {
     HashMapHolder<MasterPlayer>::Insert(player);
     playerNameToMasterPlayerPointer[player->GetName()] = player;
 }
-void ObjectAccessor::RemoveObject(MasterPlayer *player)
+void ObjectAccessor::RemoveObject(MasterPlayer* player)
 {
     HashMapHolder<MasterPlayer>::Remove(player);
     playerNameToMasterPlayerPointer.erase(player->GetName());

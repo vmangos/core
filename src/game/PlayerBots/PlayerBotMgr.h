@@ -28,11 +28,13 @@ struct PlayerBotEntry
     uint8 state; //Online, in queue or offline
     bool isChatBot; // bot des joueurs en discussion via le site.
     bool customBot; // Enabled even if PlayerBot system disabled (AutoTesting system for example)
+    bool requestRemoval;
+    std::vector<uint16> m_pendingResponses;
     PlayerBotAI* ai;
 
-    PlayerBotEntry(uint64 guid, uint32 account, uint32 _chance): playerGUID(guid), accountId(account), chance(_chance), state(PB_STATE_OFFLINE), isChatBot(false), ai(NULL), customBot(false)
+    PlayerBotEntry(uint64 guid, uint32 account, uint32 _chance): playerGUID(guid), accountId(account), chance(_chance), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)
     {}
-    PlayerBotEntry(): state(PB_STATE_OFFLINE), isChatBot(false), ai(NULL), accountId(0), playerGUID(0), chance(100.0f), customBot(false)
+    PlayerBotEntry(): playerGUID(0), accountId(0), chance(100.0f), state(PB_STATE_OFFLINE), isChatBot(false), customBot(false), requestRemoval(false), ai(nullptr)
     {}
 };
 
@@ -63,20 +65,21 @@ class PlayerBotMgr
         ~PlayerBotMgr();
 
         void LoadConfig();
-        void load();
+        void Load();
 
-        void update(uint32 diff);
-        bool addOrRemoveBot();
+        void Update(uint32 diff);
+        bool AddOrRemoveBot();
 
-        bool addBot(PlayerBotAI* ai);
-        bool addBot(uint32 playerGuid, bool chatBot=false);
-        bool deleteBot(uint32 playerGuid);
+        bool AddBot(PlayerBotAI* ai);
+        bool AddBot(uint32 playerGuid, bool chatBot=false);
+        bool DeleteBot(std::map<uint32, PlayerBotEntry*>::iterator iter);
+        bool DeleteBot(uint32 playerGuid);
 
-        bool addRandomBot();
-        bool deleteRandomBot();
+        bool AddRandomBot();
+        bool DeleteRandomBot();
 
-        void deleteAll();
-        void addAllBots();
+        void DeleteAll();
+        void AddAllBots();
 
         void OnBotLogout(PlayerBotEntry *e);
         void OnBotLogin(PlayerBotEntry *e);

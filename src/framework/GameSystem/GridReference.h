@@ -27,25 +27,25 @@
 template<class OBJECT> class GridRefManager;
 
 template<class OBJECT>
-class MANGOS_DLL_SPEC GridReference : public Reference<GridRefManager<OBJECT>, OBJECT>
+class GridReference : public Reference<GridRefManager<OBJECT>, OBJECT>
 {
     protected:
 
-        void targetObjectBuildLink()
+        void targetObjectBuildLink() override
         {
             // called from link()
             this->getTarget()->insertFirst(this);
             this->getTarget()->incSize();
         }
 
-        void targetObjectDestroyLink()
+        void targetObjectDestroyLink() override
         {
             // called from unlink()
             if (this->isValid())
                 this->getTarget()->decSize();
         }
 
-        void sourceObjectDestroyLink()
+        void sourceObjectDestroyLink() override
         {
             // called from invalidate()
             this->getTarget()->decSize();
@@ -58,7 +58,7 @@ class MANGOS_DLL_SPEC GridReference : public Reference<GridRefManager<OBJECT>, O
         {
         }
 
-        ~GridReference()
+        ~GridReference() override
         {
             this->unlink();
         }

@@ -56,23 +56,23 @@ class instance_gnomeregan : public ScriptedInstance
 {
     public:
         instance_gnomeregan(Map* pMap);
-        ~instance_gnomeregan() {}
+        ~instance_gnomeregan() override {}
 
-        void Initialize();
+        void Initialize() override;
 
-        void OnCreatureCreate(Creature* pCreature);
-        void OnObjectCreate(GameObject* pGo);
+        void OnCreatureCreate(Creature* pCreature) override;
+        void OnObjectCreate(GameObject* pGo) override;
 
-        void SetData(uint32 uiType, uint32 uiData);
-        uint32 GetData(uint32 uiType);
-        uint64 GetData64(uint32 uiData);
+        void SetData(uint32 uiType, uint32 uiData) override;
+        uint32 GetData(uint32 uiType) override;
+        uint64 GetData64(uint32 uiData) override;
 
         sBombFace* GetBombFaces();
         void DoActivateBombFace(uint8 uiIndex);
         void DoDeactivateBombFace(uint8 uiIndex);
 
-        const char* Save() { return strInstData.c_str(); }
-        void Load(const char* chrIn);
+        char const* Save() override { return strInstData.c_str(); }
+        void Load(char const* chrIn) override;
 
     protected:
         uint32 m_auiEncounter[INSTANCE_GNOMEREGAN_MAX_ENCOUNTER];

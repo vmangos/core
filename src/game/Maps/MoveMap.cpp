@@ -16,11 +16,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "GridMap.h"
 #include "Log.h"
 #include "World.h"
 #include "VMapFactory.h"
-
 #include "MoveMap.h"
 #include "MoveMapSharedDefines.h"
 
@@ -28,11 +26,11 @@ namespace MMAP
 {
 // ######################## MMapFactory ########################
 // our global singelton copy
-MMapManager *g_MMapManager = NULL;
+MMapManager *g_MMapManager = nullptr;
 
 MMapManager* MMapFactory::createOrGetMMapManager()
 {
-    if (g_MMapManager == NULL)
+    if (g_MMapManager == nullptr)
         g_MMapManager = new MMapManager();
 
     return g_MMapManager;
@@ -43,15 +41,15 @@ void MMapFactory::clear()
     if (g_MMapManager)
     {
         delete g_MMapManager;
-        g_MMapManager = NULL;
+        g_MMapManager = nullptr;
     }
 }
 
 // ######################## MMapManager ########################
 MMapManager::~MMapManager()
 {
-    for (MMapDataSet::iterator i = loadedMMaps.begin(); i != loadedMMaps.end(); ++i)
-        delete i->second;
+    for (const auto& loadedMMap : loadedMMaps)
+        delete loadedMMap.second;
 
     // by now we should not have maps loaded
     // if we had, tiles in MMapData->mmapLoadedTiles, their actual data is lost!
@@ -90,11 +88,11 @@ bool MMapManager::loadMapData(uint32 mapId)
 
     dtNavMesh* mesh = dtAllocNavMesh();
     MANGOS_ASSERT(mesh);
-    dtStatus r = mesh->init(&params);
-    if (r != DT_SUCCESS)
+    dtStatus dtResult = mesh->init(&params);
+    if (dtStatusFailed(dtResult))
     {
         dtFreeNavMesh(mesh);
-        sLog.outError("MMAP:loadMapData: Failed to initialize dtNavMesh for mmap %03u from file %s with %u tiles. Result 0x%x.", mapId, fileName, params.maxTiles, r);
+        sLog.outError("MMAP:loadMapData: Failed to initialize dtNavMesh for mmap %03u from file %s with %u tiles. Result 0x%x.", mapId, fileName, params.maxTiles, dtResult);
         delete [] fileName;
         return false;
     }
@@ -145,7 +143,7 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
     char *fileName = new char[pathLen];
     snprintf(fileName, pathLen, (sWorld.GetDataPath() + "mmaps/%03i%02i%02i.mmtile").c_str(), mapId, y, x);
 
-    FILE *file = fopen(fileName, "rb");
+    FILE* file = fopen(fileName, "rb");
     if (!file)
     {
         //mmaps not generated on every tile. But it's often generating, where vmap placed (most of the time)
@@ -190,7 +188,7 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
 
     fclose(file);
 
-    dtMeshHeader* header = (dtMeshHeader*)data;
+    //dtMeshHeader* header = (dtMeshHeader*)data;
     dtTileRef tileRef = 0;
 
     // memory allocated for data is now managed by detour, and will be deallocated when the tile is removed
@@ -235,7 +233,8 @@ bool MMapManager::unloadMap(uint32 mapId, int32 x, int32 y)
     dtTileRef tileRef = mmap->mmapLoadedTiles[packedGridPos];
 
     // unload, and mark as non loaded
-    if (DT_SUCCESS != mmap->navMesh->removeTile(tileRef, NULL, NULL))
+    dtStatus dtResult = mmap->navMesh->removeTile(tileRef, nullptr, nullptr);
+    if (dtStatusFailed(dtResult))
     {
         // this is technically a memory leak
         // if the grid is later reloaded, dtNavMesh::addTile will return error but no extra memory is used
@@ -268,7 +267,8 @@ bool MMapManager::unloadMap(uint32 mapId)
     {
         uint32 x = (i->first >> 16);
         uint32 y = (i->first & 0x0000FFFF);
-        if (DT_SUCCESS != mmap->navMesh->removeTile(i->second, NULL, NULL))
+        dtStatus dtResult = mmap->navMesh->removeTile(i->second, nullptr, nullptr);
+        if (dtStatusFailed(dtResult))
             sLog.outError("MMAP:unloadMap: Could not unload %03u%02i%02i.mmtile from navmesh", mapId, x, y);
         else
             --loadedTiles;
@@ -310,7 +310,7 @@ bool MMapManager::unloadMapInstance(uint32 mapId, uint32 instanceId)
 dtNavMesh const* MMapManager::GetNavMesh(uint32 mapId)
 {
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
-        return NULL;
+        return nullptr;
 
     return loadedMMaps[mapId]->navMesh;
 }
@@ -318,14 +318,14 @@ dtNavMesh const* MMapManager::GetNavMesh(uint32 mapId)
 dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
 {
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
-        return NULL;
+        return nullptr;
 
     uint32 tid = (uintptr_t) ACE_Based::Thread::currentId();
     MMapData* mmap = loadedMMaps[mapId];
     mmap->navMeshQueries_lock.acquire_read();
 
     NavMeshQuerySet::iterator it = mmap->navMeshQueries.find(tid);
-    dtNavMeshQuery* navMeshQuery = NULL;
+    dtNavMeshQuery* navMeshQuery = nullptr;
     if (it == mmap->navMeshQueries.end())
     {
         mmap->navMeshQueries_lock.release();
@@ -334,12 +334,13 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
         // allocate mesh query
         navMeshQuery = dtAllocNavMeshQuery();
         MANGOS_ASSERT(navMeshQuery);
-        if (DT_SUCCESS != navMeshQuery->init(mmap->navMesh, 2048))
+        dtStatus dtResult = navMeshQuery->init(mmap->navMesh, 2048);
+        if (dtStatusFailed(dtResult))
         {
             mmap->navMeshQueries_lock.release();
             dtFreeNavMeshQuery(navMeshQuery);
             sLog.outError("MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u thread %u", mapId, tid);
-            return NULL;
+            return nullptr;
         }
 
         DETAIL_LOG("MMAP:GetNavMeshQuery: created dtNavMeshQuery for mapId %03u thread %u", mapId, tid);
@@ -422,7 +423,7 @@ bool MMapManager::loadGameObject(uint32 displayId)
 dtNavMeshQuery const* MMapManager::GetModelNavMeshQuery(uint32 displayId)
 {
     if (loadedModels.find(displayId) == loadedModels.end())
-        return NULL;
+        return nullptr;
 
     uint32 tid = (uintptr_t) ACE_Based::Thread::currentId();
     MMapData* mmap = loadedModels[displayId];
@@ -438,7 +439,7 @@ dtNavMeshQuery const* MMapManager::GetModelNavMeshQuery(uint32 displayId)
             {
                 dtFreeNavMeshQuery(query);
                 sLog.outError("MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for displayid %03u tid %u", displayId, tid);
-                return NULL;
+                return nullptr;
             }
 
             DETAIL_LOG("MMAP:GetNavMeshQuery: created dtNavMeshQuery for displayid %03u tid %u", displayId, tid);

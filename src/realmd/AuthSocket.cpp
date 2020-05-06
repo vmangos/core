@@ -48,8 +48,6 @@
 #include <ace/OS_NS_fcntl.h>
 #include <ace/OS_NS_sys_stat.h>
 
-extern DatabaseType LoginDatabase;
-
 enum AccountFlags
 {
     ACCOUNT_FLAG_GM         = 0x00000001,
@@ -179,8 +177,7 @@ typedef struct AuthHandler
 std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 /// Constructor - set the N and g values for SRP6
-AuthSocket::AuthSocket() : gridSeed(0), promptPin(false), _accountId(0), _lastRealmListRequest(0),
-_geoUnlockPIN(0)
+AuthSocket::AuthSocket() : promptPin(false), gridSeed(0), _geoUnlockPIN(0), _accountId(0), _lastRealmListRequest(0)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
@@ -309,6 +306,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
 {
     switch(_build)
     {
+        case 4544:                                          // 1.6.1
         case 4695:                                          // 1.7.1
         case 4878:                                          // 1.8.4
         case 5086:                                          // 1.9.4
@@ -547,7 +545,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     // figure out whether we need to display the PIN grid
                     promptPin = locked; // always prompt if the account is IP locked & 2FA is enabled
 
-                    if (!locked && ((lockFlags & ALWAYS_ENFORCE) == ALWAYS_ENFORCE) || _geoUnlockPIN)
+                    if ((!locked && ((lockFlags & ALWAYS_ENFORCE) == ALWAYS_ENFORCE)) || _geoUnlockPIN)
                     {
                         promptPin = true; // prompt if the lock hasn't been triggered but ALWAYS_ENFORCE is set
                     }
@@ -623,7 +621,7 @@ bool AuthSocket::_HandleLogonProof()
     }
 
     ///- Check if the client has one of the expected version numbers
-    bool valid_version = FindBuildInfo(_build) != NULL;
+    bool valid_version = FindBuildInfo(_build) != nullptr;
 
     ///- Session is closed unless overriden
     _status = STATUS_CLOSED;
@@ -641,7 +639,7 @@ bool AuthSocket::_HandleLogonProof()
         snprintf(tmp, 24, "./patches/%d%s.mpq", _build, _localizationName.c_str());
 
         char filename[PATH_MAX];
-        if (ACE_OS::realpath(tmp, filename) != NULL)
+        if (ACE_OS::realpath(tmp, filename) != nullptr)
         {
             patch_ = ACE_OS::open(filename, GENERIC_READ | FILE_FLAG_SEQUENTIAL_SCAN);
         }
@@ -701,7 +699,7 @@ bool AuthSocket::_HandleLogonProof()
         return false;
 
     Sha1Hash sha;
-    sha.UpdateBigNumbers(&A, &B, NULL);
+    sha.UpdateBigNumbers(&A, &B, nullptr);
     sha.Finalize();
     BigNumber u;
     u.SetBinary(sha.GetDigest(), 20);
@@ -738,11 +736,11 @@ bool AuthSocket::_HandleLogonProof()
     uint8 hash[20];
 
     sha.Initialize();
-    sha.UpdateBigNumbers(&N, NULL);
+    sha.UpdateBigNumbers(&N, nullptr);
     sha.Finalize();
     memcpy(hash, sha.GetDigest(), 20);
     sha.Initialize();
-    sha.UpdateBigNumbers(&g, NULL);
+    sha.UpdateBigNumbers(&g, nullptr);
     sha.Finalize();
     for (int i = 0; i < 20; ++i)
     {
@@ -758,9 +756,9 @@ bool AuthSocket::_HandleLogonProof()
     memcpy(t4, sha.GetDigest(), SHA_DIGEST_LENGTH);
 
     sha.Initialize();
-    sha.UpdateBigNumbers(&t3, NULL);
+    sha.UpdateBigNumbers(&t3, nullptr);
     sha.UpdateData(t4, SHA_DIGEST_LENGTH);
-    sha.UpdateBigNumbers(&s, &A, &B, &K, NULL);
+    sha.UpdateBigNumbers(&s, &A, &B, &K, nullptr);
     sha.Finalize();
     BigNumber M;
     M.SetBinary(sha.GetDigest(), 20);
@@ -883,7 +881,7 @@ bool AuthSocket::_HandleLogonProof()
 
         ///- Finish SRP6 and send the final result to the client
         sha.Initialize();
-        sha.UpdateBigNumbers(&A, &M, &K, NULL);
+        sha.UpdateBigNumbers(&A, &M, &K, nullptr);
         sha.Finalize();
 
         SendProof(sha);
@@ -1039,7 +1037,7 @@ bool AuthSocket::_HandleReconnectProof()
     Sha1Hash sha;
     sha.Initialize();
     sha.UpdateData(_login);
-    sha.UpdateBigNumbers(&t1, &_reconnectProof, &K, NULL);
+    sha.UpdateBigNumbers(&t1, &_reconnectProof, &K, nullptr);
     sha.Finalize();
 
     if (!memcmp(sha.GetDigest(), lp.R2, SHA_DIGEST_LENGTH))
@@ -1119,6 +1117,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
     switch(_build)
     {
+        case 4544:                                          // 1.6.1
         case 4695:                                          // 1.7.1
         case 4878:                                          // 1.8.4
         case 5086:                                          // 1.9.4
@@ -1148,7 +1147,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 
                 bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end();
 
-                RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(_build) : NULL;
+                RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(_build) : nullptr;
                 if (!buildInfo)
                     buildInfo = &i->second.realmBuildInfo;
 
@@ -1209,7 +1208,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 
                 bool ok_build = std::find(i->second.realmbuilds.begin(), i->second.realmbuilds.end(), _build) != i->second.realmbuilds.end();
 
-                RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(_build) : NULL;
+                RealmBuildInfo const* buildInfo = ok_build ? FindBuildInfo(_build) : nullptr;
                 if (!buildInfo)
                     buildInfo = &i->second.realmBuildInfo;
 
@@ -1393,7 +1392,7 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
     }
 
     // not guaranteed by the standard to be the UNIX epoch but it is on all supported platforms
-    auto time = std::time(NULL);
+    auto time = std::time(nullptr);
     uint64 now = static_cast<uint64>(time);
     uint64 step = static_cast<uint64>((floor(now / 30))) + interval;
     EndianConvertReverse(step);

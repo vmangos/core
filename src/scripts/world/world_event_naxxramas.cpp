@@ -50,33 +50,33 @@ struct NecropolisProxyAI : public ScriptedAI
 
     ObjectGuid _necropolisGuid;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
     }
 
-    void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
+    void InformGuid(ObjectGuid const necropolis, uint32 type = 0) override
     {
         _necropolisGuid = necropolis;
     }
 
-    void SpellHit(Unit* caster, const SpellEntry* spell)
+    void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && caster != m_creature)
             DoCastSpellIfCan(m_creature, SPELL_COMMUNICATION_TRIGGER);
     }
 
-    void SpellHitTarget(Unit* target, const SpellEntry* spell)
+    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
             if (Creature* crea = target->ToCreature())
                 crea->AI()->InformGuid(_necropolisGuid);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
     }
 };
@@ -106,7 +106,7 @@ struct NecropolisRelayAI : public ScriptedAI
     ObjectGuid _necropolisGuid;
     std::vector<ObjectGuid> SpawnedShards;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
     }
@@ -120,7 +120,7 @@ struct NecropolisRelayAI : public ScriptedAI
     {
         SpawnedShards.push_back(pCreature->GetObjectGuid());
     }
-    void SpellHitTarget(Unit* target, const SpellEntry* spell)
+    void SpellHitTarget(Unit* target, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
         {
@@ -129,7 +129,7 @@ struct NecropolisRelayAI : public ScriptedAI
         }
     }
     
-    void SpellHit(Unit* caster, const SpellEntry* spell) override
+    void SpellHit(Unit* caster, SpellEntry const* spell) override
     {
         if (spell->Id == SPELL_COMMUNICATION_CAMP_RELAY)
         {
@@ -151,7 +151,7 @@ struct NecropolisRelayAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
         if (despawnTimer)
         {
@@ -186,7 +186,7 @@ public:
         me->SetActiveObjectState(true);
         me->SetVisibilityModifier(3000.0f);
     }
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
     }
 };
@@ -229,7 +229,7 @@ struct npc_necrotic_shard : public ScriptedAI
         Reset();
         
         eliteSpawnTimer = urand(ELITE_SPAWN_MINIMUM, ELITE_SPAWN_MAXIMUM);
-        if(m_creature->isAlive())
+        if(m_creature->IsAlive())
             me->SetVisibility(VISIBILITY_ON);
     }
 
@@ -239,15 +239,15 @@ struct npc_necrotic_shard : public ScriptedAI
     uint32 eliteSpawnTimer;
     std::set<ObjectGuid> _adds;
 
-    void OnRemoveFromWorld()
+    void OnRemoveFromWorld() override
     {
         DespawnAdds();
     }
 
     void DespawnAdds()
     {
-        for (std::set<ObjectGuid>::iterator it = _adds.begin(); it != _adds.end(); ++it)
-            if (Creature* add = m_creature->GetMap()->GetCreature(*it))
+        for (const auto& guid : _adds)
+            if (Creature* add = m_creature->GetMap()->GetCreature(guid))
                 add->AddObjectToRemoveList();
         _adds.clear();
     }
@@ -271,22 +271,22 @@ struct npc_necrotic_shard : public ScriptedAI
             if (Creature* add = m_creature->SummonCreature(GenerateAddEntry(), x, y, z, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
             {
                 add->SetCorpseDelay(120);  // 2 min for corpse to despawn
-                add->SetRespawnDelay(30); // 30 sec to respawn after despawn(?)
-                add->SetRespawnRadius(20.0f);
+                add->SetRespawnDelay(30);  // 30 sec to respawn after despawn(?)
+                add->SetWanderDistance(20.0f);
                 _adds.insert(add->GetObjectGuid());
             }
         }
     }
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void Aggro(Unit* who)
+    void Aggro(Unit* who) override
     {
     }
 
-    void AttackStart(Unit* who)
+    void AttackStart(Unit* who) override
     {
     }
 
@@ -300,12 +300,12 @@ struct npc_necrotic_shard : public ScriptedAI
         //    break;
         //}
     }
-    void JustRespawned()
+    void JustRespawned() override
     {
         m_creature->UpdateEntry(NPC_NECROTIC_SHARD);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
         if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
             necropolis->SendGameObjectCustomAnim();
@@ -317,13 +317,13 @@ struct npc_necrotic_shard : public ScriptedAI
         DespawnAdds();
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
         if (pSpell->Id == SPELL_COMMUNICATION_TRIGGER || pSpell->Id == SPELL_ZAP_CRYSTAL)
             DoCastSpellIfCan(m_creature, SPELL_CAMP_RECEIVES_COMMUNIQUE);
     }
 
-    void DamageTaken(Unit* doneBy, uint32& damage)
+    void DamageTaken(Unit* doneBy, uint32& damage) override
     {
         if (m_creature->GetHealth() < damage + 1)
         {
@@ -356,7 +356,7 @@ struct npc_necrotic_shard : public ScriptedAI
             uiAmountHealed = 0;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (eliteSpawnTimer < diff)
         {
@@ -422,23 +422,23 @@ struct npc_cultist_engineer : public ScriptedAI
     uint32 _healTimer;
     ObjectGuid _shardGuid;
 
-    void Reset()
+    void Reset() override
     {
         _healTimer = 1000;
     }
 
-    void JustReachedHome()
+    void JustReachedHome() override
     {
         m_creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_ENGINEER_REPAIR);
         m_creature->SetChannelObjectGuid(_shardGuid);
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
 
     }
 
-    void DoAction(Unit* unit, uint32 action)
+    void DoAction(Unit* unit, uint32 action) override
     {
         if (action == ENGINEER_AI_ACTION_SET_PYLON)
         {
@@ -461,7 +461,7 @@ struct npc_cultist_engineer : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         if (_healTimer < diff)
         {
@@ -522,18 +522,18 @@ struct ShadowOfDoomAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_uiFear_Timer = 10000;
         m_uiMindFlay_Timer = 6000;
         m_uiScourgeStrike_Timer = 120000;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         uint32 rnd;
         rnd = urand(0, 1);
@@ -543,15 +543,15 @@ struct ShadowOfDoomAI : public ScriptedAI
             creature->MonsterSay(LANG_SHADOW_OF_DOOM_TEST_1, LANG_UNIVERSAL, 0);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         // Fear
         if (m_uiFear_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_FEAR) == CAST_OK)
                 m_uiFear_Timer = 10000;
         }
         else
@@ -560,7 +560,7 @@ struct ShadowOfDoomAI : public ScriptedAI
         // Mind Flay
         if (m_uiMindFlay_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDFLAY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MINDFLAY) == CAST_OK)
                 m_uiMindFlay_Timer = 10000;
         }
         else
@@ -569,7 +569,7 @@ struct ShadowOfDoomAI : public ScriptedAI
         // Scourge Strike
         if (m_uiScourgeStrike_Timer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
                 m_uiScourgeStrike_Timer = 120000;
         }
         else
@@ -597,40 +597,40 @@ struct GhoulBerserker : public ScriptedAI
     }
     uint32 _plagueTimer;
     uint32 _enrageTimer;
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _plagueTimer = 10000;
         _enrageTimer = 0;
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPAWN_SMOKE_1);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    void SpellHit(Unit* pCaster, SpellEntry const* pSpell) override
     {
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (_plagueTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CONTAGION_OF_ROT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CONTAGION_OF_ROT) == CAST_OK)
                 _plagueTimer = 8000;
         }
         else
@@ -669,27 +669,27 @@ struct SpectralSoldierAI : public ScriptedAI
     uint32 _shoutTimer;
     uint32 _sunderArmorTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _shoutTimer = 15000;
         _sunderArmorTimer = 10000;
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (_shoutTimer < uiDiff)
@@ -702,7 +702,7 @@ struct SpectralSoldierAI : public ScriptedAI
 
         if (_sunderArmorTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
                 _sunderArmorTimer = 8000;
         }
         else
@@ -731,27 +731,27 @@ struct SkeletalShocktrooperAI : public ScriptedAI
     uint32 _boneShardsTimer;
     uint32 _cleaveTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _boneShardsTimer = 10000;
         _cleaveTimer = 8000;
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (_boneShardsTimer < uiDiff)
@@ -764,7 +764,7 @@ struct SkeletalShocktrooperAI : public ScriptedAI
 
         if (_cleaveTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_CLEAVE) == CAST_OK)
                 _cleaveTimer = 10000;
         }
         else
@@ -792,32 +792,32 @@ struct SkeletalTrooperAI : public ScriptedAI
     uint32 _ShadowWordPainTimer;
     uint32 _ScourgeStrikeTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _ScourgeStrikeTimer = 120000; // 2 min
         _ShadowWordPainTimer = 15000; // 15 sec
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPAWN_SMOKE_1);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (_ShadowWordPainTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_WORD_PAIN) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SHADOW_WORD_PAIN) == CAST_OK)
                 _ShadowWordPainTimer = 30000; // 30 sec
         }
         else
@@ -825,7 +825,7 @@ struct SkeletalTrooperAI : public ScriptedAI
 
         if (_ScourgeStrikeTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
                 _ScourgeStrikeTimer = 120000; // 2 min
         }
         else
@@ -851,25 +851,25 @@ struct SpectralSpiritAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -894,31 +894,31 @@ struct SpectralApparitionAI : public ScriptedAI
 
     uint32 _ScourgeStrikeTimer;
 
-    void Reset()
+    void Reset() override
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
         _ScourgeStrikeTimer = 120000; // 2 min
     }
 
-    void JustSummoned(Creature* creature)
+    void JustSummoned(Creature* creature) override
     {
         DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
-    void JustDied(Unit*)
+    void JustDied(Unit*) override
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
             DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (_ScourgeStrikeTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
                 _ScourgeStrikeTimer = 120000;
         }
         else
@@ -947,11 +947,11 @@ struct naxx_event_rewards_giverAI : public ScriptedAI
 
     bool _alliance;
 
-    void Reset()
+    void Reset() override
     {
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
         uint32 newEntry = 0;
         uint32 victories = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
@@ -1006,9 +1006,9 @@ bool GossipHello_naxx_event_rewards_giver(Player* player, Creature* creature)
 
     uint32 attacked1 = 0;
     uint32 attacked2 = 0;
-    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1) < time(NULL))
+    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1) < time(nullptr))
         attacked1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
-    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2) < time(NULL))
+    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2) < time(nullptr))
         attacked2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
 
     // No invasion happening
@@ -1235,11 +1235,11 @@ void AddSC_world_event_naxxramas()
     newscript->RegisterSelf();
 
     // At start up
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL));
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL));
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(nullptr));
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(nullptr));
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_BLASTED_LANDS);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL));
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(nullptr));
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_ID, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);

@@ -7,7 +7,7 @@
 #include "ObjectMgr.h"
 #include "MoveSpline.h"
 #include "PlayerBotMgr.h"
-
+#include "WorldPacket.h"
 
 bool PlayerBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
 {
@@ -15,7 +15,7 @@ bool PlayerBotAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
     return true;
 }
 
-void PlayerBotAI::UpdateAI(const uint32 diff)
+void PlayerBotAI::UpdateAI(uint32 const diff)
 {
     if (me->IsBeingTeleportedNear())
     {
@@ -34,14 +34,14 @@ void PlayerBotAI::UpdateAI(const uint32 diff)
 
 void PlayerBotAI::Remove()
 {
-    me->setAI(NULL);
-    me = NULL;
+    me->setAI(nullptr);
+    me = nullptr;
 }
 
 void PlayerBotFleeingAI::OnPlayerLogin()
 {
     me->GetMotionMaster()->MoveFleeing(me);
-    me->SetGodMode(true);
+    me->SetCheatGod(true);
 }
 
 /// MageOrgrimmarAttackerAI event
@@ -53,18 +53,18 @@ enum
 };
 
 
-bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o)
+bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, Player* pClone)
 {
     ASSERT(botEntry);
     std::string name = sObjectMgr.GeneratePetName(1863); // Succubus name
     normalizePlayerName(name);
-    uint8 gender = urand(0, 1);
-    uint8 skin = urand(0, 5);
-    uint8 face = urand(0, 5);
-    uint8 hairStyle = urand(0, 5);
-    uint8 hairColor = urand(0, 5);
-    uint8 facialHair = urand(0, 5);
-    Player *newChar = new Player(sess);
+    uint8 gender = pClone ? pClone->GetByteValue(UNIT_FIELD_BYTES_0, 2) : urand(0, 1);
+    uint8 skin = pClone ? pClone->GetByteValue(PLAYER_BYTES, 0) : urand(0, 5);
+    uint8 face = pClone ? pClone->GetByteValue(PLAYER_BYTES, 1) : urand(0, 5);
+    uint8 hairStyle = pClone ? pClone->GetByteValue(PLAYER_BYTES, 2) : urand(0, 5);
+    uint8 hairColor = pClone ? pClone->GetByteValue(PLAYER_BYTES, 3) : urand(0, 5);
+    uint8 facialHair = pClone ? pClone->GetByteValue(PLAYER_BYTES_2, 0) : urand(0, 5);
+    Player* newChar = new Player(sess);
     uint32 guid = botEntry->playerGUID;
     if (!newChar->Create(guid, name, race_, class_, gender, skin, face, hairStyle, hairColor, facialHair))
     {
@@ -80,7 +80,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     // Set instance
     if (instanceId && mapId > 1) // Not a continent
     {
-        DungeonPersistentState *state = (DungeonPersistentState*)sMapPersistentStateMgr
+        DungeonPersistentState* state = (DungeonPersistentState*)sMapPersistentStateMgr
                 .AddPersistentState(sMapStorage.LookupEntry<MapEntry>(mapId), instanceId, time(nullptr) + 3600, false, true);
         newChar->BindToInstance(state, true, true);
     }
@@ -95,10 +95,11 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     newChar->Relocate(x, y, z, o);
     sObjectMgr.InsertPlayerInCache(newChar);
     newChar->SetMap(map);
+    newChar->SaveRecallPosition();
     newChar->CreatePacketBroadcaster();
     MasterPlayer* mPlayer = new MasterPlayer(sess);
     mPlayer->LoadPlayer(newChar);
-    mPlayer->SetSocial(sSocialMgr.LoadFromDB(NULL, newChar->GetObjectGuid()));
+    mPlayer->SetSocial(sSocialMgr.LoadFromDB(nullptr, newChar->GetObjectGuid()));
     if (!newChar->GetMap()->Add(newChar))
     {
         sLog.outError("PlayerBotAI::SpawnNewPlayer: Unable to add player to map!");
@@ -108,6 +109,8 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     sess->SetPlayer(newChar);
     sess->SetMasterPlayer(mPlayer);
     sObjectAccessor.AddObject(newChar);
+    newChar->SetCanModifyStats(true);
+    newChar->UpdateAllStats();
     return true;
 }
 bool MageOrgrimmarAttackerAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSession* sess)
@@ -115,24 +118,24 @@ bool MageOrgrimmarAttackerAI::OnSessionLoaded(PlayerBotEntry* entry, WorldSessio
     return SpawnNewPlayer(sess, CLASS_MAGE, RACE_GNOME, 1, 0, 1017.0f, -4450, 12, 0.65f);
 }
 
-void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
+void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
 {
     PlayerBotAI::UpdateAI(diff);
-    if (me->getLevel() != 60)
+    if (me->GetLevel() != 60)
         me->GiveLevel(60);
     /// DEATH
-    if (!me->isAlive())
+    if (!me->IsAlive())
     {
-        sPlayerBotMgr.deleteBot(me->GetGUIDLow());
+        sPlayerBotMgr.DeleteBot(me->GetGUIDLow());
         /*
-        if (me->getDeathState() < CORPSE)
+        if (me->GetDeathState() < CORPSE)
             return;
-        if (me->getDeathState() == CORPSE && me->GetDeathTimer() && me->GetDeathTimer() < (6 * MINUTE * IN_MILLISECONDS - 30000))
+        if (me->GetDeathState() == CORPSE && me->GetDeathTimer() && me->GetDeathTimer() < (6 * MINUTE * IN_MILLISECONDS - 30000))
         {
             me->SetHealth(1);
             me->RepopAtGraveyard();
         }
-        else if (me->getDeathState() == CORPSE && !me->GetDeathTimer())
+        else if (me->GetDeathState() == CORPSE && !me->GetDeathTimer())
         {
             me->ResurrectPlayer(0.5f);
             me->SpawnCorpseBones();
@@ -143,12 +146,12 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
     /// COMBAT AI
     if (me->IsNonMeleeSpellCasted(false) || (me->HasAura(AURA_REGEN_MANA) && me->GetPower(POWER_MANA) != me->GetMaxPower(POWER_MANA)))
         return;
-    float range = me->isInCombat() ? 30.0f : frand(15, 30);
+    float range = me->IsInCombat() ? 30.0f : frand(15, 30);
     Unit* target = me->SelectNearestTarget(range);
     if (target && !me->IsWithinLOSInMap(target))
-        target = NULL;
+        target = nullptr;
     // OOM ?
-    if (me->GetPower(POWER_MANA) < 40 && target && me->isInCombat())
+    if (me->GetPower(POWER_MANA) < 40 && target && me->IsInCombat())
     {
         if (me->Attack(target, true))
             me->GetMotionMaster()->MoveChase(target);
@@ -161,7 +164,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
     if (!me->HasSpellCooldown(SPELL_FROST_NOVA) && me->GetPower(POWER_MANA) > 50)
         if (nearTarget)
             me->CastSpell(me, SPELL_FROST_NOVA, false);
-    if (nearTarget && target->hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    if (nearTarget && target->HasUnitState(UNIT_STAT_CAN_NOT_MOVE))
     {
         // already runing
         if (!me->movespline->Finalized())
@@ -196,7 +199,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
         return;
     }
     /// OUT OF COMBAT REGEN
-    if (!me->isInCombat() && me->GetPower(POWER_MANA) < 150)
+    if (!me->IsInCombat() && me->GetPower(POWER_MANA) < 150)
     {
         if (!me->movespline->Finalized())
             me->StopMoving();
@@ -274,7 +277,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
             me->UpdateGroundPositionZ(x, y, z);
         }
         r = 20;
-        if (!me->GetMap()->GetWalkRandomPosition(NULL, x, y, z, r))
+        if (!me->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, r))
             return;
     }
     else
@@ -287,7 +290,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(const uint32 diff)
             float angle = me->GetOrientation() + frand(-M_PI_F / 2, M_PI_F / 2);
             x += r * cos(angle);
             y += r * sin(angle);
-            if (!me->GetMap()->GetWalkHitPosition(NULL, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), x, y, z))
+            if (!me->GetMap()->GetWalkHitPosition(nullptr, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), x, y, z))
                 return;
         }
         else
@@ -306,7 +309,7 @@ void PopulateAreaBotAI::BeforeAddToMap(Player* player)
         float y = _y;
         float z = _z;
         Map* map = sMapMgr.CreateMap(_map, player);
-        while (!map->GetWalkRandomPosition(NULL, x, y, z, _radius));
+        while (!map->GetWalkRandomPosition(nullptr, x, y, z, _radius));
         player->Relocate(x, y, z);
         player->SetLocationMapId(_map);
     }

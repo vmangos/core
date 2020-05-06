@@ -24,7 +24,7 @@
 #include "PathFinder.h"
 #include "Unit.h"
 
-class MANGOS_DLL_SPEC TargetedMovementGeneratorBase
+class TargetedMovementGeneratorBase
 {
     public:
         explicit TargetedMovementGeneratorBase(Unit &target) { i_target.link(&target, this); }
@@ -34,7 +34,7 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorBase
 };
 
 template<class T, typename D>
-class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
+class TargetedMovementGeneratorMedium
 : public MovementGeneratorMedium< T, D >, public TargetedMovementGeneratorBase
 {
     protected:
@@ -57,7 +57,7 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 
         Unit* GetTarget() const { return i_target.getTarget(); }
 
-        void unitSpeedChanged() { m_bRecalculateTravel=true; }
+        void UnitSpeedChanged() { m_bRecalculateTravel=true; }
         void UpdateFinalDistance(float fDistance);
 
     protected:
@@ -78,7 +78,7 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 };
 
 template<class T>
-class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >
+class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >
 {
     public:
         explicit ChaseMovementGenerator(Unit &target)
@@ -89,17 +89,17 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
 
         MovementGeneratorType GetMovementGeneratorType() const { return CHASE_MOTION_TYPE; }
 
-        bool Update(T &, const uint32 &);
+        bool Update(T &, uint32 const&);
         void Initialize(T &);
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
         void MovementInform(T &);
 
-        static void _clearUnitStateMove(T &u) { u.clearUnitState(UNIT_STAT_CHASE_MOVE); }
-        static void _addUnitStateMove(T &u)  { u.addUnitState(UNIT_STAT_CHASE_MOVE); }
+        static void _clearUnitStateMove(T &u) { u.ClearUnitState(UNIT_STAT_CHASE_MOVE); }
+        static void _addUnitStateMove(T &u)  { u.AddUnitState(UNIT_STAT_CHASE_MOVE); }
         bool EnableWalking() const { return false;}
-        bool _lostTarget(T &u) const { return u.getVictim() != this->GetTarget(); }
+        bool _lostTarget(T &u) const { return u.GetVictim() != this->GetTarget(); }
         void _reachTarget(T &);
     private:
         ShortTimeTracker m_spreadTimer{ 0 };
@@ -126,7 +126,7 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
 };
 
 template<class T>
-class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >
+class FollowMovementGenerator : public TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >
 {
     public:
         explicit FollowMovementGenerator(Unit &target)
@@ -137,15 +137,15 @@ class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGenerator
 
         MovementGeneratorType GetMovementGeneratorType() const { return FOLLOW_MOTION_TYPE; }
 
-        bool Update(T &, const uint32 &);
+        bool Update(T &, uint32 const&);
         void Initialize(T &);
         void Finalize(T &);
         void Interrupt(T &);
         void Reset(T &);
         void MovementInform(T &);
 
-        static void _clearUnitStateMove(T &u) { u.clearUnitState(UNIT_STAT_FOLLOW_MOVE); }
-        static void _addUnitStateMove(T &u)  { u.addUnitState(UNIT_STAT_FOLLOW_MOVE); }
+        static void _clearUnitStateMove(T &u) { u.ClearUnitState(UNIT_STAT_FOLLOW_MOVE); }
+        static void _addUnitStateMove(T &u)  { u.AddUnitState(UNIT_STAT_FOLLOW_MOVE); }
         bool EnableWalking() const;
         bool _lostTarget(T &) const { return false; }
         void _reachTarget(T &) {}

@@ -25,65 +25,202 @@
 
 enum ConditionType
 {
-    //                                                      // value1       value2        value3        value4
-    CONDITION_NOT                   = -3,                   // cond-id-1    0          returns !cond-id-1
-    CONDITION_OR                    = -2,                   // cond-id-1    cond-id-2  returns cond-id-1 OR cond-id-2
-    CONDITION_AND                   = -1,                   // cond-id-1    cond-id-2  returns cond-id-1 AND cond-id-2
-    CONDITION_NONE                  = 0,                    // 0            0
-    CONDITION_AURA                  = 1,                    // spell_id     effindex
-    CONDITION_ITEM                  = 2,                    // item_id      count   check present req. amount items in inventory
-    CONDITION_ITEM_EQUIPPED         = 3,                    // item_id      0
-    CONDITION_AREAID                = 4,                    // area_id      0
-    CONDITION_REPUTATION_RANK_MIN   = 5,                    // faction_id   min_rank
-    CONDITION_TEAM                  = 6,                    // player_team  0,      (469 - Alliance 67 - Horde)
-    CONDITION_SKILL                 = 7,                    // skill_id     skill_value
-    CONDITION_QUESTREWARDED         = 8,                    // quest_id     0
-    CONDITION_QUESTTAKEN            = 9,                    // quest_id     0,1,2   for condition true while quest active (0 any state, 1 if quest incomplete, 2 if quest completed).
-    CONDITION_AD_COMMISSION_AURA    = 10,                   // 0            0,      for condition true while one from AD commission aura active
-    CONDITION_WAR_EFFORT_STAGE      = 11,                   // value1: the stage                      value2: 0 : ==, 1: >= 2 <=
-    CONDITION_ACTIVE_GAME_EVENT     = 12,                   // event_id     0
-    CONDITION_CANT_PATH_TO_VICTIM   = 13,                   // 0
-    CONDITION_RACE_CLASS            = 14,                   // race_mask    class_mask
-    CONDITION_LEVEL                 = 15,                   // player_level 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_SOURCE_ENTRY          = 16,                   // entry
-    CONDITION_SPELL                 = 17,                   // spell_id     0, 1 (0: has spell, 1: hasn't spell)
-    CONDITION_INSTANCE_SCRIPT       = 18,                   // map_id       instance_condition_id (instance script specific enum)
-    CONDITION_QUESTAVAILABLE        = 19,                   // quest_id     0       for case when loot/gossip possible only if player can start quest
-    CONDITION_NEARBY_CREATURE       = 20,                   // creature_id  search_radius
-    CONDITION_NEARBY_GAMEOBJECT     = 21,                   // gobject_id   search_radius
-    CONDITION_QUEST_NONE            = 22,                   // quest_id     0 (quest did not take and not rewarded)
-    CONDITION_ITEM_WITH_BANK        = 23,                   // item_id      count   check present req. amount items in inventory or bank
-    CONDITION_WOW_PATCH             = 24,                   // value1: wow patch setting from config (0-10)
-                                                            // value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_ESCORT                = 25,                   // value1: eEscortConditionFlags value2: distance
-                                                            // value2: if != 0 only consider players in range of this value
-    CONDITION_ACTIVE_HOLIDAY        = 26,                   // holiday_id   0       preferred use instead CONDITION_ACTIVE_GAME_EVENT when possible
-    CONDITION_GENDER                = 27,                   // 0=male, 1=female, 2=none (see enum Gender)
-    CONDITION_IS_PLAYER             = 28,                   // 0=player only, 1=player owned too
-    CONDITION_SKILL_BELOW           = 29,                   // skill_id     skill_value
-                                                            // True if player has skill skill_id and skill less than (and not equal) skill_value (for skill_value > 1)
-                                                            // If skill_value == 1, then true if player has not skill skill_id
-    CONDITION_REPUTATION_RANK_MAX   = 30,                   // faction_id   max_rank
-    CONDITION_HAS_FLAG              = 31,                   // field_id     flag
-    CONDITION_LAST_WAYPOINT         = 32,                   // waypointId   0 : ==, 1: >= 2 <=
-    CONDITION_MAP_ID                = 33,                   // map_id
-    CONDITION_INSTANCE_DATA         = 34,                   // index        data        0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_MAP_EVENT_DATA        = 35,                   // event_id     index       data       0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_MAP_EVENT_ACTIVE      = 36,                   // event_id     0
-    CONDITION_LINE_OF_SIGHT         = 37,                   // 0            0
-    CONDITION_DISTANCE              = 38,                   // distance     0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_IS_MOVING             = 39,                   // 0            0
-    CONDITION_HAS_PET               = 40,                   // 0            0
-    CONDITION_HEALTH_PERCENT        = 41,                   // hp_percent   0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_MANA_PERCENT          = 42,                   // mana_percent 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_IS_IN_COMBAT          = 43,                   // 0            0
-    CONDITION_IS_HOSTILE_TO         = 44,                   // 0            0
-    CONDITION_IS_IN_GROUP           = 45,                   // 0            0
-    CONDITION_IS_ALIVE              = 46,                   // 0            0
-    CONDITION_MAP_EVENT_TARGETS     = 47,                   // event_id     cond_id
-    CONDITION_OBJECT_IS_SPAWNED     = 48,                   // 0            0
-    CONDITION_OBJECT_LOOT_STATE     = 49,                   // state        0
-    CONDITION_OBJECT_FIT_CONDITION  = 50,                   // guid         cond_id
+    //                                                      // Legend:
+    CONDITION_NOT                   = -3,                   // Returns the opposite of the provided condition. This condition is deprecated. Use the reverse result flag.
+                                                            // Requirement: None
+                                                            // Value1: condition_id
+    CONDITION_OR                    = -2,                   // Returns true if at least one of the provided conditions is true.
+                                                            // Requirement: None
+                                                            // Value1: condition_id
+                                                            // Value2: condition_id
+                                                            // Value3: condition_id (optional)
+                                                            // Value4: condition_id (optional)
+    CONDITION_AND                   = -1,                   // Returns true only if all the provided conditions are true.
+                                                            // Requirement: None
+                                                            // Value1: condition_id
+                                                            // Value2: condition_id
+                                                            // Value3: condition_id (optional)
+                                                            // Value4: condition_id (optional)
+    CONDITION_NONE                  = 0,                    // Always returns true. For internal use only.
+                                                            // Requirement: None
+    CONDITION_AURA                  = 1,                    // Checks if the unit has an aura from this spell.
+                                                            // Requirement: Unit Target
+                                                            // Value1: spell_id
+                                                            // Value2: effindex
+    CONDITION_ITEM                  = 2,                    // Checks if the player has an item in his inventory.
+                                                            // Requirement: Player Target
+                                                            // Value1: item_id
+                                                            // Value2: count
+    CONDITION_ITEM_EQUIPPED         = 3,                    // Checks if the player has equipped an item.
+                                                            // Requirement: Player Target
+                                                            // Value1: item_id
+    CONDITION_AREAID                = 4,                    // Checks if the player is in a specific zone or area.
+                                                            // Requirement: WorldObject Target or Source
+                                                            // Value1: area_id
+    CONDITION_REPUTATION_RANK_MIN   = 5,                    // Checks if the player's reputation with a given faction is equal or greater than.
+                                                            // Requirement: Player Target
+                                                            // Value1: faction_id
+                                                            // Value2: min_rank
+    CONDITION_TEAM                  = 6,                    // Checks if the player is a member of the specified team.
+                                                            // Requirement: Player Target
+                                                            // Value1: player_team (469 - Alliance 67 - Horde)
+    CONDITION_SKILL                 = 7,                    // Checks if the player's skill is equal or greater than.
+                                                            // Requirement: Player Target
+                                                            // Value1: skill_id
+                                                            // Value2: skill_value
+    CONDITION_QUESTREWARDED         = 8,                    // Checks if the player has already completed a quest.
+                                                            // Requirement: Player Target
+                                                            // Value1: quest_id
+    CONDITION_QUESTTAKEN            = 9,                    // Checks if the player has accepted a quest.
+                                                            // Requirement: Player Target
+                                                            // Value1: quest_id     
+                                                            // Value2: 0,1,2 for condition true while quest active (0 any state, 1 if quest incomplete, 2 if quest completed).
+    CONDITION_AD_COMMISSION_AURA    = 10,                   // Returns true if the player has an argent dawn commission aura.
+                                                            // Requirement: Player Target
+    CONDITION_WAR_EFFORT_STAGE      = 11,                   // Checks the current state of the War Effect event.
+                                                            // Requirement: None
+                                                            // Value1: stage
+                                                            // Value2: 0 : ==, 1: >= 2 <=
+    CONDITION_ACTIVE_GAME_EVENT     = 12,                   // Checks if a given game event is currently active.
+                                                            // Requirement: None
+                                                            // Value1: event_id
+    CONDITION_CANT_PATH_TO_VICTIM   = 13,                   // Returns true if the source is chasing a victim but is unable to find a path to it.
+                                                            // Requirement: Unit Source
+    CONDITION_RACE_CLASS            = 14,                   // Checks if the player's race and class matches the given mask.
+                                                            // Requirement: Player Target
+                                                            // Value1: race_mask
+                                                            // Value2: class_mask
+    CONDITION_LEVEL                 = 15,                   // Checks the target's level.
+                                                            // Requirement: Unit Target
+                                                            // Value1: level
+                                                            // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_SOURCE_ENTRY          = 16,                   // Check's if the source's entry id matches the one specified.
+                                                            // Requirement: WorldObject Source
+                                                            // Value1: entry
+    CONDITION_SPELL                 = 17,                   // Checks if the player has learned the given spell.
+                                                            // Requirement: Player Target
+                                                            // Value1: spell_id
+                                                            // Value2: 0, 1 (0: has spell, 1: hasn't spell)
+    CONDITION_INSTANCE_SCRIPT       = 18,                   // Calls the instance script to check an internal condition.
+                                                            // Requirement: Map
+                                                            // Value1: map_id
+                                                            // Value2: instance_condition_id (instance script specific enum)
+    CONDITION_QUESTAVAILABLE        = 19,                   // Checks if the player is able to accept a quest.
+                                                            // Requirement: Player Target
+                                                            // Value1: quest_id
+    CONDITION_NEARBY_CREATURE       = 20,                   // Checks if there is a creature nearby with the given id.
+                                                            // Requirement: WorldObject Target
+                                                            // Value1: creature_id
+                                                            // Value2: search_radius
+                                                            // Value3: dead
+                                                            // Value4: not_self
+    CONDITION_NEARBY_GAMEOBJECT     = 21,                   // Checks if there is a gameobject nearby with the given id.
+                                                            // Requirement: WorldObject Target
+                                                            // Value1: gobject_id
+                                                            // Value2: search_radius
+    CONDITION_QUEST_NONE            = 22,                   // Returns true if the player has not taken the given quest and has not been rewared for it before.
+                                                            // Requirement: Player Target
+                                                            // Value1: quest_id
+    CONDITION_ITEM_WITH_BANK        = 23,                   // Checks if the player has an item in his inventory or bank.
+                                                            // Requirement: Player Target
+                                                            // Value1: item_id
+                                                            // Value2: count
+    CONDITION_WOW_PATCH             = 24,                   // Checks the current content patch. (progression system)
+                                                            // Requirement: None
+                                                            // Value1: patch (0-10)
+                                                            // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_ESCORT                = 25,                   // Checks the alive state of the source and target, and the distance between them. Used for escorts.
+                                                            // Requirement: None (optionally Creature Source, Player Target)
+                                                            // Value1: flags (see enum eEscortConditionFlags)
+                                                            // Value2: distance (optional)
+    CONDITION_ACTIVE_HOLIDAY        = 26,                   // Checks if a given holiday is active. Recommended to use CONDITION_ACTIVE_GAME_EVENT instead.
+                                                            // Requirement: None
+                                                            // Value1: holiday_id
+    CONDITION_GENDER                = 27,                   // Checks the target's gender.
+                                                            // Requirement: WorldObject Target
+                                                            // Value1: gender (0=male, 1=female, 2=none) (see enum Gender)
+    CONDITION_IS_PLAYER             = 28,                   // Checks if the target is a player or belongs to a player.
+                                                            // Requirement: WorldObject Target
+                                                            // Value1: 0=player only, 1=player owned too
+    CONDITION_SKILL_BELOW           = 29,                   // Returns true if player knows the skill id and skill is less than (and not equal to) skill_value (for skill_value > 1)
+                                                            // Requirement: Player Target
+                                                            // Value1: skill_id
+                                                            // Value2: skill_value (if 1, then true if player does not know skill_id)
+    CONDITION_REPUTATION_RANK_MAX   = 30,                   // Returns true if the player's reputation with a given faction is below or equal to the specified rank.
+                                                            // Requirement: Player Target
+                                                            // Value1: faction_id
+                                                            // Value2: max_rank
+    CONDITION_HAS_FLAG              = 31,                   // Returns true if the source has a specific flag turned on.
+                                                            // Requirement: WorldObject Source
+                                                            // Value1: field_id (see UpdateFields.h)
+                                                            // Value2: flag
+    CONDITION_LAST_WAYPOINT         = 32,                   // Checks the source creature's last reached waypoint.
+                                                            // Requirement: Creature Source
+                                                            // Value1: waypointId
+                                                            // Value2: 0 : ==, 1: >= 2 <=
+    CONDITION_MAP_ID                = 33,                   // Checks the current map id.
+                                                            // Requirement: Map
+                                                            // Value1: map_id
+    CONDITION_INSTANCE_DATA         = 34,                   // Gets data from the instance script and checks the returned value.
+                                                            // Requirement: Map
+                                                            // Value1: index
+                                                            // Value2: data
+                                                            // Value3: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_MAP_EVENT_DATA        = 35,                   // Gets data from a scripted map event and checks the returned value.
+                                                            // Requirement: Map
+                                                            // Value1: event_id
+                                                            // Value2: index
+                                                            // Value3: data
+                                                            // Value4: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_MAP_EVENT_ACTIVE      = 36,                   // Returns true if a scripted map event with this id is currently active.
+                                                            // Requirement: Map
+                                                            // Value1: event_id
+    CONDITION_LINE_OF_SIGHT         = 37,                   // Returns true if the source and target are in line of sight of one another.
+                                                            // Requirement: WorldObject Source, WorldObject Target
+    CONDITION_DISTANCE              = 38,                   // Checks the distance between the provided source and target.
+                                                            // Requirement: WorldObject Source, WorldObject Target
+                                                            // Value1: distance
+                                                            // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_IS_MOVING             = 39,                   // Returns true if the target is currently moving.
+                                                            // Requirement: WorldObject Target
+    CONDITION_HAS_PET               = 40,                   // Returns true if the target has a pet.
+                                                            // Requirement: Unit Target
+    CONDITION_HEALTH_PERCENT        = 41,                   // Checks the target's current health percent.
+                                                            // Requirement: Unit Target
+                                                            // Value1: hp_percent
+                                                            // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_MANA_PERCENT          = 42,                   // Checks the target's current mana percent.
+                                                            // Requirement: Unit Target
+                                                            // Value1: mana_percent
+                                                            // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_IS_IN_COMBAT          = 43,                   // Checks if the target is currently in combat.
+                                                            // Requirement: Unit Target
+    CONDITION_IS_HOSTILE_TO         = 44,                   // Returns true if the target is hostile to the source.
+                                                            // Requirement: WorldObject Source, WorldObject Target
+    CONDITION_IS_IN_GROUP           = 45,                   // Returns true if the player is in a group.
+                                                            // Requirement: Player Target
+    CONDITION_IS_ALIVE              = 46,                   // Returns true if the target is alive.
+                                                            // Requirement: Unit Target
+    CONDITION_MAP_EVENT_TARGETS     = 47,                   // Returns true if all extra targets that are part of a scripted map event satisfy the provided condition id.
+                                                            // Requirement: Map
+                                                            // Value1: event_id
+                                                            // Value2: condition_id
+    CONDITION_OBJECT_IS_SPAWNED     = 48,                   // Returns true if the gameobject is currently spawned.
+                                                            // Requirement: GameObject Target
+    CONDITION_OBJECT_LOOT_STATE     = 49,                   // Checks the current loot state of a GameObject.
+                                                            // Requirement: GameObject Target
+                                                            // Value1: loot_state (see enum LootState)
+    CONDITION_OBJECT_FIT_CONDITION  = 50,                   // Returns true if a gameobject with this guid exists and it satisfies the provided condition id.
+                                                            // Requirement: Map
+                                                            // Value1: guid
+                                                            // Value2: condition_id
+    CONDITION_PVP_RANK              = 51,                   // Checks the player's honor rank.
+                                                            // Requirement: Player Target
+                                                            // Value1: rank
+                                                            // Value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_DB_GUID               = 52,                   // Checks source object's db guid.
+                                                            // Requirement: WorldObject Source
+                                                            // Value1: guid
 };
 
 enum ConditionFlags
@@ -104,6 +241,7 @@ enum ConditionSource                                        // From where was th
     CONDITION_FROM_SPELL_AREA       = 7,                    // Used to check a condition from spell_area table
     CONDITION_FROM_MAP_EVENT        = 8,                    // Used to check conditions from scripted map events
     CONDITION_FROM_DBSCRIPTS        = 9,                    // Used to check a condition from DB Scripts Engine
+    CONDITION_FROM_AREATRIGGER      = 10,                   // Used to check a condition from areatrigger_teleport table
 };
 
 enum ConditionRequirement

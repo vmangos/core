@@ -64,6 +64,7 @@ class PathInfo
 
         // return value : true if new path was calculated
         bool calculate(float destX, float destY, float destZ, bool forceDest = false, bool offsets = false);
+        bool calculate(Vector3 const& start, Vector3 dest, bool forceDest = false, bool offsets = false);
 
         void setUseStrightPath(bool useStraightPath) { m_useStraightPath = useStraightPath; };
         void setPathLengthLimit(float distance);
@@ -105,31 +106,31 @@ class PathInfo
         Vector3        m_endPosition;      // {x, y, z} of the destination
         Vector3        m_actualEndPosition;  // {x, y, z} of the closest possible point to given destination
         Transport*     m_transport;
-        const Unit* const       m_sourceUnit;       // the unit that is moving
-        const dtNavMesh*        m_navMesh;          // the nav mesh
-        const dtNavMeshQuery*   m_navMeshQuery;     // the nav mesh query used to find the path
+        Unit const* const       m_sourceUnit;       // the unit that is moving
+        dtNavMesh const*        m_navMesh;          // the nav mesh
+        dtNavMeshQuery const*   m_navMeshQuery;     // the nav mesh query used to find the path
         uint32          m_targetAllowedFlags;
 
         dtQueryFilter m_filter;                     // use single filter for all movements, update it when needed
 
-        inline void setStartPosition(Vector3 point) { m_startPosition = point; }
-        inline void setEndPosition(Vector3 point) { m_actualEndPosition = point; m_endPosition = point; }
-        inline void setActualEndPosition(Vector3 point) { m_actualEndPosition = point; }
+        inline void setStartPosition(Vector3 const& point) { m_startPosition = point; }
+        inline void setEndPosition(Vector3 const& point) { m_actualEndPosition = point; m_endPosition = point; }
+        inline void setActualEndPosition(Vector3 const& point) { m_actualEndPosition = point; }
 
         inline void clear()
         {
             m_polyLength = 0;
             m_pathPoints.clear();
         }
-        bool inRange(const Vector3 &p1, const Vector3 &p2, float r, float h) const;
-        float dist3DSqr(const Vector3 &p1, const Vector3 &p2) const;
-        bool inRangeYZX(const float* v1, const float* v2, float r, float h) const;
+        static bool inRange(Vector3 const& p1, Vector3 const& p2, float r, float h);
+        static float dist3DSqr(Vector3 const& p1, Vector3 const& p2);
+        static bool inRangeYZX(float const* v1, float const* v2, float r, float h);
 
-        dtPolyRef getPolyByLocation(const float* point, float *distance, uint32 flags = 0);
-        bool HaveTiles(const Vector3& p) const;
+        dtPolyRef getPolyByLocation(float const* point, float *distance, uint32 flags = 0);
+        bool HaveTiles(Vector3 const& p) const;
 
-        void BuildPolyPath(const Vector3 &startPos, const Vector3 &endPos);
-        void BuildPointPath(const float *startPoint, const float *endPoint, float distToStartPoly, float distToEndPoly);
+        void BuildPolyPath(Vector3 const& startPos, Vector3 const& endPos);
+        void BuildPointPath(float const* startPoint, float const* endPoint, float distToStartPoly, float distToEndPoly);
         void BuildShortcut();
         void BuildUnderwaterPath();
 
@@ -137,14 +138,14 @@ class PathInfo
         void updateFilter();
 
         // smooth path functions
-        uint32 fixupCorridor(dtPolyRef* path, const uint32 npath, const uint32 maxPath,
-                             const dtPolyRef* visited, const uint32 nvisited);
-        bool getSteerTarget(const float* startPos, const float* endPos, const float minTargetDist,
-                            const dtPolyRef* path, const uint32 pathSize, float* steerPos,
-                            unsigned char& steerPosFlag, dtPolyRef& steerPosRef);
-        dtStatus findSmoothPath(const float* startPos, const float* endPos,
-                              const dtPolyRef* polyPath, uint32 polyPathSize,
-                              float* smoothPath, int* smoothPathSize, uint32 smoothPathMaxSize);
+        static uint32 fixupCorridor(dtPolyRef* path, uint32 const npath, uint32 const maxPath,
+                                    dtPolyRef const* visited, uint32 const nvisited);
+        bool getSteerTarget(float const* startPos, float const* endPos, float const minTargetDist,
+                            dtPolyRef const* path, uint32 const pathSize, float* steerPos,
+                            unsigned char& steerPosFlag, dtPolyRef& steerPosRef) const;
+        dtStatus findSmoothPath(float const* startPos, float const* endPos,
+                                dtPolyRef const* polyPath, uint32 polyPathSize,
+                                float* smoothPath, int* smoothPathSize, uint32 maxSmoothPathSize);
 };
 
 typedef PathInfo PathFinder;

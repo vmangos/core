@@ -41,14 +41,14 @@ uint32 TriggerOrphanSpell[6][3] =
     {3552, 14305, 1687}    // Spooky Lighthouse
 };
 
-bool AreaTrigger_at_childrens_week_spot(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_childrens_week_spot(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    for (uint8 i = 0; i < 6; ++i)
+    for (const auto& i : TriggerOrphanSpell)
     {
-        if (pAt->id == TriggerOrphanSpell[i][0] &&
-                pPlayer->GetMiniPet() && pPlayer->GetMiniPet()->GetEntry() == TriggerOrphanSpell[i][1])
+        if (pAt->id == i[0] &&
+                pPlayer->GetMiniPet() && pPlayer->GetMiniPet()->GetEntry() == i[1])
         {
-            pPlayer->AreaExploredOrEventHappens(TriggerOrphanSpell[i][2]);
+            pPlayer->AreaExploredOrEventHappens(i[2]);
             return true;
         }
     }
@@ -65,7 +65,7 @@ enum
     NPC_RAVENHOLDT          = 13936
 };
 
-bool AreaTrigger_at_ravenholdt(Player* pPlayer, const AreaTriggerEntry* pAt)
+bool AreaTrigger_at_ravenholdt(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
     if (pPlayer->GetQuestStatus(QUEST_MANOR_RAVENHOLDT) == QUEST_STATUS_INCOMPLETE)
         pPlayer->KilledMonsterCredit(NPC_RAVENHOLDT);
@@ -75,7 +75,7 @@ bool AreaTrigger_at_ravenholdt(Player* pPlayer, const AreaTriggerEntry* pAt)
 
 void AddSC_areatrigger_scripts()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "at_ravenholdt";

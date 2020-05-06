@@ -103,7 +103,7 @@ enum
 #define OSSIRIAN_CRYSTAL_INITIAL_DIST 80.0f
 #define OSSIRIAN_CRYSTAL_NUM_ACTIVE 2
 
-const std::array<SpawnLocations, 11> CrystalSpawn =
+std::array<SpawnLocations, 11> const CrystalSpawn =
 {{
     { -9407.164062f, 1959.240845f, 85.558998f }, // central spawn, not initially spawned since it was a nerfed mechanic added in 1.11
     { -9357.931641f, 1930.596802f, 85.556198f },
@@ -123,7 +123,7 @@ struct instance_ruins_of_ahnqiraj : public ScriptedInstance
 {
 public:
     instance_ruins_of_ahnqiraj(Map* pMap);
-    void Initialize();
+    void Initialize() override;
 
     void SetData(uint32 uiType, uint32 uiData) override;
     uint32 GetData(uint32 uiType) override;
@@ -136,8 +136,8 @@ public:
     void OnCreatureDeath(Creature* pCreature) override;
     void Update(uint32 uiDiff) override;
 
-    const char* Save() override;
-    void Load(const char* chrIn) override;
+    char const* Save() override;
+    void Load(char const* chrIn) override;
 
     void SpawnNewCrystals(ObjectGuid usedCrystal);
 

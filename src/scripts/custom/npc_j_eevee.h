@@ -5,14 +5,14 @@
 struct npc_j_eevee_dreadsteedAI : public ScriptedAI
 {
     npc_j_eevee_dreadsteedAI(Creature* pCreature);
-    void Reset();
+    void Reset() override;
     uint64 guidPlayer;
     uint32 waitTimer;
     uint8 currentPoint;
     bool waypointReached;
 
-    void MovementInform(uint32 uiType, uint32 uiPointId);
-    void UpdateAI(const uint32 uiDiff);
+    void MovementInform(uint32 uiType, uint32 uiPointId) override;
+    void UpdateAI(uint32 const uiDiff) override;
 
     void SetPlayerGuid(uint64 playerGuid);
     void ShoutFreedom();
@@ -21,7 +21,7 @@ struct npc_j_eevee_dreadsteedAI : public ScriptedAI
 struct npc_j_eevee_scholomanceAI : public ScriptedAI
 {
     npc_j_eevee_scholomanceAI(Creature* pCreature);
-    void Reset();
+    void Reset() override;
 
     uint64 guidPlayer;
     uint32 waitTimer;
@@ -30,8 +30,8 @@ struct npc_j_eevee_scholomanceAI : public ScriptedAI
     bool waypointReached;
     bool finished;
 
-    void MovementInform(uint32 uiType, uint32 uiPointId);
-    void UpdateAI(const uint32 uiDiff);
+    void MovementInform(uint32 uiType, uint32 uiPointId) override;
+    void UpdateAI(uint32 const uiDiff) override;
 };
 
 #endif

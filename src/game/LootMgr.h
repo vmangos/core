@@ -170,7 +170,7 @@ class LootStore
         void Verify() const;
 
         void LoadAndCollectLootIds(LootIdSet& ids_set);
-        void CheckLootRefs(LootIdSet* ref_set = NULL) const;// check existence reference and remove it from ref_set
+        void CheckLootRefs(LootIdSet* ref_set = nullptr) const;// check existence reference and remove it from ref_set
         void ReportUnusedIds(LootIdSet const& ids_set) const;
         void ReportNotExistedId(uint32 id) const;
 
@@ -207,7 +207,7 @@ class LootTemplate
         // True if template includes at least 1 quest drop entry
         bool HasQuestDrop(LootTemplateMap const& store, uint8 GroupId = 0) const;
         // True if template includes at least 1 quest drop for an active quest of the player
-        bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const * player, uint8 GroupId = 0) const;
+        bool HasQuestDropForPlayer(LootTemplateMap const& store, Player const* player, uint8 GroupId = 0) const;
 
         // Checks integrity of the template
         void Verify(LootStore const& store, uint32 Id) const;
@@ -223,8 +223,8 @@ class LootValidatorRef :  public Reference<Loot, LootValidatorRef>
 {
     public:
         LootValidatorRef() {}
-        void targetObjectDestroyLink() {}
-        void sourceObjectDestroyLink() {}
+        void targetObjectDestroyLink() override {}
+        void sourceObjectDestroyLink() override {}
 };
 
 //=====================================================
@@ -238,9 +238,9 @@ class LootValidatorRefManager : public RefManager<Loot, LootValidatorRef>
         LootValidatorRef* getLast() { return (LootValidatorRef*)RefManager<Loot, LootValidatorRef>::getLast(); }
 
         iterator begin() { return iterator(getFirst()); }
-        iterator end() { return iterator(NULL); }
+        iterator end() { return iterator(nullptr); }
         iterator rbegin() { return iterator(getLast()); }
-        iterator rend() { return iterator(NULL); }
+        iterator rend() { return iterator(nullptr); }
 };
 
 //=====================================================
@@ -257,7 +257,7 @@ struct Loot
     QuestItemMap const& GetPlayerFFAItems() const { return m_playerFFAItems; }
     QuestItemMap const& GetPlayerNonQuestNonFFAConditionalItems() const { return m_playerNonQuestNonFFAConditionalItems; }
 
-    bool _personal;
+    bool m_personal;
     LootItemList items;
     uint32 gold;
     uint8 unlootedCount;
@@ -265,13 +265,13 @@ struct Loot
     LootType loot_type;                                     // required for for proper item loot finish (store internal loot types in different from 3.x version, in fact this meaning that it send same loot types for interesting cases like 3.x version code, skip pre-3.x client loot type limitaitons)
 
     Loot(WorldObject const* lootTarget, uint32 _gold = 0) :
-        _personal(false),
+        m_personal(false),
         gold(_gold),
         unlootedCount(0),
-        m_lootTarget(lootTarget),
-        loot_type(LOOT_CORPSE),
         roundRobinPlayer(0),
-        _groupTeam(TEAM_CROSSFACTION)
+        loot_type(LOOT_CORPSE),
+        m_lootTarget(lootTarget),
+        m_groupTeam(TEAM_CROSSFACTION)
     {
     }
     ~Loot() { clear(); }
@@ -285,20 +285,23 @@ struct Loot
     // void clear()
     void clear(bool clearQuestItems = true)
     {
-    if (clearQuestItems)
-    {
-            for (QuestItemMap::const_iterator itr = m_playerQuestItems.begin(); itr != m_playerQuestItems.end(); ++itr)
-                delete itr->second;
-            m_playerQuestItems.clear();
+        if (clearQuestItems)
+        {
+                for (const auto& itr : m_playerQuestItems)
+                    delete itr.second;
+                m_playerQuestItems.clear();
 
-            m_questItems.clear();
-    }
-        for (QuestItemMap::const_iterator itr = m_playerFFAItems.begin(); itr != m_playerFFAItems.end(); ++itr)
-            delete itr->second;
+                m_questItems.clear();
+        }
+
+        for (const auto& itr : m_playerFFAItems)
+            delete itr.second;
+
         m_playerFFAItems.clear();
 
-        for (QuestItemMap::const_iterator itr = m_playerNonQuestNonFFAConditionalItems.begin(); itr != m_playerNonQuestNonFFAConditionalItems.end(); ++itr)
-            delete itr->second;
+        for (const auto& itr : m_playerNonQuestNonFFAConditionalItems)
+            delete itr.second;
+
         m_playerNonQuestNonFFAConditionalItems.clear();
 
         m_playersLooting.clear();
@@ -307,9 +310,9 @@ struct Loot
         unlootedCount = 0;
         m_LootValidatorRefManager.clearReferences();
         roundRobinPlayer = 0;
-        _allowedLooters.clear();
-        _personal = true;
-        _groupTeam = TEAM_CROSSFACTION;
+        m_allowedLooters.clear();
+        m_personal = true;
+        m_groupTeam = TEAM_CROSSFACTION;
     }
 
     void leaveOnlyQuestItems()
@@ -327,12 +330,12 @@ struct Loot
     void RemoveLooter(ObjectGuid guid) { m_playersLooting.erase(guid); }
 
     void generateMoneyLoot(uint32 minAmount, uint32 maxAmount);
-    bool FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError = false, WorldObject const* looted = NULL);
+    bool FillLoot(uint32 loot_id, LootStore const& store, Player* loot_owner, bool personal, bool noEmptyError = false, WorldObject const* looted = nullptr);
 
     // Inserts the item into the loot (called by LootTemplate processors)
-    void AddItem(LootStoreItem const & item);
+    void AddItem(LootStoreItem const& item);
 
-    LootItem* LootItemInSlot(uint32 lootslot, uint32 playerGuid, QuestItem** qitem = NULL, QuestItem** ffaitem = NULL, QuestItem** conditem = NULL);
+    LootItem* LootItemInSlot(uint32 lootslot, uint32 playerGuid, QuestItem** qitem = nullptr, QuestItem** ffaitem = nullptr, QuestItem** conditem = nullptr);
     uint32 GetMaxSlotInLootFor(uint32 playerGuid) const;
 
     WorldObject const* GetLootTarget() const { return m_lootTarget; }
@@ -345,8 +348,8 @@ struct Loot
 
     void FillNotNormalLootFor(Player* player);
 
-    uint32 GetTeam() const { return _groupTeam; }
-    void SetTeam(Team team) { _groupTeam = team; }
+    uint32 GetTeam() const { return m_groupTeam; }
+    void SetTeam(Team team) { m_groupTeam = team; }
 
     LootItemList m_questItems;
     QuestItemMap m_playerQuestItems;
@@ -362,19 +365,19 @@ struct Loot
 
         // All rolls are registered here. They need to know, when the loot is not valid anymore
         LootValidatorRefManager m_LootValidatorRefManager;
-        std::vector<ObjectGuid> _allowedLooters;
+        std::vector<ObjectGuid> m_allowedLooters;
 
         // What is looted
         WorldObject const* m_lootTarget;
-        Team _groupTeam;
+        Team m_groupTeam;
 };
 
 struct LootView
 {
     Loot &loot;
-    Player *viewer;
+    Player* viewer;
     PermissionTypes permission;
-    LootView(Loot &_loot, Player *_viewer,PermissionTypes _permission = ALL_PERMISSION)
+    LootView(Loot &_loot, Player* _viewer,PermissionTypes _permission = ALL_PERMISSION)
         : loot(_loot), viewer(_viewer), permission(_permission) {}
 };
 

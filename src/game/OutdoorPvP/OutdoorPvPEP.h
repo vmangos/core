@@ -21,22 +21,24 @@
 #include "DBCStructure.h"
 #include "ZoneScript.h"
 
-const uint32 EP_AllianceBuffs[4] = {11413, 11414, 11415, 1386};
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 
-const uint32 EP_HordeBuffs[4] = {30880, 30683, 30682, 29520};
+uint32 const EP_AllianceBuffs[4] = {11413, 11414, 11415, 1386};
 
-const uint32 EP_GraveYardZone = 139;
+uint32 const EP_HordeBuffs[4] = {30880, 30683, 30682, 29520};
 
-const uint32 EP_GraveYardId = 927;
+uint32 const EP_GraveYardZone = 139;
 
-const uint8 EPBuffZonesNum = 3;
+uint32 const EP_GraveYardId = 927;
 
-const uint32 EP_EWT_CM = 17690;
-const uint32 EP_CGT_CM = 17689;
-const uint32 EP_NPT_CM = 17696;
-const uint32 EP_PWT_CM = 17698;
+uint8 const EPBuffZonesNum = 3;
 
-const uint32 EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
+uint32 const EP_EWT_CM = 17690;
+uint32 const EP_CGT_CM = 17689;
+uint32 const EP_NPT_CM = 17696;
+uint32 const EP_PWT_CM = 17698;
+
+uint32 const EPBuffZones[EPBuffZonesNum] = {139, 2017, 2057};
 
 enum EP_TaxiNodes
 {
@@ -136,12 +138,12 @@ const go_type EPTowerFlags[EP_TOWER_NUM] =
     {182106,0,1838.42f,-3703.56f,167.713f,0.890118f,0.0f,0.0f,0.430511f,0.902585f}
 };
 
-const uint32 EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691,10699,10701,10705};
+uint32 const EPTowerPlayerEnterEvents[EP_TOWER_NUM] = {10691,10699,10701,10705};
 
-const uint32 EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692,10698,10700,10704};
+uint32 const EPTowerPlayerLeaveEvents[EP_TOWER_NUM] = {10692,10698,10700,10704};
 
-const uint8 EP_NUM_CREATURES = 6;
-const uint8 EP_EWT_NUM_CREATURES = 5;
+uint8 const EP_NUM_CREATURES = 6;
+uint8 const EP_EWT_NUM_CREATURES = 5;
 
 // one lordaeron commander, 4 soldiers
 // should be spawned at EWT and follow a path, but trans-grid pathing isn't safe, so summon them directly at NPT
@@ -194,11 +196,11 @@ class OPvPCapturePointEP_EWT : public OPvPCapturePoint
 
         void SendChangePhase();
 
-        uint32 FillInitialWorldStates(WorldPacket & data);
+        uint32 FillInitialWorldStates(WorldPacket& data);
 
         // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player * plr);
-        void HandlePlayerLeave(Player * plr);
+        bool HandlePlayerEnter(Player* plr);
+        void HandlePlayerLeave(Player* plr);
 
     protected:
 
@@ -225,11 +227,11 @@ class OPvPCapturePointEP_NPT : public OPvPCapturePoint
 
         void SendChangePhase();
 
-        uint32 FillInitialWorldStates(WorldPacket & data);
+        uint32 FillInitialWorldStates(WorldPacket& data);
 
         // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player * plr);
-        void HandlePlayerLeave(Player * plr);
+        bool HandlePlayerEnter(Player* plr);
+        void HandlePlayerLeave(Player* plr);
 
     protected:
 
@@ -256,11 +258,11 @@ class OPvPCapturePointEP_CGT : public OPvPCapturePoint
 
         void SendChangePhase();
 
-        uint32 FillInitialWorldStates(WorldPacket & data);
+        uint32 FillInitialWorldStates(WorldPacket& data);
 
         // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player * plr);
-        void HandlePlayerLeave(Player * plr);
+        bool HandlePlayerEnter(Player* plr);
+        void HandlePlayerLeave(Player* plr);
 
     protected:
 
@@ -287,11 +289,11 @@ class OPvPCapturePointEP_PWT : public OPvPCapturePoint
 
         void SendChangePhase();
 
-        uint32 FillInitialWorldStates(WorldPacket & data);
+        uint32 FillInitialWorldStates(WorldPacket& data);
 
         // used when player is activated/inactivated in the area
-        bool HandlePlayerEnter(Player * plr);
-        void HandlePlayerLeave(Player * plr);
+        bool HandlePlayerEnter(Player* plr);
+        void HandlePlayerLeave(Player* plr);
 
     protected:
 
@@ -319,14 +321,14 @@ class OutdoorPvPEP : public OutdoorPvP
 
         bool SetupZoneScript();
 
-        void OnPlayerEnter(Player *plr);
-        void OnPlayerLeave(Player *plr);
+        void OnPlayerEnter(Player* plr);
+        void OnPlayerLeave(Player* plr);
 
         void Update(uint32 diff);
 
-        uint32 FillInitialWorldStates(WorldPacket &data);
+        uint32 FillInitialWorldStates(WorldPacket& data);
 
-        void SendRemoveWorldStates(Player * plr);
+        void SendRemoveWorldStates(Player* plr);
 
         void BuffTeams();
 
@@ -341,3 +343,4 @@ class OutdoorPvPEP : public OutdoorPvP
 
 #endif
 
+#endif

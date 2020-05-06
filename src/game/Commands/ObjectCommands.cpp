@@ -29,11 +29,12 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include <ctime>
 
 bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 {
     Player* pl = m_session->GetPlayer();
-    QueryResult *result;
+    QueryResult* result;
     GameEventMgr::ActiveEvents const& activeEventsList = sGameEventMgr.GetActiveEventList();
     if (*args)
     {
@@ -64,15 +65,15 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
         eventFilter << " AND (event IS NULL ";
         bool initString = true;
 
-        for (GameEventMgr::ActiveEvents::const_iterator itr = activeEventsList.begin(); itr != activeEventsList.end(); ++itr)
+        for (const auto itr : activeEventsList)
         {
             if (initString)
             {
-                eventFilter  <<  "OR event IN (" << *itr;
+                eventFilter  <<  "OR event IN (" << itr;
                 initString = false;
             }
             else
-                eventFilter << "," << *itr;
+                eventFilter << "," << itr;
         }
 
         if (!initString)
@@ -83,7 +84,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
         result = WorldDatabase.PQuery("SELECT gameobject.guid, id, position_x, position_y, position_z, orientation, map, "
                                       "(POW(position_x - %f, 2) + POW(position_y - %f, 2) + POW(position_z - %f, 2)) AS order_ FROM gameobject "
                                       "LEFT OUTER JOIN game_event_gameobject on gameobject.guid=game_event_gameobject.guid WHERE map = '%i' %s ORDER BY order_ ASC LIMIT 10",
-                                      m_session->GetPlayer()->GetPositionX(), m_session->GetPlayer()->GetPositionY(), m_session->GetPlayer()->GetPositionZ(), m_session->GetPlayer()->GetMapId(), eventFilter.str().c_str());
+                                      pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), pl->GetMapId(), eventFilter.str().c_str());
     }
 
     if (!result)
@@ -99,7 +100,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 
     do
     {
-        Field *fields = result->Fetch();
+        Field* fields = result->Fetch();
         lowguid = fields[0].GetUInt32();
         id =      fields[1].GetUInt32();
         x =       fields[2].GetFloat();
@@ -135,7 +136,7 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
 
     if (target)
     {
-        time_t curRespawnDelay = target->GetRespawnTimeEx() - time(NULL);
+        time_t curRespawnDelay = target->GetRespawnTimeEx() - time(nullptr);
         if (curRespawnDelay < 0)
             curRespawnDelay = 0;
 
@@ -173,7 +174,15 @@ bool ChatHandler::HandleGameObjectInfoCommand(char* args)
     }
     
     PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
-    SendSysMessage(pGameObject->isSpawned() ? "Object is spawned." : "Not spawned.");
+    if (pGameObject->isSpawned())
+        SendSysMessage("Object is spawned.");
+    else
+    {
+        time_t respawnTime = pGameObject->GetRespawnTime();
+        std::tm* pTime = std::localtime(&respawnTime);
+        PSendSysMessage("Not spawned. Respawns in %u seconds (%u:%u:%u).", pGameObject->GetRespawnDelay(), pTime->tm_hour, pTime->tm_min, pTime->tm_sec);
+    }
+    
 
     return true;
 }
@@ -188,7 +197,7 @@ bool ChatHandler::HandleGameObjectTurnCommand(char* args)
     if (!lowguid)
         return false;
 
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
 
     // by DB guid
     if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
@@ -231,7 +240,7 @@ bool ChatHandler::HandleGameObjectMoveCommand(char* args)
     if (!lowguid)
         return false;
 
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
 
     // by DB guid
     if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
@@ -246,7 +255,7 @@ bool ChatHandler::HandleGameObjectMoveCommand(char* args)
 
     if (!args)
     {
-        Player *chr = m_session->GetPlayer();
+        Player* chr = m_session->GetPlayer();
 
         Map* map = obj->GetMap();
         map->Remove(obj, false);
@@ -308,7 +317,7 @@ bool ChatHandler::HandleGameObjectDeleteCommand(char* args)
     if (!lowguid)
         return false;
 
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
 
     // by DB guid
     if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
@@ -357,7 +366,7 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
     if (!ExtractOptInt32(&args, spawntimeSecs, 0))
         return false;
 
-    const GameObjectInfo *gInfo = ObjectMgr::GetGameObjectInfo(id);
+    GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(id);
 
     if (!gInfo)
     {
@@ -375,12 +384,12 @@ bool ChatHandler::HandleGameObjectAddCommand(char* args)
         return false;
     }
 
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
     float x = float(chr->GetPositionX());
     float y = float(chr->GetPositionY());
     float z = float(chr->GetPositionZ());
     float o = float(chr->GetOrientation());
-    Map *map = chr->GetMap();
+    Map* map = chr->GetMap();
 
     GameObject* pGameObj = new GameObject;
 
@@ -431,9 +440,9 @@ bool ChatHandler::HandleGameObjectTempAddCommand(char *args)
     if (!id)
         return false;
 
-    Player *chr = m_session->GetPlayer();
+    Player* chr = m_session->GetPlayer();
 
-    char* spawntime = strtok(NULL, " ");
+    char* spawntime = strtok(nullptr, " ");
     uint32 spawntm = 300;
 
     if (spawntime)
@@ -447,9 +456,7 @@ bool ChatHandler::HandleGameObjectTempAddCommand(char *args)
     float rot2 = sin(ang / 2);
     float rot3 = cos(ang / 2);
 
-    if (!chr->SummonGameObject(id, x, y, z, ang, 0, 0, rot2, rot3, spawntm))
-        return false;
-    return true;
+    return chr->SummonGameObject(id, x, y, z, ang, 0, 0, rot2, rot3, spawntm) != nullptr;
 }
 
 bool ChatHandler::HandleGameObjectNearCommand(char* args)
@@ -461,7 +468,7 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
     uint32 count = 0;
 
     Player* pl = m_session->GetPlayer();
-    QueryResult *result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
+    QueryResult* result = WorldDatabase.PQuery("SELECT guid, id, position_x, position_y, position_z, map, "
                           "(POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) AS order_ "
                           "FROM gameobject WHERE map='%u' AND (POW(position_x - '%f', 2) + POW(position_y - '%f', 2) + POW(position_z - '%f', 2)) <= '%f' ORDER BY order_",
                           pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(),
@@ -471,7 +478,7 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
     {
         do
         {
-            Field *fields = result->Fetch();
+            Field* fields = result->Fetch();
             uint32 guid = fields[0].GetUInt32();
             uint32 entry = fields[1].GetUInt32();
             float x = fields[2].GetFloat();
@@ -479,7 +486,7 @@ bool ChatHandler::HandleGameObjectNearCommand(char* args)
             float z = fields[4].GetFloat();
             int mapid = fields[5].GetUInt16();
 
-            GameObjectInfo const * gInfo = ObjectMgr::GetGameObjectInfo(entry);
+            GameObjectInfo const* gInfo = ObjectMgr::GetGameObjectInfo(entry);
 
             if (!gInfo)
                 continue;
@@ -520,10 +527,10 @@ class NearestGameObjectInObjectRangeCheck
 
 bool ChatHandler::HandleGameObjectSelectCommand(char*)
 {
-    const float dist = 10.0f;
+    float const dist = 10.0f;
     Player* player = m_session->GetPlayer();
 
-    GameObject* go = NULL;
+    GameObject* go = nullptr;
     CellPair pair(MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY()));
     Cell cell(pair);
     cell.SetNoCreate();
@@ -577,7 +584,7 @@ bool ChatHandler::HandleGameObjectRespawnCommand(char*)
 bool ChatHandler::HandleGameObjectToggleCommand(char* args)
 {
     uint32 lowguid;
-    GameObject* obj = NULL;
+    GameObject* obj = nullptr;
 
     if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
     {

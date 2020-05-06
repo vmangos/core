@@ -41,9 +41,9 @@ void SqlDelayThread::run()
     mysql_thread_init();
     #endif
 
-    const uint32 loopSleepms = 10;
+    uint32 const loopSleepms = 10;
 
-    const uint32 pingEveryLoop = m_dbEngine->GetPingIntervall() / loopSleepms;
+    uint32 const pingEveryLoop = m_dbEngine->GetPingIntervall() / loopSleepms;
 
     uint32 loopCounter = 0;
     while (m_running)
@@ -75,7 +75,7 @@ void SqlDelayThread::Stop()
 
 void SqlDelayThread::ProcessRequests()
 {
-    SqlOperation* s = NULL;
+    SqlOperation* s = nullptr;
     while (m_dbEngine->NextDelayedOperation(s))
     {
         s->Execute(m_dbConnection);

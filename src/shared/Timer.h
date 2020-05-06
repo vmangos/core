@@ -32,12 +32,12 @@ public:
     static uint32 getMSTime();
 
     //get time difference between two timestamps
-    static uint32 getMSTimeDiff(const uint32& oldMSTime, const uint32& newMSTime)
+    static uint32 getMSTimeDiff(uint32 const& oldMSTime, uint32 const& newMSTime)
     {
         if (oldMSTime > newMSTime)
         {
-            const uint32 diff_1 = (uint32(0xFFFFFFFF) - oldMSTime) + newMSTime;
-            const uint32 diff_2 = oldMSTime - newMSTime;
+            uint32 const diff_1 = (uint32(0xFFFFFFFF) - oldMSTime) + newMSTime;
+            uint32 const diff_2 = oldMSTime - newMSTime;
 
             return std::min(diff_1, diff_2);
         }
@@ -47,21 +47,21 @@ public:
     static uint32 getMSTimeDiffToNow(uint32 t) { return getMSTimeDiff(t, getMSTime()); }
 
     //get last world tick time
-    static MANGOS_DLL_SPEC uint32 tickTime();
+    static uint32 tickTime();
     //get previous world tick time
-    static MANGOS_DLL_SPEC uint32 tickPrevTime();
+    static uint32 tickPrevTime();
     //tick world timer
-    static MANGOS_DLL_SPEC uint32 tick();
+    static uint32 tick();
 
 private:
     WorldTimer();
-    WorldTimer(const WorldTimer& );
+    WorldTimer(WorldTimer const&);
 
     //analogue to getMSTime() but it persists m_SystemTickTime
     static uint32 getMSTime_internal(bool savetime = false);
 
-    static MANGOS_DLL_SPEC uint32 m_iTime;
-    static MANGOS_DLL_SPEC uint32 m_iPrevTime;
+    static uint32 m_iTime;
+    static uint32 m_iPrevTime;
 };
 
 class IntervalTimer

@@ -47,8 +47,8 @@ namespace VMAP
             {
                 iRotation = G3D::Matrix3::fromEulerAnglesZYX(G3D::pi() * iDir.y / 180.f, G3D::pi() * iDir.x / 180.f, G3D::pi() * iDir.z / 180.f);
             }
-            G3D::Vector3 transform(const G3D::Vector3& pIn) const;
-            void moveToBasePos(const G3D::Vector3& pBasePos) { iPos -= pBasePos; }
+            G3D::Vector3 transform(G3D::Vector3 const& pIn) const;
+            void moveToBasePos(G3D::Vector3 const& pBasePos) { iPos -= pBasePos; }
     };
 
     typedef std::map<uint32, ModelSpawn> UniqueEntryMap;
@@ -74,10 +74,10 @@ namespace VMAP
         std::vector<G3D::Vector3> vertexArray;
         class WmoLiquid* liquid;
 
-        GroupModel_Raw() : liquid(0) {}
+        GroupModel_Raw() : mogpflags(0), GroupWMOID(0), liquidflags(0), liquid(nullptr) {}
         ~GroupModel_Raw();
 
-        bool Read(FILE* f);
+        bool Read(FILE* rf);
     };
 
     struct WorldModel_Raw
@@ -85,7 +85,7 @@ namespace VMAP
         uint32 RootWMOID;
         std::vector<GroupModel_Raw> groupsArray;
 
-        bool Read(const char* path);
+        bool Read(char const* path);
     };
 
     class TileAssembler
@@ -100,7 +100,7 @@ namespace VMAP
             std::set<std::string> spawnedModelFiles;
 
         public:
-            TileAssembler(const std::string& pSrcDirName, const std::string& pDestDirName);
+            TileAssembler(std::string const& pSrcDirName, std::string const& pDestDirName);
             virtual ~TileAssembler();
 
             bool convertWorld2();
@@ -108,10 +108,8 @@ namespace VMAP
             bool calculateTransformedBound(ModelSpawn& spawn);
 
             void exportGameobjectModels();
-            bool convertRawFile(const std::string& pModelFilename);
+            bool convertRawFile(std::string const& pModelFilename);
             void setModelNameFilterMethod(bool (*pFilterMethod)(char* pName)) { iFilterMethod = pFilterMethod; }
-            std::string getDirEntryNameFromModName(unsigned int pMapId, const std::string& pModPosName);
-            unsigned int getUniqueNameId(const std::string pName);
     };
 }                                                           // VMAP
 #endif                                                      /*_TILEASSEMBLER_H_*/

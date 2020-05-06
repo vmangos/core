@@ -31,13 +31,13 @@ EndContentData */
 # npc_mist
 ####*/
 
-enum
+enum MistData
 {
-    SAY_AT_HOME             = -1000323,
-    EMOTE_AT_HOME           = -1000324,
-    QUEST_MIST              = 938,
-    NPC_ARYNIA              = 3519,
-    FACTION_DARNASSUS       = 79
+    SAY_AT_HOME       = 1330,
+    EMOTE_AT_HOME     = 1340,
+    QUEST_MIST        = 938,
+    NPC_ARYNIA        = 3519,
+    FACTION_DARNASSUS = 79
 };
 
 struct npc_mistAI : public FollowerAI
@@ -47,13 +47,13 @@ struct npc_mistAI : public FollowerAI
         Reset();
     }
 
-    void Reset() { }
+    void Reset() override { }
 
-    void MoveInLineOfSight(Unit *pWho)
+    void MoveInLineOfSight(Unit *pWho) override
     {
         FollowerAI::MoveInLineOfSight(pWho);
 
-        if (!m_creature->getVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_ARYNIA)
+        if (!m_creature->GetVictim() && !HasFollowState(STATE_FOLLOW_COMPLETE) && pWho->GetEntry() == NPC_ARYNIA)
         {
             if (m_creature->IsWithinDistInMap(pWho, 10.0f))
             {
@@ -78,9 +78,9 @@ struct npc_mistAI : public FollowerAI
     }
 
     //call not needed here, no known abilities
-    /*void UpdateFollowerAI(const uint32 uiDiff)
+    /*void UpdateFollowerAI(uint32 const uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
@@ -99,11 +99,9 @@ struct npc_sethirAI : public ScriptedAI
         Reset();
     }
 
-    void Reset()
-    {
-    }
+    void Reset() override { }
 
-    void Aggro(Unit* pUnit)
+    void Aggro(Unit* pUnit) override
     {
         m_creature->MonsterSay("Filfh! Filfh everywhere! The forests must be cleansed!");
         for (uint32 counter = 0; counter < 6; counter++)
@@ -114,23 +112,21 @@ struct npc_sethirAI : public ScriptedAI
         }
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(uint32 const diff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         DoMeleeAttackIfReady();
     }
 };
 
-
 CreatureAI* GetAI_npc_sethir(Creature* pCreature)
 {
     return new npc_sethirAI(pCreature);
 }
 
-
-bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     if (pQuest->GetQuestId() == QUEST_MIST)
     {
@@ -144,14 +140,13 @@ bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, const Quest* pQu
     return true;
 }
 
-
-enum eSpells
+enum FandralStaghelmData
 {
-    SPELL_WRATH         = 20698,
-    SPELL_AE_ROOT       = 20699,
-    SPELL_REJUVENATION  = 20701,
-    SPELL_SUMM_TREANT   = 20702,
-    SPELL_HURRICANE     = 27530,
+    SPELL_WRATH        = 20698,
+    SPELL_AE_ROOT      = 20699,
+    SPELL_REJUVENATION = 20701,
+    SPELL_SUMM_TREANT  = 20702,
+    SPELL_HURRICANE    = 27530
 };
 
 struct boss_fandral_staghelmAI : public ScriptedAI
@@ -171,14 +166,14 @@ public:
         m_uiHurricaneTimer = 27000;
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(uint32 const uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
             return;
 
         if (m_uiWrathTimer <= uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WRATH) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_WRATH) == CAST_OK)
                 m_uiWrathTimer = urand(1, 5) * 1000;
         }
         else
@@ -232,15 +227,17 @@ CreatureAI* GetAI_boss_fandral_staghelm(Creature* pCreature)
 {
     return new boss_fandral_staghelmAI(pCreature);
 }
+
 //Alita
-enum
+enum TreshalaFallowbrookData
 {
-    QUEST_MORTALITY_WANES =  1142
+    QUEST_MORTALITY_WANES = 1142
 };
+
 bool QuestComplete_npc_treshala_fallowbrook(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
 {
     if (!pQuestGiver)
-            return false;
+        return false;
     if (pQuest->GetQuestId() == QUEST_MORTALITY_WANES)
     {
         pQuestGiver->HandleEmoteCommand(EMOTE_ONESHOT_CRY);
@@ -250,7 +247,7 @@ bool QuestComplete_npc_treshala_fallowbrook(Player* pPlayer, Creature* pQuestGiv
 
 void AddSC_teldrassil()
 {
-    Script *newscript;
+    Script* newscript;
 
     newscript = new Script;
     newscript->Name = "npc_mist";

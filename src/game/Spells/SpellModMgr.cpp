@@ -45,13 +45,13 @@ SpellModMgr::~SpellModMgr()
 SQL : cf sql/nostalrius/spell_mod.sql et sql/nostalrius/spell_effect_mod.sql
 */
 
-inline void ModUInt32ValueIfExplicit(Field &f, uint32 &value)
+inline void ModUInt32ValueIfExplicit(Field &f, uint32& value)
 {
     if (f.GetInt32() >= 0)
         value = f.GetUInt32();
 }
 
-inline void ModInt32ValueIfExplicit(Field &f, int32 &value)
+inline void ModInt32ValueIfExplicit(Field &f, int32& value)
 {
     if (f.GetInt32() != -1)
         value = f.GetInt32();

@@ -29,55 +29,55 @@ class BIHWrap
         template<class RayCallback>
         struct MDLCallback
         {
-            const T* const* objects;
+            T const* const* objects;
             RayCallback& cb;
             uint32 objects_size;
 
-            MDLCallback(RayCallback& callback, const T* const* objects_array, uint32 s) : cb(callback), objects(objects_array), objects_size(s) {}
+            MDLCallback(RayCallback& callback, T const* const* objects_array, uint32 s) : objects(objects_array), cb(callback), objects_size(s) {}
 
-            bool operator()(const Ray& r, uint32 Idx, float& MaxDist, bool /*stopAtFirst*/)
+            bool operator()(Ray const& r, uint32 Idx, float& MaxDist, bool /*stopAtFirst*/)
             {
                 if (Idx >= objects_size)
                     return false;
-                if (const T* obj = objects[Idx])
+                if (T const* obj = objects[Idx])
                     return cb(r, *obj, MaxDist/*, stopAtFirst*/);
                 return false;
             }
 
-            void operator()(const Vector3& p, uint32 Idx)
+            void operator()(Vector3 const& p, uint32 Idx)
             {
                 if (Idx >= objects_size)
                     return;
-                if (const T* obj = objects[Idx])
+                if (T const* obj = objects[Idx])
                     cb(p, *obj);
             }
         };
 
-        typedef G3D::Array<const T*> ObjArray;
+        typedef G3D::Array<T const*> ObjArray;
 
         BIH m_tree;
         ObjArray m_objects;
-        G3D::Table<const T*, uint32> m_obj2Idx;
-        G3D::Set<const T*> m_objects_to_push;
+        G3D::Table<T const*, uint32> m_obj2Idx;
+        G3D::Set<T const*> m_objects_to_push;
         int unbalanced_times;
 
     public:
 
         BIHWrap() : unbalanced_times(0) {}
 
-        void insert(const T& obj)
+        void insert(T const& obj)
         {
             ++unbalanced_times;
             m_objects_to_push.insert(&obj);
         }
 
-        void remove(const T& obj)
+        void remove(T const& obj)
         {
             ++unbalanced_times;
             uint32 Idx = 0;
-            const T* temp;
+            T const* temp;
             if (m_obj2Idx.getRemove(&obj, temp, Idx))
-                m_objects[Idx] = NULL;
+                m_objects[Idx] = nullptr;
             else
                 m_objects_to_push.remove(&obj);
         }
@@ -96,7 +96,7 @@ class BIHWrap
         }
 
         template<typename RayCallback>
-        void intersectRay(const Ray& r, RayCallback& intersectCallback, float& maxDist)
+        void intersectRay(Ray const& r, RayCallback& intersectCallback, float& maxDist)
         {
             balance();
             MDLCallback<RayCallback> temp_cb(intersectCallback, m_objects.getCArray(), m_objects.size());
@@ -104,7 +104,7 @@ class BIHWrap
         }
 
         template<typename IsectCallback>
-        void intersectPoint(const Vector3& p, IsectCallback& intersectCallback)
+        void intersectPoint(Vector3 const& p, IsectCallback& intersectCallback)
         {
             balance();
             MDLCallback<IsectCallback> temp_cb(intersectCallback, m_objects.getCArray(), m_objects.size());
