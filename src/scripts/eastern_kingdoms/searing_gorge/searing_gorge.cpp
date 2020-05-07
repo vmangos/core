@@ -22,44 +22,10 @@ SDCategory: Searing Gorge
 EndScriptData */
 
 /* ContentData
-npc_lothos_riftwaker
 npc_zamael_lunthistle
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_lothos_riftwaker
-######*/
-
-bool GossipHello_npc_lothos_riftwaker(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestRewardStatus(7487) || pPlayer->GetQuestRewardStatus(7848))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Teleport me to the Molten Core", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_lothos_riftwaker(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        if (pPlayer->TeleportTo(409, 1091.89f, -466.985f, -105.084f, 3.64f))
-            if (!pPlayer->IsAlive())
-            {
-                pPlayer->ResurrectPlayer(0.5f, false);
-                pPlayer->SpawnCorpseBones();
-            }
-    }
-
-    return true;
-}
 
 /*######
 ## npc_dorius_stonetender
@@ -376,12 +342,6 @@ CreatureAI* GetAI_npc_dorius(Creature* pCreature)
 void AddSC_searing_gorge()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_lothos_riftwaker";
-    newscript->pGossipHello =  &GossipHello_npc_lothos_riftwaker;
-    newscript->pGossipSelect = &GossipSelect_npc_lothos_riftwaker;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_dorius_stonetender";

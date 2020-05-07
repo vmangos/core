@@ -760,52 +760,6 @@ bool GossipSelect_npc_kharan_mighthammer(Player* pPlayer, Creature* pCreature, u
     return true;
 }
 
-/*######
-## npc_lokhtos_darkbargainer
-######*/
-
-#define ITEM_THRORIUM_BROTHERHOOD_CONTRACT               18628
-#define ITEM_SULFURON_INGOT                              17203
-#define QUEST_A_BINDING_CONTRACT                         7604
-#define SPELL_CREATE_THORIUM_BROTHERHOOD_CONTRACT_DND    23059
-
-#define GOSSIP_ITEM_SHOW_ACCESS     "Show me what I have access to, Lothos."
-#define GOSSIP_ITEM_GET_CONTRACT    "Get Thorium Brotherhood Contract"
-
-bool GossipHello_npc_lokhtos_darkbargainer(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pCreature->IsVendor() && pPlayer->GetReputationRank(59) >= REP_FRIENDLY)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_ITEM_SHOW_ACCESS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-    if (pPlayer->GetQuestRewardStatus(QUEST_A_BINDING_CONTRACT) != 1 &&
-            !pPlayer->HasItemCount(ITEM_THRORIUM_BROTHERHOOD_CONTRACT, 1, true) &&
-            pPlayer->HasItemCount(ITEM_SULFURON_INGOT, 1))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_GET_CONTRACT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    if (pPlayer->GetReputationRank(59) < REP_FRIENDLY)
-        pPlayer->SEND_GOSSIP_MENU(3673, pCreature->GetGUID());
-    else
-        pPlayer->SEND_GOSSIP_MENU(3677, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_lokhtos_darkbargainer(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pPlayer->CastSpell(pPlayer, SPELL_CREATE_THORIUM_BROTHERHOOD_CONTRACT_DND, false);
-    }
-
-    if (uiAction == GOSSIP_ACTION_TRADE)
-        pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-
-    return true;
-}
 
 /*######
 ## npc_mistress_nagmara
@@ -2571,12 +2525,6 @@ void AddSC_blackrock_depths()
     newscript->Name = "npc_kharan_mighthammer";
     newscript->pGossipHello =  &GossipHello_npc_kharan_mighthammer;
     newscript->pGossipSelect = &GossipSelect_npc_kharan_mighthammer;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_lokhtos_darkbargainer";
-    newscript->pGossipHello =  &GossipHello_npc_lokhtos_darkbargainer;
-    newscript->pGossipSelect = &GossipSelect_npc_lokhtos_darkbargainer;
     newscript->RegisterSelf();
 
     newscript = new Script;

@@ -1940,6 +1940,19 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
     {
+        // Revive player who died inside instance.
+        if ((GetDeathState() == DEAD) && (mapid > 1) && (GetMapId() != mapid))
+        {
+            if (Corpse* corpse = GetCorpse())
+            {
+                if (mapid == corpse->GetMapId())
+                {
+                    ResurrectPlayer(0.5f);
+                    SpawnCorpseBones();
+                }
+            }
+        }
+
         // check if we can enter before stopping combat / removing pet / totems / interrupting spells
         // Check enter rights before map getting to avoid creating instance copy for player
         // this check not dependent from map instance copy and same for all instance copies of selected map
