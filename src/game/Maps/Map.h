@@ -324,7 +324,7 @@ struct ScriptedEvent
     ScriptedEvent(ScriptedEvent const&) = delete;
 };
 
-class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
+class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
 {
     friend class MapReference;
     friend class ObjectGridLoader;
@@ -907,6 +907,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool ScriptCommand_SetGoState(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_DespawnGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_LoadGameObject(ScriptInfo const& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_QuestCredit(ScriptInfo const& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         ScriptCommandFunction const m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -994,6 +995,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             &Map::ScriptCommand_SetGoState,             // 80
             &Map::ScriptCommand_DespawnGameObject,      // 81
             &Map::ScriptCommand_LoadGameObject,         // 82
+            &Map::ScriptCommand_QuestCredit,            // 83
         };
 
     public:
@@ -1001,7 +1003,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         uint32 GetLastPlayerLeftTime() const { return _lastPlayerLeftTime; }
 };
 
-class MANGOS_DLL_SPEC WorldMap : public Map
+class WorldMap : public Map
 {
     using Map::GetPersistentState;                      // hide in subclass for overwrite
 
@@ -1013,7 +1015,7 @@ class MANGOS_DLL_SPEC WorldMap : public Map
         WorldPersistentState* GetPersistanceState() const;
 };
 
-class MANGOS_DLL_SPEC DungeonMap : public Map
+class DungeonMap : public Map
 {
     using Map::GetPersistentState;                      // hide in subclass for overwrite
 
@@ -1042,7 +1044,7 @@ class MANGOS_DLL_SPEC DungeonMap : public Map
         bool m_unloadWhenEmpty;
 };
 
-class MANGOS_DLL_SPEC BattleGroundMap : public Map
+class BattleGroundMap : public Map
 {
     using Map::GetPersistentState;                      // hide in subclass for overwrite
 

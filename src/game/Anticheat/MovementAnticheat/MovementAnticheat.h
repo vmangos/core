@@ -15,7 +15,6 @@ enum CheatType
     CHEAT_TYPE_TIME_DESYNC,
     CHEAT_TYPE_NUM_DESYNC,
     CHEAT_TYPE_OVERSPEED_DIST,
-    CHEAT_TYPE_OVERSPEED_Z,
     CHEAT_TYPE_OVERSPEED_JUMP,
     CHEAT_TYPE_JUMP_SPEED_CHANGE,
     CHEAT_TYPE_MULTI_JUMP,
@@ -47,35 +46,38 @@ class ChatHandler;
 class WorldSession;
 class WorldPacket;
 
-class MovementCheatData: public MovementAnticheatInterface
+class MovementAnticheat
 {
     public:
-        explicit MovementCheatData(Player* _me) : me(_me), m_session(_me->GetSession()) {}
+        explicit MovementAnticheat(Player* _me) : me(_me), m_session(_me->GetSession()) {}
 
-        void Init() override;
-        void InitNewPlayer(Player* pPlayer) override;
-        void InitSpeeds(Unit* unit) override;
-        void ResetJumpCounters() override;
+        void Init();
+        void InitNewPlayer(Player* pPlayer);
+        void InitSpeeds(Unit* unit);
+        void ResetJumpCounters();
 
-        void AddCheats(uint32 cheats, uint32 count = 1) override;
+        void AddCheats(uint32 cheats, uint32 count = 1);
         void StoreCheat(uint32 type, uint32 count = 1);
         uint32 ComputeCheatAction(std::stringstream& reason);
 
-        void HandleCommand(ChatHandler* handler) const override;
-        uint32 Update(uint32 diff, std::stringstream& reason) override;
-        uint32 Finalize(std::stringstream& reason) override;
+        void HandleCommand(ChatHandler* handler) const;
+        uint32 Update(uint32 diff, std::stringstream& reason);
+        uint32 Finalize(std::stringstream& reason);
 
         // Public methods called from the movement handler upon received a packet.
-        bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) override;
-        bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode) override;
-        bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode) override;
+        bool HandlePositionTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
+        bool HandleSpeedChangeAck(Player* pPlayer, MovementInfo& movementInfo, float speedReceived, UnitMoveType moveType, uint16 opcode);
+        bool HandleFlagTests(Player* pPlayer, MovementInfo& movementInfo, uint16 opcode);
 
-        void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin) override;
-        void OnUnreachable(Unit* attacker) override;
-        void OnExplore(AreaEntry const* pArea) override;
-        void OnTransport(Player* plMover, ObjectGuid transportGuid) override;
-        void OnWrongAckData() override;
-        void OnFailedToAckChange() override;
+        bool IsInKnockBack() const { return m_knockBack; }
+        bool ExtrapolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const;
+
+        void OnKnockBack(Player* pPlayer, float speedxy, float speedz, float cos, float sin);
+        void OnUnreachable(Unit* attacker);
+        void OnExplore(AreaEntry const* pArea);
+        void OnTransport(Player* plMover, ObjectGuid transportGuid);
+        void OnWrongAckData();
+        void OnFailedToAckChange();
 
 private:
         bool CheckTeleport(MovementInfo const& movementInfo) const;
@@ -86,15 +88,13 @@ private:
         bool CheckNoFallTime(MovementInfo const& movementInfo, uint16 opcode);
         bool CheckTeleportToTransport(MovementInfo const& movementInfo) const;
         uint32 CheckSpeedHack(MovementInfo const& movementInfo, uint16 opcode);
-        bool InterpolateMovement(MovementInfo const& mi, uint32 diffMs, float &x, float &y, float &z, float &o) const override;
-        bool GetMaxAllowedDist(MovementInfo const& mi, uint32 diffMs, float &dxy, float &dz) const;
         uint32 CheckTimeDesync(MovementInfo const& movementInfo);
 
         MovementInfo& GetLastMovementInfo() { return me->m_movementInfo; }
         MovementInfo const& GetLastMovementInfo() const { return me->m_movementInfo; }
         float GetClientSpeed(UnitMoveType m) const { return m_clientSpeeds[m]; }
         float GetSpeedForMovementInfo(MovementInfo const& movementInfo) const;
-        bool IsInKnockBack() const override { return m_knockBack; }
+        
         bool m_knockBack = false;
 
         // Multi jump

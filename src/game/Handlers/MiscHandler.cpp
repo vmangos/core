@@ -101,12 +101,13 @@ public:
         sess->SetReceivedWhoRequest(false);
         if (!sess->GetPlayer() || !sess->GetPlayer()->IsInWorld())
             return;
-        uint32 clientcount = 0;
-        Team team = sess->GetPlayer()->GetTeam();
-        AccountTypes security = sess->GetSecurity();
-        bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
-        AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
 
+        uint32 clientcount = 0;
+        Team const team = sess->GetPlayer()->GetTeam();
+        AccountTypes const security = sess->GetSecurity();
+        bool const allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
+        bool const showBotsInWhoList = sWorld.getConfig(CONFIG_BOOL_PLAYER_BOT_SHOW_IN_WHO_LIST);
+        AccountTypes const gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
         uint32 const zone = sess->GetPlayer()->GetCachedZoneId();
         bool const notInBattleground = !((zone == 2597) || (zone == 3277) || (zone == 3358));
 
@@ -130,6 +131,10 @@ public:
                 if (pPlayer->GetSession()->GetSecurity() > gmLevelInWhoList)
                     continue;
             }
+
+            // skip bots
+            if (!showBotsInWhoList && pPlayer->GetSession()->GetBot())
+                continue;
 
             // do not process players which are not in world
             if (!pPlayer->IsInWorld())
@@ -1009,8 +1014,14 @@ void WorldSession::HandleInspectOpcode(WorldPacket& recv_data)
 
     _player->SetSelectionGuid(guid);
 
-    Player* plr = sObjectMgr.GetPlayer(guid);
-    if (!plr)                                               // wrong player
+    Player* pTarget = sObjectMgr.GetPlayer(guid);
+    if (!pTarget)
+        return;
+
+    if (_player->GetDistance3dToCenter(pTarget) > INSPECT_DISTANCE)
+        return;
+
+    if (_player->IsValidAttackTarget(pTarget))
         return;
 
     WorldPacket data(SMSG_INSPECT, 8);
@@ -1022,60 +1033,68 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data)
 {
     ObjectGuid guid;
     recv_data >> guid;
-    // DEBUG_LOG("Party Stats guid is " I64FMTD,guid);
 
-    Player* pPlayer = sObjectMgr.GetPlayer(guid);
-    if (pPlayer)
-    {
-        WorldPacket data(MSG_INSPECT_HONOR_STATS, (8 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
-        data << guid;                                       // player guid
-        data << (uint8)pPlayer->GetHonorMgr().GetHighestRank().rank;           // Highest Rank
+    Player* pTarget = sObjectMgr.GetPlayer(guid);
+    if (!pTarget)
+        return;
 
-                                                                          // Today Honorable and Dishonorable Kills
-        data << pPlayer->GetUInt32Value(PLAYER_FIELD_SESSION_KILLS);
+    if (_player->GetDistance3dToCenter(pTarget) > INSPECT_DISTANCE)
+        return;
 
-        // Yesterday Honorable Kills
-        data << pPlayer->GetUInt16Value(PLAYER_FIELD_YESTERDAY_KILLS, 0);
+    if (_player->IsValidAttackTarget(pTarget))
+        return;
 
-        // Unknown (deprecated, yesterday dishonourable?)
-        data << (uint16)0;
+    WorldPacket data(MSG_INSPECT_HONOR_STATS, (8 + 1 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 4 + 1));
 
-        // Last Week Honorable Kills
-        data << pPlayer->GetUInt16Value(PLAYER_FIELD_LAST_WEEK_KILLS, 0);
+    // player guid
+    data << guid;
 
-        // Unknown (deprecated, last week dishonourable?)
-        data << (uint16)0;
+    // Highest Rank
+    data << (uint8)pTarget->GetHonorMgr().GetHighestRank().rank;
 
-        // This Week Honorable kills
-        data << pPlayer->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
+    // Today Honorable and Dishonorable Kills
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_SESSION_KILLS);
 
-        // Unknown (deprecated, this week dishonourable?)
-        data << (uint16)0;
+    // Yesterday Honorable Kills
+    data << pTarget->GetUInt16Value(PLAYER_FIELD_YESTERDAY_KILLS, 0);
 
-        // Lifetime Honorable Kills
-        data << pPlayer->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
+    // Unknown (deprecated, yesterday dishonourable?)
+    data << (uint16)0;
 
-        // Lifetime Dishonorable Kills
-        data << pPlayer->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
+    // Last Week Honorable Kills
+    data << pTarget->GetUInt16Value(PLAYER_FIELD_LAST_WEEK_KILLS, 0);
 
-        // Yesterday Honor
-        data << pPlayer->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
+    // Unknown (deprecated, last week dishonourable?)
+    data << (uint16)0;
 
-        // Last Week Honor
-        data << pPlayer->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
+    // This Week Honorable kills
+    data << pTarget->GetUInt16Value(PLAYER_FIELD_THIS_WEEK_KILLS, 0);
 
-        // This Week Honor
-        data << pPlayer->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
+    // Unknown (deprecated, this week dishonourable?)
+    data << (uint16)0;
 
-        // Last Week Standing
-        data << pPlayer->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
+    // Lifetime Honorable Kills
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_HONORABLE_KILLS);
 
-        // Rank progress bar
-        data << (uint8)pPlayer->GetByteValue(PLAYER_FIELD_BYTES2, 0);
+    // Lifetime Dishonorable Kills
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_LIFETIME_DISHONORABLE_KILLS);
 
-        SendPacket(&data);
-    } else
-        DEBUG_LOG("%s not found!", guid.GetString().c_str());
+    // Yesterday Honor
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_YESTERDAY_CONTRIBUTION);
+
+    // Last Week Honor
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_CONTRIBUTION);
+
+    // This Week Honor
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_THIS_WEEK_CONTRIBUTION);
+
+    // Last Week Standing
+    data << pTarget->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
+
+    // Rank progress bar
+    data << (uint8)pTarget->GetByteValue(PLAYER_FIELD_BYTES2, 0);
+
+    SendPacket(&data);
 }
 
 void WorldSession::HandleWorldTeleportOpcode(WorldPacket& recv_data)

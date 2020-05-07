@@ -221,8 +221,9 @@ Item::Item() : loot(nullptr)
 {
     m_objectType |= TYPEMASK_ITEM;
     m_objectTypeId = TYPEID_ITEM;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     m_updateFlag = UPDATEFLAG_ALL;
-
+#endif
     m_valuesCount = ITEM_END;
     m_slot = 0;
     uState = ITEM_NEW;

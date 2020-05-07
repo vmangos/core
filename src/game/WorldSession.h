@@ -51,8 +51,8 @@ class LoginQueryHolder;
 class CharacterHandler;
 class MovementInfo;
 class WorldSession;
-class WardenInterface;
-class MovementAnticheatInterface;
+class Warden;
+class MovementAnticheat;
 class BigNumber;
 class BehaviorAnalyzer;
 class MasterPlayer;
@@ -270,7 +270,7 @@ typedef std::map<std::string, WorldSessionScript*> SessionScriptsMap;
 #define ALL_SESSION_SCRIPTS(session, what) for (SessionScriptsMap::iterator it = session->scripts.begin(); it != session->scripts.end(); ++it) it->second->what;
 
 /// Player session in the World
-class MANGOS_DLL_SPEC WorldSession
+class WorldSession
 {
     friend class CharacterHandler;
     public:
@@ -489,7 +489,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         // Warden / Anticheat
         void InitWarden(BigNumber* K);
-        WardenInterface* GetWarden() const { return m_warden; }
+        Warden* GetWarden() const { return m_warden; }
 
         bool AllowPacket(uint16 opcode);
         void ProcessAnticheatAction(char const* detector, char const* reason, uint32 action, uint32 banTime = 0 /* Perm ban */);
@@ -500,7 +500,7 @@ class MANGOS_DLL_SPEC WorldSession
         bool IsClientHashComputed() const { return _clientHashComputeStep != HASH_NOT_COMPUTED; }
         
         void InitCheatData(Player* pPlayer);
-        MovementAnticheatInterface* GetCheatData();
+        MovementAnticheat* GetCheatData();
 
         void AddScript(std::string name, WorldSessionScript* script)
         {
@@ -915,8 +915,8 @@ class MANGOS_DLL_SPEC WorldSession
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool _receivedPacketType[PACKET_PROCESS_MAX_TYPE];
 
-        WardenInterface* m_warden;
-        MovementAnticheatInterface* m_cheatData;
+        Warden* m_warden;
+        MovementAnticheat* m_cheatData;
 
         std::string m_username;
         uint32 _floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];

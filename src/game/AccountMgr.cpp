@@ -474,7 +474,7 @@ uint32 AccountPersistentData::CountWhispersTo(MasterPlayer* from, MasterPlayer* 
 
 bool AccountPersistentData::CanWhisper(MasterPlayer* player) const
 {
-    return sAnticheatLib->CanWhisper(*this, player);
+    return sAnticheatMgr->CanWhisper(*this, player);
 }
 
 uint32 AccountPersistentData::GetWhisperScore(MasterPlayer* from, MasterPlayer* target) const

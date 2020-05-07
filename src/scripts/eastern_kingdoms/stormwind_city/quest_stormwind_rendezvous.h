@@ -95,9 +95,10 @@ enum
     NPC_MARCUS_JONATHAN             = 466,
     NPC_STORMWIND_ROYAL_GUARD       = 1756,
 
-    GOSSIP_ROWE_NOTHING             = 9063,
+    GOSSIP_ROWE_COMPLETED           = 9066,
     GOSSIP_ROWE_READY               = 9065,
     GOSSIP_ROWE_BUSY                = 9064,
+    GOSSIP_ROWE_NOTHING             = 9063,
 
     MOUNT_WINDSOR                   = 2410,
 

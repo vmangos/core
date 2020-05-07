@@ -115,7 +115,13 @@ enum
     NPC_CLEANER             = 14503,
 
     GO_LIGHT                = 179693,
-    GO_SLAIN_PEASANT        = 179695,
+    GO_DEATH_POST           = 179694,
+    GO_SLAIN_PEASANT1       = 179695,
+    GO_SLAIN_PEASANT2       = 179696,
+    GO_SLAIN_PEASANT3       = 179698,
+    GO_SLAIN_PEASANT4       = 179699,
+
+    DEATH_POST_SPAWNS_COUNT = 14,
 
     SPELL_PESTE             = 23072,
     SPELL_TIR_FLECHE        = 22121,
@@ -188,6 +194,39 @@ static ErisHavenfireMove ErisHavenfireEvent[] =
     {3358.7299f, -3075.9846f, 174.794f, 1.575f}         // Archer 7
 };
 
+struct DeathPostSpawn
+{
+    DeathPostSpawn(uint32 entry_, float x_, float y_, float z_, float o_, float rot0_, float rot1_, float rot2_, float rot3_) :
+        entry(entry_), x(x_), y(y_), z(z_), o(o_), rot0(rot0_), rot1(rot1_), rot2(rot2_), rot3(rot3_) {}
+    uint32 entry;
+    float x;
+    float y;
+    float z;
+    float o;
+    float rot0;
+    float rot1;
+    float rot2;
+    float rot3;
+};
+
+static DeathPostSpawn deathPostSpawnPositions[DEATH_POST_SPAWNS_COUNT] =
+{
+    { GO_DEATH_POST,     3355.48f, -3010.68f, 175.212f, 5.06146f, 0.0f, 0.0f, -0.573576f, 0.819152f },
+    { GO_SLAIN_PEASANT3, 3352.82f, -3007.79f, 177.409f, 2.53072f, 0.0f, 0.0f, 0.953716f, 0.300708f },
+    { GO_SLAIN_PEASANT1, 3353.07f, -3009.16f, 176.615f, 3.01941f, 0.0f, 0.0f, 0.998135f, 0.0610518f },
+    { GO_SLAIN_PEASANT4, 3354.08f, -3010.35f, 172.769f, 2.46091f, 0.0f, 0.0f, 0.942641f, 0.333808f },
+    { GO_SLAIN_PEASANT2, 3353.87f, -3007.88f, 171.79f, 5.18363f, 0.0f, 0.0f, -0.522498f, 0.852641f },
+    { GO_SLAIN_PEASANT2, 3353.28f, -3013.75f, 173.584f, 1.20428f, 0.0f, 0.0f, 0.566406f, 0.824126f },
+    { GO_SLAIN_PEASANT2, 3353.34f, -3009.84f, 173.532f, 1.98967f, 0.0f, 0.0f, 0.83867f, 0.54464f },
+    { GO_SLAIN_PEASANT3, 3353.8f, -3009.6f, 175.499f, 0.802851f, 0.0f, 0.0f, 0.390731f, 0.920505f },
+    { GO_SLAIN_PEASANT4, 3355.88f, -3014.61f, 173.609f, 5.58505f, 0.0f, 0.0f, -0.34202f, 0.939693f },
+    { GO_SLAIN_PEASANT4, 3354.33f, -3012.57f, 173.045f, 5.06146f, 0.0f, 0.0f, -0.573576f, 0.819152f },
+    { GO_SLAIN_PEASANT2, 3354.29f, -3011.48f, 171.916f, 2.80997f, 0.0f, 0.0f, 0.986285f, 0.16505f },
+    { GO_SLAIN_PEASANT1, 3354.74f, -3013.16f, 176.816f, 2.61799f, 0.0f, 0.0f, 0.965925f, 0.258821f },
+    { GO_SLAIN_PEASANT3, 3355.1f, -3013.5f, 176.482f, 0.139625f, 0.0f, 0.0f, 0.0697555f, 0.997564f },
+    { GO_SLAIN_PEASANT4, 3351.66f, -3007.61f, 175.0f, 4.53786f, 0.0f, 0.0f, -0.766044f, 0.642789f },
+};
+
 struct npc_eris_havenfireAI : public ScriptedAI
 {
     explicit npc_eris_havenfireAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -201,24 +240,26 @@ struct npc_eris_havenfireAI : public ScriptedAI
     uint32 Timer[2];
     uint32 BuffTimer;
     uint32 TimerArcher[8];
-    uint32 VillageoisMorts;
-    uint32 VillageoisPasses;
-    uint64 JoueurGUID;
+    uint32 VillagerDiedCount;
+    uint32 VillagerSurvivedCount;
+    uint64 PlayerGUID;
     uint64 ArchersGUIDs[8];
-    uint64 VillageoisGUIDs[50];
+    uint64 VillagerGUIDs[50];
+    uint64 DeathPostGUIDs[DEATH_POST_SPAWNS_COUNT];
+
     bool BeginQuete;
     bool CleanerSpawn;
 
     Player* GetPlayer()
     {
-        return me->GetMap()->GetPlayer(JoueurGUID);
+        return me->GetMap()->GetPlayer(PlayerGUID);
     }
 
     void Reset() override
     {
         Vague = 0;
-        VillageoisMorts = 0;
-        VillageoisPasses = 0;
+        VillagerDiedCount = 0;
+        VillagerSurvivedCount = 0;
         BeginQuete = false;
         CleanerSpawn = false;
 
@@ -230,7 +271,9 @@ struct npc_eris_havenfireAI : public ScriptedAI
             TimerArcher[i] = 5000;
             ArchersGUIDs[i] = 0;
         }
-        for (uint64 & guid : VillageoisGUIDs)
+        for (uint64 & guid : VillagerGUIDs)
+            guid = 0;
+        for (uint64 & guid : DeathPostGUIDs)
             guid = 0;
     }
 
@@ -240,7 +283,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
     {
         if ((who->GetTypeId() == TYPEID_PLAYER || who->IsPet()) && !CleanerSpawn && BeginQuete)
         {
-            if (who->GetGUID() != JoueurGUID || who->IsPet())
+            if (who->GetGUID() != PlayerGUID || who->IsPet())
             {   
                 if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
                 {
@@ -319,6 +362,13 @@ struct npc_eris_havenfireAI : public ScriptedAI
             }
         }
         mobsEntries.clear();
+
+        for (auto& guid : DeathPostGUIDs)
+        {
+            if (GameObject* pGo = me->GetMap()->GetGameObject(guid))
+                pGo->Delete();
+            guid = 0;
+        }
     }
 
     void JustSummoned(Creature* summoned) override
@@ -344,11 +394,11 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 summoned->CastSpell(summoned, SPELL_PESTE, true);
             // no break
             case NPC_PAYSANT_0:
-                while (VillageoisGUIDs[Var] && Var < 49)
+                while (VillagerGUIDs[Var] && Var < 49)
                     ++Var;
 
                 if (Var < 50)
-                    VillageoisGUIDs[Var] = summoned->GetGUID();
+                    VillagerGUIDs[Var] = summoned->GetGUID();
 
                 if (Player* player = GetPlayer())
                     summoned->SetFactionTemplateId(player->GetFactionTemplateId());
@@ -364,7 +414,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
         if ((pSummoned->GetEntry() == NPC_PAYSANT_0 || pSummoned->GetEntry() == NPC_PAYSANT_1) && uiPointId == POINT_FIN_EVENT)
         {
-            ++VillageoisPasses;
+            ++VillagerSurvivedCount;
             switch (rand() % 15)
             {
                 case 0:
@@ -382,15 +432,15 @@ struct npc_eris_havenfireAI : public ScriptedAI
             }
 
             int Var = 0;
-            while (VillageoisGUIDs[Var] != pSummoned->GetGUID() && Var < 49)
+            while (VillagerGUIDs[Var] != pSummoned->GetGUID() && Var < 49)
                 ++Var;
 
             if (Var < 50)
-                VillageoisGUIDs[Var] = 0;
+                VillagerGUIDs[Var] = 0;
 
             pSummoned->ForcedDespawn();
 
-            if (VillageoisPasses >= 50)
+            if (VillagerSurvivedCount >= 50)
                 if (Player* player = GetPlayer())
                     SituationFinale(player);
         }
@@ -402,17 +452,25 @@ struct npc_eris_havenfireAI : public ScriptedAI
             return;
 
         if (pSummoned->GetEntry() == NPC_PAYSANT_0 || pSummoned->GetEntry() == NPC_PAYSANT_1)
-            ++VillageoisMorts;
+        {
+            if (VillagerDiedCount < DEATH_POST_SPAWNS_COUNT)
+            {
+                const auto& spawn = deathPostSpawnPositions[VillagerDiedCount];
+                if (GameObject* pGo = m_creature->SummonGameObject(spawn.entry, spawn.x, spawn.y, spawn.z, spawn.o, spawn.rot0, spawn.rot1, spawn.rot2, spawn.rot3, 1200000, false))
+                    DeathPostGUIDs[VillagerDiedCount] = pGo->GetGUID();
+            }
+            ++VillagerDiedCount;
+        }
 
-        if (VillageoisMorts >= 15)
+        if (VillagerDiedCount >= 15)
             EchecEvent(GetPlayer(), true);
 
         int Var = 0;
-        while (VillageoisGUIDs[Var] != pSummoned->GetGUID() && Var < 49)
+        while (VillagerGUIDs[Var] != pSummoned->GetGUID() && Var < 49)
             ++Var;
 
         if (Var < 50)
-            VillageoisGUIDs[Var] = 0;
+            VillagerGUIDs[Var] = 0;
     }
 
     void EchecEvent(Player* pPlayer, bool npcDespawn)
@@ -444,11 +502,11 @@ struct npc_eris_havenfireAI : public ScriptedAI
             return;
 
         Vague = 0;
-        VillageoisMorts = 0;
-        VillageoisPasses = 0;
+        VillagerDiedCount = 0;
+        VillagerSurvivedCount = 0;
         CleanerSpawn = false;
         BeginQuete = true;
-        JoueurGUID = pPlayer->GetGUID();
+        PlayerGUID = pPlayer->GetGUID();
 
         Timer[0] = 10000;
         Timer[1] = 100000;
@@ -458,14 +516,13 @@ struct npc_eris_havenfireAI : public ScriptedAI
             TimerArcher[i] = 5000;
             ArchersGUIDs[i] = 0;
         }
-        for (uint64 & guid : VillageoisGUIDs)
+        for (uint64 & guid : VillagerGUIDs)
             guid = 0;
 
         for (int i = ArcherPop0; i < Fin; i++)
             m_creature->SummonCreature(NPC_ARCHER, ErisHavenfireEvent[i].X, ErisHavenfireEvent[i].Y, ErisHavenfireEvent[i].Z, ErisHavenfireEvent[i].O, TEMPSUMMON_DEAD_DESPAWN, 0);
 
-        GameObject* pLight = m_creature->FindNearestGameObject(GO_LIGHT, 100.0f);
-        if (!pLight)
+        if (!m_creature->FindNearestGameObject(GO_LIGHT, 100.0f))
             m_creature->SummonGameObject(GO_LIGHT, 3327.0f, -2970.0f, 160.034f, 5.2135f, 0, 0, 0, 0, 0);
     }
 
@@ -673,12 +730,12 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
                         while (Var < 50)
                         {
-                            if (VillageoisGUIDs[Var])
+                            if (VillagerGUIDs[Var])
                             {
-                                Unit* Villagois = m_creature->GetMap()->GetCreature(VillageoisGUIDs[Var]);
+                                Unit* Villagois = m_creature->GetMap()->GetCreature(VillagerGUIDs[Var]);
                                 if (Villagois && Villagois->IsAlive())
                                 {
-                                    GUIDs[var] = VillageoisGUIDs[Var];
+                                    GUIDs[var] = VillagerGUIDs[Var];
                                     ++var;
                                 }
                             }
@@ -775,7 +832,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
 
             if (npc_eris_havenfireAI* pErisEventAI = dynamic_cast<npc_eris_havenfireAI*>(eris->AI()))
             {
-                if (pCaster->GetGUID() != pErisEventAI->JoueurGUID && pErisEventAI->BeginQuete && !pErisEventAI->CleanerSpawn)
+                if (pCaster->GetGUID() != pErisEventAI->PlayerGUID && pErisEventAI->BeginQuete && !pErisEventAI->CleanerSpawn)
                 {
                     if (Creature* Crea = m_creature->SummonCreature(NPC_CLEANER, 3358.1096f, -3049.8063f, 166.226f, 1.87f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 1000))
                     {

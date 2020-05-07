@@ -164,6 +164,9 @@ struct boss_arlokkAI : public ScriptedAI
             m_pInstance->SetData(TYPE_ARLOKK, DONE);
         if (GameObject* door = m_creature->FindNearestGameObject(GO_ARLOKK_FORCE_FIELD, 100.0f))
             door->ResetDoorOrButton();
+
+        // Remove a Hakkar Power stack.
+        m_creature->CastSpell(m_creature, SPELL_HAKKAR_POWER_DOWN, true);
     }
 
     void DoSummonSinglePhanter(float x, float y, float z, Unit* pTarget)

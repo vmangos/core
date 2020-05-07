@@ -84,8 +84,8 @@ enum ConditionType
     CONDITION_ACTIVE_GAME_EVENT     = 12,                   // Checks if a given game event is currently active.
                                                             // Requirement: None
                                                             // Value1: event_id
-    CONDITION_CANT_PATH_TO_VICTIM   = 13,                   // Returns true if the creature is chasing a victim but is unable to find a path to it.
-                                                            // Requirement: Creature Source
+    CONDITION_CANT_PATH_TO_VICTIM   = 13,                   // Returns true if the source is chasing a victim but is unable to find a path to it.
+                                                            // Requirement: Unit Source
     CONDITION_RACE_CLASS            = 14,                   // Checks if the player's race and class matches the given mask.
                                                             // Requirement: Player Target
                                                             // Value1: race_mask

@@ -135,7 +135,7 @@ bool ChatHandler::HandleSaveAllCommand(char* /*args*/)
 
 bool ChatHandler::HandleAntiSpamAdd(char* args)
 {
-    if (!*args || !sAnticheatLib->GetAntispam())
+    if (!*args || !sAnticheatMgr->GetAntispam())
         return false;
 
     char* wordStr = ExtractQuotedArg(&args);
@@ -161,7 +161,7 @@ bool ChatHandler::HandleAntiSpamAdd(char* args)
 
 bool ChatHandler::HandleAntiSpamRemove(char* args)
 {
-    if (!*args || !sAnticheatLib->GetAntispam())
+    if (!*args || !sAnticheatMgr->GetAntispam())
         return false;
 
     char* wordStr = ExtractQuotedArg(&args);
@@ -181,7 +181,7 @@ bool ChatHandler::HandleAntiSpamRemove(char* args)
 
 bool ChatHandler::HandleAntiSpamReplace(char* args)
 {
-    if (!*args || !sAnticheatLib->GetAntispam())
+    if (!*args || !sAnticheatMgr->GetAntispam())
         return false;
 
     char* fromStr = ExtractQuotedArg(&args);
@@ -210,7 +210,7 @@ bool ChatHandler::HandleAntiSpamReplace(char* args)
 
 bool ChatHandler::HandleAntiSpamRemoveReplace(char* args)
 {
-    if (!*args || !sAnticheatLib->GetAntispam())
+    if (!*args || !sAnticheatMgr->GetAntispam())
         return false;
 
     char* fromStr = ExtractQuotedArg(&args);
@@ -1886,7 +1886,7 @@ bool ChatHandler::HandleReloadSpellDisabledCommand(char *args)
 
 bool ChatHandler::HandleReloadAutoBroadcastCommand(char *args)
 {
-    sAutoBroadCastMgr.load();
+    sAutoBroadCastMgr.Load();
     SendSysMessage("DB table `autobroadcast` reloaded.");
     return true;
 }
@@ -1915,7 +1915,7 @@ bool ChatHandler::HandleReloadConditionsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAnticheatCommand(char*)
 {
-    sAnticheatLib->LoadAnticheatData();
+    sAnticheatMgr->LoadAnticheatData();
     SendSysMessage(">> Anticheat data reloaded");
     return true;
 }

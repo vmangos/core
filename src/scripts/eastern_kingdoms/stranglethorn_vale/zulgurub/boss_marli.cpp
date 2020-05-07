@@ -189,6 +189,9 @@ struct boss_marliAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MARLI, DONE);
+
+        // Remove a Hakkar Power stack.
+        m_creature->CastSpell(m_creature, SPELL_HAKKAR_POWER_DOWN, true);
     }
 
     void SpellHitTarget(Unit* pCaster, SpellEntry const* pSpell) override

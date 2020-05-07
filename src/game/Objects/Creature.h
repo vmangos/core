@@ -343,13 +343,14 @@ enum CreatureStateFlag : uint8
 // Vendors
 struct VendorItem
 {
-    VendorItem(uint32 _item, uint32 _maxcount, uint32 _incrtime, uint32 _itemflags)
-        : item(_item), maxcount(_maxcount), incrtime(_incrtime), itemflags(_itemflags) {}
+    VendorItem(uint32 _item, uint32 _maxcount, uint32 _incrtime, uint32 _itemflags, uint32 _conditionId)
+        : item(_item), maxcount(_maxcount), incrtime(_incrtime), itemflags(_itemflags), conditionId(_conditionId) {}
 
     uint32 item;
     uint32 maxcount;                                        // 0 for infinity item amount
     uint32 incrtime;                                        // time for restore items amount if maxcount != 0
     uint32 itemflags;
+    uint32 conditionId;                                     // condition to check for this item
 };
 typedef std::vector<VendorItem*> VendorItemList;
 
@@ -364,9 +365,9 @@ struct VendorItemData
     }
     bool Empty() const { return m_items.empty(); }
     uint8 GetItemCount() const { return m_items.size(); }
-    void AddItem(uint32 item, uint32 maxcount, uint32 ptime, uint32 itemflags)
+    void AddItem(uint32 item, uint32 maxcount, uint32 ptime, uint32 itemflags, uint32 conditonId)
     {
-        m_items.push_back(new VendorItem(item, maxcount, ptime, itemflags));
+        m_items.push_back(new VendorItem(item, maxcount, ptime, itemflags, conditonId));
     }
     bool RemoveItem(uint32 item_id);
     VendorItem const* FindItem(uint32 item_id) const;
@@ -499,7 +500,7 @@ class ThreatListProcesser
         virtual bool Process(Unit* unit) = 0;
 };
 
-class MANGOS_DLL_SPEC Creature : public Unit
+class Creature : public Unit
 {
     CreatureAI *i_AI;
 
@@ -792,7 +793,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool canStartAttack(Unit const* who, bool force) const;
         bool _IsTargetAcceptable(Unit const* target) const;
         bool canCreatureAttack(Unit const* pVictim, bool force) const;
-        bool CantPathToVictim() const;
 
         // Smartlog
         time_t GetCombatTime(bool total) const;

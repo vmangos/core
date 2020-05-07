@@ -33,7 +33,7 @@ class GameObject;
 class Creature;
 class WorldObject;
 
-class MANGOS_DLL_SPEC InstanceData : public ZoneScript
+class InstanceData : public ZoneScript
 {
     public:
 

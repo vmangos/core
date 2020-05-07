@@ -395,6 +395,8 @@ enum TorekData
     SPELL_REND        = 11977,
     SPELL_THUNDERCLAP = 8078,
 
+    FACTION_ORGRIMMAR = 1174,
+
     QUEST_TOREK_ASSULT = 6544,
 
     NPC_SPLINTERTREE_RAIDER = 12859,
@@ -501,6 +503,13 @@ bool QuestAccept_npc_torek(Player* pPlayer, Creature* pCreature, Quest const* pQ
     {
         //TODO: find companions, make them follow Torek, at any time (possibly done by mangos/database in future?)
         DoScriptText(SAY_READY, pCreature, pPlayer);
+
+        // Faction changes during escort.
+        pCreature->SetFactionTemporary(FACTION_ORGRIMMAR, TEMPFACTION_RESTORE_RESPAWN);
+        std::list<Creature*> lCrea;
+        pCreature->GetCreatureListWithEntryInGrid(lCrea, NPC_SPLINTERTREE_RAIDER, 40.0f);
+        for (const auto& it : lCrea)
+            it->SetFactionTemporary(FACTION_ORGRIMMAR, TEMPFACTION_RESTORE_RESPAWN);
 
         if (npc_torekAI* pEscortAI = dynamic_cast<npc_torekAI*>(pCreature->AI()))
             pEscortAI->Start(true, pPlayer->GetGUID(), pQuest);

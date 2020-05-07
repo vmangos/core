@@ -82,7 +82,7 @@ enum MoveOptions
     MOVE_STRAIGHT_PATH       = 0x100,
 };
 
-class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
+class MotionMaster : std::stack<MovementGenerator *>
 {
         typedef stack<MovementGenerator *> Impl;
         typedef std::vector<MovementGenerator *> ExpireList;

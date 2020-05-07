@@ -65,20 +65,21 @@ class PlayerBotMgr
         ~PlayerBotMgr();
 
         void LoadConfig();
-        void load();
+        void Load();
 
-        void update(uint32 diff);
-        bool addOrRemoveBot();
+        void Update(uint32 diff);
+        bool AddOrRemoveBot();
 
-        bool addBot(PlayerBotAI* ai);
-        bool addBot(uint32 playerGuid, bool chatBot=false);
-        bool deleteBot(uint32 playerGuid);
+        bool AddBot(PlayerBotAI* ai);
+        bool AddBot(uint32 playerGuid, bool chatBot=false);
+        bool DeleteBot(std::map<uint32, PlayerBotEntry*>::iterator iter);
+        bool DeleteBot(uint32 playerGuid);
 
-        bool addRandomBot();
-        bool deleteRandomBot();
+        bool AddRandomBot();
+        bool DeleteRandomBot();
 
-        void deleteAll();
-        void addAllBots();
+        void DeleteAll();
+        void AddAllBots();
 
         void OnBotLogout(PlayerBotEntry *e);
         void OnBotLogin(PlayerBotEntry *e);

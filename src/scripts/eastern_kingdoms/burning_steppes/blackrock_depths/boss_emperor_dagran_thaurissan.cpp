@@ -26,7 +26,7 @@ EndScriptData */
 
 enum eEmperor
 {
-    FACTION_NEUTRAL             = 734,
+    FACTION_FRIENDLY            = 35,
     SAY_AGGRO                   = -1230001,
     SAY_SLAY                    = -1230002,
 
@@ -73,7 +73,7 @@ struct boss_emperor_dagran_thaurissanAI : public ScriptedAI
         {
             if (pPrincess->IsAlive())
             {
-                pPrincess->SetFactionTemplateId(FACTION_NEUTRAL);
+                pPrincess->SetFactionTemplateId(FACTION_FRIENDLY);
                 pPrincess->AI()->EnterEvadeMode();
             }
         }

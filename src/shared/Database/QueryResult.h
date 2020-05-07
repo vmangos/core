@@ -26,7 +26,7 @@
 #include "Errors.h"
 #include "Field.h"
 
-class MANGOS_DLL_SPEC QueryResult
+class QueryResult
 {
     public:
         QueryResult(uint64 rowCount, uint32 fieldCount)
@@ -51,7 +51,7 @@ class MANGOS_DLL_SPEC QueryResult
 
 typedef std::vector<std::string> QueryFieldNames;
 
-class MANGOS_DLL_SPEC QueryNamedResult
+class QueryNamedResult
 {
     public:
         explicit QueryNamedResult(QueryResult* query, QueryFieldNames const& names) : mQuery(query), mFieldNames(names) {}

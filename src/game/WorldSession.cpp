@@ -85,7 +85,7 @@ WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_
     m_sessionDbLocaleIndex(sObjectMgr.GetIndexForLocale(locale)), m_latency(0), m_tutorialState(TUTORIALDATA_UNCHANGED), m_warden(nullptr), m_cheatData(nullptr),
     m_bot(nullptr), m_lastReceivedPacketTime(0), _clientOS(CLIENT_OS_UNKNOWN), _gameBuild(0),
     _charactersCount(10), _characterMaxLevel(0), _clientHashComputeStep(HASH_NOT_COMPUTED), 
-    m_lastPubChannelMsgTime(NULL), m_moveRejectTime(0), m_masterPlayer(nullptr)
+    m_lastPubChannelMsgTime(0), m_moveRejectTime(0), m_masterPlayer(nullptr)
 {
     if (sock)
     {
@@ -223,8 +223,10 @@ void WorldSession::SendPacket(WorldPacket const* packet)
 
     //sLog.outString("[%s]Send packet : %u|0x%x (%s)", GetPlayerName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
     if (Player* player = GetPlayer())
+    {
         DEBUG_UNIT_IF(packet->GetOpcode() != SMSG_MESSAGECHAT && packet->GetOpcode() != SMSG_WARDEN_DATA, player,
             DEBUG_PACKETS_SEND, "[%s] Send packet : %u/0x%x (%s)", player->GetName(), packet->GetOpcode(), packet->GetOpcode(), LookupOpcodeName(packet->GetOpcode()));
+    }
 
     if (m_Socket->SendPacket(*packet) == -1)
         m_Socket->CloseSocket();
@@ -324,7 +326,6 @@ bool WorldSession::Update(PacketFilter& updater)
         if (_clientHashComputeStep == HASH_COMPUTED && GetPlayer())
         {
             _clientHashComputeStep = HASH_NOTIFIED;
-            sAnticheatLib->OnClientHashComputed(this);
         }
         ///- Cleanup socket pointer if need
         if (m_Socket && m_Socket->IsClosed())
@@ -349,7 +350,6 @@ bool WorldSession::Update(PacketFilter& updater)
     }
     else // Async map based update
     {
-        sAnticheatLib->MapAccountUpdate(this);
         if (GetMasterPlayer() && GetPlayer())
         {
             GetMasterPlayer()->LoadPlayer(GetPlayer());
@@ -1085,7 +1085,7 @@ void WorldSession::SetDumpRecvPackets(char const* file)
 
 void WorldSession::InitWarden(BigNumber* k)
 {
-    m_warden = sAnticheatLib->CreateWardenFor(this, k);
+    m_warden = sAnticheatMgr->CreateWardenFor(this, k);
 }
 
 void WorldSession::InitCheatData(Player* pPlayer)
@@ -1093,12 +1093,12 @@ void WorldSession::InitCheatData(Player* pPlayer)
     if (m_cheatData)
         m_cheatData->InitNewPlayer(pPlayer);
     else
-        m_cheatData = sAnticheatLib->CreateAnticheatFor(pPlayer);
+        m_cheatData = sAnticheatMgr->CreateAnticheatFor(pPlayer);
 }
 
-MovementAnticheatInterface* WorldSession::GetCheatData()
+MovementAnticheat* WorldSession::GetCheatData()
 {
-    return m_cheatData ? m_cheatData : (m_cheatData = sAnticheatLib->CreateAnticheatFor(GetPlayer()));
+    return m_cheatData ? m_cheatData : (m_cheatData = sAnticheatMgr->CreateAnticheatFor(GetPlayer()));
 }
 
 void WorldSession::ProcessAnticheatAction(char const* detector, char const* reason, uint32 cheatAction, uint32 banSeconds)
@@ -1217,6 +1217,7 @@ bool WorldSession::AllowPacket(uint16 opcode)
         case CMSG_BUY_ITEM:
         case CMSG_SELL_ITEM:
             _floodPacketsCount[FLOOD_SLOW_OPCODES]++;
+            break;
         default:
             break;
     }

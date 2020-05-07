@@ -256,6 +256,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
     TradeData* my_trade = _player->m_trade;
     if (!my_trade)
         return;
+
     double lastModificationTimeInMS = difftime(time(nullptr), my_trade->GetLastModificationTime()) * 1000;
     if (lastModificationTimeInMS < my_trade->GetScamPreventionDelay()) // if we are not outside the delay period since last modification
     {
@@ -276,6 +277,12 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
 
     // set before checks to properly undo at problems (it already set in to client)
     my_trade->SetAccepted(true);
+
+    if (_player->GetDistance3dToCenter(trader) > TRADE_DISTANCE)
+    {
+        SendTradeStatus(TRADE_STATUS_TARGET_TO_FAR);
+        return;
+    }
 
     // not accept case incorrect money amount
     if (my_trade->GetMoney() > _player->GetMoney())
@@ -368,7 +375,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
                 clearAcceptTradeMode(myItems, hisItems);
 
                 my_spell->Delete();
-                my_trade->SetSpell(NULL);
+                my_trade->SetSpell(0);
                 return;
             }
         }
@@ -384,7 +391,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
             {
                 if (my_spell)
                     my_spell->Delete();
-                his_trade->SetSpell(NULL);
+                his_trade->SetSpell(0);
 
                 clearAcceptTradeMode(my_trade, his_trade);
                 clearAcceptTradeMode(myItems, hisItems);
@@ -408,7 +415,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
                     my_spell->Delete();
                 his_spell->Delete();
 
-                his_trade->SetSpell(NULL);
+                his_trade->SetSpell(0);
                 return;
             }
         }
@@ -629,7 +636,7 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    if (!pOther->IsWithinDistInMap(_player, 10.0f, false))
+    if (_player->GetDistance3dToCenter(pOther) > TRADE_DISTANCE)
     {
         SendTradeStatus(TRADE_STATUS_TARGET_TO_FAR);
         return;

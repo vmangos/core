@@ -3,16 +3,14 @@
  */
 
 #include "HardcodedEvents.h"
-#include "PlayerBotMgr.h"
 #include "World.h"
-#include "PlayerBotAI.h"
-#include "CinematicStuff.h"
 #include "MapManager.h"
 #include "world/world_event_naxxramas.h"
 #include "world/world_event_wareffort.h"
 #include "GridSearchers.h"
 #include <chrono>
 #include <random>
+#include <limits>
 
 /*
  * Elemental Invasion
@@ -259,8 +257,8 @@ void DragonsOfNightmare::Update()
     {
         // Event is active, dragons exist in the world
         uint32 alive = 0;
-        // Update respawn time to 9999999999 if the dragon is dead, get current alive count
-        GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, 9999999999);
+        // Update respawn time to max time value if the dragon is dead, get current alive count
+        GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, std::numeric_limits<time_t>::max());
 
         // If any dragons are still alive, do not pass go. We'll update once they are all dead
         if (alive)
@@ -575,149 +573,6 @@ bool ToastingGoblets::ShouldEnable() const
 
     return timeinfo->tm_min >= 10 && timeinfo->tm_min <= 20;
 }
-
-SilithusWarEffortBattle::SilithusWarEffortBattle() : WorldEvent (EVENT_SILITHUS_WE_START)
-{
-#if 0
-    AvaliableCombos = { RaceClassCombo(1, 1), RaceClassCombo(1, 2), RaceClassCombo(1, 4), RaceClassCombo(1, 5), RaceClassCombo(1, 8), RaceClassCombo(1, 9),
-                        RaceClassCombo(2, 1), RaceClassCombo(2, 4), RaceClassCombo(2, 3), RaceClassCombo(2, 7), RaceClassCombo(2, 9),
-                        RaceClassCombo(3, 1), RaceClassCombo(3, 4), RaceClassCombo(3, 5), RaceClassCombo(3, 8), RaceClassCombo(3, 3), RaceClassCombo(3, 2),
-                        RaceClassCombo(4, 1), RaceClassCombo(4, 4), RaceClassCombo(4, 5), RaceClassCombo(4, 11), RaceClassCombo(4, 3),
-                        RaceClassCombo(5, 1), RaceClassCombo(5, 4), RaceClassCombo(5, 4), RaceClassCombo(5, 8), RaceClassCombo(5, 9),
-                        RaceClassCombo(6, 1), RaceClassCombo(6, 11), RaceClassCombo(6, 3), RaceClassCombo(6, 7),
-                        RaceClassCombo(7, 1), RaceClassCombo(7, 4),    RaceClassCombo(7, 8), RaceClassCombo(7, 9),
-                        RaceClassCombo(8, 1), RaceClassCombo(8, 4), RaceClassCombo(8, 5), RaceClassCombo(8, 8), RaceClassCombo(8, 3), RaceClassCombo(8, 7) };
-
-
-    //leave only alliance
-    AvaliableCombos =
-    {
-        RaceClassCombo(1, 1), RaceClassCombo(1, 2), RaceClassCombo(1, 4), RaceClassCombo(1, 5), RaceClassCombo(1, 8), RaceClassCombo(1, 9),
-        RaceClassCombo(3, 1), RaceClassCombo(3, 4), RaceClassCombo(3, 5), RaceClassCombo(3, 8), RaceClassCombo(3, 3), RaceClassCombo(3, 2),
-        RaceClassCombo(4, 1), RaceClassCombo(4, 4), RaceClassCombo(4, 5), RaceClassCombo(4, 11), RaceClassCombo(4, 3),
-        RaceClassCombo(7, 1), RaceClassCombo(7, 4),    RaceClassCombo(7, 8), RaceClassCombo(7, 9)
-    };
-
-#endif
-
-    //leave only warriors, mage, warlocks
-    AvaliableCombos =
-    {
-        RaceClassCombo(1, 1),RaceClassCombo(1, 8), RaceClassCombo(1, 9),
-        RaceClassCombo(3, 1), RaceClassCombo(3, 8),
-        RaceClassCombo(4, 1), 
-        RaceClassCombo(7, 1), RaceClassCombo(7, 8), RaceClassCombo(7, 9)
-    };
-
-}
-
-void SilithusWarEffortBattle::Update()
-{
-    //for (BotEventInfo& BotInfo : Bots)
-    //{
-    //
-    //}
-}
-
-void SilithusWarEffortBattle::Enable()
-{
-    MapID KalimdorID(1, 14);
-    Map* KalimdorMap = nullptr;
-    MapManager::MapMapType& Maps = const_cast <MapManager::MapMapType&> (sMapMgr.Maps());
-    
-    KalimdorMap = Maps[KalimdorID];
-    
-    float CenterX = EventPos.x;
-    float CenterY = EventPos.y;
-    
-    float const Radius = 45.0f;
-
-    //spawn several hostile mob near
-    for (int mobID = 0; mobID < 15; ++mobID)
-    {
-        float FinalX = CenterX + frand(-Radius, Radius);
-        float FinalY = CenterY + frand(-Radius, Radius);
-        float FinalZ = KalimdorMap->GetHeight(FinalX, FinalY, 0.0f, true, 100.0f);
-        float FinalO = frand(0, M_PI_F * 2);
-
-        Creature* c = nullptr;
-        if (c = KalimdorMap->SummonCreature(14471, FinalX, FinalY, FinalZ, FinalO, TEMPSUMMON_CORPSE_DESPAWN, 0))
-        {
-            SummonedMobs.push_back(c);
-            c->SetActiveObjectState(true);
-        }
-    }
-
-    for (int botID = 0; botID < 300; ++botID)
-    {
-        //rand race
-        int32 ComboID = urand(0, AvaliableCombos.size() - 1);
-
-        float FinalX = CenterX + frand(-Radius, Radius);
-        float FinalY = CenterY + frand(-Radius, Radius);
-        float FinalZ = KalimdorMap->GetHeight(FinalX, FinalY, 0.0f, true, 100.0f);
-        float FinalO = frand(0, M_PI_F * 2);
-
-        RaceClassCombo RaceClass = AvaliableCombos[ComboID];
-
-        BattlePlayerAI* PlayerAi = new BattlePlayerAI(nullptr, RaceClass.Race, RaceClass.Class, EventPos.mapId, 14, FinalX, FinalY, FinalZ, FinalO);
-        if (sPlayerBotMgr.addBot(PlayerAi))
-        {
-            BotEventInfo EventInfo(PlayerAi);
-
-            Bots.push_back(EventInfo);
-        }
-    }
-
-
-}
-
-void SilithusWarEffortBattle::Disable()
-{
-    sPlayerBotMgr.deleteAll();
-
-    std::vector <Creature*> DeadCreatures;
-
-    for (Creature* cr : SummonedMobs)
-    {
-        if (cr->IsDead())
-        {
-            DeadCreatures.push_back(cr);
-        }
-        else
-        {
-            cr->ForcedDespawn();
-        }
-    }
-
-//     for (Creature* DeadCr : DeadCreatures)
-//     {
-//         SummonedMobs.erase(DeadCr);
-//     }
-    DeadCreatures.clear();
-
-    SummonedMobs.clear();
-}
-
-
-void BattlePlayerAI::OnPlayerLogin()
-{
-    //YOU ARE NOT PREPARED!
-    me->GiveLevel(60);
-
-    CinematicStuff::AddSpells(me);
-    CinematicStuff::StuffLevel60(me);
-
-    //YOU ARE PREPARED!
-    //CinematicStuff::SearchAndDestroy(me);
-
-    //if we dead... well, ressurect
-    me->ResurrectPlayer(1.0f);
-}
-
-
-
-
 
 ScourgeInvasionEvent::ScourgeInvasionEvent()
     :WorldEvent(GAME_EVENT_SCOURGE_INVASION),
@@ -1704,10 +1559,9 @@ void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
     auto darkmoon = new DarkmoonFaire();
     auto fireworks = new FireworksShow();
     auto goblets = new ToastingGoblets();
-    auto silithusWarEffortBattle = new SilithusWarEffortBattle();
     auto scourge_invasion = new ScourgeInvasionEvent();
     auto war_effort = new WarEffortEvent();
-    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, fireworks, goblets, silithusWarEffortBattle, scourge_invasion, war_effort };
+    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, fireworks, goblets, scourge_invasion, war_effort };
 }
 
 

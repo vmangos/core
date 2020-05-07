@@ -24,7 +24,7 @@
 
 #include "MovementGenerator.h"
 
-class MANGOS_DLL_SPEC IdleMovementGenerator : public MovementGenerator
+class IdleMovementGenerator : public MovementGenerator
 {
     public:
 
@@ -38,7 +38,7 @@ class MANGOS_DLL_SPEC IdleMovementGenerator : public MovementGenerator
 
 extern IdleMovementGenerator si_idleMovement;
 
-class MANGOS_DLL_SPEC DistractMovementGenerator : public MovementGenerator
+class DistractMovementGenerator : public MovementGenerator
 {
     public:
         explicit DistractMovementGenerator(uint32 timer) : m_timer(timer) {}
@@ -54,7 +54,7 @@ class MANGOS_DLL_SPEC DistractMovementGenerator : public MovementGenerator
         uint32 m_timer;
 };
 
-class MANGOS_DLL_SPEC AssistanceDistractMovementGenerator : public DistractMovementGenerator
+class AssistanceDistractMovementGenerator : public DistractMovementGenerator
 {
     public:
         AssistanceDistractMovementGenerator(uint32 timer) :

@@ -9,7 +9,7 @@
 struct AutoBroadCastEntry
 {
     int32 stringId;
-    };
+};
 
 class AutoBroadCastMgr
 {
@@ -17,8 +17,8 @@ class AutoBroadCastMgr
         AutoBroadCastMgr();
         ~AutoBroadCastMgr();
 
-        void load();
-        void update(uint32 diff);
+        void Load();
+        void Update(uint32 diff);
 
     protected:
         std::vector<AutoBroadCastEntry> entries;

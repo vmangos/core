@@ -224,66 +224,11 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
     }
 
     m_isArrivalDone = false;
-
     creature.AddUnitState(UNIT_STAT_ROAMING_MOVE);
 
     WaypointNode const& nextNode = currPoint->second;
-
-    // will contain generated path
-    PointsArray genPath;
-    genPath.reserve(20);    // little optimization
-
-    PathFinder pf(&creature);
-
-    // compute path to next node and put it in the path
-    pf.calculate(nextNode.x, nextNode.y, nextNode.z, true);
-    genPath.insert(genPath.end(), pf.getPath().begin(), pf.getPath().end());
-
-    // make sure to reset spline index as its new path
-    m_nextNodeSplineIdx = -1;
-
-    // if creature should not stop at current node reach
-    if (!nextNode.delay)
-    {
-        // we'll add path to node after this one too to make animation more smoother
-        m_nextNodeSplineIdx = genPath.size() - 1;
-        auto nodeAfterItr = currPoint;
-        ++nodeAfterItr;
-        if (nodeAfterItr == i_path->end())
-            nodeAfterItr = i_path->begin();
-
-        auto const& nodeAfter = nodeAfterItr->second;
-        Vector3 nodeAfterCoord(nodeAfter.x, nodeAfter.y, nodeAfter.z);
-
-        // startPoint should contain current node destination that we are about to reach
-        Vector3 startPoint = genPath.back();
-
-        // we add artificially a point in the direction of next destination to avoid client making shortcut and avoiding current node destination
-        Vector3 intPoint = startPoint.lerp(nodeAfterCoord, 0.1f);
-        genPath.push_back(intPoint);
-        creature.UpdateAllowedPositionZ(intPoint.x, intPoint.y, intPoint.z);
-
-        // avoid computing path for near nodes
-        if ((nodeAfterCoord - startPoint).squaredMagnitude() > 10)
-        {
-            // compute path to next node from intermediate point and add it to generated path
-            pf.calculate(intPoint, nodeAfterCoord, true);
-            genPath.insert(genPath.end(), pf.getPath().begin() + 1, pf.getPath().end());
-        }
-        else
-        {
-            // add only node coord as we are near enough of it
-            genPath.push_back(nodeAfterCoord);
-        }
-    }
-
-    // send path to client
     Movement::MoveSplineInit init(creature, "WaypointMovementGenerator<Creature>::StartMove");
-    
-    if (m_PathOrigin == PATH_FROM_SPECIAL)
-        init.MoveTo(nextNode.x, nextNode.y, nextNode.z, MOVE_STRAIGHT_PATH);
-    else
-        init.MovebyPath(genPath);
+    init.MoveTo(nextNode.x, nextNode.y, nextNode.z, (m_PathOrigin == PATH_FROM_SPECIAL) ? MOVE_STRAIGHT_PATH : MOVE_PATHFINDING);
 
     if (nextNode.orientation != 100 && nextNode.delay != 0)
         init.SetFacing(nextNode.orientation);
@@ -316,9 +261,8 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, uint32 cons
     {
         if (creature.IsStopped())
             Stop(STOP_TIME_FOR_PLAYER);
-        else if (creature.movespline->Finalized() || (m_nextNodeSplineIdx >= 0 && creature.movespline->currentPathIdx() >= m_nextNodeSplineIdx))
+        else if (creature.movespline->Finalized())
         {
-            // we arrived to a node either by movespline finalized or node reached while creature continue to move
             if (OnArrived(creature))        // fire script events
                 StartMove(creature);        // restart movement if needed
         }
