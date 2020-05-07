@@ -10,7 +10,8 @@ INSERT INTO `migrations` VALUES ('20200506172006');
 
 
 -- add correct reputation requirement for harpy hide quiver
-UPDATE `item_template` SET `required_reputation_rank` = 6 WHERE `entry` = 19319;
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (500, 5, 730, 6, 0, 0, 0);
+UPDATE `npc_vendor` SET `condition_id` = 500 WHERE `item` = 19319 AND `entry` IN (13217, 13216);
 
 
 -- End of migration.
