@@ -1373,15 +1373,19 @@ UPDATE `creature_template` SET `gossip_menu_id`=7236 WHERE `entry` = 16399;
 INSERT INTO `gossip_menu` VALUES (7237, 8537, 0);
 UPDATE `creature_template` SET `gossip_menu_id`=7237 WHERE `entry` = 16418;
 
--- Midsummer Celebrant
-UPDATE `creature_template` SET `gossip_menu_id`=9148 WHERE `entry` = 16781;
+-- Handor
+DELETE FROM `gossip_menu` WHERE `entry`=9148;
+DELETE FROM `gossip_menu_option` WHERE `menu_id`=9148;
+UPDATE `creature_template` SET `gossip_menu_id`=0 WHERE `entry` = 3316;
 
 -- Festival Loremaster
 INSERT INTO `gossip_menu` VALUES (7326, 8703, 0);
 UPDATE `creature_template` SET `gossip_menu_id`=7326 WHERE `entry` = 16817;
 
--- Festival Talespinner
-UPDATE `creature_template` SET `gossip_menu_id`=9298 WHERE `entry` = 16818;
+-- Basil Frye
+UPDATE `gossip_menu` SET `entry`=2750 WHERE `entry`=9298;
+UPDATE `gossip_menu_option` SET `menu_id`=2750 WHERE `menu_id`=9298;
+UPDATE `creature_template` SET `gossip_menu_id`=2750 WHERE `entry`=4605;
 
 
 -- End of migration.
