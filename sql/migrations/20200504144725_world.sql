@@ -21,6 +21,10 @@ UPDATE `creature_template` SET `scale` = 1.35 WHERE `entry` = 14728;
 -- Noarm correct location
 UPDATE `creature` SET `position_x` = -8804.547582, `position_y` = 337.790001, `position_z` = 95.097664, `orientation` = 1.521965, `wander_distance` = 1, `movement_type` = 1 WHERE `guid` = 79781;
 
+-- allow Umpi to roam
+UPDATE `creature` SET `wander_distance` = 1.5, `movement_type` = 1 WHERE `guid` = 16051;
+
+
 
 -- End of migration.
 END IF;
