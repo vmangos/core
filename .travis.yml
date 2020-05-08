@@ -22,8 +22,8 @@ addons:
       - libmysql++-dev
       
 install:
-    export TBB_ROOT_DIR=/usr/include/tbb/
-    export ACE_ROOT=/usr/include/ace/
+  - export TBB_ROOT_DIR=/usr/include/tbb/
+  - export ACE_ROOT=/usr/include/ace/
 
 matrix:
   include:
