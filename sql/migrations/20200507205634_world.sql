@@ -19,10 +19,19 @@ UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9378 AND 
 -- sylvanna forestmoon
 UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9555 AND `option_id` = 5;
 
+-- yelmak
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9165 AND `option_id` = 5;
+
+-- doctor marsh
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9299 AND `option_id` = 5;
+
 
 -- require alchemy skill of 150 to unlock expert alchemist training gossip
 -- ainethil
 UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9212 AND `option_id` = 5;
+
+-- doctor herbert halsey
+UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9301 AND `option_id` = 5
 
 
 -- add condition to unlock master alchemist training gossip
