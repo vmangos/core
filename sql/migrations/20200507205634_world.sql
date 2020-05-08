@@ -26,7 +26,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9165 AND 
 UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9299 AND `option_id` = 5;
 
 
--- require alchemy skill of 150 to unlock expert alchemist training gossip
+-- require alchemy skill of 150 to unlock artisan alchemist training gossip
 -- ainethil
 UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9212 AND `option_id` = 5;
 
