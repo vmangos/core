@@ -919,16 +919,7 @@ UPDATE `creature_template` SET `gossip_menu_id`=3604 WHERE `entry` = 11615;
 UPDATE `creature_template` SET `gossip_menu_id`=3821 WHERE `entry` = 11616;
 
 -- Ganoosh
-INSERT INTO `gossip_menu` VALUES (12859, 8270, 507);
-INSERT INTO `gossip_menu` VALUES (12859, 8283, 508);
-INSERT INTO `gossip_menu` VALUES (12859, 8289, 520);
-INSERT INTO `gossip_menu` VALUES (12859, 8296, 518);
-INSERT INTO `gossip_menu` VALUES (12859, 8291, 524);
-INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES (12859, 0, 1, 'I want to browse your goods.', 3370, 3, 4, 0, 0, 0, 0, 0, '', 0, 440);
-INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES (12859, 1, 0, 'Here, I\'d like to give you this token of my love.', 11723, 1, 1, 0, 0, 1285901, 0, 0, '', 0, 523);
-DELETE FROM `gossip_scripts` WHERE `id`=1285901;
-INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1285901, 0, 15, 27549, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Ganoosh - Cast Spell Valentine');
-UPDATE `creature_template` SET `gossip_menu_id`=12859 WHERE `entry` = 11750;
+UPDATE `creature_template` SET `npc_flags`=2 WHERE `entry` = 11750;
 
 -- Tajarri
 INSERT INTO `gossip_menu` VALUES (4084, 4977, 0);
