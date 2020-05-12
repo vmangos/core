@@ -216,7 +216,7 @@ enum ItemDynFlags
     ITEM_DYNFLAG_UNK13                        = 0x00002000,
     ITEM_DYNFLAG_UNK14                        = 0x00004000,
     ITEM_DYNFLAG_UNK15                        = 0x00008000,
-    ITEM_DYNFLAG_UNK16                        = 0x00010000,
+    ITEM_DYNFLAG_UNK16                        = 0x00010000, // soulbound pre 1.7
     ITEM_DYNFLAG_UNK17                        = 0x00020000,
 };
 
@@ -258,7 +258,11 @@ class Item : public Object
         void SetOwnerGuid(ObjectGuid guid) { SetGuidValue(ITEM_FIELD_OWNER, guid); }
         Player* GetOwner()const;
 
-        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED,val); }
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED, val); ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNK16, val); }
+#else
+        void SetBinding(bool val) { ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED, val); }
+#endif
         bool IsSoulBound() const { return HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED); }
         bool IsBindedNotWith(Player const* player) const;
         bool IsBoundByEnchant() const;
