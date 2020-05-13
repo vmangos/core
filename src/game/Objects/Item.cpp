@@ -475,6 +475,9 @@ bool Item::LoadFromDB(uint32 guidLow, ObjectGuid ownerGuid, Field* fields, uint3
     if (IsSoulBound() && proto->Bonding == NO_BIND)
     {
         ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_BINDED, false);
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_6_1
+        ApplyModFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_UNK16, false);
+#endif
         need_save = true;
     }
 

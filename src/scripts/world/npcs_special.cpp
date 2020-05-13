@@ -2256,7 +2256,7 @@ enum
 
     TEXT_ID_VICTORY_A = 8315,
     TEXT_ID_VICTORY_H = 8316,
-    TEXT_ID_TIE = 8318,
+    TEXT_ID_TIE = 8320,
 
 };
 

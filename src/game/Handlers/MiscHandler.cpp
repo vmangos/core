@@ -887,10 +887,6 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket& recv_data)
         if (pTeleTrigger->destination.mapId != corpseMapId)
             if (AreaTriggerTeleport const* corpseAt = sObjectMgr.GetMapEntranceTrigger(corpseMapId))
                 pTeleTrigger = corpseAt;
-
-        // now we can resurrect player, and then check teleport requirements
-        pPlayer->ResurrectPlayer(0.5f);
-        pPlayer->SpawnCorpseBones();
     }
 
     if (!pPlayer->IsGameMaster() && !pPlayer->HasCheatOption(PLAYER_CHEAT_TRIGGER_PASS))
