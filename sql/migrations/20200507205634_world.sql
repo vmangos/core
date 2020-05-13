@@ -43,7 +43,7 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9212 AND `option_id` = 5;
 
 -- doctor herbert halsey
-UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9301 AND `option_id` = 5
+UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9301 AND `option_id` = 5;
 
 
 -- require alchemy skill of 225 to unlock master alchemist training gossip
