@@ -1460,7 +1460,6 @@ void AddSC_the_barrens()
     newscript->GetAI = &GetAI_npc_polly;
     newscript->RegisterSelf();
 
-
     newscript = new Script;
     newscript->Name = "npc_twiggy_flathead";
     newscript->GetAI = &GetAI_npc_twiggy_flathead;
