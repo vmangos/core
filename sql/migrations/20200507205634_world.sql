@@ -9,9 +9,30 @@ INSERT INTO `migrations` VALUES ('20200507205634');
 -- Add your query below.
 
 
+-- add training menu back to vosur brakthell
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
+(4116, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 0);
+
+-- add training menu back to alchemist mallory
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
+(4110, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 0);
+
+-- add training menu back to cyndra kindwhisper
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
+(4112, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 0);
+
+-- add training menu back to whuut
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
+(4118, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 0);
+
+-- add training menu back to miao'zan
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
+(4129, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 0);
+
+
 -- require alchemy skill of 50 to unlock expert alchemist training gossip
 -- tally berryfizz
-UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9364 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4123 AND `option_id` = 5;
 
 -- lilyssia nightbreeze
 UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9378 AND `option_id` = 5;
@@ -20,7 +41,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9378 AND 
 UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9555 AND `option_id` = 5;
 
 -- yelmak
-UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9165 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4126 AND `option_id` = 5;
 
 -- doctor marsh
 UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9299 AND `option_id` = 5;
@@ -43,7 +64,8 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9212 AND `option_id` = 5;
 
 -- doctor herbert halsey
-UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9301 AND `option_id` = 5;
+INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
+(4132, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 4454);
 
 
 -- require alchemy skill of 225 to unlock master alchemist training gossip
