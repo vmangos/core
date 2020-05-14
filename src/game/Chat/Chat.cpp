@@ -416,6 +416,7 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand instanceCommandTable[] =
     {
         { "continents",     SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleInstanceContinentsCommand,  "", nullptr },
+        { "getdata",        SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceGetDataCommand,     "", nullptr },
         { "listbinds",      SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceListBindsCommand,   "", nullptr },
         { "unbind",         SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceUnbindCommand,      "", nullptr },
         { "stats",          SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleInstanceStatsCommand,       "", nullptr },

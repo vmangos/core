@@ -614,6 +614,25 @@ bool ChatHandler::HandleInstanceContinentsCommand(char*)
     return true;
 }
 
+bool ChatHandler::HandleInstanceGetDataCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    if (!pPlayer)
+        return false;
+    Map* pMap = pPlayer->FindMap();
+    if (!pMap)
+        return false;
+    InstanceData* pData = pMap->GetInstanceData();
+    if (!pData)
+        return false;
+    uint32 index = 0;
+    if (!ExtractUInt32(&args, index))
+        return false;
+
+    PSendSysMessage("Data[%u] = %u", index, pData->GetData(index));
+    return true;
+}
+
 bool ChatHandler::HandleInstancePerfInfosCommand(char* args)
 {
     Player* player = GetSession()->GetPlayer();

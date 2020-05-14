@@ -538,6 +538,7 @@ class ChatHandler
         bool HandleInstanceSaveDataCommand(char* args);
         bool HandleInstanceSwitchCommand(char* args);
         bool HandleInstanceContinentsCommand(char* args);
+        bool HandleInstanceGetDataCommand(char* args);
         bool HandleInstancePerfInfosCommand(char* args);
         bool HandleInstanceBindingMode(char* args);
         bool HandlePBCastStatsCommand(char* args);
