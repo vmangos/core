@@ -46,6 +46,9 @@ UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4126 AND 
 -- doctor marsh
 UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9299 AND `option_id` = 5;
 
+-- bena winterhoof
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9117 AND `option_id` = 5;
+
 -- alchemist narett
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
 (4122, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 361);
@@ -59,26 +62,23 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (4130, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 361);
 
 
--- require alchemy skill of 150 to unlock artisan alchemist training gossip
+-- require alchemy skill of 125 to unlock artisan alchemist training gossip
 -- ainethil
-UPDATE `gossip_menu_option` SET `condition_id` = 4454 WHERE `menu_id` = 9212 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 362 WHERE `menu_id` = 9212 AND `option_id` = 5;
 
 -- doctor herbert halsey
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
-(4132, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 4454);
+(4132, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 362);
 
 
 -- require alchemy skill of 225 to unlock master alchemist training gossip
--- add condition to unlock master alchemist training gossip
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4455, 7, 171, 225, 0, 0, 0);
-
 -- kylanna windwhisper
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
-(4125, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 4455);
+(4125, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 363);
 
 -- rogvar
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
-(4134, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 4455);
+(4134, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 363);
 
 
 -- End of migration.
