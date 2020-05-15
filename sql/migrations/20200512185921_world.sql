@@ -26,7 +26,10 @@ UPDATE `creature` SET `orientation` = 3.776711 WHERE `guid`= 79550;
 
 -- add missing injured stockade guard
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(79581, 4996, 0, 0, 0, 0, 0, 0, -8766.31, 819.304, 97.6345, 5.357542, 25, 25, 0, 100, 0, 0, 0, 0, 0, 10);
+(79581, 4996, 0, 0, 0, 0, 0, 0, -8766.31, 819.304, 97.6345, 5.357542, 540, 540, 0, 100, 0, 0, 0, 0, 0, 10);
+
+-- increase respawn time for injured stockade guard
+UPDATE `creature` SET `spawntimesecsmin`=540, `spawntimesecsmax`=540 WHERE `id`=4996;
 
 -- pathing and scripts for nurse lilian
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 5042;
