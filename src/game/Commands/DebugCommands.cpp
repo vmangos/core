@@ -1345,8 +1345,6 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     if (!spellEntry)
         return false;
 
-    SpellBonusEntry const* bonus = sSpellMgr.GetSpellBonusData(spellid);
-
     float direct_calc = spellEntry->CalculateDefaultCoefficient(SPELL_DIRECT_DAMAGE);
     float dot_calc = spellEntry->CalculateDefaultCoefficient(DOT);
 
@@ -1379,9 +1377,9 @@ bool ChatHandler::HandleDebugSpellCoefsCommand(char* args)
     char const* dotDamageStr = GetMangosString(LANG_DOT_DAMAGE);
 
     PSendSysMessage(LANG_SPELLCOEFS, spellid, isDirectHeal ? directHealStr : directDamageStr,
-                    direct_calc, direct_calc * 1.88f, bonus ? bonus->direct_damage : 0.0f, bonus ? bonus->ap_bonus : 0.0f);
+                    direct_calc, direct_calc * 1.88f, spellEntry->EffectBonusCoefficient[0], 0.0f);
     PSendSysMessage(LANG_SPELLCOEFS, spellid, isDotHeal ? dotHealStr : dotDamageStr,
-                    dot_calc, dot_calc * 1.88f, bonus ? bonus->dot_damage : 0.0f, bonus ? bonus->ap_dot_bonus : 0.0f);
+                    dot_calc, dot_calc * 1.88f, spellEntry->EffectBonusCoefficient[0], 0.0f);
 
     return true;
 }
