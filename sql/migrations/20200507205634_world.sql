@@ -35,23 +35,23 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4123 AND `option_id` = 5;
 
 -- lilyssia nightbreeze
-UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9378 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4121 AND `option_id` = 5;
 
 -- sylvanna forestmoon
-UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9555 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4114 AND `option_id` = 5;
 
 -- yelmak
 UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4126 AND `option_id` = 5;
 
 -- doctor marsh
-UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9299 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4133 AND `option_id` = 5;
 
 -- bena winterhoof
-UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 9117 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4131 AND `option_id` = 5;
 
 -- alchemist narett
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
-(4122, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 361);
+(4119, 3, 3, "Train me.", 3266, 5, 16, 0, 0, 0, 0, 0, "(NULL)", 0, 361);
 
 -- kylanna
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
@@ -64,7 +64,7 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 
 -- require alchemy skill of 125 to unlock artisan alchemist training gossip
 -- ainethil
-UPDATE `gossip_menu_option` SET `condition_id` = 362 WHERE `menu_id` = 9212 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 362 WHERE `menu_id` = 4124 AND `option_id` = 5;
 
 -- doctor herbert halsey
 INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, `action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, `condition_id`) VALUES
