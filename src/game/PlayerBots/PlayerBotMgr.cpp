@@ -944,6 +944,127 @@ bool ChatHandler::HandlePartyBotSetRoleCommand(char* args)
     return false;
 }
 
+bool ChatHandler::HandlePartyBotPauseHelper(Player* pTarget, bool pause)
+{
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            pAI->m_paused = pause;
+
+            if (pause)
+            {
+                pTarget->StopMoving();
+                pTarget->GetMotionMaster()->MoveIdle();
+            }
+            
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotPauseCommand(char* /*args*/)
+{
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (HandlePartyBotPauseHelper(pTarget, true))
+        PSendSysMessage("%s paused.", pTarget->GetName());
+    else
+        SendSysMessage("Target is not a party bot.");
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotUnpauseCommand(char* /*args*/)
+{
+    Player* pTarget = GetSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (HandlePartyBotPauseHelper(pTarget, false))
+        PSendSysMessage("%s unpaused.", pTarget->GetName());
+    else
+        SendSysMessage("Target is not a party bot.");
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotPauseAllCommand(char* /*args*/)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    bool success = false;
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (HandlePartyBotPauseHelper(pMember, true))
+                success = true;
+        }
+    }
+
+    if (success)
+        PSendSysMessage("All party bots paused.");
+    else
+        SendSysMessage("No party bots in group.");
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotUnpauseAllCommand(char* /*args*/)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    bool success = false;
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (HandlePartyBotPauseHelper(pMember, false))
+                success = true;
+        }
+    }
+
+    if (success)
+        PSendSysMessage("All party bots unpaused.");
+    else
+        SendSysMessage("No party bots in group.");
+
+    return true;
+}
+
 bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
 {
     Player* pTarget = GetSelectedPlayer();

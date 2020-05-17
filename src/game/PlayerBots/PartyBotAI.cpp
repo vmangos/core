@@ -455,6 +455,9 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         return;
     }
 
+    if (m_paused)
+        return;
+
     if (me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
     {
         // Stop auto shot if no target.

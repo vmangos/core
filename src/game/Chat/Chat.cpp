@@ -92,6 +92,10 @@ ChatCommand * ChatHandler::getCommandTable()
         { "add",        SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAddCommand,         "", nullptr },
         { "clone",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotCloneCommand,       "", nullptr },
         { "setrole",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotSetRoleCommand,     "", nullptr },
+        { "pause",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotPauseCommand,       "", nullptr },
+        { "pauseall",   SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotPauseAllCommand,    "", nullptr },
+        { "unpause",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnpauseCommand,     "", nullptr },
+        { "unpauseall", SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnpauseAllCommand,  "", nullptr },
         { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
