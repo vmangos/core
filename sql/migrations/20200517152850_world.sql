@@ -1,0 +1,47 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20200517152850');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20200517152850');
+-- Add your query below.
+
+DELETE FROM `gameobject` WHERE `id`=175885;
+
+-- Undercity, Orgrimma, Thunder Bluff, Brill, Tarren Mill, Darkshire, Scarlet Monastery
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('18097','175885','0','2838.71','-680.909','137.15','2.02571','0','0','0.848346','0.529443','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('18098','175885','0','-10572.5','-1135.52','28.0294','4.88397','0','0','0.643918','-0.765094','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('18099','175885','0','-35.0581','-950.789','54.2862','1.32201','0','0','0.613911','0.789375','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('18100','175885','0','2291.32','293.044','35.1823','3.08365','0','0','0.99958','0.0289672','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('18102','175885','1','-1196.41','46.6079','174.081','1.76304','0','0','0.771707','0.635978','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('18103','175885','1','1629.83','-4373.95','31.3176','3.63479','0','0','0.969749','-0.244105','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('18101','175885','0','1715.97','239.983','62.6581','0.337882','0','0','0.168138','0.985763','25','25','100','1','0','0','0','10');
+
+DELETE FROM `gameobject` WHERE `id`=176573;
+
+-- Stormwind, Ironforge, Darnassus, Kharanos, Hillsbrad Fields, Theramore, Alcaz (Lighthouse), Menethil, Northshire Abbey, Westfal (Lighthouse), Astranaar, Southshore, Lakeshire
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('94','176573','0','-9233.2','-2190.14','63.9339','2.94713','0','0','0.995277','0.0970768','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('619','176573','0','-869.729','-498.138','11.135','4.66387','0','0','0.724051','-0.689747','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('870','176573','1','2694.02','-358.497','108.847','5.57864','0','0','0.345034','-0.93859','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('1140','176573','0','-11408.5','1946.96','11.0009','0.0735627','0','0','0.0367731','0.999324','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('4841','176573','0','-8897.29','-153.956','81.3125','2.23322','0','0','0.898617','0.438733','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('6867','176573','1','-2822.9','-4728.41','5.21527','1.94557','0','0','0.826457','0.563','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('9114','176573','0','-3707.43','-823.422','9.89948','5.69602','0','0','0.289382','-0.957214','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('9104','176573','1','-3742.21','-4425.92','27.9066','2.19216','0','0','0.889423','0.457085','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('26283','176573','0','-869.732','-498.14','11.135','4.84137','0','0','0.660066','-0.751207','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('26414','176573','0','-489.961','98.3014','56.8404','5.23878','0','0','0.49879','-0.866723','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('26426','176573','0','-5578.76','-457.799','414.054','4.88391','0','0','0.643942','-0.765074','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('26435','176573','1','9956.59','2521.72','1319.12','5.13173','0','0','0.544445','-0.838797','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('26469','176573','0','-4808.06','-1121.24','500.206','2.98874','0','0','0.997081','0.0763503','25','25','100','1','0','0','0','10');
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES('26743','176573','0','-8818.62','635.754','94.6308','0.692286','0','0','0.339272','0.940688','25','25','100','1','0','0','0','10');
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
