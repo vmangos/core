@@ -3647,7 +3647,6 @@ void SpellMgr::LoadSpells()
         spell->EffectBonusCoefficient[0] = fields[80].GetFloat();
         spell->EffectBonusCoefficient[1] = fields[81].GetFloat();
         spell->EffectBonusCoefficient[2] = fields[82].GetFloat();
-
         spell->EffectMechanic[0] = fields[83].GetUInt32();
         spell->EffectMechanic[1] = fields[84].GetUInt32();
         spell->EffectMechanic[2] = fields[85].GetUInt32();
