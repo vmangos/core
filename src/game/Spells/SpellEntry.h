@@ -367,6 +367,44 @@ namespace Spells
 
         return false;
     }
+
+    // Spell deals damage directly and could kill target instantly.
+    inline bool IsDirectDamageEffect(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            case SPELL_EFFECT_INSTAKILL:
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_POWER_BURN:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                return true;
+        }
+
+        return false;
+    }
+
+    // Spell deals damage directly and can benefit from bonuses (spell power, attack power).
+    inline bool IsDirectDamageWithBonusEffect(uint32 effectName)
+    {
+        switch (effectName)
+        {
+            case SPELL_EFFECT_SCHOOL_DAMAGE:
+            case SPELL_EFFECT_HEALTH_LEECH:
+            case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
+            case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
+            case SPELL_EFFECT_WEAPON_DAMAGE:
+            case SPELL_EFFECT_POWER_BURN:
+            case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
+                return true;
+        }
+
+        return false;
+    }
 }
 
 class SpellEntry

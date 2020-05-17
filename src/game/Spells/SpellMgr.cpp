@@ -3240,19 +3240,8 @@ namespace SpellInternal
     {
         for (uint32 i : spellInfo->Effect)
         {
-            switch (i)
-            {
-                case SPELL_EFFECT_INSTAKILL:
-                case SPELL_EFFECT_SCHOOL_DAMAGE:
-                case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
-                case SPELL_EFFECT_HEALTH_LEECH:
-                case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
-                case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
-                case SPELL_EFFECT_WEAPON_DAMAGE:
-                case SPELL_EFFECT_POWER_BURN:
-                case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-                    return true;
-            }
+            if (IsDirectDamageEffect(i))
+                return true;
         }
 
         return false;
