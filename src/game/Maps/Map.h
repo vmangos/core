@@ -582,7 +582,7 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
 
         void MonsterYellToMap(ObjectGuid guid, int32 textId, Language language, Unit const* target) const;
         void MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, Language language, Unit const* target, uint32 senderLowGuid = 0) const;
-        void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0) const;
+        void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId) const;
 
         // GameObjectCollision
         float GetHeight(float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;

@@ -364,6 +364,9 @@ enum BellHourlySoundZones
     TELDRASSIL_ZONE          = 141,
     DARNASSUS_ZONE           = 1657,
     ASHENVALE_ZONE           = 331,
+    ORGRIMMA_ZONE            = 1637,
+    THUNDERBLUFF_ZONE        = 1638,
+    STORMWIND_ZONE           = 1519
 };
 
 enum BellHourlyObjects
@@ -462,7 +465,20 @@ struct go_bells : public GameObjectAI
                     break;
                 }
                 case EVENT_RING_BELL:
-                    me->PlayDirectSound(_soundId);
+                    switch (me->GetZoneId())
+                    {
+                        case ORGRIMMA_ZONE:
+                        case THUNDERBLUFF_ZONE:
+                        case UNDERCITY_ZONE:
+                        case STORMWIND_ZONE:
+                        case IRONFORGE_ZONE:
+                        case DARNASSUS_ZONE:
+                            me->GetMap()->PlayDirectSoundToMap(_soundId, me->GetZoneId()); // play sound zone wide (only one spawn in main cities needed)
+                            break;
+                        default:
+                            me->PlayDirectSound(_soundId); // play sound area wide sound
+                            break;
+                    }
                     break;
                 default:
                     break;

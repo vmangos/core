@@ -3122,7 +3122,7 @@ void Map::MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, Language lan
 * @param soundId Played Sound
 * @param zoneId Id of the Zone to which the sound should be restricted
 */
-void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId /*=0*/) const
+void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId) const
 {
     WorldPacket data(SMSG_PLAY_SOUND, 4);
     data << uint32(soundId);

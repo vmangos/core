@@ -2440,7 +2440,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, int32 c
             if (Type == CHAT_TYPE_ZONE_YELL)
             {
                 if (Map* pZone = pSource->GetMap())
-                    pZone->PlayDirectSoundToMap(SoundId);
+                    pZone->PlayDirectSoundToMap(SoundId, pSource->GetZoneId());
             }
             else
                 pSource->PlayDirectSound(SoundId);
@@ -2564,7 +2564,7 @@ void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map*
     }
 
     if (SoundId)
-        pMap->PlayDirectSoundToMap(SoundId);
+        pMap->PlayDirectSoundToMap(SoundId, 0); // TODO: is 0 correct here?
 
     if (pCreatureSource)                                // If provided pointer for sayer, use direct version
         pMap->MonsterYellToMap(pCreatureSource->GetObjectGuid(), iTextEntry, Language(LanguageId), pTarget);
