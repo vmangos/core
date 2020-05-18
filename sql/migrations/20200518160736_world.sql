@@ -32,12 +32,14 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- pathing and scripts for kazan mogosh
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 1237;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(1237, 1, -5671.19, -1577.15, 383.329, 3.4383, 40000, 0, 0),
-(1237, 2, -5668.92, -1574.36, 383.204, 100, 0, 0, 0),
-(1237, 3, -5668.73, -1571.90, 383.204, 100, 0, 0, 0),
-(1237, 4, -5665.08, -1567.92, 383.204, 0.753848, 50000, 0, 0),
-(1237, 5, -5665.08, -1567.92, 383.204, 0.753848, 0, 0, 1237);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1237, 0, 3, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, -5671.19, -1577.15, 383.329, 3.4383, 0, 'kazan mogosh - run to coords');
+(1237, 1, -5671.19, -1577.15, 383.329, 3.4383, 40000, 0, 1238),
+(1237, 2, -5671.19, -1577.15, 383.329, 3.4383, 0, 0, 1238),
+(1237, 3, -5668.92, -1574.36, 383.204, 100, 0, 0, 0),
+(1237, 4, -5668.73, -1571.90, 383.204, 100, 0, 0, 0),
+(1237, 5, -5665.08, -1567.92, 383.204, 0.753848, 50000, 0, 1237),
+(1237, 6, -5665.08, -1567.92, 383.204, 0.753848, 0, 0, 1237);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1237, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'kazan mogosh - run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1238, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'kazan mogosh - walk');
 
 -- pathing and scripts for miner grumnal
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 1360;
