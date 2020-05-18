@@ -759,7 +759,9 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
         count = GUILD_MAX_MEMBERS;
     data << uint32(count);
     data << MOTD;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GINFO;
+#endif
 
     data << uint32(m_Ranks.size());
     for (const auto& itr : m_Ranks)
@@ -777,6 +779,9 @@ void Guild::Roster(WorldSession* session /*= nullptr*/)
             data << uint8(pl->GetLevel());
             data << uint8(pl->GetClass());
             data << uint32(pl->GetCachedZoneId());
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+            data << uint8(0);
+#endif
             data << itr->second.Pnote;
             data << itr->second.OFFnote;
         }
