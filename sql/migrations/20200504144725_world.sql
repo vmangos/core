@@ -24,6 +24,8 @@ UPDATE `creature` SET `position_x` = -8804.547582, `position_y` = 337.790001, `p
 -- allow Umpi to roam
 UPDATE `creature` SET `wander_distance` = 1.5, `movement_type` = 1 WHERE `guid` = 16051;
 
+-- allow dannie fizzwizzle to roam
+UPDATE `creature` SET `wander_distance` = 1.3, `movement_type` = 1 WHERE `guid` = 217;
 
 
 -- End of migration.
