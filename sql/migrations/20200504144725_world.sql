@@ -27,6 +27,9 @@ UPDATE `creature` SET `wander_distance` = 1.5, `movement_type` = 1 WHERE `guid` 
 -- allow dannie fizzwizzle to roam
 UPDATE `creature` SET `wander_distance` = 1.3, `movement_type` = 1 WHERE `guid` = 217;
 
+-- remove felhunter from forlorn cavern
+DELETE FROM `creature` WHERE `guid` = 86190;
+
 
 -- End of migration.
 END IF;
