@@ -47,7 +47,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (14041, 33, 17.0065, -13.1396, -4.29649, 100, 0, 0, 0),
 (14041, 34, 13.0492, -31.4141, -4.29695, 100, 0, 0, 0),
 (14041, 35, -1.66263, -31.2745, -4.29695, 100, 0, 0, 0),
-(14041, 36, -18.2959, -17.0123, -4.29695, 100, 55000, 1.3, 0),
+(14041, 36, -18.2959, -17.0123, -4.29695, 100, 55000, 1.3, 14043),
 (14041, 37, -15.6317, -16.0231, -4.29695, 100, 0, 0, 0),
 (14041, 38, -15.5101, -3.39945, -4.29695, 100, 0, 0, 0),
 (14041, 39, -17.9317, -1.00978, -3.77108, 1.55107, 147000, 0, 14042),
@@ -60,6 +60,8 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (14041, 7, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'haggle - stop sift');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (14042, 2, 28, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'haggle - start sleep');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (14042, 147, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'haggle - stop sleep');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (14041, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 9141, 0, 0, 0, 0, 0, 0, 0, 0, 'haggle - speak');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (14043, 54, 0, 2, 0, 0, 0, 0, 0, 0, 0, 9147, 0, 0, 0, 0, 0, 0, 0, 0, 'haggle - speak');
 
 -- add random text for haggle
 UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 14041;
