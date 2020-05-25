@@ -1789,6 +1789,23 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                 return;
             }
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+            if (m_spellInfo->Id == 18280) // Curse of Agony Dummy
+            {
+                if (SpellEntry const* pSpellEntry = m_triggeredByAuraSpell)
+                {
+                    WorldObject* pCaster = m_caster;
+                    if (SpellAuraHolder const* pAuraHolder = unitTarget->GetSpellAuraHolder(pSpellEntry->Id))
+                        if (Unit* pAuraCaster = pAuraHolder->GetCaster())
+                            pCaster = pAuraCaster;
+
+                    int32 damagePoint = m_triggeredByAuraBasePoints;
+                    damagePoint = pCaster->SpellDamageBonusDone(unitTarget, pSpellEntry, EFFECT_INDEX_0, damagePoint, DOT);
+                    pCaster->CastCustomSpell(unitTarget, 18277, &damagePoint, nullptr, nullptr, true);
+                }
+                return;
+            }
+#endif
             break;
         }
         case SPELLFAMILY_PRIEST:
