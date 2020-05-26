@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20200526235421');
 -- Add your query below.
 
-UPDATE `quest_template` set `ExclusiveGroup` = 0 WHERE `entry` = 1661;
+UPDATE `quest_template` SET `ExclusiveGroup` = 0 WHERE `entry` = 1661;
 
 -- End of migration.
 END IF;
