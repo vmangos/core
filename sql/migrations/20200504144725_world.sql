@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20200504144725');
 
 
 -- Alowicious Czervik correct location
-UPDATE `creature` SET `position_x` = 1627.165, `position_y` = -4412.519, `position_z` = 15.453, `orientation` = 4.771000 WHERE `guid` = 86237;
+UPDATE `creature` SET `position_x` = 1627.81, `position_y` = -4413.17, `position_z` = 15.7001, `orientation` = 4.13643 WHERE `guid` = 86237;
 
 -- correct scale for Rumstag Proudstrider
 UPDATE `creature_template` SET `scale` = 1.35 WHERE `entry` = 14728;
