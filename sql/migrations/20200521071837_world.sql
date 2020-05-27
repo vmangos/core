@@ -12,14 +12,14 @@ INSERT INTO `migrations` VALUES ('20200521071837');
 -- add path for grand mason marblesten
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 2790;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(2790, 1, -5033.81, -1022.23, 508.876, 3.76026, 28000, 0, 2790),
-(2790, 2, -5033.81, -1022.23, 508.876, 3.76026, 0, 0, 2791),
-(2790, 3, -5028.33, -1019.80, 508.875, 5.377125, 24000, 0, 2790),
-(2790, 4, -5028.33, -1019.80, 508.875, 5.377125, 0, 0, 2791),
-(2790, 5, -5028.87, -1022.47, 508.876, 4.612935, 26000, 0, 2790),
-(2790, 6, -5028.87, -1022.47, 508.876, 4.612935, 0, 0, 2791);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2790, 1, 1, 233, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'grand mason marblesten - start work');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (2791, 0, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'grand mason marblesten - stop work');
+(2790, 1, -5033.81, -1022.23, 508.876, 3.76026, 28000, 0, 279001),
+(2790, 2, -5033.81, -1022.23, 508.876, 3.76026, 0, 0, 279002),
+(2790, 3, -5028.33, -1019.80, 508.875, 5.377125, 24000, 0, 279010),
+(2790, 4, -5028.33, -1019.80, 508.875, 5.377125, 0, 0, 27902),
+(2790, 5, -5028.87, -1022.47, 508.876, 4.612935, 26000, 0, 279001),
+(2790, 6, -5028.87, -1022.47, 508.876, 4.612935, 0, 0, 279002);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (279001, 1, 1, 233, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'grand mason marblesten - start work');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (279002, 0, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'grand mason marblesten - stop work');
 
 
 -- End of migration.
