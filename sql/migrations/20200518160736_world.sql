@@ -16,11 +16,11 @@ UPDATE `creature_equip_template` SET `equipentry1` = 2827 WHERE `entry` = 1355;
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 1355;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (1355, 1, -5666.22, -1565.44, 383.204, 2.32129, 10000, 0, 0),
-(1355, 2, -5666.22, -1565.44, 383.204, 2.32129, 500, 0, 1356),
-(1355, 3, -5664.8657, -1566.5822, 383.2028, 5.8637, 7000, 0, 1355);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1355, 3, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'cook ghilm - point');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1355, 4, 19, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'cook ghilm - set default equip');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1356, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 2196, 0, 0, 0, 0, 0, 0, 0, 0, 'cook ghilm - equip meat leg');
+(1355, 2, -5666.22, -1565.44, 383.204, 2.32129, 500, 0, 135502),
+(1355, 3, -5664.8657, -1566.5822, 383.2028, 5.8637, 7000, 0, 135501);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (135501, 3, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'cook ghilm - point');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (135501, 4, 19, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'cook ghilm - set default equip');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (135502, 0, 19, 0, 0, 0, 0, 0, 0, 0, 0, 2196, 0, 0, 0, 0, 0, 0, 0, 0, 'cook ghilm - equip meat leg');
 
 -- pathing for frast dokner
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 1698;
@@ -32,14 +32,14 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- pathing and scripts for kazan mogosh
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 1237;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(1237, 1, -5671.19, -1577.15, 383.329, 3.4383, 40000, 0, 1238),
-(1237, 2, -5671.19, -1577.15, 383.329, 3.4383, 0, 0, 1238),
+(1237, 1, -5671.19, -1577.15, 383.329, 3.4383, 40000, 0, 123702),
+(1237, 2, -5671.19, -1577.15, 383.329, 3.4383, 0, 0, 123702),
 (1237, 3, -5668.92, -1574.36, 383.204, 100, 0, 0, 0),
 (1237, 4, -5668.73, -1571.90, 383.204, 100, 0, 0, 0),
-(1237, 5, -5665.08, -1567.92, 383.204, 0.753848, 50000, 0, 1237),
-(1237, 6, -5665.08, -1567.92, 383.204, 0.753848, 0, 0, 1237);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1237, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'kazan mogosh - run');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1238, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'kazan mogosh - walk');
+(1237, 5, -5665.08, -1567.92, 383.204, 0.753848, 50000, 0, 123701),
+(1237, 6, -5665.08, -1567.92, 383.204, 0.753848, 0, 0, 123701);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (123701, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'kazan mogosh - run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (123702, 0, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'kazan mogosh - walk');
 
 -- pathing and scripts for miner grumnal
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 1360;
@@ -47,11 +47,11 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (1360, 1, -5685.68, -1596.67, 383.204, 4.08407, 420000, 0, 0),
 (1360, 2, -5683.20, -1593.97, 383.204, 100, 0, 0, 0),
 (1360, 3, -5676.94, -1580.58, 383.204, 100, 0, 0, 0),
-(1360, 4, -5674.35, -1576.85, 383.204, 0.64881, 6000, 0, 1360),
+(1360, 4, -5674.35, -1576.85, 383.204, 0.64881, 6000, 0, 136001),
 (1360, 5, -5676.28, -1574.44, 383.204, 1.47946, 30000, 0, 0),
 (1360, 6, -5674.35, -1576.85, 383.204, 100, 0, 0, 0),
 (1360, 7, -5685.48, -1592.99, 383.204, 100, 0, 0, 0);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1360, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 124, 0, 0, 0, 0, 0, 0, 0, 0, 'miner grumnal - speak');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (136001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 124, 0, 0, 0, 0, 0, 0, 0, 0, 'miner grumnal - speak');
 
 
 -- End of migration.
