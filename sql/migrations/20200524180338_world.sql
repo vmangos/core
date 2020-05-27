@@ -47,7 +47,7 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (504303, 7, -8781.85, 835.478, 94.9935, 100, 0, 0, 0);
 
 -- add event
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (5043, 5043, 0, 1, 0, 100, 1, 1800000, 1800000, 1800000, 1800000, 504301, 0, 0, 'start - stockade jailbreak');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (504301, 5043, 0, 1, 0, 100, 1, 1800000, 1800000, 1800000, 1800000, 504301, 0, 0, 'start - stockade jailbreak');
 
 -- add event scripts
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (504301, 0, 10, 5043, 15000, 0, 0, 0, 0, 0, 0, 1, 504301, 6, 6, -8716.43, 884.722, 76.3504, 3.84802, 0, 'jailbreak - summon middle lane 1');
