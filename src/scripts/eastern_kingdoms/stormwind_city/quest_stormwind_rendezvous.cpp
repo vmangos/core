@@ -30,7 +30,7 @@ void npc_reginald_windsorAI::ResetCreature()
     m_bRoweKnows = false;
     m_squireRoweGuid.Clear();
 
-    m_uiDespawnTimer = 5 * MINUTE*IN_MILLISECONDS;
+    m_uiDespawnTimer = 5 * MINUTE * IN_MILLISECONDS;
     Timer = 3000;
     Tick = 0;
     IDSpeech = 0;
@@ -179,7 +179,6 @@ void npc_reginald_windsorAI::UpdateAI_corpse(uint32 const uiDiff)
         if (FinalTimer < uiDiff)
         {
             PokeRowe();
-            m_creature->ForcedDespawn(7 * MINUTE * IN_MILLISECONDS);
             TheEnd = false;
         }
     }
@@ -928,7 +927,6 @@ void npc_squire_roweAI::UpdateAI(uint32 const uiDiff)
                     pWindsor->SetWalk(false);
                     pWindsor->SetSpeedRate(MOVE_RUN, 1.0f);
                     pWindsor->GetMotionMaster()->MovePoint(0, WindsorWaypoints[0].x, WindsorWaypoints[0].y, WindsorWaypoints[0].z, MOVE_PATHFINDING);
-                    pWindsor->SetRespawnDelay(100000000);
                     pWindsor->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 }
                 ++m_uiStep;
@@ -1043,7 +1041,6 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
         pWindsor->SetWalk(false);
         pWindsor->SetSpeedRate(MOVE_RUN, 1.0f);
         pWindsor->GetMotionMaster()->MovePoint(0, WindsorWaypoints[0].x, WindsorWaypoints[0].y, WindsorWaypoints[0].z, MOVE_PATHFINDING);
-        pWindsor->SetRespawnDelay(100000000);
         pWindsor->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
         globalWindsorLastSpawnTime = sWorld.GetGameTime();
