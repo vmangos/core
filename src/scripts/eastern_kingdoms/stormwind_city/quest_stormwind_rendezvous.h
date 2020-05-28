@@ -16,13 +16,13 @@ struct Coords
     float x, y, z, o;
 };
 
-static Coords RoweDeplacement[] =
+static Coords RoweWaypoints[] =
 {
     { -9058.07f, 441.32f, 93.06f, 3.84f },
     { -9084.88f, 419.23f, 92.42f, 3.83f }
 };
 
-static Coords WindsorDeplacement[] =
+static Coords WindsorWaypoints[] =
 {
     { -9050.406250f, 443.974792f, 93.056458f, 0.659825f },
     { -8968.008789f, 509.771759f, 96.350754f, 0.679460f },
@@ -94,6 +94,7 @@ enum
     NPC_MERCUTIO                    = 12581,
     NPC_MARCUS_JONATHAN             = 466,
     NPC_STORMWIND_ROYAL_GUARD       = 1756,
+    NPC_LADY_ONYXIA                 = 12756,
 
     GOSSIP_ROWE_COMPLETED           = 9066,
     GOSSIP_ROWE_READY               = 9065,
@@ -106,7 +107,6 @@ enum
     SPELL_INVISIBILITY              = 23452,
     SPELL_WINDSOR_DEATH             = 20465,
     SPELL_WINSOR_READ_TABLETS       = 20358,
-    SPELL_ONYXIA_TRANS              = 17136,
     SPELL_PRESTOR_DESPAWNS          = 20466,
     SPELL_WINDSOR_DISMISS_HORSE     = 20000,
 };
@@ -118,13 +118,15 @@ struct npc_reginald_windsorAI : ScriptedAI
     uint32 Timer;
     uint32 Tick;
     uint32 IDSpeech;
-    uint64 GardesGUIDs[30];
+    uint64 GuardsGUIDs[30];
     uint64 DragsGUIDs[10];
     uint64 playerGUID;
     bool Begin;
+    bool SummonHorse;
+    bool ShooHorse;
     bool BeginQuest;
     bool NeedCheck;
-    bool GardeNeed[6];
+    bool GuardNeed[6];
     bool PhaseFinale;
     bool TheEnd;
     bool CombatJustEnded;
@@ -132,7 +134,7 @@ struct npc_reginald_windsorAI : ScriptedAI
     bool QuestAccepted;
     bool m_bRoweKnows;
     uint32 FinalTimer;
-    uint32 GardeTimer[6];
+    uint32 GuardTimer[6];
     uint32 m_uiDespawnTimer;
     ObjectGuid m_squireRoweGuid;
 
@@ -144,7 +146,7 @@ struct npc_reginald_windsorAI : ScriptedAI
     void JustDied(Unit* pKiller) override;
     void PokeRowe();
     void DoTalk(Unit* pWho, bool yell, Unit* pTarget = nullptr);
-    void SituationFinale();
+    void EndScene();
     void UpdateAI_corpse(uint32 const uiDiff) override;
     void MoveInLineOfSight(Unit* Victim) override;
     void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry) override;
