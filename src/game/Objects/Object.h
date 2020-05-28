@@ -307,6 +307,7 @@ class Object
     public:
         virtual ~Object();
 
+        void SetIsNewObject(bool state) { m_isNewObject = state; }
         bool const& IsInWorld() const { return m_inWorld; }
         virtual void AddToWorld()
         {
@@ -620,6 +621,7 @@ class Object
 
     private:
         bool m_inWorld;
+        bool m_isNewObject;
 
         PackedGuid m_PackGUID;
 

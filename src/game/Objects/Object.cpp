@@ -188,6 +188,7 @@ Object::Object() : m_updateFlag(0)
     m_valuesCount       = 0;
 
     m_inWorld           = false;
+    m_isNewObject       = false;
     m_objectUpdated     = false;
     _deleted            = false;
     _delayedActions     = 0;
@@ -275,54 +276,22 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData* data, Player* target) c
     if (!target)
         return;
 
-    uint8  updatetype   = UPDATETYPE_CREATE_OBJECT;
+    uint8 updatetype   = UPDATETYPE_CREATE_OBJECT;
     uint8 updateFlags  = m_updateFlag;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (target == this)                                     // building packet for yourself
         updateFlags |= UPDATEFLAG_SELF;
 
-    if (updateFlags & UPDATEFLAG_HAS_POSITION)
-    {
-        // UPDATETYPE_CREATE_OBJECT2 dynamic objects, corpses...
-        if (isType(TYPEMASK_DYNAMICOBJECT) || isType(TYPEMASK_CORPSE) || isType(TYPEMASK_PLAYER))
-            updatetype = UPDATETYPE_CREATE_OBJECT2;
-
-        // UPDATETYPE_CREATE_OBJECT2 for pets...
-        if (target->GetPetGuid() == GetObjectGuid())
-            updatetype = UPDATETYPE_CREATE_OBJECT2;
-
-        // UPDATETYPE_CREATE_OBJECT2 for some gameobject types...
-        if (isType(TYPEMASK_GAMEOBJECT))
-        {
-            GameObject* go = (GameObject*)this;
-            switch (go->GetGoType())
-            {
-                case GAMEOBJECT_TYPE_BUTTON:
-                {
-                    LockEntry const* lock = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
-                    if (!lock || lock->Index[1] != LOCKTYPE_SLOW_OPEN ||
-                            (go->isSpawned() && !go->GetRespawnDelay()))
-                        break;
-                }
-                case GAMEOBJECT_TYPE_TRAP:
-                case GAMEOBJECT_TYPE_DUEL_ARBITER:
-                case GAMEOBJECT_TYPE_FLAGSTAND:
-                case GAMEOBJECT_TYPE_FLAGDROP:
-                    updatetype = UPDATETYPE_CREATE_OBJECT2;
-                    break;
-                case GAMEOBJECT_TYPE_TRANSPORT:
-                    updateFlags |= UPDATEFLAG_TRANSPORT;
-                    break;
-            }
-        }
-    }
+    if (m_isNewObject)
+        updatetype = UPDATETYPE_CREATE_OBJECT2;
 #else
     if (target->GetMover() == this)
         updateFlags |= UPDATEFLAG_SELF;
-    else if (isType(TYPEMASK_GAMEOBJECT) && ((GameObject*)this)->GetGoType() == GAMEOBJECT_TYPE_TRANSPORT)
-        updateFlags |= UPDATEFLAG_TRANSPORT;
 #endif
+
+    if (isType(TYPEMASK_GAMEOBJECT) && ((GameObject*)this)->GetGoType() == GAMEOBJECT_TYPE_TRANSPORT)
+        updateFlags |= UPDATEFLAG_TRANSPORT;
 
     //DEBUG_LOG("BuildCreateUpdate: update-type: %u, object-type: %u got updateFlags: %X", updatetype, m_objectTypeId, updateFlags);
 
