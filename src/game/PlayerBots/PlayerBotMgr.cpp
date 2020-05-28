@@ -950,15 +950,15 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     uint32 duration = 0;
     if (char* arg1 = ExtractArg(&args))
     {
-        if (!(all = (strcmp(arg1, "all") == 0)));
+        if (!(all = (strcmp(arg1, "all") == 0)) && pause)
             duration = atoi(arg1);
 
         if (char* arg2 = ExtractArg(&args))
         {
-            if (!duration)
+            if (!duration && pause)
                 duration = atoi(arg2);
             else if (!all)
-                strcmp(arg1, "all") == 0;
+                all = strcmp(arg2, "all") == 0;
         }
     }
 

@@ -67,7 +67,6 @@ public:
     void UpdateInCombatAI_Druid() final;
     void UpdateOutOfCombatAI_Druid() final;
 
-    bool m_paused = false;
     std::vector<LootResponseData> m_lootResponses;
     ShortTimeTracker m_updateTimer;
     ObjectGuid m_leaderGuid;
