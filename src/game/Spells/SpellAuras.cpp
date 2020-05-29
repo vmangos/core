@@ -4162,7 +4162,7 @@ void Aura::HandlePeriodicHeal(bool apply, bool /*Real*/)
         //   amount of bonus healing you have during the duration of the periodic
         //   spell will have no impact on how much it heals for.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-        m_modifier.m_amount = caster->SpellHealingBonusDone(target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+        m_modifier.m_amount = caster->SpellHealingBonusDone(target, GetSpellProto(), GetEffIndex(), m_modifier.m_amount, DOT, GetStackAmount());
 #endif
     }
 }
@@ -4225,12 +4225,12 @@ uint32 Aura::CalculateDotDamage() const
     {
         // SpellDamageBonusDone for magic spells
         if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
-            damage = caster->SpellDamageBonusDone(target, GetSpellProto(), damage, DOT, GetStackAmount());
+            damage = caster->SpellDamageBonusDone(target, GetSpellProto(), GetEffIndex(), damage, DOT, GetStackAmount());
         // MeleeDamagebonusDone for weapon based spells
         else
         {
             WeaponAttackType attackType = GetSpellProto()->GetWeaponAttackType();
-            damage = caster->MeleeDamageBonusDone(target, damage, attackType, GetSpellProto(), DOT, GetStackAmount());
+            damage = caster->MeleeDamageBonusDone(target, damage, attackType, GetSpellProto(), GetEffIndex(), DOT, GetStackAmount());
         }
     }
 
@@ -4290,7 +4290,7 @@ void Aura::HandlePeriodicLeech(bool apply, bool /*Real*/)
         if (!caster)
             return;
 
-        m_modifier.m_amount = caster->SpellDamageBonusDone(GetTarget(), GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+        m_modifier.m_amount = caster->SpellDamageBonusDone(GetTarget(), GetSpellProto(), GetEffIndex(), m_modifier.m_amount, DOT, GetStackAmount());
     }
 }
 
@@ -4316,7 +4316,7 @@ void Aura::HandlePeriodicHealthFunnel(bool apply, bool /*Real*/)
         if (!caster)
             return;
 
-        m_modifier.m_amount = caster->SpellDamageBonusDone(GetTarget(), GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+        m_modifier.m_amount = caster->SpellDamageBonusDone(GetTarget(), GetSpellProto(), GetEffIndex(), m_modifier.m_amount, DOT, GetStackAmount());
     }
 }
 
@@ -5620,16 +5620,16 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             // Consecration: recalculate the damage on each tick
             if (spellProto->IsFitToFamily<SPELLFAMILY_PALADIN, CF_PALADIN_CONSECRATION>())
-                pdamage = pCaster->SpellDamageBonusDone(target, GetSpellProto(), m_currentBasePoints, DOT, GetStackAmount());
+                pdamage = pCaster->SpellDamageBonusDone(target, GetSpellProto(), GetEffIndex(), m_currentBasePoints, DOT, GetStackAmount());
 
             // SpellDamageBonus for magic spells
             if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
-                pdamage = target->SpellDamageBonusTaken(pCaster, spellProto, pdamage, DOT, GetStackAmount());
+                pdamage = target->SpellDamageBonusTaken(pCaster, spellProto, GetEffIndex(), pdamage, DOT, GetStackAmount());
             // MeleeDamagebonus for weapon based spells
             else
             {
                 WeaponAttackType attackType = spellProto->GetWeaponAttackType();
-                pdamage = target->MeleeDamageBonusTaken(pCaster, pdamage, attackType, spellProto, DOT, GetStackAmount());
+                pdamage = target->MeleeDamageBonusTaken(pCaster, pdamage, attackType, spellProto, GetEffIndex(), DOT, GetStackAmount());
             }
 
             // Calculate armor mitigation if it is a physical spell
@@ -5740,7 +5740,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 pdamage = pdamageReductedArmor;
             }
 
-            pdamage = target->SpellDamageBonusTaken(pCaster, spellProto, pdamage, DOT, GetStackAmount());
+            pdamage = target->SpellDamageBonusTaken(pCaster, spellProto, GetEffIndex(), pdamage, DOT, GetStackAmount());
 
             target->CalculateDamageAbsorbAndResist(pCaster, spellProto->GetSpellSchoolMask(), DOT, pdamage, &absorb, &resist, spellProto);
 
@@ -5829,7 +5829,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             uint32 amount;
             if (aura_type == SPELL_AURA_PERIODIC_HEAL)
             {
-                int32 const intAmount = pCaster->SpellHealingBonusDone(target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+                int32 const intAmount = pCaster->SpellHealingBonusDone(target, GetSpellProto(), GetEffIndex(), m_modifier.m_amount, DOT, GetStackAmount());
                 amount = intAmount > 0 ? intAmount : 0;
             }
             else
@@ -5843,7 +5843,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             else
                 pdamage = amount;
 
-            pdamage = target->SpellHealingBonusTaken(pCaster, spellProto, pdamage, DOT, GetStackAmount());
+            pdamage = target->SpellHealingBonusTaken(pCaster, spellProto, GetEffIndex(), pdamage, DOT, GetStackAmount());
 
             DETAIL_FILTER_LOG(LOG_FILTER_PERIODIC_AFFECTS, "PeriodicTick: %s heal of %s for %u health inflicted by %u",
                               GetCasterGuid().GetString().c_str(), target->GetGuidStr().c_str(), pdamage, GetId());
@@ -6092,7 +6092,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             SpellNonMeleeDamage damageInfo(pCaster, target, spellProto->Id, SpellSchools(spellProto->School));
             damageInfo.periodicLog = true;
 
-            pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto);
+            pCaster->CalculateSpellDamage(&damageInfo, gain, spellProto, GetEffIndex());
 
             damageInfo.target->CalculateAbsorbResistBlock(pCaster, &damageInfo, spellProto);
 
@@ -7283,72 +7283,402 @@ void SpellAuraHolder::CalculateForDebuffLimit()
     m_debuffLimitAffected = true;
     m_debuffLimitScore = 0;
 
-    // First, some exceptions
-    switch (m_spellProto->SpellFamilyName)
+    // Gouge - Category 1
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_GOUGE>())
     {
-        case SPELLFAMILY_GENERIC:
-        {
-            switch (m_spellProto->Id)
-            {
-                // Hakkar's Blood Siphon
-                case 24323:
-                case 24322:
-                case 28732: // Faerlina Widow's Embrace
-                case 25181: // Ossirian Arcane Weakness
-                case 25177: // Ossirian Fire Weakness
-                case 25178: // Ossirian Frost Weakness
-                case 25180: // Ossirian Nature Weakness
-                case 25183: // Ossirian Shadow Weakness
-                    m_debuffLimitScore = 4;
-                    return;
-            }
-        }
-        case SPELLFAMILY_PALADIN:
-        {
-            switch (m_spellProto->Id)
-            {
-                // Judgement of Wisdom (3 ranks)
-                case 20186:
-                case 20354:
-                case 20355:
-                // Judgement of Light
-                case 20185: // r1
-                case 20344: // r2
-                case 20345: // r3
-                case 20346: // r4
-                    m_debuffLimitScore = 3;
-                    return;
-                // Judgement of the Crusader (6 ranks)
-                case 21183:
-                case 20188:
-                case 20300:
-                case 20301:
-                case 20302:
-                case 20303:
-                    m_debuffLimitScore = 2;
-                    return;
-            }
-        }
-        case SPELLFAMILY_MAGE:
-        {
-            switch (m_spellProto->Id)
-            {
-                // Ignite talent trigger
-                case 12654:
-                    m_debuffLimitScore = 2;
-                    return;
-            }
-        }
-    }
-
-    // Fireball
-    if (m_spellProto->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_FIREBALL, CF_MAGE_CONJURE>())
-    {
-        m_debuffLimitScore = 0;
+        m_debuffLimitScore = 1;
         return;
     }
 
-    // Gestion des priorites par type d'aura
+    // Garrote - Category 2
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_GARROTE>())
+    {
+        m_debuffLimitScore = 2;
+        return;
+    }
+
+    // Rupture - Category 2
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_RUPTURE>())
+    {
+        m_debuffLimitScore = 2;
+        return;
+    }
+
+    // Rend - Category 2
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_REND>())
+    {
+        m_debuffLimitScore = 2;
+        return;
+    }
+
+    // Rake - Category 2
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_RAKE_CLAW>())
+    {
+        m_debuffLimitScore = 2;
+        return;
+    }
+
+    // Rip - Category 2
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_RIP_BITE>())
+    {
+        m_debuffLimitScore = 2;
+        return;
+    }
+
+    // Hamstring - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_HAMSTRING>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Kidney Shot - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_KIDNEY_SHOT>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Bash - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_BASH>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Expose Armor - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_EXPOSE_ARMOR>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Sunder Armor - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_SUNDER_ARMOR>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Thunder Clap - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_THUNDER_CLAP>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Hemorrhage - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_HEMORRHAGE>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Mocking Blow - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_MOCKING_BLOW>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Mortal Strike - Category 3
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_MORTAL_STRIKE>())
+    {
+        m_debuffLimitScore = 3;
+        return;
+    }
+
+    // Demoralizing Shout - Category 4
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_DEMORALIZING_SHOUT>())
+    {
+        m_debuffLimitScore = 4;
+        return;
+    }
+
+    // Demoralizing Roar - Category 4
+    if (m_spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_DEMORALIZING_ROAR>())
+    {
+        m_debuffLimitScore = 4;
+        return;
+    }
+
+    uint32 const firstRank = sSpellMgr.GetFirstSpellInChain(m_spellProto->Id);
+    switch (firstRank)
+    {
+        // Category 0 below
+        case 1604: // Dazed
+        case 2094: // Blind
+        case 3409: // Crippling Poison (Rank 1)
+        case 11201: // Crippling Poison (Rank 2)
+        case 3600: // Earthbind
+        case 4066: // Small Bronze Bomb
+        case 4067: // Big Bronze Bomb
+        case 4069: // Big Iron Bomb
+        case 4507: // Target Dummy Spawn Effect
+        case 5246: // Intimidating Shout
+        case 5530: // Mace Stun Effect
+        case 6358: // Seduction
+        case 6788: // Weakened Soul
+        case 9672: // Frostbolt (npc spell)
+        case 339: // Entangling Roots
+        case 2908: // Soothe Animal
+        case 8056: // Frost Shock
+        case 8122: // Psychic Scream
+        case 605: // Mind Control
+        case 6770: // Sap (Rank 1)
+        case 2070: // Sap (Rank 2)
+        case 11297: // Sap (rank 3)
+        case 18202: // Rend (item spell)
+        case 18075: // Rend (item spell)
+        case 17511: // Poison
+        case 17504: // Rend (item spell)
+        case 17484: // Skullforge Brand
+        case 17483: // Shadow Bolt (item spell)
+        case 17407: // Wound
+        case 17196: // Seeping Willow
+        case 16406: // Rend (item spell)
+        case 14914: // Holy Fire
+        case 21162: // Fireball (item spell)
+        case 13752: // Faerie Fire (item spell)
+        case 12328: // Death Wish
+        case 13526: // Corrosive Poison
+        case 13318: // Rend (item spell)
+        case 11366: // Pyroblast
+        case 133: // Fireball
+        case 12721: // Deep Wound
+        case 24388: // Brain Damage
+        case 21159: // Fireball (item spell)
+        case 21151: // Gutgore Ripper
+        case 12421: // Mithril Frag Bomb
+        case 12562: // The Big One
+        case 118: // Polymorph
+        case 13237: // Goblin Mortar
+        case 13327: // Reckless Charge
+        case 13747: // Slow
+        case 13808: // M73 Frag Grenade
+        case 14251: // Riposte
+        case 3355: // Freezing Trap Effect (Rank 1)
+        case 14308: // Freezing Trap Effect (Rank 2)
+        case 14309: // Freezing Trap Effect (Rank 3)
+        case 15235: // Crystal Yield
+        case 15487: // Silence
+        case 8034: // Frost Brand Attack
+        case 16454: // Searing Blast
+        case 17153: // Rend (item spell)
+        case 5484: // Howl of Terror
+        case 18093: // Pyroclasm
+        case 18118: // Aftermath
+        case 18223: // Curse of Exhaustion
+        case 710: // Banish
+        case 18798: // Freeze
+        case 19229: // Improved Wing Clip
+        case 19410: // Improved Concussive Shot
+        case 19755: // Frightalon
+        case 19784: // Dark Iron Bomb
+        case 19872: // Calm Dragonkin
+        case 19970: // Entangling Roots
+        case 20066: // Repentance
+        case 20586: // Windreaper
+        case 24375: // War Stomp
+        case 24394: // Intimidation
+            m_debuffLimitScore = 0;
+            return;
+        // Category 1 below
+        case 1833: // Cheap Shot
+        case 5917: // Fumble
+        case 7922: // Charge Stun
+        case 9658: // Flame Buffet
+        case 10578: // Fireball (item spell)
+        case 2096: // Mind Vision
+        case 453: // Mind Soothe
+        case 1714: // Curse of Tongues
+        case 11103: // Impact (Rank 1)
+        case 12357: // Impact (Rank 2)
+        case 12358: // Impact (Rank 3)
+        case 12359: // Impact (Rank 4)
+        case 12360: // Impact (Rank 5)
+        case 11113: // Blast Wave
+        case 2974: // Wing Clip
+        case 3043: // Scorpid Sting
+        case 16413: // Fireball (item spell)
+        case 16415: // Fireball (item spell)
+        case 17330: // Poison
+        case 17506: // Soul Breaker
+        case 17639: // Wail of the Banshee
+        case 18289: // Creeping Mold
+        case 18425: // Kick - Silenced
+        case 18469: // Counterspell - Silenced
+        case 18498: // Shield Bash - Silenced
+        case 19821: // Arcane Bomb
+        case 20184: // Judgement of Justice
+        case 20511: // Intimidating Shout
+        case 22639: // Eskhandar's Rake
+        case 23023: // Conflagration
+        case 28272: // Polymorph Pig
+            m_debuffLimitScore = 1;
+            return;
+        // Category 2 below
+        case 12579: // Winter's Chill
+        case 67: // Vindication (Rank 1)
+        case 26017: // Vindication (Rank 2)
+        case 26018: // Vindication (Rank 3)
+        case 23605: // Spell Vulnerability
+        case 702: // Curse of Weakness
+        case 11374: // Gift of Arthas
+        case 8921: // Moonfire
+        case 18265: // Siphon Life
+        case 980: // Curse of Agony
+        case 13797: // Immolation Trap Effect
+        case 1978: // Serpent Sting
+        case 21992: // Thunderfury
+        case 2818: // Deadly Poison
+        case 348: // Immolate
+        case 23577: // Expose Weakness
+        case 17315: // Puncture Armor
+        case 16928: // Armor Shatter
+        case 17877: // Shadowburn
+        case 23415: // Improved Blessing of Protection
+        case 9035: // Hex of Weakness
+        case 2944: // Devouring Plague
+        case 24640: // Scorpid Poison (Rank 1)
+        case 24583: // Scorpid Poison (Rank 2)
+        case 24586: // Scorpid Poison (Rank 3)
+        case 24587: // Scorpid Poison (Rank 4)
+        case 12766: // Poison Cloud
+        case 2943: // Touch of Weakness (Rank 1)
+        case 19249: // Touch of Weakness (Rank 2)
+        case 19251: // Touch of Weakness (Rank 3)
+        case 19252: // Touch of Weakness (Rank 4)
+        case 19253: // Touch of Weakness (Rank 5)
+        case 19254: // Touch of Weakness (Rank 6)
+        case 8050: // Flame Shock
+        case 172: // Corruption
+        case 16528: // Numbing Pain
+        case 15258: // Shadow Vulnerability
+        case 13003: // Shrink Ray
+        case 589: // Shadow Word: Pain
+        case 12654: // Ignite
+            m_debuffLimitScore = 2;
+            return;
+        // Category 3 below
+        case 355: // Taunt
+        case 603: // Curse of Doom
+        case 676: // Disarm
+        case 1161: // Challenging Shout
+        case 1543: // Flare
+        case 2855: // Detect Magic
+        case 4068: // Iron Grenade
+        case 5116: // Concussive Shot
+        case 5209: // Challenging Roar
+        case 5782: // Fear
+        case 770: // Faerie Fire
+        case 16857: // Faerie Fire (Feral)
+        case 120: // Cone of Cold
+        case 10: // Blizzard
+        case 2120: // Flamestrike
+        case 122: // Frost Nova
+        case 853: // Hammer of Justice
+        case 5760: // Mind-numbing Poison
+        case 8692: // Mind-numbing Poison II
+        case 11398: // Mind-numbing Poison III
+        case 1120: // Drain Soul
+        case 5740: // Rain of Fire
+        case 689: // Drain Life
+        case 5138: // Drain Mana
+        case 704: // Curse of Reclessness
+        case 1490: // Curse of the Elements
+        case 12323: // Piercing Howl
+        case 11071: // Forstbite (Rank 1)
+        case 12496: // Frostbite (Rank 2)
+        case 12497: // Frostbite (Rank 3)
+        case 12543: // Hi-Explosive Bomb
+        case 12798: // Revenge
+        case 12809: // Concussion Blow
+        case 13218: // Wound Poison
+        case 13810: // Frost Trap Aura
+        case 3034: // Viper Sting
+        case 1510: // Volley
+        case 13812: // Explosive Trap Effect
+        case 1130: // Hunter's Mark
+        case 15286: // Vampiric Embrace
+        case 15268: // Blackout (Rank 1)
+        case 15323: // Blackout (Rank 2)
+        case 15324: // Blackout (Rank 3)
+        case 15325: // Blackout (Rank 4)
+        case 15326: // Blackout (Rank 5)
+        case 15407: // Mind Flay
+        case 16922: // Starfire Stun
+        case 17364: // Stormstrike
+        case 16914: // Hurricane
+        case 17794: // Shadow Vulnerability (Rank 1)
+        case 17798: // Shadow Vulnerability (Rank 2)
+        case 17797: // Shadow Vulnerability (Rank 3)
+        case 17799: // Shadow Vulnerability (Rank 4)
+        case 17800: // Shadow Vulnerability (Rank 5)
+        case 6789: // Death Coil
+        case 17862: // Curse of Shadow
+        case 18656: // Corruption (item spell)
+        case 2637: // Hibernate
+        case 19185: // Entrapment
+        case 10797: // Starshards
+        case 19503: // Scatter Shot
+        case 19675: // Feral Charge Effect
+        case 19769: // Thorium Grenade
+        case 20006: // Unholy Curse
+        case 21183: // Judgement of the Crusader (Rank 1)
+        case 20188: // Judgement of the Crusader (Rank 2)
+        case 20300: // Judgement of the Crusader (Rank 3)
+        case 20301: // Judgement of the Crusader (Rank 4)
+        case 20302: // Judgement of the Crusader (Rank 5)
+        case 20303: // Judgement of the Crusader (Rank 6)
+        case 20185: // Judgement of Light (Rank 1)
+        case 20344: // Judgement of Light (Rank 2)
+        case 20345: // Judgement of Light (Rank 3)
+        case 20346: // Judgement of Light (Rank 4)
+        case 20186: // Judgement of Wisdom (Rank 1)
+        case 20354: // Judgement of Wisdom (Rank 2)
+        case 20355: // Judgement of Wisdom (Rank 3)
+        case 20549: // War Stomp
+        case 20253: // Intercept Stun (Rank 1)
+        case 20614: // Intercept Stun (Rank 2)
+        case 20615: // Intercept Stun (Rank 3)
+        case 20116: // Consecration (-1.8)
+        case 26573: // Consecration (1.9+)
+        case 21152: // Earthshaker
+        case 22959: // Fire Vulnerability
+        case 23454: // Stun
+        case 23694: // Improved Hamstring
+        case 24423: // Screech (Rank 1)
+        case 24577: // Screech (Rank 2)
+        case 24578: // Screech (Rank 3)
+        case 24579: // Screech (Rank 4)
+        case 5570: // Insect Swarm
+        case 116: // Frostbolt
+        case 25999: // Boar Charge
+            m_debuffLimitScore = 3;
+            return;
+        // Category 4 below
+        case 6136: // Chilled
+        case 6795: // Growl
+        case 17331: // Fang of the Crystal Spider
+        case 27648: // Thunderfury
+        case 24323: // Hakkar's Blood Siphon
+        case 24322: // Hakkar's Blood Siphon
+        case 28732: // Faerlina Widow's Embrace
+        case 25181: // Ossirian Arcane Weakness
+        case 25177: // Ossirian Fire Weakness
+        case 25178: // Ossirian Frost Weakness
+        case 25180: // Ossirian Nature Weakness
+        case 25183: // Ossirian Shadow Weakness
+        // Possibly an even higher category
+        case 7321: // Chilled
+        case 16597: // Curse of Shahram
+        case 20005: // Chilled
+            m_debuffLimitScore = 4;
+            return;
+    }
+
+    // Determine based on aura type
     for (uint32 i : m_spellProto->EffectApplyAuraName)
     {
         if (!i)

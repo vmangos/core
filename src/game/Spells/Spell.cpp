@@ -1332,7 +1332,20 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Add bonuses and fill damageInfo struct
         else
         {
-            pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType, this);
+            // we need index of damage dealing effect for CalculateSpellDamage to use right bonus coefficient
+            SpellEffectIndex damageEffectIndex = EFFECT_INDEX_0;
+
+            for (uint8 effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
+            {
+                if ((mask & (1 << effectNumber)) &&
+                    IsDirectDamageWithBonusEffect(m_spellInfo->Effect[effectNumber]))
+                {
+                    damageEffectIndex = SpellEffectIndex(effectNumber);
+                    break;
+                }
+            }
+
+            pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, damageEffectIndex, m_attackType, this);
         }
 
         unitTarget->CalculateAbsorbResistBlock(pCaster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
@@ -1838,26 +1851,35 @@ void Spell::HandleDelayedSpellLaunch(TargetInfo *target)
         unit->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_HITBYSPELL);
     if (missInfo == SPELL_MISS_NONE || (missInfo == SPELL_MISS_REFLECT && target->reflectResult == SPELL_MISS_NONE))
     {
-        for (int32 effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
+        // we need index of damage dealing effect for CalculateSpellDamage to use right bonus coefficient
+        SpellEffectIndex damageEffectIndex = EFFECT_INDEX_0;
+
+        for (uint8 effectNumber = 0; effectNumber < MAX_EFFECT_INDEX; ++effectNumber)
         {
-            if (mask & (1 << effectNumber) && m_spellInfo->IsEffectHandledOnDelayedSpellLaunch(SpellEffectIndex(effectNumber)))
+            if (mask & (1 << effectNumber))
             {
-                HandleEffects(unit, nullptr, nullptr, SpellEffectIndex(effectNumber), m_damageMultipliers[effectNumber]);
-                if (m_applyMultiplierMask & (1 << effectNumber))
+                if (IsDirectDamageWithBonusEffect(m_spellInfo->Effect[effectNumber]))
+                    damageEffectIndex = SpellEffectIndex(effectNumber);
+
+                if (m_spellInfo->IsEffectHandledOnDelayedSpellLaunch(SpellEffectIndex(effectNumber)))
                 {
-                    // Get multiplier
-                    float multiplier = m_spellInfo->DmgMultiplier[effectNumber];
-                    // Apply multiplier mods
-                    if (Unit* pRealUnitCaster = ToUnit(pRealCaster))
-                        if (Player* modOwner = pRealUnitCaster->GetSpellModOwner())
-                            modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, this);
-                    m_damageMultipliers[effectNumber] *= multiplier;
+                    HandleEffects(unit, nullptr, nullptr, SpellEffectIndex(effectNumber), m_damageMultipliers[effectNumber]);
+                    if (m_applyMultiplierMask & (1 << effectNumber))
+                    {
+                        // Get multiplier
+                        float multiplier = m_spellInfo->DmgMultiplier[effectNumber];
+                        // Apply multiplier mods
+                        if (Unit* pRealUnitCaster = ToUnit(pRealCaster))
+                            if (Player* modOwner = pRealUnitCaster->GetSpellModOwner())
+                                modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, this);
+                        m_damageMultipliers[effectNumber] *= multiplier;
+                    }
                 }
             }
         }
 
         if (m_damage > 0)
-            pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType, this);
+            pCaster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, damageEffectIndex, m_attackType, this);
     }
 
     target->damage = damageInfo.damage;

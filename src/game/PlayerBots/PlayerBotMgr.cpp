@@ -944,6 +944,117 @@ bool ChatHandler::HandlePartyBotSetRoleCommand(char* args)
     return false;
 }
 
+bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
+{
+    bool all = false;
+    uint32 duration = 0;
+    if (char* arg1 = ExtractArg(&args))
+    {
+        if (!(all = (strcmp(arg1, "all") == 0)) && pause)
+            duration = atoi(arg1);
+
+        if (char* arg2 = ExtractArg(&args))
+        {
+            if (!duration && pause)
+                duration = atoi(arg2);
+            else if (!all)
+                all = strcmp(arg2, "all") == 0;
+        }
+    }
+
+    if (pause && !duration)
+        duration = 5 * MINUTE * IN_MILLISECONDS;
+
+    if (all)
+    {
+        Player* pPlayer = GetSession()->GetPlayer();
+        Group* pGroup = pPlayer->GetGroup();
+        if (!pGroup)
+        {
+            SendSysMessage("You are not in a group.");
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        bool success = false;
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* pMember = itr->getSource())
+            {
+                if (pMember == pPlayer)
+                    continue;
+
+                if (HandlePartyBotPauseApplyHelper(pMember, pause, duration))
+                    success = true;
+            }
+        }
+
+        if (success)
+        {
+            if (pause)
+                PSendSysMessage("All party bots paused for %u seconds.", (duration / IN_MILLISECONDS));
+            else
+                SendSysMessage("All party bots unpaused.");
+        }
+        else
+            SendSysMessage("No party bots in group.");
+    }
+    else
+    {
+        Player* pTarget = GetSelectedPlayer();
+        if (!pTarget)
+        {
+            SendSysMessage(LANG_NO_CHAR_SELECTED);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (HandlePartyBotPauseApplyHelper(pTarget, pause, duration))
+        {
+            if (pause)
+                PSendSysMessage("%s paused for %u seconds.", pTarget->GetName(), (duration / IN_MILLISECONDS));
+            else
+                PSendSysMessage("%s unpaused.", pTarget->GetName());
+        }
+            
+        else
+            SendSysMessage("Target is not a party bot.");
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandlePartyBotPauseApplyHelper(Player* pTarget, bool pause, uint32 duration)
+{
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            pAI->m_updateTimer.Reset(duration);
+
+            if (pause)
+            {
+                pTarget->StopMoving();
+                pTarget->GetMotionMaster()->MoveIdle();
+            }
+            
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotPauseCommand(char* args)
+{
+    return HandlePartyBotPauseHelper(args, true);
+}
+
+bool ChatHandler::HandlePartyBotUnpauseCommand(char* args)
+{
+    return HandlePartyBotPauseHelper(args, false);
+}
+
 bool ChatHandler::HandlePartyBotRemoveCommand(char* args)
 {
     Player* pTarget = GetSelectedPlayer();

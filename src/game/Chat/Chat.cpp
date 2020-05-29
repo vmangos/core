@@ -92,6 +92,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { "add",        SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotAddCommand,         "", nullptr },
         { "clone",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotCloneCommand,       "", nullptr },
         { "setrole",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotSetRoleCommand,     "", nullptr },
+        { "pause",      SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotPauseCommand,       "", nullptr },
+        { "unpause",    SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotUnpauseCommand,     "", nullptr },
         { "remove",     SEC_ADMINISTRATOR,      false, &ChatHandler::HandlePartyBotRemoveCommand,      "", nullptr },
         { nullptr,      0,                      false, nullptr,                                        "", nullptr },
     };
@@ -416,8 +418,10 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand instanceCommandTable[] =
     {
         { "continents",     SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleInstanceContinentsCommand,  "", nullptr },
+        { "getdata",        SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceGetDataCommand,     "", nullptr },
         { "listbinds",      SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceListBindsCommand,   "", nullptr },
         { "unbind",         SEC_GAMEMASTER,     false, &ChatHandler::HandleInstanceUnbindCommand,      "", nullptr },
+        { "groupunbind",    SEC_BASIC_ADMIN,    false, &ChatHandler::HandleInstanceGroupUnbindCommand, "", nullptr },
         { "stats",          SEC_BASIC_ADMIN,    true,  &ChatHandler::HandleInstanceStatsCommand,       "", nullptr },
         { "savedata",       SEC_BASIC_ADMIN,    false, &ChatHandler::HandleInstanceSaveDataCommand,    "", nullptr },
         { "switch",         SEC_BASIC_ADMIN,    false, &ChatHandler::HandleInstanceSwitchCommand,      "", nullptr },
@@ -736,7 +740,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { "skinning_loot_template",       SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadLootTemplatesSkinningCommand,   "", nullptr },
         { "spell_affect",                 SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadSpellAffectCommand,             "", nullptr },
         { "spell_area",                   SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadSpellAreaCommand,               "", nullptr },
-        { "spell_bonus_data",             SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadSpellBonusesCommand,            "", nullptr },
         { "spell_chain",                  SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadSpellChainCommand,              "", nullptr },
         { "spell_elixir",                 SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadSpellElixirCommand,             "", nullptr },
         { "spell_learn_spell",            SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadSpellLearnSpellCommand,         "", nullptr },
@@ -859,7 +862,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "log",            SEC_CONSOLE,        true, nullptr,                                         "", serverLogCommandTable },
         { "motd",           SEC_PLAYER,         true,  &ChatHandler::HandleServerMotdCommand,          "", nullptr },
         { "plimit",         SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerPLimitCommand,        "", nullptr },
-        { "resetallraid",   SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerResetAllRaidCommand,  "", nullptr },
+        { "resetallraids",  SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleServerResetAllRaidCommand,  "", nullptr },
         { "restart",        SEC_ADMINISTRATOR,  true, nullptr,                                         "", serverRestartCommandTable },
         { "shutdown",       SEC_ADMINISTRATOR,  true, nullptr,                                         "", serverShutdownCommandTable },
         { "set",            SEC_ADMINISTRATOR,  true, nullptr,                                         "", serverSetCommandTable },

@@ -984,7 +984,6 @@ bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
     HandleReloadSpellElixirCommand((char*)"a");
     HandleReloadSpellLearnSpellCommand((char*)"a");
     HandleReloadSpellProcEventCommand((char*)"a");
-    HandleReloadSpellBonusesCommand((char*)"a");
     HandleReloadSpellProcItemEnchantCommand((char*)"a");
     HandleReloadSpellScriptTargetCommand((char*)"a");
     HandleReloadSpellTargetPositionCommand((char*)"a");
@@ -1358,14 +1357,6 @@ bool ChatHandler::HandleReloadSpellAreaCommand(char* /*args*/)
     sLog.outString("Re-Loading SpellArea Data...");
     sSpellMgr.LoadSpellAreas();
     SendSysMessage("DB table `spell_area` (spell dependences from area/quest/auras state) reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadSpellBonusesCommand(char* /*args*/)
-{
-    sLog.outString("Re-Loading Spell Bonus Data...");
-    sSpellMgr.LoadSpellBonuses();
-    SendSysMessage("DB table `spell_bonus_data` (spell damage/healing coefficients) reloaded.");
     return true;
 }
 

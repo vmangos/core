@@ -24,7 +24,6 @@ EndScriptData */
 /* ContentData
 npc_beaten_corpse
 npc_gilthares
-npc_taskmaster_fizzule
 npc_twiggy_flathead
 at_twiggy_flathead
 npc_wizzlecrank_shredder
@@ -250,97 +249,6 @@ bool QuestAccept_npc_gilthares(Player* pPlayer, Creature* pCreature, Quest const
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
     }
     return true;
-}
-
-/*######
-## npc_taskmaster_fizzule
-######*/
-
-enum
-{
-    FACTION_FRIENDLY_F  = 35,
-    SPELL_FLARE         = 10113,
-    SPELL_FOLLY         = 10137,
-};
-
-struct npc_taskmaster_fizzuleAI : public ScriptedAI
-{
-    npc_taskmaster_fizzuleAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        factionNorm = pCreature->GetFactionTemplateId();
-        Reset();
-    }
-
-    uint32 factionNorm;
-    bool IsFriend;
-    uint32 Reset_Timer;
-    uint8 FlareCount;
-
-    void Reset() override
-    {
-        IsFriend = false;
-        Reset_Timer = 120000;
-        FlareCount = 0;
-        m_creature->SetFactionTemplateId(factionNorm);
-    }
-
-    void DoFriend()
-    {
-        m_creature->RemoveAllAuras();
-        m_creature->DeleteThreatList();
-        m_creature->CombatStop(true);
-
-        m_creature->StopMoving();
-        m_creature->GetMotionMaster()->MoveIdle();
-
-        m_creature->SetFactionTemplateId(FACTION_FRIENDLY_F);
-        m_creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
-    }
-
-    void SpellHit(Unit *caster, SpellEntry const* spell) override
-    {
-        if (spell->Id == SPELL_FLARE || spell->Id == SPELL_FOLLY)
-        {
-            ++FlareCount;
-
-            if (FlareCount >= 2)
-                IsFriend = true;
-        }
-    }
-
-    void UpdateAI(uint32 const diff) override
-    {
-        if (IsFriend)
-        {
-            if (Reset_Timer < diff)
-                EnterEvadeMode();
-            else Reset_Timer -= diff;
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-
-    void ReceiveEmote(Player* pPlayer, uint32 emote) override
-    {
-        if (emote == TEXTEMOTE_SALUTE)
-        {
-            if (FlareCount >= 2)
-            {
-                if (m_creature->GetFactionTemplateId() == FACTION_FRIENDLY_F)
-                    return;
-
-                DoFriend();
-            }
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_taskmaster_fizzule(Creature* pCreature)
-{
-    return new npc_taskmaster_fizzuleAI(pCreature);
 }
 
 /*#####
@@ -1548,15 +1456,9 @@ void AddSC_the_barrens()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "npc_taskmaster_fizzule";
-    newscript->GetAI = &GetAI_npc_taskmaster_fizzule;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "npc_polly";
     newscript->GetAI = &GetAI_npc_polly;
     newscript->RegisterSelf();
-
 
     newscript = new Script;
     newscript->Name = "npc_twiggy_flathead";

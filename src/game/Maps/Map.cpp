@@ -441,7 +441,9 @@ Map::Add(T* obj)
     DEBUG_LOG("%s enters grid[%u,%u]", obj->GetObjectGuid().GetString().c_str(), cell.GridX(), cell.GridY());
 
     obj->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
+    obj->SetIsNewObject(true);
     UpdateObjectVisibility(obj, cell, p);
+    obj->SetIsNewObject(false);
 }
 
 template<>
