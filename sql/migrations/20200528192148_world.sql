@@ -15,7 +15,14 @@ UPDATE `creature_template` SET `faction` = 534 WHERE `entry` = 12581;
 UPDATE `creature_equip_template` SET `equipentry1` = 1899, `equipentry2` = 143 WHERE `entry` = 12739;
 
 -- Fixing broadcast texts
-UPDATE `broadcast_text` SET `emote_id1` = 1 WHERE `entry` = 8090;
+UPDATE `broadcast_text` SET `emote_id1` = 1 WHERE `entry` in (8090, 8107, 8121, 8123, 8125, 8132, 8126, 8126, 8130, 8210, 8212, 8215, 8216, 8218, 8219, 8227, 8235);
+UPDATE `broadcast_text` SET `emote_id1` = 22 WHERE `entry` in (8109, 8127, 8128, 8129);
+UPDATE `broadcast_text` SET `emote_id1` = 35 WHERE `entry` = 8091;
+UPDATE `broadcast_text` SET `emote_id1` = 11 WHERE `entry` = 8214;
+UPDATE `broadcast_text` SET `emote_id1` = 25 WHERE `entry` in (8206, 8207, 8211);
+
+UPDATE `broadcast_text` SET `chat_type` = 6 WHERE `entry` = 8119;
+UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` in (8109, 8129, 8248);
 
 -- End of migration.
 END IF;

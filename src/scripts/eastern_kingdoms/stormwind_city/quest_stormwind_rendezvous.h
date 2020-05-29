@@ -72,11 +72,11 @@ static Coords WindsorEventMove[] =
 
 const Coords WindsorSummon = { -9148.40f, 371.32f, 91.0f, 0.70f };
 
-uint32 WindsorTalk[] =
+uint32 MasqueradeDialogSteps[] =
 {
-    8119, 8121, 8123, 8133, 8125, 8132, 8126, 8134, 8127, 8128,
-    8129, 8130, 8205, 8206, 8207, 8208, 8210, 8212, 8211, 8215,
-    8216, 8218, 8227, 8219, 8235, 8237, 8247, 8249, 8250
+    8091, 8090, 8107, 8109, 8119, 8121, 8123, 8133, 8124, 8125, 8132, 8126, 8134, 8127, 8128, 8129, 8130, 8205, 8206,
+    8207, 8208, 8210, 8212, 8211, 8214, 8215, 8216, 8218, 8226, 8227, 8219, 8228, 8236, 8235, 8237, 8238, 8239, 8247,
+    8246, 8248, 8266, 8249, 8250, 8251
 };
 
 enum
@@ -95,16 +95,15 @@ enum
     NPC_MARCUS_JONATHAN             = 466,
     NPC_STORMWIND_ROYAL_GUARD       = 1756,
     NPC_LADY_ONYXIA                 = 12756,
+    NPC_ROWE                        = 17804,
 
     GOSSIP_ROWE_COMPLETED           = 9066,
     GOSSIP_ROWE_READY               = 9065,
     GOSSIP_ROWE_BUSY                = 9064,
     GOSSIP_ROWE_NOTHING             = 9063,
 
-    SAY_WINDSOR_GREETING            = 8090,
-    EMOTE_TEXT_DIES                 = 8251,
-    EMOTE_TEXT_MEDALLION_SHATTERS   = 8266,
     SAY_SIGNAL_SENT                 = 14389,
+    SAY_HISS                        = 8245,
 
     MOUNT_WINDSOR                   = 2410,
 
@@ -112,8 +111,7 @@ enum
     SPELL_INVISIBILITY              = 23452,
     SPELL_WINDSOR_DEATH             = 20465,
     SPELL_WINSOR_READ_TABLETS       = 20358,
-    SPELL_PRESTOR_DESPAWNS          = 20466,
-    SPELL_WINDSOR_DISMISS_HORSE     = 20000,
+    SPELL_PRESTOR_DESPAWNS          = 20466
 };
 
 struct npc_reginald_windsorAI : ScriptedAI
@@ -150,7 +148,8 @@ struct npc_reginald_windsorAI : ScriptedAI
     void ResetCreature() override;
     void JustDied(Unit* pKiller) override;
     void PokeRowe();
-    void DoTalk(Unit* pWho, bool yell, Unit* pTarget = nullptr);
+    void AdvanceDialog(Unit* pWho, Unit* pTarget = nullptr);
+    void CompleteQuest();
     void EndScene();
     void UpdateAI_corpse(uint32 const uiDiff) override;
     void MoveInLineOfSight(Unit* Victim) override;
