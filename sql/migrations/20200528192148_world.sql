@@ -14,6 +14,9 @@ UPDATE `creature_template` SET `faction` = 534 WHERE `entry` = 12581;
 -- Fix equip template of spawned Onyxia guards
 UPDATE `creature_equip_template` SET `equipentry1` = 1899, `equipentry2` = 143 WHERE `entry` = 12739;
 
+-- Fixing broadcast texts
+UPDATE `broadcast_text` SET `emote_id1` = 1 WHERE `entry` = 8090;
+
 -- End of migration.
 END IF;
 END??

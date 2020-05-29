@@ -265,7 +265,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
                 {
                     int Var = i + 7;
                     pGuard->SetFacingTo(WindsorEventMove[Var].o);
-                    pGuard->HandleEmote(EMOTE_STATE_KNEEL);
+                    pGuard->SetStandState(UNIT_STAND_STATE_KNEEL);
                     GuardNeed[i] = false;
                 }
             }
@@ -513,7 +513,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
         case 21:
             if (Creature* General = m_creature->FindNearestCreature(NPC_MARCUS_JONATHAN, 150.0f))
             {
-                General->HandleEmote(EMOTE_STATE_KNEEL);
+                General->SetStandState(UNIT_STAND_STATE_KNEEL);
                 General->SetFacingTo(WindsorEventMove[13].o);
                 m_creature->SetFacingToObject(General);
                 DoTalk(m_creature, false);

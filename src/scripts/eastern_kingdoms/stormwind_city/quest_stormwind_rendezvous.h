@@ -101,6 +101,11 @@ enum
     GOSSIP_ROWE_BUSY                = 9064,
     GOSSIP_ROWE_NOTHING             = 9063,
 
+    SAY_WINDSOR_GREETING            = 8090,
+    EMOTE_TEXT_DIES                 = 8251,
+    EMOTE_TEXT_MEDALLION_SHATTERS   = 8266,
+    SAY_SIGNAL_SENT                 = 14389,
+
     MOUNT_WINDSOR                   = 2410,
 
     SPELL_GREATER_INVISIBILITY      = 16380,
