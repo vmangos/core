@@ -300,11 +300,12 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
         {
             SummonHorse = false;
             m_creature->Unmount();
-            Creature* pMercutio = m_creature->SummonCreature(NPC_MERCUTIO, m_creature->GetPositionX() - 1.0f,
-                    m_creature->GetPositionY() + 2.0f, m_creature->GetPositionZ(), m_creature->GetOrientation(),
-                    TEMPSUMMON_TIMED_DESPAWN, 12000);
-            pMercutio->SetWalk(false);
-            m_creature->SetFacingToObject(pMercutio);
+            DoCast(m_creature, SPELL_WINDSOR_DISMISS_HORSE, true);
+            if (Creature* pMercutio = m_creature->FindNearestCreature(NPC_MERCUTIO, 10.0f))
+            {
+                pMercutio->SetWalk(false);
+                m_creature->SetFacingToObject(pMercutio);
+            }
             ShooHorse = true;
             Timer = 2000;
         }

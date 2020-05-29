@@ -111,7 +111,8 @@ enum
     SPELL_INVISIBILITY              = 23452,
     SPELL_WINDSOR_DEATH             = 20465,
     SPELL_WINSOR_READ_TABLETS       = 20358,
-    SPELL_PRESTOR_DESPAWNS          = 20466
+    SPELL_PRESTOR_DESPAWNS          = 20466,
+    SPELL_WINDSOR_DISMISS_HORSE     = 20000
 };
 
 struct npc_reginald_windsorAI : ScriptedAI
