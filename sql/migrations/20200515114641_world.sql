@@ -27,7 +27,7 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (3009, 11536, 225, 171, 50, 0, 0, 5875);
 
 -- add correct recipes to jaxin chong
-DELETE FROM `npc_trainer` WHERE `entry` = 2837
+DELETE FROM `npc_trainer` WHERE `entry` = 2837;
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (2837, 2275, 10, 0, 0, 5, 0, 5875),
 (2837, 2280, 450, 171, 50, 10, 0, 5875),
