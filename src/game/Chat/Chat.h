@@ -939,6 +939,7 @@ class ChatHandler
 
         //! Development Commands
         bool HandleSaveAllCommand(char* args);
+		bool HandleSendWorldText(char* args);
         bool HandleDebugMoveCommand(char* args);
 
         Player*   GetSelectedPlayer() const;

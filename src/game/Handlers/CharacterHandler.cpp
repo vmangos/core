@@ -748,6 +748,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         pCurrChar->SetStandState(UNIT_STAND_STATE_STAND);
 
     m_playerLoading = false;
+	if (sWorld.getConfig(CONFIG_BOOL_WORLD_LOGN_ON))
+	{
+		sWorld.SendWorldText(20001, pCurrChar->GetName(), pCurrChar->GetName());
+	}
     _clientMoverGuid = pCurrChar->GetObjectGuid();
     delete holder;
     if (alreadyOnline)

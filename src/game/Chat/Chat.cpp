@@ -1184,6 +1184,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "stable",         SEC_TICKETMASTER,   false, &ChatHandler::HandleStableCommand,              "", nullptr },
         { "quit",           SEC_CONSOLE,        true,  &ChatHandler::HandleQuitCommand,                "", nullptr },
         { "mmap",           SEC_GAMEMASTER,     false, nullptr,                                        "", mmapCommandTable },
+		{ "sj",             SEC_PLAYER,         true, &ChatHandler::HandleSendWorldText,               "", nullptr },
         { "video",          SEC_GAMEMASTER,     false, nullptr,                                        "", videosCommandTable },
         { "freeze",         SEC_TICKETMASTER,   false, &ChatHandler::HandleFreezeCommand,              "", nullptr },
         { "unfreeze",       SEC_TICKETMASTER,   false, &ChatHandler::HandleUnfreezeCommand,            "", nullptr },

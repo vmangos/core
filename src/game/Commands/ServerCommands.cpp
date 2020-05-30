@@ -334,6 +334,18 @@ bool ChatHandler::HandleServerMotdCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleSendWorldText(char* args)
+{
+	if (!m_session->GetPlayer() || !*args)
+		return false;
+	
+		if (Player* player = m_session->GetPlayer())
+		 {
+		sWorld.SendWorldText(20002, player->GetName(), player->GetName(), args);
+		}
+	return true;
+}
+
 // Define the 'Message of the day' for the realm
 bool ChatHandler::HandleServerSetMotdCommand(char* args)
 {
