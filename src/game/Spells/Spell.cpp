@@ -572,6 +572,17 @@ void Spell::FillTargetMap()
                                 break;
                         }
                         break;
+                    case TARGET_LOCATION_UNIT_MINION_POSITION:
+                    case TARGET_LOCATION_CASTER_FRONT_RIGHT:
+                    case TARGET_LOCATION_CASTER_BACK_RIGHT:
+                    case TARGET_LOCATION_CASTER_BACK_LEFT:
+                    case TARGET_LOCATION_CASTER_FRONT_LEFT:
+                    case TARGET_LOCATION_CASTER_FRONT:
+                    case TARGET_LOCATION_CASTER_BACK:
+                    case TARGET_LOCATION_CASTER_LEFT:
+                    case TARGET_LOCATION_CASTER_RIGHT:
+                        SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
+                        break;
                     case 0:
                         SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                         if (m_casterUnit)
@@ -2136,13 +2147,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             else if (m_casterGo)
                 AddGOTarget(m_casterGo, effIndex);
             break;
-        case TARGET_LOCATION_CASTER_FRONT_RIGHT:
-        case TARGET_LOCATION_CASTER_BACK_RIGHT:
-        case TARGET_LOCATION_CASTER_BACK_LEFT:
-        case TARGET_LOCATION_CASTER_FRONT_LEFT:
-            if (m_casterUnit)
-                targetUnitMap.push_back(m_casterUnit);
-            break;
         case TARGET_UNIT_ENEMY_NEAR_CASTER:
         {
             m_targets.m_targetMask = 0;
@@ -3017,11 +3021,15 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 sLog.outError("SPELL: unknown target coordinates for spell ID %u", m_spellInfo->Id);
             break;
         }
+        case TARGET_LOCATION_UNIT_MINION_POSITION: // unknown how pet summon is different - maybe some formation support?
+        case TARGET_LOCATION_CASTER_FRONT_RIGHT:
+        case TARGET_LOCATION_CASTER_BACK_RIGHT:
+        case TARGET_LOCATION_CASTER_BACK_LEFT:
+        case TARGET_LOCATION_CASTER_FRONT_LEFT:
         case TARGET_LOCATION_CASTER_FRONT:
         case TARGET_LOCATION_CASTER_BACK:
         case TARGET_LOCATION_CASTER_LEFT:
         case TARGET_LOCATION_CASTER_RIGHT:
-        case TARGET_LOCATION_UNIT_MINION_POSITION:
         {     
             if (targetMode == TARGET_LOCATION_UNIT_MINION_POSITION && m_spellInfo->Effect[effIndex] == SPELL_EFFECT_DUEL)
                 break;
@@ -3040,17 +3048,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 switch (targetMode)
                 {
                     case TARGET_LOCATION_UNIT_MINION_POSITION:
-                    case TARGET_LOCATION_CASTER_FRONT:
-                        break;
-                    case TARGET_LOCATION_CASTER_BACK:
-                        angle += M_PI_F;
-                        break;
-                    case TARGET_LOCATION_CASTER_LEFT:
-                        angle += M_PI_F / 2;
-                        break;
-                    case TARGET_LOCATION_CASTER_RIGHT:
-                        angle -= M_PI_F / 2;
-                        break;
+                    case TARGET_LOCATION_CASTER_FRONT_LEFT:  angle += M_PI_F * 0.25f; break;
+                    case TARGET_LOCATION_CASTER_BACK_LEFT:   angle += M_PI_F * 0.75f; break;
+                    case TARGET_LOCATION_CASTER_BACK_RIGHT:  angle += M_PI_F * 1.25f; break;
+                    case TARGET_LOCATION_CASTER_FRONT_RIGHT: angle += M_PI_F * 1.75f; break;
+                    case TARGET_LOCATION_CASTER_FRONT:                                break;
+                    case TARGET_LOCATION_CASTER_BACK:        angle += M_PI_F;         break;
+                    case TARGET_LOCATION_CASTER_LEFT:        angle += M_PI_F / 2;     break;
+                    case TARGET_LOCATION_CASTER_RIGHT:       angle -= M_PI_F / 2;     break;
                 }
 
                 float x, y, z;
