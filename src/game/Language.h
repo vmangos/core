@@ -1172,5 +1172,6 @@ enum MangosStrings
     // opvp si
     LANG_OPVP_SI_CAPTURE_H              = 10049,
     LANG_OPVP_SI_CAPTURE_A              = 10050,
+	LANG_COMMAND_MODIFY_JF              = 20005,
 };
 #endif

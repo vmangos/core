@@ -1074,6 +1074,8 @@ class Player final: public Unit
         void AddItemToBuyBackSlot(Item* pItem, uint32 money, ObjectGuid vendorGuid);
         Item* GetItemFromBuyBackSlot(uint32 slot);
         void RemoveItemFromBuyBackSlot(uint32 slot, bool del);
+		uint32 Getjifen() const;
+		void Modifyjifen(int32 d);
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
         uint32 GetBuyBackItemPrice(uint32 slot) const { return GetUInt32Value(PLAYER_FIELD_BUYBACK_PRICE_1 + slot - BUYBACK_SLOT_START); }
 #else
