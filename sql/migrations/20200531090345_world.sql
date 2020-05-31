@@ -22,7 +22,7 @@ DELETE FROM `npc_vendor` WHERE `entry` = 1682 AND `item` = 3107;
 DELETE FROM `npc_vendor` WHERE `entry` = 1682 AND `item` = 3135;
 
 -- Recipe: Rage Potion - Xandar Goodbeard
-UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 1685 AND `item` = 5640;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 1685 AND `item` = 5640;
 
 -- Keen Throwing Knife - Xandar Goodbeard
 DELETE FROM `npc_vendor` WHERE `entry` = 1685 AND `item` = 3107;
@@ -31,7 +31,7 @@ DELETE FROM `npc_vendor` WHERE `entry` = 1685 AND `item` = 3107;
 DELETE FROM `npc_vendor` WHERE `entry` = 1685 AND `item` = 3135;
 
 -- Agile Boots - Xandar Goodbeard
-UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 954 AND `item` = 4788;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 954 AND `item` = 4788;
 
 -- Whispering Vest - Aldren Cordon
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 1214 AND `item` = 4781;
