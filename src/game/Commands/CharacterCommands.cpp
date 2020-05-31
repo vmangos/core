@@ -3088,7 +3088,9 @@ bool ChatHandler::HandleDeleteItemCommand(char* args)
             return false;
         }
 
-        while (count)
+        uint32 stacksToRemove = count;
+
+        while (stacksToRemove)
         {
             result.reset(CharacterDatabase.PQuery(
                 "SELECT guid, count FROM item_instance ii WHERE itemEntry = %u and owner_guid = %u ORDER BY count DESC",
@@ -3106,10 +3108,10 @@ bool ChatHandler::HandleDeleteItemCommand(char* args)
             auto guid = fields[0].GetUInt32();
             auto stackCount = fields[1].GetUInt32();
 
-            if (stackCount > count) // make sure we don't delete more than requested
+            if (stackCount > stacksToRemove) // make sure we don't delete more than requested
             {
                 if (!CharacterDatabase.PExecute("UPDATE item_instance SET count = %u WHERE guid = %u",
-                    stackCount - count, guid))
+                    stackCount - stacksToRemove, guid))
                 {
                     SendSysMessage("Encountered an error while attempting to adjust item stack count");
                     SetSentErrorMessage(true);
@@ -3148,7 +3150,7 @@ bool ChatHandler::HandleDeleteItemCommand(char* args)
                     return false;
                 }
 
-                count -= stackCount;
+                stacksToRemove -= stackCount;
             }
         }
     }
