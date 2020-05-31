@@ -82,6 +82,7 @@
 #include "GameEventMgr.h"
 #include "world/world_event_naxxramas.h"
 #include "world/world_event_wareffort.h"
+#include "WorldSession.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -432,6 +433,7 @@ Player::Player(WorldSession* session) : Unit(),
     m_session = session;
 
     m_ExtraFlags = 0;
+	m_getLastMbTime = time(NULL);
     if (GetSession()->GetSecurity() > SEC_PLAYER)
     {
         m_currentTicketCounter = sTicketMgr->GetLastTicketId();
@@ -1145,6 +1147,19 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     SetCanDelayTeleport(false);
 
     time_t now = time(nullptr);
+
+	if (sConfig.GetBoolDefault("Customsys.OnlineGift", false) && IsAlive())//ещ╣Ц
+	{
+		if (now >= m_getLastMbTime + uint32(sConfig.GetIntDefault("Customsys.OnlineGift.Time", 15)))
+		{
+			uint32 jifen = sConfig.GetIntDefault("Customsys.OnlineGift.Jifen", 0);
+			uint32 money = sConfig.GetIntDefault("Customsys.OnlineGift.Money", 0);
+			m_session->GetPlayer()->Modifyjifen((int32)jifen);
+			m_session->GetPlayer()->ModifyMoney((int32)money);
+			GetSession()->SendNotification(20003, jifen, money / 10000);
+			m_getLastMbTime = now;
+		}
+	}
 
     UpdatePvPFlagTimer(update_diff);
 
