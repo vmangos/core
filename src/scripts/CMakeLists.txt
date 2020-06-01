@@ -262,7 +262,6 @@ set (SCRIPTS_SRCS
     kalimdor/the_barrens/wailing_caverns/instance_wailing_caverns.cpp
     kalimdor/the_barrens/wailing_caverns/wailing_caverns.cpp
     kalimdor/thousand_needles/thousand_needles.cpp
-    kalimdor/thunder_bluff/thunder_bluff.cpp
     kalimdor/ungoro_crater/ungoro_crater.cpp
     kalimdor/winterspring/winterspring.cpp
     PrecompiledHeaders/scriptPCH.cpp
