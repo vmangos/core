@@ -214,7 +214,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- mountaineer stenn
 -- correct pathing
 DELETE FROM `creature_movement` WHERE `id` = 8376;
-UPDATE `creature` SET position_x = -5400.07, position_y = -2890.89, position_z = 342.003, orientation = 1.5708 WHERE `guid` = 8376;
+UPDATE `creature` SET `position_x` = -5400.07, `position_y` = -2890.89, `position_z` = 342.003, `orientation` = 1.5708 WHERE `guid` = 8376;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (1278, 1, -5400.07, -2890.89, 342.003, 1.5708, 180000, 0, 0),
 (1278, 2, -5401.18, -2884.7, 342.467, 100, 0, 0, 0),
