@@ -80,6 +80,7 @@
 #include "AuraRemovalMgr.h"
 #include "InstanceStatistics.h"
 #include "GuardMgr.h"
+#include "Language.h"//ещ╣Ц
 
 #include <chrono>
 
@@ -143,6 +144,29 @@ World::World()
     m_timeRate = 1.0f;
     m_charDbWorkerThread    = nullptr;
 }
+
+void World::RewardItemid(Player* plr, uint32 item_id, uint32 count)//ещ╣Ц
+ {
+	ItemPosCountVec dest;
+	uint32 no_space_count = 0;
+	uint8 msg = plr->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, item_id, count, &no_space_count);
+
+		if (msg == EQUIP_ERR_ITEM_NOT_FOUND)
+		 {
+		sLog.outErrorDb("Reward item (Entry %u) not exist in `item_template`.", item_id);
+		return;
+		}
+
+		if (msg != EQUIP_ERR_OK)                                // convert to possible store amount
+		 count -= no_space_count;
+
+		if (count != 0 && !dest.empty())                        // can add some
+		 if (Item* item = plr->StoreNewItem(dest, item_id, true, 0))
+		 plr->SendNewItem(item, count, true, false);
+
+			//if (no_space_count > 0)
+				//SendRewardMarkByMail(plr, item_id, no_space_count);
+		}
 
 /// World destructor
 World::~World()

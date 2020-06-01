@@ -714,6 +714,7 @@ class World
         WorldSession* FindSession(uint32 id) const;
         void AddSession(WorldSession* s);
         bool RemoveSession(uint32 id);
+		void RewardItemid(Player* plr, uint32 item_id, uint32 count);//ещ╣Ц
         /// Get the number of current active sessions
         void UpdateMaxSessionCounters();
         uint32 GetActiveAndQueuedSessionCount() const { return m_sessions.size(); }

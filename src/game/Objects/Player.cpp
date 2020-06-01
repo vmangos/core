@@ -1152,11 +1152,22 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 	{
 		if (now >= m_getLastMbTime + uint32(sConfig.GetIntDefault("Customsys.OnlineGift.Time", 15)))
 		{
+			uint32 itemid = sConfig.GetIntDefault("Customsys.OnlineGift.Itemid", 40001);
+			uint32 itemcount = sConfig.GetIntDefault("Customsys.OnlineGift.Itemcount", 1);
 			uint32 jifen = sConfig.GetIntDefault("Customsys.OnlineGift.Jifen", 0);
 			uint32 money = sConfig.GetIntDefault("Customsys.OnlineGift.Money", 0);
+			ItemPrototype const *pProto = sObjectMgr.GetItemPrototype(itemid);
 			m_session->GetPlayer()->Modifyjifen((int32)jifen);
 			m_session->GetPlayer()->ModifyMoney((int32)money);
-			GetSession()->SendNotification(20003, jifen, money / 10000);
+			if (pProto && itemcount > 0)
+			{
+				sWorld.RewardItemid(this, itemid, itemcount);
+				GetSession()->SendNotification(20003, pProto->Name1, itemcount, jifen, money / 10000);
+			}
+			else
+			{
+				GetSession()->SendNotification(20004, jifen, money / 10000);
+			}
 			m_getLastMbTime = now;
 		}
 	}
