@@ -32,6 +32,7 @@
 #include <ace/SOCK_Stream.h>
 #include <ace/Message_Block.h>
 #include <ace/Auto_Ptr.h>
+#include <string>
 #include <map>
 
 #include <openssl/bn.h>
