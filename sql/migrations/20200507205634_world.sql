@@ -19,7 +19,7 @@ UPDATE `gossip_menu_option` SET `condition_id` = 361 WHERE `menu_id` = 4126 AND 
 
 -- require alchemy skill of 225 to unlock master alchemist training gossip
 -- kylanna windwhisper
-UPDATE `gossip_menu_option` SET `condition_id` = 362 WHERE `menu_id` = 4133 AND `option_id` = 5;
+UPDATE `gossip_menu_option` SET `condition_id` = 363 WHERE `menu_id` = 4133 AND `option_id` = 5;
 
 
 -- End of migration.
