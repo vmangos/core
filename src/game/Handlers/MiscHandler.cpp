@@ -37,7 +37,7 @@
 #include "LootMgr.h"
 #include "Chat.h"
 #include "ScriptMgr.h"
-#include <zlib/zlib.h>
+#include <zlib.h>
 #include "ObjectAccessor.h"
 #include "Object.h"
 #include "BattleGround.h"

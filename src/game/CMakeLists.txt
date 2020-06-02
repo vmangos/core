@@ -492,6 +492,7 @@ include_directories(
   ${TBB_INCLUDE_DIRS}
   ${ACE_INCLUDE_DIR}
   ${OPENSSL_INCLUDE_DIR}
+  ${ZLIB_INCLUDE_DIRS}
 )
 
 if(WIN32)
