@@ -34,7 +34,7 @@ void PlayerBotAI::UpdateAI(uint32 const diff)
 
 void PlayerBotAI::Remove()
 {
-    me->setAI(nullptr);
+    me->SetAI(nullptr);
     me = nullptr;
 }
 

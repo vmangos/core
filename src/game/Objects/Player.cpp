@@ -20550,10 +20550,31 @@ void Player::RemoveAI()
     if (i_AI)
         i_AI->Remove();
 }
+
+void Player::RemoveTemporaryAI()
+{
+    PlayerBotEntry* pBot = GetSession()->GetBot();
+
+    if (!pBot || (pBot->ai != AI()))
+        RemoveAI();
+
+    if (pBot && (pBot->ai != AI()))
+        SetAI(pBot->ai);
+}
+
 void Player::SetControlledBy(Unit* pWho)
 {
-    RemoveAI();
-    i_AI = new PlayerControlledAI(this, pWho->ToCreature());
+    if (i_AI)
+    {
+        PlayerBotEntry* pBot = GetSession()->GetBot();
+
+        // Careful not to delete bot ai
+        if (!pBot || (pBot->ai != i_AI))
+            delete i_AI;
+
+        i_AI = nullptr;
+    }
+    i_AI = new PlayerControlledAI(this, pWho);
 }
 
 #define CHANGERACE_LOG(format, ...) sLog.outString("[RaceChanger/Log] " format, ##__VA_ARGS__)

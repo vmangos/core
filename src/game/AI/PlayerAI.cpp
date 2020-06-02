@@ -40,7 +40,7 @@ static std::vector<uint32> hunterSkipSpells =
 
 void PlayerAI::Remove()
 {
-    me->setAI(nullptr);
+    me->SetAI(nullptr);
     delete this;
 }
 

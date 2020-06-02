@@ -179,7 +179,7 @@ void PlayerBotMgr::OnPlayerInWorld(Player* player)
 {
     if (PlayerBotEntry* e = player->GetSession()->GetBot())
     {
-        player->setAI(e->ai);
+        player->SetAI(e->ai);
         e->ai->SetPlayer(player);
         e->ai->OnPlayerLogin();
     }
