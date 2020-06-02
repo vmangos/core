@@ -166,7 +166,7 @@ include_directories(
 
 if(WIN32)
   include_directories(
-    ${CMAKE_SOURCE_DIR}/dep/include-windows
+    ${CMAKE_SOURCE_DIR}/dep/windows/include
   )
 endif()
 
