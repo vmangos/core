@@ -5133,28 +5133,6 @@ class npc_av_battle_npc_summoner: public ScriptedAI
             m_despawnAfterTime = t;
         }
 
-        uint32 Rand3(uint32 a, uint32 b, uint32 c) const
-        {
-            switch (urand(0, 2))
-            {
-                case 0:
-                    return a;
-                case 1:
-                    return b;
-                default:
-                    return c;
-            }
-        }
-        uint32 Rand2(uint32 a, uint32 b) const
-        {
-            switch (urand(0, 1))
-            {
-                case 0:
-                    return a;
-                default:
-                    return b;
-            }
-        }
         uint32 SelectCreatureEntry() const
         {
             Map* m = m_creature->GetMap();
@@ -5167,26 +5145,26 @@ class npc_av_battle_npc_summoner: public ScriptedAI
                     switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
                     {
                         case AV_NPC_BASIC:
-                            return Rand3(12048, 12127, 12047);
+                            return PickRandomValue(12048, 12127, 12047);
                         case AV_NPC_SEASONED:
-                            return Rand3(13327, 13324, 13325);
+                            return PickRandomValue(13327, 13324, 13325);
                         case AV_NPC_VETERAN:
-                            return Rand3(13336, 13333, 13335);
+                            return PickRandomValue(13336, 13333, 13335);
                         case AV_NPC_CHAMPION:
-                            return Rand3(13427, 13424, 13426);
+                            return PickRandomValue(13427, 13424, 13426);
                     }
                     return 0;
                 case BG_TEAM_HORDE:
                     switch (bgAv->getReinforcementLevelGroundUnit(m_factionId))
                     {
                         case AV_NPC_BASIC:
-                            return Rand2(12052, 12051);
+                            return PickRandomValue(12052, 12051);
                         case AV_NPC_SEASONED:
-                            return Rand2(13330, 13329);
+                            return PickRandomValue(13330, 13329);
                         case AV_NPC_VETERAN:
-                            return Rand2(13337, 13334);
+                            return PickRandomValue(13337, 13334);
                         case AV_NPC_CHAMPION:
-                            return Rand2(13428, 13425);
+                            return PickRandomValue(13428, 13425);
                     }
                     return 0;
                 default: // Trolls

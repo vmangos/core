@@ -345,20 +345,7 @@ struct npc_injured_patientAI : public ScriptedAI
             Pvloss = false;
             //stand up
             m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-
-            switch (urand(0, 2))
-            {
-                case 0:
-                    DoScriptText(SAY_DOC1, m_creature);
-                    break;
-                case 1:
-                    DoScriptText(SAY_DOC2, m_creature);
-                    break;
-                case 2:
-                    DoScriptText(SAY_DOC3, m_creature);
-                    break;
-            }
-
+            DoScriptText(PickRandomValue(SAY_DOC1, SAY_DOC2, SAY_DOC3), m_creature);
             m_creature->SetWalk(false);
 
             uint32 mobId = m_creature->GetEntry();

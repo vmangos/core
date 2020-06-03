@@ -6200,24 +6200,7 @@ void Aura::PeriodicDummyTick()
                 }
                 case 8067:                                  // Party Time!
                 {
-                    switch (urand(0, 4))
-                    {
-                        case 0:
-                            target->HandleEmoteCommand(EMOTE_ONESHOT_APPLAUD);
-                            return;
-                        case 1:
-                            target->HandleEmoteCommand(EMOTE_ONESHOT_CHEER);
-                            return;
-                        case 2:
-                            target->HandleEmoteCommand(EMOTE_ONESHOT_CHICKEN);
-                            return;
-                        case 3:
-                            target->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
-                            return;
-                        case 4:
-                            target->HandleEmoteCommand(EMOTE_ONESHOT_DANCE);
-                            return;
-                    }
+                    target->HandleEmoteCommand(PickRandomValue(EMOTE_ONESHOT_APPLAUD, EMOTE_ONESHOT_CHEER, EMOTE_ONESHOT_CHICKEN, EMOTE_ONESHOT_LAUGH, EMOTE_ONESHOT_DANCE));
                     return;
                 }
                 case 7057:                                  // Haunting Spirits

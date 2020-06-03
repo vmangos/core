@@ -223,7 +223,7 @@ void MageOrgrimmarAttackerAI::UpdateAI(uint32 const diff)
         }
         else if (me->GetPositionX() + 10 < 1357.0f)
         {
-            switch (urand(0, 1))
+            switch (urand(0, 2))
             {
                 case 0:
                     x = 1357;
