@@ -51,6 +51,8 @@
 #include "MovementPacketSender.h"
 #include "ZoneScript.h"
 #include "PlayerAI.h"
+#include "PlayerBotAI.h"
+#include "PlayerBotMgr.h"
 #include "Anticheat.h"
 
 using namespace Spells;
@@ -2995,7 +2997,7 @@ void Unit::ModPossess(Unit* pTarget, bool apply, AuraRemoveMode m_removeMode)
 
         if (Player* pPlayerTarget = pTarget->ToPlayer())
         {
-            pPlayerTarget->RemoveAI();
+            pPlayerTarget->RemoveTemporaryAI();
             pPlayerTarget->RelocateToLastClientPosition(); // Movement interpolation - prevent undermap.
         }
 
@@ -3203,18 +3205,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         else if (Player* pPlayer = target->ToPlayer())
         {
-            if (caster->IsCreature())
-            {
-                pPlayer->SetControlledBy(caster);
-                if (pPlayer->i_AI && m_spellAuraHolder->GetId() == 28410)
-                    pPlayer->i_AI->enablePositiveSpells = true;
-            }
-            else
-            {
-                PlayerAI *oldAi = pPlayer->i_AI;
-                delete oldAi;
-                pPlayer->i_AI = new PlayerControlledAI(pPlayer, caster);
-            }
+            pPlayer->SetControlledBy(caster);
+            if (pPlayer->i_AI && m_spellAuraHolder->GetId() == 28410)
+                pPlayer->i_AI->enablePositiveSpells = true;
         }
         target->UpdateControl();
 
@@ -3307,7 +3300,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         else if (pPlayerTarget)
         {
-            pPlayerTarget->RemoveAI();
+            pPlayerTarget->RemoveTemporaryAI();
 
             // Charmed players are seen as hostile and not in the group for other clients, restore
             // group upon charm end
