@@ -595,15 +595,9 @@ uint8 SelectRandomRaceForClass(uint8 playerClass, Team playerTeam)
         case CLASS_WARRIOR:
         {
             if (playerTeam == ALLIANCE)
-            {
-                std::vector<uint32> races = { RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME };
-                return SelectRandomContainerElement(races);
-            }
+                return PickRandomValue(RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME);
             else
-            {
-                std::vector<uint32> races = { RACE_ORC, RACE_UNDEAD, RACE_TAUREN, RACE_TROLL };
-                return SelectRandomContainerElement(races);
-            }
+                return PickRandomValue(RACE_ORC, RACE_UNDEAD, RACE_TAUREN, RACE_TROLL);
             break;
         }
         case CLASS_PALADIN:
@@ -613,76 +607,45 @@ uint8 SelectRandomRaceForClass(uint8 playerClass, Team playerTeam)
         case CLASS_HUNTER:
         {
             if (playerTeam == ALLIANCE)
-            {
-                std::vector<uint32> races = { RACE_DWARF, RACE_NIGHTELF };
-                return SelectRandomContainerElement(races);
-            }
+                return urand(0, 1) ? RACE_DWARF : RACE_NIGHTELF;
             else
-            {
-                std::vector<uint32> races = { RACE_ORC, RACE_TAUREN, RACE_TROLL };
-                return SelectRandomContainerElement(races);
-            }
+                return PickRandomValue(RACE_ORC, RACE_TAUREN, RACE_TROLL);
             break;
         }
         case CLASS_ROGUE:
         {
             if (playerTeam == ALLIANCE)
-            {
-                std::vector<uint32> races = { RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME };
-                return SelectRandomContainerElement(races);
-            }
+                return PickRandomValue(RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF, RACE_GNOME);
             else
-            {
-                std::vector<uint32> races = { RACE_ORC, RACE_UNDEAD, RACE_TROLL };
-                return SelectRandomContainerElement(races);
-            }
+                return PickRandomValue(RACE_ORC, RACE_UNDEAD, RACE_TROLL);
             break;
         }
         case CLASS_PRIEST:
         {
             if (playerTeam == ALLIANCE)
-            {
-                std::vector<uint32> races = { RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF };
-                return SelectRandomContainerElement(races);
-            }
+                return PickRandomValue(RACE_HUMAN, RACE_DWARF, RACE_NIGHTELF);
             else
-            {
-                std::vector<uint32> races = { RACE_UNDEAD, RACE_TROLL };
-                return SelectRandomContainerElement(races);
-            }
+                return urand(0, 1) ? RACE_UNDEAD : RACE_TROLL;
             break;
         }
         case CLASS_SHAMAN:
         {
-            std::vector<uint32> races = { RACE_ORC, RACE_TAUREN, RACE_TROLL };
-            return SelectRandomContainerElement(races);
+            return PickRandomValue(RACE_ORC, RACE_TAUREN, RACE_TROLL);
         }
         case CLASS_MAGE:
         {
             if (playerTeam == ALLIANCE)
-            {
-                std::vector<uint32> races = { RACE_HUMAN, RACE_GNOME };
-                return SelectRandomContainerElement(races);
-            }
+                return urand(0, 1) ? RACE_HUMAN : RACE_GNOME;
             else
-            {
-                std::vector<uint32> races = { RACE_UNDEAD, RACE_TROLL };
-                return SelectRandomContainerElement(races);
-            }
+                return urand(0, 1) ? RACE_UNDEAD : RACE_TROLL;
             break;
         }
         case CLASS_WARLOCK:
         {
             if (playerTeam == ALLIANCE)
-            {
-                std::vector<uint32> races = { RACE_HUMAN, RACE_GNOME };
-                return SelectRandomContainerElement(races);
-            }
+                return urand(0, 1) ? RACE_HUMAN : RACE_GNOME;
             else
-            {
-                std::vector<uint32> races = { RACE_ORC, RACE_UNDEAD };
-                return SelectRandomContainerElement(races);
-            }
+                return urand(0, 1) ? RACE_ORC : RACE_UNDEAD;
             break;
         }
         case CLASS_DRUID:
@@ -823,8 +786,7 @@ bool ChatHandler::HandlePartyBotAddCommand(char* args)
         botClass = CLASS_HUNTER;
     else if (option == "dps")
     {
-        std::vector<uint32> dpsClasses = { CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK };
-        botClass = SelectRandomContainerElement(dpsClasses);
+        botClass = PickRandomValue(CLASS_WARRIOR, CLASS_HUNTER, CLASS_ROGUE, CLASS_MAGE, CLASS_WARLOCK);
         botRole = CombatBotBaseAI::IsMeleeDamageClass(botClass) ? ROLE_MELEE_DPS : ROLE_RANGE_DPS;
     }
     else if (option == "healer")
