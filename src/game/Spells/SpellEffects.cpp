@@ -5001,6 +5001,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 29710:
+                {
+                    if (Player* pPlayerTarget = ToPlayer(unitTarget))
+                    {
+                        pPlayerTarget->CastSpell(pPlayerTarget, 29705, false);
+                    }
+                    return;
+                }
             }
             break;
         }
