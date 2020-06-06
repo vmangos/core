@@ -17,71 +17,16 @@
 /* ScriptData
 SDName: Silverpine_Forest
 SD%Complete: 100
-SDComment: Quest support: 435, 452, 1886
+SDComment: Quest support: 435, 452
 SDCategory: Silverpine Forest
 EndScriptData */
 
 /* ContentData
-npc_astor_hadren
 npc_deathstalker_erland
 npc_deathstalker_faerleia
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_astor_hadren
-######*/
-
-struct npc_astor_hadrenAI : public ScriptedAI
-{
-    npc_astor_hadrenAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-        m_creature->SetFactionTemplateId(68);
-    }
-
-    void JustDied(Unit *who) override
-    {
-        m_creature->SetFactionTemplateId(68);
-    }
-};
-
-CreatureAI* GetAI_npc_astor_hadren(Creature *_creature)
-{
-    return new npc_astor_hadrenAI(_creature);
-}
-
-bool GossipHello_npc_astor_hadren(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(1886) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "You're Astor Hadren, right?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(623, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_astor_hadren(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF + 1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "You've got something I need, Astor. And I'll be taking it now.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(624, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF + 2:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pCreature->SetFactionTemplateId(21);
-            ((npc_astor_hadrenAI*)pCreature->AI())->AttackStart(pPlayer);
-            break;
-    }
-    return true;
-}
 
 /*#####
 ## npc_deathstalker_erland
@@ -711,13 +656,6 @@ void AddSC_silverpine_forest()
     newscript = new Script;
     newscript->Name = "npc_human_worgen";
     newscript->GetAI = &GetAI_npc_human_worgen;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_astor_hadren";
-    newscript->pGossipHello =  &GossipHello_npc_astor_hadren;
-    newscript->pGossipSelect = &GossipSelect_npc_astor_hadren;
-    newscript->GetAI = &GetAI_npc_astor_hadren;
     newscript->RegisterSelf();
 
     newscript = new Script;

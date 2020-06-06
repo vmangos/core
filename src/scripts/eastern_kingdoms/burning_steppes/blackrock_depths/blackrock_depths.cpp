@@ -26,7 +26,6 @@ go_shadowforge_brazier
 at_ring_of_law
 npc_grimstone
 mob_phalanx
-npc_kharan_mighthammer
 npc_lokhtos_darkbargainer
 go_dark_keeper_portrait
 go_thunderbrew_laguer_keg
@@ -673,93 +672,6 @@ CreatureAI* GetAI_mob_phalanx(Creature* pCreature)
 {
     return new mob_phalanxAI(pCreature);
 }
-
-/*######
-## npc_kharan_mighthammer
-######*/
-
-#define QUEST_4001      4001
-#define QUEST_4342      4342
-
-#define GOSSIP_ITEM_KHARAN_1    "I need to know where the princess are, Kharan!"
-#define GOSSIP_ITEM_KHARAN_2    "All is not lost, Kharan!"
-
-#define GOSSIP_ITEM_KHARAN_3    "Gor'shak is my friend, you can trust me."
-#define GOSSIP_ITEM_KHARAN_4    "Not enough, you need to tell me more."
-#define GOSSIP_ITEM_KHARAN_5    "So what happened?"
-#define GOSSIP_ITEM_KHARAN_6    "Continue..."
-#define GOSSIP_ITEM_KHARAN_7    "So you suspect that someone on the inside was involved? That they were tipped off?"
-#define GOSSIP_ITEM_KHARAN_8    "Continue with your story please."
-#define GOSSIP_ITEM_KHARAN_9    "Indeed."
-#define GOSSIP_ITEM_KHARAN_10   "The door is open, Kharan. You are a free man."
-
-bool GossipHello_npc_kharan_mighthammer(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(QUEST_4001) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    if (pPlayer->GetQuestStatus(4342) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-
-    if (pPlayer->GetTeam() == HORDE)
-        pPlayer->SEND_GOSSIP_MENU(2473, pCreature->GetGUID());
-    else
-        pPlayer->SEND_GOSSIP_MENU(2474, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_kharan_mighthammer(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(2475, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(2476, pCreature->GetGUID());
-            break;
-
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            pPlayer->SEND_GOSSIP_MENU(2477, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_6, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(2478, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_7, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            pPlayer->SEND_GOSSIP_MENU(2479, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+6:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_8, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-            pPlayer->SEND_GOSSIP_MENU(2480, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+7:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_9, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
-            pPlayer->SEND_GOSSIP_MENU(2481, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+8:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KHARAN_10, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
-            pPlayer->SEND_GOSSIP_MENU(2482, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+9:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            if (pPlayer->GetTeam() == HORDE)
-                pPlayer->AreaExploredOrEventHappens(QUEST_4001);
-            else
-                pPlayer->AreaExploredOrEventHappens(QUEST_4342);
-            break;
-    }
-    return true;
-}
-
 
 /*######
 ## npc_mistress_nagmara
@@ -2519,12 +2431,6 @@ void AddSC_blackrock_depths()
     newscript = new Script;
     newscript->Name = "mob_phalanx";
     newscript->GetAI = &GetAI_mob_phalanx;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_kharan_mighthammer";
-    newscript->pGossipHello =  &GossipHello_npc_kharan_mighthammer;
-    newscript->pGossipSelect = &GossipSelect_npc_kharan_mighthammer;
     newscript->RegisterSelf();
 
     newscript = new Script;
