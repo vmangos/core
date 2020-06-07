@@ -14,11 +14,13 @@ UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 1446;
 
 
 -- ai event
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (144601, 1446, 0, 1, 0, 100, 1, 420000, 420000, 420000, 420000, 144601, 0, 0, 'regina halloran - start waypoints');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (144601, 1446, 0, 1, 0, 100, 1, 600000, 600000, 600000, 600000, 144601, 144602, 144603, 'regina halloran - start hide and seek');
 
 
 -- ai script
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144601, 0, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1446, 0, 0, 0, 0, 0, 0, 0, 'regina halloran - start waypoints');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144602, 0, 68, 144501, 2, 1445, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'regina halloran - start jesse halloran script');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144603, 0, 68, 148201, 2, 1482, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'regina halloran - start andrea halloran script');
 
 
 -- waypoints
@@ -65,17 +67,13 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 1445;
 
 
--- ai event
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (144501, 1445, 0, 1, 0, 100, 1, 438000, 438000, 439200, 439200, 144501, 0, 0, 'jesse halloran - start waypoints');
-
-
--- ai script
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144501, 0, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1445, 0, 0, 0, 0, 0, 0, 0, 'jesse halloran - start waypoints');
+-- event script
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144501, 0, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1445, 0, 0, 0, 0, 0, 0, 0, 'jesse halloran - start waypoints');
 
 
 -- waypoints
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(1445, 1, -3667.39, -733.498, 10.9584, 100, 0, 0, 144502),
+(1445, 1, -3667.39, -733.498, 10.9584, 100, 20000, 0, 144502),
 (1445, 2, -3667.39, -733.498, 10.9584, 100, 0, 0, 144502),
 (1445, 3, -3673.4, -732.86, 10.9419, 100, 0, 0, 0),
 (1445, 4, -3677.45, -742.278, 9.93885, 100, 0, 0, 0),
@@ -105,22 +103,17 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144504, 0, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'jesse halloran - sad');
 
 
-
 -- andrea halloran
 UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 1482;
 
 
--- ai event
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (148201, 1482, 0, 1, 0, 100, 1, 628200, 628200, 628200, 628200, 148201, 0, 0, 'andrea halloran - start waypoints');
-
-
--- ai script
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (148201, 0, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1482, 0, 0, 0, 0, 0, 0, 0, 'andrea halloran - start waypoints');
+-- event script
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (148201, 0, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1482, 0, 0, 0, 0, 0, 0, 0, 'andrea halloran - start waypoints');
 
 
 -- waypoints
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(1482, 1, -3674.24, -734.459, 10.9442, 100, 0, 0, 0),
+(1482, 1, -3674.24, -734.459, 10.9442, 100, 204000, 1, 0),
 (1482, 2, -3677.58, -742.043, 9.93783, 100, 0, 0, 0),
 (1482, 3, -3675.82, -746.042, 10.2159, 100, 0, 0, 0),
 (1482, 4, -3669.3, -746.881, 10.2402, 100, 0, 0, 0),
