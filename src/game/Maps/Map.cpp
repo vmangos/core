@@ -1134,6 +1134,9 @@ void Map::Remove(Player* player, bool remove)
     if (i_data)
         i_data->OnPlayerLeave(player);
 
+    m_mCreatureSummonCount.erase(player->GetGUID());
+    m_mCreatureSummonLimit.erase(player->GetGUID());
+
     if (remove)
         player->CleanupsBeforeDelete();
     else
@@ -1208,6 +1211,9 @@ Map::Remove(T* obj, bool remove)
     DEBUG_LOG("Remove object (GUID: %u TypeId:%u) from grid[%u,%u]", obj->GetGUIDLow(), obj->GetTypeId(), cell.data.Part.grid_x, cell.data.Part.grid_y);
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
     MANGOS_ASSERT(grid != nullptr);
+
+    m_mCreatureSummonCount.erase(obj->GetGUID());
+    m_mCreatureSummonLimit.erase(obj->GetGUID());
 
     if (obj->isActiveObject())
         RemoveFromActive(obj);

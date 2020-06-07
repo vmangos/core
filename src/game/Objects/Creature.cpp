@@ -521,10 +521,6 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, CreatureData const* data /*=
     SetCanModifyStats(true);
     UpdateAllStats();
 
-    // Bosses have increased loot distance.
-    if (GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS)
-        SetLootAndXPModDist(150.0f);
-
     m_reputationId = -1;
 
     // checked and error show at loading templates

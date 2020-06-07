@@ -491,6 +491,11 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
         // must called with RemoveFromWorld
         void RemoveFromActive(WorldObject* obj);
 
+        void SetSummonLimitForObject(uint64 guid, uint32 limit);
+        uint32 GetSummonLimitForObject(uint64 guid) const;
+        uint32 GetSummonCountForObject(uint64 guid) const;
+        void IncrementSummonCountForObject(uint64 guid);
+        void DecrementSummonCountForObject(uint64 guid);
         Creature* SummonCreature(uint32 entry, float x, float y, float z, float ang, TempSummonType spwtype = TEMPSUMMON_DEAD_DESPAWN, uint32 despwtime = 25000, bool asActiveObject = false);
 
         Player* GetPlayer(ObjectGuid guid);
@@ -817,6 +822,10 @@ class Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable
 
         // WeatherSystem
         WeatherSystem* m_weatherSystem;
+
+        // Creature summon limit
+        std::unordered_map<uint64, uint32> m_mCreatureSummonLimit;
+        std::unordered_map<uint64, uint32> m_mCreatureSummonCount;
 
         // Scripted Map Events
         std::map<uint32, ScriptedEvent> m_mScriptedEvents;

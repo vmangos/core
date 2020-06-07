@@ -992,17 +992,14 @@ class WorldObject : public Object
 
         bool IsWithinLootXPDist(WorldObject const* objToLoot) const;
 
-        // val is added to CONFIG_FLOAT_GROUP_XP_DISTANCE when calculating
-        // if player should be eligible for loot and XP from this object.
-        void SetLootAndXPModDist(float val);
-
         float GetVisibilityModifier() const;
         void SetVisibilityModifier(float f);
 
-        uint32 GetCreatureSummonCount() { return m_creatureSummonCount; }
+        uint32 GetCreatureSummonCount() const;
         void DecrementSummonCounter();
+        void IncrementSummonCounter();
 
-        uint32 GetCreatureSummonLimit() const { return m_creatureSummonLimit; }
+        uint32 GetCreatureSummonLimit() const;
         void SetCreatureSummonLimit(uint32 limit);
 
         virtual uint32 GetLevel() const = 0;
@@ -1110,11 +1107,7 @@ class WorldObject : public Object
         ViewPoint m_viewPoint;
 
         WorldUpdateCounter m_updateTracker;
-        
-        float m_lootAndXPRangeModifier;
 
-        uint32 m_creatureSummonCount;                       // Current summon count
-        uint32 m_creatureSummonLimit;                       // Hard limit on creature summons
         uint32 m_summonLimitAlert;                          // Timer to alert GMs if a creature is at the summon limit
 
         typedef std::list<ObjectGuid> DynObjectGUIDs;
