@@ -906,6 +906,47 @@ bool ChatHandler::HandlePartyBotSetRoleCommand(char* args)
     return false;
 }
 
+bool ChatHandler::HandlePartyBotAttackCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget || (pTarget == pPlayer))
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (pMember->IsValidAttackTarget(pTarget))
+                        pAI->AttackStart(pTarget);
+                }
+            }            
+        }
+    }
+    
+    PSendSysMessage("All bots are now attacking %s.", pTarget->GetName());
+    return true;
+}
+
 bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
 {
     bool all = false;
@@ -946,7 +987,7 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
                 if (pMember == pPlayer)
                     continue;
 
-                if (HandlePartyBotPauseApplyHelper(pMember, pause, duration))
+                if (HandlePartyBotPauseApplyHelper(pMember, duration))
                     success = true;
             }
         }
@@ -971,7 +1012,7 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
             return false;
         }
 
-        if (HandlePartyBotPauseApplyHelper(pTarget, pause, duration))
+        if (HandlePartyBotPauseApplyHelper(pTarget, duration))
         {
             if (pause)
                 PSendSysMessage("%s paused for %u seconds.", pTarget->GetName(), (duration / IN_MILLISECONDS));
@@ -986,7 +1027,7 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     return true;
 }
 
-bool ChatHandler::HandlePartyBotPauseApplyHelper(Player* pTarget, bool pause, uint32 duration)
+bool ChatHandler::HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
 {
     if (pTarget->AI())
     {
@@ -994,7 +1035,7 @@ bool ChatHandler::HandlePartyBotPauseApplyHelper(Player* pTarget, bool pause, ui
         {
             pAI->m_updateTimer.Reset(duration);
 
-            if (pause)
+            if (duration)
             {
                 pTarget->StopMoving();
                 pTarget->GetMotionMaster()->MoveIdle();
