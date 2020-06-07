@@ -77,7 +77,7 @@ add_library(g3dlite STATIC
 SET_TARGET_PROPERTIES (g3dlite PROPERTIES FOLDER "3rd Party")
 
 if(WIN32)
-  include_directories(${CMAKE_SOURCE_DIR}/dep/include/zlib)
+  include_directories(${CMAKE_SOURCE_DIR}/dep/windows/include/zlib)
   if(MINGW)
     target_link_libraries(g3dlite zlib libseh)
   else()

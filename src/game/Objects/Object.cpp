@@ -1239,12 +1239,12 @@ bool WorldObject::IsWithinLootXPDist(WorldObject const* objToLoot) const
     if (objToLoot && IsInMap(objToLoot) && objToLoot->GetMap()->IsRaid())
         return true;
 
-    return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE) + objToLoot->m_lootAndXPRangeModifier, false);
-}
+    // Bosses have increased loot distance.
+    float lootDistance = sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE);
+    if (objToLoot->IsCreature() && (static_cast<Creature const*>(objToLoot)->GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS))
+        lootDistance += 150.0f;
 
-void WorldObject::SetLootAndXPModDist(float val)
-{
-    m_lootAndXPRangeModifier = val;
+    return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, lootDistance, false);
 }
 
 float WorldObject::GetVisibilityModifier() const
@@ -1265,14 +1265,13 @@ void WorldObject::SetVisibilityModifier(float f)
 
 WorldObject::WorldObject()
     :   m_isActiveObject(false), m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_currMap(nullptr),
-        m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0), m_creatureSummonCount(0), m_summonLimitAlert(0)
+        m_mapId(0), m_InstanceId(0), m_summonLimitAlert(0)
 {
     // Phasing
     worldMask = WORLD_DEFAULT_OBJECT;
     m_zoneScript = nullptr;
     m_transport = nullptr;
     m_movementInfo.time = WorldTimer::getMSTime();
-    m_creatureSummonLimit = sWorld.GetCreatureSummonCountLimit();
 }
 
 void WorldObject::CleanupsBeforeDelete()
@@ -2005,6 +2004,87 @@ void WorldObject::AddObjectToRemoveList()
     _deleted = true;
 }
 
+uint32 Map::GetSummonLimitForObject(uint64 guid) const
+{
+    const auto itr = m_mCreatureSummonLimit.find(guid);
+    if (itr != m_mCreatureSummonLimit.end())
+        return itr->second;
+
+    return sWorld.getConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT);
+}
+
+uint32 WorldObject::GetCreatureSummonLimit() const
+{
+    if (FindMap())
+        return FindMap()->GetSummonLimitForObject(GetGUID());
+    return sWorld.getConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT);
+}
+
+void Map::SetSummonLimitForObject(uint64 guid, uint32 limit)
+{
+    m_mCreatureSummonLimit[guid] = limit;
+}
+
+void WorldObject::SetCreatureSummonLimit(uint32 limit)
+{
+    if (FindMap())
+        return FindMap()->SetSummonLimitForObject(GetGUID(), limit);
+    else
+        sLog.outError("Attempt to set summon limit for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
+}
+
+uint32 Map::GetSummonCountForObject(uint64 guid) const
+{
+    const auto itr = m_mCreatureSummonCount.find(guid);
+    if (itr != m_mCreatureSummonCount.end())
+        return itr->second;
+
+    return 0;
+}
+
+uint32 WorldObject::GetCreatureSummonCount() const
+{
+    if (FindMap())
+        return FindMap()->GetSummonCountForObject(GetGUID());
+
+    return 0;
+}
+
+void Map::DecrementSummonCountForObject(uint64 guid)
+{
+    auto itr = m_mCreatureSummonCount.find(guid);
+    if (itr != m_mCreatureSummonCount.end())
+        if (itr->second != 0)
+            itr->second--;
+}
+
+void WorldObject::DecrementSummonCounter()
+{
+    if (FindMap())
+    {
+        FindMap()->DecrementSummonCountForObject(GetGUID());
+
+        // Stop the alert if all the minions despawned
+        if (!FindMap()->GetSummonCountForObject(GetGUID()))
+            m_summonLimitAlert = 0;
+    }
+    else
+        sLog.outError("Attempt to decrement summon count for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
+}
+
+void Map::IncrementSummonCountForObject(uint64 guid)
+{
+    m_mCreatureSummonCount[guid]++;
+}
+
+void WorldObject::IncrementSummonCounter()
+{
+    if (FindMap())
+        FindMap()->IncrementSummonCountForObject(GetGUID());
+    else
+        sLog.outError("Attempt to increment summon count for %s but object is not added to map yet!", GetObjectGuid().GetString().c_str());
+}
+
 Creature* Map::SummonCreature(uint32 entry, float x, float y, float z, float ang, TempSummonType spwtype, uint32 despwtime, bool asActiveObject)
 {
     CreatureInfo const* pInf = sObjectMgr.GetCreatureTemplate(entry);
@@ -2046,10 +2126,11 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
         return nullptr;
     }
 
-    if (m_creatureSummonCount >= m_creatureSummonLimit)
+    uint32 const currentSummonCount = GetCreatureSummonCount();
+    if (currentSummonCount >= GetCreatureSummonLimit())
     {
         sLog.outInfo("WorldObject::SummonCreature: %s in (map %u, instance %u) attempted to summon Creature (Entry: %u), but already has %u active summons",
-            GetGuidStr().c_str(), GetMapId(), GetInstanceId(), id, m_creatureSummonCount);
+            GetGuidStr().c_str(), GetMapId(), GetInstanceId(), id, currentSummonCount);
 
         // Alert GMs in the next tick if we don't already have an alert scheduled
         if (!m_summonLimitAlert)
@@ -2093,27 +2174,10 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     pCreature->SetWorldMask(GetWorldMask());
     // return the creature therewith the summoner has access to it
 
-    ++m_creatureSummonCount;
+    IncrementSummonCounter();
     return pCreature;
 }
 
-void WorldObject::SetCreatureSummonLimit(uint32 limit)
-{
-    //sLog.outInfo("[WorldObject]: Object %s is changing summon limit to %u", GetGuidStr().c_str(), limit);
-    m_creatureSummonLimit = limit;
-}
-
-void WorldObject::DecrementSummonCounter()
-{
-    if (m_creatureSummonCount)
-        --m_creatureSummonCount;
-
-    // Stop the alert if all the minions despawned
-    if (!m_creatureSummonCount)
-        m_summonLimitAlert = 0;
-}
-
-// Nostalrius
 GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool attach)
 {
     if (!IsInWorld())
@@ -3042,8 +3106,8 @@ void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
             std::stringstream message;
             message << "SummonCreature: " << GetGuidStr().c_str()
                     << " in (map " << GetMapId() << ", instance " << GetInstanceId() << ")"
-                    << " has " << m_creatureSummonCount << " active summons,"
-                    << " and the limit is " << m_creatureSummonLimit;
+                    << " has " << GetCreatureSummonCount() << " active summons,"
+                    << " and the limit is " << GetCreatureSummonLimit();
             sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "SummonAlert", message.str().c_str());
 
             m_summonLimitAlert = 5 * MINUTE * IN_MILLISECONDS;
@@ -3484,7 +3548,7 @@ float WorldObject::MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType,
     } 
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
-    // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking player’s Weapon Skill.
+    // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking playerÂ’s Weapon Skill.
     // https://us.forums.blizzard.com/en/wow/t/bug-hit-tables/185675/33
     if (skillDiff < -10 && hitChance > 0)
         hitChance -= 1.0f;

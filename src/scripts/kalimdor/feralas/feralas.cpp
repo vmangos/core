@@ -24,34 +24,6 @@ EndScriptData */
 #include "scriptPCH.h"
 
 /*######
-## npc_gregan_brewspewer
-######*/
-
-bool GossipHello_npc_gregan_brewspewer(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pCreature->IsVendor() && pPlayer->GetQuestStatus(3909) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Buy somethin', will ya?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(2433, pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_npc_gregan_brewspewer(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-        pPlayer->SEND_GOSSIP_MENU(2434, pCreature->GetGUID());
-    }
-    if (uiAction == GOSSIP_ACTION_TRADE)
-        pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-    return true;
-}
-
-/*######
 ## npc_screecher_spirit
 ######*/
 
@@ -950,12 +922,6 @@ void AddSC_feralas()
     newscript = new Script;
     newscript->Name = "boss_therazza";
     newscript->GetAI = &GetAI_TheRazza;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_gregan_brewspewer";
-    newscript->pGossipHello = &GossipHello_npc_gregan_brewspewer;
-    newscript->pGossipSelect = &GossipSelect_npc_gregan_brewspewer;
     newscript->RegisterSelf();
 
     newscript = new Script;
