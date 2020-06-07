@@ -2052,7 +2052,7 @@ uint32 WorldObject::GetCreatureSummonCount() const
 
 void Map::DecrementSummonCountForObject(uint64 guid)
 {
-    auto& itr = m_mCreatureSummonCount.find(guid);
+    auto itr = m_mCreatureSummonCount.find(guid);
     if (itr != m_mCreatureSummonCount.end())
         if (itr->second != 0)
             itr->second--;
@@ -3548,7 +3548,7 @@ float WorldObject::MeleeSpellMissChance(Unit* pVictim, WeaponAttackType attType,
     } 
 
     // There is some code in 1.12 that explicitly adds a modifier that causes the first 1% of +hit gained from
-    // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking player’s Weapon Skill.
+    // talents or gear to be ignored against monsters with more than 10 Defense Skill above the attacking playerÂ’s Weapon Skill.
     // https://us.forums.blizzard.com/en/wow/t/bug-hit-tables/185675/33
     if (skillDiff < -10 && hitChance > 0)
         hitChance -= 1.0f;
