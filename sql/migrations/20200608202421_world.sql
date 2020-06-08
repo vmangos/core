@@ -215,7 +215,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 
 -- add guard patrol
-UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 11254;
+UPDATE `creature` SET `position_x` = -926.996, `position_y` = -3512.18, `position_z` = 70.3572, `movement_type` = 2 WHERE `guid` = 11254;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (11254, 1, -926.996, -3512.18, 70.3572, 100, 0, 0, 0),
 (11254, 2, -907.775, -3512.1, 70.7302, 100, 0, 0, 0),
@@ -270,6 +270,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (11254, 51, -901.838, -3512.49, 70.8088, 100, 0, 0, 0),
 (11254, 52, -907.775, -3512.1, 70.7302, 100, 0, 0, 0);
 
+
+-- remove incorrect guard
+DELETE FROM `creature` WHERE `guid` = 11210;
 
 
 -- End of migration.
