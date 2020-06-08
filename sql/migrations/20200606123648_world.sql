@@ -64,9 +64,6 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 
 
 -- jesse halloran
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 1445;
-
-
 -- event script
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144501, 0, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1445, 0, 0, 0, 0, 0, 0, 0, 'jesse halloran - start waypoints');
 
@@ -104,9 +101,6 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 
 
 -- andrea halloran
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 1482;
-
-
 -- event script
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (148201, 0, 60, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1482, 0, 0, 0, 0, 0, 0, 0, 'andrea halloran - start waypoints');
 
