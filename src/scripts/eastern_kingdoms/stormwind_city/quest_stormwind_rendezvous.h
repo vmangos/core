@@ -16,13 +16,13 @@ struct Coords
     float x, y, z, o;
 };
 
-static Coords RoweDeplacement[] =
+static Coords RoweWaypoints[] =
 {
     { -9058.07f, 441.32f, 93.06f, 3.84f },
     { -9084.88f, 419.23f, 92.42f, 3.83f }
 };
 
-static Coords WindsorDeplacement[] =
+static Coords WindsorWaypoints[] =
 {
     { -9050.406250f, 443.974792f, 93.056458f, 0.659825f },
     { -8968.008789f, 509.771759f, 96.350754f, 0.679460f },
@@ -72,11 +72,11 @@ static Coords WindsorEventMove[] =
 
 const Coords WindsorSummon = { -9148.40f, 371.32f, 91.0f, 0.70f };
 
-uint32 WindsorTalk[] =
+uint32 MasqueradeDialogSteps[] =
 {
-    8119, 8121, 8123, 8133, 8125, 8132, 8126, 8134, 8127, 8128,
-    8129, 8130, 8205, 8206, 8207, 8208, 8210, 8212, 8211, 8215,
-    8216, 8218, 8227, 8219, 8235, 8237, 8247, 8249, 8250
+    8091, 8090, 8107, 8109, 8119, 8121, 8123, 8133, 8124, 8125, 8132, 8126, 8134, 8127, 8128, 8129, 8130, 8205, 8206,
+    8207, 8208, 8210, 8212, 8211, 8214, 8215, 8216, 8218, 8226, 8227, 8219, 8228, 8236, 8235, 8237, 8238, 8239, 8247,
+    8246, 8248, 8266, 8249, 8250, 8251
 };
 
 enum
@@ -94,11 +94,16 @@ enum
     NPC_MERCUTIO                    = 12581,
     NPC_MARCUS_JONATHAN             = 466,
     NPC_STORMWIND_ROYAL_GUARD       = 1756,
+    NPC_LADY_ONYXIA                 = 12756,
+    NPC_ROWE                        = 17804,
 
     GOSSIP_ROWE_COMPLETED           = 9066,
     GOSSIP_ROWE_READY               = 9065,
     GOSSIP_ROWE_BUSY                = 9064,
     GOSSIP_ROWE_NOTHING             = 9063,
+
+    SAY_SIGNAL_SENT                 = 14389,
+    SAY_HISS                        = 8245,
 
     MOUNT_WINDSOR                   = 2410,
 
@@ -106,9 +111,8 @@ enum
     SPELL_INVISIBILITY              = 23452,
     SPELL_WINDSOR_DEATH             = 20465,
     SPELL_WINSOR_READ_TABLETS       = 20358,
-    SPELL_ONYXIA_TRANS              = 17136,
     SPELL_PRESTOR_DESPAWNS          = 20466,
-    SPELL_WINDSOR_DISMISS_HORSE     = 20000,
+    SPELL_WINDSOR_DISMISS_HORSE     = 20000
 };
 
 struct npc_reginald_windsorAI : ScriptedAI
@@ -118,13 +122,15 @@ struct npc_reginald_windsorAI : ScriptedAI
     uint32 Timer;
     uint32 Tick;
     uint32 IDSpeech;
-    uint64 GardesGUIDs[30];
+    uint64 GuardsGUIDs[30];
     uint64 DragsGUIDs[10];
     uint64 playerGUID;
     bool Begin;
+    bool SummonHorse;
+    bool ShooHorse;
     bool BeginQuest;
     bool NeedCheck;
-    bool GardeNeed[6];
+    bool GuardNeed[6];
     bool PhaseFinale;
     bool TheEnd;
     bool CombatJustEnded;
@@ -132,7 +138,7 @@ struct npc_reginald_windsorAI : ScriptedAI
     bool QuestAccepted;
     bool m_bRoweKnows;
     uint32 FinalTimer;
-    uint32 GardeTimer[6];
+    uint32 GuardTimer[6];
     uint32 m_uiDespawnTimer;
     ObjectGuid m_squireRoweGuid;
 
@@ -143,8 +149,9 @@ struct npc_reginald_windsorAI : ScriptedAI
     void ResetCreature() override;
     void JustDied(Unit* pKiller) override;
     void PokeRowe();
-    void DoTalk(Unit* pWho, bool yell, Unit* pTarget = nullptr);
-    void SituationFinale();
+    void AdvanceDialog(Unit* pWho, Unit* pTarget = nullptr);
+    void CompleteQuest();
+    void EndScene();
     void UpdateAI_corpse(uint32 const uiDiff) override;
     void MoveInLineOfSight(Unit* Victim) override;
     void SpellHit(Unit* /*pCaster*/, SpellEntry const* pSpellEntry) override;
