@@ -26,7 +26,7 @@ UPDATE `creature` SET `position_x` = -814.122, `position_y` = -689.843, `positio
 
 
 -- add patrol to guard
-UPDATE `creature` SET UPDATE `creature` SET `position_x` = -891.071, `position_y` = -540.262, `position_z` = 6.86808, `movement_type` = 2 WHERE `guid` = 15928;
+UPDATE `creature` SET `position_x` = -891.071, `position_y` = -540.262, `position_z` = 6.86808, `movement_type` = 2 WHERE `guid` = 15928;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (15928, 1, -891.071, -540.262, 6.86808, 100, 0, 0, 0),
 (15928, 2, -874.494, -540.699, 7.83399, 100, 0, 0, 0),
