@@ -383,7 +383,7 @@ UPDATE `creature` SET `position_x` = -4685.36, `position_y` = -3457.5, `position
 
 
 -- allow mountaineer haggis to roam
-UPDATE `creature` SET `position_x` = -4684.62, `position_y` = -3168.74, `position_z` = 310.144, `wander_distance` = 5, `movement_type` = 1 WHERE `guid` = 8243;
+UPDATE `creature` SET `position_x` = -4684.62, `position_y` = -3168.74, `position_z` = 310.144, `wander_distance` = 5, `movement_type` = 1 WHERE `guid` = 8241;
 
 
 -- set mountaineer modax to roam not pathfind
