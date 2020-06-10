@@ -42,6 +42,12 @@ UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 1214 
 -- Wise Man's Belt - Aldren Cordon
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 1214 AND `item` = 4782;
 
+-- Striped Yellowtail - Khara Deepwater
+UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 1684 AND `item` = 21552;
+
+-- Strong Fishing Pole - Khara Deepwater
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 1684 AND `item` = 6365;
+
 
 -- End of migration.
 END IF;
