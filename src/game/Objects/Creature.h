@@ -95,6 +95,8 @@ struct CreatureInfo
 {
     uint32  entry;
     uint32  display_id[MAX_DISPLAY_IDS_PER_CREATURE];
+    uint32  display_probability[MAX_DISPLAY_IDS_PER_CREATURE];
+    uint32  display_total_probability;
     char*   name;
     char*   subname;
     uint32  gossip_menu_id;
@@ -678,6 +680,7 @@ class Creature : public Unit
         CreatureData const* GetCreatureData() const;
 
         static uint32 ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
+        static float GetScaleForDisplayId(uint32 displayId, CreatureInfo const* cinfo);
 
         std::string GetAIName() const;
         std::string GetScriptName() const;

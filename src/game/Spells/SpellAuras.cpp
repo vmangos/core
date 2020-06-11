@@ -2616,9 +2616,8 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 if (ci && target->GetTypeId() == TYPEID_UNIT)
                 {
                     ((Creature*)target)->LoadEquipment(ci->equipment_id, true);
-                    mod_x = ci->scale;
+                    mod_x = Creature::GetScaleForDisplayId(display_id, ci);
                 }
-                    
             }
 
             if (display_id)

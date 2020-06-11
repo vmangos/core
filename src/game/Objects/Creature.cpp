@@ -289,13 +289,6 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
 
-    SetObjectScale(cinfo->scale);
-    // Reset native scale before we apply creature info multiplier, otherwise we are
-    // stuck at 1 from the previous m_nativeScaleOverride if the unit's entry is
-    // being changed
-    m_nativeScaleOverride = cinfo->scale;
-    m_nativeScale = cinfo->scale;
-
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
 
@@ -319,6 +312,14 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
     }
 
     display_id = minfo->display_id;                            // it can be different (for another gender)
+
+    float const scale = GetScaleForDisplayId(display_id, cinfo);
+    SetObjectScale(scale);
+    // Reset native scale before we apply creature info multiplier, otherwise we are
+    // stuck at 1 from the previous m_nativeScaleOverride if the unit's entry is
+    // being changed
+    m_nativeScaleOverride = scale;
+    m_nativeScale = scale;
 
     SetNativeDisplayId(display_id);
     SetDisplayId(display_id);
@@ -566,6 +567,19 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, CreatureData const* data /*=
     return true;
 }
 
+float Creature::GetScaleForDisplayId(uint32 displayId, CreatureInfo const* cinfo)
+{
+    float scale = cinfo->scale;
+    if (scale <= 0.0f)
+    {
+        if (CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId))
+            scale = displayEntry->scale;
+        else
+            scale = DEFAULT_OBJECT_SCALE;
+    }
+    return scale;
+}
+
 uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data /*= nullptr*/, GameEventCreatureData const* eventData /*=nullptr*/)
 {
     // Use creature event display id explicit, override any other static models
@@ -579,12 +593,39 @@ uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* 
     // use defaults from the template
     uint32 display_id = 0;
 
-    // display id selected here may be replaced with other_gender using own function
-    uint32 maxDisplayId = 0;
-    for (; maxDisplayId < MAX_DISPLAY_IDS_PER_CREATURE && cinfo->display_id[maxDisplayId]; ++maxDisplayId);
+    if (cinfo->display_total_probability)
+    {
+        uint32 const roll = urand(1, cinfo->display_total_probability);
+        uint32 sum = 0;
 
-    if (maxDisplayId)
-        display_id = cinfo->display_id[urand(0, maxDisplayId - 1)];
+        for (int i = 0; i < MAX_DISPLAY_IDS_PER_CREATURE; i++)
+        {
+            uint32 const currentId = cinfo->display_id[i];
+            if (!currentId)
+                continue;
+
+            uint32 const currentChance = cinfo->display_probability[i];
+            if (!currentChance)
+                continue;
+
+            if ((roll > sum) && (roll <= (sum + currentChance)))
+            {
+                display_id = currentId;
+                break;
+            }
+
+            sum += currentChance;
+        }
+    }
+    else
+    {
+        // display id selected here may be replaced with other_gender using own function
+        uint32 maxDisplayId = 0;
+        for (; maxDisplayId < MAX_DISPLAY_IDS_PER_CREATURE && cinfo->display_id[maxDisplayId]; ++maxDisplayId);
+
+        if (maxDisplayId)
+            display_id = cinfo->display_id[urand(0, maxDisplayId - 1)];
+    }
 
     // fail safe, we use creature entry 1 and make error
     if (!display_id)
