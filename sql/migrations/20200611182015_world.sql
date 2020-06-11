@@ -18,7 +18,7 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 0.5 WHERE `guid` 
 
 
 -- npc's should roam
-UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (5960, 4179, 4182, 4244, 4194, 4252);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (5960, 4179, 4182, 4244, 4194, 4252, 4251);
 
 
 -- viktori prism antras - speak
