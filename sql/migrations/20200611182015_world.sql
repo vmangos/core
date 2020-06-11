@@ -168,6 +168,14 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (887, 42, -10646, -1191.34, 28.4968, 100, 0, 0, 0);
 
 
+-- blind mary correct path
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4255;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(302, 1, -10785.4, -1374.49, 39.7132, 100, 30000, 0, 0),
+(302, 2, -10780.2, -1380.28, 39.7193, 100, 30000, 0, 0),
+(302, 3, -10786, -1381, 39.7193, 0.006667, 30000, 0, 0);
+
+
 -- End of migration.
 END IF;
 END??
