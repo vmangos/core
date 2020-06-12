@@ -681,7 +681,7 @@ class Creature : public Unit
         CreatureData const* GetCreatureData() const;
 
         static std::pair<uint32, float> ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
-        static float Creature::GetScaleForDisplayId(uint32 displayId);
+        static float GetScaleForDisplayId(uint32 displayId);
 
         std::string GetAIName() const;
         std::string GetScriptName() const;
