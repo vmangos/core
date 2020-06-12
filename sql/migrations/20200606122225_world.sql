@@ -83,7 +83,7 @@ UPDATE `creature` SET `wander_distance` = 0.5, `movement_type` = 1 WHERE `guid` 
 
 
 -- move waypoint for menethil sentry 9557
-UPDATE `creature_movement` SET `position_x` = -3731.85, `position_y` = -810.085, `position_z` = 20.3015 WHERE `id` = 9557 AND `point` = 1;
+UPDATE `creature_movement` SET `position_x` = -3730.86, `position_y` = -808.12, `position_z` = 20.3013 WHERE `id` = 9557 AND `point` = 1;
 
 
 -- add script to menethil sentry 9554
