@@ -2180,12 +2180,14 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
             return;
         }
 
-        uint32 display_id = Creature::ChooseDisplayId(ci);
-        CreatureDisplayInfoAddon const* minfo = sObjectMgr.GetCreatureDisplayInfoRandomGender(display_id);
+        uint32 displayId;
+        float scale;
+        std::tie(displayId, scale) = Creature::ChooseDisplayId(ci);
+        CreatureDisplayInfoAddon const* minfo = sObjectMgr.GetCreatureDisplayInfoRandomGender(displayId);
         if (minfo)
-            display_id = minfo->display_id;
+            displayId = minfo->display_id;
 
-        target->Mount(display_id, GetId());
+        target->Mount(displayId, GetId());
     }
     else
         target->Unmount(true);
@@ -2603,20 +2605,21 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             }
             else
             {
+                float displayScale = mod_x;
                 CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(m_modifier.m_miscvalue);
                 if (!ci)
                 {
-                    display_id = 16358;                           // pig pink ^_^
-                    sLog.outError("Auras: unknown creature id = %d (only need its display_id) Form Spell Aura Transform in Spell ID = %d", m_modifier.m_miscvalue, GetId());
+                    display_id = UNIT_DISPLAY_ID_BOX;
+                    sLog.outError("Aura::HandleAuraTransform - Unknown creature id (%d) (only need its display_id) for spell %d.", m_modifier.m_miscvalue, GetId());
                 }
                 else
-                    display_id = Creature::ChooseDisplayId(ci);   // Will use the default display id here
+                    std::tie(display_id, displayScale) = Creature::ChooseDisplayId(ci);   // Will use the default display id here
 
                 // creature case, need to update equipment
-                if (ci && target->GetTypeId() == TYPEID_UNIT)
+                if (ci && target->IsCreature())
                 {
                     ((Creature*)target)->LoadEquipment(ci->equipment_id, true);
-                    mod_x = Creature::GetScaleForDisplayId(display_id, ci);
+                    mod_x = displayScale;
                 }
             }
 

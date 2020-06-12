@@ -6361,7 +6361,7 @@ void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32& path, uin
 
 uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_team /* = false */)
 {
-    uint16 mount_entry = 0;
+    uint32 creatureId = 0;
 
     // select mount creature id
     TaxiNodesEntry const* node = GetTaxiNodeEntry(id);
@@ -6369,32 +6369,34 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
     {
         if (team == ALLIANCE)
         {
-            mount_entry = node->MountCreatureID[1];
-            if (!mount_entry && allowed_alt_team)
-                mount_entry = node->MountCreatureID[0];
+            creatureId = node->MountCreatureID[1];
+            if (!creatureId && allowed_alt_team)
+                creatureId = node->MountCreatureID[0];
         }
         else if (team == HORDE)
         {
-            mount_entry = node->MountCreatureID[0];
+            creatureId = node->MountCreatureID[0];
 
-            if (!mount_entry && allowed_alt_team)
-                mount_entry = node->MountCreatureID[1];
+            if (!creatureId && allowed_alt_team)
+                creatureId = node->MountCreatureID[1];
         }
     }
 
-    CreatureInfo const* mount_info = GetCreatureTemplate(mount_entry);
-    if (!mount_info)
+    CreatureInfo const* pCreatureInfo = GetCreatureTemplate(creatureId);
+    if (!pCreatureInfo)
         return 0;
 
-    uint16 mount_id = Creature::ChooseDisplayId(mount_info);
-    if (!mount_id)
+    uint32 displayId;
+    float scale;
+    std::tie(displayId, scale) = Creature::ChooseDisplayId(pCreatureInfo);
+    if (!displayId)
         return 0;
 
-    CreatureDisplayInfoAddon const* minfo = GetCreatureDisplayInfoRandomGender(mount_id);
+    CreatureDisplayInfoAddon const* minfo = GetCreatureDisplayInfoRandomGender(displayId);
     if (minfo)
-        mount_id = minfo->display_id;
+        displayId = minfo->display_id;
 
-    return mount_id;
+    return displayId;
 }
 
 void ObjectMgr::LoadGraveyardZones()

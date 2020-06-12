@@ -558,4 +558,7 @@ enum UnitDismountResult
     DISMOUNTRESULT_OK           = 3     // no error
 };
 
+// First entry in CreatureDisplayInfo.dbc
+#define UNIT_DISPLAY_ID_BOX 4
+
 #endif

@@ -34,6 +34,7 @@
 #include "Cell.h"
 #include "Util.h"
 
+#include <utility>
 #include <list>
 
 class SpellEntry;
@@ -95,6 +96,7 @@ struct CreatureInfo
 {
     uint32  entry;
     uint32  display_id[MAX_DISPLAY_IDS_PER_CREATURE];
+    float   display_scale[MAX_DISPLAY_IDS_PER_CREATURE];
     uint32  display_probability[MAX_DISPLAY_IDS_PER_CREATURE];
     uint32  display_total_probability;
     char*   name;
@@ -111,7 +113,6 @@ struct CreatureInfo
     uint32  npc_flags;
     float   speed_walk;
     float   speed_run;
-    float   scale;
     float   detection_range;                                // Detection Range for Line of Sight aggro
     float   call_for_help_range;                            // Radius for combat assistance call
     float   leash_range;                                    // Hard limit on allowed chase distance
@@ -679,8 +680,8 @@ class Creature : public Unit
         CreatureDataAddon const* GetCreatureAddon() const;
         CreatureData const* GetCreatureData() const;
 
-        static uint32 ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
-        static float GetScaleForDisplayId(uint32 displayId, CreatureInfo const* cinfo);
+        static std::pair<uint32, float> ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data = nullptr, GameEventCreatureData const* eventData = nullptr);
+        static float Creature::GetScaleForDisplayId(uint32 displayId);
 
         std::string GetAIName() const;
         std::string GetScriptName() const;
