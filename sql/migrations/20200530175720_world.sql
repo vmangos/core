@@ -396,7 +396,7 @@ UPDATE `creature` SET `wander_distance` = 3, `movement_type` = 1 WHERE `guid` = 
 UPDATE `creature` SET `movement_type`= 2 WHERE `id`= 6577;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (6577, 1, -5368.92, -3747.12, 304.661, 100, 0, 540000, 0),
-(6577, 2, -5375.95, -3731.8, 300.288, 100, 0, 5000, 687701);
+(6577, 2, -5375.95, -3731.8, 300.288, 100, 0, 5000, 657701);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (657701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2633, 0, 0, 0, 0, 0, 0, 0, 0, 'bingles blastenheimer - speech');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (657701, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'bingles blastenheimer - talk emote');
 
