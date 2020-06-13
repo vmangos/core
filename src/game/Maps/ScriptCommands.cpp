@@ -823,10 +823,9 @@ bool Map::ScriptCommand_Morph(ScriptInfo const& script, WorldObject* source, Wor
     else
     {
         CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(script.morph.creatureOrModelEntry);
-        uint32 displayId;
-        float scale;
-        std::tie(displayId, scale) = Creature::ChooseDisplayId(ci);
-        pSource->SetDisplayId(displayId);
+        uint32 display_id = Creature::ChooseDisplayId(ci);
+
+        pSource->SetDisplayId(display_id);
     }
 
     return false;
@@ -843,12 +842,7 @@ bool Map::ScriptCommand_Mount(ScriptInfo const& script, WorldObject* source, Wor
         return ShouldAbortScript(script);
     }
 
-    uint32 displayId = script.mount.creatureOrModelEntry;
-    if (!script.mount.isDisplayId && script.mount.creatureOrModelEntry)
-    {
-        float scale;
-        std::tie(displayId, scale) = Creature::ChooseDisplayId(ObjectMgr::GetCreatureTemplate(script.mount.creatureOrModelEntry));
-    }
+    uint32 displayId = script.mount.isDisplayId || !script.mount.creatureOrModelEntry ? script.mount.creatureOrModelEntry : Creature::ChooseDisplayId(ObjectMgr::GetCreatureTemplate(script.mount.creatureOrModelEntry));
 
     if (pSource->IsAlive())
     {

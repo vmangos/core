@@ -297,9 +297,8 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
 
     SetInitCreaturePowerType();
 
-    uint32 displayId;
     float scale;
-    std::tie(displayId, scale) = ChooseDisplayId(GetCreatureInfo(), data, eventData);
+    uint32 displayId = ChooseDisplayId(GetCreatureInfo(), data, eventData, &scale);
     if (!displayId)                                         // Cancel load if no display id
     {
         sLog.outErrorDb("Creature (Entry: %u) has no display id defined in table `creature_template`, can't load.", Entry);
@@ -576,15 +575,23 @@ float Creature::GetScaleForDisplayId(uint32 displayId)
     return DEFAULT_OBJECT_SCALE;
 }
 
-std::pair<uint32, float> Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data /*= nullptr*/, GameEventCreatureData const* eventData /*=nullptr*/)
+uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data /*= nullptr*/, GameEventCreatureData const* eventData /*=nullptr*/, float* scale /*=nullptr*/)
 {
     // Use creature event display id explicit, override any other static models
     if (eventData && eventData->display_id)
-        return std::make_pair(eventData->display_id, GetScaleForDisplayId(eventData->display_id));
+    {
+        if (scale)
+            *scale = GetScaleForDisplayId(eventData->display_id);
+        return eventData->display_id;
+    }
 
     // Use creature display id explicit, override template (creature.display_id)
     if (data && data->display_id)
-        return std::make_pair(data->display_id, GetScaleForDisplayId(data->display_id));
+    {
+        if (scale)
+            *scale = GetScaleForDisplayId(data->display_id);
+        return data->display_id;
+    }
 
     // use defaults from the template
     int8 displayIndex = -1;
@@ -625,12 +632,17 @@ std::pair<uint32, float> Creature::ChooseDisplayId(CreatureInfo const* cinfo, Cr
     if (displayIndex < 0)
     {
         sLog.outErrorDb("Creature::ChooseDisplayId can not select native display id for creature entry %u, placeholder model will be used.", cinfo->entry);
-        return std::make_pair(UNIT_DISPLAY_ID_BOX, DEFAULT_OBJECT_SCALE);
+        if (scale)
+            *scale = DEFAULT_OBJECT_SCALE;
+        return UNIT_DISPLAY_ID_BOX;
     }
 
     uint32 displayId = cinfo->display_id[displayIndex];
-    float scale = cinfo->display_scale[displayIndex] ? cinfo->display_scale[displayIndex] : GetScaleForDisplayId(displayId);
-    return std::make_pair(displayId, scale);
+
+    if (scale)
+        *scale = cinfo->display_scale[displayIndex] ? cinfo->display_scale[displayIndex] : GetScaleForDisplayId(displayId);
+
+    return displayId;
 }
 
 void Creature::Update(uint32 update_diff, uint32 diff)

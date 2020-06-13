@@ -2179,10 +2179,7 @@ void Aura::HandleAuraMounted(bool apply, bool Real)
             sLog.outErrorDb("AuraMounted: `creature_template`='%u' not found in database (only need its display_id)", m_modifier.m_miscvalue);
             return;
         }
-
-        uint32 displayId;
-        float scale;
-        std::tie(displayId, scale) = Creature::ChooseDisplayId(ci);
+        uint32 displayId  = Creature::ChooseDisplayId(ci);
         CreatureDisplayInfoAddon const* minfo = sObjectMgr.GetCreatureDisplayInfoRandomGender(displayId);
         if (minfo)
             displayId = minfo->display_id;
@@ -2270,8 +2267,33 @@ std::pair<unsigned int, float> GetShapeshiftDisplayInfo(ShapeshiftForm form, Uni
             display_id = 10045;
         break;
     case FORM_CREATUREBEAR:
-        display_id = 902;
+    {
+        uint32 modelId = 0;
+        if (CreatureDisplayInfoEntry const* pDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(target->GetNativeDisplayId()))
+            modelId = pDisplayInfo->ModelId;
+
+        switch (modelId)
+        {
+            case MODEL_NELF_FEMALE:
+            case MODEL_NELF_MALE:
+            {
+                display_id = 2281;
+                break;
+            }
+            case MODEL_TAUREN_FEMALE:
+            case MODEL_TAUREN_MALE:
+            {
+                display_id = 2289;
+                break;
+            }
+            default:
+            {
+                display_id = 902;
+                break;
+            }
+        }
         break;
+    }
     case FORM_GHOSTWOLF:
         display_id = 4613;
         mod = 0.80f;
@@ -2613,7 +2635,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                     sLog.outError("Aura::HandleAuraTransform - Unknown creature id (%d) (only need its display_id) for spell %d.", m_modifier.m_miscvalue, GetId());
                 }
                 else
-                    std::tie(display_id, displayScale) = Creature::ChooseDisplayId(ci);   // Will use the default display id here
+                    display_id = Creature::ChooseDisplayId(ci, nullptr, nullptr, &displayScale);   // Will use the default display id here
 
                 // creature case, need to update equipment
                 if (ci && target->IsCreature())

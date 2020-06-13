@@ -97,7 +97,7 @@ UPDATE `creature_template` SET `display_total_probability`=0, `display_probabili
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16982;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16981;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16980;
-UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16979;
+UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0, `display_id2`=16542 WHERE `entry`=16979;
 UPDATE `creature_template` SET `display_total_probability`=2, `display_probability1`=1, `display_probability2`=1, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16895;
 UPDATE `creature_template` SET `display_total_probability`=2, `display_probability1`=1, `display_probability2`=1, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16894;
 UPDATE `creature_template` SET `display_total_probability`=4, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=1 WHERE `entry`=16893;
@@ -207,13 +207,15 @@ UPDATE `creature_template` SET `display_total_probability`=0, `display_probabili
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16380;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16379;
 UPDATE `creature_template` SET `display_total_probability`=100, `display_probability1`=40, `display_probability2`=20, `display_probability3`=20, `display_probability4`=20 WHERE `entry`=16378;
-UPDATE `creature_template` SET `display_total_probability`=3, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=0 WHERE `entry`=16377;
+UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16377 && `patch`=8;
+UPDATE `creature_template` SET `display_total_probability`=3, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=0 WHERE `entry`=16377 && `patch`=9;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16376;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16375;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16374;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16373;
 UPDATE `creature_template` SET `display_total_probability`=3, `display_probability1`=2, `display_probability2`=1, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16372;
-UPDATE `creature_template` SET `display_total_probability`=3, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=0 WHERE `entry`=16371;
+UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16371 && `patch`=8;
+UPDATE `creature_template` SET `display_total_probability`=3, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=0 WHERE `entry`=16371 && `patch`=9;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16369;
 UPDATE `creature_template` SET `display_total_probability`=2, `display_probability1`=1, `display_probability2`=1, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16368;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=16365;
@@ -2190,8 +2192,10 @@ UPDATE `creature_template` SET `display_total_probability`=100, `display_probabi
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=12383;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=12382;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=12381;
-UPDATE `creature_template` SET `display_total_probability`=4, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=1 WHERE `entry`=12380;
-UPDATE `creature_template` SET `display_total_probability`=4, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=1 WHERE `entry`=12379;
+UPDATE `creature_template` SET `display_total_probability`=2, `display_probability1`=1, `display_probability2`=1, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=12380 && `patch`=0;
+UPDATE `creature_template` SET `display_total_probability`=4, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=1 WHERE `entry`=12380 && `patch`=1;
+UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=12379 && `patch`=0;
+UPDATE `creature_template` SET `display_total_probability`=4, `display_probability1`=1, `display_probability2`=1, `display_probability3`=1, `display_probability4`=1 WHERE `entry`=12379 && `patch`=1;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=12378;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=12377;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=12376;
@@ -2763,7 +2767,7 @@ UPDATE `creature_template` SET `display_total_probability`=0, `display_probabili
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=11449;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=11448;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=11447;
-UPDATE `creature_template` SET `display_total_probability`=3, `display_probability1`=1, `display_probability2`=1, `display_probability3`=0, `display_probability4`=1 WHERE `entry`=11446;
+UPDATE `creature_template` SET `display_total_probability`=3, `display_probability1`=1, `display_probability2`=1, `display_probability3`=0, `display_probability4`=1, `display_id3`=13131, `display_id4`=13132 WHERE `entry`=11446;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=11445;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=11444;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=11443;
@@ -4277,7 +4281,8 @@ UPDATE `creature_template` SET `display_total_probability`=1, `display_probabili
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=7997;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=7996;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=7995;
-UPDATE `creature_template` SET `display_total_probability`=100, `display_probability1`=25, `display_probability2`=25, `display_probability3`=25, `display_probability4`=25 WHERE `entry`=7980;
+UPDATE `creature_template` SET `display_total_probability`=100, `display_probability1`=50, `display_probability2`=50, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=7980 && `patch`=0;
+UPDATE `creature_template` SET `display_total_probability`=100, `display_probability1`=25, `display_probability2`=25, `display_probability3`=25, `display_probability4`=25 WHERE `entry`=7980 && `patch`=1;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=7978;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=7977;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=7976;
@@ -6688,7 +6693,8 @@ UPDATE `creature_template` SET `display_total_probability`=1, `display_probabili
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=4265;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=4264;
 UPDATE `creature_template` SET `display_total_probability`=0, `display_probability1`=0, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=4263;
-UPDATE `creature_template` SET `display_total_probability`=100, `display_probability1`=25, `display_probability2`=25, `display_probability3`=25, `display_probability4`=25 WHERE `entry`=4262;
+UPDATE `creature_template` SET `display_total_probability`=100, `display_probability1`=100, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=4262 && `patch`=0;
+UPDATE `creature_template` SET `display_total_probability`=100, `display_probability1`=25, `display_probability2`=25, `display_probability3`=25, `display_probability4`=25 WHERE `entry`=4262 && `patch`=2;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=4261;
 UPDATE `creature_template` SET `display_total_probability`=1, `display_probability1`=1, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=4260;
 UPDATE `creature_template` SET `display_total_probability`=100, `display_probability1`=100, `display_probability2`=0, `display_probability3`=0, `display_probability4`=0 WHERE `entry`=4259;
@@ -10429,6 +10435,30 @@ ALTER TABLE `creature_template`
 
 -- Fix mistakes for Horde Guard.
 UPDATE `creature_display_info_addon` SET `display_id_other_gender`=0 WHERE `display_id` IN (4261, 4262, 4263, 4264);
+
+-- Evolving Ectoplasm
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `beast_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (5776, 0, 4267, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Evolving Ectoplasm (Red)', NULL, 0, 17, 18, 1158, 1251, 0, 0, 782, 14, 0, 1, 1.14286, 20, 5, 0, 1, 1, 74, 96, 0, 84, 1, 2000, 2000, 1, 64, 0, 0, 0, 0, 0, 0, 23.8896, 32.8482, 100, 10, 0, 3640, 3640, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 1, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 'npc_evolving_ectoplasm');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `beast_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (5777, 0, 2568, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Evolving Ectoplasm (Green)', NULL, 0, 17, 18, 1158, 1251, 0, 0, 782, 14, 0, 1, 1.14286, 20, 5, 0, 1, 1, 74, 96, 0, 84, 1, 2000, 2000, 1, 64, 0, 0, 0, 0, 0, 0, 23.8896, 32.8482, 100, 10, 0, 3640, 3640, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 1, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 'npc_evolving_ectoplasm');
+INSERT INTO `creature_template` (`entry`, `patch`, `display_id1`, `display_id2`, `display_id3`, `display_id4`, `display_scale1`, `display_scale2`, `display_scale3`, `display_scale4`, `display_probability1`, `display_probability2`, `display_probability3`, `display_probability4`, `display_total_probability`, `name`, `subname`, `gossip_menu_id`, `level_min`, `level_max`, `health_min`, `health_max`, `mana_min`, `mana_max`, `armor`, `faction`, `npc_flags`, `speed_walk`, `speed_run`, `detection_range`, `call_for_help_range`, `leash_range`, `rank`, `xp_multiplier`, `dmg_min`, `dmg_max`, `dmg_school`, `attack_power`, `dmg_multiplier`, `base_attack_time`, `ranged_attack_time`, `unit_class`, `unit_flags`, `dynamic_flags`, `beast_family`, `trainer_type`, `trainer_spell`, `trainer_class`, `trainer_race`, `ranged_dmg_min`, `ranged_dmg_max`, `ranged_attack_power`, `type`, `type_flags`, `loot_id`, `pickpocket_loot_id`, `skinning_loot_id`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spell_id1`, `spell_id2`, `spell_id3`, `spell_id4`, `spell_list_id`, `pet_spell_list_id`, `gold_min`, `gold_max`, `ai_name`, `movement_type`, `inhabit_type`, `civilian`, `racial_leader`, `regeneration`, `equipment_id`, `trainer_id`, `vendor_id`, `mechanic_immune_mask`, `school_immune_mask`, `flags_extra`, `script_name`) VALUES (5778, 0, 4535, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Evolving Ectoplasm (Black)', NULL, 0, 17, 18, 1158, 1251, 0, 0, 782, 14, 0, 1, 1.14286, 20, 5, 0, 1, 1, 74, 96, 0, 84, 1, 2000, 2000, 1, 64, 0, 0, 0, 0, 0, 0, 23.8896, 32.8482, 100, 10, 0, 3640, 3640, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '', 1, 3, 0, 0, 3, 0, 0, 0, 0, 0, 0, 'npc_evolving_ectoplasm');
+
+-- Fix wrong Winter Veil display id used by Goraluk Anvilcrack.
+UPDATE `game_event_creature_data` SET `display_id`=15760 WHERE `guid`=45829;
+
+-- Correct display id for alliance Lunar Festival Harbinger spawns.
+UPDATE `creature` SET `display_id`=15871 WHERE `guid`=91626;
+UPDATE `creature` SET `display_id`=15871 WHERE `guid`=91632;
+UPDATE `creature` SET `display_id`=15871, `position_x`=10153.6, `position_y`=2593.45, `position_z`=1330.84, `orientation`=4.57276 WHERE `guid`=94919;
+
+-- Correct display id for alliance Lunar Festival Vendor spawns.
+UPDATE `creature` SET `display_id`=15870 WHERE `guid`=91625;
+UPDATE `creature` SET `display_id`=15870 WHERE `guid`=91636;
+UPDATE `creature` SET `display_id`=15870 WHERE `guid`=91689;
+UPDATE `creature` SET `display_id`=15870, `position_x`=10148, `position_y`=2572.63, `position_z`=1320.7, `orientation`=4.18879 WHERE `guid`=94920;
+
+-- Remove duplicate Thunder Bluff Reveler spawns.
+DELETE FROM `creature` WHERE `guid` IN (208676, 208677, 212002, 208678);
+DELETE FROM `creature_addon` WHERE `guid` IN (208676, 208677, 212002, 208678);
+DELETE FROM `game_event_creature` WHERE `guid` IN (208676, 208677, 212002, 208678);
 
 
 -- End of migration.

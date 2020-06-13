@@ -115,9 +115,8 @@ bool EffectDummyCreature_npc_kitten(WorldObject* /*pCaster*/, uint32 uiSpellId, 
         // Not nice way, however using UpdateEntry will not be correct.
         if (CreatureInfo const* pTemp = sObjectMgr.GetCreatureTemplate(NPC_CORRUPT_SABER))
         {
-            uint32 displayId;
             float scale;
-            std::tie(displayId, scale) = Creature::ChooseDisplayId(pTemp);
+            uint32 displayId = Creature::ChooseDisplayId(pTemp, nullptr, nullptr, &scale);
             pCreatureTarget->SetEntry(pTemp->entry);
             pCreatureTarget->SetDisplayId(displayId);
             pCreatureTarget->SetName(pTemp->name);

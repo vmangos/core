@@ -6386,9 +6386,7 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
     if (!pCreatureInfo)
         return 0;
 
-    uint32 displayId;
-    float scale;
-    std::tie(displayId, scale) = Creature::ChooseDisplayId(pCreatureInfo);
+    uint32 displayId = Creature::ChooseDisplayId(pCreatureInfo);
     if (!displayId)
         return 0;
 

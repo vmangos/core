@@ -637,10 +637,15 @@ CreatureAI* GetAI_npc_disciple_of_naralex(Creature* pCreature)
 
 enum
 {
-    SPELL_IMMUNE_FIRE    =   7942,
-    SPELL_IMMUNE_FROST   =   7940,
-    SPELL_IMMUNE_NATURE  =   7941,
-    SPELL_IMMUNE_SHADOW  =   7743,
+    SPELL_IMMUNE_FIRE    =  7942,
+    SPELL_IMMUNE_FROST   =  7940,
+    SPELL_IMMUNE_NATURE  =  7941,
+    SPELL_IMMUNE_SHADOW  =  7743,
+
+    SPELL_TRANSFORM_RED   = 7943,
+    SPELL_TRANSFORM_BLUE  = 7944,
+    SPELL_TRANSFORM_GREEN = 7945,
+    SPELL_TRANSFORM_BLACK = 7946,
 };
 
 struct EvolvingEctoplasmAI : public ScriptedAI
@@ -666,29 +671,29 @@ struct EvolvingEctoplasmAI : public ScriptedAI
         {
             if (pSpell->School == SPELL_SCHOOL_FROST)
             {
-//                m_creature->SetDisplayId(1751);
-                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FROST, CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_BLUE, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FROST, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                 m_uiImmuneTimer = 10000;
                 isImmune = true;
             }
             else if (pSpell->School == SPELL_SCHOOL_FIRE)
             {
-//                m_creature->SetDisplayId(11138);
-                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FIRE, CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_RED, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FIRE, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                 m_uiImmuneTimer = 10000;
                 isImmune = true;
             }
             else if (pSpell->School == SPELL_SCHOOL_NATURE)
             {
-//                m_creature->SetDisplayId(4266);
-                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_NATURE, CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_GREEN, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_NATURE, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                 m_uiImmuneTimer = 10000;
                 isImmune = true;
             }
             else if (pSpell->School == SPELL_SCHOOL_SHADOW)
             {
-//                m_creature->SetDisplayId(767);
-                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_SHADOW, CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_TRANSFORM_BLACK, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_IMMUNE_SHADOW, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
                 m_uiImmuneTimer = 10000;
                 isImmune = true;
             }
@@ -699,7 +704,10 @@ struct EvolvingEctoplasmAI : public ScriptedAI
     {
         if (m_uiImmuneTimer < uiDiff)
         {
-//            m_creature->SetDisplayId(1751);
+            m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM_RED);
+            m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM_BLUE);
+            m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM_GREEN);
+            m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM_BLACK);
             m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_SHADOW);
             m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_FROST);
             m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_FIRE);
