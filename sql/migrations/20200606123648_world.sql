@@ -86,7 +86,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (1445, 14, -3676.01, -744.941, 10.1241, 100, 0, 0, 0),
 (1445, 15, -3676.75, -740.048, 10.9372, 100, 0, 0, 0),
 (1445, 16, -3674.21, -733.571, 10.9429, 100, 0, 0, 0),
-(1445, 17, -3667.39, -733.498, 10.9584, 100, 10000, 0, 144504);
+(1445, 17, -3667.39, -733.498, 10.9584, 100, 10000, 0, 0);
 
 
 -- creature_movement_scripts
@@ -97,7 +97,6 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144503, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3329, 0, 0, 0, 0, 0, 0, 0, 0, 'jesse halloran - speak');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144503, 205, 0, 0, 0, 0, 0, 0, 0, 0, 0, 304, 0, 0, 0, 0, 0, 0, 0, 0, 'jesse halloran - speak');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144503, 206, 0, 0, 0, 0, 0, 0, 0, 0, 0, 305, 0, 0, 0, 0, 0, 0, 0, 0, 'jesse halloran - speak');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (144504, 0, 1, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'jesse halloran - sad');
 
 
 -- andrea halloran
