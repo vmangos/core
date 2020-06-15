@@ -40,7 +40,7 @@ DELETE FROM `npc_vendor` WHERE `entry` = 1452 AND `item` = 6183;
 -- Balanced Throwing Dagger - Gruham Rumdnul 
 DELETE FROM `npc_vendor` WHERE `entry` = 1452 AND `item` = 2946;
 
--- Balanced Throwing Dagger - Gruham Rumdnul 
+-- Weighted Throwing Axe - Gruham Rumdnul 
 DELETE FROM `npc_vendor` WHERE `entry` = 1452 AND `item` = 3131;
 
 
