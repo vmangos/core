@@ -289,13 +289,6 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
 
-    SetObjectScale(cinfo->scale);
-    // Reset native scale before we apply creature info multiplier, otherwise we are
-    // stuck at 1 from the previous m_nativeScaleOverride if the unit's entry is
-    // being changed
-    m_nativeScaleOverride = cinfo->scale;
-    m_nativeScale = cinfo->scale;
-
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
 
@@ -304,24 +297,32 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=nu
 
     SetInitCreaturePowerType();
 
-    uint32 display_id = ChooseDisplayId(GetCreatureInfo(), data, eventData);
-    if (!display_id)                                        // Cancel load if no display id
+    float scale;
+    uint32 displayId = ChooseDisplayId(GetCreatureInfo(), data, eventData, &scale);
+    if (!displayId)                                         // Cancel load if no display id
     {
         sLog.outErrorDb("Creature (Entry: %u) has no display id defined in table `creature_template`, can't load.", Entry);
         return false;
     }
 
-    CreatureDisplayInfoAddon const* minfo = sObjectMgr.GetCreatureDisplayInfoRandomGender(display_id);
+    CreatureDisplayInfoAddon const* minfo = sObjectMgr.GetCreatureDisplayInfoRandomGender(displayId);
     if (!minfo)                                             // Cancel load if no display info addon defined
     {
         sLog.outErrorDb("Creature (Entry: %u) has no display id data defined in table `creature_display_info_addon`, can't load.", Entry);
         return false;
     }
 
-    display_id = minfo->display_id;                            // it can be different (for another gender)
+    displayId = minfo->display_id;                          // it can be different (for another gender)
 
-    SetNativeDisplayId(display_id);
-    SetDisplayId(display_id);
+    SetObjectScale(scale);
+    // Reset native scale before we apply creature info multiplier, otherwise we are
+    // stuck at 1 from the previous m_nativeScaleOverride if the unit's entry is
+    // being changed
+    m_nativeScaleOverride = scale;
+    m_nativeScale = scale;
+
+    SetNativeDisplayId(displayId);
+    SetDisplayId(displayId);
     SetByteValue(UNIT_FIELD_BYTES_0, 2, minfo->gender);
 
     // Load creature equipment
@@ -566,36 +567,82 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, CreatureData const* data /*=
     return true;
 }
 
-uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data /*= nullptr*/, GameEventCreatureData const* eventData /*=nullptr*/)
+float Creature::GetScaleForDisplayId(uint32 displayId)
+{
+    if (CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(displayId))
+        return displayEntry->scale;
+    
+    return DEFAULT_OBJECT_SCALE;
+}
+
+uint32 Creature::ChooseDisplayId(CreatureInfo const* cinfo, CreatureData const* data /*= nullptr*/, GameEventCreatureData const* eventData /*=nullptr*/, float* scale /*=nullptr*/)
 {
     // Use creature event display id explicit, override any other static models
     if (eventData && eventData->display_id)
+    {
+        if (scale)
+            *scale = GetScaleForDisplayId(eventData->display_id);
         return eventData->display_id;
+    }
 
     // Use creature display id explicit, override template (creature.display_id)
     if (data && data->display_id)
-        return data->display_id;
-
-    // use defaults from the template
-    uint32 display_id = 0;
-
-    // display id selected here may be replaced with other_gender using own function
-    uint32 maxDisplayId = 0;
-    for (; maxDisplayId < MAX_DISPLAY_IDS_PER_CREATURE && cinfo->display_id[maxDisplayId]; ++maxDisplayId);
-
-    if (maxDisplayId)
-        display_id = cinfo->display_id[urand(0, maxDisplayId - 1)];
-
-    // fail safe, we use creature entry 1 and make error
-    if (!display_id)
     {
-        sLog.outErrorDb("Creature::ChooseDisplayId can not select native display id for creature entry %u, model from creature entry 1 will be used instead.", cinfo->entry);
-
-        if (CreatureInfo const* creatureDefault = ObjectMgr::GetCreatureTemplate(1))
-            display_id = creatureDefault->display_id[0];
+        if (scale)
+            *scale = GetScaleForDisplayId(data->display_id);
+        return data->display_id;
     }
 
-    return display_id;
+    // use defaults from the template
+    int8 displayIndex = -1;
+    if (cinfo->display_total_probability)
+    {
+        uint32 const roll = urand(1, cinfo->display_total_probability);
+        uint32 sum = 0;
+
+        for (int i = 0; i < MAX_DISPLAY_IDS_PER_CREATURE; i++)
+        {
+            if (!cinfo->display_id[i])
+                continue;
+
+            uint32 const currentChance = cinfo->display_probability[i];
+            if (!currentChance)
+                continue;
+
+            if ((roll > sum) && (roll <= (sum + currentChance)))
+            {
+                displayIndex = i;
+                break;
+            }
+
+            sum += currentChance;
+        }
+    }
+    else
+    {
+        // display id selected here may be replaced with other_gender using own function
+        uint32 maxDisplayId = 0;
+        for (; maxDisplayId < MAX_DISPLAY_IDS_PER_CREATURE && cinfo->display_id[maxDisplayId]; ++maxDisplayId);
+
+        if (maxDisplayId)
+            displayIndex = urand(0, maxDisplayId - 1);
+    }
+
+    // fail safe, we use creature entry 1 and make error
+    if (displayIndex < 0)
+    {
+        sLog.outErrorDb("Creature::ChooseDisplayId can not select native display id for creature entry %u, placeholder model will be used.", cinfo->entry);
+        if (scale)
+            *scale = DEFAULT_OBJECT_SCALE;
+        return UNIT_DISPLAY_ID_BOX;
+    }
+
+    uint32 displayId = cinfo->display_id[displayIndex];
+
+    if (scale)
+        *scale = cinfo->display_scale[displayIndex] ? cinfo->display_scale[displayIndex] : GetScaleForDisplayId(displayId);
+
+    return displayId;
 }
 
 void Creature::Update(uint32 update_diff, uint32 diff)

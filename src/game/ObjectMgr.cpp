@@ -1194,24 +1194,29 @@ void ObjectMgr::CheckCreatureTemplates()
         if (!factionTemplate)
             sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction template (%u)", cInfo->entry, cInfo->faction);
 
-        // used later for scale
-        CreatureDisplayInfoEntry const* displayScaleEntry = nullptr;
-
+        uint32 displaySumProbability = 0;
         for (int i = 0; i < MAX_DISPLAY_IDS_PER_CREATURE; ++i)
         {
+            displaySumProbability += cInfo->display_probability[i];
+
             CorrectCreatureDisplayIds(cInfo->entry, const_cast<CreatureInfo*>(cInfo)->display_id[i]);
 
             if (cInfo->display_id[i])
             {
+                if (!cInfo->display_probability[i] && cInfo->display_total_probability)
+                {
+                    const_cast<CreatureInfo*>(cInfo)->display_id[i] = 0;
+                    continue;
+                }
+
                 CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->display_id[i]);
                 if (!displayEntry)
                 {
                     sLog.outErrorDb("Creature (Entry: %u) has nonexistent display_id%d (%u), can crash client", cInfo->entry, i + 1, cInfo->display_id[i]);
                     sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `display_id%d`=0 WHERE entry=%u;", i + 1, cInfo->entry);
                     const_cast<CreatureInfo*>(cInfo)->display_id[i] = 0;
+                    continue;
                 }
-                else if (!displayScaleEntry)
-                    displayScaleEntry = displayEntry;
 
                 CreatureDisplayInfoAddon const* minfo = sCreatureDisplayInfoAddonStorage.LookupEntry<CreatureDisplayInfoAddon>(cInfo->display_id[i]);
                 if (!minfo)
@@ -1219,8 +1224,8 @@ void ObjectMgr::CheckCreatureTemplates()
             }
         }
 
-        if (!displayScaleEntry)
-            sLog.outErrorDb("Creature (Entry: %u) does not have any valid display id", cInfo->entry);
+        if (displaySumProbability != cInfo->display_total_probability)
+            sLog.outErrorDb("Creature (Entry: %u) has a total display probability (%u) that does not match sum of individual probabilities (%u).", cInfo->entry, cInfo->display_total_probability, displaySumProbability);
 
         // use below code for 0-checks for unit_class
         if (!cInfo->unit_class)
@@ -1320,15 +1325,6 @@ void ObjectMgr::CheckCreatureTemplates()
         {
             if (!(cInfo->npc_flags & UNIT_NPC_FLAG_VENDOR))
                 sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with vendor_id %u but not have flag UNIT_NPC_FLAG_VENDOR (%u), vendor items will ignored.", cInfo->entry, cInfo->vendor_id, UNIT_NPC_FLAG_VENDOR);
-        }
-
-        /// if not set custom creature scale then load scale from CreatureDisplayInfo.dbc
-        if (cInfo->scale <= 0.0f)
-        {
-            if (displayScaleEntry)
-                const_cast<CreatureInfo*>(cInfo)->scale = displayScaleEntry->scale;
-            else
-                const_cast<CreatureInfo*>(cInfo)->scale = DEFAULT_OBJECT_SCALE;
         }
 
         if (cInfo->xp_multiplier < 0.0f)
@@ -6365,7 +6361,7 @@ void ObjectMgr::GetTaxiPath(uint32 source, uint32 destination, uint32& path, uin
 
 uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_team /* = false */)
 {
-    uint16 mount_entry = 0;
+    uint32 creatureId = 0;
 
     // select mount creature id
     TaxiNodesEntry const* node = GetTaxiNodeEntry(id);
@@ -6373,32 +6369,32 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
     {
         if (team == ALLIANCE)
         {
-            mount_entry = node->MountCreatureID[1];
-            if (!mount_entry && allowed_alt_team)
-                mount_entry = node->MountCreatureID[0];
+            creatureId = node->MountCreatureID[1];
+            if (!creatureId && allowed_alt_team)
+                creatureId = node->MountCreatureID[0];
         }
         else if (team == HORDE)
         {
-            mount_entry = node->MountCreatureID[0];
+            creatureId = node->MountCreatureID[0];
 
-            if (!mount_entry && allowed_alt_team)
-                mount_entry = node->MountCreatureID[1];
+            if (!creatureId && allowed_alt_team)
+                creatureId = node->MountCreatureID[1];
         }
     }
 
-    CreatureInfo const* mount_info = GetCreatureTemplate(mount_entry);
-    if (!mount_info)
+    CreatureInfo const* pCreatureInfo = GetCreatureTemplate(creatureId);
+    if (!pCreatureInfo)
         return 0;
 
-    uint16 mount_id = Creature::ChooseDisplayId(mount_info);
-    if (!mount_id)
+    uint32 displayId = Creature::ChooseDisplayId(pCreatureInfo);
+    if (!displayId)
         return 0;
 
-    CreatureDisplayInfoAddon const* minfo = GetCreatureDisplayInfoRandomGender(mount_id);
+    CreatureDisplayInfoAddon const* minfo = GetCreatureDisplayInfoRandomGender(displayId);
     if (minfo)
-        mount_id = minfo->display_id;
+        displayId = minfo->display_id;
 
-    return mount_id;
+    return displayId;
 }
 
 void ObjectMgr::LoadGraveyardZones()
