@@ -107,7 +107,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 DELETE FROM `creature_ai_events` WHERE `creature_id`=6790;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (679001, 6790, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 679001, 0, 0, 'Innkeeper Trelayne - Greet Players On Entering Tavern');
 DELETE FROM `creature_ai_scripts` WHERE `id`=679001;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (679001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 82, 0, 0, 0, 0, 0, 0, 0, 'Innkeeper Trelayne - Say Text');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (679001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 'Innkeeper Trelayne - Say Text');
 
 
 -- farrin daris scripts
@@ -174,6 +174,24 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (302, 1, -10785.4, -1374.49, 39.7132, 100, 30000, 0, 0),
 (302, 2, -10780.2, -1380.28, 39.7193, 100, 30000, 0, 0),
 (302, 3, -10786, -1381, 39.7193, 0.006667, 30000, 0, 0);
+
+
+-- madame eva event
+UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 265;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (26501, 265, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 26501, 0, 0, 'madame eva - speak');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (26501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 74, 75, 76, 0, 0, 0, 0, 0, 'madame eva - speak');
+
+
+-- commander althea ebonlocke event
+UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 264;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (26401, 264, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 26401, 0, 0, 'commander althea ebonlocke - speak');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (26401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 62, 0, 0, 0, 0, 0, 0, 0, 'commander althea ebonlocke - speak');
+
+
+-- tavernkeep smitts event
+UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 273;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (27301, 273, 0, 1, 0, 100, 1, 45000, 60000, 150000, 180000, 27301, 0, 0, 'tavernkeep smitts - speak');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (27301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 'tavernkeep smitts - speak');
 
 
 -- End of migration.
