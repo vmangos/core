@@ -37,6 +37,7 @@ enum
     SAY_NEFARIUS_LOSE1          = 5709,
     SAY_REND_ATTACK             = 5722,
     SAY_NEFARIUS_WARCHIEF       = 5720,
+    SAY_NEFARIUS_PACING         = 5721,
     SAY_NEFARIUS_VICTORY        = 5824,
 
     // Arena event random taunt - handled on creature death
@@ -137,7 +138,8 @@ static const SIDialogueEntry aStadiumDialogue[] =
     {NPC_BLACKHAND_HANDLER,     0,                          0},
     {SAY_NEFARIUS_LOSE1,        NPC_LORD_VICTOR_NEFARIUS,   3000},
     {SAY_REND_ATTACK,           NPC_REND_BLACKHAND,         2000},
-    {SAY_NEFARIUS_WARCHIEF,     NPC_LORD_VICTOR_NEFARIUS,   0},
+    {SAY_NEFARIUS_WARCHIEF,     NPC_LORD_VICTOR_NEFARIUS,   2000},
+    {SAY_NEFARIUS_PACING,       NPC_LORD_VICTOR_NEFARIUS,   0},
     {SAY_NEFARIUS_VICTORY,      NPC_LORD_VICTOR_NEFARIUS,   5000},
     {NPC_REND_BLACKHAND,        0,                          0},
     {0, 0, 0},
@@ -595,10 +597,12 @@ void instance_blackrock_spire::JustDidDialogueStep(int32 iEntry)
                 pRend->SetWalk(false);
                 pRend->GetMotionMaster()->MovePoint(0, aStadiumLocs[6].x, aStadiumLocs[6].y, aStadiumLocs[6].z);
             }
+            m_uiStadiumEventTimer = 30000;
+            break;
+        case SAY_NEFARIUS_PACING:
             // Make Lord Nefarius walk back and forth while Rend is preparing Glyth
             if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
                 pNefarius->GetMotionMaster()->MoveWaypoint(0);
-            m_uiStadiumEventTimer = 30000;
             break;
         case SAY_NEFARIUS_VICTORY:
             SetData(TYPE_STADIUM, DONE);
