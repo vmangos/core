@@ -68,8 +68,6 @@ void AddSC_boss_thebeast();
 void AddSC_boss_warmastervoone();
 void AddSC_boss_quatermasterzigris();
 void AddSC_boss_pyroguard_emberseer();
-void AddSC_boss_gyth();
-void AddSC_boss_rend_blackhand();
 void AddSC_boss_razorgore();                         //blackwing_lair
 void AddSC_boss_vael();
 void AddSC_boss_broodlord();
@@ -330,8 +328,6 @@ void AddScripts()
 
     AddSC_instance_blackrock_spire();
     AddSC_boss_pyroguard_emberseer();
-    AddSC_boss_gyth();
-    AddSC_boss_rend_blackhand();
     AddSC_boss_razorgore();                                 //blackwing_lair
     AddSC_boss_vael();
     AddSC_boss_broodlord();
