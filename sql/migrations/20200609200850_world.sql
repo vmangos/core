@@ -209,6 +209,11 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (3544, 38, -10.2388, -858.247, 59.8757, 100, 0, 0, 0);
 
 
+-- hans zandin add missing text
+DELETE FROM `creature_ai_scripts` WHERE `id`=239601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (239601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 615, 616, 614, 0, 0, 0, 0, 0, 0, 'Hans Zandin - Say Text');
+
+
 -- End of migration.
 END IF;
 END??
