@@ -158,7 +158,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 
 -- tarren mill
 -- guards should roam
-UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 9 WHERE `guid` IN (15558, 15538, 15535, 15355, 15533, 15354, 15353, 15307, 15306, 15303, 15515, 15252, 15541);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 9 WHERE `guid` IN (15558, 15538, 15535, 15355, 15533, 15354, 15353, 15307, 15306, 15303, 15515, 15282, 15541);
 
 
 -- guards should roam
