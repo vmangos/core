@@ -115,6 +115,7 @@ class instance_blackrock_spire : public ScriptedInstance, private DialogueHelper
         void JustDidDialogueStep(int32 iEntry) override;
         Creature* GetSpeakerByEntry(uint32 uiEntry) override;
         void DoSendNextStadiumWave();
+        void DespawnStadiumSpectators();
 
         uint32 m_auiEncounter[INSTANCE_BRS_MAX_ENCOUNTER];
         std::string strInstData;

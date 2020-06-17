@@ -110,7 +110,7 @@ static const Position aSpectatorsTargetLocs[12] =
 static const Position aStadiumLocs[7] =
 {
     {210.00f, -420.30f, 110.94f, 3.14f},                    // dragons summon location
-    {210.14f, -397.54f, 111.1f, 0.0f},                      // Gyth summon location
+    {211.762f,-397.58f, 111.18f, 4.74f},                    // Gyth summon location
     {163.62f, -420.33f, 110.47f, 0.0f},                     // center of the stadium location (for movement)
     {164.63f, -444.04f, 121.97f, 3.22f},                    // Lord Nefarius summon position
     {161.01f, -443.73f, 121.97f, 6.26f},                    // Rend summon position
@@ -138,7 +138,7 @@ static const SIDialogueEntry aStadiumDialogue[] =
     {NPC_BLACKHAND_HANDLER,     0,                          0},
     {SAY_NEFARIUS_LOSE1,        NPC_LORD_VICTOR_NEFARIUS,   3000},
     {SAY_REND_ATTACK,           NPC_REND_BLACKHAND,         2000},
-    {SAY_NEFARIUS_WARCHIEF,     NPC_LORD_VICTOR_NEFARIUS,   2000},
+    {SAY_NEFARIUS_WARCHIEF,     NPC_LORD_VICTOR_NEFARIUS,   3000},
     {SAY_NEFARIUS_PACING,       NPC_LORD_VICTOR_NEFARIUS,   0},
     {SAY_NEFARIUS_VICTORY,      NPC_LORD_VICTOR_NEFARIUS,   5000},
     {NPC_REND_BLACKHAND,        0,                          0},
@@ -340,7 +340,8 @@ void instance_blackrock_spire::OnCreatureCreate(Creature* pCreature)
             m_uiNefariusGUID = pCreature->GetGUID();
             break;
         case NPC_REND_BLACKHAND:
-            m_uiRendGUID = pCreature->GetGUID();
+            if (!m_uiRendGUID) // only save the original Rend
+                m_uiRendGUID = pCreature->GetGUID();
             break;
         case NPC_GYTH:
             m_uiGythGUID = pCreature->GetGUID();
@@ -423,27 +424,19 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
             else if (uiData == DONE)
             {
                 // Event complete: remove the summoned spectators
-                for (GuidList::const_iterator itr = m_lStadiumSpectatorsGUIDList.begin(); itr != m_lStadiumSpectatorsGUIDList.end(); ++itr)
-                {
-                    if (Creature* pSpectator = instance->GetCreature(*itr))
-                        pSpectator->ForcedDespawn();
-                }
+                DespawnStadiumSpectators();
                 DoUseDoorOrButton(m_uiGythExitDoorGUID);
             }
             else if (uiData == FAIL)
             {
                 // Despawn Nefarius, Rend and the spectators on fail (the others are despawned OnCreatureEvade())
                 if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
-                    pNefarius->ForcedDespawn();
+                    pNefarius->DespawnOrUnsummon();
                 if (Creature* pRend = GetCreature(m_uiRendGUID))
-                    pRend->ForcedDespawn();
+                    pRend->DespawnOrUnsummon();
                 if (Creature* pGyth = GetCreature(m_uiGythGUID))
-                    pGyth->ForcedDespawn();
-                for (GuidList::const_iterator itr = m_lStadiumSpectatorsGUIDList.begin(); itr != m_lStadiumSpectatorsGUIDList.end(); ++itr)
-                {
-                    if (Creature* pSpectator = instance->GetCreature(*itr))
-                        pSpectator->ForcedDespawn();
-                }
+                    pGyth->DespawnOrUnsummon();
+                DespawnStadiumSpectators();
 
                 m_uiStadiumEventTimer = 0;
                 m_uiStadiumMobsAlive = 0;
@@ -520,7 +513,7 @@ void instance_blackrock_spire::OnCreatureDeath(Creature* pCreature)
                 }
             }
             --m_uiStadiumMobsAlive;
-            if (m_uiStadiumMobsAlive == 0)
+            if (!m_uiStadiumMobsAlive && (m_uiStadiumWaves == MAX_STADIUM_WAVES))
                 DoSendNextStadiumWave();
             break;
         case NPC_GYTH:
@@ -545,7 +538,7 @@ void instance_blackrock_spire::OnCreatureEvade(Creature* pCreature)
             if (!pCreature->IsTemporarySummon())
                 break;
             SetData(TYPE_STADIUM, FAIL);
-            pCreature->ForcedDespawn();
+            pCreature->DespawnOrUnsummon();
             break;
     }
 }
@@ -578,12 +571,13 @@ void instance_blackrock_spire::JustDidDialogueStep(int32 iEntry)
                 // Summon the spectators and move them to the western balcony
                 for (uint8 i = 0; i < 12; i++)
                 {
-                    Creature* pSpectator = pNefarius->SummonCreature(aStadiumSpectators[i], aSpectatorsSpawnLocs[i].x, aSpectatorsSpawnLocs[i].y, aSpectatorsSpawnLocs[i].z, aSpectatorsSpawnLocs[i].o, TEMPSUMMON_DEAD_DESPAWN, 0);
-                    if (pSpectator)
+                    if (Creature* pSpectator = pNefarius->SummonCreature(aStadiumSpectators[i], aSpectatorsSpawnLocs[i].x, aSpectatorsSpawnLocs[i].y, aSpectatorsSpawnLocs[i].z, aSpectatorsSpawnLocs[i].o, TEMPSUMMON_DEAD_DESPAWN, 0))
                     {
-                        pSpectator->SetFacingTo(aSpectatorsTargetLocs[i].o);
+                        pSpectator->SetDetectionDistance(1.0f);
+                        pSpectator->SetNoCallAssistance(true);
                         pSpectator->SetWalk(false);
-                        pSpectator->GetMotionMaster()->MovePoint(0, aSpectatorsTargetLocs[i].x, aSpectatorsTargetLocs[i].y, aSpectatorsTargetLocs[i].z);
+                        pSpectator->SetHomePosition(aSpectatorsTargetLocs[i].x, aSpectatorsTargetLocs[i].y, aSpectatorsTargetLocs[i].z, aSpectatorsTargetLocs[i].o);
+                        pSpectator->GetMotionMaster()->MovePoint(0, aSpectatorsTargetLocs[i].x, aSpectatorsTargetLocs[i].y, aSpectatorsTargetLocs[i].z, 0, 0.0f, aSpectatorsTargetLocs[i].o);
                         m_lStadiumSpectatorsGUIDList.push_back(pSpectator->GetObjectGuid());
                     }
                 }
@@ -602,7 +596,7 @@ void instance_blackrock_spire::JustDidDialogueStep(int32 iEntry)
         case SAY_NEFARIUS_PACING:
             // Make Lord Nefarius walk back and forth while Rend is preparing Glyth
             if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
-                pNefarius->GetMotionMaster()->MoveWaypoint(0);
+                pNefarius->GetMotionMaster()->MoveWaypoint();
             break;
         case SAY_NEFARIUS_VICTORY:
             SetData(TYPE_STADIUM, DONE);
@@ -616,6 +610,16 @@ void instance_blackrock_spire::JustDidDialogueStep(int32 iEntry)
             }
             break;
     }
+}
+
+void instance_blackrock_spire::DespawnStadiumSpectators()
+{
+    for (const auto& itr : m_lStadiumSpectatorsGUIDList)
+    {
+        if (Creature* pSpectator = instance->GetCreature(itr))
+            pSpectator->DespawnOrUnsummon();
+    }
+    m_lStadiumSpectatorsGUIDList.clear();
 }
 
 void instance_blackrock_spire::DoSendNextStadiumWave()
@@ -659,8 +663,8 @@ void instance_blackrock_spire::DoSendNextStadiumWave()
             pNefarius->GetMotionMaster()->MoveIdle();
             pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[5].x, aStadiumLocs[5].y, aStadiumLocs[5].z);
 
-            if (Creature* pTemp = pNefarius->SummonCreature(NPC_GYTH, aStadiumLocs[1].x, aStadiumLocs[1].y, aStadiumLocs[1].z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
-                pTemp->GetMotionMaster()->MovePoint(0, aStadiumLocs[2].x, aStadiumLocs[2].y, aStadiumLocs[2].z);
+            if (Creature* pGyth = pNefarius->SummonCreature(NPC_GYTH, aStadiumLocs[1].x, aStadiumLocs[1].y, aStadiumLocs[1].z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
+                pGyth->GetMotionMaster()->MoveWaypoint();
         }
 
         // Set this to 2, because Rend will be summoned later during the fight
@@ -856,6 +860,8 @@ uint64 instance_blackrock_spire::GetData64(uint32 uiType)
             return m_uiEmberseerGUID;
         case NPC_LORD_VICTOR_NEFARIUS:
             return m_uiNefariusGUID;
+        case NPC_REND_BLACKHAND:
+            return m_uiRendGUID;
         case NPC_GYTH:
             return m_uiGythGUID;
         case NPC_SCARSHIELD_INFILTRATOR:
@@ -925,12 +931,13 @@ bool AreaTrigger_at_blackrock_spire(Player* pPlayer, AreaTriggerEntry const* pAt
                 if (pInstance->GetData(TYPE_STADIUM) == IN_PROGRESS || pInstance->GetData(TYPE_STADIUM) == DONE)
                     return false;
 
-                // Summon Nefarius and Rend for the dialogue event
-                // Note: Nefarius and Rend need to be hostile and not attackable
-                if (Creature* pNefarius = pPlayer->SummonCreature(NPC_LORD_VICTOR_NEFARIUS, aStadiumLocs[3].x, aStadiumLocs[3].y, aStadiumLocs[3].z, aStadiumLocs[3].o, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                    pNefarius->SetFactionTemporary(FACTION_BLACK_DRAGON, TEMPFACTION_NONE);
-                if (Creature* pRend = pPlayer->SummonCreature(NPC_REND_BLACKHAND, aStadiumLocs[4].x, aStadiumLocs[4].y, aStadiumLocs[4].z, aStadiumLocs[4].o, TEMPSUMMON_CORPSE_DESPAWN, 0))
-                    pRend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+                // Respawn Nefarius and Rend for the dialogue event if they are not spawned already.
+                if (Creature* pNefarius = pInstance->GetCreature(pInstance->GetData64(NPC_LORD_VICTOR_NEFARIUS)))
+                    if (!pNefarius->IsAlive())
+                        pNefarius->Respawn();
+                if (Creature* pRend = pInstance->GetCreature(pInstance->GetData64(NPC_REND_BLACKHAND)))
+                    if (!pRend->IsAlive())
+                        pRend->Respawn();
 
                 pInstance->SetData(TYPE_STADIUM, IN_PROGRESS);
             }
@@ -1047,7 +1054,6 @@ struct npc_rookery_hatcherAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SOLAKAR, FAIL);
         m_creature->ForcedDespawn();
     }
-
 
     void MoveInLineOfSight(Unit* pWho) override
     {

@@ -631,6 +631,7 @@ CreatureAI* GetAI_boss_victor_nefarius(Creature* creature)
         return new boss_victor_nefariusAI(creature);
 
     // UBRS
+    creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
     return new NullCreatureAI(creature);
 }
 
