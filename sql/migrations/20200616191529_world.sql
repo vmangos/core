@@ -125,14 +125,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (934, 67, -9267.15, -2190.66, 64.0898, 100, 0, 0, 0);
 
 
---add effsee and hilary scripts
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 8963;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (896301, 8963, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 896301, 896302, 0, 'effsee - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (896301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4627, 0, 0, 0, 0, 0, 0, 0, 0, 'effsee - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (896302, 0, 68, 896201, 2, 8962, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'hilary - speak');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (896201, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4628, 0, 0, 0, 0, 0, 0, 0, 0, 'hilary - speak');
-
-
 -- add roger and jamin scripts
 UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 5607;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (560701, 5607, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 560701, 560702, 560703, 'jamin and roger - speak');
