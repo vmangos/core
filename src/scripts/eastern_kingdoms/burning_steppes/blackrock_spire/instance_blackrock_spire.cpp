@@ -567,7 +567,7 @@ void instance_blackrock_spire::JustDidDialogueStep(int32 iEntry)
                 pRend->SetFacingTo(aStadiumLocs[5].o);
             if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
             {
-                pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[5].x, aStadiumLocs[5].y, aStadiumLocs[5].z);
+                pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[5].x, aStadiumLocs[5].y, aStadiumLocs[5].z, 0, 0.0f, aStadiumLocs[5].o);
                 // Summon the spectators and move them to the western balcony
                 for (uint8 i = 0; i < 12; i++)
                 {
@@ -664,7 +664,10 @@ void instance_blackrock_spire::DoSendNextStadiumWave()
             pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[5].x, aStadiumLocs[5].y, aStadiumLocs[5].z, 0, 0.0f, aStadiumLocs[5].o);
 
             if (Creature* pGyth = pNefarius->SummonCreature(NPC_GYTH, aStadiumLocs[1].x, aStadiumLocs[1].y, aStadiumLocs[1].z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
+            {
+                pGyth->SetWalk(false);
                 pGyth->GetMotionMaster()->MoveWaypoint();
+            }
         }
 
         // Set this to 2, because Rend will be summoned later during the fight
