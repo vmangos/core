@@ -80,8 +80,6 @@ enum
     GO_EMBERSEER_RUNE05         = 175270,
     GO_EMBERSEER_RUNE06         = 175271,
     GO_EMBERSEER_RUNE07         = 175272,
-
-    FACTION_BLACK_DRAGON        = 103
 };
 
 class instance_blackrock_spire : public ScriptedInstance, private DialogueHelper
