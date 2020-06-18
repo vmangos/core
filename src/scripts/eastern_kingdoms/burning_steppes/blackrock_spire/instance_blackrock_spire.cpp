@@ -661,7 +661,7 @@ void instance_blackrock_spire::DoSendNextStadiumWave()
         {
             // Stop Lord Nefarius from moving and put him back in place
             pNefarius->GetMotionMaster()->MoveIdle();
-            pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[5].x, aStadiumLocs[5].y, aStadiumLocs[5].z);
+            pNefarius->GetMotionMaster()->MovePoint(0, aStadiumLocs[5].x, aStadiumLocs[5].y, aStadiumLocs[5].z, 0, 0.0f, aStadiumLocs[5].o);
 
             if (Creature* pGyth = pNefarius->SummonCreature(NPC_GYTH, aStadiumLocs[1].x, aStadiumLocs[1].y, aStadiumLocs[1].z, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
                 pGyth->GetMotionMaster()->MoveWaypoint();
@@ -911,7 +911,7 @@ InstanceData* GetInstanceData_instance_blackrock_spire(Map* pMap)
 
 bool AreaTrigger_at_blackrock_spire(Player* pPlayer, AreaTriggerEntry const* pAt)
 {
-    if (pPlayer->IsDead())
+    if (pPlayer->IsDead() || pPlayer->IsGameMaster())
         return false;
 
     switch (pAt->id)
