@@ -617,7 +617,7 @@ void npc_reginald_windsorAI::UpdateAI(uint32 const uiDiff)
             {
                 Bolvar->SetWalk(false);
                 Bolvar->GetMotionMaster()->MovePoint(0, WindsorEventMove[15].x, WindsorEventMove[15].y, WindsorEventMove[15].z,
-                        MOVE_NONE, 0, 5.740616);
+                        MOVE_NONE, 0, 5.740616f);
                 X = Bolvar->GetPositionX() - WindsorEventMove[15].x;
                 Y = Bolvar->GetPositionY() - WindsorEventMove[15].y;
                 Timer = 1000 + sqrt((X * X) + (Y * Y)) / (m_creature->GetSpeed(MOVE_WALK) * 0.001f);

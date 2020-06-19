@@ -558,4 +558,27 @@ enum UnitDismountResult
     DISMOUNTRESULT_OK           = 3     // no error
 };
 
+// First entry in CreatureDisplayInfo.dbc
+#define UNIT_DISPLAY_ID_BOX 4
+
+enum ModelIds
+{
+    MODEL_HUMAN_MALE    = 49,
+    MODEL_HUMAN_FEMALE  = 50,
+    MODEL_ORC_MALE      = 51,
+    MODEL_ORC_FEMALE    = 52,
+    MODEL_DWARF_MALE    = 53,
+    MODEL_DWARF_FEMALE  = 54,
+    MODEL_NELF_MALE     = 55,
+    MODEL_NELF_FEMALE   = 56,
+    MODEL_UNDEAD_MALE   = 57,
+    MODEL_UNDEAD_FEMALE = 58,
+    MODEL_TAUREN_MALE   = 59,
+    MODEL_TAUREN_FEMALE = 60,
+    MODEL_GNOME_MALE    = 182,
+    MODEL_GNOME_FEMALE  = 183,
+    MODEL_TROLL_MALE    = 185,
+    MODEL_TROLL_FEMALE  = 186,
+};
+
 #endif
