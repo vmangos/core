@@ -23,6 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "blackrock_spire.h"
+#include "WaypointManager.h"
 
 //#define DEBUG_ON
 
@@ -53,6 +54,8 @@ enum
     SAY_REND_TAUNT2             = 5678,
     SAY_REND_TAUNT3             = 5673,
     SAY_REND_TAUNT4             = 5674,
+
+    WAYPOINT_ID_STADIUM         = 10442,
 };
 
 /* Areatrigger
@@ -119,7 +122,7 @@ static const Position aStadiumLocs[7] =
 };
 
 // Stadium event description
-static const uint32 aStadiumEventNpcs[MAX_STADIUM_WAVES][5] =
+static const uint32 aStadiumEventNpcs[MAX_STADIUM_WAVES][MAX_STADIUM_MOBS_PER_WAVE] =
 {
     {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, 0},
     {NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_WHELP, NPC_CHROMATIC_DRAGON, 0},
@@ -630,6 +633,7 @@ void instance_blackrock_spire::DoSendNextStadiumWave()
         if (Creature* pNefarius = GetCreature(m_uiNefariusGUID))
         {
             float fX, fY, fZ;
+            Creature* pFirstMob = nullptr;
             for (uint8 i = 0; i < MAX_STADIUM_MOBS_PER_WAVE; ++i)
             {
                 if (aStadiumEventNpcs[m_uiStadiumWaves][i] == 0)
@@ -639,14 +643,16 @@ void instance_blackrock_spire::DoSendNextStadiumWave()
                 fX = std::min(aStadiumLocs[0].x, fX);    // Halfcircle - suits better the rectangular form
                 if (Creature* pTemp = pNefarius->SummonCreature(aStadiumEventNpcs[m_uiStadiumWaves][i], fX, fY, fZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0))
                 {
-                    // Get some point in the center of the stadium
-                    pTemp->GetRandomPoint(aStadiumLocs[2].x, aStadiumLocs[2].y, aStadiumLocs[2].z, 5.0f, fX, fY, fZ);
-                    fX = std::min(aStadiumLocs[2].x, fX);// Halfcircle - suits better the rectangular form
-
-                    pTemp->GetMotionMaster()->MovePoint(0, fX, fY, fZ);
+                    if (!pFirstMob)
+                        pFirstMob = pTemp;
+                    else
+                        pTemp->JoinCreatureGroup(pFirstMob, frand(3.0f, 5.0f), i, OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER);
                     ++m_uiStadiumMobsAlive;
                 }
             }
+
+            if (pFirstMob)
+                pFirstMob->GetMotionMaster()->MoveWaypoint(0, 0, PATH_FROM_SPECIAL, 0, WAYPOINT_ID_STADIUM, true);
         }
 
         DoUseDoorOrButton(m_uiGythCombatDoorGUID);
