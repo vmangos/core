@@ -62,14 +62,12 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/burning_steppes/blackrock_depths/boss_tomb_of_seven.cpp
     eastern_kingdoms/burning_steppes/blackrock_depths/instance_blackrock_depths.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_drakkisath.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_gyth.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_halycon.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_highlord_omokk.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_mother_smolderweb.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_overlord_wyrmthalak.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_pyroguard_emberseer.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_quartermaster_zigris.cpp
-    eastern_kingdoms/burning_steppes/blackrock_spire/boss_rend_blackhand.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_shadow_hunter_voshgajin.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_the_beast.cpp
     eastern_kingdoms/burning_steppes/blackrock_spire/boss_urok.cpp
