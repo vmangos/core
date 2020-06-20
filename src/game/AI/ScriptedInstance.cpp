@@ -303,7 +303,7 @@ void DialogueHelper::DoNextDialogueStep()
     }
 
     // Simulate Case
-    if (uiSpeakerEntry && iTextEntry < 0)
+    if (uiSpeakerEntry && iTextEntry)
     {
         // Use Speaker if directly provided
         Creature* pSpeaker = GetSpeakerByEntry(uiSpeakerEntry);

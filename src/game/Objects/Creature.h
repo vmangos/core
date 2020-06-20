@@ -34,7 +34,6 @@
 #include "Cell.h"
 #include "Util.h"
 
-#include <utility>
 #include <list>
 
 class SpellEntry;
