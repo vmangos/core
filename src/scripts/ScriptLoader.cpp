@@ -28,7 +28,6 @@ void AddSC_boss_immol_thar();
 void AddSC_boss_tendris_warpwood();
 void AddSC_npc_pusillin();
 void AddSC_boss_zevrim();
-void AddSC_npc_ecorcefer();
 void AddSC_dreadsteed_ritual();
 void AddSC_npc_king_gordok();
 
@@ -284,7 +283,6 @@ void AddScripts()
     AddSC_boss_immol_thar();
     AddSC_boss_tendris_warpwood();
     AddSC_npc_pusillin();
-    AddSC_npc_ecorcefer();
     AddSC_boss_zevrim();
     AddSC_dreadsteed_ritual();
     AddSC_npc_king_gordok();

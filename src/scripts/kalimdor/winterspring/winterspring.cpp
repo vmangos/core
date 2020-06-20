@@ -103,37 +103,6 @@ bool GossipSelect_npc_rivern_frostwind(Player* pPlayer, Creature* pCreature, uin
     return true;
 }
 
-/*######
-## npc_witch_doctor_mauari
-######*/
-
-bool GossipHello_npc_witch_doctor_mauari(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestRewardStatus(975))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I'd like you to make me a new Cache of Mau'ari please.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(3377, pCreature->GetGUID());
-    }
-    else
-        pPlayer->SEND_GOSSIP_MENU(3375, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_witch_doctor_mauari(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, 16351, false);
-    }
-
-    return true;
-}
-
 enum
 {
     SPELL_FOOLS_PLIGHT              = 23504,
@@ -927,12 +896,6 @@ void AddSC_winterspring()
     newscript->Name = "npc_rivern_frostwind";
     newscript->pGossipHello =  &GossipHello_npc_rivern_frostwind;
     newscript->pGossipSelect = &GossipSelect_npc_rivern_frostwind;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_witch_doctor_mauari";
-    newscript->pGossipHello =  &GossipHello_npc_witch_doctor_mauari;
-    newscript->pGossipSelect = &GossipSelect_npc_witch_doctor_mauari;
     newscript->RegisterSelf();
 
     newscript = new Script;

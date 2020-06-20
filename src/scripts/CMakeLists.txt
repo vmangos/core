@@ -220,7 +220,6 @@ set (SCRIPTS_SRCS
     kalimdor/feralas/dire_maul/boss_zevrim.cpp
     kalimdor/feralas/dire_maul/dreadsteed_ritual.cpp
     kalimdor/feralas/dire_maul/instance_dire_maul.cpp
-    kalimdor/feralas/dire_maul/npc_ecorcefer.cpp
     kalimdor/feralas/dire_maul/npc_pusillin.cpp
     kalimdor/moonglade/boss_omen.cpp
     kalimdor/moonglade/moonglade.cpp
