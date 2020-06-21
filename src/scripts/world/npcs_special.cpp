@@ -33,7 +33,6 @@ npc_injured_patient     100%    patients for triage-quests (6622 and 6624)
 npc_doctor              100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 and 6624 (Triage)
 npc_lunaclaw_spirit     100%    Appears at two different locations, quest 6001/6002
 npc_mount_vendor        100%    Regular mount vendors all over the world. Display gossip if player doesn't meet the requirements to buy
-npc_sayge               100%    Darkmoon event fortune teller, buff player based on answers given
 npc_event_fireworks     100%    Shoots fireworks every hour. Used for New Year's Eve event.
 EndContentData */
 
@@ -742,140 +741,6 @@ bool GossipSelect_npc_lunaclaw_spirit(Player* pPlayer, Creature* pCreature, uint
     {
         pPlayer->SEND_GOSSIP_MENU(TEXT_ID_PROGRESS, pCreature->GetGUID());
         pPlayer->AreaExploredOrEventHappens((pPlayer->GetTeam() == ALLIANCE) ? QUEST_BODY_HEART_A : QUEST_BODY_HEART_H);
-    }
-    return true;
-}
-
-/*######
-## npc_sayge
-######*/
-
-#define SPELL_DMG       23768                               //dmg
-#define SPELL_RES       23769                               //res
-#define SPELL_ARM       23767                               //arm
-#define SPELL_SPI       23738                               //spi
-#define SPELL_INT       23766                               //int
-#define SPELL_STM       23737                               //stm
-#define SPELL_STR       23735                               //str
-#define SPELL_AGI       23736                               //agi
-#define SPELL_FORTUNE   23765                               //faire fortune
-
-bool GossipHello_npc_sayge(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->HasSpellCooldown(SPELL_INT) ||
-            pPlayer->HasSpellCooldown(SPELL_ARM) ||
-            pPlayer->HasSpellCooldown(SPELL_DMG) ||
-            pPlayer->HasSpellCooldown(SPELL_RES) ||
-            pPlayer->HasSpellCooldown(SPELL_STR) ||
-            pPlayer->HasSpellCooldown(SPELL_AGI) ||
-            pPlayer->HasSpellCooldown(SPELL_STM) ||
-            pPlayer->HasSpellCooldown(SPELL_SPI))
-        pPlayer->SEND_GOSSIP_MENU(7393, pCreature->GetGUID());
-    else
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Yes", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(7339, pCreature->GetGUID());
-    }
-
-    return true;
-}
-
-void SendAction_npc_sayge(Player* pPlayer, Creature* pCreature, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Slay the Man",                      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Turn him over to liege",            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Confiscate the corn",               GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let him go and have the corn",      GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-            pPlayer->SEND_GOSSIP_MENU(7340, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Execute your friend painfully",     GOSSIP_SENDER_MAIN + 1, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Execute your friend painlessly",    GOSSIP_SENDER_MAIN + 2, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let your friend go",                GOSSIP_SENDER_MAIN + 3, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->SEND_GOSSIP_MENU(7341, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Confront the diplomat",             GOSSIP_SENDER_MAIN + 4, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Show not so quiet defiance",        GOSSIP_SENDER_MAIN + 5, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Remain quiet",                      GOSSIP_SENDER_MAIN + 2, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->SEND_GOSSIP_MENU(7361, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+4:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Speak against your brother openly", GOSSIP_SENDER_MAIN + 6, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Help your brother in",              GOSSIP_SENDER_MAIN + 7, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Keep your brother out without letting him know", GOSSIP_SENDER_MAIN + 8, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->SEND_GOSSIP_MENU(7362, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+5:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Take credit, keep gold",            GOSSIP_SENDER_MAIN + 5, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Take credit, share the gold",       GOSSIP_SENDER_MAIN + 4, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Let the knight take credit",        GOSSIP_SENDER_MAIN + 3, GOSSIP_ACTION_INFO_DEF);
-            pPlayer->SEND_GOSSIP_MENU(7363, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Thanks",                            GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            pPlayer->SEND_GOSSIP_MENU(7364, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+6:
-            pCreature->CastSpell(pPlayer, SPELL_FORTUNE, true);
-            pPlayer->SEND_GOSSIP_MENU(7365, pCreature->GetGUID());
-            break;
-    }
-}
-
-bool GossipSelect_npc_sayge(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiSender)
-    {
-        case GOSSIP_SENDER_MAIN:
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
-        case GOSSIP_SENDER_MAIN+1:
-            pCreature->CastSpell(pPlayer, SPELL_DMG, true);
-            pPlayer->AddSpellCooldown(SPELL_DMG, 0, time(nullptr) + 7200);
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
-        case GOSSIP_SENDER_MAIN+2:
-            pCreature->CastSpell(pPlayer, SPELL_RES, true);
-            pPlayer->AddSpellCooldown(SPELL_RES, 0, time(nullptr) + 7200);
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
-        case GOSSIP_SENDER_MAIN+3:
-            pCreature->CastSpell(pPlayer, SPELL_ARM, true);
-            pPlayer->AddSpellCooldown(SPELL_ARM, 0, time(nullptr) + 7200);
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
-        case GOSSIP_SENDER_MAIN+4:
-            pCreature->CastSpell(pPlayer, SPELL_SPI, true);
-            pPlayer->AddSpellCooldown(SPELL_SPI, 0, time(nullptr) + 7200);
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
-        case GOSSIP_SENDER_MAIN+5:
-            pCreature->CastSpell(pPlayer, SPELL_INT, true);
-            pPlayer->AddSpellCooldown(SPELL_INT, 0, time(nullptr) + 7200);
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
-        case GOSSIP_SENDER_MAIN+6:
-            pCreature->CastSpell(pPlayer, SPELL_STM, true);
-            pPlayer->AddSpellCooldown(SPELL_STM, 0, time(nullptr) + 7200);
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
-        case GOSSIP_SENDER_MAIN+7:
-            pCreature->CastSpell(pPlayer, SPELL_STR, true);
-            pPlayer->AddSpellCooldown(SPELL_STR, 0, time(nullptr) + 7200);
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
-        case GOSSIP_SENDER_MAIN+8:
-            pCreature->CastSpell(pPlayer, SPELL_AGI, true);
-            pPlayer->AddSpellCooldown(SPELL_AGI, 0, time(nullptr) + 7200);
-            SendAction_npc_sayge(pPlayer, pCreature, uiAction);
-            break;
     }
     return true;
 }
@@ -2488,12 +2353,6 @@ void AddSC_npcs_special()
     newscript->Name = "npc_lunaclaw_spirit";
     newscript->pGossipHello =  &GossipHello_npc_lunaclaw_spirit;
     newscript->pGossipSelect = &GossipSelect_npc_lunaclaw_spirit;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_sayge";
-    newscript->pGossipHello = &GossipHello_npc_sayge;
-    newscript->pGossipSelect = &GossipSelect_npc_sayge;
     newscript->RegisterSelf();
 
     newscript = new Script;

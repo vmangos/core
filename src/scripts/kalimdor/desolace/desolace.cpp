@@ -1069,12 +1069,8 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void DoVendor(bool visible) const
     {
-        auto pVendor = m_creature->FindNearestCreature(m_bRigger ? NPC_SUPER_SELLER_680 : NPC_VENDOR_TRON_1000, 100.0f);
-
-        if (pVendor)
-        {
+        if (Creature* pVendor = m_creature->FindNearestCreature(m_bRigger ? NPC_SUPER_SELLER_680 : NPC_VENDOR_TRON_1000, 100.0f))
             pVendor->SetVisibility(visible ? VISIBILITY_ON : VISIBILITY_OFF);
-        }
     }
 
     void WaypointReached(uint32 uiPoint) override
@@ -1245,34 +1241,6 @@ bool QuestAccept_npc_rigger_gizelton(Player* pPlayer, Creature* pCreature, Quest
     return true;
 }
 
-/*
- * Vendor-Tron 1000, Super-Seller 680 (Gizelton Caravan, Bodyguard For Hire support)
- */
-
-struct npc_caravan_vendorAI : ScriptedAI
-{
-    explicit npc_caravan_vendorAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        npc_caravan_vendorAI::Reset();
-        
-        m_creature->SetVisibility(VISIBILITY_OFF);
-    }
-
-    void Reset() override
-    {
-
-    }
-};
-
-CreatureAI* GetAI_npc_caravan_vendor(Creature* pCreature)
-{
-    return new npc_caravan_vendorAI(pCreature);
-}
-
-/*
- *
- */
-
 void AddSC_desolace()
 {
     Script* newscript;
@@ -1325,10 +1293,5 @@ void AddSC_desolace()
     newscript = new Script;
     newscript->Name = "npc_rigger_gizelton";
     newscript->pQuestAcceptNPC = &QuestAccept_npc_rigger_gizelton;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_caravan_vendor";
-    newscript->GetAI = &GetAI_npc_caravan_vendor;
     newscript->RegisterSelf();
 }

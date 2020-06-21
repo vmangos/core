@@ -131,10 +131,13 @@ enum
     MOB_GARDE_WYRM_GRIFFEMORT   = 12460,
 
     EMOTE_DESTROY_EGG           = -1469034,
+    GOSSIP_OPTION_NEFARIUS      = 6045,
 
     CONDITION_SCEPTER_FAIL      = 1,
     CONDITION_SCEPTER_WIN       = 2
 };
+
+void NefariusGossipOptionClicked(Creature* pCreature);
 
 struct blackwing_technicians_helper
 {
@@ -786,10 +789,11 @@ struct instance_blackwing_lair : public ScriptedInstance
         case DATA_SCEPTER_CHAMPION:
             m_auiData[DATA_SCEPTER_CHAMPION] = uiData;
             break;
+        case GOSSIP_OPTION_NEFARIUS:
+            if (Creature* pCreature = GetCreature(m_auiData[DATA_NEFARIUS_GUID]))
+                NefariusGossipOptionClicked(pCreature);
+            break;
         }
-
-
-
 
         if (uiData == DONE || TYPE_SCEPTER_RUN == uiType || DATA_SCEPTER_CHAMPION == uiData)
         {
