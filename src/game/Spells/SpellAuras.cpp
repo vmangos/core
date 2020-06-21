@@ -6241,8 +6241,10 @@ void Aura::PeriodicDummyTick()
                     for (const auto& aura : uAuras)
                     {
                         if (ribbonCount < 2)
+                        {
                             if (aura.second->GetId() == 29705)
                                 ribbonCount++;
+                        }
                         else
                             break;
                     }
