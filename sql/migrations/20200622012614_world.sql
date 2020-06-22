@@ -11,7 +11,7 @@ INSERT INTO `migrations` VALUES ('20200622012614');
 
 -- Varimathras
 UPDATE `creature` SET `orientation`='0.820305' WHERE  `guid`=31901;
-UPDATE `creature_template` SET `display_scale1`='1.2' WHERE  `entry`=2425
+UPDATE `creature_template` SET `display_scale1`='1.2' WHERE  `entry`=2425;
 
 
 -- End of migration.
