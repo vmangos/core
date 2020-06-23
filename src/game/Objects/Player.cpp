@@ -5325,7 +5325,7 @@ float Player::GetDodgeFromAgility() const
         default:
             return 0.0f;
     }
-    float classrate = valLevel1 * float(60.0f - GetLevel()) / 59.0f + valLevel60 * float(GetLevel() - 1.0f) / 59.0f;
+    float classrate = (valLevel1 * float(60.0f - GetLevel()) / 59.0f + valLevel60 * float(GetLevel() - 1.0f) / 59.0f) * 4.5f; //◊‘∂®“Â…¡±‹
     return GetStat(STAT_AGILITY) / classrate;
 }
 

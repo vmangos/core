@@ -30,26 +30,26 @@ bool GossipHello_TeleportNPC(Player *player, Creature *_Creature)
     // HORDE
     if (player->GetTeam() == HORDE)
     {
-		player->ADD_GOSSIP_ITEM(5, "【世界主城】 - 特色商人大本营", GOSSIP_SENDER_MAIN, 628);
-		player->ADD_GOSSIP_ITEM(5, "  阵营城市"               , GOSSIP_SENDER_MAIN, 1);
-        player->ADD_GOSSIP_ITEM(5, "  新人副本"            , GOSSIP_SENDER_MAIN, 5);
-        player->ADD_GOSSIP_ITEM(5, "【团队副本】"                 , GOSSIP_SENDER_MAIN, 101);
-		player->ADD_GOSSIP_ITEM(5, "一号暮光怪牧场", GOSSIP_SENDER_MAIN, 629);
-		player->ADD_GOSSIP_ITEM(5, "二号西瘟疫牧场", GOSSIP_SENDER_MAIN, 630);
-        player->ADD_GOSSIP_ITEM(5, "古尔巴十竞技场" , GOSSIP_SENDER_MAIN, 4015);
+		player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
+		player->ADD_GOSSIP_ITEM(5, "-阵营城市-", GOSSIP_SENDER_MAIN, 1);
+		player->ADD_GOSSIP_ITEM(5, "-新人副本-", GOSSIP_SENDER_MAIN, 5);
+		player->ADD_GOSSIP_ITEM(5, "【团队副本】", GOSSIP_SENDER_MAIN, 101);
+		player->ADD_GOSSIP_ITEM(5, "一号场地刷暮光信徒<新人成长>", GOSSIP_SENDER_MAIN, 629);
+		player->ADD_GOSSIP_ITEM(5, "二号场地刷瘟疫锅周边怪<新人成长>", GOSSIP_SENDER_MAIN, 630);
+		player->ADD_GOSSIP_ITEM(5, "古巴竞技场 - 叶文洁" , GOSSIP_SENDER_MAIN, 4015);
 
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
     }
     // ALLIANCE
     else
     {
-		player->ADD_GOSSIP_ITEM(5, "【世界主城】 - 特色商人大本营", GOSSIP_SENDER_MAIN, 628);
-		player->ADD_GOSSIP_ITEM(5, "  阵营城市", GOSSIP_SENDER_MAIN, 2);
-		player->ADD_GOSSIP_ITEM(5, "  新人副本", GOSSIP_SENDER_MAIN, 5);
+		player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
+		player->ADD_GOSSIP_ITEM(5, "-阵营城市-", GOSSIP_SENDER_MAIN, 2);
+		player->ADD_GOSSIP_ITEM(5, "-新人副本-", GOSSIP_SENDER_MAIN, 5);
 		player->ADD_GOSSIP_ITEM(5, "【团队副本】", GOSSIP_SENDER_MAIN, 101);
-		player->ADD_GOSSIP_ITEM(5, "一号暮光怪牧场", GOSSIP_SENDER_MAIN, 629);
-		player->ADD_GOSSIP_ITEM(5, "二号西瘟疫牧场", GOSSIP_SENDER_MAIN, 630);
-		player->ADD_GOSSIP_ITEM(5, "古尔巴十竞技场", GOSSIP_SENDER_MAIN, 4015);
+		player->ADD_GOSSIP_ITEM(5, "一号场地刷暮光信徒<新人成长>", GOSSIP_SENDER_MAIN, 629);
+		player->ADD_GOSSIP_ITEM(5, "二号场地刷瘟疫锅周边怪<新人成长>", GOSSIP_SENDER_MAIN, 630);
+		player->ADD_GOSSIP_ITEM(5, "古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
 
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
     }
@@ -123,12 +123,12 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
             player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
             break;
         case 101: // Raids
+			player->ADD_GOSSIP_ITEM(5, "祖尔格拉布 - ZUG", GOSSIP_SENDER_MAIN, 4000);
+			player->ADD_GOSSIP_ITEM(5, "安其拉废墟 - FX", GOSSIP_SENDER_MAIN, 4004);
 			player->ADD_GOSSIP_ITEM(5, "奥妮克希亚的巢穴 - 黑龙MM", GOSSIP_SENDER_MAIN, 4001);
 			player->ADD_GOSSIP_ITEM(5, "熔火之心 - MC", GOSSIP_SENDER_MAIN, 4002);
 			player->ADD_GOSSIP_ITEM(5, "黑翼之巢 - BWL", GOSSIP_SENDER_MAIN, 4003);
-			player->ADD_GOSSIP_ITEM(5, "祖尔格拉布 - ZUG", GOSSIP_SENDER_MAIN, 4000);
-			player->ADD_GOSSIP_ITEM(5, "安其拉废墟 - FX", GOSSIP_SENDER_MAIN, 4004);
-			player->ADD_GOSSIP_ITEM(5, "安其拉神殿 - TAQ", GOSSIP_SENDER_MAIN, 4005);
+			player->ADD_GOSSIP_ITEM(5, "安其拉 - TAQ", GOSSIP_SENDER_MAIN, 4005);
 			player->ADD_GOSSIP_ITEM(5, "纳克萨玛斯 - NAXX", GOSSIP_SENDER_MAIN, 4006);
 			player->ADD_GOSSIP_ITEM(5, "<-[返回主菜单]", GOSSIP_SENDER_MAIN, 100);
 
@@ -527,26 +527,26 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
             // HORDE
             if (player->GetTeam() == HORDE)
             {
-				player->ADD_GOSSIP_ITEM(5, "【世界主城】 - 特色商人大本营", GOSSIP_SENDER_MAIN, 628);
-				player->ADD_GOSSIP_ITEM(5, "  阵营城市", GOSSIP_SENDER_MAIN, 1);
-				player->ADD_GOSSIP_ITEM(5, "  新人副本", GOSSIP_SENDER_MAIN, 5);
+				player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
+				player->ADD_GOSSIP_ITEM(5, "-阵营城市-", GOSSIP_SENDER_MAIN, 1);
+				player->ADD_GOSSIP_ITEM(5, "-新人副本-", GOSSIP_SENDER_MAIN, 5);
 				player->ADD_GOSSIP_ITEM(5, "【团队副本】", GOSSIP_SENDER_MAIN, 101);
-				player->ADD_GOSSIP_ITEM(5, "一号暮光怪牧场", GOSSIP_SENDER_MAIN, 629);
-				player->ADD_GOSSIP_ITEM(5, "二号西瘟疫牧场", GOSSIP_SENDER_MAIN, 630);
-				player->ADD_GOSSIP_ITEM(5, "古尔巴十竞技场", GOSSIP_SENDER_MAIN, 4015);
+				player->ADD_GOSSIP_ITEM(5, "一号场地刷暮光信徒<新人成长>", GOSSIP_SENDER_MAIN, 629);
+				player->ADD_GOSSIP_ITEM(5, "二号场地刷瘟疫锅周边怪<新人成长>", GOSSIP_SENDER_MAIN, 630);
+				player->ADD_GOSSIP_ITEM(5, "古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
 
                 player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
             }
             // ALLIANCE
             else
             {
-				player->ADD_GOSSIP_ITEM(5, "【世界主城】 - 特色商人大本营", GOSSIP_SENDER_MAIN, 628);
-				player->ADD_GOSSIP_ITEM(5, "  阵营城市", GOSSIP_SENDER_MAIN, 2);
-				player->ADD_GOSSIP_ITEM(5, "  新人副本", GOSSIP_SENDER_MAIN, 5);
+				player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
+				player->ADD_GOSSIP_ITEM(5, "-阵营城市-", GOSSIP_SENDER_MAIN, 2);
+				player->ADD_GOSSIP_ITEM(5, "-新人副本-", GOSSIP_SENDER_MAIN, 5);
 				player->ADD_GOSSIP_ITEM(5, "【团队副本】", GOSSIP_SENDER_MAIN, 101);
-				player->ADD_GOSSIP_ITEM(5, "一号暮光怪牧场", GOSSIP_SENDER_MAIN, 629);
-				player->ADD_GOSSIP_ITEM(5, "二号西瘟疫牧场", GOSSIP_SENDER_MAIN, 630);
-				player->ADD_GOSSIP_ITEM(5, "古尔巴十竞技场", GOSSIP_SENDER_MAIN, 4015);
+				player->ADD_GOSSIP_ITEM(5, "一号场地刷暮光信徒<新人成长>", GOSSIP_SENDER_MAIN, 629);
+				player->ADD_GOSSIP_ITEM(5, "二号场地刷瘟疫锅周边怪<新人成长>", GOSSIP_SENDER_MAIN, 630);
+				player->ADD_GOSSIP_ITEM(5, "古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
 
                 player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
             }
@@ -596,31 +596,31 @@ void Enchant(Player* player, Item* item, uint32 enchantid)
 {
     if (!item)
     {
-        player->GetSession()->SendNotification("You must first equip the item you are trying to enchant.");
+        player->GetSession()->SendNotification("你必须先装备你要附魔的物品。");
         return;
     }
 
     if (!enchantid)
     {
-        player->GetSession()->SendNotification("Something went wrong.");
+        player->GetSession()->SendNotification("未完成。");
         return;
     }
 
     item->ClearEnchantment(PERM_ENCHANTMENT_SLOT);
     item->SetEnchantment(PERM_ENCHANTMENT_SLOT, enchantid, 0, 0);
-    player->GetSession()->SendNotification("%s succesfully enchanted", item->GetProto()->Name1);
+    player->GetSession()->SendNotification("%s 成功被附魔", item->GetProto()->Name1);
 }
 
 bool GossipHello_EnchantNPC(Player* player, Creature* creature)
 {
 
-    player->ADD_GOSSIP_ITEM(5, "Chest", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_CHEST);
-    player->ADD_GOSSIP_ITEM(5, "Cloak", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_BACK);
-    player->ADD_GOSSIP_ITEM(5, "Bracers", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_WRISTS);
-    player->ADD_GOSSIP_ITEM(5, "Gloves", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_HANDS);
-    player->ADD_GOSSIP_ITEM(5, "Boots", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_FEET);
-    player->ADD_GOSSIP_ITEM(5, "Mainhand", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_MAINHAND);
-    player->ADD_GOSSIP_ITEM(5, "Offhand", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_OFFHAND);
+    player->ADD_GOSSIP_ITEM(5, "胸部", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_CHEST);
+    player->ADD_GOSSIP_ITEM(5, "披风", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_BACK);
+    player->ADD_GOSSIP_ITEM(5, "护腕", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_WRISTS);
+    player->ADD_GOSSIP_ITEM(5, "手套", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_HANDS);
+    player->ADD_GOSSIP_ITEM(5, "靴子", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_FEET);
+    player->ADD_GOSSIP_ITEM(5, "主手武器", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_MAINHAND);
+    player->ADD_GOSSIP_ITEM(5, "副手武器", GOSSIP_SENDER_MAIN, EQUIPMENT_SLOT_OFFHAND);
 
     player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
     return true;
@@ -635,43 +635,43 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
         switch (action)
         {
         case EQUIPMENT_SLOT_CHEST:
-            player->ADD_GOSSIP_ITEM(5, "Greater Stats", GOSSIP_SENDER_MAIN, CHEST_STATS);
+            player->ADD_GOSSIP_ITEM(5, "所有属性+4", GOSSIP_SENDER_MAIN, CHEST_STATS);
             break;
         case EQUIPMENT_SLOT_BACK:
-            player->ADD_GOSSIP_ITEM(5, "Agility", GOSSIP_SENDER_MAIN, CLOAK_AGILITY);
-            player->ADD_GOSSIP_ITEM(5, "Armor", GOSSIP_SENDER_MAIN, CLOAK_ARMOR);
-            player->ADD_GOSSIP_ITEM(5, "Dodge", GOSSIP_SENDER_MAIN, CLOAK_DODGE);
-            player->ADD_GOSSIP_ITEM(5, "Subtlety", GOSSIP_SENDER_MAIN, CLOAK_SUB);
+            player->ADD_GOSSIP_ITEM(5, "敏捷+3", GOSSIP_SENDER_MAIN, CLOAK_AGILITY);
+            player->ADD_GOSSIP_ITEM(5, "护甲+70", GOSSIP_SENDER_MAIN, CLOAK_ARMOR);
+            player->ADD_GOSSIP_ITEM(5, "闪避+1%", GOSSIP_SENDER_MAIN, CLOAK_DODGE);
+            player->ADD_GOSSIP_ITEM(5, "狡诈", GOSSIP_SENDER_MAIN, CLOAK_SUB);
         break;
         case EQUIPMENT_SLOT_WRISTS:
-            player->ADD_GOSSIP_ITEM(5, "Stamina", GOSSIP_SENDER_MAIN, BRACER_STAM);
-            player->ADD_GOSSIP_ITEM(5, "Strength", GOSSIP_SENDER_MAIN, BRACER_STR);
-            player->ADD_GOSSIP_ITEM(5, "Healing", GOSSIP_SENDER_MAIN, BRACER_HEAL);
-            player->ADD_GOSSIP_ITEM(5, "Intellect", GOSSIP_SENDER_MAIN, BRACER_INT);
+            player->ADD_GOSSIP_ITEM(5, "耐力+9", GOSSIP_SENDER_MAIN, BRACER_STAM);
+            player->ADD_GOSSIP_ITEM(5, "力量+9", GOSSIP_SENDER_MAIN, BRACER_STR);
+            player->ADD_GOSSIP_ITEM(5, "治疗法术+24", GOSSIP_SENDER_MAIN, BRACER_HEAL);
+            player->ADD_GOSSIP_ITEM(5, "智力+7", GOSSIP_SENDER_MAIN, BRACER_INT);
             break;
         case EQUIPMENT_SLOT_HANDS:
-            player->ADD_GOSSIP_ITEM(5, "Agility", GOSSIP_SENDER_MAIN, GLOVES_AGI);
-            player->ADD_GOSSIP_ITEM(5, "Fire Power", GOSSIP_SENDER_MAIN, GLOVES_FIRE);
-            player->ADD_GOSSIP_ITEM(5, "Frost Power", GOSSIP_SENDER_MAIN, GLOVES_FROST);
-            player->ADD_GOSSIP_ITEM(5, "Shadow Power", GOSSIP_SENDER_MAIN, GLOVES_SHADOW);
-            player->ADD_GOSSIP_ITEM(5, "Healing", GOSSIP_SENDER_MAIN, GLOVES_HEALING);
+            player->ADD_GOSSIP_ITEM(5, "敏捷+15", GOSSIP_SENDER_MAIN, GLOVES_AGI);
+            player->ADD_GOSSIP_ITEM(5, "火焰伤害+20", GOSSIP_SENDER_MAIN, GLOVES_FIRE);
+            player->ADD_GOSSIP_ITEM(5, "冰霜伤害+20", GOSSIP_SENDER_MAIN, GLOVES_FROST);
+            player->ADD_GOSSIP_ITEM(5, "暗影伤害+20", GOSSIP_SENDER_MAIN, GLOVES_SHADOW);
+            player->ADD_GOSSIP_ITEM(5, "治疗法术+30", GOSSIP_SENDER_MAIN, GLOVES_HEALING);
             break;
         case EQUIPMENT_SLOT_FEET:
-            player->ADD_GOSSIP_ITEM(5, "Stamina", GOSSIP_SENDER_MAIN, BOOTS_STAM);
-            player->ADD_GOSSIP_ITEM(5, "Minor Speed", GOSSIP_SENDER_MAIN, BOOTS_SPEED);
-            player->ADD_GOSSIP_ITEM(5, "Agility", GOSSIP_SENDER_MAIN, BOOTS_AGI);
+            player->ADD_GOSSIP_ITEM(5, "耐力+7", GOSSIP_SENDER_MAIN, BOOTS_STAM);
+            player->ADD_GOSSIP_ITEM(5, "移动速度略微提升", GOSSIP_SENDER_MAIN, BOOTS_SPEED);
+            player->ADD_GOSSIP_ITEM(5, "敏捷+5", GOSSIP_SENDER_MAIN, BOOTS_AGI);
             break;
         case EQUIPMENT_SLOT_MAINHAND:
-            player->ADD_GOSSIP_ITEM(5, "Crusader", GOSSIP_SENDER_MAIN, WEP_CRUSADER);
-            player->ADD_GOSSIP_ITEM(5, "1H Agility", GOSSIP_SENDER_MAIN, WEP1H_AGILITY);
-            player->ADD_GOSSIP_ITEM(5, "2H Agility", GOSSIP_SENDER_MAIN, WEP2H_AGILITY);
-            player->ADD_GOSSIP_ITEM(5, "Spellpower", GOSSIP_SENDER_MAIN, WEP_SPELLPOWER);
-            player->ADD_GOSSIP_ITEM(5, "Healing", GOSSIP_SENDER_MAIN, WEP_HEAL);
+            player->ADD_GOSSIP_ITEM(5, "十字军", GOSSIP_SENDER_MAIN, WEP_CRUSADER);
+            player->ADD_GOSSIP_ITEM(5, "单手武器敏捷+15", GOSSIP_SENDER_MAIN, WEP1H_AGILITY);
+            player->ADD_GOSSIP_ITEM(5, "双手武器敏捷+15", GOSSIP_SENDER_MAIN, WEP2H_AGILITY);
+            player->ADD_GOSSIP_ITEM(5, "法术伤害+30r", GOSSIP_SENDER_MAIN, WEP_SPELLPOWER);
+            player->ADD_GOSSIP_ITEM(5, "治疗法术+55", GOSSIP_SENDER_MAIN, WEP_HEAL);
             break;
         case EQUIPMENT_SLOT_OFFHAND:
-            player->ADD_GOSSIP_ITEM(5, "Spirit", GOSSIP_SENDER_MAIN, OFFHAND_SPIRIT);
-            player->ADD_GOSSIP_ITEM(5, "Stamina", GOSSIP_SENDER_MAIN, OFFHAND_STAM);
-            player->ADD_GOSSIP_ITEM(5, "Frost Resistance", GOSSIP_SENDER_MAIN, OFFHAND_FROSTRES);
+            player->ADD_GOSSIP_ITEM(5, "精神+9", GOSSIP_SENDER_MAIN, OFFHAND_SPIRIT);
+            player->ADD_GOSSIP_ITEM(5, "耐力+7", GOSSIP_SENDER_MAIN, OFFHAND_STAM);
+            player->ADD_GOSSIP_ITEM(5, "冰霜抗性+8", GOSSIP_SENDER_MAIN, OFFHAND_FROSTRES);
             break;
         }
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
@@ -691,7 +691,7 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
                         && item->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_SWORD2 && item->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_POLEARM
                         && item->GetProto()->SubClass != ITEM_SUBCLASS_WEAPON_STAFF)
                     {
-                        player->GetSession()->SendNotification("Requires 2 handed weapon");
+                        player->GetSession()->SendNotification("需要双手武器");
                         player->CLOSE_GOSSIP_MENU();
                         return true;
                     }
@@ -725,7 +725,7 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
                 item = player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND);
                 if (item && item->GetProto()->SubClass != ITEM_SUBCLASS_ARMOR_SHIELD)
                 {
-                    player->GetSession()->SendNotification("Requires Shield");
+                    player->GetSession()->SendNotification("需要盾牌");
                     player->CLOSE_GOSSIP_MENU();
                     return true;
                 }
@@ -810,8 +810,6 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
     }
     return true;
 }
-
-
 
 void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
 {
