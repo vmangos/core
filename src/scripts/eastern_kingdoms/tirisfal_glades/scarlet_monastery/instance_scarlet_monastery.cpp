@@ -90,10 +90,10 @@ struct instance_scarlet_monastery : ScriptedInstance
     uint64 m_uiWhitemaneGUID;
     uint64 m_uiVorrelGUID;
     uint64 m_uiDoorHighInquisitorGUID;
+    uint64 m_uiChapelDoorGUID;
 
     bool m_ashbringerActive;
     Player* m_ashbringerWielder;
-    GameObject* m_chapelDoor;
     uint32 m_ashbringerCheckTimer;
     std::set<ObjectGuid> m_ashbringerReactedNpcs;
     EventMap m_events;
@@ -106,10 +106,10 @@ struct instance_scarlet_monastery : ScriptedInstance
         m_uiWhitemaneGUID = 0;
         m_uiVorrelGUID = 0;
         m_uiDoorHighInquisitorGUID = 0;
+        m_uiChapelDoorGUID = 0;
         m_ashbringerCheckTimer = 5000;
         m_ashbringerReactedNpcs.clear();
         m_ashbringerWielder = nullptr;
-        m_chapelDoor = nullptr;
         m_events.Reset();
     }
 
@@ -135,7 +135,7 @@ struct instance_scarlet_monastery : ScriptedInstance
             m_uiDoorHighInquisitorGUID = pGo->GetGUID();
 
         if (pGo->GetEntry() == GO_CHAPEL_DOOR)
-            m_chapelDoor = pGo;
+            m_uiChapelDoorGUID = pGo->GetGUID();
     }
 
     uint64 GetData64(uint32 data) override
@@ -372,8 +372,8 @@ struct instance_scarlet_monastery : ScriptedInstance
                         pCreature->SetFactionTemplateId(35);
 
                     // Chapel door should be open if event is activated
-                    if (m_chapelDoor)
-                        m_chapelDoor->SetGoState(GO_STATE_ACTIVE);
+                    if (GameObject* chapelDoor = GetGameObject(m_uiChapelDoorGUID))
+                        chapelDoor->SetGoState(GO_STATE_ACTIVE);
 
                     // Mograine's first yell.
                     DoOrSimulateScriptTextForThisInstance(YELL_COMMANDER, NPC_COMMANDER_MOGRAINE);
