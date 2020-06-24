@@ -93,6 +93,7 @@ struct instance_scarlet_monastery : ScriptedInstance
 
     bool m_ashbringerActive;
     Player* m_ashbringerWielder;
+    GameObject* m_chapelDoor;
     uint32 m_ashbringerCheckTimer;
     std::set<ObjectGuid> m_ashbringerReactedNpcs;
     EventMap m_events;
@@ -108,6 +109,7 @@ struct instance_scarlet_monastery : ScriptedInstance
         m_ashbringerCheckTimer = 5000;
         m_ashbringerReactedNpcs.clear();
         m_ashbringerWielder = nullptr;
+        m_chapelDoor = nullptr;
         m_events.Reset();
     }
 
@@ -132,9 +134,8 @@ struct instance_scarlet_monastery : ScriptedInstance
         if (pGo->GetEntry() == GO_HIGH_INQUISITOR_DOOR)
             m_uiDoorHighInquisitorGUID = pGo->GetGUID();
 
-        // Chapel door should be open if event is activated
-        if (pGo->GetEntry() == GO_CHAPEL_DOOR && m_ashbringerActive)
-            DoOpenDoor(pGo->GetGUID());
+        if (pGo->GetEntry() == GO_CHAPEL_DOOR)
+            m_chapelDoor = pGo;
     }
 
     uint64 GetData64(uint32 data) override
@@ -158,9 +159,7 @@ struct instance_scarlet_monastery : ScriptedInstance
     {
         if (uiType == TYPE_MOGRAINE_AND_WHITE_EVENT)
         {
-            if (uiData == IN_PROGRESS)
-                DoUseDoorOrButton(m_uiDoorHighInquisitorGUID);
-            if (uiData == FAIL)
+            if (uiData == IN_PROGRESS || uiData == FAIL)
                 DoUseDoorOrButton(m_uiDoorHighInquisitorGUID);
 
             m_auiEncounter[0] = uiData;
@@ -213,8 +212,6 @@ struct instance_scarlet_monastery : ScriptedInstance
                 else
                     return;
                 receiver->StopMoving(true);
-                if (receiver->GetStandState() != UNIT_STAND_STATE_STAND)
-                    receiver->SetStandState(UNIT_STAND_STATE_STAND);
                 receiver->SetFacingToObject(pCaster);
                 receiver->SetStandState(UNIT_STAND_STATE_KNEEL);
                 receiver->AddUnitState(UNIT_STAT_ROOT);
@@ -260,23 +257,20 @@ struct instance_scarlet_monastery : ScriptedInstance
                             pC->SetObjectScale(2.0f);
                             pC->CastSpell(pC, SPELL_MOGRAINE_COMETH, true);
                             // TODO: The coordinates below appear to be guessed, set the correct ones once we have them.
-                            pC->GetMotionMaster()->MovePoint(0, 1148.0f, 1398.71f, 32.0f, 0, 2.7f);
+                            pC->GetMotionMaster()->MovePoint(0, 1150.35f, 1398.39f, 32.0f, 0, 2.7f);
                         }
-                        m_events.ScheduleEvent(EVENT_TALK2, Seconds(31));
+                        m_events.ScheduleEvent(EVENT_TALK2, Seconds(33));
                         break;
                     case EVENT_TALK2:
                         if (pHighlord)
-                        {
                             DoScriptText(SAY_ASHBRINGER1, pHighlord);
-                            pMograine->SetFacingToObject(pHighlord);
-                            pHighlord->SetFacingToObject(pMograine);
-                        }
                         m_events.ScheduleEvent(EVENT_STAND, Seconds(4));
                         break;
                     case EVENT_STAND:
                         pMograine->SetSheath(SHEATH_STATE_MELEE);
                         pMograine->HandleEmoteCommand(EMOTE_STATE_STAND);
                         pMograine->SetStandState(UNIT_STAND_STATE_STAND);
+                        pMograine->SetFacingToObject(pHighlord);
                         m_events.ScheduleEvent(EVENT_TALK3, Seconds(2));
                         break;
                     case EVENT_TALK3:
@@ -324,20 +318,18 @@ struct instance_scarlet_monastery : ScriptedInstance
                         break;
                 }
             }
+
             return;
         }
 
-        if (!m_ashbringerActive)
+        if (m_ashbringerCheckTimer < diff)
         {
-            if (m_ashbringerCheckTimer < diff)
-            {
-                m_ashbringerCheckTimer = 5000;
-            }
-            else
-            {
-                m_ashbringerCheckTimer -= diff;
-                return;
-            }
+            m_ashbringerCheckTimer = 5000;
+        }
+        else
+        {
+            m_ashbringerCheckTimer -= diff;
+            return;
         }
 
         Map::PlayerList const& lPlayers = instance->GetPlayers();
@@ -360,7 +352,6 @@ struct instance_scarlet_monastery : ScriptedInstance
                 {
                     m_ashbringerActive = true;
                     m_ashbringerWielder = pPlayer;
-
                     std::list<Creature*> ScarletList;
                     GetCreatureListWithEntryInGrid(ScarletList, pPlayer,
                                                    {
@@ -378,9 +369,11 @@ struct instance_scarlet_monastery : ScriptedInstance
                                                    }, 2000.0f);
 
                     for (Creature* pCreature : ScarletList)
-                    {
                         pCreature->SetFactionTemplateId(35);
-                    }
+
+                    // Chapel door should be open if event is activated
+                    if (m_chapelDoor)
+                        m_chapelDoor->SetGoState(GO_STATE_ACTIVE);
 
                     // Mograine's first yell.
                     DoOrSimulateScriptTextForThisInstance(YELL_COMMANDER, NPC_COMMANDER_MOGRAINE);
