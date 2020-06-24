@@ -24,6 +24,9 @@ UPDATE `broadcast_text` SET `emote_id1` = 1 WHERE `entry` = 12470;
 UPDATE `broadcast_text` SET `emote_id1` = 6 WHERE `entry` = 12471;
 UPDATE `broadcast_text` SET `emote_id1` = 20 WHERE `entry` = 12472;
 
+-- Delete old script text
+DELETE FROM `script_texts` WHERE `entry` IN (-1999928, -1999916, -1999917, -1999918, -1999920, -1999921, -1999922, -1999923, -1999924, -1999925, -1999926);
+
 -- End of migration.
 END IF;
 END??
