@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20200608202421');
 -- Add your query below.
 
 
---refuge point
+-- refuge point
 -- add guard patrol
 UPDATE `creature` SET `position_x` = -1157.48, `position_y` = -2615.69, `position_z` = 55.6105, `movement_type` = 2 WHERE `guid` = 11217;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
