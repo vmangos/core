@@ -9,13 +9,19 @@ INSERT INTO `migrations` VALUES ('20200608202421');
 -- Add your query below.
 
 
--- refuge point
+--misc
 -- add foggy mackreel script
 UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 2696;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (269601, 2696, 0, 1, 0, 100, 1, 1000, 15000, 120000, 150000, 269601, 0, 0, 'foggy mackreel - speak');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (269601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 790, 791, 0, 0, 0, 0, 0, 0, 0, 'foggy mackreel - speak');
 
 
+-- add bimble longberry script
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (797801, 7978, 0, 1, 0, 100, 1, 0, 30000, 15000, 45000, 797801, 0, 0, 'bimble longberry - speak');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (797801, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4021, 4019, 4020, 0, 0, 0, 0, 0, 0, 'bimble longberry - speak');
+
+
+-- refuge point
 -- add guard patrol
 UPDATE `creature` SET `position_x` = -1157.48, `position_y` = -2615.69, `position_z` = 55.6105, `movement_type` = 2 WHERE `guid` = 11217;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
