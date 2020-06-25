@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20200608202421');
 -- Add your query below.
 
 
---misc
+-- misc
 -- add foggy mackreel script
 UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 2696;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (269601, 2696, 0, 1, 0, 100, 1, 1000, 15000, 120000, 150000, 269601, 0, 0, 'foggy mackreel - speak');
