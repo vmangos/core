@@ -25,10 +25,10 @@ DELETE FROM `npc_vendor` WHERE `entry` = 2810 AND `item` = 18256;
 DELETE FROM `npc_vendor` WHERE `entry` = 2810 AND `item` = 5956;
 
 -- Weighted Throwing Axe - Vikki Lonsav
-DELETE FROM `npc_vendor` WHERE `entry` = 2812 AND `item` = 3131;
+DELETE FROM `npc_vendor` WHERE `entry` = 2808 AND `item` = 3131;
 
 -- Balanced Throwing Dagger - Vikki Lonsav
-DELETE FROM `npc_vendor` WHERE `entry` = 2812 AND `item` = 2946;
+DELETE FROM `npc_vendor` WHERE `entry` = 2808 AND `item` = 2946;
 
 -- Dense Shortbow - Mu'uta
 INSERT INTO `npc_vendor` (`entry`, `maxcount`, `incrtime`, `item`) VALUES
@@ -49,7 +49,7 @@ DELETE FROM `npc_vendor` WHERE `entry` = 2821 AND `item` = 14341;
 -- Imbued Vial - Keena
 DELETE FROM `npc_vendor` WHERE `entry` = 2821 AND `item` = 18256;
 
--- Pattern: Barbaric Leggins - Mu'uta
+-- Pattern: Barbaric Leggins - Keena
 INSERT INTO `npc_vendor` (`entry`, `maxcount`, `incrtime`, `item`) VALUES
 (2821, 1, 7200, 5973);
 
