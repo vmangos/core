@@ -222,7 +222,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (848, 16, -9269.38, -2191.46, 64.0892, 100, 0, 0, 0),
 (848, 17, -9280.25, -2210.56, 63.6031, 100, 0, 0, 0),
 (848, 18, -9314.18, -2208.45, 61.8981, 100, 0, 0, 0);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (84801, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Madison - Say Text');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (84801, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Madison - Run');
 
 -- add amy davenport waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `id` = 777;
