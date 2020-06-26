@@ -12,29 +12,22 @@ INSERT INTO `migrations` VALUES ('20200611182015');
 -- npc's should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` IN (4248, 4181, 4064, 4245, 4180);
 
-
 -- npc's should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 0.5 WHERE `guid` IN (4242, 4198, 4196, 4197, 4081, 4175, 4195, 4205, 4083, 4210, 4188, 4189, 4190);
-
 
 -- npc's should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (5960, 4179, 4182, 4244, 4194, 4252, 4251);
 
-
--- viktori prism antras - speak
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 4198;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (419802, 4198, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 419802, 0, 0, 'Viktori Prism\\\'Antras - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (419802, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 77, 79, 0, 0, 0, 0, 0, 0, 0, 'Viktori Prism\'Antras - speak');
-
+-- Braelyn Firehand - speak
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (419802, 4198, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 419802, 0, 0, 'Braelyn Firehand - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (419802, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 77, 79, 0, 0, 0, 0, 0, 0, 0, 'Braelyn Firehand - Say Text');
 
 -- remove incorrect guards 
 DELETE FROM `creature` WHERE `guid` IN (6133, 6127);
 
-
 -- watcher keefer should roam not pathfind
 DELETE FROM `creature_movement` WHERE `id` = 5965;
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 4 WHERE `guid` = 5965;
-
 
 -- watcher petras correct path
 UPDATE `creature` SET `position_x` = -10554.4, `position_y` = -1228.83, `position_z` = 27.5662, `movement_type` = 2 WHERE `guid` = 4247;
@@ -67,7 +60,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (828, 26, -10553.6, -1250.2, 31.8325, 100, 0, 0, 0),
 (828, 27, -10553.7, -1246.75, 30.9599, 100, 0, 0, 0),
 (828, 28, -10554.2, -1233.77, 28.3546, 100, 0, 0, 0);
-
 
 -- watcher backus correct path
 UPDATE `creature` SET `position_x` = -10512.7, `position_y` = -1187.08, `position_z` = 28.1543 WHERE `guid` = 4230;
@@ -102,23 +94,14 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (840, 27, -10474.4, -1181.57, 27.6911, 100, 0, 0, 0),
 (840, 28, -10512.7, -1187.08, 28.1543, 100, 0, 0, 0);
 
-
--- events list for innkeeper trelayne
-DELETE FROM `creature_ai_events` WHERE `creature_id`=6790;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (679001, 6790, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 679001, 0, 0, 'Innkeeper Trelayne - Greet Players On Entering Tavern');
-DELETE FROM `creature_ai_scripts` WHERE `id`=679001;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (679001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 'Innkeeper Trelayne - Say Text');
-
-
 -- farrin daris scripts
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4062;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (2112, 1, -10514.7, -1156.19, 34.9574, 4.06662, 150000, 0, 0),
 (2112, 2, -10499, -1154.68, 34.9574, 3.19395, 93000, 0, 211201);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (211201, 0, 39, 211201, 211202, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Farrin Daris - Speak');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (211201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 963, 966, 964, 965, 0, 0, 0, 0, 0, 'Farrin Daris - Speak');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (211202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 962, 961, 963, 966, 0, 0, 0, 0, 0, 'Farrin Daris - Speak');
-
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (211201, 0, 39, 211201, 211202, 0, 0, 0, 0, 0, 0, 50, 50, 0, 0, 0, 0, 0, 0, 0, 'Farrin Daris - Say Text');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (211201, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 963, 966, 964, 965, 0, 0, 0, 0, 0, 'Farrin Daris - Say Text');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (211202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 962, 961, 963, 966, 0, 0, 0, 0, 0, 'Farrin Daris - Say Text');
 
 -- watcher jordan correct path
 DELETE FROM `creature_movement_template` WHERE `entry` = 887;
@@ -167,7 +150,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (887, 41, -10648.6, -1192.04, 28.5482, 100, 0, 0, 0),
 (887, 42, -10646, -1191.34, 28.4968, 100, 0, 0, 0);
 
-
 -- blind mary correct path
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 4255;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -175,23 +157,20 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (302, 2, -10780.2, -1380.28, 39.7193, 100, 30000, 0, 0),
 (302, 3, -10786, -1381, 39.7193, 0.006667, 30000, 0, 0);
 
-
 -- madame eva event
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 265;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (26501, 265, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 26501, 0, 0, 'madame eva - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (26501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 74, 75, 76, 0, 0, 0, 0, 0, 'madame eva - speak');
-
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 265;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (26501, 265, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 26501, 0, 0, 'Madame Eva - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (26501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 73, 74, 75, 76, 0, 0, 0, 0, 0, 'Madame Eva - Say Text');
 
 -- commander althea ebonlocke event
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 264;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (26401, 264, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 26401, 0, 0, 'commander althea ebonlocke - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (26401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 62, 0, 0, 0, 0, 0, 0, 0, 'commander althea ebonlocke - speak');
-
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 264;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (26401, 264, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 26401, 0, 0, 'Commander Althea Ebonlocke - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (26401, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 61, 62, 0, 0, 0, 0, 0, 0, 0, 'Commander Althea Ebonlocke - Say Text');
 
 -- tavernkeep smitts event
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 273;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (27301, 273, 0, 1, 0, 100, 1, 45000, 60000, 150000, 180000, 27301, 0, 0, 'tavernkeep smitts - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (27301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 'tavernkeep smitts - speak');
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 273;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (27301, 273, 0, 1, 0, 100, 1, 45000, 60000, 150000, 180000, 27301, 0, 0, 'Tavernkeep Smitts - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (27301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 'Tavernkeep Smitts - Say Text');
 
 
 -- End of migration.
