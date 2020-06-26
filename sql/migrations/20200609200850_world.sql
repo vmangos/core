@@ -9,24 +9,20 @@ INSERT INTO `migrations` VALUES ('20200609200850');
 -- Add your query below.
 
 
---southshore
+-- southshore
 -- brewmeister says hiccup
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` = 15314;
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 2705;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (270502, 2705, 0, 0, 0, 100, 1, 10000, 20000, 60000, 80000, 270502, 0, 0, 'Brewmeister Bilger - Speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (270502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1953, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewmeister Bilger - Speak');
-
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (270502, 2705, 0, 0, 0, 100, 1, 10000, 20000, 60000, 80000, 270502, 0, 0, 'Brewmeister Bilger - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (270502, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1953, 0, 0, 0, 0, 0, 0, 0, 0, 'Brewmeister Bilger - Say Text');
 
 -- correct position for guard
 UPDATE `creature` SET `position_x` = -756.026, `position_y` = -658.905, `position_z` = 15.2827 WHERE `guid` = 16383;
 
-
 -- correct position for guard
 UPDATE `creature` SET `position_x` = -814.122, `position_y` = -689.843, `position_z` = 7.84335 WHERE `guid` = 16385;
 
-
 -- add patrol to guard
-UPDATE `creature` SET `position_x` = -891.071, `position_y` = -540.262, `position_z` = 6.86808, `movement_type` = 2 WHERE `guid` = 15928;
+UPDATE `creature` SET `position_x` = -891.071, `position_y` = -540.262, `position_z` = 6.86808, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 15928;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (15928, 1, -891.071, -540.262, 6.86808, 100, 0, 0, 0),
 (15928, 2, -874.494, -540.699, 7.83399, 100, 0, 0, 0),
@@ -49,7 +45,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (15928, 19, -870.078, -539.733, 8.15647, 100, 0, 0, 0),
 (15928, 20, -874.494, -540.699, 7.83399, 100, 0, 0, 0);
 
-
 -- correct patrol for guard
 UPDATE `creature` SET `position_x` = -747.554, `position_y` = -684.579, `position_z` = 11.8954 WHERE `guid` = 16387;
 DELETE FROM `creature_movement` WHERE `id` = 16387;
@@ -69,10 +64,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (16387, 13, -768.479, -688.378, 9.96307, 100, 0, 0, 0),
 (16387, 14, -759.409, -686.896, 11.4542, 100, 0, 0, 0);
 
-
 -- guards should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` IN (15667, 15674);
-
 
 -- add patrol to guard
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 15323;
@@ -85,7 +78,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (15323, 6, -681.714, -430.579, 66.7264, 100, 0, 0, 0),
 (15323, 7, -677.304, -433.94, 66.7264, 100, 0, 0, 0),
 (15323, 8, -670.475, -432.6, 66.7264, 100, 0, 0, 0);
-
 
 -- correct patrol for farmer kent
 UPDATE `creature` SET `position_x` = -841.737, `position_y` = -645.461, `position_z` = 16.2098 WHERE `guid` = 15976;
@@ -155,18 +147,15 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (2436, 62, -818.662, -623.293, 13.1924, 100, 0, 0, 0),
 (2436, 63, -830.559, -634.047, 14.1155, 100, 0, 0, 0);
 
-
 -- tarren mill
 -- guards should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 9 WHERE `guid` IN (15558, 15538, 15535, 15355, 15533, 15354, 15353, 15307, 15306, 15303, 15515, 15282, 15541);
 
-
 -- guards should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` IN (15521, 15518, 15514, 15531);
 
-
 -- correct pathing for jason lemieux
-DELETE FROM creature_movement WHERE id = 15530;
+DELETE FROM `creature_movement` WHERE `id` = 15530;
 UPDATE `creature` SET `position_x` = -16.677, `position_y` = -869.531, `position_z` = 59.3036 WHERE `guid` = 15530;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (3544, 1, -16.677, -869.531, 59.3036, 100, 0, 0, 0),
@@ -208,10 +197,9 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (3544, 37, -7.05282, -847.149, 60.0365, 100, 0, 0, 0),
 (3544, 38, -10.2388, -858.247, 59.8757, 100, 0, 0, 0);
 
-
 -- hans zandin add missing text
-DELETE FROM `creature_ai_scripts` WHERE `id`=239601;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (239601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 615, 616, 614, 0, 0, 0, 0, 0, 0, 'Hans Zandin - Say Text');
+DELETE FROM `creature_ai_scripts` WHERE `id` = 239601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (239601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 614, 615, 616, 0, 0, 0, 0, 0, 0, 'Hans Zandin - Say Text');
 
 
 -- End of migration.
