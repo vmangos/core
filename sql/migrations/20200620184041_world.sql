@@ -30,13 +30,13 @@ UPDATE `creature_questrelation` SET `patch_min`=3 WHERE `id`=14387 AND `quest`=7
 
 -- Update areatrigger conditions for entrance.
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7850, -2, 7487, 7848, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4024, 24, 2, 2, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7851, -1, 4102, 4024, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4022, 24, 2, 2, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7851, -1, 4102, 4022, 0, 0, 0);
 UPDATE `areatrigger_teleport` SET `required_condition`=7850 WHERE `id`=3528;
 UPDATE `areatrigger_teleport` SET `required_condition`=7851 WHERE `id`=3529;
 
 -- Lothos Riftwaker's gossip option was added in Patch 1.11.
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7852, -1, 7850, 4019, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (7852, -1, 4019, 7850, 0, 0, 0);
 UPDATE `gossip_menu_option` SET `condition_id`=7852 WHERE `menu_id`=5750;
 
 
