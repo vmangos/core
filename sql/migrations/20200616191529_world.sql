@@ -46,14 +46,13 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 
 
 -- add guard howe script
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 903;
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (90301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 0, 0, 'guard howe - speak');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (90301, 903, 0, 1, 0, 100, 0, 25000, 25000, 180000, 180000, 90301, 0, 0, 'guard howe - speak');
-
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 903;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (90301, 903, 0, 1, 0, 100, 1, 25000, 25000, 180000, 180000, 90301, 0, 0, 'Guard Howe - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (90301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 0, 0, 0, 0, 0, 0, 0, 0, 'Guard Howe - Say Text');
 
 -- update guard clarke waypoints 
-DELETE FROM creature_movement WHERE id = 10088;
-DELETE FROM creature_movement_template WHERE entry = 934;
+DELETE FROM `creature_movement` WHERE `id` = 10088;
+DELETE FROM `creature_movement_template` WHERE `entry` = 934;
 UPDATE `creature` SET `position_x` = -9266.45, `position_y` = -2182.23, `position_z` = 64.0898 WHERE `id` = 934;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (934, 1, -9266.45, -2182.23, 64.0898, 100, 0, 0, 0),
@@ -124,20 +123,18 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (934, 66, -9266.46, -2197.24, 63.977, 100, 0, 0, 0),
 (934, 67, -9267.15, -2190.66, 64.0898, 100, 0, 0, 0);
 
-
 -- add roger and jamin scripts
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 5607;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (560701, 5607, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 560701, 560702, 560703, 'jamin and roger - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1922, 0, 0, 0, 0, 0, 0, 0, 0, 'roger - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560702, 0, 68, 560801, 2, 5608, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'jamin - say');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560703, 0, 68, 560701, 2, 5607, 10, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'roger - speak');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560701, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1924, 0, 0, 0, 0, 0, 0, 0, 0, 'roger - speak');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560801, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1923, 0, 0, 0, 0, 0, 0, 0, 0, 'jamin - speak');
-
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 5607;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (560701, 5607, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 560701, 0, 0, 'Roger - Start Conversation with Roger OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1922, 0, 0, 0, 0, 0, 0, 0, 0, 'Roger - Say Text');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560701, 0, 39, 560801, 0, 0, 0, 0, 0, 0, 0, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Roger - Start Script to Say Texts');
+DELETE FROM `event_scripts` WHERE `id`=560801;
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560801, 2, 0, 0, 0, 0, 0, 6153, 0, 9, 2, 1923, 0, 0, 0, 0, 0, 0, 0, 0, 'Jamin - Say Text');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (560801, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1924, 0, 0, 0, 0, 0, 0, 0, 0, 'Roger - Say Text');
 
 -- add rachel nathan running waypoints
-DELETE FROM creature_movement_template WHERE entry = 849;
-DELETE FROM creature_movement WHERE id = 6154;
+DELETE FROM `creature_movement_template` WHERE `entry` = 849;
+DELETE FROM `creature_movement` WHERE `id` = 6154;
 UPDATE `creature` SET `position_x` = -9261.87, `position_y` = -2204.55, `position_z` = 64.0584 WHERE `id` = 849;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (849, 1, -9261.87, -2204.55, 64.0584, 100, 0, 0, 84901),
@@ -197,16 +194,14 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (6154, 6155, 1.50062, 5.82011, 1);
 
-
 -- add zem leeward scripts
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 348;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (34801, 348, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 34801, 0, 0, 'zem leeward - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (34801, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 46, 0, 0, 0, 0, 0, 0, 0, 'zem leeward - speak');
-
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 348;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (34801, 348, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 34801, 0, 0, 'Zem Leeward - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (34801, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 45, 46, 0, 0, 0, 0, 0, 0, 0, 'Zem Leeward - Say Text');
 
 -- add madison waypoints
-DELETE FROM creature_movement_template WHERE entry = 848;
-DELETE FROM creature_movement WHERE id = 6150;
+DELETE FROM `creature_movement_template` WHERE `entry` = 848;
+DELETE FROM `creature_movement` WHERE `id` = 6150;
 UPDATE `creature` SET `position_x` = -9327.6, `position_y` = -2202.14, `position_z` = 61.6543 WHERE `id` = 848;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (848, 1, -9327.6, -2202.14, 61.6543, 2.48597, 180000, 0, 84801),
@@ -227,8 +222,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (848, 16, -9269.38, -2191.46, 64.0892, 100, 0, 0, 0),
 (848, 17, -9280.25, -2210.56, 63.6031, 100, 0, 0, 0),
 (848, 18, -9314.18, -2208.45, 61.8981, 100, 0, 0, 0);
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (84801, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'madison - run');
-
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (84801, 0, 25, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Madison - Say Text');
 
 -- add amy davenport waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `id` = 777;
@@ -236,7 +230,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (777, 1, -9260.21, -2203.09, 63.934, 3.33358, 40000, 0, 0),
 (777, 2, -9261.72, -2199.52, 63.9353, 100, 40000, 0, 0),
 (777, 3, -9262.13, -2204.12, 63.9335, 100, 1000, 0, 0);
-
 
 -- add matthew hooper waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `id` = 1680;
@@ -248,7 +241,6 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (1680, 5, -9316.69, -2146.62, 63.4833, 2.83685, 45000, 0, 168002);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (168001, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'matthew hooper - run');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (168002, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'matthew hooper - walk');
-
 
 -- add darcy waypoints
 UPDATE `creature` SET `position_x` = -9216.47, `position_y` = -2148.66, `position_z` = 64.3539, `movement_type` = 2 WHERE `id` = 379;
@@ -269,13 +261,11 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (379, 14, -9218.84, -2155.02, 64.3541, 100, 0, 0, 0),
 (379, 15, -9217.04, -2151.46, 64.3541, 100, 0, 0, 0);
 
-
 -- add alma jainrose waypoints
 UPDATE `creature` SET `movement_type` = 2 WHERE `id` = 812;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (812, 1, -9237.78, -2041.65, 78.1678, 4.64889, 45000, 0, 0),
 (812, 2, -9234.28, -2033.73, 78.1663, 3.9619, 35000, 0, 0);
-
 
 -- various npc's should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (6158);
