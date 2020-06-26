@@ -27,9 +27,6 @@ UPDATE `npc_vendor` SET `maxcount` = 0, `incrtime` = 0 WHERE `entry` = 3540 AND 
 -- Strong Fishing Pole - Lindea Rabonne
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 2383 AND `item` = 6365;
 
--- Aquadynamic Fish Attractor - Lindea Rabonne
-UPDATE `npc_vendor` SET `maxcount` = 1 WHERE `entry` = 2383 AND `item` = 6533;
-
 -- Flagon of Mead - Barkeep Kelly
 DELETE FROM `npc_vendor` WHERE `entry` = 2366 AND `item` = 2594;
 
@@ -49,19 +46,19 @@ DELETE FROM `npc_vendor` WHERE `entry` = 2380 AND `item` = 858;
 DELETE FROM `npc_vendor` WHERE `entry` = 2380 AND `item` = 3385;
 
 -- Fiery Cloak - Robert Aebischer
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 2380 AND `item` = 4797;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 3543 AND `item` = 4797;
 
 -- Heavy Runed Cloak - Robert Aebischer
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 2380 AND `item` = 4798;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 3543 AND `item` = 4798;
 
 -- Antiquated Cloak - Robert Aebischer
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 2380 AND `item` = 4799;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 3543 AND `item` = 4799;
 
 -- Mighty Chain Pants - Robert Aebischer
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 2380 AND `item` = 4800;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 3543 AND `item` = 4800;
 
 -- Legionnaire's Leggings - Robert Aebischer
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 2380 AND `item` = 4816;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 14400 WHERE `entry` = 3543 AND `item` = 4816;
 
 -- Weighted Throwing Axe - Kayren Soothallow
 DELETE FROM `npc_vendor` WHERE `entry` = 2401 AND `item` = 3131;
