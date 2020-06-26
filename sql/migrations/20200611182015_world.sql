@@ -18,9 +18,10 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 0.5 WHERE `guid` 
 -- npc's should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (5960, 4179, 4182, 4244, 4194, 4252, 4251);
 
--- Braelyn Firehand - speak
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (419802, 4198, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 419802, 0, 0, 'Braelyn Firehand - Say Text OOC');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (419802, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 77, 79, 0, 0, 0, 0, 0, 0, 0, 'Braelyn Firehand - Say Text');
+-- Viktori Prism Antras - speak
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 276;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (27601, 276, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 27601, 0, 0, 'Viktori Prism Antras - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (27601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 77, 79, 0, 0, 0, 0, 0, 0, 0, 'Viktori Prism Antras - Say Text');
 
 -- remove incorrect guards 
 DELETE FROM `creature` WHERE `guid` IN (6133, 6127);
@@ -171,6 +172,12 @@ INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 273;
 INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (27301, 273, 0, 1, 0, 100, 1, 45000, 60000, 150000, 180000, 27301, 0, 0, 'Tavernkeep Smitts - Say Text OOC');
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (27301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 82, 0, 0, 0, 0, 0, 0, 0, 0, 'Tavernkeep Smitts - Say Text');
+
+-- events list for innkeeper trelayne
+DELETE FROM `creature_ai_events` WHERE `creature_id`=6790;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (679001, 6790, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 679001, 0, 0, 'Innkeeper Trelayne - Say Text OOC');
+DELETE FROM `creature_ai_scripts` WHERE `id`=679001;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (679001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 0, 0, 0, 0, 0, 'Innkeeper Trelayne - Say Text');
 
 
 -- End of migration.
