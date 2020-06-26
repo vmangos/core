@@ -11,24 +11,24 @@ INSERT INTO `migrations` VALUES ('20200608202421');
 
 -- misc
 -- add foggy mackreel script
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 2696;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (269601, 2696, 0, 1, 0, 100, 1, 1000, 15000, 120000, 150000, 269601, 0, 0, 'foggy mackreel - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (269601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 790, 791, 0, 0, 0, 0, 0, 0, 0, 'foggy mackreel - speak');
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 2696;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (269601, 2696, 0, 1, 0, 100, 1, 1000, 15000, 120000, 150000, 269601, 0, 0, 'Foggy Mackreel - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (269601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 790, 791, 0, 0, 0, 0, 0, 0, 0, 'Foggy Mackreel - Say Text');
 
 
 -- add bimble longberry script
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (797801, 7978, 0, 1, 0, 100, 1, 0, 30000, 15000, 45000, 797801, 0, 0, 'bimble longberry - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (797801, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4021, 4019, 4020, 0, 0, 0, 0, 0, 0, 'bimble longberry - speak');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (797801, 7978, 0, 1, 0, 100, 1, 0, 30000, 15000, 45000, 797801, 0, 0, 'Bimble Longberry - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (797801, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4021, 4019, 4020, 0, 0, 0, 0, 0, 0, 'Bimble Longberry - Say Text');
 
 
 -- add myra tyrngaarde script
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (510901, 5109, 0, 1, 0, 100, 1, 1000, 15000, 40000, 60000, 510901, 0, 0, 'myra tyrngaarde - speak');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (510901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4014, 4013, 4015, 0, 0, 0, 0, 0, 0, 'myra tyrngaarde - speak');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (510901, 5109, 0, 1, 0, 100, 1, 1000, 15000, 40000, 60000, 510901, 0, 0, 'Myra Tyrngaarde - Say Text OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (510901, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4014, 4013, 4015, 0, 0, 0, 0, 0, 0, 'Myra Tyrngaarde - Say Text');
 
 
 -- refuge point
 -- add guard patrol
-UPDATE `creature` SET `position_x` = -1157.48, `position_y` = -2615.69, `position_z` = 55.6105, `movement_type` = 2 WHERE `guid` = 11217;
+UPDATE `creature` SET `position_x` = -1157.48, `position_y` = -2615.69, `position_z` = 55.6105, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 11217;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (11217, 1, -1157.48, -2615.69, 55.6105, 100, 0, 0, 0),
 (11217, 2, -1159.52, -2602.59, 55.9453, 100, 0, 0, 0),
@@ -95,16 +95,14 @@ DELETE FROM `creature_movement` WHERE `id` = 11987;
 
 
 -- chatting guards
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1069602, 10696, 1069602, 1, 0, 100, 1, 6000, 9000, 6000, 9000, 1069602, 0, 0, 'Refuge Pointe Defender - Chat Emote');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1069603, 10696, 1069603, 1, 0, 100, 1, 6000, 9000, 6000, 9000, 1069603, 0, 0, 'Refuge Pointe Defender - Chat Emote');
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1069602, 52, 11909, 0, 0, 0, 0);
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1069603, 52, 11911, 0, 0, 0, 0);
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1069602, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Refuge Pointe Defender - Chat Emote');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1069603, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Refuge Pointe Defender - Chat Emote');
-
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1069602, 10696, 10696, 1, 0, 100, 1, 6000, 9000, 6000, 9000, 1069602, 0, 0, 'Refuge Pointe Defender - Emote Talk OOC');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (10694, 52, 11909, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (10695, 52, 11911, 0, 0, 0, 0);
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (10696, -2, 10694, 10695, 0, 0, 0);
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1069602, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Refuge Pointe Defender - Emote Talk');
 
 -- add guard patrol
-UPDATE `creature` SET `position_x` = -1157.48, `position_y` = -2615.69, `position_z` = 55.6105, `movement_type` = 2 WHERE `guid` = 11581;
+UPDATE `creature` SET `position_x` = -1157.48, `position_y` = -2615.69, `position_z` = 55.6105, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 11581;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (11581, 1, -1287.23, -2607.49, 60.2273, 100, 0, 0, 0),
 (11581, 2, -1294.26, -2604.2, 62.885, 100, 0, 0, 0),
@@ -290,6 +288,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 -- remove incorrect guard
 DELETE FROM `creature` WHERE `guid` = 11210;
+DELETE FROM `creature_addon` WHERE `guid` = 11210;
 
 
 -- End of migration.
