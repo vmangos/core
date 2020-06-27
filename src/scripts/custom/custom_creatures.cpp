@@ -31,12 +31,13 @@ bool GossipHello_TeleportNPC(Player *player, Creature *_Creature)
     if (player->GetTeam() == HORDE)
     {
 		player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
-		player->ADD_GOSSIP_ITEM(5, "-阵营城市-", GOSSIP_SENDER_MAIN, 1);
-		player->ADD_GOSSIP_ITEM(5, "-新人副本-", GOSSIP_SENDER_MAIN, 5);
+		player->ADD_GOSSIP_ITEM(5, "〖阵营城市〗", GOSSIP_SENDER_MAIN, 1);
+		player->ADD_GOSSIP_ITEM(5, "〖新人副本〗", GOSSIP_SENDER_MAIN, 5);
 		player->ADD_GOSSIP_ITEM(5, "【团队副本】", GOSSIP_SENDER_MAIN, 101);
 		player->ADD_GOSSIP_ITEM(5, "一号场地刷暮光信徒<新人成长>", GOSSIP_SENDER_MAIN, 629);
 		player->ADD_GOSSIP_ITEM(5, "二号场地刷瘟疫锅周边怪<新人成长>", GOSSIP_SENDER_MAIN, 630);
-		player->ADD_GOSSIP_ITEM(5, "古巴竞技场 - 叶文洁" , GOSSIP_SENDER_MAIN, 4015);
+		player->ADD_GOSSIP_ITEM(5, ">>古巴竞技场 - 叶文洁" , GOSSIP_SENDER_MAIN, 4015);
+		player->ADD_GOSSIP_ITEM(5, ">>海加尔山的战役1 - 三体长老", GOSSIP_SENDER_MAIN, 631);
 
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
     }
@@ -44,12 +45,13 @@ bool GossipHello_TeleportNPC(Player *player, Creature *_Creature)
     else
     {
 		player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
-		player->ADD_GOSSIP_ITEM(5, "-阵营城市-", GOSSIP_SENDER_MAIN, 2);
-		player->ADD_GOSSIP_ITEM(5, "-新人副本-", GOSSIP_SENDER_MAIN, 5);
+		player->ADD_GOSSIP_ITEM(5, "〖阵营城市〗", GOSSIP_SENDER_MAIN, 2);
+		player->ADD_GOSSIP_ITEM(5, "〖新人副本〗", GOSSIP_SENDER_MAIN, 5);
 		player->ADD_GOSSIP_ITEM(5, "【团队副本】", GOSSIP_SENDER_MAIN, 101);
 		player->ADD_GOSSIP_ITEM(5, "一号场地刷暮光信徒<新人成长>", GOSSIP_SENDER_MAIN, 629);
 		player->ADD_GOSSIP_ITEM(5, "二号场地刷瘟疫锅周边怪<新人成长>", GOSSIP_SENDER_MAIN, 630);
-		player->ADD_GOSSIP_ITEM(5, "古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
+		player->ADD_GOSSIP_ITEM(5, ">>古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
+		player->ADD_GOSSIP_ITEM(5, ">>海加尔山的战役1 - 三体长老", GOSSIP_SENDER_MAIN, 631);
 
         player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
     }
@@ -522,18 +524,23 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
 			player->CLOSE_GOSSIP_MENU();
 			player->TeleportTo(0, 981.47f, -1821.84f, 80.48f, 0.0f);
 			break;
+		case 631: // 海尔加山入口
+			player->CLOSE_GOSSIP_MENU();
+			player->TeleportTo(1, 4603.94f, -3879.25f, 944.18f, 0.0f);
+			break;
 
         case 100: // Main Menu
             // HORDE
             if (player->GetTeam() == HORDE)
             {
 				player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
-				player->ADD_GOSSIP_ITEM(5, "-阵营城市-", GOSSIP_SENDER_MAIN, 1);
-				player->ADD_GOSSIP_ITEM(5, "-新人副本-", GOSSIP_SENDER_MAIN, 5);
+				player->ADD_GOSSIP_ITEM(5, "〖阵营城市〗", GOSSIP_SENDER_MAIN, 1);
+				player->ADD_GOSSIP_ITEM(5, "〖新人副本〗", GOSSIP_SENDER_MAIN, 5);
 				player->ADD_GOSSIP_ITEM(5, "【团队副本】", GOSSIP_SENDER_MAIN, 101);
 				player->ADD_GOSSIP_ITEM(5, "一号场地刷暮光信徒<新人成长>", GOSSIP_SENDER_MAIN, 629);
 				player->ADD_GOSSIP_ITEM(5, "二号场地刷瘟疫锅周边怪<新人成长>", GOSSIP_SENDER_MAIN, 630);
-				player->ADD_GOSSIP_ITEM(5, "古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
+				player->ADD_GOSSIP_ITEM(5, ">>古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
+				player->ADD_GOSSIP_ITEM(5, ">>海加尔山的战役1 - 三体长老", GOSSIP_SENDER_MAIN, 631);
 
                 player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
             }
@@ -541,12 +548,13 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
             else
             {
 				player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
-				player->ADD_GOSSIP_ITEM(5, "-阵营城市-", GOSSIP_SENDER_MAIN, 2);
-				player->ADD_GOSSIP_ITEM(5, "-新人副本-", GOSSIP_SENDER_MAIN, 5);
+				player->ADD_GOSSIP_ITEM(5, "〖阵营城市〗", GOSSIP_SENDER_MAIN, 2);
+				player->ADD_GOSSIP_ITEM(5, "〖新人副本〗", GOSSIP_SENDER_MAIN, 5);
 				player->ADD_GOSSIP_ITEM(5, "【团队副本】", GOSSIP_SENDER_MAIN, 101);
 				player->ADD_GOSSIP_ITEM(5, "一号场地刷暮光信徒<新人成长>", GOSSIP_SENDER_MAIN, 629);
 				player->ADD_GOSSIP_ITEM(5, "二号场地刷瘟疫锅周边怪<新人成长>", GOSSIP_SENDER_MAIN, 630);
-				player->ADD_GOSSIP_ITEM(5, "古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
+				player->ADD_GOSSIP_ITEM(5, ">>古巴竞技场 - 叶文洁", GOSSIP_SENDER_MAIN, 4015);
+				player->ADD_GOSSIP_ITEM(5, ">>海加尔山的战役1 - 三体长老", GOSSIP_SENDER_MAIN, 631);
 
                 player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, _Creature->GetGUID());
             }
@@ -1152,6 +1160,166 @@ CreatureAI* GetAI_custom_summon_debug(Creature *creature)
     return new npc_summon_debugAI(creature);
 }
 
+// REWARD SHOP NPC
+
+bool OnGossipHello_RewardShopNPC(Player* player, Creature* creature)
+{
+	if (player->IsInCombat())
+		return false;
+
+	std::string Text = "输入电子兑换券并点“接受”";
+	player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_DOT, ">>兑换我的电子兑换券", GOSSIP_SENDER_MAIN, 1, Text, true);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, ">>我如何获得电子兑换券？", GOSSIP_SENDER_MAIN, 2);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "注：兑换券是奖励给捐赠服务器租赁的玩家的礼券。\n（礼券可兑换+150%速度坐骑、职业增益被动技能、属性增益包包等物品，详情请咨询游戏管理员）", GOSSIP_SENDER_MAIN, 3);
+	if (player->IsGameMaster())
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "[GM]我想生成一个电子兑换券", GOSSIP_SENDER_MAIN, 4);
+
+	player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+	return true;
+}
+
+bool OnGossipSelect_RewardShopNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
+{
+	player->PlayerTalkClass->ClearMenus();
+	std::string info("您可以通过访问淘虾网站（http://ka.taoxia.xyz）获取电子兑换券。");
+	uint32 rnd1 = urand(10000, 90000);
+	uint32 rnd2 = urand(10000, 90000);
+	uint32 rnd3 = urand(10000, 90000);
+	uint32 rnd4 = urand(10000, 90000);
+	uint32 rnd5 = urand(10000, 90000);
+
+	std::string CreatedBy = player->GetName();
+	std::ostringstream randomcode;
+	randomcode << "GM-" << rnd1 << "-" << rnd2 << "-" << rnd3 << "-" << rnd4 << "-" << rnd5;
+
+	switch (action)
+	{
+	case 2:
+		creature->MonsterWhisper(info.c_str(), player, false);
+		player->CLOSE_GOSSIP_MENU();
+		break;
+	case 3:
+		player->CLOSE_GOSSIP_MENU();
+		break;
+	case 4:
+		player->PlayerTalkClass->ClearMenus();
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个名称更改电子兑换券。", GOSSIP_SENDER_MAIN, 6);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个派系变更电子兑换券。", GOSSIP_SENDER_MAIN, 7);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个种族变更电子兑换券。", GOSSIP_SENDER_MAIN, 8);
+		player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+		break;
+	case 6:
+		CharacterDatabase.PQuery("INSERT INTO `reward_shop` (`action`, `action_data`, `quantity`, `code`, `status`, `PlayerGUID`, `PlayerIP`, `CreatedBy`) VALUES(3, 0, 0, '%s', 0, 0, '0', '%s')", randomcode.str().c_str(), CreatedBy.c_str());
+		ChatHandler(player->GetSession()).PSendSysMessage("已成功创建您的卡密 %s", randomcode.str().c_str());
+		player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+		break;
+	case 7:
+		CharacterDatabase.PQuery("INSERT INTO `reward_shop` (`action`, `action_data`, `quantity`, `code`, `status`, `PlayerGUID`, `PlayerIP`,`CreatedBy`) VALUES(4, 0, 0, '%s', 0, 0, '0', '%s')", randomcode.str().c_str(), CreatedBy.c_str());
+		ChatHandler(player->GetSession()).PSendSysMessage("已成功创建您的卡密 %s", randomcode.str().c_str());
+		player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+		break;
+	case 8:
+		CharacterDatabase.PQuery("INSERT INTO `reward_shop` (`action`, `action_data`, `quantity`, `code`, `status`, `PlayerGUID`, `PlayerIP`, `CreatedBy`) VALUES(5, 0, 0, '%s', 0, 0, '0', '%s')", randomcode.str().c_str(), CreatedBy.c_str());
+		ChatHandler(player->GetSession()).PSendSysMessage("已成功创建您的卡密 %s", randomcode.str().c_str());
+		player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+		break;
+	}
+	return true;
+}
+
+bool OnGossipSelectCode_RewardShopNPC(Player* player, Creature* creature, uint32 sender, uint32, const char* code)
+{
+	uint32 playerguid = player->GetGUID();
+	std::string playerIP = player->GetSession()->GetRemoteAddress();
+	std::string rewardcode = code;
+	std::ostringstream messageCode;
+	messageCode << "我很抱歉 " << player->GetName() << ", 这不是有效卡密或已被兑换。";
+
+	//check for code
+	QueryResult* result = CharacterDatabase.PQuery("SELECT id, action, action_data, quantity, status FROM reward_shop WHERE code = '%s'", rewardcode.c_str());
+
+	std::size_t found = rewardcode.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890-");
+
+	if (found != std::string::npos)
+		return false;
+
+	if (!result)
+	{
+		player->PlayDirectSound(9638); // No
+		creature->MonsterWhisper(messageCode.str().c_str(), player);
+		creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+		player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+		return false;
+	}
+
+	std::transform(rewardcode.begin(), rewardcode.end(), rewardcode.begin(), ::toupper);
+
+	do
+	{
+		Field* fields = result->Fetch();
+		uint32 id = fields[0].GetUInt32();
+		uint32 action = fields[1].GetUInt32();
+		uint32 action_data = fields[2].GetUInt32();
+		uint32 quantity = fields[3].GetUInt32();
+		uint32 status = fields[4].GetInt32();
+		uint32 nospace = 0;
+		int count = 1;
+		uint32 noSpaceForCount = 0;
+		ItemPosCountVec dest;
+		InventoryResult msg = player->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, action_data, quantity, &noSpaceForCount);
+
+
+		if (status == 1)
+		{
+			player->PlayDirectSound(9638); // No
+			creature->MonsterWhisper(messageCode.str().c_str(), player);
+			creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
+			player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
+			return false;
+		}
+		switch (action)
+		{
+
+		case 1: /* Item */
+			if (msg != EQUIP_ERR_OK)
+				count -= noSpaceForCount;
+
+			if (count == 0 || dest.empty())
+			{
+				ChatHandler(player->GetSession()).PSendSysMessage("兑换失败,不能携带更多此类物品或者您的背包空间不足。");
+				//ChatHandler(player->GetSession()).PSendSysMessage(true);
+				return false;
+			}
+
+			if (count > 0 && action_data)
+			{
+				player->AddItem(action_data, quantity);
+			}
+			break;
+		case 2: /* Gold */
+			player->ModifyMoney(action_data * 10000);
+			ChatHandler(player->GetSession()).PSendSysMessage("兑换系统: 成功添加 [%u G币]", action_data);
+			break;
+		case 3: /* Name Change */
+			player->SetAtLoginFlag(AT_LOGIN_RENAME);
+			ChatHandler(player->GetSession()).PSendSysMessage("兑换系统: 请注销名称变更。");
+			break;
+		case 4: /* Faction Change */
+			player->SetAtLoginFlag(AT_LOGIN_CHANGE_FACTION);
+			ChatHandler(player->GetSession()).PSendSysMessage("兑换系统: 请注销阵营变更。");
+			break;
+		case 5: /* Race Change */
+			player->SetAtLoginFlag(AT_LOGIN_CHANGE_RACE);
+			ChatHandler(player->GetSession()).PSendSysMessage("兑换系统: 请注销种族变更。");
+			break;
+		}
+
+	} while (result->NextRow());
+
+	CharacterDatabase.PQuery("UPDATE reward_shop SET status = 1, PlayerGUID = '%u', PlayerIP = '%s' WHERE code = '%s'", playerguid, playerIP.c_str(), rewardcode.c_str());
+	return true;
+}
+
 void AddSC_custom_creatures()
 {
     Script* newscript;
@@ -1195,4 +1363,11 @@ void AddSC_custom_creatures()
     newscript->Name = "custom_npc_summon_debugAI";
     newscript->GetAI = &GetAI_custom_summon_debug;
     newscript->RegisterSelf(false);
+
+	newscript = new Script;
+	newscript->Name = "reward_shop_npc";
+	newscript->pGossipHello = &OnGossipHello_RewardShopNPC;
+	newscript->pGossipSelect = &OnGossipSelect_RewardShopNPC;
+	newscript->pGossipSelectWithCode = &OnGossipSelectCode_RewardShopNPC;
+	newscript->RegisterSelf(false);
 }

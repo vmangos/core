@@ -389,6 +389,8 @@ enum AtLoginFlags
     //AT_LOGIN_CUSTOMIZE         = 0x08, -- used in post-3.x
     //AT_LOGIN_RESET_PET_TALENTS = 0x10, -- used in post-3.x
     AT_LOGIN_FIRST             = 0x20,
+	AT_LOGIN_CHANGE_FACTION    = 0x40,
+	AT_LOGIN_CHANGE_RACE       = 0x80,
 };
 
 enum PlayerCheatOptions : uint16
