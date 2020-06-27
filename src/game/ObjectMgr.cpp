@@ -286,6 +286,19 @@ void ObjectMgr::LoadAllIdentifiers()
         } while (result->NextRow());
     }
 
+    m_GossipMenuIdSet.clear();
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `gossip_menu`"));
+
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 id = fields[0].GetUInt32();
+            m_GossipMenuIdSet.insert(id);
+        } while (result->NextRow());
+    }
+
     sSpellMgr.LoadExistingSpellIds();
 }
 

@@ -2284,3 +2284,19 @@ bool Map::ScriptCommand_QuestCredit(ScriptInfo const& script, WorldObject* sourc
 
     return false;
 }
+
+// SCRIPT_COMMAND_SET_GOSSIP_MENU (84)
+bool Map::ScriptCommand_SetGossipMenu(ScriptInfo const& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_GOSSIP_MENU (script id %u) call for a nullptr or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->SetDefaultGossipMenuId(script.setGossipMenu.gossipMenuId);
+
+    return false;
+}

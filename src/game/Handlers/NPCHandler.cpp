@@ -383,7 +383,7 @@ void WorldSession::HandleGossipHelloOpcode(WorldPacket& recv_data)
 
     if (!sScriptMgr.OnGossipHello(_player, pCreature))
     {
-        _player->PrepareGossipMenu(pCreature, pCreature->GetCreatureInfo()->gossip_menu_id);
+        _player->PrepareGossipMenu(pCreature, pCreature->GetDefaultGossipMenuId());
         _player->SendPreparedGossip(pCreature);
     }
 }
