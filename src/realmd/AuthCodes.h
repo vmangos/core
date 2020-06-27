@@ -76,14 +76,8 @@ enum AuthResult
     WOW_FAIL_FAIL_NOACCESS          = 0x0D,                 ///< Unable to connect
     WOW_SUCCESS_SURVEY              = 0x0E,                 ///< Connected.
     WOW_FAIL_PARENTCONTROL          = 0x0F,                 ///< Access to this account has been blocked by parental controls. Your settings may be changed in your account preferences at <site>
-    WOW_FAIL_LOCKED_ENFORCED        = 0x10,                 ///< You have applied a lock to your account. You can change your locked status by calling your account lock phone number.
-    //WOW_FAIL_OVERMIND_CONVERTED
-    //WOW_FAIL_ANTI_INDULGENCE
-    //WOW_FAIL_EXPIRED
-    //WOW_FAIL_BILLING_LOCK
-    //WOW_FAIL_AA_LOCK
-    //WOW_FAIL_UNLOCKABLE_LOCK
-    //WOW_FAIL_OTHER
+    WOW_FAIL_ANTI_INDULGENCE        = 0x13,                 /// ? Not tested. Anti-indulgence in Chinese client?
+    WOW_FAIL_DISCONNECTED           = 0xFF
 };
 
 #endif
