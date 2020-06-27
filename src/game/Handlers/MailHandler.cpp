@@ -282,12 +282,6 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
             pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_MAIL_ATTACHMENT_INVALID);
             return;
         }
-
-        if (req->COD && item->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
-        {
-            pl->SendMailResult(0, MAIL_SEND, MAIL_ERR_CANT_SEND_WRAPPED_COD);
-            return;
-        }
     }
 
     // Antispam checks
