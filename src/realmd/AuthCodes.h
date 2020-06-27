@@ -85,7 +85,7 @@ enum AuthResult
     WOW_FAIL_EXPIRED                = 0x14,                 ///< Unable to connect
     WOW_FAIL_NO_GAME_ACCOUNT        = 0x15,                 ///< Unable to connect
     WOW_FAIL_CHARGEBACK             = 0x16,                 ///< This World of Warcraft account has been temporary closed due to a chargeback on its subscription. Please refer to this <site> for further information.
-    WOW_FAIL_IGR_WITHOUT_BNET       = 0x17,                 ///< In order to log in to World of Warcraft usign IGR time, this World of Warcraft account must first be merged with a Battle.net account. Please visit <site> to merge this account.
+    WOW_FAIL_IGR_WITHOUT_BNET       = 0x17,                 ///< In order to log in to World of Warcraft using IGR time, this World of Warcraft account must first be merged with a Battle.net account. Please visit <site> to merge this account.
     WOW_FAIL_GAME_ACCOUNT_LOCKED    = 0x18,                 ///< Access to your account has been temporarily disabled.
     WOW_FAIL_UNLOCKABLE_LOCK        = 0x19,                 ///< Your account has been locked but can be unlocked.
     WOW_FAIL_CONVERSION_REQUIRED    = 0x20,                 ///< This account needs to be converted to a Battle.net account. Please [Click Here] or go to: <site> to begin conversion.
