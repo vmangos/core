@@ -17,14 +17,13 @@
 /* ScriptData
 SDName: Stormwind_City
 SD%Complete: 100
-SDComment: Quest support: 1640, 1447, 4185, 11223 (DB support required for spell 42711)
+SDComment: Quest support: 1640, 1447
 SDCategory: Stormwind City
 EndScriptData */
 
 /* ContentData
 npc_bartleby
 npc_dashel_stonefist
-npc_lady_katrana_prestor
 EndContentData */
 
 #include "scriptPCH.h"
@@ -466,51 +465,6 @@ CreatureAI* GetAI_npc_dashel_stonefist(Creature* pCreature)
     return new npc_dashel_stonefistAI(pCreature);
 }
 
-/*######
-## npc_lady_katrana_prestor
-######*/
-
-#define GOSSIP_ITEM_KAT_1 "Pardon the intrusion, Lady Prestor, but Highlord Bolvar suggested that I seek your advice."
-#define GOSSIP_ITEM_KAT_2 "My apologies, Lady Prestor."
-#define GOSSIP_ITEM_KAT_3 "Begging your pardon, Lady Prestor. That was not my intent."
-#define GOSSIP_ITEM_KAT_4 "Thank you for your time, Lady Prestor."
-
-bool GossipHello_npc_lady_katrana_prestor(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->IsQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(4185) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(2693, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_lady_katrana_prestor(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    switch (uiAction)
-    {
-        case GOSSIP_ACTION_INFO_DEF:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            pPlayer->SEND_GOSSIP_MENU(2694, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+1:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            pPlayer->SEND_GOSSIP_MENU(2695, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+2:
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_KAT_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            pPlayer->SEND_GOSSIP_MENU(2696, pCreature->GetGUID());
-            break;
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            pPlayer->AreaExploredOrEventHappens(4185);
-            break;
-    }
-    return true;
-}
 /*######
 ## Quest #434 The Attack
 ######*/
@@ -1309,12 +1263,6 @@ void AddSC_stormwind_city()
     newscript->Name = "npc_dashel_stonefist";
     newscript->GetAI = &GetAI_npc_dashel_stonefist;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_dashel_stonefist;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_lady_katrana_prestor";
-    newscript->pGossipHello = &GossipHello_npc_lady_katrana_prestor;
-    newscript->pGossipSelect = &GossipSelect_npc_lady_katrana_prestor;
     newscript->RegisterSelf();
 
     // The Attack quest
