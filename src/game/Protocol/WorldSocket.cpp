@@ -232,9 +232,9 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     if (locale >= MAX_LOCALE)
         locale = LOCALE_enUS;
     os = fields[9].GetString();
-	jf = fields[9].GetUInt32();
     uint32 accFlags = fields[10].GetUInt32();
-    bool isBanned = fields[11].GetBool();
+	jf = fields[11].GetUInt32();
+    bool isBanned = fields[12].GetBool();
     delete result;
 
     
