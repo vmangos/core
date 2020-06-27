@@ -77,7 +77,6 @@ enum AuthResult
     WOW_SUCCESS_SURVEY              = 0x0E,                 ///< Connected.
     WOW_FAIL_PARENTCONTROL          = 0x0F,                 ///< Access to this account has been blocked by parental controls. Your settings may be changed in your account preferences at <site>
     WOW_FAIL_LOCKED_ENFORCED        = 0x10,                 ///< You have applied a lock to your account. You can change your locked status by calling your account lock phone number.
-    WOW_FAIL_TRIAL_ENDED            = 0x11,                 ///< Your trial subscription has expired. Please visit <site> to upgrade your account.
     //WOW_FAIL_OVERMIND_CONVERTED
     //WOW_FAIL_ANTI_INDULGENCE
     //WOW_FAIL_EXPIRED
