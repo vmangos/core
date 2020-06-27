@@ -1737,7 +1737,6 @@ enum MailResponseResult
     MAIL_ERR_RECIPIENT_NOT_FOUND       = 4,
     MAIL_ERR_NOT_YOUR_TEAM             = 5,
     MAIL_ERR_INTERNAL_ERROR            = 6,
-    MAIL_ERR_DISABLED_FOR_TRIAL_ACC    = 14,
     MAIL_ERR_RECIPIENT_CAP_REACHED     = 15,
     MAIL_ERR_CANT_SEND_WRAPPED_COD     = 16,
     MAIL_ERR_MAIL_AND_CHAT_SUSPENDED   = 17,
@@ -1799,7 +1798,6 @@ enum TradeStatus
     TRADE_STATUS_TARGET_DEAD    = 18,
     TRADE_STATUS_YOU_LOGOUT     = 19,
     TRADE_STATUS_TARGET_LOGOUT  = 20,
-    TRADE_STATUS_TRIAL_ACCOUNT  = 21,                       // Trial accounts can not perform that action
     TRADE_STATUS_ONLY_CONJURED  = 22                        // You can only trade conjured items... (cross realm BG related).
 };
 
