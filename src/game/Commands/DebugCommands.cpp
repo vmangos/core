@@ -316,6 +316,28 @@ bool ChatHandler::HandleDebugSendEquipErrorCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleDebugSendMailErrorCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    uint32 mailId;
+    if (!ExtractUInt32(&args, mailId))
+        return false;
+
+    uint32 mailAction;
+    if (!ExtractUInt32(&args, mailAction))
+        return false;
+
+    uint32 mailError;
+    if (!ExtractUInt32(&args, mailError))
+        return false;
+
+    uint8 msg = atoi(args);
+    m_session->GetMasterPlayer()->SendMailResult(mailId, MailResponseType(mailAction), MailResponseResult(mailError));
+    return true;
+}
+
 bool ChatHandler::HandleDebugSendSellErrorCommand(char* args)
 {
     if (!*args)
