@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20200627204553');
 -- Add your query below.
 
---forests edge
+-- forests edge
 -- add stormwind guard 80463 waypoints
 UPDATE `creature` SET `position_x` = -9625.91, `position_y` = 648.695, `position_z` = 38.6521, `movement_type` = 2 WHERE `guid` = 80463;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -109,7 +109,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, 
 -- npc's should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (80464, 80465, 80443, 80447, 80460, 80461, 80456, 80458, 80446, 80457, 80486);
 
---goldshire
+-- goldshire
 -- update waypoints for bo
 DELETE FROM creature_movement WHERE id = 80320;
 DELETE FROM creature_movement_template WHERE entry = 797;
@@ -141,6 +141,50 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 7 WHERE `guid` IN
 DELETE FROM `creature_ai_scripts` WHERE `id`=29501;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (29501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 84, 85, 0, 0, 0, 0, 0, 0, 'Innkeeper Farley - Say Text');
 
+-- add waypoints and scripts to matt
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(794, 1, -9387.13, -117.859, 58.862, 2.818, 3597000, 0, 79401),
+(794, 2, -9383.68, -114.327, 58.8469, 100, 0, 0, 0),
+(794, 3, -9380.77, -110.285, 58.8178, 100, 0, 0, 0),
+(794, 4, -9378.45, -104.929, 60.5617, 100, 0, 0, 0),
+(794, 5, -9388.37, -91.1196, 63.2423, 100, 0, 0, 0),
+(794, 6, -9418.03, -87.5691, 60.0556, 100, 0, 0, 0),
+(794, 7, -9421.72, -81.2192, 60.4194, 100, 0, 0, 0),
+(794, 8, -9423.2, -53.2072, 63.5551, 100, 0, 0, 0),
+(794, 9, -9420.56, -37.2724, 62.9432, 100, 0, 0, 0),
+(794, 10, -9422.44, -21.2467, 62.0099, 100, 0, 0, 0),
+(794, 11, -9432.84, 15.3516, 59.0447, 100, 0, 0, 0),
+(794, 12, -9433.96, 52.9096, 56.3998, 100, 0, 0, 0),
+(794, 13, -9437.53, 63.9734, 56.3863, 100, 0, 0, 0),
+(794, 14, -9433.31, 76.173, 56.1534, 100, 0, 0, 0),
+(794, 15, -9421.61, 95.8219, 57.8012, 100, 0, 0, 0),
+(794, 16, -9410.34, 117.386, 60.4114, 100, 0, 0, 0),
+(794, 17, -9410.93, 130.485, 59.4201, 100, 0, 0, 0),
+(794, 18, -9420.29, 146.493, 57.5605, 100, 0, 0, 0),
+(794, 19, -9430.31, 151.226, 55.5763, 100, 900000, 0, 79402),
+(794, 20, -9426.91, 144.703, 57.4634, 100, 0, 0, 0),
+(794, 21, -9413.45, 125.26, 59.7663, 100, 0, 0, 0),
+(794, 22, -9404.68, 114.129, 60.4918, 100, 0, 0, 0),
+(794, 23, -9402.83, 103.103, 59.0547, 100, 0, 0, 0),
+(794, 24, -9418.24, 85.2314, 56.7479, 100, 0, 0, 0),
+(794, 25, -9434.07, 71.3512, 56.1786, 100, 0, 0, 0),
+(794, 26, -9439.36, 64.1234, 56.2029, 100, 0, 0, 0),
+(794, 27, -9437.39, 53.4107, 56.0962, 100, 0, 0, 0),
+(794, 28, -9427.39, 38.3134, 57.1306, 100, 0, 0, 0),
+(794, 29, -9418.42, 26.2133, 58.0576, 100, 0, 0, 0),
+(794, 30, -9401.25, 4.77202, 60.2208, 100, 0, 0, 0),
+(794, 31, -9392.87, -4.30769, 60.91, 100, 0, 0, 0),
+(794, 32, -9380.95, -17.9289, 62.2038, 100, 0, 0, 0),
+(794, 33, -9360.5, -37.7572, 64.222, 100, 0, 0, 0),
+(794, 34, -9356, -50.1369, 65.8597, 100, 0, 0, 0),
+(794, 35, -9356.07, -60.5225, 66.4481, 100, 0, 0, 0),
+(794, 36, -9358.77, -73.3921, 64.9128, 100, 0, 0, 0),
+(794, 37, -9371.97, -90.3814, 64.1589, 100, 0, 0, 0),
+(794, 38, -9377.91, -101.176, 61.7324, 100, 0, 0, 0),
+(794, 39, -9379.77, -110.074, 58.8343, 100, 0, 0, 0),
+(794, 40, -9383.17, -114.531, 58.8394, 100, 0, 0, 0);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (79401, 3594, 0, 0, 0, 0, 0, 0, 0, 0, 0, 894, 0, 0, 0, 0, 0, 0, 0, 0, 'Matt - Say Text');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (79402, 873, 0, 0, 0, 0, 0, 0, 0, 0, 0, 893, 0, 0, 0, 0, 0, 0, 0, 0, 'Matt - Say Text');
 
 -- End of migration.
 END IF;
