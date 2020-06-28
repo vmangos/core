@@ -142,6 +142,7 @@ DELETE FROM `creature_ai_scripts` WHERE `id`=29501;
 INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (29501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 84, 85, 0, 0, 0, 0, 0, 0, 'Innkeeper Farley - Say Text');
 
 -- add waypoints and scripts to matt
+UPDATE `creature` SET `movement_type` = 2 WHERE `id` = 794;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (794, 1, -9387.13, -117.859, 58.862, 2.818, 3597000, 0, 79401),
 (794, 2, -9383.68, -114.327, 58.8469, 100, 0, 0, 0),
