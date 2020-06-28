@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20200627204553');
 -- Add your query below.
 
-
+--forests edge
 -- add stormwind guard 80463 waypoints
 UPDATE `creature` SET `position_x` = -9625.91, `position_y` = 648.695, `position_z` = 38.6521, `movement_type` = 2 WHERE `guid` = 80463;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -108,6 +108,38 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, 
 
 -- npc's should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (80464, 80465, 80443, 80447, 80460, 80461, 80456, 80458, 80446, 80457, 80486);
+
+--goldshire
+-- update waypoints for bo
+DELETE FROM creature_movement WHERE id = 80320;
+DELETE FROM creature_movement_template WHERE entry = 797;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(797, 1, -9425.55, 129.192, 59.5418, 100, 38000, 7, 8032001),
+(797, 2, -9442.73, 135.681, 58.3425, 100, 0, 0, 0),
+(797, 3, -9446.76, 132.807, 58.745, 100, 0, 0, 0),
+(797, 4, -9452.98, 129.175, 58.9913, 100, 0, 0, 0),
+(797, 5, -9457.24, 125.796, 59.014, 100, 0, 0, 0),
+(797, 6, -9463.49, 121.757, 58.6251, 100, 0, 0, 0),
+(797, 7, -9464.32, 118.82, 58.0714, 100, 0, 0, 0),
+(797, 8, -9464.71, 116.082, 57.9214, 100, 0, 0, 0),
+(797, 9, -9464.12, 107.346, 57.5387, 100, 0, 0, 0),
+(797, 10, -9461.14, 95.8617, 58.3268, 100, 44000, 3, 0),
+(797, 11, -9464.12, 107.346, 57.5387, 100, 0, 0, 0),
+(797, 12, -9464.71, 116.082, 57.9214, 100, 0, 0, 0),
+(797, 13, -9464.32, 118.82, 58.0714, 100, 0, 0, 0),
+(797, 14, -9463.49, 121.757, 58.6251, 100, 0, 0, 0),
+(797, 15, -9457.24, 125.796, 59.014, 100, 0, 0, 0),
+(797, 16, -9452.98, 129.175, 58.9913, 100, 0, 0, 0),
+(797, 17, -9446.76, 132.807, 58.745, 100, 0, 0, 0),
+(797, 18, -9442.73, 135.681, 58.3425, 100, 0, 0, 0);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8032001, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Bo - Run');
+
+-- npc's should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 7 WHERE `guid` IN (80317, 80321);
+
+-- add missing text to innkeeper farley
+DELETE FROM `creature_ai_scripts` WHERE `id`=29501;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (29501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 86, 84, 85, 0, 0, 0, 0, 0, 0, 'Innkeeper Farley - Say Text');
 
 
 -- End of migration.
