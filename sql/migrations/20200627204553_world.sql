@@ -270,6 +270,14 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (81362, 17, -9794.25, -1416.94, 62.7356, 100, 0, 0, 0),
 (81362, 18, -9798.88, -1406.96, 62.6995, 100, 0, 0, 0);
 
+-- add stormwind guard 81365 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 81365;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(81365, 1, -9776.59, -1394.81, 97.8873, 100, 60000, 0, 0),
+(81365, 2, -9788.5, -1399.94, 97.8873, 4.34587, 60000, 0, 0),
+(81365, 3, -9783.52, -1412.02, 97.8873, 100, 60000, 0, 0),
+(81365, 4, -9771.3, -1406.96, 97.8868, 1.16937, 60000, 0, 0);
+
 
 -- End of migration.
 END IF;
