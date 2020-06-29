@@ -230,6 +230,24 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (79861, 8, -9086.64, 417.472, 92.2924, 100, 0, 0, 0),
 (79861, 9, -9079.49, 425.134, 92.5005, 100, 0, 0, 0);
 
+-- tower of azora
+-- npc's should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (80928, 80936, 80929, 80924, 80926, 80925, 80931);
+
+-- add servant of azora 80927 waypoints
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 80927;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(80927, 1, -9554.81, -706.766, 90.4123, 100, 0, 0, 0),
+(80927, 2, -9559.78, -705.204, 90.4257, 100, 0, 0, 0),
+(80927, 3, -9567.61, -707.474, 90.422, 100, 0, 0, 0),
+(80927, 4, -9573.15, -714.011, 90.4237, 100, 0, 0, 0),
+(80927, 5, -9573.83, -722.376, 90.4257, 100, 0, 0, 0),
+(80927, 6, -9569.41, -729.787, 90.4263, 100, 0, 0, 0),
+(80927, 7, -9557.52, -734.085, 90.4258, 100, 0, 0, 0),
+(80927, 8, -9549.81, -728.635, 90.4258, 100, 0, 0, 0),
+(80927, 9, -9546.45, -720.288, 90.4259, 100, 0, 0, 0),
+(80927, 10, -9548.53, -712.153, 90.4209, 100, 0, 0, 0);
+
 
 -- End of migration.
 END IF;
