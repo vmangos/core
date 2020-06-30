@@ -279,6 +279,78 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (81365, 4, -9771.3, -1406.96, 97.8868, 1.16937, 60000, 0, 0);
 
 
+
+-- eastvale logging camp
+-- remove old scripts and waypoints
+DELETE FROM `creature_template_addon` WHERE entry = 11328;
+DELETE FROM `creature_addon` WHERE `guid` IN (81252, 81249, 81348, 81349, 81250);
+DELETE FROM `creature_movement` WHERE `id` IN (81252, 81249, 81348, 81349, 81250);
+DELETE FROM `creature_movement_scripts` WHERE `id` IN (8125001, 8125002, 8125003, 8125204, 8125208, 8125209, 8124901, 8124904, 8124905, 8134805, 8134810, 8134811, 8134902, 8134906, 8134907);
+UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0  WHERE `guid` IN (81252, 81249, 81348, 81349, 81250);
+
+
+-- add corect positions
+UPDATE `creature` SET `position_x` = -9535.65, `position_y` = -1329.81, `position_z` = 47.3419, `orientation` = 1.939 WHERE `guid` = 81252;
+UPDATE `creature` SET `position_x` = -9529.32, `position_y` = -1323.67, `position_z` = 45.9509, `orientation` = 2.70945 WHERE `guid` = 81249;
+UPDATE `creature` SET `position_x` = -9535.3, `position_y` = -1304.7, `position_z` = 44.702, `orientation` = 5.28088 WHERE `guid` = 81348;
+UPDATE `creature` SET `position_x` = -9501.6, `position_y` = -1282.86, `position_z` = 43.6379, `orientation` = 6.01566 WHERE `guid` = 81349;
+UPDATE `creature` SET `position_x` = -9523.21, `position_y` = -1290.25, `position_z` = 44.1174, `orientation` = 5.23877 WHERE `guid` = 81250;
+
+
+
+
+
+
+-- eastvale peasant 81252
+UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 11328;
+
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (8125201, 11328, 8125201, 1, 0, 100, 1, 0, 0, 255000, 255000, 8125201, 0, 0, 'Westfall Worker 81252 - Start Waypoints OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125201, 0, 60, 1, 0, 0, 0, 0, 0, 0, 0, 81252, 0, 0, 0, 0, 0, 0, 0, 0, 'Westfall Worker 81252 - Start Waypoints');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8125201, 52, 81252, 0, 0, 0, 0);
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (8125202, 11328, 8125201, 1, 0, 100, 0, 0, 0, 0, 0, 8125202, 0, 0, 'Westfall Worker 81252 - Start ChopWood Emote OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125202, 0, 68, 8125201, 2, 11328, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Westfall Worker 81252 - SSFA Eastvale Peasant');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125201, 0, 1, 234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Westfall Worker - ChopWood Emote - Started by Event 8125202');
+
+
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+81252, 1, -9535.65, -1329.81, 47.272, 100, 6000, 0, 8125201
+81252, 2, -9508.88, -1333.61, 44.3237, 100, 0, 0, 0
+81252, 3, -9498.48, -1327.6, 42.0789, 100, 0, 0, 0
+81252, 4, -9478.76, -1307.33, 42.1843, 100, 0, 0, 0
+81252, 5, -9466.71, -1296.88, 41.4483, 100, 3000, 0, 8125202
+81252, 6, -9470.67, -1295.27, 41.0593, 100, 0, 0, 0
+81252, 7, -9471.37, -1289.82, 41.1039, 100, 10000, 0, 8125203
+81252, 8, -9497.14, -1325.79, 41.7219, 100, 0, 0, 0
+81252, 9, -9511.88, -1333.19, 44.8482, 100, 0, 0, 0
+81252, 10, -9523.05, -1335.57, 46.8005, 100, 0, 0, 0
+81252, 11, -9532.64, -1333.36, 47.621, 100, 0, 0, 0
+81252, 12, -9535.65, -1329.81, 47.272, 100, 6000, 0, 8125204
+
+
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125201, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Emote None');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125201, 4, 23, 89, 1, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Morph');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125202, 2, 23, 308, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Morph');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 1, 16, 6289, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Play Sound -  What');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 1, 35, 0, 0, 0, 0, 81251, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Face Target');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 2, 16, 6288, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Play Sound - More Work');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 4, 39, 1061601, 0, 0, 0, 81251, 0, 9, 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Start Script Supervisor Raelene');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 8, 16, 6242, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Play Sound - No One Else Available');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125203, 13, 39, 8125001, 0, 0, 0, 81348, 0, 9, 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Start Script Eastvale Peasant 81250');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125204, 0, 35, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1.939, 0, 'Eastvale Peasant 81252 - Orientation');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125204, 2, 1, 234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Emote ChopWood');
+
+
+
+
+
+
+
+
+-- eastvale peasant 81250
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125001, 0, 60, 1, 0, 0, 0, 0, 0, 0, 0, 81348, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81348 - Start Waypoints - Started by Eastvale Peasant 81252');
+
+
 -- End of migration.
 END IF;
 END??
