@@ -275,6 +275,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "poi",            SEC_DEVELOPPER,     false, &ChatHandler::HandleDebugSendPoiCommand,             "", nullptr },
         { "qpartymsg",      SEC_DEVELOPPER,     false, &ChatHandler::HandleDebugSendQuestPartyMsgCommand,   "", nullptr },
         { "qinvalidmsg",    SEC_DEVELOPPER,     false, &ChatHandler::HandleDebugSendQuestInvalidMsgCommand, "", nullptr },
+        { "mailerror",      SEC_DEVELOPPER,     false, &ChatHandler::HandleDebugSendMailErrorCommand,       "", nullptr },
         { "sellerror",      SEC_DEVELOPPER,     false, &ChatHandler::HandleDebugSendSellErrorCommand,       "", nullptr },
         { "spellfail",      SEC_DEVELOPPER,     false, &ChatHandler::HandleDebugSendSpellFailCommand,       "", nullptr },
         { "visual",         SEC_DEVELOPPER,     true,  &ChatHandler::HandleSendSpellVisualCommand,          "", nullptr },
