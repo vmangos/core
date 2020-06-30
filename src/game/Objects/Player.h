@@ -1100,8 +1100,8 @@ class Player final: public Unit
         bool IsTwoHandUsed() const
         {
             Item* mainItem = GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND);
-            return mainItem && mainItem->GetProto()->InventoryType == INVTYPE_2HWEAPON;
-        }
+            return mainItem && mainItem->GetProto()->InventoryType == INVTYPE_2HWEAPON && !CanTitanGrip();
+		}
         void SendNewItem(Item* item, uint32 count, bool received, bool created, bool broadcast = false, bool showInChat = true);
         bool BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, uint8 bag, uint8 slot);
         void OnReceivedItem(Item* item);
@@ -1486,6 +1486,8 @@ class Player final: public Unit
         bool m_canParry;
         bool m_canBlock;
         bool m_canDualWield;
+		bool m_canTitanGrip;
+		uint32 m_titanGripPenaltySpellId;
         float m_ammoDPS;
         float m_personalXpRate;
         uint32 m_foodEmoteTimer;
@@ -1554,6 +1556,8 @@ class Player final: public Unit
         void SetCanBlock(bool value);
         bool CanDualWield() const { return m_canDualWield; }
         void SetCanDualWield(bool value) { m_canDualWield = value; }
+		bool CanTitanGrip() const { return m_canTitanGrip; }
+		void SetCanTitanGrip(bool value, uint32 penaltySpellId = 0);
 
         void ApplyStatBuffMod(Stats stat, float val, bool apply) { ApplyModSignedFloatValue((val > 0 ? PLAYER_FIELD_POSSTAT0 + stat : PLAYER_FIELD_NEGSTAT0 + stat), val, apply); }
         void ApplyStatPercentBuffMod(Stats stat, float val, bool apply)

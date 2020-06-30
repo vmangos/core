@@ -255,6 +255,7 @@ class Spell
         void EffectLearnSpell(SpellEffectIndex eff_idx);
         void EffectDispel(SpellEffectIndex eff_idx);
         void EffectDualWield(SpellEffectIndex eff_idx);
+		void EffectTitanGrip(SpellEffectIndex eff_idx);
         void EffectPickPocket(SpellEffectIndex eff_idx);
         void EffectAddFarsight(SpellEffectIndex eff_idx);
         void EffectSummonWild(SpellEffectIndex eff_idx);

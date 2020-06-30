@@ -193,6 +193,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectApplyAreaAura,                            //129 SPELL_EFFECT_APPLY_AREA_AURA_ENEMY
     &Spell::EffectDespawnObject,                            //130 SPELL_EFFECT_DESPAWN_OBJECT
     &Spell::EffectNostalrius,                               //131 SPELL_EFFECT_NOSTALRIUS
+	&Spell::EffectTitanGrip,                                //132 SPELL_EFFECT_TITAN_GRIP Allows you to equip two-handed axes, maces and swords in one hand, but you attack $49152s1% slower than normal.
 };
 
 void Spell::EffectEmpty(SpellEffectIndex /*eff_idx*/)
@@ -3266,6 +3267,12 @@ void Spell::EffectDualWield(SpellEffectIndex /*eff_idx*/)
 {
     if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
         ((Player*)unitTarget)->SetCanDualWield(true);
+}
+
+void Spell::EffectTitanGrip(SpellEffectIndex /*eff_idx*/)
+{
+	if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
+		((Player*)unitTarget)->SetCanTitanGrip(true);
 }
 
 void Spell::EffectPull(SpellEffectIndex /*eff_idx*/)
