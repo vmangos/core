@@ -446,7 +446,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (81257, 10, -9410.44, -1336.3, 50.4051, 100, 0, 0, 0);
 
 -- npc's should roam
-UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (81247, 81259);
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 81259;
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 0.5 WHERE `guid` = 81247;
 
 
 -- End of migration.
