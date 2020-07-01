@@ -431,6 +431,23 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1061601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6891, 6892, 6890, 0, 0, 0, 0, 0, 0, 'Supervisor Raelen - Speak');
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1061601, 2, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Supervisor Raelen - Emote Point');
 
+-- add eastvale lumberjack waypoints
+UPDATE `creature` SET `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 81257;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(81257, 1, -9400.75, -1336.92, 50.0289, 100, 20000, 0, 0),
+(81257, 2, -9401.56, -1338.09, 50.0274, 100, 0, 0, 0),
+(81257, 3, -9405.42, -1339.04, 50.0274, 100, 0, 0, 0),
+(81257, 4, -9409.35, -1338.22, 50.0274, 100, 0, 0, 0),
+(81257, 5, -9414.88, -1332.98, 51.4641, 100, 0, 0, 0),
+(81257, 6, -9417.64, -1330.03, 51.4427, 100, 0, 0, 0),
+(81257, 7, -9426.08, -1323.97, 51.4639, 100, 20000, 0, 0),
+(81257, 8, -9419.65, -1328.88, 51.4533, 100, 0, 0, 0),
+(81257, 9, -9416.5, -1331.4, 51.4431, 100, 0, 0, 0),
+(81257, 10, -9410.44, -1336.3, 50.4051, 100, 0, 0, 0);
+
+-- npc's should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (81247, 81259);
+
 
 -- End of migration.
 END IF;
