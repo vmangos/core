@@ -664,6 +664,14 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 81259;
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 0.5 WHERE `guid` = 81247;
 
+-- remove kids at night
+INSERT INTO game_event_creature VALUES
+(86156, -27),
+(86157, -27),
+(86158, -27),
+(86159, -27),
+(86354, -27);
+
 
 -- End of migration.
 END IF;
