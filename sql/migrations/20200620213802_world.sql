@@ -16,7 +16,7 @@ UPDATE `creature` SET `position_x` = -10598, `position_y` = 1160.48, `position_z
 -- correct movement and enable event ai
 UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0  WHERE `guid` IN (89861, 44296);
 DELETE FROM `creature_addon` WHERE `guid` IN (45524, 44296, 89861, 45477, 45521);
-UPDATE `creature_template` SET `ai_name` = "EventAI" WHERE entry = 842;
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 842;
 
 -- add gameobjects
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
