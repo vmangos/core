@@ -384,6 +384,7 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, 
 (80491, 1423, 0, 0, 0, 0, 0, 0, -9610.83, -427.736, 57.5228, 0.887339, 285, 285, 1, 100, 0, 2, 0, 0, 0, 10);
 
 -- add stormwind guard 80491 waypoints
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (80491, 1, -9610.83, -427.736, 57.3851, 100, 0, 0, 0),
 (80491, 2, -9597.86, -457.442, 57.6541, 100, 0, 0, 0),
 (80491, 3, -9592.34, -472.696, 57.7307, 100, 0, 0, 0),
@@ -665,7 +666,7 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 0.5 WHERE `guid` = 81247;
 
 -- remove kids at night
-INSERT INTO game_event_creature VALUES
+INSERT INTO `game_event_creature` VALUES
 (86156, -27),
 (86157, -27),
 (86158, -27),
