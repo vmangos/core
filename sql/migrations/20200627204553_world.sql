@@ -232,6 +232,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (79861, 9, -9079.49, 425.134, 92.5005, 100, 0, 0, 0);
 
 -- update kira songshine waypoints
+DELETE FROM `creature_movement` WHERE `id` = 80283;
 UPDATE `creature` SET `position_x` = -9537.01, `position_y` = -30.562, `position_z` = 55.8583 WHERE `guid` = 80283;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (3937, 1, -9537.01, -30.562, 55.8583, 100, 0, 0, 0),
