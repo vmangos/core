@@ -98,11 +98,20 @@ void PartyBotAI::LearnPremadeSpecForClass()
     for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
     {
         if (itr.second.requiredClass == me->GetClass() &&
-           ((m_role == ROLE_INVALID) || (itr.second.role == m_role)))
+           ((m_role == ROLE_INVALID) || (itr.second.role == m_role)) &&
+           (!m_level || (itr.second.level == m_level)))
         {
             sObjectMgr.ApplyPremadeSpecTemplateToPlayer(itr.first, me);
-            break;
+            return;
         }
+    }
+
+    if (m_level)
+    {
+        me->MonsterSay("No appropriate spec template found!");
+        me->GiveLevel(m_level);
+        me->InitTalentForLevel();
+        me->SetUInt32Value(PLAYER_XP, 0);
     }
 }
 

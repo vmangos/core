@@ -78,10 +78,12 @@ enum BattleBotSpells
 
 void BattleBotAI::AddPremadeGearAndSpells()
 {
+    uint8 const level = m_level ? m_level : sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
     std::vector<uint32> vSpecs;
     for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
     {
-        if (itr.second.requiredClass == me->GetClass())
+        if (itr.second.requiredClass == me->GetClass() &&
+            itr.second.level == level)
             vSpecs.push_back(itr.first);
     }
     if (!vSpecs.empty())
@@ -90,7 +92,8 @@ void BattleBotAI::AddPremadeGearAndSpells()
     std::vector<uint32> vGear;
     for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
     {
-        if (itr.second.requiredClass == me->GetClass())
+        if (itr.second.requiredClass == me->GetClass() &&
+            itr.second.level == level)
             vGear.push_back(itr.first);
     }
     if (!vGear.empty())
@@ -109,6 +112,14 @@ void BattleBotAI::AddPremadeGearAndSpells()
             }
             break;
         }
+    }
+
+    if (level != me->GetLevel())
+    {
+        sLog.outError("BattleBotAI::AddPremadeGearAndSpells - No level %u templates found!", level);
+        me->GiveLevel(level);
+        me->InitTalentForLevel();
+        me->SetUInt32Value(PLAYER_XP, 0);
     }
 }
 

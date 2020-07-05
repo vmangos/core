@@ -21,8 +21,8 @@ class BattleBotAI : public CombatBotBaseAI
 {
 public:
 
-    BattleBotAI(uint8 race, uint8 class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, uint8 bgId)
-        : CombatBotBaseAI(),  m_race(race), m_class(class_), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId)
+    BattleBotAI(uint8 race, uint8 class_, uint8 level, uint32 mapId, uint32 instanceId, float x, float y, float z, float o, uint8 bgId)
+        : CombatBotBaseAI(),  m_race(race), m_class(class_), m_level(level), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o), m_battlegroundId(bgId)
     {
         m_updateTimer.Reset(2000);
     }
@@ -78,6 +78,7 @@ public:
     ShortTimeTracker m_updateTimer;
     uint8 m_race = 0;
     uint8 m_class = 0;
+    uint8 m_level = 0;
     uint32 m_mapId = 0;
     uint32 m_instanceId = 0;
     float m_x = 0.0f;
