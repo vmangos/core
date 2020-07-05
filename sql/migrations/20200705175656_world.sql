@@ -59,7 +59,7 @@ UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 958 AND `item` = 954;
 UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 1198 AND `item` = 11303;
 
 -- Unlit Poor Torch - Drake Lindgren
-DELETE FROM `npc_vendor` WHERE `entry` = 1250 AND `item` = 6183
+DELETE FROM `npc_vendor` WHERE `entry` = 1250 AND `item` = 6183;
 
 
 
