@@ -528,7 +528,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, CreatureData const* data /*=
         if (FactionEntry const* pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction))
             m_reputationId = pFaction->reputationListID;
 
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_PVP)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_PVP))
         SetPvP(true);
     else
         SetPvP(false);
@@ -540,19 +540,19 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, CreatureData const* data /*=
     SetLeashDistance(GetCreatureInfo()->leash_range);
     SetDetectionDistance(GetCreatureInfo()->detection_range);
 
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_LARGE_AOI)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_LARGE_AOI))
     {
         SetVisibilityModifier(VISIBILITY_DISTANCE_LARGE);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
     }
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_GIGANTIC_AOI)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_GIGANTIC_AOI))
     {
         SetVisibilityModifier(VISIBILITY_DISTANCE_GIGANTIC);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
             SetActiveObjectState(true);
     } 
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INFINITE_AOI)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_INFINITE_AOI))
     {
         SetVisibilityModifier(MAX_VISIBILITY_DISTANCE);
         if (sWorld.getConfig(CONFIG_BOOL_VISIBILITY_FORCE_ACTIVE_OBJECTS))
@@ -2089,7 +2089,7 @@ bool Creature::IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectInd
         return true;
 
     // Taunt immunity special flag check
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NOT_TAUNTABLE)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_NOT_TAUNTABLE))
     {
         // Taunt aura apply check
         if (spellInfo->Effect[index] == SPELL_EFFECT_APPLY_AURA)
@@ -2122,7 +2122,7 @@ bool Creature::IsVisibleInGridForPlayer(Player const* pl) const
     if (pl->IsGameMaster())
         return true;
 
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INVISIBLE)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_INVISIBLE))
         return false;
 
     // Live player (or with not release body see live creatures or death creatures with corpse disappearing time > 0
@@ -2203,10 +2203,10 @@ bool Creature::CanAssistTo(Unit const* u, Unit const* enemy, bool checkfaction /
     if (!IsAlive())
         return false;
 
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_ASSIST)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_ASSIST))
         return false;
 
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO))
         return false;
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_PASSIVE))
@@ -3169,7 +3169,7 @@ void Creature::ResetHomePosition()
 
 void Creature::RemoveAurasAtReset()
 {
-    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE)
+    if (HasExtraFlag(CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE))
     {
         RemoveAllNegativeAuras(AURA_REMOVE_BY_DEFAULT);
         return;

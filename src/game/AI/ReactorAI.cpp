@@ -25,7 +25,7 @@
 
 int ReactorAI::Permissible(Creature const* creature)
 {
-    if ((creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO) || creature->IsNeutralToAll())
+    if (creature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_AGGRO) || creature->IsNeutralToAll())
         return PERMIT_BASE_REACTIVE;
 
     return PERMIT_BASE_NO;
