@@ -375,7 +375,7 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             m_spreadTimer.Reset(urand(2500, 3500));
             if (Creature* creature = owner.ToCreature())
             {
-                if (!(creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING) && !creature->IsPet() && !i_target.getTarget()->IsMoving())
+                if (!creature->HasExtraFlag(CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING) && !creature->IsPet() && !i_target.getTarget()->IsMoving())
                 {
                     if (m_bRecalculateTravel && TargetDeepInBounds(owner, i_target.getTarget()))
                         DoBackMovement(owner, i_target.getTarget());

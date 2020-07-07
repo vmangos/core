@@ -1235,7 +1235,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const* spellProto, bool durabilityLoss
                 playerKiller = pPlayerTap;
 
             if (playerKiller)
-                pCreatureVictim->GetMap()->BindToInstanceOrRaid(playerKiller, pCreatureVictim->GetRespawnTimeEx(), pCreatureVictim->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND);
+                pCreatureVictim->GetMap()->BindToInstanceOrRaid(playerKiller, pCreatureVictim->GetRespawnTimeEx(), pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_INSTANCE_BIND));
         }
     }
 
@@ -2163,7 +2163,6 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
 
 MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackType attType, int32 crit_chance, int32 miss_chance, int32 dodge_chance, int32 parry_chance, int32 block_chance, bool SpellCasted) const
 {
-    // Nostalrius : cheat.
     if (IsPlayer() && ToPlayer()->HasCheatOption(PLAYER_CHEAT_ALWAYS_CRIT))
         return MELEE_HIT_CRIT;
 
@@ -2229,9 +2228,9 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
 
     // parry chances
     // check if attack comes from behind, nobody can parry or block if attacker is behind
-    if (!from_behind)
+    if (!from_behind && (parry_chance > 0))
     {
-        if (parry_chance > 0 && (pVictim->IsPlayer() || !(((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_PARRY)))
+        if (pVictim->IsPlayer() || !((Creature*)pVictim)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_PARRY))
         {
             parry_chance -= parrySkillBonus;
 
@@ -2278,9 +2277,9 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
 
     // block chances
     // check if attack comes from behind, nobody can parry or block if attacker is behind
-    if (!from_behind)
+    if (!from_behind && (block_chance > 0))
     {
-        if ((pVictim->IsPlayer() || !(((Creature*)pVictim)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK))
+        if ((pVictim->IsPlayer() || !((Creature*)pVictim)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_BLOCK))
           && !(IsCreature() && GetMeleeDamageSchoolMask() != SPELL_SCHOOL_MASK_NORMAL))  // can't block elemental melee attacks from mobs
         {
             block_chance -= blockSkillBonus;
@@ -2322,10 +2321,10 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(Unit const* pVictim, WeaponAttackT
     }
 
     if ((!IsPlayer() && !IsPet()) &&
-        !(((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSH) &&
+        !((Creature*)this)->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_CRUSH) &&
         !SpellCasted /*Only autoattack can be crashing blow*/)
     {
-        if (((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_ALWAYS_CRUSH)
+        if (((Creature*)this)->HasExtraFlag(CREATURE_FLAG_EXTRA_ALWAYS_CRUSH))
         {
             return MELEE_HIT_CRUSHING;
         }
@@ -2445,7 +2444,7 @@ bool Unit::IsSpellBlocked(WorldObject* pCaster, Unit* pVictim, SpellEntry const*
     // Check creatures flags_extra for disable block
     if (Creature const* pCreature = ToCreature())
     {
-        if (pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_BLOCK)
+        if (pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_BLOCK))
             return false;
     }
 
@@ -5559,7 +5558,7 @@ void Unit::SetInCombatState(bool bPvP, Unit* pEnemy)
         OnEnterCombat(pEnemy, true);
 
         // Some bosses are set into combat with zone
-        if (GetMap()->IsDungeon() && (pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_AGGRO_ZONE) && pEnemy && pEnemy->IsControlledByPlayer())
+        if (GetMap()->IsDungeon() && pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_AGGRO_ZONE) && pEnemy && pEnemy->IsControlledByPlayer())
             pCreature->SetInCombatWithZone();
         if (Spell* spell = m_currentSpells[CURRENT_CHANNELED_SPELL])
             if (spell->getState() == SPELL_STATE_CASTING)
@@ -5982,7 +5981,7 @@ bool Unit::IsVisibleForOrDetect(WorldObject const* pDetector, WorldObject const*
 
     if (Creature const* pCreature = ToCreature())
     {
-        if ((pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY) &&
+        if (pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_ONLY_VISIBLE_TO_FRIENDLY) &&
             !pCreature->IsFriendlyTo(pDetector))
             return false;
     } 
@@ -6890,7 +6889,7 @@ bool Unit::CanHaveThreatList() const
     if (pCreature->GetCharmerGuid().IsPlayer())
         return false;
 
-    if (pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_THREAT_LIST)
+    if (pCreature->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_THREAT_LIST))
         return false;
 
     return true;

@@ -3628,15 +3628,13 @@ SpellMissInfo WorldObject::MeleeSpellHitResult(Unit* pVictim, SpellEntry const* 
         canParry = false;
     }
     // Check creatures flags_extra for disable parry
-    if (pVictim->GetTypeId() == TYPEID_UNIT)
-    {
-        uint32 flagEx = ((Creature*)pVictim)->GetCreatureInfo()->flags_extra;
-        if (flagEx & CREATURE_FLAG_EXTRA_NO_PARRY)
+    if (Creature* pCreatureVictim = pVictim->ToCreature())
+    { 
+        if (pCreatureVictim->HasExtraFlag(CREATURE_FLAG_EXTRA_NO_PARRY))
             canParry = false;
     }
-
     // Check if the player can parry
-    if (pVictim->GetTypeId() == TYPEID_PLAYER)
+    else
     {
         if (!((Player*)pVictim)->CanParry())
             canParry = false;
