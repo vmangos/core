@@ -105,7 +105,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 -- add missing guard
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
-(80473, 1423, 0, 0, 0, 0, 0, 0, -9611.2, 637.101, 51.6805, 0.887339, 285, 285, 1, 100, 0, 1, 0, 0, 0, 10);
+(99141, 1423, 0, 0, 0, 0, 0, 0, -9611.2, 637.101, 51.6805, 0.887339, 285, 285, 1, 100, 0, 1, 0, 0, 0, 10);
 
 -- npc's should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (80464, 80465, 80443, 80447, 80460, 80461, 80456, 80458, 80446, 80457, 80486);
@@ -218,18 +218,23 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (58302, 8, -9295.63, 392.504, 76.2484, 100, 0, 0, 0),
 (58302, 9, -9300.58, 404.784, 74.2369, 100, 2000, 0, 0);
 
--- add stormwind guard 79861 waypoints
+
+-- add missing guard
+INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
+(99140, 1423, 0, 0, 0, 0, 0, 0, -9073.3, 427.18, 93.0558, 0.887339, 285, 285, 0, 100, 0, 2, 0, 0, 0, 10);
+
+-- add stormwind guard 99140 waypoints
 UPDATE `creature` SET `position_x` = -9073.3, `position_y` = 427.18, `position_z` = 93.0558, `movement_type` = 2 WHERE `guid` = 79861;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(79861, 1, -9073.3, 427.18, 93.0558, 100, 0, 0, 0),
-(79861, 2, -9086.64, 417.472, 92.2924, 100, 0, 0, 0),
-(79861, 3, -9120.96, 394.504, 92.0548, 100, 0, 0, 0),
-(79861, 4, -9142.03, 376.161, 90.6847, 100, 0, 0, 0),
-(79861, 5, -9165.44, 351.636, 87.3068, 100, 2000, 0, 0),
-(79861, 6, -9142.03, 376.161, 90.6847, 100, 0, 0, 0),
-(79861, 7, -9120.96, 394.504, 92.0548, 100, 0, 0, 0),
-(79861, 8, -9086.64, 417.472, 92.2924, 100, 0, 0, 0),
-(79861, 9, -9079.49, 425.134, 92.5005, 100, 0, 0, 0);
+(99140, 1, -9073.3, 427.18, 93.0558, 100, 0, 0, 0),
+(99140, 2, -9086.64, 417.472, 92.2924, 100, 0, 0, 0),
+(99140, 3, -9120.96, 394.504, 92.0548, 100, 0, 0, 0),
+(99140, 4, -9142.03, 376.161, 90.6847, 100, 0, 0, 0),
+(99140, 5, -9165.44, 351.636, 87.3068, 100, 2000, 0, 0),
+(99140, 6, -9142.03, 376.161, 90.6847, 100, 0, 0, 0),
+(99140, 7, -9120.96, 394.504, 92.0548, 100, 0, 0, 0),
+(99140, 8, -9086.64, 417.472, 92.2924, 100, 0, 0, 0),
+(99140, 9, -9079.49, 425.134, 92.5005, 100, 0, 0, 0);
 
 -- update kira songshine waypoints
 DELETE FROM `creature_movement` WHERE `id` = 80283;
