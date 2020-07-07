@@ -112,8 +112,8 @@ UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN
 
 -- goldshire
 -- update waypoints for bo
-DELETE FROM creature_movement WHERE id = 80320;
-DELETE FROM creature_movement_template WHERE entry = 797;
+DELETE FROM `creature_movement` WHERE `id` = 80320;
+DELETE FROM `creature_movement_template` WHERE `entry` = 797;
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (797, 1, -9425.55, 129.192, 59.5418, 100, 38000, 7, 8032001),
 (797, 2, -9442.73, 135.681, 58.3425, 100, 0, 0, 0),
@@ -224,7 +224,6 @@ INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, 
 (99140, 1423, 0, 0, 0, 0, 0, 0, -9073.3, 427.18, 93.0558, 0.887339, 285, 285, 0, 100, 0, 2, 0, 0, 0, 10);
 
 -- add stormwind guard 99140 waypoints
-UPDATE `creature` SET `position_x` = -9073.3, `position_y` = 427.18, `position_z` = 93.0558, `movement_type` = 2 WHERE `guid` = 79861;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (99140, 1, -9073.3, 427.18, 93.0558, 100, 0, 0, 0),
 (99140, 2, -9086.64, 417.472, 92.2924, 100, 0, 0, 0),
