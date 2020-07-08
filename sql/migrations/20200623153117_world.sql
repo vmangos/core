@@ -8,14 +8,12 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20200623153117');
 -- Add your query below.
 
+
 -- Highlord Mograine Transform should not use any weapon
 -- https://www.youtube.com/watch?v=QViNP4cnPyM
 -- https://www.youtube.com/watch?v=m3E6W6-rRGA
 UPDATE `creature_template` SET `equipment_id` = 0 WHERE `entry` = 16440;
 DELETE FROM `creature_equip_template` WHERE `entry` = 16440;
-
--- Deleted random, unused, non blizzlike equipment_id
-DELETE FROM `creature_equip_template` WHERE `entry` = 50001;
 
 -- Fix for Ashbringer texts
 UPDATE `broadcast_text` SET `chat_type` = 6 WHERE `entry` = 12389;
@@ -26,6 +24,7 @@ UPDATE `broadcast_text` SET `emote_id1` = 20 WHERE `entry` = 12472;
 
 -- Delete old script text
 DELETE FROM `script_texts` WHERE `entry` IN (-1999928, -1999916, -1999917, -1999918, -1999920, -1999921, -1999922, -1999923, -1999924, -1999925, -1999926);
+
 
 -- End of migration.
 END IF;
