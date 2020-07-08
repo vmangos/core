@@ -12,7 +12,7 @@ INSERT INTO `migrations` VALUES ('20200625235926');
 -- Respawn Stonetalon Peak for pre 1.11
 -- Chylina
 UPDATE `creature` SET `patch_min`='9' WHERE  `guid`=32313;
-INSERT INTO `creature` VALUES (199603, 4084, 0, 0, 0, 1, 0, 0, 2735.39, 1489.98, 237.51, 3.038, 300, 300, 0, 100, 0, 0, 0, 0, 0, 8);
+INSERT INTO `creature` VALUES (32325, 4084, 0, 0, 0, 1, 0, 0, 2735.39, 1489.98, 237.51, 3.038, 300, 300, 0, 100, 0, 0, 0, 0, 0, 8);
 
 -- Illyanie
 -- position wasn't changed in 1.11, fail in development by blizzard
