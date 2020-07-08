@@ -14,9 +14,9 @@ INSERT INTO `migrations` VALUES ('20200620213802');
 UPDATE `creature` SET `position_x` = -10598, `position_y` = 1160.48, `position_z` = 38.4546, `orientation` = 6.16101 WHERE `guid` = 45524;
 
 -- correct movement and enable event ai
-UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0  WHERE `guid` IN (89861, 44296);
+UPDATE `creature` SET `movement_type` = 2, `wander_distance` = 0  WHERE `guid` IN (89861);
+UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0  WHERE `guid` IN (44296);
 DELETE FROM `creature_addon` WHERE `guid` IN (45524, 44296, 89861, 45477, 45521);
-UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 842;
 
 -- add gameobjects
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
@@ -25,18 +25,6 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (363458, 105568, 0, -10651, 1115.64, 35.6105, 4.04917, 0, 0, -0.898793, 0.438373, 900, 900, 100, 1, 0, 0, 0, 10);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
 (363463, 105568, 0, -10642.1, 1108.35, 35.6388, 0.436332, 0, 0, 0.216439, 0.976296, 900, 900, 100, 1, 0, 0, 0, 10);
-
-
--- lumberjack 89861
--- ai_events and ai_scripts
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (8986101, 842, 8986101, 1, 0, 100, 1, 0, 0, 225000, 225000, 8986101, 0, 0, 'lumberjack 89861 - start waypoints');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8986101, 0, 60, 1, 0, 0, 0, 0, 0, 0, 0, 89861, 0, 0, 0, 0, 0, 0, 0, 0, 'lumberjack 89861 - start waypoints');
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (8986102, 842, 8986101, 1, 0, 100, 0, 0, 0, 0, 0, 8986102, 0, 0, 'lumberjacks - start chopping');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8986102, 0, 68, 8986101, 2, 842, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'lumberjacks - start chopping');
--- event script to start lumberjacks chopping
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8986101, 0, 1, 234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'lumberjacks - start chopping');
--- condition so that this only applies to 89861
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8986101, 52, 89861, 0, 0, 0, 0);
 
 -- waypoints
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -61,7 +49,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (89861, 19, -10582.7, 1137.78, 39.256, 100, 0, 0, 0),
 (89861, 20, -10581.9, 1138.66, 39.3293, 100, 0, 0, 0),
 (89861, 21, -10583.6, 1144.18, 40.1724, 100, 0, 0, 0),
-(89861, 22, -10584.8, 1144.22, 40.1724, 100, 6000, 0, 8986103);
+(89861, 22, -10584.8, 1144.22, 40.1724, 100, 6000, 0, 8986103),
+(89861, 23, -10584.8, 1144.22, 40.1724, 100, 225000, 0, 0);
 
 -- movement scripts
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8986101, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'lumberjack 89861 - emote none');
