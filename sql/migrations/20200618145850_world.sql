@@ -47,7 +47,7 @@ UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 2669 A
 
 
 -- Pattern: Bright Yellow Shirt - Danielle Zipstitch
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 266 AND `item` = 14627;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 2668 AND `item` = 14627;
 
 
 -- Gyrochronatom - Herble Baubletump
@@ -56,7 +56,7 @@ UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 3133 
 
 -- Redridge
 -- Pattern: Black Whelp Cloak - Clyde Ranthal
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 3133 AND `item` = 7289;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 2697 AND `item` = 7289;
 
 
 -- Wolf Bracers - Bernard Brubaker
