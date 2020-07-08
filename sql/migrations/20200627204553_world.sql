@@ -193,7 +193,7 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 -- add clara charles ambush event
 UPDATE creature_movement SET `position_x` = -9215.99, `position_y` = 364.038, `position_z` = 72.1662, `script_id` = 591701, `waittime` = 11000 WHERE `id` = 79881 AND `point` = 6;
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (591701, 0, 39, 591701, 591702, 0, 0, 0, 0, 0, 0, 35, 35, 0, 0, 0, 0, 0, 0, 0, 'Clara Charles - Summon Defias Ambusher');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (591701, 0, 10, 583, 27000, 0, 0, 0, 0, 0, 0, 1, 58301, 6, 4, -9228.46, 340.316, 73.8243, 0, 0, 'Clara Charles - Summon Defias Ambusher');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (591701, 0, 10, 583, 15000, 0, 0, 0, 0, 0, 0, 1, 58301, 6, 6, -9228.46, 340.316, 73.8243, 0, 0, 'Clara Charles - Summon Defias Ambusher');
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (58301, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 58301, 0, 0, 0, 0, 0, 0, 0, 'Defias Ambusher - Start Waypoints');
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (58301, 1, -9228.46, 340.316, 73.8243, 100, 2000, 0, 0),
@@ -204,8 +204,9 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (58301, 6, -9220.93, 337.276, 73.3947, 100, 0, 0, 0),
 (58301, 7, -9228.5, 309.567, 74.4148, 100, 0, 0, 0),
 (58301, 8, -9229.13, 304.239, 74.4127, 100, 0, 0, 0),
-(58301, 9, -9238.92, 305.596, 74.2677, 100, 2000, 0, 0);
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (591702, 0, 10, 583, 28000, 0, 0, 0, 0, 0, 0, 1, 58302, 6, 4, -9231.07, 358.854, 73.7231, 0, 0, 'Clara Charles - Summon Defias Ambusher');
+(58301, 9, -9238.92, 305.596, 74.2677, 100, 2000, 0, 58301);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (58301, 0, 18, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Defias Ambusher - Despawn');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (591702, 0, 10, 583, 15000, 0, 0, 0, 0, 0, 0, 1, 58302, 6, 6, -9231.07, 358.854, 73.7231, 0, 0, 'Clara Charles - Summon Defias Ambusher');
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (58302, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 58302, 0, 0, 0, 0, 0, 0, 0, 'Defias Ambusher - Start Waypoints');
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (58302, 1, -9231.07, 358.854, 73.7231, 100, 2000, 0, 0),
@@ -216,8 +217,8 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 (58302, 6, -9268.99, 377.365, 78.1787, 100, 0, 0, 0),
 (58302, 7, -9288.57, 386.671, 76.7691, 100, 0, 0, 0),
 (58302, 8, -9295.63, 392.504, 76.2484, 100, 0, 0, 0),
-(58302, 9, -9300.58, 404.784, 74.2369, 100, 2000, 0, 0);
-
+(58302, 9, -9300.58, 404.784, 74.2369, 100, 2000, 0, 58302);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (58302, 0, 18, 2, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Defias Ambusher - Despawn');
 
 -- add missing guard
 INSERT INTO `creature` (`guid`, `id`, `id2`, `id3`, `id4`, `map`, `display_id`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `wander_distance`, `health_percent`, `mana_percent`, `movement_type`, `spawn_flags`, `visibility_mod`, `patch_min`, `patch_max`) VALUES
