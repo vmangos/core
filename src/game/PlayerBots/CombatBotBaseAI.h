@@ -399,6 +399,7 @@ public:
             SpellEntry const* pShieldBash;
             SpellEntry const* pShieldSlam;
             SpellEntry const* pSunderArmor;
+            SpellEntry const* pMockingBlow;
             SpellEntry const* pConcussionBlow;
             SpellEntry const* pPiercingHowl;
         } warrior;
