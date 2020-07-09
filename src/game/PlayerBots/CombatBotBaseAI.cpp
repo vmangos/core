@@ -1363,6 +1363,14 @@ void CombatBotBaseAI::PopulateSpellData()
                         m_spells.warrior.pSunderArmor->Id < pSpellEntry->Id)
                         m_spells.warrior.pSunderArmor = pSpellEntry;
                 }
+                
+                else if (pSpellEntry->SpellName[0].find("Mocking Blow") != std::string::npos)
+				{
+					if (!m_spells.warrior.pMockingBlow ||
+						m_spells.warrior.pMockingBlow->Id < pSpellEntry->Id)
+						m_spells.warrior.pMockingBlow = pSpellEntry;
+				}
+                
                 else if (pSpellEntry->SpellName[0].find("Concussion Blow") != std::string::npos)
                 {
                     if (!m_spells.warrior.pConcussionBlow ||
