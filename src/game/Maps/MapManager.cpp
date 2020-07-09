@@ -32,6 +32,10 @@
 #include "ZoneScriptMgr.h"
 #include "Map.h"
 
+#if defined(_MSC_VER) && (_MSC_VER >= 1900)
+# pragma execution_character_set("utf-8")
+#endif
+
 typedef MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
 INSTANTIATE_CLASS_MUTEX(MapManager, ACE_Recursive_Thread_Mutex);
@@ -196,7 +200,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
                 {
                     // probably there must be special opcode, because client has this string constant in GlobalStrings.lua
                     // TODO: this is not a good place to send the message
-                    player->GetSession()->SendAreaTriggerMessage("You must be in a raid group to enter %s instance", mapName);
+                    player->GetSession()->SendAreaTriggerMessage("您必须在一个团队中才能进入 %s 副本", mapName);
                     DEBUG_LOG("MAP: Player '%s' must be in a raid group to enter instance of '%s'", player->GetName(), mapName);
                     return false;
                 }
