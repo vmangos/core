@@ -2085,6 +2085,14 @@ void PartyBotAI::UpdateInCombatAI_Warrior()
             if (DoCastSpell(pVictim, m_spells.warrior.pSunderArmor) == SPELL_CAST_OK)
                 return;
         }
+        
+        if (m_spells.warrior.pMockingBlow &&
+			m_role == ROLE_TANK &&
+			CanTryToCastSpell(pVictim, m_spells.warrior.pMockingBlow))
+		{
+			if (DoCastSpell(pVictim, m_spells.warrior.pMockingBlow) == SPELL_CAST_OK)
+				return;
+		}
 
         if (m_spells.warrior.pHamstring &&
             pVictim->IsMoving() &&
