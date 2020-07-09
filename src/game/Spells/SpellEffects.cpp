@@ -1492,7 +1492,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 28441:                                 // AB Effect 000
                 {
-
                     return;
                 }
                 case 28697:                                 // Forgiveness (SM Ashbringer event)
