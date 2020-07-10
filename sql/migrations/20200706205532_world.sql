@@ -113,6 +113,177 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (1421, 21, -11330.2, -240.199, 74.323, 100, 0, 0, 0);
 
 
+
+
+
+
+
+
+
+
+
+
+-- add private thorsen waypoints and scripts ** delete old creature movement scripts
+UPDATE `creature_template` SET `npc_flags` = 1 WHERE `entry` = 738;
+DELETE FROM `creature_movement` WHERE `id` = 2243;INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(738, 1, -11313.9, -202.766, 75.395, 100, 0, 0, 73801),
+(738, 2, -11316.8, -203.916, 75.316, 100, 0, 0, 0),
+(738, 3, -11324.6, -212.077, 76.2363, 100, 0, 0, 0),
+(738, 4, -11328.2, -218.913, 75.8114, 100, 0, 0, 0),
+(738, 5, -11333.7, -223.069, 75.2037, 100, 0, 0, 0),
+(738, 6, -11347.6, -215.984, 75.2442, 100, 0, 0, 0),
+(738, 7, -11358.6, -212.341, 75.2207, 100, 0, 0, 0),
+(738, 8, -11370, -215.514, 75.2442, 100, 0, 0, 0),
+(738, 9, -11377.6, -223.995, 74.3537, 100, 0, 0, 0),
+(738, 10, -11379.3, -234.53, 70.0932, 100, 0, 0, 0),
+(738, 11, -11381.5, -249.342, 65.1676, 100, 0, 0, 0),
+(738, 12, -11384.3, -264.911, 61.4105, 100, 0, 0, 0),
+(738, 13, -11389.4, -273.725, 59.6832, 100, 2000, 0, 73802),
+(738, 14, -11396.6, -284.985, 58.3481, 100, 0, 0, 0),
+(738, 15, -11415.7, -287.402, 53.9826, 100, 0, 0, 0),
+(738, 16, -11426.8, -287.418, 50.4211, 100, 0, 0, 0),
+(738, 17, -11448.8, -287.209, 43.3921, 100, 0, 0, 0),
+(738, 18, -11480.8, -294.045, 36.0647, 100, 0, 0, 0),
+(738, 19, -11506.7, -313.858, 35.807, 100, 0, 0, 0),
+(738, 20, -11516.2, -320.712, 35.7982, 100, 0, 0, 0),
+(738, 21, -11524.1, -328.567, 35.7574, 100, 0, 0, 0),
+(738, 22, -11527.6, -353.22, 37.7469, 100, 30000, 0, 73803),
+(738, 23, -11527.6, -353.22, 37.7469, 100, 1000, 0, 73804),
+(738, 24, -11523.1, -344.517, 37.5403, 100, 0, 0, 0),
+(738, 25, -11508.1, -315.891, 35.7581, 100, 0, 0, 0),
+(738, 26, -11480.8, -294.045, 36.0666, 100, 0, 0, 0),
+(738, 27, -11459.6, -288.214, 40.3782, 100, 0, 0, 0),
+(738, 28, -11426.2, -287.765, 50.558, 100, 0, 0, 0),
+(738, 29, -11403.8, -286.564, 56.93, 100, 0, 0, 0),
+(738, 30, -11396.6, -284.985, 58.3481, 100, 0, 0, 0),
+(738, 31, -11384.7, -257.563, 62.7445, 100, 1000, 0, 73805),
+(738, 32, -11383.4, -249.876, 64.8444, 100, 0, 0, 0),
+(738, 33, -11382.6, -242.23, 67.2165, 100, 0, 0, 0),
+(738, 34, -11382.2, -234.665, 69.8806, 100, 0, 0, 0),
+(738, 35, -11380.8, -227.514, 73.12, 100, 0, 0, 0),
+(738, 36, -11379.2, -224.26, 74.126, 100, 0, 0, 0),
+(738, 37, -11374.4, -217.811, 75.21, 100, 0, 0, 0),
+(738, 38, -11368.3, -212.911, 75.2508, 100, 0, 0, 0),
+(738, 39, -11360.5, -210.667, 75.2206, 100, 0, 0, 0),
+(738, 40, -11356.5, -210.498, 75.2252, 100, 0, 0, 0),
+(738, 41, -11348.4, -210.834, 75.2222, 100, 0, 0, 0),
+(738, 42, -11344.3, -210.761, 75.2211, 100, 0, 0, 0),
+(738, 43, -11336.4, -209.551, 75.2204, 100, 0, 0, 0),
+(738, 44, -11328.8, -206.55, 75.391, 100, 0, 0, 0),
+(738, 45, -11318.5, -202.401, 75.6196, 100, 0, 0, 0),
+(738, 46, -11313.9, -202.766, 75.395, 100, 30000, 0, 73806);
+
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73801, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 102, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Speak');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73802, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Run');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73802, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Speak');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73803, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Speak');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73803, 2, 10, 775, 198000, 0, 0, 0, 0, 0, 0, 1, 77501, 6, 6, -11516.7, -434.378, 40.5358, 0, 0, 'Private Thorsen - Summon Kurzens Agent');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73803, 3, 10, 775, 198000, 0, 0, 0, 0, 0, 0, 1, 77502, 6, 6, -11516.7, -434.378, 40.5358, 0, 0, 'Private Thorsen - Summon Kurzens Agent 2');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73804, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 105, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Speak');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73805, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Walk');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73806, 0, 35, 0, 0, 0, 0, 1398, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Orientation');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73806, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 106, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Speak');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73806, 7, 39, 73301, 0, 0, 0, 1398, 0, 9, 2, 100, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Start Script Sergeant Yohwa 73301');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73301, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 108, 0, 0, 0, 0, 0, 0, 0, 0, 'Sergeant Yohwa - Speak');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-- add kurzens agent 1 waypoints and scripts
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77501, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 77501, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Start Waypoints');
+
+INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(77501, 1, -11516.7, -434.378, 40.5358, 100, 0, 0, 0),
+(77501, 2, -11516, -424.896, 38.3987, 100, 0, 0, 0),
+(77501, 3, -11517.3, -405.868, 37.0146, 100, 0, 0, 0),
+(77501, 4, -11519, -397.098, 37.9161, 100, 0, 0, 0),
+(77501, 5, -11519.3, -389.269, 39.008, 100, 0, 0, 0),
+(77501, 6, -11517.6, -380.275, 39.3757, 100, 0, 0, 0),
+(77501, 7, -11515.9, -371.952, 38.6723, 100, 0, 0, 0),
+(77501, 8, -11517.8, -363.71, 38.0627, 100, 0, 0, 0),
+(77501, 9, -11518.9, -358.243, 37.6753, 100, 0, 0, 0),
+(77501, 10, -11518.3, -361.352, 37.8621, 100, 0, 0, 0),
+(77501, 11, -11517.1, -377.9, 39.1602, 100, 0, 0, 0),
+(77501, 12, -11518.4, -384.31, 39.5131, 100, 0, 0, 0),
+(77501, 13, -11519.5, -393.299, 38.4269, 100, 0, 0, 0),
+(77501, 14, -11518.4, -400.074, 37.6105, 100, 0, 0, 0),
+(77501, 15, -11515.5, -415.856, 37.4521, 100, 0, 0, 0),
+(77501, 16, -11516.7, -434.378, 40.5358, 100, 0, 0, 0),
+
+
+
+
+
+-- add kurzens agent 2 waypoints and scripts
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77502, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 77502, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent 2 - Start Waypoints');
+
+INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(77502, 1, -11516.7, -434.378, 40.5358, 100, 0, 0, 0),
+(77502, 2, -11516, -424.896, 38.3987, 100, 0, 0, 0),
+(77502, 3, -11517.3, -405.868, 37.0146, 100, 0, 0, 0),
+(77502, 4, -11519, -397.098, 37.9161, 100, 0, 0, 0),
+(77502, 5, -11519.3, -389.269, 39.008, 100, 0, 0, 0),
+(77502, 6, -11517.6, -380.275, 39.3757, 100, 0, 0, 0),
+(77502, 7, -11515.9, -371.952, 38.6723, 100, 0, 0, 0),
+(77502, 8, -11517.8, -363.71, 38.0627, 100, 0, 0, 0),
+(77502, 9, -11518.3, -361.352, 37.8621, 100, 0, 0, 0),
+(77502, 10, -11517.1, -377.9, 39.1602, 100, 0, 0, 0),
+(77502, 11, -11518.4, -384.31, 39.5131, 100, 0, 0, 0),
+(77502, 12, -11519.5, -393.299, 38.4269, 100, 0, 0, 0),
+(77502, 13, -11518.4, -400.074, 37.6105, 100, 0, 0, 0),
+(77502, 14, -11515.5, -415.856, 37.4521, 100, 0, 0, 0),
+(77502, 15, -11516.7, -434.378, 40.5358, 100, 0, 0, 0);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 -- End of migration.
 END IF;
 END??
