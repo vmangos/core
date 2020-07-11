@@ -180,8 +180,8 @@ INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73802, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 103, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Speak');
 
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73803, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Speak');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73803, 2, 10, 775, 198000, 0, 0, 0, 0, 0, 0, 1, 77501, 6, 6, -11516.7, -434.378, 40.5358, 0, 0, 'Private Thorsen - Summon Kurzens Agent');
-INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73803, 3, 10, 775, 198000, 0, 0, 0, 0, 0, 0, 1, 77502, 6, 6, -11516.7, -434.378, 40.5358, 0, 0, 'Private Thorsen - Summon Kurzens Agent 2');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73803, 1, 10, 775, 198000, 0, 0, 0, 0, 0, 0, 1, 77501, 6, 7, -11516.7, -434.378, 40.5358, 0, 0, 'Private Thorsen - Summon Kurzens Agent');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73803, 2, 10, 775, 198000, 0, 0, 0, 0, 0, 0, 1, 77502, 6, 7, -11516.7, -434.378, 40.5358, 0, 0, 'Private Thorsen - Summon Kurzens Agent 2');
 
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (73804, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 105, 0, 0, 0, 0, 0, 0, 0, 0, 'Private Thorsen - Speak');
 
@@ -213,23 +213,32 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77501, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 77501, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Start Waypoints');
 
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(77501, 1, -11516.7, -434.378, 40.5358, 100, 0, 0, 0),
-(77501, 2, -11516, -424.896, 38.3987, 100, 0, 0, 0),
-(77501, 3, -11517.3, -405.868, 37.0146, 100, 0, 0, 0),
-(77501, 4, -11519, -397.098, 37.9161, 100, 0, 0, 0),
-(77501, 5, -11519.3, -389.269, 39.008, 100, 0, 0, 0),
-(77501, 6, -11517.6, -380.275, 39.3757, 100, 0, 0, 0),
-(77501, 7, -11515.9, -371.952, 38.6723, 100, 0, 0, 0),
-(77501, 8, -11517.8, -363.71, 38.0627, 100, 0, 0, 0),
-(77501, 9, -11518.9, -358.243, 37.6753, 100, 0, 0, 0),
-(77501, 10, -11518.3, -361.352, 37.8621, 100, 0, 0, 0),
-(77501, 11, -11517.1, -377.9, 39.1602, 100, 0, 0, 0),
-(77501, 12, -11518.4, -384.31, 39.5131, 100, 0, 0, 0),
-(77501, 13, -11519.5, -393.299, 38.4269, 100, 0, 0, 0),
-(77501, 14, -11518.4, -400.074, 37.6105, 100, 0, 0, 0),
-(77501, 15, -11515.5, -415.856, 37.4521, 100, 0, 0, 0),
-(77501, 16, -11516.7, -434.378, 40.5358, 100, 0, 0, 0),
+77501, 1, -11516.7, -434.378, 40.5358, 100, 0, 0, 77501
+77501, 2, -11516, -424.896, 38.3987, 100, 0, 0, 0
+77501, 3, -11517.3, -405.868, 37.0146, 100, 0, 0, 0
+77501, 4, -11519, -397.098, 37.9161, 100, 2000, 0, 77502
+77501, 5, -11519.3, -389.269, 39.008, 100, 0, 0, 0
+77501, 6, -11517.6, -380.275, 39.3757, 100, 0, 0, 0
+77501, 7, -11515.9, -371.952, 38.6723, 100, 0, 0, 0
+77501, 8, -11517.8, -363.71, 38.0627, 100, 0, 0, 0
+77501, 9, -11518.9, -358.243, 37.6753, 100, 30000, 0, 77503
+77501, 10, -11518.3, -361.352, 37.8621, 100, 0, 0, 0
+77501, 11, -11517.1, -377.9, 39.1602, 100, 0, 0, 0
+77501, 12, -11518.4, -384.31, 39.5131, 100, 0, 0, 0
+77501, 13, -11519.5, -393.299, 38.4269, 100, 0, 0, 0
+77501, 14, -11518.4, -400.074, 37.6105, 100, 0, 0, 0
+77501, 15, -11515.5, -415.856, 37.4521, 100, 0, 0, 0
+77501, 16, -11516.7, -434.378, 40.5358, 100, 0, 0, 77505
 
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77501, 0, 22, 35, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Set Faction');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77502, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Walk');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77503, 0, 22, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Set Faction');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77503, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Speak');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77503, 1, 26, 0, 0, 0, 0, 738, 20, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Attack');
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77505, 0, 18, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Despawn');
 
 
 
@@ -238,22 +247,27 @@ INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77502, 0, 60, 3, 0, 0, 0, 0, 0, 0, 0, 0, 77502, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent 2 - Start Waypoints');
 
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(77502, 1, -11516.7, -434.378, 40.5358, 100, 0, 0, 0),
-(77502, 2, -11516, -424.896, 38.3987, 100, 0, 0, 0),
-(77502, 3, -11517.3, -405.868, 37.0146, 100, 0, 0, 0),
-(77502, 4, -11519, -397.098, 37.9161, 100, 0, 0, 0),
-(77502, 5, -11519.3, -389.269, 39.008, 100, 0, 0, 0),
-(77502, 6, -11517.6, -380.275, 39.3757, 100, 0, 0, 0),
-(77502, 7, -11515.9, -371.952, 38.6723, 100, 0, 0, 0),
-(77502, 8, -11517.8, -363.71, 38.0627, 100, 0, 0, 0),
-(77502, 9, -11518.3, -361.352, 37.8621, 100, 0, 0, 0),
-(77502, 10, -11517.1, -377.9, 39.1602, 100, 0, 0, 0),
-(77502, 11, -11518.4, -384.31, 39.5131, 100, 0, 0, 0),
-(77502, 12, -11519.5, -393.299, 38.4269, 100, 0, 0, 0),
-(77502, 13, -11518.4, -400.074, 37.6105, 100, 0, 0, 0),
-(77502, 14, -11515.5, -415.856, 37.4521, 100, 0, 0, 0),
-(77502, 15, -11516.7, -434.378, 40.5358, 100, 0, 0, 0);
+77502, 1, -11516.7, -434.378, 40.5358, 100, 0, 0, 77501
+77502, 2, -11516, -424.896, 38.3987, 100, 0, 0, 0
+77502, 3, -11517.3, -405.868, 37.0146, 100, 0, 0, 0
+77502, 4, -11518.4, -400.074, 37.6105, 100, 2000, 0, 77502
+77502, 5, -11519, -397.098, 37.9161, 100, 0, 0, 0
+77502, 6, -11519.3, -389.269, 39.008, 100, 0, 0, 0
+77502, 7, -11517.6, -380.275, 39.3757, 100, 0, 0, 0
+77502, 8, -11515.9, -371.952, 38.6723, 100, 0, 0, 0
+77502, 9, -11517.8, -363.71, 38.0627, 100, 0, 0, 0
+77502, 10, -11518.3, -361.352, 37.8621, 100, 30000, 0, 77504
+77502, 11, -11517.1, -377.9, 39.1602, 100, 0, 0, 0
+77502, 12, -11518.4, -384.31, 39.5131, 100, 0, 0, 0
+77502, 13, -11519.5, -393.299, 38.4269, 100, 0, 0, 0
+77502, 14, -11518.4, -400.074, 37.6105, 100, 0, 0, 0
+77502, 15, -11515.5, -415.856, 37.4521, 100, 0, 0, 0
+77502, 16, -11516.7, -434.378, 40.5358, 100, 0, 0, 77505
 
+
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77504, 0, 22, 39, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Set Faction');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77504, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 101, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Speak');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (77504, 1, 26, 0, 0, 0, 0, 738, 20, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kurzens Agent - Attack');
 
 
 
