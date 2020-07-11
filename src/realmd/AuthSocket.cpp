@@ -506,79 +506,90 @@ bool AuthSocket::_HandleLogonChallenge()
                 }
                 else
                 {
-                    ///- Get the password from the account table, upper it, and make the SRP6 calculation
-                    std::string rI = fields[0].GetCppString();
-
-                    ///- Don't calculate (v, s) if there are already some in the database
-                    std::string databaseV = fields[4].GetCppString();
-                    std::string databaseS = fields[5].GetCppString();
-
-                    DEBUG_LOG("database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
-
-                    // multiply with 2, bytes are stored as hexstring
-                    if(databaseV.size() != s_BYTE_SIZE*2 || databaseS.size() != s_BYTE_SIZE*2)
-                        _SetVSFields(rI);
-                    else
+                    // If the account has no game time, reject the logon attempt
+                    QueryResult *timeresult = LoginDatabase.PQuery("SELECT gametime FROM account WHERE "
+                        "id = %u AND gametime < UNIX_TIMESTAMP() LIMIT 1", account_id);
+                    if (timeresult)
                     {
-                        s.SetHexStr(databaseS.c_str());
-                        v.SetHexStr(databaseV.c_str());
-                    }
-
-                    b.SetRand(19 * 8);
-                    BigNumber gmod = g.ModExp(b, N);
-                    B = ((v * 3) + gmod) % N;
-
-                    MANGOS_ASSERT(gmod.GetNumBytes() <= 32);
-
-                    ///- Fill the response packet with the result
-                    pkt << uint8(WOW_SUCCESS);
-
-                    // B may be calculated < 32B so we force minimal length to 32B
-                    pkt.append(B.AsByteArray(32));      // 32 bytes
-                    pkt << uint8(1);
-                    pkt.append(g.AsByteArray());
-                    pkt << uint8(32);
-                    pkt.append(N.AsByteArray(32));
-                    pkt.append(s.AsByteArray());        // 32 bytes
-                    pkt.append(VersionChallenge.data(), VersionChallenge.size());
-
-                    // figure out whether we need to display the PIN grid
-                    promptPin = locked; // always prompt if the account is IP locked & 2FA is enabled
-
-                    if ((!locked && ((lockFlags & ALWAYS_ENFORCE) == ALWAYS_ENFORCE)) || _geoUnlockPIN)
-                    {
-                        promptPin = true; // prompt if the lock hasn't been triggered but ALWAYS_ENFORCE is set
-                    }
-
-                    if (promptPin)
-                    {
-                        BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", _login.c_str(), get_remote_address().c_str());
-
-                        uint32 gridSeedPkt = gridSeed = static_cast<uint32>(rand32());
-                        EndianConvert(gridSeedPkt);
-                        serverSecuritySalt.SetRand(16 * 8); // 16 bytes random
-
-                        pkt << uint8(1); // securityFlags, only '1' is available in classic (PIN input)
-                        pkt << gridSeedPkt;
-                        pkt.append(serverSecuritySalt.AsByteArray(16).data(), 16);
+                        pkt << (uint8) WOW_FAIL_NO_TIME;
+                        BASIC_LOG("[AuthChallenge] Account '%s' with no game time using IP '%s' tries to login!",_login.c_str (), get_remote_address().c_str());
                     }
                     else
                     {
-                        if (_build > CLIENT_BUILD_1_10_2)
-                            pkt << uint8(0);
+                        ///- Get the password from the account table, upper it, and make the SRP6 calculation
+                        std::string rI = fields[0].GetCppString();
+
+                        ///- Don't calculate (v, s) if there are already some in the database
+                        std::string databaseV = fields[4].GetCppString();
+                        std::string databaseS = fields[5].GetCppString();
+
+                        DEBUG_LOG("database authentication values: v='%s' s='%s'", databaseV.c_str(), databaseS.c_str());
+
+                        // multiply with 2, bytes are stored as hexstring
+                        if(databaseV.size() != s_BYTE_SIZE*2 || databaseS.size() != s_BYTE_SIZE*2)
+                            _SetVSFields(rI);
+                        else
+                        {
+                            s.SetHexStr(databaseS.c_str());
+                            v.SetHexStr(databaseV.c_str());
+                        }
+
+                        b.SetRand(19 * 8);
+                        BigNumber gmod = g.ModExp(b, N);
+                        B = ((v * 3) + gmod) % N;
+
+                        MANGOS_ASSERT(gmod.GetNumBytes() <= 32);
+
+                        ///- Fill the response packet with the result
+                        pkt << uint8(WOW_SUCCESS);
+
+                        // B may be calculated < 32B so we force minimal length to 32B
+                        pkt.append(B.AsByteArray(32));      // 32 bytes
+                        pkt << uint8(1);
+                        pkt.append(g.AsByteArray());
+                        pkt << uint8(32);
+                        pkt.append(N.AsByteArray(32));
+                        pkt.append(s.AsByteArray());        // 32 bytes
+                        pkt.append(VersionChallenge.data(), VersionChallenge.size());
+
+                        // figure out whether we need to display the PIN grid
+                        promptPin = locked; // always prompt if the account is IP locked & 2FA is enabled
+
+                        if ((!locked && ((lockFlags & ALWAYS_ENFORCE) == ALWAYS_ENFORCE)) || _geoUnlockPIN)
+                        {
+                            promptPin = true; // prompt if the lock hasn't been triggered but ALWAYS_ENFORCE is set
+                        }
+
+                        if (promptPin)
+                        {
+                            BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", _login.c_str(), get_remote_address().c_str());
+
+                            uint32 gridSeedPkt = gridSeed = static_cast<uint32>(rand32());
+                            EndianConvert(gridSeedPkt);
+                            serverSecuritySalt.SetRand(16 * 8); // 16 bytes random
+
+                            pkt << uint8(1); // securityFlags, only '1' is available in classic (PIN input)
+                            pkt << gridSeedPkt;
+                            pkt.append(serverSecuritySalt.AsByteArray(16).data(), 16);
+                        }
+                        else
+                        {
+                            if (_build > CLIENT_BUILD_1_10_2)
+                                pkt << uint8(0);
+                        }
+
+                        _localizationName.resize(4);
+                        for(int i = 0; i < 4; ++i)
+                            _localizationName[i] = ch->country[4-i-1];
+
+                        LoadAccountSecurityLevels(account_id);
+                        BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' is using '%c%c%c%c' locale (%u)", _login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
+
+                        _accountId = account_id;
+
+                        ///- All good, await client's proof
+                        _status = STATUS_LOGON_PROOF;
                     }
-
-                    _localizationName.resize(4);
-                    for(int i = 0; i < 4; ++i)
-                        _localizationName[i] = ch->country[4-i-1];
-
-                    LoadAccountSecurityLevels(account_id);
-                    BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' is using '%c%c%c%c' locale (%u)", _login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
-
-                    _accountId = account_id;
-
-                    ///- All good, await client's proof
-                    _status = STATUS_LOGON_PROOF;
                 }
             }
             delete result;
