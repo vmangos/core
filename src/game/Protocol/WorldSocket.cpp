@@ -178,6 +178,21 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         sLog.outError("WorldSocket::HandleAuthSession: Sent Auth Response (unknown account).");
         return -1;
     }
+    
+    QueryResult *timeresult = LoginDatabase.PQuery("SELECT gametime FROM account WHERE "
+        "username = '%s' AND gametime > UNIX_TIMESTAMP() LIMIT 1", safe_account.c_str());
+
+    // Stop if there is no game time left
+    if (!timeresult)
+    {
+        packet.Initialize(SMSG_AUTH_RESPONSE, 1);
+        packet << uint8(AUTH_BILLING_EXPIRED);
+
+        SendPacket(packet);
+
+        sLog.outError("WorldSocket::HandleAuthSession: Sent Auth Response (no game time left).");
+        return -1;
+    }
 
     Field* fields = result->Fetch();
 
