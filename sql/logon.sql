@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS `account` (
   `last_pwd_reset` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
   `online` tinyint(4) NOT NULL DEFAULT '0',
   `expansion` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `game
   `mutetime` bigint(40) NOT NULL DEFAULT '0',
   `mutereason` varchar(255) NOT NULL DEFAULT '',
   `muteby` varchar(50) NOT NULL DEFAULT '',
@@ -42,6 +43,7 @@ CREATE TABLE IF NOT EXISTS `account` (
   `recruiter` int(11) NOT NULL DEFAULT '0',
   `current_realm` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `banned` tinyint(1) unsigned NOT NULL DEFAULT '0',
+  `gametime` bigint(40) NOT NULL DEFAULT '0',
   `mail_verif` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `remember_token` varchar(100) NOT NULL DEFAULT '',
   `flags` int(10) unsigned NOT NULL DEFAULT '0',
