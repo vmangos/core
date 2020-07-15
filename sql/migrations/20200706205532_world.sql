@@ -653,7 +653,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 
 
 
--- add private thorsen waypoints and scripts ** delete old creature movement scripts
+-- add private thorsen waypoints and scripts
+DELETE FROM `creature_movement_scripts` WHERE `id` = 224302;
 UPDATE `creature` SET `position_x` = -11313.9, `position_y` = -202.766, `position_z` = 75.395 WHERE `id` = 738;
 UPDATE `creature_template` SET `npc_flags` = 1 WHERE `entry` = 738;
 DELETE FROM `creature_movement` WHERE `id` = 2243;
