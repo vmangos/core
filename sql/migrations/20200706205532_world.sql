@@ -116,7 +116,7 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 -- yojamba isle
 -- zandalar headshrinker should be static
 DELETE FROM `creature_movement` WHERE `id` = 282;
-UPDATE `creature` SET `movement_type` = 0 WHERE `guid` IN (282, 284, 280, 285, 283);
+UPDATE `creature` SET `movement_type` = 0, `wander_distance` = 0 WHERE `guid` IN (282, 284, 280, 285, 283);
 
 -- add correct waypoints to zandalar headshrinker patrol
 DELETE FROM `creature_movement` WHERE `id` IN (286, 287);
