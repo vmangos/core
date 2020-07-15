@@ -646,7 +646,9 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1391, 14, -12976.9, -670.189, 51.3674, 100, 0, 0, 0);
 
 
-
+-- booty bay
+-- allow npc's to roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (66, 579);
 
 
 
