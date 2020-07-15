@@ -369,7 +369,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- add skullsplitter patrol
 UPDATE `creature` SET `position_x` = -12762, `position_y` = -890.346, `position_z` = 52.7586 WHERE `guid` IN (1408, 2539, 1409);
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1408;
-UPDATE `creature` SET `movement_type` = 0 WHERE `guid`IN (2539, 1409);
+UPDATE `creature` SET `movement_type` = 0 WHERE `guid` IN (2539, 1409);
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (1408, 2539, 4, 3, 11),
 (1408, 1409, 4, 17, 11);
