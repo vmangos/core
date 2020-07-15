@@ -624,7 +624,26 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (857, 61, -12827.3, -800.899, 60.6489, 100, 0, 0, 0);
 
 
-
+-- ruins of zul mamwe
+-- add skullsplitter hunter patrol
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1391;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(1391, 1392, 3, 17, 11);
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(1391, 1, -12992.4, -671.172, 52.4459, 100, 0, 0, 0),
+(1391, 2, -13008.5, -683.035, 55.2639, 100, 0, 0, 0),
+(1391, 3, -13019.7, -692.503, 55.1819, 100, 0, 0, 0),
+(1391, 4, -13022.1, -715.903, 54.698, 100, 0, 0, 0),
+(1391, 5, -13022.3, -728.91, 54.9169, 100, 0, 0, 0),
+(1391, 6, -13022.2, -720.807, 54.6897, 100, 0, 0, 0),
+(1391, 7, -13021.3, -704.648, 55.2174, 100, 0, 0, 0),
+(1391, 8, -13021.3, -693.826, 55.3925, 100, 0, 0, 0),
+(1391, 9, -13010, -684.352, 55.2492, 100, 0, 0, 0),
+(1391, 10, -12997.8, -673.99, 53.6997, 100, 0, 0, 0),
+(1391, 11, -12984, -669.189, 51.5392, 100, 0, 0, 0),
+(1391, 12, -12976.9, -670.189, 51.367, 100, 0, 0, 0),
+(1391, 13, -12936.8, -689.792, 51.0965, 100, 0, 0, 0),
+(1391, 14, -12976.9, -670.189, 51.3674, 100, 0, 0, 0);
 
 
 
@@ -637,7 +656,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- add private thorsen waypoints and scripts ** delete old creature movement scripts
 UPDATE `creature` SET `position_x` = -11313.9, `position_y` = -202.766, `position_z` = 75.395 WHERE `id` = 738;
 UPDATE `creature_template` SET `npc_flags` = 1 WHERE `entry` = 738;
-DELETE FROM `creature_movement` WHERE `id` = 2243;INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+DELETE FROM `creature_movement` WHERE `id` = 2243;
+INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (738, 1, -11313.9, -202.766, 75.395, 100, 0, 0, 73801),
 (738, 2, -11316.8, -203.916, 75.316, 100, 0, 0, 0),
 (738, 3, -11324.6, -212.077, 76.2363, 100, 0, 0, 0),
