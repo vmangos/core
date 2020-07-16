@@ -651,7 +651,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (66, 579);
 
 
---venture co base camp
+-- venture co base camp
 -- add venture co shredder patrol
 UPDATE `creature` SET `position_x` = -12137.4, `position_y` = -588.142, `position_z` = 14.0061, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 2538;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
