@@ -727,6 +727,31 @@ DELETE FROM `creature` WHERE `guid` = 2401;
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (1414, 1423, 1846, 2193);
 
 
+-- zg entrance
+-- add hakkari oracle patrol
+UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 733;
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(733, 1, -11916.5, -1089.93, 77.2794, 100, 0, 0, 0),
+(733, 2, -11916.5, -1072.16, 77.2796, 100, 0, 0, 0),
+(733, 3, -11916.5, -1084.36, 77.2798, 100, 0, 0, 0),
+(733, 4, -11916.1, -1116.62, 77.2792, 100, 0, 0, 0),
+(733, 5, -11916, -1142.12, 77.2789, 100, 0, 0, 0),
+(733, 6, -11916.1, -1121.86, 77.282, 100, 0, 0, 0);
+
+-- add talking guards
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 11355;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1135501, 11355, 1135501, 1, 0, 100, 1, 4000, 9000, 4000, 9000, 1135501, 0, 0, 'Creature GUID 741 - Emote Talk OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1135501, 0, 39, 1135501, 1135502, 1135503, 1135501, 0, 0, 0, 0, 25, 25, 25, 25, 0, 0, 0, 0, 0, 'Creature GUID 741 - Start Script');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1135501, 0, 1, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Creature GUID 741 - Emote Talk');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1135502, 0, 1, 1, 0, 0, 0, 740, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Creature GUID 740 - Emote Talk');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1135503, 0, 1, 1, 0, 0, 0, 739, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Creature GUID 739 - Emote Talk');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1135501, 52, 741, 0, 0, 0, 0);
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1135502, 11355, 1135502, 1, 0, 100, 1, 4000, 9000, 4000, 9000, 1135502, 0, 0, 'Creature GUID 744 - Emote Talk OOC ');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1135502, 0, 39, 1135504, 1135505, 1135506, 1135504, 0, 0, 0, 0, 25, 25, 25, 25, 0, 0, 0, 0, 0, 'Creature GUID 744 - Start Script');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1135504, 0, 1, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Creature GUID 744 - Emote Talk');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1135505, 0, 1, 1, 0, 0, 0, 742, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Creature GUID 742 - Emote Talk');
+INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1135506, 0, 1, 1, 0, 0, 0, 743, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Creature GUID 743 - Emote Talk OOC ');
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (1135502, 52, 744, 0, 0, 0, 0);
 
 
 
