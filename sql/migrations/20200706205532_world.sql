@@ -720,8 +720,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (2481, 36, -12081.6, -727.649, 15.2843, 100, 0, 0, 0),
 (2481, 37, -12090.6, -714.381, 15.9185, 100, 0, 0, 0);
 
-
-
+-- remove venture co shredder
+DELETE FROM `creature` WHERE `guid` = 2401;
 
 
 
