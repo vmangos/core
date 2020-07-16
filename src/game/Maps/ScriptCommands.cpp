@@ -79,12 +79,11 @@ bool Map::ScriptCommand_Emote(ScriptInfo const& script, WorldObject* source, Wor
 
     // find the emote
     std::vector<uint32> emotes;
-    emotes.push_back(script.emote.emoteId);
-    for (uint32 emoteId : script.emote.randomEmotes)
+    for (uint32 emoteId : script.emote.emoteId)
     {
         if (!emoteId)
             continue;
-        emotes.push_back(uint32(emoteId));
+        emotes.push_back(emoteId);
     }
 
     pSource->HandleEmote(emotes[urand(0, emotes.size() - 1)]);

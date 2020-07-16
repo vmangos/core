@@ -249,10 +249,18 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, char const* tablename)
             }
             case SCRIPT_COMMAND_EMOTE:
             {
-                if (!sEmotesStore.LookupEntry(tmp.emote.emoteId))
+                if (!sEmotesStore.LookupEntry(tmp.emote.emoteId[0]))
                 {
-                    sLog.outErrorDb("Table `%s` has invalid emote id (datalong = %u) in SCRIPT_COMMAND_EMOTE for script id %u", tablename, tmp.emote.emoteId, tmp.id);
+                    sLog.outErrorDb("Table `%s` has invalid emote id (datalong = %u) in SCRIPT_COMMAND_EMOTE for script id %u", tablename, tmp.emote.emoteId[0], tmp.id);
                     continue;
+                }
+                for (uint32 i = 1; i < MAX_EMOTE_ID; i++)
+                {
+                    if (tmp.emote.emoteId[i] && !sEmotesStore.LookupEntry(tmp.emote.emoteId[i]))
+                    {
+                        sLog.outErrorDb("Table `%s` has invalid emote id (datalong%u = %u) in SCRIPT_COMMAND_EMOTE for script id %u", tablename, i, tmp.emote.emoteId[i], tmp.id);
+                        tmp.emote.emoteId[i] = 0;
+                    }
                 }
                 break;
             }
