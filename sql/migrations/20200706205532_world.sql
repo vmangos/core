@@ -723,7 +723,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- remove venture co shredder
 DELETE FROM `creature` WHERE `guid` = 2401;
 
-
+-- allow venture co geologist to roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (1414, 1423, 1846, 2193);
 
 
 
