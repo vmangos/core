@@ -708,6 +708,25 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1380, 26, -12817.6, -676.784, 79.7162, 100, 0, 0, 0),
 (1380, 27, -12816.4, -683.531, 81.6081, 100, 0, 0, 0);
 
+-- add skullsplitter hunter patrol
+UPDATE `creature` SET  `position_x` = -12851.7, `position_y` = -653.414, `position_z` = 59.6281, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 1213;
+UPDATE `creature` SET  `position_x` = -12851.7, `position_y` = -653.414, `position_z` = 59.6281, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 1215;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(1213, 1215, 3, 17, 11);
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(1213, 1, -12851.7, -653.414, 59.6281, 100, 0, 0, 0),
+(1213, 2, -12858.8, -656.43, 57.2591, 100, 0, 0, 0),
+(1213, 3, -12864.8, -665.388, 56.7861, 100, 0, 0, 0),
+(1213, 4, -12866.9, -677.362, 55.9866, 100, 0, 0, 0),
+(1213, 5, -12868.6, -693.505, 56.1732, 100, 0, 0, 0),
+(1213, 6, -12882.6, -706.893, 53.9363, 100, 0, 0, 0),
+(1213, 7, -12966.8, -727.768, 54.9683, 100, 0, 0, 0),
+(1213, 8, -12927.5, -718.73, 51.4769, 100, 0, 0, 0),
+(1213, 9, -12892, -711.201, 53.2939, 100, 0, 0, 0),
+(1213, 10, -12871.9, -698.534, 55.8871, 100, 0, 0, 0),
+(1213, 11, -12867.8, -683.877, 55.8077, 100, 0, 0, 0),
+(1213, 12, -12865.2, -667.258, 56.7242, 100, 0, 0, 0);
+
 -- add skullsplitter scout patrol
 UPDATE `creature` SET  `position_x` = -12916.2, `position_y` = -859.78, `position_z` = 71.5787, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 1638;
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
