@@ -646,7 +646,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1391, 14, -12976.9, -670.189, 51.3674, 100, 0, 0, 0);
 
 -- add skullsplitter hunter patrol
-UPDATE `creature` SET  `position_x` = -12828.1, `position_y` = -804.768, `position_z` = 60.5913, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 1360;
+UPDATE `creature` SET  `position_x` = -12828.1, `position_y` = -804.768, `position_z` = 60.5913, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` IN (1360, 1361);
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (1360, 1361, 3, 17, 11);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
