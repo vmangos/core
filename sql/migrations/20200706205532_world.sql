@@ -646,7 +646,8 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1391, 14, -12976.9, -670.189, 51.3674, 100, 0, 0, 0);
 
 -- add skullsplitter hunter patrol
-UPDATE `creature` SET  `position_x` = -12828.1, `position_y` = -804.768, `position_z` = 60.5913, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` IN (1360, 1361);
+UPDATE `creature` SET  `position_x` = -12828.1, `position_y` = -804.768, `position_z` = 60.5913, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 1360;
+UPDATE `creature` SET  `position_x` = -12828.1, `position_y` = -804.768, `position_z` = 60.5913, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 1361;
 INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
 (1360, 1361, 3, 17, 11);
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
@@ -672,6 +673,40 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (1360, 20, -12794.8, -778.515, 61.9093, 100, 0, 0, 0),
 (1360, 21, -12819.7, -798.98, 61.9473, 100, 0, 0, 0),
 (1360, 22, -12834.7, -809.028, 58.7304, 100, 0, 0, 0);
+
+-- add skullsplitter hunter patrol
+UPDATE `creature` SET  `position_x` = -12812.5, `position_y` = -686.394, `position_z` = 81.4995, `movement_type` = 2, `wander_distance` = 0 WHERE `guid` = 1380;
+UPDATE `creature` SET  `position_x` = -12812.5, `position_y` = -686.394, `position_z` = 81.4995, `movement_type` = 0, `wander_distance` = 0 WHERE `guid` = 1383;
+INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `flags`) VALUES
+(1380, 1383, 3, 17, 11);
+INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
+(1380, 1, -12812.5, -686.394, 81.4995, 100, 0, 0, 0),
+(1380, 2, -12809.8, -691.803, 81.9422, 100, 0, 0, 0),
+(1380, 3, -12812, -698.643, 80.3653, 100, 0, 0, 0),
+(1380, 4, -12813.8, -701.964, 81.0294, 100, 0, 0, 0),
+(1380, 5, -12816.3, -705.029, 81.5747, 100, 0, 0, 0),
+(1380, 6, -12817.1, -708.954, 82.4586, 100, 0, 0, 0),
+(1380, 7, -12817.2, -713.097, 82.1438, 100, 0, 0, 0),
+(1380, 8, -12820.1, -719.53, 80.51, 100, 0, 0, 0),
+(1380, 9, -12822.7, -721.685, 80.4382, 100, 0, 0, 0),
+(1380, 10, -12825.8, -723.828, 80.3614, 100, 0, 0, 0),
+(1380, 11, -12833.8, -729.371, 79.0146, 100, 0, 0, 0),
+(1380, 12, -12830.5, -727.392, 79.6808, 100, 0, 0, 0),
+(1380, 13, -12824.5, -722.925, 80.1836, 100, 0, 0, 0),
+(1380, 14, -12821.6, -720.934, 80.2101, 100, 0, 0, 0),
+(1380, 15, -12818.8, -718.356, 80.5203, 100, 0, 0, 0),
+(1380, 16, -12817.1, -713.576, 81.9534, 100, 0, 0, 0),
+(1380, 17, -12817.2, -709.644, 82.4768, 100, 0, 0, 0),
+(1380, 18, -12816.6, -705.662, 81.7275, 100, 0, 0, 0),
+(1380, 19, -12812.3, -699.151, 80.4864, 100, 0, 0, 0),
+(1380, 20, -12810.7, -695.853, 80.5682, 100, 0, 0, 0),
+(1380, 21, -12811.4, -688.525, 81.4155, 100, 0, 0, 0),
+(1380, 22, -12813.8, -685.447, 82.0557, 100, 0, 0, 0),
+(1380, 23, -12817.9, -679.75, 80.988, 100, 0, 0, 0),
+(1380, 24, -12813.5, -664.972, 70.7187, 100, 0, 0, 0),
+(1380, 25, -12815.7, -670.463, 76.0304, 100, 0, 0, 0),
+(1380, 26, -12817.6, -676.784, 79.7162, 100, 0, 0, 0),
+(1380, 27, -12816.4, -683.531, 81.6081, 100, 0, 0, 0);
 
 
 -- booty bay
