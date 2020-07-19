@@ -10248,7 +10248,7 @@ bool Player::IsInDisallowedItemUseForm() const
         return false;
 
     SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
-    return !(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY);
+    return ssEntry && !(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY);
 }
 
 void Player::SetAmmo(uint32 item)
