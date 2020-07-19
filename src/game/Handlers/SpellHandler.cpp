@@ -132,7 +132,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
     SpellCastResult itemCastCheckResult = SPELL_CAST_OK;
     if (!pItem->IsTargetValidForItemUse(targets.getUnitTarget()))
         itemCastCheckResult = SPELL_FAILED_BAD_TARGETS;
-    else if (pUser->IsInDisallowedMountForm())
+    else if (pUser->IsInDisallowedItemUseForm())
     {
         // World of Warcraft Client Patch 1.10.0 (2006-03-28)
         // - All shapeshift forms can now use equipped items.

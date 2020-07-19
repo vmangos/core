@@ -10241,6 +10241,16 @@ InventoryResult Player::CanUseAmmo(uint32 item) const
     return EQUIP_ERR_ITEM_NOT_FOUND;
 }
 
+bool Player::IsInDisallowedItemUseForm() const
+{
+    ShapeshiftForm const form = GetShapeshiftForm();
+    if (form == FORM_NONE)
+        return false;
+
+    SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
+    return !(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY);
+}
+
 void Player::SetAmmo(uint32 item)
 {
     if (!item)
