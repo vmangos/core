@@ -14,8 +14,8 @@ class PartyBotAI : public CombatBotBaseAI
 {
 public:
 
-    PartyBotAI(Player* pLeader, Player* pClone, CombatBotRoles role, uint8 race, uint8 class_, uint32 mapId, uint32 instanceId, float x, float y, float z, float o)
-        : CombatBotBaseAI(), m_race(race), m_class(class_), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o)
+    PartyBotAI(Player* pLeader, Player* pClone, CombatBotRoles role, uint8 race, uint8 class_, uint8 level, uint32 mapId, uint32 instanceId, float x, float y, float z, float o)
+        : CombatBotBaseAI(), m_race(race), m_class(class_), m_level(level), m_mapId(mapId), m_instanceId(instanceId), m_x(x), m_y(y), m_z(z), m_o(o)
     {
         m_role = role;
         m_leaderGuid = pLeader->GetObjectGuid();
@@ -73,6 +73,7 @@ public:
     ObjectGuid m_cloneGuid;
     uint8 m_race = 0;
     uint8 m_class = 0;
+    uint8 m_level = 0;
     uint32 m_mapId = 0;
     uint32 m_instanceId = 0;
     float m_x = 0.0f;

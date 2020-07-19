@@ -50,9 +50,6 @@ enum CombatBotSpells
     PET_RAPTOR  = 3254,
     PET_TURTLE  = 3461,
     PET_HYENA   = 4127,
-
-    ITEM_ARROW  = 2512,
-    ITEM_BULLET = 2516,
 };
 
 void CombatBotBaseAI::AutoAssignRole()
@@ -194,6 +191,9 @@ void CombatBotBaseAI::PopulateSpellData()
     SpellEntry const* pPolymorphCow = nullptr;
     SpellEntry const* pPolymorphPig = nullptr;
     SpellEntry const* pPolymorphTurtle = nullptr;
+
+    // Mage Frost Armor (to replace ice armor at low level)
+    SpellEntry const* pFrostArmor = nullptr;
 
     bool hasDeadlyPoison = false;
     bool hasInstantPoison = false;
@@ -732,6 +732,12 @@ void CombatBotBaseAI::PopulateSpellData()
                     if (!m_spells.mage.pIceArmor ||
                         m_spells.mage.pIceArmor->Id < pSpellEntry->Id)
                         m_spells.mage.pIceArmor = pSpellEntry;
+                }
+                if (pSpellEntry->SpellName[0].find("Frost Armor") != std::string::npos)
+                {
+                    if (!pFrostArmor ||
+                        pFrostArmor->Id < pSpellEntry->Id)
+                        pFrostArmor = pSpellEntry;
                 }
                 else if (pSpellEntry->SpellName[0].find("Ice Barrier") != std::string::npos)
                 {
@@ -1979,6 +1985,9 @@ void CombatBotBaseAI::PopulateSpellData()
         }
         case CLASS_MAGE:
         {
+            if (!m_spells.mage.pIceArmor && pFrostArmor)
+                m_spells.mage.pIceArmor = pFrostArmor;
+
             std::vector<SpellEntry const*> polymorph;
             if (pPolymorphSheep)
                 polymorph.push_back(pPolymorphSheep);
@@ -2380,10 +2389,10 @@ void CombatBotBaseAI::SummonPetIfNeeded()
         if (me->GetLevel() < 10)
             return;
 
-        std::vector<uint32> vPets = { PET_WOLF, PET_CAT, PET_BEAR, PET_CRAB, PET_GORILLA, PET_BIRD,
-                                      PET_BOAR, PET_BAT, PET_CROC, PET_SPIDER, PET_OWL, PET_STRIDER,
-                                      PET_SCORPID, PET_SERPENT, PET_RAPTOR, PET_TURTLE, PET_HYENA };
-        if (Creature* pCreature = me->SummonCreature(SelectRandomContainerElement(vPets),
+        uint32 petId = PickRandomValue( PET_WOLF, PET_CAT, PET_BEAR, PET_CRAB, PET_GORILLA, PET_BIRD,
+                                        PET_BOAR, PET_BAT, PET_CROC, PET_SPIDER, PET_OWL, PET_STRIDER,
+                                        PET_SCORPID, PET_SERPENT, PET_RAPTOR, PET_TURTLE, PET_HYENA );
+        if (Creature* pCreature = me->SummonCreature(petId,
             me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0f,
             TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 3000, false, 3000))
         {
