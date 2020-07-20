@@ -11132,7 +11132,7 @@ void ObjectMgr::ApplyPremadeGearTemplateToPlayer(uint32 entry, Player* pPlayer) 
                         pPlayer->GetReputationMgr().SetReputation(pFaction, pPlayer->GetReputationMgr().GetRepPointsToRank(ReputationRank(pItem->RequiredReputationRank)));
 
             // Learn required profession
-            if (pItem->RequiredSkill && !pPlayer->HasSkill(pItem->RequiredSkill))
+            if (pItem->RequiredSkill && (!pPlayer->HasSkill(pItem->RequiredSkill) || (pPlayer->GetSkill(pItem->RequiredSkill, false, false) <  pItem->RequiredSkillRank)))
                 pPlayer->SetSkill(pItem->RequiredSkill, pItem->RequiredSkillRank, 300);
 
             // Learn required proficiency
