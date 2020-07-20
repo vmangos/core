@@ -1310,8 +1310,8 @@ void PartyBotAI::UpdateInCombatAI_Mage()
     if (Unit* pVictim = me->GetVictim())
     {
         if (m_spells.mage.pPyroblast &&
-            m_spells.mage.pPresenceOfMind &&
-            me->HasAura(m_spells.mage.pPresenceOfMind->Id) &&
+           ((m_spells.mage.pPresenceOfMind && me->HasAura(m_spells.mage.pPresenceOfMind->Id)) ||
+            (!pVictim->IsInCombat() && (pVictim->GetMaxHealth() > me->GetMaxHealth()) && (me->GetDistance(pVictim) > 30.0f))) &&
             CanTryToCastSpell(pVictim, m_spells.mage.pPyroblast))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pPyroblast) == SPELL_CAST_OK)
