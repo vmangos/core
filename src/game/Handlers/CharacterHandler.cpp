@@ -259,6 +259,14 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket& recv_data)
         return;
     }
 
+    if (!Player::ValidateAppearance(race_, class_, gender, hairStyle, hairColor, face, facialHair, skin, true))
+    {
+        data << (uint8)CHAR_CREATE_FAILED;
+        SendPacket(&data);
+        ProcessAnticheatAction("PassiveAnticheat", "Attempt to create character with invalid appearance attributes", CHEAT_ACTION_LOG);
+        return;
+    }
+
     // prevent character creating with invalid name
     if (!normalizePlayerName(name))
     {

@@ -26,6 +26,8 @@ char const AreaTableEntryfmt[]="niiiixxxxxissssssssxixxxi";
 char const AreaTriggerEntryfmt[]="niffffffff";
 char const AuctionHouseEntryfmt[]="niiixxxxxxxxx";
 char const BankBagSlotPricesEntryfmt[]="ni";
+char const CharSectionsEntryfmt[] = "diiiiixxxi";
+char const CharacterFacialHairStylesfmt[] = "iiixxxxxx";
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
 char const ChrClassesEntryfmt[]="nxxixssssssssxxix";
 #else

@@ -172,8 +172,8 @@ void PInfoHandler::HandleAccountInfoResult(QueryResult* result, PInfoData *data)
 // Not threadsafe, executed in thread unsafe callback
 void PInfoHandler::HandleResponse(WorldSession* session, PInfoData *data)
 {
-    char const* raceName = GetRaceName(data->race, session->GetSessionDbcLocale());
-    char const* className = GetClassName(data->class_, session->GetSessionDbcLocale());
+    char const* raceName = GetUnitRaceName(data->race, session->GetSessionDbcLocale());
+    char const* className = GetUnitClassName(data->class_, session->GetSessionDbcLocale());
     if (!raceName)
         raceName = "";
     if (!className)
