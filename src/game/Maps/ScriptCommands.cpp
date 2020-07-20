@@ -77,17 +77,10 @@ bool Map::ScriptCommand_Emote(ScriptInfo const& script, WorldObject* source, Wor
         return ShouldAbortScript(script);
     }
 
-    // find the emote
-    std::vector<uint32> emotes;
-    emotes.push_back(script.emote.emoteId);
-    for (uint32 emoteId : script.emote.randomEmotes)
-    {
-        if (!emoteId)
-            continue;
-        emotes.push_back(uint32(emoteId));
-    }
+    uint32 emoteCount = 1;
+    for (; emoteCount < MAX_EMOTE_ID && script.emote.emoteId[emoteCount]; ++emoteCount);
 
-    pSource->HandleEmote(emotes[urand(0, emotes.size() - 1)]);
+    pSource->HandleEmote(script.emote.emoteId[urand(0, emoteCount-1)]);
 
     return false;
 }

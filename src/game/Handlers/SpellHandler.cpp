@@ -129,7 +129,20 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
     targets.Update(pUser);
 
+    SpellCastResult itemCastCheckResult = SPELL_CAST_OK;
     if (!pItem->IsTargetValidForItemUse(targets.getUnitTarget()))
+        itemCastCheckResult = SPELL_FAILED_BAD_TARGETS;
+    else if (pUser->IsInDisallowedItemUseForm())
+    {
+        // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+        // - All shapeshift forms can now use equipped items.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        if (!(bagIndex == INVENTORY_SLOT_BAG_0 && slot < EQUIPMENT_SLOT_END))
+#endif
+        itemCastCheckResult = SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED;
+    }
+
+    if (itemCastCheckResult != SPELL_CAST_OK)
     {
         // free gray item after use fail
         pUser->SendEquipError(EQUIP_ERR_NONE, pItem, nullptr);
@@ -147,7 +160,7 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
 
         // send spell error
         if (SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(spellid))
-            Spell::SendCastResult(_player, spellInfo, SPELL_FAILED_BAD_TARGETS);
+            Spell::SendCastResult(_player, spellInfo, itemCastCheckResult);
         return;
     }
 

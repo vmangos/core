@@ -16,30 +16,6 @@ enum PartyBotSpells
     PB_SPELL_DRINK = 1137,
     PB_SPELL_AUTO_SHOT = 75,
     PB_SPELL_SHOOT_WAND = 5019,
-    PB_SPELL_TAME_BEAST = 13481,
-
-    PB_SPELL_SUMMON_IMP = 688,
-    PB_SPELL_SUMMON_VOIDWALKER = 697,
-    PB_SPELL_SUMMON_FELHUNTER = 691,
-    PB_SPELL_SUMMON_SUCCUBUS = 712,
-
-    PB_PET_WOLF    = 565,
-    PB_PET_CAT     = 681,
-    PB_PET_BEAR    = 822,
-    PB_PET_CRAB    = 831,
-    PB_PET_GORILLA = 1108,
-    PB_PET_BIRD    = 1109,
-    PB_PET_BOAR    = 1190,
-    PB_PET_BAT     = 1554,
-    PB_PET_CROC    = 1693,
-    PB_PET_SPIDER  = 1781,
-    PB_PET_OWL     = 1997,
-    PB_PET_STRIDER = 2322,
-    PB_PET_SCORPID = 3127,
-    PB_PET_SERPENT = 3247,
-    PB_PET_RAPTOR  = 3254,
-    PB_PET_TURTLE  = 3461,
-    PB_PET_HYENA   = 4127,
 };
 
 #define PB_UPDATE_INTERVAL 1000
@@ -95,14 +71,53 @@ void PartyBotAI::CloneFromPlayer(Player const* pPlayer)
 
 void PartyBotAI::LearnPremadeSpecForClass()
 {
+    // First attempt to find a spec. Must be for correct class, level and role.
     for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
     {
         if (itr.second.requiredClass == me->GetClass() &&
-           ((m_role == ROLE_INVALID) || (itr.second.role == m_role)))
+           ((m_role == ROLE_INVALID) || (itr.second.role == m_role)) &&
+           (!m_level || (itr.second.level == m_level)))
         {
+            if (m_role == ROLE_INVALID)
+                m_role = itr.second.role;
+
             sObjectMgr.ApplyPremadeSpecTemplateToPlayer(itr.first, me);
-            break;
+            return;
         }
+    }
+
+    if (m_role != ROLE_INVALID)
+    {
+        // Second attempt, but this time we will accept any role, just so
+        // that we have level appropriate spells.
+        for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+        {
+            if (itr.second.requiredClass == me->GetClass() &&
+                (!m_level || (itr.second.level == m_level)))
+            {
+                sObjectMgr.ApplyPremadeSpecTemplateToPlayer(itr.first, me);
+                return;
+            }
+        }
+    }
+    
+    if (m_level > 1)
+    {
+        // Third attempt. Check for lower level specs. Better than nothing.
+        for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
+        {
+            if (itr.second.requiredClass == me->GetClass() &&
+                itr.second.level < m_level)
+            {
+                sObjectMgr.ApplyPremadeSpecTemplateToPlayer(itr.first, me);
+                break;
+            }
+        }
+
+        me->MonsterSay("No spec template for this level found!");
+        me->GiveLevel(m_level);
+        me->InitTalentForLevel();
+        me->SetUInt32Value(PLAYER_XP, 0);
     }
 }
 
@@ -1295,8 +1310,8 @@ void PartyBotAI::UpdateInCombatAI_Mage()
     if (Unit* pVictim = me->GetVictim())
     {
         if (m_spells.mage.pPyroblast &&
-            m_spells.mage.pPresenceOfMind &&
-            me->HasAura(m_spells.mage.pPresenceOfMind->Id) &&
+           ((m_spells.mage.pPresenceOfMind && me->HasAura(m_spells.mage.pPresenceOfMind->Id)) ||
+            (!pVictim->IsInCombat() && (pVictim->GetMaxHealth() > me->GetMaxHealth()) && (me->GetDistance(pVictim) > 30.0f))) &&
             CanTryToCastSpell(pVictim, m_spells.mage.pPyroblast))
         {
             if (DoCastSpell(pVictim, m_spells.mage.pPyroblast) == SPELL_CAST_OK)

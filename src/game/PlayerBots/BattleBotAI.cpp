@@ -6,6 +6,7 @@
 #include "ObjectMgr.h"
 #include "PlayerBotMgr.h"
 #include "WorldPacket.h"
+#include "World.h"
 #include "Spell.h"
 #include "SpellAuras.h"
 #include "Chat.h"
@@ -18,12 +19,6 @@ enum BattleBotSpells
     BB_SPELL_DRINK = 1137,
     BB_SPELL_AUTO_SHOT = 75,
     BB_SPELL_SHOOT_WAND = 5019,
-    BB_SPELL_TAME_BEAST = 13481,
-
-    BB_SPELL_SUMMON_IMP = 688,
-    BB_SPELL_SUMMON_VOIDWALKER = 697,
-    BB_SPELL_SUMMON_FELHUNTER = 691,
-    BB_SPELL_SUMMON_SUCCUBUS = 712,
 
     BB_SPELL_MOUNT_40_HUMAN = 470,
     BB_SPELL_MOUNT_40_NELF = 10787,
@@ -49,24 +44,6 @@ enum BattleBotSpells
     BB_SPELL_MOUNT_40_WARLOCK = 5784,
     BB_SPELL_MOUNT_60_WARLOCK = 23161,
 
-    BB_PET_WOLF    = 565,
-    BB_PET_CAT     = 681,
-    BB_PET_BEAR    = 822,
-    BB_PET_CRAB    = 831,
-    BB_PET_GORILLA = 1108,
-    BB_PET_BIRD    = 1109,
-    BB_PET_BOAR    = 1190,
-    BB_PET_BAT     = 1554,
-    BB_PET_CROC    = 1693,
-    BB_PET_SPIDER  = 1781,
-    BB_PET_OWL     = 1997,
-    BB_PET_STRIDER = 2322,
-    BB_PET_SCORPID = 3127,
-    BB_PET_SERPENT = 3247,
-    BB_PET_RAPTOR  = 3254,
-    BB_PET_TURTLE  = 3461,
-    BB_PET_HYENA   = 4127,
-
     BB_ITEM_ARROW  = 2512,
     BB_ITEM_BULLET = 2516,
 };
@@ -78,23 +55,49 @@ enum BattleBotSpells
 
 void BattleBotAI::AddPremadeGearAndSpells()
 {
-    std::vector<uint32> vSpecs;
+    uint8 const level = m_level ? m_level : sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+
+    std::vector<PlayerPremadeSpecTemplate const*> vSpecs;
     for (const auto& itr : sObjectMgr.GetPlayerPremadeSpecTemplates())
     {
-        if (itr.second.requiredClass == me->GetClass())
-            vSpecs.push_back(itr.first);
+        if (itr.second.requiredClass == me->GetClass() &&
+            itr.second.level == level)
+            vSpecs.push_back(&itr.second);
     }
     if (!vSpecs.empty())
-        sObjectMgr.ApplyPremadeSpecTemplateToPlayer(SelectRandomContainerElement(vSpecs), me);
+    {
+        PlayerPremadeSpecTemplate const* pSpec = SelectRandomContainerElement(vSpecs);
+        sObjectMgr.ApplyPremadeSpecTemplateToPlayer(pSpec->entry, me);
+        m_role = pSpec->role;
+    }
 
-    std::vector<uint32> vGear;
+    if (m_role == ROLE_INVALID)
+        AutoAssignRole();
+
+    std::vector<PlayerPremadeGearTemplate const*> vGear;
     for (const auto& itr : sObjectMgr.GetPlayerPremadeGearTemplates())
     {
-        if (itr.second.requiredClass == me->GetClass())
-            vGear.push_back(itr.first);
+        if (itr.second.requiredClass == me->GetClass() &&
+            itr.second.level == level)
+            vGear.push_back(&itr.second);
     }
     if (!vGear.empty())
-        sObjectMgr.ApplyPremadeGearTemplateToPlayer(SelectRandomContainerElement(vGear), me);
+    {
+        uint32 gearId = 0;
+        // Try to find a role appropriate gear template.
+        for (const auto itr : vGear)
+        {
+            if (itr->role == m_role)
+            {
+                gearId = itr->entry;
+                break;
+            }
+        }
+        // There is no gear template for this role, pick randomly.
+        if (!gearId)
+            gearId = SelectRandomContainerElement(vGear)->entry;
+        sObjectMgr.ApplyPremadeGearTemplateToPlayer(gearId, me);
+    } 
 
     switch (me->GetClass())
     {
@@ -109,6 +112,14 @@ void BattleBotAI::AddPremadeGearAndSpells()
             }
             break;
         }
+    }
+
+    if (level != me->GetLevel())
+    {
+        sLog.outError("BattleBotAI::AddPremadeGearAndSpells - No level %u templates found!", level);
+        me->GiveLevel(level);
+        me->InitTalentForLevel();
+        me->SetUInt32Value(PLAYER_XP, 0);
     }
 }
 
@@ -397,6 +408,10 @@ Unit* BattleBotAI::SelectAttackTarget(Unit* pExcept) const
 
 Unit* BattleBotAI::SelectFollowTarget() const
 {
+    if (me->HasAura(AURA_WARSONG_FLAG) ||
+        me->HasAura(AURA_SILVERWING_FLAG))
+        return nullptr;
+
     std::list<Player*> players;
     me->GetAlivePlayerListInRange(me, players, VISIBILITY_DISTANCE_NORMAL);
     Player* pHealerFollowTarget = nullptr;
@@ -702,7 +717,6 @@ void BattleBotAI::UpdateAI(uint32 const diff)
     {
         ResetSpellData();
         AddPremadeGearAndSpells();
-        AutoAssignRole();
         PopulateSpellData();
         AddAllSpellReagents();
         me->UpdateSkillsToMaxSkillsForLevel();
