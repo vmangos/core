@@ -49,8 +49,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (89861, 19, -10582.7, 1137.78, 39.256, 100, 0, 0, 0),
 (89861, 20, -10581.9, 1138.66, 39.3293, 100, 0, 0, 0),
 (89861, 21, -10583.6, 1144.18, 40.1724, 100, 0, 0, 0),
-(89861, 22, -10584.8, 1144.22, 40.1724, 100, 6000, 0, 8986103),
-(89861, 23, -10584.8, 1144.22, 40.1724, 100, 225000, 0, 0);
+(89861, 23, -10584.8, 1144.22, 40.1724, 100, 225000, 0, 8986103);
 
 -- movement scripts
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8986101, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'lumberjack 89861 - emote none');
