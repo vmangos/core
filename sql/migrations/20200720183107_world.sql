@@ -40,6 +40,9 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (4716206, 0, 1, 1, 0, 0, 0, 46783, 0, 9, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Creature GUID 46783 - Emote Talk OOC ');
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4716202, 52, 47152, 0, 0, 0, 0);
 
+-- artist renfray should roam
+UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 46872;
+
 
 -- End of migration.
 END IF;
