@@ -682,6 +682,9 @@ bool AuthSocket::_HandleLogonProof()
         xferh.file_size = file_size;
 
         send((const char*)&xferh, sizeof(xferh));
+        
+        InitPatch();
+        
         return true;
     }
     /// </ul>
