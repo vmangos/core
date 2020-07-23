@@ -41,22 +41,6 @@ enum eAuthCmd
     CMD_XFER_CANCEL                 = 0x34
 };
 
-// not used by us currently
-enum eAuthSrvCmd
-{
-    CMD_GRUNT_AUTH_CHALLENGE        = 0x0,
-    CMD_GRUNT_AUTH_VERIFY           = 0x2,
-    CMD_GRUNT_CONN_PING             = 0x10,
-    CMD_GRUNT_CONN_PONG             = 0x11,
-    CMD_GRUNT_HELLO                 = 0x20,
-    CMD_GRUNT_PROVESESSION          = 0x21,
-    CMD_GRUNT_KICK                  = 0x24,
-    CMD_GRUNT_PCWARNING             = 0x29,
-    CMD_GRUNT_STRINGS               = 0x41,
-    CMD_GRUNT_SUNKENUPDATE          = 0x44,
-    CMD_GRUNT_SUNKEN_ONLINE         = 0x46
-};
-
 enum AuthResult
 {
     WOW_SUCCESS                     = 0x00,
