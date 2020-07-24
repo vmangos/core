@@ -43,6 +43,10 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- artist renfray should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` = 46872;
 
+-- add missing text to artist renfray
+DELETE FROM `creature_ai_scripts` WHERE `id`=1193601;
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1193601, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7272, 7274, 7273, 7275, 0, 0, 0, 0, 0, 'Artist Renfray - Say Text');
+
 
 -- End of migration.
 END IF;
