@@ -45,6 +45,10 @@
 #include "MasterPlayer.h"
 #include "PlayerBroadcaster.h"
 
+ // EJ robot
+#include "RobotAI.h"
+#include "RobotManager.h"
+
 // config option SkipCinematics supported values
 enum CinematicsSkipMode
 {
@@ -779,6 +783,21 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             //GetWarden()->SendSpeedChange(UnitMoveType(i), pCurrChar->GetSpeed(UnitMoveType(i)));
 
     ALL_SESSION_SCRIPTS(this, OnLogin(pCurrChar));
+
+    // EJ robot
+    pCurrChar->rai = new RobotAI(pCurrChar);
+    if (isRobotSession)
+    {        
+        std::ostringstream loginBroadCastStream;
+        loginBroadCastStream << pCurrChar->GetName() << " logged in";
+        sWorld.SendServerMessage(ServerMessageType::SERVER_MSG_CUSTOM, loginBroadCastStream.str().c_str());
+    }
+    else
+    {
+        pCurrChar->rai->strategyMap[Strategy_Index::Strategy_Index_Solo]->sb->IdentifyCharacterSpells();
+        pCurrChar->rai->strategyMap[Strategy_Index::Strategy_Index_Solo]->sb->Reset();
+        pCurrChar->rai->strategyMap[Strategy_Index::Strategy_Index_Solo]->sb->characterType;
+    }
 }
 
 void WorldSession::HandleSetFactionAtWarOpcode(WorldPacket& recv_data)
@@ -945,4 +964,23 @@ void WorldSession::HandleChangePlayerNameOpcodeCallBack(QueryResult* result, uin
 
     sObjectMgr.ChangePlayerNameInCache(guidLow, oldname, newname);
     sWorld.InvalidatePlayerDataToAllClient(guid);
+}
+
+// EJ robot 
+void WorldSession::HandlePlayerLogin_Simple(ObjectGuid pmCharacterGUID)
+{
+    if (PlayerLoading() || GetPlayer() != nullptr)
+    {        
+        KickPlayer();
+        return;
+    }
+
+    LoginQueryHolder* holder = new LoginQueryHolder(GetAccountId(), pmCharacterGUID);
+    if (!holder->Initialize())
+    {
+        delete holder;                                      // delete all unprocessed queries
+        return;
+    }
+    m_playerLoading = true;
+    CharacterDatabase.DelayQueryHolderUnsafe(&chrHandler, &CharacterHandler::HandlePlayerLoginCallback, holder);
 }

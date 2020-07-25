@@ -99,7 +99,20 @@ class ChaseMovementGenerator : public TargetedMovementGeneratorMedium<T, ChaseMo
         static void _clearUnitStateMove(T &u) { u.ClearUnitState(UNIT_STAT_CHASE_MOVE); }
         static void _addUnitStateMove(T &u)  { u.AddUnitState(UNIT_STAT_CHASE_MOVE); }
         bool EnableWalking() const { return false;}
-        bool _lostTarget(T &u) const { return u.GetVictim() != this->GetTarget(); }
+        // EJ chase target is not victim only 
+        //bool _lostTarget(T &u) const { return u.GetVictim() != this->GetTarget(); }
+        bool _lostTarget(T& u) const
+        {
+            if (Unit* tu = this->GetTarget())
+            {
+                if (tu->GetObjectGuid() == u.GetTargetGuid())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         void _reachTarget(T &);
     private:
         ShortTimeTracker m_spreadTimer{ 0 };

@@ -42,6 +42,12 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     if (owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_POSSESSED))
         return;
 
+    // EJ debug 
+    if (owner.GetGUIDLow() == 2)
+    {
+        bool breakPoint = true;
+    }
+
     float x, y, z;
     bool losChecked = false;
     bool losResult = false;
@@ -83,15 +89,30 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         // TRANSPORT_VMAPS
         if (transport)
         {
-            i_target->GetNearPoint2D(x, y, m_fOffset, m_fAngle + i_target->GetOrientation());
-            z = srcZ;
+            // EJ no relative near angle 
+            //i_target->GetNearPoint2D(x, y, m_fOffset, m_fAngle + i_target->GetOrientation());
+            //z = srcZ;
+            if (WorldObject* targetWO = i_target->ToWorldObject())
+            {
+                targetWO->GetNearPoint(targetWO, x, y, z, targetWO->GetObjectBoundingRadius(), m_fOffset, targetWO->GetAngle(owner.GetPositionX(), owner.GetPositionY()));
+            }            
         }
         else
-            i_target->GetClosePoint(x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, m_fAngle, &owner);
-
+        {
+            // EJ no relative near angle 
+            //i_target->GetClosePoint(x, y, z, owner.GetObjectBoundingRadius(), m_fOffset, m_fAngle, &owner);
+            if (WorldObject* targetWO = i_target->ToWorldObject())
+            {
+                targetWO->GetNearPoint(targetWO, x, y, z, targetWO->GetObjectBoundingRadius(), m_fOffset, targetWO->GetAngle(owner.GetPositionX(), owner.GetPositionY()));
+            }
+        }
         if (!i_target->m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING) && !i_target->IsInWater())
+        {
             if (!owner.GetMap()->GetWalkHitPosition(transport, srcX, srcY, srcZ, x, y, z))
+            {
                 i_target->GetSafePosition(x, y, z);
+            }
+        }
     }
 
     m_bTargetOnTransport = transport;
@@ -272,6 +293,12 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         return true;
     }
 
+    // EJ debug 
+    if (owner.GetGUIDLow() == 2)
+    {
+        bool breakPoint = true;
+    }
+
     bool interrupted = false;
     m_checkDistanceTimer.Update(time_diff);
     if (m_checkDistanceTimer.Passed())
@@ -347,7 +374,11 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         else
         {
             if (!owner.HasInArc(0.01f, i_target.getTarget()))
+            {
                 owner.SetInFront(i_target.getTarget());
+                // EJ add set facing to 
+                owner.SetFacingTo(owner.GetAngle(i_target.getTarget()));
+            }
         }
         
 
@@ -480,8 +511,11 @@ void ChaseMovementGenerator<T>::DoSpreadIfNeeded(T &owner, Unit* target)
 template<class T>
 void ChaseMovementGenerator<T>::_reachTarget(T &owner)
 {
-    if (owner.CanReachWithMeleeAutoAttack(this->i_target.getTarget()))
-        owner.Attack(this->i_target.getTarget(), true);
+    // EJ chase will not auto attack 
+    //if (owner.CanReachWithMeleeAutoAttack(this->i_target.getTarget()))
+    //{
+    //    owner.Attack(this->i_target.getTarget(), true);
+    //}
 }
 
 template<>
@@ -632,7 +666,11 @@ bool FollowMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         MovementInform(owner);
 
         if (m_fAngle == 0.f && !owner.HasInArc(0.01f, i_target.getTarget()))
+        {
             owner.SetInFront(i_target.getTarget());
+            // EJ add set facing to 
+            owner.SetFacingTo(owner.GetAngle(i_target.getTarget()));
+        }
 
         if (!m_bTargetReached)
         {

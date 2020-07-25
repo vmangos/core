@@ -32,6 +32,9 @@
 #include "SocialMgr.h"
 #include "Util.h"
 
+ // EJ robot 
+#include "RobotManager.h"
+
 /* differeces from off:
     -you can uninvite yourself - is is useful
     -you can accept invitation even if leader went offline
@@ -103,6 +106,40 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket& recv_data)
     if (group2 || player->GetGroupInvite())
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_ALREADY_IN_GROUP_S);
+
+        // EJ robot group recheck
+        if (player->GetSession()->isRobotSession)
+        {
+            if (Group* checkGroup = player->GetGroup())
+            {
+                if (Player* leader = ObjectAccessor::FindPlayer(checkGroup->GetLeaderGuid()))
+                {
+                    if (leader->GetSession()->isRobotSession)
+                    {
+                        player->RemoveFromGroup();
+                    }
+                }
+                else
+                {
+                    player->RemoveFromGroup();
+                }
+            }
+            else if (Group* groupInvite = player->GetGroupInvite())
+            {
+                if (Player* leader = ObjectAccessor::FindPlayer(groupInvite->GetLeaderGuid()))
+                {
+                    if (leader->GetSession()->isRobotSession)
+                    {
+                        player->RemoveFromGroup();
+                    }
+                }
+                else
+                {
+                    player->RemoveFromGroup();
+                }
+            }
+        }
+
         return;
     }
 

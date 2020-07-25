@@ -83,6 +83,9 @@
 #include "world/world_event_naxxramas.h"
 #include "world/world_event_wareffort.h"
 
+// EJ robot 
+#include "RobotAI.h"
+
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
 #define PLAYER_SKILL_INDEX(x)       (PLAYER_SKILL_INFO_1_1 + ((x)*3))
@@ -600,6 +603,12 @@ Player::Player(WorldSession* session) : Unit(),
 
     m_longSightSpell = 0;
     m_longSightRange = 0.0f;
+
+    // EJ robot
+    groupRole = 0;
+    rai = NULL;
+    // EJ auto fish
+    fishing = false;
 }
 
 Player::~Player()
@@ -1219,7 +1228,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             QuestStatusData& q_status = mQuestStatus[*iter];
             if (q_status.m_timer <= update_diff)
             {
-                uint32 quest_id  = *iter;
+                uint32 quest_id = *iter;
                 ++iter;                                     // current iter will be removed in FailQuest
                 FailQuest(quest_id);
             }
@@ -1338,7 +1347,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     //   dungeons, battlegrounds, and raid instances.
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     // not auto-free ghost from body in instances
-    if (GetDeathState() == CORPSE  && !GetMap()->Instanceable())
+    if (GetDeathState() == CORPSE && !GetMap()->Instanceable())
 #else
     if (GetDeathState() == CORPSE)
 #endif
@@ -1407,7 +1416,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         }
 
         float x, y, z, o;
-        if (IsInWorld() && sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_INTERP) && movespline->Finalized() && GetCheatData()->ExtrapolateMovement(m_movementInfo, WorldTimer::getMSTime() - m_movementInfo.time,  x, y, z, o))
+        if (IsInWorld() && sWorld.getConfig(CONFIG_BOOL_ENABLE_MOVEMENT_INTERP) && movespline->Finalized() && GetCheatData()->ExtrapolateMovement(m_movementInfo, WorldTimer::getMSTime() - m_movementInfo.time, x, y, z, o))
         {
             GetMap()->DoPlayerGridRelocation(this, x, y, z, o);
             m_position.x = x;
@@ -1421,6 +1430,69 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         uint32 cheatAction = GetCheatData()->Update(p_time, reason);
         if (cheatAction)
             GetSession()->ProcessAnticheatAction("MovementAnticheat", reason.str().c_str(), cheatAction, sWorld.getConfig(CONFIG_UINT32_AC_MOVEMENT_BAN_DURATION));
+    }
+
+    // EJ robot    
+    if (rai)
+    {
+        rai->Update(p_time);
+    }
+
+    // EJ auto fish
+    if (fishing)
+    {
+        CastSpell(this, 7620, true);
+        fishing = false;
+    }
+
+    if (Group* myGroup = GetGroup())
+    {
+        if (myGroup->GetLeaderGuid() == GetObjectGuid())
+        {
+            // EJ group updates
+            myGroup->groupAttackersMap.clear();
+            for (GroupReference* groupRef = myGroup->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
+            {
+                if (Player* member = groupRef->getSource())
+                {
+                    if (member->IsAlive())
+                    {
+                        for (Unit::AttackerSet::const_iterator attackerIT = member->GetAttackers().begin(); attackerIT != member->GetAttackers().end(); ++attackerIT)
+                        {
+                            if (Unit* eachAttacker = *attackerIT)
+                            {
+                                if (eachAttacker->IsAlive())
+                                {
+                                    if (myGroup->groupAttackersMap.find(eachAttacker->GetGUID()) == myGroup->groupAttackersMap.end())
+                                    {
+                                        myGroup->groupAttackersMap[eachAttacker->GetGUID()] = eachAttacker;
+                                    }
+                                }
+                            }
+                        }
+                        if (Pet* memberPet = member->GetPet())
+                        {
+                            if (memberPet->IsAlive())
+                            {
+                                for (Unit::AttackerSet::const_iterator attackerIT = memberPet->GetAttackers().begin(); attackerIT != memberPet->GetAttackers().end(); ++attackerIT)
+                                {
+                                    if (Unit* eachAttacker = *attackerIT)
+                                    {
+                                        if (eachAttacker->IsAlive())
+                                        {
+                                            if (myGroup->groupAttackersMap.find(eachAttacker->GetGUID()) == myGroup->groupAttackersMap.end())
+                                            {
+                                                myGroup->groupAttackersMap[eachAttacker->GetGUID()] = eachAttacker;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -21514,4 +21586,41 @@ void Player::CreatePacketBroadcaster()
     // Register player packet queue with the packet broadcaster
     m_broadcaster = std::make_shared<PlayerBroadcaster>(m_session->GetSocket(), GetObjectGuid());
     sWorld.GetBroadcaster()->RegisterPlayer(m_broadcaster);
+}
+
+// EJ robot 
+uint32 Player::GetMaxTalentCountTab()
+{
+    std::unordered_map<uint32, uint32> tabCountMap;
+
+    for (uint32 i = 0; i < sTalentStore.GetNumRows(); ++i)
+    {
+        if (TalentEntry const* te = sTalentStore.LookupEntry(i))
+        {
+            if (TalentTabEntry const* talentTabInfo = sTalentTabStore.LookupEntry(te->TalentTab))
+            {
+                if ((GetClassMask() & talentTabInfo->ClassMask) != 0)
+                {
+                    for (int8 rank = MAX_TALENT_RANK - 1; rank >= 0; --rank)
+                    {
+                        if (HasSpell(te->RankID[rank]))
+                        {
+                            tabCountMap[talentTabInfo->tabpage] = tabCountMap[talentTabInfo->tabpage] + rank + 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    uint32 maxValue = 0;
+    uint32 result = 0;
+    for (std::unordered_map<uint32, uint32>::iterator tcIT = tabCountMap.begin(); tcIT != tabCountMap.end(); tcIT++)
+    {
+        if (tcIT->second > maxValue)
+        {
+            maxValue = tcIT->second;
+            result = tcIT->first;
+        }
+    }
+    return result;
 }

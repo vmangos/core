@@ -51,6 +51,9 @@
 #include "AccountMgr.h"
 #include "MasterPlayer.h"
 
+// EJ robot
+#include "RobotManager.h"
+
 // select opcodes appropriate for processing in Map::Update context for current session state
 static bool MapSessionFilterHelper(WorldSession* session, OpcodeHandler const& opHandle)
 {
@@ -91,6 +94,9 @@ WorldSession::WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_
     }
     else
         m_Address = "<BOT>";
+
+    // EJ robot
+    isRobotSession = false;
 }
 
 /// WorldSession destructor
@@ -143,6 +149,15 @@ void WorldSession::SendPacket(WorldPacket const* packet)
         sLog.outInfo("[NETWORK] Packet %s size %u is too large. Not sent [Account %u Player %s]", LookupOpcodeName(packet->GetOpcode()), packet->size(), GetAccountId(), GetPlayerName());
         return;
     }
+
+    // EJ robot    
+    if (isRobotSession)
+    {
+        WorldPacket eachCopy(*packet);
+        sRobotManager->HandlePacket(this, eachCopy);
+        return;
+    }
+
     if (!m_Socket)
     {
         if (GetBot() && GetBot()->ai)
@@ -292,6 +307,27 @@ bool WorldSession::ForcePlayerLogoutDelay()
 /// Update the WorldSession (triggered by World update)
 bool WorldSession::Update(PacketFilter& updater)
 {
+    // EJ robot    
+    if (isRobotSession)
+    {
+        if (_player)
+        {
+            if (_player->IsBeingTeleportedNear())
+            {
+                WorldPacket data(MSG_MOVE_TELEPORT_ACK, 10);
+                data << _player->GetObjectGuid();
+                data << uint32(0) << uint32(0);
+                HandleMoveTeleportAckOpcode(data);
+            }
+            else if (_player->IsBeingTeleportedFar())
+            {
+                HandleMoveWorldportAckOpcode();
+            }
+        }
+
+        return true;
+    }
+
     uint32 sessionUpdateTime = WorldTimer::getMSTime();
     for (uint32 & i : _floodPacketsCount)
         i = 0;

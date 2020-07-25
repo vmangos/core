@@ -407,6 +407,63 @@ set (game_SRCS
     vmap/VMapTools.h
     vmap/WorldModel.h
 
+	Marketer/MarketerConfig.h
+	Marketer/MarketerConfig.cpp
+	Marketer/MarketerManager.h
+	Marketer/MarketerManager.cpp
+	
+	Robot/RobotAI.h
+	Robot/RobotAI.cpp
+	Robot/RobotConfig.h
+	Robot/RobotConfig.cpp
+	Robot/RobotEntity.h
+	Robot/RobotEntity.cpp
+	Robot/RobotManager.h
+	Robot/RobotManager.cpp
+	Robot/Scripts/Script_Base.h
+	Robot/Scripts/Script_Base.cpp
+	Robot/Scripts/Script_Druid.h
+	Robot/Scripts/Script_Druid.cpp
+	Robot/Scripts/Script_Hunter.h
+	Robot/Scripts/Script_Hunter.cpp
+	Robot/Scripts/Script_Mage.h
+	Robot/Scripts/Script_Mage.cpp
+	Robot/Scripts/Script_Paladin.h
+	Robot/Scripts/Script_Paladin.cpp
+	Robot/Scripts/Script_Priest.h
+	Robot/Scripts/Script_Priest.cpp
+	Robot/Scripts/Script_Rogue.h
+	Robot/Scripts/Script_Rogue.cpp
+	Robot/Scripts/Script_Shaman.h
+	Robot/Scripts/Script_Shaman.cpp
+	Robot/Scripts/Script_Warlock.h
+	Robot/Scripts/Script_Warlock.cpp
+	Robot/Scripts/Script_Warrior.h
+	Robot/Scripts/Script_Warrior.cpp
+	Robot/Strategies/Strategy_Base.h
+	Robot/Strategies/Strategy_Base.cpp
+	Robot/Strategies/Strategy_Group.h
+	Robot/Strategies/Strategy_Group.cpp
+	Robot/Strategies/Strategy_Group_Azuregos.h
+	Robot/Strategies/Strategy_Group_Azuregos.cpp
+	Robot/Strategies/Strategy_Group_BlackrockSpire.h
+	Robot/Strategies/Strategy_Group_BlackrockSpire.cpp
+	Robot/Strategies/Strategy_Group_DoctorWeavil.h
+	Robot/Strategies/Strategy_Group_DoctorWeavil.cpp
+	Robot/Strategies/Strategy_Group_Emeriss.h
+	Robot/Strategies/Strategy_Group_Emeriss.cpp
+	Robot/Strategies/Strategy_Group_Lethon.h
+	Robot/Strategies/Strategy_Group_Lethon.cpp
+	Robot/Strategies/Strategy_Group_MoltenCore.h
+	Robot/Strategies/Strategy_Group_MoltenCore.cpp
+	Robot/Strategies/Strategy_Group_Taerar.h
+	Robot/Strategies/Strategy_Group_Taerar.cpp
+	Robot/Strategies/Strategy_Group_Test.h
+	Robot/Strategies/Strategy_Group_Test.cpp
+	Robot/Strategies/Strategy_Group_Ysondre.h
+	Robot/Strategies/Strategy_Group_Ysondre.cpp
+	Robot/Strategies/Strategy_Solo.h
+	Robot/Strategies/Strategy_Solo.cpp
 )
 
 
@@ -477,6 +534,10 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Threat
   ${CMAKE_CURRENT_SOURCE_DIR}/Transports
   ${CMAKE_CURRENT_SOURCE_DIR}/vmap
+  ${CMAKE_CURRENT_SOURCE_DIR}/Marketer
+  ${CMAKE_CURRENT_SOURCE_DIR}/Robot
+  ${CMAKE_CURRENT_SOURCE_DIR}/Robot/Scripts
+  ${CMAKE_CURRENT_SOURCE_DIR}/Robot/Strategies
   ${CMAKE_SOURCE_DIR}/src/scripts
   ${CMAKE_SOURCE_DIR}/src/scripts/PrecompiledHeaders
   ${CMAKE_SOURCE_DIR}/dep/include/g3dlite
@@ -535,6 +596,15 @@ source_group("References"
 
 source_group("Anticheat"
   REGULAR_EXPRESSION Anticheat
+)
+
+
+source_group("Marketer"
+  REGULAR_EXPRESSION Marketer
+)
+
+source_group("Robot"
+  REGULAR_EXPRESSION Robot|Script_|Strategy_
 )
 
 if(PCH)

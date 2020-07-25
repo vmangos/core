@@ -277,6 +277,10 @@ class WorldSession
         WorldSession(uint32 id, WorldSocket *sock, AccountTypes sec, time_t mute_time, LocaleConstant locale);
         ~WorldSession();
 
+        // EJ robot
+        bool isRobotSession;
+        void HandlePlayerLogin_Simple(ObjectGuid pmCharacterGUID);
+
         bool PlayerLoading() const { return m_playerLoading; }
         bool PlayerLogout() const { return m_playerLogout; }
         bool PlayerLogoutWithSave() const { return m_playerLogout && m_playerSave; }

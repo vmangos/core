@@ -755,7 +755,14 @@ void Pet::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 
     if (m_happinessTimer <= update_diff)
     {
-        LooseHappiness();
+        // EJ robot's pet will not lose happiness                
+        if (Player* ownerPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            if (!ownerPlayer->GetSession()->isRobotSession)
+            {
+                LooseHappiness();
+            }
+        }
         m_happinessTimer = 7500;
     }
     else
@@ -1305,6 +1312,9 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     else
         SetName(creature->GetNameForLocaleIdx(sObjectMgr.GetDBCLocaleIndex()));
 
+    // EJ pet name
+    SetName(cinfo->name);
+
     m_loyaltyPoints = 1000;
     if (cinfo->type == CREATURE_TYPE_BEAST)
     {
@@ -1323,6 +1333,52 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
         
         SetLoyaltyLevel(REBELLIOUS);
     }
+    return true;
+}
+
+// EJ create pet base from info 
+bool Pet::CreateBaseAtCreatureInfo(const CreatureInfo* pmCI, Map* pmCreatePositionMap, float pmCreatePositionX, float pmCreatePositionY, float pmCreatePositionZ, float pmCreatePositionOrientation)
+{
+    if (!pmCI)
+    {        
+        return false;
+    }
+    CreatureCreatePos pos(pmCreatePositionMap, pmCreatePositionX, pmCreatePositionY, pmCreatePositionZ, pmCreatePositionOrientation);
+    uint32 guid = pmCreatePositionMap->GenerateLocalLowGuid(HIGHGUID_PET);
+    uint32 pet_number = sObjectMgr.GeneratePetNumber();
+
+    if (!Create(guid, pos, pmCI, pet_number))
+    {
+        return false;
+    }
+    CreatureInfo const* cinfo = GetCreatureInfo();
+    if (!cinfo)
+    {
+        sLog.outError("CreateBaseAtCreature() failed, creatureInfo is missing!");
+        return false;
+    }
+    if (cinfo->type == CREATURE_TYPE_CRITTER)
+    {
+        setPetType(MINI_PET);
+        return true;
+    }
+    SetDisplayId(pmCI->display_id[0]);
+    SetNativeDisplayId(pmCI->display_id[0]);
+    SetMaxPower(POWER_HAPPINESS, GetCreatePowers(POWER_HAPPINESS));
+    SetPower(POWER_HAPPINESS, 166500);
+    SetPowerType(POWER_FOCUS);
+    SetUInt32Value(UNIT_FIELD_PET_NAME_TIMESTAMP, 0);
+    SetUInt32Value(UNIT_FIELD_PETEXPERIENCE, 0);
+    SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(pmCI->level_min));
+    SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
+    SetName(cinfo->name);    
+    SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_WARRIOR);
+    SetByteValue(UNIT_FIELD_BYTES_0, 2, GENDER_NONE);
+    SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_FOCUS);
+    SetSheath(SHEATH_STATE_MELEE);
+    SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_AURAS | UNIT_BYTE2_FLAG_UNK5);
+    SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_RENAME | UNIT_FLAG_PET_ABANDON);
+    SetLoyaltyLevel(LoyaltyLevel::REBELLIOUS);
     return true;
 }
 

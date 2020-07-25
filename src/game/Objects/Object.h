@@ -39,7 +39,11 @@
 
 #define CONTACT_DISTANCE            0.5f
 #define INTERACTION_DISTANCE        5.0f
-#define ATTACK_DISTANCE             5.0f
+
+// EJ ATTACK_DISTANCE set to 4.0f
+//#define ATTACK_DISTANCE             5.0f
+#define ATTACK_DISTANCE             4.0f
+
 #define INSPECT_DISTANCE            10.0f
 #define TRADE_DISTANCE              11.11f
 
@@ -65,7 +69,7 @@
 
 // TrinityCore
 #define DEFAULT_COMBAT_REACH        1.5f
-#define MIN_MELEE_REACH             2.0f
+#define MIN_MELEE_REACH             1.0f
 #define NOMINAL_MELEE_RANGE         5.0f
 #define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2)
 

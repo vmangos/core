@@ -41,6 +41,9 @@
 #include "Anticheat.h"
 #include "AccountMgr.h"
 
+ // EJ robot
+#include "RobotManager.h"
+
 bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
 {
     if (!IsLanguageAllowedForChatType(lang, msgType))
@@ -377,6 +380,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                     a->addMessage(msg, type, GetPlayerPointer(), nullptr);
             }
 
+            // EJ robot
+            if (!GetPlayer()->GetSession()->isRobotSession)
+            {
+                sRobotManager->HandlePlayerSay(GetPlayer(), msg);
+            }
+
             break;
         case CHAT_MSG_EMOTE:
             if (GetPlayer()->GetLevel() < sWorld.getConfig(CONFIG_UINT32_SAY_EMOTE_MIN_LEVEL)
@@ -488,6 +497,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
                         if (AntispamInterface *a = sAnticheatMgr->GetAntispam())
                             a->addMessage(msg, type, GetPlayerPointer(), PlayerPointer(new PlayerWrapper<MasterPlayer>(player)));
                 }
+
+                // EJ robot
+                sRobotManager->HandleChatCommand(GetPlayer(), msg, toPlayer);
             }
         }
         break;
@@ -512,6 +524,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             group->BroadcastPacket(&data, false, group->GetMemberGroup(GetPlayer()->GetObjectGuid()));
             if (lang != LANG_ADDON)
                 sWorld.LogChat(this, "Group", msg, nullptr, group->GetId());
+
+            // EJ robot
+            sRobotManager->HandleChatCommand(GetPlayer(), msg);
         }
         break;
         case CHAT_MSG_GUILD: // Master side
@@ -574,6 +589,9 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket& recv_data)
             group->BroadcastPacket(&data, false);
             if (lang != LANG_ADDON)
                 sWorld.LogChat(this, "Raid", msg, nullptr, group->GetId());
+
+            // EJ robot
+            sRobotManager->HandleChatCommand(GetPlayer(), msg);
         }
         break;
 

@@ -9472,7 +9472,9 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
         attacker_number = 0;
     angle += (attacker_number ? ((float(M_PI / 2) - float(M_PI) * rand_norm_f()) * attacker_number / sizeFactor) * 0.3f : 0);
 
-    float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + rand_norm_f() * (attacker->GetMeleeReach() - attacker->GetObjectBoundingRadius());
+    // EJ random attack point will not be less than 1.0f
+    //float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + rand_norm_f() * (attacker->GetMeleeReach() - attacker->GetObjectBoundingRadius());
+    float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + frand(CONTACT_DISTANCE, MIN_MELEE_REACH);
     float initialPosX, initialPosY, initialPosZ, o;
     GetPosition(initialPosX, initialPosY, initialPosZ);
 
@@ -10109,15 +10111,31 @@ Unit* Unit::SelectNearestTarget(float dist) const
 
 float Unit::GetMinChaseDistance(Unit* victim) const
 {
-    if (m_casterChaseDistance > 1.0f)
-        return m_casterChaseDistance;
-    return GetObjectBoundingRadius();
+    // EJ min chase distance recalculate
+    //if (m_casterChaseDistance > 1.0f)
+    //{
+    //    return m_casterChaseDistance;
+    //}
+    //return GetObjectBoundingRadius();
+    float minGap = m_casterChaseDistance;
+    if (minGap < MIN_MELEE_REACH)
+    {
+        minGap = MIN_MELEE_REACH;
+    }
+    return GetObjectBoundingRadius() + minGap;
 }
 
 float Unit::GetMaxChaseDistance(Unit* victim) const
 {
-    if (m_casterChaseDistance > 1.0f)
+    // EJ max chase distance recalculate
+    //if (m_casterChaseDistance > 1.0f)
+    //{
+    //    return m_casterChaseDistance + GetObjectBoundingRadius() + victim->GetObjectBoundingRadius();
+    //}
+    if (m_casterChaseDistance > MIN_MELEE_REACH)
+    {
         return m_casterChaseDistance + GetObjectBoundingRadius() + victim->GetObjectBoundingRadius();
+    }
     return GetMeleeReach() + BASE_MELEERANGE_OFFSET;
 }
 
@@ -10363,5 +10381,104 @@ void Unit::InitPlayerDisplayIds()
         default:
             return;
     }
+}
 
+// EJ aura  
+int Unit::GetAuraStack(uint32 pmSpellID, ObjectGuid pmOGCaster)
+{
+    int auraStack = 0;
+    for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end(); iter++)
+    {
+        if (SpellAuraHolder* sah = iter->second)
+        {
+            if (sah->GetId() == pmSpellID)
+            {
+                if (!pmOGCaster.IsEmpty())
+                {
+                    if (sah->GetCasterGuid() != pmOGCaster)
+                    {
+                        continue;
+                    }
+                }
+                auraStack = sah->GetStackAmount();
+                break;
+            }
+        }
+    }
+    return auraStack;
+}
+
+int Unit::GetAuraDuration(uint32 pmSpellID, ObjectGuid pmOGCaster)
+{
+    int auraDuration = 0;
+    for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end(); iter++)
+    {
+        if (SpellAuraHolder* sah = iter->second)
+        {
+            if (sah->GetId() == pmSpellID)
+            {
+                if (!pmOGCaster.IsEmpty())
+                {
+                    if (sah->GetCasterGuid() != pmOGCaster)
+                    {
+                        continue;
+                    }
+                }
+                auraDuration = sah->GetAuraDuration();
+                break;
+            }
+        }
+    }
+    return auraDuration;
+}
+
+bool Unit::HasCasterAura(uint32 pmSpellID, ObjectGuid pmOGCaster)
+{
+    for (SpellAuraHolderMap::iterator iter = m_spellAuraHolders.begin(); iter != m_spellAuraHolders.end(); iter++)
+    {
+        if (SpellAuraHolder* sah = iter->second)
+        {
+            if (sah->GetId() == pmSpellID && sah->GetCasterGuid() == pmOGCaster)
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool Unit::HasAuraWithDispelType(uint32 pmDispelType)
+{
+    DispelType dispelType = (DispelType)pmDispelType;
+    uint32 dispelMask = Spells::GetDispellMask(dispelType);
+    SpellAuraHolderMap& auras = GetSpellAuraHolderMap();
+    for (SpellAuraHolderMap::iterator itr = auras.begin(); itr != auras.end(); itr++)
+    {
+        if (SpellEntry const* spell = itr->second->GetSpellProto())
+        {
+            if (!spell->IsPositiveSpell())
+            {
+                if ((1 << spell->Dispel) & dispelMask)
+                {
+                    return true;
+                }
+            }            
+        }        
+    }
+    return false;
+}
+
+// EJ get creature
+Creature* Unit::GetNearbyCreatureWithEntry(uint32 pmEntry, float pmExactDistance)
+{
+    std::list<Creature*> allCreatures;
+    GetCreatureListWithEntryInGrid(allCreatures, pmEntry, pmExactDistance);
+    for (Creature* eachCreature : allCreatures)
+    {
+        if (eachCreature->GetEntry() == pmEntry)
+        {
+            return eachCreature;
+        }
+    }
+    return NULL;
 }

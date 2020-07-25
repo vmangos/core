@@ -1835,6 +1835,17 @@ struct Position
     float y = 0.0f;
     float z = 0.0f;
     float o = 0.0f;
+
+    // EJ position angle calculate
+    float GetAngle(Position pmTargetPosition)
+    {
+        float dx = pmTargetPosition.x - x;
+        float dy = pmTargetPosition.y - y;
+
+        float ang = atan2(dy, dx);
+        ang = (ang >= 0) ? ang : 2 * M_PI_F + ang;
+        return ang;
+    }
 };
 
 struct WorldLocation

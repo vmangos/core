@@ -40,6 +40,9 @@
 
 #include <array>
 
+// EJ robot 
+#include "RobotAI.h"
+
 GroupMemberStatus GetGroupMemberStatus(Player const* member = nullptr)
 {
     uint8 flags = MEMBER_STATUS_OFFLINE;
@@ -82,6 +85,8 @@ Group::Group() : m_Id(0), m_leaderLastOnline(0), m_groupType(GROUPTYPE_NORMAL),
                  m_bgGroup(nullptr), m_lootMethod(FREE_FOR_ALL), m_lootThreshold(ITEM_QUALITY_UNCOMMON),
                  m_subGroupsCounts(nullptr), m_groupTeam(TEAM_NONE), m_LFGAreaId(0)
 {
+    // EJ group strategy index
+    groupStrategyIndex = Strategy_Index::Strategy_Index_Group;
 }
 
 Group::~Group()
@@ -130,6 +135,9 @@ bool Group::Create(ObjectGuid guid, char const*  name)
     m_lootMethod = GROUP_LOOT;
     m_lootThreshold = ITEM_QUALITY_UNCOMMON;
     m_looterGuid = guid;
+
+    // EJ free loot
+    m_lootMethod = FREE_FOR_ALL;
 
     if (!isBGGroup())
     {
@@ -2343,4 +2351,59 @@ void Group::UpdateLooterGuid(WorldObject* pLootedObject, bool ifneed)
             SendTargetIconList(player->GetSession());
         }
     }
+}
+
+// EJ rti
+ObjectGuid Group::GetOGByTargetIcon(int pmID)
+{
+    if (pmID >= 0 && pmID < TARGET_ICON_COUNT)
+    {
+        return m_targetIcons[pmID];
+    }
+    return ObjectGuid();
+}
+
+int Group::GetTargetIconByOG(ObjectGuid pmOG)
+{
+    for (int i = 0; i < TARGET_ICON_COUNT; ++i)
+    {
+        if (m_targetIcons[i] == pmOG)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+// EJ group attackers
+std::unordered_map<ObjectGuid, Unit*> Group::GetGroupAttackers(uint32 pmCreatureEntry)
+{
+    std::unordered_map<ObjectGuid, Unit*> resultMap;
+    resultMap.clear();
+    for (std::unordered_map<ObjectGuid, Unit*>::iterator aIT = groupAttackersMap.begin(); aIT != groupAttackersMap.end(); aIT++)
+    {
+        if (Unit* eachA = aIT->second)
+        {
+            if (eachA->GetEntry() == pmCreatureEntry)
+            {
+                resultMap[eachA->GetGUID()] = eachA;
+            }
+        }
+    }
+    return resultMap;
+}
+
+Unit* Group::GetGroupAttacker(uint32 pmCreatureEntry)
+{
+    for (std::unordered_map<ObjectGuid, Unit*>::iterator aIT = groupAttackersMap.begin(); aIT != groupAttackersMap.end(); aIT++)
+    {
+        if (Unit* eachA = aIT->second)
+        {
+            if (eachA->GetEntry() == pmCreatureEntry)
+            {
+                return eachA;
+            }
+        }
+    }
+    return NULL;
 }

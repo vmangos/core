@@ -60,6 +60,9 @@ class PlayerAI;
 class PlayerBroadcaster;
 class MapReference;
 
+// EJ robot 
+class RobotAI;
+
 #define PLAYER_MAX_SKILLS           127
 #define PLAYER_EXPLORED_ZONES_SIZE  64
 #define CORPSE_REPOP_TIME (6 * MINUTE * IN_MILLISECONDS)
@@ -859,6 +862,14 @@ class Player final: public Unit
     public:
         explicit Player (WorldSession* session);
         ~Player() override;
+
+        // EJ robot
+        RobotAI* rai;
+        uint32 GetMaxTalentCountTab();
+        // 0 dps, 1 tank, 2 healer
+        uint32 groupRole;
+        // EJ auto fish
+        bool fishing;        
 
         void CleanupsBeforeDelete() override;
 

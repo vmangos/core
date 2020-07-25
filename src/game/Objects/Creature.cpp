@@ -1051,7 +1051,7 @@ void Creature::DoFleeToGetAssistance()
 
 
 float Creature::GetFleeingSpeed() const
-{
+{    
     //TODO: There are different speeds for the different mobs, isn't there?
     return GetSpeed(MOVE_RUN);
 }

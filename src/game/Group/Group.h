@@ -194,6 +194,21 @@ class Group
         Group();
         ~Group();
 
+        // EJ TargetIcon        
+        ObjectGuid GetOGByTargetIcon(int pmID);
+        int GetTargetIconByOG(ObjectGuid pmOG);
+
+        // EJ group target arrangement
+        std::unordered_map<ObjectGuid, ObjectGuid> groupTargetArrangementMap;
+
+        // EJ group strategy index
+        uint32 groupStrategyIndex;
+
+        // EJ group attackers
+        std::unordered_map<ObjectGuid, Unit*> groupAttackersMap;
+        std::unordered_map<ObjectGuid, Unit*> GetGroupAttackers(uint32 pmCreatureEntry);
+        Unit* GetGroupAttacker(uint32 pmCreatureEntry);
+
         // group manipulation methods
         bool   Create(ObjectGuid guid, char const*  name);
         bool   LoadGroupFromDB(Field* fields);
