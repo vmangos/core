@@ -18427,6 +18427,8 @@ void Player::LeaveBattleground(bool teleportToEntryPoint)
                  GetGUIDLow(), GetSession()->GetAccountId(), GetSession()->GetRemoteAddress().c_str(),
                  bg->GetTypeID());
     }
+
+    SetFactionForRace(GetRace()); // reset faction
 }
 
 bool Player::CanJoinToBattleground() const
