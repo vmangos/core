@@ -558,7 +558,7 @@ bool AuthSocket::_HandleLogonChallenge()
                         EndianConvert(gridSeedPkt);
                         serverSecuritySalt.SetRand(16 * 8); // 16 bytes random
 
-                        pkt << uint8(1); // securityFlags, only '1' is available in classic (PIN input)
+                        pkt << uint8(1); // securityFlags, only '1' is available in vanilla (PIN input)
                         pkt << gridSeedPkt;
                         pkt.append(serverSecuritySalt.AsByteArray(16).data(), 16);
                     }
