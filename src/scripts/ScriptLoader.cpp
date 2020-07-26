@@ -258,6 +258,7 @@ void AddSC_winterspring();
 void AddSC_war_effort();
 
 void AddSC_npc_j_eevee();                            // J'Eevee, the Imp in a Jar
+void AddSC_boss_Santi_elder();                      //boss_Santi_elder
 
 void AddScripts()
 {
@@ -513,4 +514,5 @@ void AddScripts()
     AddSC_winterspring();
 
     AddSC_npc_j_eevee();
+	AddSC_boss_Santi_elder();                               //boss_Santi_elder
 }
