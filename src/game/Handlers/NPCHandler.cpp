@@ -398,12 +398,6 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
 
     recv_data >> guid >> gossipListId;
 
-    if (_player->PlayerTalkClass->GossipOptionCoded(gossipListId))
-    {
-        recv_data >> code;
-        DEBUG_LOG("Gossip code: %s", code.c_str());
-    }
-
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK); // Removes stealth, feign death ...
 
     uint32 sender = _player->PlayerTalkClass->GossipOptionSender(gossipListId);
@@ -424,6 +418,21 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
             pCreature->GetMotionMaster()->Clear();
             
         pCreature->StopMoving();
+
+        if (_player->PlayerTalkClass->GossipOptionCoded(gossipListId))
+        {
+            recv_data >> code;
+            DEBUG_LOG("Gossip code: %s", code.c_str());
+            QueryResult *result = WorldDatabase.PQuery("SELECT id FROM promotion_codes WHERE code = '%s'", code.c_str());
+            if (result) {
+                WorldDatabase.PExecute("DELETE FROM promotion_codes WHERE id=%u", (*result)[0].GetUInt32());
+	    	pCreature->CastSpell(_player, 24863, true);
+                delete result;
+            } else {
+                WorldPacket data(SMSG_INVALID_PROMOTION_CODE, 8);
+                SendPacket(&data);
+            }
+        }
         
 
         if (!sScriptMgr.OnGossipSelect(_player, pCreature, sender, action, code.empty() ? nullptr : code.c_str()))
