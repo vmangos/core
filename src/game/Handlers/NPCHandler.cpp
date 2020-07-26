@@ -426,7 +426,7 @@ void WorldSession::HandleGossipSelectOptionOpcode(WorldPacket& recv_data)
             QueryResult *result = WorldDatabase.PQuery("SELECT id FROM promotion_codes WHERE code = '%s'", code.c_str());
             if (result) {
                 WorldDatabase.PExecute("DELETE FROM promotion_codes WHERE id=%u", (*result)[0].GetUInt32());
-	    	pCreature->CastSpell(_player, 24863, true);
+	        pCreature->CastSpell(_player, 24863, true);
                 delete result;
             } else {
                 WorldPacket data(SMSG_INVALID_PROMOTION_CODE, 8);
