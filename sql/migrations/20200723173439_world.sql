@@ -94,6 +94,10 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (4159, 3911, 10, 0, 0, 5, 0, 5875);
 
+-- correct recipes to meilosh
+INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
+(11557, 12117, 2400, 197, 230, 0, 0, 5875);
+
 
 -- End of migration.
 END IF;
