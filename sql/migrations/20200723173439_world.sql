@@ -8,7 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20200723173439');
 -- Add your query below.
 
-
+-- blacksmithing
 -- correct recipes to dane lindgren
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (957, 3341, 90, 164, 25, 0, 0, 5875);
@@ -83,6 +83,16 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (2836, 3345, 1000, 164, 110, 0, 0, 5875),
 (2836, 3516, 600, 164, 100, 0, 0, 5875),
 (2836, 19670, 600, 164, 100, 0, 0, 5875);
+
+
+-- tailoring
+-- correct recipes to mahani
+INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
+(3704, 3911, 10, 0, 0, 5, 0, 5875);
+
+-- correct recipes to me lynn
+INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
+(4159, 3911, 10, 0, 0, 5, 0, 5875);
 
 
 -- End of migration.
