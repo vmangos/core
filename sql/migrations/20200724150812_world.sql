@@ -9,6 +9,7 @@ INSERT INTO `migrations` VALUES ('20200724150812');
 -- Add your query below.
 
 
+-- enchanting
 -- correct recipes to teg dawnstrider
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (3011, 13623, 2250, 333, 150, 0, 0, 5875);
@@ -47,6 +48,10 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 (11072, 7429, 100, 333, 20, 0, 0, 5875),
 (11074, 7429, 100, 333, 20, 0, 0, 5875),
 (11073, 7429, 100, 333, 20, 0, 0, 5875);
+
+
+-- cooking
+DELETE FROM `npc_trainer` WHERE `entry` IN (1355, 1699, 5482) AND `spell` = 1290;
 
 
 -- End of migration.
