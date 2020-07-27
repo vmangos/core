@@ -1,5 +1,6 @@
 #include "Script_Base.h"
 #include "RobotConfig.h"
+#include "RobotAI.h"
 #include "MapManager.h"
 #include "Pet.h"
 #include "PetAI.h"
@@ -19,8 +20,8 @@ Script_Base::Script_Base(Player* pmMe)
 	characterType = 0;
 	petting = true;
 
-	float chaseDistanceMin = MIN_DISTANCE_GAP;
-	float chaseDistanceMax = MELEE_MIN_DISTANCE;
+	chaseDistanceMin = MIN_DISTANCE_GAP;
+	chaseDistanceMax = MELEE_MIN_DISTANCE;
 
 	rti = -1;
 }
@@ -370,55 +371,11 @@ bool Script_Base::Follow(Unit* pmTarget, float pmDistance)
 	{
 		return false;
 	}
-	if (me->IsNonMeleeSpellCasted(true, false, true))
+	if (me->IsNonMeleeSpellCasted(false, false, true))
 	{
 		return false;
 	}
-	float currentDistance = me->GetDistance(pmTarget);
-	if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == MovementGeneratorType::CHASE_MOTION_TYPE)
-	{
-		if (ChaseMovementGenerator<Player> const* mg = dynamic_cast<ChaseMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent()))
-		{
-			if (Unit* mgTarget = mg->GetTarget())
-			{
-				if (mgTarget->GetGUID() == pmTarget->GetGUID())
-				{
-					if (currentDistance > ATTACK_RANGE_LIMIT)
-					{
-						me->AttackStop();
-						me->StopMoving();
-						me->GetMotionMaster()->Clear();
-						ClearTarget();
-						return false;
-					}
-					if (me->GetTargetGuid() != pmTarget->GetObjectGuid())
-					{
-						ChooseTarget(pmTarget);
-					}
-					return true;
-				}
-			}
-		}
-	}
-	if (currentDistance > ATTACK_RANGE_LIMIT)
-	{
-		return false;
-	}
-	me->AttackStop();
-	me->StopMoving();
-	me->GetMotionMaster()->Clear();
-	ClearTarget();
-	if (me->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
-	{
-		me->SetStandState(UNIT_STAND_STATE_STAND);
-	}
-	if (me->IsWalking())
-	{
-		me->SetWalk(false);
-	}
-	ChooseTarget(pmTarget);
-	me->GetMotionMaster()->MoveChase(pmTarget, pmDistance);
-
+	me->rai->rm->Chase(pmTarget, pmDistance);
 	return true;
 }
 
@@ -428,78 +385,23 @@ bool Script_Base::Chase(Unit* pmTarget, float pmMaxDistance, float pmMinDistance
 	{
 		return false;
 	}
+	if (me->HasAuraType(SPELL_AURA_MOD_PACIFY))
+	{
+		return false;
+	}
+	if (me->HasUnitState(UnitState::UNIT_STAT_NOT_MOVE))
+	{
+		return false;
+	}
+	if (me->HasUnitState(UnitState::UNIT_STAT_ROAMING_MOVE))
+	{
+		return false;
+	}
 	if (me->IsNonMeleeSpellCasted(false, false, true))
 	{
 		return false;
 	}
-	if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == MovementGeneratorType::POINT_MOTION_TYPE)
-	{
-		return true;
-	}
-	float currentDistance = me->GetDistance(pmTarget);
-	if (pmMinDistance > INTERACTION_DISTANCE)
-	{
-		if (currentDistance < pmMinDistance)
-		{
-			if (pmTarget->GetTargetGuid() != me->GetObjectGuid())
-			{
-				me->AttackStop();
-				me->StopMoving();
-				me->GetMotionMaster()->Clear();
-				ClearTarget();
-
-				float destX = 0.0f;
-				float destY = 0.0f;
-				float destZ = 0.0f;
-				pmTarget->GetNearPoint(pmTarget, destX, destY, destZ, pmTarget->GetObjectBoundingRadius(), pmMinDistance + MELEE_MIN_DISTANCE, pmTarget->GetAngle(me));
-				me->GetMotionMaster()->MovePoint(0, destX, destY, destZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(pmTarget));
-				return true;
-			}
-		}
-	}
-	if (me->GetMotionMaster()->GetCurrentMovementGeneratorType() == MovementGeneratorType::CHASE_MOTION_TYPE)
-	{
-		if (ChaseMovementGenerator<Player> const* mg = dynamic_cast<ChaseMovementGenerator<Player> const*>(me->GetMotionMaster()->GetCurrent()))
-		{
-			if (Unit* mgTarget = mg->GetTarget())
-			{
-				if (mgTarget->GetGUID() == pmTarget->GetGUID())
-				{
-					if (currentDistance > ATTACK_RANGE_LIMIT)
-					{
-						me->AttackStop();
-						me->StopMoving();
-						me->GetMotionMaster()->Clear();
-						ClearTarget();
-						return false;
-					}
-					if (me->GetTargetGuid() != pmTarget->GetObjectGuid())
-					{
-						ChooseTarget(pmTarget);
-					}
-					return true;
-				}
-			}
-		}
-	}
-	if (currentDistance > ATTACK_RANGE_LIMIT)
-	{
-		return false;
-	}
-	me->AttackStop();
-	me->StopMoving();
-	me->GetMotionMaster()->Clear();
-	ClearTarget();
-	if (me->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
-	{
-		me->SetStandState(UNIT_STAND_STATE_STAND);
-	}
-	if (me->IsWalking())
-	{
-		me->SetWalk(false);
-	}
-	ChooseTarget(pmTarget);
-	me->GetMotionMaster()->MoveChase(pmTarget, pmMaxDistance);
+	me->rai->rm->Chase(pmTarget, pmMaxDistance, pmMinDistance);
 	return true;
 }
 
@@ -546,7 +448,7 @@ bool Script_Base::CastSpell(Unit* pmTarget, std::string pmSpellName, float pmDis
 	}
 	if (pmCheckAura)
 	{
-		if (HasAura(pmTarget, pmSpellName, pmOnlyMyAura))
+		if (sRobotManager->HasAura(pmTarget, pmSpellName, me))
 		{
 			return false;
 		}
@@ -617,106 +519,6 @@ bool Script_Base::CastSpell(Unit* pmTarget, std::string pmSpellName, float pmDis
 	}
 
 	return false;
-}
-
-bool Script_Base::HasAura(Unit* pmTarget, std::string pmSpellName, bool pmOnlyMyAura)
-{
-	if (!me)
-	{
-		return false;
-	}
-	Unit* target = pmTarget;
-	if (!pmTarget)
-	{
-		target = me;
-	}
-	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
-	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
-	{
-		uint32 spellID = *it;
-		if (pmOnlyMyAura)
-		{
-			if (target->HasCasterAura(spellID, me->GetGUID()))
-			{
-				return true;
-			}
-		}
-		else
-		{
-			if (target->HasAura(spellID))
-			{
-				return true;
-			}
-		}
-	}
-
-	return false;
-}
-
-uint32 Script_Base::GetAuraDuration(Unit* pmTarget, std::string pmSpellName, bool pmOnlyMyAura)
-{
-	uint32 duration = 0;
-	if (!me)
-	{
-		return false;
-	}
-	Unit* target = pmTarget;
-	if (!pmTarget)
-	{
-		target = me;
-	}
-	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
-	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
-	{
-		uint32 spellID = *it;
-		if (pmOnlyMyAura)
-		{
-			duration = target->GetAuraDuration(spellID, me->GetObjectGuid());
-		}
-		else
-		{
-			duration = target->GetAuraDuration(spellID);
-		}
-		if (duration > 0)
-		{
-			break;
-		}
-	}
-
-	return duration;
-}
-
-uint32 Script_Base::GetAuraStack(Unit* pmTarget, std::string pmSpellName, bool pmOnlyMyAura)
-{
-	uint32 auraCount = 0;
-	if (!me)
-	{
-		return false;
-	}
-	Unit* target = pmTarget;
-	if (!pmTarget)
-	{
-		target = me;
-	}
-	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
-	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
-	{
-		uint32 spellID = *it;
-		if (pmOnlyMyAura)
-		{
-			auraCount = target->GetAuraStack(spellID, me->GetObjectGuid());
-		}
-		else
-		{
-			auraCount = target->GetAuraStack(spellID);
-		}
-		if (auraCount > 0)
-		{
-			break;
-		}
-	}
-
-	return auraCount;
 }
 
 void Script_Base::ClearShapeshift()
@@ -816,7 +618,7 @@ void Script_Base::CancelAura(uint32 pmSpellID)
 	}
 }
 
-bool Script_Base::Rest()
+bool Script_Base::Eat()
 {
 	bool result = false;
 
@@ -849,6 +651,40 @@ bool Script_Base::Rest()
 	{
 		return false;
 	}
+	if (!me->HasItemCount(foodEntry, 1))
+	{
+		me->StoreNewItemInBestSlots(foodEntry, 20);
+	}
+
+	me->CombatStop(true);
+	me->GetMotionMaster()->Clear();
+	me->StopMoving();
+	ClearTarget();
+
+	Item* pFood = GetItemInInventory(foodEntry);
+	if (pFood && !pFood->IsInTrade())
+	{
+		if (UseItem(pFood, me))
+		{
+			result = true;
+		}
+	}
+
+	return result;
+}
+
+bool Script_Base::Drink()
+{
+	bool result = false;
+
+	if (!me)
+	{
+		return false;
+	}
+	if (me->IsInCombat())
+	{
+		return false;
+	}
 	uint32 drinkEntry = 0;
 	if (me->GetLevel() >= 45)
 	{
@@ -871,39 +707,19 @@ bool Script_Base::Rest()
 		drinkEntry = 1205;
 	}
 
-	if (!me->HasItemCount(foodEntry, 1))
-	{
-		me->StoreNewItemInBestSlots(foodEntry, 20);
-	}
 	if (!me->HasItemCount(drinkEntry, 1))
 	{
 		me->StoreNewItemInBestSlots(drinkEntry, 20);
 	}
-
 	me->CombatStop(true);
 	me->GetMotionMaster()->Clear();
 	me->StopMoving();
 	ClearTarget();
-
-	Item* pFood = GetItemInInventory(foodEntry);
-	if (pFood && !pFood->IsInTrade())
-	{
-		if (UseItem(pFood, me))
-		{
-			//std::ostringstream useRemarksStream;
-			//useRemarksStream << "Use item " << pFood->GetTemplate()->Name1;
-			//me->Say(useRemarksStream.str(), Language::LANG_UNIVERSAL);
-			result = true;
-		}
-	}
 	Item* pDrink = GetItemInInventory(drinkEntry);
 	if (pDrink && !pDrink->IsInTrade())
 	{
 		if (UseItem(pDrink, me))
 		{
-			//std::ostringstream useRemarksStream;
-			//useRemarksStream << "Use item " << pDrink->GetTemplate()->Name1;
-			//me->Say(useRemarksStream.str(), Language::LANG_UNIVERSAL);
 			result = true;
 		}
 	}

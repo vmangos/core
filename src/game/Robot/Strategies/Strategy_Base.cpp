@@ -13,7 +13,8 @@ Strategy_Base::Strategy_Base(Player* pmMe)
 {
     me = pmMe;
     engageTarget = NULL;
-    restDelay = 0;
+    eatDelay = 0;
+    drinkDelay = 0;
     engageDelay = 0;
 
     switch (me->GetClass())
@@ -61,6 +62,11 @@ Strategy_Base::Strategy_Base(Player* pmMe)
     case Classes::CLASS_DRUID:
     {
         sb = new Script_Druid(me);
+        break;
+    }
+    default:
+    {
+        sb = new Script_Base(me);
         break;
     }
     }

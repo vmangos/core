@@ -253,7 +253,7 @@ void Strategy_Group_MoltenCore::Update(uint32 pmDiff)
 		bool groupInCombat = GroupInCombat();
 		if (groupInCombat)
 		{
-			restDelay = 0;
+			eatDelay = 0;
 			combatTime += pmDiff;
 		}
 		else
@@ -388,9 +388,9 @@ void Strategy_Group_MoltenCore::Update(uint32 pmDiff)
 		}
 		else
 		{
-			if (restDelay > 0)
+			if (eatDelay > 0)
 			{
-				restDelay -= pmDiff;
+				eatDelay -= pmDiff;
 				return;
 			}
 			switch (me->groupRole)
@@ -493,7 +493,7 @@ bool Strategy_Group_MoltenCore::DPS()
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-						me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(magmadar));
+						me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(magmadar));
 						return true;
 					}
 					if (sb->DPS(magmadar, false))
@@ -520,10 +520,10 @@ bool Strategy_Group_MoltenCore::DPS()
 		{
 			if (combatTime > dpsDelay)
 			{
-				if (Player* mainTank = GetMainTank())
-				{
-					return sb->DPS(mainTank->GetSelectedUnit(), true);
-				}
+				//if (Player* mainTank = GetMainTank())
+				//{
+				//	return sb->DPS(mainTank->GetSelectedUnit(), true);
+				//}
 			}
 		}
 		if (Unit* geddon = myGroup->GetGroupAttacker(CreatureEntry_RobotStrategy::CreatureEntry_Strategy_Baron_Geddon))
@@ -547,7 +547,7 @@ bool Strategy_Group_MoltenCore::DPS()
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-					me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(geddon));
+					me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(geddon));
 				}
 				return true;
 			}
@@ -621,7 +621,7 @@ bool Strategy_Group_MoltenCore::DPS()
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-					me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(rag));
+					me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(rag));
 					return true;
 				}
 				return sb->DPS(rag, false);
@@ -652,7 +652,7 @@ bool Strategy_Group_MoltenCore::Tank()
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-						me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(magmadar));
+						me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(magmadar));
 						return true;
 					}
 					if (sb->Tank(magmadar, false))
@@ -674,7 +674,7 @@ bool Strategy_Group_MoltenCore::Tank()
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-						me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(magmadar));
+						me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(magmadar));
 						return true;
 					}
 					if (sb->DPS(magmadar, false))
@@ -728,10 +728,10 @@ bool Strategy_Group_MoltenCore::Tank()
 			{
 				if (combatTime > dpsDelay)
 				{
-					if (Player* mainTank = GetMainTank())
-					{
-						return sb->DPS(mainTank->GetSelectedUnit());
-					}
+					//if (Player* mainTank = GetMainTank())
+					//{
+					//	return sb->DPS(mainTank->GetSelectedUnit());
+					//}
 				}
 			}
 		}
@@ -755,7 +755,7 @@ bool Strategy_Group_MoltenCore::Tank()
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-					me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(geddon));
+					me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(geddon));
 				}
 				return true;
 			}
@@ -808,7 +808,7 @@ bool Strategy_Group_MoltenCore::Tank()
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 						me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-						me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(golemagg));
+						me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(golemagg));
 						return true;
 					}
 					if (Creature* myHound = me->GetMap()->GetCreature(me->GetTargetGuid()))
@@ -979,7 +979,7 @@ bool Strategy_Group_MoltenCore::Tank()
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-									me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(majordomo));
+									me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(majordomo));
 									return true;
 								}
 							}
@@ -1045,7 +1045,7 @@ bool Strategy_Group_MoltenCore::Tank()
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-				me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(rag));
+				me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(rag));
 				return true;
 			}
 			if (me->groupRole == GroupRole_MoltenCore::GroupRole_MoltenCore_Tank1)
@@ -1129,7 +1129,7 @@ bool Strategy_Group_MoltenCore::Heal()
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-					me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(geddon));
+					me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(geddon));
 					return true;
 				}
 			}
@@ -1200,7 +1200,7 @@ bool Strategy_Group_MoltenCore::Heal()
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-				me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(rag));
+				me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(rag));
 				return true;
 			}
 		}
@@ -1227,29 +1227,29 @@ bool Strategy_Group_MoltenCore::Heal()
 				myGroup->SetTargetIcon(6, ObjectGuid());
 				return false;
 			}
-			if (Player* mainTank = GetMainTank())
-			{
-				if (mainTank->GetHealthPercent() < 90.0f)
-				{
-					if (sb->Heal(mainTank, cure))
-					{
-						return true;
-					}
-				}
-			}
+			//if (Player* mainTank = GetMainTank())
+			//{
+			//	if (mainTank->GetHealthPercent() < 90.0f)
+			//	{
+			//		if (sb->Heal(mainTank, cure))
+			//		{
+			//			return true;
+			//		}
+			//	}
+			//}
 		}
 		else
 		{
-			if (Player* mainTank = GetMainTank())
-			{
-				if (mainTank->GetHealthPercent() < 90.0f)
-				{
-					if (sb->SubHeal(mainTank))
-					{
-						return true;
-					}
-				}
-			}
+			//if (Player* mainTank = GetMainTank())
+			//{
+			//	if (mainTank->GetHealthPercent() < 90.0f)
+			//	{
+			//		if (sb->SubHeal(mainTank))
+			//		{
+			//			return true;
+			//		}
+			//	}
+			//}
 			for (GroupReference* groupRef = myGroup->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
 			{
 				if (Player* member = groupRef->getSource())
@@ -1274,24 +1274,4 @@ bool Strategy_Group_MoltenCore::Heal()
 	}
 
 	return false;
-}
-
-Player* Strategy_Group_MoltenCore::GetMainTank()
-{
-	if (Player* tank1 = GetPlayerByGroupRole(GroupRole_MoltenCore::GroupRole_MoltenCore_Tank1))
-	{
-		if (tank1->IsAlive())
-		{
-			return tank1;
-		}
-	}
-	if (Player* tank2 = GetPlayerByGroupRole(GroupRole_MoltenCore::GroupRole_MoltenCore_Tank2))
-	{
-		if (tank2->IsAlive())
-		{
-			return tank2;
-		}
-	}
-
-	return NULL;
 }

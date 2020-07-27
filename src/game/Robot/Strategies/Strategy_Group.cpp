@@ -22,7 +22,8 @@ void Strategy_Group::Reset()
 	engageDelay = 0;
 	combatTime = 0;
 	teleportAssembleDelay = 0;
-	restDelay = 0;
+	eatDelay = 0;
+	drinkDelay = 0;
 	readyCheckDelay = 0;
 	staying = false;
 	holding = false;
@@ -86,7 +87,8 @@ void Strategy_Group::InitialStrategy()
 {
 	combatTime = 0;
 	teleportAssembleDelay = 0;
-	restDelay = 0;
+	eatDelay = 0;
+	drinkDelay = 0;
 	readyCheckDelay = 0;
 	dpsDelay = sRobotConfig.DPSDelay;
 	staying = false;
@@ -260,18 +262,26 @@ bool Strategy_Group::Update0(uint32 pmDiff)
 						me->GetThreatManager().clearReferences();
 						me->ClearInCombat();
 						sb->ClearTarget();
-						if (Map* leaderMap = leaderPlayer->GetMap())
+						if (leaderPlayer->GetMapId() != me->GetMapId())
 						{
-							if (leaderMap->CanEnter(me))
+							canTeleport = false;
+							if (Map* leaderMap = leaderPlayer->GetMap())
 							{
-								me->TeleportTo(leaderPlayer->GetMapId(), leaderPlayer->GetPositionX(), leaderPlayer->GetPositionY(), leaderPlayer->GetPositionZ(), leaderPlayer->GetOrientation());
-								sRobotManager->WhisperTo(me, "I have come", Language::LANG_UNIVERSAL, leaderPlayer);
-								return false;
+								if (leaderMap->CanEnter(me))
+								{
+									canTeleport = true;
+								}
 							}
-							else
-							{
-								sRobotManager->WhisperTo(me, "I can not come to you", Language::LANG_UNIVERSAL, leaderPlayer);
-							}
+						}
+						if (canTeleport)
+						{
+							me->TeleportTo(leaderPlayer->GetMapId(), leaderPlayer->GetPositionX(), leaderPlayer->GetPositionY(), leaderPlayer->GetPositionZ(), leaderPlayer->GetOrientation());
+							sRobotManager->WhisperTo(me, "I have come", Language::LANG_UNIVERSAL, leaderPlayer);
+							return false;
+						}
+						else
+						{
+							sRobotManager->WhisperTo(me, "I can not come to you", Language::LANG_UNIVERSAL, leaderPlayer);
 						}
 					}
 				}
@@ -298,7 +308,8 @@ void Strategy_Group::Update(uint32 pmDiff)
 		bool groupInCombat = GroupInCombat();
 		if (groupInCombat)
 		{
-			restDelay = 0;
+			eatDelay = 0;
+			drinkDelay = 0;
 			combatTime += pmDiff;
 		}
 		else
@@ -406,9 +417,17 @@ void Strategy_Group::Update(uint32 pmDiff)
 		}
 		else
 		{
-			if (restDelay > 0)
+			if (eatDelay > 0)
 			{
-				restDelay -= pmDiff;
+				eatDelay -= pmDiff;
+				if (drinkDelay > 0)
+				{
+					drinkDelay -= pmDiff;
+					if (drinkDelay <= 0)
+					{
+						sb->Drink();
+					}
+				}
 				return;
 			}
 			switch (me->groupRole)
@@ -575,48 +594,6 @@ std::unordered_set<ObjectGuid> Strategy_Group::GetPlayerGUIDSetByGroupRoleSet(st
 	return resultSet;
 }
 
-Player* Strategy_Group::GetMainTank()
-{
-	if (!me)
-	{
-		return NULL;
-	}
-	switch (me->groupRole)
-	{
-	case GroupRole::GroupRole_Tank:
-	{
-		return me;
-	}
-	default:
-	{
-		if (Group* myGroup = me->GetGroup())
-		{
-			for (GroupReference* groupRef = myGroup->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
-			{
-				if (Player* member = groupRef->getSource())
-				{
-					if (member->IsAlive())
-					{
-						if (member->groupRole == GroupRole::GroupRole_Tank)
-						{
-							return member;
-						}
-					}
-				}
-			}
-		}
-		break;
-	}
-	}
-
-	return NULL;
-}
-
-Player* Strategy_Group::GetSubTank()
-{
-	return NULL;
-}
-
 bool Strategy_Group::Engage(Unit* pmTarget)
 {
 	if (!me)
@@ -658,30 +635,87 @@ bool Strategy_Group::DPS()
 	}
 	if (combatTime > dpsDelay)
 	{
-		if (sb->DPS(me->GetSelectedUnit(), Chasing()))
-		{
-			return true;
-		}
-		Unit* closestVictim = NULL;
-		float closestDistance = ATTACK_RANGE_LIMIT;
 		if (Group* myGroup = me->GetGroup())
 		{
-			for (std::unordered_map<ObjectGuid, Unit*>::iterator gaIT = myGroup->groupAttackersMap.begin(); gaIT != myGroup->groupAttackersMap.end(); gaIT++)
+			Player* tank = NULL;
+			for (GroupReference* groupRef = myGroup->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
 			{
-				if (Unit* eachAttacker = gaIT->second)
+				if (Player* member = groupRef->getSource())
 				{
-					float eachAttackerDistance = me->GetDistance(eachAttacker);
-					if (eachAttackerDistance < closestDistance)
+					if (member->IsAlive())
 					{
-						closestVictim = eachAttacker;
-						closestDistance = eachAttackerDistance;
+						if (member->groupRole == GroupRole::GroupRole_Tank)
+						{
+							if (me->GetDistance(member) < ATTACK_RANGE_LIMIT)
+							{
+								tank = member;
+								break;
+							}
+						}
 					}
 				}
 			}
-		}
-		if (sb->DPS(closestVictim, Chasing()))
-		{
-			return true;
+			if (tank)
+			{
+				if (Unit* rtiUnit = ObjectAccessor::GetUnit(*me, myGroup->GetOGByTargetIcon(7)))
+				{
+					if (rtiUnit->IsAlive())
+					{
+						if (sRobotManager->TankThreatOK(tank, rtiUnit))
+						{
+							if (sb->DPS(rtiUnit, Chasing()))
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+			else
+			{
+				if (Unit* myTarget = me->GetSelectedUnit())
+				{
+					if (!sRobotManager->HasAura(myTarget, "Polymorph"))
+					{
+						if (sb->DPS(myTarget, Chasing()))
+						{
+							return true;
+						}
+					}
+				}
+				Unit* lowestAttacker = NULL;
+				uint32 lowestHP = 0;
+				for (std::unordered_map<ObjectGuid, Unit*>::iterator gaIT = myGroup->groupAttackersMap.begin(); gaIT != myGroup->groupAttackersMap.end(); gaIT++)
+				{
+					if (Unit* eachAttacker = gaIT->second)
+					{
+						if (me->GetDistance(eachAttacker) < INTERACTION_DISTANCE)
+						{
+							if (!sRobotManager->HasAura(eachAttacker, "Polymorph"))
+							{
+								uint32 eachHealth = eachAttacker->GetHealth();
+								if (!lowestAttacker)
+								{
+									lowestAttacker = eachAttacker;
+									lowestHP = eachHealth;
+								}
+								else
+								{
+									if (eachHealth < lowestHP)
+									{
+										lowestAttacker = eachAttacker;
+										lowestHP = eachHealth;
+									}
+								}
+							}
+						}
+					}
+				}
+				if (sb->DPS(lowestAttacker, Chasing()))
+				{
+					return true;
+				}
+			}
 		}
 	}
 
@@ -698,69 +732,134 @@ bool Strategy_Group::Tank()
 	{
 		return false;
 	}
-	if (Player* mainTank = GetMainTank())
+	if (Group* myGroup = me->GetGroup())
 	{
-		if (mainTank->GetGUID() != me->GetGUID())
+		// 1 check ot 
+		if (Unit* rtiUnit = ObjectAccessor::GetUnit(*me, myGroup->GetOGByTargetIcon(7)))
 		{
-			return DPS();
-		}
-	}
-	if (Unit* myTarget = me->GetSelectedUnit())
-	{
-		if (me->IsValidAttackTarget(myTarget))
-		{
-			if (myTarget->GetTargetGuid() != me->GetObjectGuid())
+			if (rtiUnit->IsAlive())
 			{
-				if (me->GetDistance(myTarget) < RANGED_MAX_DISTANCE)
+				if (rtiUnit->GetTargetGuid() != me->GetObjectGuid())
 				{
-					sb->Taunt(myTarget);
-					if (sb->Tank(myTarget, Chasing()))
+					if (sb->Tank(rtiUnit, Chasing()))
+					{
+						sb->Taunt(rtiUnit);
+						return true;
+					}
+				}
+			}
+		}
+		for (std::unordered_map<ObjectGuid, Unit*>::iterator gaIT = myGroup->groupAttackersMap.begin(); gaIT != myGroup->groupAttackersMap.end(); gaIT++)
+		{
+			if (Unit* eachAttacker = gaIT->second)
+			{
+				if (eachAttacker->GetTargetGuid() != me->GetObjectGuid())
+				{
+					if (!sRobotManager->HasAura(eachAttacker, "Polymorph"))
+					{
+						if (sb->Tank(eachAttacker, Chasing()))
+						{
+							sb->Taunt(eachAttacker);
+							myGroup->SetTargetIcon(7, eachAttacker->GetObjectGuid());
+							return true;
+						}
+					}
+				}
+			}
+		}
+		// 2 check threat
+		if (Unit* rtiUnit = ObjectAccessor::GetUnit(*me, myGroup->GetOGByTargetIcon(7)))
+		{
+			if (rtiUnit->IsAlive())
+			{
+				if (!sRobotManager->TankThreatOK(me, rtiUnit))
+				{
+					if (sb->Tank(rtiUnit, Chasing()))
 					{
 						return true;
 					}
 				}
 			}
 		}
-	}
-	Unit* closestVictim = NULL;
-	float closestDistance = ATTACK_RANGE_LIMIT;
-	if (Group* myGroup = me->GetGroup())
-	{
 		for (std::unordered_map<ObjectGuid, Unit*>::iterator gaIT = myGroup->groupAttackersMap.begin(); gaIT != myGroup->groupAttackersMap.end(); gaIT++)
 		{
 			if (Unit* eachAttacker = gaIT->second)
 			{
-				// tank can only cover 30.0f range
-				if (me->GetDistance(eachAttacker) < RANGED_MAX_DISTANCE)
+				if (!sRobotManager->HasAura(eachAttacker, "Polymorph"))
 				{
-					if (eachAttacker->GetTargetGuid() != me->GetObjectGuid())
+					if (!sRobotManager->TankThreatOK(me, eachAttacker))
 					{
-						sb->Taunt(eachAttacker);
 						if (sb->Tank(eachAttacker, Chasing()))
 						{
+							myGroup->SetTargetIcon(7, eachAttacker->GetObjectGuid());
 							return true;
 						}
-					}
-					float eachAttackerDistance = me->GetDistance(eachAttacker);
-					if (eachAttackerDistance < closestDistance)
-					{
-						closestVictim = eachAttacker;
-						closestDistance = eachAttackerDistance;
 					}
 				}
 			}
 		}
-	}
-	if (Unit* myTarget = me->GetSelectedUnit())
-	{
-		if (sb->Tank(myTarget, Chasing()))
+		// 3 check lowest 
+		ObjectGuid rtiOG = ObjectGuid();
+		uint32 rtiHP = 0;
+		ObjectGuid lowestOG = ObjectGuid();
+		uint32 lowestHP = 0;
+		if (Unit* rtiUnit = ObjectAccessor::GetUnit(*me, myGroup->GetOGByTargetIcon(7)))
 		{
-			return true;
+			if (rtiUnit->IsAlive())
+			{
+				rtiOG = rtiUnit->GetObjectGuid();
+				rtiHP = rtiUnit->GetHealth();
+			}
 		}
-	}
-	if (sb->Tank(closestVictim, Chasing()))
-	{
-		return true;
+		for (std::unordered_map<ObjectGuid, Unit*>::iterator gaIT = myGroup->groupAttackersMap.begin(); gaIT != myGroup->groupAttackersMap.end(); gaIT++)
+		{
+			if (Unit* eachAttacker = gaIT->second)
+			{
+				if (me->GetDistance(eachAttacker) < INTERACTION_DISTANCE)
+				{
+					if (!sRobotManager->HasAura(eachAttacker, "Polymorph"))
+					{
+						ObjectGuid eachOG = eachAttacker->GetObjectGuid();
+						uint32 eachHealth = eachAttacker->GetHealth();
+						if (lowestOG.IsEmpty())
+						{
+							lowestOG = eachOG;
+							lowestHP = eachHealth;
+						}
+						else
+						{
+							if (eachHealth < lowestHP)
+							{
+								lowestHP = eachHealth;
+								lowestOG = eachOG;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (!lowestOG.IsEmpty())
+		{
+			if (rtiOG.IsEmpty())
+			{
+				myGroup->SetTargetIcon(7, lowestOG);
+			}
+			else if (lowestHP < rtiHP)
+			{
+				myGroup->SetTargetIcon(7, lowestOG);
+			}
+		}
+		// 4 attack X target 
+		if (Unit* rtiUnit = ObjectAccessor::GetUnit(*me, myGroup->GetOGByTargetIcon(7)))
+		{
+			if (rtiUnit->IsAlive())
+			{
+				if (sb->Tank(rtiUnit, Chasing()))
+				{
+					return true;
+				}
+			}
+		}
 	}
 
 	return false;
@@ -813,9 +912,10 @@ bool Strategy_Group::Rest()
 	}
 	if (canTry)
 	{
-		if (sb->Rest())
+		if (sb->Eat())
 		{
-			restDelay = DEFAULT_REST_DELAY;
+			eatDelay = DEFAULT_REST_DELAY;
+			drinkDelay = 1000;
 			return true;
 		}
 	}
@@ -837,17 +937,22 @@ bool Strategy_Group::Heal()
 	{
 		int lowMemberCount = 0;
 		uint8 mySubGroup = me->GetSubGroup();
+		Player* mainTank = NULL;
 		for (GroupReference* groupRef = myGroup->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
 		{
 			if (Player* member = groupRef->getSource())
 			{
 				if (member->IsAlive())
 				{
+					if (member->groupRole == GroupRole::GroupRole_Tank)
+					{
+						mainTank = member;
+					}
 					if (member->GetSubGroup() == mySubGroup)
 					{
 						if (member->GetHealthPercent() < 60.0f)
 						{
-							if (me->GetDistance(member) < RANGED_MAX_DISTANCE)
+							if (me->GetDistance(member) < RANGED_FAR_DISTANCE)
 							{
 								lowMemberCount++;
 							}
@@ -863,7 +968,7 @@ bool Strategy_Group::Heal()
 				return true;
 			}
 		}
-		if (Player* mainTank = GetMainTank())
+		if (mainTank)
 		{
 			if (mainTank->GetHealthPercent() < 90.0f)
 			{
@@ -939,23 +1044,36 @@ bool Strategy_Group::Follow()
 	{
 		return false;
 	}
-	if (Player* mainTank = GetMainTank())
+	if (Group* myGroup = me->GetGroup())
 	{
-		if (mainTank->GetGUID() != me->GetGUID())
+		if (me->groupRole != GroupRole::GroupRole_Tank)
 		{
-			if (sb->Follow(mainTank, followDistance))
+			for (GroupReference* groupRef = myGroup->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
+			{
+				if (Player* member = groupRef->getSource())
+				{
+					if (member->IsAlive())
+					{
+						if (member->groupRole == GroupRole::GroupRole_Tank)
+						{
+							if (sb->Follow(member, followDistance))
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (Player* leader = ObjectAccessor::FindPlayer(myGroup->GetLeaderGuid()))
+		{
+			if (sb->Follow(leader, followDistance))
 			{
 				return true;
 			}
 		}
 	}
-	if (Group* myGroup = me->GetGroup())
-	{
-		if (Player* leader = ObjectAccessor::FindPlayer(myGroup->GetLeaderGuid()))
-		{
-			return sb->Follow(leader, followDistance);
-		}
-	}
+
 	return false;
 }
 

@@ -71,8 +71,6 @@ public:
 
     virtual bool Engage(Unit* pmTarget);
     virtual bool DPS();
-    virtual Player* GetMainTank();
-    virtual Player* GetSubTank();
     virtual bool Tank();
     virtual bool Tank(Unit* pmTarget);
     virtual bool Rest();

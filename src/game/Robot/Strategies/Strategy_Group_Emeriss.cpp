@@ -395,7 +395,7 @@ void Strategy_Group_Emeriss::Update(uint32 pmDiff)
 		bool groupInCombat = GroupInCombat();
 		if (groupInCombat)
 		{
-			restDelay = 0;
+			eatDelay = 0;
 			combatTime += pmDiff;
 		}
 		else
@@ -706,9 +706,9 @@ void Strategy_Group_Emeriss::Update(uint32 pmDiff)
 		}
 		else
 		{
-			if (restDelay > 0)
+			if (eatDelay > 0)
 			{
-				restDelay -= pmDiff;
+				eatDelay -= pmDiff;
 				return;
 			}
 			switch (me->groupRole)
@@ -1010,7 +1010,7 @@ bool Strategy_Group_Emeriss::DPS()
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-					me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+					me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 				}
 				else if (attacking)
 				{
@@ -1124,7 +1124,7 @@ bool Strategy_Group_Emeriss::Tank()
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-					me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+					me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 				}
 				else if (tanking)
 				{
@@ -1295,7 +1295,7 @@ bool Strategy_Group_Emeriss::Heal()
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-				me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+				me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 			}
 			else if (healing)
 			{

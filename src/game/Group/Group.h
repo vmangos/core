@@ -205,6 +205,7 @@ class Group
         uint32 groupStrategyIndex;
 
         // EJ group attackers
+        void UpdateGroupAttackers();
         std::unordered_map<ObjectGuid, Unit*> groupAttackersMap;
         std::unordered_map<ObjectGuid, Unit*> GetGroupAttackers(uint32 pmCreatureEntry);
         Unit* GetGroupAttacker(uint32 pmCreatureEntry);

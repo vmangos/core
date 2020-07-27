@@ -1450,48 +1450,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         if (myGroup->GetLeaderGuid() == GetObjectGuid())
         {
             // EJ group updates
-            myGroup->groupAttackersMap.clear();
-            for (GroupReference* groupRef = myGroup->GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
-            {
-                if (Player* member = groupRef->getSource())
-                {
-                    if (member->IsAlive())
-                    {
-                        for (Unit::AttackerSet::const_iterator attackerIT = member->GetAttackers().begin(); attackerIT != member->GetAttackers().end(); ++attackerIT)
-                        {
-                            if (Unit* eachAttacker = *attackerIT)
-                            {
-                                if (eachAttacker->IsAlive())
-                                {
-                                    if (myGroup->groupAttackersMap.find(eachAttacker->GetGUID()) == myGroup->groupAttackersMap.end())
-                                    {
-                                        myGroup->groupAttackersMap[eachAttacker->GetGUID()] = eachAttacker;
-                                    }
-                                }
-                            }
-                        }
-                        if (Pet* memberPet = member->GetPet())
-                        {
-                            if (memberPet->IsAlive())
-                            {
-                                for (Unit::AttackerSet::const_iterator attackerIT = memberPet->GetAttackers().begin(); attackerIT != memberPet->GetAttackers().end(); ++attackerIT)
-                                {
-                                    if (Unit* eachAttacker = *attackerIT)
-                                    {
-                                        if (eachAttacker->IsAlive())
-                                        {
-                                            if (myGroup->groupAttackersMap.find(eachAttacker->GetGUID()) == myGroup->groupAttackersMap.end())
-                                            {
-                                                myGroup->groupAttackersMap[eachAttacker->GetGUID()] = eachAttacker;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            myGroup->UpdateGroupAttackers();
         }
     }
 }

@@ -3297,7 +3297,7 @@ void RobotManager::HandlePlayerSay(Player* pmPlayer, std::string pmContent)
 			float newY = 0.0f;
 			float newZ = 0.0f;
 			targetUnit->GetNearPoint(targetUnit, newX, newY, newZ, targetUnit->GetObjectBoundingRadius(), distance, angle);
-			pmPlayer->GetMotionMaster()->MovePoint(0, newX, newY, newZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, pmPlayer->GetAngle(targetUnit));
+			pmPlayer->GetMotionMaster()->MovePoint(1, newX, newY, newZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, pmPlayer->GetAngle(targetUnit));
 			replyStream << "Going to near point";
 		}
 		else
@@ -3332,7 +3332,7 @@ void RobotManager::HandlePlayerSay(Player* pmPlayer, std::string pmContent)
 			newY = tp.y + (pmPlayer->GetCombatReach() + distance) * std::sin(angle);
 			newZ = tp.z + 10.0f;
 			pmPlayer->UpdateAllowedPositionZ(newX, newY, newZ);
-			pmPlayer->GetMotionMaster()->MovePoint(0, newX, newY, newZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, pmPlayer->GetAngle(targetUnit));
+			pmPlayer->GetMotionMaster()->MovePoint(1, newX, newY, newZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, pmPlayer->GetAngle(targetUnit));
 			replyStream << "Going to near point";
 		}
 		else
@@ -3468,7 +3468,7 @@ void RobotManager::HandlePlayerSay(Player* pmPlayer, std::string pmContent)
 			float destX = 0;
 			float destY = 0;
 			float destZ = 0;
-			targetUnit->GetNearPoint(pmPlayer, destX, destY, destZ, pmPlayer->GetObjectBoundingRadius(), distance, M_PI / 4 + targetUnit->GetAngle(pmPlayer));
+			targetUnit->GetNearPoint(targetUnit, destX, destY, destZ, targetUnit->GetObjectBoundingRadius(), distance, M_PI / 4 + targetUnit->GetAngle(pmPlayer));
 			pmPlayer->GetMotionMaster()->MovePoint(1, destX, destY, destZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, pmPlayer->GetAngle(targetUnit));
 			sWorld.SendServerMessage(ServerMessageType::SERVER_MSG_CUSTOM, "Move side", pmPlayer);
 		}
@@ -3562,7 +3562,7 @@ void RobotManager::HandlePacket(WorldSession* pmSession, WorldPacket pmPacket)
 						me->GetSession()->HandleGroupDeclineOpcode(p);
 						std::ostringstream timeLeftStream;
 						timeLeftStream << "Not interested. I will reconsider in " << rs->interestsDelay / 1000 << " seconds";
-						WhisperTo(me, timeLeftStream.str(), Language::LANG_UNIVERSAL, inviter);
+						WhisperTo(inviter, timeLeftStream.str(), Language::LANG_UNIVERSAL, me);
 					}
 					else
 					{
@@ -3572,7 +3572,7 @@ void RobotManager::HandlePacket(WorldSession* pmSession, WorldPacket pmPacket)
 							me->GetSession()->HandleGroupDeclineOpcode(p);
 							std::ostringstream timeLeftStream;
 							timeLeftStream << "Your level is low.";
-							WhisperTo(me, timeLeftStream.str(), Language::LANG_UNIVERSAL, inviter);
+							WhisperTo(inviter, timeLeftStream.str(), Language::LANG_UNIVERSAL, me);
 						}
 						else
 						{
@@ -3594,7 +3594,7 @@ void RobotManager::HandlePacket(WorldSession* pmSession, WorldPacket pmPacket)
 								std::ostringstream replyStream_Talent;
 								uint32 characterTalentTab = me->GetMaxTalentCountTab();
 								replyStream_Talent << "My talent category is " << characterTalentTabNameMap[me->GetClass()][characterTalentTab];
-								WhisperTo(me, replyStream_Talent.str(), Language::LANG_UNIVERSAL, inviter);
+								WhisperTo(inviter, replyStream_Talent.str(), Language::LANG_UNIVERSAL, me);
 								break;
 							}
 							else
@@ -3604,7 +3604,7 @@ void RobotManager::HandlePacket(WorldSession* pmSession, WorldPacket pmPacket)
 								me->GetSession()->HandleGroupDeclineOpcode(p);
 								std::ostringstream timeLeftStream;
 								timeLeftStream << "Not interested. I will reconsider in " << rs->interestsDelay / 1000 << " seconds";
-								WhisperTo(me, timeLeftStream.str(), Language::LANG_UNIVERSAL, inviter);
+								WhisperTo(inviter, timeLeftStream.str(), Language::LANG_UNIVERSAL, me);
 								break;
 							}
 						}
@@ -3700,7 +3700,7 @@ void RobotManager::HandlePacket(WorldSession* pmSession, WorldPacket pmPacket)
 					break;
 				}
 				me->DuelComplete(DuelCompleteType::DUEL_INTERRUPTED);
-				WhisperTo(me, "Not interested", Language::LANG_UNIVERSAL, me->duel->opponent);
+				WhisperTo(me->duel->opponent, "Not interested", Language::LANG_UNIVERSAL, me);
 				break;
 			}
 			default:
@@ -3712,12 +3712,12 @@ void RobotManager::HandlePacket(WorldSession* pmSession, WorldPacket pmPacket)
 	}
 }
 
-void RobotManager::WhisperTo(Player* pmSender, std::string pmContent, Language pmLanguage, Player* pmTarget)
+void RobotManager::WhisperTo(Player* pmTarget, std::string pmContent, Language pmLanguage, Player* pmSender)
 {
 	if (pmSender && pmTarget)
 	{
 		WorldPacket data;
-		ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, pmContent.c_str(), pmLanguage, 0, pmSender->GetObjectGuid(), pmSender->GetName());
+		ChatHandler::BuildChatPacket(data, CHAT_MSG_WHISPER, pmContent.c_str(), pmLanguage, 0, pmSender->GetObjectGuid());
 		pmTarget->GetSession()->SendPacket(&data);
 	}
 }
@@ -3772,7 +3772,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						replyStream << "My group role is ";
 						replyStream << rs->GetGroupRoleName();
 					}
-					WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+					WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 				}
 			}
 		}
@@ -3820,7 +3820,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 									rs->followDistance = cmdDistance;
 									std::ostringstream replyStream;
 									replyStream << "Following " << rs->followDistance;
-									WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+									WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 								}
 								else
 								{
@@ -3829,29 +3829,23 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								}
 							}
 							rs->sb->ClearTarget();
-							rs->restDelay = 0;
+							rs->eatDelay = 0;
+							rs->drinkDelay = 0;
 							rs->staying = false;
 							rs->holding = false;
 							rs->following = true;
 							if (member->IsAlive())
 							{
 								member->AttackStop();
+								member->CastStop();
 								member->StopMoving();
 								member->GetMotionMaster()->Clear();
-								if (member->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
-								{
-									member->SetStandState(UNIT_STAND_STATE_STAND);
-								}
-								if (member->IsWalking())
-								{
-									member->SetWalk(false);
-								}
 								rs->sb->ChooseTarget(pmSender);
-								member->GetMotionMaster()->MoveChase(pmSender, rs->followDistance);
+								member->rai->rm->Chase(pmSender, rs->followDistance);
 							}
 							std::ostringstream replyStream;
 							replyStream << "Following " << rs->followDistance;
-							WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+							WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 						}
 					}
 				}
@@ -3991,6 +3985,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 												rs->sb->ChooseTarget(target);
 												if (rs->Engage(target))
 												{
+													myGroup->ClearTargetIcon(target->GetObjectGuid());
 													rs->engageTarget = target;
 													int engageDelay = 5000;
 													if (commandVector.size() > 1)
@@ -4001,7 +3996,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 													rs->engageDelay = engageDelay;
 													std::ostringstream replyStream;
 													replyStream << "Try to engage " << target->GetName();
-													WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+													WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 												}
 											}
 										}
@@ -4045,15 +4040,10 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							if (Strategy_Base* rs = member->rai->strategyMap[myGroup->groupStrategyIndex])
 							{
-								if (rs->sb->Rest())
+								if (rs->sb->Eat())
 								{
-									int checkDelay = DEFAULT_REST_DELAY;
-									if (commandVector.size() > 1)
-									{
-										std::string checkStr = commandVector.at(1);
-										checkDelay = atoi(checkStr.c_str());
-									}
-									rs->restDelay = checkDelay;
+									rs->eatDelay = DEFAULT_REST_DELAY;
+									rs->drinkDelay = 1000;
 									replyStream << "Resting";
 								}
 								else
@@ -4066,7 +4056,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							replyStream << "I am dead";
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4155,20 +4145,13 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								{
 									if (member->GetDistance(pmSender) < sRobotConfig.AssembleTeleportMinRange)
 									{
-										rs->moveDelay = 3000;
-										replyStream << "We are close, I will move to you";
 										member->GetMotionMaster()->Clear();
-										member->StopMoving();
-										if (member->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
-										{
-											member->SetStandState(UNIT_STAND_STATE_STAND);
-										}
-										if (member->IsWalking())
-										{
-											member->SetWalk(false);
-										}
-										rs->restDelay = 0;
-										member->GetMotionMaster()->MovePoint(0, pmSender->GetPositionX(), pmSender->GetPositionY(), pmSender->GetPositionZ(), MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, pmSender->GetOrientation());
+										member->StopMoving();										
+										rs->eatDelay = 0;
+										rs->drinkDelay = 0;
+										member->rai->rm->MovePosition(pmSender->GetPosition());
+										replyStream << "We are close, I will move to you";
+										rs->moveDelay = 3000;
 									}
 									else
 									{
@@ -4197,7 +4180,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								}
 							}
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4247,6 +4230,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 											{
 												if (rs->Tank(target))
 												{
+													myGroup->ClearTargetIcon(target->GetObjectGuid());
 													rs->staying = false;
 													rs->engageTarget = target;
 													int engageDelay = 5000;
@@ -4258,7 +4242,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 													rs->engageDelay = engageDelay;
 													std::ostringstream replyStream;
 													replyStream << "Try to tank " << target->GetName();
-													WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+													WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 												}
 											}
 										}
@@ -4366,7 +4350,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							replyStream << "I am not a hunter or a warlock";
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4436,7 +4420,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							replyStream << "I am dead";
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4501,7 +4485,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							replyStream << "I am dead";
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4595,7 +4579,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							replyStream << "I am dead";
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4641,7 +4625,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							replyStream << "I am dead";
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4686,7 +4670,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 							{
 								replyStream << "DPS delay is : " << rs->dpsDelay;
 							}
-							WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+							WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 						}
 					}
 				}
@@ -4732,7 +4716,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							replyStream << "I am dead";
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4801,7 +4785,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 										{
 											std::ostringstream replyStream;
 											replyStream << "Reviving " << deadMap[reviveIndex]->GetName();
-											WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+											WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 										}
 									}
 									reviveIndex++;
@@ -4867,7 +4851,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								replyStream << "Auto cure is off";
 							}
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4917,7 +4901,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 						{
 							replyStream << "I am dead";
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -4981,24 +4965,18 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								{
 									if (member->IsAlive())
 									{
-										rs->moveDelay = 1000;
-										replyStream << "Move side";
-										member->GetMotionMaster()->Clear();
-										member->StopMoving();
 										float distance = member->GetDistance(target);
 										float destX = 0;
 										float destY = 0;
 										float destZ = 0;
 										target->GetNearPoint(target, destX, destY, destZ, target->GetObjectBoundingRadius(), distance, M_PI / 4 + target->GetAngle(member));
-										if (member->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
-										{
-											member->SetStandState(UNIT_STAND_STATE_STAND);
-										}
-										if (member->IsWalking())
-										{
-											member->SetWalk(false);
-										}
-										member->GetMotionMaster()->MovePoint(1, destX, destY, destZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, member->GetAngle(target));
+										member->StopMoving();
+										member->GetMotionMaster()->Clear();
+										member->AttackStop();
+										member->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+										member->rai->rm->MovePosition(destX, destY, destZ);
+										rs->moveDelay = 1000;
+										replyStream << "Move side";
 									}
 									else
 									{
@@ -5006,7 +4984,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 									}
 								}
 							}
-							WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+							WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 						}
 					}
 				}
@@ -5069,24 +5047,18 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 							{
 								if (member->IsAlive())
 								{
-									rs->moveDelay = 1000;
-									replyStream << "Move forward";
-									member->GetMotionMaster()->Clear();
-									member->StopMoving();
 									float distance = 10.0f;
 									float destX = 0;
 									float destY = 0;
 									float destZ = 0;
-									member->GetNearPoint(pmSender, destX, destY, destZ, pmSender->GetObjectBoundingRadius(), distance, pmSender->GetOrientation());
-									if (member->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
-									{
-										member->SetStandState(UNIT_STAND_STATE_STAND);
-									}
-									if (member->IsWalking())
-									{
-										member->SetWalk(false);
-									}
-									member->GetMotionMaster()->MovePoint(1, destX, destY, destZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, member->GetOrientation());
+									member->GetNearPoint(member, destX, destY, destZ, member->GetObjectBoundingRadius(), distance, pmSender->GetOrientation());
+									member->StopMoving();
+									member->GetMotionMaster()->Clear();
+									member->AttackStop();
+									member->CastStop();
+									member->rai->rm->MovePosition(destX, destY, destZ);
+									rs->moveDelay = 1000;
+									replyStream << "Move forward";
 								}
 								else
 								{
@@ -5094,7 +5066,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								}
 							}
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -5156,24 +5128,18 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 							{
 								if (member->IsAlive())
 								{
-									rs->moveDelay = 1000;
-									replyStream << "Move back";
-									member->GetMotionMaster()->Clear();
-									member->StopMoving();
 									float distance = 10.0f;
 									float destX = 0;
 									float destY = 0;
 									float destZ = 0;
-									member->GetNearPoint(pmSender, destX, destY, destZ, pmSender->GetObjectBoundingRadius(), distance, pmSender->GetOrientation() + M_PI);
-									if (member->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
-									{
-										member->SetStandState(UNIT_STAND_STATE_STAND);
-									}
-									if (member->IsWalking())
-									{
-										member->SetWalk(false);
-									}
-									member->GetMotionMaster()->MovePoint(1, destX, destY, destZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, member->GetOrientation());
+									member->GetNearPoint(member, destX, destY, destZ, member->GetObjectBoundingRadius(), distance, pmSender->GetOrientation() + M_PI);
+									member->StopMoving();
+									member->GetMotionMaster()->Clear();
+									member->AttackStop();
+									member->CastStop();
+									member->rai->rm->MovePosition(destX, destY, destZ);
+									rs->moveDelay = 1000;
+									replyStream << "Move back";
 								}
 								else
 								{
@@ -5181,7 +5147,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								}
 							}
 						}
-						WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+						WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 					}
 				}
 			}
@@ -5290,7 +5256,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 									}
 									}
 								}
-								WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+								WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 							}
 						}
 					}
@@ -5383,7 +5349,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 									}
 									}
 								}
-								WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+								WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 							}
 						}
 					}
@@ -5467,7 +5433,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 									}
 									}
 								}
-								WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+								WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 							}
 						}
 					}
@@ -5509,29 +5475,24 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								{
 									std::ostringstream replyStream;
 									replyStream << "Marked too faraway";
-									WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+									WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 									continue;
 								}
-								member->GetMotionMaster()->Clear();
-								member->StopMoving();
-								if (member->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
-								{
-									member->SetStandState(UNIT_STAND_STATE_STAND);
-								}
-								if (member->IsWalking())
-								{
-									member->SetWalk(false);
-								}
-								rs->restDelay = 0;
+								rs->eatDelay = 0;
+								rs->drinkDelay = 0;
 								rs->following = false;
 								rs->holding = true;
-								member->GetMotionMaster()->MovePoint(1, rs->markPos.x, rs->markPos.y, rs->markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, rs->markPos.GetAngle(rs->basePos));
+								member->GetMotionMaster()->Clear();
+								member->StopMoving();
+								member->AttackStop();
+								member->CastStop();
+								member->rai->rm->MovePosition(rs->markPos);
 							}
 							else
 							{
 								std::ostringstream replyStream;
 								replyStream << "Not marked";
-								WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+								WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 							}
 						}
 					}
@@ -5588,7 +5549,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 							{
 								replyStream << "petting is off";
 							}
-							WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+							WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 						}
 					}
 				}
@@ -5700,7 +5661,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 									EquipNewItem(member, 16309, EquipmentSlots::EQUIPMENT_SLOT_NECK);
 									std::ostringstream replyStream;
 									replyStream << "Equip all fire resistance gears.";
-									WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+									WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 								}
 							}
 							else if (equipType == "reset")
@@ -5708,7 +5669,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								InitializeEquipments(member, true);
 								std::ostringstream replyStream;
 								replyStream << "All my equipments are reset.";
-								WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+								WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 							}
 						}
 					}
@@ -5756,7 +5717,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 							}
 							std::ostringstream replyStream;
 							replyStream << "RTI is " << rs->sb->rti;
-							WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+							WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 						}
 					}
 				}
@@ -5796,7 +5757,7 @@ void RobotManager::HandleChatCommand(Player* pmSender, std::string pmCMD, Player
 								rs->assistDelay = 5000;
 								std::ostringstream replyStream;
 								replyStream << "Try to pin down my RTI : " << rs->sb->rti;
-								WhisperTo(member, replyStream.str(), Language::LANG_UNIVERSAL, pmSender);
+								WhisperTo(pmSender, replyStream.str(), Language::LANG_UNIVERSAL, member);
 							}
 						}
 					}
@@ -5823,30 +5784,42 @@ bool RobotManager::InitializeCharacter(Player* pmTargetPlayer, uint32 pmTargetLe
 		{
 		case Classes::CLASS_WARRIOR:
 		{
+			pmTargetPlayer->LearnSpell(201, true);
+			//pmTargetPlayer->SetSkill(43, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // sword 
 			break;
 		}
 		case Classes::CLASS_HUNTER:
 		{
-			pmTargetPlayer->SetSkill(45, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // bow 
-			pmTargetPlayer->SetSkill(46, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // gun 
-			pmTargetPlayer->SetSkill(226, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // crossbow 
+			pmTargetPlayer->LearnSpell(5011, true);
+			pmTargetPlayer->LearnSpell(266, true);
+			pmTargetPlayer->LearnSpell(264, true);
+			//pmTargetPlayer->SetSkill(45, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // bow 
+			//pmTargetPlayer->SetSkill(46, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // gun 
+			//pmTargetPlayer->SetSkill(226, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // crossbow 
 			break;
 		}
 		case Classes::CLASS_SHAMAN:
 		{
+			pmTargetPlayer->LearnSpell(227, true);
+			//pmTargetPlayer->SetSkill(136, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // stave 
 			break;
 		}
 		case Classes::CLASS_PALADIN:
 		{
-			pmTargetPlayer->SetSkill(160, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // mace 2 
+			pmTargetPlayer->LearnSpell(199, true);
+			//pmTargetPlayer->SetSkill(160, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // mace 2 
 			break;
 		}
 		case Classes::CLASS_WARLOCK:
 		{
+			pmTargetPlayer->LearnSpell(227, true);
+			//pmTargetPlayer->SetSkill(136, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // stave 
 			break;
 		}
 		case Classes::CLASS_PRIEST:
 		{
+			pmTargetPlayer->LearnSpell(227, true);
+			//pmTargetPlayer->SetSkill(136, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // stave 
 			break;
 		}
 		case Classes::CLASS_ROGUE:
@@ -5855,11 +5828,15 @@ bool RobotManager::InitializeCharacter(Player* pmTargetPlayer, uint32 pmTargetLe
 		}
 		case Classes::CLASS_MAGE:
 		{
+			pmTargetPlayer->LearnSpell(227, true);
+			//pmTargetPlayer->SetSkill(136, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // stave 
 			break;
 		}
 		case Classes::CLASS_DRUID:
 		{
-			pmTargetPlayer->SetSkill(160, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // mace 2 
+			pmTargetPlayer->LearnSpell(227, true);
+			//pmTargetPlayer->SetSkill(136, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // stave 
+			//pmTargetPlayer->SetSkill(160, pmTargetPlayer->GetLevel() * 5, pmTargetPlayer->GetLevel() * 5); // mace 2 
 			break;
 		}
 		default:
@@ -6712,4 +6689,131 @@ void RobotManager::RandomTeleport(Player* pmTargetPlayer)
 		pmTargetPlayer->TeleportTo(destMapID, destX, destY, destZ, 0.0f);
 		sLog.outBasic("Teleport robot %s (level %d)", pmTargetPlayer->GetName(), pmTargetPlayer->GetLevel());
 	}
+}
+
+bool RobotManager::TankThreatOK(Player* pmTankPlayer, Unit* pmVictim)
+{
+	if (pmTankPlayer && pmVictim)
+	{
+		if (pmTankPlayer->IsAlive() && pmVictim->IsAlive())
+		{
+			switch (pmTankPlayer->GetClass())
+			{
+			case Classes::CLASS_WARRIOR:
+			{
+				if (sRobotManager->HasAura(pmVictim, "Sunder Armor"))
+				{
+					return true;
+				}
+				//if (sRobotManager->GetAuraStack(pmVictim, "Sunder Armor", pmTankPlayer) > 2)
+				//{
+				//	return true;
+				//}
+				break;
+			}
+			case Classes::CLASS_PALADIN:
+			{
+				if (sRobotManager->HasAura(pmVictim, "Judgement of the Crusader"))
+				{
+					return true;
+				}
+				break;
+			}
+			case Classes::CLASS_DRUID:
+			{
+				return true;
+			}
+			default:
+			{
+				break;
+			}
+			}
+		}
+	}
+	return false;
+}
+
+bool RobotManager::HasAura(Unit* pmTarget, std::string pmSpellName, Unit* pmCaster)
+{
+	if (!pmTarget)
+	{
+		return false;
+	}
+	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
+	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
+	{
+		uint32 spellID = *it;
+		if (pmCaster)
+		{
+			if (pmTarget->HasCasterAura(spellID, pmCaster->GetGUID()))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			if (pmTarget->HasAura(spellID))
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+uint32 RobotManager::GetAuraDuration(Unit* pmTarget, std::string pmSpellName, Unit* pmCaster)
+{
+	if (!pmTarget)
+	{
+		return false;
+	}
+	uint32 duration = 0;
+	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
+	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
+	{
+		uint32 spellID = *it;
+		if (pmCaster)
+		{
+			duration = pmTarget->GetAuraDuration(spellID, pmCaster->GetObjectGuid());
+		}
+		else
+		{
+			duration = pmTarget->GetAuraDuration(spellID);
+		}
+		if (duration > 0)
+		{
+			break;
+		}
+	}
+
+	return duration;
+}
+
+uint32 RobotManager::GetAuraStack(Unit* pmTarget, std::string pmSpellName, Unit* pmCaster)
+{
+	uint32 auraCount = 0;
+	if (!pmTarget)
+	{
+		return false;
+	}
+	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
+	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
+	{
+		uint32 spellID = *it;
+		if (pmCaster)
+		{
+			auraCount = pmTarget->GetAuraStack(spellID, pmCaster->GetObjectGuid());
+		}
+		else
+		{
+			auraCount = pmTarget->GetAuraStack(spellID);
+		}
+		if (auraCount > 0)
+		{
+			break;
+		}
+	}
+
+	return auraCount;
 }

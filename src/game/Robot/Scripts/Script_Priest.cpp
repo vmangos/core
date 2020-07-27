@@ -143,7 +143,7 @@ bool Script_Priest::Heal_Holy(Unit* pmTarget, bool pmCure)
 		{
 			return true;
 		}
-		if (!HasAura(pmTarget, "Weakened Soul"))
+		if (!sRobotManager->HasAura(pmTarget, "Weakened Soul"))
 		{
 			if (pmTarget->IsInCombat())
 			{
@@ -322,7 +322,7 @@ bool Script_Priest::DPS_Common(Unit* pmTarget, bool pmChase)
 		{
 			return false;
 		}
-		if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+		if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
 		{
 			return false;
 		}
@@ -412,7 +412,7 @@ bool Script_Priest::Attack_Common(Unit* pmTarget)
 	{
 		return false;
 	}
-	if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+	if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
 	{
 		return false;
 	}
@@ -456,7 +456,7 @@ bool Script_Priest::Buff(Unit* pmTarget, bool pmCure)
 	}
 	if (me->GetDistance(pmTarget) < PRIEST_RANGE_DISTANCE)
 	{
-		if (!HasAura(pmTarget, "Power Word: Fortitude") && !HasAura(pmTarget, "Prayer of Fortitude"))
+		if (!sRobotManager->HasAura(pmTarget, "Power Word: Fortitude") && !sRobotManager->HasAura(pmTarget, "Prayer of Fortitude"))
 		{
 			if (FindSpellID("Prayer of Fortitude"))
 			{

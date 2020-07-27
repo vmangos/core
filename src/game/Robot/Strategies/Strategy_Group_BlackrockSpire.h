@@ -30,8 +30,7 @@ public:
 
     void Update(uint32 pmDiff) override;
     std::string GetGroupRoleName() override;
-    void SetGroupRole(std::string pmRoleName) override;
-    Player* GetMainTank() override;
+    void SetGroupRole(std::string pmRoleName) override;    
     bool DPS() override;
     bool Engage(Unit* pmTarget);
     bool Heal() override;

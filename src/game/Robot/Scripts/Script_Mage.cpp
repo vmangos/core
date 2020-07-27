@@ -72,10 +72,10 @@ bool Script_Mage::Assist()
                     {
                         if (assistTarget->GetCreatureType() == CreatureType::CREATURE_TYPE_HUMANOID)
                         {
-                            uint32 duration = GetAuraDuration(assistTarget, "Polymorph");
+                            uint32 duration = sRobotManager->GetAuraDuration(assistTarget, "Polymorph");
                             if (duration < 3000)
                             {
-                                Chase(assistTarget, RANGE_CHASE_DISTANCE);
+                                Chase(assistTarget, FOLLOW_FAR_DISTANCE);
                                 CastSpell(assistTarget, "Polymorph", MAGE_RANGE_DISTANCE);
                                 return true;
                             }
@@ -113,7 +113,7 @@ bool Script_Mage::DPS_Arcane(Unit* pmTarget, bool pmChase)
         {
             return false;
         }
-        if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+        if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
         {
             return false;
         }
@@ -179,7 +179,7 @@ bool Script_Mage::DPS_Fire(Unit* pmTarget, bool pmChase)
         {
             return false;
         }
-        if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+        if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
         {
             return false;
         }
@@ -245,7 +245,7 @@ bool Script_Mage::DPS_Frost(Unit* pmTarget, bool pmChase)
         {
             return false;
         }
-        if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+        if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
         {
             return false;
         }
@@ -347,7 +347,7 @@ bool Script_Mage::Attack_Arcane(Unit* pmTarget)
         return false;
     }
 
-    if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+    if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
     {
         return false;
     }
@@ -402,7 +402,7 @@ bool Script_Mage::Attack_Fire(Unit* pmTarget)
         return false;
     }
 
-    if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+    if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
     {
         return false;
     }
@@ -457,7 +457,7 @@ bool Script_Mage::Attack_Frost(Unit* pmTarget)
         return false;
     }
 
-    if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+    if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
     {
         return false;
     }
@@ -508,21 +508,11 @@ bool Script_Mage::Buff(Unit* pmTarget, bool pmCure)
     }
     if (me->GetDistance(pmTarget) < MAGE_RANGE_DISTANCE)
     {
-        if (!HasAura(pmTarget, "Arcane Intellect") && !HasAura(pmTarget, "Arcane Brilliance"))
+        if (!sRobotManager->HasAura(pmTarget, "Arcane Intellect"))
         {
-            if (FindSpellID("Arcane Brilliance"))
+            if (CastSpell(pmTarget, "Arcane Intellect", MAGE_RANGE_DISTANCE, true))
             {
-                if (CastSpell(pmTarget, "Arcane Brilliance", MAGE_RANGE_DISTANCE, true))
-                {
-                    return true;
-                }
-            }
-            else
-            {
-                if (CastSpell(pmTarget, "Arcane Intellect", MAGE_RANGE_DISTANCE, true))
-                {
-                    return true;
-                }
+                return true;
             }
         }
     }

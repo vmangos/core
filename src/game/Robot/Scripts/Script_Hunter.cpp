@@ -93,7 +93,7 @@ bool Script_Hunter::DPS_BeastMastery(Unit* pmTarget, bool pmChase)
 		{
 			return false;
 		}
-		if (!Chase(pmTarget, RANGE_CHASE_DISTANCE, HUNTER_MIN_RANGE_DISTANCE))
+		if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE, HUNTER_MIN_RANGE_DISTANCE))
 		{
 			return false;
 		}
@@ -110,7 +110,7 @@ bool Script_Hunter::DPS_BeastMastery(Unit* pmTarget, bool pmChase)
 		}
 	}
 	me->Attack(pmTarget, true);
-	if (CastSpell(pmTarget, "Hunter's Mark", 100.0f, true))
+	if (CastSpell(pmTarget, "Hunter's Mark", VISIBILITY_DISTANCE_NORMAL, true))
 	{
 		return true;
 	}
@@ -183,7 +183,7 @@ bool Script_Hunter::DPS_Marksmanship(Unit* pmTarget, bool pmChase)
 		{
 			return false;
 		}
-		if (!Chase(pmTarget, RANGE_CHASE_DISTANCE, HUNTER_MIN_RANGE_DISTANCE))
+		if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE, HUNTER_MIN_RANGE_DISTANCE))
 		{
 			return false;
 		}
@@ -200,7 +200,7 @@ bool Script_Hunter::DPS_Marksmanship(Unit* pmTarget, bool pmChase)
 		}
 	}
 	me->Attack(pmTarget, true);
-	if (CastSpell(pmTarget, "Hunter's Mark", 100, true))
+	if (CastSpell(pmTarget, "Hunter's Mark", VISIBILITY_DISTANCE_NORMAL, true))
 	{
 		return true;
 	}
@@ -289,7 +289,7 @@ bool Script_Hunter::DPS_Survival(Unit* pmTarget, bool pmChase)
 		{
 			return false;
 		}
-		if (!Chase(pmTarget, RANGE_CHASE_DISTANCE, HUNTER_MIN_RANGE_DISTANCE))
+		if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE, HUNTER_MIN_RANGE_DISTANCE))
 		{
 			return false;
 		}
@@ -307,7 +307,7 @@ bool Script_Hunter::DPS_Survival(Unit* pmTarget, bool pmChase)
 	}
 
 	me->Attack(pmTarget, true);
-	if (CastSpell(pmTarget, "Hunter's Mark", 100, true))
+	if (CastSpell(pmTarget, "Hunter's Mark", VISIBILITY_DISTANCE_NORMAL, true))
 	{
 		return true;
 	}
@@ -418,12 +418,12 @@ bool Script_Hunter::Attack_BeastMastery(Unit* pmTarget)
 	{
 		return false;
 	}
-	if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+	if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
 	{
 		return false;
 	}
 	me->Attack(pmTarget, true);
-	if (CastSpell(pmTarget, "Hunter's Mark", 100, true))
+	if (CastSpell(pmTarget, "Hunter's Mark", VISIBILITY_DISTANCE_NORMAL, true))
 	{
 		return true;
 	}
@@ -495,12 +495,12 @@ bool Script_Hunter::Attack_Marksmanship(Unit* pmTarget)
 	{
 		return false;
 	}
-	if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+	if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
 	{
 		return false;
 	}
 	me->Attack(pmTarget, true);
-	if (CastSpell(pmTarget, "Hunter's Mark", 100, true))
+	if (CastSpell(pmTarget, "Hunter's Mark", VISIBILITY_DISTANCE_NORMAL, true))
 	{
 		return true;
 	}
@@ -572,12 +572,12 @@ bool Script_Hunter::Attack_Survival(Unit* pmTarget)
 	{
 		return false;
 	}
-	if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+	if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
 	{
 		return false;
 	}
 	me->Attack(pmTarget, true);
-	if (CastSpell(pmTarget, "Hunter's Mark", 100, true))
+	if (CastSpell(pmTarget, "Hunter's Mark", VISIBILITY_DISTANCE_NORMAL, true))
 	{
 		return true;
 	}

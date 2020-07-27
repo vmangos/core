@@ -34,6 +34,11 @@
 template<class T, typename D>
 void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 {
+    // EJ debug 
+    if (owner.IsPlayer() && owner.GetGUIDLow() == 50)
+    {
+        bool breakPoint = true;
+    }
     // Note: Any method that accesses the target's movespline here must be
     // internally locked by the target's spline lock
     if (!i_target.isValid() || !i_target->IsInWorld())
@@ -41,12 +46,6 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 
     if (owner.HasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_POSSESSED))
         return;
-
-    // EJ debug 
-    if (owner.GetGUIDLow() == 2)
-    {
-        bool breakPoint = true;
-    }
 
     float x, y, z;
     bool losChecked = false;
@@ -133,14 +132,17 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
         m_bReachable = true;
     }
 
+    // EJ CanReachWithMeleeAutoAttackAtPosition is no longer in use since chase is using for range following 
     // Enforce stricter checking inside dungeons
-    if (m_bReachable && owner.GetMap() && owner.GetMap()->IsDungeon())
-    {
-        // Check dest coords to ensure reachability
-        G3D::Vector3 dest = path.getActualEndPosition();
-        if (!owner.CanReachWithMeleeAutoAttackAtPosition(i_target.getTarget(), dest[0], dest[1], dest[2]))
-            m_bReachable = false;
-    }
+    //if (m_bReachable && owner.GetMap() && owner.GetMap()->IsDungeon())
+    //{
+    //    // Check dest coords to ensure reachability
+    //    G3D::Vector3 dest = path.getActualEndPosition();
+    //    if (!owner.CanReachWithMeleeAutoAttackAtPosition(i_target.getTarget(), dest[0], dest[1], dest[2]))
+    //    {
+    //        m_bReachable = false;
+    //    }
+    //}
 
     m_bRecalculateTravel = false;
     if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
@@ -259,6 +261,11 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
 template<class T>
 bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 {
+    // EJ debug 
+    if (owner.IsPlayer() && owner.GetGUIDLow() == 50)
+    {
+        bool breakPoint = true;
+    }
     if (!i_target.isValid() || !i_target->IsInWorld())
         return false;
 
@@ -292,13 +299,6 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
         _clearUnitStateMove(owner);
         return true;
     }
-
-    // EJ debug 
-    if (owner.GetGUIDLow() == 2)
-    {
-        bool breakPoint = true;
-    }
-
     bool interrupted = false;
     m_checkDistanceTimer.Update(time_diff);
     if (m_checkDistanceTimer.Passed())
@@ -323,6 +323,11 @@ bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
             else
             {
                 float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
+                // EJ allowed dist can be ranged 
+                if (allowed_dist < m_fOffset)
+                {
+                    allowed_dist = m_fOffset;
+                }
                 bool targetMoved = false;
                 G3D::Vector3 dest(m_fTargetLastX, m_fTargetLastY, m_fTargetLastZ);
                 if (Transport* ownerTransport = owner.GetTransport())

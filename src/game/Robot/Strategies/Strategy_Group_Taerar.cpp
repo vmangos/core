@@ -384,7 +384,7 @@ void Strategy_Group_Taerar::Update(uint32 pmDiff)
 		bool groupInCombat = GroupInCombat();
 		if (groupInCombat)
 		{
-			restDelay = 0;
+			eatDelay = 0;
 			combatTime += pmDiff;
 			if (myGroup->GetGroupAttackers(CreatureEntry_RobotStrategy::CreatureEntry_Strategy_Shade_of_Taerar).size() > 0)
 			{
@@ -702,9 +702,9 @@ void Strategy_Group_Taerar::Update(uint32 pmDiff)
 		}
 		else
 		{
-			if (restDelay > 0)
+			if (eatDelay > 0)
 			{
-				restDelay -= pmDiff;
+				eatDelay -= pmDiff;
 				return;
 			}
 			switch (me->groupRole)
@@ -954,7 +954,7 @@ bool Strategy_Group_Taerar::DPS()
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-							me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+							me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 						}
 						return true;
 					}
@@ -1126,7 +1126,7 @@ bool Strategy_Group_Taerar::DPS()
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-					me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+					me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 				}
 				else if (attacking)
 				{
@@ -1183,7 +1183,7 @@ bool Strategy_Group_Taerar::Tank()
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-							me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+							me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 							return true;
 						}
 					}
@@ -1203,7 +1203,7 @@ bool Strategy_Group_Taerar::Tank()
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 							me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-							me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+							me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 							return true;
 						}
 					}
@@ -1234,7 +1234,7 @@ bool Strategy_Group_Taerar::Tank()
 												actionDelay = 1000;
 												actionType = ActionType_Taerar::ActionType_Taerar_MarkMove;
 												markPos = shadePos;
-												me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(myShade));
+												me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(myShade));
 												return true;
 											}
 										}
@@ -1256,7 +1256,7 @@ bool Strategy_Group_Taerar::Tank()
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-									me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+									me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 									return true;
 								}
 							}
@@ -1289,7 +1289,7 @@ bool Strategy_Group_Taerar::Tank()
 												actionDelay = 1000;
 												actionType = ActionType_Taerar::ActionType_Taerar_MarkMove;
 												markPos = shadePos;
-												me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(myShade));
+												me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(myShade));
 												return true;
 											}
 										}
@@ -1311,7 +1311,7 @@ bool Strategy_Group_Taerar::Tank()
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-									me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+									me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 									return true;
 								}
 							}
@@ -1344,7 +1344,7 @@ bool Strategy_Group_Taerar::Tank()
 												actionDelay = 1000;
 												actionType = ActionType_Taerar::ActionType_Taerar_MarkMove;
 												markPos = shadePos;
-												me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(myShade));
+												me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(myShade));
 												return true;
 											}
 										}
@@ -1366,7 +1366,7 @@ bool Strategy_Group_Taerar::Tank()
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 									me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-									me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+									me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 									return true;
 								}
 							}
@@ -1464,7 +1464,7 @@ bool Strategy_Group_Taerar::Tank()
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 					me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-					me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+					me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 				}
 				else if (tanking)
 				{
@@ -1893,7 +1893,7 @@ bool Strategy_Group_Taerar::Heal()
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL);
 				me->InterruptSpell(CurrentSpellTypes::CURRENT_MELEE_SPELL);
-				me->GetMotionMaster()->MovePoint(0, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
+				me->GetMotionMaster()->MovePoint(1, markPos.x, markPos.y, markPos.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE, 0.0f, me->GetAngle(boss));
 			}
 			else if (healing)
 			{

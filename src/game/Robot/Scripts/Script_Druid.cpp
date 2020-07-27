@@ -374,7 +374,7 @@ bool Script_Druid::DPS_Feral(Unit* pmTarget, bool pmChase)
 		{
 			return true;
 		}
-		if (HasAura(me, "Berserk"))
+		if (sRobotManager->HasAura(me, "Berserk"))
 		{
 			uint8 comboPoints = me->GetComboPoints();
 			if (comboPoints >= 4)
@@ -681,14 +681,14 @@ bool Script_Druid::Tank_Feral(Unit* pmTarget, bool pmChase, bool pmSingle)
 	{
 		if (rage > 200)
 		{
-			if (GetAuraStack(pmTarget, "Lacerate", true) < 5)
+			if (sRobotManager->GetAuraStack(pmTarget, "Lacerate", me) < 5)
 			{
 				if (CastSpell(pmTarget, "Lacerate", MELEE_MAX_DISTANCE))
 				{
 					return true;
 				}
 			}
-			else if (GetAuraDuration(pmTarget, "Lacerate", true) < 3000)
+			else if (sRobotManager->GetAuraDuration(pmTarget, "Lacerate", me) < 3000)
 			{
 				if (CastSpell(pmTarget, "Lacerate", MELEE_MAX_DISTANCE))
 				{
@@ -859,7 +859,7 @@ bool Script_Druid::Attack_Balance(Unit* pmTarget)
 			return true;
 		}
 	}
-	if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+	if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
 	{
 		return false;
 	}
@@ -1334,7 +1334,7 @@ bool Script_Druid::Buff(Unit* pmTarget, bool pmCure)
 		}
 		if (doThorn)
 		{
-			if (!HasAura(pmTarget, "Thorns"))
+			if (!sRobotManager->HasAura(pmTarget, "Thorns"))
 			{
 				ClearShapeshift();
 				if (CastSpell(pmTarget, "Thorns", DRUID_RANGE_DISTANCE, true))
@@ -1344,7 +1344,7 @@ bool Script_Druid::Buff(Unit* pmTarget, bool pmCure)
 			}
 		}
 
-		if (!HasAura(pmTarget, "Mark of the Wild") && !HasAura(pmTarget, "Gift of the Wild"))
+		if (!sRobotManager->HasAura(pmTarget, "Mark of the Wild") && !sRobotManager->HasAura(pmTarget, "Gift of the Wild"))
 		{
 			ClearShapeshift();
 			if (FindSpellID("Gift of the Wild"))

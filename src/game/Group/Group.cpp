@@ -2376,6 +2376,52 @@ int Group::GetTargetIconByOG(ObjectGuid pmOG)
 }
 
 // EJ group attackers
+void Group::UpdateGroupAttackers()
+{
+    groupAttackersMap.clear();
+    for (GroupReference* groupRef = GetFirstMember(); groupRef != nullptr; groupRef = groupRef->next())
+    {
+        if (Player* member = groupRef->getSource())
+        {
+            if (member->IsAlive())
+            {
+                for (Unit::AttackerSet::const_iterator attackerIT = member->GetAttackers().begin(); attackerIT != member->GetAttackers().end(); ++attackerIT)
+                {
+                    if (Unit* eachAttacker = *attackerIT)
+                    {
+                        if (eachAttacker->IsAlive())
+                        {
+                            if (groupAttackersMap.find(eachAttacker->GetGUID()) == groupAttackersMap.end())
+                            {
+                                groupAttackersMap[eachAttacker->GetGUID()] = eachAttacker;
+                            }
+                        }
+                    }
+                }
+                if (Pet* memberPet = member->GetPet())
+                {
+                    if (memberPet->IsAlive())
+                    {
+                        for (Unit::AttackerSet::const_iterator attackerIT = memberPet->GetAttackers().begin(); attackerIT != memberPet->GetAttackers().end(); ++attackerIT)
+                        {
+                            if (Unit* eachAttacker = *attackerIT)
+                            {
+                                if (eachAttacker->IsAlive())
+                                {
+                                    if (groupAttackersMap.find(eachAttacker->GetGUID()) == groupAttackersMap.end())
+                                    {
+                                        groupAttackersMap[eachAttacker->GetGUID()] = eachAttacker;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 std::unordered_map<ObjectGuid, Unit*> Group::GetGroupAttackers(uint32 pmCreatureEntry)
 {
     std::unordered_map<ObjectGuid, Unit*> resultMap;

@@ -72,7 +72,7 @@ bool Script_Shaman::DPS_Common(Unit* pmTarget, bool pmChase)
         {
             return false;
         }
-        if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+        if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
         {
             return false;
         }
@@ -148,7 +148,7 @@ bool Script_Shaman::Attack_Common(Unit* pmTarget)
     {
         return false;
     }
-    if (!Chase(pmTarget, RANGE_CHASE_DISTANCE))
+    if (!Chase(pmTarget, FOLLOW_FAR_DISTANCE))
     {
         return false;
     }

@@ -91,7 +91,7 @@ bool Script_Paladin::Heal_Holy(Unit* pmTarget, bool pmCure)
 	float healthPCT = pmTarget->GetHealthPercent();
 	if (healthPCT < 20.0f)
 	{
-		if (!HasAura(pmTarget, "Forbearance"))
+		if (!sRobotManager->HasAura(pmTarget, "Forbearance"))
 		{
 			if (CastSpell(pmTarget, "Lay on Hands", PALADIN_RANGE_DISTANCE))
 			{
@@ -548,7 +548,7 @@ bool Script_Paladin::Buff(Unit* pmTarget, bool pmCure)
 	{
 	case PaladinBlessingType::PaladinBlessingType_Kings:
 	{
-		if (!HasAura(pmTarget, "Blessing of Kings") && !HasAura(pmTarget, "Greater Blessing of Kings"))
+		if (!sRobotManager->HasAura(pmTarget, "Blessing of Kings") && !sRobotManager->HasAura(pmTarget, "Greater Blessing of Kings"))
 		{
 			if (FindSpellID("Greater Blessing of Kings"))
 			{
@@ -569,7 +569,7 @@ bool Script_Paladin::Buff(Unit* pmTarget, bool pmCure)
 	}
 	case PaladinBlessingType::PaladinBlessingType_Might:
 	{
-		if (!HasAura(pmTarget, "Blessing of Might") && !HasAura(pmTarget, "Greater Blessing of Might"))
+		if (!sRobotManager->HasAura(pmTarget, "Blessing of Might") && !sRobotManager->HasAura(pmTarget, "Greater Blessing of Might"))
 		{
 			if (FindSpellID("Greater Blessing of Might"))
 			{
@@ -590,7 +590,7 @@ bool Script_Paladin::Buff(Unit* pmTarget, bool pmCure)
 	}
 	case PaladinBlessingType::PaladinBlessingType_Wisdom:
 	{
-		if (!HasAura(pmTarget, "Blessing of Wisdom") && !HasAura(pmTarget, "Greater Blessing of Wisdom"))
+		if (!sRobotManager->HasAura(pmTarget, "Blessing of Wisdom") && !sRobotManager->HasAura(pmTarget, "Greater Blessing of Wisdom"))
 		{
 			if (FindSpellID("Greater Blessing of Wisdom"))
 			{

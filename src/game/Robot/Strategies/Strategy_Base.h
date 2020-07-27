@@ -19,7 +19,8 @@ public:
     Script_Base* sb;
     Unit* engageTarget;
 
-    int restDelay;
+    int eatDelay;
+    int drinkDelay;
     int32 engageDelay;
 };
 #endif

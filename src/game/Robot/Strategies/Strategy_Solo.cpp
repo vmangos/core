@@ -1,4 +1,5 @@
 #include "Strategy_Solo.h"
+#include "RobotAI.h"
 #include "Script_Warrior.h"
 #include "Script_Hunter.h"
 #include "Script_Shaman.h"
@@ -23,7 +24,8 @@ void Strategy_Solo::InitialStrategy()
 
 	deathDelay = 0;
 	soloDelay = urand(sRobotConfig.SoloMinDelay, sRobotConfig.SoloMaxDelay);
-	restDelay = 0;
+	eatDelay = 0;
+	drinkDelay = 0;
 	waitDelay = 0;
 	strollDelay = 0;
 	confuseDelay = 0;
@@ -172,15 +174,25 @@ void Strategy_Solo::Update(uint32 pmDiff)
 	{
 		if (me->IsInCombat())
 		{
-			restDelay = 0;
+			eatDelay = 0;
+			drinkDelay = 0;
 			me->StopMoving();
 			me->GetMotionMaster()->Clear();
 			soloState = RobotSoloState::RobotSoloState_Battle;
 			return;
 		}
-		restDelay -= pmDiff;
-		if (restDelay < 0)
+		eatDelay -= pmDiff;
+		if (drinkDelay > 0)
 		{
+			drinkDelay -= pmDiff;
+			if (drinkDelay <= 0)
+			{
+				sb->Drink();
+			}
+		}
+		if (eatDelay < 0)
+		{
+			drinkDelay = 0;
 			me->StopMoving();
 			me->GetMotionMaster()->Clear();
 			soloState = RobotSoloState::RobotSoloState_Wander;
@@ -288,10 +300,11 @@ bool Strategy_Solo::Rest()
 		}
 		else
 		{
-			if (sb->Rest())
+			if (sb->Eat())
 			{
 				soloState = RobotSoloState::RobotSoloState_Rest;
-				restDelay = DEFAULT_REST_DELAY;
+				eatDelay = DEFAULT_REST_DELAY;
+				drinkDelay = 1000;
 				return true;
 			}
 		}
@@ -512,7 +525,7 @@ bool Strategy_Solo::Stroll()
 		float destZ = 0;
 		if (me->GetRandomPoint(me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), distance, destX, destY, destZ))
 		{
-			me->GetMotionMaster()->MovePoint(0, destX, destY, destZ);
+			me->rai->rm->MovePosition(destX, destY, destZ);
 		}
 		strollDelay = 5 * TimeConstants::IN_MILLISECONDS;
 		soloState = RobotSoloState::RobotSoloState_Stroll;
@@ -524,7 +537,7 @@ bool Strategy_Solo::Stroll()
 bool Strategy_Solo::Confuse()
 {
 	// EJ confuse issue use wait instead
-	return Wait();
+	//return Wait();
 
 	if (me)
 	{
@@ -557,7 +570,8 @@ void Strategy_Solo::Reset()
 	deathDelay = 0;
 	confuseDelay = 0;
 	engageDelay = 0;
-	restDelay = 0;
+	eatDelay = 0;
+	drinkDelay = 0;
 	soloDelay = urand(sRobotConfig.SoloMinDelay, sRobotConfig.SoloMaxDelay);
 	waitDelay = 0;
 	strollDelay = 0;
