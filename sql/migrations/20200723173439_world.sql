@@ -98,6 +98,10 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel`, `build_min`, `build_max`) VALUES
 (11557, 12117, 2400, 197, 230, 0, 0, 5875);
 
+-- correct recipes to shadoweave tailors
+DELETE FROM `npc_trainer` WHERE `entry` = 9584 AND `spell` IN (3917, 12117, 12118);
+DELETE FROM `npc_trainer` WHERE `entry` = 4578 AND `spell` IN (3917, 12117, 12118);
+
 
 -- End of migration.
 END IF;
