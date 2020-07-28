@@ -18,6 +18,18 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (136701, 40, 0, 0, 0, 0, 0, 0, 0, 0, 4, 135, 139, 140, 141, 0, 0, 0, 0, 0, 'Billy - Talk');
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (136701, 45, 0, 0, 0, 0, 0, 79702, 0, 9, 2, 144, 145, 147, 0, 0, 0, 0, 0, 0, 'Adam - Talk');
 
+-- add ol emma ooc event
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 3520;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (352001, 3520, 0, 1, 0, 100, 1, 0, 0, 180000, 180000, 352001, 0, 0, 'Ol Emma - Say OOC');
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (352002, 3520, 0, 1, 0, 100, 1, 6000, 6000, 180000, 180000, 352002, 0, 0, 'Ol Emma - Say OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (352001, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1107, 1110, 1111, 1109, 0, 0, 0, 0, 0, 'Ol Emma - Talk');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (352002, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 1108, 1106, 1105, 1112, 0, 0, 0, 0, 0, 'Ol Emma - Talk');
+
+-- add shellene ooc event
+UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 14497;
+INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (1449701, 14497, 0, 1, 0, 100, 1, 1000, 15000, 150000, 180000, 1449701, 0, 0, 'Shellene - Say OOC');
+INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (1449701, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 9689, 9690, 9691, 9692, 0, 0, 0, 0, 0, 'Shellene - Talk');
+
 
 -- End of migration.
 END IF;
