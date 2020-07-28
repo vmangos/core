@@ -40,9 +40,9 @@
 #define CONTACT_DISTANCE            0.5f
 #define INTERACTION_DISTANCE        5.0f
 
-// EJ ATTACK_DISTANCE set to 4.0f
+// EJ ATTACK_DISTANCE set to 3.0f
 //#define ATTACK_DISTANCE             5.0f
-#define ATTACK_DISTANCE             4.0f
+#define ATTACK_DISTANCE             3.0f
 
 #define INSPECT_DISTANCE            10.0f
 #define TRADE_DISTANCE              11.11f

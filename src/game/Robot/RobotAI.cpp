@@ -94,9 +94,14 @@ void RobotMovement::Chase(Unit* pmChaseTarget, float pmChaseDistanceMax, float p
 			return;
 		}
 	}
-	float distanceInRange = frand(chaseDistanceMin, chaseDistanceMax);
+	float checkNearRange = chaseDistanceMax - ATTACK_DISTANCE;
+	if (checkNearRange < chaseDistanceMin)
+	{
+		checkNearRange = chaseDistanceMin;
+	}
+	float distanceInRange = frand(checkNearRange, chaseDistanceMax);
 	chaseTarget->GetNearPoint(chaseTarget, pointTarget.x, pointTarget.y, pointTarget.z, chaseTarget->GetObjectBoundingRadius(), distanceInRange, chaseTarget->GetAngle(me));
-	me->GetMotionMaster()->MovePoint(1, pointTarget.x, pointTarget.y, pointTarget.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE);
+	MovePoint(pointTarget.x, pointTarget.y, pointTarget.z);
 }
 
 void RobotMovement::MovePosition(Position pmTargetPosition, uint32 pmLimitDelay)
@@ -130,7 +135,19 @@ void RobotMovement::MovePosition(float pmX, float pmY, float pmZ, uint32 pmLimit
 		pointTarget.y = pmY;
 		pointTarget.z = pmZ;
 		activeMovementType = RobotMovementType::RobotMovementType_Point;
-		me->GetMotionMaster()->MovePoint(1, pointTarget.x, pointTarget.y, pointTarget.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE);
+		MovePoint(pointTarget.x, pointTarget.y, pointTarget.z);
+	}
+}
+
+void RobotMovement::MovePoint(float pmX, float pmY, float pmZ)
+{
+	if (me)
+	{
+		if (me->GetStandState() != UnitStandStateType::UNIT_STAND_STATE_STAND)
+		{
+			me->SetStandState(UnitStandStateType::UNIT_STAND_STATE_STAND);
+		}
+		me->GetMotionMaster()->MovePoint(1, pmX, pmY, pmZ, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE);
 	}
 }
 
@@ -177,7 +194,7 @@ void RobotMovement::Update(uint32 pmDiff)
 		{
 			if (!me->IsMoving())
 			{
-				me->GetMotionMaster()->MovePoint(1, pointTarget.x, pointTarget.y, pointTarget.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE);
+				MovePoint(pointTarget.x, pointTarget.y, pointTarget.z);
 			}
 		}
 		break;
@@ -222,9 +239,14 @@ void RobotMovement::Update(uint32 pmDiff)
 			}
 			else
 			{
-				float distanceInRange = frand(chaseDistanceMin, chaseDistanceMax);
+				float checkNearRange = chaseDistanceMax - ATTACK_DISTANCE;
+				if (checkNearRange < chaseDistanceMin)
+				{
+					checkNearRange = chaseDistanceMin;
+				}
+				float distanceInRange = frand(checkNearRange, chaseDistanceMax);
 				chaseTarget->GetNearPoint(chaseTarget, pointTarget.x, pointTarget.y, pointTarget.z, chaseTarget->GetObjectBoundingRadius(), distanceInRange, chaseTarget->GetAngle(me));
-				me->GetMotionMaster()->MovePoint(1, pointTarget.x, pointTarget.y, pointTarget.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE);
+				MovePoint(pointTarget.x, pointTarget.y, pointTarget.z);
 			}
 		}
 		else
@@ -234,14 +256,19 @@ void RobotMovement::Update(uint32 pmDiff)
 			{
 				if (!me->IsMoving())
 				{
-					me->GetMotionMaster()->MovePoint(1, pointTarget.x, pointTarget.y, pointTarget.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE);
+					MovePoint(pointTarget.x, pointTarget.y, pointTarget.z);
 				}
 			}
 			else
 			{
-				float distanceInRange = frand(chaseDistanceMin, chaseDistanceMax);
+				float checkNearRange = chaseDistanceMax - ATTACK_DISTANCE;
+				if (checkNearRange < chaseDistanceMin)
+				{
+					checkNearRange = chaseDistanceMin;
+				}
+				float distanceInRange = frand(checkNearRange, chaseDistanceMax);
 				chaseTarget->GetNearPoint(chaseTarget, pointTarget.x, pointTarget.y, pointTarget.z, chaseTarget->GetObjectBoundingRadius(), distanceInRange, chaseTarget->GetAngle(me));
-				me->GetMotionMaster()->MovePoint(1, pointTarget.x, pointTarget.y, pointTarget.z, MoveOptions::MOVE_PATHFINDING | MoveOptions::MOVE_RUN_MODE);
+				MovePoint(pointTarget.x, pointTarget.y, pointTarget.z);
 			}
 		}
 		break;
