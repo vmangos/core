@@ -12409,7 +12409,11 @@ void Player::OnGossipSelect(WorldObject* pSource, uint32 gossipListId)
             break;
         case GOSSIP_OPTION_INNKEEPER:
             PlayerTalkClass->CloseGossip();
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             SetBindPoint(guid);
+#else
+            GetSession()->SendBindPoint((Creature*)pSource);
+#endif
             break;
         case GOSSIP_OPTION_BANKER:
             GetSession()->SendShowBank(guid);
