@@ -74,6 +74,15 @@ UPDATE `npc_vendor` SET `maxcount` = 4, `incrtime` = 7200 WHERE `entry` = 1313 A
 -- schematic blue firework - darian singh
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 5175 AND `item` = 1304;
 
+-- scroll of strength - deneb walker
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 2805 AND `item` = 954;
+
+-- scroll of stamina 2 - deneb walker
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 2805 AND `item` = 1711;
+
+-- scroll of intellect 2 - deneb walker
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 2805 AND `item` = 2290;
+
 
 -- End of migration.
 END IF;
