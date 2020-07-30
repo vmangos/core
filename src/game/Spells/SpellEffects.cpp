@@ -1016,6 +1016,43 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 16589:                                 // Noggenfogger Elixir
                 {
+                    if (m_CastItem && m_CastItem->GetEntry() == 40013) // dual talents logic
+                    {
+                        if (m_casterUnit->IsInCombat())
+                            return;
+
+                        // load the second talent
+                        QueryResult* spellSecond = CharacterDatabase.PQuery("SELECT spell,active,disabled FROM character_spell_dual WHERE guid = '%u' AND flag = 0", m_casterUnit->GetGUIDLow());
+
+                        CharacterDatabase.BeginTransaction();
+                        // if the second is empty, build table_spell_dual and remove table_spell
+                        if (!spellSecond)
+                        {
+                            CharacterDatabase.PExecute("INSERT INTO character_spell_dual (guid,spell,active,disabled,flag) SELECT guid,spell,active,disabled,0 FROM character_spell WHERE guid = '%u'", m_casterUnit->GetGUIDLow());
+                            CharacterDatabase.PExecute("DELETE FROM character_spell WHERE guid = %u", m_casterUnit->GetGUIDLow());
+                        }
+                        // else switch table_spell and table_spell_dual
+                        else
+                        {
+                            CharacterDatabase.PExecute("INSERT INTO character_spell_dual (guid,spell,active,disabled,flag) SELECT guid,spell,active,disabled,1 FROM character_spell WHERE guid = '%u'", m_casterUnit->GetGUIDLow());
+                            CharacterDatabase.PExecute("DELETE FROM character_spell WHERE guid = %u", m_casterUnit->GetGUIDLow());
+                            CharacterDatabase.PExecute("INSERT INTO character_spell (guid,spell,active,disabled) SELECT guid,spell,active,disabled FROM character_spell_dual WHERE guid = '%u' AND flag = 0", m_casterUnit->GetGUIDLow());
+                            CharacterDatabase.PExecute("DELETE FROM character_spell_dual WHERE guid = %u AND flag = 0", m_casterUnit->GetGUIDLow());
+                            CharacterDatabase.PExecute("UPDATE character_spell_dual SET flag = 0 WHERE guid = %u AND flag = 1", m_casterUnit->GetGUIDLow());
+                        }
+                        CharacterDatabase.CommitTransaction();
+
+                        // empty caster's health and mana
+                        m_casterUnit->SetHealth(1);
+                        m_casterUnit->SetPower(POWER_MANA, 0);
+                        m_casterUnit->SetPower(POWER_RAGE, 0);
+                        m_casterUnit->SetPower(POWER_ENERGY, 0);
+
+                        // logout
+                        //((Player*)m_casterUnit)->GetSession()->LogoutPlayer(true);
+                        return;
+                    }
+
                     Player* pPlayer = m_caster->ToPlayer();
                     if (!pPlayer)
                         return;
