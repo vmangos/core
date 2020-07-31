@@ -320,6 +320,8 @@ void RobotManager::CheckLevelRobotEntities(uint32 pmLevel, uint32 pmRobotType, u
 		re->robot_type = pmRobotType;
 		robotEntityMap[pmRobotType].insert(re);
 
+		sLog.outBasic("new robot entity created. target level - %d robot type - %d", pmLevel, pmRobotType);
+
 		toOnline--;
 	}
 }
@@ -342,7 +344,7 @@ void RobotManager::UpdateRobotManager(uint32 pmDiff)
 		{
 			if (WorldSession* eachWS = itr.second)
 			{
-				if (eachWS->isRobotSession)
+				if (!eachWS->isRobotSession)
 				{
 					if (Player* eachPlayer = eachWS->GetPlayer())
 					{
@@ -6623,13 +6625,13 @@ void RobotManager::RandomTeleport(Player* pmTargetPlayer)
 		uint32 spawnID = 0;
 		if (pmTargetPlayer->GetRace() == Races::RACE_ORC || pmTargetPlayer->GetRace() == Races::RACE_TAUREN || pmTargetPlayer->GetRace() == Races::RACE_TROLL || pmTargetPlayer->GetRace() == Races::RACE_UNDEAD)
 		{
-			spawnID = urand(0, sRobotManager->orgrimmar_gruntSpawnIDMap.size() - 1);
-			spawnID = sRobotManager->orgrimmar_gruntSpawnIDMap[spawnID];
+			spawnID = urand(0, orgrimmar_gruntSpawnIDMap.size() - 1);
+			spawnID = orgrimmar_gruntSpawnIDMap[spawnID];
 		}
 		else
 		{
-			spawnID = urand(0, sRobotManager->ironforge_guardSpawnIDMap.size() - 1);
-			spawnID = sRobotManager->ironforge_guardSpawnIDMap[spawnID];
+			spawnID = urand(0, ironforge_guardSpawnIDMap.size() - 1);
+			spawnID = ironforge_guardSpawnIDMap[spawnID];
 		}
 		if (spawnID > 0)
 		{
@@ -6647,10 +6649,10 @@ void RobotManager::RandomTeleport(Player* pmTargetPlayer)
 	{
 		float distance = frand(sRobotConfig.TeleportMinRange, sRobotConfig.TeleportMaxRange);
 		float angle = frand(0, 2 * M_PI);
-		if (sRobotManager->onlinePlayerIDMap.size() > 0)
+		if (onlinePlayerIDMap.size() > 0)
 		{
-			uint32 playerIndex = urand(0, sRobotManager->onlinePlayerIDMap.size() - 1);
-			uint32 cid = sRobotManager->onlinePlayerIDMap[playerIndex];
+			uint32 playerIndex = urand(0, onlinePlayerIDMap.size() - 1);
+			uint32 cid = onlinePlayerIDMap[playerIndex];
 			ObjectGuid og = ObjectGuid(HighGuid::HIGHGUID_PLAYER, cid);
 			if (Player* targetP = ObjectAccessor::FindPlayer(og))
 			{
@@ -6701,11 +6703,11 @@ bool RobotManager::TankThreatOK(Player* pmTankPlayer, Unit* pmVictim)
 			{
 			case Classes::CLASS_WARRIOR:
 			{
-				if (sRobotManager->HasAura(pmVictim, "Sunder Armor"))
+				if (HasAura(pmVictim, "Sunder Armor"))
 				{
 					return true;
 				}
-				//if (sRobotManager->GetAuraStack(pmVictim, "Sunder Armor", pmTankPlayer) > 2)
+				//if (GetAuraStack(pmVictim, "Sunder Armor", pmTankPlayer) > 2)
 				//{
 				//	return true;
 				//}
@@ -6713,7 +6715,7 @@ bool RobotManager::TankThreatOK(Player* pmTankPlayer, Unit* pmVictim)
 			}
 			case Classes::CLASS_PALADIN:
 			{
-				if (sRobotManager->HasAura(pmVictim, "Judgement of the Crusader"))
+				if (HasAura(pmVictim, "Judgement of the Crusader"))
 				{
 					return true;
 				}
@@ -6739,7 +6741,7 @@ bool RobotManager::HasAura(Unit* pmTarget, std::string pmSpellName, Unit* pmCast
 	{
 		return false;
 	}
-	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
+	std::set<uint32> spellIDSet = spellNameEntryMap[pmSpellName];
 	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
 	{
 		uint32 spellID = *it;
@@ -6769,7 +6771,7 @@ uint32 RobotManager::GetAuraDuration(Unit* pmTarget, std::string pmSpellName, Un
 		return false;
 	}
 	uint32 duration = 0;
-	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
+	std::set<uint32> spellIDSet = spellNameEntryMap[pmSpellName];
 	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
 	{
 		uint32 spellID = *it;
@@ -6797,7 +6799,7 @@ uint32 RobotManager::GetAuraStack(Unit* pmTarget, std::string pmSpellName, Unit*
 	{
 		return false;
 	}
-	std::set<uint32> spellIDSet = sRobotManager->spellNameEntryMap[pmSpellName];
+	std::set<uint32> spellIDSet = spellNameEntryMap[pmSpellName];
 	for (std::set<uint32>::iterator it = spellIDSet.begin(); it != spellIDSet.end(); it++)
 	{
 		uint32 spellID = *it;

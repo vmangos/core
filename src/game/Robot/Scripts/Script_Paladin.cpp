@@ -382,13 +382,6 @@ bool Script_Paladin::Attack_Retribution(Unit* pmTarget)
 			return true;
 		}
 	}
-	if (me->HasAura(AURA_THE_ART_OF_WAR_1) || me->HasAura(AURA_THE_ART_OF_WAR_2))
-	{
-		if (CastSpell(pmTarget, "Exorcism", MELEE_MAX_DISTANCE))
-		{
-			return true;
-		}
-	}
 	if (pmTarget->IsNonMeleeSpellCasted(false))
 	{
 		if (CastSpell(pmTarget, "Hammer of Justice", MELEE_MAX_DISTANCE))
@@ -396,11 +389,31 @@ bool Script_Paladin::Attack_Retribution(Unit* pmTarget)
 			return true;
 		}
 	}
-	if (CastSpell(pmTarget, "Judgement of Light", MELEE_MAX_DISTANCE))
+	if (sRobotManager->HasAura(pmTarget, "Judgement of the Crusader"))
 	{
-		return true;
+		if (FindSpellID("Seal of Command"))
+		{
+			if (CastSpell(me, "Seal of Command", PALADIN_RANGE_DISTANCE, true))
+			{
+				return true;
+			}
+		}
+		else
+		{
+			if (CastSpell(me, "Seal of Righteousness", PALADIN_RANGE_DISTANCE, true))
+			{
+				return true;
+			}
+		}
 	}
-	if (CastSpell(pmTarget, "Crusader Strike", MELEE_MAX_DISTANCE))
+	else
+	{
+		if (CastSpell(me, "Seal of the Crusader", PALADIN_RANGE_DISTANCE, true))
+		{
+			return true;
+		}
+	}
+	if (CastSpell(pmTarget, "Judgement", MELEE_MAX_DISTANCE))
 	{
 		return true;
 	}
@@ -450,7 +463,21 @@ bool Script_Paladin::Attack_Common(Unit* pmTarget)
 			return true;
 		}
 	}
-	if (CastSpell(pmTarget, "Judgement of Light", MELEE_MAX_DISTANCE))
+	if (sRobotManager->HasAura(pmTarget, "Judgement of the Crusader"))
+	{
+		if (CastSpell(me, "Seal of Righteousness", PALADIN_RANGE_DISTANCE, true))
+		{
+			return true;
+		}
+	}
+	else
+	{
+		if (CastSpell(me, "Seal of the Crusader", PALADIN_RANGE_DISTANCE, true))
+		{
+			return true;
+		}
+	}
+	if (CastSpell(pmTarget, "Judgement", MELEE_MAX_DISTANCE))
 	{
 		return true;
 	}
@@ -471,23 +498,6 @@ bool Script_Paladin::Buff(Unit* pmTarget, bool pmCure)
 	if (!me)
 	{
 		return false;
-	}
-	if (me->GetGUID() == pmTarget->GetGUID())
-	{
-		if (FindSpellID("Seal of Command"))
-		{
-			if (CastSpell(me, "Seal of Command", PALADIN_RANGE_DISTANCE, true))
-			{
-				return true;
-			}
-		}
-		else
-		{
-			if (CastSpell(me, "Seal of Righteousness", PALADIN_RANGE_DISTANCE, true))
-			{
-				return true;
-			}
-		}
 	}
 	switch (auraType)
 	{

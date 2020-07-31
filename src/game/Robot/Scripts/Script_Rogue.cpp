@@ -99,7 +99,7 @@ bool Script_Rogue::DPS_Combat(Unit* pmTarget, bool pmChase)
 		}
 	}
 	// when facing boss 
-	if (pmTarget->GetMaxHealth() / me->GetMaxHealth() > 10.0f)
+	if (pmTarget->GetMaxHealth() / me->GetMaxHealth() > 5.0f)
 	{
 		if (CastSpell(pmTarget, "Adrenaline Rush", MELEE_MAX_DISTANCE))
 		{
@@ -108,7 +108,7 @@ bool Script_Rogue::DPS_Combat(Unit* pmTarget, bool pmChase)
 		}
 		if (energy > 25)
 		{
-			if (CastSpell(pmTarget, "Blade Flurry", MELEE_MAX_DISTANCE))
+			if (CastSpell(me, "Blade Flurry", MELEE_MAX_DISTANCE))
 			{
 				return true;
 			}
