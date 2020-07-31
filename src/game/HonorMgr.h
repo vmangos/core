@@ -66,6 +66,7 @@ class HonorMaintenancer
         void DistributeRankPoints(Team team);
         void InactiveDecayRankPoints();
         void FlushRankPoints();
+        void SetCityRanks();
         void CreateCalculationReport();
 
         float GetStandingCPByPosition(HonorStandingList& standingList, uint32 position);

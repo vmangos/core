@@ -536,6 +536,8 @@ class ChatHandler
         bool HandleHonorSetRPCommand(char*args);
         bool HandleHonorResetCommand(char*args);
 
+        bool HandleShowCityTitleCommand(char* args);
+
         bool HandleInstanceListBindsCommand(char* args);
         bool HandleInstanceUnbindCommand(char* args);
         bool HandleInstanceGroupUnbindCommand(char* args);

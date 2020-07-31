@@ -2372,6 +2372,25 @@ bool ChatHandler::HandleHonorSetRPCommand(char *args)
     return true;
 }
 
+bool ChatHandler::HandleShowCityTitleCommand(char* args)
+{
+    if (!*args)
+    {
+        PSendSysMessage("Syntax: .title on | off");
+        return false;
+    }
+
+    bool value;
+    ExtractOnOff(&args, value);
+
+    Player *target = GetSelectedPlayer();
+
+    if (!target)
+        target = m_session->GetPlayer();
+
+    target->SetByteValue(PLAYER_BYTES_3, 2, value ? target->GetRace() : 0);
+    return true;
+}   
 
 bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
 {
