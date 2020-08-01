@@ -32,13 +32,13 @@ EndContentData */
 ## npc_daphne_stilwell
 ######*/
 
-enum
+enum DaphneStilwellData
 {
-    SAY_DS_START        = -1000293,
-    SAY_DS_DOWN_1       = -1000294,
-    SAY_DS_DOWN_2       = -1000295,
-    SAY_DS_DOWN_3       = -1000296,
-    SAY_DS_PROLOGUE     = -1000297,
+    SAY_DS_START        = 2360,
+    SAY_DS_DOWN_1       = 5269,
+    SAY_DS_DOWN_2       = 2369,
+    SAY_DS_DOWN_3       = 2358,
+    SAY_DS_PROLOGUE     = 3090,
 
     SPELL_SHOOT         = 6660,
     QUEST_TOME_VALOR    = 1651,
@@ -191,13 +191,16 @@ CreatureAI* GetAI_npc_daphne_stilwell(Creature* pCreature)
 ## npc_defias_traitor
 ######*/
 
-#define SAY_START                   -1000101
-#define SAY_PROGRESS                -1000102
-#define SAY_END                     -1000103
-#define SAY_AGGRO_1                 -1000104
-#define SAY_AGGRO_2                 -1000105
+enum DefiasTraitorData
+{
+    SAY_START                   = 9,
+    SAY_PROGRESS                = 10,
+    SAY_END                     = 11,
+    SAY_AGGRO_1                 = 489,
+    SAY_AGGRO_2                 = 485,
 
-#define QUEST_DEFIAS_BROTHERHOOD    155
+    QUEST_DEFIAS_BROTHERHOOD    = 155
+};
 
 struct npc_defias_traitorAI : public npc_escortAI
 {
