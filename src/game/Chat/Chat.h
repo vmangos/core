@@ -342,6 +342,7 @@ class ChatHandler
         bool HandleCharacterChangeRaceCommand(char *args);
         bool HandleCharacterCopySkinCommand(char *args);
         bool HandleCharacterFillFlysCommand(char *args);
+        bool HandleCharacterCityTitleCommand(char *args);
         bool HandleCharacterPremadeGearCommand(char *args);
         bool HandleCharacterPremadeSpecCommand(char *args);
         bool HandleCharacterPremadeSaveGearCommand(char *args);
@@ -535,8 +536,6 @@ class ChatHandler
         bool HandleHonorAddKillCommand(char* args);
         bool HandleHonorSetRPCommand(char*args);
         bool HandleHonorResetCommand(char*args);
-
-        bool HandleShowCityTitleCommand(char* args);
 
         bool HandleInstanceListBindsCommand(char* args);
         bool HandleInstanceUnbindCommand(char* args);
