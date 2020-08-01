@@ -2388,7 +2388,11 @@ bool ChatHandler::HandleShowCityTitleCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
-    target->SetByteValue(PLAYER_BYTES_3, 2, value ? target->GetRace() : 0);
+    if (value)
+        target->SetCityTitle();
+    else
+        target->RemoveCityTitle();
+
     return true;
 }   
 
