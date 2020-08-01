@@ -85,7 +85,7 @@ UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 2805 AND `item` = 1711;
 UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 2805 AND `item` = 2290;
 
 
---stv
+-- stv
 -- Corporal Bluth
 INSERT INTO `npc_vendor` (`entry`, `item`) VALUES
 (734, 3137),
