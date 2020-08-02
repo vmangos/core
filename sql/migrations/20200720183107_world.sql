@@ -83,7 +83,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (183408, -2, 183405, 183406, 0, 0, 0);
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (183409, -2, 183407, 183408, 0, 0, 0);
 
---  allow creatures to roam 
+-- allow creatures to roam 
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 1 WHERE `guid` IN (52251, 48615, 51999, 52004, 48206, 48205);
 
 
