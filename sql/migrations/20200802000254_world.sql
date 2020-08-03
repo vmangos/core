@@ -23,17 +23,19 @@ DELETE FROM `script_texts` WHERE `entry` IN (-1999906, -1999907, -1999908, -1999
                                             -1900128, -1900129, -1900130, -1900131, -1900132, -1900133, -1900134, -1900135,
                                             -1900136, -1900137, -1900138, -1900139, -1900140, -1900141, -1900142, -1900143,
                                             -1900144, -1900145, -1900146, -1900147, -1900148, -1900149, -1900150, -1900151,
-                                            -1900152, -1900153, -1900154, -1900155, -1900156, -1900157, -1900158, -1900159);
+                                            -1900152, -1900153, -1900154, -1900155, -1900156, -1900157, -1900158, -1900159,
+                                            -1500000, -1500001, -1500002, -1500003, -1500004, -1500005, -1500006, -1500007);
 
 UPDATE `broadcast_text` SET `chat_type` = 1 WHERE `entry` IN (10474, 4613, 3934, 3936, 9648, 9712, 9713, 9714, 9715, 9728, 9655,
                                                               7368, 7366, 7369, 7407, 7358, 7343, 7346, 7344, 7227, 7355, 7357,
-                                                              7471, 7400);
+                                                              7471, 7400, 277, 278, 89, 90, 91, 92, 93, 276);
 UPDATE `broadcast_text` SET `chat_type` = 6, `emote_id1` = 22 WHERE `entry` = 10537;
 UPDATE `broadcast_text` SET `emote_id1` = 1 WHERE `entry` IN (1403, 7403);
-UPDATE `broadcast_text` SET `emote_id1` = 5 WHERE `entry` = 1404;
-UPDATE `broadcast_text` SET `emote_id1` = 25 WHERE `entry` = 1402;
+UPDATE `broadcast_text` SET `emote_id1` = 5 WHERE `entry` IN (1404, 89, 90, 91, 92, 93);
+UPDATE `broadcast_text` SET `emote_id1` = 25 WHERE `entry` IN (1402, 6107, 6118);
 UPDATE `broadcast_text` SET `emote_id1` = 22 WHERE `entry` = 7397;
 UPDATE `broadcast_text` SET `emote_id1` = 11 WHERE `entry` = 7398;
+UPDATE `broadcast_text` SET `sound_id` = 8593 WHERE `entry` = 277;
 
 
 -- End of migration.
