@@ -29,7 +29,6 @@ EndContentData */
 
 #include "scriptPCH.h"
 
-
 /*######
 ## npc_darrowshire_spirit
 ######*/
@@ -106,7 +105,7 @@ bool GossipSelect_npc_tirion_fordring(Player* pPlayer, Creature* pCreature, uint
 
 // Eris Havenfire event
 
-enum
+enum ErisHavenfireData
 {
     NPC_PAYSANT_0           = 14484,        // BLESSE
     NPC_PAYSANT_1           = 14485,        // CONTAMINE
@@ -132,21 +131,21 @@ enum
     SPELL_FUFU              = 23196,
     SPELL_SEE               = 23199,        // Pas sur de son utilité
 
-    SAY_PEASANT_RANDOM_3    = -1900118,
-    SAY_PEASANT_RANDOM_2    = -1900119,
-    SAY_PEASANT_RANDOM_1    = -1900120,
-    SAY_PEASANT_END_4       = -1900121,
-    SAY_PEASANT_END_3       = -1900122,
-    SAY_PEASANT_END_2       = -1900123,
-    SAY_PEASANT_END_1       = -1900124,
-    SAY_ERIS_FAIL_1         = -1900125,
-    SAY_ERIS_FAIL_2         = -1900126,
-    SAY_PEASANT_SPAWN_1     = -1900127,
-    SAY_PEASANT_SPAWN_2     = -1900128,
-    SAY_PEASANT_SPAWN_3     = -1900129,
-    SAY_PEASANT_SPAWN_4     = -1900130,
-    SAY_ERIS_END            = -1900131,
-    SAY_ERIS_HEAL           = -1900132,
+    SAY_PEASANT_RANDOM_3    = 9683,
+    SAY_PEASANT_RANDOM_2    = 9680,
+    SAY_PEASANT_RANDOM_1    = 9682,
+    SAY_PEASANT_END_4       = 9653,
+    SAY_PEASANT_END_3       = 9650,
+    SAY_PEASANT_END_2       = 9652,
+    SAY_PEASANT_END_1       = 9654,
+    SAY_ERIS_FAIL_1         = 9648,
+    SAY_ERIS_FAIL_2         = 9649,
+    SAY_PEASANT_SPAWN_1     = 9712,
+    SAY_PEASANT_SPAWN_2     = 9713,
+    SAY_PEASANT_SPAWN_3     = 9714,
+    SAY_PEASANT_SPAWN_4     = 9715,
+    SAY_ERIS_END            = 9728,
+    SAY_ERIS_HEAL           = 9655,
 
     QUEST_BALANCE_OF_LIGHT  = 7622,
 
@@ -277,7 +276,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
             guid = 0;
     }
 
-    void AttackedBy(Unit* /*Attacker*/) override {}
+    void AttackedBy(Unit* /*Attacker*/) override { }
 
     void MoveInLineOfSight(Unit* who) override
     {
@@ -320,6 +319,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                     summoned->AddThreat(curr, float(urand(100, 200)));
             }
         }
+
         if (Player* player = GetPlayer())
             if (player->IsAlive())
             {
@@ -705,7 +705,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_BUFF) == CAST_OK)
             {
-                DoScriptText(SAY_ERIS_HEAL, m_creature);
+                if (Player* player = GetPlayer())
+                    DoScriptText(SAY_ERIS_HEAL, m_creature, player);
                 BuffTimer = urand(75000, 90000);
             }
         }
@@ -806,10 +807,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         m_uiSayPeasantTimer = urand(10000, 30000);
     }
 
-    void KilledUnit(Unit* victim) override
-    {
-    }
-
+    void KilledUnit(Unit* victim) override { }
 
     void DamageTaken(Unit *done_by, uint32 &damage) override
     {
@@ -846,9 +844,7 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
         }
     }
 
-    void MoveInLineOfSight(Unit* who) override
-    {
-    }
+    void MoveInLineOfSight(Unit* who) override { }
 
     void MovementInform(uint32 uiType, uint32 uiPointId) override
     {
@@ -905,7 +901,7 @@ CreatureAI* GetAI_npc_eris_havenfire_peasant(Creature* pCreature)
     return new npc_eris_havenfire_peasantAI(pCreature);
 }
 
-enum
+enum DemetriaData
 {
     NPC_SCARLET_TROOPER                 = 12352,
     SPELL_MIND_BLAST                    = 17194,
@@ -924,7 +920,9 @@ struct npc_demetriaAI : public ScriptedAI
     {
         Reset();
     }
+
     uint64 guidScarletTrooper[9];
+
     void MovementInform(uint32 movementType, uint32 moveId) override
     {
         if (movementType != WAYPOINT_MOTION_TYPE)
@@ -952,16 +950,19 @@ struct npc_demetriaAI : public ScriptedAI
                 }
             }
         }
+
         if (moveId == 99)
         {
             DespawnTroopers();
             m_creature->ForcedDespawn();
         }
     }
+
     void JustDied(Unit* Killer) override
     {
         DespawnTroopers();
     }
+
     void DespawnTroopers()
     {
         for (uint64 guid : guidScarletTrooper)
@@ -1056,6 +1057,7 @@ struct npc_demetriaAI : public ScriptedAI
         }
         DoMeleeAttackIfReady();
     }
+
     void Reset() override
     {
         MindBlast_Timer = 3000;
@@ -1067,6 +1069,7 @@ struct npc_demetriaAI : public ScriptedAI
         Resurrect_Timer = 10000;
         m_creature->AddAura(SPELL_SHADOWFORM);
     }
+
     void DoRessurectUnit(Creature* creature, Unit* victim)//from Thekal's script.
     {
         float x, y, z, o;
@@ -1085,11 +1088,11 @@ struct npc_demetriaAI : public ScriptedAI
             creature->AI()->AttackStart(victim);
     }
 };
+
 CreatureAI* GetAI_npc_demetria(Creature* pCreature)
 {
     return new npc_demetriaAI(pCreature);
 }
-
 
 /******************************
 *** npc_darrowshire_trigger ***
@@ -1117,7 +1120,7 @@ static DarrowshireMove DarrowshireEvent[] =
     {1446.8f, -3694.27f, 76.5966f, 0.401503f}       // Defender spawn Davil Lightfire / Captain Redpath / Joseph Redpath
 };
 
-enum
+enum DarrowshireTriggerData
 {
     // Attacker
     NPC_MARAUDING_CORPSE        = 10951,
@@ -1142,28 +1145,28 @@ enum
 
     SPELL_SUMMON_MARDUK_THE_BLACK = 18650,
 
-    SAY_HORGUS_DIED             = -1900133,
-    SAY_LIGHTFIRE_DIED          = -1900134,
-    SAY_REDPATH_DIED            = -1900135,
-    SAY_SCOURGE_DEFEATED        = -1900136,
-    SAY_MILITIA_RANDOM_1        = -1900137,
-    SAY_MILITIA_RANDOM_2        = -1900138,
-    SAY_MILITIA_RANDOM_3        = -1900139,
-    SAY_MILITIA_RANDOM_4        = -1900140,
-    SAY_MILITIA_RANDOM_5        = -1900141,
-    SAY_MILITIA_RANDOM_6        = -1900142,
-    SAY_MILITIA_RANDOM_7        = -1900143,
-    SAY_MILITIA_RANDOM_8        = -1900144,
-    SAY_DEFENDER_YELL           = -1900145,
-    SAY_LIGHTFIRE_YELL          = -1900146,
-    SAY_DAVIL_YELL              = -1900147,
-    SAY_HORGUS_YELL             = -1900148,
-    SAY_DAVIL_DESPAWN           = -1900149,
-    SAY_REDPATH_YELL            = -1900150,
-    SAY_REDPATH_CORRUPTED       = -1900151,
-    SAY_MARDUK_YELL             = -1900152,
+    SAY_HORGUS_DIED             = 7368,
+    SAY_LIGHTFIRE_DIED          = 7366,
+    SAY_REDPATH_DIED            = 7369,
+    SAY_SCOURGE_DEFEATED        = 7407,
+    SAY_MILITIA_RANDOM_1        = 7347,
+    SAY_MILITIA_RANDOM_2        = 7348,
+    SAY_MILITIA_RANDOM_3        = 7349,
+    SAY_MILITIA_RANDOM_4        = 7350,
+    SAY_MILITIA_RANDOM_5        = 7351,
+    SAY_MILITIA_RANDOM_6        = 7352,
+    SAY_MILITIA_RANDOM_7        = 7353,
+    SAY_MILITIA_RANDOM_8        = 7354,
+    SAY_DEFENDER_YELL           = 7358,
+    SAY_LIGHTFIRE_YELL          = 7343,
+    SAY_DAVIL_YELL              = 7346,
+    SAY_HORGUS_YELL             = 7344,
+    SAY_DAVIL_DESPAWN           = 7227,
+    SAY_REDPATH_YELL            = 7355,
+    SAY_REDPATH_CORRUPTED       = 7357,
+    SAY_MARDUK_YELL             = 7471,
 
-    QUEST_BATTLE_DARROWSHIRE    = 5721,
+    QUEST_BATTLE_DARROWSHIRE    = 5721
 };
 
 struct npc_darrowshire_triggerAI : public ScriptedAI
@@ -1210,6 +1213,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                 }
             }
         }
+
         PhaseStep = 0;
         PhaseTimer = 6000;
 
@@ -1221,18 +1225,21 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
 
     bool _cleanupDone;
     bool _initialized;
+
     void OnRemoveFromWorld() override
     {
         if (_cleanupDone || !_initialized)
             return;
         DespawnAll();
     }
+
     void DespawnGuid(ObjectGuid& g)
     {
         if (Creature* c = m_creature->GetMap()->GetCreature(g))
             c->ForcedDespawn();
         g.Clear();
     }
+
     void DespawnAll()
     {
         _cleanupDone = true;
@@ -1704,20 +1711,19 @@ CreatureAI* GetAI_npc_darrowshire_trigger(Creature* pCreature)
     return new npc_darrowshire_triggerAI(pCreature);
 }
 
-
 /*************************
 *** npc_joseph_redpath ***
 *************************/
 
-enum
+enum JosephRedpathData
 {
-    SAY_JOSEPH_1            = -1900153,
-    SAY_PAMELA_1            = -1900154,
-    SAY_PAMELA_2            = -1900155,
-    SAY_PAMELA_3            = -1900156,
-    SAY_JOSEPH_2            = -1900157,
-    SAY_PAMELA_4            = -1900158,
-    SAY_JOSEPH_3            = -1900159,
+    SAY_JOSEPH_1            = 7397,
+    SAY_PAMELA_1            = 7399,
+    SAY_PAMELA_2            = 7400,
+    SAY_PAMELA_3            = 7401,
+    SAY_JOSEPH_2            = 7398,
+    SAY_PAMELA_4            = 7402,
+    SAY_JOSEPH_3            = 7403,
 
     NPC_PAMELA_REDPATH      = 10926
 };
@@ -1735,9 +1741,7 @@ struct npc_joseph_redpathAI : public ScriptedAI
     uint32 EventStep;
     uint32 EventTimer;
 
-    void Reset() override
-    {
-    }
+    void Reset() override { }
 
     void BeginEvent()
     {
@@ -1885,12 +1889,14 @@ bool GossipHello_npc_joseph_redpath(Player* pPlayer, Creature* pCreature)
     }
     return true;
 }
-enum
+
+enum MarkOfDetonationData
 {
     QUEST_WHEN_SMOKEY_SINGS__I_GET_VIOLENT  = 6041,
     SPELL_PLACING_SMOKEY_S_EXPLOSIVES       = 19250,
     TRIGGER_SCOURGE_STRUCTURE = 12247
 };
+
 bool EffectDummyGameObj_go_mark_of_detonation(WorldObject* pCaster, uint32 uiSpellId, SpellEffectIndex effIndex, GameObject* pGameObjectTarget)
 {
     //always check spellid and effectindex
