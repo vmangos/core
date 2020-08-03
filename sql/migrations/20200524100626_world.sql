@@ -9,6 +9,9 @@ INSERT INTO `migrations` VALUES ('20200524100626');
 -- Add your query below.
 
 
+-- Removing unused ev event_ai.
+UPDATE `creature_template` SET `ai_name` = '' WHERE `entry` = 5042;
+
 -- Removing unused script actions.
 DELETE FROM `creature_ai_scripts` WHERE `id` IN (504201);
 
