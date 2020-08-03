@@ -108,7 +108,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 
 -- Knaz Blunderflame
 INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
-(8679, 4389, 1, 7200),
+(8679, 4389, 1, 10800),
 (8679, 4382, 1, 10800),
 (8679, 4404, 1, 10800),
 (8679, 4363, 1, 10800),
@@ -127,7 +127,7 @@ UPDATE `npc_vendor` SET `maxcount` = 1 WHERE `entry` = 2685 AND `item` = 4371;
 
 -- Mazk Snipeshot
 INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
-(2685, 4389, 1, 7200),
+(2685, 4389, 1, 10800),
 (2685, 4382, 1, 10800),
 (2685, 4404, 3, 10800),
 (2685, 4363, 2, 10800);
@@ -166,7 +166,15 @@ DELETE FROM `npc_vendor` WHERE `entry` = 2480 AND `item` = 858;
 DELETE FROM `npc_vendor` WHERE `entry` = 2480 AND `item` = 3385;
 
 -- Rizz Loosebolt - Gyrochronatom
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 2684 AND `item` = 4389;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800  WHERE `entry` = 2684 AND `item` = 4389;
+
+-- Rizz Loosebolt - Schematic: Ice Deflector
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 43200  WHERE `entry` = 13308 AND `item` = 4389;
+
+-- Kris Legace
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
+(3536, 4830, 1, 43200),
+(3536, 4832, 1, 43200);
 
 
 -- End of migration.
