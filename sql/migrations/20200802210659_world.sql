@@ -19,7 +19,7 @@ UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 7249;
 DELETE FROM `creature_ai_events` WHERE `creature_id`=2922;
 DELETE FROM `creature_ai_scripts` WHERE `id`IN (292201, 292202, 292203);
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(2922, 1, -6631.39, -2726.79, 243.585, 2.96706, 25000, 0, 0),
+(2922, 1, -6631.39, -2726.79, 243.585, 2.96706, 25000, 0, 292204),
 (2922, 2, -6633.1, -2718.19, 243.968, 100, 0, 0, 0),
 (2922, 3, -6644.94, -2710.01, 245.064, 100, 0, 0, 0),
 (2922, 4, -6656.24, -2711.52, 242.568, 100, 0, 0, 0),
@@ -70,6 +70,7 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (292202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 905, 898, 900, 899, 0, 0, 0, 0, 0, 'Servo - Talk');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (292202, 0, 25, 1, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Servo - Run');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (292203, 0, 25, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Servo - Walk');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (292204, 0, 4, 46, 2, 1, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Servo - Set Non Attackable');
 
 
 -- End of migration.
