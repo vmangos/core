@@ -517,13 +517,6 @@ UPDATE `creature` SET `position_x` = -9536.21, `position_y` = -1273.05, `positio
 UPDATE `creature` SET `position_x` = -9523.21, `position_y` = -1290.25, `position_z` = 44.1174, `orientation` = 5.23877 WHERE `guid` = 81250;
 
 -- eastvale peasant 81252
-UPDATE `creature_template` SET `ai_name` = 'EventAI' WHERE `entry` = 11328;
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (8125201, 11328, 8125201, 1, 0, 100, 1, 0, 0, 360000, 360000, 8125201, 0, 0, 'Westfall Worker 81252 - Start Waypoints OOC');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125201, 0, 60, 1, 0, 0, 0, 0, 0, 0, 0, 81252, 0, 0, 0, 0, 0, 0, 0, 0, 'Westfall Worker 81252 - Start Waypoints');
-INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (8125201, 52, 81252, 0, 0, 0, 0);
-INSERT INTO `creature_ai_events` (`id`, `creature_id`, `condition_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_script`, `action2_script`, `action3_script`, `comment`) VALUES (8125202, 11328, 8125201, 1, 0, 100, 0, 0, 0, 0, 0, 8125202, 0, 0, 'Westfall Worker 81252 - Start ChopWood Emote OOC');
-INSERT INTO `creature_ai_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125202, 0, 68, 8125201, 2, 11328, 100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Westfall Worker 81252 - SSFA Eastvale Peasant');
-INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125201, 0, 1, 234, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Westfall Worker - ChopWood Emote - Started by Event 8125202');
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (81252, 1, -9535.65, -1329.81, 47.272, 100, 6000, 0, 8125201),
 (81252, 2, -9508.88, -1333.61, 44.3237, 100, 0, 0, 0),
@@ -536,7 +529,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (81252, 9, -9511.88, -1333.19, 44.8482, 100, 0, 0, 0),
 (81252, 10, -9523.05, -1335.57, 46.8005, 100, 0, 0, 0),
 (81252, 11, -9532.64, -1333.36, 47.621, 100, 0, 0, 0),
-(81252, 12, -9535.65, -1329.81, 47.272, 100, 6000, 0, 8125204);
+(81252, 12, -9535.65, -1329.81, 47.272, 100, 360000, 0, 8125204);
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125201, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Emote None');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125201, 4, 23, 89, 1, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Morph');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (8125202, 2, 23, 308, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Eastvale Peasant 81252 - Morph');
