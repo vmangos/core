@@ -39,6 +39,36 @@ void RobotMovement::ResetMovement()
 
 void RobotMovement::Chase(Unit* pmChaseTarget, float pmChaseDistanceMax, float pmChaseDistanceMin, uint32 pmLimitDelay)
 {
+	limitDelay = pmLimitDelay;
+	if (!me)
+	{
+		return;
+	}
+	if (!me->IsAlive())
+	{
+		return;
+	}
+	if (me->HasAuraType(SPELL_AURA_MOD_PACIFY))
+	{
+		return;
+	}
+	if (me->HasUnitState(UnitState::UNIT_STAT_NOT_MOVE))
+	{
+		return;
+	}
+	if (me->HasUnitState(UnitState::UNIT_STAT_ROAMING_MOVE))
+	{
+		return;
+	}
+	if (me->IsNonMeleeSpellCasted(false, false, true))
+	{
+		return;
+	}
+	if (me->IsBeingTeleported())
+	{
+		ResetMovement();
+		return;
+	}
 	if (!pmChaseTarget)
 	{
 		return;
@@ -61,12 +91,6 @@ void RobotMovement::Chase(Unit* pmChaseTarget, float pmChaseDistanceMax, float p
 				return;
 			}
 		}
-	}
-	limitDelay = pmLimitDelay;
-	if (me->IsBeingTeleported())
-	{
-		ResetMovement();
-		return;
 	}
 	if (activeMovementType == RobotMovementType::RobotMovementType_Chase)
 	{
@@ -112,6 +136,30 @@ void RobotMovement::MovePosition(Position pmTargetPosition, uint32 pmLimitDelay)
 void RobotMovement::MovePosition(float pmX, float pmY, float pmZ, uint32 pmLimitDelay)
 {
 	limitDelay = pmLimitDelay;
+	if (!me)
+	{
+		return;
+	}
+	if (!me->IsAlive())
+	{
+		return;
+	}
+	if (me->HasAuraType(SPELL_AURA_MOD_PACIFY))
+	{
+		return;
+	}
+	if (me->HasUnitState(UnitState::UNIT_STAT_NOT_MOVE))
+	{
+		return;
+	}
+	if (me->HasUnitState(UnitState::UNIT_STAT_ROAMING_MOVE))
+	{
+		return;
+	}
+	if (me->IsNonMeleeSpellCasted(false, false, true))
+	{
+		return;
+	}
 	if (me->IsBeingTeleported())
 	{
 		ResetMovement();
@@ -163,6 +211,31 @@ void RobotMovement::Update(uint32 pmDiff)
 	{
 		return;
 	}
+	if (!me->IsAlive())
+	{
+		return;
+	}
+	if (me->HasAuraType(SPELL_AURA_MOD_PACIFY))
+	{
+		return;
+	}
+	if (me->HasUnitState(UnitState::UNIT_STAT_NOT_MOVE))
+	{
+		return;
+	}
+	if (me->HasUnitState(UnitState::UNIT_STAT_ROAMING_MOVE))
+	{
+		return;
+	}
+	if (me->IsNonMeleeSpellCasted(false, false, true))
+	{
+		return;
+	}
+	if (me->IsBeingTeleported())
+	{
+		ResetMovement();
+		return;
+	}
 	checkDelay += pmDiff;
 	if (limitDelay > 0)
 	{
@@ -171,11 +244,6 @@ void RobotMovement::Update(uint32 pmDiff)
 		{
 			ResetMovement();
 		}
-	}
-	if (me->IsBeingTeleported())
-	{
-		ResetMovement();
-		return;
 	}
 	switch (activeMovementType)
 	{

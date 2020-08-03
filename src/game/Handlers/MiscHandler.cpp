@@ -470,12 +470,7 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket& recv_data)
 
     _player->SetSelectionGuid(guid);
 
-    // update reputation list if need
     Unit* unit = ObjectAccessor::GetUnit(*_player, guid);   // can select group members at diff maps
-
-    if (unit)
-        if (FactionTemplateEntry const* factionTemplateEntry = sObjectMgr.GetFactionTemplateEntry(unit->GetFactionTemplateId()))
-            _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
     // Drop combo points only for rogues and druids
     // Warriors use combo points internally, do no reset for everyone

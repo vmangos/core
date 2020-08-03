@@ -319,7 +319,7 @@ bool WorldSession::Update(PacketFilter& updater)
                 data << uint32(0) << uint32(0);
                 HandleMoveTeleportAckOpcode(data);
             }
-            else if (_player->IsBeingTeleportedFar())
+            if (_player->IsBeingTeleportedFar())
             {
                 HandleMoveWorldportAckOpcode();
             }

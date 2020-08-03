@@ -9474,7 +9474,7 @@ void Unit::GetRandomAttackPoint(Unit const* attacker, float &x, float &y, float 
 
     // EJ random attack point will not be less than 1.0f
     //float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + rand_norm_f() * (attacker->GetMeleeReach() - attacker->GetObjectBoundingRadius());
-    float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + frand(CONTACT_DISTANCE, MIN_MELEE_REACH);
+    float dist = attacker->GetObjectBoundingRadius() + GetObjectBoundingRadius() + frand(MIN_MELEE_REACH, DEFAULT_COMBAT_REACH);
     float initialPosX, initialPosY, initialPosZ, o;
     GetPosition(initialPosX, initialPosY, initialPosZ);
 

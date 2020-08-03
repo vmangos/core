@@ -696,6 +696,7 @@ void RobotManager::LogoutRobot(uint32 pmCharacterID)
 		if (WorldSession* checkWS = checkP->GetSession())
 		{
 			checkWS->LogoutPlayer(true);
+			checkWS->SetDisconnectedSession();
 		}
 	}
 }

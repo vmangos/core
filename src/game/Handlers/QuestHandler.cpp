@@ -108,6 +108,12 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recv_data)
 
     _player->PrepareGossipMenu(pCreature, pCreature->GetDefaultGossipMenuId());
     _player->SendPreparedGossip(pCreature);
+
+    // update reputation list if need    
+    if (FactionTemplateEntry const* factionTemplateEntry = sObjectMgr.GetFactionTemplateEntry(pCreature->GetFactionTemplateId()))
+    {
+        _player->GetReputationMgr().SetVisible(factionTemplateEntry);
+    }
 }
 
 void WorldSession::HandleQuestgiverAcceptQuestOpcode(WorldPacket& recv_data)

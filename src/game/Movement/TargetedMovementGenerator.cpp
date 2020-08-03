@@ -34,11 +34,6 @@
 template<class T, typename D>
 void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 {
-    // EJ debug 
-    if (owner.IsPlayer() && owner.GetGUIDLow() == 50)
-    {
-        bool breakPoint = true;
-    }
     // Note: Any method that accesses the target's movespline here must be
     // internally locked by the target's spline lock
     if (!i_target.isValid() || !i_target->IsInWorld())
@@ -261,11 +256,6 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
 template<class T>
 bool ChaseMovementGenerator<T>::Update(T &owner, uint32 const&  time_diff)
 {
-    // EJ debug 
-    if (owner.IsPlayer() && owner.GetGUIDLow() == 50)
-    {
-        bool breakPoint = true;
-    }
     if (!i_target.isValid() || !i_target->IsInWorld())
         return false;
 
