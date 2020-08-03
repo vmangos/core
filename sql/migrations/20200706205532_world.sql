@@ -634,7 +634,7 @@ INSERT INTO `creature_groups` (`leader_guid`, `member_guid`, `dist`, `angle`, `f
 (1366, 1365, 4, 15, 11),
 (1366, 1367, 4, 17, 11);
 INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
-(1059, 1, -13083.2, -606.34, 54.6774, 5.79507, 1800000, 0, 0),
+(1059, 1, -13083.2, -606.34, 54.6774, 5.79507, 1800000, 0, 105901),
 (1059, 2, -13077.1, -609.557, 54.2712, 100, 0, 0, 0),
 (1059, 3, -13047.4, -626.467, 53.2251, 100, 0, 0, 0),
 (1059, 4, -13034, -632.831, 53.4244, 100, 0, 0, 0),
@@ -716,6 +716,8 @@ INSERT INTO `creature_movement_template` (`entry`, `point`, `position_x`, `posit
 (1059, 80, -13061.6, -622.437, 55.0027, 100, 0, 0, 0),
 (1059, 81, -13064.5, -619.891, 53.8211, 100, 0, 0, 0),
 (1059, 82, -13067.6, -617.375, 53.7851, 100, 0, 0, 0);
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (105901, 0, 3, 0, 0, 2, 0, 1365, 0, 9, 2, 0, 0, 0, 0, -13076.9, -607.447, 54.53199, 5.55015, 0, 'Creature 1365 - Move');
+INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `condition_id`, `comments`) VALUES (105901, 0, 3, 0, 0, 2, 0, 1367, 0, 9, 2, 0, 0, 0, 0, -13076.4, -602.553, 54.8787, 5.34071, 0, 'Creature 1367- Move');
 
 -- add skullsplitter hunter patrol
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 1391;
