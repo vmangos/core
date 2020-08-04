@@ -84,7 +84,6 @@ enum AccountFlags
     ACCOUNT_FLAG_DEMOS               = 0x20000000,
     ACCOUNT_FLAG_DEATHKNIGHTOK       = 0x40000000,
 };
-};
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some paltform
 #if defined( __GNUC__ )
