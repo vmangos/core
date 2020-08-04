@@ -50,8 +50,6 @@
 
 enum AccountFlags
 {
-enum AccountFlags
-{
     ACCOUNT_FLAG_GM                  = 0x00000001,
     ACCOUNT_FLAG_NOKICK              = 0x00000002,
     ACCOUNT_FLAG_COLLECTOR           = 0x00000004,
