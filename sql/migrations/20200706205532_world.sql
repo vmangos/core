@@ -59,9 +59,6 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 -- commander aggro gosh should roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 3 WHERE `guid` = 721;
 
--- remove grunt
-DELETE FROM `creature` WHERE `guid` = 610;
-
 
 -- rebel camp
 -- add rebel watchman waypoints
