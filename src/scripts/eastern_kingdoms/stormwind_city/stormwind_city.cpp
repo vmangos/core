@@ -441,13 +441,13 @@ bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, Ques
                 return false;
 
             dashelStonefistAI->m_thugs[0]->AI()->AttackStart(pPlayer);
-            dashelStonefistAI->m_thugs[0]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            dashelStonefistAI->m_thugs[0]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
             // thug 2
             if (dashelStonefistAI->m_thugs[1] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8685.416992f, 443.130829f, 99.526917f, 5.759635f, TEMPSUMMON_DEAD_DESPAWN))
             {
                 dashelStonefistAI->m_thugs[1]->AI()->AttackStart(pPlayer);
-                dashelStonefistAI->m_thugs[1]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                dashelStonefistAI->m_thugs[1]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             }
             // start quest fight.
             dashelStonefistAI->startQuestFight();

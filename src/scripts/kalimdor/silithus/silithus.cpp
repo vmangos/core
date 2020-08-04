@@ -1268,7 +1268,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
     {
         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         pCreature->SetVisibility(VISIBILITY_OFF);
 
         OverlordCount = 0;
@@ -1311,7 +1311,7 @@ struct npc_Emissary_RomankhanAI : public ScriptedAI
         {
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
             m_creature->SetVisibility(VISIBILITY_ON);
         }
     }
@@ -1836,7 +1836,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                     target->AI()->AttackStart(pSummoned);
                 }
 
-                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                pSummoned->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
                 break;
             case NPC_KALDOREI_INFANTRY:
@@ -2048,7 +2048,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pMerithra->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                                pMerithra->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
                         m_uiEventTimer = 0;
@@ -2102,7 +2102,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pArygos->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                                pArygos->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
                         m_uiEventTimer = 0;
@@ -2159,7 +2159,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                                 pCaelestrasz->GetMotionMaster()->MovePoint(POINT_ID_DRAGON_ATTACK, pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ());
                                 pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                                 pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                                pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                                pCaelestrasz->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                             }
                         }
                         m_uiEventTimer = 0;
@@ -2362,7 +2362,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         m_creature->SetWalk(true);
                         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
                         m_creature->CastSpell(m_creature, SPELL_BRONZE_DRAGON_TRANSFORM, false);
                         m_uiEventTimer = 1000;
                         break;

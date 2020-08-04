@@ -444,7 +444,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
 {
     explicit npc_grenka_bloodscreechAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetVisibility(VISIBILITY_OFF);
 
         m_uiWave = 0;
@@ -505,7 +505,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
             case 2:
                 {
                     DoSummon(3);
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_PASSIVE);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
                     m_creature->SetVisibility(VISIBILITY_ON);
                     if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_PlayerGuid))
                     {

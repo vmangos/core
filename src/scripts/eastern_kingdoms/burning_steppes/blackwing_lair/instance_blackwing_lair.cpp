@@ -425,13 +425,13 @@ struct instance_blackwing_lair : public ScriptedInstance
                 else if (m_auiEncounter[TYPE_LASHLAYER] == IN_PROGRESS)
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
-                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                     pCreature->ForcedDespawn(1000);
                 }
                 else if (m_auiEncounter[TYPE_LASHLAYER] == FAIL)
                 {
                     pCreature->SetVisibility(VISIBILITY_ON);
-                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                    pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_IMMUNE_TO_NPC);
                 }
                 break;
             case MOB_EVEILLEUR_GRIFFEMORT:

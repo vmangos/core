@@ -194,7 +194,7 @@ struct npc_private_hendelAI : public ScriptedAI
         // case: When NPC respawns after previous event and looses quest giver flag for some players, so they need to relog to talk to him again.
         m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         // reset unattackable flag from previous event
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void AttackedBy(Unit* pAttacker) override
@@ -255,7 +255,7 @@ struct npc_private_hendelAI : public ScriptedAI
                         m_allies[i]->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
 
                     // rare case: horde players attack NPC during event so make them unattackable for them
-                    m_allies[i]->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+                    m_allies[i]->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
                     // visual teleport spell
                     m_allies[i]->CastSpell(m_allies[i], TELEPORT_VISUAL, false);
                     // move allies to the destination points
@@ -849,7 +849,7 @@ bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*
             return false;
 
         // rare case: players from the opposite faction can attack the NPC during event. Set him unattackable like on official.
-        tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+        tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (npc_archmage_tervoshAI* tervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()))
             tervoshAI->m_eventStarted = true;
@@ -872,7 +872,7 @@ bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*
             // something weird happened
             if (!tervosh)
                 return false;
-            tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
+            tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_IMMUNE_TO_NPC);
             tervosh->SetVisibility(VISIBILITY_OFF);
             // start the event.
             if (npc_archmage_tervoshAI* tervoshNewAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()))
