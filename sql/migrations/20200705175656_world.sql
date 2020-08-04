@@ -42,10 +42,10 @@ UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 843 AN
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 843 AND `item` = 6274;
 
 -- Agile Boots - Defias Profiteer
-UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 1669 AND `item` = 4788;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 1669 AND `item` = 4788;
 
 -- Recipe: Rage Potion - Defias Profiteer
-UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 1669 AND `item` = 5640;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 1669 AND `item` = 5640;
 
 
 -- elwynn
@@ -53,14 +53,13 @@ UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 1669 AND `item` = 5640;
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 7200 WHERE `entry` = 66 AND `item` = 6270;
 
 -- Scroll of Strength - Dawn Brightstar
-UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 958 AND `item` = 954;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 958 AND `item` = 954;
 
 -- Fine Shortbow - Rallic Finn
-UPDATE `npc_vendor` SET `maxcount` = 2, WHERE `entry` = 1198 AND `item` = 11303;
+UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 1198 AND `item` = 11303;
 
 -- Unlit Poor Torch - Drake Lindgren
 DELETE FROM `npc_vendor` WHERE `entry` = 1250 AND `item` = 6183;
-
 
 
 -- End of migration.
