@@ -35,7 +35,6 @@ enum eAuthCmd
     CMD_REALM_LIST                  = 0x10,
     CMD_XFER_INITIATE               = 0x30,
     CMD_XFER_DATA                   = 0x31,
-    // these opcodes no longer exist in currently supported client
     CMD_XFER_ACCEPT                 = 0x32,
     CMD_XFER_RESUME                 = 0x33,
     CMD_XFER_CANCEL                 = 0x34
