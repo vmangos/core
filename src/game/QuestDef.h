@@ -226,6 +226,7 @@ class Quest
         uint32 GetRequiredRaces() const { return RequiredRaces; }
         uint32 GetRequiredSkill() const { return RequiredSkill; }
         uint32 GetRequiredSkillValue() const { return RequiredSkillValue; }
+        uint32 GetRequiredCondition() const { return RequiredCondition; }
         uint32 GetRepObjectiveFaction() const { return RepObjectiveFaction; }
         int32  GetRepObjectiveValue() const { return RepObjectiveValue; }
         uint32 GetRequiredMinRepFaction() const { return RequiredMinRepFaction; }
@@ -327,6 +328,7 @@ class Quest
         uint32 RequiredRaces;
         uint32 RequiredSkill;
         uint32 RequiredSkillValue;
+        uint32 RequiredCondition;
         uint32 RepObjectiveFaction;
         int32  RepObjectiveValue;
         uint32 RequiredMinRepFaction;
