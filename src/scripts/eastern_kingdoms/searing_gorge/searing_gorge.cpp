@@ -31,15 +31,15 @@ EndContentData */
 ## npc_dorius_stonetender
 ######*/
 
-enum
+enum DoriusStonetenderData
 {
-    SAY_DORIUS_AGGRO_1              = -1000993,
-    SAY_DORIUS_AGGRO_2              = -1000994,
+    SAY_DORIUS_AGGRO_1              = 4353,
+    SAY_DORIUS_AGGRO_2              = 4351,
 
     NPC_DARK_IRON_STEELSHIFTER      = 8337,
     MAX_STEELSHIFTERS               = 4,
 
-    QUEST_ID_SUNTARA_STONES         = 3367,
+    QUEST_ID_SUNTARA_STONES         = 3367
 };
 
 struct npc_dorius_stonetenderAI : public npc_escortAI
@@ -49,20 +49,20 @@ struct npc_dorius_stonetenderAI : public npc_escortAI
         Reset();
     }
 
-    void Reset() override {}
+    void Reset() override { }
 
     void ResetCreature() override
     {
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void JustStartedEscort() override
     {
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
     }
 
     void Aggro(Unit* pWho) override
@@ -129,33 +129,31 @@ bool QuestAccept_npc_dorius_stonetender(Player* pPlayer, Creature* pCreature, Qu
     return false;
 }
 
-
 /*######
 ## Quest 3566
 ######*/
 
-enum
+enum ObsidionData
 {
     QUEST_RISE_OBSIDION     = 3566,
 
-    SAY_DORIUS1             = -1084001,
-    SAY_DORIUS2             = -1084002,
-    SAY_DORIUS3             = -1084003,
-    SAY_DORIUS4             = -1084004,
-    SAY_DORIUS5             = -1084005,
-    SAY_DORIUS6             = -1084006,
-    EMOTE_DORIUS7           = -1084007,
-    SAY_LATHORIC1           = -1084008,
-    SAY_LATHORIC2           = -1084009,
+    SAY_DORIUS1             = 4393,
+    SAY_DORIUS2             = 4394,
+    SAY_DORIUS3             = 4395,
+    SAY_DORIUS4             = 4396,
+    SAY_DORIUS5             = 4397,
+    SAY_DORIUS6             = 4398,
+    EMOTE_DORIUS7           = 4399,
+    SAY_LATHORIC1           = 4391,
+    SAY_LATHORIC2           = 4392,
 
     NPC_DORIUS              = 8421,
     NPC_LATHORIC_THE_BLACK  = 8391,
     NPC_OBSIDION            = 8400,
 
     SPELL_GROUND_SMASH      = 12734,
-    SPELL_KNOCK_AWAY        = 10101,
+    SPELL_KNOCK_AWAY        = 10101
 };
-
 
 struct npc_obsidionAI : public ScriptedAI
 {
@@ -167,7 +165,6 @@ struct npc_obsidionAI : public ScriptedAI
     ObjectGuid m_Dorius;
     bool m_IsEventRunning;
 
-
     npc_obsidionAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
     void Reset() override
@@ -177,18 +174,17 @@ struct npc_obsidionAI : public ScriptedAI
         m_playerList.clear();
         m_IsEventRunning = false;
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_IMMUNE_TO_NPC);
 
         if (Creature* cr = m_creature->GetMap()->GetCreature(m_Dorius))
             cr->DeleteLater();
         m_Dorius.Clear();
-
     }
 
     void Aggro(Unit* pWho) override
     {
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
         ScriptedAI::Aggro(pWho);
     }
 
@@ -249,7 +245,7 @@ struct npc_obsidionAI : public ScriptedAI
                     if (Player* player = m_creature->GetMap()->GetPlayer(guid))
                     {
                         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_NPC);
 
                         AttackStart(player);
                         if (Creature* lathoric = m_creature->GetMap()->GetCreature(m_Dorius))
@@ -257,12 +253,11 @@ struct npc_obsidionAI : public ScriptedAI
                             lathoric->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                             lathoric->AI()->AttackStart(player);
                         }
-                            
                         break;
                     }
                 }
             }
-       }
+        }
 
         // fighting
         if (!m_creature->SelectHostileTarget() || !m_creature->GetVictim())
@@ -276,7 +271,6 @@ struct npc_obsidionAI : public ScriptedAI
         else
             m_uiGroundSmashTimer -= uiDiff;
 
-
         if (m_uiKnockAwayTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_KNOCK_AWAY) == CAST_OK)
@@ -289,7 +283,6 @@ struct npc_obsidionAI : public ScriptedAI
     }
 };
 
-
 bool GossipHello_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature)
 {
     if (Creature* Obsidion = GetClosestCreatureWithEntry(pCreature, NPC_OBSIDION, VISIBLE_RANGE))
@@ -297,10 +290,8 @@ bool GossipHello_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature)
 
     pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid(), QUEST_RISE_OBSIDION);
     pPlayer->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, pCreature->GetObjectGuid());
-
     return true;
 }
-
 
 bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
@@ -319,7 +310,6 @@ bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, Q
                     for (GroupReference* pRef = pGroup->GetFirstMember(); pRef != nullptr; pRef = pRef->next())
                         if (Player* pMember = pRef->getSource())
                             pObsidionAI->m_playerList.push_back(pMember->GetObjectGuid());
-
             }
         }
         else
@@ -328,16 +318,10 @@ bool QuestAccept_npc_dying_archaeologist(Player* pPlayer, Creature* pCreature, Q
     return false;
 }
 
-
 CreatureAI* GetAI_npc_dorius(Creature* pCreature)
 {
     return new npc_obsidionAI(pCreature);
 }
-
-
-/*######
-##
-######*/
 
 void AddSC_searing_gorge()
 {

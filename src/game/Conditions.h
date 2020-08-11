@@ -242,6 +242,7 @@ enum ConditionSource                                        // From where was th
     CONDITION_FROM_MAP_EVENT        = 8,                    // Used to check conditions from scripted map events
     CONDITION_FROM_DBSCRIPTS        = 9,                    // Used to check a condition from DB Scripts Engine
     CONDITION_FROM_AREATRIGGER      = 10,                   // Used to check a condition from areatrigger_teleport table
+    CONDITION_FROM_QUEST            = 11,
 };
 
 enum ConditionRequirement

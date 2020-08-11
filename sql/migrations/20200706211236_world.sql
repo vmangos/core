@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20200706211236');
 
 
 -- Delgren the Purifier - No XP on kill, no loot, 10 seconds respawn.
-UPDATE `creature_template` SET `flags_extra` = 2 + 64 + 524288, `loot_id`=0, `civilian`=0 WHERE `entry`=3663;
+UPDATE `creature_template` SET `flags_extra` = 2 + 64 + 524288, `loot_id`=0 WHERE `entry`=3663;
 UPDATE `creature` SET `spawntimesecsmin`=10, `spawntimesecsmax`=10 WHERE `id`=3663;
 DELETE FROM `creature_loot_template` WHERE `entry`=3663;
 

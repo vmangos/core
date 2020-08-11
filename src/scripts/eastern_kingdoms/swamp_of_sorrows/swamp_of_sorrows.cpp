@@ -31,19 +31,19 @@ EndContentData */
 ## npc_galen_goodward
 ######*/
 
-enum Galen
+enum GalenGoodwardData
 {
     QUEST_GALENS_ESCAPE     = 1393,
 
     GO_GALENS_CAGE          = 37118,
 
-    SAY_PERIODIC            = -1000582,
-    SAY_QUEST_ACCEPTED      = -1000583,
-    SAY_ATTACKED_1          = -1000584,
-    SAY_ATTACKED_2          = -1000585,
-    SAY_QUEST_COMPLETE      = -1000586,
-    EMOTE_WHISPER           = -1000587,
-    EMOTE_DISAPPEAR         = -1000588
+    SAY_PERIODIC            = 7124,
+    SAY_QUEST_ACCEPTED      = 1854,
+    SAY_ATTACKED_1          = 1628,
+    SAY_ATTACKED_2          = 1629,
+    SAY_QUEST_COMPLETE      = 1855,
+    EMOTE_WHISPER           = 2076,
+    EMOTE_DISAPPEAR         = 1856
 };
 
 struct npc_galen_goodwardAI : public npc_escortAI
