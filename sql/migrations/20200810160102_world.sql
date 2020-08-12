@@ -52,18 +52,14 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (49855, 38, 9744.31, 946.046, 1293.16, 100, 0, 0, 0),
 (49855, 39, 9749.49, 928.846, 1295.62, 100, 0, 0, 0);
 
-
-
 -- add waypoints to creature 48164 (done by eye data not available)
 UPDATE `creature` SET `movement_type` = 2 WHERE `guid` = 48164
 INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `position_z`, `orientation`, `waittime`, `wander_distance`, `script_id`) VALUES
 (48164, 1, 9817.79, 432.526, 1317.18, 100, 10000, 0, 0),
 (48164, 2, 9835.47, 438.116, 1317.18, 100, 10000, 0, 0);
 
-
 -- move creature 49499 (done by eye data not available)
 UPDATE `creature` SET `position_x` = 9549.59, `position_y` = 690.513, `position_z` = 1264.922, `movement_type` = 1, `wander_distance` = 5 WHERE `guid` = 49499;
-
 
 -- correct waypoints for creature guid 49845
 DELETE FROM `creature_movement` WHERE `id` = 49845;
@@ -104,6 +100,7 @@ INSERT INTO `creature_movement` (`id`, `point`, `position_x`, `position_y`, `pos
 (49857, 14, 9940.860352, 2104.219971, 1328.770020, 100, 0, 0, 0),
 (49857, 15, 9936.580078, 2077.729980, 1328.260010, 100, 0, 0, 0);
 
+-- allow creature to roam
 UPDATE `creature` SET `movement_type` = 1, `wander_distance` = 2 WHERE `guid` = 46502;
 
 
