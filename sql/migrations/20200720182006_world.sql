@@ -9,8 +9,12 @@ INSERT INTO `migrations` VALUES ('20200720182006');
 -- Add your query below.
 
 
--- remove quest warlords command (4903) from warlord goretooth (9077)
-DELETE FROM `creature_questrelation` WHERE `quest` = 4903 AND `id` = 9077
+-- Remove quest Warlords Command (4903) from Warlord Goretooth (9077)
+DELETE FROM `creature_questrelation` WHERE `quest` = 4903 AND `id` = 9077;
+
+-- Add reputation requirement to receive Warlord Goretooth's Command.
+INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3`, `value4`, `flags`) VALUES (4903, 5, 76, 4, 0, 0, 0);
+UPDATE `conditions` SET `value3`=4903 WHERE `condition_entry`=61002;
 
 
 -- End of migration.
