@@ -73,7 +73,7 @@ UPDATE `npc_vendor` SET `maxcount` = 5, `incrtime` = 7200 WHERE `entry` = 1313 A
 UPDATE `npc_vendor` SET `maxcount` = 4, `incrtime` = 7200 WHERE `entry` = 1313 AND `item` = 2453;
 
 -- schematic blue firework - darian singh
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 5175 AND `item` = 1304;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 1304 AND `item` = 18649;
 
 -- scroll of strength - deneb walker
 UPDATE `npc_vendor` SET `maxcount` = 2 WHERE `entry` = 2805 AND `item` = 954;
@@ -148,7 +148,7 @@ UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 2670 
 -- Xizk Goodstitch - Pattern: Enchanter's Cowl
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 2670 AND `item` = 14630;
 
--- Fargon Mortalak - Pattern: Enchanter's Cowl
+-- Fargon Mortalak - Heavy Notched Belt
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800 WHERE `entry` = 2845 AND `item` = 12257;
 
 -- Nerrist 
@@ -169,7 +169,7 @@ DELETE FROM `npc_vendor` WHERE `entry` = 2480 AND `item` = 3385;
 UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 10800  WHERE `entry` = 2684 AND `item` = 4389;
 
 -- Rizz Loosebolt - Schematic: Ice Deflector
-UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 43200  WHERE `entry` = 13308 AND `item` = 4389;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime` = 43200  WHERE `entry` = 2684 AND `item` = 13308;
 
 -- Kris Legace
 INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
