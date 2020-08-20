@@ -38,7 +38,8 @@ char const* conditionSourceToStr[] =
     "spell_area",
     "scripted map event",
     "script action",
-    "areatrigger"
+    "areatrigger",
+    "quest template",
 };
 
 // Stores what params need to be provided to each condition type.
