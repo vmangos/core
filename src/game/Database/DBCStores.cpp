@@ -30,6 +30,7 @@
 #include "ObjectMgr.h"
 
 #include <map>
+#include <vector>
 
 struct WMOAreaTableTripple
 {
@@ -47,6 +48,44 @@ struct WMOAreaTableTripple
     int32 rootId;
     int32 adtId;
 };
+
+bool DoesWStringBeginWith(std::wstring const& searchIn, std::wstring const& searchFor)
+{
+    return searchIn.rfind(searchFor, 0) == 0;
+}
+
+bool DoesWStringEndWith(std::wstring const& searchIn, std::wstring const& searchFor)
+{
+    if (searchIn.length() >= searchFor.length())
+        return (0 == searchIn.compare(searchIn.length() - searchFor.length(), searchFor.length(), searchFor));
+
+    return false;
+}
+
+static std::wstring const namesBeginToken = L"\\<"; // if reserved word begins with this, it means its allowed as long as the word is not at the beginning of the name
+static std::wstring const namedEndToken = L"\\>";   // if reserved word ends with this, it means its allowed as long as the word is not at the end of the name
+
+struct BannedWordEntry
+{
+    BannedWordEntry(std::wstring word, bool notBegin, bool notEnd) : bannedWord(word), allowedIfNotBeginWith(notBegin), allowedIfNotEndWith(notEnd) { };
+    std::wstring bannedWord;
+    bool allowedIfNotBeginWith;
+    bool allowedIfNotEndWith;
+
+    bool Validate(std::wstring const& name) const
+    {
+        if (allowedIfNotBeginWith && !DoesWStringBeginWith(name, bannedWord))
+            return true;
+
+        if (allowedIfNotEndWith && !DoesWStringEndWith(name, bannedWord))
+            return true;
+
+        return name.find(bannedWord) == std::string::npos;
+    }
+};
+
+std::vector<BannedWordEntry> NamesProfaneValidators;
+std::vector<BannedWordEntry> NamesReservedValidators;
 
 DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
 DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
@@ -73,6 +112,8 @@ DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
 DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
 DBCStorage <LockEntry> sLockStore(LockEntryfmt);
+DBCStorage<NamesProfanityEntry> sNamesProfanityStore(NamesProfanityEntryfmt);
+DBCStorage<NamesReservedEntry> sNamesReservedStore(NamesReservedEntryfmt);
 DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
 DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
@@ -176,7 +217,7 @@ void LoadDBCStores(std::string const& dataPath)
 {
     std::string dbcPath = dataPath + "dbc/";
 
-    uint32 const DBCFilesCount = 41;
+    uint32 const DBCFilesCount = 43;
 
     BarGoLink bar(DBCFilesCount);
 
@@ -222,6 +263,58 @@ void LoadDBCStores(std::string const& dataPath)
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemRandomPropertiesStore, dbcPath, "ItemRandomProperties.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemSetStore,             dbcPath, "ItemSet.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sLockStore,                dbcPath, "Lock.dbc");
+
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sNamesProfanityStore,      dbcPath, "NamesProfanity.dbc");
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sNamesReservedStore,       dbcPath, "NamesReserved.dbc");
+    for (uint32 i = 0; i < sNamesProfanityStore.GetNumRows(); ++i)
+    {
+        NamesProfanityEntry const* namesProfanity = sNamesProfanityStore.LookupEntry(i);
+        if (!namesProfanity)
+            continue;
+
+        std::wstring wname;
+        ASSERT(Utf8toWStr(namesProfanity->Name, wname));
+
+        bool bannedAtBegin = false;
+        bool bannedAtEnd = false;
+        if (DoesWStringBeginWith(wname, namesBeginToken))
+        {
+            bannedAtBegin = true;
+            wname.erase(0, namesBeginToken.length());
+        }
+        if (DoesWStringEndWith(wname, namedEndToken))
+        {
+            bannedAtEnd = true;
+            wname.erase(wname.length() - namedEndToken.length(), namedEndToken.length());
+        }
+
+        NamesProfaneValidators.emplace_back(BannedWordEntry(wname, bannedAtBegin, bannedAtEnd));
+    }
+    for (uint32 i = 0; i < sNamesReservedStore.GetNumRows(); ++i)
+    {
+        NamesReservedEntry const* namesReserved = sNamesReservedStore.LookupEntry(i);
+        if (!namesReserved)
+            continue;
+
+        std::wstring wname;
+        ASSERT(Utf8toWStr(namesReserved->Name, wname));
+
+        bool bannedAtBegin = false;
+        bool bannedAtEnd = false;
+        if (DoesWStringBeginWith(wname, namesBeginToken))
+        {
+            bannedAtBegin = true;
+            wname.erase(0, namesBeginToken.length());
+        }
+        if (DoesWStringEndWith(wname, namedEndToken))
+        {
+            bannedAtEnd = true;
+            wname.erase(wname.length() - namedEndToken.length(), namedEndToken.length());
+        }
+
+        NamesReservedValidators.emplace_back(BannedWordEntry(wname, bannedAtBegin, bannedAtEnd));
+    }
+
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sQuestSortStore,           dbcPath, "QuestSort.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillLineStore,           dbcPath, "SkillLine.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillRaceClassInfoStore,  dbcPath, "SkillRaceClassInfo.dbc");
@@ -587,4 +680,24 @@ char const* GetUnitClassName(uint8 class_, uint8 locale)
 {
     ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(class_);
     return classEntry ? classEntry->name[locale] : nullptr;
+}
+
+ResponseCodes ValidateName(std::wstring name)
+{
+    // Convert first letter of name to lower case.
+    name[0] = wcharToLower(name[0]);
+
+    for (auto const& bannedWord : NamesProfaneValidators)
+    {
+        if (!bannedWord.Validate(name))
+            return CHAR_NAME_PROFANE;
+    }
+
+    for (auto const& bannedWord : NamesReservedValidators)
+    {
+        if (!bannedWord.Validate(name))
+            return CHAR_NAME_RESERVED;
+    }
+
+    return CHAR_NAME_SUCCESS;
 }
