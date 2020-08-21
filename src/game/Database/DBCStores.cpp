@@ -682,7 +682,7 @@ char const* GetUnitClassName(uint8 class_, uint8 locale)
     return classEntry ? classEntry->name[locale] : nullptr;
 }
 
-ResponseCodes ValidateName(std::wstring name)
+uint8 ValidateName(std::wstring name)
 {
     // Convert first letter of name to lower case.
     name[0] = wcharToLower(name[0]);

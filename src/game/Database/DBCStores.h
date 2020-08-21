@@ -53,7 +53,7 @@ typedef std::multimap<uint32, SkillRaceClassInfoEntry const*> SkillRaceClassInfo
 typedef std::pair<SkillRaceClassInfoMap::iterator, SkillRaceClassInfoMap::iterator> SkillRaceClassInfoBounds;
 SkillRaceClassInfoEntry const* GetSkillRaceClassInfo(uint32 skill, uint8 race, uint8 class_);
 
-ResponseCodes ValidateName(std::wstring name);
+uint8 ValidateName(std::wstring name);
 
 extern DBCStorage <AuctionHouseEntry>            sAuctionHouseStore;
 extern DBCStorage <BankBagSlotPricesEntry>       sBankBagSlotPricesStore;
