@@ -912,7 +912,7 @@ bool ChatHandler::HandlePartyBotSetRoleCommand(char* args)
     return false;
 }
 
-bool ChatHandler::HandlePartyBotAttackCommand(char* args)
+bool ChatHandler::HandlePartyBotAttackStartCommand(char* args)
 {
     Player* pPlayer = GetSession()->GetPlayer();
     Unit* pTarget = GetSelectedUnit();
@@ -949,8 +949,200 @@ bool ChatHandler::HandlePartyBotAttackCommand(char* args)
         }
     }
     
-    PSendSysMessage("All bots are now attacking %s.", pTarget->GetName());
+    PSendSysMessage("All party bots are now attacking %s.", pTarget->GetName());
     return true;
+}
+
+void StopPartyBotAttackHelper(PartyBotAI* pAI, Player* pBot)
+{
+    pBot->AttackStop(true);
+    pBot->InterruptNonMeleeSpells(false);
+    if (!pBot->IsStopped())
+        pBot->StopMoving();
+    if (pBot->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
+        pBot->GetMotionMaster()->Clear();
+    if (pAI->m_updateTimer.GetExpiry() < 3000)
+        pAI->m_updateTimer.Reset(3000);
+}
+
+bool ChatHandler::HandlePartyBotAttackStopCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget || (pTarget == pPlayer))
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Group* pGroup = pPlayer->GetGroup();
+    if (!pGroup)
+    {
+        SendSysMessage("You are not in a group.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == pPlayer)
+                continue;
+
+            if (pMember->AI())
+            {
+                if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pMember->AI()))
+                {
+                    if (pMember->GetVictim() == pTarget)
+                        StopPartyBotAttackHelper(pAI, pMember);
+                }
+            }
+        }
+    }
+
+    PSendSysMessage("All party bots have stopped attacking %s.", pTarget->GetName());
+    return true;
+}
+
+bool HandlePartyBotComeToMeHelper(Player* pBot, Player* pPlayer)
+{
+    if (pBot->AI() && pBot->IsAlive() && pBot->IsInMap(pPlayer) && !pBot->HasUnitState(UNIT_STAT_NO_FREE_MOVE))
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pBot->AI()))
+        {
+            if (pBot->GetVictim())
+                StopPartyBotAttackHelper(pAI, pBot);
+
+            if (pBot->GetStandState() != UNIT_STAND_STATE_STAND)
+                pBot->SetStandState(UNIT_STAND_STATE_STAND);
+
+            pBot->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+            pBot->MonsterMove(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotComeToMeCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    bool ok = false;
+
+    if (pTarget && pTarget != pPlayer)
+    {
+        if (ok = HandlePartyBotComeToMeHelper(pTarget, pPlayer))
+            PSendSysMessage("%s is coming to your position.", pTarget->GetName());
+        else
+            PSendSysMessage("%s is not a party bot or it cannot move.", pTarget->GetName());
+        return false;
+    }
+    else if (Group* pGroup = pPlayer->GetGroup())
+    {
+        bool ok = false;
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* pMember = itr->getSource())
+            {
+                if (pMember == pPlayer)
+                    continue;
+
+                ok = HandlePartyBotComeToMeHelper(pMember, pPlayer) || ok;
+            }
+        }
+
+        if (ok)
+            SendSysMessage("All party bots are coming to your position.");
+        else
+            SendSysMessage("There are no party bots in the group or they cannot move.");
+        return ok;
+    }
+
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
+}
+
+bool HandlePartyBotUseGObjectHelper(Player* pTarget, GameObject* pGo)
+{
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            if (pTarget->IsWithinDist(pGo, INTERACTION_DISTANCE))
+            {
+                pGo->Use(pTarget);
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
+{
+    Player* pPlayer = GetSession()->GetPlayer();
+    Player* pTarget = GetSelectedPlayer();
+
+    GameObject* pGo = getSelectedGameObject();
+    if (!pGo)
+    {
+        SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
+        return false;
+    }
+
+    bool ok = false;
+
+    if (pTarget && pTarget != pPlayer)
+    {
+        if (ok = HandlePartyBotUseGObjectHelper(pTarget, pGo))
+            PSendSysMessage("%s has used the object.", pTarget->GetName());
+        else
+            PSendSysMessage("%s is not in range or is not a party bot.", pTarget->GetName());
+        return ok;
+    }
+    else if (Group* pGroup = pPlayer->GetGroup())
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player* pMember = itr->getSource())
+                ok = HandlePartyBotUseGObjectHelper(pMember, pGo) || ok;
+        }
+
+        if (ok)
+            SendSysMessage("All party bots in range have used the object.");
+        else
+            SendSysMessage("There are no party bots in range of the object.");
+    }
+
+    return ok;
+}
+
+bool HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
+{
+    if (pTarget->AI())
+    {
+        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
+        {
+            pAI->m_updateTimer.Reset(duration);
+
+            if (duration)
+            {
+                pTarget->StopMoving();
+                pTarget->GetMotionMaster()->MoveIdle();
+            }
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
@@ -1031,27 +1223,6 @@ bool ChatHandler::HandlePartyBotPauseHelper(char* args, bool pause)
     }
 
     return true;
-}
-
-bool ChatHandler::HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
-{
-    if (pTarget->AI())
-    {
-        if (PartyBotAI* pAI = dynamic_cast<PartyBotAI*>(pTarget->AI()))
-        {
-            pAI->m_updateTimer.Reset(duration);
-
-            if (duration)
-            {
-                pTarget->StopMoving();
-                pTarget->GetMotionMaster()->MoveIdle();
-            }
-            
-            return true;
-        }
-    }
-
-    return false;
 }
 
 bool ChatHandler::HandlePartyBotPauseCommand(char* args)
