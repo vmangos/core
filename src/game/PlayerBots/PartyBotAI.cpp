@@ -16,6 +16,7 @@ enum PartyBotSpells
     PB_SPELL_DRINK = 1137,
     PB_SPELL_AUTO_SHOT = 75,
     PB_SPELL_SHOOT_WAND = 5019,
+    PB_SPELL_HONORLESS_TARGET = 2479,
 };
 
 #define PB_UPDATE_INTERVAL 1000
@@ -195,6 +196,37 @@ bool PartyBotAI::DrinkAndEat()
     }
 
     return needToEat || needToDrink;
+}
+
+bool PartyBotAI::ShouldAutoRevive() const
+{
+    if (me->GetDeathState() == DEAD)
+        return true;
+
+    bool alivePlayerNearby = false;
+    Group* pGroup = me->GetGroup();
+    for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+    {
+        if (Player* pMember = itr->getSource())
+        {
+            if (pMember == me)
+                continue;
+
+            if (pMember->IsInCombat())
+                return false;
+
+            if (pMember->IsAlive())
+            {
+                if (IsHealerClass(pMember->GetClass()))
+                    return false;
+
+                if (me->IsWithinDistInMap(pMember, 15.0f))
+                    alivePlayerNearby = true;
+            }
+        }
+    }
+
+    return alivePlayerNearby;
 }
 
 bool PartyBotAI::AttackStart(Unit* pVictim)
@@ -459,11 +491,11 @@ void PartyBotAI::UpdateAI(uint32 const diff)
         }
         else
         {
-            if (me->GetDeathState() == DEAD)
+            if (ShouldAutoRevive())
             {
                 me->ResurrectPlayer(0.5f);
                 me->SpawnCorpseBones();
-                me->SendCreateUpdateToPlayer(pLeader);
+                me->CastSpell(me, PB_SPELL_HONORLESS_TARGET, true);
             }
         }
         
