@@ -8347,7 +8347,7 @@ uint8 ObjectMgr::CheckPlayerName(std::string const& name, bool create)
     if (!isValidString(wname, strictMask, false, create))
         return CHAR_NAME_MIXED_LANGUAGES;
 
-    return CHAR_NAME_SUCCESS;
+    return ValidateName(wname);
 }
 
 bool ObjectMgr::IsValidCharterName(std::string const& name)
@@ -8384,6 +8384,16 @@ PetNameInvalidReason ObjectMgr::CheckPetName(std::string const& name)
     uint32 strictMask = sWorld.getConfig(CONFIG_UINT32_STRICT_PET_NAMES);
     if (!isValidString(wname, strictMask, false))
         return PET_NAME_MIXED_LANGUAGES;
+
+    switch (ValidateName(wname))
+    {
+        case CHAR_NAME_PROFANE:
+            return PET_NAME_PROFANE;
+        case CHAR_NAME_RESERVED:
+            return PET_NAME_RESERVED;
+        default:
+            break;
+    }
 
     return PET_NAME_SUCCESS;
 }
