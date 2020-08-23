@@ -1040,7 +1040,7 @@ bool ChatHandler::HandlePartyBotComeToMeCommand(char* args)
             PSendSysMessage("%s is coming to your position.", pTarget->GetName());
         else
             PSendSysMessage("%s is not a party bot or it cannot move.", pTarget->GetName());
-        return false;
+        return ok;
     }
     else if (Group* pGroup = pPlayer->GetGroup())
     {
@@ -1119,9 +1119,12 @@ bool ChatHandler::HandlePartyBotUseGObjectCommand(char* args)
             SendSysMessage("All party bots in range have used the object.");
         else
             SendSysMessage("There are no party bots in range of the object.");
+        return ok;
     }
 
-    return ok;
+    SendSysMessage("You are not in a group.");
+    SetSentErrorMessage(true);
+    return false;
 }
 
 bool HandlePartyBotPauseApplyHelper(Player* pTarget, uint32 duration)
