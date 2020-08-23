@@ -31,6 +31,7 @@
 
 #include <map>
 #include <vector>
+#include <regex>
 
 struct WMOAreaTableTripple
 {
@@ -48,44 +49,6 @@ struct WMOAreaTableTripple
     int32 rootId;
     int32 adtId;
 };
-
-bool DoesWStringBeginWith(std::wstring const& searchIn, std::wstring const& searchFor)
-{
-    return searchIn.rfind(searchFor, 0) == 0;
-}
-
-bool DoesWStringEndWith(std::wstring const& searchIn, std::wstring const& searchFor)
-{
-    if (searchIn.length() >= searchFor.length())
-        return (0 == searchIn.compare(searchIn.length() - searchFor.length(), searchFor.length(), searchFor));
-
-    return false;
-}
-
-static std::wstring const namesBeginToken = L"\\<"; // if reserved word begins with this, it means its allowed as long as the word is not at the beginning of the name
-static std::wstring const namedEndToken = L"\\>";   // if reserved word ends with this, it means its allowed as long as the word is not at the end of the name
-
-struct BannedWordEntry
-{
-    BannedWordEntry(std::wstring word, bool notBegin, bool notEnd) : bannedWord(word), allowedIfNotBeginWith(notBegin), allowedIfNotEndWith(notEnd) { };
-    std::wstring bannedWord;
-    bool allowedIfNotBeginWith;
-    bool allowedIfNotEndWith;
-
-    bool Validate(std::wstring const& name) const
-    {
-        if (allowedIfNotBeginWith && !DoesWStringBeginWith(name, bannedWord))
-            return true;
-
-        if (allowedIfNotEndWith && !DoesWStringEndWith(name, bannedWord))
-            return true;
-
-        return name.find(bannedWord) == std::string::npos;
-    }
-};
-
-std::vector<BannedWordEntry> NamesProfaneValidators;
-std::vector<BannedWordEntry> NamesReservedValidators;
 
 DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
 DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
@@ -114,6 +77,11 @@ DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
 DBCStorage <LockEntry> sLockStore(LockEntryfmt);
 DBCStorage<NamesProfanityEntry> sNamesProfanityStore(NamesProfanityEntryfmt);
 DBCStorage<NamesReservedEntry> sNamesReservedStore(NamesReservedEntryfmt);
+static std::wstring const emacsStartOfLineToken = L"\\<"; // equivalent to ^
+static std::wstring const emacsEndOfLineToken = L"\\>";   // equivalent to $
+typedef std::vector<std::wregex> NameValidationRegexContainer;
+NameValidationRegexContainer NamesProfaneValidators;
+NameValidationRegexContainer NamesReservedValidators;
 DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
 DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
@@ -275,20 +243,16 @@ void LoadDBCStores(std::string const& dataPath)
         std::wstring wname;
         ASSERT(Utf8toWStr(namesProfanity->Name, wname));
 
-        bool bannedAtBegin = false;
-        bool bannedAtEnd = false;
-        if (DoesWStringBeginWith(wname, namesBeginToken))
-        {
-            bannedAtBegin = true;
-            wname.erase(0, namesBeginToken.length());
-        }
-        if (DoesWStringEndWith(wname, namedEndToken))
-        {
-            bannedAtEnd = true;
-            wname.erase(wname.length() - namedEndToken.length(), namedEndToken.length());
-        }
+        // the dbc uses emacs regex syntax
+        auto index = wname.find(emacsStartOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsStartOfLineToken.length(), L"^");
 
-        NamesProfaneValidators.emplace_back(BannedWordEntry(wname, bannedAtBegin, bannedAtEnd));
+        index = wname.find(emacsEndOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsEndOfLineToken.length(), L"$");
+
+        NamesProfaneValidators.emplace_back(wname, std::regex::icase | std::regex::optimize);
     }
     for (uint32 i = 0; i < sNamesReservedStore.GetNumRows(); ++i)
     {
@@ -299,20 +263,16 @@ void LoadDBCStores(std::string const& dataPath)
         std::wstring wname;
         ASSERT(Utf8toWStr(namesReserved->Name, wname));
 
-        bool bannedAtBegin = false;
-        bool bannedAtEnd = false;
-        if (DoesWStringBeginWith(wname, namesBeginToken))
-        {
-            bannedAtBegin = true;
-            wname.erase(0, namesBeginToken.length());
-        }
-        if (DoesWStringEndWith(wname, namedEndToken))
-        {
-            bannedAtEnd = true;
-            wname.erase(wname.length() - namedEndToken.length(), namedEndToken.length());
-        }
+        // the dbc uses emacs regex syntax
+        auto index = wname.find(emacsStartOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsStartOfLineToken.length(), L"^");
 
-        NamesReservedValidators.emplace_back(BannedWordEntry(wname, bannedAtBegin, bannedAtEnd));
+        index = wname.find(emacsEndOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsEndOfLineToken.length(), L"$");
+
+        NamesReservedValidators.emplace_back(wname, std::regex::icase | std::regex::optimize);
     }
 
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sQuestSortStore,           dbcPath, "QuestSort.dbc");
@@ -682,22 +642,15 @@ char const* GetUnitClassName(uint8 class_, uint8 locale)
     return classEntry ? classEntry->name[locale] : nullptr;
 }
 
-uint8 ValidateName(std::wstring name)
+uint8 ValidateName(std::wstring const& name)
 {
-    // Convert first letter of name to lower case.
-    name[0] = wcharToLower(name[0]);
-
-    for (auto const& bannedWord : NamesProfaneValidators)
-    {
-        if (!bannedWord.Validate(name))
+    for (std::wregex const& regex : NamesProfaneValidators)
+        if (std::regex_search(name, regex))
             return CHAR_NAME_PROFANE;
-    }
 
-    for (auto const& bannedWord : NamesReservedValidators)
-    {
-        if (!bannedWord.Validate(name))
-            return CHAR_NAME_RESERVED;
-    }
+    for (std::wregex const& regex : NamesReservedValidators)
+        if (std::regex_search(name, regex))
+            return CHAR_NAME_RESERVED;       
 
     return CHAR_NAME_SUCCESS;
 }
