@@ -1484,19 +1484,19 @@ void Creature::SaveToDB(uint32 mapid)
        << data.creature_id[2] << ","
        << data.creature_id[3] << ","
        << mapid << ","
-       << displayId << ","
-       << GetEquipmentId() << ","
-       << GetPositionX() << ","
-       << GetPositionY() << ","
-       << GetPositionZ() << ","
-       << GetOrientation() << ","
-       << data.spawntimesecsmin << ","                     // respawn time minimum
-       << data.spawntimesecsmax << ","                     // respawn time maximum
-       << wander_distance << ","                           // wander distance
-       << data.health_percent << ","                       // health_percent
-       << data.mana_percent << ","                         // mana_percent
-       << GetDefaultMovementType() << ","                  // default movement generator type
-       << m_isActiveObject << ","
+       << data.display_id << ","
+       << data.equipment_id << ","
+       << data.position.x << ","
+       << data.position.y << ","
+       << data.position.z << ","
+       << data.position.o << ","
+       << data.spawntimesecsmin << ","
+       << data.spawntimesecsmax << ","
+       << wander_distance << ","
+       << data.health_percent << ","
+       << data.mana_percent << ","
+       << data.movement_type << ","
+       << data.spawn_flags << ","
        << m_visibilityModifier << ","
        << "0,"                                             // patch_min
        << "10)";                                           // patch_max
