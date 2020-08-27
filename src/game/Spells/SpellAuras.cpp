@@ -2388,40 +2388,42 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 
     if (apply)
     {
-
-
         Powers PowerType = POWER_MANA;
         switch (form)
         {
-        case FORM_CAT:
-            PowerType = POWER_ENERGY;
-            break;
-        case FORM_BEAR:
-        case FORM_DIREBEAR:
-            PowerType = POWER_RAGE;
-            break;
-        /*case FORM_TRAVEL:
-        case FORM_AQUA:
-        case FORM_GHOUL:
-        case FORM_CREATUREBEAR:
-        case FORM_GHOSTWOLF:
-        case FORM_MOONKIN:
-        case FORM_AMBIENT:
-        case FORM_SHADOW:
-        case FORM_STEALTH:
-        case FORM_TREE:
-        case FORM_SPIRITOFREDEMPTION:
-            break;*/
-        case FORM_BATTLESTANCE:
-        case FORM_BERSERKERSTANCE:
-        case FORM_DEFENSIVESTANCE:
-            PowerType = POWER_RAGE;
-            break;
-        default:
-            break;
+            case FORM_CAT:
+                PowerType = POWER_ENERGY;
+                break;
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+                PowerType = POWER_RAGE;
+                break;
+                /*case FORM_TRAVEL:
+                case FORM_AQUA:
+                case FORM_GHOUL:
+                case FORM_CREATUREBEAR:
+                case FORM_GHOSTWOLF:
+                case FORM_MOONKIN:
+                case FORM_AMBIENT:
+                case FORM_SHADOW:
+                case FORM_STEALTH:
+                case FORM_TREE:
+                case FORM_SPIRITOFREDEMPTION:
+                break;*/
+            case FORM_BATTLESTANCE:
+            case FORM_BERSERKERSTANCE:
+            case FORM_DEFENSIVESTANCE:
+                PowerType = POWER_RAGE;
+                break;
+            default:
+                break;
         }
+
         // remove other shapeshift before applying a new one
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT, GetHolder());
+
+        if (!(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY))
+            target->RemoveSpellsCausingAura(SPELL_AURA_WATER_WALK, GetHolder());
 
         if (PowerType != POWER_MANA)
         {

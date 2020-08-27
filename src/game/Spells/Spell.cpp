@@ -6947,6 +6947,16 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
             }
+            case SPELL_AURA_WATER_WALK:
+            {
+                if (Unit* pTarget = m_targets.getUnitTarget())
+                {
+                    // Player is not allowed to cast water walk on shapeshifted / mounted target
+                    if (pTarget->IsShapeShifted() || pTarget->IsMounted())
+                        return SPELL_FAILED_BAD_TARGETS;
+                }
+                break;
+            }
             default:
                 break;
         }
