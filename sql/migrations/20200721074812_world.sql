@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20200721074812');
 
 
 -- rogues should have 100 thrown items at start
-UPDATE `platercreateinfo_item` SET `amount` = 100 WHERE `class` = 4 AND `itemid` IN (2947, 3111);
+UPDATE `playercreateinfo_item` SET `amount` = 100 WHERE `class` = 4 AND `itemid` IN (2947, 3111);
 
 
 -- End of migration.
