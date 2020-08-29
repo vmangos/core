@@ -1737,7 +1737,9 @@ enum MailResponseResult
     MAIL_ERR_RECIPIENT_NOT_FOUND       = 4,
     MAIL_ERR_NOT_YOUR_TEAM             = 5,
     MAIL_ERR_INTERNAL_ERROR            = 6,
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     MAIL_ERR_DISABLED_FOR_TRIAL_ACC    = 14,
+#endif
     MAIL_ERR_RECIPIENT_CAP_REACHED     = 15,
 };
 
@@ -1795,8 +1797,12 @@ enum TradeStatus
     TRADE_STATUS_TARGET_DEAD    = 18,
     TRADE_STATUS_YOU_LOGOUT     = 19,
     TRADE_STATUS_TARGET_LOGOUT  = 20,
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     TRADE_STATUS_TRIAL_ACCOUNT  = 21,                       // Trial accounts can not perform that action
+#endif
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     TRADE_STATUS_ONLY_CONJURED  = 22                        // You can only trade conjured items... (cross realm BG related).
+#endif
 };
 
 // TrinityCore

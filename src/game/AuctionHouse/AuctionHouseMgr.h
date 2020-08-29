@@ -48,7 +48,9 @@ enum AuctionError
     AUCTION_ERR_HIGHER_BID              = 5,                // ERR_AUCTION_HIGHER_BID
     AUCTION_ERR_BID_INCREMENT           = 7,                // ERR_AUCTION_BID_INCREMENT
     AUCTION_ERR_BID_OWN                 = 10,               // ERR_AUCTION_BID_OWN
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_6_1
     AUCTION_ERR_RESTRICTED_ACCOUNT      = 13                // ERR_RESTRICTED_ACCOUNT
+#endif
 };
 
 enum AuctionAction
