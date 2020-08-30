@@ -5198,20 +5198,23 @@ void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
     unitTarget->InterruptSpellsCastedOnMe(true);
     unitTarget->CombatStop();
 
-    HostileReference* pReference = unitTarget->GetHostileRefManager().getFirst();
-
-    while (pReference)
+    // Flask of Petrification does not cause mobs to stop attacking.
+    if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX2_FOOD_BUFF))
     {
-        HostileReference* pNextRef = pReference->next();
-        if (!guard_check || !pReference->getSource()->getOwner()->IsContestedGuard())
+        HostileReference* pReference = unitTarget->GetHostileRefManager().getFirst();
+        while (pReference)
         {
-            pReference->removeReference();
-            delete pReference;
-        }
-        else
-            no_guards = false;
+            HostileReference* pNextRef = pReference->next();
+            if (!guard_check || !pReference->getSource()->getOwner()->IsContestedGuard())
+            {
+                pReference->removeReference();
+                delete pReference;
+            }
+            else
+                no_guards = false;
 
-        pReference = pNextRef;
+            pReference = pNextRef;
+        }
     }
     
     unitTarget->m_lastSanctuaryTime = WorldTimer::getMSTime();
