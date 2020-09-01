@@ -24,7 +24,6 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-
 static float const aZombieSummonLoc[3][3] =
 {
     { 3267.9f, -3172.1f, 297.42f },
@@ -32,12 +31,9 @@ static float const aZombieSummonLoc[3][3] =
     { 3308.3f, -3185.8f, 297.42f },
 };
 
-enum
+enum GluthData
 {
-    // Cannot see these emotes being used in vanilla
-    // EMOTE_ZOMBIE    = -1533119,
-    // EMOTE_DECIMATE  = -1533152,
-    EMOTE_FRENZY            = -1000002,
+    EMOTE_FRENZY            = 1191,
 
     SPELL_DOUBLE_ATTACK     = 19818, // Added on reset in cmangos, not sure why
 
@@ -54,7 +50,6 @@ enum
     NPC_ZOMBIE_CHOW         = 16360,
     SPELL_INFECTED_WOUND    = 29307
 };
-
 
 enum eGLuthEvents
 {
@@ -151,6 +146,7 @@ struct boss_gluthAI : public ScriptedAI
         // only want to do these calculations inside naxx
         if (m_pInstance->GetMap()->GetId() != 533)
             return;
+
         if (pSpell->Id == SPELL_DECIMATE)
         {
             Map::PlayerList const& pList = m_pInstance->GetMap()->GetPlayers();
@@ -174,85 +170,85 @@ struct boss_gluthAI : public ScriptedAI
         {
             switch (l_EventId)
             {
-            case EVENT_MORTAL_WOUND:
-            {
-                // mortal wound current target every 
-                if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALWOUND) == CAST_OK)
-                    m_events.Repeat(MORTAL_WOUND_CD);
-                else
-                    m_events.Repeat(100);
-                break;
-            }
-            case EVENT_DECIMATE:
-            {
-                // decimate every DECIMATE_CD ms
-                // all the decimate logic is handled in SpellHit, so we dont put any players on 
-                // 5% hp until we know the boss has received his stun etc
-                if (DoCastSpellIfCan(m_creature, SPELL_DECIMATE) == CAST_OK)
-                    m_events.Repeat(DECIMATE_CD);
-                else
-                    m_events.Repeat(100);
-                break;
-            }
-            case EVENT_FRENZY:
-            {
-                // Frenzy every FRENZY_CD ms
-                if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
+                case EVENT_MORTAL_WOUND:
                 {
-                    m_events.Repeat(FRENZY_CD);
-                    DoScriptText(EMOTE_FRENZY, m_creature);
+                    // mortal wound current target every
+                    if (DoCastSpellIfCan(m_creature->GetVictim(), SPELL_MORTALWOUND) == CAST_OK)
+                        m_events.Repeat(MORTAL_WOUND_CD);
+                    else
+                        m_events.Repeat(100);
+                    break;
                 }
-                else
-                    m_events.Repeat(100);
-                break;
-            }
-            case EVENT_SUMMON:
-                // Summon an add every SUMMON_CD ms
-                SummonAdd();
-                m_events.Repeat(SUMMON_CD);
-                break;
-            case EVENT_BERSERK:
-            {
-                // berserk after BERSERK_CD ms
-                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-                    m_events.Repeat(300000); // duration of berserk 
-                else
-                    m_events.Repeat(100);
-                break;
-            }
-            case EVENT_TERRIFYING_ROAR:
-            {
-                // fear every FEAR_CD ms
-                if (DoCastSpellIfCan(m_creature, SPELL_TERRIFYING_ROAR) == CAST_OK)
-                    m_events.Repeat(FEAR_CD);
-                else
-                    m_events.Repeat(100);
-                break;
-            }
-            case EVENT_ZOMBIE_SEARCH:
-            {
-                // every ZOMBIE_SEARCH_CD ms he checks if any zombies are close enough to eat
-                DoSearchZombieChow();
-                m_events.Repeat(ZOMBIE_SEARCH_CD);
-                break;
-            }
-            case EVENT_EVADE_CHECK:
-            {
-                m_events.Repeat(Seconds(5));
-                float curZ = m_creature->GetPositionZ();
-                if (curZ < 293.0f && curZ > 300.0f) // avoid getting stuck in wall on pull
+                case EVENT_DECIMATE:
                 {
-                    EnterEvadeMode();
+                    // decimate every DECIMATE_CD ms
+                    // all the decimate logic is handled in SpellHit, so we dont put any players on
+                    // 5% hp until we know the boss has received his stun etc
+                    if (DoCastSpellIfCan(m_creature, SPELL_DECIMATE) == CAST_OK)
+                        m_events.Repeat(DECIMATE_CD);
+                    else
+                        m_events.Repeat(100);
+                    break;
                 }
-                else
+                case EVENT_FRENZY:
                 {
-                    if (m_creature->GetDistance2d(m_creature->GetHomePosition()) > 150.0f)
+                    // Frenzy every FRENZY_CD ms
+                    if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
+                    {
+                        m_events.Repeat(FRENZY_CD);
+                        DoScriptText(EMOTE_FRENZY, m_creature);
+                    }
+                    else
+                        m_events.Repeat(100);
+                    break;
+                }
+                case EVENT_SUMMON:
+                    // Summon an add every SUMMON_CD ms
+                    SummonAdd();
+                    m_events.Repeat(SUMMON_CD);
+                    break;
+                case EVENT_BERSERK:
+                {
+                    // berserk after BERSERK_CD ms
+                    if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                        m_events.Repeat(300000); // duration of berserk
+                    else
+                        m_events.Repeat(100);
+                    break;
+                }
+                case EVENT_TERRIFYING_ROAR:
+                {
+                    // fear every FEAR_CD ms
+                    if (DoCastSpellIfCan(m_creature, SPELL_TERRIFYING_ROAR) == CAST_OK)
+                        m_events.Repeat(FEAR_CD);
+                    else
+                        m_events.Repeat(100);
+                    break;
+                }
+                case EVENT_ZOMBIE_SEARCH:
+                {
+                    // every ZOMBIE_SEARCH_CD ms he checks if any zombies are close enough to eat
+                    DoSearchZombieChow();
+                    m_events.Repeat(ZOMBIE_SEARCH_CD);
+                    break;
+                }
+                case EVENT_EVADE_CHECK:
+                {
+                    m_events.Repeat(Seconds(5));
+                    float curZ = m_creature->GetPositionZ();
+                    if (curZ < 293.0f && curZ > 300.0f) // avoid getting stuck in wall on pull
                     {
                         EnterEvadeMode();
                     }
+                    else
+                    {
+                        if (m_creature->GetDistance2d(m_creature->GetHomePosition()) > 150.0f)
+                        {
+                            EnterEvadeMode();
+                        }
+                    }
+                    break;
                 }
-                break;
-            }
             }
         }
 
@@ -267,6 +263,7 @@ struct boss_gluthAI : public ScriptedAI
         GetCreatureListWithEntryInGrid(chowableZombies, m_creature, NPC_ZOMBIE_CHOW, 15.0f);
         if (chowableZombies.empty())
             return;
+
         for (const auto& chowableZombie : chowableZombies)
         {
             if (!chowableZombie->IsAlive())
@@ -311,6 +308,7 @@ struct mob_zombieChow : public ScriptedAI
 
     instance_naxxramas* m_pInstance;
     bool isHitByDecimate;
+
     void Reset() override
     {
         isHitByDecimate = false;
