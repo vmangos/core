@@ -557,9 +557,15 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_DB_GUID:
         {
             if (GameObject const* pGo = source->ToGameObject())
-                return pGo->GetDBTableGUIDLow() == m_value1;
+            {
+                if (uint32 dbGuid = pGo->GetDBTableGUIDLow())
+                    return (dbGuid == m_value1) || (dbGuid == m_value2) || (dbGuid == m_value3) || (dbGuid == m_value4);
+            }
             else if (Creature const* pCreature = source->ToCreature())
-                return pCreature->GetDBTableGUIDLow() == m_value1;
+            { 
+                if (uint32 dbGuid = pCreature->GetDBTableGUIDLow())
+                    return (dbGuid == m_value1) || (dbGuid == m_value2) || (dbGuid == m_value3) || (dbGuid == m_value4);
+            }
             return false;
         }
     }
