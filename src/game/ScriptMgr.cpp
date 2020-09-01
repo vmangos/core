@@ -41,6 +41,7 @@ ScriptMapMap sSpellScripts;
 ScriptMapMap sCreatureSpellScripts;
 ScriptMapMap sGameObjectScripts;
 ScriptMapMap sEventScripts;
+ScriptMapMap sGenericScripts;
 ScriptMapMap sGossipScripts;
 ScriptMapMap sCreatureMovementScripts;
 ScriptMapMap sCreatureAIScripts;
@@ -1354,6 +1355,30 @@ void ScriptMgr::LoadSpellScripts()
     }
 }
 
+void ScriptMgr::LoadGenericScripts()
+{
+    LoadScripts(sGenericScripts, "generic_scripts");
+
+    std::set<uint32> genericIds;                            // Store possible event ids
+    CollectPossibleGenericIds(genericIds);
+
+    // Then check if all scripts are in above list of possible script entries.
+    for (const auto& itr : sGenericScripts)
+    {
+        auto const itr2 = genericIds.find(itr.first);
+        if (itr2 == genericIds.end())
+            sLog.outErrorDb("Table `generic_scripts` has script (Id: %u) not referenced from anywhere", itr.first);
+    }
+
+    // Check if any generic script ids are missing.
+    for (uint32 id : genericIds)
+    {
+        auto const itr = sGenericScripts.find(id);
+        if (itr == sGenericScripts.end())
+            sLog.outErrorDb("Table `generic_scripts` does not contain script (Id: %u) referenced from another script", id);
+    }
+}
+
 void ScriptMgr::LoadEventScripts()
 {
     LoadScripts(sEventScripts, "event_scripts");
@@ -1454,6 +1479,7 @@ void ScriptMgr::CheckAllScriptTexts()
     CheckScriptTexts(sCreatureSpellScripts);
     CheckScriptTexts(sGameObjectScripts);
     CheckScriptTexts(sEventScripts);
+    CheckScriptTexts(sGenericScripts);
     CheckScriptTexts(sGossipScripts);
     CheckScriptTexts(sCreatureMovementScripts);
     CheckScriptTexts(sCreatureAIScripts);
@@ -2211,9 +2237,96 @@ void ScriptMgr::LoadEscortData()
     }
 }
 
+void ScriptMgr::CollectPossibleGenericIds(std::set<uint32>& genericIds)
+{
+    char const* script_tables[10] =
+    {
+        "creature_ai_scripts",
+        "creature_movement_scripts",
+        "creature_spells_scripts",
+        "event_scripts",
+        "generic_scripts",
+        "gossip_scripts",
+        "gameobject_scripts",
+        "spell_scripts",
+        "quest_end_scripts",
+        "quest_start_scripts"
+    };
+    Field* fields;
+    for (const auto& script_table : script_tables)
+    {
+        // From SCRIPT_COMMAND_START_SCRIPT.
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command`=39", script_table));
+
+        if (result)
+        {
+            do
+            {
+                fields = result->Fetch();
+                uint32 script1 = fields[0].GetUInt32();
+                if (script1)
+                    genericIds.insert(script1);
+                uint32 script2 = fields[1].GetUInt32();
+                if (script2)
+                    genericIds.insert(script2);
+                uint32 script3 = fields[2].GetUInt32();
+                if (script3)
+                    genericIds.insert(script3);
+                uint32 script4 = fields[3].GetUInt32();
+                if (script4)
+                    genericIds.insert(script4);
+            } while (result->NextRow());
+        }
+
+        // From SCRIPT_COMMAND_TEMP_SUMMON_CREATURE.
+        result.reset(WorldDatabase.PQuery("SELECT `dataint2` FROM `%s` WHERE `command`=10 && `dataint2`!=0", script_table));
+
+        if (result)
+        {
+            do
+            {
+                fields = result->Fetch();
+                uint32 script1 = fields[0].GetUInt32();
+                if (script1)
+                    genericIds.insert(script1);
+            } while (result->NextRow());
+        }
+
+        // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL.
+        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command`=68 && `datalong`!=0", script_table));
+
+        if (result)
+        {
+            do
+            {
+                fields = result->Fetch();
+                uint32 script1 = fields[0].GetUInt32();
+                if (script1)
+                    genericIds.insert(script1);
+            } while (result->NextRow());
+        }
+
+        // From SCRIPT_COMMAND_START_MAP_EVENT, SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET and SCRIPT_COMMAND_EDIT_MAP_EVENT.
+        result.reset(WorldDatabase.PQuery("SELECT `dataint2`, `dataint4` FROM `%s` WHERE `command` IN (61, 63, 69)", script_table));
+
+        if (result)
+        {
+            do
+            {
+                fields = result->Fetch();
+                int32 script1 = fields[0].GetInt32();
+                if (script1 > 0)
+                    genericIds.insert(script1);
+                int32 script2 = fields[1].GetInt32();
+                if (script2 > 0)
+                    genericIds.insert(script2);
+            } while (result->NextRow());
+        }
+    }
+}
+
 void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
 {
-
     // Load all possible script entries from gameobjects.
     std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `data2` FROM `gameobject_template` WHERE `type`=10 && `data2` > 0"));
     Field* fields;
@@ -2313,90 +2426,6 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
                         eventIds.insert(spell->EffectMiscValue[j]);
                 }
             }
-        }
-    }
-    
-    // Load all possible script entries from SCRIPT_COMMAND_START_SCRIPT.
-    char const* script_tables[9] =
-    {
-        "creature_ai_scripts",
-        "creature_movement_scripts",
-        "creature_spells_scripts",
-        "event_scripts",
-        "gossip_scripts",
-        "gameobject_scripts",
-        "spell_scripts",
-        "quest_end_scripts",
-        "quest_start_scripts"
-    };
-    for (const auto& script_table : script_tables)
-    {
-        // From SCRIPT_COMMAND_START_SCRIPT.
-        result.reset(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command`=39", script_table));
-
-        if (result)
-        {
-            do
-            {
-                fields = result->Fetch();
-                uint32 event1 = fields[0].GetUInt32();
-                if (event1)
-                    eventIds.insert(event1);
-                uint32 event2 = fields[1].GetUInt32();
-                if (event2)
-                    eventIds.insert(event2);
-                uint32 event3 = fields[2].GetUInt32();
-                if (event3)
-                    eventIds.insert(event3);
-                uint32 event4 = fields[3].GetUInt32();
-                if (event4)
-                    eventIds.insert(event4);
-            } while (result->NextRow());
-        }
-
-        // From SCRIPT_COMMAND_TEMP_SUMMON_CREATURE.
-        result.reset(WorldDatabase.PQuery("SELECT `dataint2` FROM `%s` WHERE `command`=10 && `dataint2`!=0", script_table));
-
-        if (result)
-        {
-            do
-            {
-                fields = result->Fetch();
-                uint32 event1 = fields[0].GetUInt32();
-                if (event1)
-                    eventIds.insert(event1);
-            } while (result->NextRow());
-        }
-
-        // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL.
-        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command`=68", script_table));
-
-        if (result)
-        {
-            do
-            {
-                fields = result->Fetch();
-                uint32 event1 = fields[0].GetUInt32();
-                if (event1)
-                    eventIds.insert(event1);
-            } while (result->NextRow());
-        }
-
-        // From SCRIPT_COMMAND_START_MAP_EVENT, SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET and SCRIPT_COMMAND_EDIT_MAP_EVENT.
-        result.reset(WorldDatabase.PQuery("SELECT `dataint2`, `dataint4` FROM `%s` WHERE `command` IN (61, 63, 69)", script_table));
-
-        if (result)
-        {
-            do
-            {
-                fields = result->Fetch();
-                uint32 event1 = fields[0].GetUInt32();
-                if (event1)
-                    eventIds.insert(event1);
-                uint32 event2 = fields[1].GetUInt32();
-                if (event2)
-                    eventIds.insert(event2);
-            } while (result->NextRow());
         }
     }
 }

@@ -737,6 +737,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { "gameobject_battleground",      SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadBattleEventCommand,             "", nullptr },
         { "gossip_menu",                  SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadGossipMenuCommand,              "", nullptr },
         { "gossip_menu_option",           SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadGossipMenuOptionCommand,        "", nullptr },
+        { "generic_scripts",              SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadGenericScriptsCommand,          "", nullptr },
         { "gossip_scripts",               SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadGossipScriptsCommand,           "", nullptr },
         { "item_enchantment_template",    SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadItemEnchantementsCommand,       "", nullptr },
         { "item_loot_template",           SEC_DEVELOPPER,    true,  &ChatHandler::HandleReloadLootTemplatesItemCommand,       "", nullptr },

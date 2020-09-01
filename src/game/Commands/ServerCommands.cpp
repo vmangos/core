@@ -966,6 +966,7 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
     sLog.outString("Re-Loading Scripts...");
     HandleReloadGameObjectScriptsCommand((char*)"a");
     HandleReloadGossipScriptsCommand((char*)"a");
+    HandleReloadGenericScriptsCommand((char*)"a");
     HandleReloadEventScriptsCommand((char*)"a");
     HandleReloadQuestEndScriptsCommand((char*)"a");
     HandleReloadQuestStartScriptsCommand((char*)"a");
@@ -1480,6 +1481,26 @@ bool ChatHandler::HandleReloadGameObjectScriptsCommand(char* args)
 
     if (*args != 'a')
         SendSysMessage("DB table `gameobject_scripts` reloaded.");
+
+    return true;
+}
+
+bool ChatHandler::HandleReloadGenericScriptsCommand(char* args)
+{
+    if (sScriptMgr.IsScriptScheduled())
+    {
+        SendSysMessage("DB scripts used currently, please attempt reload later.");
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (*args != 'a')
+        sLog.outString("Re-Loading Scripts from `generic_scripts`...");
+
+    sScriptMgr.LoadGenericScripts();
+
+    if (*args != 'a')
+        SendSysMessage("DB table `generic_scripts` reloaded.");
 
     return true;
 }

@@ -1072,9 +1072,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
     m_bEnded = true;
 
     if (bSuccess && m_uiSuccessScript)
-        m_Map.ScriptsStart(sEventScripts, m_uiSuccessScript, GetSourceObject(), GetTargetObject());
+        m_Map.ScriptsStart(sGenericScripts, m_uiSuccessScript, GetSourceObject(), GetTargetObject());
     else if (!bSuccess && m_uiFailureScript)
-        m_Map.ScriptsStart(sEventScripts, m_uiFailureScript, GetSourceObject(), GetTargetObject());
+        m_Map.ScriptsStart(sGenericScripts, m_uiFailureScript, GetSourceObject(), GetTargetObject());
 
     for (const auto& target : m_vTargets)
     {
@@ -1084,9 +1084,9 @@ void ScriptedEvent::EndEvent(bool bSuccess)
             continue;
 
         if (bSuccess && target.uiSuccessScript)
-            m_Map.ScriptsStart(sEventScripts, target.uiSuccessScript, pObject, GetTargetObject());
+            m_Map.ScriptsStart(sGenericScripts, target.uiSuccessScript, pObject, GetTargetObject());
         else if (!bSuccess && target.uiFailureScript)
-            m_Map.ScriptsStart(sEventScripts, target.uiFailureScript, pObject, GetTargetObject());
+            m_Map.ScriptsStart(sGenericScripts, target.uiFailureScript, pObject, GetTargetObject());
     }
 }
 
