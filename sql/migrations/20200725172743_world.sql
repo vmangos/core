@@ -116,7 +116,7 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 (8679, 4361, 1, 10800);
 
 -- Cowardly Crosby - Admirals Hat
-UPDATE `npc_vendor` SET `maxcount` = 1 WHERE `entry` = 2672 AND `item` = 10318;
+UPDATE `npc_vendor` SET `maxcount` = 1, `incrtime`=9000 WHERE `entry` = 2672 AND `item` = 10318;
 
 -- Haren Kanmae - Dense Shortbow
 INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
