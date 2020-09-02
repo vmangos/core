@@ -582,7 +582,7 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand creatureSpawnsSetCommandTable[] =
     {
-        { "entry",          SEC_DEVELOPPER,     false, &ChatHandler::HandleNpcSpawnSetEntryCommand, "", nullptr },
+        { "entry",          SEC_DEVELOPPER,     false, &ChatHandler::HandleNpcSpawnSetEntryCommand,    "", nullptr },
         { "displayid",      SEC_DEVELOPPER,     false, &ChatHandler::HandleNpcSpawnSetDisplayIdCommand,"", nullptr },
         { "movetype",       SEC_DEVELOPPER,     false, &ChatHandler::HandleNpcSpawnSetMoveTypeCommand, "", nullptr },
         { "wanderdistance", SEC_DEVELOPPER,     false, &ChatHandler::HandleNpcSpawnWanderDistCommand,  "", nullptr },

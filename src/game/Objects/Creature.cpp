@@ -1451,7 +1451,7 @@ void Creature::SaveToDB(uint32 mapid)
             displayId = 0;
     }
 
-    // data->guid = guid don't must be update at save
+    // data->guid = guid must not be updated at save
     data.creature_id[0] = GetEntry();
     data.position.mapId = mapid;
     data.display_id = displayId;
@@ -1462,9 +1462,7 @@ void Creature::SaveToDB(uint32 mapid)
     data.position.o = GetOrientation();
     data.spawntimesecsmin = m_respawnDelay;
     data.spawntimesecsmax = m_respawnDelay;
-    // prevent add data integrity problems
     data.wander_distance = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0 : m_wanderDistance;;
-    // prevent add data integrity problems
     data.movement_type = !m_wanderDistance && GetDefaultMovementType() == RANDOM_MOTION_TYPE
                         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
     data.spawn_flags = m_isActiveObject ? SPAWN_FLAG_ACTIVE : 0;
@@ -1474,10 +1472,10 @@ void Creature::SaveToDB(uint32 mapid)
     // updated in DB
     WorldDatabase.BeginTransaction();
 
-    WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", GetGUIDLow());
+    WorldDatabase.PExecuteLog("DELETE FROM `creature` WHERE `guid`=%u", GetGUIDLow());
 
     std::ostringstream ss;
-    ss << "INSERT INTO creature VALUES ("
+    ss << "INSERT INTO `creature` VALUES ("
        << GetGUIDLow() << ","
        << data.creature_id[0] << ","
        << data.creature_id[1] << ","
@@ -1495,7 +1493,7 @@ void Creature::SaveToDB(uint32 mapid)
        << wander_distance << ","
        << data.health_percent << ","
        << data.mana_percent << ","
-       << data.movement_type << ","
+       << uint32(data.movement_type) << ","
        << data.spawn_flags << ","
        << m_visibilityModifier << ","
        << "0,"                                             // patch_min
