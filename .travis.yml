@@ -57,7 +57,9 @@ matrix:
         - /c/Program\ Files\ \(x86\)/Microsoft\ Visual\ Studio/2017/BuildTools/MSBuild/15.0/Bin/MSBuild.exe "MaNGOS.sln" //p:Platform=x64 //p:Configuration=Release //m:2
 
 scripts: |-
-  mkdir build 
+  mkdir build
+  mkdir _install
   cd build 
-  cmake -DDEBUG=0 -DUSE_LIBCURL=1 .. 
+  cmake -DCMAKE_INSTALL_PREFIX=../_install -DDEBUG=0 -DUSE_LIBCURL=1 .. 
   make -j2
+  make install 
