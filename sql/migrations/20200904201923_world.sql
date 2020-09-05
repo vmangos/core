@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20200904201923');
 
 
 -- NPC spawn pre naxxramas entrance
-INSERT INTO `creature` VALUES (151317, 8555, 0, 0, 0, 0, 0, 0, 3134.28, -3728.23, 135.685, 4.45059, 345, 345, 0, 100, 0, 0, 0, 0, 0, 10);
+INSERT INTO `creature` VALUES (151317, 8555, 0, 0, 0, 0, 0, 0, 3134.28, -3728.23, 135.685, 4.45059, 345, 345, 0, 100, 0, 0, 0, 0, 0, 9);
 
 
 -- End of migration.
