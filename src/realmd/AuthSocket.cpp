@@ -306,6 +306,10 @@ void AuthSocket::SendProof(Sha1Hash sha)
 {
     switch(_build)
     {
+        case 4222:                                          // 1.2.4
+        case 4297:                                          // 1.3.1
+        case 4375:                                          // 1.4.2
+        case 4449:                                          // 1.5.1
         case 4544:                                          // 1.6.1
         case 4695:                                          // 1.7.1
         case 4878:                                          // 1.8.4
