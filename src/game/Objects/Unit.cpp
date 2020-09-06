@@ -2569,6 +2569,9 @@ float Unit::MeleeMissChanceCalc(Unit const* pVictim, WeaponAttackType attType) c
         }
         if (!isNormal && !m_currentSpells[CURRENT_MELEE_SPELL])
             missChance += 19.0f;
+
+        if (IsNextSwingSpellCasted())
+            missChance -= 19.0f;
     }
 
     int32 skillDiff = int32(GetWeaponSkillValue(attType, pVictim)) - int32(pVictim->GetDefenseSkillValue(this));
