@@ -30,6 +30,9 @@ bool GossipHello_TeleportNPC(Player *player, Creature *_Creature)
     // HORDE
     if (player->GetTeam() == HORDE)
     {
+		char *tmp = new char[100];
+		sprintf(tmp, "|cFF0041FF我的账号积分：[%d]点.|r", player->Getjifen());
+		player->ADD_GOSSIP_ITEM(4, tmp, GOSSIP_SENDER_MAIN, 888);
 		player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
 		player->ADD_GOSSIP_ITEM(5, "〖阵营城市〗", GOSSIP_SENDER_MAIN, 1);
 		player->ADD_GOSSIP_ITEM(5, "〖新人副本〗", GOSSIP_SENDER_MAIN, 5);
@@ -44,6 +47,9 @@ bool GossipHello_TeleportNPC(Player *player, Creature *_Creature)
     // ALLIANCE
     else
     {
+		char *tmp = new char[100];
+		sprintf(tmp, "|cFF0041FF我的账号积分：[%d]点.|r", player->Getjifen());
+		player->ADD_GOSSIP_ITEM(4, tmp, GOSSIP_SENDER_MAIN, 888);
 		player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
 		player->ADD_GOSSIP_ITEM(5, "〖阵营城市〗", GOSSIP_SENDER_MAIN, 2);
 		player->ADD_GOSSIP_ITEM(5, "〖新人副本〗", GOSSIP_SENDER_MAIN, 5);
@@ -528,11 +534,18 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
 			player->CLOSE_GOSSIP_MENU();
 			player->TeleportTo(1, 4603.94f, -3879.25f, 944.18f, 0.0f);
 			break;
+		case 888: // 关闭积分菜单
+			player->CLOSE_GOSSIP_MENU();
+			ChatHandler(player->GetSession()).PSendSysMessage("我们会再见的朋友！");
+			break;
 
         case 100: // Main Menu
             // HORDE
             if (player->GetTeam() == HORDE)
             {
+				char *tmp = new char[100];
+				sprintf(tmp, "|cFF0041FF我的账号积分：[%d]点.|r", player->Getjifen());
+				player->ADD_GOSSIP_ITEM(4, tmp, GOSSIP_SENDER_MAIN, 888);
 				player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
 				player->ADD_GOSSIP_ITEM(5, "〖阵营城市〗", GOSSIP_SENDER_MAIN, 1);
 				player->ADD_GOSSIP_ITEM(5, "〖新人副本〗", GOSSIP_SENDER_MAIN, 5);
@@ -547,6 +560,9 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
             // ALLIANCE
             else
             {
+				char *tmp = new char[100];
+				sprintf(tmp, "|cFF0041FF我的账号积分：[%d]点.|r", player->Getjifen());
+				player->ADD_GOSSIP_ITEM(4, tmp, GOSSIP_SENDER_MAIN, 888);
 				player->ADD_GOSSIP_ITEM(5, "★世界主城★", GOSSIP_SENDER_MAIN, 628);
 				player->ADD_GOSSIP_ITEM(5, "〖阵营城市〗", GOSSIP_SENDER_MAIN, 2);
 				player->ADD_GOSSIP_ITEM(5, "〖新人副本〗", GOSSIP_SENDER_MAIN, 5);
@@ -1167,12 +1183,12 @@ bool OnGossipHello_RewardShopNPC(Player* player, Creature* creature)
 	if (player->IsInCombat())
 		return false;
 
-	std::string Text = "输入电子兑换券并点“接受”";
-	player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_DOT, ">>兑换我的电子兑换券", GOSSIP_SENDER_MAIN, 1, Text, true);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, ">>我如何获得电子兑换券？", GOSSIP_SENDER_MAIN, 2);
-	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "注：兑换券是奖励给捐赠服务器租赁的玩家的礼券。\n（礼券可兑换+150%速度坐骑、职业增益被动技能、属性增益包包等物品，详情请咨询游戏管理员）", GOSSIP_SENDER_MAIN, 3);
+	std::string Text = "输入电子卡密并点“接受”";
+	player->ADD_GOSSIP_ITEM_EXTENDED(GOSSIP_ICON_DOT, ">>我要使用电子卡密兑换奖励", GOSSIP_SENDER_MAIN, 1, Text, true);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, ">>我如何获得电子卡密？", GOSSIP_SENDER_MAIN, 2);
+	player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "关闭...", GOSSIP_SENDER_MAIN, 3);
 	if (player->IsGameMaster())
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "[GM]我想生成一个电子兑换券", GOSSIP_SENDER_MAIN, 4);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "[GM]我想生成一个电子卡密", GOSSIP_SENDER_MAIN, 4);
 
 	player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
 	return true;
@@ -1181,7 +1197,7 @@ bool OnGossipHello_RewardShopNPC(Player* player, Creature* creature)
 bool OnGossipSelect_RewardShopNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
 	player->PlayerTalkClass->ClearMenus();
-	std::string info("您可以通过访问淘虾网站（http://ka.taoxia.xyz）获取电子兑换券。");
+	std::string info("您可以通过访问服务器网站或参与相关活动获取电子卡密。");
 	uint32 rnd1 = urand(10000, 90000);
 	uint32 rnd2 = urand(10000, 90000);
 	uint32 rnd3 = urand(10000, 90000);
@@ -1203,9 +1219,9 @@ bool OnGossipSelect_RewardShopNPC(Player* player, Creature* creature, uint32 sen
 		break;
 	case 4:
 		player->PlayerTalkClass->ClearMenus();
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个名称更改电子兑换券。", GOSSIP_SENDER_MAIN, 6);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个派系变更电子兑换券。", GOSSIP_SENDER_MAIN, 7);
-		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个种族变更电子兑换券。", GOSSIP_SENDER_MAIN, 8);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个名称更改电子卡密。", GOSSIP_SENDER_MAIN, 6);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个派系变更电子卡密。", GOSSIP_SENDER_MAIN, 7);
+		player->ADD_GOSSIP_ITEM(GOSSIP_ICON_DOT, "我想生成一个种族变更电子卡密。", GOSSIP_SENDER_MAIN, 8);
 		player->SEND_GOSSIP_MENU(player->GetGossipTextId(creature), creature->GetGUID());
 		break;
 	case 6:

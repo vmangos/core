@@ -1191,6 +1191,52 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
         return;
     }
 
+    // transmogrification stone
+    if (gift->GetEntry() == 40009)
+    {
+        // only ammor and weapon can be transmoged
+        if (item->GetProto()->Class != 2 && item->GetProto()->Class != 4)
+            return;
+
+        // skip Miscellaneous / Libram / Idol / Totem
+        if (item->GetProto()->Class == 4 &&
+            (item->GetProto()->SubClass == 0
+                || item->GetProto()->SubClass == 7
+                || item->GetProto()->SubClass == 8
+                || item->GetProto()->SubClass == 9))
+            return;
+
+        // find the slot of the item
+        uint8 slots[4];
+        _player->ViableEquipSlots(item->GetProto(), &slots[0], true);
+        uint8 slot = slots[0];
+
+        // skip empty slot
+        if (!_player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
+            if (slot == EQUIPMENT_SLOT_MAINHAND && _player->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND))
+                // when mainhand is empty, use offhand
+                slot = EQUIPMENT_SLOT_OFFHAND;
+            else
+                return;
+
+        // save to db
+        uint32 guid = item->GetOwnerGuid().GetCounter();
+        CharacterDatabase.BeginTransaction();
+        // remove old transmog
+        CharacterDatabase.PExecute("DELETE FROM character_transmog WHERE guid = %u AND slot = %u", guid, slot);
+        // insert new transmog
+        CharacterDatabase.PExecute("INSERT INTO character_transmog VALUES ('%u', '%u', '%u', '%u')", guid, slot, item->GetGUIDLow(), 0);
+        CharacterDatabase.CommitTransaction();
+
+        // make transmogrification effect
+        _player->SetUInt32Value(PLAYER_VISIBLE_ITEM_1_0 + (slot * MAX_VISIBLE_ITEM_OFFSET), item->GetEntry());
+
+        // remove the transmog stone
+        uint32 count = 1;
+        _player->DestroyItemCount(gift, count, true);
+        return;
+    }
+
     if (item->GetGuidValue(ITEM_FIELD_GIFTCREATOR))         // HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED);
     {
         _player->SendEquipError(EQUIP_ERR_WRAPPED_CANT_BE_WRAPPED, item, nullptr);
