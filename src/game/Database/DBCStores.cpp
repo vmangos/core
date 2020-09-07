@@ -30,6 +30,8 @@
 #include "ObjectMgr.h"
 
 #include <map>
+#include <vector>
+#include <regex>
 
 struct WMOAreaTableTripple
 {
@@ -73,6 +75,13 @@ DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
 DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
 DBCStorage <LockEntry> sLockStore(LockEntryfmt);
+DBCStorage<NamesProfanityEntry> sNamesProfanityStore(NamesProfanityEntryfmt);
+DBCStorage<NamesReservedEntry> sNamesReservedStore(NamesReservedEntryfmt);
+static std::wstring const emacsStartOfLineToken = L"\\<"; // equivalent to ^
+static std::wstring const emacsEndOfLineToken = L"\\>";   // equivalent to $
+typedef std::vector<std::wregex> NameValidationRegexContainer;
+NameValidationRegexContainer NamesProfaneValidators;
+NameValidationRegexContainer NamesReservedValidators;
 DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
 DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
 DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
@@ -176,7 +185,7 @@ void LoadDBCStores(std::string const& dataPath)
 {
     std::string dbcPath = dataPath + "dbc/";
 
-    uint32 const DBCFilesCount = 41;
+    uint32 const DBCFilesCount = 43;
 
     BarGoLink bar(DBCFilesCount);
 
@@ -222,6 +231,50 @@ void LoadDBCStores(std::string const& dataPath)
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemRandomPropertiesStore, dbcPath, "ItemRandomProperties.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemSetStore,             dbcPath, "ItemSet.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sLockStore,                dbcPath, "Lock.dbc");
+
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sNamesProfanityStore,      dbcPath, "NamesProfanity.dbc");
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sNamesReservedStore,       dbcPath, "NamesReserved.dbc");
+    for (uint32 i = 0; i < sNamesProfanityStore.GetNumRows(); ++i)
+    {
+        NamesProfanityEntry const* namesProfanity = sNamesProfanityStore.LookupEntry(i);
+        if (!namesProfanity)
+            continue;
+
+        std::wstring wname;
+        ASSERT(Utf8toWStr(namesProfanity->Name, wname));
+
+        // the dbc uses emacs regex syntax
+        auto index = wname.find(emacsStartOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsStartOfLineToken.length(), L"^");
+
+        index = wname.find(emacsEndOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsEndOfLineToken.length(), L"$");
+
+        NamesProfaneValidators.emplace_back(wname, std::regex::icase | std::regex::optimize);
+    }
+    for (uint32 i = 0; i < sNamesReservedStore.GetNumRows(); ++i)
+    {
+        NamesReservedEntry const* namesReserved = sNamesReservedStore.LookupEntry(i);
+        if (!namesReserved)
+            continue;
+
+        std::wstring wname;
+        ASSERT(Utf8toWStr(namesReserved->Name, wname));
+
+        // the dbc uses emacs regex syntax
+        auto index = wname.find(emacsStartOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsStartOfLineToken.length(), L"^");
+
+        index = wname.find(emacsEndOfLineToken, 0);
+        if (index != std::wstring::npos)
+            wname.replace(index, emacsEndOfLineToken.length(), L"$");
+
+        NamesReservedValidators.emplace_back(wname, std::regex::icase | std::regex::optimize);
+    }
+
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sQuestSortStore,           dbcPath, "QuestSort.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillLineStore,           dbcPath, "SkillLine.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillRaceClassInfoStore,  dbcPath, "SkillRaceClassInfo.dbc");
@@ -587,4 +640,17 @@ char const* GetUnitClassName(uint8 class_, uint8 locale)
 {
     ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(class_);
     return classEntry ? classEntry->name[locale] : nullptr;
+}
+
+uint8 ValidateName(std::wstring const& name)
+{
+    for (std::wregex const& regex : NamesProfaneValidators)
+        if (std::regex_search(name, regex))
+            return CHAR_NAME_PROFANE;
+
+    for (std::wregex const& regex : NamesReservedValidators)
+        if (std::regex_search(name, regex))
+            return CHAR_NAME_RESERVED;       
+
+    return CHAR_NAME_SUCCESS;
 }

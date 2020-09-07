@@ -568,6 +568,7 @@ class Unit : public WorldObject
         virtual UnitDismountResult Unmount(bool from_aura = false);
         ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(GetByteValue(UNIT_FIELD_BYTES_1, 2)); }
         void SetShapeshiftForm(ShapeshiftForm form) { SetByteValue(UNIT_FIELD_BYTES_1, 2, form); }
+        bool IsShapeShifted() const; // mirrors clientside logic, moonkin form not counted as shapeshift
         bool IsInFeralForm() const
         {
             ShapeshiftForm form = GetShapeshiftForm();

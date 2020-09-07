@@ -865,8 +865,17 @@ bool Player::StoreNewItemInBestSlots(uint32 titem_id, uint32 titem_amount, uint3
             }
             if (uint32 randomPropertyId = Item::GenerateItemRandomPropertyId(titem_id))
                 pItem->SetItemRandomProperties(randomPropertyId);
+
+            AutoUnequipOffhandIfNeed();
+
+            if ((titem_amount > 1) && (titem_amount <= pItem->GetProto()->GetMaxStackSize()))
+            {
+                pItem->SetCount(titem_amount);
+                titem_amount = 0;
+                break;
+            }
         }
-        AutoUnequipOffhandIfNeed();
+        
         --titem_amount;
     }
 
@@ -10313,16 +10322,6 @@ InventoryResult Player::CanUseAmmo(uint32 item) const
         return EQUIP_ERR_OK;
     }
     return EQUIP_ERR_ITEM_NOT_FOUND;
-}
-
-bool Player::IsInDisallowedItemUseForm() const
-{
-    ShapeshiftForm const form = GetShapeshiftForm();
-    if (form == FORM_NONE)
-        return false;
-
-    SpellShapeshiftFormEntry const* ssEntry = sSpellShapeshiftFormStore.LookupEntry(form);
-    return ssEntry && !(ssEntry->flags1 & SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY);
 }
 
 void Player::SetAmmo(uint32 item)
