@@ -1717,12 +1717,11 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 if (!m_casterUnit)
                     return;
 
-                float cost = m_currentBasePoints[EFFECT_INDEX_0];
-
+                int32 dmg = m_casterUnit->CalculateSpellDamage(m_casterUnit, m_spellInfo, eff_idx, &m_currentBasePoints[EFFECT_INDEX_0]);
                 if (Player* modOwner = m_casterUnit->GetSpellModOwner())
-                    modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, cost, this);
+                    modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, dmg, this);
 
-                int32 dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, eff_idx, uint32(cost > 0 ? cost : 0), SPELL_DIRECT_DAMAGE);
+                dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, eff_idx, uint32(dmg > 0 ? dmg : 0), SPELL_DIRECT_DAMAGE);
                 dmg = m_casterUnit->SpellDamageBonusTaken(m_casterUnit, m_spellInfo, eff_idx, dmg, SPELL_DIRECT_DAMAGE);
 
                 if (int32(m_casterUnit->GetHealth()) > dmg)
@@ -1741,11 +1740,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
 
                     m_casterUnit->CastCustomSpell(m_casterUnit, 31818, &mana, nullptr, nullptr, true, nullptr);
-                    // Mana Feed
-                    int32 manaFeedVal = m_casterUnit->CalculateSpellDamage(m_casterUnit, m_spellInfo, EFFECT_INDEX_1);
-                    manaFeedVal = manaFeedVal * mana / 100;
-                    if (manaFeedVal > 0)
-                        m_casterUnit->CastCustomSpell(m_casterUnit, 32553, &manaFeedVal, nullptr, nullptr, true, nullptr);
                 }
                 else
                     SendCastResult(SPELL_FAILED_FIZZLE);
@@ -5248,20 +5242,23 @@ void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
     unitTarget->InterruptSpellsCastedOnMe(true);
     unitTarget->CombatStop();
 
-    HostileReference* pReference = unitTarget->GetHostileRefManager().getFirst();
-
-    while (pReference)
+    // Flask of Petrification does not cause mobs to stop attacking.
+    if (!m_spellInfo->HasAttribute(SPELL_ATTR_EX2_FOOD_BUFF))
     {
-        HostileReference* pNextRef = pReference->next();
-        if (!guard_check || !pReference->getSource()->getOwner()->IsContestedGuard())
+        HostileReference* pReference = unitTarget->GetHostileRefManager().getFirst();
+        while (pReference)
         {
-            pReference->removeReference();
-            delete pReference;
-        }
-        else
-            no_guards = false;
+            HostileReference* pNextRef = pReference->next();
+            if (!guard_check || !pReference->getSource()->getOwner()->IsContestedGuard())
+            {
+                pReference->removeReference();
+                delete pReference;
+            }
+            else
+                no_guards = false;
 
-        pReference = pNextRef;
+            pReference = pNextRef;
+        }
     }
     
     unitTarget->m_lastSanctuaryTime = WorldTimer::getMSTime();

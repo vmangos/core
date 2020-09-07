@@ -23,87 +23,12 @@ EndScriptData
 */
 
 /* ContentData
-npc_kanati
 npc_lakota_windsong
 npc_paoka_swiftmountain
 npc_plucky_johnson
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-# npc_kanati
-######*/
-
-enum
-{
-    SAY_KAN_START              = -1000410,
-
-    QUEST_PROTECT_KANATI        = 4966,
-    NPC_GALAK_ASS               = 10720
-};
-
-float const m_afGalakLoc[] = { -4867.387695f, -1357.353760f, -48.226f};
-
-struct npc_kanatiAI : public npc_escortAI
-{
-    npc_kanatiAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override { }
-
-    void WaypointReached(uint32 uiPointId) override
-    {
-        switch (uiPointId)
-        {
-            case 0:
-                DoScriptText(SAY_KAN_START, m_creature);
-                DoSpawnGalak();
-                break;
-            case 1:
-                if (Player* pPlayer = GetPlayerForEscort())
-                    pPlayer->GroupEventHappens(QUEST_PROTECT_KANATI, m_creature);
-                break;
-        }
-    }
-
-    void DoSpawnGalak()
-    {
-        for (int i = 0; i < 3; ++i)
-            m_creature->SummonCreature(NPC_GALAK_ASS,
-                                       m_afGalakLoc[0], m_afGalakLoc[1], m_afGalakLoc[2], 0.0f,
-                                       TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
-    }
-
-    void JustSummoned(Creature* pSummoned) override
-    {
-        pSummoned->AI()->AttackStart(m_creature);
-    }
-
-    void JustDied(Unit* pKiller) override
-    {
-        // set quest to failed
-        if (Player* pPlayer = GetPlayerForEscort())
-            pPlayer->FailQuest(QUEST_PROTECT_KANATI);
-    }
-};
-
-CreatureAI* GetAI_npc_kanati(Creature* pCreature)
-{
-    return new npc_kanatiAI(pCreature);
-}
-
-bool QuestAccept_npc_kanati(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_PROTECT_KANATI)
-    {
-        if (npc_kanatiAI* pEscortAI = dynamic_cast<npc_kanatiAI*>(pCreature->AI()))
-            pEscortAI->Start(false, pPlayer->GetGUID(), pQuest, true);
-    }
-    return true;
-}
 
 /*######
 # npc_lakota_windsong
@@ -444,7 +369,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
 {
     explicit npc_grenka_bloodscreechAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
         m_creature->SetVisibility(VISIBILITY_OFF);
 
         m_uiWave = 0;
@@ -505,7 +430,7 @@ struct npc_grenka_bloodscreechAI : ScriptedAI
             case 2:
                 {
                     DoSummon(3);
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_PASSIVE);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED | UNIT_FLAG_IMMUNE_TO_NPC);
                     m_creature->SetVisibility(VISIBILITY_ON);
                     if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_PlayerGuid))
                     {
@@ -563,12 +488,6 @@ bool ProcessEventId_event_test_of_endurance(uint32 eventId, Object* pSource, Obj
 void AddSC_thousand_needles()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_kanati";
-    newscript->GetAI = &GetAI_npc_kanati;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_kanati;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_lakota_windsong";

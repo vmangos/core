@@ -43,6 +43,7 @@ public:
     Player* SelectResurrectionTarget() const;
     Player* SelectShieldTarget() const;
     bool DrinkAndEat();
+    bool ShouldAutoRevive() const;
     void RunAwayFromTarget(Unit* pTarget);
     bool EnterCombatDruidForm();
 

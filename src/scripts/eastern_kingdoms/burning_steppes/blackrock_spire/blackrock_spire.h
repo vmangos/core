@@ -16,8 +16,8 @@ enum
     TYPE_FLAMEWREATH            = 2,                        // Only summon once per instance
     TYPE_STADIUM                = 3,
     TYPE_VALTHALAK              = 4,                        // Only summon once per instance
-    TYPE_EVENT_DOOR_UBRS        = 5,                        // Pour Event Porte de UBRS
-    TYPE_SOLAKAR                = 6,                        // Pour Event Rookery
+    TYPE_EVENT_DOOR_UBRS        = 5,                        // UBRS door event
+    TYPE_SOLAKAR                = 6,                        // Rookery event
     INSTANCE_BRS_MAX_ENCOUNTER  = 7,
 
     NPC_SCARSHIELD_INFILTRATOR  = 10299,
@@ -63,8 +63,8 @@ enum
     GO_ROOKERY_EGG              = 175124,
     GO_FATHER_FLAME             = 175245,
 
-    // Pour Event Porte de UBRS
-    GO_DOOR_URBS                = 170556,
+    // UBRS door event
+    GO_DOOR_URBS                = 164725,
     GO_BRAZIER01                = 175528,
     GO_BRAZIER02                = 175529,
     GO_BRAZIER03                = 175530,
@@ -72,7 +72,7 @@ enum
     GO_BRAZIER05                = 175532,
     GO_BRAZIER06                = 175533,
 
-    // Pour Event Emberseer
+    // Emberseer event
     GO_EMBERSEER_RUNE01         = 175187,
     GO_EMBERSEER_RUNE02         = 175267,
     GO_EMBERSEER_RUNE03         = 175268,

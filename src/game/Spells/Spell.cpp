@@ -6134,6 +6134,19 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!m_targets.getUnitTarget() || m_caster->IsFriendlyTo(m_targets.getUnitTarget()))
                         return SPELL_FAILED_BAD_TARGETS;
                 }
+                else if (m_spellInfo->IsFitToFamilyMask<CF_WARLOCK_LIFE_TAP>() && m_casterUnit)
+                {
+                    float cost = m_currentBasePoints[EFFECT_INDEX_0];
+
+                    if (Player* modOwner = m_casterUnit->GetSpellModOwner())
+                        modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_COST, cost, this);
+
+                    int32 dmg = m_casterUnit->SpellDamageBonusDone(m_casterUnit, m_spellInfo, SpellEffectIndex(i), uint32(cost > 0 ? cost : 0), SPELL_DIRECT_DAMAGE);
+                    dmg = m_casterUnit->SpellDamageBonusTaken(m_casterUnit, m_spellInfo, SpellEffectIndex(i), dmg, SPELL_DIRECT_DAMAGE);
+
+                    if (int32(m_casterUnit->GetHealth()) <= dmg)
+                        return SPELL_FAILED_FIZZLE;
+                }
                 break;
             }
             case SPELL_EFFECT_SCHOOL_DAMAGE:
@@ -6932,6 +6945,16 @@ SpellCastResult Spell::CheckCast(bool strict)
                     !m_caster->IsValidAttackTarget(m_targets.getUnitTarget()) &&
                     !m_spellInfo->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_MIND_VISION>())   // exception for mind vision
                     return SPELL_FAILED_BAD_TARGETS;
+                break;
+            }
+            case SPELL_AURA_WATER_WALK:
+            {
+                if (Unit* pTarget = m_targets.getUnitTarget())
+                {
+                    // Player is not allowed to cast water walk on shapeshifted / mounted target
+                    if (pTarget->IsShapeShifted() || pTarget->IsMounted())
+                        return SPELL_FAILED_BAD_TARGETS;
+                }
                 break;
             }
             default:
