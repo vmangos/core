@@ -916,6 +916,50 @@ Item* Player::StoreNewItemInInventorySlot(uint32 itemEntry, uint32 amount)
     return nullptr;
 }
 
+void Player::SatisfyItemRequirements(ItemPrototype const* pItem)
+{
+    if (GetLevel() < pItem->RequiredLevel)
+    {
+        GiveLevel(pItem->RequiredLevel);
+        InitTalentForLevel();
+        SetUInt32Value(PLAYER_XP, 0);
+    }
+
+    // Set required honor rank
+    auto playerRank = (sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_EQUIP_REQUIREMENTS) && sWorld.GetWowPatch() < WOW_PATCH_106) ? m_honorMgr.GetRank().rank : m_honorMgr.GetHighestRank().rank;
+    if (playerRank < (uint8)pItem->RequiredHonorRank)
+    {
+        HonorRankInfo rank;
+        rank.rank = pItem->RequiredHonorRank;
+        m_honorMgr.CalculateRankInfo(rank);
+        m_honorMgr.SetHighestRank(rank);
+        m_honorMgr.SetRank(rank);
+    }
+
+    // Set required reputation
+    if (pItem->RequiredReputationFaction && pItem->RequiredReputationRank)
+        if (FactionEntry const* pFaction = sObjectMgr.GetFactionEntry(pItem->RequiredReputationFaction))
+            if (GetReputationMgr().GetRank(pFaction) < pItem->RequiredReputationRank)
+                GetReputationMgr().SetReputation(pFaction, GetReputationMgr().GetRepPointsToRank(ReputationRank(pItem->RequiredReputationRank)));
+
+    // Learn required spell
+    if (pItem->RequiredSpell && !HasSpell(pItem->RequiredSpell))
+        LearnSpell(pItem->RequiredSpell, false, false);
+
+    // Learn required profession
+    if (pItem->RequiredSkill && (!HasSkill(pItem->RequiredSkill) || (GetSkill(pItem->RequiredSkill, false, false) <  pItem->RequiredSkillRank)))
+        SetSkill(pItem->RequiredSkill, pItem->RequiredSkillRank, 300);
+
+    // Learn Dual Wield Specialization
+    if (pItem->InventoryType == INVTYPE_WEAPONOFFHAND && !HasSpell(674))
+        LearnSpell(674, false, false);
+
+    // Learn required proficiency
+    if (uint32 proficiencySpellId = pItem->GetProficiencySpell())
+        if (!HasSpell(proficiencySpellId))
+            LearnSpell(proficiencySpellId, false, false);
+}
+
 void Player::SendMirrorTimer(MirrorTimerType Type, uint32 MaxValue, uint32 CurrentValue, int32 Regen)
 {
     if (int(MaxValue) == DISABLED_MIRROR_TIMER)
